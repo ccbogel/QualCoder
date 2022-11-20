@@ -50,17 +50,194 @@ def exception_handler(exception_type, value, tb_obj):
     mb.setText(text_)
     mb.exec()
 
-def format_ris(ris_list):
-    """ Format items in list for display.
-    TY = EJOUR,JOUR
-        title
-        authors
-        journal name, year, date, volume, issue
-        ?doi ? abstract
-     """
+
+class Ris:
+    """ Load ris list of dictionaries.
+        Format RIS to short display.
+        References in RIS can be poorly created often due to how the researcher created them. """
+
+    app = None
+    refs = []
+
+    def __init__(self, app):
+        sys.excepthook = exception_handler
+        self.app = app
+
+    def get_references(self):
+        """ As list if dictionaries with risid and summary
+        """
+        cur = self.app.conn.cursor()
+        self.refs = []
+        cur.execute("select distinct risid from ris order by risid")
+        ris_ids_res = cur.fetchall()
+        for ris_id in ris_ids_res:
+            ref = {'risid': ris_id[0]}
+            details = str(ris_id[0]) + " "
+            cur.execute("select tag, longtag, value from ris where risid=?", [ris_id[0]])
+            res = cur.fetchall()
+            for r in res:
+                ref[r[0]] = r[2]
+                ref[r[1]] = r[2]
+                details += r[0] + ' - ' + r[1] + ' - ' + r[2] + "\n"
+            ref['details'] = details
+            ref['formatted'] = self.format_ris(ref)
+            self.refs.append(ref)
+
+    def format_ris(self, ref):
+        """ Format items in list for display.
+            ref type
+            title
+            authors (or editor)
+            journal name, year, date, volume, issue
+            pages
+            publisher (and place)
+            issn
+            url, doi?
+         """
+
+        ref_type = ""
+        try:
+            ref_type = ref_types[ref['TY']] + "\n"
+        except KeyError:
+            pass
+        title = ""
+        authors = ""
+        published_year = ""
+        periodical_name = ""
+        volume = None
+        issue = None
+        editor = None
+        edition = None
+        pages = None
+        end_page = None
+        publisher = None
+        issn = None
+        url = None
+        doi = None
+        txt = ""
+
+        for tag in ("TI", "ST", "T2", "T3", "TT"):
+            try:
+                # Get the first title based on the above order
+                if title == "":
+                    title = ref[tag] + "\n"
+            except KeyError:
+                pass
+        for tag in ("AU", "A1", "A2", "A3", "A4"):
+            try:
+                authors += " " + ref[tag]
+            except KeyError:
+                pass
+        if authors != "":
+            authors = authors[1:] + "\n"
+        try:
+            editor = "Editor: " + ref['ED'] + "\n"
+        except KeyError:
+            pass
+
+        for tag in ("PY", "Y1"):
+            try:
+                if published_year == "":
+                    published_year = ref[tag] + " "
+            except KeyError:
+                pass
+        try:
+            publisher = ref['PB']
+            try:
+                publisher += " " + ref['PP']
+            except KeyError:
+                pass
+        except KeyError:
+            pass
+        try:
+            issn = "ISSN: " + ref['SN']
+        except KeyError:
+            pass
+        # Journal name, T2 tag is often used for this
+        for tag in ("JO", "JF", "T2", "JA", "J1", "J2"):
+            try:
+                if periodical_name == "":
+                    periodical_name = ref[tag] + ". "
+            except KeyError:
+                pass
+        # Edition
+        try:
+            edition = ref['ET']
+        except KeyError:
+            pass
+        # Volume and issue
+        for tag in ("VL", "VO"):
+            try:
+                if volume is None:
+                    volume = " Vol." + ref[tag]
+            except KeyError:
+                pass
+        try:
+            issue = ref['IS']
+        except KeyError:
+            pass
+        volume_and_or_issue = ""
+        if volume and issue:
+            volume_and_or_issue = volume + "(" + issue + ") "
+        if volume is None and issue:
+            volume_and_or_issue += " " + issue + " "
+        if volume_and_or_issue == "" and edition:
+            volume_and_or_issue = "Edn. " + edition
+        # Pages
+        try:
+            pages = ref['SP']
+        except KeyError:
+            pass
+        try:
+            end_page = ref['EP']
+        except KeyError:
+            pass
+        if pages and end_page is not None:
+            pages += "-" + end_page
+        if pages:
+            pages = " pp." + pages
+        # URL and DOI
+        try:
+            url = ref['UR']
+            try:
+                url += " Accessed: " + ref['Y2']
+            except KeyError:
+                pass
+        except KeyError:
+            pass
+        try:
+            doi = "DOI: " + ref['DO']
+        except KeyError:
+            pass
+
+        # Wrap up reference
+        txt += ref_type + title + authors
+        if editor:
+            txt += editor
+        # Periodicals
+        txt += periodical_name + published_year + volume_and_or_issue
+        if pages:
+            txt += pages
+        txt += "\n"
+        # Other published
+        if publisher:
+            txt += publisher + " "
+        # Extra information
+        if issn:
+            txt += issn + "\n"
+        # Links
+        if url:
+            txt += url + "\n"
+        '''if doi:
+            txt += doi'''
+        # Clean up
+        txt = txt.replace("  ", " ")
+        txt = txt.strip()
+        #print(txt)
+        return txt
 
 
-class ImportRis:
+class RisImport:
     """ Import an RIS format bibliography and store in database.
     References in RIS can be poorly created often due to how the researcher created them. """
 
@@ -172,7 +349,7 @@ class ImportRis:
         return exists
 
 
-ref_type = {
+ref_types = {
 'ABST': 'Abstract',
 'ADVS': 'Audiovisual material',
 'AGGR': 'Aggregated Database',

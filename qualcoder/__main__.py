@@ -62,7 +62,7 @@ from qualcoder.manage_links import DialogManageLinks
 from qualcoder.manage_references import DialogReferenceManager
 from qualcoder.memo import DialogMemo
 from qualcoder.refi import RefiExport, RefiImport
-from qualcoder.ris import ImportRis
+from qualcoder.ris import RisImport
 from qualcoder.reports import DialogReportCoderComparisons, DialogReportCodeFrequencies
 from qualcoder.report_code_summary import DialogReportCodeSummary
 from qualcoder.report_compare_coder_file import DialogCompareCoderByFile
@@ -1141,14 +1141,13 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Manage references.
         Link to files. Unlink from files. """
 
-        print("TODO manage refs")
         ui = DialogReferenceManager(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_manage, ui)
 
     def import_references(self):
         """ Import references in RIS format. """
 
-        ImportRis(self.app, self.ui.textEdit)
+        RisImport(self.app, self.ui.textEdit)
 
     def import_survey(self):
         """ Import survey flat sheet: csv file or xlsx.

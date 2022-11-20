@@ -25,21 +25,22 @@ Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 """
 
-import datetime
+#import datetime
 import os
-import re
+#import re
 import sys
 import logging
 import traceback
 
-from PyQt6 import QtWidgets, QtCore, QtGui
-from PyQt6.QtCore import Qt
+from PyQt6 import QtWidgets, QtCore  #, QtGui
+#from PyQt6.QtCore import Qt
 
 from .GUI.ui_reference_manager import Ui_Dialog_reference_manager
-from .confirm_delete import DialogConfirmDelete
-from .helpers import DialogGetStartAndEndMarks, Message
-from .view_av import DialogViewAV
-from .view_image import DialogViewImage
+#from .confirm_delete import DialogConfirmDelete
+#from .helpers import Message
+from .ris import Ris
+#from .view_av import DialogViewAV
+#from .view_image import DialogViewImage
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -84,13 +85,11 @@ class DialogReferenceManager(QtWidgets.QDialog):
         font2 += '"' + self.app.settings['font'] + '";'
         self.ui.tableWidget_files.setStyleSheet(font2)
         self.ui.tableWidget_files.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        #self.ui.tableWidget_files.doubleClicked.connect(self.double_clicked_to_view)
         #self.ui.tableWidget_files.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         #self.ui.tableWidget_files.customContextMenuRequested.connect(self.table_menu)
         self.ui.tableWidget_refs.setStyleSheet(font2)
         self.ui.tableWidget_refs.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
         self.ui.tableWidget_refs.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
-        #self.ui.tableWidget_refs.doubleClicked.connect(self.double_clicked_to_view)
         #self.ui.tableWidget_refs.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         #self.ui.tableWidget_refs.customContextMenuRequested.connect(self.table_menu)
 
@@ -107,13 +106,10 @@ class DialogReferenceManager(QtWidgets.QDialog):
         for row in result:
             self.files.append(dict(zip(keys, row)))
         self.fill_table_files()
-
-        cur.execute("select risid, tag, longtag, value from ris")
-        result = cur.fetchall()
-        self.refs = []
-        keys = 'risid', 'name', 'risid', 'memo', 'date'
-        for row in result:
-            self.refs.append(dict(zip(keys, row)))
+        r = Ris(self.app)
+        r.get_references()
+        self.refs = r.refs
+        self.fill_table_refs()
 
     def fill_table_files(self):
         """ Fill widget with file details. """
@@ -146,6 +142,9 @@ class DialogReferenceManager(QtWidgets.QDialog):
         if self.app.settings['showids']:
             self.ui.tableWidget_files.showColumn(0)
         self.ui.tableWidget_files.resizeColumnsToContents()
+        if self.ui.tableWidget_files.columnWidth(1) > 600:
+            self.ui.tableWidget_files.setColumnWidth(1, 600)
+        self.ui.tableWidget_files.resizeRowsToContents()
 
     def fill_table_refs(self):
         """ Fill widget with ref details. """
@@ -161,13 +160,17 @@ class DialogReferenceManager(QtWidgets.QDialog):
             item = QtWidgets.QTableWidgetItem(str(f['risid']))
             item.setFlags(QtCore.Qt.ItemFlag.ItemIsEnabled)
             self.ui.tableWidget_refs.setItem(row, 0, item)
-            item = QtWidgets.QTableWidgetItem(f['details'])
+            item = QtWidgets.QTableWidgetItem(f['formatted'])
+            item.setToolTip(f['details'])
             item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
             self.ui.tableWidget_refs.setItem(row, 1, item)
-        #self.ui.tableWidget_refs.hideColumn(0)
+        self.ui.tableWidget_refs.hideColumn(0)
         if self.app.settings['showids']:
             self.ui.tableWidget_refs.showColumn(0)
         self.ui.tableWidget_refs.resizeColumnsToContents()
+        if self.ui.tableWidget_refs.columnWidth(1) > 600:
+            self.ui.tableWidget_refs.setColumnWidth(1, 600)
+        self.ui.tableWidget_refs.resizeRowsToContents()
 
     '''def table_menu(self, position):
         """ Context menu to add/remove files to case. """
