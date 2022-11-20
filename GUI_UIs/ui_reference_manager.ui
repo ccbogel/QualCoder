@@ -29,7 +29,7 @@
       </size>
      </property>
      <property name="text">
-      <string>Assign selected reference to file.</string>
+      <string>Assign selected file(s) to selected reference. Right-click menu.</string>
      </property>
     </widget>
    </item>
@@ -47,44 +47,18 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>110</height>
+       <height>70</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>110</height>
+       <height>70</height>
       </size>
      </property>
      <property name="title">
       <string/>
      </property>
-     <widget class="QPushButton" name="pushButton_view_file">
-      <property name="geometry">
-       <rect>
-        <x>300</x>
-        <y>10</y>
-        <width>181</width>
-        <height>25</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>View file</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="pushButton_view_ref">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>10</y>
-        <width>281</width>
-        <height>25</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>View reference details</string>
-      </property>
-     </widget>
      <widget class="QPushButton" name="pushButton_remove_unused">
       <property name="geometry">
        <rect>
@@ -95,30 +69,14 @@
        </rect>
       </property>
       <property name="text">
-       <string>Remove unused references</string>
-      </property>
-     </widget>
-     <widget class="QDialogButtonBox" name="buttonBox">
-      <property name="geometry">
-       <rect>
-        <x>690</x>
-        <y>70</y>
-        <width>181</width>
-        <height>25</height>
-       </rect>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
-      <property name="standardButtons">
-       <set>QDialogButtonBox::Ok</set>
+       <string>Delete unused references</string>
       </property>
      </widget>
      <widget class="QCheckBox" name="checkBox_hide_files">
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>40</y>
+        <y>10</y>
         <width>271</width>
         <height>23</height>
        </rect>
@@ -131,7 +89,7 @@
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>70</y>
+        <y>40</y>
         <width>331</width>
         <height>23</height>
        </rect>
@@ -145,38 +103,5 @@
   </layout>
  </widget>
  <resources/>
- <connections>
-  <connection>
-   <sender>buttonBox</sender>
-   <signal>accepted()</signal>
-   <receiver>Dialog_reference_manager</receiver>
-   <slot>accept()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>248</x>
-     <y>254</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>157</x>
-     <y>274</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>buttonBox</sender>
-   <signal>rejected()</signal>
-   <receiver>Dialog_reference_manager</receiver>
-   <slot>reject()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>316</x>
-     <y>260</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>286</x>
-     <y>274</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>
