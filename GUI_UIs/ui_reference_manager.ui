@@ -94,6 +94,9 @@
         <height>30</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete selected reference&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
        <string/>
       </property>
@@ -107,11 +110,14 @@
         <height>30</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Link selected files to selected reference&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
        <string/>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_unlink_ref">
+     <widget class="QPushButton" name="pushButton_unlink_files">
       <property name="geometry">
        <rect>
         <x>350</x>
@@ -120,18 +126,8 @@
         <height>30</height>
        </rect>
       </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="pushButton_unlink_file">
-      <property name="geometry">
-       <rect>
-        <x>390</x>
-        <y>8</y>
-        <width>30</width>
-        <height>30</height>
-       </rect>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Unlink selected files from references&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -146,6 +142,9 @@
         <height>30</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete all references that are not assigned to files&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
        <string/>
       </property>
@@ -153,11 +152,14 @@
      <widget class="QPushButton" name="pushButton_edit_ref">
       <property name="geometry">
        <rect>
-        <x>450</x>
+        <x>410</x>
         <y>9</y>
         <width>30</width>
         <height>30</height>
        </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Edit reference&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
