@@ -26,6 +26,7 @@ ui_dialog_report_codings.py \
 ui_dialog_report_comparisons.py \
 ui_dialog_report_file_summary.py \
 ui_move_resize_rectangle.py \
+ui_reference_manager.py \
 ui_save_query.py \
 ui_speech_to_text.py \
 ui_dialog_select_items.py \
