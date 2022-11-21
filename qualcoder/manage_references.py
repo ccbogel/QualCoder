@@ -25,7 +25,7 @@ Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 """
 
-#import datetime
+from copy import deepcopy
 import os
 #import re
 import sys
@@ -36,12 +36,11 @@ from PyQt6 import QtWidgets, QtCore, QtGui
 #from PyQt6.QtCore import Qt
 
 from .GUI.base64_helper import *
+from .GUI.ui_reference_editor import Ui_DialogReferenceEditor
 from .GUI.ui_reference_manager import Ui_Dialog_reference_manager
-#from .confirm_delete import DialogConfirmDelete
+from .confirm_delete import DialogConfirmDelete
 #from .helpers import Message
 from .ris import Ris
-#from .view_av import DialogViewAV
-#from .view_image import DialogViewImage
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -96,29 +95,27 @@ class DialogReferenceManager(QtWidgets.QDialog):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(link_icon), "png")
         self.ui.pushButton_link.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_link
+        self.ui.pushButton_link.pressed.connect(self.link_files_to_reference)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(undo_icon), "png")
         self.ui.pushButton_unlink_files.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_unlink_files
+        self.ui.pushButton_unlink_files.pressed.connect(self.unlink_files)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(pencil_icon), "png")
         self.ui.pushButton_edit_ref.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_edit_ref
+        self.ui.pushButton_edit_ref.pressed.connect(self.edit_reference)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(delete_icon), "png")
         self.ui.pushButton_delete_ref.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_delete_ref
+        self.ui.pushButton_delete_ref.pressed.connect(self.delete_reference)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(doc_delete_icon), "png")
         self.ui.pushButton_delete_unused_refs.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_delete_unused_refs
+        self.ui.pushButton_delete_unused_refs.setEnabled(False)
 
         self.get_data()
-
         self.ui.tableWidget_refs.installEventFilter(self)
         self.ui.tableWidget_files.installEventFilter(self)
-
 
     def get_data(self):
         """ Get data for files and references. """
@@ -197,8 +194,8 @@ class DialogReferenceManager(QtWidgets.QDialog):
         self.ui.tableWidget_refs.resizeRowsToContents()
 
     def eventFilter(self, object_, event):
-        """ Ctrl + L Link file(s) to reference.
-        Ctrl + U to Unlink file
+        """ L Link files to reference.
+        U to unlink selcted files
         Note. Fires multiple times very quickly.
         """
 
@@ -208,25 +205,105 @@ class DialogReferenceManager(QtWidgets.QDialog):
             if key == QtCore.Qt.Key.Key_L and (self.ui.tableWidget_refs.hasFocus() or self.ui.tableWidget_files.hasFocus()):
                 self.link_files_to_reference()
                 return True
+            if key == QtCore.Qt.Key.Key_U and (self.ui.tableWidget_refs.hasFocus() or self.ui.tableWidget_files.hasFocus()):
+                self.unlink_files()
+                return True
         return False
+
+    def unlink_files(self):
+        """ Remove linked reference from selected files. """
+
+        file_row_objs = self.ui.tableWidget_files.selectionModel().selectedRows()
+        if not file_row_objs:
+            return
+        cur = self.app.conn.cursor()
+        for index in file_row_objs:
+            fid = int(index.data())  # Column 0 data
+            #print(fid)
+            cur.execute("update source set risid=null where id=?", [fid])
+            self.app.conn.commit()
+            self.ui.tableWidget_files.item(index.row(), 2).setText("")
+        self.get_data()
 
     def link_files_to_reference(self):
         """ Link the selected files to the selected reference.
          """
 
-        ref_row = self.ui.tableWidget_refs.currentRow()
         ref_row_obj = self.ui.tableWidget_refs.selectionModel().selectedRows()
         if not ref_row_obj:
             return
-        ris_id = int(ref_row_obj[0].data()) # Only One index returned. Column 0 data
+        ris_id = int(ref_row_obj[0].data())  # Only One index returned. Column 0 data
         file_row_objs = self.ui.tableWidget_files.selectionModel().selectedRows()
         if not file_row_objs:
             return
-        fids = []
+        #print(index, index.row())
+        cur = self.app.conn.cursor()
         for index in file_row_objs:
-            fids.append(int(index.data()))   # Column 0 data
+            fid = int(index.data())  # Column 0 data
+            cur.execute("update source set risid=? where id=?", [ris_id, fid])
+            self.app.conn.commit()
+            self.ui.tableWidget_files.item(index.row(), 2).setText(str(ris_id))
+        self.get_data()
 
-        print(ris_id, fids)
+    def edit_reference(self):
+        """ Edit selected reference. """
+
+        ref_row_obj = self.ui.tableWidget_refs.selectionModel().selectedRows()
+        if not ref_row_obj:
+            return
+        ris_id = int(ref_row_obj[0].data())  # Only One index returned. Column 0 data
+        r_data = None
+        for r in self.refs:
+            if r['risid'] == ris_id:
+                r_data = deepcopy(r)
+        short_dict = {}
+        for k in r_data:
+            if len(k) == 2:
+                short_dict[k] = r_data[k]
+        print(short_dict)
+        print("TODO edit ref")
+
+        reference_editor = QtWidgets.QDialog()
+        ui_re = Ui_DialogReferenceEditor()
+        ui_re.setupUi(reference_editor)
+        print("TODO create columns and fill table with data")
+        ui_re.tableWidget.setColumnCount(2)
+        ui_re.tableWidget.setHorizontalHeaderLabels(["RIS", "Data"])
+        '''rows = self.ui.tableWidget.rowCount()
+        for r in range(0, rows):
+            self.ui.tableWidget.removeRow(0)'''
+        for row, key in enumerate(short_dict):
+            ui_re.tableWidget.insertRow(row)
+            ris_item = QtWidgets.QTableWidgetItem(key)
+            ris_item.setFlags(ris_item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
+            ui_re.tableWidget.setItem(row, 0, ris_item)
+        reference_editor.exec()
+        print("TODO get changes from table and update database ris table, and update tablewidget_refs")
+
+    def delete_reference(self):
+        """ Delete the selected reference.
+        Remove reference risid from files.
+        """
+
+        ref_row_obj = self.ui.tableWidget_refs.selectionModel().selectedRows()
+        if not ref_row_obj:
+            return
+        ris_id = int(ref_row_obj[0].data())  # Only One index returned. Column 0 data
+        note = _("Delete this reference.") + " Ref id {" + str(ris_id) + "}  \n"
+        for r in self.refs:
+            if r['risid'] == ris_id:
+                note += r['formatted']
+        ui = DialogConfirmDelete(self.app, note)
+        ok = ui.exec()
+        if not ok:
+            return
+        cur = self.app.conn.cursor()
+        cur.execute("update source set risid=null where risid=?", [ris_id])
+        cur.execute("delete from ris where risid=?", [ris_id])
+        self.app.conn.commit()
+        self.get_data()
+        self.fill_table_refs()
+        self.fill_table_files()
 
 
 
