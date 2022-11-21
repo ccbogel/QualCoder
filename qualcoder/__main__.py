@@ -59,8 +59,10 @@ from qualcoder.locale.base64_lang_helper import *
 from qualcoder.journals import DialogJournals
 from qualcoder.manage_files import DialogManageFiles
 from qualcoder.manage_links import DialogManageLinks
+from qualcoder.manage_references import DialogReferenceManager
 from qualcoder.memo import DialogMemo
 from qualcoder.refi import RefiExport, RefiImport
+from qualcoder.ris import RisImport
 from qualcoder.reports import DialogReportCoderComparisons, DialogReportCodeFrequencies
 from qualcoder.report_code_summary import DialogReportCodeSummary
 from qualcoder.report_compare_coder_file import DialogCompareCoderByFile
@@ -804,6 +806,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionExport_codebook_with_memos.triggered.connect(self.codebook_with_memos)
         self.ui.actionExit.triggered.connect(self.closeEvent)
         self.ui.actionExit.setShortcut('Ctrl+Q')
+        self.ui.actionImport_references_RIS_format.triggered.connect(self.import_references)
 
         # File cases and journals menu
         self.ui.actionManage_files.triggered.connect(self.manage_files)
@@ -816,6 +819,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionImport_survey.triggered.connect(self.import_survey)
         self.ui.actionImport_survey.setShortcut('Alt+I')
         self.ui.actionManage_bad_links_to_files.triggered.connect(self.manage_bad_file_links)
+        self.ui.actionManage_references.triggered.connect(self.manage_references)
 
         # Coding menu
         self.ui.actionCodes.triggered.connect(self.text_coding)
@@ -928,6 +932,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionREFI_QDA_Project_import.setEnabled(True)
         self.ui.actionRQDA_Project_import.setEnabled(True)
         self.ui.actionExport_codebook.setEnabled(False)
+        self.ui.actionImport_references_RIS_format.setEnabled(False)
         # files cases journals menu
         self.ui.actionManage_files.setEnabled(False)
         self.ui.actionManage_journals.setEnabled(False)
@@ -935,6 +940,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionManage_attributes.setEnabled(False)
         self.ui.actionImport_survey.setEnabled(False)
         self.ui.actionManage_bad_links_to_files.setEnabled(False)
+        self.ui.actionManage_references.setEnabled(False)
         # codes menu
         self.ui.actionCodes.setEnabled(False)
         self.ui.actionCode_image.setEnabled(False)
@@ -968,12 +974,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionREFI_QDA_Project_import.setEnabled(True)
         self.ui.actionRQDA_Project_import.setEnabled(True)
         self.ui.actionExport_codebook.setEnabled(True)
+        self.ui.actionImport_references_RIS_format.setEnabled(True)
         # Files cases journals menu
         self.ui.actionManage_files.setEnabled(True)
         self.ui.actionManage_journals.setEnabled(True)
         self.ui.actionManage_cases.setEnabled(True)
         self.ui.actionManage_attributes.setEnabled(True)
         self.ui.actionImport_survey.setEnabled(True)
+        self.ui.actionManage_references.setEnabled(True)
         # Codes menu
         self.ui.actionCodes.setEnabled(True)
         self.ui.actionCode_image.setEnabled(True)
@@ -1128,6 +1136,18 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.label_manage.hide()
         ui = DialogManageAttributes(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_manage, ui)
+
+    def manage_references(self):
+        """ Manage references.
+        Link to files. Unlink from files. """
+
+        ui = DialogReferenceManager(self.app, self.ui.textEdit)
+        self.tab_layout_helper(self.ui.tab_manage, ui)
+
+    def import_references(self):
+        """ Import references in RIS format. """
+
+        RisImport(self.app, self.ui.textEdit)
 
     def import_survey(self):
         """ Import survey flat sheet: csv file or xlsx.
@@ -1402,7 +1422,7 @@ class MainWindow(QtWidgets.QMainWindow):
             "bookmarkpos integer, codername text)")
         cur.execute(
             "CREATE TABLE source (id integer primary key, name text, fulltext text, mediapath text, memo text, "
-            "owner text, date text, av_text_id integer, unique(name))")
+            "owner text, date text, av_text_id integer, risid integer, unique(name))")
         cur.execute(
             "CREATE TABLE code_image (imid integer primary key,id integer,x1 integer, y1 integer, width integer, "
             "height integer, cid integer, memo text, date text, owner text, important integer)")
@@ -1465,8 +1485,9 @@ class MainWindow(QtWidgets.QMainWindow):
                     "tooltip text);")
         cur.execute("CREATE TABLE gr_av_item (gr_avid integer primary key, grid integer, avid integer,"
                     "x integer, y integer, pos0 integer, pos1 integer, filepath text, tooltip text, color text);")
+        cur.execute("CREATE TABLE ris (risid integer, tag text, longtag text, value text);")
         cur.execute("INSERT INTO project VALUES(?,?,?,?,?,?,?)",
-                    ('v6', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', qualcoder_version, 0,
+                    ('v8', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', qualcoder_version, 0,
                      0, self.app.settings['codername']))
         self.app.conn.commit()
         try:
@@ -1793,7 +1814,21 @@ class MainWindow(QtWidgets.QMainWindow):
             db7_update = True
         if db7_update:
             cur.execute('update project set databaseversion="v7", about=?', [qualcoder_version])
+            self.app.conn.commit()
             self.ui.textEdit.append(_("Updating database to version") + " v7")
+        # Database version v8
+        try:
+            cur.execute("select risid from ris")
+        except sqlite3.OperationalError:
+            cur.execute("CREATE TABLE ris (risid integer, tag text, longtag text, value text);")
+            cur.execute('update project set databaseversion="v8", about=?', [qualcoder_version])
+            self.app.conn.commit()
+            self.ui.textEdit.append(_("Updating database to version") + " v8")
+        try:
+            cur.execute("select risid from source")
+        except sqlite3.OperationalError:
+            cur.execute('ALTER TABLE source ADD risid integer')
+
 
         # Save a date and 24 hour stamped backup
         if self.app.settings['backup_on_open'] == 'True' and newproject == "no":

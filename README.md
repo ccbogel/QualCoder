@@ -32,7 +32,7 @@ IMPORTANT: in the first window of the installation mark the option "Add Python t
 
 py -m pip install --upgrade pip
 
-`py -m pip install wheel pyqt6 chardet ebooklib lxml openpyxl Pillow ply pdfminer.six pandas plotly pydub python-vlc SpeechRecognition`
+`py -m pip install wheel pyqt6 chardet ebooklib lxml openpyxl Pillow ply pdfminer.six pandas plotly pydub python-vlc rispy SpeechRecognition`
 
  Wait, until all modules are installed .
  
@@ -85,7 +85,7 @@ Note: To exit venv type `deactivate`
 
 6. Install the needed python modules.
 
-`pip install chardet ebooklib lxml ply openpyxl pandas pdfminer pyqt6 pillow pdfminer.six plotly pydub python-vlc six SpeechRecognition`
+`pip install chardet ebooklib lxml ply openpyxl pandas pdfminer pyqt6 pillow pdfminer.six plotly pydub python-vlc rispy six SpeechRecognition`
 
 7. Install QualCoder, type the following, the dot is important:
 
@@ -115,7 +115,7 @@ Not tested, but please see the above instructions to build QualCoder inside a vi
 
 2. Install additional python modules
 
-`sudo python3 -m pip install ebooklib plotly pydub python-vlc SpeechRecognition`
+`sudo python3 -m pip install ebooklib plotly pydub python-vlc rispy SpeechRecognition`
 
 If success, all requirements are satisfied.
 
@@ -167,7 +167,7 @@ python3 get-pip.py
 (you might already have them, don't do this again if you just update QualCoder to a newer version)
 
 ```sh
-pip3 install chardet ebooklib lxml openpyxl pandas pillow ply pdfminer.six plotly pydub pyqt6 python-vlc six SpeechRecognition
+pip3 install chardet ebooklib lxml openpyxl pandas pillow ply pdfminer.six plotly pydub pyqt6 python-vlc rispy six SpeechRecognition
 ```
 
 6) Install system dependencies using Homebrew (aka `brew`) 
@@ -187,10 +187,10 @@ From the QualCoder-Master directory run the setup script:
 `python3 setup.py install`
 
 
-Assuming you downloaded the 3.0 version. You can now run with:
+Assuming you downloaded the 3.1 version. You can now run with:
 
 ```
-python3 /applications/QualCoder-3.0/qualcoder/__main__.py
+python3 /applications/QualCoder-3.1/qualcoder/__main__.py
 ```
 
 Alternative commands to run QualCoder (Suggestions):
@@ -218,7 +218,7 @@ Open the Terminal App and move to the unzipped Qualcoder-Master directory, then 
 
 1) Install Python dependency modules using `pip3`:
 
-`pip3 install chardet ebooklib ffmpeg-python lxml py2app pyqt6 pillow ply pdfminer.six openpyxl pandas plotly pydub python-vlc six SpeechRecognition`
+`pip3 install chardet ebooklib ffmpeg-python lxml py2app pyqt6 pillow ply pdfminer.six openpyxl pandas plotly pydub python-vlc rispy six SpeechRecognition`
 
 2) Create the Application. You will find it in the 'dist' folder and drag it to 'Applications'.
 `python3 setup.py py2app`
@@ -248,7 +248,7 @@ However, you do still need to install the VLC software.
 ## Dependencies
 Required:
 
-Python 3.7+ version, pyqt6, lxml, Pillow, six  (Mac OS), ebooklib, ply, chardet, pdfminer.six, openpyxl, pandas, plotly, pydub, python-vlc, SpeechRecognition, qpdf  (Linux for programatically applying pdf decryption for pdfs with blank password)
+Python 3.7+ version, pyqt6, lxml, Pillow, six  (Mac OS), ebooklib, ply, chardet, pdfminer.six, openpyxl, pandas, plotly, pydub, python-vlc, rispy, SpeechRecognition, qpdf  (Linux for programatically applying pdf decryption for pdfs with blank password)
 
 ## License
 QualCoder is distributed under the MIT LICENSE.

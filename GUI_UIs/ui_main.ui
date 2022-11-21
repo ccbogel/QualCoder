@@ -139,6 +139,7 @@
      <addaction name="actionREFI_Codebook_import"/>
      <addaction name="actionREFI_QDA_Project_import"/>
      <addaction name="actionRQDA_Project_import"/>
+     <addaction name="actionImport_references_RIS_format"/>
     </widget>
     <addaction name="actionCreate_New_Project"/>
     <addaction name="actionOpen_Project"/>
@@ -162,6 +163,7 @@
     <addaction name="actionManage_journals"/>
     <addaction name="actionManage_attributes"/>
     <addaction name="actionManage_bad_links_to_files"/>
+    <addaction name="actionManage_references"/>
    </widget>
    <widget class="QMenu" name="menuCoding">
     <property name="title">
@@ -452,6 +454,16 @@
   <action name="actionExport_codebook_with_memos">
    <property name="text">
     <string>Export codebook with memos as ODT file</string>
+   </property>
+  </action>
+  <action name="actionImport_references_RIS_format">
+   <property name="text">
+    <string>Import references RIS format</string>
+   </property>
+  </action>
+  <action name="actionManage_references">
+   <property name="text">
+    <string>Manage references</string>
    </property>
   </action>
  </widget>

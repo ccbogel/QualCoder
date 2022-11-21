@@ -68,6 +68,7 @@ setup(
         'pandas',
         'plotly',
         'pydub',
+        'rispy',
         'SpeechRecognition'
     ],
     package_data={
