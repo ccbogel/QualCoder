@@ -29,7 +29,7 @@
       </size>
      </property>
      <property name="text">
-      <string>Assign selected file(s) to selected reference. Right-click menu.</string>
+      <string>Assign selected file(s) to selected reference. Press L or Button below.</string>
      </property>
     </widget>
    </item>
@@ -59,19 +59,6 @@
      <property name="title">
       <string/>
      </property>
-     <widget class="QPushButton" name="pushButton_remove_unused">
-      <property name="geometry">
-       <rect>
-        <x>490</x>
-        <y>10</y>
-        <width>381</width>
-        <height>25</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Delete unused references</string>
-      </property>
-     </widget>
      <widget class="QCheckBox" name="checkBox_hide_files">
       <property name="geometry">
        <rect>
@@ -96,6 +83,84 @@
       </property>
       <property name="text">
        <string>Hide assigned references</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_delete_ref">
+      <property name="geometry">
+       <rect>
+        <x>510</x>
+        <y>8</y>
+        <width>30</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_link">
+      <property name="geometry">
+       <rect>
+        <x>310</x>
+        <y>8</y>
+        <width>30</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_unlink_ref">
+      <property name="geometry">
+       <rect>
+        <x>350</x>
+        <y>8</y>
+        <width>30</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_unlink_file">
+      <property name="geometry">
+       <rect>
+        <x>390</x>
+        <y>8</y>
+        <width>30</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_delete_unused_refs">
+      <property name="geometry">
+       <rect>
+        <x>550</x>
+        <y>8</y>
+        <width>30</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_edit_ref">
+      <property name="geometry">
+       <rect>
+        <x>450</x>
+        <y>9</y>
+        <width>30</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
       </property>
      </widget>
     </widget>
