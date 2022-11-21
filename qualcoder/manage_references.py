@@ -32,9 +32,10 @@ import sys
 import logging
 import traceback
 
-from PyQt6 import QtWidgets, QtCore  #, QtGui
+from PyQt6 import QtWidgets, QtCore, QtGui
 #from PyQt6.QtCore import Qt
 
+from .GUI.base64_helper import *
 from .GUI.ui_reference_manager import Ui_Dialog_reference_manager
 #from .confirm_delete import DialogConfirmDelete
 #from .helpers import Message
@@ -92,8 +93,32 @@ class DialogReferenceManager(QtWidgets.QDialog):
         self.ui.tableWidget_refs.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         #self.ui.tableWidget_refs.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         #self.ui.tableWidget_refs.customContextMenuRequested.connect(self.table_menu)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(link_icon), "png")
+        self.ui.pushButton_link.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_link
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(undo_icon), "png")
+        self.ui.pushButton_unlink_files.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_unlink_files
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(pencil_icon), "png")
+        self.ui.pushButton_edit_ref.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_edit_ref
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(delete_icon), "png")
+        self.ui.pushButton_delete_ref.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_delete_ref
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_delete_icon), "png")
+        self.ui.pushButton_delete_unused_refs.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_delete_unused_refs
 
         self.get_data()
+
+        self.ui.tableWidget_refs.installEventFilter(self)
+        self.ui.tableWidget_files.installEventFilter(self)
+
 
     def get_data(self):
         """ Get data for files and references. """
@@ -164,7 +189,6 @@ class DialogReferenceManager(QtWidgets.QDialog):
             item.setToolTip(f['details'])
             item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
             self.ui.tableWidget_refs.setItem(row, 1, item)
-        self.ui.tableWidget_refs.hideColumn(0)
         if self.app.settings['showids']:
             self.ui.tableWidget_refs.showColumn(0)
         self.ui.tableWidget_refs.resizeColumnsToContents()
@@ -172,15 +196,39 @@ class DialogReferenceManager(QtWidgets.QDialog):
             self.ui.tableWidget_refs.setColumnWidth(1, 600)
         self.ui.tableWidget_refs.resizeRowsToContents()
 
-    '''def table_menu(self, position):
-        """ Context menu to add/remove files to case. """
+    def eventFilter(self, object_, event):
+        """ Ctrl + L Link file(s) to reference.
+        Ctrl + U to Unlink file
+        Note. Fires multiple times very quickly.
+        """
 
-        menu = QtWidgets.QMenu()
-        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-        action_add = menu.addAction(_("Add files to case"))
-        action_remove = menu.addAction(_("Remove files from case"))
-        action = menu.exec(self.ui.tableWidget.mapToGlobal(position))
-        if action == action_add:
-            self.add_files_to_case()
-        if action == action_remove:
-            self.remove_files_from_case()'''
+        if type(event) == QtGui.QKeyEvent:
+            key = event.key()
+            mod = event.modifiers()
+            if key == QtCore.Qt.Key.Key_L and (self.ui.tableWidget_refs.hasFocus() or self.ui.tableWidget_files.hasFocus()):
+                self.link_files_to_reference()
+                return True
+        return False
+
+    def link_files_to_reference(self):
+        """ Link the selected files to the selected reference.
+         """
+
+        ref_row = self.ui.tableWidget_refs.currentRow()
+        ref_row_obj = self.ui.tableWidget_refs.selectionModel().selectedRows()
+        if not ref_row_obj:
+            return
+        ris_id = int(ref_row_obj[0].data()) # Only One index returned. Column 0 data
+        file_row_objs = self.ui.tableWidget_files.selectionModel().selectedRows()
+        if not file_row_objs:
+            return
+        fids = []
+        for index in file_row_objs:
+            fids.append(int(index.data()))   # Column 0 data
+
+        print(ris_id, fids)
+
+
+
+
+

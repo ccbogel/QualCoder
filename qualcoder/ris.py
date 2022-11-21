@@ -97,7 +97,7 @@ class Ris:
 
         ref_type = ""
         try:
-            ref_type = ref_types[ref['TY']] + "\n"
+            ref_type = ref_types[ref['TY']] + " {Ref id:" + str(ref['risid']) + "}\n"
         except KeyError:
             pass
         title = ""
