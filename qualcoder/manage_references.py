@@ -25,21 +25,18 @@ Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 """
 
-from copy import deepcopy
 import os
-#import re
+from rispy import TAG_KEY_MAPPING
 import sys
 import logging
 import traceback
 
 from PyQt6 import QtWidgets, QtCore, QtGui
-#from PyQt6.QtCore import Qt
 
 from .GUI.base64_helper import *
 from .GUI.ui_reference_editor import Ui_DialogReferenceEditor
 from .GUI.ui_reference_manager import Ui_Dialog_reference_manager
 from .confirm_delete import DialogConfirmDelete
-#from .helpers import Message
 from .ris import Ris
 
 path = os.path.abspath(os.path.dirname(__file__))
@@ -252,33 +249,52 @@ class DialogReferenceManager(QtWidgets.QDialog):
         if not ref_row_obj:
             return
         ris_id = int(ref_row_obj[0].data())  # Only One index returned. Column 0 data
-        r_data = None
+        ref_data = None
         for r in self.refs:
             if r['risid'] == ris_id:
-                r_data = deepcopy(r)
+                ref_data = r
         short_dict = {}
-        for k in r_data:
+        for k in ref_data:
             if len(k) == 2:
-                short_dict[k] = r_data[k]
-        print(short_dict)
-        print("TODO edit ref")
-
+                short_dict[k] = ref_data[k]
         reference_editor = QtWidgets.QDialog()
         ui_re = Ui_DialogReferenceEditor()
         ui_re.setupUi(reference_editor)
-        print("TODO create columns and fill table with data")
         ui_re.tableWidget.setColumnCount(2)
         ui_re.tableWidget.setHorizontalHeaderLabels(["RIS", "Data"])
-        '''rows = self.ui.tableWidget.rowCount()
-        for r in range(0, rows):
-            self.ui.tableWidget.removeRow(0)'''
         for row, key in enumerate(short_dict):
             ui_re.tableWidget.insertRow(row)
             ris_item = QtWidgets.QTableWidgetItem(key)
             ris_item.setFlags(ris_item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
+            for tagkey in TAG_KEY_MAPPING:
+                #print(tk, TAG_KEY_MAPPING[tk])
+                if key == tagkey:
+                    ris_item.setToolTip(TAG_KEY_MAPPING[tagkey])
             ui_re.tableWidget.setItem(row, 0, ris_item)
-        reference_editor.exec()
-        print("TODO get changes from table and update database ris table, and update tablewidget_refs")
+            value_item = QtWidgets.QTableWidgetItem(short_dict[key])
+            ui_re.tableWidget.setItem(row, 1, value_item)
+        ui_re.tableWidget.resizeColumnsToContents()
+        if ui_re.tableWidget.columnWidth(1) > 600:
+            ui_re.tableWidget.setColumnWidth(1, 600)
+        ui_re.tableWidget.resizeRowsToContents()
+        ok = reference_editor.exec()
+        if not ok:
+            return
+        rows = ui_re.tableWidget.rowCount()
+        for i in range(0, rows):
+            print()
+        cur = self.app.conn.cursor()
+        ref_edited = False
+        for row, key in enumerate(short_dict):
+            if ui_re.tableWidget.item(row, 1).text() != short_dict[key]:
+                cur.execute("update ris set value=? where risid=? and tag=?",
+                            [ui_re.tableWidget.item(row, 1).text(), ris_id, key])
+                self.app.conn.commit()
+                ref_edited = True
+        if ref_edited:
+            self.parent_textEdit.append(_("Reference edited."))
+        self.get_data()
+        self.fill_table_refs()
 
     def delete_reference(self):
         """ Delete the selected reference.
@@ -304,6 +320,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
         self.get_data()
         self.fill_table_refs()
         self.fill_table_files()
+        self.parent_textEdit.append(_("Reference deleted."))
 
 
 
