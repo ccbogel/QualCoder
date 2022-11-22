@@ -126,7 +126,6 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.ui = Ui_Dialog_manage_files()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-
         self.default_import_directory = self.app.settings['directory']
         self.attributes = []
         self.av_dialog_open = None
@@ -720,12 +719,20 @@ class DialogManageFiles(QtWidgets.QDialog):
         """ When add button pressed, opens the AddAtribute dialog to get new attribute text.
         Then get the attribute type through a dialog.
         AddAttribute dialog checks for duplicate attribute name.
-        New attribute is added to the model and database. """
+        New attribute is added to the model and database.
+        Reserved attribute words - usef for imported references:
+        Ref_Type (Type of Reference) – character variable
+        Ref_Author (authors list) – character
+        Ref_Title – character
+        Ref_Year (of publication) – numeric
+        """
 
         if self.av_dialog_open is not None:
             self.av_dialog_open.mediaplayer.stop()
             self.av_dialog_open = None
-        check_names = self.attribute_names + [{'name': 'name'}, {'name': 'memo'}, {'name': 'id'}, {'name': 'date'}]
+        check_names = self.attribute_names + [{'name': 'name'}, {'name': 'memo'}, {'name': 'id'}, {'name': 'date'},
+                                              {'name': 'Ref_Type'}, {'name': 'Ref_Author'}, {'name': 'Ref_Title'},
+                                              {'name':'Ref_Year'}]
         ui = DialogAddAttribute(self.app, check_names)
         ok = ui.exec()
         if not ok:

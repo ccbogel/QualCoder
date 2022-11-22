@@ -122,7 +122,8 @@ class DialogManageAttributes(QtWidgets.QDialog):
         AddItem dialog checks for duplicate attribute name.
         New attribute is added to the model and database. """
 
-        check_names = [{'name': 'name'}, {'name': 'memo'}, {'name': 'id'}, {'name': 'date'}]
+        check_names = [{'name': 'name'}, {'name': 'memo'}, {'name': 'id'}, {'name': 'date'}, {'name': 'Ref_Type'},
+                       {'name': 'Ref_Author'}, {'name': 'Ref_Title'}, {'name': 'Ref_Year'}]
         check_names.extend(self.attributes)
         ui = DialogAddAttribute(self.app, check_names)
         ui.exec()  # ok = ui.exec() does not pick up pressing the cancel button
