@@ -256,6 +256,10 @@ class DialogReferenceManager(QtWidgets.QDialog):
             cur.execute("update source set risid=? where id=?", [ris_id, fid])
             self.app.conn.commit()
             self.ui.tableWidget_files.item(index.row(), 2).setText(str(ris_id))
+
+            # TODO insert file attributes for
+            # Ref_Type, Ref_Author, Ref_Title, Ref_Year
+
         self.get_data()
 
     def edit_reference(self):

@@ -26,6 +26,7 @@ https://github.com/ccbogel/QualCoder
 """
 
 import collections
+import datetime
 import logging
 import os
 import rispy
@@ -239,7 +240,14 @@ class Ris:
 
 class RisImport:
     """ Import an RIS format bibliography and store in database.
-    References in RIS can be poorly created often due to how the researcher created them. """
+    References in RIS can be poorly created often due to how the researcher created them.
+
+    Create these variables for the sources
+    Ref_Type (Type of Reference) – character variable
+    Ref_Author (authors list) – character
+    Ref_Title – character
+    Ref_Year (of publication) – numeric
+    """
 
     app = None
     parent_text_edit = None
@@ -256,7 +264,25 @@ class RisImport:
         # print("Response ", response)
         imports = response[0]
         if imports:
+            self.create_file_attributes()
             self.import_ris_file(imports[0])
+
+    def create_file_attributes(self):
+        """  """
+
+        # update attribute_type list and database
+        now_date = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        cur = self.app.conn.cursor()
+        ref_vars = {'Ref_Authors': 'character', 'Ref_Title': 'character', 'Ref_Type': 'character', 'Ref_Year': 'numeric'}
+        for key in ref_vars:
+
+            cur.execute("select name from attribute type where name=?", [key])
+            res = cur.fetchone()
+            if not res:
+                cur.execute("insert into attribute_type (name,date,owner,memo,caseOrFile, valuetype) values(?,?,?,?,?,?)",
+                        (key, now_date, self.app.settings['codername'], "", 'file', ref_vars[key]))
+                self.app.conn.commit()
+        self.app.delete_backup = False
 
     def import_ris_file(self, filepath):
         """ Open file and extract RIS information.
