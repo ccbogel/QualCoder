@@ -47,10 +47,10 @@ def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.
     tb_obj: exception.__traceback__ """
     tb = '\n'.join(traceback.format_tb(tb_obj))
-    text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
-    print(text)
-    logger.error(_("Uncaught exception: ") + text)
-    QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
+    text_ = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
+    print(text_)
+    logger.error(_("Uncaught exception: ") + text_)
+    QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text_)
 
 
 class DialogReferenceManager(QtWidgets.QDialog):
@@ -109,10 +109,12 @@ class DialogReferenceManager(QtWidgets.QDialog):
         pm.loadFromData(QtCore.QByteArray.fromBase64(doc_delete_icon), "png")
         self.ui.pushButton_delete_unused_refs.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_delete_unused_refs.setEnabled(False)
-
+        self.ui.pushButton_delete_unused_refs.hide()
         self.get_data()
         self.ui.tableWidget_refs.installEventFilter(self)
         self.ui.tableWidget_files.installEventFilter(self)
+        self.ui.checkBox_hide_files.toggled.connect(self.fill_table_files)
+        self.ui.checkBox_hide_refs.toggled.connect(self.fill_table_refs)
 
     def get_data(self):
         """ Get data for files and references. """
@@ -154,6 +156,10 @@ class DialogReferenceManager(QtWidgets.QDialog):
             risid = ""
             if f['risid'] is not None:
                 risid = str(f['risid'])
+                if self.ui.checkBox_hide_files.isChecked():
+                    self.ui.tableWidget_files.setRowHidden(row, True)
+                else:
+                    self.ui.tableWidget_files.setRowHidden(row, False)
             item = QtWidgets.QTableWidgetItem(risid)
             item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
             self.ui.tableWidget_files.setItem(row, 2, item)
@@ -171,18 +177,28 @@ class DialogReferenceManager(QtWidgets.QDialog):
         rows = self.ui.tableWidget_refs.rowCount()
         for c in range(0, rows):
             self.ui.tableWidget_refs.removeRow(0)
-        header_labels = ["RIS id", "Reference"]
+        header_labels = ["Ref id", _("Reference")]
         self.ui.tableWidget_refs.setColumnCount(len(header_labels))
         self.ui.tableWidget_refs.setHorizontalHeaderLabels(header_labels)
-        for row, f in enumerate(self.refs):
+        for row, ref in enumerate(self.refs):
             self.ui.tableWidget_refs.insertRow(row)
-            item = QtWidgets.QTableWidgetItem(str(f['risid']))
+            item = QtWidgets.QTableWidgetItem(str(ref['risid']))
             item.setFlags(QtCore.Qt.ItemFlag.ItemIsEnabled)
             self.ui.tableWidget_refs.setItem(row, 0, item)
-            item = QtWidgets.QTableWidgetItem(f['formatted'])
-            item.setToolTip(f['details'])
+            item = QtWidgets.QTableWidgetItem(ref['formatted'])
+            item.setToolTip(ref['details'])
             item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
             self.ui.tableWidget_refs.setItem(row, 1, item)
+            # Check if files assigned to this ref
+            files_assigned = False
+            for f in self.files:
+                if f['risid'] == ref['risid']:
+                    files_assigned = True
+                    break
+            if self.ui.checkBox_hide_refs.isChecked() and files_assigned:
+                self.ui.tableWidget_refs.setRowHidden(row, True)
+            else:
+                self.ui.tableWidget_refs.setRowHidden(row, False)
         if self.app.settings['showids']:
             self.ui.tableWidget_refs.showColumn(0)
         self.ui.tableWidget_refs.resizeColumnsToContents()
@@ -198,7 +214,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
 
         if type(event) == QtGui.QKeyEvent:
             key = event.key()
-            mod = event.modifiers()
+            #mod = event.modifiers()
             if key == QtCore.Qt.Key.Key_L and (self.ui.tableWidget_refs.hasFocus() or self.ui.tableWidget_files.hasFocus()):
                 self.link_files_to_reference()
                 return True
@@ -321,8 +337,4 @@ class DialogReferenceManager(QtWidgets.QDialog):
         self.fill_table_refs()
         self.fill_table_files()
         self.parent_textEdit.append(_("Reference deleted."))
-
-
-
-
 
