@@ -237,7 +237,7 @@ Move to the Qualcoder-master folder or the release folder.
 
 Run this line:
 
-`pyinstaller -w -n "QualCoder-3.1" --icon=QC_Logo.ico --onefile qualcoder/__main__.py`
+`pyinstaller -w -n "QualCoder-3.2" --icon=QC_Logo.ico --onefile qualcoder/__main__.py`
 
 The executable file will be inside a folder called dist
 
