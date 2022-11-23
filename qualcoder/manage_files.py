@@ -446,23 +446,21 @@ class DialogManageFiles(QtWidgets.QDialog):
         cur.execute(sql)
         attr_types = cur.fetchall()
         insert_sql = "insert into attribute (name, attr_type, value, id, date, owner) values(?,'file','',?,?,?)"
-        for s in sources:
-            for a in attr_types:
+        for source in sources:
+            for attribute in attr_types:
                 sql = "select value from attribute where id=? and name=?"
-                cur.execute(sql, (s[0], a[0]))
+                cur.execute(sql, (source[0], attribute[0]))
                 res = cur.fetchone()
-                # print("file", s[0],"attr", a[0], " res", res, type(res))
                 if res is None:
-                    # print("No attr placeholder found")
-                    placeholders = [a[0], s[0], datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                    placeholders = [attribute[0], source[0], datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                                     self.app.settings['codername']]
                     cur.execute(insert_sql, placeholders)
                     self.app.conn.commit()
 
         # Check and delete attribute values where file has been deleted
-        att_to_del_sql = "SELECT distinct attribute.id FROM  attribute where \
+        attribute_to_del_sql = "SELECT distinct attribute.id FROM  attribute where \
         attribute.id not in (select source.id from source) order by attribute.id asc"
-        cur.execute(att_to_del_sql)
+        cur.execute(attribute_to_del_sql)
         res = cur.fetchall()
         for r in res:
             cur.execute("delete from attribute where attr_type='file' and id=?", [r[0], ])
@@ -1740,18 +1738,21 @@ class DialogManageFiles(QtWidgets.QDialog):
             case_item = QtWidgets.QTableWidgetItem(data['case'])
             case_item.setFlags(case_item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget.setItem(row, self.CASE_COLUMN, case_item)
-
             # Add the attribute values
+            #TODO consider using role type for numerics
             for a in self.attributes:
                 for col, header in enumerate(self.header_labels):
                     if fid == a[2] and a[0] == header:
-                        s = ''
+                        string_value = ''
                         if a[1] is not None:
-                            s = str(a[1])
-                        item = QtWidgets.QTableWidgetItem(s)
+                            string_value = str(a[1])
+                        item = QtWidgets.QTableWidgetItem(string_value)
                         tt = self.get_tooltip_values(a[0])
+                        if header in ("Ref_Authors", "Ref_Title", "Ref_Type", "Ref_Year"):
+                            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
                         item.setToolTip(tt)
                         self.ui.tableWidget.setItem(row, col, item)
+        # Resize columns and rows
         dialog_w = self.size().width() - 20
         table_w = 0
         for i in range(self.ui.tableWidget.columnCount()):

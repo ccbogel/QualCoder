@@ -265,12 +265,12 @@ class RisImport:
         imports = response[0]
         if imports:
             self.create_file_attributes()
+            self.create_file_placeholder_attributes()
             self.import_ris_file(imports[0])
 
     def create_file_attributes(self):
-        """  """
+        """ Creates the attributes for Ref_Authors, Ref_Title, Ref_Type, Ref_Year """
 
-        # update attribute_type list and database
         now_date = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         cur = self.app.conn.cursor()
         ref_vars = {'Ref_Authors': 'character', 'Ref_Title': 'character', 'Ref_Type': 'character', 'Ref_Year': 'numeric'}
@@ -283,6 +283,30 @@ class RisImport:
                         (key, now_date, self.app.settings['codername'], "", 'file', ref_vars[key]))
                 self.app.conn.commit()
         self.app.delete_backup = False
+
+    def create_file_placeholder_attributes(self):
+        """ Creates empty placeholder attributes for each file.
+         Duplicated the methods manage_files.check_attribute_placeholders """
+
+        cur = self.app.conn.cursor()
+        sql = "select id from source "
+        cur.execute(sql)
+        sources = cur.fetchall()
+        sql = 'select name from attribute_type where caseOrFile ="file"'
+        cur.execute(sql)
+        attr_types = cur.fetchall()
+        attr_types = ["Ref_Authors", "Ref_Title", "Ref_Type", "Ref_Year"]
+        insert_sql = "insert into attribute (name, attr_type, value, id, date, owner) values(?,'file','',?,?,?)"
+        for source in sources:
+            for att in attr_types:
+                sql = "select value from attribute where id=? and name=?"
+                cur.execute(sql, [source[0], att])
+                res = cur.fetchone()
+                if res is None:
+                    placeholders = [att, source[0], datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                                    self.app.settings['codername']]
+                    cur.execute(insert_sql, placeholders)
+                    self.app.conn.commit()
 
     def import_ris_file(self, filepath):
         """ Open file and extract RIS information.
