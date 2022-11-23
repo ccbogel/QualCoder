@@ -561,6 +561,9 @@ class App(object):
         QMenu {border: 1px solid #808080;}\n\
         QListWidget::item:selected {border-left: 2px solid red; color: #000000;}\n\
         QTableWidget:focus {border: 3px solid #ffaa00;}\n\
+        QHeaderView::section {background-color: #f9f9f9}\n\
+        QTabBar::tab {background-color: #f9f9f9; border-top: #f9f9f9 4px solid; margin-left: 4px;}\n\
+        QTabBar::tab:selected {background-color: #f9f9f9; border-top: 2px solid #ffaa00; border-bottom: 2px solid #ffaa00; margin-left: 4px;}\n\
         QTreeWidget {font-size: 12px;}\n\
         QTreeWidget::branch:selected {border-left: 2px solid red; color: #000000;}"
         style = style.replace("* {font-size: 12", "* {font-size:" + str(settings.get('fontsize')))
