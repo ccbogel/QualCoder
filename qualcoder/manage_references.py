@@ -208,7 +208,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
 
     def eventFilter(self, object_, event):
         """ L Link files to reference.
-        U to unlink selcted files
+        U to unlink selected files
         Note. Fires multiple times very quickly.
         """
 
@@ -249,17 +249,37 @@ class DialogReferenceManager(QtWidgets.QDialog):
         file_row_objs = self.ui.tableWidget_files.selectionModel().selectedRows()
         if not file_row_objs:
             return
-        #print(index, index.row())
+        ref = None
+        attr_values = {"Ref_Authors": "", "Ref_Title": "", "Ref_Type": "", "Ref_Year": ""}
+        for r in self.refs:
+            if r['risid'] == ris_id:
+                ref = r
+        try:
+            attr_values['Ref_Authors'] = ref['AU']
+        except KeyError:
+            pass
+        try:
+            attr_values['Ref_Title'] = ref['TI']
+        except KeyError:
+            pass
+        try:
+            attr_values['Ref_Type'] = ref['TY']
+        except KeyError:
+            pass
+        try:
+            attr_values['Ref_Year'] = ref['PY']
+        except KeyError:
+            pass
         cur = self.app.conn.cursor()
         for index in file_row_objs:
             fid = int(index.data())  # Column 0 data
             cur.execute("update source set risid=? where id=?", [ris_id, fid])
             self.app.conn.commit()
             self.ui.tableWidget_files.item(index.row(), 2).setText(str(ris_id))
-
-            # TODO insert file attributes for
-            # Ref_Type, Ref_Author, Ref_Title, Ref_Year
-
+            sql = "update attribute set value=? where id=? and name=?"
+            for attribute in attr_values:
+                cur.execute(sql, [attr_values[attribute], fid, attribute])
+                self.app.conn.commit()
         self.get_data()
 
     def edit_reference(self):
