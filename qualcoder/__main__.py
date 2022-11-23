@@ -499,7 +499,8 @@ class App(object):
 
     def merge_settings_with_default_stylesheet(self, settings):
         """ Originally had separate stylesheet file. Now stylesheet is coded because
-        avoids potential data file import errors with pyinstaller. """
+        avoids potential data file import errors with pyinstaller.
+        QSlider handles code based on: https://forum.qt.io/topic/87256/how-to-set-qslider-handle-to-round/2 """
 
         style_dark = "* {font-size: 12px; background-color: #2a2a2a; color:#eeeeee;}\n\
         QWidget:focus {border: 2px solid #f89407;}\n\
@@ -543,7 +544,10 @@ class App(object):
         QListWidget::item:selected {border-left: 3px solid red; color: #eeeeee;}\n\
         QHeaderView::section {background-color: #505050; color: #ffce42;}\n\
         QTreeWidget {font-size: 12px;}\n\
-        QTreeWidget::branch:selected {border-left: 2px solid red; color: #eeeeee;}"
+        QTreeWidget::branch:selected {border-left: 2px solid red; color: #eeeeee;}\n\
+        QSlider::groove:horizontal {background-color: #777777; border: 0px solid #777777; height: 10px; border-radius: 4px;}\n\
+        QSlider::handle:horizontal { background-color: #ffaa00; border: 2px solid #ffaa00; width: 16px; height: 16px; \
+        line-height: 16px; margin-top: -4px; margin-bottom: -4px; border-radius: 8px;}"
         style_dark = style_dark.replace("* {font-size: 12", "* {font-size:" + str(settings.get('fontsize')))
         style_dark = style_dark.replace("QTreeWidget {font-size: 12",
                                         "QTreeWidget {font-size: " + str(settings.get('treefontsize')))
@@ -562,8 +566,8 @@ class App(object):
         QListWidget::item:selected {border-left: 2px solid red; color: #000000;}\n\
         QTableWidget:focus {border: 3px solid #ffaa00;}\n\
         QHeaderView::section {background-color: #f9f9f9}\n\
-        QTabBar::tab {background-color: #f9f9f9; border-top: #f9f9f9 4px solid; margin-left: 4px;}\n\
-        QTabBar::tab:selected {background-color: #f9f9f9; border-top: 2px solid #ffaa00; border-bottom: 2px solid #ffaa00; margin-left: 4px;}\n\
+        QTabBar::tab {background-color: #f9f9f9; border-top: #f9f9f9 4px solid; padding-left: 6px; padding-right: 6px;}\n\
+        QTabBar::tab:selected {background-color: #f9f9f9; border-top: 3px solid #ffaa00; border-bottom: 3px solid #ffaa00;}\n\
         QTreeWidget {font-size: 12px;}\n\
         QTreeWidget::branch:selected {border-left: 2px solid red; color: #000000;}"
         style = style.replace("* {font-size: 12", "* {font-size:" + str(settings.get('fontsize')))
