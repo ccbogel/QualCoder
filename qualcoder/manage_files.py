@@ -1747,6 +1747,8 @@ class DialogManageFiles(QtWidgets.QDialog):
                         string_value = ''
                         if a[1] is not None:
                             string_value = str(a[1])
+                        if header == "Ref_Authors":
+                            string_value = string_value.replace(";", "\n")
                         item = QtWidgets.QTableWidgetItem(string_value)
                         tt = self.get_tooltip_values(a[0])
                         if header in ("Ref_Authors", "Ref_Title", "Ref_Type", "Ref_Year"):
