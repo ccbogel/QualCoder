@@ -544,10 +544,8 @@ class App(object):
         QListWidget::item:selected {border-left: 3px solid red; color: #eeeeee;}\n\
         QHeaderView::section {background-color: #505050; color: #ffce42;}\n\
         QTreeWidget {font-size: 12px;}\n\
-        QTreeWidget::branch:selected {border-left: 2px solid red; color: #eeeeee;}\n\
-        QSlider::groove:horizontal {background-color: #777777; border: 0px solid #777777; height: 10px; border-radius: 4px;}\n\
-        QSlider::handle:horizontal { background-color: #ffaa00; border: 2px solid #ffaa00; width: 16px; height: 16px; \
-        line-height: 16px; margin-top: -4px; margin-bottom: -4px; border-radius: 8px;}"
+        QTreeView {background-color: #484848}\n\
+        QTreeView::branch:selected {border-left: 2px solid red; color: #eeeeee;}"
         style_dark = style_dark.replace("* {font-size: 12", "* {font-size:" + str(settings.get('fontsize')))
         style_dark = style_dark.replace("QTreeWidget {font-size: 12",
                                         "QTreeWidget {font-size: " + str(settings.get('treefontsize')))
