@@ -1701,6 +1701,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.ui.label_fcount.setText(_("Files: ") + str(len(self.source)))
         self.ui.tableWidget.setColumnCount(len(self.header_labels))
         self.ui.tableWidget.setHorizontalHeaderLabels(self.header_labels)
+        self.ui.tableWidget.horizontalHeader().setStretchLastSection(False)
         rows = self.ui.tableWidget.rowCount()
         for r in range(0, rows):
             self.ui.tableWidget.removeRow(0)
@@ -1753,23 +1754,16 @@ class DialogManageFiles(QtWidgets.QDialog):
                         item.setToolTip(tt)
                         self.ui.tableWidget.setItem(row, col, item)
         # Resize columns and rows
-        '''dialog_w = self.size().width() - 20
-        table_w = 0
-        for i in range(self.ui.tableWidget.columnCount()):
-            table_w += self.ui.tableWidget.columnWidth(i)
-        if self.ui.tableWidget.columnWidth(self.NAME_COLUMN) > 450 and table_w > dialog_w:
-            self.ui.tableWidget.setColumnWidth(self.NAME_COLUMN, 450)'''
-        self.ui.tableWidget.resizeColumnsToContents()
-        for i in range(self.ui.tableWidget.columnCount()):
-            #print(i, self.ui.tableWidget.columnWidth(i))
-            if self.ui.tableWidget.columnWidth(i) > 450:
-                # TODO Resizing does not work
-                print(i, self.ui.tableWidget.columnWidth(i))
-                print("Resizing column", i)
-                self.ui.tableWidget.setColumnWidth(i, 450)
-                print(i, self.ui.tableWidget.columnWidth(i))
-        self.ui.tableWidget.resizeRowsToContents()
         self.ui.tableWidget.hideColumn(self.ID_COLUMN)
         if self.app.settings['showids']:
             self.ui.tableWidget.showColumn(self.ID_COLUMN)
-        self.ui.tableWidget.verticalHeader().setVisible(False)
+        self.ui.tableWidget.resizeColumnsToContents()
+        for i in range(self.ui.tableWidget.columnCount()):
+            if self.ui.tableWidget.columnWidth(i) > 450:
+                # TODO Resizing does not work here, strange. report_sql it does work
+                #print(i, self.ui.tableWidget.columnWidth(i))
+                #print("Resizing column", i)
+                self.ui.tableWidget.setColumnWidth(i, 450)
+                #print(i, self.ui.tableWidget.columnWidth(i))
+        self.ui.tableWidget.resizeRowsToContents()
+        #self.ui.tableWidget.verticalHeader().setVisible(False)
