@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>809</width>
-    <height>619</height>
+    <width>799</width>
+    <height>596</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -22,8 +22,8 @@
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
     <rect>
-     <x>490</x>
-     <y>580</y>
+     <x>560</x>
+     <y>520</y>
      <width>201</width>
      <height>32</height>
     </rect>
@@ -106,7 +106,7 @@
   <widget class="QCheckBox" name="checkBox">
    <property name="geometry">
     <rect>
-     <x>460</x>
+     <x>510</x>
      <y>150</y>
      <width>151</width>
      <height>22</height>
@@ -122,7 +122,7 @@
   <widget class="QLabel" name="label_directory">
    <property name="geometry">
     <rect>
-     <x>10</x>
+     <x>30</x>
      <y>560</y>
      <width>691</width>
      <height>21</height>
@@ -242,8 +242,8 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>388</y>
-     <width>691</width>
+     <y>410</y>
+     <width>781</width>
      <height>21</height>
     </rect>
    </property>
@@ -258,15 +258,14 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>410</y>
-     <width>761</width>
-     <height>101</height>
+     <y>432</y>
+     <width>791</width>
+     <height>71</height>
     </rect>
    </property>
    <property name="text">
     <string>Backup video and audio files. Uncheck to speed up backups.
-Not recommended unless you have many large files slowing the backup.
-You must store these files elsewhere.</string>
+Not recommended unless you have many large files slowing the backup.</string>
    </property>
    <property name="checked">
     <bool>true</bool>
@@ -275,7 +274,7 @@ You must store these files elsewhere.</string>
   <widget class="QLabel" name="label_5">
    <property name="geometry">
     <rect>
-     <x>360</x>
+     <x>410</x>
      <y>282</y>
      <width>161</width>
      <height>21</height>
@@ -294,7 +293,7 @@ You must store these files elsewhere.</string>
   <widget class="QComboBox" name="comboBox_timestamp">
    <property name="geometry">
     <rect>
-     <x>530</x>
+     <x>580</x>
      <y>280</y>
      <width>151</width>
      <height>28</height>
@@ -304,7 +303,7 @@ You must store these files elsewhere.</string>
   <widget class="QLabel" name="label_6">
    <property name="geometry">
     <rect>
-     <x>350</x>
+     <x>400</x>
      <y>317</y>
      <width>181</width>
      <height>21</height>
@@ -323,7 +322,7 @@ You must store these files elsewhere.</string>
   <widget class="QComboBox" name="comboBox_speaker">
    <property name="geometry">
     <rect>
-     <x>560</x>
+     <x>610</x>
      <y>314</y>
      <width>121</width>
      <height>28</height>
@@ -385,7 +384,7 @@ You must store these files elsewhere.</string>
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>360</y>
+     <y>370</y>
      <width>141</width>
      <height>21</height>
     </rect>
@@ -404,7 +403,7 @@ You must store these files elsewhere.</string>
    <property name="geometry">
     <rect>
      <x>180</x>
-     <y>360</y>
+     <y>370</y>
      <width>48</width>
      <height>30</height>
     </rect>
@@ -441,7 +440,7 @@ You must store these files elsewhere.</string>
     <rect>
      <x>20</x>
      <y>120</y>
-     <width>661</width>
+     <width>751</width>
      <height>16</height>
     </rect>
    </property>
@@ -454,7 +453,7 @@ You must store these files elsewhere.</string>
     <rect>
      <x>20</x>
      <y>350</y>
-     <width>661</width>
+     <width>751</width>
      <height>16</height>
     </rect>
    </property>
@@ -465,7 +464,7 @@ You must store these files elsewhere.</string>
   <widget class="QLabel" name="label_8">
    <property name="geometry">
     <rect>
-     <x>360</x>
+     <x>410</x>
      <y>230</y>
      <width>211</width>
      <height>24</height>
@@ -484,7 +483,7 @@ You must store these files elsewhere.</string>
   <widget class="QComboBox" name="comboBox_text_chunk_size">
    <property name="geometry">
     <rect>
-     <x>580</x>
+     <x>630</x>
      <y>229</y>
      <width>101</width>
      <height>30</height>
@@ -514,7 +513,7 @@ You must store these files elsewhere.</string>
   <widget class="QComboBox" name="comboBox_style">
    <property name="geometry">
     <rect>
-     <x>530</x>
+     <x>580</x>
      <y>190</y>
      <width>151</width>
      <height>28</height>
@@ -524,7 +523,7 @@ You must store these files elsewhere.</string>
   <widget class="QLabel" name="label_style">
    <property name="geometry">
     <rect>
-     <x>386</x>
+     <x>436</x>
      <y>190</y>
      <width>121</width>
      <height>21</height>
