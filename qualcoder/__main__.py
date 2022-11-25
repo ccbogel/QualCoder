@@ -498,9 +498,14 @@ class App(object):
         return settings_data
 
     def merge_settings_with_default_stylesheet(self, settings):
-        """ Originally had separate stylesheet file. Now stylesheet is coded because
-        avoids potential data file import errors with pyinstaller.
-        Orange #f89407 
+        """ Stylesheet is coded to avoid potential data file import errors with pyinstaller.
+        Various options for colour schemes:
+        original, dark, blue, green, orange, purple, yellow
+
+        Orange #f89407
+
+        Wild: QWidget {background: qlineargradient( x1:0 y1:0, x2:1 y2:0, stop:0 cyan, stop:1 blue);}
+        color: qlineargradient(spread:pad, x1:0 y1:0, x2:1 y2:0, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(255, 255, 255, 255));
         """
 
         style_dark = "* {font-size: 12px; background-color: #2a2a2a; color:#eeeeee;}\n\
@@ -514,31 +519,32 @@ class App(object):
         QGroupBox {border: None;}\n\
         QGroupBox:focus {border: 3px solid #ffaa00;}\n\
         QHeaderView::section {background-color: #505050; color: #ffce42;}\n\
-        QLabel#label_search_regex {background-color:#808080;}\n\
-        QLabel#label_search_case_sensitive {background-color:#808080;}\n\
-        QLabel#label_search_all_files {background-color:#808080;}\n\
-        QLabel#label_font_size {background-color:#808080;}\n\
-        QLabel#label_search_all_journals {background-color:#808080;}\n\
-        QLabel#label_exports {background-color:#808080;}\n\
-        QLabel#label_time_3 {background-color:#808080;}\n\
-        QLabel#label_volume {background-color:#808080;}\n\
-        QLabel:disabled {color: #808080;}\n\
-        QLineEdit {border: 1px solid #808080;}\n\
+        QLabel {border: 1px solid #858585;}\n\
+        QLabel#label_search_regex {background-color:#858585;}\n\
+        QLabel#label_search_case_sensitive {background-color:#858585;}\n\
+        QLabel#label_search_all_files {background-color:#858585;}\n\
+        QLabel#label_font_size {background-color:#858585;}\n\
+        QLabel#label_search_all_journals {background-color:#858585;}\n\
+        QLabel#label_exports {background-color:#858585;}\n\
+        QLabel#label_time_3 {background-color:#858585;}\n\
+        QLabel#label_volume {background-color:#858585;}\n\
+        QLabel:disabled {color: #707070;}\n\
+        QLineEdit {border: 1px solid #858585;}\n\
         QListWidget::item:selected {border-left: 3px solid red; color: #eeeeee;}\n\
         QMenuBar::item:selected {background-color: #3498db; }\n\
-        QMenu {border: 1px solid #808080;}\n\
+        QMenu {border: 1px solid #858585;}\n\
         QMenu::item:selected {background-color:  #3498db;}\n\
-        QMenu::item:disabled {color: #777777;}\n\
-        QPushButton {background-color: #808080;}\n\
+        QMenu::item:disabled {color: #707070;}\n\
+        QPushButton {background-color: #858585;}\n\
         QPushButton:hover {border: 2px solid #ffaa00;}\n\
-        QRadioButton::indicator {border: 1px solid #808080; background-color: #2a2a2a;}\n\
-        QRadioButton::indicator::checked {border: 2px solid #808080; background-color: orange;}\n\
+        QRadioButton::indicator {border: 1px solid #858585; background-color: #2a2a2a;}\n\
+        QRadioButton::indicator::checked {border: 2px solid #858585; background-color: orange;}\n\
         QSlider::handle:horizontal {background-color: #f89407;}\n\
-        QTabBar {border: 2px solid #808080;}\n\
-        QTabBar::tab {border: 1px solid #808080;}\n\
-        QTabBar::tab:selected {border: 2px solid #f89407; background-color: #707070; margin-left: 3px;}\n\
-        QTabBar::tab:!selected {border: 2px solid #707070; background-color: #2a2a2a; margin-left: 3px;}\n\
-        QTabWidget::pane {border: 1px solid #808080;}\n\
+        QTabBar {border: 2px solid #858585;}\n\
+        QTabBar::tab {border: 1px solid #858585;}\n\
+        QTabBar::tab:selected {border: 2px solid #858585; background-color: #707070; margin-left: 3px;}\n\
+        QTabBar::tab:!selected {border: 2px solid #858585; background-color: #2a2a2a; margin-left: 3px;}\n\
+        QTabWidget::pane {border: 1px solid #858585;}\n\
         QTableWidget {border: 1px solid #ffaa00; gridline-color: #707070;}\n\
         QTableWidget:focus {border: 3px solid #ffaa00;}\n\
         QTextEdit {border: 1px solid #ffaa00; selection-color: #000000; selection-background-color:#ffffff;}\n\
@@ -555,14 +561,15 @@ class App(object):
         QWidget {background-color: #efefef; color: #000000}\n\
         QWidget:focus {border: 2px solid #f89407;}\n\
         QDialog {border: 1px solid #808080;}\n\
-        QComboBox {border: 1px solid #707070;}\n\
+        QComboBox {border: 1px solid #707070; background-color: #fafafa;}\n\
         QComboBox:hover,QPushButton:hover {border: 2px solid #f89407;}\n\
         QGroupBox {border: None;}\n\
         QGroupBox:focus {border: 3px solid #f89407;}\n\
         QHeaderView::section {background-color: #f9f9f9}\n\
+        QLineEdit {border: 1px solid #707070; background-color: #fafafa;}\n\
         QListWidget::item:selected {border-left: 2px solid red; color: #000000;}\n\
         QMenu {border: 1px solid #808080;}\n\
-        QMenu::item:disabled {color: #777777;}\n\
+        QMenu::item:disabled {color: #707070;}\n\
         QTableWidget {border: 1px solid #f89407; gridline-color: #707070;}\n\
         QTableWidget:focus {border: 3px solid #f89407;}\n\
         QTabBar {border: 2px solid #808080;}\n\
@@ -577,7 +584,6 @@ class App(object):
         style = style.replace("* {font-size: 12", "* {font-size:" + str(settings.get('fontsize')))
         style = style.replace("QTreeWidget {font-size: 12",
                               "QTreeWidget {font-size: " + str(settings.get('treefontsize')))
-
         if self.settings['stylesheet'] == 'dark':
             return style_dark
         if self.settings['stylesheet'] == "orange":
@@ -585,10 +591,9 @@ class App(object):
             style = style.replace("#f89407", "#306eff")
         if self.settings['stylesheet'] == "yellow":
             style = style.replace("#efefef", "#f9e79f")
-            #style = style.replace("#f89407", "#ffff00")
         if self.settings['stylesheet'] == "green":
             style = style.replace("#efefef", "#c8e6c9")
-            style = style.replace("#f89407", "#ffff00")
+            style = style.replace("#f89407", "#ea202c")
         if self.settings['stylesheet'] == "blue":
             style = style.replace("#efefef", "#cbe9fa")
             style = style.replace("#f89407", "#303f9f")
