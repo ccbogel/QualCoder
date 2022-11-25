@@ -183,9 +183,6 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
         self.ui.tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.load_file_data()
-        # Initial resize of table columns
-        self.ui.tableWidget.resizeColumnsToContents()
-        self.ui.tableWidget.resizeRowsToContents()
 
     @staticmethod
     def help():
@@ -230,6 +227,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         if col > self.CASE_COLUMN:
             action_equals_value = menu.addAction(_("Show this value"))
             action_order_by_value = menu.addAction(_("Order by attribute"))
+        action_show_values_like = menu.addAction(_("Show values like"))
         action_rename = menu.addAction(_("Rename database entry"))
         action_export = menu.addAction(_("Export"))
         action_delete = menu.addAction(_("Delete"))
@@ -279,6 +277,16 @@ class DialogManageFiles(QtWidgets.QDialog):
                 if compare_text != text_:
                     self.ui.tableWidget.setRowHidden(r, True)
             self.rows_hidden = True
+        if action == action_show_values_like:
+            #item = self.ui.tableWidget.item(row, col)
+            #cell_text = item.text()  # not great with author list. cell_text is final parameter in InputDialog
+            text_value, ok = QtWidgets.QInputDialog.getText(self, _("Text filter"), _("Show values like:"),
+                                                       QtWidgets.QLineEdit.EchoMode.Normal)
+            self.rows_hidden = True
+            if ok and text_value != '':
+                for r in range(0, self.ui.tableWidget.rowCount()):
+                    if self.ui.tableWidget.item(r, col).text().find(text_value) == -1:
+                        self.ui.tableWidget.setRowHidden(r, True)
         if action == action_show_all:
             for r in range(0, self.ui.tableWidget.rowCount()):
                 self.ui.tableWidget.setRowHidden(r, False)
@@ -304,7 +312,6 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.app.conn.commit()
         self.parent_text_edit.append(_("Renamed database file entry: ") + existing_name + " -> " + new_name)
         self.load_file_data()
-        self.fill_table()
         self.app.delete_backup = False
         self.update_files_in_dialogs()
 
@@ -509,6 +516,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         video files.
         Db version 5+: av_text_id links the text file to the audio/video
         Obtain some file metadata to use in table tooltip.
+        Fills table after data is loaded.
         param:
             order_by: string ""= name, "date" = date, "filetype" = mediapath,
                 "casename" = by alphabetic casename
@@ -1663,7 +1671,6 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.check_attribute_placeholders()
         self.parent_text_edit.append(_("Deleted file: ") + self.source[row]['name'])
         self.load_file_data()
-        self.fill_table()
         self.app.delete_backup = False
 
     def get_tooltip_values(self, attribute_name):
@@ -1761,11 +1768,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.ui.tableWidget.showColumn(self.ID_COLUMN)
         self.ui.tableWidget.resizeColumnsToContents()
         for i in range(self.ui.tableWidget.columnCount()):
-            if self.ui.tableWidget.columnWidth(i) > 450:
-                # TODO Resizing does not work here, strange. report_sql it does work
-                #print(i, self.ui.tableWidget.columnWidth(i))
-                #print("Resizing column", i)
-                self.ui.tableWidget.setColumnWidth(i, 450)
-                #print(i, self.ui.tableWidget.columnWidth(i))
+            if self.ui.tableWidget.columnWidth(i) > 500:
+                self.ui.tableWidget.setColumnWidth(i, 500)
         self.ui.tableWidget.resizeRowsToContents()
         #self.ui.tableWidget.verticalHeader().setVisible(False)
