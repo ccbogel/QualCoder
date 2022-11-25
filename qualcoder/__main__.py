@@ -36,7 +36,6 @@ import logging
 from logging.handlers import RotatingFileHandler
 import os
 import platform
-from random import randint
 import shutil
 import sys
 import sqlite3
@@ -581,28 +580,22 @@ class App(object):
 
         if self.settings['stylesheet'] == 'dark':
             return style_dark
-        '''r = randint(1, 6)
-        # Orange
-        if r == 2:
+        if self.settings['stylesheet'] == "orange":
             style = style.replace("#efefef", "#ffcba4")
             style = style.replace("#f89407", "#306eff")
-        # Yellow
-        if r == 3:
+        if self.settings['stylesheet'] == "yellow":
             style = style.replace("#efefef", "#f9e79f")
             #style = style.replace("#f89407", "#ffff00")
-        # Green
-        if r == 4:
+        if self.settings['stylesheet'] == "green":
             style = style.replace("#efefef", "#c8e6c9")
             style = style.replace("#f89407", "#ffff00")
-        # Blue
-        if r == 5:
+        if self.settings['stylesheet'] == "blue":
             style = style.replace("#efefef", "#cbe9fa")
             style = style.replace("#f89407", "#303f9f")
-        # Purple
-        if r == 6:
+        if self.settings['stylesheet'] == "purple":
             style = style.replace("#efefef", "#dfe2ff")
             style = style.replace("#f89407", "#ca1b9a")
-        return style'''
+        return style
 
     def load_settings(self):
         result = self._load_config_ini()
