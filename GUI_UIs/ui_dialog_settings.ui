@@ -41,7 +41,7 @@
      <x>190</x>
      <y>80</y>
      <width>241</width>
-     <height>31</height>
+     <height>30</height>
     </rect>
    </property>
   </widget>
@@ -67,7 +67,7 @@
      <x>30</x>
      <y>220</y>
      <width>229</width>
-     <height>38</height>
+     <height>32</height>
     </rect>
    </property>
   </widget>
@@ -77,7 +77,7 @@
      <x>270</x>
      <y>220</y>
      <width>71</width>
-     <height>38</height>
+     <height>32</height>
     </rect>
    </property>
    <property name="minimum">
@@ -138,7 +138,7 @@
      <x>30</x>
      <y>520</y>
      <width>391</width>
-     <height>31</height>
+     <height>30</height>
     </rect>
    </property>
    <property name="text">
@@ -170,7 +170,7 @@
      <x>190</x>
      <y>40</y>
      <width>241</width>
-     <height>32</height>
+     <height>30</height>
     </rect>
    </property>
   </widget>
@@ -196,7 +196,7 @@
      <x>270</x>
      <y>260</y>
      <width>71</width>
-     <height>38</height>
+     <height>32</height>
     </rect>
    </property>
    <property name="minimum">
@@ -213,7 +213,7 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>160</y>
+     <y>152</y>
      <width>151</width>
      <height>20</height>
     </rect>
@@ -229,7 +229,7 @@
    <property name="geometry">
     <rect>
      <x>190</x>
-     <y>150</y>
+     <y>146</y>
      <width>241</width>
      <height>32</height>
     </rect>
@@ -243,7 +243,7 @@
     <rect>
      <x>10</x>
      <y>388</y>
-     <width>511</width>
+     <width>691</width>
      <height>21</height>
     </rect>
    </property>
@@ -260,7 +260,7 @@
      <x>10</x>
      <y>410</y>
      <width>761</width>
-     <height>91</height>
+     <height>101</height>
     </rect>
    </property>
    <property name="text">
@@ -275,9 +275,9 @@ You must store these files elsewhere.</string>
   <widget class="QLabel" name="label_5">
    <property name="geometry">
     <rect>
-     <x>370</x>
-     <y>230</y>
-     <width>141</width>
+     <x>360</x>
+     <y>282</y>
+     <width>161</width>
      <height>21</height>
     </rect>
    </property>
@@ -295,7 +295,7 @@ You must store these files elsewhere.</string>
    <property name="geometry">
     <rect>
      <x>530</x>
-     <y>223</y>
+     <y>280</y>
      <width>151</width>
      <height>28</height>
     </rect>
@@ -304,9 +304,9 @@ You must store these files elsewhere.</string>
   <widget class="QLabel" name="label_6">
    <property name="geometry">
     <rect>
-     <x>390</x>
-     <y>277</y>
-     <width>201</width>
+     <x>350</x>
+     <y>317</y>
+     <width>181</width>
      <height>21</height>
     </rect>
    </property>
@@ -323,9 +323,9 @@ You must store these files elsewhere.</string>
   <widget class="QComboBox" name="comboBox_speaker">
    <property name="geometry">
     <rect>
-     <x>610</x>
-     <y>270</y>
-     <width>71</width>
+     <x>560</x>
+     <y>314</y>
+     <width>121</width>
      <height>28</height>
     </rect>
    </property>
@@ -352,7 +352,7 @@ You must store these files elsewhere.</string>
      <x>270</x>
      <y>300</y>
      <width>71</width>
-     <height>38</height>
+     <height>32</height>
     </rect>
    </property>
    <property name="minimum">
@@ -363,19 +363,6 @@ You must store these files elsewhere.</string>
    </property>
    <property name="singleStep">
     <number>2</number>
-   </property>
-  </widget>
-  <widget class="QCheckBox" name="checkBox_dark_mode">
-   <property name="geometry">
-    <rect>
-     <x>460</x>
-     <y>180</y>
-     <width>191</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Dark mode</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_current_coder">
@@ -397,14 +384,14 @@ You must store these files elsewhere.</string>
   <widget class="QLabel" name="label_backups_to_keep">
    <property name="geometry">
     <rect>
-     <x>350</x>
+     <x>20</x>
      <y>360</y>
-     <width>271</width>
+     <width>141</width>
      <height>21</height>
     </rect>
    </property>
    <property name="text">
-    <string>Number of backups</string>
+    <string>Backups</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
@@ -416,10 +403,10 @@ You must store these files elsewhere.</string>
   <widget class="QSpinBox" name="spinBox_backups">
    <property name="geometry">
     <rect>
-     <x>630</x>
+     <x>180</x>
      <y>360</y>
      <width>48</width>
-     <height>26</height>
+     <height>30</height>
     </rect>
    </property>
    <property name="minimum">
@@ -438,7 +425,7 @@ You must store these files elsewhere.</string>
      <x>440</x>
      <y>80</y>
      <width>89</width>
-     <height>31</height>
+     <height>30</height>
     </rect>
    </property>
    <property name="toolTip">
@@ -479,7 +466,7 @@ You must store these files elsewhere.</string>
    <property name="geometry">
     <rect>
      <x>360</x>
-     <y>315</y>
+     <y>230</y>
      <width>211</width>
      <height>24</height>
     </rect>
@@ -498,9 +485,9 @@ You must store these files elsewhere.</string>
    <property name="geometry">
     <rect>
      <x>580</x>
-     <y>314</y>
+     <y>229</y>
      <width>101</width>
-     <height>28</height>
+     <height>30</height>
     </rect>
    </property>
    <item>
@@ -523,6 +510,32 @@ You must store these files elsewhere.</string>
      <string>20000</string>
     </property>
    </item>
+  </widget>
+  <widget class="QComboBox" name="comboBox_style">
+   <property name="geometry">
+    <rect>
+     <x>530</x>
+     <y>190</y>
+     <width>151</width>
+     <height>28</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_style">
+   <property name="geometry">
+    <rect>
+     <x>386</x>
+     <y>190</y>
+     <width>121</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Style</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+   </property>
   </widget>
  </widget>
  <tabstops>
