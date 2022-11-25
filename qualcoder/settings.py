@@ -87,8 +87,6 @@ class DialogSettings(QtWidgets.QDialog):
                 if row[0] != "":
                     coders.append(row[0])
         self.ui.comboBox_coders.addItems(coders)
-        '''languages = ["Deutsch de", "English en", "Ελληνικά el", "Español es", "Français fr",
-                "Italiano it", "日本 jp", "Português, pt"]'''
         languages = ["Deutsch de", "English en", "Español es", "Français fr",
                      "Italiano it", "Português, pt"]
         self.ui.comboBox_language.addItems(languages)
@@ -120,10 +118,11 @@ class DialogSettings(QtWidgets.QDialog):
             self.ui.checkBox.setChecked(True)
         else:
             self.ui.checkBox.setChecked(False)
-        if self.settings['stylesheet'] == 'dark':
-            self.ui.checkBox_dark_mode.setChecked(True)
-        else:
-            self.ui.checkBox_dark_mode.setChecked(False)
+        styles = ["original", "dark", "blue", "green", "orange", "purple", "yellow"]
+        self.ui.comboBox_style.addItems(styles)
+        for index, style in enumerate(styles):
+            if style == self.settings['stylesheet']:
+                self.ui.comboBox_style.setCurrentIndex(index)
         if self.settings['backup_on_open'] == 'True':
             self.ui.checkBox_auto_backup.setChecked(True)
         else:
@@ -196,12 +195,9 @@ class DialogSettings(QtWidgets.QDialog):
             self.settings['showids'] = 'True'
         else:
             self.settings['showids'] = 'False'
-        if self.ui.checkBox_dark_mode.isChecked():
-            if self.settings['stylesheet'] != 'dark':
-                restart_qualcoder = True
-            self.settings['stylesheet'] = 'dark'
-        else:
-            self.settings['stylesheet'] = 'original'
+        if self.settings['stylesheet'] != self.ui.comboBox_style.currentText()[-2:]:
+            restart_qualcoder = True
+        self.settings['stylesheet'] = self.ui.comboBox_style.currentText()
         if self.settings['language'] != self.ui.comboBox_language.currentText()[-2:]:
             restart_qualcoder = True
         self.settings['language'] = self.ui.comboBox_language.currentText()[-2:]
