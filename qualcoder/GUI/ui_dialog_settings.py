@@ -12,7 +12,7 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 class Ui_Dialog_settings(object):
     def setupUi(self, Dialog_settings):
         Dialog_settings.setObjectName("Dialog_settings")
-        Dialog_settings.resize(799, 596)
+        Dialog_settings.resize(800, 596)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Policy.Fixed, QtWidgets.QSizePolicy.Policy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -80,7 +80,7 @@ class Ui_Dialog_settings(object):
         self.checkBox_auto_backup.setChecked(True)
         self.checkBox_auto_backup.setObjectName("checkBox_auto_backup")
         self.checkBox_backup_AV_files = QtWidgets.QCheckBox(Dialog_settings)
-        self.checkBox_backup_AV_files.setGeometry(QtCore.QRect(10, 432, 791, 71))
+        self.checkBox_backup_AV_files.setGeometry(QtCore.QRect(10, 432, 761, 71))
         self.checkBox_backup_AV_files.setChecked(True)
         self.checkBox_backup_AV_files.setObjectName("checkBox_backup_AV_files")
         self.label_5 = QtWidgets.QLabel(Dialog_settings)
