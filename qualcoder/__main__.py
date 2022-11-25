@@ -542,7 +542,7 @@ class App(object):
         QTabWidget::pane {border: 1px solid #808080;}\n\
         QTableWidget {border: 1px solid #ffaa00; gridline-color: #707070;}\n\
         QTableWidget:focus {border: 3px solid #ffaa00;}\n\
-        QTextEdit {border: 1px solid #ffaa00;}\n\
+        QTextEdit {border: 1px solid #ffaa00; selection-color: #000000; selection-background-color:#ffffff;}\n\
         QTextEdit:focus {border: 2px solid #ffaa00;}\n\
         QToolTip {background-color: #2a2a2a; color:#eeeeee; border: 1px solid #f89407; }\n\
         QTreeWidget {font-size: 12px;}\n\
@@ -570,7 +570,7 @@ class App(object):
         QTabBar::tab {background-color: #f9f9f9; border-top: #f9f9f9 4px solid; padding-left: 6px; padding-right: 6px;}\n\
         QTabBar::tab:selected {background-color: #f9f9f9; border-top: 3px solid #f89407; border-bottom: 3px solid #f89407;}\n\
         QTabWidget::pane {border: 1px solid #808080;}\n\
-        QTextEdit {background-color: #fcfcfc;}\n\
+        QTextEdit {background-color: #fcfcfc; selection-color: #ffffff; selection-background-color:#000000;}\n\
         QTextEdit:focus {border: 2px solid #f89407;}\n\
         QToolTip {background-color: #fffacd; color:#000000; border: 1px solid #f89407; }\n\
         QTreeWidget {font-size: 12px;}\n\
@@ -601,8 +601,8 @@ class App(object):
         # Purple
         if r == 6:
             style = style.replace("#efefef", "#dfe2ff")
-            style = style.replace("#f89407", "#ca1b9a")'''
-        return style
+            style = style.replace("#f89407", "#ca1b9a")
+        return style'''
 
     def load_settings(self):
         result = self._load_config_ini()
