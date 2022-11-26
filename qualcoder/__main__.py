@@ -519,7 +519,7 @@ class App(object):
         QGroupBox {border: None;}\n\
         QGroupBox:focus {border: 3px solid #ffaa00;}\n\
         QHeaderView::section {background-color: #505050; color: #ffce42;}\n\
-        QLabel {border: 1px solid #858585;}\n\
+        QLabel {border: none;}\n\
         QLabel#label_search_regex {background-color:#858585;}\n\
         QLabel#label_search_case_sensitive {background-color:#858585;}\n\
         QLabel#label_search_all_files {background-color:#858585;}\n\
