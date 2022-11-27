@@ -541,7 +541,7 @@ class App(object):
         QRadioButton::indicator::checked {border: 2px solid #858585; background-color: orange;}\n\
         QSlider::handle:horizontal {background-color: #f89407;}\n\
         QTabBar {border: 2px solid #858585;}\n\
-        QTabBar::tab {border: 1px solid #858585;}\n\
+        QTabBar::tab {border: 1px solid #858585; padding-left: 6px; padding-right: 6px;}\n\
         QTabBar::tab:selected {border: 2px solid #858585; background-color: #707070; margin-left: 3px;}\n\
         QTabBar::tab:!selected {border: 2px solid #858585; background-color: #2a2a2a; margin-left: 3px;}\n\
         QTabWidget::pane {border: 1px solid #858585;}\n\
@@ -586,6 +586,10 @@ class App(object):
                               "QTreeWidget {font-size: " + str(settings.get('treefontsize')))
         if self.settings['stylesheet'] == 'dark':
             return style_dark
+        style_rainbow = style_dark
+        if self.settings['stylesheet'] == 'rainbow':
+            style_rainbow = style_rainbow + "\nQDialog {background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0.2 black, stop:0.27 red, stop:0.31 yellow, stop:0.35 green, stop:0.39 #306eff, stop:0.42 blue, stop:0.45 darkMagenta, stop:0.5 black);}"
+            return style_rainbow
         if self.settings['stylesheet'] == "orange":
             style = style.replace("#efefef", "#ffcba4")
             style = style.replace("#f89407", "#306eff")

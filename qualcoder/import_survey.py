@@ -120,11 +120,15 @@ class DialogImportSurvey(QtWidgets.QDialog):
         for row in result:
             self.preexisting_fields.append({'name': row[0]})
         self.select_file()
-        print("FILE ", self.filepath)
-        if self.filepath != "":
+        # print("FILE ", self.filepath)  # returns a List
+        if self.filepath:
             self.prepare_fields()
             self.fill_table_widget()
         else:
+            self.ui.groupBox.hide()
+            self.ui.tableWidget.hide()
+            self.ui.label_msg.setText(_("No survey selected."))
+            self.ui.label_msg.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
             self.close()
 
     def select_file(self):
