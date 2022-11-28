@@ -44,8 +44,8 @@
       <property name="geometry">
        <rect>
         <x>240</x>
-        <y>40</y>
-        <width>181</width>
+        <y>45</y>
+        <width>183</width>
         <height>30</height>
        </rect>
       </property>
@@ -54,9 +54,9 @@
       <property name="geometry">
        <rect>
         <x>240</x>
-        <y>17</y>
-        <width>171</width>
-        <height>20</height>
+        <y>21</y>
+        <width>183</width>
+        <height>22</height>
        </rect>
       </property>
       <property name="text">
@@ -69,8 +69,8 @@
      <widget class="QPushButton" name="pushButton_search">
       <property name="geometry">
        <rect>
-        <x>110</x>
-        <y>80</y>
+        <x>10</x>
+        <y>81</y>
         <width>30</width>
         <height>30</height>
        </rect>
@@ -86,8 +86,8 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>20</y>
-        <width>61</width>
+        <y>22</y>
+        <width>130</width>
         <height>22</height>
        </rect>
       </property>
@@ -99,7 +99,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>40</y>
+        <y>45</y>
         <width>211</width>
         <height>30</height>
        </rect>
@@ -108,8 +108,8 @@
      <widget class="QPushButton" name="pushButton_attributeselect">
       <property name="geometry">
        <rect>
-        <x>200</x>
-        <y>81</y>
+        <x>150</x>
+        <y>82</y>
         <width>34</width>
         <height>30</height>
        </rect>
@@ -124,8 +124,8 @@
      <widget class="QLabel" name="label_exports">
       <property name="geometry">
        <rect>
-        <x>240</x>
-        <y>84</y>
+        <x>831</x>
+        <y>89</y>
         <width>24</width>
         <height>24</height>
        </rect>
@@ -140,8 +140,8 @@
      <widget class="QComboBox" name="comboBox_export">
       <property name="geometry">
        <rect>
-        <x>270</x>
-        <y>81</y>
+        <x>860</x>
+        <y>86</y>
         <width>91</width>
         <height>30</height>
        </rect>
@@ -176,36 +176,20 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>-2</y>
-        <width>231</width>
-        <height>22</height>
+        <y>-3</y>
+        <width>211</width>
+        <height>23</height>
        </rect>
       </property>
       <property name="text">
        <string>Coding report</string>
       </property>
      </widget>
-     <widget class="QLabel" name="label_matrix">
-      <property name="geometry">
-       <rect>
-        <x>600</x>
-        <y>20</y>
-        <width>30</width>
-        <height>30</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Matrix options&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
      <widget class="QComboBox" name="comboBox_matrix">
       <property name="geometry">
        <rect>
-        <x>631</x>
-        <y>23</y>
+        <x>610</x>
+        <y>25</y>
         <width>281</width>
         <height>29</height>
        </rect>
@@ -218,9 +202,9 @@
       <property name="geometry">
        <rect>
         <x>430</x>
-        <y>0</y>
+        <y>18</y>
         <width>161</width>
-        <height>23</height>
+        <height>26</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -233,9 +217,9 @@
      <widget class="QComboBox" name="comboBox_memos">
       <property name="geometry">
        <rect>
-        <x>410</x>
-        <y>80</y>
-        <width>171</width>
+        <x>240</x>
+        <y>81</y>
+        <width>181</width>
         <height>30</height>
        </rect>
       </property>
@@ -246,10 +230,10 @@
      <widget class="QLabel" name="label_memos">
       <property name="geometry">
        <rect>
-        <x>370</x>
-        <y>80</y>
-        <width>30</width>
-        <height>30</height>
+        <x>205</x>
+        <y>81</y>
+        <width>28</width>
+        <height>28</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -263,9 +247,9 @@
       <property name="geometry">
        <rect>
         <x>430</x>
-        <y>24</y>
+        <y>51</y>
         <width>161</width>
-        <height>23</height>
+        <height>26</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -278,10 +262,10 @@
      <widget class="QCheckBox" name="checkBox_matrix_transpose">
       <property name="geometry">
        <rect>
-        <x>632</x>
-        <y>0</y>
-        <width>211</width>
-        <height>23</height>
+        <x>613</x>
+        <y>-1</y>
+        <width>231</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="text">
@@ -292,9 +276,9 @@
       <property name="geometry">
        <rect>
         <x>430</x>
-        <y>50</y>
+        <y>85</y>
         <width>161</width>
-        <height>23</height>
+        <height>26</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -307,9 +291,9 @@
      <widget class="QLineEdit" name="lineEdit_search_results">
       <property name="geometry">
        <rect>
-        <x>590</x>
-        <y>80</y>
-        <width>181</width>
+        <x>610</x>
+        <y>85</y>
+        <width>161</width>
         <height>30</height>
        </rect>
       </property>
@@ -320,14 +304,17 @@
      <widget class="QLabel" name="label_search_results">
       <property name="geometry">
        <rect>
-        <x>592</x>
-        <y>56</y>
-        <width>181</width>
-        <height>20</height>
+        <x>610</x>
+        <y>58</y>
+        <width>101</width>
+        <height>22</height>
        </rect>
       </property>
       <property name="text">
-       <string>Search Results for:</string>
+       <string>Search:</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
       </property>
       <property name="wordWrap">
        <bool>true</bool>
@@ -336,8 +323,8 @@
      <widget class="QPushButton" name="pushButton_search_next">
       <property name="geometry">
        <rect>
-        <x>780</x>
-        <y>80</y>
+        <x>778</x>
+        <y>85</y>
         <width>34</width>
         <height>30</height>
        </rect>
@@ -352,8 +339,8 @@
      <widget class="QComboBox" name="comboBox_sort">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>80</y>
+        <x>50</x>
+        <y>81</y>
         <width>91</width>
         <height>30</height>
        </rect>
@@ -381,6 +368,25 @@
         <string>1 - 10</string>
        </property>
       </item>
+     </widget>
+     <widget class="QLabel" name="label_search_export">
+      <property name="geometry">
+       <rect>
+        <x>830</x>
+        <y>58</y>
+        <width>121</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Export:</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
      </widget>
     </widget>
    </item>
