@@ -146,9 +146,6 @@ class DialogReportCodes(QtWidgets.QDialog):
         pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
         self.ui.pushButton_search_next.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_search_next.pressed.connect(self.search_results_next)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_color_grid_icon_24), "png")
-        self.ui.label_matrix.setPixmap(pm)
         options = ["", _("Top categories by case"), _("Top categories by file"), _("Categories by case"),
                    _("Categories by file"), _("Codes by case"), _("Codes by file")]
         self.ui.comboBox_matrix.addItems(options)
