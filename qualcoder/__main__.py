@@ -588,7 +588,12 @@ class App(object):
             return style_dark
         style_rainbow = style_dark
         if self.settings['stylesheet'] == 'rainbow':
-            style_rainbow = style_rainbow + "\nQDialog {background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0.2 black, stop:0.27 red, stop:0.31 yellow, stop:0.35 green, stop:0.39 #306eff, stop:0.42 blue, stop:0.45 darkMagenta, stop:0.5 black);}"
+            style_rainbow += "\nQDialog {background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0.2 black, stop:0.27 red, stop:0.31 yellow, stop:0.35 green, stop:0.39 #306eff, stop:0.42 blue, stop:0.45 darkMagenta, stop:0.5 black);}"
+            style_rainbow += "\nQFrame#line {background-color: none;}"
+            style_rainbow += "\nQFrame#line_2 {background-color: none;}"
+            style_rainbow += "\nQFrame#line_3 {background-color: none;}"
+            style_rainbow += "\nQFrame#line_4 {background-color: none;}"
+            style_rainbow += "\nQSlider {background-color: none;}"
             return style_rainbow
         if self.settings['stylesheet'] == "orange":
             style = style.replace("#efefef", "#ffcba4")
