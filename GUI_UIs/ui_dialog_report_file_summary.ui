@@ -43,13 +43,13 @@
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>38</height>
+          <height>36</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
           <width>16777215</width>
-          <height>38</height>
+          <height>36</height>
          </size>
         </property>
         <property name="title">
@@ -58,14 +58,17 @@
         <widget class="QLabel" name="label_search_results">
          <property name="geometry">
           <rect>
-           <x>330</x>
+           <x>340</x>
            <y>0</y>
-           <width>181</width>
-           <height>20</height>
+           <width>161</width>
+           <height>28</height>
           </rect>
          </property>
          <property name="text">
-          <string>Search Results for:</string>
+          <string>Search:</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
          </property>
          <property name="wordWrap">
           <bool>true</bool>
@@ -106,19 +109,19 @@
            <x>0</x>
            <y>0</y>
            <width>281</width>
-           <height>22</height>
+           <height>28</height>
           </rect>
          </property>
          <property name="minimumSize">
           <size>
            <width>0</width>
-           <height>22</height>
+           <height>28</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
            <width>16777215</width>
-           <height>22</height>
+           <height>28</height>
           </size>
          </property>
          <property name="text">
