@@ -56,7 +56,7 @@
         <property name="minimumSize">
          <size>
           <width>0</width>
-          <height>22</height>
+          <height>24</height>
          </size>
         </property>
         <property name="maximumSize">
@@ -112,7 +112,7 @@
         <widget class="QPushButton" name="pushButton_delete">
          <property name="geometry">
           <rect>
-           <x>260</x>
+           <x>280</x>
            <y>0</y>
            <width>30</width>
            <height>30</height>
@@ -220,7 +220,7 @@
         <widget class="QPushButton" name="pushButton_help">
          <property name="geometry">
           <rect>
-           <x>670</x>
+           <x>200</x>
            <y>0</y>
            <width>30</width>
            <height>30</height>
