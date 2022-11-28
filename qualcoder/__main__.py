@@ -594,6 +594,7 @@ class App(object):
             style_rainbow += "\nQFrame#line_3 {background-color: none;}"
             style_rainbow += "\nQFrame#line_4 {background-color: none;}"
             style_rainbow += "\nQSlider {background-color: none;}"
+            style_rainbow += "\nQGroupBox {background-color: none;}"
             return style_rainbow
         if self.settings['stylesheet'] == "orange":
             style = style.replace("#efefef", "#ffcba4")
