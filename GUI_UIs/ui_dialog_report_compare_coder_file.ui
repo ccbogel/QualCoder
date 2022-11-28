@@ -43,13 +43,13 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>120</height>
+       <height>100</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>120</height>
+       <height>100</height>
       </size>
      </property>
      <property name="title">
@@ -59,9 +59,9 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>20</y>
+        <y>27</y>
         <width>101</width>
-        <height>22</height>
+        <height>28</height>
        </rect>
       </property>
       <property name="text">
@@ -71,8 +71,8 @@
      <widget class="QComboBox" name="comboBox_coders">
       <property name="geometry">
        <rect>
-        <x>112</x>
-        <y>20</y>
+        <x>115</x>
+        <y>27</y>
         <width>211</width>
         <height>28</height>
        </rect>
@@ -82,9 +82,9 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>-2</y>
+        <y>-1</y>
         <width>291</width>
-        <height>22</height>
+        <height>24</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -95,44 +95,12 @@ Select two coders, one file, one code.</string>
        <string>Coder comparisons by file</string>
       </property>
      </widget>
-     <widget class="QLabel" name="label_matrix">
-      <property name="geometry">
-       <rect>
-        <x>600</x>
-        <y>20</y>
-        <width>30</width>
-        <height>30</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Matrix options&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_memos">
-      <property name="geometry">
-       <rect>
-        <x>600</x>
-        <y>70</y>
-        <width>30</width>
-        <height>30</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Memo reporting options</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
      <widget class="QLabel" name="label_selections">
       <property name="geometry">
        <rect>
-        <x>330</x>
-        <y>20</y>
-        <width>611</width>
+        <x>333</x>
+        <y>27</y>
+        <width>400</width>
         <height>28</height>
        </rect>
       </property>
@@ -144,7 +112,7 @@ Select two coders, one file, one code.</string>
       <property name="geometry">
        <rect>
         <x>50</x>
-        <y>60</y>
+        <y>62</y>
         <width>32</width>
         <height>32</height>
        </rect>
@@ -160,7 +128,7 @@ Select two coders, one file, one code.</string>
       <property name="geometry">
        <rect>
         <x>90</x>
-        <y>60</y>
+        <y>62</y>
         <width>32</width>
         <height>32</height>
        </rect>
@@ -176,7 +144,7 @@ Select two coders, one file, one code.</string>
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>60</y>
+        <y>62</y>
         <width>32</width>
         <height>32</height>
        </rect>
@@ -192,7 +160,7 @@ Select two coders, one file, one code.</string>
       <property name="geometry">
        <rect>
         <x>130</x>
-        <y>60</y>
+        <y>62</y>
         <width>32</width>
         <height>32</height>
        </rect>
