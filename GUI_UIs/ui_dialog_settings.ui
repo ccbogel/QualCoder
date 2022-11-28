@@ -48,10 +48,10 @@
   <widget class="QLabel" name="label_new_coder">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>84</y>
-     <width>171</width>
-     <height>21</height>
+     <x>15</x>
+     <y>82</y>
+     <width>161</width>
+     <height>24</height>
     </rect>
    </property>
    <property name="text">
@@ -64,9 +64,9 @@
   <widget class="QFontComboBox" name="fontComboBox">
    <property name="geometry">
     <rect>
-     <x>30</x>
+     <x>20</x>
      <y>220</y>
-     <width>229</width>
+     <width>271</width>
      <height>32</height>
     </rect>
    </property>
@@ -74,7 +74,7 @@
   <widget class="QSpinBox" name="spinBox">
    <property name="geometry">
     <rect>
-     <x>270</x>
+     <x>300</x>
      <y>220</y>
      <width>71</width>
      <height>32</height>
@@ -93,10 +93,10 @@
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>30</x>
+     <x>20</x>
      <y>190</y>
-     <width>211</width>
-     <height>21</height>
+     <width>351</width>
+     <height>24</height>
     </rect>
    </property>
    <property name="text">
@@ -106,10 +106,10 @@
   <widget class="QCheckBox" name="checkBox">
    <property name="geometry">
     <rect>
-     <x>510</x>
+     <x>580</x>
      <y>150</y>
      <width>151</width>
-     <height>22</height>
+     <height>28</height>
     </rect>
    </property>
    <property name="toolTip">
@@ -124,7 +124,7 @@
     <rect>
      <x>30</x>
      <y>560</y>
-     <width>691</width>
+     <width>731</width>
      <height>21</height>
     </rect>
    </property>
@@ -149,9 +149,9 @@
    <property name="geometry">
     <rect>
      <x>15</x>
-     <y>47</y>
+     <y>44</y>
      <width>161</width>
-     <height>20</height>
+     <height>24</height>
     </rect>
    </property>
    <property name="toolTip">
@@ -177,14 +177,14 @@
   <widget class="QLabel" name="label_3">
    <property name="geometry">
     <rect>
-     <x>30</x>
+     <x>20</x>
      <y>260</y>
-     <width>241</width>
-     <height>41</height>
+     <width>271</width>
+     <height>30</height>
     </rect>
    </property>
    <property name="text">
-    <string>Font size for categories and codes tree</string>
+    <string>Font size for codes tree</string>
    </property>
    <property name="wordWrap">
     <bool>true</bool>
@@ -193,7 +193,7 @@
   <widget class="QSpinBox" name="spinBox_treefontsize">
    <property name="geometry">
     <rect>
-     <x>270</x>
+     <x>300</x>
      <y>260</y>
      <width>71</width>
      <height>32</height>
@@ -213,9 +213,9 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>152</y>
+     <y>151</y>
      <width>151</width>
-     <height>20</height>
+     <height>24</height>
     </rect>
    </property>
    <property name="text">
@@ -228,9 +228,9 @@
   <widget class="QComboBox" name="comboBox_language">
    <property name="geometry">
     <rect>
-     <x>190</x>
+     <x>180</x>
      <y>146</y>
-     <width>241</width>
+     <width>191</width>
      <height>32</height>
     </rect>
    </property>
@@ -242,8 +242,8 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>410</y>
-     <width>781</width>
+     <y>408</y>
+     <width>761</width>
      <height>21</height>
     </rect>
    </property>
@@ -258,7 +258,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>432</y>
+     <y>437</y>
      <width>761</width>
      <height>71</height>
     </rect>
@@ -274,10 +274,10 @@ Not recommended unless you have many large files slowing the backup.</string>
   <widget class="QLabel" name="label_5">
    <property name="geometry">
     <rect>
-     <x>410</x>
-     <y>282</y>
-     <width>161</width>
-     <height>21</height>
+     <x>430</x>
+     <y>280</y>
+     <width>141</width>
+     <height>28</height>
     </rect>
    </property>
    <property name="toolTip">
@@ -303,10 +303,10 @@ Not recommended unless you have many large files slowing the backup.</string>
   <widget class="QLabel" name="label_6">
    <property name="geometry">
     <rect>
-     <x>400</x>
+     <x>430</x>
      <y>317</y>
-     <width>181</width>
-     <height>21</height>
+     <width>171</width>
+     <height>28</height>
     </rect>
    </property>
    <property name="toolTip">
@@ -332,10 +332,10 @@ Not recommended unless you have many large files slowing the backup.</string>
   <widget class="QLabel" name="label_7">
    <property name="geometry">
     <rect>
-     <x>30</x>
+     <x>20</x>
      <y>300</y>
-     <width>241</width>
-     <height>41</height>
+     <width>271</width>
+     <height>30</height>
     </rect>
    </property>
    <property name="text">
@@ -348,7 +348,7 @@ Not recommended unless you have many large files slowing the backup.</string>
   <widget class="QSpinBox" name="spinBox_docfontsize">
    <property name="geometry">
     <rect>
-     <x>270</x>
+     <x>300</x>
      <y>300</y>
      <width>71</width>
      <height>32</height>
@@ -369,8 +369,8 @@ Not recommended unless you have many large files slowing the backup.</string>
     <rect>
      <x>10</x>
      <y>10</y>
-     <width>651</width>
-     <height>21</height>
+     <width>521</width>
+     <height>24</height>
     </rect>
    </property>
    <property name="text">
@@ -386,14 +386,14 @@ Not recommended unless you have many large files slowing the backup.</string>
      <x>20</x>
      <y>370</y>
      <width>141</width>
-     <height>21</height>
+     <height>28</height>
     </rect>
    </property>
    <property name="text">
     <string>Backups</string>
    </property>
    <property name="alignment">
-    <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
+    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
    </property>
    <property name="wordWrap">
     <bool>true</bool>
@@ -464,10 +464,10 @@ Not recommended unless you have many large files slowing the backup.</string>
   <widget class="QLabel" name="label_8">
    <property name="geometry">
     <rect>
-     <x>410</x>
+     <x>430</x>
      <y>230</y>
-     <width>211</width>
-     <height>24</height>
+     <width>201</width>
+     <height>28</height>
     </rect>
    </property>
    <property name="toolTip">
@@ -483,9 +483,9 @@ Not recommended unless you have many large files slowing the backup.</string>
   <widget class="QComboBox" name="comboBox_text_chunk_size">
    <property name="geometry">
     <rect>
-     <x>630</x>
+     <x>640</x>
      <y>229</y>
-     <width>101</width>
+     <width>91</width>
      <height>30</height>
     </rect>
    </property>
@@ -523,10 +523,10 @@ Not recommended unless you have many large files slowing the backup.</string>
   <widget class="QLabel" name="label_style">
    <property name="geometry">
     <rect>
-     <x>436</x>
-     <y>190</y>
-     <width>121</width>
-     <height>21</height>
+     <x>430</x>
+     <y>191</y>
+     <width>141</width>
+     <height>28</height>
     </rect>
    </property>
    <property name="text">
