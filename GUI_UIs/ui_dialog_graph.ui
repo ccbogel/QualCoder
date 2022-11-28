@@ -228,9 +228,9 @@ Right-click for options</string>
       <property name="geometry">
        <rect>
         <x>520</x>
-        <y>0</y>
+        <y>2</y>
         <width>481</width>
-        <height>44</height>
+        <height>28</height>
        </rect>
       </property>
       <property name="text">
