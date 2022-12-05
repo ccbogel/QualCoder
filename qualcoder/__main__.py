@@ -436,6 +436,8 @@ class App(object):
                 result['showids'] = False
             else:
                 result['showids'] = True
+        if 'report_text_context_characters' in default:
+            result['report_text_context_characters'] = default.getint('report_text_context_characters')
         return result
 
     def check_and_add_additional_settings(self, settings_data):
