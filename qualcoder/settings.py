@@ -135,7 +135,7 @@ class DialogSettings(QtWidgets.QDialog):
         if self.settings['directory'] == "":
             self.settings['directory'] = os.path.expanduser("~")
         self.ui.label_directory.setText(self.settings['directory'])
-        text_styles = [_('Bold'), _('Italic'), _('Bigger'), _('Code color')]
+        text_styles = [_('Bold'), _('Italic'), _('Bigger')]  #, _('Code color')]
         self.ui.comboBox_text_style.addItems(text_styles)
         for index, style in enumerate(text_styles):
             if style == self.settings['report_text_context_style']:

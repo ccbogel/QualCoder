@@ -1779,6 +1779,10 @@ class DialogReportCodes(QtWidgets.QDialog):
         fmt_normal.setFontWeight(QtGui.QFont.Weight.Normal)
         fmt_bold = QtGui.QTextCharFormat()
         fmt_bold.setFontWeight(QtGui.QFont.Weight.Bold)
+        fmt_italic = QtGui.QTextCharFormat()
+        fmt_italic.setFontItalic(True)
+        fmt_larger = QtGui.QTextCharFormat()
+        fmt_larger.setFontPointSize(self.app.settings['docfontsize'] + 2)
         memo_choice = self.ui.comboBox_memos.currentText()
         for i, row in enumerate(self.results):
             self.heading(row)
@@ -1802,8 +1806,12 @@ class DialogReportCodes(QtWidgets.QDialog):
                 pos1 = len(self.ui.textEdit.toPlainText())
                 cursor.setPosition(pos0, QtGui.QTextCursor.MoveMode.MoveAnchor)
                 cursor.setPosition(pos1, QtGui.QTextCursor.MoveMode.KeepAnchor)
-                if self.ui.checkBox_text_context.isChecked():
+                if self.ui.checkBox_text_context.isChecked() and self.app.settings['report_text_context_style'] == 'Bold':
                     cursor.setCharFormat(fmt_bold)
+                if self.ui.checkBox_text_context.isChecked() and self.app.settings['report_text_context_style'] == 'Italic':
+                    cursor.setCharFormat(fmt_italic)
+                if self.ui.checkBox_text_context.isChecked() and self.app.settings['report_text_context_style'] == 'Bigger':
+                    cursor.setCharFormat(fmt_larger)
                 pos0 = len(self.ui.textEdit.toPlainText())
                 self.ui.textEdit.insertPlainText(row['posttext'])
                 pos1 = len(self.ui.textEdit.toPlainText())
