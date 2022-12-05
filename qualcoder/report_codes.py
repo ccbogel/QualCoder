@@ -1477,7 +1477,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         for r in self.results:
             # Pre text
-            pre_text_length = 200
+            pre_text_length = self.app.settings['report_text_context_characters']
             if r['pos0'] > pre_text_length - 1:
                 pre_text_start = r['pos0'] - pre_text_length + 1  # sqlite strings start at 1 not 0
             else:
@@ -1492,7 +1492,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 r['pretext'] = res_pre[0]
             # Post text
             post_text_start = r['pos1'] + 1  # sqlite strings start at 1 not 0
-            post_text_length = 200
+            post_text_length = self.app.settings['report_text_context_characters']
             sql = "select substr(fulltext,?,?) from source where id=?"
             cur.execute(sql, [post_text_start, post_text_length, r['fid']])
             res_post = cur.fetchone()
@@ -1779,6 +1779,10 @@ class DialogReportCodes(QtWidgets.QDialog):
         fmt_normal.setFontWeight(QtGui.QFont.Weight.Normal)
         fmt_bold = QtGui.QTextCharFormat()
         fmt_bold.setFontWeight(QtGui.QFont.Weight.Bold)
+        fmt_italic = QtGui.QTextCharFormat()
+        fmt_italic.setFontItalic(True)
+        fmt_larger = QtGui.QTextCharFormat()
+        fmt_larger.setFontPointSize(self.app.settings['docfontsize'] + 2)
         memo_choice = self.ui.comboBox_memos.currentText()
         for i, row in enumerate(self.results):
             self.heading(row)
@@ -1802,8 +1806,12 @@ class DialogReportCodes(QtWidgets.QDialog):
                 pos1 = len(self.ui.textEdit.toPlainText())
                 cursor.setPosition(pos0, QtGui.QTextCursor.MoveMode.MoveAnchor)
                 cursor.setPosition(pos1, QtGui.QTextCursor.MoveMode.KeepAnchor)
-                if self.ui.checkBox_text_context.isChecked():
+                if self.ui.checkBox_text_context.isChecked() and self.app.settings['report_text_context_style'] == 'Bold':
                     cursor.setCharFormat(fmt_bold)
+                if self.ui.checkBox_text_context.isChecked() and self.app.settings['report_text_context_style'] == 'Italic':
+                    cursor.setCharFormat(fmt_italic)
+                if self.ui.checkBox_text_context.isChecked() and self.app.settings['report_text_context_style'] == 'Bigger':
+                    cursor.setCharFormat(fmt_larger)
                 pos0 = len(self.ui.textEdit.toPlainText())
                 self.ui.textEdit.insertPlainText(row['posttext'])
                 pos1 = len(self.ui.textEdit.toPlainText())

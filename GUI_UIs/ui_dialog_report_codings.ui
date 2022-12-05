@@ -282,7 +282,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>Surround coded tet with pre-text and post-text for context.</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Surround coded text with pre-text and post-text.&lt;/p&gt;&lt;p&gt;Change Settings for number of characters and display style.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string>Text context</string>

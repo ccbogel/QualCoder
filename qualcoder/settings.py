@@ -135,6 +135,12 @@ class DialogSettings(QtWidgets.QDialog):
         if self.settings['directory'] == "":
             self.settings['directory'] = os.path.expanduser("~")
         self.ui.label_directory.setText(self.settings['directory'])
+        text_styles = [_('Bold'), _('Italic'), _('Bigger')]  #, _('Code color')]
+        self.ui.comboBox_text_style.addItems(text_styles)
+        for index, style in enumerate(text_styles):
+            if style == self.settings['report_text_context_style']:
+                self.ui.comboBox_text_style.setCurrentIndex(index)
+        self.ui.spinBox_chars_before_after.setValue(self.settings['report_text_context_characters'])
         self.ui.pushButton_choose_directory.clicked.connect(self.choose_directory)
         self.ui.pushButton_set_coder.pressed.connect(self.new_coder_entered)
 
@@ -213,6 +219,8 @@ class DialogSettings(QtWidgets.QDialog):
         else:
             self.settings['backup_av_files'] = 'False'
         self.settings['backup_num'] = self.ui.spinBox_backups.value()
+        self.settings['report_text_context_characters'] = self.ui.spinBox_chars_before_after.value()
+        self.settings['report_text_context_style'] = self.ui.comboBox_text_style.currentText()
         self.save_settings()
         if restart_qualcoder:
             Message(self.app, _("Restart QualCoder"), _("Restart QualCoder to enact some changes")).exec()

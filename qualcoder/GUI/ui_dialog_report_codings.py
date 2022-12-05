@@ -166,7 +166,7 @@ class Ui_Dialog_reportCodings(object):
         self.checkBox_show_stats.setToolTip(_translate("Dialog_reportCodings", "Display summary statistics"))
         self.checkBox_show_stats.setText(_translate("Dialog_reportCodings", "Statistics"))
         self.checkBox_matrix_transpose.setText(_translate("Dialog_reportCodings", "Transpose matrix"))
-        self.checkBox_text_context.setToolTip(_translate("Dialog_reportCodings", "Surround coded tet with pre-text and post-text for context."))
+        self.checkBox_text_context.setToolTip(_translate("Dialog_reportCodings", "<html><head/><body><p>Surround coded text with pre-text and post-text.</p><p>Change Settings for number of characters and display style.</p></body></html>"))
         self.checkBox_text_context.setText(_translate("Dialog_reportCodings", "Text context"))
         self.lineEdit_search_results.setToolTip(_translate("Dialog_reportCodings", "Search results for text"))
         self.label_search_results.setText(_translate("Dialog_reportCodings", "Search:"))

@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
-    <height>596</height>
+    <width>794</width>
+    <height>665</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -23,7 +23,7 @@
    <property name="geometry">
     <rect>
      <x>560</x>
-     <y>520</y>
+     <y>590</y>
      <width>201</width>
      <height>32</height>
     </rect>
@@ -41,7 +41,7 @@
      <x>190</x>
      <y>80</y>
      <width>241</width>
-     <height>30</height>
+     <height>28</height>
     </rect>
    </property>
   </widget>
@@ -67,7 +67,7 @@
      <x>20</x>
      <y>220</y>
      <width>271</width>
-     <height>32</height>
+     <height>28</height>
     </rect>
    </property>
   </widget>
@@ -77,7 +77,7 @@
      <x>300</x>
      <y>220</y>
      <width>71</width>
-     <height>32</height>
+     <height>28</height>
     </rect>
    </property>
    <property name="minimum">
@@ -123,7 +123,7 @@
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>560</y>
+     <y>630</y>
      <width>731</width>
      <height>21</height>
     </rect>
@@ -136,7 +136,7 @@
    <property name="geometry">
     <rect>
      <x>30</x>
-     <y>520</y>
+     <y>590</y>
      <width>391</width>
      <height>30</height>
     </rect>
@@ -170,7 +170,7 @@
      <x>190</x>
      <y>40</y>
      <width>241</width>
-     <height>30</height>
+     <height>28</height>
     </rect>
    </property>
   </widget>
@@ -178,13 +178,16 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>260</y>
+     <y>250</y>
      <width>271</width>
-     <height>30</height>
+     <height>28</height>
     </rect>
    </property>
    <property name="text">
     <string>Font size for codes tree</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
    </property>
    <property name="wordWrap">
     <bool>true</bool>
@@ -194,9 +197,9 @@
    <property name="geometry">
     <rect>
      <x>300</x>
-     <y>260</y>
+     <y>250</y>
      <width>71</width>
-     <height>32</height>
+     <height>28</height>
     </rect>
    </property>
    <property name="minimum">
@@ -231,7 +234,7 @@
      <x>180</x>
      <y>146</y>
      <width>191</width>
-     <height>32</height>
+     <height>28</height>
     </rect>
    </property>
    <property name="toolTip">
@@ -242,7 +245,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>408</y>
+     <y>478</y>
      <width>761</width>
      <height>21</height>
     </rect>
@@ -258,7 +261,7 @@
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>437</y>
+     <y>507</y>
      <width>761</width>
      <height>71</height>
     </rect>
@@ -333,13 +336,16 @@ Not recommended unless you have many large files slowing the backup.</string>
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>300</y>
+     <y>280</y>
      <width>271</width>
-     <height>30</height>
+     <height>28</height>
     </rect>
    </property>
    <property name="text">
     <string>Font size for documents</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
    </property>
    <property name="wordWrap">
     <bool>true</bool>
@@ -349,9 +355,9 @@ Not recommended unless you have many large files slowing the backup.</string>
    <property name="geometry">
     <rect>
      <x>300</x>
-     <y>300</y>
+     <y>280</y>
      <width>71</width>
-     <height>32</height>
+     <height>28</height>
     </rect>
    </property>
    <property name="minimum">
@@ -384,7 +390,7 @@ Not recommended unless you have many large files slowing the backup.</string>
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>370</y>
+     <y>440</y>
      <width>141</width>
      <height>28</height>
     </rect>
@@ -403,7 +409,7 @@ Not recommended unless you have many large files slowing the backup.</string>
    <property name="geometry">
     <rect>
      <x>180</x>
-     <y>370</y>
+     <y>440</y>
      <width>48</width>
      <height>30</height>
     </rect>
@@ -424,7 +430,7 @@ Not recommended unless you have many large files slowing the backup.</string>
      <x>440</x>
      <y>80</y>
      <width>89</width>
-     <height>30</height>
+     <height>28</height>
     </rect>
    </property>
    <property name="toolTip">
@@ -452,7 +458,7 @@ Not recommended unless you have many large files slowing the backup.</string>
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>350</y>
+     <y>420</y>
      <width>751</width>
      <height>16</height>
     </rect>
@@ -486,7 +492,7 @@ Not recommended unless you have many large files slowing the backup.</string>
      <x>640</x>
      <y>229</y>
      <width>91</width>
-     <height>30</height>
+     <height>28</height>
     </rect>
    </property>
    <item>
@@ -534,6 +540,83 @@ Not recommended unless you have many large files slowing the backup.</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_reports_text_context">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>310</y>
+     <width>351</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Reports with text context</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_chars_before_after">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>340</y>
+     <width>271</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Characters before and after</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="QSpinBox" name="spinBox_chars_before_after">
+   <property name="geometry">
+    <rect>
+     <x>300</x>
+     <y>340</y>
+     <width>71</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="minimum">
+    <number>20</number>
+   </property>
+   <property name="maximum">
+    <number>300</number>
+   </property>
+   <property name="singleStep">
+    <number>5</number>
+   </property>
+   <property name="value">
+    <number>150</number>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_coded_text_style">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>370</y>
+     <width>271</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Text context, coded text style</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="comboBox_text_style">
+   <property name="geometry">
+    <rect>
+     <x>300</x>
+     <y>370</y>
+     <width>151</width>
+     <height>28</height>
+    </rect>
    </property>
   </widget>
  </widget>

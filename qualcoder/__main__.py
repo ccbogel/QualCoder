@@ -436,6 +436,8 @@ class App(object):
                 result['showids'] = False
             else:
                 result['showids'] = True
+        if 'report_text_context_characters' in default:
+            result['report_text_context_characters'] = default.getint('report_text_context_characters')
         return result
 
     def check_and_add_additional_settings(self, settings_data):
@@ -477,7 +479,8 @@ class App(object):
                 'docfontsize', 'showids',
                 'dialogreport_file_summary_splitter0', 'dialogreport_file_summary_splitter0',
                 'dialogreport_code_summary_splitter0', 'dialogreport_code_summary_splitter0',
-                'stylesheet', 'backup_num', 'codetext_chunksize'
+                'stylesheet', 'backup_num', 'codetext_chunksize',
+                'report_text_context_characters', 'report_text_context_style'
                 ]
         for key in keys:
             if key not in settings_data:
@@ -492,6 +495,10 @@ class App(object):
                     settings_data[key] = 50000
                 if key == 'showids':
                     settings_data[key] = False
+                if key == 'report_text_context_style':
+                    settings_data[key] = "Bold"
+                if key == 'report_text_context_characters':
+                    settings_data[key] = 150
         # write out new ini file, if needed
         if len(settings_data) > dict_len:
             self.write_config_ini(settings_data)
@@ -706,6 +713,8 @@ class App(object):
             'dialogreport_code_summary_splitter0': 100,
             'dialogreport_code_summary_splitter1': 100,
             'stylesheet': 'original',
+            'report_text_context_chars': 150,
+            'report_text_contextz-style': 'Bold',
             'codetext_chunksize': 50000
         }
 
@@ -1061,6 +1070,8 @@ class MainWindow(QtWidgets.QMainWindow):
         msg += _("Language") + ": " + self.app.settings['language'] + "\n"
         msg += _("Timestamp format") + ": " + self.app.settings['timestampformat'] + "\n"
         msg += _("Speaker name format") + ": " + str(self.app.settings['speakernameformat']) + "\n"
+        msg += _("Report text context characters: ") + str(self.app.settings['report_text_context_characters']) + "\n"
+        msg += _("Report text context style: ") + self.app.settings['report_text_context_style'] + "\n"
         msg += _("Backup on open") + ": " + str(self.app.settings['backup_on_open']) + "\n"
         msg += _("Backup AV files") + ": " + str(self.app.settings['backup_av_files'])
         if platform.system() == "Windows":
@@ -1987,13 +1998,13 @@ class MainWindow(QtWidgets.QMainWindow):
         sql = "select count(jid) from journal"
         cur.execute(sql)
         res = cur.fetchone()
-        msg += _("Journals: ") + str(res[0])
+        msg += _("Journals: ") + str(res[0]) + "\n"
         cur.execute("select name from source where id=?", [result[4]])
         bookmark_filename = cur.fetchone()
         if bookmark_filename is not None and result[5] is not None:
             msg += "\nText Bookmark: " + str(bookmark_filename[0])
             msg += ", position: " + str(result[5])
-
+            msg += "\n"
         if platform.system() == "Windows":
             msg += "\n" + _("Directory (folder) paths / represents \\")
         self.ui.textEdit.append(msg)
