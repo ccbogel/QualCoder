@@ -219,6 +219,8 @@ class DialogSettings(QtWidgets.QDialog):
         else:
             self.settings['backup_av_files'] = 'False'
         self.settings['backup_num'] = self.ui.spinBox_backups.value()
+        self.settings['report_text_context_characters'] = self.ui.spinBox_chars_before_after.value()
+        self.settings['report_text_context_style'] = self.ui.comboBox_text_style.currentText()
         self.save_settings()
         if restart_qualcoder:
             Message(self.app, _("Restart QualCoder"), _("Restart QualCoder to enact some changes")).exec()
