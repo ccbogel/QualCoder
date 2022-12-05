@@ -618,26 +618,6 @@ Not recommended unless you have many large files slowing the backup.</string>
      <height>28</height>
     </rect>
    </property>
-   <item>
-    <property name="text">
-     <string>Bold</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Italic</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Bigger</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Colour stripe</string>
-    </property>
-   </item>
   </widget>
  </widget>
  <tabstops>
