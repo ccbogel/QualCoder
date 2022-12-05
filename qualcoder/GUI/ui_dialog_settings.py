@@ -176,10 +176,6 @@ class Ui_Dialog_settings(object):
         self.comboBox_text_style = QtWidgets.QComboBox(Dialog_settings)
         self.comboBox_text_style.setGeometry(QtCore.QRect(300, 370, 151, 28))
         self.comboBox_text_style.setObjectName("comboBox_text_style")
-        self.comboBox_text_style.addItem("")
-        self.comboBox_text_style.addItem("")
-        self.comboBox_text_style.addItem("")
-        self.comboBox_text_style.addItem("")
 
         self.retranslateUi(Dialog_settings)
         self.buttonBox.accepted.connect(Dialog_settings.accept) # type: ignore
@@ -234,10 +230,6 @@ class Ui_Dialog_settings(object):
         self.label_reports_text_context.setText(_translate("Dialog_settings", "Reports with text context"))
         self.label_chars_before_after.setText(_translate("Dialog_settings", "Characters before and after"))
         self.label_coded_text_style.setText(_translate("Dialog_settings", "Text context, coded text style"))
-        self.comboBox_text_style.setItemText(0, _translate("Dialog_settings", "Bold"))
-        self.comboBox_text_style.setItemText(1, _translate("Dialog_settings", "Italic"))
-        self.comboBox_text_style.setItemText(2, _translate("Dialog_settings", "Bigger"))
-        self.comboBox_text_style.setItemText(3, _translate("Dialog_settings", "Colour stripe"))
 
 
 if __name__ == "__main__":
