@@ -11,7 +11,7 @@ Instructions and other information are available here: https://qualcoder.wordpre
 ## INSTALLATION 
 
 ### Prerequisites
-You will need to have a python3.7 or newer version up to pthin 3.10 installed. For the moment do not use python 3.11, as there is an issue to resolve. Optional: VLC for audio/video coding. ffmpeg installed for speech to text and waveform image. VLC is required, for QualCoder releases 3.1 and lower.
+You will need to have a python3.7 or newer version installed. Optional: VLC for audio/video coding. ffmpeg installed for speech to text and waveform image. VLC is required, for QualCoder releases 3.1 and lower.
 
 ### Windows
 
@@ -48,6 +48,8 @@ If not already there, move to the same drive letter e.g. C: then type:
 `py -m qualcoder`
 
 Alternately, run by double-click. Open the QualCoder-master\qualcoder folder. Double-click the __main__.py file to run. You can make a shortcut to this file and keep the shortcut on the desktop.
+
+Note: 8 Dec 2022 - lxml may not install on python version 3.11 until a bug in lxml is fixed. Ignore errors related to this. lxml is only used to validate REFI-QDA data files.
 
 ### Debian/Ubuntu Linux
 
