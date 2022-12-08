@@ -32,11 +32,10 @@ from PyQt6.QtCore import Qt
 import csv
 import datetime
 import logging
-from shutil import copyfile
-
 from openpyxl import load_workbook
 import os
 import re
+from shutil import copyfile
 import sqlite3
 import sys
 import traceback
@@ -217,7 +216,6 @@ class DialogImportSurvey(QtWidgets.QDialog):
             except csv.Error as err:
                 logger.error(('file %s, line %d: %s' % (self.filepath, reader.line_num, err)))
                 self.parent_textEdit.append(_("Row error: ") + str(reader.line_num) + "  " + str(err))
-                fail_msg += _("Row error: ") + str(err) + "\n"
                 return False
         # Get field names and replace blacks with a placeholder
         self.fields = []

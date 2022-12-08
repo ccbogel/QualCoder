@@ -49,7 +49,7 @@ from .xsd import codebook, project
 from .GUI.ui_dialog_refi_export_endings import Ui_Dialog_refi_export_line_endings
 from .helpers import Message
 
-# If lxml not imported (python 3.11 lxml build errors)
+# If lxml not imported it will not crash. (a bug in python 3.11 lxml build errors)
 lxml_etree = None
 try:
     from lxml import etree as lxml_etree
