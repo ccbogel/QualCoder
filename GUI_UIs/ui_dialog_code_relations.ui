@@ -65,7 +65,7 @@
      <widget class="QPushButton" name="pushButton_exportcsv">
       <property name="geometry">
        <rect>
-        <x>690</x>
+        <x>710</x>
         <y>30</y>
         <width>28</width>
         <height>28</height>
@@ -81,7 +81,7 @@
      <widget class="QPushButton" name="pushButton_calculate">
       <property name="geometry">
        <rect>
-        <x>360</x>
+        <x>390</x>
         <y>30</y>
         <width>28</width>
         <height>28</height>
@@ -99,7 +99,7 @@
        <rect>
         <x>10</x>
         <y>30</y>
-        <width>151</width>
+        <width>171</width>
         <height>23</height>
        </rect>
       </property>
@@ -115,7 +115,7 @@
        <rect>
         <x>10</x>
         <y>60</y>
-        <width>161</width>
+        <width>181</width>
         <height>23</height>
        </rect>
       </property>
@@ -126,7 +126,7 @@
      <widget class="QPushButton" name="pushButton_select_files">
       <property name="geometry">
        <rect>
-        <x>330</x>
+        <x>360</x>
         <y>30</y>
         <width>28</width>
         <height>28</height>
@@ -142,10 +142,10 @@
      <widget class="QComboBox" name="comboBox_relation_type">
       <property name="geometry">
        <rect>
-        <x>170</x>
+        <x>190</x>
         <y>60</y>
-        <width>221</width>
-        <height>25</height>
+        <width>251</width>
+        <height>26</height>
        </rect>
       </property>
       <item>
@@ -187,7 +187,7 @@
      <widget class="QLabel" name="label">
       <property name="geometry">
        <rect>
-        <x>170</x>
+        <x>200</x>
         <y>30</y>
         <width>131</width>
         <height>22</height>
@@ -200,7 +200,7 @@
      <widget class="QPushButton" name="pushButton_boxplots">
       <property name="geometry">
        <rect>
-        <x>660</x>
+        <x>680</x>
         <y>30</y>
         <width>28</width>
         <height>28</height>
@@ -216,9 +216,9 @@
      <widget class="QLabel" name="label_search_results">
       <property name="geometry">
        <rect>
-        <x>410</x>
+        <x>450</x>
         <y>30</y>
-        <width>181</width>
+        <width>211</width>
         <height>20</height>
        </rect>
       </property>
@@ -232,9 +232,9 @@
      <widget class="QLineEdit" name="lineEdit_search_results">
       <property name="geometry">
        <rect>
-        <x>410</x>
+        <x>450</x>
         <y>57</y>
-        <width>181</width>
+        <width>161</width>
         <height>28</height>
        </rect>
       </property>
@@ -245,7 +245,7 @@
      <widget class="QPushButton" name="pushButton_search_next">
       <property name="geometry">
        <rect>
-        <x>594</x>
+        <x>614</x>
         <y>57</y>
         <width>30</width>
         <height>28</height>
