@@ -1783,16 +1783,22 @@ class DialogReportCodes(QtWidgets.QDialog):
         fmt_italic.setFontItalic(True)
         fmt_larger = QtGui.QTextCharFormat()
         fmt_larger.setFontPointSize(self.app.settings['docfontsize'] + 2)
-        memo_choice = self.ui.comboBox_memos.currentText()
+        #memo_choice = self.ui.comboBox_memos.currentText()
+        memo_choice_index = self.ui.comboBox_memos.currentIndex()
+        '''                 
+        [_("None"), _("Also code memos"), _("Also coded memos"), _("Also all memos"), _("Only memos"),
+        _("Only coded memos"), _("Annotations"), _("Codebook memos")]
+        '''
+
         for i, row in enumerate(self.results):
             self.heading(row)
-            if memo_choice in (_("Only memos"), _("Only coded memos")) and row['coded_memo'] != "":
+            if row['coded_memo'] != "" and memo_choice_index in (4, 5):  # Only memos, Only coded memos
                 # TODO review
                 cursor = self.ui.textEdit.textCursor()
                 pos0 = len(self.ui.textEdit.toPlainText())
                 self.ui.textEdit.insertPlainText("\n")
                 self.ui.textEdit.insertPlainText(row['coded_memo'] + "\n")
-            if row['result_type'] == 'text' and memo_choice not in (_("Only memos"), _("Only coded memos")):
+            if row['result_type'] == 'text' and memo_choice_index not in (4, 5):  # Only memos, Only coded memos
                 cursor = self.ui.textEdit.textCursor()
                 pos0 = len(self.ui.textEdit.toPlainText())
                 self.ui.textEdit.insertPlainText("\n")
@@ -1819,13 +1825,13 @@ class DialogReportCodes(QtWidgets.QDialog):
                 cursor.setPosition(pos1, QtGui.QTextCursor.MoveMode.KeepAnchor)
                 if self.ui.checkBox_text_context.isChecked():
                     cursor.setCharFormat(fmt_normal)
-                if memo_choice != _("Only coded memos"):
+                if memo_choice_index != 5:  # Only coded memos:
                     self.ui.textEdit.insertPlainText("\n")
-                if memo_choice in (_("Also all memos"), _("Also coded memos")) and row['coded_memo'] != "":
+                if row['coded_memo'] != "" and memo_choice_index in (1, 2):  # Also all memos, Also coded memos
                     self.ui.textEdit.insertPlainText(_("MEMO: ") + row['coded_memo'] + "\n")
-            if row['result_type'] == 'image' and memo_choice not in (_("Only memos"), _("Only coded memos")):
+            if row['result_type'] == 'image' and memo_choice_index not in (4, 5):  # Only memos, Only coded memos
                 self.put_image_into_textedit(row, i, self.ui.textEdit)
-            if row['result_type'] == 'av' and memo_choice not in (_("Only memos"), _("Only coded memos")):
+            if row['result_type'] == 'av' and memo_choice_index not in (4, 5):  # Only memos, Only coded memos
                 self.ui.textEdit.insertPlainText("\n" + row['text'] + "\n")
             self.text_links.append(row)
         self.eventFilterTT.set_positions(self.text_links)
@@ -1833,20 +1839,25 @@ class DialogReportCodes(QtWidgets.QDialog):
         # Fill matrix or clear third splitter pane.
         self.ui.tableWidget.setColumnCount(0)
         self.ui.tableWidget.setRowCount(0)
-        matrix_option = self.ui.comboBox_matrix.currentText()
-        if matrix_option == "":
+        #matrix_option = self.ui.comboBox_matrix.currentText()
+        matrix_option_index = self.ui.comboBox_matrix.currentIndex()
+        '''
+        ["", _("Top categories by case"), _("Top categories by file"), _("Categories by case"),
+        _("Categories by file"), _("Codes by case"), _("Codes by file")]
+        '''
+        if matrix_option_index == 0:
             self.ui.splitter.setSizes([200, 400, 0])
             return
-        # matrix_option is string is in the defualt language (e.g. EN, ES, DE etc)
-        if matrix_option in (_("Categories by case"), _("Top categories by case"), _("Codes by case")) and self.case_ids == "":
+        if self.case_ids == "" and matrix_option_index in (1, 3, 5):  # Categories by case, Top categories by case, Codes by case
             Message(self.app, _("No case matrix"), _("Cases not selected")).exec()
+            self.ui.splitter.setSizes([200, 400, 0])
             return
-        if matrix_option == _("Top categories by case") and self.case_ids != "":
+        if self.case_ids != "" and matrix_option_index == 1:  # Top categories by case
             self.matrix_by_top_categories(self.results, self.case_ids, "case")
-        if matrix_option == _("Top categories by file") and self.case_ids == "":
+        if self.case_ids != "" and matrix_option_index == 2:  # Top categories by file
             self.matrix_by_top_categories(self.results, self.file_ids)
         # Top categories BY FILE for SELECTED CASES
-        if matrix_option == _("Top categories by file") and self.case_ids != "":
+        if self.case_ids != "" and matrix_option_index == 2:  # Top categories by file
             # Need to create file ids comma separated string
             files_id_name = self.app.get_filenames()
             file_ids = []
@@ -1859,13 +1870,12 @@ class DialogReportCodes(QtWidgets.QDialog):
                         r['file_or_casename'] = f['name']
             file_ids = str(list(set(file_ids)))[1:-1]  # Remove '[' ']'
             self.matrix_by_top_categories(self.results, file_ids)
-
-        if matrix_option == _("Categories by case") and self.case_ids != "":
+        if self.case_ids != "" and matrix_option_index == 3:  # Categories by case
             self.matrix_by_categories(self.results, self.case_ids, "case")
-        if matrix_option == _("Categories by file") and self.case_ids == "":
+        if self.case_ids == "" and matrix_option_index == 4:  # Categories by file
             self.matrix_by_categories(self.results, self.file_ids)
         # Categories BY FILE for SELECTED CASES
-        if matrix_option == _("Categories by file") and self.case_ids != "":
+        if self.case_ids != "" and matrix_option_index == 4:  # Categories by file
             # Need to create file ids comma separated string
             files_id_name = self.app.get_filenames()
             file_ids = []
@@ -1879,12 +1889,12 @@ class DialogReportCodes(QtWidgets.QDialog):
             file_ids = str(list(set(file_ids)))[1:-1]  # Remove '[' ']'
             self.matrix_by_categories(self.results, file_ids)
 
-        if matrix_option == _("Codes by case") and self.case_ids != "":
+        if self.case_ids != "" and matrix_option_index == 5:  # Codes by case
             self.matrix_by_codes(self.results, self.case_ids, "case")
-        if matrix_option == _("Codes by file") and self.case_ids == "":
+        if self.case_ids == "" and matrix_option_index == 6:  # Codes by file
             self.matrix_by_codes(self.results, self.file_ids)
         # Codes BY FILE for SELECTED CASES
-        if matrix_option == _("Codes by file") and self.case_ids != "":
+        if self.case_ids != "" and matrix_option_index == 6:  # Codes by file
             # Need to create file ids comma separated string
             files_id_name = self.app.get_filenames()
             file_ids = []
