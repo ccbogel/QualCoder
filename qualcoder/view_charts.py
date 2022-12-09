@@ -454,19 +454,20 @@ class ViewCharts(QDialog):
 
     def show_bar_chart(self):
         """ https://www.tutorialspoint.com/plotly/plotly_bar_and_pie_chart.htm
+        Index numbering matches order of options, set up in init
         """
 
-        chart_type = self.ui.comboBox_bar_charts.currentText()
-        if chart_type == "":
+        chart_type_index = self.ui.comboBox_bar_charts.currentIndex()
+        if chart_type_index < 1:
             return
         self.get_selected_categories_and_codes()
-        if chart_type == "Code frequency":
+        if chart_type_index == 1:  # Code frequency
             self.barchart_code_frequency()
-        if chart_type == "Code by characters":
+        if chart_type_index == 2:  # Code by characters
             self.barchart_code_volume_by_characters()
-        if chart_type == "Code by image area":
+        if chart_type_index == 3:  # Code by image area
             self.barchart_code_volume_by_area()
-        if chart_type == "Code by audio/video segments":
+        if chart_type_index == 4:  # Code by audio/video segments
             self.barchart_code_volume_by_segments()
         self.ui.comboBox_bar_charts.setCurrentIndex(0)
 
@@ -607,19 +608,21 @@ class ViewCharts(QDialog):
         self.helper_export_html(fig)
 
     def show_pie_chart(self):
-        """ Various pie chart options. """
+        """ Various pie chart options.
+        Index numbering matches order of options, set up in init
+        """
 
-        chart_type = self.ui.comboBox_pie_charts.currentText()
-        if chart_type == "":
+        chart_type_index = self.ui.comboBox_pie_charts.currentIndex()
+        if chart_type_index < 1:
             return
         self.get_selected_categories_and_codes()
-        if chart_type == "Code frequency":
+        if chart_type_index == 1:  # Code frequency
             self.piechart_code_frequency()
-        if chart_type == "Code by characters":
+        if chart_type_index == 2:  # Code by characters
             self.piechart_code_volume_by_characters()
-        if chart_type == "Code by image area":
+        if chart_type_index == 3:  # Code by image area
             self.piechart_code_volume_by_area()
-        if chart_type == "Code by audio/video segments":
+        if chart_type_index == 4:  # Code by audio/video segments
             self.piechart_code_volume_by_segments()
         self.ui.comboBox_pie_charts.setCurrentIndex(0)
 
@@ -759,30 +762,31 @@ class ViewCharts(QDialog):
         self.helper_export_html(fig)
 
     def show_hierarchy_chart(self):
-        """
+        """ Disp;lay treemaps and sunburst charts.
         https://plotly.com/python/sunburst-charts/
+        Index numbering matches order of options, set up in init
         """
 
-        chart_type = self.ui.comboBox_sunburst_charts.currentText()
-        if chart_type == "":
+        chart_type_index = self.ui.comboBox_sunburst_charts.currentIndex()
+        if chart_type_index < 1:
             return
         self.get_selected_categories_and_codes()
         self.helper_for_matching_category_and_code_name()
-        if chart_type == "Code frequency sunburst":
+        if chart_type_index == 1:  # Code frequency sunburst
             self.hierarchy_code_frequency("sunburst")
-        if chart_type == "Code frequency treemap":
+        if chart_type_index == 2:  # Code frequency treemap
             self.hierarchy_code_frequency("treemap")
-        if chart_type == "Code by characters sunburst":
+        if chart_type_index == 3:  # Code by characters sunburst
             self.hierarchy_code_volume_by_characters("sunburst")
-        if chart_type == "Code by characters treemap":
+        if chart_type_index == 4:  # Code by characters treemap
             self.hierarchy_code_volume_by_characters("treemap")
-        if chart_type == "Code by image area sunburst":
+        if chart_type_index == 5: # Code by image area sunburst
             self.hierarchy_code_volume_by_area("sunburst")
-        if chart_type == "Code by image area treemap":
+        if chart_type_index == 6:  # Code by image area treemap
             self.hierarchy_code_volume_by_area("treemap")
-        if chart_type == "Code by A/V sunburst":
+        if chart_type_index == 7:  # Code by A/V sunburst
             self.hierarchy_code_volume_by_segments("sunburst")
-        if chart_type == "Code by A/V treemap":
+        if chart_type_index == 8:  # Code by A/V treemap
             self.hierarchy_code_volume_by_segments("treemap")
         self.ui.comboBox_sunburst_charts.setCurrentIndex(0)
 
@@ -1344,41 +1348,6 @@ class ViewCharts(QDialog):
                             case_counts += self.heatmap_counter_by_file_and_code(owner, fid[0], code_['cid'])
                         code_counts.append(case_counts)
                     data.append(code_counts)
-
-        '''# Add the code count directly to each parent category, add parentname to each code
-        # MIGHT? MODIFY THIS TO SHOW CATEGORY COUNTS ?
-        for category in self.categories:
-            category['count'] = None
-            for code_ in self.codes:
-                if code_['catid'] == category['catid']:
-                    category['count'] += code_['count']
-                    code_['parentname'] = category['name']
-        # Find leaf categories, add to parent categories, and gradually remove leaves
-        # Until only top categories remain
-        sub_categories = copy(self.categories)
-        counter = 0
-        while len(sub_categories) > 0 or counter < 5000:
-            # Identify parent categories
-            parent_list = []
-            for super_cat in sub_categories:
-                for child_cat in sub_categories:
-                    if super_cat['catid'] == child_cat['supercatid']:
-                        child_cat['parentname'] = super_cat['name']
-                        parent_list.append(super_cat)
-            # Identify leaf categories
-            leaf_list = []
-            for category in sub_categories:
-                if category not in parent_list:
-                    leaf_list.append(category)
-            # Add counts for each leaf category to higher category
-            for leaf_category in leaf_list:
-                for cat in self.categories:
-                    if cat['catid'] == leaf_category['supercatid']:
-                        cat['count'] += leaf_category['count']
-                sub_categories.remove(leaf_category)
-            counter += 1
-        combined = self.categories + self.codes'''
-
         # Create the plot
         fig = px.imshow(data,
                         labels=dict(x=heatmap_type, y="Codes", color="Count"),
@@ -1392,4 +1361,3 @@ class ViewCharts(QDialog):
         self.ui.comboBox_heatmap.blockSignals(True)
         self.ui.comboBox_heatmap.setCurrentIndex(0)
         self.ui.comboBox_heatmap.blockSignals(False)
-
