@@ -135,10 +135,10 @@ class DialogSettings(QtWidgets.QDialog):
         if self.settings['directory'] == "":
             self.settings['directory'] = os.path.expanduser("~")
         self.ui.label_directory.setText(self.settings['directory'])
-        text_styles = [_('Bold'), _('Italic'), _('Bigger')]  #, _('Code color')]
+        text_styles = [_('Bold'), _('Italic'), _('Bigger')]
         self.ui.comboBox_text_style.addItems(text_styles)
-        for index, style in enumerate(text_styles):
-            if style == self.settings['report_text_context_style']:
+        for index, tstyle in enumerate(text_styles):
+            if tstyle == self.settings['report_text_context_style']:
                 self.ui.comboBox_text_style.setCurrentIndex(index)
         self.ui.spinBox_chars_before_after.setValue(self.settings['report_text_context_characters'])
         self.ui.pushButton_choose_directory.clicked.connect(self.choose_directory)
@@ -201,9 +201,11 @@ class DialogSettings(QtWidgets.QDialog):
             self.settings['showids'] = 'True'
         else:
             self.settings['showids'] = 'False'
-        if self.settings['stylesheet'] != self.ui.comboBox_style.currentText()[-2:]:
+        index = self.ui.comboBox_style.currentIndex()
+        styles = ["original", "dark", "blue", "green", "orange", "purple", "yellow", "rainbow"]
+        if self.settings['stylesheet'] != styles[index]:
             restart_qualcoder = True
-        self.settings['stylesheet'] = self.ui.comboBox_style.currentText()
+        self.settings['stylesheet'] = styles[index]
         if self.settings['language'] != self.ui.comboBox_language.currentText()[-2:]:
             restart_qualcoder = True
         self.settings['language'] = self.ui.comboBox_language.currentText()[-2:]
@@ -220,7 +222,8 @@ class DialogSettings(QtWidgets.QDialog):
             self.settings['backup_av_files'] = 'False'
         self.settings['backup_num'] = self.ui.spinBox_backups.value()
         self.settings['report_text_context_characters'] = self.ui.spinBox_chars_before_after.value()
-        self.settings['report_text_context_style'] = self.ui.comboBox_text_style.currentText()
+        ts_index = self.ui.comboBox_text_style.currentIndex()
+        self.settings['report_text_context_style'] = ['Bold', 'Italic', 'Bigger'][ts_index]
         self.save_settings()
         if restart_qualcoder:
             Message(self.app, _("Restart QualCoder"), _("Restart QualCoder to enact some changes")).exec()
