@@ -207,19 +207,19 @@ class DialogReportRelations(QtWidgets.QDialog):
         relation is 1 character: Inclusion, Overlap, Exact, Proximity
         """
 
-        combo_rel_type = self.ui.comboBox_relation_type.currentText()
+        index = self.ui.comboBox_relation_type.currentIndex()
         selected_relations = ['E', 'I', 'O', 'P']
-        if combo_rel_type == "Overlap":
+        if index == 1:  # Overlap
             selected_relations = ['O']
-        if combo_rel_type == "Inclusion":
+        if index == 2:  # Inclusion
             selected_relations = ['I']
-        if combo_rel_type == "Exact":
+        if index == 3:  # Exact
             selected_relations = ['E']
-        if combo_rel_type == "Proximity":
+        if index == 4:  # Proximity
             selected_relations = ['P']
-        if combo_rel_type == "Overlap Inclusion":
+        if index == 5:  # Overlap Inclusion
             selected_relations = ['O', 'I']
-        if combo_rel_type == "Overlap Inclusion Exact":
+        if index == 6:  # Overlap Inclusion Exact
             selected_relations = ['O', 'I', 'E']
 
         selected_fids = ""
