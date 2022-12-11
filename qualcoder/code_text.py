@@ -721,6 +721,8 @@ class DialogCodeText(QtWidgets.QWidget):
         Also called on other coding dialogs in the dialog_list. """
 
         self.codes, self.categories = self.app.get_codes_categories()
+        for c in self.codes:
+            c['name'] = c['name']
 
     # RHS splitter details for code rule, current journal, project memo
     def show_code_rule(self):
@@ -1012,6 +1014,7 @@ class DialogCodeText(QtWidgets.QWidget):
         action_change_code = None
         action_start_pos = None
         action_unmark = None
+        action_new_code = None
 
         # Can have multiple coded text at this position
         for item in self.code_text:
@@ -1049,6 +1052,7 @@ class DialogCodeText(QtWidgets.QWidget):
                     submenu.addAction(item['name'])
             action_annotate = menu.addAction(_("Annotate (A)"))
             action_copy = menu.addAction(_("Copy to clipboard"))
+            action_new_code = menu.addAction("Mark with new code")
         if selected_text == "" and self.is_annotated(cursor.position()):
             action_edit_annotate = menu.addAction(_("Edit annotation"))
         action_set_bookmark = menu.addAction(_("Set bookmark (B)"))
@@ -1107,8 +1111,25 @@ class DialogCodeText(QtWidgets.QWidget):
         if action == action_hide_top_groupbox:
             self.ui.groupBox.setVisible(False)
             return
+        if action == action_new_code:
+            self.mark_with_new_code()
+            return
         # Remaining actions will be the submenu codes
         self.recursive_set_current_item(self.ui.treeWidget.invisibleRootItem(), action.text())
+        self.mark()
+
+    def mark_with_new_code(self):
+        """ Create new code and mark selected text. """
+
+        codes_copy = deepcopy(self.codes)
+        self.add_code()
+        new_code = None
+        for c in self.codes:
+            if c not in codes_copy:
+                new_code = c
+        if not new_code:
+            return
+        self.recursive_set_current_item(self.ui.treeWidget.invisibleRootItem(), new_code['name'])
         self.mark()
 
     def change_code_to_another_code(self, position):
