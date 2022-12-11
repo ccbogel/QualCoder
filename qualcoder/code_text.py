@@ -2770,8 +2770,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.lineEdit_search.setEnabled(True)
         self.ui.checkBox_search_case.setEnabled(True)
         self.ui.checkBox_search_all_files.setEnabled(True)
-        self.ui.lineEdit_search.setText("")
-        self.ui.label_search_totals.setText("0 / 0")
+        self.search_for_text()
 
     def get_coded_text_update_eventfilter_tooltips(self):
         """ Called by load_file, and from other dialogs on update.
