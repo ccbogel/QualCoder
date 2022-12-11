@@ -547,7 +547,7 @@ class DialogCodeText(QtWidgets.QWidget):
         """ Fill code label with currently selected item's code name and colour.
          Also, if text is highlighted, assign the text to this code.
 
-         Called by: treewidgetitem_clicked, select_tree_item_by_code_name """
+         Called by: treewidgetitem_clicked """
 
         current = self.ui.treeWidget.currentItem()
         # Extra to fill right-hand side splitter details
@@ -606,8 +606,10 @@ class DialogCodeText(QtWidgets.QWidget):
                 if c['memo'] != "" and c['memo'] is not None:
                     memo = _("Memo")
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
-                top_item.setToolTip(0, c['name'])
                 top_item.setToolTip(2, c['memo'])
+                if len(c['name']) > 50:
+                    top_item.setText(0, c['name'][:24] + '..' + c['name'][-24:])
+                    top_item.setToolTip(0, c['name'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_list.append(c)
         for item in remove_list:
@@ -628,8 +630,10 @@ class DialogCodeText(QtWidgets.QWidget):
                         if c['memo'] != "" and c['memo'] is not None:
                             memo = _("Memo")
                         child = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
-                        child.setToolTip(0, c['name'])
                         child.setToolTip(2, c['memo'])
+                        if len(c['name']) > 50:
+                            child.setText(0, c['name'][:24] + '..' + c['name'][-24:])
+                            child.setToolTip(0, c['name'])
                         item.addChild(child)
                         remove_list.append(c)
                     it += 1
@@ -647,8 +651,10 @@ class DialogCodeText(QtWidgets.QWidget):
                 if c['memo'] != "" and c['memo'] is not None:
                     memo = _("Memo")
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
-                top_item.setToolTip(0, c['name'])
                 top_item.setToolTip(2, c['memo'])
+                if len(c['name']) > 50:
+                    top_item.setText(0, c['name'][:24] + '..' + c['name'][-24:])
+                    top_item.setToolTip(0, c['name'])
                 top_item.setBackground(0, QBrush(QColor(c['color']), Qt.BrushStyle.SolidPattern))
                 color = TextColor(c['color']).recommendation
                 top_item.setForeground(0, QBrush(QColor(color)))
@@ -670,11 +676,13 @@ class DialogCodeText(QtWidgets.QWidget):
                     if c['memo'] != "" and c['memo'] is not None:
                         memo = _("Memo")
                     child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
+                    child.setToolTip(2, c['memo'])
+                    if len(c['name']) > 50:
+                        child.setText(0, c['name'][:24] + '..' + c['name'][-24:])
+                        child.setToolTip(0, c['name'])
                     child.setBackground(0, QBrush(QColor(c['color']), Qt.BrushStyle.SolidPattern))
                     color = TextColor(c['color']).recommendation
                     child.setForeground(0, QBrush(QColor(color)))
-                    child.setToolTip(0, c['name'])
-                    child.setToolTip(2, c['memo'])
                     child.setFlags(
                         Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsUserCheckable |
                         Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsDragEnabled)
@@ -2572,7 +2580,7 @@ class DialogCodeText(QtWidgets.QWidget):
             self.prev_chars(file_, selected)
 
     def prev_chars(self, file_, selected):
-        """ Load previous ext chunk of the text file.
+        """ Load previous text chunk of the text file.
         params:
             file_  : selected file, Dictionary
             selected:  list widget item """
@@ -2914,14 +2922,15 @@ class DialogCodeText(QtWidgets.QWidget):
             cursor.setPosition(o[1] - self.file_['start'], QtGui.QTextCursor.MoveMode.KeepAnchor)
             cursor.mergeCharFormat(fmt)
 
-    def select_tree_item_by_code_name(self, codename):
-        """ Set a tree item code. This still call fill_code_label and
-         put the selected code in the top left code label and
+    '''def select_tree_item_by_code_name(self, codename):
+        """ Set a tree item code. Called by  and
+         Put the selected code colour label and
          underline matching text in the textedit.
          param:
             codename: a string of the codename
          """
 
+        #TOO not used delete
         it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
         item = it.value()
         while item:
@@ -2929,7 +2938,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 self.ui.treeWidget.setCurrentItem(item)
             it += 1
             item = it.value()
-        self.fill_code_label_undo_show_selected_code()
+        self.fill_code_label_undo_show_selected_code()'''
 
     def mark(self):
         """ Mark selected text in file with currently selected code.
@@ -3420,7 +3429,6 @@ class DialogCodeText(QtWidgets.QWidget):
                             'pos0': startPos, 'pos1': startPos + len(txt),
                             'owner': self.app.settings['codername'], 'memo': "",
                             'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")}
-                    # TODO IntegrityError: UNIQUE constraint failed
                     try:
                         cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,\
                             owner,memo,date) values(?,?,?,?,?,?,?,?)",
@@ -3432,7 +3440,7 @@ class DialogCodeText(QtWidgets.QWidget):
                                 "cid": item['cid'], "fid": item['fid'], "pos0": item['pos0'], "pos1": item['pos1'],
                                 "owner": item['owner']}
                         undo_list.append(undo)
-                    except Exception as e:
+                    except sqlite3.IntegrityError as e:
                         logger.debug(_("Autocode insert error ") + str(e))
                     self.app.delete_backup = False
                 self.parent_textEdit.append(_("Automatic coding in files: ") + filenames
