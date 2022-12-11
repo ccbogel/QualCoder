@@ -355,6 +355,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
                 for i in c['display_list']:
                     display_list.append(str(i))
                 top_item = QtWidgets.QTreeWidgetItem(display_list)
+                top_item.setToolTip(0, c['name'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_list.append(c)
         for item in remove_list:
@@ -373,6 +374,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
                         for i in c['display_list']:
                             display_list.append(str(i))
                         child = QtWidgets.QTreeWidgetItem(display_list)
+                        child.setToolTip(0, c['name'])
                         item.addChild(child)
                         remove_list.append(c)
                     it += 1
@@ -393,6 +395,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
                 color = TextColor(c['color']).recommendation
                 top_item.setForeground(0, QBrush(QtGui.QColor(color)))
                 top_item.setFlags(Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEnabled)
+                top_item.setToolTip(0, c['name'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_items.append(c)
         for item in remove_items:
@@ -412,6 +415,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
                     color = TextColor(c['color']).recommendation
                     child.setForeground(0, QBrush(QtGui.QColor(color)))
                     child.setFlags(Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEnabled)
+                    child.setToolTip(0, c['name'])
                     item.addChild(child)
                     c['catid'] = -1  # make unmatchable
                 it += 1
@@ -678,6 +682,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         for c in cats:
             if c['supercatid'] is None:
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid'])])
+                top_item.setToolTip(0, c['name'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_list.append(c)
         for item in remove_list:
@@ -693,6 +698,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
                 while item:  # while there is an item in the list
                     if item.text(1) == 'catid:' + str(c['supercatid']):
                         child = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid'])])
+                        child.setToolTip(0, c['name'])
                         item.addChild(child)
                         remove_list.append(c)
                     it += 1
@@ -710,6 +716,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
                 color = TextColor(c['color']).recommendation
                 top_item.setForeground(0, QBrush(QtGui.QColor(color)))
                 top_item.setFlags(Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEnabled)
+                top_item.setToolTip(0, c['name'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_items.append(c)
         for item in remove_items:
@@ -726,6 +733,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
                     color = TextColor(c['color']).recommendation
                     child.setForeground(0, QBrush(QtGui.QColor(color)))
                     child.setFlags(Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEnabled)
+                    child.setToolTip(0, c['name'])
                     item.addChild(child)
                     c['catid'] = -1  # make unmatchable
                 it += 1

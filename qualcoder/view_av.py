@@ -25,6 +25,7 @@ Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 """
+
 import sqlite3
 from copy import copy, deepcopy
 import datetime
@@ -561,14 +562,12 @@ class DialogCodeAV(QtWidgets.QDialog):
                 if c['memo'] != "" and c['memo'] is not None:
                     memo = "Memo"
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
+                top_item.setToolTip(0, c['name'])
                 top_item.setToolTip(2, c['memo'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_list.append(c)
         for item in remove_list:
-            # try:
             cats.remove(item)
-            # except Exception as e:
-            #    print(e, item)
 
         ''' Add child categories. Look at each unmatched category, iterate through tree
         to add as child, then remove matched categories from the list. '''
@@ -586,6 +585,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                         if c['memo'] != "":
                             memo = "Memo"
                         child = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
+                        child.setToolTip(0, c['name'])
                         child.setToolTip(2, c['memo'])
                         item.addChild(child)
                         remove_list.append(c)
@@ -604,6 +604,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                 if c['memo'] != "" and c['memo'] is not None:
                     memo = "Memo"
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
+                top_item.setToolTip(0, c['name'])
                 top_item.setToolTip(2, c['memo'])
                 top_item.setBackground(0, QBrush(QColor(c['color']), Qt.BrushStyle.SolidPattern))
                 color = TextColor(c['color']).recommendation
@@ -630,6 +631,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                     child.setBackground(0, QBrush(QColor(c['color']), Qt.BrushStyle.SolidPattern))
                     color = TextColor(c['color']).recommendation
                     child.setForeground(0, QBrush(QColor(color)))
+                    child.setToolTip(0, c['name'])
                     child.setToolTip(2, c['memo'])
                     child.setFlags(
                         Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsUserCheckable |
@@ -3303,7 +3305,7 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
     def edit_segment_start(self):
         """ Edit segment start time. """
 
-        i, ok_pressed = QtWidgets.QInputDialog.getInt(None, "Segment start in mseconds",
+        i, ok_pressed = QtWidgets.QInputDialog.getInt(self, "Segment start in mseconds",
                                                       "Edit time in milliseconds\n1000 msecs = 1 second:",
                                                       self.segment['pos0'], 1,
                                                       self.segment['pos1'] - 1, 5)

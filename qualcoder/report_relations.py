@@ -873,14 +873,12 @@ class DialogReportRelations(QtWidgets.QDialog):
         remove_list = []
         for c in cats:
             if c['supercatid'] is None:
-                top_item = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid'])])  # check this
+                top_item = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid'])])
+                top_item.setToolTip(0, c['name'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_list.append(c)
         for item in remove_list:
-            # try:
             cats.remove(item)
-            # except Exception as e:
-            #    logger.debug(str(e) + " item:" + str(item))
 
         ''' Add child categories. Look at each unmatched category, iterate through tree to
         add as child then remove matched categories from the list. '''
@@ -894,6 +892,7 @@ class DialogReportRelations(QtWidgets.QDialog):
                     # logger.debug("While: ", item.text(0), item.text(1), c['catid'], c['supercatid'])
                     if item.text(1) == 'catid:' + str(c['supercatid']):
                         child = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid'])])
+                        child.setToolTip(0, c['name'])
                         item.addChild(child)
                         # logger.debug("Adding: " + c['name'])
                         remove_list.append(c)
@@ -913,6 +912,7 @@ class DialogReportRelations(QtWidgets.QDialog):
                 top_item.setForeground(0, QBrush(QtGui.QColor(color)))
                 top_item.setFlags(
                     Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEnabled)
+                top_item.setToolTip(0, c['name'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_items.append(c)
         for item in remove_items:
@@ -930,6 +930,7 @@ class DialogReportRelations(QtWidgets.QDialog):
                     child.setForeground(0, QBrush(QtGui.QColor(color)))
                     child.setFlags(
                         Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEnabled)
+                    child.setToolTip(0, c['name'])
                     item.addChild(child)
                     c['catid'] = -1  # make unmatchable
                 it += 1

@@ -394,6 +394,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 if c['memo'] != "":
                     memo = _("Memo")
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
+                top_item.setToolTip(0, c['name'])
                 top_item.setToolTip(2, c['memo'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_list.append(c)
@@ -415,6 +416,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                         if c['memo'] != "":
                             memo = "Memo"
                         child = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
+                        child.setToolTip(0, c['name'])
                         child.setToolTip(2, c['memo'])
                         item.addChild(child)
                         remove_list.append(c)
@@ -437,6 +439,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 color = TextColor(c['color']).recommendation
                 top_item.setForeground(0, QBrush(QtGui.QColor(color)))
                 top_item.setFlags(Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEnabled)
+                top_item.setToolTip(0, c['name'])
                 top_item.setToolTip(2, c['memo'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_items.append(c)
@@ -458,6 +461,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                     color = TextColor(c['color']).recommendation
                     child.setForeground(0, QBrush(QtGui.QColor(color)))
                     child.setFlags(Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEnabled)
+                    child.setToolTip(0, c['name'])
                     child.setToolTip(2, c['memo'])
                     item.addChild(child)
                     c['catid'] = -1  # make unmatchable
@@ -685,6 +689,103 @@ class DialogReportCodes(QtWidgets.QDialog):
         msg = _('Report exported: ') + filepath
         Message(self.app, _('Report exported'), msg, "information").exec()
         self.parent_textEdit.append(msg)
+
+    '''def export_xlsx_file(self):
+        """ Export report to xlsx file.
+        Export coded data as csv with codes as column headings.
+        Draw data from self.text_results, self.image_results, self.av_results
+        First need to determine number of columns based on the distinct number of codes in the results.
+        Then the number of rows based on the most frequently assigned code.
+        Each data cell contains coded text, or the memo if A/V or image and the file or case name.
+        """
+
+        if not self.results:
+            return
+        codes_all = []
+        codes_freq_list = []
+        for i in self.results:
+            codes_all.append(i['codename'])
+        codes_set = list(set(codes_all))
+        codes_set.sort()
+        for x in codes_set:
+            codes_freq_list.append(codes_all.count(x))
+        ncols = len(codes_set)
+        nrows = sorted(codes_freq_list)[-1]
+
+        # Prepare data rows for csv writer
+        csv_data = []
+        for r in range(0, nrows):
+            row = []
+            for c in range(0, ncols):
+                row.append("")
+            csv_data.append(row)
+
+        wb = openpyxl.Workbook()
+        ws = wb.active
+
+        # Column headings
+        for col, code in enumerate(codes_set):
+            ws.cell(column=col +1 , row=1, value=code)
+
+        # Look at each code and fill column with data
+        for col, code in enumerate(codes_set):
+            row = 0
+            for i in self.results:
+                if i['codename'] == code:
+                    if i['result_type'] == 'text':
+                        d = i['text'] + "\n" + i['file_or_casename']
+                        # Add file id if results are based on attribute selection
+                        if i['file_or_case'] == "":
+                            d += " fid:" + str(i['fid'])
+                        csv_data[row][col] = d
+                        ws.cell(column=col + 1, row=row+2, value=d)
+                        row += 1
+                    if i['result_type'] == 'image':
+                        d = ""
+                        try:
+                            d = i['memo']
+                        except KeyError:
+                            pass
+                        if d == "":
+                            d = _("NO MEMO")
+                        d += "\n" + i['file_or_casename']
+                        # Add filename if results are based on attribute selection
+                        if i['file_or_case'] == "":
+                            d += " " + i['mediapath'][8:]
+                        csv_data[row][col] = d
+                        ws.cell(column=col + 1, row=row+2, value=d)
+                        row += 1
+                    if i['result_type'] == 'av':
+                        d = ""
+                        try:
+                            d = i['memo']
+                        except KeyError:
+                            pass
+                        if d == "":
+                            d = _("NO MEMO")
+                        d += "\n"
+                        # av 'text' contains video/filename, time slot and memo, so trim some out
+                        trimmed = i['text'][6:]
+                        pos = trimmed.find(']')
+                        trimmed = trimmed[:pos + 1]
+                        # Add case name as well as file name and time slot
+                        if i['file_or_case'] != "File":
+                            trimmed = i['file_or_casename'] + " " + trimmed
+                        d += trimmed
+                        csv_data[row][col] = d
+                        #ws.cell(column=col, row=row, value="{0}".format(openpyxl.utils.get_column_letter(col)))
+                        ws.cell(column=col+1, row=row+2, value=d)
+                        row += 1
+
+        filename = "Report_codings.xlsx"
+        exp_dlg = ExportDirectoryPathDialog(self.app, filename)
+        filepath = exp_dlg.filepath
+        if filepath is None:
+            return
+        wb.save(filepath)
+        msg = _('Report exported: ') + filepath
+        Message(self.app, _('Report exported'), msg, "information").exec()
+        self.parent_textEdit.append(msg)'''
 
     def export_html_file(self):
         """ Export report to a html file. Create folder of images and change refs to the
