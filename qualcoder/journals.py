@@ -75,6 +75,9 @@ class DialogJournals(QtWidgets.QDialog):
     # variables for searching through journal(s)
     search_indices = []  # A list of tuples of (journal name, match.start, match length)
     search_index = 0
+    text_changed_flag = False
+    qtimer = None
+    timer_msecs = 1500
 
     def __init__(self, app, parent_text_edit, parent=None):
 
@@ -86,6 +89,9 @@ class DialogJournals(QtWidgets.QDialog):
         self.current_jid = None
         self.search_indices = []
         self.search_index = 0
+        self.qtimer = QtCore.QTimer()
+        self.qtimer.timeout.connect(self.update_database_text)
+        self.text_changed_flag = False
         cur = self.app.conn.cursor()
         cur.execute("select name, date, jentry, owner, jid from journal")
         result = cur.fetchall()
@@ -228,14 +234,19 @@ class DialogJournals(QtWidgets.QDialog):
         self.ui.textEdit.blockSignals(True)
         self.ui.textEdit.setPlainText(self.journals[row]['jentry'])
         self.ui.textEdit.blockSignals(False)
+        self.qtimer.start(self.timer_msecs)
 
-    def text_changed(self):
+    def update_database_text(self):
         """ Journals list entry and database is updated from changes to text edit.
         The signal is switched off when a different journal is loaded.
+        Called via qtimer every 2 seconds.
         """
 
         if self.jid is None:
             return
+        if not self.text_changed_flag:
+            return
+        self.text_changed_flag = False
         self.journals[self.ui.tableWidget.currentRow()]['jentry'] = self.ui.textEdit.toPlainText()
         # Update database as text is edited
         now_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
@@ -244,6 +255,12 @@ class DialogJournals(QtWidgets.QDialog):
                     (self.journals[self.ui.tableWidget.currentRow()]['jentry'], now_date, self.jid))
         self.app.conn.commit()
         self.app.delete_backup = False
+
+    def text_changed(self):
+        """ Used in combination with timer to update database entry.
+        """
+
+        self.text_changed_flag = True
 
     def closeEvent(self, event):
         """ Save splitter dimensions. """
@@ -289,6 +306,7 @@ class DialogJournals(QtWidgets.QDialog):
         self.ui.tableWidget.setCurrentCell(newest, 0)
         self.jid = jid
         self.ui.textEdit.setFocus()
+        self.qtimer.start(self.timer_msecs)
 
     def export(self):
         """ Export journal to a plain text file, filename will have .txt ending. """
@@ -330,7 +348,7 @@ class DialogJournals(QtWidgets.QDialog):
             self.parent_textEdit.append(_("Journal deleted: ") + journalname)
 
     def table_selection_changed(self):
-        """ Update the journal text for the current selection. """
+        """ Present the journal text for the current selection. """
 
         row = self.ui.tableWidget.currentRow()
         self.ui.label_jname.setText(_("Journal: ") + self.journals[row]['name'])
@@ -381,7 +399,7 @@ class DialogJournals(QtWidgets.QDialog):
         Resets current search_index.
         If all files is checked then searches for all matching text across all text files
         and displays the file text and current position to user.
-        NOT IMPLEMENTED If case sensitive is checked then text searched is matched for case sensitivity.
+        NOT IMPLEMENTED If case-sensitive is checked then text searched is matched for case sensitivity.
         """
 
         if self.jid is None and not (self.ui.checkBox_search_all_journals.isChecked()):
