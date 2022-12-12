@@ -168,6 +168,11 @@
       </item>
       <item>
        <property name="text">
+        <string>xlsx</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
         <string>csv</string>
        </property>
       </item>
