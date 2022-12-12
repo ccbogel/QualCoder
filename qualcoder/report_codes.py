@@ -374,8 +374,8 @@ class DialogReportCodes(QtWidgets.QDialog):
     def fill_tree(self):
         """ Fill tree widget, top level items are main categories and unlinked codes. """
 
-        cats = copy(self.categories)
-        codes = copy(self.code_names)
+        cats = deepcopy(self.categories)
+        codes = deepcopy(self.code_names)
         self.ui.treeWidget.clear()
         self.ui.treeWidget.setColumnCount(4)
         self.ui.treeWidget.setHeaderLabels([_("Name"), "Id", _("Memo"), _("Count")])
@@ -511,6 +511,8 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.export_text_file()
         if text_ == "csv":
             self.export_csv_file()
+        if text_ == "xlsx":
+            self.export_xlsx_file()
         self.ui.comboBox_export.setCurrentIndex(0)
         if self.te:
             reply = QtWidgets.QMessageBox.question(self, _("Export Matrix"), _("Export matrix results"),
@@ -690,7 +692,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         Message(self.app, _('Report exported'), msg, "information").exec()
         self.parent_textEdit.append(msg)
 
-    '''def export_xlsx_file(self):
+    def export_xlsx_file(self):
         """ Export report to xlsx file.
         Export coded data as csv with codes as column headings.
         Draw data from self.text_results, self.image_results, self.av_results
@@ -701,81 +703,35 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         if not self.results:
             return
-        codes_all = []
-        codes_freq_list = []
-        for i in self.results:
-            codes_all.append(i['codename'])
-        codes_set = list(set(codes_all))
-        codes_set.sort()
-        for x in codes_set:
-            codes_freq_list.append(codes_all.count(x))
-        ncols = len(codes_set)
-        nrows = sorted(codes_freq_list)[-1]
-
-        # Prepare data rows for csv writer
-        csv_data = []
-        for r in range(0, nrows):
-            row = []
-            for c in range(0, ncols):
-                row.append("")
-            csv_data.append(row)
-
         wb = openpyxl.Workbook()
         ws = wb.active
+        # Columns file/case, coder, coded text/img/av, id, codename .... categories
 
         # Column headings
-        for col, code in enumerate(codes_set):
-            ws.cell(column=col +1 , row=1, value=code)
+        col_headings = ["File/case", "Coder", "Coded", "Id", "Codename"]
+        row = 1
+        for col, code in enumerate(col_headings):
+            ws.cell(column=col + 1, row=row, value=code)
 
-        # Look at each code and fill column with data
-        for col, code in enumerate(codes_set):
-            row = 0
-            for i in self.results:
-                if i['codename'] == code:
-                    if i['result_type'] == 'text':
-                        d = i['text'] + "\n" + i['file_or_casename']
-                        # Add file id if results are based on attribute selection
-                        if i['file_or_case'] == "":
-                            d += " fid:" + str(i['fid'])
-                        csv_data[row][col] = d
-                        ws.cell(column=col + 1, row=row+2, value=d)
-                        row += 1
-                    if i['result_type'] == 'image':
-                        d = ""
-                        try:
-                            d = i['memo']
-                        except KeyError:
-                            pass
-                        if d == "":
-                            d = _("NO MEMO")
-                        d += "\n" + i['file_or_casename']
-                        # Add filename if results are based on attribute selection
-                        if i['file_or_case'] == "":
-                            d += " " + i['mediapath'][8:]
-                        csv_data[row][col] = d
-                        ws.cell(column=col + 1, row=row+2, value=d)
-                        row += 1
-                    if i['result_type'] == 'av':
-                        d = ""
-                        try:
-                            d = i['memo']
-                        except KeyError:
-                            pass
-                        if d == "":
-                            d = _("NO MEMO")
-                        d += "\n"
-                        # av 'text' contains video/filename, time slot and memo, so trim some out
-                        trimmed = i['text'][6:]
-                        pos = trimmed.find(']')
-                        trimmed = trimmed[:pos + 1]
-                        # Add case name as well as file name and time slot
-                        if i['file_or_case'] != "File":
-                            trimmed = i['file_or_casename'] + " " + trimmed
-                        d += trimmed
-                        csv_data[row][col] = d
-                        #ws.cell(column=col, row=row, value="{0}".format(openpyxl.utils.get_column_letter(col)))
-                        ws.cell(column=col+1, row=row+2, value=d)
-                        row += 1
+        for row, data in enumerate(self.results):
+            ws.cell(column=1, row=row + 2, value=data['file_or_casename'])
+            ws.cell(column=2, row=row + 2, value=data['coder'])
+            id = ""
+            if data['result_type'] == 'text':
+                id = "ctid:" + str(data['ctid'])
+                ws.cell(column=3, row=row + 2, value=data['text'])
+            if data['result_type'] == 'image':
+                id = "imid:" + str(data['imid'])
+                ws.cell(column=3, row=row + 2, value="image")
+            if data['result_type'] == 'av':
+                id = "avid:" + str(data['avid'])
+                ws.cell(column=3, row=row + 2, value="a/v")
+            ws.cell(column=4, row=row + 2, value=id)
+            ws.cell(column=5, row=row + 2, value=data['codename'])
+            categories = self.categories_of_code(data['cid'])
+            for i, category in enumerate(categories):
+                ws.cell(column=6 + i, row=row + 2, value=category)
+                ws.cell(column=6 + i, row=1, value='Category')  # Headings
 
         filename = "Report_codings.xlsx"
         exp_dlg = ExportDirectoryPathDialog(self.app, filename)
@@ -783,9 +739,40 @@ class DialogReportCodes(QtWidgets.QDialog):
         if filepath is None:
             return
         wb.save(filepath)
-        msg = _('Report exported: ') + filepath
+        msg = _("Each row contains filename, coder, coded, codename and categories.") + "\n"
+        msg += _('Report exported: ') + filepath
         Message(self.app, _('Report exported'), msg, "information").exec()
-        self.parent_textEdit.append(msg)'''
+        self.parent_textEdit.append(msg)
+
+    def categories_of_code(self, cid):
+        """ Get parent categories of this code.
+
+        param: cid : Integer of code id
+        return: category_names : List
+        """
+
+        code_ = None
+        for c in self.code_names:
+            if c['cid'] == cid:
+                code_ = c
+        if not code_:
+            return []
+        if not code_['catid']:
+            return []
+        catid = code_['catid']
+        category_names = []
+        more = True
+        counter = 0
+        while more and counter < 1000:
+            for category in self.categories:
+                if catid == category['catid']:
+                    category_names.append(category['name'])
+                    catid = category['supercatid']
+                    if not catid:
+                        more = False
+            counter += 1
+        return category_names
+
 
     def export_html_file(self):
         """ Export report to a html file. Create folder of images and change refs to the
@@ -1294,7 +1281,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         if self.file_ids != "" and self.case_ids == "":
             # Coded text
             sql = "select code_name.name, color, source.name, pos0, pos1, seltext, "
-            sql += "code_text.owner, fid, code_text.memo, code_name.memo, source.memo, ctid "
+            sql += "code_text.owner, fid, code_text.memo, code_name.memo, source.memo, ctid, code_name.cid "
             sql += " from code_text join code_name "
             sql += "on code_name.cid = code_text.cid join source on fid = source.id "
             sql += "where code_name.cid in (" + code_ids + ") "
@@ -1314,7 +1301,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 cur.execute(sql, parameters)
             result = cur.fetchall()
             keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'text', 'coder', 'fid', 'coded_memo', \
-                   'codename_memo', 'source_memo', 'ctid'
+                   'codename_memo', 'source_memo', 'ctid', 'cid'
             for row in result:
                 tmp = dict(zip(keys, row))
                 tmp['result_type'] = 'text'
@@ -1329,7 +1316,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             parameters = []
             sql = "select code_name.name, color, source.name, x1, y1, width, height,"
             sql += "code_image.owner, source.mediapath, source.id, code_image.memo, "
-            sql += "code_name.memo, source.memo, imid "
+            sql += "code_name.memo, source.memo, imid, code_name.cid "
             sql += " from code_image join code_name "
             sql += "on code_name.cid = code_image.cid join source on code_image.id = source.id "
             sql += "where code_name.cid in (" + code_ids + ") "
@@ -1349,7 +1336,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 cur.execute(sql, parameters)
             result = cur.fetchall()
             keys = 'codename', 'color', 'file_or_casename', 'x1', 'y1', 'width', 'height', 'coder', 'mediapath', \
-                   'fid', 'coded_memo', 'codename_memo', 'source_memo', 'imid'
+                   'fid', 'coded_memo', 'codename_memo', 'source_memo', 'imid', 'cid'
             for row in result:
                 tmp = dict(zip(keys, row))
                 tmp['result_type'] = 'image'
@@ -1359,7 +1346,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             # Coded audio and video, also looks for search_text in coded segment memo
             parameters = []
             sql = "select code_name.name, color, source.name, pos0, pos1, code_av.memo, "
-            sql += " code_av.owner, source.mediapath, source.id, code_name.memo, source.memo, avid "
+            sql += " code_av.owner, source.mediapath, source.id, code_name.memo, source.memo, avid, code_name.cid"
             sql += " from code_av join code_name "
             sql += "on code_name.cid = code_av.cid join source on code_av.id = source.id "
             sql += "where code_name.cid in (" + code_ids + ") "
@@ -1379,7 +1366,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 cur.execute(sql, parameters)
             result = cur.fetchall()
             keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'coded_memo', 'coder', 'mediapath', 'fid', \
-                   'codename_memo', 'source_memo', 'avid'
+                   'codename_memo', 'source_memo', 'avid', 'cid'
             for row in result:
                 tmp = dict(zip(keys, row))
                 tmp['result_type'] = 'av'
@@ -1400,7 +1387,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             # Coded text
             sql = "select code_name.name, color, cases.name, "
             sql += "code_text.pos0, code_text.pos1, seltext, code_text.owner, code_text.fid, "
-            sql += "cases.memo, code_text.memo, code_name.memo, source.memo, ctid "
+            sql += "cases.memo, code_text.memo, code_name.memo, source.memo, ctid, code_name.cid "
             sql += "from code_text join code_name on code_name.cid = code_text.cid "
             sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
             sql += "code_text.fid = case_text.fid "
@@ -1423,7 +1410,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 cur.execute(sql, parameters)
             results = cur.fetchall()
             keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'text', 'coder', 'fid', \
-                   'cases_memo', 'coded_memo', 'codename_memo', 'source_memo', 'ctid'
+                   'cases_memo', 'coded_memo', 'codename_memo', 'source_memo', 'ctid', 'cid'
             for row in results:
                 tmp = dict(zip(keys, row))
                 tmp['result_type'] = 'text'
@@ -1438,7 +1425,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             parameters = []
             sql = "select code_name.name, color, cases.name, "
             sql += "x1, y1, width, height, code_image.owner,source.mediapath, source.id, "
-            sql += "code_image.memo, cases.memo, code_name.memo, source.memo, imid "
+            sql += "code_image.memo, cases.memo, code_name.memo, source.memo, imid, code_name.cid "
             sql += "from code_image join code_name on code_name.cid = code_image.cid "
             sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
             sql += "code_image.id = case_text.fid "
@@ -1460,7 +1447,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 cur.execute(sql, parameters)
             imgresults = cur.fetchall()
             keys = 'codename', 'color', 'file_or_casename', 'x1', 'y1', 'width', 'height', 'coder', 'mediapath', \
-                   'fid', 'coded_memo', 'case_memo', 'codename_memo', 'source_memo', 'imid'
+                   'fid', 'coded_memo', 'case_memo', 'codename_memo', 'source_memo', 'imid', 'cid'
             for row in imgresults:
                 tmp = dict(zip(keys, row))
                 tmp['result_type'] = 'image'
@@ -1471,8 +1458,9 @@ class DialogReportCodes(QtWidgets.QDialog):
             parameters = []
             av_sql = "select distinct code_name.name, color, cases.name as case_name, "
             av_sql += "code_av.pos0, code_av.pos1, code_av.owner,source.mediapath, source.id, "
-            av_sql += "code_av.memo as coded_memo, cases.memo as case_memo, code_name.memo, source.memo, avid "
-            av_sql += " from code_av join code_name on code_name.cid = code_av.cid "
+            av_sql += "code_av.memo as coded_memo, cases.memo as case_memo, code_name.memo, source.memo, avid, "
+            av_sql+= "code_name.cid "
+            av_sql += "from code_av join code_name on code_name.cid = code_av.cid "
             av_sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
             av_sql += "code_av.id = case_text.fid "
             av_sql += " join source on case_text.fid = source.id "
@@ -1493,7 +1481,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 cur.execute(av_sql, parameters)
             avresults = cur.fetchall()
             keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'coder', 'mediapath', \
-                   'fid', 'coded_memo', 'case_memo', 'codename_memo', 'source_memo', 'avid'
+                   'fid', 'coded_memo', 'case_memo', 'codename_memo', 'source_memo', 'avid', 'cid'
             for row in avresults:
                 tmp = dict(zip(keys, row))
                 tmp['result_type'] = 'av'
