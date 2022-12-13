@@ -2442,9 +2442,13 @@ class DialogCodeText(QtWidgets.QWidget):
             selected : QTreeWidgetItem """
 
         if selected.text(1)[0:3] == 'cid':
+            code_ = None
+            for c in self.codes:
+                if c['cid'] == int(selected.text(1)[4:]):
+                    code_ = c
             new_name, ok = QtWidgets.QInputDialog.getText(self, _("Rename code"),
-                                                          _("New code name:"), QtWidgets.QLineEdit.EchoMode.Normal,
-                                                          selected.text(0))
+                                                          _("New code name:") + " " * 40, QtWidgets.QLineEdit.EchoMode.Normal,
+                                                          code_['name'])
             if not ok or new_name == '':
                 return
             # Check that no other code has this name
@@ -2476,8 +2480,12 @@ class DialogCodeText(QtWidgets.QWidget):
             return
 
         if selected.text(1)[0:3] == 'cat':
-            new_name, ok = QtWidgets.QInputDialog.getText(self, _("Rename category"), _("New category name:"),
-                                                          QtWidgets.QLineEdit.EchoMode.Normal, selected.text(0))
+            cat = None
+            for c in self.categories:
+                if c['catid'] == int(selected.text(1)[6:]):
+                    cat = c
+            new_name, ok = QtWidgets.QInputDialog.getText(self, _("Rename category"), _("New category name:") + " " * 40,
+                                                          QtWidgets.QLineEdit.EchoMode.Normal, cat['name'])
             if not ok or new_name == '':
                 return
             # Check that no other category has this name
