@@ -653,6 +653,8 @@ class DialogCodeText(QtWidgets.QWidget):
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
                 top_item.setToolTip(2, c['memo'])
                 if len(c['name']) > 50:
+                    #chunks = [c['name'][i:i + 40] for i in range(0, len(c['name']), 40)]
+                    #print(chunks)
                     top_item.setText(0, c['name'][:24] + '..' + c['name'][-24:])
                     top_item.setToolTip(0, c['name'])
                 top_item.setBackground(0, QBrush(QColor(c['color']), Qt.BrushStyle.SolidPattern))
@@ -1638,6 +1640,8 @@ class DialogCodeText(QtWidgets.QWidget):
 
     def recursive_traverse(self, item, text_):
         """ Find all children codes of this item that match or not and hide or unhide based on 'text'.
+        Looks at tooltip also because the code text may be shortened to 50 characters for display, and the tooltip
+        is not shortened.
         Recurse through all child categories.
         Called by: show_codes_like
         param:
@@ -1647,7 +1651,8 @@ class DialogCodeText(QtWidgets.QWidget):
 
         child_count = item.childCount()
         for i in range(child_count):
-            if "cid:" in item.child(i).text(1) and len(text_) > 0 and text_ not in item.child(i).text(0):
+            if "cid:" in item.child(i).text(1) and len(text_) > 0 and text_ not in item.child(i).text(0) and \
+                    text_ not in item.child(i).toolTip(0):
                 item.child(i).setHidden(True)
             if "cid:" in item.child(i).text(1) and text_ == "":
                 item.child(i).setHidden(False)
