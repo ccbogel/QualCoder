@@ -607,14 +607,14 @@ class DialogCodeText(QtWidgets.QWidget):
                     memo = _("Memo")
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
                 top_item.setToolTip(2, c['memo'])
-                if len(c['name']) > 50:
-                    top_item.setText(0, c['name'][:24] + '..' + c['name'][-24:])
+                top_item.setToolTip(0, '')
+                if len(c['name']) > 52:
+                    top_item.setText(0, c['name'][:25] + '..' + c['name'][-25:])
                     top_item.setToolTip(0, c['name'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_list.append(c)
         for item in remove_list:
             cats.remove(item)
-
         ''' Add child categories. look at each unmatched category, iterate through tree
          to add as child, then remove matched categories from the list '''
         count = 0
@@ -631,8 +631,9 @@ class DialogCodeText(QtWidgets.QWidget):
                             memo = _("Memo")
                         child = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
                         child.setToolTip(2, c['memo'])
-                        if len(c['name']) > 50:
-                            child.setText(0, c['name'][:24] + '..' + c['name'][-24:])
+                        child.setToolTip(0, '')
+                        if len(c['name']) > 52:
+                            child.setText(0, c['name'][:25] + '..' + c['name'][-25:])
                             child.setToolTip(0, c['name'])
                         item.addChild(child)
                         remove_list.append(c)
@@ -642,7 +643,6 @@ class DialogCodeText(QtWidgets.QWidget):
             for item in remove_list:
                 cats.remove(item)
             count += 1
-
         # Add unlinked codes as top level items
         remove_items = []
         for c in codes:
@@ -652,10 +652,9 @@ class DialogCodeText(QtWidgets.QWidget):
                     memo = _("Memo")
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
                 top_item.setToolTip(2, c['memo'])
-                if len(c['name']) > 50:
-                    #chunks = [c['name'][i:i + 40] for i in range(0, len(c['name']), 40)]
-                    #print(chunks)
-                    top_item.setText(0, c['name'][:24] + '..' + c['name'][-24:])
+                top_item.setToolTip(0, '')
+                if len(c['name']) > 52:
+                    top_item.setText(0, c['name'][:25] + '..' + c['name'][-25:])
                     top_item.setToolTip(0, c['name'])
                 top_item.setBackground(0, QBrush(QColor(c['color']), Qt.BrushStyle.SolidPattern))
                 color = TextColor(c['color']).recommendation
@@ -679,8 +678,9 @@ class DialogCodeText(QtWidgets.QWidget):
                         memo = _("Memo")
                     child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
                     child.setToolTip(2, c['memo'])
-                    if len(c['name']) > 50:
-                        child.setText(0, c['name'][:24] + '..' + c['name'][-24:])
+                    child.setToolTip(0, c['name'])
+                    if len(c['name']) > 52:
+                        child.setText(0, c['name'][:25] + '..' + c['name'][-25:])
                         child.setToolTip(0, c['name'])
                     child.setBackground(0, QBrush(QColor(c['color']), Qt.BrushStyle.SolidPattern))
                     color = TextColor(c['color']).recommendation
