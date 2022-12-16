@@ -55,7 +55,7 @@ Note: 8 Dec 2022 - lxml may not install on python version 3.11 until a bug in lx
 
 It is best to run QualCoder inside a python virtual environment, so that the system installed python modules do not clash and cause problems.
 
-1. REcommend that you install vlc (download from site) or:
+1. Recommend that you install vlc (download from site) or:
 
 `sudo apt install vlc`
 
@@ -225,27 +225,6 @@ Open the Terminal App and move to the unzipped Qualcoder-Master directory, then 
 2) Create the Application. You will find it in the 'dist' folder and drag it to 'Applications'.
 `python3 setup.py py2app`
 
-## Creating an executable file
-
-Download pyinstaller
-
-`pip install pyinstaller` 
-
-or upgrade it if already installed
-
-`pip install --upgrade pyinstaller`
-
-Move to the Qualcoder-master folder or the release folder.
-
-Run this line:
-
-`pyinstaller -w -n "QualCoder-3.2" --icon=QC_Logo.ico --onefile qualcoder/__main__.py`
-
-The executable file will be inside a folder called dist
-
-This 'file' contains all the python modules packaged up for use on that operating system, and can be shared to others who use the same operating system.
-
-However, you do still need to install the VLC software.
  
 ## Dependencies
 Required:
