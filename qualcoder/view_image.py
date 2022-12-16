@@ -405,7 +405,10 @@ class DialogCodeImage(QtWidgets.QDialog):
                 if c['memo'] != "" and c['memo'] is not None:
                     memo = "Memo"
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
-                top_item.setToolTip(0, c['name'])
+                top_item.setToolTip(0, '')
+                if len(c['name']) > 52:
+                    top_item.setText(0, c['name'][:25] + '..' + c['name'][-25:])
+                    top_item.setToolTip(0, c['name'])
                 top_item.setToolTip(2, c['memo'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_list.append(c)
@@ -427,7 +430,10 @@ class DialogCodeImage(QtWidgets.QDialog):
                         if c['memo'] != "" and c['memo'] is not None:
                             memo = "Memo"
                         child = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
-                        child.setToolTip(0, c['name'])
+                        child.setToolTip(0, '')
+                        if len(c['name']) > 52:
+                            child.setText(0, c['name'][:25] + '..' + c['name'][-25:])
+                            child.setToolTip(0, c['name'])
                         child.setToolTip(2, c['memo'])
                         item.addChild(child)
                         remove_list.append(c)
@@ -446,7 +452,10 @@ class DialogCodeImage(QtWidgets.QDialog):
                 if c['memo'] != "" and c['memo'] is not None:
                     memo = "Memo"
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
-                top_item.setToolTip(0, c['name'])
+                top_item.setToolTip(0, '')
+                if len(c['name']) > 52:
+                    top_item.setText(0, c['name'][:25] + '..' + c['name'][-25:])
+                    top_item.setToolTip(0, c['name'])
                 top_item.setToolTip(2, c['memo'])
                 top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
                 color = TextColor(c['color']).recommendation
@@ -473,7 +482,10 @@ class DialogCodeImage(QtWidgets.QDialog):
                     child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
                     color = TextColor(c['color']).recommendation
                     child.setForeground(0, QBrush(QtGui.QColor(color)))
-                    child.setToolTip(0, c['name'])
+                    child.setToolTip(0, '')
+                    if len(c['name']) > 52:
+                        child.setText(0, c['name'][:25] + '..' + c['name'][-25:])
+                        child.setToolTip(0, c['name'])
                     child.setToolTip(2, c['memo'])
                     child.setFlags(
                         Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsUserCheckable |
@@ -1670,7 +1682,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             selected : QTreeWidgetItem """
 
         if selected.text(1)[0:3] == 'cid':
-            new_name, ok = QtWidgets.QInputDialog.getText(self, _("Rename code"), _("New code name:"),
+            new_name, ok = QtWidgets.QInputDialog.getText(self, _("Rename code") + " " * 40, _("New code name:"),
                                                           QtWidgets.QLineEdit.EchoMode.Normal, selected.text(0))
             if not ok or new_name == '':
                 return
