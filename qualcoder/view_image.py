@@ -1682,7 +1682,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             selected : QTreeWidgetItem """
 
         if selected.text(1)[0:3] == 'cid':
-            new_name, ok = QtWidgets.QInputDialog.getText(self, _("Rename code") + " " * 40, _("New code name:"),
+            new_name, ok = QtWidgets.QInputDialog.getText(self, _("Rename code"), _("New code name:") + " " * 30,
                                                           QtWidgets.QLineEdit.EchoMode.Normal, selected.text(0))
             if not ok or new_name == '':
                 return
