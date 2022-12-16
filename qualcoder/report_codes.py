@@ -394,7 +394,10 @@ class DialogReportCodes(QtWidgets.QDialog):
                 if c['memo'] != "":
                     memo = _("Memo")
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
-                top_item.setToolTip(0, c['name'])
+                top_item.setToolTip(0, '')
+                if len(c['name']) > 52:
+                    top_item.setText(0, c['name'][:25] + '..' + c['name'][-25:])
+                    top_item.setToolTip(0, c['name'])
                 top_item.setToolTip(2, c['memo'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_list.append(c)
@@ -416,7 +419,10 @@ class DialogReportCodes(QtWidgets.QDialog):
                         if c['memo'] != "":
                             memo = "Memo"
                         child = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
-                        child.setToolTip(0, c['name'])
+                        child.setToolTip(0, '')
+                        if len(c['name']) > 52:
+                            child.setText(0, c['name'][:25] + '..' + c['name'][-25:])
+                            child.setToolTip(0, c['name'])
                         child.setToolTip(2, c['memo'])
                         item.addChild(child)
                         remove_list.append(c)
@@ -439,7 +445,10 @@ class DialogReportCodes(QtWidgets.QDialog):
                 color = TextColor(c['color']).recommendation
                 top_item.setForeground(0, QBrush(QtGui.QColor(color)))
                 top_item.setFlags(Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEnabled)
-                top_item.setToolTip(0, c['name'])
+                top_item.setToolTip(0, '')
+                if len(c['name']) > 52:
+                    top_item.setText(0, c['name'][:25] + '..' + c['name'][-25:])
+                    top_item.setToolTip(0, c['name'])
                 top_item.setToolTip(2, c['memo'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_items.append(c)
@@ -461,7 +470,10 @@ class DialogReportCodes(QtWidgets.QDialog):
                     color = TextColor(c['color']).recommendation
                     child.setForeground(0, QBrush(QtGui.QColor(color)))
                     child.setFlags(Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEnabled)
-                    child.setToolTip(0, c['name'])
+                    child.setToolTip(0, '')
+                    if len(c['name']) > 52:
+                        child.setText(0, c['name'][:25] + '..' + c['name'][-25:])
+                        child.setToolTip(0, c['name'])
                     child.setToolTip(2, c['memo'])
                     item.addChild(child)
                     c['catid'] = -1  # make unmatchable
