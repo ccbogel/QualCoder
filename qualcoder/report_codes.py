@@ -1081,6 +1081,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 self.ui.pushButton_attributeselect.setIcon(QtGui.QIcon(pm))
             return
         self.attributes = ui.parameters
+        print("Attributes after GUI\n", self.attributes)
         if not self.attributes:
             pm = QtGui.QPixmap()
             pm.loadFromData(QtCore.QByteArray.fromBase64(attributes_icon), "png")
@@ -1095,10 +1096,11 @@ class DialogReportCodes(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         # Run a series of sql based on each selected attribute
         # Apply a set to the resulting ids to determine the final list of ids
+        boolean_and_or = self.attributes[0]
         for a in self.attributes:
             # File attributes
             file_sql = "select id from attribute where "
-            if a[1] == 'file':
+            if len(a) > 1 and a[1] == 'file':
                 file_sql += "attribute.name = '" + a[0] + "' "
                 file_sql += " and attribute.value " + a[3] + " "
                 if a[3] == 'between':
@@ -1115,7 +1117,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 for i in result:
                     file_ids.append(i[0])
             # Case attributes
-            if a[1] == 'case':
+            if len(a) > 1 and a[1] == 'case':
                 # Case text table also links av and images
                 case_sql = "select distinct case_text.fid from cases "
                 case_sql += "join case_text on case_text.caseid=cases.caseid "
@@ -1159,12 +1161,12 @@ class DialogReportCodes(QtWidgets.QDialog):
         file_msg = ""
         case_msg = ""
         for a in self.attributes:
-            if a[1] == 'file':
+            if len(a) > 1 and a[1] == 'file':
                 file_msg += " or " + a[0] + " " + a[3] + " " + ",".join(a[4])
         if len(file_msg) > 4:
             file_msg = "(" + _("File: ") + file_msg[3:] + ")"
         for a in self.attributes:
-            if a[1] == 'case':
+            if len(a) > 1 and a[1] == 'case':
                 case_msg += " or " + a[0] + " " + a[3] + " " + ",".join(a[4])
         if len(case_msg) > 5:
             case_msg = "(" + _("Case: ") + case_msg[4:] + ")"
