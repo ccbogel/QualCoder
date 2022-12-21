@@ -1160,14 +1160,17 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.attributes_msg = ""
         file_msg = ""
         case_msg = ""
+        bool_msg = " or "
         for a in self.attributes:
+            if len(a) == 1 and a[0] == "BOOLEAN_AND":
+                bool_msg = " and "
             if len(a) > 1 and a[1] == 'file':
-                file_msg += " or " + a[0] + " " + a[3] + " " + ",".join(a[4])
+                file_msg += bool_msg + a[0] + " " + a[3] + " " + ",".join(a[4])
         if len(file_msg) > 4:
             file_msg = "(" + _("File: ") + file_msg[3:] + ")"
         for a in self.attributes:
             if len(a) > 1 and a[1] == 'case':
-                case_msg += " or " + a[0] + " " + a[3] + " " + ",".join(a[4])
+                case_msg += bool_msg + a[0] + " " + a[3] + " " + ",".join(a[4])
         if len(case_msg) > 5:
             case_msg = "(" + _("Case: ") + case_msg[4:] + ")"
         if file_msg != "" and case_msg != "":
