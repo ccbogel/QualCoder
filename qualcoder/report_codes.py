@@ -1081,7 +1081,6 @@ class DialogReportCodes(QtWidgets.QDialog):
                 self.ui.pushButton_attributeselect.setIcon(QtGui.QIcon(pm))
             return
         self.attributes = ui.parameters
-        print("Attributes after GUI\n", self.attributes)
         if not self.attributes:
             pm = QtGui.QPixmap()
             pm.loadFromData(QtCore.QByteArray.fromBase64(attributes_icon), "png")
@@ -1091,32 +1090,18 @@ class DialogReportCodes(QtWidgets.QDialog):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(attributes_selected_icon), "png")
         self.ui.pushButton_attributeselect.setIcon(QtGui.QIcon(pm))
-        file_ids = []
+        print("Attributes after GUI\n", self.attributes)
         case_file_ids = []
         cur = self.app.conn.cursor()
         # Run a series of sql based on each selected attribute
         # Apply a set to the resulting ids to determine the final list of ids
-        boolean_and_or = self.attributes[0]
+        file_ids = self.select_attributes_file_ids()
+        print("file_ids", file_ids)
+        case_file_ids = self.select_attributes_case_file_ids()
+        print("case_file_ids", case_file_ids)
+        '''# TODO move to separate method
+        # Case attributes
         for a in self.attributes:
-            # File attributes
-            file_sql = "select id from attribute where "
-            if len(a) > 1 and a[1] == 'file':
-                file_sql += "attribute.name = '" + a[0] + "' "
-                file_sql += " and attribute.value " + a[3] + " "
-                if a[3] == 'between':
-                    file_sql += a[4][0] + " and " + a[4][1] + " "
-                if a[3] in ('in', 'not in'):
-                    file_sql += "(" + ','.join(a[4]) + ") "  # One item the comma is skipped
-                if a[3] not in ('between', 'in', 'not in'):
-                    file_sql += a[4][0]
-                if a[2] == 'numeric':
-                    file_sql = file_sql.replace(' attribute.value ', ' cast(attribute.value as real) ')
-                file_sql += " and attribute.attr_type='file'"
-                cur.execute(file_sql)
-                result = cur.fetchall()
-                for i in result:
-                    file_ids.append(i[0])
-            # Case attributes
             if len(a) > 1 and a[1] == 'case':
                 # Case text table also links av and images
                 case_sql = "select distinct case_text.fid from cases "
@@ -1139,7 +1124,8 @@ class DialogReportCodes(QtWidgets.QDialog):
                 cur.execute(case_sql)
                 case_result = cur.fetchall()
                 for i in case_result:
-                    case_file_ids.append(i[0])
+                    case_file_ids.append(i[0])'''
+
         # Consolidate case and file ids
         if file_ids == [] and case_file_ids == []:
             Message(self.app, "Nothing found", "Nothing found").exec()
@@ -1178,6 +1164,125 @@ class DialogReportCodes(QtWidgets.QDialog):
         else:
             self.attributes_msg = file_msg + case_msg
         self.ui.pushButton_attributeselect.setToolTip(_("Attributes: ") + self.attributes_msg)
+
+    def select_attributes_file_ids(self):
+        """ Attribute search. Get file ids for attribute parameters using a boolean or / boolean and """
+
+        file_ids = []
+        boolean_and_or = self.attributes[0][0]
+        cur = self.app.conn.cursor()
+        if boolean_and_or == "BOOLEAN_OR":
+            for a in self.attributes:
+                # File attributes
+                file_sql = "select id from attribute where "
+                if len(a) > 1 and a[1] == 'file':
+                    file_sql += "attribute.name = '" + a[0] + "' "
+                    file_sql += " and attribute.value " + a[3] + " "
+                    if a[3] == 'between':
+                        file_sql += a[4][0] + " and " + a[4][1] + " "
+                    if a[3] in ('in', 'not in'):
+                        file_sql += "(" + ','.join(a[4]) + ") "  # One item the comma is skipped
+                    if a[3] not in ('between', 'in', 'not in'):
+                        file_sql += a[4][0]
+                    if a[2] == 'numeric':
+                        file_sql = file_sql.replace(' attribute.value ', ' cast(attribute.value as real) ')
+                    file_sql += " and attribute.attr_type='file'"
+                    cur.execute(file_sql)
+                    result = cur.fetchall()
+                    for i in result:
+                        file_ids.append(i[0])
+            return file_ids
+        # boolean and
+        list_of_sets = []
+        for a in self.attributes:
+            # File attributes
+            file_sql = "select id from attribute where "
+            if len(a) > 1 and a[1] == 'file':
+                attribute_set = set()
+                file_sql += "attribute.name = '" + a[0] + "' "
+                file_sql += " and attribute.value " + a[3] + " "
+                if a[3] == 'between':
+                    file_sql += a[4][0] + " and " + a[4][1] + " "
+                if a[3] in ('in', 'not in'):
+                    file_sql += "(" + ','.join(a[4]) + ") "  # One item the comma is skipped
+                if a[3] not in ('between', 'in', 'not in'):
+                    file_sql += a[4][0]
+                if a[2] == 'numeric':
+                    file_sql = file_sql.replace(' attribute.value ', ' cast(attribute.value as real) ')
+                file_sql += " and attribute.attr_type='file'"
+                cur.execute(file_sql)
+                result = cur.fetchall()
+                for i in result:
+                    attribute_set.add(i[0])
+                if attribute_set != {}:
+                    list_of_sets.append(attribute_set)
+        if len(list_of_sets) == 0:
+            return []
+        if len(list_of_sets) == 1:
+            return list(list_of_sets[0])
+        if len(list_of_sets) > 1:
+            result_set = set.intersection(*list_of_sets)
+        return list(result_set)
+
+    def select_attributes_case_file_ids(self):
+        """ Attribute search. Get case ids for attribute parameters using a boolean or / boolean and  """
+
+        case_file_ids = []
+        boolean_and_or = self.attributes[0][0]
+        cur = self.app.conn.cursor()
+        if boolean_and_or == "BOOLEAN_OR":
+            for a in self.attributes:
+                if len(a) > 1 and a[1] == 'case':
+                    # Case text table also links av and images
+                    case_sql = "select distinct case_text.fid from cases "
+                    case_sql += "join case_text on case_text.caseid=cases.caseid "
+                    case_sql += "join attribute on cases.caseid=attribute.id "
+                    case_sql += " where "
+                    case_sql += "attribute.name = '" + a[0] + "' "
+                    case_sql += " and attribute.value " + a[3] + " "
+                    if a[3] == 'between':
+                        case_sql += a[4][0] + " and " + a[4][1] + " "
+                    if a[3] in ('in', 'not in'):
+                        case_sql += "(" + ','.join(a[4]) + ") "  # One item the comma is skipped
+                    if a[3] not in ('between', 'in', 'not in'):
+                        case_sql += a[4][0]
+                    if a[2] == 'numeric':
+                        case_sql = case_sql.replace(' attribute.value ', ' cast(attribute.value as real) ')
+                    case_sql += " and attribute.attr_type='case'"
+                    # print("Attribute selected: ", a)
+                    # print(case_sql)
+                    cur.execute(case_sql)
+                    case_result = cur.fetchall()
+                    for i in case_result:
+                        case_file_ids.append(i[0])
+            return case_file_ids
+        # boolean and
+        # TODO
+        for a in self.attributes:
+            if len(a) > 1 and a[1] == 'case':
+                # Case text table also links av and images
+                case_sql = "select distinct case_text.fid from cases "
+                case_sql += "join case_text on case_text.caseid=cases.caseid "
+                case_sql += "join attribute on cases.caseid=attribute.id "
+                case_sql += " where "
+                case_sql += "attribute.name = '" + a[0] + "' "
+                case_sql += " and attribute.value " + a[3] + " "
+                if a[3] == 'between':
+                    case_sql += a[4][0] + " and " + a[4][1] + " "
+                if a[3] in ('in', 'not in'):
+                    case_sql += "(" + ','.join(a[4]) + ") "  # One item the comma is skipped
+                if a[3] not in ('between', 'in', 'not in'):
+                    case_sql += a[4][0]
+                if a[2] == 'numeric':
+                    case_sql = case_sql.replace(' attribute.value ', ' cast(attribute.value as real) ')
+                case_sql += " and attribute.attr_type='case'"
+                # print("Attribute selected: ", a)
+                # print(case_sql)
+                cur.execute(case_sql)
+                case_result = cur.fetchall()
+                for i in case_result:
+                    case_file_ids.append(i[0])
+
 
     def search(self):
         """ Search for selected codings.
