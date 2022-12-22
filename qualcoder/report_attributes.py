@@ -118,6 +118,12 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
 
         if not attribute_list:
             return
+        first_attr = attribute_list.pop(0)
+        radio_bool = first_attr[0]
+        if radio_bool == "BOOLEAN_OR":
+            self.ui.radioButton_or.setChecked(True)
+        else:
+            self.ui.radioButton_and.setChecked(True)
         for a in attribute_list:
             for x in range(0, self.ui.tableWidget.rowCount()):
                 if self.ui.tableWidget.item(x, self.NAME_COLUMN).text() == a[0]:
@@ -136,6 +142,10 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
         Check that values are acceptable for operator and for numeric type. """
 
         self.parameters = []
+        if self.ui.radioButton_or.isChecked():
+            self.parameters.append(["BOOLEAN_OR"])
+        else:
+            self.parameters.append(["BOOLEAN_AND"])
         for x in range(0, self.ui.tableWidget.rowCount()):
             values = self.ui.tableWidget.item(x, self.VALUE_LIST_COLUMN).text()
             values = values.split(';')
