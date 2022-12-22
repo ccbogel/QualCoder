@@ -1090,58 +1090,27 @@ class DialogReportCodes(QtWidgets.QDialog):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(attributes_selected_icon), "png")
         self.ui.pushButton_attributeselect.setIcon(QtGui.QIcon(pm))
-        print("Attributes after GUI\n", self.attributes)
-        case_file_ids = []
-        cur = self.app.conn.cursor()
-        # Run a series of sql based on each selected attribute
-        # Apply a set to the resulting ids to determine the final list of ids
+        # Get file ides for case attributes and for file attributes
         file_ids = self.select_attributes_file_ids()
-        print("file_ids", file_ids)
         case_file_ids = self.select_attributes_case_file_ids()
-        print("case_file_ids", case_file_ids)
-        '''# TODO move to separate method
-        # Case attributes
-        for a in self.attributes:
-            if len(a) > 1 and a[1] == 'case':
-                # Case text table also links av and images
-                case_sql = "select distinct case_text.fid from cases "
-                case_sql += "join case_text on case_text.caseid=cases.caseid "
-                case_sql += "join attribute on cases.caseid=attribute.id "
-                case_sql += " where "
-                case_sql += "attribute.name = '" + a[0] + "' "
-                case_sql += " and attribute.value " + a[3] + " "
-                if a[3] == 'between':
-                    case_sql += a[4][0] + " and " + a[4][1] + " "
-                if a[3] in ('in', 'not in'):
-                    case_sql += "(" + ','.join(a[4]) + ") "  # One item the comma is skipped
-                if a[3] not in ('between', 'in', 'not in'):
-                    case_sql += a[4][0]
-                if a[2] == 'numeric':
-                    case_sql = case_sql.replace(' attribute.value ', ' cast(attribute.value as real) ')
-                case_sql += " and attribute.attr_type='case'"
-                # print("Attribute selected: ", a)
-                # print(case_sql)
-                cur.execute(case_sql)
-                case_result = cur.fetchall()
-                for i in case_result:
-                    case_file_ids.append(i[0])'''
-
-        # Consolidate case and file ids
+        # Consolidate case and file ids, using 'and' or 'or'
         if file_ids == [] and case_file_ids == []:
             Message(self.app, "Nothing found", "Nothing found").exec()
             return
         set_ids = {}
         set_file_ids = set(file_ids)
         set_case_file_ids = set(case_file_ids)
-        # Intersect case file ids and file ids
-        if file_ids != [] and case_file_ids != []:
+        # 'and' attribute radio button selected
+        if file_ids != [] and case_file_ids != [] and self.attributes[0][0] == "BOOLEAN_AND":
             set_ids = set_file_ids.intersection(set_case_file_ids)
+        # 'or' attribute radio button selected
+        if file_ids != [] and case_file_ids != [] and self.attributes[0][0] == "BOOLEAN_AND":
+            set_ids = set_file_ids.union(set_case_file_ids)
         if file_ids != [] and case_file_ids == []:
             set_ids = set_file_ids
         if file_ids == [] and case_file_ids != []:
             set_ids = set_case_file_ids
         self.attribute_file_ids = list(set_ids)
-        # print("Attribute file ids", self.attribute_file_ids)
         # Prepare message for label tooltip
         self.attributes_msg = ""
         file_msg = ""
@@ -1257,9 +1226,10 @@ class DialogReportCodes(QtWidgets.QDialog):
                         case_file_ids.append(i[0])
             return case_file_ids
         # boolean and
-        # TODO
+        list_of_sets = []
         for a in self.attributes:
             if len(a) > 1 and a[1] == 'case':
+                attribute_set = set()
                 # Case text table also links av and images
                 case_sql = "select distinct case_text.fid from cases "
                 case_sql += "join case_text on case_text.caseid=cases.caseid "
@@ -1279,10 +1249,18 @@ class DialogReportCodes(QtWidgets.QDialog):
                 # print("Attribute selected: ", a)
                 # print(case_sql)
                 cur.execute(case_sql)
-                case_result = cur.fetchall()
-                for i in case_result:
-                    case_file_ids.append(i[0])
-
+                result = cur.fetchall()
+                for i in result:
+                    attribute_set.add(i[0])
+                if attribute_set != {}:
+                    list_of_sets.append(attribute_set)
+        if len(list_of_sets) == 0:
+            return []
+        if len(list_of_sets) == 1:
+            return list(list_of_sets[0])
+        if len(list_of_sets) > 1:
+            result_set = set.intersection(*list_of_sets)
+        return list(result_set)
 
     def search(self):
         """ Search for selected codings.
