@@ -151,7 +151,7 @@ Fedora uses wayland with does not work well with the Qt graphical interface (for
 
 1) Install recent versions of [Python3](https://www.python.org/downloads/) and [VLC](https://www.videolan.org/vlc/).
 
-2) Download the latest release "Source code" version in ZIP format, from the releases section of the project here on Github: https://github.com/ccbogel/QualCoder/releases/tag/3.0 and extract it into /Applications
+2) Download the latest release "Source code" version in ZIP format, from the releases section of the project here on Github: https://github.com/ccbogel/QualCoder/releases/tag/3.1 and extract it into /Applications
 
 3) Open the Terminal app (or any other command shell)
 
