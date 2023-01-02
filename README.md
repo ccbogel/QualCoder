@@ -159,6 +159,8 @@ Fedora uses wayland with does not work well with the Qt graphical interface (for
 
 ```sh
 curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+
+
 python3 get-pip.py
 ```
 
