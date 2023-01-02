@@ -155,7 +155,7 @@ Fedora uses wayland with does not work well with the Qt graphical interface (for
 
 3) Open the Terminal app (or any other command shell)
 
-4) Install PIP (if not yet installed, try typing `pip3 --version` and hit ENTER) 
+4) Install PIP usingthese commands (if not yet installed, try typing `pip3 --version` and hit ENTER) 
 
 ```sh
 curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
