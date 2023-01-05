@@ -45,7 +45,7 @@ from PyQt6.QtCore import *
 
 
 class Highlighter(QSyntaxHighlighter):
-    """ SQL code highlighter """
+    """ SQL code highlighter. """
 
     highlighting_rules = []
 

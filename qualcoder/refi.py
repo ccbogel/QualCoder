@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2022 Colin Curtain
+Copyright (c) 2023 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -387,8 +387,9 @@ class RefiImport:
         # Parse Notes after sources. Some Notes are text annotations
         for c in children:
             if c.tag == "{urn:QDA-XML:project:1.0}Notes":
-                count = self.parse_notes(c)
-                self.parent_textedit.append(_("Parsing Notes. Loaded: " + str(count)))
+                journal_count, annotation_count = self.parse_notes(c)
+                self.parent_textedit.append(_("Parsing Notes. Journals loaded: " + str(journal_count)))
+                self.parent_textedit.append(_("Parsing Notes. Text annotations loaded: " + str(annotation_count)))
 
         # Fill attributes table for File variables drawn fom Cases.Case tags
         # After Sources are loaded
@@ -1516,13 +1517,16 @@ class RefiImport:
         <PlainTextSelection guid="d61907b2-d0d4-48dc-b8b7-5e4f7ae5faa6" startPosition="455" endPosition="596" />
         </Note>
 
+        called by: import_project
+
         param: element Notes
 
-        return: count of Notes
+        return: count of journals, count of annotations
         """
 
         cur = self.app.conn.cursor()
-        count = 0
+        annotation_count = 0
+        journal_count = 0
         for el in list(element):  # element.getchildren():
             # print(el.tag, el.get("name"), el.get("plainTextPath"))
             name = el.get("name")
@@ -1545,6 +1549,7 @@ class RefiImport:
                 if a['NoteRef'] == el.get("guid"):
                     annotation = True
                     self.insert_annotation(a['TextSource'], el)
+                    annotation_count += 1
                     break
 
             # Journal paths starts with internal://
@@ -1558,11 +1563,20 @@ class RefiImport:
                         jentry = f.read()
                 except Exception as err:
                     self.parent_textedit.append(_('Trying to read Note element: ') + path_ + '\n' + str(err))
+                # Check journal name does not exist. If it exists, add 3 random numbers, fix for Integrity Error
+                cur.execute("select name from journal where name=?", [name])
+                name_exists = cur.fetchone()
+                if name_exists:
+                    msg = _("Duplicate journal name: ") + name
+                    self.parent_textedit.append(msg)
+                    name += "_" + str(randint(0, 9)) + str(randint(0, 9)) + str(randint(0, 9))
+                    msg = _("Duplicate journal renamed to: ") + name
+                    self.parent_textedit.append(msg)
                 cur.execute("insert into journal(name,jentry,owner,date) values(?,?,?,?)",
-                            (name, jentry, creating_user, create_date))
+                                (name, jentry, creating_user, create_date))
                 self.app.conn.commit()
-            count += 1
-        return count
+                journal_count += 1
+        return journal_count, annotation_count
 
     def insert_annotation(self, source_guid, element):
         """ Insert annotation into database

@@ -100,7 +100,7 @@ class DialogSQL(QtWidgets.QDialog):
 
         self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         highlighter = Highlighter(self.ui.textEdit_sql)
-        if self.app.settings['stylesheet'] == "dark":
+        if self.app.settings['stylesheet'] in ("dark", "rainbow"):
             highlighter.create_rules(dark=True)
         self.ui.textEdit_sql.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.textEdit_sql.customContextMenuRequested.connect(self.sql_menu)
@@ -277,7 +277,7 @@ class DialogSQL(QtWidgets.QDialog):
                     item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
                     self.ui.tableWidget_results.setItem(row, col, item)
             self.ui.tableWidget_results.resizeColumnsToContents()
-            # Keep column widths reasonable, 450 pixels max
+            # Keep column widths reasonable, 500 pixels max
             for i in range(self.ui.tableWidget_results.columnCount()):
                 if self.ui.tableWidget_results.columnWidth(i) > 500:
                     self.ui.tableWidget_results.setColumnWidth(i, 500)

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2022 Colin Curtain
+Copyright (c) 2023 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -118,9 +118,9 @@ recent_project.txt. The config file contains the name of the current coder, \
 default working directory, selected font and other parameters.</p>\
 <p>QualCoder is written in python3 using Qt6 for the graphical interface.</p>\
 <p>The REFI-QDA Project import and export seem to work ok, but are still experimental. </p>\
-<h2 class="western">License</h2>\
-<p>MIT License</p>\
-<p>Copyright (c) 2022 Colin Curtain</p>\
+<h2 class="western">Licenses</h2>\
+<h3>MIT License</h3>\
+<p>Copyright (c) 2023 Colin Curtain</p>\
 <p>Permission is hereby granted, free of charge, to any person<br />\
 obtaining a copy of this software and associated documentation files<br />\
 (the &quot;Software&quot;), to deal in the Software without<br />\
@@ -137,4 +137,62 @@ WARRANTIES OF MERCHANTABILITY,</p>\
 SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,<br />\
 DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR<br />\
 OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR<br />\
-THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>'
+THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>\
+<h3>License for highlighter.py code</h3>\
+<p>## Copyright (C) 2013 Riverbank Computing Limited.<br />\
+## Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).<br />\
+## All rights reserved.<br />\
+##<br />\
+## This file is part of the examples of PyQt.<br />\
+##<br />\
+## $QT_BEGIN_LICENSE:BSD<br />\
+## You may use this file under the terms of the BSD license as follows:<br />\
+##<br />\
+## "Redistribution and use in source and binary forms, with or without<br />\
+## modification, are permitted provided that the following conditions are<br />\
+## met:<br />\
+##   * Redistributions of source code must retain the above copyright<br />\
+##     notice, this list of conditions and the following disclaimer.<br />\
+##   * Redistributions in binary form must reproduce the above copyright<br />\
+##     notice, this list of conditions and the following disclaimer in<br />\
+##     the documentation and/or other materials provided with the<br />\
+##     distribution.<br />\
+##   * Neither the name of Nokia Corporation and its Subsidiary(-ies) nor<br />\
+##     the names of its contributors may be used to endorse or promote<br />\
+##     products derived from this software without specific prior written<br />\
+##     permission.<br />\
+##<br />\
+## THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS<br />\
+## "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT<br />\
+## LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR<br />\
+## A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT<br />\
+## OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,<br />\
+## SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT<br />\
+## LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,<br />\
+## DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY<br />\
+## THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT<br />\
+## (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE<br />\
+## OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE."<br />\
+<h3>License for docx.py code</h3>\
+Copyright (c) 2009-2010 Mike MacCana<br />\
+<br />\
+Permission is hereby granted, free of charge, to any person<br />\
+obtaining a copy of this software and associated documentation<br />\
+files (the "Software"), to deal in the Software without<br />\
+restriction, including without limitation the rights to use,<br />\
+copy, modify, merge, publish, distribute, sublicense, and/or sell<br />\
+copies of the Software, and to permit persons to whom the<br />\
+Software is furnished to do so, subject to the following<br />\
+conditions:<br />\
+<br />\
+The above copyright notice and this permission notice shall be<br />\
+included in all copies or substantial portions of the Software.<br />\
+<br />\
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,<br />\
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES<br />\
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND<br />\
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT<br />\
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,<br />\
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING<br />\
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR<br />\
+OTHER DEALINGS IN THE SOFTWARE.'
