@@ -384,7 +384,7 @@ class RefiImport:
                 count = self.parse_sources(c)
                 self.parent_textedit.append(_("Parsing sources. Loaded: " + str(count)))
 
-        # Parse Notes after sources. Some Notes are text annotations
+        # Parse Notes after sources. Notes contain journals and also text annotations
         for c in children:
             if c.tag == "{urn:QDA-XML:project:1.0}Notes":
                 journal_count, annotation_count = self.parse_notes(c)
@@ -1498,7 +1498,7 @@ class RefiImport:
 
     def parse_notes(self, element):
         """ Parse the Notes element.
-        Notes may be journal entries or annotations.
+        Notes may be journal entries or text annotations.
         Example journal format:
         <Note guid="4691a8a0-d67c-4dcc-91d6-e9075dc230cc" name="Assignment Progress Memo"
         richTextPath="internal://4691a8a0-d67c-4dcc-91d6-e9075dc230cc.docx"
@@ -1544,6 +1544,7 @@ class RefiImport:
                     creating_user = u['name']
 
             # Check if the Note is a TextSource Annotation
+            #TODO may need revision - re GitHub issue #743 Nvivo annotations need review
             annotation = False
             for a in self.annotations:
                 if a['NoteRef'] == el.get("guid"):
