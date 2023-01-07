@@ -100,6 +100,7 @@ class RefiImport:
     variables = []
     file_vars = []  # Values for each variable for each file Found within Cases Case tag
     annotations = []  # Text source annotation references
+    links = []  # Links - using now for Nvivo to link Note with .txt or .docx to PlainTextSelection annotation
     parent_textedit = None
     app = None
     tree = None
@@ -295,7 +296,7 @@ class RefiImport:
         {urn: QDA - XML: project:1.0}Variables
         {urn: QDA - XML: project:1.0}Cases
         {urn: QDA - XML: project:1.0}Sources
-        {urn: QDA - XML: project:1.0}Links  not implemented
+        {urn: QDA - XML: project:1.0}Links
         {urn: QDA - XML: project:1.0}Sets  not implemented
         {urn: QDA - XML: project:1.0}Graphs  not implemented
         {urn: QDA - XML: project:1.0}Notes
@@ -370,6 +371,14 @@ class RefiImport:
             if c.tag == "{urn:QDA-XML:project:1.0}Description":
                 self.parent_textedit.append(_("Parsing and loading project memo"))
                 self.parse_project_description(c)
+            if c.tag == "{urn:QDA-XML:project:1.0}Links":
+                self.parse_links(c)
+
+        # Parse Notes to add plaintext to link for links between PlainTextSelection and Note .txt/.docx
+        children = list(root)  # root.getchildren()
+        for c in children:
+            if c.tag == "{urn:QDA-XML:project:1.0}Notes":
+                self.parse_notes_for_plaintextselection_link(c)
 
         # Parse Cases element for any file variable values (No case name and only one sourceref)
         # Fill list of dictionaries of these variable values
@@ -387,9 +396,9 @@ class RefiImport:
         # Parse Notes after sources. Notes contain journals and also text annotations
         for c in children:
             if c.tag == "{urn:QDA-XML:project:1.0}Notes":
-                journal_count, annotation_count = self.parse_notes(c)
+                # Parse for journals AND annoations. Multiple ways annotations ca nbe stored
+                journal_count = self.parse_notes(c)
                 self.parent_textedit.append(_("Parsing Notes. Journals loaded: " + str(journal_count)))
-                self.parent_textedit.append(_("Parsing Notes. Text annotations loaded: " + str(annotation_count)))
 
         # Fill attributes table for File variables drawn fom Cases.Case tags
         # After Sources are loaded
@@ -433,6 +442,45 @@ class RefiImport:
         msg += _("Relative paths to external files are untested.\n")
         msg += _("Select a coder name in Settings dropbox, otherwise coded text and media may appear uncoded.")
         Message(self.app, _('REFI-QDA Project import'), msg, "warning").exec()
+
+    def parse_links(self, element):
+        """ Parse Links element for each Link and add to list.
+        Nvivo - Links PlainTextSelection to Note. Note contains the plaintext.txt annotation text.
+        """
+
+        for el in list(element):  # element.getchildren():
+            #print("LINK TAG", el.tag, "GUID", el.get("guid"), "origin", el.get("originGUID"), "target", el.get("targetGUID"))
+            link = {"GUID": el.get("guid"), "originGUID": el.get("originGUID"), "targetGUID": el.get("targetGUID")}
+            self.links.append(link)
+
+    def parse_notes_for_plaintextselection_link(self, notes_element):
+        """ Parse the Notes element to determine if the element is a originGUID
+         Nvivo - Links PlainTextSelection to Note. Note contains the plaintext.txt annotation text.
+         Add plain text to the link. """
+
+        for el in list(notes_element):
+            note_guid = el.get('guid')
+            # Presumes these will be internal paths
+            source_path = el.get("plainTextPath")
+            if source_path is not None:
+                try:
+                    source_path = source_path.split('internal:/')[1]
+                    source_path = self.folder_name + self.sources_name + source_path
+                except IndexError:
+                    print("IndexError notinternal: source path", source_path)
+                    source_path = None
+            if source_path:
+                try:
+                    with open(source_path, encoding='utf-8', errors='replace') as f:
+                        fulltext = f.read()
+                        for lnk in self.links:
+                            #print(lnk['originGUID'], " link --- note", note_guid)
+                            if note_guid == lnk['originGUID']:
+                                lnk['text'] = fulltext
+                except Exception as err:
+                    print("Error Note text source", source_path, err)
+                    logger.warning(str(err))
+                    self.parent_textedit.append(_("Cannot read text source from Note: ") + source_path + "\n" + str(err))
 
     def parse_cases_for_file_variables(self, root):
         """ Parse Cases element for each Case. Look for any file variables (No case name and only one sourceref).
@@ -1433,6 +1481,8 @@ class RefiImport:
         NOTE: MAXQDA. Some PlainTextSelection elements DO NOT have a Coding element, but DO HAVE a Description element.
         For these, load the Description text as an annotation.
 
+        NOTE: Nvivo some PlainTextSelection elements linkto Link and Note as text annotations
+
         Some Coding guids match a Case guid. This is Case text.
 
         Example format:
@@ -1492,11 +1542,23 @@ class RefiImport:
                                                 " cid:" + str(cid) + " fid: " + str(source['id']) + _(" Positions:") +
                                                 str(pos0) + " - " + str(pos1))
         if annotation:
+            if memo == "":
+                """ Nvivo stores text annotations as txt/docx documents. These are references in a Note.
+                PlainTextSelection guid links to the Link targetGUID.
+                The Link originGUID links to Note guid.
+                The Note should contain the plainTextPath to the annotation text in a .txt file.
+                """
+                for lnk in self.links:
+                    if lnk['targetGUID'] == element.get('guid'):
+                        try:
+                            memo = lnk['text']
+                        except KeyError:
+                            pass
             sql = "insert into annotation (fid,pos0,pos1,memo,owner,date) values (?,?,?,?,?,?)"
             cur.execute(sql, [source['id'], int(pos0), int(pos1), memo, creating_user, create_date])
             self.app.conn.commit()
 
-    def parse_notes(self, element):
+    def parse_notes(self, notes_element):
         """ Parse the Notes element.
         Notes may be journal entries or text annotations.
         Example journal format:
@@ -1525,10 +1587,9 @@ class RefiImport:
         """
 
         cur = self.app.conn.cursor()
-        annotation_count = 0
         journal_count = 0
-        for el in list(element):  # element.getchildren():
-            # print(el.tag, el.get("name"), el.get("plainTextPath"))
+        for el in list(notes_element):  # element.getchildren():
+            #print("Notes xml\n", el.tag, el.get("name"), el.get("plainTextPath"), el.get("guid"))
             name = el.get("name")
             create_date = el.get("creationDateTime")
             if create_date is None:
@@ -1543,18 +1604,25 @@ class RefiImport:
                 if u['guid'] == creating_user_guid:
                     creating_user = u['name']
 
-            # Check if the Note is a TextSource Annotation
-            #TODO may need revision - re GitHub issue #743 Nvivo annotations need review
+            # Check if the Note is a TextSource Annotation with Text stored in the Note
+            # Text annotation can be as a plainTextPath from the note. This is obtained when getting Links
             annotation = False
             for a in self.annotations:
                 if a['NoteRef'] == el.get("guid"):
                     annotation = True
                     self.insert_annotation(a['TextSource'], el)
-                    annotation_count += 1
                     break
+            # Check annotations have not already be resolved via parsing PlainTextSelection Link to Notes
+            for lnk in self.links:
+                if lnk['targetGUID'] == el.get('guid'):
+                    try:
+                        lnk['text']
+                        annotation = True
+                    except KeyError:
+                        pass
 
-            # Journal paths starts with internal://
-            if el.get("plainTextPath") is not None and not annotation:
+            # Presumes Journal paths starts with internal://
+            if el.get("plainTextPath") is not None and not annotation and name != "":
                 path_ = el.get("plainTextPath").split('internal:/')[1]
                 # Folder can be named: sources or Sources
                 path_ = self.folder_name + self.sources_name + path_
@@ -1567,17 +1635,11 @@ class RefiImport:
                 # Check journal name does not exist. If it exists, add 3 random numbers, fix for Integrity Error
                 cur.execute("select name from journal where name=?", [name])
                 name_exists = cur.fetchone()
-                if name_exists:
-                    msg = _("Duplicate journal name: ") + name
-                    self.parent_textedit.append(msg)
-                    name += "_" + str(randint(0, 9)) + str(randint(0, 9)) + str(randint(0, 9))
-                    msg = _("Duplicate journal renamed to: ") + name
-                    self.parent_textedit.append(msg)
                 cur.execute("insert into journal(name,jentry,owner,date) values(?,?,?,?)",
                                 (name, jentry, creating_user, create_date))
                 self.app.conn.commit()
                 journal_count += 1
-        return journal_count, annotation_count
+        return journal_count
 
     def insert_annotation(self, source_guid, element):
         """ Insert annotation into database
@@ -1592,6 +1654,7 @@ class RefiImport:
         param: element The Note element
         """
 
+        print("getting here??")
         user_guid = element.get("modifyingUser")
         owner = None
         for u in self.users:
