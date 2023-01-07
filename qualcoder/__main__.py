@@ -518,6 +518,7 @@ class App(object):
         style_dark = "* {font-size: 12px; background-color: #2a2a2a; color:#eeeeee;}\n\
         QWidget:focus {border: 2px solid #f89407;}\n\
         QDialog {border: 1px solid #707070;}\n\
+        QFileDialog {font-size: 12px}\n\
         QCheckBox {border: None}\n\
         QCheckBox::indicator {border: 2px solid #808080; background-color: #2a2a2a;}\n\
         QCheckBox::indicator::checked {border: 2px solid #808080; background-color: orange;}\n\
@@ -561,6 +562,7 @@ class App(object):
         QTreeView {background-color: #484848}\n\
         QTreeView::branch:selected {border-left: 2px solid red; color: #eeeeee;}"
         style_dark = style_dark.replace("* {font-size: 12", "* {font-size:" + str(settings.get('fontsize')))
+        style_dark = style_dark.replace("QFileDialog {font-size: 12", "QFileDialog {font-size:" + str(settings.get('fontsize')))
         style_dark = style_dark.replace("QTreeWidget {font-size: 12",
                                         "QTreeWidget {font-size: " + str(settings.get('treefontsize')))
 
@@ -568,6 +570,7 @@ class App(object):
         QWidget {background-color: #efefef; color: #000000}\n\
         QWidget:focus {border: 2px solid #f89407;}\n\
         QDialog {border: 1px solid #808080;}\n\
+        QFileDialog {font-size: 12px}\n\
         QComboBox {border: 1px solid #707070; background-color: #fafafa;}\n\
         QComboBox:hover,QPushButton:hover {border: 2px solid #f89407;}\n\
         QGroupBox {border: None;}\n\
@@ -589,6 +592,7 @@ class App(object):
         QTreeWidget {font-size: 12px;}\n\
         QTreeView::branch:selected {border-left: 2px solid red; color: #000000;}"
         style = style.replace("* {font-size: 12", "* {font-size:" + str(settings.get('fontsize')))
+        style = style.replace("QFileDialog {font-size: 12", "QFileDialog {font-size:" + str(settings.get('fontsize')))
         style = style.replace("QTreeWidget {font-size: 12",
                               "QTreeWidget {font-size: " + str(settings.get('treefontsize')))
         if self.settings['stylesheet'] == 'dark':
@@ -1073,7 +1077,8 @@ class MainWindow(QtWidgets.QMainWindow):
         msg += _("Report text context characters: ") + str(self.app.settings['report_text_context_characters']) + "\n"
         msg += _("Report text context style: ") + self.app.settings['report_text_context_style'] + "\n"
         msg += _("Backup on open") + ": " + str(self.app.settings['backup_on_open']) + "\n"
-        msg += _("Backup AV files") + ": " + str(self.app.settings['backup_av_files'])
+        msg += _("Backup AV files") + ": " + str(self.app.settings['backup_av_files']) + "\n"
+        msg += _("Style") + "; " + self.app.settings['stylesheet']
         if platform.system() == "Windows":
             msg += "\n" + _("Directory (folder) paths / represents \\")
         msg += "\n========"
