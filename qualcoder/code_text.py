@@ -960,7 +960,7 @@ class DialogCodeText(QtWidgets.QWidget):
         menu.addAction(action_all)
         menu.addAction(action_first)
         menu.addAction(action_last)
-        action = menu.exec(self.ui.lineEdit_search.mapToGlobal(position))
+        action = menu.exec(self.ui.pushButton_auto_code.mapToGlobal(position))
         if action is None:
             return
         if action == action_all:
