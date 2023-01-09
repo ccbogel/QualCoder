@@ -74,6 +74,8 @@ class DialogSelectItems(QtWidgets.QDialog):
 
     def __init__(self, app_, data, title, selection_mode):
         """ present list of names to user for selection.
+        Can use comboBox to select groups of items to reduce the length of the list.
+        The group key is used with View_graph
 
         params:
             data: list of dictionaries containing the key 'name'
@@ -98,6 +100,7 @@ class DialogSelectItems(QtWidgets.QDialog):
         # Check for 'name' key
         no_name_key = False
 
+        # Get groups key from data, for combobox to reduce selection list
         self.groups = []
         for d in self.data:
             if not d['name']:
@@ -109,10 +112,12 @@ class DialogSelectItems(QtWidgets.QDialog):
         if no_name_key:
             text = _("This data does not contain names to select from")
             Message(app_, _('Dictionary has no "name" key'), text, "warning")
+        self.ui.comboBox.hide()
         if self.groups:
             self.groups = list(set(self.groups))
             self.groups.insert(0, _("All"))
             self.ui.comboBox.setEnabled(True)
+            self.ui.comboBox.show()
             self.ui.comboBox.addItems(self.groups)
 
         if self.selection_mode == "single":
