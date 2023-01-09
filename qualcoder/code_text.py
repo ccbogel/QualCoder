@@ -94,9 +94,11 @@ class DialogCodeText(QtWidgets.QWidget):
     code_text = []
     annotations = []
     undo_deleted_codes = []  # undo last deleted code(s), multiple may have been deleted at th same time, so a list
+
     # Overlapping coded text details
     overlaps_at_pos = []
     overlaps_at_pos_idx = 0
+
     # Search text variables
     search_indices = []
     search_index = 0
@@ -105,8 +107,12 @@ class DialogCodeText(QtWidgets.QWidget):
     selected_code_index = 0
     important = False  # Show/hide important codes
     attributes = []  # Show selected files using these attributes in list widget
-    # A list of dictionaries of autcode history {title, list of dictionary of sql commands}
+
+    # Autocode variables
+    all_first_last = "all"  # Autocode all instances or first or last in a file
+    # A list of dictionaries of autocode history {title, list of dictionary of sql commands}
     autocode_history = []
+
     # Timers to reduce overly sensitive key events: overlap, re-size oversteps by multiple characters
     code_resize_timer = 0
     overlap_timer = 0
@@ -239,6 +245,8 @@ class DialogCodeText(QtWidgets.QWidget):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(magic_wand_icon), "png")
         self.ui.pushButton_auto_code.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_auto_code.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.ui.pushButton_auto_code.customContextMenuRequested.connect(self.button_auto_code_menu)
         self.ui.pushButton_auto_code.clicked.connect(self.auto_code)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(wand_one_file_icon), "png")
@@ -927,6 +935,40 @@ class DialogCodeText(QtWidgets.QWidget):
             self.ui.lineEdit_search.textEdited.disconnect(self.search_for_text)
             self.ui.lineEdit_search.returnPressed.connect(self.search_for_text)
             return
+
+    def button_auto_code_menu(self, position):
+        """ Options to auto-code all instances, first instance or last instance in a file. """
+
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        msg = ""
+        if self.all_first_last == "all":
+            msg = " *"
+        else:
+            msg = ""
+        action_all = QtGui.QAction(_("all matches in file") + msg)
+        if self.all_first_last == "first":
+            msg = " *"
+        else:
+            msg = ""
+        action_first = QtGui.QAction(_("first match in file") + msg)
+        if self.all_first_last == "last":
+            msg = " *"
+        else:
+            msg = ""
+        action_last = QtGui.QAction(_("last match in file") + msg)
+        menu.addAction(action_all)
+        menu.addAction(action_first)
+        menu.addAction(action_last)
+        action = menu.exec(self.ui.lineEdit_search.mapToGlobal(position))
+        if action is None:
+            return
+        if action == action_all:
+            self.all_first_last = "all"
+        if action == action_first:
+            self.all_first_last = "first"
+        if action == action_last:
+            self.all_first_last = "last"
 
     def text_edit_recent_codes_menu(self, position):
         """ Alternative context menu.
@@ -2878,24 +2920,6 @@ class DialogCodeText(QtWidgets.QWidget):
             cursor.setPosition(o[1] - self.file_['start'], QtGui.QTextCursor.MoveMode.KeepAnchor)
             cursor.mergeCharFormat(fmt)
 
-    '''def select_tree_item_by_code_name(self, codename):
-        """ Set a tree item code. Called by  and
-         Put the selected code colour label and
-         underline matching text in the textedit.
-         param:
-            codename: a string of the codename
-         """
-
-        #TOO not used delete
-        it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
-        item = it.value()
-        while item:
-            if item.text(0) == codename:
-                self.ui.treeWidget.setCurrentItem(item)
-            it += 1
-            item = it.value()
-        self.fill_code_label_undo_show_selected_code()'''
-
     def mark(self):
         """ Mark selected text in file with currently selected code.
        Need to check for multiple same codes at same pos0 and pos1.
@@ -3331,6 +3355,7 @@ class DialogCodeText(QtWidgets.QWidget):
 
     def auto_code(self):
         """ Autocode text in one file or all files with currently selected code.
+        Button menu option to auto-code all, first or last instances in files.
         """
 
         code_item = self.ui.treeWidget.currentItem()
@@ -3338,7 +3363,7 @@ class DialogCodeText(QtWidgets.QWidget):
             Message(self.app, _('Warning'), _("No code was selected"), "warning").exec()
             return
         cid = int(code_item.text(1).split(':')[1])
-        # Input dialog too narrow, so code below
+        # Input dialog too narrow, so code below to widen dialog
         dialog = QtWidgets.QInputDialog(None)
         dialog.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         dialog.setWindowTitle(_("Automatic coding"))
@@ -3376,9 +3401,15 @@ class DialogCodeText(QtWidgets.QWidget):
                 filenames += f['name'] + " "
                 cur.execute("select name, id, fulltext, memo, owner, date from source where id=? and mediapath is Null",
                             [f['id']])
-                currentfile = cur.fetchone()
-                text_ = currentfile[2]
+                current_file = cur.fetchone()
+                text_ = current_file[2]
                 text_starts = [match.start() for match in re.finditer(re.escape(txt), text_)]
+                # Trim to first or last instance if option selected
+                if self.all_first_last == "first" and len(text_starts) > 1:
+                    text_starts = [text_starts[0]]
+                if self.all_first_last == "last" and len(text_starts) > 1:
+                    text_starts = [text_starts[-1]]
+
                 # Add new items to database
                 for startPos in text_starts:
                     item = {'cid': cid, 'fid': int(f['id']), 'seltext': str(txt),
