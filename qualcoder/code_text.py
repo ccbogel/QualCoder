@@ -1828,7 +1828,6 @@ class DialogCodeText(QtWidgets.QWidget):
         Only works if clicked on a code (text cursor is in the coded text).
         Shrink start and end code positions using alt arrow left and alt arrow right
         Extend start and end code positions using shift arrow left, shift arrow right
-        Ctrl + E Turn Edit mode on or off
         Ctrl + Z Undo the last coding deletion.
         """
 
@@ -1856,10 +1855,10 @@ class DialogCodeText(QtWidgets.QWidget):
             diff = now - self.code_resize_timer
             if diff.microseconds < 100000:
                 return False
-            # Ctrl + E Edit mode
+            '''# Ctrl + E Edit mode
             if key == QtCore.Qt.Key.Key_E and mod == QtCore.Qt.KeyboardModifier.ControlModifier:
                 self.edit_mode_toggle()
-                return True
+                return True'''
             # Ignore all other key events if edit mode is active
             if self.edit_mode:
                 return False
