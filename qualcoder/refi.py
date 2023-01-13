@@ -157,7 +157,7 @@ class RefiImport:
         # look for the Codes tag, which contains each Code element
         for child in root:
             # print("CB:", cb, "tag:", cb.tag)  # 1 only , Codes
-            if child.tag in ("{urn:QDA-XML:codebook:1:0}Codes", "{urn:QDA-XML:project:1.0}Codes"):
+            if child.tag in ("{urn:QDA-XML:codebook:1.0}Codes", "{urn:QDA-XML:project:1.0}Codes"):
                 counter = 0
                 code_elements = list(child)  # list of children of child element
                 for el_ in code_elements:
@@ -193,14 +193,14 @@ class RefiImport:
         now_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
         description = ""
         for el in elements:
-            if el.tag in ("{urn:QDA-XML:codebook:1:0}Description", "{urn:QDA-XML:project:1.0}Description"):
+            if el.tag in ("{urn:QDA-XML:codebook:1.0}Description", "{urn:QDA-XML:project:1.0}Description"):
                 description = el.text
 
         # Determine if the parent is a code or a category
         # if parent has Code element children, so must be a category, insert into code_cat table
         is_category = False
         for el in elements:
-            if el.tag in ("{urn:QDA-XML:codebook:1:0}Code", "{urn:QDA-XML:project:1.0}Code"):
+            if el.tag in ("{urn:QDA-XML:codebook:1.0}Code", "{urn:QDA-XML:project:1.0}Code"):
                 is_category = True
         # if parent does not have Code element children and isCodable is false, it must be a category
         if parent.get("isCodable") == "false":
@@ -240,7 +240,7 @@ class RefiImport:
                     except sqlite3.IntegrityError:
                         pass
             for el in elements:
-                if el.tag not in ("{urn:QDA-XML:codebook:1:0}Description", "{urn:QDA-XML:project:1.0}Description"):
+                if el.tag not in ("{urn:QDA-XML:codebook:1.0}Description", "{urn:QDA-XML:project:1.0}Description"):
                     counter += self.sub_codes(el, last_insert_id)
                     # print("tag:", el.tag, el.text, el.get("name"), el.get("color"), el.get("isCodable"))
             return counter
@@ -267,7 +267,7 @@ class RefiImport:
 
         # One child, a description so, insert this code into code_name table
         if is_category is False and len(elements) == 1 and elements[0].tag in (
-                "{urn:QDA-XML:codebook:1:0}Description", "{urn:QDA-XML:project:1.0}Description"):
+                "{urn:QDA-XML:codebook:1.0}Description", "{urn:QDA-XML:project:1.0}Description"):
             name = parent.get("name")
             # print("Only a description child: ", name)
             color = parent.get("color")
@@ -598,7 +598,7 @@ class RefiImport:
             for d in d_elements:
                 memo = ""
                 # print("Memo ", d.tag)
-                if el.tag != "{urn:QDA-XML:project:1:0}Description":
+                if el.tag != "{urn:QDA-XML:project:1.0}Description":
                     memo = d.text
                 variable["memo"] = memo
 
@@ -663,7 +663,7 @@ class RefiImport:
                 item['memo'] = ""
                 for d in d_elements:
                     # print("Memo ", d.tag)
-                    if d.tag == "{urn:QDA-XML:project:1:0}Description":
+                    if d.tag == "{urn:QDA-XML:project:1.0}Description":
                         # print("case memo")
                         item['memo'] = d.text
 
@@ -3144,8 +3144,8 @@ class RefiExport(QtWidgets.QDialog):
         """
 
         self.xml = '<?xml version="1.0" encoding="utf-8"?>\n'
-        self.xml += '<CodeBook xmlns="urn:QDA-XML:codebook:1:0" '
-        self.xml += 'xsi:schemaLocation="urn:QDA-XML:codebook:1:0 Codebook.xsd" '
+        self.xml += '<CodeBook xmlns="urn:QDA-XML:codebook:1.0" '
+        self.xml += 'xsi:schemaLocation="urn:QDA-XML:codebook:1.0 Codebook.xsd" '
         self.xml += 'origin="QualCoder" '
         self.xml += 'xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">'
         self.xml += self.codebook_xml()[10:]
