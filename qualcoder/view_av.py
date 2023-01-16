@@ -3701,7 +3701,7 @@ class DialogViewAV(QtWidgets.QDialog):
 
         # TODO Waveform creation only tested on Ubuntu
         if platform.system() in ("Windows", "Darwin"):
-            self.ui.label_waveform.hide()
+            self.ui.label_waveform.setText("Waveform not available for Windows, macOS")
             return
 
         waveform_path = self.app.project_path + "/audio/waveform.png"
@@ -3791,6 +3791,9 @@ class DialogViewAV(QtWidgets.QDialog):
     def speech_to_text(self):
         """ Convert speech to text using online service. """
 
+        if platform.system() in ("Windows", "Darwin"):
+            msg = "Speech to text not tested on Windows, macOS. QC might hang."
+            self.ui.label_waveform.setText(msg)
         ui = SpeechToText(self.app, self.abs_path)
         ok = ui.exec()
         if not ok:
