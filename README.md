@@ -21,12 +21,29 @@ If you are uncomfortable with these warnings install from source as detailed nex
 
 **Alternatively install from source:**
 
-Consider using a virtual environment, I have not tested using venv on a Windows intallation yet. Not using a virtual environment may affect other python software you may has installed.
+Seriously consider using a virtual environment, I have not tested using venv on a Windows intallation yet. Not using a virtual environment may affect other python software you may has installed.
 
 1. Download the QualCoder software from: https://github.com/ccbogel/QualCoder from the Green Code button. This is the newest, but not yet officially released code. Alternatively, choose the most recent release. Click the green button "Code", and then "Download ZIP". Then, unpack the file in a selected place (e.g. desktop).
 
 2. Download and install the Python programming language. The minimum version for QualCoder is 3.7.  [Python3](https://www.python.org/downloads/). Download the file (at the bottom of the web site) "Windows installer (64-bit)"
 IMPORTANT: in the first window of the installation mark the option "Add Python to PATH"
+
+2.1. Install venv
+I am using python3.9  you can choose another recent version if you prefer, and if more recent versions are in the Ubuntu repository.
+
+`sudo apt install python3.9-venv`
+
+2.2. Download and unzip the Qualcoder folder.
+
+2.3. Move (cd) into the QualCoder folder. 
+You should be inside the QualCoder-master folder or if using a release, e.g. the Qualcoder-3.1 folder.
+
+`python3.9 -m venv qualcoder`
+
+Activate venv, this changes the command prompt display using (brackets): (qualcoder) 
+Note: To exit venv type `deactivate`
+
+`source qualcoder/bin/activate`
 
 3. Install python modules from command. Type "cmd" in the Windows Start search engine, and click on the black software "cmd.exe" - the command console for Windows. In the console type or paste, using the right-click context menu (ctrl+v does not work) the following:
 
@@ -46,6 +63,14 @@ The `py` command uses the most recent installed version of python. You can use a
 If not already there, move to the same drive letter e.g. C: then type:
 
 `py -m qualcoder`
+
+Or if using venv (recommended):
+
+At any time to start QualCoder in the virtual environment, cd to the Qualcoder-master (or Qualcoder release folder), then type:
+`source qualcoder/bin/activate`
+
+Then type
+`qualcoder`
 
 Alternately, run by double-click. Open the QualCoder-master\qualcoder folder. Double-click the __main__.py file to run. You can make a shortcut to this file and keep the shortcut on the desktop.
 
