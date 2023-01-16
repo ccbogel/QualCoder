@@ -233,7 +233,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         action_delete = menu.addAction(_("Delete"))
         if self.rows_hidden:
             action_show_all = menu.addAction(_("Show all rows"))
-        if mediapath is None or (mediapath is not None and mediapath[0] == "/"):
+        if mediapath is None or mediapath == "" or (mediapath is not None and mediapath[0] == "/"):
             action_export_to_linked = menu.addAction(_("Move file to externally linked file"))
         else:
             action_import_linked = menu.addAction(_("Import linked file"))
