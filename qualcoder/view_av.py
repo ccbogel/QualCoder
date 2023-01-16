@@ -3699,13 +3699,18 @@ class DialogViewAV(QtWidgets.QDialog):
         https://ffmpeg.org/ffmpeg-filters.html
         Requires installed ffmpeg """
 
+        # TODO Waveform creation only tested on Ubuntu
+        if platform.system() in ("Windows", "Darwin"):
+            self.ui.label_waveform.hide()
+            return
+
         waveform_path = self.app.project_path + "/audio/waveform.png"
         if os.path.exists(waveform_path):
             os.remove(waveform_path)
         command = 'ffmpeg -i "' + self.abs_path + '"'
         command += ' -filter_complex'
         command += ' "aformat=channel_layouts=mono,showwavespic=s=1020x100'
-        if self.app.settings['stylesheet'] == "dark":
+        if self.app.settings['stylesheet'] in ("dark", "rainbow"):
             command += ':colors=#f89407"'
         else:
             command += ':colors=#0A0A0A"'
