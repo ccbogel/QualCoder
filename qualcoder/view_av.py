@@ -3804,9 +3804,6 @@ class DialogViewAV(QtWidgets.QDialog):
     def speech_to_text(self):
         """ Convert speech to text using online service. """
 
-        if platform.system() in ("Windows", "Darwin"):
-            msg = "Speech to text not tested on Windows, macOS. QC might hang."
-            self.ui.label_waveform.setText(msg)
         ui = SpeechToText(self.app, self.abs_path)
         ok = ui.exec()
         if not ok:
