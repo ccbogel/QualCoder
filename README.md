@@ -15,7 +15,7 @@ You will need to have a python3.7 or newer version installed. Optional: VLC for 
 
 ### Windows
 
-Newer releases contain an exe file (created on Windows 10, 64 bit).Double-click to run. Look at the Releases in the right hand side column. I have had feedback of one instance on Windows where an anti-virus affected the importing and moving of files by QualCoder (AVG). 
+Newer releases contain an exe file (created on Windows 10, 64 bit).Double-click to run. Look for the Releases link on the right hand side of this page. I have had feedback of one instance on Windows where an anti-virus affected the importing and moving of files by QualCoder (AVG). 
 An online virus testing site www.virustotal.com indicated 2 vendors out of many detected a potential problem due to their detection methods (false positives), 5 March 2022. Always check the MD5 checksum on downloading the exe. I have not got the exe Microsoft certified (I am not sure of the processes or cost involved).
 If you are uncomfortable with these warnings install from source as detailed next.
 
