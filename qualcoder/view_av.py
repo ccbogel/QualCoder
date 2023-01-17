@@ -3700,43 +3700,56 @@ class DialogViewAV(QtWidgets.QDialog):
         Requires installed ffmpeg """
 
         # TODO Waveform creation only tested on Ubuntu
-        if platform.system() in ("Windows", "Darwin"):
+        '''if platform.system() in ("Windows", "Darwin"):
             self.ui.label_waveform.setText("Waveform not available for Windows, macOS")
-            return
+            return'''
 
         waveform_path = self.app.project_path + "/audio/waveform.png"
         if os.path.exists(waveform_path):
             os.remove(waveform_path)
-        command = 'ffmpeg -i "' + self.abs_path + '"'
-        command += ' -filter_complex'
-        command += ' "aformat=channel_layouts=mono,showwavespic=s=1020x100'
+        wf_command = 'ffmpeg -i "' + self.abs_path + '"'
+        wf_command += ' -filter_complex'
+        wf_command += ' "aformat=channel_layouts=mono,showwavespic=s=1020x100'
         if self.app.settings['stylesheet'] in ("dark", "rainbow"):
-            command += ':colors=#f89407"'
+            wf_command += ':colors=#f89407"'
         else:
-            command += ':colors=#0A0A0A"'
-        command += ' -frames:v 1 '
-        command += '"' + waveform_path + '"'
-        subprocess.run(command, shell=True)
+            wf_command += ':colors=#0A0A0A"'
+        wf_command += ' -frames:v 1'
+        wf_command += ' "' + waveform_path + '"'
+        try:
+            subprocess.run(wf_command, timeout=15, shell=True)
+        except Exception as e_:
+            logger.error(str(e_))
+            print(str(e_))
+            Message(self.app, "ffmpeg error", str(e_))
         # https://www.cloudacm.com/?p=3105
         spectrogram_path = self.app.project_path + "/audio/spectrogram.png"
         if os.path.exists(spectrogram_path):
             os.remove(spectrogram_path)
-        '''command2 = 'ffmpeg -i "' + self.abs_path + '" -lavfi showspectrumpic=s=1020x200 '
-        command2 += '"' + spec_path + '"'
-
-        command2 = 'ffmpeg -i "' + self.abs_path + '" -lavfi showspectrumpic=s=1020x200 '
-        command2 += '"' + spec_path + '"'
-        subprocess.run(command2, shell=True)'''
-
-        command3 = 'ffmpeg -i "' + self.abs_path + '" -lavfi showspectrumpic=s=1020x200:legend=disabled '
-        command3 += '"' + spectrogram_path + '"'
-        subprocess.run(command3, shell=True)
+        sp_command = 'ffmpeg -i "' + self.abs_path + '"'
+        sp_command += ' -lavfi showspectrumpic=s=1020x200:legend=disabled'
+        sp_command += ' "' + spectrogram_path + '"'
+        print(sp_command)
+        try:
+            subprocess.run(sp_command, timeout=15, shell=True)
+        except Exception as e_:
+            logger.error(str(e_))
+            Message(self.app, "ffmpeg error", str(e_))
+            print(str(e_))
+            #return
+        print("4 sp success")
 
         pm = QtGui.QPixmap()
         if self.waveform_image == "waveform":
+            if not os.path.exists(waveform_path):
+                self.ui.label_waveform.hide()
+                return
             pm.load(waveform_path)
             self.ui.label_waveform.setToolTip(_("Waveform") + "\n" + "Ctrl+I " + _("Spectrogram"))
         if self.waveform_image == "spectrogram":
+            if not os.path.exists(spectrogram_path):
+                self.ui.label_waveform.hide()
+                return
             pm.load(spectrogram_path)
         self.ui.label_waveform.setPixmap(QtGui.QPixmap(pm).scaled(1020, 60))
         if not os.path.exists(waveform_path):
