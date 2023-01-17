@@ -21,49 +21,49 @@ If you are uncomfortable with these warnings install from source as detailed nex
 
 **Alternatively install from source:**
 
-Seriously consider using a virtual environment (points 2.1 to 2.3 below). Not using a virtual environment may affect other python software you may have installed.
+Seriously consider using a virtual environment (commands in point 5 below). Not using a virtual environment may affect other python software you may have installed.
 
 1. Download the QualCoder software from: https://github.com/ccbogel/QualCoder from the Green Code button. This is the newest, but not yet officially released code. Alternatively, choose the most recent release. Click the green button "Code", and then "Download ZIP". Then, unpack the file in a selected place (e.g. desktop).
 
 2. Download and install the Python programming language. The minimum version for QualCoder is 3.7.  [Python3](https://www.python.org/downloads/). Download the file (at the bottom of the web site) "Windows installer (64-bit)"
 IMPORTANT: in the first window of the installation mark the option "Add Python to PATH"
 
-2.1. Install venv
-I am using python3.10  you can choose another recent version if you prefer, and if more recent versions are in the Ubuntu repository.
+3. Download and unzip the QualCoder folder. (Tip, remove the doubled up folder extraction QualCoder-master\QualCoder-master when asked where to extract. Just QualCoder-master).
+
+4. Use the Windows command prompt. Type "cmd" in the Windows Start search engine, and click on the black software "cmd.exe" - the command console for Windows. In the console type or paste, using the right-click context menu (ctrl+v does not work)
+
+4. Move (cd) into the QualCoder folder. 
+You should be inside the QualCoder-master folder or if using a release, e.g. the Qualcoder-3.1 folder.
+
+5. Install and activate the virtual environment. This step can be skipped, but I recommend you do not skip it.
 
 `pip install virtual env`
 
-2.2. Download and unzip the Qualcoder folder.
-
-2.3. Move (cd) into the QualCoder folder. 
-You should be inside the QualCoder-master folder or if using a release, e.g. the Qualcoder-3.1 folder.
-
 `virtualenv env`
 
-Activate venv, this changes the command prompt display using (brackets): (env) 
+Activate the virtual environment, this changes the command prompt display using (brackets): (env) 
 
 `env\Scripts\activate.bat`
 
-3. Install python modules from command. Type "cmd" in the Windows Start search engine, and click on the black software "cmd.exe" - the command console for Windows. In the console type or paste, using the right-click context menu (ctrl+v does not work) the following:
+6. Install python modules. Type the following:
 
-py -m pip install --upgrade pip
+`py -m pip install --upgrade pip`
 
 `py -m pip install wheel pyqt6 chardet ebooklib lxml openpyxl Pillow ply pdfminer.six pandas plotly pydub python-vlc rispy SpeechRecognition`
 
  Wait, until all modules are installed .
  
-4. Build and install Qualcoder, from the downloaded folder type
+7. Build and install Qualcoder, from the downloaded folder type
 
 `py -m pip install .`
 
 The `py` command uses the most recent installed version of python. You can use a specific version on your Windows, if you have many python versions installed, e.g. `py -3.10`  See discussion here: [Difference between py and python](https://stackoverflow.com/questions/50896496/what-is-the-difference-between-py-and-python-in-the-terminal)
 
-5. Run QualCoder from cmd.exe
-If not already there, move to the same drive letter e.g. C: then type:
+8. Run QualCoder from the command prompt
 
 `py -m qualcoder`
 
-6. To exit the virual environment type:
+9. If running in a virual environment, to exit the virtual environment type:
 
 `deactivate`
 
