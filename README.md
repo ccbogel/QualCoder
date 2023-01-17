@@ -23,21 +23,23 @@ If you are uncomfortable with these warnings install from source as detailed nex
 
 **Alternatively install from source:**
 
-Seriously consider using a virtual environment (commands in point 5 below). Not using a virtual environment may affect other python software you may have installed.
+Seriously consider using a virtual environment (commands in point 6 below). Not using a virtual environment may affect other python software you may have installed.
 
 1. Download and install the Python programming language. The minimum version for QualCoder is 3.7. I recommend 3.10 for now.  [Python3](https://www.python.org/downloads/). Download the file (at the bottom of the web site) "Windows installer (64-bit)"
 
 IMPORTANT: in the first window of the installation mark the option "Add Python to PATH"
 
-2.  Download the QualCoder software from: https://github.com/ccbogel/QualCoder from the Green Code button. This is the newest, but not yet officially released code. Alternatively, choose the most recent release. Click the green button "Code", and then "Download ZIP". Then, unpack the file in a selected place (e.g. desktop). (Tip, remove the doubled up folder extraction QualCoder-master\QualCoder-master when asked where to extract. Just QualCoder-master). 
+2.  Download the QualCoder software from: https://github.com/ccbogel/QualCoder from the Green Code button. This is the newest, but not yet officially released code.  Click the green button "Code", and then "Download ZIP". Alternatively, choose the most recent release zip, see right hand side of this page for the link to Releases.
 
-3. Use the Windows command prompt. Type "cmd" in the Windows Start search engine, and click on the black software "cmd.exe" - the command console for Windows. In the console type or paste, using the right-click context menu (ctrl+v does not work)
+3.    Unzip the folder to a location (e.g. downloads). (Tip, remove the doubled up folder extraction QualCoder-master\QualCoder-master when asked where to extract. Just QualCoder-master). 
 
-4. Move (using the `cd` command) into the QualCoder folder. You should be inside the QualCoder-master folder or if using a release (the Qualcoder-3.1 folder). e.g. 
+4. Use the Windows command prompt. Type "cmd" in the Windows Start search engine, and click on the black software "cmd.exe" - the command console for Windows. In the console type or paste, using the right-click context menu (ctrl+v does not work)
+
+5. Move (using the `cd` command) into the QualCoder folder. You should be inside the QualCoder-master folder or if using a release (the Qualcoder-3.1 folder). e.g. 
 
 `cd Downloads\QualCoder-master`
 
-5. Install and activate the virtual environment. This step can be skipped, but I recommend you do not skip it.
+6. Install and activate the virtual environment. This step can be skipped, but I recommend you do not skip it.
 
 `pip install virtual env`
 
@@ -47,7 +49,7 @@ Activate the virtual environment, this changes the command prompt display using 
 
 `env\Scripts\activate.bat`
 
-6. Install python modules. Type the following:
+7. Install python modules. Type the following:
 
 `py -m pip install --upgrade pip`
 
@@ -55,24 +57,24 @@ Activate the virtual environment, this changes the command prompt display using 
 
  Wait, until all modules are installed .
  
-7. Build and install Qualcoder, from the downloaded folder type
+8. Build and install Qualcoder, from the downloaded folder type
 
 `py -m pip install .`
 
 The `py` command uses the most recent installed version of python. You can use a specific version on your Windows, if you have many python versions installed, e.g. `py -3.10`  See discussion here: [Difference between py and python](https://stackoverflow.com/questions/50896496/what-is-the-difference-between-py-and-python-in-the-terminal)
 
-8. Run QualCoder from the command prompt
+9. Run QualCoder from the command prompt
 
 `py -m qualcoder`
 
-9. If running in a virual environment, to exit the virtual environment type:
+10. If running QualCoder in a virtual environment, to exit the virtual environment type:
 
 `deactivate`
 
 The Windows commpand prompt will then remomove the  *(env)*
 
 **To start QualCoder again:**
-If not using virtual environment, as long as you are in the same drive letter, eg C:
+If you are not using virtual environment, as long as you are in the same drive letter, eg C:
 
 `py -m qualcoder`
 
