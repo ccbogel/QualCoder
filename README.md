@@ -75,7 +75,8 @@ The `py` command uses the most recent installed version of python. You can use a
 
 The command prompt will then remomove the  *(env)* wording.
 
-**To start QualCoder again:**
+**To start QualCoder again**
+
 If you are not using virtual environment, as long as you are in the same drive letter, eg C:
 
 `py -m qualcoder`
