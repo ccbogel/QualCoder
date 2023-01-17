@@ -29,16 +29,16 @@ Seriously consider using a virtual environment, I have not tested using venv on 
 IMPORTANT: in the first window of the installation mark the option "Add Python to PATH"
 
 2.1. Install venv
-I am using python3.9  you can choose another recent version if you prefer, and if more recent versions are in the Ubuntu repository.
+I am using python3.10  you can choose another recent version if you prefer, and if more recent versions are in the Ubuntu repository.
 
-`sudo apt install python3.9-venv`
+`sudo apt install python3.10-venv`
 
 2.2. Download and unzip the Qualcoder folder.
 
 2.3. Move (cd) into the QualCoder folder. 
 You should be inside the QualCoder-master folder or if using a release, e.g. the Qualcoder-3.1 folder.
 
-`python3.9 -m venv qualcoder`
+`python3.10 -m venv qualcoder`
 
 Activate venv, this changes the command prompt display using (brackets): (qualcoder) 
 Note: To exit venv type `deactivate`
@@ -89,17 +89,17 @@ It is best to run QualCoder inside a python virtual environment, so that the sys
 `sudo apt install python3-pip`
 
 1. Install venv
-I am using python3.9  you can choose another recent version if you prefer, and if more recent versions are in the Ubuntu repository.
+I am using python3.10  you can choose another recent version if you prefer, and if more recent versions are in the Ubuntu repository.
 
-`sudo apt install python3.9-venv`
+`sudo apt install python3.10-venv`
 
 3. Download and unzip the Qualcoder folder.
 
 4. Open a terminal and move (cd) into that folder. 
-You should be inside the QualCoder-master folder or if using a release, e.g. the Qualcoder-3.0 folder.
+You should be inside the QualCoder-master folder or if using a release, e.g. the Qualcoder-3.1 folder.
 Inside the QualCoder-master folder:
 
-`python3.9 -m venv qualcoder`
+`python3.10 -m venv qualcoder`
 
 Activate venv, this changes the command prompt display using (brackets): (qualcoder) 
 Note: To exit venv type `deactivate`
