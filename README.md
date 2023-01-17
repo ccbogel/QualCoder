@@ -41,7 +41,6 @@ You should be inside the QualCoder-master folder or if using a release, e.g. the
 `virtualenv env`
 
 Activate venv, this changes the command prompt display using (brackets): (env) 
-Note: To exit venv type `deactivate`
 
 `env\Scripts\activate.bat`
 
