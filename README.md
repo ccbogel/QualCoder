@@ -40,10 +40,10 @@ You should be inside the QualCoder-master folder or if using a release, e.g. the
 
 `virtualenv env`
 
-Activate venv, this changes the command prompt display using (brackets): (qualcoder) 
+Activate venv, this changes the command prompt display using (brackets): (env) 
 Note: To exit venv type `deactivate`
 
-`env\\Scripts\\activate.bat`
+`env\Scripts\activate.bat`
 
 3. Install python modules from command. Type "cmd" in the Windows Start search engine, and click on the black software "cmd.exe" - the command console for Windows. In the console type or paste, using the right-click context menu (ctrl+v does not work) the following:
 
