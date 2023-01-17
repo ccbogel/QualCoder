@@ -21,7 +21,7 @@ If you are uncomfortable with these warnings install from source as detailed nex
 
 **Alternatively install from source:**
 
-Seriously consider using a virtual environment, I have not tested using venv on a Windows intallation yet. Not using a virtual environment may affect other python software you may has installed.
+Seriously consider using a virtual environment (points 2.1 to 2.3 below). Not using a virtual environment may affect other python software you may have installed.
 
 1. Download the QualCoder software from: https://github.com/ccbogel/QualCoder from the Green Code button. This is the newest, but not yet officially released code. Alternatively, choose the most recent release. Click the green button "Code", and then "Download ZIP". Then, unpack the file in a selected place (e.g. desktop).
 
@@ -62,6 +62,12 @@ The `py` command uses the most recent installed version of python. You can use a
 If not already there, move to the same drive letter e.g. C: then type:
 
 `py -m qualcoder`
+
+6. To exit the virual environment type:
+
+`deactivate`
+
+The Windows commpand prompt will then remomove the  *(env)*
 
 Or if using venv (recommended):
 
