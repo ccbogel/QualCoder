@@ -41,7 +41,7 @@ IMPORTANT: in the first window of the installation mark the option "Add Python t
 
 6. Install and activate the virtual environment. This step can be skipped, but I recommend you do not skip it.
 
-`pip install virtual env`
+`pip install virtualenv`
 
 `virtualenv env`
 
