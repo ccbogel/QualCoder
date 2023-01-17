@@ -31,19 +31,19 @@ IMPORTANT: in the first window of the installation mark the option "Add Python t
 2.1. Install venv
 I am using python3.10  you can choose another recent version if you prefer, and if more recent versions are in the Ubuntu repository.
 
-`sudo apt install python3.10-venv`
+`pip install virtual env`
 
 2.2. Download and unzip the Qualcoder folder.
 
 2.3. Move (cd) into the QualCoder folder. 
 You should be inside the QualCoder-master folder or if using a release, e.g. the Qualcoder-3.1 folder.
 
-`python3.10 -m venv qualcoder`
+`virtualenv env`
 
 Activate venv, this changes the command prompt display using (brackets): (qualcoder) 
 Note: To exit venv type `deactivate`
 
-`source qualcoder/bin/activate`
+`env\\Scripts\\activate.bat`
 
 3. Install python modules from command. Type "cmd" in the Windows Start search engine, and click on the black software "cmd.exe" - the command console for Windows. In the console type or paste, using the right-click context menu (ctrl+v does not work) the following:
 
