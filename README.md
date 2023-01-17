@@ -43,6 +43,8 @@ IMPORTANT: in the first window of the installation mark the option "Add Python t
 
 `pip install virtualenv`
 
+Create a virtual environment called env.
+
 `virtualenv env`
 
 Activate the virtual environment, this changes the command prompt display using (brackets): (env) 
