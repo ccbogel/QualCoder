@@ -57,7 +57,7 @@ Activate the virtual environment, this changes the command prompt display using 
 
  Wait, until all modules are installed .
  
-8. Build and install Qualcoder, from the downloaded folder type
+8. Install Qualcoder, from the downloaded folder type
 
 `py -m pip install .`
 
