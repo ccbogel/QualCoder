@@ -3428,7 +3428,6 @@ class DialogViewAV(QtWidgets.QDialog):
     prev_text = ""
     no_codes_annotes_cases = True
     code_deletions = []
-    waveform_image = "waveform"
 
     def __init__(self, app, file_, parent=None):
 
@@ -3442,7 +3441,6 @@ class DialogViewAV(QtWidgets.QDialog):
         self.search_indices = []
         self.search_index = 0
         self.abs_path = ""
-        self.waveform_image = "waveform"
         if self.file_['mediapath'][0:6] in ('/audio', '/video'):
             self.abs_path = self.app.project_path + self.file_['mediapath']
         if self.file_['mediapath'][0:6] in ('audio:', 'video:'):
@@ -3697,9 +3695,9 @@ class DialogViewAV(QtWidgets.QDialog):
         """ Create waveform image in the audio folder. Apply image to label_waveform.
         If a video file has multiple tracks only the first one is used for this method.
         https://ffmpeg.org/ffmpeg-filters.html
-        Requires installed ffmpeg """
+        Requires installed ffmpeg
+        ffmpeg is much slower on Windows han Ubuntu """
 
-        # TODO Waveform creation only tested on Ubuntu
         '''if platform.system() in ("Windows", "Darwin"):
             self.ui.label_waveform.setText("Waveform not available for Windows, macOS")
             return'''
@@ -3722,55 +3720,26 @@ class DialogViewAV(QtWidgets.QDialog):
             logger.error(str(e_))
             print(str(e_))
             Message(self.app, "ffmpeg error", str(e_))
-        # https://www.cloudacm.com/?p=3105
+        '''# https://www.cloudacm.com/?p=3105
         spectrogram_path = self.app.project_path + "/audio/spectrogram.png"
         if os.path.exists(spectrogram_path):
             os.remove(spectrogram_path)
         sp_command = 'ffmpeg -i "' + self.abs_path + '"'
         sp_command += ' -lavfi showspectrumpic=s=1020x200:legend=disabled'
         sp_command += ' "' + spectrogram_path + '"'
-        print(sp_command)
         try:
             subprocess.run(sp_command, timeout=15, shell=True)
         except Exception as e_:
             logger.error(str(e_))
             Message(self.app, "ffmpeg error", str(e_))
             print(str(e_))
-            #return
-        print("4 sp success")
-
-        pm = QtGui.QPixmap()
-        if self.waveform_image == "waveform":
-            if not os.path.exists(waveform_path):
-                self.ui.label_waveform.hide()
-                return
-            pm.load(waveform_path)
-            self.ui.label_waveform.setToolTip(_("Waveform") + "\n" + "Ctrl+I " + _("Spectrogram"))
-        if self.waveform_image == "spectrogram":
-            if not os.path.exists(spectrogram_path):
-                self.ui.label_waveform.hide()
-                return
-            pm.load(spectrogram_path)
-        self.ui.label_waveform.setPixmap(QtGui.QPixmap(pm).scaled(1020, 60))
+            #return'''
         if not os.path.exists(waveform_path):
             self.ui.label_waveform.hide()
-
-    def change_label_image_waveform_spectrogram(self, image_type):
-        """ On click swap between waveform and spectrogram.
-        Ctrl + W """
-
+            return
         pm = QtGui.QPixmap()
-        if image_type == "spectrogram":
-            pm.load(self.app.project_path + "/audio/spectrogram.png")
-            self.ui.label_waveform.setPixmap(QtGui.QPixmap(pm).scaled(1020, 60))
-            msg = _("Spectrogram") + "\n" + _("White/yellow - Deep purple") + " 0Db to -120Db" + "\n"
-            msg += _("Bar height: 0Hz to 12000+Hz")
-            msg += "\n" + "Ctrl+U " + _("Waveform")
-            self.ui.label_waveform.setToolTip(msg)
-        if image_type == "waveform":
-            pm.load(self.app.project_path + "/audio/waveform.png")
-            self.ui.label_waveform.setPixmap(QtGui.QPixmap(pm).scaled(1020, 60))
-            self.ui.label_waveform.setToolTip(_("Waveform") + "\n" + "Ctrl+I " + _("Spectrogram"))
+        pm.load(waveform_path)
+        self.ui.label_waveform.setPixmap(QtGui.QPixmap(pm).scaled(1020, 60))
 
     def get_cases_codings_annotations(self):
         """ Get all linked cases, coded text and annotations for this file """
@@ -3877,8 +3846,6 @@ class DialogViewAV(QtWidgets.QDialog):
             Ctrl + 1 .. 8 to insert speaker in format [speaker name]
             Ctrl + Shift + > to increase play rate
             Ctrl + Shift + < to decrease play rate
-            Ctrl + U Change to waveform image
-            Ctrl + I Change to spectrogram
         """
 
         if event.type() != 7:  # QtGui.QKeyEvent
@@ -3921,10 +3888,6 @@ class DialogViewAV(QtWidgets.QDialog):
         if key == QtCore.Qt.Key.Key_Less and (mods and QtCore.Qt.KeyboardModifier.ShiftModifier) and \
                 (mods and QtCore.Qt.KeyboardModifier.ControlModifier):
             self.decrease_play_rate()
-        if key == QtCore.Qt.Key.Key_U and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
-            self.change_label_image_waveform_spectrogram("waveform")
-        if key == QtCore.Qt.Key.Key_I and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
-            self.change_label_image_waveform_spectrogram("spectrogram")
         return True
 
     def rewind_30_seconds(self):
