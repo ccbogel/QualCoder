@@ -20,6 +20,6 @@ echo "sudo rm -R /usr/share/qualcoder"
 echo "sudo rm /usr/share/icons/qualcoder128.png"
 echo "sudo rm /usr/share/applications/qualcoder.desktop"
 echo "also note that via dnf the subsequent packages were installed: python3-devel python3-pdfminer.noarch python3-qt5 python3-pillow python3-openpyxl python3-pandas pyhon3-plotly python3-pip python3-pyqt6 python3-lxml python3-pil vlc python3-ply python3-six python3-chardet ffmpeg"
-echo "and via python's pip these packages were installed: Ebooklib pydub SpeechRecognition pdfminer.six"
+echo "and via python's pip these packages were installed: Ebooklib pydub rispy SpeechRecognition pdfminer.six"
 echo "Consider whether you still need these packages"
 
