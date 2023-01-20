@@ -118,7 +118,7 @@ class DialogSettings(QtWidgets.QDialog):
             self.ui.checkBox.setChecked(True)
         else:
             self.ui.checkBox.setChecked(False)
-        styles = [_("original"), _("dark"), _("blue"), _("green"), _("orange"), _("purple"), _("yellow"), _("rainbow")]
+        styles = [_("original"), _("dark"), _("blue"), _("green"), _("orange"), _("purple"), _("yellow"), _("rainbow"), _("native")]
         self.ui.comboBox_style.addItems(styles)
         for index, style in enumerate(styles):
             if style == self.settings['stylesheet']:
@@ -202,7 +202,7 @@ class DialogSettings(QtWidgets.QDialog):
         else:
             self.settings['showids'] = 'False'
         index = self.ui.comboBox_style.currentIndex()
-        styles = ["original", "dark", "blue", "green", "orange", "purple", "yellow", "rainbow"]
+        styles = ["original", "dark", "blue", "green", "orange", "purple", "yellow", "rainbow", "native"]
         if self.settings['stylesheet'] != styles[index]:
             restart_qualcoder = True
         self.settings['stylesheet'] = styles[index]
