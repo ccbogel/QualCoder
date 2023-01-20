@@ -507,7 +507,7 @@ class App(object):
     def merge_settings_with_default_stylesheet(self, settings):
         """ Stylesheet is coded to avoid potential data file import errors with pyinstaller.
         Various options for colour schemes:
-        original, dark, blue, green, orange, purple, yellow
+        original, dark, blue, green, orange, purple, yellow, native
 
         Orange #f89407
 
@@ -623,6 +623,9 @@ class App(object):
         if self.settings['stylesheet'] == "purple":
             style = style.replace("#efefef", "#dfe2ff")
             style = style.replace("#f89407", "#ca1b9a")
+        if self.settings['stylesheet'] == "native":
+            style = "* {font-size: 12px;}\n\
+            "
         return style
 
     def load_settings(self):
@@ -821,7 +824,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         # Test of macOS menu bar
-        self.ui.menubar.setNativeMenuBar(False)
+        
+        if self.app.settings['stylesheet'] == "native":
+            self.ui.menubar.setNativeMenuBar(True)
+        else:
+            self.ui.menubar.setNativeMenuBar(False)
         self.get_latest_github_release()
         try:
             w = int(self.app.settings['mainwindow_w'])
@@ -2147,9 +2154,10 @@ def gui():
     QtGui.QFontDatabase.addApplicationFont("GUI/NotoSans-hinted/NotoSans-Bold.ttf")
     stylesheet = qual_app.merge_settings_with_default_stylesheet(settings)
     app.setStyleSheet(stylesheet)
-    pm = QtGui.QPixmap()
-    pm.loadFromData(QtCore.QByteArray.fromBase64(qualcoder32), "png")
-    app.setWindowIcon(QtGui.QIcon(pm))
+    if sys.platform != 'darwin':
+      pm = QtGui.QPixmap()
+      pm.loadFromData(QtCore.QByteArray.fromBase64(qualcoder32), "png")
+      app.setWindowIcon(QtGui.QIcon(pm))
 
     # Use two character language setting
     lang = settings.get('language', 'en')
