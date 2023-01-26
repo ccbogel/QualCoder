@@ -264,10 +264,10 @@ Open the Terminal App and move to the unzipped Qualcoder-Master directory, then 
 
 1) Install Python dependency modules using `pip3`:
 
-`pip3 install chardet ebooklib ffmpeg-python lxml py2app pyqt6 pillow ply pdfminer.six openpyxl pandas plotly pydub python-vlc rispy six SpeechRecognition`
+`pip3 install chardet ebooklib ffmpeg-python lxml pyqt6 pillow ply pdfminer.six openpyxl pandas plotly pydub python-vlc rispy six SpeechRecognition PyInstaller`
 
 2) Create the Application. You will find it in the 'dist' folder and drag it to 'Applications'.
-`python3 setup.py py2app`
+`pyinstaller qualcoder.spec`
 
  
 ## Dependencies
@@ -280,7 +280,7 @@ QualCoder is distributed under the MIT LICENSE.
 
 ##  Citation APA style
 
-Curtain, C. (2022) QualCoder 3.1 [Computer software]. Retrieved from
+Curtain, C. (2022) QualCoder 3.2 [Computer software]. Retrieved from
 https://github.com/ccbogel/QualCoder/releases/tag/3.1
 
 
