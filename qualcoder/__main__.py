@@ -507,7 +507,7 @@ class App(object):
     def merge_settings_with_default_stylesheet(self, settings):
         """ Stylesheet is coded to avoid potential data file import errors with pyinstaller.
         Various options for colour schemes:
-        original, dark, blue, green, orange, purple, yellow, native
+        original, dark, blue, green, orange, purple, yellow, rainbow, native
 
         Orange #f89407
 
@@ -1447,6 +1447,9 @@ class MainWindow(QtWidgets.QMainWindow):
         v4 has added column ctid (autonumber) in code_text.
         v5 had added column for codername in project. added column for av_text_id in source to link A/V with text file.
             And a stored_sql table.
+        v6 has tables for storage of graph items.
+        v7 has memo links from graph items (text/image/av to coding memos).
+        v8 has table for ris bibliography data.
         """
 
         self.app = App()

@@ -3264,6 +3264,8 @@ class DialogCodeText(QtWidgets.QWidget):
             all = "all" :  for all text files.
         """
 
+        if all_ =="" and not self.file_:
+            return
         item = self.ui.treeWidget.currentItem()
         if item is None or item.text(1)[0:3] == 'cat':
             Message(self.app, _('Warning'), _("No code was selected"), "warning").exec()
