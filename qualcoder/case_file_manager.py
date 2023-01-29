@@ -76,6 +76,8 @@ class DialogCaseFileManager(QtWidgets.QDialog):
     casefiles = []
     case_text = []
     selected_text_file = None
+    header_labels = ["id", "File name", "Assigned"]
+    attributes = []
 
     def __init__(self, app_, parent_text_edit, case):
 
@@ -122,7 +124,27 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         except KeyError:
             pass
         self.get_files()
+        self.get_attributes()
         self.fill_table()
+
+    def get_attributes(self):
+
+        self.header_labels = ["id", "File name", "Assigned"]
+        cur = self.app.conn.cursor()
+        sql = "select name from attribute_type where caseOrFile='file'"
+        cur.execute(sql)
+        result = cur.fetchall()
+        self.attribute_names = []
+        for n in result:
+            self.header_labels.append(n[0])
+            self.attribute_names.append({'name': n[0]})
+        sql = "select attribute.name, value, id from attribute join attribute_type on \
+                attribute_type.name=attribute.name where attribute_type.caseOrFile='file'"
+        cur.execute(sql)
+        result = cur.fetchall()
+        self.attributes = []
+        for row in result:
+            self.attributes.append(row)
 
     def closeEvent(self, event):
         """ Save dialog and splitter dimensions. """
@@ -257,9 +279,8 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         rows = self.ui.tableWidget.rowCount()
         for c in range(0, rows):
             self.ui.tableWidget.removeRow(0)
-        header_labels = ["id", "File name", "Assigned"]
-        self.ui.tableWidget.setColumnCount(len(header_labels))
-        self.ui.tableWidget.setHorizontalHeaderLabels(header_labels)
+        self.ui.tableWidget.setColumnCount(len(self.header_labels))
+        self.ui.tableWidget.setHorizontalHeaderLabels(self.header_labels)
 
         for row, f in enumerate(self.allfiles):
             self.ui.tableWidget.insertRow(row)
@@ -277,6 +298,18 @@ class DialogCaseFileManager(QtWidgets.QDialog):
             item = QtWidgets.QTableWidgetItem(assigned)
             item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
             self.ui.tableWidget.setItem(row, 2, item)
+            for a in self.attributes:
+                for col, header in enumerate(self.header_labels):
+                    if f[0] == a[2] and a[0] == header:
+                        string_value = ''
+                        if a[1] is not None:
+                            string_value = str(a[1])
+                        if header == "Ref_Authors":
+                            string_value = string_value.replace(";", "\n")
+                        item = QtWidgets.QTableWidgetItem(string_value)
+                        if header in ("Ref_Authors", "Ref_Title", "Ref_Type", "Ref_Year"):
+                            item.setFlags(QtCore.Qt.ItemFlag.ItemIsEnabled)
+                        self.ui.tableWidget.setItem(row, col, item)
 
         self.ui.tableWidget.hideColumn(0)
         if self.app.settings['showids']:
