@@ -182,6 +182,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.ui.tableWidget.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
         self.ui.tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+        self.ui.tableWidget.installEventFilter(self)
         self.load_file_data()
 
     @staticmethod
@@ -190,6 +191,24 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         url = "https://github.com/ccbogel/QualCoder/wiki/05-Files"
         webbrowser.open(url)
+
+    def eventFilter(self, object_, event):
+        """ Using this event filter to
+
+        Ctrl + A to show all rows
+        Ctrl + Z Undo the last  deletion.
+        """
+
+        if type(event) == QtGui.QKeyEvent:
+            key = event.key()
+            mod = event.modifiers()
+            if key == QtCore.Qt.Key.Key_A and mod == QtCore.Qt.KeyboardModifier.ControlModifier:
+                for r in range(0, self.ui.tableWidget.rowCount()):
+                    self.ui.tableWidget.setRowHidden(r, False)
+                self.rows_hidden = False
+                return True
+
+        return False
 
     def table_menu(self, position):
         """ Context menu for displaying table rows in differing order """
@@ -232,7 +251,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         action_export = menu.addAction(_("Export"))
         action_delete = menu.addAction(_("Delete"))
         if self.rows_hidden:
-            action_show_all = menu.addAction(_("Show all rows"))
+            action_show_all = menu.addAction(_("Show all rows Ctrl A"))
         if mediapath is None or mediapath == "" or (mediapath is not None and mediapath[0] == "/"):
             action_export_to_linked = menu.addAction(_("Move file to externally linked file"))
         else:
@@ -303,6 +322,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         for s in self.source:
             filenames.append({'name': s['name']})
         ui = DialogAddItemName(self.app, filenames, _("Rename database entry"), existing_name)
+        ui.ui.lineEdit.setText(existing_name)
         ui.exec()
         new_name = ui.get_new_name()
         if new_name is None:

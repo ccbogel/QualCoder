@@ -82,7 +82,7 @@ class DialogAddItemName(QtWidgets.QDialog):
 
         this_item = str(self.ui.lineEdit.text())
         if this_item in self.existing_items:
-            QtWidgets.QMessageBox.warning(None, _("Duplicated"), _("This already exists"))
+            QtWidgets.QMessageBox.warning(None, "    " + _("Duplicated") + " " * 20, _("This already exists"))
             return
         self.new_item = this_item
         self.close()
