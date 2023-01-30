@@ -540,7 +540,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         param:
             order_by: string ""= name, "date" = date, "filetype" = mediapath,
                 "casename" = by alphabetic casename
-                "attribute:attribute name" selected atribute
+                "attribute:attribute name" selected attribute
         """
 
         # check a placeholder attribute is present for the file, add if missing
@@ -738,7 +738,8 @@ class DialogManageFiles(QtWidgets.QDialog):
         res = cur.fetchall()
         if res:
             for r in res:
-                text_ += r[0] + " "
+                text_ += r[0] + ";"
+            text_ = text_[:-1]
         return text_
 
     def add_attribute(self):
