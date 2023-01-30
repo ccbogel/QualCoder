@@ -1829,6 +1829,7 @@ class DialogCodeText(QtWidgets.QWidget):
         Shrink start and end code positions using alt arrow left and alt arrow right
         Extend start and end code positions using shift arrow left, shift arrow right
         Ctrl + Z Undo the last coding deletion.
+        Ctrl + F jump to Search box
         """
 
         if object_ is self.ui.treeWidget.viewport():
@@ -1855,10 +1856,10 @@ class DialogCodeText(QtWidgets.QWidget):
             diff = now - self.code_resize_timer
             if diff.microseconds < 100000:
                 return False
-            '''# Ctrl + E Edit mode
-            if key == QtCore.Qt.Key.Key_E and mod == QtCore.Qt.KeyboardModifier.ControlModifier:
-                self.edit_mode_toggle()
-                return True'''
+            # Ctrl + F jump to search box
+            if key == QtCore.Qt.Key.Key_F and mod == QtCore.Qt.KeyboardModifier.ControlModifier:
+                self.ui.lineEdit_search.setFocus()
+                return True
             # Ignore all other key events if edit mode is active
             if self.edit_mode:
                 return False
