@@ -247,14 +247,23 @@ class DialogManageFiles(QtWidgets.QDialog):
             action_equals_value = menu.addAction(_("Show this value"))
             action_order_by_value = menu.addAction(_("Order by attribute"))
         action_show_values_like = menu.addAction(_("Show values like"))
-        action_rename = menu.addAction(_("Rename database entry"))
-        action_export = menu.addAction(_("Export"))
-        action_delete = menu.addAction(_("Delete"))
+        action_assign_case = None
+        if col == self.CASE_COLUMN:
+            action_assign_case = menu.addAction(_("Assign case to file"))
+        action_rename = None
+        action_export = None
+        action_delete = None
+        if col == self.NAME_COLUMN:
+            action_rename = menu.addAction(_("Rename database entry"))
+            action_export = menu.addAction(_("Export"))
+            action_delete = menu.addAction(_("Delete"))
         if self.rows_hidden:
             action_show_all = menu.addAction(_("Show all rows Ctrl A"))
-        if mediapath is None or mediapath == "" or (mediapath is not None and mediapath[0] == "/"):
+        action_export_to_linked = None
+        if col == self.NAME_COLUMN and (mediapath is None or mediapath == "" or (mediapath is not None and mediapath[0] == "/")):
             action_export_to_linked = menu.addAction(_("Move file to externally linked file"))
-        else:
+        action_import_linked = None
+        if col == self.NAME_COLUMN and mediapath is not None and mediapath[0] != "/":
             action_import_linked = menu.addAction(_("Import linked file"))
         action = menu.exec(self.ui.tableWidget.mapToGlobal(position))
         if action is None:
@@ -275,6 +284,8 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.delete()
         if action == action_rename:
             self.rename_database_entry()
+        if action == action_assign_case:
+            self.assign_case_to_file()
         if action == action_alphabetic:
             self.load_file_data()
         if action == action_date:
@@ -297,8 +308,6 @@ class DialogManageFiles(QtWidgets.QDialog):
                     self.ui.tableWidget.setRowHidden(r, True)
             self.rows_hidden = True
         if action == action_show_values_like:
-            #item = self.ui.tableWidget.item(row, col)
-            #cell_text = item.text()  # not great with author list. cell_text is final parameter in InputDialog
             text_value, ok = QtWidgets.QInputDialog.getText(self, _("Text filter"), _("Show values like:"),
                                                        QtWidgets.QLineEdit.EchoMode.Normal)
             self.rows_hidden = True
@@ -310,6 +319,39 @@ class DialogManageFiles(QtWidgets.QDialog):
             for r in range(0, self.ui.tableWidget.rowCount()):
                 self.ui.tableWidget.setRowHidden(r, False)
             self.rows_hidden = False
+
+    def assign_case_to_file(self):
+        """ Assign one or more cases to file. """
+
+        row = self.ui.tableWidget.currentRow()
+        fid = int(self.ui.tableWidget.item(row, self.ID_COLUMN).text())
+        casenames = self.app.get_casenames()
+        ui = DialogSelectItems(self.app, casenames, _("Delete files"), "multi")
+        ok = ui.exec()
+        if not ok:
+            return
+        selection = ui.get_selected()
+        if not selection:
+            return
+        cur = self.app.conn.cursor()
+        cur.execute("select fulltext from source where id=?", [fid])
+        res = cur.fetchone()
+        len_text = 0
+        if res is not None and res[0] is not None:
+            len_text = len(res[0])
+        for case_ in selection:
+            # Check if already linked file to case
+            cur.execute("select * from case_text where caseid = ? and fid=? and pos0=? and pos1=?",
+                        (case_['id'], fid, 0, len_text))
+            result = cur.fetchall()
+            if len(result) == 0:
+                sql = "insert into case_text (caseid, fid, pos0, pos1, owner, date, memo) values(?,?,?,?,?,?,?)"
+                cur.execute(sql, (case_['id'], fid, 0, len_text, self.app.settings['codername'],
+                                  datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), ""))
+                self.app.conn.commit()
+        # Visual feedback
+        cases_text = self.get_cases_by_filename(self.ui.tableWidget.item(row, self.NAME_COLUMN).text())
+        self.ui.tableWidget.item(row, self.CASE_COLUMN).setText(cases_text)
 
     def rename_database_entry(self):
         """ Rename the database entry of the file. """
