@@ -105,6 +105,16 @@ class Ui_Dialog_journals(object):
 
         self.retranslateUi(Dialog_journals)
         QtCore.QMetaObject.connectSlotsByName(Dialog_journals)
+        Dialog_journals.setTabOrder(self.pushButton_create, self.pushButton_export)
+        Dialog_journals.setTabOrder(self.pushButton_export, self.pushButton_export_all)
+        Dialog_journals.setTabOrder(self.pushButton_export_all, self.pushButton_delete)
+        Dialog_journals.setTabOrder(self.pushButton_delete, self.lineEdit_search)
+        Dialog_journals.setTabOrder(self.lineEdit_search, self.pushButton_previous)
+        Dialog_journals.setTabOrder(self.pushButton_previous, self.pushButton_next)
+        Dialog_journals.setTabOrder(self.pushButton_next, self.tableWidget)
+        Dialog_journals.setTabOrder(self.tableWidget, self.textEdit)
+        Dialog_journals.setTabOrder(self.textEdit, self.checkBox_search_all_journals)
+        Dialog_journals.setTabOrder(self.checkBox_search_all_journals, self.pushButton_help)
 
     def retranslateUi(self, Dialog_journals):
         _translate = QtCore.QCoreApplication.translate
