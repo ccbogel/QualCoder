@@ -310,6 +310,19 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>pushButton_create</tabstop>
+  <tabstop>pushButton_export</tabstop>
+  <tabstop>pushButton_export_all</tabstop>
+  <tabstop>pushButton_delete</tabstop>
+  <tabstop>lineEdit_search</tabstop>
+  <tabstop>pushButton_previous</tabstop>
+  <tabstop>pushButton_next</tabstop>
+  <tabstop>tableWidget</tabstop>
+  <tabstop>textEdit</tabstop>
+  <tabstop>checkBox_search_all_journals</tabstop>
+  <tabstop>pushButton_help</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
