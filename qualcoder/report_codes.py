@@ -889,15 +889,31 @@ class DialogReportCodes(QtWidgets.QDialog):
     def eventFilter(self, object_, event):
         """ Used to detect key events in the textedit.
         H Hide / Unhide top groupbox
+        Ctrl F Search box focus
         """
 
-        if type(event) == QtGui.QKeyEvent and (self.ui.textEdit.hasFocus() or self.ui.treeWidget.hasFocus() or
+        '''if type(event) == QtGui.QKeyEvent and (self.ui.textEdit.hasFocus() or self.ui.treeWidget.hasFocus() or
                                                self.ui.listWidget_files.hasFocus() or
                                                self.ui.listWidget_cases.hasFocus()):
             key = event.key()
+
             # Hide unHide top groupbox
             if key == QtCore.Qt.Key.Key_H:
                 self.ui.groupBox.setHidden(not (self.ui.groupBox.isHidden()))
+                return True'''
+        if  type(event) == QtGui.QKeyEvent:
+            key = event.key()
+            mod = event.modifiers()
+            # Hide unHide top groupbox
+            if key == QtCore.Qt.Key.Key_H and (self.ui.textEdit.hasFocus() or self.ui.treeWidget.hasFocus() or
+                                               self.ui.listWidget_files.hasFocus() or
+                                               self.ui.listWidget_cases.hasFocus()):
+                self.ui.groupBox.setHidden(not (self.ui.groupBox.isHidden()))
+                return True
+            # Ctrl + F jump to search box
+            if key == QtCore.Qt.Key.Key_F and mod == QtCore.Qt.KeyboardModifier.ControlModifier:
+                self.ui.lineEdit_search_results.setFocus()
+                self.ui.groupBox.setHidden(False)
                 return True
         return False
 
