@@ -159,6 +159,9 @@ class DialogJournals(QtWidgets.QDialog):
         self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
         self.ui.checkBox_search_all_journals.stateChanged.connect(self.search_for_text)
         self.ui.textEdit.textChanged.connect(self.text_changed)
+        self.ui.textEdit.installEventFilter(self)
+        self.ui.tableWidget.installEventFilter(self)
+
 
     @staticmethod
     def help():
@@ -166,6 +169,20 @@ class DialogJournals(QtWidgets.QDialog):
 
         url = "https://github.com/ccbogel/QualCoder/wiki/04-Journals"
         webbrowser.open(url)
+
+    def eventFilter(self, object_, event):
+        """
+        Ctrl F Search box focus
+        """
+
+        if type(event) == QtGui.QKeyEvent:
+            key = event.key()
+            mod = event.modifiers()
+            # Ctrl + F jump to search box
+            if key == QtCore.Qt.Key.Key_F and mod == QtCore.Qt.KeyboardModifier.ControlModifier:
+                self.ui.lineEdit_search.setFocus()
+                return True
+        return False
 
     def fill_table(self):
         """ Fill journals table. Update journal count label. """
