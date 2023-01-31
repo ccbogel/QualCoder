@@ -892,16 +892,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         Ctrl F Search box focus
         """
 
-        '''if type(event) == QtGui.QKeyEvent and (self.ui.textEdit.hasFocus() or self.ui.treeWidget.hasFocus() or
-                                               self.ui.listWidget_files.hasFocus() or
-                                               self.ui.listWidget_cases.hasFocus()):
-            key = event.key()
-
-            # Hide unHide top groupbox
-            if key == QtCore.Qt.Key.Key_H:
-                self.ui.groupBox.setHidden(not (self.ui.groupBox.isHidden()))
-                return True'''
-        if  type(event) == QtGui.QKeyEvent:
+        if type(event) == QtGui.QKeyEvent:
             key = event.key()
             mod = event.modifiers()
             # Hide unHide top groupbox
