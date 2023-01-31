@@ -48,6 +48,7 @@ MEDIAPATH = 3
 MEMO = 4
 OWNER = 5
 DATE = 6
+AV_TEXT_ID = 7
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -163,7 +164,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         sql += "caseid=? order by lower(source.name) asc"
         cur.execute(sql, [self.case['caseid'], ])
         self.casefiles = cur.fetchall()
-        sql = "select id, name, fulltext, mediapath, memo, owner, date from  source order by source.name asc"
+        sql = "select id, name, fulltext, mediapath, memo, owner, date, av_text_id from  source order by source.name asc"
         cur.execute(sql)
         self.allfiles = cur.fetchall()
         msg = _("Files linked: ") + str(len(self.casefiles)) + " / " + str(len(self.allfiles))
@@ -352,7 +353,8 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         dictionary = {'name': self.allfiles[index][NAME], 'mediapath': self.allfiles[index][MEDIAPATH],
                       'owner': self.allfiles[index][OWNER], 'id': self.allfiles[index][0],
                       'date': self.allfiles[index][DATE],
-                      'memo': self.allfiles[index][MEMO], 'fulltext': self.allfiles[index][FULLTEXT]}
+                      'memo': self.allfiles[index][MEMO], 'fulltext': self.allfiles[index][FULLTEXT],
+                      'av_text_id': self.allfiles[index][AV_TEXT_ID]}
         # Mediapath will be None for a .transcribed empty text media entry, and 'docs:' for a linked text document
         if self.allfiles[index][MEDIAPATH] is None or self.allfiles[index][MEDIAPATH][0:5] == 'docs:':
             return
