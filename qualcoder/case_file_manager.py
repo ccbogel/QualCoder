@@ -205,8 +205,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
             msg += self.add_file_to_case(file_)
         # Update messages and table widget
         self.get_files()
-        # TODO change this approach
-        #self.fill_table()
+        self.show_or_hide_rows()
         Message(self.app, _("File added to case"), msg, "information").exec()
         self.parent_textEdit.append(msg)
         self.app.delete_backup = False
