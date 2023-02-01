@@ -205,7 +205,8 @@ class DialogCaseFileManager(QtWidgets.QDialog):
             msg += self.add_file_to_case(file_)
         # Update messages and table widget
         self.get_files()
-        self.fill_table()
+        # TODO change this approach
+        #self.fill_table()
         Message(self.app, _("File added to case"), msg, "information").exec()
         self.parent_textEdit.append(msg)
         self.app.delete_backup = False
@@ -240,6 +241,15 @@ class DialogCaseFileManager(QtWidgets.QDialog):
                           link['owner'], link['date'], link['memo']))
         self.app.conn.commit()
         msg = file_[1] + _(" added to case.") + "\n"
+
+        # Update table entry assigned to Yes
+        rows = self.ui.tableWidget.rowCount()
+        for row in range(0, rows):
+            fid = int(self.ui.tableWidget.item(row, 0).text())
+            if fid == file_[0]:  # file_[0] is fid
+                item = QtWidgets.QTableWidgetItem(_("Yes"))
+                item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
+                self.ui.tableWidget.setItem(row, 2, item)
         return msg
 
     def remove_files_from_case(self):
