@@ -3623,6 +3623,7 @@ class DialogViewAV(QtWidgets.QDialog):
         self.mediaplayer = self.instance.media_player_new()
         self.mediaplayer.video_set_mouse_input(False)
         self.mediaplayer.video_set_key_input(False)
+        #self.mediaplayer.set_hwnd(int(self.ddialog.dframe.winId())) # Does not work, but works without anyway
         self.ui.pushButton_play.clicked.connect(self.play_pause)
         self.ui.horizontalSlider_vol.valueChanged.connect(self.set_volume)
         self.ui.comboBox_tracks.currentIndexChanged.connect(self.audio_track_changed)
