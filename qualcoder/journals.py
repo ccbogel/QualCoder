@@ -26,6 +26,8 @@ https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 """
 
+'''from PyQt6.QtGui import QSyntaxHighlighter, QTextCharFormat, QBrush, QFont, QColor
+from PyQt6.QtCore import *'''
 from PyQt6 import QtCore, QtWidgets, QtGui
 import datetime
 import os
@@ -160,8 +162,9 @@ class DialogJournals(QtWidgets.QDialog):
         self.ui.checkBox_search_all_journals.stateChanged.connect(self.search_for_text)
         self.ui.textEdit.textChanged.connect(self.text_changed)
         self.ui.textEdit.installEventFilter(self)
-        self.ui.tableWidget.installEventFilter(self)
+        highlighter = Highlighter(self.ui.textEdit, self.app)
 
+        self.ui.tableWidget.installEventFilter(self)
 
     @staticmethod
     def help():
@@ -511,3 +514,55 @@ class DialogJournals(QtWidgets.QDialog):
         cursor.setPosition(cursor.position() + next_result[2], QtGui.QTextCursor.MoveMode.KeepAnchor)
         self.ui.textEdit.setTextCursor(cursor)
         self.ui.label_search_totals.setText(str(self.search_index + 1) + " / " + str(len(self.search_indices)))
+
+
+class Highlighter(QtGui.QSyntaxHighlighter):
+    """ Journal text mardown highlighter. """
+
+    highlighting_rules = []
+    app = None
+
+    def __init__(self, parent, app):
+        QtGui.QSyntaxHighlighter.__init__(self, parent)
+        self.parent = parent
+        self.app = app
+        self.highlighting_rules = []
+        self.rules()
+
+    def rules(self):
+        """ Sets formatting rules for markdown text.
+        H1 H2 H3 and bold
+        """
+
+        # Heading 1
+        h1_format = QtGui.QTextCharFormat()
+        h1_format.setFontPointSize(self.app.settings['docfontsize'] + 6)
+        h1_format.setFontWeight(QtGui.QFont.Weight.Bold)
+        self.highlighting_rules += [(QtCore.QRegularExpression("# [^\n]*"), h1_format)]
+        # Heading 2
+        h2_format = QtGui.QTextCharFormat()
+        h2_format.setFontPointSize(self.app.settings['docfontsize'] + 4)
+        h2_format.setFontWeight(QtGui.QFont.Weight.Bold)
+        self.highlighting_rules += [(QtCore.QRegularExpression("## [^\n]*"), h2_format)]
+        # Heading 3
+        h3_format = QtGui.QTextCharFormat()
+        h3_format.setFontPointSize(self.app.settings['docfontsize'] + 2)
+        h3_format.setFontWeight(QtGui.QFont.Weight.Bold)
+        self.highlighting_rules += [(QtCore.QRegularExpression("### [^\n]*"), h3_format)]
+        # Italic
+        italic_format = QtGui.QTextCharFormat()
+        italic_format.setFontItalic(True)
+        self.highlighting_rules += [(QtCore.QRegularExpression("\*.*\*"), italic_format)]
+        # Bold
+        bold_format = QtGui.QTextCharFormat()
+        bold_format.setFontWeight(QtGui.QFont.Weight.Bold)
+        self.highlighting_rules += [(QtCore.QRegularExpression("\*\*.*\*\*"), bold_format)]
+
+    def highlightBlock(self, text):
+        for pattern, format_ in self.highlighting_rules:
+            reg_exp = QtCore.QRegularExpression(pattern)
+            i = reg_exp.globalMatch(text)
+            while i.hasNext():
+                match = i.next()
+                self.setFormat(match.capturedStart(), match.capturedLength(), format_)
+
