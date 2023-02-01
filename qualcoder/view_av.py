@@ -288,8 +288,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ddialog.gridLayout = QtWidgets.QGridLayout(self.ddialog)
         self.ddialog.dframe = QtWidgets.QFrame(self.ddialog)
         self.ddialog.dframe.setObjectName("frame")
-        if platform.system() == "Darwin":  # For MacOS
-            self.ddialog.dframe = QtWidgets.QMacCocoaViewContainer(0)
+        '''if platform.system() == "Darwin":  # For MacOS
+            self.ddialog.dframe = QtWidgets.QMacCocoaViewContainer(0)'''
         self.palette = self.ddialog.dframe.palette()
         self.palette.setColor(QtGui.QPalette.ColorRole.Window, QColor(30, 30, 30))
         self.ddialog.dframe.setPalette(self.palette)
@@ -305,8 +305,9 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ddialog.customContextMenuRequested.connect(self.ddialog_menu)
 
         # Create a vlc instance with an empty vlc media player
-        # https://stackoverflow.com/questions/55339786/how-to-turn-off-vlcpulse-audio-from-python-program
+        # Fix an Ubuntu error but, makes no difference self.instance = vlc.Instance("--no-xlib")
         self.instance = vlc.Instance()
+        # Ubuntu 22.04 hide - self.ddialog.hide() as vlc is not inside dialog
         self.mediaplayer = self.instance.media_player_new()
         self.mediaplayer.video_set_mouse_input(False)
         self.mediaplayer.video_set_key_input(False)
@@ -3589,11 +3590,12 @@ class DialogViewAV(QtWidgets.QDialog):
         title = self.abs_path.split('/')[-1]
         self.ddialog.setWindowTitle(title)
         self.ddialog.gridLayout = QtWidgets.QGridLayout(self.ddialog)
-        # TODO consider using QVideoWidget
+        # NOT using QVideoWidget - too difficult to use
         self.ddialog.dframe = QtWidgets.QFrame(self.ddialog)
         self.ddialog.dframe.setObjectName("frame")
-        if platform.system() == "Darwin":  # for MacOS
-            self.ddialog.dframe = QtWidgets.QMacCocoaViewContainer(0)
+        #TODO commented out code does not work
+        '''if platform.system() == "Darwin":  # for MacOS
+            self.ddialog.dframe = QtWidgets.QMacCocoaViewContainer(0)'''
         self.palette = self.ddialog.dframe.palette()
         self.palette.setColor(QtGui.QPalette.ColorRole.Window, QColor(30, 30, 30))
         self.ddialog.dframe.setPalette(self.palette)
@@ -3614,7 +3616,9 @@ class DialogViewAV(QtWidgets.QDialog):
         if self.file_['mediapath'][0:6] not in ("/audio", "audio:"):
             self.ddialog.show()
         # Create a vlc instance
+        # Fix an Ubuntu error but, makes no difference self.instance = vlc.Instance("--no-xlib")
         self.instance = vlc.Instance()
+        # Ubuntu 22.04 hide - self.ddialog.hide() as vlc is not inside dialog
         # Create an empty vlc media player
         self.mediaplayer = self.instance.media_player_new()
         self.mediaplayer.video_set_mouse_input(False)
@@ -3697,10 +3701,6 @@ class DialogViewAV(QtWidgets.QDialog):
         https://ffmpeg.org/ffmpeg-filters.html
         Requires installed ffmpeg
         ffmpeg is much slower on Windows han Ubuntu """
-
-        '''if platform.system() in ("Windows", "Darwin"):
-            self.ui.label_waveform.setText("Waveform not available for Windows, macOS")
-            return'''
 
         waveform_path = self.app.project_path + "/audio/waveform.png"
         if os.path.exists(waveform_path):
