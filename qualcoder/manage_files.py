@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2022 Colin Curtain
+Copyright (c) 2023 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -229,42 +229,42 @@ class DialogManageFiles(QtWidgets.QDialog):
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         action_view = menu.addAction(_("View"))
-        action_alphabetic = None
-        action_date = None
+        action_filename_asc = None
         action_type = None
-        action_casename = None
-        action_equals_value = None
-        action_order_by_value = None
-        action_show_all = None
-        action_import_linked = None
-        action_export_to_linked = None
-        if col <= self.CASE_COLUMN:
-            action_alphabetic = menu.addAction(_("Alphabetic order"))
-            action_date = menu.addAction(_("Date order"))
+        if col == self.NAME_COLUMN:
+            action_filename_asc = menu.addAction(_("Order ascending"))
             action_type = menu.addAction(_("File type order"))
-            action_casename = menu.addAction(_("Case order"))
-        if col > self.CASE_COLUMN:
-            action_equals_value = menu.addAction(_("Show this value"))
-            action_order_by_value = menu.addAction(_("Order by attribute"))
-        action_show_values_like = menu.addAction(_("Show values like"))
+        action_date_asc = None
+        if col == self.DATE_COLUMN:
+            action_date_asc = menu.addAction(_("Order ascending"))
+        action_casename_asc = None
         action_assign_case = None
         if col == self.CASE_COLUMN:
+            action_casename_asc = menu.addAction(_("Order ascending"))
             action_assign_case = menu.addAction(_("Assign case to file"))
+        if col != self.MEMO_COLUMN:
+            action_show_values_like = menu.addAction(_("Show values like"))
+        action_equals_value = None
+        action_order_by_value = None
+        if col > self.CASE_COLUMN:
+            action_equals_value = menu.addAction(_("Show this value"))
+            action_order_by_value = menu.addAction(_("Order ascending"))
         action_rename = None
         action_export = None
         action_delete = None
+        action_export_to_linked = None
+        action_import_linked = None
         if col == self.NAME_COLUMN:
             action_rename = menu.addAction(_("Rename database entry"))
             action_export = menu.addAction(_("Export"))
             action_delete = menu.addAction(_("Delete"))
+            if  (mediapath is None or mediapath == "" or (mediapath is not None and mediapath[0] == "/")):
+                action_export_to_linked = menu.addAction(_("Move file to externally linked file"))
+            if mediapath is not None and mediapath != "" and mediapath[0] != "/":
+                action_import_linked = menu.addAction(_("Import linked file"))
+        action_show_all = None
         if self.rows_hidden:
             action_show_all = menu.addAction(_("Show all rows Ctrl A"))
-        action_export_to_linked = None
-        if col == self.NAME_COLUMN and (mediapath is None or mediapath == "" or (mediapath is not None and mediapath[0] == "/")):
-            action_export_to_linked = menu.addAction(_("Move file to externally linked file"))
-        action_import_linked = None
-        if col == self.NAME_COLUMN and mediapath is not None and mediapath[0] != "/":
-            action_import_linked = menu.addAction(_("Import linked file"))
         action = menu.exec(self.ui.tableWidget.mapToGlobal(position))
         if action is None:
             return
@@ -286,14 +286,14 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.rename_database_entry()
         if action == action_assign_case:
             self.assign_case_to_file()
-        if action == action_alphabetic:
+        if action == action_filename_asc:
             self.load_file_data()
-        if action == action_date:
+        if action == action_date_asc:
             self.load_file_data("date")
             self.fill_table()
         if action == action_type:
             self.load_file_data("filetype")
-        if action == action_casename:
+        if action == action_casename_asc:
             self.load_file_data("casename")
         if action == action_order_by_value:
             self.load_file_data("attribute:" + self.header_labels[col])
