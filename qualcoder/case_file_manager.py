@@ -104,11 +104,12 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         font2 += '"' + self.app.settings['font'] + '";'
         self.ui.tableWidget.setStyleSheet(font2)
         self.ui.tableWidget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        self.ui.tableWidget.doubleClicked.connect(self.double_clicked_to_view)
         self.ui.tableWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
+        self.ui.tableWidget.doubleClicked.connect(self.double_clicked_to_view)
+        self.ui.tableWidget.selectionModel().selectionChanged.connect(self.row_selection_changed)
+
         self.ui.label_case.setText(_("Case: ") + self.case['name'])
-        self.ui.pushButton_view.clicked.connect(self.view_file)
         self.ui.pushButton_auto_assign.clicked.connect(self.automark)
         self.ui.pushButton_add_files.clicked.connect(self.add_files_to_case)
         self.ui.pushButton_remove.clicked.connect(self.remove_files_from_case)
@@ -117,6 +118,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         self.ui.textBrowser.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.textBrowser.customContextMenuRequested.connect(self.text_browser_menu)
         self.ui.textBrowser.setOpenLinks(False)
+        self.ui.checkBox_hide.stateChanged.connect(self.show_or_hide_rows)
         try:
             s0 = int(self.app.settings['dialogcasefilemanager_splitter0'])
             s1 = int(self.app.settings['dialogcasefilemanager_splitter1'])
@@ -274,11 +276,24 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         self.fill_table()
         self.app.delete_backup = False
 
+    def show_or_hide_rows(self):
+        """ Show or hide table rows if check box hide is checked or not. """
+
+        rows = self.ui.tableWidget.rowCount()
+        if self.ui.checkBox_hide.isChecked():
+            for r in range(0, rows):
+                # Text present so hide
+                if len(self.ui.tableWidget.item(r, 2).text()) > 0:
+                    self.ui.tableWidget.hideRow(r)
+            return
+        for r in range(0, rows):
+            self.ui.tableWidget.showRow(r)
+
     def fill_table(self):
         """ Fill list widget with file details. """
 
         rows = self.ui.tableWidget.rowCount()
-        for c in range(0, rows):
+        for r in range(0, rows):
             self.ui.tableWidget.removeRow(0)
         self.ui.tableWidget.setColumnCount(len(self.header_labels))
         self.ui.tableWidget.setHorizontalHeaderLabels(self.header_labels)
@@ -326,19 +341,20 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         # TODO need this method? better in init to go to view_file
         self.view_file()
 
-    def view_file(self):
-        """ View text file in qTextBrowser, or open image or media file.
-         Check media file link works, as media may have moved. """
+    def row_selection_changed(self):
+        """ Row selection changed.
+        If first row is text, show the text in textEdit. """
 
         index_list = self.ui.tableWidget.selectionModel().selectedIndexes()
-        index = None
-        if len(index_list) > 0:
-            index = index_list[0].row()
-        if index is None:
+        rows = []
+        for i in index_list:
+            rows.append(i.row())
+        rows = list(set(rows))  # duplicate rows due to multiple columns
+        if len(rows) == 0:
             return
         self.ui.textBrowser.setText("")
-        self.ui.tableWidget.selectRow(index)
         self.selected_text_file = None
+        index = rows[0]
         # A fulltext source is displayed if fulltext is present
         # If the mediapath is None, this represents an A/V transcribed file
         self.ui.label_file.setText(_("Displayed file: ") + self.allfiles[index][NAME])
@@ -349,7 +365,20 @@ class DialogCaseFileManager(QtWidgets.QDialog):
             self.unlight()
             self.highlight()
             return
-        # need the data as a dictionary to view images and audio/video
+
+    def view_file(self):
+        """ Open image or media file to view.
+         Check media file link works, as media may have moved.
+         Text files are displayed via row_selection_changed. """
+
+        index_list = self.ui.tableWidget.selectionModel().selectedIndexes()
+        index = None
+        if len(index_list) > 0:
+            index = index_list[0].row()
+        if index is None:
+            return
+
+        # Need the data as a dictionary to view images and audio/video
         dictionary = {'name': self.allfiles[index][NAME], 'mediapath': self.allfiles[index][MEDIAPATH],
                       'owner': self.allfiles[index][OWNER], 'id': self.allfiles[index][0],
                       'date': self.allfiles[index][DATE],
@@ -395,7 +424,8 @@ class DialogCaseFileManager(QtWidgets.QDialog):
             ui_img.exec()
 
     def load_case_text(self):
-        """ Load case text for selected_text_file """
+        """ Load case text for selected_text_file.
+         Called by: view_file. """
 
         self.case_text = []
         if self.selected_text_file is None:

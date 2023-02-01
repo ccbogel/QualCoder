@@ -31,25 +31,12 @@
      <property name="title">
       <string>Actions</string>
      </property>
-     <widget class="QPushButton" name="pushButton_view">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>30</y>
-        <width>181</width>
-        <height>25</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>View file</string>
-      </property>
-     </widget>
      <widget class="QPushButton" name="pushButton_auto_assign">
       <property name="geometry">
        <rect>
-        <x>10</x>
+        <x>390</x>
         <y>60</y>
-        <width>381</width>
+        <width>370</width>
         <height>25</height>
        </rect>
       </property>
@@ -60,7 +47,7 @@
      <widget class="QPushButton" name="pushButton_add_files">
       <property name="geometry">
        <rect>
-        <x>200</x>
+        <x>10</x>
         <y>30</y>
         <width>281</width>
         <height>25</height>
@@ -73,9 +60,9 @@
      <widget class="QPushButton" name="pushButton_remove">
       <property name="geometry">
        <rect>
-        <x>490</x>
-        <y>30</y>
-        <width>381</width>
+        <x>10</x>
+        <y>60</y>
+        <width>370</width>
         <height>25</height>
        </rect>
       </property>
@@ -86,9 +73,9 @@
      <widget class="QDialogButtonBox" name="buttonBox">
       <property name="geometry">
        <rect>
-        <x>660</x>
+        <x>770</x>
         <y>60</y>
-        <width>211</width>
+        <width>101</width>
         <height>25</height>
        </rect>
       </property>
@@ -97,6 +84,19 @@
       </property>
       <property name="standardButtons">
        <set>QDialogButtonBox::Ok</set>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBox_hide">
+      <property name="geometry">
+       <rect>
+        <x>300</x>
+        <y>30</y>
+        <width>321</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Hide assigned files</string>
       </property>
      </widget>
     </widget>
@@ -182,6 +182,9 @@
         <width>16777215</width>
         <height>24</height>
        </size>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Double click the file row to view image, audio, or video&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string>File:</string>
