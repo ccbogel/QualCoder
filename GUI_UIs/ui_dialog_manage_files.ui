@@ -84,7 +84,7 @@ Text files (from any source) are exported from the text stored in the database a
      <widget class="QPushButton" name="pushButton_delete">
       <property name="geometry">
        <rect>
-        <x>570</x>
+        <x>610</x>
         <y>3</y>
         <width>30</width>
         <height>30</height>
@@ -213,7 +213,7 @@ Cannot export text transcription file associated with an audio or video as a lin
      <widget class="QLabel" name="label_fcount">
       <property name="geometry">
        <rect>
-        <x>410</x>
+        <x>450</x>
         <y>7</y>
         <width>121</width>
         <height>26</height>
