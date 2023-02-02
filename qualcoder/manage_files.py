@@ -183,6 +183,9 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
         self.ui.tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.ui.tableWidget.installEventFilter(self)
+        self.ui.tableWidget.horizontalHeader().setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        self.ui.tableWidget.horizontalHeader().customContextMenuRequested.connect(self.table_header_menu)
+        self.ui.tableWidget.horizontalHeader().setToolTip(_("Right click header row to hide columns"))
         self.load_file_data()
 
     @staticmethod
@@ -207,11 +210,39 @@ class DialogManageFiles(QtWidgets.QDialog):
                     self.ui.tableWidget.setRowHidden(r, False)
                 self.rows_hidden = False
                 return True
-
         return False
 
+    def table_header_menu(self, position):
+        """ Used to show and hide columns """
+
+        index_at = self.ui.tableWidget.indexAt(position)
+        header_index = int(index_at.column())
+        menu = QtWidgets.QMenu(self)
+        action_show_all_columns = menu.addAction(_("Show all columns"))
+        action_hide_column = None
+        if header_index > 0:
+            action_hide_column = menu.addAction(_("Hide column"))
+        action_hide_columns_starting = menu.addAction(_("Hide columns starting with"))
+        action = menu.exec(self.ui.tableWidget.mapToGlobal(position))
+        if action == action_show_all_columns:
+            for c in range(0, self.ui.tableWidget.columnCount()):
+                self.ui.tableWidget.setColumnHidden(c, False)
+            return
+        if action == action_hide_column:
+            self.ui.tableWidget.setColumnHidden(header_index, True)
+            return
+        if action == action_hide_columns_starting:
+            msg = _("Hide columns starting with:")
+            filter, ok = QtWidgets.QInputDialog.getText(self, _("Hide Columns"), msg,
+                                                            QtWidgets.QLineEdit.EchoMode.Normal)
+            for c in range(1, self.ui.tableWidget.columnCount()):
+                h_text = self.ui.tableWidget.horizontalHeaderItem(c).text()
+                if len(h_text) >= len(filter) and filter == h_text[:len(filter)]:
+                    self.ui.tableWidget.setColumnHidden(c, True)
+
     def table_menu(self, position):
-        """ Context menu for displaying table rows in differing order """
+        """ Context menu for displaying table rows in differing order,
+        hiding table rows, assigning case to file, file rename, export import from linked. """
 
         row = self.ui.tableWidget.currentRow()
         col = self.ui.tableWidget.currentColumn()
@@ -242,12 +273,12 @@ class DialogManageFiles(QtWidgets.QDialog):
         if col == self.CASE_COLUMN:
             action_casename_asc = menu.addAction(_("Order ascending"))
             action_assign_case = menu.addAction(_("Assign case to file"))
+        action_show_values_like = None
         if col != self.MEMO_COLUMN:
             action_show_values_like = menu.addAction(_("Show values like"))
-        action_equals_value = None
+        action_equals_value = menu.addAction(_("Show this value"))
         action_order_by_value = None
         if col > self.CASE_COLUMN:
-            action_equals_value = menu.addAction(_("Show this value"))
             action_order_by_value = menu.addAction(_("Order ascending"))
         action_rename = None
         action_export = None

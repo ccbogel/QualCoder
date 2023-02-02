@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2022 Colin Curtain
+Copyright (c) 2023 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -118,6 +118,8 @@ class DialogCases(QtWidgets.QDialog):
         self.ui.pushButton_file_manager.pressed.connect(self.open_case_file_manager)
         self.ui.tableWidget.itemChanged.connect(self.cell_modified)
         self.ui.tableWidget.cellClicked.connect(self.cell_selected)
+        self.ui.tableWidget.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(plus_icon), "png")
         self.ui.pushButton_add_attribute.setIcon(QtGui.QIcon(pm))
@@ -142,6 +144,10 @@ class DialogCases(QtWidgets.QDialog):
         self.ui.textBrowser.customContextMenuRequested.connect(self.text_edit_menu)
         self.insert_nonexisting_attribute_placeholders()
         self.ui.tableWidget.itemSelectionChanged.connect(self.count_selected_items)
+        self.ui.tableWidget.horizontalHeader().setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        self.ui.tableWidget.horizontalHeader().customContextMenuRequested.connect(self.table_header_menu)
+        self.ui.tableWidget.horizontalHeader().setToolTip(_("Right click header row to hide columns"))
+        self.ui.tableWidget.installEventFilter(self)
         self.fill_table()
         # Initial resize of table columns
         self.ui.tableWidget.resizeColumnsToContents()
@@ -155,6 +161,21 @@ class DialogCases(QtWidgets.QDialog):
             pass
         self.eventFilterTT = ToolTipEventFilter()
         self.ui.textBrowser.installEventFilter(self.eventFilterTT)
+
+    def eventFilter(self, object_, event):
+        """ Using this event filter to
+
+        Ctrl + A to show all rows
+        """
+
+        if type(event) == QtGui.QKeyEvent:
+            key = event.key()
+            mod = event.modifiers()
+            if key == QtCore.Qt.Key.Key_A and mod == QtCore.Qt.KeyboardModifier.ControlModifier:
+                for r in range(0, self.ui.tableWidget.rowCount()):
+                    self.ui.tableWidget.setRowHidden(r, False)
+                return True
+        return False
 
     def insert_nonexisting_attribute_placeholders(self):
         """ Check attribute placeholder is present in attribute table.
@@ -244,7 +265,7 @@ class DialogCases(QtWidgets.QDialog):
         Message(self.app, _('Csv file Export'), msg).exec()
         self.parent_text_edit.append(msg)
 
-    def load_cases_and_attributes(self):
+    def load_cases_and_attributes(self, casename_order="asc"):
         """ Load case and attribute details from database. Display in tableWidget.
         Cases are a list of dictionaries.
         Attributes are a list of tuples(name,value,id)
@@ -261,7 +282,12 @@ class DialogCases(QtWidgets.QDialog):
             self.source.append({'name': row[0], 'id': row[1], 'fulltext': row[2],
                                 'mediapath': row[3], 'memo': row[4], 'owner': row[5], 'date': row[6],
                                 'av_text_id': row[7]})
-        cur.execute("select name, memo, owner, date, caseid from cases")
+        case_sql = "select name, memo, owner, date, caseid from cases "
+        if casename_order == "asc":
+            case_sql += "order by name asc"
+        if casename_order == "desc":
+            case_sql += "order by name desc"
+        cur.execute(case_sql)
         result = cur.fetchall()
         for row in result:
             sql = "select distinct case_text.fid, source.name from case_text join source on case_text.fid=source.id "
@@ -689,6 +715,81 @@ class DialogCases(QtWidgets.QDialog):
         files = cur.fetchall()
         self.cases[x]['files'] = files
         self.fill_table()
+
+    def table_header_menu(self, position):
+        """ Used to show and hide columns """
+
+        index_at = self.ui.tableWidget.indexAt(position)
+        header_index = int(index_at.column())
+        menu = QtWidgets.QMenu(self)
+        action_show_all_columns = menu.addAction(_("Show all columns"))
+        action_hide_column = None
+        if header_index > 0:
+            action_hide_column = menu.addAction(_("Hide column"))
+        action_hide_columns_starting = menu.addAction(_("Hide columns starting with"))
+        action = menu.exec(self.ui.tableWidget.mapToGlobal(position))
+        if action == action_show_all_columns:
+            for c in range(0, self.ui.tableWidget.columnCount()):
+                self.ui.tableWidget.setColumnHidden(c, False)
+            return
+        if action == action_hide_column:
+            self.ui.tableWidget.setColumnHidden(header_index, True)
+            return
+        if action == action_hide_columns_starting:
+            msg = _("Hide columns starting with:")
+            filter, ok = QtWidgets.QInputDialog.getText(self, _("Hide Columns"), msg,
+                                                            QtWidgets.QLineEdit.EchoMode.Normal)
+            for c in range(1, self.ui.tableWidget.columnCount()):
+                h_text = self.ui.tableWidget.horizontalHeaderItem(c).text()
+                if len(h_text) >= len(filter) and filter == h_text[:len(filter)]:
+                    self.ui.tableWidget.setColumnHidden(c, True)
+
+    def table_menu(self, position):
+        """ Context menu for displaying table rows in differing order
+         and hiding table rows. """
+
+        row = self.ui.tableWidget.currentRow()
+        col = self.ui.tableWidget.currentColumn()
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        action_asc = None
+        action_desc = None
+        if col == 0:
+            action_asc = menu.addAction(_("Order ascending"))
+            action_desc = menu.addAction(_("Order descending"))
+        action_show_values_like = menu.addAction(_("Show values like"))
+        action_equals_value = menu.addAction(_("Show this value"))
+        action_show_all = menu.addAction(_("Show all rows Ctrl A"))
+        action = menu.exec(self.ui.tableWidget.mapToGlobal(position))
+        if action is None:
+            return
+        if action == action_asc:
+            self.load_cases_and_attributes("asc")
+            self.fill_table()
+        if action == action_desc:
+            self.load_cases_and_attributes("desc")
+            self.fill_table()
+        if action == action_equals_value:
+            # Hide rows that do not match this value
+            item_to_compare = self.ui.tableWidget.item(row, col)
+            compare_text = item_to_compare.text()
+            for r in range(0, self.ui.tableWidget.rowCount()):
+                item = self.ui.tableWidget.item(r, col)
+                text_ = item.text()
+                if compare_text != text_:
+                    self.ui.tableWidget.setRowHidden(r, True)
+            return
+        if action == action_show_values_like:
+            text_value, ok = QtWidgets.QInputDialog.getText(self, _("Text filter"), _("Show values like:"),
+                                                       QtWidgets.QLineEdit.EchoMode.Normal)
+            if ok and text_value != '':
+                for r in range(0, self.ui.tableWidget.rowCount()):
+                    if self.ui.tableWidget.item(r, col).text().find(text_value) == -1:
+                        self.ui.tableWidget.setRowHidden(r, True)
+            return
+        if action == action_show_all:
+            for r in range(0, self.ui.tableWidget.rowCount()):
+                self.ui.tableWidget.setRowHidden(r, False)
 
     def fill_table(self):
         """ Fill the table widget with case details. """
