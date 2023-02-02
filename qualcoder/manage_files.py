@@ -223,10 +223,13 @@ class DialogManageFiles(QtWidgets.QDialog):
         if header_index > 0:
             action_hide_column = menu.addAction(_("Hide column"))
         action_hide_columns_starting = menu.addAction(_("Hide columns starting with"))
+        action_show_columns_starting = menu.addAction(_("Show columns starting with"))
         action = menu.exec(self.ui.tableWidget.mapToGlobal(position))
         if action == action_show_all_columns:
             for c in range(0, self.ui.tableWidget.columnCount()):
                 self.ui.tableWidget.setColumnHidden(c, False)
+            if not self.app.settings['showids']:
+                self.ui.tableWidget.setColumnHidden(self.ID_COLUMN, True)
             return
         if action == action_hide_column:
             self.ui.tableWidget.setColumnHidden(header_index, True)
@@ -238,6 +241,16 @@ class DialogManageFiles(QtWidgets.QDialog):
             for c in range(1, self.ui.tableWidget.columnCount()):
                 h_text = self.ui.tableWidget.horizontalHeaderItem(c).text()
                 if len(h_text) >= len(filter) and filter == h_text[:len(filter)]:
+                    self.ui.tableWidget.setColumnHidden(c, True)
+        if action == action_show_columns_starting:
+            msg = _("Show columns starting with:")
+            filter, ok = QtWidgets.QInputDialog.getText(self, _("Show Columns"), msg,
+                                                            QtWidgets.QLineEdit.EchoMode.Normal)
+            for c in range(4, self.ui.tableWidget.columnCount()):
+                h_text = self.ui.tableWidget.horizontalHeaderItem(c).text()
+                if len(h_text) >= len(filter) and filter == h_text[:len(filter)]:
+                    self.ui.tableWidget.setColumnHidden(c, False)
+                else:
                     self.ui.tableWidget.setColumnHidden(c, True)
 
     def table_menu(self, position):
@@ -261,9 +274,11 @@ class DialogManageFiles(QtWidgets.QDialog):
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         action_view = menu.addAction(_("View"))
         action_filename_asc = None
+        action_filename_desc = None
         action_type = None
         if col == self.NAME_COLUMN:
             action_filename_asc = menu.addAction(_("Order ascending"))
+            action_filename_desc = menu.addAction(_("Order descending"))
             action_type = menu.addAction(_("File type order"))
         action_date_asc = None
         if col == self.DATE_COLUMN:
@@ -319,6 +334,8 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.assign_case_to_file()
         if action == action_filename_asc:
             self.load_file_data()
+        if action == action_filename_desc:
+            self.load_file_data("filename desc")
         if action == action_date_asc:
             self.load_file_data("date")
             self.fill_table()
@@ -611,7 +628,8 @@ class DialogManageFiles(QtWidgets.QDialog):
         Obtain some file metadata to use in table tooltip.
         Fills table after data is loaded.
         param:
-            order_by: string ""= name, "date" = date, "filetype" = mediapath,
+            order_by: string ""= name asc, "filename desc" = name desc,
+            "date" = date, "filetype" = mediapath,
                 "casename" = by alphabetic casename
                 "attribute:attribute name" selected attribute
         """
@@ -623,6 +641,8 @@ class DialogManageFiles(QtWidgets.QDialog):
         placeholders = None
         # default alphabetic order
         sql = "select name, id, fulltext, mediapath, memo, owner, date, av_text_id from source order by upper(name)"
+        if  order_by == "filename desc":
+            sql += " desc"
         if order_by == "date":
             sql = "select name, id, fulltext, mediapath, memo, owner, date, av_text_id from source order by date, upper(name)"
         if order_by == "filetype":
