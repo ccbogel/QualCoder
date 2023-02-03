@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2022 Colin Curtain
+Copyright (c) 2023 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -84,6 +84,27 @@ colors = [
 
 COLS = 10
 ROWS = 12
+
+
+def color_matcher(hex_color):
+    """ Match a colour similar to a color in the colors list.
+    Used with REFI import """
+
+    if len(hex_color) != 7:
+        return "#D8D8D8"  # light gray
+    test_r = int(hex_color[1:3], 16)
+    test_g = int(hex_color[3:5], 16)
+    test_b = int(hex_color[5:7], 16)
+
+    best_match = ["#D8D8D8", 255.0]  # light gray default, colour difference
+    for c in colors:
+        r = int(c[1:3], 16)
+        g = int(c[3:5], 16)
+        b = int(c[5:7], 16)
+        diff = (abs(r - test_r) + abs(g - test_g) + abs(b - test_b)) / 3
+        if diff < best_match[1]:
+            best_match = [c, diff]
+    return best_match[0]
 
 
 class DialogColorSelect(QtWidgets.QDialog):

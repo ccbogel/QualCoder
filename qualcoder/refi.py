@@ -44,7 +44,7 @@ import zipfile
 
 from PyQt6 import QtWidgets, QtCore
 
-from .color_selector import colors
+from .color_selector import colors, color_matcher
 from .xsd import codebook, project
 from .GUI.ui_dialog_refi_export_endings import Ui_Dialog_refi_export_line_endings
 from .helpers import Message
@@ -227,6 +227,9 @@ class RefiImport:
                     color = parent.get("color")
                     if color is None:
                         color = colors[randint(0, 119)]
+                    else:
+                        # Convert other software hex color to a similar one listed in color_selector.py
+                        color = color_matcher(color)
                     try:
                         # print(is_codable, name, "inserting into code name")
                         cur = self.app.conn.cursor()
@@ -252,6 +255,9 @@ class RefiImport:
             color = parent.get("color")
             if color is None:
                 color = colors[randint(0, 119)]
+            else:
+                # Convert other software hex color to a similar one listed in color_selector.py
+                color = color_matcher(color)
             try:
                 cur = self.app.conn.cursor()
                 cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,'',?,?,?)",
@@ -273,6 +279,9 @@ class RefiImport:
             color = parent.get("color")
             if color is None:
                 color = colors[randint(0, 119)]
+            else:
+                # Convert other software hex color to a similar one listed in color_selector.py
+                color = color_matcher(color)
             try:
                 cur = self.app.conn.cursor()
                 cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,'',?,?,?)",
