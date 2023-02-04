@@ -114,6 +114,7 @@ class DialogManageFiles(QtWidgets.QDialog):
     default_import_directory = os.path.expanduser("~")
     attribute_names = []  # list of dictionary name:value for AddAtribute dialog
     av_dialog_open = None  # Used for opened AV dialog
+    files_renamed = []  # list of dictionaries of old and new names and fid
 
     def __init__(self, app, parent_text_edit, tab_coding, tab_reports):
 
@@ -172,6 +173,10 @@ class DialogManageFiles(QtWidgets.QDialog):
         pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_csv_icon), "png")
         self.ui.pushButton_export_attributes.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_export_attributes.clicked.connect(self.export_attributes)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(undo_icon), "png")
+        self.ui.pushButton_undo.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_undo.clicked.connect(self.undo_file_rename)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(question_icon), "png")
         self.ui.pushButton_help.setIcon(QtGui.QIcon(pm))
@@ -421,9 +426,45 @@ class DialogManageFiles(QtWidgets.QDialog):
         cur.execute("update source set name=? where name=?", [new_name, existing_name])
         self.app.conn.commit()
         self.parent_text_edit.append(_("Renamed database file entry: ") + existing_name + " -> " + new_name)
+        entry = {'old_name': existing_name, 'name': new_name,
+                 'fid': int(self.ui.tableWidget.item(row, self.ID_COLUMN).text())}
+        self.files_renamed.append(entry)
+        self.ui.pushButton_undo.setEnabled(True)
         self.load_file_data()
         self.app.delete_backup = False
         self.update_files_in_dialogs()
+
+    def undo_file_rename(self):
+        """ Undo file name rename. """
+
+        if len(self.files_renamed) == 0:
+            self.ui.pushButton_undo.setEnabled(False)
+            # Could occur when file deleted
+            return
+        ui = DialogSelectItems(self.app, self.files_renamed, _("Undo file rename"), "single")
+        ok = ui.exec()
+        if not ok:
+            return
+        selection = ui.get_selected()
+        if not selection:
+            return
+        filenames = self.app.get_filenames()
+        for f in filenames:
+            if f['name'] == selection['old_name']:
+                Message(self.app, _("Cannot undo"), _("Another file has this name"), "warning").exec()
+                self.files_renamed = [x for x in self.files_renamed if not (selection['fid'] == x.get('fid'))]
+                if len(self.files_renamed) == 0:
+                    self.ui.pushButton_undo.setEnabled(False)
+                return
+        cur = self.app.conn.cursor()
+        cur.execute("update source set name=? where name=?", [selection['old_name'], selection['name']])
+        self.app.conn.commit()
+        self.parent_text_edit.append(_("Reversed renamed database file entry: ") +
+                                     selection['name'] + " -> " + selection['old_name'])
+        self.load_file_data()
+        self.files_renamed = [x for x in self.files_renamed if not (selection['fid'] == x.get('fid'))]
+        if len(self.files_renamed) == 0:
+            self.ui.pushButton_undo.setEnabled(False)
 
     def button_export_file_as_linked_file(self):
         """ User presses button to export current row's file.
@@ -1642,6 +1683,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         for s in selection:
             msg += _("Deleted file: ") + s['name'] + "\n"
+            self.files_renamed = [x for x in self.files_renamed if not (s['id'] == x.get('fid'))]
             # Delete text source
             if s['mediapath'] is None or 'docs:' in s['mediapath']:
                 try:
@@ -1694,7 +1736,6 @@ class DialogManageFiles(QtWidgets.QDialog):
                     cur.execute("delete from case_text where fid = ?", [res[0]])
                     cur.execute("delete from attribute where attr_type ='file' and id=?", [res[0]])
                     self.app.conn.commit()
-
         self.update_files_in_dialogs()
         self.check_attribute_placeholders()
         self.parent_text_edit.append(msg)
@@ -1780,6 +1821,8 @@ class DialogManageFiles(QtWidgets.QDialog):
                 cur.execute("delete from case_text where fid = ?", [res[0]])
                 cur.execute("delete from attribute where attr_type ='file' and id=?", [res[0]])
                 self.app.conn.commit()
+
+        self.files_renamed = [x for x in self.files_renamed if not (file_id == x.get('fid'))]
 
         self.update_files_in_dialogs()
         self.check_attribute_placeholders()
