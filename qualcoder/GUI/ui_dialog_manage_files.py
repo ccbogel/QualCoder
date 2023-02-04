@@ -67,6 +67,11 @@ class Ui_Dialog_manage_files(object):
         self.label_fcount = QtWidgets.QLabel(self.groupBox)
         self.label_fcount.setGeometry(QtCore.QRect(450, 7, 121, 26))
         self.label_fcount.setObjectName("label_fcount")
+        self.pushButton_undo = QtWidgets.QPushButton(self.groupBox)
+        self.pushButton_undo.setEnabled(False)
+        self.pushButton_undo.setGeometry(QtCore.QRect(410, 3, 30, 30))
+        self.pushButton_undo.setText("")
+        self.pushButton_undo.setObjectName("pushButton_undo")
         self.gridLayout.addWidget(self.groupBox, 1, 0, 1, 1)
         self.tableWidget = QtWidgets.QTableWidget(Dialog_manage_files)
         self.tableWidget.setObjectName("tableWidget")
@@ -98,6 +103,7 @@ class Ui_Dialog_manage_files(object):
         self.pushButton_export_attributes.setToolTip(_translate("Dialog_manage_files", "<html><head/><body><p>Export attributes as csv file</p></body></html>"))
         self.pushButton_help.setToolTip(_translate("Dialog_manage_files", "Help"))
         self.label_fcount.setText(_translate("Dialog_manage_files", "Files:"))
+        self.pushButton_undo.setToolTip(_translate("Dialog_manage_files", "<html><head/><body><p>Undo file rename</p></body></html>"))
         self.label_file.setText(_translate("Dialog_manage_files", "File:"))
 
 
