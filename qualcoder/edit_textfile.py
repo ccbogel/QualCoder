@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2022 Colin Curtain
+Copyright (c) 2023 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -242,7 +242,7 @@ class DialogEditTextFile(QtWidgets.QDialog):
                     c['npos0'] += pre_chars + post_chars
                     c['npos1'] += pre_chars + post_chars
                     changed = True
-                if not changed and c['npos0'] < pre_start < c['npos1']:
+                if not changed and c['npos0'] is not None and c['npos0'] < pre_start < c['npos1']:
                     c['npos1'] += pre_chars + post_chars
             for c in self.annotations:
                 changed = False
