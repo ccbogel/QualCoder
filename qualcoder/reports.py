@@ -354,6 +354,8 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
                 display_list = []
                 for i in c['display_list']:
                     display_list.append(str(i))
+                if len(display_list[0]) > 62:  # Keep category name short
+                    display_list[0] = display_list[0][:30] + '..' + display_list[0][-30:]
                 top_item = QtWidgets.QTreeWidgetItem(display_list)
                 top_item.setToolTip(0, c['name'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
@@ -373,6 +375,8 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
                         display_list = []
                         for i in c['display_list']:
                             display_list.append(str(i))
+                        if len(display_list[0]) > 62:  # Keep category name short
+                            display_list[0] = display_list[0][:30] + '..' + display_list[0][-30:]
                         child = QtWidgets.QTreeWidgetItem(display_list)
                         child.setToolTip(0, c['name'])
                         item.addChild(child)
@@ -390,6 +394,8 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
                 display_list = []
                 for i in c['display_list']:
                     display_list.append(str(i))
+                if len(display_list[0]) > 62:  # Keep code name short
+                    display_list[0] = display_list[0][:30] + '..' + display_list[0][-30:]
                 top_item = QtWidgets.QTreeWidgetItem(display_list)
                 top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
                 color = TextColor(c['color']).recommendation
@@ -410,6 +416,8 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
                     display_list = []
                     for i in c['display_list']:
                         display_list.append(str(i))
+                    if len(display_list[0]) > 62:  # Keep code name short
+                        display_list[0] = display_list[0][:30] + '..' + display_list[0][-30:]
                     child = QtWidgets.QTreeWidgetItem(display_list)
                     child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
                     color = TextColor(c['color']).recommendation
@@ -442,6 +450,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         self.parent_textEdit = parent_textedit
         self.comparisons = ""
         self.selected_coders = []
+        self.file_summaries = []
         self.get_data()
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_reportComparisons()
@@ -597,12 +606,28 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
             char_list = [0] * f[1]
             for coded in result0:
                 for char in range(coded[0], coded[1]):
-                    char_list[char] += 1
-                    total['coded0'] += 1
+                    try:
+                        char_list[char] += 1
+                        total['coded0'] += 1
+                    except IndexError as e_:
+                        msg = "DialogReportCoderComparisons.calculate_agreement_for_code_name "
+                        msg += str(e_) + " fid:" + str(f[0]) + " len_text:" + str(f[1]) + " pos1:" + str(coded[1])
+                        msg += " cid:" + str(cid) + " coder:" + self.selected_coders[0]
+                        print(msg)
+                        logger.error(msg)
+                        self.parent_textEdit.append(msg)
             for coded in result1:
                 for char in range(coded[0], coded[1]):
-                    char_list[char] += 1
-                    total['coded1'] += 1
+                    try:
+                        char_list[char] += 1
+                        total['coded1'] += 1
+                    except IndexError as e_:
+                        msg = "DialogReportCoderComparisons.calculate_agreement_for_code_name "
+                        msg += str(e_) + " fid:" + str(f[0]) + " len_text:" + str(f[1]) + " pos1:" + str(coded[1])
+                        msg += " cid:" + str(cid) + " coder:" + self.selected_coders[0]
+                        print(msg)
+                        logger.error(msg)
+                        self.parent_textEdit.append(msg)
             uncoded = 0
             single_coded = 0
             dual_coded = 0
@@ -682,6 +707,8 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         for c in cats:
             if c['supercatid'] is None:
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid'])])
+                if len(c['name']) > 62:
+                    top_item.setText(0, c['name'][:30] + '..' + c['name'][-30:])
                 top_item.setToolTip(0, c['name'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_list.append(c)
@@ -698,6 +725,8 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
                 while item:  # while there is an item in the list
                     if item.text(1) == 'catid:' + str(c['supercatid']):
                         child = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid'])])
+                        if len(c['name']) > 62:
+                            child.setText(0, c['name'][:30] + '..' + c['name'][-30:])
                         child.setToolTip(0, c['name'])
                         item.addChild(child)
                         remove_list.append(c)
@@ -706,12 +735,13 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
             for item in remove_list:
                 cats.remove(item)
             count += 1
-
         # Add unlinked codes as top level items
         remove_items = []
         for c in codes:
             if c['catid'] is None:
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid'])])
+                if len(c['name']) > 62:
+                    top_item.setText(0, c['name'][:30] + '..' + c['name'][-30:])
                 top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
                 color = TextColor(c['color']).recommendation
                 top_item.setForeground(0, QBrush(QtGui.QColor(color)))
@@ -729,6 +759,8 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
             while item:
                 if item.text(1) == 'catid:' + str(c['catid']):
                     child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid'])])
+                    if len(c['name']) > 62:
+                        child.setText(0, c['name'][:30] + '..' + c['name'][-30:])
                     child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
                     color = TextColor(c['color']).recommendation
                     child.setForeground(0, QBrush(QtGui.QColor(color)))
