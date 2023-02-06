@@ -1,6 +1,6 @@
 <img src="https://github.com/ccbogel/QualCoder/blob/master/qualcoder.png" width=200 height=200>
 
-# IMPORTANT  -do not download the latest code from green code button - until this warning is removed. I uploaded some erroneous files. Should be resolved within 24 hours. (6 Feb 2022 AEST)
+# IMPORTANT  -do not download the latest code from green code button - until this warning is removed. I uploaded three erroneous older files. Should be resolved within 24 hours. (6 Feb 2022 AEST)
 
 # QualCoder
 QualCoder is a qualitative data analysis application written in python3 and Qt6.
