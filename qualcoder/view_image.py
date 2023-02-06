@@ -28,6 +28,7 @@ https://qualcoder.wordpress.com/
 
 from copy import deepcopy
 import datetime
+import html
 import logging
 import os
 from random import randint
@@ -39,6 +40,7 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QBrush
 
 from .add_item_name import DialogAddItemName
+from .code_in_all_files import DialogCodeInAllFiles
 from .color_selector import DialogColorSelect
 from .color_selector import colors, TextColor
 from .confirm_delete import DialogConfirmDelete
@@ -46,7 +48,7 @@ from .GUI.base64_helper import *
 from .GUI.ui_dialog_code_image import Ui_Dialog_code_image
 from .GUI.ui_dialog_view_image import Ui_Dialog_view_image
 from .move_resize_rectangle import DialogMoveResizeRectangle
-from .helpers import Message, DialogCodeInAllFiles
+from .helpers import ExportDirectoryPathDialog, Message
 from .memo import DialogMemo
 from .report_attributes import DialogSelectAttributeParameters
 from .reports import DialogReportCoderComparisons, DialogReportCodeFrequencies  # for isinstance()
@@ -89,6 +91,7 @@ class DialogCodeImage(QtWidgets.QDialog):
     important = False  # Show/hide imporant flagged codes
     attributes = []
     undo_deleted_code = None  # Undo last deleted code
+    degrees = 0  # for rotation
 
     def __init__(self, app, parent_textedit, tab_reports):
         """ Show list of image files.
@@ -112,6 +115,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.selection = None
         self.important = False
         self.attributes = []
+        self.degrees = 0
         self.get_codes_and_categories()
         self.get_coded_areas()
         QtWidgets.QDialog.__init__(self)
@@ -131,8 +135,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         tree_font = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
         tree_font += '"' + self.app.settings['font'] + '";'
         self.ui.treeWidget.setStyleSheet(tree_font)
-        self.ui.label_code.setStyleSheet(tree_font)  # usually smaller font
-        self.ui.label_coder.setText("Coder: " + self.app.settings['codername'])
+        self.ui.label_image.setStyleSheet(tree_font)  # Usually smaller font
         self.setWindowTitle(_("Image coding"))
         self.ui.horizontalSlider.valueChanged[int].connect(self.redraw_scene)
         self.ui.horizontalSlider.setToolTip(_("Key + or W zoom in. Key - or Q zoom out"))
@@ -142,11 +145,16 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.ui.pushButton_memo.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_memo.pressed.connect(self.active_file_memo)
         self.ui.pushButton_memo.setEnabled(False)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_icon), "png")
+        self.ui.pushButton_export.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_export.pressed.connect(self.export_html_file)
+        self.ui.pushButton_export.setEnabled(False)
         self.ui.listWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.listWidget.customContextMenuRequested.connect(self.file_menu)
         self.ui.listWidget.setStyleSheet(tree_font)
         self.get_files()
-        self.ui.listWidget.itemClicked.connect(self.listwidgetitem_view_file)
+        self.ui.listWidget.selectionModel().selectionChanged.connect(self.file_selection_changed)
         self.ui.treeWidget.setDragEnabled(True)
         self.ui.treeWidget.setAcceptDrops(True)
         self.ui.treeWidget.setDragDropMode(QtWidgets.QAbstractItemView.DragDropMode.InternalMove)
@@ -154,7 +162,6 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.ui.listWidget.installEventFilter(self)
         self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
-        self.ui.treeWidget.itemClicked.connect(self.fill_code_label)
         # The buttons in the splitter are smaller 24x24 pixels
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(playback_next_icon_24), "png")
@@ -275,106 +282,49 @@ class DialogCodeImage(QtWidgets.QDialog):
             self.ui.listWidget.addItem(item)
 
     def get_files_from_attributes(self):
-        """ Trim the files list to files identified by attributes.
-        Attribute dialing results are a dictionary of:
-        [0] attribute name, or 'case name'
-        [1] attribute type: character, numeric
-        [2] modifier: > < == != like between
-        [3] comparison value as list, one item or two items for between
-
-        DialogSelectAttributeParameters returns lists for each parameter selected of:
-        attribute name, file or case, character or numeric, operator, list of one or two comparator values
-        two comparator values are used with the 'between' operator
-        ['source', 'file', 'character', '==', ["'interview'"]]
-        ['case name', 'case', 'character', '==', ["'ID1'"]]
-
-        Note, sqls are NOT parameterised.
-        results from multiple parameters are intersected, an AND boolean function.
+        """ Select files based on attribute selections.
+        Attribute results are a dictionary of:
+        first item is a Boolean AND or OR list item
+        Followed by each attribute list item
         """
 
-        pm = QtGui.QPixmap()
-        ui = DialogSelectAttributeParameters(self.app, "file")
+        # Clear ui
+        self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
+        ui = DialogSelectAttributeParameters(self.app)
         ui.fill_parameters(self.attributes)
+        temp_attributes = deepcopy(self.attributes)
+        self.attributes = []
         ok = ui.exec()
         if not ok:
-            self.attributes = []
+            self.attributes = temp_attributes
+            pm = QtGui.QPixmap()
             pm.loadFromData(QtCore.QByteArray.fromBase64(tag_icon32), "png")
             self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
-            self.ui.pushButton_file_attributes.setToolTip(_("Show files with file attributes"))
-            self.get_files()
+            self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
+            if self.attributes:
+                pm = QtGui.QPixmap()
+                pm.loadFromData(QtCore.QByteArray.fromBase64(tag_iconyellow32), "png")
+                self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
             return
         self.attributes = ui.parameters
-        if not self.attributes:
+        if len(self.attributes) == 1:
+            pm = QtGui.QPixmap()
             pm.loadFromData(QtCore.QByteArray.fromBase64(tag_icon32), "png")
             self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
-            self.ui.pushButton_file_attributes.setToolTip(_("Show files with file attributes"))
-            self.get_files()
+            self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
             return
-
-        file_ids = []
-        case_file_ids = []
-        cur = self.app.conn.cursor()
-        # Run a series of sql based on each selected attribute
-        # Apply a set to the resulting ids to determine the final list of ids
-        for a in self.attributes:
-            sql = "select id from attribute where "
-            # File attributes
-            if a[1] == 'file':
-                sql += "attribute.name = '" + a[0] + "' "
-                sql += " and attribute.value " + a[3] + " "
-                if a[3] == 'between':
-                    sql += a[4][0] + " and " + a[4][1] + " "
-                if a[3] in ('in', 'not in'):
-                    sql += "(" + ','.join(a[4]) + ") "  # One item the comma is skipped
-                if a[3] not in ('between', 'in', 'not in'):
-                    sql += a[4][0]
-                if a[2] == 'numeric':
-                    sql = sql.replace(' attribute.value ', ' cast(attribute.value as real) ')
-                sql += " and attribute.attr_type='file'"
-                cur.execute(sql)
-                result = cur.fetchall()
-                for i in result:
-                    file_ids.append(i[0])
-            # Case names
-            if a[1] == "case":
-                # Case text table also links av and images
-                sql = "select distinct case_text.fid from cases join case_text on case_text.caseid=cases.caseid "
-                sql += "join source on source.id=case_text.fid where cases.name " + a[3]
-                if a[3] != "like":
-                    sql += a[4][0]
-                else:
-                    sql += "'%" + a[4][0][1:-1] + "%'"  # remove apstrophies in a[4][0]
-                cur.execute(sql)
-                case_result = cur.fetchall()
-                for i in case_result:
-                    case_file_ids.append(i[0])
-        if file_ids == [] and case_file_ids == []:
-            Message(self.app, "Nothing found", "Nothing found").exec()
+        if not ui.result_file_ids:
+            Message(self.app, _("Nothing found") + " " * 20, _("No matching files found")).exec()
+            pm = QtGui.QPixmap()
+            pm.loadFromData(QtCore.QByteArray.fromBase64(tag_icon32), "png")
+            self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
+            self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
             return
-        set_ids = {}
-        set_file_ids = set(file_ids)
-        set_case_file_ids = set(case_file_ids)
-        # Need to intersect case file ids and file ids
-        if file_ids != [] and case_file_ids != []:
-            set_ids = set_file_ids.intersection(set_case_file_ids)
-        if file_ids != [] and case_file_ids == []:
-            set_ids = set_file_ids
-        if file_ids == [] and case_file_ids != []:
-            set_ids = set_case_file_ids
-        self.get_files(list(set_ids))
-        # Prepare message for label tooltop
-        msg = ""
-        for a in self.attributes:
-            if a[1] == 'file':
-                msg += " or" + "\n" + a[0] + " " + a[3] + " " + ",".join(a[4])
-        if len(msg) > 3:
-            msg = msg[3:]
-        for a in self.attributes:
-            if a[1] == 'case':
-                msg += " and" + "\n" + a[0] + " " + a[3] + " " + ",".join(a[4])
-        self.ui.pushButton_file_attributes.setToolTip(_("Show files:") + msg)
+        pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(tag_iconyellow32), "png")
         self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_file_attributes.setToolTip(ui.tooltip_msg)
+        self.get_files(ui.result_file_ids)
 
     def fill_tree(self):
         """ Fill tree widget, top level items are main categories and unlinked codes. """
@@ -398,6 +348,10 @@ class DialogCodeImage(QtWidgets.QDialog):
                 if c['memo'] != "" and c['memo'] is not None:
                     memo = "Memo"
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
+                top_item.setToolTip(0, '')
+                if len(c['name']) > 52:
+                    top_item.setText(0, c['name'][:25] + '..' + c['name'][-25:])
+                    top_item.setToolTip(0, c['name'])
                 top_item.setToolTip(2, c['memo'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_list.append(c)
@@ -419,6 +373,10 @@ class DialogCodeImage(QtWidgets.QDialog):
                         if c['memo'] != "" and c['memo'] is not None:
                             memo = "Memo"
                         child = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
+                        child.setToolTip(0, '')
+                        if len(c['name']) > 52:
+                            child.setText(0, c['name'][:25] + '..' + c['name'][-25:])
+                            child.setToolTip(0, c['name'])
                         child.setToolTip(2, c['memo'])
                         item.addChild(child)
                         remove_list.append(c)
@@ -437,6 +395,10 @@ class DialogCodeImage(QtWidgets.QDialog):
                 if c['memo'] != "" and c['memo'] is not None:
                     memo = "Memo"
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
+                top_item.setToolTip(0, '')
+                if len(c['name']) > 52:
+                    top_item.setText(0, c['name'][:25] + '..' + c['name'][-25:])
+                    top_item.setToolTip(0, c['name'])
                 top_item.setToolTip(2, c['memo'])
                 top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
                 color = TextColor(c['color']).recommendation
@@ -463,6 +425,10 @@ class DialogCodeImage(QtWidgets.QDialog):
                     child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
                     color = TextColor(c['color']).recommendation
                     child.setForeground(0, QBrush(QtGui.QColor(color)))
+                    child.setToolTip(0, '')
+                    if len(c['name']) > 52:
+                        child.setText(0, c['name'][:25] + '..' + c['name'][-25:])
+                        child.setToolTip(0, c['name'])
                     child.setToolTip(2, c['memo'])
                     child.setFlags(
                         Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsUserCheckable |
@@ -592,7 +558,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             self.go_to_latest_coded_file()
             return
 
-    def listwidgetitem_view_file(self):
+    def file_selection_changed(self):
         """ Item selected so fill current file variable and load. """
 
         if len(self.files) == 0:
@@ -619,9 +585,10 @@ class DialogCodeImage(QtWidgets.QDialog):
 
     def load_file(self):
         """ Add image to scene if it exists. If not exists clear the GUI and variables.
-        Called by: select_image_menu, listwidgetitem_view_file
+        Called by: select_image_menu, file_selection_changed
         """
 
+        self.degrees = 0
         self.ui.label_coded_area.setText("Coded area")
         self.ui.label_coded_area.setToolTip("")
         source = self.app.project_path + self.file_['mediapath']
@@ -638,6 +605,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             self.scene.removeItem(items[i])
         self.setWindowTitle(_("Image: ") + self.file_['name'])
         self.ui.pushButton_memo.setEnabled(True)
+        self.ui.pushButton_export.setEnabled(True)
         self.pixmap = QtGui.QPixmap.fromImage(image)
         pixmap_item = QtWidgets.QGraphicsPixmapItem(QtGui.QPixmap.fromImage(image))
         pixmap_item.setPos(0, 0)
@@ -682,19 +650,25 @@ class DialogCodeImage(QtWidgets.QDialog):
 
     def redraw_scene(self):
         """ Resize image. Triggered by user change in slider. Or resize or move of a coded area.
-        Also called by unmark, as all items need to be redrawn. """
+        Called by unmark, and Menu rotate action, as all items need to be redrawn. """
 
         if self.pixmap is None:
             return
         self.scale = (self.ui.horizontalSlider.value() + 1) / 100
         height = int(self.scale * self.pixmap.height())
         pixmap = self.pixmap.scaledToHeight(height, QtCore.Qt.TransformationMode.FastTransformation)
+        transform = QtGui.QTransform().rotate(self.degrees)
+        pixmap = pixmap.transformed(transform)
         pixmap_item = QtWidgets.QGraphicsPixmapItem(pixmap)
         pixmap_item.setPos(0, 0)
         self.scene.clear()
         self.scene.addItem(pixmap_item)
         self.draw_coded_areas()
-        self.ui.horizontalSlider.setToolTip(_("Scale: ") + str(int(self.scale * 100)) + "%")
+        scale_text = _("Scale: ") + str(int(self.scale * 100)) + "%"
+        self.ui.horizontalSlider.setToolTip(scale_text)
+        msg = _("Width") + ": " + str(self.pixmap.width()) + " " + _("Height") + ": " + str(self.pixmap.height()) + "\n"
+        msg += scale_text + " " + _("Rotation") + ": " + str(self.degrees) + "\u00b0"
+        self.ui.label_image.setText(msg)
 
     def draw_coded_areas(self):
         """ Draw coded areas with scaling. This coder is shown in dashed rectangles.
@@ -717,10 +691,26 @@ class DialogCodeImage(QtWidgets.QDialog):
                         if item['important'] == 1:
                             tooltip += "\n" + _("IMPORTANT")
                         color = QtGui.QColor(c['color'])
+                # Degrees 0
                 x = item['x1'] * self.scale
                 y = item['y1'] * self.scale
                 width = item['width'] * self.scale
                 height = item['height'] * self.scale
+                if self.degrees == 90:
+                    y = (item['x1']) * self.scale
+                    x = (self.pixmap.height() - item['y1'] - item['height']) * self.scale
+                    height = item['width'] * self.scale
+                    width = item['height'] * self.scale
+                if self.degrees == 180:
+                    x = (self.pixmap.width() - item['x1'] - item['width']) * self.scale
+                    y = (self.pixmap.height() - item['y1'] - item['height']) * self.scale
+                    width = item['width'] * self.scale
+                    height = item['height'] * self.scale
+                if self.degrees == 270:
+                    y = (self.pixmap.width() - item['x1'] - item['width']) * self.scale
+                    x = (item['y1']) * self.scale
+                    height = item['width'] * self.scale
+                    width = item['height'] * self.scale
                 rect_item = QtWidgets.QGraphicsRectItem(x, y, width, height)
                 rect_item.setPen(QtGui.QPen(color, 2, QtCore.Qt.PenStyle.DashLine))
                 rect_item.setToolTip(tooltip)
@@ -730,23 +720,77 @@ class DialogCodeImage(QtWidgets.QDialog):
                     if not self.important:
                         self.scene.addItem(rect_item)
 
-    def fill_code_label(self):
-        """ Fill code label with currently selected item's code name. """
+    def export_html_file(self):
+        """ Export the QGraphicsScene as a png image with transparent background.
+               Called by QButton_export.
+               """
 
-        current = self.ui.treeWidget.currentItem()
-        if current.text(1)[0:3] == 'cat':
-            self.ui.label_code.setText(_("NO CODE SELECTED"))
+        filename = self.file_['name'].replace(".", "_") + ".html"
+        e_dir = ExportDirectoryPathDialog(self.app, filename)
+        filepath = e_dir.filepath
+        if filepath is None:
             return
-        self.ui.label_code.setText(_("Code: ") + current.text(0))
-        # update background colour of label
-        for c in self.codes:
-            if current.text(0) == c['name']:
-                palette = self.ui.label_code.palette()
-                code_color = QtGui.QColor(c['color'])
-                palette.setColor(QtGui.QPalette.ColorRole.Window, code_color)
-                self.ui.label_code.setPalette(palette)
-                self.ui.label_code.setAutoFillBackground(True)
-                break
+        pic_width = self.pixmap.width() * self.scale  # self.scene.sceneRect().width()
+        pic_height = self.pixmap.height() * self.scale  # self.scene.sceneRect().height()
+        if self.degrees in (90, 270):
+            pic_width, pic_height = pic_height, pic_width
+        rect_area = QtCore.QRectF(0.0, 0.0, pic_width, pic_height)
+        image = QtGui.QImage(int(pic_width), int(pic_height), QtGui.QImage.Format.Format_ARGB32_Premultiplied)
+        painter = QtGui.QPainter(image)
+        painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
+        # Render method requires QRectF NOT QRect
+        self.scene.render(painter, QtCore.QRectF(image.rect()), rect_area)
+        painter.end()
+        # Convert to base64 as String not bytes
+        byte_array = QtCore.QByteArray()
+        buffer = QtCore.QBuffer(byte_array)
+        buffer.open(QtCore.QIODevice.OpenModeFlag.WriteOnly)
+        image.save(buffer, 'PNG')
+        base64_string = byte_array.toBase64().data().decode("UTF-8")
+        # Create html file
+        h = "<!DOCTYPE html>\n<html>\n<head>\n<title>Coded Image</title>\n</head>\n"
+        h += "<body>\n<div>\n"
+        h += "<h1>" + html.escape(filename) + "</h1>\n"
+        h += '<img src="data:image/png;base64,' + base64_string + '" usemap="#coded_areas" />'
+        # Create image map
+        h += "<map name='coded_areas'>\n"
+        for c in self.code_areas:
+            # Coordinates are x1,y1 to x2,y2 for a rectangle. Adjust for scale and rotation.
+            # Degrees 0
+            x1 = c['x1'] * self.scale
+            y1 = c['y1'] * self.scale
+            x2 = x1 + c['width'] * self.scale
+            y2 = y1 + c['height'] * self.scale
+            if self.degrees == 90:
+                y1 = (c['x1']) * self.scale
+                x1 = (self.pixmap.height() - c['y1'] - c['height']) * self.scale
+                y2 = y1 + c['width'] * self.scale
+                x2 = x1 + c['height'] * self.scale
+            if self.degrees == 180:
+                x1 = (self.pixmap.width() - c['x1'] - c['width']) * self.scale
+                y1 = (self.pixmap.height() - c['y1'] - c['height']) * self.scale
+                x2 = x1 + c['width'] * self.scale
+                y2 = y1 + c['height'] * self.scale
+            if self.degrees == 270:
+                y1 = (self.pixmap.width() - c['x1'] - c['width']) * self.scale
+                x1 = (c['y1']) * self.scale
+                y2 = y1 + c['width'] * self.scale
+                x2 = x1 + c['height'] * self.scale
+            tag = '<area shape="rect" coords="' + str(x1) + "," + str(y1) + ","
+            tag += str(x2) + "," + str(y2) + '" '
+            tag += 'title="' + html.escape(c['name'])
+            if c['memo'] != "":
+                tag += html.escape('\n' + c['memo'])
+            tag += '" href="#1" >\n'
+            h += tag
+        h += "</map>\n"
+        if self.file_['memo'] != "":
+            h += '<h2>Image memo</h2>\n'
+            h += '<p>' + html.escape(self.file_['memo']) + '</p>\n'
+        h += "</div>\n</body>\n</html>"
+        with open(filepath, 'w', encoding='utf-8-sig') as f:
+            f.write(h)
+        Message(self.app, _("Image exported"), filepath).exec()
 
     def tree_menu(self, position):
         """ Context menu for treewidget items.
@@ -819,11 +863,14 @@ class DialogCodeImage(QtWidgets.QDialog):
         Coded media comes from ALL files for this coder.
         Need to store textedit start and end positions so that code in context can be used.
         Called from tree_menu.
+        Re-load the codings may have changed.
         param:
             code_dict : code dictionary
         """
 
         DialogCodeInAllFiles(self.app, code_dict)
+        self.get_coded_areas()
+        self.redraw_scene()
 
     def move_code(self, selected):
         """ Move code to another category or to no category in the tree.
@@ -906,7 +953,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             if key == QtCore.Qt.Key.Key_H:
                 self.ui.groupBox_2.setHidden(not (self.ui.groupBox_2.isHidden()))
                 return True
-            if key == QtCore.Qt.Key.Key_Minus  or key == QtCore.Qt.Key.Key_Q:
+            if key == QtCore.Qt.Key.Key_Minus or key == QtCore.Qt.Key.Key_Q:
                 v = self.ui.horizontalSlider.value()
                 v -= 3
                 if v < self.ui.horizontalSlider.minimum():
@@ -962,6 +1009,8 @@ class DialogCodeImage(QtWidgets.QDialog):
         if not items:
             menu = QtWidgets.QMenu()
             menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            action_rotate = menu.addAction(_("Rotate clockwise"))
+            action_rotate_counter = menu.addAction(_("Rotate counter-clockwise"))
             action_hide_top_groupbox = None
             action_show_top_groupbox = None
             if self.ui.groupBox_2.isHidden():
@@ -975,6 +1024,16 @@ class DialogCodeImage(QtWidgets.QDialog):
                 self.ui.groupBox_2.setVisible(True)
             if action == action_hide_top_groupbox:
                 self.ui.groupBox_2.setVisible(False)
+            if action == action_rotate:
+                self.degrees += 90
+                if self.degrees > 270:
+                    self.degrees = 0
+                self.redraw_scene()
+            if action == action_rotate_counter:
+                self.degrees -= 90
+                if self.degrees < 0:
+                    self.degrees = 270
+                self.redraw_scene()
             return
         item = items[0]
         if len(items) > 1:
@@ -1063,11 +1122,20 @@ class DialogCodeImage(QtWidgets.QDialog):
 
         if self.file_ is None:
             return
+        # Reposition pos based on rotation
+        pix_h_scaled = self.pixmap.height() * self.scale
+        pix_w_scaled = self.pixmap.width() * self.scale
+        if self.degrees == 90:
+            pos = QtCore.QPointF(pos.y(), pix_h_scaled - pos.x())
+        if self.degrees == 180:
+            pos = QtCore.QPointF(pix_w_scaled - pos.x(), pix_h_scaled - pos.y())
+        if self.degrees == 270:
+            pos = QtCore.QPointF(pix_w_scaled - pos.y(), pos.x())
         items = []
         for item in self.code_areas:
             if item['id'] == self.file_['id'] and item['owner'] == self.app.settings['codername']:
-                if pos.x() >= item['x1'] * self.scale and pos.x() <= (item['x1'] + item['width']) * self.scale \
-                        and pos.y() >= item['y1'] * self.scale and pos.y() <= (
+                if item['x1'] * self.scale <= pos.x() <= (item['x1'] + item['width']) * self.scale \
+                        and item['y1'] * self.scale <= pos.y() <= (
                         item['y1'] + item['height']) * self.scale:
                     items.append(item)
         return items
@@ -1170,7 +1238,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         The point and width and height must be based on the original image size,
         so add in scale factor.
         param:
-            p1 : QPoint of mouse release """
+            p1 : QtCore.QPointF of mouse release """
 
         code_ = self.ui.treeWidget.currentItem()
         if code_ is None:
@@ -1179,10 +1247,26 @@ class DialogCodeImage(QtWidgets.QDialog):
             return
         cid = int(code_.text(1)[4:])  # must be integer
         code_name = code_.text(0)
+        pix_h_scaled = self.pixmap.height() * self.scale
+        pix_w_scaled = self.pixmap.width() * self.scale
+        width = p1.x() - self.selection.x()
+        height = p1.y() - self.selection.y()
         x = self.selection.x()
         y = self.selection.y()
-        width = p1.x() - x
-        height = p1.y() - y
+        # Reposition x and y and width, height based on rotation
+        if self.degrees == 90:
+            x = y
+            # Need to use the p1 x point (mouse release point) as the y low values are reversed on the right hand side
+            y = pix_h_scaled - p1.x()
+            width, height = height, width
+        if self.degrees == 180:
+            x = pix_w_scaled - p1.x()
+            y = pix_h_scaled - p1.y()
+        if self.degrees == 270:
+            y = x
+            # Need to use the p1 y point (mouse release point) as the y low values are reversed on the left hand side
+            x = pix_w_scaled - p1.y()
+            width, height = height, width
         if width < 0:
             x = x + width
             width = abs(width)
@@ -1194,8 +1278,8 @@ class DialogCodeImage(QtWidgets.QDialog):
             if type(item) == QtWidgets.QGraphicsPixmapItem:
                 if x + width > item.boundingRect().width() or y + height > item.boundingRect().height():
                     self.selection = None
+                    print("outside")
                     return
-
         x_unscaled = round(x / self.scale)
         y_unscaled = round(y / self.scale)
         width_unscaled = round(width / self.scale)
@@ -1217,16 +1301,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         imid = cur.fetchone()[0]
         item['imid'] = imid
         self.code_areas.append(item)
-        rect_item = QtWidgets.QGraphicsRectItem(x, y, width, height)
-        color = None
-        for i in range(0, len(self.codes)):
-            if self.codes[i]['cid'] == int(cid):
-                color = QtGui.QColor(self.codes[i]['color'])
-        if color is None:
-            return
-        rect_item.setPen(QtGui.QPen(color, 2, QtCore.Qt.PenStyle.DashLine))
-        rect_item.setToolTip(code_.text(0))
-        self.scene.addItem(rect_item)
+        self.redraw_scene()
         self.selection = None
         self.app.delete_backup = False
         self.fill_code_counts_in_tree()
@@ -1354,7 +1429,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             parent : QTreeWidgetItem """
 
         msg = _("Merge code: ") + item['name'] + " ==> " + parent.text(0)
-        reply = QtWidgets.QMessageBox.question(None, _('Merge codes'),
+        reply = QtWidgets.QMessageBox.question(self, _('Merge codes'),
                                                msg, QtWidgets.QMessageBox.StandardButton.Yes,
                                                QtWidgets.QMessageBox.StandardButton.No)
         if reply == QtWidgets.QMessageBox.StandardButton.No:
@@ -1382,7 +1457,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         duplicate code name. A random color is selected for the code.
         New code is added to data and database.
         param:
-            catid : None to add to without category, catid to add to to category. """
+            catid : None to add to without category, catid to add to category. """
 
         ui = DialogAddItemName(self.app, self.codes, _("Add new code"), _("Code name"))
         ui.exec()
@@ -1426,7 +1501,7 @@ class DialogCodeImage(QtWidgets.QDialog):
 
     def delete_category_or_code(self, selected):
         """ Delete the selected category or code.
-        If category deleted, sub-level items are retained.
+        If category deleted, sublevel items are retained.
         param:
             selected : QTreeWidgetItem """
 
@@ -1466,7 +1541,7 @@ class DialogCodeImage(QtWidgets.QDialog):
 
     def delete_category(self, selected):
         """ Find category, remove from database, refresh categories and code data
-        and fill treeWidget. Sub-level items are retained.
+        and fill treeWidget. Sublevel items are retained.
         param:
             selected : QTreeWidgetItem """
 
@@ -1550,7 +1625,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             selected : QTreeWidgetItem """
 
         if selected.text(1)[0:3] == 'cid':
-            new_name, ok = QtWidgets.QInputDialog.getText(self, _("Rename code"), _("New code name:"),
+            new_name, ok = QtWidgets.QInputDialog.getText(self, _("Rename code"), _("New code name:") + " " * 30,
                                                           QtWidgets.QLineEdit.EchoMode.Normal, selected.text(0))
             if not ok or new_name == '':
                 return
@@ -1650,6 +1725,7 @@ class DialogViewImage(QtWidgets.QDialog):
     image_data = None
     pixmap = None
     scene = None
+    degrees = 0  # for rotation
 
     def __init__(self, app, image_data, parent=None):
         """ Image_data contains: {name, mediapath, owner, id, date, memo, fulltext}
@@ -1659,6 +1735,7 @@ class DialogViewImage(QtWidgets.QDialog):
         sys.excepthook = exception_handler
         self.app = app
         self.image_data = image_data
+        self.degrees = 0
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_view_image()
         self.ui.setupUi(self)
@@ -1691,6 +1768,8 @@ class DialogViewImage(QtWidgets.QDialog):
         self.ui.horizontalSlider.valueChanged[int].connect(self.redraw_scene)
         self.ui.horizontalSlider.setToolTip(_("Key + or W zoom in. Key - or Q zoom out"))
         self.ui.textEdit.setText(self.image_data['memo'])
+        tt = _("L rotate clockwise\nR rotate anti-clockwise\n+ - zoom in and out")
+        self.ui.graphicsView.setToolTip(tt)
 
         # Scale initial picture by height to mostly fit inside scroll area
         # Tried other methods e.g. sizes of components, but nothing was correct.
@@ -1711,6 +1790,8 @@ class DialogViewImage(QtWidgets.QDialog):
         scale = (self.ui.horizontalSlider.value() + 1) / 100
         height = int(scale * self.pixmap.height())
         pixmap = self.pixmap.scaledToHeight(height, QtCore.Qt.TransformationMode.FastTransformation)
+        transform = QtGui.QTransform().rotate(self.degrees)
+        pixmap = pixmap.transformed(transform)
         pixmap_item = QtWidgets.QGraphicsPixmapItem(pixmap)
         pixmap_item.setPos(0, 0)
         self.scene.clear()
@@ -1724,6 +1805,7 @@ class DialogViewImage(QtWidgets.QDialog):
         """ Using this event filter to apply key events.
         Key events on scene
         + and- keys
+        L and R rotation
         """
 
         # Hide / unHide top groupbox
@@ -1743,4 +1825,14 @@ class DialogViewImage(QtWidgets.QDialog):
                     return True
                 self.ui.horizontalSlider.setValue(v)
                 return True
+            if key == QtCore.Qt.Key.Key_L:
+                self.degrees -= 90
+                if self.degrees < 0:
+                    self.degrees = 270
+                self.redraw_scene()
+            if key == QtCore.Qt.Key.Key_R:
+                self.degrees += 90
+                if self.degrees > 270:
+                    self.degrees = 0
+                self.redraw_scene()
         return False
