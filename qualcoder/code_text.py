@@ -2563,11 +2563,13 @@ class DialogCodeText(QtWidgets.QWidget):
         action_next_chars = None
         action_prev_chars = None
         action_show_files_like = None
+        action_show_case_files = None
         action_memo = menu.addAction(_("Open memo"))
         if len(self.filenames) > 1:
             action_next = menu.addAction(_("Next file"))
             action_latest = menu.addAction(_("File with latest coding"))
             action_show_files_like = menu.addAction(_("Show files like"))
+            action_show_case_files = menu.addAction(_("Show case files"))
         if file_['characters'] > self.app.settings['codetext_chunksize']:
             action_next_chars = menu.addAction(str(self.app.settings['codetext_chunksize']) + _(" next  characters"))
             if file_['start'] > 0:
@@ -2591,6 +2593,32 @@ class DialogCodeText(QtWidgets.QWidget):
             self.prev_chars(file_, selected)
         if action == action_show_files_like:
             self.show_files_like()
+        if action == action_show_case_files:
+            self.show_case_files()
+
+    def show_case_files(self):
+        """ Show files of specified case.
+        Or show all files. """
+
+        cases = self.app.get_casenames()
+        cases.insert(0, {"name": _("Show all files"),  "id": -1})
+        ui = DialogSelectItems(self.app, cases, _("Select case"), "single")
+        ok = ui.exec()
+        if not ok:
+            return
+        selection = ui.get_selected()
+        if not selection:
+            return
+        if selection['id'] == -1:
+            self.get_files()
+            return
+        cur = self.app.conn.cursor()
+        cur.execute('select fid from case_text where caseid=?', [selection['id']])
+        res = cur.fetchall()
+        file_ids = []
+        for r in res:
+            file_ids.append(r[0])
+        self.get_files(file_ids)
 
     def show_files_like(self):
         """ Show files that contain specified filename text.

@@ -652,6 +652,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         action_next = menu.addAction(_("Next file"))
         action_latest = menu.addAction(_("File with latest coding"))
         action_show_files_like = menu.addAction(_("Show files like"))
+        action_show_case_files = menu.addAction(_("Show case files"))
         action = menu.exec(self.ui.listWidget.mapToGlobal(position))
         if action is None:
             return
@@ -688,6 +689,32 @@ class DialogCodeAV(QtWidgets.QDialog):
                     return
         if action == action_show_files_like:
             self.show_files_like()
+        if action == action_show_case_files:
+            self.show_case_files()
+
+    def show_case_files(self):
+        """ Show files of specified case.
+        Or show all files. """
+
+        cases = self.app.get_casenames()
+        cases.insert(0, {"name": _("Show all files"),  "id": -1})
+        ui = DialogSelectItems(self.app, cases, _("Select case"), "single")
+        ok = ui.exec()
+        if not ok:
+            return
+        selection = ui.get_selected()
+        if not selection:
+            return
+        if selection['id'] == -1:
+            self.get_files()
+            return
+        cur = self.app.conn.cursor()
+        cur.execute('select fid from case_text where caseid=?', [selection['id']])
+        res = cur.fetchall()
+        file_ids = []
+        for r in res:
+            file_ids.append(r[0])
+        self.get_files(file_ids)
 
     def show_files_like(self):
         """ Show files that contain specified filename text.
