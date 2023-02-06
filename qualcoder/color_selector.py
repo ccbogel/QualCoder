@@ -188,6 +188,8 @@ class DialogColorSelect(QtWidgets.QDialog):
         cur.execute("select color, name from code_name order by name")
         self.used_colors = cur.fetchall()
         self.fill_table()
+        self.ui.tableWidget.installEventFilter(self)
+        self.ui.tableWidget.setFocus()
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         font = 'font: ' + str(app.settings['fontsize']) + 'pt '
         font += '"' + app.settings['font'] + '";'
@@ -203,7 +205,7 @@ class DialogColorSelect(QtWidgets.QDialog):
         self.ui.label_colour_new.setToolTip(_("New colour"))
         self.ui.label_colour_new.setText(code_['name'])
 
-    def event(self, event):
+    def eventFilter(self, object, event):
         """ Using this event filter to apply appearance of several types of colour blindness
         N normal vision
         R Red weak
@@ -282,14 +284,12 @@ class DialogColorSelect(QtWidgets.QDialog):
                 item = QtWidgets.QTableWidgetItem(text)
                 item.setToolTip(ttip)
                 if color_range == "normal":
-                    #print("n", code_color)
                     item.setBackground(QtGui.QBrush(QtGui.QColor(code_color)))
                 if color_range == "red_weak":
-                    #print("rw", colors_red_weak[row * COLS + col])
                     item.setBackground(QtGui.QBrush(QtGui.QColor(colors_red_weak[row * COLS + col])))
                 if color_range == "red_blind":
-                    #print("rb", colors_red_blind[row * COLS + col])
                     item.setBackground(QtGui.QBrush(QtGui.QColor(colors_red_blind[row * COLS + col])))
+                    item.setToolTip("rb")
                 '''if color_range == "green_weak":
                     item.setBackground(QtGui.QBrush(QtGui.QColor(colors_green_weak[row * COLS + col])))
                 if color_range == "green_blind":
