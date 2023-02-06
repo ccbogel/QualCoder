@@ -231,8 +231,8 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.redraw_scene()
 
     def get_coded_areas(self):
-        """ Get the coded area details for the rectangles.
-        Order by area descending so when items are drawn to the scen its largest to smallest on top.
+        """ Get the coded area details for the rectangles for all image files by all coders.
+        Order by area descending so when items are drawn to the scene. First largest to smallest on top.
         Called by init and by unmark. """
 
         self.code_areas = []
@@ -280,6 +280,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             item = QtWidgets.QListWidgetItem(f['name'])
             item.setToolTip(f['memo'])
             self.ui.listWidget.addItem(item)
+        self.clear_file()
 
     def get_files_from_attributes(self):
         """ Select files based on attribute selections.
@@ -545,11 +546,12 @@ class DialogCodeImage(QtWidgets.QDialog):
                 file_ = f
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-        memo_action = menu.addAction(_("Open memo"))
+        action_memo = menu.addAction(_("Open memo"))
         action_next = menu.addAction(_("Next file"))
         action_latest = menu.addAction(_("File with latest coding"))
+        action_show_files_like = menu.addAction(_("Show files like"))
         action = menu.exec(self.ui.listWidget.mapToGlobal(position))
-        if action == memo_action:
+        if action == action_memo:
             self.file_memo(file_)
         if action == action_next:
             self.go_to_next_file()
@@ -557,6 +559,34 @@ class DialogCodeImage(QtWidgets.QDialog):
         if action == action_latest:
             self.go_to_latest_coded_file()
             return
+        if action == action_show_files_like:
+            self.show_files_like()
+
+    def show_files_like(self):
+        """ Show files that contain specified filename text.
+        If blank, show all files. """
+
+        dialog = QtWidgets.QInputDialog(self)
+        dialog.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        dialog.setWindowTitle(_("Show files like"))
+        dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
+        dialog.setInputMode(QtWidgets.QInputDialog.InputMode.TextInput)
+        dialog.setLabelText(_("Show files containing the text. (Blank for all)"))
+        dialog.resize(200, 20)
+        ok = dialog.exec()
+        if not ok:
+            return
+        text_ = str(dialog.textValue())
+        if text_ == "":
+            self.get_files()
+            return
+        cur = self.app.conn.cursor()
+        cur.execute('select id from source where name like ?', ['%' + text_ + '%'])
+        res = cur.fetchall()
+        file_ids = []
+        for r in res:
+            file_ids.append(r[0])
+        self.get_files(file_ids)
 
     def file_selection_changed(self):
         """ Item selected so fill current file variable and load. """

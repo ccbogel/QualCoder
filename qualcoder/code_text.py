@@ -378,7 +378,7 @@ class DialogCodeText(QtWidgets.QWidget):
 
     def get_files(self, ids=None):
         """ Get files with additional details and fill list widget.
-         Called by: init, get_files_from_attributes
+         Called by: init, get_files_from_attributes, show_files_like
          param:
          ids: list, fill with ids to limit file selection.
          """
@@ -410,6 +410,9 @@ class DialogCodeText(QtWidgets.QWidget):
                 tt += "\nMemo: " + f['memo']
             item.setToolTip(tt)
             self.ui.listWidget.addItem(item)
+        self.file_ = None
+        self.code_text = [] # Must be before clearing textEdit, as next calls cursorChanged
+        self.ui.textEdit.setText("")
 
     def update_file_tooltip(self):
         """ Create tooltip for file containing characters, codings and from: to: if partially loaded.
@@ -2555,35 +2558,65 @@ class DialogCodeText(QtWidgets.QWidget):
                 file_ = f
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-        next_action = None
-        latest_action = None
-        next_chars_action = None
-        prev_chars_action = None
-        memo_action = menu.addAction(_("Open memo"))
+        action_next = None
+        action_latest = None
+        action_next_chars = None
+        action_prev_chars = None
+        action_show_files_like = None
+        action_memo = menu.addAction(_("Open memo"))
         if len(self.filenames) > 1:
-            next_action = menu.addAction(_("Next file"))
-            latest_action = menu.addAction(_("File with latest coding"))
+            action_next = menu.addAction(_("Next file"))
+            action_latest = menu.addAction(_("File with latest coding"))
+            action_show_files_like = menu.addAction(_("Show files like"))
         if file_['characters'] > self.app.settings['codetext_chunksize']:
-            next_chars_action = menu.addAction(str(self.app.settings['codetext_chunksize']) + _(" next  characters"))
+            action_next_chars = menu.addAction(str(self.app.settings['codetext_chunksize']) + _(" next  characters"))
             if file_['start'] > 0:
-                prev_chars_action = menu.addAction(
+                action_prev_chars = menu.addAction(
                     str(self.app.settings['codetext_chunksize']) + _(" previous  characters"))
-        go_to_bookmark_action = menu.addAction(_("Go to bookmark"))
+        action_go_to_bookmark = menu.addAction(_("Go to bookmark"))
         action = menu.exec(self.ui.listWidget.mapToGlobal(position))
         if action is None:
             return
-        if action == memo_action:
+        if action == action_memo:
             self.file_memo(file_)
-        if action == next_action:
+        if action == action_next:
             self.go_to_next_file()
-        if action == latest_action:
+        if action == action_latest:
             self.go_to_latest_coded_file()
-        if action == go_to_bookmark_action:
+        if action == action_go_to_bookmark:
             self.go_to_bookmark()
-        if action == next_chars_action:
+        if action == action_next_chars:
             self.next_chars(file_, selected)
-        if action == prev_chars_action:
+        if action == action_prev_chars:
             self.prev_chars(file_, selected)
+        if action == action_show_files_like:
+            self.show_files_like()
+
+    def show_files_like(self):
+        """ Show files that contain specified filename text.
+        If blank, show all files. """
+
+        dialog = QtWidgets.QInputDialog(self)
+        dialog.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        dialog.setWindowTitle(_("Show files like"))
+        dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
+        dialog.setInputMode(QtWidgets.QInputDialog.InputMode.TextInput)
+        dialog.setLabelText(_("Show files containing the text. (Blank for all)"))
+        dialog.resize(200, 20)
+        ok = dialog.exec()
+        if not ok:
+            return
+        text_ = str(dialog.textValue())
+        if text_ == "":
+            self.get_files()
+            return
+        cur = self.app.conn.cursor()
+        cur.execute('select id from source where name like ?', ['%' + text_ + '%'])
+        res = cur.fetchall()
+        file_ids = []
+        for r in res:
+            file_ids.append(r[0])
+        self.get_files(file_ids)
 
     def prev_chars(self, file_, selected):
         """ Load previous text chunk of the text file.

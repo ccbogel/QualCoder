@@ -264,7 +264,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.label_coder.setText(_("Coder: ") + self.app.settings['codername'])
         self.setWindowTitle(_("Media coding"))
         self.ui.listWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        self.ui.listWidget.customContextMenuRequested.connect(self.select_media_menu)
+        self.ui.listWidget.customContextMenuRequested.connect(self.file_menu)
         self.ui.listWidget.setStyleSheet(tree_font)
         self.ui.listWidget.selectionModel().selectionChanged.connect(self.file_selection_changed)
 
@@ -401,6 +401,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             item = QtWidgets.QListWidgetItem(f['name'])
             item.setToolTip(f['memo'])
             self.ui.listWidget.addItem(item)
+        self.clear_file()
 
     def get_files_from_attributes(self):
         """ Select files based on attribute selections.
@@ -634,7 +635,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             item = it.value()
             count += 1
 
-    def select_media_menu(self, position):
+    def file_menu(self, position):
         """ Context menu to select the next image alphabetically, or
          to select the image that was most recently coded """
 
@@ -650,6 +651,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         memo_action = menu.addAction(_("Open memo"))
         action_next = menu.addAction(_("Next file"))
         action_latest = menu.addAction(_("File with latest coding"))
+        action_show_files_like = menu.addAction(_("Show files like"))
         action = menu.exec(self.ui.listWidget.mapToGlobal(position))
         if action is None:
             return
@@ -684,6 +686,34 @@ class DialogCodeAV(QtWidgets.QDialog):
                     self.load_segments()
                     self.fill_code_counts_in_tree()
                     return
+        if action == action_show_files_like:
+            self.show_files_like()
+
+    def show_files_like(self):
+        """ Show files that contain specified filename text.
+        If blank, show all files. """
+
+        dialog = QtWidgets.QInputDialog(self)
+        dialog.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        dialog.setWindowTitle(_("Show files like"))
+        dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
+        dialog.setInputMode(QtWidgets.QInputDialog.InputMode.TextInput)
+        dialog.setLabelText(_("Show files containing the text. (Blank for all)"))
+        dialog.resize(200, 20)
+        ok = dialog.exec()
+        if not ok:
+            return
+        text_ = str(dialog.textValue())
+        if text_ == "":
+            self.get_files()
+            return
+        cur = self.app.conn.cursor()
+        cur.execute('select id from source where name like ?', ['%' + text_ + '%'])
+        res = cur.fetchall()
+        file_ids = []
+        for r in res:
+            file_ids.append(r[0])
+        self.get_files(file_ids)
 
     def active_file_memo(self):
         """ Send active file to file_memo method.
@@ -809,7 +839,7 @@ class DialogCodeAV(QtWidgets.QDialog):
 
     def clear_file(self):
         """ When AV file removed clear all details.
-        Called by null file with load_media, and from ManageFiles.delete. """
+        Called by null file with load_media, ManageFiles.delete, get_files """
 
         self.stop()
         self.media = None
@@ -820,7 +850,9 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.pushButton_coding.setEnabled(False)
         self.ui.textEdit.clear()
         self.transcription = None
-        self.ddialog.hide()
+        # None on init
+        if self.ddialog is not None:
+            self.ddialog.hide()
 
     def load_media(self):
         """ Add media to media dialog. """
@@ -1141,6 +1173,9 @@ class DialogCodeAV(QtWidgets.QDialog):
          This is because when beginning play again, the audio track reverts to the first track.
          Programming setting the audio track to other values does not work."""
 
+        # Occurs on init , get_files
+        if self.mediaplayer is None:
+            return
         self.mediaplayer.stop()
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
