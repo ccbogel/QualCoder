@@ -85,7 +85,7 @@ colors = [
 # www.color-blindness.com/coblis-color-blindness-simulator/
 # https://imagecolorpicker.com/en
 colors_red_weak = [
-    "#FBF4D0", "#FAF2B3", "#FBF598", "#1E1D03", "#232105", "#F6EDE0", "#F2E4CF", "#EAD4AB", "#E5C584", "#E0B75B",
+    "#FBF4D0", "#FAF2B3", "#FBF598", "#FCF892", "#efe000", "#F6EDE0", "#F2E4CF", "#EAD4AB", "#E5C584", "#E0B75B",
     "#F6ECCE", "#F3E2A9", "#F2DB81", "#F1D559", "#F1D02F", "#EFE3E2", "#E6D3D1", "#D5B5B0", "#C7978C", "#BD7C66",
     "#F3E8E1", "#EBDBD0", "#DFC4AD", "#D5AD87", "#CD9860", "#F0DFCE", "#DFC19D", "#CFA46B", "#C08939", "#B2710F",
     "#F6E5CD", "#EBCC9C", "#E0B56B", "#D69F38", "#CC8B0F", "#E4D5D3", "#C8AEA9", "#AD877E", "#966454", "#854626",
@@ -115,33 +115,33 @@ colors_red_blind = [
     ]
 
 colors_green_weak = [
-    "#", "#", "#", "#", "#", "#", "#", "#", "#", "#",
-    "#", "#", "#", "#", "#", "#", "#", "#", "#", "#",
-    "#", "#", "#", "#", "#", "#", "#", "#", "#", "#",
-    "#", "#", "#", "#", "#", "#", "#", "#", "#", "#",
-    "#", "#", "#", "#", "#", "#", "#", "#", "#", "#",
-    "#", "#", "#", "#", "#", "#", "#", "#", "#", "#",
-    "#", "#", "#", "#", "#", "#", "#", "#", "#", "#",
-    "#", "#", "#", "#", "#", "#", "#", "#", "#", "#",
-    "#", "#", "#", "#", "#", "#", "#", "#", "#", "#",
-    "#", "#", "#", "#", "#", "#", "#", "#", "#", "#",
-    "#", "#", "#", "#", "#", "#", "#", "#", "#", "#",
-    "#", "#", "#", "#", "#", "#", "#", "#", "#", "#"
+    "#FBF2DF", "#FAF0CA", "#FBF3AC", "#F3DC61", "#F3DC61", "#FCEAE4", "#FCE1D2", "#F8CFA9", "#F4BF81", "#F0B157",
+    "#FBE9D7", "#FBDEB6", "#FBD695", "#FCD073", "#FDCA51", "#FBDFE0", "#F2CFCE", "#E2B1A7", "#D5937E", "#CB7853",
+    "#FCE4E2", "#F8D7CE", "#EDBFA8", "#E3A87F", "#DB9354", "#FDDBCD", "#EDBC98", "#DD9F64", "#CD842D", "#BD6D00",
+    "#FFE2D1", "#FAC799", "#F0AF64", "#E5992E", "#D98600", "#F0D1D1", "#D4AAA3", "#B98474", "#A16145", "#8F430A",
+    "#F5D5CE", "#DCB29C", "#C58F6B", "#AE6F38", "#995304", "#E7CEDB", "#C1A4B7", "#9C7A93", "#7B536F", "#63324B",
+    "#FADFE6", "#F0D0D8", "#DFB3BA", "#D1959C", "#C77A7D", "#F7E0F7", "#EBD2F4", "#D3B7EF", "#BD9CEE", "#AA84ED",
+    "#E3D3F5", "#B7AFEA", "#888ADE", "#4368D2", "#2D49AF", "#F0DFF8", "#DED0F6", "#B9B1F3", "#8D92F4", "#3F75F1",
+    "#E6D7D3", "#BEB5A7", "#97947A", "#70734E", "#4A5323", "#F1E3E5", "#D5CBCB", "#B9B4B0", "#9D9E95", "#82877B",
+    "#EDECE6", "#E0E5D4", "#D1E3C2", "#C2E2B2", "#A2E496", "#F4F1E7", "#EDECD7", "#E0E5B6", "#D1E197", "#C2E17E",
+    "#EEEAC0", "#E7E8A8", "#E1E893", "#DAEA82", "#D1E86B", "#EDECF7", "#DAE7F5", "#C7E6F7", "#B6E7F8", "#8CDCF4",
+    "#E1D8F5", "#B3B6EC", "#8094E2", "#3474D8", "#1954B0", "#E0DDF7", "#BDCAF6", "#98B8F8", "#5693DC", "#2087F7",
+    "#DCD5ED", "#AAB1DA", "#778FC7", "#3C6CB3", "#054B8F", "#F6E3E9", "#E5D4D9", "#D4C4C9", "#C3B4B9", "#B2A5A9"
     ]
 
 colors_green_blind = [
-    "#", "#", "#", "#", "#", "#", "#", "#", "#", "#",
-    "#", "#", "#", "#", "#", "#", "#", "#", "#", "#",
-    "#", "#", "#", "#", "#", "#", "#", "#", "#", "#",
-    "#", "#", "#", "#", "#", "#", "#", "#", "#", "#",
-    "#", "#", "#", "#", "#", "#", "#", "#", "#", "#",
-    "#", "#", "#", "#", "#", "#", "#", "#", "#", "#",
-    "#", "#", "#", "#", "#", "#", "#", "#", "#", "#",
-    "#", "#", "#", "#", "#", "#", "#", "#", "#", "#",
-    "#", "#", "#", "#", "#", "#", "#", "#", "#", "#",
-    "#", "#", "#", "#", "#", "#", "#", "#", "#", "#",
-    "#", "#", "#", "#", "#", "#", "#", "#", "#", "#",
-    "#", "#", "#", "#", "#", "#", "#", "#", "#", "#"
+    "#fff0e9", "#ffeddd", "#ffefdc", "#fff2e3", "#ffd698", "#ffe9e6", "#ffdfd4", "#facea9", "#f2c081", "#eab456",
+    "#ffe7dd", "#ffdcbe", "#ffd4a0", "#ffce83", "#ffc865", "#fddee0", "#f0d0ce", "#d7b6a7", "#c19e7c", "#b18a50",
+    "#ffe3e2", "#fad7ce", "#e8c1a8", "#d8ae7e", "#ca9c52", "#ffdacd", "#e9be98", "#d2a563", "#bc8e2a", "#a67d00",
+    "#ffe1d4", "#f7c898", "#e7b363", "#d6a12b", "#c49300", "#f0d1d1", "#ccada2", "#a98b72", "#8d6e43", "#785a00",
+    "#f6d4ce", "#d8b49c", "#ba956a", "#9e7936", "#846300", "#e6cedb", "#b8a7b6", "#8d8292", "#675f6d", "#4f4649",
+    "#fcdfe6", "#edd1d7", "#d2b8b9", "#bba09a", "#a98d7a", "#f7e1f7", "#e4d5f4", "#c0bfee", "#9cabeb", "#7c9ce9",
+    "#e2d4f5", "#acb2e9", "#7192dd", "#1476d0", "#005d9e", "#f2def8", "#dcd1f5", "#acb6f2", "#719cf2", "#0085eb",
+    "#f2d3d4", "#ceb0a8", "#aa8e7b", "#876d4f", "#654d25", "#fcdfe6", "#e2c7cb", "#c9b0b1", "#af9896", "#96817c",
+    "#ffe7e8", "#ffdcd6", "#fed7c5", "#ffd4b6", "#ffd5a3", "#ffedeb", "#ffe6dc", "#ffdbbe", "#ffd5a4", "#ffd293",
+    "#ffe4cd", "#ffe0be", "#ffdeb4", "#ffdeb2", "#ffdba8", "#ffe7f8", "#f5e0f6", "#efdcf9", "#ecdbfb", "#dbd1f7",
+    "#e5d6f6", "#b1b6ec", "#7797e1", "#1479d7", "#005c9d", "#ebdaf8", "#c9c7f7", "#a5b5f9", "#6a90dd", "#008bf5",
+    "#e4d3ed", "#b1afda", "#7c8dc7", "#3c6cb3", "#004e85", "#fde1e9", "#ecd1d9", "#dac2c9", "#c9b2b9", "#b8a3a9"
     ]
 
 COLS = 10
@@ -230,7 +230,7 @@ class DialogColorSelect(QtWidgets.QDialog):
                 self.fill_table("green_blind")
                 return True
             if key == QtCore.Qt.Key.Key_G:
-                self.fill_table("green weak")
+                self.fill_table("green_weak")
                 return True
         return False
 
@@ -290,10 +290,10 @@ class DialogColorSelect(QtWidgets.QDialog):
                 if color_range == "red_blind":
                     item.setBackground(QtGui.QBrush(QtGui.QColor(colors_red_blind[row * COLS + col])))
                     item.setToolTip("rb")
-                '''if color_range == "green_weak":
+                if color_range == "green_weak":
                     item.setBackground(QtGui.QBrush(QtGui.QColor(colors_green_weak[row * COLS + col])))
                 if color_range == "green_blind":
-                    item.setBackground(QtGui.QBrush(QtGui.QColor(colors_green_blind[row * COLS + col])))'''
+                    item.setBackground(QtGui.QBrush(QtGui.QColor(colors_green_blind[row * COLS + col])))
                 item.setForeground(QtGui.QBrush(QtGui.QColor(TextColor(code_color).recommendation)))
                 item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
                 self.ui.tableWidget.setItem(row, col, item)
