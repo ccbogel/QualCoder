@@ -85,7 +85,7 @@ colors = [
 # www.color-blindness.com/coblis-color-blindness-simulator/
 # https://imagecolorpicker.com/en
 colors_red_weak = [
-    "#FBF4D0", "#FAF2B3", "#FBF598", "#1E1D03", "#232105", "#F6EDE0", "#F2E4CF", "#EAD4AB", "#E5C584", "#E0B75B",
+    "#FBF4D0", "#FAF2B3", "#FBF598", "#FCF892", "#efe000", "#F6EDE0", "#F2E4CF", "#EAD4AB", "#E5C584", "#E0B75B",
     "#F6ECCE", "#F3E2A9", "#F2DB81", "#F1D559", "#F1D02F", "#EFE3E2", "#E6D3D1", "#D5B5B0", "#C7978C", "#BD7C66",
     "#F3E8E1", "#EBDBD0", "#DFC4AD", "#D5AD87", "#CD9860", "#F0DFCE", "#DFC19D", "#CFA46B", "#C08939", "#B2710F",
     "#F6E5CD", "#EBCC9C", "#E0B56B", "#D69F38", "#CC8B0F", "#E4D5D3", "#C8AEA9", "#AD877E", "#966454", "#854626",
@@ -103,7 +103,7 @@ colors_red_blind = [
     "#FFF3D0", "#FFF0B9", "#FFF1BC", "#FFF4CC", "#F9DD00", "#F5EDE0", "#EFE5CF", "#E4D6AC", "#DAC985", "#D1BD5D",
     "#F7EBCE", "#F3E2A9", "#F0DC82", "#EED659", "#EBD22F", "#EAE4E3", "#DCD7D3", "#C3BCB3", "#ACA492", "#9B906E",
     "#F0E9E1", "#E5DDD1", "#D3C9AF", "#C2B58B", "#B3A464", "#EAE1CF", "#D2C69F", "#BCAD6F", "#A7963D", "#948418",
-    "#F1E7CE", "#F1E7CE", "#CEBC6D", "#BEAA3B", "#AF9C18", "#DDD7D5", "#B9B3AC", "#979183", "#7B735A", "#695F2C",
+    "#F1E7CE", "#E0d19E", "#CEBC6D", "#BEAA3B", "#AF9C18", "#DDD7D5", "#B9B3AC", "#979183", "#7B735A", "#695F2C",
     "#E3DBD1", "#C4BAA3", "#A69B76", "#8C7F47", "#766919", "#D6D4DE", "#A9ABC0", "#7E84A4", "#55618A", "#394770",
     "#E9E5E9", "#DBD7DD", "#BFBDC8", "#A5A5B4", "#9192A1", "#E6E6FB", "#D4D9FC", "#B2C1FF", "#91ABFF", "#749AFF",
     "#D4D8F8", "#A4B4F4", "#6B90F3", "#006FED", "#0057B7", "#E2E3FA", "#CFD4FA", "#A3B6FF", "#7399FF", "#337FFF",
@@ -115,33 +115,33 @@ colors_red_blind = [
     ]
 
 colors_green_weak = [
-    "#", "#", "#", "#", "#", "#", "#", "#", "#", "#",
-    "#", "#", "#", "#", "#", "#", "#", "#", "#", "#",
-    "#", "#", "#", "#", "#", "#", "#", "#", "#", "#",
-    "#", "#", "#", "#", "#", "#", "#", "#", "#", "#",
-    "#", "#", "#", "#", "#", "#", "#", "#", "#", "#",
-    "#", "#", "#", "#", "#", "#", "#", "#", "#", "#",
-    "#", "#", "#", "#", "#", "#", "#", "#", "#", "#",
-    "#", "#", "#", "#", "#", "#", "#", "#", "#", "#",
-    "#", "#", "#", "#", "#", "#", "#", "#", "#", "#",
-    "#", "#", "#", "#", "#", "#", "#", "#", "#", "#",
-    "#", "#", "#", "#", "#", "#", "#", "#", "#", "#",
-    "#", "#", "#", "#", "#", "#", "#", "#", "#", "#"
+    "#FBF2DF", "#FAF0CA", "#FBF3AC", "#FCF7A1", "#F3DC61", "#FCEAE4", "#FCE1D2", "#F8CFA9", "#F4BF81", "#F0B157",
+    "#FBE9D7", "#FBDEB6", "#FBD695", "#FCD073", "#FDCA51", "#FBDFE0", "#F2CFCE", "#E2B1A7", "#D5937E", "#CB7853",
+    "#FCE4E2", "#F8D7CE", "#EDBFA8", "#E3A87F", "#DB9354", "#FDDBCD", "#EDBC98", "#DD9F64", "#CD842D", "#BD6D00",
+    "#FFE2D1", "#FAC799", "#F0AF64", "#E5992E", "#D98600", "#F0D1D1", "#D4AAA3", "#B98474", "#A16145", "#8F430A",
+    "#F5D5CE", "#DCB29C", "#C58F6B", "#AE6F38", "#995304", "#E7CEDB", "#C1A4B7", "#9C7A93", "#7B536F", "#63324B",
+    "#FADFE6", "#F0D0D8", "#DFB3BA", "#D1959C", "#C77A7D", "#F7E0F7", "#EBD2F4", "#D3B7EF", "#BD9CEE", "#AA84ED",
+    "#E3D3F5", "#B7AFEA", "#888ADE", "#4368D2", "#2D49AF", "#F0DFF8", "#DED0F6", "#B9B1F3", "#8D92F4", "#3F75F1",
+    "#E6D7D3", "#BEB5A7", "#97947A", "#70734E", "#4A5323", "#F1E3E5", "#D5CBCB", "#B9B4B0", "#9D9E95", "#82877B",
+    "#EDECE6", "#E0E5D4", "#D1E3C2", "#C2E2B2", "#A2E496", "#F4F1E7", "#EDECD7", "#E0E5B6", "#D1E197", "#C2E17E",
+    "#EEEAC0", "#E7E8A8", "#E1E893", "#DAEA82", "#D1E86B", "#EDECF7", "#DAE7F5", "#C7E6F7", "#B6E7F8", "#8CDCF4",
+    "#E1D8F5", "#B3B6EC", "#8094E2", "#3474D8", "#1954B0", "#E0DDF7", "#BDCAF6", "#98B8F8", "#5693DC", "#2087F7",
+    "#DCD5ED", "#AAB1DA", "#778FC7", "#3C6CB3", "#054B8F", "#F6E3E9", "#E5D4D9", "#D4C4C9", "#C3B4B9", "#B2A5A9"
     ]
 
 colors_green_blind = [
-    "#", "#", "#", "#", "#", "#", "#", "#", "#", "#",
-    "#", "#", "#", "#", "#", "#", "#", "#", "#", "#",
-    "#", "#", "#", "#", "#", "#", "#", "#", "#", "#",
-    "#", "#", "#", "#", "#", "#", "#", "#", "#", "#",
-    "#", "#", "#", "#", "#", "#", "#", "#", "#", "#",
-    "#", "#", "#", "#", "#", "#", "#", "#", "#", "#",
-    "#", "#", "#", "#", "#", "#", "#", "#", "#", "#",
-    "#", "#", "#", "#", "#", "#", "#", "#", "#", "#",
-    "#", "#", "#", "#", "#", "#", "#", "#", "#", "#",
-    "#", "#", "#", "#", "#", "#", "#", "#", "#", "#",
-    "#", "#", "#", "#", "#", "#", "#", "#", "#", "#",
-    "#", "#", "#", "#", "#", "#", "#", "#", "#", "#"
+    "#FFF0E9", "#FFEDDD", "#FFEFDC", "#FFF2E3", "#FFD698", "#FFE9E6", "#FFDFD4", "#FACEA9", "#F2C081", "#EAB456",
+    "#FFE7DD", "#FFDCBE", "#FFD4A0", "#FFCE83", "#FFC865", "#FDDEE0", "#F0D0CE", "#D7B6A7", "#C19E7C", "#B18A50",
+    "#FFE3E2", "#FAD7CE", "#E8C1A8", "#D8AE7E", "#CA9C52", "#FFDACD", "#E9BE98", "#D2A563", "#BC8E2A", "#A67D00",
+    "#FFE1D4", "#F7C898", "#E7B363", "#D6A12B", "#C49300", "#F0D1D1", "#CCADA2", "#A98B72", "#8D6E43", "#785A00",
+    "#F6D4CE", "#D8B49C", "#BA956A", "#9E7936", "#846300", "#E6CEDB", "#B8A7B6", "#8D8292", "#675F6D", "#4F4649",
+    "#FCDFE6", "#EDD1D7", "#D2B8B9", "#BBA09A", "#A98D7A", "#F7E1F7", "#E4D5F4", "#C0BFEE", "#9CABEB", "#7C9CE9",
+    "#E2D4F5", "#ACB2E9", "#7192DD", "#1476D0", "#005D9E", "#F2DEF8", "#DCD1F5", "#ACB6F2", "#719CF2", "#0085EB",
+    "#F2D3D4", "#CEB0A8", "#AA8E7B", "#876D4F", "#654D25", "#FCDFE6", "#E2C7CB", "#C9B0B1", "#AF9896", "#96817C",
+    "#FFE7E8", "#FFDCD6", "#FED7C5", "#FFD4B6", "#FFD5A3", "#FFEDEB", "#FFE6DC", "#FFDBBE", "#FFD5A4", "#FFD293",
+    "#FFE4CD", "#FFE0BE", "#FFDEB4", "#FFDEB2", "#FFDBA8", "#FFE7F8", "#F5E0F6", "#EFDCF9", "#ECDBFB", "#DBD1F7",
+    "#E5D6F6", "#B1B6EC", "#7797E1", "#1479D7", "#005C9D", "#EBDAF8", "#C9C7F7", "#A5B5F9", "#6A90DD", "#008BF5",
+    "#E4D3ED", "#B1AFDA", "#7C8DC7", "#3C6CB3", "#004E85", "#FDE1E9", "#ECD1D9", "#DAC2C9", "#C9B2B9", "#B8A3A9"
     ]
 
 COLS = 10
@@ -176,6 +176,7 @@ class DialogColorSelect(QtWidgets.QDialog):
 
     selected_color = None
     used_colors = []
+    categories = []
 
     def __init__(self, app, code_, parent=None):
 
@@ -184,17 +185,17 @@ class DialogColorSelect(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_colour_selector()
         self.ui.setupUi(self)
-        cur = app.conn.cursor()
-        cur.execute("select color, name from code_name order by name")
-        self.used_colors = cur.fetchall()
-        self.fill_table()
-        self.ui.tableWidget.installEventFilter(self)
-        self.ui.tableWidget.setFocus()
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
+        self.app = app
         font = 'font: ' + str(app.settings['fontsize']) + 'pt '
         font += '"' + app.settings['font'] + '";'
         self.setStyleSheet(font)
         self.selected_color = code_['color']
+        self.ui.tableWidget.setStyleSheet("border: none; font-size: 10px")
+        cur = app.conn.cursor()
+        cur.execute("select color, name from code_name order by name")
+        self.used_colors = cur.fetchall()
+        self.fill_table()
         # preset with the current colour
         fg_color = TextColor(code_['color']).recommendation
         style = "QLabel {background-color :" + code_['color'] + "; color : " + fg_color + ";}"
@@ -204,35 +205,23 @@ class DialogColorSelect(QtWidgets.QDialog):
         self.ui.label_colour_old.setText(code_['name'])
         self.ui.label_colour_new.setToolTip(_("New colour"))
         self.ui.label_colour_new.setText(code_['name'])
+        self.ui.radioButton_normal.toggled.connect(self.on_clicked)
+        self.ui.radioButton_red_weak.toggled.connect(self.on_clicked)
+        self.ui.radioButton_red_blind.toggled.connect(self.on_clicked)
+        self.ui.radioButton_green_weak.toggled.connect(self.on_clicked)
+        self.ui.radioButton_green_blind.toggled.connect(self.on_clicked)
 
-    def eventFilter(self, object, event):
-        """ Using this event filter to apply appearance of several types of colour blindness
-        N normal vision
-        R Red weak
-        Shift R Red blind
-        G Green Weak
-        Shift G Green blind
-        """
-
-        if type(event) == QtGui.QKeyEvent:
-            key = event.key()
-            mod = event.modifiers()
-            if key == QtCore.Qt.Key.Key_N:
-                self.fill_table()
-                return True
-            if key == QtCore.Qt.Key.Key_R and mod == QtCore.Qt.KeyboardModifier.ShiftModifier:
-                self.fill_table("red_blind")
-                return True
-            if key == QtCore.Qt.Key.Key_R:
-                self.fill_table("red_weak")
-                return True
-            if key == QtCore.Qt.Key.Key_G and mod == QtCore.Qt.KeyboardModifier.ShiftModifier:
-                self.fill_table("green_blind")
-                return True
-            if key == QtCore.Qt.Key.Key_G:
-                self.fill_table("green weak")
-                return True
-        return False
+    def on_clicked(self):
+        if self.ui.radioButton_normal.isChecked():
+            self.fill_table()
+        if self.ui.radioButton_red_weak.isChecked():
+            self.fill_table("red_weak")
+        if self.ui.radioButton_red_blind.isChecked():
+            self.fill_table("red_blind")
+        if self.ui.radioButton_green_weak.isChecked():
+            self.fill_table("green_weak")
+        if self.ui.radioButton_green_blind.isChecked():
+            self.fill_table("green_blind")
 
     def color_selected(self):
         """ Get colour selection from table widget. """
@@ -258,7 +247,7 @@ class DialogColorSelect(QtWidgets.QDialog):
 
     def fill_table(self, color_range="normal"):
         """ Twelve rows of ten columns of colours.
-        normal, red weak, red blnd, green weak, green blind
+        normal, red weak, red blind, green weak, green blind
         param:
         color_range: String
         """
@@ -271,9 +260,7 @@ class DialogColorSelect(QtWidgets.QDialog):
         self.ui.tableWidget.verticalHeader().setVisible(False)
         self.ui.tableWidget.horizontalHeader().setVisible(False)
         for row in range(0, ROWS):
-            self.ui.tableWidget.setRowHeight(row, 31)
             for col in range(0, COLS):
-                self.ui.tableWidget.setColumnWidth(col, 52)
                 code_color = colors[row * COLS + col]
                 text = ""
                 ttip = ""
@@ -289,12 +276,16 @@ class DialogColorSelect(QtWidgets.QDialog):
                     item.setBackground(QtGui.QBrush(QtGui.QColor(colors_red_weak[row * COLS + col])))
                 if color_range == "red_blind":
                     item.setBackground(QtGui.QBrush(QtGui.QColor(colors_red_blind[row * COLS + col])))
-                    item.setToolTip("rb")
-                '''if color_range == "green_weak":
+                if color_range == "green_weak":
                     item.setBackground(QtGui.QBrush(QtGui.QColor(colors_green_weak[row * COLS + col])))
                 if color_range == "green_blind":
-                    item.setBackground(QtGui.QBrush(QtGui.QColor(colors_green_blind[row * COLS + col])))'''
+                    item.setBackground(QtGui.QBrush(QtGui.QColor(colors_green_blind[row * COLS + col])))
                 item.setForeground(QtGui.QBrush(QtGui.QColor(TextColor(code_color).recommendation)))
                 item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
+                item.setFont(QtGui.QFont("Times", 10))
                 self.ui.tableWidget.setItem(row, col, item)
+                self.ui.tableWidget.setColumnWidth(col, 38)
+            self.ui.tableWidget.setRowHeight(row, 22)
+        #self.ui.tableWidget.resizeColumnsToContents()
+        #self.ui.tableWidget.resizeRowsToContents()
         self.ui.tableWidget.cellClicked.connect(self.color_selected)
