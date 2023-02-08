@@ -103,7 +103,7 @@ colors_red_blind = [
     "#FFF3D0", "#FFF0B9", "#FFF1BC", "#FFF4CC", "#F9DD00", "#F5EDE0", "#EFE5CF", "#E4D6AC", "#DAC985", "#D1BD5D",
     "#F7EBCE", "#F3E2A9", "#F0DC82", "#EED659", "#EBD22F", "#EAE4E3", "#DCD7D3", "#C3BCB3", "#ACA492", "#9B906E",
     "#F0E9E1", "#E5DDD1", "#D3C9AF", "#C2B58B", "#B3A464", "#EAE1CF", "#D2C69F", "#BCAD6F", "#A7963D", "#948418",
-    "#F1E7CE", "#F1E7CE", "#CEBC6D", "#BEAA3B", "#AF9C18", "#DDD7D5", "#B9B3AC", "#979183", "#7B735A", "#695F2C",
+    "#F1E7CE", "#E0d19E", "#CEBC6D", "#BEAA3B", "#AF9C18", "#DDD7D5", "#B9B3AC", "#979183", "#7B735A", "#695F2C",
     "#E3DBD1", "#C4BAA3", "#A69B76", "#8C7F47", "#766919", "#D6D4DE", "#A9ABC0", "#7E84A4", "#55618A", "#394770",
     "#E9E5E9", "#DBD7DD", "#BFBDC8", "#A5A5B4", "#9192A1", "#E6E6FB", "#D4D9FC", "#B2C1FF", "#91ABFF", "#749AFF",
     "#D4D8F8", "#A4B4F4", "#6B90F3", "#006FED", "#0057B7", "#E2E3FA", "#CFD4FA", "#A3B6FF", "#7399FF", "#337FFF",
@@ -115,7 +115,7 @@ colors_red_blind = [
     ]
 
 colors_green_weak = [
-    "#FBF2DF", "#FAF0CA", "#FBF3AC", "#F3DC61", "#F3DC61", "#FCEAE4", "#FCE1D2", "#F8CFA9", "#F4BF81", "#F0B157",
+    "#FBF2DF", "#FAF0CA", "#FBF3AC", "#FCF7A1", "#F3DC61", "#FCEAE4", "#FCE1D2", "#F8CFA9", "#F4BF81", "#F0B157",
     "#FBE9D7", "#FBDEB6", "#FBD695", "#FCD073", "#FDCA51", "#FBDFE0", "#F2CFCE", "#E2B1A7", "#D5937E", "#CB7853",
     "#FCE4E2", "#F8D7CE", "#EDBFA8", "#E3A87F", "#DB9354", "#FDDBCD", "#EDBC98", "#DD9F64", "#CD842D", "#BD6D00",
     "#FFE2D1", "#FAC799", "#F0AF64", "#E5992E", "#D98600", "#F0D1D1", "#D4AAA3", "#B98474", "#A16145", "#8F430A",
@@ -130,18 +130,18 @@ colors_green_weak = [
     ]
 
 colors_green_blind = [
-    "#fff0e9", "#ffeddd", "#ffefdc", "#fff2e3", "#ffd698", "#ffe9e6", "#ffdfd4", "#facea9", "#f2c081", "#eab456",
-    "#ffe7dd", "#ffdcbe", "#ffd4a0", "#ffce83", "#ffc865", "#fddee0", "#f0d0ce", "#d7b6a7", "#c19e7c", "#b18a50",
-    "#ffe3e2", "#fad7ce", "#e8c1a8", "#d8ae7e", "#ca9c52", "#ffdacd", "#e9be98", "#d2a563", "#bc8e2a", "#a67d00",
-    "#ffe1d4", "#f7c898", "#e7b363", "#d6a12b", "#c49300", "#f0d1d1", "#ccada2", "#a98b72", "#8d6e43", "#785a00",
-    "#f6d4ce", "#d8b49c", "#ba956a", "#9e7936", "#846300", "#e6cedb", "#b8a7b6", "#8d8292", "#675f6d", "#4f4649",
-    "#fcdfe6", "#edd1d7", "#d2b8b9", "#bba09a", "#a98d7a", "#f7e1f7", "#e4d5f4", "#c0bfee", "#9cabeb", "#7c9ce9",
-    "#e2d4f5", "#acb2e9", "#7192dd", "#1476d0", "#005d9e", "#f2def8", "#dcd1f5", "#acb6f2", "#719cf2", "#0085eb",
-    "#f2d3d4", "#ceb0a8", "#aa8e7b", "#876d4f", "#654d25", "#fcdfe6", "#e2c7cb", "#c9b0b1", "#af9896", "#96817c",
-    "#ffe7e8", "#ffdcd6", "#fed7c5", "#ffd4b6", "#ffd5a3", "#ffedeb", "#ffe6dc", "#ffdbbe", "#ffd5a4", "#ffd293",
-    "#ffe4cd", "#ffe0be", "#ffdeb4", "#ffdeb2", "#ffdba8", "#ffe7f8", "#f5e0f6", "#efdcf9", "#ecdbfb", "#dbd1f7",
-    "#e5d6f6", "#b1b6ec", "#7797e1", "#1479d7", "#005c9d", "#ebdaf8", "#c9c7f7", "#a5b5f9", "#6a90dd", "#008bf5",
-    "#e4d3ed", "#b1afda", "#7c8dc7", "#3c6cb3", "#004e85", "#fde1e9", "#ecd1d9", "#dac2c9", "#c9b2b9", "#b8a3a9"
+    "#FFF0E9", "#FFEDDD", "#FFEFDC", "#FFF2E3", "#FFD698", "#FFE9E6", "#FFDFD4", "#FACEA9", "#F2C081", "#EAB456",
+    "#FFE7DD", "#FFDCBE", "#FFD4A0", "#FFCE83", "#FFC865", "#FDDEE0", "#F0D0CE", "#D7B6A7", "#C19E7C", "#B18A50",
+    "#FFE3E2", "#FAD7CE", "#E8C1A8", "#D8AE7E", "#CA9C52", "#FFDACD", "#E9BE98", "#D2A563", "#BC8E2A", "#A67D00",
+    "#FFE1D4", "#F7C898", "#E7B363", "#D6A12B", "#C49300", "#F0D1D1", "#CCADA2", "#A98B72", "#8D6E43", "#785A00",
+    "#F6D4CE", "#D8B49C", "#BA956A", "#9E7936", "#846300", "#E6CEDB", "#B8A7B6", "#8D8292", "#675F6D", "#4F4649",
+    "#FCDFE6", "#EDD1D7", "#D2B8B9", "#BBA09A", "#A98D7A", "#F7E1F7", "#E4D5F4", "#C0BFEE", "#9CABEB", "#7C9CE9",
+    "#E2D4F5", "#ACB2E9", "#7192DD", "#1476D0", "#005D9E", "#F2DEF8", "#DCD1F5", "#ACB6F2", "#719CF2", "#0085EB",
+    "#F2D3D4", "#CEB0A8", "#AA8E7B", "#876D4F", "#654D25", "#FCDFE6", "#E2C7CB", "#C9B0B1", "#AF9896", "#96817C",
+    "#FFE7E8", "#FFDCD6", "#FED7C5", "#FFD4B6", "#FFD5A3", "#FFEDEB", "#FFE6DC", "#FFDBBE", "#FFD5A4", "#FFD293",
+    "#FFE4CD", "#FFE0BE", "#FFDEB4", "#FFDEB2", "#FFDBA8", "#FFE7F8", "#F5E0F6", "#EFDCF9", "#ECDBFB", "#DBD1F7",
+    "#E5D6F6", "#B1B6EC", "#7797E1", "#1479D7", "#005C9D", "#EBDAF8", "#C9C7F7", "#A5B5F9", "#6A90DD", "#008BF5",
+    "#E4D3ED", "#B1AFDA", "#7C8DC7", "#3C6CB3", "#004E85", "#FDE1E9", "#ECD1D9", "#DAC2C9", "#C9B2B9", "#B8A3A9"
     ]
 
 COLS = 10
@@ -204,8 +204,27 @@ class DialogColorSelect(QtWidgets.QDialog):
         self.ui.label_colour_old.setText(code_['name'])
         self.ui.label_colour_new.setToolTip(_("New colour"))
         self.ui.label_colour_new.setText(code_['name'])
+        self.ui.radioButton.toggled.connect(self.on_clicked)
+        self.ui.radioButton_2.toggled.connect(self.on_clicked)
+        self.ui.radioButton_3.toggled.connect(self.on_clicked)
+        self.ui.radioButton_4.toggled.connect(self.on_clicked)
+        self.ui.radioButton_5.toggled.connect(self.on_clicked)
 
-    def eventFilter(self, object, event):
+
+    def on_clicked(self):
+        #self.ui.radioButton = self.sender()
+        if self.ui.radioButton.isChecked():
+            self.fill_table()
+        if self.ui.radioButton_2.isChecked():
+            self.fill_table("red_weak")
+        if self.ui.radioButton_3.isChecked():
+            self.fill_table("red_blind")
+        if self.ui.radioButton_4.isChecked():
+            self.fill_table("green_weak")
+        if self.ui.radioButton_5.isChecked():
+            self.fill_table("green_blind")
+
+    '''def eventFilter(self, object, event):
         """ Using this event filter to apply appearance of several types of colour blindness
         N normal vision
         R Red weak
@@ -232,7 +251,7 @@ class DialogColorSelect(QtWidgets.QDialog):
             if key == QtCore.Qt.Key.Key_G:
                 self.fill_table("green_weak")
                 return True
-        return False
+        return False'''
 
     def color_selected(self):
         """ Get colour selection from table widget. """
@@ -271,9 +290,9 @@ class DialogColorSelect(QtWidgets.QDialog):
         self.ui.tableWidget.verticalHeader().setVisible(False)
         self.ui.tableWidget.horizontalHeader().setVisible(False)
         for row in range(0, ROWS):
-            self.ui.tableWidget.setRowHeight(row, 31)
+            #self.ui.tableWidget.setRowHeight(row, 25)
             for col in range(0, COLS):
-                self.ui.tableWidget.setColumnWidth(col, 52)
+                #self.ui.tableWidget.setColumnWidth(col, 25)
                 code_color = colors[row * COLS + col]
                 text = ""
                 ttip = ""
@@ -289,7 +308,6 @@ class DialogColorSelect(QtWidgets.QDialog):
                     item.setBackground(QtGui.QBrush(QtGui.QColor(colors_red_weak[row * COLS + col])))
                 if color_range == "red_blind":
                     item.setBackground(QtGui.QBrush(QtGui.QColor(colors_red_blind[row * COLS + col])))
-                    item.setToolTip("rb")
                 if color_range == "green_weak":
                     item.setBackground(QtGui.QBrush(QtGui.QColor(colors_green_weak[row * COLS + col])))
                 if color_range == "green_blind":
@@ -297,4 +315,6 @@ class DialogColorSelect(QtWidgets.QDialog):
                 item.setForeground(QtGui.QBrush(QtGui.QColor(TextColor(code_color).recommendation)))
                 item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
                 self.ui.tableWidget.setItem(row, col, item)
+                self.ui.tableWidget.setColumnWidth(col, 32)
+            self.ui.tableWidget.setRowHeight(row, 16)
         self.ui.tableWidget.cellClicked.connect(self.color_selected)
