@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>650</width>
-    <height>500</height>
+    <height>450</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -19,19 +19,34 @@
   <property name="minimumSize">
    <size>
     <width>650</width>
-    <height>500</height>
+    <height>450</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>650</width>
-    <height>500</height>
+    <height>450</height>
    </size>
   </property>
   <property name="windowTitle">
    <string>Colour selector</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>3</number>
+   </property>
+   <property name="leftMargin">
+    <number>3</number>
+   </property>
+   <property name="topMargin">
+    <number>9</number>
+   </property>
+   <property name="rightMargin">
+    <number>3</number>
+   </property>
+   <property name="bottomMargin">
+    <number>9</number>
+   </property>
    <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="minimumSize">
@@ -123,135 +138,112 @@
      <property name="title">
       <string/>
      </property>
-     <widget class="QLabel" name="label">
-      <property name="geometry">
-       <rect>
-        <x>440</x>
-        <y>20</y>
-        <width>161</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show how colours are seen with common types of colour blindness.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-      <property name="text">
-       <string>Colour vision</string>
-      </property>
-     </widget>
-     <widget class="QTableWidget" name="tableWidget">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>20</y>
-        <width>394</width>
-        <height>265</height>
-       </rect>
-      </property>
-      <property name="minimumSize">
-       <size>
-        <width>394</width>
-        <height>265</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>394</width>
-        <height>265</height>
-       </size>
-      </property>
-     </widget>
-     <widget class="QRadioButton" name="radioButton">
-      <property name="geometry">
-       <rect>
-        <x>440</x>
-        <y>60</y>
-        <width>181</width>
-        <height>23</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Normal</string>
-      </property>
-      <property name="checked">
-       <bool>true</bool>
-      </property>
-     </widget>
-     <widget class="QRadioButton" name="radioButton_2">
-      <property name="geometry">
-       <rect>
-        <x>440</x>
-        <y>90</y>
-        <width>181</width>
-        <height>23</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Red weak</string>
-      </property>
-     </widget>
-     <widget class="QRadioButton" name="radioButton_3">
-      <property name="geometry">
-       <rect>
-        <x>440</x>
-        <y>120</y>
-        <width>181</width>
-        <height>23</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Red blind</string>
-      </property>
-     </widget>
-     <widget class="QRadioButton" name="radioButton_4">
-      <property name="geometry">
-       <rect>
-        <x>440</x>
-        <y>150</y>
-        <width>181</width>
-        <height>23</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Green weak</string>
-      </property>
-     </widget>
-     <widget class="QRadioButton" name="radioButton_5">
-      <property name="geometry">
-       <rect>
-        <x>440</x>
-        <y>180</y>
-        <width>181</width>
-        <height>23</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Green blind</string>
-      </property>
-     </widget>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0">
+       <widget class="QTableWidget" name="tableWidget">
+        <property name="minimumSize">
+         <size>
+          <width>420</width>
+          <height>280</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>420</width>
+          <height>280</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QGroupBox" name="groupBox_color_vision">
+        <property name="minimumSize">
+         <size>
+          <width>180</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>2000</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="title">
+         <string>Color vision</string>
+        </property>
+        <widget class="QRadioButton" name="radioButton_normal">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>30</y>
+           <width>181</width>
+           <height>23</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Normal</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+        <widget class="QRadioButton" name="radioButton_red_weak">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>60</y>
+           <width>181</width>
+           <height>23</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Red weak</string>
+         </property>
+        </widget>
+        <widget class="QRadioButton" name="radioButton_red_blind">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>90</y>
+           <width>181</width>
+           <height>23</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Red blind</string>
+         </property>
+        </widget>
+        <widget class="QRadioButton" name="radioButton_green_weak">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>120</y>
+           <width>181</width>
+           <height>23</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Green weak</string>
+         </property>
+        </widget>
+        <widget class="QRadioButton" name="radioButton_green_blind">
+         <property name="geometry">
+          <rect>
+           <x>10</x>
+           <y>150</y>
+           <width>181</width>
+           <height>23</height>
+          </rect>
+         </property>
+         <property name="text">
+          <string>Green blind</string>
+         </property>
+        </widget>
+       </widget>
+      </item>
+     </layout>
     </widget>
-   </item>
-   <item>
-    <widget class="QLabel" name="label_2">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>34</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>16777215</width>
-       <height>34</height>
-      </size>
-     </property>
-     <property name="text">
-      <string>Apply colour range to category</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <widget class="QComboBox" name="comboBox"/>
    </item>
   </layout>
  </widget>
