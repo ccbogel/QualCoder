@@ -253,6 +253,16 @@ class App(object):
         self.project_name = project_path.split('/')[-1]
         self.conn = sqlite3.connect(os.path.join(project_path, 'data.qda'))
 
+    def get_category_names(self):
+        cur = self.conn.cursor()
+        cur.execute("select name, memo, owner, date, catid, supercatid from code_cat order by lower(name)")
+        result = cur.fetchall()
+        res = []
+        keys = 'name', 'memo', 'owner', 'date', 'catid', 'supercatid'
+        for row in result:
+            res.append(dict(zip(keys, row)))
+        return res
+
     def get_code_names(self):
         cur = self.conn.cursor()
         cur.execute("select name, memo, owner, date, cid, catid, color from code_name order by lower(name)")

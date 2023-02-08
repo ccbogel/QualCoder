@@ -176,6 +176,7 @@ class DialogColorSelect(QtWidgets.QDialog):
 
     selected_color = None
     used_colors = []
+    categories = []
 
     def __init__(self, app, code_, parent=None):
 
@@ -184,17 +185,17 @@ class DialogColorSelect(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_colour_selector()
         self.ui.setupUi(self)
-        cur = app.conn.cursor()
-        cur.execute("select color, name from code_name order by name")
-        self.used_colors = cur.fetchall()
-        self.fill_table()
-        self.ui.tableWidget.installEventFilter(self)
-        self.ui.tableWidget.setFocus()
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
+        self.app = app
         font = 'font: ' + str(app.settings['fontsize']) + 'pt '
         font += '"' + app.settings['font'] + '";'
         self.setStyleSheet(font)
         self.selected_color = code_['color']
+        self.ui.tableWidget.setStyleSheet("border: none")
+        cur = app.conn.cursor()
+        cur.execute("select color, name from code_name order by name")
+        self.used_colors = cur.fetchall()
+        self.fill_table()
         # preset with the current colour
         fg_color = TextColor(code_['color']).recommendation
         style = "QLabel {background-color :" + code_['color'] + "; color : " + fg_color + ";}"
@@ -204,54 +205,23 @@ class DialogColorSelect(QtWidgets.QDialog):
         self.ui.label_colour_old.setText(code_['name'])
         self.ui.label_colour_new.setToolTip(_("New colour"))
         self.ui.label_colour_new.setText(code_['name'])
-        self.ui.radioButton.toggled.connect(self.on_clicked)
-        self.ui.radioButton_2.toggled.connect(self.on_clicked)
-        self.ui.radioButton_3.toggled.connect(self.on_clicked)
-        self.ui.radioButton_4.toggled.connect(self.on_clicked)
-        self.ui.radioButton_5.toggled.connect(self.on_clicked)
-
+        self.ui.radioButton_normal.toggled.connect(self.on_clicked)
+        self.ui.radioButton_red_weak.toggled.connect(self.on_clicked)
+        self.ui.radioButton_red_blind.toggled.connect(self.on_clicked)
+        self.ui.radioButton_green_weak.toggled.connect(self.on_clicked)
+        self.ui.radioButton_green_blind.toggled.connect(self.on_clicked)
 
     def on_clicked(self):
-        #self.ui.radioButton = self.sender()
-        if self.ui.radioButton.isChecked():
+        if self.ui.radioButton_normal.isChecked():
             self.fill_table()
-        if self.ui.radioButton_2.isChecked():
+        if self.ui.radioButton_red_weak.isChecked():
             self.fill_table("red_weak")
-        if self.ui.radioButton_3.isChecked():
+        if self.ui.radioButton_red_blind.isChecked():
             self.fill_table("red_blind")
-        if self.ui.radioButton_4.isChecked():
+        if self.ui.radioButton_green_weak.isChecked():
             self.fill_table("green_weak")
-        if self.ui.radioButton_5.isChecked():
+        if self.ui.radioButton_green_blind.isChecked():
             self.fill_table("green_blind")
-
-    '''def eventFilter(self, object, event):
-        """ Using this event filter to apply appearance of several types of colour blindness
-        N normal vision
-        R Red weak
-        Shift R Red blind
-        G Green Weak
-        Shift G Green blind
-        """
-
-        if type(event) == QtGui.QKeyEvent:
-            key = event.key()
-            mod = event.modifiers()
-            if key == QtCore.Qt.Key.Key_N:
-                self.fill_table()
-                return True
-            if key == QtCore.Qt.Key.Key_R and mod == QtCore.Qt.KeyboardModifier.ShiftModifier:
-                self.fill_table("red_blind")
-                return True
-            if key == QtCore.Qt.Key.Key_R:
-                self.fill_table("red_weak")
-                return True
-            if key == QtCore.Qt.Key.Key_G and mod == QtCore.Qt.KeyboardModifier.ShiftModifier:
-                self.fill_table("green_blind")
-                return True
-            if key == QtCore.Qt.Key.Key_G:
-                self.fill_table("green_weak")
-                return True
-        return False'''
 
     def color_selected(self):
         """ Get colour selection from table widget. """
@@ -277,7 +247,7 @@ class DialogColorSelect(QtWidgets.QDialog):
 
     def fill_table(self, color_range="normal"):
         """ Twelve rows of ten columns of colours.
-        normal, red weak, red blnd, green weak, green blind
+        normal, red weak, red blind, green weak, green blind
         param:
         color_range: String
         """
@@ -287,12 +257,10 @@ class DialogColorSelect(QtWidgets.QDialog):
             self.ui.tableWidget.removeRow(0)
         self.ui.tableWidget.setColumnCount(COLS)
         self.ui.tableWidget.setRowCount(ROWS)
-        self.ui.tableWidget.verticalHeader().setVisible(False)
+        #self.ui.tableWidget.verticalHeader().setVisible(False)
         self.ui.tableWidget.horizontalHeader().setVisible(False)
         for row in range(0, ROWS):
-            #self.ui.tableWidget.setRowHeight(row, 25)
             for col in range(0, COLS):
-                #self.ui.tableWidget.setColumnWidth(col, 25)
                 code_color = colors[row * COLS + col]
                 text = ""
                 ttip = ""
@@ -314,7 +282,10 @@ class DialogColorSelect(QtWidgets.QDialog):
                     item.setBackground(QtGui.QBrush(QtGui.QColor(colors_green_blind[row * COLS + col])))
                 item.setForeground(QtGui.QBrush(QtGui.QColor(TextColor(code_color).recommendation)))
                 item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
+                item.setFont(QtGui.QFont("Times", 10))
                 self.ui.tableWidget.setItem(row, col, item)
-                self.ui.tableWidget.setColumnWidth(col, 32)
-            self.ui.tableWidget.setRowHeight(row, 16)
+                self.ui.tableWidget.setColumnWidth(col, 38)
+            self.ui.tableWidget.setRowHeight(row, 22)
+        #self.ui.tableWidget.resizeColumnsToContents()
+        #self.ui.tableWidget.resizeRowsToContents()
         self.ui.tableWidget.cellClicked.connect(self.color_selected)
