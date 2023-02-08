@@ -191,7 +191,7 @@ class DialogColorSelect(QtWidgets.QDialog):
         font += '"' + app.settings['font'] + '";'
         self.setStyleSheet(font)
         self.selected_color = code_['color']
-        self.ui.tableWidget.setStyleSheet("border: none")
+        self.ui.tableWidget.setStyleSheet("border: none; font-size: 10px")
         cur = app.conn.cursor()
         cur.execute("select color, name from code_name order by name")
         self.used_colors = cur.fetchall()
@@ -257,7 +257,7 @@ class DialogColorSelect(QtWidgets.QDialog):
             self.ui.tableWidget.removeRow(0)
         self.ui.tableWidget.setColumnCount(COLS)
         self.ui.tableWidget.setRowCount(ROWS)
-        #self.ui.tableWidget.verticalHeader().setVisible(False)
+        self.ui.tableWidget.verticalHeader().setVisible(False)
         self.ui.tableWidget.horizontalHeader().setVisible(False)
         for row in range(0, ROWS):
             for col in range(0, COLS):
