@@ -1752,7 +1752,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.recursive_set_current_item(self.ui.treeWidget.invisibleRootItem(), action.text())
         self.mark()
 
-    def recursive_set_current_item(self, item, txt):
+    def recursive_set_current_item(self, item, text_):
         """ Set matching item to be the current selected item.
         Recurse through any child categories.
         Tried to use QTreeWidget.finditems - but this did not find matching item text
@@ -1762,9 +1762,10 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         child_count = item.childCount()
         for i in range(child_count):
-            if item.child(i).text(0) == txt and item.child(i).text(1)[0:3] == "cid":
+            if item.child(i).text(1)[0:3] == "cid" and (item.child(i).text(0) == text_ or
+            item.child(i).toolTip(0) == text_):
                 self.ui.treeWidget.setCurrentItem(item.child(i))
-            self.recursive_set_current_item(item.child(i), txt)
+            self.recursive_set_current_item(item.child(i), text_)
 
     def cycle_overlap(self):
         """ Cycle through coded text items located at current cursor position.

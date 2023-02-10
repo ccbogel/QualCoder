@@ -974,22 +974,23 @@ class DialogCodeImage(QtWidgets.QDialog):
         root = self.ui.treeWidget.invisibleRootItem()
         self.recursive_traverse(root, txt)
 
-    def recursive_traverse(self, item, txt):
+    def recursive_traverse(self, item, text_):
         """ Find all children codes of this item that match or not and hide or unhide based on 'text'.
         Recurse through all child categories.
         Called by: show_codes_like
         param:
             item: a QTreeWidgetItem
-            text:  Text string for matching with code names
+            text_:  Text string for matching with code names
         """
 
         child_count = item.childCount()
         for i in range(child_count):
-            if "cid:" in item.child(i).text(1) and len(txt) > 0 and txt not in item.child(i).text(0):
+            if "cid:" in item.child(i).text(1) and len(text_) > 0 and \
+                    (text_ not in item.child(i).text(0) or text_ not in item.child(i).toolTip(0)):
                 item.child(i).setHidden(True)
-            if "cid:" in item.child(i).text(1) and txt == "":
+            if "cid:" in item.child(i).text(1) and text_ == "":
                 item.child(i).setHidden(False)
-            self.recursive_traverse(item.child(i), txt)
+            self.recursive_traverse(item.child(i), text_)
 
     def eventFilter(self, object_, event):
         """ Using this event filter to identify treeWidgetItem drop events.
