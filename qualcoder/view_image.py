@@ -313,6 +313,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             pm.loadFromData(QtCore.QByteArray.fromBase64(tag_icon32), "png")
             self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
             self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
+            self.get_files()
             return
         if not ui.result_file_ids:
             Message(self.app, _("Nothing found") + " " * 20, _("No matching files found")).exec()
@@ -551,6 +552,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         action_latest = menu.addAction(_("File with latest coding"))
         action_show_files_like = menu.addAction(_("Show files like"))
         action_show_case_files = menu.addAction(_("Show case files"))
+        action_show_by_attribute = menu.addAction(_("Show files by attributes"))
         action = menu.exec(self.ui.listWidget.mapToGlobal(position))
         if action == action_memo:
             self.file_memo(file_)
@@ -564,6 +566,8 @@ class DialogCodeImage(QtWidgets.QDialog):
             self.show_files_like()
         if action == action_show_case_files:
             self.show_case_files()
+        if action == action_show_by_attribute:
+            self.get_files_from_attributes()
 
     def show_case_files(self):
         """ Show files of specified case.

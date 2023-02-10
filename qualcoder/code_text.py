@@ -473,6 +473,7 @@ class DialogCodeText(QtWidgets.QWidget):
             pm.loadFromData(QtCore.QByteArray.fromBase64(tag_icon32), "png")
             self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
             self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
+            self.get_files()
             return
         if not ui.result_file_ids:
             Message(self.app, _("Nothing found") + " " * 20, _("No matching files found")).exec()
@@ -2564,11 +2565,13 @@ class DialogCodeText(QtWidgets.QWidget):
         action_prev_chars = None
         action_show_files_like = None
         action_show_case_files = None
+        action_show_by_attribute = None
         action_memo = menu.addAction(_("Open memo"))
         if len(self.filenames) > 1:
             action_next = menu.addAction(_("Next file"))
             action_latest = menu.addAction(_("File with latest coding"))
             action_show_files_like = menu.addAction(_("Show files like"))
+            action_show_by_attribute = menu.addAction(_("Show files by attributes"))
             action_show_case_files = menu.addAction(_("Show case files"))
         if file_['characters'] > self.app.settings['codetext_chunksize']:
             action_next_chars = menu.addAction(str(self.app.settings['codetext_chunksize']) + _(" next  characters"))
@@ -2595,6 +2598,8 @@ class DialogCodeText(QtWidgets.QWidget):
             self.show_files_like()
         if action == action_show_case_files:
             self.show_case_files()
+        if action == action_show_by_attribute:
+            self.get_files_from_attributes()
 
     def show_case_files(self):
         """ Show files of specified case.
