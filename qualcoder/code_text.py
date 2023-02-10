@@ -607,7 +607,7 @@ class DialogCodeText(QtWidgets.QWidget):
                     memo = _("Memo")
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
                 top_item.setToolTip(2, c['memo'])
-                top_item.setToolTip(0, '')
+                top_item.setToolTip(0, c['name'])
                 if len(c['name']) > 52:
                     top_item.setText(0, c['name'][:25] + '..' + c['name'][-25:])
                     top_item.setToolTip(0, c['name'])
@@ -1018,6 +1018,7 @@ class DialogCodeText(QtWidgets.QWidget):
         action_start_pos = None
         action_unmark = None
         action_new_code = None
+        action_new_invivo_code = None
 
         # Can have multiple coded text at this position
         for item in self.code_text:
@@ -1055,16 +1056,17 @@ class DialogCodeText(QtWidgets.QWidget):
                     submenu.addAction(item['name'])
             action_annotate = menu.addAction(_("Annotate (A)"))
             action_copy = menu.addAction(_("Copy to clipboard"))
-            action_new_code = menu.addAction("Mark with new code")
+            action_new_code = menu.addAction(_("Mark with new code"))
+            action_new_invivo_code = menu.addAction(_("in vivo code (V)"))
         if selected_text == "" and self.is_annotated(cursor.position()):
             action_edit_annotate = menu.addAction(_("Edit annotation"))
         action_set_bookmark = menu.addAction(_("Set bookmark (B)"))
         action_hide_top_groupbox = None
         action_show_top_groupbox = None
         if self.ui.groupBox.isHidden():
-            action_show_top_groupbox = menu.addAction(_("Show control panel"))
+            action_show_top_groupbox = menu.addAction(_("Show control panel (H)"))
         if not self.ui.groupBox.isHidden():
-            action_hide_top_groupbox = menu.addAction(_("Hide control panel"))
+            action_hide_top_groupbox = menu.addAction(_("Hide control panel (H)"))
         action = menu.exec(self.ui.textEdit.mapToGlobal(position))
         if action is None:
             return
@@ -1117,15 +1119,23 @@ class DialogCodeText(QtWidgets.QWidget):
         if action == action_new_code:
             self.mark_with_new_code()
             return
+        if action == action_new_invivo_code:
+            self.mark_with_new_code(in_vivo=True)
+            return
         # Remaining actions will be the submenu codes
         self.recursive_set_current_item(self.ui.treeWidget.invisibleRootItem(), action.text())
         self.mark()
 
-    def mark_with_new_code(self):
-        """ Create new code and mark selected text. """
+    def mark_with_new_code(self, in_vivo=False):
+        """ Create new code and mark selected text.
+        param:
+            in_vivo : Boolean if True use in vivio text selection as code name """
 
         codes_copy = deepcopy(self.codes)
-        self.add_code()
+        if not in_vivo:
+            self.add_code()
+        else:
+            self.add_code(catid=None, code_name=self.ui.textEdit.textCursor().selectedText())
         new_code = None
         for c in self.codes:
             if c not in codes_copy:
@@ -1133,6 +1143,7 @@ class DialogCodeText(QtWidgets.QWidget):
         if not new_code:
             return
         self.recursive_set_current_item(self.ui.treeWidget.invisibleRootItem(), new_code['name'])
+
         self.mark()
 
     def change_code_to_another_code(self, position):
@@ -1191,11 +1202,15 @@ class DialogCodeText(QtWidgets.QWidget):
         Tried to use QTreeWidget.finditems - but this did not find matching item text
         Called by: textEdit recent codes menu option
         Required for: mark()
+        param:
+            item : QTreeWidgetItem - usually root
+            text_ : String
         """
 
         child_count = item.childCount()
         for i in range(child_count):
-            if item.child(i).text(0) == text_ and item.child(i).text(1)[0:3] == "cid":
+            if item.child(i).text(1)[0:3] == "cid" and (item.child(i).text(0) == text_
+            or item.child(i).toolTip(0) == text_):
                 self.ui.treeWidget.setCurrentItem(item.child(i))
             self.recursive_set_current_item(item.child(i), text_)
 
@@ -1661,6 +1676,7 @@ class DialogCodeText(QtWidgets.QWidget):
         O Shortcut to cycle through overlapping codes - at clicked position
         S search text - may include current selection
         R opens a context menu for recently used codes for marking text
+        V assign in vivo code to selected text
         """
 
         if not self.ui.textEdit.hasFocus():
@@ -1710,6 +1726,10 @@ class DialogCodeText(QtWidgets.QWidget):
         # Quick mark selected
         if key == QtCore.Qt.Key.Key_Q and selected_text != "":
             self.mark()
+            return
+        # Create or assign in vivo code to selected text
+        if key == QtCore.Qt.Key.Key_V and selected_text != "":
+            self.mark_with_new_code(in_vivo=True)
             return
         # Recent codes context menu
         if key == QtCore.Qt.Key.Key_R and self.file_ is not None and self.ui.textEdit.textCursor().selectedText() != "":
@@ -2244,18 +2264,21 @@ class DialogCodeText(QtWidgets.QWidget):
         self.update_dialog_codes_and_categories()
         self.get_coded_text_update_eventfilter_tooltips()
 
-    def add_code(self, catid=None):
+    def add_code(self, catid=None, code_name=""):
         """ Use add_item dialog to get new code text. Add_code_name dialog checks for
         duplicate code name. A random color is selected for the code.
         New code is added to data and database.
         param:
-            catid : None to add to without category, catid to add to category. """
+            catid : None to add to without category, catid to add to category.
+            code_name : String : Usef for 'in vivo' coding where name is preset by in vivo text selection.
+        """
 
-        ui = DialogAddItemName(self.app, self.codes, _("Add new code"), _("Code name"))
-        ui.exec()
-        code_name = ui.get_new_name()
-        if code_name is None:
-            return
+        if code_name == "":
+            ui = DialogAddItemName(self.app, self.codes, _("Add new code"), _("Code name"))
+            ui.exec()
+            code_name = ui.get_new_name()
+            if code_name is None:
+                return
         code_color = colors[randint(0, len(colors) - 1)]
         item = {'name': code_name, 'memo': "", 'owner': self.app.settings['codername'],
                 'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'catid': catid,
