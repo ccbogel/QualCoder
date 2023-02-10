@@ -1137,13 +1137,20 @@ class DialogCodeText(QtWidgets.QWidget):
         else:
             self.add_code(catid=None, code_name=self.ui.textEdit.textCursor().selectedText())
         new_code = None
+        print(0)
         for c in self.codes:
             if c not in codes_copy:
                 new_code = c
-        if not new_code:
+        if new_code is None and not in_vivo:
+            # not a new code and not an in vivo coding
             return
+        if new_code is None and in_vivo:
+            # Find existing code name that matches in vivo selection
+            new_code = None
+            for c in self.codes:
+                if c['name'] == self.ui.textEdit.textCursor().selectedText():
+                    new_code = c
         self.recursive_set_current_item(self.ui.treeWidget.invisibleRootItem(), new_code['name'])
-
         self.mark()
 
     def change_code_to_another_code(self, position):
@@ -2270,7 +2277,9 @@ class DialogCodeText(QtWidgets.QWidget):
         New code is added to data and database.
         param:
             catid : None to add to without category, catid to add to category.
-            code_name : String : Usef for 'in vivo' coding where name is preset by in vivo text selection.
+            code_name : String : Used for 'in vivo' coding where name is preset by in vivo text selection.
+        return:
+            True  - new code added, False - code exists or could not be added
         """
 
         if code_name == "":
@@ -2278,22 +2287,28 @@ class DialogCodeText(QtWidgets.QWidget):
             ui.exec()
             code_name = ui.get_new_name()
             if code_name is None:
-                return
+                return False
         code_color = colors[randint(0, len(colors) - 1)]
         item = {'name': code_name, 'memo': "", 'owner': self.app.settings['codername'],
                 'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'catid': catid,
                 'color': code_color}
         cur = self.app.conn.cursor()
-        cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,?,?,?,?)",
-                    (item['name'], item['memo'], item['owner'], item['date'], item['catid'], item['color']))
-        self.app.conn.commit()
-        self.app.delete_backup = False
-        cur.execute("select last_insert_rowid()")
-        cid = cur.fetchone()[0]
-        item['cid'] = cid
-        self.parent_textEdit.append(_("New code: ") + item['name'])
+        try:
+            cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,?,?,?,?)",
+                        (item['name'], item['memo'], item['owner'], item['date'], item['catid'], item['color']))
+            self.app.conn.commit()
+            self.app.delete_backup = False
+            cur.execute("select last_insert_rowid()")
+            cid = cur.fetchone()[0]
+            item['cid'] = cid
+            self.parent_textEdit.append(_("New code: ") + item['name'])
+        except sqlite3.IntegrityError:
+            # Can occur with in vivo coding
+            print("in vivo coding. Code already exists")
+            return False
         self.update_dialog_codes_and_categories()
         self.get_coded_text_update_eventfilter_tooltips()
+        return True
 
     def update_dialog_codes_and_categories(self):
         """ Update code and category tree here and in DialogReportCodes, ReportCoderComparisons, ReportCodeFrequencies
