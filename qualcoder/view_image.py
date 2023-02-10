@@ -350,7 +350,7 @@ class DialogCodeImage(QtWidgets.QDialog):
                 if c['memo'] != "" and c['memo'] is not None:
                     memo = "Memo"
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
-                top_item.setToolTip(0, '')
+                top_item.setToolTip(0, c['name'])
                 if len(c['name']) > 52:
                     top_item.setText(0, c['name'][:25] + '..' + c['name'][-25:])
                     top_item.setToolTip(0, c['name'])
@@ -375,7 +375,7 @@ class DialogCodeImage(QtWidgets.QDialog):
                         if c['memo'] != "" and c['memo'] is not None:
                             memo = "Memo"
                         child = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
-                        child.setToolTip(0, '')
+                        child.setToolTip(0, c['name'])
                         if len(c['name']) > 52:
                             child.setText(0, c['name'][:25] + '..' + c['name'][-25:])
                             child.setToolTip(0, c['name'])
@@ -397,7 +397,7 @@ class DialogCodeImage(QtWidgets.QDialog):
                 if c['memo'] != "" and c['memo'] is not None:
                     memo = "Memo"
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
-                top_item.setToolTip(0, '')
+                top_item.setToolTip(0, c['name'])
                 if len(c['name']) > 52:
                     top_item.setText(0, c['name'][:25] + '..' + c['name'][-25:])
                     top_item.setToolTip(0, c['name'])
@@ -427,7 +427,7 @@ class DialogCodeImage(QtWidgets.QDialog):
                     child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
                     color = TextColor(c['color']).recommendation
                     child.setForeground(0, QBrush(QtGui.QColor(color)))
-                    child.setToolTip(0, '')
+                    child.setToolTip(0, c['name'])
                     if len(c['name']) > 52:
                         child.setText(0, c['name'][:25] + '..' + c['name'][-25:])
                         child.setToolTip(0, c['name'])
