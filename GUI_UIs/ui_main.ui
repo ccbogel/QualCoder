@@ -140,6 +140,7 @@
      <addaction name="actionREFI_QDA_Project_import"/>
      <addaction name="actionRQDA_Project_import"/>
      <addaction name="actionImport_references_RIS_format"/>
+     <addaction name="actionImport_plain_text_codes_list"/>
     </widget>
     <addaction name="actionCreate_New_Project"/>
     <addaction name="actionOpen_Project"/>
@@ -172,6 +173,7 @@
     <addaction name="actionCodes"/>
     <addaction name="actionCode_image"/>
     <addaction name="actionCode_audio_video"/>
+    <addaction name="actionColour_scheme"/>
    </widget>
    <widget class="QMenu" name="menuReports">
     <property name="title">
@@ -464,6 +466,16 @@
   <action name="actionManage_references">
    <property name="text">
     <string>Manage references</string>
+   </property>
+  </action>
+  <action name="actionColour_scheme">
+   <property name="text">
+    <string>Colour scheme</string>
+   </property>
+  </action>
+  <action name="actionImport_plain_text_codes_list">
+   <property name="text">
+    <string>Import plain text codes list</string>
    </property>
   </action>
  </widget>
