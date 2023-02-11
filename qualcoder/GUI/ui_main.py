@@ -177,6 +177,10 @@ class Ui_MainWindow(object):
         self.actionImport_references_RIS_format.setObjectName("actionImport_references_RIS_format")
         self.actionManage_references = QtGui.QAction(MainWindow)
         self.actionManage_references.setObjectName("actionManage_references")
+        self.actionColour_scheme = QtGui.QAction(MainWindow)
+        self.actionColour_scheme.setObjectName("actionColour_scheme")
+        self.actionImport_plain_text_codes_list = QtGui.QAction(MainWindow)
+        self.actionImport_plain_text_codes_list.setObjectName("actionImport_plain_text_codes_list")
         self.menuOpen_Recent_Project.addAction(self.actionNone)
         self.menuExport.addAction(self.actionProject_Exchange_Export)
         self.menuExport.addAction(self.actionREFI_Codebook_export)
@@ -187,6 +191,7 @@ class Ui_MainWindow(object):
         self.menuImport.addAction(self.actionREFI_QDA_Project_import)
         self.menuImport.addAction(self.actionRQDA_Project_import)
         self.menuImport.addAction(self.actionImport_references_RIS_format)
+        self.menuImport.addAction(self.actionImport_plain_text_codes_list)
         self.menuProject.addAction(self.actionCreate_New_Project)
         self.menuProject.addAction(self.actionOpen_Project)
         self.menuProject.addAction(self.menuOpen_Recent_Project.menuAction())
@@ -208,6 +213,7 @@ class Ui_MainWindow(object):
         self.menuCoding.addAction(self.actionCodes)
         self.menuCoding.addAction(self.actionCode_image)
         self.menuCoding.addAction(self.actionCode_audio_video)
+        self.menuCoding.addAction(self.actionColour_scheme)
         self.menuReports.addAction(self.actionCoding_reports)
         self.menuReports.addAction(self.actionCoding_comparison)
         self.menuReports.addAction(self.actionCoding_comparison_by_file)
@@ -303,6 +309,8 @@ class Ui_MainWindow(object):
         self.actionExport_codebook_with_memos.setText(_translate("MainWindow", "Export codebook with memos as ODT file"))
         self.actionImport_references_RIS_format.setText(_translate("MainWindow", "Import references RIS format"))
         self.actionManage_references.setText(_translate("MainWindow", "Manage references"))
+        self.actionColour_scheme.setText(_translate("MainWindow", "Colour scheme"))
+        self.actionImport_plain_text_codes_list.setText(_translate("MainWindow", "Import plain text codes list"))
 
 
 if __name__ == "__main__":
