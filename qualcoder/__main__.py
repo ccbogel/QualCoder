@@ -36,6 +36,7 @@ import logging
 from logging.handlers import RotatingFileHandler
 import os
 import platform
+from random import randint
 import shutil
 import sys
 import sqlite3
@@ -50,6 +51,7 @@ from qualcoder.attributes import DialogManageAttributes
 from qualcoder.cases import DialogCases
 from qualcoder.codebook import Codebook
 from qualcoder.code_text import DialogCodeText
+from qualcoder.color_selector import colors
 from qualcoder.GUI.base64_helper import *
 from qualcoder.GUI.ui_main import Ui_MainWindow
 from qualcoder.helpers import Message
@@ -880,6 +882,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionExit.triggered.connect(self.closeEvent)
         self.ui.actionExit.setShortcut('Ctrl+Q')
         self.ui.actionImport_references_RIS_format.triggered.connect(self.import_references)
+        self.ui.actionImport_plain_text_codes_list.triggered.connect(self.import_plain_text_codes)
 
         # File cases and journals menu
         self.ui.actionManage_files.triggered.connect(self.manage_files)
@@ -901,6 +904,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCode_image.setShortcut('Alt+I')
         self.ui.actionCode_audio_video.triggered.connect(self.av_coding)
         self.ui.actionCode_audio_video.setShortcut('Alt+V')
+        #self.ui.actionColour_scheme.triggered.connect()
 
         # Reports menu
         self.ui.actionCoding_reports.triggered.connect(self.report_coding)
@@ -1006,6 +1010,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionRQDA_Project_import.setEnabled(True)
         self.ui.actionExport_codebook.setEnabled(False)
         self.ui.actionImport_references_RIS_format.setEnabled(False)
+        self.ui.actionImport_plain_text_codes_list.setEnabled(False)
+
         # files cases journals menu
         self.ui.actionManage_files.setEnabled(False)
         self.ui.actionManage_journals.setEnabled(False)
@@ -1018,6 +1024,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCodes.setEnabled(False)
         self.ui.actionCode_image.setEnabled(False)
         self.ui.actionCode_audio_video.setEnabled(False)
+        self.ui.actionColour_scheme.setEnabled(False)
         # reports menu
         self.ui.actionCoding_reports.setEnabled(False)
         self.ui.actionCoding_comparison.setEnabled(False)
@@ -1048,6 +1055,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionRQDA_Project_import.setEnabled(True)
         self.ui.actionExport_codebook.setEnabled(True)
         self.ui.actionImport_references_RIS_format.setEnabled(True)
+        self.ui.actionImport_plain_text_codes_list.setEnabled(True)
         # Files cases journals menu
         self.ui.actionManage_files.setEnabled(True)
         self.ui.actionManage_journals.setEnabled(True)
@@ -1059,6 +1067,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCodes.setEnabled(True)
         self.ui.actionCode_image.setEnabled(True)
         self.ui.actionCode_audio_video.setEnabled(True)
+        self.ui.actionColour_scheme.setEnabled(True)
         # Reports menu
         self.ui.actionCoding_reports.setEnabled(True)
         self.ui.actionCoding_comparison.setEnabled(True)
@@ -1224,6 +1233,36 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Import references in RIS format. """
 
         RisImport(self.app, self.ui.textEdit)
+
+    def import_plain_text_codes(self):
+        """ Import a list of plain text codes codebook. """
+
+        response = QtWidgets.QFileDialog.getOpenFileNames(self, _('Select plain text codes file'),
+                                                          self.app.settings['directory'], "(*.txt)",
+                                                          options=QtWidgets.QFileDialog.Option.DontUseNativeDialog
+                                                          )
+        filepath = response[0]
+        if not filepath:
+            self.ui.textEdit.append(_("Codes list text file not imported"))
+            return
+        filepath = filepath[0]  # A list of one name
+        self.ui.textEdit.append("\n" + _("Importing codes from: ") + filepath)
+        self.ui.textEdit.append(_("Refresh codes trees via menu options for coding, reports"))
+        with open(filepath, 'r', encoding='UTF-8') as file_:
+            lines = file_.readlines()
+            for code_name in lines:
+                item = {'name': code_name.strip(), 'memo': "", 'owner': self.app.settings['codername'],
+                        'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'catid': None,
+                        'color': colors[randint(0, len(colors) - 1)]}
+                cur = self.app.conn.cursor()
+                try:
+                    cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,?,?,?,?)",
+                                (item['name'], item['memo'], item['owner'], item['date'], item['catid'], item['color']))
+                    self.app.conn.commit()
+                    self.app.delete_backup = False
+                    self.ui.textEdit.append(_("Imported code: ") + code_name.strip())
+                except sqlite3.IntegrityError:
+                    self.ui.textEdit.append(_("Duplicate code not imported: ") + code_name.strip())
 
     def import_survey(self):
         """ Import survey flat sheet: csv file or xlsx.
@@ -1439,7 +1478,6 @@ class MainWindow(QtWidgets.QMainWindow):
                         logger.warning("close event " + str(err))
                 # TODO calls twice, do not know how to fix
                 QtWidgets.QApplication.instance().quit()
-                # QtWidgets.qApp.quit()
                 return
             if event is False:
                 return
