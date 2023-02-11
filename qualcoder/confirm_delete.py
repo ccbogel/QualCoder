@@ -61,6 +61,7 @@ class DialogConfirmDelete(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_confirmDelete()
         self.ui.setupUi(self)
+        self.setMinimumSize(260, 80)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         font = 'font: ' + str(app.settings['fontsize']) + 'pt '
         font += '"' + app.settings['font'] + '";'
