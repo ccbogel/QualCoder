@@ -278,6 +278,9 @@ class DialogManageFiles(QtWidgets.QDialog):
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         action_view = menu.addAction(_("View"))
+        action_view_original_text = None
+        if mediapath is not None and len(mediapath) > 6 and (mediapath[:6] in ('/docs/', 'docs:/')):
+            action_view_original_text = menu.addAction(_("view original text file"))
         action_filename_asc = None
         action_filename_desc = None
         action_type = None
@@ -321,6 +324,9 @@ class DialogManageFiles(QtWidgets.QDialog):
             return
         if action == action_view:
             self.view()
+            return
+        if action == action_view_original_text:
+            self.view_original_text_file(mediapath)
             return
         if self.av_dialog_open is not None:
             self.av_dialog_open.mediaplayer.stop()
@@ -372,6 +378,17 @@ class DialogManageFiles(QtWidgets.QDialog):
             for r in range(0, self.ui.tableWidget.rowCount()):
                 self.ui.tableWidget.setRowHidden(r, False)
             self.rows_hidden = False
+
+    def view_original_text_file(self, mediapath):
+        """ View orignainal text file.
+         param:
+         mediapath: String '/docs/' for internal 'docs:/' for external """
+
+        print("TODO")
+        if mediapath[:6] == "/docs/":
+            path = self.app.project_path + "/documents/" + mediapath[6:]
+            print(path)
+            webbrowser.open(path)
 
     def assign_case_to_file(self):
         """ Assign one or more cases to file. """
@@ -1490,7 +1507,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             return
 
         # Internal storage
-        mediapath = "/docs" + import_file
+        mediapath = "/docs/" + filename
         if link_path != "":
             mediapath = link_path
         entry = {'name': filename, 'id': -1, 'fulltext': text_, 'mediapath': mediapath, 'memo': "",
