@@ -302,7 +302,7 @@ class App(object):
 
         if ids is None:
             ids = []
-        sql = "select id, name, memo from source where (mediapath is Null or mediapath like '/docs/%' or mediapath like 'docs:%') "
+        sql = "select id, name, memo, mediapath from source where (mediapath is Null or mediapath like '/docs/%' or mediapath like 'docs:%') "
         if ids:
             str_ids = list(map(str, ids))
             sql += " and id in (" + ",".join(str_ids) + ")"
@@ -312,7 +312,7 @@ class App(object):
         result = cur.fetchall()
         res = []
         for row in result:
-            res.append({'id': row[0], 'name': row[1], 'memo': row[2]})
+            res.append({'id': row[0], 'name': row[1], 'memo': row[2], 'mediapath': row[3]})
         return res
 
     def get_image_filenames(self, ids=None):
