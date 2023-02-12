@@ -302,7 +302,7 @@ class App(object):
 
         if ids is None:
             ids = []
-        sql = "select id, name, memo from source where (mediapath is Null or mediapath like 'docs:%') "
+        sql = "select id, name, memo from source where (mediapath is Null or mediapath like '/docs/%' or mediapath like 'docs:%') "
         if ids:
             str_ids = list(map(str, ids))
             sql += " and id in (" + ",".join(str_ids) + ")"

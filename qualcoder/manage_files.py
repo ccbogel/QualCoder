@@ -1208,7 +1208,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                     Message(self.app, _("pdf miner is not installed"), _(text_), "critical").exec()
                     return'''
                 destination += "/documents/" + filename
-                # Try and remove encryption from pdf if a simple encryption, for Linux
+                '''# Try and remove encryption from pdf if a simple encryption, for Linux
                 if platform.system() == "Linux":
                     process = subprocess.Popen(["qpdf", "--decrypt", f, destination],
                                                stdout=subprocess.PIPE)
@@ -1226,12 +1226,12 @@ class DialogManageFiles(QtWidgets.QDialog):
                     # qpdf decrypt not implemented for windows, OSX.  Warn user of encrypted PDF
                     pdf_msg = _(
                         "Sometimes pdfs are encrypted, download and decrypt using qpdf before trying to load the pdf")
-                    # Message(self.app, _('If import error occurs'), msg, "warning").exec()
-                    if link_path == "":
-                        copyfile(f, destination)
-                        self.load_file_text(f)
-                    else:
-                        self.load_file_text(f, "docs:" + link_path)
+                    # Message(self.app, _('If import error occurs'), msg, "warning").exec()'''
+                if link_path == "":
+                    copyfile(f, destination)
+                    self.load_file_text(f)
+                else:
+                    self.load_file_text(f, "docs:" + link_path)
                 known_file_type = True
 
             # Media files
@@ -1312,7 +1312,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                     c.get_files_and_cases()
 
     def load_media_reference(self, mediapath):
-        """ Load media reference information for audio, video, images.
+        """ Load media reference information for all file types.
 
         param:
             mediapath: QualCoder project folder path OR external link path to file
@@ -1489,7 +1489,8 @@ class DialogManageFiles(QtWidgets.QDialog):
                                           _("Duplicate filename.\nFile not imported"))
             return
 
-        mediapath = None
+        # Internal storage
+        mediapath = "/docs" + import_file
         if link_path != "":
             mediapath = link_path
         entry = {'name': filename, 'id': -1, 'fulltext': text_, 'mediapath': mediapath, 'memo': "",
