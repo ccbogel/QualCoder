@@ -380,15 +380,22 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.rows_hidden = False
 
     def view_original_text_file(self, mediapath):
-        """ View orignainal text file.
+        """ View orignal text file.
          param:
          mediapath: String '/docs/' for internal 'docs:/' for external """
 
-        print("TODO")
         if mediapath[:6] == "/docs/":
             path = self.app.project_path + "/documents/" + mediapath[6:]
-            print(path)
+            print("Internal:", path)
             webbrowser.open(path)
+            return
+        if mediapath[:5] == "docs:":
+            path = mediapath[5:]
+            print("TO open external ", path)
+            webbrowser.open(path)
+            return
+        logger.error("Cannot open text file in browser " + mediapath)
+        print("manage_files.view_original_text_file. Cannot open text file in browser " + mediapath)
 
     def assign_case_to_file(self):
         """ Assign one or more cases to file. """
