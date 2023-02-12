@@ -2605,6 +2605,10 @@ class DialogCodeText(QtWidgets.QWidget):
         action_show_case_files = None
         action_show_by_attribute = None
         action_memo = menu.addAction(_("Open memo"))
+        action_view_original_text = None
+        if file_ is not None and file_['mediapath'] is not None and len(file_['mediapath']) > 6 and \
+                (file_['mediapath'][:6] == '/docs/' or file_['mediapath'][:5] == 'docs:'):
+            action_view_original_text = menu.addAction(_("view original text file"))
         if len(self.filenames) > 1:
             action_next = menu.addAction(_("Next file"))
             action_latest = menu.addAction(_("File with latest coding"))
@@ -2622,6 +2626,8 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         if action == action_memo:
             self.file_memo(file_)
+        if action == action_view_original_text:
+            self.view_original_text_file()
         if action == action_next:
             self.go_to_next_file()
         if action == action_latest:
@@ -2638,6 +2644,24 @@ class DialogCodeText(QtWidgets.QWidget):
             self.show_case_files()
         if action == action_show_by_attribute:
             self.get_files_from_attributes()
+
+    def view_original_text_file(self):
+        """ View orignal text file.
+         param:
+         mediapath: String '/docs/' for internal 'docs:/' for external """
+
+        if self.file_['mediapath'][:6] == "/docs/":
+            path = self.app.project_path + "/documents/" + self.file_['mediapath'][6:]
+            print("Internal:", path)
+            webbrowser.open(path)
+            return
+        if self.file_['mediapath'][:5] == "docs:":
+            path = self.file_['mediapath'][5:]
+            print("TO open external ", path)
+            webbrowser.open(path)
+            return
+        logger.error("Cannot open text file in browser " + self.file_['mediapath'])
+        print("code_text.view_original_text_file. Cannot open text file in browser " + self.file_['mediapath'])
 
     def show_case_files(self):
         """ Show files of specified case.
