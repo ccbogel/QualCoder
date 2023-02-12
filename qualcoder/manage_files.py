@@ -279,7 +279,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         action_view = menu.addAction(_("View"))
         action_view_original_text = None
-        if mediapath is not None and len(mediapath) > 6 and (mediapath[:6] in ('/docs/', 'docs:/')):
+        if mediapath is not None and len(mediapath) > 6 and (mediapath[:6] == '/docs/' or mediapath[:5] == 'docs:'):
             action_view_original_text = menu.addAction(_("view original text file"))
         action_filename_asc = None
         action_filename_desc = None
