@@ -104,7 +104,7 @@ def file_typer(mediapath):
         return "text"
     if len(mediapath) < 6:
         return "text"
-    if len(mediapath) > 5 and mediapath[:6] == "/docs/" or mediapath[:6] == "docs:/":
+    if len(mediapath) > 5 and mediapath[:6] == "/docs/" or mediapath[:5] == "docs:":
         return "text"
     mediapath = mediapath.lower()
     if mediapath[-3:] in ('jpg', 'png'):
