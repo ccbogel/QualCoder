@@ -499,7 +499,7 @@ class RefiImport:
         children = list(root)  # root.getchildren()
         for el in children:
             if el.tag == "{urn:QDA-XML:project:1.0}Cases":
-                print(el.tag)
+                # print(el.tag)
                 for c in list(el):  # el.getchildren():
                     self.parse_case_for_file_variables(c)
 
@@ -807,7 +807,9 @@ class RefiImport:
         """ Helper method to obtain name, guid, creating user, create date, path type from each source.
          The sources folder can be named: sources or Sources
          MAXQDA uses sources, NVIVO uses Sources
-         """
+         param:
+            element: xml element
+        """
 
         name = element.get("name")
         creating_user_guid = element.get("creatingUser")
@@ -835,14 +837,18 @@ class RefiImport:
                 self.sources_name = "/sources"
         # Determine internal or external path
         source_path = ""
+        rich_text_path = ""
         path_type = ""
         if path_ is None:
-            source_path = element.get("plainTextPath").split('internal:/')[1]
-            source_path = self.folder_name + self.sources_name + source_path
+            source_path = self.folder_name + self.sources_name + element.get("plainTextPath").split('internal:/')[1]
+            if element.get("richTextPath") is not None:
+                rich_text_path = self.folder_name + self.sources_name + element.get("richTextPath").split('internal:/')[1]
             path_type = "internal"
         if path_ is not None and path_.find("internal://") == 0:
             path_ = element.get("path").split('internal:/')[1]
             source_path = self.folder_name + self.sources_name + path_
+            if element.get("richTextPath") is not None:
+                rich_text_path = self.folder_name + self.sources_name + element.get("richTextPath").split('internal:/')[1]
             path_type = "internal"
         if path_ is not None and path_.find("relative://") == 0:
             source_path = self.base_path + path_.split('relative://')[1]
@@ -850,7 +856,7 @@ class RefiImport:
         if path_ is not None and path_.find("absolute://") == 0:
             source_path = path_.split('absolute://')[1]
             path_type = "absolute"
-        return name, creating_user, create_date, source_path, path_type
+        return name, creating_user, create_date, source_path, path_type, rich_text_path
 
     def load_picture_source(self, element):
         """ Load this picture source.
@@ -862,8 +868,8 @@ class RefiImport:
             element: PictureSource element object
          """
 
-        name, creating_user, create_date, source_path, path_type = self.name_creating_user_create_date_source_path_helper(
-            element)
+        name, creating_user, create_date, source_path, path_type, rich_text_path = \
+            self.name_creating_user_create_date_source_path_helper(element)
         media_path = "/images/" + name  # Default
         if path_type == "internal":
             # Copy file into .qda images folder and rename into original name
@@ -958,8 +964,8 @@ class RefiImport:
             element: AudioSource element object
         """
 
-        name, creating_user, create_date, source_path, path_type = self.name_creating_user_create_date_source_path_helper(
-            element)
+        name, creating_user, create_date, source_path, path_type, rich_text_path = \
+            self.name_creating_user_create_date_source_path_helper(element)
         media_path = "/audio/" + name  # Default
         if path_type == "internal":
             # Copy file into .qda audio folder and rename into original name
@@ -1020,8 +1026,8 @@ class RefiImport:
             element: VideoSource element object
         """
 
-        name, creating_user, create_date, source_path, path_type = self.name_creating_user_create_date_source_path_helper(
-            element)
+        name, creating_user, create_date, source_path, path_type, rich_text_path = \
+            self.name_creating_user_create_date_source_path_helper(element)
         media_path = "/video/" + name  # Default
         if path_type == "internal":
             # Copy file into .qda video folder and rename into original name
@@ -1293,18 +1299,24 @@ class RefiImport:
     def load_pdf_source(self, element):
         """ Load the pdf and text representation into sqlite.
         Can manage internal and absolute source paths.
+        TODO test relative path
 
         Params:
             element: PDFSource element object
         """
 
-        # TODO relative path
-
-        name, creating_user, create_date, source_path, path_type = self.name_creating_user_create_date_source_path_helper(
-            element)
+        name, creating_user, create_date, source_path, path_type, rich_text_path = \
+            self.name_creating_user_create_date_source_path_helper(element)
+        # pdf suffix may need to be added on
+        if name.lower()[-4:] != ".pdf":
+            name += ".pdf"
+        #print("source path: ", source_path)
+        #print("name: ", name)
+        media_path = "/docs/" + name  # Default
         if path_type == "internal":
             # Copy file into .qda documents folder and rename into original name
             destination = self.app.project_path + "/documents/" + name
+            #print("destination: ", destination)
             try:
                 shutil.copyfile(source_path, destination)
                 # print("PDF IMPORT", source_path, destination)
@@ -1316,8 +1328,6 @@ class RefiImport:
         if path_type == "relative":
             media_path = "docs:" + self.base_path + source_path
             # print(source_path, media_path)
-        # TODO media_path variable is not used, dont actually use the PDF document, but keep the PDF in the Documents folder
-
         """ The PDF source contains a text representation:
         <Representation plainTextPath="internal://142EB46D‐612E‐4593‐A385‐D0E5D04D1288.txt"
         modifyingUser="AD68FBE7‐E1EE‐4A82‐A279‐23CC698C89EB" modifiedDateTime="2018‐03‐27T18:01:07Z"
@@ -1337,10 +1347,10 @@ class RefiImport:
         for el in element:
             if el.tag == "{urn:QDA-XML:project:1.0}Representation":
                 # print("PDF Representation element found")
-                self.load_text_source(el, name, create_date)
+                self.load_text_source(el, name, create_date, media_path)
                 break
 
-    def load_text_source(self, element, pdf_rep_name="", pdf_rep_date=""):
+    def load_text_source(self, element, pdf_rep_name="", pdf_rep_date="", mediapath=None):
         """ Load this text source into sqlite.
          Add the description and the text codings.
          When testing with Windows Nvivo export: import from docx or txt
@@ -1357,9 +1367,10 @@ class RefiImport:
          """
 
         # TODO absolute and relative - not tested relative
-        name, creating_user, create_date, source_path, path_type = self.name_creating_user_create_date_source_path_helper(
-            element)
+        name, creating_user, create_date, source_path, path_type, rich_text_path = \
+            self.name_creating_user_create_date_source_path_helper(element)
         if pdf_rep_name != "":
+            # contains .pdf
             name = pdf_rep_name
         if pdf_rep_date != "":
             create_date = pdf_rep_date
@@ -1369,7 +1380,7 @@ class RefiImport:
         for el in list(element):  # element.getchildren():
             if el.tag == "{urn:QDA-XML:project:1.0}Description":
                 memo = el.text
-        source = {'name': name, 'id': -1, 'fulltext': "", 'mediapath': None, 'memo': memo,
+        source = {'name': name, 'id': -1, 'fulltext': "", 'mediapath': mediapath, 'memo': memo,
                   'owner': self.app.settings['codername'], 'date': create_date, 'guid': element.get('guid')}
 
         # Check plain text file line endings for Windows 2 character \r\n
@@ -1422,12 +1433,27 @@ class RefiImport:
         if path_type == "internal":
             # Copy file into .qda documents folder and rename into original name
             destination = self.app.project_path + "/documents/" + name + '.' + source_path.split('.')[-1]
+            #print("source", source_path)
+            #print("dest", destination)
             try:
                 shutil.copyfile(source_path, destination)
             except Exception as err:
                 logger.warning(str(err))
                 self.parent_textedit.append(
                     _('Cannot copy TextSource file from: ') + source_path + "\nto: " + destination + '\n' + str(err))
+            # If present, copy rich text file into .qda documents folder and rename into original name
+            if rich_text_path != "":
+                rtf_destination = self.app.project_path + "/documents/" + name + '.' + rich_text_path.split('.')[-1]
+                #print("rtf source", rich_text_path)
+                #print("dest", rtf_destination)
+                cur.execute("update source set mediapath=? where id=?", ["/docs/" + name + '.' + rich_text_path.split('.')[-1], source['id']])
+                self.app.conn.commit()
+                try:
+                    shutil.copyfile(rich_text_path, rtf_destination)
+                except Exception as err:
+                    logger.warning(str(err))
+                    self.parent_textedit.append(
+                        _('Cannot copy TextSource file from: ') + rich_text_path + "\nto: " + rtf_destination + '\n' + str(err))
 
         # Parse PlainTextSelection elements for Coding elements
         for el in list(element):  # element.getchildren():
@@ -1663,7 +1689,6 @@ class RefiImport:
         param: element The Note element
         """
 
-        print("getting here??")
         user_guid = element.get("modifyingUser")
         owner = None
         for u in self.users:
