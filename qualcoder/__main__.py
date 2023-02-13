@@ -50,6 +50,7 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 from qualcoder.attributes import DialogManageAttributes
 from qualcoder.cases import DialogCases
 from qualcoder.codebook import Codebook
+from qualcoder.code_color_scheme import DialogCodeColorScheme
 from qualcoder.code_text import DialogCodeText
 from qualcoder.color_selector import colors
 from qualcoder.GUI.base64_helper import *
@@ -904,7 +905,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCode_image.setShortcut('Alt+I')
         self.ui.actionCode_audio_video.triggered.connect(self.av_coding)
         self.ui.actionCode_audio_video.setShortcut('Alt+V')
-        #self.ui.actionColour_scheme.triggered.connect()
+        self.ui.actionColour_scheme.triggered.connect(self.code_color_scheme)
 
         # Reports menu
         self.ui.actionCoding_reports.triggered.connect(self.report_coding)
@@ -1359,6 +1360,13 @@ class MainWindow(QtWidgets.QMainWindow):
         except Exception as err:
             logger.debug(str(err))
             Message(self.app, _("A/V Coding"), str(err), "warning").exec()
+
+    def code_color_scheme(self):
+        """ Edit code color scheme. """
+
+        ui = DialogCodeColorScheme(self.app, self.ui.textEdit, self.ui.tab_reports)
+        ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
+        self.tab_layout_helper(self.ui.tab_coding, ui)
 
     def tab_layout_helper(self, tab_widget, ui):
         """ Used when loading a coding, report or manage dialog  in to a tab widget.
