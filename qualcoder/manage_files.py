@@ -535,11 +535,8 @@ class DialogManageFiles(QtWidgets.QDialog):
         if mediapath is not None and mediapath[:6] == "/docs/":
             mediapath = "/documents/" + mediapath[6:]
         if mediapath is not None:
-            print("mediapath", mediapath)
             file_directory = mediapath.split('/')[1]  # as [0] will be blank
-            print("file_directory", file_directory)
             destination = directory + "/" + mediapath.split('/')[-1]
-            print("dest directory", destination)
         if mediapath is None:
             # Some older text files, and QC internally created text Db entries have None as mediapath
             cur = self.app.conn.cursor()
@@ -549,7 +546,6 @@ class DialogManageFiles(QtWidgets.QDialog):
             mediapath = "/documents/" + name
             destination = directory + "/" + name
         msg = _("Export to ") + destination + "\n"
-        print("sourh path", self.app.project_path + mediapath)
         try:
             move(self.app.project_path + mediapath, destination)
         except Exception as err:
