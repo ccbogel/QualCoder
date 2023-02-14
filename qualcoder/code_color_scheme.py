@@ -27,11 +27,8 @@ https://qualcoder.wordpress.com/
 """
 
 from copy import deepcopy
-import datetime
-import html
 import logging
 import os
-from random import randint
 import sys
 import traceback
 
@@ -40,12 +37,15 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QBrush
 
 
-from .color_selector import colors, TextColor
+from .color_selector import colors, colors_red_weak, colors_red_blind, colors_green_weak, colors_green_blind, TextColor
 from GUI.ui_dialog_code_colours import Ui_Dialog_code_colors
 
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
+
+ROWS = 12
+COLS = 10
 
 
 def exception_handler(exception_type, value, tb_obj):
@@ -68,6 +68,7 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
     app = None
     parent_textEdit = None
 
+
     def __init__(self, app, parent_textedit, tab_reports):
         """
         """
@@ -79,6 +80,8 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
         self.codes = []
         self.categories = []
         self.get_codes_and_categories()
+        self.perspective = [_("Normal vision"), _("Red weak"), _("Red blind"), _("Green weak"), _("Green blind")]
+        self.perspective_idx = 0
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_code_colors()
         self.ui.setupUi(self)
@@ -94,7 +97,10 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
         self.ui.treeWidget.viewport().installEventFilter(self)
         self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
+        self.ui.pushButton_clear_selection.pressed.connect(self.ui.tableWidget.clearSelection)
         self.fill_tree()
+        self.fill_table()
+        self.ui.pushButton_perspective.pressed.connect(self.change_perspective)
 
     def get_codes_and_categories(self):
         """ Called from init, delete category/code, event_filter """
@@ -246,3 +252,59 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
         if action is None:
             return
         return
+
+    def change_perspective(self):
+        """ Change colours for different vision perspectives. """
+
+        self.perspective_idx += 1
+        if self.perspective_idx >= len(self.perspective):
+            self.perspective_idx = 0
+        self.fill_table()
+        self.ui.label_perspective.setText(_("Perspective: ") + self.perspective[self.perspective_idx])
+
+
+    def fill_table(self):
+        """ Twelve rows of ten columns of colours.
+        normal, red weak, red blind, green weak, green blind
+        param:
+        color_range: String
+        """
+
+        self.ui.tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.MultiSelection)
+        for r in range(self.ui.tableWidget.rowCount()):
+            self.ui.tableWidget.removeRow(0)
+        self.ui.tableWidget.setColumnCount(COLS)
+        self.ui.tableWidget.setRowCount(ROWS)
+        self.ui.tableWidget.verticalHeader().setVisible(False)
+        self.ui.tableWidget.horizontalHeader().setVisible(False)
+        for row in range(0, ROWS):
+            for col in range(0, COLS):
+                code_color = colors[row * COLS + col]
+                text = ""
+                '''ttip = ""
+                for c in self.used_colors:
+                    if code_color == c[0]:
+                        text = "*"
+                        ttip += c[1] + "\n"'''
+                item = QtWidgets.QTableWidgetItem(text)
+                #item.setToolTip(ttip)
+                if self.perspective_idx == 0:
+                    item.setBackground(QtGui.QBrush(QtGui.QColor(code_color)))
+                if self.perspective_idx == 1:
+                    item.setBackground(QtGui.QBrush(QtGui.QColor(colors_red_weak[row * COLS + col])))
+                if self.perspective_idx == 2:
+                    item.setBackground(QtGui.QBrush(QtGui.QColor(colors_red_blind[row * COLS + col])))
+                if self.perspective_idx == 3:
+                    item.setBackground(QtGui.QBrush(QtGui.QColor(colors_green_weak[row * COLS + col])))
+                if self.perspective_idx == 4:
+                    item.setBackground(QtGui.QBrush(QtGui.QColor(colors_green_blind[row * COLS + col])))
+                item.setForeground(QtGui.QBrush(QtGui.QColor(TextColor(code_color).recommendation)))
+                item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
+                item.setFont(QtGui.QFont("Times", 10))
+                self.ui.tableWidget.setItem(row, col, item)
+                self.ui.tableWidget.setColumnWidth(col, 38)
+            self.ui.tableWidget.setRowHeight(row, 22)
+        #self.ui.tableWidget.resizeColumnsToContents()
+        #self.ui.tableWidget.resizeRowsToContents()
+
+
