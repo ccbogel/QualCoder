@@ -65,28 +65,6 @@
      </widget>
     </widget>
    </item>
-   <item row="4" column="0">
-    <widget class="QSlider" name="horizontalSlider">
-     <property name="minimum">
-      <number>9</number>
-     </property>
-     <property name="singleStep">
-      <number>3</number>
-     </property>
-     <property name="value">
-      <number>99</number>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="tickPosition">
-      <enum>QSlider::TicksBelow</enum>
-     </property>
-     <property name="tickInterval">
-      <number>10</number>
-     </property>
-    </widget>
-   </item>
    <item row="3" column="0">
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
@@ -123,12 +101,33 @@
             <x>0</x>
             <y>0</y>
             <width>467</width>
-            <height>512</height>
+            <height>538</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_3">
-           <item row="0" column="0">
+           <item row="1" column="0">
             <widget class="QTableWidget" name="tableWidget"/>
+           </item>
+           <item row="3" column="0">
+            <widget class="QPushButton" name="pushButton_perspective">
+             <property name="text">
+              <string>Change perspective</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QPushButton" name="pushButton_clear_selection">
+             <property name="text">
+              <string>Clear selection</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_perspective">
+             <property name="text">
+              <string>Perspective: normal vision</string>
+             </property>
+            </widget>
            </item>
           </layout>
          </widget>
