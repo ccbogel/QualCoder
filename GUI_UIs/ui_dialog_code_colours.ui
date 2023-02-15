@@ -74,7 +74,7 @@
       <property name="topMargin">
        <number>1</number>
       </property>
-      <item row="0" column="0">
+      <item row="1" column="0">
        <widget class="QSplitter" name="splitter_2">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -83,12 +83,28 @@
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
-         <widget class="QTreeWidget" name="treeWidget">
-          <column>
-           <property name="text">
-            <string notr="true">1</string>
-           </property>
-          </column>
+         <widget class="QGroupBox" name="groupBox_3">
+          <property name="title">
+           <string/>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_4">
+           <item row="0" column="0">
+            <widget class="QTreeWidget" name="treeWidget">
+             <column>
+              <property name="text">
+               <string notr="true">1</string>
+              </property>
+             </column>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QPushButton" name="pushButton_clear_selection_codes">
+             <property name="text">
+              <string>Clear selection</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
          </widget>
         </widget>
         <widget class="QScrollArea" name="scrollArea">
@@ -100,7 +116,7 @@
            <rect>
             <x>0</x>
             <y>0</y>
-            <width>467</width>
+            <width>447</width>
             <height>538</height>
            </rect>
           </property>
