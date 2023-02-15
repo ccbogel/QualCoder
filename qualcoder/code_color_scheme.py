@@ -38,7 +38,7 @@ from PyQt6.QtGui import QBrush
 
 
 from .color_selector import colors, colors_red_weak, colors_red_blind, colors_green_weak, colors_green_blind, TextColor
-from GUI.ui_dialog_code_colours import Ui_Dialog_code_colors
+from .GUI.ui_dialog_code_colours import Ui_Dialog_code_colors
 
 
 path = os.path.abspath(os.path.dirname(__file__))
@@ -67,7 +67,7 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
 
     app = None
     parent_textEdit = None
-
+    selected_colors = []
 
     def __init__(self, app, parent_textedit, tab_reports):
         """
@@ -82,6 +82,7 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
         self.get_codes_and_categories()
         self.perspective = [_("Normal vision"), _("Red weak"), _("Red blind"), _("Green weak"), _("Green blind")]
         self.perspective_idx = 0
+        self.selected_colors = []
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_code_colors()
         self.ui.setupUi(self)
@@ -97,7 +98,10 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
         self.ui.treeWidget.viewport().installEventFilter(self)
         self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
+        self.ui.treeWidget.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.MultiSelection)
+        self.ui.pushButton_clear_selection_codes.pressed.connect(self.ui.treeWidget.clearSelection)
         self.ui.pushButton_clear_selection.pressed.connect(self.ui.tableWidget.clearSelection)
+        self.ui.tableWidget.itemSelectionChanged.connect(self.update_selected_colors)
         self.fill_tree()
         self.fill_table()
         self.ui.pushButton_perspective.pressed.connect(self.change_perspective)
@@ -113,8 +117,8 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
         cats = deepcopy(self.categories)
         codes = deepcopy(self.codes)
         self.ui.treeWidget.clear()
-        self.ui.treeWidget.setColumnCount(4)
-        self.ui.treeWidget.setHeaderLabels([_("Name"), _("Id"), _("Memo"), _("Count")])
+        self.ui.treeWidget.setColumnCount(3)
+        self.ui.treeWidget.setHeaderLabels([_("Codes tree"), _("Id"), _("Memo")])
         if not self.app.settings['showids']:
             self.ui.treeWidget.setColumnHidden(1, True)
         else:
@@ -223,35 +227,24 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
 
     def tree_menu(self, position):
         """ Context menu for treewidget items.
-        Add, rename, memo, move or delete code or category. Change code color. """
+        TODO """
 
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         selected = self.ui.treeWidget.currentItem()
-        action_add_code_to_category = None
-        action_add_category_to_category = None
-        action_merge_category = None
-        if selected is not None and selected.text(1)[0:3] == 'cat':
-            action_add_code_to_category = menu.addAction(_("Add new code to category"))
-            action_add_category_to_category = menu.addAction(_("Add a new category to category"))
-            action_merge_category = menu.addAction(_("Merge category into category"))
-        action_add_code = menu.addAction(_("Add a new code"))
-        action_add_category = menu.addAction(_("Add a new category"))
-        action_rename = menu.addAction(_("Rename"))
-        action_edit_memo = menu.addAction(_("View or edit memo"))
-        action_delete = menu.addAction(_("Delete"))
-        action_color = None
-        action_show_coded_media = None
-        action_move_code = None
-        if selected is not None and selected.text(1)[0:3] == 'cid':
-            action_color = menu.addAction(_("Change code color"))
-            action_move_code = menu.addAction(_("Move code to"))
-            action_show_coded_media = menu.addAction(_("Show coded text and media"))
-        action_show_codes_like = menu.addAction(_("Show codes like"))
+
         action = menu.exec(self.ui.treeWidget.mapToGlobal(position))
         if action is None:
             return
         return
+
+    def update_selected_colors(self):
+        """ Update colour list. """
+
+        self.selected_colors = []
+        for i in self.ui.tableWidget.selectedItems():
+            self.selected_colors.append(colors[i.row() * COLS + i.column()])
+        #print(self.selected_colors)
 
     def change_perspective(self):
         """ Change colours for different vision perspectives. """
@@ -261,7 +254,6 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
             self.perspective_idx = 0
         self.fill_table()
         self.ui.label_perspective.setText(_("Perspective: ") + self.perspective[self.perspective_idx])
-
 
     def fill_table(self):
         """ Twelve rows of ten columns of colours.
