@@ -19,13 +19,13 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>80</height>
+       <height>60</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>80</height>
+       <height>60</height>
       </size>
      </property>
      <property name="title">
@@ -53,14 +53,33 @@
      <widget class="QLabel" name="label">
       <property name="geometry">
        <rect>
-        <x>0</x>
+        <x>20</x>
         <y>10</y>
-        <width>911</width>
-        <height>31</height>
+        <width>461</width>
+        <height>41</height>
        </rect>
       </property>
       <property name="text">
-       <string>Colour scheme for codes. Select colours  in order, select codes. Categories ignored.</string>
+       <string>Codes colour scheme. Select colours in order. Select codes. Apply.</string>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_undo">
+      <property name="geometry">
+       <rect>
+        <x>520</x>
+        <y>10</y>
+        <width>30</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Undo all changes.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string/>
       </property>
      </widget>
     </widget>
@@ -124,7 +143,7 @@
             <x>0</x>
             <y>0</y>
             <width>447</width>
-            <height>538</height>
+            <height>558</height>
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_3">
