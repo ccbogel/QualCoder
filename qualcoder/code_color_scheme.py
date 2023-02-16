@@ -105,11 +105,17 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
         self.fill_tree()
         self.fill_table()
         self.ui.pushButton_perspective.pressed.connect(self.change_perspective)
+        self.ui.pushButton_apply.pressed.connect(self.apply_colors_to_codes)
 
     def get_codes_and_categories(self):
         """ Called from init, delete category/code, event_filter """
 
         self.codes, self.categories = self.app.get_codes_categories()
+
+    def apply_colors_to_codes(self):
+        """  """
+
+        pass
 
     def fill_tree(self):
         """ Fill tree widget, top level items are main categories and unlinked codes. """
