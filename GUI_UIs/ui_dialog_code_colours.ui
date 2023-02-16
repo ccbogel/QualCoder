@@ -55,12 +55,12 @@
        <rect>
         <x>0</x>
         <y>10</y>
-        <width>431</width>
+        <width>911</width>
         <height>31</height>
        </rect>
       </property>
       <property name="text">
-       <string>Colour scheme for codes</string>
+       <string>Colour scheme for codes. Select colours  in order, select codes. Categories ignored.</string>
       </property>
      </widget>
     </widget>
@@ -104,6 +104,13 @@
              </property>
             </widget>
            </item>
+           <item row="2" column="0">
+            <widget class="QPushButton" name="pushButton_apply">
+             <property name="text">
+              <string>Apply colours to codes</string>
+             </property>
+            </widget>
+           </item>
           </layout>
          </widget>
         </widget>
@@ -121,13 +128,10 @@
            </rect>
           </property>
           <layout class="QGridLayout" name="gridLayout_3">
-           <item row="1" column="0">
-            <widget class="QTableWidget" name="tableWidget"/>
-           </item>
-           <item row="3" column="0">
-            <widget class="QPushButton" name="pushButton_perspective">
+           <item row="0" column="0">
+            <widget class="QLabel" name="label_perspective">
              <property name="text">
-              <string>Change perspective</string>
+              <string>Perspective: normal vision</string>
              </property>
             </widget>
            </item>
@@ -138,10 +142,13 @@
              </property>
             </widget>
            </item>
-           <item row="0" column="0">
-            <widget class="QLabel" name="label_perspective">
+           <item row="1" column="0">
+            <widget class="QTableWidget" name="tableWidget"/>
+           </item>
+           <item row="3" column="0">
+            <widget class="QPushButton" name="pushButton_perspective">
              <property name="text">
-              <string>Perspective: normal vision</string>
+              <string>Change perspective</string>
              </property>
             </widget>
            </item>
