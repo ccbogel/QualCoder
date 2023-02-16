@@ -26,7 +26,7 @@ https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 """
 
-from copy import deepcopy
+from copy import deepcopy, copy
 import logging
 import os
 import sys
@@ -67,6 +67,7 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
 
     app = None
     parent_textEdit = None
+    original_code_colors = []
     selected_colors = []
 
     def __init__(self, app, parent_textedit, tab_reports):
@@ -111,11 +112,46 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
         """ Called from init, delete category/code, event_filter """
 
         self.codes, self.categories = self.app.get_codes_categories()
+        # add perspective color
+        for c in self.codes:
+            c['perspective'] = c['color']
+        self.original_code_colors = deepcopy(self.codes)
 
     def apply_colors_to_codes(self):
-        """  """
+        """ Apply selected colours to selected codes, """
 
-        pass
+        if not self.selected_colors:
+            return
+        all_tree_items = self.ui.treeWidget.selectedItems()
+        if not all_tree_items:
+            return
+        color_list = copy(self.selected_colors)
+        code_items = []
+        for t in all_tree_items:
+            #print(t.text(0), t.text(1))
+            if t.text(1)[:3] == "cid":
+                code_items.append(t)
+        while len(color_list) < len(code_items):
+            color_list += self.selected_colors
+            
+        i = -1
+        for ci in code_items:
+            i += 1
+            # code_ids are String "cid:5"
+            for co in self.codes:
+                if int(ci.text(1)[4:]) == co['cid']:
+                    co['color'] = color_list[i]
+                    # temp test perspective
+                    co['perspective'] = color_list[i]
+                break
+            ci.setBackground(0, QBrush(QtGui.QColor(color_list[i]), Qt.BrushStyle.SolidPattern))
+            color = TextColor(color_list[i]).recommendation
+            ci.setForeground(0, QBrush(QtGui.QColor(color)))
+        # TODO update database
+
+
+        self.ui.treeWidget.clearSelection()
+        self.ui.tableWidget.clearSelection()
 
     def fill_tree(self):
         """ Fill tree widget, top level items are main categories and unlinked codes. """
@@ -191,7 +227,7 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
                     top_item.setText(0, c['name'][:25] + '..' + c['name'][-25:])
                     top_item.setToolTip(0, c['name'])
                 top_item.setToolTip(2, c['memo'])
-                top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
+                top_item.setBackground(0, QBrush(QtGui.QColor(c['perspective']), Qt.BrushStyle.SolidPattern))
                 color = TextColor(c['color']).recommendation
                 top_item.setForeground(0, QBrush(QtGui.QColor(color)))
                 top_item.setFlags(
@@ -202,7 +238,7 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
         for item in remove_items:
             codes.remove(item)
 
-        # Add codes as children to categories
+        # Add codes as children of categories
         for c in codes:
             it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
             item = it.value()
@@ -213,7 +249,7 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
                     if c['memo'] != "" and c['memo'] is not None:
                         memo = "Memo"
                     child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
-                    child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
+                    child.setBackground(0, QBrush(QtGui.QColor(c['perspective']), Qt.BrushStyle.SolidPattern))
                     color = TextColor(c['color']).recommendation
                     child.setForeground(0, QBrush(QtGui.QColor(color)))
                     child.setToolTip(0, c['name'])
@@ -233,7 +269,8 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
 
     def tree_menu(self, position):
         """ Context menu for treewidget items.
-        TODO """
+        TODO no plans for now
+        """
 
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
