@@ -38,6 +38,7 @@ from PyQt6.QtGui import QBrush
 
 
 from .color_selector import colors, colors_red_weak, colors_red_blind, colors_green_weak, colors_green_blind, TextColor
+from .GUI.base64_helper import undo_icon
 from .GUI.ui_dialog_code_colours import Ui_Dialog_code_colors
 
 
@@ -107,6 +108,10 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
         self.fill_table()
         self.ui.pushButton_perspective.pressed.connect(self.change_perspective)
         self.ui.pushButton_apply.pressed.connect(self.apply_colors_to_codes)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(undo_icon), "png")
+        self.ui.pushButton_undo.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_undo.pressed.connect(self.undo_color_changes)
 
     def get_codes_and_categories(self):
         """ Called from init, delete category/code, event_filter """
@@ -116,6 +121,19 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
         for c in self.codes:
             c['perspective'] = c['color']
         self.original_code_colors = deepcopy(self.codes)
+
+    def undo_color_changes(self):
+        """  """
+
+        cur = self.app.conn.cursor()
+        sql = "update code_name set color=? where cid=?"
+        for c in self.original_code_colors:
+            cur.execute(sql, [c['color'], c['cid']])
+        self.app.conn.commit()
+        self.get_codes_and_categories()
+        self.perspective_idx = 0
+        self.fill_tree()
+        self.fill_table()
 
     def apply_colors_to_codes(self):
         """ Apply selected colours to selected codes, """
@@ -133,11 +151,13 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
                 code_items.append(t)
         while len(color_list) < len(code_items):
             color_list += self.selected_colors
-            
+
+        cur = self.app.conn.cursor()
+        sql = "update code_name set color=? where cid=?"
         i = -1
         for ci in code_items:
             i += 1
-            # code_ids are String "cid:5"
+            # code_ids are String "cid:5", update perspective color
             for co in self.codes:
                 if int(ci.text(1)[4:]) == co['cid']:
                     co['color'] = color_list[i]
@@ -147,9 +167,11 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
             ci.setBackground(0, QBrush(QtGui.QColor(color_list[i]), Qt.BrushStyle.SolidPattern))
             color = TextColor(color_list[i]).recommendation
             ci.setForeground(0, QBrush(QtGui.QColor(color)))
-        # TODO update database
-
-
+            cur.execute(sql, [color_list[i], int(ci.text(1)[4:])])
+        self.app.conn.commit()
+        self.perspective_idx = 0
+        '''self.fill_table()
+        self.fill_tree()'''
         self.ui.treeWidget.clearSelection()
         self.ui.tableWidget.clearSelection()
 
