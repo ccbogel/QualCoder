@@ -162,7 +162,7 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
                 if int(ci.text(1)[4:]) == co['cid']:
                     co['color'] = color_list[i]
                     # temp test perspective
-                    co['perspective'] = color_list[i]
+                    #co['perspective'] = color_list[i]
                 break
             ci.setBackground(0, QBrush(QtGui.QColor(color_list[i]), Qt.BrushStyle.SolidPattern))
             color = TextColor(color_list[i]).recommendation
@@ -304,12 +304,11 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
         return
 
     def update_selected_colors(self):
-        """ Update colour list. """
+        """ Update colour list. Prior to applying colors. """
 
         self.selected_colors = []
         for i in self.ui.tableWidget.selectedItems():
             self.selected_colors.append(colors[i.row() * COLS + i.column()])
-        #print(self.selected_colors)
 
     def change_perspective(self):
         """ Change colours for different vision perspectives. """
@@ -318,6 +317,21 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
         if self.perspective_idx >= len(self.perspective):
             self.perspective_idx = 0
         self.fill_table()
+
+        # Update code perspective color for filling tree background
+        for c in self.codes:
+            color_index = colors.index(c['color'])
+            if self.perspective_idx == 0:
+                c['perspective'] = colors[color_index]
+            if self.perspective_idx == 1:
+                c['perspective'] = colors_red_weak[color_index]
+            if self.perspective_idx == 2:
+                c['perspective'] = colors_red_blind[color_index]
+            if self.perspective_idx == 3:
+                c['perspective'] = colors_green_weak[color_index]
+            if self.perspective_idx == 4:
+                c['perspective'] = colors_green_blind[color_index]
+        self.fill_tree()
         self.ui.label_perspective.setText(_("Perspective: ") + self.perspective[self.perspective_idx])
 
     def fill_table(self):
