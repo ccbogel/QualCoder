@@ -99,7 +99,7 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
         self.ui.treeWidget.setStyleSheet(tree_font)
         self.ui.treeWidget.viewport().installEventFilter(self)
         self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
+        #self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
         self.ui.treeWidget.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.MultiSelection)
         self.ui.pushButton_clear_selection_codes.pressed.connect(self.ui.treeWidget.clearSelection)
         self.ui.pushButton_clear_selection.pressed.connect(self.ui.tableWidget.clearSelection)
@@ -117,7 +117,7 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
         """ Called from init, delete category/code, event_filter """
 
         self.codes, self.categories = self.app.get_codes_categories()
-        # add perspective color
+        # Add perspective color key
         for c in self.codes:
             c['perspective'] = c['color']
         self.original_code_colors = deepcopy(self.codes)
@@ -146,7 +146,6 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
         color_list = copy(self.selected_colors)
         code_items = []
         for t in all_tree_items:
-            #print(t.text(0), t.text(1))
             if t.text(1)[:3] == "cid":
                 code_items.append(t)
         while len(color_list) < len(code_items):
@@ -158,20 +157,17 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
         for ci in code_items:
             i += 1
             # code_ids are String "cid:5", update perspective color
-            for co in self.codes:
-                if int(ci.text(1)[4:]) == co['cid']:
-                    co['color'] = color_list[i]
-                    # temp test perspective
-                    #co['perspective'] = color_list[i]
-                break
-            ci.setBackground(0, QBrush(QtGui.QColor(color_list[i]), Qt.BrushStyle.SolidPattern))
-            color = TextColor(color_list[i]).recommendation
-            ci.setForeground(0, QBrush(QtGui.QColor(color)))
-            cur.execute(sql, [color_list[i], int(ci.text(1)[4:])])
+            for code_ in self.codes:
+                if int(ci.text(1)[4:]) == code_['cid']:
+                    code_['color'] = color_list[i]
+                    code_['perspective'] = color_list[i]
+                    ci.setBackground(0, QBrush(QtGui.QColor(color_list[i]), Qt.BrushStyle.SolidPattern))
+                    color = TextColor(color_list[i]).recommendation
+                    ci.setForeground(0, QBrush(QtGui.QColor(color)))
+                    cur.execute(sql, [color_list[i], int(ci.text(1)[4:])])
         self.app.conn.commit()
-        self.perspective_idx = 0
-        '''self.fill_table()
-        self.fill_tree()'''
+        self.perspective_idx = 4
+        self.change_perspective()
         self.ui.treeWidget.clearSelection()
         self.ui.tableWidget.clearSelection()
 
@@ -289,9 +285,8 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
                 count += 1
         self.ui.treeWidget.expandAll()
 
-    def tree_menu(self, position):
+    '''def tree_menu(self, position):
         """ Context menu for treewidget items.
-        TODO no plans for now
         """
 
         menu = QtWidgets.QMenu()
@@ -301,7 +296,7 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
         action = menu.exec(self.ui.treeWidget.mapToGlobal(position))
         if action is None:
             return
-        return
+        return'''
 
     def update_selected_colors(self):
         """ Update colour list. Prior to applying colors. """
