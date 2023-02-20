@@ -538,9 +538,29 @@ class DialogCodeText(QtWidgets.QWidget):
         pm.loadFromData(QtCore.QByteArray.fromBase64(round_arrow_right_icon_24), "png")
         self.ui.pushButton_show_codings_next.setIcon(QtGui.QIcon(pm))
 
+    def tree_traverse_for_non_expanded(self, item, non_expanded):
+        """ Find all categories and codes
+        Recurse through all child categories.
+        Called by: fill_tree
+        param:
+            item: a QTreeWidgetItem
+            list of non-expanded categories as Sring if catid:#
+        """
+
+        child_count = item.childCount()
+        for i in range(child_count):
+            if "catid:" in item.child(i).text(1)  and not item.child(i).isExpanded():
+                non_expanded.append(item.child(i).text(1))
+            self.tree_traverse_for_non_expanded(item.child(i), non_expanded)
+
     def fill_tree(self):
         """ Fill tree widget, top level items are main categories and unlinked codes.
-        The Count column counts the number of times that code has been used by selected coder in selected file. """
+        The Count column counts the number of times that code has been used by selected coder in selected file.
+        Keep record of non-expanded items, then re-enact these items when treee fill is called again. """
+
+        non_expanded = []
+        self.tree_traverse_for_non_expanded(self.ui.treeWidget.invisibleRootItem(), non_expanded)
+        print(non_expanded)
 
         cats = deepcopy(self.categories)
         codes = deepcopy(self.codes)
@@ -553,7 +573,7 @@ class DialogCodeText(QtWidgets.QWidget):
             self.ui.treeWidget.setColumnHidden(1, False)
         self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.ui.treeWidget.header().setStretchLastSection(False)
-        # add top level categories
+        # Add top level categories
         remove_list = []
         for c in cats:
             if c['supercatid'] is None:
@@ -567,6 +587,10 @@ class DialogCodeText(QtWidgets.QWidget):
                     top_item.setText(0, c['name'][:25] + '..' + c['name'][-25:])
                     top_item.setToolTip(0, c['name'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
+                if 'catid:' + str(c['catid']) in non_expanded:
+                    top_item.setExpanded(False)
+                else:
+                    top_item.setExpanded(True)
                 remove_list.append(c)
         for item in remove_list:
             cats.remove(item)
@@ -591,6 +615,10 @@ class DialogCodeText(QtWidgets.QWidget):
                             child.setText(0, c['name'][:25] + '..' + c['name'][-25:])
                             child.setToolTip(0, c['name'])
                         item.addChild(child)
+                        if 'catid:' + str(c['catid']) in non_expanded:
+                            child.setExpanded(False)
+                        else:
+                            child.setExpanded(True)
                         remove_list.append(c)
                     it += 1
                     item = it.value()
@@ -648,7 +676,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 it += 1
                 item = it.value()
                 count += 1
-        self.ui.treeWidget.expandAll()
+        #self.ui.treeWidget.expandAll()
         self.fill_code_counts_in_tree()
 
     def fill_code_counts_in_tree(self):
