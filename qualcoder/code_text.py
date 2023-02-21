@@ -560,8 +560,6 @@ class DialogCodeText(QtWidgets.QWidget):
 
         non_expanded = []
         self.tree_traverse_for_non_expanded(self.ui.treeWidget.invisibleRootItem(), non_expanded)
-        print(non_expanded)
-
         cats = deepcopy(self.categories)
         codes = deepcopy(self.codes)
         self.ui.treeWidget.clear()

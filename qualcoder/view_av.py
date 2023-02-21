@@ -487,9 +487,26 @@ class DialogCodeAV(QtWidgets.QDialog):
         if len(selected_text) > 0:
             self.mark()
 
+    def tree_traverse_for_non_expanded(self, item, non_expanded):
+        """ Find all categories and codes
+        Recurse through all child categories.
+        Called by: fill_tree
+        param:
+            item: a QTreeWidgetItem
+            list of non-expanded categories as Sring if catid:#
+        """
+
+        child_count = item.childCount()
+        for i in range(child_count):
+            if "catid:" in item.child(i).text(1)  and not item.child(i).isExpanded():
+                non_expanded.append(item.child(i).text(1))
+            self.tree_traverse_for_non_expanded(item.child(i), non_expanded)
+            
     def fill_tree(self):
         """ Fill tree widget, tope level items are main categories and unlinked codes. """
 
+        non_expanded = []
+        self.tree_traverse_for_non_expanded(self.ui.treeWidget.invisibleRootItem(), non_expanded)
         cats = deepcopy(self.categories)
         codes = deepcopy(self.codes)
         self.ui.treeWidget.clear()
@@ -515,6 +532,10 @@ class DialogCodeAV(QtWidgets.QDialog):
                     top_item.setToolTip(0, c['name'])
                 top_item.setToolTip(2, c['memo'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
+                if 'catid:' + str(c['catid']) in non_expanded:
+                    top_item.setExpanded(False)
+                else:
+                    top_item.setExpanded(True)
                 remove_list.append(c)
         for item in remove_list:
             cats.remove(item)
@@ -541,6 +562,10 @@ class DialogCodeAV(QtWidgets.QDialog):
                             child.setToolTip(0, c['name'])
                         child.setToolTip(2, c['memo'])
                         item.addChild(child)
+                        if 'catid:' + str(c['catid']) in non_expanded:
+                            child.setExpanded(False)
+                        else:
+                            child.setExpanded(True)
                         remove_list.append(c)
                     it += 1
                     item = it.value()
@@ -600,7 +625,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                 it += 1
                 item = it.value()
                 count += 1
-        self.ui.treeWidget.expandAll()
+        #self.ui.treeWidget.expandAll()
         self.fill_code_counts_in_tree()
 
     def fill_code_counts_in_tree(self):
