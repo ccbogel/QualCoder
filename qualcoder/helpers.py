@@ -422,8 +422,8 @@ class DialogCodeInAV(QtWidgets.QDialog):
         self.setWindowTitle(self.data['file_or_casename'])
         self.gridLayout = QtWidgets.QGridLayout(self)
         self.frame = QtWidgets.QFrame(self)
-        if platform.system() == "Darwin":  # for macOS
-            self.frame = QtWidgets.QMacCocoaViewContainer(0)
+        '''if platform.system() == "Darwin":  # for macOS
+            self.frame = QtWidgets.QMacCocoaViewContainer(0)'''
         self.gridLayout.addWidget(self.frame, 0, 0, 0, 0)
         if not vlc:
             return
