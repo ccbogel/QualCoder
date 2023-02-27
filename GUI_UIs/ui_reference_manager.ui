@@ -169,6 +169,17 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>tableWidget_refs</tabstop>
+  <tabstop>tableWidget_files</tabstop>
+  <tabstop>checkBox_hide_files</tabstop>
+  <tabstop>checkBox_hide_refs</tabstop>
+  <tabstop>pushButton_link</tabstop>
+  <tabstop>pushButton_unlink_files</tabstop>
+  <tabstop>pushButton_edit_ref</tabstop>
+  <tabstop>pushButton_delete_ref</tabstop>
+  <tabstop>pushButton_delete_unused_refs</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
