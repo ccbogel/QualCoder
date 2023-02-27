@@ -128,7 +128,7 @@
         <widget class="QPushButton" name="pushButton_import_cases">
          <property name="geometry">
           <rect>
-           <x>80</x>
+           <x>40</x>
            <y>0</y>
            <width>30</width>
            <height>30</height>
@@ -144,7 +144,7 @@
         <widget class="QPushButton" name="pushButton_add_attribute">
          <property name="geometry">
           <rect>
-           <x>40</x>
+           <x>120</x>
            <y>0</y>
            <width>30</width>
            <height>30</height>
@@ -188,7 +188,7 @@
         <widget class="QPushButton" name="pushButton_file_manager">
          <property name="geometry">
           <rect>
-           <x>120</x>
+           <x>80</x>
            <y>0</y>
            <width>30</width>
            <height>30</height>
@@ -243,7 +243,10 @@
  <tabstops>
   <tabstop>pushButton_add</tabstop>
   <tabstop>pushButton_import_cases</tabstop>
+  <tabstop>pushButton_file_manager</tabstop>
   <tabstop>pushButton_add_attribute</tabstop>
+  <tabstop>pushButton_export_attributes</tabstop>
+  <tabstop>pushButton_help</tabstop>
   <tabstop>pushButton_delete</tabstop>
   <tabstop>tableWidget</tabstop>
   <tabstop>textBrowser</tabstop>
