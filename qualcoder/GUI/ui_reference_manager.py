@@ -67,6 +67,14 @@ class Ui_Dialog_reference_manager(object):
 
         self.retranslateUi(Dialog_reference_manager)
         QtCore.QMetaObject.connectSlotsByName(Dialog_reference_manager)
+        Dialog_reference_manager.setTabOrder(self.tableWidget_refs, self.tableWidget_files)
+        Dialog_reference_manager.setTabOrder(self.tableWidget_files, self.checkBox_hide_files)
+        Dialog_reference_manager.setTabOrder(self.checkBox_hide_files, self.checkBox_hide_refs)
+        Dialog_reference_manager.setTabOrder(self.checkBox_hide_refs, self.pushButton_link)
+        Dialog_reference_manager.setTabOrder(self.pushButton_link, self.pushButton_unlink_files)
+        Dialog_reference_manager.setTabOrder(self.pushButton_unlink_files, self.pushButton_edit_ref)
+        Dialog_reference_manager.setTabOrder(self.pushButton_edit_ref, self.pushButton_delete_ref)
+        Dialog_reference_manager.setTabOrder(self.pushButton_delete_ref, self.pushButton_delete_unused_refs)
 
     def retranslateUi(self, Dialog_reference_manager):
         _translate = QtCore.QCoreApplication.translate
