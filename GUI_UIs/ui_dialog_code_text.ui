@@ -916,13 +916,42 @@ As all assigned positions may be incorrect. </string>
   </layout>
  </widget>
  <tabstops>
+  <tabstop>pushButton_annotate</tabstop>
+  <tabstop>pushButton_show_annotations</tabstop>
+  <tabstop>pushButton_coding_memo</tabstop>
+  <tabstop>pushButton_show_memos</tabstop>
+  <tabstop>spinBox_font_size</tabstop>
+  <tabstop>pushButton_auto_code</tabstop>
+  <tabstop>pushButton_auto_code_frag_this_file</tabstop>
+  <tabstop>pushButton_auto_code_frag_all_files</tabstop>
+  <tabstop>pushButton_auto_code_surround</tabstop>
+  <tabstop>pushButton_auto_code_undo</tabstop>
+  <tabstop>pushButton_help</tabstop>
   <tabstop>lineEdit_search</tabstop>
-  <tabstop>pushButton_previous</tabstop>
-  <tabstop>pushButton_next</tabstop>
   <tabstop>checkBox_search_case</tabstop>
   <tabstop>checkBox_search_all_files</tabstop>
-  <tabstop>pushButton_auto_code</tabstop>
+  <tabstop>pushButton_previous</tabstop>
+  <tabstop>pushButton_next</tabstop>
+  <tabstop>pushButton_edit</tabstop>
+  <tabstop>comboBox_export</tabstop>
+  <tabstop>listWidget</tabstop>
+  <tabstop>pushButton_next_file</tabstop>
+  <tabstop>pushButton_latest</tabstop>
+  <tabstop>pushButton_bookmark_go</tabstop>
+  <tabstop>pushButton_document_memo</tabstop>
+  <tabstop>pushButton_file_attributes</tabstop>
+  <tabstop>treeWidget</tabstop>
+  <tabstop>pushButton_show_codings_prev</tabstop>
+  <tabstop>pushButton_show_codings_next</tabstop>
+  <tabstop>pushButton_show_all_codings</tabstop>
+  <tabstop>pushButton_important</tabstop>
   <tabstop>textEdit</tabstop>
+  <tabstop>pushButton_code_rule</tabstop>
+  <tabstop>pushButton_journal</tabstop>
+  <tabstop>pushButton_project_memo</tabstop>
+  <tabstop>textEdit_info</tabstop>
+  <tabstop>pushButton_exit_edit</tabstop>
+  <tabstop>pushButton_delete_all_codes</tabstop>
  </tabstops>
  <resources/>
  <connections/>
