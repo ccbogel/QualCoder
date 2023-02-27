@@ -3572,34 +3572,36 @@ class DialogCodeText(QtWidgets.QWidget):
                 cur.execute("select name, id, fulltext, memo, owner, date from source where id=? and mediapath is Null",
                             [f['id']])
                 current_file = cur.fetchone()
-                text_ = current_file[2]
-                text_starts = [match.start() for match in re.finditer(re.escape(txt), text_)]
-                # Trim to first or last instance if option selected
-                if self.all_first_last == "first" and len(text_starts) > 1:
-                    text_starts = [text_starts[0]]
-                if self.all_first_last == "last" and len(text_starts) > 1:
-                    text_starts = [text_starts[-1]]
+                # Rare but possible no result is returned, hence if statement
+                if current_file is not None:
+                    text_ = current_file[2]
+                    text_starts = [match.start() for match in re.finditer(re.escape(txt), text_)]
+                    # Trim to first or last instance if option selected
+                    if self.all_first_last == "first" and len(text_starts) > 1:
+                        text_starts = [text_starts[0]]
+                    if self.all_first_last == "last" and len(text_starts) > 1:
+                        text_starts = [text_starts[-1]]
 
-                # Add new items to database
-                for startPos in text_starts:
-                    item = {'cid': cid, 'fid': int(f['id']), 'seltext': str(txt),
-                            'pos0': startPos, 'pos1': startPos + len(txt),
-                            'owner': self.app.settings['codername'], 'memo': "",
-                            'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")}
-                    try:
-                        cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,\
-                            owner,memo,date) values(?,?,?,?,?,?,?,?)",
-                                    [item['cid'], item['fid'], item['seltext'], item['pos0'],
-                                     item['pos1'], item['owner'], item['memo'], item['date']])
-                        self.app.conn.commit()
-                        # Record a list of undo sql
-                        undo = {"sql": "delete from code_text where cid=? and fid=? and pos0=? and pos1=? and owner=?",
-                                "cid": item['cid'], "fid": item['fid'], "pos0": item['pos0'], "pos1": item['pos1'],
-                                "owner": item['owner']}
-                        undo_list.append(undo)
-                    except sqlite3.IntegrityError as e:
-                        logger.debug(_("Autocode insert error ") + str(e))
-                    self.app.delete_backup = False
+                    # Add new items to database
+                    for startPos in text_starts:
+                        item = {'cid': cid, 'fid': int(f['id']), 'seltext': str(txt),
+                                'pos0': startPos, 'pos1': startPos + len(txt),
+                                'owner': self.app.settings['codername'], 'memo': "",
+                                'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")}
+                        try:
+                            cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,\
+                                owner,memo,date) values(?,?,?,?,?,?,?,?)",
+                                        [item['cid'], item['fid'], item['seltext'], item['pos0'],
+                                         item['pos1'], item['owner'], item['memo'], item['date']])
+                            self.app.conn.commit()
+                            # Record a list of undo sql
+                            undo = {"sql": "delete from code_text where cid=? and fid=? and pos0=? and pos1=? and owner=?",
+                                    "cid": item['cid'], "fid": item['fid'], "pos0": item['pos0'], "pos1": item['pos1'],
+                                    "owner": item['owner']}
+                            undo_list.append(undo)
+                        except sqlite3.IntegrityError as e:
+                            logger.debug(_("Autocode insert error ") + str(e))
+                        self.app.delete_backup = False
                 self.parent_textEdit.append(_("Automatic coding in files: ") + filenames
                                             + _(". with text: ") + txt)
         if len(undo_list) > 0:
