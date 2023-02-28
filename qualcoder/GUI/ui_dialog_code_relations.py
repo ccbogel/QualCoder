@@ -124,6 +124,17 @@ class Ui_Dialog_CodeRelations(object):
 
         self.retranslateUi(Dialog_CodeRelations)
         QtCore.QMetaObject.connectSlotsByName(Dialog_CodeRelations)
+        Dialog_CodeRelations.setTabOrder(self.radioButton_this, self.radioButton_all)
+        Dialog_CodeRelations.setTabOrder(self.radioButton_all, self.comboBox_relation_type)
+        Dialog_CodeRelations.setTabOrder(self.comboBox_relation_type, self.pushButton_select_files)
+        Dialog_CodeRelations.setTabOrder(self.pushButton_select_files, self.pushButton_calculate)
+        Dialog_CodeRelations.setTabOrder(self.pushButton_calculate, self.lineEdit_search_results)
+        Dialog_CodeRelations.setTabOrder(self.lineEdit_search_results, self.pushButton_search_next)
+        Dialog_CodeRelations.setTabOrder(self.pushButton_search_next, self.pushButton_boxplots)
+        Dialog_CodeRelations.setTabOrder(self.pushButton_boxplots, self.pushButton_exportcsv)
+        Dialog_CodeRelations.setTabOrder(self.pushButton_exportcsv, self.treeWidget)
+        Dialog_CodeRelations.setTabOrder(self.treeWidget, self.tableWidget)
+        Dialog_CodeRelations.setTabOrder(self.tableWidget, self.tableWidget_statistics)
 
     def retranslateUi(self, Dialog_CodeRelations):
         _translate = QtCore.QCoreApplication.translate
@@ -134,6 +145,7 @@ class Ui_Dialog_CodeRelations(object):
         self.radioButton_this.setText(_translate("Dialog_CodeRelations", "This coder"))
         self.radioButton_all.setText(_translate("Dialog_CodeRelations", "All coders"))
         self.pushButton_select_files.setToolTip(_translate("Dialog_CodeRelations", "Select text files."))
+        self.comboBox_relation_type.setToolTip(_translate("Dialog_CodeRelations", "<html><head/><body><p>Relationship types</p></body></html>"))
         self.comboBox_relation_type.setItemText(0, _translate("Dialog_CodeRelations", "All"))
         self.comboBox_relation_type.setItemText(1, _translate("Dialog_CodeRelations", "Overlap"))
         self.comboBox_relation_type.setItemText(2, _translate("Dialog_CodeRelations", "Inclusion"))
