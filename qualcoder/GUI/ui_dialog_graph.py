@@ -97,6 +97,21 @@ class Ui_DialogGraph(object):
 
         self.retranslateUi(DialogGraph)
         QtCore.QMetaObject.connectSlotsByName(DialogGraph)
+        DialogGraph.setTabOrder(self.pushButton_selectbranch, self.pushButton_freetextitem)
+        DialogGraph.setTabOrder(self.pushButton_freetextitem, self.pushButton_addcase)
+        DialogGraph.setTabOrder(self.pushButton_addcase, self.pushButton_addfile)
+        DialogGraph.setTabOrder(self.pushButton_addfile, self.pushButton_addline)
+        DialogGraph.setTabOrder(self.pushButton_addline, self.pushButton_codes_of_text)
+        DialogGraph.setTabOrder(self.pushButton_codes_of_text, self.pushButton_codes_of_images)
+        DialogGraph.setTabOrder(self.pushButton_codes_of_images, self.pushButton_codes_of_av)
+        DialogGraph.setTabOrder(self.pushButton_codes_of_av, self.pushButton_memos_of_file)
+        DialogGraph.setTabOrder(self.pushButton_memos_of_file, self.pushButton_reveal)
+        DialogGraph.setTabOrder(self.pushButton_reveal, self.pushButton_export)
+        DialogGraph.setTabOrder(self.pushButton_export, self.pushButton_clear)
+        DialogGraph.setTabOrder(self.pushButton_clear, self.pushButton_savegraph)
+        DialogGraph.setTabOrder(self.pushButton_savegraph, self.pushButton_loadgraph)
+        DialogGraph.setTabOrder(self.pushButton_loadgraph, self.pushButton_deletegraph)
+        DialogGraph.setTabOrder(self.pushButton_deletegraph, self.graphicsView)
 
     def retranslateUi(self, DialogGraph):
         _translate = QtCore.QCoreApplication.translate
