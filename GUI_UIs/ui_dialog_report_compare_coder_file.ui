@@ -77,6 +77,9 @@
         <height>28</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select two coders&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
      </widget>
      <widget class="QLabel" name="label_title">
       <property name="geometry">
@@ -223,6 +226,11 @@ Select two coders, one file, one code.</string>
  </widget>
  <tabstops>
   <tabstop>comboBox_coders</tabstop>
+  <tabstop>pushButton_run</tabstop>
+  <tabstop>pushButton_clear</tabstop>
+  <tabstop>pushButton_export_odt</tabstop>
+  <tabstop>pushButton_help1</tabstop>
+  <tabstop>listWidget_files</tabstop>
   <tabstop>treeWidget</tabstop>
   <tabstop>textEdit</tabstop>
  </tabstops>
