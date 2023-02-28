@@ -82,13 +82,19 @@ class Ui_Dialog_reportCompareCoderFile(object):
 
         self.retranslateUi(Dialog_reportCompareCoderFile)
         QtCore.QMetaObject.connectSlotsByName(Dialog_reportCompareCoderFile)
-        Dialog_reportCompareCoderFile.setTabOrder(self.comboBox_coders, self.treeWidget)
+        Dialog_reportCompareCoderFile.setTabOrder(self.comboBox_coders, self.pushButton_run)
+        Dialog_reportCompareCoderFile.setTabOrder(self.pushButton_run, self.pushButton_clear)
+        Dialog_reportCompareCoderFile.setTabOrder(self.pushButton_clear, self.pushButton_export_odt)
+        Dialog_reportCompareCoderFile.setTabOrder(self.pushButton_export_odt, self.pushButton_help1)
+        Dialog_reportCompareCoderFile.setTabOrder(self.pushButton_help1, self.listWidget_files)
+        Dialog_reportCompareCoderFile.setTabOrder(self.listWidget_files, self.treeWidget)
         Dialog_reportCompareCoderFile.setTabOrder(self.treeWidget, self.textEdit)
 
     def retranslateUi(self, Dialog_reportCompareCoderFile):
         _translate = QtCore.QCoreApplication.translate
         Dialog_reportCompareCoderFile.setWindowTitle(_translate("Dialog_reportCompareCoderFile", "Reports"))
         self.label_2.setText(_translate("Dialog_reportCompareCoderFile", "Coders:"))
+        self.comboBox_coders.setToolTip(_translate("Dialog_reportCompareCoderFile", "<html><head/><body><p>Select two coders</p></body></html>"))
         self.label_title.setToolTip(_translate("Dialog_reportCompareCoderFile", "To compare coding.\n"
 "Select two coders, one file, one code."))
         self.label_title.setText(_translate("Dialog_reportCompareCoderFile", "Coder comparisons by file"))
