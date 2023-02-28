@@ -65,6 +65,11 @@ class Ui_Dialog_reportCodeFrequencies(object):
 
         self.retranslateUi(Dialog_reportCodeFrequencies)
         QtCore.QMetaObject.connectSlotsByName(Dialog_reportCodeFrequencies)
+        Dialog_reportCodeFrequencies.setTabOrder(self.pushButton_select_files, self.pushButton_exporttext)
+        Dialog_reportCodeFrequencies.setTabOrder(self.pushButton_exporttext, self.pushButton_exportcsv)
+        Dialog_reportCodeFrequencies.setTabOrder(self.pushButton_exportcsv, self.radioButton)
+        Dialog_reportCodeFrequencies.setTabOrder(self.radioButton, self.radioButton_2)
+        Dialog_reportCodeFrequencies.setTabOrder(self.radioButton_2, self.treeWidget)
 
     def retranslateUi(self, Dialog_reportCodeFrequencies):
         _translate = QtCore.QCoreApplication.translate
@@ -72,6 +77,7 @@ class Ui_Dialog_reportCodeFrequencies(object):
         self.label_selections.setText(_translate("Dialog_reportCodeFrequencies", "Code and category frequencies: overall and by coder"))
         self.pushButton_exporttext.setToolTip(_translate("Dialog_reportCodeFrequencies", "<html><head/><body><p>Export text file</p></body></html>"))
         self.pushButton_exportcsv.setToolTip(_translate("Dialog_reportCodeFrequencies", "<html><head/><body><p>Export csv file</p></body></html>"))
+        self.pushButton_select_files.setToolTip(_translate("Dialog_reportCodeFrequencies", "<html><head/><body><p>Select files</p></body></html>"))
         self.pushButton_select_files.setText(_translate("Dialog_reportCodeFrequencies", "Select files"))
         self.radioButton.setText(_translate("Dialog_reportCodeFrequencies", "Alphabetic ascending"))
         self.radioButton_2.setText(_translate("Dialog_reportCodeFrequencies", "Totals descending"))
