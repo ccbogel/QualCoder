@@ -439,8 +439,22 @@
   <tabstop>comboBox_coders</tabstop>
   <tabstop>lineEdit</tabstop>
   <tabstop>pushButton_search</tabstop>
+  <tabstop>comboBox_sort</tabstop>
+  <tabstop>pushButton_attributeselect</tabstop>
+  <tabstop>comboBox_memos</tabstop>
+  <tabstop>checkBox_important</tabstop>
+  <tabstop>checkBox_show_stats</tabstop>
+  <tabstop>checkBox_text_context</tabstop>
+  <tabstop>checkBox_matrix_transpose</tabstop>
+  <tabstop>comboBox_matrix</tabstop>
+  <tabstop>listWidget_files</tabstop>
+  <tabstop>listWidget_cases</tabstop>
   <tabstop>treeWidget</tabstop>
+  <tabstop>lineEdit_search_results</tabstop>
+  <tabstop>pushButton_search_next</tabstop>
+  <tabstop>comboBox_export</tabstop>
   <tabstop>textEdit</tabstop>
+  <tabstop>tableWidget</tabstop>
  </tabstops>
  <resources/>
  <connections/>
