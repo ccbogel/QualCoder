@@ -318,6 +318,24 @@ Right-click for options</string>
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>pushButton_selectbranch</tabstop>
+  <tabstop>pushButton_freetextitem</tabstop>
+  <tabstop>pushButton_addcase</tabstop>
+  <tabstop>pushButton_addfile</tabstop>
+  <tabstop>pushButton_addline</tabstop>
+  <tabstop>pushButton_codes_of_text</tabstop>
+  <tabstop>pushButton_codes_of_images</tabstop>
+  <tabstop>pushButton_codes_of_av</tabstop>
+  <tabstop>pushButton_memos_of_file</tabstop>
+  <tabstop>pushButton_reveal</tabstop>
+  <tabstop>pushButton_export</tabstop>
+  <tabstop>pushButton_clear</tabstop>
+  <tabstop>pushButton_savegraph</tabstop>
+  <tabstop>pushButton_loadgraph</tabstop>
+  <tabstop>pushButton_deletegraph</tabstop>
+  <tabstop>graphicsView</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
