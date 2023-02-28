@@ -179,7 +179,7 @@
      <widget class="QPushButton" name="pushButton_play">
       <property name="geometry">
        <rect>
-        <x>187</x>
+        <x>8</x>
         <y>10</y>
         <width>28</width>
         <height>28</height>
@@ -233,7 +233,7 @@
      <widget class="QLabel" name="label_time">
       <property name="geometry">
        <rect>
-        <x>320</x>
+        <x>138</x>
         <y>10</y>
         <width>181</width>
         <height>28</height>
@@ -246,7 +246,7 @@
      <widget class="QPushButton" name="pushButton_coding">
       <property name="geometry">
        <rect>
-        <x>0</x>
+        <x>320</x>
         <y>10</y>
         <width>181</width>
         <height>28</height>
@@ -263,7 +263,7 @@ Key shortcut: Ctrl S</string>
      <widget class="QLabel" name="label_segment">
       <property name="geometry">
        <rect>
-        <x>6</x>
+        <x>280</x>
         <y>50</y>
         <width>241</width>
         <height>28</height>
@@ -279,7 +279,7 @@ Key shortcut: Ctrl S</string>
      <widget class="QLabel" name="label_coder">
       <property name="geometry">
        <rect>
-        <x>280</x>
+        <x>0</x>
         <y>50</y>
         <width>261</width>
         <height>28</height>
@@ -297,6 +297,9 @@ Key shortcut: Ctrl S</string>
         <width>51</width>
         <height>28</height>
        </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Change track, if multiple avaiable.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
      <widget class="QCheckBox" name="checkBox_scroll_transcript">
@@ -334,7 +337,7 @@ Key shortcut: Ctrl S</string>
      <widget class="QPushButton" name="pushButton_rewind_30">
       <property name="geometry">
        <rect>
-        <x>250</x>
+        <x>71</x>
         <y>10</y>
         <width>28</width>
         <height>28</height>
@@ -350,7 +353,7 @@ Key shortcut: Ctrl S</string>
      <widget class="QPushButton" name="pushButton_forward_30">
       <property name="geometry">
        <rect>
-        <x>280</x>
+        <x>101</x>
         <y>10</y>
         <width>28</width>
         <height>28</height>
@@ -398,7 +401,7 @@ Key shortcut: Ctrl S</string>
      <widget class="QPushButton" name="pushButton_rewind_5">
       <property name="geometry">
        <rect>
-        <x>219</x>
+        <x>40</x>
         <y>10</y>
         <width>28</width>
         <height>28</height>
@@ -489,7 +492,26 @@ Key shortcut: Ctrl S</string>
  </widget>
  <tabstops>
   <tabstop>pushButton_play</tabstop>
+  <tabstop>pushButton_rewind_5</tabstop>
+  <tabstop>pushButton_rewind_30</tabstop>
+  <tabstop>pushButton_forward_30</tabstop>
+  <tabstop>pushButton_coding</tabstop>
+  <tabstop>pushButton_rate_down</tabstop>
+  <tabstop>pushButton_rate_up</tabstop>
   <tabstop>horizontalSlider_vol</tabstop>
+  <tabstop>comboBox_tracks</tabstop>
+  <tabstop>pushButton_important</tabstop>
+  <tabstop>pushButton_help</tabstop>
+  <tabstop>checkBox_scroll_transcript</tabstop>
+  <tabstop>horizontalSlider</tabstop>
+  <tabstop>graphicsView</tabstop>
+  <tabstop>listWidget</tabstop>
+  <tabstop>pushButton_next_file</tabstop>
+  <tabstop>pushButton_latest</tabstop>
+  <tabstop>pushButton_document_memo</tabstop>
+  <tabstop>pushButton_file_attributes</tabstop>
+  <tabstop>treeWidget</tabstop>
+  <tabstop>textEdit</tabstop>
  </tabstops>
  <resources/>
  <connections/>
