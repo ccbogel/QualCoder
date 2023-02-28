@@ -148,6 +148,9 @@
         <height>26</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Relationship types&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <item>
        <property name="text">
         <string>All</string>
@@ -342,6 +345,20 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>radioButton_this</tabstop>
+  <tabstop>radioButton_all</tabstop>
+  <tabstop>comboBox_relation_type</tabstop>
+  <tabstop>pushButton_select_files</tabstop>
+  <tabstop>pushButton_calculate</tabstop>
+  <tabstop>lineEdit_search_results</tabstop>
+  <tabstop>pushButton_search_next</tabstop>
+  <tabstop>pushButton_boxplots</tabstop>
+  <tabstop>pushButton_exportcsv</tabstop>
+  <tabstop>treeWidget</tabstop>
+  <tabstop>tableWidget</tabstop>
+  <tabstop>tableWidget_statistics</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
