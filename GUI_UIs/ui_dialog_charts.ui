@@ -31,7 +31,7 @@
     <rect>
      <x>10</x>
      <y>80</y>
-     <width>311</width>
+     <width>321</width>
      <height>22</height>
     </rect>
    </property>
@@ -44,7 +44,7 @@
     <rect>
      <x>10</x>
      <y>143</y>
-     <width>291</width>
+     <width>321</width>
      <height>22</height>
     </rect>
    </property>
@@ -87,7 +87,7 @@
     <rect>
      <x>10</x>
      <y>200</y>
-     <width>291</width>
+     <width>321</width>
      <height>22</height>
     </rect>
    </property>
@@ -100,7 +100,7 @@
     <rect>
      <x>410</x>
      <y>103</y>
-     <width>151</width>
+     <width>321</width>
      <height>22</height>
     </rect>
    </property>
@@ -133,7 +133,7 @@
     <rect>
      <x>410</x>
      <y>160</y>
-     <width>231</width>
+     <width>321</width>
      <height>22</height>
     </rect>
    </property>
@@ -160,7 +160,7 @@ Codings from the entire text file are used for the calculations.</string>
     <rect>
      <x>410</x>
      <y>220</y>
-     <width>211</width>
+     <width>321</width>
      <height>22</height>
     </rect>
    </property>
@@ -267,7 +267,7 @@ Codings from the entire text file are used for the calculations.</string>
     <rect>
      <x>410</x>
      <y>280</y>
-     <width>151</width>
+     <width>321</width>
      <height>22</height>
     </rect>
    </property>
@@ -312,7 +312,7 @@ Codings from the entire text file are used for the calculations.</string>
     <rect>
      <x>10</x>
      <y>516</y>
-     <width>291</width>
+     <width>321</width>
      <height>22</height>
     </rect>
    </property>
@@ -325,7 +325,7 @@ Codings from the entire text file are used for the calculations.</string>
     <rect>
      <x>10</x>
      <y>457</y>
-     <width>291</width>
+     <width>321</width>
      <height>22</height>
     </rect>
    </property>
@@ -432,7 +432,7 @@ Codings from the entire text file are used for the calculations.</string>
     <rect>
      <x>10</x>
      <y>280</y>
-     <width>261</width>
+     <width>321</width>
      <height>22</height>
     </rect>
    </property>
@@ -516,6 +516,23 @@ Codings from the entire text file are used for the calculations.</string>
   <zorder>line_4</zorder>
   <zorder>comboBox_heatmap</zorder>
  </widget>
+ <tabstops>
+  <tabstop>checkBox_export_html</tabstop>
+  <tabstop>comboBox_pie_charts</tabstop>
+  <tabstop>comboBox_bar_charts</tabstop>
+  <tabstop>comboBox_sunburst_charts</tabstop>
+  <tabstop>comboBox_heatmap</tabstop>
+  <tabstop>radioButton_file</tabstop>
+  <tabstop>radioButton_case</tabstop>
+  <tabstop>comboBox_char_attributes</tabstop>
+  <tabstop>comboBox_num_attributes</tabstop>
+  <tabstop>lineEdit_filter</tabstop>
+  <tabstop>comboBox_coders</tabstop>
+  <tabstop>comboBox_file</tabstop>
+  <tabstop>comboBox_case</tabstop>
+  <tabstop>comboBox_category</tabstop>
+  <tabstop>pushButton_attributes</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
