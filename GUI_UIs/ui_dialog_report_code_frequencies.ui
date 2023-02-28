@@ -133,6 +133,9 @@
         <height>32</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select files&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
        <string>Select files</string>
       </property>
@@ -200,6 +203,14 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>pushButton_select_files</tabstop>
+  <tabstop>pushButton_exporttext</tabstop>
+  <tabstop>pushButton_exportcsv</tabstop>
+  <tabstop>radioButton</tabstop>
+  <tabstop>radioButton_2</tabstop>
+  <tabstop>treeWidget</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
