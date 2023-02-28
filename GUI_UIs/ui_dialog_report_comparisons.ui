@@ -88,6 +88,9 @@
         <height>32</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select two coders&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
      </widget>
      <widget class="QPushButton" name="pushButton_clear">
       <property name="geometry">
@@ -202,7 +205,10 @@
  <tabstops>
   <tabstop>comboBox_coders</tabstop>
   <tabstop>pushButton_run</tabstop>
+  <tabstop>pushButton_clear</tabstop>
   <tabstop>pushButton_exporttext</tabstop>
+  <tabstop>pushButton_help1</tabstop>
+  <tabstop>treeWidget</tabstop>
  </tabstops>
  <resources/>
  <connections/>
