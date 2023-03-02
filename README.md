@@ -287,6 +287,10 @@ https://github.com/ccbogel/QualCoder/releases/tag/3.1
 
 Colin Curtain BPharm GradDipComp PhD. Python programmer, lecturer.
 
+https://www.utas.edu.au/profiles/staff/umore/colin-curtain
+
+https://scholar.google.com/citations?user=KTMRMWoAAAAJ&hl=en
+
 
 ## Leave a review
 If you like QualCoder and found it useful for your work. Please leave a review on these sites:
