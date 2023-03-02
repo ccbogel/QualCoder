@@ -283,6 +283,10 @@ QualCoder is distributed under the MIT LICENSE.
 Curtain, C. (2022) QualCoder 3.2 [Computer software]. Retrieved from
 https://github.com/ccbogel/QualCoder/releases/tag/3.1
 
+## Creator
+
+Colin Curtain BPharm GradDipComp PhD. Python programmer, lecturer.
+
 
 ## Leave a review
 If you like QualCoder and found it useful for your work. Please leave a review on these sites:
