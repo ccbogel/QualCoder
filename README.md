@@ -285,7 +285,7 @@ https://github.com/ccbogel/QualCoder/releases/tag/3.2
 
 ## Creator
 
-Colin Curtain BPharm GradDipComp PhD. Python programmer, lecturer.
+Dr Colin Curtain BPharm GradDipComp PhD. Python programmer, lecturer.
 
 https://www.utas.edu.au/profiles/staff/umore/colin-curtain
 
