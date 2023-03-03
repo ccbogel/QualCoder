@@ -191,6 +191,8 @@ Fedora uses wayland with does not work well with the Qt graphical interface (for
 
 The instructions work on Mac Monterey. It is recommended to use a virtual environment, see: https://sourabhbajaj.com/mac-setup/Python/virtualenv.html The below instructions can be used inside a virtual environment folder instead of placing in Applications.
 
+You will need to install developer tools for mac (sorry I am not sure how to describe how to do this).
+
 1) Install recent versions of [Python3](https://www.python.org/downloads/) and [VLC](https://www.videolan.org/vlc/).
 
 2) Download the latest release "Source code" version in ZIP format, from the releases section of the project here on Github: https://github.com/ccbogel/QualCoder/releases/tag/3.1 and extract it into /Applications
