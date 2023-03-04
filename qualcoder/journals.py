@@ -80,6 +80,9 @@ class DialogJournals(QtWidgets.QDialog):
     qtimer = None
     timer_msecs = 1500
 
+    # Timer to reduce overly sensitive key events
+    keypress_timer = 0
+
     def __init__(self, app, parent_text_edit, parent=None):
 
         super(DialogJournals, self).__init__(parent)  # overrride accept method
@@ -92,6 +95,7 @@ class DialogJournals(QtWidgets.QDialog):
         self.search_index = 0
         self.qtimer = QtCore.QTimer()
         self.qtimer.timeout.connect(self.update_database_text)
+        self.keypress_timer = datetime.datetime.now()
         self.text_changed_flag = False
         cur = self.app.conn.cursor()
         cur.execute("select name, date, jentry, owner, jid from journal")
@@ -177,9 +181,14 @@ class DialogJournals(QtWidgets.QDialog):
         webbrowser.open(url)
 
     def eventFilter(self, object_, event):
+        """ Ctrl F Search box focus.
+        Control 1 to 4 match buttons order. Control 0 opens help.
+        keypress timers prevents multiple key events firing too soon
         """
-        Ctrl F Search box focus
-        """
+
+        # keypress timing
+        now = datetime.datetime.now()
+        keypress_diff = now - self.keypress_timer
 
         if type(event) == QtGui.QKeyEvent:
             key = event.key()
@@ -188,6 +197,28 @@ class DialogJournals(QtWidgets.QDialog):
             if key == QtCore.Qt.Key.Key_F and mod == QtCore.Qt.KeyboardModifier.ControlModifier:
                 self.ui.lineEdit_search.setFocus()
                 return True
+            # Alt 0 to 9
+            if mod == QtCore.Qt.KeyboardModifier.ControlModifier and keypress_diff.microseconds > 550000:
+                if key == QtCore.Qt.Key.Key_1:
+                    self.keypress_timer = datetime.datetime.now()
+                    self.create_journal()
+                    return True
+                if key == QtCore.Qt.Key.Key_2:
+                    self.keypress_timer = datetime.datetime.now()
+                    self.export()
+                    return True
+                if key == QtCore.Qt.Key.Key_3:
+                    self.keypress_timer = datetime.datetime.now()
+                    self.export_all_journals_as_one_file()
+                    return True
+                if key == QtCore.Qt.Key.Key_4:
+                    self.keypress_timer = datetime.datetime.now()
+                    self.delete()
+                    return True
+                if key == QtCore.Qt.Key.Key_0:
+                    self.keypress_timer = datetime.datetime.now()
+                    self.help()
+                    return True
         return False
 
     def fill_table(self):
@@ -357,18 +388,18 @@ class DialogJournals(QtWidgets.QDialog):
         row = self.ui.tableWidget.currentRow()
         if row == -1:
             return
-        journalname = self.journals[row]['name']
+        journal_name = self.journals[row]['name']
         ui = DialogConfirmDelete(self.app, self.journals[row]['name'])
         ok = ui.exec()
         if ok:
             cur = self.app.conn.cursor()
-            cur.execute("delete from journal where name = ?", [journalname])
+            cur.execute("delete from journal where name = ?", [journal_name])
             self.app.conn.commit()
             for item in self.journals:
-                if item['name'] == journalname:
+                if item['name'] == journal_name:
                     self.journals.remove(item)
             self.fill_table()
-            self.parent_textEdit.append(_("Journal deleted: ") + journalname)
+            self.parent_textEdit.append(_("Journal deleted: ") + journal_name)
 
     def table_selection_changed(self):
         """ Present the journal text for the current selection. """
