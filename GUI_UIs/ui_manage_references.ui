@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Dialog_reference_manager</class>
- <widget class="QDialog" name="Dialog_reference_manager">
+ <class>Dialog_manage_references</class>
+ <widget class="QDialog" name="Dialog_manage_references">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -29,7 +29,7 @@
       </size>
      </property>
      <property name="text">
-      <string>Assign selected file(s) to selected reference. Press L or Button below.</string>
+      <string>Assign selected file(s) to selected reference. Press L or Link button below.</string>
      </property>
     </widget>
    </item>
@@ -88,7 +88,7 @@
      <widget class="QPushButton" name="pushButton_delete_ref">
       <property name="geometry">
        <rect>
-        <x>490</x>
+        <x>560</x>
         <y>8</y>
         <width>30</width>
         <height>30</height>
@@ -104,7 +104,7 @@
      <widget class="QPushButton" name="pushButton_link">
       <property name="geometry">
        <rect>
-        <x>350</x>
+        <x>340</x>
         <y>8</y>
         <width>30</width>
         <height>30</height>
@@ -120,7 +120,7 @@
      <widget class="QPushButton" name="pushButton_unlink_files">
       <property name="geometry">
        <rect>
-        <x>390</x>
+        <x>380</x>
         <y>8</y>
         <width>30</width>
         <height>30</height>
@@ -136,7 +136,7 @@
      <widget class="QPushButton" name="pushButton_delete_unused_refs">
       <property name="geometry">
        <rect>
-        <x>540</x>
+        <x>600</x>
         <y>8</y>
         <width>30</width>
         <height>30</height>
@@ -152,7 +152,7 @@
      <widget class="QPushButton" name="pushButton_edit_ref">
       <property name="geometry">
        <rect>
-        <x>430</x>
+        <x>420</x>
         <y>8</y>
         <width>30</width>
         <height>30</height>
@@ -160,6 +160,22 @@
       </property>
       <property name="toolTip">
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Edit reference&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_import">
+      <property name="geometry">
+       <rect>
+        <x>480</x>
+        <y>8</y>
+        <width>30</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Import references. RIS format.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -177,6 +193,7 @@
   <tabstop>pushButton_link</tabstop>
   <tabstop>pushButton_unlink_files</tabstop>
   <tabstop>pushButton_edit_ref</tabstop>
+  <tabstop>pushButton_import</tabstop>
   <tabstop>pushButton_delete_ref</tabstop>
   <tabstop>pushButton_delete_unused_refs</tabstop>
  </tabstops>

@@ -35,9 +35,9 @@ from PyQt6 import QtWidgets, QtCore, QtGui
 
 from .GUI.base64_helper import *
 from .GUI.ui_reference_editor import Ui_DialogReferenceEditor
-from .GUI.ui_reference_manager import Ui_Dialog_reference_manager
+from .GUI.ui_manage_references import Ui_Dialog_manage_references
 from .confirm_delete import DialogConfirmDelete
-from .ris import Ris
+from .ris import Ris, RisImport
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -72,7 +72,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
         self.files = []
         self.refs = []
         QtWidgets.QDialog.__init__(self)
-        self.ui = Ui_Dialog_reference_manager()
+        self.ui = Ui_Dialog_manage_references()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
@@ -89,6 +89,10 @@ class DialogReferenceManager(QtWidgets.QDialog):
         self.ui.tableWidget_refs.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         #self.ui.tableWidget_refs.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         #self.ui.tableWidget_refs.customContextMenuRequested.connect(self.table_menu)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_import_icon), "png")
+        self.ui.pushButton_import.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_import.pressed.connect(self.import_references)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(link_icon), "png")
         self.ui.pushButton_link.setIcon(QtGui.QIcon(pm))
@@ -205,6 +209,12 @@ class DialogReferenceManager(QtWidgets.QDialog):
         if self.ui.tableWidget_refs.columnWidth(1) > 600:
             self.ui.tableWidget_refs.setColumnWidth(1, 600)
         self.ui.tableWidget_refs.resizeRowsToContents()
+
+    def import_references(self):
+        """ Import RIS formatted references from .ris or .txt files """
+
+        RisImport(self.app, self.parent_textEdit)
+        self.get_data()
 
     def eventFilter(self, object_, event):
         """ L Link files to reference.
