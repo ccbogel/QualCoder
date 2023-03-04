@@ -179,13 +179,13 @@ Not tested, but please see the above instructions to build QualCoder inside a vi
 
 Retrieve the current package code from this repository
 
-`git clone https://github.com/ccbogel/QualCoder.git`
+1) Open your preferred shell (terminal). 2) Navigate to your preferred code directory. 3) There, run: `git clone https://github.com/ccbogel/QualCoder.git` and 4) enter the directory with `cd QualCoder`. 5) Make `install_fedora.sh` executable (`chmod +x install_fedora.sh`) and 6) run the `./install_fedora.sh` script from the terminal. The script is for python version 3.11.
 
-Make `install_fedora.sh` executable (`chmod +x install_fedora.sh`) and run the `./install_fedora.sh` script from the terminal. Make sure the qualcoder folder is in the same directory as the install.sh script (i.e. as it appears when you download the QualCoder-master folder). The script is for python version 3.10.
+Then start QualCoder as any other app on your system.
 
-This script installs the dependencies using dnf and the ebook libraries with a work-around, specified at https://github.com/ccbogel/QualCoder/issues/72#issuecomment-695962784.
+Note 1_ This script installs the dependencies using dnf and the ebook libraries with a work-around, specified at https://github.com/ccbogel/QualCoder/issues/72#issuecomment-695962784.
 
-Fedora uses wayland with does not work well with the Qt graphical interface (for now). I suggest you also install xwayland.
+Note 2: Fedora uses wayland with does not work well with the Qt graphical interface (for now). I suggest you also install xwayland.
 
 ### MacOS
 
