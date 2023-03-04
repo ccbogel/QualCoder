@@ -33,6 +33,8 @@ import logging
 import traceback
 
 from .GUI.ui_dialog_memo import Ui_Dialog_memo
+from .helpers import MarkdownHighlighter
+
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -79,6 +81,7 @@ class DialogMemo(QtWidgets.QDialog):
         if clear_button == "hide":
             self.ui.pushButton_clear.hide()
         self.ui.pushButton_clear.pressed.connect(self.clear_contents)
+        highlighter = MarkdownHighlighter(self.ui.textEdit, self.app)
 
     def clear_contents(self):
         """ Clear all text """
