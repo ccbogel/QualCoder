@@ -206,13 +206,6 @@ class DialogCases(QtWidgets.QDialog):
         url = "https://github.com/ccbogel/QualCoder/wiki/06-Cases"
         webbrowser.open(url)
 
-    def closeEvent(self, event):
-        """ Save splitter dimensions. """
-
-        sizes = self.ui.splitter.sizes()
-        self.app.settings['dialogcases_splitter0'] = sizes[0]
-        self.app.settings['dialogcases_splitter1'] = sizes[1]
-
     def count_selected_items(self):
         """ Update label with the count of selected rows.
          Also clear the text edit if multiple rows are selected.
