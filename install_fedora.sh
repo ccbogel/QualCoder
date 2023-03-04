@@ -6,7 +6,7 @@ echo "This installer uses DNF package management."
 echo "QualCoder will be copied to the directory /usr/share/"
 echo "These actions require owner (sudo) permission"
 echo "The installer will also install dependencies"
-sudo dnf install python3-devel python3-pdfminer.noarch python3-qt5 python3-pillow python3-openpyxl python3-pandas pythn3-plotly python3-pip python3-pyqt6 python3-lxml python3-pil vlc python3-ply python3-six python3-chardet ffmpeg -y
+sudo dnf install python3-devel python3-pdfminer.noarch python3-qt5 python3-pillow python3-openpyxl python3-pandas python3-plotly python3-pip python3-pyqt6 python3-lxml python3-pillow vlc python3-ply python3-six python3-chardet ffmpeg -y
 # several python packages are not available by Fedora, so install using pip
 echo "Please wait ..."
 python3 -m pip install Ebooklib pydub rispy SpeechRecognition pdfminer.six
