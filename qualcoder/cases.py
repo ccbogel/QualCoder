@@ -151,14 +151,14 @@ class DialogCases(QtWidgets.QDialog):
         self.fill_table()
         # Initial resize of table columns
         self.ui.tableWidget.resizeColumnsToContents()
-        self.ui.splitter.setSizes([1, 1])
-        try:
+        self.ui.splitter.setSizes([1, 0])
+        '''try:
             s0 = int(self.app.settings['dialogcases_splitter0'])
             s1 = int(self.app.settings['dialogcases_splitter1'])
             if s0 > 10 and s1 > 10:
                 self.ui.splitter.setSizes([s0, s1])
         except KeyError:
-            pass
+            pass'''
         self.eventFilterTT = ToolTipEventFilter()
         self.ui.textBrowser.installEventFilter(self.eventFilterTT)
 
@@ -651,8 +651,8 @@ class DialogCases(QtWidgets.QDialog):
         self.app.delete_backup = False
 
     def cell_selected(self):
-        """ Highlight case text if a file is selected.
-        Indicate memo is present, update memo text, or delete memo by clearing text.
+        """ Indicate memo is present, update memo text, or delete memo by clearing text.
+        Open case_files_manager if files column is selected.
         """
 
         self.ui.textBrowser.clear()
@@ -678,9 +678,6 @@ class DialogCases(QtWidgets.QDialog):
             for row in result:
                 self.case_text.append({'caseid': row[0], 'fid': row[1], 'pos0': row[2],
                                        'pos1': row[3], 'owner': row[4], 'date': row[5], 'memo': row[6]})
-
-        # if y == self.NAME_COLUMN:
-        self.view()
 
         if y == self.MEMO_COLUMN:
             ui = DialogMemo(self.app, _("Memo for case ") + self.cases[x]['name'],
@@ -768,7 +765,9 @@ class DialogCases(QtWidgets.QDialog):
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         action_asc = None
         action_desc = None
+        action_view_case = None
         if col == 0:
+            action_view_case = menu.addAction(_("View case"))
             action_asc = menu.addAction(_("Order ascending"))
             action_desc = menu.addAction(_("Order descending"))
         action_show_values_like = menu.addAction(_("Show values like"))
@@ -776,6 +775,10 @@ class DialogCases(QtWidgets.QDialog):
         action_show_all = menu.addAction(_("Show all rows Ctrl A"))
         action = menu.exec(self.ui.tableWidget.mapToGlobal(position))
         if action is None:
+            return
+        if action == action_view_case:
+            self.ui.splitter.setSizes([1, 1])
+            self.view_case_files()
             return
         if action == action_asc:
             self.load_cases_and_attributes("asc")
@@ -882,7 +885,7 @@ class DialogCases(QtWidgets.QDialog):
                 tt = tt[1:]
         return tt
 
-    def view(self):
+    def view_case_files(self):
         """ View all the text associated with this case.
         Add links to open image and A/V files. """
 
