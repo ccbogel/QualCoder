@@ -135,11 +135,9 @@
      <property name="title">
       <string>Import</string>
      </property>
-     <addaction name="actionImport_survey"/>
      <addaction name="actionREFI_Codebook_import"/>
      <addaction name="actionREFI_QDA_Project_import"/>
      <addaction name="actionRQDA_Project_import"/>
-     <addaction name="actionImport_references_RIS_format"/>
      <addaction name="actionImport_plain_text_codes_list"/>
     </widget>
     <addaction name="actionCreate_New_Project"/>
@@ -164,6 +162,7 @@
     <addaction name="actionManage_journals"/>
     <addaction name="actionManage_attributes"/>
     <addaction name="actionManage_references"/>
+    <addaction name="actionImport_survey_2"/>
     <addaction name="actionManage_bad_links_to_files"/>
    </widget>
    <widget class="QMenu" name="menuCoding">
@@ -476,6 +475,11 @@
   <action name="actionImport_plain_text_codes_list">
    <property name="text">
     <string>Import plain text codes list</string>
+   </property>
+  </action>
+  <action name="actionImport_survey_2">
+   <property name="text">
+    <string>Import survey</string>
    </property>
   </action>
  </widget>
