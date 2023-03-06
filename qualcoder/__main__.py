@@ -65,7 +65,6 @@ from qualcoder.manage_links import DialogManageLinks
 from qualcoder.manage_references import DialogReferenceManager
 from qualcoder.memo import DialogMemo
 from qualcoder.refi import RefiExport, RefiImport
-from qualcoder.ris import RisImport
 from qualcoder.reports import DialogReportCoderComparisons, DialogReportCodeFrequencies
 from qualcoder.report_code_summary import DialogReportCodeSummary
 from qualcoder.report_compare_coder_file import DialogCompareCoderByFile
@@ -873,7 +872,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionExport_codebook_with_memos.triggered.connect(self.codebook_with_memos)
         self.ui.actionExit.triggered.connect(self.closeEvent)
         self.ui.actionExit.setShortcut('Ctrl+Q')
-        self.ui.actionImport_references_RIS_format.triggered.connect(self.import_references)
         self.ui.actionImport_plain_text_codes_list.triggered.connect(self.import_plain_text_codes)
 
         # File cases and journals menu
@@ -884,8 +882,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionManage_cases.setShortcut('Alt+C')
         self.ui.actionManage_attributes.triggered.connect(self.manage_attributes)
         self.ui.actionManage_attributes.setShortcut('Alt+A')
-        self.ui.actionImport_survey.triggered.connect(self.import_survey)
-        self.ui.actionImport_survey.setShortcut('Alt+I')
+        self.ui.actionImport_survey_2.triggered.connect(self.import_survey)
+        self.ui.actionImport_survey_2.setShortcut('Alt+I')
         self.ui.actionManage_bad_links_to_files.triggered.connect(self.manage_bad_file_links)
         self.ui.actionManage_references.triggered.connect(self.manage_references)
 
@@ -1001,7 +999,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionREFI_QDA_Project_import.setEnabled(True)
         self.ui.actionRQDA_Project_import.setEnabled(True)
         self.ui.actionExport_codebook.setEnabled(False)
-        self.ui.actionImport_references_RIS_format.setEnabled(False)
         self.ui.actionImport_plain_text_codes_list.setEnabled(False)
 
         # files cases journals menu
@@ -1009,7 +1006,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionManage_journals.setEnabled(False)
         self.ui.actionManage_cases.setEnabled(False)
         self.ui.actionManage_attributes.setEnabled(False)
-        self.ui.actionImport_survey.setEnabled(False)
+        self.ui.actionImport_survey_2.setEnabled(False)
         self.ui.actionManage_bad_links_to_files.setEnabled(False)
         self.ui.actionManage_references.setEnabled(False)
         # codes menu
@@ -1046,14 +1043,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionREFI_QDA_Project_import.setEnabled(True)
         self.ui.actionRQDA_Project_import.setEnabled(True)
         self.ui.actionExport_codebook.setEnabled(True)
-        self.ui.actionImport_references_RIS_format.setEnabled(True)
         self.ui.actionImport_plain_text_codes_list.setEnabled(True)
         # Files cases journals menu
         self.ui.actionManage_files.setEnabled(True)
         self.ui.actionManage_journals.setEnabled(True)
         self.ui.actionManage_cases.setEnabled(True)
         self.ui.actionManage_attributes.setEnabled(True)
-        self.ui.actionImport_survey.setEnabled(True)
+        self.ui.actionImport_survey_2.setEnabled(True)
         self.ui.actionManage_references.setEnabled(True)
         # Codes menu
         self.ui.actionCodes.setEnabled(True)
@@ -1215,16 +1211,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.tab_layout_helper(self.ui.tab_manage, ui)
 
     def manage_references(self):
-        """ Manage references.
-        Link to files. Unlink from files. """
+        """ Manage references. Import references. Edit references.
+        Link/unlink references to files. """
 
         ui = DialogReferenceManager(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_manage, ui)
-
-    def import_references(self):
-        """ Import references in RIS format. """
-
-        RisImport(self.app, self.ui.textEdit)
 
     def import_plain_text_codes(self):
         """ Import a list of plain text codes codebook. """
