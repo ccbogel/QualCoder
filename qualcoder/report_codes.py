@@ -164,7 +164,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.pushButton_attributeselect.clicked.connect(self.select_attributes)
         self.ui.comboBox_export.currentIndexChanged.connect(self.export_option_selected)
         self.ui.comboBox_export.setEnabled(False)
-        self.ui.textEdit.installEventFilter(self)  # for H key
+        self.ui.textEdit.installEventFilter(self)
         self.ui.textEdit.setReadOnly(True)
         self.ui.textEdit.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.textEdit.customContextMenuRequested.connect(self.text_edit_menu)
@@ -578,11 +578,14 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         if len(self.ui.textEdit.document().toPlainText()) == 0:
             return
-        filename = "Report_codings.txt"
-        exp_dlg = ExportDirectoryPathDialog(self.app, filename)
-        filepath = exp_dlg.filepath
-        if filepath is None:
+        filepath, ok = QtWidgets.QFileDialog.getSaveFileName(self,
+                                                            _("Save Text File"), self.app.settings['directory'],
+                                                            "Text Files(*.txt)",
+                                                            options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
+        if filepath is None or not ok:
             return
+        if filepath[-4:] != ".txt":
+            filepath += ".txt"
         ''' https://stackoverflow.com/questions/39422573/python-writing-weird-unicode-to-csv
         Using a byte order mark so that other software recognises UTF-8
         '''
@@ -601,9 +604,15 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         if len(self.ui.textEdit.document().toPlainText()) == 0:
             return
-        filename = "Report_codings.odt"
-        exp_dlg = ExportDirectoryPathDialog(self.app, filename)
-        filepath = exp_dlg.filepath
+        filepath, ok = QtWidgets.QFileDialog.getSaveFileName(self,
+                                                            _("Save Open Document Text File"), self.app.settings['directory'],
+                                                            "ODT Files(*.odt)",
+                                                            options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
+        if filepath is None or not ok:
+            return
+        if filepath[-4:] != ".odt":
+            filepath += ".odt"
+
         if filepath is None:
             return
         tw = QtGui.QTextDocumentWriter()
@@ -689,11 +698,14 @@ class DialogReportCodes(QtWidgets.QDialog):
                         d += trimmed
                         csv_data[row][col] = d
                         row += 1
-        filename = "Report_codings.csv"
-        exp_dlg = ExportDirectoryPathDialog(self.app, filename)
-        filepath = exp_dlg.filepath
-        if filepath is None:
+        filepath, ok = QtWidgets.QFileDialog.getSaveFileName(self,
+                                                            _("Save CSV File"), self.app.settings['directory'],
+                                                            "CSV Files(*.csv)",
+                                                            options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
+        if filepath is None or not ok:
             return
+        if filepath[-4:] != ".csv":
+            filepath += ".csv"
         with open(filepath, 'w', encoding='utf-8-sig', newline='') as csvfile:
             filewriter = csv.writer(csvfile, delimiter=',',
                                     quotechar='"', quoting=csv.QUOTE_MINIMAL)
@@ -744,12 +756,14 @@ class DialogReportCodes(QtWidgets.QDialog):
             for i, category in enumerate(categories):
                 ws.cell(column=6 + i, row=row + 2, value=category)
                 ws.cell(column=6 + i, row=1, value='Category')  # Headings
-
-        filename = "Report_codings.xlsx"
-        exp_dlg = ExportDirectoryPathDialog(self.app, filename)
-        filepath = exp_dlg.filepath
-        if filepath is None:
+        filepath, ok = QtWidgets.QFileDialog.getSaveFileName(self,
+                                                            _("Save Excel File"), self.app.settings['directory'],
+                                                            "XLSX Files(*.xlsx)",
+                                                            options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
+        if filepath is None or not ok:
             return
+        if filepath[-4:] != ".xlsx":
+            filepath += ".xlsx"
         wb.save(filepath)
         msg = _("Each row contains filename, coder, coded, codename and categories.") + "\n"
         msg += _('Report exported: ') + filepath
@@ -792,11 +806,18 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         if len(self.ui.textEdit.document().toPlainText()) == 0:
             return
-        html_filename = "Report_codings.html"
-        exp_dlg = ExportDirectoryPathDialog(self.app, html_filename)
-        filepath = exp_dlg.filepath
-        if filepath is None:
+        #html_filename = "Report_codings.html"
+        #exp_dlg = ExportDirectoryPathDialog(self.app, html_filename)
+        #filepath = exp_dlg.filepath
+        filepath, ok = QtWidgets.QFileDialog.getSaveFileName(self,
+                                                            _("Save HTML File"), self.app.settings['directory'],
+                                                            "HTML Files(*.html)",
+                                                            options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
+        if filepath is None or not ok:
             return
+        if filepath[-5:] != ".html":
+            filepath += ".html"
+
         tw = QtGui.QTextDocumentWriter()
         tw.setFileName(filepath)
         tw.setFormat(b'HTML')  # byte array needed for Windows 10
