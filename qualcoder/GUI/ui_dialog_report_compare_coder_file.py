@@ -76,6 +76,7 @@ class Ui_Dialog_reportCompareCoderFile(object):
         self.treeWidget.setObjectName("treeWidget")
         self.treeWidget.headerItem().setText(0, "Code Tree")
         self.textEdit = QtWidgets.QTextEdit(self.splitter)
+        self.textEdit.setReadOnly(True)
         self.textEdit.setObjectName("textEdit")
         self.gridLayout.addWidget(self.splitter, 0, 0, 1, 1)
         self.verticalLayout.addWidget(self.groupBox_2)
@@ -101,7 +102,7 @@ class Ui_Dialog_reportCompareCoderFile(object):
         self.label_selections.setText(_translate("Dialog_reportCompareCoderFile", "Coders selected"))
         self.pushButton_clear.setToolTip(_translate("Dialog_reportCompareCoderFile", "<html><head/><body><p>Clear selection</p></body></html>"))
         self.pushButton_export_odt.setToolTip(_translate("Dialog_reportCompareCoderFile", "Export ODT file"))
-        self.pushButton_run.setToolTip(_translate("Dialog_reportCompareCoderFile", "<html><head/><body><p>Run comparison</p></body></html>"))
+        self.pushButton_run.setToolTip(_translate("Dialog_reportCompareCoderFile", "<html><head/><body><p>Run comparison.</p><p>Select 2 coders, 1 file, 1 code.</p></body></html>"))
         self.pushButton_help1.setToolTip(_translate("Dialog_reportCompareCoderFile", "Statistics explanation"))
 
 
