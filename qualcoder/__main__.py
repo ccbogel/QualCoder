@@ -57,7 +57,7 @@ from qualcoder.GUI.base64_helper import *
 from qualcoder.GUI.ui_main import Ui_MainWindow
 from qualcoder.helpers import Message
 from qualcoder.import_survey import DialogImportSurvey
-from qualcoder.information import DialogInformation
+from qualcoder.information import DialogInformation, menu_shortcuts
 from qualcoder.locale.base64_lang_helper import *
 from qualcoder.journals import DialogJournals
 from qualcoder.manage_files import DialogManageFiles
@@ -930,6 +930,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionAbout.triggered.connect(self.about)
         self.ui.actionSpecial_functions.setShortcut('Alt+Z')
         self.ui.actionSpecial_functions.triggered.connect(self.special_functions)
+        self.ui.actionMenu_Key_Shortcuts.triggered.connect(self.display_menu_key_shortcuts)
 
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
@@ -1215,6 +1216,9 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Display manual in browser. """
 
         webbrowser.open("https://github.com/ccbogel/QualCoder/wiki")
+
+    def display_menu_key_shortcuts(self):
+        self.ui.textEdit.append(menu_shortcuts)
 
     def about(self):
         """ About dialog. """

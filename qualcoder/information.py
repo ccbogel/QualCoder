@@ -118,6 +118,7 @@ recent_project.txt. The config file contains the name of the current coder, \
 default working directory, selected font and other parameters.</p>\
 <p>QualCoder is written in python3 using Qt6 for the graphical interface.</p>\
 <p>The REFI-QDA Project import and export seem to work ok, but are still experimental. </p>\
+<p>Created by Colin Curtain BPharm GradDipComp PhD, python programmer, lecturer University of Tasmania.</p>\
 <h2 class="western">Licenses</h2>\
 <h3>MIT License</h3>\
 <p>Copyright (c) 2023 Colin Curtain</p>\
@@ -196,3 +197,55 @@ HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,<br />\
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING<br />\
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR<br />\
 OTHER DEALINGS IN THE SOFTWARE.'
+
+menu_shortcuts = 'Menu key Shortcuts\n\
+==================\n\
+Alt 1 Open Project menu\n\
+Alt 2 Open Files and Cases menu\n\
+Alt 3 Open Coding menu\n\
+Alt 4 Open Reports menu\n\
+Alt 5 Open Help menu\n\
+\n\
+Project menu key shortcuts\n\
+==========================\n\
+Ctrl N New project\n\
+Ctrl O Open project\n\
+Alt X Close project\n\
+Ctrl M Project memo\n\
+Alt S Settings\n\
+Ctrl Q Exit\n\
+\n\
+Files and Cases menu key shortcuts\n\
+==================================\n\
+Alt F Manage files\n\
+Alt C Manage cases\n\
+Alt J Manage journals\n\
+Alt A Manage attributes\n\
+Alt R Manage references\n\
+Ctrl I Import survey\n\
+\n\
+Coding menu key shortcuts\n\
+=========================\n\
+Alt T Code text\n\
+Alt I Code image\n\
+Alt V Code audio/video\n\
+Alt E Colour scheme\n\
+\n\
+Reports menu key shortcuts\n\
+==========================\n\
+Alt K Coding reports\n\
+Alt L Coding comparison\n\
+Alt M Coding comparison by file\n\
+Alt N Code frequencies\n\
+Alt O File summary\n\
+Alt P Code summary\n\
+Alt Q Code relations\n\
+Alt G Open Graph\n\
+Alt U Charts\n\
+Alt D Database queries\n\
+\n\
+Help menu key shortcuts\n\
+=======================\n\
+Alt H Contents - opens in web browser\n\
+Alt Y About\n\
+Alt Z Special functions'
