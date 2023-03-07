@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2022 Colin Curtain
+Copyright (c) 2023 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -454,7 +454,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
         Warn if an incorrect number of fields in the row. """
 
         num_fields_in_row_error = False
-        self.ui.label_msg.setText("")
+        #self.ui.label_msg.setText("")
         num_rows = self.ui.tableWidget.rowCount()
         for row in range(0, num_rows):
             self.ui.tableWidget.removeRow(0)

@@ -876,6 +876,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionImport_plain_text_codes_list.triggered.connect(self.import_plain_text_codes)
 
         # File cases and journals menu
+        self.ui.actionManage_files.setShortcut('Alt+F')
         self.ui.actionManage_files.triggered.connect(self.manage_files)
         self.ui.actionManage_journals.triggered.connect(self.journals)
         self.ui.actionManage_journals.setShortcut('Alt+J')
@@ -884,8 +885,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionManage_attributes.triggered.connect(self.manage_attributes)
         self.ui.actionManage_attributes.setShortcut('Alt+A')
         self.ui.actionImport_survey_2.triggered.connect(self.import_survey)
-        self.ui.actionImport_survey_2.setShortcut('Alt+I')
+        self.ui.actionImport_survey_2.setShortcut('Ctrl+I')
         self.ui.actionManage_bad_links_to_files.triggered.connect(self.manage_bad_file_links)
+        self.ui.actionManage_references.setShortcut('Alt+R')
         self.ui.actionManage_references.triggered.connect(self.manage_references)
 
         # Coding menu
@@ -895,26 +897,38 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCode_image.setShortcut('Alt+I')
         self.ui.actionCode_audio_video.triggered.connect(self.av_coding)
         self.ui.actionCode_audio_video.setShortcut('Alt+V')
+        self.ui.actionColour_scheme.setShortcut('Alt+E')
         self.ui.actionColour_scheme.triggered.connect(self.code_color_scheme)
 
         # Reports menu
+        self.ui.actionCoding_reports.setShortcut('Alt+K')
         self.ui.actionCoding_reports.triggered.connect(self.report_coding)
+        self.ui.actionCoding_comparison.setShortcut('Alt+L')
         self.ui.actionCoding_comparison.triggered.connect(self.report_coding_comparison)
+        self.ui.actionCoding_comparison_by_file.setShortcut('Alt+M')
         self.ui.actionCoding_comparison_by_file.triggered.connect(self.report_compare_coders_by_file)
+        self.ui.actionCode_frequencies.setShortcut('Alt+N')
         self.ui.actionCode_frequencies.triggered.connect(self.report_code_frequencies)
-        self.ui.actionView_Graph.triggered.connect(self.view_graph_original)
-        self.ui.actionView_Graph.setShortcut('Ctrl+G')
-        self.ui.actionCharts.triggered.connect(self.view_charts)
-        self.ui.actionCode_relations.triggered.connect(self.report_code_relations)
+        self.ui.actionFile_summary.setShortcut('Alt+O')
         self.ui.actionFile_summary.triggered.connect(self.report_file_summary)
+        self.ui.actionCode_summary.setShortcut('Alt+P')
         self.ui.actionCode_summary.triggered.connect(self.report_code_summary)
+        self.ui.actionCode_relations.setShortcut('Alt+Q')
+        self.ui.actionCode_relations.triggered.connect(self.report_code_relations)
+        self.ui.actionView_Graph.setShortcut('Alt+G')
+        self.ui.actionView_Graph.triggered.connect(self.view_graph_original)
+        self.ui.actionCharts.setShortcut('Alt+U')
+        self.ui.actionCharts.triggered.connect(self.view_charts)
         # TODO self.ui.actionText_mining.triggered.connect(self.text_mining)
+        self.ui.actionSQL_statements.setShortcut('Alt+D')
         self.ui.actionSQL_statements.triggered.connect(self.report_sql)
 
-        # help menu
+        # Help menu
+        self.ui.actionContents.setShortcut('Alt+H')
         self.ui.actionContents.triggered.connect(self.help)
-        self.ui.actionContents.setShortcut('Ctrl+H')
+        self.ui.actionAbout.setShortcut('Alt+Y')
         self.ui.actionAbout.triggered.connect(self.about)
+        self.ui.actionSpecial_functions.setShortcut('Alt+Z')
         self.ui.actionSpecial_functions.triggered.connect(self.special_functions)
 
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
@@ -1269,9 +1283,9 @@ class MainWindow(QtWidgets.QMainWindow):
         Identify qualitative questions and assign these data to the source table for
         coding and review. Modal dialog. """
 
+        self.ui.label_manage.hide()
         ui = DialogImportSurvey(self.app, self.ui.textEdit)
-        ui.exec()
-        self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
+        self.tab_layout_helper(self.ui.tab_manage, ui)
 
     def manage_cases(self):
         """ Create, edit, delete, rename cases, add cases to files or parts of
