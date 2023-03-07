@@ -1452,7 +1452,7 @@ class DialogCodeAV(QtWidgets.QDialog):
     def coded_media_dialog(self, code_dict):
         """ Display all coded media for this code, in a separate modal dialog.
         Coded media comes from ALL files for this coder.
-        Need to store textedit start and end positions so that code in context can be used.
+        Need to store textedit start and end positions so that code in 000000000000 can be used.
         Called from tree_menu.
         Re-load the codings may have changed.
         param:
@@ -1621,11 +1621,11 @@ class DialogCodeAV(QtWidgets.QDialog):
         Also use eventFilter for QGraphicsView.
 
         Options are:
-            Alt + R rewind 30 seconds
+            Alt + minus rewind 30 seconds
             Ctrl + R to rewind 5 seconds.
-            Alt + F forward 30 seconds
+            Alt + plus forward 30 seconds
             Ctrl + P to play/pause On start rewind 1 second
-            Ctr + D to play/pause On start rewind 1 second
+            Ctrl + D to play/pause On start rewind 1 second
             Ctrl + S to start and stop av segment creation
 
             Ctrl + Shift + > to increase play rate
@@ -1737,10 +1737,10 @@ class DialogCodeAV(QtWidgets.QDialog):
         if key == QtCore.Qt.Key.Key_S and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
             self.create_or_clear_segment()
         # Advance 30 seconds Alt F
-        if key == QtCore.Qt.Key.Key_F and mods == QtCore.Qt.KeyboardModifier.AltModifier:
+        if key == QtCore.Qt.Key.Key_Plus and mods & QtCore.Qt.KeyboardModifier.AltModifier:
             self.forward_30_seconds()
         # Rewind 30 seconds Alt R
-        if key == QtCore.Qt.Key.Key_R and mods == QtCore.Qt.KeyboardModifier.AltModifier:
+        if key == QtCore.Qt.Key.Key_Minus and mods == QtCore.Qt.KeyboardModifier.AltModifier:
             self.rewind_30_seconds()
         # Rewind 5 seconds Ctrl R
         if key == QtCore.Qt.Key.Key_R and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
@@ -3565,7 +3565,7 @@ class DialogViewAV(QtWidgets.QDialog):
         doc_font = 'font: ' + str(self.app.settings['docfontsize']) + 'pt '
         doc_font += '"' + self.app.settings['font'] + '";'
         self.ui.textEdit.setStyleSheet(doc_font)
-        self.ui.label_note.setText(_("Transcription area: Alt+R Ctrl+R Alt+F Ctrl+P/S Ctrl+T Ctrl+N Ctrl+1-8 Ctrl+D"))
+        self.ui.label_note.setText(_("Transcription area: Ctrl+R Alt+Minus Alt+Plus Ctrl+P/S Ctrl+T Ctrl+N Ctrl+1-8 Ctrl+D"))
         tt = _(
             "Avoid selecting sections of text with a combination of not underlined (not coded / annotated / case-assigned) and underlined (coded, annotated, case-assigned).")
         tt += _(
@@ -3930,9 +3930,9 @@ class DialogViewAV(QtWidgets.QDialog):
     def eventFilter(self, object_, event):
         """ Add key options to improve manual transcribing.
         Options are:
-            Alt + R to rewind 5 seconds.
-            Ctrl + R rewind 30 seconds
-            Alt + F forward 30 seconds
+            Alt + minus to rewind 30 seconds.
+            Ctrl + R rewind 5 seconds
+            Alt + plus forward 30 seconds
             Ctrl + S OR ctrl + P to start/pause On start rewind 1 second
             Ctrl + T to insert timestamp in format [hh.mm.ss]
             Ctrl + N to enter a new speakers name into shortcuts
@@ -3954,11 +3954,11 @@ class DialogViewAV(QtWidgets.QDialog):
         # Rewind 5 seconds   Ctrl + R
         if key == QtCore.Qt.Key.Key_R and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
             self.rewind_5_seconds()
-        # Rewind 30 seconds Alt R
-        if key == QtCore.Qt.Key.Key_R and mods == QtCore.Qt.KeyboardModifier.AltModifier:
+        # Rewind 30 seconds Alt minus
+        if key == QtCore.Qt.Key.Key_Minus and mods == QtCore.Qt.KeyboardModifier.AltModifier:
             self.rewind_30_seconds()
-        # Advance 30 seconds Alt F
-        if key == QtCore.Qt.Key.Key_F and mods == QtCore.Qt.KeyboardModifier.AltModifier:
+        # Advance 30 seconds Alt plus
+        if key == QtCore.Qt.Key.Key_Plus and mods & QtCore.Qt.KeyboardModifier.AltModifier:
             self.forward_30_seconds()
         #  Insert  timestamp Ctrl T
         if key == QtCore.Qt.Key.Key_T and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
