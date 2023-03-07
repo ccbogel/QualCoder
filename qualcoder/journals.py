@@ -171,7 +171,7 @@ class DialogJournals(QtWidgets.QDialog):
         # spell = SpellChecker(language='fr')
         # spell = SpellChecker(language='pt')
         highlighter = MarkdownHighlighter(self.ui.textEdit, self.app)
-        self.ui.tableWidget.installEventFilter(self)
+        #self.ui.tableWidget.installEventFilter(self)
 
     @staticmethod
     def help():
@@ -180,7 +180,39 @@ class DialogJournals(QtWidgets.QDialog):
         url = "https://github.com/ccbogel/QualCoder/wiki/04-Journals"
         webbrowser.open(url)
 
-    def eventFilter(self, object_, event):
+    def keyPressEvent(self, event):
+        """ Used to open top level menus. """
+        key = event.key()
+        mods = QtWidgets.QApplication.keyboardModifiers()
+
+        # Ctrl + F jump to search box
+        if key == QtCore.Qt.Key.Key_F and mod == QtCore.Qt.KeyboardModifier.ControlModifier:
+            self.ui.lineEdit_search.setFocus()
+            return
+        # Alt 0 to 9
+        if mods & QtCore.Qt.KeyboardModifier.ControlModifier:  # and keypress_diff.microseconds > 550000:
+            if key == QtCore.Qt.Key.Key_1:
+                #self.keypress_timer = datetime.datetime.now()
+                self.create_journal()
+                return
+            if key == QtCore.Qt.Key.Key_2:
+                #self.keypress_timer = datetime.datetime.now()
+                self.export()
+                return
+            if key == QtCore.Qt.Key.Key_3:
+                #self.keypress_timer = datetime.datetime.now()
+                self.export_all_journals_as_one_file()
+                return
+            if key == QtCore.Qt.Key.Key_4:
+                #self.keypress_timer = datetime.datetime.now()
+                self.delete()
+                return
+            if key == QtCore.Qt.Key.Key_0:
+                #self.keypress_timer = datetime.datetime.now()
+                self.help()
+                return
+
+    '''def eventFilter(self, object_, event):
         """ Ctrl F Search box focus.
         Control 1 to 4 match buttons order. Control 0 opens help.
         keypress timers prevents multiple key events firing too soon
@@ -219,7 +251,7 @@ class DialogJournals(QtWidgets.QDialog):
                     self.keypress_timer = datetime.datetime.now()
                     self.help()
                     return True
-        return False
+        return False'''
 
     def fill_table(self):
         """ Fill journals table. Update journal count label. """
