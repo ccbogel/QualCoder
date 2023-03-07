@@ -550,7 +550,7 @@ class App(object):
         QListWidget::item:selected {border-left: 3px solid red; color: #eeeeee;}\n\
         QMenuBar::item:selected {background-color: #3498db; }\n\
         QMenu {border: 1px solid #858585;}\n\
-        QMenu::item:selected {background-color:  #3498db;}\n\
+        QMenu::item:selected {background-color: #3498db;}\n\
         QMenu::item:disabled {color: #707070;}\n\
         QPushButton {background-color: #858585;}\n\
         QPushButton:hover {border: 2px solid #ffaa00;}\n\
@@ -588,6 +588,7 @@ class App(object):
         QLineEdit {border: 1px solid #707070; background-color: #fafafa;}\n\
         QListWidget::item:selected {border-left: 2px solid red; color: #000000;}\n\
         QMenu {border: 1px solid #808080;}\n\
+        QMenu::item:selected {background-color: #fafafa;}\n\
         QMenu::item:disabled {color: #707070;}\n\
         QTableWidget {border: 1px solid #f89407; gridline-color: #707070;}\n\
         QTableWidget:focus {border: 3px solid #f89407;}\n\
@@ -1074,6 +1075,21 @@ class MainWindow(QtWidgets.QMainWindow):
         # TODO FOR FUTURE EXPANSION text mining
         self.ui.actionText_mining.setEnabled(False)
         self.ui.actionText_mining.setVisible(False)
+
+    def keyPressEvent(self, event):
+        """ Used to open top level menus. """
+        key = event.key()
+        mods = QtWidgets.QApplication.keyboardModifiers()
+        if mods & QtCore.Qt.KeyboardModifier.AltModifier and key == QtCore.Qt.Key.Key_1:
+            self.ui.menuProject.popup(QtGui.QCursor.pos())
+        if mods & QtCore.Qt.KeyboardModifier.AltModifier and key == QtCore.Qt.Key.Key_2:
+            self.ui.menuFiles_and_Cases.popup(QtGui.QCursor.pos())
+        if mods & QtCore.Qt.KeyboardModifier.AltModifier and key == QtCore.Qt.Key.Key_3:
+            self.ui.menuCoding.popup(QtGui.QCursor.pos())
+        if mods & QtCore.Qt.KeyboardModifier.AltModifier and key == QtCore.Qt.Key.Key_4:
+            self.ui.menuReports.popup(QtGui.QCursor.pos())
+        if mods & QtCore.Qt.KeyboardModifier.AltModifier and key == QtCore.Qt.Key.Key_5:
+            self.ui.menuHelp.popup(QtGui.QCursor.pos())
 
     def settings_report(self):
         """ Display general settings and project summary """
