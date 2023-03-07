@@ -198,6 +198,7 @@
     <addaction name="actionContents"/>
     <addaction name="actionAbout"/>
     <addaction name="actionSpecial_functions"/>
+    <addaction name="actionMenu_Key_Shortcuts"/>
    </widget>
    <addaction name="menuProject"/>
    <addaction name="menuFiles_and_Cases"/>
@@ -480,6 +481,11 @@
   <action name="actionImport_survey_2">
    <property name="text">
     <string>Import survey</string>
+   </property>
+  </action>
+  <action name="actionMenu_Key_Shortcuts">
+   <property name="text">
+    <string>Menu Key Shortcuts</string>
    </property>
   </action>
  </widget>
