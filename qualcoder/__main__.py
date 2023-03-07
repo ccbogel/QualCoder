@@ -1219,6 +1219,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def display_menu_key_shortcuts(self):
         self.ui.textEdit.append(menu_shortcuts)
+        self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
 
     def about(self):
         """ About dialog. """
