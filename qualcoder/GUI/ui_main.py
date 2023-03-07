@@ -183,6 +183,8 @@ class Ui_MainWindow(object):
         self.actionImport_plain_text_codes_list.setObjectName("actionImport_plain_text_codes_list")
         self.actionImport_survey_2 = QtGui.QAction(MainWindow)
         self.actionImport_survey_2.setObjectName("actionImport_survey_2")
+        self.actionMenu_Key_Shortcuts = QtGui.QAction(MainWindow)
+        self.actionMenu_Key_Shortcuts.setObjectName("actionMenu_Key_Shortcuts")
         self.menuOpen_Recent_Project.addAction(self.actionNone)
         self.menuExport.addAction(self.actionProject_Exchange_Export)
         self.menuExport.addAction(self.actionREFI_Codebook_export)
@@ -230,6 +232,7 @@ class Ui_MainWindow(object):
         self.menuHelp.addAction(self.actionContents)
         self.menuHelp.addAction(self.actionAbout)
         self.menuHelp.addAction(self.actionSpecial_functions)
+        self.menuHelp.addAction(self.actionMenu_Key_Shortcuts)
         self.menubar.addAction(self.menuProject.menuAction())
         self.menubar.addAction(self.menuFiles_and_Cases.menuAction())
         self.menubar.addAction(self.menuCoding.menuAction())
@@ -313,6 +316,7 @@ class Ui_MainWindow(object):
         self.actionColour_scheme.setText(_translate("MainWindow", "Colour scheme"))
         self.actionImport_plain_text_codes_list.setText(_translate("MainWindow", "Import plain text codes list"))
         self.actionImport_survey_2.setText(_translate("MainWindow", "Import survey"))
+        self.actionMenu_Key_Shortcuts.setText(_translate("MainWindow", "Menu Key Shortcuts"))
 
 
 if __name__ == "__main__":
