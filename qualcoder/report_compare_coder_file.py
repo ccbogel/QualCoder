@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2022 Colin Curtain
+Copyright (c) 2023 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -69,7 +69,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
     Coded text sequences for one code and one text file. Apply Cohen's Kappa for text files.
     Coded image areas for one code and one text file.
 
-    Used to help advise coders / second coder on howto improve accuracy of coding.
+    Used to help advise coders / second coder on how to improve accuracy of coding.
     """
 
     app = None
@@ -129,6 +129,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         self.fill_tree()
         self.ui.treeWidget.itemSelectionChanged.connect(self.code_selected)
         self.ui.listWidget_files.itemClicked.connect(self.file_selected)
+        self.ui.textEdit.setReadOnly(True)
 
     def information(self):
         """ Provide statistical help information. """
