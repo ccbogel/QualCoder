@@ -103,6 +103,7 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
         self.ui.treeWidget.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.MultiSelection)
         self.ui.pushButton_clear_selection_codes.pressed.connect(self.ui.treeWidget.clearSelection)
         self.ui.pushButton_clear_selection.pressed.connect(self.ui.tableWidget.clearSelection)
+        self.ui.tableWidget.setTabKeyNavigation(False)
         self.ui.tableWidget.itemSelectionChanged.connect(self.update_selected_colors)
         self.fill_tree()
         self.fill_table()

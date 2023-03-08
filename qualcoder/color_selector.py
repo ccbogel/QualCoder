@@ -192,6 +192,7 @@ class DialogColorSelect(QtWidgets.QDialog):
         self.setStyleSheet(font)
         self.selected_color = code_['color']
         self.ui.tableWidget.setStyleSheet("border: none; font-size: 10px")
+        self.ui.tableWidget.setTabKeyNavigation(False)
         cur = app.conn.cursor()
         cur.execute("select color, name from code_name order by name")
         self.used_colors = cur.fetchall()

@@ -125,8 +125,11 @@ class DialogReportRelations(QtWidgets.QDialog):
         self.ui.pushButton_search_next.clicked.connect(self.search_text)
         self.ui.tableWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
+        self.ui.tableWidget.setTabKeyNavigation(False)
         self.ui.tableWidget_statistics.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget_statistics.customContextMenuRequested.connect(self.table_statistics_menu)
+        self.ui.tableWidget_statistics.setTabKeyNavigation(False)
+
         # Default to select all files
         cur = self.app.conn.cursor()
         sql = "select distinct name, id from source where id in (select fid from code_text) order by name"
