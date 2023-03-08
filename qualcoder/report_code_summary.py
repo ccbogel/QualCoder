@@ -102,6 +102,7 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         self.ui.treeWidget.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.fill_tree()
         self.ui.treeWidget.itemClicked.connect(self.fill_text_edit)
+        self.ui.textEdit.setTabChangesFocus(True)
 
     def splitter_sizes(self):
         """ Detect size changes in splitter and store in app.settings variable. """

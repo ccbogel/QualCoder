@@ -104,6 +104,7 @@ class DialogSQL(QtWidgets.QDialog):
             highlighter.create_rules(dark=True)
         self.ui.textEdit_sql.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.textEdit_sql.customContextMenuRequested.connect(self.sql_menu)
+        self.ui.textEdit_sql.setTabChangesFocus(True)
         self.ui.tableWidget_results.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget_results.customContextMenuRequested.connect(self.table_menu)
         self.ui.tableWidget_results.setTabKeyNavigation(False)

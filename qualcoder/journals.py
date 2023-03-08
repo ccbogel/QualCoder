@@ -165,6 +165,7 @@ class DialogJournals(QtWidgets.QDialog):
         self.ui.checkBox_search_all_journals.stateChanged.connect(self.search_for_text)
         self.ui.textEdit.textChanged.connect(self.text_changed)
         self.ui.textEdit.installEventFilter(self)
+        self.ui.textEdit.setTabChangesFocus(True)
         #spell = SpellChecker()
         # spell = SpellChecker(language='de')
         # spell = SpellChecker(language='es')
