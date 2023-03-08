@@ -111,6 +111,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
         self.ui.tableWidget.setHorizontalHeaderLabels([""])
         self.ui.tableWidget.horizontalHeader().setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget.horizontalHeader().customContextMenuRequested.connect(self.table_menu)
+        self.ui.tableWidget.setTabKeyNavigation(False)
 
         cur = self.app.conn.cursor()
         cur.execute("select name from attribute_type where caseOrFile='case'")

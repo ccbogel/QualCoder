@@ -148,6 +148,7 @@ class DialogCases(QtWidgets.QDialog):
         self.ui.tableWidget.horizontalHeader().customContextMenuRequested.connect(self.table_header_menu)
         self.ui.tableWidget.horizontalHeader().setToolTip(_("Right click header row to hide columns"))
         self.ui.tableWidget.installEventFilter(self)
+        self.ui.tableWidget.setTabKeyNavigation(False)
         self.fill_table()
         # Initial resize of table columns
         self.ui.tableWidget.resizeColumnsToContents()

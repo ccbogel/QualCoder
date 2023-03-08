@@ -106,6 +106,7 @@ class DialogSQL(QtWidgets.QDialog):
         self.ui.textEdit_sql.customContextMenuRequested.connect(self.sql_menu)
         self.ui.tableWidget_results.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget_results.customContextMenuRequested.connect(self.table_menu)
+        self.ui.tableWidget_results.setTabKeyNavigation(False)
 
         # Add tables and fields to treeWidget
         self.get_schema_update_tree_widget()

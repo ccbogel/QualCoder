@@ -171,7 +171,7 @@ class DialogJournals(QtWidgets.QDialog):
         # spell = SpellChecker(language='fr')
         # spell = SpellChecker(language='pt')
         highlighter = MarkdownHighlighter(self.ui.textEdit, self.app)
-        #self.ui.tableWidget.installEventFilter(self)
+        self.ui.tableWidget.setTabKeyNavigation(False)
 
     @staticmethod
     def help():

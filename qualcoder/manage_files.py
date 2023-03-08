@@ -181,6 +181,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         pm.loadFromData(QtCore.QByteArray.fromBase64(question_icon), "png")
         self.ui.pushButton_help.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_help.pressed.connect(self.help)
+        self.ui.tableWidget.setTabKeyNavigation(False)
         self.ui.tableWidget.itemChanged.connect(self.cell_modified)
         self.ui.tableWidget.cellClicked.connect(self.cell_selected)
         self.ui.tableWidget.cellDoubleClicked.connect(self.cell_double_clicked)
