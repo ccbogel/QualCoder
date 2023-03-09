@@ -54,7 +54,7 @@ from .confirm_delete import DialogConfirmDelete
 from .GUI.base64_helper import *
 from .GUI.ui_dialog_code_av import Ui_Dialog_code_av
 from .GUI.ui_dialog_view_av import Ui_Dialog_view_av
-from .helpers import msecs_to_hours_mins_secs, Message
+from .helpers import msecs_to_hours_mins_secs, Message, ExportDirectoryPathDialog
 from .memo import DialogMemo
 from .report_attributes import DialogSelectAttributeParameters
 from .reports import DialogReportCoderComparisons, DialogReportCodeFrequencies  # for isinstance()
@@ -3255,6 +3255,12 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         action_play = menu.addAction(_('Play segment'))
         action_edit_start = menu.addAction(_('Edit segment start position'))
         action_edit_end = menu.addAction(_('Edit segment end position'))
+        action_export = None
+        try:
+            print(subprocess.check_output(['which', 'ffmpeg']))
+            action_export = menu.addAction(_('Export segment to file'))
+        except Exception as e_:
+            print(e_)
         action_important = None
         action_not_important = None
         action_link_segment_to_text = None
@@ -3292,6 +3298,57 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         if action == action_not_important:
             self.set_coded_importance(False)
             return
+        if action == action_export:
+            self.export_segment()
+
+    def export_segment(self):
+        """ Export segment as audio/video file.
+        If a video file has multiple tracks only the first one is used for this method.
+        https://ffmpeg.org/ffmpeg-filters.html
+        Requires installed ffmpeg
+        ffmpeg -i input.ogg -ss '100ms' -to '600ms' -c copy output.ogg
+        presumes file ending of .xxx (ogg, mp4, mp3, mov...)
+        """
+
+        msecs_from = msecs_to_hours_mins_secs(self.segment['pos0'])
+        msecs_from = msecs_from.replace('.', "H", 1)
+        msecs_from = msecs_from.replace('.', "M", 1) + "S"
+        msecs_to = msecs_to_hours_mins_secs(self.segment['pos1'])
+        msecs_to = msecs_to.replace('.', "H", 1)
+        msecs_to = msecs_to.replace('.', "M", 1) + "S"
+        filename = self.code_av_dialog.file_['name'][:-4] + "_"
+        filename += msecs_from + "_to_" + msecs_to + "_"
+        filename += self.code_av_dialog.file_['name'][-4:]
+        export_dir = ExportDirectoryPathDialog(self.app, filename)
+        filepath = export_dir.filepath
+        if filepath is None:
+            return
+        if os.path.exists(filepath):
+            os.remove(filepath)
+        mediapath = ""
+        try:
+            if self.code_av_dialog.file_['mediapath'][0:6] in ('/audio', '/video'):
+                mediapath = self.app.project_path + self.code_av_dialog.file_['mediapath']
+            if self.code_av_dialog.file_['mediapath'][0:6] in ('audio:', 'video:'):
+                mediapath = self.code_av_dialog.file_['mediapath'][6:]
+        except Exception as e_:
+            Message(self.app, _('Media not found'), str(e_) + "\n" + self.app.project_path + self.code_av_dialog.file_['mediapath'],
+                    "warning").exec()
+            return
+        ffmpeg_command = 'ffmpeg -i "' + mediapath + '" -ss '
+        ffmpeg_command += "'" + str(self.segment['pos0']) + "ms'"
+        ffmpeg_command += ' -to '
+        ffmpeg_command += "'" + str(self.segment['pos1']) + "ms'"
+        ffmpeg_command += ' "' + filepath + '"'
+        #print(ffmpeg_command)
+        try:
+            subprocess.run(ffmpeg_command, timeout=15, shell=True)
+            self.code_av_dialog.parent_textEdit.append(_("A/V segment exported: ") + filepath)
+            Message(self.app, _("Segment exported"), filepath)
+        except Exception as e_:
+            logger.error(str(e_))
+            print(str(e_))
+            Message(self.app, "ffmpeg error", str(e_))
 
     def set_coded_importance(self, important=True):
         """ Set or unset importance to self.segment.
