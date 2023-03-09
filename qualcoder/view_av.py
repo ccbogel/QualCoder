@@ -3257,9 +3257,11 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         action_edit_end = menu.addAction(_('Edit segment end position'))
         action_export = None
         try:
-            print(subprocess.check_output(['which', 'ffmpeg']))
+            result = subprocess.run(['ffmpeg', '-version'], capture_output=True, text=True).stdout
+            #print("RESULT:", result)
             action_export = menu.addAction(_('Export segment to file'))
         except Exception as e_:
+            print("Cannot find ffmpeg")
             print(e_)
         action_important = None
         action_not_important = None
@@ -3336,19 +3338,19 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
                     "warning").exec()
             return
         ffmpeg_command = 'ffmpeg -i "' + mediapath + '" -ss '
-        ffmpeg_command += "'" + str(self.segment['pos0']) + "ms'"
+        ffmpeg_command += str(self.segment['pos0']/1000)
         ffmpeg_command += ' -to '
-        ffmpeg_command += "'" + str(self.segment['pos1']) + "ms'"
-        ffmpeg_command += ' "' + filepath + '"'
-        #print(ffmpeg_command)
+        ffmpeg_command += str(self.segment['pos1']/1000)
+        ffmpeg_command += ' -c copy "' + filepath + '"'
+        #print("FFMPEG COMMAND\n", ffmpeg_command)
         try:
             subprocess.run(ffmpeg_command, timeout=15, shell=True)
             self.code_av_dialog.parent_textEdit.append(_("A/V segment exported: ") + filepath)
-            Message(self.app, _("Segment exported"), filepath)
+            Message(self.app, _("Segment exported"), filepath).exec()
         except Exception as e_:
             logger.error(str(e_))
             print(str(e_))
-            Message(self.app, "ffmpeg error", str(e_))
+            Message(self.app, "ffmpeg error", str(e_)).exec()
 
     def set_coded_importance(self, important=True):
         """ Set or unset importance to self.segment.
