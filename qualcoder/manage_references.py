@@ -271,6 +271,22 @@ class DialogReferenceManager(QtWidgets.QDialog):
         except KeyError:
             pass
         try:
+            attr_values['Ref_Authors'] += " " + ref['A1']
+        except KeyError:
+            pass
+        try:
+            attr_values['Ref_Authors'] += " " + ref['A2']
+        except KeyError:
+            pass
+        try:
+            attr_values['Ref_Authors'] += " " + ref['A3']
+        except KeyError:
+            pass
+        try:
+            attr_values['Ref_Authors'] += " " + ref['A4']
+        except KeyError:
+            pass
+        try:
             attr_values['Ref_Title'] = ref['TI']
         except KeyError:
             pass
