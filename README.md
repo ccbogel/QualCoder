@@ -11,7 +11,8 @@ Instructions and other information are available here: https://qualcoder.wordpre
 ## INSTALLATION 
 
 ### Prerequisites
-Optional: VLC for audio/video coding. ffmpeg installed for speech to text and waveform image see:  https://phoenixnap.com/kb/ffmpeg-windows. 
+Optional: VLC for audio/video coding. 
+Optional: ffmpeg installed for speech to text and waveform image see here to install ffmpeg on Windows:  https://phoenixnap.com/kb/ffmpeg-windows. 
 
 For installing from source you will need to have python 3.7 or a newer version installed.
 
