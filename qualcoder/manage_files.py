@@ -1631,17 +1631,17 @@ class DialogManageFiles(QtWidgets.QDialog):
             msg += self.source[rows[0]]['mediapath'].split(':')[1]
             Message(self.app, _('Cannot export'), msg, "warning").exec()
             return
-
-        # Warn of export of text representation of linked files (e.g. odt, docx, txt, md, pdf)
-        text_rep = False
-        if self.source[rows[0]]['mediapath'] is not None and ':' in self.source[rows[0]]['mediapath'] \
-                and self.source[rows[0]]['fulltext'] != "":
-            msg = _("This is a linked file. Will export text representation.") + "\n"
-            msg += self.source[rows[0]]['mediapath'].split(':')[1]
-            Message(self.app, _("Can export text"), msg, "warning").exec()
-            text_rep = True
         # Currently can only export ONE file at time, due to tableWidget single selection mode
         row = rows[0]
+        # Warn of export of text representation of linked files (e.g. odt, docx, txt, md, pdf)
+        text_rep = False
+        if self.source[row]['mediapath'] is not None and (':' in self.source[row]['mediapath']) \
+                and self.source[row]['fulltext'] != "":
+            msg = _("This is a linked file. Will export text representation.") + "\n"
+            msg += self.source[row]['mediapath'].split(':')[1]
+            Message(self.app, _("Can export text"), msg, "warning").exec()
+            text_rep = True
+
         filename = self.source[row]['name']
         if self.source[row]['mediapath'] is None or self.source[row]['mediapath'][0:5] == 'docs:':
             filename = filename + ".txt"
@@ -1652,32 +1652,40 @@ class DialogManageFiles(QtWidgets.QDialog):
         msg = _("Export to ") + destination + "\n"
 
         # Export audio, video, picture files
-        if self.source[row]['mediapath'] is not None and text_rep is False:
+        if self.source[row]['mediapath'] is not None and self.source[row]['mediapath'][0:6] != "/docs/" and text_rep is False:
             file_path = self.app.project_path + self.source[row]['mediapath']
+            print("FP",file_path)
             # destination = directory + "/" + filename
             try:
                 copyfile(file_path, destination)
                 msg += destination + "\n"
+                Message(self.app, _("Files exported"), msg).exec()
+                self.parent_text_edit.append(filename + _(" exported to ") + msg)
             except FileNotFoundError:
-                pass
+                Message(self.app, _("Error"), _("File not found")).exec()
+            return
 
-        # Export pdf, docx, odt, epub, html files if located in documents directory
+        # Export pdf, docx, odt, epub, html files if located in documents directory, and text representation
         document_stored = os.path.exists(self.app.project_path + "/documents/" + self.source[row]['name'])
         if document_stored and (self.source[row]['mediapath'] is None or self.source[row]['mediapath'][0:6] == "/docs/"):
             # destination = directory + "/" + self.source[row]['name']
             try:
                 copyfile(self.app.project_path + "/documents/" + self.source[row]['name'], destination)
+                filedata = self.source[row]['fulltext']
+                f = open(destination + ".txt", 'w', encoding='utf-8-sig')
+                f.write(filedata)
+                f.close()
                 msg += destination + "\n"
+                Message(self.app, _("Files exported"), msg).exec()
+                self.parent_text_edit.append(filename + _(" exported to ") + msg)
             except FileNotFoundError as err:
                 logger.warning(str(err))
                 print(err)
                 document_stored = False
+            return
 
         # Export transcribed files, user created text files, text representations of linked files
-        print("DEST", destination, "DOCEXISTS", document_stored)
-
-        if (self.source[row]['mediapath'] is None or self.source[row]['mediapath'][
-                                                     0:5] == 'docs:') and not document_stored:
+        if (self.source[row]['mediapath'] is None or self.source[row]['mediapath'][0:5] == 'docs:') and not document_stored:
             filedata = self.source[row]['fulltext']
             f = open(destination, 'w', encoding='utf-8-sig')
             f.write(filedata)
