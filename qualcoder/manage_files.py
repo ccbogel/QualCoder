@@ -1631,6 +1631,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             msg += self.source[rows[0]]['mediapath'].split(':')[1]
             Message(self.app, _('Cannot export'), msg, "warning").exec()
             return
+
         # Warn of export of text representation of linked files (e.g. odt, docx, txt, md, pdf)
         text_rep = False
         if self.source[rows[0]]['mediapath'] is not None and ':' in self.source[rows[0]]['mediapath'] \
@@ -1650,7 +1651,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             return
         msg = _("Export to ") + destination + "\n"
 
-        # export audio, video, picture files
+        # Export audio, video, picture files
         if self.source[row]['mediapath'] is not None and text_rep is False:
             file_path = self.app.project_path + self.source[row]['mediapath']
             # destination = directory + "/" + filename
@@ -1660,18 +1661,21 @@ class DialogManageFiles(QtWidgets.QDialog):
             except FileNotFoundError:
                 pass
 
-        # export pdf, docx, odt, epub, html files if located in documents directory
+        # Export pdf, docx, odt, epub, html files if located in documents directory
         document_stored = os.path.exists(self.app.project_path + "/documents/" + self.source[row]['name'])
-        if document_stored and self.source[row]['mediapath'] is None:
+        if document_stored and (self.source[row]['mediapath'] is None or self.source[row]['mediapath'][0:6] == "/docs/"):
             # destination = directory + "/" + self.source[row]['name']
             try:
                 copyfile(self.app.project_path + "/documents/" + self.source[row]['name'], destination)
                 msg += destination + "\n"
             except FileNotFoundError as err:
                 logger.warning(str(err))
+                print(err)
                 document_stored = False
 
         # Export transcribed files, user created text files, text representations of linked files
+        print("DEST", destination, "DOCEXISTS", document_stored)
+
         if (self.source[row]['mediapath'] is None or self.source[row]['mediapath'][
                                                      0:5] == 'docs:') and not document_stored:
             filedata = self.source[row]['fulltext']
