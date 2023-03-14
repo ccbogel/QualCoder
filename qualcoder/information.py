@@ -198,54 +198,23 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING<br />\
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR<br />\
 OTHER DEALINGS IN THE SOFTWARE.'
 
-menu_shortcuts = 'Menu key Shortcuts\n\
-==================\n\
-Alt 1 Open Project menu\n\
-Alt 2 Open Files and Cases menu\n\
-Alt 3 Open Coding menu\n\
-Alt 4 Open Reports menu\n\
-Alt 5 Open Help menu\n\
-\n\
-Project menu key shortcuts\n\
-==========================\n\
-Ctrl N New project\n\
-Ctrl O Open project\n\
-Alt X Close project\n\
-Ctrl M Project memo\n\
-Alt S Settings\n\
-Ctrl Q Exit\n\
-\n\
-Files and Cases menu key shortcuts\n\
-==================================\n\
-Alt F Manage files\n\
-Alt C Manage cases\n\
-Alt J Manage journals\n\
-Alt A Manage attributes\n\
-Alt R Manage references\n\
-Ctrl I Import survey\n\
-\n\
-Coding menu key shortcuts\n\
-=========================\n\
-Alt T Code text\n\
-Alt I Code image\n\
-Alt V Code audio/video\n\
-Alt E Colour scheme\n\
-\n\
-Reports menu key shortcuts\n\
-==========================\n\
-Alt K Coding reports\n\
-Alt L Coding comparison\n\
-Alt M Coding comparison by file\n\
-Alt N Code frequencies\n\
-Alt O File summary\n\
-Alt P Code summary\n\
-Alt Q Code relations\n\
-Alt G Open Graph\n\
-Alt U Charts\n\
-Alt D Database queries\n\
-\n\
-Help menu key shortcuts\n\
-=======================\n\
-Alt H Contents - opens in web browser\n\
-Alt Y About\n\
-Alt Z Special functions'
+menu_shortcuts = '<table><tr><th>Menu key Shortcuts</th><th>Project menu key shortcuts</th>\n\
+<th>Files and Cases menu key shortcuts</th></tr>\n\
+<tr><td>Alt 1 Open Project menu</td><td>Ctrl N New project</td><td>Alt F Manage files</td></tr>\n\
+<tr><td>Alt 2 Open Files and Cases menu</td><td>Ctrl O Open project</td><td>Alt C Manage cases</td></tr>\n\
+<tr><td>Alt 3 Open Coding menu</td><td>Alt X Close project</td><td>Alt J Manage journals</td></tr>\n\
+<tr><td>Alt 4 Open Reports menu</td><td>Ctrl M Project memo</td><td>Alt A Manage attributes</td></tr>\n\
+<tr><td>Alt 5 Open Help menu</td><td>Alt S Settings</td><td>Alt R Manage references</td></tr>\n\
+<tr><td><br/></td><td>Ctrl Q Exit</td><td>Ctrl I Import survey</td></tr>\n\
+</table><br/><table>\n\
+<tr><th>Coding menu key shortcuts</th><th>Reports menu key shortcuts</th><th>Help menu key shortcuts</th></tr>\n\
+<tr><td>Alt T Code text</td><td>Alt K Coding reports</td><td>Alt H Contents - in web browser</td></tr>\n\
+<tr><td>Alt I Code image</td><td>Alt L Coding comparison</td><td>Alt Y About</td></tr>\n\
+<tr><td>Alt V Code audio/video</td><td>Alt M Coding comparison by file</td><td>Alt Z Special functions</td></tr>\n\
+<tr><td>Alt E Colour scheme</td><td>Alt N Code frequencies</td><td></td></tr>\n\
+<tr><td></td><td>Alt O File summary</td><td></td></tr>\n\
+<tr><td></td><td>Alt P Code summary</td><td></td></tr>\n\
+<tr><td></td><td>Alt Q Code relations</td><td></td></tr>\n\
+<tr><td></td><td>Alt G Open Graph</td><td></td></tr>\n\
+<tr><td></td><td>Alt U Charts</td><td></td></tr>\n\
+<tr><td></td><td>Alt D Database queries</td><td></td></tr></table>'
