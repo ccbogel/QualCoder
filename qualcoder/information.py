@@ -198,8 +198,9 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING<br />\
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR<br />\
 OTHER DEALINGS IN THE SOFTWARE.'
 
-menu_shortcuts = '<table><tr><th>Menu key Shortcuts</th><th>Project menu key shortcuts</th>\n\
-<th>Files and Cases menu key shortcuts</th></tr>\n\
+menu_shortcuts = '<h1>Menu key shortcuts</h1>\n\
+<table><tr><td><b>Menu shortcuts</b></td><td><b>Project menu shortcuts</b></td>\n\
+<td><b>Files and Cases menu shortcuts</b></td></tr>\n\
 <tr><td>Alt 1 Open Project menu</td><td>Ctrl N New project</td><td>Alt F Manage files</td></tr>\n\
 <tr><td>Alt 2 Open Files and Cases menu</td><td>Ctrl O Open project</td><td>Alt C Manage cases</td></tr>\n\
 <tr><td>Alt 3 Open Coding menu</td><td>Alt X Close project</td><td>Alt J Manage journals</td></tr>\n\
@@ -207,7 +208,7 @@ menu_shortcuts = '<table><tr><th>Menu key Shortcuts</th><th>Project menu key sho
 <tr><td>Alt 5 Open Help menu</td><td>Alt S Settings</td><td>Alt R Manage references</td></tr>\n\
 <tr><td><br/></td><td>Ctrl Q Exit</td><td>Ctrl I Import survey</td></tr>\n\
 </table><br/><table>\n\
-<tr><th>Coding menu key shortcuts</th><th>Reports menu key shortcuts</th><th>Help menu key shortcuts</th></tr>\n\
+<tr><td><b>Coding menu shortcuts</b></td><td><b>Reports menu shortcuts</b></td><td><b>Help menu shortcuts</b></td></tr>\n\
 <tr><td>Alt T Code text</td><td>Alt K Coding reports</td><td>Alt H Contents - in web browser</td></tr>\n\
 <tr><td>Alt I Code image</td><td>Alt L Coding comparison</td><td>Alt Y About</td></tr>\n\
 <tr><td>Alt V Code audio/video</td><td>Alt M Coding comparison by file</td><td>Alt Z Special functions</td></tr>\n\
@@ -218,3 +219,20 @@ menu_shortcuts = '<table><tr><th>Menu key Shortcuts</th><th>Project menu key sho
 <tr><td></td><td>Alt G Open Graph</td><td></td></tr>\n\
 <tr><td></td><td>Alt U Charts</td><td></td></tr>\n\
 <tr><td></td><td>Alt D Database queries</td><td></td></tr></table>'
+
+manage_section_shortcuts = '<h1>Manage section key shortcuts</h1><table>\n\
+<tr><td><b>Key&nbsp;&nbsp;&nbsp;</b></td><td><b>Manage files</b></td><td><b>Cases</b></td>\n\
+<td><b>Journals</b></td><td><b>References</b></td></tr>\n\
+<tr><td>Ctrl 0</td><td>Help</td><td>Help</td><td>Help</td><td></td></tr>\n\
+<tr><td>Ctrl 1</td><td>View file</td><td>Create case</td><td>Create journal</td><td></td></tr>\n\
+<tr><td>Ctrl 2</td><td>Import file</td><td>Import cases</td><td>Export</td><td>Unlink file</td></tr>\n\
+<tr><td>Ctrl 3</td><td>Link to file</td><td>Case file manager</td><td>Export all</td><td>Edit reference</td></tr>\n\
+<tr><td>Ctrl 4</td><td>Create text file</td><td>Add attribute</td><td>Delete journal</td><td>Import references</td></tr>\n\
+<tr><td>Ctrl 5</td><td>Import linked file</td><td>Export attributes</td><td></td><td>Delete reference<</td></tr>\n\
+<tr><td>Ctrl 6</td><td>Export to linked file</td><td>Delete case</td><td></td><td></td></tr>\n\
+<tr><td>Ctrl 7</td><td>Add attribute</td><td></td><td></td><td></td></tr>\n\
+<tr><td>Ctrl 8</td><td>Export attributes</td><td></td><td></td><td></td></tr>\n\
+<tr><td>Ctrl 9</td><td>Export file</td><td></td><td></td><td></td></tr>\n\
+<tr><td></td><td>Ctrl A Show all rows</td><td>Ctrl A Show all rows</td><td></td><td>L Link selected</td></tr>\n\
+<tr><td></td><td></td><td></td><td></td><td>U Unlink selected</td></tr>\n\
+</table>'
