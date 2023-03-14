@@ -201,6 +201,48 @@ class DialogManageFiles(QtWidgets.QDialog):
         url = "https://github.com/ccbogel/QualCoder/wiki/05-Files"
         webbrowser.open(url)
 
+    def keyPressEvent(self, event):
+        """ Used to activate buttons.
+        Ctrl 0 to 9
+        """
+        key = event.key()
+        mods = QtWidgets.QApplication.keyboardModifiers()
+        # Ctrl 0 to 4
+        if mods & QtCore.Qt.KeyboardModifier.ControlModifier:
+            if key == QtCore.Qt.Key.Key_1:
+                self.view()
+                return
+            if key == QtCore.Qt.Key.Key_2:
+                self.import_files()
+                return
+            if key == QtCore.Qt.Key.Key_3:
+                self.link_files()
+                return
+            if key == QtCore.Qt.Key.Key_4:
+                self.create_text_file()
+                return
+            if key == QtCore.Qt.Key.Key_5:
+                self.button_import_linked_file()
+                return
+            if key == QtCore.Qt.Key.Key_6:
+                self.button_export_file_as_linked_file()
+                return
+            if key == QtCore.Qt.Key.Key_7:
+                self.add_attribute()
+                return
+            if key == QtCore.Qt.Key.Key_8:
+                self.export_attributes()
+                return
+            if key == QtCore.Qt.Key.Key_9:
+                self.export()
+                return
+
+
+
+            if key == QtCore.Qt.Key.Key_0:
+                self.help()
+                return
+
     def eventFilter(self, object_, event):
         """ Using this event filter to
 

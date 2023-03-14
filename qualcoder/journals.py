@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2022 Colin Curtain
+Copyright (c) 2023 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -182,34 +182,29 @@ class DialogJournals(QtWidgets.QDialog):
         webbrowser.open(url)
 
     def keyPressEvent(self, event):
-        """ Used to open top level menus. """
+        """ Used to activate buttons. """
         key = event.key()
         mods = QtWidgets.QApplication.keyboardModifiers()
 
         # Ctrl + F jump to search box
-        if key == QtCore.Qt.Key.Key_F and mod == QtCore.Qt.KeyboardModifier.ControlModifier:
+        if key == QtCore.Qt.Key.Key_F and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
             self.ui.lineEdit_search.setFocus()
             return
-        # Alt 0 to 9
-        if mods & QtCore.Qt.KeyboardModifier.ControlModifier:  # and keypress_diff.microseconds > 550000:
+        # Ctrl 0 to 4
+        if mods & QtCore.Qt.KeyboardModifier.ControlModifier:
             if key == QtCore.Qt.Key.Key_1:
-                #self.keypress_timer = datetime.datetime.now()
                 self.create_journal()
                 return
             if key == QtCore.Qt.Key.Key_2:
-                #self.keypress_timer = datetime.datetime.now()
                 self.export()
                 return
             if key == QtCore.Qt.Key.Key_3:
-                #self.keypress_timer = datetime.datetime.now()
                 self.export_all_journals_as_one_file()
                 return
             if key == QtCore.Qt.Key.Key_4:
-                #self.keypress_timer = datetime.datetime.now()
                 self.delete()
                 return
             if key == QtCore.Qt.Key.Key_0:
-                #self.keypress_timer = datetime.datetime.now()
                 self.help()
                 return
 
