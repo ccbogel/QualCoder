@@ -236,9 +236,6 @@ class DialogManageFiles(QtWidgets.QDialog):
             if key == QtCore.Qt.Key.Key_9:
                 self.export()
                 return
-
-
-
             if key == QtCore.Qt.Key.Key_0:
                 self.help()
                 return

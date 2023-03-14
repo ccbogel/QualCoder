@@ -218,6 +218,30 @@ class DialogReferenceManager(QtWidgets.QDialog):
         RisImport(self.app, self.parent_textEdit)
         self.get_data()
 
+    def keyPressEvent(self, event):
+        """ Used to activate buttons.
+        Ctrl 2 to 5
+        """
+        key = event.key()
+        mods = QtWidgets.QApplication.keyboardModifiers()
+        # Ctrl 2 to 5
+        if mods & QtCore.Qt.KeyboardModifier.ControlModifier:
+            if key == QtCore.Qt.Key.Key_2:
+                self.unlink_files()
+                return
+            if key == QtCore.Qt.Key.Key_3:
+                self.edit_reference()
+                return
+            if key == QtCore.Qt.Key.Key_4:
+                self.import_references()
+                return
+            if key == QtCore.Qt.Key.Key_5:
+                self.delete_reference()
+                return
+            '''if key == QtCore.Qt.Key.Key_0:
+                self.help()
+                return'''
+
     def eventFilter(self, object_, event):
         """ L Link files to reference.
         U to unlink selected files

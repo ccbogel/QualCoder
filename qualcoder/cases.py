@@ -115,7 +115,7 @@ class DialogCases(QtWidgets.QDialog):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(clipboard_copy_icon), "png")
         self.ui.pushButton_file_manager.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_file_manager.pressed.connect(self.open_case_file_manager)
+        self.ui.pushButton_file_manager.pressed.connect(self.case_file_manager)
         self.ui.tableWidget.itemChanged.connect(self.cell_modified)
         self.ui.tableWidget.cellClicked.connect(self.cell_selected)
         self.ui.tableWidget.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
@@ -162,6 +162,36 @@ class DialogCases(QtWidgets.QDialog):
             pass'''
         self.eventFilterTT = ToolTipEventFilter()
         self.ui.textBrowser.installEventFilter(self.eventFilterTT)
+
+    def keyPressEvent(self, event):
+        """ Used to activate buttons.
+        Ctrl 0 to 6
+        """
+        key = event.key()
+        mods = QtWidgets.QApplication.keyboardModifiers()
+        # Ctrl 0 to 6
+        if mods & QtCore.Qt.KeyboardModifier.ControlModifier:
+            if key == QtCore.Qt.Key.Key_1:
+                self.add_case()
+                return
+            if key == QtCore.Qt.Key.Key_2:
+                self.import_cases_and_attributes()
+                return
+            if key == QtCore.Qt.Key.Key_3:
+                self.case_file_manager()
+                return
+            if key == QtCore.Qt.Key.Key_4:
+                self.add_attribute()
+                return
+            if key == QtCore.Qt.Key.Key_5:
+                self.export_attributes()
+                return
+            if key == QtCore.Qt.Key.Key_6:
+                self.delete_case()
+                return
+            if key == QtCore.Qt.Key.Key_0:
+                self.help()
+                return
 
     def eventFilter(self, object_, event):
         """ Using this event filter to
@@ -687,9 +717,9 @@ class DialogCases(QtWidgets.QDialog):
                 self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem(_("Memo")))
             self.app.delete_backup = False
         if y == self.FILES_COLUMN:
-            self.open_case_file_manager()
+            self.case_file_manager()
 
-    def open_case_file_manager(self):
+    def case_file_manager(self):
         """ Link files to cases.
          Called by click in files column in table or by button. """
 
