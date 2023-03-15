@@ -154,11 +154,21 @@ class Ui_Dialog_view_av(object):
 
         self.retranslateUi(Dialog_view_av)
         QtCore.QMetaObject.connectSlotsByName(Dialog_view_av)
-        Dialog_view_av.setTabOrder(self.pushButton_play, self.horizontalSlider_vol)
+        Dialog_view_av.setTabOrder(self.horizontalSlider, self.pushButton_play)
+        Dialog_view_av.setTabOrder(self.pushButton_play, self.pushButton_rewind_5)
+        Dialog_view_av.setTabOrder(self.pushButton_rewind_5, self.pushButton_rewind_30)
+        Dialog_view_av.setTabOrder(self.pushButton_rewind_30, self.pushButton_forward_30)
+        Dialog_view_av.setTabOrder(self.pushButton_forward_30, self.pushButton_rate_down)
+        Dialog_view_av.setTabOrder(self.pushButton_rate_down, self.pushButton_rate_up)
+        Dialog_view_av.setTabOrder(self.pushButton_rate_up, self.horizontalSlider_vol)
         Dialog_view_av.setTabOrder(self.horizontalSlider_vol, self.comboBox_tracks)
-        Dialog_view_av.setTabOrder(self.comboBox_tracks, self.checkBox_scroll_transcript)
+        Dialog_view_av.setTabOrder(self.comboBox_tracks, self.pushButton_help)
+        Dialog_view_av.setTabOrder(self.pushButton_help, self.checkBox_scroll_transcript)
         Dialog_view_av.setTabOrder(self.checkBox_scroll_transcript, self.textEdit)
-        Dialog_view_av.setTabOrder(self.textEdit, self.horizontalSlider)
+        Dialog_view_av.setTabOrder(self.textEdit, self.lineEdit_search)
+        Dialog_view_av.setTabOrder(self.lineEdit_search, self.pushButton_previous)
+        Dialog_view_av.setTabOrder(self.pushButton_previous, self.pushButton_next)
+        Dialog_view_av.setTabOrder(self.pushButton_next, self.pushButton_speechtotext)
 
     def retranslateUi(self, Dialog_view_av):
         _translate = QtCore.QCoreApplication.translate
