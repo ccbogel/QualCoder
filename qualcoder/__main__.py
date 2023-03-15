@@ -57,7 +57,7 @@ from qualcoder.GUI.base64_helper import *
 from qualcoder.GUI.ui_main import Ui_MainWindow
 from qualcoder.helpers import Message
 from qualcoder.import_survey import DialogImportSurvey
-from qualcoder.information import DialogInformation, menu_shortcuts, manage_section_shortcuts
+from qualcoder.information import DialogInformation, menu_shortcuts, manage_section_shortcuts, view_av_shortcuts
 from qualcoder.locale.base64_lang_helper import *
 from qualcoder.journals import DialogJournals
 from qualcoder.manage_files import DialogManageFiles
@@ -1219,6 +1219,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def display_menu_key_shortcuts(self):
         self.ui.textEdit.append(menu_shortcuts)
         self.ui.textEdit.append(manage_section_shortcuts)
+        self.ui.textEdit.append(view_av_shortcuts)
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
 
     def about(self):

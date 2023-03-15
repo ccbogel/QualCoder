@@ -234,5 +234,17 @@ manage_section_shortcuts = '<h1>Manage section key shortcuts</h1><table>\n\
 <tr><td>Ctrl 8</td><td>Export attributes</td><td></td><td></td><td></td></tr>\n\
 <tr><td>Ctrl 9</td><td>Export file</td><td></td><td></td><td></td></tr>\n\
 <tr><td></td><td>Ctrl A Show all rows</td><td>Ctrl A Show all rows</td><td></td><td>L Link selected</td></tr>\n\
-<tr><td></td><td></td><td></td><td></td><td>U Unlink selected</td></tr>\n\
+<tr><td></td><td></td><td></td><td></td><td>U Unlink file</td></tr>\n\
 </table>'
+
+view_av_shortcuts = '<br /><h2>Manage files - view A/V shortcuts</h2>\n\
+Alt minus Rewind 30 seconds.<br />Ctrl R Rewind 5 seconds<br />Alt plus Forward 30 seconds<br />\n\
+Ctrl S OR Ctrl P Start/pause. On start rewind 1 second<br />\n\
+Ctrl T Insert timestamp in format [hh.mm.ss]<br />\n\
+Ctrl N Enter a new speakers name into shortcuts<br />\n\
+Ctrl D Delete speaker names from shortcuts<br />\n\
+Ctrl 1 .. 8 Insert speaker in format [speaker name]<br />\n\
+Ctrl Shift > Increase play rate<br />\n\
+Ctrl Shift < Decrease play rate<br />'
+
+coding_section_shortcuts = ''
