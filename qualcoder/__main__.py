@@ -57,7 +57,7 @@ from qualcoder.GUI.base64_helper import *
 from qualcoder.GUI.ui_main import Ui_MainWindow
 from qualcoder.helpers import Message
 from qualcoder.import_survey import DialogImportSurvey
-from qualcoder.information import DialogInformation, menu_shortcuts
+from qualcoder.information import DialogInformation, menu_shortcuts, manage_section_shortcuts
 from qualcoder.locale.base64_lang_helper import *
 from qualcoder.journals import DialogJournals
 from qualcoder.manage_files import DialogManageFiles
@@ -1109,9 +1109,8 @@ class MainWindow(QtWidgets.QMainWindow):
     def settings_report(self):
         """ Display general settings and project summary """
 
-        msg = _("Settings")
-        msg += "\n========\n"
-        msg += _("Coder") + ": " + self.app.settings['codername'] + "\n"
+        self.ui.textEdit.append("<h1>" +_("Settings") + "</h1>")
+        msg = _("Coder") + ": " + self.app.settings['codername'] + "\n"
         msg += _("Font") + ": " + self.app.settings['font'] + " " + str(self.app.settings['fontsize']) + "\n"
         msg += _("Tree font size") + ": " + str(self.app.settings['treefontsize']) + "\n"
         msg += _("Working directory") + ": " + self.app.settings['directory']
@@ -1126,7 +1125,7 @@ class MainWindow(QtWidgets.QMainWindow):
         msg += _("Style") + "; " + self.app.settings['stylesheet']
         if platform.system() == "Windows":
             msg += "\n" + _("Directory (folder) paths / represents \\")
-        msg += "\n========"
+        msg += "\n"
         self.ui.textEdit.append(msg)
         self.ui.textEdit.textCursor().movePosition(QtGui.QTextCursor.MoveOperation.End)
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
@@ -1219,6 +1218,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def display_menu_key_shortcuts(self):
         self.ui.textEdit.append(menu_shortcuts)
+        self.ui.textEdit.append(manage_section_shortcuts)
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
 
     def about(self):
@@ -2053,9 +2053,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.project['databaseversion'] = result[0]
         self.project['date'] = result[1]
         self.project['memo'] = result[2]
-        msg = "\n" + _("PROJECT SUMMARY")
-        msg += "\n========\n"
-        msg += _("Date time now: ") + datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M") + "\n"
+        self.ui.textEdit.append("\n")
+        self.ui.textEdit.append("<h1>" + _("Project summary") + "</h1>")
+        msg = _("Date time now: ") + datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M") + "\n"
         msg += self.app.project_name + "\n"
         msg += _("Project path: ") + self.app.project_path + "\n"
         msg += _("Project date: ") + str(self.project['date']) + "\n"
@@ -2105,7 +2105,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.actionManage_bad_links_to_files.setEnabled(True)
         else:
             self.ui.actionManage_bad_links_to_files.setEnabled(False)
-        self.ui.textEdit.append("\n========\n")
+        self.ui.textEdit.append("\n")
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
         self.ui.textEdit.verticalScrollBar().setValue(self.ui.textEdit.verticalScrollBar().maximum())
 
