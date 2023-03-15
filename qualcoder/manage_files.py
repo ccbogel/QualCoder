@@ -571,6 +571,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             return
         if directory != self.app.last_export_directory:
             self.app.last_export_directory = directory
+        destination = self.app.last_export_directory
         file_directory = ""
         if mediapath is not None and mediapath[:6] == "/docs/":
             mediapath = "/documents/" + mediapath[6:]
