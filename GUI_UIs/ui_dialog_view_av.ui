@@ -512,12 +512,22 @@ red underline = Assigned to code or annotation</string>
   </layout>
  </widget>
  <tabstops>
+  <tabstop>horizontalSlider</tabstop>
   <tabstop>pushButton_play</tabstop>
+  <tabstop>pushButton_rewind_5</tabstop>
+  <tabstop>pushButton_rewind_30</tabstop>
+  <tabstop>pushButton_forward_30</tabstop>
+  <tabstop>pushButton_rate_down</tabstop>
+  <tabstop>pushButton_rate_up</tabstop>
   <tabstop>horizontalSlider_vol</tabstop>
   <tabstop>comboBox_tracks</tabstop>
+  <tabstop>pushButton_help</tabstop>
   <tabstop>checkBox_scroll_transcript</tabstop>
   <tabstop>textEdit</tabstop>
-  <tabstop>horizontalSlider</tabstop>
+  <tabstop>lineEdit_search</tabstop>
+  <tabstop>pushButton_previous</tabstop>
+  <tabstop>pushButton_next</tabstop>
+  <tabstop>pushButton_speechtotext</tabstop>
  </tabstops>
  <resources/>
  <connections/>
