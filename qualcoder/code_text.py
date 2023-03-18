@@ -280,6 +280,7 @@ class DialogCodeText(QtWidgets.QWidget):
         pm.loadFromData(QtCore.QByteArray.fromBase64(project_icon), "png")
         self.ui.pushButton_project_memo.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_project_memo.pressed.connect(self.show_project_memo)
+        self.ui.textEdit_info.tabChangesFocus()
         self.ui.textEdit_info.textChanged.connect(self.rhs_splitter_text_changed)
 
         self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
@@ -723,6 +724,7 @@ class DialogCodeText(QtWidgets.QWidget):
     def show_code_rule(self):
         """ Show current journal text in right-hand side splitter pane. """
 
+        self.ui.textEdit_info.setPlainText("")
         selected = self.ui.treeWidget.currentItem()
         if selected is None:
             return
@@ -737,7 +739,6 @@ class DialogCodeText(QtWidgets.QWidget):
                     if c['memo'] is not None:
                         txt += c['memo']
                     break
-            self.ui.textEdit_info.hide()
         else:  # Code is selected
             for c in self.codes:
                 if c['cid'] == int(selected.text(1)[4:]):
