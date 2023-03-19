@@ -1697,10 +1697,9 @@ class DialogCodeText(QtWidgets.QWidget):
             self.recursive_traverse(item.child(i), text_)
 
     def keyPressEvent(self, event):
-        """ This works best without the modifiers.
-         As pressing Ctrl + E give the Ctrl but not the E.
-         These key presses are not used in edi mode.
-
+        """
+        Ctrl Z Undo last unmarking
+        Ctrl F jump to search box
         A annotate - for current selection
         Q Quick Mark with code - for current selection
         B Create bookmark - at clicked position
@@ -1712,6 +1711,52 @@ class DialogCodeText(QtWidgets.QWidget):
         R opens a context menu for recently used codes for marking text
         V assign in vivo code to selected text
         """
+
+        key = event.key()
+        mods = event.modifiers()
+
+        # Ctrl + F jump to search box
+        if key == QtCore.Qt.Key.Key_F and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
+            self.ui.lineEdit_search.setFocus()
+            return
+
+        # Ctrl Z undo last unmarked coding
+        if key == QtCore.Qt.Key.Key_Z and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
+            self.undo_last_unmarked_code()
+            return
+
+        # Ctrl 0 to 9
+        if mods & QtCore.Qt.KeyboardModifier.ControlModifier:
+            if key == QtCore.Qt.Key.Key_1:
+                self.go_to_next_file()
+                return
+            if key == QtCore.Qt.Key.Key_2:
+                self.go_to_latest_coded_file()
+                return
+            if key == QtCore.Qt.Key.Key_3:
+                self.go_to_bookmark()
+                return
+            if key == QtCore.Qt.Key.Key_4:
+                self.file_memo(self.file_)
+                return
+            if key == QtCore.Qt.Key.Key_5:
+                self.get_files_from_attributes()
+                return
+            if key == QtCore.Qt.Key.Key_6:
+                self.show_selected_code_in_text_previous()
+                return
+            if key == QtCore.Qt.Key.Key_7:
+                self.show_selected_code_in_text_next()
+                return
+            if key == QtCore.Qt.Key.Key_8:
+                self.show_all_codes_in_text()
+                return
+            if key == QtCore.Qt.Key.Key_9:
+                self.show_important_coded()
+                return
+            if key == QtCore.Qt.Key.Key_0:
+                self.help()
+                return
 
         if not self.ui.textEdit.hasFocus():
             return
@@ -1886,8 +1931,6 @@ class DialogCodeText(QtWidgets.QWidget):
         Only works if clicked on a code (text cursor is in the coded text).
         Shrink start and end code positions using alt arrow left and alt arrow right
         Extend start and end code positions using shift arrow left, shift arrow right
-        Ctrl Z Undo the last coding deletion.
-        Ctrl F jump to Search box
         Ctrl E Enter and exit Edit Mode
         """
 
@@ -1900,13 +1943,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 return True
         # Change start and end code positions using alt arrow left and alt arrow right
         # and shift arrow left, shift arrow right
-        # QtGui.QKeyEvent = 7
-        if type(event) == QtGui.QKeyEvent:
-            key = event.key()
-            mod = event.modifiers()
-            if key == QtCore.Qt.Key.Key_Z and mod == QtCore.Qt.KeyboardModifier.ControlModifier:
-                self.undo_last_unmarked_code()
-                return True
+
         if type(event) == QtGui.QKeyEvent and self.ui.textEdit.hasFocus():
             key = event.key()
             mod = event.modifiers()
@@ -1915,16 +1952,9 @@ class DialogCodeText(QtWidgets.QWidget):
             diff = now - self.code_resize_timer
             if diff.microseconds < 100000:
                 return False
-            # Ctrl + E Edit mode
+            # Ctrl + E Edit mode - must be detected here as crtl E is oerridden in editable textEdit
             if key == QtCore.Qt.Key.Key_E and mod == QtCore.Qt.KeyboardModifier.ControlModifier:
                 self.edit_mode_toggle()
-                return True
-            # Ignore all other key events if edit mode is active
-            if self.edit_mode:
-                return False
-            # Ctrl + F jump to search box
-            if key == QtCore.Qt.Key.Key_F and mod == QtCore.Qt.KeyboardModifier.ControlModifier:
-                self.ui.lineEdit_search.setFocus()
                 return True
             # Ignore all other key events if edit mode is active
             if self.edit_mode:
