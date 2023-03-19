@@ -815,7 +815,11 @@ As all assigned positions may be incorrect. </string>
        </widget>
       </widget>
      </widget>
-     <widget class="QTextEdit" name="textEdit"/>
+     <widget class="QTextEdit" name="textEdit">
+      <property name="tabChangesFocus">
+       <bool>true</bool>
+      </property>
+     </widget>
      <widget class="QGroupBox" name="groupBox_info">
       <property name="title">
        <string/>
@@ -906,7 +910,11 @@ As all assigned positions may be incorrect. </string>
          <property name="orientation">
           <enum>Qt::Vertical</enum>
          </property>
-         <widget class="QTextEdit" name="textEdit_info"/>
+         <widget class="QTextEdit" name="textEdit_info">
+          <property name="tabChangesFocus">
+           <bool>true</bool>
+          </property>
+         </widget>
         </widget>
        </item>
       </layout>
