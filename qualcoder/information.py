@@ -247,4 +247,17 @@ Ctrl 1 .. 8 Insert speaker in format [speaker name]<br />\n\
 Ctrl Shift > Increase play rate<br />\n\
 Ctrl Shift < Decrease play rate<br />'
 
-coding_section_shortcuts = ''
+coding_section_shortcuts = '<h1>Code text, Code image, Code Audio/Video</h1>\
+Ctrl 1<br />\
+Ctrl 2<br />\
+Ctrl 3<br />\
+Ctrl 4<br />\
+Ctrl 5<br />\
+Ctrl 6<br />\
+Ctrl 7<br />\
+Ctrl 8<br />\
+Ctrl 9<br />\
+Ctrl 0 Help - opens in browser<br />\
+<h2>Code text keys</h2>\
+<h2>Code image keys</h2>\
+<h2>Code audio/video keys</h2>'
