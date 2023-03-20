@@ -247,17 +247,66 @@ Ctrl 1 .. 8 Insert speaker in format [speaker name]<br />\n\
 Ctrl Shift > Increase play rate<br />\n\
 Ctrl Shift < Decrease play rate<br />'
 
-coding_section_shortcuts = '<h1>Code text, Code image, Code Audio/Video</h1>\
-Ctrl 1<br />\
-Ctrl 2<br />\
-Ctrl 3<br />\
-Ctrl 4<br />\
-Ctrl 5<br />\
-Ctrl 6<br />\
-Ctrl 7<br />\
-Ctrl 8<br />\
-Ctrl 9<br />\
+coding_text_shortcuts = '<h2>Code text key shortcuts</h2>\
+Ctrl 1 Next file<br />\
+Ctrl 2 File with latest coding<br />\
+Ctrl 3 Go to bookmark<br />\
+Ctrl 4 Open file memo<br />\
+Ctrl 5 Filter files by attributes<br />\
+Ctrl 6 Show selected code previous<br />\
+Ctrl 7 Show selected code next<br />\
+Ctrl 8 Show all codes in text (if selected code previous or next has been used)<br />\
+Ctrl 9 Show codes marked important<br />\
 Ctrl 0 Help - opens in browser<br />\
-<h2>Code text keys</h2>\
-<h2>Code image keys</h2>\
-<h2>Code audio/video keys</h2>'
+Ctrl F Jump to search box<br />\
+Ctrl Z The last code is unmarked, undo and restore that coding<br />\
+Ctrl E Enter and Exit Edit mode<br />\
+A Annotate - Current text selection<br />\
+Q Quick Mark with code - for current selection<br />\
+B Create bookmark - at clicked position<br />\
+H Hide / Unhide top groupbox<br />\
+I Tag code at clicked position as important<br />\
+M Memo code - at clicked position<br />\
+O Shortcut to cycle through overlapping codes - at clicked position<br />\
+S Search text - may include current selection<br />\
+R opens a context menu for recently used codes for marking text<br />\
+V assign in vivo code to selected text<br />\
+Alt + Left arrow  Shrink coding to the left <br />\
+Alt + Right arrow Shrink coding to the right<br />\
+Shift + Left arrow Extend coding to the left<br />\
+Shift + Right arrow Extend coding to the right'
+
+coding_image_shortcuts = '<h2>Code image key shortcuts</h2>\
+Ctrl 1 Next file<br />\
+Ctrl 2 File with latest coding<br />\
+Ctrl 3 Open file memo<br />\
+Ctrl 4 Filter files by attributes<br />\
+Ctrl 5 Show codes marked important<br />\
+Ctrl 0 Help - opens in browser<br />\
+Ctrl Z The last code is unmarked, undo and restore that coding<br />\
+Minus or Q Zoom out<br />\
+Plus or W Zoom in'
+
+coding_av_shortcuts = '<h2>Code audio/video keys</h2>\
+Ctrl 1 Next file<br />\
+Ctrl 2 File with latest coding<br />\
+Ctrl 3 Open file memo<br />\
+Ctrl 4 Filter files by attributes<br />\
+Ctrl 9 Show codes marked important<br />\
+Ctrl 0 Help - opens in browser<br />\
+A annotate - for current selection<br />\
+Q Quick Mark with code - for current selection<br />\
+I Tag important<br />\
+M memo code - at clicked position<br />\
+O Shortcut to cycle through overlapping codes - at clicked position<br />\
+S search text - may include current selection<br />\
+R opens a context menu for recently used codes for marking text<br />\
+Ctrl Z Restore last unmarked code(s) - text code(s) or segment code<br />\
+Alt minus Rewind 30 seconds<br />\
+Ctrl + R Rewind 5 seconds<br />\
+Alt + plus Forward 30 seconds<br />\
+Ctrl + P Play/pause. On start rewind 1 second<br />\
+Ctrl + D Play/pause. On start rewind 1 second<br />\
+Ctrl + S Start and stop av segment creation<br />\
+Ctrl Shift > Increase play rate<br />\
+Ctrl Shift < Decrease play rate<br />'

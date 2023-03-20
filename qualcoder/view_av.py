@@ -1558,17 +1558,92 @@ class DialogCodeAV(QtWidgets.QDialog):
         I Tag important
         M memo code - at clicked position
         O Shortcut to cycle through overlapping codes - at clicked position
-        #S search text - may include current selection
+        S search text - may include current selection
         R opens a context menu for recently used codes for marking text
+
+        Ctrl 0 to 9 Button presses
+        Ctrl + Z restore last unmarked code(s) - text code(s) or segment code.
+        Alt + minus rewind 30 seconds
+        Ctrl + R to rewind 5 seconds.
+        Alt + plus forward 30 seconds
+        Ctrl + P to play/pause On start rewind 1 second
+        Ctrl + D to play/pause On start rewind 1 second
+        Ctrl + S to start and stop av segment creation
+        Ctrl + Shift + > to increase play rate
+        Ctrl + Shift + < to decrease play rate
         """
+
+        key = event.key()
+        mods = QtGui.QGuiApplication.keyboardModifiers()
+        # Increase play rate  Ctrl + Shift + >
+        if key == QtCore.Qt.Key.Key_Greater and (mods and QtCore.Qt.KeyboardModifier.ShiftModifier) and \
+                (mods and QtCore.Qt.KeyboardModifier.ControlModifier):
+            self.increase_play_rate()
+            return
+        # Decrease play rate  Ctrl + Shift + <
+        if key == QtCore.Qt.Key.Key_Less and (mods and QtCore.Qt.KeyboardModifier.ShiftModifier) and \
+                (mods and QtCore.Qt.KeyboardModifier.ControlModifier):
+            self.decrease_play_rate()
+            return
+        # Advance 30 seconds Alt F
+        if key == QtCore.Qt.Key.Key_Plus and mods & QtCore.Qt.KeyboardModifier.AltModifier:
+            self.forward_30_seconds()
+            return
+        # Rewind 30 seconds Alt R
+        if key == QtCore.Qt.Key.Key_Minus and mods == QtCore.Qt.KeyboardModifier.AltModifier:
+            self.rewind_30_seconds()
+            return
+        # Ctrl 0 to 9
+        if mods & QtCore.Qt.KeyboardModifier.ControlModifier:
+            #  Ctrl + P pause/play toggle
+            if key == QtCore.Qt.Key.Key_P or key == QtCore.Qt.Key.Key_D:
+                self.play_pause()
+                return
+            #  Ctrl S to start and end A/V segment recording
+            if key == QtCore.Qt.Key.Key_S:
+                self.create_or_clear_segment()
+                return
+            # Rewind 5 seconds Ctrl R
+            if key == QtCore.Qt.Key.Key_R:
+                self.rewind_5_seconds()
+                return
+            if key == QtCore.Qt.Key.Key_1:
+                self.go_to_next_file()
+                return
+            if key == QtCore.Qt.Key.Key_2:
+                self.go_to_latest_coded_file()
+                return
+            if key == QtCore.Qt.Key.Key_3:
+                self.file_memo(self.file_)
+                return
+            if key == QtCore.Qt.Key.Key_4:
+                self.get_files_from_attributes()
+                return
+            if key == QtCore.Qt.Key.Key_5:
+                self.show_important_coded()
+                return
+            if key == QtCore.Qt.Key.Key_9:
+                self.show_important_coded()
+                return
+            if key == QtCore.Qt.Key.Key_0:
+                self.help()
+                return
+            # Restore unmarked code(s) if undo code is present
+            if key == QtCore.Qt.Key.Key_Z:
+                if not self.undo_deleted_codes:
+                    return
+                try:
+                    if self.undo_deleted_codes[0]['is_segment']:
+                        self.restore_unmarked_segment()
+                except KeyError:
+                    self.restore_unmarked_text_codes()
 
         if not self.ui.textEdit.hasFocus():
             return
         '''# Ignore all other key events if edit mode is active  # Edit mode not used here yet
         if self.edit_mode:
             return'''
-        key = event.key()
-        # mod = QtGui.QGuiApplication.keyboardModifiers()
+
         cursor_pos = self.ui.textEdit.textCursor().position()
         selected_text = self.ui.textEdit.textCursor().selectedText()
         codes_here = []
@@ -1576,7 +1651,6 @@ class DialogCodeAV(QtWidgets.QDialog):
             if item['pos0'] <= cursor_pos <= item['pos1'] and \
                     item['owner'] == self.app.settings['codername']:
                 codes_here.append(item)
-
         # Annotate selected
         if key == QtCore.Qt.Key.Key_A and selected_text != "":
             self.annotate(cursor_pos)
@@ -1604,14 +1678,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         if key == QtCore.Qt.Key.Key_R and self.file_ is not None and self.ui.textEdit.textCursor().selectedText() != "":
             self.textedit_recent_codes_menu(self.ui.textEdit.cursorRect().topLeft())
             return
-        '''# Search, with or without selected
-        if key == QtCore.Qt.Key_S and self.file_ is not None:
-            if selected_text == "":
-                self.ui.lineEdit_search.setFocus()
-            else:
-                self.ui.lineEdit_search.setText(selected_text)
-                self.search_for_text()
-                self.ui.pushButton_next.setFocus()'''
 
     def eventFilter(self, object_, event):
         """ Using this event filter to identify treeWidgetItem drop events.
@@ -1619,27 +1685,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         QEvent::Drop 63 A drag and drop operation is completed (QDropEvent).
         https://stackoverflow.com/questions/28994494/why-does-qtreeview-not-fire-a-drop-or-move-event-during-drag-and-drop
         Also use eventFilter for QGraphicsView.
-
-        Options are:
-            Alt + minus rewind 30 seconds
-            Ctrl + R to rewind 5 seconds.
-            Alt + plus forward 30 seconds
-            Ctrl + P to play/pause On start rewind 1 second
-            Ctrl + D to play/pause On start rewind 1 second
-            Ctrl + S to start and stop av segment creation
-
-            Ctrl + Shift + > to increase play rate
-            Ctrl + Shift + < to decrease play rate
-
-            TextEdit:
-            A annotate - for current selection
-            I mark coded as important
-            M memo code - at clicked position
-            O Shortcut to cycle through overlapping codes - at clicked position
-            Q Quick Mark with code - for current selection
-            R opens a context menu for recently used codes for marking text
-
-            Ctrl + Z restore last unmarked code(s) - text code(s) or segment code.
 
         Also detect key events in the textedit. These are used to extend or shrink a text coding.
         Only works if clicked on a code (text cursor is in the coded text).
@@ -1655,19 +1700,9 @@ class DialogCodeAV(QtWidgets.QDialog):
                 self.item_moved_update_data(item, parent)
         if event.type() != 7 or self.media is None:
             return False
+
         key = event.key()
         mods = event.modifiers()
-
-        # Restore unmarked code(s) if undo code is present
-        if key == QtCore.Qt.Key.Key_Z and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
-            if not self.undo_deleted_codes:
-                return True
-            try:
-                if self.undo_deleted_codes[0]['is_segment']:
-                    self.restore_unmarked_segment()
-            except KeyError:
-                self.restore_unmarked_text_codes()
-
         # Change start and end code positions using alt arrow left and alt arrow right
         # and shift arrow left, shift arrow right
         if self.ui.textEdit.hasFocus():
@@ -1701,58 +1736,6 @@ class DialogCodeAV(QtWidgets.QDialog):
                         and diff.microseconds > msec_gap:
                     self.extend_right(codes_here[0])
                     return True
-            '''selected_text = self.ui.textEdit.textCursor().selectedText()
-            # Annotate selected
-            if key == QtCore.Qt.Key_A and selected_text != "":
-                self.annotate(self.ui.textEdit.textCursor().position())
-                return True
-            # Important  for coded text
-            if key == QtCore.Qt.Key_I:
-                self.set_important(cursor_pos)
-                return True
-            # Memo for current code
-            if key == QtCore.Qt.Key_M:
-                self.coded_text_memo(cursor_pos)
-                return True
-            # Overlapping codes cycle
-            now = datetime.datetime.now()
-            overlap_diff = now - self.overlap_timer
-            if key == QtCore.Qt.Key_O and len(codes_here) > 1 and overlap_diff.microseconds > 150000:
-                self.overlap_timer = datetime.datetime.now()
-                self.cycle_overlap()
-            # Quick Mark selected
-            if key == QtCore.Qt.Key_Q and selected_text != "":
-                self.mark()
-                return True
-            # Recent codes menu
-            if key == QtCore.Qt.Key_R and self.ui.textEdit.textCursor().selectedText() != "":
-                self.textedit_recent_codes_menu(self.ui.textEdit.cursorRect().topLeft())
-                return True'''
-
-        #  Ctrl + P pause/play toggle
-        if (key == QtCore.Qt.Key.Key_P or key == QtCore.Qt.Key.Key_D) and \
-                mods == QtCore.Qt.KeyboardModifier.ControlModifier:
-            self.play_pause()
-        #  Ctrl S to start and end A/V segment recording
-        if key == QtCore.Qt.Key.Key_S and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
-            self.create_or_clear_segment()
-        # Advance 30 seconds Alt F
-        if key == QtCore.Qt.Key.Key_Plus and mods & QtCore.Qt.KeyboardModifier.AltModifier:
-            self.forward_30_seconds()
-        # Rewind 30 seconds Alt R
-        if key == QtCore.Qt.Key.Key_Minus and mods == QtCore.Qt.KeyboardModifier.AltModifier:
-            self.rewind_30_seconds()
-        # Rewind 5 seconds Ctrl R
-        if key == QtCore.Qt.Key.Key_R and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
-            self.rewind_5_seconds()
-        # Increase play rate  Ctrl + Shift + >
-        if key == QtCore.Qt.Key.Key_Greater and (mods and QtCore.Qt.KeyboardModifier.ShiftModifier) and \
-                (mods and QtCore.Qt.KeyboardModifier.ControlModifier):
-            self.increase_play_rate()
-        # Decrease play rate  Ctrl + Shift + <
-        if key == QtCore.Qt.Key.Key_Less and (mods and QtCore.Qt.KeyboardModifier.ShiftModifier) and \
-                (mods and QtCore.Qt.KeyboardModifier.ControlModifier):
-            self.decrease_play_rate()
         return False
 
     def textedit_recent_codes_menu(self, position):
