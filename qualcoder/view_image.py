@@ -34,6 +34,7 @@ import os
 from random import randint
 import sys
 import traceback
+import webbrowser
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import Qt
@@ -1017,43 +1018,76 @@ class DialogCodeImage(QtWidgets.QDialog):
                 item.child(i).setHidden(False)
             self.recursive_traverse(item.child(i), text_)
 
+    def keyPressEvent(self, event):
+        """
+        Ctrl Z Undo last unmarking
+        H hide / show top group box
+        Ctrl 0 to Ctrl 9 - button presses
+        + or W  Zoom out
+        - or Q Zoom in
+        Ctrl 0 to Ctrl 5 Buttons and Help
+        """
+
+        key = event.key()
+        mods = event.modifiers()
+
+        if key == QtCore.Qt.Key.Key_H:
+            self.ui.groupBox_2.setHidden(not (self.ui.groupBox_2.isHidden()))
+            return
+        # Ctrl Z undo last unmarked coding
+        if key == QtCore.Qt.Key.Key_Z and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
+            self.undo_last_unmarked_code()
+            return
+        if key == QtCore.Qt.Key.Key_Minus or key == QtCore.Qt.Key.Key_Q:
+            v = self.ui.horizontalSlider.value()
+            v -= 3
+            if v < self.ui.horizontalSlider.minimum():
+                return
+            self.ui.horizontalSlider.setValue(v)
+            return
+        if key == QtCore.Qt.Key.Key_Plus or key == QtCore.Qt.Key.Key_W:
+            v = self.ui.horizontalSlider.value()
+            v += 3
+            if v > self.ui.horizontalSlider.maximum():
+                return
+            self.ui.horizontalSlider.setValue(v)
+            return
+        # Ctrl 0 to 9
+        if mods & QtCore.Qt.KeyboardModifier.ControlModifier:
+            if key == QtCore.Qt.Key.Key_1:
+                self.go_to_next_file()
+                return
+            if key == QtCore.Qt.Key.Key_2:
+                self.go_to_latest_coded_file()
+                return
+            if key == QtCore.Qt.Key.Key_3:
+                self.file_memo(self.file_)
+                return
+            if key == QtCore.Qt.Key.Key_4:
+                self.get_files_from_attributes()
+                return
+            if key == QtCore.Qt.Key.Key_5:
+                self.show_important_coded()
+                return
+            if key == QtCore.Qt.Key.Key_0:
+                self.help()
+                return
+
+    @staticmethod
+    def help():
+        """ Open help for transcribe section in browser. """
+
+        url = "https://github.com/ccbogel/QualCoder/wiki/08-Coding-Images"
+        webbrowser.open(url)
+
     def eventFilter(self, object_, event):
         """ Using this event filter to identify treeWidgetItem drop events.
         http://doc.qt.io/qt-5/qevent.html#Type-enum
         QEvent::Drop	63	A drag and drop operation is completed (QDropEvent).
         https://stackoverflow.com/questions/28994494/why-does-qtreeview-not-fire-a-drop-or-move-event-during-drag-and-drop
         Also use eventFilter for QGraphicsView.
-
-        Key events on scene
-        H Hide / unHide top groupbox
-        minus reduce the scale
-        plus increase the scale
-        Ctrl Z undo last unmarked code
         """
 
-        if type(event) == QtGui.QKeyEvent:
-            key = event.key()
-            mod = event.modifiers()
-            if key == QtCore.Qt.Key.Key_Z and mod == QtCore.Qt.KeyboardModifier.ControlModifier:
-                self.undo_last_unmarked_code()
-                return True
-            if key == QtCore.Qt.Key.Key_H:
-                self.ui.groupBox_2.setHidden(not (self.ui.groupBox_2.isHidden()))
-                return True
-            if key == QtCore.Qt.Key.Key_Minus or key == QtCore.Qt.Key.Key_Q:
-                v = self.ui.horizontalSlider.value()
-                v -= 3
-                if v < self.ui.horizontalSlider.minimum():
-                    return True
-                self.ui.horizontalSlider.setValue(v)
-                return True
-            if key == QtCore.Qt.Key.Key_Plus or key == QtCore.Qt.Key.Key_W:
-                v = self.ui.horizontalSlider.value()
-                v += 3
-                if v > self.ui.horizontalSlider.maximum():
-                    return True
-                self.ui.horizontalSlider.setValue(v)
-                return True
         if object_ is self.ui.treeWidget.viewport():
             if event.type() == QtCore.QEvent.Type.Drop:
                 item = self.ui.treeWidget.currentItem()

@@ -1710,6 +1710,7 @@ class DialogCodeText(QtWidgets.QWidget):
         S search text - may include current selection
         R opens a context menu for recently used codes for marking text
         V assign in vivo code to selected text
+        Ctrl 0 to Ctrl 9 - button presses
         """
 
         key = event.key()
@@ -1952,7 +1953,7 @@ class DialogCodeText(QtWidgets.QWidget):
             diff = now - self.code_resize_timer
             if diff.microseconds < 100000:
                 return False
-            # Ctrl + E Edit mode - must be detected here as crtl E is oerridden in editable textEdit
+            # Ctrl + E Edit mode - must be detected here as Ctrl E is overridden in editable textEdit
             if key == QtCore.Qt.Key.Key_E and mod == QtCore.Qt.KeyboardModifier.ControlModifier:
                 self.edit_mode_toggle()
                 return True
