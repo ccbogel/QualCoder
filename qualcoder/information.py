@@ -220,7 +220,7 @@ menu_shortcuts = '<h1>Menu key shortcuts</h1>\n\
 <tr><td></td><td>Alt U Charts</td><td></td></tr>\n\
 <tr><td></td><td>Alt D Database queries</td><td></td></tr></table>'
 
-manage_section_shortcuts = '<h1>Manage section key shortcuts</h1><table>\n\
+manage_section_shortcuts = '<h1>Manage menu section key shortcuts</h1><table>\n\
 <tr><td><b>Key&nbsp;&nbsp;&nbsp;</b></td><td><b>Manage files</b></td><td><b>Cases</b></td>\n\
 <td><b>Journals</b></td><td><b>References</b></td></tr>\n\
 <tr><td>Ctrl 0</td><td>Help</td><td>Help</td><td>Help</td><td></td></tr>\n\
@@ -246,6 +246,8 @@ Ctrl D Delete speaker names from shortcuts<br />\n\
 Ctrl 1 .. 8 Insert speaker in format [speaker name]<br />\n\
 Ctrl Shift > Increase play rate<br />\n\
 Ctrl Shift < Decrease play rate<br />'
+
+menu_shortcuts_display = menu_shortcuts + manage_section_shortcuts + view_av_shortcuts
 
 coding_text_shortcuts = '<h2>Code text key shortcuts</h2>\
 Ctrl 1 Next file<br />\
@@ -287,7 +289,7 @@ Ctrl Z The last code is unmarked, undo and restore that coding<br />\
 Minus or Q Zoom out<br />\
 Plus or W Zoom in'
 
-coding_av_shortcuts = '<h2>Code audio/video keys</h2>\
+coding_av_shortcuts = '<h2>Code audio/video key shortcuts</h2>\
 Ctrl 1 Next file<br />\
 Ctrl 2 File with latest coding<br />\
 Ctrl 3 Open file memo<br />\
@@ -303,10 +305,12 @@ S search text - may include current selection<br />\
 R opens a context menu for recently used codes for marking text<br />\
 Ctrl Z Restore last unmarked code(s) - text code(s) or segment code<br />\
 Alt minus Rewind 30 seconds<br />\
-Ctrl + R Rewind 5 seconds<br />\
+Ctrl R Rewind 5 seconds<br />\
 Alt + plus Forward 30 seconds<br />\
-Ctrl + P Play/pause. On start rewind 1 second<br />\
-Ctrl + D Play/pause. On start rewind 1 second<br />\
-Ctrl + S Start and stop av segment creation<br />\
+Ctrl P Play/pause. On start rewind 1 second<br />\
+Ctrl D Play/pause. On start rewind 1 second<br />\
+Ctrl S Start and stop av segment creation<br />\
 Ctrl Shift > Increase play rate<br />\
 Ctrl Shift < Decrease play rate<br />'
+
+coding_shortcuts_display = coding_text_shortcuts + coding_image_shortcuts + coding_av_shortcuts
