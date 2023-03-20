@@ -245,7 +245,7 @@ Ctrl N Enter a new speakers name into shortcuts<br />\n\
 Ctrl D Delete speaker names from shortcuts<br />\n\
 Ctrl 1 .. 8 Insert speaker in format [speaker name]<br />\n\
 Ctrl Shift > Increase play rate<br />\n\
-Ctrl Shift < Decrease play rate<br />'
+Ctrl Shift < Decrease play rate<br /><br />'
 
 menu_shortcuts_display = menu_shortcuts + manage_section_shortcuts + view_av_shortcuts
 
