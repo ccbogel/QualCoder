@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2022 Colin Curtain
+Copyright (c) 2023 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -29,8 +29,8 @@ https://qualcoder.wordpress.com/
 from copy import copy, deepcopy
 import csv
 import logging
-import os
 import openpyxl
+import os
 from PIL import Image
 import re
 from shutil import copyfile
