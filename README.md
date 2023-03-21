@@ -290,7 +290,7 @@ https://github.com/ccbogel/QualCoder/releases/tag/3.2
 
 ## Creator
 
-Dr Colin Curtain BPharm GradDipComp PhD. Python programmer, lecturer.
+Dr Colin Curtain BPharm GradDipComp PhD. Pharmacy lecturer at the University of Tasmania. Obtained a Graduate Diploma in Computing in 2011. Have developed my python programming skills from this time. This project originated from my use of RQDA during my PhD - *Evaluation of clinical decision support provided by medication review software*.
 
 https://www.utas.edu.au/profiles/staff/umore/colin-curtain
 
