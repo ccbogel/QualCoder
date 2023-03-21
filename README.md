@@ -290,7 +290,7 @@ https://github.com/ccbogel/QualCoder/releases/tag/3.2
 
 ## Creator
 
-Dr Colin Curtain BPharm GradDipComp PhD. Pharmacy lecturer at the University of Tasmania. I obtained a Graduate Diploma in Computing in 2011. I have developed my python programming skills from this time onwards. The QualCoder project originated from my use of RQDA during my PhD - *Evaluation of clinical decision support provided by medication review software*. My original and now completely deprecated PyQDA software on PyPI was my first attempt at creating qualiatative software. The reason for creating the software was that during my PhD RQDA did not always install or work well for me, but I did realise that I could use the same sqlite database and access it with python. The current database is different to the older RQDA version.
+Dr Colin Curtain BPharm GradDipComp PhD. Pharmacy lecturer at the University of Tasmania. I obtained a Graduate Diploma in Computing in 2011. I have developed my python programming skills from this time onwards. The QualCoder project originated from my use of RQDA during my PhD - *Evaluation of clinical decision support provided by medication review software*. My original and now completely deprecated PyQDA software on PyPI was my first attempt at creating qualiatative software. The reason for creating the software was that during my PhD RQDA did not always install or work well for me, but I did realise that I could use the same sqlite database and access it with python. The current database is different to the older RQDA version. This is an ongoing hobby project, perhaps a labour of love, which I do utilise with some of the Masters and PhD students I supervise. 
 
 https://www.utas.edu.au/profiles/staff/umore/colin-curtain
 
