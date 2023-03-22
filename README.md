@@ -233,15 +233,15 @@ pip3 install chardet ebooklib lxml openpyxl pandas pillow ply pdfminer.six plotl
 brew install qpdf
 ```
 
-From the QualCoder-Master directory run the setup script:
+7) From the QualCoder-Master directory run the setup script:
 
 `python3 setup.py install`
 
 
-Assuming you downloaded the 3.1 version. You can now run with:
+Assuming you downloaded the 3.2 version. You can now run with:
 
 ```
-python3 /applications/QualCoder-3.1/qualcoder/__main__.py
+python3 /applications/QualCoder-3.2/qualcoder/__main__.py
 ```
 
 Alternative commands to run QualCoder (Suggestions):
