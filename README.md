@@ -221,19 +221,7 @@ python3 get-pip.py
 pip3 install chardet ebooklib lxml openpyxl pandas pillow ply pdfminer.six plotly pydub pyqt6 python-vlc rispy six SpeechRecognition
 ```
 
-6) Install system dependencies using Homebrew (aka `brew`) 
-
-6.1) Install `brew` if do not already have it (try typing `brew` and hit ENTER):
-
-* Follow instructions here about installing Homebrew on your macOS: https://brew.sh/
-
-6.2) Install QPDF package (needed to deal with PDF files) using Homebrew package manager:
-
-```sh
-brew install qpdf
-```
-
-7) From the QualCoder-Master directory run the setup script:
+6) From the QualCoder-Master directory run the setup script:
 
 `python3 setup.py install`
 
