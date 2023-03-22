@@ -252,11 +252,11 @@ From any directory:
 
 From the QualCoder-Master directory:
 
-`python -m qualcoder`
+`python3 -m qualcoder`
 
 or
 
-`python qualcoder/__main__.py`
+`python3 qualcoder/__main__.py`
 
 You can install QualCoder anywhere you want, so the path above depends on where you extracted the archive.
 
