@@ -202,7 +202,7 @@ You will need to install developer tools for mac (sorry I am not sure how to des
 
 3) Open the Terminal app (or any other command shell)
 
-4) Install PIP usingthese commands (if not yet installed, try typing `pip3 --version` and hit ENTER) 
+4) Install PIP using these commands (if not already installed). Check pip is installed: try typing `pip3 --version` and hit ENTER) 
 
 ```sh
 curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
@@ -218,12 +218,12 @@ python3 get-pip.py
 (you might already have them, don't do this again if you just update QualCoder to a newer version)
 
 ```sh
-pip3 install chardet ebooklib lxml openpyxl pandas pillow ply pdfminer.six plotly pydub pyqt6 python-vlc rispy six SpeechRecognition
+pip3 install chardet ebooklib openpyxl pandas pillow ply pdfminer.six plotly pydub pyqt6 python-vlc rispy six SpeechRecognition lxml
 ```
 
 6) From the QualCoder-Master directory run the setup script:
 
-`python3 setup.py install`
+`python3 -m pip install .`
 
 
 Assuming you downloaded the 3.2 version. You can now run with:
@@ -257,10 +257,13 @@ Open the Terminal App and move to the unzipped Qualcoder-Master directory, then 
 
 1) Install Python dependency modules using `pip3`:
 
-`pip3 install chardet ebooklib ffmpeg-python lxml pyqt6 pillow ply pdfminer.six openpyxl pandas plotly pydub python-vlc rispy six SpeechRecognition PyInstaller`
+`pip3 install chardet ebooklib ffmpeg-python pyqt6 pillow ply pdfminer.six openpyxl pandas plotly pydub python-vlc rispy six SpeechRecognition lxml`
 
-2) Create the Application. You will find it in the 'dist' folder and drag it to 'Applications'.
-`pyinstaller qualcoder.spec`
+2) Open the Terminal App and move to the unzipped Qualcoder-Master directory, then run the following commands:
+
+'pip3 install -U py2app' or for a system installation of python 'sudo pip3 install -U py2app'
+
+'python3 setup.py py2app`
 
  
 ## Dependencies
