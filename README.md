@@ -261,9 +261,9 @@ Open the Terminal App and move to the unzipped Qualcoder-Master directory, then 
 
 2) Open the Terminal App and move to the unzipped Qualcoder-Master directory, then run the following commands:
 
-'pip3 install -U py2app' or for a system installation of python 'sudo pip3 install -U py2app'
+`pip3 install -U py2app` or for a system installation of python `sudo pip3 install -U py2app`
 
-'python3 setup.py py2app`
+`python3 setup.py py2app`
 
  
 ## Dependencies
