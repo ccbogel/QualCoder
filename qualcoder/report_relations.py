@@ -744,8 +744,7 @@ class DialogReportRelations(QtWidgets.QDialog):
         keys = 'fid', 'filename', 'cid', 'codename', 'text', 'pos0', 'pos1', 'owner'
         for row in res:
             coded_text0.append(dict(zip(keys, row)))
-        '''for ct in coded_text0:
-            print(ct)'''
+
         coded_text1 = deepcopy(coded_text0)
         result = []
         for i in coded_text0:
@@ -754,8 +753,6 @@ class DialogReportRelations(QtWidgets.QDialog):
                 if i != j and i['fid'] == j['fid'] and i['pos0'] == j['pos0'] and i['pos1'] == j['pos1']:
                     tmp_result.append(j)
             if tmp_result:
-                print(len(tmp_result))
-
                 result.append(i)
                 # Remove matches from coded_text1 to avoid result duplications
                 coded_text1.remove(i)
@@ -763,6 +760,8 @@ class DialogReportRelations(QtWidgets.QDialog):
                     result.append(t)
                     # Remove matches from coded_text1 to avoid result duplications
                     coded_text1.remove(t)
+            if tmp_result:
+                result.append({'fid': "", 'filename': "", 'cid': "", 'codename': "", 'text': "", 'pos0': "", 'pos1': "", 'owner': ""})
         if not result:
             msg = _("No exact matches found.")
             Message(self.app, _('No results'), msg, "information").exec()
