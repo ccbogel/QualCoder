@@ -298,7 +298,7 @@ class DialogCodeInText(QtWidgets.QDialog):
         """
 
         if not self.event_filter_on:
-            return
+            return False
         # Change start and end code positions using alt arrow left and alt arrow right
         # and shift arrow left, shift arrow right
         # QtGui.QKeyEvent = 7
