@@ -26,9 +26,10 @@ https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 """
 
-from copy import copy
+from copy import copy, deepcopy
 import csv
 import logging
+import openpyxl
 import os
 import pandas as pd
 import plotly.express as px
@@ -107,6 +108,10 @@ class DialogReportRelations(QtWidgets.QDialog):
         pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_csv_icon), "png")
         self.ui.pushButton_exportcsv.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_exportcsv.pressed.connect(self.export_csv_file)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_csv_icon), "png")
+        self.ui.pushButton_export_exact.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_export_exact.pressed.connect(self.export_exact_excel_file)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(cogs_icon), "png")
         self.ui.pushButton_calculate.setIcon(QtGui.QIcon(pm))
@@ -298,6 +303,9 @@ class DialogReportRelations(QtWidgets.QDialog):
         whichmax is the code with the highest pos1 or None if equal
         operlapindex is the combined lowest to the highest positions. Only used for E, O, P
         unionindex is the lowest and highest positions of the union of overlap. Only used for E, O
+
+        Called by:
+            calculate_relations_for_coder_and_selected_codes
 
         Returns:
         id1, id2, overlapindex, unionindex, distance, whichmin, min, whichmax, max, fid
@@ -722,6 +730,153 @@ class DialogReportRelations(QtWidgets.QDialog):
             self.ui.tableWidget.setItem(r, memo1, item)
         self.ui.tableWidget.resizeColumnsToContents()
 
+    def export_exact_excel_file(self):
+        """ Export exact match text codings for all codes as excel file.
+        Output ordered by filename and code name ascending. """
+
+        cur = self.app.conn.cursor()
+        sql = "select fid, source.name, code_text.cid, code_name.name, seltext,pos0,pos1,code_text.owner from " \
+              "code_text join code_name on code_name.cid=code_text.cid join source on source.id=code_text.fid " \
+              "order by source.name, code_name.name"
+        cur.execute(sql)
+        res = cur.fetchall()
+        coded_text0 = []
+        keys = 'fid', 'filename', 'cid', 'codename', 'text', 'pos0', 'pos1', 'owner'
+        for row in res:
+            coded_text0.append(dict(zip(keys, row)))
+        '''for ct in coded_text0:
+            print(ct)'''
+        coded_text1 = deepcopy(coded_text0)
+        result = []
+        for i in coded_text0:
+            tmp_result = []
+            for j in coded_text1:
+                if i != j and i['fid'] == j['fid'] and i['pos0'] == j['pos0'] and i['pos1'] == j['pos1']:
+                    tmp_result.append(j)
+            if tmp_result:
+                print(len(tmp_result))
+
+                result.append(i)
+                # Remove matches from coded_text1 to avoid result duplications
+                coded_text1.remove(i)
+                for t in tmp_result:
+                    result.append(t)
+                    # Remove matches from coded_text1 to avoid result duplications
+                    coded_text1.remove(t)
+        if not result:
+            msg = _("No exact matches found.")
+            Message(self.app, _('No results'), msg, "information").exec()
+            return
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        # Column headings
+        col_headings = ["Filename", "Codename", "pos0", "pos1", "Text", "Owner"]
+        row = 1
+        for col, code in enumerate(col_headings):
+            ws.cell(column=col + 1, row=row, value=code)
+        for row, data in enumerate(result):
+            ws.cell(column=1, row=row + 2, value=data['filename'])
+            ws.cell(column=2, row=row + 2, value=data['codename'])
+            ws.cell(column=3, row=row + 2, value=data['pos0'])
+            ws.cell(column=4, row=row + 2, value=data['pos1'])
+            ws.cell(column=5, row=row + 2, value=data['text'])
+            ws.cell(column=6, row=row + 2, value=data['owner'])
+        filepath, ok = QtWidgets.QFileDialog.getSaveFileName(self,
+                                                             _("Save Excel File"), self.app.settings['directory'],
+                                                             "XLSX Files(*.xlsx)",
+                                                             options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
+        if filepath is None or not ok:
+            return
+        if filepath[-4:] != ".xlsx":
+            filepath += ".xlsx"
+        wb.save(filepath)
+        msg = _("Report of exact matches for text codings by file and code") + "\n"
+        msg += _("Each row contains filename, codename, pos0, pos1, text, owner.") + "\n"
+        msg += _('Report exported to: ') + filepath
+        Message(self.app, _('Report exported'), msg, "information").exec()
+        self.parent_textEdit.append(msg)
+
+    def export_csv_file(self):
+        """ Export data as csv file(s),
+        The main file is called projectname_relations.csv.
+        The summary file (if generated) is called projectname_relations_stats.csv
+        The csv is comma delimited and all fields quoted. """
+
+        if not self.result_relations:
+            return
+
+        shortname = self.app.project_name.split(".qda")[0]
+        filename = shortname + "_relations.csv"
+        e = ExportDirectoryPathDialog(self.app, filename)
+        filepath = e.filepath
+        if filepath is None:
+            return
+        col_names = ["Fid", _("Filename"), "Code0", "Code0 " + _("name"), "Code0_pos0", "Code0_pos1",
+                     "Code1", "Code1 " + _("name"),
+                     "Code1_pos0", "Code1_pos1", _("Relation"), _("Minimum"), _("Maximum"),
+                     _("Overlap") + " 0", _("Overlap") + " 1", _("Union") + " 0",
+                     _("Union") + " 1", _("Distance"), _("Text before"), _("Text overlap"), _("Text after"), _("Owner"),
+                     "ctid0", "ctid1", "text0", "text1", _("Memo") + "0", _("Memo") + "1"]
+        with open(filepath, 'w', encoding='UTF8') as f:
+            writer = csv.writer(f, quoting=csv.QUOTE_ALL)
+            writer.writerow(col_names)
+            for r in self.result_relations:
+                row = [r['fid'], r['file_name'], r['cid0'], r['c0_name'], r['c0_pos0'], r['c0_pos1'], r['cid1'],
+                       r['c1_name'], r['c1_pos0'], r['c1_pos1'], r['relation'], str(r['whichmin']).replace('None', ''),
+                       str(r['whichmax']).replace('None', '')]
+                if r['overlapindex']:
+                    row.append(r['overlapindex'][0])
+                    row.append(r['overlapindex'][1])
+                else:
+                    row.append('')
+                    row.append('')
+                if r['unionindex']:
+                    row.append(r['unionindex'][0])
+                    row.append(r['unionindex'][1])
+                else:
+                    row.append('')
+                    row.append('')
+                row.append(str(r['distance']).replace('None', ''))
+                row.append(r['text_before'])
+                row.append(r['text_overlap'])
+                row.append(r['text_after'])
+                row.append(r['owner'])
+                row.append(r['ctid0'])
+                row.append(r['ctid1'])
+                row.append(r['ctid0_text'])
+                row.append(r['ctid1_text'])
+                row.append(r['coded_memo0'])
+                row.append(r['coded_memo1'])
+                writer.writerow(row)
+        msg = _("Code relations csv file exported to: ") + filepath
+        Message(self.app, _('Csv file Export'), msg, "information").exec()
+        self.parent_textEdit.append(msg)
+        # Write statistical summary file
+        if not self.result_summary:
+            return
+        stats_filepath = filepath[:-4] + "_stats.csv"
+        stats_col_names = ["Code0", "Code0 " + _("name"), "Code1", "Code1 " + _("name"), "Count", _("Minimum"), "Q1",
+                           "Median", "Q3", _("Maximum"), "Mean", "std dev"]
+        with open(stats_filepath, 'w', encoding='UTF8') as f:
+            writer = csv.writer(f, quoting=csv.QUOTE_ALL)
+            writer.writerow(stats_col_names)
+            for r in self.result_summary:
+                row = [r['cid0'], r['c0_name'], r['cid1'], r['c1_name'], str(r['count']), str(r['min']),
+                       str(r['quantiles'][0]), str(r['quantiles'][1]), str(r['quantiles'][2]), str(r['max']),
+                       str(r['mean']), str(r['stdev'])]
+                writer.writerow(row)
+        msg = _("Code relations stats csv file exported to: ") + filepath
+        Message(self.app, _('Csv summary file Export'), msg, "information").exec()
+        self.parent_textEdit.append(msg)
+
+    def closeEvent(self, event):
+        """ Save splitter dimensions. """
+
+        sizes = self.ui.splitter.sizes()
+        self.app.settings['dialogcodecrossovers_splitter0'] = sizes[0]
+        self.app.settings['dialogcodecrossovers_splitter1'] = sizes[1]
+
+    # Statistics
     def summary_statistics(self):
         """ Show summary coding distance statistics.
          Called after the main results are produced. """
@@ -939,83 +1094,3 @@ class DialogReportRelations(QtWidgets.QDialog):
                 it += 1
                 item = it.value()
         self.ui.treeWidget.expandAll()
-
-    def export_csv_file(self):
-        """ Export data as csv file(s),
-        The main file is called projectname_relations.csv.
-        The summary file (if generated) is called projectname_relations_stats.csv
-        The csv is comma delimited and all fields quoted. """
-
-        if not self.result_relations:
-            return
-
-        shortname = self.app.project_name.split(".qda")[0]
-        filename = shortname + "_relations.csv"
-        e = ExportDirectoryPathDialog(self.app, filename)
-        filepath = e.filepath
-        if filepath is None:
-            return
-        col_names = ["Fid", _("Filename"), "Code0", "Code0 " + _("name"), "Code0_pos0", "Code0_pos1",
-                     "Code1", "Code1 " + _("name"),
-                     "Code1_pos0", "Code1_pos1", _("Relation"), _("Minimum"), _("Maximum"),
-                     _("Overlap") + " 0", _("Overlap") + " 1", _("Union") + " 0",
-                     _("Union") + " 1", _("Distance"), _("Text before"), _("Text overlap"), _("Text after"), _("Owner"),
-                     "ctid0", "ctid1", "text0", "text1", _("Memo") + "0", _("Memo") + "1"]
-        with open(filepath, 'w', encoding='UTF8') as f:
-            writer = csv.writer(f, quoting=csv.QUOTE_ALL)
-            writer.writerow(col_names)
-            for r in self.result_relations:
-                row = [r['fid'], r['file_name'], r['cid0'], r['c0_name'], r['c0_pos0'], r['c0_pos1'], r['cid1'],
-                       r['c1_name'], r['c1_pos0'], r['c1_pos1'], r['relation'], str(r['whichmin']).replace('None', ''),
-                       str(r['whichmax']).replace('None', '')]
-                if r['overlapindex']:
-                    row.append(r['overlapindex'][0])
-                    row.append(r['overlapindex'][1])
-                else:
-                    row.append('')
-                    row.append('')
-                if r['unionindex']:
-                    row.append(r['unionindex'][0])
-                    row.append(r['unionindex'][1])
-                else:
-                    row.append('')
-                    row.append('')
-                row.append(str(r['distance']).replace('None', ''))
-                row.append(r['text_before'])
-                row.append(r['text_overlap'])
-                row.append(r['text_after'])
-                row.append(r['owner'])
-                row.append(r['ctid0'])
-                row.append(r['ctid1'])
-                row.append(r['ctid0_text'])
-                row.append(r['ctid1_text'])
-                row.append(r['coded_memo0'])
-                row.append(r['coded_memo1'])
-                writer.writerow(row)
-        msg = _("Code relations csv file exported to: ") + filepath
-        Message(self.app, _('Csv file Export'), msg, "information").exec()
-        self.parent_textEdit.append(msg)
-        # Write statistical summary file
-        if not self.result_summary:
-            return
-        stats_filepath = filepath[:-4] + "_stats.csv"
-        stats_col_names = ["Code0", "Code0 " + _("name"), "Code1", "Code1 " + _("name"), "Count", _("Minimum"), "Q1",
-                           "Median", "Q3", _("Maximum"), "Mean", "std dev"]
-        with open(stats_filepath, 'w', encoding='UTF8') as f:
-            writer = csv.writer(f, quoting=csv.QUOTE_ALL)
-            writer.writerow(stats_col_names)
-            for r in self.result_summary:
-                row = [r['cid0'], r['c0_name'], r['cid1'], r['c1_name'], str(r['count']), str(r['min']),
-                       str(r['quantiles'][0]), str(r['quantiles'][1]), str(r['quantiles'][2]), str(r['max']),
-                       str(r['mean']), str(r['stdev'])]
-                writer.writerow(row)
-        msg = _("Code relations stats csv file exported to: ") + filepath
-        Message(self.app, _('Csv summary file Export'), msg, "information").exec()
-        self.parent_textEdit.append(msg)
-
-    def closeEvent(self, event):
-        """ Save splitter dimensions. """
-
-        sizes = self.ui.splitter.sizes()
-        self.app.settings['dialogcodecrossovers_splitter0'] = sizes[0]
-        self.app.settings['dialogcodecrossovers_splitter1'] = sizes[1]
