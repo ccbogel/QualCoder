@@ -659,6 +659,7 @@ class TableWidgetItem(QtWidgets.QTableWidgetItem):
 DEFAULT_SQL = ["-- CASE TEXT\nselect cases.name ,  substr(source.fulltext, case_text.pos0, case_text.pos1 -  case_text.pos0 ) as casetext \
 from cases join case_text on  cases.caseid = case_text.caseid join source on source.id= case_text.fid \
 where case_text.pos1 >0",
+
                '-- CODES, FILEID, CODED TEXT\nselect  code_name.name as "codename", \
 code_text.fid, code_text.pos0, code_text.pos1, code_text.seltext from code_name \
 join  code_text on code_name.cid = code_text.cid\n\
@@ -672,6 +673,7 @@ source.name as "filename", code_text.pos1 - code_text.pos0 as "CodingLength",\
 code_text.pos0 as "index1", code_text.pos1 as "index2" \
 from code_text join code_name on code_text.cid = code_name.cid \
 join source on code_text.fid = source.id',
+
                '-- CODED TEXT WITH EACH CASE\nselect code_name.name as codename, cases.name as casename,\
  code_text.pos0, code_text.pos1, code_text.fid, seltext as "coded text", code_text.owner \
  from code_text join code_name on code_name.cid = code_text.cid \
@@ -681,12 +683,14 @@ where \n\
 -- and case_text.caseid in ( case_ids ) -- provide your case ids \n\
 -- and \n\
 (code_text.pos0 >= case_text.pos0 and code_text.pos1 <= case_text.pos1)',
+
                '-- ALL OR SELECTED ANNOTATIONS\nselect annotation.anid as "Annotation ID" , annotation.memo as "Annotation text", \n\
 annotation.fid as "File ID" , source.name as "File name", annotation.pos0 as "Start position", \n\
 annotation.pos1 as "End position", annotation.owner as "Coder name", annotation.date as "Date" from annotation \n\
 left join source on source.id = annotation.fid \n\
 -- DISPLAY ANNOTATIONS FOR SELECTED FILE, UNCOMMENT THE FOLLOWING: \n\
 -- AND source.name = "FILE NAME"',
+
                '-- ALL OR SELECTED CODINGS MEMOS\nselect code_text.memo as "Coding memo", code_text.cid as "Code ID", code_name.name as "Code name", \n\
 code_text.fid as "File ID", source.name as "File name", code_text.owner as "Coder name", code_text.date as "Date", \n\
 code_text.important as "Important(yes=1, no=0)" from source left join code_text on code_text.fid = source.id \n\
@@ -694,16 +698,41 @@ left join code_name on code_name.cid = code_text.cid where code_text.memo != "" 
 -- TO DISPLAY CODING FOR SELECTED CODE OR FILE, UNCOMMENT THE FOLLOWING:\n\
 -- AND code_name.name = "CODE NAME"  -- TO SELECT SPECIFIC CODE\n\
 -- AND source.name = "FILE NAME" -- TO SELECT SPECIFIC FILE',
+
                '-- FILES THAT ARE NOT CODED with code id 1\n\
 select source.name from source where source.id not in\n\
 (select code_text.fid from code_text where code_text.cid=1\n\
 union select code_av.id from code_av where code_av.cid=1\n\
 union select code_image.id from code_image where code_image.cid=1)',
-               '-- CODES NOTT USED IN A FILE. Example using file id 1 presuming a text file.\n\
+
+               '-- CODES NOT USED IN A FILE. Example using file id 1 presuming a text file.\n\
 select code_name.name from code_name where code_name.cid not in\n\
 -- Uncomment the appropriate line below for another file type if needed\n\
 (select code_text.cid from code_text where code_text.fid=1)  -- comment out for another file type\n\
 -- (select code_av.cid from code_av where code_av.id=1) -- uncomment for av files\n\
--- (select code_image.cid from code_image where code_image.id=1) -- uncomment for image files'
+-- (select code_image.cid from code_image where code_image.id=1) -- uncomment for image files',
 
-               ]
+'-- THREE OR MORE EXACTLY OVERLAPPING CODINGS IN A SELECTED FILE\n\
+-- Everywhere use the same file id, otherwise results will be incorrect\n\
+-- IDs for codes and files can be found by selecting Show IDs in Settings then go to Code Text, and Manage Files\n\n\
+SELECT  code_name.name AS "codename", code_text.cid,  code_text.fid, source.name, code_text.pos0, code_text.pos1, \n\
+code_text.seltext, code_text.memo AS "coding memo" \n\
+FROM  code_name JOIN  code_text ON code_name.cid = code_text.cid JOIN source ON source.id = code_text.fid \n\
+WHERE code_text.cid IN (1,2,3) -- INSERT IDs OF CODES OF INTEREST, (3 or more)\n\
+AND  fid = 1 \n\
+AND pos0 IN (SELECT  pos0 FROM code_text WHERE cid=1 AND fid=1) -- Put ID OF THE FIRST OBLIGATORY CODE \n\
+AND pos1 IN (SELECT  pos1 FROM code_text WHERE cid=1 AND fid=1) \n\
+AND pos0 IN (SELECT  pos0 FROM code_text WHERE cid=2 AND fid=1) -- PUT ID OF THE SECOND OBLIGATORY CODE \n\
+AND pos1 IN (SELECT  pos1 FROM code_text WHERE cid=2 AND fid=1) \n\
+AND pos0 IN (SELECT  pos0 FROM code_text WHERE cid=3 AND fid=1) -- PUT ID OF THE THIRD OBLIGATORY CODE \n\
+AND pos1 IN (SELECT  pos1 FROM code_text WHERE cid=3 AND fid=1) \n\
+-- ABOVE ADD MORE CODES IF NEEDED BY COPYING ABOVE TWO "AND" STATEMENTS AND PUT cid=THE EXTRA CODEID for each additional code\n\n\
+-- REMOVE "--" FROM THE STATEMENTS BELOW AND ADD CODE IDs TO EXCLUDE CODINGS WITH SOME CODES\n\
+-- AND NOT pos0 IN (SELECT pos0 FROM code_text WHERE cid=CODEID AND fid=1) \n\
+-- AND NOT pos1 IN (SELECT pos1 FROM code_text WHERE cid=CODEID AND fid=1) \n\n\
+-- REMOVE "--" BEFORE STATEMENTS AND INSERT IDs OF CODES\n\
+-- OR pos0 IN (SELECT pos0 FROM code_text WHERE cid=CODEID AND fid=1) \n\
+-- OR pos1 IN (SELECT pos1 FROM code_text WHERE cid=CODEID AND fid=1) \n\n\
+-- BELOW REMOVE "--" TO HIDE DUPLICATE ROWS OF OVERLAPPING CODINGS\n\
+-- GROUP BY pos0'
+]
