@@ -732,10 +732,13 @@ AND pos1 IN (SELECT  pos1 FROM code_text WHERE cid=3 AND fid=1) \n\
 -- and you want to show only the 3 selected above, providing the 4th code below is not overlapping\n\
 -- AND NOT pos0 IN (SELECT pos0 FROM code_text WHERE cid=CODEID AND fid=1) \n\
 -- AND NOT pos1 IN (SELECT pos1 FROM code_text WHERE cid=CODEID AND fid=1) \n\n\
--- Remove "--" before these two statements, add CODE IDs of codes\n\
--- This is used to display the 3 overlapping  codings avbove, but only if a 4th overlapping code is also applied to this same segemnt\n\
--- AND (pos0 IN (SELECT pos0 FROM code_text WHERE cid=CODEID AND fid=1) \n\
--- AND pos1 IN (SELECT pos1 FROM code_text WHERE cid=CODEID AND fid=1)) \n\n\
+-- Remove "--" before these statements, add CODE IDs of codes\n\
+-- This is used to display the 3 overlapping  codings above, \n\
+-- but only if one OR two more additional overlapping code are also applied to this same segment\n\
+--AND (\n\
+--(pos0 IN (SELECT pos0 FROM code_text WHERE cid=CODEID AND fid=1) AND pos1 IN (SELECT pos1 FROM code_text WHERE cid=CODEID AND fid=1))\n\
+--OR (pos0 IN (SELECT pos0 FROM code_text WHERE cid=CODEID AND fid=1) AND pos1 IN (SELECT pos1 FROM code_text WHERE cid=CODEID AND fid=1))\n\
+--)\n\n\
 -- Below remove "--" to hide duplicate rows of overlapping codings\n\
 -- GROUP BY pos0'
 ]
