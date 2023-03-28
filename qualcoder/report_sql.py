@@ -726,13 +726,16 @@ AND pos0 IN (SELECT  pos0 FROM code_text WHERE cid=2 AND fid=1) -- PUT ID OF THE
 AND pos1 IN (SELECT  pos1 FROM code_text WHERE cid=2 AND fid=1) \n\
 AND pos0 IN (SELECT  pos0 FROM code_text WHERE cid=3 AND fid=1) -- PUT ID OF THE THIRD OBLIGATORY CODE \n\
 AND pos1 IN (SELECT  pos1 FROM code_text WHERE cid=3 AND fid=1) \n\
--- ABOVE ADD MORE CODES IF NEEDED BY COPYING ABOVE TWO "AND" STATEMENTS AND PUT cid=THE EXTRA CODEID for each additional code\n\n\
--- REMOVE "--" FROM THE STATEMENTS BELOW AND ADD CODE IDs TO EXCLUDE CODINGS WITH SOME CODES\n\
+-- Add more codes if needed by copying the above two "AND" statements and put cid=THE EXTRA CODE ID for each additional code\n\n\
+-- Remove "--" from the statements below and add CODE IDS to exclude some overlapping codes\n\
+-- e.g. Four different codes are used for some of these overlaps, \n\
+-- and you want to show only the 3 selected above, providing the 4th code below is not overlapping\n\
 -- AND NOT pos0 IN (SELECT pos0 FROM code_text WHERE cid=CODEID AND fid=1) \n\
 -- AND NOT pos1 IN (SELECT pos1 FROM code_text WHERE cid=CODEID AND fid=1) \n\n\
--- REMOVE "--" BEFORE STATEMENTS AND INSERT IDs OF CODES\n\
--- OR pos0 IN (SELECT pos0 FROM code_text WHERE cid=CODEID AND fid=1) \n\
--- OR pos1 IN (SELECT pos1 FROM code_text WHERE cid=CODEID AND fid=1) \n\n\
--- BELOW REMOVE "--" TO HIDE DUPLICATE ROWS OF OVERLAPPING CODINGS\n\
+-- Remove "--" before these two statements, add CODE IDs of codes\n\
+-- This is used to \n\
+-- OR (pos0 IN (SELECT pos0 FROM code_text WHERE cid=CODEID AND fid=1) \n\
+-- AND pos1 IN (SELECT pos1 FROM code_text WHERE cid=CODEID AND fid=1)) \n\n\
+-- Below remove "--" to hide duplicate rows of overlapping codings\n\
 -- GROUP BY pos0'
 ]
