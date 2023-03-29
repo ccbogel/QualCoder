@@ -76,7 +76,9 @@ class DialogCases(QtWidgets.QDialog):
     MEMO_COLUMN = 1
     ID_COLUMN = 2
     FILES_COLUMN = 3
+    ATTRIBUTE_START_COLUMN = 4
     header_labels = []
+    attribute_labels_ordered = []
     app = None
     parent_text_edit = None
     source = []
@@ -103,7 +105,6 @@ class DialogCases(QtWidgets.QDialog):
         doc_font = 'font: ' + str(self.app.settings['docfontsize']) + 'pt '
         doc_font += '"' + self.app.settings['font'] + '";'
         self.ui.textBrowser.setStyleSheet(doc_font)
-        self.load_cases_and_attributes()
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(pencil_icon), "png")
         self.ui.pushButton_add.setIcon(QtGui.QIcon(pm))
@@ -146,20 +147,13 @@ class DialogCases(QtWidgets.QDialog):
         self.ui.tableWidget.itemSelectionChanged.connect(self.count_selected_items)
         self.ui.tableWidget.horizontalHeader().setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget.horizontalHeader().customContextMenuRequested.connect(self.table_header_menu)
-        self.ui.tableWidget.horizontalHeader().setToolTip(_("Right click header row to hide columns"))
         self.ui.tableWidget.installEventFilter(self)
         self.ui.tableWidget.setTabKeyNavigation(False)
+        self.load_cases_and_attributes()
         self.fill_table()
         # Initial resize of table columns
         self.ui.tableWidget.resizeColumnsToContents()
         self.ui.splitter.setSizes([1, 0])
-        '''try:
-            s0 = int(self.app.settings['dialogcases_splitter0'])
-            s1 = int(self.app.settings['dialogcases_splitter1'])
-            if s0 > 10 and s1 > 10:
-                self.ui.splitter.setSizes([s0, s1])
-        except KeyError:
-            pass'''
         self.eventFilterTT = ToolTipEventFilter()
         self.ui.textBrowser.installEventFilter(self.eventFilterTT)
 
@@ -237,9 +231,9 @@ class DialogCases(QtWidgets.QDialog):
         url = "https://github.com/ccbogel/QualCoder/wiki/06-Cases"
         webbrowser.open(url)
 
+    # Revise
     def count_selected_items(self):
-        """ Update label with the count of selected rows.
-         Also clear the text edit if multiple rows are selected.
+        """ Clear the text edit if multiple rows are selected.
          return:
             item_count """
 
@@ -250,11 +244,11 @@ class DialogCases(QtWidgets.QDialog):
         i = len(set(ix))
         if i > 1:
             self.ui.textBrowser.clear()
-        case_name = ""
+            self.ui.splitter.setSizes([100, 0])
+        '''case_name = ""
         if i == 1:
             case_name = self.ui.tableWidget.item(indexes[0].row(), 0).text()
-        self.ui.label_cases.setText(_("Cases: ") + str(i) + "/" + str(len(self.cases)) + "  " + case_name)
-
+        self.ui.label_cases.setText(_("Cases: ") + str(i) + "/" + str(len(self.cases)) + "  " + case_name)'''
         return i
 
     def export_attributes(self):
@@ -290,7 +284,7 @@ class DialogCases(QtWidgets.QDialog):
         self.parent_text_edit.append(msg)
 
     def load_cases_and_attributes(self, casename_order="asc"):
-        """ Load case and attribute details from database. Display in tableWidget.
+        """ Load case (to maximum) and attribute details from database. Display in tableWidget.
         Cases are a list of dictionaries.
         Attributes are a list of tuples(name,value,id)
         """
@@ -306,31 +300,55 @@ class DialogCases(QtWidgets.QDialog):
             self.source.append({'name': row[0], 'id': row[1], 'fulltext': row[2],
                                 'mediapath': row[3], 'memo': row[4], 'owner': row[5], 'date': row[6],
                                 'av_text_id': row[7]})
-        case_sql = "select name, memo, owner, date, caseid from cases "
+        case_sql = "select name, memo, owner, date, ifnull(caseid,'') from cases "  # Odd error with null in the past
         if casename_order == "asc":
             case_sql += "order by name asc"
         if casename_order == "desc":
             case_sql += "order by name desc"
         cur.execute(case_sql)
-        result = cur.fetchall()
-        for row in result:
+        cases_result = cur.fetchall()
+
+        for row in cases_result:
             sql = "select distinct case_text.fid, source.name from case_text join source on case_text.fid=source.id "
             sql += "where caseid=? order by source.name asc"
             cur.execute(sql, [row[4], ])
-            files = cur.fetchall()
-            self.cases.append({'name': row[0], 'memo': row[1], 'owner': row[2], 'date': row[3],
-                               'caseid': row[4], 'files': files})
+            files_res = cur.fetchall()
+            case_memo = row[1]
+            if case_memo is None:
+                case_memo = ""  # Error catch
+            self.cases.append({'name': row[0], 'memo': case_memo, 'owner': row[2], 'date': row[3],
+                               'caseid': row[4], 'files': files_res, 'attributes': []})
         cur.execute("select name from attribute_type where caseOrFile='case'")
-        attribute_names = cur.fetchall()
+        attribute_names_res = cur.fetchall()
         self.header_labels = ["Name", "Memo", "Id", "Files"]
-        for i in attribute_names:
-            self.header_labels.append(i[0])
+        self.attribute_labels_ordered = []
+        for att_name in attribute_names_res:
+            self.header_labels.append(att_name[0])
+            self.attribute_labels_ordered.append(att_name[0])
+        # Add list if attribute values to cases, order matches header columns
+        sql = "select ifnull(value, '') from attribute where attr_type='case' and attribute.name=? order by id"
+        for a in self.attribute_labels_ordered:
+            cur.execute(sql, [a])
+            att_result = cur.fetchall()
+            for i, c in enumerate(self.cases):
+                c['attributes'].append(att_result[i][0])
+
+        # TODO reconsider this data structure
         sql = "select attribute.name, value, id from attribute where attr_type='case'"
         cur.execute(sql)
-        result = cur.fetchall()
+        attr_result = cur.fetchall()
         self.attributes = []
-        for row in result:
+        for row in attr_result:
             self.attributes.append(row)
+
+    def update_label(self):
+        """ Update label when loading data, adding or deleting cases. """
+
+        cur = self.app.conn.cursor()
+        cur.execute("select count(caseid) from cases")
+        total_cases = cur.fetchone()[0]
+        msg = _("Cases: ") + str(total_cases) + " "
+        self.ui.label_cases.setText(msg)
 
     def add_attribute(self):
         """ When add button pressed, opens the addItem dialog to get new attribute text.
@@ -833,29 +851,27 @@ class DialogCases(QtWidgets.QDialog):
                 self.ui.tableWidget.setRowHidden(r, False)
 
     def fill_table(self):
-        """ Fill the table widget with case details. """
+        """ Fill the table widget with case details.
+        Slow with lots of cases. So trying pagination. """
 
+        self.update_label()
+        self.ui.tableWidget.blockSignals(True)
         self.ui.tableWidget.setColumnCount(len(self.header_labels))
-        self.ui.label_cases.setText(_("Cases: ") + str(len(self.cases)))
         rows = self.ui.tableWidget.rowCount()
         for c in range(0, rows):
             self.ui.tableWidget.removeRow(0)
         self.ui.tableWidget.setHorizontalHeaderLabels(self.header_labels)
-        for row, c in enumerate(self.cases):
-            self.ui.tableWidget.insertRow(row)
+        self.ui.tableWidget.setRowCount(len(self.cases))
+        for row in range(0, len(self.cases)):
+            c = self.cases[row]
             self.ui.tableWidget.setItem(row, self.NAME_COLUMN,
                                         QtWidgets.QTableWidgetItem(c['name']))
-            memotmp = c['memo']
             item = QtWidgets.QTableWidgetItem("")
-            item.setToolTip(_("Click to edit memo"))
-            if memotmp is not None and memotmp != "":
+            if c['memo'] != "":
                 item = QtWidgets.QTableWidgetItem(_("Memo"))
-                item.setToolTip(_("Click to edit memo"))
+            item.setToolTip(_("Click to edit memo"))
             self.ui.tableWidget.setItem(row, self.MEMO_COLUMN, item)
-            cid = c['caseid']
-            if cid is None:
-                cid = ""
-            item = QtWidgets.QTableWidgetItem(str(cid))
+            item = QtWidgets.QTableWidgetItem(str(c['caseid']))
             item.setFlags(QtCore.Qt.ItemFlag.ItemIsEnabled)
             self.ui.tableWidget.setItem(row, self.ID_COLUMN, item)
             # Number of files assigned to case
@@ -863,22 +879,23 @@ class DialogCases(QtWidgets.QDialog):
             item.setFlags(QtCore.Qt.ItemFlag.ItemIsEnabled)
             item.setToolTip(_("Click to manage files for this case"))
             self.ui.tableWidget.setItem(row, self.FILES_COLUMN, item)
-            # 0Add attribute values to their columns
-            for a in self.attributes:
-                for col, header in enumerate(self.header_labels):
-                    if cid == a[2] and a[0] == header:
-                        s = ''
-                        if a[1] is not None:
-                            s = str(a[1])
-                        item = QtWidgets.QTableWidgetItem(s)
-                        tt = self.get_tooltip_values(a[0])
-                        item.setToolTip(tt)
-                        self.ui.tableWidget.setItem(row, col, item)
+            # Add attribute values to their columns
+            for offset, attribute in enumerate(c['attributes']):
+                item = QtWidgets.QTableWidgetItem(attribute)
+                self.ui.tableWidget.setItem(row, self.ATTRIBUTE_START_COLUMN + offset, item)
         self.ui.tableWidget.verticalHeader().setVisible(False)
         self.ui.tableWidget.resizeRowsToContents()
         self.ui.tableWidget.hideColumn(self.ID_COLUMN)
         if self.app.settings['showids']:
             self.ui.tableWidget.showColumn(self.ID_COLUMN)
+        '''# Add generic header to table
+        for i in range(0, self.ATTRIBUTE_START_COLUMN):
+            self.ui.tableWidget.horizontalHeaderItem(i).setToolTip(_("Right click header row to hide columns"))'''
+        # Add statistics tooltips to table headers for attributes
+        for i, attribute_name in enumerate(self.attribute_labels_ordered):
+            tt = self.get_tooltip_values(attribute_name)
+            self.ui.tableWidget.horizontalHeaderItem(self.ATTRIBUTE_START_COLUMN + i).setToolTip(_("Right click header row to hide columns") + "\n" + tt)
+        self.ui.tableWidget.blockSignals(False)
 
     def get_tooltip_values(self, attribute_name):
         """ Get values to display in tooltips for the value list column.
@@ -900,7 +917,7 @@ class DialogCases(QtWidgets.QDialog):
             tt = _("Minimum: ") + str(res[0]) + "\n"
             tt += _("Maximum: ") + str(res[1])
         if value_type == "character":
-            sql = 'select distinct value from attribute where name=? and attr_type="case" and length(value)>0 limit 20'
+            sql = 'select distinct value from attribute where name=? and attr_type="case" and length(value)>0 limit 10'
             cur.execute(sql, [attribute_name])
             res = cur.fetchall()
             for r in res:
