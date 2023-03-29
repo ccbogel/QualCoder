@@ -36,11 +36,6 @@ class Ui_Dialog_cases(object):
         self.label.setWordWrap(True)
         self.label.setObjectName("label")
         self.gridLayout_2.addWidget(self.label, 3, 0, 1, 1)
-        self.label_cases = QtWidgets.QLabel(self.groupBox_2)
-        self.label_cases.setMinimumSize(QtCore.QSize(0, 24))
-        self.label_cases.setMaximumSize(QtCore.QSize(16777215, 22))
-        self.label_cases.setObjectName("label_cases")
-        self.gridLayout_2.addWidget(self.label_cases, 1, 0, 1, 1)
         self.groupBox = QtWidgets.QGroupBox(self.groupBox_2)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Policy.Preferred, QtWidgets.QSizePolicy.Policy.Fixed)
         sizePolicy.setHorizontalStretch(0)
@@ -56,7 +51,7 @@ class Ui_Dialog_cases(object):
         self.pushButton_add.setText("")
         self.pushButton_add.setObjectName("pushButton_add")
         self.pushButton_delete = QtWidgets.QPushButton(self.groupBox)
-        self.pushButton_delete.setGeometry(QtCore.QRect(280, 0, 30, 30))
+        self.pushButton_delete.setGeometry(QtCore.QRect(630, 0, 30, 30))
         self.pushButton_delete.setText("")
         self.pushButton_delete.setObjectName("pushButton_delete")
         self.pushButton_import_cases = QtWidgets.QPushButton(self.groupBox)
@@ -85,6 +80,11 @@ class Ui_Dialog_cases(object):
         self.pushButton_help.setGeometry(QtCore.QRect(200, 0, 30, 30))
         self.pushButton_help.setText("")
         self.pushButton_help.setObjectName("pushButton_help")
+        self.label_cases = QtWidgets.QLabel(self.groupBox)
+        self.label_cases.setGeometry(QtCore.QRect(240, 5, 221, 24))
+        self.label_cases.setMinimumSize(QtCore.QSize(0, 24))
+        self.label_cases.setMaximumSize(QtCore.QSize(16777215, 22))
+        self.label_cases.setObjectName("label_cases")
         self.gridLayout_2.addWidget(self.groupBox, 0, 0, 1, 1)
         self.gridLayout.addWidget(self.groupBox_2, 1, 1, 1, 1)
 
@@ -102,8 +102,7 @@ class Ui_Dialog_cases(object):
     def retranslateUi(self, Dialog_cases):
         _translate = QtCore.QCoreApplication.translate
         Dialog_cases.setWindowTitle(_translate("Dialog_cases", "Cases"))
-        self.label.setText(_translate("Dialog_cases", "Click on a case name to view the case. Double click the name to edit the case name. Click on Memo to edit a memo for the case. Click on Files to link files and file text to the case."))
-        self.label_cases.setText(_translate("Dialog_cases", "Cases: "))
+        self.label.setText(_translate("Dialog_cases", "Double click case name to change the name. Click on Memo to edit a memo for the case. Click on Files to link files and file text to the case."))
         self.pushButton_add.setToolTip(_translate("Dialog_cases", "<html><head/><body><p>Add case</p></body></html>"))
         self.pushButton_delete.setToolTip(_translate("Dialog_cases", "<html><head/><body><p>Delete case</p></body></html>"))
         self.pushButton_import_cases.setToolTip(_translate("Dialog_cases", "<html><head/><body><p>Import cases</p><p>Import from a csv or xlsx file.</p><p>The file must have a header row and the first column must have the unique case names or identifiers. Subsequent columns are attributes for each case.</p></body></html>"))
@@ -112,6 +111,7 @@ class Ui_Dialog_cases(object):
         self.pushButton_file_manager.setToolTip(_translate("Dialog_cases", "<html><head/><body><p>Case file manager</p></body></html>"))
         self.pushButton_export_attributes.setToolTip(_translate("Dialog_cases", "<html><head/><body><p>Export attributes as csv file</p></body></html>"))
         self.pushButton_help.setToolTip(_translate("Dialog_cases", "Help"))
+        self.label_cases.setText(_translate("Dialog_cases", "Cases: "))
 
 
 if __name__ == "__main__":
