@@ -44,29 +44,10 @@
          </size>
         </property>
         <property name="text">
-         <string>Click on a case name to view the case. Double click the name to edit the case name. Click on Memo to edit a memo for the case. Click on Files to link files and file text to the case.</string>
+         <string>Double click case name to change the name. Click on Memo to edit a memo for the case. Click on Files to link files and file text to the case.</string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_cases">
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>24</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>16777215</width>
-          <height>22</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Cases: </string>
         </property>
        </widget>
       </item>
@@ -112,7 +93,7 @@
         <widget class="QPushButton" name="pushButton_delete">
          <property name="geometry">
           <rect>
-           <x>280</x>
+           <x>630</x>
            <y>0</y>
            <width>30</width>
            <height>30</height>
@@ -231,6 +212,31 @@
          </property>
          <property name="text">
           <string/>
+         </property>
+        </widget>
+        <widget class="QLabel" name="label_cases">
+         <property name="geometry">
+          <rect>
+           <x>240</x>
+           <y>5</y>
+           <width>221</width>
+           <height>24</height>
+          </rect>
+         </property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>24</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>22</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Cases: </string>
          </property>
         </widget>
        </widget>
