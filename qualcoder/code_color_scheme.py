@@ -191,7 +191,7 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
         for c in cats:
             if c['supercatid'] is None:
                 memo = ""
-                if c['memo'] != "" and c['memo'] is not None:
+                if c['memo'] != "":
                     memo = "Memo"
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
                 top_item.setToolTip(0, c['name'])
@@ -216,7 +216,7 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
                 while item and count2 < 10000:  # while there is an item in the list
                     if item.text(1) == 'catid:' + str(c['supercatid']):
                         memo = ""
-                        if c['memo'] != "" and c['memo'] is not None:
+                        if c['memo'] != "":
                             memo = "Memo"
                         child = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
                         child.setToolTip(0, c['name'])
@@ -238,7 +238,7 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
         for c in codes:
             if c['catid'] is None:
                 memo = ""
-                if c['memo'] != "" and c['memo'] is not None:
+                if c['memo'] != "":
                     memo = "Memo"
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
                 top_item.setToolTip(0, c['name'])
@@ -265,7 +265,7 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
             while item and count < 10000:
                 if item.text(1) == 'catid:' + str(c['catid']):
                     memo = ""
-                    if c['memo'] != "" and c['memo'] is not None:
+                    if c['memo'] != "":
                         memo = "Memo"
                     child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
                     child.setBackground(0, QBrush(QtGui.QColor(c['perspective']), Qt.BrushStyle.SolidPattern))
@@ -285,19 +285,6 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
                 item = it.value()
                 count += 1
         self.ui.treeWidget.expandAll()
-
-    '''def tree_menu(self, position):
-        """ Context menu for treewidget items.
-        """
-
-        menu = QtWidgets.QMenu()
-        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-        selected = self.ui.treeWidget.currentItem()
-
-        action = menu.exec(self.ui.treeWidget.mapToGlobal(position))
-        if action is None:
-            return
-        return'''
 
     def update_selected_colors(self):
         """ Update colour list. Prior to applying colors. """

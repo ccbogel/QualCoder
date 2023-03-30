@@ -247,7 +247,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             if img_res[0] > 0:
                 tt += str(img_res[0])
             item = QtWidgets.QListWidgetItem(f['name'])
-            if f['memo'] is not None and f['memo'] != "":
+            if f['memo'] != "":
                 tt += _("\nMEMO: ") + f['memo']
             item.setToolTip(tt)
             self.ui.listWidget_files.addItem(item)
@@ -260,7 +260,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         for c in self.cases:
             tt = ""
             item = QtWidgets.QListWidgetItem(c['name'])
-            if c['memo'] is not None and c['memo'] != "":
+            if c['memo'] != "":
                 tt = _("MEMO: ") + c['memo']
             item.setToolTip(tt)
             self.ui.listWidget_cases.addItem(item)
@@ -961,12 +961,12 @@ class DialogReportCodes(QtWidgets.QDialog):
         results = []
         for i in self.ui.treeWidget.selectedItems():
             if i.text(1)[0:5] == "catid":
-                cur.execute('select name, memo from code_cat where catid=?', [i.text(1)[6:]])
+                cur.execute("select name, isnull(memo,'') from code_cat where catid=?", [i.text(1)[6:]])
                 res = cur.fetchone()
                 if res is not None:
                     results.append([_("Category: "), res[0], res[1]])
             if i.text(1)[0:3] == 'cid':
-                cur.execute('select name, memo, color from code_name where cid=?', [i.text(1)[4:]])
+                cur.execute("select name, isnull(memo,''), color from code_name where cid=?", [i.text(1)[4:]])
                 res = cur.fetchone()
                 if res is not None:
                     results.append([_("Code: "), res[0], res[1], res[2]])
@@ -1228,7 +1228,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         if self.file_ids != "" and self.case_ids == "":
             # Coded text
             sql = "select code_name.name, color, source.name, pos0, pos1, seltext, "
-            sql += "code_text.owner, fid, code_text.memo, code_name.memo, source.memo, ctid, code_name.cid "
+            sql += "code_text.owner, fid, isnull(code_text.memo,''), isnull(code_name.memo,''), " \
+                   "isnull(source.memo,''), ctid, code_name.cid "
             sql += " from code_text join code_name "
             sql += "on code_name.cid = code_text.cid join source on fid = source.id "
             sql += "where code_name.cid in (" + code_ids + ") "
@@ -1262,8 +1263,8 @@ class DialogReportCodes(QtWidgets.QDialog):
             # Coded images
             parameters = []
             sql = "select code_name.name, color, source.name, x1, y1, width, height,"
-            sql += "code_image.owner, source.mediapath, source.id, code_image.memo, "
-            sql += "code_name.memo, source.memo, imid, code_name.cid "
+            sql += "code_image.owner, source.mediapath, source.id, isnull(code_image.memo,''), "
+            sql += "code_name.memo, isnull(source.memo,''), imid, code_name.cid "
             sql += " from code_image join code_name "
             sql += "on code_name.cid = code_image.cid join source on code_image.id = source.id "
             sql += "where code_name.cid in (" + code_ids + ") "
@@ -1292,8 +1293,9 @@ class DialogReportCodes(QtWidgets.QDialog):
 
             # Coded audio and video, also looks for search_text in coded segment memo
             parameters = []
-            sql = "select code_name.name, color, source.name, pos0, pos1, code_av.memo, "
-            sql += " code_av.owner, source.mediapath, source.id, code_name.memo, source.memo, avid, code_name.cid"
+            sql = "select code_name.name, color, source.name, pos0, pos1, isnull(code_av.memo,''), "
+            sql += " code_av.owner, source.mediapath, source.id, isnull(code_name.memo,''), isnull(source.memo,''), " \
+                   "avid, code_name.cid"
             sql += " from code_av join code_name "
             sql += "on code_name.cid = code_av.cid join source on code_av.id = source.id "
             sql += "where code_name.cid in (" + code_ids + ") "
@@ -1334,7 +1336,8 @@ class DialogReportCodes(QtWidgets.QDialog):
             # Coded text
             sql = "select code_name.name, color, cases.name, "
             sql += "code_text.pos0, code_text.pos1, seltext, code_text.owner, code_text.fid, "
-            sql += "cases.memo, code_text.memo, code_name.memo, source.memo, ctid, code_name.cid "
+            sql += "isnull(cases.memo,''), isnul(code_text.memo,''), isnul(code_name.memo,''), "
+            sql += "isnull(source.memo,''), ctid, code_name.cid "
             sql += "from code_text join code_name on code_name.cid = code_text.cid "
             sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
             sql += "code_text.fid = case_text.fid "
@@ -1372,7 +1375,8 @@ class DialogReportCodes(QtWidgets.QDialog):
             parameters = []
             sql = "select code_name.name, color, cases.name, "
             sql += "x1, y1, width, height, code_image.owner,source.mediapath, source.id, "
-            sql += "code_image.memo, cases.memo, code_name.memo, source.memo, imid, code_name.cid "
+            sql += "isnull(code_image.memo,''), isnull(cases.memo,''), isnull(code_name.memo,''), "
+            sql += "isnull(source.memo,''), imid, code_name.cid "
             sql += "from code_image join code_name on code_name.cid = code_image.cid "
             sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
             sql += "code_image.id = case_text.fid "
@@ -1405,7 +1409,8 @@ class DialogReportCodes(QtWidgets.QDialog):
             parameters = []
             av_sql = "select distinct code_name.name, color, cases.name as case_name, "
             av_sql += "code_av.pos0, code_av.pos1, code_av.owner,source.mediapath, source.id, "
-            av_sql += "code_av.memo as coded_memo, cases.memo as case_memo, code_name.memo, source.memo, avid, "
+            av_sql += "isnull(code_av.memo,'') as coded_memo, isnull(cases.memo,'') as case_memo, "
+            av_sql += "isnull(code_name.memo,''), isnull(source.memo,''), avid, "
             av_sql+= "code_name.cid "
             av_sql += "from code_av join code_name on code_name.cid = code_av.cid "
             av_sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
@@ -1819,7 +1824,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         fmt_italic.setFontItalic(True)
         fmt_larger = QtGui.QTextCharFormat()
         fmt_larger.setFontPointSize(self.app.settings['docfontsize'] + 2)
-        #memo_choice = self.ui.comboBox_memos.currentText()
+        # memo_choice, use current index, as other languages will not match
         memo_choice_index = self.ui.comboBox_memos.currentIndex()
         '''                 
         [_("None"), _("Also code memos"), _("Also coded memos"), _("Also all memos"), _("Only memos"),
@@ -2006,12 +2011,10 @@ class DialogReportCodes(QtWidgets.QDialog):
         head = "\n" + _("[VIEW] ")
         head += item['codename'] + ", "
         memo_choice = self.ui.comboBox_memos.currentText()
-        if memo_choice in (_("Also code memos"), _("Also all memos"), _("Only memos")) and item['codename_memo'] != "" and \
-                item['codename_memo'] is not None:
+        if memo_choice in (_("Also code memos"), _("Also all memos"), _("Only memos")) and item['codename_memo'] != "":
             head += _("CODE MEMO: ") + item['codename_memo'] + "<br />"
         head += _("File: ") + filename + ", "
-        if memo_choice in (_("Also all memos"), _("Only memos")) and item['source_memo'] != "" and \
-                item['source_memo'] is not None:
+        if memo_choice in (_("Also all memos"), _("Only memos")) and item['source_memo'] != "":
             head += _(" FILE MEMO: ") + item['source_memo']
         if item['file_or_case'] == 'Case':
             head += " " + _("Case: ") + item['file_or_casename']
@@ -2197,7 +2200,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             head += " " + item['file_or_case'] + ": " + item['file_or_casename'] + ", "
             if memo_choice in (_("Also all memos"), _("Only memos")):
                 cur = self.app.conn.cursor()
-                cur.execute("select memo from cases where name=?", [item['file_or_casename']])
+                cur.execute("select isnull(memo,'') from cases where name=?", [item['file_or_casename']])
                 res = cur.fetchone()
                 if res is not None and res != "":
                     head += ", " + _("CASE MEMO: ") + res[0]
