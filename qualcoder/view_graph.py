@@ -534,7 +534,7 @@ class ViewGraph(QDialog):
             if pth:
                 file_['path'] = pth[0]
             for code in selected_codes:
-                sql = "select cid,id,pos0,pos1, isnull(memo,''), avid from code_av where cid=? and id=?"
+                sql = "select cid,id,pos0,pos1, ifnull(memo,''), avid from code_av where cid=? and id=?"
                 cur.execute(sql, [code['cid'], file_['id']])
                 res = cur.fetchall()
                 for r in res:
@@ -595,7 +595,7 @@ class ViewGraph(QDialog):
             if p:
                 file_['path'] = p[0]
             for code in selected_codes:
-                sql = "select cid,id,x1,y1,width,height,isnull(memo,''), imid from code_image where cid=? and id=?"
+                sql = "select cid,id,x1,y1,width,height,ifnull(memo,''), imid from code_image where cid=? and id=?"
                 cur.execute(sql, [code['cid'], file_['id']])
                 res = cur.fetchall()
                 for r in res:
@@ -650,7 +650,7 @@ class ViewGraph(QDialog):
         cur = self.app.conn.cursor()
         for file_ in selected_files:
             for code in selected_codes:
-                sql = "select cid,fid,seltext,isnull(memo,''), ctid from code_text where cid=? and fid=?"
+                sql = "select cid,fid,seltext,ifnull(memo,''), ctid from code_text where cid=? and fid=?"
                 cur.execute(sql, [code['cid'], file_['id']])
                 res = cur.fetchall()
                 for r in res:
@@ -707,7 +707,7 @@ class ViewGraph(QDialog):
         cur = self.app.conn.cursor()
         for file_ in selected_files:
             for code in selected_codes:
-                sql = "select cid,fid,seltext,isnull(memo,''),ctid from code_text where cid=? and fid=? and memo !='' order by pos0 asc"
+                sql = "select cid,fid,seltext,ifnull(memo,''),ctid from code_text where cid=? and fid=? and memo !='' order by pos0 asc"
                 cur.execute(sql, [code['cid'], file_['id']])
                 res = cur.fetchall()
                 for r in res:
@@ -1290,7 +1290,7 @@ class ViewGraph(QDialog):
         cur.execute("update gr_pix_item set w=(select width from code_image where code_image.imid=gr_pix_item.imid)")
         cur.execute("update gr_pix_item set h=(select height from code_image where code_image.imid=gr_pix_item.imid)")
         # Tooltips
-        cur.execute("select grpixid, source.name, code_name.name, isnull(code_image.memo,''), code_image.imid from "
+        cur.execute("select grpixid, source.name, code_name.name, ifnull(code_image.memo,''), code_image.imid from "
                     "gr_pix_item join code_image on code_image.imid=gr_pix_item.imid "
                     "join code_name on code_name.cid= code_image.cid "
                     "join source on source.id=code_image.id")
@@ -1314,7 +1314,7 @@ class ViewGraph(QDialog):
         self.app.conn.commit()
         # Tooltips
         cur.execute("select gr_avid, source.name, code_name.name, gr_av_item.pos0, gr_av_item.pos1, "
-                    "isnull(code_av.memo,''), code_av.avid from gr_av_item "
+                    "ifnull(code_av.memo,''), code_av.avid from gr_av_item "
                     "join code_av on code_av.avid=gr_av_item.avid "
                     "join code_name on code_name.cid= code_av.cid "
                     "join source on source.id=code_av.id")
@@ -1338,7 +1338,7 @@ class ViewGraph(QDialog):
 
         cur = self.app.conn.cursor()
         # Tooltips
-        cur.execute("select gfreeid, source.name, code_name.name, isnull(code_text.memo,''), code_text.ctid "
+        cur.execute("select gfreeid, source.name, code_name.name, ifnull(code_text.memo,''), code_text.ctid "
                     "from gr_free_text_item "
                     "join code_text on code_text.ctid=gr_free_text_item.ctid "
                     "join code_name on code_name.cid= code_text.cid "
@@ -1590,7 +1590,7 @@ class ViewGraph(QDialog):
         cur.execute(sql_case, [grid])
         res = cur.fetchall()
         for i in res:
-            cur.execute("select name, isnull(memo,'') from cases where caseid=?", [i[2]])
+            cur.execute("select name, ifnull(memo,'') from cases where caseid=?", [i[2]])
             res_name = cur.fetchone()
             if res_name is not None:
                 self.scene.addItem(
@@ -1610,7 +1610,7 @@ class ViewGraph(QDialog):
         cur.execute(sql_file, [grid])
         res = cur.fetchall()
         for i in res:
-            cur.execute("select name, isnull(memo) from source where id=?", [i[2]])
+            cur.execute("select name, ifnull(memo) from source where id=?", [i[2]])
             res_name = cur.fetchone()
             if res_name is not None:
                 self.scene.addItem(
@@ -1932,7 +1932,7 @@ class CaseTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.setFont(QtGui.QFont(self.settings['font'], self.font_size, fontweight))
         self.setPos(x, y)
         cur = self.app.conn.cursor()
-        cur.execute("select isnull(memo,'') from cases where caseid=?", [case_id])
+        cur.execute("select ifnull(memo,'') from cases where caseid=?", [case_id])
         res = cur.fetchone()
         if res:
             self.setToolTip(_("Case") + ": " + res[0])
@@ -2101,7 +2101,7 @@ class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.setFont(QtGui.QFont(self.settings['font'], self.font_size, fontweight))
         self.setPos(x, y)
         cur = self.app.conn.cursor()
-        cur.execute("select isnull(memo,'') from source where id=?", [file_id])
+        cur.execute("select ifnull(memo,'') from source where id=?", [file_id])
         res = cur.fetchone()
         if res:
             self.setToolTip(_("File") + ": " + res[0])
@@ -2314,7 +2314,7 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         # Get current coded text memo text
         if self.memo_ctid is not None:
             cur = self.app.conn.cursor()
-            cur.execute("select isnull(memo,'') from code_text where ctid=?", [self.memo_ctid])
+            cur.execute("select ifnull(memo,'') from code_text where ctid=?", [self.memo_ctid])
             res = cur.fetchone()
             current_text = res[0]
             if res is None:
@@ -2325,7 +2325,7 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         # Get current coded image memo text
         if self.memo_imid is not None:
             cur = self.app.conn.cursor()
-            cur.execute("select isnull(memo,'') from code_image where imid=?", [self.memo_imid])
+            cur.execute("select ifnull(memo,'') from code_image where imid=?", [self.memo_imid])
             res = cur.fetchone()
             current_text = res[0]
             if res is None:
@@ -2336,7 +2336,7 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         # Get current coded av memo text
         if self.memo_avid is not None:
             cur = self.app.conn.cursor()
-            cur.execute("select isnull(memo,'') from code_av where avid=?", [self.memo_avid])
+            cur.execute("select ifnull(memo,'') from code_av where avid=?", [self.memo_avid])
             res = cur.fetchone()
             current_text = res[0]
             if res is None:
@@ -2394,7 +2394,7 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         if action == image_context_action:
             cur = self.app.conn.cursor()
             cur.execute("select code_name.cid, code_name.name, code_name.color, code_image.owner,"
-                        "isnull(code_image.memo,''), x1, y1,width,height, source.name, source.id, source.mediapath "
+                        "ifnull(code_image.memo,''), x1, y1,width,height, source.name, source.id, source.mediapath "
                         "from code_image join code_name on code_name.cid=code_image.cid join source on "
                         "source.id=code_image.id where code_image.imid=?",
                         [self.memo_imid])
@@ -2408,7 +2408,7 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
             DialogCodeInImage(self.app, data).exec()
         if action == av_context_action:
             cur = self.app.conn.cursor()
-            cur.execute("select code_name.cid, code_name.name, code_name.color, code_av.owner,isnull(code_av.memo,''),"
+            cur.execute("select code_name.cid, code_name.name, code_name.color, code_av.owner,ifnull(code_av.memo,''),"
                         "pos0, pos1, source.name, source.id, source.mediapath "
                         "from code_av join code_name on code_name.cid=code_av.cid join source on "
                         "source.id=code_av.id where code_av.avid=?",
@@ -2427,7 +2427,7 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
                 text_id = self.memo_ctid
             cur = self.app.conn.cursor()
             cur.execute("select code_name.cid, code_name.name, code_name.color, code_text.owner,"
-                        "isnull(code_text.memo,''), pos0, pos1, source.name, source.id "
+                        "ifnull(code_text.memo,''), pos0, pos1, source.name, source.id "
                         "from code_text join code_name on code_name.cid=code_text.cid join source on "
                         "source.id=code_text.fid where code_text.ctid=?",
                         [text_id])
@@ -2723,7 +2723,7 @@ class AVGraphicsItem(QtWidgets.QGraphicsPixmapItem):
             return
         if action == context_action:
             cur = self.app.conn.cursor()
-            cur.execute("select code_name.cid, code_name.name, code_name.color, code_av.owner,isnull(code_av.memo,'') "
+            cur.execute("select code_name.cid, code_name.name, code_name.color, code_av.owner,ifnull(code_av.memo,'') "
                         "from code_av join code_name on code_name.cid=code_av.cid where code_av.avid=?",
                         [self.avid])
             res = cur.fetchone()
@@ -2848,7 +2848,7 @@ class PixmapGraphicsItem(QtWidgets.QGraphicsPixmapItem):
              mediapath, fid, memo, file_or_case}'''
             cur = self.app.conn.cursor()
             cur.execute("select code_name.cid, code_name.name, code_name.color, code_image.owner,"
-                        "isnull(code_image.memo,'') "
+                        "ifnull(code_image.memo,'') "
                         "from code_image join code_name on code_name.cid=code_image.cid where code_image.imid=?",
                         [self.imid])
             res = cur.fetchone()
@@ -2923,7 +2923,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
     def get_memo(self):
         cur = self.app.conn.cursor()
         if self.code_or_cat['cid'] is not None:
-            cur.execute("select isnull(memo,'') from code_name where name=?", [self.code_or_cat['name']])
+            cur.execute("select ifnull(memo,'') from code_name where name=?", [self.code_or_cat['name']])
             res = cur.fetchone()
             if res:
                 self.code_or_cat['memo'] = res[0]
@@ -2931,7 +2931,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
             else:
                 self.setToolTip(_("Code"))
         else:
-            cur.execute("select isnull(memo,'') from code_cat where name=?", [self.code_or_cat['name']])
+            cur.execute("select ifnull(memo,'') from code_cat where name=?", [self.code_or_cat['name']])
             res = cur.fetchone()
             if res:
                 self.code_or_cat['memo'] = res[0]
