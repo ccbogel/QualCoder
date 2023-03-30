@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2022 Colin Curtain
+Copyright (c) 2023 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -252,7 +252,7 @@ class DialogReportRelations(QtWidgets.QDialog):
 
         # Get codings for each selected text file separately
         for fid_name in file_ids_names:
-            sql = "select fid, code_text.cid, pos0, pos1, name, ctid,seltext, code_text.memo from code_text " \
+            sql = "select fid, code_text.cid, pos0, pos1, name, ctid,seltext, isnull(code_text.memo,'') from code_text " \
                   "join code_name on code_name.cid=code_text.cid where code_text.owner=? and fid=? " \
                   "and code_text.cid in (" + code_ids + ") order by code_text.cid"
             cur.execute(sql, [coder_name, fid_name['fid']])

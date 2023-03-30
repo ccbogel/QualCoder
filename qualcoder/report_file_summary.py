@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2022 Colin Curtain
+Copyright (c) 2023 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -156,7 +156,7 @@ class DialogReportFileSummary(QtWidgets.QDialog):
             if img_res[0] > 0:
                 tt += str(img_res[0])
             item = QtWidgets.QListWidgetItem(f['name'])
-            if f['memo'] is not None and f['memo'] != "":
+            if f['memo'] != "":
                 tt += _("\nMemo: ") + f['memo']
             item.setToolTip(tt)
             self.ui.listWidget.addItem(item)
@@ -174,7 +174,7 @@ class DialogReportFileSummary(QtWidgets.QDialog):
             return
         cur = self.app.conn.cursor()
         text_ = file_name + "\n\n"
-        if file_['memo'] is not None:
+        if file_['memo'] != "":
             text_ += _("MEMO: ") + "\n" + file_['memo'] + "\n"
         text_ += self.get_attributes(file_['id'])
         text_ += self.get_case_assignment(file_['id'])

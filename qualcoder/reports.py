@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2022 Colin Curtain
+Copyright (c) 2023 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -137,14 +137,14 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
 
         cur = self.app.conn.cursor()
         self.categories = []
-        cur.execute("select name, catid, owner, date, memo, supercatid from code_cat order by lower(name)")
+        cur.execute("select name, catid, owner, date, isnull(memo,''), supercatid from code_cat order by lower(name)")
         result = cur.fetchall()
         for row in result:
             self.categories.append({'name': row[0], 'catid': row[1], 'owner': row[2],
                                     'date': row[3], 'memo': row[4], 'supercatid': row[5],
                                     'display_list': [row[0], 'catid:' + str(row[1])]})
         self.codes = []
-        cur.execute("select name, memo, owner, date, cid, catid, color from code_name order by lower(name)")
+        cur.execute("select name, isnull(memo,''), owner, date, cid, catid, color from code_name order by lower(name)")
         result = cur.fetchall()
         for row in result:
             self.codes.append({'name': row[0], 'memo': row[1], 'owner': row[2], 'date': row[3],
