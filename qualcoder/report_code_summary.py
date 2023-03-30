@@ -138,7 +138,7 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         for c in cats:
             if c['supercatid'] is None:
                 memo = ""
-                if c['memo'] != "" and c['memo'] is not None:
+                if c['memo'] != "":
                     memo = _("Memo")
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
                 top_item.setToolTip(0, c['name'])
@@ -160,7 +160,7 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
                 while item and count2 < 10000:  # while there is an item in the list
                     if item.text(1) == 'catid:' + str(c['supercatid']):
                         memo = ""
-                        if c['memo'] != "" and c['memo'] is not None:
+                        if c['memo'] != "":
                             memo = _("Memo")
                         child = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
                         child.setToolTip(0, c['name'])
@@ -179,7 +179,7 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         for c in codes:
             if c['catid'] is None:
                 memo = ""
-                if c['memo'] != "" and c['memo'] is not None:
+                if c['memo'] != "":
                     memo = _("Memo")
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
                 top_item.setToolTip(0, c['name'])
@@ -202,7 +202,7 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
             while item and count < 10000:
                 if item.text(1) == 'catid:' + str(c['catid']):
                     memo = ""
-                    if c['memo'] != "" and c['memo'] is not None:
+                    if c['memo'] != "":
                         memo = _("Memo")
                     child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
                     child.setBackground(0, QtGui.QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
@@ -266,27 +266,24 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         text = _("CODE: ") + code_['name'] + "  " + current.text(1)
         text += "  " + _("COLOUR: ") + code_['color'] + "  " + _("CREATED BY: ") + code_['owner'] + "\n\n"
-        memo = ""
-        if code_['memo'] is not None:
-            memo = code_['memo']
-        text += _("MEMO: ") + "\n" + memo + "\n"
+        text += _("MEMO: ") + "\n" + code_['memo'] + "\n"
 
         # Coding statistics
         coders = []
         sources = []
-        text_sql = "select fid, seltext, pos0, pos1, owner, memo, avid from code_text where cid=?"
+        text_sql = "select fid, seltext, pos0, pos1, owner, isnull(memo,''), avid from code_text where cid=?"
         cur.execute(text_sql, [code_['cid']])
         text_res = cur.fetchall()
         for r in text_res:
             coders.append(r[4])
             sources.append(r[0])
-        img_sql = "select id, x1, y1, width, height, owner, memo from code_image where cid=?"
+        img_sql = "select id, x1, y1, width, height, owner, isnull(memo,'') from code_image where cid=?"
         cur.execute(img_sql, [code_['cid']])
         img_res = cur.fetchall()
         for r in img_res:
             coders.append(r[5])
             sources.append(r[0])
-        av_sql = "select id, pos0, pos1, owner, memo from code_av where cid=?"
+        av_sql = "select id, pos0, pos1, owner, isnull(memo,'') from code_av where cid=?"
         cur.execute(av_sql, [code_['cid']])
         av_res = cur.fetchall()
         for r in av_res:
