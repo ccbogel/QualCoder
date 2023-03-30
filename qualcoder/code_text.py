@@ -407,7 +407,7 @@ class DialogCodeText(QtWidgets.QWidget):
             tt += "\n" + _("Codings: ") + str(res[0])
             tt += "\n" + _("From: ") + str(f['start']) + _(" to ") + str(f['end'])
             item = QtWidgets.QListWidgetItem(f['name'])
-            if f['memo'] is not None and f['memo'] != "":
+            if f['memo'] != "":
                 tt += "\nMemo: " + f['memo']
             item.setToolTip(tt)
             self.ui.listWidget.addItem(item)
@@ -435,7 +435,7 @@ class DialogCodeText(QtWidgets.QWidget):
         res = cur.fetchone()
         tt += "\n" + _("Codings: ") + str(res[0])
         tt += "\n" + _("From: ") + str(f['start']) + _(" to ") + str(f['end'])
-        if self.file_['memo'] is not None and self.file_['memo'] != "":
+        if self.file_['memo'] != "":
             tt += "\nMemo: " + self.file_['memo']
         # Find item to update tooltip
         items = self.ui.listWidget.findItems(self.file_['name'], Qt.MatchFlag.MatchExactly)
@@ -522,7 +522,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 self.ui.label_code.setStyleSheet(style)
                 self.ui.label_code.setAutoFillBackground(True)
                 tt = c['name'] + "\n"
-                if c['memo'] is not None and c['memo'] != "":
+                if c['memo'] != "":
                     tt += _("Memo: ") + c['memo']
                 self.ui.label_code.setToolTip(tt)
                 break
@@ -577,7 +577,7 @@ class DialogCodeText(QtWidgets.QWidget):
         for c in cats:
             if c['supercatid'] is None:
                 memo = ""
-                if c['memo'] != "" and c['memo'] is not None:
+                if c['memo'] != "":
                     memo = _("Memo")
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
                 top_item.setToolTip(2, c['memo'])
@@ -605,7 +605,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 while item and count2 < 10000:  # while there is an item in the list
                     if item.text(1) == 'catid:' + str(c['supercatid']):
                         memo = ""
-                        if c['memo'] != "" and c['memo'] is not None:
+                        if c['memo'] != "":
                             memo = _("Memo")
                         child = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
                         child.setToolTip(2, c['memo'])
@@ -630,7 +630,7 @@ class DialogCodeText(QtWidgets.QWidget):
         for c in codes:
             if c['catid'] is None:
                 memo = ""
-                if c['memo'] != "" and c['memo'] is not None:
+                if c['memo'] != "":
                     memo = _("Memo")
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
                 top_item.setToolTip(2, c['memo'])
@@ -656,7 +656,7 @@ class DialogCodeText(QtWidgets.QWidget):
             while item and count < 10000:
                 if item.text(1) == 'catid:' + str(c['catid']):
                     memo = ""
-                    if c['memo'] != "" and c['memo'] is not None:
+                    if c['memo'] != "":
                         memo = _("Memo")
                     child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
                     child.setToolTip(2, c['memo'])
@@ -736,14 +736,12 @@ class DialogCodeText(QtWidgets.QWidget):
         if selected.text(1)[0:3] == 'cat':
             for c in self.categories:
                 if c['catid'] == int(selected.text(1)[6:]):
-                    if c['memo'] is not None:
-                        txt += c['memo']
+                    txt += c['memo']
                     break
         else:  # Code is selected
             for c in self.codes:
                 if c['cid'] == int(selected.text(1)[4:]):
-                    if c['memo'] is not None:
-                        txt += c['memo']
+                    txt += c['memo']
                     break
             self.ui.textEdit_info.show()
             # Get coded examples
@@ -1720,12 +1718,10 @@ class DialogCodeText(QtWidgets.QWidget):
         if key == QtCore.Qt.Key.Key_F and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
             self.ui.lineEdit_search.setFocus()
             return
-
         # Ctrl Z undo last unmarked coding
         if key == QtCore.Qt.Key.Key_Z and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
             self.undo_last_unmarked_code()
             return
-
         # Ctrl 0 to 9
         if mods & QtCore.Qt.KeyboardModifier.ControlModifier:
             if key == QtCore.Qt.Key.Key_1:
@@ -3056,7 +3052,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 fmt.setForeground(text_brush)
                 # Highlight codes with memos - these are italicised
                 # Italics also used for overlapping codes
-                if item['memo'] is not None and item['memo'] != "":
+                if item['memo'] != "":
                     fmt.setFontItalic(True)
                 else:
                     fmt.setFontItalic(False)
@@ -4086,7 +4082,7 @@ class ToolTipEventFilter(QtCore.QObject):
                         if self.app.settings['showids']:
                             text_ += " [ctid:" + str(item['ctid']) + "]"
                         text_ += "<br />" + seltext
-                        if item['memo'] is not None and item['memo'] != "":
+                        if item['memo'] != "":
                             text_ += "<br /><em>" + _("MEMO: ") + item['memo'] + "</em>"
                         if item['important'] == 1:
                             text_ += "<br /><em>IMPORTANT</em>"

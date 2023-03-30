@@ -159,7 +159,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.segments = []
         self.media_duration_text = ""
         '''self.text_for_segment = {'cid': None, 'fid': None, 'seltext': None, 'pos0': None, 'pos1': None,
-                'owner': None, 'memo': None, 'date': None, 'avid': None}'''
+                'owner': None, 'memo': '', 'date': None, 'avid': None}'''
         self.segment_for_text = None
         self.undo_deleted_codes = []
         self.get_codes_and_categories()
@@ -383,7 +383,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             bl_sql = " and id not in (" + bl_sql[1:] + ") "
         self.files = []
         cur = self.app.conn.cursor()
-        sql = "select name, id, memo, owner, date, mediapath, av_text_id from source where "
+        sql = "select name, id, ifnull(memo,''), owner, date, mediapath, av_text_id from source where "
         sql += "substr(mediapath,1,6) in ('/audio','/video', 'audio:', 'video:') " + bl_sql + " "
         if ids:
             str_ids = list(map(str, ids))
@@ -523,7 +523,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         for c in cats:
             if c['supercatid'] is None:
                 memo = ""
-                if c['memo'] != "" and c['memo'] is not None:
+                if c['memo'] != "":
                     memo = "Memo"
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
                 top_item.setToolTip(0, c['name'])
@@ -579,7 +579,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         for c in codes:
             if c['catid'] is None:
                 memo = ""
-                if c['memo'] != "" and c['memo'] is not None:
+                if c['memo'] != "":
                     memo = "Memo"
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
                 top_item.setToolTip(0, c['name'])
@@ -606,7 +606,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             while item and count < 10000:
                 if item.text(1) == 'catid:' + str(c['catid']):
                     memo = ""
-                    if c['memo'] != "" and c['memo'] is not None:
+                    if c['memo'] != "":
                         memo = _("Memo")
                     child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
                     child.setBackground(0, QBrush(QColor(c['color']), Qt.BrushStyle.SolidPattern))
@@ -854,7 +854,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         if self.file_ is None:
             return
         # 10 is assigned as an initial default for y values for segments
-        sql = "select avid, id, pos0, pos1, code_av.cid, code_av.memo, code_av.date, "
+        sql = "select avid, id, pos0, pos1, code_av.cid, ifnull(code_av.memo,''), code_av.date, "
         sql += " code_av.owner, code_name.name, code_name.color, 10, code_av.important from code_av"
         sql += " join code_name on code_name.cid=code_av.cid"
         sql += " where id=? "
@@ -1029,7 +1029,7 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         # Get text annotations
         cur = self.app.conn.cursor()
-        cur.execute("select anid, fid, pos0, pos1, memo, owner, date from annotation where owner=? and fid=?",
+        cur.execute("select anid, fid, pos0, pos1, ifnull(memo,''), owner, date from annotation where owner=? and fid=?",
                     [self.app.settings['codername'], self.transcription[0]])
         result = cur.fetchall()
         keys = 'anid', 'fid', 'pos0', 'pos1', 'memo', 'owner', 'date'
@@ -1050,7 +1050,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.code_text = []
         # seltext length, longest first, so overlapping shorter text is superimposed.
         sql = "select code_text.cid, code_text.fid, seltext, code_text.pos0, code_text.pos1, "
-        sql += "code_text.owner, code_text.date, code_text.memo, code_text.avid,code_av.pos0, code_av.pos1, "
+        sql += "code_text.owner, code_text.date, ifnull(code_text.memo,''), code_text.avid,code_av.pos0, code_av.pos1, "
         sql += "code_text.important, code_text.ctid "
         sql += "from code_text left join code_av on code_text.avid = code_av.avid "
         sql += " where code_text.fid=? and code_text.owner=? order by length(seltext) desc"
@@ -2412,7 +2412,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             fmt.setForeground(text_brush)
             # Highlight codes with memos - these are italicised
             # Italics also used for overlapping codes
-            if item['memo'] is not None and item['memo'] != "":
+            if item['memo'] != "":
                 fmt.setFontItalic(True)
             else:
                 fmt.setFontItalic(False)
@@ -3115,7 +3115,7 @@ class ToolTipEventFilter(QtCore.QObject):
                         if item['avid'] is not None:
                             text_ += " [" + msecs_to_hours_mins_secs(item['av_pos0'])
                             text_ += " - " + msecs_to_hours_mins_secs(item['av_pos1']) + "]"
-                        if item['memo'] is not None and item['memo'] != "":
+                        if item['memo'] != "":
                             text_ += "<br /><em>" + _("MEMO: ") + item['memo'] + "</em>"
                         if item['important'] == 1:
                             text_ += "<br /><em>IMPORTANT</em>"

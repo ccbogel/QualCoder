@@ -57,6 +57,7 @@ from qualcoder.GUI.base64_helper import *
 from qualcoder.GUI.ui_main import Ui_MainWindow
 from qualcoder.helpers import Message
 from qualcoder.import_survey import DialogImportSurvey
+from qualcoder.import_twitter_data import DialogImportTwitterData
 from qualcoder.information import DialogInformation, menu_shortcuts_display, coding_shortcuts_display
 from qualcoder.locale.base64_lang_helper import *
 from qualcoder.journals import DialogJournals
@@ -278,7 +279,7 @@ class App(object):
     def get_filenames(self):
         """ Get all filenames. As id, name, memo """
         cur = self.conn.cursor()
-        cur.execute("select id, name, memo from source order by lower(name)")
+        cur.execute("select id, name, ifnull(memo,'') from source order by lower(name)")
         result = cur.fetchall()
         res = []
         for row in result:
@@ -322,7 +323,7 @@ class App(object):
 
         if ids is None:
             ids = []
-        sql = "select id, name, memo from source where mediapath like '/images/%' or mediapath like 'images:%'"
+        sql = "select id, name, ifnull(memo,'') from source where mediapath like '/images/%' or mediapath like 'images:%'"
         if ids:
             str_ids = list(map(str, ids))
             sql += " and id in (" + ",".join(str_ids) + ")"
@@ -342,7 +343,7 @@ class App(object):
 
         if ids is None:
             ids = []
-        sql = "select id, name, memo from source where "
+        sql = "select id, name, ifnull(memo,'') from source where "
         sql += "(mediapath like '/audio/%' or mediapath like 'audio:%' or mediapath like '/video/%' or mediapath like 'video:%') "
         if ids:
             str_ids = list(map(str, ids))
@@ -375,14 +376,14 @@ class App(object):
 
         cur = self.conn.cursor()
         categories = []
-        cur.execute("select name, catid, owner, date, memo, supercatid from code_cat order by lower(name)")
+        cur.execute("select name, catid, owner, date, ifnull(memo,''), supercatid from code_cat order by lower(name)")
         result = cur.fetchall()
         keys = 'name', 'catid', 'owner', 'date', 'memo', 'supercatid'
         for row in result:
             categories.append(dict(zip(keys, row)))
         codes = []
         cur = self.conn.cursor()
-        cur.execute("select name, memo, owner, date, cid, catid, color from code_name order by lower(name)")
+        cur.execute("select name, ifnull(memo,''), owner, date, cid, catid, color from code_name order by lower(name)")
         result = cur.fetchall()
         keys = 'name', 'memo', 'owner', 'date', 'cid', 'catid', 'color'
         for row in result:
@@ -739,12 +740,12 @@ class App(object):
         cur = self.conn.cursor()
         if fileids is not None:
             cur.execute(
-                "select name, id, fulltext, memo, owner, date from source where id in (?) and fulltext is not null",
+                "select name, id, fulltext, ifnull(memo, ''), owner, date from source where id in (?) and fulltext is not null",
                 fileids
             )
         else:
             cur.execute(
-                "select name, id, fulltext, memo, owner, date from source where fulltext is not null order by name")
+                "select name, id, fulltext, ifnull(memo,''), owner, date from source where fulltext is not null order by name")
         keys = 'name', 'id', 'fulltext', 'memo', 'owner', 'date'
         result = []
         for row in cur.fetchall():
@@ -1290,6 +1291,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.ui.label_manage.hide()
         ui = DialogImportSurvey(self.app, self.ui.textEdit)
+        #ui = DialogImportTwitterData(self.app, self.ui.textEdit)
+
         self.tab_layout_helper(self.ui.tab_manage, ui)
 
     def manage_cases(self):

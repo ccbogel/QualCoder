@@ -365,7 +365,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         for c in cats:
             if c['supercatid'] is None:
                 memo = ""
-                if c['memo'] != "" and c['memo'] is not None:
+                if c['memo'] != "":
                     memo = "Memo"
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
                 top_item.setToolTip(0, c['name'])
@@ -394,7 +394,7 @@ class DialogCodeImage(QtWidgets.QDialog):
                 while item and count2 < 10000:  # while there is an item in the list
                     if item.text(1) == 'catid:' + str(c['supercatid']):
                         memo = ""
-                        if c['memo'] != "" and c['memo'] is not None:
+                        if c['memo'] != "":
                             memo = "Memo"
                         child = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
                         child.setToolTip(0, c['name'])
@@ -420,7 +420,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         for c in codes:
             if c['catid'] is None:
                 memo = ""
-                if c['memo'] != "" and c['memo'] is not None:
+                if c['memo'] != "":
                     memo = "Memo"
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
                 top_item.setToolTip(0, c['name'])
@@ -447,7 +447,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             while item and count < 10000:
                 if item.text(1) == 'catid:' + str(c['catid']):
                     memo = ""
-                    if c['memo'] != "" and c['memo'] is not None:
+                    if c['memo'] != "":
                         memo = "Memo"
                     child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
                     child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
