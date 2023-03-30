@@ -137,14 +137,14 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
 
         cur = self.app.conn.cursor()
         self.categories = []
-        cur.execute("select name, catid, owner, date, isnull(memo,''), supercatid from code_cat order by lower(name)")
+        cur.execute("select name, catid, owner, date, ifnull(memo,''), supercatid from code_cat order by lower(name)")
         result = cur.fetchall()
         for row in result:
             self.categories.append({'name': row[0], 'catid': row[1], 'owner': row[2],
                                     'date': row[3], 'memo': row[4], 'supercatid': row[5],
                                     'display_list': [row[0], 'catid:' + str(row[1])]})
         self.codes = []
-        cur.execute("select name, isnull(memo,''), owner, date, cid, catid, color from code_name order by lower(name)")
+        cur.execute("select name, ifnull(memo,''), owner, date, cid, catid, color from code_name order by lower(name)")
         result = cur.fetchall()
         for row in result:
             self.codes.append({'name': row[0], 'memo': row[1], 'owner': row[2], 'date': row[3],

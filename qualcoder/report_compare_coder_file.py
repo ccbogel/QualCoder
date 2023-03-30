@@ -360,7 +360,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         total = {'dual_coded': 0, 'single_coded': 0, 'uncoded': 0, 'duration': msecs, 'coded0': 0, 'coded1': 0}
         # Get res0 and res1 a/v segments
         cur = self.app.conn.cursor()
-        sql = "select pos0, pos1, pos1 - pos0, isnull(memo,''), owner from code_av where id=? and cid=? and owner=?"
+        sql = "select pos0, pos1, pos1 - pos0, ifnull(memo,''), owner from code_av where id=? and cid=? and owner=?"
         keys = 'pos0', 'pos1', 'seg_len', 'memo', 'owner'
         res0 = []
         res1 = []
@@ -480,7 +480,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         total = {'dual_coded': 0, 'single_coded': 0, 'uncoded': 0, 'pixels': 0, 'coded0': 0, 'coded1': 0}
         cur = self.app.conn.cursor()
         sql = "select cast(x1 as int), cast(y1 as int), cast(width as int), cast(height as int), " \
-              "cast(width as int) * cast(height as int), isnull(memo,''), owner from code_image where id=? and cid=? " \
+              "cast(width as int) * cast(height as int), ifnull(memo,''), owner from code_image where id=? and cid=? " \
               "and owner=?"
         keys = 'x1', 'y1', 'width', 'height', 'area', 'memo', 'owner'
         res0 = []
