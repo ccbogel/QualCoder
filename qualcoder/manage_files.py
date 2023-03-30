@@ -39,6 +39,7 @@ import sys
 from shutil import copyfile, move
 import subprocess
 import traceback
+from urllib.parse import urlparse
 import webbrowser
 import zipfile
 
@@ -307,6 +308,7 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         row = self.ui.tableWidget.currentRow()
         col = self.ui.tableWidget.currentColumn()
+        item_text = self.ui.tableWidget.item(row, col).text()
         # Use these next few lines to use for moving a linked file into or an internal file out of the project folder
         mediapath = None
         try:
@@ -355,13 +357,17 @@ class DialogManageFiles(QtWidgets.QDialog):
             action_rename = menu.addAction(_("Rename database entry"))
             action_export = menu.addAction(_("Export"))
             action_delete = menu.addAction(_("Delete"))
-            if  (mediapath is None or mediapath == "" or (mediapath is not None and mediapath[0] == "/")):
+            if mediapath is None or mediapath == "" or (mediapath is not None and mediapath[0] == "/"):
                 action_export_to_linked = menu.addAction(_("Move file to externally linked file"))
             if mediapath is not None and mediapath != "" and mediapath[0] != "/":
                 action_import_linked = menu.addAction(_("Import linked file"))
         action_show_all = None
         if self.rows_hidden:
             action_show_all = menu.addAction(_("Show all rows Ctrl A"))
+        action_url = None
+        url_test = urlparse(item_text)
+        if all([url_test.scheme, url_test.netloc]):
+            action_url = menu.addAction(_("Open URL"))
         action = menu.exec(self.ui.tableWidget.mapToGlobal(position))
         if action is None:
             return
@@ -421,9 +427,11 @@ class DialogManageFiles(QtWidgets.QDialog):
             for r in range(0, self.ui.tableWidget.rowCount()):
                 self.ui.tableWidget.setRowHidden(r, False)
             self.rows_hidden = False
+        if action == action_url:
+            webbrowser.open(item_text)
 
     def view_original_text_file(self, mediapath):
-        """ View orignal text file.
+        """ View original text file.
          param:
          mediapath: String '/docs/' for internal 'docs:/' for external """
 
@@ -2002,7 +2010,6 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.ui.tableWidget.setItem(row, self.CASE_COLUMN, case_item)
             # Add the attribute values
             #TODO consider using role type for numerics
-            # Add attribute values to their columns
             for offset, attribute in enumerate(data['attributes']):
                 value = attribute
                 if self.attribute_labels_ordered[offset] == "Ref_Authors":
@@ -2011,20 +2018,6 @@ class DialogManageFiles(QtWidgets.QDialog):
                 self.ui.tableWidget.setItem(row, self.ATTRIBUTE_START_COLUMN + offset, item)
                 if self.attribute_labels_ordered[offset] in ("Ref_Authors", "Ref_Title", "Ref_Type", "Ref_Year"):
                     item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
-            '''for a in self.attributes:
-                for col, header in enumerate(self.header_labels):
-                    if fid == a[2] and a[0] == header:
-                        string_value = ''
-                        if a[1] is not None:
-                            string_value = str(a[1])
-                        if header == "Ref_Authors":
-                            string_value = string_value.replace(";", "\n")
-                        item = QtWidgets.QTableWidgetItem(string_value)
-                        tt = self.get_tooltip_values(a[0])
-                        if header in ("Ref_Authors", "Ref_Title", "Ref_Type", "Ref_Year"):
-                            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
-                        item.setToolTip(tt)
-                        self.ui.tableWidget.setItem(row, col, item)'''
         # Resize columns and rows
         self.ui.tableWidget.hideColumn(self.ID_COLUMN)
         if self.app.settings['showids']:

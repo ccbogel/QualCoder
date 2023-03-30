@@ -32,6 +32,7 @@ from openpyxl import load_workbook
 import os
 import sys
 import traceback
+from urllib.parse import urlparse
 import webbrowser
 
 from PyQt6 import QtCore, QtGui, QtWidgets
@@ -807,6 +808,7 @@ class DialogCases(QtWidgets.QDialog):
 
         row = self.ui.tableWidget.currentRow()
         col = self.ui.tableWidget.currentColumn()
+        item_text = self.ui.tableWidget.item(row, col).text()
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         action_asc = None
@@ -819,6 +821,10 @@ class DialogCases(QtWidgets.QDialog):
         action_show_values_like = menu.addAction(_("Show values like"))
         action_equals_value = menu.addAction(_("Show this value"))
         action_show_all = menu.addAction(_("Show all rows Ctrl A"))
+        action_url = None
+        url_test = urlparse(item_text)
+        if all([url_test.scheme, url_test.netloc]):
+            action_url = menu.addAction(_("Open URL"))
         action = menu.exec(self.ui.tableWidget.mapToGlobal(position))
         if action is None:
             return
@@ -853,6 +859,8 @@ class DialogCases(QtWidgets.QDialog):
         if action == action_show_all:
             for r in range(0, self.ui.tableWidget.rowCount()):
                 self.ui.tableWidget.setRowHidden(r, False)
+        if action == action_url:
+            webbrowser.open(item_text)
 
     def fill_table(self):
         """ Fill the table widget with case details.
