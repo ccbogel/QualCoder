@@ -57,7 +57,7 @@ from qualcoder.GUI.base64_helper import *
 from qualcoder.GUI.ui_main import Ui_MainWindow
 from qualcoder.helpers import Message
 from qualcoder.import_survey import DialogImportSurvey
-from qualcoder.import_twitter_data import DialogImportTwitterData
+#from qualcoder.import_twitter_data import DialogImportTwitterData
 from qualcoder.information import DialogInformation, menu_shortcuts_display, coding_shortcuts_display
 from qualcoder.locale.base64_lang_helper import *
 from qualcoder.journals import DialogJournals
