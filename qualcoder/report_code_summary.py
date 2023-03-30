@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2022 Colin Curtain
+Copyright (c) 2023 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -271,19 +271,19 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         # Coding statistics
         coders = []
         sources = []
-        text_sql = "select fid, seltext, pos0, pos1, owner, isnull(memo,''), avid from code_text where cid=?"
+        text_sql = "select fid, seltext, pos0, pos1, owner, ifnull(memo,''), avid from code_text where cid=?"
         cur.execute(text_sql, [code_['cid']])
         text_res = cur.fetchall()
         for r in text_res:
             coders.append(r[4])
             sources.append(r[0])
-        img_sql = "select id, x1, y1, width, height, owner, isnull(memo,'') from code_image where cid=?"
+        img_sql = "select id, x1, y1, width, height, owner, ifnull(memo,'') from code_image where cid=?"
         cur.execute(img_sql, [code_['cid']])
         img_res = cur.fetchall()
         for r in img_res:
             coders.append(r[5])
             sources.append(r[0])
-        av_sql = "select id, pos0, pos1, owner, isnull(memo,'') from code_av where cid=?"
+        av_sql = "select id, pos0, pos1, owner, ifnull(memo,'') from code_av where cid=?"
         cur.execute(av_sql, [code_['cid']])
         av_res = cur.fetchall()
         for r in av_res:

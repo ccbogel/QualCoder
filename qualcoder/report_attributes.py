@@ -102,11 +102,11 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
         self.result_file_ids = []
         self.result_tooltip_msg = ""
         cur = self.app.conn.cursor()
-        sql = "select name, valuetype, isnull(memo,''), caseOrFile from attribute_type"
+        sql = "select name, valuetype, ifnull(memo,''), caseOrFile from attribute_type"
         if limiter == "case":
-            sql = "select name, valuetype, isnull(memo,''), 'case' from attribute_type where caseOrFile='case'"
+            sql = "select name, valuetype, ifnull(memo,''), 'case' from attribute_type where caseOrFile='case'"
         if limiter == "file":
-            sql = "select name, valuetype, isnull(memo,''), 'file' from attribute_type where caseOrFile='file'"
+            sql = "select name, valuetype, ifnull(memo,''), 'file' from attribute_type where caseOrFile='file'"
         cur.execute(sql)
         self.attribute_type = []
         keys = 'name', 'valuetype', 'memo', 'caseOrFile'
