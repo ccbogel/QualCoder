@@ -111,7 +111,7 @@ class ViewCharts(QDialog):
         self.ui.comboBox_coders.addItems(coders)
 
         self.attributes = []
-        cur.execute("select name, memo, caseOrFile, valuetype from attribute_type")
+        cur.execute("select name, isnull(memo,''), caseOrFile, valuetype from attribute_type")
         result = cur.fetchall()
         self.attributes = []
         keys = 'name', 'memo', 'caseOrFile', 'valuetype'
