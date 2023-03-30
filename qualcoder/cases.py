@@ -149,7 +149,7 @@ class DialogCases(QtWidgets.QDialog):
         self.ui.tableWidget.horizontalHeader().customContextMenuRequested.connect(self.table_header_menu)
         self.ui.tableWidget.installEventFilter(self)
         self.ui.tableWidget.setTabKeyNavigation(False)
-        self.load_cases_and_attributes()
+        self.load_cases_data()
         self.fill_table()
         # Initial resize of table columns
         self.ui.tableWidget.resizeColumnsToContents()
@@ -283,7 +283,7 @@ class DialogCases(QtWidgets.QDialog):
         Message(self.app, _('Csv file Export'), msg).exec()
         self.parent_text_edit.append(msg)
 
-    def load_cases_and_attributes(self, casename_order="asc"):
+    def load_cases_data(self, casename_order="asc"):
         """ Load case (to maximum) and attribute details from database. Display in tableWidget.
         Cases are a list of dictionaries.
         Attributes are a list of tuples(name,value,id)
@@ -331,7 +331,11 @@ class DialogCases(QtWidgets.QDialog):
             cur.execute(sql, [a])
             att_result = cur.fetchall()
             for i, c in enumerate(self.cases):
-                c['attributes'].append(att_result[i][0])
+                try:
+                    c['attributes'].append(att_result[i][0])
+                except IndexError:
+                    # Rare but possible that attributes are not listed in attributes table for the case
+                    c['attributes'].append('')
 
         # TODO reconsider this data structure
         sql = "select attribute.name, value, id from attribute where attr_type='case'"
@@ -382,7 +386,7 @@ class DialogCases(QtWidgets.QDialog):
             sql = "insert into attribute (name, value, id, attr_type, date, owner) values (?,?,?,?,?,?)"
             cur.execute(sql, (name, "", id_[0], 'case', now_date, self.app.settings['codername']))
         self.app.conn.commit()
-        self.load_cases_and_attributes()
+        self.load_cases_data()
         self.fill_table()
         self.parent_text_edit.append(_("Attribute added to cases: ") + name + ", " + _("type: ") + value_type)
         self.app.delete_backup = False
@@ -483,7 +487,7 @@ class DialogCases(QtWidgets.QDialog):
                         cur.execute(sql, (fields[col], v[col], n_i[1], 'case',
                                           now_date, self.app.settings['codername']))
         self.app.conn.commit()
-        self.load_cases_and_attributes()
+        self.load_cases_data()
         self.fill_table()
         msg = _("Cases and attributes imported from: ") + filepath
         self.app.delete_backup = False
@@ -559,7 +563,7 @@ class DialogCases(QtWidgets.QDialog):
                         cur.execute(sql, (fields[col], v[col], n_i[1], 'case',
                                           now_date, self.app.settings['codername']))
         self.app.conn.commit()
-        self.load_cases_and_attributes()
+        self.load_cases_data()
         self.fill_table()
         msg = _("Cases and attributes imported from: ") + filepath
         self.app.delete_backup = False
@@ -628,7 +632,7 @@ class DialogCases(QtWidgets.QDialog):
                     cur.execute("delete from attribute where id=? and attr_type='case'", [id_])
                     self.app.conn.commit()
                     self.parent_text_edit.append("Case deleted: " + c['name'])
-        self.load_cases_and_attributes()
+        self.load_cases_data()
         self.app.delete_backup = False
         self.fill_table()
 
@@ -823,10 +827,10 @@ class DialogCases(QtWidgets.QDialog):
             self.view_case_files()
             return
         if action == action_asc:
-            self.load_cases_and_attributes("asc")
+            self.load_cases_data("asc")
             self.fill_table()
         if action == action_desc:
-            self.load_cases_and_attributes("desc")
+            self.load_cases_data("desc")
             self.fill_table()
         if action == action_equals_value:
             # Hide rows that do not match this value
