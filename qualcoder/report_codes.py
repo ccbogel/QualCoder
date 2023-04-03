@@ -1895,7 +1895,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             return
         if self.case_ids != "" and matrix_option_index == 1:  # Top categories by case
             self.matrix_by_top_categories(self.results, self.case_ids, "case")
-        if self.case_ids != "" and matrix_option_index == 2:  # Top categories by file
+        if self.case_ids == "" and matrix_option_index == 2:  # Top categories by file
             self.matrix_by_top_categories(self.results, self.file_ids)
         # Top categories BY FILE for SELECTED CASES
         if self.case_ids != "" and matrix_option_index == 2:  # Top categories by file
