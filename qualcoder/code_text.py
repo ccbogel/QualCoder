@@ -2700,7 +2700,7 @@ class DialogCodeText(QtWidgets.QWidget):
             self.get_files_from_attributes()
 
     def view_original_text_file(self):
-        """ View orignal text file.
+        """ View original text file.
          param:
          mediapath: String '/docs/' for internal 'docs:/' for external """
 
@@ -3597,7 +3597,8 @@ class DialogCodeText(QtWidgets.QWidget):
             filenames = ""
             for f in files:
                 filenames += f['name'] + " "
-                cur.execute("select name, id, fulltext, memo, owner, date from source where id=? and mediapath is Null",
+                cur.execute("select name, id, fulltext, memo, owner, date from source where id=? and "
+                            "(mediapath is null or mediapath like '/docs/%' or mediapath like 'docs:%')",
                             [f['id']])
                 current_file = cur.fetchone()
                 # Rare but possible no result is returned, hence if statement
