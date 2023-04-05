@@ -164,6 +164,7 @@
     <addaction name="actionManage_references"/>
     <addaction name="actionImport_survey_2"/>
     <addaction name="actionManage_bad_links_to_files"/>
+    <addaction name="actionImport_twitter_data"/>
    </widget>
    <widget class="QMenu" name="menuCoding">
     <property name="title">
@@ -486,6 +487,11 @@
   <action name="actionMenu_Key_Shortcuts">
    <property name="text">
     <string>Menu Key Shortcuts</string>
+   </property>
+  </action>
+  <action name="actionImport_twitter_data">
+   <property name="text">
+    <string>Import twitter data</string>
    </property>
   </action>
  </widget>
