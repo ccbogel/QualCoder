@@ -8,6 +8,8 @@ Text files can be typed in manually or loaded from txt, odt, docx, html, htm, md
 This project has been tested under Ubuntu 22.04 and Windows 10/11. It has been used on MacOS and various Linux distros.
 Instructions and other information are available here: https://qualcoder.wordpress.com/ and on the [Github Wiki](https://github.com/ccbogel/QualCoder/wiki).
 
+<script type="text/javascript" src="https://cdnjs.buymeacoffee.com/1.0.0/button.prod.min.js" data-name="bmc-button" data-slug="ccbogelB" data-color="#FFDD00" data-emoji=""  data-font="Cookie" data-text="Buy me a coffee" data-outline-color="#000000" data-font-color="#000000" data-coffee-color="#ffffff" ></script>
+
 ## INSTALLATION 
 
 ### Prerequisites
