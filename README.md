@@ -8,7 +8,7 @@ Text files can be typed in manually or loaded from txt, odt, docx, html, htm, md
 This project has been tested under Ubuntu 22.04 and Windows 10/11. It has been used on MacOS and various Linux distros.
 Instructions and other information are available here: https://qualcoder.wordpress.com/ and on the [Github Wiki](https://github.com/ccbogel/QualCoder/wiki).
 
-It is best to download the Current Release form the Releases page. Occassional errors can occur in this latest code. **There is currently an error in the Manage Files and Cases table table dispay of attributes in the latest code.**
+It is best to download the Current Release form the Releases page. Occassional errors can occur in this latest code. **There was an error in the Manage Files and Cases table table dispay of attributes early April, fixed 8 April.**
 
 <a href="https://www.buymeacoffee.com/ccbogelB" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
 
