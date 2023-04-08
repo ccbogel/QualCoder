@@ -892,9 +892,17 @@ class DialogCases(QtWidgets.QDialog):
             item.setToolTip(_("Click to manage files for this case"))
             self.ui.tableWidget.setItem(row, self.FILES_COLUMN, item)
             # Add attribute values to their columns
+            for a in self.attributes:
+                for col, header in enumerate(self.header_labels):
+                    if c['caseid'] == a[2] and a[0] == header:
+                        item = QtWidgets.QTableWidgetItem(str(a[1]))
+                        tt = self.get_tooltip_values(a[0])
+                        item.setToolTip(tt)
+                        self.ui.tableWidget.setItem(row, col, item)
+            '''#TODO may not work
             for offset, attribute in enumerate(c['attributes']):
                 item = QtWidgets.QTableWidgetItem(attribute)
-                self.ui.tableWidget.setItem(row, self.ATTRIBUTE_START_COLUMN + offset, item)
+                self.ui.tableWidget.setItem(row, self.ATTRIBUTE_START_COLUMN + offset, item)'''
         self.ui.tableWidget.verticalHeader().setVisible(False)
         self.ui.tableWidget.resizeRowsToContents()
         self.ui.tableWidget.hideColumn(self.ID_COLUMN)
