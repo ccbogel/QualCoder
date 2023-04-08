@@ -1065,7 +1065,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionManage_attributes.setEnabled(True)
         self.ui.actionImport_survey_2.setEnabled(True)
         self.ui.actionManage_references.setEnabled(True)
-        self.ui.actionImport_twitter_data.setEnabled(True)
+        self.ui.actionImport_twitter_data.setEnabled(False)
         # Codes menu
         self.ui.actionCodes.setEnabled(True)
         self.ui.actionCode_image.setEnabled(True)
