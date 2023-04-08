@@ -1217,6 +1217,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         icon, metadata = self.get_icon_and_metadata(id_)
         entry['icon'] = icon
         entry['metadata'] = metadata
+        entry['attributes'] = []
 
         # Add file attribute placeholders
         att_sql = 'select name from attribute_type where caseOrFile ="file"'
