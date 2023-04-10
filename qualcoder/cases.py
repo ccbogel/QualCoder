@@ -284,7 +284,7 @@ class DialogCases(QtWidgets.QDialog):
         Message(self.app, _('Csv file Export'), msg).exec()
         self.parent_text_edit.append(msg)
 
-    def load_cases_data(self, casename_order="asc"):
+    def load_cases_data(self, order_by="asc"):
         """ Load case (to maximum) and attribute details from database. Display in tableWidget.
         Cases are a list of dictionaries.
         Attributes are a list of tuples(name,value,id)
@@ -293,31 +293,62 @@ class DialogCases(QtWidgets.QDialog):
         self.source = []
         self.cases = []
         self.case_text = []
+        result = []
 
         cur = self.app.conn.cursor()
-        cur.execute("select name, id, fulltext, mediapath, memo, owner, date, av_text_id from source")
-        result = cur.fetchall()
-        for row in result:
+        cur.execute("select name, id, fulltext, mediapath, ifnull(memo,''), owner, date, av_text_id from source")
+        file_result = cur.fetchall()
+        for row in file_result:
             self.source.append({'name': row[0], 'id': row[1], 'fulltext': row[2],
                                 'mediapath': row[3], 'memo': row[4], 'owner': row[5], 'date': row[6],
                                 'av_text_id': row[7]})
-        case_sql = "select name, memo, owner, date, ifnull(caseid,'') from cases "  # Odd error with null in the past
-        if casename_order == "asc":
-            case_sql += "order by name asc"
-        if casename_order == "desc":
-            case_sql += "order by name desc"
-        cur.execute(case_sql)
-        cases_result = cur.fetchall()
+        if order_by == "asc":
+            # Odd error with null caseid in the past
+            sql = "select name, ifnull(memo,''), owner, date, ifnull(caseid,'') from cases "
+            sql += "order by name asc"
+            cur.execute(sql)
+            result = cur.fetchall()
+        if order_by == "desc":
+            # Odd error with null in the past
+            sql = "select name, ifnull(memo,''), owner, date, ifnull(caseid,'') from cases "
+            sql += "order by name desc"
+            cur.execute(sql)
+            result = cur.fetchall()
+        if order_by[:14] == "attribute asc:":
+            attribute_name = order_by[14:]
+            cur.execute("select valuetype from attribute_type where name=?", [attribute_name])
+            attr_type = cur.fetchone()[0]
+            # Odd error with null caseid in the past
+            sql = "select cases.name, ifnull(memo,''), cases.owner, cases.date, ifnull(caseid,'') from cases "
+            sql += "join attribute on attribute.id = cases.caseid "
+            sql += "where attribute.attr_type = 'case' and attribute.name=? "
+            if attr_type == "character":
+                sql += "order by lower(attribute.value) asc "
+            else:
+                sql += "order by cast(attribute.value as numeric) asc"
+            cur.execute(sql, [attribute_name])
+            result = cur.fetchall()
+        if order_by[:15] == "attribute desc:":
+            attribute_name = order_by[15:]
+            cur.execute("select valuetype from attribute_type where name=?", [attribute_name])
+            attr_type = cur.fetchone()[0]
+            # Odd error with null caseid in the past
+            sql = "select cases.name, ifnull(memo,''), cases.owner, cases.date, ifnull(caseid,'') from cases "
+            sql += "join attribute on attribute.id = cases.caseid "
+            sql += "where attribute.attr_type = 'case' and attribute.name=? "
+            if attr_type == "character":
+                sql += "order by lower(attribute.value) desc "
+            else:
+                sql += "order by cast(attribute.value as numeric) desc"
+            cur.execute(sql, [attribute_name])
+            result = cur.fetchall()
 
-        for row in cases_result:
+        for row in result:
             sql = "select distinct case_text.fid, source.name from case_text join source on case_text.fid=source.id "
             sql += "where caseid=? order by source.name asc"
             cur.execute(sql, [row[4], ])
             files_res = cur.fetchall()
-            case_memo = row[1]
-            if case_memo is None:
-                case_memo = ""  # Error catch
-            self.cases.append({'name': row[0], 'memo': case_memo, 'owner': row[2], 'date': row[3],
+            self.cases.append({'name': row[0], 'memo': row[1], 'owner': row[2], 'date': row[3],
                                'caseid': row[4], 'files': files_res, 'attributes': []})
         cur.execute("select name from attribute_type where caseOrFile='case'")
         attribute_names_res = cur.fetchall()
@@ -327,24 +358,14 @@ class DialogCases(QtWidgets.QDialog):
             self.header_labels.append(att_name[0])
             self.attribute_labels_ordered.append(att_name[0])
         # Add list if attribute values to cases, order matches header columns
-        sql = "select ifnull(value, '') from attribute where attr_type='case' and attribute.name=? order by id"
+        sql = "select ifnull(value, '') from attribute where attr_type='case' and attribute.name=? and id=?"
         for a in self.attribute_labels_ordered:
-            cur.execute(sql, [a])
-            att_result = cur.fetchall()
             for i, c in enumerate(self.cases):
-                try:
-                    c['attributes'].append(att_result[i][0])
-                except IndexError:
-                    # Rare but possible that attributes are not listed in attributes table for the case
-                    c['attributes'].append('')
-
-        # TODO reconsider this data structure
-        sql = "select attribute.name, value, id from attribute where attr_type='case'"
-        cur.execute(sql)
-        attr_result = cur.fetchall()
-        self.attributes = []
-        for row in attr_result:
-            self.attributes.append(row)
+                cur.execute(sql, [a, c['caseid']])
+                res = cur.fetchone()
+                if res:
+                    c['attributes'].append(res[0])
+        self.fill_table()
 
     def update_label(self):
         """ Update label when loading data, adding or deleting cases. """
@@ -598,6 +619,7 @@ class DialogCases(QtWidgets.QDialog):
             cur.execute("insert into attribute(name,attr_type,value,id,date,owner) \
                 values (?,?,?,?,?,?)",
                         (att[0], "case", "", item['caseid'], item['date'], item['owner']))
+            item['attributes'].append('')
         self.app.conn.commit()
         self.cases.append(item)
         self.fill_table()
@@ -688,13 +710,6 @@ class DialogCases(QtWidgets.QDialog):
             cur.execute("update attribute set value=?, date=?, owner=? where id=? and name=? and attr_type='case'",
                         (value, now_date, self.app.settings['codername'], self.cases[x]['caseid'], attribute_name))
             self.app.conn.commit()
-            # Reload attributes
-            sql = "select attribute.name, value, id from attribute where attr_type='case'"
-            cur.execute(sql)
-            result = cur.fetchall()
-            self.attributes = []
-            for row in result:
-                self.attributes.append(row)
         self.app.delete_backup = False
 
     def cell_selected(self):
@@ -808,7 +823,12 @@ class DialogCases(QtWidgets.QDialog):
 
         row = self.ui.tableWidget.currentRow()
         col = self.ui.tableWidget.currentColumn()
-        item_text = self.ui.tableWidget.item(row, col).text()
+        item_text = ""
+        try:
+            item_text = self.ui.tableWidget.item(row, col).text()
+        except AttributeError:  # NoneType error
+            pass
+
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         action_asc = None
@@ -820,6 +840,11 @@ class DialogCases(QtWidgets.QDialog):
             action_desc = menu.addAction(_("Order descending"))
         action_show_values_like = menu.addAction(_("Show values like"))
         action_equals_value = menu.addAction(_("Show this value"))
+        action_order_by_value_asc = None
+        action_order_by_value_desc = None
+        if col >= self.ATTRIBUTE_START_COLUMN:
+            action_order_by_value_asc = menu.addAction(_("Order ascending"))
+            action_order_by_value_desc = menu.addAction(_("Order descending"))
         action_show_all = menu.addAction(_("Show all rows Ctrl A"))
         action_url = None
         url_test = urlparse(item_text)
@@ -838,6 +863,10 @@ class DialogCases(QtWidgets.QDialog):
         if action == action_desc:
             self.load_cases_data("desc")
             self.fill_table()
+        if action == action_order_by_value_asc:
+            self.load_cases_data("attribute asc:" + self.header_labels[col])
+        if action == action_order_by_value_desc:
+            self.load_cases_data("attribute desc:" + self.header_labels[col])
         if action == action_equals_value:
             # Hide rows that do not match this value
             item_to_compare = self.ui.tableWidget.item(row, col)
@@ -892,17 +921,9 @@ class DialogCases(QtWidgets.QDialog):
             item.setToolTip(_("Click to manage files for this case"))
             self.ui.tableWidget.setItem(row, self.FILES_COLUMN, item)
             # Add attribute values to their columns
-            for a in self.attributes:
-                for col, header in enumerate(self.header_labels):
-                    if c['caseid'] == a[2] and a[0] == header:
-                        item = QtWidgets.QTableWidgetItem(str(a[1]))
-                        tt = self.get_tooltip_values(a[0])
-                        item.setToolTip(tt)
-                        self.ui.tableWidget.setItem(row, col, item)
-            '''#TODO may not work
             for offset, attribute in enumerate(c['attributes']):
                 item = QtWidgets.QTableWidgetItem(attribute)
-                self.ui.tableWidget.setItem(row, self.ATTRIBUTE_START_COLUMN + offset, item)'''
+                self.ui.tableWidget.setItem(row, self.ATTRIBUTE_START_COLUMN + offset, item)
         self.ui.tableWidget.verticalHeader().setVisible(False)
         self.ui.tableWidget.resizeRowsToContents()
         self.ui.tableWidget.hideColumn(self.ID_COLUMN)

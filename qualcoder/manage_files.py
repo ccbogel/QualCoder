@@ -131,7 +131,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         self.default_import_directory = self.app.settings['directory']
-        self.attributes = []
+        #self.attributes = []
         self.attribute_labels_ordered = []
         self.av_dialog_open = None
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
@@ -345,9 +345,11 @@ class DialogManageFiles(QtWidgets.QDialog):
         if col != self.MEMO_COLUMN:
             action_show_values_like = menu.addAction(_("Show values like"))
         action_equals_value = menu.addAction(_("Show this value"))
-        action_order_by_value = None
+        action_order_by_value_asc = None
+        action_order_by_value_desc = None
         if col > self.CASE_COLUMN:
-            action_order_by_value = menu.addAction(_("Order ascending"))
+            action_order_by_value_asc = menu.addAction(_("Order ascending"))
+            action_order_by_value_desc = menu.addAction(_("Order descending"))
         action_rename = None
         action_export = None
         action_delete = None
@@ -398,13 +400,14 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.load_file_data("filename desc")
         if action == action_date_asc:
             self.load_file_data("date")
-            #self.fill_table()
         if action == action_type:
             self.load_file_data("filetype")
         if action == action_casename_asc:
             self.load_file_data("casename")
-        if action == action_order_by_value:
-            self.load_file_data("attribute:" + self.header_labels[col])
+        if action == action_order_by_value_asc:
+            self.load_file_data("attribute asc:" + self.header_labels[col])
+        if action == action_order_by_value_desc:
+            self.load_file_data("attribute desc:" + self.header_labels[col])
         if action == action_equals_value:
             # Hide rows that do not match this value
             item_to_compare = self.ui.tableWidget.item(row, col)
@@ -691,7 +694,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                     placeholders = [attribute[0], source[0], datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                                     self.app.settings['codername']]
                     cur.execute(insert_sql, placeholders)
-                    self.app.conn.commit()
+        self.app.conn.commit()
 
         # Check and delete attribute values where file has been deleted
         attribute_to_del_sql = "SELECT distinct attribute.id FROM  attribute where \
@@ -750,7 +753,8 @@ class DialogManageFiles(QtWidgets.QDialog):
             order_by: string ""= name asc, "filename desc" = name desc,
             "date" = date, "filetype" = mediapath,
                 "casename" = by alphabetic casename
-                "attribute:attribute name" selected attribute
+                "attribute:attribute name" selected attribute - ascending
+                "attribute desc: attribute name ttribute - descending
         """
 
         # check a placeholder attribute is present for the file, add if missing
@@ -773,8 +777,8 @@ class DialogManageFiles(QtWidgets.QDialog):
             sql += "left join cases on cases.caseid=case_text.caseid "
             sql += "order by cases.name, source.name "
 
-        if order_by[:10] == "attribute:":
-            attribute_name = order_by[10:]
+        if order_by[:14] == "attribute asc:":
+            attribute_name = order_by[14:]
             # two types of ordering character or numeric
             cur.execute("select valuetype from attribute_type where name=?", [attribute_name])
             attr_type = cur.fetchone()[0]
@@ -786,6 +790,21 @@ class DialogManageFiles(QtWidgets.QDialog):
             else:
                 sql += "order by cast(attribute.value as numeric) asc"
             placeholders = [attribute_name]
+
+        if order_by[:15] == "attribute desc:":
+            attribute_name = order_by[15:]
+            # two types of ordering character or numeric
+            cur.execute("select valuetype from attribute_type where name=?", [attribute_name])
+            attr_type = cur.fetchone()[0]
+            sql = "select source.name, source.id, fulltext, mediapath, ifnull(source.memo,''), source.owner, "
+            sql += "source.date, av_text_id from source join attribute on attribute.id = source.id "
+            sql += " where attribute.attr_type = 'file' and attribute.name=? "
+            if attr_type == "character":
+                sql += "order by lower(attribute.value) desc "
+            else:
+                sql += "order by cast(attribute.value as numeric) desc"
+            placeholders = [attribute_name]
+
         if placeholders is not None:
             cur.execute(sql, placeholders)
         else:
@@ -798,34 +817,30 @@ class DialogManageFiles(QtWidgets.QDialog):
                                 'av_text_id': row[7], 'metadata': metadata, 'icon': icon,
                                 'case': self.get_cases_by_filename(row[0]),
                                 'attributes': []})
-        # Attributes
+
         self.header_labels = [_("Name"), _("Memo"), _("Date"), _("Id"), _("Case")]
+        # Attributes
         sql = "select name from attribute_type where caseOrFile='file'"
         cur.execute(sql)
         attribute_names_res = cur.fetchall()
         self.attribute_names = []  # for AddAtribute dialog
-        self.attribute_labels_ordered = []  # helps filling table
+        self.attribute_labels_ordered = []  # Helps filling table more quickly
         for att_name in attribute_names_res:
             self.header_labels.append(att_name[0])
             self.attribute_labels_ordered.append(att_name[0])
             self.attribute_names.append({'name': att_name[0]})  # for AddAtribute dialog
-        # Add list of attribute values to cases, order matches header columns
-        sql = "select ifnull(value, '') from attribute where attr_type='file' and attribute.name=? order by id"
-        for a in self.attribute_labels_ordered:
-            cur.execute(sql, [a])
-            att_result = cur.fetchall()
-            for i, c in enumerate(self.source):
-                c['attributes'].append(att_result[i][0])
-
-        # TODO reconsider this data structure
-        sql = "select attribute.name, value, id from attribute join attribute_type on \
-        attribute_type.name=attribute.name where attribute_type.caseOrFile='file'"
-        cur.execute(sql)
-        result = cur.fetchall()
-        self.attributes = []
-        for row in result:
-            self.attributes.append(row)
-
+        # Add list of attribute values to files, order matches header columns
+        sql = "select ifnull(value, '') from attribute where attr_type='file' and attribute.name=? and id=?"
+        for s in self.source:
+            for att_name in self.attribute_labels_ordered:
+                cur.execute(sql, [att_name, s['id']])
+                res = cur.fetchone()
+                if res:
+                    tmp = res[0]
+                    # For nicer display
+                    if att_name == "Ref_authors":
+                        tmp = tmp.replace(";", "\n")
+                    s['attributes'].append(tmp)
         self.fill_table()
 
     def get_icon_and_metadata(self, id_):
@@ -1199,26 +1214,25 @@ class DialogManageFiles(QtWidgets.QDialog):
             return
 
         # Create entry details to add to self.source and to database
-        entry = {'name': name, 'id': -1, 'fulltext': '', 'memo': "",
+        item = {'name': name, 'id': -1, 'fulltext': '', 'memo': "",
                  'owner': self.app.settings['codername'], 'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                  'mediapath': None, 'icon': None, 'metadata': '', 'case': ""}
         # Update database
         cur = self.app.conn.cursor()
         cur.execute("insert into source(name,fulltext,mediapath,memo,owner,date) values(?,?,?,?,?,?)",
                     (
-                        entry['name'], entry['fulltext'], entry['mediapath'], entry['memo'], entry['owner'],
-                        entry['date']))
+                        item['name'], item['fulltext'], item['mediapath'], item['memo'], item['owner'],
+                        item['date']))
         self.app.conn.commit()
         cur.execute("select last_insert_rowid()")
         id_ = cur.fetchone()[0]
-        entry['id'] = id_
+        item['id'] = id_
         ui = DialogEditTextFile(self.app, id_)
         ui.exec()
         icon, metadata = self.get_icon_and_metadata(id_)
-        entry['icon'] = icon
-        entry['metadata'] = metadata
-        entry['attributes'] = []
-
+        item['icon'] = icon
+        item['metadata'] = metadata
+        item['attributes'] = []
         # Add file attribute placeholders
         att_sql = 'select name from attribute_type where caseOrFile ="file"'
         cur.execute(att_sql)
@@ -1229,10 +1243,10 @@ class DialogManageFiles(QtWidgets.QDialog):
                             self.app.settings['codername']]
             cur.execute(insert_sql, placeholders)
             self.app.conn.commit()
-            entry['attributes'].append('')
+            item['attributes'].append('')
         self.update_files_in_dialogs()
-        self.parent_text_edit.append(_("File created: ") + entry['name'])
-        self.source.append(entry)
+        self.parent_text_edit.append(_("File created: ") + item['name'])
+        self.source.append(item)
         self.fill_table()
         self.app.delete_backup = False
 
@@ -2012,23 +2026,11 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.ui.tableWidget.setItem(row, self.CASE_COLUMN, case_item)
             # Add the attribute values
             #TODO consider using role type for numerics
-            # Add the attribute values
-            for a in self.attributes:
-                for col, header in enumerate(self.header_labels):
-                    if fid == a[2] and a[0] == header:
-                        item = QtWidgets.QTableWidgetItem(str(a[1]))
-                        tt = self.get_tooltip_values(a[0])
-                        item.setToolTip(tt)
-                        self.ui.tableWidget.setItem(row, col, item)
-            '''#TOSO Flawed
             for offset, attribute in enumerate(data['attributes']):
-                value = attribute
-                if self.attribute_labels_ordered[offset] == "Ref_Authors":
-                    value = value.replace(";", "\n")
-                item = QtWidgets.QTableWidgetItem(value)
+                item = QtWidgets.QTableWidgetItem(attribute)
                 self.ui.tableWidget.setItem(row, self.ATTRIBUTE_START_COLUMN + offset, item)
                 if self.attribute_labels_ordered[offset] in ("Ref_Authors", "Ref_Title", "Ref_Type", "Ref_Year"):
-                    item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)'''
+                    item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
         # Resize columns and rows
         self.ui.tableWidget.hideColumn(self.ID_COLUMN)
         if self.app.settings['showids']:
