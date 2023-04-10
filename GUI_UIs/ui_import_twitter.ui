@@ -72,19 +72,6 @@
        <string>Select file</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_import">
-      <property name="geometry">
-       <rect>
-        <x>230</x>
-        <y>80</y>
-        <width>181</width>
-        <height>30</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Import file</string>
-      </property>
-     </widget>
      <widget class="QLabel" name="label_file">
       <property name="geometry">
        <rect>
