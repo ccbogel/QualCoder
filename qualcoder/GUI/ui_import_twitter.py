@@ -36,9 +36,6 @@ class Ui_Dialog_Import_twitter(object):
         self.pushButton_select_file = QtWidgets.QPushButton(self.groupBox)
         self.pushButton_select_file.setGeometry(QtCore.QRect(10, 80, 211, 30))
         self.pushButton_select_file.setObjectName("pushButton_select_file")
-        self.pushButton_import = QtWidgets.QPushButton(self.groupBox)
-        self.pushButton_import.setGeometry(QtCore.QRect(230, 80, 181, 30))
-        self.pushButton_import.setObjectName("pushButton_import")
         self.label_file = QtWidgets.QLabel(self.groupBox)
         self.label_file.setGeometry(QtCore.QRect(420, 80, 481, 30))
         self.label_file.setText("")
@@ -57,7 +54,6 @@ class Ui_Dialog_Import_twitter(object):
         self.groupBox.setTitle(_translate("Dialog_Import_twitter", "Import twitter data file"))
         self.label_information.setText(_translate("Dialog_Import_twitter", "Use the R statistics package to get the twitter data and create a csv file. Then import the csv file."))
         self.pushButton_select_file.setText(_translate("Dialog_Import_twitter", "Select file"))
-        self.pushButton_import.setText(_translate("Dialog_Import_twitter", "Import file"))
 
 
 if __name__ == "__main__":
