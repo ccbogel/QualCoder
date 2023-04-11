@@ -348,10 +348,11 @@ information = '#  This is an experimental function.\n\
 If you have an existing CSV fully quoted file of tweet data that contains at a minimum these exact headings:\n\
 id, full_text, screen_name\n\
 Then QualCoder should import the tweet data\n\
-Additional tweet fields may be: created_at, coordinates, retweet_count, favorite_count, lang\n\
-Additional user fields may be:\n\
+Additional tweet fields must be: created_at, coordinates, retweet_count, favorite_count, lang\n\
+Additional user fields must be:\n\
 location, url, description, followers_count, friends_count, listed_count, favourites_count, statuses_count\n\
 Each tweet will be a source file in QualCoder. Each user will be a case in QualCoder.\n\
+There is an example csv file in the Examples folder called: rtweet_judo_tweets_data.csv\n\
 \n\
 As of 10th April 2023 these instructions may no longer work. You may need to pay for twitter authentication and rtweet may or may not work.\n\
 Instructions for getting twitter data using the R Statistics Package\n\
