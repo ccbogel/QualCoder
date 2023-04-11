@@ -175,8 +175,14 @@ class DialogReportCodes(QtWidgets.QDialog):
             if s0 > 10 and s1 > 10:
                 self.ui.splitter.setSizes([s0, s1, 0])
             v0 = int(self.app.settings['dialogreportcodes_splitter_v0'])
+            if v0 < 10:
+                v0 == 10
             v1 = int(self.app.settings['dialogreportcodes_splitter_v1'])
+            if v1 < 10:
+                v1 == 10
             v2 = int(self.app.settings['dialogreportcodes_splitter_v2'])
+            if v2 < 10:
+                v2 == 10
             self.ui.splitter_vert.setSizes([v0, v1, v2])
         except KeyError:
             pass
@@ -197,9 +203,9 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.app.settings['dialogreportcodes_splitter0'] = sizes[0]
         self.app.settings['dialogreportcodes_splitter1'] = sizes[1]
         sizes_vert = self.ui.splitter_vert.sizes()
-        self.app.settings['dialogreportcodes_splitter_v0'] = sizes_vert[0]
-        self.app.settings['dialogreportcodes_splitter_v1'] = sizes_vert[1]
-        self.app.settings['dialogreportcodes_splitter_v2'] = sizes_vert[2]
+        self.app.settings['dialogreportcodes_splitter_v0'] = max(sizes_vert[0], 10)
+        self.app.settings['dialogreportcodes_splitter_v1'] = max(sizes_vert[1], 10)
+        self.app.settings['dialogreportcodes_splitter_v2'] = max(sizes_vert[2], 10)
 
     def get_files_and_cases(self):
         """ Get source files with additional details and fill files list widget.
