@@ -892,8 +892,7 @@ class DialogCases(QtWidgets.QDialog):
             webbrowser.open(item_text)
 
     def fill_table(self):
-        """ Fill the table widget with case details.
-        Slow with lots of cases. So trying pagination. """
+        """ Fill the table widget with case details. """
 
         self.update_label()
         self.ui.tableWidget.blockSignals(True)
@@ -929,9 +928,6 @@ class DialogCases(QtWidgets.QDialog):
         self.ui.tableWidget.hideColumn(self.ID_COLUMN)
         if self.app.settings['showids']:
             self.ui.tableWidget.showColumn(self.ID_COLUMN)
-        '''# Add generic header to table
-        for i in range(0, self.ATTRIBUTE_START_COLUMN):
-            self.ui.tableWidget.horizontalHeaderItem(i).setToolTip(_("Right click header row to hide columns"))'''
         # Add statistics tooltips to table headers for attributes
         for i, attribute_name in enumerate(self.attribute_labels_ordered):
             tt = self.get_tooltip_values(attribute_name)
