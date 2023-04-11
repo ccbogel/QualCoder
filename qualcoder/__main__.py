@@ -258,7 +258,7 @@ class App(object):
 
     def get_category_names(self):
         cur = self.conn.cursor()
-        cur.execute("select name, memo, owner, date, catid, supercatid from code_cat order by lower(name)")
+        cur.execute("select name, ifnull(memo,''), owner, date, catid, supercatid from code_cat order by lower(name)")
         result = cur.fetchall()
         res = []
         keys = 'name', 'memo', 'owner', 'date', 'catid', 'supercatid'
@@ -268,7 +268,7 @@ class App(object):
 
     def get_code_names(self):
         cur = self.conn.cursor()
-        cur.execute("select name, memo, owner, date, cid, catid, color from code_name order by lower(name)")
+        cur.execute("select name, ifnull(memo,''), owner, date, cid, catid, color from code_name order by lower(name)")
         result = cur.fetchall()
         res = []
         keys = 'name', 'memo', 'owner', 'date', 'cid', 'catid', 'color'
@@ -289,7 +289,7 @@ class App(object):
     def get_casenames(self):
         """ Get all case names. As id, name, memo. """
         cur = self.conn.cursor()
-        cur.execute("select caseid, name, memo from cases order by lower(name)")
+        cur.execute("select caseid, name, ifnull(memo,'') from cases order by lower(name)")
         result = cur.fetchall()
         res = []
         for row in result:
@@ -303,7 +303,7 @@ class App(object):
 
         if ids is None:
             ids = []
-        sql = "select id, name, memo, mediapath from source where (mediapath is Null or mediapath like '/docs/%' or mediapath like 'docs:%') "
+        sql = "select id, name, ifnull(memo,''), mediapath from source where (mediapath is Null or mediapath like '/docs/%' or mediapath like 'docs:%') "
         if ids:
             str_ids = list(map(str, ids))
             sql += " and id in (" + ",".join(str_ids) + ")"
