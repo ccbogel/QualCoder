@@ -208,6 +208,12 @@ class ViewCharts(QDialog):
         cur = self.app.conn.cursor()
         # Run a series of sql based on each selected attribute
         # Apply a set to the resulting ids to determine the final list of ids
+
+        #TODO ATTRS: [['BOOLEAN_OR'], ['Age', 'case', 'numeric', '>', ['10']], ['source', 'file', 'character', '=', ["'internal'"]]]
+        # see report_attributes.py
+        # select_attributes_file_ids
+        # select_attributes_case_file_ids
+        print("ATTRS:", attributes)
         for a in attributes:
             # File attributes
             file_sql = "select id from attribute where "
