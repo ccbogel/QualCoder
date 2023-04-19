@@ -175,12 +175,8 @@ class ViewCharts(QDialog):
 
     # DATA FILTERS SECTION
     def select_attributes(self):
-        """ Select files based on attribute selections.
-        Attribute results are a dictionary of:
-        [0] attribute name,
-        [1] attribute type: character, numeric
-        [2] modifier: > < == != like between
-        [3] comparison value as list, one item or two items for between
+        """ Select files based on attribute selections usind DialogSecectAttributeParameters.
+        Attribute selection results are a list of:
 
         DialogSelectAttributeParameters returns lists for each parameter selected of:
         attribute name, file or case, character or numeric, operator, list of one or two comparator values
@@ -188,12 +184,22 @@ class ViewCharts(QDialog):
         ['source', 'file', 'character', '==', ["'interview'"]]
         ['case name', 'case', 'character', '==', ["'ID1'"]]
 
+        [0] boolean or OR boolean and
+        [1] ...[n] each select attribute
+        [['BOOLEAN_OR'], ['Age', 'case', 'numeric', '>', ['10']], ['source', 'file', 'character', '=', ["'internal'"]]]
+        Each selected attribute contains:
+        [0] attribute name,
+        [1] case or file
+        [2] attribute type: character, numeric
+        [3] modifier: > < == != like between
+        [4] comparison value as list, one item or two items for between
+
         sqls are NOT parameterised.
         Results from multiple parameters are intersected, an AND boolean function.
         Results stored in attribute_file_ids as list of file_id integers
         """
 
-        self.attribute_case_ids = []
+        self.attribute_case_ids = []  # TODO unsure here
         self.attribute_file_ids = []
         self.attributes_msg = ""
         ui = DialogSelectAttributeParameters(self.app)
@@ -202,126 +208,14 @@ class ViewCharts(QDialog):
         if not ok:
             self.ui.pushButton_attributes.setToolTip("")
             return
-        attributes = ui.parameters
-        file_ids = []
-        case_file_ids = []
-        cur = self.app.conn.cursor()
         # Run a series of sql based on each selected attribute
         # Apply a set to the resulting ids to determine the final list of ids
-
-        #TODO ATTRS: [['BOOLEAN_OR'], ['Age', 'case', 'numeric', '>', ['10']], ['source', 'file', 'character', '=', ["'internal'"]]]
-        # see report_attributes.py
-        # select_attributes_file_ids
-        # select_attributes_case_file_ids
-        print("ATTRS:", attributes)
-        and_or = attributes.pop(0)[0]  # first item is the and / or bollean operator
-        #TODO use the methods in the report_attributes.py
-        #file_ids = ui.get_results_file_ids()  # using file and case parameters
-        for a in attributes:
-            # File attributes
-            file_sql = "select id from attribute where "
-            if a[1] == 'file':
-                file_sql += "attribute.name = '" + a[0] + "' "
-                file_sql += " and attribute.value " + a[3] + " "
-                if a[3] == 'between':
-                    file_sql += a[4][0] + " and " + a[4][1] + " "
-                if a[3] in ('in', 'not in'):
-                    file_sql += "(" + ','.join(a[4]) + ") "  # One item the comma is skipped
-                if a[3] not in ('between', 'in', 'not in'):
-                    file_sql += a[4][0]
-                if a[2] == 'numeric':
-                    file_sql = file_sql.replace(' attribute.value ', ' cast(attribute.value as real) ')
-                file_sql += " and attribute.attr_type='file'"
-                cur.execute(file_sql)
-                result = cur.fetchall()
-                for i in result:
-                    file_ids.append(i[0])
-            # Case attributes
-            if a[1] == 'case':
-                # Get case ids for heatmap charts
-                case_sql = "select distinct cases.caseid, cases.name from cases "
-                case_sql += "join case_text on case_text.caseid=cases.caseid "
-                case_sql += "join attribute on cases.caseid=attribute.id "
-                case_sql += " where "
-                case_sql += "attribute.name = '" + a[0] + "' "
-                case_sql += " and attribute.value " + a[3] + " "
-                if a[3] == 'between':
-                    case_sql += a[4][0] + " and " + a[4][1] + " "
-                if a[3] in ('in', 'not in'):
-                    case_sql += "(" + ','.join(a[4]) + ") "  # One item the comma is skipped
-                if a[3] not in ('between', 'in', 'not in'):
-                    case_sql += a[4][0]
-                if a[2] == 'numeric':
-                    case_sql = case_sql.replace(' attribute.value ', ' cast(attribute.value as real) ')
-                case_sql += " and attribute.attr_type='case'"
-                # print("Attribute selected: ", a)
-                # print(case_sql)
-                cur.execute(case_sql)
-                case_id_and_name_result = cur.fetchall()
-                for c in case_id_and_name_result:
-                    self.attribute_case_ids_and_names.append(c)
-
-                # Case text table also links av and images
-                case_sql = "select distinct case_text.fid from cases "
-                case_sql += "join case_text on case_text.caseid=cases.caseid "
-                case_sql += "join attribute on cases.caseid=attribute.id "
-                case_sql += " where "
-                case_sql += "attribute.name = '" + a[0] + "' "
-                case_sql += " and attribute.value " + a[3] + " "
-                if a[3] == 'between':
-                    case_sql += a[4][0] + " and " + a[4][1] + " "
-                if a[3] in ('in', 'not in'):
-                    case_sql += "(" + ','.join(a[4]) + ") "  # One item the comma is skipped
-                if a[3] not in ('between', 'in', 'not in'):
-                    case_sql += a[4][0]
-                if a[2] == 'numeric':
-                    case_sql = case_sql.replace(' attribute.value ', ' cast(attribute.value as real) ')
-                case_sql += " and attribute.attr_type='case'"
-                # print("Attribute selected: ", a)
-                # print(case_sql)
-                cur.execute(case_sql)
-                case_result = cur.fetchall()
-                for i in case_result:
-                    case_file_ids.append(i[0])
-        # Consolidate case and file ids
-        if file_ids == [] and case_file_ids == []:
-            Message(self.app, "Nothing found", "Nothing found").exec()
-            self.ui.pushButton_attributes.setToolTip("")
-            return
-        # Clear any visible file and case selections
-        self.ui.comboBox_file.setCurrentIndex(0)
-        self.ui.comboBox_case.setCurrentIndex(0)
-
-        set_ids = {}
-        set_file_ids = set(file_ids)
-        set_case_file_ids = set(case_file_ids)
-        # Intersect case file ids and file ids
-        if file_ids != [] and case_file_ids != []:
-            set_ids = set_file_ids.intersection(set_case_file_ids)
-        if file_ids != [] and case_file_ids == []:
-            set_ids = set_file_ids
-        if file_ids == [] and case_file_ids != []:
-            set_ids = set_case_file_ids
-        self.attribute_file_ids = list(set_ids)
-        # print("Attribute file ids", self.attribute_file_ids)
-        # Prepare message for button
-        file_msg = ""
-        case_msg = ""
-        for a in attributes:
-            # attr: [['BOOLEAN_OR'], ['Age', 'case', 'numeric', '>', ['10']], ['source', 'file', 'character', '=', ["'internal'"]]]
-            if a[1] == 'file':
-                file_msg += " " + and_or + " " + a[0] + " " + a[3] + " " + ",".join(a[4])
-        #if len(file_msg) > 4:
-        file_msg = "(" + _("File: ") + file_msg[3:] + ")"
-        for a in attributes:
-            if a[1] == 'case':
-                case_msg += " " + and_or + " " + a[0] + " " + a[3] + " " + ",".join(a[4])
-        #if len(case_msg) > 5:
-        case_msg = "(" + _("Case: ") + case_msg[4:] + ")"
-        if file_msg != "" and case_msg != "":
-            self.attributes_msg = file_msg + " and " + case_msg
-        else:
-            self.attributes_msg = file_msg + case_msg
+        # use the methods in the report_attributes.py
+        # using file and case parameters and selected 'and' or 'or'
+        self.attribute_file_ids = ui.result_file_ids
+        print("FILE IDS", self.attribute_file_ids)
+        self.attributes_msg = ui.tooltip_msg
+        print("ATTR MSG", self.attributes_msg)
         self.ui.pushButton_attributes.setToolTip(self.attributes_msg)
 
     def clear_combobox_files(self):
