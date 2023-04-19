@@ -214,6 +214,9 @@ class ViewCharts(QDialog):
         # select_attributes_file_ids
         # select_attributes_case_file_ids
         print("ATTRS:", attributes)
+        and_or = attributes.pop(0)[0]  # first item is the and / or bollean operator
+        #TODO use the methods in the report_attributes.py
+        #file_ids = ui.get_results_file_ids()  # using file and case parameters
         for a in attributes:
             # File attributes
             file_sql = "select id from attribute where "
@@ -305,15 +308,16 @@ class ViewCharts(QDialog):
         file_msg = ""
         case_msg = ""
         for a in attributes:
+            # attr: [['BOOLEAN_OR'], ['Age', 'case', 'numeric', '>', ['10']], ['source', 'file', 'character', '=', ["'internal'"]]]
             if a[1] == 'file':
-                file_msg += " or " + a[0] + " " + a[3] + " " + ",".join(a[4])
-        if len(file_msg) > 4:
-            file_msg = "(" + _("File: ") + file_msg[3:] + ")"
+                file_msg += " " + and_or + " " + a[0] + " " + a[3] + " " + ",".join(a[4])
+        #if len(file_msg) > 4:
+        file_msg = "(" + _("File: ") + file_msg[3:] + ")"
         for a in attributes:
             if a[1] == 'case':
-                case_msg += " or " + a[0] + " " + a[3] + " " + ",".join(a[4])
-        if len(case_msg) > 5:
-            case_msg = "(" + _("Case: ") + case_msg[4:] + ")"
+                case_msg += " " + and_or + " " + a[0] + " " + a[3] + " " + ",".join(a[4])
+        #if len(case_msg) > 5:
+        case_msg = "(" + _("Case: ") + case_msg[4:] + ")"
         if file_msg != "" and case_msg != "":
             self.attributes_msg = file_msg + " and " + case_msg
         else:
