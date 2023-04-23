@@ -605,7 +605,8 @@ class DialogCases(QtWidgets.QDialog):
             return
         # update case list and database
         item = {'name': case_name, 'memo': "", 'owner': self.app.settings['codername'],
-                'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'files': []}
+                'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'files': [],
+                'attributes': []}
         cur = self.app.conn.cursor()
         sql = "insert into cases (name,memo,owner,date) values(?,?,?,?)"
         cur.execute(sql, (item['name'], item['memo'], item['owner'], item['date']))
