@@ -221,15 +221,18 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
         set_file_ids = set(file_ids)
         set_case_file_ids = set(case_file_ids)
         # 'and' attribute radio button selected
+        #print("get results file ids Files: ", set_file_ids)
+        #print("get results file ids Cases: ", set_case_file_ids)
         if file_ids != [] and case_file_ids != [] and self.parameters[0][0] == "BOOLEAN_AND":
             set_ids = set_file_ids.intersection(set_case_file_ids)
         # 'or' attribute radio button selected
-        if file_ids != [] and case_file_ids != [] and self.parameters[0][0] == "BOOLEAN_AND":
+        if file_ids != [] and case_file_ids != [] and self.parameters[0][0] == "BOOLEAN_OR":
             set_ids = set_file_ids.union(set_case_file_ids)
         if file_ids != [] and case_file_ids == []:
             set_ids = set_file_ids
         if file_ids == [] and case_file_ids != []:
             set_ids = set_case_file_ids
+        #print("set ids: ", set_ids)
         self.result_file_ids = list(set_ids)
 
     def get_results_message(self):
