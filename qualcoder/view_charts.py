@@ -213,9 +213,7 @@ class ViewCharts(QDialog):
         # use the methods in the report_attributes.py
         # using file and case parameters and selected 'and' or 'or'
         self.attribute_file_ids = ui.result_file_ids
-        print("FILE IDS", self.attribute_file_ids)
         self.attributes_msg = ui.tooltip_msg
-        print("ATTR MSG", self.attributes_msg)
         self.ui.pushButton_attributes.setToolTip(self.attributes_msg)
 
     def clear_combobox_files(self):
