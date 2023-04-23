@@ -1,4 +1,5 @@
 SOURCES         = ui_dialog_add_item.py \
+ui_attribute.py \
 ui_dialog_assign_attribute.py \
 ui_case_file_manager.py \
 ui_dialog_cases.py \
