@@ -1342,7 +1342,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             # Coded text
             sql = "select code_name.name, color, cases.name, "
             sql += "code_text.pos0, code_text.pos1, seltext, code_text.owner, code_text.fid, "
-            sql += "ifnull(cases.memo,''), ifnul(code_text.memo,''), ifnull(code_name.memo,''), "
+            sql += "ifnull(cases.memo,''), ifnull(code_text.memo,''), ifnull(code_name.memo,''), "
             sql += "ifnull(source.memo,''), ctid, code_name.cid "
             sql += "from code_text join code_name on code_name.cid = code_text.cid "
             sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
