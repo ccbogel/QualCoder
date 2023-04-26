@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2022 Colin Curtain
+Copyright (c) 2023 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,7 @@ languages = ['de', 'es', 'fr', 'it', 'pt']
 
 
 class CreateHelperFile:
-    """ Create an output python file with converted languaged into base64
+    """ Create an output python file with converted languages into base64
     The output file is used as a helper file in QualCoder
     This helps to get around translation data failing to load depending on where qualcoder
     is called from. Important for use with pyinstaller as accessing data files does not work well.
@@ -42,7 +42,7 @@ class CreateHelperFile:
     def __init__(self):
 
         header = '#!/usr/bin/python\n# -*- coding: utf-8 -*-\n\
-        \n"""\nCopyright (c) 2021 Colin Curtain\n\n\
+        \n"""\nCopyright (c) 2023 Colin Curtain\n\n\
         Permission is hereby granted, free of charge, to any person obtaining a copy\n\
         of this software and associated documentation files (the "Software"), to deal\n\
         in the Software without restriction, including without limitation the rights\n\
