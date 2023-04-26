@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2021 Colin Curtain
+Copyright (c) 2023 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -35,16 +35,15 @@ import base64
 import os
 
 
-class CreateHelperFile():
+class CreateHelperFile:
     """ This helps to get around icon data failing to load depending on where qualcoder
      is called from.  Important for use with pyinstaller as accessing data files does not work well.
     """
 
     def __init__(self):
-        #super(CreateHellpderFile, self).__init__()
 
         header = '#!/usr/bin/python\n# -*- coding: utf-8 -*-\n\
-        \n"""\nCopyright (c) 2021 Colin Curtain\n\n\
+        \n"""\nCopyright (c) 2023 Colin Curtain\n\n\
         Permission is hereby granted, free of charge, to any person obtaining a copy\n\
         of this software and associated documentation files (the "Software"), to deal\n\
         in the Software without restriction, including without limitation the rights\n\
