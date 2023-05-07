@@ -82,13 +82,13 @@ codebook = '<?xml version="1.0" encoding="UTF-8"?>\n\
 <xsd:attribute name="guid" type="GUIDType" use="required"/>\n\
 </xsd:complexType>\n\
 <xsd:simpleType name="GUIDType">\n\
-<xsd:restrictionbase="xsd:token">\n\
-<xsd:patternvalue="([0‐9a‐fA‐F]{8}‐[0‐9a‐fA‐F]{4}‐[0‐9a‐fA‐F]{4}‐[0‐9a‐fA‐F]{4}‐[0‐9a‐fA‐F]{12})|(\{[0‐9a‐fA‐F]{8}‐[0‐9a‐fA‐F]{4}‐[0‐9a‐fA‐F]{4}‐[0‐9a‐fA‐F]{4}‐[0‐9a‐fA‐F]{12}\})"/>\n\
+<xsd:restriction base="xsd:token">\n\
+<xsd:pattern value="([0‐9a‐fA‐F]{8}‐[0‐9a‐fA‐F]{4}‐[0‐9a‐fA‐F]{4}‐[0‐9a‐fA‐F]{4}‐[0‐9a‐fA‐F]{12})|(\{[0‐9a‐fA‐F]{8}‐[0‐9a‐fA‐F]{4}‐[0‐9a‐fA‐F]{4}‐[0‐9a‐fA‐F]{4}‐[0‐9a‐fA‐F]{12}\})"/>\n\
 </xsd:restriction>\n\
 </xsd:simpleType>\n\
 <xsd:simpleType name="RGBType">\n\
-<xsd:restrictionbase="xsd:token">\n\
-<xsd:patternvalue="#([A‐Fa‐f0‐9]{6}|[A‐Fa‐f0‐9]{3})"/>\n\
+<xsd:restriction base="xsd:token">\n\
+<xsd:pattern value="#([A‐Fa‐f0‐9]{6}|[A‐Fa‐f0‐9]{3})"/>\n\
 </xsd:restriction>\n\
 </xsd:simpleType>\n\
 </xsd:schema>'
