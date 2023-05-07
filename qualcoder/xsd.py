@@ -34,7 +34,7 @@ Hard-coding reduces potential problems when pyinstaller tries to import data fil
 """
 
 
-codebook = '<?xml version="1.0" encoding="UTF-8"?>\n\
+xsd_codebook = '<?xml version="1.0" encoding="UTF-8"?>\n\
 <xsd:schema xmlns="urn:QDA-XML:codebook:1.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="urn:QDA-XML:codebook:1.0" elementFormDefault="qualified" attributeFormDefault="unqualified" version="1.0">\n\
 <!-- =====ElementDeclarations===== ‐‐>\n\
 <xsd:element name="CodeBook" type="CodeBookType">\n\
@@ -53,11 +53,12 @@ codebook = '<?xml version="1.0" encoding="UTF-8"?>\n\
 </xsd:complexType>\n\
 <xsd:complexType name="CodesType">\n\
 <xsd:sequence>\n\
-<xsd:element name="Code"type="CodeType" maxOccurs="unbounded"/>\n\
-</xsd:sequence></xsd:complexType>\n\
+<xsd:element name="Code" type="CodeType" maxOccurs="unbounded"/>\n\
+</xsd:sequence>\n\
+</xsd:complexType>\n\
 <xsd:complexType name="SetsType">\n\
 <xsd:sequence>\n\
-<xsd:element name="Set"type="SetType" maxOccurs="unbounded"/>\n\
+<xsd:element name="Set" type="SetType" maxOccurs="unbounded"/>\n\
 </xsd:sequence>\n\
 </xsd:complexType>\n\
 <xsd:complexType name="CodeType">\n\
@@ -93,7 +94,7 @@ codebook = '<?xml version="1.0" encoding="UTF-8"?>\n\
 </xsd:simpleType>\n\
 </xsd:schema>'
 
-project = '<?xml version="1.0" encoding="UTF-8"?>\n\
+xsd_project = '<?xml version="1.0" encoding="UTF-8"?>\n\
 <!-- edited with XMLSpy v2005 rel. 3 U (http://www.altova.com) by  Fred van Blommestein -->\n\
 <!--  Library: QDA-XML version 1.0  Release Date: 18 March 2019 Module: Project.xsd  -->\n\
 <!-- ===== Copyright Notice ===== -->\n\

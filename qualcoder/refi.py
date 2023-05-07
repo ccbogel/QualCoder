@@ -40,13 +40,13 @@ import sys
 import traceback
 import uuid
 import xml.etree.ElementTree as etree
-#import xmlschema  # TODO
+import xmlschema
 import zipfile
 
 from PyQt6 import QtWidgets, QtCore
 
 from .color_selector import colors, color_matcher
-from .xsd import codebook, project
+from .xsd import xsd_codebook, xsd_project
 from .GUI.ui_dialog_refi_export_endings import Ui_Dialog_refi_export_line_endings
 from .helpers import Message
 
@@ -151,13 +151,13 @@ class RefiImport:
 
     def import_codebook(self):
         """ Import REFI-QDA standard codebook into opened project.
-        Codebooks do not validate using the qdasoftware.org Codebook.xsd generated on 2017-10-05 16:17z"""
+        """
 
         tree = etree.parse(self.file_path)  # get element tree object
         root = tree.getroot()
         # look for the Codes tag, which contains each Code element
         for child in root:
-            # print("CB:", cb, "tag:", cb.tag)  # 1 only , Codes
+            #print("CB:", child, "tag:", child.tag)  # 1 only , Codes
             if child.tag in ("{urn:QDA-XML:codebook:1.0}Codes", "{urn:QDA-XML:project:1.0}Codes"):
                 counter = 0
                 code_elements = list(child)  # list of children of child element
@@ -1855,20 +1855,18 @@ class RefiImport:
         return: true or false passing validation
         """
 
-        return True   # TODO
-        file_xsd = codebook
-        #TODO unclosed codebook token line 3 col 0
-        '''if xsd_type != "codebook":
-            file_xsd = project
+        file_xsd = xsd_codebook
+        if xsd_type != "codebook":
+            file_xsd = xsd_project
         xsd = xmlschema.XMLSchema(file_xsd)
         try:
             result = xsd.is_valid(self.xml)
             print("Valid xml")
             return True
         except Exception as e_:
-            print(e_)
+            print("Invalid xml", e_)
             logger.error(e_)
-            return False'''
+            return False
 
 
 class RefiLineEndings(QtWidgets.QDialog):
@@ -1974,18 +1972,18 @@ class RefiExport(QtWidgets.QDialog):
             # print(s['id'], s['name'], s['mediapath'], s['filename'], s['plaintext_filename'], s['external'])
             destination = '/Sources/' + s['filename']
             if s['mediapath'] is not None and s['external'] is None:
-                try:
+                if True: #try:
                     if s['external'] is None:
-                        shutil.copyfile(self.app.project_path + s['mediapath'],
+                        shutil.copyfile(self.app.project_path + s['mediapath'].replace("/docs/", "/documents/"),
                                         prep_path + destination)
                     else:
                         shutil.copyfile(self.app.project_path + s['mediapath'],
                                         self.app.settings['directory'] + '/' + s['filename'])
-                except FileNotFoundError as err:
+                '''except FileNotFoundError as err:
                     txt_errors += "Error in media export: " + s['filename'] + "\n" + str(err)
                     msg = "ERROR in refi.export_project. media export: " + s['filename'] + "\n" + str(err)
                     print(msg)
-                    logger.warning(msg)
+                    logger.warning(msg)'''
             if s['mediapath'] is None:  # an internal document
                 try:
                     shutil.copyfile(self.app.project_path + '/documents/' + s['name'],
@@ -3191,14 +3189,16 @@ class RefiExport(QtWidgets.QDialog):
             No return value
         """
 
-        return True  # TODO tmp
-        # TODO unclosed codebook token line 3 col 0
-        '''file_xsd = codebook
+        file_xsd = xsd_codebook
         if xsd_type != "codebook":
-            file_xsd = project
-        print("file xsd\n", file_xsd)
-
-        xsd = xmlschema.XMLSchema(file_xsd)
+            file_xsd = xsd_project
+        #print(file_xsd)
+        # TODO codebook: ParseError unclosed token line 3 col 0
+        try:
+            xsd = xmlschema.XMLSchema(file_xsd)
+        except xmlschema.XMLSchemaException as e_:
+            print(xsd_type, e_)
+            return False
         try:
             result = xsd.is_valid(self.xml)
             print("Valid xml")
@@ -3207,4 +3207,4 @@ class RefiExport(QtWidgets.QDialog):
             print(e_)
             logger.error(e_)
             print(self.xml)
-            return False'''
+            return False
