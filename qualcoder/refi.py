@@ -49,12 +49,12 @@ from .xsd import codebook, project
 from .GUI.ui_dialog_refi_export_endings import Ui_Dialog_refi_export_line_endings
 from .helpers import Message
 
-# If lxml not imported it will not crash. (a bug in python 3.11 lxml build errors)
+"""# If lxml not imported it will not crash. (a bug in python 3.11 lxml build errors)
 lxml_etree = None
 try:
     from lxml import etree as lxml_etree
 except Exception as e:
-    print(e)
+    print(e)"""
 
 # If VLC not installed, it will not crash
 vlc = None
@@ -1855,7 +1855,7 @@ class RefiImport:
         """
 
         #TODO needs lxml or another xml validator
-        if lxml_etree is None:
+        """if lxml_etree is None:
             msg = _("Cannot validate xml. Presumed valid. python3 lxml module not avaiable for python " + sys.version)
             self.parent_textedit.append(msg)
             return True
@@ -1873,7 +1873,8 @@ class RefiImport:
             return False
         except AssertionError as err:
             print("Incorrect XML schema: {0}".format(err))
-            return False
+            return False"""
+        return True
 
 
 class RefiLineEndings(QtWidgets.QDialog):
@@ -3195,7 +3196,7 @@ class RefiExport(QtWidgets.QDialog):
         """
 
         #TODO needs lxml or another xml validator
-        if lxml_etree is None:
+        """if lxml_etree is None:
             msg = _("Cannot validate xml. Presumed valid. python3 lxml module not available for python " + sys.version)
             self.parent_textedit.append(msg)
             return True
@@ -3215,4 +3216,5 @@ class RefiExport(QtWidgets.QDialog):
             return False
         except AssertionError as err:
             print("Incorrect XML schema: {0}".format(err))
-            return False
+            return False"""
+        return True
