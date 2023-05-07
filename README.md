@@ -62,7 +62,7 @@ Activate the virtual environment, this changes the command prompt display using 
 
 `py -m pip install --upgrade pip`
 
-`py -m pip install wheel pyqt6 chardet ebooklib openpyxl Pillow ply pdfminer.six pandas plotly pydub python-vlc rispy SpeechRecognition`
+`py -m pip install wheel pyqt6 chardet ebooklib openpyxl Pillow ply pdfminer.six pandas plotly pydub python-vlc rispy SpeechRecognition xmlschema`
 
  Wait, until all modules are installed .
  
@@ -95,8 +95,6 @@ If you are using a virtual environment:
 `env\Scripts\activate.bat `
 
 `py -m qualcoder`
-
-Note: 8 Dec 2022 - lxml may not install on python version 3.11 until a bug in lxml is fixed. Ignore errors related to this. lxml is only used to validate REFI-QDA data files.
 
 ### Debian/Ubuntu Linux
 
@@ -134,7 +132,7 @@ Note: To exit venv type `deactivate`
 
 6. Install the needed python modules.
 
-`pip install chardet ebooklib ply openpyxl pandas pdfminer pyqt6 pillow pdfminer.six plotly pydub python-vlc rispy six SpeechRecognition`
+`pip install chardet ebooklib ply openpyxl pandas pdfminer pyqt6 pillow pdfminer.six plotly pydub python-vlc rispy six SpeechRecognition xmlschema`
 
 7. Install QualCoder, type the following, the dot is important:
 
@@ -164,7 +162,7 @@ Not tested, but please see the above instructions to build QualCoder inside a vi
 
 2. Install additional python modules
 
-`sudo python3 -m pip install ebooklib plotly pydub python-vlc rispy SpeechRecognition`
+`sudo python3 -m pip install ebooklib plotly pydub python-vlc rispy SpeechRecognition xmlschema`
 
 If success, all requirements are satisfied.
 
@@ -222,7 +220,7 @@ python3 get-pip.py
 (you might already have them, don't do this again if you just update QualCoder to a newer version)
 
 ```sh
-pip3 install chardet ebooklib openpyxl pandas pillow ply pdfminer.six plotly pydub pyqt6 python-vlc rispy six SpeechRecognition
+pip3 install chardet ebooklib openpyxl pandas pillow ply pdfminer.six plotly pydub pyqt6 python-vlc rispy six SpeechRecognition xmlschema
 ```
 
 6) From the QualCoder-Master directory run the setup script:
@@ -261,7 +259,7 @@ Open the Terminal App and move to the unzipped Qualcoder-Master directory, then 
 
 1) Install Python dependency modules using `pip3`:
 
-`pip3 install chardet ebooklib ffmpeg-python pyqt6 pillow ply pdfminer.six openpyxl pandas plotly pydub python-vlc rispy six SpeechRecognition`
+`pip3 install chardet ebooklib ffmpeg-python pyqt6 pillow ply pdfminer.six openpyxl pandas plotly pydub python-vlc rispy six SpeechRecognition xmlschema`
 
 2) Open the Terminal App and move to the unzipped Qualcoder-Master directory, then run the following commands:
 
