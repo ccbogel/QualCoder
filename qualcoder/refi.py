@@ -40,6 +40,7 @@ import sys
 import traceback
 import uuid
 import xml.etree.ElementTree as etree
+#import xmlschema  # TODO
 import zipfile
 
 from PyQt6 import QtWidgets, QtCore
@@ -1854,27 +1855,20 @@ class RefiImport:
         return: true or false passing validation
         """
 
-        #TODO needs lxml or another xml validator
-        """if lxml_etree is None:
-            msg = _("Cannot validate xml. Presumed valid. python3 lxml module not avaiable for python " + sys.version)
-            self.parent_textedit.append(msg)
-            return True
+        return True   # TODO
         file_xsd = codebook
-        if xsd_type != "codebook":
+        #TODO unclosed codebook token line 3 col 0
+        '''if xsd_type != "codebook":
             file_xsd = project
+        xsd = xmlschema.XMLSchema(file_xsd)
         try:
-            xml_doc = lxml_etree.fromstring(bytes(self.xml, "utf-8"))
-            xsd_doc = lxml_etree.fromstring(bytes(file_xsd, "utf-8"))
-            xmlschema = lxml_etree.XMLSchema(xsd_doc)
-            xmlschema.assert_(xml_doc)
+            result = xsd.is_valid(self.xml)
+            print("Valid xml")
             return True
-        except lxml_etree.XMLSyntaxError as err:
-            print("PARSING ERROR:{0}".format(err))
-            return False
-        except AssertionError as err:
-            print("Incorrect XML schema: {0}".format(err))
-            return False"""
-        return True
+        except Exception as e_:
+            print(e_)
+            logger.error(e_)
+            return False'''
 
 
 class RefiLineEndings(QtWidgets.QDialog):
@@ -2296,7 +2290,7 @@ class RefiExport(QtWidgets.QDialog):
 
         xml = ''
         cur = self.app.conn.cursor()
-        cur.execute("select caseid, name, memo, owner, date from cases")
+        cur.execute("select caseid, name, ifnull(memo,''), owner, date from cases")
         result = cur.fetchall()
         if not result:
             return xml
@@ -2304,10 +2298,10 @@ class RefiExport(QtWidgets.QDialog):
         for r in result:
             xml += '<Case guid="' + self.create_guid() + '" '
             xml += 'name="' + html.escape(r[1]) + '">\n'
-            description = html.escape(r[2])
-            if description != "":
+            if r[2] != "":
+                description = html.escape(r[2])
                 xml += '<Description>' + description + '</Description>\n'
-            if description == "":
+            else:
                 xml += '<Description />\n'
             xml += self.case_variables_xml(r[0])
             xml += self.case_source_ref_xml(r[0])
@@ -2330,7 +2324,7 @@ class RefiExport(QtWidgets.QDialog):
 
         xml = ""
         cur = self.app.conn.cursor()
-        sql = "select attribute.name, value from attribute where attr_type='case' and id=?"
+        sql = "select attribute.name, ifnull(value,'') from attribute where attr_type='case' and id=?"
         cur.execute(sql, (caseid,))
         attributes = cur.fetchall()
         for a in attributes:
@@ -2559,7 +2553,7 @@ class RefiExport(QtWidgets.QDialog):
                 xml += 'creationDateTime="' + self.convert_timestamp(s['date']) + '" '
                 if s['external'] is None:
                     # Internal - may not need to convert xml entities
-                    print("plaintext internal", s['plaintext_filename'])
+                    #print("sources_xml method: plaintext internal", s['plaintext_filename'])
                     xml += 'path="internal://' + html.escape(s['filename']) + '" '
                 else:
                     xml += 'path="absolute://' + html.escape(s['external']) + '" '
@@ -3188,6 +3182,8 @@ class RefiExport(QtWidgets.QDialog):
     def xml_validation(self, xsd_type="codebook"):
         """ Verify that the XML complies with XSD.
         I believe the codebook XSD might be incorrect.
+        See:
+        https://stackoverflow.com/questions/299588/validating-with-an-xml-schema-in-python
         Arguments:
             1. file_xml: Input xml file
             2. file_xsd: xsd file which needs to be validated against xml
@@ -3195,26 +3191,20 @@ class RefiExport(QtWidgets.QDialog):
             No return value
         """
 
-        #TODO needs lxml or another xml validator
-        """if lxml_etree is None:
-            msg = _("Cannot validate xml. Presumed valid. python3 lxml module not available for python " + sys.version)
-            self.parent_textedit.append(msg)
-            return True
-        file_xsd = codebook
+        return True  # TODO tmp
+        # TODO unclosed codebook token line 3 col 0
+        '''file_xsd = codebook
         if xsd_type != "codebook":
             file_xsd = project
+        print("file xsd\n", file_xsd)
+
+        xsd = xmlschema.XMLSchema(file_xsd)
         try:
-            xml_doc = lxml_etree.fromstring(bytes(self.xml, "utf-8"))
-            xsd_doc = lxml_etree.fromstring(bytes(file_xsd, "utf-8"))
-            xmlschema = lxml_etree.XMLSchema(xsd_doc)
-            xmlschema.assert_(xml_doc)
+            result = xsd.is_valid(self.xml)
+            print("Valid xml")
             return True
-        except lxml_etree.XMLSyntaxError as err:
-            print("PARSING ERROR:{0}".format(err))
-            logger.error("XML parsingerror: {0}".format(err))
-            # May have problems with special characters e.g. &
-            return False
-        except AssertionError as err:
-            print("Incorrect XML schema: {0}".format(err))
-            return False"""
-        return True
+        except Exception as e_:
+            print(e_)
+            logger.error(e_)
+            print(self.xml)
+            return False'''
