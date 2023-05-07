@@ -58,7 +58,6 @@ setup(
     python_requires='>=3.7',
     install_requires=[
         'pyqt6',
-        'lxml',
         'Pillow', 
         'ebooklib',
         'pdfminer.six',
