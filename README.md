@@ -12,6 +12,8 @@ It is best to download the Current Release form the Releases page. Occassional e
 
 <a href="https://www.buymeacoffee.com/ccbogelB" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
 
+*** Note: REFI-QDA Project export problem, REFI-QDA codebook export problem ***
+
 ## INSTALLATION 
 
 ### Prerequisites
