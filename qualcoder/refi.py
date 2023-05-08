@@ -2448,8 +2448,8 @@ class RefiExport(QtWidgets.QDialog):
         for s in self.sources:
             guid = self.create_guid()
             # Text document
-            if (s['mediapath'] is None and (s['name'][-4:].lower() != '.pdf' and s['name'][-12:] != '.transcribed')) or \
-                    (s['mediapath'] is not None and s['mediapath'][0:5] == 'docs:' and (
+            if ((s['mediapath'] is None) and (s['name'][-4:].lower() != '.pdf' and s['name'][-12:] != '.transcribed')) or \
+                    (s['mediapath'] is not None and s['mediapath'][0:6] == '/docs/' and (
                             s['name'][-4:].lower() != '.pdf' or s['name'][-12:] != '.transcribed')):
                 xml += '<TextSource '
                 if s['external'] is None:
@@ -2973,7 +2973,7 @@ class RefiExport(QtWidgets.QDialog):
 
         self.sources = []
         cur = self.app.conn.cursor()
-        cur.execute("SELECT id, name, fulltext, mediapath, memo, owner, date FROM source")
+        cur.execute("SELECT id, name, fulltext, mediapath, ifnull(memo,''), owner, date FROM source")
         results = cur.fetchall()
         for r in results:
             guid = self.create_guid()
