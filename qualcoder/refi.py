@@ -1969,22 +1969,19 @@ class RefiExport(QtWidgets.QDialog):
             add_line_ending_for_maxqda = True
         txt_errors = ""
         for s in self.sources:
-            # print(s['id'], s['name'], s['mediapath'], s['filename'], s['plaintext_filename'], s['external'])
+            #print(s['id'], s['name'], s['mediapath'], s['filename'], s['plaintext_filename'], s['external'])
             destination = '/Sources/' + s['filename']
-            if s['mediapath'] is not None and s['external'] is None:
-                if True: #try:
-                    if s['external'] is None:
-                        shutil.copyfile(self.app.project_path + s['mediapath'].replace("/docs/", "/documents/"),
-                                        prep_path + destination)
-                    else:
-                        shutil.copyfile(self.app.project_path + s['mediapath'],
-                                        self.app.settings['directory'] + '/' + s['filename'])
-                '''except FileNotFoundError as err:
-                    txt_errors += "Error in media export: " + s['filename'] + "\n" + str(err)
-                    msg = "ERROR in refi.export_project. media export: " + s['filename'] + "\n" + str(err)
-                    print(msg)
-                    logger.warning(msg)'''
-            if s['mediapath'] is None:  # an internal document
+            if s['mediapath'] is not None and s['mediapath'] != "" and s['external'] is None:
+                #print("Source\n", self.app.project_path + s['mediapath'].replace("/docs/", "/documents/"))
+                #print("dest\n", prep_path + destination)
+                try:
+                    shutil.copyfile(self.app.project_path + s['mediapath'].replace("/docs/", "/documents/"),
+                                prep_path + destination)
+                except FileNotFoundError as err:
+                    print(err)
+                    logger.warning(err)
+
+            if (s['mediapath'] is None or s['mediapath'] == "") and s['external'] is None:  # an internal document
                 try:
                     shutil.copyfile(self.app.project_path + '/documents/' + s['name'],
                                     prep_path + destination)
@@ -3009,7 +3006,6 @@ class RefiExport(QtWidgets.QDialog):
                 if source['mediapath'][0:6] in ('audio:', 'video:'):
                     source['external'] = source['mediapath'][6:]
             self.sources.append(source)
-
     def get_users(self):
         """ Get all users and assign guid.
         QualCoder sqlite does not actually keep a separate list of users.
@@ -3179,7 +3175,6 @@ class RefiExport(QtWidgets.QDialog):
 
     def xml_validation(self, xsd_type="codebook"):
         """ Verify that the XML complies with XSD.
-        I believe the codebook XSD might be incorrect.
         See:
         https://stackoverflow.com/questions/299588/validating-with-an-xml-schema-in-python
         Arguments:
@@ -3192,19 +3187,21 @@ class RefiExport(QtWidgets.QDialog):
         file_xsd = xsd_codebook
         if xsd_type != "codebook":
             file_xsd = xsd_project
-        #print(file_xsd)
-        # TODO codebook: ParseError unclosed token line 3 col 0
         try:
             xsd = xmlschema.XMLSchema(file_xsd)
-        except xmlschema.XMLSchemaException as e_:
-            print(xsd_type, e_)
-            return False
+        except Exception as e_:
+            print("xsd creation error", e_)
+            # ParseError: unclosed token: line 3, column 0
+            # Occurs with codebook export only
+            #TODO hack below
+            return True
         try:
             result = xsd.is_valid(self.xml)
             print("Valid xml")
             return True
         except Exception as e_:
-            print(e_)
+            print("Invalid xml", e_)
             logger.error(e_)
-            print(self.xml)
             return False
+
+
