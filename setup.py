@@ -1,7 +1,7 @@
 """ from setup example: https://github.com/pypa/sampleproject/blob/master/setup.py
 """
 import sys
-from setuptools import setup, find_packages
+from setuptools import setup, find_namespace_packages
 from os import path
 here = path.abspath(path.dirname(__file__))
 # Get the long description from the README file
@@ -54,7 +54,7 @@ setup(
         'Development Status :: 3 - Alpha'
     ],
     keywords='qualitative data analysis',
-    packages=find_packages(include=['qualcoder','qualcoder.*']),
+    packages=find_namespace_packages(include=['qualcoder','qualcoder.*']),
     python_requires='>=3.7',
     install_requires=[
         'pyqt6',
