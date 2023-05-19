@@ -42,7 +42,7 @@ IMPORTANT: in the first window of the installation mark the option "Add Python t
 
 4. Use the Windows command prompt. Type "cmd" in the Windows Start search engine, and click on the black software "cmd.exe" - the command console for Windows. In the console type or paste, using the right-click mouse copy and paste (ctrl+v does not work)
 
-5. In the command prompt, move (using the `cd` command) into the QualCoder folder. You should be inside the QualCoder-master folder or if using a release (the Qualcoder-3.2 folder). e.g. 
+5. In the command prompt, move (using the `cd` command) into the QualCoder folder. You should be inside the QualCoder-master folder or if using a release (the Qualcoder-3.3 folder). e.g. 
 
 `cd Downloads\QualCoder-master`
 
@@ -116,7 +116,7 @@ I am using python3.10  you can choose another recent version if you prefer, and 
 3. Download and unzip the Qualcoder folder.
 
 4. Open a terminal and move (cd) into that folder. 
-You should be inside the QualCoder-master folder or if using a release, e.g. the Qualcoder-3.2 folder.
+You should be inside the QualCoder-master folder or if using a release, e.g. the Qualcoder-3.3 folder.
 Inside the QualCoder-master folder:
 
 `python3.10 -m venv qualcoder`
@@ -278,8 +278,8 @@ QualCoder is distributed under the MIT LICENSE.
 
 ##  Citation APA style
 
-Curtain, C. (2023) QualCoder 3.2 [Computer software]. Retrieved from
-https://github.com/ccbogel/QualCoder/releases/tag/3.2
+Curtain, C. (2023) QualCoder 3.3 [Computer software]. Retrieved from
+https://github.com/ccbogel/QualCoder/releases/tag/3.3
 
 ## Creator
 
