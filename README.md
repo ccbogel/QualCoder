@@ -100,7 +100,7 @@ If you are using a virtual environment:
 
 ### Debian/Ubuntu Linux
 
-It is best to run QualCoder inside a python virtual environment, so that the system installed python modules do not clash and cause problems.
+It is best to run QualCoder inside a python virtual environment, so that the system installed python modules do not clash and cause problems. If you are using the alternative Ubuntu Desktop manager **Xfce** you may need to run this: `sudo apt install libxcb-cursor0`
 
 1. Recommend that you install vlc (download from site) or:
 
