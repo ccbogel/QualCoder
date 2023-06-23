@@ -51,8 +51,7 @@ def exception_handler(exception_type, value, tb_obj):
     text_ = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
     print(text_)
     logger.error(_("Uncaught exception:") + "\n" + text_)
-    QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text_)
-
+    QtWidgets.QMessageBF
 
 class DialogManageAttributes(QtWidgets.QDialog):
     """ Attribute management. Create and delete attributes in the attributes table.
@@ -110,10 +109,9 @@ class DialogManageAttributes(QtWidgets.QDialog):
     def count_selected_items(self):
         """ Update label with the count of selected items. """
 
+        print("COUNT SEL itms")
         indexes = self.ui.tableWidget.selectedIndexes()
-        ix = []
-        for i in indexes:
-            ix.append(i.row())
+        ix = [i.row() for i in indexes]
         i = set(ix)
         self.ui.label.setText(_("Attributes: ") + str(len(i)) + "/" + str(len(self.attributes)))
 

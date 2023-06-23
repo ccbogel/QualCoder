@@ -287,6 +287,4 @@ class DialogColorSelect(QtWidgets.QDialog):
                 self.ui.tableWidget.setItem(row, col, item)
                 self.ui.tableWidget.setColumnWidth(col, 38)
             self.ui.tableWidget.setRowHeight(row, 22)
-        #self.ui.tableWidget.resizeColumnsToContents()
-        #self.ui.tableWidget.resizeRowsToContents()
         self.ui.tableWidget.cellClicked.connect(self.color_selected)

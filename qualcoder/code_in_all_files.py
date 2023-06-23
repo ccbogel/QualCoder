@@ -364,10 +364,10 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
     def mark_with_more_codes(self, item):
         """ Select and apply more codes to this coded segment. """
 
-        codes = []
-        for c in self.codes:
+        codes = [c for c in self.codes if c['cid'] != self.code_dict['cid']]
+        '''for c in self.codes:
             if c['cid'] != self.code_dict['cid']:
-                codes.append(c)
+                codes.append(c)'''
         ui = DialogSelectItems(self.app, codes, _("Select codes"), "multi")
         ok = ui.exec()
         if not ok:

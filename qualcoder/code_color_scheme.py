@@ -145,10 +145,10 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
         if not all_tree_items:
             return
         color_list = copy(self.selected_colors)
-        code_items = []
-        for t in all_tree_items:
+        code_items = [t for t in all_tree_items if t.text(1)[:3] == "cid"]
+        '''for t in all_tree_items:
             if t.text(1)[:3] == "cid":
-                code_items.append(t)
+                code_items.append(t)'''
         while len(color_list) < len(code_items):
             color_list += self.selected_colors
 
@@ -335,13 +335,7 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
             for col in range(0, COLS):
                 code_color = colors[row * COLS + col]
                 text = ""
-                '''ttip = ""
-                for c in self.used_colors:
-                    if code_color == c[0]:
-                        text = "*"
-                        ttip += c[1] + "\n"'''
                 item = QtWidgets.QTableWidgetItem(text)
-                #item.setToolTip(ttip)
                 if self.perspective_idx == 0:
                     item.setBackground(QtGui.QBrush(QtGui.QColor(code_color)))
                 if self.perspective_idx == 1:
@@ -358,7 +352,5 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
                 self.ui.tableWidget.setItem(row, col, item)
                 self.ui.tableWidget.setColumnWidth(col, 38)
             self.ui.tableWidget.setRowHeight(row, 22)
-        #self.ui.tableWidget.resizeColumnsToContents()
-        #self.ui.tableWidget.resizeRowsToContents()
 
 

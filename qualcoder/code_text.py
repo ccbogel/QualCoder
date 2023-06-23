@@ -717,8 +717,8 @@ class DialogCodeText(QtWidgets.QWidget):
         Also called on other coding dialogs in the dialog_list. """
 
         self.codes, self.categories = self.app.get_codes_categories()
-        for c in self.codes:
-            c['name'] = c['name']
+        '''for c in self.codes:
+            c['name'] = c['name']  # Why did I do this ?'''
 
     # RHS splitter details for code rule, current journal, project memo
     def show_code_rule(self):
@@ -1162,7 +1162,6 @@ class DialogCodeText(QtWidgets.QWidget):
         else:
             self.add_code(catid=None, code_name=self.ui.textEdit.textCursor().selectedText())
         new_code = None
-        print(0)
         for c in self.codes:
             if c not in codes_copy:
                 new_code = c
@@ -2395,7 +2394,7 @@ class DialogCodeText(QtWidgets.QWidget):
         """ When button pressed, add a new category.
         Note: the addItem dialog does the checking for duplicate category names
         param:
-            suoercatid : None to add without category, supercatid to add to category. """
+            supercatid : None to add without category, supercatid to add to category. """
 
         ui = DialogAddItemName(self.app, self.categories, _("Category"), _("Category name"))
         ui.exec()
@@ -2705,14 +2704,13 @@ class DialogCodeText(QtWidgets.QWidget):
          mediapath: String '/docs/' for internal 'docs:/' for external """
 
         if self.file_['mediapath'][:6] == "/docs/":
-            path = self.app.project_path + "/documents/" + self.file_['mediapath'][6:]
-            print("Internal:", path)
-            webbrowser.open(path)
+            doc_path = self.app.project_path + "/documents/" + self.file_['mediapath'][6:]
+            webbrowser.open(doc_path)
             return
         if self.file_['mediapath'][:5] == "docs:":
-            path = self.file_['mediapath'][5:]
-            print("TO open external ", path)
-            webbrowser.open(path)
+            doc_path = self.file_['mediapath'][5:]
+            print("TO open external ", doc_path)
+            webbrowser.open(doc_path)
             return
         logger.error("Cannot open text file in browser " + self.file_['mediapath'])
         print("code_text.view_original_text_file. Cannot open text file in browser " + self.file_['mediapath'])
@@ -2736,9 +2734,9 @@ class DialogCodeText(QtWidgets.QWidget):
         cur = self.app.conn.cursor()
         cur.execute('select fid from case_text where caseid=?', [selection['id']])
         res = cur.fetchall()
-        file_ids = []
-        for r in res:
-            file_ids.append(r[0])
+        file_ids = [r[0] for r in res]
+        '''for r in res:
+            file_ids.append(r[0])'''
         self.get_files(file_ids)
 
     def show_files_like(self):
@@ -2762,9 +2760,9 @@ class DialogCodeText(QtWidgets.QWidget):
         cur = self.app.conn.cursor()
         cur.execute('select id from source where name like ?', ['%' + text_ + '%'])
         res = cur.fetchall()
-        file_ids = []
-        for r in res:
-            file_ids.append(r[0])
+        file_ids = [r[0] for r in res]
+        '''for r in res:
+            file_ids.append(r[0])'''
         self.get_files(file_ids)
 
     def prev_chars(self, file_, selected):
@@ -2929,9 +2927,9 @@ class DialogCodeText(QtWidgets.QWidget):
 
         if len(self.filenames) == 0:
             return
-        itemname = self.ui.listWidget.currentItem().text()
+        item_name = self.ui.listWidget.currentItem().text()
         for f in self.filenames:
-            if f['name'] == itemname:
+            if f['name'] == item_name:
                 self.file_ = f
                 self.load_file(self.file_)
                 self.search_term = ""

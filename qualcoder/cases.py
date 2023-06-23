@@ -239,17 +239,11 @@ class DialogCases(QtWidgets.QDialog):
             item_count """
 
         indexes = self.ui.tableWidget.selectedIndexes()
-        ix = []
-        for i in indexes:
-            ix.append(i.row())
+        ix = [i.row() for i in indexes]
         i = len(set(ix))
         if i > 1:
             self.ui.textBrowser.clear()
             self.ui.splitter.setSizes([100, 0])
-        '''case_name = ""
-        if i == 1:
-            case_name = self.ui.tableWidget.item(indexes[0].row(), 0).text()
-        self.ui.label_cases.setText(_("Cases: ") + str(i) + "/" + str(len(self.cases)) + "  " + case_name)'''
         return i
 
     def export_attributes(self):
@@ -263,9 +257,9 @@ class DialogCases(QtWidgets.QDialog):
             return
         cols = self.ui.tableWidget.columnCount()
         rows = self.ui.tableWidget.rowCount()
-        header = []
-        for i in range(0, cols):
-            header.append(self.ui.tableWidget.horizontalHeaderItem(i).text())
+        header = [self.ui.tableWidget.horizontalHeaderItem(i).text() for i in range(0, cols)]
+        '''for i in range(0, cols):
+            header.append(self.ui.tableWidget.horizontalHeaderItem(i).text())'''
         with open(filepath, mode='w') as f:
             writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             writer.writerow(header)
@@ -385,9 +379,9 @@ class DialogCases(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         cur.execute("select name from attribute_type where caseOrFile='case'")
         result = cur.fetchall()
-        attribute_names = []
-        for a in result:
-            attribute_names.append({'name': a[0]})
+        attribute_names = [{'name': a[0]} for a in result]
+        '''for a in result:
+            attribute_names.append({'name': a[0]})'''
         check_names = attribute_names + [{'name': 'name'}, {'name': 'memo'}, {'name': 'caseid'}, {'name': 'date'}]
         add_ui = DialogAddAttribute(self.app, check_names)
         ok = add_ui.exec()
@@ -445,12 +439,12 @@ class DialogCases(QtWidgets.QDialog):
             # Some rows may be blank so ignore importation
             if (set(value)) != {None}:
                 # Values are tuples, convert to list, and remove 'None' string
-                row = []
-                for item in value:
+                row = [item if item else "" for item in value]
+                '''for item in value:
                     if item is None:
                         row.append("")
                     else:
-                        row.append(item)
+                        row.append(item)'''
                 data.append(row)
 
         now_date = str(datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"))
@@ -800,20 +794,20 @@ class DialogCases(QtWidgets.QDialog):
             return
         if action == action_hide_columns_starting:
             msg = _("Hide columns starting with:")
-            filter, ok = QtWidgets.QInputDialog.getText(self, _("Hide Columns"), msg,
+            hide_col, ok = QtWidgets.QInputDialog.getText(self, _("Hide Columns"), msg,
                                                             QtWidgets.QLineEdit.EchoMode.Normal)
             for c in range(1, self.ui.tableWidget.columnCount()):
                 h_text = self.ui.tableWidget.horizontalHeaderItem(c).text()
-                if len(h_text) >= len(filter) and filter == h_text[:len(filter)]:
+                if len(h_text) >= len(hide_col) and hide_col == h_text[:len(hide_col)]:
                     self.ui.tableWidget.setColumnHidden(c, True)
             return
         if action == action_show_columns_starting:
             msg = _("Show columns starting with:")
-            filter, ok = QtWidgets.QInputDialog.getText(self, _("Show Columns"), msg,
+            show_col, ok = QtWidgets.QInputDialog.getText(self, _("Show Columns"), msg,
                                                             QtWidgets.QLineEdit.EchoMode.Normal)
             for c in range(3, self.ui.tableWidget.columnCount()):
                 h_text = self.ui.tableWidget.horizontalHeaderItem(c).text()
-                if len(h_text) >= len(filter) and filter == h_text[:len(filter)]:
+                if len(h_text) >= len(show_col) and show_col == h_text[:len(show_col)]:
                     self.ui.tableWidget.setColumnHidden(c, False)
                 else:
                     self.ui.tableWidget.setColumnHidden(c, True)
