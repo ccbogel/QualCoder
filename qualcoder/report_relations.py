@@ -257,10 +257,10 @@ class DialogReportRelations(QtWidgets.QDialog):
                   "and code_text.cid in (" + code_ids + ") order by code_text.cid"
             cur.execute(sql, [coder_name, fid_name['fid']])
             result = cur.fetchall()
-            coded = []
-            for row in result:
+            coded = [row for row in result if row[0] == fid_name['fid']]
+            '''for row in result:
                 if row[0] == fid_name['fid']:
-                    coded.append(row)
+                    coded.append(row)'''
 
             # TODO later, find the closest Other code for relation analysis
             # Look at each code again other codes, when done remove from list of codes

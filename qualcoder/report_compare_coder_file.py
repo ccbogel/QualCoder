@@ -268,7 +268,6 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
 
         if len(self.ui.textEdit.document().toPlainText()) == 0:
             return
-        print("here 1")
         filename = "Coder_comparison_by_file.odt"
         e_ = ExportDirectoryPathDialog(self.app, filename)
         filepath = e_.filepath
