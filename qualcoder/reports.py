@@ -542,8 +542,8 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         """ Export coding comparison statistics to text file. """
 
         filename = "Coder_comparison.txt"
-        e = ExportDirectoryPathDialog(self.app, filename)
-        filepath = e.filepath
+        export_path = ExportDirectoryPathDialog(self.app, filename)
+        filepath = export_path.filepath
         if filepath is None:
             return
         f = open(filepath, 'w', encoding="'utf-8-sig'")

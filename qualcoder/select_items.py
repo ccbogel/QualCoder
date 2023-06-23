@@ -139,10 +139,10 @@ class DialogSelectItems(QtWidgets.QDialog):
             self.ui.listView.setModel(self.model)
             return
 
-        self.data_refined = []
-        for d in self.data:
+        self.data_refined = [d for d in self.data if d['group'] == grouper]
+        '''for d in self.data:
             if d['group'] == grouper:
-                self.data_refined.append(d)
+                self.data_refined.append(d)'''
         self.model = ListModel(self.data_refined)
         self.ui.listView.setModel(self.model)
 

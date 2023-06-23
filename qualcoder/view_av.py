@@ -740,9 +740,9 @@ class DialogCodeAV(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         cur.execute('select fid from case_text where caseid=?', [selection['id']])
         res = cur.fetchall()
-        file_ids = []
-        for r in res:
-            file_ids.append(r[0])
+        file_ids = [r[0] for r in res]
+        '''for r in res:
+            file_ids.append(r[0])'''
         self.get_files(file_ids)
 
     def show_files_like(self):
@@ -766,9 +766,9 @@ class DialogCodeAV(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         cur.execute('select id from source where name like ?', ['%' + text_ + '%'])
         res = cur.fetchall()
-        file_ids = []
-        for r in res:
-            file_ids.append(r[0])
+        file_ids = [r[0] for r in res]
+        '''for r in res:
+            file_ids.append(r[0])'''
         self.get_files(file_ids)
 
     def active_file_memo(self):
@@ -1780,10 +1780,10 @@ class DialogCodeAV(QtWidgets.QDialog):
         Highlight the coded text. """
 
         pos = self.ui.textEdit.textCursor().position()
-        codes_here = []
-        for i in self.code_text:
+        codes_here = [c for c in self.code_text if c['pos0'] <= pos <= c['pos1']]
+        '''for i in self.code_text:
             if i['pos0'] <= pos <= i['pos1']:
-                codes_here.append(i)
+                codes_here.append(i)'''
         self.overlap_code_index += 1
         if self.overlap_code_index >= len(codes_here):
             self.overlap_code_index = 0

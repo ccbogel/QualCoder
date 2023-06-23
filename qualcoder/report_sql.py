@@ -196,7 +196,7 @@ class DialogSQL(QtWidgets.QDialog):
 
         item_text = self.ui.treeWidget.currentItem().text(0)
         index = self.ui.treeWidget.currentIndex()
-        # Check use stored sql to fill corect text for sql
+        # Check use stored sql to fill correct text for sql
         for s in self.stored_sqls:
             if index == s['index']:
                 self.ui.textEdit_sql.clear()
@@ -306,19 +306,19 @@ class DialogSQL(QtWidgets.QDialog):
         result = cur.fetchall()
         for row in result:
             table_name = row[2]
-            fields = []
             field_results = cur.execute("PRAGMA table_info(" + table_name + ")")
             # each field is a tuple of cid, name, type (integer, text, ), notNull (1=notNull),
             # defaultValue(None usually), primaryKey(as integers 1 up, or 0)
-            for field in field_results:
-                fields.append(field)
+            fields = [field for field in field_results]
+            '''for field in field_results:
+                fields.append(field)'''
             table_dict[table_name] = fields
         self.schema = table_dict
 
         # Fill tree widget with tables and views
-        tables_and_views = []
-        for k in self.schema.keys():
-            tables_and_views.append(k)
+        tables_and_views = [k for k in self.schema.keys()]
+        '''for k in self.schema.keys():
+            tables_and_views.append(k)'''
         tables_and_views.sort()
         self.ui.treeWidget.clear()
         for table_name in tables_and_views:
