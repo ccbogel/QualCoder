@@ -207,9 +207,9 @@ class MergeProjects:
         # Need to identify duplicate journal names and not import them
         cur_d.execute("select name from journal")
         j_names_res = cur_d.fetchall()
-        j_names = []
-        for j in j_names_res:
-            j_names.append(j[0])
+        j_names = [j[0] for j in j_names_res]
+        '''for j in j_names_res:
+            j_names.append(j[0])'''
         for j in self.journals_s:
             # Possible to have two identical journal names in earlier db versions
             if j['name'] not in j_names:
@@ -261,9 +261,9 @@ class MergeProjects:
         # Remove all duplicate cases and case text lists from source data
         cur_d.execute("select name from cases")
         res_cases_dest = cur_d.fetchall()
-        existing_case_names = []
-        for r in res_cases_dest:
-            existing_case_names.append(r[0])
+        existing_case_names = [r[0] for r in res_cases_dest]
+        '''for r in res_cases_dest:
+            existing_case_names.append(r[0])'''
         remove_case_list = []
         for case_s in self.cases_s:
             if case_s['name'] in existing_case_names:
@@ -538,9 +538,9 @@ class MergeProjects:
         cur_d = self.app.conn.cursor()
         cur_d.execute("select name from code_cat")
         res_dest_catnames = cur_d.fetchall()
-        dest_cat_names_list = []
-        for r in res_dest_catnames:
-            dest_cat_names_list.append(r[0])
+        dest_cat_names_list = [r[0] for r in res_dest_catnames]
+        '''for r in res_dest_catnames:
+            dest_cat_names_list.append(r[0])'''
         temp_source_cats = []
         for cat in self.categories_s:
             if cat['name'] not in dest_cat_names_list:
@@ -622,9 +622,9 @@ class MergeProjects:
         cur_d = self.app.conn.cursor()
         cur_d.execute("select name from attribute_type")
         res_attr_name_dest = cur_d.fetchall()
-        attribute_names_dest = []
-        for r in res_attr_name_dest:
-            attribute_names_dest.append(r[0])
+        attribute_names_dest = [r[0] for r in res_attr_name_dest]
+        '''for r in res_attr_name_dest:
+            attribute_names_dest.append(r[0])'''
         self.attribute_types_s = []
         for r in temp_attribute_types_s:
             if r['name'] not in attribute_names_dest:

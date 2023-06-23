@@ -268,7 +268,6 @@ class DialogReferenceManager(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         for index in file_row_objs:
             fid = int(index.data())  # Column 0 data
-            #print(fid)
             cur.execute("update source set risid=null where id=?", [fid])
             self.app.conn.commit()
             self.ui.tableWidget_files.item(index.row(), 2).setText("")
@@ -372,9 +371,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
         ok = reference_editor.exec()
         if not ok:
             return
-        rows = ui_re.tableWidget.rowCount()
-        for i in range(0, rows):
-            print()
+        #rows = ui_re.tableWidget.rowCount()
         cur = self.app.conn.cursor()
         ref_edited = False
         for row, key in enumerate(short_dict):

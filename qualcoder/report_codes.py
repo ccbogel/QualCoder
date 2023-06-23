@@ -176,13 +176,13 @@ class DialogReportCodes(QtWidgets.QDialog):
                 self.ui.splitter.setSizes([s0, s1, 0])
             v0 = int(self.app.settings['dialogreportcodes_splitter_v0'])
             if v0 < 10:
-                v0 == 10
+                v0 = 10
             v1 = int(self.app.settings['dialogreportcodes_splitter_v1'])
             if v1 < 10:
-                v1 == 10
+                v1 = 10
             v2 = int(self.app.settings['dialogreportcodes_splitter_v2'])
             if v2 < 10:
-                v2 == 10
+                v2 = 10
             self.ui.splitter_vert.setSizes([v0, v1, v2])
         except KeyError:
             pass
@@ -640,23 +640,23 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         if not self.results:
             return
-        codes_all = []
-        codes_freq_list = []
-        for i in self.results:
-            codes_all.append(i['codename'])
+        codes_all = [i['codename'] for i in self.results]
+        '''for i in self.results:
+            codes_all.append(i['codename'])'''
         codes_set = list(set(codes_all))
         codes_set.sort()
-        for x in codes_set:
-            codes_freq_list.append(codes_all.count(x))
+        codes_freq_list = [codes_all.count(x) for x in codes_set]
+        '''for x in codes_set:
+            codes_freq_list.append(codes_all.count(x))'''
         ncols = len(codes_set)
         nrows = sorted(codes_freq_list)[-1]
 
         # Prepare data rows for csv writer
         csv_data = []
         for r in range(0, nrows):
-            row = []
-            for c in range(0, ncols):
-                row.append("")
+            row = ["" for c in range(0, ncols)]
+            '''for c in range(0, ncols):
+                row.append("")'''
             csv_data.append(row)
 
         # Look at each code and fill column with data
@@ -812,9 +812,6 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         if len(self.ui.textEdit.document().toPlainText()) == 0:
             return
-        #html_filename = "Report_codings.html"
-        #exp_dlg = ExportDirectoryPathDialog(self.app, html_filename)
-        #filepath = exp_dlg.filepath
         filepath, ok = QtWidgets.QFileDialog.getSaveFileName(self,
                                                             _("Save HTML File"), self.app.settings['directory'],
                                                             "HTML Files(*.html)",
@@ -1487,9 +1484,9 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         # Order code names by frequency
         # Get unique code names
-        tmp_names = []
-        for r in self.results:
-            tmp_names.append(r['codename'])
+        tmp_names = [r['codename'] for r in self.results]
+        '''for r in self.results:
+            tmp_names.append(r['codename'])'''
         codenames = list(set(tmp_names))
         # Create list dictionary of code name and code count
         name_and_count = []
@@ -1886,16 +1883,13 @@ class DialogReportCodes(QtWidgets.QDialog):
         # Fill matrix or clear third splitter pane.
         self.ui.tableWidget.setColumnCount(0)
         self.ui.tableWidget.setRowCount(0)
-        #matrix_option = self.ui.comboBox_matrix.currentText()
         matrix_option_index = self.ui.comboBox_matrix.currentIndex()
-        '''
-        ["", _("Top categories by case"), _("Top categories by file"), _("Categories by case"),
-        _("Categories by file"), _("Codes by case"), _("Codes by file")]
-        '''
+
         if matrix_option_index == 0:
             self.ui.splitter.setSizes([200, 400, 0])
             return
-        if self.case_ids == "" and matrix_option_index in (1, 3, 5):  # Categories by case, Top categories by case, Codes by case
+        # Categories by case, Top categories by case, Codes by case
+        if self.case_ids == "" and matrix_option_index in (1, 3, 5):
             Message(self.app, _("No case matrix"), _("Cases not selected")).exec()
             self.ui.splitter.setSizes([200, 400, 0])
             return
@@ -2245,9 +2239,10 @@ class DialogReportCodes(QtWidgets.QDialog):
         # Get selected codes (Matrix columns)
         items = self.ui.treeWidget.selectedItems()
         horizontal_labels = []  # column (code) labels
-        for item in items:
+        horizontal_labels = [item.text(0) for item in items if item.text(1)[:3] == "cid"]
+        '''for item in items:
             if item.text(1)[:3] == "cid":
-                horizontal_labels.append(item.text(0))
+                horizontal_labels.append(item.text(0))'''
 
         # Get file or cases (rows)
         cur = self.app.conn.cursor()
@@ -2256,9 +2251,9 @@ class DialogReportCodes(QtWidgets.QDialog):
             sql = "select caseid, name from cases where caseid in (" + ids + ")"
         cur.execute(sql)
         id_and_name = cur.fetchall()
-        vertical_labels = []
-        for c in id_and_name:
-            vertical_labels.append(c[1])
+        vertical_labels = [c[1] for c in id_and_name]
+        '''for c in id_and_name:
+            vertical_labels.append(c[1])'''
 
         transpose = self.ui.checkBox_matrix_transpose.isChecked()
         if transpose:
