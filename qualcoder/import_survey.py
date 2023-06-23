@@ -164,12 +164,12 @@ class DialogImportSurvey(QtWidgets.QDialog):
             # Some rows may be complete blank so ignore importation
             if (set(value)) != {None}:
                 # Values are tuples, convert to list, and remove 'None' string
-                row = []
-                for item in value:
+                row = [item if item else "" for item in value]
+                '''for item in value:
                     if item is None:
                         row.append("")
                     else:
-                        row.append(item)
+                        row.append(item)'''
                 self.data.append(row)
         # Get field names and replace blacks with a placeholder
         self.fields = []
@@ -365,9 +365,9 @@ class DialogImportSurvey(QtWidgets.QDialog):
         sql = "select name from attribute_type where caseOrFile='case'"
         cur.execute(sql)
         result = cur.fetchall()
-        existing_attr_names = []
-        for r in result:
-            existing_attr_names.append(r[0])
+        existing_attr_names = [r[0] for r in result]
+        '''for r in result:
+            existing_attr_names.append(r[0])'''
         sql = "insert into attribute_type (name,date,owner,memo, valueType, caseOrFile) values(?,?,?,?,?,?)"
         for col, name in enumerate(self.fields):
             if self.fields_type[col] != "qualitative" and col > 0:  # col==0 is the case identifier
@@ -455,7 +455,6 @@ class DialogImportSurvey(QtWidgets.QDialog):
         Warn if an incorrect number of fields in the row. """
 
         num_fields_in_row_error = False
-        #self.ui.label_msg.setText("")
         num_rows = self.ui.tableWidget.rowCount()
         for row in range(0, num_rows):
             self.ui.tableWidget.removeRow(0)

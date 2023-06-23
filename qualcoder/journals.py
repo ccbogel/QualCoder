@@ -166,7 +166,7 @@ class DialogJournals(QtWidgets.QDialog):
         self.ui.textEdit.textChanged.connect(self.text_changed)
         self.ui.textEdit.installEventFilter(self)
         self.ui.textEdit.setTabChangesFocus(True)
-        #spell = SpellChecker()
+        #spell = SpellChecker()  # Was testing this out
         # spell = SpellChecker(language='de')
         # spell = SpellChecker(language='es')
         # spell = SpellChecker(language='fr')
@@ -207,47 +207,6 @@ class DialogJournals(QtWidgets.QDialog):
             if key == QtCore.Qt.Key.Key_0:
                 self.help()
                 return
-
-    '''def eventFilter(self, object_, event):
-        """ Ctrl F Search box focus.
-        Control 1 to 4 match buttons order. Control 0 opens help.
-        keypress timers prevents multiple key events firing too soon
-        """
-
-        # keypress timing
-        now = datetime.datetime.now()
-        keypress_diff = now - self.keypress_timer
-
-        if type(event) == QtGui.QKeyEvent:
-            key = event.key()
-            mod = event.modifiers()
-            # Ctrl + F jump to search box
-            if key == QtCore.Qt.Key.Key_F and mod == QtCore.Qt.KeyboardModifier.ControlModifier:
-                self.ui.lineEdit_search.setFocus()
-                return True
-            # Alt 0 to 9
-            if mod == QtCore.Qt.KeyboardModifier.ControlModifier and keypress_diff.microseconds > 550000:
-                if key == QtCore.Qt.Key.Key_1:
-                    self.keypress_timer = datetime.datetime.now()
-                    self.create_journal()
-                    return True
-                if key == QtCore.Qt.Key.Key_2:
-                    self.keypress_timer = datetime.datetime.now()
-                    self.export()
-                    return True
-                if key == QtCore.Qt.Key.Key_3:
-                    self.keypress_timer = datetime.datetime.now()
-                    self.export_all_journals_as_one_file()
-                    return True
-                if key == QtCore.Qt.Key.Key_4:
-                    self.keypress_timer = datetime.datetime.now()
-                    self.delete()
-                    return True
-                if key == QtCore.Qt.Key.Key_0:
-                    self.keypress_timer = datetime.datetime.now()
-                    self.help()
-                    return True
-        return False'''
 
     def fill_table(self):
         """ Fill journals table. Update journal count label. """
@@ -290,8 +249,8 @@ class DialogJournals(QtWidgets.QDialog):
             text_ += _("Journal: ") + j['name'] + "\n"
             text_ += j['jentry'] + "\n========\n\n"
         filename = "Collated_journals.txt"
-        e = ExportDirectoryPathDialog(self.app, filename)
-        filepath = e.filepath
+        exp_directory = ExportDirectoryPathDialog(self.app, filename)
+        filepath = exp_directory.filepath
         if filepath is None:
             return
         ''' https://stackoverflow.com/questions/39422573/python-writing-weird-unicode-to-csv

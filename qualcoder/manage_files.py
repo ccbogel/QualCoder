@@ -28,45 +28,38 @@ https://qualcoder.wordpress.com/
 
 import csv
 import datetime
-import ebooklib
-from ebooklib import epub
-import logging
-import os
-import PIL
-from PIL import Image
-import platform
-import sys
-from shutil import copyfile, move
-import subprocess
-import traceback
-from urllib.parse import urlparse
 import webbrowser
 import zipfile
+from shutil import copyfile, move
+from urllib.parse import urlparse
 
+import PIL
+import ebooklib
+from PIL import Image
 from PyQt6 import QtCore, QtGui, QtWidgets
+from ebooklib import epub
+from pdfminer.converter import PDFPageAggregator
+from pdfminer.layout import LAParams, LTTextBox, LTTextLine
+from pdfminer.pdfdocument import PDFDocument
+from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
+from pdfminer.pdfpage import PDFPage
+from pdfminer.pdfparser import PDFParser
 
+from .GUI.base64_helper import *
+from .GUI.ui_dialog_manage_files import Ui_Dialog_manage_files
 from .add_attribute import DialogAddAttribute
 from .add_item_name import DialogAddItemName
-from .GUI.base64_helper import *
 from .code_text import DialogCodeText  # for isinstance()
 from .confirm_delete import DialogConfirmDelete
 from .docx import opendocx, getdocumenttext
-from .GUI.ui_dialog_manage_files import Ui_Dialog_manage_files
 from .edit_textfile import DialogEditTextFile
 from .helpers import ExportDirectoryPathDialog, Message, msecs_to_hours_mins_secs
 from .html_parser import *
 from .memo import DialogMemo
-from .select_items import DialogSelectItems
-from .view_image import DialogViewImage, DialogCodeImage  # DialogCodeImage for isinstance()
-from .view_av import DialogViewAV, DialogCodeAV  # DialogCodeAV for isinstance()
 from .report_codes import DialogReportCodes  # for isInstance()
-
-from pdfminer.pdfpage import PDFPage
-from pdfminer.pdfparser import PDFParser
-from pdfminer.pdfdocument import PDFDocument
-from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
-from pdfminer.converter import PDFPageAggregator
-from pdfminer.layout import LAParams, LTTextBox, LTTextLine
+from .select_items import DialogSelectItems
+from .view_av import DialogViewAV, DialogCodeAV  # DialogCodeAV for isinstance()
+from .view_image import DialogViewImage, DialogCodeImage  # DialogCodeImage for isinstance()
 
 # If VLC not installed, it will not crash
 vlc = None
@@ -131,7 +124,6 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         self.default_import_directory = self.app.settings['directory']
-        #self.attributes = []
         self.attribute_labels_ordered = []
         self.av_dialog_open = None
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
@@ -285,19 +277,19 @@ class DialogManageFiles(QtWidgets.QDialog):
             return
         if action == action_hide_columns_starting:
             msg = _("Hide columns starting with:")
-            filter, ok = QtWidgets.QInputDialog.getText(self, _("Hide Columns"), msg,
+            hide_filter, ok = QtWidgets.QInputDialog.getText(self, _("Hide Columns"), msg,
                                                             QtWidgets.QLineEdit.EchoMode.Normal)
             for c in range(1, self.ui.tableWidget.columnCount()):
                 h_text = self.ui.tableWidget.horizontalHeaderItem(c).text()
-                if len(h_text) >= len(filter) and filter == h_text[:len(filter)]:
+                if len(h_text) >= len(hide_filter) and hide_filter == h_text[:len(hide_filter)]:
                     self.ui.tableWidget.setColumnHidden(c, True)
         if action == action_show_columns_starting:
             msg = _("Show columns starting with:")
-            filter, ok = QtWidgets.QInputDialog.getText(self, _("Show Columns"), msg,
+            show_filter, ok = QtWidgets.QInputDialog.getText(self, _("Show Columns"), msg,
                                                             QtWidgets.QLineEdit.EchoMode.Normal)
             for c in range(4, self.ui.tableWidget.columnCount()):
                 h_text = self.ui.tableWidget.horizontalHeaderItem(c).text()
-                if len(h_text) >= len(filter) and filter == h_text[:len(filter)]:
+                if len(h_text) >= len(show_filter) and show_filter == h_text[:len(show_filter)]:
                     self.ui.tableWidget.setColumnHidden(c, False)
                 else:
                     self.ui.tableWidget.setColumnHidden(c, True)
@@ -439,14 +431,13 @@ class DialogManageFiles(QtWidgets.QDialog):
          mediapath: String '/docs/' for internal 'docs:/' for external """
 
         if mediapath[:6] == "/docs/":
-            path = self.app.project_path + "/documents/" + mediapath[6:]
-            print("Internal:", path)
-            webbrowser.open(path)
+            media_path = self.app.project_path + "/documents/" + mediapath[6:]
+            webbrowser.open(media_path)
             return
         if mediapath[:5] == "docs:":
-            path = mediapath[5:]
-            print("TO open external ", path)
-            webbrowser.open(path)
+            media_path = mediapath[5:]
+            print("TO open external ", media_path)
+            webbrowser.open(media_path)
             return
         logger.error("Cannot open text file in browser " + mediapath)
         print("manage_files.view_original_text_file. Cannot open text file in browser " + mediapath)
@@ -719,9 +710,9 @@ class DialogManageFiles(QtWidgets.QDialog):
             return
         cols = self.ui.tableWidget.columnCount()
         rows = self.ui.tableWidget.rowCount()
-        header = []
-        for i in range(0, cols):
-            header.append(self.ui.tableWidget.horizontalHeaderItem(i).text())
+        header = [self.ui.tableWidget.horizontalHeaderItem(i).text() for i in range(0, cols)]
+        '''for i in range(0, cols):
+            header.append(self.ui.tableWidget.horizontalHeaderItem(i).text())'''
         with open(filepath, mode='w') as f:
             writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             writer.writerow(header)
@@ -1698,9 +1689,9 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.av_dialog_open.mediaplayer.stop()
             self.av_dialog_open = None
         index_list = self.ui.tableWidget.selectionModel().selectedIndexes()
-        rows = []
-        for i in index_list:
-            rows.append(i.row())
+        rows = [i.row() for i in index_list]
+        '''for i in index_list:
+            rows.append(i.row())'''
         rows = list(set(rows))  # duplicate rows due to multiple columns
         if len(rows) == 0:
             return
@@ -1734,8 +1725,6 @@ class DialogManageFiles(QtWidgets.QDialog):
         # Export audio, video, picture files
         if self.source[row]['mediapath'] is not None and self.source[row]['mediapath'][0:6] != "/docs/" and text_rep is False:
             file_path = self.app.project_path + self.source[row]['mediapath']
-            print("FP",file_path)
-            # destination = directory + "/" + filename
             try:
                 copyfile(file_path, destination)
                 msg += destination + "\n"
@@ -1748,7 +1737,6 @@ class DialogManageFiles(QtWidgets.QDialog):
         # Export pdf, docx, odt, epub, html files if located in documents directory, and text representation
         document_stored = os.path.exists(self.app.project_path + "/documents/" + self.source[row]['name'])
         if document_stored and (self.source[row]['mediapath'] is None or self.source[row]['mediapath'][0:6] == "/docs/"):
-            # destination = directory + "/" + self.source[row]['name']
             try:
                 copyfile(self.app.project_path + "/documents/" + self.source[row]['name'], destination)
                 filedata = self.source[row]['fulltext']
@@ -1874,9 +1862,9 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.av_dialog_open.mediaplayer.stop()
             self.av_dialog_open = None
         index_list = self.ui.tableWidget.selectionModel().selectedIndexes()
-        rows = []
-        for i in index_list:
-            rows.append(i.row())
+        rows = [i.row() for i in index_list]
+        '''for i in index_list:
+            rows.append(i.row())'''
         rows = list(set(rows))  # duplicate rows due to multiple columns
         if len(rows) == 0:
             return
@@ -2025,7 +2013,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             case_item.setFlags(case_item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget.setItem(row, self.CASE_COLUMN, case_item)
             # Add the attribute values
-            #TODO consider using role type for numerics
+            # TODO consider using role type for numerics
             for offset, attribute in enumerate(data['attributes']):
                 item = QtWidgets.QTableWidgetItem(attribute)
                 self.ui.tableWidget.setItem(row, self.ATTRIBUTE_START_COLUMN + offset, item)
