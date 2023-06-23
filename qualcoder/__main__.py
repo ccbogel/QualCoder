@@ -312,8 +312,9 @@ class App(object):
         cur.execute(sql)
         result = cur.fetchall()
         res = []
+        keys = 'id', 'name', 'memo', 'mediapath'
         for row in result:
-            res.append({'id': row[0], 'name': row[1], 'memo': row[2], 'mediapath': row[3]})
+            res.append(dict(zip(keys, row)))
         return res
 
     def get_image_filenames(self, ids=None):
@@ -730,7 +731,7 @@ class App(object):
             'codetext_chunksize': 50000
         }
 
-    def get_file_texts(self, fileids=None):
+    def get_file_texts(self, file_ids=None):
         """ Get the texts of all text files as a list of dictionaries.
         Called by DialogCodeText.search_for_text
         param:
@@ -738,10 +739,10 @@ class App(object):
         """
 
         cur = self.conn.cursor()
-        if fileids is not None:
+        if file_ids is not None:
             cur.execute(
                 "select name, id, fulltext, ifnull(memo, ''), owner, date from source where id in (?) and fulltext is not null",
-                fileids
+                file_ids
             )
         else:
             cur.execute(
@@ -752,7 +753,7 @@ class App(object):
             result.append(dict(zip(keys, row)))
         return result
 
-    def get_journal_texts(self, jids=None):
+    def get_journal_texts(self, journal_ids=None):
         """ Get the texts of all journals as a list of dictionaries.
         Called by DialogJournals.search_for_text
         param:
@@ -760,10 +761,10 @@ class App(object):
         """
 
         cur = self.conn.cursor()
-        if jids is not None:
+        if journal_ids is not None:
             cur.execute(
                 "select name, jid, jentry, owner, date from journal where jid in (?)",
-                jids
+                journal_ids
             )
         else:
             cur.execute("select name, jid, jentry, owner, date from journal order by date desc")
@@ -1176,7 +1177,7 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Report on coding and categories. """
 
         self.ui.label_reports.hide()
-        ui = DialogReportCodes(self.app, self.ui.textEdit)
+        ui = DialogReportCodes(self.app, self.ui.textEdit, self.ui.tab_coding)
         self.tab_layout_helper(self.ui.tab_reports, ui)
 
     def report_file_summary(self):

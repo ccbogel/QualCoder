@@ -26,7 +26,7 @@ https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 """
 
-from copy import copy, deepcopy
+from copy import deepcopy
 import csv
 import logging
 import openpyxl
@@ -103,11 +103,12 @@ class DialogReportCodes(QtWidgets.QDialog):
     # list of dictionaries of row, col, textEdit, list of links
     matrix_links = []
 
-    def __init__(self, app, parent_textedit):
+    def __init__(self, app, parent_textedit, tab_coding):
         super(DialogReportCodes, self).__init__()
         sys.excepthook = exception_handler
         self.app = app
         self.parent_textEdit = parent_textedit
+        self.tab_coding = tab_coding
         self.get_codes_categories_coders()
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_reportCodings()
@@ -746,17 +747,17 @@ class DialogReportCodes(QtWidgets.QDialog):
         for row, data in enumerate(self.results):
             ws.cell(column=1, row=row + 2, value=data['file_or_casename'])
             ws.cell(column=2, row=row + 2, value=data['coder'])
-            id = ""
+            coding_id = ""
             if data['result_type'] == 'text':
-                id = "ctid:" + str(data['ctid'])
+                coding_id = "ctid:" + str(data['ctid'])
                 ws.cell(column=3, row=row + 2, value=data['text'])
             if data['result_type'] == 'image':
-                id = "imid:" + str(data['imid'])
+                coding_id = "imid:" + str(data['imid'])
                 ws.cell(column=3, row=row + 2, value="image")
             if data['result_type'] == 'av':
-                id = "avid:" + str(data['avid'])
+                coding_id = "avid:" + str(data['avid'])
                 ws.cell(column=3, row=row + 2, value="a/v")
-            ws.cell(column=4, row=row + 2, value=id)
+            ws.cell(column=4, row=row + 2, value=coding_id)
             ws.cell(column=5, row=row + 2, value=data['codename'])
             categories = self.categories_of_code(data['cid'])
             for i, category in enumerate(categories):
@@ -1414,7 +1415,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             av_sql += "code_av.pos0, code_av.pos1, code_av.owner,source.mediapath, source.id, "
             av_sql += "ifnull(code_av.memo,'') as coded_memo, ifnull(cases.memo,'') as case_memo, "
             av_sql += "ifnull(code_name.memo,''), ifnull(source.memo,''), avid, "
-            av_sql+= "code_name.cid "
+            av_sql += "code_name.cid "
             av_sql += "from code_av join code_name on code_name.cid = code_av.cid "
             av_sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
             av_sql += "code_av.id = case_text.fid "
@@ -1837,9 +1838,6 @@ class DialogReportCodes(QtWidgets.QDialog):
         for i, row in enumerate(self.results):
             self.heading(row)
             if row['coded_memo'] != "" and memo_choice_index in (4, 5):  # Only memos, Only coded memos
-                # TODO review
-                cursor = self.ui.textEdit.textCursor()
-                pos0 = len(self.ui.textEdit.toPlainText())
                 self.ui.textEdit.insertPlainText("\n")
                 self.ui.textEdit.insertPlainText(row['coded_memo'] + "\n")
             if row['result_type'] == 'text' and memo_choice_index not in (4, 5):  # Only memos, Only coded memos
@@ -2081,13 +2079,15 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         # Check that there is a link to view at this location before showing menu option
         action_view = None
-        found = None
+        action_unmark = None
+        code_here = None
         for row in self.results:
             if row['textedit_start'] <= pos < row['textedit_end']:
-                found = row
+                code_here = row
                 break
-        if found:
+        if code_here:
             action_view = menu.addAction(_("View in context"))
+            action_unmark = menu.addAction(_("Unmark"))
         action_copy = None
         if selected_text != "":
             action_copy = menu.addAction(_("Copy to clipboard"))
@@ -2105,7 +2105,9 @@ class DialogReportCodes(QtWidgets.QDialog):
         if action is None:
             return
         if action == action_view:
-            self.show_context_from_text_edit(cursor_context_pos)
+            self.show_context_from_text_edit(code_here)
+        if action == action_unmark:
+            self.unmark(code_here)
         if action == action_copy:
             cb = QtWidgets.QApplication.clipboard()
             cb.setText(selected_text)
@@ -2119,6 +2121,51 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.ui.groupBox.setVisible(False)
         if action == action_rotate_180:
             self.rotate_image(cursor_context_pos, img_fmt, html_link, 90)
+
+    def unmark(self, code):
+        """ Unmark this coding. """
+
+        cur = self.app.conn.cursor()
+        if code['result_type'] == 'text':
+            cur.execute("delete from code_text where ctid=?", [code['ctid']])
+        if code['result_type'] == 'image':
+            cur.execute("delete from code_image where imid=?", [code['imid']])
+        if code['result_type'] == 'av':
+            cur.execute("delete from code_av where avid=?", [code['avid']])
+        self.app.conn.commit()
+        code['result_type'] = "deleted"
+
+        # Format strike through
+        cursor = self.ui.textEdit.textCursor()
+        cursor.setPosition(code['textedit_start'], QtGui.QTextCursor.MoveMode.MoveAnchor)
+        cursor.setPosition(code['textedit_end'], QtGui.QTextCursor.MoveMode.KeepAnchor)
+        fmt = QtGui.QTextCharFormat()
+        fmt.setFontStrikeOut(True)  # .setUnderlineStyle(QtGui.QTextCharFormat.UnderlineStyle.SingleUnderline)
+        cursor.mergeCharFormat(fmt)
+
+        contents = self.tab_coding.layout()
+        # Remove widgets from layout
+        for i in reversed(range(contents.count())):
+            contents.itemAt(i).widget().close()
+            contents.itemAt(i).widget().setParent(None)
+
+    def show_context_from_text_edit(self, code):
+        """ Heading (code, file, owner) in textEdit clicked so show context of coding in dialog.
+        Called by: textEdit.cursorPositionChanged, after results are filled.
+        Called by context menu.
+        param:
+            code : Dictionary of codenmae, color, file_or_casename, pos0, pos1, text, coder, fid, ctid, cid, result_type
+        """
+
+        if code['result_type'] == 'text':
+            ui = DialogCodeInText(self.app, code)
+            ui.exec()
+        if code['result_type'] == 'image':
+            ui = DialogCodeInImage(self.app, code)
+            ui.exec()
+        if code['result_type'] == 'av':
+            ui = DialogCodeInAV(self.app, code)
+            ui.exec()
 
     def rotate_image(self, cursor_context_pos, img_fmt, html_link, degrees):
         """  Rotate image 180 degrees.
@@ -2154,26 +2201,6 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.textEdit.setTextCursor(cursor)
         cursor.removeSelectedText()
         cursor_context_pos.insertImage(img_fmt)
-
-    def show_context_from_text_edit(self, cursor_context_pos):
-        """ Heading (code, file, owner) in textEdit clicked so show context of coding in dialog.
-        Called by: textEdit.cursorPositionChanged, after results are filled.
-        text/image/av results contain textedit_start and textedit_end which map the cursor position to the result.
-        Called by context menu.
-        """
-
-        pos = cursor_context_pos.position()
-        for row in self.results:
-            if row['textedit_start'] <= pos < row['textedit_end']:
-                if row['result_type'] == 'text':
-                    ui = DialogCodeInText(self.app, row)
-                    ui.exec()
-                if row['result_type'] == 'image':
-                    ui = DialogCodeInImage(self.app, row)
-                    ui.exec()
-                if row['result_type'] == 'av':
-                    ui = DialogCodeInAV(self.app, row)
-                    ui.exec()
 
     def matrix_heading(self, item, text_edit):
         """ Takes a dictionary item and creates a heading for the coded text portion.
