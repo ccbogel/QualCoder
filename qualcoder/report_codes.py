@@ -195,6 +195,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.listWidget_files.customContextMenuRequested.connect(self.listwidget_files_menu)
         self.ui.listWidget_cases.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.listWidget_cases.customContextMenuRequested.connect(self.listwidget_cases_menu)
+        self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.ui.treeWidget.customContextMenuRequested.connect(self.treewidget_menu)
         self.eventFilterTT = ToolTipEventFilter()
         self.ui.textEdit.installEventFilter(self.eventFilterTT)
 
@@ -516,6 +518,42 @@ class DialogReportCodes(QtWidgets.QDialog):
             it += 1
             item = it.value()
             count += 1
+
+    def treewidget_menu(self, position):
+        """ Menu to select all codes or other selection parameters. """
+
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        action_all = menu.addAction(_("Select all codes"))
+        action_unselect = menu.addAction(_("Remove selections"))
+        action_like = menu.addAction(_("Select codes like"))
+        action = menu.exec(self.ui.treeWidget.mapToGlobal(position))
+        if action == action_all:
+            self.ui.treeWidget.selectAll()
+        if action == action_unselect:
+            selected = self.ui.treeWidget.selectedItems()
+            for tree_item in selected:
+                tree_item.setSelected(False)
+        if action == action_like:
+            # Need to unselect where mouse click occurred
+            clicked_selected = self.ui.treeWidget.selectedItems()[0]
+            clicked_selected.setSelected(False)
+            # Input dialog narrow, so code below
+            dialog = QtWidgets.QInputDialog(None)
+            dialog.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            dialog.setWindowTitle(_("Select some codes"))
+            dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
+            dialog.setInputMode(QtWidgets.QInputDialog.InputMode.TextInput)
+            dialog.setLabelText(_("Select codes containing text"))
+            dialog.resize(200, 20)
+            ok = dialog.exec()
+            if not ok:
+                return
+            selection_text = str(dialog.textValue())
+            tree_items = self.ui.treeWidget.findItems(selection_text, Qt.MatchFlag.MatchContains | Qt.MatchFlag.MatchRecursive, 0)
+            for tree_item in tree_items:
+                if 'cid' in tree_item.text(1):
+                    tree_item.setSelected(True)
 
     def export_option_selected(self):
         """ ComboBox export option selected. """
