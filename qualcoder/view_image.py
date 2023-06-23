@@ -263,7 +263,6 @@ class DialogCodeImage(QtWidgets.QDialog):
             bl_sql = " and id not in (" + bl_sql[1:] + ") "
 
         self.ui.listWidget.clear()
-        self.files = []
         cur = self.app.conn.cursor()
         sql = "select name, id, memo, owner, date, mediapath from source where "
         sql += "substr(mediapath,1,7) in ('/images', 'images:') " + bl_sql + " "
@@ -640,9 +639,9 @@ class DialogCodeImage(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         cur.execute('select id from source where name like ?', ['%' + text_ + '%'])
         res = cur.fetchall()
-        file_ids = []
-        for r in res:
-            file_ids.append(r[0])
+        file_ids = [r[0] for r in res]
+        '''for r in res:
+            file_ids.append(r[0])'''
         self.get_files(file_ids)
 
     def file_selection_changed(self):
@@ -650,9 +649,9 @@ class DialogCodeImage(QtWidgets.QDialog):
 
         if len(self.files) == 0:
             return
-        itemname = self.ui.listWidget.currentItem().text()
+        item_name = self.ui.listWidget.currentItem().text()
         for f in self.files:
-            if f['name'] == itemname:
+            if f['name'] == item_name:
                 self.file_ = f
                 self.load_file()
                 break
@@ -813,12 +812,12 @@ class DialogCodeImage(QtWidgets.QDialog):
                """
 
         filename = self.file_['name'].replace(".", "_") + ".html"
-        e_dir = ExportDirectoryPathDialog(self.app, filename)
-        filepath = e_dir.filepath
+        export_dir = ExportDirectoryPathDialog(self.app, filename)
+        filepath = export_dir.filepath
         if filepath is None:
             return
-        pic_width = self.pixmap.width() * self.scale  # self.scene.sceneRect().width()
-        pic_height = self.pixmap.height() * self.scale  # self.scene.sceneRect().height()
+        pic_width = self.pixmap.width() * self.scale
+        pic_height = self.pixmap.height() * self.scale
         if self.degrees in (90, 270):
             pic_width, pic_height = pic_height, pic_width
         rect_area = QtCore.QRectF(0.0, 0.0, pic_width, pic_height)
@@ -937,9 +936,9 @@ class DialogCodeImage(QtWidgets.QDialog):
             self.delete_category_or_code(selected)
         if selected is not None and action == action_show_coded_media:
             found = None
-            tofind = int(selected.text(1)[4:])
+            to_find = int(selected.text(1)[4:])
             for code in self.codes:
-                if code['cid'] == tofind:
+                if code['cid'] == to_find:
                     found = code
                     break
             if found:
@@ -983,9 +982,9 @@ class DialogCodeImage(QtWidgets.QDialog):
 
     def show_codes_like(self):
         """ Show all codes if text parameter is empty.
-         Show selected codes that contain entered text. """
+         Show selected codes that contain entered text.
+         Input dialog is narrow, so some code below to make it wider. """
 
-        # Input dialog narrow, so code below
         dialog = QtWidgets.QInputDialog(None)
         dialog.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         dialog.setWindowTitle(_("Show codes containing"))
@@ -1268,9 +1267,8 @@ class DialogCodeImage(QtWidgets.QDialog):
         if not items:
             return
         msg = ""
-        ttip = ""
+        tooltip = ""
         for i in items:
-            codename = ""
             for c in self.codes:
                 if c['cid'] == i['cid']:
                     codename = c['name']
@@ -1281,9 +1279,9 @@ class DialogCodeImage(QtWidgets.QDialog):
             pic_area = self.pixmap.width() * self.pixmap.height()
             percent_area = round(area / pic_area * 100, 2)
             msg += " area: " + str(percent_area) + "%\n"
-            ttip = msg + "\n" + i['memo']
+            tooltip = msg + "\n" + i['memo']
         self.ui.label_coded_area.setText(msg)
-        self.ui.label_coded_area.setToolTip(ttip)
+        self.ui.label_coded_area.setToolTip(tooltip)
 
     def set_coded_importance(self, item, important=True):
         """ Set or unset importance to coded image item.
@@ -1394,7 +1392,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         if height < 0:
             y = y + height
             height = abs(height)
-        # outside image area, do not code
+        # Outside image area, do not code
         for item in self.scene.items():
             if type(item) == QtWidgets.QGraphicsPixmapItem:
                 if x + width > item.boundingRect().width() or y + height > item.boundingRect().height():
@@ -1435,7 +1433,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             item : QTreeWidgetItem
             parent : QTreeWidgetItem """
 
-        # find the category in the list
+        # Find the category in the list
         if item.text(1)[0:3] == 'cat':
             found = -1
             for i in range(0, len(self.categories)):
@@ -1503,7 +1501,9 @@ class DialogCodeImage(QtWidgets.QDialog):
         return no_merge_list
 
     def merge_category(self, catid):
-        """ Select another category to merge this category into. """
+        """ Select another category to merge this category into.
+        params:
+            catid: Integer category id that is to be merged and removed. """
 
         nons = []
         nons = self.recursive_non_merge_item(self.ui.treeWidget.currentItem(), nons)
@@ -1628,7 +1628,7 @@ class DialogCodeImage(QtWidgets.QDialog):
 
         if selected.text(1)[0:3] == 'cat':
             self.delete_category(selected)
-            return  # avoid error as selected is now None
+            return  # Avoids error as selected is now None
         if selected.text(1)[0:3] == 'cid':
             self.delete_code(selected)
 
@@ -1638,7 +1638,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         param:
             selected : QTreeWidgetItem """
 
-        # find the code_in the list, check to delete
+        # Find the code_in the list, check to delete
         found = -1
         for i in range(0, len(self.codes)):
             if self.codes[i]['cid'] == int(selected.text(1)[4:]):
@@ -1706,7 +1706,7 @@ class DialogCodeImage(QtWidgets.QDialog):
                 selected.setData(2, QtCore.Qt.ItemDataRole.DisplayRole, "")
             else:
                 selected.setData(2, QtCore.Qt.ItemDataRole.DisplayRole, _("Memo"))
-            # update codes list and database
+            # Update codes list and database
             if memo != self.codes[found]['memo']:
                 self.codes[found]['memo'] = memo
                 cur = self.app.conn.cursor()
@@ -1715,7 +1715,7 @@ class DialogCodeImage(QtWidgets.QDialog):
                 self.app.delete_backup = False
 
         if selected.text(1)[0:3] == 'cat':
-            # find the category in the list
+            # Find the category in the list
             found = -1
             for i in range(0, len(self.categories)):
                 if self.categories[i]['catid'] == int(selected.text(1)[6:]):
@@ -1750,7 +1750,7 @@ class DialogCodeImage(QtWidgets.QDialog):
                                                           QtWidgets.QLineEdit.EchoMode.Normal, selected.text(0))
             if not ok or new_name == '':
                 return
-            # check that no other code has this text
+            # Check that no other code has this text
             for c in self.codes:
                 if c['name'] == new_name:
                     Message(self.app, _("Name in use"), new_name + _(" Choose another name"), "warning").exec()
@@ -1778,20 +1778,20 @@ class DialogCodeImage(QtWidgets.QDialog):
                                                           QtWidgets.QLineEdit.EchoMode.Normal, selected.text(0))
             if not ok or new_name == '':
                 return
-            # check that no other category has this text
+            # Check that no other category has this text
             for c in self.categories:
                 if c['name'] == new_name:
                     msg = _("This category name is already in use")
                     Message(self.app, _("Duplicate category name"), msg, "warning").exec()
                     return
-            # find the category in the list
+            # Find the category in the list
             found = -1
             for i in range(0, len(self.categories)):
                 if self.categories[i]['catid'] == int(selected.text(1)[6:]):
                     found = i
             if found == -1:
                 return
-            # update category list and database
+            # Update category list and database
             cur = self.app.conn.cursor()
             cur.execute("update code_cat set name=? where catid=?",
                         (new_name, self.categories[found]['catid']))
@@ -1824,7 +1824,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         if new_color is None:
             return
         selected.setBackground(0, QBrush(QtGui.QColor(new_color), Qt.BrushStyle.SolidPattern))
-        # update codes list and database
+        # Update codes list and database
         self.codes[found]['color'] = new_color
         cur = self.app.conn.cursor()
         cur.execute("update code_name set color=? where cid=?",
