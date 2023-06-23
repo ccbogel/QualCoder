@@ -42,6 +42,7 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QBrush
 
 from .color_selector import TextColor
+from .confirm_delete import DialogConfirmDelete
 from .GUI.base64_helper import *
 from .GUI.ui_dialog_report_codings import Ui_Dialog_reportCodings
 from .helpers import Message, msecs_to_hours_mins_secs, DialogCodeInImage, DialogCodeInAV, DialogCodeInText, \
@@ -2080,14 +2081,16 @@ class DialogReportCodes(QtWidgets.QDialog):
         # Check that there is a link to view at this location before showing menu option
         action_view = None
         action_unmark = None
+        action_important = None
         code_here = None
         for row in self.results:
             if row['textedit_start'] <= pos < row['textedit_end']:
                 code_here = row
                 break
-        if code_here:
+        if code_here and code_here['result_type'] != "deleted":
             action_view = menu.addAction(_("View in context"))
             action_unmark = menu.addAction(_("Unmark"))
+            action_important = menu.addAction(_("Add important mark"))
         action_copy = None
         if selected_text != "":
             action_copy = menu.addAction(_("Copy to clipboard"))
@@ -2108,6 +2111,8 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.show_context_from_text_edit(code_here)
         if action == action_unmark:
             self.unmark(code_here)
+        if action == action_important:
+            self.mark_important(code_here)
         if action == action_copy:
             cb = QtWidgets.QApplication.clipboard()
             cb.setText(selected_text)
@@ -2122,9 +2127,41 @@ class DialogReportCodes(QtWidgets.QDialog):
         if action == action_rotate_180:
             self.rotate_image(cursor_context_pos, img_fmt, html_link, 90)
 
-    def unmark(self, code):
-        """ Unmark this coding. """
+    def mark_important(self, code):
+        """ Add important mark to coding.
+        No effect if already marked important.
+        param:
+            code : Dictionary of codenmae, color, file_or_casename, pos0, pos1, text, coder, fid, ctid, cid, result_type
+        """
 
+        cur = self.app.conn.cursor()
+        if code['result_type'] == 'text':
+            cur.execute("update code_text set important=1 where ctid=?", [code['ctid']])
+        if code['result_type'] == 'image':
+            cur.execute("update code_image set important=1 where imid=?", [code['imid']])
+        if code['result_type'] == 'av':
+            cur.execute("update code_av set important=1 where avid=?", [code['avid']])
+        self.app.conn.commit()
+
+        self.app.delete_backup = False
+
+        # Remove widgets from coding layout
+        contents = self.tab_coding.layout()
+        if contents:
+            for i in reversed(range(contents.count())):
+                contents.itemAt(i).widget().close()
+                contents.itemAt(i).widget().setParent(None)
+
+    def unmark(self, code):
+        """ Unmark this coding.
+        param:
+            code : Dictionary of codenmae, color, file_or_casename, pos0, pos1, text, coder, fid, ctid, cid, result_type"""
+
+        coded = _("Delete coded section. ") + code['codename'] + ". " + code['coder']
+        ui = DialogConfirmDelete(self.app, coded, _("Delete coded section"))
+        ok = ui.exec()
+        if not ok:
+            return
         cur = self.app.conn.cursor()
         if code['result_type'] == 'text':
             cur.execute("delete from code_text where ctid=?", [code['ctid']])
@@ -2133,21 +2170,35 @@ class DialogReportCodes(QtWidgets.QDialog):
         if code['result_type'] == 'av':
             cur.execute("delete from code_av where avid=?", [code['avid']])
         self.app.conn.commit()
+
+        self.app.delete_backup = False
         code['result_type'] = "deleted"
+
+        for m in self.matrix_links:
+            if m['result_type'] == 'text' and m['ctid'] == code['ctid']:
+                m['result_type'] = 'deleted'
+                break
+            if m['result_type'] == 'image' and m['imid'] == code['imid']:
+                m['result_type'] = 'deleted'
+                break
+            if m['result_type'] == 'av' and m['avid'] == code['avid']:
+                m['result_type'] = 'deleted'
+                break
 
         # Format strike through
         cursor = self.ui.textEdit.textCursor()
         cursor.setPosition(code['textedit_start'], QtGui.QTextCursor.MoveMode.MoveAnchor)
         cursor.setPosition(code['textedit_end'], QtGui.QTextCursor.MoveMode.KeepAnchor)
         fmt = QtGui.QTextCharFormat()
-        fmt.setFontStrikeOut(True)  # .setUnderlineStyle(QtGui.QTextCharFormat.UnderlineStyle.SingleUnderline)
+        fmt.setFontStrikeOut(True)
         cursor.mergeCharFormat(fmt)
 
+        # Remove widgets from coding layout
         contents = self.tab_coding.layout()
-        # Remove widgets from layout
-        for i in reversed(range(contents.count())):
-            contents.itemAt(i).widget().close()
-            contents.itemAt(i).widget().setParent(None)
+        if contents:
+            for i in reversed(range(contents.count())):
+                contents.itemAt(i).widget().close()
+                contents.itemAt(i).widget().setParent(None)
 
     def show_context_from_text_edit(self, code):
         """ Heading (code, file, owner) in textEdit clicked so show context of coding in dialog.
@@ -2422,7 +2473,7 @@ class DialogReportCodes(QtWidgets.QDialog):
 
     def fill_matrix_table(self, results, vertical_labels, horizontal_labels):
         """ Clear then fill the table.
-        Called by matrix_by_codes, matrix_by_caegories, matrix_by_top_categories.
+        Called by matrix_by_codes, matrix_by_categories, matrix_by_top_categories.
         """
 
         # Clear and fill tableWidget
@@ -2521,7 +2572,8 @@ class DialogReportCodes(QtWidgets.QDialog):
 
     def table_text_edit_menu(self, position):
         """ Context menu for textEdit.
-        To view coded in context. """
+        To view coded in context.
+        """
 
         x = self.ui.tableWidget.currentRow()
         y = self.ui.tableWidget.currentColumn()
@@ -2537,12 +2589,10 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         # Check that there is a link to view at this location before showing menu option
         action_view = None
-        found = None
         for m in self.matrix_links:
-            if m['row'] == x and m['col'] == y and m['textedit_start'] <= pos < m['textedit_end']:
-                found = True
-        if found:
-            action_view = menu.addAction(_("View in context"))
+            if m['row'] == x and m['col'] == y and m['textedit_start'] <= pos < m['textedit_end'] \
+                    and m['result_type'] != 'deleted':
+                action_view = menu.addAction(_("View in context"))
         action_copy = None
         if selected_text != "":
             action_copy = menu.addAction(_("Copy to clipboard"))
