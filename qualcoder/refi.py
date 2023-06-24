@@ -874,7 +874,7 @@ class RefiImport:
         media_path = "/images/" + name  # Default
         if path_type == "internal":
             # Copy file into .qda images folder and rename into original name
-            destination = self.app.project_path + "/images/" + name
+            destination = os.path.join(self.app.project_path, "images", name)
             media_path = "/images/" + name
             try:
                 shutil.copyfile(source_path, destination)
@@ -970,7 +970,7 @@ class RefiImport:
         media_path = "/audio/" + name  # Default
         if path_type == "internal":
             # Copy file into .qda audio folder and rename into original name
-            destination = self.app.project_path + "/audio/" + name
+            destination = os.path.join(self.app.project_path, "audio", name)
             media_path = "/audio/" + name
             try:
                 shutil.copyfile(source_path, destination)
@@ -1006,7 +1006,7 @@ class RefiImport:
         if no_transcript:
             # Create an empty transcription file
             now_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            txt_name = name + ".transcribed"
+            txt_name = name + ".txt"
             cur.execute('insert into source(name,fulltext,mediapath,memo,owner,date) values(?,"","","",?,?)',
                         (txt_name, creating_user, now_date))
             self.app.conn.commit()
@@ -1032,7 +1032,7 @@ class RefiImport:
         media_path = "/video/" + name  # Default
         if path_type == "internal":
             # Copy file into .qda video folder and rename into original name
-            destination = self.app.project_path + "/video/" + name
+            destination = os.path.join(self.app.project_path, "video", name)
             media_path = "/video/" + name
             try:
                 shutil.copyfile(source_path, destination)
@@ -1316,7 +1316,7 @@ class RefiImport:
         media_path = "/docs/" + name  # Default
         if path_type == "internal":
             # Copy file into .qda documents folder and rename into original name
-            destination = self.app.project_path + "/documents/" + name
+            destination = os.path.join(self.app.project_path, +"documents", name)
             #print("destination: ", destination)
             try:
                 shutil.copyfile(source_path, destination)
@@ -1651,11 +1651,8 @@ class RefiImport:
             # Check annotations have not already be resolved via parsing PlainTextSelection Link to Notes
             for lnk in self.links:
                 if lnk['targetGUID'] == el.get('guid'):
-                    try:
-                        lnk['text']
+                    if lnk.get('text'):
                         annotation = True
-                    except KeyError:
-                        pass
 
             # Presumes Journal paths starts with internal://
             if el.get("plainTextPath") is not None and not annotation and name != "":
@@ -1942,20 +1939,20 @@ class RefiExport(QtWidgets.QDialog):
         """
 
         project_name = self.app.project_name[:-4]
-        prep_path = os.path.expanduser('~') + '/.qualcoder/' + project_name
+        prep_path = os.path.join(os.path.expanduser('~'), '.qualcoder', project_name)
         try:
             shutil.rmtree(prep_path)
         except FileNotFoundError:
             pass
         try:
             os.mkdir(prep_path)
-            os.mkdir(prep_path + "/Sources")
+            os.mkdir(os.path.join(prep_path, "Sources"))
         except Exception as err:
             logger.error(_("Project export error ") + str(err))
             Message(self.app, _("Project"), _("Project not exported. Exiting. ") + str(err), "warning").exec()
             return
         try:
-            with open(prep_path + '/project.qde', 'w', encoding="utf-8-sig") as f:
+            with open(os.path.join(prep_path, 'project.qde'), 'w', encoding="utf-8-sig") as f:
                 f.write(self.xml)
         except Exception as err:
             Message(self.app, _("Project"), _("Project not exported. Exiting. ") + str(err), "warning").exec()
@@ -1983,7 +1980,7 @@ class RefiExport(QtWidgets.QDialog):
 
             if (s['mediapath'] is None or s['mediapath'] == "") and s['external'] is None:  # an internal document
                 try:
-                    shutil.copyfile(self.app.project_path + '/documents/' + s['name'],
+                    shutil.copyfile(os.path.join(self.app.project_path, 'documents', s['name']),
                                     prep_path + destination)
                 except FileNotFoundError:
                     with open(prep_path + destination, 'w', encoding="utf-8-sig") as f:
@@ -1991,19 +1988,19 @@ class RefiExport(QtWidgets.QDialog):
             # Also need to export a plain text file as a source
             # plaintext has different guid from richtext, and also might be associated with media - eg transcripts
             if s['plaintext_filename'] is not None:
-                with open(prep_path + '/Sources/' + s['plaintext_filename'], "w", encoding="utf-8-sig") as f:
+                with open(os.path.join(prep_path, 'Sources', s['plaintext_filename']), "w", encoding="utf-8-sig") as f:
                     try:
                         if add_line_ending_for_maxqda:
                             f.write(s['fulltext'].replace("\n", "\r\n"))
                         else:
                             f.write(s['fulltext'])
                     except Exception as err:
-                        txt_errors += '\nIn plaintext file export: ' + s['plaintext_filename'] + "\n" + str(err)
+                        #txt_errors += '\nIn plaintext file export: ' + s['plaintext_filename'] + "\n" + str(err)
                         logger.error(str(err) + '\nIn plaintext file export: ' + s['plaintext_filename'])
                         print(err)
 
         for notefile in self.note_files:
-            with open(prep_path + '/Sources/' + notefile[0], "w", encoding="utf-8-sig") as f:
+            with open(os.path.join(prep_path, 'Sources', notefile[0]), "w", encoding="utf-8-sig") as f:
                 f.write(notefile[1])
         options = QtWidgets.QFileDialog.Option.DontResolveSymlinks | QtWidgets.QFileDialog.Option.ShowDirsOnly
         directory = QtWidgets.QFileDialog.getExistingDirectory(None,
@@ -2036,7 +2033,7 @@ class RefiExport(QtWidgets.QDialog):
             msg += "\nErrors: "
             msg += txt_errors
         Message(self.app, _("Project exported"), _(msg)).exec()
-        self.parent_textedit.append(_("Project exported") + "\n" + _(msg))
+        self.parent_textedit.append(_("Project exported") + "\n" + msg)
 
     def export_codebook(self):
         """ Export REFI format codebook. """
@@ -2048,7 +2045,7 @@ class RefiExport(QtWidgets.QDialog):
                                                                self.app.settings['directory'], options)
         if directory == "":
             return
-        filename = directory + "/" + filename
+        filename = os.path.join(directory, filename)
         try:
             f = open(filename, 'w')
             f.write(self.xml)
@@ -2150,7 +2147,7 @@ class RefiExport(QtWidgets.QDialog):
             if r[1] == "" or r[1] is None:
                 xml += '<Description />\n'
             else:
-                xml += '<Description>' + html.escape(r[1]) + '</Description>\n'
+                xml += f"<Description>{html.escape(r[1])}</Description>\n"
             xml += '</Variable>\n'
             self.variables.append({'guid': guid, 'name': r[0], 'caseOrFile': r[2], 'type': r[3]})
         xml += '</Variables>\n'
@@ -2167,7 +2164,7 @@ class RefiExport(QtWidgets.QDialog):
         if not results:  # this should not happen
             return '<Description />\n'
         memo = str(results[0][0])
-        xml = '<Description>' + html.escape(memo) + '</Description>\n'
+        xml = f"<Description>{html.escape(memo)}</Description>\n"
         return xml
 
     def create_journal_note_xml(self, journal):
@@ -2243,9 +2240,8 @@ class RefiExport(QtWidgets.QDialog):
                 user = u['guid']
                 break
         xml += 'creatingUser="' + user + '" '
-        xml += 'creationDateTime="' + self.convert_timestamp(ann['date']) + '" '
-        xml += '>\n'
-        xml += '<PlainTextContent>' + ann['memo'] + '</PlainTextContent>\n'
+        xml += 'creationDateTime="' + self.convert_timestamp(ann['date']) + '" >\n'
+        xml += f"<PlainTextContent>{ann['memo']}</PlainTextContent>\n"
         guid = self.create_guid()
         xml += '<PlainTextSelection guid="' + guid + '" startPosition="' + str(ann['pos0'])
         xml += '" endPosition="' + str(ann['pos1']) + '" />\n'
@@ -2295,7 +2291,7 @@ class RefiExport(QtWidgets.QDialog):
             xml += 'name="' + html.escape(r[1]) + '">\n'
             if r[2] != "":
                 description = html.escape(r[2])
-                xml += '<Description>' + description + '</Description>\n'
+                xml += f"<Description>{description}</Description>\n"
             else:
                 xml += '<Description />\n'
             xml += self.case_variables_xml(r[0])
@@ -2332,9 +2328,9 @@ class RefiExport(QtWidgets.QDialog):
                     var_type = v['type']
             xml += '<VariableRef targetGUID="' + guid + '" />\n'
             if var_type == 'numeric' and a[1] != '':
-                xml += '<FloatValue>' + a[1] + '</FloatValue>\n'
+                xml += f"<FloatValue>{a[1]}</FloatValue>\n"
             if var_type == 'character':
-                xml += '<TextValue>' + html.escape(a[1]) + '</TextValue>\n'
+                xml += f"<TextValue>{html.escape(a[1])}</TextValue>\n"
             xml += '</VariableValue>\n'
         return xml
 
@@ -2357,9 +2353,7 @@ class RefiExport(QtWidgets.QDialog):
             for s in self.sources:
                 if s['id'] == row[0]:
                     # put xml creation here, in case a source id does not match up
-                    xml += '<SourceRef targetGUID="'
-                    xml += s['guid']
-                    xml += '"/>\n'
+                    xml += '<SourceRef targetGUID="' + s['guid'] + '"/>\n'
         return xml
 
     def source_variables_xml(self, sourceid):
@@ -2391,9 +2385,9 @@ class RefiExport(QtWidgets.QDialog):
                     var_type = v['type']
             xml += '<VariableRef targetGUID="' + guid + '" />\n'
             if var_type == 'numeric' and a[1] != '':  # test
-                xml += '<FloatValue>' + a[1] + '</FloatValue>\n'
+                xml += f"<FloatValue>{a[1]}</FloatValue>\n"
             if var_type == 'character':
-                xml += '<TextValue>' + html.escape(a[1]) + '</TextValue>\n'
+                xml += f"<TextValue>{html.escape(a[1])}</TextValue>\n"
             xml += '</VariableValue>\n'
         return xml
 
@@ -2465,7 +2459,7 @@ class RefiExport(QtWidgets.QDialog):
                 xml += 'name="' + html.escape(s['name']) + '">\n'
                 memo = html.escape(s['memo'])
                 if memo != "":
-                    xml += '<Description>' + memo + '</Description>\n'
+                    xml += f"<Description>{memo}</Description>\n"
                 xml += self.text_selection_xml(s['id'])
                 xml += self.source_variables_xml(s['id'])
                 for a in self.annotations:
@@ -2490,7 +2484,7 @@ class RefiExport(QtWidgets.QDialog):
                 xml += 'name="' + html.escape(s['name']) + '">\n'
                 memo = html.escape(s['memo'])
                 if s['memo'] != "":
-                    xml += '<Description>' + memo + '</Description>\n'
+                    xml += f"<Description>{memo}</Description>\n"
                 xml += '<Representation guid="' + self.create_guid() + '" '
                 # Internal filename is a guid identifier
                 xml += 'plainTextPath="internal://' + s['plaintext_filename'] + '" '
@@ -2518,7 +2512,7 @@ class RefiExport(QtWidgets.QDialog):
                 xml += 'name="' + html.escape(s['name']) + '" >\n'
                 memo = html.escape(s['memo'])
                 if memo != '':
-                    xml += '<Description>' + memo + '</Description>\n'
+                    xml += f"<Description>{memo}</Description>\n"
                 xml += self.picture_selection_xml(s['id'])
                 xml += self.source_variables_xml(s['id'])
                 xml += '</PictureSource>\n'
@@ -2536,7 +2530,7 @@ class RefiExport(QtWidgets.QDialog):
                 xml += 'name="' + html.escape(s['name']) + '" >\n'
                 memo = html.escape(s['memo'])
                 if memo != '':
-                    xml += '<Description>' + memo + '</Description>\n'
+                    xml += f"<Description>{memo}</Description>\n"
                 xml += self.transcript_xml(s)
                 xml += self.av_selection_xml(s['id'], 'Audio')
                 xml += self.source_variables_xml(s['id'])
@@ -2556,7 +2550,7 @@ class RefiExport(QtWidgets.QDialog):
                 xml += 'name="' + html.escape(s['name']) + '" >\n'
                 memo = html.escape(self.code_guid(s['memo']))
                 if memo != '':
-                    xml += '<Description>' + memo + '</Description>\n'
+                    xml += f"<Description>{memo}</Description>\n"
                 xml += self.transcript_xml(s)
                 xml += self.av_selection_xml(s['id'], 'Video')
                 xml += self.source_variables_xml(s['id'])
@@ -2592,7 +2586,7 @@ class RefiExport(QtWidgets.QDialog):
                 xml += 'creationDateTime="' + self.convert_timestamp(r[5]) + '">\n'
                 if r[6] != "":  # Description element comes before coding element
                     memo = html.escape(r[6])
-                    xml += '<Description>' + memo + '</Description>\n'
+                    xml += f"<Description>{memo}</Description>\n"
                 xml += '<Coding guid="' + self.create_guid() + '" '
                 xml += 'creatingUser="' + self.user_guid(r[4]) + '" >\n'
                 xml += '<CodeRef targetGUID="' + code_guid + '" />\n'
@@ -2627,7 +2621,7 @@ class RefiExport(QtWidgets.QDialog):
             xml += 'creationDateTime="' + self.convert_timestamp(r[7]) + '">\n'
             if r[8] is not None and r[8] != "":
                 memo = html.escape(r[8])
-                xml += '<Description>' + memo + '</Description>\n'
+                xml += f"<Description>{memo}</Description>\n"
             xml += '<Coding guid="' + self.create_guid() + '" '
             xml += 'creatingUser="' + self.user_guid(r[6]) + '" >\n'
             code_guid = self.code_guid(r[1])
@@ -2671,7 +2665,7 @@ class RefiExport(QtWidgets.QDialog):
             xml += 'creatingUser="' + self.user_guid(r[4]) + '" >\n'
             if r[6] != "":
                 memo = html.escape(r[6])
-                xml += '<Description>' + memo + '</Description>\n'
+                xml += f"<Description>{memo}</Description>\n"
             xml += '<Coding guid="' + self.create_guid() + '" '
             xml += 'creatingUser="' + self.user_guid(r[4]) + '" '
             xml += 'creationDateTime="' + self.convert_timestamp(r[5]) + '">\n'
@@ -2679,7 +2673,7 @@ class RefiExport(QtWidgets.QDialog):
             if code_guid != "":
                 xml += '<CodeRef targetGUID="' + code_guid + '"/>\n'
             xml += '</Coding>\n'
-            xml += '</' + mediatype + 'Selection>\n'
+            xml += f"</{mediatype}'Selection>\n"
         return xml
 
     def transcript_xml(self, source):
@@ -2953,9 +2947,7 @@ class RefiExport(QtWidgets.QDialog):
         """ Convert yyyy-mm-dd hh:mm:ss to REFI-QDA yyyy-mm-ddThh:mm:ssZ
         I have found one instance of an underscore where the space should be. """
 
-        time_out = time_in[0:10] + "T" + time_in[11:] + "Z"
-        '''if " " in time_in:
-            time_out = time_in.split(' ')[0] + 'T' + time_in.split(' ')[1] + "Z"'''
+        time_out = f"{time_in[0:10]}T{time_in[11:]}Z"
         return time_out
 
     def get_sources(self):
@@ -3006,6 +2998,7 @@ class RefiExport(QtWidgets.QDialog):
                 if source['mediapath'][0:6] in ('audio:', 'video:'):
                     source['external'] = source['mediapath'][6:]
             self.sources.append(source)
+
     def get_users(self):
         """ Get all users and assign guid.
         QualCoder sqlite does not actually keep a separate list of users.
@@ -3037,7 +3030,7 @@ class RefiExport(QtWidgets.QDialog):
             memo = html.escape(c['memo'])
             if memo != "":
                 xml += '>\n'
-                xml += '<Description>' + memo + '</Description>\n'
+                xml += f"<Description>{memo}</Description>\n"
                 xml += '</Code>\n'
             else:  # no description element, so wrap up code as <code />
                 xml += ' />\n'
@@ -3086,7 +3079,7 @@ class RefiExport(QtWidgets.QDialog):
                 xml += '">\n'
                 memo = html.escape(ca['memo'])
                 if memo != "":
-                    xml += '<Description>' + memo + '</Description>\n'
+                    xml += f"<Description>{memo}</Description>\n"
                 # Add codes in this category
                 for code_ in self.codes:
                     if code_['catid'] == ca['catid']:
@@ -3120,7 +3113,7 @@ class RefiExport(QtWidgets.QDialog):
                     xml += '">\n'
                     memo = html.escape(c['memo'])
                     if memo != "":
-                        xml += '<Description>' + memo + '</Description>\n'
+                        xml += f"<Description>{memo}</Description>\n"
                     xml += self.add_sub_categories(c['catid'], cats)
                     # add codes
                     for co in self.codes:
@@ -3203,5 +3196,3 @@ class RefiExport(QtWidgets.QDialog):
             print("Invalid xml", e_)
             logger.error(e_)
             return False
-
-
