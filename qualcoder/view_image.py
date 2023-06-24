@@ -339,7 +339,7 @@ class DialogCodeImage(QtWidgets.QDialog):
 
         child_count = item.childCount()
         for i in range(child_count):
-            if "catid:" in item.child(i).text(1)  and not item.child(i).isExpanded():
+            if "catid:" in item.child(i).text(1) and not item.child(i).isExpanded():
                 non_expanded.append(item.child(i).text(1))
             self.tree_traverse_for_non_expanded(item.child(i), non_expanded)
 
@@ -465,7 +465,7 @@ class DialogCodeImage(QtWidgets.QDialog):
                 it += 1
                 item = it.value()
                 count += 1
-        #self.ui.treeWidget.expandAll()
+        # self.ui.treeWidget.expandAll()
         self.fill_code_counts_in_tree()
 
     def fill_code_counts_in_tree(self):
@@ -1505,12 +1505,12 @@ class DialogCodeImage(QtWidgets.QDialog):
         params:
             catid: Integer category id that is to be merged and removed. """
 
-        nons = []
-        nons = self.recursive_non_merge_item(self.ui.treeWidget.currentItem(), nons)
-        nons.append(str(catid))
-        non_str = "(" + ",".join(nons) + ")"
+        do_not_merge_list = []
+        do_not_merge_list = self.recursive_non_merge_item(self.ui.treeWidget.currentItem(), do_not_merge_list)
+        do_not_merge_list.append(str(catid))
+        do_not_merge_ids_str = "(" + ",".join(do_not_merge_list) + ")"
         sql = "select name, catid, supercatid from code_cat where catid not in "
-        sql += non_str + " order by name"
+        sql += do_not_merge_ids_str + " order by name"
         cur = self.app.conn.cursor()
         cur.execute(sql)
         res = cur.fetchall()
@@ -1522,8 +1522,8 @@ class DialogCodeImage(QtWidgets.QDialog):
         if not ok:
             return
         category = ui.get_selected()
-        for c in self.codes:
-            if c['catid'] == catid:
+        for code in self.codes:
+            if code['catid'] == catid:
                 cur.execute("update code_name set catid=? where catid=?", [category['catid'], catid])
         cur.execute("delete from code_cat where catid=?", [catid])
         self.app.conn.commit()
@@ -1537,8 +1537,8 @@ class DialogCodeImage(QtWidgets.QDialog):
         cur.execute(sql)
         orphans = cur.fetchall()
         sql = "update code_cat set supercatid=Null where supercatid=?"
-        for i in orphans:
-            cur.execute(sql, [i[0]])
+        for orphan in orphans:
+            cur.execute(sql, [orphan[0]])
         self.app.conn.commit()
         self.update_dialog_codes_and_categories()
 

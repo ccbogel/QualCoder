@@ -412,7 +412,7 @@ class DialogCodeText(QtWidgets.QWidget):
             item.setToolTip(tt)
             self.ui.listWidget.addItem(item)
         self.file_ = None
-        self.code_text = [] # Must be before clearing textEdit, as next calls cursorChanged
+        self.code_text = []  # Must be before clearing textEdit, as next calls cursorChanged
         self.ui.textEdit.setText("")
 
     def update_file_tooltip(self):
@@ -550,7 +550,7 @@ class DialogCodeText(QtWidgets.QWidget):
 
         child_count = item.childCount()
         for i in range(child_count):
-            if "catid:" in item.child(i).text(1)  and not item.child(i).isExpanded():
+            if "catid:" in item.child(i).text(1) and not item.child(i).isExpanded():
                 non_expanded.append(item.child(i).text(1))
             self.tree_traverse_for_non_expanded(item.child(i), non_expanded)
 
@@ -675,7 +675,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 it += 1
                 item = it.value()
                 count += 1
-        #self.ui.treeWidget.expandAll()
+        # self.ui.treeWidget.expandAll()
         self.fill_code_counts_in_tree()
 
     def fill_code_counts_in_tree(self):
@@ -1532,14 +1532,17 @@ class DialogCodeText(QtWidgets.QWidget):
         return no_merge_list
 
     def merge_category(self, catid):
-        """ Select another category to merge this category into. """
+        """ Select another category to merge this category into.
+        param:
+            catid : Integer cateogry identfier
+        """
 
-        nons = []
-        nons = self.recursive_non_merge_item(self.ui.treeWidget.currentItem(), nons)
-        nons.append(str(catid))
-        non_str = "(" + ",".join(nons) + ")"
+        do_not_merge_list = []
+        do_not_merge_list = self.recursive_non_merge_item(self.ui.treeWidget.currentItem(), do_not_merge_list)
+        do_not_merge_list.append(str(catid))
+        do_not_merge_ids_string = "(" + ",".join(do_not_merge_list) + ")"
         sql = "select name, catid, supercatid from code_cat where catid not in "
-        sql += non_str + " order by name"
+        sql += do_not_merge_ids_string + " order by name"
         cur = self.app.conn.cursor()
         cur.execute(sql)
         res = cur.fetchall()
@@ -1551,8 +1554,8 @@ class DialogCodeText(QtWidgets.QWidget):
         if not ok:
             return
         category = ui.get_selected()
-        for c in self.codes:
-            if c['catid'] == catid:
+        for code in self.codes:
+            if code['catid'] == catid:
                 cur.execute("update code_name set catid=? where catid=?", [category['catid'], catid])
         cur.execute("delete from code_cat where catid=?", [catid])
         self.app.conn.commit()
@@ -1566,8 +1569,8 @@ class DialogCodeText(QtWidgets.QWidget):
         cur.execute(sql)
         orphans = cur.fetchall()
         sql = "update code_cat set supercatid=Null where supercatid=?"
-        for i in orphans:
-            cur.execute(sql, [i[0]])
+        for orphan in orphans:
+            cur.execute(sql, [orphan[0]])
         self.app.conn.commit()
         self.update_dialog_codes_and_categories()
 
@@ -1979,7 +1982,9 @@ class DialogCodeText(QtWidgets.QWidget):
         return False
 
     def extend_left(self, code_):
-        """ Shift left arrow. """
+        """ Shift left arrow.
+        param:
+            code_ """
 
         if code_['pos0'] < 1:
             return
@@ -3459,7 +3464,7 @@ class DialogCodeText(QtWidgets.QWidget):
             all = "all" :  for all text files.
         """
 
-        if all_ =="" and not self.file_:
+        if all_ == "" and not self.file_:
             return
         item = self.ui.treeWidget.currentItem()
         if item is None or item.text(1)[0:3] == 'cat':

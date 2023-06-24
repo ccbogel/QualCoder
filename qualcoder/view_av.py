@@ -498,7 +498,7 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         child_count = item.childCount()
         for i in range(child_count):
-            if "catid:" in item.child(i).text(1)  and not item.child(i).isExpanded():
+            if "catid:" in item.child(i).text(1) and not item.child(i).isExpanded():
                 non_expanded.append(item.child(i).text(1))
             self.tree_traverse_for_non_expanded(item.child(i), non_expanded)
             
@@ -625,7 +625,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                 it += 1
                 item = it.value()
                 count += 1
-        #self.ui.treeWidget.expandAll()
+        # self.ui.treeWidget.expandAll()
         self.fill_code_counts_in_tree()
 
     def fill_code_counts_in_tree(self):
@@ -1702,12 +1702,10 @@ class DialogCodeAV(QtWidgets.QDialog):
             return False
 
         key = event.key()
-        mods = event.modifiers()
+        mod = event.modifiers()
         # Change start and end code positions using alt arrow left and alt arrow right
         # and shift arrow left, shift arrow right
         if self.ui.textEdit.hasFocus():
-            key = event.key()
-            mod = event.modifiers()
             cursor_pos = self.ui.textEdit.textCursor().position()
             codes_here = []
             for item in self.code_text:
@@ -1771,7 +1769,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         child_count = item.childCount()
         for i in range(child_count):
             if item.child(i).text(1)[0:3] == "cid" and (item.child(i).text(0) == text_ or
-            item.child(i).toolTip(0) == text_):
+                item.child(i).toolTip(0) == text_):
                 self.ui.treeWidget.setCurrentItem(item.child(i))
             self.recursive_set_current_item(item.child(i), text_)
 
@@ -2056,14 +2054,14 @@ class DialogCodeAV(QtWidgets.QDialog):
     def merge_category(self, catid):
         """ Select another category to merge this category into.
         param:
-            catid: integer """
+            catid: Integer  category identifier """
 
-        nons = []
-        nons = self.recursive_non_merge_item(self.ui.treeWidget.currentItem(), nons)
-        nons.append(str(catid))
-        non_str = "(" + ",".join(nons) + ")"
+        do_not_merge_list = []
+        do_not_merge_list = self.recursive_non_merge_item(self.ui.treeWidget.currentItem(), do_not_merge_list)
+        do_not_merge_list.append(str(catid))
+        do_not_merge_ids_str = "(" + ",".join(do_not_merge_list) + ")"
         sql = "select name, catid, supercatid from code_cat where catid not in "
-        sql += non_str + " order by name"
+        sql += do_not_merge_ids_str + " order by name"
         cur = self.app.conn.cursor()
         cur.execute(sql)
         res = cur.fetchall()
@@ -2075,8 +2073,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         if not ok:
             return
         category = ui.get_selected()
-        for c in self.codes:
-            if c['catid'] == catid:
+        for code in self.codes:
+            if code['catid'] == catid:
                 cur.execute("update code_name set catid=? where catid=?", [category['catid'], catid])
         cur.execute("delete from code_cat where catid=?", [catid])
         self.app.conn.commit()
@@ -2090,8 +2088,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         cur.execute(sql)
         orphans = cur.fetchall()
         sql = "update code_cat set supercatid=Null where supercatid=?"
-        for i in orphans:
-            cur.execute(sql, [i[0]])
+        for orphan in orphans:
+            cur.execute(sql, [orphan[0]])
         self.app.conn.commit()
         self.update_dialog_codes_and_categories()
 
@@ -2233,7 +2231,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         cur.execute("delete from code_cat where catid = ?", [category['catid'], ])
         self.app.conn.commit()
         self.parent_textEdit.append(_("Category deleted: ") + category['name'])
-        selected = None
         self.update_dialog_codes_and_categories()
         self.app.delete_backup = False
 
@@ -3241,7 +3238,7 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         action_export = None
         try:
             result = subprocess.run(['ffmpeg', '-version'], capture_output=True, text=True).stdout
-            #print("RESULT:", result)
+            # print(f"RESULT: {result}")
             action_export = menu.addAction(_('Export segment to file'))
         except Exception as e_:
             print("Cannot find ffmpeg")
@@ -3325,7 +3322,7 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         ffmpeg_command += ' -to '
         ffmpeg_command += str(self.segment['pos1']/1000)
         ffmpeg_command += ' -c copy "' + filepath + '"'
-        #print("FFMPEG COMMAND\n", ffmpeg_command)
+        # print(f"FFMPEG COMMAND\n {ffmpeg_command}")
         try:
             subprocess.run(ffmpeg_command, timeout=15, shell=True)
             self.code_av_dialog.parent_textEdit.append(_("A/V segment exported: ") + filepath)
@@ -3728,7 +3725,7 @@ class DialogViewAV(QtWidgets.QDialog):
         # NOT using QVideoWidget - too difficult to use
         self.ddialog.dframe = QtWidgets.QFrame(self.ddialog)
         self.ddialog.dframe.setObjectName("frame")
-        #TODO commented out code does not work
+        # TODO commented out code does not work
         '''if platform.system() == "Darwin":  # for MacOS
             self.ddialog.dframe = QtWidgets.QMacCocoaViewContainer(0)'''
         self.palette = self.ddialog.dframe.palette()
@@ -3758,7 +3755,7 @@ class DialogViewAV(QtWidgets.QDialog):
         self.mediaplayer = self.instance.media_player_new()
         self.mediaplayer.video_set_mouse_input(False)
         self.mediaplayer.video_set_key_input(False)
-        #self.mediaplayer.set_hwnd(int(self.ddialog.dframe.winId())) # Does not work, but works without anyway
+        # self.mediaplayer.set_hwnd(int(self.ddialog.dframe.winId())) # Does not work as is, but above code works without anyway
         self.ui.pushButton_play.clicked.connect(self.play_pause)
         self.ui.horizontalSlider_vol.valueChanged.connect(self.set_volume)
         self.ui.comboBox_tracks.currentIndexChanged.connect(self.audio_track_changed)
