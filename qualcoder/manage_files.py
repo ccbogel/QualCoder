@@ -440,7 +440,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             webbrowser.open(media_path)
             return
         logger.error("Cannot open text file in browser " + mediapath)
-        print("manage_files.view_original_text_file. Cannot open text file in browser " + mediapath)
+        print(f"manage_files.view_original_text_file. Cannot open text file in browser {mediapath}")
 
     def assign_case_to_file(self):
         """ Assign one or more cases to file. """
@@ -494,7 +494,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         cur.execute("update source set name=? where name=?", [new_name, existing_name])
         self.app.conn.commit()
-        self.parent_text_edit.append(_("Renamed database file entry: ") + existing_name + " -> " + new_name)
+        self.parent_text_edit.append(_("Renamed database file entry: ") + f"{existing_name} -> {new_name}")
         entry = {'old_name': existing_name, 'name': new_name,
                  'fid': int(self.ui.tableWidget.item(row, self.ID_COLUMN).text())}
         self.files_renamed.append(entry)
@@ -529,7 +529,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         cur.execute("update source set name=? where name=?", [selection['old_name'], selection['name']])
         self.app.conn.commit()
         self.parent_text_edit.append(_("Reversed renamed database file entry: ") +
-                                     selection['name'] + " -> " + selection['old_name'])
+                                     f"{selection['name']} -> {selection['old_name']}")
         self.load_file_data()
         self.files_renamed = [x for x in self.files_renamed if not (selection['fid'] == x.get('fid'))]
         if len(self.files_renamed) == 0:
@@ -711,8 +711,6 @@ class DialogManageFiles(QtWidgets.QDialog):
         cols = self.ui.tableWidget.columnCount()
         rows = self.ui.tableWidget.rowCount()
         header = [self.ui.tableWidget.horizontalHeaderItem(i).text() for i in range(0, cols)]
-        '''for i in range(0, cols):
-            header.append(self.ui.tableWidget.horizontalHeaderItem(i).text())'''
         with open(filepath, mode='w') as f:
             writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             writer.writerow(header)
@@ -890,7 +888,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             except (FileNotFoundError, PIL.UnidentifiedImageError):
                 metadata += _("Cannot locate media. ") + abs_path
                 return icon, metadata
-            metadata += "W: " + str(w) + " x H: " + str(h)
+            metadata += f"W: {w} x H: {h}"
         if res[2][:7] == "images:":
             pm = QtGui.QPixmap()
             pm.loadFromData(QtCore.QByteArray.fromBase64(picture_link), "png")
@@ -903,7 +901,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             except (FileNotFoundError, PIL.UnidentifiedImageError):
                 metadata += _("Cannot locate media. ") + abs_path
                 return icon, metadata
-            metadata += "W: " + str(w) + " x H: " + str(h)
+            metadata += f"W: {w} x H: {h}"
         if res[2][:7] == "/video/":
             pm = QtGui.QPixmap()
             pm.loadFromData(QtCore.QByteArray.fromBase64(play), "png")
@@ -945,11 +943,11 @@ class DialogManageFiles(QtWidgets.QDialog):
             bytes_ = os.path.getsize(abs_path)
         except OSError:
             pass
-        metadata += "\nBytes: " + str(bytes_)
+        metadata += f"\nBytes: {bytes_}"
         if 1024 < bytes_ < 1024 * 1024:
-            metadata += "  " + str(int(bytes_ / 1024)) + "KB"
+            metadata += f"  {int(bytes_ / 1024)}KB"
         if bytes_ > 1024 * 1024:
-            metadata += "  " + str(int(bytes_ / 1024 / 1024)) + "MB"
+            metadata += f"  {int(bytes_ / 1024 / 1024)}MB"
         # Get case names linked to the file
         txt = self.get_cases_by_filename(res[0])
         if txt != "":
@@ -1690,8 +1688,6 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.av_dialog_open = None
         index_list = self.ui.tableWidget.selectionModel().selectedIndexes()
         rows = [i.row() for i in index_list]
-        '''for i in index_list:
-            rows.append(i.row())'''
         rows = list(set(rows))  # duplicate rows due to multiple columns
         if len(rows) == 0:
             return
@@ -1863,8 +1859,6 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.av_dialog_open = None
         index_list = self.ui.tableWidget.selectionModel().selectedIndexes()
         rows = [i.row() for i in index_list]
-        '''for i in index_list:
-            rows.append(i.row())'''
         rows = list(set(rows))  # duplicate rows due to multiple columns
         if len(rows) == 0:
             return

@@ -303,7 +303,8 @@ class App(object):
 
         if ids is None:
             ids = []
-        sql = "select id, name, ifnull(memo,''), mediapath from source where (mediapath is Null or mediapath like '/docs/%' or mediapath like 'docs:%') "
+        sql = "select id, name, ifnull(memo,''), mediapath from source where (mediapath is Null or mediapath " \
+              "like '/docs/%' or mediapath like 'docs:%') "
         if ids:
             str_ids = list(map(str, ids))
             sql += " and id in (" + ",".join(str_ids) + ")"
@@ -945,12 +946,12 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def fill_recent_projects_menu_actions(self):
         """ Get the recent projects from the .qualcoder txt file.
-        Add up to 7 recent projects to the menu. """
+        Add up to five recent projects to the menu. """
 
         self.recent_projects = self.app.read_previous_project_paths()
         if len(self.recent_projects) == 0:
             return
-        # Removes the qtdesigner default action. Also clears the section when a proect is closed
+        # Removes the qtdesigner default action. Also clears the section when a project is closed
         # so that the options for recent projects can be updated
         self.ui.menuOpen_Recent_Project.clear()
         for i, r in enumerate(self.recent_projects):
@@ -1109,19 +1110,19 @@ class MainWindow(QtWidgets.QMainWindow):
     def settings_report(self):
         """ Display general settings and project summary """
 
-        self.ui.textEdit.append("<h1>" +_("Settings") + "</h1>")
+        self.ui.textEdit.append("<h1>" + _("Settings") + "</h1>")
         msg = _("Coder") + ": " + self.app.settings['codername'] + "\n"
-        msg += _("Font") + ": " + self.app.settings['font'] + " " + str(self.app.settings['fontsize']) + "\n"
-        msg += _("Tree font size") + ": " + str(self.app.settings['treefontsize']) + "\n"
-        msg += _("Working directory") + ": " + self.app.settings['directory']
-        msg += "\n" + _("Show IDs") + ": " + str(self.app.settings['showids']) + "\n"
-        msg += _("Language") + ": " + self.app.settings['language'] + "\n"
-        msg += _("Timestamp format") + ": " + self.app.settings['timestampformat'] + "\n"
-        msg += _("Speaker name format") + ": " + str(self.app.settings['speakernameformat']) + "\n"
+        msg += _("Font") + ": " + f"{self.app.settings['font']} {str(self.app.settings['fontsize'])}\n"
+        msg += _("Tree font size") + f": {str(self.app.settings['treefontsize'])}\n"
+        msg += _("Working directory") + f": {self.app.settings['directory']}\n"
+        msg += _("Show IDs") + f": {str(self.app.settings['showids'])}\n"
+        msg += _("Language") + f": {self.app.settings['language']}\n"
+        msg += _("Timestamp format") + f": {self.app.settings['timestampformat']}\n"
+        msg += _("Speaker name format") + f": {str(self.app.settings['speakernameformat'])}\n"
         msg += _("Report text context characters: ") + str(self.app.settings['report_text_context_characters']) + "\n"
         msg += _("Report text context style: ") + self.app.settings['report_text_context_style'] + "\n"
-        msg += _("Backup on open") + ": " + str(self.app.settings['backup_on_open']) + "\n"
-        msg += _("Backup AV files") + ": " + str(self.app.settings['backup_av_files']) + "\n"
+        msg += _("Backup on open") + f": {str(self.app.settings['backup_on_open'])}\n"
+        msg += _("Backup AV files") + f": {str(self.app.settings['backup_av_files'])}\n"
         msg += _("Style") + "; " + self.app.settings['stylesheet']
         if platform.system() == "Windows":
             msg += "\n" + _("Directory (folder) paths / represents \\")
@@ -1664,7 +1665,7 @@ class MainWindow(QtWidgets.QMainWindow):
         except Exception as err:
             msg = _("Problem creating database ")
             logger.warning(msg + self.app.project_path + " Exception:" + str(err))
-            self.ui.textEdit.append("\n" + msg + "\n" + self.app.project_path)
+            self.ui.textEdit.append(f"\n{msg}\n{self.app.project_path}")
             self.ui.textEdit.append(str(err))
             self.close_project()
             return
@@ -1698,7 +1699,7 @@ class MainWindow(QtWidgets.QMainWindow):
         ui = DialogSettings(self.app)
         ui.exec()
         self.settings_report()
-        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
+        font = f"font: {str(self.app.settings['fontsize'])} + pt "
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
         # Name change: Close all opened dialogs as coder name needs to change everywhere
@@ -1981,7 +1982,6 @@ class MainWindow(QtWidgets.QMainWindow):
         except sqlite3.OperationalError:
             cur.execute('ALTER TABLE source ADD risid integer')
 
-
         # Save a date and 24 hour stamped backup
         if self.app.settings['backup_on_open'] == 'True' and newproject == "no":
             self.save_backup()
@@ -2142,7 +2142,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 contents.itemAt(i).widget().setParent(None)
         # Added if statement for the first opening of QualCoder. Otherwise, looks odd closing a project that is not there.
         if self.app.project_name != "":
-            self.ui.textEdit.append("Closing project: " + self.app.project_name)
+            self.ui.textEdit.append(_("Closing project: ") + self.app.project_name)
             self.ui.textEdit.append("========\n")
             self.app.append_recent_project(self.app.project_path)
         if self.app.conn is not None:
