@@ -130,10 +130,10 @@ class DialogCodeImage(QtWidgets.QDialog):
         # Need this otherwise small images are centred on screen, and affect context menu position points
         self.ui.graphicsView.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignTop)
         self.scene.installEventFilter(self)
-        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
+        font = f"font: {self.app.settings['fontsize']}pt "
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
-        tree_font = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
+        tree_font = f"font: {self.app.settings['treefontsize']}pt "
         tree_font += '"' + self.app.settings['font'] + '";'
         self.ui.treeWidget.setStyleSheet(tree_font)
         self.ui.label_image.setStyleSheet(tree_font)  # Usually smaller font
@@ -750,9 +750,9 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.scene.clear()
         self.scene.addItem(pixmap_item)
         self.draw_coded_areas()
-        scale_text = _("Scale: ") + str(int(self.scale * 100)) + "%"
+        scale_text = _("Scale: ") + f"{int(self.scale * 100)}%"
         self.ui.horizontalSlider.setToolTip(scale_text)
-        msg = _("Width") + ": " + str(self.pixmap.width()) + " " + _("Height") + ": " + str(self.pixmap.height()) + "\n"
+        msg = _("Width") + f": {self.pixmap.width()} " + _("Height") + f": {self.pixmap.height()}\n"
         msg += scale_text + " " + _("Rotation") + ": " + str(self.degrees) + "\u00b0"
         self.ui.label_image.setText(msg)
 
@@ -769,11 +769,11 @@ class DialogCodeImage(QtWidgets.QDialog):
                 tooltip = ""
                 for c in self.codes:
                     if c['cid'] == item['cid']:
-                        tooltip = c['name'] + " (" + item['owner'] + ")"
+                        tooltip = f"{c['name']} ({item['owner']})"
                         if self.app.settings['showids']:
-                            tooltip += "[imid:" + str(item['imid']) + "]"
+                            tooltip += f"[imid:{item['imid']}]"
                         if item['memo'] != "":
-                            tooltip += "\nMemo: " + item['memo']
+                            tooltip += f"\nMemo: {item['memo']}"
                         if item['important'] == 1:
                             tooltip += "\n" + _("IMPORTANT")
                         color = QtGui.QColor(c['color'])
@@ -836,7 +836,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         # Create html file
         h = "<!DOCTYPE html>\n<html>\n<head>\n<title>Coded Image</title>\n</head>\n"
         h += "<body>\n<div>\n"
-        h += "<h1>" + html.escape(filename) + "</h1>\n"
+        h += f"<h1>{html.escape(filename)}</h1>\n"
         h += '<img src="data:image/png;base64,' + base64_string + '" usemap="#coded_areas" />'
         # Create image map
         h += "<map name='coded_areas'>\n"
@@ -872,7 +872,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         h += "</map>\n"
         if self.file_['memo'] != "":
             h += '<h2>Image memo</h2>\n'
-            h += '<p>' + html.escape(self.file_['memo']) + '</p>\n'
+            h += f"<p>{html.escape(self.file_['memo'])}</p>\n"
         h += "</div>\n</body>\n</html>"
         with open(filepath, 'w', encoding='utf-8-sig') as f:
             f.write(h)
@@ -1273,12 +1273,12 @@ class DialogCodeImage(QtWidgets.QDialog):
                 if c['cid'] == i['cid']:
                     codename = c['name']
                     msg += codename
-            msg += "\nx:" + str(int(i['x1'])) + " y:" + str(int(i['y1']))
-            msg += " w:" + str(int(i['width'])) + " h:" + str(int(i['height']))
+            msg += f"\nx:{int(i['x1'])} y:{int(i['y1'])}"
+            msg += f" w:{int(i['width'])} h:{int(i['height'])}"
             area = i['width'] * i['height']
             pic_area = self.pixmap.width() * self.pixmap.height()
             percent_area = round(area / pic_area * 100, 2)
-            msg += " area: " + str(percent_area) + "%\n"
+            msg += f" area: {percent_area}%\n"
             tooltip = msg + "\n" + i['memo']
         self.ui.label_coded_area.setText(msg)
         self.ui.label_coded_area.setToolTip(tooltip)
@@ -1397,7 +1397,6 @@ class DialogCodeImage(QtWidgets.QDialog):
             if type(item) == QtWidgets.QGraphicsPixmapItem:
                 if x + width > item.boundingRect().width() or y + height > item.boundingRect().height():
                     self.selection = None
-                    print("outside")
                     return
         x_unscaled = round(x / self.scale)
         y_unscaled = round(y / self.scale)
@@ -1800,7 +1799,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             # self.categories[found]['name'] = new_name
             # selected.setData(0, QtCore.Qt.DisplayRole, new_name)
             self.parent_textEdit.append(_("Category renamed from: ") +
-                                        old_name + " ==> " + new_name)
+                                        f"{old_name} ==> {new_name}")
             self.update_dialog_codes_and_categories()
             self.app.delete_backup = False
 
@@ -1860,7 +1859,7 @@ class DialogViewImage(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_view_image()
         self.ui.setupUi(self)
-        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
+        font = f"font: {self.app.settings['fontsize']}pt "
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
         abs_path = ""

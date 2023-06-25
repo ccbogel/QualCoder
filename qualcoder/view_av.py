@@ -252,13 +252,13 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.textEdit.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.textEdit.customContextMenuRequested.connect(self.textedit_menu)
 
-        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
+        font = f"font: {self.app.settings['fontsize']}pt "
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
-        tree_font = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
+        tree_font = f"font: {self.app.settings['treefontsize']}pt "
         tree_font += '"' + self.app.settings['font'] + '";'
         self.ui.treeWidget.setStyleSheet(tree_font)
-        doc_font = 'font: ' + str(self.app.settings['docfontsize']) + 'pt '
+        doc_font = f"font: {self.app.settings['docfontsize']}pt "
         doc_font += '"' + self.app.settings['font'] + '";'
         self.ui.textEdit.setStyleSheet(doc_font)
         self.ui.label_coder.setText(_("Coder: ") + self.app.settings['codername'])
@@ -378,9 +378,9 @@ class DialogCodeAV(QtWidgets.QDialog):
         bad_links = self.app.check_bad_file_links()
         bl_sql = ""
         for bl in bad_links:
-            bl_sql += "," + str(bl['id'])
+            bl_sql += f",{bl['id']}"
         if len(bl_sql) > 0:
-            bl_sql = " and id not in (" + bl_sql[1:] + ") "
+            bl_sql = f" and id not in ({bl_sql[1:]}) "
         self.files = []
         cur = self.app.conn.cursor()
         sql = "select name, id, ifnull(memo,''), owner, date, mediapath, av_text_id from source where "
@@ -501,7 +501,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             if "catid:" in item.child(i).text(1) and not item.child(i).isExpanded():
                 non_expanded.append(item.child(i).text(1))
             self.tree_traverse_for_non_expanded(item.child(i), non_expanded)
-            
+
     def fill_tree(self):
         """ Fill tree widget, tope level items are main categories and unlinked codes. """
 
@@ -726,7 +726,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         Or show all files. """
 
         cases = self.app.get_casenames()
-        cases.insert(0, {"name": _("Show all files"),  "id": -1})
+        cases.insert(0, {"name": _("Show all files"), "id": -1})
         ui = DialogSelectItems(self.app, cases, _("Select case"), "single")
         ok = ui.exec()
         if not ok:
@@ -767,8 +767,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         cur.execute('select id from source where name like ?', ['%' + text_ + '%'])
         res = cur.fetchall()
         file_ids = [r[0] for r in res]
-        '''for r in res:
-            file_ids.append(r[0])'''
         self.get_files(file_ids)
 
     def active_file_memo(self):
@@ -1020,17 +1018,18 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.app.conn.commit()
             cur.execute("select id, fulltext from source where id=?", [tr_id])
             self.transcription = cur.fetchone()
-            print("transcritpion", self.transcription)
+            '''print("transcription", self.transcription)
             if self.transcription is None:
-                print("tr_id", tr_id)
+                print("tr_id", tr_id)'''
         self.ui.textEdit.setText(self.transcription[1])
         self.ui.textEdit.ensureCursorVisible()
         self.get_timestamps_from_transcription()
 
         # Get text annotations
         cur = self.app.conn.cursor()
-        cur.execute("select anid, fid, pos0, pos1, ifnull(memo,''), owner, date from annotation where owner=? and fid=?",
-                    [self.app.settings['codername'], self.transcription[0]])
+        cur.execute(
+            "select anid, fid, pos0, pos1, ifnull(memo,''), owner, date from annotation where owner=? and fid=?",
+            [self.app.settings['codername'], self.transcription[0]])
         result = cur.fetchall()
         keys = 'anid', 'fid', 'pos0', 'pos1', 'memo', 'owner', 'date'
         for row in result:
@@ -1057,7 +1056,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         cur.execute(sql, values)
         code_results = cur.fetchall()
         keys = 'cid', 'fid', 'seltext', 'pos0', 'pos1', 'owner', 'date', 'memo', 'avid', 'av_pos0', 'av_pos1', \
-               'important', 'ctid'
+            'important', 'ctid'
         for row in code_results:
             self.code_text.append(dict(zip(keys, row)))
         # Update filter for tooltip and redo formatting
@@ -1769,7 +1768,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         child_count = item.childCount()
         for i in range(child_count):
             if item.child(i).text(1)[0:3] == "cid" and (item.child(i).text(0) == text_ or
-                item.child(i).toolTip(0) == text_):
+                                                        item.child(i).toolTip(0) == text_):
                 self.ui.treeWidget.setCurrentItem(item.child(i))
             self.recursive_set_current_item(item.child(i), text_)
 
@@ -2158,7 +2157,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         new_name = ui.get_new_name()
         if new_name is None:
             return
-        # add to database
         item = {'name': new_name, 'cid': None, 'memo': "",
                 'owner': self.app.settings['codername'],
                 'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")}
@@ -2316,7 +2314,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             cur = self.app.conn.cursor()
             cur.execute("update code_name set name=? where cid=?", (new_name, self.codes[found]['cid']))
             self.app.conn.commit()
-            self.parent_textEdit.append(_("Code renamed: ") + self.codes[found]['name'] + " ==> " + new_name)
+            self.parent_textEdit.append(_("Code renamed: ") + f"{self.codes[found]['name']} ==> {new_name}")
             self.update_dialog_codes_and_categories()
             self.app.delete_backup = False
             return
@@ -2326,13 +2324,13 @@ class DialogCodeAV(QtWidgets.QDialog):
                                                           QtWidgets.QLineEdit.EchoMode.Normal, selected.text(0))
             if not ok or new_name == '':
                 return
-            # check that no other category has this text
+            # Check that no other category has this text
             for c in self.categories:
                 if c['name'] == new_name:
                     msg_ = _("This category name is already in use")
                     Message(self.app, _('Duplicate category name'), msg_, "warning").exec()
                     return
-            # find the category in the list
+            # Find the category in the list
             found = -1
             for i in range(0, len(self.categories)):
                 if self.categories[i]['catid'] == int(selected.text(1)[6:]):
@@ -3241,8 +3239,7 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
             # print(f"RESULT: {result}")
             action_export = menu.addAction(_('Export segment to file'))
         except Exception as e_:
-            print("Cannot find ffmpeg")
-            print(e_)
+            print(f"Cannot find ffmpeg {e_}")
         action_important = None
         action_not_important = None
         action_link_segment_to_text = None
@@ -3314,13 +3311,14 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
             if self.code_av_dialog.file_['mediapath'][0:6] in ('audio:', 'video:'):
                 mediapath = self.code_av_dialog.file_['mediapath'][6:]
         except Exception as e_:
-            Message(self.app, _('Media not found'), str(e_) + "\n" + self.app.project_path + self.code_av_dialog.file_['mediapath'],
+            Message(self.app, _('Media not found'),
+                    str(e_) + "\n" + self.app.project_path + self.code_av_dialog.file_['mediapath'],
                     "warning").exec()
             return
         ffmpeg_command = 'ffmpeg -i "' + mediapath + '" -ss '
-        ffmpeg_command += str(self.segment['pos0']/1000)
+        ffmpeg_command += str(self.segment['pos0'] / 1000)
         ffmpeg_command += ' -to '
-        ffmpeg_command += str(self.segment['pos1']/1000)
+        ffmpeg_command += str(self.segment['pos1'] / 1000)
         ffmpeg_command += ' -c copy "' + filepath + '"'
         # print(f"FFMPEG COMMAND\n {ffmpeg_command}")
         try:
@@ -3595,16 +3593,17 @@ class DialogViewAV(QtWidgets.QDialog):
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         if not vlc:
             return
-        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
+        font = f"font: {self.app.settings['fontsize']}pt "
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
-        font = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
+        font = f"font: {self.app.settings['treefontsize']}pt "
         font += '"' + self.app.settings['font'] + '";'
         self.ui.label_speakers.setStyleSheet(font)
-        doc_font = 'font: ' + str(self.app.settings['docfontsize']) + 'pt '
+        doc_font = f"font: {self.app.settings['docfontsize']}pt "
         doc_font += '"' + self.app.settings['font'] + '";'
         self.ui.textEdit.setStyleSheet(doc_font)
-        self.ui.label_note.setText(_("Transcription area: Ctrl+R Alt+Minus Alt+Plus Ctrl+P/S Ctrl+T Ctrl+N Ctrl+1-8 Ctrl+D"))
+        self.ui.label_note.setText(
+            _("Transcription area: Ctrl+R Alt+Minus Alt+Plus Ctrl+P/S Ctrl+T Ctrl+N Ctrl+1-8 Ctrl+D"))
         tt = _(
             "Avoid selecting sections of text with a combination of not underlined (not coded / annotated / case-assigned) and underlined (coded, annotated, case-assigned).")
         tt += _(
