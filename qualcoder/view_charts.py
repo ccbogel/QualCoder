@@ -91,7 +91,7 @@ class ViewCharts(QDialog):
         self.ui.setupUi(self)
         integers = QtGui.QIntValidator()
         self.ui.lineEdit_filter.setValidator(integers)
-        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
+        font = f"font: {self.app.settings['fontsize']}pt "
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
@@ -252,7 +252,7 @@ class ViewCharts(QDialog):
             file_ids = ""
             for id_ in self.attribute_file_ids:
                 file_ids += "," + str(id_)
-            return _("Attributes: ") + self.attributes_msg + " ", " in (" + file_ids[1:] + ")"
+            return _("Attributes: ") + self.attributes_msg + " ", f" in ({file_ids[1:]})"
 
         file_name = self.ui.comboBox_file.currentText()
         case_name = self.ui.comboBox_case.currentText()
@@ -261,7 +261,7 @@ class ViewCharts(QDialog):
         if file_name != "":
             for f in self.files:
                 if f['name'] == file_name:
-                    return _("File: ") + file_name + " ", "=" + str(f['id'])
+                    return _("File: ") + file_name + " ", f"={f['id']}"
         case_id = -1
         for c in self.cases:
             if c['name'] == case_name:
@@ -276,7 +276,7 @@ class ViewCharts(QDialog):
             file_ids += "," + str(r[0])
         if file_ids == "":
             return "", ""
-        return _("Case: ") + case_name + " ", " in (" + file_ids[1:] + ")"
+        return _("Case: ") + case_name + " ", f" in ({file_ids[1:]})"
 
     def get_selected_categories_and_codes(self):
         """ The base state contains all categories and codes.

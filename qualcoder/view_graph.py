@@ -97,7 +97,7 @@ class ViewGraph(QDialog):
         # Set up the user interface from Designer.
         self.ui = Ui_DialogGraph()
         self.ui.setupUi(self)
-        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
+        font = f"font: {self.app.settings['fontsize']}pt "
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
@@ -681,7 +681,7 @@ class ViewGraph(QDialog):
                         freetextid = item.freetextid + 1
             item = FreeTextGraphicsItem(self.app, freetextid, x, y, s['name'], 9, color, False, s['ctid'])
             item.ctid = s['ctid']
-            msg = _("File: ") + s['filename'] + "\n" + _("Code: ") + s['codename']
+            msg = _("File: ") + f"{s['filename']}\n" + _("Code: ") + s['codename']
             if s['memo'] != "":
                 msg += "\n" + _("Memo: ") + s['memo']
             item.setToolTip(msg)
@@ -747,7 +747,7 @@ class ViewGraph(QDialog):
                             if item.memo_avid == r[5]:
                                 coding_memo_displayed = True
                     if not coding_memo_displayed:
-                        tt = _("Memo for duration: ") + str(r[2]) + " - " + str(r[3]) + " " + _("msecs")
+                        tt = _("Memo for duration: ") + f"{r[2]} - {r[3]} " + _("msecs")
                         memos.append({'cid': r[0], 'fid': r[1], 'tooltip': tt, 'name': r[4], 'filetype': 'A/V',
                                       'codename': code['name'], 'filename': file_['name'], 'avid': r[5], 'imid': None,
                                       'ctid': None})
@@ -828,7 +828,7 @@ class ViewGraph(QDialog):
     def color_selection(self, obj_type="line"):
         """ Get a color for Free text items and Free lines.
          Called by: add_lines_to_graph, show_codes, show_memos.
-         Ifobj_type is line, limit choices, otherwise include black and white.
+         If obj_type is line, limit choices, otherwise include black and white.
          param: obj_type : String
 
          return: color : String """
@@ -1299,7 +1299,7 @@ class ViewGraph(QDialog):
             tt = _("File: ") + r[1] + "\n"
             tt += _("Code: ") + r[2] + "\n"
             if self.app.settings['showids']:
-                tt += "imid: " + str(r[4]) + "\n"
+                tt += f"imid: {r[4]}\n"
             tt += _("Memo: ") + r[3]
             cur.execute("update gr_pix_item set tooltip=? where grpixid=?", [tt, r[0]])
         self.app.conn.commit()
@@ -1325,7 +1325,7 @@ class ViewGraph(QDialog):
                 tt += _("Code: ") + r[2] + "\n"
                 tt += str(r[3]) + " - " + str(r[4]) + "\n"
                 if self.app.settings['showids']:
-                    tt += "avid: " + str(r[6]) + "\n"
+                    tt += f"avid: {r[6]}\n"
                 tt += _("Memo: ") + r[5]
                 cur.execute("update gr_av_item set tooltip=? where gr_avid=?", [tt, r[0]])
                 self.app.conn.commit()
@@ -1350,7 +1350,7 @@ class ViewGraph(QDialog):
                 tt = _("File: ") + r[1] + "\n"
                 tt += _("Code: ") + r[2] + "\n"
                 if self.app.settings['showids']:
-                    tt += "ctid: " + str(r[4]) + "\n"
+                    tt += f"ctid: {r[4]}\n"
                 tt += _("Memo: ") + r[3]
                 cur.execute("update gr_free_text_item set tooltip=? where gfreeid=?", [tt, r[0]])
                 self.app.conn.commit()
@@ -1376,7 +1376,7 @@ class ViewGraph(QDialog):
                 tt = _("File: ") + r[1] + "\n"
                 tt += _("Code: ") + r[2] + "\n"
                 if self.app.settings['showids']:
-                    tt += "ctid: " + str(r[4]) + "\n"
+                    tt += f"ctid: {r[4]}\n"
                 tt += _("Memo for: ") + r[3]
                 cur.execute("update gr_free_text_item set tooltip=? where gfreeid=?", [tt, r[0]])
                 self.app.conn.commit()
@@ -1395,8 +1395,8 @@ class ViewGraph(QDialog):
                 tt = _("File: ") + r[1] + "\n"
                 tt += _("Code: ") + r[2] + "\n"
                 if self.app.settings['showids']:
-                    tt += "imid: " + str(r[7]) + "\n"
-                tt += _("Memo for area: ") + "x:" + str(int(r[3])) + " y:" + str(int(r[4])) + " " + _("width:") + \
+                    tt += f"imid: {r[7]}\n"
+                tt += _("Memo for area: ") + f"x:{int(r[3])} y:{int(r[4])} " + _("width:") + \
                       str(int(r[5])) + " " + _("height:") + str(int(r[6]))
                 cur.execute("update gr_free_text_item set tooltip=? where gfreeid=?", [tt, r[0]])
                 self.app.conn.commit()
@@ -1416,7 +1416,7 @@ class ViewGraph(QDialog):
                 tt = _("File: ") + r[1] + "\n"
                 tt += _("Code: ") + r[2] + "\n"
                 if self.app.settings['showids']:
-                    tt += "avid: " + str(r[5]) + "\n"
+                    tt += f"avid: {r[5]}\n"
                 tt += _("Memo for duration: ") + str(int(r[3])) + "  - " + str(int(r[4])) + _("msecs")
                 cur.execute("update gr_free_text_item set tooltip=? where gfreeid=?", [tt, r[0]])
                 self.app.conn.commit()
@@ -1708,7 +1708,7 @@ class ViewGraph(QDialog):
                 cdcat = _("Category")
                 if i[4] is not None:
                     cdcat = _("Code")
-                err_msg += cdcat + _(" does not exist: ") + str(i[3]) + " " + str(i[4]) + " "
+                err_msg += cdcat + _(" does not exist: ") + f"{i[3]} {i[4]} "
                 cur.execute("delete from gr_cdct_text_item where grid=? and supercatid=? and catid=? and cid=?",
                             [grid, i[2], i[3], i[4]])
                 self.app.conn.execute()
@@ -2221,7 +2221,7 @@ class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         cur.execute(sql, [self.file_id])
         result = cur.fetchall()
         for r in result:
-            attribute_text += '<br>' + r[0] + ": " + r[1]
+            attribute_text += f"<br>{r[0]}: {r[1]}"
         return attribute_text
 
 
