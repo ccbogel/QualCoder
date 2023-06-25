@@ -66,7 +66,7 @@ class DialogSettings(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_settings()
         self.ui.setupUi(self)
-        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
+        font = f"font: {self.app.settings['fontsize']}pt "
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
@@ -137,8 +137,8 @@ class DialogSettings(QtWidgets.QDialog):
         self.ui.label_directory.setText(self.settings['directory'])
         text_styles = [_('Bold'), _('Italic'), _('Bigger')]
         self.ui.comboBox_text_style.addItems(text_styles)
-        for index, tstyle in enumerate(text_styles):
-            if tstyle == self.settings['report_text_context_style']:
+        for index, text_style in enumerate(text_styles):
+            if text_style == self.settings['report_text_context_style']:
                 self.ui.comboBox_text_style.setCurrentIndex(index)
         self.ui.spinBox_chars_before_after.setValue(self.settings['report_text_context_characters'])
         self.ui.pushButton_choose_directory.clicked.connect(self.choose_directory)
