@@ -579,14 +579,17 @@ class App(object):
                                         "QTreeWidget {font-size: " + str(settings.get('treefontsize')))
 
         style = "* {font-size: 12px; color: #000000;}\n\
-        QWidget {background-color: #efefef; color: #000000}\n\
-        QWidget:focus {border: 2px solid #f89407;}\n\
+        QWidget {background-color: #efefef; color: #000000; border: none;}\n\
+        QWidget:focus {border: 1px solid #f89407;}\n\
         QDialog {border: 1px solid #808080;}\n\
         QFileDialog {font-size: 12px}\n\
         QComboBox {border: 1px solid #707070; background-color: #fafafa;}\n\
         QComboBox:hover,QPushButton:hover {border: 2px solid #f89407;}\n\
         QGroupBox {border: None;}\n\
         QGroupBox:focus {border: 3px solid #f89407;}\n\
+        QPushButton {border-style: outset; border-width: 2px; border-radius: 2px; border-color: beige; padding: 2px;}\n\
+        QPushButton:pressed {border-style: inset; background-color: white;}\n\
+        QGraphicsView {border: 1px solid #808080}\n\
         QHeaderView::section {background-color: #f9f9f9}\n\
         QLineEdit {border: 1px solid #707070; background-color: #fafafa;}\n\
         QListWidget::item:selected {border-left: 2px solid red; color: #000000;}\n\
@@ -598,7 +601,7 @@ class App(object):
         QTabBar {border: 2px solid #808080;}\n\
         QTabBar::tab {background-color: #f9f9f9; border-top: #f9f9f9 4px solid; padding-left: 6px; padding-right: 6px;}\n\
         QTabBar::tab:selected {background-color: #f9f9f9; border-top: 3px solid #f89407; border-bottom: 3px solid #f89407;}\n\
-        QTabWidget::pane {border: 1px solid #808080;}\n\
+        QTabWidget {border: none;}\n\
         QTextEdit {background-color: #fcfcfc; selection-color: #ffffff; selection-background-color:#000000;}\n\
         QTextEdit:focus {border: 2px solid #f89407;}\n\
         QToolTip {background-color: #fffacd; color:#000000; border: 1px solid #f89407; }\n\
@@ -637,8 +640,7 @@ class App(object):
             style = style.replace("#efefef", "#dfe2ff")
             style = style.replace("#f89407", "#ca1b9a")
         if self.settings['stylesheet'] == "native":
-            style = "* {font-size: 12px;}\n\
-            "
+            style = "* {font-size: 12px;}"
         return style
 
     def load_settings(self):
@@ -932,7 +934,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionSpecial_functions.triggered.connect(self.special_functions)
         self.ui.actionMenu_Key_Shortcuts.triggered.connect(self.display_menu_key_shortcuts)
 
-        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
+        font = f"font: {self.app.settings['fontsize']}pt "
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
         self.ui.textEdit.setReadOnly(True)
@@ -1699,7 +1701,7 @@ class MainWindow(QtWidgets.QMainWindow):
         ui = DialogSettings(self.app)
         ui.exec()
         self.settings_report()
-        font = f"font: {str(self.app.settings['fontsize'])} + pt "
+        font = f"font: {self.app.settings['fontsize']}pt "
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
         # Name change: Close all opened dialogs as coder name needs to change everywhere
