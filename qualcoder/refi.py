@@ -1316,7 +1316,7 @@ class RefiImport:
         media_path = "/docs/" + name  # Default
         if path_type == "internal":
             # Copy file into .qda documents folder and rename into original name
-            destination = os.path.join(self.app.project_path, +"documents", name)
+            destination = os.path.join(self.app.project_path, "documents", name)
             #print("destination: ", destination)
             try:
                 shutil.copyfile(source_path, destination)
