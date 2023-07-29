@@ -705,6 +705,17 @@ class DialogCases(QtWidgets.QDialog):
             cur.execute("update attribute set value=?, date=?, owner=? where id=? and name=? and attr_type='case'",
                         (value, now_date, self.app.settings['codername'], self.cases[x]['caseid'], attribute_name))
             self.app.conn.commit()
+
+        # Update self.cases[attributes]
+        # Add list of attribute values to files, order matches header columns
+        sql = "select ifnull(value, '') from attribute where attr_type='case' and attribute.name=? and id=?"
+        self.cases[x]['attributes'] = []
+        for att_name in self.attribute_labels_ordered:
+            cur.execute(sql, [att_name, self.cases[x]['caseid']])
+            res = cur.fetchone()
+            if res:
+                self.cases[x]['attributes'].append(res[0])
+
         self.app.delete_backup = False
 
     def cell_selected(self):

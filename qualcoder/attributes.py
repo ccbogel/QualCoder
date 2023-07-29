@@ -109,7 +109,6 @@ class DialogManageAttributes(QtWidgets.QDialog):
     def count_selected_items(self):
         """ Update label with the count of selected items. """
 
-        print("COUNT SEL itms")
         indexes = self.ui.tableWidget.selectedIndexes()
         ix = [i.row() for i in indexes]
         i = set(ix)

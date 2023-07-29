@@ -436,7 +436,6 @@ class DialogManageFiles(QtWidgets.QDialog):
             return
         if mediapath[:5] == "docs:":
             media_path = mediapath[5:]
-            print("TO open external ", media_path)
             webbrowser.open(media_path)
             return
         logger.error("Cannot open text file in browser " + mediapath)
@@ -812,7 +811,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         sql = "select name from attribute_type where caseOrFile='file'"
         cur.execute(sql)
         attribute_names_res = cur.fetchall()
-        self.attribute_names = []  # for AddAtribute dialog
+        self.attribute_names = []  # for AddAttribute dialog
         self.attribute_labels_ordered = []  # Helps filling table more quickly
         for att_name in attribute_names_res:
             self.header_labels.append(att_name[0])
@@ -1059,7 +1058,7 @@ class DialogManageFiles(QtWidgets.QDialog):
 
     def cell_modified(self):
         """ Attribute values can be changed.
-        Filenames cannot be changed. """
+        """
 
         x = self.ui.tableWidget.currentRow()
         y = self.ui.tableWidget.currentColumn()
@@ -1087,6 +1086,21 @@ class DialogManageFiles(QtWidgets.QDialog):
             cur.execute("update attribute set value=? where id=? and name=? and attr_type='file'",
                         (value, self.source[x]['id'], attribute_name))
             self.app.conn.commit()
+
+            # Update self.source[attributes]
+            # Add list of attribute values to files, order matches header columns
+            sql = "select ifnull(value, '') from attribute where attr_type='file' and attribute.name=? and id=?"
+            self.source[x]['attributes'] = []
+            for att_name in self.attribute_labels_ordered:
+                cur.execute(sql, [att_name, self.source[x]['id']])
+                res = cur.fetchone()
+                if res:
+                    tmp = res[0]
+                    # For nicer display
+                    if att_name == "Ref_authors":
+                        tmp = tmp.replace(";", "\n")
+                    self.source[x]['attributes'].append(tmp)
+
             self.app.delete_backup = False
             self.ui.tableWidget.resizeColumnsToContents()
 
@@ -1154,7 +1168,6 @@ class DialogManageFiles(QtWidgets.QDialog):
                 self.ui.tableWidget.setItem(x, self.MEMO_COLUMN, QtWidgets.QTableWidgetItem(_("Memo")))
         except Exception as err:
             logger.warning(str(err))
-            print(err)
             Message(self.app, _('view AV error'), str(err), "warning").exec()
             self.av_dialog_open = None
             return
@@ -1375,7 +1388,6 @@ class DialogManageFiles(QtWidgets.QDialog):
                     try:
                         self.load_file_text(f, "docs:" + link_path)
                     except Exception as err:
-                        print(err)
                         logger.warning(str(err))
                         Message(self.app, _('Unknown file type'), _("Cannot import file") + ":\n" + f, "warning")
         if pdf_msg != "":
@@ -1500,7 +1512,6 @@ class DialogManageFiles(QtWidgets.QDialog):
             book = epub.read_epub(import_file)
             for d in book.get_items_of_type(ebooklib.ITEM_DOCUMENT):
                 try:
-                    # print(d.get_content())
                     bytes_ = d.get_body_content()
                     string = bytes_.decode('utf-8')
                     text_ += html_to_text(string) + "\n\n"  # add line to paragraph spacing for visual format
@@ -1635,7 +1646,6 @@ class DialogManageFiles(QtWidgets.QDialog):
             logger.warning("ODT IMPORT ERROR")
             return ""
         data = data[data_start + 22: data_end]
-        # print(data)
         data = data.replace('</text:index-title-template>', '')
         data = data.replace('</text:index-entry-span>', '')
         data = data.replace('</text:table-of-content-entry-template>', '')
