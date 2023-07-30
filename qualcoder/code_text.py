@@ -2112,7 +2112,7 @@ class DialogCodeText(QtWidgets.QWidget):
         cursor.mergeCharFormat(fmt)
         # Update tooltips to show only this code
         self.eventFilterTT.set_codes_and_annotations(self.app, tt_code_text, self.codes, self.annotations,
-                                                     self.file_['start'])
+                                                     self.file_)
         # Need to reload arrow iconsas they dissapear on Windows
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_color_grid_icon_24), "png")
@@ -2189,7 +2189,7 @@ class DialogCodeText(QtWidgets.QWidget):
         cursor.mergeCharFormat(fmt)
         # Update tooltips to show only this code
         self.eventFilterTT.set_codes_and_annotations(self.app, tt_code_text, self.codes, self.annotations,
-                                                     self.file_['start'])
+                                                     self.file_)
         # Need to reload arrow icons as they dissapear on Windows
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_color_grid_icon_24), "png")
@@ -3012,10 +3012,10 @@ class DialogCodeText(QtWidgets.QWidget):
                 if c['important'] == 1:
                     imp_coded.append(c)
             self.eventFilterTT.set_codes_and_annotations(self.app, imp_coded, self.codes, self.annotations,
-                                                         self.file_['start'])
+                                                         self.file_)
         else:
             self.eventFilterTT.set_codes_and_annotations(self.app, self.code_text, self.codes, self.annotations,
-                                                         self.file_['start'])
+                                                         self.file_)
         self.unlight()
         self.highlight()
 
@@ -4021,10 +4021,11 @@ class ToolTipEventFilter(QtCore.QObject):
     codes = None
     code_text = None
     annotations = None
+    file_id = None
     offset = 0
     app = None
 
-    def set_codes_and_annotations(self, app, code_text, codes, annotations, offset):
+    def set_codes_and_annotations(self, app, code_text, codes, annotations, file_):
         """ Code_text contains the coded text to be displayed in a tooptip.
         Annotations - a mention is made if current position is annotated
 
@@ -4040,7 +4041,8 @@ class ToolTipEventFilter(QtCore.QObject):
         self.code_text = code_text
         self.codes = codes
         self.annotations = annotations
-        self.offset = offset
+        self.file_id = file_['id']
+        self.offset = file_['start']
         for item in self.code_text:
             for c in self.codes:
                 if item['cid'] == c['cid']:
@@ -4100,7 +4102,7 @@ class ToolTipEventFilter(QtCore.QObject):
                 text_ = multiple_msg + text_
             # Check annotations
             for ann in self.annotations:
-                if ann['pos0'] - self.offset <= pos <= ann['pos1'] - self.offset:
+                if ann['pos0'] - self.offset <= pos <= ann['pos1'] - self.offset and self.file_id == ann['fid']:
                     text_ += "<p>" + _("ANNOTATED:") + ann['memo'] + "</p>"
             if text_ != "":
                 receiver.setToolTip(text_)
