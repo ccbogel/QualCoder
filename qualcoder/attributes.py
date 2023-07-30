@@ -51,7 +51,11 @@ def exception_handler(exception_type, value, tb_obj):
     text_ = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
     print(text_)
     logger.error(_("Uncaught exception:") + "\n" + text_)
-    QtWidgets.QMessageBF
+    mb = QtWidgets.QMessageBox()
+    mb.setStyleSheet("* {font-size: 12pt}")
+    mb.setWindowTitle(_('Uncaught Exception'))
+    mb.setText(text_)
+    mb.exec()
 
 class DialogManageAttributes(QtWidgets.QDialog):
     """ Attribute management. Create and delete attributes in the attributes table.
