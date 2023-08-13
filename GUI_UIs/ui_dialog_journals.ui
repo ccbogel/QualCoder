@@ -291,7 +291,7 @@
       </column>
       <column>
        <property name="text">
-        <string>Date</string>
+        <string>Modified</string>
        </property>
       </column>
       <column>
