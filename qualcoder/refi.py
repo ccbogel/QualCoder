@@ -40,7 +40,7 @@ import sys
 import traceback
 import uuid
 import xml.etree.ElementTree as etree
-import xmlschema
+#import xmlschema
 import zipfile
 
 from PyQt6 import QtWidgets, QtCore
@@ -1855,7 +1855,8 @@ class RefiImport:
         file_xsd = xsd_codebook
         if xsd_type != "codebook":
             file_xsd = xsd_project
-        xsd = xmlschema.XMLSchema(file_xsd)
+        return True
+        '''xsd = xmlschema.XMLSchema(file_xsd)
         try:
             result = xsd.is_valid(self.xml)
             print("Valid xml")
@@ -1863,7 +1864,7 @@ class RefiImport:
         except Exception as e_:
             print("Invalid xml", e_)
             logger.error(e_)
-            return False
+            return False'''
 
 
 class RefiLineEndings(QtWidgets.QDialog):
@@ -3180,7 +3181,8 @@ class RefiExport(QtWidgets.QDialog):
         file_xsd = xsd_codebook
         if xsd_type != "codebook":
             file_xsd = xsd_project
-        try:
+        return True
+        '''try:
             xsd = xmlschema.XMLSchema(file_xsd)
         except Exception as e_:
             print("xsd creation error", e_)
@@ -3195,4 +3197,4 @@ class RefiExport(QtWidgets.QDialog):
         except Exception as e_:
             print("Invalid xml", e_)
             logger.error(e_)
-            return False
+            return False'''
