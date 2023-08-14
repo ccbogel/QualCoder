@@ -77,6 +77,7 @@ class DialogJournals(QtWidgets.QDialog):
     search_indices = []  # A list of tuples of (journal name, match.start, match length)
     search_index = 0
     text_changed_flag = False
+    rows_hidden = False
     qtimer = None
     timer_msecs = 1500
 
@@ -97,11 +98,8 @@ class DialogJournals(QtWidgets.QDialog):
         self.qtimer.timeout.connect(self.update_database_text)
         self.keypress_timer = datetime.datetime.now()
         self.text_changed_flag = False
-        cur = self.app.conn.cursor()
-        cur.execute("select name, date, jentry, owner, jid from journal")
-        result = cur.fetchall()
-        for row in result:
-            self.journals.append({'name': row[0], 'date': row[1], 'jentry': row[2], 'owner': row[3], 'jid': row[4]})
+        self.rows_hidden = False
+        self.load_journals()
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_journals()
         self.ui.setupUi(self)
@@ -166,13 +164,29 @@ class DialogJournals(QtWidgets.QDialog):
         self.ui.textEdit.textChanged.connect(self.text_changed)
         self.ui.textEdit.installEventFilter(self)
         self.ui.textEdit.setTabChangesFocus(True)
-        #spell = SpellChecker()  # Was testing this out
+        #spell = SpellChecker()  # Was testing this out Dont use
         # spell = SpellChecker(language='de')
         # spell = SpellChecker(language='es')
         # spell = SpellChecker(language='fr')
         # spell = SpellChecker(language='pt')
         highlighter = MarkdownHighlighter(self.ui.textEdit, self.app)
         self.ui.tableWidget.setTabKeyNavigation(False)
+
+        self.ui.tableWidget.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
+
+    def load_journals(self, order="name asc"):
+        """ Load journals.
+        Order by Name asc/desc date asc/desc """
+
+        self.journals = []
+        cur = self.app.conn.cursor()
+        sql = "select name, date, jentry, owner, jid from journal order by "
+        sql += order
+        cur.execute(sql)
+        result = cur.fetchall()
+        for row in result:
+            self.journals.append({'name': row[0], 'date': row[1], 'jentry': row[2], 'owner': row[3], 'jid': row[4]})
 
     @staticmethod
     def help():
@@ -241,6 +255,89 @@ class DialogJournals(QtWidgets.QDialog):
         self.ui.textEdit.setText("")
         self.ui.label_jcount.setText(_("Journals: ") + str(len(self.journals)))
 
+    def table_menu(self, position):
+        """ Context menu for displaying table rows in differing order,
+                hiding table rows by showing selected coder. """
+
+        row = self.ui.tableWidget.currentRow()
+        col = self.ui.tableWidget.currentColumn()
+        item_text = self.ui.tableWidget.item(row, col).text()
+
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+
+        action_name_asc = None
+        action_name_desc = None
+        action_show_name_like = None
+        if col == NAME_COLUMN:
+            action_name_asc = menu.addAction(_("Order ascending"))
+            action_name_desc = menu.addAction(_("Order descending"))
+            action_show_name_like = menu.addAction(_("Show name like"))
+
+        action_date_asc = None
+        action_date_desc = None
+        if col == DATE_COLUMN:
+            action_date_asc = menu.addAction(_("Order ascending"))
+            action_date_desc = menu.addAction(_("Order descending"))
+        action_show_this_coder = None
+        coder_names = []
+        for j in self.journals:
+            coder_names.append(j['owner'])
+        coder_name_set = set(coder_names)
+        if len(coder_name_set) > 1 and col == OWNER_COLUMN:
+            action_show_this_coder = menu.addAction(_("Show this coder"))
+
+        action_show_values_like = None
+        action_order_by_value_asc = None
+        action_order_by_value_desc = None
+
+        action_show_all = None
+        if self.rows_hidden:
+            action_show_all = menu.addAction(_("Show all rows Ctrl A"))
+            self.rows_hidden = False
+
+        action = menu.exec(self.ui.tableWidget.mapToGlobal(position))
+        if action == action_date_asc:
+            self.load_journals("date asc")
+            self.fill_table()
+            return
+        if action == action_date_desc:
+            self.load_journals("date desc")
+            self.fill_table()
+            return
+        if action == action_name_asc:
+            self.load_journals("name asc")
+            self.fill_table()
+            return
+        if action == action_name_desc:
+            self.load_journals("name desc")
+            self.fill_table()
+            return
+        if action == action_show_all:
+            for r in range(0, self.ui.tableWidget.rowCount()):
+                self.ui.tableWidget.setRowHidden(r, False)
+            self.rows_hidden = False
+            return
+        if action == action_show_name_like:
+            text_value, ok = QtWidgets.QInputDialog.getText(self, _("Text filter"), _("Show names like:"),
+                                                            QtWidgets.QLineEdit.EchoMode.Normal)
+            if ok and text_value != '':
+                if ok and text_value != '':
+                    for r in range(0, self.ui.tableWidget.rowCount()):
+                        if self.ui.tableWidget.item(r, NAME_COLUMN).text().find(text_value) == -1:
+                            self.ui.tableWidget.setRowHidden(r, True)
+                    self.rows_hidden = True
+            return
+
+        if action == action_show_this_coder:
+            coder_selected = self.ui.tableWidget.item(row, OWNER_COLUMN).text()
+            for r in range(0, self.ui.tableWidget.rowCount()):
+                coder_name = self.ui.tableWidget.item(r, OWNER_COLUMN).text()
+                if coder_selected != coder_name:
+                    self.ui.tableWidget.setRowHidden(r, True)
+            self.rows_hidden = True
+            return
+
     def export_all_journals_as_one_file(self):
         """ Export a collation of all journals as one text file. """
 
@@ -296,6 +393,7 @@ class DialogJournals(QtWidgets.QDialog):
                     (self.journals[self.ui.tableWidget.currentRow()]['jentry'], now_date, self.jid))
         self.app.conn.commit()
         self.app.delete_backup = False
+        # TODO update the visual table entry for the date
 
     def text_changed(self):
         """ Used in combination with timer to update database entry.
