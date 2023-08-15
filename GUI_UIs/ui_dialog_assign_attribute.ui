@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>380</width>
-    <height>148</height>
+    <width>472</width>
+    <height>162</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -64,7 +64,7 @@
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
     <rect>
-     <x>70</x>
+     <x>90</x>
      <y>90</y>
      <width>171</width>
      <height>27</height>
@@ -72,6 +72,19 @@
    </property>
    <property name="standardButtons">
     <set>QDialogButtonBox::Ok</set>
+   </property>
+  </widget>
+  <widget class="QRadioButton" name="radioButton_journals">
+   <property name="geometry">
+    <rect>
+     <x>270</x>
+     <y>42</y>
+     <width>121</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Journals</string>
    </property>
   </widget>
  </widget>
