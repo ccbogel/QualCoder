@@ -101,8 +101,9 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
         self.parameters = []
         self.result_file_ids = []
         self.result_tooltip_msg = ""
+        self.tooltip_msg = ""
         cur = self.app.conn.cursor()
-        sql = "select name, valuetype, ifnull(memo,''), caseOrFile from attribute_type"
+        sql = "select name, valuetype, ifnull(memo,''), caseOrFile from attribute_type where caseOrFile!='journal'"
         if limiter == "case":
             sql = "select name, valuetype, ifnull(memo,''), 'case' from attribute_type where caseOrFile='case'"
         if limiter == "file":
@@ -136,7 +137,7 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
             self.ui.tableWidget.cellWidget(x, self.OPERATOR_COLUMN).setCurrentText("")
 
     def fill_parameters(self, attribute_list):
-        """ Pre fill attributes in Dialog from a previous selection.
+        """ Pre-fill attributes in Dialog from a previous selection.
         Called by parent class. """
 
         if not attribute_list:
