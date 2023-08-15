@@ -49,6 +49,7 @@ NAME_COLUMN = 0
 DATE_COLUMN = 1
 OWNER_COLUMN = 2
 JID_COLUMN = 3
+ATTRIBUTE_START_COLUMN = 4
 
 
 def exception_handler(exception_type, value, tb_obj):
@@ -69,6 +70,7 @@ class DialogJournals(QtWidgets.QDialog):
     """  View, create, export, rename and delete journals. """
 
     journals = []
+    header_labels = []
     jid = None  # journal database jid
     app = None
     parent_textEdit = None
@@ -99,6 +101,7 @@ class DialogJournals(QtWidgets.QDialog):
         self.keypress_timer = datetime.datetime.now()
         self.text_changed_flag = False
         self.rows_hidden = False
+        self.attribute_labels_ordered = []
         self.load_journals()
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_journals()
@@ -132,7 +135,7 @@ class DialogJournals(QtWidgets.QDialog):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(delete_icon), "png")
         self.ui.pushButton_delete.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_delete.clicked.connect(self.delete)
+        self.ui.pushButton_delete.clicked.connect(self.delete_journal)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_csv_icon), "png")
         self.ui.pushButton_export_all.setIcon(QtGui.QIcon(pm))
@@ -174,11 +177,13 @@ class DialogJournals(QtWidgets.QDialog):
 
         self.ui.tableWidget.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
+        self.ui.textEdit.hide()
 
     def load_journals(self, order="name asc"):
         """ Load journals.
         Order by Name asc/desc date asc/desc """
 
+        self.check_attribute_placeholders()
         self.journals = []
         cur = self.app.conn.cursor()
         sql = "select name, date, jentry, owner, jid from journal order by "
@@ -186,7 +191,60 @@ class DialogJournals(QtWidgets.QDialog):
         cur.execute(sql)
         result = cur.fetchall()
         for row in result:
-            self.journals.append({'name': row[0], 'date': row[1], 'jentry': row[2], 'owner': row[3], 'jid': row[4]})
+            self.journals.append({'name': row[0], 'date': row[1], 'jentry': row[2], 'owner': row[3], 'jid': row[4],
+                                  'attributes': []})
+
+        # Attributes and attributes in table header labels
+        self.header_labels = [_("Name"), _("Modified"), _("Coder"), _("jid")]
+
+        sql = "select name from attribute_type where caseOrFile='journal'"
+        cur.execute(sql)
+        attribute_names_res = cur.fetchall()
+        self.attribute_labels_ordered = []  # Help filling table more quickly
+        for att_name in attribute_names_res:
+            self.header_labels.append(att_name[0])
+            self.attribute_labels_ordered.append(att_name[0])
+        # Add list of attribute values to files, order matches header columns
+        sql = "select ifnull(value, '') from attribute where attr_type='journal' and attribute.name=? and id=?"
+        for j in self.journals:
+            for att_name in self.attribute_labels_ordered:
+                cur.execute(sql, [att_name, j['jid']])
+                res = cur.fetchone()
+                if res:
+                    j['attributes'].append(res[0])
+
+    def check_attribute_placeholders(self):
+        """ Journals can be added after attributes are in the project.
+         Need to add placeholder attribute values for these, if missing.
+         Also,if a journal is deleted, check and remove any isolated attribute values. """
+
+        cur = self.app.conn.cursor()
+        sql = "select jid from journal "
+        cur.execute(sql)
+        journal_jids_res = cur.fetchall()
+        sql = 'select name from attribute_type where caseOrFile ="journal"'
+        cur.execute(sql)
+        attr_types = cur.fetchall()
+        insert_sql = "insert into attribute (name, attr_type, value, id, date, owner) values(?,'journal','',?,?,?)"
+        for jid in journal_jids_res:
+            for attribute in attr_types:
+                sql = "select value from attribute where id=? and name=?"
+                cur.execute(sql, (jid[0], attribute[0]))
+                res = cur.fetchone()
+                if res is None:
+                    placeholders = [attribute[0], jid[0], datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                                    self.app.settings['codername']]
+                    cur.execute(insert_sql, placeholders)
+        self.app.conn.commit()
+
+        # Check and delete attribute values where journal has been deleted
+        attribute_to_del_sql = "SELECT distinct attribute.id FROM attribute where \
+        attribute.id not in (select journal.jid from journal) order by attribute.id asc"
+        cur.execute(attribute_to_del_sql)
+        res = cur.fetchall()
+        for r in res:
+            cur.execute("delete from attribute where attr_type='journal' and id=?", [r[0], ])
+            self.app.conn.commit()
 
     @staticmethod
     def help():
@@ -226,21 +284,29 @@ class DialogJournals(QtWidgets.QDialog):
         """ Fill journals table. Update journal count label. """
 
         self.ui.tableWidget.blockSignals(True)
+        self.ui.tableWidget.setColumnCount(len(self.header_labels))
+        self.ui.tableWidget.setHorizontalHeaderLabels(self.header_labels)
+        self.ui.tableWidget.horizontalHeader().setStretchLastSection(False)
+
         rows = self.ui.tableWidget.rowCount()
         for r in range(0, rows):
             self.ui.tableWidget.removeRow(0)
-        for row, details in enumerate(self.journals):
+        for row, data in enumerate(self.journals):
             self.ui.tableWidget.insertRow(row)
-            self.ui.tableWidget.setItem(row, NAME_COLUMN, QtWidgets.QTableWidgetItem(details['name']))
-            item = QtWidgets.QTableWidgetItem(details['date'])
+            self.ui.tableWidget.setItem(row, NAME_COLUMN, QtWidgets.QTableWidgetItem(data['name']))
+            item = QtWidgets.QTableWidgetItem(data['date'])
             item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget.setItem(row, DATE_COLUMN, item)
-            item = QtWidgets.QTableWidgetItem(details['owner'])
+            item = QtWidgets.QTableWidgetItem(data['owner'])
             item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget.setItem(row, OWNER_COLUMN, item)
-            item = QtWidgets.QTableWidgetItem(str(details['jid']))
+            item = QtWidgets.QTableWidgetItem(str(data['jid']))
             item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget.setItem(row, JID_COLUMN, item)
+            # Add attributes
+            for offset, attribute in enumerate(data['attributes']):
+                item = QtWidgets.QTableWidgetItem(attribute)
+                self.ui.tableWidget.setItem(row, ATTRIBUTE_START_COLUMN + offset, item)
 
         self.ui.tableWidget.verticalHeader().setVisible(False)
         if self.app.settings['showids']:
@@ -286,11 +352,9 @@ class DialogJournals(QtWidgets.QDialog):
         coder_name_set = set(coder_names)
         if len(coder_name_set) > 1 and col == OWNER_COLUMN:
             action_show_this_coder = menu.addAction(_("Show this coder"))
-
         action_show_values_like = None
-        action_order_by_value_asc = None
-        action_order_by_value_desc = None
-
+        if col >= ATTRIBUTE_START_COLUMN:
+            action_show_values_like = menu.addAction(_("Show values like"))
         action_show_all = None
         if self.rows_hidden:
             action_show_all = menu.addAction(_("Show all rows Ctrl A"))
@@ -300,18 +364,38 @@ class DialogJournals(QtWidgets.QDialog):
         if action == action_date_asc:
             self.load_journals("date asc")
             self.fill_table()
+            # To prevent text entry errors clear journal area
+            self.ui.label_jname.setText(_("Journal: "))
+            self.jid = None
+            self.ui.textEdit.clear()
+            self.ui.textEdit.hide()
             return
         if action == action_date_desc:
             self.load_journals("date desc")
             self.fill_table()
+            # To prevent text entry errors clear journal area
+            self.ui.label_jname.setText(_("Journal: "))
+            self.jid = None
+            self.ui.textEdit.clear()
+            self.ui.textEdit.hide()
             return
         if action == action_name_asc:
             self.load_journals("name asc")
             self.fill_table()
+            # To prevent text entry errors clear journal area
+            self.ui.label_jname.setText(_("Journal: "))
+            self.jid = None
+            self.ui.textEdit.clear()
+            self.ui.textEdit.hide()
             return
         if action == action_name_desc:
             self.load_journals("name desc")
             self.fill_table()
+            # To prevent text entry errors clear journal area
+            self.ui.label_jname.setText(_("Journal: "))
+            self.jid = None
+            self.ui.textEdit.clear()
+            self.ui.textEdit.hide()
             return
         if action == action_show_all:
             for r in range(0, self.ui.tableWidget.rowCount()):
@@ -320,13 +404,33 @@ class DialogJournals(QtWidgets.QDialog):
             return
         if action == action_show_name_like:
             text_value, ok = QtWidgets.QInputDialog.getText(self, _("Text filter"), _("Show names like:"),
-                                                            QtWidgets.QLineEdit.EchoMode.Normal)
+                                                            QtWidgets.QLineEdit.EchoMode.Normal, item_text)
             if ok and text_value != '':
                 if ok and text_value != '':
                     for r in range(0, self.ui.tableWidget.rowCount()):
                         if self.ui.tableWidget.item(r, NAME_COLUMN).text().find(text_value) == -1:
                             self.ui.tableWidget.setRowHidden(r, True)
                     self.rows_hidden = True
+            # To prevent text entry errors clear journal area
+            self.ui.label_jname.setText(_("Journal: "))
+            self.jid = None
+            self.ui.textEdit.clear()
+            self.ui.textEdit.hide()
+            return
+        if action == action_show_values_like:
+            text_value, ok = QtWidgets.QInputDialog.getText(self, _("Text filter"), _("Show values like:"),
+                                                            QtWidgets.QLineEdit.EchoMode.Normal, item_text)
+            if ok and text_value != '':
+                if ok and text_value != '':
+                    for r in range(0, self.ui.tableWidget.rowCount()):
+                        if self.ui.tableWidget.item(r, col).text().find(text_value) == -1:
+                            self.ui.tableWidget.setRowHidden(r, True)
+                    self.rows_hidden = True
+            # To prevent text entry errors clear journal area
+            self.ui.label_jname.setText(_("Journal: "))
+            self.jid = None
+            self.ui.textEdit.clear()
+            self.ui.textEdit.hide()
             return
 
         if action == action_show_this_coder:
@@ -336,6 +440,11 @@ class DialogJournals(QtWidgets.QDialog):
                 if coder_selected != coder_name:
                     self.ui.tableWidget.setRowHidden(r, True)
             self.rows_hidden = True
+            # To prevent text entry errors clear journal area
+            self.ui.label_jname.setText(_("Journal: "))
+            self.jid = None
+            self.ui.textEdit.clear()
+            self.ui.textEdit.hide()
             return
 
     def export_all_journals_as_one_file(self):
@@ -446,6 +555,7 @@ class DialogJournals(QtWidgets.QDialog):
         self.jid = jid
         self.ui.textEdit.setFocus()
         self.qtimer.start(self.timer_msecs)
+        self.app.delete_backup = False
 
     def export(self):
         """ Export journal to a plain text file, filename will have .txt ending. """
@@ -467,7 +577,7 @@ class DialogJournals(QtWidgets.QDialog):
         Message(self.app, _("Journal export"), msg, "information").exec()
         self.parent_textEdit.append(msg)
 
-    def delete(self):
+    def delete_journal(self):
         """ Delete journal from database and update model and widget. """
 
         row = self.ui.tableWidget.currentRow()
@@ -485,6 +595,8 @@ class DialogJournals(QtWidgets.QDialog):
                     self.journals.remove(item)
             self.fill_table()
             self.parent_textEdit.append(_("Journal deleted: ") + journal_name)
+        self.check_attribute_placeholders()
+        self.app.delete_backup = False
 
     def table_selection_changed(self):
         """ Present the journal text for the current selection. """
@@ -492,6 +604,7 @@ class DialogJournals(QtWidgets.QDialog):
         row = self.ui.tableWidget.currentRow()
         self.ui.label_jname.setText(_("Journal: ") + self.journals[row]['name'])
         self.jid = int(self.ui.tableWidget.item(row, JID_COLUMN).text())
+        self.ui.textEdit.show()
         self.view()
 
     def cell_modified(self):
@@ -530,6 +643,44 @@ class DialogJournals(QtWidgets.QDialog):
                 self.ui.label_jname.setText(_("Journal: ") + self.journals[row]['name'])
             else:  # Put the original text in the cell
                 self.ui.tableWidget.item(row, y).setText(self.journals[row]['name'])
+
+        # Update attribute value
+        if y >= ATTRIBUTE_START_COLUMN:
+            value = str(self.ui.tableWidget.item(row, y).text()).strip()
+            attribute_name = self.header_labels[y]
+            cur = self.app.conn.cursor()
+
+            # Check numeric for numeric attributes, clear "" if it cannot be cast
+            cur.execute("select valuetype from attribute_type where caseOrFile='journal' and name=?",
+                        (attribute_name,))
+            result = cur.fetchone()
+            if result is None:
+                return
+            if result[0] == "numeric":
+                try:
+                    float(value)
+                except ValueError:
+                    self.ui.tableWidget.item(row, y).setText("")
+                    value = ""
+                    msg = _("This attribute is numeric")
+                    Message(self.app, _("Warning"), msg, "warning").exec()
+
+            cur.execute("update attribute set value=? where id=? and name=? and attr_type='journal'",
+                        (value, self.journals[row]['jid'], attribute_name))
+            self.app.conn.commit()
+
+            # Update self.journals[attributes]
+            # Add list of attribute values to journals, order matches header columns
+            sql = "select ifnull(value, '') from attribute where attr_type='journal' and attribute.name=? and id=?"
+            self.journals[row]['attributes'] = []
+            for att_name in self.attribute_labels_ordered:
+                cur.execute(sql, [att_name, self.journals[row]['jid']])
+                res = cur.fetchone()
+                if res:
+                    self.journals[row]['attributes'].append(res[0])
+
+        self.app.delete_backup = False
+        self.ui.tableWidget.resizeColumnsToContents()
 
     # Functions to search though the journal(s) text
     def search_for_text(self):

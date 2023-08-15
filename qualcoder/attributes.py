@@ -99,11 +99,12 @@ class DialogManageAttributes(QtWidgets.QDialog):
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
 
     def get_attributes(self):
-        """ Get attributes from sqlite. """
+        """ Get attributes from sqlite.
+        caseOrFile  also now contains journal. """
 
         self.attributes = []
         cur = self.app.conn.cursor()
-        cur.execute("select name, date, owner, memo, caseOrFile, valuetype from attribute_type")
+        cur.execute("select name, date, owner, memo, caseOrFile, valuetype from attribute_type order by name")
         result = cur.fetchall()
         self.attributes = []
         keys = 'name', 'date', 'owner', 'memo', 'caseOrFile', 'valuetype'
@@ -143,6 +144,10 @@ class DialogManageAttributes(QtWidgets.QDialog):
         case_or_file = "case"
         if ui.radioButton_files.isChecked():
             case_or_file = "file"
+        if ui.radioButton_cases .isChecked():
+            case_or_file = "case"
+        if ui.radioButton_journals.isChecked():
+            case_or_file = "journal"
         # Update attributes list and database
         now_date = str(datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"))
         item = {'name': name, 'memo': "", 'owner': self.app.settings['codername'],
@@ -158,6 +163,10 @@ class DialogManageAttributes(QtWidgets.QDialog):
         ids = cur.fetchall()
         if case_or_file == "case":
             sql = "select caseid from cases"
+            cur.execute(sql)
+            ids = cur.fetchall()
+        if case_or_file == "journal":
+            sql = "select jid from journal"
             cur.execute(sql)
             ids = cur.fetchall()
         for id_ in ids:

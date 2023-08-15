@@ -811,12 +811,12 @@ class DialogManageFiles(QtWidgets.QDialog):
         sql = "select name from attribute_type where caseOrFile='file'"
         cur.execute(sql)
         attribute_names_res = cur.fetchall()
-        self.attribute_names = []  # for AddAttribute dialog
-        self.attribute_labels_ordered = []  # Helps filling table more quickly
+        self.attribute_names = []  # For AddAttribute dialog
+        self.attribute_labels_ordered = []  # Help filling table more quickly
         for att_name in attribute_names_res:
             self.header_labels.append(att_name[0])
             self.attribute_labels_ordered.append(att_name[0])
-            self.attribute_names.append({'name': att_name[0]})  # for AddAtribute dialog
+            self.attribute_names.append({'name': att_name[0]})  # For AddAttribute dialog
         # Add list of attribute values to files, order matches header columns
         sql = "select ifnull(value, '') from attribute where attr_type='file' and attribute.name=? and id=?"
         for s in self.source:
