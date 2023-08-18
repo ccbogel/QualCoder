@@ -36,6 +36,7 @@ import traceback
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtWidgets import QDialog
+from wordcloud import WordCloud, STOPWORDS
 
 from .GUI.ui_dialog_charts import Ui_DialogCharts
 
@@ -163,6 +164,16 @@ class ViewCharts(QDialog):
         for c in self.categories:
             categories_combobox_list.append(c['name'])
         self.ui.comboBox_category.addItems(categories_combobox_list)
+
+        self.ui.comboBox_wordclouds.currentIndexChanged.connect(self.show_word_cloud)
+        wordclouds_combobox_list = ['', _('White'),
+                             _('Black'),
+                             _('Yellow'),
+                             _('Blue'),
+                             _("Red"),
+                             _("Green")
+                             ]
+        self.ui.comboBox_wordclouds.addItems(wordclouds_combobox_list)
 
         # Attributes comboboxes. Initial radio button checked is Files
         self.ui.comboBox_char_attributes.currentIndexChanged.connect(self.character_attribute_charts)
@@ -353,6 +364,41 @@ class ViewCharts(QDialog):
             if filepath is None:
                 return
             fig.write_html(filepath)
+
+    def show_word_cloud(self):
+        """ Show word cloud """
+
+        chart_type_index = self.ui.comboBox_wordclouds.currentIndex()
+        if chart_type_index < 1:
+            return
+
+        title = _('Word cloud')
+        owner, subtitle = self.owner_and_subtitle_helper()
+        cur = self.app.conn.cursor()
+        values = []
+        case_file_name, file_ids = self.get_file_ids()
+        if case_file_name != "":
+            subtitle += case_file_name
+        for c in self.codes:
+            sql = "select seltext from code_text where cid=? and owner like ?"
+            if file_ids != "":
+                sql = "select seltext from code_text where cid=? and owner like ? and fid" + file_ids
+            cur.execute(sql, [c['cid'], owner])
+            res_text = cur.fetchone()
+            if res_text:
+                values.append(res_text[0])
+        # Create image
+        text = " ".join(values)
+        stopwords = set(STOPWORDS)
+        colours = ['', 'white', 'black', 'yellow', 'blue', 'red', 'green']
+        wordcloud = WordCloud(background_color=colours[chart_type_index], width=800, height=600).generate(text)
+        # Display image
+        fig = px.imshow(wordcloud, title=title + subtitle)
+        fig.update_xaxes(visible=False)
+        fig.update_yaxes(visible=False)
+        fig.show()
+        self.helper_export_html(fig)
+        self.ui.comboBox_wordclouds.setCurrentIndex(0)
 
     def show_bar_chart(self):
         """ https://www.tutorialspoint.com/plotly/plotly_bar_and_pie_chart.htm
