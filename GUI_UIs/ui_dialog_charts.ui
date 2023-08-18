@@ -482,6 +482,42 @@ Codings from the entire text file are used for the calculations.</string>
     </rect>
    </property>
   </widget>
+  <widget class="Line" name="line_5">
+   <property name="geometry">
+    <rect>
+     <x>410</x>
+     <y>380</y>
+     <width>331</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="orientation">
+    <enum>Qt::Horizontal</enum>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_word_clouds">
+   <property name="geometry">
+    <rect>
+     <x>410</x>
+     <y>400</y>
+     <width>321</width>
+     <height>22</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Word clouds</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="comboBox_wordclouds">
+   <property name="geometry">
+    <rect>
+     <x>410</x>
+     <y>430</y>
+     <width>321</width>
+     <height>25</height>
+    </rect>
+   </property>
+  </widget>
   <zorder>groupBox</zorder>
   <zorder>label_info</zorder>
   <zorder>label_pie</zorder>
@@ -515,6 +551,9 @@ Codings from the entire text file are used for the calculations.</string>
   <zorder>line_3</zorder>
   <zorder>line_4</zorder>
   <zorder>comboBox_heatmap</zorder>
+  <zorder>line_5</zorder>
+  <zorder>label_word_clouds</zorder>
+  <zorder>comboBox_wordclouds</zorder>
  </widget>
  <tabstops>
   <tabstop>checkBox_export_html</tabstop>
