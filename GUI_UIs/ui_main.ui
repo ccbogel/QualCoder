@@ -109,7 +109,7 @@
      <x>0</x>
      <y>0</y>
      <width>1024</width>
-     <height>22</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuProject">
@@ -155,7 +155,7 @@
    </widget>
    <widget class="QMenu" name="menuFiles_and_Cases">
     <property name="title">
-     <string>Files and Cases</string>
+     <string>Manage</string>
     </property>
     <addaction name="actionManage_files"/>
     <addaction name="actionManage_cases"/>
