@@ -327,7 +327,10 @@ class DialogJournals(QtWidgets.QDialog):
 
         row = self.ui.tableWidget.currentRow()
         col = self.ui.tableWidget.currentColumn()
-        item_text = self.ui.tableWidget.item(row, col).text()
+        item = self.ui.tableWidget.item(row, col)
+        item_text = ""
+        if item is not None:
+            item_text = item.text()
 
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
@@ -545,6 +548,12 @@ class DialogJournals(QtWidgets.QDialog):
         cur.execute("select last_insert_rowid()")
         jid = cur.fetchone()[0]
         journal['jid'] = jid
+
+        sql = 'select count(name) from attribute_type where caseOrFile ="journal"'
+        cur.execute(sql)
+        attribute_count = cur.fetchone()[0]
+        journal['attributes'] = [''] * attribute_count
+        self.check_attribute_placeholders()
         self.parent_textEdit.append(_("Journal created: ") + journal['name'])
         self.journals.append(journal)
         self.fill_table()
