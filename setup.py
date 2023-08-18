@@ -69,6 +69,7 @@ setup(
         'pydub',
         'rispy',
         'SpeechRecognition',
+        'wordcloud',
         'xmlschema'
     ],
     package_data={
