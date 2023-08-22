@@ -42,6 +42,7 @@ from .confirm_delete import DialogConfirmDelete
 from .GUI.base64_helper import *
 from .GUI.ui_dialog_journals import Ui_Dialog_journals
 from .helpers import Message, ExportDirectoryPathDialog, MarkdownHighlighter
+from .memo import DialogMemo
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -202,8 +203,9 @@ class DialogJournals(QtWidgets.QDialog):
 
         # Attributes and attributes in table header labels
         self.header_labels = [_("Name"), _("Modified"), _("Coder"), _("jid")]
+        self.header_value_type = ["character", "character", "character", "numeric"]
 
-        sql = "select name from attribute_type where caseOrFile='journal'"
+        sql = "select name, valuetype from attribute_type where caseOrFile='journal'"
         cur.execute(sql)
         attribute_names_res = cur.fetchall()
         self.attribute_names = []  # For AddAttribute dialog
@@ -211,6 +213,7 @@ class DialogJournals(QtWidgets.QDialog):
         for att_name in attribute_names_res:
             self.attribute_names.append({"name": att_name[0]})
             self.header_labels.append(att_name[0])
+            self.header_value_type.append(att_name[1])
             self.attribute_labels_ordered.append(att_name[0])
         # Add list of attribute values to files, order matches header columns
         sql = "select ifnull(value, '') from attribute where attr_type='journal' and attribute.name=? and id=?"
@@ -407,8 +410,11 @@ class DialogJournals(QtWidgets.QDialog):
         if len(coder_name_set) > 1 and col == OWNER_COLUMN:
             action_show_this_coder = menu.addAction(_("Show this coder"))
         action_show_values_like = None
+        action_date_picker = None
         if col >= ATTRIBUTE_START_COLUMN:
             action_show_values_like = menu.addAction(_("Show values like"))
+            if self.header_value_type[col] == "character" and "date" in self.header_labels[col].lower():
+                action_date_picker = menu.addAction(_("Enter date"))
         action_show_all = None
         if self.rows_hidden:
             action_show_all = menu.addAction(_("Show all rows Ctrl A"))
@@ -485,6 +491,17 @@ class DialogJournals(QtWidgets.QDialog):
             self.jid = None
             self.ui.textEdit.clear()
             self.ui.textEdit.hide()
+            return
+
+        if action == action_date_picker:
+            ui = DialogMemo(self.app, "Date selector", "", "hide")
+            ui.ui.textEdit.hide()
+            calendar = QtWidgets.QCalendarWidget()
+            ui.ui.gridLayout.addWidget(calendar, 0, 0, 1, 1)
+            ok = ui.exec()
+            if ok:
+                selected_date = calendar.selectedDate().toString("yyyy-MM-dd")
+                self.ui.tableWidget.setItem(row, col, QtWidgets.QTableWidgetItem(selected_date))
             return
 
         if action == action_show_this_coder:
