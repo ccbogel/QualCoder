@@ -50,7 +50,7 @@
      <widget class="QPushButton" name="pushButton_export">
       <property name="geometry">
        <rect>
-        <x>50</x>
+        <x>40</x>
         <y>8</y>
         <width>28</width>
         <height>28</height>
@@ -66,7 +66,7 @@
      <widget class="QPushButton" name="pushButton_delete">
       <property name="geometry">
        <rect>
-        <x>130</x>
+        <x>650</x>
         <y>8</y>
         <width>28</width>
         <height>28</height>
@@ -108,7 +108,7 @@
      <widget class="QPushButton" name="pushButton_export_all">
       <property name="geometry">
        <rect>
-        <x>90</x>
+        <x>70</x>
         <y>8</y>
         <width>28</width>
         <height>28</height>
@@ -263,7 +263,7 @@
      <widget class="QPushButton" name="pushButton_help">
       <property name="geometry">
        <rect>
-        <x>680</x>
+        <x>700</x>
         <y>8</y>
         <width>28</width>
         <height>28</height>
@@ -271,6 +271,22 @@
       </property>
       <property name="toolTip">
        <string>Help</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_add_attribute">
+      <property name="geometry">
+       <rect>
+        <x>100</x>
+        <y>8</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add Attribute&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
