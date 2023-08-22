@@ -37,6 +37,7 @@ import traceback
 import webbrowser
 
 from .add_item_name import DialogAddItemName
+from .add_attribute import DialogAddAttribute
 from .confirm_delete import DialogConfirmDelete
 from .GUI.base64_helper import *
 from .GUI.ui_dialog_journals import Ui_Dialog_journals
@@ -73,7 +74,7 @@ class DialogJournals(QtWidgets.QDialog):
     header_labels = []
     jid = None  # journal database jid
     app = None
-    parent_textEdit = None
+    parent_text_edit = None
     textDialog = None
     # variables for searching through journal(s)
     search_indices = []  # A list of tuples of (journal name, match.start, match length)
@@ -91,7 +92,7 @@ class DialogJournals(QtWidgets.QDialog):
         super(DialogJournals, self).__init__(parent)  # overrride accept method
         sys.excepthook = exception_handler
         self.app = app
-        self.parent_textEdit = parent_text_edit
+        self.parent_text_edit = parent_text_edit
         self.journals = []
         self.current_jid = None
         self.search_indices = []
@@ -144,6 +145,10 @@ class DialogJournals(QtWidgets.QDialog):
         pm.loadFromData(QtCore.QByteArray.fromBase64(question_icon), "png")
         self.ui.pushButton_help.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_help.pressed.connect(self.help)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(plus_icon), "png")
+        self.ui.pushButton_add_attribute.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_add_attribute.clicked.connect(self.add_attribute)
 
         # Search text in journals
         pm = QtGui.QPixmap()
@@ -178,6 +183,7 @@ class DialogJournals(QtWidgets.QDialog):
         self.ui.tableWidget.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
         self.ui.textEdit.hide()
+        self.attribute_names = []  # For AddAttribute dialog
 
     def load_journals(self, order="name asc"):
         """ Load journals.
@@ -200,8 +206,10 @@ class DialogJournals(QtWidgets.QDialog):
         sql = "select name from attribute_type where caseOrFile='journal'"
         cur.execute(sql)
         attribute_names_res = cur.fetchall()
+        self.attribute_names = []  # For AddAttribute dialog
         self.attribute_labels_ordered = []  # Help filling table more quickly
         for att_name in attribute_names_res:
+            self.attribute_names.append({"name": att_name[0]})
             self.header_labels.append(att_name[0])
             self.attribute_labels_ordered.append(att_name[0])
         # Add list of attribute values to files, order matches header columns
@@ -212,6 +220,49 @@ class DialogJournals(QtWidgets.QDialog):
                 res = cur.fetchone()
                 if res:
                     j['attributes'].append(res[0])
+
+    def add_attribute(self):
+        """ When add button pressed, opens the AddAtribute dialog to get new attribute text.
+        Then get the attribute type through a dialog.
+        AddAttribute dialog checks for duplicate attribute name.
+        New attribute is added to the model and database.
+        Reserved attribute words - used for imported references:
+        Ref_Type (Type of Reference) – character variable
+        Ref_Author (authors list) – character
+        Ref_Title – character
+        Ref_Year (of publication) – numeric
+        """
+
+        check_names = self.attribute_names + [{'name': 'name'}, {'name': 'memo'}, {'name': 'id'}, {'name': 'date'},
+                                              {'name': 'Ref_Type'}, {'name': 'Ref_Author'}, {'name': 'Ref_Title'},
+                                              {'name':'Ref_Year'}]
+        ui = DialogAddAttribute(self.app, check_names)
+        ok = ui.exec()
+        if not ok:
+            return
+        name = ui.new_name
+        value_type = ui.value_type
+        if name == "":
+            return
+
+        self.attribute_names.append({'name': name})
+        # Update attribute_type list and database
+        now_date = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        cur = self.app.conn.cursor()
+        cur.execute("insert into attribute_type (name,date,owner,memo,caseOrFile, valuetype) values(?,?,?,?,?,?)",
+                    (name, now_date, self.app.settings['codername'], "", 'journal', value_type))
+        self.app.conn.commit()
+        self.app.delete_backup = False
+        sql = "select jid from journal"
+        cur.execute(sql)
+        jids = cur.fetchall()
+        for jid_ in jids:
+            sql = "insert into attribute (name, value, id, attr_type, date, owner) values (?,?,?,?,?,?)"
+            cur.execute(sql, (name, "", jid_[0], 'journal', now_date, self.app.settings['codername']))
+        self.app.conn.commit()
+        self.load_journals()
+        self.fill_table()
+        self.parent_text_edit.append(_("Attribute added to journals: ") + name + ", " + _("type") + ": " + value_type)
 
     def check_attribute_placeholders(self):
         """ Journals can be added after attributes are in the project.
@@ -469,7 +520,7 @@ class DialogJournals(QtWidgets.QDialog):
         f.write(text_)
         f.close()
         msg = _("Collated journals exported as text file to: ") + filepath
-        self.parent_textEdit.append(msg)
+        self.parent_text_edit.append(msg)
         Message(self.app, _("Journals exported"), msg).exec()
 
     def view(self):
@@ -554,7 +605,7 @@ class DialogJournals(QtWidgets.QDialog):
         attribute_count = cur.fetchone()[0]
         journal['attributes'] = [''] * attribute_count
         self.check_attribute_placeholders()
-        self.parent_textEdit.append(_("Journal created: ") + journal['name'])
+        self.parent_text_edit.append(_("Journal created: ") + journal['name'])
         self.journals.append(journal)
         self.fill_table()
         newest = len(self.journals) - 1
@@ -584,7 +635,7 @@ class DialogJournals(QtWidgets.QDialog):
         f.close()
         msg = _("Journal exported to: ") + str(filepath)
         Message(self.app, _("Journal export"), msg, "information").exec()
-        self.parent_textEdit.append(msg)
+        self.parent_text_edit.append(msg)
 
     def delete_journal(self):
         """ Delete journal from database and update model and widget. """
@@ -603,7 +654,7 @@ class DialogJournals(QtWidgets.QDialog):
                 if item['name'] == journal_name:
                     self.journals.remove(item)
             self.fill_table()
-            self.parent_textEdit.append(_("Journal deleted: ") + journal_name)
+            self.parent_text_edit.append(_("Journal deleted: ") + journal_name)
         self.check_attribute_placeholders()
         self.app.delete_backup = False
 
@@ -646,7 +697,7 @@ class DialogJournals(QtWidgets.QDialog):
                 cur.execute("update journal set name=? where name=?",
                             (new_name, self.journals[row]['name']))
                 self.app.conn.commit()
-                self.parent_textEdit.append(
+                self.parent_text_edit.append(
                     _("Journal name changed from: ") + self.journals[row]['name'] + " to: " + new_name)
                 self.journals[row]['name'] = new_name
                 self.ui.label_jname.setText(_("Journal: ") + self.journals[row]['name'])
