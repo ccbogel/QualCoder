@@ -94,17 +94,11 @@ class DialogJournals(QtWidgets.QDialog):
         sys.excepthook = exception_handler
         self.app = app
         self.parent_text_edit = parent_text_edit
-        self.journals = []
-        self.current_jid = None
-        self.search_indices = []
-        self.search_index = 0
         self.qtimer = QtCore.QTimer()
         self.qtimer.timeout.connect(self.update_database_text)
         self.keypress_timer = datetime.datetime.now()
         self.text_changed_flag = False
         self.rows_hidden = False
-        self.attribute_labels_ordered = []
-        self.load_journals()
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_journals()
         self.ui.setupUi(self)
@@ -123,7 +117,12 @@ class DialogJournals(QtWidgets.QDialog):
                 self.ui.splitter.setSizes([s0, s1])
         except KeyError:
             pass
-        self.fill_table()
+        self.journals = []
+        self.current_jid = None
+        self.search_indices = []
+        self.search_index = 0
+        self.attribute_labels_ordered = []
+        self.load_journals()
         self.ui.tableWidget.itemChanged.connect(self.cell_modified)
         self.ui.tableWidget.itemSelectionChanged.connect(self.table_selection_changed)
         pm = QtGui.QPixmap()
@@ -188,18 +187,37 @@ class DialogJournals(QtWidgets.QDialog):
 
     def load_journals(self, order="name asc"):
         """ Load journals.
-        Order by Name asc/desc date asc/desc """
+        Order by Name asc/desc date asc/desc.
+        param: order: String for name, modified; or attributename + '| asc' or '|desc' suffix.
+        """
 
+        # Check for attribute ordering
+        att_ordering = None
+        att_name = None
+        if order[-5] == "|":
+            att_ordering = " " + order[-4:]
+            att_name = order[:-5]
         self.check_attribute_placeholders()
         self.journals = []
         cur = self.app.conn.cursor()
-        sql = "select name, date, jentry, owner, jid from journal order by "
-        sql += order
-        cur.execute(sql)
-        result = cur.fetchall()
-        for row in result:
-            self.journals.append({'name': row[0], 'date': row[1], 'jentry': row[2], 'owner': row[3], 'jid': row[4],
-                                  'attributes': []})
+        if not att_ordering:
+            sql = "select name, date, jentry, owner, jid from journal order by "
+            sql += order
+            cur.execute(sql)
+            result = cur.fetchall()
+            for row in result:
+                self.journals.append({'name': row[0], 'date': row[1], 'jentry': row[2], 'owner': row[3], 'jid': row[4],
+                                      'attributes': []})
+        else:
+            sql = "select journal.name, journal.date, jentry, journal.owner, journal.jid from journal "
+            sql += "join attribute on attribute.id=journal.jid where attribute.attr_type='journal' "
+            sql += "and attribute.name='" + att_name + "'"
+            sql += " order by attribute.value" + att_ordering
+            cur.execute(sql)
+            result = cur.fetchall()
+            for row in result:
+                self.journals.append({'name': row[0], 'date': row[1], 'jentry': row[2], 'owner': row[3], 'jid': row[4],
+                                      'attributes': []})
 
         # Attributes and attributes in table header labels
         self.header_labels = [_("Name"), _("Modified"), _("Coder"), _("jid")]
@@ -223,6 +241,12 @@ class DialogJournals(QtWidgets.QDialog):
                 res = cur.fetchone()
                 if res:
                     j['attributes'].append(res[0])
+        self.fill_table()
+        # To prevent text entry errors, after re-ordering, clear journal area
+        self.ui.label_jname.setText(_("Journal: "))
+        self.jid = None
+        self.ui.textEdit.clear()
+        self.ui.textEdit.hide()
 
     def add_attribute(self):
         """ When add button pressed, opens the AddAtribute dialog to get new attribute text.
@@ -236,9 +260,7 @@ class DialogJournals(QtWidgets.QDialog):
         Ref_Year (of publication) – numeric
         """
 
-        check_names = self.attribute_names + [{'name': 'name'}, {'name': 'memo'}, {'name': 'id'}, {'name': 'date'},
-                                              {'name': 'Ref_Type'}, {'name': 'Ref_Author'}, {'name': 'Ref_Title'},
-                                              {'name':'Ref_Year'}]
+        check_names = self.attribute_names + [{'name': 'Name'}, {'name': 'Modified'}, {'name': 'Coder'}, {'name': 'jid'}]
         ui = DialogAddAttribute(self.app, check_names)
         ok = ui.exec()
         if not ok:
@@ -377,7 +399,8 @@ class DialogJournals(QtWidgets.QDialog):
 
     def table_menu(self, position):
         """ Context menu for displaying table rows in differing order,
-                hiding table rows by showing selected coder. """
+            Showing specific rows, adding dates to Character Attributes that contain 'date' i nthe name.
+        """
 
         row = self.ui.tableWidget.currentRow()
         col = self.ui.tableWidget.currentColumn()
@@ -393,15 +416,15 @@ class DialogJournals(QtWidgets.QDialog):
         action_name_desc = None
         action_show_name_like = None
         if col == NAME_COLUMN:
-            action_name_asc = menu.addAction(_("Order ascending"))
-            action_name_desc = menu.addAction(_("Order descending"))
+            action_name_asc = menu.addAction(_("Ascending"))
+            action_name_desc = menu.addAction(_("Descending"))
             action_show_name_like = menu.addAction(_("Show name like"))
 
-        action_date_asc = None
-        action_date_desc = None
+        action_modified_date_asc = None
+        action_modified_date_desc = None
         if col == DATE_COLUMN:
-            action_date_asc = menu.addAction(_("Order ascending"))
-            action_date_desc = menu.addAction(_("Order descending"))
+            action_modified_date_asc = menu.addAction(_("Ascending"))
+            action_modified_date_desc = menu.addAction(_("Descending"))
         action_show_this_coder = None
         coder_names = []
         for j in self.journals:
@@ -411,51 +434,40 @@ class DialogJournals(QtWidgets.QDialog):
             action_show_this_coder = menu.addAction(_("Show this coder"))
         action_show_values_like = None
         action_date_picker = None
+        action_attribute_ascending = None
+        action_attribute_descending = None
         if col >= ATTRIBUTE_START_COLUMN:
             action_show_values_like = menu.addAction(_("Show values like"))
             if self.header_value_type[col] == "character" and "date" in self.header_labels[col].lower():
                 action_date_picker = menu.addAction(_("Enter date"))
+            action_attribute_ascending = menu.addAction(_("Ascending"))
+            action_attribute_descending = menu.addAction(_("Descending"))
         action_show_all = None
         if self.rows_hidden:
             action_show_all = menu.addAction(_("Show all rows Ctrl A"))
             self.rows_hidden = False
 
         action = menu.exec(self.ui.tableWidget.mapToGlobal(position))
-        if action == action_date_asc:
+        if action == action_modified_date_asc:
             self.load_journals("date asc")
-            self.fill_table()
-            # To prevent text entry errors clear journal area
-            self.ui.label_jname.setText(_("Journal: "))
-            self.jid = None
-            self.ui.textEdit.clear()
-            self.ui.textEdit.hide()
             return
-        if action == action_date_desc:
+        if action == action_modified_date_desc:
             self.load_journals("date desc")
-            self.fill_table()
-            # To prevent text entry errors clear journal area
-            self.ui.label_jname.setText(_("Journal: "))
-            self.jid = None
-            self.ui.textEdit.clear()
-            self.ui.textEdit.hide()
             return
         if action == action_name_asc:
             self.load_journals("name asc")
-            self.fill_table()
-            # To prevent text entry errors clear journal area
-            self.ui.label_jname.setText(_("Journal: "))
-            self.jid = None
-            self.ui.textEdit.clear()
-            self.ui.textEdit.hide()
             return
         if action == action_name_desc:
             self.load_journals("name desc")
-            self.fill_table()
-            # To prevent text entry errors clear journal area
-            self.ui.label_jname.setText(_("Journal: "))
-            self.jid = None
-            self.ui.textEdit.clear()
-            self.ui.textEdit.hide()
+            return
+        if action == action_attribute_ascending:
+            attribute_name = self.header_labels[col]
+            self.load_journals(attribute_name + "| asc")
+            return
+        if action == action_attribute_descending:
+            attribute_name = self.header_labels[col]
+
+            self.load_journals(attribute_name + "|desc")
             return
         if action == action_show_all:
             for r in range(0, self.ui.tableWidget.rowCount()):
@@ -492,7 +504,6 @@ class DialogJournals(QtWidgets.QDialog):
             self.ui.textEdit.clear()
             self.ui.textEdit.hide()
             return
-
         if action == action_date_picker:
             ui = DialogMemo(self.app, "Date selector", "", "hide")
             ui.ui.textEdit.hide()
@@ -503,7 +514,6 @@ class DialogJournals(QtWidgets.QDialog):
                 selected_date = calendar.selectedDate().toString("yyyy-MM-dd")
                 self.ui.tableWidget.setItem(row, col, QtWidgets.QTableWidgetItem(selected_date))
             return
-
         if action == action_show_this_coder:
             coder_selected = self.ui.tableWidget.item(row, OWNER_COLUMN).text()
             for r in range(0, self.ui.tableWidget.rowCount()):

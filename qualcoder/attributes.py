@@ -125,7 +125,8 @@ class DialogManageAttributes(QtWidgets.QDialog):
         New attribute is added to the model and database. """
 
         check_names = [{'name': 'name'}, {'name': 'memo'}, {'name': 'id'}, {'name': 'date'}, {'name': 'Ref_Type'},
-                       {'name': 'Ref_Author'}, {'name': 'Ref_Title'}, {'name': 'Ref_Year'}]
+                       {'name': 'Ref_Author'}, {'name': 'Ref_Title'}, {'name': 'Ref_Year'}, {'name': 'jid'},
+                       {'name': 'Coder'}, {'name': 'Name'}, {'name': 'Modified'}]
         check_names.extend(self.attributes)
         ui = DialogAddAttribute(self.app, check_names)
         ui.exec()  # ok = ui.exec() does not pick up pressing the cancel button
