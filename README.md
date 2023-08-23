@@ -10,7 +10,7 @@ Instructions and other information are available here: https://qualcoder.wordpre
 
 It is best to download the Current Release form the Releases page. Occassional errors can occur in this latest code.
 
-If you like the work doen on QualCoder please vuy me a coffee ...
+If you like QualCoder please vuy me a coffee ...
 
 <a href="https://www.buymeacoffee.com/ccbogelB" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
 
