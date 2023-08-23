@@ -209,10 +209,17 @@ class DialogJournals(QtWidgets.QDialog):
                 self.journals.append({'name': row[0], 'date': row[1], 'jentry': row[2], 'owner': row[3], 'jid': row[4],
                                       'attributes': []})
         else:
+            # Get attribute value type
+            cur.execute("select valuetype from attribute_type where name=?", [att_name])
+            res = cur.fetchone()
+            valuetype = res[0]
             sql = "select journal.name, journal.date, jentry, journal.owner, journal.jid from journal "
             sql += "join attribute on attribute.id=journal.jid where attribute.attr_type='journal' "
             sql += "and attribute.name='" + att_name + "'"
-            sql += " order by attribute.value" + att_ordering
+            if valuetype == "numeric":
+                sql += " order by cast(attribute.value as real) " + att_ordering
+            else:
+                sql += " order by attribute.value" + att_ordering
             cur.execute(sql)
             result = cur.fetchall()
             for row in result:
@@ -398,7 +405,7 @@ class DialogJournals(QtWidgets.QDialog):
 
     def table_menu(self, position):
         """ Context menu for displaying table rows in differing order,
-            Showing specific rows, adding dates to Character Attributes that contain 'date' i nthe name.
+            Showing specific rows, adding dates to Character Attributes that contain 'date' in the name.
         """
 
         row = self.ui.tableWidget.currentRow()
