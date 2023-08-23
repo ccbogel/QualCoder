@@ -376,21 +376,14 @@ class DialogCases(QtWidgets.QDialog):
         AddItem dialog checks for duplicate attribute name.
         New attribute is added to the model and database. """
 
-        cur = self.app.conn.cursor()
-        cur.execute("select name from attribute_type where caseOrFile='case'")
-        result = cur.fetchall()
-        attribute_names = [{'name': a[0]} for a in result]
-        '''for a in result:
-            attribute_names.append({'name': a[0]})'''
-        check_names = attribute_names + [{'name': 'name'}, {'name': 'memo'}, {'name': 'caseid'}, {'name': 'date'}]
-        add_ui = DialogAddAttribute(self.app, check_names)
+        add_ui = DialogAddAttribute(self.app)
         ok = add_ui.exec()
         if not ok or add_ui.new_name == "":
             return
         name = add_ui.new_name
         value_type = add_ui.value_type
 
-        # update attribute_type list and database
+        # Update attribute_type list and database
         now_date = str(datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"))
         sql = "insert into attribute_type (name,date,owner,memo,caseOrFile, valuetype) values(?,?,?,?,?,?)"
         cur.execute(sql, (name, now_date, self.app.settings['codername'], "", 'case', value_type))

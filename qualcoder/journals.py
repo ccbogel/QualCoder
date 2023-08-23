@@ -260,8 +260,7 @@ class DialogJournals(QtWidgets.QDialog):
         Ref_Year (of publication) – numeric
         """
 
-        check_names = self.attribute_names + [{'name': 'Name'}, {'name': 'Modified'}, {'name': 'Coder'}, {'name': 'jid'}]
-        ui = DialogAddAttribute(self.app, check_names)
+        ui = DialogAddAttribute(self.app)
         ok = ui.exec()
         if not ok:
             return

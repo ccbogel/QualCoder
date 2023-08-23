@@ -985,10 +985,9 @@ class DialogManageFiles(QtWidgets.QDialog):
         if self.av_dialog_open is not None:
             self.av_dialog_open.mediaplayer.stop()
             self.av_dialog_open = None
-        check_names = self.attribute_names + [{'name': 'name'}, {'name': 'memo'}, {'name': 'id'}, {'name': 'date'},
-                                              {'name': 'Ref_Type'}, {'name': 'Ref_Author'}, {'name': 'Ref_Title'},
-                                              {'name':'Ref_Year'}]
-        ui = DialogAddAttribute(self.app, check_names)
+        '''check_names = self.attribute_names + [{'name': 'Ref_Type'}, {'name': 'Ref_Author'}, {'name': 'Ref_Title'},
+                                              {'name':'Ref_Year'}]'''
+        ui = DialogAddAttribute(self.app)
         ok = ui.exec()
         if not ok:
             return

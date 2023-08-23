@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2022 Colin Curtain
+Copyright (c) 2023 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -57,18 +57,21 @@ class DialogAddAttribute(QtWidgets.QDialog):
     Dialog returns ok if the item is not a duplicate of a name in the list.
     """
 
-    existing_names = []
-    new_name = ""
-    value_type = "character"
-    app = None
-
-    def __init__(self, app, names, parent=None):
-        super(DialogAddAttribute, self).__init__(parent)  # overrride accept method
+    def __init__(self, app, parent=None):
+        super(DialogAddAttribute, self).__init__(parent)
 
         sys.excepthook = exception_handler
         self.app = app
-        for n in names:
-            self.existing_names.append(n['name'])
+        self.new_name = ""
+        self.value_type = "character"
+        self.existing_names = ['Ref_Type', 'Ref_Author', 'Ref_Title', 'Ref_Year']
+        cur = self.app.conn.cursor()
+        sql = "select name from attribute_type"
+        cur.execute(sql)
+        res = cur.fetchall()
+        for r in res:
+            self.existing_names.append(r[0])
+
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_DialogAddAttribute()
         self.ui.setupUi(self)
@@ -88,7 +91,10 @@ class DialogAddAttribute(QtWidgets.QDialog):
         duplicate = False
         if new_name in self.existing_names:
             duplicate = True
-            Message(self.app, _("Duplicated"), _("This already exists"), "warning").exec()
+            msg = _("This attribute name already exists in cases, files or journals.")
+            msg += "\n" + _("Or is reserved for bibliography attributes:")
+            msg += "\n" + "Ref_Type, Ref_Author, Ref_Title, Ref_Year"
+            Message(self.app, _("Duplicate"), msg, "warning").exec()
             self.new_name = ""
             self.done(0)
         if duplicate is False:
