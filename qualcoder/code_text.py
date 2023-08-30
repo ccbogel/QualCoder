@@ -1048,7 +1048,7 @@ class DialogCodeText(QtWidgets.QWidget):
         # Can have multiple coded text at this position
         for item in self.code_text:
             if cursor.position() + self.file_['start'] >= item['pos0'] and cursor.position() <= item['pos1']:
-                action_unmark = QtGui.QAction(_("Unmark"))
+                action_unmark = QtGui.QAction(_("Unmark (U)"))
                 action_code_memo = QtGui.QAction(_("Memo coded text (M)"))
                 action_start_pos = QtGui.QAction(_("Change start position (SHIFT LEFT/ALT RIGHT)"))
                 action_end_pos = QtGui.QAction(_("Change end position (SHIFT RIGHT/ALT LEFT)"))
@@ -1709,7 +1709,8 @@ class DialogCodeText(QtWidgets.QWidget):
         O Shortcut to cycle through overlapping codes - at clicked position
         S search text - may include current selection
         R opens a context menu for recently used codes for marking text
-        V assign in vivo code to selected text
+        U Unmark at selected location
+        V assign 'in vivo' code to selected text
         Ctrl 0 to Ctrl 9 - button presses
         """
 
@@ -1804,6 +1805,10 @@ class DialogCodeText(QtWidgets.QWidget):
         # Quick mark selected
         if key == QtCore.Qt.Key.Key_Q and selected_text != "":
             self.mark()
+            return
+        # Unmark at text position
+        if key == QtCore.Qt.Key.Key_U:
+            self.unmark(cursor_pos)
             return
         # Create or assign in vivo code to selected text
         if key == QtCore.Qt.Key.Key_V and selected_text != "":

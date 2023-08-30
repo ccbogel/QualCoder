@@ -261,7 +261,7 @@ Ctrl 8 Show all codes in text (if selected code previous or next has been used)<
 Ctrl 9 Show codes marked important<br />\
 Ctrl 0 Help - opens in browser<br />\
 Ctrl F Jump to search box<br />\
-Ctrl Z The last code is unmarked, undo and restore that coding<br />\
+Ctrl Z The last code that was unmarked, restore that coding<br />\
 Ctrl E Enter and Exit Edit mode<br />\
 A Annotate - Current text selection<br />\
 Q Quick Mark with code - for current selection<br />\
@@ -271,7 +271,8 @@ I Tag code at clicked position as important<br />\
 M Memo code - at clicked position<br />\
 O Shortcut to cycle through overlapping codes - at clicked position<br />\
 S Search text - may include current selection<br />\
-R opens a context menu for recently used codes for marking text<br />\
+R Opens a context menu for recently used codes for marking text<br />\
+U Umark at clicked position in the text<br />\
 V assign in vivo code to selected text<br />\
 Alt + Left arrow  Shrink coding to the left <br />\
 Alt + Right arrow Shrink coding to the right<br />\
