@@ -1035,12 +1035,13 @@ class DialogCodeText(QtWidgets.QWidget):
         action_copy = None
         action_code_memo = None
         action_edit_annotate = None
-        action_end_pos = None
         action_important = None
         action_mark = None
         action_not_important = None
         action_change_code = None
-        action_start_pos = None
+        #action_start_pos = None
+        #action_end_pos = None
+        action_change_pos = None
         action_unmark = None
         action_new_code = None
         action_new_invivo_code = None
@@ -1050,8 +1051,9 @@ class DialogCodeText(QtWidgets.QWidget):
             if cursor.position() + self.file_['start'] >= item['pos0'] and cursor.position() <= item['pos1']:
                 action_unmark = QtGui.QAction(_("Unmark (U)"))
                 action_code_memo = QtGui.QAction(_("Memo coded text (M)"))
-                action_start_pos = QtGui.QAction(_("Change start position (SHIFT LEFT/ALT RIGHT)"))
-                action_end_pos = QtGui.QAction(_("Change end position (SHIFT RIGHT/ALT LEFT)"))
+                #action_start_pos = QtGui.QAction(_("Change start position (SHIFT LEFT/ALT RIGHT)"))
+                #action_end_pos = QtGui.QAction(_("Change end position (SHIFT RIGHT/ALT LEFT)"))
+                action_change_pos = QtGui.QAction(_("Change code position key presses"))
                 if item['important'] is None or item['important'] > 1:
                     action_important = QtGui.QAction(_("Add important mark (I)"))
                 if item['important'] == 1:
@@ -1061,10 +1063,12 @@ class DialogCodeText(QtWidgets.QWidget):
             menu.addAction(action_unmark)
         if action_code_memo:
             menu.addAction(action_code_memo)
-        if action_start_pos:
+        if action_change_pos:
+            menu.addAction(action_change_pos)
+        '''if action_start_pos:
             menu.addAction(action_start_pos)
         if action_end_pos:
-            menu.addAction(action_end_pos)
+            menu.addAction(action_end_pos)'''
         if action_important:
             menu.addAction(action_important)
         if action_not_important:
@@ -1120,12 +1124,14 @@ class DialogCodeText(QtWidgets.QWidget):
         if action == action_code_memo:
             self.coded_text_memo(cursor.position())
             return
-        if action == action_start_pos:
+        if action == action_change_pos:
+            self.change_code_pos_message()
+        '''if action == action_start_pos:
             self.change_code_pos(cursor.position(), "start")
             return
         if action == action_end_pos:
             self.change_code_pos(cursor.position(), "end")
-            return
+            return'''
         if action == action_set_bookmark:
             cur = self.app.conn.cursor()
             bookmark_pos = cursor.position() + self.file_['start']
@@ -1380,10 +1386,10 @@ class DialogCodeText(QtWidgets.QWidget):
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
 
-    def change_code_pos(self, location, start_or_end):
+    def change_code_pos_message(self):  #, location, start_or_end):
         """  Called via textedit_menu. """
 
-        msg = _("Change start position (SHIFT LEFT/ALT RIGHT)\nChange end position (SHIFT RIGHT/ALT LEFT)")
+        msg = _("Change start position (extend SHIFT LEFT/ shrink ALT RIGHT)\nChange end position (extend SHIFT RIGHT/ shrink ALT LEFT)")
         Message(self.app, _("Use key presses") + " " * 20, msg).exec()
 
         '''if self.file_ is None:
