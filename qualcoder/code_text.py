@@ -1392,68 +1392,59 @@ class DialogCodeText(QtWidgets.QWidget):
         msg = _("Change start position (extend SHIFT LEFT/ shrink ALT RIGHT)\nChange end position (extend SHIFT RIGHT/ shrink ALT LEFT)")
         Message(self.app, _("Use key presses") + " " * 20, msg).exec()
 
-        '''if self.file_ is None:
+    def shift_code_positions(self, position):
+        """ After a text file is edited - text added or deleted, code positions may be inaccurate.
+         enter a positive or negative integer to shift code positions for all codes after a click position in the
+         document.
+         Activated by ^ At key press"""
+
+        if self.file_ is None:
             return
         code_list = []
         for item in self.code_text:
-            if item['pos0'] <= location + self.file_['start'] <= item['pos1'] and \
-                    item['owner'] == self.app.settings['codername']:
+            if item['pos0'] > position + self.file_['start']:
                 code_list.append(item)
+                #print(item['pos0'], ">", position + self.file_['start'])
         if not code_list:
             return
-        code_to_edit = None
-        if len(code_list) == 1:
-            code_to_edit = code_list[0]
-        # Multiple codes to select from
-        if len(code_list) > 1:
-            ui = DialogSelectItems(self.app, code_list, _("Select code for change"), "single")
-            ok = ui.exec()
-            if not ok:
-                return
-            code_to_edit = ui.get_selected()
-        if code_to_edit is None:
-            return
-        txt_len = len(self.ui.textEdit.toPlainText())
-        changed_start = 0
-        changed_end = 0
         int_dialog = QtWidgets.QInputDialog()
         int_dialog.setMinimumSize(60, 150)
         # Remove context flag does not work here
         int_dialog.setWindowFlags(int_dialog.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        msg = _("Key shortcuts\nShift left Arrow\nShift Right Arrow\nAlt Left Arrow\nAlt Right Arrow")
+        msg = _("Shift codings after clicked position")
         int_dialog.setWhatsThis(msg)
         int_dialog.setToolTip(msg)
-        if start_or_end == "start":
-            max_ = code_to_edit['pos1'] - code_to_edit['pos0'] - 1
-            min_ = -1 * code_to_edit['pos0']
-            changed_start, ok = int_dialog.getInt(self, _("Change start position"),
-                                                  _("Change start character position. Positive or negative number:"), 0,
-                                                  min_, max_, 1)
-            if not ok:
-                return
-        if start_or_end == "end":
-            max_ = txt_len - code_to_edit['pos1']
-            min_ = code_to_edit['pos0'] - code_to_edit['pos1'] + 1
-            changed_end, ok = int_dialog.getInt(self, _("Change end position"),
-                                                _("Change end character position. Positive or negative number:"), 0,
-                                                min_, max_, 1)
-            if not ok:
-                return
-        if changed_start == 0 and changed_end == 0:
+        msg2 = _("Shift code positions for all codes after you have clicked on a position in the text.\n"
+                 "Back up the project before running this action.\n"
+                 "This function will help if you have edited the coded text and the codes are out of position.\n"
+                 "Positive numbers (moves right) or negative numbers (moves left) (-500 to 500)\n"
+                 "Clicked character position: ") + str(position)
+        delta_shift, ok = int_dialog.getInt(self, msg,msg2 , 0, -500, 500, 1)
+        if not ok:
+            return
+        if delta_shift == 0:
             return
         int_dialog.done(1)  # Need this, as reactivated when called again with same int value.
-        # Update database, reload code_text and highlights
-        new_pos0 = code_to_edit['pos0'] + changed_start
-        new_pos1 = code_to_edit['pos1'] + changed_end
         cur = self.app.conn.cursor()
-        text_sql = "select substr(fulltext,?,?) from source where id=?"
-        cur.execute(text_sql, [new_pos0, new_pos1, self.file_['id']])
-        seltext = cur.fetchone()[0]
-        sql = "update code_text set pos0=?, pos1=?, seltext=? where ctid=?"
-        cur.execute(sql, [new_pos0, new_pos1, seltext, code_to_edit['ctid']])
-        self.app.conn.commit()
+        length_sql = "select length(fulltext) from source where id=?"
+        cur.execute(length_sql, [self.file_['id']])
+        fulltext_length = cur.fetchone()[0]
+        text_sql = "select substr(fulltext,?,?), length(fulltext) from source where id=?"
+        # Update code_text rows in database
+        for coded in code_list:
+            #print(coded['seltext'], coded['pos0'], coded['pos1'])
+            new_pos0 = coded['pos0'] + delta_shift
+            new_pos1 = coded['pos1'] + delta_shift
+            # Get seltext and update if coded pos0 and pos1 are within bounds
+            if new_pos0 > -1 and new_pos1 < fulltext_length:
+                cur.execute(text_sql, [new_pos0, new_pos1 - new_pos0, self.file_['id']])
+                seltext = cur.fetchone()[0]
+                #print("len", fulltext_length, seltext)
+                sql = "update code_text set pos0=?, pos1=?, seltext=? where ctid=?"
+                cur.execute(sql, [new_pos0, new_pos1, seltext, coded['ctid']])
+                self.app.conn.commit()
         self.app.delete_backup = False
-        self.get_coded_text_update_eventfilter_tooltips()'''
+        self.get_coded_text_update_eventfilter_tooltips()
 
     def copy_selected_text_to_clipboard(self):
         """ Copy text to clipboard for external use.
@@ -1726,6 +1717,8 @@ class DialogCodeText(QtWidgets.QWidget):
         V assign 'in vivo' code to selected text
         Ctrl 0 to Ctrl 9 - button presses
         # Display Clicked character position
+        ^ At key. Shift code positions. May be needed after the text is edited
+            (added or deleted) to shift subsequent codings.
         """
 
         key = event.key()
@@ -1789,7 +1782,10 @@ class DialogCodeText(QtWidgets.QWidget):
         # Hash display character position
         if key == QtCore.Qt.Key.Key_Exclam:
             Message(self.app, _("Text position") + " " * 20, _("Character position: ") + str(cursor_pos)).exec()
-
+            return
+        if key == QtCore.Qt.Key.Key_Dollar:
+            self.shift_code_positions(self.ui.textEdit.textCursor().position() + self.file_['start'])
+            return
         # Annotate selected
         if key == QtCore.Qt.Key.Key_A and selected_text != "":
             self.annotate()
