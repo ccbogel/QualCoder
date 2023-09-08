@@ -1382,7 +1382,11 @@ class DialogCodeText(QtWidgets.QWidget):
 
     def change_code_pos(self, location, start_or_end):
         """  Called via textedit_menu. """
-        if self.file_ is None:
+
+        msg = _("Change start position (SHIFT LEFT/ALT RIGHT)\nChange end position (SHIFT RIGHT/ALT LEFT)")
+        Message(self.app, _("Use key presses") + " " * 20, msg).exec()
+
+        '''if self.file_ is None:
             return
         code_list = []
         for item in self.code_text:
@@ -1436,11 +1440,14 @@ class DialogCodeText(QtWidgets.QWidget):
         new_pos0 = code_to_edit['pos0'] + changed_start
         new_pos1 = code_to_edit['pos1'] + changed_end
         cur = self.app.conn.cursor()
-        sql = "update code_text set pos0=?, pos1=? where ctid=?"
-        cur.execute(sql, [new_pos0, new_pos1, code_to_edit['ctid']])
+        text_sql = "select substr(fulltext,?,?) from source where id=?"
+        cur.execute(text_sql, [new_pos0, new_pos1, self.file_['id']])
+        seltext = cur.fetchone()[0]
+        sql = "update code_text set pos0=?, pos1=?, seltext=? where ctid=?"
+        cur.execute(sql, [new_pos0, new_pos1, seltext, code_to_edit['ctid']])
         self.app.conn.commit()
         self.app.delete_backup = False
-        self.get_coded_text_update_eventfilter_tooltips()
+        self.get_coded_text_update_eventfilter_tooltips()'''
 
     def copy_selected_text_to_clipboard(self):
         """ Copy text to clipboard for external use.
@@ -1712,6 +1719,7 @@ class DialogCodeText(QtWidgets.QWidget):
         U Unmark at selected location
         V assign 'in vivo' code to selected text
         Ctrl 0 to Ctrl 9 - button presses
+        # Display Clicked character position
         """
 
         key = event.key()
@@ -1772,6 +1780,10 @@ class DialogCodeText(QtWidgets.QWidget):
             if item['pos0'] <= cursor_pos + self.file_['start'] <= item['pos1'] and \
                     item['owner'] == self.app.settings['codername']:
                 codes_here.append(item)
+        # Hash display character position
+        if key == QtCore.Qt.Key.Key_Exclam:
+            Message(self.app, _("Text position") + " " * 20, _("Character position: ") + str(cursor_pos)).exec()
+
         # Annotate selected
         if key == QtCore.Qt.Key.Key_A and selected_text != "":
             self.annotate()
