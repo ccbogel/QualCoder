@@ -52,6 +52,7 @@ from qualcoder.cases import DialogCases
 from qualcoder.codebook import Codebook
 from qualcoder.code_color_scheme import DialogCodeColorScheme
 from qualcoder.code_text import DialogCodeText
+from qualcoder.code_pdf import DialogCodePdf
 from qualcoder.color_selector import colors
 from qualcoder.GUI.base64_helper import *
 from qualcoder.GUI.ui_main import Ui_MainWindow
@@ -297,7 +298,7 @@ class App(object):
         return res
 
     def get_text_filenames(self, ids=None):
-        """ Get filenames of text files.
+        """ Get filenames, id, memo and mediapath of text files.
         param:
             ids: list of Integer ids for a restricted list of files. """
 
@@ -305,6 +306,28 @@ class App(object):
             ids = []
         sql = "select id, name, ifnull(memo,''), mediapath from source where (mediapath is Null or mediapath " \
               "like '/docs/%' or mediapath like 'docs:%') "
+        if ids:
+            str_ids = list(map(str, ids))
+            sql += " and id in (" + ",".join(str_ids) + ")"
+        sql += "order by lower(name)"
+        cur = self.conn.cursor()
+        cur.execute(sql)
+        result = cur.fetchall()
+        res = []
+        keys = 'id', 'name', 'memo', 'mediapath'
+        for row in result:
+            res.append(dict(zip(keys, row)))
+        return res
+
+    def get_pdf_filenames(self, ids=None):
+        """ Get id, filenames, memo and mediapath of pdf text files.
+        param:
+            ids: list of Integer ids for a restricted list of files. """
+
+        if ids is None:
+            ids = []
+        sql = "select id, name, ifnull(memo,''), mediapath from source where mediapath is not Null and(mediapath " \
+              "like '/docs/%' or mediapath like 'docs:%') and (mediapath like '%.pdf' or mediapath like '%.PDF')"
         if ids:
             str_ids = list(map(str, ids))
             sql += " and id in (" + ",".join(str_ids) + ")"
@@ -579,13 +602,13 @@ class App(object):
                                         "QTreeWidget {font-size: " + str(settings.get('treefontsize')))
 
         style = "* {font-size: 12px; color: #000000;}\n\
-        QWidget {background-color: #efefef; color: #000000; border: none;}\n\
+        QWidget {background-color: #efefef; color: #000000; border: 1px #707070;}\n\
         QWidget:focus {border: 1px solid #f89407;}\n\
         QDialog {border: 1px solid #808080;}\n\
         QFileDialog {font-size: 12px}\n\
         QComboBox {border: 1px solid #707070; background-color: #fafafa;}\n\
         QComboBox:hover,QPushButton:hover {border: 2px solid #f89407;}\n\
-        QGroupBox {border: None;}\n\
+        QGroupBox {border-right: 1px solid #707070; border-bottom: 1px solid #707070;}\n\
         QGroupBox:focus {border: 3px solid #f89407;}\n\
         QPushButton {border-style: outset; border-width: 2px; border-radius: 2px; border-color: beige; padding: 2px;}\n\
         QPushButton:pressed {border-style: inset; background-color: white;}\n\
@@ -856,7 +879,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def init_ui(self):
         """ Set up menu triggers """
 
-        # project menu
+        # Project menu
         self.ui.actionCreate_New_Project.triggered.connect(self.new_project)
         self.ui.actionCreate_New_Project.setShortcut('Ctrl+N')
         self.ui.actionOpen_Project.triggered.connect(self.open_project)
@@ -879,7 +902,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionExit.triggered.connect(self.closeEvent)
         self.ui.actionExit.setShortcut('Ctrl+Q')
         self.ui.actionImport_plain_text_codes_list.triggered.connect(self.import_plain_text_codes)
-        # File cases and journals menu
+        # Manage menu
         self.ui.actionManage_files.setShortcut('Alt+F')
         self.ui.actionManage_files.triggered.connect(self.manage_files)
         self.ui.actionManage_journals.triggered.connect(self.journals)
@@ -901,6 +924,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCode_image.setShortcut('Alt+I')
         self.ui.actionCode_audio_video.triggered.connect(self.av_coding)
         self.ui.actionCode_audio_video.setShortcut('Alt+V')
+        self.ui.actionCode_pdf.triggered.connect(self.pdf_coding)
         self.ui.actionColour_scheme.setShortcut('Alt+E')
         self.ui.actionColour_scheme.triggered.connect(self.code_color_scheme)
         # Reports menu
@@ -1008,7 +1032,7 @@ class MainWindow(QtWidgets.QMainWindow):
          Enable project import options.
          Called by init and by close_project. """
 
-        # project menu
+        # Project menu
         self.ui.actionClose_Project.setEnabled(False)
         self.ui.actionProject_Memo.setEnabled(False)
         self.ui.actionProject_Exchange_Export.setEnabled(False)
@@ -1018,7 +1042,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionRQDA_Project_import.setEnabled(True)
         self.ui.actionExport_codebook.setEnabled(False)
         self.ui.actionImport_plain_text_codes_list.setEnabled(False)
-        # files cases journals menu
+        # Manage menu
         self.ui.actionManage_files.setEnabled(False)
         self.ui.actionManage_journals.setEnabled(False)
         self.ui.actionManage_cases.setEnabled(False)
@@ -1027,12 +1051,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionManage_bad_links_to_files.setEnabled(False)
         self.ui.actionManage_references.setEnabled(False)
         self.ui.actionImport_twitter_data.setEnabled(False)
-        # codes menu
+        # Coding menu
         self.ui.actionCodes.setEnabled(False)
         self.ui.actionCode_image.setEnabled(False)
         self.ui.actionCode_audio_video.setEnabled(False)
+        self.ui.actionCode_pdf.setEnabled(False)
         self.ui.actionColour_scheme.setEnabled(False)
-        # reports menu
+        # Reports menu
         self.ui.actionCoding_reports.setEnabled(False)
         self.ui.actionCoding_comparison.setEnabled(False)
         self.ui.actionCoding_comparison_by_file.setEnabled(False)
@@ -1045,7 +1070,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCategories.setEnabled(False)
         self.ui.actionView_Graph.setEnabled(False)
         self.ui.actionCharts.setEnabled(False)
-        # help menu
+        # Help menu
         self.ui.actionSpecial_functions.setEnabled(False)
 
     def show_menu_options(self):
@@ -1062,7 +1087,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionRQDA_Project_import.setEnabled(True)
         self.ui.actionExport_codebook.setEnabled(True)
         self.ui.actionImport_plain_text_codes_list.setEnabled(True)
-        # Files cases journals menu
+        # Manage menu
         self.ui.actionManage_files.setEnabled(True)
         self.ui.actionManage_journals.setEnabled(True)
         self.ui.actionManage_cases.setEnabled(True)
@@ -1070,10 +1095,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionImport_survey_2.setEnabled(True)
         self.ui.actionManage_references.setEnabled(True)
         self.ui.actionImport_twitter_data.setEnabled(True)
-        # Codes menu
+        # Coding menu
         self.ui.actionCodes.setEnabled(True)
         self.ui.actionCode_image.setEnabled(True)
         self.ui.actionCode_audio_video.setEnabled(True)
+        self.ui.actionCode_pdf.setEnabled(True)
         self.ui.actionColour_scheme.setEnabled(True)
         # Reports menu
         self.ui.actionCoding_reports.setEnabled(True)
@@ -1354,6 +1380,21 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             msg = _("This project contains no text files.")
             Message(self.app, _('No text files'), msg).exec()
+
+    def pdf_coding(self):
+        """ Create edit and delete codes. Apply and remove codes  to the pdf
+        text in imported pdf files. """
+
+        files = self.app.get_pdf_filenames()
+        if len(files) > 0:
+            self.ui.label_coding.hide()
+            ui = DialogCodePdf(self.app, self.ui.textEdit, self.ui.tab_reports)
+            ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
+            self.tab_layout_helper(self.ui.tab_coding, ui)
+        else:
+            msg = _("This project contains no pdf files.")
+            Message(self.app, _('No pdf files'), msg).exec()
+        pass
 
     def image_coding(self):
         """ Create edit and delete codes. Apply and remove codes to the image (or regions)
