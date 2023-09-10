@@ -173,6 +173,7 @@
     <addaction name="actionCodes"/>
     <addaction name="actionCode_image"/>
     <addaction name="actionCode_audio_video"/>
+    <addaction name="actionCode_pdf"/>
     <addaction name="actionColour_scheme"/>
    </widget>
    <widget class="QMenu" name="menuReports">
@@ -492,6 +493,11 @@
   <action name="actionImport_twitter_data">
    <property name="text">
     <string>Import twitter data</string>
+   </property>
+  </action>
+  <action name="actionCode_pdf">
+   <property name="text">
+    <string>Code pdf</string>
    </property>
   </action>
  </widget>
