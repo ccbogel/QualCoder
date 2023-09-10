@@ -187,6 +187,8 @@ class Ui_MainWindow(object):
         self.actionMenu_Key_Shortcuts.setObjectName("actionMenu_Key_Shortcuts")
         self.actionImport_twitter_data = QtGui.QAction(parent=MainWindow)
         self.actionImport_twitter_data.setObjectName("actionImport_twitter_data")
+        self.actionCode_pdf = QtGui.QAction(parent=MainWindow)
+        self.actionCode_pdf.setObjectName("actionCode_pdf")
         self.menuOpen_Recent_Project.addAction(self.actionNone)
         self.menuExport.addAction(self.actionProject_Exchange_Export)
         self.menuExport.addAction(self.actionREFI_Codebook_export)
@@ -219,6 +221,7 @@ class Ui_MainWindow(object):
         self.menuCoding.addAction(self.actionCodes)
         self.menuCoding.addAction(self.actionCode_image)
         self.menuCoding.addAction(self.actionCode_audio_video)
+        self.menuCoding.addAction(self.actionCode_pdf)
         self.menuCoding.addAction(self.actionColour_scheme)
         self.menuReports.addAction(self.actionCoding_reports)
         self.menuReports.addAction(self.actionCoding_comparison)
@@ -321,6 +324,7 @@ class Ui_MainWindow(object):
         self.actionImport_survey_2.setText(_translate("MainWindow", "Import survey"))
         self.actionMenu_Key_Shortcuts.setText(_translate("MainWindow", "Menu Key Shortcuts"))
         self.actionImport_twitter_data.setText(_translate("MainWindow", "Import twitter data"))
+        self.actionCode_pdf.setText(_translate("MainWindow", "Code pdf"))
 
 
 if __name__ == "__main__":
