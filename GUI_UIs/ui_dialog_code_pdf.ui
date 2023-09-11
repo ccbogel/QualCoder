@@ -36,7 +36,7 @@
        <rect>
         <x>10</x>
         <y>0</y>
-        <width>211</width>
+        <width>191</width>
         <height>28</height>
        </rect>
       </property>
@@ -210,35 +210,7 @@
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QLabel" name="label_font_size">
-      <property name="geometry">
-       <rect>
-        <x>290</x>
-        <y>2</y>
-        <width>24</width>
-        <height>24</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Text font size.&lt;/p&gt;&lt;p&gt;A default size can be set in Settings.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-      <property name="autoFillBackground">
-       <bool>false</bool>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::Box</enum>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-      </property>
-      <property name="wordWrap">
-       <bool>true</bool>
-      </property>
-     </widget>
-     <widget class="QSpinBox" name="spinBox_font_size">
+     <widget class="QSpinBox" name="spinBox_font_adjuster">
       <property name="geometry">
        <rect>
         <x>320</x>
@@ -248,16 +220,16 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Text font size&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Adjust text font size in pdf.&lt;/p&gt;&lt;p&gt;Reduces text overlaps.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="minimum">
-       <number>6</number>
+       <number>-10</number>
       </property>
       <property name="maximum">
-       <number>32</number>
+       <number>0</number>
       </property>
       <property name="value">
-       <number>12</number>
+       <number>-2</number>
       </property>
      </widget>
      <widget class="QLabel" name="label_search_regex">
@@ -414,12 +386,15 @@
        <rect>
         <x>770</x>
         <y>6</y>
-        <width>141</width>
+        <width>111</width>
         <height>26</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Useful if font colours are harder to see&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
-       <string>Black/White Text</string>
+       <string>Black Text</string>
       </property>
      </widget>
      <widget class="QCheckBox" name="checkBox_text">
@@ -447,10 +422,69 @@
         <height>26</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rectangle objects&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
        <string>Rects</string>
       </property>
       <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_font_size">
+      <property name="geometry">
+       <rect>
+        <x>292</x>
+        <y>3</y>
+        <width>24</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Pdf font size adjustment&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="autoFillBackground">
+       <bool>false</bool>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::Box</enum>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_pages">
+      <property name="geometry">
+       <rect>
+        <x>200</x>
+        <y>3</y>
+        <width>24</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Pages&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="autoFillBackground">
+       <bool>false</bool>
+      </property>
+      <property name="frameShape">
+       <enum>QFrame::Box</enum>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+      <property name="wordWrap">
        <bool>true</bool>
       </property>
      </widget>
@@ -767,7 +801,7 @@
   </layout>
  </widget>
  <tabstops>
-  <tabstop>spinBox_font_size</tabstop>
+  <tabstop>spinBox_font_adjuster</tabstop>
   <tabstop>pushButton_help</tabstop>
   <tabstop>lineEdit_search</tabstop>
   <tabstop>checkBox_search_case</tabstop>
