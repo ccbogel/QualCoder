@@ -602,7 +602,7 @@ class App(object):
                                         "QTreeWidget {font-size: " + str(settings.get('treefontsize')))
 
         style = "* {font-size: 12px; color: #000000;}\n\
-        QWidget {background-color: #efefef; color: #000000; border: 1px #707070;}\n\
+        QWidget {background-color: #efefef; color: #000000; border: none;}\n\
         QWidget:focus {border: 1px solid #f89407;}\n\
         QDialog {border: 1px solid #808080;}\n\
         QFileDialog {font-size: 12px}\n\
@@ -619,6 +619,11 @@ class App(object):
         QMenu {border: 1px solid #808080;}\n\
         QMenu::item:selected {background-color: #fafafa;}\n\
         QMenu::item:disabled {color: #707070;}\n\
+        QSpinBox {border: 1px solid #808080;}\n\
+        QSplitter::handle {background-color: #808080;}\n\
+        QSplitter::handle:horizontal {width: 2px;}\n\
+        QSplitter::handle:vertical {height: 2px;}\n\
+        QSplitter::handle:pressed {background-color: red;}\n\
         QTableWidget {border: 1px solid #f89407; gridline-color: #707070;}\n\
         QTableWidget:focus {border: 3px solid #f89407;}\n\
         QTabBar {border: 2px solid #808080;}\n\

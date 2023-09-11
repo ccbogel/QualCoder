@@ -235,11 +235,11 @@ class DialogCodePdf(QtWidgets.QWidget):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(clipboard_copy_icon), "png")
         self.ui.label_search_all_files.setPixmap(QtGui.QPixmap(pm).scaled(22, 22))
+        self.ui.label_pages.setPixmap(QtGui.QPixmap(pm).scaled(22, 22))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(font_size_icon), "png")
-        #self.ui.label_font_size.setPixmap(QtGui.QPixmap(pm).scaled(22, 22))
-        self.ui.spinBox_font_size.setValue(self.app.settings['docfontsize'])
-        self.ui.spinBox_font_size.valueChanged.connect(self.change_text_font_size)
+        self.ui.label_font_size.setPixmap(QtGui.QPixmap(pm).scaled(22, 22))
+        self.ui.spinBox_font_adjuster.valueChanged.connect(self.pdf_text_font_size_adjuster)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(playback_back_icon), "png")
         self.ui.pushButton_previous.setIcon(QtGui.QIcon(pm))
@@ -308,13 +308,10 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.get_files()
         self.fill_tree()
 
-    def change_text_font_size(self):
-        """ Spinbox font size changed, range: 6 - 32 points. """
+    def pdf_text_font_size_adjuster(self):
+        """ Spinbox font size adjustment from 0 to -10pt. """
 
-        font = 'font: ' + str(self.ui.spinBox_font_size.value()) + 'pt '
-        font += '"' + self.app.settings['font'] + '";'
-        self.ui.textEdit.setStyleSheet(font)
-        #TODO more pdf items
+        self.update_page()
 
     def spin_page_changed(self):
         pass
@@ -2821,6 +2818,32 @@ class DialogCodePdf(QtWidgets.QWidget):
                 self.search_term = ""
                 break
 
+    def file_memo(self, file_):
+        """ Open file memo to view or edit.
+        Called by pushButton_document_memo for loaded text, via active_file_memo
+        and through file_menu for any file.
+        param: file_ : Dictionary of file values
+        """
+
+        if file_ is None:
+            return
+        ui = DialogMemo(self.app, _("Memo for file: ") + file_['name'], file_['memo'])
+        ui.exec()
+        memo = ui.memo
+        if memo == file_['memo']:
+            return
+        file_['memo'] = memo
+        cur = self.app.conn.cursor()
+        cur.execute("update source set memo=? where id=?", (memo, file_['id']))
+        self.app.conn.commit()
+        items = self.ui.listWidget.findItems(file_['name'], Qt.MatchFlag.MatchExactly)
+        if len(items) == 1:
+            tt = items[0].toolTip()
+            memo_pos = (tt.find(_("Memo:")))
+            new_tt = tt[:memo_pos] + _("Memo: ") + file_['memo']
+            items[0].setToolTip(new_tt)
+        self.app.delete_backup = False
+
     def file_selection_changed(self):
         """ File selection changed. """
 
@@ -2867,6 +2890,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.spinBox.setMinimum(1)
         self.ui.spinBox.setMaximum(len(self.pages))
         print("len pages:", len(self.pages))
+        self.ui.spinBox.setToolTip(_("Pages: ") + str(len(self.pages)))
         self.ui.spinBox.setEnabled(True)
         self.show_page(self.page_num)
 
@@ -3173,10 +3197,11 @@ class DialogCodePdf(QtWidgets.QWidget):
                 # print(i['fontname'], type(t['fontname']), t['fontsize'], type(t['fontsize']))
                 '''font = QtGui.QFont(t['fontname'], t['fontsize'])
                 print(t['fontname'])'''
-                font_size = t['fontsize'] - 2  # minus 2 helps stop overlaps as using ITC Officina Sans Book Regular
+                #font_size = QtGui.QFont(self.app.settings['font'], font_size)
+                adjustment = self.ui.spinBox_font_adjuster.value()
+                font_size = t['fontsize'] + adjustment  # e.g. minus 2 helps stop text overlaps
                 if font_size < 4:
                     font_size = 4
-                #font = QtGui.QFont(self.app.settings['font'], font_size)
                 font = QtGui.QFont("Noto Sans", font_size)
                 item.setFont(font)
                 ttip = f"x:{int(t['left'])}, y:{int(t['top'])} {t['text']}"
