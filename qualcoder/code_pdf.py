@@ -201,13 +201,14 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.pushButton_next_file.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_next_file.pressed.connect(self.go_to_next_file)
         pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(bookmark_icon_24), "png")
+        pm.loadFromData(QtCore.QByteArray.fromBase64(eye_doc_icon), "png")
         self.ui.pushButton_bookmark_go.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_bookmark_go.pressed.connect(self.go_to_bookmark)
+        self.ui.pushButton_bookmark_go.pressed.connect(self.view_original_file)
+        self.ui.pushButton_bookmark_go.setToolTip(_("View original file"))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(notepad_2_icon_24), "png")
         self.ui.pushButton_document_memo.setIcon(QtGui.QIcon(pm))
-        #self.ui.pushButton_document_memo.pressed.connect(self.active_file_memo)
+        self.ui.pushButton_document_memo.pressed.connect(self.file_memo)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(round_arrow_right_icon_24), "png")
         self.ui.pushButton_show_codings_next.setIcon(QtGui.QIcon(pm))
@@ -2528,52 +2529,56 @@ class DialogCodePdf(QtWidgets.QWidget):
 
         selected = self.ui.listWidget.currentItem()
         file_ = None
-        for f in self.filenames:
-            if selected.text() == f['name']:
-                file_ = f
+        if selected is not None:
+            for f in self.filenames:
+                if selected.text() == f['name']:
+                    file_ = f
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         action_next = None
         action_latest = None
-        action_next_chars = None
-        action_prev_chars = None
+        '''action_next_chars = None
+        action_prev_chars = None'''
         action_show_files_like = None
         action_show_case_files = None
         action_show_by_attribute = None
-        action_memo = menu.addAction(_("Open memo"))
-        action_view_original_text = None
-        if file_ is not None and file_['mediapath'] is not None and len(file_['mediapath']) > 6 and \
+        action_memo = None
+        if file_ is not None and self.file_ is not None:
+            action_memo = menu.addAction(_("Open memo"))
+        action_view_original_file = None
+        if file_ is not None and self.file_ is not None and file_['mediapath'] is not None and \
+                len(file_['mediapath']) > 6 and \
                 (file_['mediapath'][:6] == '/docs/' or file_['mediapath'][:5] == 'docs:'):
-            action_view_original_text = menu.addAction(_("view original text file"))
+            action_view_original_file = menu.addAction(_("View original text file"))
         if len(self.filenames) > 1:
             action_next = menu.addAction(_("Next file"))
             action_latest = menu.addAction(_("File with latest coding"))
             action_show_files_like = menu.addAction(_("Show files like"))
             action_show_by_attribute = menu.addAction(_("Show files by attributes"))
             action_show_case_files = menu.addAction(_("Show case files"))
-        if file_['characters'] > self.app.settings['codetext_chunksize']:
+        '''if file_ is not None and file_['characters'] > self.app.settings['codetext_chunksize']:
             action_next_chars = menu.addAction(str(self.app.settings['codetext_chunksize']) + _(" next  characters"))
             if file_['start'] > 0:
                 action_prev_chars = menu.addAction(
-                    str(self.app.settings['codetext_chunksize']) + _(" previous  characters"))
-        action_go_to_bookmark = menu.addAction(_("Go to bookmark"))
+                    str(self.app.settings['codetext_chunksize']) + _(" previous  characters"))'''
+        #action_go_to_bookmark = menu.addAction(_("Go to bookmark"))
         action = menu.exec(self.ui.listWidget.mapToGlobal(position))
         if action is None:
             return
         if action == action_memo:
             self.file_memo(file_)
-        if action == action_view_original_text:
-            self.view_original_text_file()
+        if action == action_view_original_file:
+            self.view_original_file()
         if action == action_next:
             self.go_to_next_file()
         if action == action_latest:
             self.go_to_latest_coded_file()
-        if action == action_go_to_bookmark:
+        '''if action == action_go_to_bookmark:
             self.go_to_bookmark()
         if action == action_next_chars:
             self.next_chars(file_, selected)
         if action == action_prev_chars:
-            self.prev_chars(file_, selected)
+            self.prev_chars(file_, selected)'''
         if action == action_show_files_like:
             self.show_files_like()
         if action == action_show_case_files:
@@ -2581,11 +2586,13 @@ class DialogCodePdf(QtWidgets.QWidget):
         if action == action_show_by_attribute:
             self.get_files_from_attributes()
 
-    def view_original_text_file(self):
-        """ View original text file.
+    def view_original_file(self):
+        """ View original pdf file. Opens in browser or other OS default software.
          param:
          mediapath: String '/docs/' for internal 'docs:/' for external """
 
+        if self.file_ is None:
+            return
         if self.file_['mediapath'][:6] == "/docs/":
             doc_path = self.app.project_path + "/documents/" + self.file_['mediapath'][6:]
             webbrowser.open(doc_path)
@@ -2752,10 +2759,12 @@ class DialogCodePdf(QtWidgets.QWidget):
                 self.search_term = ""
                 return
 
-    '''def go_to_latest_coded_file(self):
-        """ Go and open file with the latest coding. Button. """
+    def go_to_latest_coded_file(self):
+        """ Go and open file with the latest coding.
+        Files menu option. """
 
-        sql = "SELECT fid FROM code_text where owner=? order by date desc limit 1"
+        sql = "SELECT code_text.fid FROM code_text join source on source.id=code_text.fid \
+            where code_text.owner=? and lower(source.mediapath)='%pdf' order by code_text.date desc limit 1"
         cur = self.app.conn.cursor()
         cur.execute(sql, [self.app.settings['codername'], ])
         result = cur.fetchone()
@@ -2766,9 +2775,9 @@ class DialogCodePdf(QtWidgets.QWidget):
                 self.ui.listWidget.setCurrentRow(i)
                 self.load_file(f)
                 self.search_term = ""
-                break'''
+                break
 
-    def go_to_bookmark(self):
+    '''def go_to_bookmark(self):
         """ Find bookmark, open the file and highlight the bookmarked character.
         Adjust for start of text file, as this may be a smaller portion of the full text file.
 
@@ -2801,7 +2810,7 @@ class DialogCodePdf(QtWidgets.QWidget):
                     self.ui.textEdit.setTextCursor(text_cursor)
                 except Exception as e:
                     logger.debug(str(e))
-                break
+                break'''
 
     def listwidgetitem_view_file(self):
         """ When listwidget item is pressed load the file.
@@ -2818,13 +2827,15 @@ class DialogCodePdf(QtWidgets.QWidget):
                 self.search_term = ""
                 break
 
-    def file_memo(self, file_):
+    def file_memo(self, file_=None):
         """ Open file memo to view or edit.
         Called by pushButton_document_memo for loaded text, via active_file_memo
         and through file_menu for any file.
         param: file_ : Dictionary of file values
         """
 
+        if file_ is None:
+            file_ = self.file_
         if file_ is None:
             return
         ui = DialogMemo(self.app, _("Memo for file: ") + file_['name'], file_['memo'])

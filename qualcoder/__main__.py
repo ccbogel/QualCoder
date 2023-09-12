@@ -583,6 +583,10 @@ class App(object):
         QRadioButton::indicator {border: 1px solid #858585; background-color: #2a2a2a;}\n\
         QRadioButton::indicator::checked {border: 2px solid #858585; background-color: orange;}\n\
         QSlider::handle:horizontal {background-color: #f89407;}\n\
+        QSplitter::handle {background-color: #909090;}\n\
+        QSplitter::handle:horizontal {width: 2px;}\n\
+        QSplitter::handle:vertical {height: 2px;}\n\
+        QSplitter::handle:pressed {background-color: red;}\n\
         QTabBar {border: 2px solid #858585;}\n\
         QTabBar::tab {border: 1px solid #858585; padding-left: 6px; padding-right: 6px;}\n\
         QTabBar::tab:selected {border: 2px solid #858585; background-color: #707070; margin-left: 3px;}\n\
