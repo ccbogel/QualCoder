@@ -2322,9 +2322,12 @@ class DialogCodeText(QtWidgets.QWidget):
             self.update_dialog_codes_and_categories()
 
     def merge_codes(self, item, parent):
-        """ Merge code or category with another code or category.
+        """ Merge code with another code.
         Called by item_moved_update_data when a code is moved onto another code. """
 
+        # Check item dropped on itself, an error can occur on Ubuntu 22.04.
+        if item['name'] == parent.text(0):
+            return
         msg = '<p style="font-size:' + str(self.app.settings['fontsize']) + 'px">'
         msg += _("Merge code: ") + item['name'] + _(" into code: ") + parent.text(0) + '</p>'
         reply = QtWidgets.QMessageBox.question(self, _('Merge codes'),
