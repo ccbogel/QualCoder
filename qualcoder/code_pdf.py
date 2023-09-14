@@ -30,6 +30,7 @@ import datetime
 import logging
 from operator import itemgetter
 import os
+from PIL import Image
 from pdfminer.converter import PDFPageAggregator
 from pdfminer.layout import LAParams, LTTextBox, LTTextLine, LTTextBoxHorizontal, LTImage, LTFigure, LTCurve, LTLine, \
     LTRect
@@ -2186,7 +2187,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         # Check item dropped on itself. Error can occur on Ubuntu 22.04.
         if item['name'] == parent.text(0):
             return
-        
+
         msg = '<p style="font-size:' + str(self.app.settings['fontsize']) + 'px">'
         msg += _("Merge code: ") + item['name'] + _(" into code: ") + parent.text(0) + '</p>'
         reply = QtWidgets.QMessageBox.question(self, _('Merge codes'),
@@ -2956,16 +2957,16 @@ class DialogCodePdf(QtWidgets.QWidget):
         if isinstance(lobj, LTLine):
             #print("LTLINE", lobj.__dir__())
             # left, btm, right, top = lobj.x0, lobj.y0, lobj.x1, lobj.y1
-            line_dict = {'x0': lobj.x0, 'y0': page.mediabox[3] - lobj.y0, 'y1': page.mediabox[3] - lobj.y1,
-                         'x1': lobj.x1, 'linewidth': lobj.linewidth, 'stroke': lobj.stroke, 'fill': lobj.fill,
+            line_dict = {'x0': round(lobj.x0,3), 'y0': round(page.mediabox[3] - lobj.y0,3), 'y1': round(page.mediabox[3] - lobj.y1,3),
+                         'x1': round(lobj.x1,3), 'linewidth': lobj.linewidth, 'stroke': lobj.stroke, 'fill': lobj.fill,
                          'stroking_color': lobj.stroking_color, 'non_stroking_color': lobj.non_stroking_color,
                          'pts': lobj.pts, 'depth': depth}
             self.page_dict['lines'].append(line_dict)
 
         if isinstance(lobj, LTRect):
             #print("LTRECT", lobj, type(lobj))
-            rect_dict = {"x": lobj.bbox[0], "y": page.mediabox[3] - lobj.bbox[1] - lobj.height,
-                         "w": lobj.width, "h": lobj.height,
+            rect_dict = {"x": round(lobj.bbox[0],3), "y": round(page.mediabox[3] - lobj.bbox[1] - lobj.height,3),
+                         "w": round(lobj.width,3), "h": round(lobj.height,3),
                          "linewidth": lobj.linewidth, "stroke": lobj.stroke, "fill": lobj.fill,
                          "stroking_color": lobj.stroking_color,
                          "non_stroking_color": lobj.non_stroking_color, 'is_empty': lobj.is_empty(),
@@ -2976,8 +2977,9 @@ class DialogCodePdf(QtWidgets.QWidget):
             """ LTCurve can be a LTRect, LTImage or LTLine. The LTRect can contain a LTImage. """
             # print(lobj.__dir__())
             # left, btm, right, top = lobj.x0, lobj.y0, lobj.x1, lobj.y1
-            curve_dict = {'x0': lobj.x0, 'y0': page.mediabox[3] - lobj.y0, 'y1': page.mediabox[3] - lobj.y1,
-                          'x1': lobj.x1, 'linewidth': lobj.linewidth, 'stroke': lobj.stroke, 'fill': lobj.fill,
+            curve_dict = {'x0': round(lobj.x0,3), 'y0': round(page.mediabox[3] - lobj.y0,3),
+                          'y1': round(page.mediabox[3] - lobj.y1,3),
+                          'x1': round(lobj.x1,3), 'linewidth': lobj.linewidth, 'stroke': lobj.stroke, 'fill': lobj.fill,
                           'stroking_color': lobj.stroking_color, 'non_stroking_color': lobj.non_stroking_color,
                           'is_empty': lobj.is_empty(),  # 'analyze': lobj.analyze(laparams),
                           'evenodd': lobj.evenodd,
@@ -2990,9 +2992,9 @@ class DialogCodePdf(QtWidgets.QWidget):
             #  left, bottom, right, and top
             #print("LTTEXTLINE", obj.__dir__())
             left, btm, right, top, text = lobj.x0, lobj.y0, lobj.x1, lobj.y1, lobj.get_text()
-            textline_dict = {'left': left, 'btm': page.mediabox[3] - btm,
-                             'top': page.mediabox[3] - top,
-                             'right': right, 'text': text, 'depth': depth}
+            textline_dict = {'left': round(left,3), 'btm': round(page.mediabox[3] - btm,3),
+                             'top': round(page.mediabox[3] - top,3),
+                             'right': round(right,3), 'text': text, 'depth': depth}
             char_font_sizes = []
             fontnames = []
             colors = []
@@ -3016,8 +3018,9 @@ class DialogCodePdf(QtWidgets.QWidget):
                 #print("TEXTLINE", textline.__dir__())
                 # LTTextLineHorizontal
                 left, btm, right, top, text = textline.x0, textline.y0, textline.x1, textline.y1, textline.get_text()
-                textline_dict = {'left': left, 'btm': page.mediabox[3] - btm, 'top': page.mediabox[3] - top,
-                                 'right': right, 'text': text, 'depth': depth}
+                textline_dict = {'left': round(left,3), 'btm': round(page.mediabox[3] - btm,3),
+                                 'top': round(page.mediabox[3] - top,3),
+                                 'right': round(right,3), 'text': text, 'depth': depth}
                 char_font_sizes = []
                 fontnames = []
                 colors = []
@@ -3039,8 +3042,9 @@ class DialogCodePdf(QtWidgets.QWidget):
             #print("IMG", lobj.__dir__())
             #print("BBOX - x,y,w,h", lobj.bbox)
 
-            img_dict = {"name": lobj.name, "x": lobj.bbox[0], "y": page.mediabox[3] - lobj.bbox[1] - lobj.height,
-                        "w": lobj.width, "h": lobj.height,
+            img_dict = {"name": lobj.name, "x": round(lobj.bbox[0],3),
+                        "y": round(page.mediabox[3] - lobj.bbox[1] - lobj.height,3),
+                        "w": round(lobj.width,3), "h": round(lobj.height,3),
                         'imagemask': lobj.imagemask, 'colorspace': lobj.colorspace,
                         'depth': depth}
             #'voverlap':lobj.voverlap(), 'vdistance':lobj.vdistance(),
@@ -3054,7 +3058,7 @@ class DialogCodePdf(QtWidgets.QWidget):
                     else:
                         cspace.append(v)
                 img_dict['colorspace'] = cspace
-
+            img_dict['stream'] = lobj.stream
             if lobj.stream:
                 img_dict['pixmap'] = None
                 file_stream = lobj.stream.get_rawdata()
@@ -3066,14 +3070,27 @@ class DialogCodePdf(QtWidgets.QWidget):
                 img_dict['pixmap'] = qpscaled
             if not img_dict['pixmap'].isNull():
                 self.page_dict['images'].append(img_dict)
+            else:
+                print(lobj.__dir__())
+                print(lobj.stream)
+
+                #image = Image.frombytes('1', lobj.srcsize, lobj.stream.get_data(), 'raw')
+                '''qim = QtGui.QImage(data, im.width, im.height, QtGui.QImage.Format_ARGB32)
+                pixmap = QtGui.QPixmap.fromImage(qim)'''
+
+                pm = QtGui.QPixmap()
+                pm.loadFromData(QtCore.QByteArray.fromBase64(question_icon), "png")
+                pm = pm.scaled(int(img_dict['w']), int(img_dict['h']))
+                img_dict['pixmap'] = pm
+                self.page_dict['images'].append(img_dict)
             # saved_file = save_image(lobj, page_number, images_folder)
 
-        if isinstance(lobj, LTFigure):
+        '''if isinstance(lobj, LTFigure):
             """ LTFigure objects are containers for other LT* objects, so recurse through the children.
              LTRect, LTChar, LTCurve, LTLine """
 
             for obj in lobj:
-                self.get_item_and_hierarchy(page, obj, depth=depth + 1)
+                self.get_item_and_hierarchy(page, obj, depth=depth + 1)'''
 
         if isinstance(lobj, Iterable):
             for obj in lobj:
@@ -3145,10 +3162,9 @@ class DialogCodePdf(QtWidgets.QWidget):
         if self.ui.checkBox_rect.isChecked():
             for r in page['rect']:
                 counter += 1
-                #if self.ui.radioButton_objects.isChecked():
-                #    text_edit_text += "RECT: " + str(r) + "\n"
+                if self.ui.radioButton_objects.isChecked():
+                    text_edit_text += "RECT: " + str(r) + "\n"
                 item = self.scene.addRect(r['x'], r['y'], r['w'], r['h'])
-                #print("PAGE", self.page_num + 1, "RECT", r)
                 if r['fill']:
                     color = self.get_qcolor(r['non_stroking_color'])
                     item.setPen(QtGui.QPen(QtGui.QBrush(QtCore.Qt.BrushStyle.NoBrush), 0))  # Border
@@ -3162,8 +3178,8 @@ class DialogCodePdf(QtWidgets.QWidget):
             # addPath QPainterPath - maybe?
             for c in page['curves']:
                 counter += 1
-                #if self.ui.radioButton_objects.isChecked():
-                #    text_edit_text += "CURVE: " + str(c) + "\n"
+                if self.ui.radioButton_objects.isChecked():
+                    text_edit_text += "CURVE: " + str(c) + "\n"
                 if c['stroke'] and not c['fill']:
                     item = QtGui.QPolygonF(c['pts'])
                     color = self.get_qcolor(c['stroking_color'])
@@ -3181,9 +3197,13 @@ class DialogCodePdf(QtWidgets.QWidget):
         if self.ui.checkBox_image.isChecked():
             for img in page['images']:
                 counter += 1
-                '''if self.ui.radioButton_objects.isChecked():
-                    text_edit_text += "IMAGE: " + str(img) + "\n"
-                    self.put_image_into_textedit(img, counter)'''
+                if self.ui.radioButton_objects.isChecked():
+                    #text_edit_text += "IMAGE: " + str(img) + "\n"
+                    text_edit_text += "IMAGE:\n"
+                    for k in img:
+                        text_edit_text += k + ": " + str(img[k]) + "\n"
+                    text_edit_text += "\n"
+                    #self.put_image_into_textedit(img, counter)
                 # Add pixmap to textEdit
                 item = self.scene.addPixmap(img['pixmap'])
                 item.setPos(img['x'], img['y'])
