@@ -237,7 +237,12 @@ class DialogCodePdf(QtWidgets.QWidget):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(clipboard_copy_icon), "png")
         self.ui.label_search_all_files.setPixmap(QtGui.QPixmap(pm).scaled(22, 22))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(project_icon), "png")
         self.ui.label_pages.setPixmap(QtGui.QPixmap(pm).scaled(22, 22))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_icon), "png")
+        self.ui.label_exports.setPixmap(QtGui.QPixmap(pm).scaled(22, 22))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(font_size_icon), "png")
         self.ui.label_font_size.setPixmap(QtGui.QPixmap(pm).scaled(22, 22))
@@ -3029,7 +3034,8 @@ class DialogCodePdf(QtWidgets.QWidget):
                     char_font_sizes.append(fontsize)
                     fontnames.append(fontname)  # TODO get most common
                     colors.append(color)
-                '''fontname = fontnames[0]  # Not using this information
+                '''# Not using font name information as cannot extract font from pdf
+                fontname = fontnames[0]  
                 if fontname.find("+") > 0:
                     # print(fontname)
                     fontname = fontname.split("+")[1]
@@ -3041,7 +3047,6 @@ class DialogCodePdf(QtWidgets.QWidget):
         if isinstance(lobj, LTImage):
             #print("IMG", lobj.__dir__())
             #print("BBOX - x,y,w,h", lobj.bbox)
-
             img_dict = {"name": lobj.name, "x": round(lobj.bbox[0],3),
                         "y": round(page.mediabox[3] - lobj.bbox[1] - lobj.height,3),
                         "w": round(lobj.width,3), "h": round(lobj.height,3),
@@ -3059,8 +3064,8 @@ class DialogCodePdf(QtWidgets.QWidget):
                         cspace.append(v)
                 img_dict['colorspace'] = cspace
             img_dict['stream'] = lobj.stream
+            img_dict['pixmap'] = None
             if lobj.stream:
-                img_dict['pixmap'] = None
                 file_stream = lobj.stream.get_rawdata()
                 file_ext = self.get_image_type(file_stream[0:4])
                 img_dict['filetype'] = file_ext
@@ -3068,27 +3073,26 @@ class DialogCodePdf(QtWidgets.QWidget):
                 qp.loadFromData(file_stream)
                 qpscaled = qp.scaled(int(img_dict['w']), int(img_dict['h']))
                 img_dict['pixmap'] = qpscaled
-            if not img_dict['pixmap'].isNull():
-                self.page_dict['images'].append(img_dict)
-            else:
+                if qp.isNull():
+                    img_dict['pixmap'] = None
+                '''else:
+                    file_name = QtWidgets.QFileDialog.getSaveFileName(self, 'Save File', '', '*.jpg')
+                    qp.save(file_name[0])  # tuple of path and type'''
+            self.page_dict['images'].append(img_dict)
+
+            '''else:
                 print(lobj.__dir__())
                 print(lobj.stream)
-
-                #image = Image.frombytes('1', lobj.srcsize, lobj.stream.get_data(), 'raw')
-                '''qim = QtGui.QImage(data, im.width, im.height, QtGui.QImage.Format_ARGB32)
-                pixmap = QtGui.QPixmap.fromImage(qim)'''
-
                 pm = QtGui.QPixmap()
                 pm.loadFromData(QtCore.QByteArray.fromBase64(question_icon), "png")
                 pm = pm.scaled(int(img_dict['w']), int(img_dict['h']))
                 img_dict['pixmap'] = pm
                 self.page_dict['images'].append(img_dict)
-            # saved_file = save_image(lobj, page_number, images_folder)
+            # saved_file = save_image(lobj, page_number, images_folder)'''
 
         '''if isinstance(lobj, LTFigure):
             """ LTFigure objects are containers for other LT* objects, so recurse through the children.
              LTRect, LTChar, LTCurve, LTLine """
-
             for obj in lobj:
                 self.get_item_and_hierarchy(page, obj, depth=depth + 1)'''
 
@@ -3205,8 +3209,15 @@ class DialogCodePdf(QtWidgets.QWidget):
                     text_edit_text += "\n"
                     #self.put_image_into_textedit(img, counter)
                 # Add pixmap to textEdit
-                item = self.scene.addPixmap(img['pixmap'])
-                item.setPos(img['x'], img['y'])
+                if img['pixmap']:
+                    qpixmap_item = self.scene.addPixmap(img['pixmap'])
+                    qpixmap_item.setPos(img['x'], img['y'])
+                else:
+                    pixmap = QtGui.QPixmap()
+                    pixmap.loadFromData(QtCore.QByteArray.fromBase64(question_icon), "png")
+                    pixmap = pixmap.scaled(int(img['w']), int(img['h']))
+                    qpixmap_item = self.scene.addPixmap(pixmap)
+                    qpixmap_item.setPos(img['x'], img['y'])
 
         if self.ui.checkBox_line.isChecked():
             for line in page['lines']:
