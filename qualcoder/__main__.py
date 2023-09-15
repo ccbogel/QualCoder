@@ -586,6 +586,9 @@ class App(object):
         QSplitter::handle {background-color: #909090;}\n\
         QSplitter::handle:horizontal {width: 2px;}\n\
         QSplitter::handle:vertical {height: 2px;}\n\
+        QSplitterHandle:hover {}\n\
+        QSplitter::handle:horizontal:hover {background-color: red;}\n\
+        QSplitter::handle:vertical:hover {background-color: red;}\n\
         QSplitter::handle:pressed {background-color: red;}\n\
         QTabBar {border: 2px solid #858585;}\n\
         QTabBar::tab {border: 1px solid #858585; padding-left: 6px; padding-right: 6px;}\n\
@@ -627,6 +630,9 @@ class App(object):
         QSplitter::handle {background-color: #808080;}\n\
         QSplitter::handle:horizontal {width: 2px;}\n\
         QSplitter::handle:vertical {height: 2px;}\n\
+        QSplitterHandle:hover {}\n\
+        QSplitter::handle:horizontal:hover {background-color: red;}\n\
+        QSplitter::handle:vertical:hover {background-color: red;}\n\
         QSplitter::handle:pressed {background-color: red;}\n\
         QTableWidget {border: 1px solid #f89407; gridline-color: #707070;}\n\
         QTableWidget:focus {border: 3px solid #f89407;}\n\
