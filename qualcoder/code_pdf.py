@@ -30,7 +30,6 @@ import datetime
 import logging
 from operator import itemgetter
 import os
-from PIL import Image
 from pdfminer.converter import PDFPageAggregator
 from pdfminer.layout import LAParams, LTTextBox, LTTextLine, LTTextBoxHorizontal, LTImage, LTFigure, LTCurve, LTLine, \
     LTRect
@@ -240,6 +239,8 @@ class DialogCodePdf(QtWidgets.QWidget):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(project_icon), "png")
         self.ui.label_pages.setPixmap(QtGui.QPixmap(pm).scaled(22, 22))
+        self.ui.comboBox_export.setEnabled(False)
+        self.ui.comboBox_export.setToolTip("Deactivated while testing other functions for code pdf")
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_icon), "png")
         self.ui.label_exports.setPixmap(QtGui.QPixmap(pm).scaled(22, 22))
@@ -306,8 +307,11 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.checkBox_text.stateChanged.connect(self.update_page)
         self.ui.checkBox_line.stateChanged.connect(self.update_page)
         self.ui.checkBox_black_text.stateChanged.connect(self.update_page)
-        self.ui.radioButton_objects.clicked.connect(self.update_page)
-        self.ui.radioButton_text.clicked.connect(self.update_page)
+        # TODO REimplemnt as tabbed text edits
+        #self.ui.radioButton_objects.clicked.connect(self.update_page)
+        #self.ui.radioButton_text.clicked.connect(self.update_page)
+        self.ui.textEdit.setEnabled(False)  # TODO temp safety
+
         self.ui.spinBox.setEnabled(False)
         self.ui.spinBox.setMinimum(1)
         self.ui.spinBox.valueChanged.connect(self.spin_page_changed)
@@ -915,7 +919,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         """ Context menu for textEdit.
         Mark, unmark, annotate, copy, memo coded, coded importance. """
 
-        # TODO ?
+        #TODO remove return when tabbed
         return
         cursor = self.ui.textEdit.cursorForPosition(position)
         selected_text = self.ui.textEdit.textCursor().selectedText()
@@ -979,7 +983,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             action_new_invivo_code = menu.addAction(_("in vivo code (V)"))
         if selected_text == "" and self.is_annotated(cursor.position()):
             action_edit_annotate = menu.addAction(_("Edit annotation"))
-        action_set_bookmark = menu.addAction(_("Set bookmark (B)"))
+        #action_set_bookmark = menu.addAction(_("Set bookmark (B)"))
         action_hide_top_groupbox = None
         action_show_top_groupbox = None
         if self.ui.groupBox.isHidden():
@@ -1021,13 +1025,13 @@ class DialogCodePdf(QtWidgets.QWidget):
             return
         if action == action_end_pos:
             self.change_code_pos(cursor.position(), "end")
-            return'''
+            return
         if action == action_set_bookmark:
             cur = self.app.conn.cursor()
             bookmark_pos = cursor.position() + self.file_['start']
             cur.execute("update project set bookmarkfile=?, bookmarkpos=?", [self.file_['id'], bookmark_pos])
             self.app.conn.commit()
-            return
+            return'''
         if action == action_change_code:
             self.change_code_to_another_code(cursor.position())
             return
@@ -1599,9 +1603,9 @@ class DialogCodePdf(QtWidgets.QWidget):
             if key == QtCore.Qt.Key.Key_2:
                 self.go_to_latest_coded_file()
                 return
-            if key == QtCore.Qt.Key.Key_3:
+            '''if key == QtCore.Qt.Key.Key_3:
                 self.go_to_bookmark()
-                return
+                return'''
             if key == QtCore.Qt.Key.Key_4:
                 self.file_memo(self.file_)
                 return
@@ -2263,8 +2267,8 @@ class DialogCodePdf(QtWidgets.QWidget):
 
         self.get_codes_and_categories()
         self.fill_tree()
-        self.unlight()
-        self.highlight()
+        '''self.unlight()
+        self.highlight()'''
         self.get_coded_text_update_eventfilter_tooltips()
 
         contents = self.tab_reports.layout()
@@ -2942,11 +2946,14 @@ class DialogCodePdf(QtWidgets.QWidget):
             self.page_dict = {'pagenum': i}
             print(f'Processing page: {i + 1}')
             self.page_dict['mediabox'] = page.mediabox
-            self.page_dict['text'] = []
+            self.page_dict['text_boxes'] = []
             self.page_dict['lines'] = []
             self.page_dict['curves'] = []
             self.page_dict['images'] = []
             self.page_dict['rect'] = []
+            self.page_dict['plain_text'] = []
+            self.page_dict['plain_text_start'] = 0
+            self.page_dict['plain_text_end'] = 0
             interpreter.process_page(page)
             layout = device.get_result()
             for lobj in layout:
@@ -3014,7 +3021,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             textline_dict['fontname'] = fontname
             textline_dict['fontsize'] = int(median(char_font_sizes))
             textline_dict['color'] = colors[0]
-            self.page_dict['text'].append(textline_dict)
+            self.page_dict['text_boxes'].append(textline_dict)
 
         if isinstance(lobj, LTTextBox):
             # y-coordinates are the distance from the bottom of the page
@@ -3042,7 +3049,7 @@ class DialogCodePdf(QtWidgets.QWidget):
                 textline_dict['fontname'] = fontname'''
                 textline_dict['fontsize'] = int(median(char_font_sizes))
                 textline_dict['color'] = colors[0]
-                self.page_dict['text'].append(textline_dict)
+                self.page_dict['text_boxes'].append(textline_dict)
 
         if isinstance(lobj, LTImage):
             #print("IMG", lobj.__dir__())
@@ -3080,18 +3087,9 @@ class DialogCodePdf(QtWidgets.QWidget):
                     qp.save(file_name[0])  # tuple of path and type'''
             self.page_dict['images'].append(img_dict)
 
-            '''else:
-                print(lobj.__dir__())
-                print(lobj.stream)
-                pm = QtGui.QPixmap()
-                pm.loadFromData(QtCore.QByteArray.fromBase64(question_icon), "png")
-                pm = pm.scaled(int(img_dict['w']), int(img_dict['h']))
-                img_dict['pixmap'] = pm
-                self.page_dict['images'].append(img_dict)
-            # saved_file = save_image(lobj, page_number, images_folder)'''
-
         '''if isinstance(lobj, LTFigure):
-            """ LTFigure objects are containers for other LT* objects, so recurse through the children.
+            """ Not needed.
+            LTFigure objects are containers for other LT* objects, so recurse through the children.
              LTRect, LTChar, LTCurve, LTLine """
             for obj in lobj:
                 self.get_item_and_hierarchy(page, obj, depth=depth + 1)'''
@@ -3124,6 +3122,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         device = PDFPageAggregator(rsrcmgr, laparams=laparams)
         interpreter = PDFPageInterpreter(rsrcmgr, device)
         self.full_text = ""
+        page_end_index = 0
         for i, page in enumerate(PDFPage.create_pages(doc)):
             page_text = ""
             interpreter.process_page(page)
@@ -3138,6 +3137,9 @@ class DialogCodePdf(QtWidgets.QWidget):
             page_text = page_text.replace(u"\uE002", "Th")
             page_text = page_text.replace(u"\uFB01", "fi")
             self.pages[i]['plain_text'] = page_text
+            page_end_index += len(page_text)
+            self.pages[i]['plain_text_end'] = page_end_index
+            self.pages[i]['plain_text_start'] = page_end_index - len(page_text)
             self.full_text += page_text
         '''print("++++++FULL TEXT++++++++")
         print(self.full_text)'''
@@ -3149,7 +3151,6 @@ class DialogCodePdf(QtWidgets.QWidget):
         page_rect = page['mediabox']
         self.ui.textEdit.setText("")
         text_edit_text = ""
-        #if self.ui.radioButton_objects.isChecked():
         #    text_edit_text = "PAGE RECT: " + str(page_rect) + "\n"
         self.scene = QtWidgets.QGraphicsScene()
         self.ui.graphicsView.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)  #RenderHint.SmoothPixmapTransform)  # Antialiasing
@@ -3166,6 +3167,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         if self.ui.checkBox_rect.isChecked():
             for r in page['rect']:
                 counter += 1
+                #TODO reminpmenet at tabbed
                 if self.ui.radioButton_objects.isChecked():
                     text_edit_text += "RECT: " + str(r) + "\n"
                 item = self.scene.addRect(r['x'], r['y'], r['w'], r['h'])
@@ -3182,6 +3184,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             # addPath QPainterPath - maybe?
             for c in page['curves']:
                 counter += 1
+                #TODO reminpmenet at tabbed
                 if self.ui.radioButton_objects.isChecked():
                     text_edit_text += "CURVE: " + str(c) + "\n"
                 if c['stroke'] and not c['fill']:
@@ -3201,6 +3204,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         if self.ui.checkBox_image.isChecked():
             for img in page['images']:
                 counter += 1
+                #TODO reminpmenet at tabbed
                 if self.ui.radioButton_objects.isChecked():
                     #text_edit_text += "IMAGE: " + str(img) + "\n"
                     text_edit_text += "IMAGE:\n"
@@ -3222,6 +3226,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         if self.ui.checkBox_line.isChecked():
             for line in page['lines']:
                 counter += 1
+                #TODO reminpmenet at tabbed
                 if self.ui.radioButton_objects.isChecked():
                     text_edit_text += "LINE: " + str(line) + "\n"
                 color = QtCore.Qt.GlobalColor.black
@@ -3234,8 +3239,9 @@ class DialogCodePdf(QtWidgets.QWidget):
 
         if self.ui.checkBox_text.isChecked():
             self.text_items = []
-            for t in page['text']:
+            for t in page['text_boxes']:
                 counter += 1
+                #TODO reminpmenet at tabbed
                 if self.ui.radioButton_objects.isChecked():
                     text_edit_text += "TEXT: " +str(t) + "\n"
                 item = self.scene.addText(t['text'])
@@ -3264,13 +3270,22 @@ class DialogCodePdf(QtWidgets.QWidget):
                     QGraphicsItem::ItemIsFocusable | QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable | ti->flags())'''
         text_edit_text += "\n\nOBJECTS: " + str(counter)
 
+        # TODO reminpmenet at tabbed
         if self.ui.radioButton_objects.isChecked():
+            text_edit_text += "\n" + _("TEXT START CHARACTER POSITION: ") + str(page['plain_text_start']) + "\n"
+            text_edit_text += _("TEXT END CHARACTER POSITION: ") + str(page['plain_text_end']) + "\n"
+            text_edit_text += _("NUMBER OF CHARACTERS: ") + str(page['plain_text_end'] - page['plain_text_start'])
             self.ui.textEdit.setText(text_edit_text)
+        # TODO reminpmenet at tabbed
         if self.ui.radioButton_text.isChecked():
             self.ui.textEdit.setText(page['plain_text'])
+            # TODO start and end marks for code positioning in textEdit display
+            self.file_['start'] = page['plain_text_start']
+            self.file_['end'] = page['plain_text_end']
+            self.get_coded_text_update_eventfilter_tooltips()
 
     def get_qcolor(self, pdf_color) -> QtGui.QColor:
-        """  Get a pdf_color which can be in various formatos.
+        """  Get a pdf_color which can be in various formats.
         Return a QColor object.
         A float or integer
         A list with one numeric element --> (0=black -> gray -> 1=white)
