@@ -2093,11 +2093,15 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.update_dialog_codes_and_categories()
 
     def merge_codes(self, item, parent):
-        """ Merge code or category with another code or category.
+        """ Merge code with another code .
         Called by item_moved_update_data when a code is moved onto another code.
         param:
             item: QTreeWidgetItem
             parent: QTreeWidgetItem """
+
+        # Check item dropped on itself. Error can occur on Ubuntu 22.04.
+        if item['name'] == parent.text(0):
+            return
 
         msg_ = _("Merge code: ") + item['name'] + " ==> " + parent.text(0)
         reply = QtWidgets.QMessageBox.question(self, _('Merge codes'),
