@@ -282,7 +282,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
         self.ui.treeWidget.itemClicked.connect(self.fill_code_label_undo_show_selected_code)
-        self.ui.splitter.setSizes([150, 400])
+        self.ui.splitter.setSizes([150, 400, 150])
         #self.ui.splitter_2.setSizes([400, 100])  # RHS splitter
         '''try:
             s0 = int(self.app.settings['dialogcodepdf_splitter0'])
