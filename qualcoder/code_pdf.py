@@ -2770,10 +2770,9 @@ class DialogCodePdf(QtWidgets.QWidget):
                     self.pages[i]['text_boxes'].append(text_dict)
 
             # Remove excess line endings, include those with one blank space on a line
-            # This will affect matching from textboxes to plaintext
-            page_text = page_text.replace('\n \n', '\n')
-            page_text = page_text.replace('\n\n\n', '\n\n')
-
+            # This will affect matching from textboxes to plaintext - commented out now
+            #page_text = page_text.replace('\n \n', '\n')
+            #page_text = page_text.replace('\n\n\n', '\n\n')
             self.pages[i]['plain_text'] = page_text
             page_end_index += len(page_text)
             self.pages[i]['plain_text_end'] = page_end_index
@@ -2923,28 +2922,24 @@ class DialogCodePdf(QtWidgets.QWidget):
         cursor = item.textCursor()
         codes_format = []
         for code_ in self.code_text:
-            if 'to each' in code_['seltext'] and text_item['pos0'] < 50:
-                print(code_['color'], code_['pos0'], code_['pos1'], " -- ", text_item['pos0'], text_item['pos1'])
-
             if code_['pos0'] <= text_item['pos0'] < code_['pos1']:
                 codes_format.append(code_)
             if text_item['pos0'] < code_['pos0'] <= text_item['pos1']:
                 codes_format.append(code_)
-
-        print(codes_format)
+            # Code starts within text_item text and continues beyond it
+            if code_['pos0'] < text_item['pos1'] and code_['pos1'] > text_item['pos1']:
+                codes_format.append(code_)
         for cf in codes_format:
-            #cursor.setPosition(int(item['pos0'] - self.file_['start']), QtGui.QTextCursor.MoveMode.MoveAnchor)
+            #print("CODE", cf['pos0'], cf['pos1'], cf['seltext'], "TXTITEM", text_item['pos0'], text_item['pos1'])
             pos0 = int(cf['pos0'] - text_item['pos0'])
             if pos0 < 0:
                 pos0 = 0
             pos1 = int(cf['pos1'] - text_item['pos0'])
-            if pos1 > len()  #TODO HERE
+            if pos1 > len(text_item['text']):
+                pos1 = len(text_item['text']) - 1
             cursor.setPosition(pos0, QtGui.QTextCursor.MoveMode.MoveAnchor) # Or zero
-            #cursor.setPosition(int(item['pos1'] - self.file_['start']), QtGui.QTextCursor.MoveMode.KeepAnchor)
             cursor.setPosition(pos1, QtGui.QTextCursor.MoveMode.KeepAnchor)
-            #cursor.setPosition(0, QtGui.QTextCursor.MoveMode.MoveAnchor)  # Test
-            #cursor.setPosition(3, QtGui.QTextCursor.MoveMode.KeepAnchor)  # Test
-            color = cf['color'] #  QtCore.Qt.GlobalColor.red  # codes.get(item['cid'], {}).get('color', "#777777")  # default gray
+            color = cf['color']
             brush = QBrush(QColor(color))
             fmt = QtGui.QTextCharFormat()
             fmt.setBackground(brush)
@@ -2953,6 +2948,8 @@ class DialogCodePdf(QtWidgets.QWidget):
             fmt.setForeground(QBrush(QColor(foreground_color)))
             cursor.mergeCharFormat(fmt)
             #cursor.setCharFormat(fmt)
+            # Check text matches
+            #TODO if cf['seltext'] != text_item['text'][pos0:pos1]:
 
     def get_qcolor(self, pdf_color) -> QtGui.QColor:
         """  Get a pdf_color which can be in various formats.
