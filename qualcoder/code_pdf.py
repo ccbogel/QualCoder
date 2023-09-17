@@ -31,7 +31,8 @@ import logging
 from operator import itemgetter
 import os
 from pdfminer.converter import PDFPageAggregator
-from pdfminer.layout import LAParams, LTTextBox, LTTextLine, LTTextBoxHorizontal, LTImage, LTFigure, LTCurve, LTLine, \
+# Unused LTFigure
+from pdfminer.layout import LAParams, LTTextBox, LTTextLine, LTTextBoxHorizontal, LTImage, LTCurve, LTLine, \
     LTRect
 from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
 from pdfminer.pdfpage import PDFPage
@@ -158,7 +159,8 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.page_full_text = ""
         self.text_items = []
         self.selected_text_boxes = ""
-        self.pdf_object_info_text = ""
+        self.pdf_object_info_text = ""  # Contains details of PDF page objects
+        self.page_dict = {}  # Temporary variable used when loading PDF pages
 
         # Set up ui
         self.ui = Ui_Dialog_code_pdf()
@@ -250,7 +252,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(font_size_icon), "png")
         self.ui.label_font_size.setPixmap(QtGui.QPixmap(pm).scaled(22, 22))
-        self.ui.spinBox_font_adjuster.valueChanged.connect(self.pdf_text_font_size_adjuster)
+        self.ui.spinBox_font_adjuster.valueChanged.connect(self.update_page)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(playback_back_icon), "png")
         self.ui.pushButton_previous.setIcon(QtGui.QIcon(pm))
@@ -281,6 +283,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
         self.ui.treeWidget.itemClicked.connect(self.fill_code_label_undo_show_selected_code)
         self.ui.splitter.setSizes([150, 400])
+        #self.ui.splitter_2.setSizes([400, 100])  # RHS splitter
         '''try:
             s0 = int(self.app.settings['dialogcodepdf_splitter0'])
             s1 = int(self.app.settings['dialogcodepdf_splitter1'])
@@ -317,11 +320,6 @@ class DialogCodePdf(QtWidgets.QWidget):
 
         self.get_files()
         self.fill_tree()
-
-    def pdf_text_font_size_adjuster(self):
-        """ Spinbox font size adjustment from 0 to -10pt. """
-
-        self.update_page()
 
     def spin_page_changed(self):
         pass
@@ -677,8 +675,6 @@ class DialogCodePdf(QtWidgets.QWidget):
         Also called on other coding dialogs in the dialog_list. """
 
         self.codes, self.categories = self.app.get_codes_categories()
-        '''for c in self.codes:
-            c['name'] = c['name']  # Why did I do this ?'''
 
     # Header section widgets
 
@@ -1162,65 +1158,11 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
 
-    def change_code_pos_message(self):  #, location, start_or_end):
+    def change_code_pos_message(self):
         """  Called via textedit_menu. """
 
         msg = _("Change start position (extend SHIFT LEFT/ shrink ALT RIGHT)\nChange end position (extend SHIFT RIGHT/ shrink ALT LEFT)")
         Message(self.app, _("Use key presses") + " " * 20, msg).exec()
-
-    def shift_code_positions(self, position):
-        """ After a text file is edited - text added or deleted, code positions may be inaccurate.
-         enter a positive or negative integer to shift code positions for all codes after a click position in the
-         document.
-         Activated by ^ At key press"""
-
-        if self.file_ is None:
-            return
-        code_list = []
-        for item in self.code_text:
-            if item['pos0'] > position + self.file_['start']:
-                code_list.append(item)
-                #print(item['pos0'], ">", position + self.file_['start'])
-        if not code_list:
-            return
-        int_dialog = QtWidgets.QInputDialog()
-        int_dialog.setMinimumSize(60, 150)
-        # Remove context flag does not work here
-        int_dialog.setWindowFlags(int_dialog.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        msg = _("Shift codings after clicked position")
-        int_dialog.setWhatsThis(msg)
-        int_dialog.setToolTip(msg)
-        msg2 = _("Shift code positions for all codes after you have clicked on a position in the text.\n"
-                 "Back up the project before running this action.\n"
-                 "This function will help if you have edited the coded text and the codes are out of position.\n"
-                 "Positive numbers (moves right) or negative numbers (moves left) (-500 to 500)\n"
-                 "Clicked character position: ") + str(position)
-        delta_shift, ok = int_dialog.getInt(self, msg,msg2 , 0, -500, 500, 1)
-        if not ok:
-            return
-        if delta_shift == 0:
-            return
-        int_dialog.done(1)  # Need this, as reactivated when called again with same int value.
-        cur = self.app.conn.cursor()
-        length_sql = "select length(fulltext) from source where id=?"
-        cur.execute(length_sql, [self.file_['id']])
-        fulltext_length = cur.fetchone()[0]
-        text_sql = "select substr(fulltext,?,?), length(fulltext) from source where id=?"
-        # Update code_text rows in database
-        for coded in code_list:
-            #print(coded['seltext'], coded['pos0'], coded['pos1'])
-            new_pos0 = coded['pos0'] + delta_shift
-            new_pos1 = coded['pos1'] + delta_shift
-            # Get seltext and update if coded pos0 and pos1 are within bounds
-            if new_pos0 > -1 and new_pos1 < fulltext_length:
-                cur.execute(text_sql, [new_pos0, new_pos1 - new_pos0, self.file_['id']])
-                seltext = cur.fetchone()[0]
-                #print("len", fulltext_length, seltext)
-                sql = "update code_text set pos0=?, pos1=?, seltext=? where ctid=?"
-                cur.execute(sql, [new_pos0, new_pos1, seltext, coded['ctid']])
-                self.app.conn.commit()
-        self.app.delete_backup = False
-        self.get_coded_text_update_eventfilter_tooltips()
 
     def copy_selected_text_to_clipboard(self):
         """ Copy text to clipboard for external use.
@@ -1436,7 +1378,6 @@ class DialogCodePdf(QtWidgets.QWidget):
         Ctrl F jump to search box
         A annotate - for current selection
         Q Quick Mark with code - for current selection
-        B Create bookmark - at clicked position
         H Hide / Unhide top groupbox
         I Tag important
         M memo code - at clicked position
@@ -1447,8 +1388,6 @@ class DialogCodePdf(QtWidgets.QWidget):
         V assign 'in vivo' code to selected text
         Ctrl 0 to Ctrl 9 - button presses
         # Display Clicked character position
-        ^ At key. Shift code positions. May be needed after the text is edited
-            (added or deleted) to shift subsequent codings.
         + Zoom in
         -Zoom out
         """
@@ -1507,10 +1446,8 @@ class DialogCodePdf(QtWidgets.QWidget):
                     return
                 self.ui.graphicsView.scale(0.9, 0.9)
                 return
-
         if not self.ui.textEdit.hasFocus():
             return
-
         key = event.key()
         # mod = QtGui.QGuiApplication.keyboardModifiers()
         cursor_pos = self.ui.textEdit.textCursor().position()
@@ -1523,9 +1460,6 @@ class DialogCodePdf(QtWidgets.QWidget):
         # Hash display character position
         if key == QtCore.Qt.Key.Key_Exclam:
             Message(self.app, _("Text position") + " " * 20, _("Character position: ") + str(cursor_pos)).exec()
-            return
-        if key == QtCore.Qt.Key.Key_Dollar:
-            self.shift_code_positions(self.ui.textEdit.textCursor().position() + self.file_['start'])
             return
         # Annotate selected
         if key == QtCore.Qt.Key.Key_A and selected_text != "":
@@ -1591,10 +1525,8 @@ class DialogCodePdf(QtWidgets.QWidget):
         item = self.overlaps_at_pos[self.overlaps_at_pos_idx]
         # Remove formatting
         cursor = self.ui.textEdit.textCursor()
-        print(1)
         cursor.setPosition(int(item['pos0'] - self.file_['start']), QtGui.QTextCursor.MoveMode.MoveAnchor)
         cursor.setPosition(int(item['pos1'] - self.file_['start']), QtGui.QTextCursor.MoveMode.KeepAnchor)
-        print(2)
         cursor.setCharFormat(QtGui.QTextCharFormat())
         # Reapply formatting
         color = ""
@@ -2601,7 +2533,6 @@ class DialogCodePdf(QtWidgets.QWidget):
                 self.ui.listWidget.item(x).setSelected(True)
 
         self.file_ = file_
-        #TODO fix text start and end
         if "start" not in self.file_:
             self.file_['start'] = 0
         sql_values = []
@@ -2645,7 +2576,6 @@ class DialogCodePdf(QtWidgets.QWidget):
         laparams = LAParams()
         device = PDFPageAggregator(resource_manager, laparams=laparams)
         interpreter = PDFPageInterpreter(resource_manager, device)
-        #self.get_resources()
         pages_generator = PDFPage.get_pages(pdf_file)  # generator PDFpage objects
         self.pages = []
         self.page_num = 0
@@ -2671,6 +2601,7 @@ class DialogCodePdf(QtWidgets.QWidget):
     def get_item_and_hierarchy(self, page, lobj: Any, depth=0):
         """ Get item details add to page_dict, with depth and all its descendants.
         Objects added to self.page_dict, with depth counter
+        Except for text items, do this separately.
         """
 
         if isinstance(lobj, LTLine):
@@ -2706,7 +2637,7 @@ class DialogCodePdf(QtWidgets.QWidget):
                           'depth': depth}
             self.page_dict['curves'].append(curve_dict)
 
-        if isinstance(lobj, LTTextLine):
+        '''if isinstance(lobj, LTTextLine) or isinstance(lobj, LTTextBox):
             # y-coordinates are the distance from the bottom of the page
             #  left, bottom, right, and top
             #print("LTTEXTLINE", obj.__dir__())
@@ -2731,39 +2662,14 @@ class DialogCodePdf(QtWidgets.QWidget):
             textline_dict['fontname'] = fontname
             textline_dict['fontsize'] = int(median(char_font_sizes))
             textline_dict['color'] = colors[0]
-            self.page_dict['text_boxes'].append(textline_dict)
+            self.page_dict['text_boxes'].append(textline_dict)'''
 
-        if isinstance(lobj, LTTextBox):
-            # y-coordinates are the distance from the bottom of the page
-            #  left, bottom, right, and top
-            for textline in lobj:
-                #print("TEXTLINE", textline.__dir__())
-                # LTTextLineHorizontal
-                left, btm, right, top, text = textline.x0, textline.y0, textline.x1, textline.y1, textline.get_text()
-                textline_dict = {'left': round(left,3), 'btm': round(page.mediabox[3] - btm,3),
-                                 'top': round(page.mediabox[3] - top,3),
-                                 'right': round(right,3), 'text': text, 'depth': depth}
-                # Fix Pdfminer recognising invalid unicode characters.
-                textline_dict['text'] = textline_dict['text'].replace(u"\uE002", "Th")
-                textline_dict['text'] = textline_dict['text'].replace(u"\uFB01", "fi")
-
-                char_font_sizes = []
-                fontnames = []
-                colors = []
-                for ltchar in textline:
-                    fontname, fontsize, color = self.get_char_info(ltchar)
-                    char_font_sizes.append(fontsize)
-                    fontnames.append(fontname)  # TODO get most common
-                    colors.append(color)
-                '''# Not using font name information as cannot extract font from pdf
-                fontname = fontnames[0]  
-                if fontname.find("+") > 0:
-                    # print(fontname)
-                    fontname = fontname.split("+")[1]
-                textline_dict['fontname'] = fontname'''
-                textline_dict['fontsize'] = int(median(char_font_sizes))
-                textline_dict['color'] = colors[0]
-                self.page_dict['text_boxes'].append(textline_dict)
+        '''if isinstance(lobj, LTFigure):
+            """ Not needed.
+            LTFigure objects are containers for other LT* objects, so recurse through the children.
+             LTRect, LTChar, LTCurve, LTLine """
+            for obj in lobj:
+                self.get_item_and_hierarchy(page, obj, depth=depth + 1)'''
 
         if isinstance(lobj, LTImage):
             #print("IMG", lobj.__dir__())
@@ -2801,20 +2707,15 @@ class DialogCodePdf(QtWidgets.QWidget):
                     qp.save(file_name[0])  # tuple of path and type'''
             self.page_dict['images'].append(img_dict)
 
-        '''if isinstance(lobj, LTFigure):
-            """ Not needed.
-            LTFigure objects are containers for other LT* objects, so recurse through the children.
-             LTRect, LTChar, LTCurve, LTLine """
-            for obj in lobj:
-                self.get_item_and_hierarchy(page, obj, depth=depth + 1)'''
-
         if isinstance(lobj, Iterable):
             for obj in lobj:
                 self.get_item_and_hierarchy(page, obj, depth=depth + 1)
 
     def get_page_text(self):
         """ Get page text to match QualCoder text import.
-        TODO CHECK the loaded page text matches that stored in qualcoder """
+        Check the loaded page text matches that stored in qualcoder.
+
+        """
 
         filepath = None
         if self.file_['mediapath'][:6] == "/docs/":
@@ -2838,24 +2739,53 @@ class DialogCodePdf(QtWidgets.QWidget):
         interpreter = PDFPageInterpreter(rsrcmgr, device)
         self.full_text = ""
         page_end_index = 0
+        pos0 = 0  # character pos
         for i, page in enumerate(PDFPage.create_pages(doc)):
             page_text = ""
             interpreter.process_page(page)
             layout = device.get_result()
-            for lt_obj in layout:
-                if isinstance(lt_obj, LTTextBox) or isinstance(lt_obj, LTTextLine):
-                    page_text += lt_obj.get_text() + "\n"  # add line to paragraph spacing for visual format
+            for lobj in layout:
+                if isinstance(lobj, LTTextBox) or isinstance(lobj, LTTextLine):
+                    page_text += lobj.get_text() + "\n"  # add line to paragraph spacing for visual format
+                    # y coordinates are the distance from the bottom of the page
+                    #  left, bottom, right, and top
+                    # print("LTTEXTLINE", obj.__dir__())
+                    left, btm, right, top, text = lobj.x0, lobj.y0, lobj.x1, lobj.y1, lobj.get_text()
+                    # Fix Pdfminer recognising invalid unicode characters.
+                    text = text.replace(u"\uE002", "Th")
+                    text = text.replace(u"\uFB01", "fi")
+                    text_dict = {'left': round(left, 3), 'btm': round(page.mediabox[3] - btm, 3),
+                                     'top': round(page.mediabox[3] - top, 3),
+                                     'right': round(right, 3), 'text': text,
+                                     'pos0': pos0, 'pos1': pos0 + len(text) + 1}
+                    pos0 += len(text) + 1
+                    char_font_sizes = []
+                    char_colors = []
+                    for ltchar in lobj:
+                        fontname, fontsize, char_color = self.get_char_info(ltchar)
+                        char_font_sizes.append(fontsize)
+                        char_colors.append(char_color)
+                    text_dict['fontsize'] =  int(median(char_font_sizes))
+                    text_dict['color'] = char_colors[0]
+                    self.pages[i]['text_boxes'].append(text_dict)
+
             # Remove excess line endings, include those with one blank space on a line
+            # This will affect matching from textboxes to plaintext
             page_text = page_text.replace('\n \n', '\n')
             page_text = page_text.replace('\n\n\n', '\n\n')
-            # Fix Pdfminer recognising invalid unicode characters.
-            page_text = page_text.replace(u"\uE002", "Th")
-            page_text = page_text.replace(u"\uFB01", "fi")
+
             self.pages[i]['plain_text'] = page_text
             page_end_index += len(page_text)
             self.pages[i]['plain_text_end'] = page_end_index
             self.pages[i]['plain_text_start'] = page_end_index - len(page_text)
             self.full_text += page_text
+
+        if self.full_text == self.file_['fulltext']:
+            print(len(self.file_['fulltext']), len(self.full_text))
+            print("Plain text matches")
+        else:
+            print(len(self.file_['fulltext']), len(self.full_text))
+            print("Plain text does not match")
 
     def show_page(self, page_num):
         """ Display pdf page, using the PDF objects. """
@@ -2946,25 +2876,25 @@ class DialogCodePdf(QtWidgets.QWidget):
             self.text_items = []
             for t in page['text_boxes']:
                 counter += 1
-                self.pdf_object_info_text += "TEXT: " +str(t) + "\n"
+                self.pdf_object_info_text += "TEXT: " + str(t) + "\n"
                 item = self.scene.addText(t['text'])
                 item.setPos(t['left'], t['top'])
-                # print(i['fontname'], type(t['fontname']), t['fontsize'], type(t['fontsize']))
-                '''font = QtGui.QFont(t['fontname'], t['fontsize'])
-                print(t['fontname'])'''
-                #font_size = QtGui.QFont(self.app.settings['font'], font_size)
+                '''print(i['fontname'], type(t['fontname']), t['fontsize'], type(t['fontsize']))
+                font = QtGui.QFont(t['fontname'], t['fontsize']) '''
                 adjustment = self.ui.spinBox_font_adjuster.value()
                 font_size = t['fontsize'] + adjustment  # e.g. minus 2 helps stop text overlaps
                 if font_size < 4:
                     font_size = 4
                 font = QtGui.QFont("Noto Sans", font_size)
                 item.setFont(font)
-                ttip = f"x:{int(t['left'])}, y:{int(t['top'])} {t['text']}"
-                item.setToolTip(ttip)
+                '''ttip = f"x:{int(t['left'])}, y:{int(t['top'])} {t['text']}"
+                item.setToolTip(ttip)'''
                 color = self.get_qcolor(t['color'])
                 if self.ui.checkBox_black_text.isChecked():
                     color = QtCore.Qt.GlobalColor.black
-                item.setDefaultTextColor(color)  # TODO option to set black only
+                item.setDefaultTextColor(color)
+                self.format_text_box(item, t)
+
                 # Interaction
                 item.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditorInteraction)
                 item.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
@@ -2978,10 +2908,51 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.pdf_object_info_text += _("NUMBER OF CHARACTERS: ") + str(page['plain_text_end'] - page['plain_text_start'])
 
         self.ui.textEdit.setText(page['plain_text'])
-        # TODO start and end marks for code positioning in textEdit display
+        # Start and end marks for code positioning in textEdit display
         self.file_['start'] = page['plain_text_start']
         self.file_['end'] = page['plain_text_end']
         self.get_coded_text_update_eventfilter_tooltips()
+
+    def format_text_box(self, item, text_item):
+        """ Apply code backgrounds to text.
+         Loop through coded text and match any at this position.
+         param:
+            item: QGraphicsTextItem
+            text_item: dictionary of pdf text item data """
+
+        cursor = item.textCursor()
+        codes_format = []
+        for code_ in self.code_text:
+            if 'to each' in code_['seltext'] and text_item['pos0'] < 50:
+                print(code_['color'], code_['pos0'], code_['pos1'], " -- ", text_item['pos0'], text_item['pos1'])
+
+            if code_['pos0'] <= text_item['pos0'] < code_['pos1']:
+                codes_format.append(code_)
+            if text_item['pos0'] < code_['pos0'] <= text_item['pos1']:
+                codes_format.append(code_)
+
+        print(codes_format)
+        for cf in codes_format:
+            #cursor.setPosition(int(item['pos0'] - self.file_['start']), QtGui.QTextCursor.MoveMode.MoveAnchor)
+            pos0 = int(cf['pos0'] - text_item['pos0'])
+            if pos0 < 0:
+                pos0 = 0
+            pos1 = int(cf['pos1'] - text_item['pos0'])
+            if pos1 > len()  #TODO HERE
+            cursor.setPosition(pos0, QtGui.QTextCursor.MoveMode.MoveAnchor) # Or zero
+            #cursor.setPosition(int(item['pos1'] - self.file_['start']), QtGui.QTextCursor.MoveMode.KeepAnchor)
+            cursor.setPosition(pos1, QtGui.QTextCursor.MoveMode.KeepAnchor)
+            #cursor.setPosition(0, QtGui.QTextCursor.MoveMode.MoveAnchor)  # Test
+            #cursor.setPosition(3, QtGui.QTextCursor.MoveMode.KeepAnchor)  # Test
+            color = cf['color'] #  QtCore.Qt.GlobalColor.red  # codes.get(item['cid'], {}).get('color', "#777777")  # default gray
+            brush = QBrush(QColor(color))
+            fmt = QtGui.QTextCharFormat()
+            fmt.setBackground(brush)
+            # Foreground depends on the defined need_white_text color in color_selector
+            foreground_color = TextColor(color).recommendation
+            fmt.setForeground(QBrush(QColor(foreground_color)))
+            cursor.mergeCharFormat(fmt)
+            #cursor.setCharFormat(fmt)
 
     def get_qcolor(self, pdf_color) -> QtGui.QColor:
         """  Get a pdf_color which can be in various formats.
@@ -3025,12 +2996,6 @@ class DialogCodePdf(QtWidgets.QWidget):
                 #print(e)
                 pass
         return color
-
-    def spin_page_changed(self):
-        pass
-        if self.pages:
-            self.page_num = self.ui.spinBox.value() - 1
-            self.show_page(self.page_num)
 
     def get_coded_text_update_eventfilter_tooltips(self):
         """ Called by load_file, and from other dialogs on update.
@@ -3173,7 +3138,9 @@ class DialogCodePdf(QtWidgets.QWidget):
     def mark_selected_textboxes(self):
         """  """
 
-        item = self.ui.treeWidget.currentItem()
+        pass
+        #TODO
+        '''item = self.ui.treeWidget.currentItem()
         if item is None:
             Message(self.app, _('Warning'), _("No code was selected"), "warning").exec()
             return
@@ -3182,7 +3149,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         print(len(self.selected_textboxes))
         cid = int(item.text(1).split(':')[1])
         for tb in self.selected_textboxes:
-            print(tb.toPlainText())
+            print(tb.toPlainText())'''
 
     def mark(self):
         """ Mark selected text in file with currently selected code.
@@ -3587,13 +3554,11 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
         '''        item.redraw()
         self.update(self.sceneRect())'''
 
-
     def mouseReleaseEvent(self, mouseEvent):
         """ On mouse release, an item might be repositioned so need to redraw all the
         link_items """
 
         super(GraphicsScene, self).mouseReleaseEvent(mouseEvent)
 
-        self.selectedItems()
         '''for item in self.selectedItems():
             print(item)'''
