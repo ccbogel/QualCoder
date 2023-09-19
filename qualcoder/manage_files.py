@@ -28,6 +28,7 @@ https://qualcoder.wordpress.com/
 
 import csv
 import datetime
+from typing import Iterable
 import webbrowser
 import zipfile
 from shutil import copyfile, move
@@ -58,8 +59,9 @@ from .html_parser import *
 from .memo import DialogMemo
 from .report_codes import DialogReportCodes  # for isInstance()
 from .select_items import DialogSelectItems
-from .view_av import DialogViewAV, DialogCodeAV  # DialogCodeAV for isinstance()
-from .view_image import DialogViewImage, DialogCodeImage  # DialogCodeImage for isinstance()
+from .view_av import DialogViewAV, DialogCodeAV  # for isinstance update files
+from .view_image import DialogViewImage, DialogCodeImage  # for isinstance update files
+from .code_pdf import DialogCodePdf # for isinstance update files
 
 # If VLC not installed, it will not crash
 vlc = None
@@ -1410,6 +1412,8 @@ class DialogManageFiles(QtWidgets.QDialog):
                     c.get_files()
                 if isinstance(c, DialogCodeText):
                     c.get_files()
+                if isinstance(c, DialogCodePdf):
+                    c.get_files()
         contents = self.tab_reports.layout()
         if contents is not None:
             # Examine widgets in layout
@@ -1487,6 +1491,8 @@ class DialogManageFiles(QtWidgets.QDialog):
     def load_file_text(self, import_file, link_path=""):
         """ Import from file types of odt, docx pdf, epub, txt, html, htm.
         Implement character detection for txt imports.
+        Loading pdf text. I have removed additional line breaks. See commented sections below.
+        Removing these allows the pdf to be coded in Code_text and Code_pdf without positional shifting problems.
 
         param:
             import_file: filepath of file to be imported, String
@@ -1534,13 +1540,14 @@ class DialogManageFiles(QtWidgets.QDialog):
                 layout = device.get_result()
                 for lt_obj in layout:
                     if isinstance(lt_obj, LTTextBox) or isinstance(lt_obj, LTTextLine):
-                        text_ += lt_obj.get_text() + "\n"  # add line to paragraph spacing for visual format
+                        text_ += lt_obj.get_text()  # + "\n"  # add line to paragraph spacing for visual format
+                        # Fix Pdfminer recognising invalid unicode characters.
+                        text_ = text_.replace(u"\uE002", "Th")
+                        text_ = text_.replace(u"\uFB01", "fi")
             # Remove excess line endings, include those with one blank space on a line
-            text_ = text_.replace('\n \n', '\n')
-            text_ = text_.replace('\n\n\n', '\n\n')
-            # Fix Pdfminer recognising invalid unicode characters.
-            text_ = text_.replace(u"\uE002", "Th")
-            text_ = text_.replace(u"\uFB01", "fi")
+            # Temporary mark out
+            #text_ = text_.replace('\n \n', '\n')
+            #text_ = text_.replace('\n\n\n', '\n\n')
 
         # Import from html
         if import_file[-5:].lower() == ".html" or import_file[-4:].lower() == ".htm":
@@ -1553,7 +1560,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                         break
                     html_text += line
                 text_ = html_to_text(html_text)
-                QtWidgets.QMessageBox.warning(self, _('Warning'), str(import_errors) + _(" lines not imported"))
+                Message(self.app, _("Warning"), str(import_errors) + _(" lines not imported"), "warning").exec()
         # Try importing as a plain text file.
         # TODO https://stackoverflow.com/questions/436220/how-to-determine-the-encoding-of-text
         # coding = chardet.detect(file.content).get('encoding')

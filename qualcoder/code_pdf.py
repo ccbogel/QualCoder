@@ -27,6 +27,7 @@ https://github.com/ccbogel/QualCoder
 from binascii import b2a_hex
 from copy import copy, deepcopy
 import datetime
+import difflib
 import logging
 from operator import itemgetter
 import os
@@ -283,7 +284,6 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
         self.ui.treeWidget.itemClicked.connect(self.fill_code_label_undo_show_selected_code)
         self.ui.splitter.setSizes([150, 400, 150])
-        #self.ui.splitter_2.setSizes([400, 100])  # RHS splitter
         '''try:
             s0 = int(self.app.settings['dialogcodepdf_splitter0'])
             s1 = int(self.app.settings['dialogcodepdf_splitter1'])
@@ -325,13 +325,13 @@ class DialogCodePdf(QtWidgets.QWidget):
         pass
         if self.pages:
             self.page_num = self.ui.spinBox.value() - 1
-            self.show_page(self.page_num)
+            self.show_page()
 
     def update_page(self):
         """ Show and hide PDF elements on page and redraw. """
 
         if self.pages:
-            self.show_page(self.page_num)
+            self.show_page()
 
     def get_files(self, ids=None):
         """ Get pdf files with additional details and fill list widget.
@@ -822,7 +822,7 @@ class DialogCodePdf(QtWidgets.QWidget):
 
         if self.pdf_object_info_text == "":
             return
-        ui = DialogMemo(self.app, _("PDF objects"),self.pdf_object_info_text)
+        ui = DialogMemo(self.app, _("PDF objects"), self.pdf_object_info_text)
         ui.ui.pushButton_clear.hide()
         ui.exec()
 
@@ -1548,6 +1548,8 @@ class DialogCodePdf(QtWidgets.QWidget):
         Adjust for when portion of full text file loaded.
         Called by: textEdit cursor position changed. """
 
+        if self.file_ is None:
+            return
         self.overlaps_at_pos = []
         self.overlaps_at_pos_idx = 0
         pos = self.ui.textEdit.textCursor().position()
@@ -2536,12 +2538,20 @@ class DialogCodePdf(QtWidgets.QWidget):
         if "start" not in self.file_:
             self.file_['start'] = 0
         sql_values = []
-        file_result = self.app.get_file_texts([file_['id']])[0]
+        file_result = self.app.get_file_texts([file_['id']])
+        if not file_result:
+            self.file_ = None
+            self.ui.textEdit.clear()
+            self.scene = QtWidgets.QGraphicsScene()
+            self.ui.graphicsView.setScene(self.scene)
+            return
+        file_result = file_result[0]
         if "end" not in self.file_:
             self.file_['end'] = len(file_result['fulltext'])
         sql_values.append(int(file_result['id']))
-        self.text = file_result['fulltext'][self.file_['start']:self.file_['end']]
-        self.ui.textEdit.setPlainText(self.text)
+        # self.text = file_result['fulltext'][self.file_['start']:self.file_['end']]
+        # print(self.file_['start'], "-", self.file_['end'])
+        # self.ui.textEdit.setPlainText(self.text)
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
         self.show_all_codes_in_text()  # Deactivates the show_selected_code if this is active
@@ -2555,7 +2565,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.spinBox.setMaximum(len(self.pages))
         self.ui.spinBox.setToolTip(_("Pages: ") + str(len(self.pages)))
         self.ui.spinBox.setEnabled(True)
-        self.show_page(self.page_num)
+        self.show_page()
 
     def load_pdf(self):
         """ Load page elements for all pages in the PDF.
@@ -2579,29 +2589,41 @@ class DialogCodePdf(QtWidgets.QWidget):
         pages_generator = PDFPage.get_pages(pdf_file)  # generator PDFpage objects
         self.pages = []
         self.page_num = 0
+        self.document_text = ""
+        self.page_end_index = 0  # text end of page
+        self.text_pos0 = 0  # character pos
         for i, page in enumerate(pages_generator):
-            self.page_dict = {'pagenum': i}
+            self.page_text = ""
+            self.page_dict = {'pagenum': i, 'mediabox': page.mediabox, 'text_boxes': [], 'lines': [], 'curves': [],
+                              'images': [], 'rect': [], 'plain_text': [], 'plain_text_start': 0, 'plain_text_end': 0}
             # print(f'Processing page: {i + 1}')
-            self.page_dict['mediabox'] = page.mediabox
-            self.page_dict['text_boxes'] = []
-            self.page_dict['lines'] = []
-            self.page_dict['curves'] = []
-            self.page_dict['images'] = []
-            self.page_dict['rect'] = []
-            self.page_dict['plain_text'] = []
-            self.page_dict['plain_text_start'] = 0
-            self.page_dict['plain_text_end'] = 0
             interpreter.process_page(page)
             layout = device.get_result()
             for lobj in layout:
                 self.get_item_and_hierarchy(page, lobj)
+            self.page_dict['plain_text'] = self.page_text
+            self.page_dict['plain_text_start'] = self.page_end_index
+            self.page_end_index += len(self.page_text)
+            self.page_dict['plain_text_end'] = self.page_end_index
             self.pages.append(self.page_dict)
-        self.get_page_text()  # get full text to match sqlite stored text
+            self.document_text += self.page_text
+        if self.document_text != self.file_['fulltext']:
+            #print("MISMATCH TEXTS:", len(self.full_text), "SQL FILE", len(self.file_['fulltext']))
+            #print("DIFF:", len(self.full_text) - len(self.file_['fulltext']))
+            msg = _("Texts do not match. Likely PDF imported before 3.4 QualCodr version or the PDF text has been edited.")
+            msg += _("\nView PDF but cannot code. Code positions will appear wrongly.\nCharacter difference: ")
+            msg += str(len(self.document_text) - len(self.file_['fulltext']))
+            Message(self.app, _("Warning"), msg, "warning").exec()
+            d = list(difflib.unified_diff(self.document_text, self.file_['fulltext'], n=0))
+            for i in d:
+                print(i)
 
     def get_item_and_hierarchy(self, page, lobj: Any, depth=0):
         """ Get item details add to page_dict, with depth and all its descendants.
-        Objects added to self.page_dict, with depth counter
-        Except for text items, do this separately.
+        Objects added to self.page_dict, with depth counter.
+        LTFigure objects are not listed in the if statements, as they are containers for other objects, and are
+        iterated, via the isinstance(Iteratable).
+
         """
 
         if isinstance(lobj, LTLine):
@@ -2637,39 +2659,37 @@ class DialogCodePdf(QtWidgets.QWidget):
                           'depth': depth}
             self.page_dict['curves'].append(curve_dict)
 
-        '''if isinstance(lobj, LTTextLine) or isinstance(lobj, LTTextBox):
+        if isinstance(lobj, LTTextLine):  # or isinstance(lobj, LTTextBox):
             # y-coordinates are the distance from the bottom of the page
             #  left, bottom, right, and top
             #print("LTTEXTLINE", obj.__dir__())
-            left, btm, right, top, text = lobj.x0, lobj.y0, lobj.x1, lobj.y1, lobj.get_text()
-            textline_dict = {'left': round(left,3), 'btm': round(page.mediabox[3] - btm,3),
-                             'top': round(page.mediabox[3] - top,3),
-                             'right': round(right,3), 'text': text, 'depth': depth}
+            left, btm, right, top, text_ = lobj.x0, lobj.y0, lobj.x1, lobj.y1, lobj.get_text()
+            text_dict = {'left': round(left, 3), 'btm': round(page.mediabox[3] - btm, 3),
+                             'top': round(page.mediabox[3] - top, 3),
+                             'right': round(right, 3), 'text': text_, 'depth': depth,
+                             'pos0': self.text_pos0, 'pos1': self.text_pos0 + len(text_) + 1}
             # Fix Pdfminer recognising invalid unicode characters.
-            textline_dict['text'] = textline_dict['text'].replace(u"\uE002", "Th")
-            textline_dict['text'] = textline_dict['text'].replace(u"\uFB01", "fi")
+            text_dict['text'] = text_dict['text'].replace(u"\uE002", "Th")
+            text_dict['text'] = text_dict['text'].replace(u"\uFB01", "fi")
+            self.full_text += text_dict['text'] #+ "\n"  # add line to paragraph spacing for visual format
+            self.page_text += text_dict['text'] #+ "\n"
+            self.text_pos0 += len(text_dict['text'])
+            text_dict['pos1'] = self.text_pos0
             char_font_sizes = []
-            fontnames = []
+            #fontnames = []
             colors = []
             for ltchar in lobj:
                 fontname, fontsize, color = self.get_char_info(ltchar)
                 char_font_sizes.append(fontsize)
-                fontnames.append(fontname)  # TODO get most common
+                #fontnames.append(fontname)  # TODO get most common
                 colors.append(color)
-            fontname = fontnames[0]
+            '''fontname = fontnames[0]
             if fontname.find("+") > 0:
                 fontname = fontname.split("+")[1]
-            textline_dict['fontname'] = fontname
-            textline_dict['fontsize'] = int(median(char_font_sizes))
-            textline_dict['color'] = colors[0]
-            self.page_dict['text_boxes'].append(textline_dict)'''
-
-        '''if isinstance(lobj, LTFigure):
-            """ Not needed.
-            LTFigure objects are containers for other LT* objects, so recurse through the children.
-             LTRect, LTChar, LTCurve, LTLine """
-            for obj in lobj:
-                self.get_item_and_hierarchy(page, obj, depth=depth + 1)'''
+            text_dict['fontname'] = fontname'''
+            text_dict['fontsize'] = int(median(char_font_sizes))
+            text_dict['color'] = colors[0]
+            self.page_dict['text_boxes'].append(text_dict)
 
         if isinstance(lobj, LTImage):
             #print("IMG", lobj.__dir__())
@@ -2698,98 +2718,25 @@ class DialogCodePdf(QtWidgets.QWidget):
                 img_dict['filetype'] = file_ext
                 qp = QtGui.QPixmap()
                 qp.loadFromData(file_stream)
-                qpscaled = qp.scaled(int(img_dict['w']), int(img_dict['h']))
-                img_dict['pixmap'] = qpscaled
+                img_dict['pixmap'] = qp.scaled(int(img_dict['w']), int(img_dict['h']))
                 if qp.isNull():
                     img_dict['pixmap'] = None
-                '''else:
+                '''else:  # Potential to extract some images.
                     file_name = QtWidgets.QFileDialog.getSaveFileName(self, 'Save File', '', '*.jpg')
                     qp.save(file_name[0])  # tuple of path and type'''
             self.page_dict['images'].append(img_dict)
 
         if isinstance(lobj, Iterable):
+            # Includes LTFigure objects
+            # Must not iterate the TextLines within the TextBox - otherwise double ups occur
             for obj in lobj:
                 self.get_item_and_hierarchy(page, obj, depth=depth + 1)
 
-    def get_page_text(self):
-        """ Get page text to match QualCoder text import.
-        Check the loaded page text matches that stored in qualcoder.
+    def show_page(self):
+        """ Display pdf page, using the PDF objects. Only checked pdf objects are displayed.
+        Coded text segments are shown in their QGraphicsTextItems. """
 
-        """
-
-        filepath = None
-        if self.file_['mediapath'][:6] == "/docs/":
-            filepath = self.app.project_path + "/documents/" + self.file_['mediapath'][6:]
-        if self.file_['mediapath'][:5] == "docs:":
-            filepath = self.file_['mediapath'][5:]
-        if not filepath:
-            logger.error("Cannot open pdf file" + self.file_['mediapath'])
-            print("Cannot open pdf file " + self.file_['mediapath'])
-            return
-        file_obj = open(filepath, 'rb')
-        parser = PDFParser(file_obj)
-        doc = PDFDocument(parser=parser)
-        parser.set_document(doc)
-        # Potential error with encrypted PDF
-        rsrcmgr = PDFResourceManager()
-        laparams = LAParams()
-        laparams.char_margin = 1.0
-        laparams.word_margin = 1.0
-        device = PDFPageAggregator(rsrcmgr, laparams=laparams)
-        interpreter = PDFPageInterpreter(rsrcmgr, device)
-        self.full_text = ""
-        page_end_index = 0
-        pos0 = 0  # character pos
-        for i, page in enumerate(PDFPage.create_pages(doc)):
-            page_text = ""
-            interpreter.process_page(page)
-            layout = device.get_result()
-            for lobj in layout:
-                if isinstance(lobj, LTTextBox) or isinstance(lobj, LTTextLine):
-                    page_text += lobj.get_text() + "\n"  # add line to paragraph spacing for visual format
-                    # y coordinates are the distance from the bottom of the page
-                    #  left, bottom, right, and top
-                    # print("LTTEXTLINE", obj.__dir__())
-                    left, btm, right, top, text = lobj.x0, lobj.y0, lobj.x1, lobj.y1, lobj.get_text()
-                    # Fix Pdfminer recognising invalid unicode characters.
-                    text = text.replace(u"\uE002", "Th")
-                    text = text.replace(u"\uFB01", "fi")
-                    text_dict = {'left': round(left, 3), 'btm': round(page.mediabox[3] - btm, 3),
-                                     'top': round(page.mediabox[3] - top, 3),
-                                     'right': round(right, 3), 'text': text,
-                                     'pos0': pos0, 'pos1': pos0 + len(text) + 1}
-                    pos0 += len(text) + 1
-                    char_font_sizes = []
-                    char_colors = []
-                    for ltchar in lobj:
-                        fontname, fontsize, char_color = self.get_char_info(ltchar)
-                        char_font_sizes.append(fontsize)
-                        char_colors.append(char_color)
-                    text_dict['fontsize'] =  int(median(char_font_sizes))
-                    text_dict['color'] = char_colors[0]
-                    self.pages[i]['text_boxes'].append(text_dict)
-
-            # Remove excess line endings, include those with one blank space on a line
-            # This will affect matching from textboxes to plaintext - commented out now
-            #page_text = page_text.replace('\n \n', '\n')
-            #page_text = page_text.replace('\n\n\n', '\n\n')
-            self.pages[i]['plain_text'] = page_text
-            page_end_index += len(page_text)
-            self.pages[i]['plain_text_end'] = page_end_index
-            self.pages[i]['plain_text_start'] = page_end_index - len(page_text)
-            self.full_text += page_text
-
-        if self.full_text == self.file_['fulltext']:
-            print(len(self.file_['fulltext']), len(self.full_text))
-            print("Plain text matches")
-        else:
-            print(len(self.file_['fulltext']), len(self.full_text))
-            print("Plain text does not match")
-
-    def show_page(self, page_num):
-        """ Display pdf page, using the PDF objects. """
-
-        page = self.pages[page_num]
+        page = self.pages[self.page_num]
         page_rect = page['mediabox']
         self.ui.textEdit.setText("")
         text_edit_text = ""
@@ -2886,8 +2833,8 @@ class DialogCodePdf(QtWidgets.QWidget):
                     font_size = 4
                 font = QtGui.QFont("Noto Sans", font_size)
                 item.setFont(font)
-                '''ttip = f"x:{int(t['left'])}, y:{int(t['top'])} {t['text']}"
-                item.setToolTip(ttip)'''
+                #ttip = f"x:{int(t['left'])}, y:{int(t['top'])} {t['text']}"
+                #item.setToolTip(ttip)
                 color = self.get_qcolor(t['color'])
                 if self.ui.checkBox_black_text.isChecked():
                     color = QtCore.Qt.GlobalColor.black
@@ -2924,7 +2871,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         for code_ in self.code_text:
             if code_['pos0'] <= text_item['pos0'] < code_['pos1']:
                 codes_format.append(code_)
-            if text_item['pos0'] < code_['pos0'] <= text_item['pos1']:
+            if text_item['pos0'] < code_['pos0'] < text_item['pos1']:
                 codes_format.append(code_)
             # Code starts within text_item text and continues beyond it
             if code_['pos0'] < text_item['pos1'] and code_['pos1'] > text_item['pos1']:
@@ -2949,7 +2896,12 @@ class DialogCodePdf(QtWidgets.QWidget):
             cursor.mergeCharFormat(fmt)
             #cursor.setCharFormat(fmt)
             # Check text matches
-            #TODO if cf['seltext'] != text_item['text'][pos0:pos1]:
+
+            # TODO add tooltip
+            #item.setToolTip("GGG")
+
+            # TODO if cf['seltext'] != text_item['text'][pos0:pos1]:
+
 
     def get_qcolor(self, pdf_color) -> QtGui.QColor:
         """  Get a pdf_color which can be in various formats.
