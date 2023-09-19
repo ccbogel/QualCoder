@@ -3019,7 +3019,7 @@ class RefiExport(QtWidgets.QDialog):
 
         self.codes = []
         cur = self.app.conn.cursor()
-        cur.execute("select name, memo, owner, date, cid, catid, color from code_name")
+        cur.execute("select name, ifnull(memo,''), owner, date, cid, catid, color from code_name")
         result = cur.fetchall()
         for row in result:
             c = {'name': row[0], 'memo': row[1], 'owner': row[2], 'date': row[3].replace(' ', 'T'),
@@ -3045,7 +3045,7 @@ class RefiExport(QtWidgets.QDialog):
 
         self.categories = []
         cur = self.app.conn.cursor()
-        cur.execute("select name, catid, owner, date, memo, supercatid from code_cat")
+        cur.execute("select name, catid, owner, date, ifnull(memo,''), supercatid from code_cat")
         result = cur.fetchall()
         for row in result:
             self.categories.append({'name': row[0], 'catid': row[1], 'owner': row[2],
