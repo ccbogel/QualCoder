@@ -28,17 +28,17 @@ https://qualcoder.wordpress.com/
 
 import csv
 import datetime
-from typing import Iterable
+import ebooklib
+from ebooklib import epub
+import PIL
+from PIL import Image
+from typing import Iterable, Any
 import webbrowser
 import zipfile
 from shutil import copyfile, move
 from urllib.parse import urlparse
 
-import PIL
-import ebooklib
-from PIL import Image
 from PyQt6 import QtCore, QtGui, QtWidgets
-from ebooklib import epub
 from pdfminer.converter import PDFPageAggregator
 from pdfminer.layout import LAParams, LTTextBox, LTTextLine
 from pdfminer.pdfdocument import PDFDocument
@@ -113,6 +113,7 @@ class DialogManageFiles(QtWidgets.QDialog):
     attribute_labels_ordered = []  # helps with filling table data
     av_dialog_open = None  # Used for opened AV dialog
     files_renamed = []  # list of dictionaries of old and new names and fid
+    pdf_page_text = ""  # Used when loading pdf text
 
     def __init__(self, app, parent_text_edit, tab_coding, tab_reports):
 
@@ -1312,11 +1313,6 @@ class DialogManageFiles(QtWidgets.QDialog):
                     self.load_file_text(f, "docs:" + link_path)
                 known_file_type = True
             if f.split('.')[-1].lower() == 'pdf':
-                '''if pdfminer_installed is False:
-                    text_ = "For Linux run the following on the terminal: sudo pip install pdfminer.six\n"
-                    text_ += "For Windows run the following in the command prompt: pip install pdfminer.six"
-                    Message(self.app, _("pdf miner is not installed"), _(text_), "critical").exec()
-                    return'''
                 destination += "/documents/" + filename
                 '''# Try and remove encryption from pdf if a simple encryption, for Linux
                 if platform.system() == "Linux":
@@ -1524,30 +1520,22 @@ class DialogManageFiles(QtWidgets.QDialog):
                     logger.debug("ebooklib get_body_content error " + str(err))
         # Import PDF
         if import_file[-4:].lower() == '.pdf':
-            fp = open(import_file, 'rb')  # read binary mode
-            parser = PDFParser(fp)
-            doc = PDFDocument(parser=parser)
-            parser.set_document(doc)
-            # Potential error with encrypted PDF
-            rsrcmgr = PDFResourceManager()
+            pdf_file = open(import_file, 'rb')
+            resource_manager = PDFResourceManager()
             laparams = LAParams()
-            laparams.char_margin = 1.0
-            laparams.word_margin = 1.0
-            device = PDFPageAggregator(rsrcmgr, laparams=laparams)
-            interpreter = PDFPageInterpreter(rsrcmgr, device)
-            for page in PDFPage.create_pages(doc):
+            # laparams.char_margin = 1.0
+            # laparams.word_margin = 1.0
+            device = PDFPageAggregator(resource_manager, laparams=laparams)
+            interpreter = PDFPageInterpreter(resource_manager, device)
+            pages_generator = PDFPage.get_pages(pdf_file)  # Generator PDFpage objects
+            text_ = ""
+            for i, page in enumerate(pages_generator):
+                self.pdf_page_text = ""
                 interpreter.process_page(page)
                 layout = device.get_result()
-                for lt_obj in layout:
-                    if isinstance(lt_obj, LTTextBox) or isinstance(lt_obj, LTTextLine):
-                        text_ += lt_obj.get_text()  # + "\n"  # add line to paragraph spacing for visual format
-                        # Fix Pdfminer recognising invalid unicode characters.
-                        text_ = text_.replace(u"\uE002", "Th")
-                        text_ = text_.replace(u"\uFB01", "fi")
-            # Remove excess line endings, include those with one blank space on a line
-            # Temporary mark out
-            #text_ = text_.replace('\n \n', '\n')
-            #text_ = text_.replace('\n\n\n', '\n\n')
+                for lobj in layout:
+                    self.get_item_and_hierarchy(page, lobj)
+                text_ += self.pdf_page_text
 
         # Import from html
         if import_file[-5:].lower() == ".html" or import_file[-4:].lower() == ".htm":
@@ -1629,7 +1617,6 @@ class DialogManageFiles(QtWidgets.QDialog):
                             self.app.settings['codername']]
             cur.execute(insert_sql, placeholders)
             self.app.conn.commit()
-
         msg = entry['name']
         if link_path == "":
             msg += _(" imported")
@@ -1637,6 +1624,22 @@ class DialogManageFiles(QtWidgets.QDialog):
             msg += _(" linked")
         self.parent_text_edit.append(msg)
         self.source.append(entry)
+
+    # Pdf loading method
+    def get_item_and_hierarchy(self, page, lobj: Any):
+        """ Get text item details add to page_dict, with descendants.
+        Use LTextLine as this object can be parsed in Code_pdf for font size and colour.
+        """
+
+        if isinstance(lobj, LTTextLine):  # Do not use LTTextBox
+            obj_text = lobj.get_text()
+            # Fix Pdfminer recognising invalid unicode characters.
+            obj_text = obj_text.replace(u"\uE002", "Th")
+            obj_text = obj_text.replace(u"\uFB01", "fi")
+            self.pdf_page_text += obj_text
+        if isinstance(lobj, Iterable):
+            for obj in lobj:
+                self.get_item_and_hierarchy(page, obj)
 
     def convert_odt_to_text(self, import_file):
         """ Convert odt to very rough equivalent with headings, list items and tables for

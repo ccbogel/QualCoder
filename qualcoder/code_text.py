@@ -2135,7 +2135,7 @@ class DialogCodeText(QtWidgets.QWidget):
         # Update tooltips to show only this code
         self.eventFilterTT.set_codes_and_annotations(self.app, tt_code_text, self.codes, self.annotations,
                                                      self.file_)
-        # Need to reload arrow icons as they dissapear on Windows
+        # Need to reload arrow icons as they dissappear on Windows
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_color_grid_icon_24), "png")
         self.ui.pushButton_show_all_codings.setIcon(QtGui.QIcon(pm))
@@ -2990,7 +2990,12 @@ class DialogCodeText(QtWidgets.QWidget):
         if "start" not in self.file_:
             self.file_['start'] = 0
         sql_values = []
-        file_result = self.app.get_file_texts([file_['id']])[0]
+        try:
+            file_result = self.app.get_file_texts([file_['id']])[0]
+        except IndexError:
+            # Error occurs when file opened here but also deleted in ManageFiles
+            self.file_ = None
+            return
         if "end" not in self.file_:
             self.file_['end'] = len(file_result['fulltext'])
         sql_values.append(int(file_result['id']))
