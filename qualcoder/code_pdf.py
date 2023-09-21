@@ -728,8 +728,9 @@ class DialogCodePdf(QtWidgets.QWidget):
                     logger.exception('Failed searching text %s for %s', filedata['name'], self.search_term)
         else:
             try:
-                if self.text:
-                    for match in pattern.finditer(self.text):
+                displayed_text = self.ui.textEdit.toPlainText()
+                if displayed_text != "":
+                    for match in pattern.finditer(displayed_text):
                         # Get result as first dictionary item
                         source_name = self.app.get_file_texts([self.file_['id'], ])[0]
                         self.search_indices.append((source_name, match.start(), len(match.group(0))))
@@ -2549,9 +2550,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         if "end" not in self.file_:
             self.file_['end'] = len(file_result['fulltext'])
         sql_values.append(int(file_result['id']))
-        # self.text = file_result['fulltext'][self.file_['start']:self.file_['end']]
-        # print(self.file_['start'], "-", self.file_['end'])
-        # self.ui.textEdit.setPlainText(self.text)
+        # self.text = file_result['fulltext'][self.file_['start']:self.file_['end']]  # tod remove
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
         self.show_all_codes_in_text()  # Deactivates the show_selected_code if this is active
@@ -2614,9 +2613,6 @@ class DialogCodePdf(QtWidgets.QWidget):
             msg += _("\nView PDF but cannot code. Code positions will appear wrongly.\nCharacter difference: ")
             msg += str(len(self.document_text) - len(self.file_['fulltext']))
             Message(self.app, _("Warning"), msg, "warning").exec()
-            d = list(difflib.unified_diff(self.document_text, self.file_['fulltext'], n=0))
-            for i in d:
-                print(i)
 
     def get_item_and_hierarchy(self, page, lobj: Any, depth=0):
         """ Get item details add to page_dict, with depth and all its descendants.
@@ -2859,20 +2855,17 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.file_['end'] = page['plain_text_end']
         self.get_coded_text_update_eventfilter_tooltips()
 
-    def format_text_box(self, graphics_item, text_item):
+    def format_text_box(self, item, text_item):
         """ Apply code backgrounds to text.
          Loop through coded text and match any at this position.
          param:
             item: QGraphicsTextItem
             text_item: dictionary of pdf text item data """
 
-        cursor = graphics_item.textCursor()
+        cursor = item.textCursor()
         codes_format = []
+        print(f"===========\n Page {self.page_num} Item {text_item['text']} {text_item['pos0']} - {text_item['pos1']}")
         for code_ in self.code_text:
-            if "collection and" in code_['seltext']:
-                print(self.ui.textEdit.toPlainText()[0:100])
-                print(f" page {self.page_num} CODE pos0 {code_['pos0']} pos1 {code_['pos1']} seltext {code_['seltext']}"
-                              f", GRITEM pos0 {text_item['pos0']}, pos1 {text_item['pos1']}")
             if code_['pos0'] <= text_item['pos0'] < code_['pos1']:
                 codes_format.append(code_)
             if text_item['pos0'] < code_['pos0'] < text_item['pos1']:
@@ -2880,17 +2873,15 @@ class DialogCodePdf(QtWidgets.QWidget):
             # Code starts within text_item text and continues beyond it
             if code_['pos0'] < text_item['pos1'] and code_['pos1'] > text_item['pos1']:
                 codes_format.append(code_)
-
+            print(f"Code {code_['seltext']} {code_['pos0']} - {code_['pos1']}")
         for cf in codes_format:
-            '''print(f" page {self.page_num} CODE pos0 {cf['pos0']} pos1 {cf['pos1']} seltext {cf['seltext']}"
-                  f", GRITEM pos0 {text_item['pos0']}, pos1 {text_item['pos1']}")'''
+            #print("CODE", cf['pos0'], cf['pos1'], cf['seltext'], "TXTITEM", text_item['pos0'], text_item['pos1'])
             pos0 = int(cf['pos0'] - text_item['pos0'])
             if pos0 < 0:
                 pos0 = 0
             pos1 = int(cf['pos1'] - text_item['pos0'])
             if pos1 > len(text_item['text']):
                 pos1 = len(text_item['text']) - 1
-            #print(f"TBOX pos0 {pos0} pos1 {pos1} lentext {len(graphics_item.toPlainText())}")
             cursor.setPosition(pos0, QtGui.QTextCursor.MoveMode.MoveAnchor) # Or zero
             cursor.setPosition(pos1, QtGui.QTextCursor.MoveMode.KeepAnchor)
             color = cf['color']
@@ -2994,7 +2985,7 @@ class DialogCodePdf(QtWidgets.QWidget):
     def unlight(self):
         """ Remove all text highlighting from current file. """
 
-        if self.text is None or self.text == "":
+        if self.ui.textEdit.toPlainText() == "":
             return
         cursor = self.ui.textEdit.textCursor()
         cursor.setPosition(0, QtGui.QTextCursor.MoveMode.MoveAnchor)
@@ -3009,58 +3000,54 @@ class DialogCodePdf(QtWidgets.QWidget):
         For defined colours in color_selector, make text light on dark, and conversely dark on light
         """
 
-        if self.file_ is None:
+        if self.file_ is None or self.ui.textEdit.toPlainText() == "":
             return
-        if len(self.ui.textEdit.toPlainText()) == 0:
-            return
-        if self.text is not None:
-            # Add coding highlights
-            codes = {x['cid']: x for x in self.codes}
-            for item in self.code_text:
-                fmt = QtGui.QTextCharFormat()
-                cursor = self.ui.textEdit.textCursor()
-                '''print(f"page {self.page_num} len_text {len(self.ui.textEdit.toPlainText())} "
-                      f"pos0 {int(item['pos0'] - self.file_['start'])} "
-                    f"pos1 {int(item['pos1'] - self.file_['start'])}")'''
-                cursor.setPosition(int(item['pos0'] - self.file_['start']), QtGui.QTextCursor.MoveMode.MoveAnchor)
-                cursor.setPosition(int(item['pos1'] - self.file_['start']), QtGui.QTextCursor.MoveMode.KeepAnchor)
-                color = codes.get(item['cid'], {}).get('color', "#777777")  # default gray
-                brush = QBrush(QColor(color))
-                fmt.setBackground(brush)
-                # Foreground depends on the defined need_white_text color in color_selector
-                text_brush = QBrush(QColor(TextColor(color).recommendation))
-                fmt.setForeground(text_brush)
-                # Highlight codes with memos - these are italicised
-                # Italics also used for overlapping codes
-                if item['memo'] != "":
-                    fmt.setFontItalic(True)
-                else:
-                    fmt.setFontItalic(False)
-                # Bold important codes
-                if item['important']:
-                    fmt.setFontWeight(QtGui.QFont.Weight.Bold)
-                # Use important flag for ONLY showing important codes (button selected)
-                if self.important and item['important'] == 1:
-                    cursor.setCharFormat(fmt)
-                # Show all codes, as important button not selected
-                if not self.important:
-                    cursor.setCharFormat(fmt)
+        # Add coding highlights
+        codes = {x['cid']: x for x in self.codes}
+        for item in self.code_text:
+            fmt = QtGui.QTextCharFormat()
+            cursor = self.ui.textEdit.textCursor()
+            #print(f"len text {len(self.ui.textEdit.toPlainText())} TEXTEDIT page {self.page_num} pos0 {item['pos0'] - self.file_['start']}"
+            #      f" pos1 {item['pos1'] - self.file_['start']}")  # tmp
+            cursor.setPosition(int(item['pos0'] - self.file_['start']), QtGui.QTextCursor.MoveMode.MoveAnchor)
+            cursor.setPosition(int(item['pos1'] - self.file_['start']), QtGui.QTextCursor.MoveMode.KeepAnchor)
+            color = codes.get(item['cid'], {}).get('color', "#777777")  # default gray
+            brush = QBrush(QColor(color))
+            fmt.setBackground(brush)
+            # Foreground depends on the defined need_white_text color in color_selector
+            text_brush = QBrush(QColor(TextColor(color).recommendation))
+            fmt.setForeground(text_brush)
+            # Highlight codes with memos - these are italicised
+            # Italics also used for overlapping codes
+            if item['memo'] != "":
+                fmt.setFontItalic(True)
+            else:
+                fmt.setFontItalic(False)
+            # Bold important codes
+            if item['important']:
+                fmt.setFontWeight(QtGui.QFont.Weight.Bold)
+            # Use important flag for ONLY showing important codes (button selected)
+            if self.important and item['important'] == 1:
+                cursor.setCharFormat(fmt)
+            # Show all codes, as important button not selected
+            if not self.important:
+                cursor.setCharFormat(fmt)
 
-            # Add annotation marks - these are in bold, important codings are also bold
-            for note in self.annotations:
-                if len(self.file_.keys()) > 0:  # will be zero if using autocode and no file is loaded
-                    # Cursor pos could be negative if annotation was for an earlier text portion
-                    cursor = self.ui.textEdit.textCursor()
-                    if note['fid'] == self.file_['id'] and \
-                            0 <= int(note['pos0']) - self.file_['start'] < int(note['pos1']) - self.file_['start'] <= \
-                            len(self.ui.textEdit.toPlainText()):
-                        cursor.setPosition(int(note['pos0']) - self.file_['start'],
-                                           QtGui.QTextCursor.MoveMode.MoveAnchor)
-                        cursor.setPosition(int(note['pos1']) - self.file_['start'],
-                                           QtGui.QTextCursor.MoveMode.KeepAnchor)
-                        format_bold = QtGui.QTextCharFormat()
-                        format_bold.setFontWeight(QtGui.QFont.Weight.Bold)
-                        cursor.mergeCharFormat(format_bold)
+        # Add annotation marks - these are in bold, important codings are also bold
+        for note in self.annotations:
+            if len(self.file_.keys()) > 0:  # will be zero if using autocode and no file is loaded
+                # Cursor pos could be negative if annotation was for an earlier text portion
+                cursor = self.ui.textEdit.textCursor()
+                if note['fid'] == self.file_['id'] and \
+                        0 <= int(note['pos0']) - self.file_['start'] < int(note['pos1']) - self.file_['start'] <= \
+                        len(self.ui.textEdit.toPlainText()):
+                    cursor.setPosition(int(note['pos0']) - self.file_['start'],
+                                       QtGui.QTextCursor.MoveMode.MoveAnchor)
+                    cursor.setPosition(int(note['pos1']) - self.file_['start'],
+                                       QtGui.QTextCursor.MoveMode.KeepAnchor)
+                    format_bold = QtGui.QTextCharFormat()
+                    format_bold.setFontWeight(QtGui.QFont.Weight.Bold)
+                    cursor.mergeCharFormat(format_bold)
         self.apply_underline_to_overlaps()
 
     def apply_underline_to_overlaps(self):

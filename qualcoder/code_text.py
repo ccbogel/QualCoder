@@ -3066,53 +3066,52 @@ class DialogCodeText(QtWidgets.QWidget):
         For defined colours in color_selector, make text light on dark, and conversely dark on light
         """
 
-        if self.file_ is None:
+        if self.file_ is None or self.ui.textEdit.toPlainText() == "":
             return
-        if self.text is not None:
-            # Add coding highlights
-            codes = {x['cid']: x for x in self.codes}
-            for item in self.code_text:
-                fmt = QtGui.QTextCharFormat()
-                cursor = self.ui.textEdit.textCursor()
-                cursor.setPosition(int(item['pos0'] - self.file_['start']), QtGui.QTextCursor.MoveMode.MoveAnchor)
-                cursor.setPosition(int(item['pos1'] - self.file_['start']), QtGui.QTextCursor.MoveMode.KeepAnchor)
-                color = codes.get(item['cid'], {}).get('color', "#777777")  # default gray
-                brush = QBrush(QColor(color))
-                fmt.setBackground(brush)
-                # Foreground depends on the defined need_white_text color in color_selector
-                text_brush = QBrush(QColor(TextColor(color).recommendation))
-                fmt.setForeground(text_brush)
-                # Highlight codes with memos - these are italicised
-                # Italics also used for overlapping codes
-                if item['memo'] != "":
-                    fmt.setFontItalic(True)
-                else:
-                    fmt.setFontItalic(False)
-                # Bold important codes
-                if item['important']:
-                    fmt.setFontWeight(QtGui.QFont.Weight.Bold)
-                # Use important flag for ONLY showing important codes (button selected)
-                if self.important and item['important'] == 1:
-                    cursor.setCharFormat(fmt)
-                # Show all codes, as important button not selected
-                if not self.important:
-                    cursor.setCharFormat(fmt)
+        # Add coding highlights
+        codes = {x['cid']: x for x in self.codes}
+        for item in self.code_text:
+            fmt = QtGui.QTextCharFormat()
+            cursor = self.ui.textEdit.textCursor()
+            cursor.setPosition(int(item['pos0'] - self.file_['start']), QtGui.QTextCursor.MoveMode.MoveAnchor)
+            cursor.setPosition(int(item['pos1'] - self.file_['start']), QtGui.QTextCursor.MoveMode.KeepAnchor)
+            color = codes.get(item['cid'], {}).get('color', "#777777")  # default gray
+            brush = QBrush(QColor(color))
+            fmt.setBackground(brush)
+            # Foreground depends on the defined need_white_text color in color_selector
+            text_brush = QBrush(QColor(TextColor(color).recommendation))
+            fmt.setForeground(text_brush)
+            # Highlight codes with memos - these are italicised
+            # Italics also used for overlapping codes
+            if item['memo'] != "":
+                fmt.setFontItalic(True)
+            else:
+                fmt.setFontItalic(False)
+            # Bold important codes
+            if item['important']:
+                fmt.setFontWeight(QtGui.QFont.Weight.Bold)
+            # Use important flag for ONLY showing important codes (button selected)
+            if self.important and item['important'] == 1:
+                cursor.setCharFormat(fmt)
+            # Show all codes, as important button not selected
+            if not self.important:
+                cursor.setCharFormat(fmt)
 
-            # Add annotation marks - these are in bold, important codings are also bold
-            for note in self.annotations:
-                if len(self.file_.keys()) > 0:  # will be zero if using autocode and no file is loaded
-                    # Cursor pos could be negative if annotation was for an earlier text portion
-                    cursor = self.ui.textEdit.textCursor()
-                    if note['fid'] == self.file_['id'] and \
-                            0 <= int(note['pos0']) - self.file_['start'] < int(note['pos1']) - self.file_['start'] <= \
-                            len(self.ui.textEdit.toPlainText()):
-                        cursor.setPosition(int(note['pos0']) - self.file_['start'],
-                                           QtGui.QTextCursor.MoveMode.MoveAnchor)
-                        cursor.setPosition(int(note['pos1']) - self.file_['start'],
-                                           QtGui.QTextCursor.MoveMode.KeepAnchor)
-                        format_bold = QtGui.QTextCharFormat()
-                        format_bold.setFontWeight(QtGui.QFont.Weight.Bold)
-                        cursor.mergeCharFormat(format_bold)
+        # Add annotation marks - these are in bold, important codings are also bold
+        for note in self.annotations:
+            if len(self.file_.keys()) > 0:  # will be zero if using autocode and no file is loaded
+                # Cursor pos could be negative if annotation was for an earlier text portion
+                cursor = self.ui.textEdit.textCursor()
+                if note['fid'] == self.file_['id'] and \
+                        0 <= int(note['pos0']) - self.file_['start'] < int(note['pos1']) - self.file_['start'] <= \
+                        len(self.ui.textEdit.toPlainText()):
+                    cursor.setPosition(int(note['pos0']) - self.file_['start'],
+                                       QtGui.QTextCursor.MoveMode.MoveAnchor)
+                    cursor.setPosition(int(note['pos1']) - self.file_['start'],
+                                       QtGui.QTextCursor.MoveMode.KeepAnchor)
+                    format_bold = QtGui.QTextCharFormat()
+                    format_bold.setFontWeight(QtGui.QFont.Weight.Bold)
+                    cursor.mergeCharFormat(format_bold)
         self.apply_underline_to_overlaps()
 
     def apply_underline_to_overlaps(self):
