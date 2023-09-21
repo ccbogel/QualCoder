@@ -172,7 +172,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
                 res = [0]
             tt = ""
             f['mediapath'] = res[1]
-            if res[1] is None or res[1][0:5] == "docs:":
+            if res[1] is None or res[1][0:5] == "docs:" or res[1][0:5] == "/docs":
                 tt += _("Text file\n")
                 tt += _("Characters: ") + str(res[0])
                 f['type'] = 'text'
