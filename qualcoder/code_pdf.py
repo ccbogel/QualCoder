@@ -2859,16 +2859,20 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.file_['end'] = page['plain_text_end']
         self.get_coded_text_update_eventfilter_tooltips()
 
-    def format_text_box(self, item, text_item):
+    def format_text_box(self, graphics_item, text_item):
         """ Apply code backgrounds to text.
          Loop through coded text and match any at this position.
          param:
             item: QGraphicsTextItem
             text_item: dictionary of pdf text item data """
 
-        cursor = item.textCursor()
+        cursor = graphics_item.textCursor()
         codes_format = []
         for code_ in self.code_text:
+            if "collection and" in code_['seltext']:
+                print(self.ui.textEdit.toPlainText()[0:100])
+                print(f" page {self.page_num} CODE pos0 {code_['pos0']} pos1 {code_['pos1']} seltext {code_['seltext']}"
+                              f", GRITEM pos0 {text_item['pos0']}, pos1 {text_item['pos1']}")
             if code_['pos0'] <= text_item['pos0'] < code_['pos1']:
                 codes_format.append(code_)
             if text_item['pos0'] < code_['pos0'] < text_item['pos1']:
@@ -2876,14 +2880,17 @@ class DialogCodePdf(QtWidgets.QWidget):
             # Code starts within text_item text and continues beyond it
             if code_['pos0'] < text_item['pos1'] and code_['pos1'] > text_item['pos1']:
                 codes_format.append(code_)
+
         for cf in codes_format:
-            #print("CODE", cf['pos0'], cf['pos1'], cf['seltext'], "TXTITEM", text_item['pos0'], text_item['pos1'])
+            '''print(f" page {self.page_num} CODE pos0 {cf['pos0']} pos1 {cf['pos1']} seltext {cf['seltext']}"
+                  f", GRITEM pos0 {text_item['pos0']}, pos1 {text_item['pos1']}")'''
             pos0 = int(cf['pos0'] - text_item['pos0'])
             if pos0 < 0:
                 pos0 = 0
             pos1 = int(cf['pos1'] - text_item['pos0'])
             if pos1 > len(text_item['text']):
                 pos1 = len(text_item['text']) - 1
+            #print(f"TBOX pos0 {pos0} pos1 {pos1} lentext {len(graphics_item.toPlainText())}")
             cursor.setPosition(pos0, QtGui.QTextCursor.MoveMode.MoveAnchor) # Or zero
             cursor.setPosition(pos1, QtGui.QTextCursor.MoveMode.KeepAnchor)
             color = cf['color']
@@ -3004,12 +3011,17 @@ class DialogCodePdf(QtWidgets.QWidget):
 
         if self.file_ is None:
             return
+        if len(self.ui.textEdit.toPlainText()) == 0:
+            return
         if self.text is not None:
             # Add coding highlights
             codes = {x['cid']: x for x in self.codes}
             for item in self.code_text:
                 fmt = QtGui.QTextCharFormat()
                 cursor = self.ui.textEdit.textCursor()
+                '''print(f"page {self.page_num} len_text {len(self.ui.textEdit.toPlainText())} "
+                      f"pos0 {int(item['pos0'] - self.file_['start'])} "
+                    f"pos1 {int(item['pos1'] - self.file_['start'])}")'''
                 cursor.setPosition(int(item['pos0'] - self.file_['start']), QtGui.QTextCursor.MoveMode.MoveAnchor)
                 cursor.setPosition(int(item['pos1'] - self.file_['start']), QtGui.QTextCursor.MoveMode.KeepAnchor)
                 color = codes.get(item['cid'], {}).get('color', "#777777")  # default gray
