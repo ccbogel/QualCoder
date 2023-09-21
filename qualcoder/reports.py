@@ -642,13 +642,17 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
             total['single_coded'] += single_coded
             total['uncoded'] += uncoded
             total['characters'] += f[1]
-        total['agreement'] = round(100 * (total['dual_coded'] + total['uncoded']) / total['characters'], 2)
-        total['dual_percent'] = round(100 * total['dual_coded'] / total['characters'], 2)
-        total['uncoded_percent'] = round(100 * total['uncoded'] / total['characters'], 2)
-        total['disagreement'] = round(100 - total['agreement'], 2)
-        try:
+        if total['characters'] != 0:
+            total['agreement'] = round(100 * (total['dual_coded'] + total['uncoded']) / total['characters'], 2)
+            total['dual_percent'] = round(100 * total['dual_coded'] / total['characters'], 2)
+            total['uncoded_percent'] = round(100 * total['uncoded'] / total['characters'], 2)
+            total['disagreement'] = round(100 - total['agreement'], 2)
             total['agree_coded_only'] = round(100 * total['dual_coded'] / (total['dual_coded'] + total['single_coded']), 2)
-        except ZeroDivisionError:
+        else:
+            total['agreement'] = "zero div"
+            total['dual_percent'] = "zero div"
+            total['uncoded_percent'] = "zero div"
+            total['disgreement'] = "zero div"
             total['agree_coded_only'] = "zero div"
         # Cohen's Kappa
         '''
