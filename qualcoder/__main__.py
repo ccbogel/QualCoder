@@ -1402,9 +1402,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
         files = self.app.get_pdf_filenames()
         if len(files) > 0:
-            msg = "Under construction"
+            '''msg = "Under construction"
             Message(self.app, _('TODO'), msg).exec()
-            return
+            return'''
             self.ui.label_coding.hide()
             ui = DialogCodePdf(self.app, self.ui.textEdit, self.ui.tab_reports)
             ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
