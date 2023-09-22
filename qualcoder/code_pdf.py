@@ -3131,10 +3131,12 @@ class DialogCodePdf(QtWidgets.QWidget):
             for graphic_textbox in self.selected_graphic_textboxes:
                 if textbox['graphic_item_ref'] == graphic_textbox:
                     selected_boxes.append(textbox)
-
+        # Go through the text_boxes charcter positions
+        # Link up boxes so that one stringof coded text is applied.
+        linked_positions = []
         for tb in selected_boxes:
-            print(tb)
-            #print(graphic_tb.toPlainText())
+            #print(tb)
+            print("CHAR POS:", tb['pos0'], tb['pos1'])
 
     def mark(self):
         """ Mark selected text in file with currently selected code.
