@@ -14,6 +14,10 @@ If you like QualCoder please vuy me a coffee ...
 
 <a href="https://www.buymeacoffee.com/ccbogelB" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
 
+## NOTE - 22 September 2023
+There is an experimental Code PDF function tht has been added in the latest code (from today).
+It's functionality is still undergoing a lot of testing. 
+
 ## INSTALLATION 
 
 ### Prerequisites
