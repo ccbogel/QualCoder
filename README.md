@@ -10,15 +10,16 @@ Instructions and other information are available here: https://qualcoder.wordpre
 
 It is best to download the Current Release form the Releases page. Occassional errors can occur in this latest code.
 
-If you like QualCoder please vuy me a coffee ...
+If you like QualCoder please buy me a coffee ...
 
 <a href="https://www.buymeacoffee.com/ccbogelB" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
+
+
+## INSTALLATION 
 
 ## NOTE - 22 September 2023
 There is an experimental Code PDF function tht has been added in the latest code (from today).
 It's functionality is still undergoing a lot of testing. 
-
-## INSTALLATION 
 
 ### Prerequisites
 Optional: VLC for audio/video coding. 
