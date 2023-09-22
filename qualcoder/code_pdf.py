@@ -158,8 +158,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.total_pages = 0
         self.full_text = ""
         self.page_full_text = ""
-        self.text_items = []
-        self.selected_text_boxes = ""
+        self.selected_graphic_textboxes = []
         self.pdf_object_info_text = ""  # Contains details of PDF page objects
         self.page_dict = {}  # Temporary variable used when loading PDF pages
 
@@ -306,7 +305,7 @@ class DialogCodePdf(QtWidgets.QWidget):
 
         # Graphics view items setup
         self.ui.graphicsView.setDragMode(QtWidgets.QGraphicsView.DragMode.RubberBandDrag)
-        # Need this otherwise small images are centred on screen, and affect context menu position points
+        # Need this otherwise images are centred on screen, and affect context menu position points
         self.ui.graphicsView.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignTop)
         self.ui.graphicsView.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         #self.ui.graphicsView.customContextMenuRequested.connect(self.graphicsview_menu)
@@ -329,10 +328,12 @@ class DialogCodePdf(QtWidgets.QWidget):
         msg += "\n" + _("Some images will not display and image masks and rotations will not work.")
         msg += "\n" + _("Original fonts or bold or italic are not applied.")
         msg += "\n" + _("There is not enough information in pdfminer to accurately display polygon curves.")
-        msg += "\n" + _("Plain text must match exactly for this function to work well.")
+        msg += "\n" + _("Plain text must match exactly for Code PDF to work correctly.")
+        msg += "\n" + _("A warning will display if the parsed PDF text does not match the database stored plain text.")
         msg += "\n" + _("Plain text of PDFs loaded in to QualCoder before version 3.4 will not have the plain text positions correct for PDF display.")
         msg += "\n" + _("This means coding stripes will show in incorrect positions.")
         msg += "\n" + _("Similarly, if the PDF plain text has beeen edited in any way, this will affect coding stripes display.")
+        msg += "\n" + _("For now, coding is done via the right-hand side plain text pane.")
         msg += "\n" + _("THIS FUNCTION IS EXPERIMENTAL AND UNDERGOING LOTS OF UPDATES")
         Message(self.app, _("Information") + " " * 20, msg).exec()
 
@@ -495,11 +496,11 @@ class DialogCodePdf(QtWidgets.QWidget):
                 self.ui.label_code.setToolTip(tt)
                 break
         selected_text = self.ui.textEdit.textCursor().selectedText()
-        self.selected_textboxes = self.scene.selectedItems()
-        if len(selected_text) > 0 and len(self.selected_textboxes) == 0:
+        # TODO Need more info here to do marking/unmarking
+        self.selected_graphic_textboxes = self.scene.selectedItems()
+        if len(selected_text) > 0 and len(self.selected_graphic_textboxes) == 0:
             self.mark()
-        #print(len(selected_text), len(self.selected_textboxes))
-        if len(selected_text) == 0 and len(self.selected_textboxes) > 0:
+        if len(selected_text) == 0 and len(self.selected_graphic_textboxes) > 0:
             self.mark_selected_textboxes()
 
         # When a code is selected undo the show selected code features
@@ -839,7 +840,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             return
 
     def show_pdf_object_info(self):
-        """ show the pdf object in information dialog """
+        """ show the pdf object in information dialog. """
 
         if self.pdf_object_info_text == "":
             return
@@ -1058,6 +1059,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             pass
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
+        self.update_page_text_objects()
 
     def recursive_set_current_item(self, item, text_):
         """ Set matching item to be the current selected item.
@@ -1678,6 +1680,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.app.conn.commit()
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
+        self.update_page_text_objects()
 
     def extend_right(self, code_):
         """ Shift right arrow. """
@@ -1695,6 +1698,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.app.conn.commit()
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
+        self.update_page_text_objects()
 
     def shrink_to_left(self, code_):
         """ Alt left arrow, shrinks code from the right end of the code. """
@@ -1711,6 +1715,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.app.conn.commit()
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
+        self.update_page_text_objects()
 
     def shrink_to_right(self, code_):
         """ Alt right arrow shrinks code from the left end of the code. """
@@ -1727,6 +1732,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.app.conn.commit()
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
+        self.update_page_text_objects()
 
     def show_selected_code_in_text_next(self):
         """ Highlight only the selected code in the text. Move to next instance in text
@@ -2342,8 +2348,6 @@ class DialogCodePdf(QtWidgets.QWidget):
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         action_next = None
         action_latest = None
-        '''action_next_chars = None
-        action_prev_chars = None'''
         action_show_files_like = None
         action_show_case_files = None
         action_show_by_attribute = None
@@ -2361,12 +2365,6 @@ class DialogCodePdf(QtWidgets.QWidget):
             action_show_files_like = menu.addAction(_("Show files like"))
             action_show_by_attribute = menu.addAction(_("Show files by attributes"))
             action_show_case_files = menu.addAction(_("Show case files"))
-        '''if file_ is not None and file_['characters'] > self.app.settings['codetext_chunksize']:
-            action_next_chars = menu.addAction(str(self.app.settings['codetext_chunksize']) + _(" next  characters"))
-            if file_['start'] > 0:
-                action_prev_chars = menu.addAction(
-                    str(self.app.settings['codetext_chunksize']) + _(" previous  characters"))'''
-        #action_go_to_bookmark = menu.addAction(_("Go to bookmark"))
         action = menu.exec(self.ui.listWidget.mapToGlobal(position))
         if action is None:
             return
@@ -2378,12 +2376,6 @@ class DialogCodePdf(QtWidgets.QWidget):
             self.go_to_next_file()
         if action == action_latest:
             self.go_to_latest_coded_file()
-        '''if action == action_go_to_bookmark:
-            self.go_to_bookmark()
-        if action == action_next_chars:
-            self.next_chars(file_, selected)
-        if action == action_prev_chars:
-            self.prev_chars(file_, selected)'''
         if action == action_show_files_like:
             self.show_files_like()
         if action == action_show_case_files:
@@ -2408,7 +2400,6 @@ class DialogCodePdf(QtWidgets.QWidget):
             webbrowser.open(doc_path)
             return
         logger.error("Cannot open text file in browser " + self.file_['mediapath'])
-        print("code_text.view_original_text_file. Cannot open text file in browser " + self.file_['mediapath'])
 
     def show_case_files(self):
         """ Show files of specified case.
@@ -2456,8 +2447,6 @@ class DialogCodePdf(QtWidgets.QWidget):
         cur.execute('select id from source where name like ?', ['%' + text_ + '%'])
         res = cur.fetchall()
         file_ids = [r[0] for r in res]
-        '''for r in res:
-            file_ids.append(r[0])'''
         self.get_files(file_ids)
 
     def go_to_next_file(self):
@@ -2477,7 +2466,8 @@ class DialogCodePdf(QtWidgets.QWidget):
 
     def go_to_latest_coded_file(self):
         """ Go and open file with the latest coding.
-        Files menu option. """
+        Files menu option.
+        #TODO check this works correctly """
 
         sql = "SELECT code_text.fid FROM code_text join source on source.id=code_text.fid \
             where code_text.owner=? and lower(source.mediapath)='%pdf' order by code_text.date desc limit 1"
@@ -2583,14 +2573,14 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.checkBox_search_case.setEnabled(True)
         self.ui.checkBox_search_all_files.setEnabled(True)
         self.search_for_text()
-        self.load_pdf()
+        self.load_pdf_pages()
         self.ui.spinBox.setMinimum(1)
         self.ui.spinBox.setMaximum(len(self.pages))
         self.ui.spinBox.setToolTip(_("Pages: ") + str(len(self.pages)))
         self.ui.spinBox.setEnabled(True)
         self.show_page()
 
-    def load_pdf(self):
+    def load_pdf_pages(self):
         """ Load page elements for all pages in the PDF.
 
                 # next_result is a tuple containing a dictionary of
@@ -2616,7 +2606,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         pages_generator = PDFPage.get_pages(pdf_file)  # generator PDFpage objects
         self.pages = []
         self.page_num = 0
-        self.document_text = ""
+        document_text = ""
         self.page_end_index = 0  # text end of page
         self.text_pos0 = 0  # character pos
         for i, page in enumerate(pages_generator):
@@ -2626,27 +2616,25 @@ class DialogCodePdf(QtWidgets.QWidget):
             interpreter.process_page(page)
             layout = device.get_result()
             for lobj in layout:
-                self.get_item_and_hierarchy(page, lobj)
+                self.get_pdf_items_and_hierarchy(page, lobj)
             self.page_dict['plain_text'] = self.page_text
             self.page_dict['plain_text_start'] = self.page_end_index
             self.page_end_index += len(self.page_text)
             self.page_dict['plain_text_end'] = self.page_end_index
             self.pages.append(self.page_dict)
-            self.document_text += self.page_text
-        if self.document_text != self.file_['fulltext']:
-            #print("MISMATCH TEXTS:", len(self.full_text), "SQL FILE", len(self.file_['fulltext']))
-            #print("DIFF:", len(self.full_text) - len(self.file_['fulltext']))
-            msg = _("Texts do not match. Likely PDF imported before 3.4 QualCodr version or the PDF text has been edited.")
+            document_text += self.page_text
+        if document_text != self.file_['fulltext']:
+            msg = _("Parsing the PDF text.") + "\n"
+            msg += _("Texts do not match. PDF imported before 3.4 QualCodr version or the PDF text has been edited.")
             msg += _("\nView PDF but cannot code. Code positions will appear wrongly.\nCharacter difference: ")
-            msg += str(len(self.document_text) - len(self.file_['fulltext']))
+            msg += str(abs(len(document_text) - len(self.file_['fulltext'])))
             Message(self.app, _("Warning"), msg, "warning").exec()
 
-    def get_item_and_hierarchy(self, page, lobj: Any, depth=0):
+    def get_pdf_items_and_hierarchy(self, page, lobj: Any, depth=0):
         """ Get item details add to page_dict, with depth and all its descendants.
         Objects added to self.page_dict, with depth counter.
-        LTFigure objects are not listed in the if statements, as they are containers for other objects, and are
-        iterated, via the isinstance(Iteratable).
-
+        LTFigure objects are not listed in the if statements, as they are containers for other objects,
+         and are iterated, via the isinstance(Iteratable).
         """
 
         if isinstance(lobj, LTLine):
@@ -2689,8 +2677,9 @@ class DialogCodePdf(QtWidgets.QWidget):
             left, btm, right, top, text_ = lobj.x0, lobj.y0, lobj.x1, lobj.y1, lobj.get_text()
             text_dict = {'left': round(left, 3), 'btm': round(page.mediabox[3] - btm, 3),
                              'top': round(page.mediabox[3] - top, 3),
-                             'right': round(right, 3), 'text': text_, 'depth': depth,
-                             'pos0': self.text_pos0, 'pos1': self.text_pos0 + len(text_) + 1}
+                             'right': round(right, 3), 'text': text_, 'pos0': self.text_pos0,
+                         'pos1': self.text_pos0 + len(text_) + 1, 'graphic_item_ref': None,
+                         'depth': depth,}
             # Fix Pdfminer recognising invalid unicode characters.
             text_dict['text'] = text_dict['text'].replace(u"\uE002", "Th")
             text_dict['text'] = text_dict['text'].replace(u"\uFB01", "fi")
@@ -2753,7 +2742,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             # Includes LTFigure objects
             # Must not iterate the TextLines within the TextBox - otherwise double ups occur
             for obj in lobj:
-                self.get_item_and_hierarchy(page, obj, depth=depth + 1)
+                self.get_pdf_items_and_hierarchy(page, obj, depth=depth + 1)
 
     def show_page(self):
         """ Display pdf page, using the PDF objects. Only checked pdf objects are displayed.
@@ -2772,14 +2761,11 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.graphicsView.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)  #RenderHint.SmoothPixmapTransform)  # Antialiasing
         self.scene.setSceneRect(QtCore.QRectF(0, 0, page_rect[2], page_rect[3]))
         self.ui.graphicsView.setScene(self.scene)
-        #self.ui.graphicsView.setBackgroundBrush(QtCore.Qt.GlobalColor.white)
         self.scene.setBackgroundBrush(QtCore.Qt.GlobalColor.white)
         self.scene.installEventFilter(self)  # TODO Later
         gray_pen = QtGui.QPen(QtCore.Qt.GlobalColor.gray, 1, QtCore.Qt.PenStyle.SolidLine)
-        gray_dotted_pen = QtGui.QPen(QtCore.Qt.GlobalColor.gray, 1, QtCore.Qt.PenStyle.DotLine)
         self.scene.addRect(0, 0, page_rect[2], page_rect[3], gray_pen)
         counter = 0
-        # Not sure to display these rects
         if self.ui.checkBox_rect.isChecked():
             for r in page['rect']:
                 counter += 1
@@ -2792,7 +2778,6 @@ class DialogCodePdf(QtWidgets.QWidget):
                 if r['stroke']:
                     color = self.get_qcolor(r['stroking_color'])
                     item.setPen(QtGui.QPen(color, r['linewidth']))  # Border
-
         if self.ui.checkBox_curve.isChecked():
             # https://stackoverflow.com/questions/63016214/drawing-multi-point-curve-with-pyqt5
             # addPath QPainterPath - maybe?
@@ -2810,7 +2795,6 @@ class DialogCodePdf(QtWidgets.QWidget):
                     pen = QtGui.QPen(QtGui.QBrush(QtCore.Qt.BrushStyle.NoBrush), 0)  # Border
                     item = QtGui.QPolygonF(c['pts'])
                     self.scene.addPolygon(item,pen , brush)
-
         # Images before or after curves?
         # Seems better here, but sometimes overlaps
         if self.ui.checkBox_image.isChecked():
@@ -2820,18 +2804,16 @@ class DialogCodePdf(QtWidgets.QWidget):
                 for k in img:
                     self.pdf_object_info_text += k + ": " + str(img[k]) + "\n"
                 self.pdf_object_info_text += "\n"
-                #self.put_image_into_textedit(img, counter)
-                # Add pixmap to textEdit
                 if img['pixmap']:
                     qpixmap_item = self.scene.addPixmap(img['pixmap'])
                     qpixmap_item.setPos(img['x'], img['y'])
                 else:
+                    # Use placeholder question mark icon
                     pixmap = QtGui.QPixmap()
                     pixmap.loadFromData(QtCore.QByteArray.fromBase64(question_icon), "png")
                     pixmap = pixmap.scaled(int(img['w']), int(img['h']))
                     qpixmap_item = self.scene.addPixmap(pixmap)
                     qpixmap_item.setPos(img['x'], img['y'])
-
         if self.ui.checkBox_line.isChecked():
             for line in page['lines']:
                 counter += 1
@@ -2842,9 +2824,9 @@ class DialogCodePdf(QtWidgets.QWidget):
                 if line['fill']:
                     color = self.get_qcolor(line['non_stroking_color'])
                 line_pen = QtGui.QPen(color, line['linewidth'], QtCore.Qt.PenStyle.SolidLine)
-                item = self.scene.addLine(line['x0'], line['y0'], line['x1'], line['y1'], line_pen)
+                self.scene.addLine(line['x0'], line['y0'], line['x1'], line['y1'], line_pen)
         self.update_page_text_objects()
-        counter += len(self.text_items)
+        counter += len(page['text_boxes'])
         text_edit_text += "\n\nOBJECTS: " + str(counter)
         self.pdf_object_info_text += "\n" + _("TEXT START CHARACTER POSITION: ") + str(page['plain_text_start']) + "\n"
         self.pdf_object_info_text += _("TEXT END CHARACTER POSITION: ") + str(page['plain_text_end']) + "\n"
@@ -2853,15 +2835,17 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.get_coded_text_update_eventfilter_tooltips()
 
     def update_page_text_objects(self):
-        """ pdf text graphics objects are shown on scene.
+        """ Pdf text graphics objects are shown on scene.
          Update the highlighting of these objects when codes are marked / unmarked or changed in some way,
-          e.g. changed code colour."""
+          e.g. changed code colour.
+          Called by: show_page, extend_left, extend_right, shrink_left, shrink_right, merge_codes, delete_code,
+          mark, unmark, undo_last_unmarked, rename_category_or_code, change_code_color, change_code_to_another_code
+        """
 
         for graphics_item in self.scene.items():
             if isinstance(graphics_item, QtWidgets.QGraphicsTextItem):
                 self.scene.removeItem(graphics_item)
 
-        self.text_items = []
         if not self.ui.checkBox_text.isChecked():
             return
         page = self.pages[self.page_num]
@@ -2885,7 +2869,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             # Interaction
             item.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditorInteraction)
             item.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
-            self.text_items.append(item)
+            text_box['graphic_item_ref'] = item
 
     def format_text_box(self, item, text_item):
         """ Apply code backgrounds to text.
@@ -3131,20 +3115,26 @@ class DialogCodePdf(QtWidgets.QWidget):
             cursor.mergeCharFormat(fmt)
 
     def mark_selected_textboxes(self):
-        """  """
+        """ Code selected graphcs textboxes. Textboxes are selected via mouse drag.
+        Graphics textboxes are referenced within pages[page_num][text_box] dictionary.
+         Textboxes often overlap. """
 
-        pass
-        #TODO
-        '''item = self.ui.treeWidget.currentItem()
+        item = self.ui.treeWidget.currentItem()
         if item is None:
             Message(self.app, _('Warning'), _("No code was selected"), "warning").exec()
             return
         if item.text(1).split(':')[0] == 'catid':  # must be a code
             return
-        print(len(self.selected_textboxes))
         cid = int(item.text(1).split(':')[1])
-        for tb in self.selected_textboxes:
-            print(tb.toPlainText())'''
+        selected_boxes = []
+        for textbox in self.pages[self.page_num]['text_boxes']:
+            for graphic_textbox in self.selected_graphic_textboxes:
+                if textbox['graphic_item_ref'] == graphic_textbox:
+                    selected_boxes.append(textbox)
+
+        for tb in selected_boxes:
+            print(tb)
+            #print(graphic_tb.toPlainText())
 
     def mark(self):
         """ Mark selected text in file with currently selected code.
