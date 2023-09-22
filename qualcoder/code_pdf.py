@@ -2595,7 +2595,6 @@ class DialogCodePdf(QtWidgets.QWidget):
             self.page_text = ""
             self.page_dict = {'pagenum': i, 'mediabox': page.mediabox, 'text_boxes': [], 'lines': [], 'curves': [],
                               'images': [], 'rect': [], 'plain_text': [], 'plain_text_start': 0, 'plain_text_end': 0}
-            # print(f'Processing page: {i + 1}')
             interpreter.process_page(page)
             layout = device.get_result()
             for lobj in layout:
@@ -2733,6 +2732,9 @@ class DialogCodePdf(QtWidgets.QWidget):
         Coded text segments are shown in their QGraphicsTextItems. """
 
         page = self.pages[self.page_num]
+        # Start and end marks for code positioning in textEdit display
+        self.file_['start'] = page['plain_text_start']
+        self.file_['end'] = page['plain_text_end']
         page_rect = page['mediabox']
         self.ui.textEdit.setText("")
         text_edit_text = ""
@@ -2850,9 +2852,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.pdf_object_info_text += _("NUMBER OF CHARACTERS: ") + str(page['plain_text_end'] - page['plain_text_start'])
 
         self.ui.textEdit.setText(page['plain_text'])
-        # Start and end marks for code positioning in textEdit display
-        self.file_['start'] = page['plain_text_start']
-        self.file_['end'] = page['plain_text_end']
+
         self.get_coded_text_update_eventfilter_tooltips()
 
     def format_text_box(self, item, text_item):
@@ -2863,28 +2863,43 @@ class DialogCodePdf(QtWidgets.QWidget):
             text_item: dictionary of pdf text item data """
 
         cursor = item.textCursor()
-        codes_format = []
-        print(f"===========\n Page {self.page_num} Item {text_item['text']} {text_item['pos0']} - {text_item['pos1']}")
+        codes_for_item = []
+
+        '''print(f"===========\n Page {self.page_num} displayed as ({self.page_num +1 }) "
+              f"page_start {self.pages[self.page_num]['plain_text_start']} "
+              f"page_end {self.pages[self.page_num]['plain_text_end']} "
+              f"Item: {text_item['text']} item pos0 - pos1 :{text_item['pos0']} - {text_item['pos1']}")'''
+        ''' page 0 (1) all codes are listed
+        page 1 (2) only one code in the list ?
+        Then when changing back to page 0, one 1 code is in the code_text list ??
+        '''
+        '''for c in self.code_text:
+            print(c)'''
+
+        # TODO add in self.pages[self.page_num]['plain_text_start'] or end
         for code_ in self.code_text:
             if code_['pos0'] <= text_item['pos0'] < code_['pos1']:
-                codes_format.append(code_)
+                codes_for_item.append(code_)
             if text_item['pos0'] < code_['pos0'] < text_item['pos1']:
-                codes_format.append(code_)
+                codes_for_item.append(code_)
             # Code starts within text_item text and continues beyond it
-            if code_['pos0'] < text_item['pos1'] and code_['pos1'] > text_item['pos1']:
-                codes_format.append(code_)
-            print(f"Code {code_['seltext']} {code_['pos0']} - {code_['pos1']}")
-        for cf in codes_format:
-            #print("CODE", cf['pos0'], cf['pos1'], cf['seltext'], "TXTITEM", text_item['pos0'], text_item['pos1'])
-            pos0 = int(cf['pos0'] - text_item['pos0'])
+            if code_['pos0'] < text_item['pos1'] < code_['pos1']:
+                codes_for_item.append(code_)
+            #print(f"Code {code_['seltext']} {code_['pos0']} - {code_['pos1']}")
+        if not codes_for_item:
+            return
+        tooltip_text = ""
+        for graphics_item_code in codes_for_item:
+            print("CF", graphics_item_code)
+            pos0 = int(graphics_item_code['pos0'] - text_item['pos0'])
             if pos0 < 0:
                 pos0 = 0
-            pos1 = int(cf['pos1'] - text_item['pos0'])
+            pos1 = int(graphics_item_code['pos1'] - text_item['pos0'])
             if pos1 > len(text_item['text']):
                 pos1 = len(text_item['text']) - 1
             cursor.setPosition(pos0, QtGui.QTextCursor.MoveMode.MoveAnchor) # Or zero
             cursor.setPosition(pos1, QtGui.QTextCursor.MoveMode.KeepAnchor)
-            color = cf['color']
+            color = graphics_item_code['color']
             brush = QBrush(QColor(color))
             fmt = QtGui.QTextCharFormat()
             fmt.setBackground(brush)
@@ -2893,12 +2908,12 @@ class DialogCodePdf(QtWidgets.QWidget):
             fmt.setForeground(QBrush(QColor(foreground_color)))
             cursor.mergeCharFormat(fmt)
             #cursor.setCharFormat(fmt)
-            # Check text matches
 
             # TODO add tooltip
-            #item.setToolTip("GGG")
+            tooltip_text += graphics_item_code['name'] + "\n"
+            # Check text matches
+            item.setToolTip(tooltip_text)
 
-            # TODO if cf['seltext'] != text_item['text'][pos0:pos1]:
 
 
     def get_qcolor(self, pdf_color) -> QtGui.QColor:
@@ -2951,7 +2966,7 @@ class DialogCodePdf(QtWidgets.QWidget):
 
         if self.file_ is None:
             return
-        sql_values = [int(self.file_['id']), self.app.settings['codername'], self.file_['start'], self.file_['end']]
+        sql_values = [int(self.file_['id']), self.app.settings['codername']]  # , self.file_['start'], self.file_['end']]
         # Get code text for this file and for this coder
         self.code_text = []
         # seltext length, longest first, so overlapping shorter text is superimposed.
@@ -2959,8 +2974,7 @@ class DialogCodePdf(QtWidgets.QWidget):
               "code_text.memo, important, name"
         sql += " from code_text join code_name on code_text.cid = code_name.cid"
         sql += " where fid=? and code_text.owner=? "
-        # For file text which is currently loaded
-        sql += " and pos0 >=? and pos1 <=? "
+        # sql += " and pos0 >=? and pos1 <=? "  # problem area, removed
         sql += "order by length(seltext) desc, important asc"
         cur = self.app.conn.cursor()
         cur.execute(sql, sql_values)
@@ -2968,6 +2982,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         keys = 'ctid', 'cid', 'fid', 'seltext', 'pos0', 'pos1', 'owner', 'date', 'memo', 'important', 'name'
         for row in code_results:
             self.code_text.append(dict(zip(keys, row)))
+
         # Update filter for tooltip and redo formatting
         if self.important:
             imp_coded = []
@@ -3007,8 +3022,11 @@ class DialogCodePdf(QtWidgets.QWidget):
         for item in self.code_text:
             fmt = QtGui.QTextCharFormat()
             cursor = self.ui.textEdit.textCursor()
-            #print(f"len text {len(self.ui.textEdit.toPlainText())} TEXTEDIT page {self.page_num} pos0 {item['pos0'] - self.file_['start']}"
-            #      f" pos1 {item['pos1'] - self.file_['start']}")  # tmp
+            '''print(f"len text {len(self.ui.textEdit.toPlainText())} TEXTEDIT page {self.page_num} pos0 {item['pos0'] - self.file_['start']}"
+                  f" pos1 {item['pos1'] - self.file_['start']}"
+                  f" page plain text end {self.pages[self.page_num]['plain_text_end']}")  # tmp'''
+            if item['pos0'] > self.pages[self.page_num]['plain_text_end'] or item['pos1'] < self.pages[self.page_num]['plain_text_start']:
+                continue
             cursor.setPosition(int(item['pos0'] - self.file_['start']), QtGui.QTextCursor.MoveMode.MoveAnchor)
             cursor.setPosition(int(item['pos1'] - self.file_['start']), QtGui.QTextCursor.MoveMode.KeepAnchor)
             color = codes.get(item['cid'], {}).get('color', "#777777")  # default gray
@@ -3135,8 +3153,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         if len(result) > 0:
             # The event can trigger multiple times, so do not present a warning to the user
             return
-        self.code_text.append(coded)
-        #self.highlight()
+        #self.code_text.append(coded) Need this?
         cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
             memo,date, important) values(?,?,?,?,?,?,?,?,?)", (coded['cid'], coded['fid'],
                                                                coded['seltext'], coded['pos0'], coded['pos1'],
@@ -3154,7 +3171,7 @@ class DialogCodePdf(QtWidgets.QWidget):
                 tmp_code = c
         if tmp_code is None:
             return
-        # Need to remove from recent_codes, if there and add back in first position
+        # Need to remove from recent_codes, if there, and add back in first position
         for item in self.recent_codes:
             if item == tmp_code:
                 self.recent_codes.remove(item)
@@ -3389,7 +3406,7 @@ class ToolTipEventFilter(QtCore.QObject):
     app = None
 
     def set_codes_and_annotations(self, app, code_text, codes, annotations, file_):
-        """ Code_text contains the coded text to be displayed in a tooptip.
+        """ Code_text contains the coded text to be displayed in a tooltip.
         Annotations - a mention is made if current position is annotated
 
         param:
