@@ -593,7 +593,8 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         """
 
         # coded0 and coded1 are the total characters coded by coder 0 and coder 1
-        total = {'dual_coded': 0, 'single_coded': 0, 'uncoded': 0, 'characters': 0, 'coded0': 0, 'coded1': 0, 'agree_coded_only': 0}
+        total = {'dual_coded': 0, 'single_coded': 0, 'uncoded': 0, 'characters': 0, 'coded0': 0, 'coded1': 0,
+                 'agree_coded_only': 0.0, 'agreement': 0.0, 'disagreement': 0.0, 'uncoded_percent': 0.0}
         # Loop through each source file
         cur = self.app.conn.cursor()
         sql = "select pos0,pos1,fid from code_text where fid=? and cid=? and owner=?"
@@ -642,6 +643,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
             total['single_coded'] += single_coded
             total['uncoded'] += uncoded
             total['characters'] += f[1]
+
         if total['characters'] != 0:
             total['agreement'] = round(100 * (total['dual_coded'] + total['uncoded']) / total['characters'], 2)
             total['dual_percent'] = round(100 * total['dual_coded'] / total['characters'], 2)
@@ -652,7 +654,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
             total['agreement'] = "zero div"
             total['dual_percent'] = "zero div"
             total['uncoded_percent'] = "zero div"
-            total['disgreement'] = "zero div"
+            total['disagreement'] = "zero div"
             total['agree_coded_only'] = "zero div"
         # Cohen's Kappa
         '''
