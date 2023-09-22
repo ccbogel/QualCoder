@@ -782,13 +782,39 @@ class App(object):
         cur = self.conn.cursor()
         if file_ids is not None:
             cur.execute(
-                "select name, id, fulltext, ifnull(memo, ''), owner, date from source where id in (?) and fulltext is not null",
-                file_ids
-            )
+                "select name, id, fulltext, ifnull(memo, ''), owner, date, mediapath from "
+                "source where id in (?) and fulltext is not null order by name", file_ids)
         else:
             cur.execute(
-                "select name, id, fulltext, ifnull(memo,''), owner, date from source where fulltext is not null order by name")
-        keys = 'name', 'id', 'fulltext', 'memo', 'owner', 'date'
+                "select name, id, fulltext, ifnull(memo,''), owner, date, mediapath "
+                "from source where fulltext is not null order by name")
+        keys = 'name', 'id', 'fulltext', 'memo', 'owner', 'date', 'mediapath'
+        result = []
+        for row in cur.fetchall():
+            result.append(dict(zip(keys, row)))
+        return result
+
+    def get_pdf_file_texts(self, file_ids=None):
+        """ Get the texts of all text files as a list of dictionaries.
+        Called by DialogCodePdf.search_for_text
+        param:
+            fileids - a list of fileids or None
+        """
+
+        cur = self.conn.cursor()
+        if file_ids is not None:
+            cur.execute(
+                "select name, id, fulltext, ifnull(memo, ''), owner, date, mediapath from "
+                "source where id in (?) and fulltext is not null and mediapath is not Null and "
+                "(mediapath like '/docs/%' or mediapath like 'docs:%') and "
+                "(mediapath like '%.pdf' or mediapath like '%.PDF') order by name", file_ids)
+        else:
+            cur.execute(
+                "select name, id, fulltext, ifnull(memo,''), owner, date, mediapath "
+                "from source where fulltext is not null and mediapath is not Null and " 
+                "(mediapath like '/docs/%' or mediapath like 'docs:%') and "
+                "(mediapath like '%.pdf' or mediapath like '%.PDF') order by name")
+        keys = 'name', 'id', 'fulltext', 'memo', 'owner', 'date', 'mediapath'
         result = []
         for row in cur.fetchall():
             result.append(dict(zip(keys, row)))

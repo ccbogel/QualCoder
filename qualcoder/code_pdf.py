@@ -230,8 +230,16 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.pushButton_show_all_codings.pressed.connect(self.show_all_codes_in_text)
         self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
         self.ui.lineEdit_search.setEnabled(False)
-        self.ui.checkBox_search_all_files.stateChanged.connect(self.search_for_text)
-        self.ui.checkBox_search_all_files.setEnabled(False)
+
+        # TODO search allfiles, finding wrong text positions
+        self.ui.checkBox_search_all_files.hide()
+        # self.ui.checkBox_search_all_files.stateChanged.connect(self.search_for_text)
+        # self.ui.checkBox_search_all_files.setEnabled(False)
+        # pm = QtGui.QPixmap()
+        # pm.loadFromData(QtCore.QByteArray.fromBase64(clipboard_copy_icon), "png")
+        # self.ui.label_search_all_files.setPixmap(QtGui.QPixmap(pm).scaled(22, 22))
+        self.ui.label_search_all_files.hide()
+
         self.ui.checkBox_search_case.stateChanged.connect(self.search_for_text)
         self.ui.checkBox_search_case.setEnabled(False)
         pm = QtGui.QPixmap()
@@ -240,9 +248,6 @@ class DialogCodePdf(QtWidgets.QWidget):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(text_letter_t_icon), "png")
         self.ui.label_search_case_sensitive.setPixmap(QtGui.QPixmap(pm).scaled(22, 22))
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(clipboard_copy_icon), "png")
-        self.ui.label_search_all_files.setPixmap(QtGui.QPixmap(pm).scaled(22, 22))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(project_icon), "png")
         self.ui.label_pages.setPixmap(QtGui.QPixmap(pm).scaled(22, 22))
@@ -323,10 +328,12 @@ class DialogCodePdf(QtWidgets.QWidget):
         msg = _("QualCoder roughly displays PDFs.")
         msg += "\n" + _("Some images will not display and image masks and rotations will not work.")
         msg += "\n" + _("Original fonts or bold or italic are not applied.")
+        msg += "\n" + _("There is not enough information in pdfminer to accurately display polygon curves.")
         msg += "\n" + _("Plain text must match exactly for this function to work well.")
         msg += "\n" + _("Plain text of PDFs loaded in to QualCoder before version 3.4 will not have the plain text positions correct for PDF display.")
         msg += "\n" + _("This means coding stripes will show in incorrect positions.")
         msg += "\n" + _("Similarly, if the PDF plain text has beeen edited in any way, this will affect coding stripes display.")
+        msg += "\n" + _("THIS FUNCTION IS EXPERIMENTAL AND UNDERGOING LOTS OF UPDATES")
         Message(self.app, _("Information") + " " * 20, msg).exec()
 
     def spin_page_changed(self):
@@ -727,7 +734,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.search_indices = []
         if self.ui.checkBox_search_all_files.isChecked():
             """ Search for this text across all files. """
-            for filedata in self.app.get_file_texts():
+            for filedata in self.app.get_pdf_file_texts():
                 try:
                     text_ = filedata['fulltext']
                     for match in pattern.finditer(text_):
@@ -740,7 +747,7 @@ class DialogCodePdf(QtWidgets.QWidget):
                 if displayed_text != "":
                     for match in pattern.finditer(displayed_text):
                         # Get result as first dictionary item
-                        source_name = self.app.get_file_texts([self.file_['id'], ])[0]
+                        source_name = self.app.get_pdf_file_texts([self.file_['id'], ])[0]
                         self.search_indices.append((source_name, match.start(), len(match.group(0))))
             except re.error:
                 logger.exception('Failed searching current file for %s', self.search_term)
@@ -750,7 +757,10 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.label_search_totals.setText("0 / " + str(len(self.search_indices)))
 
     def move_to_previous_search_text(self):
-        """ Push button pressed to move to previous search text position. """
+        """ Push button pressed to move to previous search text position.
+        TODO something wrong when traversing other files.
+        TODO Hidden this option
+        """
 
         if self.file_ is None or self.search_indices == []:
             return
@@ -760,7 +770,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         cursor = self.ui.textEdit.textCursor()
         prev_result = self.search_indices[self.search_index]
         # prev_result is a tuple containing a dictionary of
-        # (name, id, fullltext, memo, owner, date) and char position and search string length
+        # (name, id, fullltext, memo, owner, date, mediapath) and char position and search string length
         if self.file_ is None or self.file_['id'] != prev_result[0]['id']:
             self.load_file(prev_result[0])
             self.ui.lineEdit_search.setText(self.search_term)
@@ -770,7 +780,9 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.label_search_totals.setText(str(self.search_index + 1) + " / " + str(len(self.search_indices)))
 
     def move_to_next_search_text(self):
-        """ Push button pressed to move to next search text position. """
+        """ Push button pressed to move to next search text position.
+        TODO something wrong when traversing other files.
+        TODO Hidden this option"""
 
         if self.file_ is None or self.search_indices == []:
             return
@@ -2580,6 +2592,10 @@ class DialogCodePdf(QtWidgets.QWidget):
 
     def load_pdf(self):
         """ Load page elements for all pages in the PDF.
+
+                # next_result is a tuple containing a dictionary of
+        # (name, id, fullltext, memo, owner, date) and char position and search string length
+        Called by: next_search_result
         """
 
         self.ui.spinBox.setValue(1)
@@ -2859,7 +2875,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             font_size = text_box['fontsize'] + adjustment  # e.g. minus 2 helps stop text overlaps
             if font_size < 4:
                 font_size = 4
-            font = QtGui.QFont("Noto Sans", font_size)
+            font = QtGui.QFont(self.app.settings['font'], font_size)
             item.setFont(font)
             color = self.get_qcolor(text_box['color'])
             if self.ui.checkBox_black_text.isChecked():
