@@ -320,6 +320,14 @@ class DialogCodePdf(QtWidgets.QWidget):
 
         self.get_files()
         self.fill_tree()
+        msg = _("QualCoder roughly displays PDFs.")
+        msg += "\n" + _("Some images will not display and image masks and rotations will not work.")
+        msg += "\n" + _("Original fonts or bold or italic are not applied.")
+        msg += "\n" + _("Plain text must match exactly for this function to work well.")
+        msg += "\n" + _("Plain text of PDFs loaded in to QualCoder before version 3.4 will not have the plain text positions correct for PDF display.")
+        msg += "\n" + _("This means coding stripes will show in incorrect positions.")
+        msg += "\n" + _("Similarly, if the PDF plain text has beeen edited in any way, this will affect coding stripes display.")
+        Message(self.app, _("Information") + " " * 20, msg).exec()
 
     def spin_page_changed(self):
         pass
@@ -2819,38 +2827,8 @@ class DialogCodePdf(QtWidgets.QWidget):
                     color = self.get_qcolor(line['non_stroking_color'])
                 line_pen = QtGui.QPen(color, line['linewidth'], QtCore.Qt.PenStyle.SolidLine)
                 item = self.scene.addLine(line['x0'], line['y0'], line['x1'], line['y1'], line_pen)
-
         self.update_page_text_objects()
-        '''if self.ui.checkBox_text.isChecked():
-            self.text_items = []
-            for t in page['text_boxes']:
-                counter += 1
-                self.pdf_object_info_text += "TEXT: " + str(t) + "\n"
-                item = self.scene.addText(t['text'])
-                item.setPos(t['left'], t['top'])
-                # print(i['fontname'], type(t['fontname']), t['fontsize'], type(t['fontsize']))
-                # font = QtGui.QFont(t['fontname'], t['fontsize']) 
-                adjustment = self.ui.spinBox_font_adjuster.value()
-                font_size = t['fontsize'] + adjustment  # e.g. minus 2 helps stop text overlaps
-                if font_size < 4:
-                    font_size = 4
-                font = QtGui.QFont("Noto Sans", font_size)
-                item.setFont(font)
-                #ttip = f"x:{int(t['left'])}, y:{int(t['top'])} {t['text']}"
-                #item.setToolTip(ttip)
-                color = self.get_qcolor(t['color'])
-                if self.ui.checkBox_black_text.isChecked():
-                    color = QtCore.Qt.GlobalColor.black
-                item.setDefaultTextColor(color)
-                self.format_text_box(item, t)
-
-                # Interaction
-                item.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditorInteraction)
-                item.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
-                self.text_items.append(item)
-                #item.setFlags(
-                #    QGraphicsItem::ItemIsFocusable | QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable | ti->flags())'''
-
+        counter += len(self.text_items)
         text_edit_text += "\n\nOBJECTS: " + str(counter)
         self.pdf_object_info_text += "\n" + _("TEXT START CHARACTER POSITION: ") + str(page['plain_text_start']) + "\n"
         self.pdf_object_info_text += _("TEXT END CHARACTER POSITION: ") + str(page['plain_text_end']) + "\n"
