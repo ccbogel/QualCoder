@@ -1990,6 +1990,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.parent_textEdit.append(msg)
         self.update_dialog_codes_and_categories()
         self.get_coded_text_update_eventfilter_tooltips()
+        self.update_page_text_objects()
 
     def add_code(self, catid=None, code_name=""):
         """ Use add_item dialog to get new code text. Add_code_name dialog checks for
@@ -2117,6 +2118,7 @@ class DialogCodePdf(QtWidgets.QWidget):
                 self.recent_codes.remove(item)
                 break
         self.update_dialog_codes_and_categories()
+        self.update_page_text_objects()
 
     def delete_category(self, selected):
         """ Find category, remove from database, refresh categories and code data
@@ -2235,6 +2237,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             old_name = self.codes[found]['name']
             self.parent_textEdit.append(_("Code renamed from: ") + old_name + _(" to: ") + new_name)
             self.update_dialog_codes_and_categories()
+            self.update_page_text_objects()
             return
 
         if selected.text(1)[0:3] == 'cat':
@@ -2297,6 +2300,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.app.conn.commit()
         self.app.delete_backup = False
         self.update_dialog_codes_and_categories()
+        self.update_page_text_objects()
 
     def file_menu(self, position):
         """ Context menu for listWidget files to get to the next file and
@@ -2816,15 +2820,16 @@ class DialogCodePdf(QtWidgets.QWidget):
                 line_pen = QtGui.QPen(color, line['linewidth'], QtCore.Qt.PenStyle.SolidLine)
                 item = self.scene.addLine(line['x0'], line['y0'], line['x1'], line['y1'], line_pen)
 
-        if self.ui.checkBox_text.isChecked():
+        self.update_page_text_objects()
+        '''if self.ui.checkBox_text.isChecked():
             self.text_items = []
             for t in page['text_boxes']:
                 counter += 1
                 self.pdf_object_info_text += "TEXT: " + str(t) + "\n"
                 item = self.scene.addText(t['text'])
                 item.setPos(t['left'], t['top'])
-                '''print(i['fontname'], type(t['fontname']), t['fontsize'], type(t['fontsize']))
-                font = QtGui.QFont(t['fontname'], t['fontsize']) '''
+                # print(i['fontname'], type(t['fontname']), t['fontsize'], type(t['fontsize']))
+                # font = QtGui.QFont(t['fontname'], t['fontsize']) 
                 adjustment = self.ui.spinBox_font_adjuster.value()
                 font_size = t['fontsize'] + adjustment  # e.g. minus 2 helps stop text overlaps
                 if font_size < 4:
@@ -2843,17 +2848,50 @@ class DialogCodePdf(QtWidgets.QWidget):
                 item.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditorInteraction)
                 item.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
                 self.text_items.append(item)
-                '''item.setFlags(
-                    QGraphicsItem::ItemIsFocusable | QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable | ti->flags())'''
-        text_edit_text += "\n\nOBJECTS: " + str(counter)
+                #item.setFlags(
+                #    QGraphicsItem::ItemIsFocusable | QGraphicsItem::ItemIsMovable | QGraphicsItem::ItemIsSelectable | ti->flags())'''
 
+        text_edit_text += "\n\nOBJECTS: " + str(counter)
         self.pdf_object_info_text += "\n" + _("TEXT START CHARACTER POSITION: ") + str(page['plain_text_start']) + "\n"
         self.pdf_object_info_text += _("TEXT END CHARACTER POSITION: ") + str(page['plain_text_end']) + "\n"
         self.pdf_object_info_text += _("NUMBER OF CHARACTERS: ") + str(page['plain_text_end'] - page['plain_text_start'])
-
         self.ui.textEdit.setText(page['plain_text'])
-
         self.get_coded_text_update_eventfilter_tooltips()
+
+    def update_page_text_objects(self):
+        """ pdf text graphics objects are shown on scene.
+         Update the highlighting of these objects when codes are marked / unmarked or changed in some way,
+          e.g. changed code colour."""
+
+        for graphics_item in self.scene.items():
+            if isinstance(graphics_item, QtWidgets.QGraphicsTextItem):
+                self.scene.removeItem(graphics_item)
+
+        self.text_items = []
+        if not self.ui.checkBox_text.isChecked():
+            return
+        page = self.pages[self.page_num]
+        for text_box in page['text_boxes']:
+            self.pdf_object_info_text += "TEXT: " + str(text_box) + "\n"
+            item = self.scene.addText(text_box['text'])
+            item.setPos(text_box['left'], text_box['top'])
+            '''print(i['fontname'], type(t['fontname']), t['fontsize'], type(t['fontsize']))
+            font = QtGui.QFont(t['fontname'], t['fontsize']) '''
+            adjustment = self.ui.spinBox_font_adjuster.value()
+            font_size = text_box['fontsize'] + adjustment  # e.g. minus 2 helps stop text overlaps
+            if font_size < 4:
+                font_size = 4
+            font = QtGui.QFont("Noto Sans", font_size)
+            item.setFont(font)
+            color = self.get_qcolor(text_box['color'])
+            if self.ui.checkBox_black_text.isChecked():
+                color = QtCore.Qt.GlobalColor.black
+            item.setDefaultTextColor(color)
+            self.format_text_box(item, text_box)
+            # Interaction
+            item.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditorInteraction)
+            item.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
+            self.text_items.append(item)
 
     def format_text_box(self, item, text_item):
         """ Apply code backgrounds to text.
@@ -2888,9 +2926,8 @@ class DialogCodePdf(QtWidgets.QWidget):
             #print(f"Code {code_['seltext']} {code_['pos0']} - {code_['pos1']}")
         if not codes_for_item:
             return
-        tooltip_text = ""
+        tooltip_list = []
         for graphics_item_code in codes_for_item:
-            print("CF", graphics_item_code)
             pos0 = int(graphics_item_code['pos0'] - text_item['pos0'])
             if pos0 < 0:
                 pos0 = 0
@@ -2909,12 +2946,10 @@ class DialogCodePdf(QtWidgets.QWidget):
             cursor.mergeCharFormat(fmt)
             #cursor.setCharFormat(fmt)
 
-            # TODO add tooltip
-            tooltip_text += graphics_item_code['name'] + "\n"
-            # Check text matches
-            item.setToolTip(tooltip_text)
-
-
+            tooltip_list.append(graphics_item_code['name'])
+        tooltip_list = list(set(tooltip_list))
+        tooltip_list.sort()
+        item.setToolTip("\n".join(tooltip_list))
 
     def get_qcolor(self, pdf_color) -> QtGui.QColor:
         """  Get a pdf_color which can be in various formats.
@@ -3180,6 +3215,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         if len(self.recent_codes) > 10:
             self.recent_codes = self.recent_codes[:10]
         self.update_file_tooltip()
+        self.update_page_text_objects()
 
     def undo_last_unmarked_code(self):
         """ Restore the last deleted code(s).
@@ -3199,6 +3235,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.undo_deleted_codes = []
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
+        self.update_page_text_objects()
 
     def unmark(self, location):
         """ Remove code marking by this coder from selected text in current file.
@@ -3241,6 +3278,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.fill_code_counts_in_tree()
         self.update_file_tooltip()
         self.app.delete_backup = False
+        self.update_page_text_objects()
 
     def annotate(self, cursor_pos=None):
         """ Add view, or remove an annotation for selected text.
