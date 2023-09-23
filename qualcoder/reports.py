@@ -482,23 +482,25 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.SelectionMode.ExtendedSelection)
         self.ui.comboBox_coders.insertItems(0, self.coders)
         self.ui.comboBox_coders.currentTextChanged.connect(self.coder_selected)
+        if len(self.coders) == 3:  # includes empty slot
+            self.ui.comboBox_coders.setCurrentIndex(1)
+            self.ui.comboBox_coders.setCurrentIndex(2)
         self.fill_tree()
 
     def get_data(self):
         """ Called from init. gets coders, code_names, categories, file_summaries.
-        Images and A/V dta are not loaded. """
+        Images and A/V files are not used. """
 
         self.code_names, self.categories = self.app.get_codes_categories()
         cur = self.app.conn.cursor()
+        cur.execute("select id, length(fulltext) from source where fulltext is not null")
+        self.file_summaries = cur.fetchall()
         sql = "select owner from  code_image union select owner from code_text union select owner from code_av"
         cur.execute(sql)
         result = cur.fetchall()
         self.coders = [""]
         for row in result:
             self.coders.append(row[0])
-        cur.execute(
-            'select id, length(fulltext) from source where (mediapath is Null or substr(mediapath,1,5)="docs:")')
-        self.file_summaries = cur.fetchall()
 
     def coder_selected(self):
         """ Select coders for comparison - only two coders can be selected. """
@@ -585,11 +587,17 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
     def calculate_agreement_for_code_name(self, cid):
         """ Calculate the two-coder statistics for this cid
         Percentage agreement.
-        Get the start and end positions in all files (source table) for this cid
+        Get the start and end positions in all files (source table) for this cid.
+
+        self.file_summaries item [0] = id, [1] = full text length
         Look at each file separately to ge the commonly coded text.
         Each character that is coded by coder 1 or coder 2 is incremented, resulting in a list of 0, 1, 2
         where 0 is no codings at all, 1 is coded by only one coder and 2 is coded by both coders.
         'Disagree%':'','A not B':'','B not A':'', coded only:'' ,'K':''
+
+        param:
+            cid : integer source file id
+
         """
 
         # coded0 and coded1 are the total characters coded by coder 0 and coder 1
