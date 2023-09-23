@@ -3115,9 +3115,11 @@ class DialogCodePdf(QtWidgets.QWidget):
             cursor.mergeCharFormat(fmt)
 
     def mark_selected_textboxes(self):
-        """ Code selected graphcs textboxes. Textboxes are selected via mouse drag.
+        """ Code selected graphics textboxes. Textboxes are selected via mouse drag.
         Graphics textboxes are referenced within pages[page_num][text_box] dictionary.
-         Textboxes often overlap. """
+        Textboxes often overlap, so link up for one coded segment:
+        CHAR POS: 706 - 818, CHAR POS: 865 - 976, CHAR POS: 976 - 1078
+        """
 
         item = self.ui.treeWidget.currentItem()
         if item is None:
@@ -3131,12 +3133,65 @@ class DialogCodePdf(QtWidgets.QWidget):
             for graphic_textbox in self.selected_graphic_textboxes:
                 if textbox['graphic_item_ref'] == graphic_textbox:
                     selected_boxes.append(textbox)
-        # Go through the text_boxes charcter positions
-        # Link up boxes so that one stringof coded text is applied.
+        # Go through the text_boxes character positions
+        # Link up boxes so that one string of coded text is applied.
+        #for tb in selected_boxes:
+        #    print("CHAR POS:", tb['pos0'], tb['pos1'])
         linked_positions = []
-        for tb in selected_boxes:
-            #print(tb)
-            print("CHAR POS:", tb['pos0'], tb['pos1'])
+        pos0 = selected_boxes[0]['pos0']
+        pos1 = selected_boxes[0]['pos1']
+        seltext = selected_boxes[0]['text']
+        selected_boxes.pop(0)
+        for box in selected_boxes:
+            if box['pos0'] == pos1:
+                pos1 = box['pos1']
+                seltext += box['text']
+        #print(f"\npos0 {pos0} - {pos1}")
+        if pos0 == pos1:
+            return
+
+        # TODO fix Below duplicates code in def mark()
+
+        # Add the coded section to code text, add to database and update GUI
+        coded = {'cid': cid, 'fid': int(self.file_['id']), 'seltext': seltext,
+                 'pos0': pos0, 'pos1': pos1, 'owner': self.app.settings['codername'], 'memo': "",
+                 'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),
+                 'important': None}
+        # Check for an existing duplicated marking first
+        cur = self.app.conn.cursor()
+        cur.execute("select * from code_text where cid = ? and fid=? and pos0=? and pos1=? and owner=?",
+                    (coded['cid'], coded['fid'], coded['pos0'], coded['pos1'], coded['owner']))
+        result = cur.fetchall()
+        if len(result) > 0:
+            # The event can trigger multiple times, so do not present a warning to the user
+            return
+        cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
+                    memo,date, important) values(?,?,?,?,?,?,?,?,?)", (coded['cid'], coded['fid'],
+                                                                       coded['seltext'], coded['pos0'], coded['pos1'],
+                                                                       coded['owner'],
+                                                                       coded['memo'], coded['date'], coded['important']))
+        self.app.conn.commit()
+        self.app.delete_backup = False
+        # Update filter for tooltip and update code colours
+        self.get_coded_text_update_eventfilter_tooltips()
+        self.fill_code_counts_in_tree()
+        # Update recent_codes
+        tmp_code = None
+        for c in self.codes:
+            if c['cid'] == cid:
+                tmp_code = c
+        if tmp_code is None:
+            return
+        # Need to remove from recent_codes, if there, and add back in first position
+        for item in self.recent_codes:
+            if item == tmp_code:
+                self.recent_codes.remove(item)
+                break
+        self.recent_codes.insert(0, tmp_code)
+        if len(self.recent_codes) > 10:
+            self.recent_codes = self.recent_codes[:10]
+        self.update_file_tooltip()
+        self.update_page_text_objects()
 
     def mark(self):
         """ Mark selected text in file with currently selected code.
@@ -3174,7 +3229,6 @@ class DialogCodePdf(QtWidgets.QWidget):
         if len(result) > 0:
             # The event can trigger multiple times, so do not present a warning to the user
             return
-        #self.code_text.append(coded) Need this?
         cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
             memo,date, important) values(?,?,?,?,?,?,?,?,?)", (coded['cid'], coded['fid'],
                                                                coded['seltext'], coded['pos0'], coded['pos1'],
