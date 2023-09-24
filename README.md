@@ -17,10 +17,6 @@ If you like QualCoder please buy me a coffee ...
 
 ## INSTALLATION 
 
-## NOTE - 22 September 2023
-There is an experimental Code PDF function tht has been added in the latest code (from today).
-It's functionality is still undergoing a lot of testing. 
-
 ### Prerequisites
 Optional: VLC for audio/video coding. 
 Optional: ffmpeg installed for speech to text and waveform image see here to install ffmpeg on Windows:  https://phoenixnap.com/kb/ffmpeg-windows. 
