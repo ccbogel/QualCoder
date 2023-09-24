@@ -108,6 +108,7 @@ class DialogCodePdf(QtWidgets.QWidget):
     code_text = []
     annotations = []
     undo_deleted_codes = []  # undo last deleted code(s), multiple may have been deleted at th same time, so a list
+    different_text_lengths = False
 
     # Overlapping coded text details
     overlaps_at_pos = []
@@ -333,8 +334,6 @@ class DialogCodePdf(QtWidgets.QWidget):
         msg += "\n" + _("Plain text of PDFs loaded in to QualCoder before version 3.4 will not have the plain text positions correct for PDF display.")
         msg += "\n" + _("This means coding stripes will show in incorrect positions.")
         msg += "\n" + _("Similarly, if the PDF plain text has beeen edited in any way, this will affect coding stripes display.")
-        msg += "\n" + _("For now, coding is done via the right-hand side plain text pane.")
-        msg += "\n" + _("THIS FUNCTION IS EXPERIMENTAL AND UNDERGOING LOTS OF UPDATES")
         Message(self.app, _("Information") + " " * 20, msg).exec()
 
     def spin_page_changed(self):
@@ -501,7 +500,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         if len(selected_text) > 0 and len(self.selected_graphic_textboxes) == 0:
             self.mark()
         if len(selected_text) == 0 and len(self.selected_graphic_textboxes) > 0:
-            self.mark_selected_textboxes()
+            self.mark(by_text_boxes=True)
 
         # When a code is selected undo the show selected code features
         self.highlight()
@@ -1059,7 +1058,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             pass
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
-        self.update_page_text_objects()
+        self.display_page_text_objects()
 
     def recursive_set_current_item(self, item, text_):
         """ Set matching item to be the current selected item.
@@ -1680,7 +1679,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.app.conn.commit()
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
-        self.update_page_text_objects()
+        self.display_page_text_objects()
 
     def extend_right(self, code_):
         """ Shift right arrow. """
@@ -1698,7 +1697,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.app.conn.commit()
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
-        self.update_page_text_objects()
+        self.display_page_text_objects()
 
     def shrink_to_left(self, code_):
         """ Alt left arrow, shrinks code from the right end of the code. """
@@ -1715,7 +1714,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.app.conn.commit()
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
-        self.update_page_text_objects()
+        self.display_page_text_objects()
 
     def shrink_to_right(self, code_):
         """ Alt right arrow shrinks code from the left end of the code. """
@@ -1732,7 +1731,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.app.conn.commit()
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
-        self.update_page_text_objects()
+        self.display_page_text_objects()
 
     def show_selected_code_in_text_next(self):
         """ Highlight only the selected code in the text. Move to next instance in text
@@ -2016,7 +2015,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.parent_textEdit.append(msg)
         self.update_dialog_codes_and_categories()
         self.get_coded_text_update_eventfilter_tooltips()
-        self.update_page_text_objects()
+        self.display_page_text_objects()
 
     def add_code(self, catid=None, code_name=""):
         """ Use add_item dialog to get new code text. Add_code_name dialog checks for
@@ -2144,7 +2143,7 @@ class DialogCodePdf(QtWidgets.QWidget):
                 self.recent_codes.remove(item)
                 break
         self.update_dialog_codes_and_categories()
-        self.update_page_text_objects()
+        self.display_page_text_objects()
 
     def delete_category(self, selected):
         """ Find category, remove from database, refresh categories and code data
@@ -2263,7 +2262,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             old_name = self.codes[found]['name']
             self.parent_textEdit.append(_("Code renamed from: ") + old_name + _(" to: ") + new_name)
             self.update_dialog_codes_and_categories()
-            self.update_page_text_objects()
+            self.display_page_text_objects()
             return
 
         if selected.text(1)[0:3] == 'cat':
@@ -2326,7 +2325,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.app.conn.commit()
         self.app.delete_backup = False
         self.update_dialog_codes_and_categories()
-        self.update_page_text_objects()
+        self.display_page_text_objects()
 
     def file_menu(self, position):
         """ Context menu for listWidget files to get to the next file and
@@ -2623,12 +2622,14 @@ class DialogCodePdf(QtWidgets.QWidget):
             self.page_dict['plain_text_end'] = self.page_end_index
             self.pages.append(self.page_dict)
             document_text += self.page_text
-        if document_text != self.file_['fulltext']:
+        self.different_text_lengths = False
+        if len(document_text) != len(self.file_['fulltext']):
             msg = _("Parsing the PDF text.") + "\n"
             msg += _("Texts do not match. PDF imported before 3.4 QualCodr version or the PDF text has been edited.")
             msg += _("\nView PDF but cannot code. Code positions will appear wrongly.\nCharacter difference: ")
             msg += str(abs(len(document_text) - len(self.file_['fulltext'])))
             Message(self.app, _("Warning"), msg, "warning").exec()
+            self.different_text_lengths = True
 
     def get_pdf_items_and_hierarchy(self, page, lobj: Any, depth=0):
         """ Get item details add to page_dict, with depth and all its descendants.
@@ -2679,7 +2680,7 @@ class DialogCodePdf(QtWidgets.QWidget):
                              'top': round(page.mediabox[3] - top, 3),
                              'right': round(right, 3), 'text': text_, 'pos0': self.text_pos0,
                          'pos1': self.text_pos0 + len(text_) + 1, 'graphic_item_ref': None,
-                         'depth': depth,}
+                         'bold': False, 'depth': depth}
             # Fix Pdfminer recognising invalid unicode characters.
             text_dict['text'] = text_dict['text'].replace(u"\uE002", "Th")
             text_dict['text'] = text_dict['text'].replace(u"\uFB01", "fi")
@@ -2690,9 +2691,12 @@ class DialogCodePdf(QtWidgets.QWidget):
             char_font_sizes = []
             #fontnames = []
             colors = []
+            #bold = False
             for ltchar in lobj:
                 fontname, fontsize, color = self.get_char_info(ltchar)
                 char_font_sizes.append(fontsize)
+                #if "bold" in fontname.lower():
+                #    bold = True
                 #fontnames.append(fontname)  # TODO get most common
                 colors.append(color)
             '''fontname = fontnames[0]
@@ -2825,7 +2829,7 @@ class DialogCodePdf(QtWidgets.QWidget):
                     color = self.get_qcolor(line['non_stroking_color'])
                 line_pen = QtGui.QPen(color, line['linewidth'], QtCore.Qt.PenStyle.SolidLine)
                 self.scene.addLine(line['x0'], line['y0'], line['x1'], line['y1'], line_pen)
-        self.update_page_text_objects()
+        self.display_page_text_objects()
         counter += len(page['text_boxes'])
         text_edit_text += "\n\nOBJECTS: " + str(counter)
         self.pdf_object_info_text += "\n" + _("TEXT START CHARACTER POSITION: ") + str(page['plain_text_start']) + "\n"
@@ -2834,8 +2838,8 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.textEdit.setText(page['plain_text'])
         self.get_coded_text_update_eventfilter_tooltips()
 
-    def update_page_text_objects(self):
-        """ Pdf text graphics objects are shown on scene.
+    def display_page_text_objects(self):
+        """ PDF text graphics objects are shown on scene.
          Update the highlighting of these objects when codes are marked / unmarked or changed in some way,
           e.g. changed code colour.
           Called by: show_page, extend_left, extend_right, shrink_left, shrink_right, merge_codes, delete_code,
@@ -2921,6 +2925,8 @@ class DialogCodePdf(QtWidgets.QWidget):
             # Foreground depends on the defined need_white_text color in color_selector
             foreground_color = TextColor(color).recommendation
             fmt.setForeground(QBrush(QColor(foreground_color)))
+            if text_item['bold']:
+                fmt.setFontWeight(QtGui.QFont.Weight.Bold)
             cursor.mergeCharFormat(fmt)
             #cursor.setCharFormat(fmt)
 
@@ -3114,92 +3120,26 @@ class DialogCodePdf(QtWidgets.QWidget):
             cursor.setPosition(o[1] - self.file_['start'], QtGui.QTextCursor.MoveMode.KeepAnchor)
             cursor.mergeCharFormat(fmt)
 
-    def mark_selected_textboxes(self):
-        """ Code selected graphics textboxes. Textboxes are selected via mouse drag.
+    def mark(self, by_text_boxes=False):
+        """ Mark selected text in file with currently selected code.
+        Need to check for multiple same codes at same pos0 and pos1.
+        Update recent_codes list.
+        Adjust for start of text file, as this may be a smaller portion of the full text file.
+
+        Code selected graphics textboxes. Textboxes are selected via mouse drag.
         Graphics textboxes are referenced within pages[page_num][text_box] dictionary.
         Textboxes often overlap, so link up for one coded segment:
         CHAR POS: 706 - 818, CHAR POS: 865 - 976, CHAR POS: 976 - 1078
+
+        param:
+            by_text_boxes: Bool: True = coding by text boxes, False = coding by Text Edit
         """
 
-        item = self.ui.treeWidget.currentItem()
-        if item is None:
-            Message(self.app, _('Warning'), _("No code was selected"), "warning").exec()
+        if self.different_text_lengths and by_text_boxes:
+            msg = _("PDF loaded text does not match Imported PDF text length.") + "\n"
+            msg += _("Mark using the right hand side text pane.")
+            Message(self.app, _("Cannot mark"), msg).exec()
             return
-        if item.text(1).split(':')[0] == 'catid':  # must be a code
-            return
-        cid = int(item.text(1).split(':')[1])
-        selected_boxes = []
-        for textbox in self.pages[self.page_num]['text_boxes']:
-            for graphic_textbox in self.selected_graphic_textboxes:
-                if textbox['graphic_item_ref'] == graphic_textbox:
-                    selected_boxes.append(textbox)
-        # Go through the text_boxes character positions
-        # Link up boxes so that one string of coded text is applied.
-        #for tb in selected_boxes:
-        #    print("CHAR POS:", tb['pos0'], tb['pos1'])
-        linked_positions = []
-        pos0 = selected_boxes[0]['pos0']
-        pos1 = selected_boxes[0]['pos1']
-        seltext = selected_boxes[0]['text']
-        selected_boxes.pop(0)
-        for box in selected_boxes:
-            if box['pos0'] == pos1:
-                pos1 = box['pos1']
-                seltext += box['text']
-        #print(f"\npos0 {pos0} - {pos1}")
-        if pos0 == pos1:
-            return
-
-        # TODO fix Below duplicates code in def mark()
-
-        # Add the coded section to code text, add to database and update GUI
-        coded = {'cid': cid, 'fid': int(self.file_['id']), 'seltext': seltext,
-                 'pos0': pos0, 'pos1': pos1, 'owner': self.app.settings['codername'], 'memo': "",
-                 'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),
-                 'important': None}
-        # Check for an existing duplicated marking first
-        cur = self.app.conn.cursor()
-        cur.execute("select * from code_text where cid = ? and fid=? and pos0=? and pos1=? and owner=?",
-                    (coded['cid'], coded['fid'], coded['pos0'], coded['pos1'], coded['owner']))
-        result = cur.fetchall()
-        if len(result) > 0:
-            # The event can trigger multiple times, so do not present a warning to the user
-            return
-        cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
-                    memo,date, important) values(?,?,?,?,?,?,?,?,?)", (coded['cid'], coded['fid'],
-                                                                       coded['seltext'], coded['pos0'], coded['pos1'],
-                                                                       coded['owner'],
-                                                                       coded['memo'], coded['date'], coded['important']))
-        self.app.conn.commit()
-        self.app.delete_backup = False
-        # Update filter for tooltip and update code colours
-        self.get_coded_text_update_eventfilter_tooltips()
-        self.fill_code_counts_in_tree()
-        # Update recent_codes
-        tmp_code = None
-        for c in self.codes:
-            if c['cid'] == cid:
-                tmp_code = c
-        if tmp_code is None:
-            return
-        # Need to remove from recent_codes, if there, and add back in first position
-        for item in self.recent_codes:
-            if item == tmp_code:
-                self.recent_codes.remove(item)
-                break
-        self.recent_codes.insert(0, tmp_code)
-        if len(self.recent_codes) > 10:
-            self.recent_codes = self.recent_codes[:10]
-        self.update_file_tooltip()
-        self.update_page_text_objects()
-
-    def mark(self):
-        """ Mark selected text in file with currently selected code.
-       Need to check for multiple same codes at same pos0 and pos1.
-       Update recent_codes list.
-       Adjust for start of text file, as this may be a smaller portion of the full text file.
-       """
-
         if self.file_ is None:
             Message(self.app, _('Warning'), _("No file was selected"), "warning").exec()
             return
@@ -3210,13 +3150,41 @@ class DialogCodePdf(QtWidgets.QWidget):
         if item.text(1).split(':')[0] == 'catid':  # must be a code
             return
         cid = int(item.text(1).split(':')[1])
-        selected_text = self.ui.textEdit.textCursor().selectedText()
-        pos0 = self.ui.textEdit.textCursor().selectionStart() + self.file_['start']
-        pos1 = self.ui.textEdit.textCursor().selectionEnd() + self.file_['start']
+
+        pos0 = -1
+        pos1 = -1
+
+        if by_text_boxes:
+            # Mark by Graphics Text Boxes
+            selected_boxes = []
+            for textbox in self.pages[self.page_num]['text_boxes']:
+                for graphic_textbox in self.selected_graphic_textboxes:
+                    if textbox['graphic_item_ref'] == graphic_textbox:
+                        selected_boxes.append(textbox)
+            # Go through the text_boxes character positions
+            # Link up boxes so that one string of coded text is applied.
+            # for tb in selected_boxes:
+            #    print("CHAR POS:", tb['pos0'], tb['pos1'])
+            linked_positions = []
+            pos0 = selected_boxes[0]['pos0']
+            pos1 = selected_boxes[0]['pos1']
+            seltext = selected_boxes[0]['text']
+            selected_boxes.pop(0)
+            for box in selected_boxes:
+                if box['pos0'] == pos1:
+                    pos1 = box['pos1']
+                    seltext += box['text']
+        else:
+            # Mark by TextEdit
+            seltext = self.ui.textEdit.textCursor().selectedText()
+            pos0 = self.ui.textEdit.textCursor().selectionStart() + self.file_['start']
+            pos1 = self.ui.textEdit.textCursor().selectionEnd() + self.file_['start']
+
         if pos0 == pos1:
             return
+
         # Add the coded section to code text, add to database and update GUI
-        coded = {'cid': cid, 'fid': int(self.file_['id']), 'seltext': selected_text,
+        coded = {'cid': cid, 'fid': int(self.file_['id']), 'seltext': seltext,
                  'pos0': pos0, 'pos1': pos1, 'owner': self.app.settings['codername'], 'memo': "",
                  'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),
                  'important': None}
@@ -3255,7 +3223,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         if len(self.recent_codes) > 10:
             self.recent_codes = self.recent_codes[:10]
         self.update_file_tooltip()
-        self.update_page_text_objects()
+        self.display_page_text_objects()
 
     def undo_last_unmarked_code(self):
         """ Restore the last deleted code(s).
@@ -3275,7 +3243,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.undo_deleted_codes = []
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
-        self.update_page_text_objects()
+        self.display_text_objects()
 
     def unmark(self, location):
         """ Remove code marking by this coder from selected text in current file.
@@ -3318,7 +3286,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.fill_code_counts_in_tree()
         self.update_file_tooltip()
         self.app.delete_backup = False
-        self.update_page_text_objects()
+        self.display_page_text_objects()
 
     def annotate(self, cursor_pos=None):
         """ Add view, or remove an annotation for selected text.
