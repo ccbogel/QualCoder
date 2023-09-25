@@ -25,16 +25,14 @@ Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 """
 from binascii import b2a_hex
-from copy import copy, deepcopy
+from copy import deepcopy
 import datetime
-import difflib
 import logging
 from operator import itemgetter
 import os
 from pdfminer.converter import PDFPageAggregator
-# Unused LTFigure
-from pdfminer.layout import LAParams, LTTextBox, LTTextLine, LTTextBoxHorizontal, LTImage, LTCurve, LTLine, \
-    LTRect
+# Unused LTFigure, LTTextBox, LTTextBoxHorizontal
+from pdfminer.layout import LAParams, LTTextLine, LTImage, LTCurve, LTLine, LTRect
 from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
 from pdfminer.pdfpage import PDFPage
 from pdfminer.psparser import PSLiteral  # Partly using for color conversion
@@ -109,6 +107,7 @@ class DialogCodePdf(QtWidgets.QWidget):
     annotations = []
     undo_deleted_codes = []  # undo last deleted code(s), multiple may have been deleted at th same time, so a list
     different_text_lengths = False
+    metadata = ""
 
     # Overlapping coded text details
     overlaps_at_pos = []
@@ -159,6 +158,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.total_pages = 0
         self.full_text = ""
         self.page_full_text = ""
+        self.metadata = ""
         self.selected_graphic_textboxes = []
         self.pdf_object_info_text = ""  # Contains details of PDF page objects
         self.page_dict = {}  # Temporary variable used when loading PDF pages
@@ -714,6 +714,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.label_search_totals.setText("0 / 0")
         if len(self.search_term) < int(self.search_type):
             return
+        #TODO some errors to fix
         pattern = None
         flags = 0
         if not self.ui.checkBox_search_case.isChecked():
@@ -843,7 +844,8 @@ class DialogCodePdf(QtWidgets.QWidget):
 
         if self.pdf_object_info_text == "":
             return
-        ui = DialogMemo(self.app, _("PDF objects"), self.pdf_object_info_text)
+        msg = self.pdf_object_info_text + "\n" + _("METADATA") + ":\n" + self.metadata
+        ui = DialogMemo(self.app, _("PDF objects"), msg)
         ui.ui.pushButton_clear.hide()
         ui.exec()
 
@@ -2597,6 +2599,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             logger.error("Cannot open pdf file" + self.file_['mediapath'])
             print("Cannot open pdf file " + self.file_['mediapath'])
             return
+        self.get_pdf_metadata(filepath)
         pdf_file = open(filepath, 'rb')
         resource_manager = PDFResourceManager()
         laparams = LAParams()
@@ -3207,6 +3210,14 @@ class DialogCodePdf(QtWidgets.QWidget):
         # Update filter for tooltip and update code colours
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
+
+        # Reflect marked position by showing location in textEdit
+        if by_text_boxes:
+            cursor = self.ui.textEdit.textCursor()
+            cursor.setPosition(coded['pos0'] - self.file_['start'])
+            cursor.setPosition(coded['pos1'] - self.file_['start'], QtGui.QTextCursor.MoveMode.KeepAnchor)
+            self.ui.textEdit.setTextCursor(cursor)
+
         # Update recent_codes
         tmp_code = None
         for c in self.codes:
@@ -3382,6 +3393,23 @@ class DialogCodePdf(QtWidgets.QWidget):
                                         + str(item['pos0']) + _(" for: ") + self.file_['name'])
         self.get_coded_text_update_eventfilter_tooltips()
 
+    def get_pdf_metadata(self, filepath):
+        """  """
+
+        fp = open(filepath, 'rb')
+        parser = PDFParser(fp)
+        doc = PDFDocument(parser)
+        info = doc.info  # tmp
+        self.metadata = ""
+        if info:
+            for k, v in info[0].items():
+                # print(k,v)
+                self.metadata += k + " = "
+                try:
+                    self.metadata += v.decode('UTF-8', errors="ignore")
+                except AttributeError as e:
+                    self.metadata += str(e)
+                self.metadata += "\n"
     @staticmethod
     def get_image_type(stream_first_4_bytes) -> str:
         """Find out the image file type based on the magic number comparison of the first 4 (or 2) bytes.
