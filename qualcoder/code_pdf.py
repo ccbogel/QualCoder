@@ -309,7 +309,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         # Need this otherwise images are centred on screen, and affect context menu position points
         self.ui.graphicsView.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignTop)
         self.ui.graphicsView.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
-        #self.ui.graphicsView.customContextMenuRequested.connect(self.graphicsview_menu)
+        self.ui.graphicsView.customContextMenuRequested.connect(self.graphicsview_menu)
         self.ui.graphicsView.viewport().installEventFilter(self)
 
         self.ui.checkBox_curve.stateChanged.connect(self.update_page)
@@ -1280,7 +1280,7 @@ class DialogCodePdf(QtWidgets.QWidget):
     def merge_category(self, catid):
         """ Select another category to merge this category into.
         param:
-            catid : Integer cateogry identfier
+            catid : Integer category identifier
         """
 
         do_not_merge_list = []
@@ -2938,6 +2938,47 @@ class DialogCodePdf(QtWidgets.QWidget):
         tooltip_list.sort()
         item.setToolTip("\n".join(tooltip_list))
 
+    def graphicsview_menu(self, position):
+        """ Menu for unmarking codes and more ... """
+
+        scene_item = self.ui.graphicsView.itemAt(position)
+        if scene_item is None:
+            return
+        #print(type(scene_item))
+        if not isinstance(scene_item, QtWidgets.QGraphicsTextItem):
+            return
+        text_box = None
+        for tb in self.pages[self.page_num]['text_boxes']:
+            if tb['graphic_item_ref'] == scene_item:
+                text_box = tb
+                break
+        if not text_box:
+            return
+        #print(f"Textbox: {text_box}")
+        # Get codes applied to text box
+        codes_for_item = []
+        for code_ in self.code_text:
+            if code_['pos0'] <= text_box['pos0'] < code_['pos1']:
+                codes_for_item.append(code_)
+            if text_box['pos0'] < code_['pos0'] < text_box['pos1']:
+                codes_for_item.append(code_)
+            # Code starts within text_item text and continues beyond it
+            if code_['pos0'] < text_box['pos1'] < code_['pos1']:
+                codes_for_item.append(code_)
+        #print(f"Codes: {codes_for_item}")
+
+        # Menu for blank graphics view area
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        action_unmark = None
+        if codes_for_item:
+            action_unmark = menu.addAction(_("Unmark"))
+        action = menu.exec(self.ui.graphicsView.mapToGlobal(position))
+        if action == action_unmark:
+            cursor = self.ui.textEdit.textCursor()
+            cursor.setPosition(codes_for_item[0]['pos0'] - self.file_['start'])
+            self.unmark(cursor.position())
+
     def get_qcolor(self, pdf_color) -> QtGui.QColor:
         """  Get a pdf_color which can be in various formats.
         Return a QColor object.
@@ -3462,7 +3503,7 @@ class DialogCodePdf(QtWidgets.QWidget):
     def help():
         """ Open help for transcribe section in browser. """
 
-        url = "https://github.com/ccbogel/QualCoder/wiki/07-Coding-Text"
+        url = "https://github.com/ccbogel/QualCoder/wiki/07a--Coding-text-on-PDFs"
         webbrowser.open(url)
 
 
