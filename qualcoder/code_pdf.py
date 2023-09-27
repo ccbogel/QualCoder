@@ -495,7 +495,6 @@ class DialogCodePdf(QtWidgets.QWidget):
                 self.ui.label_code.setToolTip(tt)
                 break
         selected_text = self.ui.textEdit.textCursor().selectedText()
-        # TODO Need more info here to do marking/unmarking
         self.selected_graphic_textboxes = self.scene.selectedItems()
         if len(selected_text) > 0 and len(self.selected_graphic_textboxes) == 0:
             self.mark()
@@ -1638,7 +1637,8 @@ class DialogCodePdf(QtWidgets.QWidget):
             # using timer for a lot of things
             now = datetime.datetime.now()
             diff = now - self.code_resize_timer
-            if diff.microseconds < 100000:
+            # timer sensitivity is reduced compared to Code_text as scene redraw adds time.
+            if diff.microseconds < 50000:
                 return False
 
             cursor_pos = self.ui.textEdit.textCursor().position()
@@ -1648,7 +1648,7 @@ class DialogCodePdf(QtWidgets.QWidget):
                         item['owner'] == self.app.settings['codername']:
                     codes_here.append(item)
             if len(codes_here) == 1:
-                # Key event can be too sensitive, adjusted  for 150 millisecond gap
+                # Key event can be too sensitive, adjusted  for millisecond gap
                 self.code_resize_timer = datetime.datetime.now()
                 if key == QtCore.Qt.Key.Key_Left and mod == QtCore.Qt.KeyboardModifier.AltModifier:
                     self.shrink_to_left(codes_here[0])
@@ -2939,7 +2939,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         item.setToolTip("\n".join(tooltip_list))
 
     def graphicsview_menu(self, position):
-        """ Menu for unmarking codes and more ... """
+        """ Menu for unmarking codes, code memos and important marking. """
 
         scene_item = self.ui.graphicsView.itemAt(position)
         if scene_item is None:
@@ -2957,6 +2957,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         #print(f"Textbox: {text_box}")
         # Get codes applied to text box
         codes_for_item = []
+        mid_text_box_pos = int((text_box['pos0'] + text_box['pos1']) / 2)
         for code_ in self.code_text:
             if code_['pos0'] <= text_box['pos0'] < code_['pos1']:
                 codes_for_item.append(code_)
@@ -2967,17 +2968,32 @@ class DialogCodePdf(QtWidgets.QWidget):
                 codes_for_item.append(code_)
         #print(f"Codes: {codes_for_item}")
 
-        # Menu for blank graphics view area
+        # Menu for graphics view area
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         action_unmark = None
+        action_memo = None
+        action_important = None
         if codes_for_item:
             action_unmark = menu.addAction(_("Unmark"))
+            action_memo = menu.addAction(_("Code memo"))
+            action_important = menu.addAction(_("Mark important"))
+
         action = menu.exec(self.ui.graphicsView.mapToGlobal(position))
         if action == action_unmark:
             cursor = self.ui.textEdit.textCursor()
-            cursor.setPosition(codes_for_item[0]['pos0'] - self.file_['start'])
+            #cursor.setPosition(codes_for_item[0]['pos0'] - self.file_['start'])
+            cursor.setPosition(mid_text_box_pos)
             self.unmark(cursor.position())
+            return
+        if action == action_memo:
+            cursor = self.ui.textEdit.textCursor()
+            cursor.setPosition(mid_text_box_pos)
+            self.coded_text_memo(cursor.position())
+        if action == action_important:
+            cursor = self.ui.textEdit.textCursor()
+            cursor.setPosition(mid_text_box_pos)
+            self.set_important(cursor.position(), True)
 
     def get_qcolor(self, pdf_color) -> QtGui.QColor:
         """  Get a pdf_color which can be in various formats.
@@ -3122,10 +3138,8 @@ class DialogCodePdf(QtWidgets.QWidget):
                 if note['fid'] == self.file_['id'] and \
                         0 <= int(note['pos0']) - self.file_['start'] < int(note['pos1']) - self.file_['start'] <= \
                         len(self.ui.textEdit.toPlainText()):
-                    cursor.setPosition(int(note['pos0']) - self.file_['start'],
-                                       QtGui.QTextCursor.MoveMode.MoveAnchor)
-                    cursor.setPosition(int(note['pos1']) - self.file_['start'],
-                                       QtGui.QTextCursor.MoveMode.KeepAnchor)
+                    cursor.setPosition(int(note['pos0']) - self.file_['start'], QtGui.QTextCursor.MoveMode.MoveAnchor)
+                    cursor.setPosition(int(note['pos1']) - self.file_['start'], QtGui.QTextCursor.MoveMode.KeepAnchor)
                     format_bold = QtGui.QTextCharFormat()
                     format_bold.setFontWeight(QtGui.QFont.Weight.Bold)
                     cursor.mergeCharFormat(format_bold)
@@ -3144,13 +3158,13 @@ class DialogCodePdf(QtWidgets.QWidget):
             for j in self.code_text:
                 if j != i:
                     if j['pos0'] <= i['pos0'] <= j['pos1']:
-                        if j['pos0'] >= i['pos0'] and j['pos1'] <= i['pos1']:
+                        if (j['pos0'] >= i['pos0'] and j['pos1'] <= i['pos1']) and (j['pos0'] != j['pos1']):
                             overlaps.append([j['pos0'], j['pos1']])
-                        elif i['pos0'] >= j['pos0'] and i['pos1'] <= j['pos1']:
+                        elif (i['pos0'] >= j['pos0'] and i['pos1'] <= j['pos1']) and (i['pos0'] != i['pos1']):
                             overlaps.append([i['pos0'], i['pos1']])
-                        elif j['pos0'] > i['pos0']:
+                        elif j['pos0'] > i['pos0'] and (j['pos0'] != i['pos1']):
                             overlaps.append([j['pos0'], i['pos1']])
-                        else:  # j['pos0'] < i['pos0']:
+                        elif j['pos1'] != i['pos0']:  # j['pos0'] < i['pos0']:
                             overlaps.append([j['pos1'], i['pos0']])
         cursor = self.ui.textEdit.textCursor()
         for o in overlaps:
