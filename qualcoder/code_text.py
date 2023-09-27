@@ -3127,13 +3127,13 @@ class DialogCodeText(QtWidgets.QWidget):
             for j in self.code_text:
                 if j != i:
                     if j['pos0'] <= i['pos0'] <= j['pos1']:
-                        if j['pos0'] >= i['pos0'] and j['pos1'] <= i['pos1']:
+                        if (j['pos0'] >= i['pos0'] and j['pos1'] <= i['pos1']) and (j['pos0'] != j['pos1']):
                             overlaps.append([j['pos0'], j['pos1']])
-                        elif i['pos0'] >= j['pos0'] and i['pos1'] <= j['pos1']:
+                        elif (i['pos0'] >= j['pos0'] and i['pos1'] <= j['pos1']) and (i['pos0'] != i['pos1']):
                             overlaps.append([i['pos0'], i['pos1']])
-                        elif j['pos0'] > i['pos0']:
+                        elif j['pos0'] > i['pos0'] and (j['pos0'] != i['pos1']):
                             overlaps.append([j['pos0'], i['pos1']])
-                        else:  # j['pos0'] < i['pos0']:
+                        elif j['pos1'] != i['pos0']:  # j['pos0'] < i['pos0']:
                             overlaps.append([j['pos1'], i['pos0']])
         cursor = self.ui.textEdit.textCursor()
         for o in overlaps:
