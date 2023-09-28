@@ -472,7 +472,7 @@ class DialogCodePdf(QtWidgets.QWidget):
 
     def fill_code_label_undo_show_selected_code(self):
         """ Fill code label with currently selected item's code name and colour.
-         Also, if text is highlighted, assign the text to this code.
+         Also, if text or graphics textbox(es) is highlighted, assign the text to this code.
 
          Called by: treewidgetitem_clicked """
 
@@ -494,6 +494,7 @@ class DialogCodePdf(QtWidgets.QWidget):
                     tt += _("Memo: ") + c['memo']
                 self.ui.label_code.setToolTip(tt)
                 break
+        # Selected text viatext edit OR via selected text boxes.
         selected_text = self.ui.textEdit.textCursor().selectedText()
         self.selected_graphic_textboxes = self.scene.selectedItems()
         if len(selected_text) > 0 and len(self.selected_graphic_textboxes) == 0:
@@ -3318,7 +3319,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         if by_text_boxes:
             cursor = self.ui.textEdit.textCursor()
             cursor.setPosition(coded['pos0'] - self.file_['start'])
-            cursor.setPosition(coded['pos1'] - self.file_['start'], QtGui.QTextCursor.MoveMode.KeepAnchor)
+            #cursor.setPosition(coded['pos1'] - self.file_['start'], QtGui.QTextCursor.MoveMode.KeepAnchor)
             self.ui.textEdit.setTextCursor(cursor)
 
         # Update recent_codes
