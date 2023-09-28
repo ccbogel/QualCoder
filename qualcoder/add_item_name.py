@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2022 Colin Curtain
+Copyright (c) 2023 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -31,6 +31,7 @@ import logging
 import traceback
 
 from PyQt6 import QtWidgets, QtCore
+from PyQt6.QtGui import QRegularExpressionValidator
 
 from .GUI.ui_dialog_add_item import Ui_Dialog_add_item
 
@@ -61,7 +62,15 @@ class DialogAddItemName(QtWidgets.QDialog):
     existing_items = []
     Dialog_addItem = None
 
-    def __init__(self, app, items, title, text, parent=None):
+    def __init__(self, app, items, title, text, reg_expression=None, parent=None):
+        """ Params:
+            app : App class
+            items: list of dictionaries containing 'name' key
+            title: String
+            text: String
+            validation: QRegularExpression object
+            """
+
         super(DialogAddItemName, self).__init__(parent)
         sys.excepthook = exception_handler
         self.existing_items = []
@@ -74,6 +83,9 @@ class DialogAddItemName(QtWidgets.QDialog):
         self.setStyleSheet("* {font-size:" + str(app.settings['fontsize']) + "pt} ")
         self.setWindowTitle(title)
         self.ui.label.setText(text)
+        if reg_expression:
+            valid_regex = QRegularExpressionValidator(reg_expression)
+            self.ui.lineEdit.setValidator(valid_regex)
         self.ui.lineEdit.setFocus()
 
     def accept(self):
