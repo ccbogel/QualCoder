@@ -3315,13 +3315,6 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
 
-        # Reflect marked position by showing location in textEdit
-        if by_text_boxes:
-            cursor = self.ui.textEdit.textCursor()
-            cursor.setPosition(coded['pos0'] - self.file_['start'])
-            #cursor.setPosition(coded['pos1'] - self.file_['start'], QtGui.QTextCursor.MoveMode.KeepAnchor)
-            self.ui.textEdit.setTextCursor(cursor)
-
         # Update recent_codes
         tmp_code = None
         for c in self.codes:
