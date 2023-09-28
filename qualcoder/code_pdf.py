@@ -939,10 +939,10 @@ class DialogCodePdf(QtWidgets.QWidget):
         if action is None:
             return
         if action == action_important:
-            self.set_important(cursor.position())
+            self.set_important(position=cursor.position(), ctid=None, important=True)
             return
         if action == action_not_important:
-            self.set_important(cursor.position(), False)
+            self.set_important(position=cursor.position(), ctid=None, important=False)
             return
         if selected_text != "" and action == action_copy:
             self.copy_selected_text_to_clipboard()
@@ -1089,11 +1089,14 @@ class DialogCodePdf(QtWidgets.QWidget):
                 return True
         return False
 
-    def set_important(self, position, important=True):
+    def set_important(self, position=None, ctid=None, important=True):
         """ Set or unset importance to coded text.
         Importance is denoted using '1'
+        Coded text items may be based ona text cursor location, if selected by the text edit,
+        or may be based on a ctid if selected via the graphics scene.
         params:
             position: textEdit character cursor position
+            ctid: the code text integer for the specific coded segment
             important: boolean, default True """
 
         # Need to get coded segments at this position
@@ -1106,8 +1109,12 @@ class DialogCodePdf(QtWidgets.QWidget):
         for item in self.code_text:
             if item['pos0'] <= position + self.file_['start'] <= item['pos1'] and \
                     item['owner'] == self.app.settings['codername'] and \
-                    ((not important and item['important'] == 1) or (important and item['important'] != 1)):
+                    ((not important and item['important'] == 1) or (important and item['important'] != 1)) and \
+                    ctid is None:
                 coded_text_list.append(item)
+            if ctid is not None and ctid == item['ctid']:
+                coded_text_list.append(item)
+                break
         if not coded_text_list:
             return
         text_items = []
@@ -1132,9 +1139,16 @@ class DialogCodePdf(QtWidgets.QWidget):
             self.app.conn.commit()
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
+        self.update_page()
 
-    def coded_text_memo(self, position=None):
-        """ Add or edit a memo for this coded text. """
+    def coded_text_memo(self, position=None, ctid=None):
+        """ Add or edit a memo for this coded text.
+        Coded text items may be based ona text cursor location, if selected by tthe text edit,
+        or may be based on a ctid if selected via the graphics scene.
+        param:
+            position: QTextCursor position
+            ctid: the code text integer for the specific coded segment
+        """
 
         if position is None:
             # Called via button
@@ -1144,8 +1158,11 @@ class DialogCodePdf(QtWidgets.QWidget):
         coded_text_list = []
         for item in self.code_text:
             if item['pos0'] <= position + self.file_['start'] <= item['pos1'] and \
-                    item['owner'] == self.app.settings['codername']:
+                    item['owner'] == self.app.settings['codername'] and ctid is None:
                 coded_text_list.append(item)
+            if ctid is not None and ctid == item['ctid']:
+                coded_text_list.append(item)
+                break
         if not coded_text_list:
             return
         text_item = None
@@ -1180,6 +1197,7 @@ class DialogCodePdf(QtWidgets.QWidget):
                 i['memo'] = memo
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
+        self.update_page()
 
     def change_code_pos_message(self):
         """  Called via textedit_menu. """
@@ -1501,16 +1519,16 @@ class DialogCodePdf(QtWidgets.QWidget):
             return
         # Important  for coded text
         if key == QtCore.Qt.Key.Key_I:
-            self.set_important(cursor_pos)
+            self.set_important(position=cursor_pos, ctid=None)
             return
         # Memo for current code
         if key == QtCore.Qt.Key.Key_M:
-            self.coded_text_memo(cursor_pos)
+            self.coded_text_memo(position=cursor_pos, ctid=None)
             return
         # Overlapping codes cycle
         now = datetime.datetime.now()
         overlap_diff = now - self.overlap_timer
-        if key == QtCore.Qt.Key.Key_O and len(self.overlaps_at_pos) > 0 and overlap_diff.microseconds > 150000:
+        if key == QtCore.Qt.Key.Key_O and len(self.overlaps_at_pos) > 0 and overlap_diff.microseconds > 100000:
             self.overlap_timer = datetime.datetime.now()
             self.highlight_selected_overlap()
             return
@@ -1638,7 +1656,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             now = datetime.datetime.now()
             diff = now - self.code_resize_timer
             # timer sensitivity is reduced compared to Code_text as scene redraw adds time.
-            if diff.microseconds < 50000:
+            if diff.microseconds < 30000:
                 return False
 
             cursor_pos = self.ui.textEdit.textCursor().position()
@@ -2928,12 +2946,16 @@ class DialogCodePdf(QtWidgets.QWidget):
             # Foreground depends on the defined need_white_text color in color_selector
             foreground_color = TextColor(color).recommendation
             fmt.setForeground(QBrush(QColor(foreground_color)))
-            if text_item['bold']:
-                fmt.setFontWeight(QtGui.QFont.Weight.Bold)
+            '''if text_item['bold']:
+                fmt.setFontWeight(QtGui.QFont.Weight.Bold)'''
             cursor.mergeCharFormat(fmt)
             #cursor.setCharFormat(fmt)
-
-            tooltip_list.append(graphics_item_code['name'])
+            tooltip_item_text = graphics_item_code['name']
+            if graphics_item_code['memo'] is not None and graphics_item_code['memo'] != "":
+                tooltip_item_text += "\n" + _("Memo: ") + graphics_item_code['memo']
+            if graphics_item_code['important'] == 1:
+                tooltip_item_text += "\n" + _("Important")
+            tooltip_list.append(tooltip_item_text)
         tooltip_list = list(set(tooltip_list))
         tooltip_list.sort()
         item.setToolTip("\n".join(tooltip_list))
@@ -2956,16 +2978,16 @@ class DialogCodePdf(QtWidgets.QWidget):
             return
         #print(f"Textbox: {text_box}")
         # Get codes applied to text box
-        codes_for_item = []
-        mid_text_box_pos = int((text_box['pos0'] + text_box['pos1']) / 2)
+        codes_in_text_box = []
         for code_ in self.code_text:
-            if code_['pos0'] <= text_box['pos0'] < code_['pos1']:
-                codes_for_item.append(code_)
-            if text_box['pos0'] < code_['pos0'] < text_box['pos1']:
-                codes_for_item.append(code_)
+            # Need code_ is not in .. otherwise same code can be added multiple times
+            if code_['pos0'] <= text_box['pos0'] < code_['pos1'] and code_ not in codes_in_text_box:
+                codes_in_text_box.append(code_)
+            if text_box['pos0'] < code_['pos0'] < text_box['pos1'] and code_ not in codes_in_text_box:
+                codes_in_text_box.append(code_)
             # Code starts within text_item text and continues beyond it
-            if code_['pos0'] < text_box['pos1'] < code_['pos1']:
-                codes_for_item.append(code_)
+            if code_['pos0'] < text_box['pos1'] < code_['pos1'] and code_ not in codes_in_text_box:
+                codes_in_text_box.append(code_)
         #print(f"Codes: {codes_for_item}")
 
         # Menu for graphics view area
@@ -2974,26 +2996,52 @@ class DialogCodePdf(QtWidgets.QWidget):
         action_unmark = None
         action_memo = None
         action_important = None
-        if codes_for_item:
+        if codes_in_text_box:
             action_unmark = menu.addAction(_("Unmark"))
             action_memo = menu.addAction(_("Code memo"))
             action_important = menu.addAction(_("Mark important"))
 
         action = menu.exec(self.ui.graphicsView.mapToGlobal(position))
         if action == action_unmark:
-            cursor = self.ui.textEdit.textCursor()
-            #cursor.setPosition(codes_for_item[0]['pos0'] - self.file_['start'])
-            cursor.setPosition(mid_text_box_pos)
-            self.unmark(cursor.position())
+            if len(codes_in_text_box) > 1:
+                ui = DialogSelectItems(self.app, codes_in_text_box, _("Select code to unmark"), "single")
+                ok = ui.exec()
+                if not ok:
+                    return
+                to_unmark = ui.get_selected()
+                if to_unmark is None:
+                    return
+                self.unmark(position=None, ctid=to_unmark['ctid'])
+            else:
+                self.unmark(position=None, ctid=codes_in_text_box[0]['ctid'])
             return
         if action == action_memo:
-            cursor = self.ui.textEdit.textCursor()
-            cursor.setPosition(mid_text_box_pos)
-            self.coded_text_memo(cursor.position())
+            if len(codes_in_text_box) > 1:
+                ui = DialogSelectItems(self.app, codes_in_text_box, _("Select code to memo"), "single")
+                ok = ui.exec()
+                if not ok:
+                    return
+                to_memo = ui.get_selected()
+                if to_memo is None:
+                    return
+                self.coded_text_memo(position=None, ctid=to_memo['ctid'])
+            else:
+                self.coded_text_memo(position=None, ctid=codes_in_text_box[0]['ctid'])
+            return
         if action == action_important:
-            cursor = self.ui.textEdit.textCursor()
-            cursor.setPosition(mid_text_box_pos)
-            self.set_important(cursor.position(), True)
+            if len(codes_in_text_box) > 1:
+                ui = DialogSelectItems(self.app, codes_in_text_box, _("Select code for important flag"), "single")
+                ok = ui.exec()
+                if not ok:
+                    return
+                to_make_important = ui.get_selected()
+                if to_make_important is None:
+                    return
+                self.set_important(position=None, ctid=to_make_important['ctid'], important=True)
+            else:
+                self.set_important(position=None, ctid=codes_in_text_box[0]['ctid'], important=True)
+            #self.set_important(position=cursor.position(), ctid=None, important=True)
+            return
 
     def get_qcolor(self, pdf_color) -> QtGui.QColor:
         """  Get a pdf_color which can be in various formats.
@@ -3311,22 +3359,27 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.fill_code_counts_in_tree()
         self.display_text_objects()
 
-    def unmark(self, location):
+    def unmark(self, position=None, ctid=None):
         """ Remove code marking by this coder from selected text in current file.
-        Called by text_edit_context_menu
+        Called by text_edit_context_menu, graphicsview_menu
         Adjust for start of text file, as this may be a smaller portion of the full text file.
-
+        Coded text items may be based ona text cursor location, if selected by the text edit,
+        or may be based on a ctid if selected via the graphics scene.
         param:
-            location: text cursor location, Integer
+            position: QTextCursor position Integer
+            ctid: the code text integer for the specific coded segment
         """
 
         if self.file_ is None:
             return
         unmarked_list = []
         for item in self.code_text:
-            if item['pos0'] <= location + self.file_['start'] <= item['pos1'] and \
+            if position and item['pos0'] <= position + self.file_['start'] <= item['pos1'] and \
                     item['owner'] == self.app.settings['codername']:
                 unmarked_list.append(item)
+            if ctid and ctid == item['ctid']:
+                unmarked_list.append(item)
+                break
         if not unmarked_list:
             return
         to_unmark = []
