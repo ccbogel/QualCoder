@@ -231,7 +231,6 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.pushButton_show_all_codings.pressed.connect(self.show_all_codes_in_text)
         self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
         self.ui.lineEdit_search.setEnabled(False)
-
         # TODO search allfiles, finding wrong text positions
         self.ui.checkBox_search_all_files.hide()
         # self.ui.checkBox_search_all_files.stateChanged.connect(self.search_for_text)
@@ -240,7 +239,6 @@ class DialogCodePdf(QtWidgets.QWidget):
         # pm.loadFromData(QtCore.QByteArray.fromBase64(clipboard_copy_icon), "png")
         # self.ui.label_search_all_files.setPixmap(QtGui.QPixmap(pm).scaled(22, 22))
         self.ui.label_search_all_files.hide()
-
         self.ui.checkBox_search_case.stateChanged.connect(self.search_for_text)
         self.ui.checkBox_search_case.setEnabled(False)
         pm = QtGui.QPixmap()
@@ -734,7 +732,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         if pattern is None:
             return
         self.search_indices = []
-        if self.ui.checkBox_search_all_files.isChecked():
+        '''if self.ui.checkBox_search_all_files.isChecked():
             """ Search for this text across all files. """
             for filedata in self.app.get_pdf_file_texts():
                 try:
@@ -742,21 +740,73 @@ class DialogCodePdf(QtWidgets.QWidget):
                     for match in pattern.finditer(text_):
                         self.search_indices.append((filedata, match.start(), len(match.group(0))))
                 except re.error:
-                    logger.exception('Failed searching text %s for %s', filedata['name'], self.search_term)
-        else:
-            try:
-                displayed_text = self.ui.textEdit.toPlainText()
-                if displayed_text != "":
-                    for match in pattern.finditer(displayed_text):
-                        # Get result as first dictionary item
-                        source_name = self.app.get_pdf_file_texts([self.file_['id'], ])[0]
-                        self.search_indices.append((source_name, match.start(), len(match.group(0))))
-            except re.error:
-                logger.exception('Failed searching current file for %s', self.search_term)
+                    logger.exception('Failed searching text %s for %s', filedata['name'], self.search_term)'''
+        # Search only this document
+        '''try:
+            displayed_text = self.ui.textEdit.toPlainText()
+            if displayed_text != "":
+                for match in pattern.finditer(displayed_text):
+                    # Get result as first dictionary item
+                    source_name = self.app.get_pdf_file_texts([self.file_['id'], ])[0]
+                    # Contains (name, id, fullltext, memo, owner, date, mediapath) and char position and search string length
+                    self.search_indices.append((source_name, match.start(), len(match.group(0))))
+        except re.error:
+            logger.exception('Failed searching current file for %s', self.search_term)'''
+
+        try:
+            displayed_text = self.file_['fulltext']  # self.ui.textEdit.toPlainText()
+            if displayed_text != "":
+                for match in pattern.finditer(displayed_text):
+                    # Get result as first dictionary item
+                    source_name = self.app.get_pdf_file_texts([self.file_['id'], ])[0]
+                    # Contains (name, id, fullltext, memo, owner, date, mediapath) and char position and search string length
+                    self.search_indices.append((source_name, match.start(), len(match.group(0))))
+        except re.error:
+            logger.exception('Failed searching current file for %s', self.search_term)
+
         if len(self.search_indices) > 0:
             self.ui.pushButton_next.setEnabled(True)
             self.ui.pushButton_previous.setEnabled(True)
         self.ui.label_search_totals.setText("0 / " + str(len(self.search_indices)))
+
+    def move_to_next_search_text(self):
+        """ Push button pressed to move to next search text position.
+        TODO something wrong when traversing other files. - so hideen this option
+         # Next_result is a tuple containing a dictionary of
+
+        next_result = (name, id, fullltext, memo, owner, date, medipath) and char position and search string length
+        """
+
+        if self.file_ is None or self.search_indices == []:
+            return
+        self.search_index += 1
+        if self.search_index == len(self.search_indices):
+            self.search_index = 0
+        cursor = self.ui.textEdit.textCursor()
+        next_result = self.search_indices[self.search_index]
+        # Next_result is a tuple containing a dictionary of
+        # (name, id, fullltext, memo, owner, date, medipath) and char position and search string length
+        '''if self.file_ is None or self.file_['id'] != next_result[0]['id']:
+            self.load_file(next_result[0])
+            self.ui.lineEdit_search.setText(self.search_term)'''
+        print("search_index", self.search_index)
+        print("next res char pos", next_result[1])
+        for p in self.pages:
+            if p['plain_text_start'] <= next_result[1] < p['plain_text_end']:
+                self.page_num = p['pagenum']
+                self.show_page()
+                break
+            #print(p['pagenum'], p['plain_text_start'], p['plain_text_end'])
+
+        cursor.setPosition(cursor.position() + next_result[2] - self.pages[self.page_num]['plain_text_start'])
+        self.ui.textEdit.setTextCursor(cursor)
+
+        # Highlight selected text
+        cursor.setPosition(next_result[1])
+        cursor.setPosition(cursor.position() + next_result[2] - self.pages[self.page_num]['plain_text_start'],
+                           QtGui.QTextCursor.MoveMode.KeepAnchor)
+        self.ui.textEdit.setTextCursor(cursor)
+        self.ui.label_search_totals.setText(str(self.search_index + 1) + " / " + str(len(self.search_indices)))
 
     def move_to_previous_search_text(self):
         """ Push button pressed to move to previous search text position.
@@ -778,32 +828,6 @@ class DialogCodePdf(QtWidgets.QWidget):
             self.ui.lineEdit_search.setText(self.search_term)
         cursor.setPosition(prev_result[1])
         cursor.setPosition(cursor.position() + prev_result[2], QtGui.QTextCursor.MoveMode.KeepAnchor)
-        self.ui.textEdit.setTextCursor(cursor)
-        self.ui.label_search_totals.setText(str(self.search_index + 1) + " / " + str(len(self.search_indices)))
-
-    def move_to_next_search_text(self):
-        """ Push button pressed to move to next search text position.
-        TODO something wrong when traversing other files.
-        TODO Hidden this option"""
-
-        if self.file_ is None or self.search_indices == []:
-            return
-        self.search_index += 1
-        if self.search_index == len(self.search_indices):
-            self.search_index = 0
-        cursor = self.ui.textEdit.textCursor()
-        next_result = self.search_indices[self.search_index]
-        # next_result is a tuple containing a dictionary of
-        # (name, id, fullltext, memo, owner, date) and char position and search string length
-        if self.file_ is None or self.file_['id'] != next_result[0]['id']:
-            self.load_file(next_result[0])
-            self.ui.lineEdit_search.setText(self.search_term)
-        cursor.setPosition(cursor.position() + next_result[2])
-        self.ui.textEdit.setTextCursor(cursor)
-
-        # Highlight selected text
-        cursor.setPosition(next_result[1])
-        cursor.setPosition(cursor.position() + next_result[2], QtGui.QTextCursor.MoveMode.KeepAnchor)
         self.ui.textEdit.setTextCursor(cursor)
         self.ui.label_search_totals.setText(str(self.search_index + 1) + " / " + str(len(self.search_indices)))
 
