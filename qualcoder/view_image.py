@@ -32,6 +32,7 @@ import html
 import logging
 import os
 from random import randint
+import sqlite3
 import sys
 import traceback
 import webbrowser
@@ -1546,7 +1547,8 @@ class DialogCodeImage(QtWidgets.QDialog):
         Called by item_moved_update_data when a code is moved onto another code.
         param:
             item : QTreeWidgetItem
-            parent : QTreeWidgetItem """
+            parent : QTreeWidgetItem
+        """
 
         # Check item dropped on itself. Error can occur on Ubuntu 22.04.
         if item['name'] == parent.text(0):
@@ -1561,15 +1563,41 @@ class DialogCodeImage(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         old_cid = item['cid']
         new_cid = int(parent.text(1).split(':')[1])
-        try:
-            cur.execute("update code_image set cid=? where cid=?", [new_cid, old_cid])
-            cur.execute("update code_av set cid=? where cid=?", [new_cid, old_cid])
-            cur.execute("update code_text set cid=? where cid=?", [new_cid, old_cid])
-            self.app.conn.commit()
-        except Exception as e:
-            msg = _("Cannot merge codes. Unmark overlapping text.") + "\n" + str(e)
-            Message(self.app, _("Cannot merge"), msg).exec()
-            return
+        # Update cid for each coded segment in text, av, image. Delete where there is an Integrity error
+        ct_sql = "select ctid from code_text where cid=?"
+        cur.execute(ct_sql, [old_cid])
+        ct_res = cur.fetchall()
+        for ct in ct_res:
+            try:
+                cur.execute("update code_text set cid=? where ctid=?", [new_cid, ct[0]])
+                self.app.conn.commit()
+            except sqlite3.IntegrityError as e_:
+                # print(ct, e_)
+                cur.execute("delete from code_text where ctid=?", [ct[0]])
+                self.app.conn.commit()
+        av_sql = "select avid from code_av where cid=?"
+        cur.execute(av_sql, [old_cid])
+        av_res = cur.fetchall()
+        for av in av_res:
+            try:
+                cur.execute("update code_av set cid=? where avid=?", [new_cid, av[0]])
+                self.app.conn.commit()
+            except sqlite3.IntegrityError as e_:
+                # print(e_)
+                cur.execute("delete from code_av where avid=?", [av[0]])
+                self.app.conn.commit()
+        img_sql = "select imid from code_image where cid=?"
+        cur.execute(img_sql, [old_cid])
+        img_res = cur.fetchall()
+        for img in img_res:
+            try:
+                cur.execute("update code_image set cid=? where imid=?", [new_cid, img[0]])
+                self.app.conn.commit()
+            except sqlite3.IntegrityError as e_:
+                # print(e_)
+                cur.execute("delete from code_image where imid=?", [img[0]])
+                self.app.conn.commit()
+
         cur.execute("delete from code_name where cid=?", [old_cid, ])
         self.app.conn.commit()
         self.parent_textEdit.append(msg)
