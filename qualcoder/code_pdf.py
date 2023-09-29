@@ -2518,9 +2518,8 @@ class DialogCodePdf(QtWidgets.QWidget):
     def go_to_latest_coded_file(self):
         """ Go and open file with the latest coding.
         Files menu option.
-        #TODO check this works correctly """
+        """
 
-        print("here latest")
         sql = "SELECT code_text.fid FROM code_text join source on source.id=code_text.fid \
             where code_text.owner=? and lower(source.mediapath) like '%pdf' order by code_text.date desc limit 1"
         cur = self.app.conn.cursor()
