@@ -3023,7 +3023,6 @@ class DialogCodePdf(QtWidgets.QWidget):
         scene_item = self.ui.graphicsView.itemAt(position)
         if scene_item is None:
             return
-        #print(type(scene_item))
         if not isinstance(scene_item, QtWidgets.QGraphicsTextItem):
             return
         text_box = None
@@ -3033,7 +3032,6 @@ class DialogCodePdf(QtWidgets.QWidget):
                 break
         if not text_box:
             return
-        #print(f"Textbox: {text_box}")
         # Get codes applied to text box
         codes_in_text_box = []
         for code_ in self.code_text:
@@ -3045,7 +3043,6 @@ class DialogCodePdf(QtWidgets.QWidget):
             # Code starts within text_item text and continues beyond it
             if code_['pos0'] < text_box['pos1'] < code_['pos1'] and code_ not in codes_in_text_box:
                 codes_in_text_box.append(code_)
-        #print(f"Codes: {codes_for_item}")
 
         # Menu for graphics view area
         menu = QtWidgets.QMenu()
@@ -3053,10 +3050,18 @@ class DialogCodePdf(QtWidgets.QWidget):
         action_unmark = None
         action_memo = None
         action_important = None
+        action_remove_important = None
+        important_codes = []
         if codes_in_text_box:
-            action_unmark = menu.addAction(_("Unmark"))
             action_memo = menu.addAction(_("Code memo"))
-            action_important = menu.addAction(_("Mark important"))
+            action_unmark = menu.addAction(_("Unmark"))
+            for c in codes_in_text_box:
+                if c['important'] == 1:
+                    important_codes.append(c)
+            if len(codes_in_text_box) > len(important_codes):
+                action_important = menu.addAction(_("Flag important"))
+            if important_codes:
+                action_remove_important = menu.addAction(_("Remove important flag"))
 
         action = menu.exec(self.ui.graphicsView.mapToGlobal(position))
         if action == action_unmark:
@@ -3098,6 +3103,19 @@ class DialogCodePdf(QtWidgets.QWidget):
             else:
                 self.set_important(position=None, ctid=codes_in_text_box[0]['ctid'], important=True)
             #self.set_important(position=cursor.position(), ctid=None, important=True)
+            return
+        if action == action_remove_important:
+            if len(codes_in_text_box) > 1:
+                ui = DialogSelectItems(self.app, codes_in_text_box, _("Select code to remove important flag"), "single")
+                ok = ui.exec()
+                if not ok:
+                    return
+                remove_important = ui.get_selected()
+                if remove_important is None:
+                    return
+                self.set_important(position=None, ctid=remove_important['ctid'], important=False)
+            else:
+                self.set_important(position=None, ctid=codes_in_text_box[0]['ctid'], important=False)
             return
 
     def get_qcolor(self, pdf_color) -> QtGui.QColor:
