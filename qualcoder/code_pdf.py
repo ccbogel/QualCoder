@@ -199,6 +199,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(playback_next_icon_24), "png")
         self.ui.pushButton_latest.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_latest.pressed.connect(self.go_to_latest_coded_file)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(playback_play_icon_24), "png")
         self.ui.pushButton_next_file.setIcon(QtGui.QIcon(pm))
@@ -2519,17 +2520,19 @@ class DialogCodePdf(QtWidgets.QWidget):
         Files menu option.
         #TODO check this works correctly """
 
+        print("here latest")
         sql = "SELECT code_text.fid FROM code_text join source on source.id=code_text.fid \
-            where code_text.owner=? and lower(source.mediapath)='%pdf' order by code_text.date desc limit 1"
+            where code_text.owner=? and lower(source.mediapath) like '%pdf' order by code_text.date desc limit 1"
         cur = self.app.conn.cursor()
-        cur.execute(sql, [self.app.settings['codername'], ])
+        cur.execute(sql, [self.app.settings['codername']])
         result = cur.fetchone()
         if result is None:
             return
-        for i, f in enumerate(self.filenames):
-            if f['id'] == result[0]:
+        for i, filedata in enumerate(self.filenames):
+            if filedata['id'] == result[0]:
+                print("found", filedata['name'])
                 self.ui.listWidget.setCurrentRow(i)
-                self.load_file(f)
+                self.load_file(filedata)
                 self.search_term = ""
                 break
 
