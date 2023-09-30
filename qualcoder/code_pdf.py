@@ -758,12 +758,17 @@ class DialogCodePdf(QtWidgets.QWidget):
             if displayed_text != "":
                 for match in pattern.finditer(displayed_text):
                     # Get result as first dictionary item
-                    source_name = self.app.get_pdf_file_texts([self.file_['id'], ])[0]
-                    # Contains (name, id, fullltext, memo, owner, date, mediapath) and char position and search string length
-                    self.search_indices.append((source_name, match.start(), len(match.group(0))))
+                    '''file_dict = self.app.get_pdf_file_texts([self.file_['id'], ])[0]
+                    file_dict.pop('fulltext', None)
+                    file_dict.pop('memo', None)
+                    file_dict.pop('owner', None)
+                    file_dict.pop('date', None)
+                    file_dict.pop('mediapath', None)
+                    file_dict.pop('name', None)'''
+                    # char position and search string length
+                    self.search_indices.append((match.start(), len(match.group(0))))
         except re.error:
             logger.exception('Failed searching current file for %s', self.search_term)
-
         if len(self.search_indices) > 0:
             self.ui.pushButton_next.setEnabled(True)
             self.ui.pushButton_previous.setEnabled(True)
@@ -771,10 +776,7 @@ class DialogCodePdf(QtWidgets.QWidget):
 
     def move_to_next_search_text(self):
         """ Push button pressed to move to next search text position.
-        TODO something wrong when traversing other files. - so hideen this option
-         # Next_result is a tuple containing a dictionary of
-
-        next_result = (name, id, fullltext, memo, owner, date, medipath) and char position and search string length
+        next_result = [char position, search string length]
         """
 
         if self.file_ is None or self.search_indices == []:
@@ -782,36 +784,25 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.search_index += 1
         if self.search_index == len(self.search_indices):
             self.search_index = 0
-        cursor = self.ui.textEdit.textCursor()
         next_result = self.search_indices[self.search_index]
-        # Next_result is a tuple containing a dictionary of
-        # (name, id, fullltext, memo, owner, date, medipath) and char position and search string length
-        '''if self.file_ is None or self.file_['id'] != next_result[0]['id']:
-            self.load_file(next_result[0])
-            self.ui.lineEdit_search.setText(self.search_term)'''
-        print("search_index", self.search_index)
-        print("next res char pos", next_result[1])
         for p in self.pages:
-            if p['plain_text_start'] <= next_result[1] < p['plain_text_end']:
+            if p['plain_text_start'] <= next_result[0] < p['plain_text_end']:
                 self.page_num = p['pagenum']
+                self.ui.spinBox.setValue(self.page_num + 1)
                 self.show_page()
                 break
-            #print(p['pagenum'], p['plain_text_start'], p['plain_text_end'])
-
-        cursor.setPosition(cursor.position() + next_result[2] - self.pages[self.page_num]['plain_text_start'])
-        self.ui.textEdit.setTextCursor(cursor)
-
         # Highlight selected text
-        cursor.setPosition(next_result[1])
-        cursor.setPosition(cursor.position() + next_result[2] - self.pages[self.page_num]['plain_text_start'],
-                           QtGui.QTextCursor.MoveMode.KeepAnchor)
+        cursor = self.ui.textEdit.textCursor()
+        start_pos = next_result[0] - self.pages[self.page_num]['plain_text_start']
+        end_pos = start_pos + next_result[1]
+        cursor.setPosition(start_pos)
+        self.ui.textEdit.setTextCursor(cursor)
+        cursor.setPosition(end_pos, QtGui.QTextCursor.MoveMode.KeepAnchor)
         self.ui.textEdit.setTextCursor(cursor)
         self.ui.label_search_totals.setText(str(self.search_index + 1) + " / " + str(len(self.search_indices)))
 
     def move_to_previous_search_text(self):
         """ Push button pressed to move to previous search text position.
-        TODO something wrong when traversing other files.
-        TODO Hidden this option
         """
 
         if self.file_ is None or self.search_indices == []:
@@ -819,17 +810,32 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.search_index -= 1
         if self.search_index < 0:
             self.search_index = len(self.search_indices) - 1
+        previous_result = self.search_indices[self.search_index]
+        for p in self.pages:
+            if p['plain_text_start'] <= previous_result[0] < p['plain_text_end']:
+                self.page_num = p['pagenum']
+                self.ui.spinBox.setValue(self.page_num + 1)
+                self.show_page()
+                break
+        # Highlight selected text
+        start_pos = previous_result[0] - self.pages[self.page_num]['plain_text_start']
+        end_pos = start_pos + previous_result[1]
         cursor = self.ui.textEdit.textCursor()
-        prev_result = self.search_indices[self.search_index]
-        # prev_result is a tuple containing a dictionary of
-        # (name, id, fullltext, memo, owner, date, mediapath) and char position and search string length
-        if self.file_ is None or self.file_['id'] != prev_result[0]['id']:
-            self.load_file(prev_result[0])
-            self.ui.lineEdit_search.setText(self.search_term)
-        cursor.setPosition(prev_result[1])
-        cursor.setPosition(cursor.position() + prev_result[2], QtGui.QTextCursor.MoveMode.KeepAnchor)
+        cursor.setPosition(start_pos)
+        self.ui.textEdit.setTextCursor(cursor)
+        cursor.setPosition(end_pos, QtGui.QTextCursor.MoveMode.KeepAnchor)
         self.ui.textEdit.setTextCursor(cursor)
         self.ui.label_search_totals.setText(str(self.search_index + 1) + " / " + str(len(self.search_indices)))
+        '''for tb in self.pages[self.page_num]['text_boxes']:
+            if tb['pos0'] <= previous_result[0] < tb['pos1']:
+                x = tb['graphic_item_ref'].pos().x()
+                y = tb['graphic_item_ref'].pos().y()
+                #print("pos", tb['graphic_item_ref'].boundingRect())
+                path = QtGui.QPainterPath()
+                self.scene.setSelectionArea(path)
+                path.addRect(x + 3, y + 3, x + 4, y + 4)
+                self.scene.setSelectionArea(path)
+                break'''
 
     def lineedit_search_menu(self, position):
         """ Option to change from automatic search on 3 characters or more to press Enter to search """
@@ -1682,7 +1688,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             now = datetime.datetime.now()
             diff = now - self.code_resize_timer
             # timer sensitivity is reduced compared to Code_text as scene redraw adds time.
-            if diff.microseconds < 30000:
+            if diff.microseconds < 10000:
                 return False
 
             cursor_pos = self.ui.textEdit.textCursor().position()
