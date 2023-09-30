@@ -3073,17 +3073,9 @@ class DialogCodePdf(QtWidgets.QWidget):
         # Menu for graphics view area
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-
         ''' Cannot mark selected textboxes. as soon as context menu appears, textbox selections are removed.
         action_mark = None
-        if self.ui.treeWidget.currentItem() is not None:
-            action_mark = menu.addAction(_("Mark"))
-        # Use up to 10 recent codes
-        if len(self.recent_codes) > 0:
-            submenu = menu.addMenu(_("Mark with recent code"))
-            for item in self.recent_codes:
-                submenu.addAction(item['name'])'''
-
+        '''
         action_unmark = None
         action_memo = None
         action_important = None
@@ -3101,9 +3093,6 @@ class DialogCodePdf(QtWidgets.QWidget):
             action_unmark = menu.addAction(_("Unmark"))
 
         action = menu.exec(self.ui.graphicsView.mapToGlobal(position))
-        if action == action_mark:
-            self.mark(by_text_boxes=True)
-            return
         if action == action_unmark:
             if len(codes_in_text_box) > 1:
                 ui = DialogSelectItems(self.app, codes_in_text_box, _("Select code to unmark"), "single")
