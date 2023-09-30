@@ -495,15 +495,14 @@ class DialogCodePdf(QtWidgets.QWidget):
                 break
         # Selected text via textEdit OR via selected text boxes.
         selected_text = self.ui.textEdit.textCursor().selectedText()
-        self.selected_graphic_textboxes = self.scene.selectedItems()
-        if len(selected_text) > 0 and len(self.selected_graphic_textboxes) == 0:
-            self.mark()
-        #if len(selected_text) == 0 and len(self.selected_graphic_textboxes) > 0:
-        ''' When using search text, textEdit text may be selected as well as the text_box.
-        So in this circumstance can select textbox directly or via search text to codet the selected text boxes. '''
-        if len(self.selected_graphic_textboxes) > 0:
-            self.mark(by_text_boxes=True)
-
+        if self.scene is not None:
+            self.selected_graphic_textboxes = self.scene.selectedItems()
+            if len(selected_text) > 0 and len(self.selected_graphic_textboxes) == 0:
+                self.mark()
+            ''' When using search text, textEdit text may be selected as well as the text_box.
+            So in this circumstance can select textbox directly or via search text to codet the selected text boxes. '''
+            if len(self.selected_graphic_textboxes) > 0:
+                self.mark(by_text_boxes=True)
         # When a code is selected undo the show selected code features
         self.highlight()
         # Reload button icons as they disappear on Windows
@@ -1523,7 +1522,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             if key == QtCore.Qt.Key.Key_0:
                 self.help()
                 return
-        if self.ui.graphicsView.hasFocus():
+        if self.ui.graphicsView.hasFocus() and self.scene is not None:
             if key == QtCore.Qt.Key.Key_Plus:
                 if self.ui.graphicsView.transform().isScaling() and self.ui.graphicsView.transform().determinant() > 10:
                     return
@@ -1534,10 +1533,47 @@ class DialogCodePdf(QtWidgets.QWidget):
                     return
                 self.ui.graphicsView.scale(0.9, 0.9)
                 return
+            # Hide unHide top groupbox
+            if key == QtCore.Qt.Key.Key_H:
+                self.ui.groupBox.setHidden(not (self.ui.groupBox.isHidden()))
+                return
+            # Quick mark selected
+            if key == QtCore.Qt.Key.Key_Q:
+                self.selected_graphic_textboxes = self.scene.selectedItems()
+                if len(self.selected_graphic_textboxes) == 0:
+                    return
+                self.mark(by_text_boxes=True)
+                return
+
+            # TODO maybe get graphics boxeses and coding here - see graphicview_menu
+
+            # Recent codes selection
+            if key == QtCore.Qt.Key.Key_R and len(self.recent_codes) > 0:
+                self.selected_graphic_textboxes = self.scene.selectedItems()
+                if len(self.selected_graphic_textboxes) == 0:
+                    return
+                ''' Can only be single selection, as text bosex re-drawn selection is lost. '''
+                ui = DialogSelectItems(self.app, self.recent_codes, _("Select code"), "single")
+                ok = ui.exec()
+                if not ok:
+                    return
+                selection = ui.get_selected()
+                self.recursive_set_current_item(self.ui.treeWidget.invisibleRootItem(), selection['name'])
+                self.mark(by_text_boxes=True)
+                return
+            # Unmark text boxes
+            ''' Review graphicsview_menu for code for this action '''
+            '''if key == QtCore.Qt.Key.Key_U:
+                self.selected_graphic_textboxes = self.scene.selectedItems()
+                if len(self.selected_graphic_textboxes) == 0:
+                    return
+                print("U")
+                #self.unmark(cursor_pos)
+                return
+            # TODO MORE'''
+
         if not self.ui.textEdit.hasFocus():
             return
-        key = event.key()
-        # mod = QtGui.QGuiApplication.keyboardModifiers()
         cursor_pos = self.ui.textEdit.textCursor().position()
         selected_text = self.ui.textEdit.textCursor().selectedText()
         codes_here = []
@@ -1564,7 +1600,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         if key == QtCore.Qt.Key.Key_H:
             self.ui.groupBox.setHidden(not (self.ui.groupBox.isHidden()))
             return
-        # Important  for coded text
+        # Important for coded text
         if key == QtCore.Qt.Key.Key_I:
             self.set_important(position=cursor_pos, ctid=None)
             return
@@ -2147,7 +2183,6 @@ class DialogCodePdf(QtWidgets.QWidget):
             self.parent_textEdit.append(_("New code: ") + item['name'])
         except sqlite3.IntegrityError:
             # Can occur with in vivo coding
-            print("in vivo coding. Code already exists")
             return False
         self.update_dialog_codes_and_categories()
         self.get_coded_text_update_eventfilter_tooltips()
@@ -2492,7 +2527,6 @@ class DialogCodePdf(QtWidgets.QWidget):
             return
         if self.file_['mediapath'][:5] == "docs:":
             doc_path = self.file_['mediapath'][5:]
-            print("TO open external ", doc_path)
             webbrowser.open(doc_path)
             return
         logger.error("Cannot open text file in browser " + self.file_['mediapath'])
@@ -2574,7 +2608,6 @@ class DialogCodePdf(QtWidgets.QWidget):
             return
         for i, filedata in enumerate(self.filenames):
             if filedata['id'] == result[0]:
-                print("found", filedata['name'])
                 self.ui.listWidget.setCurrentRow(i)
                 self.load_file(filedata)
                 self.search_term = ""
@@ -3104,7 +3137,8 @@ class DialogCodePdf(QtWidgets.QWidget):
                     return
                 self.unmark(position=None, ctid=to_unmark['ctid'])
             else:
-                self.unmark(position=None, ctid=codes_in_text_box[0]['ctid'])
+                if codes_in_text_box:
+                    self.unmark(position=None, ctid=codes_in_text_box[0]['ctid'])
             return
         if action == action_memo:
             if len(codes_in_text_box) > 1:
@@ -3376,8 +3410,6 @@ class DialogCodePdf(QtWidgets.QWidget):
             # for tb in selected_boxes:
             #    print("CHAR POS:", tb['pos0'], tb['pos1'])
             linked_positions = []
-
-            print(selected_boxes)
 
             pos0 = selected_boxes[0]['pos0']
             pos1 = selected_boxes[0]['pos1']
