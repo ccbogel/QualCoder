@@ -493,12 +493,15 @@ class DialogCodePdf(QtWidgets.QWidget):
                     tt += _("Memo: ") + c['memo']
                 self.ui.label_code.setToolTip(tt)
                 break
-        # Selected text viatext edit OR via selected text boxes.
+        # Selected text via textEdit OR via selected text boxes.
         selected_text = self.ui.textEdit.textCursor().selectedText()
         self.selected_graphic_textboxes = self.scene.selectedItems()
         if len(selected_text) > 0 and len(self.selected_graphic_textboxes) == 0:
             self.mark()
-        if len(selected_text) == 0 and len(self.selected_graphic_textboxes) > 0:
+        #if len(selected_text) == 0 and len(self.selected_graphic_textboxes) > 0:
+        ''' When using search text, textEdit text may be selected as well as the text_box.
+        So in this circumstance can select textbox directly or via search text to codet the selected text boxes. '''
+        if len(self.selected_graphic_textboxes) > 0:
             self.mark(by_text_boxes=True)
 
         # When a code is selected undo the show selected code features
@@ -800,6 +803,17 @@ class DialogCodePdf(QtWidgets.QWidget):
         cursor.setPosition(end_pos, QtGui.QTextCursor.MoveMode.KeepAnchor)
         self.ui.textEdit.setTextCursor(cursor)
         self.ui.label_search_totals.setText(str(self.search_index + 1) + " / " + str(len(self.search_indices)))
+        # Select relevant text boxes
+        for tb in self.pages[self.page_num]['text_boxes']:
+            if tb['pos0'] <= next_result[0] < tb['pos1']:
+                x = tb['graphic_item_ref'].pos().x()
+                y = tb['graphic_item_ref'].pos().y()
+                #print("pos", tb['graphic_item_ref'].boundingRect())
+                path = QtGui.QPainterPath()
+                self.scene.setSelectionArea(path)
+                path.addRect(x + 2, y + 6, 1, 1)
+                self.scene.setSelectionArea(path)
+                break
 
     def move_to_previous_search_text(self):
         """ Push button pressed to move to previous search text position.
@@ -826,16 +840,17 @@ class DialogCodePdf(QtWidgets.QWidget):
         cursor.setPosition(end_pos, QtGui.QTextCursor.MoveMode.KeepAnchor)
         self.ui.textEdit.setTextCursor(cursor)
         self.ui.label_search_totals.setText(str(self.search_index + 1) + " / " + str(len(self.search_indices)))
-        '''for tb in self.pages[self.page_num]['text_boxes']:
+        # Select relevant text boxes
+        for tb in self.pages[self.page_num]['text_boxes']:
             if tb['pos0'] <= previous_result[0] < tb['pos1']:
                 x = tb['graphic_item_ref'].pos().x()
                 y = tb['graphic_item_ref'].pos().y()
                 #print("pos", tb['graphic_item_ref'].boundingRect())
                 path = QtGui.QPainterPath()
                 self.scene.setSelectionArea(path)
-                path.addRect(x + 3, y + 3, x + 4, y + 4)
+                path.addRect(x + 2, y + 6, 1, 1)
                 self.scene.setSelectionArea(path)
-                break'''
+                break
 
     def lineedit_search_menu(self, position):
         """ Option to change from automatic search on 3 characters or more to press Enter to search """
@@ -2939,7 +2954,11 @@ class DialogCodePdf(QtWidgets.QWidget):
         page = self.pages[self.page_num]
         for text_box in page['text_boxes']:
             self.pdf_object_info_text += "TEXT: " + str(text_box) + "\n"
-            item = self.scene.addText(text_box['text'])
+            display_text = text_box['text']
+            # remove line ending to shrink textbox size
+            if display_text[-1] == "\n":
+                display_text = display_text[:-1] + " "
+            item = self.scene.addText(display_text)
             item.setPos(text_box['left'], text_box['top'])
             '''print(i['fontname'], type(t['fontname']), t['fontsize'], type(t['fontsize']))
             font = QtGui.QFont(t['fontname'], t['fontsize']) '''
@@ -3024,7 +3043,8 @@ class DialogCodePdf(QtWidgets.QWidget):
         item.setToolTip("\n".join(tooltip_list))
 
     def graphicsview_menu(self, position):
-        """ Menu for unmarking codes, code memos and important marking. """
+        """ Menu for unmarking codes, code memos and important marking.
+        Also for selecting recent codes for marking. """
 
         scene_item = self.ui.graphicsView.itemAt(position)
         if scene_item is None:
@@ -3053,6 +3073,17 @@ class DialogCodePdf(QtWidgets.QWidget):
         # Menu for graphics view area
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+
+        ''' Cannot mark selected textboxes. as soon as context menu appears, textbox selections are removed.
+        action_mark = None
+        if self.ui.treeWidget.currentItem() is not None:
+            action_mark = menu.addAction(_("Mark"))
+        # Use up to 10 recent codes
+        if len(self.recent_codes) > 0:
+            submenu = menu.addMenu(_("Mark with recent code"))
+            for item in self.recent_codes:
+                submenu.addAction(item['name'])'''
+
         action_unmark = None
         action_memo = None
         action_important = None
@@ -3060,7 +3091,6 @@ class DialogCodePdf(QtWidgets.QWidget):
         important_codes = []
         if codes_in_text_box:
             action_memo = menu.addAction(_("Code memo"))
-            action_unmark = menu.addAction(_("Unmark"))
             for c in codes_in_text_box:
                 if c['important'] == 1:
                     important_codes.append(c)
@@ -3068,8 +3098,12 @@ class DialogCodePdf(QtWidgets.QWidget):
                 action_important = menu.addAction(_("Flag important"))
             if important_codes:
                 action_remove_important = menu.addAction(_("Remove important flag"))
+            action_unmark = menu.addAction(_("Unmark"))
 
         action = menu.exec(self.ui.graphicsView.mapToGlobal(position))
+        if action == action_mark:
+            self.mark(by_text_boxes=True)
+            return
         if action == action_unmark:
             if len(codes_in_text_box) > 1:
                 ui = DialogSelectItems(self.app, codes_in_text_box, _("Select code to unmark"), "single")
@@ -3353,6 +3387,9 @@ class DialogCodePdf(QtWidgets.QWidget):
             # for tb in selected_boxes:
             #    print("CHAR POS:", tb['pos0'], tb['pos1'])
             linked_positions = []
+
+            print(selected_boxes)
+
             pos0 = selected_boxes[0]['pos0']
             pos1 = selected_boxes[0]['pos1']
             seltext = selected_boxes[0]['text']
