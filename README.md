@@ -231,10 +231,10 @@ pip3 install chardet ebooklib openpyxl pandas pillow ply pdfminer.six plotly pyd
 `python3 -m pip install .`
 
 
-Assuming you downloaded the 3.2 version. You can now run with:
+Assuming you downloaded the 3.3 version. You can now run with:
 
 ```
-python3 /applications/QualCoder-3.2/qualcoder/__main__.py
+python3 /applications/QualCoder-3.3/qualcoder/__main__.py
 ```
 
 Alternative commands to run QualCoder (Suggestions):
