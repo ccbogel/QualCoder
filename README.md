@@ -199,7 +199,7 @@ Note 2: Fedora uses wayland with does not work well with the Qt graphical interf
 
 The instructions work on Mac Monterey. It is recommended to use a virtual environment, see: https://sourabhbajaj.com/mac-setup/Python/virtualenv.html The below instructions can be used inside a virtual environment folder instead of placing in Applications.
 
-You will need to install developer tools for mac (sorry I am not sure how to describe how to do this).
+You will need to install developer tools for macOS. [See https://www.cnet.com/tech/computing/install-command-line-developer-tools-in-os-x/](https://www.cnet.com/tech/computing/install-command-line-developer-tools-in-os-x/)
 
 1) Install recent versions of [Python3](https://www.python.org/downloads/) and [VLC](https://www.videolan.org/vlc/).
 
@@ -220,11 +220,15 @@ python3 get-pip.py
 
 5) Install Python dependency modules using `pip`:
 
-(you might already have them, don't do this again if you just update QualCoder to a newer version)
-
 ```sh
 pip3 install chardet ebooklib openpyxl pandas pillow ply pdfminer.six plotly pydub pyqt6 python-vlc rispy six SpeechRecognition wordcloud xmlschema
 ```
+
+Be sure that you are in the QualCoder-Master directory before doing Step 6.
+
+To change the directory, enter or copy and run the script below.
+
+`cd /Applications/QualCoder-3.3`
 
 6) From the QualCoder-Master directory run the setup script:
 
