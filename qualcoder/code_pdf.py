@@ -287,7 +287,9 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
         self.ui.treeWidget.itemClicked.connect(self.fill_code_label_undo_show_selected_code)
+        self.ui.textEdit_2.setReadOnly(True)  # Code examples
         self.ui.splitter.setSizes([150, 400, 150])
+        self.ui.splitter_2.setSizes([100, 0])
         '''try:
             s0 = int(self.app.settings['dialogcodepdf_splitter0'])
             s1 = int(self.app.settings['dialogcodepdf_splitter1'])
@@ -480,6 +482,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             self.ui.label_code.hide()
             self.ui.label_code.setToolTip("")
             return
+        self.show_code_rule()
         self.ui.label_code.show()
         # Set background colour of label to code color, and store current code for underlining
         for c in self.codes:
@@ -1458,6 +1461,32 @@ class DialogCodePdf(QtWidgets.QWidget):
             if "cid:" in item.child(i).text(1) and text_ == "":
                 item.child(i).setHidden(False)
             self.recursive_traverse(item.child(i), text_)
+
+    def show_code_rule(self):
+        """ Show code examples in right-hand side splitter pane. """
+
+        self.ui.textEdit_2.setPlainText("")
+        selected = self.ui.treeWidget.currentItem()
+        if selected is None:
+            self.ui.textEdit_2.setText("")
+            return
+        if selected.text(1)[0:3] == 'cat':
+            return
+        else:  # Code is selected
+            for c in self.codes:
+                if c['cid'] == int(selected.text(1)[4:]):
+                    txt = _("CODE: ") + c['name'] + "\n" + _("MEMO: ") + "\n"
+                    txt += c['memo'] + "\n"
+                    break
+            # Get coded examples
+            txt += "\n" + _("EXAMPLES:") + "\n"
+            cur = self.app.conn.cursor()
+            cur.execute("select seltext from code_text where length(seltext) > 0 and cid=? order by random() limit 3",
+                        [int(selected.text(1)[4:])])
+            res = cur.fetchall()
+            for i, r in enumerate(res):
+                txt += str(i + 1) + ": " + r[0] + "\n"
+        self.ui.textEdit_2.setText(txt)
 
     def keyPressEvent(self, event):
         """
