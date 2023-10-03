@@ -285,8 +285,8 @@ QualCoder is distributed under the MIT LICENSE.
 
 ##  Citation APA style
 
-Curtain, C. (2023) QualCoder 3.3 [Computer software]. Retrieved from
-https://github.com/ccbogel/QualCoder/releases/tag/3.3
+Curtain, C. (2023) QualCoder 3.4 [Computer software]. Retrieved from
+https://github.com/ccbogel/QualCoder/releases/tag/3.4
 
 ## Creator
 
