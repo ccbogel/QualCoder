@@ -182,6 +182,9 @@ class DialogJournals(QtWidgets.QDialog):
 
         self.ui.tableWidget.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
+        self.ui.tableWidget.horizontalHeader().setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        self.ui.tableWidget.horizontalHeader().customContextMenuRequested.connect(self.table_header_menu)
+
         self.ui.textEdit.hide()
         self.attribute_names = []  # For AddAttribute dialog
 
@@ -403,6 +406,52 @@ class DialogJournals(QtWidgets.QDialog):
         self.ui.textEdit.setText("")
         self.ui.label_jcount.setText(_("Journals: ") + str(len(self.journals)))
 
+    def table_header_menu(self, position):
+
+        if not self.journals:
+            return
+        index_at = self.ui.tableWidget.indexAt(position)
+        col = int(index_at.column())
+        menu = QtWidgets.QMenu(self)
+        action_name_asc = None
+        action_name_desc = None
+        if col == NAME_COLUMN:
+            action_name_asc = menu.addAction(_("Ascending"))
+            action_name_desc = menu.addAction(_("Descending"))
+        action_modified_date_asc = None
+        action_modified_date_desc = None
+        if col == DATE_COLUMN:
+            action_modified_date_asc = menu.addAction(_("Ascending"))
+            action_modified_date_desc = menu.addAction(_("Descending"))
+        action_attribute_ascending = None
+        action_attribute_descending = None
+        if col >= ATTRIBUTE_START_COLUMN:
+            action_attribute_ascending = menu.addAction(_("Ascending"))
+            action_attribute_descending = menu.addAction(_("Descending"))
+
+        action = menu.exec(self.ui.tableWidget.mapToGlobal(position))
+        if action == action_modified_date_asc:
+            self.load_journals("date asc")
+            return
+        if action == action_modified_date_desc:
+            self.load_journals("date desc")
+            return
+        if action == action_name_asc:
+            self.load_journals("name asc")
+            return
+        if action == action_name_desc:
+            self.load_journals("name desc")
+            return
+        if action == action_attribute_ascending:
+            attribute_name = self.header_labels[col]
+            self.load_journals(attribute_name + "| asc")
+            return
+        if action == action_attribute_descending:
+            attribute_name = self.header_labels[col]
+
+            self.load_journals(attribute_name + "|desc")
+            return
+
     def table_menu(self, position):
         """ Context menu for displaying table rows in differing order,
             Showing specific rows, adding dates to Character Attributes that contain 'date' in the name.
@@ -411,6 +460,7 @@ class DialogJournals(QtWidgets.QDialog):
         row = self.ui.tableWidget.currentRow()
         col = self.ui.tableWidget.currentColumn()
         item = self.ui.tableWidget.item(row, col)
+
         item_text = ""
         if item is not None:
             item_text = item.text()
