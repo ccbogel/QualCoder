@@ -29,6 +29,7 @@ https://qualcoder.wordpress.com/
 
 import base64
 import configparser
+import csv
 import datetime
 import gettext
 import json  # To get the latest GitHub release information
@@ -1324,12 +1325,12 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def import_plain_text_codes(self):
         """ Import a list of plain text codes codebook.
-        The codebook is a plain text file or tsv file.
+        The codebook is a plain text file or csv file.
         Tab separates the codename from the code description.
         """
 
         response = QtWidgets.QFileDialog.getOpenFileNames(self, _('Select plain text codes file'),
-                                                          self.app.settings['directory'], "Text (*.txt *.tsv)",
+                                                          self.app.settings['directory'], "Text (*.txt *.csv)",
                                                           options=QtWidgets.QFileDialog.Option.DontUseNativeDialog
                                                           )
         filepath = response[0]
@@ -1339,14 +1340,23 @@ class MainWindow(QtWidgets.QMainWindow):
         filepath = filepath[0]  # List to string of file path
         self.ui.textEdit.append("\n" + _("Importing codes from: ") + filepath)
         self.ui.textEdit.append(_("Refresh codes trees via menu options for coding, reports"))
-        with open(filepath, 'r', encoding='UTF-8') as file_:
-            rows = file_.readlines()
+        with open(filepath, 'r', encoding='UTF-8-sig') as file_:
+            rows = []
+            if filepath[-4:].lower() == ".csv":
+                reader = csv.reader(file_, delimiter=",", quoting=csv.QUOTE_MINIMAL)
+                for row in reader:
+                    rows.append(row)
+            else:
+                reader = csv.reader(file_, delimiter="\t", quoting=csv.QUOTE_MINIMAL)
+                for row in reader:
+                    if row:
+                        rows.append(row)
             for row in rows:
-                data = row.split("\t", 1)
+                print(row)
                 memo = ""
-                if len(data) > 1:
-                    memo = data[1]
-                item = {'name': data[0].strip(), 'memo': memo, 'owner': self.app.settings['codername'],
+                if len(row) > 1:
+                    memo = row[1]
+                item = {'name': row[0].strip(), 'memo': memo, 'owner': self.app.settings['codername'],
                         'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'catid': None,
                         'color': colors[randint(0, len(colors) - 1)]}
                 cur = self.app.conn.cursor()
@@ -1355,9 +1365,9 @@ class MainWindow(QtWidgets.QMainWindow):
                                 (item['name'], item['memo'], item['owner'], item['date'], item['catid'], item['color']))
                     self.app.conn.commit()
                     self.app.delete_backup = False
-                    self.ui.textEdit.append(_("Imported code: ") + data[0].strip())
+                    self.ui.textEdit.append(_("Imported code: ") + row[0].strip())
                 except sqlite3.IntegrityError:
-                    self.ui.textEdit.append(_("Duplicate code not imported: ") + data[0].strip())
+                    self.ui.textEdit.append(_("Duplicate code not imported: ") + row[0].strip())
 
     def import_survey(self):
         """ Import survey flat sheet: csv file or xlsx.
