@@ -1323,23 +1323,30 @@ class MainWindow(QtWidgets.QMainWindow):
         self.tab_layout_helper(self.ui.tab_manage, ui)
 
     def import_plain_text_codes(self):
-        """ Import a list of plain text codes codebook. """
+        """ Import a list of plain text codes codebook.
+        The codebook is a plain text file or tsv file.
+        Tab separates the codename from the code description.
+        """
 
         response = QtWidgets.QFileDialog.getOpenFileNames(self, _('Select plain text codes file'),
-                                                          self.app.settings['directory'], "(*.txt)",
+                                                          self.app.settings['directory'], "Text (*.txt *.tsv)",
                                                           options=QtWidgets.QFileDialog.Option.DontUseNativeDialog
                                                           )
         filepath = response[0]
         if not filepath:
             self.ui.textEdit.append(_("Codes list text file not imported"))
             return
-        filepath = filepath[0]  # A list of one name
+        filepath = filepath[0]  # List to string of file path
         self.ui.textEdit.append("\n" + _("Importing codes from: ") + filepath)
         self.ui.textEdit.append(_("Refresh codes trees via menu options for coding, reports"))
         with open(filepath, 'r', encoding='UTF-8') as file_:
-            lines = file_.readlines()
-            for code_name in lines:
-                item = {'name': code_name.strip(), 'memo': "", 'owner': self.app.settings['codername'],
+            rows = file_.readlines()
+            for row in rows:
+                data = row.split("\t", 1)
+                memo = ""
+                if len(data) > 1:
+                    memo = data[1]
+                item = {'name': data[0].strip(), 'memo': memo, 'owner': self.app.settings['codername'],
                         'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'catid': None,
                         'color': colors[randint(0, len(colors) - 1)]}
                 cur = self.app.conn.cursor()
@@ -1348,9 +1355,9 @@ class MainWindow(QtWidgets.QMainWindow):
                                 (item['name'], item['memo'], item['owner'], item['date'], item['catid'], item['color']))
                     self.app.conn.commit()
                     self.app.delete_backup = False
-                    self.ui.textEdit.append(_("Imported code: ") + code_name.strip())
+                    self.ui.textEdit.append(_("Imported code: ") + data[0].strip())
                 except sqlite3.IntegrityError:
-                    self.ui.textEdit.append(_("Duplicate code not imported: ") + code_name.strip())
+                    self.ui.textEdit.append(_("Duplicate code not imported: ") + data[0].strip())
 
     def import_survey(self):
         """ Import survey flat sheet: csv file or xlsx.
