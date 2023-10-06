@@ -57,7 +57,7 @@ from qualcoder.code_pdf import DialogCodePdf
 from qualcoder.color_selector import colors
 from qualcoder.GUI.base64_helper import *
 from qualcoder.GUI.ui_main import Ui_MainWindow
-from qualcoder.helpers import Message
+from qualcoder.helpers import Message, ImportPlainTextCodes
 from qualcoder.import_survey import DialogImportSurvey
 from qualcoder.import_twitter_data import DialogImportTwitterData
 from qualcoder.information import DialogInformation, menu_shortcuts_display, coding_shortcuts_display
@@ -1330,64 +1330,7 @@ class MainWindow(QtWidgets.QMainWindow):
         The >> symbol is used to assign code to category:  code>>category
         """
 
-        response = QtWidgets.QFileDialog.getOpenFileNames(self, _('Select plain text codes file'),
-                                                          self.app.settings['directory'], "Text (*.txt *.csv)",
-                                                          options=QtWidgets.QFileDialog.Option.DontUseNativeDialog
-                                                          )
-        filepath = response[0]
-        if not filepath:
-            self.ui.textEdit.append(_("Codes list text file not imported"))
-            return
-        filepath = filepath[0]  # List to string of file path
-        self.ui.textEdit.append("\n" + _("Importing codes from: ") + filepath)
-        self.ui.textEdit.append(_("Refresh codes trees via menu options for coding, reports"))
-        with open(filepath, 'r', encoding='UTF-8-sig') as file_:
-            rows = []
-            if filepath[-4:].lower() == ".csv":
-                reader = csv.reader(file_, delimiter=",", quoting=csv.QUOTE_MINIMAL)
-                for row in reader:
-                    rows.append(row)
-            else:
-                reader = csv.reader(file_, delimiter="\t", quoting=csv.QUOTE_MINIMAL)
-                for row in reader:
-                    if row:
-                        rows.append(row)
-        cur = self.app.conn.cursor()
-        for row in rows:
-            code_and_cat = row[0].split(">>", 1)
-            if len(code_and_cat) == 2:
-                try:
-                    cur.execute("insert into code_cat (name,memo,owner,date,supercatid) values(?,?,?,?,?)",
-                                (code_and_cat[1].strip(), "", self.app.settings['codername'],
-                                 datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), None))
-                    self.app.conn.commit()
-                except sqlite3.IntegrityError:
-                    pass
-        for row in rows:
-            memo = ""
-            if len(row) > 1:
-                memo = row[1]
-            code_and_cat = row[0].split(">>", 1)
-            if code_and_cat[0].strip() == "":
-                continue
-            catid = None
-            if len(code_and_cat) == 2:
-                cur.execute("select catid from code_cat where name=?", [code_and_cat[1].strip()])
-                res = cur.fetchone()
-                if res:
-                    catid = res[0]
-            item = {'name': code_and_cat[0].strip(), 'memo': memo, 'owner': self.app.settings['codername'],
-                    'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'catid': catid,
-                    'color': colors[randint(0, len(colors) - 1)]}
-
-            try:
-                cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,?,?,?,?)",
-                            (item['name'], item['memo'], item['owner'], item['date'], item['catid'], item['color']))
-                self.app.conn.commit()
-                self.ui.textEdit.append(_("Imported code: ") + row[0].strip())
-            except sqlite3.IntegrityError:
-                self.ui.textEdit.append(_("Duplicate code not imported: ") + row[0].strip())
-        self.app.delete_backup = False
+        ImportPlainTextCodes(self.app, self.ui.textEdit)
 
     def import_survey(self):
         """ Import survey flat sheet: csv file or xlsx.
