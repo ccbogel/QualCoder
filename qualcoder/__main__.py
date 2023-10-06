@@ -1326,7 +1326,8 @@ class MainWindow(QtWidgets.QMainWindow):
     def import_plain_text_codes(self):
         """ Import a list of plain text codes codebook.
         The codebook is a plain text file or csv file.
-        Tab separates the codename from the code description.
+        In plain text file, Tab separates the codename from the code description.
+        The >> symbol is used to assign code to category:  code>>category
         """
 
         response = QtWidgets.QFileDialog.getOpenFileNames(self, _('Select plain text codes file'),
@@ -1351,23 +1352,40 @@ class MainWindow(QtWidgets.QMainWindow):
                 for row in reader:
                     if row:
                         rows.append(row)
+        cur = self.app.conn.cursor()
         for row in rows:
-            #print(row)
+            code_and_cat = row[0].split(">>", 1)
+            if len(code_and_cat) == 2:
+                try:
+                    cur.execute("insert into code_cat (name,memo,owner,date,supercatid) values(?,?,?,?,?)",
+                                (code_and_cat[1].strip(), "", self.app.settings['codername'],
+                                 datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), None))
+                    self.app.conn.commit()
+                except sqlite3.IntegrityError:
+                    pass
+        for row in rows:
             memo = ""
             if len(row) > 1:
                 memo = row[1]
-            item = {'name': row[0].strip(), 'memo': memo, 'owner': self.app.settings['codername'],
-                    'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'catid': None,
+            code_and_cat = row[0].split(">>", 1)
+            catid = None
+            if len(code_and_cat) == 2:
+                cur.execute("select catid from code_cat where name=?", [code_and_cat[1].strip()])
+                res = cur.fetchone()
+                if res:
+                    catid = res[0]
+            item = {'name': code_and_cat[0].strip(), 'memo': memo, 'owner': self.app.settings['codername'],
+                    'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'catid': catid,
                     'color': colors[randint(0, len(colors) - 1)]}
-            cur = self.app.conn.cursor()
+
             try:
                 cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,?,?,?,?)",
                             (item['name'], item['memo'], item['owner'], item['date'], item['catid'], item['color']))
                 self.app.conn.commit()
-                self.app.delete_backup = False
                 self.ui.textEdit.append(_("Imported code: ") + row[0].strip())
             except sqlite3.IntegrityError:
                 self.ui.textEdit.append(_("Duplicate code not imported: ") + row[0].strip())
+        self.app.delete_backup = False
 
     def import_survey(self):
         """ Import survey flat sheet: csv file or xlsx.
