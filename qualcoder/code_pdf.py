@@ -2973,12 +2973,13 @@ class DialogCodePdf(QtWidgets.QWidget):
                     qpixmap_item = self.scene.addPixmap(img['pixmap'])
                     qpixmap_item.setPos(img['x'], img['y'])
                 else:
-                    # Use placeholder question mark icon
-                    pixmap = QtGui.QPixmap()
+                    # Do not use placeholder question mark icon
+                    '''pixmap = QtGui.QPixmap()
                     pixmap.loadFromData(QtCore.QByteArray.fromBase64(question_icon), "png")
                     pixmap = pixmap.scaled(int(img['w']), int(img['h']))
                     qpixmap_item = self.scene.addPixmap(pixmap)
-                    qpixmap_item.setPos(img['x'], img['y'])
+                    qpixmap_item.setPos(img['x'], img['y'])'''
+                    pass
         if self.ui.checkBox_line.isChecked():
             for line in page['lines']:
                 counter += 1

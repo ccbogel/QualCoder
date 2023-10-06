@@ -1351,23 +1351,23 @@ class MainWindow(QtWidgets.QMainWindow):
                 for row in reader:
                     if row:
                         rows.append(row)
-            for row in rows:
-                print(row)
-                memo = ""
-                if len(row) > 1:
-                    memo = row[1]
-                item = {'name': row[0].strip(), 'memo': memo, 'owner': self.app.settings['codername'],
-                        'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'catid': None,
-                        'color': colors[randint(0, len(colors) - 1)]}
-                cur = self.app.conn.cursor()
-                try:
-                    cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,?,?,?,?)",
-                                (item['name'], item['memo'], item['owner'], item['date'], item['catid'], item['color']))
-                    self.app.conn.commit()
-                    self.app.delete_backup = False
-                    self.ui.textEdit.append(_("Imported code: ") + row[0].strip())
-                except sqlite3.IntegrityError:
-                    self.ui.textEdit.append(_("Duplicate code not imported: ") + row[0].strip())
+        for row in rows:
+            #print(row)
+            memo = ""
+            if len(row) > 1:
+                memo = row[1]
+            item = {'name': row[0].strip(), 'memo': memo, 'owner': self.app.settings['codername'],
+                    'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'catid': None,
+                    'color': colors[randint(0, len(colors) - 1)]}
+            cur = self.app.conn.cursor()
+            try:
+                cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,?,?,?,?)",
+                            (item['name'], item['memo'], item['owner'], item['date'], item['catid'], item['color']))
+                self.app.conn.commit()
+                self.app.delete_backup = False
+                self.ui.textEdit.append(_("Imported code: ") + row[0].strip())
+            except sqlite3.IntegrityError:
+                self.ui.textEdit.append(_("Duplicate code not imported: ") + row[0].strip())
 
     def import_survey(self):
         """ Import survey flat sheet: csv file or xlsx.
