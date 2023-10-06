@@ -1368,6 +1368,8 @@ class MainWindow(QtWidgets.QMainWindow):
             if len(row) > 1:
                 memo = row[1]
             code_and_cat = row[0].split(">>", 1)
+            if code_and_cat[0].strip() == "":
+                continue
             catid = None
             if len(code_and_cat) == 2:
                 cur.execute("select catid from code_cat where name=?", [code_and_cat[1].strip()])
