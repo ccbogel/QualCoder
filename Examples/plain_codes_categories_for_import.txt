@@ -1,0 +1,6 @@
+code1	A memo for code 1
+cat1>>code2
+cat1>>code3
+cat3>>cat2>>code4	another memo
+cat3>>code5
+code6
