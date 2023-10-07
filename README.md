@@ -119,7 +119,7 @@ I am using python3.10  you can choose another recent version if you prefer, and 
 3. Download and unzip the Qualcoder folder.
 
 4. Open a terminal and move (cd) into that folder. 
-You should be inside the QualCoder-master folder or if using a release, e.g. the Qualcoder-3.3 folder.
+You should be inside the QualCoder-master folder or if using a release, e.g. the Qualcoder-3.4 folder.
 Inside the QualCoder-master folder:
 
 `python3.10 -m venv qualcoder`
@@ -187,7 +187,12 @@ Not tested, but please see the above instructions to build QualCoder inside a vi
 
 Retrieve the current package code from this repository
 
-1) Open your preferred shell (terminal). 2) Navigate to your preferred code directory. 3) There, run: `git clone https://github.com/ccbogel/QualCoder.git` and 4) enter the directory with `cd QualCoder`. 5) Make `install_fedora.sh` executable (`chmod +x install_fedora.sh`) and 6) run the `./install_fedora.sh` script from the terminal. The script is for python version 3.11.
+1. Open your preferred shell (terminal).
+2. Navigate to your preferred code directory.
+3. There, run: `git clone https://github.com/ccbogel/QualCoder.git` and
+4. enter the directory with `cd QualCoder`
+5. Make `install_fedora.sh` executable (`chmod +x install_fedora.sh`) and
+6. run the `./install_fedora.sh` script from the terminal. The script is for python version 3.11.
 
 Then start QualCoder as any other app on your system.
 
@@ -203,7 +208,7 @@ You will need to install developer tools for macOS. [See https://www.cnet.com/te
 
 1) Install recent versions of [Python3](https://www.python.org/downloads/) and [VLC](https://www.videolan.org/vlc/).
 
-2) Download the latest release "Source code" version in ZIP format, from the releases section of the project here on Github: https://github.com/ccbogel/QualCoder/releases/tag/3.2 and extract it into /Applications
+2) Download the latest release "Source code" version in ZIP format, from the releases section of the project here on Github: https://github.com/ccbogel/QualCoder/releases/tag/3.4 and extract it into /Applications
 
 3) Open the Terminal app (or any other command shell)
 
@@ -228,17 +233,17 @@ Be sure that you are in the QualCoder-Master directory before doing Step 6.
 
 To change the directory, enter or copy and run the script below.
 
-`cd /Applications/QualCoder-3.3`
+`cd /Applications/QualCoder-3.4`
 
 6) From the QualCoder-Master directory run the setup script:
 
 `python3 -m pip install .`
 
 
-Assuming you downloaded the 3.3 version. You can now run with:
+Assuming you downloaded the 3.4 version. You can now run with:
 
 ```
-python3 /applications/QualCoder-3.3/qualcoder/__main__.py
+python3 /applications/QualCoder-3.4/qualcoder/__main__.py
 ```
 
 Alternative commands to run QualCoder (Suggestions):
@@ -266,7 +271,7 @@ Open the Terminal App and move to the unzipped Qualcoder-Master directory, then 
 
 1) Install Python dependency modules using `pip3`:
 
-`pip3 install chardet ebooklib ffmpeg-python pyqt6 pillow ply pdfminer.six openpyxl pandas plotly pydub python-vlc rispy six SpeechRecognition xmlschema`
+`pip3 install chardet ebooklib ffmpeg-python pyqt6 pillow ply pdfminer.six openpyxl pandas plotly pydub python-vlc rispy six SpeechRecognition wordcloud xmlschema`
 
 2) Open the Terminal App and move to the unzipped Qualcoder-Master directory, then run the following commands:
 
