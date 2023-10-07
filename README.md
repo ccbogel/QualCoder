@@ -3,12 +3,12 @@
 # QualCoder
 QualCoder is a qualitative data analysis application written in python3 and Qt6.
 
-Text files can be typed in manually or loaded from txt, odt, docx, html, htm, md, epub and  pdf files. Images, video and audio can also be imported for coding. Codes can be assigned to text, images and a/v selections and grouped into categories in hierarchical fashion. Various types of reports can be produced including visual coding graphs, coder comparisons and coding frequencies.
+Text files can be typed in manually or loaded from txt, odt, docx, html, htm, md, epub and  pdf files. Images, video and audio can also be imported for coding. Codes can be assigned to text, images and a/v selections and grouped into categories in hierarchical fashion. Various types of reports can be produced including visual coding graphs, word clouds, coder comparisons and coding frequencies.
 
 This project has been tested under Ubuntu 22.04 and Windows 10/11. It has been used on MacOS and various Linux distros.
 Instructions and other information are available here: https://qualcoder.wordpress.com/ and on the [Github Wiki](https://github.com/ccbogel/QualCoder/wiki).
 
-It is best to download the Current Release from the Releases page.
+It is best to download the Current Release from the Releases page, see the Releases link in the right hand column on this page.
 
 If you like QualCoder please buy me a coffee ...
 
