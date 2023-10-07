@@ -74,26 +74,10 @@
        <string/>
       </property>
      </widget>
-     <widget class="QCheckBox" name="checkBox_search_all_files">
-      <property name="geometry">
-       <rect>
-        <x>290</x>
-        <y>38</y>
-        <width>21</width>
-        <height>36</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;search all files&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
      <widget class="QLabel" name="label_search_totals">
       <property name="geometry">
        <rect>
-        <x>430</x>
+        <x>360</x>
         <y>44</y>
         <width>81</width>
         <height>22</height>
@@ -125,7 +109,7 @@
      <widget class="QPushButton" name="pushButton_previous">
       <property name="geometry">
        <rect>
-        <x>360</x>
+        <x>290</x>
         <y>38</y>
         <width>28</width>
         <height>28</height>
@@ -141,7 +125,7 @@
      <widget class="QPushButton" name="pushButton_next">
       <property name="geometry">
        <rect>
-        <x>390</x>
+        <x>320</x>
         <y>38</y>
         <width>28</width>
         <height>28</height>
@@ -152,34 +136,6 @@
       </property>
       <property name="text">
        <string/>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_search_all_files">
-      <property name="geometry">
-       <rect>
-        <x>316</x>
-        <y>41</y>
-        <width>24</width>
-        <height>24</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search text. All text files.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-      <property name="autoFillBackground">
-       <bool>false</bool>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::Box</enum>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-      </property>
-      <property name="wordWrap">
-       <bool>true</bool>
       </property>
      </widget>
      <widget class="QLabel" name="label_search_case_sensitive">
@@ -631,23 +587,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QPushButton" name="pushButton_show_codings_prev">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>0</y>
-          <width>28</width>
-          <height>28</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show previous coding of selected code&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="pushButton_show_codings_next">
+       <widget class="QPushButton" name="pushButton_show_selected_code">
         <property name="geometry">
          <rect>
           <x>50</x>
@@ -657,7 +597,7 @@
          </rect>
         </property>
         <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show next coding of selected code.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show selected_code&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
         </property>
         <property name="text">
          <string/>
@@ -709,7 +649,7 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>348</width>
+         <width>264</width>
          <height>588</height>
         </rect>
        </property>
@@ -749,7 +689,6 @@
   <tabstop>pushButton_help</tabstop>
   <tabstop>lineEdit_search</tabstop>
   <tabstop>checkBox_search_case</tabstop>
-  <tabstop>checkBox_search_all_files</tabstop>
   <tabstop>pushButton_previous</tabstop>
   <tabstop>pushButton_next</tabstop>
   <tabstop>listWidget</tabstop>
@@ -759,8 +698,7 @@
   <tabstop>pushButton_document_memo</tabstop>
   <tabstop>pushButton_file_attributes</tabstop>
   <tabstop>treeWidget</tabstop>
-  <tabstop>pushButton_show_codings_prev</tabstop>
-  <tabstop>pushButton_show_codings_next</tabstop>
+  <tabstop>pushButton_show_selected_code</tabstop>
   <tabstop>pushButton_show_all_codings</tabstop>
   <tabstop>pushButton_important</tabstop>
   <tabstop>scrollArea</tabstop>
