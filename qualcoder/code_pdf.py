@@ -217,28 +217,19 @@ class DialogCodePdf(QtWidgets.QWidget):
         pm.loadFromData(QtCore.QByteArray.fromBase64(notepad_2_icon_24), "png")
         self.ui.pushButton_document_memo.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_document_memo.pressed.connect(self.file_memo)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(round_arrow_right_icon_24), "png")
-        self.ui.pushButton_show_codings_next.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_show_codings_next.pressed.connect(self.show_selected_code_in_text_next)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(round_arrow_left_icon_24), "png")
-        self.ui.pushButton_show_codings_prev.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_show_codings_prev.pressed.connect(self.show_selected_code_in_text_previous)
+        pm = QtGui.QPixmap()  # This function does not work
+        pm.loadFromData(QtCore.QByteArray.fromBase64(eye_icon), "png")
+        self.ui.pushButton_show_selected_code.setIcon(QtGui.QIcon(pm))
+        #self.ui.pushButton_show_selected_code.pressed.connect(self.show_selected_code)
+        #TODO use to show only this coding
+        self.ui.pushButton_show_selected_code.hide()
+
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_grid_icon_24), "png")
         self.ui.pushButton_show_all_codings.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_show_all_codings.pressed.connect(self.show_all_codes_in_text)
         self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
         self.ui.lineEdit_search.setEnabled(False)
-        # TODO search allfiles, finding wrong text positions
-        self.ui.checkBox_search_all_files.hide()
-        # self.ui.checkBox_search_all_files.stateChanged.connect(self.search_for_text)
-        # self.ui.checkBox_search_all_files.setEnabled(False)
-        # pm = QtGui.QPixmap()
-        # pm.loadFromData(QtCore.QByteArray.fromBase64(clipboard_copy_icon), "png")
-        # self.ui.label_search_all_files.setPixmap(QtGui.QPixmap(pm).scaled(22, 22))
-        self.ui.label_search_all_files.hide()
         self.ui.checkBox_search_case.stateChanged.connect(self.search_for_text)
         self.ui.checkBox_search_case.setEnabled(False)
         pm = QtGui.QPixmap()
@@ -258,16 +249,17 @@ class DialogCodePdf(QtWidgets.QWidget):
         pm.loadFromData(QtCore.QByteArray.fromBase64(font_size_icon), "png")
         self.ui.label_font_size.setPixmap(QtGui.QPixmap(pm).scaled(22, 22))
         self.ui.spinBox_font_adjuster.valueChanged.connect(self.update_page)
+
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(playback_back_icon), "png")
         self.ui.pushButton_previous.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_previous.setEnabled(False)
+        self.ui.pushButton_previous.pressed.connect(self.move_to_previous_search_text)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(playback_play_icon), "png")
         self.ui.pushButton_next.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_next.setEnabled(False)
         self.ui.pushButton_next.pressed.connect(self.move_to_next_search_text)
-        self.ui.pushButton_previous.pressed.connect(self.move_to_previous_search_text)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(question_icon), "png")
         self.ui.pushButton_help.setIcon(QtGui.QIcon(pm))
@@ -1410,7 +1402,8 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.update_dialog_codes_and_categories()
 
     def show_important_coded(self):
-        """ Show codes flagged as important. """
+        """ Show codes flagged as important.
+        Applies to both text edit and graphic scene. """
 
         self.important = not self.important
         pm = QtGui.QPixmap()
@@ -1422,6 +1415,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             self.ui.pushButton_important.setToolTip(_("Show codings flagged important"))
         self.ui.pushButton_important.setIcon(QtGui.QIcon(pm))
         self.get_coded_text_update_eventfilter_tooltips()
+        self.display_page_text_objects()
 
     def show_codes_like(self):
         """ Show all codes if text is empty.
@@ -1492,16 +1486,16 @@ class DialogCodePdf(QtWidgets.QWidget):
         """
         Ctrl Z Undo last unmarking
         Ctrl F jump to search box
-        A annotate - for current selection
+        A annotate - for current selection - text edit only
         Q Quick Mark with code - for current selection
         H Hide / Unhide top groupbox
         I Tag important
-        M memo code - at clicked position
-        O Shortcut to cycle through overlapping codes - at clicked position
+        M memo code - at clicked position - text edit only
+        O Shortcut to cycle through overlapping codes - at clicked position- text edit only
         S search text - may include current selection
         R opens a context menu for recently used codes for marking text
         U Unmark at selected location
-        V assign 'in vivo' code to selected text
+        V assign 'in vivo' code to selected text - text edit only
         Ctrl 0 to Ctrl 9 - button presses
         # Display Clicked character position
         + Zoom in
@@ -1536,12 +1530,6 @@ class DialogCodePdf(QtWidgets.QWidget):
             if key == QtCore.Qt.Key.Key_5:
                 self.get_files_from_attributes()
                 return
-            if key == QtCore.Qt.Key.Key_6:
-                self.show_selected_code_in_text_previous()
-                return
-            if key == QtCore.Qt.Key.Key_7:
-                self.show_selected_code_in_text_next()
-                return
             if key == QtCore.Qt.Key.Key_8:
                 self.show_all_codes_in_text()
                 return
@@ -1573,9 +1561,6 @@ class DialogCodePdf(QtWidgets.QWidget):
                     return
                 self.mark(by_text_boxes=True)
                 return
-
-            # TODO maybe get graphics boxeses and coding here - see graphicview_menu
-
             # Recent codes selection
             if key == QtCore.Qt.Key.Key_R and len(self.recent_codes) > 0:
                 self.selected_graphic_textboxes = self.scene.selectedItems()
@@ -1865,165 +1850,6 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.get_coded_text_update_eventfilter_tooltips()
         self.display_page_text_objects()
 
-    def show_selected_code_in_text_next(self):
-        """ Highlight only the selected code in the text. Move to next instance in text
-        from the current textEdit cursor position.
-        Adjust for a portion of text loaded.
-        Called by: pushButton_show_codings_next
-        """
-
-        if self.file_ is None:
-            return
-        item = self.ui.treeWidget.currentItem()
-        if item is None or item.text(1)[0:3] == 'cat':
-            return
-        cid = int(item.text(1)[4:])
-        # Index list has to be dynamic, as a new code_text item could be created before this method is called again
-        # Develop indices and tooltip coded text list
-        indexes = []
-        tt_code_text = []
-        for ct in self.code_text:
-            if ct['cid'] == cid:
-                indexes.append(ct)
-                tt_code_text.append(ct)
-        indexes = sorted(indexes, key=itemgetter('pos0'))
-        cursor = self.ui.textEdit.textCursor()
-        cur_pos = cursor.position()
-        end_pos = 0
-        found_larger = False
-        msg = "/" + str(len(indexes))
-        for i, index in enumerate(indexes):
-            if index['pos0'] - self.file_['start'] > cur_pos:
-                cur_pos = index['pos0'] - self.file_['start']
-                end_pos = index['pos1'] - self.file_['start']
-                found_larger = True
-                msg = str(i + 1) + msg
-                break
-        if not found_larger and indexes == []:
-            return
-        # Loop around to the highest index
-        if not found_larger and indexes != []:
-            cur_pos = indexes[0]['pos0'] - self.file_['start']
-            end_pos = indexes[0]['pos1'] - self.file_['start']
-            msg = "1" + msg
-        if not found_larger:
-            cursor = self.ui.textEdit.textCursor()
-            cursor.setPosition(0)
-            self.ui.textEdit.setTextCursor(cursor)
-        self.unlight()
-        msg = " " + _("Code:") + " " + msg
-        # Highlight the code in the text
-        color = ""
-        for c in self.codes:
-            if c['cid'] == cid:
-                color = c['color']
-        cursor.setPosition(cur_pos)
-        self.ui.textEdit.setTextCursor(cursor)
-        cursor.setPosition(cur_pos, QtGui.QTextCursor.MoveMode.MoveAnchor)
-        cursor.setPosition(end_pos, QtGui.QTextCursor.MoveMode.KeepAnchor)
-        brush = QBrush(QColor(color))
-        fmt = QtGui.QTextCharFormat()
-        fmt.setBackground(brush)
-        foreground_color = TextColor(color).recommendation
-        fmt.setForeground(QBrush(QColor(foreground_color)))
-        cursor.mergeCharFormat(fmt)
-        # Update tooltips to show only this code
-        self.eventFilterTT.set_codes_and_annotations(self.app, tt_code_text, self.codes, self.annotations,
-                                                     self.file_)
-        # Need to reload arrow icons as they dissapear on Windows
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_color_grid_icon_24), "png")
-        self.ui.pushButton_show_all_codings.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_show_codings_prev.setStyleSheet("background-color : " + color + ";color:" + foreground_color)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(round_arrow_left_icon_24), "png")
-        self.ui.pushButton_show_codings_prev.setIcon(QtGui.QIcon(pm))
-        tt = _("Show previous coding of selected code") + msg
-        self.ui.pushButton_show_codings_prev.setToolTip(tt)
-        self.ui.pushButton_show_codings_next.setStyleSheet("background-color : " + color + ";color:" + foreground_color)
-        tt = _("Show next coding of selected code") + msg
-        self.ui.pushButton_show_codings_next.setToolTip(tt)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(round_arrow_right_icon_24), "png")
-        self.ui.pushButton_show_codings_next.setIcon(QtGui.QIcon(pm))
-
-    def show_selected_code_in_text_previous(self):
-        """ Highlight only the selected code in the text. Move to previous instance in text from
-        the current textEdit cursor position.
-        Called by: pushButton_show_codings_previous
-        """
-
-        if self.file_ is None:
-            return
-        item = self.ui.treeWidget.currentItem()
-        if item is None or item.text(1)[0:3] == 'cat':
-            return
-        cid = int(item.text(1)[4:])
-        # Index list has to be dynamic, as a new code_text item could be created before this method is called again
-        # Develop indexes and tooltip coded text list
-        indexes = []
-        tt_code_text = []
-        for ct in self.code_text:
-            if ct['cid'] == cid:
-                indexes.append(ct)
-                tt_code_text.append(ct)
-        indexes = sorted(indexes, key=itemgetter('pos0'), reverse=True)
-        cursor = self.ui.textEdit.textCursor()
-        cur_pos = cursor.position()
-        end_pos = 0
-        found_smaller = False
-        msg = "/" + str(len(indexes))
-        for i, index in enumerate(indexes):
-            if index['pos0'] - self.file_['start'] < cur_pos - 1:
-                cur_pos = index['pos0'] - self.file_['start']
-                end_pos = index['pos1'] - self.file_['start']
-                found_smaller = True
-                msg = str(len(indexes) - i) + msg
-                break
-        if not found_smaller and indexes == []:
-            return
-        # Loop around to the highest index
-        if not found_smaller and indexes != []:
-            cur_pos = indexes[0]['pos0'] - self.file_['start']
-            end_pos = indexes[0]['pos1'] - self.file_['start']
-            msg = str(len(indexes)) + msg
-        msg += " " + _("Code:") + " " + msg
-        self.unlight()
-        # Highlight the code in the text
-        color = ""
-        for c in self.codes:
-            if c['cid'] == cid:
-                color = c['color']
-        cursor.setPosition(cur_pos)
-        self.ui.textEdit.setTextCursor(cursor)
-        cursor.setPosition(cur_pos, QtGui.QTextCursor.MoveMode.MoveAnchor)
-        cursor.setPosition(end_pos, QtGui.QTextCursor.MoveMode.KeepAnchor)
-        brush = QBrush(QColor(color))
-        fmt = QtGui.QTextCharFormat()
-        fmt.setBackground(brush)
-        foregroundcol = TextColor(color).recommendation
-        fmt.setForeground(QBrush(QColor(foregroundcol)))
-        cursor.mergeCharFormat(fmt)
-        # Update tooltips to show only this code
-        self.eventFilterTT.set_codes_and_annotations(self.app, tt_code_text, self.codes, self.annotations,
-                                                     self.file_)
-        # Need to reload arrow icons as they dissapear on Windows
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_color_grid_icon_24), "png")
-        self.ui.pushButton_show_all_codings.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_show_codings_prev.setStyleSheet("background-color : " + color + ";color:" + foregroundcol)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(round_arrow_left_icon_24), "png")
-        self.ui.pushButton_show_codings_prev.setIcon(QtGui.QIcon(pm))
-        tt = _("Show previous coding of selected code") + msg
-        self.ui.pushButton_show_codings_prev.setToolTip(tt)
-        self.ui.pushButton_show_codings_next.setStyleSheet("background-color : " + color + ";color:" + foregroundcol)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(round_arrow_right_icon_24), "png")
-        self.ui.pushButton_show_codings_next.setIcon(QtGui.QIcon(pm))
-        tt = _("Show next coding of selected code") + msg
-        self.ui.pushButton_show_codings_next.setToolTip(tt)
-
     def show_all_codes_in_text(self):
         """ Opposes show selected code methods.
         Highlights all the codes in the text. """
@@ -2031,18 +1857,6 @@ class DialogCodePdf(QtWidgets.QWidget):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_grid_icon_24), "png")
         self.ui.pushButton_show_all_codings.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_show_codings_prev.setStyleSheet("")
-        self.ui.pushButton_show_codings_next.setStyleSheet("")
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(round_arrow_left_icon_24), "png")
-        self.ui.pushButton_show_codings_prev.setIcon(QtGui.QIcon(pm))
-        tt = _("Show previous coding of selected code")
-        self.ui.pushButton_show_codings_prev.setToolTip(tt)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(round_arrow_right_icon_24), "png")
-        self.ui.pushButton_show_codings_next.setIcon(QtGui.QIcon(pm))
-        tt = _("Show next coding of selected code")
-        self.ui.pushButton_show_codings_next.setToolTip(tt)
         self.get_coded_text_update_eventfilter_tooltips()
 
     def coded_media_dialog(self, code_dict):
@@ -3008,6 +2822,8 @@ class DialogCodePdf(QtWidgets.QWidget):
           mark, unmark, undo_last_unmarked, rename_category_or_code, change_code_color, change_code_to_another_code
         """
 
+        if not self.file_:
+            return
         for graphics_item in self.scene.items():
             if isinstance(graphics_item, QtWidgets.QGraphicsTextItem):
                 self.scene.removeItem(graphics_item)
@@ -3044,6 +2860,7 @@ class DialogCodePdf(QtWidgets.QWidget):
     def format_text_box(self, item, text_item):
         """ Apply code backgrounds to text.
          Loop through coded text and match any at this position.
+         if self.important checked and this is not important. Do not colour.
          param:
             item: QGraphicsTextItem
             text_item: dictionary of pdf text item data """
@@ -3051,18 +2868,6 @@ class DialogCodePdf(QtWidgets.QWidget):
         cursor = item.textCursor()
         codes_for_item = []
 
-        '''print(f"===========\n Page {self.page_num} displayed as ({self.page_num +1 }) "
-              f"page_start {self.pages[self.page_num]['plain_text_start']} "
-              f"page_end {self.pages[self.page_num]['plain_text_end']} "
-              f"Item: {text_item['text']} item pos0 - pos1 :{text_item['pos0']} - {text_item['pos1']}")'''
-        ''' page 0 (1) all codes are listed
-        page 1 (2) only one code in the list ?
-        Then when changing back to page 0, one 1 code is in the code_text list ??
-        '''
-        '''for c in self.code_text:
-            print(c)'''
-
-        # TODO add in self.pages[self.page_num]['plain_text_start'] or end
         for code_ in self.code_text:
             if code_['pos0'] <= text_item['pos0'] < code_['pos1']:
                 codes_for_item.append(code_)
@@ -3076,6 +2881,9 @@ class DialogCodePdf(QtWidgets.QWidget):
             return
         tooltip_list = []
         for graphics_item_code in codes_for_item:
+            # When important flag selected only show important coded text items
+            if self.important and graphics_item_code['important'] is None:
+                continue
             pos0 = int(graphics_item_code['pos0'] - text_item['pos0'])
             if pos0 < 0:
                 pos0 = 0
@@ -3519,7 +3327,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.undo_deleted_codes = []
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
-        self.display_text_objects()
+        self.display_page_text_objects()
 
     def unmark(self, position=None, ctid=None):
         """ Remove code marking by this coder from selected text in current file.
