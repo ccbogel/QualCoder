@@ -500,13 +500,6 @@ class DialogCodePdf(QtWidgets.QWidget):
                 self.mark(by_text_boxes=True)
         # When a code is selected undo the show selected code features
         self.highlight()
-        # Reload button icons as they disappear on Windows
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(round_arrow_left_icon_24), "png")
-        self.ui.pushButton_show_codings_prev.setIcon(QtGui.QIcon(pm))
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(round_arrow_right_icon_24), "png")
-        self.ui.pushButton_show_codings_next.setIcon(QtGui.QIcon(pm))
 
     def tree_traverse_for_non_expanded(self, item, non_expanded):
         """ Find all categories and codes
