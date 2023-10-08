@@ -349,6 +349,8 @@ class RisImport:
                         data = "; ".join(entry[longtag])
                     else:
                         data = entry[longtag]
+                    if not isinstance(data, str):
+                        continue
                     #print("risid", max_risid, longtag_to_tag[longtag], longtag, data)
                     sql = "insert into ris (risid,tag,longtag,value) values (?,?,?,?)"
                     cur.execute(sql, [max_risid, longtag_to_tag[longtag], longtag, data])
@@ -383,7 +385,8 @@ class RisImport:
                 data = "; ".join(entry[longtag])
             else:
                 data = entry[longtag]
-            #print("Parameters ", longtag, data)
+            if not isinstance(data, str):
+                continue
             cur.execute(sql, [longtag, data])
             res = cur.fetchall()
             #print("res for",longtag,data,res)
