@@ -729,40 +729,12 @@ class DialogCodePdf(QtWidgets.QWidget):
         if pattern is None:
             return
         self.search_indices = []
-        '''if self.ui.checkBox_search_all_files.isChecked():
-            """ Search for this text across all files. """
-            for filedata in self.app.get_pdf_file_texts():
-                try:
-                    text_ = filedata['fulltext']
-                    for match in pattern.finditer(text_):
-                        self.search_indices.append((filedata, match.start(), len(match.group(0))))
-                except re.error:
-                    logger.exception('Failed searching text %s for %s', filedata['name'], self.search_term)'''
         # Search only this document
-        '''try:
-            displayed_text = self.ui.textEdit.toPlainText()
-            if displayed_text != "":
-                for match in pattern.finditer(displayed_text):
-                    # Get result as first dictionary item
-                    source_name = self.app.get_pdf_file_texts([self.file_['id'], ])[0]
-                    # Contains (name, id, fullltext, memo, owner, date, mediapath) and char position and search string length
-                    self.search_indices.append((source_name, match.start(), len(match.group(0))))
-        except re.error:
-            logger.exception('Failed searching current file for %s', self.search_term)'''
-
         try:
             displayed_text = self.file_['fulltext']  # self.ui.textEdit.toPlainText()
             if displayed_text != "":
                 for match in pattern.finditer(displayed_text):
-                    # Get result as first dictionary item
-                    '''file_dict = self.app.get_pdf_file_texts([self.file_['id'], ])[0]
-                    file_dict.pop('fulltext', None)
-                    file_dict.pop('memo', None)
-                    file_dict.pop('owner', None)
-                    file_dict.pop('date', None)
-                    file_dict.pop('mediapath', None)
-                    file_dict.pop('name', None)'''
-                    # char position and search string length
+                    # Get result. char position and search string length
                     self.search_indices.append((match.start(), len(match.group(0))))
         except re.error:
             logger.exception('Failed searching current file for %s', self.search_term)
@@ -2544,7 +2516,6 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.setWindowTitle(_("Code text: ") + self.file_['name'])
         self.ui.lineEdit_search.setEnabled(True)
         self.ui.checkBox_search_case.setEnabled(True)
-        self.ui.checkBox_search_all_files.setEnabled(True)
         self.search_for_text()
         self.load_pdf_pages()
         self.ui.spinBox.setMinimum(1)
