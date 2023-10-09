@@ -92,6 +92,8 @@ class DialogReferenceManager(QtWidgets.QDialog):
         self.ui.tableWidget_files.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
         #self.ui.tableWidget_files.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         #self.ui.tableWidget_files.customContextMenuRequested.connect(self.table_menu)
+        self.ui.tableWidget_files.horizontalHeader().setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        self.ui.tableWidget_files.horizontalHeader().customContextMenuRequested.connect(self.table_files_header_menu)
         self.ui.tableWidget_refs.setStyleSheet(font2)
         self.ui.tableWidget_refs.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
         self.ui.tableWidget_refs.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
@@ -191,6 +193,28 @@ class DialogReferenceManager(QtWidgets.QDialog):
         if self.ui.tableWidget_files.columnWidth(1) > 600:
             self.ui.tableWidget_files.setColumnWidth(1, 600)
         self.ui.tableWidget_files.resizeRowsToContents()
+
+    def table_files_header_menu(self, position):
+        """ Sort ascending or descending. """
+
+        if not self.files:
+            return
+        index_at = self.ui.tableWidget_refs.indexAt(position)
+        col = int(index_at.column())
+        menu = QtWidgets.QMenu(self)
+        action_files_asc = menu.addAction(_("Ascending"))
+        action_files_desc = menu.addAction(_("Descending"))
+        action = menu.exec(self.ui.tableWidget_files.mapToGlobal(position))
+        if action == action_files_asc:
+            sorted_list = sorted(self.files, key=lambda x: x['name'])
+            self.files = sorted_list
+            self.fill_table_files()
+            return
+        if action == action_files_desc:
+            sorted_list = sorted(self.files, key=lambda x: x['name'], reverse=True)
+            self.files = sorted_list
+            self.fill_table_files()
+            return
 
     def fill_table_refs(self):
         """ Fill widget with ref details. """
