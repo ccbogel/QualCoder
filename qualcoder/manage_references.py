@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2022 Colin Curtain
+Copyright (c) 2023 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -41,6 +41,14 @@ from .ris import Ris, RisImport
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
+
+REF_ID = 0
+REF_DETAIL = 1
+REF_TYPE = 2
+REF_YEAR = 3
+REF_AUTHORS = 4
+REF_JOURNAL = 5
+REF_KEYWORDS = 6
 
 
 def exception_handler(exception_type, value, tb_obj):
@@ -87,8 +95,11 @@ class DialogReferenceManager(QtWidgets.QDialog):
         self.ui.tableWidget_refs.setStyleSheet(font2)
         self.ui.tableWidget_refs.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
         self.ui.tableWidget_refs.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
-        #self.ui.tableWidget_refs.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        #self.ui.tableWidget_refs.customContextMenuRequested.connect(self.table_menu)
+        self.ui.tableWidget_refs.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        self.ui.tableWidget_refs.customContextMenuRequested.connect(self.table_refs_menu)
+        self.ui.tableWidget_refs.horizontalHeader().setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        self.ui.tableWidget_refs.horizontalHeader().customContextMenuRequested.connect(self.table_refs_header_menu)
+
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(doc_import_icon), "png")
         self.ui.pushButton_import.setIcon(QtGui.QIcon(pm))
@@ -121,6 +132,8 @@ class DialogReferenceManager(QtWidgets.QDialog):
         self.ui.tableWidget_files.installEventFilter(self)
         self.ui.checkBox_hide_files.toggled.connect(self.fill_table_files)
         self.ui.checkBox_hide_refs.toggled.connect(self.fill_table_refs)
+        self.ui.splitter.setSizes([500, 200])
+        self.rows_hidden = False
 
     def get_data(self):
         """ Get data for files and references. """
@@ -136,6 +149,8 @@ class DialogReferenceManager(QtWidgets.QDialog):
         r = Ris(self.app)
         r.get_references()
         self.refs = r.refs
+        sorted_list = sorted(self.refs, key=lambda x: x['details'])
+        self.refs = sorted_list
         self.fill_table_refs()
 
     def fill_table_files(self):
@@ -183,18 +198,49 @@ class DialogReferenceManager(QtWidgets.QDialog):
         rows = self.ui.tableWidget_refs.rowCount()
         for c in range(0, rows):
             self.ui.tableWidget_refs.removeRow(0)
-        header_labels = ["Ref id", _("Reference")]
+        header_labels = ["Ref id", _("Reference"), _("Type"), _("Year"), _("Authors"), _("Journal or Second Title"), _("Keywords")]
         self.ui.tableWidget_refs.setColumnCount(len(header_labels))
         self.ui.tableWidget_refs.setHorizontalHeaderLabels(header_labels)
         for row, ref in enumerate(self.refs):
             self.ui.tableWidget_refs.insertRow(row)
             item = QtWidgets.QTableWidgetItem(str(ref['risid']))
             item.setFlags(QtCore.Qt.ItemFlag.ItemIsEnabled)
-            self.ui.tableWidget_refs.setItem(row, 0, item)
+            self.ui.tableWidget_refs.setItem(row, REF_ID, item)
             item = QtWidgets.QTableWidgetItem(ref['formatted'])
             item.setToolTip(ref['details'])
             item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
-            self.ui.tableWidget_refs.setItem(row, 1, item)
+            self.ui.tableWidget_refs.setItem(row, REF_DETAIL, item)
+            type_of_ref = ""
+            if 'TY' in ref:
+                type_of_ref = ref['TY']
+            item = QtWidgets.QTableWidgetItem(type_of_ref)
+            item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
+            self.ui.tableWidget_refs.setItem(row, REF_TYPE, item)
+            year_of_ref = ""
+            if 'PY' in ref:
+                year_of_ref = ''.join(ch for ch in ref['PY'] if ch.isdigit())  # Digits only
+            item = QtWidgets.QTableWidgetItem(year_of_ref)
+            item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
+            self.ui.tableWidget_refs.setItem(row, REF_YEAR, item)
+            authors = ""
+            if 'authors' in ref:
+                authors = ref['authors']
+            item = QtWidgets.QTableWidgetItem(authors)
+            item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
+            self.ui.tableWidget_refs.setItem(row, REF_AUTHORS, item)
+            journal_or_secondary = ""
+            if 'journal_or_secondary' in ref:
+                journal_or_secondary = ref['journal_or_secondary']
+            item = QtWidgets.QTableWidgetItem(journal_or_secondary)
+            item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
+            self.ui.tableWidget_refs.setItem(row, REF_JOURNAL, item)
+            keywords = ""
+            if 'KW' in ref:
+                keywords = ref['KW']
+            item = QtWidgets.QTableWidgetItem(keywords)
+            item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
+            self.ui.tableWidget_refs.setItem(row, REF_KEYWORDS, item)
+
             # Check if files assigned to this ref
             files_assigned = False
             for f in self.files:
@@ -206,11 +252,162 @@ class DialogReferenceManager(QtWidgets.QDialog):
             else:
                 self.ui.tableWidget_refs.setRowHidden(row, False)
         if self.app.settings['showids']:
-            self.ui.tableWidget_refs.showColumn(0)
+            self.ui.tableWidget_refs.showColumn(REF_ID)
         self.ui.tableWidget_refs.resizeColumnsToContents()
-        if self.ui.tableWidget_refs.columnWidth(1) > 600:
-            self.ui.tableWidget_refs.setColumnWidth(1, 600)
+        if self.ui.tableWidget_refs.columnWidth(REF_DETAIL) > 500:
+            self.ui.tableWidget_refs.setColumnWidth(REF_DETAIL, 500)
+        if self.ui.tableWidget_refs.columnWidth(REF_AUTHORS) > 400:
+            self.ui.tableWidget_refs.setColumnWidth(REF_AUTHORS, 400)
+        if self.ui.tableWidget_refs.columnWidth(REF_JOURNAL) > 350:
+            self.ui.tableWidget_refs.setColumnWidth(REF_JOURNAL, 350)
         self.ui.tableWidget_refs.resizeRowsToContents()
+
+    def table_refs_header_menu(self, position):
+        """ Sort ascending or descending. """
+
+        if not self.refs:
+            return
+        index_at = self.ui.tableWidget_refs.indexAt(position)
+        col = int(index_at.column())
+        menu = QtWidgets.QMenu(self)
+        action_id_asc = None
+        action_id_desc = None
+        if col == REF_ID:
+            action_id_asc = menu.addAction(_("Ascending"))
+            action_id_desc = menu.addAction(_("Descending"))
+        action_detail_asc = None
+        action_detail_desc = None
+        if col == REF_DETAIL:
+            action_detail_asc = menu.addAction(_("Ascending"))
+            action_detail_desc = menu.addAction(_("Descending"))
+        action_type_ascending = None
+        action_type_descending = None
+        if col == REF_TYPE:
+            action_type_ascending = menu.addAction(_("Ascending"))
+            action_type_descending = menu.addAction(_("Descending"))
+        action_year_ascending = None
+        action_year_descending = None
+        if col == REF_YEAR:
+            action_year_ascending = menu.addAction(_("Ascending"))
+            action_year_descending = menu.addAction(_("Descending"))
+        action_authors_ascending = None
+        action_authors_descending = None
+        if col == REF_AUTHORS:
+            action_authors_ascending = menu.addAction(_("Ascending"))
+            action_authors_descending = menu.addAction(_("Descending"))
+        action_journal_ascending = None
+        action_journal_descending = None
+        if col == REF_JOURNAL:
+            action_journal_ascending = menu.addAction(_("Ascending"))
+            action_journal_descending = menu.addAction(_("Descending"))
+        action_keywords_ascending = None
+        action_keywords_descending = None
+        if col == REF_KEYWORDS:
+            action_keywords_ascending = menu.addAction(_("Ascending"))
+            action_keywords_descending = menu.addAction(_("Descending"))
+
+        action = menu.exec(self.ui.tableWidget_refs.mapToGlobal(position))
+        if action == action_id_asc:
+            sorted_list = sorted(self.refs, key=lambda x: x['risid'])
+            self.refs = sorted_list
+            self.fill_table_refs()
+            return
+        if action == action_id_desc:
+            sorted_list = sorted(self.refs, key=lambda x: x['risid'], reverse=True)
+            self.refs = sorted_list
+            self.fill_table_refs()
+            return
+        if action == action_detail_asc:
+            sorted_list = sorted(self.refs, key=lambda x: x['details'])
+            self.refs = sorted_list
+            self.fill_table_refs()
+            return
+        if action == action_detail_desc:
+            sorted_list = sorted(self.refs, key=lambda x: x['details'], reverse=True)
+            self.refs = sorted_list
+            self.fill_table_refs()
+            return
+        if action == action_type_ascending:
+            sorted_list = sorted(self.refs, key=lambda x: x['TY'])
+            self.refs = sorted_list
+            self.fill_table_refs()
+            return
+        if action == action_type_descending:
+            sorted_list = sorted(self.refs, key=lambda x: x['TY'], reverse=True)
+            self.refs = sorted_list
+            self.fill_table_refs()
+            return
+        if action == action_year_ascending:
+            sorted_list = sorted(self.refs, key=lambda x: x['PY'])
+            self.refs = sorted_list
+            self.fill_table_refs()
+            return
+        if action == action_year_descending:
+            sorted_list = sorted(self.refs, key=lambda x: x['PY'], reverse=True)
+            self.refs = sorted_list
+            self.fill_table_refs()
+            return
+        if action == action_authors_ascending:
+            sorted_list = sorted(self.refs, key=lambda x: x['authors'])
+            self.refs = sorted_list
+            self.fill_table_refs()
+            return
+        if action == action_authors_descending:
+            sorted_list = sorted(self.refs, key=lambda x: x['authors'], reverse=True)
+            self.refs = sorted_list
+            self.fill_table_refs()
+            return
+        if action == action_journal_ascending:
+            sorted_list = sorted(self.refs, key=lambda x: x['journal_or_secondary'])
+            self.refs = sorted_list
+            self.fill_table_refs()
+            return
+        if action == action_journal_descending:
+            sorted_list = sorted(self.refs, key=lambda x: x['journal_or_secondary'], reverse=True)
+            self.refs = sorted_list
+            self.fill_table_refs()
+            return
+        if action == action_keywords_ascending:
+            sorted_list = sorted(self.refs, key=lambda x: x['keywords'])
+            self.refs = sorted_list
+            self.fill_table_refs()
+            return
+        if action == action_keywords_descending:
+            sorted_list = sorted(self.refs, key=lambda x: x['keywords'], reverse=True)
+            self.refs = sorted_list
+            self.fill_table_refs()
+            return
+
+    def table_refs_menu(self, position):
+        """ Context menu for displaying table rows in differing order,
+            Showing specific rows.
+        """
+
+        row = self.ui.tableWidget_refs.currentRow()
+        col = self.ui.tableWidget_refs.currentColumn()
+        item = self.ui.tableWidget_refs.item(row, col)
+        item_text = ""
+        if item is not None:
+            item_text = item.text()
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        action_show_this_value = menu.addAction(_("Show this value"))
+        #action_show_name_like = menu.addAction(_("Show value like"))
+        action_show_all_rows = None
+        if self.rows_hidden:
+            action_show_all_rows = menu.addAction(_("Show all rows"))
+        action = menu.exec(self.ui.tableWidget_refs.mapToGlobal(position))
+        if action == action_show_all_rows:
+            for r in range(0, self.ui.tableWidget_refs.rowCount()):
+                self.ui.tableWidget_refs.setRowHidden(r, False)
+            self.rows_hidden = False
+            return
+        if action == action_show_this_value:
+            for r in range(0, self.ui.tableWidget_refs.rowCount()):
+                if self.ui.tableWidget_refs.item(r, col).text() != item_text:
+                    self.ui.tableWidget_refs.setRowHidden(r, True)
+            self.rows_hidden = True
+            return
 
     def import_references(self):
         """ Import RIS formatted references from .ris or .txt files """

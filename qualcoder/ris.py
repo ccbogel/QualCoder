@@ -76,17 +76,30 @@ class Ris:
             details = str(ris_id[0]) + " "
             cur.execute("select tag, longtag, value from ris where risid=?", [ris_id[0]])
             res = cur.fetchall()
+            jnl_or_secondary_title = ""
             for r in res:
                 ref[r[0]] = r[2]
                 ref[r[1]] = r[2]
                 details += r[0] + ' - ' + r[1] + ' - ' + r[2] + "\n"
+                if r[0] == 'JO':
+                    jnl_or_secondary_title = r[2]
+                if jnl_or_secondary_title == "" and r[0] == 'JF':
+                    jnl_or_secondary_title = r[2]
+                if jnl_or_secondary_title == "" and r[0] == 'T2':
+                    jnl_or_secondary_title = r[2]
             ref['details'] = details
+            ref['journal_or_secondary'] = jnl_or_secondary_title
             ref['formatted'] = self.format_ris(ref)
+            if 'PY' not in ref:
+                ref['PY'] = ""
+            if 'authors' not in ref:
+                ref['authors'] = ""
+            if 'keywords' not in ref:
+                ref['keywords'] = ""
             self.refs.append(ref)
 
     def format_ris(self, ref):
         """ Format items in list for display.
-            ref type
             title
             authors (or editor)
             journal name, year, date, volume, issue
@@ -96,11 +109,6 @@ class Ris:
             url, doi?
          """
 
-        ref_type = ""
-        try:
-            ref_type = ref_types[ref['TY']] + " {Ref id:" + str(ref['risid']) + "}\n"
-        except KeyError:
-            pass
         title = ""
         authors = ""
         published_year = ""
@@ -114,7 +122,7 @@ class Ris:
         publisher = None
         issn = None
         url = None
-        doi = None
+        # doi = None
         txt = ""
 
         for tag in ("TI", "ST", "T2", "T3", "TT"):
@@ -212,7 +220,7 @@ class Ris:
             pass
 
         # Wrap up reference
-        txt += ref_type + title + authors
+        txt += title + authors
         if editor:
             txt += editor
         # Periodicals
