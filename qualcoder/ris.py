@@ -75,20 +75,34 @@ class Ris:
             ref = {'risid': ris_id[0]}
             details = str(ris_id[0]) + " "
             cur.execute("select tag, longtag, value from ris where risid=?", [ris_id[0]])
-            res = cur.fetchall()
+            ris_result = cur.fetchall()
             jnl_or_secondary_title = ""
-            for r in res:
-                ref[r[0]] = r[2]
-                ref[r[1]] = r[2]
-                details += r[0] + ' - ' + r[1] + ' - ' + r[2] + "\n"
-                if r[0] == 'JO':
-                    jnl_or_secondary_title = r[2]
-                if jnl_or_secondary_title == "" and r[0] == 'JF':
-                    jnl_or_secondary_title = r[2]
-                if jnl_or_secondary_title == "" and r[0] == 'T2':
-                    jnl_or_secondary_title = r[2]
+            for tpl in ris_result:
+                ref[tpl[0]] = tpl[2]
+                ref[tpl[1]] = tpl[2]
+                details += tpl[0] + ' - ' + tpl[1] + ' - ' + tpl[2] + "\n"
+                if tpl[0] == 'JO':
+                    jnl_or_secondary_title = tpl[2]
+                if jnl_or_secondary_title == "" and tpl[0] == 'JF':
+                    jnl_or_secondary_title = tpl[2]
+                if jnl_or_secondary_title == "" and tpl[0] == 'T2':
+                    jnl_or_secondary_title = tpl[2]
             ref['details'] = details
             ref['journal_or_secondary'] = jnl_or_secondary_title
+            # This is use in Manage files display
+            ref['journal_vol_issue'] = jnl_or_secondary_title + " "
+            volume = None
+            issue = None
+            for tpl in ris_result:
+                # Volume and issue
+                if 'VL' in tpl:
+                    volume = tpl[2]
+                if volume is None and 'VO' in tpl:
+                    volume = tpl[2]
+                if 'IS' in tpl:
+                    issue = tpl[2]
+            if volume and issue:
+                ref['journal_vol_issue'] += f"{volume} ({issue})"
             ref['formatted'] = self.format_ris(ref)
             if 'PY' not in ref:
                 ref['PY'] = ""
@@ -132,6 +146,7 @@ class Ris:
                     title = ref[tag] + "\n"
             except KeyError:
                 pass
+        # Authors
         for tag in ("AU", "A1", "A2", "A3", "A4"):
             try:
                 authors += " " + ref[tag]
@@ -139,52 +154,40 @@ class Ris:
                 pass
         if authors != "":
             authors = authors[1:] + "\n"
-        try:
+        # Editor
+        if 'ED' in ref:
             editor = "Editor: " + ref['ED'] + "\n"
-        except KeyError:
-            pass
-
-        for tag in ("PY", "Y1"):
-            try:
-                if published_year == "":
-                    published_year = ref[tag] + " "
-            except KeyError:
-                pass
-        try:
+        # Publication year
+        if 'PY' in ref:
+            published_year = ref['PY'] + " "
+        if published_year == "" and 'Y1' in ref:
+            published_year = ref['Y1'] + " "
+        # Publisher
+        if 'PB' in ref:
             publisher = ref['PB']
-            try:
+            if 'PP' in ref:
                 publisher += " " + ref['PP']
-            except KeyError:
-                pass
-        except KeyError:
-            pass
-        try:
+        # ISSN
+        if 'SN' in ref:
             issn = "ISSN: " + ref['SN']
-        except KeyError:
-            pass
         # Journal name, T2 tag is often used for this
         for tag in ("JO", "JF", "T2", "JA", "J1", "J2"):
             try:
                 if periodical_name == "":
-                    periodical_name = ref[tag] + ". "
+                    periodical_name = ref[tag] + " "
+                    continue
             except KeyError:
                 pass
         # Edition
-        try:
+        if 'ET' in ref:
             edition = ref['ET']
-        except KeyError:
-            pass
         # Volume and issue
-        for tag in ("VL", "VO"):
-            try:
-                if volume is None:
-                    volume = " Vol." + ref[tag]
-            except KeyError:
-                pass
-        try:
+        if 'VL' in ref:
+            volume = " Vol." + ref['VL']
+        if volume is None and 'VO' in ref:
+            volume = " Vol." + ref['VO']
+        if 'IS' in ref:
             issue = ref['IS']
-        except KeyError:
-            pass
         volume_and_or_issue = ""
         if volume and issue:
             volume_and_or_issue = volume + "(" + issue + ") "
@@ -193,31 +196,21 @@ class Ris:
         if volume_and_or_issue == "" and edition:
             volume_and_or_issue = "Edn. " + edition
         # Pages
-        try:
+        if 'SP' in ref:
             pages = ref['SP']
-        except KeyError:
-            pass
-        try:
+        if 'EP' in ref:
             end_page = ref['EP']
-        except KeyError:
-            pass
         if pages and end_page is not None:
             pages += "-" + end_page
         if pages:
             pages = " pp." + pages
-        # URL and DOI
-        try:
+        # URL
+        if 'UR' in ref:
             url = ref['UR']
-            try:
+            if 'Y2' in ref:
                 url += " Accessed: " + ref['Y2']
-            except KeyError:
-                pass
-        except KeyError:
-            pass
-        try:
-            doi = "DOI: " + ref['DO']
-        except KeyError:
-            pass
+        '''if 'DO' in ref:
+            doi = "DOI: " + ref['DO']'''
 
         # Wrap up reference
         txt += title + authors
@@ -242,7 +235,6 @@ class Ris:
         # Clean up
         txt = txt.replace("  ", " ")
         txt = txt.strip()
-        #print(txt)
         return txt
 
 
