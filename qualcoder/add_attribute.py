@@ -64,7 +64,7 @@ class DialogAddAttribute(QtWidgets.QDialog):
         self.app = app
         self.new_name = ""
         self.value_type = "character"
-        self.existing_names = ['Ref_Type', 'Ref_Author', 'Ref_Title', 'Ref_Year']
+        self.existing_names = ['Ref_Type', 'Ref_Author', 'Ref_Title', 'Ref_Year', 'Ref_Journal']
         cur = self.app.conn.cursor()
         sql = "select name from attribute_type"
         cur.execute(sql)
@@ -93,7 +93,7 @@ class DialogAddAttribute(QtWidgets.QDialog):
             duplicate = True
             msg = _("This attribute name already exists in cases, files or journals.")
             msg += "\n" + _("Or is reserved for bibliography attributes:")
-            msg += "\n" + "Ref_Type, Ref_Author, Ref_Title, Ref_Year"
+            msg += "\n" + "Ref_Type, Ref_Author, Ref_Title, Ref_Year, Ref_Journal"
             Message(self.app, _("Duplicate"), msg, "warning").exec()
             self.new_name = ""
             self.done(0)
