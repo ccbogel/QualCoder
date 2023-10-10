@@ -139,11 +139,11 @@ class Ris:
         # doi = None
         txt = ""
 
-        for tag in ("TI", "ST", "T2", "T3", "TT"):
+        # Get the first title based on this order
+        for tag in ("TI", "T1", "ST", "TT"):
             try:
-                # Get the first title based on the above order
-                if title == "":
-                    title = ref[tag] + "\n"
+                title = ref[tag] + "\n"
+                break
             except KeyError:
                 pass
         # Authors
@@ -213,7 +213,8 @@ class Ris:
             doi = "DOI: " + ref['DO']'''
 
         # Wrap up reference
-        txt += title + authors
+        print(title, authors)
+        txt = title + authors
         if editor:
             txt += editor
         # Periodicals
