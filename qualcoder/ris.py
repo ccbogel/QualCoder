@@ -269,13 +269,13 @@ class RisImport:
             self.import_ris_file(imports[0])
 
     def create_file_attributes(self):
-        """ Creates the attributes for Ref_Authors, Ref_Title, Ref_Type, Ref_Year """
+        """ Creates the attributes for Ref_Authors, Ref_Title, Ref_Type, Ref_Year, Ref_Journal """
 
         now_date = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
         cur = self.app.conn.cursor()
-        ref_vars = {'Ref_Authors': 'character', 'Ref_Title': 'character', 'Ref_Type': 'character', 'Ref_Year': 'numeric'}
+        ref_vars = {'Ref_Authors': 'character', 'Ref_Title': 'character', 'Ref_Type': 'character',
+                    'Ref_Year': 'numeric', 'Ref_Journal': 'character'}
         for key in ref_vars:
-
             cur.execute("select name from attribute type where name=?", [key])
             res = cur.fetchone()
             if not res:
@@ -295,7 +295,7 @@ class RisImport:
         sql = 'select name from attribute_type where caseOrFile ="file"'
         cur.execute(sql)
         attr_types = cur.fetchall()
-        attr_types = ["Ref_Authors", "Ref_Title", "Ref_Type", "Ref_Year"]
+        attr_types = ["Ref_Authors", "Ref_Title", "Ref_Type", "Ref_Year", "Ref_Journal"]
         insert_sql = "insert into attribute (name, attr_type, value, id, date, owner) values(?,'file','',?,?,?)"
         for source in sources:
             for att in attr_types:

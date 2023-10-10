@@ -518,7 +518,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
         if not file_row_objs:
             return
         ref = None
-        attr_values = {"Ref_Authors": "", "Ref_Title": "", "Ref_Type": "", "Ref_Year": ""}
+        attr_values = {"Ref_Authors": "", "Ref_Title": "", "Ref_Type": "", "Ref_Year": "", "Ref_Journal": ""}
         for r in self.refs:
             if r['risid'] == ris_id:
                 ref = r
@@ -554,6 +554,10 @@ class DialogReferenceManager(QtWidgets.QDialog):
             attr_values['Ref_Year'] = ref['PY']
         except KeyError:
             pass
+        #try:
+        attr_values['Ref_Journal'] = ref['journal_vol_issue']
+        #except KeyError:
+        #    pass
         cur = self.app.conn.cursor()
         for index in file_row_objs:
             fid = int(index.data())  # Column 0 data
