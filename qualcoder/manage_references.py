@@ -416,7 +416,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         action_show_this_value = menu.addAction(_("Show this value"))
-        #action_show_name_like = menu.addAction(_("Show value like"))
+        action_show_value_like = menu.addAction(_("Show value like"))
         action_show_all_rows = None
         if self.rows_hidden:
             action_show_all_rows = menu.addAction(_("Show all rows"))
@@ -432,6 +432,18 @@ class DialogReferenceManager(QtWidgets.QDialog):
                     self.ui.tableWidget_refs.setRowHidden(r, True)
             self.rows_hidden = True
             return
+        if action == action_show_value_like:
+            text_value, ok = QtWidgets.QInputDialog.getText(self, _("Text filter"), _("Show value like:"),
+                                                            QtWidgets.QLineEdit.EchoMode.Normal)
+            if not ok or text_value == '':
+                return
+            for r in range(0, self.ui.tableWidget_refs.rowCount()):
+                if self.ui.tableWidget_refs.item(r, col).text().find(text_value) == -1:
+                    self.ui.tableWidget_refs.setRowHidden(r, True)
+            self.rows_hidden = True
+            return
+
+
 
     def import_references(self):
         """ Import RIS formatted references from .ris or .txt files """

@@ -213,7 +213,6 @@ class Ris:
             doi = "DOI: " + ref['DO']'''
 
         # Wrap up reference
-        print(title, authors)
         txt = title + authors
         if editor:
             txt += editor
