@@ -252,7 +252,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
         rows = self.ui.tableWidget_refs.rowCount()
         for c in range(0, rows):
             self.ui.tableWidget_refs.removeRow(0)
-        header_labels = ["Ref id", _("Reference"), _("Type"), _("Year"), _("Authors"), _("Journal or Second Title"),
+        header_labels = ["Ref id", _("Reference"), _("Type"), _("Year"), _("Authors"), _("Journal or Publication Title"),
                          _("Volume"), _("Issue"), _("Keywords")]
         self.ui.tableWidget_refs.setColumnCount(len(header_labels))
         self.ui.tableWidget_refs.setHorizontalHeaderLabels(header_labels)
