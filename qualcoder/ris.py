@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2022 Colin Curtain
+Copyright (c) 2023 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -80,7 +80,7 @@ class Ris:
             for tpl in ris_result:
                 ref[tpl[0]] = tpl[2]
                 ref[tpl[1]] = tpl[2]
-                details += tpl[0] + ' - ' + tpl[1] + ' - ' + tpl[2] + "\n"
+                details += f"{tpl[0]} - {tpl[1]} - {tpl[2]}\n"
                 if tpl[0] == 'JO':
                     jnl_or_secondary_title = tpl[2]
                 if jnl_or_secondary_title == "" and tpl[0] == 'JF':
@@ -91,11 +91,12 @@ class Ris:
             ref['journal_or_secondary'] = jnl_or_secondary_title
             # This is use in Manage files display
             ref['journal_vol_issue'] = jnl_or_secondary_title + " "
+            # Volume and issue
             volume = None
             issue = None
             ref['volume'] = ""
+            ref['issue'] = ""
             for tpl in ris_result:
-                # Volume and issue
                 if 'VL' in tpl:
                     volume = tpl[2]
                     ref['volume'] = tpl[2]
@@ -104,6 +105,7 @@ class Ris:
                     ref['volume'] = tpl[2]
                 if 'IS' in tpl:
                     issue = tpl[2]
+                    ref['issue'] = tpl[2]
 
             if volume and issue:
                 ref['journal_vol_issue'] += f"{volume} ({issue})"
@@ -251,6 +253,7 @@ class RisImport:
     Ref_Author (authors list) – character
     Ref_Title – character
     Ref_Year (of publication) – numeric
+    Ref_journal
     """
 
     app = None

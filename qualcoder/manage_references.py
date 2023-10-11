@@ -49,7 +49,8 @@ REF_YEAR = 3
 REF_AUTHORS = 4
 REF_JOURNAL = 5
 REF_VOLUME = 6
-REF_KEYWORDS = 7
+REF_ISSUE = 7
+REF_KEYWORDS = 8
 
 
 def exception_handler(exception_type, value, tb_obj):
@@ -252,7 +253,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
         for c in range(0, rows):
             self.ui.tableWidget_refs.removeRow(0)
         header_labels = ["Ref id", _("Reference"), _("Type"), _("Year"), _("Authors"), _("Journal or Second Title"),
-                         _("Volume"), _("Keywords")]
+                         _("Volume"), _("Issue"), _("Keywords")]
         self.ui.tableWidget_refs.setColumnCount(len(header_labels))
         self.ui.tableWidget_refs.setHorizontalHeaderLabels(header_labels)
         for row, ref in enumerate(self.refs):
@@ -294,6 +295,12 @@ class DialogReferenceManager(QtWidgets.QDialog):
             item = QtWidgets.QTableWidgetItem(volume)
             item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
             self.ui.tableWidget_refs.setItem(row, REF_VOLUME, item)
+            issue = ""
+            if 'issue' in ref:
+                issue = ref['issue']
+            item = QtWidgets.QTableWidgetItem(issue)
+            item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
+            self.ui.tableWidget_refs.setItem(row, REF_ISSUE, item)
             keywords = ""
             if 'KW' in ref:
                 keywords = ref['KW']
@@ -571,42 +578,35 @@ class DialogReferenceManager(QtWidgets.QDialog):
         for r in self.refs:
             if r['risid'] == ris_id:
                 ref = r
-        try:
-            attr_values['Ref_Authors'] = ref['AU']
-        except KeyError:
-            pass
-        try:
-            attr_values['Ref_Authors'] += " " + ref['A1']
-        except KeyError:
-            pass
-        try:
-            attr_values['Ref_Authors'] += " " + ref['A2']
-        except KeyError:
-            pass
-        try:
-            attr_values['Ref_Authors'] += " " + ref['A3']
-        except KeyError:
-            pass
-        try:
-            attr_values['Ref_Authors'] += " " + ref['A4']
-        except KeyError:
-            pass
-        try:
-            attr_values['Ref_Title'] = ref['TI']
-        except KeyError:
-            pass
-        try:
+        if 'TY' in ref:
             attr_values['Ref_Type'] = ref['TY']
-        except KeyError:
-            pass
-        try:
+        if 'AU' in ref:
+            attr_values['Ref_Authors'] = ref['AU']
+        if 'A1' in ref:
+            attr_values['Ref_Authors'] += " " + ref['A1']
+        if 'A2' in ref:
+            attr_values['Ref_Authors'] += " " + ref['A2']
+        if 'A3' in ref:
+            attr_values['Ref_Authors'] += " " + ref['A3']
+        if 'A4' in ref:
+            attr_values['Ref_Authors'] += " " + ref['A4']
+        attr_values['Ref_Title'] = ""
+        # Get the first title based on this order from several tags
+        attr_values['Ref_Title'] = ""
+        for tag in ("TI", "T1", "ST", "TT"):
+            try:
+                attr_values['Ref_Title'] = ref[tag]
+                break
+            except KeyError:
+                pass
+        # Get ref year from several tags
+        attr_values['Ref_Year'] = ""
+        if 'PY' in ref:
             attr_values['Ref_Year'] = ref['PY']
-        except KeyError:
-            pass
-        #try:
+        if attr_values['Ref_Year'] == "" and 'Y1' in ref:
+            attr_values['Ref_Year'] = ref['Y1']
         attr_values['Ref_Journal'] = ref['journal_vol_issue']
-        #except KeyError:
-        #    pass
+
         cur = self.app.conn.cursor()
         for index in file_row_objs:
             fid = int(index.data())  # Column 0 data
