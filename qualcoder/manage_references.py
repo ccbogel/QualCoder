@@ -91,8 +91,8 @@ class DialogReferenceManager(QtWidgets.QDialog):
         font2 += '"' + self.app.settings['font'] + '";'
         self.ui.tableWidget_files.setStyleSheet(font2)
         self.ui.tableWidget_files.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
-        #self.ui.tableWidget_files.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        #self.ui.tableWidget_files.customContextMenuRequested.connect(self.table_menu)
+        self.ui.tableWidget_files.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        self.ui.tableWidget_files.customContextMenuRequested.connect(self.table_files_menu)
         self.ui.tableWidget_files.horizontalHeader().setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget_files.horizontalHeader().customContextMenuRequested.connect(self.table_files_header_menu)
         self.ui.tableWidget_refs.setStyleSheet(font2)
@@ -136,7 +136,8 @@ class DialogReferenceManager(QtWidgets.QDialog):
         self.ui.checkBox_hide_files.toggled.connect(self.fill_table_files)
         self.ui.checkBox_hide_refs.toggled.connect(self.fill_table_refs)
         self.ui.splitter.setSizes([500, 200])
-        self.rows_hidden = False
+        self.table_files_rows_hidden = False
+        self.table_refs_rows_hidden = False
 
     def get_data(self):
         """ Get data for files and references. """
@@ -215,6 +216,33 @@ class DialogReferenceManager(QtWidgets.QDialog):
             sorted_list = sorted(self.files, key=lambda x: x['name'], reverse=True)
             self.files = sorted_list
             self.fill_table_files()
+            return
+
+    def table_files_menu(self, position):
+        """ Context menu for showing specific rows.
+        """
+
+        #row = self.ui.tableWidget_files.currentRow()
+        menu = QtWidgets.QMenu()
+        action_show_value_like = menu.addAction(_("Show value like"))
+        action_show_all_rows = None
+        if self.table_files_rows_hidden:
+            action_show_all_rows = menu.addAction(_("Show all rows"))
+        action = menu.exec(self.ui.tableWidget_files.mapToGlobal(position))
+        if action == action_show_all_rows:
+            for r in range(0, self.ui.tableWidget_files.rowCount()):
+                self.ui.tableWidget_files.setRowHidden(r, False)
+            self.table_files_rows_hidden = False
+            return
+        if action == action_show_value_like:
+            text_value, ok = QtWidgets.QInputDialog.getText(self, _("Text filter"), _("Show value like:"),
+                                                            QtWidgets.QLineEdit.EchoMode.Normal)
+            if not ok or text_value == '':
+                return
+            for r in range(0, self.ui.tableWidget_files.rowCount()):
+                if self.ui.tableWidget_files.item(r, 1).text().find(text_value) == -1:
+                    self.ui.tableWidget_files.setRowHidden(r, True)
+            self.table_files_rows_hidden = True
             return
 
     def fill_table_refs(self):
@@ -441,19 +469,19 @@ class DialogReferenceManager(QtWidgets.QDialog):
         action_show_this_value = menu.addAction(_("Show this value"))
         action_show_value_like = menu.addAction(_("Show value like"))
         action_show_all_rows = None
-        if self.rows_hidden:
+        if self.table_refs_rows_hidden:
             action_show_all_rows = menu.addAction(_("Show all rows"))
         action = menu.exec(self.ui.tableWidget_refs.mapToGlobal(position))
         if action == action_show_all_rows:
             for r in range(0, self.ui.tableWidget_refs.rowCount()):
                 self.ui.tableWidget_refs.setRowHidden(r, False)
-            self.rows_hidden = False
+            self.table_refs_rows_hidden = False
             return
         if action == action_show_this_value:
             for r in range(0, self.ui.tableWidget_refs.rowCount()):
                 if self.ui.tableWidget_refs.item(r, col).text() != item_text:
                     self.ui.tableWidget_refs.setRowHidden(r, True)
-            self.rows_hidden = True
+            self.table_refs_rows_hidden = True
             return
         if action == action_show_value_like:
             text_value, ok = QtWidgets.QInputDialog.getText(self, _("Text filter"), _("Show value like:"),
@@ -463,7 +491,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
             for r in range(0, self.ui.tableWidget_refs.rowCount()):
                 if self.ui.tableWidget_refs.item(r, col).text().find(text_value) == -1:
                     self.ui.tableWidget_refs.setRowHidden(r, True)
-            self.rows_hidden = True
+            self.table_refs_rows_hidden = True
             return
 
     def import_references(self):
