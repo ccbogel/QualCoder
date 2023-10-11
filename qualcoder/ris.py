@@ -65,7 +65,7 @@ class Ris:
         self.app = app
 
     def get_references(self):
-        """ As list if dictionaries with risid and summary
+        """ As list of dictionaries with risid and summary
         """
         cur = self.app.conn.cursor()
         self.refs = []
@@ -93,14 +93,18 @@ class Ris:
             ref['journal_vol_issue'] = jnl_or_secondary_title + " "
             volume = None
             issue = None
+            ref['volume'] = ""
             for tpl in ris_result:
                 # Volume and issue
                 if 'VL' in tpl:
                     volume = tpl[2]
+                    ref['volume'] = tpl[2]
                 if volume is None and 'VO' in tpl:
                     volume = tpl[2]
+                    ref['volume'] = tpl[2]
                 if 'IS' in tpl:
                     issue = tpl[2]
+
             if volume and issue:
                 ref['journal_vol_issue'] += f"{volume} ({issue})"
             ref['formatted'] = self.format_ris(ref)

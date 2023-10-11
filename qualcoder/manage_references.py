@@ -48,7 +48,8 @@ REF_TYPE = 2
 REF_YEAR = 3
 REF_AUTHORS = 4
 REF_JOURNAL = 5
-REF_KEYWORDS = 6
+REF_VOLUME = 6
+REF_KEYWORDS = 7
 
 
 def exception_handler(exception_type, value, tb_obj):
@@ -222,7 +223,8 @@ class DialogReferenceManager(QtWidgets.QDialog):
         rows = self.ui.tableWidget_refs.rowCount()
         for c in range(0, rows):
             self.ui.tableWidget_refs.removeRow(0)
-        header_labels = ["Ref id", _("Reference"), _("Type"), _("Year"), _("Authors"), _("Journal or Second Title"), _("Keywords")]
+        header_labels = ["Ref id", _("Reference"), _("Type"), _("Year"), _("Authors"), _("Journal or Second Title"),
+                         _("Volume"), _("Keywords")]
         self.ui.tableWidget_refs.setColumnCount(len(header_labels))
         self.ui.tableWidget_refs.setHorizontalHeaderLabels(header_labels)
         for row, ref in enumerate(self.refs):
@@ -258,6 +260,12 @@ class DialogReferenceManager(QtWidgets.QDialog):
             item = QtWidgets.QTableWidgetItem(journal_or_secondary)
             item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
             self.ui.tableWidget_refs.setItem(row, REF_JOURNAL, item)
+            volume = ""
+            if 'volume' in ref:
+                volume = ref['volume']
+            item = QtWidgets.QTableWidgetItem(volume)
+            item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
+            self.ui.tableWidget_refs.setItem(row, REF_VOLUME, item)
             keywords = ""
             if 'KW' in ref:
                 keywords = ref['KW']
@@ -324,6 +332,11 @@ class DialogReferenceManager(QtWidgets.QDialog):
         if col == REF_JOURNAL:
             action_journal_ascending = menu.addAction(_("Ascending"))
             action_journal_descending = menu.addAction(_("Descending"))
+        action_volume_ascending = None
+        action_volume_descending = None
+        if col == REF_VOLUME:
+            action_volume_ascending = menu.addAction(_("Ascending"))
+            action_volume_descending = menu.addAction(_("Descending"))
         action_keywords_ascending = None
         action_keywords_descending = None
         if col == REF_KEYWORDS:
@@ -391,6 +404,16 @@ class DialogReferenceManager(QtWidgets.QDialog):
             self.refs = sorted_list
             self.fill_table_refs()
             return
+        if action == action_volume_ascending:
+            sorted_list = sorted(self.refs, key=lambda x: x['volume'])
+            self.refs = sorted_list
+            self.fill_table_refs()
+            return
+        if action == action_volume_descending:
+            sorted_list = sorted(self.refs, key=lambda x: x['volume'], reverse=True)
+            self.refs = sorted_list
+            self.fill_table_refs()
+            return
         if action == action_keywords_ascending:
             sorted_list = sorted(self.refs, key=lambda x: x['keywords'])
             self.refs = sorted_list
@@ -442,8 +465,6 @@ class DialogReferenceManager(QtWidgets.QDialog):
                     self.ui.tableWidget_refs.setRowHidden(r, True)
             self.rows_hidden = True
             return
-
-
 
     def import_references(self):
         """ Import RIS formatted references from .ris or .txt files """
