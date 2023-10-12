@@ -128,9 +128,8 @@ class DialogCodeText(QtWidgets.QWidget):
     edit_pos = 0
     no_codes_annotes_cases = None
 
-    # Variables associated with right-hand side splitter, for project memo, current journal, code rule
+    # Variables associated with right-hand side splitter, for project memo, code rule
     project_memo = False
-    journal_entry = False
     code_rule = False
 
     def __init__(self, app, parent_textedit, tab_reports):
@@ -147,7 +146,6 @@ class DialogCodeText(QtWidgets.QWidget):
         self.recent_codes = []
         self.autocode_history = []
         self.undo_deleted_codes = []
-        self.journal = False
         self.project_memo = False
         self.code_rule = False
         self.important = False
@@ -272,10 +270,11 @@ class DialogCodeText(QtWidgets.QWidget):
         pm.loadFromData(QtCore.QByteArray.fromBase64(coding_icon), "png")
         self.ui.pushButton_code_rule.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_code_rule.pressed.connect(self.show_code_rule)
-        pm = QtGui.QPixmap()
+        '''pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(journal_icon), "png")
         self.ui.pushButton_journal.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_journal.pressed.connect(self.show_current_journal)
+        self.ui.pushButton_journal.pressed.connect(self.show_journal)'''
+        self.ui.pushButton_journal.hide()
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(project_icon), "png")
         self.ui.pushButton_project_memo.setIcon(QtGui.QIcon(pm))
@@ -720,9 +719,9 @@ class DialogCodeText(QtWidgets.QWidget):
         '''for c in self.codes:
             c['name'] = c['name']  # Why did I do this ?'''
 
-    # RHS splitter details for code rule, current journal, project memo
+    # RHS splitter details for code rule, project memo
     def show_code_rule(self):
-        """ Show current journal text in right-hand side splitter pane. """
+        """ Show text in right-hand side splitter pane. """
 
         self.ui.textEdit_info.setPlainText("")
         selected = self.ui.treeWidget.currentItem()
@@ -756,21 +755,35 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.textEdit_info.blockSignals(True)
         self.ui.textEdit_info.setText(txt)
 
-    def show_current_journal(self):
-        """ Show current journal text in right-hand side splitter pane. """
+    '''def show_journal(self):
+        """ Show journal text in right-hand side splitter pane. 
+        TODO a risk of losing the journal entry text. """
 
         journals = self.app.get_journal_texts()
         if not journals:
             self.journal_entry = False
             return
+        # Remove Dialog Journals from tab_layout - journal information clash may occur.
+        contents = self.tab_manage.layout()
+        if contents:
+            for i in reversed(range(contents.count())):
+                c = contents.itemAt(i).widget()
+                if isinstance(c, DialogJournals):
+                    print("JJJJ")
+                    # Remove widgets from layout
+                    for i in reversed(range(contents.count())):
+                        contents.itemAt(i).widget().close()
+                        contents.itemAt(i).widget().setParent(None)
         self.project_memo = False
-        self.journal_entry = journals[0]
         self.code_rule = False
+        for j in journals:
+            print(j)
+        self.journal_entry = journals[0]
         self.ui.label_info.setText(self.journal_entry['name'])
         self.ui.textEdit_info.setReadOnly(False)
         self.ui.textEdit_info.blockSignals(True)
         self.ui.textEdit_info.setText(self.journal_entry['jentry'])
-        self.ui.textEdit_info.blockSignals(False)
+        self.ui.textEdit_info.blockSignals(False)'''
 
     def show_project_memo(self):
         """ Show project memo in right-hand side splitter pane """
@@ -779,7 +792,7 @@ class DialogCodeText(QtWidgets.QWidget):
         cur.execute("select memo from project")
         res = cur.fetchone()
         self.project_memo = True
-        self.journal_entry = False
+        #self.journal_entry = False
         self.code_rule = False
         self.ui.label_info.setText(_("Project memo"))
 
@@ -790,18 +803,18 @@ class DialogCodeText(QtWidgets.QWidget):
 
     def rhs_splitter_text_changed(self):
         """ Database is updated as text is changed in textEdit_info.
-        Text is updated for the current journal, or the overall project memo.
+        Text is updated for the overall project memo.
         """
 
         if self.code_rule:
             return
         cur = self.app.conn.cursor()
         txt = self.ui.textEdit_info.toPlainText()
-        if self.journal_entry is not False:
+        '''if self.journal_entry is not False:
             now_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
             cur.execute("update journal set jentry=?, date=?, owner=? where jid=?",
-                        [txt, now_date, self.app.settings['codername'], self.journal_entry['jid']])
-        if self.project_memo is not False:
+                        [txt, now_date, self.app.settings['codername'], self.journal_entry['jid']])'''
+        if self.project_memo is True:
             cur.execute("update project set memo=?", [txt])
         self.app.conn.commit()
         self.app.delete_backup = False

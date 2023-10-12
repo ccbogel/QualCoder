@@ -29,7 +29,6 @@ https://qualcoder.wordpress.com/
 
 import base64
 import configparser
-import csv
 import datetime
 import gettext
 import json  # To get the latest GitHub release information
@@ -37,7 +36,6 @@ import logging
 from logging.handlers import RotatingFileHandler
 import os
 import platform
-from random import randint
 import shutil
 import sys
 import sqlite3
@@ -54,7 +52,6 @@ from qualcoder.codebook import Codebook
 from qualcoder.code_color_scheme import DialogCodeColorScheme
 from qualcoder.code_text import DialogCodeText
 from qualcoder.code_pdf import DialogCodePdf
-from qualcoder.color_selector import colors
 from qualcoder.GUI.base64_helper import *
 from qualcoder.GUI.ui_main import Ui_MainWindow
 from qualcoder.helpers import Message, ImportPlainTextCodes
@@ -535,7 +532,7 @@ class App(object):
                     settings_data[key] = "Bold"
                 if key == 'report_text_context_characters':
                     settings_data[key] = 150
-        # write out new ini file, if needed
+        # Write out new ini file, if needed
         if len(settings_data) > dict_len:
             self.write_config_ini(settings_data)
         return settings_data
@@ -770,7 +767,7 @@ class App(object):
             'stylesheet': 'original',
             'report_text_context_chars': 150,
             'report_text_contextz-style': 'Bold',
-            'codetext_chunksize': 50000
+            'codetext_chunksize': 50000,
         }
 
     def get_file_texts(self, file_ids=None):
@@ -1182,17 +1179,17 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.ui.textEdit.append("<h1>" + _("Settings") + "</h1>")
         msg = _("Coder") + ": " + self.app.settings['codername'] + "\n"
-        msg += _("Font") + ": " + f"{self.app.settings['font']} {str(self.app.settings['fontsize'])}\n"
-        msg += _("Tree font size") + f": {str(self.app.settings['treefontsize'])}\n"
+        msg += _("Font") + ": " + f"{self.app.settings['font']} {self.app.settings['fontsize']}\n"
+        msg += _("Tree font size") + f": {self.app.settings['treefontsize']}\n"
         msg += _("Working directory") + f": {self.app.settings['directory']}\n"
-        msg += _("Show IDs") + f": {str(self.app.settings['showids'])}\n"
+        msg += _("Show IDs") + f": {self.app.settings['showids']}\n"
         msg += _("Language") + f": {self.app.settings['language']}\n"
         msg += _("Timestamp format") + f": {self.app.settings['timestampformat']}\n"
-        msg += _("Speaker name format") + f": {str(self.app.settings['speakernameformat'])}\n"
+        msg += _("Speaker name format") + f": {self.app.settings['speakernameformat']}\n"
         msg += _("Report text context characters: ") + str(self.app.settings['report_text_context_characters']) + "\n"
         msg += _("Report text context style: ") + self.app.settings['report_text_context_style'] + "\n"
-        msg += _("Backup on open") + f": {str(self.app.settings['backup_on_open'])}\n"
-        msg += _("Backup AV files") + f": {str(self.app.settings['backup_av_files'])}\n"
+        msg += _("Backup on open") + f": {self.app.settings['backup_on_open']}\n"
+        msg += _("Backup AV files") + f": {self.app.settings['backup_av_files']}\n"
         msg += _("Style") + "; " + self.app.settings['stylesheet']
         if platform.system() == "Windows":
             msg += "\n" + _("Directory (folder) paths / represents \\")
@@ -1386,7 +1383,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.label_manage.hide()
         ui = DialogJournals(self.app, self.ui.textEdit)
         ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
-        self.tab_layout_helper(self.ui.tab_manage, ui)
+        self.journal_display = ui
+        ui.show()
+        #self.tab_layout_helper(self.ui.tab_manage, None)
+        #self.tab_layout_helper(self.ui.tab_manage, ui)
 
     def text_coding(self):
         """ Create edit and delete codes. Apply and remove codes and annotations to the
@@ -1408,9 +1408,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
         files = self.app.get_pdf_filenames()
         if len(files) > 0:
-            '''msg = "Under construction"
-            Message(self.app, _('TODO'), msg).exec()
-            return'''
             self.ui.label_coding.hide()
             ui = DialogCodePdf(self.app, self.ui.textEdit, self.ui.tab_reports)
             ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
