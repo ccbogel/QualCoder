@@ -342,9 +342,19 @@ class DialogManageFiles(QtWidgets.QDialog):
         action_equals_value = menu.addAction(_("Show this value"))
         action_order_by_value_asc = None
         action_order_by_value_desc = None
+        action_date_picker = None
         if col > self.CASE_COLUMN:
             action_order_by_value_asc = menu.addAction(_("Order ascending"))
             action_order_by_value_desc = menu.addAction(_("Order descending"))
+            #if self.header_value_type[col] == "character" and "date" in self.header_labels[col].lower():
+            if "date" in self.header_labels[col].lower():
+                # Check that a character date can be entered
+                cur = self.app.conn.cursor()
+                cur.execute("select valuetype from attribute_type where caseOrFile='file' and name=?",
+                            [self.header_labels[col], ])
+                result = cur.fetchone()
+                if result is not None and result[0] == "character":
+                    action_date_picker = menu.addAction(_("Enter date"))
         action_rename = None
         action_export = None
         action_delete = None
@@ -427,6 +437,16 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.rows_hidden = False
         if action == action_url:
             webbrowser.open(item_text)
+        if action == action_date_picker:
+            ui = DialogMemo(self.app, "Date selector", "", "hide")
+            ui.ui.textEdit.hide()
+            calendar = QtWidgets.QCalendarWidget()
+            ui.ui.gridLayout.addWidget(calendar, 0, 0, 1, 1)
+            ok = ui.exec()
+            if ok:
+                selected_date = calendar.selectedDate().toString("yyyy-MM-dd")
+                self.ui.tableWidget.setItem(row, col, QtWidgets.QTableWidgetItem(selected_date))
+            return
 
     def view_original_text_file(self, mediapath):
         """ View original text file.
@@ -1070,7 +1090,6 @@ class DialogManageFiles(QtWidgets.QDialog):
             value = str(self.ui.tableWidget.item(x, y).text()).strip()
             attribute_name = self.header_labels[y]
             cur = self.app.conn.cursor()
-
             # Check numeric for numeric attributes, clear "" if it cannot be cast
             cur.execute("select valuetype from attribute_type where caseOrFile='file' and name=?", (attribute_name,))
             result = cur.fetchone()
