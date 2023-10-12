@@ -890,12 +890,12 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Set up user interface from ui_main.py file. """
         self.app = app
         self.force_quit = force_quit
+        self.journal_display = None
         sys.excepthook = exception_handler
         QtWidgets.QMainWindow.__init__(self)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         # Test of macOS menu bar
-        
         if self.app.settings['stylesheet'] == "native":
             self.ui.menubar.setNativeMenuBar(True)
         else:
@@ -1378,7 +1378,8 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.actionManage_bad_links_to_files.setEnabled(False)
 
     def journals(self):
-        """ Create and edit journals. """
+        """ Create and edit journals.
+        From version 3.4 in a non-modal window. """
 
         self.ui.label_manage.hide()
         ui = DialogJournals(self.app, self.ui.textEdit)
@@ -1600,6 +1601,7 @@ class MainWindow(QtWidgets.QMainWindow):
         v8 has table for ris bibliography data.
         """
 
+        self.journal_display = None
         self.app = App()
         if self.app.settings['directory'] == "":
             self.app.settings['directory'] = os.path.expanduser('~')
@@ -1816,6 +1818,7 @@ class MainWindow(QtWidgets.QMainWindow):
             newproject: yes or no  if yes then do not make an initial backup
         """
 
+        self.journal_display = None
         default_directory = self.app.settings['directory']
         if path_ == "" or path_ is False:
             if default_directory == "":
@@ -2188,6 +2191,7 @@ class MainWindow(QtWidgets.QMainWindow):
         Remove widgets from tabs, clear dialog list. Close app connection.
         Delete old backups. Hide menu options. """
 
+        self.journal_display = None
         # Remove widgets from each tab
         contents = self.ui.tab_reports.layout()
         if contents:
