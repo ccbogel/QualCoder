@@ -478,6 +478,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
         action_show_all_rows = None
         if self.table_refs_rows_hidden:
             action_show_all_rows = menu.addAction(_("Show all rows"))
+        action_copy_to_clipboard = menu.addAction(_("Copy to clipboard"))
         action = menu.exec(self.ui.tableWidget_refs.mapToGlobal(position))
         if action == action_show_all_rows:
             for r in range(0, self.ui.tableWidget_refs.rowCount()):
@@ -500,6 +501,10 @@ class DialogReferenceManager(QtWidgets.QDialog):
                     self.ui.tableWidget_refs.setRowHidden(r, True)
             self.table_refs_rows_hidden = True
             return
+        if action == action_copy_to_clipboard:
+            reference_text = self.ui.tableWidget_refs.item(row, 1).text()
+            cb = QtWidgets.QApplication.clipboard()
+            cb.setText(reference_text)
 
     def import_references(self):
         """ Import RIS formatted references from .ris or .txt files """
