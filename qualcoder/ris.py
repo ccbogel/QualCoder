@@ -106,27 +106,26 @@ class Ris:
                 if 'IS' in tpl:
                     issue = tpl[2]
                     ref['issue'] = tpl[2]
-
             if volume and issue:
                 ref['journal_vol_issue'] += f"{volume} ({issue})"
-            ref['formatted'] = self.format_ris(ref)
             if 'PY' not in ref:
                 ref['PY'] = ""
             if 'authors' not in ref:
                 ref['authors'] = ""
             if 'keywords' not in ref:
                 ref['keywords'] = ""
+            ref['vancouver'], ref['apa'] = self.format_vancouver_and_apa(ref)
             self.refs.append(ref)
 
-    def format_ris(self, ref):
-        """ Format items in list for display.
-            title
-            authors (or editor)
-            journal name, year, date, volume, issue
-            pages
-            publisher (and place)
-            issn
-            url, doi?
+    def format_vancouver_and_apa(self, ref):
+        """ Format items in list for display as Vancouver style and APA style.
+            Vancouver:
+            Title.  authors (or editor)
+            journal name, year, date, volume, issue, pages
+            publisher (and place) issn, url
+
+            APA:
+            authors (year). title, journal volume issue (page numbers) URL
          """
 
         title = ""
@@ -142,8 +141,9 @@ class Ris:
         publisher = None
         issn = None
         url = None
-        # doi = None
-        txt = ""
+        doi = None
+        vancouver = ""
+        apa = "" # American Psychological Association refernce style
 
         # Get the first title based on this order
         for tag in ("TI", "T1", "ST", "TT"):
@@ -165,9 +165,9 @@ class Ris:
             editor = "Editor: " + ref['ED'] + "\n"
         # Publication year
         if 'PY' in ref:
-            published_year = ref['PY'] + " "
+            published_year = ref['PY']
         if published_year == "" and 'Y1' in ref:
-            published_year = ref['Y1'] + " "
+            published_year = ref['Y1']
         # Publisher
         if 'PB' in ref:
             publisher = ref['PB']
@@ -210,38 +210,64 @@ class Ris:
             pages += "-" + end_page
         if pages:
             pages = " pp." + pages
+            pages = pages.strip()
         # URL
         if 'UR' in ref:
             url = ref['UR']
             if 'Y2' in ref:
                 url += " Accessed: " + ref['Y2']
-        '''if 'DO' in ref:
-            doi = "DOI: " + ref['DO']'''
+        if 'DO' in ref:
+            doi = "doi: " + ref['DO']
 
-        # Wrap up reference
-        txt = title + authors
+        # Wrap up Vancouver style reference
+        vancouver = title + authors
         if editor:
-            txt += editor
+            vancouver += editor
         # Periodicals
-        txt += periodical_name + published_year + volume_and_or_issue
+        vancouver += periodical_name + published_year + " " + volume_and_or_issue
         if pages:
-            txt += pages
-        txt += "\n"
+            vancouver += pages
+        vancouver += "\n"
         # Other published
         if publisher:
-            txt += publisher + " "
+            vancouver += publisher + " "
         # Extra information
         if issn:
-            txt += issn + "\n"
+            vancouver += issn + "\n"
         # Links
         if url:
-            txt += url + "\n"
-        '''if doi:
-            txt += doi'''
+            vancouver += url + "\n"
+        if doi:
+            vancouver += doi
         # Clean up
-        txt = txt.replace("  ", " ")
-        txt = txt.strip()
-        return txt
+        vancouver = vancouver.replace("  ", " ")
+        vancouver = vancouver.strip()
+
+        # Wrap up APA style
+        # authors(year).title, journal volume issue(page numbers) URL
+        apa = authors.replace(";", ",")
+        if editor:
+            apa += editor
+        apa += " "
+        if published_year != "":
+            apa += f"({published_year}). "
+        if title != "":
+            apa += f"{title}."
+        apa += f"{periodical_name}, "
+        apa += f"{volume_and_or_issue}. "
+        if pages:
+            apa += f"({pages})"
+        if url is not None:
+            apa += url
+        if doi is not None:
+            apa += f" {doi}"
+        # Clean up
+        apa = apa.replace(" ,", ",")
+        apa = apa.replace(" .", ".")
+        apa = apa.replace("  ", " ")
+        apa = apa.strip()
+
+        return vancouver, apa
 
 
 class RisImport:
