@@ -54,7 +54,7 @@ def exception_handler(exception_type, value, tb_obj):
 
 class Ris:
     """ Load ris list of dictionaries.
-        Format RIS to short display.
+        Format RIS to Vancouver or APA for display.
         References in RIS can be poorly created often due to how the researcher created them. """
 
     app = None
@@ -64,13 +64,20 @@ class Ris:
         sys.excepthook = exception_handler
         self.app = app
 
-    def get_references(self):
-        """ As list of dictionaries with risid and summary
+    def get_references(self, selected_ris=None):
+        """ As list of dictionaries with risid and summary.
+
         """
-        cur = self.app.conn.cursor()
+
         self.refs = []
-        cur.execute("select distinct risid from ris order by risid")
+        cur = self.app.conn.cursor()
+        if not selected_ris:
+            cur.execute("select distinct risid from ris order by risid")
+        else:
+            cur.execute("select distinct risid from ris where risid=?", [selected_ris])
         ris_ids_res = cur.fetchall()
+        if not ris_ids_res:  # May be empty if selected_ris is incorrect or no references present
+            return
         for ris_id in ris_ids_res:
             ref = {'risid': ris_id[0]}
             details = str(ris_id[0]) + " "
@@ -142,13 +149,13 @@ class Ris:
         issn = None
         url = None
         doi = None
-        vancouver = ""
-        apa = "" # American Psychological Association refernce style
+        vancouver = ""  # Vancouver reference style, approximately
+        apa = "" # American Psychological Association reference style
 
         # Get the first title based on this order
         for tag in ("TI", "T1", "ST", "TT"):
             try:
-                title = ref[tag] + "\n"
+                title = f"{ref[tag]}.\n"
                 break
             except KeyError:
                 pass
@@ -162,7 +169,7 @@ class Ris:
             authors = authors[1:] + "\n"
         # Editor
         if 'ED' in ref:
-            editor = "Editor: " + ref['ED'] + "\n"
+            editor = f"Editor: {ref['ED']} \n"
         # Publication year
         if 'PY' in ref:
             published_year = ref['PY']
@@ -172,15 +179,15 @@ class Ris:
         if 'PB' in ref:
             publisher = ref['PB']
             if 'PP' in ref:
-                publisher += " " + ref['PP']
+                publisher += f" {ref['PP']}"
         # ISSN
         if 'SN' in ref:
-            issn = "ISSN: " + ref['SN']
+            issn = f"ISSN: {ref['SN']}"
         # Journal name, T2 tag is often used for this
         for tag in ("JO", "JF", "T2", "JA", "J1", "J2"):
             try:
                 if periodical_name == "":
-                    periodical_name = ref[tag] + " "
+                    periodical_name = f"{ref[tag]} "
                     continue
             except KeyError:
                 pass
@@ -189,14 +196,14 @@ class Ris:
             edition = ref['ET']
         # Volume and issue
         if 'VL' in ref:
-            volume = " Vol." + ref['VL']
+            volume = f" Vol.{ref['VL']}"
         if volume is None and 'VO' in ref:
             volume = " Vol." + ref['VO']
         if 'IS' in ref:
             issue = ref['IS']
         volume_and_or_issue = ""
         if volume and issue:
-            volume_and_or_issue = volume + "(" + issue + ") "
+            volume_and_or_issue = volume + f"({issue}) "
         if volume is None and issue:
             volume_and_or_issue += " " + issue + " "
         if volume_and_or_issue == "" and edition:
@@ -215,9 +222,9 @@ class Ris:
         if 'UR' in ref:
             url = ref['UR']
             if 'Y2' in ref:
-                url += " Accessed: " + ref['Y2']
+                url += f" Accessed: {ref['Y2']}"
         if 'DO' in ref:
-            doi = "doi: " + ref['DO']
+            doi = f"doi: {ref['DO']}"
 
         # Wrap up Vancouver style reference
         vancouver = title + authors
@@ -252,9 +259,11 @@ class Ris:
         if published_year != "":
             apa += f"({published_year}). "
         if title != "":
-            apa += f"{title}."
-        apa += f"{periodical_name}, "
-        apa += f"{volume_and_or_issue}. "
+            apa += f"{title}"
+        if periodical_name != "":
+            apa += f"{periodical_name}, "
+        if volume_and_or_issue != "":
+            apa += f"{volume_and_or_issue}. "
         if pages:
             apa += f"({pages})"
         if url is not None:

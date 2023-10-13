@@ -58,6 +58,7 @@ from .helpers import ExportDirectoryPathDialog, Message, msecs_to_hours_mins_sec
 from .html_parser import *
 from .memo import DialogMemo
 from .report_codes import DialogReportCodes  # for isInstance()
+from .ris import Ris
 from .select_items import DialogSelectItems
 from .view_av import DialogViewAV, DialogCodeAV  # for isinstance update files
 from .view_image import DialogViewImage, DialogCodeImage  # for isinstance update files
@@ -306,6 +307,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         item_text = self.ui.tableWidget.item(row, col).text()
         # Use these next few lines to use for moving a linked file into or an internal file out of the project folder
         mediapath = None
+        risid = None
         try:
             id_ = int(self.ui.tableWidget.item(row, self.ID_COLUMN).text())
         except AttributeError:
@@ -314,6 +316,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         for s in self.source:
             if s['id'] == id_:
                 mediapath = s['mediapath']
+                risid = s['risid']
         # Action cannot be None otherwise may default to one of the actions below depending on column clicked
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
@@ -343,6 +346,8 @@ class DialogManageFiles(QtWidgets.QDialog):
         action_order_by_value_asc = None
         action_order_by_value_desc = None
         action_date_picker = None
+        action_ref_apa = None
+        action_ref_vancouver = None
         if col > self.CASE_COLUMN:
             action_order_by_value_asc = menu.addAction(_("Order ascending"))
             action_order_by_value_desc = menu.addAction(_("Order descending"))
@@ -355,6 +360,9 @@ class DialogManageFiles(QtWidgets.QDialog):
                 result = cur.fetchone()
                 if result is not None and result[0] == "character":
                     action_date_picker = menu.addAction(_("Enter date"))
+            if self.header_labels[col] in ("Ref_Authors", "Ref_Title", "Ref_Journal", "Ref_Type", "Ref_Year"):
+                action_ref_apa = menu.addAction(_("Copy reference to clipboard. APA"))
+                action_ref_vancouver = menu.addAction(_("Copy reference to clipboard. Vancouver"))
         action_rename = None
         action_export = None
         action_delete = None
@@ -438,15 +446,31 @@ class DialogManageFiles(QtWidgets.QDialog):
         if action == action_url:
             webbrowser.open(item_text)
         if action == action_date_picker:
-            ui = DialogMemo(self.app, "Date selector", "", "hide")
-            ui.ui.textEdit.hide()
+            ui_memo = DialogMemo(self.app, "Date selector", "", "hide")
+            ui_memo.ui.textEdit.hide()
             calendar = QtWidgets.QCalendarWidget()
-            ui.ui.gridLayout.addWidget(calendar, 0, 0, 1, 1)
-            ok = ui.exec()
+            ui_memo.ui.gridLayout.addWidget(calendar, 0, 0, 1, 1)
+            ok = ui_memo.exec()
             if ok:
                 selected_date = calendar.selectedDate().toString("yyyy-MM-dd")
                 self.ui.tableWidget.setItem(row, col, QtWidgets.QTableWidgetItem(selected_date))
             return
+        if action == action_ref_apa:
+            ris_obj = Ris(self.app)
+            ris_obj.get_references(selected_ris=risid)
+            apa = ris_obj.refs
+            if not apa:
+                return
+            cb = QtWidgets.QApplication.clipboard()
+            cb.setText(apa[0]['apa'].replace("\n", " "))
+        if action == action_ref_vancouver:
+            ris_obj = Ris(self.app)
+            ris_obj.get_references(selected_ris=risid)
+            vancouver = ris_obj.refs
+            if not vancouver:
+                return
+            cb = QtWidgets.QApplication.clipboard()
+            cb.setText(vancouver[0]['vancouver'].replace("\n", " "))
 
     def view_original_text_file(self, mediapath):
         """ View original text file.
@@ -773,14 +797,14 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.source = []
         cur = self.app.conn.cursor()
         placeholders = None
-        # default alphabetic order
-        sql = "select name, id, fulltext, mediapath, ifnull(memo,''), owner, date, av_text_id from source order by upper(name)"
+        # Default alphabetic order
+        sql = "select name, id, fulltext, mediapath, ifnull(memo,''), owner, date, av_text_id, risid from source order by upper(name)"
         if  order_by == "filename desc":
             sql += " desc"
         if order_by == "date":
-            sql = "select name, id, fulltext, mediapath, ifnull(memo,''), owner, date, av_text_id from source order by date, upper(name)"
+            sql = "select name, id, fulltext, mediapath, ifnull(memo,''), owner, date, av_text_id, risid from source order by date, upper(name)"
         if order_by == "filetype":
-            sql = "select name, id, fulltext, mediapath, ifnull(memo,''), owner, date, av_text_id from source order by mediapath"
+            sql = "select name, id, fulltext, mediapath, ifnull(memo,''), owner, date, av_text_id, risid from source order by mediapath"
         if order_by == "casename":
             sql = "select distinct source.name, source.id, source.fulltext, source.mediapath, ifnull(source.memo,''), "
             sql += "source.owner, source.date, av_text_id "
@@ -790,11 +814,11 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         if order_by[:14] == "attribute asc:":
             attribute_name = order_by[14:]
-            # two types of ordering character or numeric
+            # Two types of ordering character or numeric
             cur.execute("select valuetype from attribute_type where name=?", [attribute_name])
             attr_type = cur.fetchone()[0]
             sql = "select source.name, source.id, fulltext, mediapath, ifnull(source.memo,''), source.owner, "
-            sql += "source.date, av_text_id from source join attribute on attribute.id = source.id "
+            sql += "source.date, av_text_id, risid from source join attribute on attribute.id = source.id "
             sql += " where attribute.attr_type = 'file' and attribute.name=? "
             if attr_type == "character":
                 sql += "order by lower(attribute.value) asc "
@@ -808,7 +832,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             cur.execute("select valuetype from attribute_type where name=?", [attribute_name])
             attr_type = cur.fetchone()[0]
             sql = "select source.name, source.id, fulltext, mediapath, ifnull(source.memo,''), source.owner, "
-            sql += "source.date, av_text_id from source join attribute on attribute.id = source.id "
+            sql += "source.date, av_text_id, risid from source join attribute on attribute.id = source.id "
             sql += " where attribute.attr_type = 'file' and attribute.name=? "
             if attr_type == "character":
                 sql += "order by lower(attribute.value) desc "
@@ -825,7 +849,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             icon, metadata = self.get_icon_and_metadata(row[1])
             self.source.append({'name': row[0], 'id': row[1], 'fulltext': row[2],
                                 'mediapath': row[3], 'memo': row[4], 'owner': row[5], 'date': row[6],
-                                'av_text_id': row[7], 'metadata': metadata, 'icon': icon,
+                                'av_text_id': row[7], 'risid': row[8], 'metadata': metadata, 'icon': icon,
                                 'case': self.get_cases_by_filename(row[0]),
                                 'attributes': []})
 
@@ -852,6 +876,9 @@ class DialogManageFiles(QtWidgets.QDialog):
                     if att_name == "Ref_authors":
                         tmp = tmp.replace(";", "\n")
                     s['attributes'].append(tmp)
+        # Get reference for file, Vancouver and APA style
+        # TODO
+
         self.fill_table()
 
     def get_icon_and_metadata(self, id_):
@@ -998,18 +1025,17 @@ class DialogManageFiles(QtWidgets.QDialog):
         Then get the attribute type through a dialog.
         AddAttribute dialog checks for duplicate attribute name.
         New attribute is added to the model and database.
-        Reserved attribute words - usef for imported references:
+        Reserved attribute words - used for imported references:
         Ref_Type (Type of Reference) – character variable
         Ref_Author (authors list) – character
         Ref_Title – character
         Ref_Year (of publication) – numeric
+        Ref_Journal - character
         """
 
         if self.av_dialog_open is not None:
             self.av_dialog_open.mediaplayer.stop()
             self.av_dialog_open = None
-        '''check_names = self.attribute_names + [{'name': 'Ref_Type'}, {'name': 'Ref_Author'}, {'name': 'Ref_Title'},
-                                              {'name':'Ref_Year'}]'''
         ui = DialogAddAttribute(self.app)
         ok = ui.exec()
         if not ok:
@@ -2049,7 +2075,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             for offset, attribute in enumerate(data['attributes']):
                 item = QtWidgets.QTableWidgetItem(attribute)
                 self.ui.tableWidget.setItem(row, self.ATTRIBUTE_START_COLUMN + offset, item)
-                if self.attribute_labels_ordered[offset] in ("Ref_Authors", "Ref_Title", "Ref_Type", "Ref_Year"):
+                if self.attribute_labels_ordered[offset] in ("Ref_Authors", "Ref_Title", "Ref_Type", "Ref_Year", "Ref_Journal"):
                     item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
         # Resize columns and rows
         self.ui.tableWidget.hideColumn(self.ID_COLUMN)

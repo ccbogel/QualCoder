@@ -505,14 +505,14 @@ class DialogReferenceManager(QtWidgets.QDialog):
         if action == action_copy_to_clipboard:
             reference_text = self.ui.tableWidget_refs.item(row, 1).text()
             cb = QtWidgets.QApplication.clipboard()
-            cb.setText(reference_text)
+            cb.setText(reference_text.replace("\n", " "))
         if action == action_copy_apa_to_clipboard:
             #reference_text = self.ui.tableWidget_refs.item(row, 1).text()
             ref_id = self.ui.tableWidget_refs.item(row, REF_ID).text()
             for ref in self.refs:
                 if int(ref_id) == ref['risid']:
                     cb = QtWidgets.QApplication.clipboard()
-                    cb.setText(ref['apa'])
+                    cb.setText(ref['apa'].replace("\n", " "))
 
     def import_references(self):
         """ Import RIS formatted references from .ris or .txt files """
