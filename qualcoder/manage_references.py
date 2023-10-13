@@ -479,6 +479,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
         if self.table_refs_rows_hidden:
             action_show_all_rows = menu.addAction(_("Show all rows"))
         action_copy_to_clipboard = menu.addAction(_("Copy to clipboard"))
+        action_copy_apa_to_clipboard = menu.addAction(_("Copy to clipboard.  APA style"))
         action = menu.exec(self.ui.tableWidget_refs.mapToGlobal(position))
         if action == action_show_all_rows:
             for r in range(0, self.ui.tableWidget_refs.rowCount()):
@@ -505,6 +506,13 @@ class DialogReferenceManager(QtWidgets.QDialog):
             reference_text = self.ui.tableWidget_refs.item(row, 1).text()
             cb = QtWidgets.QApplication.clipboard()
             cb.setText(reference_text)
+        if action == action_copy_apa_to_clipboard:
+            #reference_text = self.ui.tableWidget_refs.item(row, 1).text()
+            ref_id = self.ui.tableWidget_refs.item(row, REF_ID).text()
+            for ref in self.refs:
+                if int(ref_id) == ref['risid']:
+                    cb = QtWidgets.QApplication.clipboard()
+                    cb.setText(ref['apa'])
 
     def import_references(self):
         """ Import RIS formatted references from .ris or .txt files """
