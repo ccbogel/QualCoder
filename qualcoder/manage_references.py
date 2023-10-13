@@ -261,7 +261,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
             item = QtWidgets.QTableWidgetItem(str(ref['risid']))
             item.setFlags(QtCore.Qt.ItemFlag.ItemIsEnabled)
             self.ui.tableWidget_refs.setItem(row, REF_ID, item)
-            item = QtWidgets.QTableWidgetItem(ref['formatted'])
+            item = QtWidgets.QTableWidgetItem(ref['vancouver'])
             item.setToolTip(ref['details'])
             item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
             self.ui.tableWidget_refs.setItem(row, REF_DETAIL, item)
@@ -688,7 +688,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
         note = _("Delete this reference.") + " Ref id {" + str(ris_id) + "}  \n"
         for r in self.refs:
             if r['risid'] == ris_id:
-                note += r['formatted']
+                note += r['vancouver']
         ui = DialogConfirmDelete(self.app, note)
         ok = ui.exec()
         if not ok:
