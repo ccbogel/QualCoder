@@ -277,7 +277,9 @@ V assign in vivo code to selected text<br />\
 Alt + Left arrow  Shrink coding to the left <br />\
 Alt + Right arrow Shrink coding to the right<br />\
 Shift + Left arrow Extend coding to the left<br />\
-Shift + Right arrow Extend coding to the right'
+Shift + Right arrow Extend coding to the right<br />\
+! Exclamation mark key - describes clicked text character position<br />\
+$ Dollar key - Shift all coding postiions after a clicked position by X characters (negative numbers shift left)'
 
 coding_image_shortcuts = '<h2>Code image key shortcuts</h2>\
 Ctrl 1 Next file<br />\
