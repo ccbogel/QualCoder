@@ -85,7 +85,7 @@ The `py` command uses the most recent installed version of python. You can use a
 
 `deactivate`
 
-The command prompt will then remomove the  *(env)* wording.
+The command prompt will then remove the  *(env)* wording.
 
 **To start QualCoder again**
 
@@ -285,7 +285,7 @@ Open the Terminal App and move to the unzipped Qualcoder-Master directory, then 
 ## Dependencies
 Required:
 
-Python 3.8+ version, pyqt6, Pillow, six  (Mac OS), ebooklib, ply, chardet, pdfminer.six, openpyxl, pandas, plotly, pydub, python-vlc, rispy, SpeechRecognition, qpdf  (Linux for programatically applying pdf decryption for pdfs with blank password)
+Python 3.8+ version, pyqt6, Pillow, six  (Mac OS), ebooklib, ply, chardet, pdfminer.six, openpyxl, pandas, plotly, pydub, python-vlc, rispy, SpeechRecognition, qpdf  (Linux for programmatically applying pdf decryption for pdfs with blank password)
 
 ## License
 QualCoder is distributed under the MIT LICENSE.
@@ -311,7 +311,7 @@ https://www.saashub.com/qualcoder-alternatives
 
 https://alternativeto.net/software/qualcoder
 
-Also, if you like Qualcoder a lot and want to advertise interst in it's use, please write an article about your experience using QualCoder.
+Also, if you like Qualcoder a lot and want to advertise interest in it's use, please write an article about your experience using QualCoder.
 
 ## FaceBook group:
 To allow everyone to discuss all things QualCoder.
