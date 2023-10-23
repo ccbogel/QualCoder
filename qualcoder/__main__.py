@@ -768,6 +768,7 @@ class App(object):
             'report_text_context_chars': 150,
             'report_text_contextz-style': 'Bold',
             'codetext_chunksize': 50000,
+            'open_ai_api_key': ''
         }
 
     def get_file_texts(self, file_ids=None):
@@ -1190,6 +1191,10 @@ class MainWindow(QtWidgets.QMainWindow):
         msg += _("Report text context style: ") + self.app.settings['report_text_context_style'] + "\n"
         msg += _("Backup on open") + f": {self.app.settings['backup_on_open']}\n"
         msg += _("Backup AV files") + f": {self.app.settings['backup_av_files']}\n"
+        if self.app.settings['open_ai_api_key'] != '':
+            msg += _("OpenAI API key is set") + "\n"
+        else:
+            msg += _("OpenAI API key not set") + "\n"
         msg += _("Style") + "; " + self.app.settings['stylesheet']
         if platform.system() == "Windows":
             msg += "\n" + _("Directory (folder) paths / represents \\")
