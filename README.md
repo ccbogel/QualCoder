@@ -56,9 +56,10 @@ cd Downloads\QualCoder-master
 When not using a docker container, we recommend using a virtual environment to install packages. This will ensure that the dependencies for QualCoder are isolated from the rest of your system.
 
 ```bash
-python3 -m venv autogen
-source autogen/bin/activate
+py -m venv env
+env\\Scripts\\activate
 ```
+
 
 7. Install python modules. Type the following:
 
