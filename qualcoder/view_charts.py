@@ -186,7 +186,7 @@ class ViewCharts(QDialog):
 
     # DATA FILTERS SECTION
     def select_attributes(self):
-        """ Select files based on attribute selections usind DialogSecectAttributeParameters.
+        """ Select files based on attribute selections using DialogSecectAttributeParameters.
         Attribute selection results are a list of:
 
         DialogSelectAttributeParameters returns lists for each parameter selected of:

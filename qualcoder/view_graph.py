@@ -1529,7 +1529,7 @@ class ViewGraph(QDialog):
             # Add link which includes the scene text items and associated data, add links before text_items
             from_item = None
             to_item = None
-            # Check for each text item type and try to get a mathing characteristic
+            # Check for each text item type and try to get a matching characteristic
             for i in self.scene.items():
                 if from_item is None and line['fromcaseid'] is not None and isinstance(i, CaseTextGraphicsItem):
                     if i.case_id == line['fromcaseid']:
@@ -2773,7 +2773,7 @@ class PixmapGraphicsItem(QtWidgets.QGraphicsPixmapItem):
     remove = False
     # For graph item storage
     text = ""
-    imid = -1  # code_image table imid i=unique fo r the coded image area
+    imid = -1  # code_image table imid i=unique for the coded image area
     px = 0
     py = 0
     pwidth = 0
