@@ -90,14 +90,14 @@ class DialogCodeImage(QtWidgets.QDialog):
     selection = None  # Initial code rectangle point
     scale = 1.0
     code_areas = []
-    important = False  # Show/hide imporant flagged codes
+    important = False  # Show/hide important flagged codes
     attributes = []
     undo_deleted_code = None  # Undo last deleted code
     degrees = 0  # for rotation
 
     def __init__(self, app, parent_textedit, tab_reports):
         """ Show list of image files.
-        On select, Show a scaleable and scrollable image.
+        On select, Show a scalable and scrollable image.
         Can add a memo to image
         The slider values range from 9 to 99 with intervals of 3.
         """
@@ -335,7 +335,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         Called by: fill_tree
         param:
             item: a QTreeWidgetItem
-            list of non-expanded categories as Sring if catid:#
+            list of non-expanded categories as String if catid:#
         """
 
         child_count = item.childCount()
@@ -1867,7 +1867,7 @@ class DialogCodeImage(QtWidgets.QDialog):
 
 class DialogViewImage(QtWidgets.QDialog):
     """ View image. View and edit displayed memo.
-    Show a scaleable and scrollable image.
+    Show a scalable and scrollable image.
     The slider values range from 10 to 99.
 
     Linked images have 'image:' at start of mediapath
