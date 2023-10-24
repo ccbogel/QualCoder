@@ -57,7 +57,7 @@ When not using a docker container, we recommend using a virtual environment to i
 
 ```bash
 py -m venv env
-env\\Scripts\\activate
+env\Scripts\activate
 ```
 
 
