@@ -47,25 +47,28 @@ IMPORTANT: in the first window of the installation mark the option "Add Python t
 
 5. In the command prompt, move (using the `cd` command) into the QualCoder folder. You should be inside the QualCoder-master folder or if using a release (the Qualcoder-3.3 folder). e.g. 
 
-`cd Downloads\QualCoder-master`
+```bash
+cd Downloads\QualCoder-master
+```
 
 6. Install and activate the virtual environment. This step can be skipped, but I recommend you do not skip it.
 
-`pip install virtualenv`
+When not using a docker container, we recommend using a virtual environment to install packages. This will ensure that the dependencies for QualCoder are isolated from the rest of your system.
 
-Create a virtual environment called env.
-
-`virtualenv env`
-
-Activate the virtual environment, this changes the command prompt display using (brackets): (env) 
-
-`env\Scripts\activate.bat`
+```bash
+python3 -m venv autogen
+source autogen/bin/activate
+```
 
 7. Install python modules. Type the following:
 
-`py -m pip install --upgrade pip`
+```bash
+py -m pip install --upgrade pip
+```
 
-`py -m pip install wheel pyqt6 chardet ebooklib openpyxl Pillow ply pdfminer.six pandas plotly pydub python-vlc rispy SpeechRecognition wordcloud xmlschema`
+```bash
+py -m pip install wheel pyqt6 chardet ebooklib openpyxl Pillow ply pdfminer.six pandas plotly pydub python-vlc rispy SpeechRecognition wordcloud xmlschema
+```
 
  Wait, until all modules are installed.
 
@@ -73,13 +76,17 @@ Activate the virtual environment, this changes the command prompt display using 
  
 8. Install Qualcoder, from the downloaded folder type
 
-`py -m pip install .`
+```bash
+py -m pip install .
+```
 
 The `py` command uses the most recent installed version of python. You can use a specific version on your Windows, if you have many python versions installed, e.g. `py -3.10`  See discussion here: [Difference between py and python](https://stackoverflow.com/questions/50896496/what-is-the-difference-between-py-and-python-in-the-terminal)
 
 9. Run QualCoder from the command prompt
 
-`py -m qualcoder`
+```bash
+py -m qualcoder
+```
 
 10. If running QualCoder in a virtual environment, to exit the virtual environment type:
 
