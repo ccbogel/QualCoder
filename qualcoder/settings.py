@@ -144,8 +144,8 @@ class DialogSettings(QtWidgets.QDialog):
         self.ui.pushButton_choose_directory.clicked.connect(self.choose_directory)
         self.ui.pushButton_set_coder.pressed.connect(self.new_coder_entered)
         # AI options
-        if self.settings['open_ai_api_key']:
-            self.ui.lineEdit_openai_api_key.setText(self.settings['open_ai_api_key'])
+        self.ui.checkBox_AI_enable.setChecked(self.settings['ai_enable'] == 'True')
+        self.ui.lineEdit_openai_api_key.setText(self.settings['open_ai_api_key'])
 
     def backup_state_changed(self):
         """ Enable and disable av backup checkbox. Only enable when checkBox_auto_backup is checked. """
@@ -227,6 +227,10 @@ class DialogSettings(QtWidgets.QDialog):
         self.settings['report_text_context_characters'] = self.ui.spinBox_chars_before_after.value()
         ts_index = self.ui.comboBox_text_style.currentIndex()
         self.settings['report_text_context_style'] = ['Bold', 'Italic', 'Bigger'][ts_index]
+        if self.ui.checkBox_AI_enable.isChecked():
+            self.settings['ai_enable'] = 'True'
+        else:
+            self.settings['ai_enable'] = 'False' 
         self.settings['open_ai_api_key'] = self.ui.lineEdit_openai_api_key.text()
         self.save_settings()
         if restart_qualcoder:

@@ -13,3 +13,5 @@ dist
 __pycache__
 build
 .DS_Store
+.vscode
+*.code-workspace

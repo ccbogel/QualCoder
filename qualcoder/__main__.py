@@ -694,6 +694,10 @@ class App(object):
             result['speakernameformat'] = "[]"
         if result['stylesheet'] == 0:
             result['stylesheet'] = "original"
+        # Look for new keys in the default_settings and copy them over (using the default values)
+        for key in self.default_settings:
+            if key not in result:
+                result[key] = self.default_settings[key]     
         return result
 
     @property
@@ -768,6 +772,7 @@ class App(object):
             'report_text_context_chars': 150,
             'report_text_contextz-style': 'Bold',
             'codetext_chunksize': 50000,
+            'ai_enable': 'True',
             'open_ai_api_key': ''
         }
 
@@ -1191,6 +1196,10 @@ class MainWindow(QtWidgets.QMainWindow):
         msg += _("Report text context style: ") + self.app.settings['report_text_context_style'] + "\n"
         msg += _("Backup on open") + f": {self.app.settings['backup_on_open']}\n"
         msg += _("Backup AV files") + f": {self.app.settings['backup_av_files']}\n"
+        if self.app.settings['ai_enable'] == 'True':
+            msg += _("AI integration is enabled") + "\n"
+        else:
+            msg += _("AI integration is disabled") + "\n"
         if self.app.settings['open_ai_api_key'] != '':
             msg += _("OpenAI API key is set") + "\n"
         else:
@@ -1201,6 +1210,7 @@ class MainWindow(QtWidgets.QMainWindow):
         msg += "\n"
         self.ui.textEdit.append(msg)
         self.ui.textEdit.textCursor().movePosition(QtGui.QTextCursor.MoveOperation.End)
+        self.ui.textEdit.verticalScrollBar().setValue(self.ui.textEdit.verticalScrollBar().maximum())
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
 
     def report_sql(self):

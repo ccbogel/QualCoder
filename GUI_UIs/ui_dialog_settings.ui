@@ -89,7 +89,7 @@
        <item row="5" column="5" colspan="2">
         <widget class="QComboBox" name="comboBox_style"/>
        </item>
-       <item row="21" column="0">
+       <item row="23" column="0">
         <widget class="QLabel" name="label_openai_api_key">
          <property name="text">
           <string>OpenAI API key</string>
@@ -383,6 +383,9 @@ Not recommended unless you have many large files slowing the backup.</string>
          </property>
         </widget>
        </item>
+       <item row="23" column="1" colspan="6">
+        <widget class="QLineEdit" name="lineEdit_openai_api_key"/>
+       </item>
        <item row="8" column="2">
         <widget class="QSpinBox" name="spinBox_docfontsize">
          <property name="minimum">
@@ -429,8 +432,15 @@ Not recommended unless you have many large files slowing the backup.</string>
          </property>
         </widget>
        </item>
-       <item row="21" column="1" colspan="3">
-        <widget class="QLineEdit" name="lineEdit_openai_api_key"/>
+       <item row="22" column="0" colspan="2">
+        <widget class="QCheckBox" name="checkBox_AI_enable">
+         <property name="text">
+          <string>enable AI integration</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
