@@ -8,7 +8,7 @@ Text files can be typed in manually or loaded from txt, odt, docx, html, htm, md
 This project has been tested under Ubuntu 22.04 and Windows 10/11. It has been used on MacOS and various Linux distros.
 Instructions and other information are available here: https://qualcoder.wordpress.com/ and on the [Github Wiki](https://github.com/ccbogel/QualCoder/wiki).
 
-It is best to download the Current Release from the Releases page, see the Releases link in the right hand column on this page.
+It is best to download the Current Release from the Releases page, see the Releases link in the right-hand column on this page.
 
 If you like QualCoder please buy me a coffee ...
 
@@ -19,7 +19,7 @@ If you like QualCoder please buy me a coffee ...
 
 ### Prerequisites
 Optional: VLC for audio/video coding. 
-Optional: ffmpeg installed for speech to text and waveform image see here to install ffmpeg on Windows:  https://phoenixnap.com/kb/ffmpeg-windows. 
+Optional: ffmpeg installed for speech-to-text and waveform image see here to install ffmpeg on Windows:  https://phoenixnap.com/kb/ffmpeg-windows. 
 
 For installing from source you will need to have python 3.8 or a newer version installed.
 
@@ -27,21 +27,21 @@ For installing from source you will need to have python 3.8 or a newer version i
 
 **Use the exe**
 
-Newer releases contain an exe file (created on Windows 10, 64 bit). Double-click to run. Look for the Releases link on the right hand side of this page. I have had feedback of one instance on Windows where an anti-virus affected the importing and moving of files by QualCoder (AVG). 
+Newer releases contain an exe file (created on Windows 10, 64-bit). Double-click to run. Look for the Releases link on the right-hand side of this page. I have had feedback on one instance on Windows where an anti-virus affected the importing and moving of files by QualCoder (AVG). 
 An online virus testing site www.virustotal.com indicated 2 vendors out of many detected a potential problem due to their detection methods (false positives), 5 March 2022. Always check the MD5 checksum on downloading the exe. I have not got the exe Microsoft certified (I am not sure of the processes or cost involved).
-If you are uncomfortable with these warnings install from source as detailed next.
+If you are uncomfortable with these warnings install from the source as detailed next.
 
 **Alternatively install from source:**
 
 Seriously consider using a virtual environment (commands in point 6 below). Not using a virtual environment may affect other python software you may have installed.
 
-1. Download and install the Python programming language. The minimum version for QualCoder is 3.8. I recommend 3.10 for now.  [Python3](https://www.python.org/downloads/). Download the file (at the bottom of the web site) "Windows installer (64-bit)"
+1. Download and install the Python programming language. The minimum version for QualCoder is 3.8. I recommend 3.10 for now.  [Python3](https://www.python.org/downloads/). Download the file (at the bottom of the website) "Windows installer (64-bit)"
 
 IMPORTANT: in the first window of the installation mark the option "Add Python to PATH"
 
-2.  Download the QualCoder software from: https://github.com/ccbogel/QualCoder from the Green Code button. This is the newest, but not yet officially released code (occasionally coding errors creep in).  Click the green button "Code", and then "Download ZIP". **Alternatively**, choose the most recent release zip, see right hand side of this page for the link to Releases.
+2.  Download the QualCoder software from: https://github.com/ccbogel/QualCoder from the Green Code button. This is the newest, but not yet officially released code (occasionally coding errors creep in).  Click the green button "Code", and then "Download ZIP". **Alternatively**, choose the most recent release zip, see the right-hand side of this page for the link to Releases.
 
-3.    Unzip the folder to a location (e.g. downloads). (Tip, remove the doubled up folder extraction QualCoder-master\QualCoder-master when asked where to extract. Just QualCoder-master). 
+3.    Unzip the folder to a location (e.g. downloads). (Tip, remove the doubled-up folder extraction QualCoder-master\QualCoder-master when asked where to extract. Just QualCoder-master). 
 
 4. Use the Windows command prompt. Type "cmd" in the Windows Start search engine, and click on the black software "cmd.exe" - the command console for Windows. In the console type or paste, using the right-click mouse copy and paste (ctrl+v does not work)
 
@@ -167,7 +167,7 @@ Then type
 
 ### Arch/Manjaro Linux
 
-Not tested, but please see the above instructions to build QualCoder inside a virtual environment. The below installation instructions may affect system installed python modules.
+It has not been tested, but please see the above instructions to build QualCoder inside a virtual environment. The below installation instructions may affect system-installed python modules.
 
 1. Install modules from the command line
 
@@ -177,7 +177,7 @@ Not tested, but please see the above instructions to build QualCoder inside a vi
 
 `sudo python3 -m pip install ebooklib plotly pydub python-vlc rispy SpeechRecognition wordcloud xmlschema`
 
-If success, all requirements are satisfied.
+If successful, all requirements are satisfied.
 
 3. Build and install QualCoder, from the downloaded folder type
 
@@ -193,7 +193,7 @@ Or install from AUR as follows:
 
 ### Fedora/CentOS/RHEL linux
 
-Not tested, but please see the above instructions to build QualCoder inside a virtual environment. The below installation instructions may affect system installed python modules.
+It has not been tested, but please see the above instructions to build QualCoder inside a virtual environment. The below installation instructions may affect system-installed python modules.
 
 Retrieve the current package code from this repository
 
@@ -208,7 +208,7 @@ Then start QualCoder as any other app on your system.
 
 Note 1_ This script installs the dependencies using dnf and the ebook libraries with a work-around, specified at https://github.com/ccbogel/QualCoder/issues/72#issuecomment-695962784.
 
-Note 2: Fedora uses wayland with does not work well with the Qt graphical interface (for now). I suggest you also install xwayland.
+Note 2: Fedora uses Wayland with does not work well with the Qt graphical interface (for now). I suggest you also install Xwayland.
 
 ### MacOS
 
@@ -305,7 +305,7 @@ https://github.com/ccbogel/QualCoder/releases/tag/3.4
 
 ## Creator
 
-Dr Colin Curtain BPharm GradDipComp PhD. Pharmacy lecturer at the University of Tasmania. I obtained a Graduate Diploma in Computing in 2011. I have developed my python programming skills from this time onwards. The QualCoder project originated from my use of RQDA during my PhD - *Evaluation of clinical decision support provided by medication review software*. My original and now completely deprecated PyQDA software on PyPI was my first attempt at creating qualitative software. The reason for creating the software was that during my PhD RQDA did not always install or work well for me, but I did realise that I could use the same sqlite database and access it with python. The current database is different to the older RQDA version. This is an ongoing hobby project, perhaps a labour of love, which I do utilise with some of the Masters and PhD students I supervise. I do most of my programming on Ubuntu using the PyCharm editor, and I do a small amount of testing on WIndows. I do not have a mac or other operating systems to check how well the software works regards installation and usage.
+Dr. Colin Curtain BPharm GradDipComp Ph.D. Pharmacy lecturer at the University of Tasmania. I obtained a Graduate Diploma in Computing in 2011. I have developed my python programming skills from this time onwards. The QualCoder project originated from my use of RQDA during my PhD - *Evaluation of clinical decision support provided by medication review software*. My original and now completely deprecated PyQDA software on PyPI was my first attempt at creating qualitative software. The reason for creating the software was that during my PhD RQDA did not always install or work well for me, but I did realise that I could use the same SQLite database and access it with python. The current database is different to the older RQDA version. This is an ongoing hobby project, perhaps a labor of love, which I do utilize with some of the Masters and Ph.D. students I supervise. I do most of my programming on Ubuntu using the PyCharm editor, and I do a small amount of testing on Windows. I do not have a Mac or other operating systems to check how well the software works regards installation and usage.
 
 https://www.utas.edu.au/profiles/staff/umore/colin-curtain
 
@@ -313,13 +313,13 @@ https://scholar.google.com/citations?user=KTMRMWoAAAAJ&hl=en
 
 
 ## Leave a review
-If you like QualCoder and found it useful for your work. Please leave a review on these sites:
+If you like QualCoder and find it useful for your work. Please leave a review on these sites:
 
 https://www.saashub.com/qualcoder-alternatives
 
 https://alternativeto.net/software/qualcoder
 
-Also, if you like Qualcoder a lot and want to advertise interest in it's use, please write an article about your experience using QualCoder.
+Also, if you like Qualcoder a lot and want to advertise interest in its use, please write an article about your experience using QualCoder.
 
 ## FaceBook group:
 To allow everyone to discuss all things QualCoder.
