@@ -35,7 +35,7 @@ If you are uncomfortable with these warnings install from source as detailed nex
 
 Seriously consider using a virtual environment (commands in point 6 below). Not using a virtual environment may affect other python software you may have installed.
 
-1. Download and install the Python programming language. The minimum version for QualCoder is 3.8. I recommend 3.10 for now.  [Python3](https://www.python.org/downloads/). Download the file (at the bottom of the web site) "Windows installer (64-bit)"
+1. Download and install the Python programming language. The minimum version for QualCoder is 3.8. I recommend 3.10 for now.  [Python3](https://www.python.org/downloads/). Download the file (at the bottom of the website) "Windows installer (64-bit)"
 
 IMPORTANT: in the first window of the installation mark the option "Add Python to PATH"
 
@@ -212,7 +212,7 @@ Note 2: Fedora uses wayland with does not work well with the Qt graphical interf
 
 ### MacOS
 
-The instructions work on Mac Monterey. It is recommended to use a virtual environment, see: https://sourabhbajaj.com/mac-setup/Python/virtualenv.html The below instructions can be used inside a virtual environment folder instead of placing in Applications.
+The instructions work on Mac Monterey. It is recommended to use a virtual environment, see: https://sourabhbajaj.com/mac-setup/Python/virtualenv.html The below instructions can be used inside a virtual environment folder instead of placed in Applications.
 
 You will need to install developer tools for macOS. [See https://www.cnet.com/tech/computing/install-command-line-developer-tools-in-os-x/](https://www.cnet.com/tech/computing/install-command-line-developer-tools-in-os-x/)
 
@@ -247,7 +247,7 @@ To change the directory, enter or copy and run the script below.
 
 6) From the QualCoder-Master directory run the setup script:
 
-`python3 -m pip install .`
+`python3 -m pip install.`
 
 
 Assuming you downloaded the 3.4 version. You can now run with:
@@ -293,7 +293,7 @@ Open the Terminal App and move to the unzipped Qualcoder-Master directory, then 
 ## Dependencies
 Required:
 
-Python 3.8+ version, pyqt6, Pillow, six  (Mac OS), ebooklib, ply, chardet, pdfminer.six, openpyxl, pandas, plotly, pydub, python-vlc, rispy, SpeechRecognition, wordcloud, xmlschema
+Python 3.8+ version, pyqt6, Pillow, six  (Mac OS), ebooklib, ply, chardet, pdfminer.six, openpyxl, pandas, plotly, pydub, python-vlc, rispy, SpeechRecognition, wordcloud, XML schema
 
 ## License
 QualCoder is distributed under the MIT LICENSE.
@@ -305,7 +305,7 @@ https://github.com/ccbogel/QualCoder/releases/tag/3.4
 
 ## Creator
 
-Dr Colin Curtain BPharm GradDipComp PhD. Pharmacy lecturer at the University of Tasmania. I obtained a Graduate Diploma in Computing in 2011. I have developed my python programming skills from this time onwards. The QualCoder project originated from my use of RQDA during my PhD - *Evaluation of clinical decision support provided by medication review software*. My original and now completely deprecated PyQDA software on PyPI was my first attempt at creating qualitative software. The reason for creating the software was that during my PhD RQDA did not always install or work well for me, but I did realise that I could use the same sqlite database and access it with python. The current database is different to the older RQDA version. This is an ongoing hobby project, perhaps a labour of love, which I do utilise with some of the Masters and PhD students I supervise. I do most of my programming on Ubuntu using the PyCharm editor, and I do a small amount of testing on WIndows. I do not have a mac or other operating systems to check how well the software works regards installation and usage.
+Dr Colin Curtain BPharm GradDipComp Ph.D. Pharmacy lecturer at the University of Tasmania. I obtained a Graduate Diploma in Computing in 2011. I have developed my python programming skills from this time onwards. The QualCoder project originated from my use of RQDA during my Ph.D. - *Evaluation of clinical decision support provided by medication review software*. My original and now completely deprecated PyQDA software on PyPI was my first attempt at creating qualitative software. The reason for creating the software was that during my PhD RQDA did not always install or work well for me, but I did realise that I could use the same sqlite database and access it with python. The current database is different to the older RQDA version. This is an ongoing hobby project, perhaps a labour of love, which I do utilize with some of the Masters and Ph.D. students I supervise. I do most of my programming on Ubuntu using the PyCharm editor, and I do a small amount of testing on Windows. I do not have a mac or other operating system to check how well the software works regards installation and usage.
 
 https://www.utas.edu.au/profiles/staff/umore/colin-curtain
 
