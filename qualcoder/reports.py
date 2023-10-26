@@ -657,7 +657,10 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
             total['dual_percent'] = round(100 * total['dual_coded'] / total['characters'], 2)
             total['uncoded_percent'] = round(100 * total['uncoded'] / total['characters'], 2)
             total['disagreement'] = round(100 - total['agreement'], 2)
-            total['agree_coded_only'] = round(100 * total['dual_coded'] / (total['dual_coded'] + total['single_coded']), 2)
+            try:
+                total['agree_coded_only'] = round(100 * total['dual_coded'] / (total['dual_coded'] + total['single_coded']), 2)
+            except ZeroDivisionError:
+                total['agree_coded_only'] = "zero div"
         else:
             total['agreement'] = "zero div"
             total['dual_percent'] = "zero div"
