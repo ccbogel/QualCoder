@@ -3,7 +3,7 @@
 # QualCoder
 QualCoder is a qualitative data analysis application written in python3 and Qt6.
 
-Text files can be typed in manually or loaded from txt, odt, docx, html, htm, md, epub and  pdf files. Images, video and audio can also be imported for coding. Codes can be assigned to text, images and a/v selections and grouped into categories in hierarchical fashion. Various types of reports can be produced including visual coding graphs, word clouds, coder comparisons and coding frequencies.
+Text files can be typed in manually or loaded from txt, odt, docx, html, htm, md, epub and  PDF files. Images, video, and audio can also be imported for coding. Codes can be assigned to text, images, and a/v selections and grouped into categories in a hierarchical fashion. Various types of reports can be produced including visual coding graphs, word clouds, coder comparisons, and coding frequencies.
 
 This software has been used on MacOS and various Linux distros.
 Instructions and other information are available here: https://qualcoder.wordpress.com/ and on the [Github Wiki](https://github.com/ccbogel/QualCoder/wiki).
@@ -21,7 +21,7 @@ If you like QualCoder please buy me a coffee ...
 Optional: VLC for audio/video coding. 
 Optional: ffmpeg installed for speech-to-text and waveform image see here to install ffmpeg on Windows:  https://phoenixnap.com/kb/ffmpeg-windows. 
 
-For installing from source you will need to have python 3.8 or a newer version installed.
+For installing from source you will need to have Python 3.8 or a newer version installed.
 
 ### Windows
 
@@ -33,7 +33,7 @@ If you are uncomfortable with these warnings install from the source as detailed
 
 **Alternatively install from source:**
 
-Seriously consider using a virtual environment (commands in point 6 below). Not using a virtual environment may affect other python software you may have installed.
+Seriously consider using a virtual environment (commands in point 6 below). Not using a virtual environment may affect other Python software you may have installed.
 
 1. Download and install the Python programming language. The minimum version for QualCoder is 3.8. I recommend 3.10 for now.  [Python3](https://www.python.org/downloads/). Download the file (at the bottom of the website) "Windows installer (64-bit)"
 
@@ -73,9 +73,9 @@ py -m pip install wheel pyqt6 chardet ebooklib openpyxl Pillow ply pdfminer.six 
 
  Wait, until all modules are installed.
 
- Note: on some Windows computers, you may have to type `python3` instead of `py` as `py` may not be recognised.
+ Note: on some Windows computers, you may have to type `python3` instead of `py` as `py` may not be recognized.
  
-8. Install Qualcoder, from the downloaded folder type
+8. Install Qualcoder, from the downloaded folder  type
 
 ```bash
 py -m pip install .
@@ -97,7 +97,7 @@ The command prompt will then remove the  *(env)* wording.
 
 **To start QualCoder again**
 
-If you are not using virtual environment, as long as you are in the same drive letter, eg C:
+If you are not using a virtual environment, as long as you are in the same drive letter, eg C:
 
 `py -m qualcoder`
 
@@ -147,7 +147,7 @@ Note: To exit venv type `deactivate`
 
 `pip install chardet ebooklib ply openpyxl pandas pdfminer pyqt6 pillow pdfminer.six plotly pydub python-vlc rispy six SpeechRecognition wordcloud xmlschema`
 
-7. Install QualCoder, type the following, the dot is important:
+7. Install QualCoder, and type the following, the dot is important:
 
 `python3 -m pip install .`
 
@@ -208,11 +208,11 @@ Then start QualCoder as any other app on your system.
 
 Note 1_ This script installs the dependencies using dnf and the ebook libraries with a work-around, specified at https://github.com/ccbogel/QualCoder/issues/72#issuecomment-695962784.
 
-Note 2: Fedora uses Wayland with does not work well with the Qt graphical interface (for now). I suggest you also install Xwayland.
+Note 2: Fedora uses Wayland which does not work well with the Qt graphical interface (for now). I suggest you also install Xwayland.
 
 ### MacOS
 
-The instructions work on Mac Monterey. It is recommended to use a virtual environment, see: https://sourabhbajaj.com/mac-setup/Python/virtualenv.html The below instructions can be used inside a virtual environment folder instead of placing in Applications.
+The instructions work on Mac Monterey. It is recommended to use a virtual environment, see: https://sourabhbajaj.com/mac-setup/Python/virtualenv.html The below instructions can be used inside a virtual environment folder instead of placed in Applications.
 
 You will need to install developer tools for macOS. [See https://www.cnet.com/tech/computing/install-command-line-developer-tools-in-os-x/](https://www.cnet.com/tech/computing/install-command-line-developer-tools-in-os-x/)
 
@@ -305,7 +305,7 @@ https://github.com/ccbogel/QualCoder/releases/tag/3.4
 
 ## Creator
 
-Dr. Colin Curtain BPharm GradDipComp Ph.D. Pharmacy lecturer at the University of Tasmania. I obtained a Graduate Diploma in Computing in 2011. I have developed my python programming skills from this time onwards. The QualCoder project originated from my use of RQDA during my PhD - *Evaluation of clinical decision support provided by medication review software*. My original and now completely deprecated PyQDA software on PyPI was my first attempt at creating qualitative software. The reason for creating the software was that during my PhD RQDA did not always install or work well for me, but I did realise that I could use the same SQLite database and access it with python. The current database is different to the older RQDA version. This is an ongoing hobby project, perhaps a labor of love, which I do utilize with some of the Masters and Ph.D. students I supervise. I do most of my programming on Ubuntu using the PyCharm editor, and I do a small amount of testing on Windows. I do not have a Mac or other operating systems to check how well the software works regards installation and usage.
+Dr. Colin Curtain BPharm GradDipComp Ph.D. Pharmacy lecturer at the University of Tasmania. I obtained a Graduate Diploma in Computing in 2011. I have developed my Python programming skills from this time onwards. The QualCoder project originated from my use of RQDA during my PhD - *Evaluation of clinical decision support provided by medication review software*. My original and now completely deprecated PyQDA software on PyPI was my first attempt at creating qualitative software. The reason for creating the software was that during my PhD RQDA did not always install or work well for me, but I did realise that I could use the same SQLite database and access it with Python. The current database is different to the older RQDA version. This is an ongoing hobby project, perhaps a labor of love, which I utilize with some of the Masters and Ph.D. students I supervise. I do most of my programming on Ubuntu using the PyCharm editor, and I do a small amount of testing on Windows. I do not have a Mac or other operating system to check how well the software works regards installation and usage.
 
 https://www.utas.edu.au/profiles/staff/umore/colin-curtain
 
