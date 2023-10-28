@@ -119,6 +119,8 @@ default working directory, selected font and other parameters.</p>\
 <p>QualCoder is written in python3 using Qt6 for the graphical interface.</p>\
 <p>The REFI-QDA Project import and export seem to work ok, but are still experimental. </p>\
 <p>Created by Colin Curtain BPharm GradDipComp PhD, python programmer, lecturer University of Tasmania.</p>\
+<h2>Citation</h2>\
+Curtain, C. (2023) QualCoder VERSION [Computer software]. Retrieved from https://github.com/ccbogel/QualCoder/releases/tag/VERSION\
 <h2 class="western">Licenses</h2>\
 <h3>MIT License</h3>\
 <p>Copyright (c) 2023 Colin Curtain</p>\
