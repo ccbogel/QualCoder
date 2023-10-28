@@ -1,6 +1,24 @@
 <img src="https://github.com/ccbogel/QualCoder/blob/master/qualcoder.png" width=200 height=200>
 
 # QualCoder
+
+<div align="center">
+      <img src="https://forthebadge.com/images/badges/built-with-love.svg" />
+      <img src="https://forthebadge.com/images/badges/uses-brains.svg" />
+      <img src="https://forthebadge.com/images/badges/powered-by-responsibility.svg" />
+      <br>
+      <img src="https://img.shields.io/github/repo-size/ccbogel/QualCoder?style=for-the-badge" />
+      <img src="https://img.shields.io/github/issues/ccbogel/QualCoder?style=for-the-badge" />
+      <img src="https://img.shields.io/github/issues-raw/ccbogel/QualCoder?style=for-the-badge" />
+      <img src="https://img.shields.io/github/forks/ccbogel/QualCoder?style=for-the-badge" />
+      <img src="https://img.shields.io/github/issues-pr-closed/ccbogel/QualCoder?style=for-the-badge" />
+      <br>
+      <img src="https://img.shields.io/github/stars/ccbogel/QualCoder?style=for-the-badge" />
+      <img src="https://img.shields.io/github/contributors/ccbogel/QualCoder?style=for-the-badge" />
+      <img src="https://img.shields.io/github/issues-pr-closed/ccbogel/QualCoder?style=for-the-badge" />
+      <img src="https://img.shields.io/github/last-commit/ccbogel/QualCoder?style=for-the-badge" />
+ </div>
+ 
 QualCoder is a qualitative data analysis application written in python3 and Qt6.
 
 Text files can be typed in manually or loaded from txt, odt, docx, html, htm, md, epub and  PDF files. Images, video, and audio can also be imported for coding. Codes can be assigned to text, images, and a/v selections and grouped into categories in a hierarchical fashion. Various types of reports can be produced including visual coding graphs, word clouds, coder comparisons, and coding frequencies.
