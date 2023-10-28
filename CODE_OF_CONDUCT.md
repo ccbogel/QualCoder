@@ -1,44 +1,41 @@
 # Contributor Covenant Code of Conduct
 
-## Our Pledge
+## Our Commitment
 
-We, as contributors and maintainers, pledge to create an open and inclusive environment where participation in our project and community is a harassment-free experience for everyone, regardless of age, body size, disability, ethnicity, gender identity and expression, level of experience, nationality, personal appearance, race, religion, or sexual identity and orientation.
+We, as contributors and maintainers, commit to creating an open and inclusive environment where everyone can participate in our project and community without facing harassment. We welcome individuals regardless of age, body size, disability, ethnicity, gender identity and expression, experience level, nationality, personal appearance, race, religion, or sexual identity and orientation.
 
 ## Our Standards
 
-Behaviors that contribute to a positive environment include:
+We encourage positive behaviors such as:
 
 * Using inclusive and welcoming language
-* Respecting differing viewpoints and experiences
-* Gracefully accepting constructive criticism
-* Focusing on what benefits the community
-* Demonstrating empathy towards fellow community members
+* Respecting different viewpoints and experiences
+* Accepting constructive criticism gracefully
+* Prioritizing the community's well-being
+* Showing empathy toward others in the community
 
-Unacceptable behavior by participants includes:
+Unacceptable behaviors include:
 
-* Usage of sexualized language or imagery, unwelcome sexual attention or advances
+* Using sexualized language or imagery, or making unwelcome sexual advances
 * Trolling, insults, derogatory comments, and personal or political attacks
 * Public or private harassment
-* Revealing others' private information, such as a physical or electronic address, without explicit permission
-* Any conduct that could reasonably be deemed inappropriate in a professional setting
+* Sharing others' private information without explicit permission
+* Engaging in behavior deemed inappropriate in a professional setting
 
 ## Our Responsibilities
 
-Project maintainers are responsible for clarifying the standards of acceptable behavior and taking appropriate corrective action in response to any instances of unacceptable behavior.
-
-Maintainers have the right and responsibility to remove, edit, or reject comments, commits, code, wiki edits, issues, and other contributions that do not align with this Code of Conduct, or to temporarily or permanently ban any contributor for behavior they consider inappropriate, threatening, offensive, or harmful.
+Project maintainers are responsible for enforcing these standards and taking action against unacceptable behavior. This includes the right to remove or reject contributions that do not align with this Code of Conduct, or to ban contributors exhibiting inappropriate, threatening, offensive, or harmful behavior.
 
 ## Scope
 
-This Code of Conduct applies in both project and public spaces when an individual is representing the project or its community. Examples of representing a project include using an official project email, posting via an official social media account, or acting as an appointed representative at an online or offline event. Project representation may be further defined and clarified by maintainers.
+This Code of Conduct applies in project and public spaces where individuals represent the project or community. This representation includes using official project email, posting via official social media accounts, or acting as an appointed representative at online or offline events.
 
 ## Enforcement
 
-Incidents of abusive, harassing, or unacceptable behavior can be reported by contacting the project team at hi@taguette.org. The project team will review and investigate all complaints, responding in an appropriate manner. The team is obligated to maintain confidentiality with regard to the reporter of an incident. Specific enforcement policies may be detailed separately.
+Report incidents of abusive, harassing, or unacceptable behavior by contacting the project team at hi@taguette.org. All complaints will be reviewed and investigated, maintaining confidentiality. Specific enforcement policies may be detailed separately.
 
-Maintainers not adhering to or enforcing the Code of Conduct in good faith may face temporary or permanent repercussions as determined by other members of the project's leadership.
+Maintainers not following or enforcing the Code of Conduct in good faith may face temporary or permanent repercussions as determined by the project's leadership.
 
 ## Attribution
 
 This Code of Conduct is adapted from version 1.4 of the [Contributor Covenant](http://contributor-covenant.org/version/1/4).
-
