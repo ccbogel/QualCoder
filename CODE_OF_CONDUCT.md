@@ -43,10 +43,7 @@ Maintainers not adhering to or enforcing the Code of Conduct in good faith may f
 
 ## Attribution
 
-This Code of Conduct is adapted from the [Contributor Covenant][homepage], version 1.4, available at [http://contributor-covenant.org/version/1/4][version].
+This Code of Conduct is adapted from version 1.4 of the [Contributor Covenant](http://contributor-covenant.org/version/1/4).
 
-[homepage]: http://contributor-covenant.org
-[version]: http://contributor-covenant.org/version/1/4/
-```
 
-These revisions aim to enhance clarity and ensure consistency in language usage throughout the document, while maintaining the integrity and intent of the code of conduct.
+These revisions aim to enhance clarity and ensure consistency in language usage throughout the document while maintaining the integrity and intent of the code of conduct.
