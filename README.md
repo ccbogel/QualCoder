@@ -1,3 +1,4 @@
+<div id="top"></div>
 <img src="https://github.com/ccbogel/QualCoder/blob/master/qualcoder.png" width=200 height=200>
 
 # QualCoder
@@ -330,3 +331,4 @@ FaceBook page:
 FaceBook group:
 [https://www.facebook.com/groups/1251478525589873](https://www.facebook.com/groups/1251478525589873)
 
+<p align="right">(<a href="#top">🔼 Back to top</a>)</p>
