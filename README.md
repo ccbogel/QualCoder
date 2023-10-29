@@ -1,7 +1,7 @@
 <img src="https://github.com/ccbogel/QualCoder/blob/master/qualcoder.png" width=200 height=200>
 
 # QualCoder
-QualCoder is a qualitative data analysis application written in python3 and Qt6.
+QualCoder is a qualitative data analysis application written in Python and Qt.
 
 Text files can be typed in manually or loaded from Txt, odt, docx, html, htm, md, epub, and  PDF files. Images, video, and audio can also be imported for coding. Codes can be assigned to text, images, and a/v selections and grouped into categories in a hierarchical fashion. Various types of reports can be produced including visual coding graphs, word clouds, coder comparisons, and coding frequencies.
 
