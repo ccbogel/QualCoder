@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'ui_main.ui'
+# Form implementation generated from reading ui file 'GUI_UIs/ui_main.ui'
 #
 # Created by: PyQt6 UI code generator 6.4.2
 #
@@ -49,10 +49,13 @@ class Ui_MainWindow(object):
         self.label_reports.setWordWrap(True)
         self.label_reports.setObjectName("label_reports")
         self.tabWidget.addTab(self.tab_reports, "")
+        self.tab_ai_chat = QtWidgets.QWidget()
+        self.tab_ai_chat.setObjectName("tab_ai_chat")
+        self.tabWidget.addTab(self.tab_ai_chat, "")
         self.gridLayout.addWidget(self.tabWidget, 0, 0, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(parent=MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1024, 26))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 1024, 22))
         self.menubar.setObjectName("menubar")
         self.menuProject = QtWidgets.QMenu(parent=self.menubar)
         self.menuProject.setObjectName("menuProject")
@@ -246,7 +249,7 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuHelp.menuAction())
 
         self.retranslateUi(MainWindow)
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(4)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -259,6 +262,7 @@ class Ui_MainWindow(object):
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_coding), _translate("MainWindow", "Coding"))
         self.label_reports.setText(_translate("MainWindow", "Select an option in the Reports menu. "))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_reports), _translate("MainWindow", "Reports"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_ai_chat), _translate("MainWindow", "AI Chat"))
         self.menuProject.setTitle(_translate("MainWindow", "Project"))
         self.menuOpen_Recent_Project.setTitle(_translate("MainWindow", "Open Recent Project"))
         self.menuExport.setTitle(_translate("MainWindow", "Export"))
@@ -325,13 +329,3 @@ class Ui_MainWindow(object):
         self.actionMenu_Key_Shortcuts.setText(_translate("MainWindow", "Menu Key Shortcuts"))
         self.actionImport_twitter_data.setText(_translate("MainWindow", "Import twitter data"))
         self.actionCode_pdf.setText(_translate("MainWindow", "Code pdf"))
-
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    sys.exit(app.exec())

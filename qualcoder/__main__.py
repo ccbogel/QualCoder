@@ -72,6 +72,7 @@ from qualcoder.report_codes import DialogReportCodes
 from qualcoder.report_file_summary import DialogReportFileSummary
 from qualcoder.report_relations import DialogReportRelations
 from qualcoder.report_sql import DialogSQL
+from qualcoder.ai_chat import DialogAIChat
 from qualcoder.rqda import RqdaImport
 from qualcoder.settings import DialogSettings
 from qualcoder.special_functions import DialogSpecialFunctions
@@ -569,6 +570,7 @@ class App(object):
         QLabel#label_exports {background-color:#858585;}\n\
         QLabel#label_time_3 {background-color:#858585;}\n\
         QLabel#label_volume {background-color:#858585;}\n\
+        QLabel#ai_output {background-color: #2a2a2a;}\n\
         QLabel:disabled {color: #707070;}\n\
         QLineEdit {border: 1px solid #858585;}\n\
         QListWidget::item:selected {border-left: 3px solid red; color: #eeeeee;}\n\
@@ -640,6 +642,10 @@ class App(object):
         QTabWidget {border: none;}\n\
         QTextEdit {background-color: #fcfcfc; selection-color: #ffffff; selection-background-color:#000000;}\n\
         QTextEdit:focus {border: 2px solid #f89407;}\n\
+        QPlainTextEdit {background-color: #fcfcfc; selection-color: #ffffff; selection-background-color:#000000;}\n\
+        QPlainTextEdit:focus {border: 2px solid #f89407;}\n\
+        QWidget#scrollArea_ai_output_contents {background-color: #fcfcfc;}\n\
+        QLabel#ai_output {background-color: #fcfcfc;}\n\
         QToolTip {background-color: #fffacd; color:#000000; border: 1px solid #f89407; }\n\
         QTreeWidget {font-size: 12px;}\n\
         QTreeView::branch:selected {border-left: 2px solid red; color: #000000;}"
@@ -676,7 +682,9 @@ class App(object):
             style = style.replace("#efefef", "#dfe2ff")
             style = style.replace("#f89407", "#ca1b9a")
         if self.settings['stylesheet'] == "native":
-            style = "* {font-size: 12px;}"
+            style = "* {font-size: 12px;}\n\
+            QWidget#scrollArea_ai_output_contents {background-color: #fcfcfc;}\n\
+            QLabel#ai_output {background-color: #fcfcfc;}\n"
         return style
 
     def load_settings(self):
@@ -1008,6 +1016,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setStyleSheet(font)
         self.ui.textEdit.setReadOnly(True)
         self.settings_report()
+        self.ai_chat()
 
     def resizeEvent(self, new_size):
         """ Update the widget size details in the app.settings variables """
@@ -1476,6 +1485,12 @@ class MainWindow(QtWidgets.QMainWindow):
         ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
         self.tab_layout_helper(self.ui.tab_coding, ui)
 
+    def ai_chat(self):
+        """ Add AI chat to tab"""
+
+        self.ai_chat_window = DialogAIChat(self.app, self.ui.textEdit)
+        self.tab_layout_helper(self.ui.tab_ai_chat, self.ai_chat_window)
+
     def tab_layout_helper(self, tab_widget, ui):
         """ Used when loading a coding, report or manage dialog  in to a tab widget.
          Add widget if no layout.
@@ -1783,6 +1798,7 @@ class MainWindow(QtWidgets.QMainWindow):
         font = f"font: {self.app.settings['fontsize']}pt "
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
+        self.ai_chat_window.init_llm()
         # Name change: Close all opened dialogs as coder name needs to change everywhere
         if current_coder != self.app.settings['codername']:
             self.ui.textEdit.append(_("Coder name changed to: ") + self.app.settings['codername'])

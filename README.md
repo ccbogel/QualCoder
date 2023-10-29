@@ -67,6 +67,10 @@ Activate the virtual environment, this changes the command prompt display using 
 
 `py -m pip install wheel pyqt6 chardet ebooklib openpyxl Pillow ply pdfminer.six pandas plotly pydub python-vlc rispy SpeechRecognition wordcloud xmlschema`
 
+ For the AI-integration:
+ 
+ `pip install langchain langchain[llms]`
+ 
  Wait, until all modules are installed.
 
  Note: on some Windows computers, you may have to type `python3` instead of `py` as `py` may not be recognised.

@@ -24,7 +24,7 @@
     <item row="0" column="0">
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>4</number>
       </property>
       <widget class="QWidget" name="tab_action_log">
        <attribute name="title">
@@ -99,6 +99,11 @@
         </property>
        </widget>
       </widget>
+      <widget class="QWidget" name="tab_ai_chat">
+       <attribute name="title">
+        <string>AI Chat</string>
+       </attribute>
+      </widget>
      </widget>
     </item>
    </layout>
@@ -109,7 +114,7 @@
      <x>0</x>
      <y>0</y>
      <width>1024</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuProject">
