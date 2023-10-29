@@ -3,7 +3,7 @@
 # QualCoder
 QualCoder is a qualitative data analysis application written in python3 and Qt6.
 
-Text files can be typed in manually or loaded from txt, odt, docx, html, htm, md, epub and  PDF files. Images, video, and audio can also be imported for coding. Codes can be assigned to text, images, and a/v selections and grouped into categories in a hierarchical fashion. Various types of reports can be produced including visual coding graphs, word clouds, coder comparisons, and coding frequencies.
+Text files can be typed in manually or loaded from Txt, odt, docx, html, htm, md, epub, and  PDF files. Images, video, and audio can also be imported for coding. Codes can be assigned to text, images, and a/v selections and grouped into categories in a hierarchical fashion. Various types of reports can be produced including visual coding graphs, word clouds, coder comparisons, and coding frequencies.
 
 This software has been used on MacOS and various Linux distros.
 Instructions and other information are available here: https://qualcoder.wordpress.com/ and on the [Github Wiki](https://github.com/ccbogel/QualCoder/wiki).
@@ -75,13 +75,13 @@ py -m pip install wheel pyqt6 chardet ebooklib openpyxl Pillow ply pdfminer.six 
 
  Note: on some Windows computers, you may have to type `python3` instead of `py` as `py` may not be recognised.
  
-8. Install Qualcoder, from the downloaded folder  type
+8. Install Qualcoder, from the downloaded folder and type
 
 ```bash
-py -m pip install .
+py -m pip install.
 ```
 
-The `py` command uses the most recent installed version of python. You can use a specific version on your Windows, if you have many python versions installed, e.g. `py -3.10`  See discussion here: [Difference between py and python](https://stackoverflow.com/questions/50896496/what-is-the-difference-between-py-and-python-in-the-terminal)
+The `py` command uses the most recent installed version of Python. You can use a specific version on your Windows if you have many Python versions installed, e.g. `py -3.10`  See discussion here: [Difference between py and python](https://stackoverflow.com/questions/50896496/what-is-the-difference-between-py-and-python-in-the-terminal)
 
 9. Run QualCoder from the command prompt
 
@@ -111,7 +111,7 @@ If you are using a virtual environment:
 
 ### Debian/Ubuntu Linux
 
-It is best to run QualCoder inside a python virtual environment, so that the system installed python modules do not clash and cause problems. If you are using the alternative Ubuntu Desktop manager **Xfce** you may need to run this: `sudo apt install libxcb-cursor0`
+It is best to run QualCoder inside a Python virtual environment so that the system-installed python modules do not clash and cause problems. If you are using the alternative Ubuntu Desktop manager **Xfce** you may need to run this: `sudo apt install libxcb-cursor0`
 
 1. Recommend that you install vlc (download from site) or:
 
@@ -139,11 +139,11 @@ Note: To exit venv type `deactivate`
 
 `source qualcoder/bin/activate`
 
-5. Update pip so that it installs the most recent python packages.
+5. Update pip so that it installs the most recent Python packages.
 
 `pip install --upgrade pip`
 
-6. Install the needed python modules.
+6. Install the needed Python modules.
 
 `pip install chardet ebooklib ply openpyxl pandas pdfminer pyqt6 pillow pdfminer.six plotly pydub python-vlc rispy six SpeechRecognition wordcloud xmlschema`
 
@@ -193,7 +193,7 @@ Or install from AUR as follows:
 
 ### Fedora/CentOS/RHEL linux
 
-It has not been tested, but please see the above instructions to build QualCoder inside a virtual environment. The below installation instructions may affect system-installed python modules.
+It has not been tested, but please see the above instructions to build QualCoder inside a virtual environment. The below installation instructions may affect system-installed Python modules.
 
 Retrieve the current package code from this repository
 
@@ -202,7 +202,7 @@ Retrieve the current package code from this repository
 3. There, run: `git clone https://github.com/ccbogel/QualCoder.git` and
 4. enter the directory with `cd QualCoder`
 5. Make `install_fedora.sh` executable (`chmod +x install_fedora.sh`) and
-6. run the `./install_fedora.sh` script from the terminal. The script is for python version 3.11.
+6. run the `./install_fedora.sh` script from the terminal. The script is for Python version 3.11.
 
 Then start QualCoder as any other app on your system.
 
@@ -305,7 +305,7 @@ https://github.com/ccbogel/QualCoder/releases/tag/3.4
 
 ## Creator
 
-Dr. Colin Curtain BPharm GradDipComp Ph.D. Pharmacy lecturer at the University of Tasmania. I obtained a Graduate Diploma in Computing in 2011. I have developed my Python programming skills from this time onwards. The QualCoder project originated from my use of RQDA during my PhD - *Evaluation of clinical decision support provided by medication review software*. My original and now completely deprecated PyQDA software on PyPI was my first attempt at creating qualitative software. The reason for creating the software was that during my PhD RQDA did not always install or work well for me, but I did realise that I could use the same SQLite database and access it with Python. The current database is different to the older RQDA version. This is an ongoing hobby project, perhaps a labour of love, which I utilize with some of the Masters and Ph.D. students I supervise. I do most of my programming on Ubuntu using the PyCharm editor, and I do a small amount of testing on Windows. I do not have a Mac or other operating system to check how well the software works regards installation and usage.
+Dr. Colin Curtain BPharm GradDipComp Ph.D. Pharmacy lecturer at the University of Tasmania. I obtained a Graduate Diploma in Computing in 2011. I have developed my Python programming skills from this time onwards. The QualCoder project originated from my use of RQDA during my PhD - *Evaluation of clinical decision support provided by medication review software*. My original and now completely deprecated PyQDA software on PyPI was my first attempt at creating qualitative software. The reason for creating the software was that during my PhD RQDA did not always install or work well for me, but I did realise that I could use the same SQLite database and access it with Python. The current database is different from the older RQDA version. This is an ongoing hobby project, perhaps a labour of love, which I utilize with some of the Masters's and Ph.D. students I supervise. I do most of my programming on Ubuntu using the PyCharm editor, and I do a small amount of testing on Windows. I do not have a Mac or other operating system to check how well the software works regards installation and usage.
 
 https://www.utas.edu.au/profiles/staff/umore/colin-curtain
 
@@ -320,13 +320,11 @@ https://www.saashub.com/qualcoder-alternatives
 https://alternativeto.net/software/qualcoder
 
 Also, if you like Qualcoder a lot and want to advertise interest in its use, please write an article about your experience using QualCoder.
-
 ## FaceBook group:
 To allow everyone to discuss all things QualCoder.
 
-FaceBook page:
+Facebook page:
 [https://www.facebook.com/qualcoder](https://www.facebook.com/qualcoder)
 
-FaceBook group:
+Facebook group:
 [https://www.facebook.com/groups/1251478525589873](https://www.facebook.com/groups/1251478525589873)
-
