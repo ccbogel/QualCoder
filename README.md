@@ -68,7 +68,7 @@ py -m pip install --upgrade pip
 ```
 
 ```bash
-py -m pip install wheel pyqt6 chardet ebooklib openpyxl Pillow ply pdfminer.six pandas plotly pydub python-vlc rispy SpeechRecognition wordcloud xmlschema
+py -m pip install wheel pyqt6 chardet ebooklib openpyxl Pillow ply pyqt6.six pandas pyqt6 pydub python-vlc rispy SpeechRecognition wordcloud xmlschema
 ```
 
  Wait, until all modules are installed.
