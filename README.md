@@ -78,7 +78,7 @@ py -m pip install wheel pyqt6 chardet ebooklib openpyxl Pillow ply pdfminer.six 
 8. Install Qualcoder, from the downloaded folder and type
 
 ```bash
-py -m pip install.
+py -m pip install .
 ```
 
 The `py` command uses the most recent installed version of Python. You can use a specific version on your Windows if you have many Python versions installed, e.g. `py -3.10`  See discussion here: [Difference between py and python](https://stackoverflow.com/questions/50896496/what-is-the-difference-between-py-and-python-in-the-terminal)
