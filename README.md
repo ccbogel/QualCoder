@@ -31,7 +31,7 @@ Newer releases contain an exe file (created on Windows 10, 64-bit). Double-click
 An online virus testing site www.virustotal.com indicated 2 vendors out of many detected a potential problem due to their detection methods (false positives), 5 March 2022. Always check the MD5 checksum on downloading the exe. I have not got the exe Microsoft certified (I am not sure of the processes or cost involved).
 If you are uncomfortable with these warnings install from the source as detailed next.
 
-**Alternatively install from source:**
+**Alternatively, install from source:**
 
 Seriously consider using a virtual environment (commands in point 6 below). Not using a virtual environment may affect other Python software you may have installed.
 
