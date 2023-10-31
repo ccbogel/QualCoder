@@ -1,88 +1,90 @@
-# Contributing Guidelines
+# 😎 Contributing Guidelines
 
-This documentation contains set of guidelines to help you during the contribution process.
+Welcome to the exciting world of contribution! We've laid out some enchanting guidelines to make your journey smoother. 🌟
 
-# Submitting Contributions
-Below you will find the process and workflow used to review and merge your changes.
-##  Choose an issue/ Create an issue
+## 🔥 Submitting Contributions
+Here's a magical walkthrough to get your contributions soaring high!
 
-- Look for the existing issue or create your own issue.
-- Comment on the respective issue you would like to work before creating a Pull Request.
-- Wait for the issue to be assigned to you after which you can start working on it.
+### 🧐 Choose an Issue/ Create an Issue
 
-##  Fork the repository
+- Look for a quest on our issue board, or embark on your own by creating one.
+- Leave a comment on the quest you'd like to embark on and wait for your magical assignment.
 
-- Fork this repository by clicking on the "Fork" button. This will create a local copy of this respository on your GitHub profile.
+### 🪄 Fork the Repository
 
-##  Clone the forked repository
+- Begin your adventure by clicking the "Fork" button. This creates a personal copy of the repository in your GitHub treasure chest.
 
-- Once the repository is forked you need to clone it to your local machine.
-- Click on the "Code" button in the repository page and copy the link provided in the dropdown menu.
+### 🚀 Clone the Forked Repository
 
+- Once you've found your treasure, clone it to your local wizard's chamber.
+- Click on the "Code" button and copy the link from the dropdown menu.
 
 ```bash
-git clone https://github.com/<your-username>/<repo-name>  
+git clone https://github.com/<your-username>/<repo-name>
 ```
 
-- Keep a reference to the original project in `upstream` remote.
+- Don't forget to keep a map to the original project with the `upstream` remote.
 
-```bash  
-cd <repo-name>  
+```bash
+cd <repo-name>
 git remote add upstream https://github.com/<upstream-owner>/<repo-name>
-git remote -v # To the check the remotes for this repository 
-```  
+git remote -v # Check the mystical remotes for this repository
+```
 
-- If the project is forked already, update the copy before working.
+- If you've already found a treasure before, update it before setting sail.
 
 ```bash
 git remote update
 git checkout <branch-name>
 git rebase upstream/<branch-name>
-``` 
+```
 
-##  Create a new branch
+### 🌠 Create a New Branch
 
-- Always create a new branch and name it accordingly so as to identify the issue you are addressing.
+- Always create a new branch, give it a name that describes your quest.
 
 ```bash
-# It will create a new branch with name branch_name and switch to that branch 
+# This spell creates a new branch and takes you there.
 git checkout -b branch_name
 ```
-##  Work on the issue assigned
 
-- Work on the issue(s) assigned to you, make the necessary changes in the files/folders needed.
-- After making the changes add them to the branch you've created.
+### 🪄 Work on the Assigned Quest
 
-```bash  
-# To add all new files to branch Branch_Name  
-git add .  
-
-# To add only a few files to Branch_Name
-git add <file name>
-```
-##  Commit the changes
-
-- Add your commits.
-- Along with the commit give a descriptive message that reflects your changes.
+- Set forth on your quest, make changes to the enchanted files/folders.
+- After completing your quest, add the spoils to your branch.
 
 ```bash
-git commit -m "message"  
+# Add all newly discovered treasures to the Branch_Name.
+git add .
+
+# Or add specific treasures to Branch_Name.
+git add <file name>
 ```
-- Note : A Pull Request should always have only one commit. 
 
-##  Push the changes
+### 📜 Commit the Changes
 
-- Push the committed changes in your branch to your remote repository.
+- Document your discoveries in your magical tome with descriptive messages.
 
-```bash  
+```bash
+git commit -m "My mystical message"
+```
+
+- Remember, a Pull Request should only contain one epic discovery.
+
+### 🚁 Push the Changes
+
+- Send your magical discoveries to your remote repository.
+
+```bash
 git push origin branch_name
 ```
-##  Create a Pull Request
 
-- Go to your repository in the browser and click on compare and pull request.
-- Add a title and description to your pull request that best describes your contribution.
-- After which the pull request will be reviewed and the maintainer will provide the reviews required for the changes.
+### 🎯 Create a Pull Request
 
-If no changes are needed, this means that your Pull Request has been reviewed and will be merged to the original code base by the maintainer.
+- Visit your repository in the realm of the internet and click "compare and pull request."
+- Write a captivating title and an adventurous description for your Pull Request.
+- Your Pull Request will be reviewed by the wise maintainers and, once approved, merged into the original code.
 
-Happy Hacking!
+### ✨ Congratulations!
+
+You've joined the league of extraordinary contributors. May your journey be filled with magical adventures and enchanting discoveries. Happy Hacking! 🧙‍♂️✨🚀
