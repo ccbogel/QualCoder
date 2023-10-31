@@ -6,13 +6,13 @@ This documentation contains set of guidelines to help you during the contributio
 Below you will find the process and workflow used to review and merge your changes.
 ##  Choose an issue/ Create an issue
 
-- Look for the existing issue or create your own issue.
+- Looking for the existing issue or create your own issue.
 - Comment on the respective issue you would like to work before creating a Pull Request.
 - Wait for the issue to be assigned to you after which you can start working on it.
 
 ##  Fork the repository
 
-- Fork this repository by clicking on the "Fork" button. This will create a local copy of this respository on your GitHub profile.
+- Fork this repository by clicking on the "Fork" button. This will create a local copy of this repository  on your GitHub profile.
 
 ##  Clone the forked repository
 
