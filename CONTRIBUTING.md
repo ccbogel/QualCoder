@@ -3,7 +3,9 @@
 This documentation contains set of guidelines to help you during the contribution process.
 
 # Submitting Contributions
+
 Below you will find the process and workflow used to review and merge your changes.
+
 ##  Choose an issue/ Create an issue
 
 - Look for the existing issue or create your own issue.
@@ -77,6 +79,7 @@ git commit -m "message"
 ```bash  
 git push origin branch_name
 ```
+
 ##  Create a Pull Request
 
 - Go to your repository in the browser and click on compare and pull request.
@@ -86,3 +89,25 @@ git push origin branch_name
 If no changes are needed, this means that your Pull Request has been reviewed and will be merged to the original code base by the maintainer.
 
 Happy Hacking!
+
+
+## Additional Information 
+
+- What is fork ?
+
+A fork is a new repository that shares code and visibility settings with the original “upstream” repository. Forks are often used to iterate on ideas or changes before they are proposed back to the upstream repository, such as in open source projects or when a user does not have write access to the upstream repository.
+
+
+- What is an issue ?
+
+An Issue in GitHub is a sort of bug tracker for a project which has its own section in every repository. It can be used for discussions which include a variety of things like reporting a bug on that repository, asking questions or even asking for a particular feature. It is a great place to keep a track of tasks and enhancements of the project. Being good at writing issues often helps in building better open source projects and will help other contributors to understand your project better and help you.
+
+
+- How to create an issue ?
+
+To make a new issue in your repository, navigate to the repository where you want to raise an issue and go to the Issues tab.
+
+
+- What is pull request ?
+
+A pull request is a request to merge changes from one branch to another, typically used for code review before merging.4 It is a mechanism for a developer to notify team members that they have completed a feature and file a pull request via their Bitbucket account.
