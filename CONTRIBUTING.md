@@ -1,23 +1,25 @@
 # Contributing Guidelines
 
-This documentation contains set of guidelines to help you during the contribution process.
+This documentation contains a set of guidelines to help you during the contribution process.
 
 # Submitting Contributions
+
 Below you will find the process and workflow used to review and merge your changes.
+
 ##  Choose an issue/ Create an issue
 
 - Look for the existing issue or create your own issue.
-- Comment on the respective issue you would like to work before creating a Pull Request.
+- Comment on the respective issue you would like to work on before creating a Pull Request.
 - Wait for the issue to be assigned to you after which you can start working on it.
 
 ##  Fork the repository
 
-- Fork this repository by clicking on the "Fork" button. This will create a local copy of this respository on your GitHub profile.
+- Fork this repository by clicking on the "Fork" button. This will create a local copy of this repository on your GitHub profile.
 
 ##  Clone the forked repository
 
 - Once the repository is forked you need to clone it to your local machine.
-- Click on the "Code" button in the repository page and copy the link provided in the dropdown menu.
+- Click on the "Code" button on the repository page and copy the link provided in the dropdown menu.
 
 
 ```bash
@@ -50,7 +52,7 @@ git checkout -b branch_name
 ```
 ##  Work on the issue assigned
 
-- Work on the issue(s) assigned to you, make the necessary changes in the files/folders needed.
+- Work on the issue(s) assigned to you, and make the necessary changes in the files/folders needed.
 - After making the changes add them to the branch you've created.
 
 ```bash  
@@ -68,7 +70,7 @@ git add <file name>
 ```bash
 git commit -m "message"  
 ```
-- Note : A Pull Request should always have only one commit. 
+- Note: A Pull Request should always have only one commit. 
 
 ##  Push the changes
 
@@ -83,6 +85,6 @@ git push origin branch_name
 - Add a title and description to your pull request that best describes your contribution.
 - After which the pull request will be reviewed and the maintainer will provide the reviews required for the changes.
 
-If no changes are needed, this means that your Pull Request has been reviewed and will be merged to the original code base by the maintainer.
+If no changes are needed, this means that your Pull Request has been reviewed and will be merged into the original code base by the maintainer.
 
 Happy Hacking!
