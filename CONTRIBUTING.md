@@ -14,7 +14,7 @@ Below you will find the process and workflow used to review and merge your chang
 
 ##  Fork the repository
 
-- Fork this repository by clicking on the "Fork" button. This will create a local copy of this respository on your GitHub profile.
+- Fork this repository by clicking on the "Fork" button. This will create a local copy of this repository on your GitHub profile.
 
 ##  Clone the forked repository
 
