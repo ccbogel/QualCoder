@@ -2045,7 +2045,9 @@ class DialogReportCodes(QtWidgets.QDialog):
         res = cur.fetchone()
         if res is not None:
             filename = res[0]
-        head = "\n" + _("[VIEW] ")
+        head = "\n"
+        if item['result_type'] == 'text':
+            head += "[" + str(item['pos0']) + "-" + str(item['pos1']) + "] "
         head += item['codename'] + ", "
         memo_choice = self.ui.comboBox_memos.currentText()
         if memo_choice in (_("Also code memos"), _("Also all memos"), _("Only memos")) and item['codename_memo'] != "":
