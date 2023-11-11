@@ -93,7 +93,7 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
         self.ui.pushButton_select_replacement_text_file.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_select_project.setIcon(QtGui.QIcon(pm))
         pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(cogs_icon), "png")
+        pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
         self.ui.pushButton_text_starts.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_text_starts.clicked.connect(self.change_text_code_start_positions)
         self.ui.pushButton_text_ends.setIcon(QtGui.QIcon(pm))

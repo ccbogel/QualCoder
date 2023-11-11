@@ -117,7 +117,7 @@ class DialogSQL(QtWidgets.QDialog):
 
         self.ui.pushButton_runSQL.clicked.connect(self.run_sql)
         pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(cogs_icon), "png")
+        pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
         self.ui.pushButton_runSQL.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_export.clicked.connect(self.export_file)
         pm = QtGui.QPixmap()
