@@ -81,6 +81,7 @@ from qualcoder.view_av import DialogCodeAV
 from qualcoder.view_charts import ViewCharts
 from qualcoder.view_graph import ViewGraph
 from qualcoder.view_image import DialogCodeImage
+from qualcoder.ai_vectorstore import AiVectorstore
 
 # Check if VLC installed, for warning message for code_av
 vlc = None
@@ -147,6 +148,8 @@ class App(object):
     delete_backup = True
     # Used as a default export location, which may be different from the working directory
     last_export_directory = ""
+    sources_vectorstore = None
+    sources_collection = 'qualcoder' # name of the vectorstore collection for source documents
 
     def __init__(self):
         sys.excepthook = exception_handler
@@ -927,6 +930,7 @@ class MainWindow(QtWidgets.QMainWindow):
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
         self.init_ui()
+        self.app.sources_vectorstore = AiVectorstore(self.app, self.ui.textEdit, self.app.sources_collection)
         self.show()
 
     def init_ui(self):
@@ -1206,9 +1210,9 @@ class MainWindow(QtWidgets.QMainWindow):
         msg += _("Backup on open") + f": {self.app.settings['backup_on_open']}\n"
         msg += _("Backup AV files") + f": {self.app.settings['backup_av_files']}\n"
         if self.app.settings['ai_enable'] == 'True':
-            msg += _("AI integration is enabled") + "\n"
+            msg += _("AI Research Mate is enabled") + "\n"
         else:
-            msg += _("AI integration is disabled") + "\n"
+            msg += _("AI Research Mate is disabled") + "\n"
         if self.app.settings['open_ai_api_key'] != '':
             msg += _("OpenAI API key is set") + "\n"
         else:
@@ -1792,6 +1796,7 @@ class MainWindow(QtWidgets.QMainWindow):
         all other opened dialogs are destroyed."""
 
         current_coder = self.app.settings['codername']
+        current_ai_enable = self.app.settings['ai_enable']
         ui = DialogSettings(self.app)
         ui.exec()
         self.settings_report()
@@ -1799,6 +1804,13 @@ class MainWindow(QtWidgets.QMainWindow):
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
         self.ai_chat_window.init_llm()
+        if current_ai_enable != self.app.settings['ai_enable']:
+            if self.app.settings['ai_enable'] == 'True':
+                # AI is newly enabled
+                self.ui.textEdit.append(_("AI research mate: Rebuilding my memory..."))
+                self.app.sources_vectorstore.init_vectorstore(rebuild=True)
+            else: 
+                self.app.sources_vectorstore.close()
         # Name change: Close all opened dialogs as coder name needs to change everywhere
         if current_coder != self.app.settings['codername']:
             self.ui.textEdit.append(_("Coder name changed to: ") + self.app.settings['codername'])
@@ -2120,6 +2132,10 @@ class MainWindow(QtWidgets.QMainWindow):
         # Vacuum database
         cur.execute("vacuum")
         self.app.conn.commit()
+        
+        # AI: init and update vectorstore
+        if self.app.settings['ai_enable'] == 'True':
+            self.app.sources_vectorstore.init_vectorstore()
 
     def save_backup(self):
         """ Save a date and hours stamped backup.
@@ -2244,6 +2260,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.textEdit.append(_("Closing project: ") + self.app.project_name)
             self.ui.textEdit.append("========\n")
             self.app.append_recent_project(self.app.project_path)
+        self.app.sources_vectorstore.close()
         if self.app.conn is not None:
             self.app.conn.commit()
             self.app.conn.close()

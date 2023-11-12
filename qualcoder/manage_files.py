@@ -548,6 +548,11 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.load_file_data()
         self.app.delete_backup = False
         self.update_files_in_dialogs()
+        # update doc in vectorstore
+        if self.app.settings['ai_enable'] == 'True':
+            id = int(self.ui.tableWidget.item(row, self.ID_COLUMN).text())
+            docs = self.app.get_file_texts(file_ids=[id])
+            self.app.sources_vectorstore.import_document(docs[0]['id'], docs[0]['name'], docs[0]['fulltext'], True)
 
     def undo_file_rename(self):
         """ Undo file name rename. """
@@ -577,6 +582,8 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.parent_text_edit.append(_("Reversed renamed database file entry: ") +
                                      f"{selection['name']} -> {selection['old_name']}")
         self.load_file_data()
+        if self.app.settings['ai_enable'] == 'True':
+            self.app.sources_vectorstore.update_vectorstore()
         self.files_renamed = [x for x in self.files_renamed if not (selection['fid'] == x.get('fid'))]
         if len(self.files_renamed) == 0:
             self.ui.pushButton_undo.setEnabled(False)
@@ -1514,6 +1521,10 @@ class DialogManageFiles(QtWidgets.QDialog):
             # Update av file entry with av_text_id link to this text file
             cur.execute("update source set av_text_id=? where id=?", [tr_id, id_])
             self.app.conn.commit()
+            
+            # add doc to vectorstore
+            if self.app.settings['ai_enable'] == 'True':
+                self.app.sources_vectorstore.import_document(entry['id'], entry['name'], entry['fulltext'], update=True)
 
             # Add file attribute placeholders
             att_sql = 'select name from attribute_type where caseOrFile ="file"'
@@ -1662,6 +1673,11 @@ class DialogManageFiles(QtWidgets.QDialog):
                             self.app.settings['codername']]
             cur.execute(insert_sql, placeholders)
             self.app.conn.commit()
+            
+        # add doc to vectorstore
+        if self.app.settings['ai_enable'] == 'True':
+            self.app.sources_vectorstore.import_document(entry['id'], entry['name'], entry['fulltext'], update=True)
+            
         msg = entry['name']
         if link_path == "":
             msg += _(" imported")
@@ -1866,6 +1882,10 @@ class DialogManageFiles(QtWidgets.QDialog):
                 cur.execute("delete from case_text where fid = ?", [s['id']])
                 cur.execute("delete from attribute where attr_type ='file' and id=?", [s['id']])
                 self.app.conn.commit()
+                # Delete from vectorstore
+                if self.app.settings['ai_enable'] == 'True':
+                    self.app.sources_vectorstore.delete_document(s['id'])    
+            
             # Delete image, audio or video source
             if s['mediapath'] is not None and 'docs:' not in s['mediapath']:
                 # Get linked transcript file id
@@ -1904,6 +1924,10 @@ class DialogManageFiles(QtWidgets.QDialog):
                     cur.execute("delete from case_text where fid = ?", [res[0]])
                     cur.execute("delete from attribute where attr_type ='file' and id=?", [res[0]])
                     self.app.conn.commit()
+                    # Delete from vectorstore
+                    if self.app.settings['ai_enable'] == 'True':
+                        self.app.sources_vectorstore.delete_document(res[0])    
+
         self.update_files_in_dialogs()
         self.check_attribute_placeholders()
         self.parent_text_edit.append(msg)
@@ -1937,9 +1961,9 @@ class DialogManageFiles(QtWidgets.QDialog):
         row = rows[0]
         file_id = self.source[row]['id']
         # Delete text source
-        if self.source[row]['mediapath'] is None or 'docs:' in self.source[row]['mediapath']:
+        if self.source[row]['mediapath'] is None or self.source[row]['mediapath'][0:5] == 'docs:' or self.source[row]['mediapath'][0:6] == '/docs/':
             try:
-                if self.source[row]['mediapath'] is None:
+                if self.source[row]['mediapath'] is None or self.source[row]['mediapath'][0:6] == '/docs/':
                     os.remove(self.app.project_path + "/documents/" + self.source[row]['name'])
             except OSError as err:
                 logger.warning(_("Deleting file error: ") + str(err))
@@ -1950,9 +1974,12 @@ class DialogManageFiles(QtWidgets.QDialog):
             cur.execute("delete from case_text where fid = ?", [file_id])
             cur.execute("delete from attribute where attr_type ='file' and id=?", [file_id])
             self.app.conn.commit()
+            # Delete from vectorstore
+            if self.app.settings['ai_enable'] == 'True':
+                self.app.sources_vectorstore.delete_document(file_id)    
 
         # Delete image, audio or video source
-        if self.source[row]['mediapath'] is not None and 'docs:' not in self.source[row]['mediapath']:
+        if self.source[row]['mediapath'] is not None and self.source[row]['mediapath'][0:5] != 'docs:' and self.source[row]['mediapath'][0:6] != '/docs/':
             # Get linked transcript file id
             cur.execute("select av_text_id from source where id=?", [file_id])
             res = cur.fetchone()
@@ -1978,6 +2005,9 @@ class DialogManageFiles(QtWidgets.QDialog):
             cur.execute("delete from code_av where id = ?", [file_id])
             cur.execute("delete from attribute where attr_type='file' and id=?", [file_id])
             self.app.conn.commit()
+            # Delete from vectorstore (this should not be necessary since it's not a text file, but just to be sure...)
+            if self.app.settings['ai_enable'] == 'True':
+                self.app.sources_vectorstore.delete_document(file_id)    
 
             # Delete transcription text file
             if av_text_id is not None:
@@ -1987,6 +2017,9 @@ class DialogManageFiles(QtWidgets.QDialog):
                 cur.execute("delete from case_text where fid = ?", [res[0]])
                 cur.execute("delete from attribute where attr_type ='file' and id=?", [res[0]])
                 self.app.conn.commit()
+                # Delete from vectorstore
+                if self.app.settings['ai_enable'] == 'True':
+                    self.app.sources_vectorstore.delete_document(res[0])
 
         self.files_renamed = [x for x in self.files_renamed if not (file_id == x.get('fid'))]
 

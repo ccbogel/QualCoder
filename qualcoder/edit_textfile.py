@@ -58,12 +58,14 @@ class DialogEditTextFile(QtWidgets.QDialog):
     app = None
     text = ""
     fid = -1
+    name = ""
     codetext = []
     annotations = []
     casetext = []
     prev_text = ""
     no_codes_annotes_cases = True
     code_deletions = []
+    has_changed = False
 
     def __init__(self, app, fid, clear_button="show"):
         """ """
@@ -79,7 +81,7 @@ class DialogEditTextFile(QtWidgets.QDialog):
         self.text = ""
         if res[0] is not None:
             self.text = res[0]
-        title = res[1]
+        self.name = res[1]
         self.code_deletions = []
         self.ui = Ui_Dialog_memo()
         self.ui.setupUi(self)
@@ -87,7 +89,7 @@ class DialogEditTextFile(QtWidgets.QDialog):
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
-        self.setWindowTitle(title)
+        self.setWindowTitle(self.name)
         msg = _(
             "Avoid selecting text combinations of unmarked text sections and coded/annotated/case-assigned sections.")
         msg += " " + _("Positions may not correctly adjust.") + " "
@@ -107,7 +109,7 @@ class DialogEditTextFile(QtWidgets.QDialog):
         self.get_cases_codings_annotations()
         self.ui.textEdit.setPlainText(self.text)
         self.ui.textEdit.setFocus()
-        '''print("FILE:", title)
+        '''print("FILE:", self.name)
         if self.casetext:
             print("CASE\n", self.casetext)
         if self.annotations:
@@ -167,7 +169,8 @@ class DialogEditTextFile(QtWidgets.QDialog):
 
         +e
         """
-
+        self.has_changed = True # mark contents as beeing changed
+        
         # No need to update positions (unless entire file is a case)
         if self.no_codes_annotes_cases:
             return
@@ -394,6 +397,9 @@ class DialogEditTextFile(QtWidgets.QDialog):
         self.update_codings()
         self.update_annotations()
         self.update_casetext()
+        # update doc in vectorstore
+        if self.has_changed and self.app.settings['ai_enable'] == 'True':
+            self.app.sources_vectorstore.import_document(self.fid, self.name, self.text, update=True)
         super(DialogEditTextFile, self).accept()
 
     def update_casetext(self):

@@ -21,7 +21,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
-Author: Colin Curtain (ccbogel)
+Author: Kai Droege (kaixxx)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 """
@@ -91,11 +91,6 @@ class DialogAIChat(QtWidgets.QDialog):
         self.ui.pushButton_question.pressed.connect(self.send_question)
         self.ui.plainTextEdit_question.setPlaceholderText(_('<your question>'))
         self.ui.scrollArea_ai_output.verticalScrollBar().rangeChanged.connect(self.ai_output_bottom)
-        # palette = self.ui.plainTextEdit_question.palette()
-        # background_color = self.property("background-color")
-        # bg_color = self.palette().base().color().name()
-        # print(background_color)
-        # self.ui.ai_output.setStyleSheet(f'background-color: {background_color}; ')
         doc_font = 'font: ' + str(self.app.settings['docfontsize']) + 'pt '
         doc_font += '"' + self.app.settings['font'] + '";'
         self.ai_response_style = "'" + doc_font + " color: #356399;'"     
