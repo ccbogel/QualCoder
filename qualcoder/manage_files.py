@@ -947,7 +947,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             try:
                 image = Image.open(abs_path)
                 w, h = image.size
-            except (FileNotFoundError, PIL.UnidentifiedImageError):
+            except (FileNotFoundError, PIL.UnidentifiedImageError, AttributeError):
                 metadata += _("Cannot locate media. ") + abs_path
                 return icon, metadata
             metadata += f"W: {w} x H: {h}"
@@ -1228,8 +1228,8 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         # Check image exists
         abs_path = ""
-        if "images:" in self.source[x]['mediapath']:
-            abs_path = self.source[x]['mediapath'].split(':')[1]
+        if self.source[x]['mediapath'][:7] == "images:":
+            abs_path = self.source[x]['mediapath'][7:]
         else:
             abs_path = self.app.project_path + self.source[x]['mediapath']
         if not os.path.exists(abs_path):
