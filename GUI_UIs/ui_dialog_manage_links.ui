@@ -17,12 +17,19 @@
    <item row="3" column="0">
     <widget class="QTableWidget" name="tableWidget"/>
    </item>
+   <item row="0" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Manage bad links to files</string>
+     </property>
+    </widget>
+   </item>
    <item row="1" column="0">
     <widget class="QGroupBox" name="groupBox">
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>10</height>
+       <height>35</height>
       </size>
      </property>
      <property name="maximumSize">
@@ -34,13 +41,35 @@
      <property name="title">
       <string/>
      </property>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="label_1">
-     <property name="text">
-      <string>Click on the file name to browse to the correct file location.</string>
-     </property>
+     <widget class="QLabel" name="label_1">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>441</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Click on the file name to browse to the correct file location.</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_search_folders">
+      <property name="geometry">
+       <rect>
+        <x>480</x>
+        <y>0</y>
+        <width>171</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Automatic search through folders for the file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string>Search folders</string>
+      </property>
+     </widget>
     </widget>
    </item>
   </layout>
