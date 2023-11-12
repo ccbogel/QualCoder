@@ -36,7 +36,7 @@ import traceback
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtWidgets import QDialog
-from wordcloud import WordCloud, STOPWORDS
+from wordcloud import WordCloud  #, STOPWORDS
 
 from .GUI.ui_dialog_charts import Ui_DialogCharts
 
@@ -366,14 +366,17 @@ class ViewCharts(QDialog):
             fig.write_html(filepath)
 
     def show_word_cloud(self):
-        """ Show word cloud """
+        """ Show word cloud.
+         Can be by file and/or by category. """
 
         chart_type_index = self.ui.comboBox_wordclouds.currentIndex()
         if chart_type_index < 1:
             return
-
         title = _('Word cloud')
         owner, subtitle = self.owner_and_subtitle_helper()
+
+        self.get_selected_categories_and_codes()
+        
         cur = self.app.conn.cursor()
         values = []
         case_file_name, file_ids = self.get_file_ids()
@@ -389,7 +392,7 @@ class ViewCharts(QDialog):
                 values.append(res_text[0])
         # Create image
         text = " ".join(values)
-        stopwords = set(STOPWORDS)
+        # stopwords = set(STOPWORDS)
         colours = ['', 'white', 'black', 'yellow', 'blue', 'red', 'green']
         wordcloud = WordCloud(background_color=colours[chart_type_index], width=800, height=600).generate(text)
         # Display image
@@ -399,6 +402,57 @@ class ViewCharts(QDialog):
         fig.show()
         self.helper_export_html(fig)
         self.ui.comboBox_wordclouds.setCurrentIndex(0)
+
+    def codes_of_category_helper(self, category_name):
+        """ Get child categories and codes of this category node.
+        Only keep the category or code name. Used to reposition TextGraphicsItems on moving a category.
+
+        param: node : Dictionary of category
+
+        return: child_names : List
+        """
+
+        if node['cid'] is not None:
+            return []
+        child_names = []
+        codes, categories = self.app.get_codes_categories()
+        """ qdpx import quirk, but category names and code names can match. (MAXQDA, Nvivo)
+        This causes hierarchy to not work correctly (eg when moving a category).
+        Solution, add spaces after the code_name to separate it out. """
+        for code in codes:
+            for cat in categories:
+                if code['name'] == cat['name']:
+                    code['name'] = code['name'] + " "
+
+        """ Create a list of this category (node) and all its category children.
+        Maximum depth of 200. """
+        selected_categories = [node]
+        i = 0  # Ensure an exit from loop
+        new_model_changed = True
+        while categories != [] and new_model_changed and i < 200:
+            new_model_changed = False
+            append_list = []
+            for n in selected_categories:
+                for m in categories:
+                    if m['supercatid'] == n['catid']:
+                        append_list.append(m)
+                        child_names.append(m['name'])
+            for n in append_list:
+                selected_categories.append(n)
+                categories.remove(n)
+                new_model_changed = True
+            i += 1
+        categories = selected_categories
+        # Remove codes that are not associated with these categories
+        selected_codes = []
+        for cat in categories:
+            for code in codes:
+                if code['catid'] == cat['catid']:
+                    selected_codes.append(code)
+        codes = selected_codes
+        for c in codes:
+            child_names.append(c['name'])
+        return child_names
 
     def show_bar_chart(self):
         """ https://www.tutorialspoint.com/plotly/plotly_bar_and_pie_chart.htm
