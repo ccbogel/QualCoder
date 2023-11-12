@@ -101,9 +101,14 @@ class DialogManageLinks(QtWidgets.QDialog):
         """ Get file paths of this file name. """
 
         paths = []
+        max_iterations = 10000 # stop searching after this many iterations to prevent the app from becoming unresponsive in a large file system
+        i = 0
         for root, dirs, files in os.walk(root_dir):
             if filename in files:
                 paths.append(os.path.join(root, filename))
+            i += 1
+            if i >= max_iterations:
+                break
         return paths
 
     def closeEvent(self, event):
