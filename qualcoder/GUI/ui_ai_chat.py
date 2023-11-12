@@ -49,7 +49,7 @@ class Ui_Dialog_ai_chat(object):
         self.scrollArea_ai_output.setObjectName("scrollArea_ai_output")
         self.scrollArea_ai_output_contents = QtWidgets.QWidget()
         self.scrollArea_ai_output_contents.setGeometry(QtCore.QRect(0, 0, 926, 473))
-        # self.scrollArea_ai_output_contents.setStyleSheet("background-color: white;")
+        self.scrollArea_ai_output_contents.setStyleSheet("background-color: white;")
         self.scrollArea_ai_output_contents.setObjectName("scrollArea_ai_output_contents")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.scrollArea_ai_output_contents)
         self.verticalLayout.setContentsMargins(6, 6, 6, 6)
@@ -61,7 +61,7 @@ class Ui_Dialog_ai_chat(object):
         sizePolicy.setHeightForWidth(self.ai_output.sizePolicy().hasHeightForWidth())
         self.ai_output.setSizePolicy(sizePolicy)
         self.ai_output.setAutoFillBackground(False)
-        # self.ai_output.setStyleSheet("background-color: white;")
+        self.ai_output.setStyleSheet("")
         self.ai_output.setInputMethodHints(QtCore.Qt.InputMethodHint.ImhNone)
         self.ai_output.setFrameShape(QtWidgets.QFrame.Shape.NoFrame)
         self.ai_output.setFrameShadow(QtWidgets.QFrame.Shadow.Sunken)
@@ -83,13 +83,3 @@ class Ui_Dialog_ai_chat(object):
         _translate = QtCore.QCoreApplication.translate
         Dialog_ai_chat.setWindowTitle(_translate("Dialog_ai_chat", "AI Chat"))
         self.pushButton_question.setText(_translate("Dialog_ai_chat", ">"))
-
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    Dialog_ai_chat = QtWidgets.QDialog()
-    ui = Ui_Dialog_ai_chat()
-    ui.setupUi(Dialog_ai_chat)
-    Dialog_ai_chat.show()
-    sys.exit(app.exec())

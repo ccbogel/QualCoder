@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'GUI_UIs/ui_dialog_settings.ui'
+# Form implementation generated from reading ui file 'GUI_UIs\ui_dialog_settings.ui'
 #
 # Created by: PyQt6 UI code generator 6.4.2
 #
@@ -262,5 +262,5 @@ class Ui_Dialog_settings(object):
         self.label_new_coder.setText(_translate("Dialog_settings", "New coder"))
         self.label_current_coder.setText(_translate("Dialog_settings", "Current coder: "))
         self.pushButton_choose_directory.setText(_translate("Dialog_settings", "Default project directory"))
-        self.label_9.setText(_translate("Dialog_settings", "My AI Fellow Researchers"))
-        self.checkBox_AI_enable.setText(_translate("Dialog_settings", "enable AI integration"))
+        self.label_9.setText(_translate("Dialog_settings", "My AI Research Mate"))
+        self.checkBox_AI_enable.setText(_translate("Dialog_settings", "enable research mate"))
