@@ -1220,8 +1220,9 @@ class MainWindow(QtWidgets.QMainWindow):
         msg += _("Style") + "; " + self.app.settings['stylesheet']
         if platform.system() == "Windows":
             msg += "\n" + _("Directory (folder) paths / represents \\")
-        msg += "\n"
+        # msg += "\n"
         self.ui.textEdit.append(msg)
+        self.ui.textEdit.append("<p>&nbsp;</p>")
         self.ui.textEdit.textCursor().movePosition(QtGui.QTextCursor.MoveOperation.End)
         self.ui.textEdit.verticalScrollBar().setValue(self.ui.textEdit.verticalScrollBar().maximum())
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
