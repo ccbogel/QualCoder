@@ -103,7 +103,6 @@ class DialogCodeText(QtWidgets.QWidget):
     search_indices = []
     search_index = 0
     search_term = ""
-    search_type = "3"  # 3 chars or 5 chars or 1 for Enter
     selected_code_index = 0
     important = False  # Show/hide important codes
     attributes = []  # Show selected files using these attributes in list widget
@@ -191,8 +190,9 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.listWidget.customContextMenuRequested.connect(self.file_menu)
         self.ui.listWidget.setStyleSheet(tree_font)
         self.ui.listWidget.selectionModel().selectionChanged.connect(self.file_selection_changed)
-        self.ui.lineEdit_search.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        self.ui.lineEdit_search.customContextMenuRequested.connect(self.lineedit_search_menu)
+        #self.ui.lineEdit_search.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        #self.ui.lineEdit_search.customContextMenuRequested.connect(self.lineedit_search_menu)
+        self.ui.lineEdit_search.returnPressed.connect(self.search_for_text)
         self.get_files()
 
         # Icons marked icon_24 icons are 24x24 px but need a button of 28
@@ -842,7 +842,6 @@ class DialogCodeText(QtWidgets.QWidget):
     # Search for text methods
     def search_for_text(self):
         """ On text changed in lineEdit_search OR Enter pressed, find indices of matching text.
-        Only where text is >=3 OR 5 characters long. Or Enter is pressed (search_type==1).
         Resets current search_index.
         If all files is checked then searches for all matching text across all text files
         and displays the file text and current position to user.
@@ -857,9 +856,9 @@ class DialogCodeText(QtWidgets.QWidget):
         self.search_indices = []
         self.search_index = -1
         self.search_term = self.ui.lineEdit_search.text()
-        self.ui.label_search_totals.setText("0 / 0")
-        if len(self.search_term) < int(self.search_type):
+        if len(self.search_term) < 3:
             return
+        self.ui.label_search_totals.setText("0 / 0")
         pattern = None
         flags = 0
         if not self.ui.checkBox_search_case.isChecked():
@@ -945,7 +944,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.textEdit.setTextCursor(cursor)
         self.ui.label_search_totals.setText(str(self.search_index + 1) + " / " + str(len(self.search_indices)))
 
-    def lineedit_search_menu(self, position):
+    '''def lineedit_search_menu(self, position):
         """ Option to change from automatic search on 3 characters or more to press Enter to search """
 
         menu = QtWidgets.QMenu()
@@ -976,7 +975,7 @@ class DialogCodeText(QtWidgets.QWidget):
             self.search_type = 1
             self.ui.lineEdit_search.textEdited.disconnect(self.search_for_text)
             self.ui.lineEdit_search.returnPressed.connect(self.search_for_text)
-            return
+            return'''
 
     def button_auto_code_menu(self, position):
         """ Options to auto-code all instances, first instance or last instance in a file. """
