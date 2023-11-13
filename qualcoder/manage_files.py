@@ -1855,8 +1855,11 @@ class DialogManageFiles(QtWidgets.QDialog):
             # Delete text source
             if s['mediapath'] is None or s['mediapath'][0:5] == 'docs:' or s['mediapath'][0:6] == '/docs/':
                 try:
-                    if s['mediapath'] is None or s['mediapath'][0:6] == '/docs/':
+                    if s['mediapath'] is None:
+                        # Legacy for older < 3.4 QualCoder projects
                         os.remove(self.app.project_path + "/documents/" + s['name'])
+                    if s['mediapath'][0:6] == '/docs/':
+                        os.remove(self.app.project_path + "/documents/" + s['name'][6:])
                 except OSError as err:
                     logger.warning(_("Deleting file error: ") + str(err))
                 # Delete stored coded sections and source details
@@ -1939,8 +1942,11 @@ class DialogManageFiles(QtWidgets.QDialog):
         # Delete text source
         if self.source[row]['mediapath'] is None or self.source[row]['mediapath'][0:5] == 'docs:' or self.source[row]['mediapath'][0:6] == '/docs/':
             try:
-                if self.source[row]['mediapath'] is None or self.source[row]['mediapath'][0:6] == '/docs/':
+                if self.source[row]['mediapath']:
+                    # Legacy for older QualCoder Projects < 3.3
                     os.remove(self.app.project_path + "/documents/" + self.source[row]['name'])
+                if self.source[row]['mediapath'][0:6] == '/docs/':
+                    os.remove(self.app.project_path + "/documents/" + self.source[row]['mediapath'][6:])
             except OSError as err:
                 logger.warning(_("Deleting file error: ") + str(err))
             # Delete stored coded sections and source details
