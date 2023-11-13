@@ -363,6 +363,9 @@ class ReplaceTextFile:
              self.new_file['owner'], self.new_file['date'],
              self.old_file['id']))
         self.app.conn.commit()
+        # Update vectorstore
+        if self.app.settings['ai_enable'] == 'True':
+            self.app.sources_vectorstore.import_document(self.old_file['id'], self.new_file['name'], self.new_file['fulltext'], update=True)  
 
     @staticmethod
     def convert_odt_to_text(import_file):

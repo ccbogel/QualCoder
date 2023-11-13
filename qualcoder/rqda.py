@@ -77,6 +77,9 @@ class RqdaImport:
             self.import_data()
             self.parent_textEdit.append(_("Data imported from ") + self.file_path)
             self.parent_textEdit.append(_("File categories are not imported from RQDA"))
+             # Update vectorstore
+            if self.app.settings['ai_enable'] == 'True':
+                self.app.sources_vectorstore.update_vectorstore()  
         except Exception as e:
             self.parent_textEdit.append(_("Data import unsuccessful from ") + self.file_path + "\n" + str(e))
 
