@@ -54,7 +54,7 @@ from qualcoder.code_text import DialogCodeText
 from qualcoder.code_pdf import DialogCodePdf
 from qualcoder.GUI.base64_helper import *
 from qualcoder.GUI.ui_main import Ui_MainWindow
-from qualcoder.helpers import Message, ImportPlainTextCodes
+from qualcoder.helpers import Message, ImportPlainTextCodes, get_documents_folder
 from qualcoder.import_survey import DialogImportSurvey
 from qualcoder.import_twitter_data import DialogImportTwitterData
 from qualcoder.information import DialogInformation, menu_shortcuts_display, coding_shortcuts_display
@@ -706,7 +706,7 @@ class App(object):
             'fontsize': 14,
             'docfontsize': 12,
             'treefontsize': 12,
-            'directory': os.path.expanduser('~'),
+            'directory': get_documents_folder(),  # os.path.expanduser('~'),
             'showids': False,
             'language': 'en',
             'backup_on_open': True,
@@ -1604,7 +1604,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.journal_display = None
         self.app = App()
         if self.app.settings['directory'] == "":
-            self.app.settings['directory'] = os.path.expanduser('~')
+            self.app.settings['directory'] = get_documents_folder()  # os.path.expanduser('~')
         project_path = QtWidgets.QFileDialog.getSaveFileName(self,
                                                              _("Enter project name"), self.app.settings['directory'],
                                                              options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
@@ -1822,7 +1822,7 @@ class MainWindow(QtWidgets.QMainWindow):
         default_directory = self.app.settings['directory']
         if path_ == "" or path_ is False:
             if default_directory == "":
-                default_directory = os.path.expanduser('~')
+                default_directory = get_documents_folder()  # os.path.expanduser('~')
             path_ = QtWidgets.QFileDialog.getExistingDirectory(self,
                                                               _('Open project directory'), default_directory)
         if path_ == "" or path_ is False:
