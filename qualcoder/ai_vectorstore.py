@@ -126,14 +126,7 @@ class AiVectorstore():
         else:
             self.chroma_db = None
             raise FileNotFoundError(f'AI Vectorstore: project path "{self.app.project_path}" not found.')
-    
-    def _open_and_empty_db(self, progress_callback=None):
-        logger.debug('AI research mate: rebuilding vectorstore')
-        self._open_db()
-        # delete all the contents from the vectorstore
-        ids = self.chroma_db.get(include=[])['ids']
-        self.chroma_db.delete(ids)
-        
+
     def init_vectorstore(self, rebuild=False):
         """Initializes the vectorstore and checks if all text sources are stored.
         If rebuild is True, the contents of the vectorstore will be deleted
@@ -144,14 +137,12 @@ class AiVectorstore():
         """
         self._is_closing = False
         self.ready = False
-
-        # start background thread opening/rebuilding the chroma db. This avoids blocking the ui.
+        
+        worker = qualcoder.ai_async_worker.Worker(self._open_db)  
         if rebuild:
-            worker = qualcoder.ai_async_worker.Worker(self._open_and_empty_db)
-        else:    
-            worker = qualcoder.ai_async_worker.Worker(self._open_db)
-        # once finished opening, check if all source documents are in the vectorstore  
-        worker.signals.finished.connect(self.update_vectorstore)
+            worker.signals.finished.connect(self.rebuild_vectorstore)
+        else:
+            worker.signals.finished.connect(self.update_vectorstore)
         worker.signals.error.connect(exception_handler)
         self.threadpool.start(worker)
         
@@ -166,8 +157,6 @@ class AiVectorstore():
             self.ready = True
             self.parent_text_edit.append(msg)
             logger.debug(msg)
-        # else:
-            # logger.debug(f'Updating vectorstore, {self.import_workers_count} documents to go.')
     
     def _import_document(self, id, name, text, update=False, progress_callback=None):
         if self._is_closing:
@@ -233,11 +222,20 @@ class AiVectorstore():
         for doc in docs:
             self.import_document(doc['id'], doc['name'], doc['fulltext'], False)
             
+    def rebuild_vectorstore(self):
+        logger.debug('AI research mate: rebuilding vectorstore')
+        # delete all the contents from the vectorstore
+        ids = self.chroma_db.get(include=[])['ids']
+        self.chroma_db.delete(ids)
+        # rebuild vectorstore
+        self.update_vectorstore()
+    
     def delete_document(self, id):
         """Deletes all the embeddings from related to this doc 
         from the vectorstore"""
-        embeddings_list = self.chroma_db.get(where={"id" : id}, include=[])
+        embeddings_list = self.chroma_db.get(where={"id" : id}, include=['metadatas'])
         if len(embeddings_list['ids']) > 0: # found it
+            self.parent_text_edit.append(f'AI buddy: forgetting "{embeddings_list["metadatas"][0]["name"]}"')
             self.chroma_db.delete(embeddings_list['ids']) 
                
     def close(self):

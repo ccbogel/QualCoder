@@ -152,22 +152,6 @@ class DialogAIChat(QtWidgets.QDialog):
             self.append_ai_output(q_html)
             self.ui.plainTextEdit_question.clear()
             r = self.chat_model.predict(q) # better make an asynch call, other wise the ui freezes until the response is ready
-            rx = """Certainly! Here are some potential questions to ask yourself during the analysis of interviews for exploring the meaning of work for women in the post-war era:
-
-1. What were the primary motivations for women to enter the workforce during the post-war era?
-2. How did women perceive their roles and responsibilities at work compared to their roles in the household?
-3. Did women feel that their work was valued and recognized by society during this time?
-4. Were there any specific challenges or barriers that women faced in pursuing their careers during the post-war era?
-5. How did women navigate and balance their work and family life during this time period?
-6. Did women feel a sense of empowerment or liberation through their work, or did they experience any feelings of constraint or limitation?
-7. What were the prevailing societal norms and expectations regarding women's work during the post-war era, and how did these influence individual experiences?
-8. How did women perceive the impact of their work on their personal identity and self-worth?
-9. Were there any notable differences in the meaning of work for women from different socio-economic backgrounds or geographic locations?
-10. How did women's experiences and perspectives on work evolve and change throughout the post-war era?
-
-Remember to tailor these questions based on the specific context and objectives of your research project. Additionally, adapt and refine your questions as you progress through the analysis of the interviews to ensure a comprehensive exploration of the topic.
-
-            """
             r= r.replace('\n', '<br />')
             self.append_ai_output(f'<p style={self.ai_response_style}>{r}</p>')
             # self.append_ai_output(f'<table><tr><td style="padding: 6px; border-width: 3px; border-color: #F4F4F4; background-color: #F4F4F4">{r}</td></tr></table>')
