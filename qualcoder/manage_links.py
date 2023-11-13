@@ -31,6 +31,7 @@ import logging
 import os
 import sys
 import traceback
+import time
 
 from PyQt6 import QtCore, QtWidgets, QtGui
 
@@ -99,16 +100,25 @@ class DialogManageLinks(QtWidgets.QDialog):
 
     def find_filepaths(self):
         """ Get file paths of this file name. """
-
+        pd = QtWidgets.QProgressDialog(labelText=self.home[-30:], minimum=0, maximum=0, parent=self)
+        pd.setWindowModality(QtCore.Qt.WindowModality.WindowModal)
+        pd.setWindowTitle(_('Search folders'))
+        pd.show()
+        last_msg_update = time.time()
         for link in self.links:
             paths = []
             for root, dirs, files in os.walk(self.home):
+                QtWidgets.QApplication.processEvents() # necessary to update the progress dialog
+                if time.time() - last_msg_update > 0.1:  
+                    pd.setLabelText(f'...{root[-30:]}')
+                    last_msg_update = time.time()
                 if link['name'] in files:
                     paths.append(os.path.join(root, link['name']))
-                if len(paths) > 2:
+                if pd.wasCanceled() or len(paths) > 2:
                     break
             link['filepaths'] = paths
         self.fill_table()
+        pd.close()
 
     def closeEvent(self, event):
         """ Save dialog dimensions. """
