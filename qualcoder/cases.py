@@ -386,6 +386,7 @@ class DialogCases(QtWidgets.QDialog):
         # Update attribute_type list and database
         now_date = str(datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"))
         sql = "insert into attribute_type (name,date,owner,memo,caseOrFile, valuetype) values(?,?,?,?,?,?)"
+        cur = self.app.conn.cursor()
         cur.execute(sql, (name, now_date, self.app.settings['codername'], "", 'case', value_type))
         self.app.conn.commit()
         sql = "select caseid from cases"

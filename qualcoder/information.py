@@ -119,6 +119,8 @@ default working directory, selected font and other parameters.</p>\
 <p>QualCoder is written in python3 using Qt6 for the graphical interface.</p>\
 <p>The REFI-QDA Project import and export seem to work ok, but are still experimental. </p>\
 <p>Created by Colin Curtain BPharm GradDipComp PhD, python programmer, lecturer University of Tasmania.</p>\
+<h2>Citation</h2>\
+Curtain, C. (2023) QualCoder VERSION [Computer software]. Retrieved from https://github.com/ccbogel/QualCoder/releases/tag/VERSION\
 <h2 class="western">Licenses</h2>\
 <h3>MIT License</h3>\
 <p>Copyright (c) 2023 Colin Curtain</p>\
@@ -196,7 +198,23 @@ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT<br />\
 HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,<br />\
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING<br />\
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR<br />\
-OTHER DEALINGS IN THE SOFTWARE.'
+OTHER DEALINGS IN THE SOFTWARE.\
+<h3>License for wordcloud</h3>\
+Copyright (c) 2012 Andreas Christian Mueller<br />\
+Permission is hereby granted, free of charge, to any person obtaining a copy of<br />\
+this software and associated documentation files (the "Software"), to deal in<br />\
+the Software without restriction, including without limitation the rights to<br />\
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of<br />\
+the Software, and to permit persons to whom the Software is furnished to do so,<br />\
+subject to the following conditions:<br /><br />\
+The above copyright notice and this permission notice shall be included in all<br />\
+copies or substantial portions of the Software.<br /><br />\
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR<br />\
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS<br />\
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR<br />\
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER<br />\
+IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN<br />\
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.'
 
 menu_shortcuts = '<h1>Menu key shortcuts</h1>\n\
 <table><tr><td><b>Menu shortcuts</b></td><td><b>Project menu shortcuts</b></td>\n\
@@ -277,7 +295,9 @@ V assign in vivo code to selected text<br />\
 Alt + Left arrow  Shrink coding to the left <br />\
 Alt + Right arrow Shrink coding to the right<br />\
 Shift + Left arrow Extend coding to the left<br />\
-Shift + Right arrow Extend coding to the right'
+Shift + Right arrow Extend coding to the right<br />\
+! Exclamation mark key - describes clicked text character position<br />\
+$ Dollar key - Shift all coding postiions after a clicked position by X characters (negative numbers shift left)'
 
 coding_image_shortcuts = '<h2>Code image key shortcuts</h2>\
 Ctrl 1 Next file<br />\

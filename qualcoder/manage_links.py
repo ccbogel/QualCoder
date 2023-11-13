@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2022 Colin Curtain
+Copyright (c) 2023 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -91,25 +91,24 @@ class DialogManageLinks(QtWidgets.QDialog):
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
         self.ui.tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.links = self.app.check_bad_file_links()
-        home = os.path.expanduser('~')
         for link in self.links:
-            link['filepaths'] = self.find_filepaths(home, link['name'])
+            link['filepaths'] = []
+        self.home = os.path.expanduser('~')
         self.fill_table()
+        self.ui.pushButton_search_folders.pressed.connect(self.find_filepaths)
 
-    @staticmethod
-    def find_filepaths(root_dir, filename):
+    def find_filepaths(self):
         """ Get file paths of this file name. """
 
-        paths = []
-        max_iterations = 10000 # stop searching after this many iterations to prevent the app from becoming unresponsive in a large file system
-        i = 0
-        for root, dirs, files in os.walk(root_dir):
-            if filename in files:
-                paths.append(os.path.join(root, filename))
-            i += 1
-            if i >= max_iterations:
-                break
-        return paths
+        for link in self.links:
+            paths = []
+            for root, dirs, files in os.walk(self.home):
+                if link['name'] in files:
+                    paths.append(os.path.join(root, link['name']))
+                if len(paths) > 2:
+                    break
+            link['filepaths'] = paths
+        self.fill_table()
 
     def closeEvent(self, event):
         """ Save dialog dimensions. """
@@ -155,7 +154,8 @@ class DialogManageLinks(QtWidgets.QDialog):
          Called by: file_dialog_selection, cell_selected. """
 
         new_file_name = new_file_path.split('/')[-1]
-        self.links[row]['mediapath'] = self.links[row]['mediapath'].split(':')[0] + ':' + new_file_path
+        # Use split ':',1 as can have ':' as a part of the file path
+        self.links[row]['mediapath'] = self.links[row]['mediapath'].split(':', 1)[0] + ':' + new_file_path
         cur = self.app.conn.cursor()
         sql = "update source set mediapath=? where id=?"
         cur.execute(sql, [self.links[row]['mediapath'], self.links[row]['id']])
@@ -206,7 +206,7 @@ class DialogManageLinks(QtWidgets.QDialog):
             self.ui.tableWidget.removeRow(0)
         for row, item in enumerate(self.links):
             self.ui.tableWidget.insertRow(row)
-            type_and_path = item['mediapath'].split(':')
+            type_and_path = item['mediapath'].split(':', 1)
             type_item = QtWidgets.QTableWidgetItem(type_and_path[0])
             type_item.setFlags(type_item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget.setItem(row, 0, type_item)
@@ -218,14 +218,15 @@ class DialogManageLinks(QtWidgets.QDialog):
             if not os.path.exists(type_and_path[1]):
                 path_item.setForeground(QtGui.QBrush(QtGui.QColor("Red")))
             self.ui.tableWidget.setItem(row, 2, path_item)
-            if len(item['filepaths']) > 0:
-                suggestion1 = QtWidgets.QTableWidgetItem(item['filepaths'][0])
-                suggestion1.setFlags(name_item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
-                self.ui.tableWidget.setItem(row, 3, suggestion1)
-            if len(item['filepaths']) > 1:
-                suggestion2 = QtWidgets.QTableWidgetItem(item['filepaths'][1])
-                suggestion2.setFlags(name_item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
-                self.ui.tableWidget.setItem(row, 4, suggestion2)
+            if 'filepaths' in item:
+                if len(item['filepaths']) > 0:
+                    suggestion1 = QtWidgets.QTableWidgetItem(item['filepaths'][0])
+                    suggestion1.setFlags(name_item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
+                    self.ui.tableWidget.setItem(row, 3, suggestion1)
+                if len(item['filepaths']) > 1:
+                    suggestion2 = QtWidgets.QTableWidgetItem(item['filepaths'][1])
+                    suggestion2.setFlags(name_item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
+                    self.ui.tableWidget.setItem(row, 4, suggestion2)
         self.ui.tableWidget.hideColumn(0)
         self.ui.tableWidget.resizeColumnsToContents()
         if self.ui.tableWidget.columnWidth(0) > 450:

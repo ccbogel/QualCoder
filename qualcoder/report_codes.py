@@ -25,7 +25,7 @@ Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 """
-
+import sqlite3
 from copy import deepcopy
 import csv
 import logging
@@ -48,6 +48,7 @@ from .GUI.ui_dialog_report_codings import Ui_Dialog_reportCodings
 from .helpers import Message, msecs_to_hours_mins_secs, DialogCodeInImage, DialogCodeInAV, DialogCodeInText, \
     ExportDirectoryPathDialog
 from .report_attributes import DialogSelectAttributeParameters
+from .select_items import DialogSelectItems
 
 # If VLC not installed, it will not crash
 vlc = None
@@ -134,10 +135,10 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.SelectionMode.ExtendedSelection)
         self.ui.comboBox_coders.insertItems(0, self.coders)
         self.fill_tree()
-        self.ui.pushButton_search.clicked.connect(self.search)
+        self.ui.pushButton_run_report.clicked.connect(self.search)
         pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(cogs_icon), "png")
-        self.ui.pushButton_search.setIcon(QtGui.QIcon(pm))
+        pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
+        self.ui.pushButton_run_report.setIcon(QtGui.QIcon(pm))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_icon), "png")
         self.ui.label_exports.setPixmap(pm.scaled(22, 22))
@@ -145,7 +146,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         pm.loadFromData(QtCore.QByteArray.fromBase64(attributes_icon), "png")
         self.ui.pushButton_attributeselect.setIcon(QtGui.QIcon(pm))
         pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
+        pm.loadFromData(QtCore.QByteArray.fromBase64(rate_up_icon), "png")
         self.ui.pushButton_search_next.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_search_next.pressed.connect(self.search_results_next)
         options = ["", _("Top categories by case"), _("Top categories by file"), _("Categories by case"),
@@ -2045,7 +2046,9 @@ class DialogReportCodes(QtWidgets.QDialog):
         res = cur.fetchone()
         if res is not None:
             filename = res[0]
-        head = "\n" + _("[VIEW] ")
+        head = "\n"
+        if item['result_type'] == 'text':
+            head += "[" + str(item['pos0']) + "-" + str(item['pos1']) + "] "
         head += item['codename'] + ", "
         memo_choice = self.ui.comboBox_memos.currentText()
         if memo_choice in (_("Also code memos"), _("Also all memos"), _("Only memos")) and item['codename_memo'] != "":
@@ -2120,6 +2123,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         action_view = None
         action_unmark = None
         action_important = None
+        action_change_code_to = None
         code_here = None
         for row in self.results:
             if row['textedit_start'] <= pos < row['textedit_end']:
@@ -2129,6 +2133,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             action_view = menu.addAction(_("View in context"))
             action_unmark = menu.addAction(_("Unmark"))
             action_important = menu.addAction(_("Add important mark"))
+            action_change_code_to = menu.addAction(_("Change code to"))
         action_copy = None
         if selected_text != "":
             action_copy = menu.addAction(_("Copy to clipboard"))
@@ -2151,6 +2156,8 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.unmark(code_here)
         if action == action_important:
             self.mark_important(code_here)
+        if action == action_change_code_to:
+                self.change_code_to_another_code(code_here)
         if action == action_copy:
             cb = QtWidgets.QApplication.clipboard()
             cb.setText(selected_text)
@@ -2183,6 +2190,45 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         self.app.delete_backup = False
 
+        # Remove widgets from coding layout
+        contents = self.tab_coding.layout()
+        if contents:
+            for i in reversed(range(contents.count())):
+                contents.itemAt(i).widget().close()
+                contents.itemAt(i).widget().setParent(None)
+
+    def change_code_to_another_code(self, existing_code):
+        """ Change the selected code to anther from a list. """
+
+        # Get replacement code
+        codes_list = deepcopy(self.code_names)
+        to_hide = None
+        for code_ in codes_list:
+            if code_['cid'] == existing_code['cid']:
+                to_hide = code_
+        if to_hide:
+            codes_list.remove(to_hide)
+        ui = DialogSelectItems(self.app, codes_list, _("Select replacement code"), "single")
+        ok = ui.exec()
+        if not ok:
+            return
+        replacement_code = ui.get_selected()
+        if not replacement_code:
+            return
+        cur = self.app.conn.cursor()
+        try:
+            if existing_code['result_type'] == 'text':
+                cur.execute("update code_text set cid=? where ctid=?", [replacement_code['cid'], existing_code['ctid']])
+            if existing_code['result_type'] == 'image':
+                cur.execute("update code_image set cid=? where imid=?", [replacement_code['cid'], existing_code['imid']])
+            if existing_code['result_type'] == 'av':
+                cur.execute("update code_av set cid=? where avid=?", [replacement_code['cid'], existing_code['avid']])
+            self.app.conn.commit()
+        except sqlite3.IntegrityError:
+            Message(self.app, "Cannot change code", "This is already marked with the selected code").exec()
+            return
+        Message(self.app, "Changed code", "Run report again to update display").exec()
+        self.app.delete_backup = False
         # Remove widgets from coding layout
         contents = self.tab_coding.layout()
         if contents:

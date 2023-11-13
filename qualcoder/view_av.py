@@ -493,7 +493,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         Called by: fill_tree
         param:
             item: a QTreeWidgetItem
-            list of non-expanded categories as Sring if catid:#
+            list of non-expanded categories as String if catid:#
         """
 
         child_count = item.childCount()
@@ -2765,7 +2765,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.get_coded_text_update_eventfilter_tooltips()
 
     def change_text_code_pos(self, location, start_or_end):
-        """ Change code start or end character postion in text.
+        """ Change code start or end character position in text.
         param:
             location: integer
             start_or_end: 'start' or 'end' """
@@ -4366,7 +4366,7 @@ class DialogViewAV(QtWidgets.QDialog):
         """ Stop vlc player. Set position slider to the start.
          If multiple audio tracks are shown in the combobox, set the audio track to the first index.
          This is because when beginning play again, the audio track reverts to the first track.
-         Programatically setting the audio track to other values does not work. """
+         Programmatically setting the audio track to other values does not work. """
 
         self.mediaplayer.stop()
         pm = QtGui.QPixmap()

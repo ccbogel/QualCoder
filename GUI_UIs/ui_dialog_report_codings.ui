@@ -43,17 +43,17 @@
      <widget class="QLineEdit" name="lineEdit">
       <property name="geometry">
        <rect>
-        <x>240</x>
+        <x>200</x>
         <y>45</y>
         <width>183</width>
         <height>30</height>
        </rect>
       </property>
      </widget>
-     <widget class="QLabel" name="label">
+     <widget class="QLabel" name="label_text_limiter">
       <property name="geometry">
        <rect>
-        <x>240</x>
+        <x>200</x>
         <y>21</y>
         <width>183</width>
         <height>22</height>
@@ -66,23 +66,23 @@
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_search">
+     <widget class="QPushButton" name="pushButton_run_report">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>81</y>
-        <width>30</width>
-        <height>30</height>
+        <x>543</x>
+        <y>34</y>
+        <width>51</width>
+        <height>51</height>
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Run report&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
       </property>
      </widget>
-     <widget class="QLabel" name="label_2">
+     <widget class="QLabel" name="label_coder">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -100,7 +100,7 @@
        <rect>
         <x>10</x>
         <y>45</y>
-        <width>211</width>
+        <width>181</width>
         <height>30</height>
        </rect>
       </property>
@@ -108,10 +108,10 @@
      <widget class="QPushButton" name="pushButton_attributeselect">
       <property name="geometry">
        <rect>
-        <x>150</x>
-        <y>82</y>
+        <x>120</x>
+        <y>80</y>
         <width>34</width>
-        <height>30</height>
+        <height>32</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -193,7 +193,7 @@
      <widget class="QComboBox" name="comboBox_matrix">
       <property name="geometry">
        <rect>
-        <x>610</x>
+        <x>617</x>
         <y>25</y>
         <width>281</width>
         <height>29</height>
@@ -206,9 +206,9 @@
      <widget class="QCheckBox" name="checkBox_important">
       <property name="geometry">
        <rect>
-        <x>430</x>
-        <y>18</y>
-        <width>161</width>
+        <x>390</x>
+        <y>13</y>
+        <width>141</width>
         <height>26</height>
        </rect>
       </property>
@@ -222,7 +222,7 @@
      <widget class="QComboBox" name="comboBox_memos">
       <property name="geometry">
        <rect>
-        <x>240</x>
+        <x>200</x>
         <y>81</y>
         <width>181</width>
         <height>30</height>
@@ -235,7 +235,7 @@
      <widget class="QLabel" name="label_memos">
       <property name="geometry">
        <rect>
-        <x>205</x>
+        <x>170</x>
         <y>81</y>
         <width>28</width>
         <height>28</height>
@@ -251,9 +251,9 @@
      <widget class="QCheckBox" name="checkBox_show_stats">
       <property name="geometry">
        <rect>
-        <x>430</x>
-        <y>51</y>
-        <width>161</width>
+        <x>390</x>
+        <y>46</y>
+        <width>141</width>
         <height>26</height>
        </rect>
       </property>
@@ -267,7 +267,7 @@
      <widget class="QCheckBox" name="checkBox_matrix_transpose">
       <property name="geometry">
        <rect>
-        <x>613</x>
+        <x>620</x>
         <y>-1</y>
         <width>231</width>
         <height>24</height>
@@ -280,9 +280,9 @@
      <widget class="QCheckBox" name="checkBox_text_context">
       <property name="geometry">
        <rect>
-        <x>430</x>
-        <y>85</y>
-        <width>161</width>
+        <x>390</x>
+        <y>80</y>
+        <width>141</width>
         <height>26</height>
        </rect>
       </property>
@@ -296,7 +296,7 @@
      <widget class="QLineEdit" name="lineEdit_search_results">
       <property name="geometry">
        <rect>
-        <x>610</x>
+        <x>617</x>
         <y>85</y>
         <width>161</width>
         <height>30</height>
@@ -309,7 +309,7 @@
      <widget class="QLabel" name="label_search_results">
       <property name="geometry">
        <rect>
-        <x>610</x>
+        <x>617</x>
         <y>58</y>
         <width>101</width>
         <height>22</height>
@@ -328,7 +328,7 @@
      <widget class="QPushButton" name="pushButton_search_next">
       <property name="geometry">
        <rect>
-        <x>778</x>
+        <x>780</x>
         <y>85</y>
         <width>34</width>
         <height>30</height>
@@ -344,9 +344,9 @@
      <widget class="QComboBox" name="comboBox_sort">
       <property name="geometry">
        <rect>
-        <x>50</x>
+        <x>10</x>
         <y>81</y>
-        <width>91</width>
+        <width>101</width>
         <height>30</height>
        </rect>
       </property>
@@ -438,7 +438,7 @@
  <tabstops>
   <tabstop>comboBox_coders</tabstop>
   <tabstop>lineEdit</tabstop>
-  <tabstop>pushButton_search</tabstop>
+  <tabstop>pushButton_run_report</tabstop>
   <tabstop>comboBox_sort</tabstop>
   <tabstop>pushButton_attributeselect</tabstop>
   <tabstop>comboBox_memos</tabstop>

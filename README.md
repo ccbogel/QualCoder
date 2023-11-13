@@ -1,14 +1,14 @@
 <img src="https://github.com/ccbogel/QualCoder/blob/master/qualcoder.png" width=200 height=200>
 
 # QualCoder
-QualCoder is a qualitative data analysis application written in python3 and Qt6.
+QualCoder is a qualitative data analysis application written in Python.
 
-Text files can be typed in manually or loaded from txt, odt, docx, html, htm, md, epub and  pdf files. Images, video and audio can also be imported for coding. Codes can be assigned to text, images and a/v selections and grouped into categories in hierarchical fashion. Various types of reports can be produced including visual coding graphs, word clouds, coder comparisons and coding frequencies.
+Text files can be typed in manually or loaded from txt, odt, docx, html, htm, md, epub, and  PDF files. Images, video, and audio can also be imported for coding. Codes can be assigned to text, images, and a/v selections and grouped into categories in a hierarchical fashion. Various types of reports can be produced including visual coding graphs, coder comparisons, and coding frequencies.
 
-This project has been tested under Ubuntu 22.04 and Windows 10/11. It has been used on MacOS and various Linux distros.
+This software has been used on MacOS and various Linux distros.
 Instructions and other information are available here: https://qualcoder.wordpress.com/ and on the [Github Wiki](https://github.com/ccbogel/QualCoder/wiki).
 
-It is best to download the Current Release from the Releases page, see the Releases link in the right hand column on this page.
+It is best to download the Current Release from the Releases page, see the Releases link in the right-hand column on this page.
 
 If you like QualCoder please buy me a coffee ...
 
@@ -19,53 +19,57 @@ If you like QualCoder please buy me a coffee ...
 
 ### Prerequisites
 Optional: VLC for audio/video coding. 
-Optional: ffmpeg installed for speech to text and waveform image see here to install ffmpeg on Windows:  https://phoenixnap.com/kb/ffmpeg-windows. 
+Optional: ffmpeg installed for speech-to-text and waveform image see here to install ffmpeg on Windows:  https://phoenixnap.com/kb/ffmpeg-windows. 
 
-For installing from source you will need to have python 3.8 or a newer version installed.
+For installing from source you will need to have Python 3.8 or a newer version installed.
 
 ### Windows
 
 **Use the exe**
 
-Newer releases contain an exe file (created on Windows 10, 64 bit). Double-click to run. Look for the Releases link on the right hand side of this page. I have had feedback of one instance on Windows where an anti-virus affected the importing and moving of files by QualCoder (AVG). 
+Newer releases contain an exe file (created on Windows 10, 64-bit). Double-click to run. Look for the Releases link on the right-hand side of this page. I have had feedback on one instance on Windows where an anti-virus affected the importing and moving of files by QualCoder (AVG). 
 An online virus testing site www.virustotal.com indicated 2 vendors out of many detected a potential problem due to their detection methods (false positives), 5 March 2022. Always check the MD5 checksum on downloading the exe. I have not got the exe Microsoft certified (I am not sure of the processes or cost involved).
-If you are uncomfortable with these warnings install from source as detailed next.
+If you are uncomfortable with these warnings install from the source as detailed next.
 
-**Alternatively install from source:**
+**Alternatively, install from source:**
 
-Seriously consider using a virtual environment (commands in point 6 below). Not using a virtual environment may affect other python software you may have installed.
+Seriously consider using a virtual environment (commands in point 6 below). Not using a virtual environment may affect other Python software you may have installed.
 
-1. Download and install the Python programming language. The minimum version for QualCoder is 3.8. I recommend 3.10 for now.  [Python3](https://www.python.org/downloads/). Download the file (at the bottom of the web site) "Windows installer (64-bit)"
+1. Download and install the Python programming language. The minimum version for QualCoder is 3.8. I recommend 3.10 for now.  [Python3](https://www.python.org/downloads/). Download the file (at the bottom of the website) "Windows installer (64-bit)"
 
 IMPORTANT: in the first window of the installation mark the option "Add Python to PATH"
 
-2.  Download the QualCoder software from: https://github.com/ccbogel/QualCoder from the Green Code button. This is the newest, but not yet officially released code (occasionally coding errors creep in).  Click the green button "Code", and then "Download ZIP". **Alternatively**, choose the most recent release zip, see right hand side of this page for the link to Releases.
+2.  Download the QualCoder software from: https://github.com/ccbogel/QualCoder from the Green Code button. This is the newest, but not yet officially released code (occasionally coding errors creep in).  Click the green button "Code", and then "Download ZIP". **Alternatively**, choose the most recent release zip, see the right-hand side of this page for the link to Releases.
 
-3.    Unzip the folder to a location (e.g. downloads). (Tip, remove the doubled up folder extraction QualCoder-master\QualCoder-master when asked where to extract. Just QualCoder-master). 
+3.    Unzip the folder to a location (e.g. downloads). (Tip, remove the doubled-up folder extraction QualCoder-master\QualCoder-master when asked where to extract. Just QualCoder-master). 
 
 4. Use the Windows command prompt. Type "cmd" in the Windows Start search engine, and click on the black software "cmd.exe" - the command console for Windows. In the console type or paste, using the right-click mouse copy and paste (ctrl+v does not work)
 
-5. In the command prompt, move (using the `cd` command) into the QualCoder folder. You should be inside the QualCoder-master folder or if using a release (the Qualcoder-3.3 folder). e.g. 
+5. In the command prompt, move (using the `cd` command) into the QualCoder folder. You should be inside the QualCoder-master folder or if using a release (the Qualcoder-3.4 folder). e.g. 
 
-`cd Downloads\QualCoder-master`
+```bash
+cd Downloads\QualCoder-master
+```
 
 6. Install and activate the virtual environment. This step can be skipped, but I recommend you do not skip it.
 
-`pip install virtualenv`
+When not using a docker container, we recommend using a virtual environment to install packages. This will ensure that the dependencies for QualCoder are isolated from the rest of your system.
 
-Create a virtual environment called env.
+```bash
+py -m venv env
+env\Scripts\activate
+```
 
-`virtualenv env`
-
-Activate the virtual environment, this changes the command prompt display using (brackets): (env) 
-
-`env\Scripts\activate.bat`
 
 7. Install python modules. Type the following:
 
-`py -m pip install --upgrade pip`
+```bash
+py -m pip install --upgrade pip
+```
 
-`py -m pip install wheel pyqt6 chardet ebooklib openpyxl Pillow ply pdfminer.six pandas plotly pydub python-vlc rispy SpeechRecognition wordcloud xmlschema`
+```bash
+py -m pip install wheel pyqt6 chardet ebooklib openpyxl Pillow ply pdfminer.six pandas plotly pydub python-vlc rispy SpeechRecognition wordcloud xmlschema
+```
 
  For the AI-integration:
 
@@ -75,25 +79,29 @@ Activate the virtual environment, this changes the command prompt display using 
 
  Note: on some Windows computers, you may have to type `python3` instead of `py` as `py` may not be recognised.
  
-8. Install Qualcoder, from the downloaded folder type
+8. Install Qualcoder, from the downloaded folder and type
 
-`py -m pip install .`
+```bash
+py -m pip install .
+```
 
-The `py` command uses the most recent installed version of python. You can use a specific version on your Windows, if you have many python versions installed, e.g. `py -3.10`  See discussion here: [Difference between py and python](https://stackoverflow.com/questions/50896496/what-is-the-difference-between-py-and-python-in-the-terminal)
+The `py` command uses the most recent installed version of Python. You can use a specific version on your Windows if you have many Python versions installed, e.g. `py -3.10`  See discussion here: [Difference between py and python](https://stackoverflow.com/questions/50896496/what-is-the-difference-between-py-and-python-in-the-terminal)
 
 9. Run QualCoder from the command prompt
 
-`py -m qualcoder`
+```bash
+py -m qualcoder
+```
 
 10. If running QualCoder in a virtual environment, to exit the virtual environment type:
 
 `deactivate`
 
-The command prompt will then remomove the  *(env)* wording.
+The command prompt will then remove the  *(env)* wording.
 
 **To start QualCoder again**
 
-If you are not using virtual environment, as long as you are in the same drive letter, eg C:
+If you are not using a virtual environment, as long as you are in the same drive letter, eg C:
 
 `py -m qualcoder`
 
@@ -107,7 +115,8 @@ If you are using a virtual environment:
 
 ### Debian/Ubuntu Linux
 
-It is best to run QualCoder inside a python virtual environment, so that the system installed python modules do not clash and cause problems. If you are using the alternative Ubuntu Desktop manager **Xfce** you may need to run this: `sudo apt install libxcb-cursor0`
+There is an executable file (double-click to run) for Ubuntu 22 in the 3.4 release. Alternatively, install from source code below.
+It is best to run QualCoder inside a Python virtual environment so that the system-installed python modules do not clash and cause problems. If you are using the alternative Ubuntu Desktop manager **Xfce** you may need to run this: `sudo apt install libxcb-cursor0`
 
 1. Recommend that you install vlc (download from site) or:
 
@@ -135,15 +144,15 @@ Note: To exit venv type `deactivate`
 
 `source qualcoder/bin/activate`
 
-5. Update pip so that it installs the most recent python packages.
+5. Update pip so that it installs the most recent Python packages.
 
 `pip install --upgrade pip`
 
-6. Install the needed python modules.
+6. Install the needed Python modules.
 
 `pip install chardet ebooklib ply openpyxl pandas pdfminer pyqt6 pillow pdfminer.six plotly pydub python-vlc rispy six SpeechRecognition wordcloud xmlschema`
 
-7. Install QualCoder, type the following, the dot is important:
+7. Install QualCoder, and type the following, the dot is important:
 
 `python3 -m pip install .`
 
@@ -163,7 +172,7 @@ Then type
 
 ### Arch/Manjaro Linux
 
-Not tested, but please see the above instructions to build QualCoder inside a virtual environment. The below installation instructions may affect system installed python modules.
+It has not been tested, but please see the above instructions to build QualCoder inside a virtual environment. The below installation instructions may affect system-installed python modules.
 
 1. Install modules from the command line
 
@@ -173,7 +182,7 @@ Not tested, but please see the above instructions to build QualCoder inside a vi
 
 `sudo python3 -m pip install ebooklib plotly pydub python-vlc rispy SpeechRecognition wordcloud xmlschema`
 
-If success, all requirements are satisfied.
+If successful, all requirements are satisfied.
 
 3. Build and install QualCoder, from the downloaded folder type
 
@@ -189,7 +198,7 @@ Or install from AUR as follows:
 
 ### Fedora/CentOS/RHEL linux
 
-Not tested, but please see the above instructions to build QualCoder inside a virtual environment. The below installation instructions may affect system installed python modules.
+It has not been tested, but please see the above instructions to build QualCoder inside a virtual environment. The below installation instructions may affect system-installed Python modules.
 
 Retrieve the current package code from this repository
 
@@ -198,17 +207,17 @@ Retrieve the current package code from this repository
 3. There, run: `git clone https://github.com/ccbogel/QualCoder.git` and
 4. enter the directory with `cd QualCoder`
 5. Make `install_fedora.sh` executable (`chmod +x install_fedora.sh`) and
-6. run the `./install_fedora.sh` script from the terminal. The script is for python version 3.11.
+6. run the `./install_fedora.sh` script from the terminal. The script is for Python version 3.11.
 
 Then start QualCoder as any other app on your system.
 
 Note 1_ This script installs the dependencies using dnf and the ebook libraries with a work-around, specified at https://github.com/ccbogel/QualCoder/issues/72#issuecomment-695962784.
 
-Note 2: Fedora uses wayland with does not work well with the Qt graphical interface (for now). I suggest you also install xwayland.
+Note 2: Fedora uses Wayland which does not work well with the Qt graphical interface (for now). I suggest you also install Xwayland.
 
 ### MacOS
 
-The instructions work on Mac Monterey. It is recommended to use a virtual environment, see: https://sourabhbajaj.com/mac-setup/Python/virtualenv.html The below instructions can be used inside a virtual environment folder instead of placing in Applications.
+The instructions work on Mac Monterey. It is recommended to use a virtual environment, see: https://sourabhbajaj.com/mac-setup/Python/virtualenv.html The below instructions can be used inside a virtual environment folder instead of placed in Applications.
 
 You will need to install developer tools for macOS. [See https://www.cnet.com/tech/computing/install-command-line-developer-tools-in-os-x/](https://www.cnet.com/tech/computing/install-command-line-developer-tools-in-os-x/)
 
@@ -289,7 +298,7 @@ Open the Terminal App and move to the unzipped Qualcoder-Master directory, then 
 ## Dependencies
 Required:
 
-Python 3.8+ version, pyqt6, Pillow, six  (Mac OS), ebooklib, ply, chardet, pdfminer.six, openpyxl, pandas, plotly, pydub, python-vlc, rispy, SpeechRecognition, qpdf  (Linux for programatically applying pdf decryption for pdfs with blank password)
+Python 3.8+ version, pyqt6, Pillow, six  (Mac OS), ebooklib, ply, chardet, pdfminer.six, openpyxl, pandas, plotly, pydub, python-vlc, rispy, SpeechRecognition, wordcloud, xmlschema
 
 ## License
 QualCoder is distributed under the MIT LICENSE.
@@ -301,7 +310,7 @@ https://github.com/ccbogel/QualCoder/releases/tag/3.4
 
 ## Creator
 
-Dr Colin Curtain BPharm GradDipComp PhD. Pharmacy lecturer at the University of Tasmania. I obtained a Graduate Diploma in Computing in 2011. I have developed my python programming skills from this time onwards. The QualCoder project originated from my use of RQDA during my PhD - *Evaluation of clinical decision support provided by medication review software*. My original and now completely deprecated PyQDA software on PyPI was my first attempt at creating qualitative software. The reason for creating the software was that during my PhD RQDA did not always install or work well for me, but I did realise that I could use the same sqlite database and access it with python. The current database is different to the older RQDA version. This is an ongoing hobby project, perhaps a labour of love, which I do utilise with some of the Masters and PhD students I supervise. I do most of my programming on Ubuntu using the PyCharm editor, and I do a small amount of testing on WIndows. I do not have a mac or other operating systems to check how well the software works regards installation and usage.
+Dr. Colin Curtain BPharm GradDipComp Ph.D. Pharmacy lecturer at the University of Tasmania. I obtained a Graduate Diploma in Computing in 2011. I have developed my Python programming skills from this time onwards. The QualCoder project originated from my use of RQDA during my PhD - *Evaluation of clinical decision support provided by medication review software*. My original and now completely deprecated PyQDA software on PyPI was my first attempt at creating qualitative software. The reason for creating the software was that during my PhD RQDA did not always install or work well for me, but I did realise that I could use the same SQLite database and access it with Python. The current database is different from the older RQDA version. This is an ongoing hobby project, perhaps a labour of love, which I utilize with some of the Masters's and Ph.D. students I supervise. I do most of my programming on Ubuntu using the PyCharm editor, and I do a small amount of testing on Windows. I do not have a Mac or other operating system to check how well the software works regards installation and usage.
 
 https://www.utas.edu.au/profiles/staff/umore/colin-curtain
 
@@ -309,20 +318,18 @@ https://scholar.google.com/citations?user=KTMRMWoAAAAJ&hl=en
 
 
 ## Leave a review
-If you like QualCoder and found it useful for your work. Please leave a review on these sites:
+If you like QualCoder and find it useful for your work. Please leave a review on these sites:
 
 https://www.saashub.com/qualcoder-alternatives
 
 https://alternativeto.net/software/qualcoder
 
-Also, if you like Qualcoder a lot and want to advertise interst in it's use, please write an article about your experience using QualCoder.
-
+Also, if you like Qualcoder a lot and want to advertise interest in its use, please write an article about your experience using QualCoder.
 ## FaceBook group:
 To allow everyone to discuss all things QualCoder.
 
-FaceBook page:
+Facebook page:
 [https://www.facebook.com/qualcoder](https://www.facebook.com/qualcoder)
 
-FaceBook group:
+Facebook group:
 [https://www.facebook.com/groups/1251478525589873](https://www.facebook.com/groups/1251478525589873)
-

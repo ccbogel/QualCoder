@@ -90,7 +90,7 @@ try:
 except Exception as e:
     print(e)
 
-qualcoder_version = "QualCoder 3.4"
+qualcoder_version = "QualCoder 3.5"
 
 path = os.path.abspath(os.path.dirname(__file__))
 home = os.path.expanduser('~')
@@ -2137,6 +2137,29 @@ class MainWindow(QtWidgets.QMainWindow):
         # AI: init and update vectorstore
         if self.app.settings['ai_enable'] == 'True':
             self.app.sources_vectorstore.init_vectorstore()
+
+        # Fix missing folders within QualCoder project. Will cause import errors.
+        span = '<span style="color:red">'
+        end_span = "</span>"
+        missing_folders = False
+        if not os.path.exists(os.path.join(self.app.project_path, "documents")):
+            os.makedirs(os.path.join(self.app.project_path, "documents"))
+            self.ui.textEdit.append(f"{span}No documents folder. Created empty folder{end_span}")
+            missing_folders = True
+        if not os.path.exists(os.path.join(self.app.project_path, "audio")):
+            os.makedirs(os.path.join(self.app.project_path, "audio"))
+            self.ui.textEdit.append(f"{span}No audio folder. Created empty folder{end_span}")
+            missing_folders = True
+        if not os.path.exists(os.path.join(self.app.project_path, "images")):
+            os.makedirs(os.path.join(self.app.project_path, "images"))
+            self.ui.textEdit.append(f"{span}No images folder. Created empty folder{end_span}")
+            missing_folders = True
+        if not os.path.exists(os.path.join(self.app.project_path, "video")):
+            os.makedirs(os.path.join(self.app.project_path, "video"))
+            self.ui.textEdit.append(f"{span}No video folder. Created empty folder{end_span}")
+            missing_folders = True
+        if missing_folders:
+            Message(self.app,_("Warning"), _("QualCoder project missing folders. Created empty folders")).exec()
 
     def save_backup(self):
         """ Save a date and hours stamped backup.

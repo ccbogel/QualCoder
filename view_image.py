@@ -1895,8 +1895,8 @@ class DialogViewImage(QtWidgets.QDialog):
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
         abs_path = ""
-        if "images:" in self.image_data['mediapath']:
-            abs_path = self.image_data['mediapath'].split(':')[1]
+        if self.image_data['mediapath'][:7] == "images:":
+            abs_path = self.image_data['mediapath'][7:]
         else:
             abs_path = self.app.project_path + self.image_data['mediapath']
         self.setWindowTitle(abs_path)
