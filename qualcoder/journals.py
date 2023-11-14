@@ -599,9 +599,8 @@ class DialogJournals(QtWidgets.QDialog):
         ''' https://stackoverflow.com/questions/39422573/python-writing-weird-unicode-to-csv
         Using a byte order mark so that other software recognises UTF-8
         '''
-        f = open(filepath, 'w', encoding='utf-8-sig')
-        f.write(text_)
-        f.close()
+        with open(filepath, 'w', encoding='utf-8-sig') as outfile:
+            outfile.write(text_)
         msg = _("Collated journals exported as text file to: ") + filepath
         self.parent_text_edit.append(msg)
         Message(self.app, _("Journals exported"), msg).exec()
