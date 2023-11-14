@@ -186,6 +186,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.textEdit.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.textEdit.customContextMenuRequested.connect(self.text_edit_menu)
         self.ui.textEdit.cursorPositionChanged.connect(self.overlapping_codes_in_text)
+        self.ui.textEdit_info.setReadOnly(True)
         self.ui.listWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.listWidget.customContextMenuRequested.connect(self.file_menu)
         self.ui.listWidget.setStyleSheet(tree_font)
@@ -270,18 +271,12 @@ class DialogCodeText(QtWidgets.QWidget):
         pm.loadFromData(QtCore.QByteArray.fromBase64(coding_icon), "png")
         self.ui.pushButton_code_rule.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_code_rule.pressed.connect(self.show_code_rule)
-        '''pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(journal_icon), "png")
-        self.ui.pushButton_journal.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_journal.pressed.connect(self.show_journal)'''
         self.ui.pushButton_journal.hide()
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(project_icon), "png")
         self.ui.pushButton_project_memo.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_project_memo.pressed.connect(self.show_project_memo)
         self.ui.textEdit_info.tabChangesFocus()
-        self.ui.textEdit_info.textChanged.connect(self.rhs_splitter_text_changed)
-
         self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
         self.ui.lineEdit_search.setEnabled(False)
         self.ui.checkBox_search_all_files.stateChanged.connect(self.search_for_text)
@@ -755,36 +750,6 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.textEdit_info.blockSignals(True)
         self.ui.textEdit_info.setText(txt)
 
-    '''def show_journal(self):
-        """ Show journal text in right-hand side splitter pane. 
-        TODO a risk of losing the journal entry text. """
-
-        journals = self.app.get_journal_texts()
-        if not journals:
-            self.journal_entry = False
-            return
-        # Remove Dialog Journals from tab_layout - journal information clash may occur.
-        contents = self.tab_manage.layout()
-        if contents:
-            for i in reversed(range(contents.count())):
-                c = contents.itemAt(i).widget()
-                if isinstance(c, DialogJournals):
-                    print("JJJJ")
-                    # Remove widgets from layout
-                    for i in reversed(range(contents.count())):
-                        contents.itemAt(i).widget().close()
-                        contents.itemAt(i).widget().setParent(None)
-        self.project_memo = False
-        self.code_rule = False
-        for j in journals:
-            print(j)
-        self.journal_entry = journals[0]
-        self.ui.label_info.setText(self.journal_entry['name'])
-        self.ui.textEdit_info.setReadOnly(False)
-        self.ui.textEdit_info.blockSignals(True)
-        self.ui.textEdit_info.setText(self.journal_entry['jentry'])
-        self.ui.textEdit_info.blockSignals(False)'''
-
     def show_project_memo(self):
         """ Show project memo in right-hand side splitter pane """
 
@@ -795,29 +760,7 @@ class DialogCodeText(QtWidgets.QWidget):
         #self.journal_entry = False
         self.code_rule = False
         self.ui.label_info.setText(_("Project memo"))
-
-        self.ui.textEdit_info.setReadOnly(False)
-        self.ui.textEdit_info.blockSignals(True)
         self.ui.textEdit_info.setText(res[0])
-        self.ui.textEdit_info.blockSignals(False)
-
-    def rhs_splitter_text_changed(self):
-        """ Database is updated as text is changed in textEdit_info.
-        Text is updated for the overall project memo.
-        """
-
-        if self.code_rule:
-            return
-        cur = self.app.conn.cursor()
-        txt = self.ui.textEdit_info.toPlainText()
-        '''if self.journal_entry is not False:
-            now_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
-            cur.execute("update journal set jentry=?, date=?, owner=? where jid=?",
-                        [txt, now_date, self.app.settings['codername'], self.journal_entry['jid']])'''
-        if self.project_memo is True:
-            cur.execute("update project set memo=?", [txt])
-        self.app.conn.commit()
-        self.app.delete_backup = False
 
     # Header section widgets
     def delete_all_codes_from_file(self):
@@ -841,7 +784,7 @@ class DialogCodeText(QtWidgets.QWidget):
 
     # Search for text methods
     def search_for_text(self):
-        """ On text changed in lineEdit_search OR Enter pressed, find indices of matching text.
+        """ On Enter pressed, find indices of matching text.
         Resets current search_index.
         If all files is checked then searches for all matching text across all text files
         and displays the file text and current position to user.
@@ -857,6 +800,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.search_index = -1
         self.search_term = self.ui.lineEdit_search.text()
         if len(self.search_term) < 3:
+            self.ui.label_search_totals.setText("")
             return
         self.ui.label_search_totals.setText("0 / 0")
         pattern = None
@@ -898,7 +842,36 @@ class DialogCodeText(QtWidgets.QWidget):
         if len(self.search_indices) > 0:
             self.ui.pushButton_next.setEnabled(True)
             self.ui.pushButton_previous.setEnabled(True)
-        self.ui.label_search_totals.setText("0 / " + str(len(self.search_indices)))
+        self.ui.label_search_totals.setText(f"0 / {len(self.search_indices)}")
+
+    def move_to_next_search_text(self):
+        """ Push button pressed to move to next search text position. """
+
+        if self.file_ is None or self.search_indices == []:
+            return
+        self.search_index += 1
+        if self.search_index >= len(self.search_indices):
+            self.search_index = 0
+        cursor = self.ui.textEdit.textCursor()
+        next_result = self.search_indices[self.search_index]
+        # next_result is a tuple containing a dictionary of
+        # ({name, id, fullltext, memo, owner, date}, char position, search string length)
+        if self.file_ is None or self.file_['id'] != next_result[0]['id']:
+            for x in range(self.ui.listWidget.count()):
+                if self.ui.listWidget.item(x).text() == next_result[0]['name']:
+                    self.ui.listWidget.blockSignals(True)
+                    self.ui.listWidget.setCurrentRow(x)
+                    self.ui.listWidget.blockSignals(False)
+            self.load_file(next_result[0])
+            self.ui.lineEdit_search.setText(self.search_term)
+        cursor.setPosition(cursor.position() + next_result[2])
+        self.ui.textEdit.setTextCursor(cursor)
+
+        # Highlight selected text
+        cursor.setPosition(next_result[1])
+        cursor.setPosition(cursor.position() + next_result[2], QtGui.QTextCursor.MoveMode.KeepAnchor)
+        self.ui.textEdit.setTextCursor(cursor)
+        self.ui.label_search_totals.setText(f"{self.search_index + 1} / {len(self.search_indices)}")
 
     def move_to_previous_search_text(self):
         """ Push button pressed to move to previous search text position. """
@@ -918,31 +891,7 @@ class DialogCodeText(QtWidgets.QWidget):
         cursor.setPosition(prev_result[1])
         cursor.setPosition(cursor.position() + prev_result[2], QtGui.QTextCursor.MoveMode.KeepAnchor)
         self.ui.textEdit.setTextCursor(cursor)
-        self.ui.label_search_totals.setText(str(self.search_index + 1) + " / " + str(len(self.search_indices)))
-
-    def move_to_next_search_text(self):
-        """ Push button pressed to move to next search text position. """
-
-        if self.file_ is None or self.search_indices == []:
-            return
-        self.search_index += 1
-        if self.search_index == len(self.search_indices):
-            self.search_index = 0
-        cursor = self.ui.textEdit.textCursor()
-        next_result = self.search_indices[self.search_index]
-        # next_result is a tuple containing a dictionary of
-        # (name, id, fullltext, memo, owner, date) and char position and search string length
-        if self.file_ is None or self.file_['id'] != next_result[0]['id']:
-            self.load_file(next_result[0])
-            self.ui.lineEdit_search.setText(self.search_term)
-        cursor.setPosition(cursor.position() + next_result[2])
-        self.ui.textEdit.setTextCursor(cursor)
-
-        # Highlight selected text
-        cursor.setPosition(next_result[1])
-        cursor.setPosition(cursor.position() + next_result[2], QtGui.QTextCursor.MoveMode.KeepAnchor)
-        self.ui.textEdit.setTextCursor(cursor)
-        self.ui.label_search_totals.setText(str(self.search_index + 1) + " / " + str(len(self.search_indices)))
+        self.ui.label_search_totals.setText(f"{self.search_index + 1} / {len(self.search_indices)}")
 
     '''def lineedit_search_menu(self, position):
         """ Option to change from automatic search on 3 characters or more to press Enter to search """
@@ -1848,10 +1797,10 @@ class DialogCodeText(QtWidgets.QWidget):
         if key == QtCore.Qt.Key.Key_S and self.file_ is not None:
             if selected_text == "":
                 self.ui.lineEdit_search.setFocus()
-            else:
+            '''else:
                 self.ui.lineEdit_search.setText(selected_text)
                 self.search_for_text()
-                self.ui.pushButton_next.setFocus()
+                self.ui.pushButton_next.setFocus()'''
 
     def highlight_selected_overlap(self):
         """ Highlight the current overlapping text code, by placing formatting on top. """
@@ -2274,7 +2223,6 @@ class DialogCodeText(QtWidgets.QWidget):
 
         DialogCodeInAllFiles(self.app, code_dict)
         self.get_coded_text_update_eventfilter_tooltips()
-        #self.load_file(self.file_)
 
     def item_moved_update_data(self, item, parent):
         """ Called from drop event in treeWidget view port.
@@ -3026,10 +2974,12 @@ class DialogCodeText(QtWidgets.QWidget):
 
         if file_ is None:
             return
+        self.ui.listWidget.blockSignals(True)
         for x in range(self.ui.listWidget.count()):
             if self.ui.listWidget.item(x).text() == file_['name']:
-                self.ui.listWidget.item(x).setSelected(True)
-
+                self.ui.listWidget.setCurrentRow(x)
+                break
+        self.ui.listWidget.blockSignals(False)
         self.file_ = file_
         if "start" not in self.file_:
             self.file_['start'] = 0
@@ -3052,7 +3002,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.lineEdit_search.setEnabled(True)
         self.ui.checkBox_search_case.setEnabled(True)
         self.ui.checkBox_search_all_files.setEnabled(True)
-        self.search_for_text()
+        #self.search_for_text()
 
     def get_coded_text_update_eventfilter_tooltips(self):
         """ Called by load_file, and from other dialogs on update.
