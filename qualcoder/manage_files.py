@@ -54,7 +54,7 @@ from .code_text import DialogCodeText  # for isinstance()
 from .confirm_delete import DialogConfirmDelete
 from .docx import opendocx, getdocumenttext
 from .edit_textfile import DialogEditTextFile
-from .helpers import ExportDirectoryPathDialog, Message, msecs_to_hours_mins_secs, get_documents_folder
+from .helpers import ExportDirectoryPathDialog, Message, msecs_to_hours_mins_secs
 from .html_parser import *
 from .memo import DialogMemo
 from .report_codes import DialogReportCodes  # for isInstance()
@@ -109,7 +109,7 @@ class DialogManageFiles(QtWidgets.QDialog):
     CASE_COLUMN = 4
     ATTRIBUTE_START_COLUMN = 5
     rows_hidden = False
-    default_import_directory = get_documents_folder()  # os.path.expanduser("~")
+    default_import_directory = os.path.expanduser("~")
     attribute_names = []  # list of dictionary name:value for AddAtribute dialog
     attribute_labels_ordered = []  # helps with filling table data
     av_dialog_open = None  # Used for opened AV dialog

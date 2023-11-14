@@ -121,17 +121,6 @@ def file_typer(mediapath):
         return "video"
     return "text"
 
-def get_documents_folder():
-    if platform.system() == 'Windows':
-        # Get the path to the Documents folder using SHGetFolderPath
-        CSIDL_PERSONAL = 5       # My Documents
-        SHGFP_TYPE_CURRENT = 0   # Want current, not default value
-        buf= ctypes.create_unicode_buffer(ctypes.wintypes.MAX_PATH)
-        ctypes.windll.shell32.SHGetFolderPathW(0, CSIDL_PERSONAL, 0, SHGFP_TYPE_CURRENT, buf)
-        return buf.value
-    else:
-        return os.path.expanduser('~')
-
 
 class Message(QtWidgets.QMessageBox):
     """ This is called a lot , but is styled to font size """
