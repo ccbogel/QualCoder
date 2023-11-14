@@ -2111,7 +2111,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.textEdit.append(f"{span}No video folder. Created empty folder{end_span}")
             missing_folders = True
         if missing_folders:
-            Message(self.app,_("Warning"), _("QualCoder project missing folders. Created empty folders")).exec()
+            Message(self.app,_("Information"), _("QualCoder project missing folders. Created empty folders")).exec()
 
     def save_backup(self):
         """ Save a date and hours stamped backup.
