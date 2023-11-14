@@ -33,7 +33,7 @@ import logging
 import traceback
 
 from .GUI.ui_dialog_settings import Ui_Dialog_settings
-from .helpers import Message
+from .helpers import Message, get_documents_folder
 
 home = os.path.expanduser('~')
 path = os.path.abspath(os.path.dirname(__file__))
@@ -133,7 +133,7 @@ class DialogSettings(QtWidgets.QDialog):
             self.ui.checkBox_backup_AV_files.setChecked(False)
         self.ui.spinBox_backups.setValue(self.settings['backup_num'])
         if self.settings['directory'] == "":
-            self.settings['directory'] = os.path.expanduser("~")
+            self.settings['directory'] = get_documents_folder()  # os.path.expanduser("~")
         self.ui.label_directory.setText(self.settings['directory'])
         text_styles = [_('Bold'), _('Italic'), _('Bigger')]
         self.ui.comboBox_text_style.addItems(text_styles)

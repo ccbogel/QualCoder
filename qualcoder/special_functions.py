@@ -36,7 +36,7 @@ from .code_text import DialogCodeText  # for isinstance()
 from .confirm_delete import DialogConfirmDelete
 from .GUI.base64_helper import *
 from .GUI.ui_special_functions import Ui_Dialog_special_functions
-from .helpers import Message
+from .helpers import Message, get_documents_folder
 from .merge_projects import MergeProjects
 from .select_items import DialogSelectItems
 from .text_file_replacement import ReplaceTextFile
@@ -116,7 +116,7 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
         self.merge_project_path = ""
         default_directory = self.app.settings['directory']
         if default_directory == "":
-            default_directory = os.path.expanduser('~')
+            default_directory = get_documents_folder() # os.path.expanduser('~')
         self.merge_project_path = QtWidgets.QFileDialog.getExistingDirectory(self,
                                                                              _('Open project directory'),
                                                                              default_directory)
