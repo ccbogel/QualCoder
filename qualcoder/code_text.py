@@ -28,6 +28,7 @@ import sqlite3
 from copy import copy, deepcopy
 import datetime
 import difflib
+import html
 import logging
 from operator import itemgetter
 import os
@@ -1880,6 +1881,49 @@ class DialogCodeText(QtWidgets.QWidget):
         Message(self.app, _('Coded text file exported'), msg, "information").exec()
 
     def export_html_file(self):
+        """ Export text to html file.
+        Called by export_option_selected.
+        """
+
+        if len(self.ui.textEdit.document().toPlainText()) == 0:
+            return
+        plain_text = self.ui.textEdit.document().toPlainText()
+        # Prepare code text with name and ordering
+        code_text2 = deepcopy(self.code_text)
+        for ct in code_text2:
+            for c in self.codes:
+                if ct['cid'] == c['cid']:
+                    ct['codename'] = html.escape(c['name'])
+                    break
+        code_text_sorted = sorted(code_text2, key=lambda d: d['pos0'])
+        # Prepare html text
+        html_text = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">\
+        <html><head><meta charset="utf-8" /></head>\
+        <body style=" font-family:"Noto Sans"; font-size:10pt; font-weight:400; font-style:normal;">'
+        for i, c in enumerate(plain_text):
+            if c == "\n":
+                c_html = "<br />\n"
+            else:
+                c_html = html.escape(c)
+            for ct in code_text2:
+                if ct['pos0'] == i:
+                    html_text += f'<span title="{ct["codename"]}" style="color:#000000; background-color:{ct["color"]};">'
+                if ct['pos1'] == i:
+                    html_text += "</span>"
+            html_text += c_html  # Some encoding issues, e.g. the Euro symbol
+        html_text += "\n</body></html>"
+        html_filename = self.file_['name'] + ".html"
+        exp_dir = ExportDirectoryPathDialog(self.app, html_filename)
+        filepath = exp_dir.filepath
+        if filepath is None:
+            return
+        with open(filepath, 'w') as html_file:
+            html_file.write(html_text)
+        msg = _("Coded text file exported to: ") + filepath
+        self.parent_textEdit.append(msg)
+        Message(self.app, _('Coded text file exported'), msg, "information").exec()
+
+    def export_html_file_OLD(self):
         """ Export text to html file.
         Called by export_option_selected.
         TODO export tooltips. """
