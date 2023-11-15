@@ -590,6 +590,11 @@ As all assigned positions may be incorrect. </string>
         <string>odt</string>
        </property>
       </item>
+      <item>
+       <property name="text">
+        <string>txt</string>
+       </property>
+      </item>
      </widget>
     </widget>
    </item>
