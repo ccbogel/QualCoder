@@ -724,7 +724,6 @@ class DialogCodeText(QtWidgets.QWidget):
         if selected is None:
             return
         self.project_memo = False
-        self.journal_entry = False
         self.code_rule = True
         self.ui.label_info.setText(selected.text(0))
         txt = ""
@@ -758,7 +757,6 @@ class DialogCodeText(QtWidgets.QWidget):
         cur.execute("select memo from project")
         res = cur.fetchone()
         self.project_memo = True
-        # self.journal_entry = False
         self.code_rule = False
         self.ui.label_info.setText(_("Project memo"))
         self.ui.textEdit_info.setText(res[0])
@@ -1857,6 +1855,8 @@ class DialogCodeText(QtWidgets.QWidget):
             self.export_html_file()
         if text_ == "odt":
             self.export_odt_file()
+        if text == "txt":
+            self.export_tagged_text()
         self.ui.comboBox_export.setCurrentIndex(0)
 
     def export_odt_file(self):
@@ -1955,7 +1955,9 @@ class DialogCodeText(QtWidgets.QWidget):
         #self.export_tagged_text()
 
     def export_tagged_text(self):
-        """ Export a text file with code tags """
+        """ Export a text file with code tags.
+         code tags are surrounded by double braces:
+         {{codename{{some coded text}}codename}}. """
 
         if len(self.ui.textEdit.document().toPlainText()) == 0:
             return
@@ -1972,16 +1974,15 @@ class DialogCodeText(QtWidgets.QWidget):
         code_ids_used = list(set(code_ids_used))
 
         # Prepare text
-        text = ""
+        tagged_text = ""
         for i, c in enumerate(plain_text):
             for ct in code_text2:
                 if ct['pos0'] == i:
-                    text += "{{" + ct['codename'] + "{{"
+                    tagged_text += "{{" + ct['codename'] + "{{"
                 if ct['pos1'] == i:
-                    text += "}}" + ct['codename'] + "}}"
-            text += c
+                    tagged_text += "}}" + ct['codename'] + "}}"
+            tagged_text += c
         # Add Codes list
-        #code_text_sorted = sorted(code_text2, key=lambda d: d['codename'])
         codes_list = []
         for cd in self.codes:
             if cd['cid'] in code_ids_used:
@@ -1990,30 +1991,29 @@ class DialogCodeText(QtWidgets.QWidget):
                     if cd['catid'] == cat['catid']:
                         category = cat['name']
                 codes_list.append([cd['name'], cd['memo'], category])
-        text += "\n\n\nCODES LIST\n"
+        tagged_text += "\n\n\nCODES LIST\n"
         for cd in codes_list:
-            text += cd[0]
+            tagged_text += cd[0]
             if cd[2] is not None:
-                text += f" -- CATEGORY: {cd[2]}"
+                tagged_text += f" -- CATEGORY: {cd[2]}"
             if cd[1] != "":
-                text += f" -- CODE MEMO: {cd[1]}"
-            text += '\n'
+                tagged_text += f" -- CODE MEMO: {cd[1]}"
+            tagged_text += '\n'
 
         filename = self.file_['name'] + "_tagged.txt"
         exp_dir = ExportDirectoryPathDialog(self.app, filename)
         filepath = exp_dir.filepath
         if filepath is None:
             return
-        with open(filepath, 'w') as html_file:
-            html_file.write(text)
+        with open(filepath, 'w') as text_file:
+            text_file.write(tagged_text)
         msg = _("Coded text file exported to: ") + filepath
         self.parent_textEdit.append(msg)
         Message(self.app, _('Coded text file exported'), msg, "information").exec()
 
-    def export_html_file_OLD(self):
+    '''def export_html_file_OLD(self):
         """ Export text to html file.
-        Called by export_option_selected.
-        TODO export tooltips. """
+        Called by export_option_selected. """
 
         if len(self.ui.textEdit.document().toPlainText()) == 0:
             return
@@ -2028,7 +2028,7 @@ class DialogCodeText(QtWidgets.QWidget):
         tw.write(self.ui.textEdit.document())
         msg = _("Coded text file exported to: ") + filepath
         self.parent_textEdit.append(msg)
-        Message(self.app, _('Coded text file exported'), msg, "information").exec()
+        Message(self.app, _('Coded text file exported'), msg, "information").exec()'''
 
     def eventFilter(self, object_, event):
         """ Using this event filter to identify treeWidgetItem drop events.
