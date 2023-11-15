@@ -192,8 +192,8 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.listWidget.customContextMenuRequested.connect(self.file_menu)
         self.ui.listWidget.setStyleSheet(tree_font)
         self.ui.listWidget.selectionModel().selectionChanged.connect(self.file_selection_changed)
-        #self.ui.lineEdit_search.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        #self.ui.lineEdit_search.customContextMenuRequested.connect(self.lineedit_search_menu)
+        # self.ui.lineEdit_search.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        # self.ui.lineEdit_search.customContextMenuRequested.connect(self.lineedit_search_menu)
         self.ui.lineEdit_search.returnPressed.connect(self.search_for_text)
         self.get_files()
 
@@ -758,7 +758,7 @@ class DialogCodeText(QtWidgets.QWidget):
         cur.execute("select memo from project")
         res = cur.fetchone()
         self.project_memo = True
-        #self.journal_entry = False
+        # self.journal_entry = False
         self.code_rule = False
         self.ui.label_info.setText(_("Project memo"))
         self.ui.textEdit_info.setText(res[0])
@@ -1001,8 +1001,8 @@ class DialogCodeText(QtWidgets.QWidget):
         action_mark = None
         action_not_important = None
         action_change_code = None
-        #action_start_pos = None
-        #action_end_pos = None
+        # action_start_pos = None
+        # action_end_pos = None
         action_change_pos = None
         action_unmark = None
         action_new_code = None
@@ -1013,8 +1013,8 @@ class DialogCodeText(QtWidgets.QWidget):
             if cursor.position() + self.file_['start'] >= item['pos0'] and cursor.position() <= item['pos1']:
                 action_unmark = QtGui.QAction(_("Unmark (U)"))
                 action_code_memo = QtGui.QAction(_("Memo coded text (M)"))
-                #action_start_pos = QtGui.QAction(_("Change start position (SHIFT LEFT/ALT RIGHT)"))
-                #action_end_pos = QtGui.QAction(_("Change end position (SHIFT RIGHT/ALT LEFT)"))
+                # action_start_pos = QtGui.QAction(_("Change start position (SHIFT LEFT/ALT RIGHT)"))
+                # action_end_pos = QtGui.QAction(_("Change end position (SHIFT RIGHT/ALT LEFT)"))
                 action_change_pos = QtGui.QAction(_("Change code position key presses"))
                 if item['important'] is None or item['important'] > 1:
                     action_important = QtGui.QAction(_("Add important mark (I)"))
@@ -1209,7 +1209,7 @@ class DialogCodeText(QtWidgets.QWidget):
         child_count = item.childCount()
         for i in range(child_count):
             if item.child(i).text(1)[0:3] == "cid" and (item.child(i).text(0) == text_
-            or item.child(i).toolTip(0) == text_):
+                                                        or item.child(i).toolTip(0) == text_):
                 self.ui.treeWidget.setCurrentItem(item.child(i))
             self.recursive_set_current_item(item.child(i), text_)
 
@@ -1348,10 +1348,11 @@ class DialogCodeText(QtWidgets.QWidget):
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
 
-    def change_code_pos_message(self):  #, location, start_or_end):
+    def change_code_pos_message(self):  # , location, start_or_end):
         """  Called via textedit_menu. """
 
-        msg = _("Change start position (extend SHIFT LEFT/ shrink ALT RIGHT)\nChange end position (extend SHIFT RIGHT/ shrink ALT LEFT)")
+        msg = _(
+            "Change start position (extend SHIFT LEFT/ shrink ALT RIGHT)\nChange end position (extend SHIFT RIGHT/ shrink ALT LEFT)")
         Message(self.app, _("Use key presses") + " " * 20, msg).exec()
 
     def shift_code_positions(self, position):
@@ -1366,7 +1367,7 @@ class DialogCodeText(QtWidgets.QWidget):
         for item in self.code_text:
             if item['pos0'] > position + self.file_['start']:
                 code_list.append(item)
-                #print(item['pos0'], ">", position + self.file_['start'])
+                # print(item['pos0'], ">", position + self.file_['start'])
         if not code_list:
             return
         int_dialog = QtWidgets.QInputDialog()
@@ -1381,7 +1382,7 @@ class DialogCodeText(QtWidgets.QWidget):
                  "This function will help if you have edited the coded text and the codes are out of position.\n"
                  "Positive numbers (moves right) or negative numbers (moves left) (-500 to 500)\n"
                  "Clicked character position: ") + str(position)
-        delta_shift, ok = int_dialog.getInt(self, msg,msg2 , 0, -500, 500, 1)
+        delta_shift, ok = int_dialog.getInt(self, msg, msg2, 0, -500, 500, 1)
         if not ok:
             return
         if delta_shift == 0:
@@ -1394,14 +1395,14 @@ class DialogCodeText(QtWidgets.QWidget):
         text_sql = "select substr(fulltext,?,?), length(fulltext) from source where id=?"
         # Update code_text rows in database
         for coded in code_list:
-            #print(coded['seltext'], coded['pos0'], coded['pos1'])
+            # print(coded['seltext'], coded['pos0'], coded['pos1'])
             new_pos0 = coded['pos0'] + delta_shift
             new_pos1 = coded['pos1'] + delta_shift
             # Get seltext and update if coded pos0 and pos1 are within bounds
             if new_pos0 > -1 and new_pos1 < fulltext_length:
                 cur.execute(text_sql, [new_pos0, new_pos1 - new_pos0, self.file_['id']])
                 seltext = cur.fetchone()[0]
-                #print("len", fulltext_length, seltext)
+                # print("len", fulltext_length, seltext)
                 sql = "update code_text set pos0=?, pos1=?, seltext=? where ctid=?"
                 cur.execute(sql, [new_pos0, new_pos1, seltext, coded['ctid']])
                 self.app.conn.commit()
@@ -1902,15 +1903,21 @@ class DialogCodeText(QtWidgets.QWidget):
         <body style=" font-family:"Noto Sans"; font-size:10pt; font-weight:400; font-style:normal;">'
         for i, c in enumerate(plain_text):
             if c == "\n":
-                c_html = "<br />\n"
+                c = "<br />\n"
             else:
-                c_html = html.escape(c)
+                if c in entities.keys():
+                    c = entities[c]  # html.escape(c)
             for ct in code_text2:
                 if ct['pos0'] == i:
-                    html_text += f'<span title="{ct["codename"]}" style="color:#000000; background-color:{ct["color"]};">'
+                    title = ct['codename']
+                    if ct['important'] == 1:
+                        title += "\nIMPORTANT"
+                    if ct['memo'] is not None and ct['memo'] != "":
+                        title += f"\nMEMO: {ct['memo']}"
+                    html_text += f'<span title="{title}" style="color:#000000; background-color:{ct["color"]};">'
                 if ct['pos1'] == i:
                     html_text += "</span>"
-            html_text += c_html  # Some encoding issues, e.g. the Euro symbol
+            html_text += c  # Some encoding issues, e.g. the Euro symbol
         html_text += "\n</body></html>"
         html_filename = self.file_['name'] + ".html"
         exp_dir = ExportDirectoryPathDialog(self.app, html_filename)
@@ -2356,7 +2363,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 cur.execute("update code_text set cid=? where ctid=?", [new_cid, ct[0]])
                 self.app.conn.commit()
             except sqlite3.IntegrityError as e_:
-                #print(ct, e_)
+                # print(ct, e_)
                 cur.execute("delete from code_text where ctid=?", [ct[0]])
                 self.app.conn.commit()
         av_sql = "select avid from code_av where cid=?"
@@ -2367,7 +2374,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 cur.execute("update code_av set cid=? where avid=?", [new_cid, av[0]])
                 self.app.conn.commit()
             except sqlite3.IntegrityError as e_:
-                #print(e_)
+                # print(e_)
                 cur.execute("delete from code_av where avid=?", [av[0]])
                 self.app.conn.commit()
         img_sql = "select imid from code_image where cid=?"
@@ -2378,7 +2385,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 cur.execute("update code_image set cid=? where imid=?", [new_cid, img[0]])
                 self.app.conn.commit()
             except sqlite3.IntegrityError as e_:
-                #print(e_)
+                # print(e_)
                 cur.execute("delete from code_image where imid=?", [img[0]])
                 self.app.conn.commit()
         cur.execute("delete from code_name where cid=?", [old_cid, ])
@@ -2605,7 +2612,8 @@ class DialogCodeText(QtWidgets.QWidget):
                 if c['cid'] == int(selected.text(1)[4:]):
                     code_ = c
             new_name, ok = QtWidgets.QInputDialog.getText(self, _("Rename code"),
-                                                          _("New code name:") + " " * 40, QtWidgets.QLineEdit.EchoMode.Normal,
+                                                          _("New code name:") + " " * 40,
+                                                          QtWidgets.QLineEdit.EchoMode.Normal,
                                                           code_['name'])
             if not ok or new_name == '':
                 return
@@ -2642,7 +2650,8 @@ class DialogCodeText(QtWidgets.QWidget):
             for c in self.categories:
                 if c['catid'] == int(selected.text(1)[6:]):
                     cat = c
-            new_name, ok = QtWidgets.QInputDialog.getText(self, _("Rename category"), _("New category name:") + " " * 40,
+            new_name, ok = QtWidgets.QInputDialog.getText(self, _("Rename category"),
+                                                          _("New category name:") + " " * 40,
                                                           QtWidgets.QLineEdit.EchoMode.Normal, cat['name'])
             if not ok or new_name == '':
                 return
@@ -2785,7 +2794,7 @@ class DialogCodeText(QtWidgets.QWidget):
         Or show all files. """
 
         cases = self.app.get_casenames()
-        cases.insert(0, {"name": _("Show all files"),  "id": -1})
+        cases.insert(0, {"name": _("Show all files"), "id": -1})
         ui = DialogSelectItems(self.app, cases, _("Select case"), "single")
         ok = ui.exec()
         if not ok:
@@ -3046,7 +3055,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.lineEdit_search.setEnabled(True)
         self.ui.checkBox_search_case.setEnabled(True)
         self.ui.checkBox_search_all_files.setEnabled(True)
-        #self.search_for_text()
+        # self.search_for_text()
 
     def get_coded_text_update_eventfilter_tooltips(self):
         """ Called by load_file, and from other dialogs on update.
@@ -3222,7 +3231,7 @@ class DialogCodeText(QtWidgets.QWidget):
             # The event can trigger multiple times, so do not present a warning to the user
             return
         self.code_text.append(coded)
-        #self.highlight()
+        # self.highlight()
         cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
             memo,date, important) values(?,?,?,?,?,?,?,?,?)", (coded['cid'], coded['fid'],
                                                                coded['seltext'], coded['pos0'], coded['pos1'],
@@ -3693,9 +3702,10 @@ class DialogCodeText(QtWidgets.QWidget):
                                          item['pos1'], item['owner'], item['memo'], item['date']])
                             self.app.conn.commit()
                             # Record a list of undo sql
-                            undo = {"sql": "delete from code_text where cid=? and fid=? and pos0=? and pos1=? and owner=?",
-                                    "cid": item['cid'], "fid": item['fid'], "pos0": item['pos0'], "pos1": item['pos1'],
-                                    "owner": item['owner']}
+                            undo = {
+                                "sql": "delete from code_text where cid=? and fid=? and pos0=? and pos1=? and owner=?",
+                                "cid": item['cid'], "fid": item['fid'], "pos0": item['pos0'], "pos1": item['pos1'],
+                                "owner": item['owner']}
                             undo_list.append(undo)
                         except sqlite3.IntegrityError as e:
                             logger.debug(_("Autocode insert error ") + str(e))
@@ -4174,3 +4184,9 @@ class ToolTipEventFilter(QtCore.QObject):
                 receiver.setToolTip(text_)
         # Call Base Class Method to Continue Normal Event Processing
         return super(ToolTipEventFilter, self).eventFilter(receiver, event)
+
+
+# see https://www.freeformatter.com/html-entities.html
+entities = {"&": "&amp;", '"': '&quot;', "'": "&#39;", "<": "&lt;", ">": "&gt;", "–": "&ndash;", "—": "&mdash;",
+            "€": "&euro;", "‘": "&lsquo;", "’": "&rsquo;", "“": "&ldquo;", "”": "&rdquo;","…": "&hellip;",
+            "™": "&trade;","£": "&pound;"}
