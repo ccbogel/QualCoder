@@ -1891,12 +1891,15 @@ class DialogCodeText(QtWidgets.QWidget):
         plain_text = self.ui.textEdit.document().toPlainText()
         # Prepare code text with name and ordering
         code_text2 = deepcopy(self.code_text)
+        code_ids_used = []
         for ct in code_text2:
             for c in self.codes:
                 if ct['cid'] == c['cid']:
                     ct['codename'] = html.escape(c['name'])
+                    code_ids_used.append(c['cid'])
                     break
-        code_text_sorted = sorted(code_text2, key=lambda d: d['pos0'])
+        code_ids_used = list(set(code_ids_used))
+
         # Prepare html text
         html_text = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">\
         <html><head><meta charset="utf-8" /></head>\
@@ -1918,6 +1921,26 @@ class DialogCodeText(QtWidgets.QWidget):
                 if ct['pos1'] == i:
                     html_text += "</span>"
             html_text += c  # Some encoding issues, e.g. the Euro symbol
+        # Add Codes list
+        #code_text_sorted = sorted(code_text2, key=lambda d: d['codename'])
+        codes_directory = []
+        for cd in self.codes:
+            if cd['cid'] in code_ids_used:
+                category = None
+                for cat in self.categories:
+                    if cd['catid'] == cat['catid']:
+                        category = cat['name']
+                codes_directory.append([cd['name'], cd['color'], cd['memo'], category])
+
+        html_text += "<br /><br /><h2>Codes list</h2>\n"
+        for cd in codes_directory:
+            html_text += f'<p><span style="background-color:{cd[1]}">&nbsp;&nbsp;&nbsp;</span> &nbsp;<b>{cd[0]}</b>'
+            if cd[3] is not None:
+                html_text += f"&nbsp;CATEGORY: {cd[3]}"
+            if cd[2] != "":
+                html_text += f"&nbsp;&nbsp;CODE MEMO: {cd[2]}"
+            html_text += '</p>'
+
         html_text += "\n</body></html>"
         html_filename = self.file_['name'] + ".html"
         exp_dir = ExportDirectoryPathDialog(self.app, html_filename)
