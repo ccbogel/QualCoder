@@ -1822,7 +1822,7 @@ class MainWindow(QtWidgets.QMainWindow):
         default_directory = self.app.settings['directory']
         if path_ == "" or path_ is False:
             if default_directory == "":
-                default_directory = get_documents_folder()  # os.path.expanduser('~')
+                default_directory = os.path.expanduser('~')
             path_ = QtWidgets.QFileDialog.getExistingDirectory(self,
                                                               _('Open project directory'), default_directory)
         if path_ == "" or path_ is False:
