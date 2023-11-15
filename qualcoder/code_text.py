@@ -1951,6 +1951,63 @@ class DialogCodeText(QtWidgets.QWidget):
             html_file.write(html_text)
         msg = _("Coded text file exported to: ") + filepath
         self.parent_textEdit.append(msg)
+        Message(self.app, _('Coded html file exported'), msg, "information").exec()
+        #self.export_tagged_text()
+
+    def export_tagged_text(self):
+        """ Export a text file with code tags """
+
+        if len(self.ui.textEdit.document().toPlainText()) == 0:
+            return
+        plain_text = self.ui.textEdit.document().toPlainText()
+        # Prepare code text with name and ordering
+        code_text2 = deepcopy(self.code_text)
+        code_ids_used = []
+        for ct in code_text2:
+            for c in self.codes:
+                if ct['cid'] == c['cid']:
+                    ct['codename'] = c['name']
+                    code_ids_used.append(c['cid'])
+                    break
+        code_ids_used = list(set(code_ids_used))
+
+        # Prepare text
+        text = ""
+        for i, c in enumerate(plain_text):
+            for ct in code_text2:
+                if ct['pos0'] == i:
+                    text += "{{" + ct['codename'] + "{{"
+                if ct['pos1'] == i:
+                    text += "}}" + ct['codename'] + "}}"
+            text += c
+        # Add Codes list
+        #code_text_sorted = sorted(code_text2, key=lambda d: d['codename'])
+        codes_list = []
+        for cd in self.codes:
+            if cd['cid'] in code_ids_used:
+                category = None
+                for cat in self.categories:
+                    if cd['catid'] == cat['catid']:
+                        category = cat['name']
+                codes_list.append([cd['name'], cd['memo'], category])
+        text += "\n\n\nCODES LIST\n"
+        for cd in codes_list:
+            text += cd[0]
+            if cd[2] is not None:
+                text += f" -- CATEGORY: {cd[2]}"
+            if cd[1] != "":
+                text += f" -- CODE MEMO: {cd[1]}"
+            text += '\n'
+
+        filename = self.file_['name'] + "_tagged.txt"
+        exp_dir = ExportDirectoryPathDialog(self.app, filename)
+        filepath = exp_dir.filepath
+        if filepath is None:
+            return
+        with open(filepath, 'w') as html_file:
+            html_file.write(text)
+        msg = _("Coded text file exported to: ") + filepath
+        self.parent_textEdit.append(msg)
         Message(self.app, _('Coded text file exported'), msg, "information").exec()
 
     def export_html_file_OLD(self):
