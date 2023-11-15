@@ -1848,14 +1848,14 @@ class DialogCodeText(QtWidgets.QWidget):
     def export_option_selected(self):
         """ ComboBox export option selected. """
 
-        text_ = self.ui.comboBox_export.currentText()
-        if text_ == "":
+        export_option = self.ui.comboBox_export.currentText()
+        if export_option == "":
             return
-        if text_ == "html":
+        if export_option == "html":
             self.export_html_file()
-        if text_ == "odt":
+        if export_option == "odt":
             self.export_odt_file()
-        if text == "txt":
+        if export_option == "txt":
             self.export_tagged_text()
         self.ui.comboBox_export.setCurrentIndex(0)
 
