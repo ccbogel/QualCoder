@@ -29,6 +29,7 @@ https://qualcoder.wordpress.com/
 from copy import copy
 import datetime
 import logging
+import openpyxl
 import os
 import sys
 import traceback
@@ -81,12 +82,13 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_reportCodeFrequencies()
         self.ui.setupUi(self)
+        self.ui.pushButton_exportcsv.setToolTip(_("Export Excel file"))
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         self.ui.pushButton_exporttext.pressed.connect(self.export_text_file)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_icon), "png")
         self.ui.pushButton_exporttext.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_exportcsv.pressed.connect(self.export_csv_file)
+        self.ui.pushButton_exportcsv.pressed.connect(self.export_excel_file)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_csv_icon), "png")
         self.ui.pushButton_exportcsv.setIcon(QtGui.QIcon(pm))
@@ -296,34 +298,45 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         Message(self.app, _('Text file Export'), msg).exec()
         self.parent_textEdit.append(msg)
 
-    def export_csv_file(self):
-        """ Export data as csv. """
+    def export_excel_file(self):
+        """ Export data as excel. """
 
-        filename = "Code_frequencies.csv"
-        e = ExportDirectoryPathDialog(self.app, filename)
-        filepath = e.filepath
-        if filepath is None:
-            return
-        data = ""
         header = [_("Code Tree"), "Id"]
         for coder in self.coders:
             header.append(coder)
         header.append("Total")
-        data += ",".join(header) + "\n"
+
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        # Column headings
+        row = 1
+        for col, code in enumerate(header):
+            ws.cell(column=col + 1, row=row, value=code)
+
+        # Data
+        data = []
         it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
         item = it.value()
         while item:
-            line = ""
+            row = []
             for i in range(0, len(header)):
-                line += "," + item.text(i)
-            data += line[1:] + "\n"
+                row.append(item.text(i))
             it += 1
             item = it.value()
-        f = open(filepath, 'w', encoding='utf-8-sig')
-        f.write(data)
-        f.close()
-        msg = _("Coding frequencies csv file exported to: ") + filepath
-        Message(self.app, _('Csv file Export'), msg).exec()
+            data.append(row)
+
+        for row, data_row in enumerate(data):
+            for col, datum in enumerate(data_row):
+                ws.cell(column=col + 1, row=row + 2, value=datum)
+
+        filename = "Code_frequencies.xlsx"
+        export_dir = ExportDirectoryPathDialog(self.app, filename)
+        filepath = export_dir.filepath
+        if filepath is None:
+            return
+        wb.save(filepath)
+        msg = _("Coding frequencies exported to: ") + filepath
+        Message(self.app, _('File export'), msg).exec()
         self.parent_textEdit.append(msg)
 
     def fill_tree(self):
