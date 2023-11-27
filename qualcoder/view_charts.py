@@ -36,7 +36,7 @@ import traceback
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtWidgets import QDialog
-from wordcloud import WordCloud  #, STOPWORDS
+from .wordcloud_modified import WordCloudMod
 
 from .GUI.ui_dialog_charts import Ui_DialogCharts
 
@@ -392,9 +392,8 @@ class ViewCharts(QDialog):
                 values.append(res_text[0])
         # Create image
         text = " ".join(values)
-        # stopwords = set(STOPWORDS)
         colours = ['', 'white', 'black', 'yellow', 'blue', 'red', 'green']
-        wordcloud = WordCloud(background_color=colours[chart_type_index], width=800, height=600).generate(text)
+        wordcloud = WordCloudMod(background_color=colours[chart_type_index], width=800, height=600).generate(text)
         # Display image
         fig = px.imshow(wordcloud, title=title + subtitle)
         fig.update_xaxes(visible=False)
