@@ -70,14 +70,21 @@ import sys
 import warnings
 from xml.sax import saxutils
 
-#from .query_integral_image import query_integral_image
-#from .tokenization import unigrams_and_bigrams, process_tokens
-#FILE = os.path.dirname(__file__)
-#FONT_PATH = os.environ.get('FONT_PATH', os.path.join(FILE, 'DroidSansMono.ttf'))
 
-FONT_PATH = home = os.path.expanduser('~') + "/.qualcoder/DroidSansMono.ttf"
-#STOPWORDS = set(map(str.strip, open(os.path.join(FILE, 'stopwords')).readlines()))
-STOPWORDS = {"a", "the", "and"}  #TODO temporary testing
+FONT_PATH = home = os.path.join(os.path.expanduser('~'), ".qualcoder", "DroidSansMono.ttf")
+STOPWORDS = {"i", "me", "my", "myself", "we", "our", "ours", "ourselves", "you", "your", "you're", "yours", "yourself",
+             "yourselves", "he", "him", "his", "himself","she", "her", "hers", "herself", "it", "its", "itself", "they",
+             "them", "their", "theirs", "themselves", "what", "which", "who", "whom", "this", "that", "these", "those", "am",
+             "is", "are", "was", "were", "be","been", "being", "have", "has", "had", "having", "do","does","did", "doing", "a",
+             "an", "the", "and", "but", "if", "or", "because", "as", "until", "while", "of", "at", "by", "for", "with", "about",
+             "against", "between", "into", "through", "during", "before", "after", "above", "below", "to", "from", "up",
+             "down", "in", "out", "on", "off", "over", "under", "again", "further", "then", "once", "here", "there", "when",
+             "where", "why", "how", "all", "any", "both", "each", "few", "more", "most", "other", "some", "such", "no",
+             "nor", "not", "only", "own", "same", "so", "than", "too", "very", "can", "can't", "will", "just", "don't",
+             "should", "now"}
+stopwords_path = home = os.path.join(os.path.expanduser('~'), ".qualcoder", "stopwords.txt")
+if os.path.exists(stopwords_path):
+    STOPWORDS = set(map(str.strip, open(stopwords_path).readlines()))
 
 
 class IntegralOccupancyMap(object):
@@ -359,6 +366,7 @@ class WordCloudMod(object):
                  include_numbers=False, min_word_length=0, collocation_threshold=30):
         if font_path is None:
             font_path = FONT_PATH
+        #colormap = "Reds"
         if color_func is None and colormap is None:
             version = matplotlib.__version__
             if version[0] < "2" and version[2] < "5":
@@ -385,7 +393,7 @@ class WordCloudMod(object):
         if isinstance(random_state, int):
             random_state = Random(random_state)
         self.random_state = random_state
-        self.background_color = background_color
+        self.background_color =  background_color
         self.max_font_size = max_font_size
         self.mode = mode
 
@@ -1217,33 +1225,17 @@ def process_tokens(words, normalize_plurals=True):
 
 
 def query_integral_image(integral_image, size_x, size_y, random_state):
+    x, y = integral_image.shape
 
-    x = integral_image.shape[0]  # cdef int
-    y = integral_image.shape[1]  # cdef int
-    # area, i, j  # cdef int
-    hits = 0  # cdef int
-
-    # count how many possible locations
-    for i in range(x - size_x):
-        for j in range(y - size_y):
-            area = integral_image[i, j] + integral_image[i + size_x, j + size_y]
-            area -= integral_image[i + size_x, j] + integral_image[i, j + size_y]
-            if not area:
-                hits += 1
-    if not hits:
-        # no room left
+    # Calculate all areas
+    i, j = np.ogrid[:x-size_x, :y-size_y]
+    area = integral_image[i, j] + integral_image[i+size_x, j+size_y] - integral_image[i+size_x, j] - integral_image[i, j+size_y]
+    zero_areas = np.argwhere(area == 0)
+    if zero_areas.size == 0:
+        # No room left
         return None
-    # pick a location at random
-    goal = random_state.randint(0, hits)  # cdef int
-    hits = 0
-    for i in range(x - size_x):
-        for j in range(y - size_y):
-            area = integral_image[i, j] + integral_image[i + size_x, j + size_y]
-            area -= integral_image[i + size_x, j] + integral_image[i, j + size_y]
-            if not area:
-                hits += 1
-                if hits == goal:
-                    return i, j
-
-
+    # Pick a location at random
+    #goal = random_state.choice(zero_areas.shape[0])
+    goal = random_state.randint(0, zero_areas.shape[0] - 1)
+    return tuple(zero_areas[goal])
 
