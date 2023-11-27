@@ -1217,37 +1217,17 @@ def process_tokens(words, normalize_plurals=True):
 
 
 def query_integral_image(integral_image, size_x, size_y, random_state):
+    x, y = integral_image.shape
 
-    x = integral_image.shape[0]  # cdef int
-    y = integral_image.shape[1]  # cdef int
-    # area, i, j  # cdef int
-    #hits = 0  # cdef int
-    ij_list = []
-    # Obtain how many possible locations
-    for i in range(x - size_x):
-        for j in range(y - size_y):
-            area = integral_image[i, j] + integral_image[i + size_x, j + size_y]
-            area -= integral_image[i + size_x, j] + integral_image[i, j + size_y]
-            if not area:
-                #hits += 1
-                ij_list.append([i,j])
-    if not ij_list:  # hits:
-        # no room left
+    # Calculate all areas
+    i, j = np.ogrid[:x-size_x, :y-size_y]
+    area = integral_image[i, j] + integral_image[i+size_x, j+size_y] - integral_image[i+size_x, j] - integral_image[i, j+size_y]
+    zero_areas = np.argwhere(area == 0)
+    if zero_areas.size == 0:
+        # No room left
         return None
     # Pick a location at random
-    #goal = random_state.randint(0, hits)  # cdef int
-    goal = random_state.randint(0, len(ij_list) - 1)
-    return ij_list[goal]
-    ''' Below slows process down, pick randomly from above list.
-    hits = 0
-    for i in range(x - size_x):
-        for j in range(y - size_y):
-            area = integral_image[i, j] + integral_image[i + size_x, j + size_y]
-            area -= integral_image[i + size_x, j] + integral_image[i, j + size_y]
-            if not area:
-                hits += 1
-                if hits == goal:
-                    return i, j'''
-
-
+    #goal = random_state.choice(zero_areas.shape[0])
+    goal = random_state.randint(0, zero_areas.shape[0] - 1)
+    return tuple(zero_areas[goal])
 
