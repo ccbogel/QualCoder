@@ -122,7 +122,7 @@ class DialogAIChat(QtWidgets.QDialog):
         if self.app.settings['ai_enable'] == 'True':
             if self.app.settings['open_ai_api_key'] != '':
                 self.llm = OpenAI(openai_api_key = self.app.settings['open_ai_api_key'])
-                self.chat_model = ChatOpenAI(model='gpt-3.5-turbo')
+                self.chat_model = ChatOpenAI(model='gpt-4-1106-preview', openai_api_key=self.app.settings['open_ai_api_key'])
                 self.set_alive(True, True)
             else:
                 self.llm = None

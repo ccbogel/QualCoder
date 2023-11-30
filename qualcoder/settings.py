@@ -145,6 +145,7 @@ class DialogSettings(QtWidgets.QDialog):
         self.ui.pushButton_set_coder.pressed.connect(self.new_coder_entered)
         # AI options
         self.ui.checkBox_AI_enable.setChecked(self.settings['ai_enable'] == 'True')
+        self.ui.checkBox_AI_enable.stateChanged.connect(self.ai_enable_state_changed)
         self.ui.lineEdit_openai_api_key.setText(self.settings['open_ai_api_key'])
 
     def backup_state_changed(self):
@@ -154,7 +155,16 @@ class DialogSettings(QtWidgets.QDialog):
             self.ui.checkBox_backup_AV_files.setEnabled(True)
         else:
             self.ui.checkBox_backup_AV_files.setEnabled(False)
-
+    
+    def ai_enable_state_changed(self):
+        if self.ui.checkBox_AI_enable.isChecked():
+            api_key = self.settings['open_ai_api_key']
+            api_key = self.app.get_openai_api_key(api_key)
+            self.ui.lineEdit_openai_api_key.setText(api_key)
+            self.settings['open_ai_api_key'] = api_key
+            if api_key == '':
+                self.ui.checkBox_AI_enable.setChecked(False)
+                
     def new_coder_entered(self):
         """ New coder name entered.
         Tried to disable Enter key or catch the event. Failed. So new coder name assigned

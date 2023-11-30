@@ -428,14 +428,14 @@ Not recommended unless you have many large files slowing the backup.</string>
        <item row="20" column="0" colspan="3">
         <widget class="QLabel" name="label_9">
          <property name="text">
-          <string>My AI Research Mate</string>
+          <string>My AI buddy</string>
          </property>
         </widget>
        </item>
        <item row="22" column="0" colspan="2">
         <widget class="QCheckBox" name="checkBox_AI_enable">
          <property name="text">
-          <string>enable research mate</string>
+          <string>enable AI buddy</string>
          </property>
          <property name="checked">
           <bool>true</bool>

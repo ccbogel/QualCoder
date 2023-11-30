@@ -22,7 +22,7 @@ for file in os.listdir(ui_dir):
         # Check if ui-file has been updated and is newer than the corresponding py-file
         if (os.path.exists(py_path) == False) or (os.path.getmtime(ui_path) > os.path.getmtime(py_path)):
             cmd = f"pyuic6 {ui_path} -o {py_path}"
-            answer = input(f'Do you want to update "{py_path}"? (y/n)')
+            answer = input(f'Do you want to create/update "{py_path}"? (y/n)')
             if answer == 'y':
                 # print(f">>> {cmd}")
                 subprocess.call(cmd, shell=True)

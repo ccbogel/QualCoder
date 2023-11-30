@@ -361,6 +361,9 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.splitter.splitterMoved.connect(self.update_sizes)
         self.ui.leftsplitter.splitterMoved.connect(self.update_sizes)
         self.fill_tree()
+        
+        # AI suggestions
+        self.ui.pushButton_ai_suggest.pressed.connect(self.ai_suggest_clicked)
 
     @staticmethod
     def help():
@@ -4082,6 +4085,23 @@ class DialogCodeText(QtWidgets.QWidget):
             if c['npos1'] >= len(self.text):
                 cur.execute("delete from code_text where ctid=?", [c['ctid']])
         self.app.conn.commit()
+    
+    # AI functions
+    def ai_suggest_clicked(self):
+        """pushButton_ai_suggest clicked"""
+        self.ui.listWidget_ai.clear()
+        code_name = 'work as a passion'
+        code_memo = (
+            'Working not mainly out of necesssity, but because you are '
+            'passionate about your job. Enjoying work, beeing interested '
+            'in what you do, feeling lucky getting a particular job.')
+        descriptions = self.app.llm.generate_code_descriptions(code_name, code_memo)
+        
+        for desc in descriptions:
+            item = QtWidgets.QListWidgetItem(desc)
+            item.setToolTip(f'Tooltip for "{desc}"')
+            self.ui.listWidget_ai.addItem(item)
+        
 
 
 class ToolTipEventFilter(QtCore.QObject):

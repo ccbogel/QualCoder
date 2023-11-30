@@ -36,6 +36,7 @@ import re
 import sys
 import traceback
 import webbrowser
+import base64
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import Qt
@@ -55,6 +56,9 @@ from .reports import DialogReportCoderComparisons, DialogReportCodeFrequencies  
 from .report_codes import DialogReportCodes
 from .report_code_summary import DialogReportCodeSummary  # for isinstance()
 from .select_items import DialogSelectItems  # for isinstance()
+from .ai_llm import AnalyzedDataList
+from .ai_search_dialog import DialogAiSearch
+
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -131,7 +135,17 @@ class DialogCodeText(QtWidgets.QWidget):
     # Variables associated with right-hand side splitter, for project memo, code rule
     project_memo = False
     code_rule = False
-
+    
+    # variables for ai search
+    ai_search_docs = []
+    ai_search_name = ''
+    ai_search_description = ''
+    ai_search_file_ids = []
+    ai_search_code_ids = []
+    ai_search_similar_chunks = []
+    ai_search_chunks_pos = 0
+    
+    
     def __init__(self, app, parent_textedit, tab_reports):
 
         super(DialogCodeText, self).__init__()
@@ -361,7 +375,13 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.splitter.splitterMoved.connect(self.update_sizes)
         self.ui.leftsplitter.splitterMoved.connect(self.update_sizes)
         self.fill_tree()
-
+        
+        # AI search
+        self.ui.pushButton_ai_search.pressed.connect(self.ai_search_clicked)
+        self.ui.listWidget_ai.setStyleSheet(tree_font + 'QListWidget::item QLabel { color: blue; }')
+        self.ui.listWidget_ai.selectionModel().selectionChanged.connect(self.ai_search_selection_changed)
+        self.ui.listWidget_ai.clicked.connect(self.ai_search_list_clicked)
+        
     @staticmethod
     def help():
         """ Open help for transcribe section in browser. """
@@ -4083,8 +4103,201 @@ class DialogCodeText(QtWidgets.QWidget):
             if c['npos1'] >= len(self.text):
                 cur.execute("delete from code_text where ctid=?", [c['ctid']])
         self.app.conn.commit()
+        
+    # AI functions
+        
+    def ai_search_clicked(self):
+        """pushButton_ai_search clicked"""
+        
+        if not self.app.llm.is_ready():
+            msg = _('The AI is busy loading or updating it\'s memory, please try again later. See the main "Action Log" for progress messages.')
+            Message(self.app, _('AI Search'), msg, "warning").exec()
+            return
 
+        # Get currently selected item in code tree
+        code_item = self.ui.treeWidget.currentItem()
+        if code_item is None: # nothing selected
+            selected_id = -1
+            selected_is_code = False
+        elif code_item.text(1)[0:3] == 'cat': # category selected
+            selected_id = int(code_item.text(1).split(':')[1])
+            selected_is_code = False
+        else: # code selected
+            selected_id = int(code_item.text(1).split(':')[1])
+            selected_is_code = True           
+        
+        ui = DialogAiSearch(self.app, selected_id, selected_is_code)
+        ret = ui.exec()
+        if ret == QtWidgets.QDialog.DialogCode.Accepted:
+            self.ui.listWidget_ai.clear()
+            self.ai_search_name = ui.selected_name
+            self.ai_search_description = ui.selected_description
+            self.ai_search_file_ids = ui.selected_file_ids
+            self.ai_search_code_ids = ui.selected_code_ids
+            self.ai_search_similar_chunks = []
+            self.ai_search_chunks_pos = 0
+            self.ai_search_docs = []
+            
+            # find similar chunks of data from the vectorstore
+            self.app.llm.ai_async_is_canceled = False
+            self.ai_search_chunks_pos = 0
+            self.app.llm.retrieve_similar_data(self, self.ai_retrieve_similar_callback,  
+                                            self.ai_search_name, self.ai_search_description,
+                                            self.ai_search_file_ids)
+    
+    def ai_retrieve_similar_callback(self, chunks):
+        if self.app.llm.ai_async_is_canceled:
+            return
+        if chunks is None or len(chunks) == 0:
+            msg = _('AI: Sorry, I could not find any data in my memory related to "') + self.ai_search_name + '".'
+            Message(self.app, _('AI Search'), msg, "warning").exec()
+            return
 
+        # 1) Check if we search for data related to a code (instead of freetext) and filter out 
+        # chunks that are already coded with this code. This way, we find new data only.  
+        if self.ai_search_code_ids is not None and len(self.ai_search_code_ids) > 0:
+            filtered_chunks = []
+            for chunk in chunks:
+                chunk_already_coded = False
+                chunk_source_id = chunk.metadata['id']
+                chunk_start = chunk.metadata['start_index']
+                chunk_end = chunk_start + len(chunk.page_content)
+                code_ids_str = "(" + ", ".join(map(str, self.ai_search_code_ids)) + ")"
+                codings_sql = f'select pos0, pos1 from code_text where fid={chunk_source_id} AND cid in {code_ids_str}'
+                cur = self.app.conn.cursor()
+                cur.execute(codings_sql)
+                codings = cur.fetchall()
+                for row in codings:
+                    # Calculate the overlap by finding the maximum start position and the minimum end position
+                    coding_start = int(row[0])
+                    coding_end = int(row[1])
+                    overlap_start = max(chunk_start, coding_start)
+                    overlap_end = min(chunk_end, coding_end)                 
+                    if overlap_start < overlap_end:
+                        # found an overlap. If it is more then 50% of the coding, skip this chunk
+                        overlap_len = overlap_end - overlap_start
+                        coding_len = coding_end - coding_start
+                        if overlap_len >= 0.5 * coding_len:
+                            chunk_already_coded = True
+                            break
+                if not chunk_already_coded:
+                    filtered_chunks.append(chunk)
+            # finally: replace the chunks list with the filtered one
+            chunks = filtered_chunks        
+        
+        # 2) Send the first 20 chunks to the llm for further analysis 
+        self.ai_search_similar_chunks = chunks # save to allow analyzing more chunks later
+        self.ai_search_chunks_pos = 0
+        self.ai_analyze_similar_chunks(20)
+
+    def ai_analyze_similar_chunks(self, chunk_count):
+        if self.ai_search_chunks_pos < len(self.ai_search_similar_chunks):
+            self.app.llm.analyze_similarity(self, self.ai_search_similar_callback, 
+                                            self.ai_search_similar_chunks[self.ai_search_chunks_pos:self.ai_search_chunks_pos+chunk_count], 
+                                            self.ai_search_name, self.ai_search_description)
+            if len(self.ai_search_similar_chunks) > self.ai_search_chunks_pos + chunk_count:
+                self.ai_search_chunks_pos += chunk_count
+            else:
+                self.ai_search_chunks_pos = len(self.ai_search_similar_chunks)
+
+    def ai_search_similar_callback(self, docs):
+        self.ui.pushButton_ai_search.setText(self.ai_search_name)
+        last_row = self.ui.listWidget_ai.count() - 1
+        self.ui.listWidget_ai.clear()
+        if docs is not None and docs.data is not None and len(docs.data) > 0:
+            self.ai_search_docs.extend(docs.data)
+            for doc in self.ai_search_docs:
+                item_text = f'{doc.metadata["name"]}: '
+                item_text += '"' + str(doc.quote).replace('\n', ' ') + '"'
+                item = QtWidgets.QListWidgetItem(item_text)
+                item_tooltip = '<p>' + _('Quote: ') + f'<i>"{doc.quote}"</i></p>'
+                item_tooltip += '<p>' + _('The AI thinks: ') + f'{doc.interpretation} ({doc.relevance})' + '</p>'
+                item.setToolTip(item_tooltip)
+                self.ui.listWidget_ai.addItem(item)
+        
+        # add "find more..." label at the end:
+        if self.ai_search_chunks_pos < len(self.ai_search_similar_chunks):
+            find_more_label = QtWidgets.QLabel(_('>> find more...'))
+            #find_more_label.setStyleSheet(self.ui.listWidget_ai.styleSheet())
+            find_more_label.setStyleSheet('QLabel {color: blue; text-decoration: underline; margin-left: 2px; }')
+            find_more_label.setToolTip(_('Click here to find more data'))
+            item = QtWidgets.QListWidgetItem('')
+            self.ui.listWidget_ai.addItem(item)
+            self.ui.listWidget_ai.setItemWidget(item, find_more_label)
+            
+            """            
+            item = QtWidgets.QListWidgetItem('')
+            item.setToolTip(_('Click here to find more data'))
+            font = item.font()
+            font.setUnderline(True)
+            item.setFont(font)
+            brush = item.foreground()
+            brush.setColor(Qt.GlobalColor.blue)
+            item.setForeground(brush)
+            item.setText(_('find more...'))
+            self.ui.listWidget_ai.addItem(item)
+            """
+            
+        if last_row >= 0 and last_row < (self.ui.listWidget_ai.count() - 1):
+            self.ui.listWidget_ai.item(last_row).setSelected(True)
+    
+    def ai_search_list_clicked(self):
+        if self.ai_search_docs is None or len(self.ai_search_docs) == 0:
+            return
+        row = self.ui.listWidget_ai.currentRow()
+        if row >= len(self.ai_search_docs):
+            # out of bounds, must be the "find more..." row
+            self.ai_analyze_similar_chunks(20)
+        
+    def ai_search_selection_changed(self):
+        """Load the document in the textView and select the quote."""
+        if self.ai_search_docs is None or len(self.ai_search_docs) == 0:
+            return
+        
+        row = self.ui.listWidget_ai.currentRow()
+        if row == len(self.ai_search_docs):
+            # out of bounds, must be the "find more..." row
+            self.ui.listWidget_ai.item(row).setSelected(False)
+            return
+        
+        doc = self.ai_search_docs[row]
+        id = doc.metadata['id']
+        quote_start = doc.quote_start
+        quote_end = quote_start + len(doc.quote)
+        
+        # open doc and select quote
+        for i, f in enumerate(self.filenames):
+            if f['id'] == id:
+                f['start'] = 0
+                if f['end'] != f['characters']: # partially loaded
+                    msg = _("Entire text file will be loaded")
+                    Message(self.app, _('Information'), msg).exec()
+                f['end'] = f['characters']
+                try:
+                    self.ui.listWidget.setCurrentRow(i)
+                    self.load_file(f)
+                    # self.search_term = ""
+                    # Set text cursor position and also highlight one character, to show location.
+                    text_cursor = self.ui.textEdit.textCursor()
+                    text_cursor.setPosition(quote_start)
+                    #text_cursor.setPosition(0)
+                    #text_cursor.movePosition(QtGui.QTextCursor.MoveOperation.Right, 
+                    #                         QtGui.QTextCursor.MoveMode.MoveAnchor,
+                    #                         n=quote_start)
+                    endpos = quote_end
+                    if endpos < 0:
+                        endpos = 0
+                    text_cursor.setPosition(endpos, QtGui.QTextCursor.MoveMode.KeepAnchor)
+                    #text_cursor.movePosition(QtGui.QTextCursor.MoveOperation.Right, 
+                    #                         QtGui.QTextCursor.MoveMode.KeepAnchor,
+                    #                         n = quote_end - quote_start)
+                    self.ui.textEdit.setTextCursor(text_cursor)
+                    self.ui.textEdit.setFocus()
+                except Exception as e:
+                    logger.debug(str(e))
+                break
+
+        
 class ToolTipEventFilter(QtCore.QObject):
     """ Used to add a dynamic tooltip for the textEdit.
     The tool top text is changed according to its position in the text.

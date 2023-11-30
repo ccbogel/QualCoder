@@ -30,6 +30,7 @@ https://qualcoder.wordpress.com/
 import base64
 import configparser
 import datetime
+import time
 import gettext
 import json  # To get the latest GitHub release information
 import logging
@@ -43,6 +44,7 @@ import traceback
 import urllib.request
 import webbrowser
 from copy import copy
+import re
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 
@@ -82,6 +84,7 @@ from qualcoder.view_charts import ViewCharts
 from qualcoder.view_graph import ViewGraph
 from qualcoder.view_image import DialogCodeImage
 from qualcoder.ai_vectorstore import AiVectorstore
+from qualcoder.ai_llm import AiLLM
 
 # Check if VLC installed, for warning message for code_av
 vlc = None
@@ -150,6 +153,7 @@ class App(object):
     last_export_directory = ""
     sources_vectorstore = None
     sources_collection = 'qualcoder' # name of the vectorstore collection for source documents
+    llm = None
 
     def __init__(self):
         sys.excepthook = exception_handler
@@ -517,7 +521,8 @@ class App(object):
                 'dialogreport_file_summary_splitter0', 'dialogreport_file_summary_splitter0',
                 'dialogreport_code_summary_splitter0', 'dialogreport_code_summary_splitter0',
                 'stylesheet', 'backup_num', 'codetext_chunksize',
-                'report_text_context_characters', 'report_text_context_style'
+                'report_text_context_characters', 'report_text_context_style',
+                'ai_enable', 'open_ai_api_key'
                 ]
         for key in keys:
             if key not in settings_data:
@@ -536,6 +541,11 @@ class App(object):
                     settings_data[key] = "Bold"
                 if key == 'report_text_context_characters':
                     settings_data[key] = 150
+                if key == 'ai_enable':
+                    settings_data[key] = 'False'
+                if key == 'open_ai_api_key':
+                    settings_data[key] = ''
+
         # Write out new ini file, if needed
         if len(settings_data) > dict_len:
             self.write_config_ini(settings_data)
@@ -705,10 +715,6 @@ class App(object):
             result['speakernameformat'] = "[]"
         if result['stylesheet'] == 0:
             result['stylesheet'] = "original"
-        # Look for new keys in the default_settings and copy them over (using the default values)
-        for key in self.default_settings:
-            if key not in result:
-                result[key] = self.default_settings[key]     
         return result
 
     @property
@@ -783,7 +789,7 @@ class App(object):
             'report_text_context_chars': 150,
             'report_text_contextz-style': 'Bold',
             'codetext_chunksize': 50000,
-            'ai_enable': 'True',
+            'ai_enable': 'False',
             'open_ai_api_key': ''
         }
 
@@ -886,7 +892,111 @@ class App(object):
         except sqlite3.OperationalError:
             pass
         return coder_names
-
+    
+    def get_openai_api_key(self, key='', parent_window=None) -> str:
+        api_key_msg = _(
+'Please read this important note about access to GPT4:\n\
+\n\
+The AI buddy in qualcoder needs an API key from OpenAI to access GPT4. Follow these steps to get one:\n\
+1) Go to "https://platform.openai.com" \n\
+2) Sign up for an account (or log in if you already have one)\n\
+3) In the menu on the far left of the page, select "API keys"\n\
+4) Create a new key, copy it and enter it here.\n\
+\n\
+The access to GPT4 via the OpenAI API is not free (and also not included in ChatGPT Plus). As a new user, you will \n\
+normally receive $5 (USD) worth of credit from OpenAI. If this is used up or expired, you have to enter your payment \n\
+information on the OpenAI platform and will be charged for every single request qualcoder makes on your behalf. \n\
+The cost of a request is usually in the order of a few cents only. This money goes directly to OpenAI, the authors of \n\
+qualcoder are not involved in this in any way. We try to limit the number of requests as much as possible. But there \n\
+is always a slight risk that a malfunction of the app may lead to more requests than expected.\n\
+Therefore it is very important to SET A REASONABLE MONTHLY LIMIT in your OpenAI account ($10 will go a long way). \n\
+In the menu on "https://platform.openai.com", go to "settings", "Limits", "Usage limits" and define your monthly budget.\n\
+Liability: By using qualcoder and its ai enhanced functions you accept that the authors and copyright holders \n\
+will under no circumstances be liable for any costs resulting from the usage of the OpenAI API, even if these \n\
+costs are caused by a malfunction of the app. See the license of qualcoder for more details.\n\
+\n\
+Please enter your OpenAI api key here:')   
+        dialog = QtWidgets.QInputDialog(parent_window)
+        dialog.setStyleSheet("* {font-size:" + str(self.settings['fontsize']) + "pt} ")
+        dialog.setWindowTitle(_("OpenAI api key"))
+        # dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
+        dialog.setInputMode(QtWidgets.QInputDialog.InputMode.TextInput)
+        dialog.setLabelText(api_key_msg)
+        dialog.setTextValue(key)
+        # dialog.resize(200, 20)
+        ok = dialog.exec()
+        if not ok:
+            return ''
+        else:
+            return str(dialog.textValue())
+        
+    def prepare_ai(self, parent_window=None) -> bool:
+        """Checks if all the conditions are met to use the ai integration.
+        Downloads the embeddings model and asks for an OpenAI api key 
+        if necessary.    
+        """
+        # OpenAI api key:
+        if self.settings['open_ai_api_key'] == '':
+            self.settings['open_ai_api_key'] = self.get_openai_api_key(parent_window)
+            if self.settings['open_ai_api_key'] == '':
+                self.settings['ai_enable'] = 'False'
+                return False
+        
+        # embeddings model download:
+        if not self.sources_vectorstore.embedding_model_is_cached():
+            model_download_msg = _('\
+Since you are using the AI buddy for the first time, \n\
+qualcoder needs to download and install some \n\
+additional components. \n\
+\n\
+This will download about 2.5 GB of data. Do you \n\
+want to continue?\
+')
+            mb = QtWidgets.QMessageBox(parent=parent_window)
+            mb.setWindowTitle(_('Download AI components'))
+            mb.setText(model_download_msg)
+            mb.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Ok|
+                                QtWidgets.QMessageBox.StandardButton.Abort)
+            mb.setStyleSheet('* {font-size: ' + str(self.settings['fontsize']) + 'pt}')            
+            if mb.exec() == QtWidgets.QMessageBox.StandardButton.Ok: 
+                pd = QtWidgets.QProgressDialog(
+                    labelText='                              ', 
+                    minimum=0, maximum=100, 
+                    parent=parent_window)
+                pd.setWindowModality(QtCore.Qt.WindowModality.WindowModal)
+                pd.setStyleSheet('* {font-size: ' + str(self.settings['fontsize']) + 'pt}')
+                pd.setWindowTitle(_('Download AI components'))
+                pd.setAutoClose(False)
+                pd.show()
+                self.sources_vectorstore.download_embedding_model()
+                while self.sources_vectorstore.download_model_running:
+                    if pd.wasCanceled():
+                        self.sources_vectorstore.download_model_cancel = True
+                        self.settings['ai_enable'] = 'False'
+                        return False
+                    else:
+                        msg = self.sources_vectorstore.download_model_msg
+                        msgs = msg.split(':')
+                        if len(msgs) > 1:
+                            pd.setValue(int(''.join(filter(str.isdigit, msgs[1]))))
+                            msg = msgs[0]
+                        else:
+                            pd.setValue(0)
+                            
+                        #percent_done = re.search(r'(\d+(\.\d+)?)%', msg)
+                        #if percent_done:
+                        #    pd.setValue(int(percent_done.group(1)))
+                        #    msg = msg[:-1*(len(percent_done.group(1)) + 1)]
+                        #else:
+                        #    pd.setValue(0)
+                        pd.setLabelText(_('Downloading ') + msg)
+                        QtWidgets.QApplication.processEvents() # update the progress dialog
+                        time.sleep(0.01)
+                pd.close()
+            else:
+                self.settings['ai_enable'] = 'False'
+                return False
+        return True     
 
 class MainWindow(QtWidgets.QMainWindow):
     """ Main GUI window.
@@ -931,6 +1041,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setStyleSheet(font)
         self.init_ui()
         self.app.sources_vectorstore = AiVectorstore(self.app, self.ui.textEdit, self.app.sources_collection)
+        self.app.llm = AiLLM(self.app, self.ui.textEdit)
         self.show()
 
     def init_ui(self):
@@ -1210,9 +1321,9 @@ class MainWindow(QtWidgets.QMainWindow):
         msg += _("Backup on open") + f": {self.app.settings['backup_on_open']}\n"
         msg += _("Backup AV files") + f": {self.app.settings['backup_av_files']}\n"
         if self.app.settings['ai_enable'] == 'True':
-            msg += _("AI Research Mate is enabled") + "\n"
+            msg += _("AI buddy is enabled") + "\n"
         else:
-            msg += _("AI Research Mate is disabled") + "\n"
+            msg += _("AI buddy is disabled") + "\n"
         if self.app.settings['open_ai_api_key'] != '':
             msg += _("OpenAI API key is set") + "\n"
         else:
@@ -1808,8 +1919,13 @@ class MainWindow(QtWidgets.QMainWindow):
         if current_ai_enable != self.app.settings['ai_enable']:
             if self.app.settings['ai_enable'] == 'True':
                 # AI is newly enabled
-                self.ui.textEdit.append(_("AI research mate: Rebuilding my memory..."))
-                self.app.sources_vectorstore.init_vectorstore(rebuild=True)
+                if self.app.prepare_ai(self):
+                    self.ui.textEdit.append(_("AI buddy: Rebuilding my memory..."))
+                    self.app.sources_vectorstore.init_vectorstore(rebuild=True)
+                    self.app.llm.init_llm()
+                else:
+                    self.app.settings['ai_enable'] = False
+                    # self.ui.textEdit.append(_("AI buddy: Could not download necessary components, AI buddy disabled."))
             else: 
                 self.app.sources_vectorstore.close()
         # Name change: Close all opened dialogs as coder name needs to change everywhere
@@ -1831,7 +1947,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 for i in reversed(range(contents.count())):
                     contents.itemAt(i).widget().close()
                     contents.itemAt(i).widget().setParent(None)
-
+                    
     def project_memo(self):
         """ Give the entire project a memo. """
 
@@ -2134,9 +2250,15 @@ class MainWindow(QtWidgets.QMainWindow):
         cur.execute("vacuum")
         self.app.conn.commit()
         
-        # AI: init and update vectorstore
+        # AI: init llm and update vectorstore
         if self.app.settings['ai_enable'] == 'True':
-            self.app.sources_vectorstore.init_vectorstore()
+            if self.app.prepare_ai(self):
+                self.app.sources_vectorstore.init_vectorstore()
+                self.app.llm.init_llm()
+            else:
+                self.app.sources_vectorstore.close()
+                self.app.settings['ai_enable'] = False
+                self.ui.textEdit.append(_("AI buddy: Error - failed to initialize."))
 
         # Fix missing folders within QualCoder project. Will cause import errors.
         span = '<span style="color:red">'

@@ -28,12 +28,19 @@ https://qualcoder.wordpress.com/
 
 import sys
 import traceback
+try:
+    import pydevd # for debugging
+except:
+    pass
 from typing import Any
 from PyQt6.QtCore import QObject, QRunnable, QThreadPool, pyqtSignal, pyqtSlot
 from PyQt6 import sip
 
 # Async worker for lengthy AI functions that would otherwise block the UI.
 # Adopted from https://www.pythonguis.com/tutorials/multithreading-pyqt-applications-qthreadpool/ 
+
+class AiException(Exception):
+    pass
 
 class WorkerSignals(QObject):
     '''
@@ -92,6 +99,10 @@ class Worker(QRunnable):
         '''
         Initialise the runner function with passed args, kwargs.
         '''
+        try:
+            pydevd.settrace(suspend=False) # enable debugger
+        except:
+            pass 
 
         # Retrieve args/kwargs here; and fire processing using them
         try:
@@ -102,9 +113,13 @@ class Worker(QRunnable):
             # self.signals.error.emit((exctype, value, traceback.format_exc()))
             if not sip.isdeleted(self.signals):
                 self.signals.error.emit(exctype, value, err.__traceback__)
-        else:
-            if not sip.isdeleted(self.signals):
-                self.signals.result.emit(result)  # Return the result of the processing
+            return
+        #else:
+        #    if not sip.isdeleted(self.signals):
+        #        self.signals.result.emit(result)  # Return the result of the processing
         finally:
             if not sip.isdeleted(self.signals):
                 self.signals.finished.emit()  # Done
+        
+        if not sip.isdeleted(self.signals):
+            self.signals.result.emit(result)  # Return the result of the processing
