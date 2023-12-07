@@ -45,6 +45,8 @@ from langchain.chains.openai_functions import (
     create_structured_output_runnable,
 )
 from langchain.prompts import ChatPromptTemplate
+from langchain.callbacks.base import BaseCallbackHandler
+from langchain.schema.runnable import RunnableConfig
 from .ai_async_worker import Worker, AiException
 from .ai_vectorstore import AiVectorstore
 from .GUI.base64_helper import *
@@ -67,8 +69,15 @@ def exception_handler(exception_type, value, tb_obj):
     mb.setText(text_)
     mb.exec()
     
+class MyCustomSyncHandler(BaseCallbackHandler):
+    def __init__(self, ai_llm):
+        self.ai_llm = ai_llm
+        
+    def on_llm_new_token(self, token: str, **kwargs) -> None:
+        self.ai_llm.ai_async_progress_count += 1
+    
 # Type for returned list of documents
-class AnalyzedData(BaseModel):
+class LlmAnalyzedData(BaseModel):
     relevance: int = Field(..., 
         description='A score between 0 and 10 indicating how relevant the empirical data in "page_content" is for the analysis of the given code.')
     interpretation: str = Field(..., 
@@ -78,12 +87,18 @@ class AnalyzedData(BaseModel):
                         'relevant for the analysis of the given code. Give back the quote exactly like in the original, including errors. '
                         'Do not change the text in any way.')
     )
+
+class AnalyzedData(LlmAnalyzedData):
     quote_start: int = Field(..., 
         description='The position of the first character of the selected quote within "page_content".')
     metadata: dict = Field(default_factory=dict, 
         description='The metadata of the chunk of empirical data, excactly like in the original JSON.')
 
 # metadata: {'id':xx, 'name':xx, 'start_index':xx}
+
+class LlmAnalyzedDataList(BaseModel):
+    """A list of analyzed chunks of empircal data"""
+    data: List[AnalyzedData]
 
 class AnalyzedDataList(BaseModel):
     """A list of analyzed chunks of empircal data"""
@@ -98,12 +113,14 @@ class AiLLM():
     threadpool: QtCore.QThreadPool = None
     ai_async_is_canceled = False
     ai_async_is_finished = False
+    ai_async_progress_msgbox = None
     ai_async_progress_msg = ''
+    ai_async_progress_count = -1
+    ai_async_progress_max = -1
     busy = False   
     gpt4 = None
     default_system_prompt = (
-        'You are a member of a team of qualitative social researchers, '
-        'working with the grounded theory approach.'
+        'You are a member of a team of qualitative social researchers.'
     )
 
     def __init__(self, app, parent_text_edit):
@@ -116,7 +133,9 @@ class AiLLM():
         set_llm_cache(InMemoryCache())
         self.gpt4 = ChatOpenAI(model='gpt-4-1106-preview', 
                                openai_api_key=self.app.settings['open_ai_api_key'], 
-                               cache=True
+                               cache=True,
+                               temperature=0.0,
+                               streaming=True
                                )
         
     def is_ready(self):
@@ -126,25 +145,23 @@ class AiLLM():
                     (self.threadpool.activeThreadCount() == 0)
     
     def _ai_async_progress(self, msg):
-        print(msg)
-        if self.ai_async_progress_msg is not None:
-            new_msg = self.ai_async_progress_msg.text() + '\n' + msg
-            self.ai_async_progress_msg.setText(new_msg)
+        # print(msg)
+        self.ai_async_progress_msg = self.ai_async_progress_msg + '\n' + msg
 
     def _ai_async_finished(self):
-        self.ai_async_progress_msg.close()
+        self.ai_async_progress_msgbox.close()
         self.ai_async_is_finished = True
     
     def ai_async_query(self, parent_window, func, result_callback, *args, **kwargs):
         # show MessageBox while waiting
-        self.ai_async_progress_msg = QtWidgets.QMessageBox(parent_window)
-        self.ai_async_progress_msg.setStandardButtons((QtWidgets.QMessageBox.StandardButton.Abort))
-        self.ai_async_progress_msg.setWindowTitle('AI query running')
+        self.ai_async_progress_msgbox = QtWidgets.QMessageBox(parent_window)
+        self.ai_async_progress_msgbox.setStandardButtons((QtWidgets.QMessageBox.StandardButton.Abort))
+        self.ai_async_progress_msgbox.setWindowTitle('AI query running')
         # create Label
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(ai_search), "gif")
-        self.ai_async_progress_msg.setIconPixmap(pm.scaledToWidth(128))
-        icon_label = self.ai_async_progress_msg.findChild(QtWidgets.QLabel, "qt_msgboxex_icon_label")
+        self.ai_async_progress_msgbox.setIconPixmap(pm.scaledToWidth(128))
+        icon_label = self.ai_async_progress_msgbox.findChild(QtWidgets.QLabel, "qt_msgboxex_icon_label")
         # load gif
         bArray = QtCore.QByteArray.fromBase64(ai_search)
         bBuffer = QtCore.QBuffer(bArray)
@@ -155,18 +172,20 @@ class AiLLM():
         size = QtCore.QSize(128, 128)
         movie.setScaledSize(size)
         # avoid garbage collector
-        setattr(self.ai_async_progress_msg, 'icon_label_bArray', bArray)
-        setattr(self.ai_async_progress_msg, 'icon_label_bBuffer', bBuffer)
-        setattr(self.ai_async_progress_msg, 'icon_label', movie)
+        setattr(self.ai_async_progress_msgbox, 'icon_label_bArray', bArray)
+        setattr(self.ai_async_progress_msgbox, 'icon_label_bBuffer', bBuffer)
+        setattr(self.ai_async_progress_msgbox, 'icon_label', movie)
         # start animation
         icon_label.setMovie(movie)
         movie.start()
-        self.ai_async_progress_msg.setModal(True)
-        self.ai_async_progress_msg.show()
+        self.ai_async_progress_msgbox.setModal(True)
+        self.ai_async_progress_msgbox.show()
         self.ai_async_is_canceled = False
         
         # start async worker
         self.ai_async_is_finished = False
+        self.ai_async_progress_msg = ''
+        self.ai_async_progress_count = -1
         worker = Worker(func, *args, **kwargs) # Any other args, kwargs are passed to the run function
         worker.signals.result.connect(result_callback)
         worker.signals.finished.connect(self._ai_async_finished)
@@ -175,6 +194,11 @@ class AiLLM():
         self.threadpool.start(worker)
         
         while not self.ai_async_is_finished:
+            if (self.ai_async_progress_count > -1) and (self.ai_async_progress_max > -1):
+                progress_percent = round((self.ai_async_progress_count / self.ai_async_progress_max) * 100)
+                self.ai_async_progress_msgbox.setText(f'{self.ai_async_progress_msg} (~{progress_percent}%)')
+            else:
+                self.ai_async_progress_msgbox.setText(self.ai_async_progress_msg)
             QtWidgets.QApplication.processEvents() # update the progress dialog
             time.sleep(0.01)
     
@@ -342,34 +366,37 @@ class AiLLM():
                      '3. Select a short quote from the empirical data in "page_content" that contains the part which is most relevant for the analysis '
                      'of the given code. Give back the quote in the field "quote" of the output, following the the original exactly, including errors. '
                      'Do not change the text in any way. \n'
-                     '4. Count the number of characters from the beginning of the empirical data in "page_content" up to the selected quote and '
-                     'give back the position of the first character of the quote in the field "quote_start" of the output. \n'
-                     '5. Copy the "metadata" from the original chunk of data in the input to the field "metatdata" in the output. Do not change this '
-                     'metatdata in any way.\n'
-                     'Do these 5 steps for every chunk of empirical data in the list, then close the JSON object for the output. Make sure to return '
+                     'Do these 3 steps for every chunk of empirical data in the list, then close the JSON object for the output. Make sure to return '
                      'a valid JSON object that follows the given schema exactly.',
                     )
                 )
             ]
         )
+        
+        self.ai_async_progress_max = round(len(chunks_json) / 4)
       
         # my_analyze_chunk_prompt = analyze_chunk_prompt.format(code_name=code_name, memo_str=memo_str, chunks_json=chunks_json)
 
         runnable = create_structured_output_runnable(
-            output_schema=AnalyzedDataList, 
+            output_schema=LlmAnalyzedDataList, 
             llm=self.gpt4, 
             prompt=analyze_chunks_prompt)
+        
+        config = RunnableConfig()
+        config['callbacks'] = [MyCustomSyncHandler(self)]
 
         selected_quotes: AnalyzedDataList = runnable.invoke({
             'code_name': code_name, 
             'memo_str': memo_str, 
             'chunks_json': chunks_json
-        })
+        }, config=config)
                 
         # Adjust quote_start
         i = 0
         for doc in selected_quotes.data:
-            # doc.quote_start = doc.metadata['start_index'] + doc.quote_start
+            doc.metadata = chunk_list[i].metadata
+            
+            # doc.quote_start = doc.metadata['start_index'] + doc.quote_start 
             # quote_found = str(chunk_list[i].page_content).find(doc.quote)
             
             # search with not more than 20% mismatch (Levenshtein Distance)
