@@ -51,6 +51,7 @@ from .ai_async_worker import Worker, AiException
 from .ai_vectorstore import AiVectorstore
 from .GUI.base64_helper import *
 import fuzzysearch
+import json
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -196,6 +197,8 @@ class AiLLM():
         while not self.ai_async_is_finished:
             if (self.ai_async_progress_count > -1) and (self.ai_async_progress_max > -1):
                 progress_percent = round((self.ai_async_progress_count / self.ai_async_progress_max) * 100)
+                if progress_percent > 100:
+                    progress_percent = 100
                 self.ai_async_progress_msgbox.setText(f'{self.ai_async_progress_msg} (~{progress_percent}%)')
             else:
                 self.ai_async_progress_msgbox.setText(self.ai_async_progress_msg)
@@ -244,6 +247,12 @@ class AiLLM():
                 )
             ]
         )
+        
+        logger.debug(_('AI generate_code_descriptions prompt:\n') + code_descriptions_prompt.format(code_name=code_name, memo_prompt=memo_prompt))
+
+        self.ai_async_progress_max = round(1000 / 4) # estimated token count of the result (1000 chars)
+        config = RunnableConfig()
+        config['callbacks'] = [MyCustomSyncHandler(self)]
 
         # query the llm
         runnable = create_structured_output_runnable(
@@ -251,10 +260,12 @@ class AiLLM():
             llm = self.gpt4, 
             prompt = code_descriptions_prompt)
 
-        code_descriptions = runnable.invoke({
+        code_descriptions: CodeDescriptions = runnable.invoke({
             'code_name': code_name,
             'memo_prompt': memo_prompt
-        })
+        }, config=config)
+        
+        logger.debug(_('AI generate_code_descriptions result:\n') + code_descriptions.json())
 
         # return the result as a list
         res = []
@@ -336,7 +347,7 @@ class AiLLM():
         # create json:
         chunks_json = '{\n  "chunks_of_empirical_data":[\n'
         for chunk in chunk_list:
-            chunks_json += f'    {chunk.json()},\n'
+            chunks_json += f'    {json.dumps(chunk.page_content)},\n'
         chunks_json = chunks_json[:-2] + '\n' # delete the last comma
         chunks_json += '  ]\n}'
         
@@ -355,15 +366,15 @@ class AiLLM():
                     'human',
                     str('We are analyzing the code named "{code_name}".\n'
                      '{memo_str}'
-                     'Here is a list of larger chunks of empirical data, formatted as a JSON object. The field "page_content" contains the actual data: \n'
+                     'Here is a list of larger chunks of empirical data, formatted as a JSON object: \n'
                      '{chunks_json}\n'
                      'Your tasks: Go through this list one by one and fulfill the following tasks:\n'
-                     '1. Estimate the relevance of the chunk of empirical data in "page_content" for the analysis of the given code and give it a score '
+                     '1. Estimate the relevance of the chunk of empirical data for the analysis of the given code and give it a score '
                      'between 0 and 10. A chunk of empirical data will be relevant if it addresses a similar topic, attitude, feeling '
                      'or experience or conveys a similar meaning as the given code. Return the score in the field "relevance" of the output. \n'
-                     '2. In the field "interpretation" of the output, give a short a short explanation how the empirical data in "page_content" '
+                     '2. In the field "interpretation" of the output, give a short a short explanation how the chunk of empirical data '
                      'relates to the given code code or not \n'
-                     '3. Select a short quote from the empirical data in "page_content" that contains the part which is most relevant for the analysis '
+                     '3. Select a short quote from the chunk of empirical data that contains the part which is most relevant for the analysis '
                      'of the given code. Give back the quote in the field "quote" of the output, following the the original exactly, including errors. '
                      'Do not change the text in any way. \n'
                      'Do these 3 steps for every chunk of empirical data in the list, then close the JSON object for the output. Make sure to return '
@@ -373,9 +384,9 @@ class AiLLM():
             ]
         )
         
-        self.ai_async_progress_max = round(len(chunks_json) / 4)
+        self.ai_async_progress_max = round((len(chunks_json) / 4) * 0.7) # estimated token count of the result
       
-        # my_analyze_chunk_prompt = analyze_chunk_prompt.format(code_name=code_name, memo_str=memo_str, chunks_json=chunks_json)
+        logger.debug(_("AI analyze_similarity prompt:\n") + analyze_chunks_prompt.format(code_name=code_name, memo_str=memo_str, chunks_json=chunks_json))
 
         runnable = create_structured_output_runnable(
             output_schema=LlmAnalyzedDataList, 
@@ -390,6 +401,8 @@ class AiLLM():
             'memo_str': memo_str, 
             'chunks_json': chunks_json
         }, config=config)
+        
+        logger.debug(_("AI analyze_similarity result:\n") + selected_quotes.json())
                 
         # Adjust quote_start
         i = 0
