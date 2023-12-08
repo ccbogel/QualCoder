@@ -77,10 +77,10 @@
              <string>Send not only the name but also the memo associated with a code to the AI?</string>
             </property>
             <property name="text">
-             <string>Send memos to AI</string>
+             <string>Send memo to AI</string>
             </property>
             <property name="checked">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
            </widget>
           </item>

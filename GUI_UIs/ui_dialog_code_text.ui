@@ -616,7 +616,7 @@ As all assigned positions may be incorrect. </string>
         </size>
        </property>
        <property name="currentIndex">
-        <number>1</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="tab_docs">
         <property name="sizePolicy">
@@ -760,7 +760,7 @@ As all assigned positions may be incorrect. </string>
          <string>AI Search</string>
         </attribute>
         <attribute name="toolTip">
-         <string>Use the AI buddy to find data</string>
+         <string>Use the AI to find data</string>
         </attribute>
         <layout class="QVBoxLayout" name="verticalLayout_3">
          <item>
@@ -779,6 +779,9 @@ As all assigned positions may be incorrect. </string>
            </property>
            <property name="toolTip">
             <string>Click here to define the options for the AI based search</string>
+           </property>
+           <property name="styleSheet">
+            <string notr="true"/>
            </property>
            <property name="text">
             <string>&lt;Start AI Search&gt;</string>

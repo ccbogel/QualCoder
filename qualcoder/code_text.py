@@ -59,6 +59,7 @@ from .select_items import DialogSelectItems  # for isinstance()
 from .ai_llm import AnalyzedDataList
 from .ai_search_dialog import DialogAiSearch
 
+ai_search_analyze_count = 12
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -4174,10 +4175,10 @@ class DialogCodeText(QtWidgets.QWidget):
                     overlap_start = max(chunk_start, coding_start)
                     overlap_end = min(chunk_end, coding_end)                 
                     if overlap_start < overlap_end:
-                        # found an overlap. If it is more then 50% of the coding, skip this chunk
+                        # found an overlap. If it is more then 10% of the coding, skip this chunk
                         overlap_len = overlap_end - overlap_start
                         coding_len = coding_end - coding_start
-                        if overlap_len >= 0.5 * coding_len:
+                        if overlap_len > 0.1 * coding_len:
                             chunk_already_coded = True
                             break
                 if not chunk_already_coded:
@@ -4185,23 +4186,25 @@ class DialogCodeText(QtWidgets.QWidget):
             # finally: replace the chunks list with the filtered one
             chunks = filtered_chunks        
         
-        # 2) Send the first 20 chunks to the llm for further analysis 
+        # 2) Send the first "ai_search_analyze_count" chunks to the llm for further analysis 
         self.ai_search_similar_chunks = chunks # save to allow analyzing more chunks later
         self.ai_search_chunks_pos = 0
-        self.ai_analyze_similar_chunks(20)
+        self.ai_analyze_similar_chunks(ai_search_analyze_count)
 
     def ai_analyze_similar_chunks(self, chunk_count):
         if self.ai_search_chunks_pos < len(self.ai_search_similar_chunks):
+            # chunks left, analyze them
             self.app.llm.analyze_similarity(self, self.ai_search_similar_callback, 
                                             self.ai_search_similar_chunks[self.ai_search_chunks_pos:self.ai_search_chunks_pos+chunk_count], 
                                             self.ai_search_name, self.ai_search_description)
             if len(self.ai_search_similar_chunks) > self.ai_search_chunks_pos + chunk_count:
                 self.ai_search_chunks_pos += chunk_count
-            else:
+            else: 
                 self.ai_search_chunks_pos = len(self.ai_search_similar_chunks)
 
     def ai_search_similar_callback(self, docs):
         self.ui.pushButton_ai_search.setText(self.ai_search_name)
+        self.ui.pushButton_ai_search.setStyleSheet('text-align: left')
         last_row = self.ui.listWidget_ai.count() - 1
         self.ui.listWidget_ai.clear()
         if docs is not None and docs.data is not None and len(docs.data) > 0:
@@ -4224,22 +4227,11 @@ class DialogCodeText(QtWidgets.QWidget):
             item = QtWidgets.QListWidgetItem('')
             self.ui.listWidget_ai.addItem(item)
             self.ui.listWidget_ai.setItemWidget(item, find_more_label)
-            
-            """            
-            item = QtWidgets.QListWidgetItem('')
-            item.setToolTip(_('Click here to find more data'))
-            font = item.font()
-            font.setUnderline(True)
-            item.setFont(font)
-            brush = item.foreground()
-            brush.setColor(Qt.GlobalColor.blue)
-            item.setForeground(brush)
-            item.setText(_('find more...'))
-            self.ui.listWidget_ai.addItem(item)
-            """
-            
+                        
         if last_row >= 0 and last_row < (self.ui.listWidget_ai.count() - 1):
             self.ui.listWidget_ai.item(last_row).setSelected(True)
+            self.ui.listWidget_ai.scrollToItem(self.ui.listWidget_ai.item(last_row), QtWidgets.QAbstractItemView.ScrollHint.PositionAtCenter)
+            self.ai_search_selection_changed()
     
     def ai_search_list_clicked(self):
         if self.ai_search_docs is None or len(self.ai_search_docs) == 0:
@@ -4247,14 +4239,20 @@ class DialogCodeText(QtWidgets.QWidget):
         row = self.ui.listWidget_ai.currentRow()
         if row >= len(self.ai_search_docs):
             # out of bounds, must be the "find more..." row
-            self.ai_analyze_similar_chunks(20)
+            self.ai_analyze_similar_chunks(ai_search_analyze_count)
+        else:
+            self.ai_search_selection_changed()
         
     def ai_search_selection_changed(self):
         """Load the document in the textView and select the quote."""
         if self.ai_search_docs is None or len(self.ai_search_docs) == 0:
             return
         
-        row = self.ui.listWidget_ai.currentRow()
+        if len(self.ui.listWidget_ai.selectedIndexes()) > 0:
+            row = self.ui.listWidget_ai.selectedIndexes()[0].row()
+        else:
+            return
+        
         if row == len(self.ai_search_docs):
             # out of bounds, must be the "find more..." row
             self.ui.listWidget_ai.item(row).setSelected(False)
@@ -4277,21 +4275,15 @@ class DialogCodeText(QtWidgets.QWidget):
                     self.ui.listWidget.setCurrentRow(i)
                     self.load_file(f)
                     # self.search_term = ""
-                    # Set text cursor position and also highlight one character, to show location.
+                    # Set text cursor position
                     text_cursor = self.ui.textEdit.textCursor()
                     text_cursor.setPosition(quote_start)
-                    #text_cursor.setPosition(0)
-                    #text_cursor.movePosition(QtGui.QTextCursor.MoveOperation.Right, 
-                    #                         QtGui.QTextCursor.MoveMode.MoveAnchor,
-                    #                         n=quote_start)
                     endpos = quote_end
                     if endpos < 0:
                         endpos = 0
                     text_cursor.setPosition(endpos, QtGui.QTextCursor.MoveMode.KeepAnchor)
-                    #text_cursor.movePosition(QtGui.QTextCursor.MoveOperation.Right, 
-                    #                         QtGui.QTextCursor.MoveMode.KeepAnchor,
-                    #                         n = quote_end - quote_start)
                     self.ui.textEdit.setTextCursor(text_cursor)
+                    self.ui.textEdit.verticalScrollBar().setValue(self.ui.textEdit.verticalScrollBar().value() + 200)
                     self.ui.textEdit.setFocus()
                 except Exception as e:
                     logger.debug(str(e))

@@ -398,7 +398,7 @@ class DialogAiSearch(QtWidgets.QDialog):
                     self.selected_name = f'{item.text(0)} > {self.selected_name}'
                     item = item.parent()               
         else: # free search selected
-            self.selected_code_ids = -1
+            self.selected_code_ids = None
             self.selected_name = self.ui.lineEdit_free_topic.text()
             if self.selected_name == '':
                 msg = _('Please enter text in the "topic" field.')

@@ -262,5 +262,5 @@ class Ui_Dialog_settings(object):
         self.label_new_coder.setText(_translate("Dialog_settings", "New coder"))
         self.label_current_coder.setText(_translate("Dialog_settings", "Current coder: "))
         self.pushButton_choose_directory.setText(_translate("Dialog_settings", "Default project directory"))
-        self.label_9.setText(_translate("Dialog_settings", "My AI buddy"))
-        self.checkBox_AI_enable.setText(_translate("Dialog_settings", "enable AI buddy"))
+        self.label_9.setText(_translate("Dialog_settings", "AI Integration"))
+        self.checkBox_AI_enable.setText(_translate("Dialog_settings", "enable AI integration"))

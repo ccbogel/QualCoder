@@ -895,21 +895,21 @@ class App(object):
     
     def get_openai_api_key(self, key='', parent_window=None) -> str:
         api_key_msg = _(
-'Please read this important note about access to GPT4:\n\
+'Please read this important note about access to GPT-4:\n\
 \n\
-The AI buddy in qualcoder needs an API key from OpenAI to access GPT4. Follow these steps to get one:\n\
+The AI integration in qualcoder needs an API key from OpenAI to access GPT4. Follow these steps to get one:\n\
 1) Go to "https://platform.openai.com" \n\
 2) Sign up for an account (or log in if you already have one)\n\
 3) In the menu on the far left of the page, select "API keys"\n\
 4) Create a new key, copy it and enter it here.\n\
 \n\
 The access to GPT4 via the OpenAI API is not free (and also not included in ChatGPT Plus). As a new user, you will \n\
-normally receive $5 (USD) worth of credit from OpenAI. If this is used up or expired, you have to enter your payment \n\
-information on the OpenAI platform and will be charged for every single request qualcoder makes on your behalf. \n\
-The cost of a request is usually in the order of a few cents only. This money goes directly to OpenAI, the authors of \n\
+normally receive $5 (USD) worth of credit from OpenAI. If this is used up or expired, you have to buy new credits \n\
+on the OpenAI platform and will be charged for every request qualcoder makes on your behalf. \n\
+The cost of a request is low, usually in the order of a few cents only. This money goes directly to OpenAI, the authors of \n\
 qualcoder are not involved in this in any way. We try to limit the number of requests as much as possible. But there \n\
 is always a slight risk that a malfunction of the app may lead to more requests than expected.\n\
-Therefore it is very important to SET A REASONABLE MONTHLY LIMIT in your OpenAI account ($10 will go a long way). \n\
+It is therefore advisable to set a maximum monthly budget in your OpenAI account ($10 will go a long way). \n\
 In the menu on "https://platform.openai.com", go to "settings", "Limits", "Usage limits" and define your monthly budget.\n\
 Liability: By using qualcoder and its ai enhanced functions you accept that the authors and copyright holders \n\
 will under no circumstances be liable for any costs resulting from the usage of the OpenAI API, even if these \n\
@@ -945,7 +945,7 @@ Please enter your OpenAI api key here:')
         # embeddings model download:
         if not self.sources_vectorstore.embedding_model_is_cached():
             model_download_msg = _('\
-Since you are using the AI buddy for the first time, \n\
+Since you are using the AI integration for the first time, \n\
 qualcoder needs to download and install some \n\
 additional components. \n\
 \n\
@@ -1131,7 +1131,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setStyleSheet(font)
         self.ui.textEdit.setReadOnly(True)
         self.settings_report()
+        
         self.ai_chat()
+        # Disable ai_chat tab for now, not ready yet
+        self.ui.tabWidget.setTabVisible(4, False)
+
 
     def resizeEvent(self, new_size):
         """ Update the widget size details in the app.settings variables """
@@ -1321,9 +1325,9 @@ class MainWindow(QtWidgets.QMainWindow):
         msg += _("Backup on open") + f": {self.app.settings['backup_on_open']}\n"
         msg += _("Backup AV files") + f": {self.app.settings['backup_av_files']}\n"
         if self.app.settings['ai_enable'] == 'True':
-            msg += _("AI buddy is enabled") + "\n"
+            msg += _("AI integration is enabled") + "\n"
         else:
-            msg += _("AI buddy is disabled") + "\n"
+            msg += _("AI integration is disabled") + "\n"
         if self.app.settings['open_ai_api_key'] != '':
             msg += _("OpenAI API key is set") + "\n"
         else:
@@ -1920,12 +1924,12 @@ class MainWindow(QtWidgets.QMainWindow):
             if self.app.settings['ai_enable'] == 'True':
                 # AI is newly enabled
                 if self.app.prepare_ai(self):
-                    self.ui.textEdit.append(_("AI buddy: Rebuilding my memory..."))
+                    self.ui.textEdit.append(_("AI: Rebuilding my memory"))
                     self.app.sources_vectorstore.init_vectorstore(rebuild=True)
                     self.app.llm.init_llm()
                 else:
                     self.app.settings['ai_enable'] = False
-                    # self.ui.textEdit.append(_("AI buddy: Could not download necessary components, AI buddy disabled."))
+                    # self.ui.textEdit.append(_("AI: Could not download necessary components, AI integration disabled."))
             else: 
                 self.app.sources_vectorstore.close()
         # Name change: Close all opened dialogs as coder name needs to change everywhere
@@ -2258,7 +2262,7 @@ class MainWindow(QtWidgets.QMainWindow):
             else:
                 self.app.sources_vectorstore.close()
                 self.app.settings['ai_enable'] = False
-                self.ui.textEdit.append(_("AI buddy: Error - failed to initialize."))
+                self.ui.textEdit.append(_("AI: Error - failed to initialize."))
 
         # Fix missing folders within QualCoder project. Will cause import errors.
         span = '<span style="color:red">'

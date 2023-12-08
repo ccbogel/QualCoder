@@ -197,8 +197,8 @@ class AiLLM():
         while not self.ai_async_is_finished:
             if (self.ai_async_progress_count > -1) and (self.ai_async_progress_max > -1):
                 progress_percent = round((self.ai_async_progress_count / self.ai_async_progress_max) * 100)
-                if progress_percent > 100:
-                    progress_percent = 100
+                if progress_percent >= 100:
+                    progress_percent = 99
                 self.ai_async_progress_msgbox.setText(f'{self.ai_async_progress_msg} (~{progress_percent}%)')
             else:
                 self.ai_async_progress_msgbox.setText(self.ai_async_progress_msg)
@@ -243,7 +243,7 @@ class AiLLM():
                     'human',
                     ('You are discussing the code named "{code_name}"{memo_prompt}\n'
                     'Your task: Give back a list of 10 short descriptions of the meaning of this code using the given format. '
-                    'Try to give a variety of diverse code-descriptions. Use simple language.'),
+                    'Try to give a variety of diverse code-descriptions. Use the same language as the code name and simple, everyday terms.'),
                 )
             ]
         )
@@ -270,7 +270,6 @@ class AiLLM():
         # return the result as a list
         res = []
         for desc in code_descriptions.descriptions:
-            self.parent_text_edit.append(desc.description)
             res.append(desc.description)
         return res
     
@@ -366,6 +365,7 @@ class AiLLM():
                     'human',
                     str('We are analyzing the code named "{code_name}".\n'
                      '{memo_str}'
+                     'Please answer in the language of the code name.\n'
                      'Here is a list of larger chunks of empirical data, formatted as a JSON object: \n'
                      '{chunks_json}\n'
                      'Your tasks: Go through this list one by one and fulfill the following tasks:\n'
@@ -373,7 +373,7 @@ class AiLLM():
                      'between 0 and 10. A chunk of empirical data will be relevant if it addresses a similar topic, attitude, feeling '
                      'or experience or conveys a similar meaning as the given code. Return the score in the field "relevance" of the output. \n'
                      '2. In the field "interpretation" of the output, give a short a short explanation how the chunk of empirical data '
-                     'relates to the given code code or not \n'
+                     'relates to the given code code or not.\n'
                      '3. Select a short quote from the chunk of empirical data that contains the part which is most relevant for the analysis '
                      'of the given code. Give back the quote in the field "quote" of the output, following the the original exactly, including errors. '
                      'Do not change the text in any way. \n'
@@ -384,7 +384,7 @@ class AiLLM():
             ]
         )
         
-        self.ai_async_progress_max = round((len(chunks_json) / 4) * 0.7) # estimated token count of the result
+        self.ai_async_progress_max = round((len(chunks_json) / 4) * 0.75) # estimated token count of the result
       
         logger.debug(_("AI analyze_similarity prompt:\n") + analyze_chunks_prompt.format(code_name=code_name, memo_str=memo_str, chunks_json=chunks_json))
 
@@ -408,10 +408,7 @@ class AiLLM():
         i = 0
         for doc in selected_quotes.data:
             doc.metadata = chunk_list[i].metadata
-            
-            # doc.quote_start = doc.metadata['start_index'] + doc.quote_start 
-            # quote_found = str(chunk_list[i].page_content).find(doc.quote)
-            
+                       
             # search with not more than 20% mismatch (Levenshtein Distance)
             if doc.quote != '':
                 quote_found = fuzzysearch.find_near_matches(doc.quote, chunk_list[i].page_content, 

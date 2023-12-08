@@ -319,7 +319,7 @@ class Ui_Dialog_code_text(object):
         self.verticalLayout.addWidget(self.splitter)
 
         self.retranslateUi(Dialog_code_text)
-        self.tabWidget.setCurrentIndex(1)
+        self.tabWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(Dialog_code_text)
         Dialog_code_text.setTabOrder(self.pushButton_annotate, self.pushButton_show_annotations)
         Dialog_code_text.setTabOrder(self.pushButton_show_annotations, self.pushButton_coding_memo)
@@ -399,7 +399,7 @@ class Ui_Dialog_code_text(object):
         self.pushButton_ai_search.setToolTip(_translate("Dialog_code_text", "Click here to define the options for the AI based search"))
         self.pushButton_ai_search.setText(_translate("Dialog_code_text", "<Start AI Search>"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_ai), _translate("Dialog_code_text", "AI Search"))
-        self.tabWidget.setTabToolTip(self.tabWidget.indexOf(self.tab_ai), _translate("Dialog_code_text", "Use the AI buddy to find data"))
+        self.tabWidget.setTabToolTip(self.tabWidget.indexOf(self.tab_ai), _translate("Dialog_code_text", "Use the AI to find data"))
         self.pushButton_show_all_codings.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>Show all codings</p></body></html>"))
         self.pushButton_show_codings_prev.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>Show previous coding of selected code</p></body></html>"))
         self.pushButton_show_codings_next.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>Show next coding of selected code.</p></body></html>"))

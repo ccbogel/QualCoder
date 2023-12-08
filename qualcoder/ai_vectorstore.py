@@ -74,9 +74,13 @@ class E5SentenceTransformerEmbeddings(SentenceTransformerEmbeddings):
         Returns:
             List of embeddings, one for each text.
         """
+        
+        emb_texts = []
+        
         for text in texts:
-            text = 'passage: ' + text
-        return super().embed_documents(texts=texts)
+            emb_texts.append('passage: ' + text)
+  
+        return super().embed_documents(texts=emb_texts)
     
     def embed_query(self, text: str) -> List[float]:
         """Compute query embeddings using a HuggingFace transformer model.
@@ -94,7 +98,7 @@ class E5SentenceTransformerEmbeddings(SentenceTransformerEmbeddings):
    
     
 class AiVectorstore():
-    """ This is the memory of AI buddy. 
+    """ This is the memory of the AI. 
     It manages a chromadb vectorstore with embeddings for all text based 
     source data in the project. This allows for semantic search and retrieval 
     of chunks of data which can then be further processed with a large 
@@ -198,9 +202,9 @@ class AiVectorstore():
         if not self.ai_worker_running():
             self.download_model_running = False
             if self.download_model_cancel:
-                msg = _("AI buddy: Could not download all the necessary components, AI buddy will be disabled.")
+                msg = _("AI: Could not download all the necessary components, the AI integration will be disabled.")
             else:
-                msg = _('AI buddy: Success, components downloaded and installed.')
+                msg = _('AI: Success, components downloaded and installed.')
             self.parent_text_edit.append(msg)
             logger.debug(msg)
 
@@ -243,10 +247,10 @@ class AiVectorstore():
         """
         self._is_closing = False
         
-        self.parent_text_edit.append(_('Hi there! AI buddy is waking up...'))
+        self.parent_text_edit.append(_('AI: Hi there! Starting up...'))
         QtWidgets.QApplication.processEvents() # update ui
         
-        # import sentence_transformers # we have to import this here, not in the worker thread, or qualcoder will crash
+        import sentence_transformers # we have to import this here, not in the worker thread, or qualcoder will crash
         #self.embedding_function = E5SentenceTransformerEmbeddings(model_name=self.model_folder)
                               
         worker = Worker(self._open_db)  
@@ -264,7 +268,7 @@ class AiVectorstore():
         self.import_workers_count -= 1
         if self.import_workers_count <= 0:
             self.import_workers_count = 0
-            msg = _("AI buddy: Ok, my memory is up to date.")
+            msg = _("AI: Ok, my memory is up to date.")
             self.parent_text_edit.append(msg)
             logger.debug(msg)
 
@@ -292,7 +296,7 @@ class AiVectorstore():
         # split fulltext in smaller chunks 
         if text != '': # can only add embeddings if text is not empty
             if progress_callback != None:
-                progress_callback.emit(_('AI buddy is memorizing ') + f'"{name}"')
+                progress_callback.emit(_('AI: Memorizing ') + f'"{name}"')
 
             metadata = {'id': id, 'name': name}
             document = Document(page_content=text, metadata=metadata)
@@ -318,9 +322,7 @@ class AiVectorstore():
         Args:
             id (integer): the database id
             update (bool, optional): defaults to False.
-        """
-        #self._import_document(id, name, text, update)
-        #return       
+        """   
         
         worker = Worker(self._import_document, id, name, text, update) # Any other args, kwargs are passed to the run function
         # worker.signals.result.connect()
@@ -334,7 +336,7 @@ class AiVectorstore():
         """Collects all text sources from the database and adds them to the chroma_db if 
         not already in there.  
         """
-        msg = _("AI buddy: Let's see if there are new documents...")
+        msg = _("AI: Let's see if there are new documents")
         self.parent_text_edit.append(msg)
         logger.debug(msg)   
         docs = self.app.get_file_texts()
@@ -342,7 +344,7 @@ class AiVectorstore():
             self.import_document(doc['id'], doc['name'], doc['fulltext'], False)
             
     def rebuild_vectorstore(self):
-        msg = _('AI buddy: Give me some time to read all your documents...')
+        msg = _('AI: Give me some time to read all your documents')
         self.parent_text_edit.append(msg)
         logger.debug(msg)
         # delete all the contents from the vectorstore
@@ -357,7 +359,7 @@ class AiVectorstore():
         from the vectorstore"""
         embeddings_list = self.chroma_db.get(where={"id" : id}, include=['metadatas'])
         if len(embeddings_list['ids']) > 0: # found it
-            self.parent_text_edit.append("AI buddy: I'm gonna forget " + f'"{embeddings_list["metadatas"][0]["name"]}"')
+            self.parent_text_edit.append("AI: Forgetting " + f'"{embeddings_list["metadatas"][0]["name"]}"')
             self.chroma_db.delete(embeddings_list['ids']) 
                
     def close(self):
