@@ -224,7 +224,7 @@ class AiVectorstore():
         if self._is_closing:
             return # abort when closing db
         import sentence_transformers as st
-        self.st = st # this prevents the library from beeing garbage collected
+        self.st = st # this prevents the library from beeing garbage collected (no, seems not to work, still crashes... Have to import st in the main thread.)
         if self.app.project_path != '' and os.path.exists(self.app.project_path):
             db_path = self.app.project_path + '/vectorstore'
             self.embedding_function = E5SentenceTransformerEmbeddings(model_name=self.model_folder)
@@ -235,7 +235,8 @@ class AiVectorstore():
                                     collection_metadata=collection_metadata)
         else:
             self.chroma_db = None
-            raise FileNotFoundError(f'AI Vectorstore: project path "{self.app.project_path}" not found.')
+            logger.debug(f'Project path "{self.app.project_path}" not found.')
+            # raise FileNotFoundError(f'AI Vectorstore: project path "{self.app.project_path}" not found.')
 
     def init_vectorstore(self, rebuild=False):
         """Initializes the vectorstore and checks if all text sources are stored.
@@ -279,6 +280,9 @@ class AiVectorstore():
     def _import_document(self, id, name, text, update=False, progress_callback=None):
         if self._is_closing:
             return # abort when closing db
+        if self.chroma_db is None:
+            logger.debug('chroma_db is None')
+            return
                        
         # Check if the document is already in the store:
         embeddings_list = self.chroma_db.get(where={"id" : id}, include=['metadatas'])
@@ -336,6 +340,9 @@ class AiVectorstore():
         """Collects all text sources from the database and adds them to the chroma_db if 
         not already in there.  
         """
+        if self.chroma_db is None:
+            logger.debug('chroma_db is None')
+            return
         msg = _("AI: Let's see if there are new documents")
         self.parent_text_edit.append(msg)
         logger.debug(msg)   
@@ -344,6 +351,9 @@ class AiVectorstore():
             self.import_document(doc['id'], doc['name'], doc['fulltext'], False)
             
     def rebuild_vectorstore(self):
+        if self.chroma_db is None:
+            logger.debug('chroma_db is None')
+            return
         msg = _('AI: Give me some time to read all your documents')
         self.parent_text_edit.append(msg)
         logger.debug(msg)
@@ -357,6 +367,9 @@ class AiVectorstore():
     def delete_document(self, id):
         """Deletes all the embeddings from related to this doc 
         from the vectorstore"""
+        if self.chroma_db is None:
+            logger.debug('chroma_db is None')
+            return
         embeddings_list = self.chroma_db.get(where={"id" : id}, include=['metadatas'])
         if len(embeddings_list['ids']) > 0: # found it
             self.parent_text_edit.append("AI: Forgetting " + f'"{embeddings_list["metadatas"][0]["name"]}"')

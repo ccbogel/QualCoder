@@ -341,7 +341,7 @@ class AiLLM():
     def _analyze_similarity(self, chunk_list, code_name, code_memo='', progress_callback=None) -> list:        
         # the async function
         if progress_callback != None:
-            progress_callback.emit(_("We've found related data.\nGive me some time to inspect it more closely..."))        
+            progress_callback.emit(_("We've found potentially related data.\nGive me some time to inspect it more closely..."))        
         
         # create json:
         chunks_json = '{\n  "chunks_of_empirical_data":[\n'

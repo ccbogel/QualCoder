@@ -4130,7 +4130,6 @@ class DialogCodeText(QtWidgets.QWidget):
         ui = DialogAiSearch(self.app, selected_id, selected_is_code)
         ret = ui.exec()
         if ret == QtWidgets.QDialog.DialogCode.Accepted:
-            self.ui.listWidget_ai.clear()
             self.ai_search_name = ui.selected_name
             self.ai_search_description = ui.selected_description
             self.ai_search_file_ids = ui.selected_file_ids
@@ -4194,13 +4193,14 @@ class DialogCodeText(QtWidgets.QWidget):
     def ai_analyze_similar_chunks(self, chunk_count):
         if self.ai_search_chunks_pos < len(self.ai_search_similar_chunks):
             # chunks left, analyze them
-            self.app.llm.analyze_similarity(self, self.ai_search_similar_callback, 
-                                            self.ai_search_similar_chunks[self.ai_search_chunks_pos:self.ai_search_chunks_pos+chunk_count], 
-                                            self.ai_search_name, self.ai_search_description)
+            start_chunk_pos = self.ai_search_chunks_pos
             if len(self.ai_search_similar_chunks) > self.ai_search_chunks_pos + chunk_count:
                 self.ai_search_chunks_pos += chunk_count
             else: 
                 self.ai_search_chunks_pos = len(self.ai_search_similar_chunks)
+            self.app.llm.analyze_similarity(self, self.ai_search_similar_callback, 
+                                            self.ai_search_similar_chunks[start_chunk_pos:start_chunk_pos+chunk_count], 
+                                            self.ai_search_name, self.ai_search_description)
 
     def ai_search_similar_callback(self, docs):
         self.ui.pushButton_ai_search.setText(self.ai_search_name)
@@ -4217,6 +4217,31 @@ class DialogCodeText(QtWidgets.QWidget):
                 item_tooltip += '<p>' + _('The AI thinks: ') + f'{doc.interpretation} ({doc.relevance})' + '</p>'
                 item.setToolTip(item_tooltip)
                 self.ui.listWidget_ai.addItem(item)
+        else:
+            if self.ai_search_chunks_pos < len(self.ai_search_similar_chunks):
+                # still chunks left to inspect
+                # msg = '<p style="font-size:' + str(self.app.settings['fontsize']) + 'pt">'
+                msg = _("AI: It seems difficult to find data that fits your query directly. \n\
+This may indicate that the topic you are looking for is not present in the data \
+or that your query is too generic and unspecific. But I can still continue my search and look a \
+little harder. \n\
+Do you want me to go on?") # + '</p>'
+                
+                msg_box = QtWidgets.QMessageBox(self)
+                msg_box.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+                reply = msg_box.question(self, _('AI Search'),
+                                                msg, QtWidgets.QMessageBox.StandardButton.Yes,
+                                                QtWidgets.QMessageBox.StandardButton.No)
+                if reply == QtWidgets.QMessageBox.StandardButton.No:
+                    return
+                else:
+                    self.ai_analyze_similar_chunks(ai_search_analyze_count)
+                    return
+            else:
+                # no chunks left
+                msg = _('AI: Sorry, I could not find any data in my memory related to "') + self.ai_search_name + '".'
+                Message(self.app, _('AI Search'), msg, "warning").exec()
+                return                
         
         # add "find more..." label at the end:
         if self.ai_search_chunks_pos < len(self.ai_search_similar_chunks):
