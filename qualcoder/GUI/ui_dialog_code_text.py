@@ -241,6 +241,7 @@ class Ui_Dialog_code_text(object):
         sizePolicy.setHeightForWidth(self.pushButton_ai_search.sizePolicy().hasHeightForWidth())
         self.pushButton_ai_search.setSizePolicy(sizePolicy)
         self.pushButton_ai_search.setMinimumSize(QtCore.QSize(24, 24))
+        self.pushButton_ai_search.setStyleSheet("")
         self.pushButton_ai_search.setFlat(False)
         self.pushButton_ai_search.setObjectName("pushButton_ai_search")
         self.verticalLayout_3.addWidget(self.pushButton_ai_search)

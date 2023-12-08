@@ -133,6 +133,8 @@ def exception_handler(exception_type, value, tb_obj):
     print(msg)
     mb = QtWidgets.QMessageBox()
     mb.setStyleSheet("* {font-size: 10pt}")
+    if len(msg) > 1000:
+        msg = _('Shortened error message: ...') + msg[-1000:]
     mb.setText(msg)
     mb.exec()
 
