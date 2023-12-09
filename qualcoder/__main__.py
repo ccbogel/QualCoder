@@ -524,7 +524,7 @@ class App(object):
                 'dialogreport_code_summary_splitter0', 'dialogreport_code_summary_splitter0',
                 'stylesheet', 'backup_num', 'codetext_chunksize',
                 'report_text_context_characters', 'report_text_context_style',
-                'ai_enable', 'open_ai_api_key'
+                'ai_enable', 'open_ai_api_key', 'ai_first_startup'
                 ]
         for key in keys:
             if key not in settings_data:
@@ -547,6 +547,8 @@ class App(object):
                     settings_data[key] = 'False'
                 if key == 'open_ai_api_key':
                     settings_data[key] = ''
+                if key == 'ai_first_startup':
+                    settings_data[key] = 'True'    
 
         # Write out new ini file, if needed
         if len(settings_data) > dict_len:
@@ -792,7 +794,8 @@ class App(object):
             'report_text_contextz-style': 'Bold',
             'codetext_chunksize': 50000,
             'ai_enable': 'False',
-            'open_ai_api_key': ''
+            'open_ai_api_key': '',
+            'ai_first_startup': 'True'
         }
 
     def get_file_texts(self, file_ids=None):
@@ -899,23 +902,21 @@ class App(object):
         api_key_msg = _(
 'Please read this important note about access to GPT-4:\n\
 \n\
-The AI integration in qualcoder needs an API key from OpenAI to access GPT4. Follow these steps to get one:\n\
+The AI integration in qualcoder needs an API key from OpenAI to access GPT-4. Follow these steps to get one:\n\
 1) Go to "https://platform.openai.com" \n\
 2) Sign up for an account (or log in if you already have one)\n\
 3) In the menu on the far left of the page, select "API keys"\n\
 4) Create a new key, copy it and enter it here.\n\
 \n\
-The access to GPT4 via the OpenAI API is not free (and also not included in ChatGPT Plus). As a new user, you will \n\
-normally receive $5 (USD) worth of credit from OpenAI. If this is used up or expired, you have to buy new credits \n\
-on the OpenAI platform and will be charged for every request qualcoder makes on your behalf. \n\
-The cost of a request is low, usually in the order of a few cents only. This money goes directly to OpenAI, the authors of \n\
-qualcoder are not involved in this in any way. We try to limit the number of requests as much as possible. But there \n\
-is always a slight risk that a malfunction of the app may lead to more requests than expected.\n\
-It is therefore advisable to set a maximum monthly budget in your OpenAI account ($10 will go a long way). \n\
-In the menu on "https://platform.openai.com", go to "settings", "Limits", "Usage limits" and define your monthly budget.\n\
-Liability: By using qualcoder and its ai enhanced functions you accept that the authors and copyright holders \n\
-will under no circumstances be liable for any costs resulting from the usage of the OpenAI API, even if these \n\
-costs are caused by a malfunction of the app. See the license of qualcoder for more details.\n\
+The access to GPT-4 via the OpenAI API is not free (and also not included in ChatGPT Plus). As a new user, \n\
+you might get free credits from OpenAI. After that, you\'ll have to buy new credits on the OpenAI platform. \n\
+The charging works on a per-request-basis and will be only a few cents for a single request. This money \n\
+goes directly to OpenAI. The authors of qualcoder are not involved in this in any way. We try to limit the number \n\
+of requests as much as possible. But it is still advisable to set a monthly "usage limit" in your OpenAI account \n\
+($10 will go a long way). \n\
+Liability: Please understand that the authors and copyright holders of qualcoder will under no circumstances be \n\
+liable for any costs resulting from the usage of the OpenAI API, even if these costs are caused by a malfunction \n\
+of the app. See the license of qualcoder for more details. Thank you.\n\
 \n\
 Please enter your OpenAI api key here:')   
         dialog = QtWidgets.QInputDialog(parent_window)
@@ -939,7 +940,7 @@ Please enter your OpenAI api key here:')
         """
         # OpenAI api key:
         if self.settings['open_ai_api_key'] == '':
-            self.settings['open_ai_api_key'] = self.get_openai_api_key(parent_window)
+            self.settings['open_ai_api_key'] = self.get_openai_api_key(key='', parent_window=parent_window)
             if self.settings['open_ai_api_key'] == '':
                 self.settings['ai_enable'] = 'False'
                 return False
@@ -947,8 +948,8 @@ Please enter your OpenAI api key here:')
         # embeddings model download:
         if not self.sources_vectorstore.embedding_model_is_cached():
             model_download_msg = _('\
-Since you are using the AI integration for the first time, \n\
-qualcoder needs to download and install some \n\
+Since you are using the AI integration for the first time, \
+qualcoder needs to download and install some \
 additional components. \n\
 \n\
 This will download about 2.5 GB of data. Do you \n\
@@ -1044,7 +1045,25 @@ class MainWindow(QtWidgets.QMainWindow):
         self.init_ui()
         self.app.sources_vectorstore = AiVectorstore(self.app, self.ui.textEdit, self.app.sources_collection)
         self.app.llm = AiLLM(self.app, self.ui.textEdit)
+        self.ui.tabWidget.setCurrentIndex(0)
         self.show()
+        
+        # First start? Ask if user wants to enable ai integration or not
+        if self.app.settings['ai_first_startup'] == 'True' and self.app.settings['ai_enable'] == 'False':
+            msg = _('Welcome to the AI Setup Wizard\n\n\
+The new AI enhanced functions in Qualcoder need some additional setup. \
+If you skip this for now, you can enable or disable the AI integration \
+in the settings dialog later.\n\
+Do you want to start the AI setup now?')
+            msg_box = QtWidgets.QMessageBox(self)
+            msg_box.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            reply = msg_box.question(self, _('AI Search'),
+                                            msg, QtWidgets.QMessageBox.StandardButton.Yes,
+                                            QtWidgets.QMessageBox.StandardButton.No)
+            if reply == QtWidgets.QMessageBox.StandardButton.Yes:
+                self.enable_ai()
+        self.app.settings['ai_first_startup'] == 'False'
+        self.app.write_config_ini(self.app.settings)
 
     def init_ui(self):
         """ Set up menu triggers """
@@ -1134,11 +1153,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.textEdit.setReadOnly(True)
         self.settings_report()
         
+        self.ui.tabWidget.setCurrentIndex(0)
+        
         self.ai_chat()
         # Disable ai_chat tab for now, not ready yet
         self.ui.tabWidget.setTabVisible(4, False)
-
-
+        
     def resizeEvent(self, new_size):
         """ Update the widget size details in the app.settings variables """
 
@@ -1757,6 +1777,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.app = App()
         if self.app.settings['directory'] == "":
             self.app.settings['directory'] = os.path.expanduser('~')
+        self.app.sources_vectorstore = AiVectorstore(self.app, self.ui.textEdit, self.app.sources_collection)
+        self.app.llm = AiLLM(self.app, self.ui.textEdit)
         project_path = QtWidgets.QFileDialog.getSaveFileName(self,
                                                              _("Enter project name"), self.app.settings['directory'],
                                                              options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
@@ -1783,6 +1805,8 @@ class MainWindow(QtWidgets.QMainWindow):
             logger.critical(_("Project creation error ") + str(err))
             Message(self.app, _("Project"), self.app.project_path + _(" not successfully created"), "critical").exec()
             self.app = App()
+            self.app.sources_vectorstore = AiVectorstore(self.app, self.ui.textEdit, self.app.sources_collection)
+            self.app.llm = AiLLM(self.app, self.ui.textEdit)
             return
         self.app.project_name = self.app.project_path.rpartition('/')[2]
         self.app.settings['directory'] = self.app.project_path.rpartition('/')[0]
@@ -1925,13 +1949,7 @@ class MainWindow(QtWidgets.QMainWindow):
         if current_ai_enable != self.app.settings['ai_enable']:
             if self.app.settings['ai_enable'] == 'True':
                 # AI is newly enabled
-                if self.app.prepare_ai(self):
-                    self.ui.textEdit.append(_("AI: Rebuilding my memory"))
-                    self.app.sources_vectorstore.init_vectorstore(rebuild=True)
-                    self.app.llm.init_llm()
-                else:
-                    self.app.settings['ai_enable'] = False
-                    # self.ui.textEdit.append(_("AI: Could not download necessary components, AI integration disabled."))
+                self.enable_ai()
             else: 
                 self.app.sources_vectorstore.close()
         # Name change: Close all opened dialogs as coder name needs to change everywhere
@@ -1954,6 +1972,18 @@ class MainWindow(QtWidgets.QMainWindow):
                     contents.itemAt(i).widget().close()
                     contents.itemAt(i).widget().setParent(None)
                     
+    def enable_ai(self) -> bool:
+        self.app.settings['ai_enable'] = 'True'
+        self.app.write_config_ini(self.app.settings)
+        if self.app.prepare_ai(self):
+            if self.app.project_name != '':
+                self.app.sources_vectorstore.init_vectorstore(rebuild=True)
+            self.app.llm.init_llm()
+        else:
+            self.app.settings['ai_enable'] = 'False'
+            self.app.write_config_ini(self.app.settings)
+        return self.app.settings['ai_enable'] == 'True'
+      
     def project_memo(self):
         """ Give the entire project a memo. """
 
@@ -2263,7 +2293,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.app.llm.init_llm()
             else:
                 self.app.sources_vectorstore.close()
-                self.app.settings['ai_enable'] = False
+                # self.app.settings['ai_enable'] = 'False'
                 self.ui.textEdit.append(_("AI: Error - failed to initialize."))
 
         # Fix missing folders within QualCoder project. Will cause import errors.

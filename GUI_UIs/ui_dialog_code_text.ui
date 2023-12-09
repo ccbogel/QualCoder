@@ -185,9 +185,6 @@
       <property name="autoFillBackground">
        <bool>false</bool>
       </property>
-      <property name="frameShape">
-       <enum>QFrame::Box</enum>
-      </property>
       <property name="text">
        <string/>
       </property>
@@ -212,9 +209,6 @@
       </property>
       <property name="autoFillBackground">
        <bool>false</bool>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::Box</enum>
       </property>
       <property name="text">
        <string/>
@@ -337,9 +331,6 @@
       <property name="autoFillBackground">
        <bool>false</bool>
       </property>
-      <property name="frameShape">
-       <enum>QFrame::Box</enum>
-      </property>
       <property name="text">
        <string/>
       </property>
@@ -386,9 +377,6 @@
       </property>
       <property name="autoFillBackground">
        <bool>false</bool>
-      </property>
-      <property name="frameShape">
-       <enum>QFrame::Box</enum>
       </property>
       <property name="text">
        <string/>

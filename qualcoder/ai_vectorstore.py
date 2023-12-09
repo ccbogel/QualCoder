@@ -163,7 +163,7 @@ class AiVectorstore():
             for file_name in self.model_files:
                 local_path = os.path.join(self.model_folder, file_name)
                 if os.path.exists(local_path):
-                    continue # skipt this file, already downloaded
+                    continue # skip this file, already downloaded
                 url = hf_hub_url(self.model_name, file_name)
                 
                 # create local dir if necessary
@@ -356,7 +356,8 @@ class AiVectorstore():
         if self.chroma_db is None:
             logger.debug('chroma_db is None')
             return
-        msg = _('AI: Give me some time to read all your documents')
+        msg = _('AI: Rebuilding my memory') + '\n'
+        msg += _('AI: Give me some time to read all your documents')
         self.parent_text_edit.append(msg)
         logger.debug(msg)
         # delete all the contents from the vectorstore
