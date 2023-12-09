@@ -718,7 +718,7 @@ class App(object):
         if result['speakernameformat'] == 0:
             result['speakernameformat'] = "[]"
         if result['stylesheet'] == 0:
-            result['stylesheet'] = "original"
+            result['stylesheet'] = "native"
         return result
 
     @property
@@ -728,7 +728,7 @@ class App(object):
             'backup_num': 5,
             'codername': 'default',
             'font': 'Noto Sans',
-            'fontsize': 14,
+            'fontsize': 12,
             'docfontsize': 12,
             'treefontsize': 12,
             'directory': os.path.expanduser('~'),
@@ -789,7 +789,7 @@ class App(object):
             'dialogreport_file_summary_splitter1': 100,
             'dialogreport_code_summary_splitter0': 100,
             'dialogreport_code_summary_splitter1': 100,
-            'stylesheet': 'original',
+            'stylesheet': 'native',
             'report_text_context_chars': 150,
             'report_text_contextz-style': 'Bold',
             'codetext_chunksize': 50000,
