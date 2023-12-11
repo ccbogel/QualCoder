@@ -505,10 +505,10 @@ Codings from the entire text file are used for the calculations.</string>
     </rect>
    </property>
    <property name="text">
-    <string>Word clouds</string>
+    <string>Word cloud</string>
    </property>
   </widget>
-  <widget class="QComboBox" name="comboBox_wordclouds">
+  <widget class="QComboBox" name="comboBox_wordcloud_background">
    <property name="geometry">
     <rect>
      <x>410</x>
@@ -516,6 +516,35 @@ Codings from the entire text file are used for the calculations.</string>
      <width>321</width>
      <height>25</height>
     </rect>
+   </property>
+   <property name="toolTip">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Background&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="comboBox_wordcloud_foreground">
+   <property name="geometry">
+    <rect>
+     <x>410</x>
+     <y>460</y>
+     <width>321</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Foreground&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="pushButton_wordcloud">
+   <property name="geometry">
+    <rect>
+     <x>410</x>
+     <y>500</y>
+     <width>151</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Make wordcloud</string>
    </property>
   </widget>
   <zorder>groupBox</zorder>
@@ -553,7 +582,9 @@ Codings from the entire text file are used for the calculations.</string>
   <zorder>comboBox_heatmap</zorder>
   <zorder>line_5</zorder>
   <zorder>label_word_clouds</zorder>
-  <zorder>comboBox_wordclouds</zorder>
+  <zorder>comboBox_wordcloud_background</zorder>
+  <zorder>comboBox_wordcloud_foreground</zorder>
+  <zorder>pushButton_wordcloud</zorder>
  </widget>
  <tabstops>
   <tabstop>checkBox_export_html</tabstop>
