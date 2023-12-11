@@ -140,14 +140,7 @@ class Wordcloud:
         self.text_color = color_choice["name"]
         print(self.text_color)
         self.color_range_chosen = color_choice['range']
-
-        colors = []
-        for name, code in ImageColor.colormap.items():
-            colors.append(code)
-        self.background_color = colors[randint(0, len(colors) - 1)]
-        #self.background_color = "blue"
-        #self.colors = "yellow"
-        #self.color_range_chosen = []
+        self.background_color = "white"
 
         # Limit number of words to display
         max_count = len(self.words)
@@ -180,13 +173,13 @@ class Wordcloud:
             color_position = int(list_position / len(self.words) * num_colors)
             color = self.color_range_chosen[color_position]
             return color
-        if self.colors == "random":
+        if self.text_color == "random":
             colors = []
             for name, code in ImageColor.colormap.items():
                 colors.append(code)
             color = colors[randint(0, len(colors) - 1)]
             return color
-        return self.colors
+        return self.text_color
 
     def create_image(self):
         """ create image and save t oDownloads """
