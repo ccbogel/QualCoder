@@ -36,7 +36,7 @@ import traceback
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtWidgets import QDialog
-from .wordcloud_modified import WordCloudMod
+from .simple_wordcloud import Wordcloud
 
 from .GUI.ui_dialog_charts import Ui_DialogCharts
 
@@ -165,15 +165,11 @@ class ViewCharts(QDialog):
             categories_combobox_list.append(c['name'])
         self.ui.comboBox_category.addItems(categories_combobox_list)
 
-        self.ui.comboBox_wordclouds.currentIndexChanged.connect(self.show_word_cloud)
-        wordclouds_combobox_list = ['', _('White'),
-                             _('Black'),
-                             _('Yellow'),
-                             _('Blue'),
-                             _("Red"),
-                             _("Green")
-                             ]
-        self.ui.comboBox_wordclouds.addItems(wordclouds_combobox_list)
+        wordcloud_background_list = ['', _('Black'), _('White')]
+        self.ui.comboBox_wordcloud_background.addItems(wordcloud_background_list)
+        wordcloud_foreground_list = ['', _('yellow'), _('green'), _('red')]
+        self.ui.comboBox_wordcloud_foreground.addItems(wordcloud_foreground_list)
+        self.ui.pushButton_wordcloud.pressed.connect(self.show_word_cloud)
 
         # Attributes comboboxes. Initial radio button checked is Files
         self.ui.comboBox_char_attributes.currentIndexChanged.connect(self.character_attribute_charts)
@@ -392,7 +388,9 @@ class ViewCharts(QDialog):
                 values.append(res_text[0])
         # Create image
         text = " ".join(values)
-        colours = ['', 'white', 'black', 'yellow', 'blue', 'red', 'green']
+        Wordcloud(self.app, text)
+
+        '''colours = ['', 'white', 'black', 'yellow', 'blue', 'red', 'green']
         wordcloud = WordCloudMod(background_color=colours[chart_type_index], width=800, height=600).generate(text)
         # Display image
         fig = px.imshow(wordcloud, title=title + subtitle)
@@ -400,7 +398,7 @@ class ViewCharts(QDialog):
         fig.update_yaxes(visible=False)
         fig.show()
         self.helper_export_html(fig)
-        self.ui.comboBox_wordclouds.setCurrentIndex(0)
+        self.ui.comboBox_wordclouds.setCurrentIndex(0)'''
 
     def codes_of_category_helper(self, category_name):
         """ Get child categories and codes of this category node.
