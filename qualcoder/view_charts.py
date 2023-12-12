@@ -167,13 +167,13 @@ class ViewCharts(QDialog):
 
         wordcloud_backgrounds = [_('Black'), _('White')]
         self.ui.comboBox_wordcloud_background.addItems(wordcloud_backgrounds)
-        wordcloud_foregrounds = [_("white"), _("black"), _("grey"), _("greys"), _('yellow'), _('green'), _("greens"),
-                                 _('red'), _("cyan"), _("oranges"), _("pinks"),  _("magenta"), _("random"),
-                                 _("blue to yellow"), _("blue to red"), _("grey to red"), _("black to pink"),
-                                 _("orange to purple"), _("salmon to aqua"), _("green to blue"),  _("yellow to green"),
-                                 _("aqua to pink"),  _("river nights")
+        wordcloud_foregrounds = ["white", "grey", "black",  'yellow', 'green', "red", "cyan", "magenta", "deepskyblue",
+                                 "indigo", "lightcoral", "olive", "tan",
+                                 "greys", "greens", "oranges", "pinks", "reds", "yellows", "blues",
+                                 "blue to yellow", "blue to orange", "blue to red", "blue to aqua", "grey to red",
+                                 "black to pink", "orange to purple", "salmon to aqua", "green to blue",
+                                 "yellow to green", "aqua to pink",  "river nights", "random"
                                 ]
-        # TODO wordcloud width x height, number of words
         self.ui.comboBox_wordcloud_foreground.addItems(wordcloud_foregrounds)
         self.ui.pushButton_wordcloud.pressed.connect(self.show_word_cloud)
 
@@ -371,9 +371,6 @@ class ViewCharts(QDialog):
         """ Show word cloud.
          Can be by file and/or by category. """
 
-        '''chart_type_index = self.ui.comboBox_wordclouds.currentIndex()
-        if chart_type_index < 1:
-            return'''
         title = _('Word cloud')
         owner, subtitle = self.owner_and_subtitle_helper()
         self.get_selected_categories_and_codes()
@@ -394,9 +391,12 @@ class ViewCharts(QDialog):
         text = " ".join(values)
         background = self.ui.comboBox_wordcloud_background.currentText()
         foreground = self.ui.comboBox_wordcloud_foreground.currentText()
-        Wordcloud(self.app, text, width=800, height=600, max_words=300, background_color=background,
-                     text_color=foreground)
-
+        width = int(self.ui.spinBox_cloud_width.text())
+        height = int(self.ui.spinBox_cloud_height.text())
+        max_words = int(self.ui.spinBox_cloud_max_words.text())
+        reverse_colors = self.ui.checkBox_reverse_range.isChecked()
+        Wordcloud(self.app, text, width=width, height=height, max_words=max_words, background_color=background,
+                     text_color=foreground, reverse_colors=reverse_colors)
         '''
         fig = px.imshow(wordcloud, title=title + subtitle)
         fig.update_xaxes(visible=False)

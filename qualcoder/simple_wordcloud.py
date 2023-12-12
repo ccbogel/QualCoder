@@ -24,14 +24,14 @@ THE SOFTWARE.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 """
-
+import webbrowser
 from copy import deepcopy
 import datetime
 import logging
 import os
-from PIL.ImageQt import ImageQt
+#from PIL.ImageQt import ImageQt
 from PIL import Image, ImageColor, ImageDraw, ImageFont
-from PyQt6 import QtGui, QtWidgets
+from PyQt6 import QtWidgets
 from random import randint
 import sys
 import traceback
@@ -58,43 +58,50 @@ color_ranges = [
 {"name": "grey to red", "range": ["#d7e1ee", "#cbd6e4", "#bfcbdb", "#b3bfd1", "#a4a2a8", "#df8879", "#c86558", "#b04238", "#991f17"]},
 {"name": "black to pink", "range": ["#2e2b28", "#3b3734", "#474440", "#54504c", "#6b506b", "#ab3da9", "#de25da", "#eb44e8", "#ff80ff"]},
 {"name": "blue to red", "range": ["#1984c5", "#22a7f0", "#63bff0", "#a7d5ed", "#e2e2e2", "#e1a692", "#de6e56", "#e14b31", "#c23728"]},
+{"name": "blue to orange", "range": ["#003F5C", "#2F4B7C", "#665191", "#A05195", "#D45087", "#F95D6A", "#FF7C43", "#FFA600"]},
 {"name": "orange to purple", "range": ["#ffb400", "#d2980d", "#a57c1b", "#786028", "#363445", "#48446e", "#5e569b", "#776bcd", "#9080ff"]},
 {"name": "salmon to aqua", "range": ["#e27c7c", "#a86464", "#6d4b4b", "#503f3f", "#333333", "#3c4e4b", "#466964", "#599e94", "#6cd4c5"]},
 {"name": "green to blue", "range": ["#00D40E", "#00BA2D", "#009658", "#007185", "#0053AB", "#003193"]},
 {"name": "yellow to green", "range": ["#FEFB01", "#CEFB02", "#87FA00", "#3AF901", "#00ED01"]},
 {"name": "aqua to pink", "range": ["#54bebe", "#76c8c8", "#98d1d1", "#badbdb", "#dedad2", "#e4bcad", "#df979e", "#d7658b", "#c80064"]},
 {"name": "river nights", "range": ["#b30000", "#7c1158", "#4421af", "#1a53ff", "#0d88e6", "#00b7c7", "#5ad45a", "#8be04e", "#ebdc78"]},
-{"name": "greens", "range": ["#094F29", "#0A6921", "#1A8828", "#429B46", "#64AD62", "#94C58C"]},
+{"name": "blue to aqua", "range": ["#004C6D" ,"#006083", "#007599", "#008BAD", "#00A1C1", "#00B8D3", "#00CFE3", "#00E7F2", "#00FFFF"]},
+{"name": "greens", "range": ["#198450", "#27A567", "#2EB774", "#38CB82", "#41DC8E", "#64E3A1", "#84EAB3", "#AAF0C9", "#CBF5DD"]},
 {"name": "oranges","range": ["#FF5500", "#FF6500", "#ff7500", "#FF8500", "#FF9500"]},
 {"name": "blues", "range": ["#0000b3", "#0010d9", "#0020ff", "#0040ff", "#0060ff", "#0080ff", "#009fff", "#00bfff", "#00ffff"]},
 {"name": "pinks", "range": ["#A73CA4", "#C353C0", "#D178CF", "#DF9DDD", "#ECC3EB"]},
-{"name": "greys", "range": ["#F2F2F2", "#C2C2C2", "#929292", "#616161", "#414141", "#202020"]}
+{"name": "greys", "range": ["#F2F2F2", "#C2C2C2", "#929292", "#616161", "#414141", "#202020"]},
+{"name": "yellows", "range": ["#E47200", "#E69B00", "#E6B400", "#E6CC00", "#E5DE00", "#E8E337", "#ECE75F", "#F1EE8E", "#F7F5BC"]},
+{"name": "reds", "range": ["#C61A09", "#DF2C14", "#ED3419", "#FB3B1E", "#FF4122", "#FF6242", "#FF8164", "#FFA590", "#FFC9BB"]}
 ]
 
 
 class Wordcloud:
     font_path = home = os.path.join(os.path.expanduser('~'), ".qualcoder", "DroidSansMono.ttf")
-    stopwords = {"i", "i've", "i'm", "i'll", "me", "my", "myself", "we", "we've", "our", "ours", "ourselves", "you", "your", "you're", "yours",
-                 "yourself", "it's", "that's", "they're", "we've"
+    stopwords = {"i've", "i'm", "i'll", "me", "my", "myself", "we", "we've", "we're", "our", "ours", "ourselves", "you",
+                 "your", "you're", "yours", "yourself", "it's", "that's", "they're", "we've"
                  "yourselves", "he", "he's", "him", "his", "himself", "she", "she's", "her", "hers", "herself", "it", "its", "itself",
-                 "they", "they've", "you'd", "you'ld",
+                 "they", "they've", "you'd", "you'ld", "aren't",
                  "them", "their", "theirs", "themselves", "what", "which", "who", "whom", "this", "that", "these",
-                 "those", "am", "does", "doesn't", "was", "wasn't"
-                 "is", "are", "was", "were", "weren't", "be", "been", "being", "have", "haven't", "has", "had", "having", "do", "does", "did",
-                 "doing", "a",
+                 "those", "am", "does", "doesn't", "was", "wasn't",
+                 "is", "isn't", "is'nt", "are", "was", "wasn't", "were", "weren't", "be", "been", "being",
+                 "have", "haven't", "has", "had", "having", "do", "does", "did", "doing", "she'd",
                  "an", "the", "and", "but", "if", "or", "because", "as", "until", "while", "of", "at", "by", "for",
-                 "with", "about",
+                 "with", "about", "what's",
                  "against", "between", "into", "through", "during", "before", "after", "above", "below", "to", "from",
-                 "up",
+                 "up", "us",
                  "down", "in", "out", "on", "off", "over", "under", "again", "further", "then", "once", "here", "there",
                  "there's", "when", "had", "hadn't", "hasn't",
                  "where", "why", "how", "all", "any", "both", "each", "few", "more", "most", "other", "some", "such",
-                 "no",
+                 "no", "put", "oh", "um",
                  "nor", "not", "only", "own", "same", "so", "than", "too", "very", "can", "can't", "will", "just",
                  "don't", "did", "didn't",
-                 "should", "would", "could", "now", "got"}
+                 "should", "shouldn't", "would", "wouldn't", "could", "couldn't", "now", "got",
+                 "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t",
+                 "u", "v", "w", "x", "y", "z"}
 
-    def __init__(self, app, fulltext, width=800, height=600, max_words=150, background_color="black", text_color="random"):
+    def __init__(self, app, fulltext, width=800, height=600, max_words=150, background_color="black",
+                 text_color="random", reverse_colors=False):
 
         sys.excepthook = exception_handler
         self.app = app
@@ -104,9 +111,13 @@ class Wordcloud:
         self.background_color = background_color
         self.text_color = text_color
         self.color_range_chosen = []
+        reverse_colors = reverse_colors
         for color_range in color_ranges:
             if color_range["name"] == text_color:
-                self.color_range_chosen = color_range["range"]
+                # Need to deepcopy otherwise range may be reversed already from previous calls to class
+                self.color_range_chosen = deepcopy(color_range["range"])
+        if reverse_colors and self.color_range_chosen:
+            self.color_range_chosen.reverse()
         self.max_font_size = int(self.height / 6)
         self.min_font_size = 10
         self.font_path = os.path.join(os.path.expanduser('~'), ".qualcoder", "DroidSansMono.ttf")
@@ -182,12 +193,12 @@ class Wordcloud:
                         word2['y'] < word['y'] and  word['y'] < word2['y'] + word2['height'] and \
                         word2['y'] != -100:
                     overlap = True
-                    print("Word ", word, "\nWord2", word2, "\n")
+                    #print("Word ", word, "\nWord2", word2, "\n")
                 if word['x'] < word2['x'] and word2['x'] < word['x'] + word['width'] and \
                         word['y'] < word2['y'] and  word2['y'] < word['y'] + word['height'] and \
                         word2['y'] != -100:
                     overlap = True
-                    print("Word ", word, "\nWord2", word2, "\n")
+                    #print("Word ", word, "\nWord2", word2, "\n")
                 if word2['x'] < word['x'] and word['x'] < word2['x'] + word2['width'] and \
                         word['y'] < word2['y'] and  word2['y'] < word['y'] + word['height'] and \
                         word2['y'] != -100:
@@ -224,16 +235,17 @@ class Wordcloud:
             font = ImageFont.truetype(self.font_path, size=word['font_size'])
             draw.text((word['x'], word['y']), word["text"], font=font, fill=word["color"])
         nowtime = datetime.datetime.now().astimezone().strftime("%H-%M-%S")
-        file_name = os.path.join(os.path.expanduser("~"), "Downloads", f"wordcloud{nowtime}.png")
-        img.save(file_name)
-        ui = DialogInformation(self.app, file_name, "")
+        file_path = os.path.join(os.path.expanduser("~"), "Downloads", f"wordcloud{nowtime}.png")
+        img.save(file_path)
+        webbrowser.open(file_path)
+        '''ui = DialogInformation(self.app, file_path, "")
         label = QtWidgets.QLabel()
         qim = ImageQt(img)
         pm = QtGui.QPixmap.fromImage(qim)
         label.setPixmap(pm)
         ui.ui.gridLayout.addWidget(label, 0, 0, 1, 1)
         ui.resize(pm.width() + 30, pm.height() + 30)
-        ui.exec()
+        ui.exec()'''
 
 
 if __name__ == "__main__":
