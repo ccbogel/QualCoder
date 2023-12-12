@@ -165,10 +165,16 @@ class ViewCharts(QDialog):
             categories_combobox_list.append(c['name'])
         self.ui.comboBox_category.addItems(categories_combobox_list)
 
-        wordcloud_background_list = ['', _('Black'), _('White')]
-        self.ui.comboBox_wordcloud_background.addItems(wordcloud_background_list)
-        wordcloud_foreground_list = ['', _('yellow'), _('green'), _('red')]
-        self.ui.comboBox_wordcloud_foreground.addItems(wordcloud_foreground_list)
+        wordcloud_backgrounds = [_('Black'), _('White')]
+        self.ui.comboBox_wordcloud_background.addItems(wordcloud_backgrounds)
+        wordcloud_foregrounds = [_("white"), _("black"), _("grey"), _("greys"), _('yellow'), _('green'), _("greens"),
+                                 _('red'), _("cyan"), _("oranges"), _("pinks"),  _("magenta"), _("random"),
+                                 _("blue to yellow"), _("blue to red"), _("grey to red"), _("black to pink"),
+                                 _("orange to purple"), _("salmon to aqua"), _("green to blue"),  _("yellow to green"),
+                                 _("pink foam"),  _("river nights")
+                                ]
+        # TODO wordcloud width x height, number of words
+        self.ui.comboBox_wordcloud_foreground.addItems(wordcloud_foregrounds)
         self.ui.pushButton_wordcloud.pressed.connect(self.show_word_cloud)
 
         # Attributes comboboxes. Initial radio button checked is Files
@@ -365,14 +371,12 @@ class ViewCharts(QDialog):
         """ Show word cloud.
          Can be by file and/or by category. """
 
-        chart_type_index = self.ui.comboBox_wordclouds.currentIndex()
+        '''chart_type_index = self.ui.comboBox_wordclouds.currentIndex()
         if chart_type_index < 1:
-            return
+            return'''
         title = _('Word cloud')
         owner, subtitle = self.owner_and_subtitle_helper()
-
         self.get_selected_categories_and_codes()
-        
         cur = self.app.conn.cursor()
         values = []
         case_file_name, file_ids = self.get_file_ids()
@@ -388,11 +392,12 @@ class ViewCharts(QDialog):
                 values.append(res_text[0])
         # Create image
         text = " ".join(values)
-        Wordcloud(self.app, text)
+        background = self.ui.comboBox_wordcloud_background.currentText()
+        foreground = self.ui.comboBox_wordcloud_foreground.currentText()
+        Wordcloud(self.app, text, width=800, height=600, max_words=300, background_color=background,
+                     text_color=foreground)
 
-        '''colours = ['', 'white', 'black', 'yellow', 'blue', 'red', 'green']
-        wordcloud = WordCloudMod(background_color=colours[chart_type_index], width=800, height=600).generate(text)
-        # Display image
+        '''
         fig = px.imshow(wordcloud, title=title + subtitle)
         fig.update_xaxes(visible=False)
         fig.update_yaxes(visible=False)

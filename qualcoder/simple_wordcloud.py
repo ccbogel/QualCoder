@@ -58,31 +58,32 @@ def exception_handler(exception_type, value, tb_obj):
 
 
 color_ranges = [
-    {"name": "blue_to_yellow", "range": ["#115f9a", "#1984c5", "#22a7f0", "#48b5c4", "#76c68f", "#a6d75b", "#c9e52f", "#d0ee11", "#d0f400"]},
-{"name": "river_nights", "range": ["#b30000", "#7c1158", "#4421af", "#1a53ff", "#0d88e6", "#00b7c7", "#5ad45a", "#8be04e", "#ebdc78"]},
-{"name": "grey_to_red", "range": ["#d7e1ee", "#cbd6e4", "#bfcbdb", "#b3bfd1", "#a4a2a8", "#df8879", "#c86558", "#b04238", "#991f17"]},
-{"name": "black_to_pink", "range": ["#2e2b28", "#3b3734", "#474440", "#54504c", "#6b506b", "#ab3da9", "#de25da", "#eb44e8", "#ff80ff"]},
-{"name": "blues", "range": ["#0000b3", "#0010d9", "#0020ff", "#0040ff", "#0060ff", "#0080ff", "#009fff", "#00bfff", "#00ffff"]},
-{"name": "blue_to_red", "range": ["#1984c5", "#22a7f0", "#63bff0", "#a7d5ed", "#e2e2e2", "#e1a692", "#de6e56", "#e14b31", "#c23728"]},
-{"name": "orange_to_purple", "range": ["#ffb400", "#d2980d", "#a57c1b", "#786028", "#363445", "#48446e", "#5e569b", "#776bcd", "#9080ff"]},
-{"name": "pink_foam", "range": ["#54bebe", "#76c8c8", "#98d1d1", "#badbdb", "#dedad2", "#e4bcad", "#df979e", "#d7658b", "#c80064"]},
-{"name": "salmon_to_aqua", "range": ["#e27c7c", "#a86464", "#6d4b4b", "#503f3f", "#333333", "#3c4e4b", "#466964", "#599e94", "#6cd4c5"]},
+{"name": "blue to yellow", "range": ["#115f9a", "#1984c5", "#22a7f0", "#48b5c4", "#76c68f", "#a6d75b", "#c9e52f", "#d0ee11", "#d0f400"]},
+{"name": "grey to red", "range": ["#d7e1ee", "#cbd6e4", "#bfcbdb", "#b3bfd1", "#a4a2a8", "#df8879", "#c86558", "#b04238", "#991f17"]},
+{"name": "black to pink", "range": ["#2e2b28", "#3b3734", "#474440", "#54504c", "#6b506b", "#ab3da9", "#de25da", "#eb44e8", "#ff80ff"]},
+{"name": "blue to red", "range": ["#1984c5", "#22a7f0", "#63bff0", "#a7d5ed", "#e2e2e2", "#e1a692", "#de6e56", "#e14b31", "#c23728"]},
+{"name": "orange to purple", "range": ["#ffb400", "#d2980d", "#a57c1b", "#786028", "#363445", "#48446e", "#5e569b", "#776bcd", "#9080ff"]},
+{"name": "salmon to aqua", "range": ["#e27c7c", "#a86464", "#6d4b4b", "#503f3f", "#333333", "#3c4e4b", "#466964", "#599e94", "#6cd4c5"]},
+{"name": "green to blue", "range": ["#00D40E", "#00BA2D", "#009658", "#007185", "#0053AB", "#003193"]},
+{"name": "yellow to green", "range": ["#FEFB01", "#CEFB02", "#87FA00", "#3AF901", "#00ED01"]},
+{"name": "pink foam", "range": ["#54bebe", "#76c8c8", "#98d1d1", "#badbdb", "#dedad2", "#e4bcad", "#df979e", "#d7658b", "#c80064"]},
+{"name": "river nights", "range": ["#b30000", "#7c1158", "#4421af", "#1a53ff", "#0d88e6", "#00b7c7", "#5ad45a", "#8be04e", "#ebdc78"]},
 {"name": "greens", "range": ["#094F29", "#0A6921", "#1A8828", "#429B46", "#64AD62", "#94C58C"]},
 {"name": "oranges","range": ["#FF5500", "#FF6500", "#ff7500", "#FF8500", "#FF9500"]},
+{"name": "blues", "range": ["#0000b3", "#0010d9", "#0020ff", "#0040ff", "#0060ff", "#0080ff", "#009fff", "#00bfff", "#00ffff"]},
 {"name": "pinks", "range": ["#A73CA4", "#C353C0", "#D178CF", "#DF9DDD", "#ECC3EB"]},
-{"name": "greys", "range": ["#F2F2F2", "#C2C2C2", "#929292", "#616161", "#414141", "#202020"]},
-{"name": "green_to_blue", "range": ["#00D40E", "#00BA2D", "#009658", "#007185", "#0053AB", "#003193"]},
-{"name": "yellow_to_green", "range": ["#FEFB01", "#CEFB02", "#87FA00", "#3AF901", "#00ED01"]}]
+{"name": "greys", "range": ["#F2F2F2", "#C2C2C2", "#929292", "#616161", "#414141", "#202020"]}
+]
 
 
 class Wordcloud:
     font_path = home = os.path.join(os.path.expanduser('~'), ".qualcoder", "DroidSansMono.ttf")
-    stopwords = {"i", "i,ve", "me", "my", "myself", "we", "our", "ours", "ourselves", "you", "your", "you're", "yours",
-                 "yourself", "it's", "that's",
-                 "yourselves", "he", "him", "his", "himself", "she", "her", "hers", "herself", "it", "its", "itself",
-                 "they",
+    stopwords = {"i", "i've", "i'm", "i'll", "me", "my", "myself", "we", "we've", "our", "ours", "ourselves", "you", "your", "you're", "yours",
+                 "yourself", "it's", "that's", "they're", "we've"
+                 "yourselves", "he", "he's", "him", "his", "himself", "she", "she's", "her", "hers", "herself", "it", "its", "itself",
+                 "they", "they've", "you'd", "you'ld",
                  "them", "their", "theirs", "themselves", "what", "which", "who", "whom", "this", "that", "these",
-                 "those", "am",
+                 "those", "am", "does", "doesn't",
                  "is", "are", "was", "were", "be", "been", "being", "have", "has", "had", "having", "do", "does", "did",
                  "doing", "a",
                  "an", "the", "and", "but", "if", "or", "because", "as", "until", "while", "of", "at", "by", "for",
@@ -90,14 +91,14 @@ class Wordcloud:
                  "against", "between", "into", "through", "during", "before", "after", "above", "below", "to", "from",
                  "up",
                  "down", "in", "out", "on", "off", "over", "under", "again", "further", "then", "once", "here", "there",
-                 "when",
+                 "there's", "when", "had", "hadn't", "hasn't",
                  "where", "why", "how", "all", "any", "both", "each", "few", "more", "most", "other", "some", "such",
                  "no",
                  "nor", "not", "only", "own", "same", "so", "than", "too", "very", "can", "can't", "will", "just",
-                 "don't",
-                 "should", "now"}
+                 "don't", "did", "didn't",
+                 "should", "would", "could", "now", "got"}
 
-    def __init__(self, app, fulltext, width=800, height=600, max_words=300, background_color="black", text_color="random"):
+    def __init__(self, app, fulltext, width=800, height=600, max_words=150, background_color="black", text_color="random"):
 
         sys.excepthook = exception_handler
         self.app = app
@@ -110,8 +111,8 @@ class Wordcloud:
         for color_range in color_ranges:
             if color_range["name"] == text_color:
                 self.color_range_chosen = color_range["range"]
-        self.max_font_size = int(self.height / 5)
-        self.min_font_size = 6
+        self.max_font_size = int(self.height / 6)
+        self.min_font_size = 8
         self.font_path = os.path.join(os.path.expanduser('~'), ".qualcoder", "DroidSansMono.ttf")
 
         # Remove punctuation. Convert to lower case
@@ -135,16 +136,11 @@ class Wordcloud:
         # https://codeburst.io/python-basics-11-word-count-filter-out-punctuation-dictionary-manipulation-and-sorting-lists-3f6c55420855
         self.words = []
         for key, value in d.items():
-            self.words.append({"text": key, "frequency": value})
+            self.words.append({"text": key, "frequency": value, "x": 0, "y": -100})
         self.words = sorted(self.words, key=lambda x: x["frequency"], reverse=True)
+        if len(self.words) == 0:
+            self.words.append({"text": "NO WORDS", "frequency": 1, "x": 0, "y": 0})
         #print("Unique words: " + str(len(self.words)))
-
-        # Testing
-        color_choice = color_ranges[randint(0, len(color_ranges) -1)]
-        self.text_color = color_choice["name"]
-        print(self.text_color)
-        self.color_range_chosen = color_choice['range']
-        self.background_color = "white"
 
         # Limit number of words to display
         max_count = len(self.words)
@@ -156,6 +152,7 @@ class Wordcloud:
             total_frequency += word["frequency"]
         self.font_scale = self.max_font_size / self.words[0]['frequency']
         for i, word in enumerate(self.words):
+            word["color"] = self.word_color(i)
             word['font_size'] = int(self.font_scale * word['frequency'])
             if word['font_size'] < self.min_font_size:
                 word['font_size'] = self.min_font_size
@@ -163,11 +160,50 @@ class Wordcloud:
             left, upper, right, lower = font.getbbox(word['text'])
             word['width'] = right - left
             word['height'] = lower - upper
-            word["x"] = randint(0, self.width - 10 - word['width'])
-            word["y"] = randint(0, self.height - 10 - word['height'])
-            word["color"] = self.word_color(i)
+        # Set x and y with check for overlapping
+        for i, word in enumerate(self.words):
+            print(i, word['text'])
+            self.overlapping(word)
 
         self.create_image()
+
+    def overlapping(self, word):
+        words2= deepcopy(self.words)
+        words2.remove(word)
+
+        x_upper = self.width - 10 - word['width']
+        if x_upper < 0:
+            x_upper = 1
+        y_upper = self.height - 10 - word['height']
+        if y_upper < 0:
+            y_upper = 1
+        #word["x"] = randint(0, x_upper)
+        #word["y"] = randint(0, y_upper)
+        overlap = True
+        while overlap:
+            word["x"] = randint(0, x_upper)
+            word["y"] = randint(0, y_upper)
+            overlap = False
+            for word2 in words2:
+                if word2['x'] < word['x'] and word['x'] < word2['x'] + word2['width'] and \
+                        word2['y'] < word['y'] and  word['y'] < word2['y'] + word2['height'] and \
+                        word2['y'] != -100:
+                    overlap = True
+                    print("Word ", word, "\nWord2", word2, "\n")
+                if word['x'] < word2['x'] and word2['x'] < word['x'] + word['width'] and \
+                        word['y'] < word2['y'] and  word2['y'] < word['y'] + word['height'] and \
+                        word2['y'] != -100:
+                    overlap = True
+                    print("Word ", word, "\nWord2", word2, "\n")
+                if word2['x'] < word['x'] and word['x'] < word2['x'] + word2['width'] and \
+                        word['y'] < word2['y'] and  word2['y'] < word['y'] + word['height'] and \
+                        word2['y'] != -100:
+                    overlap = True
+                if word['x'] < word2['x'] and word2['x'] < word['x'] + word['width'] and \
+                        word2['y'] < word['y'] and  word['y'] < word2['y'] + word2['height'] and \
+                        word2['y'] != -100:
+                    overlap = True
+        return
 
     def word_color(self, list_position):
         """ use list position and words count to detemrine colur in color range. """
@@ -194,9 +230,7 @@ class Wordcloud:
         for word in reversed(self.words):
             font = ImageFont.truetype(self.font_path, size=word['font_size'])
             draw.text((word['x'], word['y']), word["text"], font=font, fill=word["color"])
-
         img.save(os.path.expanduser("~") + "/Downloads/img.png")
-
         ui = DialogInformation(self.app, "Wordcloud", "")
         label = QtWidgets.QLabel()
         qim = ImageQt(img)
