@@ -171,7 +171,7 @@ class ViewCharts(QDialog):
                                  _('red'), _("cyan"), _("oranges"), _("pinks"),  _("magenta"), _("random"),
                                  _("blue to yellow"), _("blue to red"), _("grey to red"), _("black to pink"),
                                  _("orange to purple"), _("salmon to aqua"), _("green to blue"),  _("yellow to green"),
-                                 _("pink foam"),  _("river nights")
+                                 _("aqua to pink"),  _("river nights")
                                 ]
         # TODO wordcloud width x height, number of words
         self.ui.comboBox_wordcloud_foreground.addItems(wordcloud_foregrounds)

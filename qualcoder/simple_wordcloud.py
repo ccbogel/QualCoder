@@ -26,21 +26,17 @@ https://github.com/ccbogel/QualCoder
 """
 
 from copy import deepcopy
-
-from PIL.ImageQt import ImageQt
-
-from .information import DialogInformation
+import datetime
 import logging
 import os
-from PIL import Image
-from PIL import ImageColor
-from PIL import ImageDraw
-from PIL import ImageFont
+from PIL.ImageQt import ImageQt
+from PIL import Image, ImageColor, ImageDraw, ImageFont
+from PyQt6 import QtGui, QtWidgets
 from random import randint
 import sys
 import traceback
 
-from PyQt6 import QtCore, QtGui, QtWidgets
+from .information import DialogInformation
 
 
 path = os.path.abspath(os.path.dirname(__file__))
@@ -66,7 +62,7 @@ color_ranges = [
 {"name": "salmon to aqua", "range": ["#e27c7c", "#a86464", "#6d4b4b", "#503f3f", "#333333", "#3c4e4b", "#466964", "#599e94", "#6cd4c5"]},
 {"name": "green to blue", "range": ["#00D40E", "#00BA2D", "#009658", "#007185", "#0053AB", "#003193"]},
 {"name": "yellow to green", "range": ["#FEFB01", "#CEFB02", "#87FA00", "#3AF901", "#00ED01"]},
-{"name": "pink foam", "range": ["#54bebe", "#76c8c8", "#98d1d1", "#badbdb", "#dedad2", "#e4bcad", "#df979e", "#d7658b", "#c80064"]},
+{"name": "aqua to pink", "range": ["#54bebe", "#76c8c8", "#98d1d1", "#badbdb", "#dedad2", "#e4bcad", "#df979e", "#d7658b", "#c80064"]},
 {"name": "river nights", "range": ["#b30000", "#7c1158", "#4421af", "#1a53ff", "#0d88e6", "#00b7c7", "#5ad45a", "#8be04e", "#ebdc78"]},
 {"name": "greens", "range": ["#094F29", "#0A6921", "#1A8828", "#429B46", "#64AD62", "#94C58C"]},
 {"name": "oranges","range": ["#FF5500", "#FF6500", "#ff7500", "#FF8500", "#FF9500"]},
@@ -83,8 +79,8 @@ class Wordcloud:
                  "yourselves", "he", "he's", "him", "his", "himself", "she", "she's", "her", "hers", "herself", "it", "its", "itself",
                  "they", "they've", "you'd", "you'ld",
                  "them", "their", "theirs", "themselves", "what", "which", "who", "whom", "this", "that", "these",
-                 "those", "am", "does", "doesn't",
-                 "is", "are", "was", "were", "be", "been", "being", "have", "has", "had", "having", "do", "does", "did",
+                 "those", "am", "does", "doesn't", "was", "wasn't"
+                 "is", "are", "was", "were", "weren't", "be", "been", "being", "have", "haven't", "has", "had", "having", "do", "does", "did",
                  "doing", "a",
                  "an", "the", "and", "but", "if", "or", "because", "as", "until", "while", "of", "at", "by", "for",
                  "with", "about",
@@ -112,7 +108,7 @@ class Wordcloud:
             if color_range["name"] == text_color:
                 self.color_range_chosen = color_range["range"]
         self.max_font_size = int(self.height / 6)
-        self.min_font_size = 8
+        self.min_font_size = 10
         self.font_path = os.path.join(os.path.expanduser('~'), ".qualcoder", "DroidSansMono.ttf")
 
         # Remove punctuation. Convert to lower case
@@ -162,12 +158,11 @@ class Wordcloud:
             word['height'] = lower - upper
         # Set x and y with check for overlapping
         for i, word in enumerate(self.words):
-            print(i, word['text'])
-            self.overlapping(word)
-
+            #print(i, word['text'], word['font_size'])
+            self.position_word_minimise_overlapping(word)
         self.create_image()
 
-    def overlapping(self, word):
+    def position_word_minimise_overlapping(self, word):
         words2= deepcopy(self.words)
         words2.remove(word)
 
@@ -177,8 +172,6 @@ class Wordcloud:
         y_upper = self.height - 10 - word['height']
         if y_upper < 0:
             y_upper = 1
-        #word["x"] = randint(0, x_upper)
-        #word["y"] = randint(0, y_upper)
         overlap = True
         while overlap:
             word["x"] = randint(0, x_upper)
@@ -206,7 +199,7 @@ class Wordcloud:
         return
 
     def word_color(self, list_position):
-        """ use list position and words count to detemrine colur in color range. """
+        """ Use list position and words count to detemrine colour in color range. """
 
         if self.color_range_chosen:
             num_colors = len(self.color_range_chosen)
@@ -230,14 +223,16 @@ class Wordcloud:
         for word in reversed(self.words):
             font = ImageFont.truetype(self.font_path, size=word['font_size'])
             draw.text((word['x'], word['y']), word["text"], font=font, fill=word["color"])
-        img.save(os.path.expanduser("~") + "/Downloads/img.png")
-        ui = DialogInformation(self.app, "Wordcloud", "")
+        nowtime = datetime.datetime.now().astimezone().strftime("%H-%M-%S")
+        file_name = os.path.join(os.path.expanduser("~"), "Downloads", f"wordcloud{nowtime}.png")
+        img.save(file_name)
+        ui = DialogInformation(self.app, file_name, "")
         label = QtWidgets.QLabel()
         qim = ImageQt(img)
         pm = QtGui.QPixmap.fromImage(qim)
         label.setPixmap(pm)
         ui.ui.gridLayout.addWidget(label, 0, 0, 1, 1)
-        #self.resize(self.pixmap.width(), self.pixmap.height())
+        ui.resize(pm.width() + 30, pm.height() + 30)
         ui.exec()
 
 
