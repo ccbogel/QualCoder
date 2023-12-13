@@ -168,13 +168,13 @@ class ViewCharts(QDialog):
         self.ui.label_word_clouds.setToolTip(_("Word cloud made from coded text segments"))
         wordcloud_backgrounds = [_('Black'), _('White')]
         self.ui.comboBox_wordcloud_background.addItems(wordcloud_backgrounds)
-        wordcloud_foregrounds = ["white", "grey", "black",  'yellow', 'green', "red", "cyan", "magenta", "deepskyblue",
+        wordcloud_foregrounds = ["white", "grey", "black", 'yellow', 'green', "red", "cyan", "magenta", "deepskyblue",
                                  "indigo", "lightcoral", "olive", "tan",
                                  "greys", "greens", "oranges", "pinks", "reds", "yellows", "blues",
                                  "blue to yellow", "blue to orange", "blue to red", "blue to aqua", "grey to red",
                                  "black to pink", "orange to purple", "salmon to aqua", "green to blue",
-                                 "yellow to green", "aqua to pink",  "river nights", "random"
-                                ]
+                                 "yellow to green", "aqua to pink", "river nights", "random"
+                                 ]
         self.ui.comboBox_wordcloud_foreground.addItems(wordcloud_foregrounds)
         self.ui.pushButton_wordcloud.pressed.connect(self.show_word_cloud)
 
@@ -396,15 +396,10 @@ class ViewCharts(QDialog):
         height = int(self.ui.spinBox_cloud_height.text())
         max_words = int(self.ui.spinBox_cloud_max_words.text())
         reverse_colors = self.ui.checkBox_reverse_range.isChecked()
+        # TODO change to combobox Options 1,2,3,4 ngrams
+        ngrams = 1  # self.ui.checkBox_trigrams.isChecked()
         Wordcloud(self.app, text, width=width, height=height, max_words=max_words, background_color=background,
-                     text_color=foreground, reverse_colors=reverse_colors)
-        '''
-        fig = px.imshow(wordcloud, title=title + subtitle)
-        fig.update_xaxes(visible=False)
-        fig.update_yaxes(visible=False)
-        fig.show()
-        self.helper_export_html(fig)
-        self.ui.comboBox_wordclouds.setCurrentIndex(0)'''
+                  text_color=foreground, reverse_colors=reverse_colors, ngrams=ngrams)
 
     def codes_of_category_helper(self, category_name):
         """ Get child categories and codes of this category node.
@@ -785,7 +780,7 @@ class ViewCharts(QDialog):
             self.hierarchy_code_volume_by_characters("sunburst")
         if chart_type_index == 4:  # Code by characters treemap
             self.hierarchy_code_volume_by_characters("treemap")
-        if chart_type_index == 5: # Code by image area sunburst
+        if chart_type_index == 5:  # Code by image area sunburst
             self.hierarchy_code_volume_by_area("sunburst")
         if chart_type_index == 6:  # Code by image area treemap
             self.hierarchy_code_volume_by_area("treemap")
@@ -1192,8 +1187,9 @@ class ViewCharts(QDialog):
         self.ui.comboBox_char_attributes.blockSignals(False)
 
         cur = self.app.conn.cursor()
-        cur.execute("select value, count(value) from attribute where attr_type=? and name=? group by value order by upper(value)",
-                    [file_or_case, attribute])
+        cur.execute(
+            "select value, count(value) from attribute where attr_type=? and name=? group by value order by upper(value)",
+            [file_or_case, attribute])
         res = cur.fetchall()
         labels = []
         values = []
@@ -1358,7 +1354,7 @@ class ViewCharts(QDialog):
                         labels=dict(x=heatmap_type, y="Codes", color="Count"),
                         x=x_labels,
                         y=y_labels,
-                        title=title+subtitle
+                        title=title + subtitle
                         )
         fig.update_xaxes(side="top")
         fig.show()
