@@ -174,14 +174,22 @@ class Wordcloud:
             if word not in self.stopwords:
                 word_list.append(word)
         # print("Words: " + f"{len(word_list):,d}")
-
+        print(word_list)
+        ngrams = 3
+        if ngrams > 1:
+            word_list = self.make_ngrams(word_list, 3)
+        print(word_list)
+        self.max_font_size = int(self.height / 20)
+        if self.max_font_size < self.min_font_size:
+            self.max_font_size = self.min_font_size
         # Word frequency
         d = {}
         for word in word_list:
             d[word] = d.get(word, 0) + 1  # get(key, value if not present)
         self.words = []
         for key, value in d.items():
-            self.words.append({"text": key, "frequency": value, "x": 0, "y": -100})
+            if value > 1:
+                self.words.append({"text": key, "frequency": value, "x": 0, "y": -100})
         self.words = sorted(self.words, key=lambda x: x["frequency"], reverse=True)
         if len(self.words) == 0:
             self.words.append({"text": "NO WORDS", "frequency": 1, "x": 0, "y": 0})
@@ -265,6 +273,13 @@ class Wordcloud:
             color = colors[randint(0, len(colors) - 1)]
             return color
         return self.text_color
+
+    def make_ngrams(self, tokens, number_of_words):
+        ngrams_list = []
+        for i in range(len(tokens) - number_of_words + 1):
+            tokens_list = tokens[i: i + number_of_words]
+            ngrams_list.append(" ".join(tokens_list))
+        return ngrams_list
 
     def create_image(self):
         """ Create image and save to Downloads. Draw lesser frequency words first.
