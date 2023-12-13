@@ -582,9 +582,9 @@ Codings from the entire text file are used for the calculations.</string>
   <widget class="QLabel" name="label_max_words">
    <property name="geometry">
     <rect>
-     <x>520</x>
+     <x>510</x>
      <y>440</y>
-     <width>71</width>
+     <width>91</width>
      <height>20</height>
     </rect>
    </property>
@@ -679,7 +679,7 @@ Codings from the entire text file are used for the calculations.</string>
     <rect>
      <x>600</x>
      <y>442</y>
-     <width>101</width>
+     <width>141</width>
      <height>16</height>
     </rect>
    </property>
