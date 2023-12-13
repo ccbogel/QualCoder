@@ -36,7 +36,7 @@ import traceback
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtWidgets import QDialog
-from .wordcloud_modified import WordCloudMod
+from .simple_wordcloud import Wordcloud
 
 from .GUI.ui_dialog_charts import Ui_DialogCharts
 
@@ -165,15 +165,17 @@ class ViewCharts(QDialog):
             categories_combobox_list.append(c['name'])
         self.ui.comboBox_category.addItems(categories_combobox_list)
 
-        self.ui.comboBox_wordclouds.currentIndexChanged.connect(self.show_word_cloud)
-        wordclouds_combobox_list = ['', _('White'),
-                             _('Black'),
-                             _('Yellow'),
-                             _('Blue'),
-                             _("Red"),
-                             _("Green")
-                             ]
-        self.ui.comboBox_wordclouds.addItems(wordclouds_combobox_list)
+        wordcloud_backgrounds = [_('Black'), _('White')]
+        self.ui.comboBox_wordcloud_background.addItems(wordcloud_backgrounds)
+        wordcloud_foregrounds = ["white", "grey", "black",  'yellow', 'green', "red", "cyan", "magenta", "deepskyblue",
+                                 "indigo", "lightcoral", "olive", "tan",
+                                 "greys", "greens", "oranges", "pinks", "reds", "yellows", "blues",
+                                 "blue to yellow", "blue to orange", "blue to red", "blue to aqua", "grey to red",
+                                 "black to pink", "orange to purple", "salmon to aqua", "green to blue",
+                                 "yellow to green", "aqua to pink",  "river nights", "random"
+                                ]
+        self.ui.comboBox_wordcloud_foreground.addItems(wordcloud_foregrounds)
+        self.ui.pushButton_wordcloud.pressed.connect(self.show_word_cloud)
 
         # Attributes comboboxes. Initial radio button checked is Files
         self.ui.comboBox_char_attributes.currentIndexChanged.connect(self.character_attribute_charts)
@@ -369,14 +371,9 @@ class ViewCharts(QDialog):
         """ Show word cloud.
          Can be by file and/or by category. """
 
-        chart_type_index = self.ui.comboBox_wordclouds.currentIndex()
-        if chart_type_index < 1:
-            return
         title = _('Word cloud')
         owner, subtitle = self.owner_and_subtitle_helper()
-
         self.get_selected_categories_and_codes()
-        
         cur = self.app.conn.cursor()
         values = []
         case_file_name, file_ids = self.get_file_ids()
@@ -392,15 +389,21 @@ class ViewCharts(QDialog):
                 values.append(res_text[0])
         # Create image
         text = " ".join(values)
-        colours = ['', 'white', 'black', 'yellow', 'blue', 'red', 'green']
-        wordcloud = WordCloudMod(background_color=colours[chart_type_index], width=800, height=600).generate(text)
-        # Display image
+        background = self.ui.comboBox_wordcloud_background.currentText()
+        foreground = self.ui.comboBox_wordcloud_foreground.currentText()
+        width = int(self.ui.spinBox_cloud_width.text())
+        height = int(self.ui.spinBox_cloud_height.text())
+        max_words = int(self.ui.spinBox_cloud_max_words.text())
+        reverse_colors = self.ui.checkBox_reverse_range.isChecked()
+        Wordcloud(self.app, text, width=width, height=height, max_words=max_words, background_color=background,
+                     text_color=foreground, reverse_colors=reverse_colors)
+        '''
         fig = px.imshow(wordcloud, title=title + subtitle)
         fig.update_xaxes(visible=False)
         fig.update_yaxes(visible=False)
         fig.show()
         self.helper_export_html(fig)
-        self.ui.comboBox_wordclouds.setCurrentIndex(0)
+        self.ui.comboBox_wordclouds.setCurrentIndex(0)'''
 
     def codes_of_category_helper(self, category_name):
         """ Get child categories and codes of this category node.

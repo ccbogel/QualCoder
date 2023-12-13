@@ -68,7 +68,7 @@ py -m pip install --upgrade pip
 ```
 
 ```bash
-py -m pip install wheel pyqt6 chardet ebooklib openpyxl Pillow ply pdfminer.six pandas plotly pydub python-vlc rispy SpeechRecognition wordcloud xmlschema
+py -m pip install wheel pyqt6 chardet ebooklib openpyxl Pillow ply pdfminer.six pandas plotly pydub python-vlc rispy SpeechRecognition xmlschema
 ```
 
  Wait, until all modules are installed.
@@ -146,7 +146,7 @@ Note: To exit venv type `deactivate`
 
 6. Install the needed Python modules.
 
-`pip install chardet ebooklib ply openpyxl pandas pdfminer pyqt6 pillow pdfminer.six plotly pydub python-vlc rispy six SpeechRecognition wordcloud xmlschema`
+`pip install chardet ebooklib ply openpyxl pandas pdfminer pyqt6 pillow pdfminer.six plotly pydub python-vlc rispy six SpeechRecognition xmlschema`
 
 7. Install QualCoder, and type the following, the dot is important:
 
@@ -176,7 +176,7 @@ It has not been tested, but please see the above instructions to build QualCoder
 
 2. Install additional python modules
 
-`sudo python3 -m pip install ebooklib plotly pydub python-vlc rispy SpeechRecognition wordcloud xmlschema`
+`sudo python3 -m pip install ebooklib plotly pydub python-vlc rispy SpeechRecognition xmlschema`
 
 If successful, all requirements are satisfied.
 
@@ -237,7 +237,7 @@ python3 get-pip.py
 5) Install Python dependency modules using `pip`:
 
 ```sh
-pip3 install chardet ebooklib openpyxl pandas pillow ply pdfminer.six plotly pydub pyqt6 python-vlc rispy six SpeechRecognition wordcloud xmlschema
+pip3 install chardet ebooklib openpyxl pandas pillow ply pdfminer.six plotly pydub pyqt6 python-vlc rispy six SpeechRecognition xmlschema
 ```
 
 Be sure that you are in the QualCoder-Master directory before doing Step 6.
@@ -282,7 +282,7 @@ Open the Terminal App and move to the unzipped Qualcoder-Master directory, then 
 
 1) Install Python dependency modules using `pip3`:
 
-`pip3 install chardet ebooklib ffmpeg-python pyqt6 pillow ply pdfminer.six openpyxl pandas plotly pydub python-vlc rispy six SpeechRecognition wordcloud xmlschema`
+`pip3 install chardet ebooklib ffmpeg-python pyqt6 pillow ply pdfminer.six openpyxl pandas plotly pydub python-vlc rispy six SpeechRecognition xmlschema`
 
 2) Open the Terminal App and move to the unzipped Qualcoder-Master directory, then run the following commands:
 
@@ -294,7 +294,7 @@ Open the Terminal App and move to the unzipped Qualcoder-Master directory, then 
 ## Dependencies
 Required:
 
-Python 3.8+ version, pyqt6, Pillow, six  (Mac OS), ebooklib, ply, chardet, pdfminer.six, openpyxl, pandas, plotly, pydub, python-vlc, rispy, SpeechRecognition, wordcloud, xmlschema
+Python 3.8+ version, pyqt6, Pillow, six  (Mac OS), ebooklib, ply, chardet, pdfminer.six, openpyxl, pandas, plotly, pydub, python-vlc, rispy, SpeechRecognition, xmlschema
 
 ## License
 QualCoder is distributed under the MIT LICENSE.
