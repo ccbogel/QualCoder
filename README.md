@@ -53,7 +53,7 @@ cd Downloads\QualCoder-master
 
 6. Install and activate the virtual environment. This step can be skipped, but I recommend you do not skip it.
 
-When not using a docker container, we recommend using a virtual environment to install packages. This will ensure that the dependencies for QualCoder are isolated from the rest of your system.
+When not using a docker container, we recommend using a virtual environment to install packages. This will ensure that the dependencies for QualCoder are isolated from the rest of your system. On someWindows OS you may need to replace the _py_ command with _python3_ below: 
 
 ```bash
 py -m venv env
