@@ -543,14 +543,15 @@ Codings from the entire text file are used for the calculations.</string>
   <widget class="QPushButton" name="pushButton_wordcloud">
    <property name="geometry">
     <rect>
-     <x>380</x>
-     <y>490</y>
-     <width>151</width>
-     <height>28</height>
+     <x>581</x>
+     <y>481</y>
+     <width>121</width>
+     <height>51</height>
     </rect>
    </property>
    <property name="text">
-    <string>Make wordcloud</string>
+    <string>Make
+wordcloud</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_width">
@@ -661,9 +662,9 @@ Codings from the entire text file are used for the calculations.</string>
   <widget class="QCheckBox" name="checkBox_reverse_range">
    <property name="geometry">
     <rect>
-     <x>630</x>
-     <y>462</y>
-     <width>31</width>
+     <x>380</x>
+     <y>490</y>
+     <width>21</width>
      <height>20</height>
     </rect>
    </property>
@@ -677,14 +678,43 @@ Codings from the entire text file are used for the calculations.</string>
   <widget class="QLabel" name="label_reverse_range">
    <property name="geometry">
     <rect>
-     <x>600</x>
-     <y>442</y>
-     <width>141</width>
+     <x>410</x>
+     <y>490</y>
+     <width>151</width>
      <height>16</height>
     </rect>
    </property>
    <property name="text">
     <string>Reverse range</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_trigrams">
+   <property name="geometry">
+    <rect>
+     <x>410</x>
+     <y>510</y>
+     <width>151</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Trigrams</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="checkBox_trigrams">
+   <property name="geometry">
+    <rect>
+     <x>380</x>
+     <y>510</y>
+     <width>21</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Reverse colour range&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+   <property name="text">
+    <string>Tri-grams</string>
    </property>
   </widget>
   <zorder>groupBox</zorder>
@@ -733,6 +763,8 @@ Codings from the entire text file are used for the calculations.</string>
   <zorder>spinBox_cloud_max_words</zorder>
   <zorder>checkBox_reverse_range</zorder>
   <zorder>label_reverse_range</zorder>
+  <zorder>label_trigrams</zorder>
+  <zorder>checkBox_trigrams</zorder>
  </widget>
  <tabstops>
   <tabstop>checkBox_export_html</tabstop>
