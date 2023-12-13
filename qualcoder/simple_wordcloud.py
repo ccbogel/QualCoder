@@ -35,7 +35,6 @@ from random import randint
 import sys
 import traceback
 
-
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
@@ -51,48 +50,63 @@ def exception_handler(exception_type, value, tb_obj):
 
 
 color_ranges = [
-{"name": "blue to yellow", "range": ["#115f9a", "#1984c5", "#22a7f0", "#48b5c4", "#76c68f", "#a6d75b", "#c9e52f", "#d0ee11", "#d0f400"]},
-{"name": "grey to red", "range": ["#d7e1ee", "#cbd6e4", "#bfcbdb", "#b3bfd1", "#a4a2a8", "#df8879", "#c86558", "#b04238", "#991f17"]},
-{"name": "black to pink", "range": ["#2e2b28", "#3b3734", "#474440", "#54504c", "#6b506b", "#ab3da9", "#de25da", "#eb44e8", "#ff80ff"]},
-{"name": "blue to red", "range": ["#1984c5", "#22a7f0", "#63bff0", "#a7d5ed", "#e2e2e2", "#e1a692", "#de6e56", "#e14b31", "#c23728"]},
-{"name": "blue to orange", "range": ["#003F5C", "#2F4B7C", "#665191", "#A05195", "#D45087", "#F95D6A", "#FF7C43", "#FFA600"]},
-{"name": "orange to purple", "range": ["#ffb400", "#d2980d", "#a57c1b", "#786028", "#363445", "#48446e", "#5e569b", "#776bcd", "#9080ff"]},
-{"name": "salmon to aqua", "range": ["#e27c7c", "#a86464", "#6d4b4b", "#503f3f", "#333333", "#3c4e4b", "#466964", "#599e94", "#6cd4c5"]},
-{"name": "green to blue", "range": ["#00D40E", "#00BA2D", "#009658", "#007185", "#0053AB", "#003193"]},
-{"name": "yellow to green", "range": ["#FEFB01", "#CEFB02", "#87FA00", "#3AF901", "#00ED01"]},
-{"name": "aqua to pink", "range": ["#54bebe", "#76c8c8", "#98d1d1", "#badbdb", "#dedad2", "#e4bcad", "#df979e", "#d7658b", "#c80064"]},
-{"name": "river nights", "range": ["#b30000", "#7c1158", "#4421af", "#1a53ff", "#0d88e6", "#00b7c7", "#5ad45a", "#8be04e", "#ebdc78"]},
-{"name": "blue to aqua", "range": ["#004C6D" ,"#006083", "#007599", "#008BAD", "#00A1C1", "#00B8D3", "#00CFE3", "#00E7F2", "#00FFFF"]},
-{"name": "greens", "range": ["#198450", "#27A567", "#2EB774", "#38CB82", "#41DC8E", "#64E3A1", "#84EAB3", "#AAF0C9", "#CBF5DD"]},
-{"name": "oranges","range": ["#FF5500", "#FF6500", "#ff7500", "#FF8500", "#FF9500"]},
-{"name": "blues", "range": ["#0000b3", "#0010d9", "#0020ff", "#0040ff", "#0060ff", "#0080ff", "#009fff", "#00bfff", "#00ffff"]},
-{"name": "pinks", "range": ["#A73CA4", "#C353C0", "#D178CF", "#DF9DDD", "#ECC3EB"]},
-{"name": "greys", "range": ["#F2F2F2", "#C2C2C2", "#929292", "#616161", "#414141", "#202020"]},
-{"name": "yellows", "range": ["#E47200", "#E69B00", "#E6B400", "#E6CC00", "#E5DE00", "#E8E337", "#ECE75F", "#F1EE8E", "#F7F5BC"]},
-{"name": "reds", "range": ["#C61A09", "#DF2C14", "#ED3419", "#FB3B1E", "#FF4122", "#FF6242", "#FF8164", "#FFA590", "#FFC9BB"]}
+    {"name": "blue to yellow",
+     "range": ["#115f9a", "#1984c5", "#22a7f0", "#48b5c4", "#76c68f", "#a6d75b", "#c9e52f", "#d0ee11", "#d0f400"]},
+    {"name": "grey to red",
+     "range": ["#d7e1ee", "#cbd6e4", "#bfcbdb", "#b3bfd1", "#a4a2a8", "#df8879", "#c86558", "#b04238", "#991f17"]},
+    {"name": "black to pink",
+     "range": ["#2e2b28", "#3b3734", "#474440", "#54504c", "#6b506b", "#ab3da9", "#de25da", "#eb44e8", "#ff80ff"]},
+    {"name": "blue to red",
+     "range": ["#1984c5", "#22a7f0", "#63bff0", "#a7d5ed", "#e2e2e2", "#e1a692", "#de6e56", "#e14b31", "#c23728"]},
+    {"name": "blue to orange",
+     "range": ["#003F5C", "#2F4B7C", "#665191", "#A05195", "#D45087", "#F95D6A", "#FF7C43", "#FFA600"]},
+    {"name": "orange to purple",
+     "range": ["#ffb400", "#d2980d", "#a57c1b", "#786028", "#363445", "#48446e", "#5e569b", "#776bcd", "#9080ff"]},
+    {"name": "salmon to aqua",
+     "range": ["#e27c7c", "#a86464", "#6d4b4b", "#503f3f", "#333333", "#3c4e4b", "#466964", "#599e94", "#6cd4c5"]},
+    {"name": "green to blue", "range": ["#00D40E", "#00BA2D", "#009658", "#007185", "#0053AB", "#003193"]},
+    {"name": "yellow to green", "range": ["#FEFB01", "#CEFB02", "#87FA00", "#3AF901", "#00ED01"]},
+    {"name": "aqua to pink",
+     "range": ["#54bebe", "#76c8c8", "#98d1d1", "#badbdb", "#dedad2", "#e4bcad", "#df979e", "#d7658b", "#c80064"]},
+    {"name": "river nights",
+     "range": ["#b30000", "#7c1158", "#4421af", "#1a53ff", "#0d88e6", "#00b7c7", "#5ad45a", "#8be04e", "#ebdc78"]},
+    {"name": "blue to aqua",
+     "range": ["#004C6D", "#006083", "#007599", "#008BAD", "#00A1C1", "#00B8D3", "#00CFE3", "#00E7F2", "#00FFFF"]},
+    {"name": "greens",
+     "range": ["#198450", "#27A567", "#2EB774", "#38CB82", "#41DC8E", "#64E3A1", "#84EAB3", "#AAF0C9", "#CBF5DD"]},
+    {"name": "oranges", "range": ["#FF5500", "#FF6500", "#ff7500", "#FF8500", "#FF9500"]},
+    {"name": "blues",
+     "range": ["#0000b3", "#0010d9", "#0020ff", "#0040ff", "#0060ff", "#0080ff", "#009fff", "#00bfff", "#00ffff"]},
+    {"name": "pinks", "range": ["#A73CA4", "#C353C0", "#D178CF", "#DF9DDD", "#ECC3EB"]},
+    {"name": "greys", "range": ["#F2F2F2", "#C2C2C2", "#929292", "#616161", "#414141", "#202020"]},
+    {"name": "yellows",
+     "range": ["#E47200", "#E69B00", "#E6B400", "#E6CC00", "#E5DE00", "#E8E337", "#ECE75F", "#F1EE8E", "#F7F5BC"]},
+    {"name": "reds",
+     "range": ["#C61A09", "#DF2C14", "#ED3419", "#FB3B1E", "#FF4122", "#FF6242", "#FF8164", "#FFA590", "#FFC9BB"]}
 ]
 
-stopwords = ["i've", "i'm", "i'll", "me", "my", "myself", "we", "we've", "we're", "our", "ours", "ourselves", "you",
-                 "your", "you're", "yours", "yourself", "it's", "that's", "they're", "they'll", "they'd", "we've",
-                 "yourselves", "he", "he's", "him", "his", "himself", "she", "she's", "her", "hers", "herself",
-                 "it", "its", "itself", "they", "they've", "you'd", "you'ld", "aren't",
-                 "them", "their", "theirs", "themselves", "what", "which", "who", "whom", "this", "that", "these",
-                 "those", "am", "does", "doesn't", "was", "wasn't",
-                 "is", "isn't", "is'nt", "are", "was", "wasn't", "were", "weren't", "be", "been", "being",
-                 "have", "haven't", "has", "had", "having", "do", "does", "did", "doing", "she'd",
-                 "an", "the", "and", "but", "if", "or", "because", "as", "until", "while", "of", "at", "by", "for",
-                 "with", "about", "what's",
-                 "against", "between", "into", "through", "during", "before", "after", "above", "below", "to", "from",
-                 "up", "us", "get",
-                 "down", "in", "out", "on", "off", "over", "under", "again", "further", "then", "once", "here", "there",
-                 "there's", "when", "had", "hadn't", "hasn't",
-                 "where", "why", "how", "all", "any", "both", "each", "few", "more", "most", "other", "some", "such",
-                 "no", "put", "oh", "um", "uh",
-                 "nor", "not", "only", "own", "same", "so", "than", "too", "very", "can", "can't", "will", "just",
-                 "don't", "did", "didn't",
-                 "should", "shouldn't", "would", "wouldn't", "could", "couldn't", "now", "got",
-                 "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t",
-                 "u", "v", "w", "x", "y", "z"]
+stopwords = ["a", "about", "above", "after", "again", "against", "all", "am", "an", "and", "any", "are", "aren't", "as",
+             "at",
+             "b", "be", "because", "been", "before", "being", "below", "between", "both", "but", "by", "c", "can",
+             "can't", "could", "couldn't",
+             "d", "did", "did", "didn't", "do", "does", "does", "doesn't", "doing", "don't", "down", "during",
+             "e", "each", "f", "few", "for", "from", "further", "g", "get", "got",
+             "h", "had", "had", "hadn't", "has", "hasn't", "have", "haven't", "having", "he", "he's", "her", "here",
+             "hers", "herself", "him", "himself", "his", "how",
+             "i", "i'll", "i'm", "i've", "if", "in", "into", "is", "is'nt", "isn't", "it", "it's", "its", "itself",
+             "j", "just", "k", "l", "m", "me", "more", "most", "my", "myself", "n", "no", "nor", "not", "now",
+             "o", "of", "off", "oh", "on", "once", "only", "or", "other", "our", "ours", "ourselves", "out", "over",
+             "own",
+             "p", "pre", "put", "q", "r", "re",
+             "s", "same", "she", "she'd", "she's", "should", "shouldn't", "so", "some", "such",
+             "t", "than", "that", "that's", "the", "their", "theirs", "them", "themselves", "then", "there", "there's",
+             "these",
+             "they", "they'd", "they'll", "they're", "they've", "this", "those", "through", "to", "too",
+             "u", "uh", "um", "under", "until", "up", "us", "v", "very",
+             "w", "was", "was", "wasn't", "wasn't", "we", "we're", "we've", "we've", "were", "weren't", "what",
+             "what's", "when", "where", "which", "while",
+             "who", "who's", "whom", "why", "will", "with", "would", "wouldn't",
+             "x", "y", "you", "you'd", "you'ld", "you're", "your", "yours", "yourself", "yourselves", "z"]
 
 
 class Wordcloud:
@@ -108,7 +122,6 @@ class Wordcloud:
         text color(s): a single named colour in Pil, or a named in the named colour ranges above.
         reverse_colors: if true, reverses the order of the colour range
     """
-
 
     def __init__(self, app, fulltext, width=800, height=600, max_words=200, background_color="black",
                  text_color="random", reverse_colors=False):
@@ -145,9 +158,7 @@ class Wordcloud:
                         break
                     self.stopwords.append(stopword.strip())  # Remove line ending
         except FileNotFoundError as err:
-            print(err)
             self.stopwords = stopwords
-        #print("stopwords", self.stopwords)
 
         # Remove most punctuation except apostrophe. Convert to lower case
         chars = ""
@@ -162,7 +173,7 @@ class Wordcloud:
         for word in word_list_temp:
             if word not in self.stopwords:
                 word_list.append(word)
-        #print("Words: " + f"{len(word_list):,d}")
+        # print("Words: " + f"{len(word_list):,d}")
 
         # Word frequency
         d = {}
@@ -174,7 +185,7 @@ class Wordcloud:
         self.words = sorted(self.words, key=lambda x: x["frequency"], reverse=True)
         if len(self.words) == 0:
             self.words.append({"text": "NO WORDS", "frequency": 1, "x": 0, "y": 0})
-        #print("Unique words: " + str(len(self.words)))
+        # print("Unique words: " + str(len(self.words)))
 
         # Limit number of words to display
         max_count = len(self.words)
@@ -204,7 +215,7 @@ class Wordcloud:
          While there are overlaps keep creating new x, y coordinates until no overlaps.
          Does not work perfectly, but does reduce overlaps. """
 
-        words2= deepcopy(self.words)
+        words2 = deepcopy(self.words)
         words2.remove(word)
 
         x_upper = self.width - 10 - word['width']
@@ -220,21 +231,21 @@ class Wordcloud:
             overlap = False
             for word2 in words2:
                 if word2['x'] < word['x'] and word['x'] < word2['x'] + word2['width'] and \
-                        word2['y'] < word['y'] and  word['y'] < word2['y'] + word2['height'] and \
+                        word2['y'] < word['y'] and word['y'] < word2['y'] + word2['height'] and \
                         word2['y'] != -100:
                     overlap = True
-                    #print("Word ", word, "\nWord2", word2, "\n")
+                    # print("Word ", word, "\nWord2", word2, "\n")
                 if word['x'] < word2['x'] and word2['x'] < word['x'] + word['width'] and \
-                        word['y'] < word2['y'] and  word2['y'] < word['y'] + word['height'] and \
+                        word['y'] < word2['y'] and word2['y'] < word['y'] + word['height'] and \
                         word2['y'] != -100:
                     overlap = True
-                    #print("Word ", word, "\nWord2", word2, "\n")
+                    # print("Word ", word, "\nWord2", word2, "\n")
                 if word2['x'] < word['x'] and word['x'] < word2['x'] + word2['width'] and \
-                        word['y'] < word2['y'] and  word2['y'] < word['y'] + word['height'] and \
+                        word['y'] < word2['y'] and word2['y'] < word['y'] + word['height'] and \
                         word2['y'] != -100:
                     overlap = True
                 if word['x'] < word2['x'] and word2['x'] < word['x'] + word['width'] and \
-                        word2['y'] < word['y'] and  word['y'] < word2['y'] + word2['height'] and \
+                        word2['y'] < word['y'] and word['y'] < word2['y'] + word2['height'] and \
                         word2['y'] != -100:
                     overlap = True
         return

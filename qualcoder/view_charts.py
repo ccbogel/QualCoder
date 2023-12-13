@@ -165,6 +165,7 @@ class ViewCharts(QDialog):
             categories_combobox_list.append(c['name'])
         self.ui.comboBox_category.addItems(categories_combobox_list)
 
+        self.ui.label_word_clouds.setToolTip(_("Word cloud made from coded text segments"))
         wordcloud_backgrounds = [_('Black'), _('White')]
         self.ui.comboBox_wordcloud_background.addItems(wordcloud_backgrounds)
         wordcloud_foregrounds = ["white", "grey", "black",  'yellow', 'green', "red", "cyan", "magenta", "deepskyblue",
