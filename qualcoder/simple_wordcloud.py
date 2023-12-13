@@ -143,12 +143,11 @@ class Wordcloud:
                         stopword = stopword[6:]
                     if not stopword:
                         break
-                    self.stopwords.append(stopword)
+                    self.stopwords.append(stopword.strip())  # Remove line ending
         except FileNotFoundError as err:
             print(err)
             self.stopwords = stopwords
-
-        print("stopwords", self.stopwords)
+        #print("stopwords", self.stopwords)
 
         # Remove most punctuation except apostrophe. Convert to lower case
         chars = ""
