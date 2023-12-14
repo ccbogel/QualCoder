@@ -89,9 +89,9 @@ stopwords = ["a", "about", "above", "after", "again", "against", "all", "am", "a
              "at",
              "b", "be", "because", "been", "before", "being", "below", "between", "both", "but", "by", "c", "can",
              "can't", "could", "couldn't",
-             "d", "did", "did", "didn't", "do", "does", "does", "doesn't", "doing", "don't", "down", "during",
+             "d", "did", "didn't", "do", "does", "doesn't", "doing", "don't", "down", "during",
              "e", "each", "f", "few", "for", "from", "further", "g", "get", "got",
-             "h", "had", "had", "hadn't", "has", "hasn't", "have", "haven't", "having", "he", "he's", "her", "here",
+             "h", "had", "hadn't", "has", "hasn't", "have", "haven't", "having", "he", "he's", "her", "here",
              "hers", "herself", "him", "himself", "his", "how",
              "i", "i'll", "i'm", "i've", "if", "in", "into", "is", "is'nt", "isn't", "it", "it's", "its", "itself",
              "j", "just", "k", "l", "m", "me", "more", "most", "my", "myself", "n", "no", "nor", "not", "now",
@@ -103,7 +103,7 @@ stopwords = ["a", "about", "above", "after", "again", "against", "all", "am", "a
              "these",
              "they", "they'd", "they'll", "they're", "they've", "this", "those", "through", "to", "too",
              "u", "uh", "um", "under", "until", "up", "us", "v", "very",
-             "w", "was", "was", "wasn't", "wasn't", "we", "we're", "we've", "we've", "were", "weren't", "what",
+             "w", "was", "wasn't", "we", "we're", "we've", "were", "weren't", "what",
              "what's", "when", "where", "which", "while",
              "who", "who's", "whom", "why", "will", "with", "would", "wouldn't",
              "x", "y", "you", "you'd", "you'ld", "you're", "your", "yours", "yourself", "yourselves", "z"]
@@ -121,10 +121,11 @@ class Wordcloud:
         black or white background
         text color(s): a single named colour in Pil, or a named in the named colour ranges above.
         reverse_colors: if true, reverses the order of the colour range
+        trigrams: if true, use 3 word phrases in the word cloud
     """
 
     def __init__(self, app, fulltext, width=800, height=600, max_words=200, background_color="black",
-                 text_color="random", reverse_colors=False):
+                 text_color="random", reverse_colors=False, ngrams=1):
 
         sys.excepthook = exception_handler
         self.app = app
@@ -141,7 +142,8 @@ class Wordcloud:
                 self.color_range_chosen = deepcopy(color_range["range"])
         if reverse_colors and self.color_range_chosen:
             self.color_range_chosen.reverse()
-        self.max_font_size = int(self.height / 6)
+        self.ngrams = ngrams
+        self.max_font_size = int(self.height / 6)  # This factor seems oK
         self.min_font_size = 10
         self.font_path = os.path.join(os.path.expanduser('~'), ".qualcoder", "DroidSansMono.ttf")
         # Get a different stopwords file from the .qualcoder folder
@@ -169,18 +171,25 @@ class Wordcloud:
                 chars += " "
         chars = chars.lower()
         word_list = []
-        word_list_temp = chars.split()
-        for word in word_list_temp:
+        word_list_with_stopwords = chars.split()
+        for word in word_list_with_stopwords:
             if word not in self.stopwords:
                 word_list.append(word)
         # print("Words: " + f"{len(word_list):,d}")
-
+        #print(word_list)
+        if self.ngrams > 1:
+            word_list = self.make_ngrams(word_list_with_stopwords, self.ngrams)
+            #print(word_list)
+            self.max_font_size = int(self.height / 18)  # Needs this bigger divisor. Phrases can be long
+            if self.max_font_size < self.min_font_size:
+                self.max_font_size = self.min_font_size
         # Word frequency
         d = {}
         for word in word_list:
             d[word] = d.get(word, 0) + 1  # get(key, value if not present)
         self.words = []
         for key, value in d.items():
+            #if value > 1:
             self.words.append({"text": key, "frequency": value, "x": 0, "y": -100})
         self.words = sorted(self.words, key=lambda x: x["frequency"], reverse=True)
         if len(self.words) == 0:
@@ -265,6 +274,15 @@ class Wordcloud:
             color = colors[randint(0, len(colors) - 1)]
             return color
         return self.text_color
+
+    def make_ngrams(self, tokens, number_of_words):
+        """ Create trigrams from words list. """
+
+        ngrams_list = []
+        for i in range(len(tokens) - number_of_words + 1):
+            tokens_list = tokens[i: i + number_of_words]
+            ngrams_list.append(" ".join(tokens_list))
+        return ngrams_list
 
     def create_image(self):
         """ Create image and save to Downloads. Draw lesser frequency words first.

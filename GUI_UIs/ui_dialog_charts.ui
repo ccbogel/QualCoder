@@ -543,14 +543,15 @@ Codings from the entire text file are used for the calculations.</string>
   <widget class="QPushButton" name="pushButton_wordcloud">
    <property name="geometry">
     <rect>
-     <x>380</x>
+     <x>582</x>
      <y>490</y>
-     <width>151</width>
-     <height>28</height>
+     <width>120</width>
+     <height>50</height>
     </rect>
    </property>
    <property name="text">
-    <string>Make wordcloud</string>
+    <string>Make
+wordcloud</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_width">
@@ -661,14 +662,14 @@ Codings from the entire text file are used for the calculations.</string>
   <widget class="QCheckBox" name="checkBox_reverse_range">
    <property name="geometry">
     <rect>
-     <x>630</x>
-     <y>462</y>
-     <width>31</width>
+     <x>380</x>
+     <y>490</y>
+     <width>21</width>
      <height>20</height>
     </rect>
    </property>
    <property name="toolTip">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Reverse colour range&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    <string>Reverse colour range</string>
    </property>
    <property name="text">
     <string/>
@@ -677,14 +678,47 @@ Codings from the entire text file are used for the calculations.</string>
   <widget class="QLabel" name="label_reverse_range">
    <property name="geometry">
     <rect>
-     <x>600</x>
-     <y>442</y>
-     <width>141</width>
-     <height>16</height>
+     <x>410</x>
+     <y>490</y>
+     <width>151</width>
+     <height>25</height>
     </rect>
+   </property>
+   <property name="toolTip">
+    <string>Reverse colour range</string>
    </property>
    <property name="text">
     <string>Reverse range</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_ngrams">
+   <property name="geometry">
+    <rect>
+     <x>425</x>
+     <y>523</y>
+     <width>151</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>Number of conjoined words in phrase. Stopwords applies to selection of 1 word only.</string>
+   </property>
+   <property name="text">
+    <string>n-grams</string>
+   </property>
+  </widget>
+
+<widget class="QComboBox" name="comboBox_ngrams">
+   <property name="geometry">
+    <rect>
+     <x>380</x>
+     <y>520</y>
+     <width>40</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>1=One word, 3=3 word phrase, 4=4 word phrase</string>
    </property>
   </widget>
   <zorder>groupBox</zorder>
@@ -733,6 +767,8 @@ Codings from the entire text file are used for the calculations.</string>
   <zorder>spinBox_cloud_max_words</zorder>
   <zorder>checkBox_reverse_range</zorder>
   <zorder>label_reverse_range</zorder>
+  <zorder>label_ngrams</zorder>
+  <zorder>comboBox_ngrams</zorder>
  </widget>
  <tabstops>
   <tabstop>checkBox_export_html</tabstop>

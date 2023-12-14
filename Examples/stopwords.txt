@@ -31,10 +31,8 @@ could
 couldn't
 d
 did
-did
 didn't
 do
-does
 does
 doesn't
 doing
@@ -164,12 +162,9 @@ v
 very
 w
 was
-was
-wasn't
 wasn't
 we
 we're
-we've
 we've
 were
 weren't
