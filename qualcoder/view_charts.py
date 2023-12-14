@@ -176,6 +176,8 @@ class ViewCharts(QDialog):
                                  "yellow to green", "aqua to pink", "river nights", "random"
                                  ]
         self.ui.comboBox_wordcloud_foreground.addItems(wordcloud_foregrounds)
+        wordcloud_ngram_options = ["1", "2", "3", "4"]
+        self.ui.comboBox_ngrams.addItems(wordcloud_ngram_options)
         self.ui.pushButton_wordcloud.pressed.connect(self.show_word_cloud)
 
         # Attributes comboboxes. Initial radio button checked is Files
@@ -397,7 +399,7 @@ class ViewCharts(QDialog):
         max_words = int(self.ui.spinBox_cloud_max_words.text())
         reverse_colors = self.ui.checkBox_reverse_range.isChecked()
         # TODO change to combobox Options 1,2,3,4 ngrams
-        ngrams = 1  # self.ui.checkBox_trigrams.isChecked()
+        ngrams = int( self.ui.comboBox_ngrams.currentText())
         Wordcloud(self.app, text, width=width, height=height, max_words=max_words, background_color=background,
                   text_color=foreground, reverse_colors=reverse_colors, ngrams=ngrams)
 
@@ -410,7 +412,7 @@ class ViewCharts(QDialog):
         return: child_names : List
         """
 
-        if node['cid'] is not None:
+        if category_name['cid'] is not None:
             return []
         child_names = []
         codes, categories = self.app.get_codes_categories()
@@ -424,7 +426,7 @@ class ViewCharts(QDialog):
 
         """ Create a list of this category (node) and all its category children.
         Maximum depth of 200. """
-        selected_categories = [node]
+        selected_categories = [category_name]
         i = 0  # Ensure an exit from loop
         new_model_changed = True
         while categories != [] and new_model_changed and i < 200:
