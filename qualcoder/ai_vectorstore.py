@@ -54,8 +54,8 @@ def exception_handler(exception_type, value, tb_obj):
     text_ = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
     print(text_)
     logger.error(_("Uncaught exception: ") + text_)
-    if len(text_) > 1000:
-        text_ = _('Shortened error message: ...') + text_[-1000:]
+    if len(text_) > 500:
+        text_ = _('Shortened error message: ...') + text_[-500:]
     mb = QtWidgets.QMessageBox()
     mb.setStyleSheet("* {font-size: 12pt}")
     mb.setWindowTitle(_('Uncaught Exception'))

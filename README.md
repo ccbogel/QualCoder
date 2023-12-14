@@ -68,7 +68,7 @@ py -m pip install --upgrade pip
 ```
 
 ```bash
-py -m pip install wheel pyqt6 chardet ebooklib openpyxl Pillow ply pdfminer.six pandas plotly pydub python-vlc rispy SpeechRecognition wordcloud xmlschema
+py -m pip install wheel pyqt6 chardet ebooklib openpyxl Pillow ply pdfminer.six pandas plotly pydub python-vlc rispy SpeechRecognition wordcloud xmlschema charset-normalizer
 ```
 
  For the AI-integration:

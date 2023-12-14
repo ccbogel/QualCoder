@@ -133,8 +133,8 @@ def exception_handler(exception_type, value, tb_obj):
     print(msg)
     mb = QtWidgets.QMessageBox()
     mb.setStyleSheet("* {font-size: 10pt}")
-    if len(msg) > 1000:
-        msg = _('Shortened error message: ...') + msg[-1000:]
+    if len(msg) > 500:
+        msg = _('Shortened error message: ...') + msg[-500:]
     mb.setText(msg)
     mb.exec()
 
@@ -1047,6 +1047,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.app.llm = AiLLM(self.app, self.ui.textEdit)
         self.ui.tabWidget.setCurrentIndex(0)
         self.show()
+        QtWidgets.QApplication.processEvents()
         
         # First start? Ask if user wants to enable ai integration or not
         if self.app.settings['ai_first_startup'] == 'True' and self.app.settings['ai_enable'] == 'False':
