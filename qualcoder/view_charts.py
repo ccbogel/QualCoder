@@ -36,7 +36,7 @@ import traceback
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtWidgets import QDialog
-from wordcloud import WordCloud  #, STOPWORDS
+from .simple_wordcloud import Wordcloud
 
 from .GUI.ui_dialog_charts import Ui_DialogCharts
 
@@ -165,15 +165,20 @@ class ViewCharts(QDialog):
             categories_combobox_list.append(c['name'])
         self.ui.comboBox_category.addItems(categories_combobox_list)
 
-        self.ui.comboBox_wordclouds.currentIndexChanged.connect(self.show_word_cloud)
-        wordclouds_combobox_list = ['', _('White'),
-                             _('Black'),
-                             _('Yellow'),
-                             _('Blue'),
-                             _("Red"),
-                             _("Green")
-                             ]
-        self.ui.comboBox_wordclouds.addItems(wordclouds_combobox_list)
+        self.ui.label_word_clouds.setToolTip(_("Word cloud made from coded text segments"))
+        wordcloud_backgrounds = [_('Black'), _('White')]
+        self.ui.comboBox_wordcloud_background.addItems(wordcloud_backgrounds)
+        wordcloud_foregrounds = ["white", "grey", "black", 'yellow', 'green', "red", "cyan", "magenta", "deepskyblue",
+                                 "indigo", "lightcoral", "olive", "tan",
+                                 "greys", "greens", "oranges", "pinks", "reds", "yellows", "blues",
+                                 "blue to yellow", "blue to orange", "blue to red", "blue to aqua", "grey to red",
+                                 "black to pink", "orange to purple", "salmon to aqua", "green to blue",
+                                 "yellow to green", "aqua to pink", "river nights", "random"
+                                 ]
+        self.ui.comboBox_wordcloud_foreground.addItems(wordcloud_foregrounds)
+        wordcloud_ngram_options = ["1", "2", "3", "4"]
+        self.ui.comboBox_ngrams.addItems(wordcloud_ngram_options)
+        self.ui.pushButton_wordcloud.pressed.connect(self.show_word_cloud)
 
         # Attributes comboboxes. Initial radio button checked is Files
         self.ui.comboBox_char_attributes.currentIndexChanged.connect(self.character_attribute_charts)
@@ -369,14 +374,9 @@ class ViewCharts(QDialog):
         """ Show word cloud.
          Can be by file and/or by category. """
 
-        chart_type_index = self.ui.comboBox_wordclouds.currentIndex()
-        if chart_type_index < 1:
-            return
         title = _('Word cloud')
         owner, subtitle = self.owner_and_subtitle_helper()
-
         self.get_selected_categories_and_codes()
-        
         cur = self.app.conn.cursor()
         values = []
         case_file_name, file_ids = self.get_file_ids()
@@ -392,16 +392,16 @@ class ViewCharts(QDialog):
                 values.append(res_text[0])
         # Create image
         text = " ".join(values)
-        # stopwords = set(STOPWORDS)
-        colours = ['', 'white', 'black', 'yellow', 'blue', 'red', 'green']
-        wordcloud = WordCloud(background_color=colours[chart_type_index], width=800, height=600).generate(text)
-        # Display image
-        fig = px.imshow(wordcloud, title=title + subtitle)
-        fig.update_xaxes(visible=False)
-        fig.update_yaxes(visible=False)
-        fig.show()
-        self.helper_export_html(fig)
-        self.ui.comboBox_wordclouds.setCurrentIndex(0)
+        background = self.ui.comboBox_wordcloud_background.currentText()
+        foreground = self.ui.comboBox_wordcloud_foreground.currentText()
+        width = int(self.ui.spinBox_cloud_width.text())
+        height = int(self.ui.spinBox_cloud_height.text())
+        max_words = int(self.ui.spinBox_cloud_max_words.text())
+        reverse_colors = self.ui.checkBox_reverse_range.isChecked()
+        # TODO change to combobox Options 1,2,3,4 ngrams
+        ngrams = int( self.ui.comboBox_ngrams.currentText())
+        Wordcloud(self.app, text, width=width, height=height, max_words=max_words, background_color=background,
+                  text_color=foreground, reverse_colors=reverse_colors, ngrams=ngrams)
 
     def codes_of_category_helper(self, category_name):
         """ Get child categories and codes of this category node.
@@ -412,7 +412,7 @@ class ViewCharts(QDialog):
         return: child_names : List
         """
 
-        if node['cid'] is not None:
+        if category_name['cid'] is not None:
             return []
         child_names = []
         codes, categories = self.app.get_codes_categories()
@@ -426,7 +426,7 @@ class ViewCharts(QDialog):
 
         """ Create a list of this category (node) and all its category children.
         Maximum depth of 200. """
-        selected_categories = [node]
+        selected_categories = [category_name]
         i = 0  # Ensure an exit from loop
         new_model_changed = True
         while categories != [] and new_model_changed and i < 200:
@@ -782,7 +782,7 @@ class ViewCharts(QDialog):
             self.hierarchy_code_volume_by_characters("sunburst")
         if chart_type_index == 4:  # Code by characters treemap
             self.hierarchy_code_volume_by_characters("treemap")
-        if chart_type_index == 5: # Code by image area sunburst
+        if chart_type_index == 5:  # Code by image area sunburst
             self.hierarchy_code_volume_by_area("sunburst")
         if chart_type_index == 6:  # Code by image area treemap
             self.hierarchy_code_volume_by_area("treemap")
@@ -1189,8 +1189,9 @@ class ViewCharts(QDialog):
         self.ui.comboBox_char_attributes.blockSignals(False)
 
         cur = self.app.conn.cursor()
-        cur.execute("select value, count(value) from attribute where attr_type=? and name=? group by value order by upper(value)",
-                    [file_or_case, attribute])
+        cur.execute(
+            "select value, count(value) from attribute where attr_type=? and name=? group by value order by upper(value)",
+            [file_or_case, attribute])
         res = cur.fetchall()
         labels = []
         values = []
@@ -1355,7 +1356,7 @@ class ViewCharts(QDialog):
                         labels=dict(x=heatmap_type, y="Codes", color="Count"),
                         x=x_labels,
                         y=y_labels,
-                        title=title+subtitle
+                        title=title + subtitle
                         )
         fig.update_xaxes(side="top")
         fig.show()

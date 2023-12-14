@@ -1867,10 +1867,13 @@ class DialogManageFiles(QtWidgets.QDialog):
             msg += _("Deleted file: ") + s['name'] + "\n"
             self.files_renamed = [x for x in self.files_renamed if not (s['id'] == x.get('fid'))]
             # Delete text source
-            if s['mediapath'] is None or 'docs:' in s['mediapath']:
+            if s['mediapath'] is None or s['mediapath'][0:5] == 'docs:' or s['mediapath'][0:6] == '/docs/':
                 try:
                     if s['mediapath'] is None:
+                        # Legacy for older < 3.4 QualCoder projects
                         os.remove(self.app.project_path + "/documents/" + s['name'])
+                    if s['mediapath'][0:6] == '/docs/':
+                        os.remove(self.app.project_path + "/documents/" + s['name'][6:])
                 except OSError as err:
                     logger.warning(_("Deleting file error: ") + str(err))
                 # Delete stored coded sections and source details
@@ -1885,7 +1888,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                     self.app.sources_vectorstore.delete_document(s['id'])    
             
             # Delete image, audio or video source
-            if s['mediapath'] is not None and 'docs:' not in s['mediapath']:
+            if s['mediapath'] is not None and s['mediapath'][0:5] != 'docs:' and s['mediapath'][0:6] != '/docs/':
                 # Get linked transcript file id
                 cur.execute("select av_text_id from source where id=?", [s['id']])
                 res = cur.fetchone()
@@ -1961,8 +1964,11 @@ class DialogManageFiles(QtWidgets.QDialog):
         # Delete text source
         if self.source[row]['mediapath'] is None or self.source[row]['mediapath'][0:5] == 'docs:' or self.source[row]['mediapath'][0:6] == '/docs/':
             try:
-                if self.source[row]['mediapath'] is None or self.source[row]['mediapath'][0:6] == '/docs/':
+                if self.source[row]['mediapath']:
+                    # Legacy for older QualCoder Projects < 3.3
                     os.remove(self.app.project_path + "/documents/" + self.source[row]['name'])
+                if self.source[row]['mediapath'][0:6] == '/docs/':
+                    os.remove(self.app.project_path + "/documents/" + self.source[row]['mediapath'][6:])
             except OSError as err:
                 logger.warning(_("Deleting file error: ") + str(err))
             # Delete stored coded sections and source details
@@ -1977,6 +1983,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 self.app.sources_vectorstore.delete_document(file_id)    
 
         # Delete image, audio or video source
+        # (why not simply use 'else' instead of this complicated second if-clause?)
         if self.source[row]['mediapath'] is not None and self.source[row]['mediapath'][0:5] != 'docs:' and self.source[row]['mediapath'][0:6] != '/docs/':
             # Get linked transcript file id
             cur.execute("select av_text_id from source where id=?", [file_id])

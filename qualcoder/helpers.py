@@ -27,6 +27,7 @@ https://qualcoder.wordpress.com/
 """
 
 import csv
+import ctypes
 import datetime
 import logging
 import os
@@ -58,7 +59,7 @@ def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.
     tb_obj: exception.__traceback__ """
     tb = '\n'.join(traceback.format_tb(tb_obj))
-    text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
+    text = f"Traceback (most recent call last):\n{tb}\n{exception_type.__name__}: {value}"
     print(text)
     logger.error(_("Uncaught exception: ") + text)
     QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
@@ -84,15 +85,15 @@ def msecs_to_hours_mins_secs(msecs):
     mins = int(secs / 60)
     remainder_secs = str(secs - mins * 60)
     if len(remainder_secs) == 1:
-        remainder_secs = "0" + remainder_secs
+        remainder_secs = f"0{remainder_secs}"
     hours = int(mins / 60)
     remainder_mins = str(mins - hours * 60)
     if len(remainder_mins) == 1:
-        remainder_mins = "0" + remainder_mins
+        remainder_mins = f"0{remainder_mins}"
     hours = str(hours)
     if len(hours) == 1:
-        hours = "0" + hours
-    res = hours + "." + remainder_mins + "." + remainder_secs
+        hours = f"0{hours}"
+    res = hours + f".{remainder_mins}.{remainder_secs}"
     return res
 
 
@@ -162,7 +163,7 @@ class ExportDirectoryPathDialog:
             self.filepath = directory + "/" + filename_only + "." + extension
             counter = 0
             while os.path.exists(self.filepath):
-                self.filepath = directory + "/" + filename_only + "_" + str(counter) + "." + extension
+                self.filepath = directory + f"/{filename_only}_{counter}.{extension}"
                 counter += 1
         else:
             self.filepath = None
@@ -222,8 +223,8 @@ class DialogCodeInText(QtWidgets.QDialog):
         self.code_resize_timer = datetime.datetime.now()
         QtWidgets.QDialog.__init__(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        font = 'font: ' + str(self.app.settings['docfontsize']) + 'pt '
-        font += '"' + self.app.settings['font'] + '";'
+        font = f"font: {self.app.settings['docfontsize']}pt "
+        font += f'"{self.app.settings["font"]}";'
         self.setStyleSheet(font)
         self.resize(400, 300)
         file_list = self.app.get_file_texts([data['fid'], ])
@@ -416,7 +417,7 @@ class DialogCodeInAV(QtWidgets.QDialog):
         self.app = app
         self.data = data
         QtWidgets.QDialog.__init__(self)
-        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
+        font = f"font: {self.app.settings['fontsize']}pt "
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
         self.resize(400, 300)
@@ -425,8 +426,6 @@ class DialogCodeInAV(QtWidgets.QDialog):
         self.setWindowTitle(self.data['file_or_casename'])
         self.gridLayout = QtWidgets.QGridLayout(self)
         self.frame = QtWidgets.QFrame(self)
-        '''if platform.system() == "Darwin":  # for macOS
-            self.frame = QtWidgets.QMacCocoaViewContainer(0)'''
         self.gridLayout.addWidget(self.frame, 0, 0, 0, 0)
         if not vlc:
             return
@@ -445,7 +444,8 @@ class DialogCodeInAV(QtWidgets.QDialog):
         except Exception as err:
             logger.warning((str(err)))
             print(err)
-            Message(self.app, _('Media not found'), str(e) + "\n" + self.app.project_path + self.data['mediapath'],
+            msg = f"{e}\n{self.app.project_path}{self.data['mediapath']}"
+            Message(self.app, _('Media not found'), msg,
                     "warning").exec()
             self.close()
             return
@@ -524,7 +524,7 @@ class DialogCodeInImage(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_code_context_image()
         self.ui.setupUi(self)
-        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
+        font = f"font: {self.app.settings['fontsize']}pt "
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
         abs_path = ""

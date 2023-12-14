@@ -55,6 +55,7 @@ from qualcoder.code_color_scheme import DialogCodeColorScheme
 from qualcoder.code_text import DialogCodeText
 from qualcoder.code_pdf import DialogCodePdf
 from qualcoder.GUI.base64_helper import *
+from qualcoder.GUI.base64_droidsansmono_helper import DroidSansMono
 from qualcoder.GUI.ui_main import Ui_MainWindow
 from qualcoder.helpers import Message, ImportPlainTextCodes
 from qualcoder.import_survey import DialogImportSurvey
@@ -2318,7 +2319,7 @@ Do you want to start the AI setup now?')
             self.ui.textEdit.append(f"{span}No video folder. Created empty folder{end_span}")
             missing_folders = True
         if missing_folders:
-            Message(self.app,_("Warning"), _("QualCoder project missing folders. Created empty folders")).exec()
+            Message(self.app,_("Information"), _("QualCoder project missing folders. Created empty folders")).exec()
 
     def save_backup(self):
         """ Save a date and hours stamped backup.
@@ -2560,7 +2561,7 @@ def gui():
     # print("LISTDIR: ", os.listdir(locale_dir))
     # getlang = gettext.translation('en', localedir=locale_dir, languages=['en'])
     translator = gettext.translation(domain='default', localedir=locale_dir, fallback=True)
-    if lang in ["de", "el", "es", "fr", "it", "jp", "pt"]:
+    if lang in ["de", "es", "fr", "it", "pt"]:
         # qt translator applies to ui designed GUI widgets only
         # qt_locale_dir = os.path.join(locale_dir, lang)
         # qt_locale_file = os.path.join(qt_locale_dir, "app_" + lang + ".qm")
@@ -2577,7 +2578,7 @@ def gui():
             print("qm file located at: ", qm)
             qt_translator.load(qm)
             if qt_translator.isEmpty():
-                print("Installing app_" + lang + ".qm to .qualcoder folder")
+                #print(f"Installing app_{lang}.qm to .qualcoder folder")
                 install_language(lang)
                 qt_translator.load(qm)
         app.installTranslator(qt_translator)
@@ -2597,8 +2598,10 @@ def gui():
                 mo_dir = os.path.join(home, '.qualcoder_ai')
                 translator = gettext.translation(lang, localedir=mo_dir, languages=[lang])
             except Exception as err2:
-                print("No " + lang + ".mo translation file loaded", err2)
+                print(f"No {lang}.mo translation file loaded", err2)
     translator.install()
+    # Check DroidSandMono installed  - for wordcloud
+    install_droid_sans_mono()
     ex = MainWindow(qual_app)
     if project_path:
         split_ = project_path.split("|")
@@ -2654,6 +2657,15 @@ def install_language(lang):
         with open(mo, 'wb') as file_:
             decoded_data = base64.decodebytes(mo_data)
             file_.write(decoded_data)
+
+def install_droid_sans_mono():
+    """ Install DroidSandMono ttf font for wordclouds into .qualcoder folder """
+
+    qc_folder = os.path.join(home, '.qualcoder', 'DroidSansMono.ttf')
+    with open(qc_folder, 'wb') as file_:
+        decoded_data = base64.decodebytes(DroidSansMono)
+        file_.write(decoded_data)
+
 
 
 if __name__ == "__main__":

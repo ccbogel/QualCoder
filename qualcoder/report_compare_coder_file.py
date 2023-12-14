@@ -99,7 +99,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         self.ui.pushButton_run.setEnabled(False)
         self.ui.pushButton_run.pressed.connect(self.results)
         pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(cogs_icon), "png")
+        pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
         self.ui.pushButton_run.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_clear.pressed.connect(self.clear_selection)
         pm = QtGui.QPixmap()
