@@ -543,10 +543,10 @@ Codings from the entire text file are used for the calculations.</string>
   <widget class="QPushButton" name="pushButton_wordcloud">
    <property name="geometry">
     <rect>
-     <x>581</x>
-     <y>481</y>
-     <width>121</width>
-     <height>51</height>
+     <x>582</x>
+     <y>490</y>
+     <width>120</width>
+     <height>50</height>
     </rect>
    </property>
    <property name="text">
@@ -669,7 +669,7 @@ wordcloud</string>
     </rect>
    </property>
    <property name="toolTip">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Reverse colour range&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    <string>Reverse colour range</string>
    </property>
    <property name="text">
     <string/>
@@ -681,40 +681,44 @@ wordcloud</string>
      <x>410</x>
      <y>490</y>
      <width>151</width>
-     <height>16</height>
+     <height>25</height>
     </rect>
+   </property>
+   <property name="toolTip">
+    <string>Reverse colour range</string>
    </property>
    <property name="text">
     <string>Reverse range</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_trigrams">
+  <widget class="QLabel" name="label_ngrams">
    <property name="geometry">
     <rect>
-     <x>410</x>
-     <y>510</y>
+     <x>425</x>
+     <y>523</y>
      <width>151</width>
-     <height>16</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Trigrams</string>
-   </property>
-  </widget>
-  <widget class="QCheckBox" name="checkBox_trigrams">
-   <property name="geometry">
-    <rect>
-     <x>380</x>
-     <y>510</y>
-     <width>21</width>
-     <height>20</height>
+     <height>25</height>
     </rect>
    </property>
    <property name="toolTip">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Reverse colour range&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    <string>Number of conjoined words in phrase. Stopwords applies to selection of 1 word only.</string>
    </property>
    <property name="text">
-    <string>Tri-grams</string>
+    <string>n-grams</string>
+   </property>
+  </widget>
+
+<widget class="QComboBox" name="comboBox_ngrams">
+   <property name="geometry">
+    <rect>
+     <x>380</x>
+     <y>520</y>
+     <width>40</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>1=One word, 3=3 word phrase, 4=4 word phrase</string>
    </property>
   </widget>
   <zorder>groupBox</zorder>
@@ -763,8 +767,8 @@ wordcloud</string>
   <zorder>spinBox_cloud_max_words</zorder>
   <zorder>checkBox_reverse_range</zorder>
   <zorder>label_reverse_range</zorder>
-  <zorder>label_trigrams</zorder>
-  <zorder>checkBox_trigrams</zorder>
+  <zorder>label_ngrams</zorder>
+  <zorder>comboBox_ngrams</zorder>
  </widget>
  <tabstops>
   <tabstop>checkBox_export_html</tabstop>
