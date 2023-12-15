@@ -18,12 +18,13 @@ sudo cp -r qualcoder /usr/share/qualcoder
 sudo cp qualcoder/GUI/qualcoder128.png /usr/share/icons/qualcoder128.png
 sudo cp qualcoder/GUI/qualcoder.desktop /usr/share/applications/qualcoder.desktop
 sudo python3 setup.py install
-echo "If no errors then installation is completed."
+printf "\nIf no errors then installation is completed.\n\n"
 echo "To remove qualcoder from Linux run the following in the terminal:"
 echo "sudo rm -R /usr/share/qualcoder"
 echo "sudo rm /usr/share/icons/qualcoder128.png"
 echo "sudo rm /usr/share/applications/qualcoder.desktop"
-echo "also note that via dnf the subsequent packages were installed (or used): $dnf_packages."
-echo "and via python's pip these packages were installed: $pip_packages."
-echo "Consider whether you still need these packages"
+printf "\nAlso note that via dnf the subsequent packages were installed (or used): $dnf_packages.\n\n"
+printf "And via python's pip these packages were installed: $pip_packages.\n\n"
+echo "Consider whether you still need these packages."
+
 
