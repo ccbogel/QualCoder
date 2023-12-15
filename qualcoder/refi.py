@@ -40,7 +40,6 @@ import sys
 import traceback
 import uuid
 import xml.etree.ElementTree as etree
-#import xmlschema
 import zipfile
 
 from PyQt6 import QtWidgets, QtCore
@@ -1856,15 +1855,6 @@ class RefiImport:
         if xsd_type != "codebook":
             file_xsd = xsd_project
         return True
-        '''xsd = xmlschema.XMLSchema(file_xsd)
-        try:
-            result = xsd.is_valid(self.xml)
-            print("Valid xml")
-            return True
-        except Exception as e_:
-            print("Invalid xml", e_)
-            logger.error(e_)
-            return False'''
 
 
 class RefiLineEndings(QtWidgets.QDialog):
@@ -3169,6 +3159,7 @@ class RefiExport(QtWidgets.QDialog):
 
     def xml_validation(self, xsd_type="codebook"):
         """ Verify that the XML complies with XSD.
+        NOT USED could not get implementation of xmlschema to work
         See:
         https://stackoverflow.com/questions/299588/validating-with-an-xml-schema-in-python
         Arguments:
@@ -3182,19 +3173,3 @@ class RefiExport(QtWidgets.QDialog):
         if xsd_type != "codebook":
             file_xsd = xsd_project
         return True
-        '''try:
-            xsd = xmlschema.XMLSchema(file_xsd)
-        except Exception as e_:
-            print("xsd creation error", e_)
-            # ParseError: unclosed token: line 3, column 0
-            # Occurs with codebook export only
-            #TODO hack below
-            return True
-        try:
-            result = xsd.is_valid(self.xml)
-            print("Valid xml")
-            return True
-        except Exception as e_:
-            print("Invalid xml", e_)
-            logger.error(e_)
-            return False'''
