@@ -21,7 +21,7 @@ If you like QualCoder please buy me a coffee ...
 Optional: VLC for audio/video coding. 
 Optional: ffmpeg installed for speech-to-text and waveform image see here to install ffmpeg on Windows:  https://phoenixnap.com/kb/ffmpeg-windows. 
 
-For installing from source you will need to have Python 3.8 or a newer version installed.
+For installing from source you will need to have Python 3.10 or a newer version installed.
 
 ### Windows
 
@@ -35,7 +35,7 @@ If you are uncomfortable with these warnings install from the source as detailed
 
 Seriously consider using a virtual environment (commands in point 6 below). Not using a virtual environment may affect other Python software you may have installed.
 
-1. Download and install the Python programming language. The minimum version for QualCoder is 3.8. I recommend 3.10 for now.  [Python3](https://www.python.org/downloads/). Download the file (at the bottom of the website) "Windows installer (64-bit)"
+1. Download and install the Python programming language. The minimum recommended version for QualCoder is 3.10.  [Python3](https://www.python.org/downloads/). Download the file (at the bottom of the website) "Windows installer (64-bit)"
 
 IMPORTANT: in the first window of the installation mark the option "Add Python to PATH"
 
@@ -68,7 +68,7 @@ py -m pip install --upgrade pip
 ```
 
 ```bash
-py -m pip install wheel pyqt6 chardet ebooklib openpyxl Pillow ply pdfminer.six pandas plotly pydub python-vlc rispy SpeechRecognition xmlschema
+py -m pip install wheel pyqt6 chardet ebooklib openpyxl Pillow ply pdfminer.six pandas plotly pydub python-vlc rispy SpeechRecognition
 ```
 
  Wait, until all modules are installed.
@@ -146,7 +146,7 @@ Note: To exit venv type `deactivate`
 
 6. Install the needed Python modules.
 
-`pip install chardet ebooklib ply openpyxl pandas pdfminer pyqt6 pillow pdfminer.six plotly pydub python-vlc rispy six SpeechRecognition xmlschema`
+`pip install chardet ebooklib ply openpyxl pandas pdfminer pyqt6 pillow pdfminer.six plotly pydub python-vlc rispy six SpeechRecognition`
 
 7. Install QualCoder, and type the following, the dot is important:
 
@@ -165,7 +165,6 @@ Then type
 `qualcoder`
 
 
-
 ### Arch/Manjaro Linux
 
 It has not been tested, but please see the above instructions to build QualCoder inside a virtual environment. The below installation instructions may affect system-installed python modules.
@@ -176,7 +175,7 @@ It has not been tested, but please see the above instructions to build QualCoder
 
 2. Install additional python modules
 
-`sudo python3 -m pip install ebooklib plotly pydub python-vlc rispy SpeechRecognition xmlschema`
+`sudo python3 -m pip install ebooklib plotly pydub python-vlc rispy SpeechRecognition`
 
 If successful, all requirements are satisfied.
 
@@ -237,7 +236,7 @@ python3 get-pip.py
 5) Install Python dependency modules using `pip`:
 
 ```sh
-pip3 install chardet ebooklib openpyxl pandas pillow ply pdfminer.six plotly pydub pyqt6 python-vlc rispy six SpeechRecognition xmlschema
+pip3 install chardet ebooklib openpyxl pandas pillow ply pdfminer.six plotly pydub pyqt6 python-vlc rispy six SpeechRecognition
 ```
 
 Be sure that you are in the QualCoder-Master directory before doing Step 6.
@@ -282,7 +281,7 @@ Open the Terminal App and move to the unzipped Qualcoder-Master directory, then 
 
 1) Install Python dependency modules using `pip3`:
 
-`pip3 install chardet ebooklib ffmpeg-python pyqt6 pillow ply pdfminer.six openpyxl pandas plotly pydub python-vlc rispy six SpeechRecognition xmlschema`
+`pip3 install chardet ebooklib ffmpeg-python pyqt6 pillow ply pdfminer.six openpyxl pandas plotly pydub python-vlc rispy six SpeechRecognition`
 
 2) Open the Terminal App and move to the unzipped Qualcoder-Master directory, then run the following commands:
 
@@ -294,7 +293,7 @@ Open the Terminal App and move to the unzipped Qualcoder-Master directory, then 
 ## Dependencies
 Required:
 
-Python 3.8+ version, pyqt6, Pillow, six  (Mac OS), ebooklib, ply, chardet, pdfminer.six, openpyxl, pandas, plotly, pydub, python-vlc, rispy, SpeechRecognition, xmlschema
+Python 3.8+ version, pyqt6, Pillow, six  (Mac OS), ebooklib, ply, chardet, pdfminer.six, openpyxl, pandas, plotly, pydub, python-vlc, rispy, SpeechRecognition
 
 ## License
 QualCoder is distributed under the MIT LICENSE.
