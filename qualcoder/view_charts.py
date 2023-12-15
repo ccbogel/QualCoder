@@ -400,7 +400,7 @@ class ViewCharts(QDialog):
         reverse_colors = self.ui.checkBox_reverse_range.isChecked()
         # TODO change to combobox Options 1,2,3,4 ngrams
         ngrams = int( self.ui.comboBox_ngrams.currentText())
-        Wordcloud(self.app, text, width=width, height=height, max_words=max_words, background_color=background,
+        Wordcloud(text, width=width, height=height, max_words=max_words, background_color=background,
                   text_color=foreground, reverse_colors=reverse_colors, ngrams=ngrams)
 
     def codes_of_category_helper(self, category_name):

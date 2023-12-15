@@ -124,11 +124,10 @@ class Wordcloud:
         trigrams: if true, use 3 word phrases in the word cloud
     """
 
-    def __init__(self, app, fulltext, width=800, height=600, max_words=200, background_color="black",
+    def __init__(self, fulltext, width=800, height=600, max_words=200, background_color="black",
                  text_color="random", reverse_colors=False, ngrams=1):
 
         sys.excepthook = exception_handler
-        self.app = app
         self.width = width
         self.height = height
         self.max_words = max_words
@@ -189,7 +188,6 @@ class Wordcloud:
             d[word] = d.get(word, 0) + 1  # get(key, value if not present)
         self.words = []
         for key, value in d.items():
-            #if value > 1:
             self.words.append({"text": key, "frequency": value, "x": 0, "y": -100})
         self.words = sorted(self.words, key=lambda x: x["frequency"], reverse=True)
         if len(self.words) == 0:
@@ -234,29 +232,34 @@ class Wordcloud:
         if y_upper < 0:
             y_upper = 1
         overlap = True
-        while overlap:
+        counter = 0
+        while overlap and counter < 1000:
             word["x"] = randint(0, x_upper)
             word["y"] = randint(0, y_upper)
             overlap = False
+            counter += 1
             for word2 in words2:
-                if word2['x'] < word['x'] and word['x'] < word2['x'] + word2['width'] and \
-                        word2['y'] < word['y'] and word['y'] < word2['y'] + word2['height'] and \
+                if word2['x'] < word['x'] < word2['x'] + word2['width'] and \
+                        word2['y'] < word['y'] < word2['y'] + word2['height'] and \
                         word2['y'] != -100:
                     overlap = True
                     # print("Word ", word, "\nWord2", word2, "\n")
-                if word['x'] < word2['x'] and word2['x'] < word['x'] + word['width'] and \
-                        word['y'] < word2['y'] and word2['y'] < word['y'] + word['height'] and \
+                if word['x'] < word2['x'] < word['x'] + word['width'] and \
+                        word['y'] < word2['y'] < word['y'] + word['height'] and \
                         word2['y'] != -100:
                     overlap = True
                     # print("Word ", word, "\nWord2", word2, "\n")
-                if word2['x'] < word['x'] and word['x'] < word2['x'] + word2['width'] and \
-                        word['y'] < word2['y'] and word2['y'] < word['y'] + word['height'] and \
+                if word2['x'] < word['x'] < word2['x'] + word2['width'] and \
+                        word['y'] < word2['y'] < word['y'] + word['height'] and \
                         word2['y'] != -100:
                     overlap = True
-                if word['x'] < word2['x'] and word2['x'] < word['x'] + word['width'] and \
-                        word2['y'] < word['y'] and word['y'] < word2['y'] + word2['height'] and \
+                if word['x'] < word2['x'] < word['x'] + word['width'] and \
+                        word2['y'] < word['y'] < word2['y'] + word2['height'] and \
                         word2['y'] != -100:
                     overlap = True
+        if counter > 1000:
+            word['y'] = - 100
+        print(word['text'], counter)
         return
 
     def word_color(self, list_position):
