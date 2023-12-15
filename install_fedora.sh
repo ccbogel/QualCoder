@@ -1,11 +1,11 @@
 #!/bin/bash
 
 dnf_packages="python3-pip python3-devel python3-pdfminer.noarch python3-qt5 python3-pillow python3-openpyxl python3-pandas python3-plotly python3-pip python3-pyqt6 python3-pillow vlc python3-ply python3-six python3-chardet ffmpeg"
-
 pip_packages="Ebooklib pydub SpeechRecognition pdfminer.six python-vlc rispy xmlschema"
+python_version=3.12
 
-echo "This installer is for Fedora Linux installations using python 3.10 only."
-echo "Change 3.10 in this script to higher numbers if you have a more recent version of python installed."
+printf "This installer is for Fedora Linux installations using python $python_version only.\n"
+printf "Change the python_version in this script to a higher numbers if you have a more recent version of python installed.\n\n"
 echo "This installer uses DNF package management."
 echo "QualCoder will be copied to the directory /usr/share/"
 echo "These actions require owner (sudo) permission"
