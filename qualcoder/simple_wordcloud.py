@@ -259,7 +259,7 @@ class Wordcloud:
                     overlap = True
         if counter > 1000:
             word['y'] = - 100
-        print(word['text'], counter)
+        #print(word['text'], counter)
         return
 
     def word_color(self, list_position):
