@@ -126,7 +126,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Run&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -219,11 +219,7 @@
           </column>
          </widget>
         </widget>
-        <widget class="QTextEdit" name="textEdit">
-         <property name="readOnly">
-          <bool>true</bool>
-         </property>
-        </widget>
+        <widget class="QTableWidget" name="tableWidget"/>
        </widget>
       </item>
      </layout>
@@ -237,7 +233,6 @@
   <tabstop>pushButton_export_odt</tabstop>
   <tabstop>listWidget_files</tabstop>
   <tabstop>treeWidget</tabstop>
-  <tabstop>textEdit</tabstop>
  </tabstops>
  <resources/>
  <connections/>
