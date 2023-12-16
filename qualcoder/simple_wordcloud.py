@@ -239,26 +239,28 @@ class Wordcloud:
             overlap = False
             counter += 1
             for word2 in words2:
-                if word2['x'] < word['x'] < word2['x'] + word2['width'] and \
-                        word2['y'] < word['y'] < word2['y'] + word2['height'] and \
+                if word2['x'] <= word['x'] < word2['x'] + word2['width'] and \
+                        word2['y'] <= word['y'] < word2['y'] + word2['height'] and \
                         word2['y'] != -100:
                     overlap = True
                     # print("Word ", word, "\nWord2", word2, "\n")
-                if word['x'] < word2['x'] < word['x'] + word['width'] and \
-                        word['y'] < word2['y'] < word['y'] + word['height'] and \
+                if word['x'] <= word2['x'] < word['x'] + word['width'] and \
+                        word['y'] <= word2['y'] < word['y'] + word['height'] and \
                         word2['y'] != -100:
                     overlap = True
                     # print("Word ", word, "\nWord2", word2, "\n")
-                if word2['x'] < word['x'] < word2['x'] + word2['width'] and \
-                        word['y'] < word2['y'] < word['y'] + word['height'] and \
+                if word2['x'] <= word['x'] < word2['x'] + word2['width'] and \
+                        word['y'] <= word2['y'] < word['y'] + word['height'] and \
                         word2['y'] != -100:
                     overlap = True
-                if word['x'] < word2['x'] < word['x'] + word['width'] and \
-                        word2['y'] < word['y'] < word2['y'] + word2['height'] and \
+                if word['x'] <= word2['x'] < word['x'] + word['width'] and \
+                        word2['y'] <= word['y'] < word2['y'] + word2['height'] and \
                         word2['y'] != -100:
                     overlap = True
-        if counter > 1000:
+        # If the word shape does not fit, do not use it.
+        if counter >= 1000:
             word['y'] = - 100
+            word['text'] = ""
         #print(word['text'], counter)
         return
 
