@@ -76,9 +76,10 @@ class Ui_DialogOverlappingTextSegments(object):
         self.treeWidget = QtWidgets.QTreeWidget(parent=self.splitter_vert)
         self.treeWidget.setObjectName("treeWidget")
         self.treeWidget.headerItem().setText(0, "Code Tree")
-        self.textEdit = QtWidgets.QTextEdit(parent=self.splitter)
-        self.textEdit.setReadOnly(True)
-        self.textEdit.setObjectName("textEdit")
+        self.tableWidget = QtWidgets.QTableWidget(parent=self.splitter)
+        self.tableWidget.setObjectName("tableWidget")
+        self.tableWidget.setColumnCount(0)
+        self.tableWidget.setRowCount(0)
         self.gridLayout.addWidget(self.splitter, 0, 0, 1, 1)
         self.verticalLayout.addWidget(self.groupBox_2)
 
@@ -88,7 +89,6 @@ class Ui_DialogOverlappingTextSegments(object):
         DialogOverlappingTextSegments.setTabOrder(self.pushButton_run, self.pushButton_export_odt)
         DialogOverlappingTextSegments.setTabOrder(self.pushButton_export_odt, self.listWidget_files)
         DialogOverlappingTextSegments.setTabOrder(self.listWidget_files, self.treeWidget)
-        DialogOverlappingTextSegments.setTabOrder(self.treeWidget, self.textEdit)
 
     def retranslateUi(self, DialogOverlappingTextSegments):
         _translate = QtCore.QCoreApplication.translate
@@ -99,7 +99,7 @@ class Ui_DialogOverlappingTextSegments(object):
         self.label_coder.setToolTip(_translate("DialogOverlappingTextSegments", "<html><head/><body><p>Select coder. Blank for all</p></body></html>"))
         self.label_coder.setText(_translate("DialogOverlappingTextSegments", "Coder"))
         self.pushButton_export_odt.setToolTip(_translate("DialogOverlappingTextSegments", "Export ODT file"))
-        self.pushButton_run.setToolTip(_translate("DialogOverlappingTextSegments", "<html><head/><body><p><br/></p></body></html>"))
+        self.pushButton_run.setToolTip(_translate("DialogOverlappingTextSegments", "<html><head/><body><p>Run</p></body></html>"))
         self.label_include.setText(_translate("DialogOverlappingTextSegments", "Include text"))
         self.label_exclude.setText(_translate("DialogOverlappingTextSegments", "Exclude text"))
 
