@@ -71,6 +71,7 @@ from qualcoder.report_code_summary import DialogReportCodeSummary
 from qualcoder.report_compare_coder_file import DialogCompareCoderByFile
 from qualcoder.report_codes import DialogReportCodes
 from qualcoder.report_file_summary import DialogReportFileSummary
+from qualcoder.report_exact_matches import DialogReportExactTextMatches
 from qualcoder.report_relations import DialogReportRelations
 from qualcoder.report_sql import DialogSQL
 from qualcoder.rqda import RqdaImport
@@ -982,6 +983,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCode_summary.triggered.connect(self.report_code_summary)
         self.ui.actionCode_relations.setShortcut('Alt+Q')
         self.ui.actionCode_relations.triggered.connect(self.report_code_relations)
+        self.ui.actionCode_text_exact_matches.triggered.connect(self.report_exact_text_matches)
         self.ui.actionView_Graph.setShortcut('Alt+G')
         self.ui.actionView_Graph.triggered.connect(self.view_graph_original)
         self.ui.actionCharts.setShortcut('Alt+U')
@@ -1103,6 +1105,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCoding_comparison_by_file.setEnabled(False)
         self.ui.actionCode_frequencies.setEnabled(False)
         self.ui.actionCode_relations.setEnabled(False)
+        self.ui.actionCode_text_exact_matches.setEnabled(False)
         self.ui.actionText_mining.setEnabled(False)
         self.ui.actionSQL_statements.setEnabled(False)
         self.ui.actionFile_summary.setEnabled(False)
@@ -1147,6 +1150,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCoding_comparison_by_file.setEnabled(True)
         self.ui.actionCode_frequencies.setEnabled(True)
         self.ui.actionCode_relations.setEnabled(True)
+        self.ui.actionCode_text_exact_matches.setEnabled(True)
         self.ui.actionSQL_statements.setEnabled(True)
         self.ui.actionFile_summary.setEnabled(True)
         self.ui.actionCode_summary.setEnabled(True)
@@ -1240,6 +1244,13 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.ui.label_reports.hide()
         ui = DialogReportRelations(self.app, self.ui.textEdit)
+        self.tab_layout_helper(self.ui.tab_reports, ui)
+
+    def report_exact_text_matches(self):
+        """ Show exact text coding matches in text files. """
+
+        self.ui.label_reports.hide()
+        ui = DialogReportExactTextMatches(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_reports, ui)
 
     def report_coding(self):
