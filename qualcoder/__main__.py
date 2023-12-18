@@ -2661,7 +2661,7 @@ def install_language(lang):
 def install_droid_sans_mono():
     """ Install DroidSandMono ttf font for wordclouds into .qualcoder folder """
 
-    qc_folder = os.path.join(home, '.qualcoder', 'DroidSansMono.ttf')
+    qc_folder = os.path.join(home, '.qualcoder_ai', 'DroidSansMono.ttf')
     with open(qc_folder, 'wb') as file_:
         decoded_data = base64.decodebytes(DroidSansMono)
         file_.write(decoded_data)
