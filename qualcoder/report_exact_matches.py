@@ -252,7 +252,7 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
             # Remove from result if the matching data is in the excludes list
             for excludes in excludes_result:
                 if c[1] == excludes[1] and c[2] == excludes[2]:
-                    matching_codes = []
+                    matching_codes_list = []
             # Sort lists by cid. Helps to remove duplicated differing order matches.
             matching_codes_list.sort()
             if matching_codes_list and matching_codes_list not in final_matches_list:
