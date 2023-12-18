@@ -218,27 +218,25 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
             Message(self.app, _('No codes'), msg, "warning").exec()
             return
         selected_codes_string = ",".join(selected_codes)
-        #print("selected codes ", selected_codes_string)
-        #print("excluded codes ", self.excluded_codes)
+        includes_text = self.ui.lineEdit_include.text()
+
         cur = self.app.conn.cursor()
         sql = "select code_text.cid, pos0,pos1, code_name.name, substr(source.fulltext,pos0, pos1-pos0) "
         sql += " from code_text join code_name on code_name.cid=code_text.cid "
         sql += " join source on source.id=code_text.fid "
         sql += f" where code_text.cid in ({selected_codes_string}) "
-        sql += "and code_text.owner=? and code_text.fid=? order by code_name.name, pos0"
+        sql += "and code_text.owner=? and code_text.fid=? "
+        sql += "order by code_name.name, pos0"
         cur.execute(sql, [selected_coder, fid])
         coded_result = cur.fetchall()
-        '''for r in coded_result:
-            print("MATCH:", r)'''
+
         sql = f"select code_text.cid, pos0,pos1 from code_text where "
         sql += f" code_text.cid in ({excluded_cids_string}) "
         sql += " and code_text.owner=? and code_text.fid=?"
         cur.execute(sql, [selected_coder, fid])
         excludes_result = cur.fetchall()
-        '''for r in excludes_result:
-            print("EXCLUDE", r)'''
 
-        self.matches = []
+        matches = []
         for c in coded_result:
             matching_codes = []
             # Get all matching coded text segment data
@@ -252,19 +250,24 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
                 if c[1] == excludes[1] and c[2] == excludes[2]:
                     matching_codes = []
             if matching_codes:
-                self.matches.append(matching_codes)
+                if includes_text == "":
+                    matches.append(matching_codes)
+                else:
+                    if includes_text in matching_codes[0][4]:
+                        matches.append(matching_codes)
 
-        for m in self.matches:
+        self.matches_display = []
+        for match_list in matches:
             print("========")
-            for n in m:
-                print(n)
+            for match_item in match_list:
+                print(match_item)
+                self.matches_display.append(match_item)
+            self.matches_display.append(["", "", "", "", ""])  # spacer
 
-        if len(self.matches) == 0:
+        if len(matches) == 0:
             Message(self.app, _('No results'), _("No exact matches found"), "warning").exec()
             return
         self.fill_table()
-
-
 
     #TODO
     '''def search_text(self):
@@ -408,36 +411,33 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         sel_text = 3
         code_name = 4
 
-        col_names = ["cid", "pos0", "pos1", _("text"), _("code name")]
+        col_names = ["cid", "pos0", "pos1", _("code name"), _("text")]
         self.ui.tableWidget.setColumnCount(len(col_names))
         self.ui.tableWidget.setHorizontalHeaderLabels(col_names)
         rows = self.ui.tableWidget.rowCount()
         for r in range(0, rows):
             self.ui.tableWidget.removeRow(0)
-        for r, match_list in enumerate(self.matches):
+        for r, match_item in enumerate(self.matches_display):
             self.ui.tableWidget.insertRow(r)
-            for r1, match_item in enumerate(match_list):
-                self.ui.tableWidget.insertRow(r *5 + r1)
-
-                item = QtWidgets.QTableWidgetItem()
-                item.setData(QtCore.Qt.ItemDataRole.DisplayRole, match_item[cid])
-                item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
-                self.ui.tableWidget.setItem(r *5 + r1, cid, item)
-                item = QtWidgets.QTableWidgetItem()
-                item.setData(QtCore.Qt.ItemDataRole.DisplayRole, match_item[pos0])
-                item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
-                self.ui.tableWidget.setItem(r *5 + r1, pos0, item)
-                item = QtWidgets.QTableWidgetItem()
-                item.setData(QtCore.Qt.ItemDataRole.DisplayRole, match_item[pos1])
-                item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
-                self.ui.tableWidget.setItem(r *5 + r1, pos1, item)
-                item = QtWidgets.QTableWidgetItem(match_item[sel_text])
-                item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
-                self.ui.tableWidget.setItem(r *5 + r1, sel_text, item)
-                item = QtWidgets.QTableWidgetItem()
-                item.setData(QtCore.Qt.ItemDataRole.DisplayRole, match_item[code_name])
-                item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
-                self.ui.tableWidget.setItem(r *5 + r1, code_name, item)
+            item = QtWidgets.QTableWidgetItem()
+            item.setData(QtCore.Qt.ItemDataRole.DisplayRole, match_item[cid])
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
+            self.ui.tableWidget.setItem(r, cid, item)
+            item = QtWidgets.QTableWidgetItem()
+            item.setData(QtCore.Qt.ItemDataRole.DisplayRole, match_item[pos0])
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
+            self.ui.tableWidget.setItem(r, pos0, item)
+            item = QtWidgets.QTableWidgetItem()
+            item.setData(QtCore.Qt.ItemDataRole.DisplayRole, match_item[pos1])
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
+            self.ui.tableWidget.setItem(r, pos1, item)
+            item = QtWidgets.QTableWidgetItem(match_item[sel_text])
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
+            self.ui.tableWidget.setItem(r, sel_text, item)
+            item = QtWidgets.QTableWidgetItem()
+            item.setData(QtCore.Qt.ItemDataRole.DisplayRole, match_item[code_name])
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
+            self.ui.tableWidget.setItem(r, code_name, item)
 
         self.ui.tableWidget.resizeColumnsToContents()
 
@@ -445,52 +445,21 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         """ Export exact match text codings for all codes as excel file.
         Output ordered by filename and code name ascending. """
 
-        cur = self.app.conn.cursor()
-        sql = "select fid, source.name, code_text.cid, code_name.name, seltext,pos0,pos1,code_text.owner from " \
-              "code_text join code_name on code_name.cid=code_text.cid join source on source.id=code_text.fid " \
-              "order by source.name, code_name.name"
-        cur.execute(sql)
-        res = cur.fetchall()
-        coded_text0 = []
-        keys = 'fid', 'filename', 'cid', 'codename', 'text', 'pos0', 'pos1', 'owner'
-        for row in res:
-            coded_text0.append(dict(zip(keys, row)))
-
-        coded_text1 = deepcopy(coded_text0)
-        result = []
-        for i in coded_text0:
-            tmp_result = []
-            for j in coded_text1:
-                if i != j and i['fid'] == j['fid'] and i['pos0'] == j['pos0'] and i['pos1'] == j['pos1']:
-                    tmp_result.append(j)
-            if tmp_result:
-                result.append(i)
-                # Remove matches from coded_text1 to avoid result duplications
-                coded_text1.remove(i)
-                for t in tmp_result:
-                    result.append(t)
-                    # Remove matches from coded_text1 to avoid result duplications
-                    coded_text1.remove(t)
-            if tmp_result:
-                result.append({'fid': "", 'filename': "", 'cid': "", 'codename': "", 'text': "", 'pos0': "", 'pos1': "", 'owner': ""})
-        if not result:
-            msg = _("No exact matches found.")
-            Message(self.app, _('No results'), msg, "information").exec()
+        if len(self.matches_display) == 0:
             return
         wb = openpyxl.Workbook()
         ws = wb.active
         # Column headings
-        col_headings = ["Filename", "Codename", "pos0", "pos1", "Text", "Owner"]
+        col_headings = ["cid", "pos0", "pos1", "Code name", "Text"]
         row = 1
         for col, code in enumerate(col_headings):
             ws.cell(column=col + 1, row=row, value=code)
-        for row, data in enumerate(result):
-            ws.cell(column=1, row=row + 2, value=data['filename'])
-            ws.cell(column=2, row=row + 2, value=data['codename'])
-            ws.cell(column=3, row=row + 2, value=data['pos0'])
-            ws.cell(column=4, row=row + 2, value=data['pos1'])
-            ws.cell(column=5, row=row + 2, value=data['text'])
-            ws.cell(column=6, row=row + 2, value=data['owner'])
+        for row, data in enumerate(self.matches_display):
+            ws.cell(column=1, row=row + 2, value=data[0])
+            ws.cell(column=2, row=row + 2, value=data[1])
+            ws.cell(column=3, row=row + 2, value=data[2])
+            ws.cell(column=4, row=row + 2, value=data[3])
+            ws.cell(column=5, row=row + 2, value=data[4])
         filepath, ok = QtWidgets.QFileDialog.getSaveFileName(self,
                                                              _("Save Excel File"), self.app.settings['directory'],
                                                              "XLSX Files(*.xlsx)",
@@ -500,83 +469,9 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         if filepath[-4:] != ".xlsx":
             filepath += ".xlsx"
         wb.save(filepath)
-        msg = _("Report of exact matches for text codings by file and code") + "\n"
-        msg += _("Each row contains filename, codename, pos0, pos1, text, owner.") + "\n"
+        msg = _("Report of exact matches for text codings for file") + "\n"
         msg += _('Report exported to: ') + filepath
         Message(self.app, _('Report exported'), msg, "information").exec()
-        self.parent_textEdit.append(msg)
-
-    def export_csv_file(self):
-        """ Export data as csv file(s),
-        The main file is called projectname_relations.csv.
-        The summary file (if generated) is called projectname_relations_stats.csv
-        The csv is comma delimited and all fields quoted. """
-
-        if not self.result_relations:
-            return
-
-        shortname = self.app.project_name.split(".qda")[0]
-        filename = shortname + "_relations.csv"
-        e = ExportDirectoryPathDialog(self.app, filename)
-        filepath = e.filepath
-        if filepath is None:
-            return
-        col_names = ["Fid", _("Filename"), "Code0", "Code0 " + _("name"), "Code0_pos0", "Code0_pos1",
-                     "Code1", "Code1 " + _("name"),
-                     "Code1_pos0", "Code1_pos1", _("Relation"), _("Minimum"), _("Maximum"),
-                     _("Overlap") + " 0", _("Overlap") + " 1", _("Union") + " 0",
-                     _("Union") + " 1", _("Distance"), _("Text before"), _("Text overlap"), _("Text after"), _("Owner"),
-                     "ctid0", "ctid1", "text0", "text1", _("Memo") + "0", _("Memo") + "1"]
-        with open(filepath, 'w', encoding='UTF8') as f:
-            writer = csv.writer(f, quoting=csv.QUOTE_ALL)
-            writer.writerow(col_names)
-            for r in self.result_relations:
-                row = [r['fid'], r['file_name'], r['cid0'], r['c0_name'], r['c0_pos0'], r['c0_pos1'], r['cid1'],
-                       r['c1_name'], r['c1_pos0'], r['c1_pos1'], r['relation'], str(r['whichmin']).replace('None', ''),
-                       str(r['whichmax']).replace('None', '')]
-                if r['overlapindex']:
-                    row.append(r['overlapindex'][0])
-                    row.append(r['overlapindex'][1])
-                else:
-                    row.append('')
-                    row.append('')
-                if r['unionindex']:
-                    row.append(r['unionindex'][0])
-                    row.append(r['unionindex'][1])
-                else:
-                    row.append('')
-                    row.append('')
-                row.append(str(r['distance']).replace('None', ''))
-                row.append(r['text_before'])
-                row.append(r['text_overlap'])
-                row.append(r['text_after'])
-                row.append(r['owner'])
-                row.append(r['ctid0'])
-                row.append(r['ctid1'])
-                row.append(r['ctid0_text'])
-                row.append(r['ctid1_text'])
-                row.append(r['coded_memo0'])
-                row.append(r['coded_memo1'])
-                writer.writerow(row)
-        msg = _("Code relations csv file exported to: ") + filepath
-        Message(self.app, _('Csv file Export'), msg, "information").exec()
-        self.parent_textEdit.append(msg)
-        # Write statistical summary file
-        if not self.result_summary:
-            return
-        stats_filepath = filepath[:-4] + "_stats.csv"
-        stats_col_names = ["Code0", "Code0 " + _("name"), "Code1", "Code1 " + _("name"), "Count", _("Minimum"), "Q1",
-                           "Median", "Q3", _("Maximum"), "Mean", "std dev"]
-        with open(stats_filepath, 'w', encoding='UTF8') as f:
-            writer = csv.writer(f, quoting=csv.QUOTE_ALL)
-            writer.writerow(stats_col_names)
-            for r in self.result_summary:
-                row = [r['cid0'], r['c0_name'], r['cid1'], r['c1_name'], str(r['count']), str(r['min']),
-                       str(r['quantiles'][0]), str(r['quantiles'][1]), str(r['quantiles'][2]), str(r['max']),
-                       str(r['mean']), str(r['stdev'])]
-                writer.writerow(row)
-        msg = _("Code relations stats csv file exported to: ") + filepath
-        Message(self.app, _('Csv summary file Export'), msg, "information").exec()
         self.parent_textEdit.append(msg)
 
     def fill_tree(self):
