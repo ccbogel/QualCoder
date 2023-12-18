@@ -188,296 +188,85 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         """  """
 
         selected_coder = self.ui.comboBox_coders.currentText()
-        print("selected coder: ", selected_coder)
-        selected_file = self.ui.listWidget_files.currentItem()
-        print("selected_file ", selected_file)
-        print("selected codes ")
-        print("excluded codes ", self.excluded_codes)
-        print("TODO get exact")
-        sql = ""
-
-        return
-        cur = self.app.conn.cursor()
-        cur.execute(sql)
-        result = cur.fetchall()
-
-
-    def calculate_code_relations(self):
-        """ Calculate the relations for selected codes for THIS coder or ALL coders.
-        For codings in code_text only. """
-
-        sel_codes = []
-        codes_str = ""
-        code_ids = ""
-        items = self.ui.treeWidget.selectedItems()
-        for i in items:
-            if i.text(1)[:3] == "cid":
-                sel_codes.append({"name": i.text(0), "cid": int(i.text(1)[4:])})
-                codes_str += i.text(0) + "|"
-                code_ids += "," + i.text(1)[4:]
-        if len(sel_codes) < 2:
-            msg = _("Select 2 or more codes\nUse Ctrl or Shift and mouse click")
-            Message(self.app, _('Selection warning'), msg, "warning").exec()
+        #print("selected coder: ", selected_coder)
+        file_name = self.ui.listWidget_files.currentItem().text()
+        fid = -1
+        for f in self.files:
+            if f['name'] == file_name:
+                fid = f['id']
+        #print("selected_file ", file_name, fid)
+        if fid == -1:
+            msg = _("No file has been selected.")
+            Message(self.app, _('No file'), msg, "warning").exec()
             return
-        code_ids = code_ids[1:]
-        self.result_relations = []
-        self.calculate_relations_for_coder_and_selected_codes(self.app.settings['codername'], code_ids)
-        '''else:
-            for coder_name in self.coder_names:
-                self.calculate_relations_for_coder_and_selected_codes(coder_name, code_ids)'''
+        selected_codes = []
+        items = self.ui.treeWidget.selectedItems()
+        excluded_cids = []
+        excluded_cids_string = ""
+        for excluded in self.excluded_codes:
+            excluded_cids.append(excluded[0])
+            excluded_cids_string += "," + str(excluded[0])
+        if len(excluded_cids_string) > 0:
+            excluded_cids_string = excluded_cids_string[1:]
+        for i in items:
+            if i.text(1)[0:3] == 'cid':
+                cid = int(i.text(1)[4:])
+                if cid not in excluded_cids:
+                    selected_codes.append(str(cid))
+        if len(selected_codes) == 0:
+            msg = _("No codes have been selected.")
+            Message(self.app, _('No codes'), msg, "warning").exec()
+            return
+        selected_codes_string = ",".join(selected_codes)
+        #print("selected codes ", selected_codes_string)
+        #print("excluded codes ", self.excluded_codes)
+        cur = self.app.conn.cursor()
+        sql = "select code_text.cid, pos0,pos1, code_name.name, substr(source.fulltext,pos0, pos1-pos0) "
+        sql += " from code_text join code_name on code_name.cid=code_text.cid "
+        sql += " join source on source.id=code_text.fid "
+        sql += f" where code_text.cid in ({selected_codes_string}) "
+        sql += "and code_text.owner=? and code_text.fid=? order by code_name.name, pos0"
+        cur.execute(sql, [selected_coder, fid])
+        coded_result = cur.fetchall()
+        '''for r in coded_result:
+            print("MATCH:", r)'''
+        sql = f"select code_text.cid, pos0,pos1 from code_text where "
+        sql += f" code_text.cid in ({excluded_cids_string}) "
+        sql += " and code_text.owner=? and code_text.fid=?"
+        cur.execute(sql, [selected_coder, fid])
+        excludes_result = cur.fetchall()
+        '''for r in excludes_result:
+            print("EXCLUDE", r)'''
+
+        self.matches = []
+        for c in coded_result:
+            matching_codes = []
+            # Get all matching coded text segment data
+            for c2 in coded_result:
+                if c[1] == c2[1] and c[2] == c2[2] and c[0] != c2[0]:
+                    matching_codes.append(c2)
+            if matching_codes:
+                matching_codes.append(c)
+            # Remove from result if the matching data is in the excludes list
+            for excludes in excludes_result:
+                if c[1] == excludes[1] and c[2] == excludes[2]:
+                    matching_codes = []
+            if matching_codes:
+                self.matches.append(matching_codes)
+
+        for m in self.matches:
+            print("========")
+            for n in m:
+                print(n)
+
+        if len(self.matches) == 0:
+            Message(self.app, _('No results'), _("No exact matches found"), "warning").exec()
+            return
         self.fill_table()
 
-    def calculate_relations_for_coder_and_selected_codes(self, coder_name, code_ids):
-        """ Calculate the overlap relations for selected codes for selected coder.
-        For codings in code_text only.
-        """
 
-        selected_relations = ['O']
-        selected_fids = ""
-        for f in self.files:
-            selected_fids += "," + str(f['fid'])
-        try:
-            selected_fids = selected_fids[1:]
-        except IndexError:
-            return
 
-        cur = self.app.conn.cursor()
-        sql = "select distinct fid, name from code_text join source on source.id=code_text.fid " \
-              "where code_text.owner=? and code_text.cid in (" + code_ids + ") and " \
-                                                                            "fid in (" + selected_fids + ") order by fid"
-        cur.execute(sql, [coder_name, ])
-        result = cur.fetchall()
-        file_ids_names = []
-        for r in result:
-            file_ids_names.append({'fid': r[0], 'filename': r[1]})
-        if not file_ids_names:
-            return
-
-        # Get codings for each selected text file separately
-        for fid_name in file_ids_names:
-            sql = "select fid, code_text.cid, pos0, pos1, name, ctid,seltext, ifnull(code_text.memo,'') from code_text " \
-                  "join code_name on code_name.cid=code_text.cid where code_text.owner=? and fid=? " \
-                  "and code_text.cid in (" + code_ids + ") order by code_text.cid"
-            cur.execute(sql, [coder_name, fid_name['fid']])
-            result = cur.fetchall()
-            coded = [row for row in result if row[0] == fid_name['fid']]
-            '''for row in result:
-                if row[0] == fid_name['fid']:
-                    coded.append(row)'''
-
-            # TODO later, find the closest Other code for relation analysis
-            # Look at each code again other codes, when done remove from list of codes
-            cid = 1
-            pos0 = 2
-            pos1 = 3
-            name = 4
-            ctid = 5
-            seltext = 6
-            coded_memo = 7
-            while len(coded) > 0:
-                c0 = coded.pop()
-                for c1 in coded:
-                    if c0[cid] != c1[cid]:
-                        relation = self.relation(c0, c1)
-                        # Add extra details for output
-                        relation['c0_name'] = c0[name]
-                        relation['c1_name'] = c1[name]
-                        relation['fid'] = fid_name['fid']
-                        relation['file_name'] = fid_name['filename']
-                        relation['c0_pos0'] = c0[pos0]
-                        relation['c0_pos1'] = c0[pos1]
-                        relation['c1_pos0'] = c1[pos0]
-                        relation['c1_pos1'] = c1[pos1]
-                        relation['owner'] = coder_name
-                        relation['ctid0'] = c0[ctid]
-                        relation['ctid0_text'] = c0[seltext]
-                        relation['ctid1'] = c1[ctid]
-                        relation['ctid1_text'] = c1[seltext]
-                        relation['coded_memo0'] = c0[coded_memo]
-                        relation['coded_memo1'] = c1[coded_memo]
-                        # Append relation based on comboBox selection
-                        if relation['relation'] in selected_relations:
-                            self.result_relations.append(relation)
-
-    def relation(self, c0, c1):
-        """ Relation function as in RQDA
-
-        whichmin is the code with the lowest pos0, or None if equal
-        whichmax is the code with the highest pos1 or None if equal
-        operlapindex is the combined lowest to the highest positions. Only used for E, O, P
-        unionindex is the lowest and highest positions of the union of overlap. Only used for E, O
-
-        Called by:
-            calculate_relations_for_coder_and_selected_codes
-
-        Returns:
-        id1, id2, overlapindex, unionindex, distance, whichmin, min, whichmax, max, fid
-        relation is 1 character: Inclusion, Overlap, Exact, Proximity
-        actual text as before, overlap, after
-        """
-
-        # fid = 0
-        cid = 1
-        pos0 = 2
-        pos1 = 3
-        result = {"cid0": c0[cid], "cid1": c1[cid], "relation": "", "whichmin": None, "min": 0,
-                  "whichmax": None, "max": 0, "overlapindex": None, "unionindex": None, "distance": None,
-                  "text_before": "", "text_overlap": "", "text_after": ""}
-
-        cur = self.app.conn.cursor()
-
-        # Which min
-        if c0[pos0] < c1[pos0]:
-            result['whichmin'] = c0[cid]
-            result['min'] = c0[pos0]
-        if c1[pos0] < c0[pos0]:
-            result['whichmin'] = c1[cid]
-            result['min'] = c1[pos0]
-
-        # Which max
-        if c0[pos1] > c1[pos1]:
-            result['whichmax'] = c0[cid]
-            result['max'] = c0[pos1]
-        if c1[pos1] > c0[pos1]:
-            result['whichmax'] = c1[cid]
-            result['max'] = c1[pos1]
-
-        # Check for Exact
-        if c0[pos0] == c1[pos0] and c0[pos1] == c1[pos1]:
-            result['relation'] = "E"
-            result['overlapindex'] = [c0[pos0], c0[pos1]]
-            result['unionindex'] = [c0[pos0], c0[pos1]]
-            cur.execute("select substr(fulltext,?,?) from source where source.id=?",
-                        [c0[pos0] + 1, c0[pos1] - c0[pos0], c0[0]])
-            txt = cur.fetchone()
-            if txt is not None:
-                result['text_overlap'] = txt[0]
-                result['text_before'] = ""
-                result['text_after'] = ""
-                result['distance'] = 0
-            return result
-
-        # Check for Proximity
-        if c0[pos1] < c1[pos0]:
-            result['relation'] = "P"
-            result['distance'] = c1[pos0] - c0[pos1]
-            result['text_overlap'] = ""
-            result['text_before'] = ""
-            result['text_after'] = ""
-            return result
-        if c0[pos0] > c1[pos1]:
-            result['relation'] = "P"
-            result['distance'] = c0[pos0] - c1[pos1]
-            result['text_overlap'] = ""
-            result['text_before'] = ""
-            result['text_after'] = ""
-            return result
-
-        # Check for Inclusion
-        # Exact has been resolved above
-        # c0 inside c1
-        if c0[pos0] >= c1[pos0] and c0[pos1] <= c1[pos1]:
-            result['relation'] = "I"
-            result['overlapindex'] = [c0[pos0], c0[pos1]]
-            result['unionindex'] = [c0[pos0], c0[pos1]]
-            cur.execute("select substr(fulltext,?,?) from source where source.id=?",
-                        [c0[pos0] + 1, c0[pos1] - c0[pos0], c0[0]])
-            txt = cur.fetchone()
-            if txt is not None:
-                result['text_overlap'] = txt[0]
-            cur.execute("select substr(fulltext,?,?) from source where source.id=?",
-                        [c1[pos0] + 1, c0[pos0] - c1[pos0], c0[0]])
-            txt_before = cur.fetchone()
-            if txt_before is not None:
-                result['text_before'] = txt_before[0]
-            cur.execute("select substr(fulltext,?,?) from source where source.id=?",
-                        [c0[pos1] + 1, c1[pos1] - c0[pos1], c0[0]])
-            txt_after = cur.fetchone()
-            if txt_after is not None:
-                result['text_after'] = txt_after[0]
-            result['distance'] = 0
-            return result
-
-        # c1 inside c0
-        if c1[pos0] >= c0[pos0] and c1[pos1] <= c0[pos1]:
-            result['relation'] = "I"
-            result['overlapindex'] = [c1[pos0], c1[pos1]]
-            result['unionindex'] = [c1[pos0], c1[pos1]]
-            cur.execute("select substr(fulltext,?,?) from source where source.id=?",
-                        [c1[pos0] + 1, c1[pos1] - c1[pos0], c0[0]])
-            txt = cur.fetchone()
-            if txt is not None:
-                result['text_overlap'] = txt[0]
-            cur.execute("select substr(fulltext,?,?) from source where source.id=?",
-                        [c0[pos0] + 1, c1[pos0] - c0[pos0], c0[0]])
-            txt_before = cur.fetchone()
-            if txt_before is not None:
-                result['text_before'] = txt_before[0]
-            cur.execute("select substr(fulltext,?,?) from source where source.id=?",
-                        [c1[pos1] + 1, c0[pos1] - c1[pos1], c0[0]])
-            txt_after = cur.fetchone()
-            if txt_after is not None:
-                result['text_after'] = txt_after[0]
-            result['distance'] = 0
-            return result
-
-        # Check for Overlap
-        # Should be all that is remaining
-        # c0 overlaps on the right side, left side is not overlapping
-        if c0[pos0] < c1[pos0] and c0[pos1] < c1[pos1]:
-            '''print("c0 overlaps on the right side, left side is not overlapping")
-            print("c0", c0)
-            print("C1", c1)'''
-            result['relation'] = "O"
-            # Reorder lowest to highest
-            result['overlapindex'] = sorted([c0[pos0], c1[pos1]])
-            result['unionindex'] = sorted([c0[pos1], c1[pos0]])
-            overlap_length = result['unionindex'][1] - result['unionindex'][0]
-            cur.execute("select substr(fulltext,?,?) from source where source.id=?",
-                        [c1[pos0] + 1, overlap_length, c0[0]])
-            txt = cur.fetchone()
-            if txt is not None:
-                result['text_overlap'] = txt[0]
-            cur.execute("select substr(fulltext,?,?) from source where source.id=?",
-                        [c0[pos0] + 1, c1[pos0] - c0[pos0], c0[0]])
-            txt_before = cur.fetchone()
-            if txt_before is not None:
-                result['text_before'] = txt_before[0]
-            cur.execute("select substr(fulltext,?,?) from source where source.id=?",
-                        [c0[pos1] + 1, c1[pos1] - c0[pos1], c0[0]])
-            txt_after = cur.fetchone()
-            if txt_after is not None:
-                result['text_after'] = txt_after[0]
-            result['distance'] = 0
-            return result
-
-        # c1 overlaps on the right side, left side is not overlapping
-        if c1[pos0] < c0[pos0] and c1[pos1] < c0[pos1]:
-            result['relation'] = "O"
-            result['overlapindex'] = sorted([c1[pos0], c0[pos1]])
-            result['unionindex'] = sorted([c1[pos1], c0[pos0]])
-            overlap_length = result['unionindex'][1] - result['unionindex'][0]
-            '''print("TODO c1 overlaps on the right, the left side is not overlapping")
-            print("C0", c0)
-            print("C1", c1)'''
-            cur.execute("select substr(fulltext,?,?) from source where source.id=?",
-                        [c0[pos0] + 1, overlap_length, c0[0]])
-            txt = cur.fetchone()
-            if txt is not None:
-                result['text_overlap'] = txt[0]
-            cur.execute("select substr(fulltext,?,?) from source where source.id=?",
-                        [c1[pos0] + 1, c0[pos0] - c1[pos0], c0[0]])
-            txt_before = cur.fetchone()
-            if txt_before is not None:
-                result['text_before'] = txt_before[0]
-            cur.execute("select substr(fulltext,?,?) from source where source.id=?",
-                        [c1[pos1] + 1, c0[pos1] - c1[pos1], c0[0]])
-            txt_after = cur.fetchone()
-            if txt_after is not None:
-                result['text_after'] = txt_after[0]
-            result['distance'] = 0
-            return result
-
+    #TODO
     '''def search_text(self):
         """ Search for text in the results. """
 
@@ -515,7 +304,8 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
             return
         self.ui.tableWidget.setCurrentCell(found_row, found_col)'''
 
-    def table_menu(self, position):
+    #TODO
+    '''def table_menu(self, position):
         """ Context menu to show row text in original context, row ordering. """
 
         menu = QtWidgets.QMenu()
@@ -569,7 +359,7 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
                 if val_type == "str" and self.ui.tableWidget.item(r, col).text() > cell_value:
                     self.ui.tableWidget.setRowHidden(r, True)
                 if val_type == "int" and int(self.ui.tableWidget.item(r, col).text()) > int(cell_value):
-                    self.ui.tableWidget.setRowHidden(r, True)
+                    self.ui.tableWidget.setRowHidden(r, True)'''
 
     def show_context(self):
         """ Show context of coding in dialog.
@@ -611,126 +401,44 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         https://stackoverflow.com/questions/60512920/sorting-numbers-in-qtablewidget-work-doesnt-right-pyqt5
         """
 
-        fid = 0
-        code0 = 1
-        code1 = 2
-        relation_type = 3
-        min_ = 4
-        max_ = 5
-        overlap0 = 6
-        overlap1 = 7
-        union0 = 8
-        union1 = 9
-        distance = 10
-        text_before = 11
-        text_overlap = 12
-        text_after = 13
-        owner = 14
-        ctid0 = 15
-        ctid1 = 16
-        memo0 = 17
-        memo1 = 18
-        col_names = ["FID", _("Code") + " 0", _("Code") + " 1", "Rel", "Min", "Max", _("Overlap") + " 0",
-                     _("Overlap") + " 1", _("Union") + " 0", _("Union") + " 1",
-                     _("Distance"), _("Text before"), _("Overlap"), _("Text after"), _("Owner"), "ctid0", "ctid1",
-                     _("Memo") + "0", _("Memo") + "1"]
+        #TODO
+        cid = 0
+        pos0 = 1
+        pos1 = 2
+        sel_text = 3
+        code_name = 4
+
+        col_names = ["cid", "pos0", "pos1", _("text"), _("code name")]
         self.ui.tableWidget.setColumnCount(len(col_names))
         self.ui.tableWidget.setHorizontalHeaderLabels(col_names)
         rows = self.ui.tableWidget.rowCount()
         for r in range(0, rows):
             self.ui.tableWidget.removeRow(0)
-        for r, i in enumerate(self.result_relations):
+        for r, match_list in enumerate(self.matches):
             self.ui.tableWidget.insertRow(r)
-            item = QtWidgets.QTableWidgetItem()
-            item.setData(QtCore.Qt.ItemDataRole.DisplayRole, i['fid'])
-            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
-            item.setToolTip(i['file_name'])
-            self.ui.tableWidget.setItem(r, fid, item)
-            item = QtWidgets.QTableWidgetItem()
-            item.setData(QtCore.Qt.ItemDataRole.DisplayRole, i['cid0'])
-            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
-            item.setToolTip(i['c0_name'] + "\n" + str(i['c0_pos0']) + " - " + str(i['c0_pos1']))
-            self.ui.tableWidget.setItem(r, code0, item)
-            item = QtWidgets.QTableWidgetItem()
-            item.setData(QtCore.Qt.ItemDataRole.DisplayRole, i['cid1'])
-            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
-            item.setToolTip(i['c1_name'] + "\n" + str(i['c1_pos0']) + " - " + str(i['c1_pos1']))
-            self.ui.tableWidget.setItem(r, code1, item)
-            item = QtWidgets.QTableWidgetItem(str(i['relation']))
-            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
-            ttip = _("Proximity")
-            if i['relation'] == "O":
-                ttip = _("Overlap")
-            if i['relation'] == "E":
-                ttip = _("Exact")
-            if i['relation'] == "I":
-                ttip = _("Inclusion")
-            item.setToolTip(ttip)
-            self.ui.tableWidget.setItem(r, relation_type, item)
-            item = QtWidgets.QTableWidgetItem()
-            item.setData(QtCore.Qt.ItemDataRole.DisplayRole, i['whichmin'])
-            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
-            if i['whichmin'] is not None:
-                ttip = i['c0_name']
-                if i['whichmin'] == i['cid1']:
-                    ttip = i['c1_name']
-                item.setToolTip(ttip)
-            self.ui.tableWidget.setItem(r, min_, item)
-            item = QtWidgets.QTableWidgetItem()
-            item.setData(QtCore.Qt.ItemDataRole.DisplayRole, i['whichmax'])
-            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
-            if i['whichmax'] is not None:
-                ttip = i['c0_name']
-                if i['whichmax'] == i['cid1']:
-                    ttip = i['c1_name']
-                item.setToolTip(ttip)
-            self.ui.tableWidget.setItem(r, max_, item)
-            if i['overlapindex'] is not None:
-                item = QtWidgets.QTableWidgetItem(str(i['overlapindex'][0]))
+            for r1, match_item in enumerate(match_list):
+                self.ui.tableWidget.insertRow(r *5 + r1)
+
+                item = QtWidgets.QTableWidgetItem()
+                item.setData(QtCore.Qt.ItemDataRole.DisplayRole, match_item[cid])
                 item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
-                self.ui.tableWidget.setItem(r, overlap0, item)
-                item = QtWidgets.QTableWidgetItem(str(i['overlapindex'][1]))
+                self.ui.tableWidget.setItem(r *5 + r1, cid, item)
+                item = QtWidgets.QTableWidgetItem()
+                item.setData(QtCore.Qt.ItemDataRole.DisplayRole, match_item[pos0])
                 item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
-                self.ui.tableWidget.setItem(r, overlap1, item)
-            if i['unionindex'] is not None:
-                item = QtWidgets.QTableWidgetItem(str(i['unionindex'][0]))
+                self.ui.tableWidget.setItem(r *5 + r1, pos0, item)
+                item = QtWidgets.QTableWidgetItem()
+                item.setData(QtCore.Qt.ItemDataRole.DisplayRole, match_item[pos1])
                 item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
-                self.ui.tableWidget.setItem(r, union0, item)
-                item = QtWidgets.QTableWidgetItem(str(i['unionindex'][1]))
+                self.ui.tableWidget.setItem(r *5 + r1, pos1, item)
+                item = QtWidgets.QTableWidgetItem(match_item[sel_text])
                 item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
-                self.ui.tableWidget.setItem(r, union1, item)
-            item = QtWidgets.QTableWidgetItem()
-            item.setData(QtCore.Qt.ItemDataRole.DisplayRole, i['distance'])
-            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
-            self.ui.tableWidget.setItem(r, distance, item)
-            item = QtWidgets.QTableWidgetItem(i['text_before'])
-            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
-            self.ui.tableWidget.setItem(r, text_before, item)
-            item = QtWidgets.QTableWidgetItem(i['text_overlap'])
-            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
-            self.ui.tableWidget.setItem(r, text_overlap, item)
-            item = QtWidgets.QTableWidgetItem(i['text_after'])
-            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
-            self.ui.tableWidget.setItem(r, text_after, item)
-            item = QtWidgets.QTableWidgetItem(str(i['owner']))
-            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
-            self.ui.tableWidget.setItem(r, owner, item)
-            item = QtWidgets.QTableWidgetItem()
-            item.setData(QtCore.Qt.ItemDataRole.DisplayRole, i['ctid0'])
-            item.setToolTip(i['ctid0_text'])
-            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
-            self.ui.tableWidget.setItem(r, ctid0, item)
-            item = QtWidgets.QTableWidgetItem()
-            item.setData(QtCore.Qt.ItemDataRole.DisplayRole, i['ctid1'])
-            item.setToolTip(i['ctid1_text'])
-            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
-            self.ui.tableWidget.setItem(r, ctid1, item)
-            item = QtWidgets.QTableWidgetItem(i['coded_memo0'])
-            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
-            self.ui.tableWidget.setItem(r, memo0, item)
-            item = QtWidgets.QTableWidgetItem(i['coded_memo1'])
-            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
-            self.ui.tableWidget.setItem(r, memo1, item)
+                self.ui.tableWidget.setItem(r *5 + r1, sel_text, item)
+                item = QtWidgets.QTableWidgetItem()
+                item.setData(QtCore.Qt.ItemDataRole.DisplayRole, match_item[code_name])
+                item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
+                self.ui.tableWidget.setItem(r *5 + r1, code_name, item)
+
         self.ui.tableWidget.resizeColumnsToContents()
 
     def export_exact_excel_file(self):
