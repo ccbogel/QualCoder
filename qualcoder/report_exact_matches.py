@@ -81,6 +81,7 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
 
     def __init__(self, app, parent_textedit):
 
+        self.matches_display = []
         sys.excepthook = exception_handler
         self.app = app
         self.parent_textEdit = parent_textedit
@@ -89,12 +90,15 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         self.ui = Ui_DialogMatchingTextSegments()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
+        self.ui.lineEdit_exclude.hide()
+        self.ui.label_exclude.hide()
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
         self.ui.pushButton_run.setIcon(QtGui.QIcon(pm))
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_icon), "png")
-        self.ui.pushButton_export_odt.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_export.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_export.pressed.connect(self.export_excel_file)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(delete_icon))
         self.excluded_icon = QtGui.QIcon(pm)
@@ -185,7 +189,7 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
             self.ui.listWidget_files.addItem(item)
 
     def get_exact_text_matches(self):
-        """  """
+        """ Use selected, coer, file and codes (2 or more). """
 
         selected_coder = self.ui.comboBox_coders.currentText()
         #print("selected coder: ", selected_coder)
@@ -236,35 +240,36 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         cur.execute(sql, [selected_coder, fid])
         excludes_result = cur.fetchall()
 
-        matches = []
+        final_matches_list = []
         for c in coded_result:
-            matching_codes = []
-            # Get all matching coded text segment data
+            matching_codes_list = []
+            # Get all coded matching text segment data
             for c2 in coded_result:
                 if c[1] == c2[1] and c[2] == c2[2] and c[0] != c2[0]:
-                    matching_codes.append(c2)
-            if matching_codes:
-                matching_codes.append(c)
+                    matching_codes_list.append(c2)
+            if matching_codes_list:
+                matching_codes_list.append(c)
             # Remove from result if the matching data is in the excludes list
             for excludes in excludes_result:
                 if c[1] == excludes[1] and c[2] == excludes[2]:
                     matching_codes = []
-            if matching_codes:
+            # Sort lists by cid. Helps to remove duplicated differing order matches.
+            matching_codes_list.sort()
+            if matching_codes_list and matching_codes_list not in final_matches_list:
                 if includes_text == "":
-                    matches.append(matching_codes)
+                    final_matches_list.append(matching_codes_list)
                 else:
-                    if includes_text in matching_codes[0][4]:
-                        matches.append(matching_codes)
+                    if includes_text in matching_codes_list[0][4]:
+                        final_matches_list.append(matching_codes_list)
 
         self.matches_display = []
-        for match_list in matches:
-            print("========")
+        for match_list in final_matches_list:
+            #print("========")
             for match_item in match_list:
-                print(match_item)
+                #print(match_item)
                 self.matches_display.append(match_item)
             self.matches_display.append(["", "", "", "", ""])  # spacer
-
-        if len(matches) == 0:
+        if len(final_matches_list) == 0:
             Message(self.app, _('No results'), _("No exact matches found"), "warning").exec()
             return
         self.fill_table()
@@ -396,20 +401,13 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         return
 
     def fill_table(self):
-        """ A table of:
-        Tooltips with codenames on id1,id2, relation,fid - to minimise screen use
-        id1, id2, overlapindex, unionindex, distance, whichmin, whichmax, fid
-        relation is: inclusion, overlap, exact, proximity
+        """ A table of matching coded text segments. """
 
-        https://stackoverflow.com/questions/60512920/sorting-numbers-in-qtablewidget-work-doesnt-right-pyqt5
-        """
-
-        #TODO
         cid = 0
         pos0 = 1
         pos1 = 2
-        sel_text = 3
-        code_name = 4
+        code_name = 3
+        sel_text = 4
 
         col_names = ["cid", "pos0", "pos1", _("code name"), _("text")]
         self.ui.tableWidget.setColumnCount(len(col_names))
@@ -431,17 +429,18 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
             item.setData(QtCore.Qt.ItemDataRole.DisplayRole, match_item[pos1])
             item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget.setItem(r, pos1, item)
-            item = QtWidgets.QTableWidgetItem(match_item[sel_text])
-            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
-            self.ui.tableWidget.setItem(r, sel_text, item)
-            item = QtWidgets.QTableWidgetItem()
-            item.setData(QtCore.Qt.ItemDataRole.DisplayRole, match_item[code_name])
+            item = QtWidgets.QTableWidgetItem(match_item[code_name])
             item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget.setItem(r, code_name, item)
-
+            item = QtWidgets.QTableWidgetItem()
+            item.setData(QtCore.Qt.ItemDataRole.DisplayRole, match_item[sel_text])
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
+            self.ui.tableWidget.setItem(r, sel_text, item)
         self.ui.tableWidget.resizeColumnsToContents()
+        self.ui.tableWidget.setColumnWidth(sel_text, 1000)
+        self.ui.tableWidget.resizeRowsToContents()
 
-    def export_exact_excel_file(self):
+    def export_excel_file(self):
         """ Export exact match text codings for all codes as excel file.
         Output ordered by filename and code name ascending. """
 
