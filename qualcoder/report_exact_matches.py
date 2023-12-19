@@ -225,7 +225,7 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         includes_text = self.ui.lineEdit_include.text()
 
         cur = self.app.conn.cursor()
-        sql = "select code_text.cid, pos0,pos1, code_name.name, substr(source.fulltext,pos0, pos1-pos0) "
+        sql = "select code_text.cid, pos0,pos1, code_name.name, substr(source.fulltext,pos0, 1+pos1-pos0) "
         sql += " from code_text join code_name on code_name.cid=code_text.cid "
         sql += " join source on source.id=code_text.fid "
         sql += f" where code_text.cid in ({selected_codes_string}) "
