@@ -1,7 +1,34 @@
 <img src="https://github.com/ccbogel/QualCoder/blob/master/qualcoder.png" width=200 height=200>
 
-# QualCoder
+# QualCoder AI (beta)
 QualCoder is a qualitative data analysis application written in Python.
+
+> [!NOTE] 
+> This is an experimental version of QualCoder with AI-enhanced functionality (using GPT-4). Watch the video below if you want to learn more.
+> This version was created by [Kai Dröge](https://www.hslu.ch/de-ch/hochschule-luzern/ueber-uns/personensuche/profile/?pid=823), based on QualCoder 3.5
+> I hope that my additions will be integrated in the main version at some point, but this may take a while. Until then, you can use the AI-enhanced version alongside the regular QualCoder. Both apps will not interfere with each other.
+
+> **Installation**
+
+
+> **Setup:**
+> - QualCoder AI needs some additional setup to run it's AI-enhanced functions. When you start the app for the first time, a wizard will pop up and lead you through the setup process. These are the main steps:
+> 	- You'll need an API key from OpenAI. Go to https://platform.openai.com/, create an account and click on 'API keys' in the menu on the very left. 
+> 	- QualCoder AI will automatically download some additional components which are needed to analyze your documents locally (this model: https://huggingface.co/intfloat/multilingual-e5-large). This will take a while, please be patient.
+> - If you want to enable/disable the AI functionality later or change the OpenAI API key, got to Project > Settings and scroll to the bottom.
+
+> **Usage:**
+> - You can download an example project here: XXX. This is the same data that I show in the video – a collection of interviews with Irish women about their experiences during the Second World War. It was created by Mary Muldowney and thankfully published under a creative commons license: https://repository.dri.ie/catalog/j38607880
+> - If you want to use your own data instead, go to Project > Create New Project and select a filename. Then go to Manage > Manage files and click on the second button from the left in the toolbar (arrow with document) to add a new document. 
+> - The AI-based functionality in QualCoder is multilingual and supports up to 100 languages.
+> - Once you added a new document, the AI will read it in the background and memorize the contents in it's local database. This happens on your machine; no data is sent to OpenAI at this point. The memorization may take a few minutes, depending on the length of the document. You cannot use the AI-based functionality until the memorization of all documents is completed. (See the tab "Action Log" for progress messages.)
+> - Once the AI is ready, you can go to Coding > Code text, select the tab "AI Search" and start the search. If you haven't defined any codes yet, you can use the "Free search".
+> - Search tips: 
+>   - Don’t use too generic codes or search text (like "gender” or "work") since this will lead to very generic results.
+>   - You can also use a memo attached to the code to define your code a little better and explain it to the AI. Make sure to select the option “Send memo to AI” in the AI Search window. 
+
+> **For general information about the usage of QualCoder visit the official Wiki: https://github.com/ccbogel/QualCoder/wiki**
+
 
 Text files can be typed in manually or loaded from txt, odt, docx, html, htm, md, epub, and  PDF files. Images, video, and audio can also be imported for coding. Codes can be assigned to text, images, and a/v selections and grouped into categories in a hierarchical fashion. Various types of reports can be produced including visual coding graphs, coder comparisons, and coding frequencies.
 
