@@ -7,16 +7,14 @@ QualCoder is a qualitative data analysis application written in Python.
   <thead>
     <tr>
       <td align="left">
-        :information_source: Note
+        :information_source: Note: This is an experimental version of QualCoder with AI-enhanced functionality (using GPT-4). Watch the video below if you want to learn more.
       </td>
     </tr>
   </thead>
 
   <tbody>
     <tr>
-      <td>
-This is an experimental version of QualCoder with AI-enhanced functionality (using GPT-4). Watch the video below if you want to learn more.
-       
+      <td>      
 This version was created by [Kai Dröge](https://www.hslu.ch/de-ch/hochschule-luzern/ueber-uns/personensuche/profile/?pid=823), based on QualCoder 3.5
 
 I hope that my additions will be integrated in the main version at some point, but this may take a while. Until then, you can use the AI-enhanced version alongside the regular QualCoder. Both apps will not interfere with each other.
@@ -26,16 +24,16 @@ I hope that my additions will be integrated in the main version at some point, b
 Watch my [video on YouTube](https://www.youtube.com/watch?v=FrQyTOTJhCc):</br>
 [![Horizontal Coding: AI-Based Qualitative Data Analysis in QualCoder, Free & Open Source](https://img.youtube.com/vi/FrQyTOTJhCc/hqdefault.jpg)](https://www.youtube.com/watch?v=FrQyTOTJhCc)
 
-**Installation**
+### Installation
 
 
-**Setup:**
+### Setup:
 - QualCoder AI needs some additional setup to run it's AI-enhanced functions. When you start the app for the first time, a wizard will pop up and lead you through the setup process. These are the main steps:
  - You'll need an API key from OpenAI. Go to https://platform.openai.com/, create an account and click on 'API keys' in the menu on the very left. 
  - QualCoder AI will automatically download some additional components which are needed to analyze your documents locally (this model: https://huggingface.co/intfloat/multilingual-e5-large). This will take a while, please be patient.
 - If you want to enable/disable the AI functionality later or change the OpenAI API key, got to Project > Settings and scroll to the bottom.
 
-**Usage:**
+### Usage:
 - You can download an example project here: XXX. This is the same data that I show in the video – a collection of interviews with Irish women about their experiences during the Second World War. It was created by Mary Muldowney and thankfully published under a creative commons license: https://repository.dri.ie/catalog/j38607880
 - If you want to use your own data instead, go to Project > Create New Project and select a filename. Then go to Manage > Manage files and click on the second button from the left in the toolbar (arrow with document) to add a new document. 
 - The AI-based functionality in QualCoder is multilingual and supports up to 100 languages.
