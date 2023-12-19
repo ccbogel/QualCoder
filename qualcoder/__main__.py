@@ -683,7 +683,6 @@ class App(object):
 
     def load_settings(self):
         result = self._load_config_ini()
-        print("len config", result)
         # Check keys
         if (not len(result) or 'codername' not in result.keys() or 'stylesheet' not in result.keys() or
                 'speakernameformat' not in result.keys()):
