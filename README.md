@@ -15,6 +15,7 @@ QualCoder is a qualitative data analysis application written in Python.
   <tbody>
     <tr>
       <td>      
+
 This version was created by [Kai Dröge](https://www.hslu.ch/de-ch/hochschule-luzern/ueber-uns/personensuche/profile/?pid=823), based on QualCoder 3.5
 
 I hope that my additions will be integrated in the main version at some point, but this may take a while. Until then, you can use the AI-enhanced version alongside the regular QualCoder. Both apps will not interfere with each other.
