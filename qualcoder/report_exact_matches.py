@@ -90,8 +90,6 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         self.ui = Ui_DialogMatchingTextSegments()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        self.ui.lineEdit_exclude.hide()
-        self.ui.label_exclude.hide()
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
         self.ui.pushButton_run.setIcon(QtGui.QIcon(pm))
@@ -115,8 +113,9 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
                 self.ui.splitter.setSizes([s0, s1])
         except KeyError:
             pass
-        info_label_font = 'font: 10pt "' + self.app.settings['font'] + '";'
-        self.ui.label_instructions.setStyleSheet(info_label_font)
+        info_font = 'font: 10pt "' + self.app.settings['font'] + '";'
+        self.ui.label_instructions.setStyleSheet(info_font)
+        self.ui.checkBox_any_matches.setStyleSheet(info_font)
         msg = _("Only matches where ALL codes are applied to the same text will be shown.")
         self.ui.label_instructions.setToolTip(msg)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
@@ -239,6 +238,8 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
             return
         selected_codes_string = ",".join(selected_codes)
         includes_text = self.ui.lineEdit_include.text()
+        any_selected_codes = self.ui.checkBox_any_matches.isChecked()
+        # if False - ALL selected codes must match
 
         cur = self.app.conn.cursor()
         sql = "select code_text.cid, pos0,pos1, code_name.name, substr(source.fulltext,pos0, 1+pos1-pos0), "
@@ -272,8 +273,8 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
                     matching_codes_list = []
             # Sort lists by cid. Helps to remove duplicated differing order matches.
             matching_codes_list.sort()
-            # TODO check box for any or all exact matching codes
-            if len(matching_codes_list) != len(selected_codes):
+            # checkbox NOT checked. So all exact matching codes must be present at coded segment.
+            if not any_selected_codes and len(matching_codes_list) != len(selected_codes):
                 matching_codes_list = []
             # Add resulting list to final results. Check if there is a need to include specified text.
             if matching_codes_list and matching_codes_list not in final_matches_list:
@@ -291,7 +292,13 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
                 self.matches_display.append(match_item)
             #self.matches_display.append(["", "", "", "", ""])  # spacer
         if len(final_matches_list) == 0:
-            Message(self.app, _('No results'), _("No exact matches found"), "warning").exec()
+            msg = _("No exact matches found.") + "\n"
+            if not any_selected_codes:
+                msg += _("ALL selected codes need to be exactly overlapping.")
+            Message(self.app, _('No results'), msg, "warning").exec()
+            rows = self.ui.tableWidget.rowCount()
+            for r in range(0, rows):
+                self.ui.tableWidget.removeRow(0)
             return
         self.fill_table()
 
@@ -333,7 +340,6 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
             return
         self.ui.tableWidget.setCurrentCell(found_row, found_col)'''
 
-    #TODO
     def table_menu(self, position):
         """ Context menu to show row text in original context, row ordering. """
 
