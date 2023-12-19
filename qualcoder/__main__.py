@@ -449,7 +449,7 @@ class App(object):
 
         config = configparser.ConfigParser()
         config['DEFAULT'] = settings
-        with open(self.configpath, 'w') as configfile:
+        with open(self.configpath, 'w', encoding='utf-8') as configfile:
             config.write(configfile)
 
     def _load_config_ini(self):
@@ -683,7 +683,10 @@ class App(object):
 
     def load_settings(self):
         result = self._load_config_ini()
-        if not len(result):
+        print("len config", result)
+        # Check keys
+        if (not len(result) or 'codername' not in result.keys() or 'stylesheet' not in result.keys() or
+                'speakernameformat' not in result.keys()):
             self.write_config_ini(self.default_settings)
             logger.info('Initialized config.ini')
             result = self._load_config_ini()
@@ -768,7 +771,7 @@ class App(object):
             'dialogreport_code_summary_splitter1': 100,
             'stylesheet': 'original',
             'report_text_context_chars': 150,
-            'report_text_contextz-style': 'Bold',
+            'report_text_context-style': 'Bold',
             'codetext_chunksize': 50000,
         }
 
