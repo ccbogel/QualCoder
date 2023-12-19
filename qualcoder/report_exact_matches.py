@@ -371,7 +371,7 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
                     self.ui.tableWidget.setRowHidden(r, True)
         if action == action_filter_greater:
             val_type = "str"
-            if col == 0:
+            if col in (0, 1, 2):
                 val_type = "int"
             for r in range(0, self.ui.tableWidget.rowCount()):
                 self.ui.tableWidget.setRowHidden(r, False)
@@ -381,7 +381,7 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
                     self.ui.tableWidget.setRowHidden(r, True)
         if action == action_filter_lower:
             val_type = "str"
-            if col == 0:
+            if col in (0, 1, 2):
                 val_type = "int"
             for r in range(0, self.ui.tableWidget.rowCount()):
                 self.ui.tableWidget.setRowHidden(r, False)
