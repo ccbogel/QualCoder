@@ -43,13 +43,13 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>90</height>
+       <height>100</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>90</height>
+       <height>100</height>
       </size>
      </property>
      <property name="title">
@@ -59,8 +59,8 @@
       <property name="geometry">
        <rect>
         <x>450</x>
-        <y>60</y>
-        <width>171</width>
+        <y>30</y>
+        <width>200</width>
         <height>26</height>
        </rect>
       </property>
@@ -74,7 +74,7 @@
         <x>10</x>
         <y>-1</y>
         <width>291</width>
-        <height>41</height>
+        <height>31</height>
        </rect>
       </property>
       <property name="font">
@@ -100,8 +100,8 @@
       <property name="geometry">
        <rect>
         <x>340</x>
-        <y>60</y>
-        <width>111</width>
+        <y>28</y>
+        <width>109</width>
         <height>28</height>
        </rect>
       </property>
@@ -115,8 +115,8 @@
      <widget class="QPushButton" name="pushButton_export">
       <property name="geometry">
        <rect>
-        <x>680</x>
-        <y>30</y>
+        <x>700</x>
+        <y>27</y>
         <width>32</width>
         <height>32</height>
        </rect>
@@ -131,8 +131,8 @@
      <widget class="QPushButton" name="pushButton_run">
       <property name="geometry">
        <rect>
-        <x>640</x>
-        <y>30</y>
+        <x>660</x>
+        <y>27</y>
         <width>32</width>
         <height>32</height>
        </rect>
@@ -153,39 +153,19 @@
         <height>26</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Coded text must include the text here.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="text">
        <string>Include text</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_exclude">
-      <property name="geometry">
-       <rect>
-        <x>340</x>
-        <y>30</y>
-        <width>111</width>
-        <height>26</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Exclude text</string>
       </property>
      </widget>
      <widget class="QLineEdit" name="lineEdit_include">
       <property name="geometry">
        <rect>
         <x>450</x>
-        <y>0</y>
-        <width>171</width>
-        <height>26</height>
-       </rect>
-      </property>
-     </widget>
-     <widget class="QLineEdit" name="lineEdit_exclude">
-      <property name="geometry">
-       <rect>
-        <x>450</x>
-        <y>30</y>
-        <width>171</width>
+        <y>2</y>
+        <width>201</width>
         <height>26</height>
        </rect>
       </property>
@@ -194,16 +174,30 @@
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>34</y>
+        <y>24</y>
         <width>331</width>
-        <height>51</height>
+        <height>71</height>
        </rect>
       </property>
       <property name="text">
-       <string>Select 1 file, 1 coder. Select 2 or more codes. Can exclude results by excluding an overlapping code.</string>
+       <string>Select 1 file, 1 coder, 2 or more codes. Can exclude results by excluding a code (right click on code).</string>
       </property>
       <property name="wordWrap">
        <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBox_any_matches">
+      <property name="geometry">
+       <rect>
+        <x>340</x>
+        <y>63</y>
+        <width>621</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Unchecked - all selected codes must match exactly.
+Checked - any selected codes must match exactly.</string>
       </property>
      </widget>
     </widget>
