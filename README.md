@@ -26,22 +26,25 @@ Watch my [video on YouTube](https://www.youtube.com/watch?v=FrQyTOTJhCc):</br>
 
 ### Installation
 
+Installer for windows: https://drive.switch.ch/index.php/s/cYJKPA3JV3fJqDc (switch drive is a secure data sharing platform for Swiss universities)
+
+MacOS/Linux: Follow the [installation instructions below](#installation-1) (untested)
 
 ### Setup:
 - QualCoder AI needs some additional setup to run it's AI-enhanced functions. When you start the app for the first time, a wizard will pop up and lead you through the setup process. These are the main steps:
  - You'll need an API key from OpenAI. Go to https://platform.openai.com/, create an account and click on 'API keys' in the menu on the very left. 
  - QualCoder AI will automatically download some additional components which are needed to analyze your documents locally (this model: https://huggingface.co/intfloat/multilingual-e5-large). This will take a while, please be patient.
-- If you want to enable/disable the AI functionality later or change the OpenAI API key, got to Project > Settings and scroll to the bottom.
+- If you want to enable/disable the AI functionality later or change the OpenAI API key, go to Project > Settings and scroll to the bottom.
 
 ### Usage:
-- You can download an example project here: XXX. This is the same data that I show in the video – a collection of interviews with Irish women about their experiences during the Second World War. It was created by Mary Muldowney and thankfully published under a creative commons license: https://repository.dri.ie/catalog/j38607880
+- You can download an example project here: https://drive.switch.ch/index.php/s/cYJKPA3JV3fJqDc?path=%2Fexample_project. This is the same data that I show in the video – a collection of interviews with Irish women about their experiences during the Second World War. It was created by Mary Muldowney and thankfully published under a creative commons license: https://repository.dri.ie/catalog/j38607880
 - If you want to use your own data instead, go to Project > Create New Project and select a filename. Then go to Manage > Manage files and click on the second button from the left in the toolbar (arrow with document) to add a new document. 
 - The AI-based functionality in QualCoder is multilingual and supports up to 100 languages.
 - Once you added a new document, the AI will read it in the background and memorize the contents in it's local database. This happens on your machine; no data is sent to OpenAI at this point. The memorization may take a few minutes, depending on the length of the document. You cannot use the AI-based functionality until the memorization of all documents is completed. (See the tab "Action Log" for progress messages.)
 - Once the AI is ready, you can go to Coding > Code text, select the tab "AI Search" and start the search. If you haven't defined any codes yet, you can use the "Free search".
 - Search tips: 
-  - Don’t use too generic codes or search text (like "gender” or "work") since this will lead to very generic results.
-  - You can also use a memo attached to the code to define your code a little better and explain it to the AI. Make sure to select the option “Send memo to AI” in the AI Search window. 
+  - Don’t use too generic codes or search texts (like "gender” or "work") since this will lead to very generic results.
+  - You can also use a memo attached to the code to define your code a little better and explain it to the AI. Make sure to also select the option “Send memo to AI” in the AI Search window. 
 
 **For general information about the usage of QualCoder visit the official Wiki: https://github.com/ccbogel/QualCoder/wiki**
       </td>
@@ -49,13 +52,12 @@ Watch my [video on YouTube](https://www.youtube.com/watch?v=FrQyTOTJhCc):</br>
   </tbody>
 </table>
 
+**The rest of this document is from the regular version of QualCoder (with some small updates regarding the AI-based version).**
 
 Text files can be typed in manually or loaded from txt, odt, docx, html, htm, md, epub, and  PDF files. Images, video, and audio can also be imported for coding. Codes can be assigned to text, images, and a/v selections and grouped into categories in a hierarchical fashion. Various types of reports can be produced including visual coding graphs, coder comparisons, and coding frequencies.
 
 This software has been used on MacOS and various Linux distros.
 Instructions and other information are available here: https://qualcoder.wordpress.com/ and on the [Github Wiki](https://github.com/ccbogel/QualCoder/wiki).
-
-It is best to download the Current Release from the Releases page, see the Releases link in the right-hand column on this page.
 
 If you like QualCoder please buy me a coffee ...
 
@@ -63,6 +65,8 @@ If you like QualCoder please buy me a coffee ...
 
 
 ## INSTALLATION 
+
+Note: You should be able to run the AI-based version alongside the regular one. 
 
 ### Prerequisites
 Optional: VLC for audio/video coding. 
@@ -72,11 +76,9 @@ For installing from source you will need to have Python 3.8 or a newer version i
 
 ### Windows
 
-**Use the exe**
+**Use the installer**
 
-Newer releases contain an exe file (created on Windows 10, 64-bit). Double-click to run. Look for the Releases link on the right-hand side of this page. I have had feedback on one instance on Windows where an anti-virus affected the importing and moving of files by QualCoder (AVG). 
-An online virus testing site www.virustotal.com indicated 2 vendors out of many detected a potential problem due to their detection methods (false positives), 5 March 2022. Always check the MD5 checksum on downloading the exe. I have not got the exe Microsoft certified (I am not sure of the processes or cost involved).
-If you are uncomfortable with these warnings install from the source as detailed next.
+Download the windows installer from here: https://drive.switch.ch/index.php/s/cYJKPA3JV3fJqDc (switch drive is a secure data sharing platform for Swiss universities)
 
 **Alternatively, install from source:**
 
@@ -86,21 +88,21 @@ Seriously consider using a virtual environment (commands in point 6 below). Not 
 
 IMPORTANT: in the first window of the installation mark the option "Add Python to PATH"
 
-2.  Download the QualCoder software from: https://github.com/ccbogel/QualCoder from the Green Code button. This is the newest, but not yet officially released code (occasionally coding errors creep in).  Click the green button "Code", and then "Download ZIP". **Alternatively**, choose the most recent release zip, see the right-hand side of this page for the link to Releases.
+2.  Download the QualCoder software from: https://github.com/kaixxx/QualCoder/tree/ai_integration (green 'Code' button > Download ZIP) or use git to clone the repo (make sure to use the 'ai_integration' branch)
 
-3.    Unzip the folder to a location (e.g. downloads). (Tip, remove the doubled-up folder extraction QualCoder-master\QualCoder-master when asked where to extract. Just QualCoder-master). 
+3.    Unzip the folder to a location (e.g. downloads). 
 
 4. Use the Windows command prompt. Type "cmd" in the Windows Start search engine, and click on the black software "cmd.exe" - the command console for Windows. In the console type or paste, using the right-click mouse copy and paste (ctrl+v does not work)
 
-5. In the command prompt, move (using the `cd` command) into the QualCoder folder. You should be inside the QualCoder-master folder or if using a release (the Qualcoder-3.4 folder). e.g. 
+5. In the command prompt, move (using the `cd` command) into the QualCoder folder. You should be inside the QualCoder-ai_integration folder. e.g. 
 
 ```bash
-cd Downloads\QualCoder-master
+cd Downloads\QualCoder-ai_integration
 ```
 
 6. Install and activate the virtual environment. This step can be skipped, but I recommend you do not skip it.
 
-When not using a docker container, we recommend using a virtual environment to install packages. This will ensure that the dependencies for QualCoder are isolated from the rest of your system. On someWindows OS you may need to replace the _py_ command with _python3_ below: 
+When not using a docker container, we recommend using a virtual environment to install packages. This will ensure that the dependencies for QualCoder are isolated from the rest of your system. On some Windows OS you may need to replace the _py_ command with _python3_ below: 
 
 ```bash
 py -m venv env
@@ -118,9 +120,11 @@ py -m pip install --upgrade pip
 py -m pip install wheel pyqt6 chardet ebooklib openpyxl Pillow ply pdfminer.six pandas plotly pydub python-vlc rispy SpeechRecognition wordcloud xmlschema charset-normalizer
 ```
 
- For the AI-integration:
+For the AI-integration:
 
- `pip install langchain langchain[llms], chromadb, sentence-transformers, fuzzysearch`
+```bash
+py -m pip install langchain langchain[llms] chromadb sentence-transformers fuzzysearch pydantic
+```
  
  Wait, until all modules are installed.
 
@@ -197,7 +201,9 @@ Note: To exit venv type `deactivate`
 
 6. Install the needed Python modules.
 
-`pip install chardet ebooklib ply openpyxl pandas pdfminer pyqt6 pillow pdfminer.six plotly pydub python-vlc rispy six SpeechRecognition xmlschema`
+`pip install chardet ebooklib ply openpyxl pandas pdfminer pyqt6 pillow pdfminer.six plotly pydub python-vlc rispy six SpeechRecognition xmlschema charset-normalizer`
+
+`pip install langchain langchain[llms] chromadb sentence-transformers fuzzysearch pydantic`
 
 7. Install QualCoder, and type the following, the dot is important:
 
@@ -227,7 +233,8 @@ It has not been tested, but please see the above instructions to build QualCoder
 
 2. Install additional python modules
 
-`sudo python3 -m pip install ebooklib plotly pydub python-vlc rispy SpeechRecognition xmlschema`
+`sudo python3 -m pip install ebooklib plotly pydub python-vlc rispy SpeechRecognition xmlschema charset-normalizer`
+`sudo python3 -m pip install langchain langchain[llms] chromadb sentence-transformers fuzzysearch pydantic`
 
 If successful, all requirements are satisfied.
 
@@ -245,22 +252,7 @@ Or install from AUR as follows:
 
 ### Fedora/CentOS/RHEL linux
 
-It has not been tested, but please see the above instructions to build QualCoder inside a virtual environment. The below installation instructions may affect system-installed Python modules.
-
-Retrieve the current package code from this repository
-
-1. Open your preferred shell (terminal).
-2. Navigate to your preferred code directory.
-3. There, run: `git clone https://github.com/ccbogel/QualCoder.git` and
-4. enter the directory with `cd QualCoder`
-5. Make `install_fedora.sh` executable (`chmod +x install_fedora.sh`) and
-6. run the `./install_fedora.sh` script from the terminal. The script is for Python version 3.11.
-
-Then start QualCoder as any other app on your system.
-
-Note 1_ This script installs the dependencies using dnf and the ebook libraries with a work-around, specified at https://github.com/ccbogel/QualCoder/issues/72#issuecomment-695962784.
-
-Note 2: Fedora uses Wayland which does not work well with the Qt graphical interface (for now). I suggest you also install Xwayland.
+Please see the above instructions to build QualCoder inside a virtual environment.
 
 ### MacOS
 
@@ -270,7 +262,7 @@ You will need to install developer tools for macOS. [See https://www.cnet.com/te
 
 1) Install recent versions of [Python3](https://www.python.org/downloads/) and [VLC](https://www.videolan.org/vlc/).
 
-2) Download the latest release "Source code" version in ZIP format, from the releases section of the project here on Github: https://github.com/ccbogel/QualCoder/releases/tag/3.4 and extract it into /Applications
+2) Download the latest release "Source code" version in ZIP format: https://github.com/kaixxx/QualCoder/tree/ai_integration (green 'Code' button > Download ZIP). Extract it into /Applications
 
 3) Open the Terminal app (or any other command shell)
 
@@ -288,24 +280,26 @@ python3 get-pip.py
 5) Install Python dependency modules using `pip`:
 
 ```sh
-pip3 install chardet ebooklib openpyxl pandas pillow ply pdfminer.six plotly pydub pyqt6 python-vlc rispy six SpeechRecognition xmlschema
+pip3 install chardet ebooklib openpyxl pandas pillow ply pdfminer.six plotly pydub pyqt6 python-vlc rispy six SpeechRecognition xmlschema charset-normalizer
+
+pip3 install langchain langchain[llms] chromadb sentence-transformers fuzzysearch pydantic
 ```
 
-Be sure that you are in the QualCoder-Master directory before doing Step 6.
+Be sure that you are in the QualCoder-ai_integration directory before doing Step 6.
 
 To change the directory, enter or copy and run the script below.
 
-`cd /Applications/QualCoder-3.4`
+`cd /Applications/QualCoder-ai_integration`
 
 6) From the QualCoder-Master directory run the setup script:
 
 `python3 -m pip install .`
 
 
-Assuming you downloaded the 3.4 version. You can now run with:
+You can now run with:
 
 ```
-python3 /applications/QualCoder-3.4/qualcoder/__main__.py
+python3 /applications/QualCoder-ai_integration/qualcoder/__main__.py
 ```
 
 Alternative commands to run QualCoder (Suggestions):
@@ -329,13 +323,15 @@ You can make an alias to the file and place it on your desktop.
 
 **Another option to install on Mac:**
 
-Open the Terminal App and move to the unzipped Qualcoder-Master directory, then run the following commands:
+Open the Terminal App and move to the unzipped Qualcoder-ai_integration directory, then run the following commands:
 
 1) Install Python dependency modules using `pip3`:
 
-`pip3 install chardet ebooklib ffmpeg-python pyqt6 pillow ply pdfminer.six openpyxl pandas plotly pydub python-vlc rispy six SpeechRecognition xmlschema`
+`pip3 install chardet ebooklib ffmpeg-python pyqt6 pillow ply pdfminer.six openpyxl pandas plotly pydub python-vlc rispy six SpeechRecognition xmlschema charset-normalizer`
 
-2) Open the Terminal App and move to the unzipped Qualcoder-Master directory, then run the following commands:
+`pip3 install langchain langchain[llms] chromadb sentence-transformers fuzzysearch pydantic`
+
+2) Open the Terminal App and move to the unzipped Qualcoder-ai_integration directory, then run the following commands:
 
 `pip3 install -U py2app` or for a system installation of python `sudo pip3 install -U py2app`
 
@@ -345,23 +341,27 @@ Open the Terminal App and move to the unzipped Qualcoder-Master directory, then 
 ## Dependencies
 Required:
 
-Python 3.8+ version, pyqt6, Pillow, six  (Mac OS), ebooklib, ply, chardet, pdfminer.six, openpyxl, pandas, plotly, pydub, python-vlc, rispy, SpeechRecognition, xmlschema
+Python 3.8+ version, pyqt6, Pillow, six  (Mac OS), ebooklib, ply, chardet, pdfminer.six, openpyxl, pandas, plotly, pydub, python-vlc, rispy, SpeechRecognition, xmlschema, charset-normalizer, langchain langchain[llms] chromadb sentence-transformers fuzzysearch pydantic
 
 ## License
 QualCoder is distributed under the MIT LICENSE.
 
 ##  Citation APA style
 
-Curtain, C. (2023) QualCoder 3.4 [Computer software]. Retrieved from
-https://github.com/ccbogel/QualCoder/releases/tag/3.4
+Curtain, C. & Dröge, K. (2023) QualCoder AI beta [Computer software]. Retrieved from
+https://github.com/kaixxx/QualCoder/tree/ai_integration
 
-## Creator
+## Creators
 
-Dr. Colin Curtain BPharm GradDipComp Ph.D. Pharmacy lecturer at the University of Tasmania. I obtained a Graduate Diploma in Computing in 2011. I have developed my Python programming skills from this time onwards. The QualCoder project originated from my use of RQDA during my PhD - *Evaluation of clinical decision support provided by medication review software*. My original and now completely deprecated PyQDA software on PyPI was my first attempt at creating qualitative software. The reason for creating the software was that during my PhD RQDA did not always install or work well for me, but I did realise that I could use the same SQLite database and access it with Python. The current database is different from the older RQDA version. This is an ongoing hobby project, perhaps a labour of love, which I utilize with some of the Masters's and Ph.D. students I supervise. I do most of my programming on Ubuntu using the PyCharm editor, and I do a small amount of testing on Windows. I do not have a Mac or other operating system to check how well the software works regards installation and usage.
+**Dr. Colin Curtain** BPharm GradDipComp Ph.D. Pharmacy lecturer at the University of Tasmania. I obtained a Graduate Diploma in Computing in 2011. I have developed my Python programming skills from this time onwards. The QualCoder project originated from my use of RQDA during my PhD - *Evaluation of clinical decision support provided by medication review software*. My original and now completely deprecated PyQDA software on PyPI was my first attempt at creating qualitative software. The reason for creating the software was that during my PhD RQDA did not always install or work well for me, but I did realise that I could use the same SQLite database and access it with Python. The current database is different from the older RQDA version. This is an ongoing hobby project, perhaps a labour of love, which I utilize with some of the Masters's and Ph.D. students I supervise. I do most of my programming on Ubuntu using the PyCharm editor, and I do a small amount of testing on Windows. I do not have a Mac or other operating system to check how well the software works regards installation and usage.
 
 https://www.utas.edu.au/profiles/staff/umore/colin-curtain
 
 https://scholar.google.com/citations?user=KTMRMWoAAAAJ&hl=en
+
+**Dr. Kai Dröge**, PhD in sociology (with a background in computer science), qualitative researcher and teacher, [Lucerne University for Applied Science (Switzerland)](https://www.hslu.ch/de-ch/hochschule-luzern/ueber-uns/personensuche/profile/?pid=823) and [Institute for Social Research, Frankfurt/M. (Germany)](https://www.ifs.uni-frankfurt.de/personendetails/kai-droege.html).
+
+I'm also the author of [noScribe, an AI-based audio transcription app](https://github.com/kaixxx/noScribe) that runs locally on your computer and is made for qualitative research.
 
 
 ## Leave a review
