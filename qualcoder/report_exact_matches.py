@@ -115,6 +115,10 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
                 self.ui.splitter.setSizes([s0, s1])
         except KeyError:
             pass
+        info_label_font = 'font: 10pt "' + self.app.settings['font'] + '";'
+        self.ui.label_instructions.setStyleSheet(info_label_font)
+        msg = _("Only matches where ALL codes are applied to the same text will be shown.")
+        self.ui.label_instructions.setToolTip(msg)
         font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
@@ -189,16 +193,22 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
             self.ui.listWidget_files.addItem(item)
 
     def get_exact_text_matches(self):
-        """ Use selected, coer, file and codes (2 or more). """
+        """ Use selected, coder, file and codes (2 or more).
+        All selected codes mus tbe present for the match. """
 
         selected_coder = self.ui.comboBox_coders.currentText()
         #print("selected coder: ", selected_coder)
-        file_name = self.ui.listWidget_files.currentItem().text()
+        try:
+            file_name = self.ui.listWidget_files.currentItem().text()
+        except AttributeError:
+            # None type object has no attribute text()
+            msg = _("No file has been selected.")
+            Message(self.app, _('No file'), msg, "warning").exec()
+            return
         fid = -1
         for f in self.files:
             if f['name'] == file_name:
                 fid = f['id']
-        #print("selected_file ", file_name, fid)
         if fid == -1:
             msg = _("No file has been selected.")
             Message(self.app, _('No file'), msg, "warning").exec()
@@ -255,6 +265,10 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
                     matching_codes_list = []
             # Sort lists by cid. Helps to remove duplicated differing order matches.
             matching_codes_list.sort()
+            # TODO check box for any or all exact matching codes
+            if len(matching_codes_list) != len(selected_codes):
+                matching_codes_list = []
+            # Add resulting list to final results. Check if there is a need to include specified text.
             if matching_codes_list and matching_codes_list not in final_matches_list:
                 if includes_text == "":
                     final_matches_list.append(matching_codes_list)
