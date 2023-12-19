@@ -132,6 +132,8 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         self.get_files_fill_list_widget()
         self.ui.listWidget_files.setSelectionMode(QtWidgets.QListWidget.SelectionMode.SingleSelection)
         self.ui.pushButton_run.pressed.connect(self.get_exact_text_matches)
+        self.ui.tableWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
 
     def get_data(self):
         """ Called from init. gets code_names, categories and owner names.
@@ -231,11 +233,16 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
             msg = _("No codes have been selected.")
             Message(self.app, _('No codes'), msg, "warning").exec()
             return
+        if len(selected_codes) == 1:
+            msg = _("Only one code has been selected.")
+            Message(self.app, _('One code selected'), msg, "warning").exec()
+            return
         selected_codes_string = ",".join(selected_codes)
         includes_text = self.ui.lineEdit_include.text()
 
         cur = self.app.conn.cursor()
-        sql = "select code_text.cid, pos0,pos1, code_name.name, substr(source.fulltext,pos0, 1+pos1-pos0) "
+        sql = "select code_text.cid, pos0,pos1, code_name.name, substr(source.fulltext,pos0, 1+pos1-pos0), "
+        sql += " ifnull(code_text.memo,''), source.id, source.name, code_text.owner "
         sql += " from code_text join code_name on code_name.cid=code_text.cid "
         sql += " join source on source.id=code_text.fid "
         sql += f" where code_text.cid in ({selected_codes_string}) "
@@ -282,7 +289,7 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
             for match_item in match_list:
                 #print(match_item)
                 self.matches_display.append(match_item)
-            self.matches_display.append(["", "", "", "", ""])  # spacer
+            #self.matches_display.append(["", "", "", "", ""])  # spacer
         if len(final_matches_list) == 0:
             Message(self.app, _('No results'), _("No exact matches found"), "warning").exec()
             return
@@ -327,7 +334,7 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         self.ui.tableWidget.setCurrentCell(found_row, found_col)'''
 
     #TODO
-    '''def table_menu(self, position):
+    def table_menu(self, position):
         """ Context menu to show row text in original context, row ordering. """
 
         menu = QtWidgets.QMenu()
@@ -364,7 +371,7 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
                     self.ui.tableWidget.setRowHidden(r, True)
         if action == action_filter_greater:
             val_type = "str"
-            if col in (0, 1, 2, 4, 5, 6, 7, 8, 9, 10, 15, 16):
+            if col == 0:
                 val_type = "int"
             for r in range(0, self.ui.tableWidget.rowCount()):
                 self.ui.tableWidget.setRowHidden(r, False)
@@ -374,14 +381,14 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
                     self.ui.tableWidget.setRowHidden(r, True)
         if action == action_filter_lower:
             val_type = "str"
-            if col in (0, 1, 2, 4, 5, 6, 7, 8, 9, 10, 15, 16):
+            if col == 0:
                 val_type = "int"
             for r in range(0, self.ui.tableWidget.rowCount()):
                 self.ui.tableWidget.setRowHidden(r, False)
                 if val_type == "str" and self.ui.tableWidget.item(r, col).text() > cell_value:
                     self.ui.tableWidget.setRowHidden(r, True)
                 if val_type == "int" and int(self.ui.tableWidget.item(r, col).text()) > int(cell_value):
-                    self.ui.tableWidget.setRowHidden(r, True)'''
+                    self.ui.tableWidget.setRowHidden(r, True)
 
     def show_context(self):
         """ Show context of coding in dialog.
@@ -389,28 +396,19 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         """
 
         row = self.ui.tableWidget.currentRow()
-        d = self.result_relations[row]
-        codename0 = ""
-        codename1 = ""
-        color0 = ""
-        color1 = ""
+        code_color = "#777777"
         for c in self.codes:
-            if c['cid'] == d['cid0']:
-                codename0 = c['name']
-                color0 = c['color']
-            if c['cid'] == d['cid1']:
-                codename1 = c['name']
-                color1 = c['color']
+            if c['cid'] == int(self.ui.tableWidget.item(row, 0).text()):
+                code_color = c['color']
         # data: dictionary: codename, color, file_or_casename, pos0, pos1, text, coder, fid, file_or_case,
         # textedit_start, textedit_end
-        data0 = {'codename': codename0, 'color': color0, 'file_or_casename': d['file_name'],
-                 'pos0': d['c0_pos0'], 'pos1': d['c0_pos1'],
-                 'text': '', 'coder': d['owner'], 'fid': d['fid'], 'file_or_case': 'File'}
-        data1 = {'codename': codename1, 'color': color1, 'file_or_casename': d['file_name'],
-                 'pos0': d['c1_pos0'], 'pos1': d['c1_pos1'],
-                 'text': '', 'coder': d['owner'], 'fid': d['fid'], 'file_or_case': 'File'}
-        ui = DialogCodeInText(self.app, data0)
-        ui.add_coded_text(data1)
+        data = {'pos0':  int(self.ui.tableWidget.item(row, 1).text()),
+                'pos1': int(self.ui.tableWidget.item(row, 2).text()),
+                'codename': self.ui.tableWidget.item(row, 3).text(), 'color': code_color, 'text': '',
+                'fid': int(self.ui.tableWidget.item(row, 6).text()),
+                'file_or_casename': self.ui.tableWidget.item(row, 7).text(),
+                'coder': self.ui.tableWidget.item(row, 8).text(), 'file_or_case': 'File'}
+        ui = DialogCodeInText(self.app, data)
         ui.exec()
         return
 
@@ -422,8 +420,12 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         pos1 = 2
         code_name = 3
         sel_text = 4
+        coded_memo = 5
+        fid = 6
+        file_name = 7
+        coder = 8
 
-        col_names = ["cid", "pos0", "pos1", _("code name"), _("text")]
+        col_names = ["cid", "pos0", "pos1", _("code name"), _("text"), _("Coded memo"), "fid", "File name", "Coder"]
         self.ui.tableWidget.setColumnCount(len(col_names))
         self.ui.tableWidget.setHorizontalHeaderLabels(col_names)
         rows = self.ui.tableWidget.rowCount()
@@ -450,6 +452,26 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
             item.setData(QtCore.Qt.ItemDataRole.DisplayRole, match_item[sel_text])
             item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget.setItem(r, sel_text, item)
+            item = QtWidgets.QTableWidgetItem()
+            item.setData(QtCore.Qt.ItemDataRole.DisplayRole, match_item[coded_memo])
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
+            self.ui.tableWidget.setItem(r, coded_memo, item)
+
+            item = QtWidgets.QTableWidgetItem()
+            item.setData(QtCore.Qt.ItemDataRole.DisplayRole, match_item[fid])
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
+            self.ui.tableWidget.setItem(r, fid, item)
+            item = QtWidgets.QTableWidgetItem()
+            item.setData(QtCore.Qt.ItemDataRole.DisplayRole, match_item[file_name])
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
+            self.ui.tableWidget.setItem(r, file_name, item)
+            item = QtWidgets.QTableWidgetItem()
+            item.setData(QtCore.Qt.ItemDataRole.DisplayRole, match_item[coder])
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
+            self.ui.tableWidget.setItem(r, coder, item)
+        self.ui.tableWidget.hideColumn(fid)
+        self.ui.tableWidget.hideColumn(file_name)
+        self.ui.tableWidget.hideColumn(coder)
         self.ui.tableWidget.resizeColumnsToContents()
         self.ui.tableWidget.setColumnWidth(sel_text, 1000)
         self.ui.tableWidget.resizeRowsToContents()
@@ -463,7 +485,7 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         wb = openpyxl.Workbook()
         ws = wb.active
         # Column headings
-        col_headings = ["cid", "pos0", "pos1", "Code name", "Text"]
+        col_headings = ["cid", "pos0", "pos1", "Code name", "Text", "Coded memo"]
         row = 1
         for col, code in enumerate(col_headings):
             ws.cell(column=col + 1, row=row, value=code)
@@ -473,6 +495,7 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
             ws.cell(column=3, row=row + 2, value=data[2])
             ws.cell(column=4, row=row + 2, value=data[3])
             ws.cell(column=5, row=row + 2, value=data[4])
+            ws.cell(column=6, row=row + 2, value=data[4])
         filepath, ok = QtWidgets.QFileDialog.getSaveFileName(self,
                                                              _("Save Excel File"), self.app.settings['directory'],
                                                              "XLSX Files(*.xlsx)",
