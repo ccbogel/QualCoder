@@ -200,6 +200,19 @@
 Checked - any selected codes must match exactly.</string>
       </property>
      </widget>
+     <widget class="QCheckBox" name="checkBox_one_line">
+      <property name="geometry">
+       <rect>
+        <x>680</x>
+        <y>70</y>
+        <width>161</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>One line results</string>
+      </property>
+     </widget>
     </widget>
    </item>
    <item>
