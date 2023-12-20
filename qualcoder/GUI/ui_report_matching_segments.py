@@ -112,9 +112,10 @@ class Ui_DialogMatchingTextSegments(object):
         self.pushButton_run.setToolTip(_translate("DialogMatchingTextSegments", "<html><head/><body><p>Run</p></body></html>"))
         self.label_include.setToolTip(_translate("DialogMatchingTextSegments", "<html><head/><body><p>Coded text must include the text here.</p></body></html>"))
         self.label_include.setText(_translate("DialogMatchingTextSegments", "Include text"))
-        self.label_instructions.setText(_translate("DialogMatchingTextSegments", "Select 1 file, 1 coder, 2 or more codes. Can exclude results by excluding a code (right click on code)."))
+        self.label_instructions.setText(_translate("DialogMatchingTextSegments", "Select file(s), coder, 2 or more codes. Can exclude results by excluding a code (right click on code)."))
         self.checkBox_any_matches.setText(_translate("DialogMatchingTextSegments", "Unchecked - all selected codes must match exactly.\n"
 "Checked - any selected codes must match exactly."))
+        self.checkBox_one_line.setToolTip(_translate("DialogMatchingTextSegments", "<html><head/><body><p>Matching exact coded text for multiple codes are collated into one line.</p></body></html>"))
         self.checkBox_one_line.setText(_translate("DialogMatchingTextSegments", "One line results"))
 
 
