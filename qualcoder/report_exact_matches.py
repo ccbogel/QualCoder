@@ -123,7 +123,7 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
         self.get_files_fill_list_widget()
-        self.ui.listWidget_files.setSelectionMode(QtWidgets.QListWidget.SelectionMode.SingleSelection)
+        self.ui.listWidget_files.setSelectionMode(QtWidgets.QListWidget.SelectionMode.ExtendedSelection)
         self.ui.pushButton_run.pressed.connect(self.get_exact_text_matches)
         self.ui.tableWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
@@ -188,25 +188,20 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
             self.ui.listWidget_files.addItem(item)
 
     def get_exact_text_matches(self):
-        """ Use selected, coder, file and codes (2 or more).
+        """ Use selected, coder, selected files and two or more codes.
         All selected codes mus tbe present for the match.
         Create two sets of results:
             One row per coded segment per code; one row collating all codes at one coded segment.
         """
 
         selected_coder = self.ui.comboBox_coders.currentText()
-        try:
-            file_name = self.ui.listWidget_files.currentItem().text()
-        except AttributeError:
-            # None type object has no attribute text()
-            msg = _("No file has been selected.")
-            Message(self.app, _('No file'), msg, "warning").exec()
-            return
-        fid = -1
-        for f in self.files:
-            if f['name'] == file_name:
-                fid = f['id']
-        if fid == -1:
+        file_ids = []
+        for file_item in self.ui.listWidget_files.selectedItems():
+            for f in self.files:
+                print(file_item.text(), f['name'])
+                if f['name'] == file_item.text():
+                    file_ids.append(f['id'])
+        if not file_ids:
             msg = _("No file has been selected.")
             Message(self.app, _('No file'), msg, "warning").exec()
             return
@@ -236,61 +231,63 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         includes_text = self.ui.lineEdit_include.text()
         any_selected_codes = self.ui.checkBox_any_matches.isChecked()
         # if False - ALL selected codes must match
-
-        values = [selected_coder, fid]
-        cur = self.app.conn.cursor()
-        sql = "select code_text.cid, code_name.name, pos0,pos1, substr(source.fulltext,pos0, 1+pos1-pos0), "
-        sql += " ifnull(code_text.memo,''), source.id, source.name, code_text.owner "
-        sql += " from code_text join code_name on code_name.cid=code_text.cid "
-        sql += " join source on source.id=code_text.fid "
-        sql += f" where code_text.cid in ({selected_codes_string}) "
-        if includes_text != "":
-            sql += " and instr(substr(source.fulltext,pos0, 1+pos1-pos0), ?) > 0 "
-            values = [includes_text, selected_coder, fid]
-        sql += " and code_text.owner=? and code_text.fid=? "
-        sql += " order by code_name.name, pos0"
-        cur.execute(sql, values)
-        coded_results = cur.fetchall()
-
-        sql = f"select code_text.cid, pos0,pos1 from code_text where "
-        sql += f" code_text.cid in ({excluded_cids_string}) "
-        sql += " and code_text.owner=? and code_text.fid=?"
-        cur.execute(sql, [selected_coder, fid])
-        excludes_result = cur.fetchall()
-
+        self.results_display = []
         final_matches_list = []
         one_line_results_list = []
-        for c in coded_results:
-            matching_codes_list = []
-            # Get all coded matching text segment data
-            for c2 in coded_results:
-                if c[2] == c2[2] and c[3] == c2[3] and c[0] != c2[0]:
-                    matching_codes_list.append(c2)
-            if matching_codes_list:
-                matching_codes_list.append(c)
-            # Remove from result if the matching data is in the excludes list
-            for excludes in excludes_result:
-                if c[2] == excludes[2] and c[3] == excludes[3]:
-                    matching_codes_list = []
-            # Sort lists by cid. Helps to remove duplicated differing order matches.
-            matching_codes_list.sort()
-            # checkbox NOT checked. So all exact matching codes must be present at coded segment.
-            if not any_selected_codes and len(matching_codes_list) != len(selected_codes):
-                matching_codes_list = []
-            # Add resulting list to final results. Check if there is a need to include specified text.
-            if matching_codes_list and matching_codes_list not in final_matches_list:
-                final_matches_list.append(matching_codes_list)
-                # Create one line result
-                one_line_results = list(matching_codes_list[0])
-                one_line_results[0] = str(one_line_results[0])  # cid
-                #one_line_results[5] = ""  # coded memo
-                for row in range(1, len(matching_codes_list)):
-                    one_line_results[0] += f", {str(matching_codes_list[row][0])}"  # cid
-                    one_line_results[1] += f"|{matching_codes_list[row][1]}"  # codename
-                    one_line_results[5] += f"|{matching_codes_list[row][5]}"  # coded segment memo
-                one_line_results_list.append(one_line_results)
+        cur = self.app.conn.cursor()
+        for fid in file_ids:
+            values = [selected_coder, fid]
+            sql = "select code_text.cid, code_name.name, pos0,pos1, substr(source.fulltext,pos0, 1+pos1-pos0), "
+            sql += " ifnull(code_text.memo,''), source.id, source.name, code_text.owner "
+            sql += " from code_text join code_name on code_name.cid=code_text.cid "
+            sql += " join source on source.id=code_text.fid "
+            sql += f" where code_text.cid in ({selected_codes_string}) "
+            if includes_text != "":
+                sql += " and instr(substr(source.fulltext,pos0, 1+pos1-pos0), ?) > 0 "
+                values = [includes_text, selected_coder, fid]
+            sql += " and code_text.owner=? and code_text.fid=? "
+            sql += " order by code_name.name, pos0"
+            cur.execute(sql, values)
+            coded_results = cur.fetchall()
 
-        self.results_display = []
+            sql = f"select code_text.cid, pos0,pos1 from code_text where "
+            sql += f" code_text.cid in ({excluded_cids_string}) "
+            sql += " and code_text.owner=? and code_text.fid=?"
+            cur.execute(sql, [selected_coder, fid])
+            excludes_result = cur.fetchall()
+
+            #final_matches_list = []
+            #one_line_results_list = []
+            for c in coded_results:
+                matching_codes_list = []
+                # Get all coded matching text segment data
+                for c2 in coded_results:
+                    if c[2] == c2[2] and c[3] == c2[3] and c[0] != c2[0]:
+                        matching_codes_list.append(c2)
+                if matching_codes_list:
+                    matching_codes_list.append(c)
+                # Remove from result if the matching data is in the excludes list
+                for excludes in excludes_result:
+                    if c[2] == excludes[2] and c[3] == excludes[3]:
+                        matching_codes_list = []
+                # Sort lists by cid. Helps to remove duplicated differing order matches.
+                matching_codes_list.sort()
+                # checkbox NOT checked. So all exact matching codes must be present at coded segment.
+                if not any_selected_codes and len(matching_codes_list) != len(selected_codes):
+                    matching_codes_list = []
+                # Add resulting list to final results. Check if there is a need to include specified text.
+                if matching_codes_list and matching_codes_list not in final_matches_list:
+                    final_matches_list.append(matching_codes_list)
+                    # Create one line result
+                    one_line_results = list(matching_codes_list[0])
+                    one_line_results[0] = str(one_line_results[0])  # cid
+                    #one_line_results[5] = ""  # coded memo
+                    for row in range(1, len(matching_codes_list)):
+                        one_line_results[0] += f", {str(matching_codes_list[row][0])}"  # cid
+                        one_line_results[1] += f"|{matching_codes_list[row][1]}"  # codename
+                        one_line_results[5] += f"|{matching_codes_list[row][5]}"  # coded segment memo
+                    one_line_results_list.append(one_line_results)
+
         # Each rows displayed
         for match_list in final_matches_list:
             for match_item in match_list:
