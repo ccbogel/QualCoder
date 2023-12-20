@@ -189,7 +189,10 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
 
     def get_exact_text_matches(self):
         """ Use selected, coder, file and codes (2 or more).
-        All selected codes mus tbe present for the match. """
+        All selected codes mus tbe present for the match.
+        Create two sets of results:
+            One row per coded segment per code; one row collating all codes at one coded segment.
+        """
 
         selected_coder = self.ui.comboBox_coders.currentText()
         try:
@@ -236,7 +239,7 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
 
         values = [selected_coder, fid]
         cur = self.app.conn.cursor()
-        sql = "select code_text.cid, pos0,pos1, code_name.name, substr(source.fulltext,pos0, 1+pos1-pos0), "
+        sql = "select code_text.cid, code_name.name, pos0,pos1, substr(source.fulltext,pos0, 1+pos1-pos0), "
         sql += " ifnull(code_text.memo,''), source.id, source.name, code_text.owner "
         sql += " from code_text join code_name on code_name.cid=code_text.cid "
         sql += " join source on source.id=code_text.fid "
@@ -261,13 +264,13 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
             matching_codes_list = []
             # Get all coded matching text segment data
             for c2 in coded_results:
-                if c[1] == c2[1] and c[2] == c2[2] and c[0] != c2[0]:
+                if c[2] == c2[2] and c[3] == c2[3] and c[0] != c2[0]:
                     matching_codes_list.append(c2)
             if matching_codes_list:
                 matching_codes_list.append(c)
             # Remove from result if the matching data is in the excludes list
             for excludes in excludes_result:
-                if c[1] == excludes[1] and c[2] == excludes[2]:
+                if c[2] == excludes[2] and c[3] == excludes[3]:
                     matching_codes_list = []
             # Sort lists by cid. Helps to remove duplicated differing order matches.
             matching_codes_list.sort()
@@ -280,10 +283,11 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
                 # Create one line result
                 one_line_results = list(matching_codes_list[0])
                 one_line_results[0] = str(one_line_results[0])  # cid
-                one_line_results[5] = ""  # coded memo
+                #one_line_results[5] = ""  # coded memo
                 for row in range(1, len(matching_codes_list)):
                     one_line_results[0] += f", {str(matching_codes_list[row][0])}"  # cid
-                    one_line_results[3] += f"|{matching_codes_list[row][3]}"  # codename
+                    one_line_results[1] += f"|{matching_codes_list[row][1]}"  # codename
+                    one_line_results[5] += f"|{matching_codes_list[row][5]}"  # coded segment memo
                 one_line_results_list.append(one_line_results)
 
         self.results_display = []
@@ -381,7 +385,7 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
                     self.ui.tableWidget.setRowHidden(r, True)
         if action == action_filter_greater:
             val_type = "str"
-            if col in (0, 1, 2):
+            if col in (0, 2, 3):
                 val_type = "int"
             for r in range(0, self.ui.tableWidget.rowCount()):
                 self.ui.tableWidget.setRowHidden(r, False)
@@ -391,7 +395,7 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
                     self.ui.tableWidget.setRowHidden(r, True)
         if action == action_filter_lower:
             val_type = "str"
-            if col in (0, 1, 2):
+            if col in (0, 2, 3):
                 val_type = "int"
             for r in range(0, self.ui.tableWidget.rowCount()):
                 self.ui.tableWidget.setRowHidden(r, False)
@@ -413,9 +417,9 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
                     code_color = c['color']
         # data: dictionary: codename, color, file_or_casename, pos0, pos1, text, coder, fid, file_or_case,
         # textedit_start, textedit_end
-        data = {'pos0':  int(self.ui.tableWidget.item(row, 1).text()),
-                'pos1': int(self.ui.tableWidget.item(row, 2).text()),
-                'codename': self.ui.tableWidget.item(row, 3).text(), 'color': code_color, 'text': '',
+        data = {'codename': self.ui.tableWidget.item(row, 1).text(), 'color': code_color, 'text': '',
+                'pos0':  int(self.ui.tableWidget.item(row, 2).text()),
+                'pos1': int(self.ui.tableWidget.item(row, 3).text()),
                 'fid': int(self.ui.tableWidget.item(row, 6).text()),
                 'file_or_casename': self.ui.tableWidget.item(row, 7).text(),
                 'coder': self.ui.tableWidget.item(row, 8).text(), 'file_or_case': 'File'}
@@ -427,28 +431,31 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         """ A table of matching coded text segments. """
 
         cid = 0
-        pos0 = 1
-        pos1 = 2
-        code_name = 3
+        code_name = 1
+        pos0 = 2
+        pos1 = 3
         sel_text = 4
         coded_memo = 5
         fid = 6
         file_name = 7
         coder = 8
 
-        col_names = ["cid", "pos0", "pos1", _("code name"), _("text"), _("Coded memo"), "fid", "File name", "Coder"]
+        col_names = ["cid", _("code name"), "pos0", "pos1", _("text"), _("Coded memo"), "fid", _("File name"), _("Coder")]
         self.ui.tableWidget.setColumnCount(len(col_names))
         self.ui.tableWidget.setHorizontalHeaderLabels(col_names)
         rows = self.ui.tableWidget.rowCount()
         for r in range(0, rows):
             self.ui.tableWidget.removeRow(0)
-
         for r, match_item in enumerate(self.results_display):
             self.ui.tableWidget.insertRow(r)
             item = QtWidgets.QTableWidgetItem()
             item.setData(QtCore.Qt.ItemDataRole.DisplayRole, match_item[cid])
             item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget.setItem(r, cid, item)
+            item = QtWidgets.QTableWidgetItem()
+            item.setData(QtCore.Qt.ItemDataRole.DisplayRole, match_item[code_name])
+            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
+            self.ui.tableWidget.setItem(r, code_name, item)
             item = QtWidgets.QTableWidgetItem()
             item.setData(QtCore.Qt.ItemDataRole.DisplayRole, match_item[pos0])
             item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
@@ -457,9 +464,6 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
             item.setData(QtCore.Qt.ItemDataRole.DisplayRole, match_item[pos1])
             item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget.setItem(r, pos1, item)
-            item = QtWidgets.QTableWidgetItem(match_item[code_name])
-            item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
-            self.ui.tableWidget.setItem(r, code_name, item)
             item = QtWidgets.QTableWidgetItem()
             item.setData(QtCore.Qt.ItemDataRole.DisplayRole, match_item[sel_text])
             item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
@@ -468,7 +472,6 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
             item.setData(QtCore.Qt.ItemDataRole.DisplayRole, match_item[coded_memo])
             item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget.setItem(r, coded_memo, item)
-
             item = QtWidgets.QTableWidgetItem()
             item.setData(QtCore.Qt.ItemDataRole.DisplayRole, match_item[fid])
             item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
@@ -482,7 +485,6 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
             item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget.setItem(r, coder, item)
         self.ui.tableWidget.hideColumn(fid)
-        self.ui.tableWidget.hideColumn(file_name)
         self.ui.tableWidget.hideColumn(coder)
         self.ui.tableWidget.resizeColumnsToContents()
         self.ui.tableWidget.setColumnWidth(sel_text, 1000)
@@ -497,7 +499,7 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         wb = openpyxl.Workbook()
         ws = wb.active
         # Column headings
-        col_headings = ["cid", "pos0", "pos1", "Code name", "Text", "Coded memo"]
+        col_headings = ["cid", "Code name", "pos0", "pos1", "Text", "Coded memo", "File name"]
         row = 1
         for col, code in enumerate(col_headings):
             ws.cell(column=col + 1, row=row, value=code)
@@ -507,7 +509,8 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
             ws.cell(column=3, row=row + 2, value=data[2])
             ws.cell(column=4, row=row + 2, value=data[3])
             ws.cell(column=5, row=row + 2, value=data[4])
-            ws.cell(column=6, row=row + 2, value=data[4])
+            ws.cell(column=6, row=row + 2, value=data[5])
+            ws.cell(column=7, row=row + 2, value=data[7])
         filepath, ok = QtWidgets.QFileDialog.getSaveFileName(self,
                                                              _("Save Excel File"), self.app.settings['directory'],
                                                              "XLSX Files(*.xlsx)",
@@ -616,9 +619,6 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         action_exclude_code = None
         if selected is not None and selected.text(1)[0:3] == 'cid':
             action_exclude_code = menu.addAction(_("Exclude code"))
-        '''action_restore_excluded_codes = None
-        if self.excluded_codes:
-            action_restore_excluded_codes = menu.addAction(_("Remove code exclusions"))'''
 
         action = menu.exec(self.ui.treeWidget.mapToGlobal(position))
         if action == action_clear_selected:
@@ -629,12 +629,6 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
                 item[1].setIcon(0, QtGui.QIcon())
             self.excluded_codes = []
             return
-
-        '''if action == action_restore_excluded_codes:
-            print("TODO Inc")
-            for item in self.excluded_codes:
-                item[1].setIcon(0, QtGui.QIcon())
-            self.excluded_codes = []'''
 
         if action == action_exclude_code:
             if selected.text(1)[0:3] != 'cid':
