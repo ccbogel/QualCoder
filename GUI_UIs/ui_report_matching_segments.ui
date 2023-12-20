@@ -180,7 +180,7 @@
        </rect>
       </property>
       <property name="text">
-       <string>Select 1 file, 1 coder, 2 or more codes. Can exclude results by excluding a code (right click on code).</string>
+       <string>Select file(s), coder, 2 or more codes. Can exclude results by excluding a code (right click on code).</string>
       </property>
       <property name="wordWrap">
        <bool>true</bool>
@@ -208,6 +208,9 @@ Checked - any selected codes must match exactly.</string>
         <width>161</width>
         <height>20</height>
        </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Matching exact coded text for multiple codes are collated into one line.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string>One line results</string>
