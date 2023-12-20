@@ -73,15 +73,13 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
     codes = []
     coders = []
     files = []
-    result_relations = []
-    result_summary = []
-    dataframe = None
+    results_display = []
     excluded_codes = []
     excluded_icon = None
 
     def __init__(self, app, parent_textedit):
 
-        self.matches_display = []
+        self.results_display = []
         sys.excepthook = exception_handler
         self.app = app
         self.parent_textEdit = parent_textedit
@@ -100,10 +98,6 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(delete_icon))
         self.excluded_icon = QtGui.QIcon(pm)
-
-        self.result_relations = []
-        self.result_summary = []
-        self.dataframe = None
         self.get_data()
 
         try:
@@ -198,7 +192,6 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         All selected codes mus tbe present for the match. """
 
         selected_coder = self.ui.comboBox_coders.currentText()
-        #print("selected coder: ", selected_coder)
         try:
             file_name = self.ui.listWidget_files.currentItem().text()
         except AttributeError:
@@ -241,16 +234,20 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         any_selected_codes = self.ui.checkBox_any_matches.isChecked()
         # if False - ALL selected codes must match
 
+        values = [selected_coder, fid]
         cur = self.app.conn.cursor()
         sql = "select code_text.cid, pos0,pos1, code_name.name, substr(source.fulltext,pos0, 1+pos1-pos0), "
         sql += " ifnull(code_text.memo,''), source.id, source.name, code_text.owner "
         sql += " from code_text join code_name on code_name.cid=code_text.cid "
         sql += " join source on source.id=code_text.fid "
         sql += f" where code_text.cid in ({selected_codes_string}) "
-        sql += "and code_text.owner=? and code_text.fid=? "
-        sql += "order by code_name.name, pos0"
-        cur.execute(sql, [selected_coder, fid])
-        coded_result = cur.fetchall()
+        if includes_text != "":
+            sql += " and instr(substr(source.fulltext,pos0, 1+pos1-pos0), ?) > 0 "
+            values = [includes_text, selected_coder, fid]
+        sql += " and code_text.owner=? and code_text.fid=? "
+        sql += " order by code_name.name, pos0"
+        cur.execute(sql, values)
+        coded_results = cur.fetchall()
 
         sql = f"select code_text.cid, pos0,pos1 from code_text where "
         sql += f" code_text.cid in ({excluded_cids_string}) "
@@ -259,10 +256,11 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         excludes_result = cur.fetchall()
 
         final_matches_list = []
-        for c in coded_result:
+        one_line_results_list = []
+        for c in coded_results:
             matching_codes_list = []
             # Get all coded matching text segment data
-            for c2 in coded_result:
+            for c2 in coded_results:
                 if c[1] == c2[1] and c[2] == c2[2] and c[0] != c2[0]:
                     matching_codes_list.append(c2)
             if matching_codes_list:
@@ -278,19 +276,21 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
                 matching_codes_list = []
             # Add resulting list to final results. Check if there is a need to include specified text.
             if matching_codes_list and matching_codes_list not in final_matches_list:
-                if includes_text == "":
-                    final_matches_list.append(matching_codes_list)
-                else:
-                    if includes_text in matching_codes_list[0][4]:
-                        final_matches_list.append(matching_codes_list)
+                final_matches_list.append(matching_codes_list)
+                # Create one line result
+                one_line_results = list(matching_codes_list[0])
+                one_line_results[0] = str(one_line_results[0])  # cid
+                one_line_results[5] = ""  # coded memo
+                for row in range(1, len(matching_codes_list)):
+                    one_line_results[0] += f", {str(matching_codes_list[row][0])}"  # cid
+                    one_line_results[3] += f"|{matching_codes_list[row][3]}"  # codename
+                one_line_results_list.append(one_line_results)
 
-        self.matches_display = []
+        self.results_display = []
+        # Each rows displayed
         for match_list in final_matches_list:
-            #print("========")
             for match_item in match_list:
-                #print(match_item)
-                self.matches_display.append(match_item)
-            #self.matches_display.append(["", "", "", "", ""])  # spacer
+                self.results_display.append(match_item)
         if len(final_matches_list) == 0:
             msg = _("No exact matches found.") + "\n"
             if not any_selected_codes:
@@ -300,6 +300,10 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
             for r in range(0, rows):
                 self.ui.tableWidget.removeRow(0)
             return
+
+        # Replace self.results_display if one line resulst is chosen
+        if self.ui.checkBox_one_line.isChecked():
+            self.results_display = one_line_results_list
         self.fill_table()
 
     #TODO
@@ -402,10 +406,11 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         """
 
         row = self.ui.tableWidget.currentRow()
-        code_color = "#777777"
-        for c in self.codes:
-            if c['cid'] == int(self.ui.tableWidget.item(row, 0).text()):
-                code_color = c['color']
+        code_color = "#888888"
+        if self.ui.tableWidget.item(row, 0).text().isdigit():
+            for c in self.codes:
+                if c['cid'] == int(self.ui.tableWidget.item(row, 0).text()):
+                    code_color = c['color']
         # data: dictionary: codename, color, file_or_casename, pos0, pos1, text, coder, fid, file_or_case,
         # textedit_start, textedit_end
         data = {'pos0':  int(self.ui.tableWidget.item(row, 1).text()),
@@ -437,7 +442,8 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         rows = self.ui.tableWidget.rowCount()
         for r in range(0, rows):
             self.ui.tableWidget.removeRow(0)
-        for r, match_item in enumerate(self.matches_display):
+
+        for r, match_item in enumerate(self.results_display):
             self.ui.tableWidget.insertRow(r)
             item = QtWidgets.QTableWidgetItem()
             item.setData(QtCore.Qt.ItemDataRole.DisplayRole, match_item[cid])
@@ -486,7 +492,7 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         """ Export exact match text codings for all codes as excel file.
         Output ordered by filename and code name ascending. """
 
-        if len(self.matches_display) == 0:
+        if len(self.results_display) == 0:
             return
         wb = openpyxl.Workbook()
         ws = wb.active
@@ -495,7 +501,7 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         row = 1
         for col, code in enumerate(col_headings):
             ws.cell(column=col + 1, row=row, value=code)
-        for row, data in enumerate(self.matches_display):
+        for row, data in enumerate(self.results_display):
             ws.cell(column=1, row=row + 2, value=data[0])
             ws.cell(column=2, row=row + 2, value=data[1])
             ws.cell(column=3, row=row + 2, value=data[2])
