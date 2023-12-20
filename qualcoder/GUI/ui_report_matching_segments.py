@@ -64,6 +64,9 @@ class Ui_DialogMatchingTextSegments(object):
         self.checkBox_any_matches = QtWidgets.QCheckBox(parent=self.groupBox)
         self.checkBox_any_matches.setGeometry(QtCore.QRect(340, 63, 621, 31))
         self.checkBox_any_matches.setObjectName("checkBox_any_matches")
+        self.checkBox_one_line = QtWidgets.QCheckBox(parent=self.groupBox)
+        self.checkBox_one_line.setGeometry(QtCore.QRect(680, 70, 161, 20))
+        self.checkBox_one_line.setObjectName("checkBox_one_line")
         self.verticalLayout.addWidget(self.groupBox)
         self.groupBox_2 = QtWidgets.QGroupBox(parent=DialogMatchingTextSegments)
         self.groupBox_2.setTitle("")
@@ -112,6 +115,7 @@ class Ui_DialogMatchingTextSegments(object):
         self.label_instructions.setText(_translate("DialogMatchingTextSegments", "Select 1 file, 1 coder, 2 or more codes. Can exclude results by excluding a code (right click on code)."))
         self.checkBox_any_matches.setText(_translate("DialogMatchingTextSegments", "Unchecked - all selected codes must match exactly.\n"
 "Checked - any selected codes must match exactly."))
+        self.checkBox_one_line.setText(_translate("DialogMatchingTextSegments", "One line results"))
 
 
 if __name__ == "__main__":
