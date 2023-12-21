@@ -256,8 +256,6 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
             cur.execute(sql, [selected_coder, fid])
             excludes_result = cur.fetchall()
 
-            #final_matches_list = []
-            #one_line_results_list = []
             for c in coded_results:
                 matching_codes_list = []
                 # Get all coded matching text segment data
@@ -286,6 +284,8 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
                         one_line_results[0] += f", {str(matching_codes_list[row][0])}"  # cid
                         one_line_results[1] += f"|{matching_codes_list[row][1]}"  # codename
                         one_line_results[5] += f"|{matching_codes_list[row][5]}"  # coded segment memo
+                    if one_line_results[5] == "||":
+                        one_line_results[5] = ""
                     one_line_results_list.append(one_line_results)
 
         # Each rows displayed
