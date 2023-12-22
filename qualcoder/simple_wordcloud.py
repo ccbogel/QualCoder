@@ -106,7 +106,7 @@ stopwords = ["a", "about", "above", "after", "again", "against", "all", "am", "a
              "w", "was", "wasn't", "we", "we're", "we've", "were", "weren't", "what",
              "what's", "when", "where", "which", "while",
              "who", "who's", "whom", "why", "will", "with", "would", "wouldn't",
-             "x", "y", "you", "you'd", "you'ld", "you're", "your", "yours", "yourself", "yourselves", "z"]
+             "x", "y", "you", "you'd", "you'ld", "you're", "you've", "your", "yours", "yourself", "yourselves", "z"]
 
 
 class Wordcloud:
