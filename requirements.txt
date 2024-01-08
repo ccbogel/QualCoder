@@ -1,0 +1,15 @@
+chardet==5.2.0
+EbookLib==0.18
+openpyxl==3.1.2
+pandas==2.1.1
+pdfminer.six==20221105
+Pillow==10.0.1
+plotly==5.17.0
+ply==3.11
+pydub==0.25.1
+PyQt6==6.5.2
+python-vlc==3.0.18122
+rispy==0.8.1
+six==1.16.0
+SpeechRecognition==3.10.0
+
