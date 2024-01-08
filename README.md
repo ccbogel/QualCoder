@@ -69,7 +69,7 @@ env\Scripts\activate
 py -m pip install --upgrade pip
 ```
 
-Type the following to install the nedded modules. (If yo uare installing an older QualCoder (3.3 or 3.4 version) also add *wordcloud* to the below list of imports.
+Type the following to install the nedded modules. (If you are installing an older QualCoder (3.3 or 3.4 version) also add *wordcloud* to the below list of imports.
 
 ```bash
 py -m pip install wheel pyqt6 chardet ebooklib openpyxl Pillow ply pdfminer.six pandas plotly pydub python-vlc rispy SpeechRecognition
