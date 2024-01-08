@@ -53,6 +53,8 @@ cd Downloads\QualCoder-master
 
 6. Install and activate the virtual environment. This step can be skipped, but I recommend you do not skip it.
 
+The `py` command uses the most recent installed version of Python the `py` command does not work on all Windows OS, you may instead replace `py` with `python3` You can use a specific version on your Windows if you have many Python versions installed, e.g. `py -3.10`  See discussion here: [Difference between py and python](https://stackoverflow.com/questions/50896496/what-is-the-difference-between-py-and-python-in-the-terminal)
+
 When not using a docker container, we recommend using a virtual environment to install packages. This will ensure that the dependencies for QualCoder are isolated from the rest of your system. On someWindows OS you may need to replace the _py_ command with _python3_ below: 
 
 ```bash
@@ -77,13 +79,11 @@ py -m pip install wheel pyqt6 chardet ebooklib openpyxl Pillow ply pdfminer.six 
 
  Note: on some Windows computers, you may have to type `python3` instead of `py` as `py` may not be recognised.
  
-8. Install Qualcoder, from the downloaded folder and type
+~8. Install Qualcoder, from the downloaded folder and type
 
 ```bash
 py -m pip install .
-```
-
-The `py` command uses the most recent installed version of Python. You can use a specific version on your Windows if you have many Python versions installed, e.g. `py -3.10`  See discussion here: [Difference between py and python](https://stackoverflow.com/questions/50896496/what-is-the-difference-between-py-and-python-in-the-terminal)
+```~
 
 9. Run QualCoder from the command prompt
 
