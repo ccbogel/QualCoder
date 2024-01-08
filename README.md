@@ -78,20 +78,14 @@ py -m pip install wheel pyqt6 chardet ebooklib openpyxl Pillow ply pdfminer.six 
  Wait, until all modules are installed.
 
  Note: on some Windows computers, you may have to type `python3` instead of `py` as `py` may not be recognised.
- 
-~8. Install Qualcoder, from the downloaded folder and type
 
-```bash
-py -m pip install .
-```~
-
-9. Run QualCoder from the command prompt
+8. Run QualCoder from the command prompt
 
 ```bash
 py -m qualcoder
 ```
 
-10. If running QualCoder in a virtual environment, to exit the virtual environment type:
+9. If running QualCoder in a virtual environment, to exit the virtual environment type:
 
 `deactivate`
 
