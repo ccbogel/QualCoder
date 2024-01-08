@@ -45,7 +45,7 @@ IMPORTANT: in the first window of the installation mark the option "Add Python t
 
 4. Use the Windows command prompt. Type "cmd" in the Windows Start search engine, and click on the black software "cmd.exe" - the command console for Windows. In the console type or paste, using the right-click mouse copy and paste (ctrl+v does not work)
 
-5. In the command prompt, move (using the `cd` command) into the QualCoder folder. You should be inside the QualCoder-master folder or if using a release (the Qualcoder-3.4 folder). e.g. 
+5. In the command prompt, move (using the `cd` command) into the QualCoder folder. You should be inside the QualCoder-master folder or if using a release (the Qualcoder-3.5 folder). e.g. 
 
 ```bash
 cd Downloads\QualCoder-master
@@ -107,7 +107,7 @@ If you are using a virtual environment:
 
 ### Debian/Ubuntu Linux
 
-There is an executable file (double-click to run) for Ubuntu 22 in the 3.4 release. Alternatively, install from source code below.
+There is an executable file (double-click to run) for Ubuntu 22 in the 3.5 release. Alternatively, install from source code below.
 It is best to run QualCoder inside a Python virtual environment so that the system-installed python modules do not clash and cause problems. If you are using the alternative Ubuntu Desktop manager **Xfce** you may need to run this: `sudo apt install libxcb-cursor0`
 
 1. Recommend that you install vlc (download from site) or:
@@ -126,7 +126,7 @@ I am using python3.10  you can choose another recent version if you prefer, and 
 3. Download and unzip the Qualcoder folder.
 
 4. Open a terminal and move (cd) into that folder. 
-You should be inside the QualCoder-master folder or if using a release, e.g. the Qualcoder-3.4 folder.
+You should be inside the QualCoder-master folder or if using a release, e.g. the Qualcoder-3.5 folder.
 Inside the QualCoder-master folder:
 
 `python3.10 -m venv qualcoder`
@@ -214,7 +214,7 @@ You will need to install developer tools for macOS. [See https://www.cnet.com/te
 
 1) Install recent versions of [Python3](https://www.python.org/downloads/) and [VLC](https://www.videolan.org/vlc/).
 
-2) Download the latest release "Source code" version in ZIP format, from the releases section of the project here on Github: https://github.com/ccbogel/QualCoder/releases/tag/3.4 and extract it into /Applications
+2) Download the latest release "Source code" version in ZIP format, from the releases section of the project here on Github: https://github.com/ccbogel/QualCoder/releases/tag/3.5 and extract it into /Applications
 
 3) Open the Terminal app (or any other command shell)
 
@@ -239,17 +239,17 @@ Be sure that you are in the QualCoder-Master directory before doing Step 6.
 
 To change the directory, enter or copy and run the script below.
 
-`cd /Applications/QualCoder-3.4`
+`cd /Applications/QualCoder-3.5`
 
 6) From the QualCoder-Master directory run the setup script:
 
 `python3 -m pip install .`
 
 
-Assuming you downloaded the 3.4 version. You can now run with:
+Assuming you downloaded the 3.5 version. You can now run with:
 
 ```
-python3 /applications/QualCoder-3.4/qualcoder/__main__.py
+python3 /applications/QualCoder-3.5/qualcoder/__main__.py
 ```
 
 Alternative commands to run QualCoder (Suggestions):
@@ -296,8 +296,8 @@ QualCoder is distributed under the MIT LICENSE.
 
 ##  Citation APA style
 
-Curtain, C. (2023) QualCoder 3.4 [Computer software]. Retrieved from
-https://github.com/ccbogel/QualCoder/releases/tag/3.4
+Curtain, C. (2023) QualCoder 3.5 [Computer software]. Retrieved from
+https://github.com/ccbogel/QualCoder/releases/tag/3.5
 
 ## Creator
 
