@@ -1,0 +1,15 @@
+chardet
+EbookLib
+openpyxl
+pandas
+pdfminer.six
+Pillow
+plotly
+ply
+pydub
+PyQt6
+python-vlc
+rispy
+six
+SpeechRecognition
+
