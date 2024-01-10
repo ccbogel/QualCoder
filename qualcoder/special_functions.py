@@ -165,8 +165,8 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
 
         file_types = "Text Files (*.docx *.epub *.html *.htm *.md *.odt *.pdf *.txt)"
         filepath, ok = QtWidgets.QFileDialog.getOpenFileNames(None, _('Replacement file'),
-                                                              self.app.settings['directory'], file_types,
-                                                              options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
+                                                              self.app.settings['directory'], file_types)
+        # options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
         if not ok or filepath == []:
             self.ui.pushButton_select_replacement_text_file.setToolTip(_("Select replacement text file"))
             return

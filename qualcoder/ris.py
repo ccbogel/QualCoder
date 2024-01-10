@@ -300,10 +300,8 @@ class RisImport:
         self.parent_text_edit = parent_text_edit
         response = QtWidgets.QFileDialog.getOpenFileNames(None, _('Select RIS references file'),
                                                           self.app.settings['directory'],
-                                                          "(*.txt *.ris *.RIS)",
-                                                          options=QtWidgets.QFileDialog.Option.DontUseNativeDialog
-                                                          )
-        # print("Response ", response)
+                                                          "(*.txt *.ris *.RIS)")
+        # options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
         imports = response[0]
         if imports:
             self.create_file_attributes()

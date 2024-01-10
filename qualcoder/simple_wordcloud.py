@@ -305,8 +305,8 @@ class Wordcloud:
         webbrowser.open(temp_filepath)
         filepath, ok = QtWidgets.QFileDialog.getSaveFileName(None, _("Save wordcloud"),
                                                              self.app.settings['directory'],
-                                                             "PNG Files(*.png)",
-                                                             options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
+                                                             "PNG Files(*.png)")
+        # options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
         if filepath is None or not ok:
             return
         if filepath[-3:] != ".png":

@@ -65,9 +65,8 @@ class RqdaImport:
         self.app = app
         self.parent_textEdit = parent_textedit
         response = QtWidgets.QFileDialog.getOpenFileName(None, _('Select RQDA file'),
-                                                         self.app.settings['directory'], "*.rqda",
-                                                         options=QtWidgets.QFileDialog.Option.DontUseNativeDialog
-                                                         )
+                                                         self.app.settings['directory'], "*.rqda")
+        # options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
         if response[0] == "":
             return
         self.file_path = response[0]

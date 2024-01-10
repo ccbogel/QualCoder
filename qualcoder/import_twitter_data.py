@@ -106,9 +106,8 @@ class DialogImportTwitterData(QtWidgets.QDialog):
          Called by: __init__ """
 
         response = QtWidgets.QFileDialog.getOpenFileNames(None, _('Select Twitter csv file'),
-                                                          self.app.settings['directory'], "(*.csv)",
-                                                          options=QtWidgets.QFileDialog.Option.DontUseNativeDialog
-                                                          )
+                                                          self.app.settings['directory'], "(*.csv)")
+        # options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
         self.filepath = response[0]
         if not self.filepath:
             #self.parent_textEdit.append(_("File not imported."))

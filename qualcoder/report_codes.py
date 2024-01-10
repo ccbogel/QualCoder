@@ -627,8 +627,8 @@ class DialogReportCodes(QtWidgets.QDialog):
             return
         filepath, ok = QtWidgets.QFileDialog.getSaveFileName(self,
                                                             _("Save Text File"), self.app.settings['directory'],
-                                                            "Text Files(*.txt)",
-                                                            options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
+                                                            "Text Files(*.txt)")
+        # options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
         if filepath is None or not ok:
             return
         if filepath[-4:] != ".txt":
@@ -653,8 +653,8 @@ class DialogReportCodes(QtWidgets.QDialog):
             return
         filepath, ok = QtWidgets.QFileDialog.getSaveFileName(self,
                                                             _("Save Open Document Text File"), self.app.settings['directory'],
-                                                            "ODT Files(*.odt)",
-                                                            options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
+                                                            "ODT Files(*.odt)")
+        # options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
         if filepath is None or not ok:
             return
         if filepath[-4:] != ".odt":
@@ -747,8 +747,8 @@ class DialogReportCodes(QtWidgets.QDialog):
                         row += 1
         filepath, ok = QtWidgets.QFileDialog.getSaveFileName(self,
                                                             _("Save CSV File"), self.app.settings['directory'],
-                                                            "CSV Files(*.csv)",
-                                                            options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
+                                                            "CSV Files(*.csv)")
+        # options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
         if filepath is None or not ok:
             return
         if filepath[-4:] != ".csv":
@@ -805,8 +805,8 @@ class DialogReportCodes(QtWidgets.QDialog):
                 ws.cell(column=6 + i, row=1, value='Category')  # Headings
         filepath, ok = QtWidgets.QFileDialog.getSaveFileName(self,
                                                             _("Save Excel File"), self.app.settings['directory'],
-                                                            "XLSX Files(*.xlsx)",
-                                                            options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
+                                                            "XLSX Files(*.xlsx)")
+        # options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
         if filepath is None or not ok:
             return
         if filepath[-4:] != ".xlsx":
@@ -855,8 +855,8 @@ class DialogReportCodes(QtWidgets.QDialog):
             return
         filepath, ok = QtWidgets.QFileDialog.getSaveFileName(self,
                                                             _("Save HTML File"), self.app.settings['directory'],
-                                                            "HTML Files(*.html)",
-                                                            options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
+                                                            "HTML Files(*.html)")
+        # options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
         if filepath is None or not ok:
             return
         if filepath[-5:] != ".html":

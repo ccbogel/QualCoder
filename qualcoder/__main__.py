@@ -1620,8 +1620,8 @@ class MainWindow(QtWidgets.QMainWindow):
         if self.app.settings['directory'] == "":
             self.app.settings['directory'] = os.path.expanduser('~')
         project_path = QtWidgets.QFileDialog.getSaveFileName(self,
-                                                             _("Enter project name"), self.app.settings['directory'],
-                                                             options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
+                                                             _("Enter project name"), self.app.settings['directory'])
+        # options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
         project_path = project_path[0]
         if project_path == "":
             Message(self.app, _("Project"), _("No project created."), "critical").exec()

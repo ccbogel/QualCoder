@@ -510,8 +510,8 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
             ws.cell(column=7, row=row + 2, value=data[7])
         filepath, ok = QtWidgets.QFileDialog.getSaveFileName(self,
                                                              _("Save Excel File"), self.app.settings['directory'],
-                                                             "XLSX Files(*.xlsx)",
-                                                             options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
+                                                             "XLSX Files(*.xlsx)")
+        # options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
         if filepath is None or not ok:
             return
         if filepath[-4:] != ".xlsx":
