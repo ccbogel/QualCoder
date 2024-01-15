@@ -1,7 +1,6 @@
 <img src="https://github.com/ccbogel/QualCoder/blob/master/qualcoder.png" width=200 height=200>
 
 # QualCoder AI (beta)
-QualCoder is a qualitative data analysis application written in Python.
 
 <table>
   <thead>
@@ -15,6 +14,7 @@ QualCoder is a qualitative data analysis application written in Python.
   <tbody>
     <tr>
       <td>      
+
 This version was created by [Kai Dröge](https://www.hslu.ch/de-ch/hochschule-luzern/ueber-uns/personensuche/profile/?pid=823), based on QualCoder 3.5
 
 I hope that my additions will be integrated in the main version at some point, but this may take a while. Until then, you can use the AI-enhanced version alongside the regular QualCoder. Both apps will not interfere with each other.
@@ -32,8 +32,8 @@ MacOS/Linux: Follow the [installation instructions below](#installation-1) (unte
 
 ### Setup:
 - QualCoder AI needs some additional setup to run it's AI-enhanced functions. When you start the app for the first time, a wizard will pop up and lead you through the setup process. These are the main steps:
- - You'll need an API key from OpenAI. Go to https://platform.openai.com/, create an account and click on 'API keys' in the menu on the very left. 
- - QualCoder AI will automatically download some additional components which are needed to analyze your documents locally (this model: https://huggingface.co/intfloat/multilingual-e5-large). This will take a while, please be patient.
+  - You'll need an API key from OpenAI. Go to https://platform.openai.com/, create an account and click on 'API keys' in the menu on the very left. 
+  - QualCoder AI will automatically download some additional components which are needed to analyze your documents locally (this model: https://huggingface.co/intfloat/multilingual-e5-large). This will take a while, please be patient.
 - If you want to enable/disable the AI functionality later or change the OpenAI API key, go to Project > Settings and scroll to the bottom.
 
 ### Usage:
@@ -53,6 +53,8 @@ MacOS/Linux: Follow the [installation instructions below](#installation-1) (unte
 </table>
 
 **The rest of this document is from the regular version of QualCoder (with some small updates regarding the AI-based version).**
+
+QualCoder is a qualitative data analysis application written in Python.
 
 Text files can be typed in manually or loaded from txt, odt, docx, html, htm, md, epub, and  PDF files. Images, video, and audio can also be imported for coding. Codes can be assigned to text, images, and a/v selections and grouped into categories in a hierarchical fashion. Various types of reports can be produced including visual coding graphs, coder comparisons, and coding frequencies.
 
@@ -166,7 +168,6 @@ If you are using a virtual environment:
 
 ### Debian/Ubuntu Linux
 
-There is an executable file (double-click to run) for Ubuntu 22 in the 3.4 release. Alternatively, install from source code below.
 It is best to run QualCoder inside a Python virtual environment so that the system-installed python modules do not clash and cause problems. If you are using the alternative Ubuntu Desktop manager **Xfce** you may need to run this: `sudo apt install libxcb-cursor0`
 
 1. Recommend that you install vlc (download from site) or:
