@@ -1852,7 +1852,8 @@ class DialogManageFiles(QtWidgets.QDialog):
             msg += _("Deleted file: ") + s['name'] + "\n"
             self.files_renamed = [x for x in self.files_renamed if not (s['id'] == x.get('fid'))]
             # Delete text source
-            if s['mediapath'] is None or s['mediapath'][0:5] == 'docs:' or s['mediapath'][0:6] == '/docs/':
+            if s['mediapath'] is None or s['mediapath'] == "" or s['mediapath'][0:5] == 'docs:' \
+                    or s['mediapath'][0:6] == '/docs/':
                 try:
                     if s['mediapath'] is None:
                         # Legacy for older < 3.4 QualCoder projects
@@ -1869,7 +1870,8 @@ class DialogManageFiles(QtWidgets.QDialog):
                 cur.execute("delete from attribute where attr_type ='file' and id=?", [s['id']])
                 self.app.conn.commit()
             # Delete image, audio or video source
-            if s['mediapath'] is not None and s['mediapath'][0:5] != 'docs:' and s['mediapath'][0:6] != '/docs/':
+            if s['mediapath'] is not None and s['mediapath'] != "" and s['mediapath'][0:5] != 'docs:' \
+                    and s['mediapath'][0:6] != '/docs/':
                 # Get linked transcript file id
                 cur.execute("select av_text_id from source where id=?", [s['id']])
                 res = cur.fetchone()
@@ -1939,7 +1941,8 @@ class DialogManageFiles(QtWidgets.QDialog):
         row = rows[0]
         file_id = self.source[row]['id']
         # Delete text source
-        if self.source[row]['mediapath'] is None or self.source[row]['mediapath'][0:5] == 'docs:' or self.source[row]['mediapath'][0:6] == '/docs/':
+        if self.source[row]['mediapath'] is None or self.source[row]['mediapath'] == "" or \
+                self.source[row]['mediapath'][0:5] == 'docs:' or self.source[row]['mediapath'][0:6] == '/docs/':
             try:
                 if self.source[row]['mediapath']:
                     # Legacy for older QualCoder Projects < 3.3
@@ -1958,7 +1961,8 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         # Delete image, audio or video source
         # (why not simply use 'else' instead of this complicated second if-clause?)
-        if self.source[row]['mediapath'] is not None and self.source[row]['mediapath'][0:5] != 'docs:' and self.source[row]['mediapath'][0:6] != '/docs/':
+        if self.source[row]['mediapath'] is not None and self.source[row]['mediapath'] != "" and \
+                self.source[row]['mediapath'][0:5] != 'docs:' and self.source[row]['mediapath'][0:6] != '/docs/':
             # Get linked transcript file id
             cur.execute("select av_text_id from source where id=?", [file_id])
             res = cur.fetchone()
