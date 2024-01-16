@@ -90,7 +90,7 @@ try:
 except Exception as e:
     print(e)
 
-qualcoder_version = "QualCoder 3.5"
+qualcoder_version = "QualCoder 3.6"
 
 path = os.path.abspath(os.path.dirname(__file__))
 home = os.path.expanduser('~')
