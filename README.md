@@ -300,7 +300,7 @@ To change the directory, enter or copy and run the script below.
 You can now run with:
 
 ```
-python3 /applications/QualCoder-ai_integration/qualcoder/__main__.py
+python3 /Applications/QualCoder-ai_integration/qualcoder/__main__.py
 ```
 
 Alternative commands to run QualCoder (Suggestions):
