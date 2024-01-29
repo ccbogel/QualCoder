@@ -1326,8 +1326,9 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.av_dialog_open.mediaplayer.stop()
             self.av_dialog_open = None
         response = QtWidgets.QFileDialog.getOpenFileNames(None, _('Open file'),
-                                                          self.default_import_directory)
-        # options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
+                                                          self.default_import_directory,
+                                                          options=QtWidgets.QFileDialog.Option.DontUseNativeDialog
+                                                          )
         imports = response[0]
         if not imports:
             return
@@ -1584,7 +1585,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         # Import from html
         if import_file[-5:].lower() == ".html" or import_file[-4:].lower() == ".htm":
             import_errors = 0
-            with open(import_file, "r") as sourcefile:
+            with open(import_file, "r", encoding="utf-8", errors="surrogateescape") as sourcefile:
                 html_text = ""
                 while 1:
                     line = sourcefile.readline()
@@ -1852,8 +1853,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             msg += _("Deleted file: ") + s['name'] + "\n"
             self.files_renamed = [x for x in self.files_renamed if not (s['id'] == x.get('fid'))]
             # Delete text source
-            if s['mediapath'] is None or s['mediapath'] == "" or s['mediapath'][0:5] == 'docs:' \
-                    or s['mediapath'][0:6] == '/docs/':
+            if s['mediapath'] is None or s['mediapath'][0:5] == 'docs:' or s['mediapath'][0:6] == '/docs/':
                 try:
                     if s['mediapath'] is None:
                         # Legacy for older < 3.4 QualCoder projects
@@ -1870,8 +1870,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 cur.execute("delete from attribute where attr_type ='file' and id=?", [s['id']])
                 self.app.conn.commit()
             # Delete image, audio or video source
-            if s['mediapath'] is not None and s['mediapath'] != "" and s['mediapath'][0:5] != 'docs:' \
-                    and s['mediapath'][0:6] != '/docs/':
+            if s['mediapath'] is not None and s['mediapath'][0:5] != 'docs:' and s['mediapath'][0:6] != '/docs/':
                 # Get linked transcript file id
                 cur.execute("select av_text_id from source where id=?", [s['id']])
                 res = cur.fetchone()
@@ -1941,8 +1940,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         row = rows[0]
         file_id = self.source[row]['id']
         # Delete text source
-        if self.source[row]['mediapath'] is None or self.source[row]['mediapath'] == "" or \
-                self.source[row]['mediapath'][0:5] == 'docs:' or self.source[row]['mediapath'][0:6] == '/docs/':
+        if self.source[row]['mediapath'] is None or self.source[row]['mediapath'][0:5] == 'docs:' or self.source[row]['mediapath'][0:6] == '/docs/':
             try:
                 if self.source[row]['mediapath']:
                     # Legacy for older QualCoder Projects < 3.3
@@ -1961,8 +1959,7 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         # Delete image, audio or video source
         # (why not simply use 'else' instead of this complicated second if-clause?)
-        if self.source[row]['mediapath'] is not None and self.source[row]['mediapath'] != "" and \
-                self.source[row]['mediapath'][0:5] != 'docs:' and self.source[row]['mediapath'][0:6] != '/docs/':
+        if self.source[row]['mediapath'] is not None and self.source[row]['mediapath'][0:5] != 'docs:' and self.source[row]['mediapath'][0:6] != '/docs/':
             # Get linked transcript file id
             cur.execute("select av_text_id from source where id=?", [file_id])
             res = cur.fetchone()
