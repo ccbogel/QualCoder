@@ -26,9 +26,24 @@ Watch my [video on YouTube](https://www.youtube.com/watch?v=FrQyTOTJhCc):</br>
 
 ### Installation
 
-Installer for windows: https://drive.switch.ch/index.php/s/cYJKPA3JV3fJqDc (switch drive is a secure data sharing platform for Swiss universities)
+Windows: Download "QualCoderAI_WINDOWS_setup.exe" from here: https://drive.switch.ch/index.php/s/cYJKPA3JV3fJqDc (switch drive is a secure data sharing platform for Swiss universities)
 
-MacOS/Linux: Follow the [installation instructions below](#installation-1) (untested)
+MacOS:
+- installer made by [gernophil](https://github.com/gernophil), thank you very much!
+- Make sure to download the right variant: "QualCoderAI_MAC_arm64.dmg" is for Macs with the newer M1/M2/M3 processors, "QualCoderAI_MAC_x86_64_unsigned.dmg" for the older Intel-based machines.
+- Download folder:  https://drive.switch.ch/index.php/s/cYJKPA3JV3fJqDc (switch drive is a secure data sharing platform for Swiss universities)
+- Installation (M1/M2/M3-based Macs): 
+    - Double-click on the downloaded dmg-file, then drag QualCoder AI into the link to your applications folder.
+    - Start QualCoder AI by double-clicking the app within your applications folder.
+- Installation (Intel-based Macs):</br>
+Note: Unfortunately, we are currently not able to sign the x86_64 package correctly, so you will get a warning that QualCoder AI is from an unregistered developer. You have to manually allow QualCoder AI to be executed, if your Gatekeeper is active. Follow these steps:
+    - Download and double-click the dmg-file.
+    - Drag QualCoder AI into the link to your applications folder
+    - Start QualCoder AI by double-clicking the app within your applications folder. You will get an error that QualCoder AI is from an unregistered developer.
+    - Go to Settings -> Privacy and Security -> Scroll down until you see a message stating QualCoder AI was prevented from starting and click "open anyway".
+    - From now on, the program should start without issues.
+
+Linux: Follow the [installation instructions below](#installation-1) (untested)
 
 ### Setup:
 - QualCoder AI needs some additional setup to run it's AI-enhanced functions. When you start the app for the first time, a wizard will pop up and lead you through the setup process. These are the main steps:
