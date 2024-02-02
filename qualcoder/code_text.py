@@ -47,7 +47,7 @@ from .code_in_all_files import DialogCodeInAllFiles
 from .color_selector import DialogColorSelect
 from .color_selector import colors, TextColor
 from .confirm_delete import DialogConfirmDelete
-from .helpers import Message, DialogGetStartAndEndMarks, ExportDirectoryPathDialog
+from .helpers import Message, DialogGetStartAndEndMarks, ExportDirectoryPathDialog, MarkdownHighlighter
 from .GUI.base64_helper import *
 from .GUI.ui_dialog_code_text import Ui_Dialog_code_text
 from .memo import DialogMemo
@@ -188,6 +188,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.textEdit.customContextMenuRequested.connect(self.text_edit_menu)
         self.ui.textEdit.cursorPositionChanged.connect(self.overlapping_codes_in_text)
         self.ui.textEdit_info.setReadOnly(True)
+        highlighter = MarkdownHighlighter(self.ui.textEdit_info, self.app)
         self.ui.listWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.listWidget.customContextMenuRequested.connect(self.file_menu)
         self.ui.listWidget.setStyleSheet(tree_font)
