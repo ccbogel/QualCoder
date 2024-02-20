@@ -252,6 +252,9 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.textEdit.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.textEdit.customContextMenuRequested.connect(self.textedit_menu)
 
+        self.ui.label_segment.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.ui.label_segment.customContextMenuRequested.connect(self.label_segment_menu)
+
         font = f"font: {self.app.settings['fontsize']}pt "
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
@@ -474,7 +477,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                 self.scene.addItem(SegmentGraphicsItem(self.app, s, scaler, self))
             if self.important and s['important'] == 1:
                 self.scene.addItem(SegmentGraphicsItem(self.app, s, scaler, self))
-        # Set te scene to the top
+        # Set the scene to the top
         self.ui.graphicsView.verticalScrollBar().setValue(0)
 
     def assign_selected_text_to_code(self):
@@ -877,6 +880,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         # Add seltext, the text link to the segment
         sql = "select seltext from code_text where avid=?"
         for s in self.segments:
+            # Use this name with label_segment context menu
+            s['name'] = f"{msecs_to_hours_mins_secs(s['pos0'])}-{msecs_to_hours_mins_secs(s['pos1'])}: {s['codename']}"
             cur.execute(sql, [s['avid']])
             res = cur.fetchall()
             txt = ""
@@ -3090,6 +3095,113 @@ class DialogCodeAV(QtWidgets.QDialog):
                                         + str(item['pos0']) + _(" for: ") + self.transcription[2])
         self.get_coded_text_update_eventfilter_tooltips()
 
+    # Segment menu. A hack to fix when pyuinstaller Segment.contxtMenu does not work.
+    def label_segment_menu(self):
+        """ Menu on the Label segment. This is in place because the segment context menu
+        does not work when packed with pyinstaller """
+
+        if self.file_ is None or not self.segments:
+            return
+        print(self.segments)
+        #temp_segments = deepcopy(self.segments)
+        for s in self.segments:
+            s['name'] = f"{msecs_to_hours_mins_secs(s['pos0'])}-{msecs_to_hours_mins_secs(s['pos1'])}: {s['codename']}"
+            print(f"{msecs_to_hours_mins_secs(s['pos0'])}-{msecs_to_hours_mins_secs(s['pos1'])}: {s['codename']}")
+        ui = DialogSelectItems(self.app, self.segments, ("Select a segment"), "single")
+        ok = ui.exec()
+        if not ok:
+            return
+        segment = ui.get_selected()
+        if not segment:
+            return
+        print(segment)
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        action_memo = menu.addAction(_('Memo for segment'))
+        action_delete = menu.addAction(_('Delete segment'))
+        action_play = menu.addAction(_('Play segment'))
+        action = menu.exec(QtGui.QCursor.pos())
+        if action is None:
+            return
+        if action == action_play:
+            self.play_segment(segment)
+            return
+        if action == action_memo:
+            self.edit_segment_memo(segment)
+            return
+        '''if action == action_delete:
+            self.delete_segment()
+            return'''
+
+    def edit_segment_memo(self, segment):
+        """ View, edit or delete memo for this segment.
+        Reload_segment is set to True, so on playing media, the update event will reload
+        all segments. """
+
+        ui = DialogMemo(self.app, _("Memo for segment"), segment["memo"])
+        ui.exec()
+        if segment['memo'] == ui.memo:
+            return
+        self.reload_segment = True
+        segment['memo'] = ui.memo
+        sql = "update code_av set memo=?, date=? where avid=?"
+        values = [segment['memo'],
+                  datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), segment['avid']]
+        cur = self.app.conn.cursor()
+        cur.execute(sql, values)
+        self.app.conn.commit()
+        self.app.delete_backup = False
+        #Reload segments ?
+        self.load_segments()
+        #self.set_segment_tooltip()
+
+
+    def play_segment(self, segment):
+        """ Play segment section. Stop at end of segment. """
+
+        pos = segment['pos0'] / self.mediaplayer.get_media().get_duration()
+        self.mediaplayer.play()
+        self.mediaplayer.set_position(pos)
+        self.is_paused = False
+        icon = QtGui.QIcon(QtGui.QPixmap('GUI/playback_pause_icon.png'))
+        self.ui.pushButton_play.setIcon(icon)
+        self.play_segment_end = segment['pos1']
+        self.timer.start()
+
+    #TODO
+    def delete_segment(self):
+        """ Mark the segment for deletion. Does not actually delete segment item, but hides
+        it from the scene. Reload_segment is set to True, so on playing media, the update
+        event will reload all segments. """
+
+        # print(self.segment)
+        ui = DialogConfirmDelete(self.app,
+                                 _("Segment: ") + self.segment['codename'] + "\n" + _("Memo: ") + self.segment['memo'])
+        ok = ui.exec()
+        if not ok:
+            return
+        tmp_seg = deepcopy(self.segment)
+        tmp_seg['is_segment'] = True  # Need to distinguish from text coding
+        self.code_av_dialog.undo_deleted_codes = [tmp_seg]
+
+        self.setToolTip("")
+        self.setLine(-100, -100, -100, -100)
+        self.segment['memo'] = ""
+        self.segment['pos0'] = -100
+        self.segment['pos1'] = -100
+        self.segment['y'] = -100
+        self.reload_segment = True
+        sql = "delete from code_av where avid=?"
+        values = [self.segment['avid']]
+        cur = self.code_av_dialog.app.conn.cursor()
+        cur.execute(sql, values)
+        sql = "update code_text set avid=null where avid=?"
+        cur.execute(sql, values)
+        self.code_av_dialog.app.conn.commit()
+        self.code_av_dialog.get_coded_text_update_eventfilter_tooltips()
+        self.app.delete_backup = False
+
+
 
 class ToolTipEventFilter(QtCore.QObject):
     """ Used to add a dynamic tooltip for the textEdit.
@@ -3253,6 +3365,8 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         I was not able to mapToGlobal position so, the menu maps to scene position plus
         the Dialog screen position.
         Makes use of current segment: self.segment
+
+        Menu now does not work when packed with pyinstaller.
         """
 
         seltext = self.code_av_dialog.ui.textEdit.textCursor().selectedText()
