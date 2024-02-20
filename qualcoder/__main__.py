@@ -604,7 +604,8 @@ class App(object):
         QTreeView {background-color: #484848}\n\
         QTreeView::branch:selected {border-left: 2px solid red; color: #eeeeee;}"
         style_dark = style_dark.replace("* {font-size: 12", "* {font-size:" + str(settings.get('fontsize')))
-        style_dark = style_dark.replace("QFileDialog {font-size: 12", "QFileDialog {font-size:" + str(settings.get('fontsize')))
+        style_dark = style_dark.replace("QFileDialog {font-size: 12",
+                                        "QFileDialog {font-size:" + str(settings.get('fontsize')))
         style_dark = style_dark.replace("QTreeWidget {font-size: 12",
                                         "QTreeWidget {font-size: " + str(settings.get('treefontsize')))
 
@@ -813,7 +814,7 @@ class App(object):
         else:
             cur.execute(
                 "select name, id, fulltext, ifnull(memo,''), owner, date, mediapath "
-                "from source where fulltext is not null and mediapath is not Null and " 
+                "from source where fulltext is not null and mediapath is not Null and "
                 "(mediapath like '/docs/%' or mediapath like 'docs:%') and "
                 "(mediapath like '%.pdf' or mediapath like '%.PDF') order by name")
         keys = 'name', 'id', 'fulltext', 'memo', 'owner', 'date', 'mediapath'
@@ -1400,8 +1401,8 @@ class MainWindow(QtWidgets.QMainWindow):
         ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
         self.journal_display = ui
         ui.show()
-        #self.tab_layout_helper(self.ui.tab_manage, None)
-        #self.tab_layout_helper(self.ui.tab_manage, ui)
+        # self.tab_layout_helper(self.ui.tab_manage, None)
+        # self.tab_layout_helper(self.ui.tab_manage, ui)
 
     def text_coding(self):
         """ Create edit and delete codes. Apply and remove codes and annotations to the
@@ -1838,7 +1839,7 @@ class MainWindow(QtWidgets.QMainWindow):
             if default_directory == "":
                 default_directory = os.path.expanduser('~')
             path_ = QtWidgets.QFileDialog.getExistingDirectory(self,
-                                                              _('Open project directory'), default_directory)
+                                                               _('Open project directory'), default_directory)
         if path_ == "" or path_ is False:
             return
         self.close_project()
@@ -2125,7 +2126,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.textEdit.append(f"{span}No video folder. Created empty folder{end_span}")
             missing_folders = True
         if missing_folders:
-            Message(self.app,_("Information"), _("QualCoder project missing folders. Created empty folders")).exec()
+            Message(self.app, _("Information"), _("QualCoder project missing folders. Created empty folders")).exec()
 
     def save_backup(self):
         """ Save a date and hours stamped backup.
@@ -2335,7 +2336,6 @@ class MainWindow(QtWidgets.QMainWindow):
             print(err)
             logger.warning(str(err))
 
-
 def gui():
     qual_app = App()
     settings = qual_app.load_settings()
@@ -2346,9 +2346,9 @@ def gui():
     stylesheet = qual_app.merge_settings_with_default_stylesheet(settings)
     app.setStyleSheet(stylesheet)
     if sys.platform != 'darwin':
-      pm = QtGui.QPixmap()
-      pm.loadFromData(QtCore.QByteArray.fromBase64(qualcoder32), "png")
-      app.setWindowIcon(QtGui.QIcon(pm))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(qualcoder32), "png")
+        app.setWindowIcon(QtGui.QIcon(pm))
 
     # Use two character language setting
     lang = settings.get('language', 'en')
@@ -2383,7 +2383,7 @@ def gui():
             print("qm file located at: ", qm)
             qt_translator.load(qm)
             if qt_translator.isEmpty():
-                #print(f"Installing app_{lang}.qm to .qualcoder folder")
+                # print(f"Installing app_{lang}.qm to .qualcoder folder")
                 install_language(lang)
                 qt_translator.load(qm)
         app.installTranslator(qt_translator)
@@ -2463,6 +2463,7 @@ def install_language(lang):
             decoded_data = base64.decodebytes(mo_data)
             file_.write(decoded_data)
 
+
 def install_droid_sans_mono():
     """ Install DroidSandMono ttf font for wordclouds into .qualcoder folder """
 
@@ -2470,7 +2471,6 @@ def install_droid_sans_mono():
     with open(qc_folder, 'wb') as file_:
         decoded_data = base64.decodebytes(DroidSansMono)
         file_.write(decoded_data)
-
 
 
 if __name__ == "__main__":
