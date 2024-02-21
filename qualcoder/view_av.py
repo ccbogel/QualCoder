@@ -860,6 +860,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         sql += " join code_name on code_name.cid=code_av.cid"
         sql += " where id=? "
         sql += " and code_av.owner=? "
+        sql += " order by pos0, pos1"
         values = [self.file_['id'], self.app.settings['codername']]
         cur = self.app.conn.cursor()
         cur.execute(sql, values)
@@ -3102,8 +3103,6 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         if self.file_ is None or not self.segments:
             return
-        print(self.segments)
-        #temp_segments = deepcopy(self.segments)
         for s in self.segments:
             s['name'] = f"{msecs_to_hours_mins_secs(s['pos0'])}-{msecs_to_hours_mins_secs(s['pos1'])}: {s['codename']}"
             print(f"{msecs_to_hours_mins_secs(s['pos0'])}-{msecs_to_hours_mins_secs(s['pos1'])}: {s['codename']}")
@@ -3114,7 +3113,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         segment = ui.get_selected()
         if not segment:
             return
-        print(segment)
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         action_memo = menu.addAction(_('Memo for segment'))
@@ -3129,9 +3127,9 @@ class DialogCodeAV(QtWidgets.QDialog):
         if action == action_memo:
             self.edit_segment_memo(segment)
             return
-        '''if action == action_delete:
-            self.delete_segment()
-            return'''
+        if action == action_delete:
+            self.delete_segment(segment)
+            return
 
     def edit_segment_memo(self, segment):
         """ View, edit or delete memo for this segment.
@@ -3155,7 +3153,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.load_segments()
         #self.set_segment_tooltip()
 
-
     def play_segment(self, segment):
         """ Play segment section. Stop at end of segment. """
 
@@ -3168,39 +3165,30 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.play_segment_end = segment['pos1']
         self.timer.start()
 
-    #TODO
-    def delete_segment(self):
+    def delete_segment(self, segment):
         """ Mark the segment for deletion. Does not actually delete segment item, but hides
         it from the scene. Reload_segment is set to True, so on playing media, the update
         event will reload all segments. """
 
         # print(self.segment)
         ui = DialogConfirmDelete(self.app,
-                                 _("Segment: ") + self.segment['codename'] + "\n" + _("Memo: ") + self.segment['memo'])
+                                 _("Segment: ") + segment['codename'] + "\n" + _("Memo: ") + segment['memo'])
         ok = ui.exec()
         if not ok:
             return
         tmp_seg = deepcopy(self.segment)
         tmp_seg['is_segment'] = True  # Need to distinguish from text coding
-        self.code_av_dialog.undo_deleted_codes = [tmp_seg]
-
-        self.setToolTip("")
-        self.setLine(-100, -100, -100, -100)
-        self.segment['memo'] = ""
-        self.segment['pos0'] = -100
-        self.segment['pos1'] = -100
-        self.segment['y'] = -100
-        self.reload_segment = True
+        self.undo_deleted_codes = [tmp_seg]
         sql = "delete from code_av where avid=?"
-        values = [self.segment['avid']]
-        cur = self.code_av_dialog.app.conn.cursor()
+        values = [segment['avid']]
+        cur = self.app.conn.cursor()
         cur.execute(sql, values)
         sql = "update code_text set avid=null where avid=?"
         cur.execute(sql, values)
-        self.code_av_dialog.app.conn.commit()
-        self.code_av_dialog.get_coded_text_update_eventfilter_tooltips()
+        self.app.conn.commit()
+        self.get_coded_text_update_eventfilter_tooltips()
         self.app.delete_backup = False
-
+        self.load_segments()
 
 
 class ToolTipEventFilter(QtCore.QObject):
