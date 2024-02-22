@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2023 Colin Curtain
+Copyright (c) 2024 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -101,6 +101,7 @@ class DialogCodeText(QtWidgets.QWidget):
     overlaps_at_pos_idx = 0
 
     # Search text variables
+    search_type = "3"
     search_indices = []
     search_index = 0
     search_term = ""
@@ -193,8 +194,9 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.listWidget.customContextMenuRequested.connect(self.file_menu)
         self.ui.listWidget.setStyleSheet(tree_font)
         self.ui.listWidget.selectionModel().selectionChanged.connect(self.file_selection_changed)
-        # self.ui.lineEdit_search.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        # self.ui.lineEdit_search.customContextMenuRequested.connect(self.lineedit_search_menu)
+        self.search_type = "3"
+        self.ui.lineEdit_search.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.ui.lineEdit_search.customContextMenuRequested.connect(self.lineedit_search_menu)
         self.ui.lineEdit_search.returnPressed.connect(self.search_for_text)
         self.get_files()
 
@@ -784,11 +786,13 @@ class DialogCodeText(QtWidgets.QWidget):
 
     # Search for text methods
     def search_for_text(self):
-        """ On Enter pressed, find indices of matching text.
+        """ Find indices of matching text.
         Resets current search_index.
         If all files is checked then searches for all matching text across all text files
         and displays the file text and current position to user.
         If case-sensitive is checked then text searched is matched for case sensitivity.
+        search_type start search options 3,or 5 chars.
+        Enter pressed is also a search option.
         """
 
         if self.file_ is None:
@@ -799,7 +803,11 @@ class DialogCodeText(QtWidgets.QWidget):
         self.search_indices = []
         self.search_index = -1
         self.search_term = self.ui.lineEdit_search.text()
-        if len(self.search_term) < 3:
+        print("ST", self.search_type, type(self.search_type))
+        if self.search_type == 3 and len(self.search_term) < 3:
+            self.ui.label_search_totals.setText("")
+            return
+        if self.search_type == 5 and len(self.search_term) < 5:
             self.ui.label_search_totals.setText("")
             return
         self.ui.label_search_totals.setText("0 / 0")
@@ -807,13 +815,6 @@ class DialogCodeText(QtWidgets.QWidget):
         flags = 0
         if not self.ui.checkBox_search_case.isChecked():
             flags |= re.IGNORECASE
-        '''if self.ui.checkBox_search_escaped.isChecked():
-            pattern = re.compile(re.escape(self.search_term), flags)
-        else:
-            try:
-                pattern = re.compile(self.search_term, flags)
-            except:
-                logger.warning('Bad escape')'''
         try:
             pattern = re.compile(self.search_term, flags)
         except re.error as e_:
@@ -893,38 +894,31 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.textEdit.setTextCursor(cursor)
         self.ui.label_search_totals.setText(f"{self.search_index + 1} / {len(self.search_indices)}")
 
-    '''def lineedit_search_menu(self, position):
-        """ Option to change from automatic search on 3 characters or more to press Enter to search """
+    def lineedit_search_menu(self, position):
+        """ Option to change from automatic search on 3 characters or 5 character to search.
+         Enter is alway a search option. """
 
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         action_char3 = QtGui.QAction(_("Automatic search 3 or more characters"))
         action_char5 = QtGui.QAction(_("Automatic search 5 or more characters"))
-        action_enter = QtGui.QAction(_("Press Enter to search"))
-        if self.search_type != "3":
+        if self.search_type != 3:
             menu.addAction(action_char3)
-        if self.search_type != "5":
+        if self.search_type != 5:
             menu.addAction(action_char5)
-        if self.search_type != "Enter":
-            menu.addAction(action_enter)
         action = menu.exec(self.ui.lineEdit_search.mapToGlobal(position))
         if action is None:
             return
         if action == action_char3:
             self.search_type = 3
             self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
-            self.ui.lineEdit_search.returnPressed.disconnect(self.search_for_text)
+            #self.ui.lineEdit_search.returnPressed.disconnect(self.search_for_text)
             return
         if action == action_char5:
             self.search_type = 5
             self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
-            self.ui.lineEdit_search.returnPressed.disconnect(self.search_for_text)
+            #self.ui.lineEdit_search.returnPressed.disconnect(self.search_for_text)
             return
-        if action == action_enter:
-            self.search_type = 1
-            self.ui.lineEdit_search.textEdited.disconnect(self.search_for_text)
-            self.ui.lineEdit_search.returnPressed.connect(self.search_for_text)
-            return'''
 
     def button_auto_code_menu(self, position):
         """ Options to auto-code all instances, first instance or last instance in a file. """
