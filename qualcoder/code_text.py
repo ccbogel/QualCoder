@@ -1000,8 +1000,8 @@ class DialogCodeText(QtWidgets.QWidget):
         action_mark = None
         action_not_important = None
         action_change_code = None
-        # action_start_pos = None
-        # action_end_pos = None
+        action_start_pos = None
+        action_end_pos = None
         action_change_pos = None
         action_unmark = None
         action_new_code = None
@@ -1012,9 +1012,9 @@ class DialogCodeText(QtWidgets.QWidget):
             if cursor.position() + self.file_['start'] >= item['pos0'] and cursor.position() <= item['pos1']:
                 action_unmark = QtGui.QAction(_("Unmark (U)"))
                 action_code_memo = QtGui.QAction(_("Memo coded text (M)"))
-                # action_start_pos = QtGui.QAction(_("Change start position (SHIFT LEFT/ALT RIGHT)"))
-                # action_end_pos = QtGui.QAction(_("Change end position (SHIFT RIGHT/ALT LEFT)"))
-                action_change_pos = QtGui.QAction(_("Change code position key presses"))
+                action_start_pos = QtGui.QAction(_("Change start position (SHIFT LEFT/ALT RIGHT)"))
+                action_end_pos = QtGui.QAction(_("Change end position (SHIFT RIGHT/ALT LEFT)"))
+                #action_change_pos = QtGui.QAction(_("Change code position key presses"))
                 if item['important'] is None or item['important'] > 1:
                     action_important = QtGui.QAction(_("Add important mark (I)"))
                 if item['important'] == 1:
@@ -1026,10 +1026,10 @@ class DialogCodeText(QtWidgets.QWidget):
             menu.addAction(action_code_memo)
         if action_change_pos:
             menu.addAction(action_change_pos)
-        '''if action_start_pos:
+        if action_start_pos:
             menu.addAction(action_start_pos)
         if action_end_pos:
-            menu.addAction(action_end_pos)'''
+            menu.addAction(action_end_pos)
         if action_important:
             menu.addAction(action_important)
         if action_not_important:
@@ -1085,14 +1085,14 @@ class DialogCodeText(QtWidgets.QWidget):
         if action == action_code_memo:
             self.coded_text_memo(cursor.position())
             return
-        if action == action_change_pos:
-            self.change_code_pos_message()
-        '''if action == action_start_pos:
-            self.change_code_pos(cursor.position(), "start")
+        '''if action == action_change_pos:
+            self.change_code_pos_message()'''
+        if action == action_start_pos:
+            self.change_code_start_or_end_position(cursor.position(), "start")
             return
         if action == action_end_pos:
-            self.change_code_pos(cursor.position(), "end")
-            return'''
+            self.change_code_start_or_end_position(cursor.position(), "end")
+            return
         if action == action_set_bookmark:
             cur = self.app.conn.cursor()
             bookmark_pos = cursor.position() + self.file_['start']
@@ -1117,6 +1117,60 @@ class DialogCodeText(QtWidgets.QWidget):
         # Remaining actions will be the submenu codes
         self.recursive_set_current_item(self.ui.treeWidget.invisibleRootItem(), action.text())
         self.mark()
+
+    def change_code_start_or_end_position(self, position, start_or_end):
+        """ change start or end pos of code. """
+
+        if self.file_ is None:
+            return
+        coded_list = []
+        for item in self.code_text:
+            if item['pos0'] <= position + self.file_['start'] <= item['pos1'] and \
+                    item['owner'] == self.app.settings['codername']:
+                coded_list.append(item)
+        if not coded_list:
+            return
+        code_ = []
+        if len(coded_list) == 1:
+            code_ = coded_list[0]
+        # Multiple codes at this position to select from
+        if len(coded_list) > 1:
+            ui = DialogSelectItems(self.app, coded_list, _("Select codes"), "single")
+            ok = ui.exec()
+            if not ok:
+                return
+            code_ = ui.get_selected()
+        if not code_:
+            return
+
+        cur = self.app.conn.cursor()
+        length_sql = "select length(fulltext) from source where id=?"
+        cur.execute(length_sql, [self.file_['id']])
+        fulltext_length = cur.fetchone()[0]
+        title = f"Adjust code {start_or_end}"
+        adjustment, ok = QtWidgets.QInputDialog.getInt(self, title, code_['name'])
+        if not ok:
+            return
+        if start_or_end == "start":
+            code_['pos0'] += adjustment
+            if code_['pos0'] < 0:
+                code_['pos0'] = 0
+            if code_['pos0'] >= code_['pos1']:
+                code_['pos0'] = code_['pos1'] - 1
+        if start_or_end == "end":
+            code_['pos1'] += adjustment
+            if code_['pos1'] <= code_['pos0']:
+                code_['pos1'] = code_['pos0'] + 1
+            if code_['pos1'] > fulltext_length:
+                code_['pos1'] = fulltext_length - 1
+        text_sql = "select substr(fulltext,?,?), length(fulltext) from source where id=?"
+        cur.execute(text_sql, [code_['pos0'], code_['pos1'], self.file_['id']])
+        seltext = cur.fetchone()[0]
+        sql = "update code_text set pos0=?, pos1=?, seltext=? where ctid=?"
+        cur.execute(sql, [code_['pos0'], code_['pos1'], seltext, code_['ctid']])
+        self.app.conn.commit()
+        self.app.delete_backup = False
+        self.get_coded_text_update_eventfilter_tooltips()
 
     def mark_with_new_code(self, in_vivo=False):
         """ Create new code and mark selected text.
@@ -1346,13 +1400,6 @@ class DialogCodeText(QtWidgets.QWidget):
                 i['memo'] = memo
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
-
-    def change_code_pos_message(self):  # , location, start_or_end):
-        """  Called via textedit_menu. """
-
-        msg = _(
-            "Change start position (extend SHIFT LEFT/ shrink ALT RIGHT)\nChange end position (extend SHIFT RIGHT/ shrink ALT LEFT)")
-        Message(self.app, _("Use key presses") + " " * 20, msg).exec()
 
     def shift_code_positions(self, position):
         """ After a text file is edited - text added or deleted, code positions may be inaccurate.
@@ -1679,7 +1726,7 @@ class DialogCodeText(QtWidgets.QWidget):
         V assign 'in vivo' code to selected text
         Ctrl 0 to Ctrl 9 - button presses
         # Display Clicked character position
-        ^ At key. Shift code positions. May be needed after the text is edited
+        ^ Alt key. Shift code positions. May be needed after the text is edited
             (added or deleted) to shift subsequent codings.
         """
 
@@ -2079,21 +2126,32 @@ class DialogCodeText(QtWidgets.QWidget):
                 if item['pos0'] <= cursor_pos + self.file_['start'] <= item['pos1'] and \
                         item['owner'] == self.app.settings['codername']:
                     codes_here.append(item)
+            code_ = None
+            if len(codes_here) > 1 and mod in (QtCore.Qt.KeyboardModifier.AltModifier, QtCore.Qt.KeyboardModifier.ShiftModifier) \
+                                        and key in (QtCore.Qt.Key.Key_Left, QtCore.Qt.Key.Key_Right):
+                ui = DialogSelectItems(self.app, codes_here, ("Select a code"), "single")
+                ok = ui.exec()
+                if not ok:
+                    return
+                code_ = ui.get_selected()
+                if not code_:
+                    return
             if len(codes_here) == 1:
-                # Key event can be too sensitive, adjusted  for 150 millisecond gap
-                self.code_resize_timer = datetime.datetime.now()
-                if key == QtCore.Qt.Key.Key_Left and mod == QtCore.Qt.KeyboardModifier.AltModifier:
-                    self.shrink_to_left(codes_here[0])
-                    return True
-                if key == QtCore.Qt.Key.Key_Right and mod == QtCore.Qt.KeyboardModifier.AltModifier:
-                    self.shrink_to_right(codes_here[0])
-                    return True
-                if key == QtCore.Qt.Key.Key_Left and mod == QtCore.Qt.KeyboardModifier.ShiftModifier:
-                    self.extend_left(codes_here[0])
-                    return True
-                if key == QtCore.Qt.Key.Key_Right and mod == QtCore.Qt.KeyboardModifier.ShiftModifier:
-                    self.extend_right(codes_here[0])
-                    return True
+                code_ = codes_here[0]
+            # Key event can be too sensitive, adjusted  for 150 millisecond gap
+            self.code_resize_timer = datetime.datetime.now()
+            if key == QtCore.Qt.Key.Key_Left and mod == QtCore.Qt.KeyboardModifier.AltModifier:
+                self.shrink_to_left(code_)
+                return True
+            if key == QtCore.Qt.Key.Key_Right and mod == QtCore.Qt.KeyboardModifier.AltModifier:
+                self.shrink_to_right(code_)
+                return True
+            if key == QtCore.Qt.Key.Key_Left and mod == QtCore.Qt.KeyboardModifier.ShiftModifier:
+                self.extend_left(code_)
+                return True
+            if key == QtCore.Qt.Key.Key_Right and mod == QtCore.Qt.KeyboardModifier.ShiftModifier:
+                self.extend_right(code_)
+                return True
         return False
 
     def extend_left(self, code_):
@@ -2101,6 +2159,7 @@ class DialogCodeText(QtWidgets.QWidget):
         param:
             code_ """
 
+        print("code_", code_)
         if code_['pos0'] < 1:
             return
         code_['pos0'] -= 1
