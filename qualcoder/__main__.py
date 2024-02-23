@@ -456,9 +456,15 @@ class App(object):
         """ load config settings, and convert some to Integer or Boolean. """
 
         config = configparser.ConfigParser()
-        config.read(self.configpath)
-        default = config['DEFAULT']
-        result = dict(default)
+        try:
+            config.read(self.configpath)
+            default = config['DEFAULT']
+            result = dict(default)
+        except UnicodeDecodeError as err:
+            logger.warning(f"_load_config_init, character decoding error: {err}")
+            print(f"Could not load config.ini\n{err}")
+            return {}
+
         if 'fontsize' in default:
             result['fontsize'] = default.getint('fontsize')
         if 'docfontsize' in default:
