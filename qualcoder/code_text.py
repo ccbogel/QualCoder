@@ -4299,7 +4299,10 @@ class ToolTipEventFilter(QtCore.QObject):
                             text_ += " [ctid:" + str(item['ctid']) + "]"
                         text_ += "<br />" + seltext
                         if item['memo'] != "":
-                            text_ += "<br /><em>" + _("MEMO: ") + item['memo'] + "</em>"
+                            memo_text = item['memo']
+                            if len(memo_text) > 150:
+                                memo_text = memo_text[:150] + "..."
+                            text_ += "<br /><em>" + _("MEMO: ") + memo_text + "</em>"
                         if item['important'] == 1:
                             text_ += "<br /><em>IMPORTANT</em>"
                         text_ += "</p>"
