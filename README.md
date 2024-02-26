@@ -144,7 +144,7 @@ Note: To exit venv type `deactivate`
 
 `pip install chardet ebooklib ply openpyxl pandas pdfminer pyqt6 pillow pdfminer.six plotly pydub python-vlc rispy six SpeechRecognition`
 
-7. Install QualCoder, and type the following, the dot is important:
+7. You must be in the QualCoder-master folder (Or the main release folder if using a release. e.g. QualCoder-3.5 folder). Install QualCoder, and type the following, the dot is important:
 
 `python3 -m pip install .`
 
