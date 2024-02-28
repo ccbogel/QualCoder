@@ -1,7 +1,10 @@
 #!/bin/bash
 
-dnf_packages="python3-pip python3-devel python3-pdfminer.noarch python3-qt5 python3-pillow python3-openpyxl python3-pandas python3-plotly python3-pip python3-pyqt6 python3-pillow vlc python3-ply python3-six python3-chardet ffmpeg"
-pip_packages="Ebooklib pydub SpeechRecognition pdfminer.six python-vlc rispy xmlschema"
+# first we add the RPM Fusion Free Updates repo, which is a third-party repository!
+sudo dnf install -y https://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-39.noarch.rpm
+
+dnf_packages="python3-pip python3-devel python3-pdfminer.noarch python3-qt5 python3-pillow python3-openpyxl python3-pandas python3-plotly python3-pip python3-pyqt6 python3-pillow python3-vlc vlc python3-ply python3-six python3-chardet ffmpeg"
+pip_packages="Ebooklib pydub SpeechRecognition pdfminer.six rispy xmlschema"
 python_version=3.12
 
 printf "This installer is for Fedora Linux installations using python $python_version only.\n"
@@ -13,7 +16,9 @@ echo "The installer will also install dependencies"
 sudo dnf install $dnf_packages -y
 # several python packages are not available by Fedora, so install using Python's package installer 'pip'
 echo "Please wait ..."
-python3 -m pip install $pip_packages
+python -m ensurepip # which makes sure pip is available
+python3 -m pip install --upgrade pip # which makes sure pip is up to date
+python3 -m pip install $pip_packages # which finally installs the packages
 sudo cp -r qualcoder /usr/share/qualcoder
 sudo cp qualcoder/GUI/qualcoder128.png /usr/share/icons/qualcoder128.png
 sudo cp qualcoder/GUI/qualcoder.desktop /usr/share/applications/qualcoder.desktop
