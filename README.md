@@ -32,6 +32,7 @@ Windows:
 
 MacOS:
 - Installer made by [gernophil](https://github.com/gernophil), thank you very much!
+- If you have trouble getting QualCoder to run, you might need to update your operating system to the latest available version.   
 - *Installation on M1/M2/M3-based Macs:*
     - Download "QualCoderAI_MAC_arm64.dmg" from here: https://drive.switch.ch/index.php/s/cYJKPA3JV3fJqDc (switch drive is a secure data sharing platform for Swiss universities)
     - Double-click on the dmg-file, then drag QualCoder AI into the link to your applications folder.
