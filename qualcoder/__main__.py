@@ -10,7 +10,7 @@ in the Software without restriction, including without limitation the rights
 to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 copies of the Software, and to permit persons to whom the Software is
 furnished to do so, subject to the following conditions:
-
+backup
 The above copyright notice and this permission notice shall be included in
 all copies or substantial portions of the Software.
 
@@ -2139,8 +2139,8 @@ class MainWindow(QtWidgets.QMainWindow):
         Do not back up if the name already exists.
         A backup can be generated in the subsequent hour."""
 
-        nowdate = datetime.datetime.now().astimezone().strftime("%Y%m%d_%H")  # -%M-%S")
-        backup = self.app.project_path[0:-4] + "_BKUP_" + nowdate + ".qda"
+        nowdate = datetime.datetime.now().astimezone().strftime("%Y%m%d_%H")  # -%S")
+        backup = f"{self.app.project_path[0:-4]}_BKUP_{nowdate}.qda"
         # Do not try and create another backup with same date and hour
         result = os.path.exists(backup)
         if result:
@@ -2150,8 +2150,8 @@ class MainWindow(QtWidgets.QMainWindow):
                 shutil.copytree(self.app.project_path, backup)
             except FileExistsError as err:
                 msg = _("There is already a backup with this name")
-                print(str(err) + "\n" + msg)
-                logger.warning(_(msg) + "\n" + str(err))
+                print(f"{err}\nmsg")
+                logger.warning(_(msg) + f"\n{err}")
         else:
             shutil.copytree(self.app.project_path, backup,
                             ignore=shutil.ignore_patterns('*.mp3', '*.wav', '*.mp4', '*.mov', '*.ogg', '*.wmv', '*.MP3',
@@ -2179,41 +2179,40 @@ class MainWindow(QtWidgets.QMainWindow):
         msg = _("Date time now: ") + datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M") + "\n"
         msg += self.app.project_name + "\n"
         msg += _("Project path: ") + self.app.project_path + "\n"
-        msg += _("Project date: ") + str(self.project['date']) + "\n"
+        msg += _("Project date: ") + f"{self.project['date']}\n"
         sql = "select memo from project"
         cur.execute(sql)
         res = cur.fetchone()
-        msg += _("Project memo: ") + str(res[0]) + "\n"
+        msg += _("Project memo: ") + f"{res[0]}\n"
         sql = "select count(id) from source"
         cur.execute(sql)
         res = cur.fetchone()
-        msg += _("Files: ") + str(res[0]) + "\n"
+        msg += _("Files: ") + f"{res[0]}\n"
         sql = "select count(caseid) from cases"
         cur.execute(sql)
         res = cur.fetchone()
-        msg += _("Cases: ") + str(res[0]) + "\n"
+        msg += _("Cases: ") + f"{res[0]}\n"
         sql = "select count(catid) from code_cat"
         cur.execute(sql)
         res = cur.fetchone()
-        msg += _("Code categories: ") + str(res[0]) + "\n"
+        msg += _("Code categories: ") + f"{res[0]}\n"
         sql = "select count(cid) from code_name"
         cur.execute(sql)
         res = cur.fetchone()
-        msg += _("Codes: ") + str(res[0]) + "\n"
+        msg += _("Codes: ") + f"{res[0]}\n"
         sql = "select count(name) from attribute_type"
         cur.execute(sql)
         res = cur.fetchone()
-        msg += _("Attributes: ") + str(res[0]) + "\n"
+        msg += _("Attributes: ") + f"{res[0]}\n"
         sql = "select count(jid) from journal"
         cur.execute(sql)
         res = cur.fetchone()
-        msg += _("Journals: ") + str(res[0]) + "\n"
+        msg += _("Journals: ") + f"{res[0]}\n"
         cur.execute("select name from source where id=?", [result[4]])
         bookmark_filename = cur.fetchone()
         if bookmark_filename is not None and result[5] is not None:
-            msg += "\nText Bookmark: " + str(bookmark_filename[0])
-            msg += ", position: " + str(result[5])
-            msg += "\n"
+            msg += f"\nText Bookmark: {bookmark_filename[0]}"
+            msg += f", position: {result[5]}\n"
         if platform.system() == "Windows":
             msg += "\n" + _("Directory (folder) paths / represents \\")
         self.ui.textEdit.append(msg)
