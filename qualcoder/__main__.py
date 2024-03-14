@@ -881,6 +881,40 @@ class App(object):
             pass
         return coder_names
 
+    def save_backup(self, suffix=""):
+        """ Save a date and hours stamped backup.
+        Do not back up if the name already exists.
+        A backup can be generated in the subsequent hour.
+        params:
+            suffix : String to add to end of backup name. Use this for special ops
+        """
+
+        nowdate = datetime.datetime.now().astimezone().strftime("%Y%m%d_%H")  # -%S")
+        backup = f"{self.project_path[0:-4]}_BKUP_{nowdate}{suffix}.qda"
+        # Do not try and create another backup with same date and hour, unless suffix present
+        result = os.path.exists(backup)
+        if result and suffix == "":
+            return
+        msg = ""
+        if self.settings['backup_av_files'] == 'True':
+            try:
+                shutil.copytree(self.project_path, backup)
+            except FileExistsError as err:
+                msg = _("There is already a backup with this name")
+                print(f"{err}\nmsg")
+                logger.warning(_(msg) + f"\n{err}")
+        else:
+            shutil.copytree(self.project_path, backup,
+                            ignore=shutil.ignore_patterns('*.mp3', '*.wav', '*.mp4', '*.mov', '*.ogg', '*.wmv', '*.MP3',
+                                                          '*.WAV', '*.MP4', '*.MOV', '*.OGG', '*.WMV'))
+            #self.ui.textEdit.append(_("WARNING: audio and video files NOT backed up. See settings."))
+            msg = _("WARNING: audio and video files NOT backed up. See settings.") + "\n"
+        #self.ui.textEdit.append(_("Project backup created: ") + backup)
+        msg += _("Project backup created: ") + backup
+        # Delete backup path - delete the backup if no changes occurred in the project during the session
+        self.delete_backup_path_name = backup
+        return msg, backup
+
 
 class MainWindow(QtWidgets.QMainWindow):
     """ Main GUI window.
@@ -2072,7 +2106,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Save a date and 24 hour stamped backup
         if self.app.settings['backup_on_open'] == 'True' and newproject == "no":
-            self.save_backup()
+            #self.save_backup()
+            msg, backup_name = self.app.save_backup()
+            self.ui.textEdit.append(msg)
         msg = "\n" + _("Project Opened: ") + self.app.project_name
         self.ui.textEdit.append(msg)
         self.project_summary_report()
@@ -2134,7 +2170,7 @@ class MainWindow(QtWidgets.QMainWindow):
         if missing_folders:
             Message(self.app, _("Information"), _("QualCoder project missing folders. Created empty folders")).exec()
 
-    def save_backup(self):
+    '''def save_backup(self):
         """ Save a date and hours stamped backup.
         Do not back up if the name already exists.
         A backup can be generated in the subsequent hour."""
@@ -2159,7 +2195,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.textEdit.append(_("WARNING: audio and video files NOT backed up. See settings."))
         self.ui.textEdit.append(_("Project backup created: ") + backup)
         # Delete backup path - delete the backup if no changes occurred in the project during the session
-        self.app.delete_backup_path_name = backup
+        self.app.delete_backup_path_name = backup'''
 
     def project_summary_report(self):
         """ Add a summary of the project to the text edit.
