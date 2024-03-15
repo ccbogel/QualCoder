@@ -43,6 +43,7 @@ import traceback
 import urllib.request
 import webbrowser
 from copy import copy
+from contextlib import contextmanager
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 
@@ -128,6 +129,7 @@ def exception_handler(exception_type, value, tb_obj):
     tb = '\n'.join(traceback.format_tb(tb_obj))
     msg = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
     print(msg)
+    logger.error(_("Uncaught exception: ") + msg)
     mb = QtWidgets.QMessageBox()
     mb.setStyleSheet("* {font-size: 10pt}")
     mb.setText(msg)
@@ -881,40 +883,84 @@ class App(object):
             pass
         return coder_names
 
-    def save_backup(self, suffix=""):
+    def save_backup(self, suffix="", tmp=False):
         """ Save a date and hours stamped backup.
         Do not back up if the name already exists.
         A backup can be generated in the subsequent hour.
         params:
             suffix : String to add to end of backup name. Use this for special ops
+            tmp    : A temporary backup used to protect the database from beeing left in an inconsistent state
+                     if a complex operation fails mid term. 
+                     Temporary backups will always be created. If the path already exists, a unique number will be appended.  
+                     Temporary backups are not auto deleted (self.delete_backup_path_name). 
+                     Delete the temporary backup manually after the operation is finished. 
         """
 
         nowdate = datetime.datetime.now().astimezone().strftime("%Y%m%d_%H")  # -%S")
-        backup = f"{self.project_path[0:-4]}_BKUP_{nowdate}{suffix}.qda"
-        # Do not try and create another backup with same date and hour, unless suffix present
+        backup = f"{self.project_path[0:-4]}_BKUP_{nowdate}{suffix}"
+        # tmp backup: create a unique name
+        if tmp:
+            i = 1
+            while os.path.exists(f'{backup}_tmp{i:02d}.qda'):
+                i += 1
+                if i > 99: # Supports max 99 temporary backups per hour. Something must have went horribly wrong. 
+                    msg = _('Too many temporary backups. Please clean up your project folder and delete backups which are no longer needed.')
+                    raise FileExistsError(msg)
+            backup = f'{backup}_tmp{i:02d}'
+        backup = f'{backup}.qda'
+        # Normal backup: Do not try and create another backup with same date and hour, unless suffix present
         result = os.path.exists(backup)
         if result and suffix == "":
-            return
+            return '', ''
         msg = ""
         if self.settings['backup_av_files'] == 'True':
             try:
                 shutil.copytree(self.project_path, backup)
             except FileExistsError as err:
                 msg = _("There is already a backup with this name")
-                print(f"{err}\nmsg")
+                print(f"{err}\n{msg}")
                 logger.warning(_(msg) + f"\n{err}")
         else:
             shutil.copytree(self.project_path, backup,
                             ignore=shutil.ignore_patterns('*.mp3', '*.wav', '*.mp4', '*.mov', '*.ogg', '*.wmv', '*.MP3',
                                                           '*.WAV', '*.MP4', '*.MOV', '*.OGG', '*.WMV'))
-            #self.ui.textEdit.append(_("WARNING: audio and video files NOT backed up. See settings."))
             msg = _("WARNING: audio and video files NOT backed up. See settings.") + "\n"
-        #self.ui.textEdit.append(_("Project backup created: ") + backup)
         msg += _("Project backup created: ") + backup
         # Delete backup path - delete the backup if no changes occurred in the project during the session
-        self.delete_backup_path_name = backup
+        # (only for normal backups, temporary backups should be deleted automatically once the operation finishes)
+        if not tmp:
+            self.delete_backup_path_name = backup
         return msg, backup
-
+    
+    def delete_backup_folder(self, backup_path):
+        try:
+            shutil.rmtree(backup_path)
+        except Exception as err:
+            print(str(err))
+            logger.warning(str(err))
+            
+    @contextmanager
+    def backup_protected_operation(self):
+        # Create a temorary backup
+        backup_msg, backup_path = self.save_backup(tmp=True)
+        try:
+            # do the operation
+            yield
+        except Exception as e:
+            # inform user about error and the possibility to go back to the tmp backup
+            new_message = _('The last operation could not be completed due to an error. '
+                            'You may consider going back to the following backup that was created '
+                            'immediately before the operation: \n')
+            new_message += backup_path + '\n\n'
+            new_message += _('Error: ') + str(e)
+            # Capture original traceback
+            exc_type, exc_value, exc_traceback = sys.exc_info()
+            # raise new exception with additional context
+            new_exc = type(e)(new_message)
+            raise new_exc.with_traceback(exc_traceback) from e
+        else: 
+            # no error, delete tmp backup
+            self.delete_backup_folder(backup_path)        
 
 class MainWindow(QtWidgets.QMainWindow):
     """ Main GUI window.
@@ -2334,7 +2380,8 @@ class MainWindow(QtWidgets.QMainWindow):
         files_folders = os.listdir(directory)
         backups = []
         for f_ in files_folders:
-            if f_[0:lenname] == project_name_and_bkup and f_[-4:] == ".qda":
+            # take only regular backups into account, not temporary ones
+            if f_[0:lenname] == project_name_and_bkup and f_[-4:] == ".qda" and f_[-9:-6] != 'tmp':
                 backups.append(f_)
         # Sort newest to oldest, and remove any that are more than BACKUP_NUM position in the list
         backups.sort(reverse=True)
