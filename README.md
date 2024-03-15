@@ -316,11 +316,4 @@ https://www.saashub.com/qualcoder-alternatives
 https://alternativeto.net/software/qualcoder
 
 Also, if you like Qualcoder a lot and want to advertise interest in its use, please write an article about your experience using QualCoder.
-## FaceBook group:
-To allow everyone to discuss all things QualCoder.
 
-Facebook page:
-[https://www.facebook.com/qualcoder](https://www.facebook.com/qualcoder)
-
-Facebook group:
-[https://www.facebook.com/groups/1251478525589873](https://www.facebook.com/groups/1251478525589873)
