@@ -1047,18 +1047,23 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.attribute_names.append({'name': name})
         # update attribute_type list and database
         now_date = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-        cur = self.app.conn.cursor()
-        cur.execute("insert into attribute_type (name,date,owner,memo,caseOrFile, valuetype) values(?,?,?,?,?,?)",
-                    (name, now_date, self.app.settings['codername'], "", 'file', value_type))
-        self.app.conn.commit()
-        self.app.delete_backup = False
-        sql = "select id from source"
-        cur.execute(sql)
-        ids = cur.fetchall()
-        for id_ in ids:
-            sql = "insert into attribute (name, value, id, attr_type, date, owner) values (?,?,?,?,?,?)"
-            cur.execute(sql, (name, "", id_[0], 'file', now_date, self.app.settings['codername']))
-        self.app.conn.commit()
+        # backup_msg, backup_path = self.app.save_backup(temp=True)
+        
+        with self.app.backup_protected_operation():
+            # raise ValueError('TESTERROR')
+            cur = self.app.conn.cursor()
+            cur.execute("insert into attribute_type (name,date,owner,memo,caseOrFile, valuetype) values(?,?,?,?,?,?)",
+                        (name, now_date, self.app.settings['codername'], "", 'file', value_type))
+            self.app.conn.commit()
+            self.app.delete_backup = False
+            sql = "select id from source"
+            cur.execute(sql)
+            ids = cur.fetchall()
+            for id_ in ids:
+                sql = "insert into attribute (name, value, id, attr_type, date, owner) values (?,?,?,?,?,?)"
+                cur.execute(sql, (name, "", id_[0], 'file', now_date, self.app.settings['codername']))
+            self.app.conn.commit()
+
         self.load_file_data()
         self.fill_table()
         self.parent_text_edit.append(_("Attribute added to files: ") + name + ", " + _("type") + ": " + value_type)
