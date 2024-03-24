@@ -384,16 +384,21 @@ class DialogEditTextFile(QtWidgets.QDialog):
         """ Accepted button overridden method. """
 
         self.text = self.ui.textEdit.toPlainText()
-        cur = self.app.conn.cursor()
-        cur.execute("update source set fulltext=? where id=?", (self.text, self.fid))
-        self.app.conn.commit()
-        for item in self.code_deletions:
-            cur.execute(item)
-        self.app.conn.commit()
-        self.code_deletions = []
-        self.update_codings()
-        self.update_annotations()
-        self.update_casetext()
+        try:
+            cur = self.app.conn.cursor()
+            cur.execute("update source set fulltext=? where id=?", (self.text, self.fid))
+            # self.app.conn.commit()
+            for item in self.code_deletions:
+                cur.execute(item)
+            # self.app.conn.commit()
+            self.code_deletions = []
+            self.update_codings()
+            self.update_annotations()
+            self.update_casetext()
+            self.app.conn.commit() # commit all changes in one go to prevent inconsistencies of the database
+        except:
+            self.app.conn.rollback() # revert all changes 
+            raise
         super(DialogEditTextFile, self).accept()
 
     def update_casetext(self):
@@ -406,7 +411,7 @@ class DialogEditTextFile(QtWidgets.QDialog):
                 cur.execute(sql, [c['npos0'], c['npos1'], c['id'], c['npos0'], c['npos1']])
             if c['npos1'] >= len(self.text):
                 cur.execute("delete from case_text where id=?", [c['id']])
-        self.app.conn.commit()
+        # self.app.conn.commit()
 
     def update_annotations(self):
         """ Update annotation positions. """
@@ -418,7 +423,7 @@ class DialogEditTextFile(QtWidgets.QDialog):
                 cur.execute(sql, [a['npos0'], a['npos1'], a['anid'], a['npos0'], a['npos1']])
             if a['npos1'] >= len(self.text):
                 cur.execute("delete from annotation where anid=?", [a['anid']])
-        self.app.conn.commit()
+        # self.app.conn.commit()
 
     def update_codings(self):
         """ Update coding positions and seltext. """
@@ -431,7 +436,7 @@ class DialogEditTextFile(QtWidgets.QDialog):
                 cur.execute(sql, [c['npos0'], c['npos1'], seltext, c['ctid']])
             if c['npos1'] >= len(self.text):
                 cur.execute("delete from code_text where ctid=?", [c['ctid']])
-        self.app.conn.commit()
+        # self.app.conn.commit()
 
     def textedit_menu(self, position):
         """ Context menu for select all and copy of text. """
