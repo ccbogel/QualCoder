@@ -53,6 +53,8 @@ from .GUI.base64_helper import *
 import fuzzysearch
 import json
 
+max_memo_length = 1500 # maximum length of the memo send to the AI
+
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -231,7 +233,7 @@ class AiLLM():
 
         # create the prompt         
         if code_memo != '':
-            memo_prompt = f' with the following code memo: "{code_memo[:300]}".'
+            memo_prompt = f' with the following code memo: "{code_memo[:max_memo_length]}".'
         else:
             memo_prompt = '.'
 
@@ -353,7 +355,7 @@ class AiLLM():
         chunks_json += '  ]\n}'
         
         if code_memo != '':
-            memo_str = f'The code has the following memo attached: "{code_memo[:300]}".\n'
+            memo_str = f'The code has the following memo attached: "{code_memo[:max_memo_length]}".\n'
         else:
             memo_str = ''
         
@@ -376,7 +378,7 @@ class AiLLM():
                      'or experience or conveys a similar meaning as the given code. Return the score in the field "relevance" of the output. \n'
                      '2. In the field "interpretation" of the output, give a short a short explanation how the chunk of empirical data '
                      'relates to the given code code or not.\n'
-                     '3. Select a short quote from the chunk of empirical data that contains the part which is most relevant for the analysis '
+                     '3. Select a quote from the chunk of empirical data that contains the part which is most relevant for the analysis '
                      'of the given code. Give back the quote in the field "quote" of the output, following the the original exactly, including errors. '
                      'Do not change the text in any way. \n'
                      'Do these 3 steps for every chunk of empirical data in the list, then close the JSON object for the output. Make sure to return '
@@ -411,10 +413,10 @@ class AiLLM():
         for doc in selected_quotes.data:
             doc.metadata = chunk_list[i].metadata
                        
-            # search with not more than 20% mismatch (Levenshtein Distance)
+            # search with not more than 30% mismatch (Levenshtein Distance)
             if doc.quote != '':
                 quote_found = fuzzysearch.find_near_matches(doc.quote, chunk_list[i].page_content, 
-                                                        max_l_dist=round(len(doc.quote) * 0.2)) # result: list [Match(start=x, end=x, dist=x, matched='txt')]
+                                                        max_l_dist=round(len(doc.quote) * 0.3)) # result: list [Match(start=x, end=x, dist=x, matched='txt')]
             else: 
                 quote_found = []
             if len(quote_found) > 0:
