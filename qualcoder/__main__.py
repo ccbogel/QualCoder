@@ -1031,7 +1031,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.menubar.setNativeMenuBar(True)
         else:
             self.ui.menubar.setNativeMenuBar(False)
-        self.get_latest_github_release()
+        # self.get_latest_github_release()
         try:
             w = int(self.app.settings['mainwindow_w'])
             h = int(self.app.settings['mainwindow_h'])
