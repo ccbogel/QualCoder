@@ -32,7 +32,7 @@ os.environ["ANONYMIZED_TELEMETRY"] = "0" # for chromadb
 
 from langchain.embeddings.sentence_transformer import SentenceTransformerEmbeddings
 from langchain.text_splitter import CharacterTextSplitter, RecursiveCharacterTextSplitter
-from langchain.vectorstores import Chroma
+from langchain_community.vectorstores import Chroma
 from langchain.docstore.document import Document
 from huggingface_hub import hf_hub_url
 import requests

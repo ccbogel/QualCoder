@@ -34,7 +34,7 @@ import time
 from PyQt6 import QtWidgets
 from PyQt6 import QtGui
 from PyQt6 import QtCore 
-from langchain.chat_models import ChatOpenAI
+from langchain_community.chat_models import ChatOpenAI
 from langchain.globals import set_llm_cache
 from langchain.cache import InMemoryCache
 from langchain.pydantic_v1 import BaseModel, Field

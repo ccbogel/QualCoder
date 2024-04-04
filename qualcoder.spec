@@ -4,6 +4,7 @@ from PyInstaller.utils.hooks import collect_data_files, copy_metadata, collect_s
 block_cipher = None
 
 datas = collect_data_files('langchain')
+datas += collect_data_files('langchain_community')
 datas += collect_data_files('chromadb')
 datas += copy_metadata('tqdm')
 datas += copy_metadata('regex')
@@ -17,12 +18,14 @@ datas += copy_metadata('pyyaml')
 datas += copy_metadata('torch')
 datas += copy_metadata('tokenizers')
 datas += copy_metadata('opentelemetry-sdk')
+datas += [('LICENSE.txt', '.')]
 
 hiddenimports = collect_submodules('chromadb')
 hiddenimports += collect_submodules('chromadb.ingest.impl')
 hiddenimports += collect_submodules('chromadb.segment.impl')
 hiddenimports += collect_submodules('chromadb.segment.impl.manager')
 hiddenimports += collect_submodules('chromadb.segment.impl.metadata')
+hiddenimports += collect_submodules('langchain_community.vectorstores.chroma')
 
 a = Analysis(
     ['qualcoder/__main__.py'],
