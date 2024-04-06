@@ -71,6 +71,7 @@ class DialogAiSearch(QtWidgets.QDialog):
     selected_name = ''
     selected_code_ids = -1
     selected_description = ''
+    include_coded_segments = False
     selected_file_ids = []
 
     def __init__(self, app_, selected_id, selected_is_code):
@@ -395,6 +396,7 @@ class DialogAiSearch(QtWidgets.QDialog):
                     self.selected_description = item.toolTip(2)
                 else:
                     self.selected_description = ''
+                self.include_coded_segments = self.ui.checkBox_coded_segments.isChecked()
                 item = item.parent()
                 while item is not None and not isinstance(item, QtWidgets.QTreeWidget):
                     self.selected_name = f'{item.text(0)} > {self.selected_name}'

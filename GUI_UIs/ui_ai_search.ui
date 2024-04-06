@@ -84,6 +84,16 @@
             </property>
            </widget>
           </item>
+          <item>
+           <widget class="QCheckBox" name="checkBox_coded_segments">
+            <property name="toolTip">
+             <string>If deselected (default), the AI searches for new material only. Segments already coded with this code are excluded from the results.</string>
+            </property>
+            <property name="text">
+             <string>Include coded segments</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
         <widget class="QWidget" name="tab_free_search">

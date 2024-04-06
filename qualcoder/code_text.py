@@ -4217,6 +4217,7 @@ class DialogCodeText(QtWidgets.QWidget):
         if ret == QtWidgets.QDialog.DialogCode.Accepted:
             self.ai_search_name = ui.selected_name
             self.ai_search_description = ui.selected_description
+            self.ai_include_coded_segments = ui.include_coded_segments
             self.ai_search_file_ids = ui.selected_file_ids
             self.ai_search_code_ids = ui.selected_code_ids
             self.ai_search_similar_chunks = []
@@ -4240,7 +4241,7 @@ class DialogCodeText(QtWidgets.QWidget):
 
         # 1) Check if we search for data related to a code (instead of freetext) and filter out 
         # chunks that are already coded with this code. This way, we find new data only.  
-        if self.ai_search_code_ids is not None and len(self.ai_search_code_ids) > 0:
+        if (not self.ai_include_coded_segments) and self.ai_search_code_ids is not None and len(self.ai_search_code_ids) > 0:
             filtered_chunks = []
             for chunk in chunks:
                 chunk_already_coded = False
