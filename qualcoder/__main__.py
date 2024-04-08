@@ -935,7 +935,7 @@ class App(object):
         # Do not try and create another backup with same date and hour, unless suffix present
         result = os.path.exists(backup)
         if result and suffix == "":
-            return
+            return '', ''
         msg = ""
         if self.settings['backup_av_files'] == 'True':
             try:
