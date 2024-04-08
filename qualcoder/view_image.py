@@ -1522,24 +1522,27 @@ class DialogCodeImage(QtWidgets.QDialog):
         if not ok:
             return
         category = ui.get_selected()
-        for code in self.codes:
-            if code['catid'] == catid:
-                cur.execute("update code_name set catid=? where catid=?", [category['catid'], catid])
-        cur.execute("delete from code_cat where catid=?", [catid])
-        self.app.conn.commit()
-        self.update_dialog_codes_and_categories()
-        for cat in self.categories:
-            if cat['supercatid'] == catid:
-                cur.execute("update code_cat set supercatid=? where supercatid=?", [category['catid'], catid])
-        self.app.conn.commit()
-        # Clear any orphan supercatids
-        sql = "select supercatid from code_cat where supercatid not in (select catid from code_cat)"
-        cur.execute(sql)
-        orphans = cur.fetchall()
-        sql = "update code_cat set supercatid=Null where supercatid=?"
-        for orphan in orphans:
-            cur.execute(sql, [orphan[0]])
-        self.app.conn.commit()
+        try:
+            for code in self.codes:
+                if code['catid'] == catid:
+                    cur.execute("update code_name set catid=? where catid=?", [category['catid'], catid])
+            cur.execute("delete from code_cat where catid=?", [catid])
+            self.update_dialog_codes_and_categories()
+            for cat in self.categories:
+                if cat['supercatid'] == catid:
+                    cur.execute("update code_cat set supercatid=? where supercatid=?", [category['catid'], catid])
+            # Clear any orphan supercatids
+            sql = "select supercatid from code_cat where supercatid not in (select catid from code_cat)"
+            cur.execute(sql)
+            orphans = cur.fetchall()
+            sql = "update code_cat set supercatid=Null where supercatid=?"
+            for orphan in orphans:
+                cur.execute(sql, [orphan[0]])
+            self.app.conn.commit()
+        except:
+            self.app.conn.rollback() # revert all changes 
+            self.update_dialog_codes_and_categories()
+            raise            
         self.update_dialog_codes_and_categories()
 
     def merge_codes(self, item, parent):
@@ -1567,39 +1570,37 @@ class DialogCodeImage(QtWidgets.QDialog):
         ct_sql = "select ctid from code_text where cid=?"
         cur.execute(ct_sql, [old_cid])
         ct_res = cur.fetchall()
-        for ct in ct_res:
-            try:
-                cur.execute("update code_text set cid=? where ctid=?", [new_cid, ct[0]])
-                self.app.conn.commit()
-            except sqlite3.IntegrityError as e_:
-                # print(ct, e_)
-                cur.execute("delete from code_text where ctid=?", [ct[0]])
-                self.app.conn.commit()
-        av_sql = "select avid from code_av where cid=?"
-        cur.execute(av_sql, [old_cid])
-        av_res = cur.fetchall()
-        for av in av_res:
-            try:
-                cur.execute("update code_av set cid=? where avid=?", [new_cid, av[0]])
-                self.app.conn.commit()
-            except sqlite3.IntegrityError as e_:
-                # print(e_)
-                cur.execute("delete from code_av where avid=?", [av[0]])
-                self.app.conn.commit()
-        img_sql = "select imid from code_image where cid=?"
-        cur.execute(img_sql, [old_cid])
-        img_res = cur.fetchall()
-        for img in img_res:
-            try:
-                cur.execute("update code_image set cid=? where imid=?", [new_cid, img[0]])
-                self.app.conn.commit()
-            except sqlite3.IntegrityError as e_:
-                # print(e_)
-                cur.execute("delete from code_image where imid=?", [img[0]])
-                self.app.conn.commit()
+        try:
+            for ct in ct_res:
+                try:
+                    cur.execute("update code_text set cid=? where ctid=?", [new_cid, ct[0]])
+                except sqlite3.IntegrityError as e_:
+                    # print(ct, e_)
+                    cur.execute("delete from code_text where ctid=?", [ct[0]])
+            av_sql = "select avid from code_av where cid=?"
+            cur.execute(av_sql, [old_cid])
+            av_res = cur.fetchall()
+            for av in av_res:
+                try:
+                    cur.execute("update code_av set cid=? where avid=?", [new_cid, av[0]])
+                except sqlite3.IntegrityError as e_:
+                    # print(e_)
+                    cur.execute("delete from code_av where avid=?", [av[0]])
+            img_sql = "select imid from code_image where cid=?"
+            cur.execute(img_sql, [old_cid])
+            img_res = cur.fetchall()
+            for img in img_res:
+                try:
+                    cur.execute("update code_image set cid=? where imid=?", [new_cid, img[0]])
+                except sqlite3.IntegrityError as e_:
+                    # print(e_)
+                    cur.execute("delete from code_image where imid=?", [img[0]])
 
-        cur.execute("delete from code_name where cid=?", [old_cid, ])
-        self.app.conn.commit()
+            cur.execute("delete from code_name where cid=?", [old_cid, ])
+            self.app.conn.commit()
+        except:
+            self.app.conn.rollback() # revert all changes 
+            raise            
         self.parent_textEdit.append(msg)
         self.update_dialog_codes_and_categories()
         self.app.delete_backup = False
