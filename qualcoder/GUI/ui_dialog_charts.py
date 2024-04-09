@@ -211,12 +211,12 @@ class Ui_DialogCharts(object):
         self.comboBox_ngrams.setGeometry(QtCore.QRect(380, 520, 40, 30))
         self.comboBox_ngrams.setObjectName("comboBox_ngrams")
         self.label_upper_count = QtWidgets.QLabel(parent=DialogCharts)
-        self.label_upper_count.setGeometry(QtCore.QRect(10, 300, 131, 24))
+        self.label_upper_count.setGeometry(QtCore.QRect(10, 300, 191, 24))
         self.label_upper_count.setLayoutDirection(QtCore.Qt.LayoutDirection.LeftToRight)
         self.label_upper_count.setAlignment(QtCore.Qt.AlignmentFlag.AlignRight|QtCore.Qt.AlignmentFlag.AlignTrailing|QtCore.Qt.AlignmentFlag.AlignVCenter)
         self.label_upper_count.setObjectName("label_upper_count")
         self.spinBox_count_max = QtWidgets.QSpinBox(parent=DialogCharts)
-        self.spinBox_count_max.setGeometry(QtCore.QRect(154, 301, 61, 26))
+        self.spinBox_count_max.setGeometry(QtCore.QRect(210, 301, 61, 26))
         self.spinBox_count_max.setMaximum(500)
         self.spinBox_count_max.setSingleStep(50)
         self.spinBox_count_max.setObjectName("spinBox_count_max")
@@ -329,7 +329,7 @@ class Ui_DialogCharts(object):
         self.label_ngrams.setToolTip(_translate("DialogCharts", "Number of conjoined words in phrase. Stopwords applies to selection of 1 word only."))
         self.label_ngrams.setText(_translate("DialogCharts", "n-grams"))
         self.comboBox_ngrams.setToolTip(_translate("DialogCharts", "1=One word, 3=3 word phrase, 4=4 word phrase"))
-        self.label_upper_count.setToolTip(_translate("DialogCharts", "<html><head/><body><p>This is to allow a wider spread of head map colours when there are extreme count differences.</p><p>0 represents no limit.</p></body></html>"))
+        self.label_upper_count.setToolTip(_translate("DialogCharts", "<html><head/><body><p>This is to allow a wider spread of heatmap colours when there are extreme count differences.</p><p>0 represents no limit.</p></body></html>"))
         self.label_upper_count.setText(_translate("DialogCharts", "Upper count limiter"))
 
 
