@@ -251,9 +251,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.textEdit.installEventFilter(self.eventFilterTT)
         self.ui.textEdit.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.textEdit.customContextMenuRequested.connect(self.textedit_menu)
-
-        self.ui.label_segment.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        self.ui.label_segment.customContextMenuRequested.connect(self.label_segment_menu)
+        self.ui.pushButton_segment_menu.pressed.connect(self.label_segment_menu)
 
         font = f"font: {self.app.settings['fontsize']}pt "
         font += '"' + self.app.settings['font'] + '";'
