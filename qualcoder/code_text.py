@@ -674,7 +674,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 item = it.value()
                 count += 1
         # self.ui.treeWidget.expandAll()
-        self.ui.treeWidget.sortByColumn(0, QtCore.Qt.SortOrder.DescendingOrder)
+        self.ui.treeWidget.sortByColumn(0, QtCore.Qt.SortOrder.AscendingOrder)
         self.fill_code_counts_in_tree()
 
     def fill_code_counts_in_tree(self):
