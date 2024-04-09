@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2023 Colin Curtain
+Copyright (c) 2024 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -638,6 +638,7 @@ class DialogCodePdf(QtWidgets.QWidget):
                 item = it.value()
                 count += 1
         # self.ui.treeWidget.expandAll()
+        self.ui.treeWidget.sortByColumn(0, QtCore.Qt.SortOrder.AscendingOrder)
         self.fill_code_counts_in_tree()
 
     def fill_code_counts_in_tree(self):
