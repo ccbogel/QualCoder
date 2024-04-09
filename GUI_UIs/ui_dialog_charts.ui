@@ -725,12 +725,12 @@ wordcloud</string>
     <rect>
      <x>10</x>
      <y>300</y>
-     <width>131</width>
+     <width>191</width>
      <height>24</height>
     </rect>
    </property>
    <property name="toolTip">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This is to allow a wider spread of head map colours when there are extreme count differences.&lt;/p&gt;&lt;p&gt;0 represents no limit.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This is to allow a wider spread of heatmap colours when there are extreme count differences.&lt;/p&gt;&lt;p&gt;0 represents no limit.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
    <property name="layoutDirection">
     <enum>Qt::LeftToRight</enum>
@@ -745,7 +745,7 @@ wordcloud</string>
   <widget class="QSpinBox" name="spinBox_count_max">
    <property name="geometry">
     <rect>
-     <x>154</x>
+     <x>210</x>
      <y>301</y>
      <width>61</width>
      <height>26</height>
