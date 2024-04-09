@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2023 Colin Curtain
+Copyright (c) 2024 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -894,7 +894,7 @@ class App(object):
         # Do not try and create another backup with same date and hour, unless suffix present
         result = os.path.exists(backup)
         if result and suffix == "":
-            return
+            return f"Backup exists already with this name: {backup}", backup
         msg = ""
         if self.settings['backup_av_files'] == 'True':
             try:
@@ -2106,7 +2106,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # Save a date and 24 hour stamped backup
         if self.app.settings['backup_on_open'] == 'True' and newproject == "no":
-            #self.save_backup()
             msg, backup_name = self.app.save_backup()
             self.ui.textEdit.append(msg)
         msg = "\n" + _("Project Opened: ") + self.app.project_name
@@ -2169,33 +2168,6 @@ class MainWindow(QtWidgets.QMainWindow):
             missing_folders = True
         if missing_folders:
             Message(self.app, _("Information"), _("QualCoder project missing folders. Created empty folders")).exec()
-
-    '''def save_backup(self):
-        """ Save a date and hours stamped backup.
-        Do not back up if the name already exists.
-        A backup can be generated in the subsequent hour."""
-
-        nowdate = datetime.datetime.now().astimezone().strftime("%Y%m%d_%H")  # -%S")
-        backup = f"{self.app.project_path[0:-4]}_BKUP_{nowdate}.qda"
-        # Do not try and create another backup with same date and hour
-        result = os.path.exists(backup)
-        if result:
-            return
-        if self.app.settings['backup_av_files'] == 'True':
-            try:
-                shutil.copytree(self.app.project_path, backup)
-            except FileExistsError as err:
-                msg = _("There is already a backup with this name")
-                print(f"{err}\nmsg")
-                logger.warning(_(msg) + f"\n{err}")
-        else:
-            shutil.copytree(self.app.project_path, backup,
-                            ignore=shutil.ignore_patterns('*.mp3', '*.wav', '*.mp4', '*.mov', '*.ogg', '*.wmv', '*.MP3',
-                                                          '*.WAV', '*.MP4', '*.MOV', '*.OGG', '*.WMV'))
-            self.ui.textEdit.append(_("WARNING: audio and video files NOT backed up. See settings."))
-        self.ui.textEdit.append(_("Project backup created: ") + backup)
-        # Delete backup path - delete the backup if no changes occurred in the project during the session
-        self.app.delete_backup_path_name = backup'''
 
     def project_summary_report(self):
         """ Add a summary of the project to the text edit.
