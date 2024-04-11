@@ -281,7 +281,7 @@ Key shortcut: Ctrl S</string>
        <rect>
         <x>0</x>
         <y>50</y>
-        <width>261</width>
+        <width>241</width>
         <height>28</height>
        </rect>
       </property>
@@ -444,6 +444,22 @@ Key shortcut: Ctrl S</string>
       </property>
       <property name="text">
        <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_segment_menu">
+      <property name="geometry">
+       <rect>
+        <x>250</x>
+        <y>50</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Button to select a segment. &lt;/p&gt;&lt;p&gt;Then a menu of options will open.&lt;/p&gt;&lt;p&gt;(This button is a work around if the right-click to open menus on the segment bars below does not work)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string>S</string>
       </property>
      </widget>
     </widget>

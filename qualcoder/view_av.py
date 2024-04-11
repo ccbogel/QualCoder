@@ -251,9 +251,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.textEdit.installEventFilter(self.eventFilterTT)
         self.ui.textEdit.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.textEdit.customContextMenuRequested.connect(self.textedit_menu)
-
-        self.ui.label_segment.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        self.ui.label_segment.customContextMenuRequested.connect(self.label_segment_menu)
+        self.ui.pushButton_segment_menu.pressed.connect(self.label_segment_menu)
 
         font = f"font: {self.app.settings['fontsize']}pt "
         font += '"' + self.app.settings['font'] + '";'
@@ -629,6 +627,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                 item = it.value()
                 count += 1
         # self.ui.treeWidget.expandAll()
+        self.ui.treeWidget.sortByColumn(0, QtCore.Qt.SortOrder.AscendingOrder)
         self.fill_code_counts_in_tree()
 
     def fill_code_counts_in_tree(self):

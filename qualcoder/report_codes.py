@@ -491,6 +491,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 it += 1
                 item = it.value()
                 count += 1
+        self.ui.treeWidget.sortByColumn(0, QtCore.Qt.SortOrder.AscendingOrder)
         self.fill_code_counts_in_tree()
         self.ui.treeWidget.expandAll()
 
