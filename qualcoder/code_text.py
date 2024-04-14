@@ -1562,24 +1562,27 @@ class DialogCodeText(QtWidgets.QWidget):
         if not ok:
             return
         category = ui.get_selected()
-        for code in self.codes:
-            if code['catid'] == catid:
-                cur.execute("update code_name set catid=? where catid=?", [category['catid'], catid])
-        cur.execute("delete from code_cat where catid=?", [catid])
-        self.app.conn.commit()
-        self.update_dialog_codes_and_categories()
-        for cat in self.categories:
-            if cat['supercatid'] == catid:
-                cur.execute("update code_cat set supercatid=? where supercatid=?", [category['catid'], catid])
-        self.app.conn.commit()
-        # Clear any orphan supercatids
-        sql = "select supercatid from code_cat where supercatid not in (select catid from code_cat)"
-        cur.execute(sql)
-        orphans = cur.fetchall()
-        sql = "update code_cat set supercatid=Null where supercatid=?"
-        for orphan in orphans:
-            cur.execute(sql, [orphan[0]])
-        self.app.conn.commit()
+        try:
+            for code in self.codes:
+                if code['catid'] == catid:
+                    cur.execute("update code_name set catid=? where catid=?", [category['catid'], catid])
+            cur.execute("delete from code_cat where catid=?", [catid])
+            self.update_dialog_codes_and_categories()
+            for cat in self.categories:
+                if cat['supercatid'] == catid:
+                    cur.execute("update code_cat set supercatid=? where supercatid=?", [category['catid'], catid])
+            # Clear any orphan supercatids
+            sql = "select supercatid from code_cat where supercatid not in (select catid from code_cat)"
+            cur.execute(sql)
+            orphans = cur.fetchall()
+            sql = "update code_cat set supercatid=Null where supercatid=?"
+            for orphan in orphans:
+                cur.execute(sql, [orphan[0]])
+            self.app.conn.commit()
+        except:
+            self.app.conn.rollback() # revert all changes 
+            self.update_dialog_codes_and_categories()
+            raise            
         self.update_dialog_codes_and_categories()
 
     def move_code(self, selected):
@@ -2493,38 +2496,36 @@ class DialogCodeText(QtWidgets.QWidget):
         ct_sql = "select ctid from code_text where cid=?"
         cur.execute(ct_sql, [old_cid])
         ct_res = cur.fetchall()
-        for ct in ct_res:
-            try:
-                cur.execute("update code_text set cid=? where ctid=?", [new_cid, ct[0]])
-                self.app.conn.commit()
-            except sqlite3.IntegrityError as e_:
-                # print(ct, e_)
-                cur.execute("delete from code_text where ctid=?", [ct[0]])
-                self.app.conn.commit()
-        av_sql = "select avid from code_av where cid=?"
-        cur.execute(av_sql, [old_cid])
-        av_res = cur.fetchall()
-        for av in av_res:
-            try:
-                cur.execute("update code_av set cid=? where avid=?", [new_cid, av[0]])
-                self.app.conn.commit()
-            except sqlite3.IntegrityError as e_:
-                # print(e_)
-                cur.execute("delete from code_av where avid=?", [av[0]])
-                self.app.conn.commit()
-        img_sql = "select imid from code_image where cid=?"
-        cur.execute(img_sql, [old_cid])
-        img_res = cur.fetchall()
-        for img in img_res:
-            try:
-                cur.execute("update code_image set cid=? where imid=?", [new_cid, img[0]])
-                self.app.conn.commit()
-            except sqlite3.IntegrityError as e_:
-                # print(e_)
-                cur.execute("delete from code_image where imid=?", [img[0]])
-                self.app.conn.commit()
-        cur.execute("delete from code_name where cid=?", [old_cid, ])
-        self.app.conn.commit()
+        try:
+            for ct in ct_res:
+                try:
+                    cur.execute("update code_text set cid=? where ctid=?", [new_cid, ct[0]])
+                except sqlite3.IntegrityError as e_:
+                    # print(ct, e_)
+                    cur.execute("delete from code_text where ctid=?", [ct[0]])
+            av_sql = "select avid from code_av where cid=?"
+            cur.execute(av_sql, [old_cid])
+            av_res = cur.fetchall()
+            for av in av_res:
+                try:
+                    cur.execute("update code_av set cid=? where avid=?", [new_cid, av[0]])
+                except sqlite3.IntegrityError as e_:
+                    # print(e_)
+                    cur.execute("delete from code_av where avid=?", [av[0]])
+            img_sql = "select imid from code_image where cid=?"
+            cur.execute(img_sql, [old_cid])
+            img_res = cur.fetchall()
+            for img in img_res:
+                try:
+                    cur.execute("update code_image set cid=? where imid=?", [new_cid, img[0]])
+                except sqlite3.IntegrityError as e_:
+                    # print(e_)
+                    cur.execute("delete from code_image where imid=?", [img[0]])
+            cur.execute("delete from code_name where cid=?", [old_cid, ])
+            self.app.conn.commit()
+        except:
+            self.app.conn.rollback() # revert all changes 
+            raise        
         self.app.delete_backup = False
         msg = msg.replace("\n", " ")
         self.parent_textEdit.append(msg)
@@ -3597,35 +3598,40 @@ class DialogCodeText(QtWidgets.QWidget):
         entries = 0
         undo_list = []
         cur = self.app.conn.cursor()
-        for start_pos in text_starts:
-            pos1 = -1  # Default if not found
-            text_end_iterator = 0
-            try:
-                while start_pos >= text_ends[text_end_iterator]:
-                    text_end_iterator += 1
-            except IndexError:
-                text_end_iterator = -1
-            if text_end_iterator >= 0:
-                pos1 = text_ends[text_end_iterator]
-                # Check if already coded in this file for this coder
-                sql = "select cid from code_text where cid=? and fid=? and pos0=? and pos1=? and owner=?"
-                cur.execute(sql, [cid, self.file_['id'], start_pos, pos1, self.app.settings['codername']])
-                res = cur.fetchone()
-                if res is None:
-                    seltext = self.file_['fulltext'][start_pos: pos1]
-                    sql = "insert into code_text (cid, fid, seltext, pos0, pos1, owner, date, memo) values(?,?,?,?,?,?,?,?)"
-                    cur.execute(sql, (cid, self.file_['id'], seltext, start_pos, pos1,
-                                      self.app.settings['codername'], now_date, ""))
-                    # Add to undo auto-coding history
-                    undo = {"sql": "delete from code_text where cid=? and fid=? and pos0=? and pos1=? and owner=?",
-                            "cid": cid, "fid": self.file_['id'], "pos0": start_pos, "pos1": pos1,
-                            "owner": self.app.settings['codername']
-                            }
-                    undo_list.append(undo)
-                    entries += 1
-                    self.app.conn.commit()
-                else:
-                    already_assigned += 1
+        try:
+            for start_pos in text_starts:
+                pos1 = -1  # Default if not found
+                text_end_iterator = 0
+                try:
+                    while start_pos >= text_ends[text_end_iterator]:
+                        text_end_iterator += 1
+                except IndexError:
+                    text_end_iterator = -1
+                if text_end_iterator >= 0:
+                    pos1 = text_ends[text_end_iterator]
+                    # Check if already coded in this file for this coder
+                    sql = "select cid from code_text where cid=? and fid=? and pos0=? and pos1=? and owner=?"
+                    cur.execute(sql, [cid, self.file_['id'], start_pos, pos1, self.app.settings['codername']])
+                    res = cur.fetchone()
+                    if res is None:
+                        seltext = self.file_['fulltext'][start_pos: pos1]
+                        sql = "insert into code_text (cid, fid, seltext, pos0, pos1, owner, date, memo) values(?,?,?,?,?,?,?,?)"
+                        cur.execute(sql, (cid, self.file_['id'], seltext, start_pos, pos1,
+                                        self.app.settings['codername'], now_date, ""))
+                        # Add to undo auto-coding history
+                        undo = {"sql": "delete from code_text where cid=? and fid=? and pos0=? and pos1=? and owner=?",
+                                "cid": cid, "fid": self.file_['id'], "pos0": start_pos, "pos1": pos1,
+                                "owner": self.app.settings['codername']
+                                }
+                        undo_list.append(undo)
+                        entries += 1
+                    else:
+                        already_assigned += 1
+            self.app.conn.commit()
+        except:
+            self.app.conn.rollback() # revert all changes
+            undo_list = [] 
+            raise    
         # Add to undo auto-coding history
         if len(undo_list) > 0:
             name = _("Coding using start and end marks") + _("\nCode: ") + item.text(0)
@@ -3653,13 +3659,17 @@ class DialogCodeText(QtWidgets.QWidget):
         if not ok:
             return
         undo = ui.get_selected()
-        self.autocode_history.remove(undo)
 
         # Run all sqls
         cur = self.app.conn.cursor()
-        for i in undo['sql_list']:
-            cur.execute(i['sql'], [i['cid'], i['fid'], i['pos0'], i['pos1'], i['owner']])
-        self.app.conn.commit()
+        try:
+            for i in undo['sql_list']:
+                cur.execute(i['sql'], [i['cid'], i['fid'], i['pos0'], i['pos1'], i['owner']])
+            self.app.conn.commit()
+        except:
+            self.app.conn.rollback() # revert all changes 
+            raise
+        self.autocode_history.remove(undo)
         self.parent_textEdit.append(_("Undo autocoding: " + undo['name'] + "\n"))
 
         # Update filter for tooltip and update code colours
@@ -3718,36 +3728,41 @@ class DialogCodeText(QtWidgets.QWidget):
         cur = self.app.conn.cursor()
         msg = ""
         undo_list = []
-        for f in files:
-            sentences = f['fulltext'].split(ending)
-            pos0 = 0
-            codes_added = 0
-            for sentence in sentences:
-                if text_ in sentence:
-                    i = {'cid': cid, 'fid': int(f['id']), 'seltext': str(sentence),
-                         'pos0': pos0, 'pos1': pos0 + len(sentence),
-                         'owner': self.app.settings['codername'], 'memo': "",
-                         'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")}
-                    # Possible IntegrityError: UNIQUE constraint failed
-                    try:
-                        codes_added += 1
-                        cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,\
-                            owner,memo,date) values(?,?,?,?,?,?,?,?)",
-                                    (i['cid'], i['fid'], i['seltext'], i['pos0'],
-                                     i['pos1'], i['owner'], i['memo'], i['date']))
-                        self.app.conn.commit()
-                        # Record a list of undo sql
-                        undo = {"sql": "delete from code_text where cid=? and fid=? and pos0=? and pos1=? and owner=?",
-                                "cid": i['cid'], "fid": i['fid'], "pos0": i['pos0'], "pos1": i['pos1'],
-                                "owner": i['owner']
-                                }
-                        undo_list.append(undo)
-                    except Exception as e:
-                        print("Autocode insert error ", str(e))
-                        logger.debug(_("Autocode insert error ") + str(e))
-                pos0 += len(sentence) + len(ending)
-            if codes_added > 0:
-                msg += _("File: ") + f['name'] + " " + str(codes_added) + _(" added codes") + "\n"
+        try:
+            for f in files:
+                sentences = f['fulltext'].split(ending)
+                pos0 = 0
+                codes_added = 0
+                for sentence in sentences:
+                    if text_ in sentence:
+                        i = {'cid': cid, 'fid': int(f['id']), 'seltext': str(sentence),
+                            'pos0': pos0, 'pos1': pos0 + len(sentence),
+                            'owner': self.app.settings['codername'], 'memo': "",
+                            'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")}
+                        # Possible IntegrityError: UNIQUE constraint failed
+                        try:
+                            codes_added += 1
+                            cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,\
+                                owner,memo,date) values(?,?,?,?,?,?,?,?)",
+                                        (i['cid'], i['fid'], i['seltext'], i['pos0'],
+                                        i['pos1'], i['owner'], i['memo'], i['date']))
+                            # Record a list of undo sql
+                            undo = {"sql": "delete from code_text where cid=? and fid=? and pos0=? and pos1=? and owner=?",
+                                    "cid": i['cid'], "fid": i['fid'], "pos0": i['pos0'], "pos1": i['pos1'],
+                                    "owner": i['owner']
+                                    }
+                            undo_list.append(undo)
+                        except Exception as e:
+                            print("Autocode insert error ", str(e))
+                            logger.debug(_("Autocode insert error ") + str(e))
+                    pos0 += len(sentence) + len(ending)
+                if codes_added > 0:
+                    msg += _("File: ") + f['name'] + " " + str(codes_added) + _(" added codes") + "\n"
+            self.app.conn.commit()
+        except:
+            self.app.conn.rollback() # revert all changes
+            undo_list = [] 
+            raise
         if len(undo_list) > 0:
             name = _("Sentence coding: ") + _("\nCode: ") + item.text(0)
             name += _("\nWith: ") + text_ + _("\nUsing line ending: ") + ending
@@ -3806,47 +3821,52 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         undo_list = []
         cur = self.app.conn.cursor()
-        for txt in texts:
-            filenames = ""
-            for f in files:
-                filenames += f['name'] + " "
-                cur.execute("select name, id, fulltext, memo, owner, date from source where id=? and "
-                            "(mediapath is null or mediapath like '/docs/%' or mediapath like 'docs:%')",
-                            [f['id']])
-                current_file = cur.fetchone()
-                # Rare but possible no result is returned, hence if statement
-                if current_file is not None:
-                    text_ = current_file[2]
-                    text_starts = [match.start() for match in re.finditer(re.escape(txt), text_)]
-                    # Trim to first or last instance if option selected
-                    if self.all_first_last == "first" and len(text_starts) > 1:
-                        text_starts = [text_starts[0]]
-                    if self.all_first_last == "last" and len(text_starts) > 1:
-                        text_starts = [text_starts[-1]]
+        try:
+            for txt in texts:
+                filenames = ""
+                for f in files:
+                    filenames += f['name'] + " "
+                    cur.execute("select name, id, fulltext, memo, owner, date from source where id=? and "
+                                "(mediapath is null or mediapath like '/docs/%' or mediapath like 'docs:%')",
+                                [f['id']])
+                    current_file = cur.fetchone()
+                    # Rare but possible no result is returned, hence if statement
+                    if current_file is not None:
+                        text_ = current_file[2]
+                        text_starts = [match.start() for match in re.finditer(re.escape(txt), text_)]
+                        # Trim to first or last instance if option selected
+                        if self.all_first_last == "first" and len(text_starts) > 1:
+                            text_starts = [text_starts[0]]
+                        if self.all_first_last == "last" and len(text_starts) > 1:
+                            text_starts = [text_starts[-1]]
 
-                    # Add new items to database
-                    for startPos in text_starts:
-                        item = {'cid': cid, 'fid': int(f['id']), 'seltext': str(txt),
-                                'pos0': startPos, 'pos1': startPos + len(txt),
-                                'owner': self.app.settings['codername'], 'memo': "",
-                                'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")}
-                        try:
-                            cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,\
-                                owner,memo,date) values(?,?,?,?,?,?,?,?)",
-                                        [item['cid'], item['fid'], item['seltext'], item['pos0'],
-                                         item['pos1'], item['owner'], item['memo'], item['date']])
-                            self.app.conn.commit()
-                            # Record a list of undo sql
-                            undo = {
-                                "sql": "delete from code_text where cid=? and fid=? and pos0=? and pos1=? and owner=?",
-                                "cid": item['cid'], "fid": item['fid'], "pos0": item['pos0'], "pos1": item['pos1'],
-                                "owner": item['owner']}
-                            undo_list.append(undo)
-                        except sqlite3.IntegrityError as e:
-                            logger.debug(_("Autocode insert error ") + str(e))
-                        self.app.delete_backup = False
+                        # Add new items to database
+                        for startPos in text_starts:
+                            item = {'cid': cid, 'fid': int(f['id']), 'seltext': str(txt),
+                                    'pos0': startPos, 'pos1': startPos + len(txt),
+                                    'owner': self.app.settings['codername'], 'memo': "",
+                                    'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")}
+                            try:
+                                cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,\
+                                    owner,memo,date) values(?,?,?,?,?,?,?,?)",
+                                            [item['cid'], item['fid'], item['seltext'], item['pos0'],
+                                            item['pos1'], item['owner'], item['memo'], item['date']])
+                                # Record a list of undo sql
+                                undo = {
+                                    "sql": "delete from code_text where cid=? and fid=? and pos0=? and pos1=? and owner=?",
+                                    "cid": item['cid'], "fid": item['fid'], "pos0": item['pos0'], "pos1": item['pos1'],
+                                    "owner": item['owner']}
+                                undo_list.append(undo)
+                            except sqlite3.IntegrityError as e:
+                                logger.debug(_("Autocode insert error ") + str(e))
+                            self.app.delete_backup = False
+                self.app.conn.commit()
                 self.parent_textEdit.append(_("Automatic coding in files: ") + filenames
-                                            + _(". with text: ") + txt)
+                                          + _(". with text: ") + txt)
+        except:
+            self.app.conn.rollback() # revert all changes 
+            undo_list = []
+            raise
         if len(undo_list) > 0:
             name = _("Text coding: ") + _("\nCode: ") + code_item.text(0)
             name += _("\nWith: ") + find_text
