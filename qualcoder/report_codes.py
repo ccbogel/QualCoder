@@ -1732,13 +1732,19 @@ class DialogReportCodes(QtWidgets.QDialog):
                 abs_path = self.app.project_path + res[2]
             msecs = 1  # Default erroneous value for media duration
             if vlc:
-                instance = vlc.Instance()
                 try:
-                    media = instance.media_new(abs_path)
-                    media.parse()
-                    msecs = media.get_duration()
-                except FileNotFoundError:
+                    instance = vlc.Instance()
+                except NameError as name_err:
+                    logger.error(f"vlc.Instance: {name_err}")
+                    instance = None
                     erroneous_msecs = True
+                if instance:
+                    try:
+                        media = instance.media_new(abs_path)
+                        media.parse()
+                        msecs = media.get_duration()
+                    except FileNotFoundError:
+                        erroneous_msecs = True
             else:
                 erroneous_msecs = True
             res_dict = {"fid": res[0], "file_duration": msecs, "filename": res[1]}

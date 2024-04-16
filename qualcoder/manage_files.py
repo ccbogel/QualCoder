@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2023 Colin Curtain
+Copyright (c) 2024 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -973,7 +973,12 @@ class DialogManageFiles(QtWidgets.QDialog):
                 return icon, metadata
             if vlc:
                 try:
-                    instance = vlc.Instance()
+                    try:
+                        instance = vlc.Instance()
+                    except NameError as name_err:
+                        # NameError: no function 'libvlc_new'
+                        logger.error(f"vlc.Instance: {name_err}")
+                        return icon, f"Cannot use vlc. {name_err}"
                     media = instance.media_new(abs_path)
                     media.parse()
                     msecs = media.get_duration()

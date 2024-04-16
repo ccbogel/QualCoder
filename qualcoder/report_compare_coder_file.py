@@ -336,22 +336,30 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         source = self.app.project_path + self.file_['mediapath']
         if self.file_['mediapath'][0:6] in ("audio:", "video:"):
             source = self.file_['mediapath'][7:]
+        duration_txt = ""
+        msecs = 1  # Default
         if vlc:
-            instance = vlc.Instance()
             try:
-                media = instance.media_new(source)
-                media.parse()
-                msecs = media.get_duration()
-                duration_txt = _("A/V Duration: ") + msecs_to_hours_mins_secs(msecs) + " , " + _("msecs: ") + str(msecs)
-            except Exception as err:
-                msg_ = _("Cannot open: ") + source + "\n" + str(err)
-                logger.debug(msg_)
-                Message(self.app, _("A/V Error"), msg_, "warning").exec()
-                logger.warning(msg_)
-                return
+                instance = vlc.Instance()
+            except NameError as name_err:
+                logger.error(f"vlc.Instance: {name_err}")
+                duration_txt += f"Duration unknown. Set at 1 msec. vlc.Instance: {name_err}"
+                instance = None
+            if instance:
+                try:
+                    media = instance.media_new(source)
+                    media.parse()
+                    msecs = media.get_duration()
+                    duration_txt = _("A/V Duration: ") + msecs_to_hours_mins_secs(msecs) + " , " + _("msecs: ") + str(msecs)
+                except Exception as err:
+                    msg_ = _("Cannot open: ") + source + "\n" + str(err)
+                    logger.debug(msg_)
+                    Message(self.app, _("A/V Error"), msg_, "warning").exec()
+                    logger.warning(msg_)
+                    return
         else:
             msecs = 1
-            duration_txt = _("A/V Duration: Unknown, Set at 1 millisecond") + "\n"
+            duration_txt += _("A/V Duration: Unknown, Set at 1 millisecond") + "\n"
             duration_txt += _("Statistical comparisons will be incorrect. VLC not installed.")
 
         self.ui.textEdit.append(duration_txt)

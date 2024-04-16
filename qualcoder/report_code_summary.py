@@ -409,13 +409,13 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
                 text += "  " + _("Average area of image: ") + str(percent_of_image) + "%\n"
         return text
 
-    def av_statistics(self, av_res):
+    def av_statistics(self, av_results):
         """ Get video statistics for image file
         param:
-            av_res: List of id, pos0, pos1, owner, memo
+            av_results: List of id, pos0, pos1, owner, memo
         """
 
-        text_ = "\n" + _("A/V CODINGS: ") + str(len(av_res)) + "\n"
+        text_ = "\n" + _("A/V CODINGS: ") + f"{len(av_results)}\n"
         cur = self.app.conn.cursor()
         sql = "select id, mediapath from source where (mediapath like '/video%' or mediapath like 'video:%' or " \
               "mediapath like '/audio%' or mediapath like 'audio:%') "
@@ -430,18 +430,23 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
             # Media duration
             media_secs = None
             if vlc:
-                instance = vlc.Instance()
-                mediaplayer = instance.media_player_new()
-                media = instance.media_new(abs_path)
-                media.parse()
-                mediaplayer.play()
-                mediaplayer.pause()
-                msecs = media.get_duration()
-                media_secs = int(msecs / 1000)
+                try:
+                    instance = vlc.Instance()
+                except NameError as name_err:
+                    logger.error(f"vlc.Instance: {name_err}")
+                    instance = None
+                if instance:
+                    mediaplayer = instance.media_player_new()
+                    media = instance.media_new(abs_path)
+                    media.parse()
+                    mediaplayer.play()
+                    mediaplayer.pause()
+                    msecs = media.get_duration()
+                    media_secs = int(msecs / 1000)
             total_coded_secs = 0
             count = 0
             avg_coded_secs = 0
-            for a in av_res:
+            for a in av_results:
                 if a[0] == r[0]:
                     total_coded_secs += int((a[2] - a[1]) / 1000)
                     count += 1
