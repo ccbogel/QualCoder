@@ -40,7 +40,6 @@ import sys
 import traceback
 import uuid
 import xml.etree.ElementTree as etree
-#import xmlschema
 import zipfile
 
 from PyQt6 import QtWidgets, QtCore
@@ -125,6 +124,7 @@ class RefiImport:
         self.cases = []
         # Sources: name id fulltext mediapath memo owner date
         self.sources = []
+        self.source_name_prefix = 0  # Used to add text prefix to source name. MaxQDA has multile same named text files.
         self.variables = []
         self.base_path = ""
         self.software_name = ""
@@ -406,7 +406,7 @@ class RefiImport:
         # Parse Notes after sources. Notes contain journals and also text annotations
         for c in children:
             if c.tag == "{urn:QDA-XML:project:1.0}Notes":
-                # Parse for journals AND annoations. Multiple ways annotations ca nbe stored
+                # Parse for journals AND annotations. Multiple ways annotations ca nbe stored
                 journal_count = self.parse_notes(c)
                 self.parent_textedit.append(_("Parsing Notes. Journals loaded: " + str(journal_count)))
 
@@ -776,6 +776,9 @@ class RefiImport:
         If during import it detects that the external file is not found, it should
         check file location and if not found ask user for the new file location.
         This check occurs in qualcoder.py
+
+        In MAXQDA qdpx folder - there has been one example of text sources wit hthe same name.
+        To work around this: Add a suffix to the text source.
 
         param element: Sources element object
 
@@ -1374,6 +1377,13 @@ class RefiImport:
         # TODO absolute and relative - not tested relative
         name, creating_user, create_date, source_path, path_type, rich_text_path = \
             self.name_creating_user_create_date_source_path_helper(element)
+        for s in self.sources:
+            if name == s['name']:
+                logger.warning(f"source name duplicated. Adding prefix: {name}")
+                self.source_name_prefix += 1
+                name = f"{self.source_name_prefix}_{name}"
+                self.parent_textedit.append(f"source name duplicated. Adding prefix: {name}")
+                break
         if pdf_rep_name != "":
             # contains .pdf
             name = pdf_rep_name
@@ -1860,15 +1870,6 @@ class RefiImport:
         if xsd_type != "codebook":
             file_xsd = xsd_project
         return True
-        '''xsd = xmlschema.XMLSchema(file_xsd)
-        try:
-            result = xsd.is_valid(self.xml)
-            print("Valid xml")
-            return True
-        except Exception as e_:
-            print("Invalid xml", e_)
-            logger.error(e_)
-            return False'''
 
 
 class RefiLineEndings(QtWidgets.QDialog):
@@ -3173,6 +3174,7 @@ class RefiExport(QtWidgets.QDialog):
 
     def xml_validation(self, xsd_type="codebook"):
         """ Verify that the XML complies with XSD.
+        NOT USED could not get implementation of xmlschema to work
         See:
         https://stackoverflow.com/questions/299588/validating-with-an-xml-schema-in-python
         Arguments:
@@ -3186,19 +3188,3 @@ class RefiExport(QtWidgets.QDialog):
         if xsd_type != "codebook":
             file_xsd = xsd_project
         return True
-        '''try:
-            xsd = xmlschema.XMLSchema(file_xsd)
-        except Exception as e_:
-            print("xsd creation error", e_)
-            # ParseError: unclosed token: line 3, column 0
-            # Occurs with codebook export only
-            #TODO hack below
-            return True
-        try:
-            result = xsd.is_valid(self.xml)
-            print("Valid xml")
-            return True
-        except Exception as e_:
-            print("Invalid xml", e_)
-            logger.error(e_)
-            return False'''

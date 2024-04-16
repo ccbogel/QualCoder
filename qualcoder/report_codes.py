@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2023 Colin Curtain
+Copyright (c) 2024 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -74,7 +74,7 @@ def exception_handler(exception_type, value, tb_obj):
 class DialogReportCodes(QtWidgets.QDialog):
     """ Get reports on coded text/images/audio/video using a range of variables:
         Files, Cases, Coders, text limiters, Attribute limiters.
-        Export reports as plain text, ODT, html or csv.
+        Export reports as plain text, ODT, html, xlsx or csv.
 
         Text context of a coded text portion is shown in the third splitter panel in a text edit.
         Case matrix is also shown in a qtablewidget in the third splitter pane.
@@ -491,6 +491,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 it += 1
                 item = it.value()
                 count += 1
+        self.ui.treeWidget.sortByColumn(0, QtCore.Qt.SortOrder.AscendingOrder)
         self.fill_code_counts_in_tree()
         self.ui.treeWidget.expandAll()
 
@@ -627,8 +628,8 @@ class DialogReportCodes(QtWidgets.QDialog):
             return
         filepath, ok = QtWidgets.QFileDialog.getSaveFileName(self,
                                                             _("Save Text File"), self.app.settings['directory'],
-                                                            "Text Files(*.txt)",
-                                                            options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
+                                                            "Text Files(*.txt)")
+        # options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
         if filepath is None or not ok:
             return
         if filepath[-4:] != ".txt":
@@ -653,8 +654,8 @@ class DialogReportCodes(QtWidgets.QDialog):
             return
         filepath, ok = QtWidgets.QFileDialog.getSaveFileName(self,
                                                             _("Save Open Document Text File"), self.app.settings['directory'],
-                                                            "ODT Files(*.odt)",
-                                                            options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
+                                                            "ODT Files(*.odt)")
+        # options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
         if filepath is None or not ok:
             return
         if filepath[-4:] != ".odt":
@@ -747,8 +748,8 @@ class DialogReportCodes(QtWidgets.QDialog):
                         row += 1
         filepath, ok = QtWidgets.QFileDialog.getSaveFileName(self,
                                                             _("Save CSV File"), self.app.settings['directory'],
-                                                            "CSV Files(*.csv)",
-                                                            options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
+                                                            "CSV Files(*.csv)")
+        # options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
         if filepath is None or not ok:
             return
         if filepath[-4:] != ".csv":
@@ -779,7 +780,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         # Columns file/case, coder, coded text/img/av, id, codename .... categories
 
         # Column headings
-        col_headings = ["File/case", "Coder", "Coded", "Id", "Codename"]
+        col_headings = ["File/case", "Coder", "Coded", "Id", "Codename", "Coded_Memo"]
         row = 1
         for col, code in enumerate(col_headings):
             ws.cell(column=col + 1, row=row, value=code)
@@ -799,18 +800,19 @@ class DialogReportCodes(QtWidgets.QDialog):
                 ws.cell(column=3, row=row + 2, value="a/v")
             ws.cell(column=4, row=row + 2, value=coding_id)
             ws.cell(column=5, row=row + 2, value=data['codename'])
+            ws.cell(column=6, row=row + 2, value=data['coded_memo'])
             categories = self.categories_of_code(data['cid'])
             for i, category in enumerate(categories):
-                ws.cell(column=6 + i, row=row + 2, value=category)
-                ws.cell(column=6 + i, row=1, value='Category')  # Headings
+                ws.cell(column=7 + i, row=row + 2, value=category)
+                ws.cell(column=7 + i, row=1, value='Category')  # Headings
         filepath, ok = QtWidgets.QFileDialog.getSaveFileName(self,
                                                             _("Save Excel File"), self.app.settings['directory'],
-                                                            "XLSX Files(*.xlsx)",
-                                                            options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
+                                                            "XLSX Files(*.xlsx)")
+        # options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
         if filepath is None or not ok:
             return
-        if filepath[-4:] != ".xlsx":
-            filepath += ".xlsx"
+        #if filepath[-4:] != ".xlsx":
+        #    filepath += ".xlsx"
         wb.save(filepath)
         msg = _("Each row contains filename, coder, coded, codename and categories.") + "\n"
         msg += _('Report exported: ') + filepath
@@ -855,8 +857,8 @@ class DialogReportCodes(QtWidgets.QDialog):
             return
         filepath, ok = QtWidgets.QFileDialog.getSaveFileName(self,
                                                             _("Save HTML File"), self.app.settings['directory'],
-                                                            "HTML Files(*.html)",
-                                                            options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
+                                                            "HTML Files(*.html)")
+        # options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
         if filepath is None or not ok:
             return
         if filepath[-5:] != ".html":

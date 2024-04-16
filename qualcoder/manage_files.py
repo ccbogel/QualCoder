@@ -1055,18 +1055,21 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.attribute_names.append({'name': name})
         # update attribute_type list and database
         now_date = str(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
-        cur = self.app.conn.cursor()
-        cur.execute("insert into attribute_type (name,date,owner,memo,caseOrFile, valuetype) values(?,?,?,?,?,?)",
-                    (name, now_date, self.app.settings['codername'], "", 'file', value_type))
-        self.app.conn.commit()
-        self.app.delete_backup = False
-        sql = "select id from source"
-        cur.execute(sql)
-        ids = cur.fetchall()
-        for id_ in ids:
-            sql = "insert into attribute (name, value, id, attr_type, date, owner) values (?,?,?,?,?,?)"
-            cur.execute(sql, (name, "", id_[0], 'file', now_date, self.app.settings['codername']))
-        self.app.conn.commit()
+        try:
+            cur = self.app.conn.cursor()
+            cur.execute("insert into attribute_type (name,date,owner,memo,caseOrFile, valuetype) values(?,?,?,?,?,?)",
+                        (name, now_date, self.app.settings['codername'], "", 'file', value_type))
+            sql = "select id from source"
+            cur.execute(sql)
+            ids = cur.fetchall()
+            for id_ in ids:
+                sql = "insert into attribute (name, value, id, attr_type, date, owner) values (?,?,?,?,?,?)"
+                cur.execute(sql, (name, "", id_[0], 'file', now_date, self.app.settings['codername']))
+            self.app.conn.commit()
+            self.app.delete_backup = False
+        except:
+            self.app.conn.rollback() # revert all changes 
+            raise
         self.load_file_data()
         self.fill_table()
         self.parent_text_edit.append(_("Attribute added to files: ") + name + ", " + _("type") + ": " + value_type)
@@ -1597,10 +1600,14 @@ class DialogManageFiles(QtWidgets.QDialog):
         # Import from html
         if import_file[-5:].lower() == ".html" or import_file[-4:].lower() == ".htm":
             import_errors = 0
-            # load and autodetect encoding
-            html_text = str(from_path(import_file).best())            
-            text_ = html_to_text(html_text)
-            if import_errors > 0:
+            with open(import_file, "r", encoding="utf-8", errors="surrogateescape") as sourcefile:
+                html_text = ""
+                while 1:
+                    line = sourcefile.readline()
+                    if not line:
+                        break
+                    html_text += line
+                text_ = html_to_text(html_text)
                 Message(self.app, _("Warning"), str(import_errors) + _(" lines not imported"), "warning").exec()
         # Try importing as a plain text file.
         # TODO https://stackoverflow.com/questions/436220/how-to-determine-the-encoding-of-text

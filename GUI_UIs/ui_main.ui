@@ -192,6 +192,7 @@
     <addaction name="actionFile_summary"/>
     <addaction name="actionCode_summary"/>
     <addaction name="actionCode_relations"/>
+    <addaction name="actionCode_text_exact_matches"/>
     <addaction name="actionView_Graph"/>
     <addaction name="actionCharts"/>
     <addaction name="actionText_mining"/>
@@ -503,6 +504,11 @@
   <action name="actionCode_pdf">
    <property name="text">
     <string>Code pdf</string>
+   </property>
+  </action>
+  <action name="actionCode_text_exact_matches">
+   <property name="text">
+    <string>Code text exact matches</string>
    </property>
   </action>
  </widget>

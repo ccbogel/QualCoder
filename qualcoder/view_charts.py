@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2023 Colin Curtain
+Copyright (c) 2024 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -1234,8 +1234,12 @@ class ViewCharts(QDialog):
 
     # HEATMAP CHARTS SECTION
     def heatmap_counter_by_file_and_code(self, owner, fid, cid):
-        """ Get count of codings for this code and this file """
+        """ Get count of codings for this code and this file.
+         Use spinbox_count_max to limit maximum counts for codes.
+         This is to allow a wider spread of head map colours when there are extreme count differences.
+         """
 
+        max_count = self.ui.spinBox_count_max.value()
         count = 0
         cur = self.app.conn.cursor()
         sql_t = "select count(cid) from code_text where owner like ? and cid=? and fid=?"
@@ -1253,6 +1257,8 @@ class ViewCharts(QDialog):
         result_av = cur.fetchone()
         if result_av is not None:
             count += result_av[0]
+        if 0 < max_count < count:
+            count = max_count
         return count
 
     def make_heatmap(self):
@@ -1301,14 +1307,14 @@ class ViewCharts(QDialog):
             if len(files) > 40:
                 files = files[:40]
                 Message(self.app, _("Too many files"), _("Too many files for display. Restricted to 40")).exec()
-            for f in files:
-                x_labels.append(f[1])
+            for file_ in files:
+                x_labels.append(file_[1])
             # Calculate the frequency of each code in each file
             # Each row is a code, each column is a file
             for code_ in codes:
                 code_counts = []
-                for f in files:
-                    code_counts.append(self.heatmap_counter_by_file_and_code(owner, f[0], code_['cid']))
+                for file_ in files:
+                    code_counts.append(self.heatmap_counter_by_file_and_code(owner, file_[0], code_['cid']))
                 data.append(code_counts)
         if heatmap_type == "Case":
             if not self.attribute_case_ids_and_names:  # self.attribute_file_ids:

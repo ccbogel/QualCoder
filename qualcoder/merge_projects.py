@@ -93,6 +93,8 @@ class MergeProjects:
         self.copy_source_files_into_destination()
         loaded = self.get_source_data()
         if loaded:
+            msg, backup_name = self.app.save_backup("_Pre-merge")
+            self.summary_msg += f"\n{msg}"
             self.insert_sources_get_new_file_ids()
             self.update_coding_file_ids()
             self.insert_categories()

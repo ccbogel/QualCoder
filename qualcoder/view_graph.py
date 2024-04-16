@@ -1050,139 +1050,136 @@ class ViewGraph(QDialog):
         self.scene.set_width(width)
         self.scene.set_height(height)
         try:
-            cur.execute("insert into graph (name, description, date, scene_width, scene_height) values(?,?,?,?,?)",
-                        [name, description, now_date, width, height])
+            try:
+                cur.execute("insert into graph (name, description, date, scene_width, scene_height) values(?,?,?,?,?)",
+                            [name, description, now_date, width, height])
+            except sqlite3.IntegrityError:
+                Message(self.app, _("Name error"), _("This name already used. Choose another name.")).exec()
+                self.app.conn.rollback()
+                return
+            cur.execute("select last_insert_rowid()")
+            grid = cur.fetchone()[0]
+            for i in self.scene.items():
+                if isinstance(i, TextGraphicsItem):
+                    sql = "insert into gr_cdct_text_item (grid,x,y,supercatid,catid,cid,font_size,bold,isvisible," \
+                        "displaytext) values (?,?,?,?,?,?,?,?,?,?)"
+                    cur.execute(sql, [grid, i.pos().x(), i.pos().y(), i.code_or_cat['supercatid'], i.code_or_cat['catid'],
+                                    i.code_or_cat['cid'], i.font_size, i.bold, i.isVisible(), i.toPlainText()])
+                if isinstance(i, FreeTextGraphicsItem):
+                    sql = "insert into gr_free_text_item (grid,freetextid, x,y,free_text,font_size,bold,color,tooltip, " \
+                        "ctid, memo_ctid, memo_imid, memo_avid) values (?,?,?,?,?,?,?,?,?,?,?,?,?)"
+                    tt = i.toolTip()
+                    cur.execute(sql, [grid, i.freetextid, i.pos().x(), i.pos().y(), i.text, i.font_size, i.bold, i.color,
+                                    tt, i.ctid, i.memo_ctid, i.memo_imid, i.memo_avid])
+                if isinstance(i, CaseTextGraphicsItem):
+                    sql = "insert into gr_case_text_item (grid,x,y,caseid,font_size,bold,color, displaytext) " \
+                        "values (?,?,?,?,?,?,?,?)"
+                    cur.execute(sql,
+                                [grid, i.pos().x(), i.pos().y(), i.case_id, i.font_size, i.bold, i.color, i.toPlainText()])
+                if isinstance(i, FileTextGraphicsItem):
+                    sql = "insert into gr_file_text_item (grid,x,y,fid,font_size,bold,color, displaytext) " \
+                        "values (?,?,?,?,?,?,?,?)"
+                    cur.execute(sql,
+                                [grid, i.pos().x(), i.pos().y(), i.file_id, i.font_size, i.bold, i.color, i.toPlainText()])
+                if isinstance(i, PixmapGraphicsItem):
+                    sql = "insert into gr_pix_item (grid,imid,x,y,px,py,w,h,filepath,tooltip) values " \
+                        "(?,?,?,?,?,?,?,?,?,?)"
+                    cur.execute(sql, [grid, i.imid, i.pos().x(), i.pos().y(), i.px, i.py, i.pwidth, i.pheight, i.path_,
+                                    i.toolTip()])
+                if isinstance(i, AVGraphicsItem):
+                    sql = "insert into gr_av_item (grid,avid,x,y,pos0,pos1,filepath,tooltip, color) values " \
+                        "(?,?,?,?,?,?,?,?,?)"
+                    cur.execute(sql,
+                                [grid, i.avid, i.pos().x(), i.pos().y(), i.pos0, i.pos1, i.path_, i.toolTip(), i.color])
+                if isinstance(i, LinkGraphicsItem):
+                    sql = "insert into gr_cdct_line_item (grid,fromcatid,fromcid,tocatid,tocid,color,linewidth,linetype," \
+                        "isvisible) values (?,?,?,?,?,?,?,?,?)"
+                    cur.execute(sql, [grid, i.from_widget.code_or_cat['catid'], i.from_widget.code_or_cat['cid'],
+                                    i.to_widget.code_or_cat['catid'], i.to_widget.code_or_cat['cid'],
+                                    i.color, i.line_width, self.line_type_to_text(i.line_type),
+                                    i.isVisible()])
+                if isinstance(i, FreeLineGraphicsItem):
+                    from_catid = None
+                    try:
+                        from_catid = i.from_widget.code_or_cat['catid']
+                    except AttributeError:
+                        pass
+                    from_cid = None
+                    try:
+                        from_cid = i.from_widget.code_or_cat['cid']
+                    except AttributeError:
+                        pass
+                    to_catid = None
+                    try:
+                        to_catid = i.to_widget.code_or_cat['catid']
+                    except AttributeError:
+                        pass
+                    to_cid = None
+                    try:
+                        to_cid = i.to_widget.code_or_cat['cid']
+                    except AttributeError:
+                        pass
+                    from_case_id = None
+                    try:
+                        from_case_id = i.from_widget.case_id
+                    except AttributeError:
+                        pass
+                    from_file_id = None
+                    try:
+                        from_file_id = i.from_widget.file_id
+                    except AttributeError:
+                        pass
+                    from_freetextid = None
+                    try:
+                        from_freetextid = i.from_widget.freetextid
+                    except AttributeError:
+                        pass
+                    from_imid = None
+                    try:
+                        from_imid = i.from_widget.imid
+                    except AttributeError:
+                        pass
+                    from_avid = None
+                    try:
+                        from_avid = i.from_widget.avid
+                    except AttributeError:
+                        pass
+                    to_imid = None
+                    try:
+                        to_imid = i.to_widget.imid
+                    except AttributeError:
+                        pass
+                    to_avid = None
+                    try:
+                        to_avid = i.to_widget.avid
+                    except AttributeError:
+                        pass
+                    to_case_id = None
+                    try:
+                        to_case_id = i.to_widget.case_id
+                    except AttributeError:
+                        pass
+                    to_file_id = None
+                    try:
+                        to_file_id = i.to_widget.file_id
+                    except AttributeError:
+                        pass
+                    to_freetextid = None
+                    try:
+                        to_freetextid = i.to_widget.freetextid
+                    except AttributeError:
+                        pass
+                    """ Free line linking options use catid/cid or caseid or fileid and last match text e.g. freetextitem """
+                    sql = "insert into gr_free_line_item (grid,fromfreetextid,fromcatid,fromcid,fromcaseid,fromfileid, " \
+                        "fromimid,fromavid,tofreetextid,tocatid,tocid,tocaseid,tofileid, toimid,toavid,color, " \
+                        "linewidth,linetype) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+                    cur.execute(sql, [grid, from_freetextid, from_catid, from_cid, from_case_id, from_file_id, from_imid,
+                                    from_avid, to_freetextid, to_catid, to_cid, to_case_id, to_file_id, to_imid, to_avid,
+                                    i.color, i.line_width, self.line_type_to_text(i.line_type)])
             self.app.conn.commit()
-        except sqlite3.IntegrityError:
-            Message(self.app, _("Name error"), _("This name already used. Choose another name.")).exec()
-            return
-        cur.execute("select last_insert_rowid()")
-        grid = cur.fetchone()[0]
-        for i in self.scene.items():
-            if isinstance(i, TextGraphicsItem):
-                sql = "insert into gr_cdct_text_item (grid,x,y,supercatid,catid,cid,font_size,bold,isvisible," \
-                      "displaytext) values (?,?,?,?,?,?,?,?,?,?)"
-                cur.execute(sql, [grid, i.pos().x(), i.pos().y(), i.code_or_cat['supercatid'], i.code_or_cat['catid'],
-                                  i.code_or_cat['cid'], i.font_size, i.bold, i.isVisible(), i.toPlainText()])
-                self.app.conn.commit()
-            if isinstance(i, FreeTextGraphicsItem):
-                sql = "insert into gr_free_text_item (grid,freetextid, x,y,free_text,font_size,bold,color,tooltip, " \
-                      "ctid, memo_ctid, memo_imid, memo_avid) values (?,?,?,?,?,?,?,?,?,?,?,?,?)"
-                tt = i.toolTip()
-                cur.execute(sql, [grid, i.freetextid, i.pos().x(), i.pos().y(), i.text, i.font_size, i.bold, i.color,
-                                  tt, i.ctid, i.memo_ctid, i.memo_imid, i.memo_avid])
-                self.app.conn.commit()
-            if isinstance(i, CaseTextGraphicsItem):
-                sql = "insert into gr_case_text_item (grid,x,y,caseid,font_size,bold,color, displaytext) " \
-                      "values (?,?,?,?,?,?,?,?)"
-                cur.execute(sql,
-                            [grid, i.pos().x(), i.pos().y(), i.case_id, i.font_size, i.bold, i.color, i.toPlainText()])
-                self.app.conn.commit()
-            if isinstance(i, FileTextGraphicsItem):
-                sql = "insert into gr_file_text_item (grid,x,y,fid,font_size,bold,color, displaytext) " \
-                      "values (?,?,?,?,?,?,?,?)"
-                cur.execute(sql,
-                            [grid, i.pos().x(), i.pos().y(), i.file_id, i.font_size, i.bold, i.color, i.toPlainText()])
-                self.app.conn.commit()
-            if isinstance(i, PixmapGraphicsItem):
-                sql = "insert into gr_pix_item (grid,imid,x,y,px,py,w,h,filepath,tooltip) values " \
-                      "(?,?,?,?,?,?,?,?,?,?)"
-                cur.execute(sql, [grid, i.imid, i.pos().x(), i.pos().y(), i.px, i.py, i.pwidth, i.pheight, i.path_,
-                                  i.toolTip()])
-                self.app.conn.commit()
-            if isinstance(i, AVGraphicsItem):
-                sql = "insert into gr_av_item (grid,avid,x,y,pos0,pos1,filepath,tooltip, color) values " \
-                      "(?,?,?,?,?,?,?,?,?)"
-                cur.execute(sql,
-                            [grid, i.avid, i.pos().x(), i.pos().y(), i.pos0, i.pos1, i.path_, i.toolTip(), i.color])
-                self.app.conn.commit()
-            if isinstance(i, LinkGraphicsItem):
-                sql = "insert into gr_cdct_line_item (grid,fromcatid,fromcid,tocatid,tocid,color,linewidth,linetype," \
-                      "isvisible) values (?,?,?,?,?,?,?,?,?)"
-                cur.execute(sql, [grid, i.from_widget.code_or_cat['catid'], i.from_widget.code_or_cat['cid'],
-                                  i.to_widget.code_or_cat['catid'], i.to_widget.code_or_cat['cid'],
-                                  i.color, i.line_width, self.line_type_to_text(i.line_type),
-                                  i.isVisible()])
-                self.app.conn.commit()
-            if isinstance(i, FreeLineGraphicsItem):
-                from_catid = None
-                try:
-                    from_catid = i.from_widget.code_or_cat['catid']
-                except AttributeError:
-                    pass
-                from_cid = None
-                try:
-                    from_cid = i.from_widget.code_or_cat['cid']
-                except AttributeError:
-                    pass
-                to_catid = None
-                try:
-                    to_catid = i.to_widget.code_or_cat['catid']
-                except AttributeError:
-                    pass
-                to_cid = None
-                try:
-                    to_cid = i.to_widget.code_or_cat['cid']
-                except AttributeError:
-                    pass
-                from_case_id = None
-                try:
-                    from_case_id = i.from_widget.case_id
-                except AttributeError:
-                    pass
-                from_file_id = None
-                try:
-                    from_file_id = i.from_widget.file_id
-                except AttributeError:
-                    pass
-                from_freetextid = None
-                try:
-                    from_freetextid = i.from_widget.freetextid
-                except AttributeError:
-                    pass
-                from_imid = None
-                try:
-                    from_imid = i.from_widget.imid
-                except AttributeError:
-                    pass
-                from_avid = None
-                try:
-                    from_avid = i.from_widget.avid
-                except AttributeError:
-                    pass
-                to_imid = None
-                try:
-                    to_imid = i.to_widget.imid
-                except AttributeError:
-                    pass
-                to_avid = None
-                try:
-                    to_avid = i.to_widget.avid
-                except AttributeError:
-                    pass
-                to_case_id = None
-                try:
-                    to_case_id = i.to_widget.case_id
-                except AttributeError:
-                    pass
-                to_file_id = None
-                try:
-                    to_file_id = i.to_widget.file_id
-                except AttributeError:
-                    pass
-                to_freetextid = None
-                try:
-                    to_freetextid = i.to_widget.freetextid
-                except AttributeError:
-                    pass
-                """ Free line linking options use catid/cid or caseid or fileid and last match text e.g. freetextitem """
-                sql = "insert into gr_free_line_item (grid,fromfreetextid,fromcatid,fromcid,fromcaseid,fromfileid, " \
-                      "fromimid,fromavid,tofreetextid,tocatid,tocid,tocaseid,tofileid, toimid,toavid,color, " \
-                      "linewidth,linetype) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
-                cur.execute(sql, [grid, from_freetextid, from_catid, from_cid, from_case_id, from_file_id, from_imid,
-                                  from_avid, to_freetextid, to_catid, to_cid, to_case_id, to_file_id, to_imid, to_avid,
-                                  i.color, i.line_width, self.line_type_to_text(i.line_type)])
-                self.app.conn.commit()
+        except:
+            self.app.conn.rollback() # revert all changes 
+            raise
         self.app.delete_backup = False
 
     @staticmethod
@@ -1739,17 +1736,21 @@ class ViewGraph(QDialog):
         if not ok:
             return
         # Delete graph entry and all its items
-        for s in selection:
-            cur.execute("delete from graph where grid = ?", [s['grid']])
-            cur.execute("delete from gr_case_text_item where grid = ?", [s['grid']])
-            cur.execute("delete from gr_file_text_item where grid = ?", [s['grid']])
-            cur.execute("delete from gr_free_line_item where grid = ?", [s['grid']])
-            cur.execute("delete from gr_free_text_item where grid = ?", [s['grid']])
-            cur.execute("delete from gr_cdct_line_item where grid = ?", [s['grid']])
-            cur.execute("delete from gr_cdct_text_item where grid = ?", [s['grid']])
-            cur.execute("delete from gr_pix_item where grid = ?", [s['grid']])
-            cur.execute("delete from gr_av_item where grid = ?", [s['grid']])
+        try:
+            for s in selection:
+                cur.execute("delete from graph where grid = ?", [s['grid']])
+                cur.execute("delete from gr_case_text_item where grid = ?", [s['grid']])
+                cur.execute("delete from gr_file_text_item where grid = ?", [s['grid']])
+                cur.execute("delete from gr_free_line_item where grid = ?", [s['grid']])
+                cur.execute("delete from gr_free_text_item where grid = ?", [s['grid']])
+                cur.execute("delete from gr_cdct_line_item where grid = ?", [s['grid']])
+                cur.execute("delete from gr_cdct_text_item where grid = ?", [s['grid']])
+                cur.execute("delete from gr_pix_item where grid = ?", [s['grid']])
+                cur.execute("delete from gr_av_item where grid = ?", [s['grid']])
             self.app.conn.commit()
+        except:
+            self.app.conn.rollback() # revert all changes 
+            raise
         self.app.delete_backup = False
 
 
