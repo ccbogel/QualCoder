@@ -1596,7 +1596,8 @@ class DialogManageFiles(QtWidgets.QDialog):
                         break
                     html_text += line
                 text_ = html_to_text(html_text)
-                Message(self.app, _("Warning"), str(import_errors) + _(" lines not imported"), "warning").exec()
+                if import_errors > 0:
+                    Message(self.app, _("Warning"), str(import_errors) + _(" lines not imported"), "warning").exec()
         # Try importing as a plain text file.
         # TODO https://stackoverflow.com/questions/436220/how-to-determine-the-encoding-of-text
         # coding = chardet.detect(file.content).get('encoding')
