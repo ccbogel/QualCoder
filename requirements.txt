@@ -34,4 +34,5 @@ python-vlc
 rispy
 six
 SpeechRecognition
+yaml
 

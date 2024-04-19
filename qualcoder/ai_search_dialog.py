@@ -42,6 +42,7 @@ from .report_attributes import DialogSelectAttributeParameters
 from .select_items import DialogSelectItems
 from .GUI.ui_ai_search import Ui_Dialog_AiSearch
 from .report_attributes import DialogSelectAttributeParameters
+from .ai_edit_prompts import prompt_types, PromptItem, PromptsList, DialogAiEditPrompts, split_name_and_scope
 from .helpers import Message
 
 path = os.path.abspath(os.path.dirname(__file__))
@@ -101,6 +102,13 @@ class DialogAiSearch(QtWidgets.QDialog):
         self.ui.listWidget_cases.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
         self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.SelectionMode.SingleSelection)
         self.fill_tree(selected_id, selected_is_code)   
+        # prompts
+        self.prompts_list = PromptsList(app_)
+        self.current_search_prompt = self.prompts_list.prompts[0] # default
+        self.ui.lineEdit_prompt.setText(self.current_search_prompt.name_and_scope())
+        self.ui.lineEdit_prompt.setToolTip(self.current_search_prompt.description)
+
+        self.ui.pushButton_change_prompt.clicked.connect(self.change_prompt)
         self.ui.buttonBox.accepted.connect(self.ok)
         self.ui.buttonBox.rejected.connect(self.cancel) 
         # attributes        
@@ -111,7 +119,7 @@ class DialogAiSearch(QtWidgets.QDialog):
         if res[0] == 0:
             self.ui.pushButton_attributeselect.setEnabled(False)
         self.ui.pushButton_attributeselect.clicked.connect(self.select_attributes)
-        self.ui.splitter.setSizes([100, 200, 0])
+        # self.ui.splitter.setSizes([100, 200, 0])
         self.get_files_and_cases()
 
           
@@ -261,6 +269,19 @@ class DialogAiSearch(QtWidgets.QDialog):
             it += 1
             item = it.value()
             count += 1
+            
+    def change_prompt(self):
+        """ Select and edit the prompt for the search. """
+        ui = DialogAiEditPrompts(self.app, 'search')
+        if ui.exec() == QtWidgets.QDialog.DialogCode.Accepted:
+            # Update prompts list and display current prompt:
+            self.prompts_list.read_prompts()
+            if ui.selected_prompt is not None:
+                self.current_search_prompt = self.prompts_list.find_prompt(ui.selected_prompt.name, ui.selected_prompt.scope, ui.selected_prompt.type)
+        if self.current_search_prompt is None:
+            self.current_search_prompt = self.prompts_list.prompts[0] # default
+        self.ui.lineEdit_prompt.setText(self.current_search_prompt.name_and_scope())
+        self.ui.lineEdit_prompt.setToolTip(self.current_search_prompt.description)
 
     def select_attributes(self):
         """ Select files based on attribute selections.
