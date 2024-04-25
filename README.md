@@ -55,7 +55,7 @@ cd Downloads\QualCoder-master
 
 The `py` command uses the most recent installed version of Python the `py` command does not work on all Windows OS, you may instead replace `py` with `python3` You can use a specific version on your Windows if you have many Python versions installed, e.g. `py -3.10`  See discussion here: [Difference between py and python](https://stackoverflow.com/questions/50896496/what-is-the-difference-between-py-and-python-in-the-terminal)
 
-We recommend using a virtual environment to install packages. This will ensure that the dependencies for QualCoder are isolated from the rest of your system. On someWindows OS you may need to replace the _py_ command with _python3_ below: 
+We recommend using a virtual environment to install packages. This will ensure that the dependencies for QualCoder are isolated from the rest of your system. On some Windows OS you may need to replace the _py_ command with _python3_ below: 
 
 ```bash
 py -m venv env
@@ -69,7 +69,7 @@ env\Scripts\activate
 py -m pip install --upgrade pip
 ```
 
-Type the following to install the nedded modules. (If you are installing an older QualCoder (3.3 or 3.4 version) also add *wordcloud* to the below list of imports.
+Type the following to install the required modules. (If you are installing an older QualCoder (3.3 or 3.4 version) also add *wordcloud* to the below list of imports.
 
 ```bash
 py -m pip install wheel pyqt6 chardet ebooklib openpyxl Pillow ply pdfminer.six pandas plotly pydub python-vlc rispy SpeechRecognition
