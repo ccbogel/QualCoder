@@ -272,21 +272,28 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         else:
             abs_path = self.app.project_path + mediapath
         msecs = None
+        text_ = ""
         if vlc:
-            instance = vlc.Instance()
-            mediaplayer = instance.media_player_new()
-            media = instance.media_new(abs_path)
-            media.parse()
-            mediaplayer.play()
-            mediaplayer.pause()
-            msecs = media.get_duration()
-            text_ += _("Duration: ") + msecs_to_hours_mins_secs(msecs) + "\n"
-            for k in meta_keys:
-                meta = media.get_meta(k)
-                if meta is not None:
-                    text_ += str(k) + ":  " + meta + "\n"
+            try:
+                instance = vlc.Instance()
+            except NameError as name_err:
+                logger.error(f"vlc.Instance: {name_err}")
+                text_ += f"Duration cannot obtain. vlc.Instance: {name_err}\n"
+                instance = None
+            if instance:
+                mediaplayer = instance.media_player_new()
+                media = instance.media_new(abs_path)
+                media.parse()
+                mediaplayer.play()
+                mediaplayer.pause()
+                msecs = media.get_duration()
+                text_ += _("Duration: ") + msecs_to_hours_mins_secs(msecs) + "\n"
+                for k in meta_keys:
+                    meta = media.get_meta(k)
+                    if meta is not None:
+                        text_ += str(k) + ":  " + meta + "\n"
         else:
-            text_ = _("Duration: Cannot obtain. VLC not installed.")
+            text_ += _("Duration: Cannot obtain. VLC not installed.")
 
         # Codes
         sql = "select code_name.name, code_av.cid, count(code_av.cid), round(avg(pos1 - pos0)), sum(pos1-pos0) "

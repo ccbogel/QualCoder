@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2023 Colin Curtain
+Copyright (c) 2024 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -235,7 +235,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_file_attributes.pressed.connect(self.get_files_from_attributes)
 
-        # until any media is selected disable some widgets
+        # Until any media is selected disable some widgets
         self.ui.pushButton_play.setEnabled(False)
         self.ui.pushButton_coding.setEnabled(False)
         self.ui.horizontalSlider.setEnabled(False)
@@ -308,7 +308,14 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         # Create a vlc instance with an empty vlc media player
         # Fix an Ubuntu error but, makes no difference self.instance = vlc.Instance("--no-xlib")
-        self.instance = vlc.Instance()
+        # Fedora 39: NameError: no function 'libvlc_new'
+        try:
+            self.instance = vlc.Instance()
+        except NameError as name_err:
+            logger.error(f"{name_err}")
+            msg = f"{name_err}"
+            Message(self.app, _("QualCoder will crash") + " " * 20, msg).exec()
+
         # Ubuntu 22.04 hide - self.ddialog.hide() as vlc is not inside dialog
         self.mediaplayer = self.instance.media_player_new()
         self.mediaplayer.video_set_mouse_input(False)
@@ -3160,7 +3167,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.mediaplayer.play()
         self.mediaplayer.set_position(pos)
         self.is_paused = False
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/playback_pause_icon.png'))
+        icon = QtGui.QPixmap()
+        icon.loadFromData(QtCore.QByteArray.fromBase64(playback_pause_icon), "png")
         self.ui.pushButton_play.setIcon(icon)
         self.play_segment_end = segment['pos1']
         self.timer.start()
@@ -3566,7 +3574,9 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         self.code_av_dialog.mediaplayer.play()
         self.code_av_dialog.mediaplayer.set_position(pos)
         self.code_av_dialog.is_paused = False
-        icon = QtGui.QIcon(QtGui.QPixmap('GUI/playback_pause_icon.png'))
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(playback_pause_icon), "png")
+        icon = QtGui.QIcon(QtGui.QPixmap(pm))
         self.code_av_dialog.ui.pushButton_play.setIcon(icon)
         self.code_av_dialog.play_segment_end = self.segment['pos1']
         self.code_av_dialog.timer.start()
@@ -3880,7 +3890,13 @@ class DialogViewAV(QtWidgets.QDialog):
             self.ddialog.show()
         # Create a vlc instance
         # Fix an Ubuntu error but, makes no difference self.instance = vlc.Instance("--no-xlib")
-        self.instance = vlc.Instance()
+        # Fedora 39 NameError: no function 'libvlc_new'
+        try:
+            self.instance = vlc.Instance()
+        except NameError as name_err:
+            logger.error(f"{name_err}")
+            msg = f"{name_err}"
+            Message(self.app, _("QualCoder will crash") + " " * 20, msg).exec()
         # Ubuntu 22.04 hide - self.ddialog.hide() as vlc is not inside dialog
         # Create an empty vlc media player
         self.mediaplayer = self.instance.media_player_new()

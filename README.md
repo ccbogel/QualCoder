@@ -137,6 +137,8 @@ env\Scripts\activate
 py -m pip install --upgrade pip
 ```
 
+Type the following to install the required modules:
+
 ```bash
 py -m pip install wheel pyqt6 chardet ebooklib openpyxl Pillow ply pdfminer.six pandas plotly pydub python-vlc rispy SpeechRecognition wordcloud xmlschema charset-normalizer
 ```

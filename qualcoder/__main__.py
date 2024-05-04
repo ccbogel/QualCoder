@@ -2038,7 +2038,10 @@ Do you want to start the AI setup now?')
         current_coder = self.app.settings['codername']
         current_ai_enable = self.app.settings['ai_enable']
         ui = DialogSettings(self.app)
-        ui.exec()
+        ret = ui.exec()
+        if ret == QtWidgets.QDialog.DialogCode.Rejected: # Dialog has been canceled
+            return
+
         self.settings_report()
         font = f"font: {self.app.settings['fontsize']}pt "
         font += '"' + self.app.settings['font'] + '";'
@@ -2197,8 +2200,18 @@ Do you want to start the AI setup now?')
             if not self.create_lock_file():
                 # Lock file already exists. Checking if it has timed out or not.
                 with open(self.lock_file_path, 'r') as lock_file:
-                    lock_user = lock_file.readline()[:-1]
-                    lock_timestamp = float(lock_file.readline())
+                    try:
+                        lock_user = lock_file.readline()[:-1]
+                        lock_timestamp = float(lock_file.readline())
+                    except: 
+                        # lock file seems corrupted/partially written. Retry once in case another instance was writing to the file at the same time:
+                        time.sleep(0.5)
+                        try:
+                            lock_user = lock_file.readline()[:-1]
+                            lock_timestamp = float(lock_file.readline())
+                        except: # permanent error, break the lock
+                            lock_user = 'unknown'
+                            lock_timestamp = 0.0
                 if float(time.time()) - lock_timestamp > lock_timeout: 
                     # has timed out, break the lock
                     msg = _('QualCoder detected that the project was not properly closed the last time it was used by "') + lock_user + '".\n'

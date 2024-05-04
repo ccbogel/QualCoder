@@ -247,7 +247,7 @@ class DialogSettings(QtWidgets.QDialog):
         self.save_settings()
         if restart_qualcoder:
             Message(self.app, _("Restart QualCoder"), _("Restart QualCoder to enact some changes")).exec()
-        self.close()
+        super().accept()
 
     def save_settings(self):
         """ Save settings to text file in user's home directory.
