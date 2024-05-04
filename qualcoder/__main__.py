@@ -1859,7 +1859,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
         current_coder = self.app.settings['codername']
         ui = DialogSettings(self.app)
-        ui.exec()
+        ret = ui.exec()
+        if ret == QtWidgets.QDialog.DialogCode.Rejected: # Dialog has been canceled
+            return
+
         self.settings_report()
         font = f"font: {self.app.settings['fontsize']}pt "
         font += '"' + self.app.settings['font'] + '";'
