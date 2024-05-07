@@ -134,10 +134,12 @@ def exception_handler(exception_type, value, tb_obj):
     mb.setStyleSheet("* {font-size: 10pt}")
     mb.setText(msg)
     mb.exec()
-    
-lock_timeout = 30.0          # in seconds. If a project lockfile is older (= has received no heartbeat for 30 seconds), 
-                             # it is assumed that the host process has died and the project is opened anyways
+
+
+lock_timeout = 30.0  # in seconds. If a project lockfile is older (= has received no heartbeat for 30 seconds),
+# it is assumed that the host process has died and the project is opened anyways
 lock_heartbeat_interval = 5  # in seconds.
+
 
 class ProjectLockHeartbeatWorker(QtCore.QObject):
     """
@@ -164,7 +166,8 @@ class ProjectLockHeartbeatWorker(QtCore.QObject):
                     with open(self.lock_file_path, 'w') as lock_file:
                         lock_file.write(f"{getpass.getuser()}\n{str(time.time())}")
                     self.lost_connection = False
-                except:
+                except Exception as e_:  # TODO Needs specific exception, printing to find out what is needed
+                    print(e_)
                     if not self.lost_connection:
                         self.io_error.emit()
                     self.lost_connection = True
@@ -174,7 +177,8 @@ class ProjectLockHeartbeatWorker(QtCore.QObject):
         """Stop the heartbeat process."""
         self.is_running = False
         self.finished.emit()
-        
+
+
 class App(object):
     """ General methods for loading settings and recent project stored in .qualcoder folder.
     Savable settings does not contain project name, project path or db connection.
@@ -214,7 +218,7 @@ class App(object):
 
         previous = []
         try:
-            with open(self.persist_path, 'r') as f:
+            with open(self.persist_path, 'r', encoding='utf-8') as f:
                 for line in f:
                     previous.append(line.strip())
         except FileNotFoundError:
@@ -248,7 +252,7 @@ class App(object):
                 result.append(i)
 
         # Write the latest projects file in order of most recently opened and without duplicate projects
-        with open(self.persist_path, 'w') as f:
+        with open(self.persist_path, 'w', encoding='utf-8') as f:
             for i, line in enumerate(result):
                 if i < 8:
                     f.write(line)
@@ -594,7 +598,8 @@ class App(object):
         Orange #f89407
 
         Wild: QWidget {background: qlineargradient( x1:0 y1:0, x2:1 y2:0, stop:0 cyan, stop:1 blue);}
-        color: qlineargradient(spread:pad, x1:0 y1:0, x2:1 y2:0, stop:0 rgba(0, 0, 0, 255), stop:1 rgba(255, 255, 255, 255));
+        color: qlineargradient(spread:pad, x1:0 y1:0, x2:1 y2:0, stop:0 rgba(0, 0, 0, 255),
+        stop:1 rgba(255, 255, 255, 255));
         """
 
         style_dark = "* {font-size: 12px; background-color: #2a2a2a; color:#eeeeee;}\n\
@@ -946,11 +951,12 @@ class App(object):
                 logger.warning(_(msg) + f"\n{err}")
         else:
             shutil.copytree(self.project_path, backup,
-                            ignore=shutil.ignore_patterns('*.lock', '*.mp3', '*.wav', '*.mp4', '*.mov', '*.ogg', '*.wmv', '*.MP3',
+                            ignore=shutil.ignore_patterns('*.lock', '*.mp3', '*.wav', '*.mp4', '*.mov', '*.ogg',
+                                                          '*.wmv', '*.MP3',
                                                           '*.WAV', '*.MP4', '*.MOV', '*.OGG', '*.WMV'))
-            #self.ui.textEdit.append(_("WARNING: audio and video files NOT backed up. See settings."))
+            # self.ui.textEdit.append(_("WARNING: audio and video files NOT backed up. See settings."))
             msg = _("WARNING: audio and video files NOT backed up. See settings.") + "\n"
-        #self.ui.textEdit.append(_("Project backup created: ") + backup)
+        # self.ui.textEdit.append(_("Project backup created: ") + backup)
         msg += _("Project backup created: ") + backup
         # Delete backup path - delete the backup if no changes occurred in the project during the session
         self.delete_backup_path_name = backup
@@ -977,6 +983,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.app = app
         self.force_quit = force_quit
         self.journal_display = None
+
+        self.heartbeat_thread = None
+        self.heartbeat_worker = None
+        self.lock_file_path = None
+        
         sys.excepthook = exception_handler
         QtWidgets.QMainWindow.__init__(self)
         self.ui = Ui_MainWindow()
@@ -1860,7 +1871,7 @@ class MainWindow(QtWidgets.QMainWindow):
         current_coder = self.app.settings['codername']
         ui = DialogSettings(self.app)
         ret = ui.exec()
-        if ret == QtWidgets.QDialog.DialogCode.Rejected: # Dialog has been canceled
+        if ret == QtWidgets.QDialog.DialogCode.Rejected:  # Dialog has been canceled
             return
 
         self.settings_report()
@@ -1901,9 +1912,9 @@ class MainWindow(QtWidgets.QMainWindow):
             self.app.conn.commit()
             self.ui.textEdit.append(_("Project memo entered."))
             self.app.delete_backup = False
-    
+
     # lock file helper functions:
-             
+
     def create_lock_file(self, break_existing_lock=False):
         """Create the lock file.
            break_existing_lock: if True, the lock file will be created even if it already exists
@@ -1922,18 +1933,19 @@ class MainWindow(QtWidgets.QMainWindow):
         """Delete the lock file to release the lock."""
         try:
             os.remove(self.lock_file_path)
-        except:
+        except Exception as e_:  # TODO determin specific exception type to add in here, so printing e_
+            print(e_)
             pass
-        
+
     def lock_file_io_error(self):
         msg = _('An error occured while writing to the project folder. '
                 'Please close the project and try to open it again.')
         msg_box = Message(self.app, _("I/O Error"), msg, "critical")
-        btnClose = msg_box.addButton(_("Close"), QtWidgets.QMessageBox.ButtonRole.AcceptRole)
-        btnIgnore = msg_box.addButton("Ignore", QtWidgets.QMessageBox.ButtonRole.RejectRole)
-        msg_box.setDefaultButton(btnClose)
+        btn_close = msg_box.addButton(_("Close"), QtWidgets.QMessageBox.ButtonRole.AcceptRole)
+        btn_ignore = msg_box.addButton("Ignore", QtWidgets.QMessageBox.ButtonRole.RejectRole)
+        msg_box.setDefaultButton(btn_close)
         msg_box.exec()
-        if msg_box.clickedButton() == btnClose:
+        if msg_box.clickedButton() == btn_close:
             self.close_project()
         logger.debug(msg)
 
@@ -1942,22 +1954,23 @@ class MainWindow(QtWidgets.QMainWindow):
         self.heartbeat_thread = QtCore.QThread()
         self.heartbeat_worker = ProjectLockHeartbeatWorker(self.app, self.lock_file_path)
         self.heartbeat_worker.moveToThread(self.heartbeat_thread)
-        
+
         self.heartbeat_thread.started.connect(self.heartbeat_worker.write_heartbeat)
         self.heartbeat_worker.finished.connect(self.heartbeat_thread.quit)
         self.heartbeat_worker.finished.connect(self.heartbeat_worker.deleteLater)
         self.heartbeat_thread.finished.connect(self.heartbeat_thread.deleteLater)
         self.heartbeat_worker.io_error.connect(self.lock_file_io_error)
-        
+
         self.heartbeat_thread.start()
 
     def stop_heartbeat(self, wait=False):
         """Stop the heartbeat and delete the lock file (if it exists)."""
         try:
             self.heartbeat_worker.stop()
-            if wait: 
+            if wait:
                 self.heartbeat_thread.wait()  # Wait for the thread to properly finish
-        except:
+        except Exception as e_:  # TODO determin actual exception, to add here, so printing e_
+            print(e_)
             pass
         self.delete_lock_file()
         self.lock_file_path = ''
@@ -2005,32 +2018,40 @@ class MainWindow(QtWidgets.QMainWindow):
                     try:
                         lock_user = lock_file.readline()[:-1]
                         lock_timestamp = float(lock_file.readline())
-                    except: 
+                    except Exception as e_:  # TODO add specific exception
+                        print(e_)
+                        logger.warning(e_)
                         # lock file seems corrupted/partially written. Retry once in case another instance was writing to the file at the same time:
                         time.sleep(0.5)
                         try:
                             lock_user = lock_file.readline()[:-1]
                             lock_timestamp = float(lock_file.readline())
-                        except: # permanent error, break the lock
+                        except Exception as e_:  # permanent error, break the lock
+                            print(e_)  # TODO determine specific exception
+                            logger.warning(e_)
                             lock_user = 'unknown'
                             lock_timestamp = 0.0
-                if float(time.time()) - lock_timestamp > lock_timeout: 
+                if float(time.time()) - lock_timestamp > lock_timeout:
                     # has timed out, break the lock
-                    msg = _('QualCoder detected that the project was not properly closed the last time it was used by "') + lock_user + '".\n'
-                    msg += _('In most cases, you can still continue your work as usual. If you encounter any problems, search for a recent backup in the project folder.')
+                    msg = _(
+                        'QualCoder detected that the project was not properly closed the last time it was used by "') + lock_user + '".\n'
+                    msg += _(
+                        'In most cases, you can still continue your work as usual. If you encounter any problems, search for a recent backup in the project folder.')
                     logger.warning(msg)
                     msg_box = Message(self.app, _("Open file"), msg, "information")
-                    msg_box.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Ok | QtWidgets.QMessageBox.StandardButton.Abort)
+                    msg_box.setStandardButtons(
+                        QtWidgets.QMessageBox.StandardButton.Ok | QtWidgets.QMessageBox.StandardButton.Abort)
                     msg_box.setDefaultButton(QtWidgets.QMessageBox.StandardButton.Ok)
                     ret = msg_box.exec()
                     if ret == QtWidgets.QMessageBox.StandardButton.Abort:
                         self.app.project_path = ""
                         self.app.project_name = ""
-                        return    
+                        return
                     self.create_lock_file(break_existing_lock=True)
                 else:
                     # lock is valid, project seems to be in use by other user
-                    msg = _('Project cannot be opened since it\'s already in use by "') + lock_user + _('". Please retry later.')
+                    msg = _('Project cannot be opened since it\'s already in use by "') + lock_user + _(
+                        '". Please retry later.')
                     logger.warning(msg)
                     Message(self.app, _("Cannot open file"), msg, "critical").exec()
                     self.app.project_path = ""
@@ -2413,7 +2434,9 @@ class MainWindow(QtWidgets.QMainWindow):
             try:
                 self.app.conn.commit()
                 self.app.conn.close()
-            except:
+            except Exception as e_:  # TODO add specific exception
+                print(e_)
+                logger.warning(e_)
                 self.app.conn = None
         self.stop_heartbeat(wait=True)
         self.delete_backup_folders()
@@ -2497,6 +2520,7 @@ class MainWindow(QtWidgets.QMainWindow):
         except Exception as err:
             print(err)
             logger.warning(str(err))
+
 
 def gui():
     qual_app = App()
