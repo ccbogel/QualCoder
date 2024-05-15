@@ -402,7 +402,7 @@ class DialogEditTextFile(QtWidgets.QDialog):
             raise
         # update doc in vectorstore
         if self.has_changed and self.app.settings['ai_enable'] == 'True':
-            self.app.sources_vectorstore.import_document(self.fid, self.name, self.text, update=True)
+            self.app.ai.sources_vectorstore.import_document(self.fid, self.name, self.text, update=True)
         super(DialogEditTextFile, self).accept()
 
     def update_casetext(self):

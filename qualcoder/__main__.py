@@ -196,9 +196,8 @@ class App(object):
     delete_backup = True
     # Used as a default export location, which may be different from the working directory
     last_export_directory = ""
-    sources_vectorstore = None
-    sources_collection = 'qualcoder' # name of the vectorstore collection for source documents
-    llm = None
+    ai = None
+    ai_models = []
 
     def __init__(self):
         sys.excepthook = exception_handler
@@ -211,7 +210,7 @@ class App(object):
         self.confighome = os.path.expanduser('~/.qualcoder_ai')
         self.configpath = os.path.join(self.confighome, 'config.ini')
         self.persist_path = os.path.join(self.confighome, 'recent_projects.txt')
-        self.settings = self.load_settings()
+        self.settings, self.ai_models = self.load_settings()
         self.last_export_directory = copy(self.settings['directory'])
         self.version = qualcoder_version
 
@@ -493,15 +492,26 @@ class App(object):
                 bad_links.append({'name': r[1], 'mediapath': r[2], 'id': r[0]})
         return bad_links
 
-    def write_config_ini(self, settings):
+    def write_config_ini(self, settings, ai_models):
         """ Stores settings for fonts, current coder, directory, and window sizes in .qualcoder folder
         Called by qualcoder.App.load_settings, qualcoder.MainWindow.open_project, settings.DialogSettings
         """
 
         config = configparser.ConfigParser()
         config['DEFAULT'] = settings
+        # add AI models
+        if len(ai_models) == 0:
+            self.ai_models_create_defaults(ai_models)
+        for model in ai_models:
+            model_section = 'ai_model_' + model['name']
+            config[model_section] = {}
+            config[model_section]['large_model'] = model['large_model']
+            config[model_section]['fast_model'] = model['fast_model']
+            config[model_section]['api_base'] = model['api_base']
+            config[model_section]['api_key'] = model['api_key']
+        
         with open(self.configpath, 'w', encoding='utf-8') as configfile:
-            config.write(configfile)
+            config.write(configfile)            
 
     def _load_config_ini(self):
         """ load config settings, and convert some to Integer or Boolean. """
@@ -533,9 +543,44 @@ class App(object):
                 result['showids'] = True
         if 'report_text_context_characters' in default:
             result['report_text_context_characters'] = default.getint('report_text_context_characters')
-        return result
+        
+        # load AI model list
+        ai_models = []
+        for section in config.sections():
+            if section.startswith('ai_model_'):
+                model = {
+                    'name': section[9:],
+                    'large_model': config[section]['large_model'],
+                    'fast_model': config[section]['fast_model'],
+                    'api_base': config[section]['api_base'],
+                    'api_key': config[section]['api_key']
+                }
+                ai_models.append(model)
+        if len(ai_models) == 0: # no models loaded, create default
+            self.ai_models_create_defaults(ai_models)
+        return result, ai_models
 
-    def check_and_add_additional_settings(self, settings_data):
+    def ai_models_create_defaults(self, models):
+        """Fills self.ai_models with a list of the default AI model parameters
+        """
+        models = [
+            {
+                'name': 'OpenAI_GPT4',
+                'large_model': 'gpt-4-turbo',
+                'fast_model': 'gpt-3.5-turbo',
+                'api_base': '',
+                'api_key': ''
+            },
+            {
+                'name': 'Blablador',
+                'large_model': 'alias-large',
+                'fast_model': 'alias-fast',
+                'api_base': 'https://helmholtz-blablador.fz-juelich.de:8000/v1',
+                'api_key': ''
+            }
+        ]
+
+    def check_and_add_additional_settings(self, settings_data, ai_models):
         """ Newer features include width and height settings for many dialogs and main window.
         timestamp format.
         dialog_crossovers IS dialog relations
@@ -594,15 +639,17 @@ class App(object):
                     settings_data[key] = 150
                 if key == 'ai_enable':
                     settings_data[key] = 'False'
-                if key == 'open_ai_api_key':
-                    settings_data[key] = ''
                 if key == 'ai_first_startup':
                     settings_data[key] = 'True'    
+                    
+        # Check AI models
+        if len(ai_models) == 0: # no models loaded, create default
+            self.ai_models_create_defaults(ai_models)
 
         # Write out new ini file, if needed
         if len(settings_data) > dict_len:
-            self.write_config_ini(settings_data)
-        return settings_data
+            self.write_config_ini(settings_data, ai_models)
+        return settings_data, ai_models
 
     def merge_settings_with_default_stylesheet(self, settings):
         """ Stylesheet is coded to avoid potential data file import errors with pyinstaller.
@@ -755,23 +802,23 @@ class App(object):
         return style
 
     def load_settings(self):
-        result = self._load_config_ini()
+        result, ai_models = self._load_config_ini()
         # Check keys
         if (not len(result) or 'codername' not in result.keys() or 'stylesheet' not in result.keys() or
                 'speakernameformat' not in result.keys()):
-            self.write_config_ini(self.default_settings)
+            self.write_config_ini(self.default_settings, ai_models)
             logger.info('Initialized config.ini')
             result = self._load_config_ini()
         # codername is also legacy, v2.8 plus keeps current coder name in database project table
         if result['codername'] == "":
             result['codername'] = "default"
-        result = self.check_and_add_additional_settings(result)
+        result, ai_models = self.check_and_add_additional_settings(result, ai_models)
         # TODO TEMPORARY delete, legacy
         if result['speakernameformat'] == 0:
             result['speakernameformat'] = "[]"
         if result['stylesheet'] == 0:
             result['stylesheet'] = "native"
-        return result
+        return result, ai_models
 
     @property
     def default_settings(self):
@@ -950,7 +997,7 @@ class App(object):
             pass
         return coder_names
     
-    def get_openai_api_key(self, key='', parent_window=None) -> str:
+    def get_ai_api_key(self, key='', parent_window=None) -> str:
         api_key_msg = _(
 'Please read this important note about access to GPT-4:\n\
 \n\
@@ -985,18 +1032,27 @@ Please enter your OpenAI api key here:')
         else:
             return str(dialog.textValue())
         
-    def prepare_ai(self, parent_window=None) -> bool:
+    #def prepare_ai(self, parent_window=None) -> bool:
         """Checks if all the conditions are met to use the ai integration.
         Downloads the embeddings model and asks for an OpenAI api key 
         if necessary.    
         """
-        # OpenAI api key:
-        if self.settings['open_ai_api_key'] == '':
-            self.settings['open_ai_api_key'] = self.get_openai_api_key(key='', parent_window=parent_window)
+        """
+        curr_model = self.ai_models[int(self.settings['ai_model_index'])]
+        if curr_model['api_key'] == '':
+            curr_model['api_key'] = self.get_ai_api_key(key='', parent_window=parent_window)
             if self.settings['open_ai_api_key'] == '':
                 self.settings['ai_enable'] = 'False'
                 return False
-        
+        """
+        """
+        if self.settings['open_ai_api_key'] == '':
+            self.settings['open_ai_api_key'] = self.get_ai_api_key(key='', parent_window=parent_window)
+            if self.settings['open_ai_api_key'] == '':
+                self.settings['ai_enable'] = 'False'
+                return False
+        """
+        """
         # embeddings model download:
         if not self.sources_vectorstore.embedding_model_is_cached():
             model_download_msg = _('\
@@ -1052,6 +1108,7 @@ want to continue?\
                 self.settings['ai_enable'] = 'False'
                 return False
         return True    
+    """
      
     def save_backup(self, suffix=""):
         """ Save a date and hours stamped backup.
@@ -1130,29 +1187,11 @@ class MainWindow(QtWidgets.QMainWindow):
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
         self.init_ui()
-        self.app.sources_vectorstore = AiVectorstore(self.app, self.ui.textEdit, self.app.sources_collection)
-        self.app.llm = AiLLM(self.app, self.ui.textEdit)
+        self.app.ai = AiLLM(self.app, self.ui.textEdit)
         self.ui.tabWidget.setCurrentIndex(0)
         self.show()
         QtWidgets.QApplication.processEvents()
         
-        # First start? Ask if user wants to enable ai integration or not
-        if self.app.settings['ai_first_startup'] == 'True' and self.app.settings['ai_enable'] == 'False':
-            msg = _('Welcome to the AI Setup Wizard\n\n\
-The new AI enhanced functions in Qualcoder need some additional setup. \
-If you skip this for now, you can enable or disable the AI integration \
-in the settings dialog later.\n\
-Do you want to start the AI setup now?')
-            msg_box = QtWidgets.QMessageBox(self)
-            msg_box.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-            reply = msg_box.question(self, _('AI Search'),
-                                            msg, QtWidgets.QMessageBox.StandardButton.Yes,
-                                            QtWidgets.QMessageBox.StandardButton.No)
-            if reply == QtWidgets.QMessageBox.StandardButton.Yes:
-                self.enable_ai()
-        self.app.settings['ai_first_startup'] == 'False'
-        self.app.write_config_ini(self.app.settings)
-
     def init_ui(self):
         """ Set up menu triggers """
 
@@ -1246,7 +1285,7 @@ Do you want to start the AI setup now?')
         
         self.ai_chat()
         # Disable ai_chat tab for now, not ready yet
-        self.ui.tabWidget.setTabVisible(4, False)
+        # self.ui.tabWidget.setTabVisible(4, False)
         
     def resizeEvent(self, new_size):
         """ Update the widget size details in the app.settings variables """
@@ -1875,8 +1914,7 @@ Do you want to start the AI setup now?')
         self.app = App()
         if self.app.settings['directory'] == "":
             self.app.settings['directory'] = os.path.expanduser('~')
-        self.app.sources_vectorstore = AiVectorstore(self.app, self.ui.textEdit, self.app.sources_collection)
-        self.app.llm = AiLLM(self.app, self.ui.textEdit)
+        self.app.ai = AiLLM(self.app, self.ui.textEdit)
         project_path = QtWidgets.QFileDialog.getSaveFileName(self,
                                                              _("Enter project name"), self.app.settings['directory'])
         # options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
@@ -1903,8 +1941,7 @@ Do you want to start the AI setup now?')
             logger.critical(_("Project creation error ") + str(err))
             Message(self.app, _("Project"), self.app.project_path + _(" not successfully created"), "critical").exec()
             self.app = App()
-            self.app.sources_vectorstore = AiVectorstore(self.app, self.ui.textEdit, self.app.sources_collection)
-            self.app.llm = AiLLM(self.app, self.ui.textEdit)
+            self.app.ai = AiLLM(self.app, self.ui.textEdit)
             return
         self.app.project_name = self.app.project_path.rpartition('/')[2]
         self.app.settings['directory'] = self.app.project_path.rpartition('/')[0]
@@ -2037,6 +2074,7 @@ Do you want to start the AI setup now?')
 
         current_coder = self.app.settings['codername']
         current_ai_enable = self.app.settings['ai_enable']
+        current_ai_model_index = self.app.settings['ai_model_index']
         ui = DialogSettings(self.app)
         ret = ui.exec()
         if ret == QtWidgets.QDialog.DialogCode.Rejected: # Dialog has been canceled
@@ -2046,13 +2084,17 @@ Do you want to start the AI setup now?')
         font = f"font: {self.app.settings['fontsize']}pt "
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
-        self.ai_chat_window.init_llm()
+        
         if current_ai_enable != self.app.settings['ai_enable']:
             if self.app.settings['ai_enable'] == 'True':
                 # AI is newly enabled
-                self.enable_ai()
-            else: 
-                self.app.sources_vectorstore.close()
+                self.app.ai.init_llm()
+            else: # AI is disabled
+                self.app.ai.close()
+        elif current_ai_model_index != self.app.settings['ai_model_index']:
+            # current model has changed
+            self.app.ai.init_llm()
+            
         # Name change: Close all opened dialogs as coder name needs to change everywhere
         if current_coder != self.app.settings['codername']:
             self.ui.textEdit.append(_("Coder name changed to: ") + self.app.settings['codername'])
@@ -2075,14 +2117,14 @@ Do you want to start the AI setup now?')
                     
     def enable_ai(self) -> bool:
         self.app.settings['ai_enable'] = 'True'
-        self.app.write_config_ini(self.app.settings)
+        self.app.write_config_ini(self.app.settings, self.app.ai_models)
         if self.app.prepare_ai(self):
             if self.app.project_name != '':
-                self.app.sources_vectorstore.init_vectorstore(rebuild=True)
-            self.app.llm.init_llm()
+                self.app.ai.sources_vectorstore.init_vectorstore(rebuild=True)
+            self.app.ai.init_llm()
         else:
             self.app.settings['ai_enable'] = 'False'
-            self.app.write_config_ini(self.app.settings)
+            self.app.write_config_ini(self.app.settings, self.app.ai_models)
         return self.app.settings['ai_enable'] == 'True'
       
     def project_memo(self):
@@ -2270,7 +2312,7 @@ Do you want to start the AI setup now?')
         names = self.app.get_coder_names_in_project()
         if self.app.settings['codername'] not in names and len(names) > 0:
             self.app.settings['codername'] = names[0]
-            self.app.write_config_ini(self.app.settings)
+            self.app.write_config_ini(self.app.settings, self.app.ai_models)
             self.ui.textEdit.append(_("Default coder name changed to: ") + names[0])
         # Display some project details
         self.app.append_recent_project(self.app.project_path)
@@ -2490,15 +2532,18 @@ Do you want to start the AI setup now?')
         self.app.conn.commit()
         
         # AI: init llm and update vectorstore
+        self.app.ai.init_llm()
+        """
         if self.app.settings['ai_enable'] == 'True':
             if self.app.prepare_ai(self):
-                self.app.sources_vectorstore.init_vectorstore()
-                self.app.llm.init_llm()
+                self.app.ai.init_llm()
             else:
-                self.app.sources_vectorstore.close()
+                self.app.ai.close()
                 # self.app.settings['ai_enable'] = 'False'
                 self.ui.textEdit.append(_("AI: Error - failed to initialize."))
-
+        """
+        self.ai_chat_window.init_ai_chat()
+        
         # Fix missing folders within QualCoder project. Will cause import errors.
         span = '<span style="color:red">'
         end_span = "</span>"
@@ -2617,7 +2662,10 @@ Do you want to start the AI setup now?')
             self.ui.textEdit.append(_("Closing project: ") + self.app.project_name)
             self.ui.textEdit.append("========\n")
             self.app.append_recent_project(self.app.project_path)
-        self.app.sources_vectorstore.close()
+        # AI
+        self.ai_chat_window.close()
+        self.app.ai.close()
+        
         if self.app.conn is not None:
             try:
                 self.app.conn.commit()
@@ -2635,7 +2683,7 @@ Do you want to start the AI setup now?')
         self.project = {"databaseversion": "", "date": "", "memo": "", "about": ""}
         self.hide_menu_options()
         self.setWindowTitle("QualCoder")
-        self.app.write_config_ini(self.app.settings)
+        self.app.write_config_ini(self.app.settings, self.app.ai_models)
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
         self.ui.textEdit.verticalScrollBar().setValue(self.ui.textEdit.verticalScrollBar().maximum())
 
@@ -2709,7 +2757,7 @@ Do you want to start the AI setup now?')
 
 def gui():
     qual_app = App()
-    settings = qual_app.load_settings()
+    settings, ai_models = qual_app.load_settings()
     project_path = qual_app.get_most_recent_projectpath()
     app = QtWidgets.QApplication(sys.argv)
     QtGui.QFontDatabase.addApplicationFont("GUI/NotoSans-hinted/NotoSans-Regular.ttf")

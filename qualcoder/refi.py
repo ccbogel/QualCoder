@@ -444,7 +444,7 @@ class RefiImport:
             self.app.write_config_ini(self.app.settings)
         # Update vectorstore
         if self.app.settings['ai_enable'] == 'True':
-            self.app.sources_vectorstore.update_vectorstore()        
+            self.app.ai.sources_vectorstore.update_vectorstore()        
         
         self.pd.close()
         msg = _("REFI-QDA PROJECT IMPORT EXPERIMENTAL FUNCTION - NOT FULLY TESTED\n")

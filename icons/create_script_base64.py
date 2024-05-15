@@ -65,11 +65,14 @@ class CreateHelperFile():
         https://qualcoder.wordpress.com/\n\n\
         Generated base64 helper file\n"""\n\n'
 
+        # Get the absolute path to the icons folder
+        script_path = os.path.abspath(__file__)
+        icons_dir = os.path.dirname(script_path)
         text = header
-        tmp_files = os.listdir()
+        tmp_files = os.listdir(icons_dir)
         files = []
         for f in tmp_files:
-            if f[-4:] == ".png":
+            if f[-4:] == ".png" or f[-4:] == ".gif":
                 files.append(f)
         files.sort()
 
@@ -80,14 +83,14 @@ class CreateHelperFile():
                 a = "a"
             name = a + f[:len(f) - 4]
             text += name + " = b'"
-            s = self.encode_base64(f)
+            s = self.encode_base64(os.path.join(icons_dir, f))
             text += s.decode('utf-8')
             text += "'\n"
             """text += name + "_pixmap = QPixmap()\n"
             text += name + '_pixmap.loadFromData(QByteArray.fromBase64(' +  + '), "png")\n'"""
 
         # write the generated file
-        filename = "base64_helper.py"
+        filename = os.path.join(os.path.dirname(icons_dir), "qualcoder", "GUI", "base64_helper.py")
         f = open(filename, 'w', encoding='utf-8-sig')
         f.write(text)
         f.close()

@@ -35,4 +35,5 @@ rispy
 six
 SpeechRecognition
 yaml
+json_repair
 

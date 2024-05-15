@@ -54,7 +54,7 @@ def exception_handler(exception_type, value, tb_obj):
         text = _('Shortened error message: ...') + text[-500:]
     QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
 
-# These system prompts cannot be changed. This string is in YAML-format.
+# These system prompts can only be changed here in the code. This string is in YAML-format.
 # Attention: First prompt in the list must be a search prompt!
 system_prompts = """
 - name: Open Search
@@ -69,31 +69,41 @@ system_prompts = """
     to what the code suggests. Do not solely focus on explicit keywords; also consider
     the subtle details, implicit meanings, or emotions depicted in the data. However,
     your interpretation must be firmly grounded in the empirical data provided,
-    avoiding any speculation. If uncertain, include the data rather than exclude
-    it.
+    avoiding any speculation. Do not make any assumptions which are not supported by 
+    the data. If uncertain, include the data rather than exclude it.
 - name: Focussed Search
   type: search
   description: This prompt is suitable for exploring a specific, well-defined phenomenon 
-    or topic. It will return less data than an open search, but the results will be more 
+    or topic. It will select less data than an open search, but the results will be more 
     precise and relevant. For this focused search to be effective, it is important to 
     clearly and concisely name your code and, preferably, include a code memo explaining 
     its meaning in greater detail (remember to check the option "Send memo to AI" in this 
     case). If conducting a free search, use "topic" and "description" instead.
   text: Carefully verify that the empirical data, or any part of it, accurately reflects 
-    the meaning implied by the code. Pay attention to subtle details and ensure you do 
-    not misinterpret the data to force a fit with the code. Your interpretation must be 
-    solidly based on the empirical data provided to you, avoiding any speculation.     
+    the meaning implied by the code. Pay attention to subtle details and ensure you do not 
+    misinterpret the data to force a fit with the code. Do not add any context that is not 
+    present in the data. Do not make any assumptions which are not supported by the data. 
+    Your interpretation must be solidly based on the empirical data provided to you, 
+    avoiding any speculation.
+- name: Summary
+  type: code_analysis
+  description: This prompt will create a simple summary of the pieces of data that have been 
+    coded with the choosen code.
+  text: Use the given code to analyse the given empirical data and summarize the results.     
 """
 
 # Define different prompt types of categories.
 # Right now, only prompts for the AI search are defined. We might add prompts for analysis, etc. later  
 prompt_types = [
-    'search'
+    'search',
+    'code_analysis'
 ]
 # Descriptions of the types, used as tooltips:
 prompt_types_descriptions = [
     ('These prompts are used in the AI search. They instruct the AI on how to decide \n'
      'wether a chunk of empirical data is related to a given code/search string or not.'
+    ),
+    ('These prompts are used to analyze the data that has been coded with a selected code.'
     )
 ]
 
@@ -267,7 +277,7 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         try:
             self.ui.comboBox_type.addItems(prompt_types)
             self.fill_tree()
-            # prselect restrict_prompt_type (if given)
+            # preselect restrict_prompt_type (if given)
             for i in range(len(prompt_types)):
                 if self.restrict_prompt_type == prompt_types[i]:
                     self.ui.treeWidget_prompts.setCurrentItem(self.ui.treeWidget_prompts.topLevelItem(i))
@@ -292,10 +302,6 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         
     def fill_tree(self):
         """ Fill tree with prompts, top level items are the prompt types. """
-        #if self.ui.treeWidget_prompts.currentItem() is not None:
-        #    sel_prompt = self.selected_prompt
-        #else:
-        #    sel_prompt = None
         old_form_updating = self.form_updating
         self.form_updating = True
         try:
@@ -316,21 +322,11 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
                         prompt_item.setToolTip(0, p.description)
                         if p == self.selected_prompt: # sel_prompt:
                             prompt_item.setSelected(True)
-                """
-                for p in self.prompts.prompts_by_type(t):
-                    child_item = QtWidgets.QTreeWidgetItem(top_item)
-                    child_item.setText(0, p.name_and_scope())
-                    child_item.setToolTip(0, p.description)
-                    if p == self.selected_prompt: # sel_prompt:
-                        child_item.setSelected(True)
-                """
-            # self.ui.treeWidget_prompts.sortByColumn(0, QtCore.Qt.SortOrder.AscendingOrder)
             self.ui.treeWidget_prompts.expandAll()
             if len(self.ui.treeWidget_prompts.selectedItems()) > 0:
                 self.ui.treeWidget_prompts.scrollToItem(self.ui.treeWidget_prompts.selectedItems()[0], QtWidgets.QAbstractItemView.ScrollHint.EnsureVisible)
         finally:
             self.form_updating = old_form_updating
-            # self.tree_selection_changed()
         
     def tree_selection_changed(self):
         """
@@ -374,7 +370,6 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
                     self.ui.pushButton_delete_prompt.setEnabled(True)
             else:
                 self.ui.widget_prompt_details.setEnabled(False)
-                # self.set_prompt_details_editable(False)
                 self.ui.lineEdit_name.setText('')
                 self.ui.radioButton_system.setChecked(False)
                 self.ui.radioButton_user.setChecked(False)

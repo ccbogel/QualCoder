@@ -146,7 +146,7 @@ py -m pip install wheel pyqt6 chardet ebooklib openpyxl Pillow ply pdfminer.six 
 For the AI-integration:
 
 ```bash
-py -m pip install langchain langchain[llms] chromadb sentence-transformers fuzzysearch pydantic
+py -m pip install langchain langchain[llms] chromadb sentence-transformers fuzzysearch pydantic yaml json_repair
 ```
  
  Wait, until all modules are installed.

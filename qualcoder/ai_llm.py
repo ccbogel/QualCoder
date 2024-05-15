@@ -34,6 +34,8 @@ import time
 from PyQt6 import QtWidgets
 from PyQt6 import QtGui
 from PyQt6 import QtCore 
+import sqlite3
+from .ai_prompts import PromptItem
 from langchain_community.chat_models import ChatOpenAI
 from langchain.globals import set_llm_cache
 from langchain.cache import InMemoryCache
@@ -47,11 +49,14 @@ from langchain.chains.openai_functions import (
 from langchain.prompts import ChatPromptTemplate
 from langchain.callbacks.base import BaseCallbackHandler
 from langchain.schema.runnable import RunnableConfig
+from langchain.schema import HumanMessage, SystemMessage, Document
 from .ai_async_worker import Worker, AiException
 from .ai_vectorstore import AiVectorstore
 from .GUI.base64_helper import *
+from .helpers import Message
 import fuzzysearch
 import json
+import json_repair
 
 max_memo_length = 1500 # maximum length of the memo send to the AI
 
@@ -118,12 +123,16 @@ class AiLLM():
     threadpool: QtCore.QThreadPool = None
     ai_async_is_canceled = False
     ai_async_is_finished = False
+    ai_async_is_errored = False
     ai_async_progress_msgbox = None
     ai_async_progress_msg = ''
     ai_async_progress_count = -1
     ai_async_progress_max = -1
     busy = False   
-    gpt4 = None
+    large_llm = None
+    fast_llm = None
+    ai_streaming_output = ''
+    sources_collection = 'qualcoder' # name of the vectorstore collection for source documents
     default_system_prompt = (
         'You are a member of a team of qualitative social researchers.'
     )
@@ -133,84 +142,213 @@ class AiLLM():
         self.parent_text_edit = parent_text_edit
         self.threadpool = QtCore.QThreadPool()
         self.threadpool.setMaxThreadCount(1)
+        self.sources_vectorstore = None
     
-    def init_llm(self):
-        set_llm_cache(InMemoryCache())
-        self.gpt4 = ChatOpenAI(model='gpt-4-1106-preview', 
-                               openai_api_key=self.app.settings['open_ai_api_key'], 
-                               cache=True,
-                               temperature=0.0,
-                               streaming=True
-                               )
+    def init_llm(self, rebuild_vectorstore=False):
+        # First start? Ask if user wants to enable ai integration or not
+        if self.app.settings['ai_first_startup'] == 'True' and self.app.settings['ai_enable'] == 'False':
+            msg = _('Welcome to the AI Setup Wizard\n\n\
+The new AI enhanced functions in Qualcoder need some additional setup. \
+If you skip this for now, you can enable or disable the AI integration \
+in the settings dialog later.\n\
+Do you want to start the AI setup now?')
+            msg_box = QtWidgets.QMessageBox(self)
+            msg_box.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            reply = msg_box.question(self, _('AI Search'),
+                                            msg, QtWidgets.QMessageBox.StandardButton.Yes,
+                                            QtWidgets.QMessageBox.StandardButton.No)
+            if reply == QtWidgets.QMessageBox.StandardButton.No:
+                self.app.settings['ai_enable'] = 'False'
+        self.app.settings['ai_first_startup'] == 'False'
+        self.app.write_config_ini(self.app.settings, self.app.ai_models)
         
+        if self.app.settings['ai_enable'] == 'True':
+            set_llm_cache(InMemoryCache())
+            # init vectorstore
+            if self.sources_vectorstore is None:
+                self.sources_vectorstore = AiVectorstore(self.app, self.parent_text_edit, self.sources_collection)
+                self.sources_vectorstore.init_vectorstore(rebuild_vectorstore)
+            # init llms
+            curr_model = self.app.ai_models[int(self.app.settings['ai_model_index'])]
+            large_model = curr_model['large_model']
+            fast_model = curr_model['fast_model']
+            api_base = curr_model['api_base']
+            api_key = curr_model['api_key']
+            self.large_llm = ChatOpenAI(model=large_model, 
+                                openai_api_key=api_key, 
+                                openai_api_base=api_base, 
+                                cache=True,
+                                temperature=0.0,
+                                streaming=True
+                                )
+            self.fast_llm = ChatOpenAI(model=fast_model, 
+                                openai_api_key=api_key, 
+                                openai_api_base=api_base, 
+                                cache=True,
+                                temperature=0.0,
+                                streaming=True
+                                )
+            self.ai_streaming_output = ''
+        else:
+            self.close()
+        
+    def close(self):
+        self.cancel(False)
+        if self.sources_vectorstore is not None: 
+            self.sources_vectorstore.close()
+            self.sources_vectorstore = None
+        self.large_llm = None
+        self.fast_llm = None
+        
+    def cancel(self, ask: bool) -> bool:
+        if not self.is_busy():
+            return True
+        if ask:
+            msg = _('Do you really want to cancel the AI operation?')
+            msg_box = Message(self.app, 'AI Cancel', msg)
+            msg_box.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
+            reply = msg_box.exec()
+            if reply == QtWidgets.QMessageBox.StandardButton.No:
+                return False
+        # cancel all waiting threads:
+        self.threadpool.clear()
+        self.ai_async_is_canceled = True
+        self.threadpool.waitForDone(5000)
+        return True
+
+    def is_busy(self) -> bool:
+        return self.threadpool.activeThreadCount() > 0
+
     def is_ready(self):
-        return (self.app.sources_vectorstore is not None) and \
-                    (self.app.sources_vectorstore.is_ready()) and \
-                    (self.gpt4 is not None) and \
-                    (self.threadpool.activeThreadCount() == 0)
+        return (self.sources_vectorstore is not None) and \
+                    (self.sources_vectorstore.is_ready()) and \
+                    (self.large_llm is not None) and \
+                    (self.fast_llm is not None) and \
+                    (not self.is_busy())
     
     def _ai_async_progress(self, msg):
-        # print(msg)
         self.ai_async_progress_msg = self.ai_async_progress_msg + '\n' + msg
+        
+    def _ai_async_error(self, exception_type, value, tb_obj):
+        self.ai_async_is_errored = True
+        exception_handler(exception_type, value, tb_obj)
 
     def _ai_async_finished(self):
-        self.ai_async_progress_msgbox.close()
+        if self.ai_async_progress_msgbox is not None:
+            try:
+                self.ai_async_progress_msgbox.close()
+            except:
+                pass
         self.ai_async_is_finished = True
     
-    def ai_async_query(self, parent_window, func, result_callback, *args, **kwargs):
-        # show MessageBox while waiting
-        self.ai_async_progress_msgbox = QtWidgets.QMessageBox(parent_window)
-        self.ai_async_progress_msgbox.setStandardButtons((QtWidgets.QMessageBox.StandardButton.Abort))
-        self.ai_async_progress_msgbox.setWindowTitle('AI query running')
-        # create Label
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(ai_search), "gif")
-        self.ai_async_progress_msgbox.setIconPixmap(pm.scaledToWidth(128))
-        icon_label = self.ai_async_progress_msgbox.findChild(QtWidgets.QLabel, "qt_msgboxex_icon_label")
-        # load gif
-        bArray = QtCore.QByteArray.fromBase64(ai_search)
-        bBuffer = QtCore.QBuffer(bArray)
-        bBuffer.open(QtCore.QIODeviceBase.OpenModeFlag.ReadWrite)
-        movie = QtGui.QMovie()
-        movie.setDevice(bBuffer)
-        movie.setFormat(b'GIF')
-        size = QtCore.QSize(128, 128)
-        movie.setScaledSize(size)
-        # avoid garbage collector
-        setattr(self.ai_async_progress_msgbox, 'icon_label_bArray', bArray)
-        setattr(self.ai_async_progress_msgbox, 'icon_label_bBuffer', bBuffer)
-        setattr(self.ai_async_progress_msgbox, 'icon_label', movie)
-        # start animation
-        icon_label.setMovie(movie)
-        movie.start()
-        self.ai_async_progress_msgbox.setModal(True)
-        self.ai_async_progress_msgbox.show()
+    def _ai_async_abort_button_clicked(self):
+        self.ai_async_is_canceled = True
+    
+    def ai_async_stream(self, llm, messages, result_callback=None, progress_callback=None, streaming_callback=None, error_callback=None):       
+        # start async worker
+        self.ai_async_is_finished = False
+        self.ai_async_is_errored = False
+        self.ai_async_progress_msg = ''
+        self.ai_async_progress_count = -1
+        worker = Worker(self._ai_async_stream, llm=llm, messages=messages)
+        if result_callback is not None: 
+            worker.signals.result.connect(result_callback)
+        if progress_callback is not None:
+            worker.signals.progress.connect(progress_callback)
+        if streaming_callback is not None:
+            worker.signals.streaming.connect(streaming_callback)
+        if error_callback is not None:
+            worker.signals.error.connect(error_callback)
+        self.threadpool.start(worker)
+
+    def _ai_async_stream(self, signals, llm, messages):
+        self.ai_async_is_canceled = False
+        self.ai_streaming_output = ''
+        for chunk in llm.stream(messages):
+            if self.ai_async_is_canceled:
+                break # cancel the streaming
+            else:
+                self.ai_streaming_output += chunk.content
+                if signals is not None:
+                    if signals.streaming is not None:
+                        signals.streaming.emit(str(chunk.content))
+                    if signals.progress is not None:
+                        self.ai_async_progress_count += len(chunk.content)
+                        signals.progress.emit(str(self.ai_async_progress_count))
+        res = self.ai_streaming_output
+        self.ai_streaming_output = ''
+        return res
+
+    def ai_async_query(self, parent_window, func, show_progress_msg, result_callback, *args, **kwargs):
+        if show_progress_msg:
+            # show MessageBox while waiting
+            self.ai_async_progress_msgbox = QtWidgets.QMessageBox(parent_window)
+            self.ai_async_progress_msgbox.setStandardButtons((QtWidgets.QMessageBox.StandardButton.Abort))
+            self.ai_async_progress_msgbox.buttonClicked.connect(self._ai_async_abort_button_clicked)
+            self.ai_async_progress_msgbox.setWindowTitle('AI query running')
+            # create Label
+            pm = QtGui.QPixmap()
+            pm.loadFromData(QtCore.QByteArray.fromBase64(ai_search), "gif")
+            self.ai_async_progress_msgbox.setIconPixmap(pm.scaledToWidth(128))
+            icon_label = self.ai_async_progress_msgbox.findChild(QtWidgets.QLabel, "qt_msgboxex_icon_label")
+            # load gif
+            bArray = QtCore.QByteArray.fromBase64(ai_search)
+            bBuffer = QtCore.QBuffer(bArray)
+            bBuffer.open(QtCore.QIODeviceBase.OpenModeFlag.ReadWrite)
+            movie = QtGui.QMovie()
+            movie.setDevice(bBuffer)
+            movie.setFormat(b'GIF')
+            size = QtCore.QSize(128, 128)
+            movie.setScaledSize(size)
+            # avoid garbage collector
+            setattr(self.ai_async_progress_msgbox, 'icon_label_bArray', bArray)
+            setattr(self.ai_async_progress_msgbox, 'icon_label_bBuffer', bBuffer)
+            setattr(self.ai_async_progress_msgbox, 'icon_label', movie)
+            # start animation
+            icon_label.setMovie(movie)
+            movie.start()
+            self.ai_async_progress_msgbox.setModal(True)
+            self.ai_async_progress_msgbox.show()
+        
         self.ai_async_is_canceled = False
         
         # start async worker
         self.ai_async_is_finished = False
+        self.ai_async_is_errored = False
         self.ai_async_progress_msg = ''
         self.ai_async_progress_count = -1
         worker = Worker(func, *args, **kwargs) # Any other args, kwargs are passed to the run function
-        worker.signals.result.connect(result_callback)
+        if result_callback is not None: 
+            worker.signals.result.connect(result_callback)
         worker.signals.finished.connect(self._ai_async_finished)
         worker.signals.progress.connect(self._ai_async_progress)
-        worker.signals.error.connect(exception_handler)
+        worker.signals.error.connect(self._ai_async_error)
         self.threadpool.start(worker)
         
-        while not self.ai_async_is_finished:
-            if (self.ai_async_progress_count > -1) and (self.ai_async_progress_max > -1):
-                progress_percent = round((self.ai_async_progress_count / self.ai_async_progress_max) * 100)
-                if progress_percent >= 100:
-                    progress_percent = 99
-                self.ai_async_progress_msgbox.setText(f'{self.ai_async_progress_msg} (~{progress_percent}%)')
-            else:
-                self.ai_async_progress_msgbox.setText(self.ai_async_progress_msg)
-            QtWidgets.QApplication.processEvents() # update the progress dialog
-            time.sleep(0.01)
+        if show_progress_msg:
+            while not (self.ai_async_is_finished or self.ai_async_is_errored or self.ai_async_is_canceled):
+                if (self.ai_async_progress_count > -1) and (self.ai_async_progress_max > -1):
+                    progress_percent = round((self.ai_async_progress_count / self.ai_async_progress_max) * 100)
+                    if progress_percent >= 100:
+                        progress_percent = 99
+                    self.ai_async_progress_msgbox.setText(f'{self.ai_async_progress_msg} (~{progress_percent}%)')
+                else:
+                    self.ai_async_progress_msgbox.setText(self.ai_async_progress_msg)
+                QtWidgets.QApplication.processEvents() # update the progress dialog
+                time.sleep(0.01)
+                
+    def get_curr_language(self):
+        """Determine the current language of the UI and/or the project. 
+        Used to instruct the AI answering in the correct language. 
+        """ 
+        lang_long = {"de": "Deutsch", "en": "English", "es": "Español", "fr": "Français", "it": "Italiano", "pt": "Português"}
+        lang = lang_long[self.app.settings['language']] 
+        if lang is None:
+            lang = 'English'
+        return lang
     
     def generate_code_descriptions(self, code_name, code_memo='') -> list:
-        """Prompts GPT-4 to create a list of 10 short descriptions of the given code.
+        """Prompts the AI to create a list of 10 short descriptions of the given code.
         This is used to get a better basis for the semantic search in the vectorstore. 
 
         Args:
@@ -223,12 +361,65 @@ class AiLLM():
 
         if self.busy:
             raise AiException('AI is busy (generate_code_descriptions)')
+                
+        code_descriptions_prompt = [
+            SystemMessage(
+                content = self.default_system_prompt
+            ),
+            HumanMessage(
+                content= (f'You are discussing the code named "{code_name}" with the following code memo: "{code_memo}". \n'
+                    'Your task: Give back a list of 10 short descriptions of the meaning of this code. '
+                    'Try to give a variety of diverse code-descriptions. Use simple language. '
+                    f'Always answer in the following language: "{self.get_curr_language()}". Do not use numbers or bullet points. '
+                    'Do not explain anything or repeat the code name, just give back the descriptive text. '
+                    'Return the list as a valid JSON object in the following form: '
+                    '{\n  "descriptions": [\n    "first description",\n    "second description",\n   ]\n}.')
+            )
+        ]
+
+        json_result = {
+            "descriptions": [
+                "first description",
+                "second description",
+                ...
+            ]
+        }
+
+        code_descriptions_prompt = [
+            SystemMessage(
+                content = self.default_system_prompt
+            ),
+            HumanMessage(
+                content= (f'You are discussing the code named "{code_name}" with the following code memo: "{code_memo}". \n'
+                    'Your task: Give back a list of 10 short descriptions of the meaning of this code. '
+                    'Try to give a variety of diverse code-descriptions. Use simple language. '
+                    f'Always answer in the following language: "{self.get_curr_language()}". Do not use numbers or bullet points. '
+                    'Do not explain anything or repeat the code name, just give back the descriptive text. '
+                    'Return the list as a valid JSON object in the following form:\n'
+                    f'{json_result}')
+            )
+        ]
+
+        logger.debug(_('AI generate_code_descriptions\n'))
+        logger.debug(_('Prompt:\n') + str(code_descriptions_prompt))
         
+        # callback to show percentage done    
+        config = RunnableConfig()
+        config['callbacks'] = [MyCustomSyncHandler(self)]
+        self.ai_async_progress_max = round(1000 / 4) # estimated token count of the result (1000 chars)
+
+        res = self.large_llm.invoke(code_descriptions_prompt, response_format={"type": "json_object"}, config=config)
+        logger.debug(str(res.content))
+        code_descriptions = json_repair.loads(str(res.content))['descriptions']
+
+        return code_descriptions
+        
+        """
         # define the format for the output
         class CodeDescription(BaseModel):
             description: str = Field(..., description="A short description of the meaning of the code")
         class CodeDescriptions(BaseModel):
-            """A list of code-descriptions"""
+            "A list of code-descriptions"
             descriptions: List[CodeDescription]
 
         # create the prompt         
@@ -261,7 +452,7 @@ class AiLLM():
         # query the llm
         runnable = create_structured_output_runnable(
             output_schema = CodeDescriptions, 
-            llm = self.gpt4, 
+            llm = self.llm, 
             prompt = code_descriptions_prompt)
 
         code_descriptions: CodeDescriptions = runnable.invoke({
@@ -276,14 +467,15 @@ class AiLLM():
         for desc in code_descriptions.descriptions:
             res.append(desc.description)
         return res
+        """
     
     def retrieve_similar_data(self, parent_window, result_callback, code_name, code_memo='', doc_ids=[]):
-        self.ai_async_query(parent_window, self._retrieve_similar_data, result_callback, code_name, code_memo, doc_ids)
+        self.ai_async_query(parent_window, self._retrieve_similar_data, True, result_callback, code_name, code_memo, doc_ids)
 
-    def _retrieve_similar_data(self, code_name, code_memo='', doc_ids=[], progress_callback=None) -> list:
+    def _retrieve_similar_data(self, code_name, code_memo='', doc_ids=[], progress_callback=None, signals=None) -> list:
         # 1) Get a list of code descriptions from the llm
         if progress_callback != None:
-            progress_callback.emit(_('Searching data related to "') + code_name + '"') 
+            progress_callback.emit(_('Stage 1:\nSearching data related to "') + code_name + '"') 
         descriptions = self.generate_code_descriptions(code_name, code_memo)
         if self.ai_async_is_canceled:
             return
@@ -294,14 +486,16 @@ class AiLLM():
             # add document filter
             search_kwargs['filter'] = {'id': {'$in':doc_ids}}
         
-        retriever = self.app.sources_vectorstore.chroma_db.as_retriever(
-            search_type="similarity_score_threshold",
-            search_kwargs=search_kwargs
-        )
+        #retriever = self.sources_vectorstore.chroma_db.as_retriever(
+        #    search_type="similarity_score_threshold",
+        #    search_kwargs=search_kwargs
+        #)
 
         chunks_meta_list = []
         for desc in descriptions:
-            chunks_meta_list.append(retriever.get_relevant_documents(desc))
+            #chunks_meta_list.append(retriever.get_relevant_documents(desc))
+            chunks_meta_list.append(self.sources_vectorstore.chroma_db.similarity_search_with_relevance_scores(desc, **search_kwargs))
+
 
         #for chunk_list in chunks_meta_list:
         #    print(chunk_list)
@@ -309,10 +503,9 @@ class AiLLM():
         # 3) Consolidate results
         # Flatten the lists of chunks in chunks_lists and collect all the chunks in a master list.
         # Duplicate chunks are collected only once. The list is sorted by the frequency 
-        # of a chunk counted over all lists. 
-        
-        # TODO: try to improve ranking with "Reciprocal Rank Fusion" (https://plg.uwaterloo.ca/~gvcormac/cormacksigir09-rrf.pdf)
-        # as implemented here: https://python.langchain.com/docs/modules/data_connection/retrievers/ensemble 
+        # of a chunk counted over all lists + the similarity score that chromadb returns.
+        # This way, frequent and relevant chunks should be sorted to the top
+        # (see: "Reciprocal Rank Fusion" (https://plg.uwaterloo.ca/~gvcormac/cormacksigir09-rrf.pdf))
 
         def chunk_unique_str(chunk):
             # helper
@@ -325,22 +518,209 @@ class AiLLM():
         chunk_master_list = [] # contains all chunks from all lists but no doubles
         for lst in chunks_meta_list:
             for chunk in lst:            
-                chunk_str = chunk_unique_str(chunk)
+                chunk_doc = chunk[0]
+                chunk_score = chunk[1]
+                chunk_str = chunk_unique_str(chunk_doc)
                 chunk_in_count_list = chunk_count_list.get(chunk_str, None)
                 if chunk_in_count_list: 
-                    chunk_count_list[chunk_str] += 1
+                    chunk_count_list[chunk_str] += 1 + chunk_score
                 else:
-                    chunk_count_list[chunk_str] = 1
-                    chunk_master_list.append(chunk)
-                        
-        # Sort the common items by their frequency in descending order
-        chunk_master_list.sort(key=lambda chunk: chunk_count_list[chunk_unique_str(chunk)], reverse=True)
+                    chunk_count_list[chunk_str] = 1 + chunk_score
+                    chunk_master_list.append(chunk_doc)
+                    
+        # add scores
+        for chunk_doc in chunk_master_list:
+            chunk_doc.metadata['score'] = chunk_count_list[chunk_unique_str(chunk_doc)]
+        
+        # Sort the common items by their score in descending order
+        chunk_master_list.sort(key=lambda chunk: chunk.metadata['score'], reverse=True)
+                                
+        logger.debug('First 10 chunks of retrieved data:\n' + str(chunk_master_list[:10]))
         
         return chunk_master_list
     
+    def search_analyze_chunk(self, parent_window, result_callback, show_progress_msg, chunk, code_name, code_memo, search_prompt: PromptItem):
+        # Analyze a chunk of data with the AI
+        # if self.ai_async_is_canceled:
+        #    return
+        self.ai_async_query(parent_window, self._search_analyze_chunk, show_progress_msg, result_callback, chunk, code_name, code_memo, search_prompt)
+        
+    def _search_analyze_chunk(self, chunk, code_name, code_memo, search_prompt: PromptItem, progress_callback=None, signals=None):
+        # the async function
+                
+        if progress_callback != None:
+            progress_callback.emit(_("Stage 2:\nInspecting the data more closely..."))        
+
+        # build up the prompt
+        
+        json_result = """
+{
+    "interpretation": your reasoning,
+    "related": your conclusion, true or false
+    "quote": the selected quote or an empty string,
+}
+"""
+        prompt = [
+            SystemMessage(
+                content=self.default_system_prompt
+            ),
+            HumanMessage(
+                content= (f'You are discussing the code named "{code_name}" with the following code memo: "{code_memo}". \n'
+                    'At the end of this message, you will find a chunk of empircal data. \n'
+                    'Your task is to inspect this chunk of empirical data and decide wether it relates to the given code or not. '
+                    f'In order to decide this, you must adher to the folowing instructions: "{search_prompt.text}". \n'
+                    'The result of your analysis must consist out of two parts:\n'
+                    '1. In the field "interpretation", present a short summary of your reasoning behind the decision wether the '
+                    'data relates to the given code or not. Avoid repeating the codes name '
+                    'or memo or phrases like "The empirical data relates to the code because...". Get directly to the point. '
+                    f'In this particular field, always answer in the language "{self.get_curr_language()}".\n'
+                    '2a. If the previous step came to the conclusion that the data relates to the code, '
+                    'identify a quote from the chunk of empirical data that contains the part which is '
+                    'relevant for the analysis of the given code. Include enough context so that the quote is comprehensable. '
+                    'Give back this quote in the field "quote" exactly like in the original, '
+                    'including errors. Do not leave anything out, do not translate the text or change it in any other way. '
+                    'If you cannot identify a particular quote, return the whole chunk of empirical data in the field "quote".\n'
+                    '2b. If step 1 came to the conclusion that the data is not relevant, '
+                    'return an empty quote ("") in the field "quote".\n'
+                    'Make sure to return nothing else but a valid JSON object in the following form: \n{\n  "interpretation": your explanation,\n  "quote": the selected quote or an empty string,\n}.'
+                    f'\n\nThe chunk of empirical data for you to analyze: \n"{chunk.page_content}"')
+                )
+            ]  
+
+        prompt = [
+            SystemMessage(
+                content=self.default_system_prompt
+            ),
+            HumanMessage(
+                content= (f'You are discussing the code named "{code_name}" with the following code memo: "{code_memo}". \n'
+                    'At the end of this message, you will find a chunk of empirical data. \n'
+                    'Your task is to inspect this chunk of empirical data and decide wether it relates to the given code or not. '
+                    f'In order to decide this, you must adher to the following instructions: "{search_prompt.text}". \n'
+                    'Summarize your reasoning briefly in the field "interpretation" of the result. '
+                    f'In this particular field, always answer in the language "{self.get_curr_language()}".\n'
+                    'If you came to the conclusion that the data relates to the code, '
+                    'identify a quote from the chunk of empirical data that contains the part which is '
+                    'relevant for the analysis of the given code. Include enough context so that the quote is comprehensable. '
+                    'Give back this quote in the field "quote" exactly like in the original, '
+                    'including errors. Do not leave anything out, do not translate the text or change it in any other way. '
+                    'If you cannot identify a particular quote, return the whole chunk of empirical data in the field "quote".\n'
+                    'If you came the conclusion that the data is not relevant, '
+                    'return an empty quote ("") in the field "quote".\n'
+                    'Make sure to return nothing else but a valid JSON object in the following form: \n{\n  "interpretation": your explanation,\n  "quote": the selected quote or an empty string,\n}.'
+                    f'\n\nThe chunk of empirical data for you to analyze: \n"{chunk.page_content}"')
+                )
+            ]
+
+        prompt = [
+            SystemMessage(
+                content=self.default_system_prompt
+            ),
+            HumanMessage(
+                content= (f'You are discussing the code named "{code_name}" with the following code memo: "{code_memo}". \n'
+                    'At the end of this message, you will find a chunk of empirical data. \n'
+                    'Your task is to inspect this chunk of empirical data and decide wether it (or parts of it) relates to the given code or not. '
+                    f'In order to decide this, you must adher to the following instructions: "{search_prompt.text}". \n'
+                    'The result consists of three parts:\n'
+                    '1) Briefly summarize your reasoning regarding the question wether this data relates to the code in the field "interpretation" of the result. '
+                    f'In this particular field, always answer in the language "{self.get_curr_language()}".\n'
+                    '2) Analyze your reasoning from the previous step. If you come to the conclusion that the chunk of data '
+                    'is not related to the code, give back \'false\' in the field "related", otherwise \'true\'.\n'
+                    '3) - If step 2 resulted in \'true\', identify a quote from the chunk of empirical data that contains the part which is '
+                    'relevant for the analysis of the given code. Include enough context so that the quote is comprehensable. '
+                    'Give back this quote in the field "quote" exactly like in the original, '
+                    'including errors. Do not leave anything out, do not translate the text or change it in any other way. '
+                    'If you cannot identify a particular quote, return the whole chunk of empirical data in the field "quote".\n'
+                    '- If step 2 resulted in \'false\', return an empty quote ("") in the field "quote".\n'
+                    f'Make sure to return nothing else but a valid JSON object in the following form: \n{json_result}.'
+                    f'\n\nThe chunk of empirical data for you to analyze: \n"{chunk.page_content}"')
+                )
+            ]
+
+        prompt = [
+            SystemMessage(
+                content=self.default_system_prompt
+            ),
+            HumanMessage(
+                content= (f'You are discussing the code named "{code_name}" with the following code memo: "{code_memo}". \n'
+                    'At the end of this message, you will find a chunk of empirical data. \n'
+                    'Your task is to inspect this chunk of empirical data and decide wether it relates to the given code or not. '
+                    f'In order to decide this, you must adher to the following instructions: "{search_prompt.text}". \n'
+                    'Summarize your reasoning briefly in the field "interpretation" of the result. '
+                    f'In this particular field, always answer in the language "{self.get_curr_language()}".\n'
+                    'If you came to the conclusion that the chunk of data '
+                    'is not related to the code, give back \'false\' in the field "related", otherwise \'true\'.\n'
+                    'If the previous step resulted in \'true\', identify a quote from the chunk of empirical data that contains the part which is '
+                    'relevant for the analysis of the given code. Include enough context so that the quote is comprehensable. '
+                    'Give back this quote in the field "quote" exactly like in the original, '
+                    'including errors. Do not leave anything out, do not translate the text or change it in any other way. '
+                    'If you cannot identify a particular quote, return the whole chunk of empirical data in the field "quote".\n'
+                    'If the previous step resulted in \'false\', return an empty quote ("") in the field "quote".\n'
+                    f'Make sure to return nothing else but a valid JSON object in the following form: \n{json_result}.'
+                    f'\n\nThe chunk of empirical data for you to analyze: \n"{chunk.page_content}"')
+                )
+            ]
+
+        prompt = [
+            SystemMessage(
+                content=self.default_system_prompt
+            ),
+            HumanMessage(
+                content= (f'You are discussing the code named "{code_name}" with the following code memo: "{code_memo}". \n'
+                    'At the end of this message, you will find a chunk of empirical data. \n'
+                    'Your task is to use the following instructions to analyze the chunk of empirical data and decide wether it relates to the given code or not. '
+                    f'Instructions: "{search_prompt.text}". \n'
+                    'Summarize your reasoning briefly in the field "interpretation" of the result. '
+                    f'In this particular field, always answer in the language "{self.get_curr_language()}".\n'
+                    'If you came to the conclusion that the chunk of data '
+                    'is not related to the code, give back \'false\' in the field "related", otherwise \'true\'.\n'
+                    'If the previous step resulted in \'true\', identify a quote from the chunk of empirical data that contains the part which is '
+                    'relevant for the analysis of the given code. Include enough context so that the quote is comprehensable. '
+                    'Give back this quote in the field "quote" exactly like in the original, '
+                    'including errors. Do not leave anything out, do not translate the text or change it in any other way. '
+                    'If you cannot identify a particular quote, return the whole chunk of empirical data in the field "quote".\n'
+                    'If the previous step resulted in \'false\', return an empty quote ("") in the field "quote".\n'
+                    f'Make sure to return nothing else but a valid JSON object in the following form: \n{json_result}.'
+                    f'\n\nThe chunk of empirical data for you to analyze: \n"{chunk.page_content}"')
+                )
+            ]
+
+        # callback to show percentage done    
+        config = RunnableConfig()
+        config['callbacks'] = [MyCustomSyncHandler(self)]
+        self.ai_async_progress_max = 130 # estimated average token count of the result
+        
+        # send the query to the llm 
+        res = self.large_llm.invoke(f'{prompt}', response_format={"type": "json_object"}, config=config)
+        res_json = json_repair.loads(str(res.content))
+        
+        # analyse and format the answer
+        # if res_json['quote'] != '': # found something
+        if 'related' in res_json and res_json['related'] == True and \
+           'quote' in res_json and res_json['quote'] != '': # found something
+            # Adjust quote_start
+            i = 0
+            doc = {}
+            doc['metadata'] = chunk.metadata
+                       
+            # search quote with not more than 30% mismatch (Levenshtein Distance). This is done because the AI sometimes alters the text a little bit.
+            quote_found = fuzzysearch.find_near_matches(res_json['quote'], chunk.page_content, 
+                             max_l_dist=round(len(res_json['quote']) * 0.3)) # result: list [Match(start=x, end=x, dist=x, matched='txt')]
+            if len(quote_found) > 0:
+                doc['quote_start'] = quote_found[0].start + doc['metadata']['start_index']
+                doc['quote'] = quote_found[0].matched
+            else: # quote not found, make the whole chunk the quote
+                doc['quote_start'] = doc['metadata']['start_index']
+                doc['quote'] = chunk.page_content
+        
+            doc['interpretation'] = res_json['interpretation']
+        else: # No quote means the AI discarded this chunk as not relevant
+            doc = None
+        return doc
+    
+    """ old:
     def analyze_similarity(self, parent_window, result_callback, chunk_list, code_name, code_memo=''):
         # Analyze the chunks of data with GPT-4
-        self.ai_async_query(parent_window, self._analyze_similarity, result_callback, chunk_list, code_name, code_memo)
+        self.ai_async_query(parent_window, self._analyze_similarity, True, result_callback, chunk_list, code_name, code_memo)
     
     def _analyze_similarity(self, chunk_list, code_name, code_memo='', progress_callback=None) -> list:        
         # the async function
@@ -394,7 +774,7 @@ class AiLLM():
 
         runnable = create_structured_output_runnable(
             output_schema=LlmAnalyzedDataList, 
-            llm=self.gpt4, 
+            llm=self.llm, 
             prompt=analyze_chunks_prompt)
         
         config = RunnableConfig()
@@ -437,7 +817,9 @@ class AiLLM():
         # Sort the selected quotes by their relevance in descending order
         selected_quotes.data.sort(key=lambda chunk: chunk.relevance, reverse=True)
          
-        return selected_quotes        
+        return selected_quotes 
+        
+        """       
    
 
     

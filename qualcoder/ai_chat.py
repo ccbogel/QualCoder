@@ -27,22 +27,29 @@ https://qualcoder.wordpress.com/
 """
 
 from PyQt6 import QtWidgets, QtCore
-from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QTextCursor, QPalette
+from PyQt6.QtCore import Qt, QEvent
+from PyQt6.QtGui import QTextCursor, QPalette, QCursor
+from PyQt6.QtWidgets import QTextEdit
+from PyQt6.QtGui import QKeySequence, QPixmap, QIcon
 
-import datetime
+from langchain.schema import HumanMessage, SystemMessage, AIMessage
+from langchain.callbacks.base import BaseCallbackHandler
+from langchain.schema.runnable import RunnableConfig
+
+from datetime import datetime
 import logging
 import os
 import re
 import sqlite3
 import sys
 import traceback
+import base64
+import json
 
 from .GUI.ui_ai_chat import Ui_Dialog_ai_chat
+from .GUI.base64_helper import *
 from .helpers import Message
-
-from langchain.llms import OpenAI
-from langchain.chat_models import ChatOpenAI
+from .ai_search_dialog import DialogAiSearch
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -60,105 +67,564 @@ def exception_handler(exception_type, value, tb_obj):
     mb.setText(text)
     mb.exec()
 
-
 class DialogAIChat(QtWidgets.QDialog):
     """ AI chat window
-    """
-
+    """    
     app = None
     parent_textEdit = None
-    filepath = ""
-    header = []
-    data = []
+    chat_history_conn = None
+    current_chat_idx = -1
+    current_streaming_chat_idx = -1
+    chat_msg_list = [] 
+    is_updating_chat_window = False
 
-    def __init__(self, app, parent_text_edit):
+    def __init__(self, app, parent_text_edit: QTextEdit):
         """ Need to comment out the connection accept signal line in ui_Dialog_Import.py.
          Otherwise, get a double-up of accept signals. """
 
         sys.excepthook = exception_handler
         self.app = app
         self.parent_textEdit = parent_text_edit
-        self.filepath = ""
         # Set up the user interface from Designer.
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_ai_chat()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
-        font += '"' + self.app.settings['font'] + '";'
-        self.setStyleSheet(font)
+        self.font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
+        self.font += '"' + self.app.settings['font'] + '";'
+        self.setStyleSheet(self.font)        
         self.ui.plainTextEdit_question.installEventFilter(self)
-        self.ui.pushButton_question.pressed.connect(self.send_question)
+        self.ui.pushButton_question.pressed.connect(self.button_question_clicked)
         self.ui.plainTextEdit_question.setPlaceholderText(_('<your question>'))
         self.ui.scrollArea_ai_output.verticalScrollBar().rangeChanged.connect(self.ai_output_bottom)
         doc_font = 'font: ' + str(self.app.settings['docfontsize']) + 'pt '
         doc_font += '"' + self.app.settings['font'] + '";'
         self.ai_response_style = "'" + doc_font + " color: #356399;'"     
         self.ai_user_style = "'" + doc_font + " color: #35998A; '"
+        self.ai_info_style = "'" + doc_font + " color: #000000;'"
         self.ui.plainTextEdit_question.setStyleSheet(self.ai_user_style[1:-1])
+        self.ui.pushButton_new_analysis.clicked.connect(self.button_new_clicked)
+        self.ui.pushButton_delete.clicked.connect(self.delete_chat)
+        self.ui.listWidget_chat_list.itemSelectionChanged.connect(self.chat_list_selection_changed)
+        # Enable editing of items on double click and when pressing F2
+        self.ui.listWidget_chat_list.setEditTriggers(QtWidgets.QListWidget.EditTrigger.DoubleClicked | QtWidgets.QListWidget.EditTrigger.EditKeyPressed)
+        self.ui.listWidget_chat_list.itemChanged.connect(self.chat_list_item_changed)
+        self.ui.ai_output.linkHovered.connect(self.on_linkHovered)
+        self.update_chat_window()
         
-        #messages
-        self.ai_welcome_message = f'<p style={self.ai_response_style}>Hi there, how can I help you with your research?</p>'
-        self.ai_offline_messsage = f'<p style={self.ai_response_style}>The AI is sleeping (not connected).</p>'
-        self.ai_api_key_missing = f"""<p style={self.ai_response_style}>API-Key misssing: In order to use the AI integration, you'll need an API-key from OpenAI 
-                                and you have to enter this key in the settings-dialog of qualcoder.
-                                Visit this page for more information on how to get an API-key: <a href=https://platform.openai.com/account/api-keys>https://platform.openai.com/account/api-keys</a></p>"""
-        self.ai_disabled = f"<p style={self.ai_response_style}>In order to use the AI-integration in qualcoder, you have to enable it in the settings.</p>"
+    def init_ai_chat(self):
+        # init chat history
+        self.chat_history_folder = self.app.project_path + '/ai_data'
+        if not os.path.exists(self.chat_history_folder):
+            os.makedirs(self.chat_history_folder)
+        self.chat_history_path = self.chat_history_folder + '/chat_history.sqlite'            
+        self.chat_history_conn = sqlite3.connect(self.chat_history_path)
+        cursor = self.chat_history_conn.cursor()
+        cursor.execute('''CREATE TABLE IF NOT EXISTS chats (
+                                id INTEGER PRIMARY KEY,
+                                name TEXT,
+                                analysis_type TEXT,
+                                summary TEXT,
+                                date TEXT,
+                                analysis_prompt TEXT)''')
+
+        cursor.execute('''CREATE TABLE IF NOT EXISTS chat_messages (
+                                id INTEGER PRIMARY KEY,
+                                chat_id INTEGER,
+                                msg_type TEXT,
+                                msg_content TEXT,
+                                FOREIGN KEY (chat_id) REFERENCES chats(id))''')
+        self.chat_history_conn.commit()
+        self.current_chat_idx = -1
+        self.fill_chat_list()
+    
+    def close(self):
+        if self.chat_history_conn is not None:
+            self.chat_history_conn.close()
+
+    def get_chat_list(self):
+        """Load the current chat list from the database into self.chat_list
+        """
+        cursor = self.chat_history_conn.cursor()
+        cursor.execute('SELECT id, name, analysis_type, summary, date, analysis_prompt FROM chats ORDER BY date DESC')
+        self.chat_list = cursor.fetchall()
+        if self.current_chat_idx >= len(self.chat_list):
+            self.current_chat_idx = len(self.chat_list) - 1    
+            
+    def fill_chat_list(self):
+        self.ui.listWidget_chat_list.clear()
+        self.get_chat_list()
+        for i in range(len(self.chat_list)):
+            chat = self.chat_list[i]
+            id, name, analysis_type, summary, date, analysis_prompt = chat
+            tooltip_text = f"Type: {analysis_type}\nSummary: {summary}\nDate: {date}\nPrompt: {analysis_prompt}"
+
+            # Creating a new QListWidgetItem
+            item = QtWidgets.QListWidgetItem(name)
+            item.setToolTip(tooltip_text)
+            item.setFlags(item.flags() | Qt.ItemFlag.ItemIsEditable)
+            
+            # Adding the item to the QListWidget
+            self.ui.listWidget_chat_list.addItem(item)
+            #if i == self.current_chat_idx:
+            #    item.setSelected(True)
+        if self.current_chat_idx >= len(self.chat_list):
+            self.current_chat_idx = len(self.chat_list) - 1
+        self.ui.listWidget_chat_list.setCurrentRow(self.current_chat_idx)
+        self.chat_list_selection_changed(force_update=True)
+
+    def new_chat(self, name, analysis_type, summary, analysis_prompt):
+        date = datetime.now()
+        date_text = date.strftime('%Y-%m-%d %H:%M:%S')
+        cursor = self.chat_history_conn.cursor()
+        cursor.execute('''INSERT INTO chats (name, analysis_type, summary, date, analysis_prompt)
+                            VALUES (?, ?, ?, ?, ?)''', (name, analysis_type, summary, date_text, analysis_prompt))
+        self.chat_history_conn.commit()
+        self.current_chat_idx = -1
+        self.fill_chat_list()
+        # select new chat
+        self.current_chat_idx = self.find_chat_idx(cursor.lastrowid)
+        self.ui.listWidget_chat_list.setCurrentRow(self.current_chat_idx)
+        self.chat_list_selection_changed()
+
+    def new_general_chat(self, name, summary):
+        self.new_chat(name, 'general chat', summary, '')
+        self.process_message('system', self.app.ai.default_system_prompt)
+        self.update_chat_window()  
+             
+    def new_code_chat(self):
+        """chat about codings"""
+       
+        ui = DialogAiSearch(self.app, 'code_analysis')
+        ret = ui.exec()
+        if ret == QtWidgets.QDialog.DialogCode.Accepted:
+            self.ai_search_code_name = ui.selected_code_name
+            self.ai_search_code_memo = ui.selected_code_memo
+            #self.ai_include_coded_segments = ui.include_coded_segments
+            self.ai_search_file_ids = ui.selected_file_ids
+            self.ai_search_code_ids = ui.selected_code_ids
+            self.ai_prompt = ui.search_prompt
+            
+            file_ids_str = str(self.ai_search_file_ids).replace('[', '(').replace(']', ')')
+            code_ids_str = str(self.ai_search_code_ids).replace('[', '(').replace(']', ')')
+                        
+            # fetch data
+            #sql = f'SELECT * FROM code_text WHERE cid IN {code_ids_str} AND fid IN {file_ids_str}'
+            
+            # This SQL sorts the results by file id, but not like 1, 1, 1, 2, 2, 3... 
+            # Instead, the results are mixed up in this order: file id = 1, 2, 3, 1, 2, 1...
+            # This tries to ensure that even if the data send to the AI must be cut off at some point 
+            # because of the token limit, there will at least be data from as many different files as 
+            # possible included in the analysis.
+            # The JOIN also adds the source.name so that the AI can refer to a certain document
+            # by its name.     
+            #sql = f"""
+            #    SELECT * 
+            #    FROM (
+            #    SELECT *, ROW_NUMBER() OVER (PARTITION BY fid ORDER BY ctid) as rn
+            #    FROM code_text 
+            #    WHERE cid IN {code_ids_str} AND fid IN {file_ids_str}
+            #    ) AS ordered
+            #    ORDER BY rn, fid;
+            #"""
+            sql = f"""
+                SELECT ordered.*, source.name
+                FROM (
+                SELECT *, ROW_NUMBER() OVER (PARTITION BY fid ORDER BY ctid) as rn
+                FROM code_text
+                WHERE cid IN {code_ids_str} AND fid IN {file_ids_str}
+                ) AS ordered
+                JOIN source ON ordered.fid = source.id
+                ORDER BY ordered.rn, ordered.fid;
+                """
+            cursor = self.app.conn.cursor()
+            cursor.execute(sql)
+            self.curr_codings = cursor.fetchall()
+            
+            ai_data = []
+            for row in self.curr_codings:
+                ai_data.append({
+                    'source_id': row[0],
+                    'source_name': row[12],
+                    'quote': row[3]
+                })
+            ai_data_json = json.dumps(ai_data)
+            
+            ai_instruction = (
+                f'You are discussing the code named "{self.ai_search_code_name}" with the following code memo: "{self.ai_search_code_memo}". \n'
+                f'Here is a list of quotes from the empirical data that have been coded with the given code:\n'
+                f'{ai_data_json}\n'
+                f'Your task is to analyze the given empirical data following these instructions: {self.ai_prompt.text}\n'
+                f'The whole discussion should be based updon the the empirical data provided and its proper interpretation. '
+                f'Do not make any assumptions which are not supported by the data.\n'
+                f'Please cite the sources that your refer to from the given empirical data, using an html anker tag of the following form: '
+                '<a href="source://{source_id}">{source_name]</a>\n' 
+                f'Always answer in the following language: "{self.app.ai.get_curr_language()}".'
+            )    
+            
+            summary = f'Analyzing the data coded as "{self.ai_search_code_name}" ({len(ai_data)} pieces of data send to the AI.)'
+            logger.debug(f'New code chat. Prompt:\n{ai_instruction}')
+            self.new_chat(f'Chat about "{self.ai_search_code_name}"', 'code chat', summary, self.ai_prompt.name_and_scope())
+            self.process_message('system', self.app.ai.default_system_prompt)
+            self.process_message('instruct', ai_instruction)
+            self.update_chat_window()  
         
-        self.alive = None # becomes True if the connection to the LLM api is established 
-        self.init_llm()
+    def delete_chat(self):
+        """Deletes the currently selected chat, connected to the button
+           'pushButton_delete'
+        """
+        if self.current_chat_idx <= -1:
+            return
+        chat_id = int(self.chat_list[self.current_chat_idx][0])
+        cursor = self.chat_history_conn.cursor()
+        try:
+            cursor.execute('DELETE from chat_messages WHERE chat_id = ?', (chat_id,))
+            cursor.execute('DELETE from chats WHERE id = ?', (chat_id,))
+            self.chat_history_conn.commit()
+        except:
+            self.chat_history_conn.rollback()
+            raise
+        self.fill_chat_list()
+
+    def find_chat_idx(self, chat_id) -> int | None:
+        """Returns the index of the chat with the id 'chat_id' in self.chat_list
+        """
+        if chat_id is None:
+            return None 
+        for i in range(len(self.chat_list)):
+            if self.chat_list[i][0] == chat_id:
+                return i
+        return None     
+
+    def update_chat_window(self):
+        # question button
+        if self.app.ai is None or not self.app.ai.is_busy():
+            pm = QPixmap()
+            pm.loadFromData(QtCore.QByteArray.fromBase64(ai_question), "png")
+            self.ui.pushButton_question.setIcon(QIcon(pm.scaled(32, 32, transformMode=Qt.TransformationMode.SmoothTransformation)))            
+            self.ui.pushButton_question.setToolTip(_('Send your question to the AI'))
+        else:
+            pm = QPixmap()
+            pm.loadFromData(QtCore.QByteArray.fromBase64(ai_stop), "png")
+            self.ui.pushButton_question.setIcon(QIcon(pm.scaled(32, 32, transformMode=Qt.TransformationMode.SmoothTransformation)))
+            self.ui.pushButton_question.setToolTip(_('Cancel AI generation'))
+                        
+        # load current chat into self.ai_output
+        if self.current_chat_idx > -1:
+            self.is_updating_chat_window = True
+            try:
+                html = ''
+                self.ui.plainTextEdit_question.setEnabled(True)
+                self.ui.pushButton_question.setEnabled(True)
+                chat = self.chat_list[self.current_chat_idx]
+                id, name, analysis_type, summary, date, analysis_prompt = chat
+                self.ui.ai_output.setText('') # clear chat window
+                # Show title
+                html += (f'<h1 style={self.ai_info_style}>{name}</h1>')
+                html += (f"<p style={self.ai_info_style}>Type: {analysis_type}<br />Summary: {summary}<br />Date: {date}<br />Prompt: {analysis_prompt}<br /></p>")
+                # Show chat messages:
+                for msg in self.chat_msg_list:
+                    if msg[2] == 'user':
+                        txt = msg[3].replace('\n', '<br />')
+                        txt = '<b>' + _('You:') + '</b><br />' + txt
+                        html += f'<p style={self.ai_user_style}>{txt}</p>'
+                    elif msg[2] == 'ai':
+                        txt = msg[3].replace('\n', '<br />')
+                        txt = '<b>' + _('AI:') + '</b><br />' + txt
+                        html += f'<p style={self.ai_response_style}>{txt}</p>'
+                    elif msg[2] == 'info':
+                        txt = msg[3].replace('\n', '<br />')
+                        txt = '<b>' + _('Info:') + '</b><br />' + txt
+                        html += f'<p style={self.ai_info_style}>{txt}</p>'
+                # add partially streamed ai response if needed
+                if len(self.app.ai.ai_streaming_output) > 0:
+                    txt = self.app.ai.ai_streaming_output.replace('\n', '<br />')
+                    txt = '<b>' + _('AI:') + '</b><br />' + txt
+                    html += f'<p style={self.ai_response_style}>{txt}</p>'
+                self.ui.ai_output.setText(html)
+                self.ui.scrollArea_ai_output.ensureVisible(0, 2147483647)
+                """
+                if len(self.ai_streaming_output) > 0:
+                    txt = self.ai_streaming_output.replace('\n', '<br />')
+                    txt = '<b>' + _('AI:') + '</b><br />' + txt
+                    html += f'<p style={self.ai_response_style}>{txt}</p>'
+                self.ui.ai_output.setText(html)
+                self.ui.scrollArea_ai_output.ensureVisible(0, 2147483647)
+                """
+            finally:
+                self.is_updating_chat_window = False
+        else:
+            self.ui.ai_output.setText('')
+            self.ui.plainTextEdit_question.setEnabled(False)
+            self.ui.pushButton_question.setEnabled(False)
+            
+    def chat_list_selection_changed(self, force_update=False):
+        if (not force_update) and (self.current_chat_idx == self.ui.listWidget_chat_list.currentRow()):
+            return
+        if self.app.ai.cancel(True):
+            # AI generation is either finished or canceled, we can change to another chat
+            self.current_chat_idx = self.ui.listWidget_chat_list.currentRow()
+            self.ui.pushButton_delete.setEnabled(self.current_chat_idx > -1)
+            self.history_update_message_list()
+            self.update_chat_window()
+        else: # return to previous chat
+            self.ui.listWidget_chat_list.setCurrentRow(self.current_chat_idx)
+        
+    def chat_list_item_changed(self, item: QtWidgets.QListWidgetItem):
+        """This method is called whenever the name of a chat is edited in the list"""
+        chat_id = self.chat_list[self.current_chat_idx][0]
+        curr_name = item.text()
+        cursor = self.chat_history_conn.cursor()
+        cursor.execute('UPDATE chats SET name = ? WHERE id = ?', (curr_name, chat_id))
+        self.chat_history_conn.commit()
+        self.get_chat_list()
+        self.update_chat_window()
+
+    def button_new_clicked(self):
+        # Create QMenu
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet(self.font)
+
+        # Add actions
+        action_codings_analysis = menu.addAction(_('New coded data analysis'))
+        action_codings_analysis.setToolTip(_('Start chatting about the data in the codings for a particular code.'))
+        action_topic_analysis = menu.addAction(_('New topic exploration'))
+        action_topic_analysis.setToolTip(_('Start chatting about data related to a certain topic, no matter if it was already coded or not.'))
+        action_general_chat = menu.addAction(_('New general chat'))
+        action_general_chat.setToolTip(_('Ask the AI anything, not related to your data. Basically a build in ChatGPT.'))
+
+        # Obtain the bottom-left point of the button in global coordinates
+        buttonRect = self.ui.pushButton_new_analysis.rect()  # Get the button's rect
+        bottomLeftPoint = buttonRect.bottomLeft()  # Bottom-left point
+        globalBottomLeftPoint = self.ui.pushButton_new_analysis.mapToGlobal(bottomLeftPoint)  # Map to global
+
+        # Execute the menu at the calculated position
+        action = menu.exec(globalBottomLeftPoint)
+
+        # Check which action was selected and do something
+        if action == action_codings_analysis:
+            self.new_code_chat()
+        elif action == action_topic_analysis:
+            print('topic analysis')
+        elif action == action_general_chat:
+            self.new_general_chat('New general chat', '')
 
     def ai_output_bottom(self, minVal=None, maxVal=None):
         self.ui.scrollArea_ai_output.verticalScrollBar().setValue(self.ui.scrollArea_ai_output.verticalScrollBar().maximum())
             
-    def append_ai_output(self, html):
+    def append_html(self, html):
         self.ui.ai_output.setText(self.ui.ai_output.text() + html) #  .append(html)
-        self.ui.ai_output.update()
-        
+        #self.ui.ai_output.update()
         self.ui.scrollArea_ai_output.ensureVisible(0, 2147483647)
-        #self.ui.scrollArea_ai_output.verticalScrollBar().setValue(self.ui.scrollArea_ai_output.verticalScrollBar().maximum())
+
+    def append_ai_output(self, txt):
+        txt = txt.replace('\n', '<br />')
+        self.append_html(f'<p style={self.ai_response_style}>{txt}</p>')
+     
+    def append_user_input(self, txt):
+        txt = txt.replace('\n', '<br />')
+        self.append_html(f'<p style={self.ai_user_style}>{txt}</p>')
         
-    def init_llm(self):
-        if self.app.settings['ai_enable'] == 'True':
-            if self.app.settings['open_ai_api_key'] != '':
-                self.llm = OpenAI(openai_api_key = self.app.settings['open_ai_api_key'])
-                self.chat_model = ChatOpenAI(model='gpt-4-1106-preview', openai_api_key=self.app.settings['open_ai_api_key'])
-                self.set_alive(True, True)
-            else:
-                self.llm = None
-                self.chat_model = None
-                self.set_alive(False, True)
-                self.append_ai_output(self.ai_api_key_missing)
+    def append_info_msg(self, txt):
+        txt = txt.replace('\n', '<br />')
+        self.append_html(f'<p style={self.ai_info_style}>{txt}</p>')
+        
+    def history_update_message_list(self, db_conn=None):
+        """Update sel.chat_msg_list from the database
+
+        Args:
+            db_conn: database conncetion, if None, use defaults to self.chat:history_conn
+        """
+        if self.current_chat_idx > -1:
+            curr_chat_id = self.chat_list[self.current_chat_idx][0]
+            if db_conn is None:
+                db_conn = self.chat_history_conn 
+            cursor = db_conn.cursor()
+            cursor.execute('SELECT * FROM chat_messages WHERE chat_id=? ORDER BY id', (curr_chat_id,))
+            self.chat_msg_list = cursor.fetchall()
+            self.ai_streaming_output = ''
         else:
-            self.llm = None
-            self.chat_model = None
-            self.set_alive(False, True)
-            self.append_ai_output(self.ai_disabled)
-            
-    def set_alive(self, alive, force_ui_update=False):
-        if alive != self.alive or force_ui_update:
-            self.alive = alive
-            self.ui.plainTextEdit_question.setEnabled(alive)
-            self.ui.pushButton_question.setEnabled(alive)
-            if alive:
-                self.append_ai_output(self.ai_welcome_message)
-            else:
-                self.append_ai_output(self.ai_offline_messsage)
+            self.chat_msg_list.clear()
+            self.ai_streaming_output = ''
     
-    def send_question(self):  
-        if self.alive:
-            q = self.ui.plainTextEdit_question.toPlainText()
-            q_html = f'<p style={self.ai_user_style}>{q}</p>'          
-            self.append_ai_output(q_html)
-            self.ui.plainTextEdit_question.clear()
-            r = self.chat_model.predict(q) # better make an asynch call, other wise the ui freezes until the response is ready
-            r= r.replace('\n', '<br />')
-            self.append_ai_output(f'<p style={self.ai_response_style}>{r}</p>')
-            # self.append_ai_output(f'<table><tr><td style="padding: 6px; border-width: 3px; border-color: #F4F4F4; background-color: #F4F4F4">{r}</td></tr></table>')
-       
-    def keyReleaseEvent(self, event):
-        if event.key() == QtCore.Qt.Key.Key_Return and self.ui.plainTextEdit_question.hasFocus():
-            self.send_question()
+    def history_get_ai_messages(self):
+        messages = []
+        for msg in self.chat_msg_list:
+            if msg[2] == 'system':
+                messages.append(SystemMessage(content=msg[3]))
+            elif msg[2] == 'instruct' or msg[2] == 'user':
+                messages.append(HumanMessage(content=msg[3]))
+            elif msg[2] == 'ai':
+                messages.append(AIMessage(content=msg[3]))
+        return messages
+    
+    def history_add_message(self, msg_type, msg_content, chat_idx= None, db_conn=None):
+        self.ai_streaming_output = ''
+        if chat_idx is None:
+            chat_idx = self.current_chat_idx
+        if chat_idx > -1:
+            curr_chat_id = self.chat_list[chat_idx][0]
+            if db_conn is None:
+                db_conn=self.chat_history_conn
+            cursor = db_conn.cursor()
+            # insert new message
+            cursor.execute('''INSERT INTO chat_messages (chat_id, msg_type, msg_content)
+                            VALUES (?, ?, ?)''', (curr_chat_id, msg_type, msg_content))
+            db_conn.commit()
+            self.history_update_message_list()
+    
+    def button_question_clicked(self):
+        if self.app.ai.is_busy():
+            self.app.ai.cancel(True)
+        else:
+            self.send_user_question()
+                    
+    def send_user_question(self):
+        if self.app.ai.is_busy():
+            msg = _('The AI is busy generating a response. Click on the button on the right to stop.')
+            Message(self.app, _('AI busy'), msg, "warning").exec()
+            return
+        elif not self.app.ai.is_ready():
+            msg = _('The AI not yet fully loaded. Please wait and retry.')
+            Message(self.app, _('AI not ready'), msg, "warning").exec()
+            return
+        q = self.ui.plainTextEdit_question.toPlainText()
+        if q != '':
+            if self.process_message('user', q):
+                self.ui.plainTextEdit_question.clear()
+                QtWidgets.QApplication.processEvents()
+                        
+    def process_message(self, msg_type, msg_content, chat_idx=None) -> bool:
+        #if not self.app.ai.is_ready():
+        #    msg = _('The AI is busy or not yet fully loaded. Please wait a moment and retry.')
+        #    Message(self.app, _('AI not ready'), msg, "warning").exec()
+        #    return False
+        if chat_idx is None:
+            chat_idx = self.current_chat_idx
+        if chat_idx <= -1:
+            self.ai_streaming_output = ''
+            self.chat_msg_list.clear()
+            msg = _('Please select a chat or create a new one.')
+            Message(self.app, _('Chat selection'), msg, "warning").exec()
+            return False
+             
+        if msg_type == 'info':
+            # info messages are only shown on screen, not send to the AI
+            self.history_add_message(msg_type, msg_content, chat_idx)
+            self.update_chat_window()
+        elif msg_type == 'system':
+            # system messages are only added to the chat history. They are never shown on screen. 
+            # The system message will be not be send to the AI immediately, but together with the next user message (as part of the chat history).
+            self.history_add_message(msg_type, msg_content, chat_idx)
+        elif msg_type == 'instruct':
+            # instruct messages are only send to the AI, but not shown on screen
+            # Other than system messages, instruct messages are send immediatly and will produce an answer that is shown on screen
+            if chat_idx == self.current_chat_idx:
+                self.history_add_message(msg_type, msg_content, chat_idx)
+                messages = self.history_get_ai_messages()
+                self.current_streaming_chat_idx = self.current_chat_idx
+                self.app.ai.ai_async_stream(self.app.ai.large_llm, 
+                                            messages, 
+                                            result_callback=self.ai_message_callback, 
+                                            progress_callback=None, 
+                                            streaming_callback=self.ai_streaming_callback, 
+                                            error_callback=None)
+                # self.app.ai.ai_async_query(self.parentWidget, self._send_message, False, self.ai_message_callback, messages)        
+        elif msg_type == 'user':
+            # user question, shown on screen and send to the AI
+            if chat_idx == self.current_chat_idx:
+                self.history_add_message(msg_type, msg_content, chat_idx)
+                messages = self.history_get_ai_messages()
+                self.current_streaming_chat_idx = self.current_chat_idx
+                self.app.ai.ai_async_stream(self.app.ai.large_llm, 
+                                            messages, 
+                                            result_callback=self.ai_message_callback, 
+                                            progress_callback=None, 
+                                            streaming_callback=self.ai_streaming_callback, 
+                                            error_callback=None)
+                # self.app.ai.ai_async_query(self.parentWidget, self._send_message, False, self.ai_message_callback, messages)
+                self.update_chat_window()
+        elif msg_type == 'ai':
+            # ai responses.
+            # create temporary db connection to make it thread safe
+            db_conn = sqlite3.connect(self.chat_history_path)
+            try: 
+                self.history_add_message(msg_type, msg_content, chat_idx, db_conn)
+                self.ai_streaming_output = ''
+                self.update_chat_window()
+            finally:
+                db_conn.close()
+        return True    
+    
+    def ai_streaming_callback(self, streamed_text):
+        self.update_chat_window()
+
+    def _send_message(self, messages, progress_callback=None):  
+        # callback for async call    
+        self.ai_streaming_output = ''
+        self.current_streaming_chat_idx = self.current_chat_idx
+        for chunk in self.app.ai.large_llm.stream(messages):
+            if self.app.ai.ai_async_is_canceled:
+                break # cancel the streaming
+            elif self.current_chat_idx != self.current_streaming_chat_idx:
+                # switched to another chat, cancel also
+                break
+            else:
+                self.ai_streaming_output += str(chunk.content)
+                if not self.is_updating_chat_window:
+                    self.update_chat_window()
+        return self.ai_streaming_output
+    
+    def ai_message_callback(self, ai_result):
+        """Called if the AI has finished sending its response.
+        The streamed resonse is now replaced with the final one.
+        """
+        self.ai_streaming_output = ''
+        if ai_result != '':
+            self.process_message('ai', ai_result, self.current_streaming_chat_idx)
+        
+    def eventFilter(self, source, event):
+        # Check if the event is a KeyPress, source is the lineEdit, and the key is Enter
+        if (event.type() == QEvent.Type.KeyPress and source is self.ui.plainTextEdit_question and
+            (event.key() == Qt.Key.Key_Return or event.key() == Qt.Key.Key_Enter)):
+            # Shift + Return/Enter creates a new line. Just pressing Return/Enter sends the question to the AI:
+            if not event.modifiers() & Qt.KeyboardModifier.ShiftModifier:
+                self.send_user_question()
+                return True  # Event handled
+        # For all other cases, return super's eventFilter result
+        return super().eventFilter(source, event)
+    
+    def on_linkHovered(self, link: str):
+        if link:
+            # Show tooltip when hovering over a link
+            if link.startswith('source://'):
+                coding_id = link[len('source://'):]
+                cursor = self.app.conn.cursor()
+                sql = (f'SELECT code_text.ctid, source.name, code_text.seltext '
+                        f'FROM code_text JOIN source ON code_text.fid = source.id '
+                        f'WHERE code_text.ctid = {coding_id}')
+                cursor.execute(sql)
+                coding = cursor.fetchone()
+                if coding is not None:
+                    tooltip_txt = f'{coding[1]}:\n' # file name
+                    tooltip_txt += f'"{coding[2]}"' # seltext
+                else:
+                    tooltip_txt = _('source not found')
+                QtWidgets.QToolTip.showText(QCursor.pos(), tooltip_txt, self.ui.ai_output)
+        else:
+            QtWidgets.QToolTip.hideText()
+
+###### Helper:
+
+class LlmCallbackHandler(BaseCallbackHandler):
+    def __init__(self, dialog_ai_chat: DialogAIChat):
+        self.dialog = dialog_ai_chat
+        
+    def on_llm_new_token(self, token: str, **kwargs) -> None:
+        self.dialog.ai_streaming_output += token
+        if not self.dialog.is_updating_chat_window:
+            self.dialog.update_chat_window()        
+
 
 
 

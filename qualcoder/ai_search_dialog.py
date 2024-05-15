@@ -42,7 +42,7 @@ from .report_attributes import DialogSelectAttributeParameters
 from .select_items import DialogSelectItems
 from .GUI.ui_ai_search import Ui_Dialog_AiSearch
 from .report_attributes import DialogSelectAttributeParameters
-from .ai_edit_prompts import prompt_types, PromptItem, PromptsList, DialogAiEditPrompts, split_name_and_scope
+from .ai_prompts import prompt_types, PromptItem, PromptsList, DialogAiEditPrompts, split_name_and_scope
 from .helpers import Message
 
 path = os.path.abspath(os.path.dirname(__file__))
@@ -69,13 +69,14 @@ class DialogAiSearch(QtWidgets.QDialog):
     
     attributes = []
     attribute_file_ids = []
-    selected_name = ''
+    selected_code_name = ''
     selected_code_ids = -1
-    selected_description = ''
+    selected_code_memo = ''
     include_coded_segments = False
     selected_file_ids = []
+    search_prompt = None
 
-    def __init__(self, app_, selected_id, selected_is_code):
+    def __init__(self, app_, prompt_type, selected_id=-1, selected_is_code=True):
         """Initializes the dialog
 
         Args:
@@ -104,10 +105,27 @@ class DialogAiSearch(QtWidgets.QDialog):
         self.fill_tree(selected_id, selected_is_code)   
         # prompts
         self.prompts_list = PromptsList(app_)
-        self.current_search_prompt = self.prompts_list.prompts[0] # default
-        self.ui.lineEdit_prompt.setText(self.current_search_prompt.name_and_scope())
-        self.ui.lineEdit_prompt.setToolTip(self.current_search_prompt.description)
-
+        self.prompt_type = prompt_type
+        # load last settings
+        last_prompt_name = self.app.settings.get('ai_search_last_prompt_name', self.prompts_list.prompts[0].name)
+        last_prompt_scope = self.app.settings.get('ai_search_last_prompt_scope', self.prompts_list.prompts[0].scope)
+        self.search_prompt = self.prompts_list.find_prompt(last_prompt_name, last_prompt_scope, self.prompt_type)
+        if self.search_prompt is None:
+            self.search_prompt = self.prompts_list.prompts[0]
+            msg = _('The last used search prompt') + \
+                f' "{last_prompt_name} ({last_prompt_scope})" ' + \
+                _('could not be found. The prompt will be reset to the default.')
+            Message(self.app, _('No codes'), msg, "warning").exec()
+        self.ui.lineEdit_prompt.setText(self.search_prompt.name_and_scope())
+        self.ui.lineEdit_prompt.setToolTip(self.search_prompt.description)
+        self.ui.tabWidget.setCurrentIndex(int(self.app.settings.get('ai_search_last_tab_index', 0)))
+        self.ui.lineEdit_free_topic.setText(self.app.settings.get('ai_search_free_topic', ''))
+        self.ui.textEdit_free_description.setText(self.app.settings.get('ai_search_free_description', '').replace('\\n', '\n'))        
+        self.ui.splitter_code_tree.moveSplitter(int(self.app.settings.get('ai_search_last_splitter_code_tree', 500)), 0)
+        self.ui.splitter_case_files.moveSplitter(int(self.app.settings.get('ai_search_last_splitter_case_files', 220)), 0)
+        self.ui.checkBox_send_memos.setChecked((self.app.settings.get('ai_search_send_memos', 'True') == 'True'))
+        self.ui.checkBox_coded_segments.setChecked((self.app.settings.get('ai_search_coded_segments', 'False') == 'True'))
+        # buttons
         self.ui.pushButton_change_prompt.clicked.connect(self.change_prompt)
         self.ui.buttonBox.accepted.connect(self.ok)
         self.ui.buttonBox.rejected.connect(self.cancel) 
@@ -272,16 +290,16 @@ class DialogAiSearch(QtWidgets.QDialog):
             
     def change_prompt(self):
         """ Select and edit the prompt for the search. """
-        ui = DialogAiEditPrompts(self.app, 'search')
+        ui = DialogAiEditPrompts(self.app, self.prompt_type)
         if ui.exec() == QtWidgets.QDialog.DialogCode.Accepted:
             # Update prompts list and display current prompt:
             self.prompts_list.read_prompts()
             if ui.selected_prompt is not None:
-                self.current_search_prompt = self.prompts_list.find_prompt(ui.selected_prompt.name, ui.selected_prompt.scope, ui.selected_prompt.type)
-        if self.current_search_prompt is None:
-            self.current_search_prompt = self.prompts_list.prompts[0] # default
-        self.ui.lineEdit_prompt.setText(self.current_search_prompt.name_and_scope())
-        self.ui.lineEdit_prompt.setToolTip(self.current_search_prompt.description)
+                self.search_prompt = self.prompts_list.find_prompt(ui.selected_prompt.name, ui.selected_prompt.scope, ui.selected_prompt.type)
+        if self.search_prompt is None:
+            self.search_prompt = self.prompts_list.prompts[0] # default
+        self.ui.lineEdit_prompt.setText(self.search_prompt.name_and_scope())
+        self.ui.lineEdit_prompt.setToolTip(self.search_prompt.description)
 
     def select_attributes(self):
         """ Select files based on attribute selections.
@@ -412,24 +430,24 @@ class DialogAiSearch(QtWidgets.QDialog):
             else:
                 item = self.ui.treeWidget.selectedItems()[0]
                 self.selected_code_ids = self._get_codes_from_tree(item)
-                self.selected_name = item.text(0)
+                self.selected_code_name = item.text(0)
                 if self.ui.checkBox_send_memos.isChecked():
-                    self.selected_description = item.toolTip(2)
+                    self.selected_code_memo = item.toolTip(2)
                 else:
-                    self.selected_description = ''
+                    self.selected_code_memo = ''
                 self.include_coded_segments = self.ui.checkBox_coded_segments.isChecked()
                 item = item.parent()
                 while item is not None and not isinstance(item, QtWidgets.QTreeWidget):
-                    self.selected_name = f'{item.text(0)} > {self.selected_name}'
+                    self.selected_code_name = f'{item.text(0)} > {self.selected_code_name}'
                     item = item.parent()               
         else: # free search selected
             self.selected_code_ids = None
-            self.selected_name = self.ui.lineEdit_free_topic.text()
-            if self.selected_name == '':
+            self.selected_code_name = self.ui.lineEdit_free_topic.text()
+            if self.selected_code_name == '':
                 msg = _('Please enter text in the "topic" field.')
                 Message(self.app, _('No codes'), msg, "warning").exec()
                 return
-            self.selected_description = self.ui.textEdit_free_description.toPlainText()
+            self.selected_code_memo = self.ui.textEdit_free_description.toPlainText()
         
         # file selection
         self.selected_file_ids = []
@@ -479,11 +497,22 @@ class DialogAiSearch(QtWidgets.QDialog):
             Message(self.app, _('No files'), msg, "warning").exec()
             return
         
+        # save the settings for the next search
+        self.app.settings['ai_search_last_prompt_name'] = self.search_prompt.name
+        self.app.settings['ai_search_last_prompt_scope'] = self.search_prompt.scope
+        self.app.settings['ai_search_last_tab_index'] = self.ui.tabWidget.currentIndex()
+        self.app.settings['ai_search_free_topic'] = self.ui.lineEdit_free_topic.text()
+        self.app.settings['ai_search_free_description'] = self.ui.textEdit_free_description.toPlainText().replace('\n', '\\n')
+        self.app.settings['ai_search_last_splitter_code_tree'] = self.ui.splitter_code_tree.sizes()[0]
+        self.app.settings['ai_search_last_splitter_case_files'] = self.ui.splitter_case_files.sizes()[0]
+        self.app.settings['ai_search_send_memos'] = 'True' if self.ui.checkBox_send_memos.isChecked() else 'False'
+        self.app.settings['ai_search_coded_segments'] = 'True' if self.ui.checkBox_coded_segments.isChecked() else 'False'
+        
         self.accept()
         
     def cancel(self):
-        self.selected_name = ''
-        self.selected_description = ''
+        self.selected_code_name = ''
+        self.selected_code_memo = ''
         self.selected_file_ids = []
         self.reject()
 

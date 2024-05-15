@@ -31,6 +31,7 @@ import os
 import sys
 import logging
 import traceback
+import copy
 
 from .GUI.ui_dialog_settings import Ui_Dialog_settings
 from .helpers import Message
@@ -63,6 +64,7 @@ class DialogSettings(QtWidgets.QDialog):
         sys.excepthook = exception_handler
         self.app = app
         self.settings = app.settings
+        self.ai_models = copy.deepcopy(self.app.ai_models)
         self.current_coder = self.app.settings['codername']
         super(QtWidgets.QDialog, self).__init__(parent)  # overrride accept method
         QtWidgets.QDialog.__init__(self)
@@ -148,7 +150,13 @@ class DialogSettings(QtWidgets.QDialog):
         # AI options
         self.ui.checkBox_AI_enable.setChecked(self.settings['ai_enable'] == 'True')
         self.ui.checkBox_AI_enable.stateChanged.connect(self.ai_enable_state_changed)
-        self.ui.lineEdit_openai_api_key.setText(self.settings['open_ai_api_key'])
+        for model in self.ai_models:
+            self.ui.comboBox_ai_model.addItem(model['name'])
+        curr_model = self.ai_models[int(self.settings['ai_model_index'])]
+        self.ui.comboBox_ai_model.setCurrentIndex(int(self.settings['ai_model_index']))
+        self.ui.comboBox_ai_model.currentTextChanged.connect(self.ai_model_changed)
+        self.ui.lineEdit_ai_api_key.setText(curr_model['api_key'])
+        self.ui.lineEdit_ai_api_key.textChanged.connect(self.ai_api_key_changed)
 
     def backup_state_changed(self):
         """ Enable and disable av backup checkbox. Only enable when checkBox_auto_backup is checked. """
@@ -161,11 +169,20 @@ class DialogSettings(QtWidgets.QDialog):
     def ai_enable_state_changed(self):
         if self.ui.checkBox_AI_enable.isChecked():
             api_key = self.settings['open_ai_api_key']
-            api_key = self.app.get_openai_api_key(api_key)
-            self.ui.lineEdit_openai_api_key.setText(api_key)
+            api_key = self.app.get_ai_api_key(api_key)
+            self.ui.lineEdit_ai_api_key.setText(api_key)
             self.settings['open_ai_api_key'] = api_key
             if api_key == '':
                 self.ui.checkBox_AI_enable.setChecked(False)
+    
+    def ai_model_changed(self):
+        self.settings['ai_model_index'] = self.ui.comboBox_ai_model.currentIndex()
+        curr_model = self.ai_models[int(self.settings['ai_model_index'])]
+        self.ui.lineEdit_ai_api_key.setText(curr_model['api_key'])
+
+    def ai_api_key_changed(self):
+        curr_model = self.ai_models[int(self.settings['ai_model_index'])]
+        curr_model['api_key'] = self.ui.lineEdit_ai_api_key.text()        
                 
     def new_coder_entered(self):
         """ New coder name entered.
@@ -239,11 +256,13 @@ class DialogSettings(QtWidgets.QDialog):
         self.settings['report_text_context_characters'] = self.ui.spinBox_chars_before_after.value()
         ts_index = self.ui.comboBox_text_style.currentIndex()
         self.settings['report_text_context_style'] = ['Bold', 'Italic', 'Bigger'][ts_index]
+        # AI settings
         if self.ui.checkBox_AI_enable.isChecked():
             self.settings['ai_enable'] = 'True'
         else:
             self.settings['ai_enable'] = 'False' 
-        self.settings['open_ai_api_key'] = self.ui.lineEdit_openai_api_key.text()
+        # self.app.ai_models = self.ai_models
+        # self.settings['ai_model_index'] = self.ui.comboBox_ai_model.currentIndex()
         self.save_settings()
         if restart_qualcoder:
             Message(self.app, _("Restart QualCoder"), _("Restart QualCoder to enact some changes")).exec()
@@ -254,4 +273,4 @@ class DialogSettings(QtWidgets.QDialog):
         Each setting has a variable identifier then a colon
         followed by the value. """
 
-        self.app.write_config_ini(self.settings)
+        self.app.write_config_ini(self.settings, self.ai_models)

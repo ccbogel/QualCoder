@@ -59,6 +59,9 @@ class WorkerSignals(QObject):
 
     progress
         int indicating % progress
+        
+    streaming
+        str containing the current streaming response particle coming from the LLM
 
     '''
     finished = pyqtSignal()
@@ -66,6 +69,7 @@ class WorkerSignals(QObject):
     error = pyqtSignal(object, object, object)
     result = pyqtSignal(object)
     progress = pyqtSignal(str)
+    streaming = pyqtSignal(str)
 
 
 class Worker(QRunnable):
@@ -90,9 +94,13 @@ class Worker(QRunnable):
         self.args = args
         self.kwargs = kwargs
         self.signals = WorkerSignals()
+        
+        # Pass the signals to the function
+        self.kwargs['signals'] = self.signals
 
         # Add the callback to our kwargs
-        self.kwargs['progress_callback'] = self.signals.progress
+        #if not 'progress_callback' in self.kwargs:
+        #    self.kwargs['progress_callback'] = self.signals.progress
 
     @pyqtSlot()
     def run(self):
