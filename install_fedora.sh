@@ -30,6 +30,7 @@ sudo cp qualcoder/GUI/qualcoder.desktop /usr/share/applications/qualcoder.deskto
 sudo python3 setup.py install
 printf "\nIf no errors then installation is completed.\n\n"
 echo "To remove qualcoder from Linux run the following in the terminal:"
+echo "sudo rm -R /usr/local/bin/qualcoder"
 echo "sudo rm -R /usr/share/qualcoder"
 echo "sudo rm /usr/share/icons/qualcoder128.png"
 echo "sudo rm /usr/share/applications/qualcoder.desktop"
