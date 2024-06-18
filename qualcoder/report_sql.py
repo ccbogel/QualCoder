@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2022 Colin Curtain
+Copyright (c) 2024 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -659,7 +659,19 @@ class TableWidgetItem(QtWidgets.QTableWidgetItem):
 DEFAULT_SQL = ["-- CASE TEXT\nselect cases.name ,  substr(source.fulltext, case_text.pos0, case_text.pos1 -  case_text.pos0 ) as casetext \
 from cases join case_text on  cases.caseid = case_text.caseid join source on source.id= case_text.fid \
 where case_text.pos1 >0",
-
+"-- SELECT CODED CASE TEXT BY CODE AND CASE ATTRIBUTE WHERE THE CASES ARE SECTIONS WITHIN THE SAME TEXT DOCUMENT \n\
+SELECT cases.name as 'case name', attribute.name as 'Case attribute', attribute.value,\n\
+source.name as 'text file name', code_name.name as 'code name', code_text.pos0, code_text.pos1, seltext \n\
+from \n\
+case_text join attribute on attribute.id=case_text.caseid join source on source.id = case_text.fid \
+join code_text on code_text.fid=source.id join code_name on code_name.cid = code_text.cid \
+join cases on cases.caseid=case_text.caseid \
+where \n\
+code_name.name = 'code1' -- change to code name of interest \n\
+and attribute.name='District' -- change to case attribute name of interest \n\
+and attribute.value='north'  -- change to case attribute value of interest \n\
+and case_text.pos0 <= code_text.pos0 \n\
+and case_text.pos1 >= code_text.pos1 ",
                '-- CODES, FILEID, CODED TEXT\nselect  code_name.name as "codename", \
 code_text.fid, code_text.pos0, code_text.pos1, code_text.seltext from code_name \
 join  code_text on code_name.cid = code_text.cid\n\
