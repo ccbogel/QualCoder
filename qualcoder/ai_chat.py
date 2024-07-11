@@ -112,7 +112,9 @@ class DialogAIChat(QtWidgets.QDialog):
         self.ui.ai_output.linkHovered.connect(self.on_linkHovered)
         self.update_chat_window()
         
-    def init_ai_chat(self):
+    def init_ai_chat(self, app = None):
+        if app is not None:
+            self.app = app
         # init chat history
         self.chat_history_folder = self.app.project_path + '/ai_data'
         if not os.path.exists(self.chat_history_folder):
@@ -242,12 +244,23 @@ class DialogAIChat(QtWidgets.QDialog):
             self.curr_codings = cursor.fetchall()
             
             ai_data = []
+            # Limit the amount of data (characters) send to the ai, so the maximum context window is not exceeded.
+            # As a rough estimation, one token is about 4 characters long (in english). 
+            # We want to fill not more than half the context window with our data, so that there is enough
+            # room for the answer and further chats.
+            max_ai_data_length = round(0.5 * (self.app.ai.large_llm_context_window * 4)) 
+            max_ai_data_length_reached = False
+            ai_data_length = 0
             for row in self.curr_codings:
+                if ai_data_length >= max_ai_data_length:
+                    max_ai_data_length_reached = True
+                    break
                 ai_data.append({
                     'source_id': row[0],
                     'source_name': row[12],
                     'quote': row[3]
                 })
+                ai_data_length = ai_data_length + len(row[3])
             ai_data_json = json.dumps(ai_data)
             
             ai_instruction = (
@@ -256,13 +269,15 @@ class DialogAIChat(QtWidgets.QDialog):
                 f'{ai_data_json}\n'
                 f'Your task is to analyze the given empirical data following these instructions: {self.ai_prompt.text}\n'
                 f'The whole discussion should be based updon the the empirical data provided and its proper interpretation. '
-                f'Do not make any assumptions which are not supported by the data.\n'
-                f'Please cite the sources that your refer to from the given empirical data, using an html anker tag of the following form: '
-                '<a href="source://{source_id}">{source_name]</a>\n' 
+                f'Do not make any assumptions which are not supported by the data. '
+                f'Please mention the sources that your refer to from the given empirical data, using an html anker tag of the following form: '
+                '<a href="source:{source_id}">{source_name}</a>\n' 
                 f'Always answer in the following language: "{self.app.ai.get_curr_language()}".'
             )    
             
             summary = f'Analyzing the data coded as "{self.ai_search_code_name}" ({len(ai_data)} pieces of data send to the AI.)'
+            if max_ai_data_length_reached:
+                summary += f'\nATTENTION: There was more coded data found, but it had to be truncated because of the limited context window of the AI.'
             logger.debug(f'New code chat. Prompt:\n{ai_instruction}')
             self.new_chat(f'Chat about "{self.ai_search_code_name}"', 'code chat', summary, self.ai_prompt.name_and_scope())
             self.process_message('system', self.app.ai.default_system_prompt)
@@ -359,6 +374,7 @@ class DialogAIChat(QtWidgets.QDialog):
             self.ui.pushButton_question.setEnabled(False)
             
     def chat_list_selection_changed(self, force_update=False):
+        self.ui.pushButton_delete.setEnabled(self.current_chat_idx > -1)
         if (not force_update) and (self.current_chat_idx == self.ui.listWidget_chat_list.currentRow()):
             return
         if self.app.ai.cancel(True):
@@ -386,12 +402,12 @@ class DialogAIChat(QtWidgets.QDialog):
         menu.setStyleSheet(self.font)
 
         # Add actions
-        action_codings_analysis = menu.addAction(_('New coded data analysis'))
+        action_codings_analysis = menu.addAction(_('New code chat'))
         action_codings_analysis.setToolTip(_('Start chatting about the data in the codings for a particular code.'))
-        action_topic_analysis = menu.addAction(_('New topic exploration'))
-        action_topic_analysis.setToolTip(_('Start chatting about data related to a certain topic, no matter if it was already coded or not.'))
+        action_topic_analysis = menu.addAction(_('New topic chat'))
+        action_topic_analysis.setToolTip(_('Start chatting about data related to a free-search topic.'))
         action_general_chat = menu.addAction(_('New general chat'))
-        action_general_chat.setToolTip(_('Ask the AI anything, not related to your data. Basically a build in ChatGPT.'))
+        action_general_chat.setToolTip(_('Ask the AI anything, not related to your data.'))
 
         # Obtain the bottom-left point of the button in global coordinates
         buttonRect = self.ui.pushButton_new_analysis.rect()  # Get the button's rect
@@ -597,8 +613,8 @@ class DialogAIChat(QtWidgets.QDialog):
     def on_linkHovered(self, link: str):
         if link:
             # Show tooltip when hovering over a link
-            if link.startswith('source://'):
-                coding_id = link[len('source://'):]
+            if link.startswith('source:'):
+                coding_id = link[len('source:'):]
                 cursor = self.app.conn.cursor()
                 sql = (f'SELECT code_text.ctid, source.name, code_text.seltext '
                         f'FROM code_text JOIN source ON code_text.fid = source.id '

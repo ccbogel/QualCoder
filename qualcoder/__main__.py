@@ -506,7 +506,9 @@ class App(object):
             model_section = 'ai_model_' + model['name']
             config[model_section] = {}
             config[model_section]['large_model'] = model['large_model']
+            config[model_section]['large_model_context_window'] = model['large_model_context_window']
             config[model_section]['fast_model'] = model['fast_model']
+            config[model_section]['fast_model_context_window'] = model['fast_model_context_window']
             config[model_section]['api_base'] = model['api_base']
             config[model_section]['api_key'] = model['api_key']
         
@@ -551,7 +553,9 @@ class App(object):
                 model = {
                     'name': section[9:],
                     'large_model': config[section]['large_model'],
+                    'large_model_context_window': config[section]['large_model_context_window'],
                     'fast_model': config[section]['fast_model'],
+                    'fast_model_context_window': config[section]['fast_model_context_window'],
                     'api_base': config[section]['api_base'],
                     'api_key': config[section]['api_key']
                 }
@@ -567,14 +571,18 @@ class App(object):
             {
                 'name': 'OpenAI_GPT4',
                 'large_model': 'gpt-4-turbo',
+                'large_model_context_window': '131072',
                 'fast_model': 'gpt-3.5-turbo',
+                'fast_model_context_window': '32768',
                 'api_base': '',
                 'api_key': ''
             },
             {
                 'name': 'Blablador',
                 'large_model': 'alias-large',
+                'large_model_context_window': '32768',
                 'fast_model': 'alias-fast',
+                'fast_model_context_window': '32768',
                 'api_base': 'https://helmholtz-blablador.fz-juelich.de:8000/v1',
                 'api_key': ''
             }
@@ -2542,7 +2550,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 # self.app.settings['ai_enable'] = 'False'
                 self.ui.textEdit.append(_("AI: Error - failed to initialize."))
         """
-        self.ai_chat_window.init_ai_chat()
+        self.ai_chat_window.init_ai_chat(self.app)
         
         # Fix missing folders within QualCoder project. Will cause import errors.
         span = '<span style="color:red">'

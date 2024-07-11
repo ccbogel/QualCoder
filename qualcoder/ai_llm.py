@@ -131,6 +131,8 @@ class AiLLM():
     busy = False   
     large_llm = None
     fast_llm = None
+    large_llm_context_window = 128000
+    fast_llm_context_window = 16385
     ai_streaming_output = ''
     sources_collection = 'qualcoder' # name of the vectorstore collection for source documents
     default_system_prompt = (
@@ -171,7 +173,9 @@ Do you want to start the AI setup now?')
             # init llms
             curr_model = self.app.ai_models[int(self.app.settings['ai_model_index'])]
             large_model = curr_model['large_model']
+            self.large_llm_context_window = int(curr_model['large_model_context_window'])
             fast_model = curr_model['fast_model']
+            self.fast_llm_context_window = int(curr_model['fast_model_context_window'])
             api_base = curr_model['api_base']
             api_key = curr_model['api_key']
             self.large_llm = ChatOpenAI(model=large_model, 
