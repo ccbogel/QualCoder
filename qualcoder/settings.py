@@ -122,8 +122,9 @@ class DialogSettings(QtWidgets.QDialog):
             self.ui.checkBox.setChecked(True)
         else:
             self.ui.checkBox.setChecked(False)
-        styles = [_("original"), _("dark"), _("blue"), _("green"), _("orange"), _("purple"), _("yellow"), _("rainbow"), _("native")]
-        self.ui.comboBox_style.addItems(styles)
+        styles = ["original", "dark", "blue", "green", "orange", "purple", "yellow", "rainbow", "native"]
+        styles_translated = [_("original"), _("dark"), _("blue"), _("green"), _("orange"), _("purple"), _("yellow"), _("rainbow"), _("native")]
+        self.ui.comboBox_style.addItems(styles_translated)
         for index, style in enumerate(styles):
             if style == self.settings['stylesheet']:
                 self.ui.comboBox_style.setCurrentIndex(index)
