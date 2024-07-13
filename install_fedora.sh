@@ -8,8 +8,8 @@ sudo dnf install \
 
 
 # Here we define which packages we install
-dnf_packages="python3-pip python3-devel python3-pdfminer.noarch python3-qt5 python3-pillow python3-openpyxl python3-pandas python3-plotly python3-pip python3-pyqt6 python3-pillow python3-vlc vlc python3-ply python3-six python3-chardet ffmpeg"
-pip_packages="Ebooklib pydub SpeechRecognition pdfminer.six rispy xmlschema"
+dnf_packages="python3-pip python3-devel python3-pdfminer.noarch python3-qt5 python3-pillow python3-openpyxl python3-pandas python3-plotly python3-pip python3-pyqt6 python3-pillow python3-vlc vlc python3-ply python3-six python3-chardet ffmpeg python3-pdfminer+image.noarch"
+pip_packages="Ebooklib pydub SpeechRecognition rispy"
 
 printf "Change the python_version in this script to a higher numbers if you have a more recent version of python installed.\n\n"
 python_version=3.12
@@ -30,6 +30,7 @@ sudo cp qualcoder/GUI/qualcoder.desktop /usr/share/applications/qualcoder.deskto
 sudo python3 setup.py install
 printf "\nIf no errors then installation is completed.\n\n"
 echo "To remove qualcoder from Linux run the following in the terminal:"
+echo "sudo rm -R /usr/local/bin/qualcoder"
 echo "sudo rm -R /usr/share/qualcoder"
 echo "sudo rm /usr/share/icons/qualcoder128.png"
 echo "sudo rm /usr/share/applications/qualcoder.desktop"
