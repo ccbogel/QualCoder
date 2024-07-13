@@ -158,6 +158,7 @@ class DialogSettings(QtWidgets.QDialog):
         self.ui.comboBox_ai_model.currentTextChanged.connect(self.ai_model_changed)
         self.ui.lineEdit_ai_api_key.setText(curr_model['api_key'])
         self.ui.lineEdit_ai_api_key.textChanged.connect(self.ai_api_key_changed)
+        self.ui.checkBox_ai_project_memo.setChecked(self.settings.get('ai_send_project_memo', 'True') == 'True')
 
     def backup_state_changed(self):
         """ Enable and disable av backup checkbox. Only enable when checkBox_auto_backup is checked. """
@@ -261,7 +262,11 @@ class DialogSettings(QtWidgets.QDialog):
         if self.ui.checkBox_AI_enable.isChecked():
             self.settings['ai_enable'] = 'True'
         else:
-            self.settings['ai_enable'] = 'False' 
+            self.settings['ai_enable'] = 'False'
+        if self.ui.checkBox_ai_project_memo.isChecked():
+            self.settings['ai_send_project_memo'] = 'True'
+        else: 
+            self.settings['ai_send_project_memo'] = 'False'
         # self.app.ai_models = self.ai_models
         # self.settings['ai_model_index'] = self.ui.comboBox_ai_model.currentIndex()
         self.save_settings()

@@ -8,11 +8,13 @@ Kai Dröge 2023
 import os
 import subprocess
 
+script_dir = os.path.dirname(os.path.abspath(__file__))
+
 # path to .ui-files
-ui_dir = "GUI_UIs"
+ui_dir = os.path.join(script_dir, "GUI_UIs")
 
 # path to .py-files
-py_dir = "qualcoder/GUI"
+py_dir = os.path.join(script_dir, "qualcoder", "GUI")
 
 for file in os.listdir(ui_dir):
     if file.endswith(".ui"):

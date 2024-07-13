@@ -77,6 +77,8 @@ class DialogAIChat(QtWidgets.QDialog):
     current_streaming_chat_idx = -1
     chat_msg_list = [] 
     is_updating_chat_window = False
+    ai_semantic_search_chunks = []
+    # filenames = []
 
     def __init__(self, app, parent_text_edit: QTextEdit):
         """ Need to comment out the connection accept signal line in ui_Dialog_Import.py.
@@ -97,12 +99,21 @@ class DialogAIChat(QtWidgets.QDialog):
         self.ui.pushButton_question.pressed.connect(self.button_question_clicked)
         self.ui.plainTextEdit_question.setPlaceholderText(_('<your question>'))
         self.ui.scrollArea_ai_output.verticalScrollBar().rangeChanged.connect(self.ai_output_bottom)
+        # Stylesheets
         doc_font = 'font: ' + str(self.app.settings['docfontsize']) + 'pt '
         doc_font += '"' + self.app.settings['font'] + '";'
-        self.ai_response_style = "'" + doc_font + " color: #356399;'"     
-        self.ai_user_style = "'" + doc_font + " color: #35998A; '"
-        self.ai_info_style = "'" + doc_font + " color: #000000;'"
+        if self.app.settings['stylesheet'] in ['dark', 'rainbow']:
+            self.ai_response_style = "'" + doc_font + " color: #8FB1D8;'"     
+            self.ai_user_style = "'" + doc_font + " color: #35998A; '"
+            self.ai_info_style = doc_font # "'" + doc_font + " color: #000000;'"
+        else:
+            self.ai_response_style = "'" + doc_font + " color: #356399;'"     
+            self.ai_user_style = "'" + doc_font + " color: #287368; '"
+            self.ai_info_style = doc_font # "'" + doc_font + " color: #000000;'"
         self.ui.plainTextEdit_question.setStyleSheet(self.ai_user_style[1:-1])
+        self.ui.ai_output.setStyleSheet(doc_font)
+        self.ui.ai_output.setAutoFillBackground(True)
+        self.ui.ai_output.setStyleSheet('QWidget:focus {border: none;}')
         self.ui.pushButton_new_analysis.clicked.connect(self.button_new_clicked)
         self.ui.pushButton_delete.clicked.connect(self.delete_chat)
         self.ui.listWidget_chat_list.itemSelectionChanged.connect(self.chat_list_selection_changed)
@@ -134,6 +145,7 @@ class DialogAIChat(QtWidgets.QDialog):
                                 id INTEGER PRIMARY KEY,
                                 chat_id INTEGER,
                                 msg_type TEXT,
+                                msg_author TEXT,
                                 msg_content TEXT,
                                 FOREIGN KEY (chat_id) REFERENCES chats(id))''')
         self.chat_history_conn.commit()
@@ -159,7 +171,7 @@ class DialogAIChat(QtWidgets.QDialog):
         for i in range(len(self.chat_list)):
             chat = self.chat_list[i]
             id, name, analysis_type, summary, date, analysis_prompt = chat
-            tooltip_text = f"Type: {analysis_type}\nSummary: {summary}\nDate: {date}\nPrompt: {analysis_prompt}"
+            tooltip_text = f"{name}\nType: {analysis_type}\nSummary: {summary}\nDate: {date}\nPrompt: {analysis_prompt}"
 
             # Creating a new QListWidgetItem
             item = QtWidgets.QListWidgetItem(name)
@@ -191,7 +203,7 @@ class DialogAIChat(QtWidgets.QDialog):
 
     def new_general_chat(self, name, summary):
         self.new_chat(name, 'general chat', summary, '')
-        self.process_message('system', self.app.ai.default_system_prompt)
+        self.process_message('system', self.app.ai.get_default_system_prompt())
         self.update_chat_window()  
              
     def new_code_chat(self):
@@ -205,7 +217,7 @@ class DialogAIChat(QtWidgets.QDialog):
             #self.ai_include_coded_segments = ui.include_coded_segments
             self.ai_search_file_ids = ui.selected_file_ids
             self.ai_search_code_ids = ui.selected_code_ids
-            self.ai_prompt = ui.search_prompt
+            self.ai_prompt = ui.current_prompt
             
             file_ids_str = str(self.ai_search_file_ids).replace('[', '(').replace(']', ')')
             code_ids_str = str(self.ai_search_code_ids).replace('[', '(').replace(']', ')')
@@ -220,15 +232,6 @@ class DialogAIChat(QtWidgets.QDialog):
             # possible included in the analysis.
             # The JOIN also adds the source.name so that the AI can refer to a certain document
             # by its name.     
-            #sql = f"""
-            #    SELECT * 
-            #    FROM (
-            #    SELECT *, ROW_NUMBER() OVER (PARTITION BY fid ORDER BY ctid) as rn
-            #    FROM code_text 
-            #    WHERE cid IN {code_ids_str} AND fid IN {file_ids_str}
-            #    ) AS ordered
-            #    ORDER BY rn, fid;
-            #"""
             sql = f"""
                 SELECT ordered.*, source.name
                 FROM (
@@ -270,19 +273,119 @@ class DialogAIChat(QtWidgets.QDialog):
                 f'Your task is to analyze the given empirical data following these instructions: {self.ai_prompt.text}\n'
                 f'The whole discussion should be based updon the the empirical data provided and its proper interpretation. '
                 f'Do not make any assumptions which are not supported by the data. '
-                f'Please mention the sources that your refer to from the given empirical data, using an html anker tag of the following form: '
-                '<a href="source:{source_id}">{source_name}</a>\n' 
+                f'Please mention the sources that your refer to from the given empirical data, using an html anchor tag of the following form: '
+                '<a href="coding:{source_id}">{source_name}</a>\n' 
                 f'Always answer in the following language: "{self.app.ai.get_curr_language()}".'
             )    
             
-            summary = f'Analyzing the data coded as "{self.ai_search_code_name}" ({len(ai_data)} pieces of data send to the AI.)'
+            summary = f'Analyzing the data coded as "{self.ai_search_code_name}" ({len(ai_data)} pieces of data sent to the AI.)'
             if max_ai_data_length_reached:
                 summary += f'\nATTENTION: There was more coded data found, but it had to be truncated because of the limited context window of the AI.'
             logger.debug(f'New code chat. Prompt:\n{ai_instruction}')
-            self.new_chat(f'Chat about "{self.ai_search_code_name}"', 'code chat', summary, self.ai_prompt.name_and_scope())
-            self.process_message('system', self.app.ai.default_system_prompt)
+            self.new_chat(f'Code "{self.ai_search_code_name}"', 'code chat', summary, self.ai_prompt.name_and_scope())
+            self.process_message('system', self.app.ai.get_default_system_prompt())
             self.process_message('instruct', ai_instruction)
             self.update_chat_window()  
+ 
+    def new_topic_chat(self):
+        """chat about a free topic in the data"""
+       
+        ui = DialogAiSearch(self.app, 'topic_analysis')
+        ret = ui.exec()
+        if ret == QtWidgets.QDialog.DialogCode.Accepted:
+            self.ai_search_code_name = ui.selected_code_name
+            self.ai_search_code_memo = ui.selected_code_memo
+            
+            self.ai_search_file_ids = ui.selected_file_ids
+            self.ai_prompt = ui.current_prompt
+            # self.filenames = self.app.get_filenames()
+            
+            summary = f'Analyzing the free topic "{self.ai_search_code_name}" in the data.\nDescription: {self.ai_search_code_memo}'
+            logger.debug(f'New topic chat.')
+            self.new_chat(f'Topic "{self.ai_search_code_name}"', 'topic chat', summary, self.ai_prompt.name_and_scope())
+            self.process_message('system', self.app.ai.get_default_system_prompt())
+            self.process_message('info', _('Searching for related data...'))
+            self.update_chat_window()  
+
+            self.app.ai.retrieve_similar_data(self, self.new_topic_chat_callback,  
+                                            self.ai_search_code_name, self.ai_search_code_memo,
+                                            self.ai_search_file_ids)
+
+    def get_filename(self, id) -> str:
+        """Return the filename for a source id
+        Args:
+            id: source id
+        Returns:
+            str: name | '' if nothing found
+        """
+        # This might be called from a different thread (ai asynch operations), so we have to create a new database connection
+        conn = sqlite3.connect(os.path.join(self.app.project_path, 'data.qda'))
+        cur = conn.cursor()
+        cur.execute(f'select name from source where id = {str(id)}')
+        res = cur.fetchone()[0]
+        if res is not None:
+            return res
+        else:
+            return ''
+          
+        #for file in self.filenames:
+        #    if file['id'] == id:
+        #        return file['name'] # found
+        #return '' # not found
+
+    def new_topic_chat_callback(self, chunks):
+        # Analyze the data found
+        if self.app.ai.ai_async_is_canceled:
+            self.process_message('info', _('Chat has been canceled by the user.'))
+            self.update_chat_window()  
+            return
+        if chunks is None or len(chunks) == 0:
+            msg = _('Sorry, the AI could could not find any data related to "') + self.ai_search_code_name + '".'
+            self.process_message('info', msg)
+            self.update_chat_window()  
+            return
+        print(chunks)
+        self.ai_semantic_search_chunks = chunks                
+        topic_analysis_max_chunks = 30
+        msg = _('Found ') + str(len(chunks))  + _(' chunks of data which might be related to the topic. Analyzing the first ') + str(topic_analysis_max_chunks) + _(' chunks closer.')
+        self.process_message('info', msg)
+        self.update_chat_window()
+
+        ai_data = []
+        max_ai_data_length = round(0.5 * (self.app.ai.large_llm_context_window * 4)) 
+        max_ai_data_length_reached = False
+        ai_data_length = 0
+        for i in range(0, topic_analysis_max_chunks):
+            if i >= len(chunks): 
+                break
+            if ai_data_length >= max_ai_data_length:
+                max_ai_data_length_reached = True
+                break
+            chunk = chunks[i]
+            ai_data.append({
+                'source_id': f'{chunk.metadata["id"]}_{chunk.metadata["start_index"]}_{len(chunk.page_content)}',
+                'source_name': self.get_filename(int(chunk.metadata['id'])),
+                'quote': chunk.page_content
+            })
+            ai_data_length += len(chunk.page_content)
+        
+        ai_data_json = json.dumps(ai_data)
+            
+        ai_instruction = (
+            f'You are analyzing the topic "{self.ai_search_code_name}" with the following description: "{self.ai_search_code_memo}". \n'
+            f'A semantic search in the empirical data resulted in the the following list of chunks of empirical data which might be relevant '
+            f'for the analysis of the given topic:\n'   
+            f'{ai_data_json}\n'
+            f'Your task is to analyze the given empirical data following these instructions: {self.ai_prompt.text}\n'
+            f'The whole discussion should be based updon the the empirical data provided and its proper interpretation. '
+            f'Do not make any assumptions which are not supported by the data. '
+            f'Please mention the sources that your refer to from the given empirical data, using an html anchor tag of the following form: '
+            '<a href="chunk:{source_id}">{source_name}</a>\n' 
+            f'Always answer in the following language: "{self.app.ai.get_curr_language()}".'
+        )    
+        logger.debug(f'Topic chat prompt:\n{ai_instruction}')
+        self.process_message('instruct', ai_instruction)
+        self.update_chat_window()   
         
     def delete_chat(self):
         """Deletes the currently selected chat, connected to the button
@@ -340,21 +443,30 @@ class DialogAIChat(QtWidgets.QDialog):
                 # Show chat messages:
                 for msg in self.chat_msg_list:
                     if msg[2] == 'user':
-                        txt = msg[3].replace('\n', '<br />')
-                        txt = '<b>' + _('You:') + '</b><br />' + txt
+                        txt = msg[4].replace('\n', '<br />')
+                        author = msg[3]
+                        if author is None or author == '':
+                            author = 'unkown'
+                        txt = f'<b>{_("User")} ({author}):</b><br />{txt}'
                         html += f'<p style={self.ai_user_style}>{txt}</p>'
                     elif msg[2] == 'ai':
-                        txt = msg[3].replace('\n', '<br />')
-                        txt = '<b>' + _('AI:') + '</b><br />' + txt
+                        txt = msg[4].replace('\n', '<br />')
+                        author = msg[3]
+                        if author is None or author == '':
+                            author = 'unkown'
+                        txt = f'<b>AI ({author}):</b><br />{txt}'                        
                         html += f'<p style={self.ai_response_style}>{txt}</p>'
                     elif msg[2] == 'info':
-                        txt = msg[3].replace('\n', '<br />')
+                        txt = msg[4].replace('\n', '<br />')
                         txt = '<b>' + _('Info:') + '</b><br />' + txt
                         html += f'<p style={self.ai_info_style}>{txt}</p>'
                 # add partially streamed ai response if needed
                 if len(self.app.ai.ai_streaming_output) > 0:
                     txt = self.app.ai.ai_streaming_output.replace('\n', '<br />')
-                    txt = '<b>' + _('AI:') + '</b><br />' + txt
+                    author = self.app.ai_models[int(self.app.settings['ai_model_index'])]['name']
+                    if author is None or author == '':
+                        author = 'unkown'
+                    txt = f'<b>AI ({author}):</b><br />{txt}'                        
                     html += f'<p style={self.ai_response_style}>{txt}</p>'
                 self.ui.ai_output.setText(html)
                 self.ui.scrollArea_ai_output.ensureVisible(0, 2147483647)
@@ -421,30 +533,13 @@ class DialogAIChat(QtWidgets.QDialog):
         if action == action_codings_analysis:
             self.new_code_chat()
         elif action == action_topic_analysis:
-            print('topic analysis')
+            self.new_topic_chat()
         elif action == action_general_chat:
             self.new_general_chat('New general chat', '')
 
     def ai_output_bottom(self, minVal=None, maxVal=None):
         self.ui.scrollArea_ai_output.verticalScrollBar().setValue(self.ui.scrollArea_ai_output.verticalScrollBar().maximum())
-            
-    def append_html(self, html):
-        self.ui.ai_output.setText(self.ui.ai_output.text() + html) #  .append(html)
-        #self.ui.ai_output.update()
-        self.ui.scrollArea_ai_output.ensureVisible(0, 2147483647)
-
-    def append_ai_output(self, txt):
-        txt = txt.replace('\n', '<br />')
-        self.append_html(f'<p style={self.ai_response_style}>{txt}</p>')
-     
-    def append_user_input(self, txt):
-        txt = txt.replace('\n', '<br />')
-        self.append_html(f'<p style={self.ai_user_style}>{txt}</p>')
-        
-    def append_info_msg(self, txt):
-        txt = txt.replace('\n', '<br />')
-        self.append_html(f'<p style={self.ai_info_style}>{txt}</p>')
-        
+                    
     def history_update_message_list(self, db_conn=None):
         """Update sel.chat_msg_list from the database
 
@@ -467,14 +562,14 @@ class DialogAIChat(QtWidgets.QDialog):
         messages = []
         for msg in self.chat_msg_list:
             if msg[2] == 'system':
-                messages.append(SystemMessage(content=msg[3]))
+                messages.append(SystemMessage(content=msg[4]))
             elif msg[2] == 'instruct' or msg[2] == 'user':
-                messages.append(HumanMessage(content=msg[3]))
+                messages.append(HumanMessage(content=msg[4]))
             elif msg[2] == 'ai':
-                messages.append(AIMessage(content=msg[3]))
+                messages.append(AIMessage(content=msg[4]))
         return messages
     
-    def history_add_message(self, msg_type, msg_content, chat_idx= None, db_conn=None):
+    def history_add_message(self, msg_type, msg_author, msg_content, chat_idx= None, db_conn=None):
         self.ai_streaming_output = ''
         if chat_idx is None:
             chat_idx = self.current_chat_idx
@@ -484,8 +579,8 @@ class DialogAIChat(QtWidgets.QDialog):
                 db_conn=self.chat_history_conn
             cursor = db_conn.cursor()
             # insert new message
-            cursor.execute('''INSERT INTO chat_messages (chat_id, msg_type, msg_content)
-                            VALUES (?, ?, ?)''', (curr_chat_id, msg_type, msg_content))
+            cursor.execute('''INSERT INTO chat_messages (chat_id, msg_type, msg_author, msg_content)
+                            VALUES (?, ?, ?, ?)''', (curr_chat_id, msg_type, msg_author, msg_content))
             db_conn.commit()
             self.history_update_message_list()
     
@@ -526,17 +621,17 @@ class DialogAIChat(QtWidgets.QDialog):
              
         if msg_type == 'info':
             # info messages are only shown on screen, not send to the AI
-            self.history_add_message(msg_type, msg_content, chat_idx)
+            self.history_add_message(msg_type, '', msg_content, chat_idx)
             self.update_chat_window()
         elif msg_type == 'system':
             # system messages are only added to the chat history. They are never shown on screen. 
             # The system message will be not be send to the AI immediately, but together with the next user message (as part of the chat history).
-            self.history_add_message(msg_type, msg_content, chat_idx)
+            self.history_add_message(msg_type, '', msg_content, chat_idx)
         elif msg_type == 'instruct':
             # instruct messages are only send to the AI, but not shown on screen
             # Other than system messages, instruct messages are send immediatly and will produce an answer that is shown on screen
             if chat_idx == self.current_chat_idx:
-                self.history_add_message(msg_type, msg_content, chat_idx)
+                self.history_add_message(msg_type, '', msg_content, chat_idx)
                 messages = self.history_get_ai_messages()
                 self.current_streaming_chat_idx = self.current_chat_idx
                 self.app.ai.ai_async_stream(self.app.ai.large_llm, 
@@ -549,7 +644,7 @@ class DialogAIChat(QtWidgets.QDialog):
         elif msg_type == 'user':
             # user question, shown on screen and send to the AI
             if chat_idx == self.current_chat_idx:
-                self.history_add_message(msg_type, msg_content, chat_idx)
+                self.history_add_message(msg_type, self.app.settings['codername'], msg_content, chat_idx)
                 messages = self.history_get_ai_messages()
                 self.current_streaming_chat_idx = self.current_chat_idx
                 self.app.ai.ai_async_stream(self.app.ai.large_llm, 
@@ -565,7 +660,8 @@ class DialogAIChat(QtWidgets.QDialog):
             # create temporary db connection to make it thread safe
             db_conn = sqlite3.connect(self.chat_history_path)
             try: 
-                self.history_add_message(msg_type, msg_content, chat_idx, db_conn)
+                ai_model_name = self.app.ai_models[int(self.app.settings['ai_model_index'])]['name']
+                self.history_add_message(msg_type, ai_model_name, msg_content, chat_idx, db_conn)
                 self.ai_streaming_output = ''
                 self.update_chat_window()
             finally:
@@ -613,8 +709,8 @@ class DialogAIChat(QtWidgets.QDialog):
     def on_linkHovered(self, link: str):
         if link:
             # Show tooltip when hovering over a link
-            if link.startswith('source:'):
-                coding_id = link[len('source:'):]
+            if link.startswith('coding:'):
+                coding_id = link[len('coding:'):]
                 cursor = self.app.conn.cursor()
                 sql = (f'SELECT code_text.ctid, source.name, code_text.seltext '
                         f'FROM code_text JOIN source ON code_text.fid = source.id '
@@ -624,6 +720,19 @@ class DialogAIChat(QtWidgets.QDialog):
                 if coding is not None:
                     tooltip_txt = f'{coding[1]}:\n' # file name
                     tooltip_txt += f'"{coding[2]}"' # seltext
+                else:
+                    tooltip_txt = _('source not found')
+                QtWidgets.QToolTip.showText(QCursor.pos(), tooltip_txt, self.ui.ai_output)
+            elif link.startswith('chunk:'):
+                chunk_id = link[len('chunk:'):]
+                source_id, start, length = chunk_id.split('_')
+                cursor = self.app.conn.cursor()
+                sql = f'SELECT name, fulltext FROM source WHERE id = {source_id}'
+                cursor.execute(sql)
+                source = cursor.fetchone()
+                if source is not None:
+                    tooltip_txt = f'{source[0]}:\n' # file name
+                    tooltip_txt += f'"{source[1][int(start):int(start) + int(length)]}"' # chunk extracted from fulltext
                 else:
                     tooltip_txt = _('source not found')
                 QtWidgets.QToolTip.showText(QCursor.pos(), tooltip_txt, self.ui.ai_output)

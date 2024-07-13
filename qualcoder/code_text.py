@@ -4312,7 +4312,7 @@ class DialogCodeText(QtWidgets.QWidget):
             self.ai_search_similar_chunk_list = []
             self.ai_search_chunks_pos = 0
             self.ai_search_results = []
-            self.ai_search_prompt = ui.search_prompt
+            self.ai_search_prompt = ui.current_prompt
             
             # Prepare the UI
             self.ai_search_running = True

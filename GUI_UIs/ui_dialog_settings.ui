@@ -75,29 +75,6 @@
           <property name="bottomMargin">
            <number>0</number>
           </property>
-          <item row="4" column="2">
-           <widget class="QLineEdit" name="lineEdit_ai_api_key"/>
-          </item>
-          <item row="1" column="0">
-           <widget class="QCheckBox" name="checkBox_AI_enable">
-            <property name="text">
-             <string>enable AI integration</string>
-            </property>
-            <property name="checked">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item row="4" column="0" colspan="2">
-           <widget class="QLabel" name="label_openai_api_key">
-            <property name="text">
-             <string>API key</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-            </property>
-           </widget>
-          </item>
           <item row="0" column="0">
            <widget class="QLabel" name="label_9">
             <property name="sizePolicy">
@@ -108,6 +85,16 @@
             </property>
             <property name="text">
              <string>AI Integration</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QCheckBox" name="checkBox_AI_enable">
+            <property name="text">
+             <string>enable AI integration</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
@@ -123,6 +110,32 @@
           </item>
           <item row="2" column="2">
            <widget class="QComboBox" name="comboBox_ai_model"/>
+          </item>
+          <item row="4" column="0" colspan="2">
+           <widget class="QLabel" name="label_openai_api_key">
+            <property name="text">
+             <string>API key</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="2">
+           <widget class="QLineEdit" name="lineEdit_ai_api_key"/>
+          </item>
+          <item row="5" column="0">
+           <widget class="QCheckBox" name="checkBox_ai_project_memo">
+            <property name="toolTip">
+             <string>You can use the Project Memo (found in the menu: Project &gt; Project Memo) to convey background information about your research, including objectives, methodology, and data, to the AI. This will help the AI generate more accurate and relevant responses. Deselect this option if you use the Project Memo for other purposes.</string>
+            </property>
+            <property name="text">
+             <string>Send project memo to AI</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>

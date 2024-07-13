@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'GUI_UIs\ui_ai_search.ui'
+# Form implementation generated from reading ui file 'c:\Users\kai\Documents\Programmierung\2023QualCoder\GUI_UIs\ui_ai_search.ui'
 #
 # Created by: PyQt6 UI code generator 6.4.2
 #
@@ -42,9 +42,9 @@ class Ui_Dialog_AiSearch(object):
         self.verticalLayout = QtWidgets.QVBoxLayout(self.widget_what)
         self.verticalLayout.setContentsMargins(0, 0, 0, 9)
         self.verticalLayout.setObjectName("verticalLayout")
-        self.label_3 = QtWidgets.QLabel(parent=self.widget_what)
-        self.label_3.setObjectName("label_3")
-        self.verticalLayout.addWidget(self.label_3)
+        self.label_what = QtWidgets.QLabel(parent=self.widget_what)
+        self.label_what.setObjectName("label_what")
+        self.verticalLayout.addWidget(self.label_what)
         self.tabWidget = QtWidgets.QTabWidget(parent=self.widget_what)
         self.tabWidget.setObjectName("tabWidget")
         self.tab_code_search = QtWidgets.QWidget()
@@ -177,7 +177,7 @@ class Ui_Dialog_AiSearch(object):
     def retranslateUi(self, Dialog_AiSearch):
         _translate = QtCore.QCoreApplication.translate
         Dialog_AiSearch.setWindowTitle(_translate("Dialog_AiSearch", "AI search"))
-        self.label_3.setText(_translate("Dialog_AiSearch", "What do you want to search for?"))
+        self.label_what.setText(_translate("Dialog_AiSearch", "What do you want to search for?"))
         self.treeWidget.setToolTip(_translate("Dialog_AiSearch", "Select the code for which you want to find more data"))
         self.checkBox_send_memos.setStatusTip(_translate("Dialog_AiSearch", "Send not only the name but also the memo associated with a code to the AI?"))
         self.checkBox_send_memos.setText(_translate("Dialog_AiSearch", "Send memo to AI"))
@@ -189,8 +189,8 @@ class Ui_Dialog_AiSearch(object):
         self.label_2.setText(_translate("Dialog_AiSearch", "Description:"))
         self.textEdit_free_description.setToolTip(_translate("Dialog_AiSearch", "Give a short description so that the AI can better understand what you are looking for"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_free_search), _translate("Dialog_AiSearch", "Free search"))
-        self.label_5.setText(_translate("Dialog_AiSearch", "Search prompt:"))
+        self.label_5.setText(_translate("Dialog_AiSearch", "Prompt:"))
         self.pushButton_change_prompt.setText(_translate("Dialog_AiSearch", "   Change Prompt   "))
-        self.label_4.setText(_translate("Dialog_AiSearch", "Where do you want to search?"))
+        self.label_4.setText(_translate("Dialog_AiSearch", "Filter the data?"))
         self.pushButton_attributeselect.setToolTip(_translate("Dialog_AiSearch", "Filter with the help of attributes"))
         self.pushButton_attributeselect.setText(_translate("Dialog_AiSearch", "Select Attributes"))

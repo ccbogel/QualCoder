@@ -310,6 +310,14 @@ class App(object):
         self.project_path = project_path
         self.project_name = project_path.split('/')[-1]
         self.conn = sqlite3.connect(os.path.join(project_path, 'data.qda'))
+        
+    def get_project_memo(self) -> str:
+        # This might be called from a different thread (ai asynch operations), so we have to create a new database connection
+        conn = sqlite3.connect(os.path.join(self.project_path, 'data.qda'))
+        cur = conn.cursor()
+        cur.execute("select memo from project")
+        memo = cur.fetchone()[0]
+        return memo
 
     def get_category_names(self):
         cur = self.conn.cursor()
@@ -524,7 +532,7 @@ class App(object):
 
         config = configparser.ConfigParser()
         try:
-            config.read(self.configpath)
+            config.read(self.configpath, 'utf-8')
             default = config['DEFAULT']
             result = dict(default)
         except UnicodeDecodeError as err:
@@ -630,7 +638,7 @@ class App(object):
                 'dialogreport_code_summary_splitter0', 'dialogreport_code_summary_splitter0',
                 'stylesheet', 'backup_num', 'codetext_chunksize',
                 'report_text_context_characters', 'report_text_context_style',
-                'ai_enable', 'open_ai_api_key', 'ai_first_startup'
+                'ai_enable', 'ai_first_startup'
                 ]
         for key in keys:
             if key not in settings_data:
@@ -906,7 +914,6 @@ class App(object):
             'report_text_context-style': 'Bold',
             'codetext_chunksize': 50000,
             'ai_enable': 'False',
-            'open_ai_api_key': '',
             'ai_first_startup': 'True'
         }
 
@@ -1499,10 +1506,6 @@ class MainWindow(QtWidgets.QMainWindow):
             msg += _("AI integration is enabled") + "\n"
         else:
             msg += _("AI integration is disabled") + "\n"
-        if self.app.settings['open_ai_api_key'] != '':
-            msg += _("OpenAI API key is set") + "\n"
-        else:
-            msg += _("OpenAI API key not set") + "\n"
         msg += _("Style") + "; " + self.app.settings['stylesheet']
         if platform.system() == "Windows":
             msg += "\n" + _("Directory (folder) paths / represents \\")
@@ -2145,17 +2148,22 @@ class MainWindow(QtWidgets.QMainWindow):
             self.app.settings['ai_enable'] = 'False'
             self.app.write_config_ini(self.app.settings, self.app.ai_models)
         return self.app.settings['ai_enable'] == 'True'
-      
+
     def project_memo(self):
         """ Give the entire project a memo. """
-
-        cur = self.app.conn.cursor()
-        cur.execute("select memo from project")
-        memo = cur.fetchone()[0]
+        memo = self.app.get_project_memo()
+        # If the memo is empty, add a template that defines all the necessary information for the AI  
+        if memo is None or memo == '':
+            memo = _('Research topic, questions and objectives: \n\n'
+                     'Methodology: \n\n'
+                     'Participants and data collected: \n\n'
+                     '#####\n'
+                     '(Everything below this mark is considered to be a personal note and will never be send to the AI.)')
         ui = DialogMemo(self.app, _("Memo for project ") + self.app.project_name,
                         memo)
         ui.exec()
         if memo != ui.memo:
+            cur = self.app.conn.cursor()
             cur.execute('update project set memo=?', (ui.memo,))
             self.app.conn.commit()
             self.ui.textEdit.append(_("Project memo entered."))

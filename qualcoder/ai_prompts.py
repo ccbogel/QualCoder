@@ -85,25 +85,33 @@ system_prompts = """
     present in the data. Do not make any assumptions which are not supported by the data. 
     Your interpretation must be solidly based on the empirical data provided to you, 
     avoiding any speculation.
-- name: Summary
+- name: Code Summary
   type: code_analysis
   description: This prompt will create a simple summary of the pieces of data that have been 
     coded with the choosen code.
-  text: Use the given code to analyse the given empirical data and summarize the results.     
+  text: Use the given code to analyse the given empirical data and summarize the results.
+- name: Topic Summary
+  type: topic_analysis
+  description: This prompt will create a simple summary of the pieces of data that are related  
+    to a certain topic.
+  text: Use the given topic and its description to analyse the given empirical data, ignoring 
+    data which is unrelated to the topic. Summarize the results.      
 """
 
-# Define different prompt types of categories.
-# Right now, only prompts for the AI search are defined. We might add prompts for analysis, etc. later  
+# Define different prompt types, depending on the task.  
 prompt_types = [
     'search',
-    'code_analysis'
+    'code_analysis',
+    'topic_analysis'
 ]
 # Descriptions of the types, used as tooltips:
 prompt_types_descriptions = [
     ('These prompts are used in the AI search. They instruct the AI on how to decide \n'
      'wether a chunk of empirical data is related to a given code/search string or not.'
     ),
-    ('These prompts are used to analyze the data that has been coded with a selected code.'
+    ('These prompts are used in the chat to analyze the data that has been coded with a selected code.'
+    ),
+    ('These prompts are used in the chat to analyse the results of a free search exploring a certain topic.'
     )
 ]
 
@@ -156,26 +164,27 @@ def split_name_and_scope(combined_str) -> {str, str}:
 
 # This type holds a list of prompts and can read/write them from/to a yaml file
 class PromptsList:
-    def __init__(self, app):
+    def __init__(self, app, type=None):
         self.prompts = []
         self.app = app
-        self.read_prompts()
+        self.read_prompts(type)
 
-    def read_prompts(self):
+    def read_prompts(self, type=None):
         self.prompts.clear()
         
         # system prompts
         yaml_data = yaml.safe_load(system_prompts)
         for prompt in yaml_data:
-            prompt['scope'] = 'system'
-            self.prompts.append(PromptItem.from_dict(prompt))
+            if type is None or type == prompt['type']:
+                prompt['scope'] = 'system'
+                self.prompts.append(PromptItem.from_dict(prompt))
         
         # read user (app-level) and project specific prompts 
         self.user_prompts_path = os.path.join(self.app.confighome, 'ai_prompts.yaml')
-        self._read_from_yaml(self.user_prompts_path, 'user')
+        self._read_from_yaml(self.user_prompts_path, type, 'user')
         if self.app.project_path != "":
             self.project_prompts_path = os.path.join(self.app.project_path, 'ai_prompts.yaml')
-            self._read_from_yaml(self.project_prompts_path, 'project')
+            self._read_from_yaml(self.project_prompts_path, type, 'project')
         else:
             self.project_prompts_path = ""
             self.project_prompts.prompts.clear()
@@ -211,14 +220,15 @@ class PromptsList:
                     found = True
         return True
 
-    def _read_from_yaml(self, filename, scope):
+    def _read_from_yaml(self, filename, type, scope):
         if not os.path.exists(filename):
             return False
         with open(filename, 'r', encoding='utf-8') as yaml_file:
             yaml_data = yaml.safe_load(yaml_file)
             for prompt in yaml_data:
-                prompt['scope'] = scope
-                self.prompts.append(PromptItem.from_dict(prompt))
+                if type is None or type == prompt['type']:
+                    prompt['scope'] = scope
+                    self.prompts.append(PromptItem.from_dict(prompt))
         return True
 
     def _write_to_yaml(self, filename, scope):      
@@ -250,13 +260,13 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
     Dialog to edit the prompts for the different AI enhanced functions
     """
     
-    def __init__(self, app_, restrict_prompt_type=''):
+    def __init__(self, app_, type=None):
         """Initializes the dialog
 
         Args:
             app_ (qualcoder App)
-            restrict_prompt_type (string): A prompt of this type must be selected the close the dialog successfully
-                                           default: '' (= any prompt type accepted)
+            type (string): Only prompts of this type are shown and allowed to be created
+                           default: None (= all prompt types allowed)
         """
         sys.excepthook = exception_handler
         self.app = app_
@@ -270,17 +280,17 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         treefont = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
         treefont += '"' + self.app.settings['font'] + '";'
         self.ui.treeWidget_prompts.setStyleSheet(treefont)
-        self.restrict_prompt_type = restrict_prompt_type
-        self.prompts = PromptsList(app_)
+        self.prompt_type = type
+        self.prompts = PromptsList(app_, type)
         self.selected_prompt = None
         self.form_updating = True
         try:
             self.ui.comboBox_type.addItems(prompt_types)
             self.fill_tree()
-            # preselect restrict_prompt_type (if given)
-            for i in range(len(prompt_types)):
-                if self.restrict_prompt_type == prompt_types[i]:
-                    self.ui.treeWidget_prompts.setCurrentItem(self.ui.treeWidget_prompts.topLevelItem(i))
+            # preselect prompt_type (if given)
+            #for i in range(len(prompt_types)):
+            #    if self.prompt_type == prompt_types[i]:
+            #        self.ui.treeWidget_prompts.setCurrentItem(self.ui.treeWidget_prompts.topLevelItem(i))
         finally:
             self.form_updating = False
             self.tree_selection_changed()
@@ -308,6 +318,8 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
             self.ui.treeWidget_prompts.clear()
             for i in range(len(prompt_types)):
                 t = prompt_types[i]
+                if self.prompt_type is not None and t != self.prompt_type:
+                    continue # skip unwanted prompt types
                 type_item = QtWidgets.QTreeWidgetItem(self.ui.treeWidget_prompts)
                 type_item.setText(0, t)
                 type_item.setToolTip(0, prompt_types_descriptions[i])
@@ -337,12 +349,12 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
             return
         if len(self.ui.treeWidget_prompts.selectedItems()) > 0:
             selected_item = self.ui.treeWidget_prompts.selectedItems()[0]
-            if get_item_level(selected_item) == 2: # prompt
+            if get_item_level(selected_item) == 2: # is a prompt
                 selected_name = selected_item.text(0)
                 selected_scope = selected_item.parent().text(0)
                 selected_type = selected_item.parent().parent().text(0)
                 self.selected_prompt = self.prompts.find_prompt(selected_name, selected_scope, selected_type)                
-            else: # type/scope   
+            else: # is type/scope   
                 self.selected_prompt = None
         else: # no item selected
             self.selected_prompt = None
@@ -358,7 +370,8 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
                 self.ui.radioButton_system.setChecked(self.selected_prompt.scope == 'system')
                 self.ui.radioButton_user.setChecked(self.selected_prompt.scope == 'user')
                 self.ui.radioButton_project.setChecked(self.selected_prompt.scope == 'project')
-                self.ui.comboBox_type.setCurrentText(self.selected_prompt.scope)
+                self.ui.comboBox_type.setCurrentText(self.selected_prompt.type)
+                self.ui.comboBox_type.setEnabled(self.prompt_type is None)
                 self.ui.plainTextEdit_description.setPlainText(self.selected_prompt.description)
                 self.ui.plainTextEdit_prompt_text.setPlainText(self.selected_prompt.text)
                 self.ui.pushButton_duplicate_prompt.setEnabled(True)
@@ -399,10 +412,16 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
                     new_type = selected_item.parent().text(0)
                     new_scope = selected_item.text(0)
                 else:
-                    new_type = 'search'
+                    if self.prompt_type is not None:
+                        new_type = self.prompt_type
+                    else:
+                        new_type = 'search'
                     new_scope = 'user'
             else: # no item selected, set default values
-                new_type = 'search'
+                if self.prompt_type is not None:
+                    new_type = self.prompt_type
+                else:
+                    new_type = 'search'
                 new_scope = 'user'
         if new_scope == 'system':
             new_scope = 'user' # system prompts cannot be created by the user
@@ -530,10 +549,10 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
                 return      
         self.prompts.save_prompts()
         
-        # check if restrict_prompt_type was set and the right type is selected 
-        if self.restrict_prompt_type != '' and (
-              (self.selected_prompt is None) or (self.selected_prompt.type != self.restrict_prompt_type)):
-            msg = _(f'You must select a {self.restrict_prompt_type} prompt.')
+        # check if prompt_type was set and the right type is selected 
+        if self.prompt_type is not None and (
+              (self.selected_prompt is None) or (self.selected_prompt.type != self.prompt_type)):
+            msg = _(f'You must select a {self.prompt_type} prompt.')
             Message(self.app, _('Edit prompts'), msg, "warning").exec()
             return      
                 

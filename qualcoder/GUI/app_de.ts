@@ -2295,7 +2295,7 @@ Texttranskriptionsdatei, die mit einer Audio- oder Videodatei verbunden ist, kan
     <message>
         <location filename="ui_dialog_refi_export_endings.py" line="41"/>
         <source>Settings</source>
-        <translation>Einstellwerte</translation>
+        <translation>Einstellungen</translation>
     </message>
     <message>
         <location filename="ui_dialog_refi_export_endings.py" line="42"/>
@@ -2813,7 +2813,7 @@ Platzhalter für &amp;quot;wie&amp;quot; sind % und _</translation>
     <message>
         <location filename="ui_dialog_settings.py" line="198"/>
         <source>Settings</source>
-        <translation>Einstellwerte</translation>
+        <translation>Einstellungen</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="129"/>
@@ -3586,7 +3586,7 @@ Kodieren Sie diesen Text erst, wenn Sie Kodieren - Text kodieren aus der Menüle
     <message>
         <location filename="ui_main.py" line="271"/>
         <source>Settings</source>
-        <translation>Einstellwerte</translation>
+        <translation>Einstellungen</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="272"/>

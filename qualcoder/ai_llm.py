@@ -113,11 +113,26 @@ class LlmAnalyzedDataList(BaseModel):
 class AnalyzedDataList(BaseModel):
     """A list of analyzed chunks of empircal data"""
     data: List[AnalyzedData]
+
+def extract_ai_memo(memo: str) -> str:
+    """In any memo, any text after the mark '#####' are considered as personal notes that will not be send to the AI.
+    This function extracts the text before this mark (or all text if no marking is found) 
+
+    Args:
+        memo (str): memo text
+
+    Returns:
+        str: shortened memo for AI
+    """
+    mark = memo.find('#####')
+    if mark > -1:
+        return memo[0:mark]
+    else:
+        return memo
     
 class AiLLM():
     """ This manages the communication between qualcoder, the vectorstore 
     and the LLM (large language model, GPT-4 in this case)."""
-
     app = None
     parent_text_edit = None
     threadpool: QtCore.QThreadPool = None
@@ -135,9 +150,13 @@ class AiLLM():
     fast_llm_context_window = 16385
     ai_streaming_output = ''
     sources_collection = 'qualcoder' # name of the vectorstore collection for source documents
-    default_system_prompt = (
-        'You are a member of a team of qualitative social researchers.'
-    )
+        
+    def get_default_system_prompt(self) -> str:
+        p =  'You are assisting a team of qualitative social researchers.'
+        project_memo = extract_ai_memo(self.app.get_project_memo())
+        if self.app.settings.get('ai_send_project_memo', 'True') == 'True' and len(project_memo) > 0:
+            p +=  f' Here is some background information about the research project the team is working on:\n{project_memo}'
+        return p
 
     def __init__(self, app, parent_text_edit):
         self.app = app
@@ -263,6 +282,8 @@ Do you want to start the AI setup now?')
             worker.signals.streaming.connect(streaming_callback)
         if error_callback is not None:
             worker.signals.error.connect(error_callback)
+        else:
+            worker.signals.error.connect(self._ai_async_error)
         self.threadpool.start(worker)
 
     def _ai_async_stream(self, signals, llm, messages):
@@ -368,7 +389,7 @@ Do you want to start the AI setup now?')
                 
         code_descriptions_prompt = [
             SystemMessage(
-                content = self.default_system_prompt
+                content = self.get_default_system_prompt()
             ),
             HumanMessage(
                 content= (f'You are discussing the code named "{code_name}" with the following code memo: "{code_memo}". \n'
@@ -391,7 +412,7 @@ Do you want to start the AI setup now?')
 
         code_descriptions_prompt = [
             SystemMessage(
-                content = self.default_system_prompt
+                content = self.get_default_system_prompt()
             ),
             HumanMessage(
                 content= (f'You are discussing the code named "{code_name}" with the following code memo: "{code_memo}". \n'
@@ -436,7 +457,7 @@ Do you want to start the AI setup now?')
             [
                 (
                     'system',
-                    self.default_system_prompt,
+                    self.get_default_system_prompt(),
                 ),
                 (
                     'human',
@@ -566,7 +587,7 @@ Do you want to start the AI setup now?')
 """
         prompt = [
             SystemMessage(
-                content=self.default_system_prompt
+                content=self.get_default_system_prompt()
             ),
             HumanMessage(
                 content= (f'You are discussing the code named "{code_name}" with the following code memo: "{code_memo}". \n'
@@ -593,7 +614,7 @@ Do you want to start the AI setup now?')
 
         prompt = [
             SystemMessage(
-                content=self.default_system_prompt
+                content=self.get_default_system_prompt()
             ),
             HumanMessage(
                 content= (f'You are discussing the code named "{code_name}" with the following code memo: "{code_memo}". \n'
@@ -617,7 +638,7 @@ Do you want to start the AI setup now?')
 
         prompt = [
             SystemMessage(
-                content=self.default_system_prompt
+                content=self.get_default_system_prompt()
             ),
             HumanMessage(
                 content= (f'You are discussing the code named "{code_name}" with the following code memo: "{code_memo}". \n'
@@ -642,7 +663,7 @@ Do you want to start the AI setup now?')
 
         prompt = [
             SystemMessage(
-                content=self.default_system_prompt
+                content=self.get_default_system_prompt()
             ),
             HumanMessage(
                 content= (f'You are discussing the code named "{code_name}" with the following code memo: "{code_memo}". \n'
@@ -666,7 +687,7 @@ Do you want to start the AI setup now?')
 
         prompt = [
             SystemMessage(
-                content=self.default_system_prompt
+                content=self.get_default_system_prompt()
             ),
             HumanMessage(
                 content= (f'You are discussing the code named "{code_name}" with the following code memo: "{code_memo}". \n'
@@ -747,7 +768,7 @@ Do you want to start the AI setup now?')
             [
                 (
                     'system',
-                    self.default_system_prompt + '\nYou are an expert in analyzing the empirical data that was collected during the research.',
+                    self.get_default_system_prompt() + '\nYou are an expert in analyzing the empirical data that was collected during the research.',
                 ),
                 (
                     'human',

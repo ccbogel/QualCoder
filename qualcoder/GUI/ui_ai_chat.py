@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'GUI_UIs\ui_ai_chat.ui'
+# Form implementation generated from reading ui file 'c:\Users\kai\Documents\Programmierung\2023QualCoder\GUI_UIs\ui_ai_chat.ui'
 #
 # Created by: PyQt6 UI code generator 6.4.2
 #
@@ -31,12 +31,10 @@ class Ui_Dialog_ai_chat(object):
         self.gridLayout_2.setContentsMargins(0, 0, 0, 0)
         self.gridLayout_2.setObjectName("gridLayout_2")
         self.scrollArea_ai_output = QtWidgets.QScrollArea(parent=self.widget_chat)
-        self.scrollArea_ai_output.setStyleSheet("")
         self.scrollArea_ai_output.setWidgetResizable(True)
         self.scrollArea_ai_output.setObjectName("scrollArea_ai_output")
         self.scrollArea_ai_output_contents = QtWidgets.QWidget()
         self.scrollArea_ai_output_contents.setGeometry(QtCore.QRect(0, 0, 664, 473))
-        self.scrollArea_ai_output_contents.setStyleSheet("background-color: white;")
         self.scrollArea_ai_output_contents.setObjectName("scrollArea_ai_output_contents")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.scrollArea_ai_output_contents)
         self.verticalLayout.setContentsMargins(30, 6, 30, 6)
@@ -48,7 +46,6 @@ class Ui_Dialog_ai_chat(object):
         sizePolicy.setHeightForWidth(self.ai_output.sizePolicy().hasHeightForWidth())
         self.ai_output.setSizePolicy(sizePolicy)
         self.ai_output.setAutoFillBackground(False)
-        self.ai_output.setStyleSheet("")
         self.ai_output.setInputMethodHints(QtCore.Qt.InputMethodHint.ImhNone)
         self.ai_output.setFrameShape(QtWidgets.QFrame.Shape.NoFrame)
         self.ai_output.setFrameShadow(QtWidgets.QFrame.Shadow.Sunken)
