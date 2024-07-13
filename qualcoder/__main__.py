@@ -502,7 +502,7 @@ class App(object):
 
         config = configparser.ConfigParser()
         try:
-            config.read(self.configpath)
+            config.read(self.configpath, 'utf-8')
             default = config['DEFAULT']
             result = dict(default)
         except UnicodeDecodeError as err:
