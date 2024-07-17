@@ -36,20 +36,23 @@ from PyQt6 import QtGui
 from PyQt6 import QtCore 
 import sqlite3
 from .ai_prompts import PromptItem
-from langchain_community.chat_models import ChatOpenAI
-from langchain.globals import set_llm_cache
-from langchain.cache import InMemoryCache
+from langchain_openai import ChatOpenAI
+from langchain_core.globals import set_llm_cache
+from langchain_community.cache import InMemoryCache
 from langchain.pydantic_v1 import BaseModel, Field
-from langchain.chains.openai_functions import (
-    create_openai_fn_chain,
-    create_structured_output_chain,
-    create_openai_fn_runnable,
-    create_structured_output_runnable,
-)
-from langchain.prompts import ChatPromptTemplate
-from langchain.callbacks.base import BaseCallbackHandler
-from langchain.schema.runnable import RunnableConfig
-from langchain.schema import HumanMessage, SystemMessage, Document
+#from langchain.chains.openai_functions import (
+#    create_openai_fn_chain,
+#    create_structured_output_chain,
+#    create_openai_fn_runnable,
+#    create_structured_output_runnable,
+#)
+#from langchain.prompts import ChatPromptTemplate
+from langchain_core.callbacks.base import BaseCallbackHandler
+from langchain_core.runnables.config import RunnableConfig
+from langchain_core.messages.human import HumanMessage
+from langchain_core.messages.ai import AIMessage
+from langchain_core.messages.system import SystemMessage
+from langchain_core.documents.base import Document
 from .ai_async_worker import Worker, AiException
 from .ai_vectorstore import AiVectorstore
 from .GUI.base64_helper import *
@@ -180,10 +183,13 @@ Do you want to start the AI setup now?')
                                             QtWidgets.QMessageBox.StandardButton.No)
             if reply == QtWidgets.QMessageBox.StandardButton.No:
                 self.app.settings['ai_enable'] = 'False'
-        self.app.settings['ai_first_startup'] == 'False'
+        self.app.settings['ai_first_startup'] = 'False'
         self.app.write_config_ini(self.app.settings, self.app.ai_models)
         
         if self.app.settings['ai_enable'] == 'True':
+            self.parent_text_edit.append(_('AI: Starting up...'))
+            QtWidgets.QApplication.processEvents() # update ui
+
             set_llm_cache(InMemoryCache())
             # init vectorstore
             if self.sources_vectorstore is None:

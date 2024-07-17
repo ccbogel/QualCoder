@@ -226,7 +226,7 @@ Rechtsklick für Optionen</translation>
     <message>
         <location filename="ui_dialog_graph.py" line="131"/>
         <source>Clear</source>
-        <translation>Beseitigen</translation>
+        <translation>Löschen</translation>
     </message>
     <message>
         <location filename="ui_dialog_graph.py" line="132"/>
@@ -2201,7 +2201,7 @@ Texttranskriptionsdatei, die mit einer Audio- oder Videodatei verbunden ist, kan
     <message>
         <location filename="ui_dialog_memo.py" line="44"/>
         <source>Clear</source>
-        <translation>Beseitigen</translation>
+        <translation>Löschen</translation>
     </message>
 </context>
 <context>
@@ -2777,7 +2777,7 @@ Platzhalter für &amp;quot;wie&amp;quot; sind % und _</translation>
     <message>
         <location filename="ui_report_attribute_parameters.py" line="69"/>
         <source>Clear</source>
-        <translation>Beseitigen</translation>
+        <translation>Löschen</translation>
     </message>
     <message>
         <location filename="ui_report_attribute_parameters.py" line="70"/>
@@ -3446,7 +3446,7 @@ rot unterstrichen = Dem Code oder der Anmerkung zugewiesen</translation>
     <message>
         <location filename="ui_dialog_view_text.py" line="75"/>
         <source>Clear</source>
-        <translation>Beseitigen</translation>
+        <translation>Löschen</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_text.py" line="76"/>

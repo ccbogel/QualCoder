@@ -320,7 +320,7 @@ class RqdaImport:
         if result is None:
             return
         self.app.settings['codername'] = result[0]
-        self.app.write_config_ini(self.app.settings)
+        self.app.write_config_ini(self.app.settings, self.app.ai_models)
 
 
 """

@@ -59,7 +59,7 @@ class DialogSettings(QtWidgets.QDialog):
     settings = {}
     current_coder = "default"
 
-    def __init__(self, app, parent=None):
+    def __init__(self, app, parent=None, section=None):
 
         sys.excepthook = exception_handler
         self.app = app
@@ -159,7 +159,9 @@ class DialogSettings(QtWidgets.QDialog):
         self.ui.lineEdit_ai_api_key.setText(curr_model['api_key'])
         self.ui.lineEdit_ai_api_key.textChanged.connect(self.ai_api_key_changed)
         self.ui.checkBox_ai_project_memo.setChecked(self.settings.get('ai_send_project_memo', 'True') == 'True')
-
+        if section is not None and section == 'AI':
+            self.ui.scrollArea.ensureWidgetVisible(self.ui.widget_ai, xMargin=0)
+            
     def backup_state_changed(self):
         """ Enable and disable av backup checkbox. Only enable when checkBox_auto_backup is checked. """
 

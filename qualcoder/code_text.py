@@ -4525,10 +4525,12 @@ class DialogCodeText(QtWidgets.QWidget):
         id = doc['metadata']['id']
         quote_start = doc['quote_start']
         quote_end = quote_start + len(doc['quote'])
+        self.open_doc_selection(id, quote_start, quote_end)
         
-        # open doc and select quote
+    def open_doc_selection(self, doc_id, sel_start, sel_end):
+        # open doc and select a certain part
         for i, f in enumerate(self.filenames):
-            if f['id'] == id:
+            if f['id'] == doc_id:
                 f['start'] = 0
                 if f['end'] != f['characters']: # partially loaded
                     msg = _("Entire text file will be loaded")
@@ -4537,11 +4539,10 @@ class DialogCodeText(QtWidgets.QWidget):
                 try:
                     self.ui.listWidget.setCurrentRow(i)
                     self.load_file(f)
-                    # self.search_term = ""
                     # Set text cursor position
                     text_cursor = self.ui.textEdit.textCursor()
-                    text_cursor.setPosition(quote_start)
-                    endpos = quote_end
+                    text_cursor.setPosition(sel_start)
+                    endpos = sel_end
                     if endpos < 0:
                         endpos = 0
                     text_cursor.setPosition(endpos, QtGui.QTextCursor.MoveMode.KeepAnchor)

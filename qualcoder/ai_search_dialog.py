@@ -113,12 +113,17 @@ class DialogAiSearch(QtWidgets.QDialog):
         self.current_prompt = self.prompts_list.find_prompt(last_prompt_name, last_prompt_scope, self.context)
         if self.current_prompt is None:
             self.current_prompt = self.prompts_list.prompts[0]
-            msg = _('The last used search prompt') + \
+            msg = _('The last used prompt') + \
                 f' "{last_prompt_name} ({last_prompt_scope})" ' + \
                 _('could not be found. The prompt will be reset to the default.')
             Message(self.app, _('No codes'), msg, "warning").exec()
-        self.ui.lineEdit_prompt.setText(self.current_prompt.name_and_scope())
-        self.ui.lineEdit_prompt.setToolTip(self.current_prompt.description)
+        for prompt in self.prompts_list.prompts:
+            self.ui.comboBox_prompts.addItem(prompt.name_and_scope())
+        self.ui.comboBox_prompts.setCurrentText = self.current_prompt.name_and_scope()
+        self.ui.comboBox_prompts.setToolTip(self.current_prompt.description)
+        self.ui.comboBox_prompts.currentIndexChanged.connect(self.on_prompt_selected)
+        # self.ui.lineEdit_prompt.setText(self.current_prompt.name_and_scope())
+        # self.ui.lineEdit_prompt.setToolTip(self.current_prompt.description)
         self.ui.tabWidget.setCurrentIndex(int(self.app.settings.get(f'ai_dlg_{self.context}_last_tab_index', 0)))
         self.ui.lineEdit_free_topic.setText(self.app.settings.get(f'ai_dlg_{self.context}_free_topic', ''))
         self.ui.textEdit_free_description.setText(self.app.settings.get(f'ai_dlg_{self.context}_free_description', '').replace('\\n', '\n'))        
@@ -305,6 +310,10 @@ class DialogAiSearch(QtWidgets.QDialog):
             item = it.value()
             count += 1
             
+    def on_prompt_selected(self, index):
+        """This function will be called whenever the user selects a new item in the combobox"""
+        self.current_prompt = self.prompts_list.prompts[self.ui.comboBox_prompts.currentIndex()]
+            
     def change_prompt(self):
         """ Select and edit the prompt for the search. """
         ui = DialogAiEditPrompts(self.app, self.context)
@@ -313,10 +322,12 @@ class DialogAiSearch(QtWidgets.QDialog):
             self.prompts_list.read_prompts()
             if ui.selected_prompt is not None:
                 self.current_prompt = self.prompts_list.find_prompt(ui.selected_prompt.name, ui.selected_prompt.scope, ui.selected_prompt.type)
-        if self.current_prompt is None:
-            self.current_prompt = self.prompts_list.prompts[0] # default
-        self.ui.lineEdit_prompt.setText(self.current_prompt.name_and_scope())
-        self.ui.lineEdit_prompt.setToolTip(self.current_prompt.description)
+            if self.current_prompt is None:
+                self.current_prompt = self.prompts_list.prompts[0] # default
+            self.ui.comboBox_prompts.setCurrentText = self.current_prompt.name_and_scope()
+            self.ui.comboBox_prompts.setToolTip(self.current_prompt.description)
+        # self.ui.lineEdit_prompt.setText(self.current_prompt.name_and_scope())
+        # self.ui.lineEdit_prompt.setToolTip(self.current_prompt.description)
 
     def select_attributes(self):
         """ Select files based on attribute selections.

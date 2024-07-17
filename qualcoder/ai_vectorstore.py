@@ -31,18 +31,23 @@ os.environ["HF_HUB_DISABLE_TELEMETRY"] = "1" # for huggingface hub
 os.environ["ANONYMIZED_TELEMETRY"] = "0" # for chromadb
 
 from langchain.embeddings.sentence_transformer import SentenceTransformerEmbeddings
-from langchain.text_splitter import CharacterTextSplitter, RecursiveCharacterTextSplitter
-from langchain_community.vectorstores import Chroma
-from langchain.docstore.document import Document
+from langchain_text_splitters.character import CharacterTextSplitter, RecursiveCharacterTextSplitter
+from langchain_chroma.vectorstores import Chroma
+from langchain_core.documents.base import Document
 from huggingface_hub import hf_hub_url
 import requests
 from typing import (Any, Iterable, Optional, List)
 import logging
 import traceback
 import time
+import importlib
 from PyQt6 import QtWidgets
 from PyQt6 import QtCore
 from .ai_async_worker import Worker, AiException
+
+# Global reference for the imported module
+global sentence_transformers_module
+sentence_transformers_module = None
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -284,11 +289,14 @@ want to continue?\
     def _open_db(self, signals, progress_callback=None):
         if self._is_closing:
             return # abort when closing db
-        import sentence_transformers as st
-        self.st = st # this prevents the library from beeing garbage collected (no, seems not to work, still crashes... Have to import st in the main thread.)
+        #import sentence_transformers as st
+        #self.st = st # this prevents the library from beeing garbage collected (no, seems not to work, still crashes... Have to import st in the main thread.)
+        #global sentence_transformers_module
+        #sentence_transformers_module = importlib.import_module('sentence_transformers')
         if self.app.project_path != '' and os.path.exists(self.app.project_path):
             db_path = self.app.project_path + '/vectorstore'
-            self.embedding_function = E5SentenceTransformerEmbeddings(model_name=self.model_folder)
+            if self.embedding_function is None:
+                self.embedding_function = E5SentenceTransformerEmbeddings(model_name=self.model_folder)
             collection_metadata = {"hnsw:space": "l2"} # {"hnsw:space": "cosine"} -> defines the distance function, cosine vs. Squared L2 (default). In my limited tests, l2 gives slightly better results, although cosine is usually recommended 
             self.chroma_db = Chroma(embedding_function=self.embedding_function, 
                                     persist_directory=db_path,
@@ -308,26 +316,38 @@ want to continue?\
             rebuild (bool, optional): Rebuild the vectorstore from the ground up. Defaults to False.
         """
         self._is_closing = False
-        
-        self.parent_text_edit.append(_('AI: Starting up...'))
-        QtWidgets.QApplication.processEvents() # update ui
+                
+        self.prepare()
         
         # import sentence_transformers # we have to import this here, not in the worker thread, or qualcoder will crash
-        #self.embedding_function = E5SentenceTransformerEmbeddings(model_name=self.model_folder)
-                  
-        self.prepare()
+        #if self.embedding_function is None:
+        #    self.embedding_function = E5SentenceTransformerEmbeddings(model_name=self.model_folder)
         
         if self.app.project_name == '': # no project open
             self.close()
-        else: # project open
-            worker = Worker(self._open_db)  
-            if rebuild:
-                worker.signals.finished.connect(self.rebuild_vectorstore)
-            else:
-                worker.signals.finished.connect(self.update_vectorstore)
-            worker.signals.error.connect(exception_handler)
-            self.threadpool.start(worker)
-        
+        else: 
+            #worker = Worker(self._import_sentence_transformers)  
+            #worker.signals.finished.connect(self.open_db)
+            #worker.signals.error.connect(exception_handler)
+            #self.threadpool.start(worker)
+            self.open_db(rebuild)
+            
+    def _import_sentence_transformers(self, signals):
+        global sentence_transformers_module
+        sentence_transformers_module = importlib.import_module('sentence_transformers')
+
+    def open_db(self, rebuild=False):
+        #global sentence_transformers_module
+        #sentence_transformers_module = importlib.import_module('sentence_transformers')
+        #self.embedding_function = E5SentenceTransformerEmbeddings(model_name=self.model_folder)
+        worker = Worker(self._open_db)  
+        if rebuild:
+            worker.signals.finished.connect(self.rebuild_vectorstore)
+        else:
+            worker.signals.finished.connect(self.update_vectorstore)
+        worker.signals.error.connect(exception_handler)
+        self.threadpool.start(worker)
+ 
     def progress_import(self, msg):
         self.parent_text_edit.append(msg)
         
@@ -335,7 +355,7 @@ want to continue?\
         self.import_workers_count -= 1
         if self.import_workers_count <= 0:
             self.import_workers_count = 0
-            msg = _("AI: Ok, my memory is up to date.")
+            msg = _("AI: Checked all documents, memory is up to date.")
             self.parent_text_edit.append(msg)
             logger.debug(msg)
 
@@ -365,8 +385,10 @@ want to continue?\
         
         # split fulltext in smaller chunks 
         if text != '': # can only add embeddings if text is not empty
-            if progress_callback != None:
-                progress_callback.emit(_('AI: Memorizing ') + f'"{name}"')
+            #if progress_callback != None:
+            #    progress_callback.emit(_('AI: Adding document to my memory: ') + f'"{name}"')
+            if signals.progress is not None:
+                signals.progress.emit(_('AI: Adding document to internal memory: ') + f'"{name}"')
 
             metadata = {'id': id, 'name': name}
             document = Document(page_content=text, metadata=metadata)
@@ -406,24 +428,35 @@ want to continue?\
         """Collects all text sources from the database and adds them to the chroma_db if 
         not already in there.  
         """
-        import sentence_transformers
+        #global sentence_transformers_module
+        #if sentence_transformers_module is None:
+        #    sentence_transformers_module = importlib.import_module('sentence_transformers')
+        #self.embedding_function = E5SentenceTransformerEmbeddings(model_name=self.model_folder)
         if self.chroma_db is None:
             logger.debug('chroma_db is None')
             return
-        msg = _("AI: Let's see if there are new documents")
-        self.parent_text_edit.append(msg)
-        logger.debug(msg)   
         docs = self.app.get_file_texts()
-        for doc in docs:
-            self.import_document(doc['id'], doc['name'], doc['fulltext'], False)
+        if len(docs) == 0:
+            msg = _("AI: No documents, AI is ready.")
+            self.parent_text_edit.append(msg)
+            logger.debug(msg)
+        else:
+            msg = _("AI: Checking for new documents")
+            self.parent_text_edit.append(msg)
+            logger.debug(msg)
+            for doc in docs:
+                self.import_document(doc['id'], doc['name'], doc['fulltext'], False)
             
     def rebuild_vectorstore(self):
-        import sentence_transformers
+        # import sentence_transformers
+        #global sentence_transformers_module
+        #if sentence_transformers_module is None:
+        #    sentence_transformers_module = importlib.import_module('sentence_transformers')
+        #self.embedding_function = E5SentenceTransformerEmbeddings(model_name=self.model_folder)
         if self.chroma_db is None:
             logger.debug('chroma_db is None')
             return
-        msg = _('AI: Rebuilding my memory') + '\n'
-        msg += _('AI: Give me some time to read all your documents')
+        msg = _('AI: Rebuilding memory. The local AI will read through all your documents, be patient.')
         self.parent_text_edit.append(msg)
         logger.debug(msg)
         # delete all the contents from the vectorstore

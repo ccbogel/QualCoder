@@ -208,12 +208,12 @@
               </widget>
              </item>
              <item>
-              <widget class="QLineEdit" name="lineEdit_prompt">
-               <property name="acceptDrops">
-                <bool>false</bool>
-               </property>
-               <property name="readOnly">
-                <bool>true</bool>
+              <widget class="QComboBox" name="comboBox_prompts">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
                </property>
               </widget>
              </item>

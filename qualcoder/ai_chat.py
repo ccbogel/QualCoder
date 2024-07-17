@@ -32,9 +32,10 @@ from PyQt6.QtGui import QTextCursor, QPalette, QCursor
 from PyQt6.QtWidgets import QTextEdit
 from PyQt6.QtGui import QKeySequence, QPixmap, QIcon
 
-from langchain.schema import HumanMessage, SystemMessage, AIMessage
-from langchain.callbacks.base import BaseCallbackHandler
-from langchain.schema.runnable import RunnableConfig
+from langchain_core.messages.human import HumanMessage
+from langchain_core.messages.ai import AIMessage
+from langchain_core.messages.system import SystemMessage
+from langchain_core.callbacks.base import BaseCallbackHandler
 
 from datetime import datetime
 import logging
@@ -80,13 +81,14 @@ class DialogAIChat(QtWidgets.QDialog):
     ai_semantic_search_chunks = []
     # filenames = []
 
-    def __init__(self, app, parent_text_edit: QTextEdit):
+    def __init__(self, app, parent_text_edit: QTextEdit, main_window: QtWidgets.QMainWindow):
         """ Need to comment out the connection accept signal line in ui_Dialog_Import.py.
          Otherwise, get a double-up of accept signals. """
 
         sys.excepthook = exception_handler
         self.app = app
         self.parent_textEdit = parent_text_edit
+        self.main_window = main_window
         # Set up the user interface from Designer.
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_ai_chat()
@@ -98,18 +100,18 @@ class DialogAIChat(QtWidgets.QDialog):
         self.ui.plainTextEdit_question.installEventFilter(self)
         self.ui.pushButton_question.pressed.connect(self.button_question_clicked)
         self.ui.plainTextEdit_question.setPlaceholderText(_('<your question>'))
-        self.ui.scrollArea_ai_output.verticalScrollBar().rangeChanged.connect(self.ai_output_bottom)
+        # self.ui.scrollArea_ai_output.verticalScrollBar().rangeChanged.connect(self.ai_output_bottom)
         # Stylesheets
         doc_font = 'font: ' + str(self.app.settings['docfontsize']) + 'pt '
         doc_font += '"' + self.app.settings['font'] + '";'
         if self.app.settings['stylesheet'] in ['dark', 'rainbow']:
             self.ai_response_style = "'" + doc_font + " color: #8FB1D8;'"     
             self.ai_user_style = "'" + doc_font + " color: #35998A; '"
-            self.ai_info_style = doc_font # "'" + doc_font + " color: #000000;'"
+            self.ai_info_style = "'" + doc_font + "'" # "'" + doc_font + " color: #000000;'"
         else:
             self.ai_response_style = "'" + doc_font + " color: #356399;'"     
             self.ai_user_style = "'" + doc_font + " color: #287368; '"
-            self.ai_info_style = doc_font # "'" + doc_font + " color: #000000;'"
+            self.ai_info_style = "'" + doc_font + "'" # "'" + doc_font + " color: #000000;'"
         self.ui.plainTextEdit_question.setStyleSheet(self.ai_user_style[1:-1])
         self.ui.ai_output.setStyleSheet(doc_font)
         self.ui.ai_output.setAutoFillBackground(True)
@@ -121,6 +123,7 @@ class DialogAIChat(QtWidgets.QDialog):
         self.ui.listWidget_chat_list.setEditTriggers(QtWidgets.QListWidget.EditTrigger.DoubleClicked | QtWidgets.QListWidget.EditTrigger.EditKeyPressed)
         self.ui.listWidget_chat_list.itemChanged.connect(self.chat_list_item_changed)
         self.ui.ai_output.linkHovered.connect(self.on_linkHovered)
+        self.ui.ai_output.linkActivated.connect(self.on_linkActivated)
         self.update_chat_window()
         
     def init_ai_chat(self, app = None):
@@ -414,7 +417,7 @@ class DialogAIChat(QtWidgets.QDialog):
                 return i
         return None     
 
-    def update_chat_window(self):
+    def update_chat_window(self, scroll_to_bottom=True):
         # question button
         if self.app.ai is None or not self.app.ai.is_busy():
             pm = QPixmap()
@@ -439,7 +442,8 @@ class DialogAIChat(QtWidgets.QDialog):
                 self.ui.ai_output.setText('') # clear chat window
                 # Show title
                 html += (f'<h1 style={self.ai_info_style}>{name}</h1>')
-                html += (f"<p style={self.ai_info_style}>Type: {analysis_type}<br />Summary: {summary}<br />Date: {date}<br />Prompt: {analysis_prompt}<br /></p>")
+                summary_br = summary.replace('\n', '<br />')
+                html += (f"<p style={self.ai_info_style}><b>{_('Type:')}</b> {analysis_type}<br /><b>{_('Summary:')}</b> {summary_br}<br /><b>{_('Date:')}</b> {date}<br /><b>{_('Prompt:')}</b> {analysis_prompt}<br /></p>")
                 # Show chat messages:
                 for msg in self.chat_msg_list:
                     if msg[2] == 'user':
@@ -454,7 +458,7 @@ class DialogAIChat(QtWidgets.QDialog):
                         author = msg[3]
                         if author is None or author == '':
                             author = 'unkown'
-                        txt = f'<b>AI ({author}):</b><br />{txt}'                        
+                        txt = f'<b>{_("AI")} ({author}):</b><br />{txt}'                        
                         html += f'<p style={self.ai_response_style}>{txt}</p>'
                     elif msg[2] == 'info':
                         txt = msg[4].replace('\n', '<br />')
@@ -479,6 +483,8 @@ class DialogAIChat(QtWidgets.QDialog):
                 self.ui.scrollArea_ai_output.ensureVisible(0, 2147483647)
                 """
             finally:
+                if scroll_to_bottom:
+                    self.ai_output_bottom()
                 self.is_updating_chat_window = False
         else:
             self.ui.ai_output.setText('')
@@ -494,7 +500,7 @@ class DialogAIChat(QtWidgets.QDialog):
             self.current_chat_idx = self.ui.listWidget_chat_list.currentRow()
             self.ui.pushButton_delete.setEnabled(self.current_chat_idx > -1)
             self.history_update_message_list()
-            self.update_chat_window()
+            self.update_chat_window(scroll_to_bottom=False)
         else: # return to previous chat
             self.ui.listWidget_chat_list.setCurrentRow(self.current_chat_idx)
         
@@ -738,6 +744,34 @@ class DialogAIChat(QtWidgets.QDialog):
                 QtWidgets.QToolTip.showText(QCursor.pos(), tooltip_txt, self.ui.ai_output)
         else:
             QtWidgets.QToolTip.hideText()
+            
+    def on_linkActivated(self, link: str):
+        if link:
+            # Open doc in coding window 
+            if link.startswith('coding:'):
+                coding_id = link[len('coding:'):]
+                cursor = self.app.conn.cursor()
+                sql = (f'SELECT fid, pos0, pos1 '
+                        f'FROM code_text '
+                        f'WHERE code_text.ctid = {coding_id}')
+                cursor.execute(sql)
+                coding = cursor.fetchone()
+                if coding is not None:
+                    self.main_window.text_coding(task='documents', 
+                                                 doc_id=int(coding[0]), 
+                                                 doc_sel_start=int(coding[1]), 
+                                                 doc_sel_end=int(coding[2]))
+                else:
+                    msg = _('Source not found')
+                    Message(self.app, _('AI Chat'), msg).exec()
+            elif link.startswith('chunk:'):
+                chunk_id = link[len('chunk:'):]
+                source_id, start, length = chunk_id.split('_')
+                end = int(start) + int(length)
+                self.main_window.text_coding(task='documents', 
+                                             doc_id=int(source_id), 
+                                             doc_sel_start=int(start), 
+                                             doc_sel_end=end)        
 
 ###### Helper:
 

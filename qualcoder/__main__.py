@@ -281,7 +281,7 @@ class App(object):
         result = self.read_previous_project_paths()
         dated_path = nowdate + "|" + new_path
         if not result:
-            with open(self.persist_path, 'w') as f:
+            with open(self.persist_path, 'w', encoding='utf-8') as f:
                 f.write(dated_path)
                 f.write(os.linesep)
             return
@@ -292,7 +292,7 @@ class App(object):
                 result.sort()
                 if len(result) > 8:
                     result = result[0:8]
-        with open(self.persist_path, 'w') as f:
+        with open(self.persist_path, 'w', encoding='utf-8') as f:
             for i, line in enumerate(result):
                 f.write(line)
                 f.write(os.linesep)
@@ -581,8 +581,17 @@ class App(object):
         """
         models = [
             {
-                'name': 'OpenAI_GPT4',
+                'name': 'OpenAI_GPT4-turbo',
                 'large_model': 'gpt-4-turbo',
+                'large_model_context_window': '131072',
+                'fast_model': 'gpt-3.5-turbo',
+                'fast_model_context_window': '32768',
+                'api_base': '',
+                'api_key': ''
+            },
+            {
+                'name': 'OpenAI_GPT4o',
+                'large_model': 'gpt-4o',
                 'large_model_context_window': '131072',
                 'fast_model': 'gpt-3.5-turbo',
                 'fast_model_context_window': '32768',
@@ -1200,7 +1209,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.menubar.setNativeMenuBar(True)
         else:
             self.ui.menubar.setNativeMenuBar(False)
-        # self.get_latest_github_release()
+        # TODO reenable in final version: self.get_latest_github_release()
         try:
             w = int(self.app.settings['mainwindow_w'])
             h = int(self.app.settings['mainwindow_h'])
@@ -1292,6 +1301,13 @@ class MainWindow(QtWidgets.QMainWindow):
         # TODO self.ui.actionText_mining.triggered.connect(self.text_mining)
         self.ui.actionSQL_statements.setShortcut('Alt+D')
         self.ui.actionSQL_statements.triggered.connect(self.report_sql)
+        # AI menu
+        self.ui.actionAI_Setup_wizard.triggered.connect(self.ai_setup_wizard)
+        self.ui.actionAI_Settings.triggered.connect(self.ai_settings)
+        self.ui.actionAI_Rebuild_internal_memory.triggered.connect(self.ai_rebuild_memory)
+        self.ui.actionAI_Edit_Project_Info.triggered.connect(self.project_memo)
+        self.ui.actionAI_Chat.triggered.connect(self.ai_go_chat)
+        self.ui.actionAI_Search_and_Coding.triggered.connect(self.ai_go_search)
         # Help menu
         self.ui.actionContents.setShortcut('Alt+H')
         self.ui.actionContents.triggered.connect(self.help)
@@ -1300,6 +1316,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionSpecial_functions.setShortcut('Alt+Z')
         self.ui.actionSpecial_functions.triggered.connect(self.special_functions)
         self.ui.actionMenu_Key_Shortcuts.triggered.connect(self.display_menu_key_shortcuts)
+        # Ensure the action_log always scrolls to the very bottom once new log entries are added:
+        self.ui.textEdit.verticalScrollBar().rangeChanged.connect(self.action_log_scroll_bottom)
 
         font = f"font: {self.app.settings['fontsize']}pt "
         font += '"' + self.app.settings['font'] + '";'
@@ -1310,8 +1328,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.tabWidget.setCurrentIndex(0)
         
         self.ai_chat()
-        # Disable ai_chat tab for now, not ready yet
-        # self.ui.tabWidget.setTabVisible(4, False)
         
     def resizeEvent(self, new_size):
         """ Update the widget size details in the app.settings variables """
@@ -1613,6 +1629,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.textEdit.append(menu_shortcuts_display)
         self.ui.textEdit.append(coding_shortcuts_display)
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
+        
+    def action_log_scroll_bottom(self):
+        """Scrolls the action log to the very bottom, malking new entries visible."""
+        self.ui.textEdit.verticalScrollBar().setValue(self.ui.textEdit.verticalScrollBar().maximum())
 
     def about(self):
         """ About dialog. """
@@ -1714,9 +1734,16 @@ class MainWindow(QtWidgets.QMainWindow):
         # self.tab_layout_helper(self.ui.tab_manage, None)
         # self.tab_layout_helper(self.ui.tab_manage, ui)
 
-    def text_coding(self):
+    def text_coding(self, task='documents', doc_id=None, doc_sel_start=0, doc_sel_end=0):
         """ Create edit and delete codes. Apply and remove codes and annotations to the
-        text in imported text files. """
+        text in imported text files. 
+        
+        task: "documents": The default, shows the tab with the text documents
+              "ai_search": Shows the tab "AI Search"
+        doc_id: If not None and task = "documents", this doument will be loaded in the coding window
+        doc_sel_start: The character-position of the beginning of the selection in the coding window
+        doc_sel_end: The end of the selection 
+        """
 
         files = self.app.get_text_filenames()
         if len(files) > 0:
@@ -1724,6 +1751,12 @@ class MainWindow(QtWidgets.QMainWindow):
             ui = DialogCodeText(self.app, self.ui.textEdit, self.ui.tab_reports)
             ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
             self.tab_layout_helper(self.ui.tab_coding, ui)
+            if task == 'documents':
+                ui.ui.tabWidget.setCurrentWidget(ui.ui.tab_docs)
+                if doc_id is not None:
+                    ui.open_doc_selection(doc_id, doc_sel_start, doc_sel_end)
+            elif task == 'ai_search':
+                ui.ui.tabWidget.setCurrentWidget(ui.ui.tab_ai)               
         else:
             msg = _("This project contains no text files.")
             Message(self.app, _('No text files'), msg).exec()
@@ -1789,7 +1822,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def ai_chat(self):
         """ Add AI chat to tab"""
 
-        self.ai_chat_window = DialogAIChat(self.app, self.ui.textEdit)
+        self.ai_chat_window = DialogAIChat(self.app, self.ui.textEdit, self)
         self.tab_layout_helper(self.ui.tab_ai_chat, self.ai_chat_window)
 
     def tab_layout_helper(self, tab_widget, ui):
@@ -1866,6 +1899,8 @@ class MainWindow(QtWidgets.QMainWindow):
             Message(self.app, _("Project creation"), _("REFI-QDA Project not successfully created"), "warning").exec()
             return
         RefiImport(self.app, self.ui.textEdit, "qdpx")
+        if self.app.settings['ai_enable'] == 'True':
+            self.app.ai.init_llm(rebuild_vectorstore=True)
         self.project_summary_report()
 
     def rqda_project_import(self):
@@ -2088,16 +2123,19 @@ class MainWindow(QtWidgets.QMainWindow):
                 contents.itemAt(i).widget().close()
                 contents.itemAt(i).widget().setParent(None)
 
-    def change_settings(self):
+    def change_settings(self, section=None):
         """ Change default settings - the coder name, font, font size.
         Language, Backup options.
         As this dialog affects all others if the coder name changes, on exit of the dialog,
-        all other opened dialogs are destroyed."""
+        all other opened dialogs are destroyed.
+        
+        section = 'AI' moves to the AI settings at the bottom of the dialog
+        """
 
         current_coder = self.app.settings['codername']
         current_ai_enable = self.app.settings['ai_enable']
         current_ai_model_index = self.app.settings['ai_model_index']
-        ui = DialogSettings(self.app)
+        ui = DialogSettings(self.app, section=section)
         ret = ui.exec()
         if ret == QtWidgets.QDialog.DialogCode.Rejected:  # Dialog has been canceled
             return
@@ -2767,6 +2805,54 @@ class MainWindow(QtWidgets.QMainWindow):
             except Exception as err:
                 print(str(err))
                 logger.warning(str(err))
+
+    # AI Menu Actions
+    def ai_setup_wizard(self):
+        """Action triggered by AI Setup Wizard menu item."""
+        print('AI wizard')
+
+    def ai_settings(self):
+        """Action triggered by AI Settings menu item."""
+        self.change_settings(section='AI')
+
+    def ai_rebuild_memory(self):
+        """Action triggered by AI Rebuild Internal Memory menu item."""
+        if self.app.settings['ai_enable'] != 'True':
+            msg = _('Please enable the AI first and set it up properly.')
+            Message(self.app, _('Rebuild AI Memory'), msg).exec() 
+            return
+        if not self.app.ai.is_ready():
+            msg = _('The AI is busy or not set up properly.')
+            Message(self.app, _('Rebuild AI Memory'), msg).exec()
+            return 
+        
+        msg = _('This will re-read all of your empirical documents, which may take some time. Do you want to continue?')
+        mb = QtWidgets.QMessageBox(self)
+        mb.setWindowTitle(_('Rebuild AI Memory'))
+        mb.setText(msg)
+        mb.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Ok|
+                            QtWidgets.QMessageBox.StandardButton.Abort)
+        mb.setStyleSheet('* {font-size: ' + str(self.app.settings['fontsize']) + 'pt}')            
+        if mb.exec() == QtWidgets.QMessageBox.StandardButton.Ok: 
+            self.ui.tabWidget.setCurrentIndex(0) # show action log
+            self.app.ai.sources_vectorstore.init_vectorstore(rebuild=True)
+
+    def ai_go_chat(self):
+        """Action triggered by AI Chat menu item."""
+        if self.app.settings['ai_enable'] != 'True':
+            msg = _('Please enable the AI first and set it up properly.')
+            Message(self.app, _('Rebuild AI Memory'), msg).exec() 
+            return
+        self.ui.tabWidget.setCurrentWidget(self.ui.tab_ai_chat) 
+
+    def ai_go_search(self):
+        """Action triggered by AI Search and Coding menu item."""
+        if self.app.settings['ai_enable'] != 'True':
+            msg = _('Please enable the AI first and set it up properly.')
+            Message(self.app, _('Rebuild AI Memory'), msg).exec() 
+            return
+        self.text_coding(task='ai_search')
+        
 
     def get_latest_github_release(self):
         """ Get latest github release.
