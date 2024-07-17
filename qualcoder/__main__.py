@@ -163,7 +163,7 @@ class ProjectLockHeartbeatWorker(QtCore.QObject):
             if time.time() - last_heartbeat >= lock_heartbeat_interval:
                 last_heartbeat = time.time()
                 try:
-                    with open(self.lock_file_path, 'w') as lock_file:
+                    with open(self.lock_file_path, 'w', encoding='utf-8') as lock_file:
                         lock_file.write(f"{getpass.getuser()}\n{str(time.time())}")
                     self.lost_connection = False
                 except Exception as e_:  # TODO Needs specific exception, printing to find out what is needed
@@ -272,7 +272,7 @@ class App(object):
         result = self.read_previous_project_paths()
         dated_path = nowdate + "|" + new_path
         if not result:
-            with open(self.persist_path, 'w') as f:
+            with open(self.persist_path, 'w', encoding='utf-8') as f:
                 f.write(dated_path)
                 f.write(os.linesep)
             return
@@ -283,7 +283,7 @@ class App(object):
                 result.sort()
                 if len(result) > 8:
                     result = result[0:8]
-        with open(self.persist_path, 'w') as f:
+        with open(self.persist_path, 'w', encoding='utf-8') as f:
             for i, line in enumerate(result):
                 f.write(line)
                 f.write(os.linesep)
@@ -1923,7 +1923,7 @@ class MainWindow(QtWidgets.QMainWindow):
             return False
         try:
             mode = 'w' if break_existing_lock else 'x'
-            with open(self.lock_file_path, mode) as lock_file:
+            with open(self.lock_file_path, mode, encoding='utf-8') as lock_file:
                 lock_file.write(f"{getpass.getuser()}\n{str(time.time())}")
             return True
         except FileExistsError:
@@ -2014,7 +2014,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.lock_file_path = os.path.normpath(proj_path + '/project_in_use.lock')
             if not self.create_lock_file():
                 # Lock file already exists. Checking if it has timed out or not.
-                with open(self.lock_file_path, 'r') as lock_file:
+                with open(self.lock_file_path, 'r', encoding='utf-8') as lock_file:
                     try:
                         lock_user = lock_file.readline()[:-1]
                         lock_timestamp = float(lock_file.readline())
