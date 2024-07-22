@@ -322,9 +322,7 @@ python3 get-pip.py
 5) Install Python dependency modules using `pip`:
 
 ```sh
-pip3 install chardet ebooklib openpyxl pandas pillow ply pdfminer.six plotly pydub pyqt6 python-vlc rispy six SpeechRecognition xmlschema charset-normalizer
-
-pip3 install langchain langchain[llms] chromadb sentence-transformers fuzzysearch pydantic
+pip3 install chardet ebooklib openpyxl pandas pillow ply pdfminer.six plotly pydub pyqt6 python-vlc rispy six SpeechRecognition xmlschema
 ```
 
 Be sure that you are in the QualCoder-ai_integration directory before doing Step 6.
