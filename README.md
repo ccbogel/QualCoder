@@ -15,7 +15,7 @@ This AI enhanced version was created by [Kai Dröge](https://www.hslu.ch/de-ch/h
 It is planned to integrate my additions into the main version of QualCoder soon. Until then, you can use the AI-enhanced version alongside the regular QualCoder. Both apps will not interfere with each other.
 
 Special thanks to these people for their feedback and support in improving the first version of QualCoder AI:<br />
-> Tom Meyer (Univ. of Bochum), Merle Koch, Ole Deitmer & Wenzel Urban (Univ. of Jena), Isabel Steinhardt (Univ. of Paderborn), Christian Schneijderberg (Univ. of Kassel), Yves Jeanrenaud (Univ. of Munich) as well as Alexandre Strube (Forschungszentrum Jülich), the developer behind Blablador, and Colin Curtain (Univ. of Tasmania), the developer of QualCoder. 
+> Tom Meyer (Univ. of Bochum), Merle Koch, Ole Deitmer & Wenzel Urban (Univ. of Jena), Andrzej Strzałkowski (Polish Academy of Sciences), Isabel Steinhardt (Univ. of Paderborn), Christian Schneijderberg (Univ. of Kassel), Yves Jeanrenaud (Univ. of Munich) as well as Alexandre Strube (Forschungszentrum Jülich), the developer behind Blablador, and Colin Curtain (Univ. of Tasmania), the developer of QualCoder. 
 
 ### Functionality
 
@@ -30,19 +30,19 @@ In addition to what's shown in the video, QualCoder AI now also includes an **AI
 ### Installation
 
 **Windows:**
-- Download "QualCoderAI_WINDOWS_setup.exe" from here: https://drive.switch.ch/index.php/s/cYJKPA3JV3fJqDc (switch drive is a secure data sharing platform for Swiss universities)
+- Download "QualCoderAI_3_6_1b_WINDOWS.exe" from here: https://drive.switch.ch/index.php/s/Piozbkwkx90uxkK (MD5-Hash: 89e2ab142c202b35a0880905e024322c). Switch drive is a secure data sharing platform for Swiss universities.
 - If you get a warning that "Windows protected your PC" and the app comes from an "Unknown publisher", you have to trust us and click "Run anyway"
 
 **MacOS:**
 - Installer made by [gernophil](https://github.com/gernophil), thank you very much!
 - If you have trouble getting QualCoder to run, you might need to update your operating system to the latest available version.   
 - *Installation on M1/M2/M3-based Macs:*
-    - Download "QualCoderAI_MAC_arm64.dmg" from here: https://drive.switch.ch/index.php/s/cYJKPA3JV3fJqDc (switch drive is a secure data sharing platform for Swiss universities)
+    - Download "QualCoderAI_MAC_arm64.dmg" from here: https://drive.switch.ch/index.php/s/Piozbkwkx90uxkK (switch drive is a secure data sharing platform for Swiss universities)
     - Double-click on the dmg-file, then drag QualCoder AI into the link to your applications folder.
     - Start QualCoder AI by double-clicking the app within your applications folder.
 - *Installation on Intel-based Macs:*</br>
 Note: Unfortunately, we are currently not able to sign the x86_64 package correctly, so you will get a warning that QualCoder AI is from an unregistered developer. You have to manually allow QualCoder AI to be executed, if your Gatekeeper is active. Follow these steps:
-    - Download "QualCoderAI_MAC_x86_64_unsigned.dmg" from here: https://drive.switch.ch/index.php/s/cYJKPA3JV3fJqDc (switch drive is a secure data sharing platform for Swiss universities)
+    - Download "QualCoderAI_MAC_x86_64_unsigned.dmg" from here: https://drive.switch.ch/index.php/s/Piozbkwkx90uxkK (switch drive is a secure data sharing platform for Swiss universities)
     - Double-click the dmg-file.
     - Drag QualCoder AI into the link to your applications folder
     - Start QualCoder AI by double-clicking the app within your applications folder. You will get an error that QualCoder AI is from an unregistered developer.
