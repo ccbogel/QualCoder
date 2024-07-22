@@ -201,7 +201,11 @@ class AiLLM():
             api_base = curr_model['api_base']
             api_key = curr_model['api_key']
             if api_key == '':
-                raise ValueError("The API-key for the AI model is empty.")
+                msg = "Cannot start the AI, the API-key for the AI model is empty. The AI will be disabled."
+                Message(self.app, _('AI API key'), msg).exec()
+                self.app.settings['ai_enable'] = 'False'
+                self.parent_text_edit.append(_('AI: No API key available, AI is disabled.'))
+                return
             elif api_key == 'None':
                 api_key = ''
             self.large_llm = ChatOpenAI(model=large_model, 

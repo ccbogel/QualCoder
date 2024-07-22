@@ -6,7 +6,16 @@
   <thead>
     <tr>
       <td align="left">
-        :information_source: Note: This is an experimental version of QualCoder with AI-enhanced functionality (using GPT-4). Watch the video below if you want to learn more.
+        :information_source: Note: This is an experimental version of QualCoder with AI-enhanced functionality. Watch the video below if you want to learn more.
+        
+        Version 3.6.1 beta (July 2024) is a major rework with the following additions:
+        - **AI Chat:** Let the AI analyze codings or any other topic in your data and discuss the results (with exact sources, of course)
+        - **Prompt Editing:** You can now view and edit all the prompts that QualCoder uses under the hood to instruct the AI on how to analyze your data. You can also define your own prompts, targeted at your particular methods and research questions. This returns methodological control back to us as researchers.
+        - **Alternative AI models:** QualCoder can now use other AI models besides the ones from OpenAI. In particular, we gained access to a free service called ["Blablador"](https://helmholtz-blablador.fz-juelich.de), offered by the German academic research agency Helmholtz Society. This service runs open-source models (Mixtral 8x7b being the largest at the moment) and is very privacy-friendly, storing no data at all. The quality of the output is usable for simple questions, but not yet on par with GPT-4 from OpenAI.
+        - The **AI Search** (see video below for a demonstration) has been greatly improved. It now also allows selecting between different prompts/different types of search.
+
+        Special thanks to these people for their feedback and support in impoving QualCoder AI:
+        Tom Meyer (Univ. of Bochum), Merle Koch, Ole Deitmer & Wenzel Urban (Univ. of Jena), Isabel Steinhardt (Univ. of Paderborn), Christian Schneijderberg (Univ. of Kassel) as well as Alexandre Strube (Forschungszentrum Jülich), the developer behind Blablador, and Colin Curtain (Univ. of Tasmania), the developer of QualCoder. 
       </td>
     </tr>
   </thead>
@@ -15,14 +24,19 @@
     <tr>
       <td>      
 
-This version was created by [Kai Dröge](https://www.hslu.ch/de-ch/hochschule-luzern/ueber-uns/personensuche/profile/?pid=823), based on QualCoder 3.5
+This AI enhanced version was created by [Kai Dröge](https://www.hslu.ch/de-ch/hochschule-luzern/ueber-uns/personensuche/profile/?pid=823), based on QualCoder 3.5
 
-I hope that my additions will be integrated in the main version at some point, but this may take a while. Until then, you can use the AI-enhanced version alongside the regular QualCoder. Both apps will not interfere with each other.
+It is planned to integrate my additions in the main version of QualCoder soon. Until then, you can use the AI-enhanced version alongside the regular QualCoder. Both apps will not interfere with each other.
 
 ### Functionality
 
 Watch my [video on YouTube](https://www.youtube.com/watch?v=FrQyTOTJhCc):</br>
 [![Horizontal Coding: AI-Based Qualitative Data Analysis in QualCoder, Free & Open Source](https://img.youtube.com/vi/FrQyTOTJhCc/hqdefault.jpg)](https://www.youtube.com/watch?v=FrQyTOTJhCc)
+
+In addition to what's shown in the video, QualCoder AI now also includes an **AI Chat**, offering three forms of dicussions with the AI:
+- Code Chat: Let the AI analyze the data in the codings for a particular code and chat about the results. The sources from your empirical data are referenced.
+- Topic Chat: Let the AI analyze any topic in you empirical data (independend of coding). Again, sources are referenced and you can discuss the results with the AI.
+- General Chat: Ask the AI anything, not related to your data. Basically a build-in ChatGPT.   
 
 ### Installation
 
@@ -50,20 +64,26 @@ Linux:
 - Follow the [installation instructions below](#installation-1) (untested)
 
 ### Setup:
-- QualCoder AI needs some additional setup to run it's AI-enhanced functions. When you start the app for the first time, a wizard will pop up and lead you through the setup process. These are the main steps:
-  - You'll need an API key from OpenAI. Go to https://platform.openai.com/, create an account and click on 'API keys' in the menu on the very left. 
-  - QualCoder AI will automatically download some additional components which are needed to analyze your documents locally (this model: https://huggingface.co/intfloat/multilingual-e5-large). This will take a while, please be patient.
-- If you want to enable/disable the AI functionality later or change the OpenAI API key, go to Project > Settings and scroll to the bottom.
+- QualCoder AI needs some additional setup to run it's AI-enhanced functions. When you start the app for the first time, a wizard will pop up and lead you through the setup process. You can aslo start this later via the menu by clicking on AI > Setup Wizard. These are the main steps:
+  1) You'll have to enable the AI and select which model you want to use. 
+    - If you opt for one of the variants of GPT-4, you'll need an API key from OpenAI. Go to https://platform.openai.com/ and create an account. Then go to your personal dashboard, click on 'API keys' in the menu on the left, create a key and enter it in the setting dialog of QualCoder. In order to use these models, you'll also need to purchase 'credits' from OpenAI. 5$ seems to be the minimal amount you can pay, which will go a long way. The cost of a single request to the AI is usually in the order of a few cents only.  
+    - If you want to use Blablador, you'll need an API-key from the Helmholtz Society. Blablador is free to use. You can sign up with you university account or Github, Google, ORCID. Follow the instructions here: (https://sdlaml.pages.jsc.fz-juelich.de/ai/guides/blablador_api_access/)[https://sdlaml.pages.jsc.fz-juelich.de/ai/guides/blablador_api_access/].
+    - You can switch between the different models at any time by using the Settings menu (AI > Settings).
+  2) On the first start of the AI, QualCoder will automatically download some additional components which are needed to analyze your documents locally (this model: https://huggingface.co/intfloat/multilingual-e5-large). This will take a while, please be patient.
+- If you want to enable/disable the AI functionality later or change settings, click on AI > Settings.
 
 ### Usage:
 - You can download an example project here: https://drive.switch.ch/index.php/s/cYJKPA3JV3fJqDc?path=%2Fexample_project. This is the same data that I show in the video – a collection of interviews with Irish women about their experiences during the Second World War. It was created by Mary Muldowney and thankfully published under a creative commons license: https://repository.dri.ie/catalog/j38607880
 - If you want to use your own data instead, go to Project > Create New Project and select a filename. Then go to Manage > Manage files and click on the second button from the left in the toolbar (arrow with document) to add a new document. 
-- The AI-based functionality in QualCoder is multilingual and supports up to 100 languages.
-- Once you added a new document, the AI will read it in the background and memorize the contents in it's local database. This happens on your machine; no data is sent to OpenAI at this point. The memorization may take a few minutes, depending on the length of the document. You cannot use the AI-based functionality until the memorization of all documents is completed. (See the tab "Action Log" for progress messages.)
-- Once the AI is ready, you can go to Coding > Code text, select the tab "AI Search" and start the search. If you haven't defined any codes yet, you can use the "Free search".
+- It is highly recommended to add a project memo with a short summary about your research topic, the questions and objectives, the methodology as well as the participants of your study and the types of data collected. This will give the AI helpful context information for the analysis. Go to Project > Project Memo to enter this information.
+- The AI-based functionality in QualCoder is multilingual and supports up to 100 languages. The user interface, however, is only available in English, French, German, Italian, Portuguese and Spanish. 
+- Once you added a new empirical document to you project, a local AI will read it in the background and memorize the contents in it's database. This happens only on your machine; no data is send to the cloud at this point. The memorization may take a few minutes, depending on the length of the document. You cannot use the AI-based functionality until the memorization of all documents is completed. (See the tab "Action Log" for progress messages.)
+- Once the AI is ready, you can discuss your data in the "AI Chat" window. Click on "New" in the bottom left corner.
+- To start the AI based search and coding, go to Coding > Code text, select the tab "AI Search" and click on "<Start AI Search>". If you haven't defined any codes yet, you can use the "Free search".
 - Search tips: 
   - Don’t use too generic codes or search texts (like "gender” or "work") since this will lead to very generic results.
-  - You can also use a memo attached to the code to define your code a little better and explain it to the AI. Make sure to also select the option “Send memo to AI” in the AI Search window. 
+  - You can also use a memo attached to the code to define your code a little better and explain it to the AI. Make sure to also select the option “Send memo to AI” in the AI Search window.
+ 
 
 **For general information about the usage of QualCoder visit the official Wiki: https://github.com/ccbogel/QualCoder/wiki**
       </td>

@@ -86,6 +86,21 @@ system_prompts = """
     your interpretation must be firmly grounded in the empirical data provided,
     avoiding any speculation. Do not make any assumptions which are not supported by
     the data. If uncertain, include the data rather than exclude it.'
+    
+- name: Content Analysis with Coding Rules
+  type: search
+  description: >
+    This prompt is made for content analysis. It instructs the AI to follow
+    the coding rules outlined in the code memo. In order for this to work properly,
+    you must ensure that\n
+    - each code has a memo with the corresponding rules and\n
+    - the option "Send memo to AI" is selected.
+  text: >
+    You must strictly follow the coding rules which are outlined in the code memo.
+    Carefully verify that the empirical data, or any part of it, accurately fits these
+    coding rules. Do not add any context that is not present in the data. Do not make
+    any assumptions which are not supported by the data. Your interpretation must
+    be solidly based on the empirical data provided to you, avoiding any speculation.
 
 - name: Code Summary
   type: code_analysis
@@ -135,6 +150,25 @@ system_prompts = """
     the insights gathered from the analysis. Base your analysis firmly on the empirical data given
     to you, but ignore data which is unrelated to the topic. Also look at the details and 
     interpret them carefully. Don''t make any assumptions which are not backed up by the data.'
+    
+- name: Analyze Unexpected
+  type: topic_analysis
+  description: 'Proving the not-so-obvious: This prompt will try to extract more unexpected
+    results.'
+  text: 'Take the given topic and description and briefly explain what empirical results would be 
+    commonly expected based on your own knowledge about the phenomenon in question. Then look
+    at the actual empirical data given to you and pick out relevant aspects which are most
+    surprising and unexpected given your previously outlined expectations.'
+
+- name: Analyze Differences
+  type: topic_analysis
+  description: 'This prompt will especially look for differences between the cases,
+    documents, etc. in the data.'
+  text: 'Use the given topic and description to analyze the given empirical data, but looking 
+    especially at differences between cases or documents in the data. If you find relevant
+    differences, point these out clearly. If you don''t find real differences, that''s
+    also a valid result. Base your analysis firmly on the empirical data. Don''t make
+    any assumptions which are not backed up by the data.'
 """
 
 # Define different prompt types, depending on the task.  
