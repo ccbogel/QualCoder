@@ -216,6 +216,8 @@
     <addaction name="actionAI_Settings"/>
     <addaction name="actionAI_Rebuild_internal_memory"/>
     <addaction name="actionAI_Edit_Project_Info"/>
+    <addaction name="actionAI_Prompts"/>
+    <addaction name="separator"/>
     <addaction name="actionAI_Chat"/>
     <addaction name="actionAI_Search_and_Coding"/>
    </widget>
@@ -535,7 +537,7 @@
   </action>
   <action name="actionAI_Edit_Project_Info">
    <property name="text">
-    <string>Edit Project Info</string>
+    <string>Project Info</string>
    </property>
   </action>
   <action name="actionAI_Chat">
@@ -551,6 +553,14 @@
   <action name="actionAI_Settings">
    <property name="text">
     <string>Settings</string>
+   </property>
+   <property name="toolTip">
+    <string>AI related Settings</string>
+   </property>
+  </action>
+  <action name="actionAI_Prompts">
+   <property name="text">
+    <string>Prompts</string>
    </property>
   </action>
  </widget>

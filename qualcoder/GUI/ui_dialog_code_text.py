@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'GUI_UIs\ui_dialog_code_text.ui'
+# Form implementation generated from reading ui file 'c:\Users\kai\Documents\Programmierung\2023QualCoder\GUI_UIs\ui_dialog_code_text.ui'
 #
 # Created by: PyQt6 UI code generator 6.4.2
 #
@@ -230,6 +230,7 @@ class Ui_Dialog_code_text(object):
         self.tab_ai.setMinimumSize(QtCore.QSize(0, 0))
         self.tab_ai.setObjectName("tab_ai")
         self.verticalLayout_3 = QtWidgets.QVBoxLayout(self.tab_ai)
+        self.verticalLayout_3.setSpacing(0)
         self.verticalLayout_3.setObjectName("verticalLayout_3")
         self.pushButton_ai_search = QtWidgets.QPushButton(parent=self.tab_ai)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Policy.Preferred, QtWidgets.QSizePolicy.Policy.Fixed)
@@ -242,11 +243,27 @@ class Ui_Dialog_code_text(object):
         self.pushButton_ai_search.setFlat(False)
         self.pushButton_ai_search.setObjectName("pushButton_ai_search")
         self.verticalLayout_3.addWidget(self.pushButton_ai_search)
+        spacerItem = QtWidgets.QSpacerItem(12, 6, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
+        self.verticalLayout_3.addItem(spacerItem)
         self.listWidget_ai = QtWidgets.QListWidget(parent=self.tab_ai)
         self.listWidget_ai.setMinimumSize(QtCore.QSize(0, 20))
         self.listWidget_ai.setToolTipDuration(60000)
         self.listWidget_ai.setObjectName("listWidget_ai")
         self.verticalLayout_3.addWidget(self.listWidget_ai)
+        self.ai_progressBar = QtWidgets.QProgressBar(parent=self.tab_ai)
+        self.ai_progressBar.setEnabled(True)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.ai_progressBar.sizePolicy().hasHeightForWidth())
+        self.ai_progressBar.setSizePolicy(sizePolicy)
+        self.ai_progressBar.setMinimumSize(QtCore.QSize(0, 6))
+        self.ai_progressBar.setMaximumSize(QtCore.QSize(16777215, 6))
+        self.ai_progressBar.setMaximum(0)
+        self.ai_progressBar.setProperty("value", 0)
+        self.ai_progressBar.setTextVisible(False)
+        self.ai_progressBar.setObjectName("ai_progressBar")
+        self.verticalLayout_3.addWidget(self.ai_progressBar)
         self.tabWidget.addTab(self.tab_ai, "")
         self.treeWidget = QtWidgets.QTreeWidget(parent=self.leftsplitter)
         self.treeWidget.setObjectName("treeWidget")
@@ -317,7 +334,7 @@ class Ui_Dialog_code_text(object):
         self.verticalLayout.addWidget(self.splitter)
 
         self.retranslateUi(Dialog_code_text)
-        self.tabWidget.setCurrentIndex(0)
+        self.tabWidget.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(Dialog_code_text)
         Dialog_code_text.setTabOrder(self.pushButton_annotate, self.pushButton_show_annotations)
         Dialog_code_text.setTabOrder(self.pushButton_show_annotations, self.pushButton_coding_memo)

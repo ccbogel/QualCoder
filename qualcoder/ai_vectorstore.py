@@ -46,8 +46,8 @@ from PyQt6 import QtCore
 from .ai_async_worker import Worker, AiException
 
 # Global reference for the imported module
-global sentence_transformers_module
-sentence_transformers_module = None
+#global sentence_transformers_module
+#sentence_transformers_module = None
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -156,7 +156,7 @@ class AiVectorstore():
         if not self.embedding_model_is_cached():
             model_download_msg = _('\
 Since you are using the AI integration for the first time, \
-qualcoder needs to download and install some \
+QualCoder needs to download and install some \
 additional components. \n\
 \n\
 This will download about 2.5 GB of data. Do you \n\
@@ -174,7 +174,7 @@ want to continue?\
                     minimum=0, maximum=100, 
                     parent=parent_window)
                 pd.setWindowModality(QtCore.Qt.WindowModality.WindowModal)
-                pd.setStyleSheet('* {font-size: ' + str(self.settings['fontsize']) + 'pt}')
+                pd.setStyleSheet('* {font-size: ' + str(self.app.settings['fontsize']) + 'pt}')
                 pd.setWindowTitle(_('Download AI components'))
                 pd.setAutoClose(False)
                 pd.show()
@@ -204,7 +204,7 @@ want to continue?\
                         time.sleep(0.01)
                 pd.close()
             else:
-                self.settings['ai_enable'] = 'False'
+                self.app.settings['ai_enable'] = 'False'
                 return False
         return True
         
@@ -213,7 +213,7 @@ want to continue?\
         and in the local cache."""
         return os.path.exists(os.path.join(self.model_folder, self.model_files[-1]))
     
-    def _download_embedding_model(self, progress_callback=None):
+    def _download_embedding_model(self, signals=None): # progress_callback=None, signals=None):
         """Downloads the embedding model to the local cache if necessary.
 
         Args:
@@ -249,12 +249,16 @@ want to continue?\
                             f.write(chunk)
                             i += 1
                             msg = f'{os.path.basename(local_path)}: {round(i/expected_size * 100)}%'
-                            if progress_callback != None:
-                                progress_callback.emit(msg)
+                            if signals is not None and signals.progress is not None:
+                                signals.progress.emit(msg)
+                            #if progress_callback != None:
+                            #    progress_callback.emit(msg)
                             print(msg, '                           ', end='\r', flush=True)
                 msg = f'{os.path.basename(local_path)}: 100%'
-                if progress_callback != None:
-                    progress_callback.emit(msg)
+                if signals is not None and signals.progress is not None:
+                    signals.progress.emit(msg)
+                #if progress_callback != None:
+                #    progress_callback.emit(msg)
                 print(msg, '                           ', end='\r', flush=True)
                 if os.path.exists(local_path):
                     os.remove(local_path)
@@ -294,7 +298,7 @@ want to continue?\
         #global sentence_transformers_module
         #sentence_transformers_module = importlib.import_module('sentence_transformers')
         if self.app.project_path != '' and os.path.exists(self.app.project_path):
-            db_path = self.app.project_path + '/vectorstore'
+            db_path = os.path.join(self.app.project_path, 'ai_data', 'vectorstore')
             if self.embedding_function is None:
                 self.embedding_function = E5SentenceTransformerEmbeddings(model_name=self.model_folder)
             collection_metadata = {"hnsw:space": "l2"} # {"hnsw:space": "cosine"} -> defines the distance function, cosine vs. Squared L2 (default). In my limited tests, l2 gives slightly better results, although cosine is usually recommended 
@@ -325,6 +329,7 @@ want to continue?\
         
         if self.app.project_name == '': # no project open
             self.close()
+            self.parent_text_edit.append(_('AI: Finished loading.'))
         else: 
             #worker = Worker(self._import_sentence_transformers)  
             #worker.signals.finished.connect(self.open_db)
@@ -332,9 +337,9 @@ want to continue?\
             #self.threadpool.start(worker)
             self.open_db(rebuild)
             
-    def _import_sentence_transformers(self, signals):
-        global sentence_transformers_module
-        sentence_transformers_module = importlib.import_module('sentence_transformers')
+    #def _import_sentence_transformers(self, signals):
+    #    global sentence_transformers_module
+    #    sentence_transformers_module = importlib.import_module('sentence_transformers')
 
     def open_db(self, rebuild=False):
         #global sentence_transformers_module
@@ -387,7 +392,7 @@ want to continue?\
         if text != '': # can only add embeddings if text is not empty
             #if progress_callback != None:
             #    progress_callback.emit(_('AI: Adding document to my memory: ') + f'"{name}"')
-            if signals.progress is not None:
+            if signals is not None and signals.progress is not None:
                 signals.progress.emit(_('AI: Adding document to internal memory: ') + f'"{name}"')
 
             metadata = {'id': id, 'name': name}

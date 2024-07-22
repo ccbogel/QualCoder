@@ -5,7 +5,13 @@ block_cipher = None
 
 datas = collect_data_files('langchain')
 datas += collect_data_files('langchain_community')
+datas += collect_data_files('langchain_core')
+datas += collect_data_files('langchain_openai')
+datas += collect_data_files('langchain_text_splitters')
+datas += collect_data_files('langchain_chroma')
 datas += collect_data_files('chromadb')
+datas += collect_data_files('transformers', include_py_files=True)
+# datas += collect_data_files('sentence_transformers')
 datas += copy_metadata('tqdm')
 datas += copy_metadata('regex')
 datas += copy_metadata('requests')
@@ -18,6 +24,7 @@ datas += copy_metadata('pyyaml')
 datas += copy_metadata('torch')
 datas += copy_metadata('tokenizers')
 datas += copy_metadata('opentelemetry-sdk')
+# datas += copy_metadata('transformers')
 datas += [('LICENSE.txt', '.')]
 
 hiddenimports = collect_submodules('chromadb')
@@ -25,7 +32,10 @@ hiddenimports += collect_submodules('chromadb.ingest.impl')
 hiddenimports += collect_submodules('chromadb.segment.impl')
 hiddenimports += collect_submodules('chromadb.segment.impl.manager')
 hiddenimports += collect_submodules('chromadb.segment.impl.metadata')
-hiddenimports += collect_submodules('langchain_community.vectorstores.chroma')
+hiddenimports += collect_submodules('transformers')
+# hiddenimports += collect_submodules('langchain_community.vectorstores.chroma')
+# hiddenimports += 'sentence_transformers'
+# hiddenimports += collect_submodules('sentence_transformers')
 
 a = Analysis(
     ['qualcoder/__main__.py'],

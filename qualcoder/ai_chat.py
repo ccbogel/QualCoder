@@ -99,6 +99,7 @@ class DialogAIChat(QtWidgets.QDialog):
         self.setStyleSheet(self.font)        
         self.ui.plainTextEdit_question.installEventFilter(self)
         self.ui.pushButton_question.pressed.connect(self.button_question_clicked)
+        self.ui.progressBar_ai.setMaximum(100)
         self.ui.plainTextEdit_question.setPlaceholderText(_('<your question>'))
         # self.ui.scrollArea_ai_output.verticalScrollBar().rangeChanged.connect(self.ai_output_bottom)
         # Stylesheets
@@ -124,6 +125,9 @@ class DialogAIChat(QtWidgets.QDialog):
         self.ui.listWidget_chat_list.itemChanged.connect(self.chat_list_item_changed)
         self.ui.ai_output.linkHovered.connect(self.on_linkHovered)
         self.ui.ai_output.linkActivated.connect(self.on_linkActivated)
+        self.ai_busy_timer = QtCore.QTimer(self)
+        self.ai_busy_timer.timeout.connect(self.update_ai_busy)
+        self.ai_busy_timer.start(100)
         self.update_chat_window()
         
     def init_ai_chat(self, app = None):
@@ -205,12 +209,21 @@ class DialogAIChat(QtWidgets.QDialog):
         self.chat_list_selection_changed()
 
     def new_general_chat(self, name, summary):
+        if self.app.settings['ai_enable'] != 'True':
+            msg = _('Please enable the AI first and set it up properly.')
+            Message(self.app, _('AI not enabled'), msg, "warning").exec()
+            return
+
         self.new_chat(name, 'general chat', summary, '')
         self.process_message('system', self.app.ai.get_default_system_prompt())
         self.update_chat_window()  
              
     def new_code_chat(self):
         """chat about codings"""
+        if self.app.settings['ai_enable'] != 'True':
+            msg = _('Please enable the AI first and set it up properly.')
+            Message(self.app, _('AI not enabled'), msg, "warning").exec()
+            return
        
         ui = DialogAiSearch(self.app, 'code_analysis')
         ret = ui.exec()
@@ -292,6 +305,10 @@ class DialogAIChat(QtWidgets.QDialog):
  
     def new_topic_chat(self):
         """chat about a free topic in the data"""
+        if self.app.settings['ai_enable'] != 'True':
+            msg = _('Please enable the AI first and set it up properly.')
+            Message(self.app, _('AI not enabled'), msg, "warning").exec()
+            return
        
         ui = DialogAiSearch(self.app, 'topic_analysis')
         ret = ui.exec()
@@ -347,7 +364,7 @@ class DialogAIChat(QtWidgets.QDialog):
             self.process_message('info', msg)
             self.update_chat_window()  
             return
-        print(chunks)
+        # print(chunks)
         self.ai_semantic_search_chunks = chunks                
         topic_analysis_max_chunks = 30
         msg = _('Found ') + str(len(chunks))  + _(' chunks of data which might be related to the topic. Analyzing the first ') + str(topic_analysis_max_chunks) + _(' chunks closer.')
@@ -415,21 +432,25 @@ class DialogAIChat(QtWidgets.QDialog):
         for i in range(len(self.chat_list)):
             if self.chat_list[i][0] == chat_id:
                 return i
-        return None     
-
-    def update_chat_window(self, scroll_to_bottom=True):
-        # question button
+        return None    
+    
+    def update_ai_busy(self):
+        # update question button + progress bar
         if self.app.ai is None or not self.app.ai.is_busy():
             pm = QPixmap()
             pm.loadFromData(QtCore.QByteArray.fromBase64(ai_question), "png")
             self.ui.pushButton_question.setIcon(QIcon(pm.scaled(32, 32, transformMode=Qt.TransformationMode.SmoothTransformation)))            
             self.ui.pushButton_question.setToolTip(_('Send your question to the AI'))
+            self.ui.progressBar_ai.setMaximum(100) # stop animation
         else:
             pm = QPixmap()
             pm.loadFromData(QtCore.QByteArray.fromBase64(ai_stop), "png")
             self.ui.pushButton_question.setIcon(QIcon(pm.scaled(32, 32, transformMode=Qt.TransformationMode.SmoothTransformation)))
             self.ui.pushButton_question.setToolTip(_('Cancel AI generation'))
-                        
+            self.ui.progressBar_ai.setMaximum(0) # start animation         
+
+    def update_chat_window(self, scroll_to_bottom=True):
+        # self.update_ai_busy()   
         # load current chat into self.ai_output
         if self.current_chat_idx > -1:
             self.is_updating_chat_window = True
@@ -597,7 +618,11 @@ class DialogAIChat(QtWidgets.QDialog):
             self.send_user_question()
                     
     def send_user_question(self):
-        if self.app.ai.is_busy():
+        if self.app.settings['ai_enable'] != 'True':
+            msg = _('Please enable the AI first and set it up properly.')
+            Message(self.app, _('AI not enabled'), msg, "warning").exec()
+            return
+        elif self.app.ai.is_busy():
             msg = _('The AI is busy generating a response. Click on the button on the right to stop.')
             Message(self.app, _('AI busy'), msg, "warning").exec()
             return

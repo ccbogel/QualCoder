@@ -138,6 +138,7 @@ class AiLLM():
     and the LLM (large language model, GPT-4 in this case)."""
     app = None
     parent_text_edit = None
+    main_window = None
     threadpool: QtCore.QThreadPool = None
     ai_async_is_canceled = False
     ai_async_is_finished = False
@@ -168,56 +169,62 @@ class AiLLM():
         self.threadpool.setMaxThreadCount(1)
         self.sources_vectorstore = None
     
-    def init_llm(self, rebuild_vectorstore=False):
-        # First start? Ask if user wants to enable ai integration or not
-        if self.app.settings['ai_first_startup'] == 'True' and self.app.settings['ai_enable'] == 'False':
-            msg = _('Welcome to the AI Setup Wizard\n\n\
-The new AI enhanced functions in Qualcoder need some additional setup. \
-If you skip this for now, you can enable or disable the AI integration \
-in the settings dialog later.\n\
-Do you want to start the AI setup now?')
-            msg_box = QtWidgets.QMessageBox(self)
-            msg_box.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-            reply = msg_box.question(self, _('AI Search'),
-                                            msg, QtWidgets.QMessageBox.StandardButton.Yes,
-                                            QtWidgets.QMessageBox.StandardButton.No)
-            if reply == QtWidgets.QMessageBox.StandardButton.No:
-                self.app.settings['ai_enable'] = 'False'
-        self.app.settings['ai_first_startup'] = 'False'
-        self.app.write_config_ini(self.app.settings, self.app.ai_models)
-        
-        if self.app.settings['ai_enable'] == 'True':
+    def init_llm(self, main_window, rebuild_vectorstore=False, enable_ai=False):  
+        self.main_window = main_window      
+        if enable_ai or self.app.settings['ai_enable'] == 'True':
             self.parent_text_edit.append(_('AI: Starting up...'))
             QtWidgets.QApplication.processEvents() # update ui
 
-            set_llm_cache(InMemoryCache())
-            # init vectorstore
-            if self.sources_vectorstore is None:
-                self.sources_vectorstore = AiVectorstore(self.app, self.parent_text_edit, self.sources_collection)
-                self.sources_vectorstore.init_vectorstore(rebuild_vectorstore)
             # init llms
+            # set_llm_cache(InMemoryCache())
+            if int(self.app.settings['ai_model_index']) < 0:
+                self.parent_text_edit.append(_('AI: Please set up the AI model'))
+                # QtWidgets.QApplication.processEvents() # update ui
+
+                main_window.change_settings(section='AI', enable_ai=True)
+                if int(self.app.settings['ai_model_index']) < 0:
+                    # still no model selected, disable AI:
+                    self.app.settings['ai_enable'] = 'False'
+                    self.parent_text_edit.append(_('AI: No model selected, AI is disabled.'))
+                    return
+                else: 
+                    # Success, model was selected. But since the "change_settings" function will start 
+                    # a new "init_llm" anyways, we are going to quit here
+                    self.app.settings['ai_enable'] = 'True'
+                    return    
             curr_model = self.app.ai_models[int(self.app.settings['ai_model_index'])]
+            
             large_model = curr_model['large_model']
             self.large_llm_context_window = int(curr_model['large_model_context_window'])
             fast_model = curr_model['fast_model']
             self.fast_llm_context_window = int(curr_model['fast_model_context_window'])
             api_base = curr_model['api_base']
             api_key = curr_model['api_key']
+            if api_key == '':
+                raise ValueError("The API-key for the AI model is empty.")
+            elif api_key == 'None':
+                api_key = ''
             self.large_llm = ChatOpenAI(model=large_model, 
                                 openai_api_key=api_key, 
                                 openai_api_base=api_base, 
-                                cache=True,
+                                cache=False,
                                 temperature=0.0,
                                 streaming=True
                                 )
             self.fast_llm = ChatOpenAI(model=fast_model, 
                                 openai_api_key=api_key, 
                                 openai_api_base=api_base, 
-                                cache=True,
+                                cache=False,
                                 temperature=0.0,
                                 streaming=True
                                 )
             self.ai_streaming_output = ''
+            self.app.settings['ai_enable'] = 'True'
+            
+            # init vectorstore
+            if self.sources_vectorstore is None:
+                self.sources_vectorstore = AiVectorstore(self.app, self.parent_text_edit, self.sources_collection)
+                self.sources_vectorstore.init_vectorstore(rebuild_vectorstore)            
         else:
             self.close()
         
@@ -421,7 +428,7 @@ Do you want to start the AI setup now?')
                 content = self.get_default_system_prompt()
             ),
             HumanMessage(
-                content= (f'You are discussing the code named "{code_name}" with the following code memo: "{code_memo}". \n'
+                content= (f'You are discussing the code named "{code_name}" with the following code memo: "{extract_ai_memo(code_memo)}". \n'
                     'Your task: Give back a list of 10 short descriptions of the meaning of this code. '
                     'Try to give a variety of diverse code-descriptions. Use simple language. '
                     f'Always answer in the following language: "{self.get_curr_language()}". Do not use numbers or bullet points. '
@@ -501,7 +508,7 @@ Do you want to start the AI setup now?')
         """
     
     def retrieve_similar_data(self, parent_window, result_callback, code_name, code_memo='', doc_ids=[]):
-        self.ai_async_query(parent_window, self._retrieve_similar_data, True, result_callback, code_name, code_memo, doc_ids)
+        self.ai_async_query(parent_window, self._retrieve_similar_data, False, result_callback, code_name, code_memo, doc_ids)
 
     def _retrieve_similar_data(self, code_name, code_memo='', doc_ids=[], progress_callback=None, signals=None) -> list:
         # 1) Get a list of code descriptions from the llm
@@ -596,7 +603,7 @@ Do you want to start the AI setup now?')
                 content=self.get_default_system_prompt()
             ),
             HumanMessage(
-                content= (f'You are discussing the code named "{code_name}" with the following code memo: "{code_memo}". \n'
+                content= (f'You are discussing the code named "{code_name}" with the following code memo: "{extract_ai_memo(code_memo)}". \n'
                     'At the end of this message, you will find a chunk of empircal data. \n'
                     'Your task is to inspect this chunk of empirical data and decide wether it relates to the given code or not. '
                     f'In order to decide this, you must adher to the folowing instructions: "{search_prompt.text}". \n'
@@ -623,7 +630,7 @@ Do you want to start the AI setup now?')
                 content=self.get_default_system_prompt()
             ),
             HumanMessage(
-                content= (f'You are discussing the code named "{code_name}" with the following code memo: "{code_memo}". \n'
+                content= (f'You are discussing the code named "{code_name}" with the following code memo: "{extract_ai_memo(code_memo)}". \n'
                     'At the end of this message, you will find a chunk of empirical data. \n'
                     'Your task is to inspect this chunk of empirical data and decide wether it relates to the given code or not. '
                     f'In order to decide this, you must adher to the following instructions: "{search_prompt.text}". \n'
@@ -647,7 +654,7 @@ Do you want to start the AI setup now?')
                 content=self.get_default_system_prompt()
             ),
             HumanMessage(
-                content= (f'You are discussing the code named "{code_name}" with the following code memo: "{code_memo}". \n'
+                content= (f'You are discussing the code named "{code_name}" with the following code memo: "{extract_ai_memo(code_memo)}". \n'
                     'At the end of this message, you will find a chunk of empirical data. \n'
                     'Your task is to inspect this chunk of empirical data and decide wether it (or parts of it) relates to the given code or not. '
                     f'In order to decide this, you must adher to the following instructions: "{search_prompt.text}". \n'
@@ -672,7 +679,7 @@ Do you want to start the AI setup now?')
                 content=self.get_default_system_prompt()
             ),
             HumanMessage(
-                content= (f'You are discussing the code named "{code_name}" with the following code memo: "{code_memo}". \n'
+                content= (f'You are discussing the code named "{code_name}" with the following code memo: "{extract_ai_memo(code_memo)}". \n'
                     'At the end of this message, you will find a chunk of empirical data. \n'
                     'Your task is to inspect this chunk of empirical data and decide wether it relates to the given code or not. '
                     f'In order to decide this, you must adher to the following instructions: "{search_prompt.text}". \n'
@@ -696,7 +703,7 @@ Do you want to start the AI setup now?')
                 content=self.get_default_system_prompt()
             ),
             HumanMessage(
-                content= (f'You are discussing the code named "{code_name}" with the following code memo: "{code_memo}". \n'
+                content= (f'You are discussing the code named "{code_name}" with the following code memo: "{extract_ai_memo(code_memo)}". \n'
                     'At the end of this message, you will find a chunk of empirical data. \n'
                     'Your task is to use the following instructions to analyze the chunk of empirical data and decide wether it relates to the given code or not. '
                     f'Instructions: "{search_prompt.text}". \n'

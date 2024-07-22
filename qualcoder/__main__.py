@@ -89,6 +89,7 @@ from qualcoder.view_graph import ViewGraph
 from qualcoder.view_image import DialogCodeImage
 from qualcoder.ai_vectorstore import AiVectorstore
 from qualcoder.ai_llm import AiLLM
+from qualcoder.ai_prompts import DialogAiEditPrompts
 
 # Check if VLC installed, for warning message for code_av
 vlc = None
@@ -513,10 +514,12 @@ class App(object):
         config['DEFAULT'] = settings
         # add AI models
         if len(ai_models) == 0:
-            self.ai_models_create_defaults(ai_models)
+            ai_models = self.ai_models_create_defaults()
         for model in ai_models:
             model_section = 'ai_model_' + model['name']
             config[model_section] = {}
+            config[model_section]['desc'] = model['desc']
+            config[model_section]['access_info_url'] = model['access_info_url']
             config[model_section]['large_model'] = model['large_model']
             config[model_section]['large_model_context_window'] = model['large_model_context_window']
             config[model_section]['fast_model'] = model['fast_model']
@@ -564,6 +567,8 @@ class App(object):
             if section.startswith('ai_model_'):
                 model = {
                     'name': section[9:],
+                    'desc': config[section]['desc'],
+                    'access_info_url': config[section]['access_info_url'],
                     'large_model': config[section]['large_model'],
                     'large_model_context_window': config[section]['large_model_context_window'],
                     'fast_model': config[section]['fast_model'],
@@ -573,33 +578,48 @@ class App(object):
                 }
                 ai_models.append(model)
         if len(ai_models) == 0: # no models loaded, create default
-            self.ai_models_create_defaults(ai_models)
+            ai_models = self.ai_models_create_defaults()
         return result, ai_models
 
-    def ai_models_create_defaults(self, models):
-        """Fills self.ai_models with a list of the default AI model parameters
-        """
+    def ai_models_create_defaults(self):
+        """Returns a list of the default AI model parameters
+        """       
         models = [
             {
-                'name': 'OpenAI_GPT4-turbo',
+                'name': 'GPT-4-turbo',
+                'desc': """The best model from OpenAI as of now for our purpose. 
+You will need an an API-key from OpenAI and have payed credits in your account. 
+OpenAI will charge a small amount for every use.""",
+                'access_info_url': 'https://platform.openai.com/api-keys',
                 'large_model': 'gpt-4-turbo',
-                'large_model_context_window': '131072',
-                'fast_model': 'gpt-3.5-turbo',
-                'fast_model_context_window': '32768',
+                'large_model_context_window': '128000',
+                'fast_model': 'gpt-4o-mini',
+                'fast_model_context_window': '128000',
                 'api_base': '',
                 'api_key': ''
             },
             {
                 'name': 'OpenAI_GPT4o',
+                'desc': """Faster, cheaper, but slightly less powerful than GPT-4-turbo.  
+You will need an an API-key from OpenAI and have payed credits in your account. 
+OpenAI will charge a small amount for every use.""",
+                'access_info_url': 'https://platform.openai.com/api-keys',
                 'large_model': 'gpt-4o',
-                'large_model_context_window': '131072',
-                'fast_model': 'gpt-3.5-turbo',
-                'fast_model_context_window': '32768',
+                'large_model_context_window': '128000',
+                'fast_model': 'gpt-4o-mini',
+                'fast_model_context_window': '128000',
                 'api_base': '',
                 'api_key': ''
             },
             {
                 'name': 'Blablador',
+                'desc': """A free and open source model (Mixtral 8x7B), excellent privacy, 
+albeit not as powerful as GPT-4. 
+Blablador is free to use and runs on a server of the Helmholtz Society, 
+a large non-profit research organization in Germany. In order to gain 
+access and get an API-key, you have to identify yourself once with your 
+university, ORCID, GitHub, or Google account.""",
+                'access_info_url': 'https://sdlaml.pages.jsc.fz-juelich.de/ai/guides/blablador_api_access/',
                 'large_model': 'alias-large',
                 'large_model_context_window': '32768',
                 'fast_model': 'alias-fast',
@@ -608,6 +628,7 @@ class App(object):
                 'api_key': ''
             }
         ]
+        return models
 
     def check_and_add_additional_settings(self, settings_data, ai_models):
         """ Newer features include width and height settings for many dialogs and main window.
@@ -647,7 +668,7 @@ class App(object):
                 'dialogreport_code_summary_splitter0', 'dialogreport_code_summary_splitter0',
                 'stylesheet', 'backup_num', 'codetext_chunksize',
                 'report_text_context_characters', 'report_text_context_style',
-                'ai_enable', 'ai_first_startup'
+                'ai_enable', 'ai_first_startup', 'ai_model_index'
                 ]
         for key in keys:
             if key not in settings_data:
@@ -669,11 +690,13 @@ class App(object):
                 if key == 'ai_enable':
                     settings_data[key] = 'False'
                 if key == 'ai_first_startup':
-                    settings_data[key] = 'True'    
+                    settings_data[key] = 'True' 
+                if key == 'ai_model_index':
+                    settings_data[key] = '0'
                     
         # Check AI models
         if len(ai_models) == 0: # no models loaded, create default
-            self.ai_models_create_defaults(ai_models)
+            ai_models = self.ai_models_create_defaults()
 
         # Write out new ini file, if needed
         if len(settings_data) > dict_len:
@@ -836,9 +859,11 @@ class App(object):
         # Check keys
         if (not len(result) or 'codername' not in result.keys() or 'stylesheet' not in result.keys() or
                 'speakernameformat' not in result.keys()):
+            # create default:
+            ai_models = self.ai_models_create_defaults()
             self.write_config_ini(self.default_settings, ai_models)
             logger.info('Initialized config.ini')
-            result = self._load_config_ini()
+            result, ai_models = self._load_config_ini()
         # codername is also legacy, v2.8 plus keeps current coder name in database project table
         if result['codername'] == "":
             result['codername'] = "default"
@@ -923,7 +948,8 @@ class App(object):
             'report_text_context-style': 'Bold',
             'codetext_chunksize': 50000,
             'ai_enable': 'False',
-            'ai_first_startup': 'True'
+            'ai_first_startup': 'True',
+            'ai_model_index': -1
         }
 
     def get_file_texts(self, file_ids=None):
@@ -1026,6 +1052,7 @@ class App(object):
             pass
         return coder_names
     
+    """
     def get_ai_api_key(self, key='', parent_window=None) -> str:
         api_key_msg = _(
 'Please read this important note about access to GPT-4:\n\
@@ -1060,28 +1087,29 @@ Please enter your OpenAI api key here:')
             return ''
         else:
             return str(dialog.textValue())
+    """
         
     #def prepare_ai(self, parent_window=None) -> bool:
-        """Checks if all the conditions are met to use the ai integration.
+    """Checks if all the conditions are met to use the ai integration.
         Downloads the embeddings model and asks for an OpenAI api key 
         if necessary.    
         """
-        """
+    """
         curr_model = self.ai_models[int(self.settings['ai_model_index'])]
         if curr_model['api_key'] == '':
             curr_model['api_key'] = self.get_ai_api_key(key='', parent_window=parent_window)
             if self.settings['open_ai_api_key'] == '':
                 self.settings['ai_enable'] = 'False'
                 return False
-        """
-        """
+    """
+    """
         if self.settings['open_ai_api_key'] == '':
             self.settings['open_ai_api_key'] = self.get_ai_api_key(key='', parent_window=parent_window)
             if self.settings['open_ai_api_key'] == '':
                 self.settings['ai_enable'] = 'False'
                 return False
-        """
-        """
+    """
+    """
         # embeddings model download:
         if not self.sources_vectorstore.embedding_model_is_cached():
             model_download_msg = _('\
@@ -1209,7 +1237,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.menubar.setNativeMenuBar(True)
         else:
             self.ui.menubar.setNativeMenuBar(False)
-        # TODO reenable in final version: self.get_latest_github_release()
+        # self.get_latest_github_release()
         try:
             w = int(self.app.settings['mainwindow_w'])
             h = int(self.app.settings['mainwindow_h'])
@@ -1222,10 +1250,30 @@ class MainWindow(QtWidgets.QMainWindow):
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
         self.init_ui()
-        self.app.ai = AiLLM(self.app, self.ui.textEdit)
         self.ui.tabWidget.setCurrentIndex(0)
         self.show()
         QtWidgets.QApplication.processEvents()
+        self.app.ai = AiLLM(self.app, self.ui.textEdit)
+        # First start? Ask if user wants to enable ai integration or not
+        if self.app.settings['ai_first_startup'] == 'True' and self.app.settings['ai_enable'] == 'False':
+            msg = _('Welcome\n\n\
+The new AI enhanced functions in QualCoder need some additional setup. \
+Do you want to enable the AI and start the setup? \
+You can also do this later by starting the AI Setup Wizard from the AI menu in the main window. \
+Click "Yes" to start now.')
+            msg_box = QtWidgets.QMessageBox(self)
+            msg_box.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            reply = msg_box.question(self, _('AI Search'),
+                                            msg, QtWidgets.QMessageBox.StandardButton.Yes,
+                                            QtWidgets.QMessageBox.StandardButton.No)
+            if reply == QtWidgets.QMessageBox.StandardButton.Yes:
+                self.ai_setup_wizard() # (will also init the llm)
+            else:
+                self.app.ai.init_llm(self)
+        else:
+            self.app.ai.init_llm(self)      
+        self.app.settings['ai_first_startup'] = 'False'
+        self.app.write_config_ini(self.app.settings, self.app.ai_models)
         
     def init_ui(self):
         """ Set up menu triggers """
@@ -1306,6 +1354,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionAI_Settings.triggered.connect(self.ai_settings)
         self.ui.actionAI_Rebuild_internal_memory.triggered.connect(self.ai_rebuild_memory)
         self.ui.actionAI_Edit_Project_Info.triggered.connect(self.project_memo)
+        self.ui.actionAI_Prompts.triggered.connect(self.ai_prompts)
         self.ui.actionAI_Chat.triggered.connect(self.ai_go_chat)
         self.ui.actionAI_Search_and_Coding.triggered.connect(self.ai_go_search)
         # Help menu
@@ -1900,7 +1949,7 @@ class MainWindow(QtWidgets.QMainWindow):
             return
         RefiImport(self.app, self.ui.textEdit, "qdpx")
         if self.app.settings['ai_enable'] == 'True':
-            self.app.ai.init_llm(rebuild_vectorstore=True)
+            self.app.ai.init_llm(self, rebuild_vectorstore=True)
         self.project_summary_report()
 
     def rqda_project_import(self):
@@ -2123,23 +2172,24 @@ class MainWindow(QtWidgets.QMainWindow):
                 contents.itemAt(i).widget().close()
                 contents.itemAt(i).widget().setParent(None)
 
-    def change_settings(self, section=None):
+    def change_settings(self, section=None, enable_ai=False):
         """ Change default settings - the coder name, font, font size.
         Language, Backup options.
         As this dialog affects all others if the coder name changes, on exit of the dialog,
         all other opened dialogs are destroyed.
         
         section = 'AI' moves to the AI settings at the bottom of the dialog
+        enable_ai = if True, the AI will be enabled in settings
         """
-
         current_coder = self.app.settings['codername']
         current_ai_enable = self.app.settings['ai_enable']
         current_ai_model_index = self.app.settings['ai_model_index']
-        ui = DialogSettings(self.app, section=section)
+        ui = DialogSettings(self.app, section=section, enable_ai=enable_ai)
         ret = ui.exec()
         if ret == QtWidgets.QDialog.DialogCode.Rejected:  # Dialog has been canceled
             return
 
+        self.app.settings, self.app.ai_models = self.app.load_settings()
         self.settings_report()
         font = f"font: {self.app.settings['fontsize']}pt "
         font += '"' + self.app.settings['font'] + '";'
@@ -2148,12 +2198,16 @@ class MainWindow(QtWidgets.QMainWindow):
         if current_ai_enable != self.app.settings['ai_enable']:
             if self.app.settings['ai_enable'] == 'True':
                 # AI is newly enabled
-                self.app.ai.init_llm()
+                self.app.ai.init_llm(self)
             else: # AI is disabled
                 self.app.ai.close()
+        elif int(current_ai_model_index) < 0:
+            # no model selected
+            self.app.settings['ai_enable'] = 'False'
+            self.app.ai.close()                        
         elif current_ai_model_index != self.app.settings['ai_model_index']:
             # current model has changed
-            self.app.ai.init_llm()
+            self.app.ai.init_llm(self)
             
         # Name change: Close all opened dialogs as coder name needs to change everywhere
         if current_coder != self.app.settings['codername']:
@@ -2181,7 +2235,7 @@ class MainWindow(QtWidgets.QMainWindow):
         if self.app.prepare_ai(self):
             if self.app.project_name != '':
                 self.app.ai.sources_vectorstore.init_vectorstore(rebuild=True)
-            self.app.ai.init_llm()
+            self.app.ai.init_llm(self)
         else:
             self.app.settings['ai_enable'] = 'False'
             self.app.write_config_ini(self.app.settings, self.app.ai_models)
@@ -2607,11 +2661,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.app.conn.commit()
         
         # AI: init llm and update vectorstore
-        self.app.ai.init_llm()
+        self.app.ai.init_llm(self)
         """
         if self.app.settings['ai_enable'] == 'True':
             if self.app.prepare_ai(self):
-                self.app.ai.init_llm()
+                self.app.ai.init_llm(self)
             else:
                 self.app.ai.close()
                 # self.app.settings['ai_enable'] = 'False'
@@ -2809,8 +2863,15 @@ class MainWindow(QtWidgets.QMainWindow):
     # AI Menu Actions
     def ai_setup_wizard(self):
         """Action triggered by AI Setup Wizard menu item."""
-        print('AI wizard')
-
+        if self.app.settings['ai_enable'] == 'True':
+            msg = _('It seems that the AI is already setup and enabled, so there is nothing to do here. Go to AI > settings if you want to change the current model or other settings.')
+            Message(self.app, _('AI Setup Wizard'), msg).exec() 
+            return
+        self.ui.textEdit.append(_('AI: Setup Wizard'))
+        QtWidgets.QApplication.processEvents() # update ui
+        self.app.ai.init_llm(self, rebuild_vectorstore=True, enable_ai=True)
+        self.ui.textEdit.append(_('AI: Setup Wizard finished'))
+        
     def ai_settings(self):
         """Action triggered by AI Settings menu item."""
         self.change_settings(section='AI')
@@ -2836,6 +2897,10 @@ class MainWindow(QtWidgets.QMainWindow):
         if mb.exec() == QtWidgets.QMessageBox.StandardButton.Ok: 
             self.ui.tabWidget.setCurrentIndex(0) # show action log
             self.app.ai.sources_vectorstore.init_vectorstore(rebuild=True)
+    
+    def ai_prompts(self):
+        """Action triggered by AI Prompts menu item."""
+        DialogAiEditPrompts(self.app).exec()
 
     def ai_go_chat(self):
         """Action triggered by AI Chat menu item."""
@@ -2909,6 +2974,7 @@ def gui():
         # locale_dir = os.path.join(locale_dir, 'LC_MESSAGES')
     # print("locale dir: ", locale_dir)
     # print("LISTDIR: ", os.listdir(locale_dir))
+    install_language(lang) # install language files on every start, so updates are reflected
     # getlang = gettext.translation('en', localedir=locale_dir, languages=['en'])
     translator = gettext.translation(domain='default', localedir=locale_dir, fallback=True)
     if lang in ["de", "es", "fr", "it", "pt"]:
@@ -2927,10 +2993,10 @@ def gui():
             qm = os.path.join(qm, 'app_' + lang + '.qm')
             print("qm file located at: ", qm)
             qt_translator.load(qm)
-            if qt_translator.isEmpty():
+            #if qt_translator.isEmpty():
                 # print(f"Installing app_{lang}.qm to .qualcoder folder")
-                install_language(lang)
-                qt_translator.load(qm)
+            #    install_language(lang)
+            #    qt_translator.load(qm)
         app.installTranslator(qt_translator)
         '''Below for pyinstaller and obtaining mo data file from .qualcoder folder
         A solution to this [Errno 13] Permission denied:
@@ -3001,12 +3067,13 @@ def install_language(lang):
     mo_path = os.path.join(mo_path, lang)
     if not os.path.exists(mo_path):
         os.mkdir(mo_path)
-        mo_path = os.path.join(mo_path, "LC_MESSAGES")
+    mo_path = os.path.join(mo_path, "LC_MESSAGES")
+    if not os.path.exists(mo_path):
         os.mkdir(mo_path)
-        mo = os.path.join(mo_path, lang + ".mo")
-        with open(mo, 'wb') as file_:
-            decoded_data = base64.decodebytes(mo_data)
-            file_.write(decoded_data)
+    mo = os.path.join(mo_path, lang + ".mo")
+    with open(mo, 'wb') as file_:
+        decoded_data = base64.decodebytes(mo_data)
+        file_.write(decoded_data)
 
 
 def install_droid_sans_mono():

@@ -217,6 +217,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.lineEdit_search.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.lineEdit_search.customContextMenuRequested.connect(self.lineedit_search_menu)
         self.ui.lineEdit_search.returnPressed.connect(self.search_for_text)
+        self.ui.tabWidget.setCurrentIndex(0) # defaults to list of documents
         self.get_files()
 
         # Icons marked icon_24 icons are 24x24 px but need a button of 28
@@ -387,6 +388,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ai_search_listview_action_label = None
         self.ui.listWidget_ai.clicked.connect(self.ai_search_list_clicked)
         
+        self.ui.ai_progressBar.setVisible(False)
         self.ai_search_spinner_sequence = ['', '.', '..', '...']
         self.ai_search_spinner_index = 0
         self.ai_search_spinner_timer = QtCore.QTimer(self)
@@ -4321,6 +4323,7 @@ class DialogCodeText(QtWidgets.QWidget):
             self.ui.listWidget_ai.clear()
             self.ai_search_current_result_index = None
             self.ai_search_spinner_timer.start(500)
+            self.ui.textEdit.setText(_('Searching for related data, please wait...'))
     
             # Phase 1: find similar chunks of data from the vectorstore
             self.app.ai.ai_async_is_canceled = False
@@ -4333,9 +4336,11 @@ class DialogCodeText(QtWidgets.QWidget):
         # Prepare the second step of the search
         if self.app.ai.ai_async_is_canceled:
             self.ai_search_running = False
+            self.ui.textEdit.setText(_(''))
             return
         if chunks is None or len(chunks) == 0:
-            msg = _('AI: Sorry, I could not find any data in my memory related to "') + self.ai_search_code_name + '".'
+            self.ui.textEdit.setText(_(''))
+            msg = _('AI: Sorry, no related data found for "') + self.ai_search_code_name + '".'
             Message(self.app, _('AI Search'), msg, "warning").exec()
             self.ai_search_running = False
             return
@@ -4371,13 +4376,22 @@ class DialogCodeText(QtWidgets.QWidget):
                     filtered_chunks.append(chunk)
             # finally: replace the chunks list with the filtered one
             chunks = filtered_chunks        
+
+        if len(chunks) == 0:
+            self.ui.textEdit.setText(_(''))
+            msg = _('AI: Sorry, no new data found for "') + self.ai_search_code_name + _('" beside what has already been coded with this code.')
+            Message(self.app, _('AI Search'), msg, "warning").exec()
+            self.ai_search_running = False
+            return
+        
+        self.ui.textEdit.setText(_('Potentially related data found, inspecting it closer. Please be patient...'))
         
         # 2) Send the first "ai_search_analysis_max_count" chunks to the llm for further analysis 
         self.ai_search_similar_chunk_list = chunks # save to allow analyzing more chunks later
         self.ai_search_chunks_pos = 0 # position of the next chunk to be analyzed
         self.ai_search_analysis_counter = 0 # conter to stop analyzing after ai_search_analysis_max_count 
         self.ai_search_found = False # Becomes True if any new data has been found
-        self.ai_search_analyze_next_chunk(True)
+        self.ai_search_analyze_next_chunk(False)
         # self.ai_analyze_similar_chunks(ai_search_analysis_max_count)
 
     def ai_search_analyze_next_chunk(self, show_progress_msg):
@@ -4430,7 +4444,8 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ai_search_chunks_pos += 1
         self.ai_search_analysis_counter += 1
         if not self.app.ai.ai_async_is_canceled:
-            self.ai_search_analyze_next_chunk(show_progress_msg=(not self.ai_search_found))
+            # self.ai_search_analyze_next_chunk(show_progress_msg=(not self.ai_search_found))
+            self.ai_search_analyze_next_chunk(show_progress_msg=False)
         else: 
             self.ai_search_running = False
 
@@ -4453,7 +4468,7 @@ class DialogCodeText(QtWidgets.QWidget):
         if self.ai_search_running: 
             # stop search
             action_item.setText('')
-            self.ai_search_listview_action_label.setText(_('>> Searching') + \
+            self.ai_search_listview_action_label.setText(_('>> Searching (click here to cancel)') + \
                 self.ai_search_spinner_sequence[self.ai_search_spinner_index])
             self.ai_search_listview_action_label.setToolTip(_('Click here to stop the search'))
             self.ai_search_listview_action_label.setVisible(True)
@@ -4483,9 +4498,16 @@ class DialogCodeText(QtWidgets.QWidget):
             selection_model = self.ui.listWidget_ai.selectionModel()
             selection_model.blockSignals(True) # stop selection_change from beeing issued
             if self.ai_search_running: # stop search
-                self.app.ai.ai_async_is_canceled = True
-                self.ai_search_running = False
-                self.ai_search_update_listview_action()
+                msg = _('Do you want to stop the search?')
+                msg_box = Message(self.app, _("Open file"), msg, "information")
+                msg_box.setStandardButtons(
+                    QtWidgets.QMessageBox.StandardButton.Ok | QtWidgets.QMessageBox.StandardButton.Abort)
+                msg_box.setDefaultButton(QtWidgets.QMessageBox.StandardButton.Ok)
+                ret = msg_box.exec()
+                if ret == QtWidgets.QMessageBox.StandardButton.Ok:
+                    self.app.ai.ai_async_is_canceled = True
+                    self.ai_search_running = False
+                    self.ai_search_update_listview_action()
             else: # 'find more' item or "finished search"
                 if self.ai_search_chunks_pos >= len(self.ai_search_similar_chunk_list):
                     msg = _('There are no more pieces of data to analyze for this search. Please start a new search.')
@@ -4557,9 +4579,11 @@ class DialogCodeText(QtWidgets.QWidget):
         if (self.app.ai.ai_async_is_finished or self.app.ai.ai_async_is_errored or self.app.ai.ai_async_is_canceled):
             self.ai_search_running = False
         if self.ai_search_running:
+            self.ui.ai_progressBar.setVisible(True)
             self.ai_search_spinner_index = (self.ai_search_spinner_index + 1) % len(self.ai_search_spinner_sequence)
             self.ai_search_update_listview_action()
         else:
+            self.ui.ai_progressBar.setVisible(False)
             self.ai_search_spinner_timer.stop()
             self.ai_search_update_listview_action()
         

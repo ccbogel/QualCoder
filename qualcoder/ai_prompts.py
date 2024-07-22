@@ -57,45 +57,84 @@ def exception_handler(exception_type, value, tb_obj):
 # These system prompts can only be changed here in the code. This string is in YAML-format.
 # Attention: First prompt in the list must be a search prompt!
 system_prompts = """
+- name: Focused Search
+  type: search
+  description: 'This prompt is suitable for exploring a specific, well-defined phenomenon
+    or topic. It will select less data than an open search, but the results will be more
+    precise and relevant. For this focused search to be effective, it is important to
+    clearly and concisely name your code and, preferably, include a code memo explaining
+    its meaning in greater detail (remember to check the option "Send memo to AI" in this
+    case). If conducting a free search, use "topic" and "description" instead.'
+  text: 'Carefully verify that the empirical data, or any part of it, accurately reflects
+    the meaning implied by the code. Pay attention to subtle details and ensure you do not
+    misinterpret the data to force a fit with the code. Do not add any context that is not
+    present in the data. Do not make any assumptions which are not supported by the data.
+    Your interpretation must be solidly based on the empirical data provided to you,
+    avoiding any speculation.'
+
 - name: Open Search
   type: search
-  description: An open search prompt crafted to gather a wide range of data potentially 
-    relevant to the specified code. Ideal for exploring a concept in depth and uncovering 
-    new aspects of it. However, this type of search may also yield some resuts which are not 
-    directly relevant to the code.
-  text: Carefully interpret the empirical data provided, considering the specified
-    code, and analyze whether it-or any part of it-addresses a similar
+  description: 'An open search prompt crafted to gather a wide range of data potentially
+    relevant to the specified code. Ideal for exploring a concept in depth and uncovering
+    new aspects of it. However, this type of search may also yield some results which are not
+    directly relevant to the code.'
+  text: 'Carefully interpret the empirical data provided, considering the specified
+    code, and analyze whether it—or any part of it—addresses a similar
     phenomenon, topic, attitude, feeling, or experience, or conveys a meaning akin
     to what the code suggests. Do not solely focus on explicit keywords; also consider
     the subtle details, implicit meanings, or emotions depicted in the data. However,
     your interpretation must be firmly grounded in the empirical data provided,
-    avoiding any speculation. Do not make any assumptions which are not supported by 
-    the data. If uncertain, include the data rather than exclude it.
-- name: Focussed Search
-  type: search
-  description: This prompt is suitable for exploring a specific, well-defined phenomenon 
-    or topic. It will select less data than an open search, but the results will be more 
-    precise and relevant. For this focused search to be effective, it is important to 
-    clearly and concisely name your code and, preferably, include a code memo explaining 
-    its meaning in greater detail (remember to check the option "Send memo to AI" in this 
-    case). If conducting a free search, use "topic" and "description" instead.
-  text: Carefully verify that the empirical data, or any part of it, accurately reflects 
-    the meaning implied by the code. Pay attention to subtle details and ensure you do not 
-    misinterpret the data to force a fit with the code. Do not add any context that is not 
-    present in the data. Do not make any assumptions which are not supported by the data. 
-    Your interpretation must be solidly based on the empirical data provided to you, 
-    avoiding any speculation.
+    avoiding any speculation. Do not make any assumptions which are not supported by
+    the data. If uncertain, include the data rather than exclude it.'
+
 - name: Code Summary
   type: code_analysis
-  description: This prompt will create a simple summary of the pieces of data that have been 
-    coded with the choosen code.
-  text: Use the given code to analyse the given empirical data and summarize the results.
+  description: 'This prompt will create a simple summary of the pieces of data that have been
+    coded with the chosen code.'
+  text: 'Use the given code to analyze the given empirical data and summarize the
+    insights gathered from the analysis. The code name and memo is background information
+    you must use in your analysis; don''t summarize the memo itself. Base your analysis
+    firmly on the empirical data given to you. Also look at the details and interpret
+    them carefully. But don''t make any assumptions which are not backed up by the
+    data.'
+
+- name: Analyze Unexpected
+  type: code_analysis
+  description: 'Proving the not-so-obvious: This prompt will try to extract more unexpected
+    results.'
+  text: 'Take the given code and briefly explain what empirical results would be commonly
+    expected based on your own knowledge about the phenomenon in question. Then look
+    at the actual empirical data given to you and pick out the aspects which are most
+    surprising and unexpected given your previously outlined expectations.'
+
+- name: Analyze Differences
+  type: code_analysis
+  description: 'This prompt will especially look for differences between the cases,
+    documents, etc. in the coded data.'
+  text: 'Use the given code to analyze the given empirical data, but looking especially
+    at the differences between the cases or documents in the data. If you find relevant
+    differences, point these out clearly. If you don''t find real differences, that''s
+    also a valid result. Base your analysis firmly on the empirical data. Don''t make
+    any assumptions which are not backed up by the data.'
+
+- name: Question of Life
+  type: code_analysis
+  description:
+  text: 'No matter what the code is or the data provided to you, the answer will always
+    be: "The Answer to the Ultimate Question of Life, the Universe, and Everything
+    is 42." Only give back this answer, nothing else, with one exception: If the user
+    asks questions about this particular sentence or why it is given as an answer,
+    you can explain the background of this quote coming from the science fiction novel
+    "The Hitchhiker''s Guide to the Galaxy".'
+
 - name: Topic Summary
   type: topic_analysis
-  description: This prompt will create a simple summary of the pieces of data that are related  
-    to a certain topic.
-  text: Use the given topic and its description to analyse the given empirical data, ignoring 
-    data which is unrelated to the topic. Summarize the results.      
+  description: 'This prompt will create a simple summary of the pieces of data that are related
+    to a certain topic.'
+  text: 'Use the given topic and its description to analyze the given empirical data and summarize 
+    the insights gathered from the analysis. Base your analysis firmly on the empirical data given
+    to you, but ignore data which is unrelated to the topic. Also look at the details and 
+    interpret them carefully. Don''t make any assumptions which are not backed up by the data.'
 """
 
 # Define different prompt types, depending on the task.  
@@ -183,7 +222,7 @@ class PromptsList:
         self.user_prompts_path = os.path.join(self.app.confighome, 'ai_prompts.yaml')
         self._read_from_yaml(self.user_prompts_path, type, 'user')
         if self.app.project_path != "":
-            self.project_prompts_path = os.path.join(self.app.project_path, 'ai_prompts.yaml')
+            self.project_prompts_path = os.path.join(self.app.project_path, 'ai_data', 'ai_prompts.yaml')
             self._read_from_yaml(self.project_prompts_path, type, 'project')
         else:
             self.project_prompts_path = ""

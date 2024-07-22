@@ -4286,11 +4286,11 @@ msgstr "Regenbogen"
 
 #: settings.py:121
 msgid "native"
-msgstr "einheimische"
+msgstr "nativ"
 
 #: settings.py:138
 msgid "Bold"
-msgstr "Kühn"
+msgstr "Fett"
 
 #: settings.py:138
 msgid "Italic"

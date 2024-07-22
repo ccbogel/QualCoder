@@ -119,7 +119,7 @@ class DialogAiSearch(QtWidgets.QDialog):
             Message(self.app, _('No codes'), msg, "warning").exec()
         for prompt in self.prompts_list.prompts:
             self.ui.comboBox_prompts.addItem(prompt.name_and_scope())
-        self.ui.comboBox_prompts.setCurrentText = self.current_prompt.name_and_scope()
+        self.ui.comboBox_prompts.setCurrentText(self.current_prompt.name_and_scope())
         self.ui.comboBox_prompts.setToolTip(self.current_prompt.description)
         self.ui.comboBox_prompts.currentIndexChanged.connect(self.on_prompt_selected)
         # self.ui.lineEdit_prompt.setText(self.current_prompt.name_and_scope())
