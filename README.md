@@ -4,18 +4,18 @@
 
 Note: This is an experimental version of QualCoder with AI-enhanced functionality.
 
-Version 3.6.1 beta (July 2024) is a major rework with the following additions:
+Version 3.6.1 beta (July 2024) is a major rework with the following new features:
 - **AI Chat:** Let the AI analyze codings or any other topic in your data and discuss the results (with exact sources, of course)
 - **Prompt Editing:** You can now view and edit all the prompts that QualCoder uses under the hood to instruct the AI on how to analyze your data. You can also define your own prompts, targeted at your particular methods and research questions. This returns methodological control back to us as researchers.
 - **Alternative AI models:** QualCoder can now use other AI models besides the ones from OpenAI. In particular, we gained access to a free service called ["Blablador"](https://helmholtz-blablador.fz-juelich.de), offered by the German academic research agency Helmholtz Society. This service runs open-source models (Mixtral 8x7b being the largest at the moment) and is very privacy-friendly, storing no data at all. The quality of the output is usable for simple questions, but not yet on par with GPT-4 from OpenAI.
 - The **AI Search** (see video below for a demonstration) has been greatly improved. It now also allows selecting between different prompts/different types of search.
 
-Special thanks to these people for their feedback and support in impoving QualCoder AI:<br />
-Tom Meyer (Univ. of Bochum), Merle Koch, Ole Deitmer & Wenzel Urban (Univ. of Jena), Isabel Steinhardt (Univ. of Paderborn), Christian Schneijderberg (Univ. of Kassel), Yves Jeanrenaud (Univ. of Munich) as well as Alexandre Strube (Forschungszentrum Jülich), the developer behind Blablador, and Colin Curtain (Univ. of Tasmania), the developer of QualCoder. 
-
 This AI enhanced version was created by [Kai Dröge](https://www.hslu.ch/de-ch/hochschule-luzern/ueber-uns/personensuche/profile/?pid=823), based on QualCoder 3.5
 
 It is planned to integrate my additions into the main version of QualCoder soon. Until then, you can use the AI-enhanced version alongside the regular QualCoder. Both apps will not interfere with each other.
+
+Special thanks to these people for their feedback and support in improving the first version of QualCoder AI:<br />
+> Tom Meyer (Univ. of Bochum), Merle Koch, Ole Deitmer & Wenzel Urban (Univ. of Jena), Isabel Steinhardt (Univ. of Paderborn), Christian Schneijderberg (Univ. of Kassel), Yves Jeanrenaud (Univ. of Munich) as well as Alexandre Strube (Forschungszentrum Jülich), the developer behind Blablador, and Colin Curtain (Univ. of Tasmania), the developer of QualCoder. 
 
 ### Functionality
 
@@ -23,8 +23,8 @@ Watch my [video on YouTube](https://www.youtube.com/watch?v=FrQyTOTJhCc):</br>
 [![Horizontal Coding: AI-Based Qualitative Data Analysis in QualCoder, Free & Open Source](https://img.youtube.com/vi/FrQyTOTJhCc/hqdefault.jpg)](https://www.youtube.com/watch?v=FrQyTOTJhCc)
 
 In addition to what's shown in the video, QualCoder AI now also includes an **AI Chat**, offering three forms of dicussions with the AI:
-- **Code Chat:** Let the AI analyze the data in the codings for a particular code and chat about the results. The sources from your empirical data are referenced.
-- **Topic Chat:** Let the AI analyze any topic in you empirical data (independend of coding). Again, sources are referenced and you can discuss the results with the AI.
+- **Code Chat:** Let the AI analyze the data in the codings for a particular code and chat about the results. You can choose between different prompts or define you own. The sources from your empirical data are referenced in the text.
+- **Topic Chat:** Let the AI analyze any topic in you empirical data (independent of previous coding). Again, several prompts are available, the sources are referenced, and you can discuss the results with the AI.
 - **General Chat:** Ask the AI anything, not related to your data. Basically a build-in ChatGPT.   
 
 ### Installation
