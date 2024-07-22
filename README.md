@@ -67,7 +67,7 @@ Note: Unfortunately, we are currently not able to sign the x86_64 package correc
 - It is highly recommended to add a project memo with a short summary about your research topic, the questions and objectives, the methodology as well as the participants of your study and the types of data collected. This will give the AI helpful context information for the analysis. Go to Project > Project Memo to enter this information.
 - The AI-based functionality in QualCoder is multilingual and supports up to 100 languages. The user interface, however, is only available in English, French, German, Italian, Portuguese and Spanish. 
 - Once you added a new empirical document to you project, a local AI will read it in the background and memorize the contents in it's database. This happens only on your machine; no data is send to the cloud at this point. The memorization may take a few minutes, depending on the length of the document. You cannot use the AI-based functionality until the memorization of all documents is completed. (See the tab "Action Log" for progress messages.)
-- Once the AI is ready, you can discuss your data in the "AI Chat" window. Click on "New" in the bottom left corner.
+- Once the AI is ready, you can discuss your data in the "AI Chat" window. Click on "New" in the bottom left corner and select one of the three types of chat.
 - To start the AI based search and coding, go to Coding > Code text, select the tab "AI Search" and click on "<Start AI Search>". If you haven't defined any codes yet, you can use the "Free search".
 - Search tips: 
   - Don’t use too generic codes or search texts (like "gender” or "work") since this will lead to very generic results.
@@ -75,10 +75,8 @@ Note: Unfortunately, we are currently not able to sign the x86_64 package correc
  
 
 **For general information about the usage of QualCoder visit the official Wiki: https://github.com/ccbogel/QualCoder/wiki**
-      </td>
-    </tr>
-  </tbody>
-</table>
+
+---
 
 **The rest of this document is from the regular version of QualCoder (with some small updates regarding the AI-based version).**
 
@@ -106,11 +104,7 @@ For installing from source you will need to have Python 3.8 or a newer version i
 
 ### Windows
 
-**Use the installer**
-
-Download the windows installer from here: https://drive.switch.ch/index.php/s/cYJKPA3JV3fJqDc (switch drive is a secure data sharing platform for Swiss universities)
-
-**Alternatively, install from source:**
+**Install from source:**
 
 Seriously consider using a virtual environment (commands in point 6 below). Not using a virtual environment may affect other Python software you may have installed.
 
@@ -155,7 +149,7 @@ py -m pip install wheel pyqt6 chardet ebooklib openpyxl Pillow ply pdfminer.six 
 For the AI-integration:
 
 ```bash
-py -m pip install langchain langchain[llms] chromadb sentence-transformers fuzzysearch pydantic yaml json_repair
+py -m pip install langchain langchain-community langchain-core langchain-chroma langchain-openai langchain-text-splitters chromadb==0.5.0 sentence-transformers fuzzysearch pydantic PyYAML json_repair
 ```
  
  Wait, until all modules are installed.
@@ -234,7 +228,7 @@ Note: To exit venv type `deactivate`
 
 `pip install chardet ebooklib ply openpyxl pandas pdfminer pyqt6 pillow pdfminer.six plotly pydub python-vlc rispy six SpeechRecognition xmlschema charset-normalizer`
 
-`pip install langchain langchain[llms] chromadb sentence-transformers fuzzysearch pydantic`
+`pip install langchain langchain-community langchain-core langchain-chroma langchain-openai langchain-text-splitters chromadb==0.5.0 sentence-transformers fuzzysearch pydantic PyYAML json_repair`
 
 7. Install QualCoder, and type the following, the dot is important:
 
@@ -265,7 +259,7 @@ It has not been tested, but please see the above instructions to build QualCoder
 2. Install additional python modules
 
 `sudo python3 -m pip install ebooklib plotly pydub python-vlc rispy SpeechRecognition xmlschema charset-normalizer`
-`sudo python3 -m pip install langchain langchain[llms] chromadb sentence-transformers fuzzysearch pydantic`
+`sudo python3 -m pip install langchain langchain-community langchain-core langchain-chroma langchain-openai langchain-text-splitters chromadb==0.5.0 sentence-transformers fuzzysearch pydantic PyYAML json_repair`
 
 If successful, all requirements are satisfied.
 
@@ -314,6 +308,10 @@ python3 get-pip.py
 pip3 install chardet ebooklib openpyxl pandas pillow ply pdfminer.six plotly pydub pyqt6 python-vlc rispy six SpeechRecognition xmlschema
 ```
 
+```sh
+pip install langchain langchain-community langchain-core langchain-chroma langchain-openai langchain-text-splitters chromadb==0.5.0 sentence-transformers fuzzysearch pydantic PyYAML json_repair
+```
+
 Be sure that you are in the QualCoder-ai_integration directory before doing Step 6.
 
 To change the directory, enter or copy and run the script below.
@@ -358,7 +356,7 @@ Open the Terminal App and move to the unzipped Qualcoder-ai_integration director
 
 `pip3 install chardet ebooklib ffmpeg-python pyqt6 pillow ply pdfminer.six openpyxl pandas plotly pydub python-vlc rispy six SpeechRecognition xmlschema charset-normalizer`
 
-`pip3 install langchain langchain[llms] chromadb sentence-transformers fuzzysearch pydantic`
+`pip3 install langchain langchain-community langchain-core langchain-chroma langchain-openai langchain-text-splitters chromadb==0.5.0 sentence-transformers fuzzysearch pydantic PyYAML json_repair`
 
 2) Open the Terminal App and move to the unzipped Qualcoder-ai_integration directory, then run the following commands:
 
@@ -370,7 +368,7 @@ Open the Terminal App and move to the unzipped Qualcoder-ai_integration director
 ## Dependencies
 Required:
 
-Python 3.8+ version, pyqt6, Pillow, six  (Mac OS), ebooklib, ply, chardet, pdfminer.six, openpyxl, pandas, plotly, pydub, python-vlc, rispy, SpeechRecognition, xmlschema, charset-normalizer, langchain langchain[llms] chromadb sentence-transformers fuzzysearch pydantic
+Python 3.8+ version, pyqt6, Pillow, six  (Mac OS), ebooklib, ply, chardet, pdfminer.six, openpyxl, pandas, plotly, pydub, python-vlc, rispy, SpeechRecognition, xmlschema, charset-normalizer, langchain, langchain-community, langchain-core, langchain-chroma, langchain-openai, langchain-text-splitters, chromadb==0.5.0, sentence-transformers, fuzzysearch, pydantic, PyYAML, json_repair
 
 ## License
 QualCoder is distributed under the MIT LICENSE.
@@ -401,11 +399,3 @@ https://www.saashub.com/qualcoder-alternatives
 https://alternativeto.net/software/qualcoder
 
 Also, if you like Qualcoder a lot and want to advertise interest in its use, please write an article about your experience using QualCoder.
-## FaceBook group:
-To allow everyone to discuss all things QualCoder.
-
-Facebook page:
-[https://www.facebook.com/qualcoder](https://www.facebook.com/qualcoder)
-
-Facebook group:
-[https://www.facebook.com/groups/1251478525589873](https://www.facebook.com/groups/1251478525589873)
