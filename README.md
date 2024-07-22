@@ -2,31 +2,20 @@
 
 # QualCoder AI (beta)
 
-<table>
-  <thead>
-    <tr>
-      <td align="left">
-        :information_source: Note: This is an experimental version of QualCoder with AI-enhanced functionality. Watch the video below if you want to learn more.
-        
-        Version 3.6.1 beta (July 2024) is a major rework with the following additions:
-        - **AI Chat:** Let the AI analyze codings or any other topic in your data and discuss the results (with exact sources, of course)
-        - **Prompt Editing:** You can now view and edit all the prompts that QualCoder uses under the hood to instruct the AI on how to analyze your data. You can also define your own prompts, targeted at your particular methods and research questions. This returns methodological control back to us as researchers.
-        - **Alternative AI models:** QualCoder can now use other AI models besides the ones from OpenAI. In particular, we gained access to a free service called ["Blablador"](https://helmholtz-blablador.fz-juelich.de), offered by the German academic research agency Helmholtz Society. This service runs open-source models (Mixtral 8x7b being the largest at the moment) and is very privacy-friendly, storing no data at all. The quality of the output is usable for simple questions, but not yet on par with GPT-4 from OpenAI.
-        - The **AI Search** (see video below for a demonstration) has been greatly improved. It now also allows selecting between different prompts/different types of search.
+Note: This is an experimental version of QualCoder with AI-enhanced functionality.
 
-        Special thanks to these people for their feedback and support in impoving QualCoder AI:
-        Tom Meyer (Univ. of Bochum), Merle Koch, Ole Deitmer & Wenzel Urban (Univ. of Jena), Isabel Steinhardt (Univ. of Paderborn), Christian Schneijderberg (Univ. of Kassel) as well as Alexandre Strube (Forschungszentrum Jülich), the developer behind Blablador, and Colin Curtain (Univ. of Tasmania), the developer of QualCoder. 
-      </td>
-    </tr>
-  </thead>
+Version 3.6.1 beta (July 2024) is a major rework with the following additions:
+- **AI Chat:** Let the AI analyze codings or any other topic in your data and discuss the results (with exact sources, of course)
+- **Prompt Editing:** You can now view and edit all the prompts that QualCoder uses under the hood to instruct the AI on how to analyze your data. You can also define your own prompts, targeted at your particular methods and research questions. This returns methodological control back to us as researchers.
+- **Alternative AI models:** QualCoder can now use other AI models besides the ones from OpenAI. In particular, we gained access to a free service called ["Blablador"](https://helmholtz-blablador.fz-juelich.de), offered by the German academic research agency Helmholtz Society. This service runs open-source models (Mixtral 8x7b being the largest at the moment) and is very privacy-friendly, storing no data at all. The quality of the output is usable for simple questions, but not yet on par with GPT-4 from OpenAI.
+- The **AI Search** (see video below for a demonstration) has been greatly improved. It now also allows selecting between different prompts/different types of search.
 
-  <tbody>
-    <tr>
-      <td>      
+Special thanks to these people for their feedback and support in impoving QualCoder AI:<br />
+Tom Meyer (Univ. of Bochum), Merle Koch, Ole Deitmer & Wenzel Urban (Univ. of Jena), Isabel Steinhardt (Univ. of Paderborn), Christian Schneijderberg (Univ. of Kassel), Yves Jeanrenaud (Univ. of Munich) as well as Alexandre Strube (Forschungszentrum Jülich), the developer behind Blablador, and Colin Curtain (Univ. of Tasmania), the developer of QualCoder. 
 
 This AI enhanced version was created by [Kai Dröge](https://www.hslu.ch/de-ch/hochschule-luzern/ueber-uns/personensuche/profile/?pid=823), based on QualCoder 3.5
 
-It is planned to integrate my additions in the main version of QualCoder soon. Until then, you can use the AI-enhanced version alongside the regular QualCoder. Both apps will not interfere with each other.
+It is planned to integrate my additions into the main version of QualCoder soon. Until then, you can use the AI-enhanced version alongside the regular QualCoder. Both apps will not interfere with each other.
 
 ### Functionality
 
@@ -34,17 +23,17 @@ Watch my [video on YouTube](https://www.youtube.com/watch?v=FrQyTOTJhCc):</br>
 [![Horizontal Coding: AI-Based Qualitative Data Analysis in QualCoder, Free & Open Source](https://img.youtube.com/vi/FrQyTOTJhCc/hqdefault.jpg)](https://www.youtube.com/watch?v=FrQyTOTJhCc)
 
 In addition to what's shown in the video, QualCoder AI now also includes an **AI Chat**, offering three forms of dicussions with the AI:
-- Code Chat: Let the AI analyze the data in the codings for a particular code and chat about the results. The sources from your empirical data are referenced.
-- Topic Chat: Let the AI analyze any topic in you empirical data (independend of coding). Again, sources are referenced and you can discuss the results with the AI.
-- General Chat: Ask the AI anything, not related to your data. Basically a build-in ChatGPT.   
+- **Code Chat:** Let the AI analyze the data in the codings for a particular code and chat about the results. The sources from your empirical data are referenced.
+- **Topic Chat:** Let the AI analyze any topic in you empirical data (independend of coding). Again, sources are referenced and you can discuss the results with the AI.
+- **General Chat:** Ask the AI anything, not related to your data. Basically a build-in ChatGPT.   
 
 ### Installation
 
-Windows: 
+**Windows:**
 - Download "QualCoderAI_WINDOWS_setup.exe" from here: https://drive.switch.ch/index.php/s/cYJKPA3JV3fJqDc (switch drive is a secure data sharing platform for Swiss universities)
 - If you get a warning that "Windows protected your PC" and the app comes from an "Unknown publisher", you have to trust us and click "Run anyway"
 
-MacOS:
+**MacOS:**
 - Installer made by [gernophil](https://github.com/gernophil), thank you very much!
 - If you have trouble getting QualCoder to run, you might need to update your operating system to the latest available version.   
 - *Installation on M1/M2/M3-based Macs:*
@@ -60,7 +49,7 @@ Note: Unfortunately, we are currently not able to sign the x86_64 package correc
     - Go to Settings -> Privacy and Security -> Scroll down until you see a message stating QualCoder AI was prevented from starting and click "open anyway".
     - From now on, the program should start without issues.
 
-Linux: 
+**Linux:**
 - Follow the [installation instructions below](#installation-1) (untested)
 
 ### Setup:
