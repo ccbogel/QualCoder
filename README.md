@@ -4,7 +4,7 @@
 
 Note: This is an experimental version of QualCoder with AI-enhanced functionality.
 
-Version 3.6.1 beta (July 2024) is a major rework with the following new features:
+**Version 3.6.1 beta (July 2024)** is a major rework with the following new features:
 - **AI Chat:** Let the AI analyze codings or any other topic in your data and discuss the results (with exact sources, of course)
 - **Prompt Editing:** You can now view and edit all the prompts that QualCoder uses under the hood to instruct the AI on how to analyze your data. You can also define your own prompts, targeted at your particular methods and research questions. This returns methodological control back to us as researchers.
 - **Alternative AI models:** QualCoder can now use other AI models besides the ones from OpenAI. In particular, we gained access to a free service called ["Blablador"](https://helmholtz-blablador.fz-juelich.de), offered by the German academic research agency Helmholtz Society. This service runs open-source models (Mixtral 8x7b being the largest at the moment) and is very privacy-friendly, storing no data at all. The quality of the output is usable for simple questions, but not yet on par with GPT-4 from OpenAI.
@@ -23,7 +23,7 @@ Watch my [video on YouTube](https://www.youtube.com/watch?v=FrQyTOTJhCc):</br>
 [![Horizontal Coding: AI-Based Qualitative Data Analysis in QualCoder, Free & Open Source](https://img.youtube.com/vi/FrQyTOTJhCc/hqdefault.jpg)](https://www.youtube.com/watch?v=FrQyTOTJhCc)
 
 In addition to what's shown in the video, QualCoder AI now also includes an **AI Chat**, offering three forms of dicussions with the AI:
-- **Code Chat:** Let the AI analyze the data in the codings for a particular code and chat about the results. You can choose between different prompts or define you own. The sources from your empirical data are referenced in the text.
+- **Code Chat:** Let the AI analyze the data in the codings for a particular code and chat about the results. You can choose between different prompts or define your own. The sources from your empirical data are referenced in the text.
 - **Topic Chat:** Let the AI analyze any topic in you empirical data (independent of previous coding). Again, several prompts are available, the sources are referenced, and you can discuss the results with the AI.
 - **General Chat:** Ask the AI anything, not related to your data. Basically a build-in ChatGPT.   
 
@@ -37,16 +37,16 @@ In addition to what's shown in the video, QualCoder AI now also includes an **AI
 - Installer made by [gernophil](https://github.com/gernophil), thank you very much!
 - If you have trouble getting QualCoder to run, you might need to update your operating system to the latest available version.   
 - *Installation on M1/M2/M3-based Macs:*
-    - Download "QualCoderAI_MAC_arm64.dmg" from here: https://drive.switch.ch/index.php/s/Piozbkwkx90uxkK (switch drive is a secure data sharing platform for Swiss universities)
+    - Download "Qualcoder_MAC_3_6_1b_arm64.dmg" from here: https://drive.switch.ch/index.php/s/Piozbkwkx90uxkK (switch drive is a secure data sharing platform for Swiss universities)
     - Double-click on the dmg-file, then drag QualCoder AI into the link to your applications folder.
     - Start QualCoder AI by double-clicking the app within your applications folder.
 - *Installation on Intel-based Macs:*</br>
-Note: Unfortunately, we are currently not able to sign the x86_64 package correctly, so you will get a warning that QualCoder AI is from an unregistered developer. You have to manually allow QualCoder AI to be executed, if your Gatekeeper is active. Follow these steps:
-    - Download "QualCoderAI_MAC_x86_64_unsigned.dmg" from here: https://drive.switch.ch/index.php/s/Piozbkwkx90uxkK (switch drive is a secure data sharing platform for Swiss universities)
+Note: Unfortunately, we are having trouble to sign the x86_64 package correctly, so you might get a warning that QualCoder AI is from an unregistered developer. You have to manually allow QualCoder AI to be executed, if your Gatekeeper is active. Follow these steps:
+    - Download "Qualcoder_MAC_3_6_1b_x86_64.dmg" from here: https://drive.switch.ch/index.php/s/Piozbkwkx90uxkK (switch drive is a secure data sharing platform for Swiss universities)
     - Double-click the dmg-file.
     - Drag QualCoder AI into the link to your applications folder
-    - Start QualCoder AI by double-clicking the app within your applications folder. You will get an error that QualCoder AI is from an unregistered developer.
-    - Go to Settings -> Privacy and Security -> Scroll down until you see a message stating QualCoder AI was prevented from starting and click "open anyway".
+    - Start QualCoder AI by double-clicking the app within your applications folder.
+    - If you get an error that QualCoder AI is from an unregistered developer, go to Settings -> Privacy and Security -> Scroll down until you see a message stating QualCoder AI was prevented from starting and click "open anyway".
     - From now on, the program should start without issues.
 
 **Linux:**
