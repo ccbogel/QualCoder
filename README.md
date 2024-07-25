@@ -112,7 +112,7 @@ Seriously consider using a virtual environment (commands in point 6 below). Not 
 
 IMPORTANT: in the first window of the installation mark the option "Add Python to PATH"
 
-2.  Download the QualCoder software from: https://github.com/kaixxx/QualCoder/tree/ai_integration (green 'Code' button > Download ZIP) or use git to clone the repo (make sure to use the 'ai_integration' branch)
+2.  Download the QualCoder software from: https://github.com/kaixxx/QualCoder/tree/ai_integration_rework (green 'Code' button > Download ZIP) or use git to clone the repo (make sure to use the 'ai_integration' branch)
 
 3.    Unzip the folder to a location (e.g. downloads). 
 
@@ -287,7 +287,7 @@ You will need to install developer tools for macOS. [See https://www.cnet.com/te
 
 1) Install recent versions of [Python3](https://www.python.org/downloads/) and [VLC](https://www.videolan.org/vlc/).
 
-2) Download the latest release "Source code" version in ZIP format: https://github.com/kaixxx/QualCoder/tree/ai_integration (green 'Code' button > Download ZIP). Extract it into /Applications
+2) Download the latest release "Source code" version in ZIP format: https://github.com/kaixxx/QualCoder/tree/ai_integration_rework (green 'Code' button > Download ZIP). Extract it into /Applications
 
 3) Open the Terminal app (or any other command shell)
 
@@ -376,7 +376,7 @@ QualCoder is distributed under the MIT LICENSE.
 ##  Citation APA style
 
 Curtain, C. & Dröge, K. (2023) QualCoder AI beta [Computer software]. Retrieved from
-https://github.com/kaixxx/QualCoder/tree/ai_integration
+https://github.com/kaixxx/QualCoder/tree/ai_integration_rework
 
 ## Creators
 
