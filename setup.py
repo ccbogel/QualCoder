@@ -68,8 +68,7 @@ setup(
         'plotly',
         'pydub',
         'rispy',
-        'SpeechRecognition',
-        'xmlschema'
+        'SpeechRecognition'
     ],
     package_data={
         'qualcoder':['Codebook.xsd', 'Project-mrt2019.xsd',
