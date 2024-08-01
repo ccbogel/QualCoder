@@ -67,6 +67,7 @@ def exception_handler(exception_type, value, tb_obj):
     mb.exec()
 
 categories_merged_update_graphics_items = []  # [old_catid, new_catid]
+categories_linked_update_graphics_items = []  # [catid, new_supercatid]
 
 
 class CodeOrganiser(QDialog):
@@ -153,7 +154,6 @@ class CodeOrganiser(QDialog):
         temp_cat_id = randint(-1000, -1)
         while temp_cat_id in cat_ids_list:
             temp_cat_id = randint(-1000, -1)
-        print("TEmp_cat_id", temp_cat_id)
         now_date = datetime.datetime.now().astimezone().strftime("%Y%m%d_%H-%S")
         # No original_name, original_catid, original_supercatid
         new_category = {'name': new_category_name, 'catid': temp_cat_id, 'owner': self.settings['codername'],
@@ -422,12 +422,13 @@ class CodeOrganiser(QDialog):
         # Menu for blank graphics view area
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-        '''action_add_text_item = menu.addAction(_("Insert Text"))
-        action_add_line = menu.addAction(_("Insert Line"))
+        action_print_items = menu.addAction(_("Print items"))
+        #action_add_line = menu.addAction(_("Insert Line"))
         action = menu.exec(self.ui.graphicsView.mapToGlobal(position))
-        if action == action_add_line:
-            self.add_lines_to_graph()
-        '''
+        if action == action_print_items:
+            for i in self.scene.items():
+                print(item)
+
 
     def export_image(self):
         """ Export the QGraphicsScene as a png image with transparent background.
@@ -499,22 +500,33 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
         for item in self.items():
             if isinstance(item, TextGraphicsItem) and item.code_or_cat['name'] == "":
                 self.removeItem(item)
-        # Update code.catid or category.supercatid if a category has been merged itno anotehr category
+        # Update code.catid or category.supercatid if a category has been merged into another category
         global categories_merged_update_graphics_items
         if len(categories_merged_update_graphics_items) > 0:
-            print("global values", categories_merged_update_graphics_items)
+            #print("global values", categories_merged_update_graphics_items)
             for item in self.items():
                 # a Code item
                 if isinstance(item, TextGraphicsItem) and item.code_or_cat['cid'] and \
                         item.code_or_cat['catid'] == categories_merged_update_graphics_items[0]:
-                    print("Match", item.code_or_cat['name'])
+                    #print("Match", item.code_or_cat['name'])
                     item.code_or_cat['catid'] = categories_merged_update_graphics_items[1]
                 # Category item
                 if isinstance(item, TextGraphicsItem) and item.code_or_cat['supercatid'] and \
                         item.code_or_cat['supercatid'] == categories_merged_update_graphics_items[0]:
-                    print("Match", item.code_or_cat['name'])
+                    #print("Match", item.code_or_cat['name'])
                     item.code_or_cat['supercatid'] = categories_merged_update_graphics_items[1]
             categories_merged_update_graphics_items = []
+
+        # Update category.supercatid if a category has been linked under another category
+        global categories_linked_update_graphics_items
+        if len(categories_linked_update_graphics_items) > 0:
+            for item in self.items():
+                if isinstance(item, TextGraphicsItem) and item.code_or_cat['supercatid'] and \
+                        item.code_or_cat['catid'] == categories_linked_update_graphics_items[0]:
+                    print("Match cat", item.code_or_cat['name'])
+                    item.code_or_cat['supercatid'] = categories_linked_update_graphics_items[1]
+                    categories_linked_update_graphics_items = []
+                    break
 
         # Check and update stored positions
         for item in self.items():
@@ -639,10 +651,10 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
 
     def __init__(self, app, code_or_cat, codes, categories):
         """ Show name and colour of text. Has context menu for various options.
-         param: app  : the main App class
-         param: code_or_cat  : Dictionary of the code details: name, memo, color etc
-         param: codes : List of codes
-         :param categories : List of categories
+         :param: app  : the main App class
+         :param: code_or_cat  : Dictionary of the code details: name, memo, color etc
+         :param: codes : List of codes
+         :param: categories : List of categories
          """
 
         super(TextGraphicsItem, self).__init__(None)
@@ -823,12 +835,17 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
 
     def link_category_under_category(self):
 
+        # Check if category is child - cannot have circular referencing
+        #children = self.child_categories(self.code_or_cat)
+        child_ids = self.child_categories(self.code_or_cat, [])
+        print(child_ids)
+        #print(f"Linking {self.code_or_cat['name']}\n--Child cats: {children}")
+        #return ("Print testing link category. End")
         categories = []
         for cat in self.categories:
             if cat['catid'] != self.code_or_cat['catid'] and cat['name'] != "":
-                # Check if category is child - cannt have circular referencing
-                children = self.child_categories(self.code_or_cat)
-                print("child cats", children)
+                # Check if category is child - cannot have circular referencing
+                #TODO
                 categories.append(cat)
         ui = DialogSelectItems(self.app, categories, 'Select category', 'single')
         ui.exec()
@@ -836,37 +853,24 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         if not category:
             return
         self.code_or_cat['supercatid'] = category['catid']
-        for c in self.categories:
-            print(c)
+        global categories_linked_update_graphics_items
+        categories_linked_update_graphics_items =[self.code_or_cat['catid'], category['catid']]
 
-    def child_categories(self, node):
-        """ Get child categories of this category node.
+    def child_categories(self, parent, child_ids):
+        """ Get child categories of this category parent.
         Create a list of this category (node) and all its category children.
         Maximum depth of 200.
         :param : node : Dictionary of category
         :return : child_category_ids : List of catid
         """
 
-        categories = deepcopy(self.categories)
-        sub_categories = []
-        i = 0  # Ensure an exit from loop
-        new_model_changed = True
-        while categories != [] and new_model_changed and i < 200:
-            new_model_changed = False
-            append_list = []
-            for n in sub_categories:
-                for m in categories:
-                    if m['supercatid'] == n['catid']:
-                        append_list.append(m)
-            for n in append_list:
-                sub_categories.append(n)
-                categories.remove(n)
-                new_model_changed = True
-            i += 1
-        child_category_ids = []
-        for category in sub_categories:
-            child_category_ids.append(category['catid'])
-        return child_category_ids
+        #categories = deepcopy(self.categories)
+        for category in self.categories:
+            print(parent['catid'], category)
+            if parent['catid'] == category['supercatid']:
+                child_ids += self.child_categories(category, child_ids)
+                print(category['name'], "child of", parent['name'])
+        return child_ids
 
     def merge_category_into_category(self):
         categories = []
