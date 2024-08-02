@@ -68,6 +68,10 @@ def exception_handler(exception_type, value, tb_obj):
 
 categories_merged_update_graphics_items = []  # [old_catid, new_catid]
 categories_linked_update_graphics_items = []  # [catid, new_supercatid]
+# Easier to modify these variables across the classes if they are global
+categories = []
+codes = []
+model = []
 
 
 class CodeOrganiser(QDialog):
@@ -81,8 +85,6 @@ class CodeOrganiser(QDialog):
     conn = None
     settings = None
     scene = None
-    categories = []
-    codes = []
     font_size = 9
 
     def __init__(self, app):
@@ -122,19 +124,21 @@ class CodeOrganiser(QDialog):
         self.ui.graphicsView.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.graphicsView.customContextMenuRequested.connect(self.graphicsview_menu)
         self.ui.graphicsView.viewport().installEventFilter(self)
-        self.codes, self.categories = app.get_codes_categories()
-        for code in self.codes:
+        global codes
+        global categories
+        codes, categories = app.get_codes_categories()
+        for code in codes:
             code['original_catid'] = code['catid']
             code['original_name'] = code['name']
-        for category in self.categories:
+        for category in categories:
             category['original_catid'] = category['catid']
             category['original_supercatid'] = category['supercatid']
             category['original_name'] = category['name']
         """ qdpx import quirk, but category names and code names can match. (MAXQDA, Nvivo)
         This causes hierarchy to not work correctly (eg when moving a category).
         Solution, add spaces after the code_name to separate it out. """
-        for code in self.codes:
-            for cat in self.categories:
+        for code in codes:
+            for cat in categories:
                 if code['name'] == cat['name']:
                     code['name'] = code['name'] + " "
 
@@ -142,10 +146,10 @@ class CodeOrganiser(QDialog):
         """ Create a new category. """
 
         cat_ids_list = []
-        for cat in self.categories:
+        for cat in categories:
             cat_ids_list.append(cat['catid'])
 
-        ui = DialogAddItemName(self.app, self.categories, _("Category"), _("Category name"))
+        ui = DialogAddItemName(self.app, categories, _("Category"), _("Category name"))
         ui.exec()
         new_category_name = ui.get_new_name()
         if new_category_name is None:
@@ -159,16 +163,18 @@ class CodeOrganiser(QDialog):
         new_category = {'name': new_category_name, 'catid': temp_cat_id, 'owner': self.settings['codername'],
                         'date': now_date, 'memo': '', 'supercatid': None,
                         'x': 10 + randint(0, 6), 'y': 10 + randint(0, 6), 'color': "#FFFFFF", 'cid': None, 'child_names': []}
-        self.categories.append(new_category)
-        self.scene.addItem(TextGraphicsItem(self.app, new_category, self.codes, self.categories))
+        categories.append(new_category)
+        self.scene.addItem(TextGraphicsItem(self.app, new_category, codes, categories))
 
     def select_tree_branch(self):
         """ Selected tree branch for model of codes and categories.
-        Called by pushButton_selectbranch
+        Called by pushButton_selectbranch.
+        Only one branch selection can be organised at a time.
+        e.g. a specific selected branch, or All for all codes and categories.
         """
 
         selection_list = [{'name': 'All'}]
-        for category in self.categories:
+        for category in categories:
             if category['name'] != "":
                 selection_list.append({'name': category['name']})
         ui = DialogSelectItems(self.app, selection_list, _("Select code tree branch"), "multi")
@@ -180,43 +186,55 @@ class CodeOrganiser(QDialog):
             node_text = "All"
         else:
             node_text = selected[0]['name']
-        cats, codes, model = self.create_initial_model()
-        model = self.get_refined_model_with_category_counts(cats, model, node_text)
-        self.list_graph(model)
+        self.create_initial_model()
+        self.get_refined_model_with_category_counts(node_text)
+        global model
+        print("^^^^ MODEL ^^^^")
+        for m in model:
+            print(m)
+        print("^^^^^^^ CATS ^^^^^^^^^")
+        for ca in categories:
+            print(ca)
+        print("^^^^^^^ CODES ^^^^^^^^^")
+        for c in codes:
+            print(c)
+        print("^^^^^^^^^^^^^^^^")
+
+        self.list_graph()
         self.ui.pushButton_selectbranch.setEnabled(False)
-        self.ui.pushButton_selectbranch.setText(_("Branch has been selected"))
+        self.ui.pushButton_selectbranch.setToolTip(_("Branch has been selected"))
 
     def create_initial_model(self):
         """ Create initial model of codes and categories.
         model contains categories and codes combined.
 
         return: categories : List of Dictionaries of categories
-        return: codes : List of Dictionaries of codes
-        return: model : List of Dictionaries of codes and categories
         """
 
-        cats = deepcopy(self.categories)
-        codes = deepcopy(self.codes)
+        global categories
+        global codes
+        copy_of_categories = deepcopy(categories)
+        copy_of_codes = deepcopy(codes)
 
-        for code_ in codes:
+        for code_ in copy_of_codes:
             code_['x'] = None
             code_['y'] = None
             code_['supercatid'] = code_['catid']
-        for cat in cats:
-            cat['x'] = None
-            cat['y'] = None
-            cat['cid'] = None
-            cat['color'] = '#FFFFFF'
-        model = cats + codes
-        return cats, codes, model
+        for category in copy_of_categories:
+            category['x'] = None
+            category['y'] = None
+            category['cid'] = None
+            category['color'] = '#FFFFFF'
+        global model
+        model = copy_of_categories + copy_of_codes
+        categories = copy_of_categories
+        codes = copy_of_codes
 
-    def get_refined_model_with_category_counts(self, cats, model, top_node_text):
+    def get_refined_model_with_category_counts(self, top_node_text):
         """ The initial model contains all categories and codes.
         The refined model method is called and based on a selected category, via QButton_selection.
         The refined model also gets counts for nodes of each category
 
-        param: cats : List of Dictionaries of categories
-        param: model : List of Dictionaries of combined categories and codes
         param: top_node_text : String name of the top category
 
         return: model : List of Dictionaries
@@ -226,26 +244,25 @@ class CodeOrganiser(QDialog):
         if top_node_text == "All":
             top_node = None
         else:
-            for cat in cats:
-                if cat['name'] == top_node_text:
-                    top_node = cat
+            global categories
+            for category in categories:
+                if category['name'] == top_node_text:
+                    top_node = category
                     top_node['supercatid'] = None  # Must set this to None
-        model = self.get_refined_model(top_node, model)
-        return model
+        self.get_refined_model(top_node)
 
     @staticmethod
-    def get_refined_model(node, model):
-        """ Return a refined model of this top node and all its children.
+    def get_refined_model(node):
+        """ Create a refined model of this top node and all its children.
+        Update the global codes and categories to match
         Called by: get_refined_model_with_category_counts
-
-        param: node : Dictionary of category, or None
-        param: model : List of Dictionaries - of categories and codes
-
-        return: new_model : List of Dictionaries of categories and codes
         """
 
+        global model
+        global codes
+        global categories
         if node is None:
-            return model
+            return  # model_
         refined_model = [node]
         i = 0  # Ensure an exit from while loop
         model_changed = True
@@ -261,7 +278,14 @@ class CodeOrganiser(QDialog):
                 model.remove(n)
                 model_changed = True
             i += 1
-        return refined_model
+        model = refined_model
+        categories = []
+        codes = []
+        for item in model:
+            if item['cid'] is not None:
+                codes.append(item)
+            else:
+                categories.append(item)
 
     def named_children_of_node(self, node):
         """ Get child categories and codes of this category node.
@@ -275,12 +299,12 @@ class CodeOrganiser(QDialog):
         if node['cid'] is not None:
             return []
         child_names = []
-        codes, categories = self.app.get_codes_categories()
+        codes_, categories_ = self.app.get_codes_categories()
         """ qdpx import quirk, but category names and code names can match. (MAXQDA, Nvivo)
         This causes hierarchy to not work correctly (eg when moving a category).
         Solution, add spaces after the code_name to separate it out. """
-        for code in codes:
-            for cat in categories:
+        for code in codes_:
+            for cat in categories_:
                 if code['name'] == cat['name']:
                     code['name'] = code['name'] + " "
 
@@ -289,39 +313,40 @@ class CodeOrganiser(QDialog):
         selected_categories = [node]
         i = 0  # Ensure an exit from loop
         new_model_changed = True
-        while categories != [] and new_model_changed and i < 200:
+        while categories_ != [] and new_model_changed and i < 200:
             new_model_changed = False
             append_list = []
             for n in selected_categories:
-                for m in categories:
+                for m in categories_:
                     if m['supercatid'] == n['catid']:
                         append_list.append(m)
                         child_names.append(m['name'])
             for n in append_list:
                 selected_categories.append(n)
-                categories.remove(n)
+                categories_.remove(n)
                 new_model_changed = True
             i += 1
-        categories = selected_categories
+        categories_ = selected_categories
         # Remove codes that are not associated with these categories
         selected_codes = []
-        for cat in categories:
-            for code in codes:
+        for cat in categories_:
+            for code in codes_:
                 if code['catid'] == cat['catid']:
                     selected_codes.append(code)
-        codes = selected_codes
-        for c in codes:
+        codes_ = selected_codes
+        for c in codes_:
             child_names.append(c['name'])
         return child_names
 
-    def list_graph(self, model):
+    def list_graph(self):
         """ Create a list graph with the categories on the left and codes on the right.
-        Additive, adds another model of nodes to the scene.
-        Does not add nodes that are already existing in the scene.
 
-        param: model : List of Dictionaries of categories and codes
+        param: global model : List of Dictionaries of categories and codes
         """
 
+        global categories
+        global codes
+        global model
         # Order the model by supercatid, subcats, codes
         ordered_model = []
         # Top level categories
@@ -358,7 +383,7 @@ class CodeOrganiser(QDialog):
                             scene_item.code_or_cat['cid'] == code_or_cat['cid']:
                         add_to_scene = False
             if add_to_scene:
-                self.scene.addItem(TextGraphicsItem(self.app, code_or_cat, self.codes, self.categories))
+                self.scene.addItem(TextGraphicsItem(self.app, code_or_cat, codes, categories))
 
         '''# Add link from Category to Category, which includes the scene text items and associated data
         for scene_item in self.scene.items():
@@ -428,7 +453,6 @@ class CodeOrganiser(QDialog):
         if action == action_print_items:
             for i in self.scene.items():
                 print(item)
-
 
     def export_image(self):
         """ Export the QGraphicsScene as a png image with transparent background.
@@ -864,8 +888,8 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         :return : child_category_ids : List of catid
         """
 
-        #categories = deepcopy(self.categories)
-        for category in self.categories:
+        categories_ = deepcopy(categories)
+        for category in categories_:  # or categories_ ?
             print(parent['catid'], category)
             if parent['catid'] == category['supercatid']:
                 child_ids += self.child_categories(category, child_ids)
