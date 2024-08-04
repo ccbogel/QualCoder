@@ -66,13 +66,9 @@ def exception_handler(exception_type, value, tb_obj):
     mb.setText(txt)
     mb.exec()
 
-categories_merged_update_graphics_items = []  # [old_catid, new_catid]
-categories_linked_update_graphics_items = []  # [catid, new_supercatid]
-update_graphics_item_models = False
 # Easier to modify these variables across the classes if they are global
-categories = []
-codes = []
 model = []
+update_graphics_item_models = False
 
 
 class CodeOrganiser(QDialog):
@@ -125,23 +121,19 @@ class CodeOrganiser(QDialog):
         self.ui.graphicsView.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.graphicsView.customContextMenuRequested.connect(self.graphicsview_menu)
         self.ui.graphicsView.viewport().installEventFilter(self)
-        global codes
-        global categories
-        codes, categories = app.get_codes_categories()
-        for code in codes:
-            code['original_catid'] = code['catid']
-            code['original_name'] = code['name']
-        for category in categories:
-            category['original_catid'] = category['catid']
-            category['original_supercatid'] = category['supercatid']
-            category['original_name'] = category['name']
+        global update_graphics_item_models
+        update_graphics_item_models = False
+        global model
+        model = []
+
+        #TODO fix
         """ qdpx import quirk, but category names and code names can match. (MAXQDA, Nvivo)
         This causes hierarchy to not work correctly (eg when moving a category).
         Solution, add spaces after the code_name to separate it out. """
-        for code in codes:
+        '''for code in codes:
             for cat in categories:
                 if code['name'] == cat['name']:
-                    code['name'] = code['name'] + " "
+                    code['name'] = code['name'] + " "'''
 
     def create_category(self):
         """ Create a new category, via push button. """
@@ -166,7 +158,7 @@ class CodeOrganiser(QDialog):
         new_category = {'name': new_category_name, 'catid': temp_cat_id, 'owner': self.settings['codername'],
                         'date': now_date, 'memo': '', 'supercatid': None,
                         'x': 10 + randint(0, 6), 'y': 10 + randint(0, 6), 'color': "#FFFFFF",
-                        'cid': None, 'child_names': []}
+                        'cid': None, 'original_cid': None, 'original_catid': temp_cat_id, 'child_names': []}
         model.append(new_category)
         self.scene.addItem(TextGraphicsItem(self.app, new_category))
 
@@ -178,8 +170,8 @@ class CodeOrganiser(QDialog):
         """
 
         selection_list = [{'name': 'All'}]
+        codes, categories = self.app.get_codes_categories()
         for category in categories:
-            if category['name'] != "":
                 selection_list.append({'name': category['name']})
         ui = DialogSelectItems(self.app, selection_list, _("Select code tree branch"), "multi")
         ok = ui.exec()
@@ -197,30 +189,32 @@ class CodeOrganiser(QDialog):
         self.ui.pushButton_selectbranch.setToolTip(_("Branch has been selected"))
 
     def create_initial_model(self):
-        """ Create initial model of codes and categories.
+        """ Create initial model of all codes and categories.
         model contains categories and codes combined.
 
         return: categories : List of Dictionaries of categories
         """
 
-        global categories
-        global codes
-        copy_of_categories = deepcopy(categories)
-        copy_of_codes = deepcopy(codes)
+        codes, categories = self.app.get_codes_categories()
+        for code in codes:
+            code['original_cid'] = code['cid']
+            code['original_catid'] = code['catid']
+            code['original_name'] = code['name']
+            code['x'] = None
+            code['y'] = None
+            code['supercatid'] = code['catid']
 
-        for code_ in copy_of_codes:
-            code_['x'] = None
-            code_['y'] = None
-            code_['supercatid'] = code_['catid']
-        for category in copy_of_categories:
+        for category in categories:
+            category['original_cid'] = None
+            category['original_catid'] = category['catid']
+            category['original_supercatid'] = category['supercatid']
+            category['original_name'] = category['name']
             category['x'] = None
             category['y'] = None
             category['cid'] = None
             category['color'] = '#FFFFFF'
         global model
-        model = copy_of_categories + copy_of_codes
-        categories = copy_of_categories
-        codes = copy_of_codes
+        model = categories + codes
 
     def get_refined_model_with_category_counts(self, top_node_text):
         """ The initial model contains all categories and codes.
@@ -232,11 +226,16 @@ class CodeOrganiser(QDialog):
         return: model : List of Dictionaries
         """
 
+        categories = []
+        global model
+        for item in model:
+            if item['cid'] is None:
+                categories.append(item)
+
         top_node = None
         if top_node_text == "All":
             top_node = None
         else:
-            global categories
             for category in categories:
                 if category['name'] == top_node_text:
                     top_node = category
@@ -251,8 +250,6 @@ class CodeOrganiser(QDialog):
         """
 
         global model
-        global codes
-        global categories
         if node is None:
             return  # model_
         refined_model = [node]
@@ -405,11 +402,13 @@ class CodeOrganiser(QDialog):
             for m in model:
                 print(m)
             print("^^^^^^^ CATS ^^^^^^^^^")
-            for ca in categories:
-                print(ca)
+            for category in model:
+                if category['cid'] is None:
+                    print(category)
             print("^^^^^^^ CODES ^^^^^^^^^")
-            for c in codes:
-                print(c)
+            for code in model:
+                if code['cid'] is not None:
+                    print(code)
             print("^^^^^^^^^^^^^^^^")
 
     def reject(self):
@@ -445,9 +444,12 @@ class CodeOrganiser(QDialog):
         action_add_category = menu.addAction(_("Add category"))
         action = menu.exec(self.ui.graphicsView.mapToGlobal(position))
         if action == action_print_items:
+            print("\nPrint of graphics items\n========")
             for i in self.scene.items():
                 if isinstance(i, TextGraphicsItem):
-                    print("Graphics item: ", i.code_or_cat)
+                    print(f"Graphics item: {i.code_or_cat['name']} cid:{i.code_or_cat['cid']} ocid:{i.code_or_cat['original_cid']}"
+                          f" catid:{i.code_or_cat['catid']} ocatid:{i.code_or_cat['original_catid']} "
+                          f"supercatid:{i.code_or_cat['supercatid']} child names{i.code_or_cat['child_names']}")
         if action == action_add_category:
             global model
             cat_ids_list = []
@@ -469,7 +471,8 @@ class CodeOrganiser(QDialog):
             new_category = {'name': new_category_name, 'catid': temp_cat_id, 'owner': self.settings['codername'],
                             'date': now_date, 'memo': '', 'supercatid': None,
                             'x': 10 + randint(0, 6), 'y': 10 + randint(0, 6), 'color': "#FFFFFF",
-                            'cid': None, 'child_names': []}
+                            'cid': None, 'child_names': [], 'original_cid': None,
+                            'original_catid': temp_cat_id}
             model.append(new_category)
             self.scene.addItem(TextGraphicsItem(self.app, new_category))  # codes, categories))
 
@@ -546,7 +549,29 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
             if isinstance(item, TextGraphicsItem) and item.code_or_cat['name'] == "":
                 self.removeItem(item)
         # Update code.catid or category.supercatid if a category has been merged into another category
-        global categories_merged_update_graphics_items
+        global model
+        global update_graphics_item_models
+        if update_graphics_item_models:
+            for m_item in model:
+                if m_item['original_cid'] is None:
+                    m_item['child_names'] = self.named_children_of_node(m_item)
+            for gr_item in self.items():
+                if isinstance(gr_item, TextGraphicsItem):
+                    for m_item in model:
+                        # Check codes
+                        if gr_item.code_or_cat['original_cid'] is not None and \
+                            gr_item.code_or_cat['original_cid'] == m_item['original_cid']:
+                                gr_item.code_or_cat = m_item
+                                gr_item.set_text()
+                                #break
+                        # Check categories
+                        '''if gr_item.code_or_cat['original_cid'] is None and \
+                            gr_item.code_or_cat['original_catid'] == m_item['original_catid']:
+                                gr_item.code_or_cat = m_item
+                                gr_item.set_text()
+                                #break'''
+
+        '''global categories_merged_update_graphics_items
         if len(categories_merged_update_graphics_items) > 0:
             #print("global values", categories_merged_update_graphics_items)
             for item in self.items():
@@ -571,7 +596,7 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
                     print("Match cat", item.code_or_cat['name'])
                     item.code_or_cat['supercatid'] = categories_linked_update_graphics_items[1]
                     categories_linked_update_graphics_items = []
-                    break
+                    break'''
 
         # Check and update stored positions
         for item in self.items():
@@ -616,6 +641,67 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
             if isinstance(item, LinkGraphicsItem):
                 item.redraw()
         self.update(self.sceneRect())"""
+
+    def named_children_of_node(self, node):
+        """ Get child categories and codes of this category node.
+        Only keep the category or code name. Used to reposition TextGraphicsItems on moving a category.
+
+        param: node : Dictionary of category
+
+        return: child_names : List
+        """
+
+        if node['cid'] is not None:
+            return []
+        child_names = []
+        #codes_, categories_ = self.app.get_codes_categories()
+        codes_ = []
+        categories_ = []
+        global model
+        model_copy = deepcopy(model)
+        for item in model_copy:
+            if item['cid'] is None:
+                categories_.append(item)
+            else:
+                codes_.append(item)
+
+        """ qdpx import quirk, but category names and code names can match. (MAXQDA, Nvivo)
+        This causes hierarchy to not work correctly (eg when moving a category).
+        Solution, add spaces after the code_name to separate it out. """
+        for code in codes_:
+            for cat in categories_:
+                if code['name'] == cat['name']:
+                    code['name'] = code['name'] + " "
+
+        """ Create a list of this category (node) and all its category children.
+        Maximum depth of 200. """
+        selected_categories = [node]
+        i = 0  # Ensure an exit from loop
+        new_model_changed = True
+        while categories_ != [] and new_model_changed and i < 200:
+            new_model_changed = False
+            append_list = []
+            for sel_category in selected_categories:
+                for m in categories_:
+                    if m['supercatid'] == sel_category['catid']:
+                        append_list.append(m)
+                        child_names.append(m['name'])
+            for append_item in append_list:
+                selected_categories.append(append_item)
+                categories_.remove(append_item)
+                new_model_changed = True
+            i += 1
+        categories_ = selected_categories
+        # Remove codes that are not associated with these categories
+        selected_codes = []
+        for category in categories_:
+            for code in codes_:
+                if code['catid'] == category['catid']:
+                    selected_codes.append(code)
+        codes_ = selected_codes
+        for code_ in codes_:
+            child_names.append(code_['name'])
+        return child_names
 
     def remove_links(self):
         """ Clean up by removing all links """
@@ -711,18 +797,27 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         #self.codes = codes
         #self.categories = categories
         self.setPos(self.code_or_cat['x'], self.code_or_cat['y'])
-        self.text = f"{self.code_or_cat['name']} catid[{self.code_or_cat['catid']}]"
-        if self.code_or_cat['cid'] is None:
-            self.text += f" supercatid[{self.code_or_cat['supercatid']}]"
+
         self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsFocusable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
         # self.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditable)
         self.setDefaultTextColor(QtGui.QColor(TextColor(self.code_or_cat['color']).recommendation))
         self.setFont(QtGui.QFont(self.settings['font'], 9, QtGui.QFont.Weight.Normal))
-        self.setPlainText(self.text)
         self.code_or_cat['memo'] = ""
         self.get_memo()
+        self.set_text()
+
+    def set_text(self):
+        """ Set viewable text """
+
+        text_ = f"{self.code_or_cat['name']}\n"
+        if self.code_or_cat['cid'] is not None:
+            text_ += f"catid[{self.code_or_cat['catid']} cid[{self.code_or_cat['cid']}]]"
+        if self.code_or_cat['cid'] is None:
+            text_ += f"catid[{self.code_or_cat['catid']}]"
+            text_ += f" supercatid[{self.code_or_cat['supercatid']}]"
+        self.setPlainText(text_)
 
     def get_memo(self):
         cur = self.app.conn.cursor()
@@ -837,14 +932,22 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
                 categories_.append(item)
         ui = DialogSelectItems(self.app, categories_, 'Select category', 'single')
         ui.exec()
-        category= ui.get_selected()
+        category = ui.get_selected()
         if not category:
+            print("Here")
             return
-        self.code_or_cat['catid'] = category['catid']
+        print("Link code to category")
+        print(self.code_or_cat)
+        print("new catid", category['catid'])
         for item in model:
-            if item['cid']  == self.code_or_cat['cid']:
+            if item['cid'] == self.code_or_cat['cid']:
                 item['catid'] = category['catid']
                 break
+        global update_graphics_item_models
+        update_graphics_item_models = True
+        self.code_or_cat['catid'] = category['catid']
+        print(self.code_or_cat)
+
 
     def merge_code_into_code(self):
         """ """
@@ -865,6 +968,8 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
                 item['cid'] = merge_code['cid']
                 break
         self.hide()
+        global update_graphics_item_models
+        update_graphics_item_models = True
 
     def remove_code_from_category(self):
         """ Remove code from category as top level item. """
@@ -875,6 +980,8 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
             if item['cid'] == self.code_or_cat['cid']:
                 item['catid'] = None
                 break
+        global update_graphics_item_models
+        update_graphics_item_models = True
 
     def case_media(self, ):
         """ Display all coded text and media for this code.
@@ -918,12 +1025,14 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.code_or_cat['supercatid'] = category['catid']
 
         # TODO need these 2 lines .. ?
-        global categories_linked_update_graphics_items
-        categories_linked_update_graphics_items =[self.code_or_cat['catid'], category['catid']]
+        #global categories_linked_update_graphics_items
+        #categories_linked_update_graphics_items =[self.code_or_cat['catid'], category['catid']]
 
         for item in model:
             if item['catid'] == self.code_or_cat['catid']:
                 item['supercatid'] = category['catid']
+        global update_graphics_item_models
+        update_graphics_item_models = True
 
     def child_categories(self, parent, child_ids):
         """ Get child categories of this category parent.
@@ -933,8 +1042,13 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         :return : child_category_ids : List of catid
         """
 
-        categories_ = deepcopy(categories)
-        for category in categories_:  # or categories_ ?
+        categories = []
+        global model
+        for item in model:
+            if item['cid'] is None:
+                categories.append(item)
+        #categories_ = deepcopy(categories)
+        for category in categories:  # or categories_ ?
             print(parent['catid'], category)
             if parent['catid'] == category['supercatid']:
                 child_ids += self.child_categories(category, child_ids)
@@ -944,14 +1058,13 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
     def merge_category_into_category(self):
         """  """
 
-        categories_ = []
-        #for c in self.categories:
+        categories = []
         global model
         for item in model:
             if item['catid'] != self.code_or_cat['catid'] and item['name'] != "" and item['cid'] is None:
                 # TODO cannot merge into sub category
-                categories_.append(item)
-        ui = DialogSelectItems(self.app, categories_, 'Select category', 'single')
+                categories.append(item)
+        ui = DialogSelectItems(self.app, categories, 'Select category', 'single')
         ui.exec()
         merge_category = ui.get_selected()
         if not merge_category:
@@ -972,12 +1085,14 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
                 item['catid'] = merge_category['catid']'''
 
         # TODO need next 2 lines ?
-        global categories_merged_update_graphics_items
-        categories_merged_update_graphics_items = [self.code_or_cat['catid'], merge_category['catid']]
+        #global categories_merged_update_graphics_items
+        #categories_merged_update_graphics_items = [self.code_or_cat['catid'], merge_category['catid']]
 
         self.code_or_cat['catid'] = merge_category['catid']
         self.code_or_cat['name'] = ""
         self.hide()
+        global update_graphics_item_models
+        update_graphics_item_models = True
 
     def remove_category_from_category(self):
         """ Remove category from category as top level item. """
@@ -986,6 +1101,8 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         for item in model:
             if item['catid'] == self.code_or_cat['catid']:
                 item['supercatid'] = None
+        global update_graphics_item_models
+        update_graphics_item_models = True
 
 
 class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
@@ -1005,7 +1122,7 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
 
         self.from_widget = from_widget
         self.to_widget = to_widget
-        self.text = from_widget.text + " - " + to_widget.text
+        #self.text = from_widget.text + " - " + to_widget.text
         self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
         self.calculate_points_and_draw()
         self.redraw()
