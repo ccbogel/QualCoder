@@ -1575,7 +1575,6 @@ class MainWindow(QtWidgets.QMainWindow):
     def code_organiser(self):
         """ Organise codes structure. """
 
-        print("Code Organiser")
         ui = CodeOrganiser(self.app)  #, self.ui.textEdit, self.ui.tab_reports)
         ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
         self.tab_layout_helper(self.ui.tab_coding, ui)
@@ -1977,13 +1976,14 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def stop_heartbeat(self, wait=False):
         """Stop the heartbeat and delete the lock file (if it exists)."""
-        try:
+
+        if self.heartbeat_worker:
             self.heartbeat_worker.stop()
-            if wait:
-                self.heartbeat_thread.wait()  # Wait for the thread to properly finish
-        except Exception as e_:  # TODO determin actual exception, to add here, so printing e_
-            print(e_)
-            pass
+            try:
+                if wait:
+                    self.heartbeat_thread.wait()  # Wait for the thread to properly finish
+            except Exception as e_:
+                print(e_)
         self.delete_lock_file()
         self.lock_file_path = ''
 
