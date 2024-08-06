@@ -366,4 +366,4 @@ class Ui_MainWindow(object):
         self.actionAI_Search_and_Coding.setText(_translate("MainWindow", "AI Search and Coding"))
         self.actionAI_Settings.setText(_translate("MainWindow", "Settings"))
         self.actionAI_Settings.setToolTip(_translate("MainWindow", "AI related Settings"))
-        self.actionAI_Prompts.setText(_translate("MainWindow", "Prompts"))
+        self.actionAI_Prompts.setText(_translate("MainWindow", "Prompt library"))

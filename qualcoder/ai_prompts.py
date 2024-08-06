@@ -55,7 +55,7 @@ def exception_handler(exception_type, value, tb_obj):
     QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
 
 # These system prompts can only be changed here in the code. This string is in YAML-format.
-# Attention: First prompt in the list must be a search prompt!
+# The first prompt in each category (search, code_analysis, topic_analysis) will be the default.
 system_prompts = """
 - name: Focused Search
   type: search
@@ -360,10 +360,6 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         try:
             self.ui.comboBox_type.addItems(prompt_types)
             self.fill_tree()
-            # preselect prompt_type (if given)
-            #for i in range(len(prompt_types)):
-            #    if self.prompt_type == prompt_types[i]:
-            #        self.ui.treeWidget_prompts.setCurrentItem(self.ui.treeWidget_prompts.topLevelItem(i))
         finally:
             self.form_updating = False
             self.tree_selection_changed()

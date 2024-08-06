@@ -203,6 +203,7 @@ class App(object):
     last_export_directory = ""
     ai = None
     ai_models = []
+    ai_embedding_function = None # This is the sentence transformer embedding function. It is stored here so it must not be reloaded every time a project is opened. 
 
     def __init__(self):
         sys.excepthook = exception_handler
@@ -811,8 +812,6 @@ university, ORCID, GitHub, or Google account.""",
         QTextEdit:focus {border: 2px solid #f89407;}\n\
         QPlainTextEdit {background-color: #fcfcfc; selection-color: #ffffff; selection-background-color:#000000;}\n\
         QPlainTextEdit:focus {border: 2px solid #f89407;}\n\
-        QWidget#scrollArea_ai_output_contents {background-color: #fcfcfc;}\n\
-        QLabel#ai_output {background-color: #fcfcfc;}\n\
         QToolTip {background-color: #fffacd; color:#000000; border: 1px solid #f89407; }\n\
         QTreeWidget {font-size: 12px;}\n\
         QTreeView::branch:selected {border-left: 2px solid red; color: #000000;}"
@@ -849,9 +848,7 @@ university, ORCID, GitHub, or Google account.""",
             style = style.replace("#efefef", "#dfe2ff")
             style = style.replace("#f89407", "#ca1b9a")
         if self.settings['stylesheet'] == "native":
-            style = "* {font-size: 12px;}\n\
-            QWidget#scrollArea_ai_output_contents {background-color: #fcfcfc;}\n\
-            QLabel#ai_output {background-color: #fcfcfc;}\n"
+            style = "* {font-size: 12px;}"
         return style
 
     def load_settings(self):
@@ -2183,7 +2180,11 @@ Click "Yes" to start now.')
         """
         current_coder = self.app.settings['codername']
         current_ai_enable = self.app.settings['ai_enable']
-        current_ai_model_index = self.app.settings['ai_model_index']
+        current_ai_model_index = int(self.app.settings['ai_model_index'])
+        if current_ai_model_index >= 0:
+            current_ai_api_key = self.app.ai_models[current_ai_model_index]['api_key']
+        else:
+            current_ai_api_key = ''
         ui = DialogSettings(self.app, section=section, enable_ai=enable_ai)
         ret = ui.exec()
         if ret == QtWidgets.QDialog.DialogCode.Rejected:  # Dialog has been canceled
@@ -2207,6 +2208,9 @@ Click "Yes" to start now.')
             self.app.ai.close()                        
         elif current_ai_model_index != self.app.settings['ai_model_index']:
             # current model has changed
+            self.app.ai.init_llm(self)
+        elif current_ai_api_key != self.app.ai_models[current_ai_model_index]['api_key']:
+            # ai api-key has changed
             self.app.ai.init_llm(self)
             
         # Name change: Close all opened dialogs as coder name needs to change everywhere
@@ -2953,6 +2957,8 @@ def gui():
     app = QtWidgets.QApplication(sys.argv)
     QtGui.QFontDatabase.addApplicationFont("GUI/NotoSans-hinted/NotoSans-Regular.ttf")
     QtGui.QFontDatabase.addApplicationFont("GUI/NotoSans-hinted/NotoSans-Bold.ttf")
+    if platform.system() == "Windows":
+        app.setStyle("fusion")
     stylesheet = qual_app.merge_settings_with_default_stylesheet(settings)
     app.setStyleSheet(stylesheet)
     if sys.platform != 'darwin':

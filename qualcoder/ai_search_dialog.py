@@ -81,7 +81,10 @@ class DialogAiSearch(QtWidgets.QDialog):
 
         Args:
             app_ (qualcoder App)
-            context: the calling context/prompt type, can be 'search', 'code_analysis', 'topic_analysis'
+            context: the calling context, can be:
+                'search': called from 'Code Text > AI Search', 
+                'code_analysis': called from 'AI Chat > New Code Chat', 
+                'topic_analysis': called from 'AI Chat > New Topic Chat'.
             selected_id (int): the id of the selected item in the codes and categories tree. -1 if no item is selected.
             selected_is_code (bool): True if the selected item is a code, False if it is a category
         """
@@ -122,8 +125,6 @@ class DialogAiSearch(QtWidgets.QDialog):
         self.ui.comboBox_prompts.setCurrentText(self.current_prompt.name_and_scope())
         self.ui.comboBox_prompts.setToolTip(self.current_prompt.description)
         self.ui.comboBox_prompts.currentIndexChanged.connect(self.on_prompt_selected)
-        # self.ui.lineEdit_prompt.setText(self.current_prompt.name_and_scope())
-        # self.ui.lineEdit_prompt.setToolTip(self.current_prompt.description)
         self.ui.tabWidget.setCurrentIndex(int(self.app.settings.get(f'ai_dlg_{self.context}_last_tab_index', 0)))
         self.ui.lineEdit_free_topic.setText(self.app.settings.get(f'ai_dlg_{self.context}_free_topic', ''))
         self.ui.textEdit_free_description.setText(self.app.settings.get(f'ai_dlg_{self.context}_free_description', '').replace('\\n', '\n'))        
@@ -319,15 +320,16 @@ class DialogAiSearch(QtWidgets.QDialog):
         ui = DialogAiEditPrompts(self.app, self.context)
         if ui.exec() == QtWidgets.QDialog.DialogCode.Accepted:
             # Update prompts list and display current prompt:
-            self.prompts_list.read_prompts()
+            self.prompts_list.read_prompts(self.context)
+            self.ui.comboBox_prompts.clear()
+            for prompt in self.prompts_list.prompts:
+                self.ui.comboBox_prompts.addItem(prompt.name_and_scope())
             if ui.selected_prompt is not None:
                 self.current_prompt = self.prompts_list.find_prompt(ui.selected_prompt.name, ui.selected_prompt.scope, ui.selected_prompt.type)
             if self.current_prompt is None:
                 self.current_prompt = self.prompts_list.prompts[0] # default
-            self.ui.comboBox_prompts.setCurrentText = self.current_prompt.name_and_scope()
+            self.ui.comboBox_prompts.setCurrentText(self.current_prompt.name_and_scope())
             self.ui.comboBox_prompts.setToolTip(self.current_prompt.description)
-        # self.ui.lineEdit_prompt.setText(self.current_prompt.name_and_scope())
-        # self.ui.lineEdit_prompt.setToolTip(self.current_prompt.description)
 
     def select_attributes(self):
         """ Select files based on attribute selections.

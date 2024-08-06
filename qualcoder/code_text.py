@@ -383,12 +383,18 @@ class DialogCodeText(QtWidgets.QWidget):
         
         # AI search
         self.ui.pushButton_ai_search.pressed.connect(self.ai_search_clicked)
-        self.ui.listWidget_ai.setStyleSheet(tree_font + 'QListWidget::item QLabel { color: blue; }')
         self.ui.listWidget_ai.selectionModel().selectionChanged.connect(self.ai_search_selection_changed)
         self.ai_search_listview_action_label = None
         self.ui.listWidget_ai.clicked.connect(self.ai_search_list_clicked)
         
         self.ui.ai_progressBar.setVisible(False)
+        palette = self.palette()
+        highlight_color = palette.color(QtGui.QPalette.ColorRole.Highlight)
+        self.ui.ai_progressBar.setStyleSheet(f"""
+            QProgressBar::chunk {{
+                background-color: {highlight_color.name()};
+            }}
+        """)
         self.ai_search_spinner_sequence = ['', '.', '..', '...']
         self.ai_search_spinner_index = 0
         self.ai_search_spinner_timer = QtCore.QTimer(self)
@@ -4336,10 +4342,10 @@ class DialogCodeText(QtWidgets.QWidget):
         # Prepare the second step of the search
         if self.app.ai.ai_async_is_canceled:
             self.ai_search_running = False
-            self.ui.textEdit.setText(_(''))
+            self.ui.textEdit.setText('')
             return
         if chunks is None or len(chunks) == 0:
-            self.ui.textEdit.setText(_(''))
+            self.ui.textEdit.setText('')
             msg = _('AI: Sorry, no related data found for "') + self.ai_search_code_name + '".'
             Message(self.app, _('AI Search'), msg, "warning").exec()
             self.ai_search_running = False
@@ -4462,7 +4468,10 @@ class DialogCodeText(QtWidgets.QWidget):
         action_item = self.ui.listWidget_ai.item(self.ui.listWidget_ai.count() -1)
         if self.ai_search_listview_action_label is None:
             self.ai_search_listview_action_label = QtWidgets.QLabel('')
-            self.ai_search_listview_action_label.setStyleSheet('QLabel {color: blue; text-decoration: underline; margin-left: 2px; }')
+            # set to default highlight color
+            palette = self.palette()
+            highlight_color = palette.color(QtGui.QPalette.ColorRole.Highlight)
+            self.ai_search_listview_action_label.setStyleSheet(f'QLabel {{color: {highlight_color.name()}; text-decoration: underline; margin-left: 2px; }}')
             self.ui.listWidget_ai.setItemWidget(action_item, self.ai_search_listview_action_label)
         
         if self.ai_search_running: 

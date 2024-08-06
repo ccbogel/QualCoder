@@ -560,7 +560,7 @@
   </action>
   <action name="actionAI_Prompts">
    <property name="text">
-    <string>Prompts</string>
+    <string>Prompt library</string>
    </property>
   </action>
  </widget>

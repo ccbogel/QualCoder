@@ -28,7 +28,7 @@ https://qualcoder.wordpress.com/
 
 from PyQt6 import QtWidgets, QtCore
 from PyQt6.QtCore import Qt, QEvent
-from PyQt6.QtGui import QTextCursor, QPalette, QCursor
+from PyQt6.QtGui import QTextCursor, QPalette, QCursor, QGuiApplication
 from PyQt6.QtWidgets import QTextEdit
 from PyQt6.QtGui import QKeySequence, QPixmap, QIcon
 
@@ -99,9 +99,17 @@ class DialogAIChat(QtWidgets.QDialog):
         self.setStyleSheet(self.font)        
         self.ui.plainTextEdit_question.installEventFilter(self)
         self.ui.pushButton_question.pressed.connect(self.button_question_clicked)
+        # set progressBar color to default highlight color
+        palette = self.palette()
+        highlight_color = palette.color(QPalette.ColorRole.Highlight)
+        self.ui.progressBar_ai.setStyleSheet(f"""
+            QProgressBar::chunk {{
+                background-color: {highlight_color.name()};
+            }}
+        """)
         self.ui.progressBar_ai.setMaximum(100)
         self.ui.plainTextEdit_question.setPlaceholderText(_('<your question>'))
-        # self.ui.scrollArea_ai_output.verticalScrollBar().rangeChanged.connect(self.ai_output_bottom)
+        # self.ui.scrollArea_ai_output.verticalScrollBar().rangeChanged.connect(self.ai_output_scroll_to_bottom)
         # Stylesheets
         doc_font = 'font: ' + str(self.app.settings['docfontsize']) + 'pt '
         doc_font += '"' + self.app.settings['font'] + '";'
@@ -109,14 +117,28 @@ class DialogAIChat(QtWidgets.QDialog):
             self.ai_response_style = "'" + doc_font + " color: #8FB1D8;'"     
             self.ai_user_style = "'" + doc_font + " color: #35998A; '"
             self.ai_info_style = "'" + doc_font + "'" # "'" + doc_font + " color: #000000;'"
+        elif self.app.settings['stylesheet'] == 'native':
+            # determine wether dark or light native style is active:
+            style_hints = QGuiApplication.styleHints()
+            if style_hints.colorScheme() == QtCore.Qt.ColorScheme.Dark:
+                self.ai_response_style = "'" + doc_font + " color: #8FB1D8;'"     
+                self.ai_user_style = "'" + doc_font + " color: #35998A; '"
+                self.ai_info_style = "'" + doc_font + "'" # "'" + doc_font + " color: #000000;'"
+            else:
+                self.ai_response_style = "'" + doc_font + " color: #356399;'"     
+                self.ai_user_style = "'" + doc_font + " color: #287368; '"
+                self.ai_info_style = "'" + doc_font + "'" # "'" + doc_font + " color: #000000;'"
         else:
             self.ai_response_style = "'" + doc_font + " color: #356399;'"     
             self.ai_user_style = "'" + doc_font + " color: #287368; '"
             self.ai_info_style = "'" + doc_font + "'" # "'" + doc_font + " color: #000000;'"
         self.ui.plainTextEdit_question.setStyleSheet(self.ai_user_style[1:-1])
+        default_bg_color = self.ui.plainTextEdit_question.palette().color(self.ui.plainTextEdit_question.viewport().backgroundRole())
         self.ui.ai_output.setStyleSheet(doc_font)
         self.ui.ai_output.setAutoFillBackground(True)
         self.ui.ai_output.setStyleSheet('QWidget:focus {border: none;}')
+        self.ui.ai_output.setStyleSheet(f'background-color: {default_bg_color.name()};')
+        self.ui.scrollArea_ai_output.setStyleSheet(f'background-color: {default_bg_color.name()};')
         self.ui.pushButton_new_analysis.clicked.connect(self.button_new_clicked)
         self.ui.pushButton_delete.clicked.connect(self.delete_chat)
         self.ui.listWidget_chat_list.itemSelectionChanged.connect(self.chat_list_selection_changed)
@@ -441,13 +463,18 @@ class DialogAIChat(QtWidgets.QDialog):
             pm.loadFromData(QtCore.QByteArray.fromBase64(ai_question), "png")
             self.ui.pushButton_question.setIcon(QIcon(pm.scaled(32, 32, transformMode=Qt.TransformationMode.SmoothTransformation)))            
             self.ui.pushButton_question.setToolTip(_('Send your question to the AI'))
-            self.ui.progressBar_ai.setMaximum(100) # stop animation
+            self.ui.progressBar_ai.setRange(0, 100)
         else:
             pm = QPixmap()
             pm.loadFromData(QtCore.QByteArray.fromBase64(ai_stop), "png")
             self.ui.pushButton_question.setIcon(QIcon(pm.scaled(32, 32, transformMode=Qt.TransformationMode.SmoothTransformation)))
             self.ui.pushButton_question.setToolTip(_('Cancel AI generation'))
-            self.ui.progressBar_ai.setMaximum(0) # start animation         
+            self.ui.progressBar_ai.setRange(0, 0)
+        # update ai status in the statusBar of the main window
+        if self.app.ai is not None:
+            self.main_window.statusBar().showMessage(_('AI: ') + self.app.ai.get_status())
+        else: 
+            self.main_window.statusBar().showMessage('')
 
     def update_chat_window(self, scroll_to_bottom=True):
         # self.update_ai_busy()   
@@ -494,18 +521,9 @@ class DialogAIChat(QtWidgets.QDialog):
                     txt = f'<b>AI ({author}):</b><br />{txt}'                        
                     html += f'<p style={self.ai_response_style}>{txt}</p>'
                 self.ui.ai_output.setText(html)
-                self.ui.scrollArea_ai_output.ensureVisible(0, 2147483647)
-                """
-                if len(self.ai_streaming_output) > 0:
-                    txt = self.ai_streaming_output.replace('\n', '<br />')
-                    txt = '<b>' + _('AI:') + '</b><br />' + txt
-                    html += f'<p style={self.ai_response_style}>{txt}</p>'
-                self.ui.ai_output.setText(html)
-                self.ui.scrollArea_ai_output.ensureVisible(0, 2147483647)
-                """
             finally:
                 if scroll_to_bottom:
-                    self.ai_output_bottom()
+                    self.ai_output_scroll_to_bottom()
                 self.is_updating_chat_window = False
         else:
             self.ui.ai_output.setText('')
@@ -564,9 +582,13 @@ class DialogAIChat(QtWidgets.QDialog):
         elif action == action_general_chat:
             self.new_general_chat('New general chat', '')
 
-    def ai_output_bottom(self, minVal=None, maxVal=None):
-        self.ui.scrollArea_ai_output.verticalScrollBar().setValue(self.ui.scrollArea_ai_output.verticalScrollBar().maximum())
-                    
+    def ai_output_scroll_to_bottom(self, minVal=None, maxVal=None):
+        # Delay the scrolling a little to make sure that the updated text is fully rendered before scrolling to the bottom: 
+        QtCore.QTimer.singleShot(0, self._ai_output_scroll_to_bottom)
+        
+    def _ai_output_scroll_to_bottom(self):
+        self.ui.scrollArea_ai_output.ensureVisible(0, self.ui.scrollArea_ai_output.widget().height())
+                                
     def history_update_message_list(self, db_conn=None):
         """Update sel.chat_msg_list from the database
 
@@ -683,7 +705,7 @@ class DialogAIChat(QtWidgets.QDialog):
                                             result_callback=self.ai_message_callback, 
                                             progress_callback=None, 
                                             streaming_callback=self.ai_streaming_callback, 
-                                            error_callback=None)
+                                            error_callback=self.ai_error_callback)
                 # self.app.ai.ai_async_query(self.parentWidget, self._send_message, False, self.ai_message_callback, messages)
                 self.update_chat_window()
         elif msg_type == 'ai':
@@ -725,6 +747,13 @@ class DialogAIChat(QtWidgets.QDialog):
         self.ai_streaming_output = ''
         if ai_result != '':
             self.process_message('ai', ai_result, self.current_streaming_chat_idx)
+        else:
+            self.process_message('info', _('Error: The AI returned an empty result. This may indicate that the AI model is not available at the moment. Try again later or choose a different model.'), self.current_streaming_chat_idx)
+            
+    def ai_error_callback(self, exception_type, value, tb_obj):
+        """Called if the AI returns an error"""
+        self.ai_streaming_output = ''
+        self.process_message('info', _('The AI returned an error: ') + str(value), self.current_streaming_chat_idx)    
         
     def eventFilter(self, source, event):
         # Check if the event is a KeyPress, source is the lineEdit, and the key is Enter

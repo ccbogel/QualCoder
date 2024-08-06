@@ -118,7 +118,6 @@ class Worker(QRunnable):
         except Exception as err:
             traceback.print_exc()
             exctype, value = sys.exc_info()[:2]
-            # self.signals.error.emit((exctype, value, traceback.format_exc()))
             if not sip.isdeleted(self.signals):
                 self.signals.error.emit(exctype, value, err.__traceback__)
             return

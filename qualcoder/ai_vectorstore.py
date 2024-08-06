@@ -141,7 +141,6 @@ class AiVectorstore():
     chroma_db = None
     _is_closing = False
     collection_name = ''
-    embedding_function = None # E5SentenceTransformerEmbeddings(model_name=model_folder)
     
     def __init__(self, app, parent_text_edit, collection_name):
         self.app = app
@@ -299,10 +298,10 @@ want to continue?\
         #sentence_transformers_module = importlib.import_module('sentence_transformers')
         if self.app.project_path != '' and os.path.exists(self.app.project_path):
             db_path = os.path.join(self.app.project_path, 'ai_data', 'vectorstore')
-            if self.embedding_function is None:
-                self.embedding_function = E5SentenceTransformerEmbeddings(model_name=self.model_folder)
+            if self.app.ai_embedding_function is None:
+                self.app.ai_embedding_function = E5SentenceTransformerEmbeddings(model_name=self.model_folder)
             collection_metadata = {"hnsw:space": "l2"} # {"hnsw:space": "cosine"} -> defines the distance function, cosine vs. Squared L2 (default). In my limited tests, l2 gives slightly better results, although cosine is usually recommended 
-            self.chroma_db = Chroma(embedding_function=self.embedding_function, 
+            self.chroma_db = Chroma(embedding_function=self.app.ai_embedding_function, 
                                     persist_directory=db_path,
                                     collection_name=self.collection_name,
                                     collection_metadata=collection_metadata)
@@ -310,6 +309,7 @@ want to continue?\
             self.chroma_db = None
             logger.debug(f'Project path "{self.app.project_path}" not found.')
             # raise FileNotFoundError(f'AI Vectorstore: project path "{self.app.project_path}" not found.')
+        self.app.ai._status = ''
 
     def init_vectorstore(self, rebuild=False):
         """Initializes the vectorstore and checks if all text sources are stored.
@@ -330,6 +330,7 @@ want to continue?\
         if self.app.project_name == '': # no project open
             self.close()
             self.parent_text_edit.append(_('AI: Finished loading.'))
+            self.app.ai._status = ''
         else: 
             #worker = Worker(self._import_sentence_transformers)  
             #worker.signals.finished.connect(self.open_db)
@@ -437,6 +438,7 @@ want to continue?\
         #if sentence_transformers_module is None:
         #    sentence_transformers_module = importlib.import_module('sentence_transformers')
         #self.embedding_function = E5SentenceTransformerEmbeddings(model_name=self.model_folder)
+        self.app.ai._status = ''
         if self.chroma_db is None:
             logger.debug('chroma_db is None')
             return
@@ -458,6 +460,7 @@ want to continue?\
         #if sentence_transformers_module is None:
         #    sentence_transformers_module = importlib.import_module('sentence_transformers')
         #self.embedding_function = E5SentenceTransformerEmbeddings(model_name=self.model_folder)
+        self.app.ai._status = ''
         if self.chroma_db is None:
             logger.debug('chroma_db is None')
             return

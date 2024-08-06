@@ -147,7 +147,7 @@ class AiLLM():
     ai_async_progress_msg = ''
     ai_async_progress_count = -1
     ai_async_progress_max = -1
-    busy = False   
+    _status = ''   
     large_llm = None
     fast_llm = None
     large_llm_context_window = 128000
@@ -174,6 +174,7 @@ class AiLLM():
         if enable_ai or self.app.settings['ai_enable'] == 'True':
             self.parent_text_edit.append(_('AI: Starting up...'))
             QtWidgets.QApplication.processEvents() # update ui
+            self._status = 'starting'
 
             # init llms
             # set_llm_cache(InMemoryCache())
@@ -186,6 +187,7 @@ class AiLLM():
                     # still no model selected, disable AI:
                     self.app.settings['ai_enable'] = 'False'
                     self.parent_text_edit.append(_('AI: No model selected, AI is disabled.'))
+                    self._status = ''
                     return
                 else: 
                     # Success, model was selected. But since the "change_settings" function will start 
@@ -203,6 +205,7 @@ class AiLLM():
             if api_key == '':
                 msg = "Cannot start the AI, the API-key for the AI model is empty. The AI will be disabled."
                 Message(self.app, _('AI API key'), msg).exec()
+                self._status = ''
                 self.app.settings['ai_enable'] = 'False'
                 self.parent_text_edit.append(_('AI: No API key available, AI is disabled.'))
                 return
@@ -228,17 +231,22 @@ class AiLLM():
             # init vectorstore
             if self.sources_vectorstore is None:
                 self.sources_vectorstore = AiVectorstore(self.app, self.parent_text_edit, self.sources_collection)
-                self.sources_vectorstore.init_vectorstore(rebuild_vectorstore)            
+                self.sources_vectorstore.init_vectorstore(rebuild_vectorstore)
+            else:
+                self._status = ''
+                self.parent_text_edit.append(_('AI: Ready'))
         else:
             self.close()
         
     def close(self):
+        self._status = 'closing'
         self.cancel(False)
         if self.sources_vectorstore is not None: 
             self.sources_vectorstore.close()
             self.sources_vectorstore = None
         self.large_llm = None
         self.fast_llm = None
+        self._status = ''
         
     def cancel(self, ask: bool) -> bool:
         if not self.is_busy():
@@ -256,6 +264,31 @@ class AiLLM():
         self.threadpool.waitForDone(5000)
         return True
 
+    def get_status(self) -> str:
+        """Return the status of the AI system:
+        - 'disabled'
+        - 'starting' (in the process of loading all its modules)
+        - 'no data' (the vectorstore is not available, propably because no project is open)
+        - 'reading data' (in the process of adding empirical douments to its internal memory)
+        - 'busy' (in the process of sending a prompt to the LLM and streaming the response)
+        - 'ready' (fully loaded and idle, ready for a task)
+        - 'closing' (in the process of shutting down)
+        """
+        if self._status != '':
+            return self._status # 'starting' and 'closing' are set by the corresponding procedures
+        elif self.app.settings['ai_enable'] != 'True':
+            return 'disabled'
+        elif self.sources_vectorstore is None:
+            return 'no data'
+        elif self.sources_vectorstore.ai_worker_running():
+            return 'reading data'
+        elif self.large_llm is None or self.fast_llm is None:
+            return 'starting'
+        elif self.threadpool.activeThreadCount() > 0:
+            return 'busy'
+        else:
+            return 'ready'
+    
     def is_busy(self) -> bool:
         return self.threadpool.activeThreadCount() > 0
 
@@ -401,8 +434,8 @@ class AiLLM():
             list: list of strings
         """
 
-        if self.busy:
-            raise AiException('AI is busy (generate_code_descriptions)')
+        #if self.is_busy():
+        #    raise AiException('AI is busy (generate_code_descriptions)')
                 
         code_descriptions_prompt = [
             SystemMessage(
@@ -432,7 +465,8 @@ class AiLLM():
                 content = self.get_default_system_prompt()
             ),
             HumanMessage(
-                content= (f'You are discussing the code named "{code_name}" with the following code memo: "{extract_ai_memo(code_memo)}". \n'
+                content= (f'We are searching for empirical data that fits a code named "{code_name}" '
+                    f'with the following code memo: "{extract_ai_memo(code_memo)}". \n'
                     'Your task: Give back a list of 10 short descriptions of the meaning of this code. '
                     'Try to give a variety of diverse code-descriptions. Use simple language. '
                     f'Always answer in the following language: "{self.get_curr_language()}". Do not use numbers or bullet points. '

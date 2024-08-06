@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'GUI_UIs\ui_ai_edit_prompts.ui'
+# Form implementation generated from reading ui file 'c:\Users\kai\Documents\Programmierung\2023QualCoder\GUI_UIs\ui_ai_edit_prompts.ui'
 #
 # Created by: PyQt6 UI code generator 6.4.2
 #
@@ -177,7 +177,7 @@ class Ui_Dialog_AiPrompts(object):
     def retranslateUi(self, Dialog_AiPrompts):
         _translate = QtCore.QCoreApplication.translate
         Dialog_AiPrompts.setWindowTitle(_translate("Dialog_AiPrompts", "AI Edit Prompts"))
-        self.label.setText(_translate("Dialog_AiPrompts", "Prompts:"))
+        self.label.setText(_translate("Dialog_AiPrompts", "Prompts library:"))
         self.pushButton_new_prompt.setText(_translate("Dialog_AiPrompts", "New"))
         self.pushButton_duplicate_prompt.setText(_translate("Dialog_AiPrompts", "Duplicate"))
         self.pushButton_delete_prompt.setText(_translate("Dialog_AiPrompts", "Delete"))

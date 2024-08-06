@@ -81,7 +81,7 @@
           <item>
            <widget class="QLabel" name="label">
             <property name="text">
-             <string>Prompts:</string>
+             <string>Prompts library:</string>
             </property>
            </widget>
           </item>

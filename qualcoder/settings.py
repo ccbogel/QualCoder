@@ -158,7 +158,6 @@ class DialogSettings(QtWidgets.QDialog):
             model = self.ai_models[i]
             self.ui.comboBox_ai_model.addItem(model['name'])
             self.ui.comboBox_ai_model.setItemData(i, model['desc'], QtCore.Qt.ItemDataRole.ToolTipRole)
-        curr_model = self.ai_models[int(self.settings['ai_model_index'])]
         self.ui.comboBox_ai_model.setCurrentIndex(int(self.settings['ai_model_index']))
         self.ui.comboBox_ai_model.currentTextChanged.connect(self.ai_model_changed)
         self.ai_model_changed()
@@ -192,21 +191,21 @@ class DialogSettings(QtWidgets.QDialog):
         self.ui.checkBox_ai_project_memo.setEnabled(self.ui.checkBox_AI_enable.isChecked())
     
     def ai_model_changed(self):
-        self.settings['ai_model_index'] = self.ui.comboBox_ai_model.currentIndex()
-        if self.settings['ai_model_index'] >= 0:
-            curr_model = self.ai_models[int(self.settings['ai_model_index'])]
-            self.ui.label_ai_model_desc.setText(curr_model['desc'])
-            self.ui.label_ai_access_info_url.setText(f'<a href="{curr_model["access_info_url"]}">{curr_model["access_info_url"]}</a>')
-            self.ui.lineEdit_ai_api_key.setText(curr_model['api_key'])
+        ai_model_index = self.ui.comboBox_ai_model.currentIndex()
+        if ai_model_index >= 0:
+            self.curr_ai_model = self.ai_models[ai_model_index]
+            self.ui.label_ai_model_desc.setText(self.curr_ai_model['desc'])
+            self.ui.label_ai_access_info_url.setText(f'<a href="{self.curr_ai_model["access_info_url"]}">{self.curr_ai_model["access_info_url"]}</a>')
+            self.ui.lineEdit_ai_api_key.setText(self.curr_ai_model['api_key'])
         else:
-            curr_model = None
+            self.curr_ai_model = None
             self.ui.label_ai_model_desc.setText('')
             self.ui.label_ai_access_info_url.setText('')
             self.ui.lineEdit_ai_api_key.setText('')            
 
     def ai_api_key_changed(self):
-        curr_model = self.ai_models[int(self.settings['ai_model_index'])]
-        curr_model['api_key'] = self.ui.lineEdit_ai_api_key.text()        
+        if self.curr_ai_model is not None:
+            self.curr_ai_model['api_key'] = self.ui.lineEdit_ai_api_key.text()        
                 
     def new_coder_entered(self):
         """ New coder name entered.
