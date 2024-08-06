@@ -986,7 +986,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.heartbeat_thread = None
         self.heartbeat_worker = None
-        self.lock_file_path = None
+        self.lock_file_path = ''
         
         sys.excepthook = exception_handler
         QtWidgets.QMainWindow.__init__(self)
@@ -1932,7 +1932,8 @@ class MainWindow(QtWidgets.QMainWindow):
     def delete_lock_file(self):
         """Delete the lock file to release the lock."""
         try:
-            os.remove(self.lock_file_path)
+            if self.lock_file_path != '':
+                os.remove(self.lock_file_path)
         except Exception as e_:  # TODO determin specific exception type to add in here, so printing e_
             print(e_)
             pass
@@ -1966,9 +1967,10 @@ class MainWindow(QtWidgets.QMainWindow):
     def stop_heartbeat(self, wait=False):
         """Stop the heartbeat and delete the lock file (if it exists)."""
         try:
-            self.heartbeat_worker.stop()
-            if wait:
-                self.heartbeat_thread.wait()  # Wait for the thread to properly finish
+            if self.heartbeat_worker is not None:
+                self.heartbeat_worker.stop()
+                if wait:
+                    self.heartbeat_thread.wait()  # Wait for the thread to properly finish
         except Exception as e_:  # TODO determin actual exception, to add here, so printing e_
             print(e_)
             pass
