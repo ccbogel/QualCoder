@@ -44,8 +44,7 @@ from .color_selector import TextColor
 from .confirm_delete import DialogConfirmDelete
 from .GUI.base64_helper import *
 from .GUI.ui_dialog_organiser import Ui_DialogOrganiser
-from .helpers import DialogCodeInAV, DialogCodeInImage, DialogCodeInText, \
-    ExportDirectoryPathDialog, Message
+from .helpers import ExportDirectoryPathDialog, Message
 from .memo import DialogMemo
 from .select_items import DialogSelectItems
 
@@ -828,12 +827,15 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
             if self.code_or_cat['supercatid'] is not None:
                 remove_category_from_category_action = menu.addAction('Remove category from category')
         memo_action = menu.addAction('Memo')
+        rename_action = menu.addAction('Rename')
         action = menu.exec(QtGui.QCursor.pos())
         if action is None:
             return
-        # Codes
         if action == memo_action:
             self.update_memo()
+        if action == rename_action:
+            self.update_name()
+        # Codes
         if action == coded_action:
             self.coded_media()
         if action == case_action:
@@ -852,30 +854,44 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         if action == remove_category_from_category_action:
             self.remove_category_from_category()
 
+    def update_name(self):
+        """ Update name of code or category.
+        Do not use allow use of any existing names, as these are also used for determining
+         sub_categories, sub_codes of a node. """
+
+        # TODO TO TEST
+        existing_names = []
+        global model
+        for item in model:
+            existing_names.append({'name': item['name']})
+
+        ui = DialogAddItemName(self.app, existing_names, _("Update name"), _("Name"))
+        ok = ui.exec()
+        if not ok:
+            return
+        name = ui.get_new_name()
+        if name is None:
+            return False
+
+        for item in model:
+            if item['cid'] == self.code_or_cat['cid'] and item['catid'] == self.code_or_cat['catid']:
+                item['name'] = name
+                break
+        global update_graphics_item_models
+        update_graphics_item_models = True
+
     def update_memo(self):
         """ Add or edit memos for codes and categories. """
-        # TODO revise for memo vs original_memo
 
-        if self.code_or_cat['cid'] is not None:
-            ui = DialogMemo(self.app, "Memo for Code " + self.code_or_cat['name'], self.code_or_cat['memo'])
-            ok = ui.exec()
-            if not ok:
-                return
-            self.code_or_cat['memo'] = ui.memo
-            cur = self.conn.cursor()
-            cur.execute("update code_name set memo=? where cid=?", (self.code_or_cat['memo'], self.code_or_cat['cid']))
-            self.conn.commit()
-        if self.code_or_cat['catid'] is not None and self.code_or_cat['cid'] is None:
-            ui = DialogMemo(self.app, "Memo for Category " + self.code_or_cat['name'], self.code_or_cat['memo'])
-            ok = ui.exec()
-            if not ok:
-                return
-            self.code_or_cat['memo'] = ui.memo
-            cur = self.conn.cursor()
-            cur.execute("update code_cat set memo=? where catid=?",
-                        (self.code_or_cat['memo'], self.code_or_cat['catid']))
-            self.conn.commit()
-
+        ui = DialogMemo(self.app, "Memo for Code " + self.code_or_cat['name'], self.code_or_cat['memo'])
+        ok = ui.exec()
+        if not ok:
+            return
+        #self.code_or_cat['memo'] = ui.memo
+        for item in model:
+            if item['cid'] == self.code_or_cat['cid'] and item['catid'] == self.code_or_cat['catid']:
+                item['memo'] = ui.memo
+                break
         global update_graphics_item_models
         update_graphics_item_models = True
 
