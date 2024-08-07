@@ -101,11 +101,14 @@
         <x>260</x>
         <y>2</y>
         <width>721</width>
-        <height>28</height>
+        <height>41</height>
        </rect>
       </property>
       <property name="text">
-       <string>Code organiser. Right click on codes and categories to link and merge.</string>
+       <string>Code organiser. Right click on codes and categories to link and merge. Add new categories. Re-structure codes tree.</string>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButton_apply">
