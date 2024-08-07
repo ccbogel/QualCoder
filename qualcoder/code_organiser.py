@@ -127,9 +127,10 @@ class CodeOrganiser(QDialog):
         update_graphics_item_models = False
         global model
         model = []
-        Message(self.app, "Code organiser", "Work in progress.\nDoes not change database yet").exec()
+        text_ = "This function does not work yet.\nThis is a work in progress to enact changes in the \ncode organiser to the code tree structure."
+        Message(self.app, "Code organiser", text_).exec()
 
-        # TODO fix
+        # TODO
         """ qdpx import quirk, but category names and code names can match. (MAXQDA, Nvivo)
         This causes hierarchy to not work correctly (eg when moving a category).
         Solution, add spaces after the code_name to separate it out. """
@@ -506,7 +507,8 @@ class CodeOrganiser(QDialog):
     def apply_model_changes(self):
         """ Apply changes to database from model. """
 
-        Message(self.app, "Work in progress.", "No changes to database").exec()
+        text_ = "No changes to database.\nWork in progress to enact changes in the \ncode organiser to the code tree structure."
+        Message(self.app, "Work in progress.", text_).exec()
         return
 
         text_ = _("Back up project before applying changes.\nNo undo option.")
@@ -514,7 +516,7 @@ class CodeOrganiser(QDialog):
         ok = ui.exec()
         if not ok:
             return
-        
+
 
 class GraphicsScene(QtWidgets.QGraphicsScene):
     """ set the scene for the graphics objects and re-draw events. """
