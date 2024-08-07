@@ -52,6 +52,7 @@ from qualcoder.attributes import DialogManageAttributes
 from qualcoder.cases import DialogCases
 from qualcoder.codebook import Codebook
 from qualcoder.code_color_scheme import DialogCodeColorScheme
+from qualcoder.code_organiser import CodeOrganiser
 from qualcoder.code_text import DialogCodeText
 from qualcoder.code_pdf import DialogCodePdf
 from qualcoder.GUI.base64_helper import *
@@ -1071,6 +1072,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCode_pdf.triggered.connect(self.pdf_coding)
         self.ui.actionColour_scheme.setShortcut('Alt+E')
         self.ui.actionColour_scheme.triggered.connect(self.code_color_scheme)
+        self.ui.actionCode_organiser.triggered.connect(self.code_organiser)
         # Reports menu
         self.ui.actionCoding_reports.setShortcut('Alt+K')
         self.ui.actionCoding_reports.triggered.connect(self.report_coding)
@@ -1196,6 +1198,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCode_audio_video.setEnabled(False)
         self.ui.actionCode_pdf.setEnabled(False)
         self.ui.actionColour_scheme.setEnabled(False)
+        self.ui.actionCode_organiser.setEnabled(False)
         # Reports menu
         self.ui.actionCoding_reports.setEnabled(False)
         self.ui.actionCoding_comparison.setEnabled(False)
@@ -1241,6 +1244,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionCode_audio_video.setEnabled(True)
         self.ui.actionCode_pdf.setEnabled(True)
         self.ui.actionColour_scheme.setEnabled(True)
+        self.ui.actionCode_organiser.setEnabled(True)
         # Reports menu
         self.ui.actionCoding_reports.setEnabled(True)
         self.ui.actionCoding_comparison.setEnabled(True)
@@ -1567,6 +1571,13 @@ class MainWindow(QtWidgets.QMainWindow):
         """ Edit code color scheme. """
 
         ui = DialogCodeColorScheme(self.app, self.ui.textEdit, self.ui.tab_reports)
+        ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
+        self.tab_layout_helper(self.ui.tab_coding, ui)
+
+    def code_organiser(self):
+        """ Organise codes structure. """
+
+        ui = CodeOrganiser(self.app)  #, self.ui.textEdit, self.ui.tab_reports)
         ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
         self.tab_layout_helper(self.ui.tab_coding, ui)
 
@@ -1936,6 +1947,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def delete_lock_file(self):
         """Delete the lock file to release the lock."""
+
         try:
             if self.lock_file_path != '':
                 os.remove(self.lock_file_path)
@@ -1971,6 +1983,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def stop_heartbeat(self, wait=False):
         """Stop the heartbeat and delete the lock file (if it exists)."""
+
         try:
             if self.heartbeat_worker is not None:
                 self.heartbeat_worker.stop()
@@ -1979,6 +1992,7 @@ class MainWindow(QtWidgets.QMainWindow):
         except Exception as e_:  # TODO determin actual exception, to add here, so printing e_
             print(e_)
             pass
+
         self.delete_lock_file()
         self.lock_file_path = ''
 
