@@ -98,6 +98,7 @@ class DialogAddItemName(QtWidgets.QDialog):
             return
         self.new_item = this_item
         self.close()
+        super(DialogAddItemName, self).accept()
 
     def get_new_name(self):
         """ Get the new name. """
