@@ -191,6 +191,8 @@ class Ui_MainWindow(object):
         self.actionCode_pdf.setObjectName("actionCode_pdf")
         self.actionCode_text_exact_matches = QtGui.QAction(parent=MainWindow)
         self.actionCode_text_exact_matches.setObjectName("actionCode_text_exact_matches")
+        self.actionCode_organiser = QtGui.QAction(parent=MainWindow)
+        self.actionCode_organiser.setObjectName("actionCode_organiser")
         self.menuOpen_Recent_Project.addAction(self.actionNone)
         self.menuExport.addAction(self.actionProject_Exchange_Export)
         self.menuExport.addAction(self.actionREFI_Codebook_export)
@@ -225,6 +227,7 @@ class Ui_MainWindow(object):
         self.menuCoding.addAction(self.actionCode_audio_video)
         self.menuCoding.addAction(self.actionCode_pdf)
         self.menuCoding.addAction(self.actionColour_scheme)
+        self.menuCoding.addAction(self.actionCode_organiser)
         self.menuReports.addAction(self.actionCoding_reports)
         self.menuReports.addAction(self.actionCoding_comparison)
         self.menuReports.addAction(self.actionCoding_comparison_by_file)
@@ -329,6 +332,7 @@ class Ui_MainWindow(object):
         self.actionImport_twitter_data.setText(_translate("MainWindow", "Import twitter data"))
         self.actionCode_pdf.setText(_translate("MainWindow", "Code pdf"))
         self.actionCode_text_exact_matches.setText(_translate("MainWindow", "Code text exact matches"))
+        self.actionCode_organiser.setText(_translate("MainWindow", "Code organiser"))
 
 
 if __name__ == "__main__":
