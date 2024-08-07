@@ -734,6 +734,7 @@ class App(object):
             style = style.replace("#f89407", "#ca1b9a")
         if self.settings['stylesheet'] == "native":
             style = "* {font-size: 12px;}"
+            style += "\nQGroupBox { border: none; background-color: transparent;}"
         return style
 
     def load_settings(self):
