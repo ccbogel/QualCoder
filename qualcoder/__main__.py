@@ -990,6 +990,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self.lock_file_path = ''
         
         sys.excepthook = exception_handler
+        
+        if platform.system() == "Windows" and self.app.settings['stylesheet'] == "native":
+            # Make 'Fusion' the standard native style on Windows, as Qt recommends here: https://www.qt.io/blog/dark-mode-on-windows-11-with-qt-6.5 
+            # The default 'Windows' style seems partially broken at the moment, especially in combination with the native dark mode. 
+            # On macOS, 'Fusion' is the default style anyways (automatically chosen by Qt).
+            QtWidgets.QApplication.instance().setStyle("Fusion")
+       
         QtWidgets.QMainWindow.__init__(self)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
