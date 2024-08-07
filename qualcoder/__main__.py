@@ -823,7 +823,7 @@ class App(object):
             'dialogreport_file_summary_splitter1': 100,
             'dialogreport_code_summary_splitter0': 100,
             'dialogreport_code_summary_splitter1': 100,
-            'stylesheet': 'original',
+            'stylesheet': 'native',
             'report_text_context_chars': 150,
             'report_text_context-style': 'Bold',
             'codetext_chunksize': 50000,
