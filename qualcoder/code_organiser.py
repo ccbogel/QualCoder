@@ -114,6 +114,8 @@ class CodeOrganiser(QDialog):
         pm.loadFromData(QtCore.QByteArray.fromBase64(sq_plus_icon), "png")
         self.ui.pushButton_create_category.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_create_category.pressed.connect(self.create_category)
+        self.ui.pushButton_apply.setEnabled(False)
+        self.ui.pushButton_apply.pressed.connect(self.apply_model_changes)
 
         # Set the scene
         self.scene = GraphicsScene()
@@ -125,6 +127,7 @@ class CodeOrganiser(QDialog):
         update_graphics_item_models = False
         global model
         model = []
+        Message(self.app, "Code organiser", "Work in progress.\nDoes not change database yet").exec()
 
         # TODO fix
         """ qdpx import quirk, but category names and code names can match. (MAXQDA, Nvivo)
@@ -187,6 +190,7 @@ class CodeOrganiser(QDialog):
         self.list_graph()
         self.ui.pushButton_selectbranch.setEnabled(False)
         self.ui.pushButton_selectbranch.setToolTip(_("Branch has been selected"))
+        self.ui.pushButton_apply.setEnabled(True)
 
     def create_initial_model(self):
         """ Create initial model of all codes and categories.
@@ -444,7 +448,7 @@ class CodeOrganiser(QDialog):
         action_add_category = menu.addAction(_("Add category"))
         action = menu.exec(self.ui.graphicsView.mapToGlobal(position))
         '''if action == action_print_items:
-            print("\nPrint of graphics items\n========")
+            print("\nPrint graphics items\n========")
             for i in self.scene.items():
                 if isinstance(i, TextGraphicsItem):
                     print(f"Graphics item: {i.code_or_cat['name']} cid:{i.code_or_cat['cid']} "
@@ -499,6 +503,18 @@ class CodeOrganiser(QDialog):
         image.save(filepath)
         Message(self.app, _("Image exported"), filepath).exec()
 
+    def apply_model_changes(self):
+        """ Apply changes to database from model. """
+
+        Message(self.app, "Work in progress.", "No changes to database").exec()
+        return
+
+        text_ = _("Back up project before applying changes.\nNo undo option.")
+        ui = DialogConfirmDelete(self.app, text_, _("Apply changes"))
+        ok = ui.exec()
+        if not ok:
+            return
+        
 
 class GraphicsScene(QtWidgets.QGraphicsScene):
     """ set the scene for the graphics objects and re-draw events. """
@@ -668,7 +684,7 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
         """ Clean up by removing all links """
 
         for scene_item in self.items():
-            if isinstance(scene_item, LinkGraphicsItem):
+            if isinstance(scene_item, LinkGraphicsItem) or isinstance(scene_item, PointGraphicsItem):
                 self.removeItem(scene_item)
 
     def create_links(self):
@@ -683,6 +699,9 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
                             cat_item.code_or_cat['catid'] == code_item.code_or_cat['catid']:
                         link_item = LinkGraphicsItem(cat_item, code_item)
                         self.addItem(link_item)
+                        point_item = PointGraphicsItem(link_item.pointer_x, link_item.pointer_y)
+                        self.addItem(point_item)
+
         # Link from Category to Category
         for item1 in self.items():
             if isinstance(item1, TextGraphicsItem):
@@ -690,9 +709,11 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
                     if isinstance(item2, TextGraphicsItem) and item1.code_or_cat['supercatid'] is not None and \
                             item1.code_or_cat['supercatid'] == item2.code_or_cat['catid'] and \
                             (item1.code_or_cat['cid'] is None and item2.code_or_cat['cid'] is None):
-                        item = LinkGraphicsItem(item1, item2)
+                        item = LinkGraphicsItem(item2, item1)
                         if item1.isVisible() and item2.isVisible():
                             self.addItem(item)
+                            point_item = PointGraphicsItem(item.pointer_x, item.pointer_y)
+                            self.addItem(point_item)
 
     def adjust_for_negative_positions(self):
         """ Move all items if negative positions. """
@@ -760,32 +781,15 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
     def set_text(self):
         """ Set viewable text """
 
-        text_ = f"{self.code_or_cat['name']}\n"
-        if self.code_or_cat['cid'] is not None:
-            text_ += f"catid[{self.code_or_cat['catid']}] cid[{self.code_or_cat['cid']}]"
-        if self.code_or_cat['cid'] is None:
-            text_ += f"catid[{self.code_or_cat['catid']}]"
-            text_ += f" supercatid[{self.code_or_cat['supercatid']}]"
+        text_ = self.code_or_cat['name']
+        if self.app.settings['showids']:
+            text_ += "\n"
+            if self.code_or_cat['cid'] is not None:
+                text_ += f"catid[{self.code_or_cat['catid']}] cid[{self.code_or_cat['cid']}]"
+            if self.code_or_cat['cid'] is None:
+                text_ += f"catid[{self.code_or_cat['catid']}]"
+                text_ += f" supercatid[{self.code_or_cat['supercatid']}]"
         self.setPlainText(text_)
-
-    '''def get_memo(self):
-        cur = self.app.conn.cursor()
-        if self.code_or_cat['cid'] is not None:
-            cur.execute("select ifnull(memo,'') from code_name where name=?", [self.code_or_cat['name']])
-            res = cur.fetchone()
-            if res:
-                self.code_or_cat['memo'] = res[0]
-                self.setToolTip(_("Code") + ": " + res[0])
-            else:
-                self.setToolTip(_("Code"))
-        else:
-            cur.execute("select ifnull(memo,'') from code_cat where name=?", [self.code_or_cat['name']])
-            res = cur.fetchone()
-            if res:
-                self.code_or_cat['memo'] = res[0]
-                self.setToolTip(_("Category") + ": " + res[0])
-            else:
-                self.setToolTip(_("Category"))'''
 
     def paint(self, painter, option, widget):
         """  """
@@ -859,7 +863,6 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         Do not use allow use of any existing names, as these are also used for determining
          sub_categories, sub_codes of a node. """
 
-        # TODO TO TEST
         existing_names = []
         global model
         for item in model:
@@ -872,7 +875,8 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         name = ui.get_new_name()
         if name is None:
             return False
-
+        self.code_or_cat['name'] = name
+        self.set_text()
         for item in model:
             if item['cid'] == self.code_or_cat['cid'] and item['catid'] == self.code_or_cat['catid']:
                 item['name'] = name
@@ -887,7 +891,8 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         ok = ui.exec()
         if not ok:
             return
-        #self.code_or_cat['memo'] = ui.memo
+        self.code_or_cat['memo'] = ui.memo
+        self.setToolTip(ui.memo)
         for item in model:
             if item['cid'] == self.code_or_cat['cid'] and item['catid'] == self.code_or_cat['catid']:
                 item['memo'] = ui.memo
@@ -975,7 +980,6 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
          Use child_names list to prevent circular linkages. """
 
         categories_ = []
-        # for cat in self.categories:
         global model
         for item in model:
             if item['catid'] != self.code_or_cat['catid'] and item['name'] != "" and item['cid'] is None and \
@@ -1046,6 +1050,8 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
     from_pos = None
     to_widget = None
     to_pos = None
+    pointer_x = 0
+    pointer_y = 0
 
     def __init__(self, from_widget, to_widget):
         """ Links codes and categories. Called when codes or categories of categories are inserted.
@@ -1056,23 +1062,18 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
 
         self.from_widget = from_widget
         self.to_widget = to_widget
-        # self.text = from_widget.text + " - " + to_widget.text
-        self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
+        # self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
         self.calculate_points_and_draw()
         self.redraw()
 
-    def contextMenuEvent(self, event):
+    '''def contextMenuEvent(self, event):
         menu = QtWidgets.QMenu()
 
         thicker_action = menu.addAction(_('Thicker'))
         action = menu.exec(QtGui.QCursor.pos())
         if action is None:
             return
-        '''if action == thicker_action:
-            self.line_width = self.line_width + 1
-            if self.line_width > 8:
-                self.line_width = 8'''
-        self.redraw()
+        self.redraw()'''
 
     def redraw(self):
         """ Called from mouse move and release events. """
@@ -1122,3 +1123,44 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
             to_y = to_y + self.to_widget.boundingRect().height()
         self.setPen(QtGui.QPen(QtCore.Qt.GlobalColor.black, 1, QtCore.Qt.PenStyle.SolidLine))
         self.setLine(from_x, from_y, to_x, to_y)
+        self.pointer_x= from_x
+        self.pointer_y = from_y
+
+
+class PointGraphicsItem(QtWidgets.QGraphicsRectItem):
+    """ Apply a rectangle pointer at one end of a link line. """
+
+    def __init__(self, x, y):
+        """
+         param: x  : Integer
+         param: y : Integer
+        """
+
+        super(PointGraphicsItem, self).__init__(None)
+
+        self.x = x
+        self.y = y
+        #self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
+        self.calculate_points_and_draw()
+        self.redraw()
+
+    def contextMenuEvent(self, event):
+        menu = QtWidgets.QMenu()
+
+        thicker_action = menu.addAction(_('Thicker'))
+        action = menu.exec(QtGui.QCursor.pos())
+        if action is None:
+            return
+        self.redraw()
+
+    def redraw(self):
+        """ Called from mouse move and release events. """
+
+        self.calculate_points_and_draw()
+
+    def calculate_points_and_draw(self):
+        """ Calculate the to x and y and from x and y points. Draw line between the
+        widgets. Join the line to appropriate side of widget. """
+
+        self.setPen(QtGui.QPen(QtCore.Qt.GlobalColor.darkGray, 2, QtCore.Qt.PenStyle.SolidLine))
+        self.setRect(self.x - 1, self.y - 1, 2, 2)
