@@ -37,7 +37,8 @@ class Ui_DialogOrganiser(object):
         self.pushButton_selectbranch.setText("")
         self.pushButton_selectbranch.setObjectName("pushButton_selectbranch")
         self.label_loaded_graph = QtWidgets.QLabel(parent=self.groupBox_header)
-        self.label_loaded_graph.setGeometry(QtCore.QRect(260, 2, 721, 28))
+        self.label_loaded_graph.setGeometry(QtCore.QRect(260, 2, 721, 41))
+        self.label_loaded_graph.setWordWrap(True)
         self.label_loaded_graph.setObjectName("label_loaded_graph")
         self.pushButton_apply = QtWidgets.QPushButton(parent=self.groupBox_header)
         self.pushButton_apply.setGeometry(QtCore.QRect(150, 3, 91, 28))
@@ -63,7 +64,7 @@ class Ui_DialogOrganiser(object):
         self.label_zoom.setToolTip(_translate("DialogOrganiser", "Click on the graph area and press + or W to zoom in. Press - or Q to zoom in or zoom out."))
         self.pushButton_create_category.setToolTip(_translate("DialogOrganiser", "<html><head/><body><p>Create category</p></body></html>"))
         self.pushButton_selectbranch.setToolTip(_translate("DialogOrganiser", "Select code branch"))
-        self.label_loaded_graph.setText(_translate("DialogOrganiser", "Code organiser. Right click on codes and categories to link and merge."))
+        self.label_loaded_graph.setText(_translate("DialogOrganiser", "Code organiser. Right click on codes and categories to link and merge. Add new categories. Re-structure codes tree."))
         self.pushButton_apply.setToolTip(_translate("DialogOrganiser", "<html><head/><body><p>Apply changed structure.</p><p>Warning. No Undo option.</p></body></html>"))
         self.pushButton_apply.setText(_translate("DialogOrganiser", "Apply"))
 
