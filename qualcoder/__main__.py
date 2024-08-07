@@ -753,7 +753,7 @@ class App(object):
         if result['speakernameformat'] == 0:
             result['speakernameformat'] = "[]"
         if result['stylesheet'] == 0:
-            result['stylesheet'] = "original"
+            result['stylesheet'] = "native"
         return result
 
     @property
@@ -823,7 +823,7 @@ class App(object):
             'dialogreport_file_summary_splitter1': 100,
             'dialogreport_code_summary_splitter0': 100,
             'dialogreport_code_summary_splitter1': 100,
-            'stylesheet': 'original',
+            'stylesheet': 'native',
             'report_text_context_chars': 150,
             'report_text_context-style': 'Bold',
             'codetext_chunksize': 50000,
@@ -1529,7 +1529,6 @@ class MainWindow(QtWidgets.QMainWindow):
         else:
             msg = _("This project contains no pdf files.")
             Message(self.app, _('No pdf files'), msg).exec()
-        pass
 
     def image_coding(self):
         """ Create edit and delete codes. Apply and remove codes to the image (or regions)
@@ -1577,7 +1576,8 @@ class MainWindow(QtWidgets.QMainWindow):
     def code_organiser(self):
         """ Organise codes structure. """
 
-        ui = CodeOrganiser(self.app)  #, self.ui.textEdit, self.ui.tab_reports)
+        self.ui.label_coding.setText("")
+        ui = CodeOrganiser(self.app)
         ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
         self.tab_layout_helper(self.ui.tab_coding, ui)
 
@@ -1951,9 +1951,9 @@ class MainWindow(QtWidgets.QMainWindow):
         try:
             if self.lock_file_path != '':
                 os.remove(self.lock_file_path)
-        except Exception as e_:  # TODO determin specific exception type to add in here, so printing e_
-            print(e_)
-            pass
+        except Exception as e_:  # TODO determine specific exception type to add in here, so printing e_
+            print("delete_lock_file", e_)
+            logger.debug(e_)
 
     def lock_file_io_error(self):
         msg = _('An error occured while writing to the project folder. '
@@ -1984,14 +1984,14 @@ class MainWindow(QtWidgets.QMainWindow):
     def stop_heartbeat(self, wait=False):
         """Stop the heartbeat and delete the lock file (if it exists)."""
 
-        try:
-            if self.heartbeat_worker is not None:
+        if self.heartbeat_worker:
+            try:
                 self.heartbeat_worker.stop()
                 if wait:
                     self.heartbeat_thread.wait()  # Wait for the thread to properly finish
-        except Exception as e_:  # TODO determin actual exception, to add here, so printing e_
-            print(e_)
-            pass
+            except Exception as e_:  # TODO determine actual exception, to add here, so printing e_
+                print(e_)
+                logger.debug(e_)
 
         self.delete_lock_file()
         self.lock_file_path = ''
