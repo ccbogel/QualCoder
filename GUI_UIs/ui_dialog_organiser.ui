@@ -34,7 +34,7 @@
      <widget class="QPushButton" name="pushButton_export">
       <property name="geometry">
        <rect>
-        <x>324</x>
+        <x>110</x>
         <y>3</y>
         <width>28</width>
         <height>28</height>
@@ -95,28 +95,12 @@
        <string/>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_clear">
-      <property name="geometry">
-       <rect>
-        <x>353</x>
-        <y>3</y>
-        <width>28</width>
-        <height>28</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Clear</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
      <widget class="QLabel" name="label_loaded_graph">
       <property name="geometry">
        <rect>
-        <x>400</x>
+        <x>260</x>
         <y>2</y>
-        <width>531</width>
+        <width>721</width>
         <height>28</height>
        </rect>
       </property>
@@ -127,7 +111,7 @@
      <widget class="QPushButton" name="pushButton_apply">
       <property name="geometry">
        <rect>
-        <x>230</x>
+        <x>150</x>
         <y>3</y>
         <width>91</width>
         <height>28</height>
@@ -161,7 +145,6 @@
   <tabstop>pushButton_selectbranch</tabstop>
   <tabstop>pushButton_create_category</tabstop>
   <tabstop>pushButton_export</tabstop>
-  <tabstop>pushButton_clear</tabstop>
   <tabstop>graphicsView</tabstop>
  </tabstops>
  <resources/>
