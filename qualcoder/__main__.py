@@ -539,7 +539,7 @@ class App(object):
         """
 
         dict_len = len(settings_data)
-        keys = ['mainwindow_w', 'mainwindow_h',
+        keys = ['mainwindow_geometry',
                 'dialogcasefilemanager_w', 'dialogcasefilemanager_h',
                 'dialogcodetext_splitter0', 'dialogcodetext_splitter1',
                 'dialogcodetext_splitter_v0', 'dialogcodetext_splitter_v1',
@@ -572,6 +572,8 @@ class App(object):
         for key in keys:
             if key not in settings_data:
                 settings_data[key] = 0
+                if key == "mainwindow_geometry":
+                    settings_data[key] = ""
                 if key == "timestampformat":
                     settings_data[key] = "[hh.mm.ss]"
                 if key == "speakernameformat":
@@ -771,8 +773,7 @@ class App(object):
             'backup_av_files': True,
             'timestampformat': "[hh.mm.ss]",
             'speakernameformat': "[]",
-            'mainwindow_w': 0,
-            'mainwindow_h': 0,
+            'mainwindow_geometry': '',
             'dialogcodetext_splitter0': 1,
             'dialogcodetext_splitter1': 1,
             'dialogcodetext_splitter_v0': 1,
@@ -990,6 +991,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self.lock_file_path = ''
         
         sys.excepthook = exception_handler
+        
+        if platform.system() == "Windows" and self.app.settings['stylesheet'] == "native":
+            # Make 'Fusion' the standard native style on Windows, as Qt recommends here: https://www.qt.io/blog/dark-mode-on-windows-11-with-qt-6.5 
+            # The default 'Windows' style seems partially broken at the moment, especially in combination with the native dark mode. 
+            # On macOS, 'Fusion' is the default style anyways (automatically chosen by Qt).
+            QtWidgets.QApplication.instance().setStyle("Fusion")
+       
         QtWidgets.QMainWindow.__init__(self)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
@@ -1000,10 +1008,10 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.menubar.setNativeMenuBar(False)
         self.get_latest_github_release()
         try:
-            w = int(self.app.settings['mainwindow_w'])
-            h = int(self.app.settings['mainwindow_h'])
-            if h > 40 and w > 50:
-                self.resize(w, h)
+            # Restore main window geometry (size, position, maximized state) from config
+            geometry_hex = self.app.settings.get('mainwindow_geometry', '')
+            if geometry_hex:
+                self.restoreGeometry(QtCore.QByteArray.fromHex(geometry_hex.encode('utf-8')))
         except KeyError:
             pass
         self.hide_menu_options()
@@ -1102,12 +1110,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setStyleSheet(font)
         self.ui.textEdit.setReadOnly(True)
         self.settings_report()
-
-    def resizeEvent(self, new_size):
-        """ Update the widget size details in the app.settings variables """
-
-        self.app.settings['mainwindow_w'] = new_size.size().width()
-        self.app.settings['mainwindow_h'] = new_size.size().height()
 
     def fill_recent_projects_menu_actions(self):
         """ Get the recent projects from the .qualcoder txt file.
@@ -1688,6 +1690,9 @@ class MainWindow(QtWidgets.QMainWindow):
                 # close project before the dialog list, as close project clean the dialogs
                 self.close_project()
                 # self.dialog_list = None
+                # save main window geometry to config.ini
+                self.app.settings['mainwindow_geometry'] = self.saveGeometry().toHex().data().decode('utf-8') 
+                self.app.write_config_ini(self.app.settings)
                 if self.app.conn is not None:
                     try:
                         self.app.conn.commit()
@@ -1946,7 +1951,7 @@ class MainWindow(QtWidgets.QMainWindow):
         try:
             if self.lock_file_path != '':
                 os.remove(self.lock_file_path)
-        except Exception as e_:  # TODO determine exact exception type to add in here, so printing e_
+        except Exception as e_:  # TODO determin specific exception type to add in here, so printing e_
             print(e_)
             pass
 
@@ -1979,13 +1984,15 @@ class MainWindow(QtWidgets.QMainWindow):
     def stop_heartbeat(self, wait=False):
         """Stop the heartbeat and delete the lock file (if it exists)."""
 
-        if self.heartbeat_worker is not None:
-            try:
+        try:
+            if self.heartbeat_worker is not None:
                 self.heartbeat_worker.stop()
                 if wait:
                     self.heartbeat_thread.wait()  # Wait for the thread to properly finish
-            except Exception as e_:  # TODO determin actual exception, to add here, so printing e_
-                print(e_)
+        except Exception as e_:  # TODO determin actual exception, to add here, so printing e_
+            print(e_)
+            pass
+
         self.delete_lock_file()
         self.lock_file_path = ''
 
