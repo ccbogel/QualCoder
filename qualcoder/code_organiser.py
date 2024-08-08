@@ -511,11 +511,77 @@ class CodeOrganiser(QDialog):
         Message(self.app, "Work in progress.", text_).exec()
         return
 
-        text_ = _("Back up project before applying changes.\nNo undo option.")
+        # TODO a warning should be in __init__
+        '''text_ = _("Back up project before applying changes.\nNo undo option.")
         ui = DialogConfirmDelete(self.app, text_, _("Apply changes"))
         ok = ui.exec()
         if not ok:
-            return
+            return'''
+
+        global model
+        new_categories = []
+        for item in model:
+            if item['catid'] < 0 and item['cid'] is None:
+                new_categories.append(item)
+        cur = self.app.conn.cursor()
+        # Insert new categories, update links to codes and pre-existing categories
+        for category in new_categories:
+            model.remove(category)
+            cur.execute("insert into code_cat (name, memo, owner, date, supercatid) values(?,?,?,?,?)",
+                        (category['name'], category['memo'], category['owner'], category['date'], category['supercatid']))
+            self.app.conn.commit()
+            cur.execute("select last_insert_rowid()")
+            category['insert_id'] = cur.fetchone()[0]
+            # Update model for code catids and pre-existing category supercatids
+            for model_item in model:
+                if model_item['catid'] == category['catid']:
+                    model_item['catid'] = category['insert_id']
+                if model_item['supercatid'] == category['catid']:
+                    model_item['supercatid'] = category['insert_id']
+
+        # Get inserted new categories where supercatid is < 0 and update these
+        cur.execute("select catid from code_cat where supercatid < 0")
+        res = cur.fetchall()
+        for res_category in res:
+            for new_category in new_categories:
+                if res_category['supercatid'] == new_category['catid']:
+                    cur.execute("update code_cat set supercatid=? where catid=?", [new_category['catid'], res_category[0]])
+                    self.app.conn.commit()
+
+        # Check for and update merged codes, update coded text, images, A/V
+
+        # Update codes and categories in model - catid, supercatid, name, memo
+
+
+
+        # TODO Change/replace dialog to state changes applied.
+
+        self.app.delete_backup = False
+        #self.update_dialog_codes_and_categories
+        self.parent_textEdit.append(_("Code tree re-organised"))
+
+    # TODO
+    '''def update_dialog_codes_and_categories(self):
+        """ Update code and category tree here and in DialogReportCodes, ReportCoderComparisons, 
+        ReportCodeFrequencies
+        Using try except blocks for each instance, as instance may have been deleted. """
+
+        contents = self.tab_reports.layout()
+        if contents:
+            for i in reversed(range(contents.count())):
+                c = contents.itemAt(i).widget()
+                if isinstance(c, DialogReportCodes):
+                    c.get_codes_categories_coders()
+                    c.fill_tree()
+                if isinstance(c, DialogReportCoderComparisons):
+                    c.get_data()
+                    c.fill_tree()
+                if isinstance(c, DialogReportCodeFrequencies):
+                    c.get_data()
+                    c.fill_tree()
+                if isinstance(c, DialogReportCodeSummary):
+                    c.get_codes_and_categories()
+                    c.fill_tree()'''
 
 
 class GraphicsScene(QtWidgets.QGraphicsScene):
