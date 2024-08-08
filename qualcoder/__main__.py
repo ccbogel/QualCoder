@@ -48,6 +48,7 @@ import getpass
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 
+from qualcoder.error_dlg import UncaughtHook
 from qualcoder.attributes import DialogManageAttributes
 from qualcoder.cases import DialogCases
 from qualcoder.codebook import Codebook
@@ -123,18 +124,8 @@ logger.setLevel(logging.DEBUG)
 handler = RotatingFileHandler(logfile, maxBytes=4000, backupCount=2)
 logger.addHandler(handler)
 
-
-def exception_handler(exception_type, value, tb_obj):
-    """ Global exception handler useful in GUIs.
-    tb_obj: exception.__traceback__ """
-    tb = '\n'.join(traceback.format_tb(tb_obj))
-    msg = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
-    print(msg)
-    mb = QtWidgets.QMessageBox()
-    mb.setStyleSheet("* {font-size: 10pt}")
-    mb.setText(msg)
-    mb.exec()
-
+# create a global hook for uncaught exceptions
+qt_exception_hook =  UncaughtHook()
 
 lock_timeout = 30.0  # in seconds. If a project lockfile is older (= has received no heartbeat for 30 seconds),
 # it is assumed that the host process has died and the project is opened anyways
@@ -195,7 +186,6 @@ class App(object):
     last_export_directory = ""
 
     def __init__(self):
-        sys.excepthook = exception_handler
         self.conn = None
         self.project_path = ""
         self.project_name = ""
@@ -989,8 +979,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.heartbeat_thread = None
         self.heartbeat_worker = None
         self.lock_file_path = ''
-        
-        sys.excepthook = exception_handler
         
         if platform.system() == "Windows" and self.app.settings['stylesheet'] == "native":
             # Make 'Fusion' the standard native style on Windows, as Qt recommends here: https://www.qt.io/blog/dark-mode-on-windows-11-with-qt-6.5 
