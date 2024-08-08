@@ -203,9 +203,9 @@ class ViewGraph(QDialog):
         """
 
         selection_list = [{'name': 'All'}]
-        for c in self.categories:
-            selection_list.append({'name': c['name']})
-        ui = DialogSelectItems(self.app, selection_list, _("Select files"), "multi")
+        for category in self.categories:
+            selection_list.append({'name': category['name']})
+        ui = DialogSelectItems(self.app, selection_list, _("Select code tree branch"), "multi")
         ok = ui.exec()
         if not ok:
             return
@@ -284,13 +284,13 @@ class ViewGraph(QDialog):
         while model != [] and model_changed and i < 20:
             model_changed = False
             append_list = []
-            for n in refined_model:
-                for m in model:
-                    if m['supercatid'] == n['catid']:
-                        append_list.append(m)
-            for n in append_list:
-                refined_model.append(n)
-                model.remove(n)
+            for refined_item in refined_model:
+                for model_item in model:
+                    if model_item['supercatid'] == refined_item['catid']:
+                        append_list.append(model_item)
+            for append_item in append_list:
+                refined_model.append(append_item)
+                model.remove(append_item)
                 model_changed = True
             i += 1
         return refined_model
@@ -357,10 +357,10 @@ class ViewGraph(QDialog):
         # Order the model by supercatid, subcats, codes
         ordered_model = []
         # Top level categories
-        for m in model:
-            if m['x'] is None and m['supercatid'] is None:
-                m['x'] = 10
-                ordered_model.append(m)
+        for code_or_category in model:
+            if code_or_category['x'] is None and code_or_category['supercatid'] is None:
+                code_or_category['x'] = 10
+                ordered_model.append(code_or_category)
         for om in ordered_model:
             model.remove(om)
 
@@ -375,41 +375,43 @@ class ViewGraph(QDialog):
                         ordered_model.insert(ordered_model.index(om), sub_cat)
             i += 1
 
-        for i in range(0, len(ordered_model)):
-            ordered_model[i]['y'] = i * self.font_size * 3
+        for item in range(0, len(ordered_model)):
+            ordered_model[item]['y'] = item * self.font_size * 3
         model = ordered_model
 
         # Add text items to the scene, providing they are not already in the scene.
-        for m in model:
-            m['child_names'] = self.named_children_of_node(m)
+        for code_or_category in model:
+            code_or_category['child_names'] = self.named_children_of_node(code_or_category)
             add_to_scene = True
-            for i in self.scene.items():
-                if isinstance(i, TextGraphicsItem):
-                    if i.code_or_cat['name'] == m['name'] and \
-                            i.code_or_cat['catid'] == m['catid'] and \
-                            i.code_or_cat['cid'] == m['cid']:
+            for scene_item in self.scene.items():
+                if isinstance(scene_item, TextGraphicsItem):
+                    if scene_item.code_or_cat['name'] == code_or_category['name'] and \
+                            scene_item.code_or_cat['catid'] == code_or_category['catid'] and \
+                            scene_item.code_or_cat['cid'] == code_or_category['cid']:
                         add_to_scene = False
             if add_to_scene:
-                self.scene.addItem(TextGraphicsItem(self.app, m))
+                self.scene.addItem(TextGraphicsItem(self.app, code_or_category))
 
         # Add link from Category to Category, which includes the scene text items and associated data
-        for m in self.scene.items():
-            if isinstance(m, TextGraphicsItem):
-                for n in self.scene.items():
-                    if isinstance(n, TextGraphicsItem) and m.code_or_cat['supercatid'] is not None and \
-                            m.code_or_cat['supercatid'] == n.code_or_cat['catid'] and \
-                            (m.code_or_cat['cid'] is None and n.code_or_cat['cid'] is None):
-                        item = LinkGraphicsItem(m, n, 2, "solid", "gray", True)
+        for scene_item in self.scene.items():
+            if isinstance(scene_item, TextGraphicsItem):
+                for scene_item2 in self.scene.items():
+                    if isinstance(scene_item2, TextGraphicsItem) and \
+                            scene_item.code_or_cat['supercatid'] is not None and \
+                            scene_item.code_or_cat['supercatid'] == scene_item2.code_or_cat['catid'] and \
+                            (scene_item.code_or_cat['cid'] is None and scene_item2.code_or_cat['cid'] is None):
+                        item = LinkGraphicsItem(scene_item, scene_item2, 2, "solid", "gray", True)
                         self.scene.addItem(item)
         # Add links from Codes to Categories
-        for m in self.scene.items():
-            if isinstance(m, TextGraphicsItem):
-                for n in self.scene.items():
+        for scene_item in self.scene.items():
+            if isinstance(scene_item, TextGraphicsItem):
+                for scene_item2 in self.scene.items():
                     # Link the n Codes to m Categories
-                    if isinstance(n, TextGraphicsItem) and n.code_or_cat['cid'] is not None and \
-                            m.code_or_cat['cid'] is None and \
-                            m.code_or_cat['catid'] == n.code_or_cat['catid']:
-                        item = LinkGraphicsItem(m, n, 2, "solid", "gray", True)
+                    if isinstance(scene_item2, TextGraphicsItem) and \
+                            scene_item2.code_or_cat['cid'] is not None and \
+                            scene_item.code_or_cat['cid'] is None and \
+                            scene_item.code_or_cat['catid'] == scene_item2.code_or_cat['catid']:
+                        item = LinkGraphicsItem(scene_item, scene_item2, 2, "solid", "gray", True)
                         self.scene.addItem(item)
         # Expand scene width and height if needed
         max_x, max_y = self.scene.suggested_scene_size()

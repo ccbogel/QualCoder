@@ -232,7 +232,7 @@ python3 get-pip.py
 5) Install Python dependency modules using `pip`:
 
 ```sh
-pip3 install chardet ebooklib openpyxl pandas pillow ply pdfminer.six plotly pydub pyqt6 python-vlc rispy six SpeechRecognition xmlschema
+pip3 install chardet ebooklib openpyxl pandas pillow ply pdfminer.six plotly pydub pyqt6 python-vlc rispy six SpeechRecognition
 ```
 
 Be sure that you are in the QualCoder-Master directory before doing Step 6.
