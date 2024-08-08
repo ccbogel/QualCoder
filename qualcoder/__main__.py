@@ -54,6 +54,7 @@ from qualcoder.attributes import DialogManageAttributes
 from qualcoder.cases import DialogCases
 from qualcoder.codebook import Codebook
 from qualcoder.code_color_scheme import DialogCodeColorScheme
+from qualcoder.code_organiser import CodeOrganiser
 from qualcoder.code_text import DialogCodeText
 from qualcoder.code_pdf import DialogCodePdf
 from qualcoder.GUI.base64_helper import *
@@ -640,7 +641,7 @@ university, ORCID, GitHub, or Google account.""",
         """
 
         dict_len = len(settings_data)
-        keys = ['mainwindow_w', 'mainwindow_h',
+        keys = ['mainwindow_geometry',
                 'dialogcasefilemanager_w', 'dialogcasefilemanager_h',
                 'dialogcodetext_splitter0', 'dialogcodetext_splitter1',
                 'dialogcodetext_splitter_v0', 'dialogcodetext_splitter_v1',
@@ -674,6 +675,8 @@ university, ORCID, GitHub, or Google account.""",
         for key in keys:
             if key not in settings_data:
                 settings_data[key] = 0
+                if key == "mainwindow_geometry":
+                    settings_data[key] = ""
                 if key == "timestampformat":
                     settings_data[key] = "[hh.mm.ss]"
                 if key == "speakernameformat":
@@ -889,8 +892,7 @@ university, ORCID, GitHub, or Google account.""",
             'backup_av_files': True,
             'timestampformat': "[hh.mm.ss]",
             'speakernameformat': "[]",
-            'mainwindow_w': 0,
-            'mainwindow_h': 0,
+            'mainwindow_geometry': '',
             'dialogcodetext_splitter0': 1,
             'dialogcodetext_splitter1': 1,
             'dialogcodetext_splitter_v0': 1,
@@ -1223,9 +1225,16 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.heartbeat_thread = None
         self.heartbeat_worker = None
-        self.lock_file_path = None
+        self.lock_file_path = ''
         
         sys.excepthook = exception_handler
+        
+        if platform.system() == "Windows" and self.app.settings['stylesheet'] == "native":
+            # Make 'Fusion' the standard native style on Windows, as Qt recommends here: https://www.qt.io/blog/dark-mode-on-windows-11-with-qt-6.5 
+            # The default 'Windows' style seems partially broken at the moment, especially in combination with the native dark mode. 
+            # On macOS, 'Fusion' is the default style anyways (automatically chosen by Qt).
+            QtWidgets.QApplication.instance().setStyle("Fusion")
+       
         QtWidgets.QMainWindow.__init__(self)
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
@@ -1236,10 +1245,10 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.menubar.setNativeMenuBar(False)
         # self.get_latest_github_release()
         try:
-            w = int(self.app.settings['mainwindow_w'])
-            h = int(self.app.settings['mainwindow_h'])
-            if h > 40 and w > 50:
-                self.resize(w, h)
+            # Restore main window geometry (size, position, maximized state) from config
+            geometry_hex = self.app.settings.get('mainwindow_geometry', '')
+            if geometry_hex:
+                self.restoreGeometry(QtCore.QByteArray.fromHex(geometry_hex.encode('utf-8')))
         except KeyError:
             pass
         self.hide_menu_options()
@@ -1323,6 +1332,7 @@ Click "Yes" to start now.')
         self.ui.actionCode_pdf.triggered.connect(self.pdf_coding)
         self.ui.actionColour_scheme.setShortcut('Alt+E')
         self.ui.actionColour_scheme.triggered.connect(self.code_color_scheme)
+        self.ui.actionCode_organiser.triggered.connect(self.code_organiser)
         # Reports menu
         self.ui.actionCoding_reports.setShortcut('Alt+K')
         self.ui.actionCoding_reports.triggered.connect(self.report_coding)
@@ -1468,6 +1478,7 @@ Click "Yes" to start now.')
         self.ui.actionCode_audio_video.setEnabled(False)
         self.ui.actionCode_pdf.setEnabled(False)
         self.ui.actionColour_scheme.setEnabled(False)
+        self.ui.actionCode_organiser.setEnabled(False)
         # Reports menu
         self.ui.actionCoding_reports.setEnabled(False)
         self.ui.actionCoding_comparison.setEnabled(False)
@@ -1513,6 +1524,7 @@ Click "Yes" to start now.')
         self.ui.actionCode_audio_video.setEnabled(True)
         self.ui.actionCode_pdf.setEnabled(True)
         self.ui.actionColour_scheme.setEnabled(True)
+        self.ui.actionCode_organiser.setEnabled(True)
         # Reports menu
         self.ui.actionCoding_reports.setEnabled(True)
         self.ui.actionCoding_comparison.setEnabled(True)
@@ -1820,7 +1832,6 @@ Click "Yes" to start now.')
         else:
             msg = _("This project contains no pdf files.")
             Message(self.app, _('No pdf files'), msg).exec()
-        pass
 
     def image_coding(self):
         """ Create edit and delete codes. Apply and remove codes to the image (or regions)
@@ -1862,6 +1873,14 @@ Click "Yes" to start now.')
         """ Edit code color scheme. """
 
         ui = DialogCodeColorScheme(self.app, self.ui.textEdit, self.ui.tab_reports)
+        ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
+        self.tab_layout_helper(self.ui.tab_coding, ui)
+
+    def code_organiser(self):
+        """ Organise codes structure. """
+
+        self.ui.label_coding.setText("")
+        ui = CodeOrganiser(self.app)
         ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
         self.tab_layout_helper(self.ui.tab_coding, ui)
 
@@ -1982,6 +2001,9 @@ Click "Yes" to start now.')
                 # close project before the dialog list, as close project clean the dialogs
                 self.close_project()
                 # self.dialog_list = None
+                # save main window geometry to config.ini
+                self.app.settings['mainwindow_geometry'] = self.saveGeometry().toHex().data().decode('utf-8') 
+                self.app.write_config_ini(self.app.settings)
                 if self.app.conn is not None:
                     try:
                         self.app.conn.commit()
@@ -2283,11 +2305,13 @@ Click "Yes" to start now.')
 
     def delete_lock_file(self):
         """Delete the lock file to release the lock."""
+
         try:
-            os.remove(self.lock_file_path)
-        except Exception as e_:  # TODO determin specific exception type to add in here, so printing e_
-            print(e_)
-            pass
+            if self.lock_file_path != '':
+                os.remove(self.lock_file_path)
+        except Exception as e_:  # TODO determine specific exception type to add in here, so printing e_
+            print("delete_lock_file", e_)
+            logger.debug(e_)
 
     def lock_file_io_error(self):
         msg = _('An error occured while writing to the project folder. '
@@ -2317,13 +2341,16 @@ Click "Yes" to start now.')
 
     def stop_heartbeat(self, wait=False):
         """Stop the heartbeat and delete the lock file (if it exists)."""
-        try:
-            self.heartbeat_worker.stop()
-            if wait:
-                self.heartbeat_thread.wait()  # Wait for the thread to properly finish
-        except Exception as e_:  # TODO determin actual exception, to add here, so printing e_
-            print(e_)
-            pass
+
+        if self.heartbeat_worker:
+            try:
+                self.heartbeat_worker.stop()
+                if wait:
+                    self.heartbeat_thread.wait()  # Wait for the thread to properly finish
+            except Exception as e_:  # TODO determine actual exception, to add here, so printing e_
+                print(e_)
+                logger.debug(e_)
+
         self.delete_lock_file()
         self.lock_file_path = ''
 
