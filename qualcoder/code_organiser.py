@@ -79,17 +79,19 @@ class CodeOrganiser(QDialog):
     """
 
     app = None
+    parent_text_edit = None
     conn = None
     settings = None
     scene = None
     font_size = 9
 
-    def __init__(self, app):
+    def __init__(self, app, text_edit):
         """ Set up the dialog. """
 
         sys.excepthook = exception_handler
         QDialog.__init__(self)
         self.app = app
+        self.parent_text_edit = text_edit
         self.settings = app.settings
         self.conn = app.conn
         # Set up the user interface from Designer.
@@ -130,6 +132,11 @@ class CodeOrganiser(QDialog):
         text_ = "This function does not work yet.\nThis is a work in progress to enact changes in the \ncode organiser to the code tree structure."
         Message(self.app, "Code organiser", text_).exec()
 
+        # TODO a warning should be in __init__
+        '''text_ = _("Back up project before applying changes to the codes tree.\nNo undo option.")
+        Message(self.app, "Code organiser", text_).exec()
+        '''
+
         # TODO
         """ qdpx import quirk, but category names and code names can match. (MAXQDA, Nvivo)
         This causes hierarchy to not work correctly (eg when moving a category).
@@ -157,7 +164,7 @@ class CodeOrganiser(QDialog):
         temp_cat_id = randint(-1000, -1)
         while temp_cat_id in cat_ids_list:
             temp_cat_id = randint(-1000, -1)
-        now_date = datetime.datetime.now().astimezone().strftime("%Y%m%d_%H-%S")
+        now_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
         new_category = {'name': new_category_name, 'catid': temp_cat_id, 'owner': self.settings['codername'],
                         'date': now_date, 'memo': '', 'supercatid': None,
                         'x': 10 + randint(0, 6), 'y': 10 + randint(0, 6), 'color': "#FFFFFF",
@@ -472,7 +479,7 @@ class CodeOrganiser(QDialog):
             temp_cat_id = randint(-1000, -1)
             while temp_cat_id in cat_ids_list:
                 temp_cat_id = randint(-1000, -1)
-            now_date = datetime.datetime.now().astimezone().strftime("%Y%m%d_%H-%S")
+            now_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
             # No original_name, original_catid, original_supercatid, orignal-memo
             new_category = {'name': new_category_name, 'original_name': '', 'catid': temp_cat_id,
                             'owner': self.settings['codername'], 'date': now_date, 'memo': '', 'original_memo': '',
@@ -511,17 +518,10 @@ class CodeOrganiser(QDialog):
         Message(self.app, "Work in progress.", text_).exec()
         return
 
-        # TODO a warning should be in __init__
-        '''text_ = _("Back up project before applying changes.\nNo undo option.")
-        ui = DialogConfirmDelete(self.app, text_, _("Apply changes"))
-        ok = ui.exec()
-        if not ok:
-            return'''
-
         global model
         new_categories = []
         for item in model:
-            if item['catid'] < 0 and item['cid'] is None:
+            if item['catid'] is not None and item['catid'] < 0 and item['cid'] is None:
                 new_categories.append(item)
         cur = self.app.conn.cursor()
         # Insert new categories, update links to codes and pre-existing categories
@@ -532,33 +532,62 @@ class CodeOrganiser(QDialog):
             self.app.conn.commit()
             cur.execute("select last_insert_rowid()")
             category['insert_id'] = cur.fetchone()[0]
-            # Update model for code catids and pre-existing category supercatids
+            # Update remaining model for code catids and pre-existing category supercatids
             for model_item in model:
                 if model_item['catid'] == category['catid']:
                     model_item['catid'] = category['insert_id']
                 if model_item['supercatid'] == category['catid']:
                     model_item['supercatid'] = category['insert_id']
 
-        # Get inserted new categories where supercatid is < 0 and update these
-        cur.execute("select catid from code_cat where supercatid < 0")
+        '''print("1 after insert new categories")
+        cur.execute("select * from code_cat")
         res = cur.fetchall()
-        for res_category in res:
+        for r in res:
+            print(r)'''
+
+        # Get inserted new categories where supercatid is < 0 and update these with insert_id
+        cur.execute("select catid, supercatid, name from code_cat where supercatid < 0")
+        res = cur.fetchall()
+        print("inserted cats")
+        for category_to_update in res:
+            print("Db cat to update (catid, supercatid)", category_to_update)
             for new_category in new_categories:
-                if res_category['supercatid'] == new_category['catid']:
-                    cur.execute("update code_cat set supercatid=? where catid=?", [new_category['catid'], res_category[0]])
+                if category_to_update[1] == new_category['catid']:
+                    cur.execute("update code_cat set supercatid=? where catid=?", [new_category['insert_id'], category_to_update[0]])
                     self.app.conn.commit()
 
-        # Check for and update merged codes, update coded text, images, A/V
+        '''print("2 after  new category supercatid updates")
+        cur.execute("select * from code_cat")
+        res = cur.fetchall()
+        for r in res:
+            print(r)'''
 
         # Update codes and categories in model - catid, supercatid, name, memo
+        for item in model:
+            # Update pre-existing categories
+            if item['catid'] is not None and item['cid'] is None:
+                cur.execute("update code_cat set name=?, memo=?, supercatid=? where catid=?",
+                            [item['name'], item['memo'], item['supercatid'], item['catid']])
+                self.app.conn.commit()
+            # Update codes
+            if item['cid'] is not None:
+                cur.execute("update code_name set name=?, memo=?, catid=? where cid=?",
+                            [item['name'], item['memo'], item['catid'], item['cid']])
+                self.app.conn.commit()
 
+        '''print("3 after existing category and code updates")
+        cur.execute("select * from code_cat")
+        res = cur.fetchall()
+        for r in res:
+            print(r)'''
 
+        # TODO Check for and update merged codes ==> update coded text, images, A/V
 
-        # TODO Change/replace dialog to state changes applied.
-
-        self.app.delete_backup = False
         #self.update_dialog_codes_and_categories
-        self.parent_textEdit.append(_("Code tree re-organised"))
+        self.app.delete_backup = False
+        self.parent_text_edit.append(_("Code tree re-organised."))
+        self.hide()
+        Message(self.app, "Code organiser", "Changed applied to the codes tree").exec()
 
     # TODO
     '''def update_dialog_codes_and_categories(self):
@@ -1054,7 +1083,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
                     item['name'] not in self.code_or_cat['child_names']:
                 categories_.append(item)
 
-        ui = DialogSelectItems(self.app, categories_, 'Select category', 'single')
+        ui = DialogSelectItems(self.app, categories_, 'Link. Select category', 'single')
         ok = ui.exec()
         if not ok:
             return
