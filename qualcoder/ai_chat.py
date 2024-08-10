@@ -31,6 +31,7 @@ from PyQt6.QtCore import Qt, QEvent
 from PyQt6.QtGui import QTextCursor, QPalette, QCursor, QGuiApplication
 from PyQt6.QtWidgets import QTextEdit
 from PyQt6.QtGui import QKeySequence, QPixmap, QIcon
+import qtawesome as qta
 
 from langchain_core.messages.human import HumanMessage
 from langchain_core.messages.ai import AIMessage
@@ -100,11 +101,9 @@ class DialogAIChat(QtWidgets.QDialog):
         self.ui.plainTextEdit_question.installEventFilter(self)
         self.ui.pushButton_question.pressed.connect(self.button_question_clicked)
         # set progressBar color to default highlight color
-        palette = self.palette()
-        highlight_color = palette.color(QPalette.ColorRole.Highlight)
         self.ui.progressBar_ai.setStyleSheet(f"""
             QProgressBar::chunk {{
-                background-color: {highlight_color.name()};
+                background-color: {self.app.highlight_color};
             }}
         """)
         self.ui.progressBar_ai.setMaximum(100)
@@ -203,7 +202,14 @@ class DialogAIChat(QtWidgets.QDialog):
             tooltip_text = f"{name}\nType: {analysis_type}\nSummary: {summary}\nDate: {date}\nPrompt: {analysis_prompt}"
 
             # Creating a new QListWidgetItem
-            item = QtWidgets.QListWidgetItem(name)
+            if analysis_type == 'general chat':
+                icon = self.app.ai.general_chat_icon
+            elif analysis_type == 'topic chat':
+                icon = self.app.ai.topic_analysis_icon
+            else: # code chat
+                icon = self.app.ai.code_analysis_icon
+
+            item = QtWidgets.QListWidgetItem(icon, name)
             item.setToolTip(tooltip_text)
             item.setFlags(item.flags() | Qt.ItemFlag.ItemIsEditable)
             
@@ -459,17 +465,15 @@ class DialogAIChat(QtWidgets.QDialog):
     def update_ai_busy(self):
         # update question button + progress bar
         if self.app.ai is None or not self.app.ai.is_busy():
-            pm = QPixmap()
-            pm.loadFromData(QtCore.QByteArray.fromBase64(ai_question), "png")
-            self.ui.pushButton_question.setIcon(QIcon(pm.scaled(32, 32, transformMode=Qt.TransformationMode.SmoothTransformation)))            
+            self.ui.pushButton_question.setIcon(qta.icon('mdi6.message-fast-outline', color=self.app.highlight_color))
             self.ui.pushButton_question.setToolTip(_('Send your question to the AI'))
-            self.ui.progressBar_ai.setRange(0, 100)
+            self.ui.progressBar_ai.setRange(0, 100) # stops the animation
         else:
-            pm = QPixmap()
-            pm.loadFromData(QtCore.QByteArray.fromBase64(ai_stop), "png")
-            self.ui.pushButton_question.setIcon(QIcon(pm.scaled(32, 32, transformMode=Qt.TransformationMode.SmoothTransformation)))
-            self.ui.pushButton_question.setToolTip(_('Cancel AI generation'))
-            self.ui.progressBar_ai.setRange(0, 0)
+            if self.ui.progressBar_ai.maximum() > 0: 
+                spin_icon = qta.icon("mdi.loading", color=self.app.highlight_color, animation=qta.Spin(self.ui.pushButton_question))
+                self.ui.pushButton_question.setIcon(spin_icon)
+                self.ui.pushButton_question.setToolTip(_('Cancel AI generation'))
+                self.ui.progressBar_ai.setRange(0, 0) # starts the animation
         # update ai status in the statusBar of the main window
         if self.app.ai is not None:
             self.main_window.statusBar().showMessage(_('AI: ') + self.app.ai.get_status())
@@ -560,10 +564,13 @@ class DialogAIChat(QtWidgets.QDialog):
 
         # Add actions
         action_codings_analysis = menu.addAction(_('New code chat'))
+        action_codings_analysis.setIcon(self.app.ai.code_analysis_icon)
         action_codings_analysis.setToolTip(_('Start chatting about the data in the codings for a particular code.'))
         action_topic_analysis = menu.addAction(_('New topic chat'))
+        action_topic_analysis.setIcon(self.app.ai.topic_analysis_icon)
         action_topic_analysis.setToolTip(_('Start chatting about data related to a free-search topic.'))
         action_general_chat = menu.addAction(_('New general chat'))
+        action_general_chat.setIcon(self.app.ai.general_chat_icon)
         action_general_chat.setToolTip(_('Ask the AI anything, not related to your data.'))
 
         # Obtain the bottom-left point of the button in global coordinates

@@ -34,6 +34,8 @@ import time
 from PyQt6 import QtWidgets
 from PyQt6 import QtGui
 from PyQt6 import QtCore 
+import qtawesome as qta
+
 import sqlite3
 from .ai_prompts import PromptItem
 from langchain_openai import ChatOpenAI
@@ -168,6 +170,17 @@ class AiLLM():
         self.threadpool = QtCore.QThreadPool()
         self.threadpool.setMaxThreadCount(1)
         self.sources_vectorstore = None
+        # Icons (https://pictogrammers.com/library/mdi/)
+        self.code_analysis_icon = qta.icon('mdi6.tag-text-outline', color=self.app.highlight_color)
+        self.topic_analysis_icon = qta.icon('mdi6.star-outline', color=self.app.highlight_color)
+        self.search_icon = qta.icon('mdi6.magnify', color=self.app.highlight_color)
+        self.general_chat_icon = qta.icon('mdi6.chat-question-outline', color=self.app.highlight_color)
+        self.prompt_scope_icon = qta.icon('mdi6.folder-open-outline', color=self.app.highlight_color)
+        self.prompt_icon = qta.icon('mdi6.script-text-outline', color=self.app.highlight_color)
+
+        transparent_pixmap = QtGui.QPixmap(32, 32)
+        transparent_pixmap.fill(QtCore.Qt.GlobalColor.transparent)
+        self.transparent_icon = QtGui.QIcon(transparent_pixmap)
     
     def init_llm(self, main_window, rebuild_vectorstore=False, enable_ai=False):  
         self.main_window = main_window      

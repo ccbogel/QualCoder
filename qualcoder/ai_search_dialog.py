@@ -95,6 +95,25 @@ class DialogAiSearch(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_AiSearch()
         self.ui.setupUi(self)
+        # adapt UI to context
+        if context == 'search':
+            self.setWindowTitle('AI Search')
+            self.ui.label_what.setText(_('What do you want to search for?'))
+            self.ui.tabWidget.setTabVisible(0, True) # code search
+            self.ui.tabWidget.setTabVisible(1, True) # free search 
+            self.ui.checkBox_coded_segments.setVisible(True)
+        elif context == 'code_analysis':
+            self.setWindowTitle('AI Code Analysis')
+            self.ui.label_what.setText(_('Which code do you want to analyze?'))
+            self.ui.tabWidget.setTabVisible(0, True) # code search
+            self.ui.tabWidget.setTabVisible(1, False) # free search
+            self.ui.checkBox_coded_segments.setVisible(False) 
+        elif context == 'topic_analysis':
+            self.setWindowTitle('AI Topic Analysis')
+            self.ui.label_what.setText(_('Which topic do you want to analyze?'))
+            self.ui.tabWidget.setTabVisible(0, False) # code search
+            self.ui.tabWidget.setTabVisible(1, True) # free search 
+            self.ui.checkBox_coded_segments.setVisible(False)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         font = 'font: ' + str(app_.settings['fontsize']) + 'pt '
         font += '"' + app_.settings['font'] + '";'
@@ -128,8 +147,12 @@ class DialogAiSearch(QtWidgets.QDialog):
         self.ui.tabWidget.setCurrentIndex(int(self.app.settings.get(f'ai_dlg_{self.context}_last_tab_index', 0)))
         self.ui.lineEdit_free_topic.setText(self.app.settings.get(f'ai_dlg_{self.context}_free_topic', ''))
         self.ui.textEdit_free_description.setText(self.app.settings.get(f'ai_dlg_{self.context}_free_description', '').replace('\\n', '\n'))        
-        self.ui.splitter_code_tree.moveSplitter(int(self.app.settings.get(f'ai_dlg_{self.context}_last_splitter_code_tree', 500)), 0)
-        self.ui.splitter_case_files.moveSplitter(int(self.app.settings.get(f'ai_dlg_{self.context}_last_splitter_case_files', 220)), 0)
+        #print(self.ui.splitter_code_tree.sizes())
+        #self.ui.splitter_code_tree.setSizes([346, 256])
+        #self.ui.splitter_code_tree.moveSplitter(300, 0)
+        #self.ui.splitter_code_tree.moveSplitter(int(self.app.settings.get(f'ai_dlg_{self.context}_last_splitter_code_tree', 500)), 0)
+        #print(self.ui.splitter_code_tree.sizes())
+        #self.ui.splitter_case_files.moveSplitter(int(self.app.settings.get(f'ai_dlg_{self.context}_last_splitter_case_files', 220)), 0)
         self.ui.checkBox_send_memos.setChecked((self.app.settings.get(f'ai_dlg_{self.context}_send_memos', 'True') == 'True'))
         self.ui.checkBox_coded_segments.setChecked((self.app.settings.get(f'ai_dlg_{self.context}_coded_segments', 'False') == 'True'))
         # buttons
@@ -145,26 +168,20 @@ class DialogAiSearch(QtWidgets.QDialog):
             self.ui.pushButton_attributeselect.setEnabled(False)
         self.ui.pushButton_attributeselect.clicked.connect(self.select_attributes)
         self.get_files_and_cases()
-        # adapt UI to context
-        if context == 'search':
-            self.setWindowTitle('AI Search')
-            self.ui.label_what.setText(_('What do you want to search for?'))
-            self.ui.tabWidget.setTabVisible(0, True) # code search
-            self.ui.tabWidget.setTabVisible(1, True) # free search 
-            self.ui.checkBox_coded_segments.setVisible(True)
-        elif context == 'code_analysis':
-            self.setWindowTitle('AI Code Analysis')
-            self.ui.label_what.setText(_('Which code do you want to analyze?'))
-            self.ui.tabWidget.setTabVisible(0, True) # code search
-            self.ui.tabWidget.setTabVisible(1, False) # free search
-            self.ui.checkBox_coded_segments.setVisible(False) 
-        elif context == 'topic_analysis':
-            self.setWindowTitle('AI Topic Analysis')
-            self.ui.label_what.setText(_('Which topic do you want to analyze?'))
-            self.ui.tabWidget.setTabVisible(0, False) # code search
-            self.ui.tabWidget.setTabVisible(1, True) # free search 
-            self.ui.checkBox_coded_segments.setVisible(False)
-
+        
+    def showEvent(self, event):
+        super().showEvent(event)
+        # restore position splitter_code_tree:
+        splitter_pos = int(self.app.settings.get(f'ai_dlg_{self.context}_last_splitter_code_tree', 500))
+        splitter_width = self.ui.splitter_code_tree.size().width()
+        splitter_handle = self.ui.splitter_code_tree.handleWidth()
+        self.ui.splitter_code_tree.setSizes([splitter_pos, splitter_width - splitter_pos - splitter_handle])
+        # restore position splitter_case_files:
+        splitter_pos = int(self.app.settings.get(f'ai_dlg_{self.context}_last_splitter_case_files', 220))
+        splitter_height = self.ui.splitter_case_files.size().height()
+        splitter_handle = self.ui.splitter_case_files.handleWidth()
+        self.ui.splitter_case_files.setSizes([splitter_pos, splitter_height - splitter_pos - splitter_handle])
+        
     def fill_tree(self, selected_id, selected_is_code):
         """ Fill tree widget, top level items are main categories and unlinked codes. """
 
@@ -452,6 +469,12 @@ class DialogAiSearch(QtWidgets.QDialog):
         """Collect the infos needed for the ai based search and the filters applied 
         (selected files, cases, attributes), then close the dialog. 
         """    
+        ai_status = self.app.ai.get_status()
+        if ai_status != 'ready':
+            msg = _('The AI ist not ready to fulfill your request (status: ') + ai_status + _(').')
+            Message(self.app, _('AI not ready'), msg, "warning").exec()
+            return
+
         if self.ui.tabWidget.currentIndex() == 0: # code search selected
             if len(self.ui.treeWidget.selectedItems()) == 0:
                 msg = _('Please select a code or category (or use "free search" instead).')

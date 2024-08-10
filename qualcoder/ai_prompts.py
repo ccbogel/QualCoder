@@ -32,10 +32,10 @@ import logging
 import traceback
 import yaml
 import copy
+import gettext
 
 from PyQt6 import QtWidgets, QtCore, QtGui
 from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QBrush
 
 from .GUI.ui_ai_edit_prompts import Ui_Dialog_AiPrompts
 from .helpers import Message
@@ -195,9 +195,9 @@ prompt_scopes = [
     'project'
 ]
 prompt_scope_descriptions = [
-    'System prompts are the defaults defined in the source code of QualCoder. They cannot be changed by the user.',
-    'User prompts are defined by you on the level of your particular instance of QualCoder. They are available in every project that you open on your machine.',
-    'Project prompts are defined by you, but for the current project only. They go with the project files. If you or somebody else opens the same project on another machine, these prompts will be available there too.'
+    ('System prompts are the defaults defined in the source code of QualCoder. They cannot be changed by the user.'),
+    ('User prompts are defined by you on the level of your particular instance of QualCoder. They are available in every project that you open on your machine.'),
+    ('Project prompts are defined by you, but for the current project only. They go with the project files. If you or somebody else opens the same project on another machine, these prompts will be available there too.')
 ]
 
 # Define a prompt of a certain type
@@ -391,16 +391,25 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
                     continue # skip unwanted prompt types
                 type_item = QtWidgets.QTreeWidgetItem(self.ui.treeWidget_prompts)
                 type_item.setText(0, t)
+                if t == 'search':
+                    type_item.setIcon(0, self.app.ai.search_icon)
+                elif t == 'code_analysis':
+                    type_item.setIcon(0, self.app.ai.code_analysis_icon)
+                elif t == 'topic_analysis':
+                    type_item.setIcon(0, self.app.ai.topic_analysis_icon)
+                
                 type_item.setToolTip(0, prompt_types_descriptions[i])
                 for j in range(len(prompt_scopes)):
                     s = prompt_scopes[j]
                     scope_item = QtWidgets.QTreeWidgetItem(type_item)
                     scope_item.setText(0, s)
                     scope_item.setToolTip(0, prompt_scope_descriptions[j])
+                    scope_item.setIcon(0, self.app.ai.prompt_scope_icon)
                     for p in self.prompts.prompts_by_type(t, s):
                         prompt_item = QtWidgets.QTreeWidgetItem(scope_item)
                         prompt_item.setText(0, p.name)
                         prompt_item.setToolTip(0, p.description)
+                        prompt_item.setIcon(0, self.app.ai.prompt_icon)
                         if p == self.selected_prompt: # sel_prompt:
                             prompt_item.setSelected(True)
             self.ui.treeWidget_prompts.expandAll()

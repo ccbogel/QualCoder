@@ -205,6 +205,7 @@ class App(object):
     ai = None
     ai_models = []
     ai_embedding_function = None # This is the sentence transformer embedding function. It is stored here so it must not be reloaded every time a project is opened. 
+    highlight_color = '#f89407' # the default color for highlighting gui elements, changes with style
 
     def __init__(self):
         sys.excepthook = exception_handler
@@ -822,6 +823,7 @@ university, ORCID, GitHub, or Google account.""",
         style = style.replace("QFileDialog {font-size: 12", "QFileDialog {font-size:" + str(settings.get('fontsize')))
         style = style.replace("QTreeWidget {font-size: 12",
                               "QTreeWidget {font-size: " + str(settings.get('treefontsize')))
+        self.highlight_color = '#f89407'
         if self.settings['stylesheet'] == 'dark':
             return style_dark
         style_rainbow = style_dark
@@ -839,19 +841,25 @@ university, ORCID, GitHub, or Google account.""",
         if self.settings['stylesheet'] == "orange":
             style = style.replace("#efefef", "#ffcba4")
             style = style.replace("#f89407", "#306eff")
+            self.highlight_color = "#306eff"
         if self.settings['stylesheet'] == "yellow":
             style = style.replace("#efefef", "#f9e79f")
         if self.settings['stylesheet'] == "green":
             style = style.replace("#efefef", "#c8e6c9")
             style = style.replace("#f89407", "#ea202c")
+            self.highlight_color = "#ea202c"
         if self.settings['stylesheet'] == "blue":
             style = style.replace("#efefef", "#cbe9fa")
             style = style.replace("#f89407", "#303f9f")
+            self.highlight_color = "#303f9f"
         if self.settings['stylesheet'] == "purple":
             style = style.replace("#efefef", "#dfe2ff")
             style = style.replace("#f89407", "#ca1b9a")
+            self.highlight_color = "#ca1b9a"
         if self.settings['stylesheet'] == "native":
             style = "* {font-size: 12px;}"
+            palette = QtWidgets.QApplication.instance().palette()
+            self.highlight_color = palette.color(QtGui.QPalette.ColorRole.Highlight).name(QtGui.QColor.NameFormat.HexRgb)
         return style
 
     def load_settings(self):
@@ -2003,7 +2011,7 @@ Click "Yes" to start now.')
                 # self.dialog_list = None
                 # save main window geometry to config.ini
                 self.app.settings['mainwindow_geometry'] = self.saveGeometry().toHex().data().decode('utf-8') 
-                self.app.write_config_ini(self.app.settings)
+                self.app.write_config_ini(self.app.settings, self.app.ai_models)
                 if self.app.conn is not None:
                     try:
                         self.app.conn.commit()

@@ -434,10 +434,6 @@ want to continue?\
         """Collects all text sources from the database and adds them to the chroma_db if 
         not already in there.  
         """
-        #global sentence_transformers_module
-        #if sentence_transformers_module is None:
-        #    sentence_transformers_module = importlib.import_module('sentence_transformers')
-        #self.embedding_function = E5SentenceTransformerEmbeddings(model_name=self.model_folder)
         self.app.ai._status = ''
         if self.chroma_db is None:
             logger.debug('chroma_db is None')
