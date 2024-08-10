@@ -51,16 +51,6 @@ path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
-def exception_handler(exception_type, value, tb_obj):
-    """ Global exception handler useful in GUIs.
-    tb_obj: exception.__traceback__ """
-    tb = '\n'.join(traceback.format_tb(tb_obj))
-    txt = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
-    print(txt)
-    logger.error(_("Uncaught exception: ") + txt)
-    QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), txt)
-
-
 class DialogReportRelations(QtWidgets.QDialog):
     """ Show code relations/crossovers for one coder.
     This is for text only. """
@@ -77,7 +67,6 @@ class DialogReportRelations(QtWidgets.QDialog):
 
     def __init__(self, app, parent_textedit):
 
-        sys.excepthook = exception_handler
         self.app = app
         self.parent_textEdit = parent_textedit
         self.get_code_data()

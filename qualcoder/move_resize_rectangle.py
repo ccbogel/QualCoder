@@ -37,16 +37,6 @@ path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
-def exception_handler(exception_type, value, tb_obj):
-    """ Global exception handler useful in GUIs.
-    tb_obj: exception.__traceback__ """
-    tb = '\n'.join(traceback.format_tb(tb_obj))
-    text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
-    print(text)
-    logger.error(_("Uncaught exception") + ":\n" + text)
-    QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
-
-
 class DialogMoveResizeRectangle(QtWidgets.QDialog):
     """
     Dialog to obtain integers for move or resize a coded image rectangle.
@@ -61,7 +51,6 @@ class DialogMoveResizeRectangle(QtWidgets.QDialog):
     def __init__(self, app, parent=None):
         super(DialogMoveResizeRectangle, self).__init__(parent)
 
-        sys.excepthook = exception_handler
         self.app = app
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_move_resize_rect()

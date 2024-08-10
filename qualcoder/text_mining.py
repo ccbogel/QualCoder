@@ -40,15 +40,6 @@ from .GUI.ui_dialog_text_mining import Ui_Dialog_text_mining
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
-def exception_handler(exception_type, value, tb_obj):
-    """ Global exception handler useful in GUIs.
-    tb_obj: exception.__traceback__ """
-    tb = '\n'.join(traceback.format_tb(tb_obj))
-    text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
-    print(text)
-    logger.error(_("Uncaught exception: ") + text)
-    QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
-
 
 class DialogTextMining(QtWidgets.QDialog):
     """ Mine text using a range of variables.
@@ -68,7 +59,6 @@ class DialogTextMining(QtWidgets.QDialog):
 
     def __init__(self, settings, parent_textEdit):
 
-        sys.excepthook = exception_handler
         self.settings = settings
         self.parent_textEdit = parent_textEdit
         self.get_data()

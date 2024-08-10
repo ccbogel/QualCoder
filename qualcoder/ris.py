@@ -38,20 +38,6 @@ path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
-def exception_handler(exception_type, value, tb_obj):
-    """ Global exception handler useful in GUIs.
-    tb_obj: exception.__traceback__ """
-    tb = '\n'.join(traceback.format_tb(tb_obj))
-    text_ = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
-    print(text_)
-    logger.error(_("Uncaught exception: ") + text_)
-    mb = QtWidgets.QMessageBox()
-    mb.setStyleSheet("* {font-size: 12pt}")
-    mb.setWindowTitle(_('Uncaught Exception'))
-    mb.setText(text_)
-    mb.exec()
-
-
 class Ris:
     """ Load ris list of dictionaries.
         Format RIS to Vancouver or APA for display.
@@ -61,7 +47,6 @@ class Ris:
     refs = []
 
     def __init__(self, app):
-        sys.excepthook = exception_handler
         self.app = app
 
     def get_references(self, selected_ris=None):
@@ -295,7 +280,6 @@ class RisImport:
     parent_text_edit = None
 
     def __init__(self, app, parent_text_edit):
-        sys.excepthook = exception_handler
         self.app = app
         self.parent_text_edit = parent_text_edit
         response = QtWidgets.QFileDialog.getOpenFileNames(None, _('Select RIS references file'),

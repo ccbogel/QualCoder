@@ -58,20 +58,6 @@ colors = {"red": QtCore.Qt.GlobalColor.red, "green": QtCore.Qt.GlobalColor.green
           "black": QtCore.Qt.GlobalColor.black, "white": QtCore.Qt.GlobalColor.white}
 
 
-def exception_handler(exception_type, value, tb_obj):
-    """ Global exception handler useful in GUIs.
-    tb_obj: exception.__traceback__ """
-    tb = '\n'.join(traceback.format_tb(tb_obj))
-    txt = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
-    print(txt)
-    logger.error(_("Uncaught exception: ") + txt)
-    mb = QtWidgets.QMessageBox()
-    mb.setStyleSheet("* {font-size: 12pt}")
-    mb.setWindowTitle(_('Uncaught Exception'))
-    mb.setText(txt)
-    mb.exec()
-
-
 class ViewGraph(QDialog):
     """ Dialog to view code and categories in an acyclic graph. Provides options for
     colors and amount of nodes to display (based on category selection).
@@ -89,7 +75,6 @@ class ViewGraph(QDialog):
     def __init__(self, app):
         """ Set up the dialog. """
 
-        sys.excepthook = exception_handler
         QDialog.__init__(self)
         self.app = app
         self.settings = app.settings
