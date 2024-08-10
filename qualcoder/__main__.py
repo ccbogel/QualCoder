@@ -50,6 +50,7 @@ import getpass
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 
+from qualcoder.error_dlg import UncaughtHook
 from qualcoder.attributes import DialogManageAttributes
 from qualcoder.cases import DialogCases
 from qualcoder.codebook import Codebook
@@ -130,20 +131,8 @@ logger.setLevel(logging.DEBUG)
 handler = RotatingFileHandler(logfile, maxBytes=4000, backupCount=2)
 logger.addHandler(handler)
 
-
-def exception_handler(exception_type, value, tb_obj):
-    """ Global exception handler useful in GUIs.
-    tb_obj: exception.__traceback__ """
-    tb = '\n'.join(traceback.format_tb(tb_obj))
-    msg = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
-    print(msg)
-    mb = QtWidgets.QMessageBox()
-    mb.setStyleSheet("* {font-size: 10pt}")
-    if len(msg) > 500:
-        msg = _('Shortened error message: ...') + msg[-500:]
-    mb.setText(msg)
-    mb.exec()
-
+# create a global hook for uncaught exceptions
+qt_exception_hook =  UncaughtHook()
 
 lock_timeout = 30.0  # in seconds. If a project lockfile is older (= has received no heartbeat for 30 seconds),
 # it is assumed that the host process has died and the project is opened anyways
@@ -208,7 +197,6 @@ class App(object):
     highlight_color = '#f89407' # the default color for highlighting gui elements, changes with style
 
     def __init__(self):
-        sys.excepthook = exception_handler
         self.conn = None
         self.project_path = ""
         self.project_name = ""
@@ -858,6 +846,7 @@ university, ORCID, GitHub, or Google account.""",
             self.highlight_color = "#ca1b9a"
         if self.settings['stylesheet'] == "native":
             style = "* {font-size: 12px;}"
+            style += "\nQGroupBox { border: none; background-color: transparent;}"
             palette = QtWidgets.QApplication.instance().palette()
             self.highlight_color = palette.color(QtGui.QPalette.ColorRole.Highlight).name(QtGui.QColor.NameFormat.HexRgb)
         return style
@@ -1234,8 +1223,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.heartbeat_thread = None
         self.heartbeat_worker = None
         self.lock_file_path = ''
-        
-        sys.excepthook = exception_handler
         
         if platform.system() == "Windows" and self.app.settings['stylesheet'] == "native":
             # Make 'Fusion' the standard native style on Windows, as Qt recommends here: https://www.qt.io/blog/dark-mode-on-windows-11-with-qt-6.5 
@@ -1888,7 +1875,7 @@ Click "Yes" to start now.')
         """ Organise codes structure. """
 
         self.ui.label_coding.setText("")
-        ui = CodeOrganiser(self.app)
+        ui = CodeOrganiser(self.app, self.ui.textEdit)
         ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
         self.tab_layout_helper(self.ui.tab_coding, ui)
 
