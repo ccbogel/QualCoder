@@ -55,16 +55,6 @@ path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
-def exception_handler(exception_type, value, tb_obj):
-    """ Global exception handler useful in GUIs.
-    tb_obj: exception.__traceback__ """
-    tb = '\n'.join(traceback.format_tb(tb_obj))
-    text = f"Traceback (most recent call last):\n{tb}\n{exception_type.__name__}: {value}"
-    print(text)
-    logger.error(_("Uncaught exception: ") + text)
-    QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
-
-
 def msecs_to_mins_and_secs(msecs):
     """ Convert milliseconds to minutes and seconds.
     msecs is an integer. Minutes and seconds output is a string."""
@@ -217,7 +207,6 @@ class DialogCodeInText(QtWidgets.QDialog):
             app : class containing app details such as database connection
         """
 
-        sys.excepthook = exception_handler
         self.app = app
         self.data = data
         self.code_resize_timer = datetime.datetime.now()
@@ -413,7 +402,6 @@ class DialogCodeInAV(QtWidgets.QDialog):
                     mediapath, fid, memo, file_or_case}
         """
 
-        sys.excepthook = exception_handler
         self.app = app
         self.data = data
         QtWidgets.QDialog.__init__(self)
@@ -516,7 +504,6 @@ class DialogCodeInImage(QtWidgets.QDialog):
                     mediapath, fid, memo, file_or_case}
         """
 
-        sys.excepthook = exception_handler
         self.app = app
         self.data = data
         self.scale = 1

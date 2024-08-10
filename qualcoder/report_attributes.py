@@ -39,20 +39,6 @@ path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
-def exception_handler(exception_type, value, tb_obj):
-    """ Global exception handler useful in GUIs.
-    tb_obj: exception.__traceback__ """
-    tb = '\n'.join(traceback.format_tb(tb_obj))
-    text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
-    print(text)
-    logger.error(_("Uncaught exception: ") + text)
-    mb = QtWidgets.QMessageBox()
-    mb.setStyleSheet("* {font-size: 12pt}")
-    mb.setWindowTitle(_('Uncaught Exception'))
-    mb.setText(text)
-    mb.exec()
-
-
 class DialogSelectAttributeParameters(QtWidgets.QDialog):
     """ Select parameters for attributes to limit coding report results.
     Parameters are from either case-based or file-based, or both.
@@ -95,7 +81,6 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
         """ limiter can be 'all', 'file' or 'case' This restricts the attributes to be displayed. """
 
         super(DialogSelectAttributeParameters, self).__init__(parent)
-        sys.excepthook = exception_handler
         self.app = app
         self.limiter = limiter
         self.parameters = []

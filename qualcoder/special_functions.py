@@ -45,16 +45,6 @@ path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
-def exception_handler(exception_type, value, tb_obj):
-    """ Global exception handler useful in GUIs.
-    tb_obj: exception.__traceback__ """
-    tb = '\n'.join(traceback.format_tb(tb_obj))
-    msg = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
-    print(msg)
-    logger.error(_("Uncaught exception: ") + msg)
-    QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), msg)
-
-
 class DialogSpecialFunctions(QtWidgets.QDialog):
     """ Dialog for special QualCoder functions.
     """
@@ -74,7 +64,6 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
     def __init__(self, app, parent_text_edit, tab_coding, parent=None):
 
         super(DialogSpecialFunctions, self).__init__(parent)
-        sys.excepthook = exception_handler
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_special_functions()
         self.ui.setupUi(self)

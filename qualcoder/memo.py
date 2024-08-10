@@ -40,16 +40,6 @@ path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
-def exception_handler(exception_type, value, tb_obj):
-    """ Global exception handler useful in GUIs.
-    tb_obj: exception.__traceback__ """
-    tb = '\n'.join(traceback.format_tb(tb_obj))
-    text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
-    print(text)
-    logger.error(_("Uncaught exception: ") + text)
-    QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
-
-
 class DialogMemo(QtWidgets.QDialog):
 
     """ Dialog to view and edit memo text.
@@ -64,7 +54,6 @@ class DialogMemo(QtWidgets.QDialog):
 
         super(DialogMemo, self).__init__(parent=None)  # overrride accept method
 
-        sys.excepthook = exception_handler
         self.app = app
         self.memo = memo
         self.ui = Ui_Dialog_memo()

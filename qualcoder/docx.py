@@ -44,16 +44,6 @@ from PyQt6 import QtWidgets
 logger = logging.getLogger(__name__)
 
 
-def exception_handler(exception_type, value, tb_obj):
-    """ Global exception handler useful in GUIs.
-    tb_obj: exception.__traceback__ """
-    tb = '\n'.join(traceback.format_tb(tb_obj))
-    text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
-    print(text)
-    logger.error(_("Uncaught exception: ") + text)
-    QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
-
-
 # All Word prefixes / namespace matches used in document.xml and core.xml.
 # LXML does not use prefixes (just the real namespace) , but these
 # make it easier to copy Word output more easily.
@@ -90,7 +80,6 @@ nsprefixes = {
 def opendocx(file):
     """ Open a docx file, return a document XML tree. """
 
-    sys.excepthook = exception_handler
     mydoc = zipfile.ZipFile(file)
     xmlcontent = mydoc.read('word/document.xml')
     document = etree.fromstring(xmlcontent)
@@ -100,7 +89,6 @@ def opendocx(file):
 def getdocumenttext(document):
     """ Return the raw text of a document, as a list of paragraphs. """
 
-    sys.excepthook = exception_handler
     paratextlist = []
     # Compile a list of all paragraph (p) elements
     paralist = []

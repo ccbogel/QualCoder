@@ -45,20 +45,6 @@ path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
-def exception_handler(exception_type, value, tb_obj):
-    """ Global exception handler useful in GUIs.
-    tb_obj: exception.__traceback__ """
-    tb = '\n'.join(traceback.format_tb(tb_obj))
-    text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
-    print(text)
-    logger.error(_("Uncaught exception: ") + text)
-    mb = QtWidgets.QMessageBox()
-    mb.setStyleSheet("* {font-size: 12pt}")
-    mb.setWindowTitle(_('Uncaught Exception'))
-    mb.setText(text)
-    mb.exec()
-
-
 class DialogManageLinks(QtWidgets.QDialog):
     """ Fix bad file links. Can browse to correct location to set a new file path.
     """
@@ -69,7 +55,6 @@ class DialogManageLinks(QtWidgets.QDialog):
 
     def __init__(self, app, parent_text_edit, tab_coding):
 
-        sys.excepthook = exception_handler
         self.app = app
         self.parent_textEdit = parent_text_edit
         self.tab_coding = tab_coding

@@ -38,17 +38,6 @@ from .GUI.ui_dialog_add_item import Ui_Dialog_add_item
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
-
-def exception_handler(exception_type, value, tb_obj):
-    """ Global exception handler useful in GUIs.
-    tb_obj: exception.__traceback__ """
-    tb = '\n'.join(traceback.format_tb(tb_obj))
-    text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
-    print(text)
-    logger.error(_("Uncaught exception") + ":\n" + text)
-    QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
-
-
 class DialogAddItemName(QtWidgets.QDialog):
     """ Dialog to get a new code or code category from user.
     Also used for Case and File adding attributes.
@@ -72,7 +61,6 @@ class DialogAddItemName(QtWidgets.QDialog):
             """
 
         super(DialogAddItemName, self).__init__(parent)
-        sys.excepthook = exception_handler
         self.existing_items = []
         for i in items:
             self.existing_items.append(i['name'])

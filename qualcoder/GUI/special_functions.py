@@ -63,7 +63,6 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
     def __init__(self, app, parent_textEdit, tab_coding, parent=None):
 
         super(DialogSpecialFunctions, self).__init__(parent)
-        sys.excepthook = exception_handler
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_special_functions()
         self.ui.setupUi(self)
