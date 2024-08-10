@@ -25,15 +25,15 @@ Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 """
-
+import sqlite3
 from copy import deepcopy
 import datetime
-import logging
+#import logging
 import os
 from random import randint
-import sqlite3
-import sys
-import traceback
+#import sqlite3
+#import sys
+#import traceback
 
 from PyQt6 import QtCore, QtWidgets, QtGui
 from PyQt6.QtWidgets import QDialog
@@ -41,7 +41,7 @@ from PyQt6.QtWidgets import QDialog
 from .add_item_name import DialogAddItemName
 from .code_in_all_files import DialogCodeInAllFiles
 from .color_selector import TextColor
-from .confirm_delete import DialogConfirmDelete
+#from .confirm_delete import DialogConfirmDelete
 from .GUI.base64_helper import *
 from .GUI.ui_dialog_organiser import Ui_DialogOrganiser
 from .helpers import ExportDirectoryPathDialog, Message
@@ -49,10 +49,10 @@ from .memo import DialogMemo
 from .select_items import DialogSelectItems
 
 path = os.path.abspath(os.path.dirname(__file__))
-logger = logging.getLogger(__name__)
+# logger = logging.getLogger(__name__)
 
 
-def exception_handler(exception_type, value, tb_obj):
+'''def exception_handler(exception_type, value, tb_obj):
     """ Global exception handler useful in GUIs.
     tb_obj: exception.__traceback__ """
     tb = '\n'.join(traceback.format_tb(tb_obj))
@@ -63,10 +63,10 @@ def exception_handler(exception_type, value, tb_obj):
     mb.setStyleSheet("* {font-size: 12pt}")
     mb.setWindowTitle(_('Uncaught Exception'))
     mb.setText(txt)
-    mb.exec()
+    mb.exec()'''
 
 
-# Easier to modify these variables across the classes if they are global
+# Easier to modify these variables across classes
 model = []
 update_graphics_item_models = False
 
@@ -79,17 +79,19 @@ class CodeOrganiser(QDialog):
     """
 
     app = None
+    parent_text_edit = None
     conn = None
     settings = None
     scene = None
     font_size = 9
 
-    def __init__(self, app):
+    def __init__(self, app, text_edit):
         """ Set up the dialog. """
 
-        sys.excepthook = exception_handler
+        #sys.excepthook = exception_handler
         QDialog.__init__(self)
         self.app = app
+        self.parent_text_edit = text_edit
         self.settings = app.settings
         self.conn = app.conn
         # Set up the user interface from Designer.
@@ -127,8 +129,14 @@ class CodeOrganiser(QDialog):
         update_graphics_item_models = False
         global model
         model = []
-        text_ = "This function does not work yet.\nThis is a work in progress to enact changes in the \ncode organiser to the code tree structure."
+        text_ = "This function does not work yet.\nThis is a work in progress to enact changes in the " \
+                "\ncode organiser to the code tree structure."
         Message(self.app, "Code organiser", text_).exec()
+
+        # TODO a warning should be in __init__
+        '''text_ = _("Back up project before applying changes to the codes tree.\nNo undo option.")
+        Message(self.app, "Code organiser", text_).exec()
+        '''
 
         # TODO
         """ qdpx import quirk, but category names and code names can match. (MAXQDA, Nvivo)
@@ -157,7 +165,7 @@ class CodeOrganiser(QDialog):
         temp_cat_id = randint(-1000, -1)
         while temp_cat_id in cat_ids_list:
             temp_cat_id = randint(-1000, -1)
-        now_date = datetime.datetime.now().astimezone().strftime("%Y%m%d_%H-%S")
+        now_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
         new_category = {'name': new_category_name, 'catid': temp_cat_id, 'owner': self.settings['codername'],
                         'date': now_date, 'memo': '', 'supercatid': None,
                         'x': 10 + randint(0, 6), 'y': 10 + randint(0, 6), 'color': "#FFFFFF",
@@ -207,6 +215,7 @@ class CodeOrganiser(QDialog):
             code['original_memo'] = code['memo']
             code['x'] = None
             code['y'] = None
+            code['delete'] = False
             code['supercatid'] = code['catid']
             """ qdpx import quirk, but category names and code names can match. (MAXQDA, Nvivo)
             This causes hierarchy to not work correctly (eg when moving a category).
@@ -226,6 +235,7 @@ class CodeOrganiser(QDialog):
             category['y'] = None
             category['cid'] = None
             category['color'] = '#FFFFFF'
+            category['delete'] = False  # True if merged
         global model
         model = categories + codes
 
@@ -389,7 +399,7 @@ class CodeOrganiser(QDialog):
         Needs focus on the QGraphicsView widget. """
 
         key = event.key()
-        mod = event.modifiers()
+        # mod = event.modifiers()
         if key == QtCore.Qt.Key.Key_Plus or key == QtCore.Qt.Key.Key_W:
             if self.ui.graphicsView.transform().isScaling() and self.ui.graphicsView.transform().determinant() > 10:
                 return
@@ -472,7 +482,7 @@ class CodeOrganiser(QDialog):
             temp_cat_id = randint(-1000, -1)
             while temp_cat_id in cat_ids_list:
                 temp_cat_id = randint(-1000, -1)
-            now_date = datetime.datetime.now().astimezone().strftime("%Y%m%d_%H-%S")
+            now_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
             # No original_name, original_catid, original_supercatid, orignal-memo
             new_category = {'name': new_category_name, 'original_name': '', 'catid': temp_cat_id,
                             'owner': self.settings['codername'], 'date': now_date, 'memo': '', 'original_memo': '',
@@ -511,11 +521,138 @@ class CodeOrganiser(QDialog):
         Message(self.app, "Work in progress.", text_).exec()
         return
 
-        text_ = _("Back up project before applying changes.\nNo undo option.")
-        ui = DialogConfirmDelete(self.app, text_, _("Apply changes"))
-        ok = ui.exec()
-        if not ok:
-            return
+        global model
+        print("MODEL")
+        for item in model:
+            print(item)
+        print(len(model))
+        print("==========")
+
+        # Merged new categories are not used. They are nameless. Remove from model
+        merged_new_categories = []
+        for item in model:
+            if item['catid'] is not None and item['catid'] < 0 and item['cid'] is None and item['name'] == "":
+                merged_new_categories.append(item)
+        for item in merged_new_categories:
+            print("Unused new merged CAT", item['catid'])
+            model.remove(item)
+        print(len(model))
+        # New categories to insert into database
+        new_categories = []
+        for item in model:
+            if item['catid'] is not None and item['catid'] < 0 and item['cid'] is None:  #  and item['name'] != "":
+                # Categories with '' as name are new categories that have been merged itno othe rcategories
+                new_categories.append(item)
+        cur = self.app.conn.cursor()
+        # Insert new categories, update links to codes and pre-existing categories
+        for category in new_categories:
+            model.remove(category)
+            try:
+                cur.execute("insert into code_cat (name, memo, owner, date, supercatid) values(?,?,?,?,?)",
+                            (category['name'], category['memo'], category['owner'], category['date'],
+                             category['supercatid']))
+                self.app.conn.commit()
+            except sqlite3.IntegrityError as e_:
+                print(e_)
+                print(category['name'])
+            cur.execute("select last_insert_rowid()")
+            category['insert_id'] = cur.fetchone()[0]
+            print("NEW CAT INSERT", category['name'], category['catid'], "->", category['insert_id'])
+
+            # Update remaining model for code catids and pre-existing category supercatids
+            for model_item in model:
+                if model_item['catid'] == category['catid']:
+                    model_item['catid'] = category['insert_id']
+                if model_item['supercatid'] == category['catid']:
+                    model_item['supercatid'] = category['insert_id']
+        print(len(model))
+
+        '''print("1 after insert new categories")
+        cur.execute("select * from code_cat")
+        res = cur.fetchall()
+        for r in res:
+            print(r)'''
+
+        # Delete pre-existing categories from database, if they have been merged into other categories
+        categories_to_delete = []
+        for item in model:
+            if item['delete'] is True and item['cid'] is None:
+                categories_to_delete.append(item)
+        for item in categories_to_delete:
+            model.remove(item)
+        for item in categories_to_delete:
+            print("CAT to DEL", item['name'], item['original_name'], item['catid'])  # tmp
+            cur.execute("delete from code_cat where catid=?", [item['catid']])
+            self.app.conn.commit()
+
+
+        # Get inserted new categories where supercatid is < 0 and update these with insert_id
+        cur.execute("select catid, supercatid, name from code_cat where supercatid < 0")
+        res = cur.fetchall()
+        print("inserted cats")
+        for category_to_update in res:
+            print("Db cat to update (catid, supercatid)", category_to_update)
+            for new_category in new_categories:
+                if category_to_update[1] == new_category['catid']:
+                    cur.execute("update code_cat set supercatid=? where catid=?", [new_category['insert_id'],
+                                                                                   category_to_update[0]])
+                    self.app.conn.commit()
+
+        '''print("2 after  new category supercatid updates")
+        cur.execute("select * from code_cat")
+        res = cur.fetchall()
+        for r in res:
+            print(r)'''
+
+        # Update codes and categories in model - catid, supercatid, name, memo
+        for item in model:
+            # Update pre-existing categories
+            if item['catid'] is not None and item['cid'] is None:
+                cur.execute("update code_cat set name=?, memo=?, supercatid=? where catid=?",
+                            [item['name'], item['memo'], item['supercatid'], item['catid']])
+                self.app.conn.commit()
+            # Update codes
+            if item['cid'] is not None:
+                cur.execute("update code_name set name=?, memo=?, catid=? where cid=?",
+                            [item['name'], item['memo'], item['catid'], item['cid']])
+                self.app.conn.commit()
+
+        '''print("3 after existing category and code updates")
+        cur.execute("select * from code_cat")
+        res = cur.fetchall()
+        for r in res:
+            print(r)'''
+
+        # TODO Check for and update merged codes ==> update coded text, images, A/V
+
+        #self.update_dialog_codes_and_categories
+        self.app.delete_backup = False
+        self.parent_text_edit.append(_("Code tree re-organised."))
+        self.hide()
+        Message(self.app, "Code organiser", "Changes applied to the codes tree").exec()
+
+    # TODO
+    '''def update_dialog_codes_and_categories(self):
+        """ Update code and category tree here and in DialogReportCodes, ReportCoderComparisons, 
+        ReportCodeFrequencies
+        Using try except blocks for each instance, as instance may have been deleted. """
+
+        contents = self.tab_reports.layout()
+        if contents:
+            for i in reversed(range(contents.count())):
+                c = contents.itemAt(i).widget()
+                if isinstance(c, DialogReportCodes):
+                    c.get_codes_categories_coders()
+                    c.fill_tree()
+                if isinstance(c, DialogReportCoderComparisons):
+                    c.get_data()
+                    c.fill_tree()
+                if isinstance(c, DialogReportCodeFrequencies):
+                    c.get_data()
+                    c.fill_tree()
+                if isinstance(c, DialogReportCodeSummary):
+                    c.get_codes_and_categories()
+                    c.fill_tree()'''
 
 
 class GraphicsScene(QtWidgets.QGraphicsScene):
@@ -551,6 +688,59 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
         """ Return scene height. """
 
         return self.scene_height
+
+    def named_children_of_node(self, node):
+        """ Get names of child categories and codes of this category node.
+        Only keep the category or code name. Used to reposition TextGraphicsItems on moving a category.
+        All category and code names are unique.
+
+        param: node : Dictionary of category
+
+        return: child_names : List
+        """
+
+        if node['cid'] is not None:
+            return []
+        child_names = []
+        codes_ = []
+        categories_ = []
+        global model
+        model_copy = deepcopy(model)
+        for item in model_copy:
+            if item['cid'] is None:
+                categories_.append(item)
+            else:
+                codes_.append(item)
+
+        """ Create a list of this category (node) and all its category children.
+        Maximum depth of 200. """
+        selected_categories = [node]
+        i = 0  # Ensure an exit from loop
+        new_model_changed = True
+        while categories_ != [] and new_model_changed and i < 200:
+            new_model_changed = False
+            append_list = []
+            for sel_category in selected_categories:
+                for m in categories_:
+                    if m['supercatid'] == sel_category['catid']:
+                        append_list.append(m)
+                        child_names.append(m['name'])
+            for append_item in append_list:
+                selected_categories.append(append_item)
+                categories_.remove(append_item)
+                new_model_changed = True
+            i += 1
+        categories_ = selected_categories
+        # Remove codes that are not associated with these categories
+        selected_codes = []
+        for category in categories_:
+            for code in codes_:
+                if code['catid'] == category['catid']:
+                    selected_codes.append(code)
+        codes_ = selected_codes
+        for code_ in codes_:
+            child_names.append(code_['name'])
+        return child_names
 
     def mouseMoveEvent(self, mouse_event):
         """ On mouse move, an item might be repositioned so need to redraw all the link_items.
@@ -630,58 +820,6 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
                 item.redraw()
         self.update(self.sceneRect())"""
 
-    def named_children_of_node(self, node):
-        """ Get child categories and codes of this category node.
-        Only keep the category or code name. Used to reposition TextGraphicsItems on moving a category.
-
-        param: node : Dictionary of category
-
-        return: child_names : List
-        """
-
-        if node['cid'] is not None:
-            return []
-        child_names = []
-        codes_ = []
-        categories_ = []
-        global model
-        model_copy = deepcopy(model)
-        for item in model_copy:
-            if item['cid'] is None:
-                categories_.append(item)
-            else:
-                codes_.append(item)
-
-        """ Create a list of this category (node) and all its category children.
-        Maximum depth of 200. """
-        selected_categories = [node]
-        i = 0  # Ensure an exit from loop
-        new_model_changed = True
-        while categories_ != [] and new_model_changed and i < 200:
-            new_model_changed = False
-            append_list = []
-            for sel_category in selected_categories:
-                for m in categories_:
-                    if m['supercatid'] == sel_category['catid']:
-                        append_list.append(m)
-                        child_names.append(m['name'])
-            for append_item in append_list:
-                selected_categories.append(append_item)
-                categories_.remove(append_item)
-                new_model_changed = True
-            i += 1
-        categories_ = selected_categories
-        # Remove codes that are not associated with these categories
-        selected_codes = []
-        for category in categories_:
-            for code in codes_:
-                if code['catid'] == category['catid']:
-                    selected_codes.append(code)
-        codes_ = selected_codes
-        for code_ in codes_:
-            child_names.append(code_['name'])
-        return child_names
-
     def remove_links(self):
         """ Clean up by removing all links """
 
@@ -729,7 +867,7 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
                 min_adjust_y = i.pos().y()
         if min_adjust_x < 0 or min_adjust_y < 0:
             for i in self.items():
-                if not isinstance(i, LinkGraphicsItem):  # or isinstance(i, FreeLineGraphicsItem)):
+                if not isinstance(i, LinkGraphicsItem):
                     i.setPos(i.pos().x() - min_adjust_x, i.pos().y() - min_adjust_y)
 
     def suggested_scene_size(self):
@@ -910,7 +1048,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         for item in model:
             if item['cid'] is None and item['name'] != "":
                 categories_.append(item)
-        ui = DialogSelectItems(self.app, categories_, 'Select category', 'single')
+        ui = DialogSelectItems(self.app, categories_, _('Link code: Select category'), 'single')
         ok = ui.exec()
         if not ok:
             return
@@ -933,7 +1071,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         for item in model:
             if item['cid'] is not None and item['cid'] != self.code_or_cat['cid'] and item['name'] != "":
                 codes_.append(item)
-        ui = DialogSelectItems(self.app, codes_, 'Select code', 'single')
+        ui = DialogSelectItems(self.app, codes_, _('Merge into: Select code'), 'single')
         ok = ui.exec()
         if not ok:
             return
@@ -988,7 +1126,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
                     item['name'] not in self.code_or_cat['child_names']:
                 categories_.append(item)
 
-        ui = DialogSelectItems(self.app, categories_, 'Select category', 'single')
+        ui = DialogSelectItems(self.app, categories_, _('Link under: Select category'), 'single')
         ok = ui.exec()
         if not ok:
             return
@@ -1012,23 +1150,28 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
             if item['catid'] != self.code_or_cat['catid'] and item['name'] != "" and item['cid'] is None and \
                     item['name'] not in self.code_or_cat['child_names']:
                 categories.append(item)
-        ui = DialogSelectItems(self.app, categories, 'Select category', 'single')
+        ui = DialogSelectItems(self.app, categories, _('Merge into: Select category'), 'single')
         ok = ui.exec()
         if not ok:
             return
         merge_category = ui.get_selected()
         if not merge_category:
             return
-        # Update subcategories of this category
+        # Update subcategories and codes of this category
         for item in model:
             if item['supercatid'] == self.code_or_cat['catid']:
                 item['supercatid'] = merge_category['catid']
-        # Update this item and codes
-        for item in model:
-            if item['catid'] == self.code_or_cat['catid']:
+            if item['catid'] == self.code_or_cat['catid'] and item['cid'] is not None:
                 item['catid'] = merge_category['catid']
 
-        self.code_or_cat['catid'] = merge_category['catid']
+        # Update this item in model
+        for item in model:
+            if item['catid'] == self.code_or_cat['catid'] and item['cid'] is None:
+                item['name'] = ""
+                item['delete'] = True  # Flag to delete from database, if pre-exisitng category
+                break
+        #self.code_or_cat['catid'] = 0
+        #self.code_or_cat['supecatid'] = 0
         self.code_or_cat['name'] = ""
         self.hide()
         global update_graphics_item_models
@@ -1125,12 +1268,12 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
             to_y = to_y + self.to_widget.boundingRect().height()
         self.setPen(QtGui.QPen(QtCore.Qt.GlobalColor.black, 1, QtCore.Qt.PenStyle.SolidLine))
         self.setLine(from_x, from_y, to_x, to_y)
-        self.pointer_x= from_x
+        self.pointer_x = from_x
         self.pointer_y = from_y
 
 
 class PointGraphicsItem(QtWidgets.QGraphicsRectItem):
-    """ Apply a rectangle pointer at one end of a link line. """
+    """ Show a rectangle pointer at one end of a link line. """
 
     def __init__(self, x, y):
         """
@@ -1142,25 +1285,25 @@ class PointGraphicsItem(QtWidgets.QGraphicsRectItem):
 
         self.x = x
         self.y = y
-        #self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
-        self.calculate_points_and_draw()
+        # self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
+        self.calculate_point_and_draw()
         self.redraw()
 
-    def contextMenuEvent(self, event):
+    '''def contextMenuEvent(self, event):
         menu = QtWidgets.QMenu()
 
         thicker_action = menu.addAction(_('Thicker'))
         action = menu.exec(QtGui.QCursor.pos())
         if action is None:
             return
-        self.redraw()
+        self.redraw()'''
 
     def redraw(self):
         """ Called from mouse move and release events. """
 
-        self.calculate_points_and_draw()
+        self.calculate_point_and_draw()
 
-    def calculate_points_and_draw(self):
+    def calculate_point_and_draw(self):
         """ Calculate the to x and y and from x and y points. Draw line between the
         widgets. Join the line to appropriate side of widget. """
 
