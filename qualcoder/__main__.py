@@ -1568,6 +1568,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.label_coding.setText("")
         ui = CodeOrganiser(self.app, self.ui.textEdit)
         ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
+        self.tab_layout_helper(self.ui.tab_reports, None)
         self.tab_layout_helper(self.ui.tab_coding, ui)
 
     def tab_layout_helper(self, tab_widget, ui):
