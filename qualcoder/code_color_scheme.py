@@ -49,20 +49,6 @@ ROWS = 12
 COLS = 10
 
 
-def exception_handler(exception_type, value, tb_obj):
-    """ Global exception handler useful in GUIs.
-    tb_obj: exception.__traceback__ """
-    tb = '\n'.join(traceback.format_tb(tb_obj))
-    text_ = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
-    print(text_)
-    logger.error(_("Uncaught exception: ") + text_)
-    mb = QtWidgets.QMessageBox()
-    mb.setStyleSheet("* {font-size: 12pt}")
-    mb.setWindowTitle(_('Uncaught Exception'))
-    mb.setText(text_)
-    mb.exec()
-
-
 class DialogCodeColorScheme(QtWidgets.QDialog):
     """ Edit codes colour scheme.  """
 
@@ -76,7 +62,6 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
         """
 
         super(DialogCodeColorScheme, self).__init__()
-        sys.excepthook = exception_handler
         self.app = app
         self.parent_textEdit = parent_textedit
         self.codes = []

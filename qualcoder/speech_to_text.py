@@ -49,16 +49,6 @@ path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
-def exception_handler(exception_type, value, tb_obj):
-    """ Global exception handler useful in GUIs.
-    tb_obj: exception.__traceback__ """
-    tb = '\n'.join(traceback.format_tb(tb_obj))
-    txt = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
-    print(txt)
-    logger.error(_("Uncaught exception: ") + txt)
-    QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), txt)
-
-
 class SpeechToText(QtWidgets.QDialog):
     """ Converts audio or video audio track to text using online services.
      Process involves converting the audio track to flac, then chunk.
@@ -87,7 +77,6 @@ class SpeechToText(QtWidgets.QDialog):
 
     def __init__(self, app, av_filepath):
 
-        sys.excepthook = exception_handler
         self.app = app
         self.text = ""
         self.filepath = av_filepath

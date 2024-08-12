@@ -41,21 +41,11 @@ path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
-def exception_handler(exception_type, value, tb_obj):
-    """ Global exception handler useful in GUIs.
-    tb_obj: exception.__traceback__ """
-    tb = '\n'.join(traceback.format_tb(tb_obj))
-    text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
-    print(text)
-    logger.error(_("Uncaught exception: ") + text)
-
-
 class _HTMLToText(HTMLParser):
     """ Convert HTML to text. """
 
     def __init__(self):
 
-        sys.excepthook = exception_handler
         HTMLParser.__init__(self)
         self._buf = []
         self.hide_output = False

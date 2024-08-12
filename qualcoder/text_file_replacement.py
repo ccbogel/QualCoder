@@ -53,16 +53,6 @@ path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
-def exception_handler(exception_type, value, tb_obj):
-    """ Global exception handler useful in GUIs.
-    tb_obj: exception.__traceback__ """
-    tb = '\n'.join(traceback.format_tb(tb_obj))
-    text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
-    print(text)
-    logger.error(_("Uncaught exception: ") + text)
-    QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
-
-
 class ReplaceTextFile:
     """  """
 
@@ -83,7 +73,6 @@ class ReplaceTextFile:
             old_file: Dictionary of {name, id, fulltext}
             new_file: String filepath """
 
-        sys.excepthook = exception_handler
         self.app = app
         self.old_file = old_file
         self.new_file_path = new_file_path

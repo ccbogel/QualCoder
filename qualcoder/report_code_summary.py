@@ -52,16 +52,6 @@ path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
-def exception_handler(exception_type, value, tb_obj):
-    """ Global exception handler useful in GUIs.
-    tb_obj: exception.__traceback__ """
-    tb = '\n'.join(traceback.format_tb(tb_obj))
-    text_ = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
-    print(text_)
-    logger.error(_("Uncaught exception:") + "\n" + text_)
-    QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text_)
-
-
 class DialogReportCodeSummary(QtWidgets.QDialog):
     """ Provide a summary report for selected code.
     """
@@ -72,7 +62,6 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
     codes = []
 
     def __init__(self, app, parent_textedit):
-        sys.excepthook = exception_handler
         self.app = app
         self.parent_textEdit = parent_textedit
         QtWidgets.QDialog.__init__(self)

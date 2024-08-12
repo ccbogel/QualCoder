@@ -53,16 +53,6 @@ REF_ISSUE = 7
 REF_KEYWORDS = 8
 
 
-def exception_handler(exception_type, value, tb_obj):
-    """ Global exception handler useful in GUIs.
-    tb_obj: exception.__traceback__ """
-    tb = '\n'.join(traceback.format_tb(tb_obj))
-    text_ = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
-    print(text_)
-    logger.error(_("Uncaught exception: ") + text_)
-    QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text_)
-
-
 class DialogReferenceManager(QtWidgets.QDialog):
     """ Dialog to manipulate files for a case.
     Add files to case, add all text or text portions from a text file.
@@ -76,7 +66,6 @@ class DialogReferenceManager(QtWidgets.QDialog):
 
     def __init__(self, app_, parent_text_edit):
 
-        sys.excepthook = exception_handler
         self.app = app_
         self.parent_textEdit = parent_text_edit
         self.files = []

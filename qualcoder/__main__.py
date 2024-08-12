@@ -1877,6 +1877,7 @@ Click "Yes" to start now.')
         self.ui.label_coding.setText("")
         ui = CodeOrganiser(self.app, self.ui.textEdit)
         ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
+        self.tab_layout_helper(self.ui.tab_reports, None)
         self.tab_layout_helper(self.ui.tab_coding, ui)
 
     def ai_chat(self):

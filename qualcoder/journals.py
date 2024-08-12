@@ -54,20 +54,6 @@ JID_COLUMN = 3
 ATTRIBUTE_START_COLUMN = 4
 
 
-def exception_handler(exception_type, value, tb_obj):
-    """ Global exception handler useful in GUIs.
-    tb_obj: exception.__traceback__ """
-    tb = '\n'.join(traceback.format_tb(tb_obj))
-    text_ = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
-    print(text_)
-    logger.error(_("Uncaught exception: ") + text_)
-    mb = QtWidgets.QMessageBox()
-    mb.setStyleSheet("* {font-size: 12pt}")
-    mb.setWindowTitle(_('Uncaught Exception'))
-    mb.setText(text_)
-    mb.exec()
-
-
 class DialogJournals(QtWidgets.QDialog):
     """  View, create, export, rename and delete journals. """
 
@@ -91,7 +77,6 @@ class DialogJournals(QtWidgets.QDialog):
     def __init__(self, app, parent_text_edit, parent=None):
 
         super(DialogJournals, self).__init__(parent)  # overrride accept method
-        sys.excepthook = exception_handler
         self.app = app
         self.parent_text_edit = parent_text_edit
         self.qtimer = QtCore.QTimer()

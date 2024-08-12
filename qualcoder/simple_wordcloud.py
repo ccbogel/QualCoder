@@ -39,16 +39,6 @@ path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
-def exception_handler(exception_type, value, tb_obj):
-    """ Global exception handler useful in GUIs.
-    tb_obj: exception.__traceback__ """
-    tb = '\n'.join(traceback.format_tb(tb_obj))
-    text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
-    print(text)
-    logger.error("Uncaught exception: " + text)
-    QtWidgets.QMessageBox.critical(None, 'Uncaught Exception', text)
-
-
 color_ranges = [
     {"name": "blue to yellow",
      "range": ["#115f9a", "#1984c5", "#22a7f0", "#48b5c4", "#76c68f", "#a6d75b", "#c9e52f", "#d0ee11", "#d0f400"]},
@@ -127,7 +117,6 @@ class Wordcloud:
     def __init__(self, app, fulltext, width=800, height=600, max_words=200, background_color="black",
                  text_color="random", reverse_colors=False, ngrams=1):
 
-        sys.excepthook = exception_handler
         self.app = app  # Used for project path
         self.width = width
         self.height = height

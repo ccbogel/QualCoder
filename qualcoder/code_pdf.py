@@ -72,20 +72,6 @@ path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
-def exception_handler(exception_type, value, tb_obj):
-    """ Global exception handler useful in GUIs.
-    tb_obj: exception.__traceback__ """
-    tb = '\n'.join(traceback.format_tb(tb_obj))
-    text_ = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
-    print(text_)
-    logger.error(_("Uncaught exception:") + "\n" + text_)
-    mb = QtWidgets.QMessageBox()
-    mb.setStyleSheet("* {font-size: 12pt}")
-    mb.setWindowTitle(_('Uncaught Exception'))
-    mb.setText(text_)
-    mb.exec()
-
-
 class DialogCodePdf(QtWidgets.QWidget):
     """ Code management. Add, delete codes. Mark and unmark text.
     Add memos and colors to codes.
@@ -134,7 +120,6 @@ class DialogCodePdf(QtWidgets.QWidget):
         super(DialogCodePdf, self).__init__()
         self.app = app
         self.tab_reports = tab_reports
-        sys.excepthook = exception_handler
         self.parent_textEdit = parent_textedit
         self.search_indices = []
         self.search_index = 0
