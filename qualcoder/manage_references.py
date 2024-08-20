@@ -37,7 +37,19 @@ from .GUI.base64_helper import *
 from .GUI.ui_reference_editor import Ui_DialogReferenceEditor
 from .GUI.ui_manage_references import Ui_Dialog_manage_references
 from .confirm_delete import DialogConfirmDelete
+#from .edit_textfile import DialogEditTextFile
+from .information import DialogInformation
+from .helpers import Message
 from .ris import Ris, RisImport
+from .view_av import DialogViewAV
+from .view_image import DialogViewImage
+
+# If VLC not installed, it will not crash
+vlc = None
+try:
+    import vlc
+except Exception as e:
+    print(e)
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -69,6 +81,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
         self.app = app_
         self.parent_textEdit = parent_text_edit
         self.files = []
+        self.av_dialog_open = None
         self.refs = []
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_manage_references()
@@ -133,10 +146,10 @@ class DialogReferenceManager(QtWidgets.QDialog):
         """ Get data for files and references. """
 
         cur = self.app.conn.cursor()
-        cur.execute("select id, name, risid, memo, date from source order by lower(name)")
+        cur.execute("select id, name, risid, memo, date, mediapath, av_text_id, fulltext from source order by lower(name)")
         result = cur.fetchall()
         self.files = []
-        keys = 'id', 'name', 'risid', 'memo', 'date'
+        keys = 'id', 'name', 'risid', 'memo', 'date', 'mediapath', 'av_text_id', 'fulltext'
         for row in result:
             self.files.append(dict(zip(keys, row)))
         self.fill_table_files()
@@ -187,7 +200,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
         self.ui.tableWidget_files.resizeRowsToContents()
 
     def table_files_header_menu(self, position):
-        """ Sort ascending or descending. """
+        """ Sort ascending or descending. Open file to view. """
 
         if not self.files:
             return
@@ -212,9 +225,12 @@ class DialogReferenceManager(QtWidgets.QDialog):
         """ Context menu for showing specific rows.
         """
 
-        #row = self.ui.tableWidget_files.currentRow()
+        row = self.ui.tableWidget_files.currentRow()
         menu = QtWidgets.QMenu()
         action_show_value_like = menu.addAction(_("Show value like"))
+        action_file_view = menu.addAction(_("View file"))
+        action_files_asc = menu.addAction(_("Ascending"))
+        action_files_desc = menu.addAction(_("Descending"))
         action_show_all_rows = None
         if self.table_files_rows_hidden:
             action_show_all_rows = menu.addAction(_("Show all rows"))
@@ -234,6 +250,95 @@ class DialogReferenceManager(QtWidgets.QDialog):
                     self.ui.tableWidget_files.setRowHidden(r, True)
             self.table_files_rows_hidden = True
             return
+        if action == action_files_desc:
+            sorted_list = sorted(self.files, key=lambda x: x['name'], reverse=True)
+            self.files = sorted_list
+            self.fill_table_files()
+            return
+        if action == action_files_asc:
+            sorted_list = sorted(self.files, key=lambda x: x['name'])
+            self.files = sorted_list
+            self.fill_table_files()
+            return
+        if action == action_file_view:
+            self.view()
+
+    def view (self):
+        """ View a text, image, audio or video media. """
+
+        if self.av_dialog_open is not None:
+            self.av_dialog_open.mediaplayer.stop()
+            self.av_dialog_open = None
+        row = self.ui.tableWidget_files.currentRow()
+        #self.ui.tableWidget_files.selectRow(x)
+        if self.files[row]['mediapath'] is not None and 'docs:' != self.files[row]['mediapath'][0:5]:
+            if len(self.files[row]['mediapath']) > 6 and self.files[row]['mediapath'][:7] in ("/images", "images:"):
+                self.view_image(row)
+                return
+            if len(self.files[row]['mediapath']) > 5 and self.files[row]['mediapath'][:6] in ("/video", "video:"):
+                self.view_av(row)
+                return
+            if len(self.files[row]['mediapath']) > 5 and self.files[row]['mediapath'][:6] in ("/audio", "audio:"):
+                self.view_av(row)
+                return
+        ui = DialogInformation(self.app, self.files[row]['name'], self.files[row]['fulltext'])
+        ui.ui.textEdit.setReadOnly(True)
+        ui.exec()
+
+    def view_av(self, row):
+        """ View an audio or video file. Edit the memo. Edit the transcript file.
+        Added try block in case VLC bindings do not work.
+        Uses a non-modal dialog.
+
+        param:
+            x  :  row number Integer
+        """
+
+        if not vlc:
+            msg = _("VLC not installed cannot play audio or video.")
+            Message(self.app, _('View AV error'), msg, "warning").exec()
+            return
+        # Check media exists
+        abs_path = ""
+        if self.files[row]['mediapath'][0:6] in ('/audio', '/video'):
+            abs_path = self.app.project_path + self.files[row]['mediapath']
+        if self.files[row]['mediapath'][0:6] in ('audio:', 'video:'):
+            abs_path = self.files[row]['mediapath'][6:]
+        if not os.path.exists(abs_path):
+            self.parent_text_edit.append(_("Bad link or non-existent file ") + abs_path)
+            return
+        try:
+            ui = DialogViewAV(self.app, self.files[row])
+            ui.ui.textEdit.setReadOnly(True)
+            # ui.exec()  # this dialog does not display well on Windows 10 so trying .show()
+            # The vlc window becomes unmovable and not resizable
+            self.av_dialog_open = ui
+            ui.show()
+        except Exception as err:
+            logger.warning(str(err))
+            Message(self.app, _('view AV error'), str(err), "warning").exec()
+            self.av_dialog_open = None
+            return
+
+    def view_image(self, row):
+        """ View an image file and edit the image memo.
+
+        param:
+            x  :  row number Integer
+        """
+
+        # Check image exists
+        abs_path = ""
+        if self.files[row]['mediapath'][:7] == "images:":
+            abs_path = self.files[row]['mediapath'][7:]
+        else:
+            abs_path = self.app.project_path + self.files[row]['mediapath']
+        if not os.path.exists(abs_path):
+            self.parent_text_edit.append(_("Bad link or non-existent file ") + abs_path)
+            return
+        ui = DialogViewImage(self.app, self.files[row])
+        ui.ui.textEdit.setReadOnly(True)
+        ui.exec()
 
     def fill_table_refs(self):
         """ Fill widget with ref details. """
