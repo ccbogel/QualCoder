@@ -29,6 +29,7 @@ import os
 from rispy import TAG_KEY_MAPPING
 import sys
 import logging
+import re
 import traceback
 
 from PyQt6 import QtWidgets, QtCore, QtGui
@@ -158,12 +159,30 @@ class DialogReferenceManager(QtWidgets.QDialog):
         keys = 'id', 'name', 'risid', 'memo', 'date', 'mediapath', 'av_text_id', 'fulltext'
         for row in result:
             self.files.append(dict(zip(keys, row)))
+        # This is used for auto-linking files to references
+        for file_ in self.files:
+            temp_name = file_['name']
+            if len(temp_name) > 4 and temp_name[-4:].lower() in (".txt", ".png", ".jpg", ".pdf", ".mp3", ".mp4",
+                                                                 ".odt", ".htm", ".wav", ".m4a", ".mov", ".ogg",
+                                                                 ".wmv"):
+                temp_name = temp_name[:-4]
+            elif len(temp_name) > 5 and temp_name[-5:].lower() in (".html", ".docx", ".jpeg"):
+                temp_name = temp_name[:-5]
+            split_name = re.split(';|,| |:', temp_name)
+            split_name = list(filter(''.__ne__, split_name))
+            file_['split_name'] = split_name
         self.fill_table_files()
         r = Ris(self.app)
         r.get_references()
         self.refs = r.refs
         sorted_list = sorted(self.refs, key=lambda x: x['details'])
         self.refs = sorted_list
+        # This is used for auto-linking files to references
+        for ref in self.refs:
+            temp_title = ref['TI']
+            split_title = re.split(';|,| |:', temp_title)
+            split_title = list(filter(''.__ne__, split_title))
+            ref['split_title'] = split_title
         self.fill_table_refs()
 
     def fill_table_files(self):
@@ -351,6 +370,12 @@ class DialogReferenceManager(QtWidgets.QDialog):
          Uses words from refernce title, first author name and year. """
 
         print("Auto link references to file names TODO")
+        print("==== FILES ====")
+        for file_ in self.files:
+            print(file_['split_name'])
+        print("\n==== REFERENCES ====")
+        for ref in self.refs:
+            print(ref['split_title'])
 
     def fill_table_refs(self):
         """ Fill widget with ref details. """
