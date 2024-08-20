@@ -131,6 +131,12 @@ class DialogReferenceManager(QtWidgets.QDialog):
         self.ui.pushButton_delete_unused_refs.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_delete_unused_refs.setEnabled(False)
         self.ui.pushButton_delete_unused_refs.hide()
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(magic_wand_icon), "png")
+        self.ui.pushButton_auto_link.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_auto_link.hide()  # Temporary hidden
+        #self.ui.pushButton_auto_link.pressed.connect(self.auto_link_files_to_references)  # Temporary commented out
+
         self.get_data()
         self.ui.tableWidget_refs.setTabKeyNavigation(False)
         self.ui.tableWidget_refs.installEventFilter(self)
@@ -263,7 +269,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
         if action == action_file_view:
             self.view()
 
-    def view (self):
+    def view(self):
         """ View a text, image, audio or video media. """
 
         if self.av_dialog_open is not None:
@@ -339,6 +345,12 @@ class DialogReferenceManager(QtWidgets.QDialog):
         ui = DialogViewImage(self.app, self.files[row])
         ui.ui.textEdit.setReadOnly(True)
         ui.exec()
+
+    def auto_link_files_to_references(self):
+        """ Auto link references to file names.
+         Uses words from refernce title, first author name and year. """
+
+        print("Auto link references to file names TODO")
 
     def fill_table_refs(self):
         """ Fill widget with ref details. """
