@@ -136,7 +136,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
         pm.loadFromData(QtCore.QByteArray.fromBase64(magic_wand_icon), "png")
         self.ui.pushButton_auto_link.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_auto_link.hide()  # Temporary hidden
-        #self.ui.pushButton_auto_link.pressed.connect(self.auto_link_files_to_references)  # Temporary commented out
+        self.ui.pushButton_auto_link.pressed.connect(self.auto_link_files_to_references)  # Temporary commented out
 
         self.get_data()
         self.ui.tableWidget_refs.setTabKeyNavigation(False)
@@ -367,15 +367,40 @@ class DialogReferenceManager(QtWidgets.QDialog):
 
     def auto_link_files_to_references(self):
         """ Auto link references to file names.
-         Uses words from refernce title, first author name and year. """
+         Uses words from reference title, first author name and year. """
 
         print("Auto link references to file names TODO")
         print("==== FILES ====")
+        files_unlinked = []
         for file_ in self.files:
             print(file_['split_name'])
+            if not file_['risid']:
+                files_unlinked.append(file_)
         print("\n==== REFERENCES ====")
         for ref in self.refs:
             print(ref['split_title'])
+        print("\n==== LINKING ====")
+        for file_ in files_unlinked:
+            print(file_['split_name'])
+            for ref in self.refs:
+                ref_words_set = set(ref['split_title'])
+                print(ref_words_set, len(ref_words_set))
+                print(file_['split_name'], len(file_['split_name']))
+                proportion_matching = len(ref_words_set.intersection(file_['split_name'])) / len(ref_words_set)
+                print("Mathcing", proportion_matching)
+
+
+        '''cur = self.app.conn.cursor()
+        for index in file_row_objs:
+            fid = int(index.data())  # Column 0 data
+            cur.execute("update source set risid=? where id=?", [ris_id, fid])
+            self.app.conn.commit()
+            self.ui.tableWidget_files.item(index.row(), 2).setText(str(ris_id))
+            sql = "update attribute set value=? where id=? and name=?"
+            for attribute in attr_values:
+                cur.execute(sql, [attr_values[attribute], fid, attribute])
+                self.app.conn.commit()
+        self.get_data()'''
 
     def fill_table_refs(self):
         """ Fill widget with ref details. """
