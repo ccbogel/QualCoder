@@ -27,10 +27,11 @@ https://github.com/ccbogel/QualCoder
 
 import os
 from rispy import TAG_KEY_MAPPING
-import sys
+# import sys
 import logging
+from operator import itemgetter
 import re
-import traceback
+# import traceback
 
 from PyQt6 import QtWidgets, QtCore, QtGui
 
@@ -38,7 +39,6 @@ from .GUI.base64_helper import *
 from .GUI.ui_reference_editor import Ui_DialogReferenceEditor
 from .GUI.ui_manage_references import Ui_Dialog_manage_references
 from .confirm_delete import DialogConfirmDelete
-#from .edit_textfile import DialogEditTextFile
 from .information import DialogInformation
 from .helpers import Message
 from .ris import Ris, RisImport
@@ -136,7 +136,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
         pm.loadFromData(QtCore.QByteArray.fromBase64(magic_wand_icon), "png")
         self.ui.pushButton_auto_link.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_auto_link.hide()  # Temporary hidden
-        self.ui.pushButton_auto_link.pressed.connect(self.auto_link_files_to_references)  # Temporary commented out
+        self.ui.pushButton_auto_link.pressed.connect(self.auto_link_files_to_references)
 
         self.get_data()
         self.ui.tableWidget_refs.setTabKeyNavigation(False)
@@ -161,14 +161,14 @@ class DialogReferenceManager(QtWidgets.QDialog):
             self.files.append(dict(zip(keys, row)))
         # This is used for auto-linking files to references
         for file_ in self.files:
-            temp_name = file_['name']
+            temp_name = file_['name'].lower()
             if len(temp_name) > 4 and temp_name[-4:].lower() in (".txt", ".png", ".jpg", ".pdf", ".mp3", ".mp4",
                                                                  ".odt", ".htm", ".wav", ".m4a", ".mov", ".ogg",
                                                                  ".wmv"):
                 temp_name = temp_name[:-4]
             elif len(temp_name) > 5 and temp_name[-5:].lower() in (".html", ".docx", ".jpeg"):
                 temp_name = temp_name[:-5]
-            split_name = re.split(';|,| |:', temp_name)
+            split_name = re.split(';|,| |:|_|-', temp_name)
             split_name = list(filter(''.__ne__, split_name))
             file_['split_name'] = split_name
         self.fill_table_files()
@@ -179,8 +179,8 @@ class DialogReferenceManager(QtWidgets.QDialog):
         self.refs = sorted_list
         # This is used for auto-linking files to references
         for ref in self.refs:
-            temp_title = ref['TI']
-            split_title = re.split(';|,| |:', temp_title)
+            temp_title = ref['TI'].lower()
+            split_title = re.split(';|,| |:|_|-', temp_title)
             split_title = list(filter(''.__ne__, split_title))
             ref['split_title'] = split_title
         self.fill_table_refs()
@@ -367,40 +367,48 @@ class DialogReferenceManager(QtWidgets.QDialog):
 
     def auto_link_files_to_references(self):
         """ Auto link references to file names.
-         Uses words from reference title, first author name and year. """
+         Uses words (as lowercase) from reference title and words (as lowercase) from file name.
+         Looks at each unlinked file. Then matches the words in the title to the words in the file name.
+         Highest match links the risid to the file. Mimimum match threshold of 0.7
+         """
 
-        print("Auto link references to file names TODO")
-        print("==== FILES ====")
+        cur = self.app.conn.cursor()
         files_unlinked = []
         for file_ in self.files:
-            print(file_['split_name'])
             if not file_['risid']:
                 files_unlinked.append(file_)
-        print("\n==== REFERENCES ====")
-        for ref in self.refs:
-            print(ref['split_title'])
-        print("\n==== LINKING ====")
         for file_ in files_unlinked:
             print(file_['split_name'])
+            match_stats = []
             for ref in self.refs:
+                #print(ref)
                 ref_words_set = set(ref['split_title'])
-                print(ref_words_set, len(ref_words_set))
-                print(file_['split_name'], len(file_['split_name']))
+                #print(ref_words_set, len(ref_words_set))
+                #print(file_['split_name'], len(file_['split_name']))
                 proportion_matching = len(ref_words_set.intersection(file_['split_name'])) / len(ref_words_set)
-                print("Mathcing", proportion_matching)
-
-
-        '''cur = self.app.conn.cursor()
-        for index in file_row_objs:
-            fid = int(index.data())  # Column 0 data
+                #print("Matching", proportion_matching)
+                if proportion_matching > 0.7:
+                    match_stats.append([ref['risid'], proportion_matching, ref['split_title']])
+                if int(proportion_matching) == 1:
+                    break
+            match_stats = sorted(match_stats, key=itemgetter(1), reverse=True)
+            #for m in match_stats:
+            #    print("-- ", m)
+            if not match_stats:
+                continue
+            best_match = match_stats[0]
+            ris_id = best_match[0]
+            # TODO
+            '''fid = int(index.data())  # Column 0 data
             cur.execute("update source set risid=? where id=?", [ris_id, fid])
             self.app.conn.commit()
             self.ui.tableWidget_files.item(index.row(), 2).setText(str(ris_id))
             sql = "update attribute set value=? where id=? and name=?"
             for attribute in attr_values:
                 cur.execute(sql, [attr_values[attribute], fid, attribute])
-                self.app.conn.commit()
-        self.get_data()'''
+                self.app.conn.commit()'''
+
+        '''self.get_data()'''
 
     def fill_table_refs(self):
         """ Fill widget with ref details. """
