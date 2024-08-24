@@ -170,7 +170,6 @@ class DialogReferenceManager(QtWidgets.QDialog):
             split_name = re.split(';|,| |:|_|-', temp_name)
             split_name = list(filter(''.__ne__, split_name))
             file_['split_name'] = split_name
-        self.fill_table_files()
         r = Ris(self.app)
         r.get_references()
         self.refs = r.refs
@@ -183,6 +182,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
             split_title = list(filter(''.__ne__, split_title))
             ref['split_title'] = split_title
         self.fill_table_refs()
+        self.fill_table_files()  # Do after refs filled, as uses ref title in files tooltips, if linked
 
     def fill_table_files(self):
         """ Fill widget with file details. """
@@ -193,27 +193,32 @@ class DialogReferenceManager(QtWidgets.QDialog):
         header_labels = ["id", "File name", "Ref Id"]
         self.ui.tableWidget_files.setColumnCount(len(header_labels))
         self.ui.tableWidget_files.setHorizontalHeaderLabels(header_labels)
-        for row, f in enumerate(self.files):
+        for row, file_ in enumerate(self.files):
             self.ui.tableWidget_files.insertRow(row)
-            item = QtWidgets.QTableWidgetItem(str(f['id']))
+            item = QtWidgets.QTableWidgetItem(str(file_['id']))
             item.setFlags(QtCore.Qt.ItemFlag.ItemIsEnabled)
             self.ui.tableWidget_files.setItem(row, 0, item)
-            item = QtWidgets.QTableWidgetItem(f['name'])
-            memo = f['memo']
+            item = QtWidgets.QTableWidgetItem(file_['name'])
+            memo = file_['memo']
             if not memo:
                 memo = ""
             item.setToolTip(memo)
             item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
             self.ui.tableWidget_files.setItem(row, 1, item)
             risid = ""
-            if f['risid'] is not None:
-                risid = str(f['risid'])
+            tooltip = ""
+            if file_['risid'] is not None:
+                risid = file_['risid']
+                linked_ref = next((ref_item for ref_item in self.refs if ref_item['risid'] == risid), None)
+                if linked_ref:
+                    tooltip = f"{linked_ref['TI']}\n{linked_ref['PY']} {linked_ref['TY']}"
                 if self.ui.checkBox_hide_files.isChecked():
                     self.ui.tableWidget_files.setRowHidden(row, True)
                 else:
                     self.ui.tableWidget_files.setRowHidden(row, False)
-            item = QtWidgets.QTableWidgetItem(risid)
+            item = QtWidgets.QTableWidgetItem(str(risid))
             item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
+            item.setToolTip(tooltip)
             self.ui.tableWidget_files.setItem(row, 2, item)
         self.ui.tableWidget_files.hideColumn(0)
         if self.app.settings['showids']:
@@ -368,7 +373,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
         """ Auto link references to file names.
          Uses words (as lowercase) from reference title and words (as lowercase) from file name.
          Looks at each unlinked file. Then matches the words in the title to the words in the file name.
-         Highest match links the risid to the file. Mimimum match threshold of 0.7
+         Highest match links the risid to the file. Minimum numer of words match threshold of 0.7
          """
 
         files_unlinked = []
@@ -610,7 +615,8 @@ class DialogReferenceManager(QtWidgets.QDialog):
 
     def table_refs_menu(self, position):
         """ Context menu for displaying table rows in differing order,
-            Showing specific rows.
+        copying a reference style to clipboard, edit reference.
+        Show specific rows.
         """
 
         row = self.ui.tableWidget_refs.currentRow()
@@ -628,6 +634,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
             action_show_all_rows = menu.addAction(_("Show all rows"))
         action_copy_to_clipboard = menu.addAction(_("Copy to clipboard"))
         action_copy_apa_to_clipboard = menu.addAction(_("Copy to clipboard.  APA style"))
+        action_edit_reference = menu.addAction(_("Edit reference"))
         action = menu.exec(self.ui.tableWidget_refs.mapToGlobal(position))
         if action == action_show_all_rows:
             for r in range(0, self.ui.tableWidget_refs.rowCount()):
@@ -654,13 +661,16 @@ class DialogReferenceManager(QtWidgets.QDialog):
             reference_text = self.ui.tableWidget_refs.item(row, 1).text()
             cb = QtWidgets.QApplication.clipboard()
             cb.setText(reference_text.replace("\n", " "))
+            return
         if action == action_copy_apa_to_clipboard:
-            #reference_text = self.ui.tableWidget_refs.item(row, 1).text()
             ref_id = self.ui.tableWidget_refs.item(row, REF_ID).text()
             for ref in self.refs:
                 if int(ref_id) == ref['risid']:
                     cb = QtWidgets.QApplication.clipboard()
                     cb.setText(ref['apa'].replace("\n", " "))
+                    return
+        if action == action_edit_reference:
+            self.edit_reference()
 
     def import_references(self):
         """ Import RIS formatted references from .ris or .txt files """
@@ -709,18 +719,33 @@ class DialogReferenceManager(QtWidgets.QDialog):
                 return True
         return False
 
-    def unlink_files(self):
-        """ Remove linked reference from selected files. """
+    def unlink_files(self, fid=None):
+        """ Remove linked reference from selected files.
+        Called by:
+            pushButton_unlink: Uses selected rows in files table. Does not use parameters.
+            Method: edit_reference. Uses parameter.
 
-        file_row_objs = self.ui.tableWidget_files.selectionModel().selectedRows()
-        if not file_row_objs:
+        :param: fid Integer source table id, or None
+        """
+
+        # Get selected file id from parameter or selected table_files rows
+        fid_list = []
+        if fid:
+            fid_list.append(fid)
+        else:
+            # Use selected table_file rows
+            file_row_model_index = self.ui.tableWidget_files.selectionModel().selectedRows()
+            if not file_row_model_index:
+                return
+            for i in file_row_model_index:
+                fid_list.append(i.data())
+        if not fid_list:
             return
+
         cur = self.app.conn.cursor()
-        for index in file_row_objs:
-            fid = int(index.data())  # Column 0 data
+        for fid in fid_list:
             cur.execute("update source set risid=null where id=?", [fid])
             self.app.conn.commit()
-            self.ui.tableWidget_files.item(index.row(), 2).setText("")
             # Clear Ref attributes
             attributes = ["Ref_Authors", "Ref_Title", "Ref_Type", "Ref_Year", "Ref_Journal"]
             sql = "update attribute set value='' where id=? and name=?"
@@ -732,12 +757,15 @@ class DialogReferenceManager(QtWidgets.QDialog):
     def link_reference_to_files(self, ris_id=None, fid=None):
         """ Link the selected files to the selected reference.
 
-        Called by: Button, Uses selected rows in tables.
+        Called by:
+            pushButton_link: Uses selected rows in references and files tables. Does not use parameters.
+            Method: auto_link_files_to_references. Uses parameters.
 
         :param: ris_id Integer reference id , or None
         :param: fid Integer source table id, or None
         """
 
+        # Get reference id from first selected row, or via parameter ris_id
         if not ris_id:
             ref_row_model_index = self.ui.tableWidget_refs.selectionModel().selectedRows()
             if not ref_row_model_index:
@@ -749,7 +777,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
             if r['risid'] == ris_id:
                 ref = r
                 break
-
+        # Get selected file id from parameter or selected table_files rows
         fid_list = []
         if fid:
             fid_list.append(fid)
@@ -762,6 +790,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
                 fid_list.append(i.data())
 
         attr_values = {"Ref_Authors": "", "Ref_Title": "", "Ref_Type": "", "Ref_Year": "", "Ref_Journal": ""}
+        # Get list of authors
         if 'AU' in ref:
             attr_values['Ref_Authors'] = ref['AU']
         if 'A1' in ref:
@@ -772,21 +801,17 @@ class DialogReferenceManager(QtWidgets.QDialog):
             attr_values['Ref_Authors'] += " " + ref['A3']
         if 'A4' in ref:
             attr_values['Ref_Authors'] += " " + ref['A4']
+        # Get reference type, e.g. Journal, book
         if 'TY' in ref:
             attr_values['Ref_Type'] = ref['TY']
-        attr_values['Ref_Title'] = ""
-
         # Get the first title based on this order from several tags
-        attr_values['Ref_Title'] = ""
         for tag in ("TI", "T1", "ST", "TT"):
             try:
                 attr_values['Ref_Title'] = ref[tag]
                 break
             except KeyError:
                 pass
-
-        # Get ref year from several tags
-        attr_values['Ref_Year'] = ""
+        # Get reference year from examining several tags
         if 'PY' in ref:
             attr_values['Ref_Year'] = ref['PY']
         if attr_values['Ref_Year'] == "" and 'Y1' in ref:
@@ -795,10 +820,8 @@ class DialogReferenceManager(QtWidgets.QDialog):
 
         cur = self.app.conn.cursor()
         for fid in fid_list:  # file_row_model_index:
-            #fid = int(index.data())  # Column 0 data
             cur.execute("update source set risid=? where id=?", [ris_id, fid])
             self.app.conn.commit()
-            #self.ui.tableWidget_files.item(index.row(), 2).setText(str(ris_id)) # Not needed
             sql = "update attribute set value=? where id=? and name=?"
             for attribute in attr_values:
                 cur.execute(sql, [attr_values[attribute], fid, attribute])
@@ -806,7 +829,8 @@ class DialogReferenceManager(QtWidgets.QDialog):
         self.get_data()
 
     def edit_reference(self):
-        """ Edit selected reference. """
+        """ Edit selected reference.
+         Also, update source attributes for this reference. """
 
         ref_row_obj = self.ui.tableWidget_refs.selectionModel().selectedRows()
         if not ref_row_obj:
@@ -843,7 +867,6 @@ class DialogReferenceManager(QtWidgets.QDialog):
         ok = reference_editor.exec()
         if not ok:
             return
-        # rows = ui_re.tableWidget.rowCount()
         cur = self.app.conn.cursor()
         ref_edited = False
         for row, key in enumerate(short_dict):
@@ -852,22 +875,26 @@ class DialogReferenceManager(QtWidgets.QDialog):
                             [ui_re.tableWidget.item(row, 1).text(), ris_id, key])
                 self.app.conn.commit()
                 ref_edited = True
+        # Update Reference attributes
+        for file_ in self.files:
+            if file_['risid'] == ris_id:
+                self.unlink_files(file_['id'])
+                self.link_reference_to_files(ris_id, file_['id'])
         if ref_edited:
             self.parent_textEdit.append(_("Reference edited."))
-        # TODO update Reference attributes
-
         self.get_data()
         self.fill_table_refs()
 
     def delete_reference(self):
         """ Delete the selected reference.
-        Remove reference risid from files.
+        Remove reference risid from source tavble and remove source attribute values.
         """
 
         ref_row_obj = self.ui.tableWidget_refs.selectionModel().selectedRows()
         if not ref_row_obj:
             return
-        ris_id = int(ref_row_obj[0].data())  # Only One index returned. Column 0 data
+        # Only use first reference index row. Column 0 data
+        ris_id = int(ref_row_obj[0].data())
         note = _("Delete this reference.") + " Ref id {" + str(ris_id) + "}  \n"
         for r in self.refs:
             if r['risid'] == ris_id:
@@ -879,13 +906,10 @@ class DialogReferenceManager(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         cur.execute("select id from source where risid=?", [ris_id])
         source_ids = cur.fetchall()
-
         cur.execute("update source set risid=null where risid=?", [ris_id])
         cur.execute("delete from ris where risid=?", [ris_id])
         self.app.conn.commit()
-
-        # Clear Ref attributes
-        # TODO TEST
+        # Clear Refeence attributes
         attributes = ["Ref_Authors", "Ref_Title", "Ref_Type", "Ref_Year", "Ref_Journal"]
         sql = "update attribute set value='' where id=? and name=?"
         for source in source_ids:
