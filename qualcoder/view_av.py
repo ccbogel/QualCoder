@@ -3151,9 +3151,10 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.mediaplayer.play()
         self.mediaplayer.set_position(pos)
         self.is_paused = False
-        icon = QtGui.QPixmap()
-        icon.loadFromData(QtCore.QByteArray.fromBase64(playback_pause_icon), "png")
-        self.ui.pushButton_play.setIcon(icon)
+
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(playback_pause_icon), "png")
+        self.ui.pushButton_play.setIcon(QtGui.QIcon(pm))
         self.play_segment_end = segment['pos1']
         self.timer.start()
 
