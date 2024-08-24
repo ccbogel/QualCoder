@@ -97,7 +97,7 @@ class Ui_Dialog_manage_references(object):
         self.pushButton_delete_unused_refs.setToolTip(_translate("Dialog_manage_references", "<html><head/><body><p>Delete all references that are not assigned to files</p></body></html>"))
         self.pushButton_edit_ref.setToolTip(_translate("Dialog_manage_references", "<html><head/><body><p>Edit reference</p></body></html>"))
         self.pushButton_import.setToolTip(_translate("Dialog_manage_references", "<html><head/><body><p>Import references. RIS format.</p></body></html>"))
-        self.pushButton_auto_link.setToolTip(_translate("Dialog_manage_references", "<html><head/><body><p>Automatically link references to unassigned file names.</p><p>Word matching uses words from the title, the first author and year.</p><p>Linking may be incorrect. </p><p>Review after applying the function.</p></body></html>"))
+        self.pushButton_auto_link.setToolTip(_translate("Dialog_manage_references", "<html><head/><body><p>Automatically link references to unassigned file names.</p><p>Word matching uses words from refernce title.</p><p>Strong matches with 70% or more matching words  are linked.</p><p>Linking may be incorrect. </p><p>Review after applying the function.</p></body></html>"))
 
 
 if __name__ == "__main__":
