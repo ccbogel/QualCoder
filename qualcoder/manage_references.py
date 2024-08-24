@@ -114,7 +114,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(link_icon), "png")
         self.ui.pushButton_link.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_link.pressed.connect(self.link_files_to_reference)
+        self.ui.pushButton_link.pressed.connect(self.link_reference_to_files)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(undo_icon), "png")
         self.ui.pushButton_unlink_files.setIcon(QtGui.QIcon(pm))
@@ -397,18 +397,19 @@ class DialogReferenceManager(QtWidgets.QDialog):
             if not match_stats:
                 continue
             best_match = match_stats[0]
+            print(best_match)
             ris_id = best_match[0]
             # TODO
-            '''fid = int(index.data())  # Column 0 data
+            fid = file_['id']
             cur.execute("update source set risid=? where id=?", [ris_id, fid])
             self.app.conn.commit()
-            self.ui.tableWidget_files.item(index.row(), 2).setText(str(ris_id))
+            #self.ui.tableWidget_files.item(index.row(), 2).setText(str(ris_id))
             sql = "update attribute set value=? where id=? and name=?"
             for attribute in attr_values:
                 cur.execute(sql, [attr_values[attribute], fid, attribute])
-                self.app.conn.commit()'''
+                self.app.conn.commit()
 
-        '''self.get_data()'''
+        self.get_data()
 
     def fill_table_refs(self):
         """ Fill widget with ref details. """
@@ -718,7 +719,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
             key = event.key()
             #mod = event.modifiers()
             if key == QtCore.Qt.Key.Key_L and (self.ui.tableWidget_refs.hasFocus() or self.ui.tableWidget_files.hasFocus()):
-                self.link_files_to_reference()
+                self.link_reference_to_files()
                 return True
             if key == QtCore.Qt.Key.Key_U and (self.ui.tableWidget_refs.hasFocus() or self.ui.tableWidget_files.hasFocus()):
                 self.unlink_files()
@@ -737,26 +738,47 @@ class DialogReferenceManager(QtWidgets.QDialog):
             cur.execute("update source set risid=null where id=?", [fid])
             self.app.conn.commit()
             self.ui.tableWidget_files.item(index.row(), 2).setText("")
+            # Clear Ref attributes
+            attributes = ["Ref_Authors", "Ref_Title", "Ref_Type", "Ref_Year", "Ref_Journal"]
+            sql = "update attribute set value='' where id=? and name=?"
+            for attribute in attributes:
+                cur.execute(sql, [fid, attribute])
+                self.app.conn.commit()
         self.get_data()
 
-    def link_files_to_reference(self):
+    def link_reference_to_files(self, ris_id=None, fid=None):
         """ Link the selected files to the selected reference.
-         """
 
-        ref_row_obj = self.ui.tableWidget_refs.selectionModel().selectedRows()
-        if not ref_row_obj:
-            return
-        ris_id = int(ref_row_obj[0].data())  # Only One index returned. Column 0 data
-        file_row_objs = self.ui.tableWidget_files.selectionModel().selectedRows()
-        if not file_row_objs:
-            return
+        Called by: Button, Uses selected rows in tables.
+
+        :param: ris_id Integer reference id , or None
+        :param: fid Integer source table id, or None
+        """
+
+        if not ris_id:
+            ref_row_model_index = self.ui.tableWidget_refs.selectionModel().selectedRows()
+            if not ref_row_model_index:
+                return
+            # Only get the first reference selected index. Column 0 data.
+            ris_id = int(ref_row_model_index[0].data())
         ref = None
-        attr_values = {"Ref_Authors": "", "Ref_Title": "", "Ref_Type": "", "Ref_Year": "", "Ref_Journal": ""}
         for r in self.refs:
             if r['risid'] == ris_id:
                 ref = r
-        if 'TY' in ref:
-            attr_values['Ref_Type'] = ref['TY']
+                break
+
+        fid_list = []
+        if fid:
+            fid_list.append(fid)
+        else:
+            # Use selected table_file rows
+            file_row_model_index = self.ui.tableWidget_files.selectionModel().selectedRows()
+            if not file_row_model_index:
+                return
+            for i in file_row_model_index:
+                fid_list.append(i.data())
+
+        attr_values = {"Ref_Authors": "", "Ref_Title": "", "Ref_Type": "", "Ref_Year": "", "Ref_Journal": ""}
         if 'AU' in ref:
             attr_values['Ref_Authors'] = ref['AU']
         if 'A1' in ref:
@@ -767,7 +789,10 @@ class DialogReferenceManager(QtWidgets.QDialog):
             attr_values['Ref_Authors'] += " " + ref['A3']
         if 'A4' in ref:
             attr_values['Ref_Authors'] += " " + ref['A4']
+        if 'TY' in ref:
+            attr_values['Ref_Type'] = ref['TY']
         attr_values['Ref_Title'] = ""
+
         # Get the first title based on this order from several tags
         attr_values['Ref_Title'] = ""
         for tag in ("TI", "T1", "ST", "TT"):
@@ -776,6 +801,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
                 break
             except KeyError:
                 pass
+
         # Get ref year from several tags
         attr_values['Ref_Year'] = ""
         if 'PY' in ref:
@@ -785,11 +811,11 @@ class DialogReferenceManager(QtWidgets.QDialog):
         attr_values['Ref_Journal'] = ref['journal_vol_issue']
 
         cur = self.app.conn.cursor()
-        for index in file_row_objs:
-            fid = int(index.data())  # Column 0 data
+        for fid in fid_list:  # file_row_model_index:
+            #fid = int(index.data())  # Column 0 data
             cur.execute("update source set risid=? where id=?", [ris_id, fid])
             self.app.conn.commit()
-            self.ui.tableWidget_files.item(index.row(), 2).setText(str(ris_id))
+            #self.ui.tableWidget_files.item(index.row(), 2).setText(str(ris_id)) # Not needed
             sql = "update attribute set value=? where id=? and name=?"
             for attribute in attr_values:
                 cur.execute(sql, [attr_values[attribute], fid, attribute])
@@ -821,7 +847,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
             ris_item = QtWidgets.QTableWidgetItem(key)
             ris_item.setFlags(ris_item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             for tagkey in TAG_KEY_MAPPING:
-                #print(tk, TAG_KEY_MAPPING[tk])
+                # print(tk, TAG_KEY_MAPPING[tk])
                 if key == tagkey:
                     ris_item.setToolTip(TAG_KEY_MAPPING[tagkey])
             ui_re.tableWidget.setItem(row, 0, ris_item)
@@ -834,7 +860,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
         ok = reference_editor.exec()
         if not ok:
             return
-        #rows = ui_re.tableWidget.rowCount()
+        # rows = ui_re.tableWidget.rowCount()
         cur = self.app.conn.cursor()
         ref_edited = False
         for row, key in enumerate(short_dict):
@@ -845,6 +871,8 @@ class DialogReferenceManager(QtWidgets.QDialog):
                 ref_edited = True
         if ref_edited:
             self.parent_textEdit.append(_("Reference edited."))
+        # TODO update Reference attributes
+
         self.get_data()
         self.fill_table_refs()
 
@@ -866,9 +894,21 @@ class DialogReferenceManager(QtWidgets.QDialog):
         if not ok:
             return
         cur = self.app.conn.cursor()
+        cur.execute("select id from source where risid=?", [ris_id])
+        source_ids = cur.fetchall()
+
         cur.execute("update source set risid=null where risid=?", [ris_id])
         cur.execute("delete from ris where risid=?", [ris_id])
         self.app.conn.commit()
+
+        # Clear Ref attributes
+        # TODO TEST
+        attributes = ["Ref_Authors", "Ref_Title", "Ref_Type", "Ref_Year", "Ref_Journal"]
+        sql = "update attribute set value='' where id=? and name=?"
+        for source in source_ids:
+            for attribute in attributes:
+                cur.execute(sql, [source[0], attribute])
+                self.app.conn.commit()
         self.get_data()
         self.fill_table_refs()
         self.fill_table_files()
