@@ -135,7 +135,6 @@ class DialogReferenceManager(QtWidgets.QDialog):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(magic_wand_icon), "png")
         self.ui.pushButton_auto_link.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_auto_link.hide()  # Temporary hidden
         self.ui.pushButton_auto_link.pressed.connect(self.auto_link_files_to_references)
 
         self.get_data()
@@ -372,44 +371,28 @@ class DialogReferenceManager(QtWidgets.QDialog):
          Highest match links the risid to the file. Mimimum match threshold of 0.7
          """
 
-        cur = self.app.conn.cursor()
         files_unlinked = []
         for file_ in self.files:
             if not file_['risid']:
                 files_unlinked.append(file_)
         for file_ in files_unlinked:
-            print(file_['split_name'])
+            # print(file_['split_name'])
             match_stats = []
             for ref in self.refs:
-                #print(ref)
                 ref_words_set = set(ref['split_title'])
-                #print(ref_words_set, len(ref_words_set))
-                #print(file_['split_name'], len(file_['split_name']))
                 proportion_matching = len(ref_words_set.intersection(file_['split_name'])) / len(ref_words_set)
-                #print("Matching", proportion_matching)
                 if proportion_matching > 0.7:
                     match_stats.append([ref['risid'], proportion_matching, ref['split_title']])
                 if int(proportion_matching) == 1:
                     break
             match_stats = sorted(match_stats, key=itemgetter(1), reverse=True)
-            #for m in match_stats:
-            #    print("-- ", m)
             if not match_stats:
                 continue
             best_match = match_stats[0]
-            print(best_match)
+            # print(best_match)
             ris_id = best_match[0]
-            # TODO
             fid = file_['id']
-            cur.execute("update source set risid=? where id=?", [ris_id, fid])
-            self.app.conn.commit()
-            #self.ui.tableWidget_files.item(index.row(), 2).setText(str(ris_id))
-            sql = "update attribute set value=? where id=? and name=?"
-            for attribute in attr_values:
-                cur.execute(sql, [attr_values[attribute], fid, attribute])
-                self.app.conn.commit()
-
-        self.get_data()
+            self.link_reference_to_files(ris_id, fid)
 
     def fill_table_refs(self):
         """ Fill widget with ref details. """
