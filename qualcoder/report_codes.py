@@ -1160,10 +1160,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         if memo_choice == _("Codebook memos"):
             self.search_codebook()
             return
-        # Get variables for search: search text, coders, codes, files,cases, attribute file ids
-        coder = self.ui.comboBox_coders.currentText()
-        self.html_links = []  # For html file output with media
-        search_text = self.ui.lineEdit.text()
+
+        # Get variables for search: Xsearch text, Xcoders, codes, files,cases, attribute file ids
         self.get_selected_files_and_cases()
 
         # Select all code items under selected categories
@@ -1178,6 +1176,10 @@ class DialogReportCodes(QtWidgets.QDialog):
             Message(self.app, _('Nothing selected'), msg, "warning").exec()
             return
 
+        coder = self.ui.comboBox_coders.currentText()  # Todo remove
+        search_text = self.ui.lineEdit.text()  # todo remove
+        important = self.ui.checkBox_important.isChecked()  # todo remove
+
         prog_dialog = QtWidgets.QProgressDialog("Running", "", 1, 5, None)
         prog_dialog.setWindowTitle(_("Searching"))
         prog_dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowCloseButtonHint)
@@ -1188,16 +1190,18 @@ class DialogReportCodes(QtWidgets.QDialog):
         rows = self.ui.tableWidget.rowCount()
         for r in range(0, rows):
             self.ui.tableWidget.removeRow(0)
-        # Default for attributes selection
-        file_or_case = ""
-        if self.file_ids != "":
-            file_or_case = "File"
+
+        file_or_case = "File"  # Default for attributes selection or file_ids
+        '''if self.file_ids != "":
+            file_or_case = "File"'''
         if self.case_ids != "":
             file_or_case = "Case"
 
         self.ui.comboBox_export.setEnabled(True)
         self.ui.textEdit.clear()
         self.te = []
+        self.html_links = []  # For html file output with media
+
         # Add search terms to textEdit
         if memo_choice == _("Only memos"):
             self.ui.textEdit.insertPlainText(_("Only memos shown. Coded data not shown.") + "\n")
@@ -1216,10 +1220,9 @@ class DialogReportCodes(QtWidgets.QDialog):
                 codes_string += i.text(0) + ". "
         codes_string += _("Codes: ") + str(codes_count) + " / " + str(len(self.code_names))
         self.ui.textEdit.insertPlainText(codes_string)
-        important = self.ui.checkBox_important.isChecked()
 
         cur = self.app.conn.cursor()
-        parameters = ""
+        parameters_display = ""
         if self.attribute_file_ids:
             self.file_ids = ""
             for a in self.attribute_file_ids:
@@ -1230,26 +1233,26 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.case_ids = ""
             for i in range(self.ui.listWidget_cases.count()):
                 self.ui.listWidget_cases.item(i).setSelected(False)
-            parameters += _("\nAttributes:\n") + self.attributes_msg + "\n"
+            parameters_display += _("\nAttributes:\n") + self.attributes_msg + "\n"
         if self.file_ids != "":
-            parameters += _("\nFiles:\n")
+            parameters_display += _("\nFiles:\n")
             cur.execute("select name from source where id in (" + self.file_ids + ") order by name")
             res = cur.fetchall()
             for r in res:
-                parameters += r[0] + ", "
-            parameters += _(" Files: ") + str(len(res)) + " / " + str(len(self.files))
+                parameters_display += r[0] + ", "
+            parameters_display += _(" Files: ") + str(len(res)) + " / " + str(len(self.files))
         if self.case_ids != "":
-            parameters += _("\nCases:\n")
+            parameters_display += _("\nCases:\n")
             cur.execute("select name from cases where caseid in (" + self.case_ids + ") order by name")
             res = cur.fetchall()
             for r in res:
-                parameters += r[0] + ", "
-        self.ui.textEdit.insertPlainText(parameters + "\n")
+                parameters_display += r[0] + ", "
+        self.ui.textEdit.insertPlainText(parameters_display + "\n")
         if search_text != "":
             self.ui.textEdit.insertPlainText("\n" + _("Search text: ") + search_text + "\n")
         self.ui.textEdit.insertPlainText("\n==========\n")
 
-        # Get selected codes
+        # Get selected codes as String of cids
         code_ids = ""
         for i in items:
             if i.text(1)[0:3] == 'cid':
@@ -1257,231 +1260,15 @@ class DialogReportCodes(QtWidgets.QDialog):
         code_ids = code_ids[1:]
         self.html_links = []
         self.results = []
-        parameters = []
 
         # FILES SEARCH, ALSO ATTRIBUTES FILE IDS SEARCH
         if self.file_ids != "" and self.case_ids == "":
-            # Coded text
-            sql = "select code_name.name, color, source.name, pos0, pos1, seltext, "
-            sql += "code_text.owner, fid, ifnull(code_text.memo,''), ifnull(code_name.memo,''), " \
-                   "ifnull(source.memo,''), ctid, code_name.cid "
-            sql += " from code_text join code_name "
-            sql += "on code_name.cid = code_text.cid join source on fid = source.id "
-            sql += "where code_name.cid in (" + code_ids + ") "
-            sql += "and source.id in (" + self.file_ids + ") "
-            if coder != "":
-                sql += " and code_text.owner=? "
-                parameters.append(coder)
-            if search_text != "":
-                sql += " and seltext like ? "
-                parameters.append("%" + str(search_text) + "%")
-            if important:
-                sql += " and code_text.important=1 "
-            sql += " order by code_name.name, source.name, pos0"
-            if not parameters:
-                cur.execute(sql)
-            else:
-                cur.execute(sql, parameters)
-            result = cur.fetchall()
-            keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'text', 'coder', 'fid', 'coded_memo', \
-                   'codename_memo', 'source_memo', 'ctid', 'cid'
-            for row in result:
-                tmp = dict(zip(keys, row))
-                tmp['result_type'] = 'text'
-                tmp['file_or_case'] = file_or_case
-                tmp['pretext'] = ""
-                tmp['posttext'] = ""
-                self.results.append(tmp)
-            if self.ui.checkBox_text_context.isChecked():
-                self.get_prettext_and_posttext()
-
-            # Coded images
-            parameters = []
-            sql = "select code_name.name, color, source.name, x1, y1, width, height,"
-            sql += "code_image.owner, source.mediapath, source.id, ifnull(code_image.memo,''), "
-            sql += "code_name.memo, ifnull(source.memo,''), imid, code_name.cid "
-            sql += " from code_image join code_name "
-            sql += "on code_name.cid = code_image.cid join source on code_image.id = source.id "
-            sql += "where code_name.cid in (" + code_ids + ") "
-            sql += "and source.id in (" + self.file_ids + ") "
-            if coder != "":
-                sql += " and code_image.owner=? "
-                parameters.append(coder)
-            if search_text != "":
-                sql += " and code_image.memo like ? "
-                parameters.append("%" + str(search_text) + "%")
-            if important:
-                sql += " and code_image.important=1 "
-            sql += " order by code_name.name, source.name, x1"
-            if not parameters:
-                cur.execute(sql)
-            else:
-                cur.execute(sql, parameters)
-            result = cur.fetchall()
-            keys = 'codename', 'color', 'file_or_casename', 'x1', 'y1', 'width', 'height', 'coder', 'mediapath', \
-                   'fid', 'coded_memo', 'codename_memo', 'source_memo', 'imid', 'cid'
-            for row in result:
-                tmp = dict(zip(keys, row))
-                tmp['result_type'] = 'image'
-                tmp['file_or_case'] = file_or_case
-                self.results.append(tmp)
-
-            # Coded audio and video, also looks for search_text in coded segment memo
-            parameters = []
-            sql = "select code_name.name, color, source.name, pos0, pos1, ifnull(code_av.memo,''), "
-            sql += " code_av.owner, source.mediapath, source.id, ifnull(code_name.memo,''), ifnull(source.memo,''), " \
-                   "avid, code_name.cid"
-            sql += " from code_av join code_name "
-            sql += "on code_name.cid = code_av.cid join source on code_av.id = source.id "
-            sql += "where code_name.cid in (" + code_ids + ") "
-            sql += "and source.id in (" + self.file_ids + ") "
-            if coder != "":
-                sql += " and code_av.owner=? "
-                parameters.append(coder)
-            if search_text != "":
-                sql += " and code_av.memo like ? "
-                parameters.append("%" + str(search_text) + "%")
-            if important:
-                sql += " and code_av.important=1 "
-            sql += " order by code_name.name, source.name, pos0"
-            if not parameters:
-                cur.execute(sql)
-            else:
-                cur.execute(sql, parameters)
-            result = cur.fetchall()
-            keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'coded_memo', 'coder', 'mediapath', 'fid', \
-                   'codename_memo', 'source_memo', 'avid', 'cid'
-            for row in result:
-                tmp = dict(zip(keys, row))
-                tmp['result_type'] = 'av'
-                tmp['file_or_case'] = file_or_case
-                text_ = str(tmp['file_or_casename']) + " "
-                if len(tmp['coded_memo']) > 0:
-                    text_ += "\nMEMO: " + tmp['coded_memo']
-                text_ += " " + msecs_to_hours_mins_secs(tmp['pos0']) + " - " + msecs_to_hours_mins_secs(tmp['pos1'])
-                tmp['text'] = text_
-                self.html_links.append({'imagename': None, 'image': None,
-                                        'avname': tmp['mediapath'], 'av0': str(int(tmp['pos0'] / 1000)),
-                                        'av1': str(int(tmp['pos1'] / 1000)), 'avtext': text_})
-                self.results.append(tmp)
-
+            self.search_by_files(code_ids)
         # CASES AND FILES SEARCH
         # Default to all files if none are selected, otherwise limit to the selected files
         if self.case_ids != "":
-            # Coded text
-            sql = "select code_name.name, color, cases.name, "
-            sql += "code_text.pos0, code_text.pos1, seltext, code_text.owner, code_text.fid, "
-            sql += "ifnull(cases.memo,''), ifnull(code_text.memo,''), ifnull(code_name.memo,''), "
-            sql += "ifnull(source.memo,''), ctid, code_name.cid "
-            sql += "from code_text join code_name on code_name.cid = code_text.cid "
-            sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
-            sql += "code_text.fid = case_text.fid "
-            sql += "join source on source.id=code_text.fid "
-            sql += "where code_name.cid in (" + code_ids + ") "
-            sql += "and case_text.caseid in (" + self.case_ids + ") "
-            if self.file_ids != "":
-                sql += " and code_text.fid in (" + self.file_ids + ")"
-            sql += "and (code_text.pos0 >= case_text.pos0 and code_text.pos1 <= case_text.pos1)"
-            if coder != "":
-                sql += " and code_text.owner=? "
-                parameters.append(coder)
-            if search_text != "":
-                sql += " and seltext like ? "
-                parameters.append("%" + str(search_text) + "%")
-            sql += " order by code_name.name, cases.name"
-            if not parameters:
-                cur.execute(sql)
-            else:
-                cur.execute(sql, parameters)
-            results = cur.fetchall()
-            keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'text', 'coder', 'fid', \
-                   'cases_memo', 'coded_memo', 'codename_memo', 'source_memo', 'ctid', 'cid'
-            for row in results:
-                tmp = dict(zip(keys, row))
-                tmp['result_type'] = 'text'
-                tmp['file_or_case'] = file_or_case
-                tmp['pretext'] = ""
-                tmp['posttext'] = ""
-                self.results.append(tmp)
-            if self.ui.checkBox_text_context.isChecked():
-                self.get_prettext_and_posttext()
+            self.search_by_cases(code_ids)
 
-            # Coded images
-            parameters = []
-            sql = "select code_name.name, color, cases.name, "
-            sql += "x1, y1, width, height, code_image.owner,source.mediapath, source.id, "
-            sql += "ifnull(code_image.memo,''), ifnull(cases.memo,''), ifnull(code_name.memo,''), "
-            sql += "ifnull(source.memo,''), imid, code_name.cid "
-            sql += "from code_image join code_name on code_name.cid = code_image.cid "
-            sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
-            sql += "code_image.id = case_text.fid "
-            sql += " join source on case_text.fid = source.id "
-            sql += "where code_name.cid in (" + code_ids + ") "
-            sql += "and case_text.caseid in (" + self.case_ids + ") "
-            if self.file_ids != "":
-                sql += " and source.id in (" + self.file_ids + ")"
-            if coder != "":
-                sql += " and code_image.owner=? "
-                parameters.append(coder)
-            if search_text != "":
-                sql += " and code_image.memo like ? "
-                parameters.append("%" + str(search_text) + "%")
-            sql += " order by code_name.name, cases.name"
-            if not parameters:
-                cur.execute(sql)
-            else:
-                cur.execute(sql, parameters)
-            imgresults = cur.fetchall()
-            keys = 'codename', 'color', 'file_or_casename', 'x1', 'y1', 'width', 'height', 'coder', 'mediapath', \
-                   'fid', 'coded_memo', 'case_memo', 'codename_memo', 'source_memo', 'imid', 'cid'
-            for row in imgresults:
-                tmp = dict(zip(keys, row))
-                tmp['result_type'] = 'image'
-                tmp['file_or_case'] = file_or_case
-                self.results.append(tmp)
-
-            # Coded audio and video
-            parameters = []
-            av_sql = "select distinct code_name.name, color, cases.name as case_name, "
-            av_sql += "code_av.pos0, code_av.pos1, code_av.owner,source.mediapath, source.id, "
-            av_sql += "ifnull(code_av.memo,'') as coded_memo, ifnull(cases.memo,'') as case_memo, "
-            av_sql += "ifnull(code_name.memo,''), ifnull(source.memo,''), avid, "
-            av_sql += "code_name.cid "
-            av_sql += "from code_av join code_name on code_name.cid = code_av.cid "
-            av_sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
-            av_sql += "code_av.id = case_text.fid "
-            av_sql += " join source on case_text.fid = source.id "
-            av_sql += "where code_name.cid in (" + code_ids + ") "
-            av_sql += "and case_text.caseid in (" + self.case_ids + ") "
-            if self.file_ids != "":
-                av_sql += " and source.id in (" + self.file_ids + ")"
-            if coder != "":
-                av_sql += " and code_av.owner=? "
-                parameters.append(coder)
-            if search_text != "":
-                av_sql += " and code_av.memo like ? "
-                parameters.append("%" + str(search_text) + "%")
-            sql += " order by code_name.name, cases.name"
-            if not parameters:
-                cur.execute(av_sql)
-            else:
-                cur.execute(av_sql, parameters)
-            avresults = cur.fetchall()
-            keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'coder', 'mediapath', \
-                   'fid', 'coded_memo', 'case_memo', 'codename_memo', 'source_memo', 'avid', 'cid'
-            for row in avresults:
-                tmp = dict(zip(keys, row))
-                tmp['result_type'] = 'av'
-                tmp['file_or_case'] = file_or_case
-                tmp_text = str(tmp['file_or_casename']) + " "
-                if len(tmp['coded_memo']) > 0:
-                    tmp_text += "\nMEMO: " + tmp['coded_memo']
-                tmp_text += " " + msecs_to_hours_mins_secs(tmp['pos0']) + " - " + msecs_to_hours_mins_secs(tmp['pos1'])
-                tmp['text'] = tmp_text
-                self.html_links.append({'imagename': None, 'image': None,
-                                        'avname': tmp['mediapath'], 'av0': str(int(tmp['pos0'] / 1000)),
-                                        'av1': str(int(tmp['pos1'] / 1000)), 'avtext': tmp_text})
-                self.results.append(tmp)
         QtCore.QCoreApplication.processEvents()
         prog_dialog.setValue(2)
         # Trim results for option: Only coded memos
@@ -1491,17 +1278,267 @@ class DialogReportCodes(QtWidgets.QDialog):
                 if r['coded_memo'] != "":
                     tmp.append(r)
             self.results = tmp
-
         # Organise results
         self.sort_search_results()
         self.fill_text_edit_with_search_results()
-        # Clean up for next search. Except attributes list
+        # Clean up for next search. Except attributes list, keep attributes selection active.
         self.attribute_file_ids = []
         self.file_ids = ""
         self.case_ids = ""
         self.attributes_msg = ""
         self.ui.pushButton_attributeselect.setToolTip(_("Attributes"))
         del prog_dialog
+
+    def search_by_files(self, code_ids):
+        """ Search by files and if attributes file ids are selected.
+        Called by search() if self.file_ids is not empty and self.case_ids is empty
+
+        :param: code_ids : String comma separated ids
+        """
+
+        coder = self.ui.comboBox_coders.currentText()
+        search_text = self.ui.lineEdit.text()
+        important = self.ui.checkBox_important.isChecked()
+        parameters = []
+        cur = self.app.conn.cursor()
+        # Coded text
+        sql = "select code_name.name, color, source.name, pos0, pos1, seltext, "
+        sql += "code_text.owner, fid, ifnull(code_text.memo,''), ifnull(code_name.memo,''), " \
+               "ifnull(source.memo,''), ctid, code_name.cid "
+        sql += " from code_text join code_name "
+        sql += "on code_name.cid = code_text.cid join source on fid = source.id "
+        sql += "where code_name.cid in (" + code_ids + ") "
+        sql += "and source.id in (" + self.file_ids + ") "
+        if coder != "":
+            sql += " and code_text.owner=? "
+            parameters.append(coder)
+        if search_text != "":
+            sql += " and seltext like ? "
+            parameters.append("%" + str(search_text) + "%")
+        if important:
+            sql += " and code_text.important=1 "
+        sql += " order by code_name.name, source.name, pos0"
+        if not parameters:
+            cur.execute(sql)
+        else:
+            cur.execute(sql, parameters)
+        result = cur.fetchall()
+        keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'text', 'coder', 'fid', 'coded_memo', \
+            'codename_memo', 'source_memo', 'ctid', 'cid'
+        for row in result:
+            tmp = dict(zip(keys, row))
+            tmp['result_type'] = 'text'
+            tmp['file_or_case'] = "File"
+            tmp['pretext'] = ""
+            tmp['posttext'] = ""
+            self.results.append(tmp)
+        if self.ui.checkBox_text_context.isChecked():
+            self.get_prettext_and_posttext()
+
+        # Coded images
+        parameters = []
+        sql = "select code_name.name, color, source.name, x1, y1, width, height,"
+        sql += "code_image.owner, source.mediapath, source.id, ifnull(code_image.memo,''), "
+        sql += "code_name.memo, ifnull(source.memo,''), imid, code_name.cid "
+        sql += " from code_image join code_name "
+        sql += "on code_name.cid = code_image.cid join source on code_image.id = source.id "
+        sql += "where code_name.cid in (" + code_ids + ") "
+        sql += "and source.id in (" + self.file_ids + ") "
+        if coder != "":
+            sql += " and code_image.owner=? "
+            parameters.append(coder)
+        if search_text != "":
+            sql += " and code_image.memo like ? "
+            parameters.append("%" + str(search_text) + "%")
+        if important:
+            sql += " and code_image.important=1 "
+        sql += " order by code_name.name, source.name, x1"
+        if not parameters:
+            cur.execute(sql)
+        else:
+            cur.execute(sql, parameters)
+        result = cur.fetchall()
+        keys = 'codename', 'color', 'file_or_casename', 'x1', 'y1', 'width', 'height', 'coder', 'mediapath', \
+            'fid', 'coded_memo', 'codename_memo', 'source_memo', 'imid', 'cid'
+        for row in result:
+            tmp = dict(zip(keys, row))
+            tmp['result_type'] = 'image'
+            tmp['file_or_case'] = "File"
+            self.results.append(tmp)
+
+        # Coded audio and video, also looks for search_text in coded segment memo
+        parameters = []
+        sql = "select code_name.name, color, source.name, pos0, pos1, ifnull(code_av.memo,''), "
+        sql += " code_av.owner, source.mediapath, source.id, ifnull(code_name.memo,''), ifnull(source.memo,''), " \
+               "avid, code_name.cid"
+        sql += " from code_av join code_name "
+        sql += "on code_name.cid = code_av.cid join source on code_av.id = source.id "
+        sql += "where code_name.cid in (" + code_ids + ") "
+        sql += "and source.id in (" + self.file_ids + ") "
+        if coder != "":
+            sql += " and code_av.owner=? "
+            parameters.append(coder)
+        if search_text != "":
+            sql += " and code_av.memo like ? "
+            parameters.append("%" + str(search_text) + "%")
+        if important:
+            sql += " and code_av.important=1 "
+        sql += " order by code_name.name, source.name, pos0"
+        if not parameters:
+            cur.execute(sql)
+        else:
+            cur.execute(sql, parameters)
+        result = cur.fetchall()
+        keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'coded_memo', 'coder', 'mediapath', 'fid', \
+            'codename_memo', 'source_memo', 'avid', 'cid'
+        for row in result:
+            tmp = dict(zip(keys, row))
+            tmp['result_type'] = 'av'
+            tmp['file_or_case'] = "File"
+            text_ = str(tmp['file_or_casename']) + " "
+            if len(tmp['coded_memo']) > 0:
+                text_ += "\nMEMO: " + tmp['coded_memo']
+            text_ += " " + msecs_to_hours_mins_secs(tmp['pos0']) + " - " + msecs_to_hours_mins_secs(tmp['pos1'])
+            tmp['text'] = text_
+            self.html_links.append({'imagename': None, 'image': None,
+                                    'avname': tmp['mediapath'], 'av0': str(int(tmp['pos0'] / 1000)),
+                                    'av1': str(int(tmp['pos1'] / 1000)), 'avtext': text_})
+            self.results.append(tmp)
+
+    def search_by_cases(self, code_ids):
+        """ Search by cases and if attributes file ids are selected.
+        Called by search() if self.file_ids is not empty and self.case_ids is empty
+
+        :param: code_ids : String comma separated ids
+        """
+
+        coder = self.ui.comboBox_coders.currentText()
+        search_text = self.ui.lineEdit.text()
+        important = self.ui.checkBox_important.isChecked()
+        cur = self.app.conn.cursor()
+        parameters = []
+
+        # Coded text
+        # TODO limit results by cas pos0 and case pos1 positions
+        sql = "select code_name.name, color, cases.name, "
+        sql += "code_text.pos0, code_text.pos1, seltext, code_text.owner, code_text.fid, "
+        sql += "ifnull(cases.memo,''), ifnull(code_text.memo,''), ifnull(code_name.memo,''), "
+        sql += "ifnull(source.memo,''), ctid, code_name.cid "
+        sql += "from code_text join code_name on code_name.cid = code_text.cid "
+        sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
+        sql += "code_text.fid = case_text.fid "
+        sql += "join source on source.id=code_text.fid "
+        sql += "where code_name.cid in (" + code_ids + ") "
+        sql += "and case_text.caseid in (" + self.case_ids + ") "
+        if self.file_ids != "":
+            sql += " and code_text.fid in (" + self.file_ids + ")"
+        sql += "and (code_text.pos0 >= case_text.pos0 and code_text.pos1 <= case_text.pos1)"
+        if coder != "":
+            sql += " and code_text.owner=? "
+            parameters.append(coder)
+        if search_text != "":
+            sql += " and seltext like ? "
+            parameters.append("%" + str(search_text) + "%")
+        if important:
+            sql += " and code_text.important=1 "
+        sql += " order by code_name.name, cases.name"
+        if not parameters:
+            cur.execute(sql)
+        else:
+            cur.execute(sql, parameters)
+        results = cur.fetchall()
+        keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'text', 'coder', 'fid', \
+            'cases_memo', 'coded_memo', 'codename_memo', 'source_memo', 'ctid', 'cid'
+        for row in results:
+            tmp = dict(zip(keys, row))
+            tmp['result_type'] = 'text'
+            tmp['file_or_case'] = "Case"
+            tmp['pretext'] = ""
+            tmp['posttext'] = ""
+            self.results.append(tmp)
+        if self.ui.checkBox_text_context.isChecked():
+            self.get_prettext_and_posttext()
+
+        # Coded images
+        parameters = []
+        sql = "select code_name.name, color, cases.name, "
+        sql += "x1, y1, width, height, code_image.owner,source.mediapath, source.id, "
+        sql += "ifnull(code_image.memo,''), ifnull(cases.memo,''), ifnull(code_name.memo,''), "
+        sql += "ifnull(source.memo,''), imid, code_name.cid "
+        sql += "from code_image join code_name on code_name.cid = code_image.cid "
+        sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
+        sql += "code_image.id = case_text.fid "
+        sql += " join source on case_text.fid = source.id "
+        sql += "where code_name.cid in (" + code_ids + ") "
+        sql += "and case_text.caseid in (" + self.case_ids + ") "
+        if self.file_ids != "":
+            sql += " and source.id in (" + self.file_ids + ")"
+        if coder != "":
+            sql += " and code_image.owner=? "
+            parameters.append(coder)
+        if search_text != "":
+            sql += " and code_image.memo like ? "
+            parameters.append("%" + str(search_text) + "%")
+        if important:
+            sql += " and code_text.important=1 "
+        sql += " order by code_name.name, cases.name"
+        if not parameters:
+            cur.execute(sql)
+        else:
+            cur.execute(sql, parameters)
+        imgresults = cur.fetchall()
+        keys = 'codename', 'color', 'file_or_casename', 'x1', 'y1', 'width', 'height', 'coder', 'mediapath', \
+            'fid', 'coded_memo', 'case_memo', 'codename_memo', 'source_memo', 'imid', 'cid'
+        for row in imgresults:
+            tmp = dict(zip(keys, row))
+            tmp['result_type'] = 'image'
+            tmp['file_or_case'] = "Case"
+            self.results.append(tmp)
+
+        # Coded audio and video
+        parameters = []
+        av_sql = "select distinct code_name.name, color, cases.name as case_name, "
+        av_sql += "code_av.pos0, code_av.pos1, code_av.owner,source.mediapath, source.id, "
+        av_sql += "ifnull(code_av.memo,'') as coded_memo, ifnull(cases.memo,'') as case_memo, "
+        av_sql += "ifnull(code_name.memo,''), ifnull(source.memo,''), avid, "
+        av_sql += "code_name.cid "
+        av_sql += "from code_av join code_name on code_name.cid = code_av.cid "
+        av_sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
+        av_sql += "code_av.id = case_text.fid "
+        av_sql += " join source on case_text.fid = source.id "
+        av_sql += "where code_name.cid in (" + code_ids + ") "
+        av_sql += "and case_text.caseid in (" + self.case_ids + ") "
+        if self.file_ids != "":
+            av_sql += " and source.id in (" + self.file_ids + ")"
+        if coder != "":
+            av_sql += " and code_av.owner=? "
+            parameters.append(coder)
+        if search_text != "":
+            av_sql += " and code_av.memo like ? "
+            parameters.append("%" + str(search_text) + "%")
+        if important:
+            sql += " and code_text.important=1 "
+        sql += " order by code_name.name, cases.name"
+        if not parameters:
+            cur.execute(av_sql)
+        else:
+            cur.execute(av_sql, parameters)
+        avresults = cur.fetchall()
+        keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'coder', 'mediapath', \
+            'fid', 'coded_memo', 'case_memo', 'codename_memo', 'source_memo', 'avid', 'cid'
+        for row in avresults:
+            tmp = dict(zip(keys, row))
+            tmp['result_type'] = 'av'
+            tmp['file_or_case'] = "Case"
+            tmp_text = str(tmp['file_or_casename']) + " "
+            if len(tmp['coded_memo']) > 0:
+                tmp_text += "\nMEMO: " + tmp['coded_memo']
+            tmp_text += " " + msecs_to_hours_mins_secs(tmp['pos0']) + " - " + msecs_to_hours_mins_secs(tmp['pos1'])
+            tmp['text'] = tmp_text
+            self.html_links.append({'imagename': None, 'image': None,
+                                    'avname': tmp['mediapath'], 'av0': str(int(tmp['pos0'] / 1000)),
+                                    'av1': str(int(tmp['pos1'] / 1000)), 'avtext': tmp_text})
+            self.results.append(tmp)
 
     def sort_search_results(self):
         """ Sort results by alphabet or by code count, ascending or descending. """
