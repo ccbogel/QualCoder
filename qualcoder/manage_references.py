@@ -376,6 +376,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
          Highest match links the risid to the file. Minimum numer of words match threshold of 0.7
          """
 
+        files_linked_count = 0
         files_unlinked = []
         for file_ in self.files:
             if not file_['risid']:
@@ -398,6 +399,9 @@ class DialogReferenceManager(QtWidgets.QDialog):
             ris_id = best_match[0]
             fid = file_['id']
             self.link_reference_to_files(ris_id, fid)
+            files_linked_count += 1
+        msg = _("Matches: ") + f"          {files_linked_count} / {len(files_unlinked)}          "
+        Message(self.app, _("Files linked to references"), msg).exec()
 
     def fill_table_refs(self):
         """ Fill widget with ref details. """
