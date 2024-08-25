@@ -1480,7 +1480,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             sql += " and code_image.memo like ? "
             parameters.append("%" + str(search_text) + "%")
         if important:
-            sql += " and code_text.important=1 "
+            sql += " and code_image.important=1 "
         sql += " order by code_name.name, cases.name"
         if not parameters:
             cur.execute(sql)
@@ -1517,7 +1517,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             av_sql += " and code_av.memo like ? "
             parameters.append("%" + str(search_text) + "%")
         if important:
-            sql += " and code_text.important=1 "
+            sql += " and code_av.important=1 "
         sql += " order by code_name.name, cases.name"
         if not parameters:
             cur.execute(av_sql)
