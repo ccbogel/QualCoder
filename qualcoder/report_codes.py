@@ -1161,7 +1161,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.search_codebook()
             return
 
-        # Get variables for search: Xsearch text, Xcoders, codes, files,cases, attribute file ids
+        # Get variables for search: codes, files,cases, attribute file ids, TODO attribute case ids
         self.get_selected_files_and_cases()
 
         # Select all code items under selected categories
@@ -1176,10 +1176,6 @@ class DialogReportCodes(QtWidgets.QDialog):
             Message(self.app, _('Nothing selected'), msg, "warning").exec()
             return
 
-        coder = self.ui.comboBox_coders.currentText()  # Todo remove
-        search_text = self.ui.lineEdit.text()  # todo remove
-        important = self.ui.checkBox_important.isChecked()  # todo remove
-
         prog_dialog = QtWidgets.QProgressDialog("Running", "", 1, 5, None)
         prog_dialog.setWindowTitle(_("Searching"))
         prog_dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowCloseButtonHint)
@@ -1187,16 +1183,11 @@ class DialogReportCodes(QtWidgets.QDialog):
         prog_dialog.setValue(1)
         prog_dialog.show()
         QtCore.QCoreApplication.processEvents()
+
+        # Clear results output
         rows = self.ui.tableWidget.rowCount()
         for r in range(0, rows):
             self.ui.tableWidget.removeRow(0)
-
-        file_or_case = "File"  # Default for attributes selection or file_ids
-        '''if self.file_ids != "":
-            file_or_case = "File"'''
-        if self.case_ids != "":
-            file_or_case = "Case"
-
         self.ui.comboBox_export.setEnabled(True)
         self.ui.textEdit.clear()
         self.te = []
@@ -1208,17 +1199,18 @@ class DialogReportCodes(QtWidgets.QDialog):
         if memo_choice == _("Only coded memos"):
             self.ui.textEdit.insertPlainText(_("Coded memos shown if available. Coded data not shown.") + "\n")
         self.ui.textEdit.insertPlainText(_("Search parameters") + "\n==========\n")
+        coder = self.ui.comboBox_coders.currentText()
         if coder == "":
-            self.ui.textEdit.insertPlainText(_("Coding by: All coders") + "\n")
+            self.ui.textEdit.insertPlainText(f"{_('Coding by: All coders')}\n")
         else:
-            self.ui.textEdit.insertPlainText(_("Coding by: ") + coder + "\n")
-        codes_string = _("Codes: ") + "\n"
+            self.ui.textEdit.insertPlainText(f"{_('Coding by: ')}{coder}\n")
+        codes_string = f"{_('Codes: ')}\n"
         codes_count = 0
         for i in items:
             if i.text(1)[0:3] == 'cid':
                 codes_count += 1
                 codes_string += i.text(0) + ". "
-        codes_string += _("Codes: ") + str(codes_count) + " / " + str(len(self.code_names))
+        codes_string += f"{_('Codes: ')}{codes_count} / {len(self.code_names)}"
         self.ui.textEdit.insertPlainText(codes_string)
 
         cur = self.app.conn.cursor()
@@ -1233,33 +1225,42 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.case_ids = ""
             for i in range(self.ui.listWidget_cases.count()):
                 self.ui.listWidget_cases.item(i).setSelected(False)
-            parameters_display += _("\nAttributes:\n") + self.attributes_msg + "\n"
+            parameters_display += f"\n{_('Attributes:')}\n {self.attributes_msg}\n"
         if self.file_ids != "":
             parameters_display += _("\nFiles:\n")
             cur.execute("select name from source where id in (" + self.file_ids + ") order by name")
             res = cur.fetchall()
             for r in res:
-                parameters_display += r[0] + ", "
-            parameters_display += _(" Files: ") + str(len(res)) + " / " + str(len(self.files))
+                parameters_display += f"{r[0]}, "
+            parameters_display += f"{_(' Files: ')} {len(res)} / {len(self.files)}"
         if self.case_ids != "":
             parameters_display += _("\nCases:\n")
             cur.execute("select name from cases where caseid in (" + self.case_ids + ") order by name")
             res = cur.fetchall()
             for r in res:
-                parameters_display += r[0] + ", "
-        self.ui.textEdit.insertPlainText(parameters_display + "\n")
-        if search_text != "":
-            self.ui.textEdit.insertPlainText("\n" + _("Search text: ") + search_text + "\n")
+                parameters_display += f"{r[0]}, "
+        self.ui.textEdit.insertPlainText(f"{parameters_display}\n")
+        if self.ui.lineEdit.text() != "":
+            self.ui.textEdit.insertPlainText(f"\n{_('Search text: ')} {self.ui.lineEdit.text()}\n")
         self.ui.textEdit.insertPlainText("\n==========\n")
 
-        # Get selected codes as String of cids
+        # Get selected codes as comma separated String of cids
         code_ids = ""
         for i in items:
             if i.text(1)[0:3] == 'cid':
-                code_ids += "," + i.text(1)[4:]
+                code_ids += f",{i.text(1)[4:]}"
         code_ids = code_ids[1:]
         self.html_links = []
         self.results = []
+
+        # TODO Case Attributes search: If used, selects entire file, even of only part is assigned to a case
+        # TODO e.g. such as a survey import
+        # TODO NEED attribute_case_ids variable to then make use of search_by_case
+        '''print("Code ids\n", code_ids)
+        print("Case ids\n", self.case_ids)
+        print("File ids\n", self.file_ids)
+        print("Attribute file ids\n", self.attribute_file_ids)
+        print("Attributes list\n", self.attributes)'''
 
         # FILES SEARCH, ALSO ATTRIBUTES FILE IDS SEARCH
         if self.file_ids != "" and self.case_ids == "":
@@ -1407,7 +1408,8 @@ class DialogReportCodes(QtWidgets.QDialog):
 
     def search_by_cases(self, code_ids):
         """ Search by cases and if attributes file ids are selected.
-        Called by search() if self.file_ids is not empty and self.case_ids is empty
+        Called by search() if self.case_ids is not empty.
+        Also uses self.file_ids to limit results
 
         :param: code_ids : String comma separated ids
         """
@@ -1419,7 +1421,6 @@ class DialogReportCodes(QtWidgets.QDialog):
         parameters = []
 
         # Coded text
-        # TODO limit results by cas pos0 and case pos1 positions
         sql = "select code_name.name, color, cases.name, "
         sql += "code_text.pos0, code_text.pos1, seltext, code_text.owner, code_text.fid, "
         sql += "ifnull(cases.memo,''), ifnull(code_text.memo,''), ifnull(code_name.memo,''), "
