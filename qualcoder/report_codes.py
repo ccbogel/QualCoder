@@ -88,6 +88,7 @@ class DialogReportCodes(QtWidgets.QDialog):
     case_ids = ""
     attributes = []
     attribute_file_ids = []
+    attribute_case_ids = []
     attributes_msg = ""
     # Text positions in the main textEdit for right-click context menu to View original file
     text_links = []
@@ -105,14 +106,14 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui = Ui_Dialog_reportCodings()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
-        font += '"' + self.app.settings['font'] + '";'
+        font = f"font: {self.app.settings['fontsize']}pt "
+        font += f'"{self.app.settings["font"]}";'
         self.setStyleSheet(font)
-        treefont = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
-        treefont += '"' + self.app.settings['font'] + '";'
+        treefont = f'font: {self.app.settings["treefontsize"]}pt '
+        treefont += f'"{self.app.settings["font"]}";'
         self.ui.treeWidget.setStyleSheet(treefont)
-        doc_font = 'font: ' + str(self.app.settings['docfontsize']) + 'pt '
-        doc_font += '"' + self.app.settings['font'] + '";'
+        doc_font = f'font: {self.app.settings["docfontsize"]}pt '
+        doc_font += f'"{self.app.settings["font"]}";'
         self.ui.textEdit.setStyleSheet(doc_font)
         self.ui.treeWidget.installEventFilter(self)  # For H key
         self.ui.listWidget_files.setStyleSheet(treefont)
@@ -874,7 +875,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 os.mkdir(html_folder_name + "/video")
             except Exception as err:
                 logger.warning(_("html folder creation error ") + str(err))
-                Message(self.app, _("Folder creation"), html_folder_name + _(" error ") + str(err), "critical").exec()
+                Message(self.app, _("Folder creation"), f"{html_folder_name} {_('error ')} {err}", "critical").exec()
                 return
         try:
             with open(filepath, 'r') as f:
@@ -888,7 +889,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             if item['imagename'] is not None:
                 image_name = item['imagename'].replace('/images/', '')
                 # print("IMG NAME: ", item['imagename'])
-                img_path = html_folder_name + "/images/" + image_name
+                img_path = f"{html_folder_name}/images/{image_name}"
                 # print("IMG PATH", img_path)
                 # item['image'] is  QtGui.QImage object
                 item['image'].save(img_path)
@@ -914,21 +915,21 @@ class DialogReportCodes(QtWidgets.QDialog):
                     av_destination = html_folder_name + av_path
                 # Copy Linked video file to html folder
                 if mediatype == "video" and linked:
-                    av_destination = html_folder_name + "/video/" + av_path.split('/')[-1]
-                    if not os.path.isfile(html_folder_name + "/video/" + av_path.split('/')[-1]):
+                    av_destination = f"{html_folder_name}/video/{av_path.split('/')[-1]}"
+                    if not os.path.isfile(av_destination):
                         copyfile(av_path, av_destination)
                 # Copy Linked audio file to html folder
                 if mediatype == "audio" and linked:
-                    av_destination = html_folder_name + "/audio/" + av_path.split('/')[-1]
-                    if not os.path.isfile(html_folder_name + "/audio/" + av_path.split('/')[-1]):
+                    av_destination = f"{html_folder_name}/audio/{av_path.split('/')[-1]}"
+                    if not os.path.isfile(av_destination):
                         copyfile(av_path, av_destination)
                 # Create html to display media time positions
                 extension = item['avname'][item['avname'].rfind('.') + 1:]
-                extra = "</p>\n<" + mediatype + " controls>"
-                extra += '<source src="' + av_destination
-                extra += '#t=' + item['av0'] + ',' + item['av1'] + '"'
-                extra += ' type="' + mediatype + '/' + extension + '">'
-                extra += '</' + mediatype + '><p>\n'
+                extra = f"</p>\n<{mediatype} controls>"
+                extra += f'<source src="{av_destination}'
+                extra += f'#t={item["av0"]},{item["av1"]}"'
+                extra += f' type="{mediatype}/{extension}">'
+                extra += f'</{mediatype}><p>\n'
                 # Hopefully only one location with exact audio/video/link: [mins.secs - mins.secs]
                 location = html.find(item['avtext'].replace('&', '&amp;'))
                 location = location + len(['avtext']) - 1
@@ -938,7 +939,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             f.write(html)
         msg = _("Report exported to: ") + filepath
         if need_media_folders:
-            msg += "\n" + _("Media folder: ") + html_folder_name
+            msg += f"\n{_('Media folder:')} {html_folder_name}"
         self.parent_textEdit.append(msg)
         Message(self.app, _('Report exported'), msg, "information").exec()
 
@@ -1084,15 +1085,15 @@ class DialogReportCodes(QtWidgets.QDialog):
         res = cur.fetchall()
         file_txt = ""
         for r in res:
-            file_txt += r[0] + ", "
+            file_txt += f"{r[0]}, "
         self.ui.textEdit.append(file_txt)
         self.ui.textEdit.append("==========")
         for a in annotes:
-            txt = "\n" + _("File") + ": " + a['filename'] + " anid: " + str(a['anid']) + " " + _("Date:") + " "
-            txt += a['date'][0:10] + " " + _("Coder:") + " " + a['owner'] + ", "
-            txt += _("Position") + ": " + str(a['pos0']) + " - " + str(a['pos1']) + "\n"
-            txt += _("TEXT") + ": " + a['text'] + "\n"
-            txt += _("ANNOTATION") + ": " + a['annotation']
+            txt = f"\n{_('File')}: {a['filename']} anid: {a['anid']} "
+            txt += f"{_('DATE:')} {a['date'][0:10]} {_('Coder:')} {a['owner']}, "
+            txt += f"{_('Position')}: {a['pos0']} - {a['pos1']}\n"
+            txt += f"{_('TEXT')}: {a['text']}\n"
+            txt += f"{_('ANNOTATION')}: {a['annotation']}"
             self.ui.textEdit.append(txt)
         self.ui.comboBox_export.setEnabled(True)
 
@@ -1105,6 +1106,7 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         # Clear ui
         self.attribute_file_ids = []
+        self.attribute_case_ids = []
         self.ui.pushButton_attributeselect.setToolTip(_("Attributes"))
         self.ui.splitter.setSizes([300, 300, 0])
         # Remove any selected case or file ids
@@ -1143,6 +1145,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.pushButton_attributeselect.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_attributeselect.setToolTip(ui.tooltip_msg)
         self.attribute_file_ids = ui.result_file_ids
+        # TODO make use of below in search_by_case
+        self.attribute_case_ids = ui.result_case_ids
 
     def search(self):
         """ Search for selected codings.
@@ -1244,15 +1248,6 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.ui.textEdit.insertPlainText(f"\n{_('Search text: ')} {self.ui.lineEdit.text()}\n")
         self.ui.textEdit.insertPlainText("\n==========\n")
 
-        # Get selected codes as comma separated String of cids
-        code_ids = ""
-        for i in items:
-            if i.text(1)[0:3] == 'cid':
-                code_ids += f",{i.text(1)[4:]}"
-        code_ids = code_ids[1:]
-        self.html_links = []
-        self.results = []
-
         # TODO Case Attributes search: If used, selects entire file, even of only part is assigned to a case
         # TODO e.g. such as a survey import
         # TODO NEED attribute_case_ids variable to then make use of search_by_case
@@ -1261,6 +1256,15 @@ class DialogReportCodes(QtWidgets.QDialog):
         print("File ids\n", self.file_ids)
         print("Attribute file ids\n", self.attribute_file_ids)
         print("Attributes list\n", self.attributes)'''
+
+        # Get selected codes as comma separated String of cids
+        code_ids = ""
+        for i in items:
+            if i.text(1)[0:3] == 'cid':
+                code_ids += f",{i.text(1)[4:]}"
+        code_ids = code_ids[1:]
+        self.html_links = []
+        self.results = []
 
         # FILES SEARCH, ALSO ATTRIBUTES FILE IDS SEARCH
         if self.file_ids != "" and self.case_ids == "":

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2023 Colin Curtain
+Copyright (c) 2024 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -75,6 +75,7 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
     limiter = "all"  # all for cases and files, file = file attributes, case = case attributes
 
     result_file_ids = []
+    result_case_ids = []
     result_tooltip_msg = ""
 
     def __init__(self, app, limiter="all", parent=None):
@@ -85,6 +86,7 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
         self.limiter = limiter
         self.parameters = []
         self.result_file_ids = []
+        self.result_case_ids = []
         self.result_tooltip_msg = ""
         self.tooltip_msg = ""
         cur = self.app.conn.cursor()
@@ -190,9 +192,15 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
                                         self.ui.tableWidget.item(x, self.CASE_OR_FILE_COLUMN).text(),
                                         self.ui.tableWidget.item(x, self.TYPE_COLUMN).text(),
                                         operator, values])
+        self.get_results_case_ids()
         self.get_results_file_ids()
         self.get_results_message()
         super(DialogSelectAttributeParameters, self).accept()
+
+    def get_results_case_ids(self):
+        """ Consolidate list of case ids from case parameters. """
+
+        print("TODO Get case ids")
 
     def get_results_file_ids(self):
         """ Consolidate list of file ids from file and case parameters. """
