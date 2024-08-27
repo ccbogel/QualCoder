@@ -108,8 +108,8 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
         self.ui = Ui_Dialog_report_attribute_parameters()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
-        font += '"' + self.app.settings['font'] + '";'
+        font = f"font: {self.app.settings['fontsize']}pt "
+        font += f'"{self.app.settings["font"]}";'
         self.setStyleSheet(font)
         self.fill_table_widget()
         self.ui.tableWidget.cellChanged.connect(self.cell_modified)
@@ -186,7 +186,7 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
             # add single quotes to character values
             if type_ == "character":
                 for i in range(0, len(values)):
-                    values[i] = "'" + values[i] + "'"
+                    values[i] = f"'{values[i]}'"
             if values:
                 self.parameters.append([self.ui.tableWidget.item(x, self.NAME_COLUMN).text(),
                                         self.ui.tableWidget.item(x, self.CASE_OR_FILE_COLUMN).text(),
@@ -200,7 +200,69 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
     def get_results_case_ids(self):
         """ Consolidate list of case ids from case parameters. """
 
-        print("TODO Get case ids")
+        self.result_case_ids = []
+        boolean_and_or = self.parameters[0][0]
+        cur = self.app.conn.cursor()
+        if boolean_and_or == "BOOLEAN_OR":
+            for a in self.parameters:
+                if len(a) > 1 and a[1] == 'case':
+                    # Case text table also links av and images
+                    case_sql = "select distinct cases.caseid from cases "
+                    case_sql += "join attribute on cases.caseid=attribute.id "
+                    case_sql += " where "
+                    case_sql += f"attribute.name = '{a[0]}' "
+                    case_sql += f" and attribute.value {a[3]} "
+                    if a[3] == 'between':
+                        case_sql += f"{a[4][0]} and {a[4][1]} "
+                    if a[3] in ('in', 'not in'):
+                        case_sql += "(" + ','.join(a[4]) + ") "  # One item the comma is skipped
+                    if a[3] not in ('between', 'in', 'not in'):
+                        case_sql += a[4][0]
+                    if a[2] == 'numeric':
+                        case_sql = case_sql.replace(' attribute.value ', ' cast(attribute.value as real) ')
+                    case_sql += " and attribute.attr_type='case'"
+                    #print("Attribute selected: ", a)
+                    cur.execute(case_sql)
+                    result = cur.fetchall()
+                    print("Res", result)
+                    for i in result:
+                        self.result_case_ids.append(i[0])
+            #print("Case ids", self.result_case_ids)
+            return
+        # Boolean and
+        list_of_sets = []
+        for a in self.parameters:
+            if len(a) > 1 and a[1] == 'case':
+                attribute_set = set()
+                # Case text table also links av and images
+                case_sql = "select distinct cases.caseid from cases "
+                case_sql += "join attribute on cases.caseid=attribute.id "
+                case_sql += " where "
+                case_sql += f"attribute.name = '{a[0]}' "
+                case_sql += f" and attribute.value {a[3]} "
+                if a[3] == 'between':
+                    case_sql += f"{a[4][0]} and {a[4][1]} "
+                if a[3] in ('in', 'not in'):
+                    case_sql += "(" + ','.join(a[4]) + ") "  # One item the comma is skipped
+                if a[3] not in ('between', 'in', 'not in'):
+                    case_sql += a[4][0]
+                if a[2] == 'numeric':
+                    case_sql = case_sql.replace(' attribute.value ', ' cast(attribute.value as real) ')
+                case_sql += " and attribute.attr_type='case'"
+                # print("Attribute selected: ", a)
+                # print(case_sql)
+                cur.execute(case_sql)
+                result = cur.fetchall()
+                for res in result:
+                    attribute_set.add(res[0])
+                if attribute_set != {}:
+                    list_of_sets.append(attribute_set)
+        if len(list_of_sets) == 1:
+            self.result_case_ids = list(list_of_sets[0])
+        if len(list_of_sets) > 1:
+            result_set = set.intersection(*list_of_sets)
+            self.result_case_ids = list(result_set)
+        #print("Case ids", self.result_case_ids)
 
     def get_results_file_ids(self):
         """ Consolidate list of file ids from file and case parameters. """
@@ -325,10 +387,10 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
                     case_sql += "join case_text on case_text.caseid=cases.caseid "
                     case_sql += "join attribute on cases.caseid=attribute.id "
                     case_sql += " where "
-                    case_sql += "attribute.name = '" + a[0] + "' "
-                    case_sql += " and attribute.value " + a[3] + " "
+                    case_sql += f"attribute.name = '{a[0]}' "
+                    case_sql += f" and attribute.value {a[3]} "
                     if a[3] == 'between':
-                        case_sql += a[4][0] + " and " + a[4][1] + " "
+                        case_sql += f"{a[4][0]} and {a[4][1]} "
                     if a[3] in ('in', 'not in'):
                         case_sql += "(" + ','.join(a[4]) + ") "  # One item the comma is skipped
                     if a[3] not in ('between', 'in', 'not in'):
@@ -339,11 +401,11 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
                     # print("Attribute selected: ", a)
                     # print(case_sql)
                     cur.execute(case_sql)
-                    case_result = cur.fetchall()
-                    for i in case_result:
-                        case_file_ids.append(i[0])
+                    case_results = cur.fetchall()
+                    for res in case_results:
+                        case_file_ids.append(res[0])
             return case_file_ids
-        # boolean and
+        # Boolean and
         list_of_sets = []
         for a in self.parameters:
             if len(a) > 1 and a[1] == 'case':
@@ -353,10 +415,10 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
                 case_sql += "join case_text on case_text.caseid=cases.caseid "
                 case_sql += "join attribute on cases.caseid=attribute.id "
                 case_sql += " where "
-                case_sql += "attribute.name = '" + a[0] + "' "
-                case_sql += " and attribute.value " + a[3] + " "
+                case_sql += f"attribute.name = '{a[0]}' "
+                case_sql += f" and attribute.value {a[3]} "
                 if a[3] == 'between':
-                    case_sql += a[4][0] + " and " + a[4][1] + " "
+                    case_sql += f"{a[4][0]} and {a[4][1]} "
                 if a[3] in ('in', 'not in'):
                     case_sql += "(" + ','.join(a[4]) + ") "  # One item the comma is skipped
                 if a[3] not in ('between', 'in', 'not in'):
@@ -367,9 +429,9 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
                 # print("Attribute selected: ", a)
                 # print(case_sql)
                 cur.execute(case_sql)
-                result = cur.fetchall()
-                for i in result:
-                    attribute_set.add(i[0])
+                results = cur.fetchall()
+                for res in results:
+                    attribute_set.add(res[0])
                 if attribute_set != {}:
                     list_of_sets.append(attribute_set)
         if len(list_of_sets) == 1:
@@ -427,14 +489,13 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
             sql = "select min(cast(value as real)), max(cast(value as real)) from attribute where name=? and attr_type=?"
             cur.execute(sql, [name, case_or_file])
             res = cur.fetchone()
-            tt = _("Minimum: ") + str(res[0]) + "\n"
-            tt += _("Maximum: ") + str(res[1])
+            tt = f'{_("Minimum:")} {res[0]}\n{_("Maximum:")} {res[1]}'
         if valuetype == "character":
             sql = "select distinct value from attribute where name=? and attr_type=? and length(value)>0 limit 20"
             cur.execute(sql, [name, case_or_file])
             res = cur.fetchall()
             for r in res:
-                tt += "\n" + r[0]
+                tt += f"\n{r[0]}"
             if len(tt) > 1:
                 tt = tt[1:]
         return tt
