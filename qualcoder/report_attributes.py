@@ -262,7 +262,6 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
         if len(list_of_sets) > 1:
             result_set = set.intersection(*list_of_sets)
             self.result_case_ids = list(result_set)
-        #print("Case ids", self.result_case_ids)
 
     def get_results_file_ids(self):
         """ Consolidate list of file ids from file and case parameters. """
