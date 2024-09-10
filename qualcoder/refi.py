@@ -2685,13 +2685,13 @@ class RefiExport(QtWidgets.QDialog):
         xml = ""
         for t in self.sources:
             if t['name'] == source['name'] + '.transcribed':
-                # Internal filename is a guid identfier
+                # Internal filename is a guid identifier
                 xml = '<Transcript plainTextPath="internal://'
                 xml += html.escape(t['plaintext_filename']) + '" '
-                xml += 'creatingUser="' + self.user_guid(t['owner']) + '" '
-                xml += 'creationDateTime="' + self.convert_timestamp(t['date']) + '" '
-                xml += 'guid="' + self.create_guid() + '" '
-                xml += 'name="' + html.escape(t['name']) + '" >\n'
+                xml += f'creatingUser="{self.user_guid(t["owner"])}" '
+                xml += f'creationDateTime="{self.convert_timestamp(t["date"])}" '
+                xml += f'guid="{self.create_guid()}" '
+                xml += f'name="{html.escape(t["name"])}" >\n'
                 # Get and add xml for syncpoints
                 sync_list = self.get_transcript_syncpoints(t)
                 for s in sync_list:
@@ -2734,8 +2734,8 @@ class RefiExport(QtWidgets.QDialog):
         results = cur.fetchall()
         for coded in results:
             # print(coded)
-            xml += '<TranscriptSelection guid="' + self.create_guid() + '" '
-            xml += 'name="' + html.escape(media['name']) + '" '
+            xml += f'<TranscriptSelection guid="{self.create_guid()}" '
+            xml += f'name="{html.escape(media["name"])}" '
             xml += 'fromSyncPoint="'
             for sp in sync_list:
                 if sp[2] == coded[0]:
@@ -2748,10 +2748,10 @@ class RefiExport(QtWidgets.QDialog):
                     xml += sp[0]
                     doubleup = True
             xml += '">\n'
-            xml += '<Coding guid="' + self.create_guid() + '" >\n'
+            xml += f'<Coding guid="{self.create_guid()}" >\n'
             code_guid = self.code_guid(coded[2])
             if code_guid != "":
-                xml += '<CodeRef targetGUID="' + code_guid + '" />\n'
+                xml += f'<CodeRef targetGUID="{code_guid}" />\n'
             xml += '</Coding>\n'
             xml += '</TranscriptSelection>\n'
         return xml
@@ -2778,9 +2778,9 @@ class RefiExport(QtWidgets.QDialog):
         cur.execute(sql, [media['id'], ])
         results = cur.fetchall()
         sync_list = []
-        # starting syncpoint
+        # Starting syncpoint
         guid = self.create_guid()
-        xml = '<SyncPoint guid="' + guid + '" position="0" timeStamp="0" />\n'
+        xml = f'<SyncPoint guid="{guid}" position="0" timeStamp="0" />\n'
         sync_list.append([guid, xml, 0])
 
         for r in results:
@@ -2790,8 +2790,8 @@ class RefiExport(QtWidgets.QDialog):
             for t in tps:
                 if t[0] <= r[0]:
                     msecs = t[1]
-            xml = '<SyncPoint guid="' + guid + '" position="' + str(r[0]) + '" '
-            xml += 'timeStamp="' + str(msecs) + '" />\n'
+            xml = f'<SyncPoint guid="{guid}" position="{r[0]}" '
+            xml += f'timeStamp="{msecs}" />\n'
             sync_list.append([guid, xml, r[0]])
             # text end position
             msecs = 0
@@ -2801,8 +2801,8 @@ class RefiExport(QtWidgets.QDialog):
             if msecs == 0:
                 msecs = tps[-1][1]  # the media end
             guid = self.create_guid()
-            xml = '<SyncPoint guid="' + guid + '" position="' + str(r[1]) + '" '
-            xml += 'timeStamp="' + str(msecs) + '" />\n'
+            xml = f'<SyncPoint guid="{guid}" position="{r[1]}" '
+            xml += f'timeStamp="{msecs}" />\n'
             sync_list.append([guid, xml, r[1]])
 
         # TODO might have multiples of the same char position and msecs, trim back?
@@ -2878,7 +2878,7 @@ class RefiExport(QtWidgets.QDialog):
             text_hms = stamp.split(':')
             text_secs = text_hms[2].split('.')[0]
             text_msecs = text_hms[2].split('.')[1]
-            # adjust msecs to 1000's for 1 or 2 digit strings
+            # Adjust msecs to 1000's for 1 or 2 digit strings
             if len(text_msecs) == 1:
                 text_msecs += "00"
             if len(text_msecs) == 2:
@@ -2899,7 +2899,7 @@ class RefiExport(QtWidgets.QDialog):
             except KeyError:
                 pass
 
-        # GEt the end of text postiiton to match to end of media, requires media lenth
+        # Get the end of text postiiton to match to end of media, requires media lenth
         media_length = 0
         cur = self.app.conn.cursor()
         media_name = media['name'][0:-12]
@@ -2914,7 +2914,7 @@ class RefiExport(QtWidgets.QDialog):
                 if media_length == -1:
                     media_length = 0
             except Exception as err:
-                msg_ = str(err) + "\n" + media_name
+                msg_ = f"{err}\n{media_name}"
                 Message(self.app, _("A/V Media not found"), msg_, "warning").exec()
                 logger.warning(msg_)
         else:
@@ -3007,10 +3007,10 @@ class RefiExport(QtWidgets.QDialog):
         for row in result:
             c = {'name': row[0], 'memo': row[1], 'owner': row[2], 'date': row[3].replace(' ', 'T'),
                  'cid': row[4], 'catid': row[5], 'color': row[6], 'guid': self.create_guid()}
-            xml = '<Code guid="' + c['guid']
-            xml += '" name="' + html.escape(c['name'])
-            xml += '" isCodable="true'
-            xml += '" color="' + c['color'] + '"'
+            xml = f'<Code guid="{c["guid"]}" '
+            xml += f'name="{html.escape(c["name"])}" '
+            xml += 'isCodable="true" '
+            xml += f'color="{c["color"]}"'
             memo = html.escape(c['memo'])
             if memo != "":
                 xml += '>\n'
@@ -3091,10 +3091,9 @@ class RefiExport(QtWidgets.QDialog):
             for c in cats:
                 if c['examine'] and cid == c['supercatid']:
                     c['examine'] = False
-                    xml += '<Code guid="' + c['guid']
-                    xml += '" name="' + html.escape(c['name'])
-                    xml += '" isCodable="false'
-                    xml += '">\n'
+                    xml += f'<Code guid="{c["guid"]}" '
+                    xml += f'name="{html.escape(c["name"])}" '
+                    xml += 'isCodable="false">\n'
                     memo = html.escape(c['memo'])
                     if memo != "":
                         xml += f"<Description>{memo}</Description>\n"
