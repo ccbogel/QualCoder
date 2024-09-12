@@ -210,8 +210,11 @@ class App(object):
         previous = []
         try:
             with open(self.persist_path, 'r', encoding='utf-8') as f:
-                for line in f:
-                    previous.append(line.strip())
+                try:
+                    for line in f:
+                        previous.append(line.strip())
+                except UnicodeDecodeError:
+                    pass  # Older projects might have non-utf8 characters
         except FileNotFoundError:
             logger.info('No previous projects found')
 
@@ -1004,8 +1007,7 @@ class MainWindow(QtWidgets.QMainWindow):
         except KeyError:
             pass
         self.hide_menu_options()
-        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
-        font += '"' + self.app.settings['font'] + '";'
+        font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
         self.init_ui()
         self.show()
@@ -1093,9 +1095,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionSpecial_functions.setShortcut('Alt+Z')
         self.ui.actionSpecial_functions.triggered.connect(self.special_functions)
         self.ui.actionMenu_Key_Shortcuts.triggered.connect(self.display_menu_key_shortcuts)
-
-        font = f"font: {self.app.settings['fontsize']}pt "
-        font += '"' + self.app.settings['font'] + '";'
+        font = f'font: {self.app.settings["fontsize"]}pt {self.app.settings["font"]}";'
         self.setStyleSheet(font)
         self.ui.textEdit.setReadOnly(True)
         self.settings_report()
@@ -1488,8 +1488,6 @@ class MainWindow(QtWidgets.QMainWindow):
         ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
         self.journal_display = ui
         ui.show()
-        # self.tab_layout_helper(self.ui.tab_manage, None)
-        # self.tab_layout_helper(self.ui.tab_manage, ui)
 
     def text_coding(self):
         """ Create edit and delete codes. Apply and remove codes and annotations to the
@@ -1828,7 +1826,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.textEdit.append(_("Opening: ") + self.app.project_path)
             self.setWindowTitle("QualCoder " + self.app.project_name)
             cur.execute('select sqlite_version()')
-            self.ui.textEdit.append("SQLite version: " + str(cur.fetchone()))
+            self.ui.textEdit.append(f"SQLite version: {cur.fetchone()}")
             cur.execute("select databaseversion, date, memo, about from project")
             result = cur.fetchone()
             self.project['databaseversion'] = result[0]
@@ -1836,14 +1834,14 @@ class MainWindow(QtWidgets.QMainWindow):
             self.project['memo'] = result[2]
             self.project['about'] = result[3]
             self.ui.textEdit.append(_("New Project Created") + "\n========\n"
-                                    + _("DB Version:") + str(self.project['databaseversion']) + "\n"
-                                    + _("Date: ") + str(self.project['date']) + "\n"
-                                    + _("About: ") + str(self.project['about']) + "\n"
-                                    + _("Coder:") + str(self.app.settings['codername']) + "\n"
+                                    + _("DB Version:") + f"{self.project['databaseversion']}\n"
+                                    + _("Date: ") + f"{self.project['date']}\n"
+                                    + _("About: ") + f"{self.project['about']}\n"
+                                    + _("Coder:") + f"{self.app.settings['codername']}\n"
                                     + "========")
         except Exception as err:
             msg = _("Problem creating database ")
-            logger.warning(msg + self.app.project_path + " Exception:" + str(err))
+            logger.warning(f"{msg}{self.app.project_path} Exception: {err}")
             self.ui.textEdit.append(f"\n{msg}\n{self.app.project_path}")
             self.ui.textEdit.append(str(err))
             self.close_project()
@@ -1936,7 +1934,7 @@ class MainWindow(QtWidgets.QMainWindow):
             return False
 
     def delete_lock_file(self):
-        """Delete the lock file to release the lock."""
+        """ Delete the lock file to release the lock. """
 
         try:
             if self.lock_file_path != '':
@@ -1958,21 +1956,20 @@ class MainWindow(QtWidgets.QMainWindow):
         logger.debug(msg)
 
     def prepare_heartbeat_thread(self):
-        """Prepare and start the heartbeat QThread."""
+        """ Prepare and start the heartbeat QThread. """
+
         self.heartbeat_thread = QtCore.QThread()
         self.heartbeat_worker = ProjectLockHeartbeatWorker(self.app, self.lock_file_path)
         self.heartbeat_worker.moveToThread(self.heartbeat_thread)
-
         self.heartbeat_thread.started.connect(self.heartbeat_worker.write_heartbeat)
         self.heartbeat_worker.finished.connect(self.heartbeat_thread.quit)
         self.heartbeat_worker.finished.connect(self.heartbeat_worker.deleteLater)
         self.heartbeat_thread.finished.connect(self.heartbeat_thread.deleteLater)
         self.heartbeat_worker.io_error.connect(self.lock_file_io_error)
-
         self.heartbeat_thread.start()
 
     def stop_heartbeat(self, wait=False):
-        """Stop the heartbeat and delete the lock file (if it exists)."""
+        """Stop the heartbeat and delete the lock file (if it exists). """
 
         if self.heartbeat_worker:
             try:
@@ -2285,7 +2282,7 @@ class MainWindow(QtWidgets.QMainWindow):
         if self.app.settings['backup_on_open'] == 'True' and newproject == "no":
             msg, backup_name = self.app.save_backup()
             self.ui.textEdit.append(msg)
-        msg = "\n" + _("Project Opened: ") + self.app.project_name
+        msg = f"\n{_('Project Opened: ')}{self.app.project_name}"
         self.ui.textEdit.append(msg)
         self.project_summary_report()
         self.show_menu_options()
@@ -2363,8 +2360,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.textEdit.append("<h1>" + _("Project summary") + "</h1>")
         msg = _("Date time now: ") + datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M") + "\n"
         msg += self.app.project_name + "\n"
-        msg += _("Project path: ") + self.app.project_path + "\n"
-        msg += _("Project date: ") + f"{self.project['date']}\n"
+        msg += f'{_("Project path: ")}{self.app.project_path}\n'
+        msg += f"{_('Project date: ')}{self.project['date']}\n"
         sql = "select memo from project"
         cur.execute(sql)
         res = cur.fetchone()
@@ -2380,19 +2377,19 @@ class MainWindow(QtWidgets.QMainWindow):
         sql = "select count(catid) from code_cat"
         cur.execute(sql)
         res = cur.fetchone()
-        msg += _("Code categories: ") + f"{res[0]}\n"
+        msg += f'{_("Code categories: ")}{res[0]}\n'
         sql = "select count(cid) from code_name"
         cur.execute(sql)
         res = cur.fetchone()
-        msg += _("Codes: ") + f"{res[0]}\n"
+        msg += f'{_("Codes: ")}{res[0]}\n'
         sql = "select count(name) from attribute_type"
         cur.execute(sql)
         res = cur.fetchone()
-        msg += _("Attributes: ") + f"{res[0]}\n"
+        msg += f'{_("Attributes: ")}{res[0]}\n'
         sql = "select count(jid) from journal"
         cur.execute(sql)
         res = cur.fetchone()
-        msg += _("Journals: ") + f"{res[0]}\n"
+        msg += f'{_("Journals: ")}{res[0]}\n'
         cur.execute("select name from source where id=?", [result[4]])
         bookmark_filename = cur.fetchone()
         if bookmark_filename is not None and result[5] is not None:
@@ -2523,7 +2520,7 @@ class MainWindow(QtWidgets.QMainWindow):
             if _json['name'] > qualcoder_version:
                 html = '<span style="color:red">' + _("Newer release available: ") + _json['name'] + '</span>'
                 self.ui.textEdit.append(html)
-                html = '<span style="color:red">' + _json['html_url'] + '</span><br />'
+                html = f'<span style="color:red">{_json["html_url"]}</span><br />'
                 self.ui.textEdit.append(html)
             else:
                 self.ui.textEdit.append(_("Latest Release: ") + _json['name'])
