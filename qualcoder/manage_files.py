@@ -172,7 +172,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.ui.tableWidget.cellDoubleClicked.connect(self.cell_double_clicked)
         self.ui.tableWidget.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
-        self.ui.tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+        self.ui.tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.MultiSelection)
         self.ui.tableWidget.installEventFilter(self)
         self.ui.tableWidget.horizontalHeader().setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget.horizontalHeader().customContextMenuRequested.connect(self.table_header_menu)
@@ -230,6 +230,7 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         Ctrl + A to show all rows
         Ctrl + Z Undo the last  deletion.
+        Ctrl + Q to select all rows 
         """
 
         if type(event) == QtGui.QKeyEvent:
@@ -239,6 +240,9 @@ class DialogManageFiles(QtWidgets.QDialog):
                 for r in range(0, self.ui.tableWidget.rowCount()):
                     self.ui.tableWidget.setRowHidden(r, False)
                 self.rows_hidden = False
+                return True
+            if key == QtCore.Qt.Key.Key_Q and mod == QtCore.Qt.KeyboardModifier.ControlModifier:
+                self.ui.tableWidget.selectAll() 
                 return True
         return False
 
@@ -357,6 +361,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             action_rename = menu.addAction(_("Rename database entry"))
             action_export = menu.addAction(_("Export"))
             action_delete = menu.addAction(_("Delete"))
+            action_bulkrename = menu.addAction(_("Bulk Rename"))
             if mediapath is None or mediapath == "" or (mediapath is not None and mediapath[0] == "/"):
                 action_export_to_linked = menu.addAction(_("Move file to externally linked file"))
             if mediapath is not None and mediapath != "" and mediapath[0] != "/":
@@ -390,6 +395,8 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.delete()
         if action == action_rename:
             self.rename_database_entry()
+        if action == action_bulkrename:
+            self.bulk_rename_database_entry()
         if action == action_assign_case:
             self.assign_case_to_file()
         if action == action_filename_asc:
@@ -533,6 +540,55 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.load_file_data()
         self.app.delete_backup = False
         self.update_files_in_dialogs()
+        
+    def bulk_rename_database_entry(self):
+        """ Bulk Rename database entries of the selected files. """
+        
+        selected_rows = self.ui.tableWidget.selectionModel().selectedRows()  # Fetch selected rows
+        if not selected_rows:
+            return  # If no rows are selected, do nothing
+
+        # Sort selected rows by their row number to ensure sequential renaming
+        selected_rows_sorted = sorted(selected_rows, key=lambda x: x.row())
+        # Gather filenames of selected rows
+        filenames = []
+        for row in selected_rows_sorted:
+            row_num = row.row()
+            filenames.append({'name': self.ui.tableWidget.item(row_num, self.NAME_COLUMN).text()})
+
+        # Display the rename dialog and ask for a base name
+        existing_name = filenames[0]['name']  
+        ui = DialogAddItemName(self.app, filenames, _("Bulk Rename database entries"), "Please input a base name for all the selected files")
+        ui.ui.lineEdit.setText("Enter base name here")  
+        ui.exec()
+
+        base_name = ui.get_new_name()
+        if not base_name:
+            return  
+
+        # Now perform the renaming for all sorted selected rows
+        cur = self.app.conn.cursor()
+        
+        for index, row in enumerate(selected_rows_sorted):
+            row_num = row.row()
+            existing_name = self.ui.tableWidget.item(row_num, self.NAME_COLUMN).text()
+
+            new_name = f"{base_name}_{str(index + 1).zfill(3)}"  # Zero-padded to 3 digits
+        
+            # Update the database with the new name
+            cur.execute("update source set name=? where name=?", [new_name, existing_name])
+            self.app.conn.commit()
+
+            # Logging and tracking the renamed entry
+            self.parent_text_edit.append(_("Renamed database file entry: ") + f"{existing_name} -> {new_name}")
+            entry = {'old_name': existing_name, 'name': new_name, 'fid': int(self.ui.tableWidget.item(row_num, self.ID_COLUMN).text())}
+            self.files_renamed.append(entry)
+
+        self.ui.pushButton_undo.setEnabled(True)
+        self.load_file_data()
+        self.app.delete_backup = False
+        self.update_files_in_dialogs()
+
 
     def undo_file_rename(self):
         """ Undo file name rename. """
