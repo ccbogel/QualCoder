@@ -549,6 +549,8 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.treeWidget.clear()
         self.ui.treeWidget.setColumnCount(4)
         self.ui.treeWidget.setHeaderLabels([_("Name"), _("Id"), _("Memo"), _("Count")])
+        self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Interactive)
+        self.ui.treeWidget.header().resizeSection(0, 400)
         if not self.app.settings['showids']:
             self.ui.treeWidget.setColumnHidden(1, True)
         else:
