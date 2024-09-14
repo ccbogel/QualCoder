@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>794</width>
-    <height>560</height>
+    <height>538</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -84,7 +84,7 @@ Text files (from any source) are exported from the text stored in the database a
      <widget class="QPushButton" name="pushButton_delete">
       <property name="geometry">
        <rect>
-        <x>610</x>
+        <x>590</x>
         <y>3</y>
         <width>30</width>
         <height>30</height>
@@ -237,6 +237,22 @@ Cannot export text transcription file associated with an audio or video as a lin
       </property>
       <property name="toolTip">
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Undo file rename&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_bulk_rename">
+      <property name="geometry">
+       <rect>
+        <x>630</x>
+        <y>3</y>
+        <width>30</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Bulk rename of database name file entries.&lt;/p&gt;&lt;p&gt;Only rename visible file rows. Can show only some rows by using attribute selection, or show/hide value like...&lt;/p&gt;&lt;p&gt;Renamed as: User chosen prefix and numbered suffix _nnn.&lt;/p&gt;&lt;p&gt;e.g. interview_001&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
