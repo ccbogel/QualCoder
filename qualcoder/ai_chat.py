@@ -56,18 +56,6 @@ from .ai_search_dialog import DialogAiSearch
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
-def exception_handler(exception_type, value, tb_obj):
-    """ Global exception handler useful in GUIs.
-    tb_obj: exception.__traceback__ """
-    tb = '\n'.join(traceback.format_tb(tb_obj))
-    text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
-    print(text)
-    logger.error(_("Uncaught exception: ") + text)
-    mb = QtWidgets.QMessageBox()
-    mb.setStyleSheet("* {font-size: 12pt}")
-    mb.setWindowTitle(_('Uncaught Exception'))
-    mb.setText(text)
-    mb.exec()
 
 class DialogAIChat(QtWidgets.QDialog):
     """ AI chat window
@@ -86,7 +74,6 @@ class DialogAIChat(QtWidgets.QDialog):
         """ Need to comment out the connection accept signal line in ui_Dialog_Import.py.
          Otherwise, get a double-up of accept signals. """
 
-        sys.excepthook = exception_handler
         self.app = app
         self.parent_textEdit = parent_text_edit
         self.main_window = main_window
@@ -761,7 +748,8 @@ class DialogAIChat(QtWidgets.QDialog):
         """Called if the AI returns an error"""
         self.ai_streaming_output = ''
         self.process_message('info', _('The AI returned an error: ') + str(value), self.current_streaming_chat_idx)    
-        
+        raise exception_type(value).with_traceback(tb_obj)  # Re-raise a new exception with the original traceback
+    
     def eventFilter(self, source, event):
         # Check if the event is a KeyPress, source is the lineEdit, and the key is Enter
         if (event.type() == QEvent.Type.KeyPress and source is self.ui.plainTextEdit_question and

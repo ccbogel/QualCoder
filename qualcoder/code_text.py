@@ -57,7 +57,7 @@ from .reports import DialogReportCoderComparisons, DialogReportCodeFrequencies  
 from .report_codes import DialogReportCodes
 from .report_code_summary import DialogReportCodeSummary  # for isinstance()
 from .select_items import DialogSelectItems  # for isinstance()
-from .ai_llm import AnalyzedDataList
+# from .ai_llm import AnalyzedDataList
 from .ai_search_dialog import DialogAiSearch
 
 ai_search_analysis_max_count = 10 # how many chunks of data are analysed in the second stage
@@ -3375,6 +3375,7 @@ class DialogCodeText(QtWidgets.QWidget):
         pos1 = self.ui.textEdit.textCursor().selectionEnd() + self.file_['start']
         if pos0 == pos1:
             return
+
         # Add the coded section to code text, add to database and update GUI
         coded = {'cid': cid, 'fid': int(self.file_['id']), 'seltext': selected_text,
                  'pos0': pos0, 'pos1': pos1, 'owner': self.app.settings['codername'], 'memo': "",
@@ -3398,6 +3399,33 @@ class DialogCodeText(QtWidgets.QWidget):
                                                                coded['memo'], coded['date'], coded['important']))
         self.app.conn.commit()
         self.app.delete_backup = False
+
+        # Add AI interpretation?
+        if self.ui.tabWidget.currentIndex() == 1: # ai search
+            ai_search_result = self.get_overlapping_ai_search_result()
+            if ai_search_result is not None:
+                memo = _("AI interpretation: ") + ai_search_result["interpretation"]
+                memo += _("\n\nAI search prompt: ") + self.ai_search_prompt.name_and_scope()
+                memo += _("\nAI model: ") + self.ai_search_ai_model
+
+                msg = '<p style="font-size: ' + str(self.app.settings['fontsize']) + 'pt">'
+                msg += _("Do you want to store the AI interpretation in a memo together with the coding?<br/><br/>")
+                msg += '<i>' + memo.replace('\n', '<br/>') + '</i></p>'
+                reply = QtWidgets.QMessageBox.question(
+                    self, 'AI Interpretation', msg,
+                    QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No,
+                    QtWidgets.QMessageBox.StandardButton.Yes
+                )
+                if reply == QtWidgets.QMessageBox.StandardButton.Yes:
+                    # Dictionary with cid fid seltext owner date name color memo
+                    cur = self.app.conn.cursor()
+                    cur.execute("update code_text set memo=? where cid=? and fid=? and seltext=? and pos0=? and pos1=? and owner=?",
+                                (memo, coded['cid'], coded['fid'], coded['seltext'], coded['pos0'],
+                                coded['pos1'],
+                                coded['owner']))
+                    self.app.conn.commit()
+                    self.code_text[len(self.code_text) - 1]['memo'] = memo
+
         # Update filter for tooltip and update code colours
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
@@ -4276,7 +4304,7 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         
         if not self.app.ai.is_ready():
-            msg = _('The AI is busy, please wait a moment and retry. For status meassages regarding the update of the AI\'s internal memory, see the main "Action Log" tab.')
+            msg = _('The AI is busy, please wait a moment and retry.')
             Message(self.app, _('AI Search'), msg, "warning").exec()
             return
 
@@ -4304,6 +4332,7 @@ class DialogCodeText(QtWidgets.QWidget):
             self.ai_search_chunks_pos = 0
             self.ai_search_results = []
             self.ai_search_prompt = ui.current_prompt
+            self.ai_search_ai_model = self.app.ai_models[int(self.app.settings['ai_model_index'])]['name']
             
             # Prepare the UI
             self.ai_search_running = True
@@ -4578,6 +4607,45 @@ class DialogCodeText(QtWidgets.QWidget):
             self.ui.ai_progressBar.setVisible(False)
             self.ai_search_spinner_timer.stop()
             self.ai_search_update_listview_action()
+            
+    def get_overlapping_ai_search_result(self):
+        """
+        Retrieves the single document from self.ai_search_results that has the longest overlap 
+        with the text selection defined in the text editor within the UI.
+
+        Returns:
+            best_doc (dict or None): The document with the longest overlap if overlapping documents 
+                exist; otherwise, None.
+        """
+        if self.ui.tabWidget.currentIndex() != 1: # not in ai search mode
+            return
+        
+        # Get the adjusted start and end positions from the text editor's current selection
+        pos0 = self.ui.textEdit.textCursor().selectionStart() + self.file_['start']
+        pos1 = self.ui.textEdit.textCursor().selectionEnd() + self.file_['start']
+        if pos0 == pos1:
+            return
+        
+        best_doc = None
+        max_overlap_length = 0 
+
+        for doc in self.ai_search_results:
+            quote_start = doc['quote_start']
+            quote_end = quote_start + len(doc['quote'])
+            
+            # Check for any intersection between the quote interval and the selection interval
+            if quote_start <= pos1 and quote_end >= pos0:
+                # Calculate the overlap length
+                overlap_start = max(quote_start, pos0)
+                overlap_end = min(quote_end, pos1)
+                overlap_length = overlap_end - overlap_start
+
+                # Update the best_doc if this document has a longer overlap
+                if overlap_length > max_overlap_length:
+                    max_overlap_length = overlap_length
+                    best_doc = doc
+
+        return best_doc
         
 class ToolTipEventFilter(QtCore.QObject):
     """ Used to add a dynamic tooltip for the textEdit.

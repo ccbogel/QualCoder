@@ -89,8 +89,8 @@ from qualcoder.view_av import DialogCodeAV
 from qualcoder.view_charts import ViewCharts
 from qualcoder.view_graph import ViewGraph
 from qualcoder.view_image import DialogCodeImage
-from qualcoder.ai_vectorstore import AiVectorstore
-from qualcoder.ai_llm import AiLLM
+# from qualcoder.ai_vectorstore import AiVectorstore
+# from qualcoder.ai_llm import AiLLM
 from qualcoder.ai_prompts import DialogAiEditPrompts
 
 # Check if VLC installed, for warning message for code_av
@@ -1253,7 +1253,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.init_ui()
         self.ui.tabWidget.setCurrentIndex(0)
         self.show()
-        QtWidgets.QApplication.processEvents()
+        QtWidgets.QApplication.processEvents() 
+        # Setup AI
+        from qualcoder.ai_llm import AiLLM
         self.app.ai = AiLLM(self.app, self.ui.textEdit)
         # First start? Ask if user wants to enable ai integration or not
         if self.app.settings['ai_first_startup'] == 'True' and self.app.settings['ai_enable'] == 'False':
@@ -1264,18 +1266,16 @@ You can also do this later by starting the AI Setup Wizard from the AI menu in t
 Click "Yes" to start now.')
             msg_box = QtWidgets.QMessageBox(self)
             msg_box.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-            reply = msg_box.question(self, _('AI Search'),
+            reply = msg_box.question(self, _('AI Integration'),
                                             msg, QtWidgets.QMessageBox.StandardButton.Yes,
                                             QtWidgets.QMessageBox.StandardButton.No)
             if reply == QtWidgets.QMessageBox.StandardButton.Yes:
                 self.ai_setup_wizard() # (will also init the llm)
-            else:
-                self.app.ai.init_llm(self)
         else:
             self.app.ai.init_llm(self)      
         self.app.settings['ai_first_startup'] = 'False'
         self.app.write_config_ini(self.app.settings, self.app.ai_models)
-        
+    
     def init_ui(self):
         """ Set up menu triggers """
 
@@ -2889,7 +2889,7 @@ Click "Yes" to start now.')
 
     # AI Menu Actions
     def ai_setup_wizard(self):
-        """Action triggered by AI Setup Wizard menu item."""
+        """Action triggered by AI Setup Wizard menu item or at the first start of QualCoder."""
         if self.app.settings['ai_enable'] == 'True':
             msg = _('It seems that the AI is already setup and enabled, so there is nothing to do here. Go to AI > settings if you want to change the current model or other settings.')
             Message(self.app, _('AI Setup Wizard'), msg).exec() 

@@ -27,6 +27,7 @@ https://qualcoder.wordpress.com/
 """
 
 import os
+# turn off telemetry
 os.environ["HF_HUB_DISABLE_TELEMETRY"] = "1" # for huggingface hub
 os.environ["ANONYMIZED_TELEMETRY"] = "0" # for chromadb
 
@@ -40,33 +41,22 @@ from typing import (Any, Iterable, Optional, List)
 import logging
 import traceback
 import time
-import importlib
 from PyQt6 import QtWidgets
 from PyQt6 import QtCore
-from .ai_async_worker import Worker, AiException
-
-# Global reference for the imported module
-#global sentence_transformers_module
-#sentence_transformers_module = None
+from qualcoder.ai_async_worker import Worker
+from qualcoder.ai_async_worker import AIException
+from qualcoder.error_dlg import show_error_dlg
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
 
-def exception_handler(exception_type, value, tb_obj):
-    """ Global exception handler useful in GUIs.
-    tb_obj: exception.__traceback__ """
+def ai_exception_handler(exception_type, value, tb_obj):
+    """ Show error message 
+    """
+    msg = exception_type.__name__ + ': ' + str(value)
     tb = '\n'.join(traceback.format_tb(tb_obj))
-    text_ = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
-    print(text_)
-    logger.error(_("Uncaught exception: ") + text_)
-    if len(text_) > 500:
-        text_ = _('Shortened error message: ...') + text_[-500:]
-    mb = QtWidgets.QMessageBox()
-    mb.setStyleSheet("* {font-size: 12pt}")
-    mb.setWindowTitle(_('Uncaught Exception'))
-    mb.setText(text_)
-    mb.exec()
+    logger.error(_("Uncaught exception: ") + msg + '\n' + tb)
+    show_error_dlg(msg, tb)
 
 class E5SentenceTransformerEmbeddings(SentenceTransformerEmbeddings):
     
@@ -116,10 +106,10 @@ class AiVectorstore():
 
     app = None
     parent_text_edit = None
-    ready = False # If the chroma_db is busy ingesting documents, ready will be "False" since we cannot make any queries yet.   
+    ready = False # If the chroma_db is busy indexing documents, ready will be "False" since we cannot make any queries yet.   
     import_workers_count = 0
     # Setup the database 
-    model_name = "intfloat/multilingual-e5-large" # or intfloat/multilingual-e5-base
+    model_name = "intfloat/multilingual-e5-large"
     cache_folder = os.path.join(os.path.expanduser('~'), '.cache', 'torch', 'sentence_transformers')
     model_folder = os.path.join(cache_folder, model_name.replace("/", "_"))
     model_files = [
@@ -149,7 +139,7 @@ class AiVectorstore():
         self.threadpool = QtCore.QThreadPool()
         self.threadpool.setMaxThreadCount(1)
         
-    def prepare(self, parent_window=None) -> bool:
+    def prepare_embedding_model(self, parent_window=None) -> bool:
         """Downloads the embeddings model if needed.    
         """
         if not self.embedding_model_is_cached():
@@ -184,20 +174,14 @@ want to continue?\
                         self.app.settings['ai_enable'] = 'False'
                         return False
                     else:
+                        # update progress bar
                         msg = self.download_model_msg
                         msgs = msg.split(':')
                         if len(msgs) > 1:
                             pd.setValue(int(''.join(filter(str.isdigit, msgs[1]))))
                             msg = msgs[0]
                         else:
-                            pd.setValue(0)
-                            
-                        #percent_done = re.search(r'(\d+(\.\d+)?)%', msg)
-                        #if percent_done:
-                        #    pd.setValue(int(percent_done.group(1)))
-                        #    msg = msg[:-1*(len(percent_done.group(1)) + 1)]
-                        #else:
-                        #    pd.setValue(0)
+                            pd.setValue(0)                            
                         pd.setLabelText(_('Downloading ') + msg)
                         QtWidgets.QApplication.processEvents() # update the progress dialog
                         time.sleep(0.01)
@@ -212,8 +196,8 @@ want to continue?\
         and in the local cache."""
         return os.path.exists(os.path.join(self.model_folder, self.model_files[-1]))
     
-    def _download_embedding_model(self, signals=None): # progress_callback=None, signals=None):
-        """Downloads the embedding model to the local cache if necessary.
+    def _download_embedding_model(self, signals=None):
+        """Background thread to download the embedding model to the local cache if necessary.
 
         Args:
             progress_callback (function(msg), optional): called regulary with an update
@@ -250,21 +234,16 @@ want to continue?\
                             msg = f'{os.path.basename(local_path)}: {round(i/expected_size * 100)}%'
                             if signals is not None and signals.progress is not None:
                                 signals.progress.emit(msg)
-                            #if progress_callback != None:
-                            #    progress_callback.emit(msg)
                             print(msg, '                           ', end='\r', flush=True)
                 msg = f'{os.path.basename(local_path)}: 100%'
                 if signals is not None and signals.progress is not None:
                     signals.progress.emit(msg)
-                #if progress_callback != None:
-                #    progress_callback.emit(msg)
                 print(msg, '                           ', end='\r', flush=True)
                 if os.path.exists(local_path):
                     os.remove(local_path)
                 os.rename(tmp_filename, local_path) 
                 
     def _download_embedding_model_callback(self, msg):
-        # self.parent_text_edit.append(msg)
         self.download_model_msg = msg
     
     def _download_embedding_model_finished(self):
@@ -282,20 +261,15 @@ want to continue?\
         self.download_model_running will be True until all files have finished downloading.
         """
         self.download_model_running = True
-        worker = Worker(self._download_embedding_model) # Any other args, kwargs are passed to the run function
-        # worker.signals.result.connect()
+        worker = Worker(self._download_embedding_model)
         worker.signals.finished.connect(self._download_embedding_model_finished)
         worker.signals.progress.connect(self._download_embedding_model_callback)
-        worker.signals.error.connect(exception_handler)
+        worker.signals.error.connect(ai_exception_handler)
         self.threadpool.start(worker)
     
     def _open_db(self, signals, progress_callback=None):
         if self._is_closing:
             return # abort when closing db
-        #import sentence_transformers as st
-        #self.st = st # this prevents the library from beeing garbage collected (no, seems not to work, still crashes... Have to import st in the main thread.)
-        #global sentence_transformers_module
-        #sentence_transformers_module = importlib.import_module('sentence_transformers')
         if self.app.project_path != '' and os.path.exists(self.app.project_path):
             db_path = os.path.join(self.app.project_path, 'ai_data', 'vectorstore')
             if self.app.ai_embedding_function is None:
@@ -308,7 +282,7 @@ want to continue?\
         else:
             self.chroma_db = None
             logger.debug(f'Project path "{self.app.project_path}" not found.')
-            # raise FileNotFoundError(f'AI Vectorstore: project path "{self.app.project_path}" not found.')
+            raise FileNotFoundError(f'AI Vectorstore: project path "{self.app.project_path}" not found.')
         self.app.ai._status = ''
 
     def init_vectorstore(self, rebuild=False):
@@ -319,39 +293,23 @@ want to continue?\
         Args:
             rebuild (bool, optional): Rebuild the vectorstore from the ground up. Defaults to False.
         """
-        self._is_closing = False
-                
-        self.prepare()
-        
-        # import sentence_transformers # we have to import this here, not in the worker thread, or qualcoder will crash
-        #if self.embedding_function is None:
-        #    self.embedding_function = E5SentenceTransformerEmbeddings(model_name=self.model_folder)
+        self._is_closing = False        
+        self.prepare_embedding_model()
         
         if self.app.project_name == '': # no project open
             self.close()
-            self.parent_text_edit.append(_('AI: Finished loading.'))
+            self.parent_text_edit.append(_('AI: Finished loading (no project open).'))
             self.app.ai._status = ''
         else: 
-            #worker = Worker(self._import_sentence_transformers)  
-            #worker.signals.finished.connect(self.open_db)
-            #worker.signals.error.connect(exception_handler)
-            #self.threadpool.start(worker)
             self.open_db(rebuild)
             
-    #def _import_sentence_transformers(self, signals):
-    #    global sentence_transformers_module
-    #    sentence_transformers_module = importlib.import_module('sentence_transformers')
-
     def open_db(self, rebuild=False):
-        #global sentence_transformers_module
-        #sentence_transformers_module = importlib.import_module('sentence_transformers')
-        #self.embedding_function = E5SentenceTransformerEmbeddings(model_name=self.model_folder)
         worker = Worker(self._open_db)  
         if rebuild:
             worker.signals.finished.connect(self.rebuild_vectorstore)
         else:
             worker.signals.finished.connect(self.update_vectorstore)
-        worker.signals.error.connect(exception_handler)
+        worker.signals.error.connect(ai_exception_handler)
         self.threadpool.start(worker)
  
     def progress_import(self, msg):
@@ -364,17 +322,12 @@ want to continue?\
             msg = _("AI: Checked all documents, memory is up to date.")
             self.parent_text_edit.append(msg)
             logger.debug(msg)
-
-        #if not self.ai_worker_running():
-        #    self.parent_text_edit.append(msg)
-        #    logger.debug(msg)
     
-    def _import_document(self, id, name, text, update=False, progress_callback=None, signals=None):
+    def _import_document(self, id, name, text, update=False, signals=None):
         if self._is_closing:
             return # abort when closing db
         if self.chroma_db is None:
-            logger.debug('chroma_db is None')
-            return
+            raise AIException(_('Vectorstore: Document import failed, chroma_db not present.'))
                        
         # Check if the document is already in the store:
         embeddings_list = self.chroma_db.get(where={"id" : id}, include=['metadatas'])
@@ -391,8 +344,6 @@ want to continue?\
         
         # split fulltext in smaller chunks 
         if text != '': # can only add embeddings if text is not empty
-            #if progress_callback != None:
-            #    progress_callback.emit(_('AI: Adding document to my memory: ') + f'"{name}"')
             if signals is not None and signals.progress is not None:
                 signals.progress.emit(_('AI: Adding document to internal memory: ') + f'"{name}"')
 
@@ -404,9 +355,13 @@ want to continue?\
             chunks = text_splitter.split_documents([document])
             
             # create embeddings for these chunks and store them in the chroma_db (with metadata)
-            chunk_texts = [chunk.page_content for chunk in chunks]
-            chunk_metadatas = [chunk.metadata for chunk in chunks]
-            self.chroma_db.add_texts(chunk_texts, chunk_metadatas)  
+            for chunk in chunks:
+                if not self._is_closing:
+                    self.chroma_db.add_texts([chunk.page_content], [chunk.metadata])  
+                else: # canceled, delete the unfinished document from the vectorstore:
+                    embeddings_list = self.chroma_db.get(where={"id" : id}, include=['metadatas'])
+                    self.chroma_db.delete(embeddings_list['ids'])
+                    break
 
     def import_document(self, id, name, text, update=False):
         """Imports a document into the chroma_db. 
@@ -426,7 +381,7 @@ want to continue?\
         # worker.signals.result.connect()
         worker.signals.finished.connect(self.finished_import)
         worker.signals.progress.connect(self.progress_import)
-        worker.signals.error.connect(exception_handler)
+        worker.signals.error.connect(ai_exception_handler)
         self.import_workers_count += 1
         self.threadpool.start(worker)
 

@@ -24,6 +24,9 @@ THE SOFTWARE.
 Author: Kai Droege (kaixxx)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+
+Async worker for lengthy AI functions that would otherwise block the UI.
+Adopted from https://www.pythonguis.com/tutorials/multithreading-pyqt-applications-qthreadpool/ 
 """
 
 import sys
@@ -36,11 +39,11 @@ from typing import Any
 from PyQt6.QtCore import QObject, QRunnable, QThreadPool, pyqtSignal, pyqtSlot
 from PyQt6 import sip
 
-# Async worker for lengthy AI functions that would otherwise block the UI.
-# Adopted from https://www.pythonguis.com/tutorials/multithreading-pyqt-applications-qthreadpool/ 
-
-class AiException(Exception):
-    pass
+class AIException(Exception):
+    """Exception raised for AI-related errors"""
+    def __init__(self, message='Unspecified AI Exception'):
+        self.message = message
+        super().__init__(self.message)
 
 class WorkerSignals(QObject):
     '''
@@ -65,7 +68,6 @@ class WorkerSignals(QObject):
 
     '''
     finished = pyqtSignal()
-    # error = pyqtSignal(tuple)
     error = pyqtSignal(object, object, object)
     result = pyqtSignal(object)
     progress = pyqtSignal(str)
@@ -98,10 +100,6 @@ class Worker(QRunnable):
         # Pass the signals to the function
         self.kwargs['signals'] = self.signals
 
-        # Add the callback to our kwargs
-        #if not 'progress_callback' in self.kwargs:
-        #    self.kwargs['progress_callback'] = self.signals.progress
-
     @pyqtSlot()
     def run(self):
         '''
@@ -116,14 +114,10 @@ class Worker(QRunnable):
         try:
             result = self.fn(*self.args, **self.kwargs)
         except Exception as err:
-            traceback.print_exc()
             exctype, value = sys.exc_info()[:2]
             if not sip.isdeleted(self.signals):
                 self.signals.error.emit(exctype, value, err.__traceback__)
             return
-        #else:
-        #    if not sip.isdeleted(self.signals):
-        #        self.signals.result.emit(result)  # Return the result of the processing
         finally:
             if not sip.isdeleted(self.signals):
                 self.signals.finished.emit()  # Done

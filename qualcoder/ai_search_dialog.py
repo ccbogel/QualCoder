@@ -49,18 +49,6 @@ path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
-def exception_handler(exception_type, value, tb_obj):
-    """ Global exception handler useful in GUIs.
-    tb_obj: exception.__traceback__ """
-    tb = '\n'.join(traceback.format_tb(tb_obj))
-    text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
-    print(text)
-    logger.error(_("Uncaught exception: ") + text)
-    if len(text) > 500:
-        text = _('Shortened error message: ...') + text[-500:]
-    QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
-
-
 class DialogAiSearch(QtWidgets.QDialog):
     """
     Dialog to select the options for the AI based search
@@ -88,7 +76,6 @@ class DialogAiSearch(QtWidgets.QDialog):
             selected_id (int): the id of the selected item in the codes and categories tree. -1 if no item is selected.
             selected_is_code (bool): True if the selected item is a code, False if it is a category
         """
-        sys.excepthook = exception_handler
         self.app = app_
         self.code_names, self.categories = self.app.get_codes_categories()
         self.context = context

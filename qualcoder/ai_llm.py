@@ -42,20 +42,13 @@ from langchain_openai import ChatOpenAI
 from langchain_core.globals import set_llm_cache
 from langchain_community.cache import InMemoryCache
 from langchain.pydantic_v1 import BaseModel, Field
-#from langchain.chains.openai_functions import (
-#    create_openai_fn_chain,
-#    create_structured_output_chain,
-#    create_openai_fn_runnable,
-#    create_structured_output_runnable,
-#)
-#from langchain.prompts import ChatPromptTemplate
 from langchain_core.callbacks.base import BaseCallbackHandler
 from langchain_core.runnables.config import RunnableConfig
 from langchain_core.messages.human import HumanMessage
 from langchain_core.messages.ai import AIMessage
 from langchain_core.messages.system import SystemMessage
 from langchain_core.documents.base import Document
-from .ai_async_worker import Worker, AiException
+from .ai_async_worker import Worker
 from .ai_vectorstore import AiVectorstore
 from .GUI.base64_helper import *
 from .helpers import Message
@@ -68,22 +61,7 @@ max_memo_length = 1500 # maximum length of the memo send to the AI
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
-
-def exception_handler(exception_type, value, tb_obj):
-    """ Global exception handler useful in GUIs.
-    tb_obj: exception.__traceback__ """
-    tb = '\n'.join(traceback.format_tb(tb_obj))
-    text_ = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
-    print(text_)
-    logger.error(_("Uncaught exception: ") + text_)
-    if len(text_) > 500:
-        text_ = _('Shortened error message: ...') + text_[-500:]
-    mb = QtWidgets.QMessageBox()
-    mb.setStyleSheet("* {font-size: 12pt}")
-    mb.setWindowTitle(_('Uncaught Exception'))
-    mb.setText(text_)
-    mb.exec()
-    
+        
 class MyCustomSyncHandler(BaseCallbackHandler):
     def __init__(self, ai_llm):
         self.ai_llm = ai_llm
@@ -137,7 +115,7 @@ def extract_ai_memo(memo: str) -> str:
     
 class AiLLM():
     """ This manages the communication between qualcoder, the vectorstore 
-    and the LLM (large language model, GPT-4 in this case)."""
+    and the LLM (large language model, e.g. GPT-4)."""
     app = None
     parent_text_edit = None
     main_window = None
@@ -317,7 +295,8 @@ class AiLLM():
         
     def _ai_async_error(self, exception_type, value, tb_obj):
         self.ai_async_is_errored = True
-        exception_handler(exception_type, value, tb_obj)
+        raise exception_type(value).with_traceback(tb_obj)  # Re-raise
+        # exception_handler(exception_type, value, tb_obj)
 
     def _ai_async_finished(self):
         if self.ai_async_progress_msgbox is not None:

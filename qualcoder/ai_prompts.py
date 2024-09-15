@@ -43,17 +43,6 @@ from .helpers import Message
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
-def exception_handler(exception_type, value, tb_obj):
-    """ Global exception handler useful in GUIs.
-    tb_obj: exception.__traceback__ """
-    tb = '\n'.join(traceback.format_tb(tb_obj))
-    text = 'Traceback (most recent call last):\n' + tb + '\n' + exception_type.__name__ + ': ' + str(value)
-    print(text)
-    logger.error(_("Uncaught exception: ") + text)
-    if len(text) > 500:
-        text = _('Shortened error message: ...') + text[-500:]
-    QtWidgets.QMessageBox.critical(None, _('Uncaught Exception'), text)
-
 # These system prompts can only be changed here in the code. This string is in YAML-format.
 # The first prompt in each category (search, code_analysis, topic_analysis) will be the default.
 system_prompts = """
@@ -341,7 +330,6 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
             type (string): Only prompts of this type are shown and allowed to be created
                            default: None (= all prompt types allowed)
         """
-        sys.excepthook = exception_handler
         self.app = app_
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_AiPrompts()
