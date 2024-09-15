@@ -123,7 +123,6 @@ class AiLLM():
     ai_async_is_canceled = False
     ai_async_is_finished = False
     ai_async_is_errored = False
-    ai_async_progress_msgbox = None
     ai_async_progress_msg = ''
     ai_async_progress_count = -1
     ai_async_progress_max = -1
@@ -155,10 +154,6 @@ class AiLLM():
         self.general_chat_icon = qta.icon('mdi6.chat-question-outline', color=self.app.highlight_color)
         self.prompt_scope_icon = qta.icon('mdi6.folder-open-outline', color=self.app.highlight_color)
         self.prompt_icon = qta.icon('mdi6.script-text-outline', color=self.app.highlight_color)
-
-        transparent_pixmap = QtGui.QPixmap(32, 32)
-        transparent_pixmap.fill(QtCore.Qt.GlobalColor.transparent)
-        self.transparent_icon = QtGui.QIcon(transparent_pixmap)
     
     def init_llm(self, main_window, rebuild_vectorstore=False, enable_ai=False):  
         self.main_window = main_window      
@@ -167,11 +162,10 @@ class AiLLM():
             QtWidgets.QApplication.processEvents() # update ui
             self._status = 'starting'
 
-            # init llms
+            # init LLMs
             # set_llm_cache(InMemoryCache())
             if int(self.app.settings['ai_model_index']) < 0:
                 self.parent_text_edit.append(_('AI: Please set up the AI model'))
-                # QtWidgets.QApplication.processEvents() # update ui
 
                 main_window.change_settings(section='AI', enable_ai=True)
                 if int(self.app.settings['ai_model_index']) < 0:
@@ -281,14 +275,16 @@ class AiLLM():
             return 'ready'
     
     def is_busy(self) -> bool:
-        return self.threadpool.activeThreadCount() > 0
+        return self.get_status() == 'busy'
+        # return self.threadpool.activeThreadCount() > 0
 
     def is_ready(self):
-        return (self.sources_vectorstore is not None) and \
-                    (self.sources_vectorstore.is_ready()) and \
-                    (self.large_llm is not None) and \
-                    (self.fast_llm is not None) and \
-                    (not self.is_busy())
+        return self.get_status() == 'ready'
+        #return (self.sources_vectorstore is not None) and \
+        #            (self.sources_vectorstore.is_ready()) and \
+        #            (self.large_llm is not None) and \
+        #            (self.fast_llm is not None) and \
+        #            (not self.is_busy())
     
     def _ai_async_progress(self, msg):
         self.ai_async_progress_msg = self.ai_async_progress_msg + '\n' + msg
@@ -299,17 +295,22 @@ class AiLLM():
         # exception_handler(exception_type, value, tb_obj)
 
     def _ai_async_finished(self):
-        if self.ai_async_progress_msgbox is not None:
-            try:
-                self.ai_async_progress_msgbox.close()
-            except:
-                pass
         self.ai_async_is_finished = True
     
     def _ai_async_abort_button_clicked(self):
         self.ai_async_is_canceled = True
     
     def ai_async_stream(self, llm, messages, result_callback=None, progress_callback=None, streaming_callback=None, error_callback=None):       
+        """Calls the LLM in a background thread and streams back the results 
+
+        Args:
+            llm (_type_): _description_
+            messages (_type_): _description_
+            result_callback (_type_, optional): _description_. Defaults to None.
+            progress_callback (_type_, optional): _description_. Defaults to None.
+            streaming_callback (_type_, optional): _description_. Defaults to None.
+            error_callback (_type_, optional): _description_. Defaults to None.
+        """
         # start async worker
         self.ai_async_is_finished = False
         self.ai_async_is_errored = False
@@ -346,37 +347,14 @@ class AiLLM():
         self.ai_streaming_output = ''
         return res
 
-    def ai_async_query(self, parent_window, func, show_progress_msg, result_callback, *args, **kwargs):
-        if show_progress_msg:
-            # show MessageBox while waiting
-            self.ai_async_progress_msgbox = QtWidgets.QMessageBox(parent_window)
-            self.ai_async_progress_msgbox.setStandardButtons((QtWidgets.QMessageBox.StandardButton.Abort))
-            self.ai_async_progress_msgbox.buttonClicked.connect(self._ai_async_abort_button_clicked)
-            self.ai_async_progress_msgbox.setWindowTitle('AI query running')
-            # create Label
-            pm = QtGui.QPixmap()
-            pm.loadFromData(QtCore.QByteArray.fromBase64(ai_search), "gif")
-            self.ai_async_progress_msgbox.setIconPixmap(pm.scaledToWidth(128))
-            icon_label = self.ai_async_progress_msgbox.findChild(QtWidgets.QLabel, "qt_msgboxex_icon_label")
-            # load gif
-            bArray = QtCore.QByteArray.fromBase64(ai_search)
-            bBuffer = QtCore.QBuffer(bArray)
-            bBuffer.open(QtCore.QIODeviceBase.OpenModeFlag.ReadWrite)
-            movie = QtGui.QMovie()
-            movie.setDevice(bBuffer)
-            movie.setFormat(b'GIF')
-            size = QtCore.QSize(128, 128)
-            movie.setScaledSize(size)
-            # avoid garbage collector
-            setattr(self.ai_async_progress_msgbox, 'icon_label_bArray', bArray)
-            setattr(self.ai_async_progress_msgbox, 'icon_label_bBuffer', bBuffer)
-            setattr(self.ai_async_progress_msgbox, 'icon_label', movie)
-            # start animation
-            icon_label.setMovie(movie)
-            movie.start()
-            self.ai_async_progress_msgbox.setModal(True)
-            self.ai_async_progress_msgbox.show()
-        
+    def ai_async_query(self, func, result_callback, *args, **kwargs):        
+        """_summary_
+
+        Args:
+            parent_window (_type_): _description_
+            func (_type_): _description_
+            result_callback (_type_): _description_
+        """
         self.ai_async_is_canceled = False
         
         # start async worker
@@ -391,19 +369,7 @@ class AiLLM():
         worker.signals.progress.connect(self._ai_async_progress)
         worker.signals.error.connect(self._ai_async_error)
         self.threadpool.start(worker)
-        
-        if show_progress_msg:
-            while not (self.ai_async_is_finished or self.ai_async_is_errored or self.ai_async_is_canceled):
-                if (self.ai_async_progress_count > -1) and (self.ai_async_progress_max > -1):
-                    progress_percent = round((self.ai_async_progress_count / self.ai_async_progress_max) * 100)
-                    if progress_percent >= 100:
-                        progress_percent = 99
-                    self.ai_async_progress_msgbox.setText(f'{self.ai_async_progress_msg} (~{progress_percent}%)')
-                else:
-                    self.ai_async_progress_msgbox.setText(self.ai_async_progress_msg)
-                QtWidgets.QApplication.processEvents() # update the progress dialog
-                time.sleep(0.01)
-                
+                        
     def get_curr_language(self):
         """Determine the current language of the UI and/or the project. 
         Used to instruct the AI answering in the correct language. 
@@ -537,8 +503,8 @@ class AiLLM():
         return res
         """
     
-    def retrieve_similar_data(self, parent_window, result_callback, code_name, code_memo='', doc_ids=[]):
-        self.ai_async_query(parent_window, self._retrieve_similar_data, False, result_callback, code_name, code_memo, doc_ids)
+    def retrieve_similar_data(self, result_callback, code_name, code_memo='', doc_ids=[]):
+        self.ai_async_query(self._retrieve_similar_data, result_callback, code_name, code_memo, doc_ids)
 
     def _retrieve_similar_data(self, code_name, code_memo='', doc_ids=[], progress_callback=None, signals=None) -> list:
         # 1) Get a list of code descriptions from the llm
@@ -607,11 +573,11 @@ class AiLLM():
         
         return chunk_master_list
     
-    def search_analyze_chunk(self, parent_window, result_callback, show_progress_msg, chunk, code_name, code_memo, search_prompt: PromptItem):
+    def search_analyze_chunk(self, parent_window, result_callback, chunk, code_name, code_memo, search_prompt: PromptItem):
         # Analyze a chunk of data with the AI
         # if self.ai_async_is_canceled:
         #    return
-        self.ai_async_query(parent_window, self._search_analyze_chunk, show_progress_msg, result_callback, chunk, code_name, code_memo, search_prompt)
+        self.ai_async_query(self._search_analyze_chunk, result_callback, chunk, code_name, code_memo, search_prompt)
         
     def _search_analyze_chunk(self, chunk, code_name, code_memo, search_prompt: PromptItem, progress_callback=None, signals=None):
         # the async function

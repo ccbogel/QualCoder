@@ -4346,7 +4346,7 @@ class DialogCodeText(QtWidgets.QWidget):
             # Phase 1: find similar chunks of data from the vectorstore
             self.app.ai.ai_async_is_canceled = False
             self.ai_search_chunks_pos = 0
-            self.app.ai.retrieve_similar_data(self, self.ai_search_prepare_analysis,  
+            self.app.ai.retrieve_similar_data(self.ai_search_prepare_analysis,  
                                             self.ai_search_code_name, self.ai_search_code_memo,
                                             self.ai_search_file_ids)
     
@@ -4409,10 +4409,10 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ai_search_chunks_pos = 0 # position of the next chunk to be analyzed
         self.ai_search_analysis_counter = 0 # conter to stop analyzing after ai_search_analysis_max_count 
         self.ai_search_found = False # Becomes True if any new data has been found
-        self.ai_search_analyze_next_chunk(False)
+        self.ai_search_analyze_next_chunk()
         # self.ai_analyze_similar_chunks(ai_search_analysis_max_count)
 
-    def ai_search_analyze_next_chunk(self, show_progress_msg):
+    def ai_search_analyze_next_chunk(self):
         if self.ai_search_chunks_pos < len(self.ai_search_similar_chunk_list):
             # still chunks left for analysis            
             if self.ai_search_analysis_counter < ai_search_analysis_max_count:
@@ -4420,7 +4420,6 @@ class DialogCodeText(QtWidgets.QWidget):
                 self.ai_search_running = True
                 self.app.ai.search_analyze_chunk(self, 
                                                   self.ai_search_analyze_next_chunk_callback,
-                                                  show_progress_msg,
                                                   self.ai_search_similar_chunk_list[self.ai_search_chunks_pos],
                                                   self.ai_search_code_name, 
                                                   self.ai_search_code_memo,
@@ -4463,7 +4462,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ai_search_analysis_counter += 1
         if not self.app.ai.ai_async_is_canceled:
             # self.ai_search_analyze_next_chunk(show_progress_msg=(not self.ai_search_found))
-            self.ai_search_analyze_next_chunk(show_progress_msg=False)
+            self.ai_search_analyze_next_chunk()
         else: 
             self.ai_search_running = False
 
@@ -4540,7 +4539,7 @@ class DialogCodeText(QtWidgets.QWidget):
                     self.ai_search_analysis_counter = 0 # counter to stop analyzing after ai_search_analysis_max_count 
                     self.ai_search_running = True
                     self.ai_search_spinner_timer.start()
-                    self.ai_search_analyze_next_chunk(False)
+                    self.ai_search_analyze_next_chunk()
             # reselect the item that was active before:
             if self.ai_search_current_result_index is not None:
                 self.ui.listWidget_ai.setCurrentRow(self.ai_search_current_result_index)

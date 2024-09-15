@@ -342,7 +342,7 @@ class DialogAIChat(QtWidgets.QDialog):
             self.process_message('info', _('Searching for related data...'))
             self.update_chat_window()  
 
-            self.app.ai.retrieve_similar_data(self, self.new_topic_chat_callback,  
+            self.app.ai.retrieve_similar_data(self.new_topic_chat_callback,  
                                             self.ai_search_code_name, self.ai_search_code_memo,
                                             self.ai_search_file_ids)
 
@@ -687,7 +687,6 @@ class DialogAIChat(QtWidgets.QDialog):
                                             progress_callback=None, 
                                             streaming_callback=self.ai_streaming_callback, 
                                             error_callback=None)
-                # self.app.ai.ai_async_query(self.parentWidget, self._send_message, False, self.ai_message_callback, messages)        
         elif msg_type == 'user':
             # user question, shown on screen and send to the AI
             if chat_idx == self.current_chat_idx:
@@ -700,7 +699,6 @@ class DialogAIChat(QtWidgets.QDialog):
                                             progress_callback=None, 
                                             streaming_callback=self.ai_streaming_callback, 
                                             error_callback=self.ai_error_callback)
-                # self.app.ai.ai_async_query(self.parentWidget, self._send_message, False, self.ai_message_callback, messages)
                 self.update_chat_window()
         elif msg_type == 'ai':
             # ai responses.
