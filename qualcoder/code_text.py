@@ -4396,7 +4396,7 @@ class DialogCodeText(QtWidgets.QWidget):
             chunks = filtered_chunks        
 
         if len(chunks) == 0:
-            self.ui.textEdit.setText(_(''))
+            self.ui.textEdit.setText('')
             msg = _('AI: Sorry, no new data found for "') + self.ai_search_code_name + _('" beside what has already been coded with this code.')
             Message(self.app, _('AI Search'), msg, "warning").exec()
             self.ai_search_running = False
@@ -4418,22 +4418,23 @@ class DialogCodeText(QtWidgets.QWidget):
             if self.ai_search_analysis_counter < ai_search_analysis_max_count:
             # ai_search_analysis_max_count not reached          
                 self.ai_search_running = True
-                self.app.ai.search_analyze_chunk(self, 
-                                                  self.ai_search_analyze_next_chunk_callback,
-                                                  self.ai_search_similar_chunk_list[self.ai_search_chunks_pos],
-                                                  self.ai_search_code_name, 
-                                                  self.ai_search_code_memo,
-                                                  self.ai_search_prompt)
+                self.app.ai.search_analyze_chunk(self.ai_search_analyze_next_chunk_callback,
+                                                 self.ai_search_similar_chunk_list[self.ai_search_chunks_pos],
+                                                 self.ai_search_code_name, 
+                                                 self.ai_search_code_memo,
+                                                 self.ai_search_prompt)
             else: # ai_search_analysis_max_count reached 
                 self.ai_search_running = False
                 if len(self.ai_search_results) == 0: # nothing found
                     self.ai_search_update_listview_action()
+                    self.ui.textEdit.setText('')
                     msg = _('The closer inspection of the first ') + str(self.ai_search_chunks_pos) + \
                         _( 'pieces of data yielded no results. You can continue to inspect more by clicking on "find more" in the list on the left.')
                     Message(self.app, _('AI Search'), msg, "warning").exec()
         else: # search finished
             self.ai_search_running = False
             if len(self.ai_search_results) == 0: # nothing found
+                self.ui.textEdit.setText('')
                 self.ai_search_update_listview_action()
                 msg = _('Upon closer inspection, no pieces of data relevant to your search query could be identified. Please start a new search.')
                 Message(self.app, _('AI Search'), msg, "warning").exec()
