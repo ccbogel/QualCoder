@@ -28,6 +28,8 @@ https://qualcoder.wordpress.com/
 
 import csv
 import datetime
+import sqlite3
+
 import ebooklib
 from ebooklib import epub
 import PIL
@@ -163,6 +165,11 @@ class DialogManageFiles(QtWidgets.QDialog):
         pm.loadFromData(QtCore.QByteArray.fromBase64(undo_icon), "png")
         self.ui.pushButton_undo.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_undo.clicked.connect(self.undo_file_rename)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(text_letter_t_icon), "png")
+        self.ui.pushButton_bulk_rename.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_bulk_rename.clicked.connect(self.bulk_rename_database_entry)
+
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(question_icon), "png")
         self.ui.pushButton_help.setIcon(QtGui.QIcon(pm))
@@ -326,8 +333,10 @@ class DialogManageFiles(QtWidgets.QDialog):
             action_casename_asc = menu.addAction(_("Order ascending"))
             action_assign_case = menu.addAction(_("Assign case to file"))
         action_show_values_like = None
+        action_hide_values_like = None
         if col != self.MEMO_COLUMN:
             action_show_values_like = menu.addAction(_("Show values like"))
+            action_hide_values_like = menu.addAction(_("Hide values like"))
         action_equals_value = menu.addAction(_("Show this value"))
         action_order_by_value_asc = None
         action_order_by_value_desc = None
@@ -381,6 +390,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         if self.av_dialog_open is not None:
             self.av_dialog_open.mediaplayer.stop()
             self.av_dialog_open = None
+            return
         if action == action_import_linked:
             self.import_linked_file(id_, mediapath)
         if action == action_export_to_linked:
@@ -417,6 +427,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 if compare_text != text_:
                     self.ui.tableWidget.setRowHidden(r, True)
             self.rows_hidden = True
+            return
         if action == action_show_values_like:
             text_value, ok = QtWidgets.QInputDialog.getText(self, _("Text filter"), _("Show values like:"),
                                                        QtWidgets.QLineEdit.EchoMode.Normal)
@@ -425,12 +436,24 @@ class DialogManageFiles(QtWidgets.QDialog):
                 for r in range(0, self.ui.tableWidget.rowCount()):
                     if self.ui.tableWidget.item(r, col).text().find(text_value) == -1:
                         self.ui.tableWidget.setRowHidden(r, True)
+            return
+        if action == action_hide_values_like:
+            text_value, ok = QtWidgets.QInputDialog.getText(self, _("Text filter"), _("Hide values like:"),
+                                                            QtWidgets.QLineEdit.EchoMode.Normal)
+            self.rows_hidden = True
+            if ok and text_value != '':
+                for r in range(0, self.ui.tableWidget.rowCount()):
+                    if self.ui.tableWidget.item(r, col).text().find(text_value) != -1:
+                        self.ui.tableWidget.setRowHidden(r, True)
+            return
         if action == action_show_all:
             for r in range(0, self.ui.tableWidget.rowCount()):
                 self.ui.tableWidget.setRowHidden(r, False)
             self.rows_hidden = False
+            return
         if action == action_url:
             webbrowser.open(item_text)
+            return
         if action == action_date_picker:
             ui_memo = DialogMemo(self.app, "Date selector", "", "hide")
             ui_memo.ui.textEdit.hide()
@@ -573,6 +596,58 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.files_renamed = [x for x in self.files_renamed if not (selection['fid'] == x.get('fid'))]
         if len(self.files_renamed) == 0:
             self.ui.pushButton_undo.setEnabled(False)
+
+    def bulk_rename_database_entry(self):
+        """ Bulk Rename source name database entries of the selected files. """
+
+        rows = self.ui.tableWidget.rowCount()
+        selected_rows = []
+        for row in range(0, rows):
+            if not self.ui.tableWidget.isRowHidden(row):
+                selected_rows.append([int(self.ui.tableWidget.item(row, self.ID_COLUMN).text()),
+                                  self.ui.tableWidget.item(row, self.NAME_COLUMN).text()])
+        if not selected_rows:
+            return
+        # Sort selected rows by their id (order of entry) to ensure sequential renaming
+        selected_rows.sort()
+        # Display the rename dialog and ask for a base name
+        additem = DialogAddItemName(self.app, [], _("Bulk Rename of database file name entries"),
+                               "Give a prefix for the names for all the displayed rows.\ne.g. prefix_001, prefix_002 ...")
+        additem.ui.lineEdit.setText("prefix")
+        ok = additem.exec()
+        if not ok:
+            return
+        prefix_name = additem.get_new_name()
+        if not prefix_name:
+            return
+
+        # Now perform the renaming for all visible rows
+        err_msg = ""
+        msg = ""
+        cur = self.app.conn.cursor()
+        for index, row in enumerate(selected_rows):
+            fid = row[0]
+            existing_name = row[1]
+            new_name = f"{prefix_name}_{str(index + 1).zfill(3)}"  # Zero-padded to 3 digits
+
+            # Update the database with the new name
+            msg = ""
+            try:
+                cur.execute("update source set name=? where name=?", [new_name, existing_name])
+                self.app.conn.commit()
+                msg += f'{_("Renamed database file entry:")} {existing_name} -> {new_name}\n'
+            except sqlite3.IntegrityError:
+                err_msg += f'_("Bulk Rename. Not renamed in use:") {existing_name}\n'
+
+            # Logging and tracking the renamed entry
+            entry = {'old_name': existing_name, 'name': new_name, 'fid': fid}
+            self.files_renamed.append(entry)
+        self.parent_text_edit.append(msg + err_msg)
+
+        self.ui.pushButton_undo.setEnabled(True)
+        self.load_file_data()
+        self.app.delete_backup = False
+        self.update_files_in_dialogs()
 
     def button_export_file_as_linked_file(self):
         """ User presses button to export current row's file.
@@ -1152,7 +1227,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.app.delete_backup = False
             self.ui.tableWidget.resizeColumnsToContents()
 
-    def view(self):
+    def view (self):
         """ View and edit text file contents.
         Alternatively view an image, audio or video media. """
 
@@ -1283,6 +1358,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         item['icon'] = icon
         item['metadata'] = metadata
         item['attributes'] = []
+        item['risid'] = None
         # Add file attribute placeholders
         att_sql = 'select name from attribute_type where caseOrFile ="file"'
         cur.execute(att_sql)

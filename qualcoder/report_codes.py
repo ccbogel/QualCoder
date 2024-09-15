@@ -84,10 +84,11 @@ class DialogReportCodes(QtWidgets.QDialog):
     html_links = []
     te = []  # Matrix (table) [row][col] of textEditWidget results
     # Variables for search restrictions
-    file_ids = ""
-    case_ids = ""
+    file_ids_string = ""
+    case_ids_string = ""
     attributes = []
     attribute_file_ids = []
+    attribute_case_ids = []
     attributes_msg = ""
     # Text positions in the main textEdit for right-click context menu to View original file
     text_links = []
@@ -105,14 +106,14 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui = Ui_Dialog_reportCodings()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
-        font += '"' + self.app.settings['font'] + '";'
+        font = f"font: {self.app.settings['fontsize']}pt "
+        font += f'"{self.app.settings["font"]}";'
         self.setStyleSheet(font)
-        treefont = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
-        treefont += '"' + self.app.settings['font'] + '";'
+        treefont = f'font: {self.app.settings["treefontsize"]}pt '
+        treefont += f'"{self.app.settings["font"]}";'
         self.ui.treeWidget.setStyleSheet(treefont)
-        doc_font = 'font: ' + str(self.app.settings['docfontsize']) + 'pt '
-        doc_font += '"' + self.app.settings['font'] + '";'
+        doc_font = f'font: {self.app.settings["docfontsize"]}pt '
+        doc_font += f'"{self.app.settings["font"]}";'
         self.ui.textEdit.setStyleSheet(doc_font)
         self.ui.treeWidget.installEventFilter(self)  # For H key
         self.ui.listWidget_files.setStyleSheet(treefont)
@@ -283,23 +284,23 @@ class DialogReportCodes(QtWidgets.QDialog):
          Called by: search """
 
         selected_files = []
-        self.file_ids = ""
+        self.file_ids_string = ""
         for item in self.ui.listWidget_files.selectedItems():
             selected_files.append(item.text())
             for f in self.files:
                 if f['name'] == item.text():
-                    self.file_ids += "," + str(f['id'])
-        if len(self.file_ids) > 0:
-            self.file_ids = self.file_ids[1:]
+                    self.file_ids_string += f",{f['id']}"
+        if len(self.file_ids_string) > 0:
+            self.file_ids_string = self.file_ids_string[1:]
         selected_cases = []
-        self.case_ids = ""
+        self.case_ids_string = ""
         for item in self.ui.listWidget_cases.selectedItems():
             selected_cases.append(item.text())
             for c in self.cases:
                 if c['name'] == item.text():
-                    self.case_ids += "," + str(c['id'])
-        if len(self.case_ids) > 0:
-            self.case_ids = self.case_ids[1:]
+                    self.case_ids_string += f",{c['id']}"
+        if len(self.case_ids_string) > 0:
+            self.case_ids_string = self.case_ids_string[1:]
 
     def listwidget_files_menu(self, position):
         """ Context menu for file selection. """
@@ -396,7 +397,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
                 top_item.setToolTip(0, '')
                 if len(c['name']) > 52:
-                    top_item.setText(0, c['name'][:25] + '..' + c['name'][-25:])
+                    top_item.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
                     top_item.setToolTip(0, c['name'])
                 top_item.setToolTip(2, c['memo'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
@@ -418,10 +419,10 @@ class DialogReportCodes(QtWidgets.QDialog):
                         memo = ""
                         if c['memo'] != "":
                             memo = "Memo"
-                        child = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
+                        child = QtWidgets.QTreeWidgetItem([c['name'], f"catid:{c['catid']}", memo])
                         child.setToolTip(0, '')
                         if len(c['name']) > 52:
-                            child.setText(0, c['name'][:25] + '..' + c['name'][-25:])
+                            child.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
                             child.setToolTip(0, c['name'])
                         child.setToolTip(2, c['memo'])
                         item.addChild(child)
@@ -440,14 +441,14 @@ class DialogReportCodes(QtWidgets.QDialog):
                 memo = ""
                 if c['memo'] != "":
                     memo = "Memo"
-                top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
+                top_item = QtWidgets.QTreeWidgetItem([c['name'], f"cid:{c['cid']}", memo])
                 top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
                 color = TextColor(c['color']).recommendation
                 top_item.setForeground(0, QBrush(QtGui.QColor(color)))
                 top_item.setFlags(Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEnabled)
                 top_item.setToolTip(0, '')
                 if len(c['name']) > 52:
-                    top_item.setText(0, c['name'][:25] + '..' + c['name'][-25:])
+                    top_item.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
                     top_item.setToolTip(0, c['name'])
                 top_item.setToolTip(2, c['memo'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
@@ -465,14 +466,14 @@ class DialogReportCodes(QtWidgets.QDialog):
                     memo = ""
                     if c['memo'] != "":
                         memo = _("Memo")
-                    child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
+                    child = QtWidgets.QTreeWidgetItem([c['name'], f"cid:{c['cid']}", memo])
                     child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
                     color = TextColor(c['color']).recommendation
                     child.setForeground(0, QBrush(QtGui.QColor(color)))
                     child.setFlags(Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEnabled)
                     child.setToolTip(0, '')
                     if len(c['name']) > 52:
-                        child.setText(0, c['name'][:25] + '..' + c['name'][-25:])
+                        child.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
                         child.setToolTip(0, c['name'])
                     child.setToolTip(2, c['memo'])
                     item.addChild(child)
@@ -672,13 +673,9 @@ class DialogReportCodes(QtWidgets.QDialog):
         if not self.results:
             return
         codes_all = [i['codename'] for i in self.results]
-        '''for i in self.results:
-            codes_all.append(i['codename'])'''
         codes_set = list(set(codes_all))
         codes_set.sort()
         codes_freq_list = [codes_all.count(x) for x in codes_set]
-        '''for x in codes_set:
-            codes_freq_list.append(codes_all.count(x))'''
         ncols = len(codes_set)
         nrows = sorted(codes_freq_list)[-1]
 
@@ -686,8 +683,6 @@ class DialogReportCodes(QtWidgets.QDialog):
         csv_data = []
         for r in range(0, nrows):
             row = ["" for c in range(0, ncols)]
-            '''for c in range(0, ncols):
-                row.append("")'''
             csv_data.append(row)
 
         # Look at each code and fill column with data
@@ -696,10 +691,10 @@ class DialogReportCodes(QtWidgets.QDialog):
             for i in self.results:
                 if i['codename'] == code:
                     if i['result_type'] == 'text':
-                        d = i['text'] + "\n" + i['file_or_casename']
+                        d = f"{i['text']}\n{i['file_or_casename']}"
                         # Add file id if results are based on attribute selection
                         if i['file_or_case'] == "":
-                            d += " fid:" + str(i['fid'])
+                            d += f" fid:{i['fid']}"
                         csv_data[row][col] = d
                         row += 1
                     if i['result_type'] == 'image':
@@ -710,10 +705,10 @@ class DialogReportCodes(QtWidgets.QDialog):
                             pass
                         if d == "":
                             d = _("NO MEMO")
-                        d += "\n" + i['file_or_casename']
+                        d += f"\n{i['file_or_casename']}"
                         # Add filename if results are based on attribute selection
                         if i['file_or_case'] == "":
-                            d += " " + i['mediapath'][8:]
+                            d += f" {i['mediapath'][8:]}"
                         csv_data[row][col] = d
                         row += 1
                     if i['result_type'] == 'av':
@@ -731,7 +726,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                         trimmed = trimmed[:pos + 1]
                         # Add case name as well as file name and time slot
                         if i['file_or_case'] != "File":
-                            trimmed = i['file_or_casename'] + " " + trimmed
+                            trimmed = f"{i['file_or_casename']} {trimmed}"
                         d += trimmed
                         csv_data[row][col] = d
                         row += 1
@@ -800,8 +795,6 @@ class DialogReportCodes(QtWidgets.QDialog):
         # options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
         if filepath is None or not ok:
             return
-        #if filepath[-4:] != ".xlsx":
-        #    filepath += ".xlsx"
         wb.save(filepath)
         msg = _("Each row contains filename, coder, coded, codename and categories.") + "\n"
         msg += _('Report exported: ') + filepath
@@ -874,7 +867,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 os.mkdir(html_folder_name + "/video")
             except Exception as err:
                 logger.warning(_("html folder creation error ") + str(err))
-                Message(self.app, _("Folder creation"), html_folder_name + _(" error ") + str(err), "critical").exec()
+                Message(self.app, _("Folder creation"), f"{html_folder_name} {_('error ')} {err}", "critical").exec()
                 return
         try:
             with open(filepath, 'r') as f:
@@ -888,7 +881,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             if item['imagename'] is not None:
                 image_name = item['imagename'].replace('/images/', '')
                 # print("IMG NAME: ", item['imagename'])
-                img_path = html_folder_name + "/images/" + image_name
+                img_path = f"{html_folder_name}/images/{image_name}"
                 # print("IMG PATH", img_path)
                 # item['image'] is  QtGui.QImage object
                 item['image'].save(img_path)
@@ -914,21 +907,21 @@ class DialogReportCodes(QtWidgets.QDialog):
                     av_destination = html_folder_name + av_path
                 # Copy Linked video file to html folder
                 if mediatype == "video" and linked:
-                    av_destination = html_folder_name + "/video/" + av_path.split('/')[-1]
-                    if not os.path.isfile(html_folder_name + "/video/" + av_path.split('/')[-1]):
+                    av_destination = f"{html_folder_name}/video/{av_path.split('/')[-1]}"
+                    if not os.path.isfile(av_destination):
                         copyfile(av_path, av_destination)
                 # Copy Linked audio file to html folder
                 if mediatype == "audio" and linked:
-                    av_destination = html_folder_name + "/audio/" + av_path.split('/')[-1]
-                    if not os.path.isfile(html_folder_name + "/audio/" + av_path.split('/')[-1]):
+                    av_destination = f"{html_folder_name}/audio/{av_path.split('/')[-1]}"
+                    if not os.path.isfile(av_destination):
                         copyfile(av_path, av_destination)
                 # Create html to display media time positions
                 extension = item['avname'][item['avname'].rfind('.') + 1:]
-                extra = "</p>\n<" + mediatype + " controls>"
-                extra += '<source src="' + av_destination
-                extra += '#t=' + item['av0'] + ',' + item['av1'] + '"'
-                extra += ' type="' + mediatype + '/' + extension + '">'
-                extra += '</' + mediatype + '><p>\n'
+                extra = f"</p>\n<{mediatype} controls>"
+                extra += f'<source src="{av_destination}'
+                extra += f'#t={item["av0"]},{item["av1"]}"'
+                extra += f' type="{mediatype}/{extension}">'
+                extra += f'</{mediatype}><p>\n'
                 # Hopefully only one location with exact audio/video/link: [mins.secs - mins.secs]
                 location = html.find(item['avtext'].replace('&', '&amp;'))
                 location = location + len(['avtext']) - 1
@@ -938,7 +931,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             f.write(html)
         msg = _("Report exported to: ") + filepath
         if need_media_folders:
-            msg += "\n" + _("Media folder: ") + html_folder_name
+            msg += f"\n{_('Media folder:')} {html_folder_name}"
         self.parent_textEdit.append(msg)
         Message(self.app, _('Report exported'), msg, "information").exec()
 
@@ -1007,7 +1000,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                     results.append([_("Code: "), res[0], res[1], res[2]])
         for r in results:
             if r[0] != "Code: ":
-                self.ui.textEdit.append(r[0] + r[1] + "\n" + r[2] + "\n")
+                self.ui.textEdit.append(f"{r[0]}{r[1]}\n{r[2]}\n")
             else:
                 cursor = self.ui.textEdit.textCursor()
                 fmt = QtGui.QTextCharFormat()
@@ -1021,7 +1014,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 text_brush = QBrush(QtGui.QColor(TextColor(r[3]).recommendation))
                 fmt.setForeground(text_brush)
                 cursor.setCharFormat(fmt)
-                self.ui.textEdit.append(r[2] + "\n")
+                self.ui.textEdit.append(f"{r[2]}\n")
         self.ui.comboBox_export.setEnabled(True)
 
     def search_annotations(self):
@@ -1039,7 +1032,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.html_links = []  # For html file output with media
         search_text = self.ui.lineEdit.text()
         self.get_selected_files_and_cases()
-        if self.file_ids == "":
+        if self.file_ids_string == "":
             Message(self.app, _("Warning"), _("No files selected for annotations")).exec()
             return
         self.ui.treeWidget.clearSelection()
@@ -1049,7 +1042,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         sql = "select anid, fid, source.name, pos0, pos1, annotation.memo, annotation.owner, annotation.date, "
         sql += "substr(fulltext, pos0 + 1, pos1 - pos0) as subtext "
         sql += "from annotation join source on source.id=annotation.fid "
-        sql += "where source.fulltext is not null and fid in (" + self.file_ids + ") "
+        sql += f"where source.fulltext is not null and fid in ({self.file_ids_string}) "
         # Coder limiter
         values = []
         if coder != "":
@@ -1080,19 +1073,19 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.ui.textEdit.append(_("Search text: ") + search_text)
         self.ui.textEdit.append(_("Files:"))
         cur.execute(
-            "select name from source where id in (" + self.file_ids + ") and source.fulltext is not null order by name")
+            "select name from source where id in (" + self.file_ids_string + ") and source.fulltext is not null order by name")
         res = cur.fetchall()
         file_txt = ""
         for r in res:
-            file_txt += r[0] + ", "
+            file_txt += f"{r[0]}, "
         self.ui.textEdit.append(file_txt)
         self.ui.textEdit.append("==========")
         for a in annotes:
-            txt = "\n" + _("File") + ": " + a['filename'] + " anid: " + str(a['anid']) + " " + _("Date:") + " "
-            txt += a['date'][0:10] + " " + _("Coder:") + " " + a['owner'] + ", "
-            txt += _("Position") + ": " + str(a['pos0']) + " - " + str(a['pos1']) + "\n"
-            txt += _("TEXT") + ": " + a['text'] + "\n"
-            txt += _("ANNOTATION") + ": " + a['annotation']
+            txt = f"\n{_('File')}: {a['filename']} anid: {a['anid']} "
+            txt += f"{_('DATE:')} {a['date'][0:10]} {_('Coder:')} {a['owner']}, "
+            txt += f"{_('Position')}: {a['pos0']} - {a['pos1']}\n"
+            txt += f"{_('TEXT')}: {a['text']}\n"
+            txt += f"{_('ANNOTATION')}: {a['annotation']}"
             self.ui.textEdit.append(txt)
         self.ui.comboBox_export.setEnabled(True)
 
@@ -1105,21 +1098,22 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         # Clear ui
         self.attribute_file_ids = []
+        self.attribute_case_ids = []
         self.ui.pushButton_attributeselect.setToolTip(_("Attributes"))
         self.ui.splitter.setSizes([300, 300, 0])
         # Remove any selected case or file ids
-        self.file_ids = ""
+        self.file_ids_string = ""
         for i in range(self.ui.listWidget_files.count()):
             self.ui.listWidget_files.item(i).setSelected(False)
-        self.case_ids = ""
+        self.case_ids_string = ""
         for i in range(self.ui.listWidget_cases.count()):
             self.ui.listWidget_cases.item(i).setSelected(False)
 
-        ui = DialogSelectAttributeParameters(self.app)
-        ui.fill_parameters(self.attributes)
+        attr_ui = DialogSelectAttributeParameters(self.app)
+        attr_ui.fill_parameters(self.attributes)
         temp_attributes = deepcopy(self.attributes)
         self.attributes = []
-        ok = ui.exec()
+        ok = attr_ui.exec()
         if not ok:
             self.attributes = temp_attributes
             pm = QtGui.QPixmap()
@@ -1131,8 +1125,9 @@ class DialogReportCodes(QtWidgets.QDialog):
                 pm.loadFromData(QtCore.QByteArray.fromBase64(attributes_selected_icon), "png")
                 self.ui.pushButton_attributeselect.setIcon(QtGui.QIcon(pm))
             return
-        self.attributes = ui.parameters
-        if len(self.attributes) == 1:
+        # As List containing (1) list of attributes, within (2) [List of attributes, boolean type]
+        self.attributes = attr_ui.parameters
+        if len(self.attributes) == 1:  # The and /or boolean operator only
             pm = QtGui.QPixmap()
             pm.loadFromData(QtCore.QByteArray.fromBase64(attributes_icon), "png")
             self.ui.pushButton_attributeselect.setIcon(QtGui.QIcon(pm))
@@ -1141,8 +1136,10 @@ class DialogReportCodes(QtWidgets.QDialog):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(attributes_selected_icon), "png")
         self.ui.pushButton_attributeselect.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_attributeselect.setToolTip(ui.tooltip_msg)
-        self.attribute_file_ids = ui.result_file_ids
+        self.ui.pushButton_attributeselect.setToolTip(attr_ui.tooltip_msg)
+        self.attributes_msg = attr_ui.tooltip_msg
+        self.attribute_file_ids = attr_ui.result_file_ids
+        self.attribute_case_ids = attr_ui.result_case_ids
 
     def search(self):
         """ Search for selected codings.
@@ -1160,10 +1157,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         if memo_choice == _("Codebook memos"):
             self.search_codebook()
             return
-        # Get variables for search: search text, coders, codes, files,cases, attribute file ids
-        coder = self.ui.comboBox_coders.currentText()
-        self.html_links = []  # For html file output with media
-        search_text = self.ui.lineEdit.text()
+
+        # Get variables for search: codes, files,cases, attribute file ids
         self.get_selected_files_and_cases()
 
         # Select all code items under selected categories
@@ -1173,7 +1168,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             msg = _("No codes have been selected.")
             Message(self.app, _('No codes'), msg, "warning").exec()
             return
-        if self.file_ids == "" and self.case_ids == "" and self.attributes == []:
+        if self.file_ids_string == "" and self.case_ids_string == "" and self.attributes == []:
             msg = _("No files, cases or attributes have been selected.")
             Message(self.app, _('Nothing selected'), msg, "warning").exec()
             return
@@ -1185,303 +1180,89 @@ class DialogReportCodes(QtWidgets.QDialog):
         prog_dialog.setValue(1)
         prog_dialog.show()
         QtCore.QCoreApplication.processEvents()
+
+        # Clear results output
         rows = self.ui.tableWidget.rowCount()
         for r in range(0, rows):
             self.ui.tableWidget.removeRow(0)
-        # Default for attributes selection
-        file_or_case = ""
-        if self.file_ids != "":
-            file_or_case = "File"
-        if self.case_ids != "":
-            file_or_case = "Case"
-
         self.ui.comboBox_export.setEnabled(True)
         self.ui.textEdit.clear()
         self.te = []
+        self.html_links = []  # For html file output with media
+
         # Add search terms to textEdit
         if memo_choice == _("Only memos"):
             self.ui.textEdit.insertPlainText(_("Only memos shown. Coded data not shown.") + "\n")
         if memo_choice == _("Only coded memos"):
             self.ui.textEdit.insertPlainText(_("Coded memos shown if available. Coded data not shown.") + "\n")
         self.ui.textEdit.insertPlainText(_("Search parameters") + "\n==========\n")
+        coder = self.ui.comboBox_coders.currentText()
         if coder == "":
-            self.ui.textEdit.insertPlainText(_("Coding by: All coders") + "\n")
+            self.ui.textEdit.insertPlainText(f"{_('Coding by: All coders')}\n")
         else:
-            self.ui.textEdit.insertPlainText(_("Coding by: ") + coder + "\n")
-        codes_string = _("Codes: ") + "\n"
+            self.ui.textEdit.insertPlainText(f"{_('Coding by: ')}{coder}\n")
+        codes_string = f"{_('Codes: ')}\n"
         codes_count = 0
         for i in items:
             if i.text(1)[0:3] == 'cid':
                 codes_count += 1
                 codes_string += i.text(0) + ". "
-        codes_string += _("Codes: ") + str(codes_count) + " / " + str(len(self.code_names))
+        codes_string += f"{_('Codes: ')}{codes_count} / {len(self.code_names)}"
         self.ui.textEdit.insertPlainText(codes_string)
-        important = self.ui.checkBox_important.isChecked()
 
         cur = self.app.conn.cursor()
-        parameters = ""
-        if self.attribute_file_ids:
-            self.file_ids = ""
-            for a in self.attribute_file_ids:
-                self.file_ids += "," + str(a)
-            self.file_ids = self.file_ids[1:]
+        parameters_display = ""
+        if self.attribute_file_ids or self.attribute_case_ids:
+            self.file_ids_string = ""
+            self.case_ids_string = ""
+            for fid in self.attribute_file_ids:
+                self.file_ids_string += f",{fid}"
+            self.file_ids_string = self.file_ids_string[1:]
+            for caseid in self.attribute_case_ids:
+                self.case_ids_string += f",{caseid}"
+            self.case_ids_string = self.case_ids_string[1:]
+
             for i in range(self.ui.listWidget_files.count()):
                 self.ui.listWidget_files.item(i).setSelected(False)
-            self.case_ids = ""
             for i in range(self.ui.listWidget_cases.count()):
                 self.ui.listWidget_cases.item(i).setSelected(False)
-            parameters += _("\nAttributes:\n") + self.attributes_msg + "\n"
-        if self.file_ids != "":
-            parameters += _("\nFiles:\n")
-            cur.execute("select name from source where id in (" + self.file_ids + ") order by name")
+            parameters_display += f"\n{_('Attributes:')}\n {self.attributes_msg}\n"
+
+        if self.file_ids_string != "":
+            parameters_display += _("\nFiles:\n")
+            cur.execute(f"select name from source where id in ({self.file_ids_string}) order by name")
             res = cur.fetchall()
             for r in res:
-                parameters += r[0] + ", "
-            parameters += _(" Files: ") + str(len(res)) + " / " + str(len(self.files))
-        if self.case_ids != "":
-            parameters += _("\nCases:\n")
-            cur.execute("select name from cases where caseid in (" + self.case_ids + ") order by name")
+                parameters_display += f"{r[0]}, "
+            parameters_display += f"{_(' Files: ')} {len(res)} / {len(self.files)}"
+        if self.case_ids_string != "":
+            parameters_display += _("\nCases:\n")
+            cur.execute(f"select name from cases where caseid in ({self.case_ids_string}) order by name")
             res = cur.fetchall()
             for r in res:
-                parameters += r[0] + ", "
-        self.ui.textEdit.insertPlainText(parameters + "\n")
-        if search_text != "":
-            self.ui.textEdit.insertPlainText("\n" + _("Search text: ") + search_text + "\n")
+                parameters_display += f"{r[0]}, "
+        self.ui.textEdit.insertPlainText(f"{parameters_display}\n")
+        if self.ui.lineEdit.text() != "":
+            self.ui.textEdit.insertPlainText(f"\n{_('Search text: ')} {self.ui.lineEdit.text()}\n")
         self.ui.textEdit.insertPlainText("\n==========\n")
 
-        # Get selected codes
-        code_ids = ""
+        # Get selected codes as comma separated String of cids
+        code_ids_string = ""
         for i in items:
             if i.text(1)[0:3] == 'cid':
-                code_ids += "," + i.text(1)[4:]
-        code_ids = code_ids[1:]
+                code_ids_string += f",{i.text(1)[4:]}"
+        code_ids_string = code_ids_string[1:]
         self.html_links = []
         self.results = []
-        parameters = []
 
         # FILES SEARCH, ALSO ATTRIBUTES FILE IDS SEARCH
-        if self.file_ids != "" and self.case_ids == "":
-            # Coded text
-            sql = "select code_name.name, color, source.name, pos0, pos1, seltext, "
-            sql += "code_text.owner, fid, ifnull(code_text.memo,''), ifnull(code_name.memo,''), " \
-                   "ifnull(source.memo,''), ctid, code_name.cid "
-            sql += " from code_text join code_name "
-            sql += "on code_name.cid = code_text.cid join source on fid = source.id "
-            sql += "where code_name.cid in (" + code_ids + ") "
-            sql += "and source.id in (" + self.file_ids + ") "
-            if coder != "":
-                sql += " and code_text.owner=? "
-                parameters.append(coder)
-            if search_text != "":
-                sql += " and seltext like ? "
-                parameters.append("%" + str(search_text) + "%")
-            if important:
-                sql += " and code_text.important=1 "
-            sql += " order by code_name.name, source.name, pos0"
-            if not parameters:
-                cur.execute(sql)
-            else:
-                cur.execute(sql, parameters)
-            result = cur.fetchall()
-            keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'text', 'coder', 'fid', 'coded_memo', \
-                   'codename_memo', 'source_memo', 'ctid', 'cid'
-            for row in result:
-                tmp = dict(zip(keys, row))
-                tmp['result_type'] = 'text'
-                tmp['file_or_case'] = file_or_case
-                tmp['pretext'] = ""
-                tmp['posttext'] = ""
-                self.results.append(tmp)
-            if self.ui.checkBox_text_context.isChecked():
-                self.get_prettext_and_posttext()
-
-            # Coded images
-            parameters = []
-            sql = "select code_name.name, color, source.name, x1, y1, width, height,"
-            sql += "code_image.owner, source.mediapath, source.id, ifnull(code_image.memo,''), "
-            sql += "code_name.memo, ifnull(source.memo,''), imid, code_name.cid "
-            sql += " from code_image join code_name "
-            sql += "on code_name.cid = code_image.cid join source on code_image.id = source.id "
-            sql += "where code_name.cid in (" + code_ids + ") "
-            sql += "and source.id in (" + self.file_ids + ") "
-            if coder != "":
-                sql += " and code_image.owner=? "
-                parameters.append(coder)
-            if search_text != "":
-                sql += " and code_image.memo like ? "
-                parameters.append("%" + str(search_text) + "%")
-            if important:
-                sql += " and code_image.important=1 "
-            sql += " order by code_name.name, source.name, x1"
-            if not parameters:
-                cur.execute(sql)
-            else:
-                cur.execute(sql, parameters)
-            result = cur.fetchall()
-            keys = 'codename', 'color', 'file_or_casename', 'x1', 'y1', 'width', 'height', 'coder', 'mediapath', \
-                   'fid', 'coded_memo', 'codename_memo', 'source_memo', 'imid', 'cid'
-            for row in result:
-                tmp = dict(zip(keys, row))
-                tmp['result_type'] = 'image'
-                tmp['file_or_case'] = file_or_case
-                self.results.append(tmp)
-
-            # Coded audio and video, also looks for search_text in coded segment memo
-            parameters = []
-            sql = "select code_name.name, color, source.name, pos0, pos1, ifnull(code_av.memo,''), "
-            sql += " code_av.owner, source.mediapath, source.id, ifnull(code_name.memo,''), ifnull(source.memo,''), " \
-                   "avid, code_name.cid"
-            sql += " from code_av join code_name "
-            sql += "on code_name.cid = code_av.cid join source on code_av.id = source.id "
-            sql += "where code_name.cid in (" + code_ids + ") "
-            sql += "and source.id in (" + self.file_ids + ") "
-            if coder != "":
-                sql += " and code_av.owner=? "
-                parameters.append(coder)
-            if search_text != "":
-                sql += " and code_av.memo like ? "
-                parameters.append("%" + str(search_text) + "%")
-            if important:
-                sql += " and code_av.important=1 "
-            sql += " order by code_name.name, source.name, pos0"
-            if not parameters:
-                cur.execute(sql)
-            else:
-                cur.execute(sql, parameters)
-            result = cur.fetchall()
-            keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'coded_memo', 'coder', 'mediapath', 'fid', \
-                   'codename_memo', 'source_memo', 'avid', 'cid'
-            for row in result:
-                tmp = dict(zip(keys, row))
-                tmp['result_type'] = 'av'
-                tmp['file_or_case'] = file_or_case
-                text_ = str(tmp['file_or_casename']) + " "
-                if len(tmp['coded_memo']) > 0:
-                    text_ += "\nMEMO: " + tmp['coded_memo']
-                text_ += " " + msecs_to_hours_mins_secs(tmp['pos0']) + " - " + msecs_to_hours_mins_secs(tmp['pos1'])
-                tmp['text'] = text_
-                self.html_links.append({'imagename': None, 'image': None,
-                                        'avname': tmp['mediapath'], 'av0': str(int(tmp['pos0'] / 1000)),
-                                        'av1': str(int(tmp['pos1'] / 1000)), 'avtext': text_})
-                self.results.append(tmp)
-
+        if self.file_ids_string != "" and self.case_ids_string == "":
+            self.search_by_files(code_ids_string)
         # CASES AND FILES SEARCH
         # Default to all files if none are selected, otherwise limit to the selected files
-        if self.case_ids != "":
-            # Coded text
-            sql = "select code_name.name, color, cases.name, "
-            sql += "code_text.pos0, code_text.pos1, seltext, code_text.owner, code_text.fid, "
-            sql += "ifnull(cases.memo,''), ifnull(code_text.memo,''), ifnull(code_name.memo,''), "
-            sql += "ifnull(source.memo,''), ctid, code_name.cid "
-            sql += "from code_text join code_name on code_name.cid = code_text.cid "
-            sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
-            sql += "code_text.fid = case_text.fid "
-            sql += "join source on source.id=code_text.fid "
-            sql += "where code_name.cid in (" + code_ids + ") "
-            sql += "and case_text.caseid in (" + self.case_ids + ") "
-            if self.file_ids != "":
-                sql += " and code_text.fid in (" + self.file_ids + ")"
-            sql += "and (code_text.pos0 >= case_text.pos0 and code_text.pos1 <= case_text.pos1)"
-            if coder != "":
-                sql += " and code_text.owner=? "
-                parameters.append(coder)
-            if search_text != "":
-                sql += " and seltext like ? "
-                parameters.append("%" + str(search_text) + "%")
-            sql += " order by code_name.name, cases.name"
-            if not parameters:
-                cur.execute(sql)
-            else:
-                cur.execute(sql, parameters)
-            results = cur.fetchall()
-            keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'text', 'coder', 'fid', \
-                   'cases_memo', 'coded_memo', 'codename_memo', 'source_memo', 'ctid', 'cid'
-            for row in results:
-                tmp = dict(zip(keys, row))
-                tmp['result_type'] = 'text'
-                tmp['file_or_case'] = file_or_case
-                tmp['pretext'] = ""
-                tmp['posttext'] = ""
-                self.results.append(tmp)
-            if self.ui.checkBox_text_context.isChecked():
-                self.get_prettext_and_posttext()
+        if self.case_ids_string != "":
+            self.search_by_cases(code_ids_string)
 
-            # Coded images
-            parameters = []
-            sql = "select code_name.name, color, cases.name, "
-            sql += "x1, y1, width, height, code_image.owner,source.mediapath, source.id, "
-            sql += "ifnull(code_image.memo,''), ifnull(cases.memo,''), ifnull(code_name.memo,''), "
-            sql += "ifnull(source.memo,''), imid, code_name.cid "
-            sql += "from code_image join code_name on code_name.cid = code_image.cid "
-            sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
-            sql += "code_image.id = case_text.fid "
-            sql += " join source on case_text.fid = source.id "
-            sql += "where code_name.cid in (" + code_ids + ") "
-            sql += "and case_text.caseid in (" + self.case_ids + ") "
-            if self.file_ids != "":
-                sql += " and source.id in (" + self.file_ids + ")"
-            if coder != "":
-                sql += " and code_image.owner=? "
-                parameters.append(coder)
-            if search_text != "":
-                sql += " and code_image.memo like ? "
-                parameters.append("%" + str(search_text) + "%")
-            sql += " order by code_name.name, cases.name"
-            if not parameters:
-                cur.execute(sql)
-            else:
-                cur.execute(sql, parameters)
-            imgresults = cur.fetchall()
-            keys = 'codename', 'color', 'file_or_casename', 'x1', 'y1', 'width', 'height', 'coder', 'mediapath', \
-                   'fid', 'coded_memo', 'case_memo', 'codename_memo', 'source_memo', 'imid', 'cid'
-            for row in imgresults:
-                tmp = dict(zip(keys, row))
-                tmp['result_type'] = 'image'
-                tmp['file_or_case'] = file_or_case
-                self.results.append(tmp)
-
-            # Coded audio and video
-            parameters = []
-            av_sql = "select distinct code_name.name, color, cases.name as case_name, "
-            av_sql += "code_av.pos0, code_av.pos1, code_av.owner,source.mediapath, source.id, "
-            av_sql += "ifnull(code_av.memo,'') as coded_memo, ifnull(cases.memo,'') as case_memo, "
-            av_sql += "ifnull(code_name.memo,''), ifnull(source.memo,''), avid, "
-            av_sql += "code_name.cid "
-            av_sql += "from code_av join code_name on code_name.cid = code_av.cid "
-            av_sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
-            av_sql += "code_av.id = case_text.fid "
-            av_sql += " join source on case_text.fid = source.id "
-            av_sql += "where code_name.cid in (" + code_ids + ") "
-            av_sql += "and case_text.caseid in (" + self.case_ids + ") "
-            if self.file_ids != "":
-                av_sql += " and source.id in (" + self.file_ids + ")"
-            if coder != "":
-                av_sql += " and code_av.owner=? "
-                parameters.append(coder)
-            if search_text != "":
-                av_sql += " and code_av.memo like ? "
-                parameters.append("%" + str(search_text) + "%")
-            sql += " order by code_name.name, cases.name"
-            if not parameters:
-                cur.execute(av_sql)
-            else:
-                cur.execute(av_sql, parameters)
-            avresults = cur.fetchall()
-            keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'coder', 'mediapath', \
-                   'fid', 'coded_memo', 'case_memo', 'codename_memo', 'source_memo', 'avid', 'cid'
-            for row in avresults:
-                tmp = dict(zip(keys, row))
-                tmp['result_type'] = 'av'
-                tmp['file_or_case'] = file_or_case
-                tmp_text = str(tmp['file_or_casename']) + " "
-                if len(tmp['coded_memo']) > 0:
-                    tmp_text += "\nMEMO: " + tmp['coded_memo']
-                tmp_text += " " + msecs_to_hours_mins_secs(tmp['pos0']) + " - " + msecs_to_hours_mins_secs(tmp['pos1'])
-                tmp['text'] = tmp_text
-                self.html_links.append({'imagename': None, 'image': None,
-                                        'avname': tmp['mediapath'], 'av0': str(int(tmp['pos0'] / 1000)),
-                                        'av1': str(int(tmp['pos1'] / 1000)), 'avtext': tmp_text})
-                self.results.append(tmp)
         QtCore.QCoreApplication.processEvents()
         prog_dialog.setValue(2)
         # Trim results for option: Only coded memos
@@ -1491,17 +1272,269 @@ class DialogReportCodes(QtWidgets.QDialog):
                 if r['coded_memo'] != "":
                     tmp.append(r)
             self.results = tmp
-
         # Organise results
         self.sort_search_results()
         self.fill_text_edit_with_search_results()
-        # Clean up for next search. Except attributes list
+        # Clean up for next search. Except attributes list, keep attributes selection active.
         self.attribute_file_ids = []
-        self.file_ids = ""
-        self.case_ids = ""
+        self.file_ids_string = ""
+        self.case_ids_string = ""
         self.attributes_msg = ""
         self.ui.pushButton_attributeselect.setToolTip(_("Attributes"))
         del prog_dialog
+
+    def search_by_files(self, code_ids):
+        """ Search by files and if attributes file ids are selected.
+        Called by search() if self.file_ids_string is not empty and self.case_ids_string is empty
+
+        :param: code_ids : String comma separated ids
+        """
+
+        print("Search by files")
+        coder = self.ui.comboBox_coders.currentText()
+        search_text = self.ui.lineEdit.text()
+        important = self.ui.checkBox_important.isChecked()
+        parameters = []
+        cur = self.app.conn.cursor()
+        # Coded text
+        sql = "select code_name.name, color, source.name, pos0, pos1, seltext, "
+        sql += "code_text.owner, fid, ifnull(code_text.memo,''), ifnull(code_name.memo,''), " \
+               "ifnull(source.memo,''), ctid, code_name.cid "
+        sql += " from code_text join code_name "
+        sql += "on code_name.cid = code_text.cid join source on fid = source.id "
+        sql += f"where code_name.cid in ({code_ids}) "
+        sql += f"and source.id in ({self.file_ids_string}) "
+        if coder != "":
+            sql += " and code_text.owner=? "
+            parameters.append(coder)
+        if search_text != "":
+            sql += " and seltext like ? "
+            parameters.append("%" + str(search_text) + "%")
+        if important:
+            sql += " and code_text.important=1 "
+        sql += " order by code_name.name, source.name, pos0"
+        if not parameters:
+            cur.execute(sql)
+        else:
+            cur.execute(sql, parameters)
+        result = cur.fetchall()
+        keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'text', 'coder', 'fid', 'coded_memo', \
+            'codename_memo', 'source_memo', 'ctid', 'cid'
+        for row in result:
+            tmp = dict(zip(keys, row))
+            tmp['result_type'] = 'text'
+            tmp['file_or_case'] = "File"
+            tmp['pretext'] = ""
+            tmp['posttext'] = ""
+            self.results.append(tmp)
+        if self.ui.checkBox_text_context.isChecked():
+            self.get_prettext_and_posttext()
+
+        # Coded images
+        parameters = []
+        sql = "select code_name.name, color, source.name, x1, y1, width, height,"
+        sql += "code_image.owner, source.mediapath, source.id, ifnull(code_image.memo,''), "
+        sql += "code_name.memo, ifnull(source.memo,''), imid, code_name.cid "
+        sql += " from code_image join code_name "
+        sql += "on code_name.cid = code_image.cid join source on code_image.id = source.id "
+        sql += f"where code_name.cid in ({code_ids}) "
+        sql += f"and source.id in ({self.file_ids_string}) "
+        if coder != "":
+            sql += " and code_image.owner=? "
+            parameters.append(coder)
+        if search_text != "":
+            sql += " and code_image.memo like ? "
+            parameters.append("%" + str(search_text) + "%")
+        if important:
+            sql += " and code_image.important=1 "
+        sql += " order by code_name.name, source.name, x1"
+        if not parameters:
+            cur.execute(sql)
+        else:
+            cur.execute(sql, parameters)
+        result = cur.fetchall()
+        keys = 'codename', 'color', 'file_or_casename', 'x1', 'y1', 'width', 'height', 'coder', 'mediapath', \
+            'fid', 'coded_memo', 'codename_memo', 'source_memo', 'imid', 'cid'
+        for row in result:
+            tmp = dict(zip(keys, row))
+            tmp['result_type'] = 'image'
+            tmp['file_or_case'] = "File"
+            self.results.append(tmp)
+
+        # Coded audio and video, also looks for search_text in coded segment memo
+        parameters = []
+        sql = "select code_name.name, color, source.name, pos0, pos1, ifnull(code_av.memo,''), "
+        sql += " code_av.owner, source.mediapath, source.id, ifnull(code_name.memo,''), ifnull(source.memo,''), " \
+               "avid, code_name.cid"
+        sql += " from code_av join code_name "
+        sql += "on code_name.cid = code_av.cid join source on code_av.id = source.id "
+        sql += f"where code_name.cid in ({code_ids}) "
+        sql += f"and source.id in ({self.file_ids_string}) "
+        if coder != "":
+            sql += " and code_av.owner=? "
+            parameters.append(coder)
+        if search_text != "":
+            sql += " and code_av.memo like ? "
+            parameters.append("%" + str(search_text) + "%")
+        if important:
+            sql += " and code_av.important=1 "
+        sql += " order by code_name.name, source.name, pos0"
+        if not parameters:
+            cur.execute(sql)
+        else:
+            cur.execute(sql, parameters)
+        result = cur.fetchall()
+        keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'coded_memo', 'coder', 'mediapath', 'fid', \
+            'codename_memo', 'source_memo', 'avid', 'cid'
+        for row in result:
+            tmp = dict(zip(keys, row))
+            tmp['result_type'] = 'av'
+            tmp['file_or_case'] = "File"
+            text_ = str(tmp['file_or_casename']) + " "
+            if len(tmp['coded_memo']) > 0:
+                text_ += "\nMEMO: " + tmp['coded_memo']
+            text_ += " " + msecs_to_hours_mins_secs(tmp['pos0']) + " - " + msecs_to_hours_mins_secs(tmp['pos1'])
+            tmp['text'] = text_
+            self.html_links.append({'imagename': None, 'image': None,
+                                    'avname': tmp['mediapath'], 'av0': str(int(tmp['pos0'] / 1000)),
+                                    'av1': str(int(tmp['pos1'] / 1000)), 'avtext': text_})
+            self.results.append(tmp)
+
+    def search_by_cases(self, code_ids):
+        """ Search by cases and if attributes file ids are selected.
+        Called by search() if self.case_ids_string is not empty.
+        Also uses self.file_ids_string to limit results
+
+        :param: code_ids : String comma separated ids
+        """
+
+        print("search by cases")
+        coder = self.ui.comboBox_coders.currentText()
+        search_text = self.ui.lineEdit.text()
+        important = self.ui.checkBox_important.isChecked()
+        cur = self.app.conn.cursor()
+        parameters = []
+
+        # Coded text
+        sql = "select code_name.name, color, cases.name, "
+        sql += "code_text.pos0, code_text.pos1, seltext, code_text.owner, code_text.fid, "
+        sql += "ifnull(cases.memo,''), ifnull(code_text.memo,''), ifnull(code_name.memo,''), "
+        sql += "ifnull(source.memo,''), ctid, code_name.cid "
+        sql += "from code_text join code_name on code_name.cid = code_text.cid "
+        sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
+        sql += "code_text.fid = case_text.fid "
+        sql += "join source on source.id=code_text.fid "
+        sql += f"where code_name.cid in ({code_ids}) "
+        sql += f"and case_text.caseid in ({self.case_ids_string}) "
+        if self.file_ids_string != "":
+            sql += f" and code_text.fid in ({self.file_ids_string})"
+        sql += "and (code_text.pos0 >= case_text.pos0 and code_text.pos1 <= case_text.pos1)"
+        if coder != "":
+            sql += " and code_text.owner=? "
+            parameters.append(coder)
+        if search_text != "":
+            sql += " and seltext like ? "
+            parameters.append("%" + str(search_text) + "%")
+        if important:
+            sql += " and code_text.important=1 "
+        sql += " order by code_name.name, cases.name"
+        if not parameters:
+            cur.execute(sql)
+        else:
+            cur.execute(sql, parameters)
+        results = cur.fetchall()
+        keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'text', 'coder', 'fid', \
+            'cases_memo', 'coded_memo', 'codename_memo', 'source_memo', 'ctid', 'cid'
+        for row in results:
+            tmp = dict(zip(keys, row))
+            tmp['result_type'] = 'text'
+            tmp['file_or_case'] = "Case"
+            tmp['pretext'] = ""
+            tmp['posttext'] = ""
+            self.results.append(tmp)
+        if self.ui.checkBox_text_context.isChecked():
+            self.get_prettext_and_posttext()
+
+        # Coded images
+        parameters = []
+        sql = "select code_name.name, color, cases.name, "
+        sql += "x1, y1, width, height, code_image.owner,source.mediapath, source.id, "
+        sql += "ifnull(code_image.memo,''), ifnull(cases.memo,''), ifnull(code_name.memo,''), "
+        sql += "ifnull(source.memo,''), imid, code_name.cid "
+        sql += "from code_image join code_name on code_name.cid = code_image.cid "
+        sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
+        sql += "code_image.id = case_text.fid "
+        sql += " join source on case_text.fid = source.id "
+        sql += f"where code_name.cid in ({code_ids}) "
+        sql += f"and case_text.caseid in ({self.case_ids_string}) "
+        if self.file_ids_string != "":
+            sql += f" and source.id in ({self.file_ids_string})"
+        if coder != "":
+            sql += " and code_image.owner=? "
+            parameters.append(coder)
+        if search_text != "":
+            sql += " and code_image.memo like ? "
+            parameters.append("%" + str(search_text) + "%")
+        if important:
+            sql += " and code_image.important=1 "
+        sql += " order by code_name.name, cases.name"
+        if not parameters:
+            cur.execute(sql)
+        else:
+            cur.execute(sql, parameters)
+        imgresults = cur.fetchall()
+        keys = 'codename', 'color', 'file_or_casename', 'x1', 'y1', 'width', 'height', 'coder', 'mediapath', \
+            'fid', 'coded_memo', 'case_memo', 'codename_memo', 'source_memo', 'imid', 'cid'
+        for row in imgresults:
+            tmp = dict(zip(keys, row))
+            tmp['result_type'] = 'image'
+            tmp['file_or_case'] = "Case"
+            self.results.append(tmp)
+
+        # Coded audio and video
+        parameters = []
+        av_sql = "select distinct code_name.name, color, cases.name as case_name, "
+        av_sql += "code_av.pos0, code_av.pos1, code_av.owner,source.mediapath, source.id, "
+        av_sql += "ifnull(code_av.memo,'') as coded_memo, ifnull(cases.memo,'') as case_memo, "
+        av_sql += "ifnull(code_name.memo,''), ifnull(source.memo,''), avid, "
+        av_sql += "code_name.cid "
+        av_sql += "from code_av join code_name on code_name.cid = code_av.cid "
+        av_sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
+        av_sql += "code_av.id = case_text.fid "
+        av_sql += " join source on case_text.fid = source.id "
+        av_sql += f"where code_name.cid in ({code_ids}) "
+        av_sql += f"and case_text.caseid in ({self.case_ids_string}) "
+        if self.file_ids_string != "":
+            av_sql += f" and source.id in ({self.file_ids_string})"
+        if coder != "":
+            av_sql += " and code_av.owner=? "
+            parameters.append(coder)
+        if search_text != "":
+            av_sql += " and code_av.memo like ? "
+            parameters.append("%" + str(search_text) + "%")
+        if important:
+            sql += " and code_av.important=1 "
+        sql += " order by code_name.name, cases.name"
+        if not parameters:
+            cur.execute(av_sql)
+        else:
+            cur.execute(av_sql, parameters)
+        avresults = cur.fetchall()
+        keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'coder', 'mediapath', \
+            'fid', 'coded_memo', 'case_memo', 'codename_memo', 'source_memo', 'avid', 'cid'
+        for row in avresults:
+            tmp = dict(zip(keys, row))
+            tmp['result_type'] = 'av'
+            tmp['file_or_case'] = "Case"
+            tmp_text = f"{tmp['file_or_casename']} "
+            if len(tmp['coded_memo']) > 0:
+                tmp_text += f"\nMEMO: {tmp['coded_memo']}"
+            tmp_text += f" {msecs_to_hours_mins_secs(tmp['pos0'])} - {msecs_to_hours_mins_secs(tmp['pos1'])}"
+            tmp['text'] = tmp_text
+            self.html_links.append({'imagename': None, 'image': None,
+                                    'avname': tmp['mediapath'], 'av0': str(int(tmp['pos0'] / 1000)),
+                                    'av1': str(int(tmp['pos1'] / 1000)), 'avtext': tmp_text})
+            self.results.append(tmp)
 
     def sort_search_results(self):
         """ Sort results by alphabet or by code count, ascending or descending. """
@@ -1517,8 +1550,6 @@ class DialogReportCodes(QtWidgets.QDialog):
         # Order code names by frequency
         # Get unique code names
         tmp_names = [r['codename'] for r in self.results]
-        '''for r in self.results:
-            tmp_names.append(r['codename'])'''
         codenames = list(set(tmp_names))
         # Create list dictionary of code name and code count
         name_and_count = []
@@ -1622,8 +1653,8 @@ class DialogReportCodes(QtWidgets.QDialog):
                 final_stats.append(st)
         msg = _("Text code statistics:")
         for st in final_stats:
-            msg += "\n" + st['codename'] + " | " + st['filename'] + " | " + _("Count: ") + str(st['codecount']) + " | "
-            msg += _("Percent of file: ") + str(st['percent']) + "%"
+            msg += f"\n{st['codename']} | {st['filename']} | {_('Count:')} {st['codecount']} | "
+            msg += f"{_('Percent of file:')} {st['percent']}%"
         msg += "\n========"
         if len(final_stats) == 0:
             msg = ""
@@ -1684,8 +1715,8 @@ class DialogReportCodes(QtWidgets.QDialog):
                 final_stats.append(st)
         msg = _("Image code statistics:")
         for st in final_stats:
-            msg += "\n" + st['codename'] + " | " + st['filename'] + " | " + _("Count: ") + str(st['codecount']) + " | "
-            msg += _("Percent of file: ") + str(st['percent']) + "%"
+            msg += f"\n{st['codename']} | {st['filename']} | {_('Count:')} {st['codecount']} | "
+            msg += f"{_('Percent of file:')} {st['percent']}%"
         msg += "\n========"
         if len(final_stats) == 0:
             msg = ""
@@ -1759,9 +1790,9 @@ class DialogReportCodes(QtWidgets.QDialog):
                 final_stats.append(st)
         msg = _("A/V code statistics:")
         for st in final_stats:
-            msg += "\n" + st['codename'] + " | " + st['filename'] + " | " + _("Count: ") + str(st['codecount']) + " | "
+            msg += f"\n{st['codename']} | {st['filename']} | {_('Count:')} {st['codecount']} | "
             if not erroneous_msecs:
-                msg += _("Percent of file: ") + str(st['percent']) + "%"
+                msg += f"{_('Percent of file:')} {st['percent']}%"
             else:
                 msg += _("Percent of file: Unknown. Either VLC not installer or file not found.")
         msg += "\n========"
@@ -1801,7 +1832,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                     count += s['codecount']
             msg += "\n" + c + " : " + str(count)
             total_count += count
-        msg = _("Code count totals") + ": " + str(total_count) + "\n============" + msg
+        msg = f"{_('Code count totals')}: {total_count}\n============{msg}"
         msg += "\n============"
         self.ui.textEdit.append(msg)
         if text_msg != "":
@@ -1907,11 +1938,11 @@ class DialogReportCodes(QtWidgets.QDialog):
                 if memo_choice_index != 5:  # Only coded memos:
                     self.ui.textEdit.insertPlainText("\n")
                 if row['coded_memo'] != "" and memo_choice_index in (1, 2):  # Also all memos, Also coded memos
-                    self.ui.textEdit.insertPlainText(_("MEMO: ") + row['coded_memo'] + "\n")
+                    self.ui.textEdit.insertPlainText(f"{_('MEMO:')} {row['coded_memo']}\n")
             if row['result_type'] == 'image' and memo_choice_index not in (4, 5):  # Only memos, Only coded memos
                 self.put_image_into_textedit(row, i, self.ui.textEdit)
             if row['result_type'] == 'av' and memo_choice_index not in (4, 5):  # Only memos, Only coded memos
-                self.ui.textEdit.insertPlainText("\n" + row['text'] + "\n")
+                self.ui.textEdit.insertPlainText(f"\n{row['text']}\n")
             self.text_links.append(row)
         self.eventFilterTT.set_positions(self.text_links)
 
@@ -1924,16 +1955,16 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.ui.splitter.setSizes([200, 400, 0])
             return
         # Categories by case, Top categories by case, Codes by case
-        if self.case_ids == "" and matrix_option_index in (1, 3, 5):
+        if self.case_ids_string == "" and matrix_option_index in (1, 3, 5):
             Message(self.app, _("No case matrix"), _("Cases not selected")).exec()
             self.ui.splitter.setSizes([200, 400, 0])
             return
-        if self.case_ids != "" and matrix_option_index == 1:  # Top categories by case
-            self.matrix_by_top_categories(self.results, self.case_ids, "case")
-        if self.case_ids == "" and matrix_option_index == 2:  # Top categories by file
-            self.matrix_by_top_categories(self.results, self.file_ids)
+        if self.case_ids_string != "" and matrix_option_index == 1:  # Top categories by case
+            self.matrix_by_top_categories(self.results, self.case_ids_string, "case")
+        if self.case_ids_string == "" and matrix_option_index == 2:  # Top categories by file
+            self.matrix_by_top_categories(self.results, self.file_ids_string)
         # Top categories BY FILE for SELECTED CASES
-        if self.case_ids != "" and matrix_option_index == 2:  # Top categories by file
+        if self.case_ids_string != "" and matrix_option_index == 2:  # Top categories by file
             # Need to create file ids comma separated string
             files_id_name = self.app.get_filenames()
             file_ids = []
@@ -1946,12 +1977,12 @@ class DialogReportCodes(QtWidgets.QDialog):
                         r['file_or_casename'] = f['name']
             file_ids = str(list(set(file_ids)))[1:-1]  # Remove '[' ']'
             self.matrix_by_top_categories(self.results, file_ids)
-        if self.case_ids != "" and matrix_option_index == 3:  # Categories by case
-            self.matrix_by_categories(self.results, self.case_ids, "case")
-        if self.case_ids == "" and matrix_option_index == 4:  # Categories by file
-            self.matrix_by_categories(self.results, self.file_ids)
+        if self.case_ids_string != "" and matrix_option_index == 3:  # Categories by case
+            self.matrix_by_categories(self.results, self.case_ids_string, "case")
+        if self.case_ids_string == "" and matrix_option_index == 4:  # Categories by file
+            self.matrix_by_categories(self.results, self.file_ids_string)
         # Categories BY FILE for SELECTED CASES
-        if self.case_ids != "" and matrix_option_index == 4:  # Categories by file
+        if self.case_ids_string != "" and matrix_option_index == 4:  # Categories by file
             # Need to create file ids comma separated string
             files_id_name = self.app.get_filenames()
             file_ids = []
@@ -1965,12 +1996,12 @@ class DialogReportCodes(QtWidgets.QDialog):
             file_ids = str(list(set(file_ids)))[1:-1]  # Remove '[' ']'
             self.matrix_by_categories(self.results, file_ids)
 
-        if self.case_ids != "" and matrix_option_index == 5:  # Codes by case
-            self.matrix_by_codes(self.results, self.case_ids, "case")
-        if self.case_ids == "" and matrix_option_index == 6:  # Codes by file
-            self.matrix_by_codes(self.results, self.file_ids)
+        if self.case_ids_string != "" and matrix_option_index == 5:  # Codes by case
+            self.matrix_by_codes(self.results, self.case_ids_string, "case")
+        if self.case_ids_string == "" and matrix_option_index == 6:  # Codes by file
+            self.matrix_by_codes(self.results, self.file_ids_string)
         # Codes BY FILE for SELECTED CASES
-        if self.case_ids != "" and matrix_option_index == 6:  # Codes by file
+        if self.case_ids_string != "" and matrix_option_index == 6:  # Codes by file
             # Need to create file ids comma separated string
             files_id_name = self.app.get_filenames()
             file_ids = []
@@ -2195,7 +2226,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 contents.itemAt(i).widget().setParent(None)
 
     def change_code_to_another_code(self, existing_code):
-        """ Change the selected code to anther from a list. """
+        """ Change the selected code to another from a list. """
 
         # Get replacement code
         codes_list = deepcopy(self.code_names)
@@ -2238,7 +2269,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         param:
             code : Dictionary of codenmae, color, file_or_casename, pos0, pos1, text, coder, fid, ctid, cid, result_type"""
 
-        coded = _("Delete coded section. ") + code['codename'] + ". " + code['coder']
+        coded = f"{_('Delete coded section.')} {code['codename']}. {code['coder']}"
         ui = DialogConfirmDelete(self.app, coded, _("Delete coded section"))
         ok = ui.exec()
         if not ok:
@@ -2352,17 +2383,17 @@ class DialogReportCodes(QtWidgets.QDialog):
         head += item['codename'] + ", "
         if memo_choice in (_("Also all memos"), _("Also code memos"), _("Only memos")) and item['codename_memo'] != "":
             head += _("CODE MEMO: All memo") + item['codename_memo'] + "<br />"
-        head += _("File: ") + filename + ", "
+        head += f"{_('File:')} {filename}, "
         if memo_choice in (_("Also alll memos"), _("Only memos")) and item['source_memo'] != "":
-            head += _(" FILE MEMO: ") + item['source_memo']
+            head += f" {_('FILE MEMO:')} {item['source_memo']}"
         if item['file_or_case'] == 'Case:':
-            head += " " + item['file_or_case'] + ": " + item['file_or_casename'] + ", "
+            head += f" {item['file_or_case']}: {item['file_or_casename']}, "
             if memo_choice in (_("Also all memos"), _("Only memos")):
                 cur = self.app.conn.cursor()
                 cur.execute("select ifnull(memo,'') from cases where name=?", [item['file_or_casename']])
                 res = cur.fetchone()
                 if res is not None and res != "":
-                    head += ", " + _("CASE MEMO: ") + res[0]
+                    head += f", {_('CASE MEMO:')} {res[0]}"
         head += item['coder']
         cursor = text_edit.textCursor()
         fmt = QtGui.QTextCharFormat()
@@ -2397,22 +2428,16 @@ class DialogReportCodes(QtWidgets.QDialog):
             r['top'] = r['codename']
         # Get selected codes (Matrix columns)
         items = self.ui.treeWidget.selectedItems()
-        horizontal_labels = []  # column (code) labels
         horizontal_labels = [item.text(0) for item in items if item.text(1)[:3] == "cid"]
-        '''for item in items:
-            if item.text(1)[:3] == "cid":
-                horizontal_labels.append(item.text(0))'''
 
         # Get file or cases (rows)
         cur = self.app.conn.cursor()
-        sql = "select distinct id, name from source where id in (" + ids + ") order by name"
+        sql = f"select distinct id, name from source where id in ({ids}) order by name"
         if type_ == "case":
-            sql = "select caseid, name from cases where caseid in (" + ids + ")"
+            sql = f"select caseid, name from cases where caseid in ({ids})"
         cur.execute(sql)
         id_and_name = cur.fetchall()
         vertical_labels = [c[1] for c in id_and_name]
-        '''for c in id_and_name:
-            vertical_labels.append(c[1])'''
 
         transpose = self.ui.checkBox_matrix_transpose.isChecked()
         if transpose:
@@ -2468,9 +2493,9 @@ class DialogReportCodes(QtWidgets.QDialog):
         # Only show categories in the results
         results = res_categories
         cur = self.app.conn.cursor()
-        sql = "select distinct id, name from source where id in (" + ids + ") order by name"
+        sql = f"select distinct id, name from source where id in ({ids}) order by name"
         if type_ == "case":
-            sql = "select caseid, name from cases where caseid in (" + ids + ")"
+            sql = f"select caseid, name from cases where caseid in ({ids})"
         cur.execute(sql)
         id_and_name = cur.fetchall()
         vertical_labels = []
@@ -2538,9 +2563,9 @@ class DialogReportCodes(QtWidgets.QDialog):
         results = res_categories
 
         cur = self.app.conn.cursor()
-        sql = "select distinct id, name from source where id in (" + ids + ") order by name"
+        sql = f"select distinct id, name from source where id in ({ids}) order by name"
         if type_ == "case":
-            sql = "select caseid, name from cases where caseid in (" + ids + ")"
+            sql = f"select caseid, name from cases where caseid in ({ids})"
         cur.execute(sql)
         id_and_name = cur.fetchall()
         vertical_labels = []
@@ -2603,14 +2628,14 @@ class DialogReportCodes(QtWidgets.QDialog):
                             if r['result_type'] == 'text' and memo_choice not in (_("Only memos"), _("Only coded memos")):
                                 self.te[row][col].append(r['text'])
                                 if memo_choice in (_("Also all memos"), _("Also coded memos")) and r['coded_memo'] != "":
-                                    self.te[row][col].append(_("MEMO: ") + r['coded_memo'])
+                                    self.te[row][col].append(f"{_('MEMO:')} {r['coded_memo']}")
                                 self.te[row][col].insertPlainText("\n")
                             if r['result_type'] == 'image' and memo_choice in (_("Only memos"), _("Only coded memos")):
                                 self.te[row][col].append(r['coded_memo'])
                             if r['result_type'] == 'image' and memo_choice not in (_("Only memos"), _("Only coded memos")):
                                 self.put_image_into_textedit(r, counter, self.te[row][col])
                             if r['result_type'] == 'av' and memo_choice not in (_("Only memos"), _("Only coded memos")):
-                                self.te[row][col].insertPlainText(r['text'] + "\n")
+                                self.te[row][col].insertPlainText(f"{r['text']}\n")
                             self.matrix_links.append(r)
                     self.ui.tableWidget.setCellWidget(row, col, self.te[row][col])
         else:  # Not transposed
@@ -2630,8 +2655,8 @@ class DialogReportCodes(QtWidgets.QDialog):
                                         self.te[row][col].append(_("MEMO: ") + r['coded_memo'])
                                 except TypeError as err:
                                     msg = str(err)
-                                    msg += "\nMatrix Coded Memo Error:\nchoice: " + str(memo_choice) + "\n"
-                                    msg += "Result dictionary:\n" + str(r) + "\n"
+                                    msg += f"\nMatrix Coded Memo Error:\nchoice: {memo_choice}\n"
+                                    msg += f"Result dictionary:\n{r}\n"
                                     logger.error(msg)
                                 self.te[row][col].insertPlainText("\n")
                             if r['result_type'] == 'image' and memo_choice in (_("Only memos"), _("Only coded memos")):

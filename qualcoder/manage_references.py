@@ -27,9 +27,11 @@ https://github.com/ccbogel/QualCoder
 
 import os
 from rispy import TAG_KEY_MAPPING
-import sys
+# import sys
 import logging
-import traceback
+from operator import itemgetter
+import re
+# import traceback
 
 from PyQt6 import QtWidgets, QtCore, QtGui
 
@@ -37,7 +39,18 @@ from .GUI.base64_helper import *
 from .GUI.ui_reference_editor import Ui_DialogReferenceEditor
 from .GUI.ui_manage_references import Ui_Dialog_manage_references
 from .confirm_delete import DialogConfirmDelete
+from .information import DialogInformation
+from .helpers import Message
 from .ris import Ris, RisImport
+from .view_av import DialogViewAV
+from .view_image import DialogViewImage
+
+# If VLC not installed, it will not crash
+vlc = None
+try:
+    import vlc
+except Exception as e:
+    print(e)
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -69,6 +82,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
         self.app = app_
         self.parent_textEdit = parent_text_edit
         self.files = []
+        self.av_dialog_open = None
         self.refs = []
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_manage_references()
@@ -100,7 +114,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(link_icon), "png")
         self.ui.pushButton_link.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_link.pressed.connect(self.link_files_to_reference)
+        self.ui.pushButton_link.pressed.connect(self.link_reference_to_files)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(undo_icon), "png")
         self.ui.pushButton_unlink_files.setIcon(QtGui.QIcon(pm))
@@ -118,6 +132,11 @@ class DialogReferenceManager(QtWidgets.QDialog):
         self.ui.pushButton_delete_unused_refs.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_delete_unused_refs.setEnabled(False)
         self.ui.pushButton_delete_unused_refs.hide()
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(magic_wand_icon), "png")
+        self.ui.pushButton_auto_link.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_auto_link.pressed.connect(self.auto_link_files_to_references)
+
         self.get_data()
         self.ui.tableWidget_refs.setTabKeyNavigation(False)
         self.ui.tableWidget_refs.installEventFilter(self)
@@ -133,19 +152,37 @@ class DialogReferenceManager(QtWidgets.QDialog):
         """ Get data for files and references. """
 
         cur = self.app.conn.cursor()
-        cur.execute("select id, name, risid, memo, date from source order by lower(name)")
+        cur.execute("select id, name, risid, memo, date, mediapath, av_text_id, fulltext from source order by lower(name)")
         result = cur.fetchall()
         self.files = []
-        keys = 'id', 'name', 'risid', 'memo', 'date'
+        keys = 'id', 'name', 'risid', 'memo', 'date', 'mediapath', 'av_text_id', 'fulltext'
         for row in result:
             self.files.append(dict(zip(keys, row)))
-        self.fill_table_files()
+        # This is used for auto-linking files to references
+        for file_ in self.files:
+            temp_name = file_['name'].lower()
+            if len(temp_name) > 4 and temp_name[-4:].lower() in (".txt", ".png", ".jpg", ".pdf", ".mp3", ".mp4",
+                                                                 ".odt", ".htm", ".wav", ".m4a", ".mov", ".ogg",
+                                                                 ".wmv"):
+                temp_name = temp_name[:-4]
+            elif len(temp_name) > 5 and temp_name[-5:].lower() in (".html", ".docx", ".jpeg"):
+                temp_name = temp_name[:-5]
+            split_name = re.split(';|,| |:|_|-', temp_name)
+            split_name = list(filter(''.__ne__, split_name))
+            file_['split_name'] = split_name
         r = Ris(self.app)
         r.get_references()
         self.refs = r.refs
         sorted_list = sorted(self.refs, key=lambda x: x['details'])
         self.refs = sorted_list
+        # This is used for auto-linking files to references
+        for ref in self.refs:
+            temp_title = ref['TI'].lower()
+            split_title = re.split(';|,| |:|_|-', temp_title)
+            split_title = list(filter(''.__ne__, split_title))
+            ref['split_title'] = split_title
         self.fill_table_refs()
+        self.fill_table_files()  # Do after refs filled, as uses ref title in files tooltips, if linked
 
     def fill_table_files(self):
         """ Fill widget with file details. """
@@ -156,27 +193,32 @@ class DialogReferenceManager(QtWidgets.QDialog):
         header_labels = ["id", "File name", "Ref Id"]
         self.ui.tableWidget_files.setColumnCount(len(header_labels))
         self.ui.tableWidget_files.setHorizontalHeaderLabels(header_labels)
-        for row, f in enumerate(self.files):
+        for row, file_ in enumerate(self.files):
             self.ui.tableWidget_files.insertRow(row)
-            item = QtWidgets.QTableWidgetItem(str(f['id']))
+            item = QtWidgets.QTableWidgetItem(str(file_['id']))
             item.setFlags(QtCore.Qt.ItemFlag.ItemIsEnabled)
             self.ui.tableWidget_files.setItem(row, 0, item)
-            item = QtWidgets.QTableWidgetItem(f['name'])
-            memo = f['memo']
+            item = QtWidgets.QTableWidgetItem(file_['name'])
+            memo = file_['memo']
             if not memo:
                 memo = ""
             item.setToolTip(memo)
             item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
             self.ui.tableWidget_files.setItem(row, 1, item)
             risid = ""
-            if f['risid'] is not None:
-                risid = str(f['risid'])
+            tooltip = ""
+            if file_['risid'] is not None:
+                risid = file_['risid']
+                linked_ref = next((ref_item for ref_item in self.refs if ref_item['risid'] == risid), None)
+                if linked_ref:
+                    tooltip = f"{linked_ref['TI']}\n{linked_ref['PY']} {linked_ref['TY']}"
                 if self.ui.checkBox_hide_files.isChecked():
                     self.ui.tableWidget_files.setRowHidden(row, True)
                 else:
                     self.ui.tableWidget_files.setRowHidden(row, False)
-            item = QtWidgets.QTableWidgetItem(risid)
+            item = QtWidgets.QTableWidgetItem(str(risid))
             item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
+            item.setToolTip(tooltip)
             self.ui.tableWidget_files.setItem(row, 2, item)
         self.ui.tableWidget_files.hideColumn(0)
         if self.app.settings['showids']:
@@ -187,7 +229,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
         self.ui.tableWidget_files.resizeRowsToContents()
 
     def table_files_header_menu(self, position):
-        """ Sort ascending or descending. """
+        """ Sort ascending or descending. Open file to view. """
 
         if not self.files:
             return
@@ -212,9 +254,12 @@ class DialogReferenceManager(QtWidgets.QDialog):
         """ Context menu for showing specific rows.
         """
 
-        #row = self.ui.tableWidget_files.currentRow()
+        row = self.ui.tableWidget_files.currentRow()
         menu = QtWidgets.QMenu()
         action_show_value_like = menu.addAction(_("Show value like"))
+        action_file_view = menu.addAction(_("View file"))
+        action_files_asc = menu.addAction(_("Ascending"))
+        action_files_desc = menu.addAction(_("Descending"))
         action_show_all_rows = None
         if self.table_files_rows_hidden:
             action_show_all_rows = menu.addAction(_("Show all rows"))
@@ -234,6 +279,129 @@ class DialogReferenceManager(QtWidgets.QDialog):
                     self.ui.tableWidget_files.setRowHidden(r, True)
             self.table_files_rows_hidden = True
             return
+        if action == action_files_desc:
+            sorted_list = sorted(self.files, key=lambda x: x['name'], reverse=True)
+            self.files = sorted_list
+            self.fill_table_files()
+            return
+        if action == action_files_asc:
+            sorted_list = sorted(self.files, key=lambda x: x['name'])
+            self.files = sorted_list
+            self.fill_table_files()
+            return
+        if action == action_file_view:
+            self.view()
+
+    def view(self):
+        """ View a text, image, audio or video media. """
+
+        if self.av_dialog_open is not None:
+            self.av_dialog_open.mediaplayer.stop()
+            self.av_dialog_open = None
+        row = self.ui.tableWidget_files.currentRow()
+        #self.ui.tableWidget_files.selectRow(x)
+        if self.files[row]['mediapath'] is not None and 'docs:' != self.files[row]['mediapath'][0:5]:
+            if len(self.files[row]['mediapath']) > 6 and self.files[row]['mediapath'][:7] in ("/images", "images:"):
+                self.view_image(row)
+                return
+            if len(self.files[row]['mediapath']) > 5 and self.files[row]['mediapath'][:6] in ("/video", "video:"):
+                self.view_av(row)
+                return
+            if len(self.files[row]['mediapath']) > 5 and self.files[row]['mediapath'][:6] in ("/audio", "audio:"):
+                self.view_av(row)
+                return
+        ui = DialogInformation(self.app, self.files[row]['name'], self.files[row]['fulltext'])
+        ui.ui.textEdit.setReadOnly(True)
+        ui.exec()
+
+    def view_av(self, row):
+        """ View an audio or video file. Edit the memo. Edit the transcript file.
+        Added try block in case VLC bindings do not work.
+        Uses a non-modal dialog.
+
+        param:
+            x  :  row number Integer
+        """
+
+        if not vlc:
+            msg = _("VLC not installed cannot play audio or video.")
+            Message(self.app, _('View AV error'), msg, "warning").exec()
+            return
+        # Check media exists
+        abs_path = ""
+        if self.files[row]['mediapath'][0:6] in ('/audio', '/video'):
+            abs_path = self.app.project_path + self.files[row]['mediapath']
+        if self.files[row]['mediapath'][0:6] in ('audio:', 'video:'):
+            abs_path = self.files[row]['mediapath'][6:]
+        if not os.path.exists(abs_path):
+            self.parent_text_edit.append(_("Bad link or non-existent file ") + abs_path)
+            return
+        try:
+            ui = DialogViewAV(self.app, self.files[row])
+            ui.ui.textEdit.setReadOnly(True)
+            # ui.exec()  # this dialog does not display well on Windows 10 so trying .show()
+            # The vlc window becomes unmovable and not resizable
+            self.av_dialog_open = ui
+            ui.show()
+        except Exception as err:
+            logger.warning(str(err))
+            Message(self.app, _('view AV error'), str(err), "warning").exec()
+            self.av_dialog_open = None
+            return
+
+    def view_image(self, row):
+        """ View an image file and edit the image memo.
+
+        param:
+            x  :  row number Integer
+        """
+
+        # Check image exists
+        abs_path = ""
+        if self.files[row]['mediapath'][:7] == "images:":
+            abs_path = self.files[row]['mediapath'][7:]
+        else:
+            abs_path = self.app.project_path + self.files[row]['mediapath']
+        if not os.path.exists(abs_path):
+            self.parent_text_edit.append(_("Bad link or non-existent file ") + abs_path)
+            return
+        ui = DialogViewImage(self.app, self.files[row])
+        ui.ui.textEdit.setReadOnly(True)
+        ui.exec()
+
+    def auto_link_files_to_references(self):
+        """ Auto link references to file names.
+         Uses words (as lowercase) from reference title and words (as lowercase) from file name.
+         Looks at each unlinked file. Then matches the words in the title to the words in the file name.
+         Highest match links the risid to the file. Minimum numer of words match threshold of 0.7
+         """
+
+        files_linked_count = 0
+        files_unlinked = []
+        for file_ in self.files:
+            if not file_['risid']:
+                files_unlinked.append(file_)
+        for file_ in files_unlinked:
+            # print(file_['split_name'])
+            match_stats = []
+            for ref in self.refs:
+                ref_words_set = set(ref['split_title'])
+                proportion_matching = len(ref_words_set.intersection(file_['split_name'])) / len(ref_words_set)
+                if proportion_matching > 0.7:
+                    match_stats.append([ref['risid'], proportion_matching, ref['split_title']])
+                if int(proportion_matching) == 1:
+                    break
+            match_stats = sorted(match_stats, key=itemgetter(1), reverse=True)
+            if not match_stats:
+                continue
+            best_match = match_stats[0]
+            # print(best_match)
+            ris_id = best_match[0]
+            fid = file_['id']
+            self.link_reference_to_files(ris_id, fid)
+            files_linked_count += 1
+        msg = _("Matches: ") + f"          {files_linked_count} / {len(files_unlinked)}          "
+        Message(self.app, _("Files linked to references"), msg).exec()
 
     def fill_table_refs(self):
         """ Fill widget with ref details. """
@@ -451,7 +619,8 @@ class DialogReferenceManager(QtWidgets.QDialog):
 
     def table_refs_menu(self, position):
         """ Context menu for displaying table rows in differing order,
-            Showing specific rows.
+        copying a reference style to clipboard, edit reference.
+        Show specific rows.
         """
 
         row = self.ui.tableWidget_refs.currentRow()
@@ -469,6 +638,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
             action_show_all_rows = menu.addAction(_("Show all rows"))
         action_copy_to_clipboard = menu.addAction(_("Copy to clipboard"))
         action_copy_apa_to_clipboard = menu.addAction(_("Copy to clipboard.  APA style"))
+        action_edit_reference = menu.addAction(_("Edit reference"))
         action = menu.exec(self.ui.tableWidget_refs.mapToGlobal(position))
         if action == action_show_all_rows:
             for r in range(0, self.ui.tableWidget_refs.rowCount()):
@@ -495,13 +665,16 @@ class DialogReferenceManager(QtWidgets.QDialog):
             reference_text = self.ui.tableWidget_refs.item(row, 1).text()
             cb = QtWidgets.QApplication.clipboard()
             cb.setText(reference_text.replace("\n", " "))
+            return
         if action == action_copy_apa_to_clipboard:
-            #reference_text = self.ui.tableWidget_refs.item(row, 1).text()
             ref_id = self.ui.tableWidget_refs.item(row, REF_ID).text()
             for ref in self.refs:
                 if int(ref_id) == ref['risid']:
                     cb = QtWidgets.QApplication.clipboard()
                     cb.setText(ref['apa'].replace("\n", " "))
+                    return
+        if action == action_edit_reference:
+            self.edit_reference()
 
     def import_references(self):
         """ Import RIS formatted references from .ris or .txt files """
@@ -543,45 +716,85 @@ class DialogReferenceManager(QtWidgets.QDialog):
             key = event.key()
             #mod = event.modifiers()
             if key == QtCore.Qt.Key.Key_L and (self.ui.tableWidget_refs.hasFocus() or self.ui.tableWidget_files.hasFocus()):
-                self.link_files_to_reference()
+                self.link_reference_to_files()
                 return True
             if key == QtCore.Qt.Key.Key_U and (self.ui.tableWidget_refs.hasFocus() or self.ui.tableWidget_files.hasFocus()):
                 self.unlink_files()
                 return True
         return False
 
-    def unlink_files(self):
-        """ Remove linked reference from selected files. """
+    def unlink_files(self, fid=None):
+        """ Remove linked reference from selected files.
+        Called by:
+            pushButton_unlink: Uses selected rows in files table. Does not use parameters.
+            Method: edit_reference. Uses parameter.
 
-        file_row_objs = self.ui.tableWidget_files.selectionModel().selectedRows()
-        if not file_row_objs:
+        :param: fid Integer source table id, or None
+        """
+
+        # Get selected file id from parameter or selected table_files rows
+        fid_list = []
+        if fid:
+            fid_list.append(fid)
+        else:
+            # Use selected table_file rows
+            file_row_model_index = self.ui.tableWidget_files.selectionModel().selectedRows()
+            if not file_row_model_index:
+                return
+            for i in file_row_model_index:
+                fid_list.append(i.data())
+        if not fid_list:
             return
+
         cur = self.app.conn.cursor()
-        for index in file_row_objs:
-            fid = int(index.data())  # Column 0 data
+        for fid in fid_list:
             cur.execute("update source set risid=null where id=?", [fid])
             self.app.conn.commit()
-            self.ui.tableWidget_files.item(index.row(), 2).setText("")
+            # Clear Ref attributes
+            attributes = ["Ref_Authors", "Ref_Title", "Ref_Type", "Ref_Year", "Ref_Journal"]
+            sql = "update attribute set value='' where id=? and name=?"
+            for attribute in attributes:
+                cur.execute(sql, [fid, attribute])
+                self.app.conn.commit()
         self.get_data()
 
-    def link_files_to_reference(self):
+    def link_reference_to_files(self, ris_id=None, fid=None):
         """ Link the selected files to the selected reference.
-         """
 
-        ref_row_obj = self.ui.tableWidget_refs.selectionModel().selectedRows()
-        if not ref_row_obj:
-            return
-        ris_id = int(ref_row_obj[0].data())  # Only One index returned. Column 0 data
-        file_row_objs = self.ui.tableWidget_files.selectionModel().selectedRows()
-        if not file_row_objs:
-            return
+        Called by:
+            pushButton_link: Uses selected rows in references and files tables. Does not use parameters.
+            Method: auto_link_files_to_references. Uses parameters.
+
+        :param: ris_id Integer reference id , or None
+        :param: fid Integer source table id, or None
+        """
+
+        # Get reference id from first selected row, or via parameter ris_id
+        if not ris_id:
+            ref_row_model_index = self.ui.tableWidget_refs.selectionModel().selectedRows()
+            if not ref_row_model_index:
+                return
+            # Only get the first reference selected index. Column 0 data.
+            ris_id = int(ref_row_model_index[0].data())
         ref = None
-        attr_values = {"Ref_Authors": "", "Ref_Title": "", "Ref_Type": "", "Ref_Year": "", "Ref_Journal": ""}
         for r in self.refs:
             if r['risid'] == ris_id:
                 ref = r
-        if 'TY' in ref:
-            attr_values['Ref_Type'] = ref['TY']
+                break
+        # Get selected file id from parameter or selected table_files rows
+        fid_list = []
+        if fid:
+            fid_list.append(fid)
+        else:
+            # Use selected table_file rows
+            file_row_model_index = self.ui.tableWidget_files.selectionModel().selectedRows()
+            if not file_row_model_index:
+                return
+            for i in file_row_model_index:
+                fid_list.append(i.data())
+
+        attr_values = {"Ref_Authors": "", "Ref_Title": "", "Ref_Type": "", "Ref_Year": "", "Ref_Journal": ""}
+        # Get list of authors
         if 'AU' in ref:
             attr_values['Ref_Authors'] = ref['AU']
         if 'A1' in ref:
@@ -592,17 +805,17 @@ class DialogReferenceManager(QtWidgets.QDialog):
             attr_values['Ref_Authors'] += " " + ref['A3']
         if 'A4' in ref:
             attr_values['Ref_Authors'] += " " + ref['A4']
-        attr_values['Ref_Title'] = ""
+        # Get reference type, e.g. Journal, book
+        if 'TY' in ref:
+            attr_values['Ref_Type'] = ref['TY']
         # Get the first title based on this order from several tags
-        attr_values['Ref_Title'] = ""
         for tag in ("TI", "T1", "ST", "TT"):
             try:
                 attr_values['Ref_Title'] = ref[tag]
                 break
             except KeyError:
                 pass
-        # Get ref year from several tags
-        attr_values['Ref_Year'] = ""
+        # Get reference year from examining several tags
         if 'PY' in ref:
             attr_values['Ref_Year'] = ref['PY']
         if attr_values['Ref_Year'] == "" and 'Y1' in ref:
@@ -610,11 +823,9 @@ class DialogReferenceManager(QtWidgets.QDialog):
         attr_values['Ref_Journal'] = ref['journal_vol_issue']
 
         cur = self.app.conn.cursor()
-        for index in file_row_objs:
-            fid = int(index.data())  # Column 0 data
+        for fid in fid_list:  # file_row_model_index:
             cur.execute("update source set risid=? where id=?", [ris_id, fid])
             self.app.conn.commit()
-            self.ui.tableWidget_files.item(index.row(), 2).setText(str(ris_id))
             sql = "update attribute set value=? where id=? and name=?"
             for attribute in attr_values:
                 cur.execute(sql, [attr_values[attribute], fid, attribute])
@@ -622,7 +833,8 @@ class DialogReferenceManager(QtWidgets.QDialog):
         self.get_data()
 
     def edit_reference(self):
-        """ Edit selected reference. """
+        """ Edit selected reference.
+         Also, update source attributes for this reference. """
 
         ref_row_obj = self.ui.tableWidget_refs.selectionModel().selectedRows()
         if not ref_row_obj:
@@ -646,7 +858,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
             ris_item = QtWidgets.QTableWidgetItem(key)
             ris_item.setFlags(ris_item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             for tagkey in TAG_KEY_MAPPING:
-                #print(tk, TAG_KEY_MAPPING[tk])
+                # print(tk, TAG_KEY_MAPPING[tk])
                 if key == tagkey:
                     ris_item.setToolTip(TAG_KEY_MAPPING[tagkey])
             ui_re.tableWidget.setItem(row, 0, ris_item)
@@ -659,7 +871,6 @@ class DialogReferenceManager(QtWidgets.QDialog):
         ok = reference_editor.exec()
         if not ok:
             return
-        #rows = ui_re.tableWidget.rowCount()
         cur = self.app.conn.cursor()
         ref_edited = False
         for row, key in enumerate(short_dict):
@@ -668,6 +879,11 @@ class DialogReferenceManager(QtWidgets.QDialog):
                             [ui_re.tableWidget.item(row, 1).text(), ris_id, key])
                 self.app.conn.commit()
                 ref_edited = True
+        # Update Reference attributes
+        for file_ in self.files:
+            if file_['risid'] == ris_id:
+                self.unlink_files(file_['id'])
+                self.link_reference_to_files(ris_id, file_['id'])
         if ref_edited:
             self.parent_textEdit.append(_("Reference edited."))
         self.get_data()
@@ -675,13 +891,14 @@ class DialogReferenceManager(QtWidgets.QDialog):
 
     def delete_reference(self):
         """ Delete the selected reference.
-        Remove reference risid from files.
+        Remove reference risid from source tavble and remove source attribute values.
         """
 
         ref_row_obj = self.ui.tableWidget_refs.selectionModel().selectedRows()
         if not ref_row_obj:
             return
-        ris_id = int(ref_row_obj[0].data())  # Only One index returned. Column 0 data
+        # Only use first reference index row. Column 0 data
+        ris_id = int(ref_row_obj[0].data())
         note = _("Delete this reference.") + " Ref id {" + str(ris_id) + "}  \n"
         for r in self.refs:
             if r['risid'] == ris_id:
@@ -691,9 +908,18 @@ class DialogReferenceManager(QtWidgets.QDialog):
         if not ok:
             return
         cur = self.app.conn.cursor()
+        cur.execute("select id from source where risid=?", [ris_id])
+        source_ids = cur.fetchall()
         cur.execute("update source set risid=null where risid=?", [ris_id])
         cur.execute("delete from ris where risid=?", [ris_id])
         self.app.conn.commit()
+        # Clear Refeence attributes
+        attributes = ["Ref_Authors", "Ref_Title", "Ref_Type", "Ref_Year", "Ref_Journal"]
+        sql = "update attribute set value='' where id=? and name=?"
+        for source in source_ids:
+            for attribute in attributes:
+                cur.execute(sql, [source[0], attribute])
+                self.app.conn.commit()
         self.get_data()
         self.fill_table_refs()
         self.fill_table_files()

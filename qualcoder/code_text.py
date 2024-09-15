@@ -158,7 +158,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui = Ui_Dialog_code_text()
         self.ui.setupUi(self)
         self.ui.groupBox_edit_mode.hide()
-        ee = _("EDITING TEXT MODE (Ctrl+E)") + " "
+        ee = f'{_("EDITING TEXT MODE (Ctrl+E)")} '
         ee += _(
             "Avoid selecting sections of text with a combination of not underlined (not coded / annotated / "
             "case-assigned) and underlined (coded, annotated, case-assigned).")
@@ -169,13 +169,13 @@ class DialogCodeText(QtWidgets.QWidget):
         self.edit_pos = 0
         self.edit_mode = False
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
+        font = f"font: {self.app.settings['fontsize']}pt "
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
-        tree_font = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
+        tree_font = f"font: {self.app.settings['treefontsize']}pt "
         tree_font += '"' + self.app.settings['font'] + '";'
         self.ui.treeWidget.setStyleSheet(tree_font)
-        doc_font = 'font: ' + str(self.app.settings['docfontsize']) + 'pt '
+        doc_font = f"font: {self.app.settings['docfontsize']}pt "
         doc_font += '"' + self.app.settings['font'] + '";'
         self.ui.textEdit.setStyleSheet(doc_font)
         self.ui.label_coder.setText("Coder: " + self.app.settings['codername'])
@@ -413,23 +413,23 @@ class DialogCodeText(QtWidgets.QWidget):
         cur = self.app.conn.cursor()
         sql = "select length(fulltext), fulltext from source where id=?"
         sql_codings = "select count(cid) from code_text where fid=? and owner=?"
-        for f in self.filenames:
-            cur.execute(sql, [f['id'], ])
+        for file_ in self.filenames:
+            cur.execute(sql, [file_['id'], ])
             res = cur.fetchone()
             if res is None:  # Safety catch
                 res = [0, ""]
             tt = _("Characters: ") + str(res[0])
-            f['characters'] = res[0]
-            f['start'] = 0
-            f['end'] = res[0]
-            f['fulltext'] = res[1]
-            cur.execute(sql_codings, [f['id'], self.app.settings['codername']])
+            file_['characters'] = res[0]
+            file_['start'] = 0
+            file_['end'] = res[0]
+            file_['fulltext'] = res[1]
+            cur.execute(sql_codings, [file_['id'], self.app.settings['codername']])
             res = cur.fetchone()
-            tt += "\n" + _("Codings: ") + str(res[0])
-            tt += "\n" + _("From: ") + str(f['start']) + _(" to ") + str(f['end'])
-            item = QtWidgets.QListWidgetItem(f['name'])
-            if f['memo'] != "":
-                tt += "\nMemo: " + f['memo']
+            tt += f'\n{_("Codings:")} {res[0]}'
+            tt += f"\n{_('From:')} {file_['start']} - {file_['end']}"
+            item = QtWidgets.QListWidgetItem(file_['name'])
+            if file_['memo'] != "":
+                tt += f"\nMemo: {file_['memo']}"
             item.setToolTip(tt)
             self.ui.listWidget.addItem(item)
         self.file_ = None
@@ -450,14 +450,14 @@ class DialogCodeText(QtWidgets.QWidget):
         if res is None:  # Safety catch
             res = [0, ""]
         tt = _("Characters: ") + str(res[0])
-        f = {'characters': res[0], 'start': 0, 'end': res[0], 'fulltext': res[1]}
+        file_size = {'characters': res[0], 'start': 0, 'end': res[0], 'fulltext': res[1]}
         sql_codings = "select count(cid) from code_text where fid=? and owner=?"
         cur.execute(sql_codings, [self.file_['id'], self.app.settings['codername']])
         res = cur.fetchone()
-        tt += "\n" + _("Codings: ") + str(res[0])
-        tt += "\n" + _("From: ") + str(f['start']) + _(" to ") + str(f['end'])
+        tt += f"\n{_('Codings:')} {res[0]}"
+        tt += f"\n{_('From:')} {file_size['start']} - {file_size['end']}"
         if self.file_['memo'] != "":
-            tt += "\nMemo: " + self.file_['memo']
+            tt += f"\nMemo: {self.file_['memo']}"
         # Find item to update tooltip
         items = self.ui.listWidget.findItems(self.file_['name'], Qt.MatchFlag.MatchExactly)
         if len(items) == 0:
@@ -542,7 +542,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 style = "QLabel {background-color :" + c['color'] + "; color : " + fg_color + ";}"
                 self.ui.label_code.setStyleSheet(style)
                 self.ui.label_code.setAutoFillBackground(True)
-                tt = c['name'] + "\n"
+                tt = f"{c['name']}\n"
                 if c['memo'] != "":
                     tt += _("Memo: ") + c['memo']
                 self.ui.label_code.setToolTip(tt)
@@ -587,6 +587,8 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.treeWidget.clear()
         self.ui.treeWidget.setColumnCount(4)
         self.ui.treeWidget.setHeaderLabels([_("Name"), _("Id"), _("Memo"), _("Count")])
+        self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Interactive)
+        self.ui.treeWidget.header().resizeSection(0, 400)
         if not self.app.settings['showids']:
             self.ui.treeWidget.setColumnHidden(1, True)
         else:
@@ -604,7 +606,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 top_item.setToolTip(2, c['memo'])
                 top_item.setToolTip(0, '')
                 if len(c['name']) > 52:
-                    top_item.setText(0, c['name'][:25] + '..' + c['name'][-25:])
+                    top_item.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
                     top_item.setToolTip(0, c['name'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 if 'catid:' + str(c['catid']) in non_expanded:
@@ -632,7 +634,7 @@ class DialogCodeText(QtWidgets.QWidget):
                         child.setToolTip(2, c['memo'])
                         child.setToolTip(0, '')
                         if len(c['name']) > 52:
-                            child.setText(0, c['name'][:25] + '..' + c['name'][-25:])
+                            child.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
                             child.setToolTip(0, c['name'])
                         item.addChild(child)
                         if 'catid:' + str(c['catid']) in non_expanded:
@@ -653,11 +655,11 @@ class DialogCodeText(QtWidgets.QWidget):
                 memo = ""
                 if c['memo'] != "":
                     memo = _("Memo")
-                top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
+                top_item = QtWidgets.QTreeWidgetItem([c['name'], f"cid:{c['cid']}", memo])
                 top_item.setToolTip(2, c['memo'])
                 top_item.setToolTip(0, c['name'])
                 if len(c['name']) > 52:
-                    top_item.setText(0, c['name'][:25] + '..' + c['name'][-25:])
+                    top_item.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
                     top_item.setToolTip(0, c['name'])
                 top_item.setBackground(0, QBrush(QColor(c['color']), Qt.BrushStyle.SolidPattern))
                 color = TextColor(c['color']).recommendation
@@ -679,11 +681,11 @@ class DialogCodeText(QtWidgets.QWidget):
                     memo = ""
                     if c['memo'] != "":
                         memo = _("Memo")
-                    child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
+                    child = QtWidgets.QTreeWidgetItem([c['name'], f"cid:{c['cid']}", memo])
                     child.setToolTip(2, c['memo'])
                     child.setToolTip(0, c['name'])
                     if len(c['name']) > 52:
-                        child.setText(0, c['name'][:25] + '..' + c['name'][-25:])
+                        child.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
                         child.setToolTip(0, c['name'])
                     child.setBackground(0, QBrush(QColor(c['color']), Qt.BrushStyle.SolidPattern))
                     color = TextColor(c['color']).recommendation
@@ -724,10 +726,8 @@ class DialogCodeText(QtWidgets.QWidget):
                     else:
                         item.setText(3, "")
                 except Exception as e:
-                    msg = "Fill code counts error\n" + str(e) + "\n"
-                    msg += sql + "\n"
-                    msg += "cid " + str(cid) + "\n"
-                    msg += "self.file_['id'] " + str(self.file_['id']) + "\n"
+                    msg = f"Fill code counts error\n{e}\n{sql}\ncid: {cid}\n"
+                    msg += f"self.file_['id']: {self.file_['id']}\n"
                     logger.debug(msg)
                     item.setText(3, "")
             it += 1
@@ -739,8 +739,6 @@ class DialogCodeText(QtWidgets.QWidget):
         Also called on other coding dialogs in the dialog_list. """
 
         self.codes, self.categories = self.app.get_codes_categories()
-        '''for c in self.codes:
-            c['name'] = c['name']  # Why did I do this ?'''
 
     # RHS splitter details for code rule, project memo
     def show_code_rule(self):
@@ -772,7 +770,7 @@ class DialogCodeText(QtWidgets.QWidget):
                         [int(selected.text(1)[4:])])
             res = cur.fetchall()
             for i, r in enumerate(res):
-                txt += str(i + 1) + ": " + r[0] + "\n"
+                txt += f"{i + 1}: {r[0]}\n"
         self.ui.textEdit_info.setReadOnly(True)
         self.ui.textEdit_info.blockSignals(True)
         self.ui.textEdit_info.setText(txt)
@@ -827,7 +825,6 @@ class DialogCodeText(QtWidgets.QWidget):
         self.search_indices = []
         self.search_index = -1
         self.search_term = self.ui.lineEdit_search.text()
-        print("ST", self.search_type, type(self.search_type))
         if self.search_type == 3 and len(self.search_term) < 3:
             self.ui.label_search_totals.setText("")
             return
@@ -1103,8 +1100,6 @@ class DialogCodeText(QtWidgets.QWidget):
         if action == action_code_memo:
             self.coded_text_memo(cursor.position())
             return
-        '''if action == action_change_pos:
-            self.change_code_pos_message()'''
         if action == action_start_pos:
             self.change_code_start_or_end_position(cursor.position(), "start")
             return
@@ -1253,13 +1248,13 @@ class DialogCodeText(QtWidgets.QWidget):
         ok = ui.exec()
         if not ok:
             return
-        replacememt_code = ui.get_selected()
-        if not replacememt_code:
+        replacement_code = ui.get_selected()
+        if not replacement_code:
             return
         cur = self.app.conn.cursor()
         sql = "update code_text set cid=? where ctid=?"
         try:
-            cur.execute(sql, [replacememt_code['cid'], text_item['ctid']])
+            cur.execute(sql, [replacement_code['cid'], text_item['ctid']])
             self.app.conn.commit()
         except sqlite3.IntegrityError:
             pass
@@ -1367,7 +1362,7 @@ class DialogCodeText(QtWidgets.QWidget):
         if len(items) == 1:
             tt = items[0].toolTip()
             memo_pos = (tt.find(_("Memo:")))
-            new_tt = tt[:memo_pos] + _("Memo: ") + file_['memo']
+            new_tt = f"{tt[:memo_pos]} {_('Memo:')} {file_['memo']}"
             items[0].setToolTip(new_tt)
         self.app.delete_backup = False
 
@@ -1399,7 +1394,7 @@ class DialogCodeText(QtWidgets.QWidget):
         if text_item is None:
             return
         # Dictionary with cid fid seltext owner date name color memo
-        msg = text_item['name'] + " [" + str(text_item['pos0']) + "-" + str(text_item['pos1']) + "]"
+        msg = f"{text_item['name']} [{text_item['pos0']} - {text_item['pos1']}]"
         ui = DialogMemo(self.app, _("Memo for Coded text: ") + msg, text_item['memo'], "show", text_item['seltext'])
         ui.exec()
         memo = ui.memo
