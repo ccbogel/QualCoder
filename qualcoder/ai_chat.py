@@ -82,8 +82,9 @@ class DialogAIChat(QtWidgets.QDialog):
         self.ui = Ui_Dialog_ai_chat()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        self.font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
-        self.font += '"' + self.app.settings['font'] + '";'
+        self.font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
+        #self.font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
+        #self.font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(self.font)        
         self.ui.plainTextEdit_question.installEventFilter(self)
         self.ui.pushButton_question.pressed.connect(self.button_question_clicked)
@@ -97,27 +98,28 @@ class DialogAIChat(QtWidgets.QDialog):
         self.ui.plainTextEdit_question.setPlaceholderText(_('<your question>'))
         # self.ui.scrollArea_ai_output.verticalScrollBar().rangeChanged.connect(self.ai_output_scroll_to_bottom)
         # Stylesheets
-        doc_font = 'font: ' + str(self.app.settings['docfontsize']) + 'pt '
-        doc_font += '"' + self.app.settings['font'] + '";'
+        # doc_font = 'font: ' + str(self.app.settings['docfontsize']) + 'pt '
+        # doc_font += '"' + self.app.settings['font'] + '";'
+        doc_font = f'font: {self.app.settings["docfontsize"]}pt \'{self.app.settings["font"]}\';'
         if self.app.settings['stylesheet'] in ['dark', 'rainbow']:
-            self.ai_response_style = "'" + doc_font + " color: #8FB1D8;'"     
-            self.ai_user_style = "'" + doc_font + " color: #35998A; '"
-            self.ai_info_style = "'" + doc_font + "'" # "'" + doc_font + " color: #000000;'"
+            self.ai_response_style = f'"{doc_font} color: #8FB1D8;"'
+            self.ai_user_style = f'"{doc_font} color: #35998A;"'     
+            self.ai_info_style = f'"{doc_font}"'     
         elif self.app.settings['stylesheet'] == 'native':
             # determine wether dark or light native style is active:
             style_hints = QGuiApplication.styleHints()
             if style_hints.colorScheme() == QtCore.Qt.ColorScheme.Dark:
-                self.ai_response_style = "'" + doc_font + " color: #8FB1D8;'"     
-                self.ai_user_style = "'" + doc_font + " color: #35998A; '"
-                self.ai_info_style = "'" + doc_font + "'" # "'" + doc_font + " color: #000000;'"
+                self.ai_response_style = f'"{doc_font} color: #8FB1D8;"'
+                self.ai_user_style = f'"{doc_font} color: #35998A;"'     
+                self.ai_info_style = f'"{doc_font}"'     
             else:
-                self.ai_response_style = "'" + doc_font + " color: #356399;'"     
-                self.ai_user_style = "'" + doc_font + " color: #287368; '"
-                self.ai_info_style = "'" + doc_font + "'" # "'" + doc_font + " color: #000000;'"
+                self.ai_response_style = f'"{doc_font} color: #356399;"'
+                self.ai_user_style = f'"{doc_font} color: #287368;"'     
+                self.ai_info_style = f'"{doc_font}"'     
         else:
-            self.ai_response_style = "'" + doc_font + " color: #356399;'"     
-            self.ai_user_style = "'" + doc_font + " color: #287368; '"
-            self.ai_info_style = "'" + doc_font + "'" # "'" + doc_font + " color: #000000;'"
+            self.ai_response_style = f'"{doc_font} color: #356399;"'
+            self.ai_user_style = f'"{doc_font} color: #287368;"'     
+            self.ai_info_style = f'"{doc_font}"'     
         self.ui.plainTextEdit_question.setStyleSheet(self.ai_user_style[1:-1])
         default_bg_color = self.ui.plainTextEdit_question.palette().color(self.ui.plainTextEdit_question.viewport().backgroundRole())
         self.ui.ai_output.setStyleSheet(doc_font)

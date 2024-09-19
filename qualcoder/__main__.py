@@ -1371,8 +1371,8 @@ Click "Yes" to start now.')
         self.ui.actionMenu_Key_Shortcuts.triggered.connect(self.display_menu_key_shortcuts)
         # Ensure the action_log always scrolls to the very bottom once new log entries are added:
         self.ui.textEdit.verticalScrollBar().rangeChanged.connect(self.action_log_scroll_bottom)
-        font = f'font: {self.app.settings["fontsize"]}pt {self.app.settings["font"]}";'
-        self.setStyleSheet(font)
+        # font = f'font: {self.app.settings["fontsize"]}pt {self.app.settings["font"]}";'
+        # self.setStyleSheet(font)
         self.ui.textEdit.setReadOnly(True)
         self.settings_report()
         
