@@ -1095,8 +1095,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionSpecial_functions.setShortcut('Alt+Z')
         self.ui.actionSpecial_functions.triggered.connect(self.special_functions)
         self.ui.actionMenu_Key_Shortcuts.triggered.connect(self.display_menu_key_shortcuts)
-        font = f'font: {self.app.settings["fontsize"]}pt {self.app.settings["font"]}";'
-        self.setStyleSheet(font)
         self.ui.textEdit.setReadOnly(True)
         self.settings_report()
 
