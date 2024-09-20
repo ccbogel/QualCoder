@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2022 Colin Curtain
+Copyright (c) 2024 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -27,9 +27,7 @@ https://github.com/ccbogel/QualCoder
 
 from PyQt6 import QtWidgets, QtCore
 import os
-import sys
 import logging
-import traceback
 
 from .GUI.ui_dialog_confirm_delete import Ui_Dialog_confirmDelete
 
@@ -52,8 +50,8 @@ class DialogConfirmDelete(QtWidgets.QDialog):
         self.ui.setupUi(self)
         self.setMinimumSize(260, 80)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        font = 'font: ' + str(app.settings['fontsize']) + 'pt '
-        font += '"' + app.settings['font'] + '";'
+        font = f'font: {app.settings["fontsize"]}pt '
+        font += f'"{app.settings["font"]}";'
         self.setStyleSheet(font)
         self.ui.label.setText(text)
         if title != "":
