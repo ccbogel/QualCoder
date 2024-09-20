@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2023 Colin Curtain
+Copyright (c) 2024 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -85,11 +85,11 @@ class DialogCases(QtWidgets.QDialog):
         self.ui = Ui_Dialog_cases()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
-        font += '"' + self.app.settings['font'] + '";'
+        font = f'font: {self.app.settings["fontsize"]}pt '
+        font += f'"{self.app.settings["font"]}";'
         self.setStyleSheet(font)
-        doc_font = 'font: ' + str(self.app.settings['docfontsize']) + 'pt '
-        doc_font += '"' + self.app.settings['font'] + '";'
+        doc_font = f'font: {self.app.settings["docfontsize"]}pt '
+        doc_font += f'"{self.app.settings["font"]}";'
         self.ui.textBrowser.setStyleSheet(doc_font)
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(pencil_icon), "png")
@@ -175,7 +175,6 @@ class DialogCases(QtWidgets.QDialog):
 
     def eventFilter(self, object_, event):
         """ Using this event filter to
-
         Ctrl + A to show all rows
         """
 
@@ -243,8 +242,6 @@ class DialogCases(QtWidgets.QDialog):
         cols = self.ui.tableWidget.columnCount()
         rows = self.ui.tableWidget.rowCount()
         header = [self.ui.tableWidget.horizontalHeaderItem(i).text() for i in range(0, cols)]
-        '''for i in range(0, cols):
-            header.append(self.ui.tableWidget.horizontalHeaderItem(i).text())'''
         with open(filepath, mode='w') as f:
             writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             writer.writerow(header)
@@ -352,7 +349,7 @@ class DialogCases(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         cur.execute("select count(caseid) from cases")
         total_cases = cur.fetchone()[0]
-        msg = _("Cases: ") + str(total_cases) + " "
+        msg = _("Cases: ") + f"{total_cases} "
         self.ui.label_cases.setText(msg)
 
     def add_attribute(self):
@@ -383,7 +380,7 @@ class DialogCases(QtWidgets.QDialog):
         self.app.conn.commit()
         self.load_cases_data()
         self.fill_table()
-        self.parent_text_edit.append(_("Attribute added to cases: ") + name + ", " + _("type: ") + value_type)
+        self.parent_text_edit.append(_("Attribute added to cases: ") + f"{name}, {_('type:')} {value_type}")
         self.app.delete_backup = False
 
     def import_cases_and_attributes(self):
@@ -419,13 +416,7 @@ class DialogCases(QtWidgets.QDialog):
             if (set(value)) != {None}:
                 # Values are tuples, convert to list, and remove 'None' string
                 row = [item if item else "" for item in value]
-                '''for item in value:
-                    if item is None:
-                        row.append("")
-                    else:
-                        row.append(item)'''
                 data.append(row)
-
         now_date = str(datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"))
         # Get field names and replace blanks with a placeholder
         fields = []
@@ -469,7 +460,7 @@ class DialogCases(QtWidgets.QDialog):
                                       attribute_value_type[col], 'case'))
                     self.app.conn.commit()
                 except Exception as e:
-                    logger.error(_("attribute:") + att_name + ", " + str(e))
+                    logger.error(_("attribute:") + f"{att_name}, {e}")
         # Insert attributes
         sql = "select name, caseid from cases"
         cur.execute(sql)
@@ -523,7 +514,7 @@ class DialogCases(QtWidgets.QDialog):
                 item['caseid'] = cur.fetchone()[0]
                 self.cases.append(item)
             except Exception as e:
-                logger.error("item:" + str(item) + ", " + str(e))
+                logger.error(f"item: {item}, {e}")
         # Determine attribute type
         attribute_value_type = ["character"] * len(fields)
         for col, att_name in enumerate(fields):
@@ -545,7 +536,7 @@ class DialogCases(QtWidgets.QDialog):
                                       attribute_value_type[col], 'case'))
                     self.app.conn.commit()
                 except Exception as e:
-                    logger.error(_("attribute:") + att_name + ", " + str(e))
+                    logger.error(_("attribute:") + f"{att_name}, {e}")
         # Insert attributes
         sql = "select name, caseid from cases"
         cur.execute(sql)
@@ -628,7 +619,7 @@ class DialogCases(QtWidgets.QDialog):
                     cur.execute("delete from case_text where caseid=?", [id_])
                     cur.execute("delete from attribute where id=? and attr_type='case'", [id_])
                     self.app.conn.commit()
-                    self.parent_text_edit.append("Case deleted: " + c['name'])
+                    self.parent_text_edit.append(f"Case deleted: {c['name']}")
         self.load_cases_data()
         self.app.delete_backup = False
         self.fill_table()
@@ -751,7 +742,7 @@ class DialogCases(QtWidgets.QDialog):
             return
         ui = DialogCaseFileManager(self.app, self.parent_text_edit, self.cases[x])
         ui.exec()
-        # reload files count
+        # Reload files count
         cur = self.app.conn.cursor()
         sql = "select distinct case_text.fid, source.name from case_text join source on case_text.fid=source.id where "
         sql += "caseid=? order by source.name asc"
@@ -916,7 +907,7 @@ class DialogCases(QtWidgets.QDialog):
         # Add statistics tooltips to table headers for attributes
         for i, attribute_name in enumerate(self.attribute_labels_ordered):
             tt = self.get_tooltip_values(attribute_name)
-            self.ui.tableWidget.horizontalHeaderItem(self.ATTRIBUTE_START_COLUMN + i).setToolTip(_("Right click header row to hide columns") + "\n" + tt)
+            self.ui.tableWidget.horizontalHeaderItem(self.ATTRIBUTE_START_COLUMN + i).setToolTip(_("Right click header row to hide columns") + f"\n{tt}")
         self.ui.tableWidget.blockSignals(False)
 
     def get_tooltip_values(self, attribute_name):
@@ -936,14 +927,13 @@ class DialogCases(QtWidgets.QDialog):
                   'attr_type="case"'
             cur.execute(sql, [attribute_name])
             res = cur.fetchone()
-            tt = _("Minimum: ") + str(res[0]) + "\n"
-            tt += _("Maximum: ") + str(res[1])
+            tt = f"{_('Minimum:')} {res[0]}\n{_('Maximum:')} {res[1]}"
         if value_type == "character":
             sql = 'select distinct value from attribute where name=? and attr_type="case" and length(value)>0 limit 10'
             cur.execute(sql, [attribute_name])
             res = cur.fetchall()
             for r in res:
-                tt += "\n" + r[0]
+                tt += f"\n{r[0]}"
             if len(tt) > 1:
                 tt = tt[1:]
         return tt
@@ -1007,9 +997,7 @@ class DialogCases(QtWidgets.QDialog):
         cursor = self.ui.textBrowser.textCursor()
         for c in display_text:
             if c['mediapath'] is None or c['mediapath'] == '' or c['mediapath'][:5] == "docs:":  # text source
-                header = "\n" + _("File: ") + c[
-                    'name']  # + _(" Text: ") + str(int(c['pos0'])) + ":" + str(int(c['pos1']))
-                header += ", " + _("Characters: ") + str(c['pos1'] - c['pos0'])
+                header = f"\n{_('File:')} {c['name']}, {_('Characters:')} {c['pos1']} - {c['pos0']}"
                 pos0 = len(self.ui.textBrowser.toPlainText())
                 self.ui.textBrowser.append(header)
                 cursor.setPosition(pos0, QtGui.QTextCursor.MoveMode.MoveAnchor)
@@ -1024,7 +1012,7 @@ class DialogCases(QtWidgets.QDialog):
                 cursor.setCharFormat(format_reg)
 
             if c['mediapath'][:7] in ("/images", "images:"):
-                header = "\n" + _('Image: ') + c['name']
+                header = f"\n{_('Image:')} {c['name']}"
                 pos0 = len(self.ui.textBrowser.toPlainText())
                 self.ui.textBrowser.append(header)
                 cursor.setPosition(pos0, QtGui.QTextCursor.MoveMode.MoveAnchor)
@@ -1036,7 +1024,7 @@ class DialogCases(QtWidgets.QDialog):
                 self.display_text_links.append(data)
 
             if c['mediapath'][:6] in ("/audio", "audio:", "/video", "video:"):
-                header = "\n" + _('AV media: ') + c['name']
+                header = f"\n{_('AV media:')} {c['name']}"
                 pos0 = len(self.ui.textBrowser.toPlainText())
                 self.ui.textBrowser.append(header)
                 cursor.setPosition(pos0, QtGui.QTextCursor.MoveMode.MoveAnchor)

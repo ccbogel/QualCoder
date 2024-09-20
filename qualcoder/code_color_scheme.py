@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2023 Colin Curtain
+Copyright (c) 2024 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -76,11 +76,11 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         self.ui.splitter.setSizes([100, 300])
 
-        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
-        font += '"' + self.app.settings['font'] + '";'
+        font = f'font: {self.app.settings["fontsize"]}pt '
+        font += f'"{self.app.settings["font"]}";'
         self.setStyleSheet(font)
-        tree_font = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
-        tree_font += '"' + self.app.settings['font'] + '";'
+        tree_font = f'font: {self.app.settings["treefontsize"]}pt '
+        tree_font += f'"{self.app.settings["font"]}";'
         self.ui.treeWidget.setStyleSheet(tree_font)
         self.ui.treeWidget.viewport().installEventFilter(self)
         self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
@@ -131,12 +131,8 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
             return
         color_list = copy(self.selected_colors)
         code_items = [t for t in all_tree_items if t.text(1)[:3] == "cid"]
-        '''for t in all_tree_items:
-            if t.text(1)[:3] == "cid":
-                code_items.append(t)'''
         while len(color_list) < len(code_items):
             color_list += self.selected_colors
-
         cur = self.app.conn.cursor()
         sql = "update code_name set color=? where cid=?"
         i = -1
@@ -178,10 +174,10 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
                 memo = ""
                 if c['memo'] != "":
                     memo = "Memo"
-                top_item = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
+                top_item = QtWidgets.QTreeWidgetItem([c['name'], f'catid:{c["catid"]}', memo])
                 top_item.setToolTip(0, c['name'])
                 if len(c['name']) > 52:
-                    top_item.setText(0, c['name'][:25] + '..' + c['name'][-25:])
+                    top_item.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
                     top_item.setToolTip(0, c['name'])
                 top_item.setToolTip(2, c['memo'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
@@ -198,15 +194,15 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
                 it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
                 item = it.value()
                 count2 = 0
-                while item and count2 < 10000:  # while there is an item in the list
-                    if item.text(1) == 'catid:' + str(c['supercatid']):
+                while item and count2 < 10000:
+                    if item.text(1) == f'catid:{c["supercatid"]}':
                         memo = ""
                         if c['memo'] != "":
                             memo = "Memo"
-                        child = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
+                        child = QtWidgets.QTreeWidgetItem([c['name'], f'catid:{c["catid"]}', memo])
                         child.setToolTip(0, c['name'])
                         if len(c['name']) > 52:
-                            child.setText(0, c['name'][:25] + '..' + c['name'][-25:])
+                            child.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
                             child.setToolTip(0, c['name'])
                         child.setToolTip(2, c['memo'])
                         item.addChild(child)
@@ -225,10 +221,10 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
                 memo = ""
                 if c['memo'] != "":
                     memo = "Memo"
-                top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
+                top_item = QtWidgets.QTreeWidgetItem([c['name'], f'cid:{c["cid"]}', memo])
                 top_item.setToolTip(0, c['name'])
                 if len(c['name']) > 52:
-                    top_item.setText(0, c['name'][:25] + '..' + c['name'][-25:])
+                    top_item.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
                     top_item.setToolTip(0, c['name'])
                 top_item.setToolTip(2, c['memo'])
                 top_item.setBackground(0, QBrush(QtGui.QColor(c['perspective']), Qt.BrushStyle.SolidPattern))
@@ -248,17 +244,17 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
             item = it.value()
             count = 0
             while item and count < 10000:
-                if item.text(1) == 'catid:' + str(c['catid']):
+                if item.text(1) == f'catid:{c["catid"]}':
                     memo = ""
                     if c['memo'] != "":
                         memo = "Memo"
-                    child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
+                    child = QtWidgets.QTreeWidgetItem([c['name'], f'cid:{c["cid"]}', memo])
                     child.setBackground(0, QBrush(QtGui.QColor(c['perspective']), Qt.BrushStyle.SolidPattern))
                     color = TextColor(c['color']).recommendation
                     child.setForeground(0, QBrush(QtGui.QColor(color)))
                     child.setToolTip(0, c['name'])
                     if len(c['name']) > 52:
-                        child.setText(0, c['name'][:25] + '..' + c['name'][-25:])
+                        child.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
                         child.setToolTip(0, c['name'])
                     child.setToolTip(2, c['memo'])
                     child.setFlags(
