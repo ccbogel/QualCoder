@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2022 Colin Curtain
+Copyright (c) 2024 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -91,12 +91,11 @@ class Codebook:
                 it = QtWidgets.QTreeWidgetItemIterator(self.tree)
                 item = it.value()
                 while item:  # while there is an item in the list
-                    if item.text(1) == 'catid:' + str(c['supercatid']):
+                    if item.text(1) == f'catid:{c["supercatid"]}':
                         memo = ""
                         if c['memo'] != "":
                             memo = "Memo"
-                        child = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
-                        child.setIcon(0, QtGui.QIcon("GUI/icon_cat.png"))
+                        child = QtWidgets.QTreeWidgetItem([c['name'], f'catid:{c["catid"]}', memo])
                         item.addChild(child)
                         remove_list.append(c)
                     it += 1
@@ -111,7 +110,7 @@ class Codebook:
                 memo = ""
                 if c['memo'] != "":
                     memo = "Memo"
-                top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo, str(c['freq'])])
+                top_item = QtWidgets.QTreeWidgetItem([c['name'], f'cid:{c["cid"]}', memo, str(c['freq'])])
                 self.tree.addTopLevelItem(top_item)
                 remove_items.append(c)
         for item in remove_items:
@@ -121,13 +120,13 @@ class Codebook:
             it = QtWidgets.QTreeWidgetItemIterator(self.tree)
             item = it.value()
             while item:
-                if item.text(1) == 'catid:' + str(c['catid']):
+                if item.text(1) == f'catid:{c["catid"]}':
                     memo = ""
                     if c['memo'] != "":
                         memo = "Memo"
-                    child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo, str(c['freq'])])
+                    child = QtWidgets.QTreeWidgetItem([c['name'], f'cid:{c["cid"]}', memo, str(c['freq'])])
                     item.addChild(child)
-                    c['catid'] = -1  # make unmatchable
+                    c['catid'] = -1  # Make unmatchable
                 it += 1
                 item = it.value()
 
@@ -139,7 +138,6 @@ class Codebook:
         filepath = exp_path.filepath
         if filepath is None:
             return
-
         # Create TextEdit document
         text_edit = QtWidgets.QTextEdit()
         fmt1 = QtGui.QTextBlockFormat()
@@ -148,9 +146,8 @@ class Codebook:
         text_edit.textCursor().beginEditBlock()
         text_edit.textCursor().setBlockFormat(fmt1)
         text_edit.textCursor().insertHtml(
-            "<p style=font-size:16pt;font-weight:400>Codebook: " + self.app.project_name + "</p><br/>")
+            f"<p style=font-size:16pt;font-weight:400>Codebook: {self.app.project_name}</p><br/>")
         text_edit.textCursor().endEditBlock()
-
         it = QtWidgets.QTreeWidgetItemIterator(self.tree)
         item = it.value()
         while item:
@@ -163,8 +160,7 @@ class Codebook:
             for i in range(0, self.depthgauge(item)):
                 prefix += "..."
             if cat:
-                category_text = '<br/><span style=font-size:14pt>' + prefix + _("Category: ") + \
-                                self.convert_entities(item.text(0)) + "</span><br/>"
+                category_text = f'<br/><span style=font-size:14pt>{prefix}Category: {self.convert_entities(item.text(0))}</span><br/>'
                 memo = ""
                 for i in self.categories:
                     if i['catid'] == id_:
@@ -173,7 +169,7 @@ class Codebook:
                 text_edit.textCursor().setBlockFormat(fmt1)
                 text_edit.textCursor().insertHtml(category_text)
                 if self.memos and memo != "":
-                    text_edit.insertHtml("<span style=font-size:8pt>MEMO: " + memo + "</span><br/>")
+                    text_edit.insertHtml(f"<span style=font-size:8pt>MEMO: {memo}</span><br/>")
                 text_edit.textCursor().endEditBlock()
             else:  # Code
                 memo = ""
@@ -182,14 +178,14 @@ class Codebook:
                     if i['cid'] == id_:
                         color = i['color']
                         memo = self.convert_entities(i['memo'])
-                code_text = prefix + '<span style="color:' + color + '">' + _("Code: ") + '</span>'
+                code_text = prefix + f'<span style="color:{color}">&#9608;</span>Code: '
                 code_text += self.convert_entities(item.text(0))
-                code_text += ", Count: " + item.text(3) + "<br/>"
+                code_text += f", Count: {item.text(3)}<br/>"
                 text_edit.textCursor().beginEditBlock()
                 text_edit.textCursor().setBlockFormat(fmt1)
                 text_edit.textCursor().insertHtml(code_text)
                 if self.memos and memo != "":
-                    text_edit.insertHtml("<span style=font-size:8pt>MEMO: " + memo + "</span><br/>")
+                    text_edit.insertHtml(f"<span style=font-size:8pt>MEMO: {memo}</span><br/>")
                 text_edit.textCursor().endEditBlock()
             it += 1
             item = it.value()
@@ -197,9 +193,7 @@ class Codebook:
         tw.setFileName(filepath)
         tw.setFormat(b'ODF')  # byte array needed for Windows 10
         tw.write(text_edit.document())
-
-        Message(self.app, _('Codebook exported'),
-                _("ODT file of codebook exported:") + "\n" + filepath).exec()
+        Message(self.app, _('Codebook exported'),f"Codebook exported:\n{filepath}").exec()
         self.parent_textEdit.append(_("Codebook exported to ") + filepath)
 
     def export_plaintext(self):
@@ -212,8 +206,8 @@ class Codebook:
                                                                self.app.settings['directory'], options)
         if directory == "":
             return
-        filename = directory + "/" + filename
-        filedata = _("Codebook for ") + self.app.project_name + "\n========"
+        filepath = os.path.join(directory,filename)
+        data = f"{_('Codebook for')} {self.app.project_name}\n========"
         it = QtWidgets.QTreeWidgetItemIterator(self.tree)
         item = it.value()
         while item:
@@ -228,30 +222,25 @@ class Codebook:
             for i in range(0, self.depthgauge(item)):
                 prefix += "--"
             if cat:
-                filedata += "\n" + prefix + _("Category: ") + item.text(0) + ", " + item.text(1)
+                data += f"\n{prefix}{_('Category:')}{item.text(0)}, {item.text(1)}"
                 for i in self.categories:
                     if i['catid'] == id_:
                         memo = i['memo']
                         owner = i['owner']
             else:
-                filedata += "\n" + prefix + _("Code: ") + item.text(0) + ", " + item.text(1)
-                filedata += ", Frq: " + item.text(3)
+                data += f"\n{prefix}{_('Code:')} {item.text(0)}, {item.text(1)}"
+                data += f", Frq: {item.text(3)}"
                 for i in self.code_names:
                     if i['cid'] == id_:
                         memo = i['memo']
                         owner = i['owner']
-            filedata += _(", Owner: ") + owner
-            if memo is None:
-                memo = ""
-            filedata += "\n" + prefix + _("Memo: ") + memo
-
+            data += f", Owner: {owner}\n{prefix}Memo: {memo}"
             it += 1
             item = it.value()
-        f = open(filename, 'w')
-        f.write(filedata)
-        f.close()
-        Message(self.app, _('Codebook exported'), _("Plain text file of codebook exported:") + "\n" + filename).exec()
-        self.parent_textEdit.append(_("Codebook exported to ") + filename)
+        with open(filepath, 'w', encoding='utf-8') as file_:
+            file_.write(data)
+        Message(self.app, _('Codebook exported'), f"Codebook exported:\n{filepath}").exec()
+        self.parent_textEdit.append(_("Codebook exported to ") + filepath)
 
     def depthgauge(self, item):
         """ Get depth for treewidget item. """
