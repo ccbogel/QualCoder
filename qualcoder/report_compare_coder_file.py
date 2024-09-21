@@ -29,8 +29,6 @@ https://qualcoder.wordpress.com/
 from copy import copy
 import logging
 import os
-import sys
-import traceback
 
 from PyQt6 import QtGui, QtWidgets, QtCore
 from PyQt6.QtCore import Qt
@@ -102,17 +100,15 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         pm.loadFromData(QtCore.QByteArray.fromBase64(question_icon), "png")
         self.ui.pushButton_help1.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_help1.pressed.connect(self.information)
-        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
-        font += '"' + self.app.settings['font'] + '";'
+        font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
-        font = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
-        font += '"' + self.app.settings['font'] + '";'
+        font = f'font: {self.app.settings["treefontsize"]}pt "{self.app.settings["font"]}";'
         self.ui.treeWidget.setStyleSheet(font)
         self.ui.listWidget_files.setStyleSheet(font)
         self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.SelectionMode.SingleSelection)
         self.ui.comboBox_coders.insertItems(0, self.coders)
         self.ui.comboBox_coders.currentTextChanged.connect(self.coder_selected)
-        if len(self.coders) == 3:  # includes empty slot
+        if len(self.coders) == 3:  # Includes empty slot
             self.ui.comboBox_coders.setCurrentIndex(1)
             self.ui.comboBox_coders.setCurrentIndex(2)
         self.fill_tree()
@@ -205,16 +201,16 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         if len(self.selected_coders) == 1 and self.selected_coders[0] != coder:
             self.selected_coders.append(coder)
             coder1 = self.ui.label_selections.text()
-            self.ui.label_selections.setText(coder1 + " , " + coder)
+            self.ui.label_selections.setText(f"{coder1} , {coder}")
         if len(self.selected_coders) == 2 and self.file_ is not None and self.code_ is not None:
             self.ui.pushButton_run.setEnabled(True)
 
     def file_selected(self):
         """ May activate run button if file, code and coders selected """
 
-        itemname = self.ui.listWidget_files.currentItem().text()
+        item_name = self.ui.listWidget_files.currentItem().text()
         for f in self.files:
-            if f['name'] == itemname:
+            if f['name'] == item_name:
                 self.file_ = f
         if len(self.selected_coders) == 2 and self.file_ is not None and self.code_ is not None:
             self.ui.pushButton_run.setEnabled(True)
@@ -282,9 +278,9 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
 
         txt = _("CODER COMPARISON FOR FILE") + "\n====\n" + _("CODERS: ")
         c1_pos0 = len(txt)
-        txt += self.selected_coders[0] + " " + _("(YELLOW CODER 0)")
+        txt += f"{self.selected_coders[0]} " + _("(YELLOW CODER 0)")
         c1_pos1 = len(txt)
-        txt += ", " + self.selected_coders[1] + " " + _("(BLUE CODER 1)") + "\n"
+        txt += f", {self.selected_coders[1]} " + _("(BLUE CODER 1)") + "\n"
         c2_pos1 = len(txt)
         txt += _("FILE: ") + self.file_['name'] + "\n"
         txt += _("CODE: ") + self.code_['name'] + "\n"
