@@ -30,8 +30,6 @@ import os
 from PIL import Image
 from PIL.ExifTags import TAGS
 import re
-import sys
-import traceback
 
 from PyQt6 import QtCore, QtWidgets, QtGui
 
@@ -72,14 +70,11 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         self.ui = Ui_Dialog_file_summary()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
-        font += '"' + self.app.settings['font'] + '";'
+        font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
-        docfont = 'font: ' + str(self.app.settings['docfontsize']) + 'pt '
-        docfont += '"' + self.app.settings['font'] + '";'
+        docfont = f'font: {self.app.settings["docfontsize"]}pt "{self.app.settings["font"]}";'
         self.ui.textEdit.setStyleSheet(docfont)
-        treefont = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
-        treefont += '"' + self.app.settings['font'] + '";'
+        treefont = f'font: {self.app.settings["treefontsize"]}pt "{self.app.settings["font"]}";'
         try:
             s0 = int(self.app.settings['dialogreport_file_summary_splitter0'])
             s1 = int(self.app.settings['dialogreport_file_summary_splitter1'])
@@ -162,14 +157,14 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         if file_ == "":
             return
         cur = self.app.conn.cursor()
-        text_ = file_name + "\n\n"
+        text_ = f"{file_name}\n\n"
         if file_['memo'] != "":
-            text_ += _("MEMO: ") + "\n" + file_['memo'] + "\n"
+            text_ += _("MEMO: ") + f"\n{file_['memo']}\n"
         text_ += self.get_attributes(file_['id'])
         text_ += self.get_case_assignment(file_['id'])
         cur.execute("select date, owner, fulltext, mediapath from source where id=?", [file_['id']])
         res = cur.fetchone()
-        text_ += "ID: " + str(file_['id']) + "  " + _("Date: ") + res[0] + "  " + _("Owner: ") + res[1] + "\n"
+        text_ += f"ID: {file_['id']}  " + _("Date: ") + f"{res[0]}  " + _("Owner: ") + f"{res[1]}\n"
         media_path = ""
         file_type = ""
         if res[3] is None or res[3] == "":
@@ -196,7 +191,7 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         elif res[3][0:8] == "/images/":
             media_path = _("Internal image file")
             file_type = "image"
-        text_ += _("Media path: ") + media_path + "\n"
+        text_ += _("Media path: ") + f"{media_path}\n"
         if file_type == "text":
             text_ += self.text_statistics(file_['id'])
         if file_type == "image":
@@ -221,9 +216,9 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         result = cur.fetchall()
         for row in result:
             if row[1] == 0 and row[2] == 0:
-                text_ += row[0] + "\n"
+                text_ += f"{row[0]}\n"
             else:
-                text_ += row[0] + " [" + str(row[1]) + " - " + str(row[2]) + "]" + "\n"
+                text_ += f"{row[0]} [{row[1]} - {row[2]}]\n"
         if not result:
             text_ += _("No case assignment") + "\n"
         text_ += "\n"
@@ -243,7 +238,7 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         if not result:
             return ""
         for row in result:
-            text_ += row[0] + ": " + str(row[1]) + " | "
+            text_ += f"{row[0]}: {row[1]} | "
         text_ += "\n"
         return text_
 
@@ -261,7 +256,6 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         else:
             abs_path = self.app.project_path + mediapath
         msecs = None
-        text_ = ""
         if vlc:
             try:
                 instance = vlc.Instance()
@@ -277,10 +271,10 @@ class DialogReportFileSummary(QtWidgets.QDialog):
                 mediaplayer.pause()
                 msecs = media.get_duration()
                 text_ += _("Duration: ") + msecs_to_hours_mins_secs(msecs) + "\n"
-                for k in meta_keys:
-                    meta = media.get_meta(k)
+                for meta_key in meta_keys:
+                    meta = media.get_meta(meta_key)
                     if meta is not None:
-                        text_ += str(k) + ":  " + meta + "\n"
+                        text_ += f"{meta_key}:  {meta}\n"
         else:
             text_ += _("Duration: Cannot obtain. VLC not installed.")
 
@@ -293,9 +287,9 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         res = cur.fetchall()
         text_ += "\n\n" + _("CODE COUNTS:") + "\n"
         for r in res:
-            text_ += r[0] + "  " + _("Count: ") + str(r[2]) + "  "
+            text_ += f"{r[0]}  " + _("Count: ") + f"{r[2]}  "
             if msecs:
-                text_ += _("Percent: ") + str(round(r[4] / msecs * 100, 2)) + "%  "
+                text_ += _("Percent: ") + f"{round(r[4] / msecs * 100, 2)}%  "
             text_ += _("Average segment: ") + f"{int(r[3]):,d}" + _(" msecs") + "\n"
 
         # Transcript
@@ -304,7 +298,7 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         cur.execute("select id from source where name=?", [filename + ".transcribed"])
         res = cur.fetchone()
         if res is not None:
-            text_ += "\n" + _("TRANSCRIPT:") + filename + ".transcribed" + "\n"
+            text_ += "\n" + _("TRANSCRIPT:") + f"{filename}.transcribed\n"
             text_ += self.text_statistics(res[0])
             text_ += _("END OF TRANSCRIPT") + "\n"
         return text_
@@ -330,10 +324,10 @@ class DialogReportFileSummary(QtWidgets.QDialog):
             media.parse()
             msecs = media.get_duration()
             text_ += _("Duration: ") + msecs_to_hours_mins_secs(msecs) + "\n"
-            for k in meta_keys:
-                meta = media.get_meta(k)
+            for meta_key in meta_keys:
+                meta = media.get_meta(meta_key)
                 if meta is not None:
-                    text_ += str(k) + ":  " + meta + "\n"
+                    text_ += f"{meta_key}:  {meta}\n"
         else:
             text_ = _("Duration: Cannot obtain. VLC not installed.")
 
@@ -346,8 +340,8 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         res = cur.fetchall()
         text_ += "\n\n" + _("CODE COUNTS:") + "\n"
         for r in res:
-            text_ += r[0] + "  " + _("Count: ") + str(r[2]) + "  "
-            text_ += _("Percent: ") + str(round(r[4] / msecs * 100, 2)) + "%  "
+            text_ += f"{r[0]}  " + _("Count: ") + f"{r[2]}  "
+            text_ += _("Percent: ") + f"{round(r[4] / msecs * 100, 2)}%  "
             text_ += _("Average segment: ") + f"{int(r[3]):,d}" + _(" msecs") + "\n"
         # Transcript
         cur.execute("select name from source where id=?", [id_])
@@ -355,7 +349,7 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         cur.execute("select id from source where name=?", [filename + ".transcribed"])
         res = cur.fetchone()
         if res is not None:
-            text_ += "\n" + _("TRANSCRIPT: ") + filename + ".transcribed" + "\n"
+            text_ += "\n" + _("TRANSCRIPT: ") + f"{filename}.transcribed\n"
             text_ += self.text_statistics(res[0])
             text_ += _("END OF TRANSCRIPT") + "\n"
         return text_
@@ -376,7 +370,7 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         # Image size and metadata
         image = Image.open(abs_path)
         w, h = image.size
-        text_ += _("Width: ") + f"{w:,d}" + "  " + _("Height: ") + f"{h:,d}" + "  " + _("Area: ") + f"{w * h:,d}" + \
+        text_ += _("Width: ") + f"{w:,d}" + "  " + _("Height: ") + f"{h:,d}  " + _("Area: ") + f"{w * h:,d}" + \
                 _(" pixels") + "\n"
         image_type = abs_path[-3:].lower()
         # From: www.thepythoncode.com/article/extracting-image-metadata-in-python
@@ -391,14 +385,14 @@ class DialogReportFileSummary(QtWidgets.QDialog):
                 if isinstance(data, bytes):
                     try:
                         data = data.decode()
-                        text_ += f"{tag:25}: {data}" + "\n"
-                    except UnicodeDecodeError as e:
-                        logger.debug(e)
+                        text_ += f"{tag:25}: {data}\n"
+                    except UnicodeDecodeError as e_:
+                        logger.debug(e_)
         # From: www.vice.com/en/article/aekn58/hack-this-extra-image-metadata-using-python
         if image_type == "png":
             for tag, value in image.info.items():
                 key = TAGS.get(tag, tag)
-                text_ += key + " " + str(value) + "\n"
+                text_ += f"{key} {value}\n"
         # Codes
         sql = "select code_name.name, code_image.cid, count(code_image.cid), round(avg(width)), round(avg(height)), "
         sql += "sum(width*height) "
@@ -411,8 +405,8 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         # Calculate statistics
         for r in res:
             area = int(r[3] * r[4])
-            text_ += r[0] + "  " + _("Count: ") + str(r[2]) + "  "
-            text_ += _("Percent: ") + str(round(r[5] / (w * h) * 100, 2)) + "%  "
+            text_ += r[0] + "  " + _("Count: ") + f"{r[2]}  "
+            text_ += _("Percent: ") + f"{round(r[5] / (w * h) * 100, 2)}%  "
             text_ += _("Average area: ") + f"{area:,d}" + _(" pixels") + "\n"
         return text_
 
@@ -427,7 +421,7 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         fulltext = cur.fetchone()[0]
         if fulltext is None:
             fulltext = ""
-        text_ += _("Characters: ") + f"{len(fulltext):,d}" + "\n"
+        text_ += _("Characters: ") + f"{len(fulltext):,d}\n"
         # Remove punctuation. Convert to lower case
         chars = ""
         for c in range(0, len(fulltext)):
@@ -438,8 +432,8 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         chars = chars.lower()
         word_list = chars.split()
         msg = _("Word calculations: Words use alphabet characters and include the apostrophe. All other characters are word separators")
-        text_ += "\n" + msg + "\n"
-        text_ += "\n" + _("Words: ") + f"{len(word_list):,d}" + "\n"
+        text_ += f"\n{msg}\n"
+        text_ += "\n" + _("Words: ") + f"{len(word_list):,d}\n"
         # Word frequency
         d = {}
         for word in word_list:
@@ -449,14 +443,14 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         for key, value in d.items():
             word_freq.append((value, key))
         word_freq.sort(reverse=True)
-        text_ += _("Unique words: ") + str(len(word_freq)) + "\n"
+        text_ += _("Unique words: ") + f"{len(word_freq)}\n"
         # Top 100 or maximum of less than 100
         max_count = len(word_freq)
         if max_count > 100:
             max_count = 100
         text_ += _("Top 100 words") + "\n"
         for i in range(0, max_count):
-            text_ += word_freq[i][1] + "   " + str(word_freq[i][0]) + " | "
+            text_ += f"{word_freq[i][1]}   {word_freq[i][0]} | "
         # Codes
         sql = "select code_name.name, code_text.cid, count(code_text.cid), sum(length(code_text.seltext)), "
         sql += "round(avg(length(code_text.seltext))) from code_text join code_name "
@@ -468,8 +462,8 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         # Calculate code statistics
         for r in res:
             text_ += r[0] + "  " + _("Count: ") + str(r[2]) + "  " + _("Total characters: ") + f"{r[3]:,d}"
-            text_ += "  " + _("Percent: ") + str(round((r[3] / len(fulltext)) * 100, 2)) + "%"
-            text_ += "  " + _("Average characters: ") + str(int(r[4])) + "\n"
+            text_ += "  " + _("Percent: ") + f"{round((r[3] / len(fulltext)) * 100, 2)}%"
+            text_ += "  " + _("Average characters: ") + f"{int(r[4])}\n"
         return text_
 
     def search_results_next(self):
@@ -500,4 +494,3 @@ class DialogReportFileSummary(QtWidgets.QDialog):
                 cursor.setPosition(match.start() + len(search_text), QtGui.QTextCursor.MoveMode.KeepAnchor)
                 self.ui.textEdit.setTextCursor(cursor)
                 break
-
