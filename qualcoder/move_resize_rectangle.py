@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2022 Colin Curtain
+Copyright (c) 2024 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -27,9 +27,7 @@ https://github.com/ccbogel/QualCoder
 
 from PyQt6 import QtCore, QtWidgets, QtGui
 import os
-import sys
 import logging
-import traceback
 
 from .GUI.ui_move_resize_rectangle import Ui_Dialog_move_resize_rect
 
@@ -38,8 +36,7 @@ logger = logging.getLogger(__name__)
 
 
 class DialogMoveResizeRectangle(QtWidgets.QDialog):
-    """
-    Dialog to obtain integers for move or resize a coded image rectangle.
+    """ Dialog to obtain integers for move or resize a coded image rectangle.
     """
 
     app = None
@@ -56,8 +53,7 @@ class DialogMoveResizeRectangle(QtWidgets.QDialog):
         self.ui = Ui_Dialog_move_resize_rect()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        font = 'font: ' + str(app.settings['fontsize']) + 'pt '
-        font += '"' + app.settings['font'] + '";'
+        font = f'font: {app.settings["fontsize"]}pt "{app.settings["font"]}";'
         self.setStyleSheet(font)
         integer_validator = QtGui.QIntValidator()
         self.ui.lineEdit_move_horizontal.setValidator(integer_validator)
