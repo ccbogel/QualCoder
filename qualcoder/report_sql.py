@@ -34,8 +34,6 @@ from datetime import datetime
 import logging
 import os
 import sqlite3
-import sys
-import traceback
 
 from .GUI.base64_helper import *
 from .GUI.ui_dialog_SQL import Ui_Dialog_sql
@@ -45,7 +43,6 @@ from .highlighter import Highlighter
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
-
 
 
 class DialogSQL(QtWidgets.QDialog):
@@ -81,13 +78,10 @@ class DialogSQL(QtWidgets.QDialog):
         self.ui = Ui_Dialog_sql()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
-        font += '"' + self.app.settings['font'] + '";'
+        font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
-        doc_font = 'font: ' + str(self.app.settings['docfontsize']) + 'pt '
-        doc_font += '"' + self.app.settings['font'] + '";'
+        doc_font = f'font: {self.app.settings["docfontsize"]}pt "{self.app.settings["font"]}";'
         self.ui.tableWidget_results.setStyleSheet(doc_font)
-
         self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         highlighter = Highlighter(self.ui.textEdit_sql)
         if self.app.settings['stylesheet'] in ("dark", "rainbow"):
@@ -156,7 +150,7 @@ class DialogSQL(QtWidgets.QDialog):
         results = cur.fetchall()
         header = []
         if cur.description is not None:
-            header = list(map(lambda x: x[0], cur.description))  # gets column names
+            header = list(map(lambda x: x[0], cur.description))  # Gets column names
         filename = "sql_report.csv"
         export_dir = ExportDirectoryPathDialog(self.app, filename)
         filepath = export_dir.filepath
@@ -192,24 +186,17 @@ class DialogSQL(QtWidgets.QDialog):
                 self.ui.textEdit_sql.clear()
                 self.ui.textEdit_sql.setText(s['sql'])
                 return
-
         for d in self.default_sqls:
             if index == d['index']:
                 self.ui.textEdit_sql.clear()
                 self.ui.textEdit_sql.setText(d['sql'])
                 return
-
-        if index.parent().row() != -1:  # there is a parent if not -1
+        if index.parent().row() != -1:  # There is a parent if not -1
             item_parent = self.ui.treeWidget.itemFromIndex(index.parent())
             item_parent_text = item_parent.text(0)
-            '''if item_parent_text == "Default Queries":
-                self.ui.textEdit_sql.clear()
-                self.ui.textEdit_sql.setText(item_text)
-                return
-            if item_parent_text != "Default Queries":'''
-            item_text = item_parent_text + "." + item_text
+            item_text = f"{item_parent_text}.{item_text}"
         cursor = self.ui.textEdit_sql.textCursor()
-        cursor.insertText(" " + item_text + " ")
+        cursor.insertText(f" {item_text} ")
 
     def run_sql(self):
         """ Run the sql text and add the results to the results text edit. """
@@ -225,7 +212,7 @@ class DialogSQL(QtWidgets.QDialog):
         self.sql = self.ui.textEdit_sql.toPlainText()
         cur = self.app.conn.cursor()
         self.sql = str(self.sql)
-        QtWidgets.QApplication.processEvents()  # stops gui freeze
+        QtWidgets.QApplication.processEvents()  # Stops gui freeze
         try:
             time0 = datetime.now()
             cur.execute(self.sql)
@@ -233,7 +220,7 @@ class DialogSQL(QtWidgets.QDialog):
             self.results = cur.fetchall()
             time1 = datetime.now()
             timediff = time1 - time0
-            self.queryTime = "Time:" + str(timediff)
+            self.queryTime = f"Time:{timediff}"
             self.ui.label.setToolTip(self.queryTime)
             self.ui.label.setText(str(len(self.results)) + _(" rows"))
             # Extra messaging where rows will be zero
@@ -262,8 +249,6 @@ class DialogSQL(QtWidgets.QDialog):
                 self.file_data.append(row_results)
                 self.ui.tableWidget_results.insertRow(row)
                 for col, value in enumerate(row_results):
-                    '''if value is None:
-                        value = ""'''
                     item = QtWidgets.QTableWidgetItem()
                     item.setData(QtCore.Qt.ItemDataRole.DisplayRole, value)
                     item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
@@ -296,25 +281,21 @@ class DialogSQL(QtWidgets.QDialog):
         result = cur.fetchall()
         for row in result:
             table_name = row[2]
-            field_results = cur.execute("PRAGMA table_info(" + table_name + ")")
+            field_results = cur.execute(f"PRAGMA table_info({table_name})")
             # each field is a tuple of cid, name, type (integer, text, ), notNull (1=notNull),
             # defaultValue(None usually), primaryKey(as integers 1 up, or 0)
             fields = [field for field in field_results]
-            '''for field in field_results:
-                fields.append(field)'''
             table_dict[table_name] = fields
         self.schema = table_dict
 
         # Fill tree widget with tables and views
         tables_and_views = [k for k in self.schema.keys()]
-        '''for k in self.schema.keys():
-            tables_and_views.append(k)'''
         tables_and_views.sort()
         self.ui.treeWidget.clear()
         for table_name in tables_and_views:
             top_item = QtWidgets.QTreeWidgetItem()
             top_item.setText(0, table_name)
-            result = cur.execute("SELECT type FROM sqlite_master WHERE name='" + table_name + "' ")
+            result = cur.execute(f"SELECT type FROM sqlite_master WHERE name='{table_name}' ")
             table_or_view = result.fetchone()[0]
             if table_or_view == "view":
                 top_item.setBackground(0, QtGui.QBrush(Qt.GlobalColor.yellow, Qt.BrushStyle.Dense6Pattern))
@@ -528,8 +509,8 @@ class DialogSQL(QtWidgets.QDialog):
             if self.ui.tableWidget_results.item(r, self.col).text() != self.cell_value:
                 self.ui.tableWidget_results.setRowHidden(r, True)
         self.ui.label.setText(str(len(self.file_data) - 1) + _(" rows [filtered]"))
-        self.queryFilters += "\n" + str(self.ui.tableWidget_results.horizontalHeaderItem(self.col).text()) + \
-                             _(" equals: ") + str(self.cell_value)
+        self.queryFilters += f"\n{self.ui.tableWidget_results.horizontalHeaderItem(self.col).text()}" + \
+                             f" = {self.cell_value}"
         self.ui.label.setToolTip(self.queryTime + self.queryFilters)
 
     def show_all_rows(self):
@@ -560,7 +541,7 @@ class NewTableWidget(QtWidgets.QTableWidget):
             self.col = self.currentColumn()
             self.cell_value = str(self.item(self.row, self.col).text())
         except AttributeError as e:
-            logger.warning("No table for menu: " + str(e))
+            logger.warning(f"No table for menu: {e}")
             return
 
         action_show_all_rows = menu.addAction(_("Clear filter"))
