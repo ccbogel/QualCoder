@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2022 Colin Curtain
+Copyright (c) 2024 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -31,8 +31,6 @@ import logging
 import os
 from random import randint
 import sqlite3
-import sys
-import traceback
 
 from PyQt6 import QtWidgets
 
@@ -67,7 +65,7 @@ class RqdaImport:
             self.parent_textEdit.append(_("Data imported from ") + self.file_path)
             self.parent_textEdit.append(_("File categories are not imported from RQDA"))
         except Exception as e:
-            self.parent_textEdit.append(_("Data import unsuccessful from ") + self.file_path + "\n" + str(e))
+            self.parent_textEdit.append(_("Data import unsuccessful from ") + f"{self.file_path}\n{e}")
 
     @staticmethod
     def convert_date(r_date):
@@ -231,14 +229,14 @@ class RqdaImport:
         self.parent_textEdit.append(str(i) + _(" codings imported from coding2 table"))
         if dup > 0:
             self.parent_textEdit.append(str(dup) + _(" duplicated codings found and ignored from coding2 table"))
-        # attribute class = character or numeric
+        # Attribute class = character or numeric
         r_cur.execute("select distinct variable from caseAttr")
         case_attr = r_cur.fetchall()
         r_cur.execute("select name,class,memo, owner, date from attributes")
         res = r_cur.fetchall()
         i = 0
         for r in res:
-            # default to a file attribute unless it is a case attribute
+            # Default to a file attribute unless it is a case attribute
             case_or_file = "file"
             for c in case_attr:
                 if c[0] == r[0]:
@@ -292,14 +290,13 @@ class RqdaImport:
         for r in res:
             name = r[0]
             if name[:-4] in (".pdf", ".odt", ".htm"):
-                name = name[:-4] + ".txt"
+                name = f"{name[:-4]}.txt"
             if name[:-5] in (".html", ".docx"):
-                name = name[:-5] + ".txt"
-            destination = self.app.project_path + "/documents/" + name
-            f = open(destination, 'w')
-            f.write(r[1])
-            f.close()
-            logger.info("Text file exported to " + destination)
+                name = f"{name[:-5]}.txt"
+            destination = f"{self.app.project_path}/documents/{name}"
+            with open(destination, 'w', encoding='utf-8-sig') as file_:
+                file_.write(r[1])
+            logger.info(f"Text file exported to {destination}")
         # Change the user name to the owner name from RQDA
         sql = "select owner from code_text"
         q_cur.execute(sql)
