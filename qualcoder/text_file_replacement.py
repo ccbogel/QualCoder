@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2022 Colin Curtain
+Copyright (c) 2024 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -29,8 +29,6 @@ https://qualcoder.wordpress.com/
 import datetime
 import ebooklib
 from ebooklib import epub
-import logging
-import os
 from pdfminer.pdfpage import PDFPage
 from pdfminer.pdfparser import PDFParser
 from pdfminer.pdfdocument import PDFDocument
@@ -38,11 +36,7 @@ from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
 from pdfminer.converter import PDFPageAggregator
 from pdfminer.layout import LAParams, LTTextBox, LTTextLine
 from shutil import copyfile
-import sys
-import traceback
 import zipfile
-
-from PyQt6 import QtWidgets
 
 from .docx import opendocx, getdocumenttext
 from .helpers import Message
@@ -94,7 +88,7 @@ class ReplaceTextFile:
         errs += self.update_case_positions()
         msg = _("Reload the other tabs.\nCheck accuracy of codings and annotations.\n")
         msg += _("Function works by identifying the first matching text segment for each coding and annotation.")
-        msg += "\n" + errs
+        msg += f"\n{errs}"
         Message(self.app, _("File replaced"), msg).exec()
 
     def update_case_positions(self):
@@ -128,7 +122,7 @@ class ReplaceTextFile:
             cur.execute("delete from case_text where id=?", [id_])
             self.app.conn.commit()
         if err_msg != "":
-            return "\n" + err_msg
+            return f"\n{err_msg}"
         return err_msg
 
     def update_code_positions(self):
@@ -182,7 +176,7 @@ class ReplaceTextFile:
         if len(to_delete) > 0:
             err_msg += _("\nDeleted ") + str(len(to_delete)) + _(" unmatched codings")
         if err_msg != "":
-            return err_msg + "\n"
+            return f"{err_msg}\n"
         return err_msg
 
     def get_codings_annotations_case(self):
@@ -246,12 +240,12 @@ class ReplaceTextFile:
         # Import from odt
         if self.new_file_path[-4:].lower() == ".odt":
             text = self.convert_odt_to_text(self.new_file_path)
-            text = text.replace("\n", "\n\n")  # add line to paragraph spacing for visual format
+            text = text.replace("\n", "\n\n")  # Add line to paragraph spacing for visual format
         # Import from docx
         if self.new_file_path[-5:].lower() == ".docx":
             document = opendocx(self.new_file_path)
             list_ = getdocumenttext(document)
-            text = "\n\n".join(list_)  # add line to paragraph spacing for visual format
+            text = "\n\n".join(list_)  # Add line to paragraph spacing for visual format
         # Import from epub
         if self.new_file_path[-5:].lower() == ".epub":
             book = epub.read_epub(self.new_file_path)
@@ -313,12 +307,12 @@ class ReplaceTextFile:
                     if text[0:6] == "\ufeff":
                         text = text[6:]
             except Exception as e:
-                msg = _("Cannot import") + str(self.new_file_path) + "\n" + str(e)
+                msg = _("Cannot import") + f"{self.new_file_path}\n{e}"
                 Message(self.app, _("Warning"), msg, "warning").exec()
                 return
             if import_errors > 0:
                 Message(self.app, _("Warning"), str(import_errors) + _(" lines not imported"), "warning").exec()
-                logger.warning(self.new_file_path + ": " + str(import_errors) + _(" lines not imported"))
+                logger.warning(f"{self.new_file_path}: {import_errors}" + _(" lines not imported"))
         # Import of text file did not work
         if text == "":
             msg = str(self.new_file_path) + _("\nPlease check if the file is empty.")
@@ -327,23 +321,20 @@ class ReplaceTextFile:
 
         name_split = self.new_file_path.split("/")
         filename = name_split[-1]
-
         cur = self.app.conn.cursor()
         # Remove old file from project folder
         cur.execute("select mediapath from source where id=?", [self.old_file['id']])
         res = cur.fetchone()
         if res[0] is None:  # Internal file
-            old_filepath = self.app.project_path + "/documents/" + self.old_file['name']
+            old_filepath = f"{self.app.project_path}/documents/{self.old_file['name']}"
             try:
                 os.remove(old_filepath)
             except FileNotFoundError as e:
                 logger.warning(_("Deleting file error: ") + str(e))
         # Insert new file into project folder
-        copyfile(self.new_file_path, self.app.project_path + "/documents/" + filename)
+        copyfile(self.new_file_path, f"{self.app.project_path}/documents/{filename}")
         # Update old file entry to new file
         mediapath = None
-        '''if link_path != "":
-            mediapath = link_path'''
         self.new_file = {'name': filename, 'id': self.old_file['id'], 'fulltext': text, 'mediapath': mediapath,
             'memo': self.old_file['memo'], 'owner': self.app.settings['codername'],
             'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
