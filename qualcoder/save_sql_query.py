@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2022 Colin Curtain
+Copyright (c) 2024 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,11 +26,9 @@ https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 """
 
-from PyQt6 import QtWidgets, QtCore
-import os
-import sys
 import logging
-import traceback
+import os
+from PyQt6 import QtWidgets, QtCore
 
 from .GUI.ui_save_query import Ui_DialogSaveQuery
 
@@ -56,8 +54,7 @@ class DialogSaveSql(QtWidgets.QDialog):
         self.ui = Ui_DialogSaveQuery()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        font = 'font: ' + str(app_.settings['fontsize']) + 'pt '
-        font += '"' + app_.settings['font'] + '";'
+        font = f'font: {app_.settings["fontsize"]}pt "{app_.settings["font"]}";'
         self.setStyleSheet(font)
 
     def accept(self):
