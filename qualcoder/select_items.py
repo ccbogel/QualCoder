@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2022 Colin Curtain
+Copyright (c) 2024 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -27,10 +27,8 @@ https://qualcoder.wordpress.com/
 """
 
 import copy
-import os
-import sys
 import logging
-import traceback
+import os
 
 from PyQt6 import QtCore, QtWidgets
 
@@ -76,8 +74,7 @@ class DialogSelectItems(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_selectitems()
         self.ui.setupUi(self)
-        font = 'font: ' + str(app_.settings['fontsize']) + 'pt '
-        font += '"' + app_.settings['font'] + '";'
+        font = f'font: {app_.settings["fontsize"]}pt "{app_.settings["font"]}";'
         self.setStyleSheet(font)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         self.setWindowTitle(title)
@@ -129,9 +126,6 @@ class DialogSelectItems(QtWidgets.QDialog):
             return
 
         self.data_refined = [d for d in self.data if d['group'] == grouper]
-        '''for d in self.data:
-            if d['group'] == grouper:
-                self.data_refined.append(d)'''
         self.model = ListModel(self.data_refined)
         self.ui.listView.setModel(self.model)
 
