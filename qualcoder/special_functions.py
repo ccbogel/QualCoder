@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2022 Colin Curtain
+Copyright (c) 2024 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -27,8 +27,6 @@ https://github.com/ccbogel/QualCoder
 
 import logging
 import os
-import sys
-import traceback
 
 from PyQt6 import QtGui, QtWidgets, QtCore
 
@@ -71,8 +69,7 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
         self.parent_text_edit = parent_text_edit
         self.tab_coding = tab_coding
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        font = 'font: ' + str(app.settings['fontsize']) + 'pt '
-        font += '"' + app.settings['font'] + '";'
+        font = f'font: {app.settings["fontsize"]}pt "{app.settings["font"]}";'
         self.setStyleSheet(font)
         self.merge_project_path = ""
         pm = QtGui.QPixmap()
