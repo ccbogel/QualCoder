@@ -27,15 +27,12 @@ https://qualcoder.wordpress.com/
 """
 
 import csv
-import ctypes
 import datetime
 import logging
 import os
 import platform
 from random import randint
 import sqlite3
-import sys
-import traceback
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 
@@ -63,8 +60,8 @@ def msecs_to_mins_and_secs(msecs):
     mins = int(secs / 60)
     remainder_secs = str(secs - mins * 60)
     if len(remainder_secs) == 1:
-        remainder_secs = "0" + remainder_secs
-    return str(mins) + "." + remainder_secs
+        remainder_secs = f"0{remainder_secs}"
+    return f"{mins}.{remainder_secs}"
 
 
 def msecs_to_hours_mins_secs(msecs):
@@ -405,8 +402,8 @@ class DialogCodeInAV(QtWidgets.QDialog):
         self.app = app
         self.data = data
         QtWidgets.QDialog.__init__(self)
-        font = f"font: {self.app.settings['fontsize']}pt "
-        font += '"' + self.app.settings['font'] + '";'
+        font = f'font: {self.app.settings["fontsize"]}pt '
+        font += f'"{self.app.settings["font"]}";'
         self.setStyleSheet(font)
         self.resize(400, 300)
         # Enable custom window hint to enable customizing window controls
@@ -468,7 +465,7 @@ class DialogCodeInAV(QtWidgets.QDialog):
         msecs = self.mediaplayer.get_time()
         msg = msecs_to_mins_and_secs(msecs)
         try:
-            msg += "\n" + _("Memo: ") + self.data['memo']
+            msg += f"\nMemo: {self.data['memo']}"
         except KeyError:
             pass
         self.setToolTip(msg)
@@ -611,7 +608,7 @@ class DialogCodeInImage(QtWidgets.QDialog):
         self.draw_coded_area()
         self.ui.graphicsView.update()
         msg = _("Key + or W zoom in. Key - or Q zoom out") + "\n"
-        msg += _("Scale: ") + str(int(self.scale * 100)) + "%"
+        msg += f'{_("Scale:")} {int(self.scale * 100)}%'
         self.ui.horizontalSlider.setToolTip(msg)
 
     def eventFilter(self, object_, event):

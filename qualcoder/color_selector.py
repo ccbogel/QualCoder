@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2023 Colin Curtain
+Copyright (c) 2024 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -27,8 +27,6 @@ https://github.com/ccbogel/QualCoder
 
 import logging
 import os
-import sys
-import traceback
 
 from PyQt6 import QtGui, QtWidgets, QtCore
 
@@ -175,8 +173,8 @@ class DialogColorSelect(QtWidgets.QDialog):
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         self.app = app
-        font = 'font: ' + str(app.settings['fontsize']) + 'pt '
-        font += '"' + app.settings['font'] + '";'
+        font = f'font: {app.settings["fontsize"]}pt '
+        font += f'"{app.settings["font"]}";'
         self.setStyleSheet(font)
         self.selected_color = code_['color']
         self.ui.tableWidget.setStyleSheet("border: none; font-size: 10px")
@@ -185,7 +183,7 @@ class DialogColorSelect(QtWidgets.QDialog):
         cur.execute("select color, name from code_name order by name")
         self.used_colors = cur.fetchall()
         self.fill_table()
-        # preset with the current colour
+        # Preset with the current colour
         fg_color = TextColor(code_['color']).recommendation
         style = "QLabel {background-color :" + code_['color'] + "; color : " + fg_color + ";}"
         self.ui.label_colour_old.setStyleSheet(style)
@@ -256,7 +254,7 @@ class DialogColorSelect(QtWidgets.QDialog):
                 for c in self.used_colors:
                     if code_color == c[0]:
                         text = "*"
-                        ttip += c[1] + "\n"
+                        ttip += f"{c[1]}\n"
                 item = QtWidgets.QTableWidgetItem(text)
                 item.setToolTip(ttip)
                 if color_range == "normal":

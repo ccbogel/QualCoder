@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2023 Colin Curtain
+Copyright (c) 2024 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -30,14 +30,13 @@ from PyQt6 import QtWidgets, QtCore, QtGui
 from copy import copy
 import difflib
 import os
-import sys
 import logging
-import traceback
 
 from .GUI.ui_dialog_memo import Ui_Dialog_memo
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
+
 
 class DialogEditTextFile(QtWidgets.QDialog):
     """ Dialog to view and edit text file data.
@@ -57,10 +56,8 @@ class DialogEditTextFile(QtWidgets.QDialog):
     has_changed = False
 
     def __init__(self, app, fid, clear_button="show"):
-        """ """
 
-        super(DialogEditTextFile, self).__init__(parent=None)  # overrride accept method
-
+        super(DialogEditTextFile, self).__init__(parent=None)  # Overrride accept method
         self.app = app
         self.fid = fid
         cur = self.app.conn.cursor()
@@ -74,8 +71,8 @@ class DialogEditTextFile(QtWidgets.QDialog):
         self.ui = Ui_Dialog_memo()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
-        font += '"' + self.app.settings['font'] + '";'
+        font = f'font: {self.app.settings["fontsize"]}pt '
+        font += f'"{self.app.settings["font"]}";'
         self.setStyleSheet(font)
         self.setWindowTitle(self.name)
         msg = _(
@@ -141,7 +138,6 @@ class DialogEditTextFile(QtWidgets.QDialog):
             self.no_codes_annotes_cases = False
 
     def clear_contents(self):
-        """ Clear all text """
         self.ui.textEdit.setPlainText("")
 
     def update_positions(self):

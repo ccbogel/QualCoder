@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2023 Colin Curtain
+Copyright (c) 2024 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -29,8 +29,6 @@ https://qualcoder.wordpress.com/
 
 import logging
 import os
-import sys
-import traceback
 import time
 
 from PyQt6 import QtCore, QtWidgets, QtGui
@@ -69,8 +67,7 @@ class DialogManageLinks(QtWidgets.QDialog):
         except KeyError:
             pass
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
-        font += '"' + self.app.settings['font'] + '";'
+        font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
         self.ui.tableWidget.cellClicked.connect(self.cell_selected)
         self.ui.tableWidget.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
@@ -139,7 +136,7 @@ class DialogManageLinks(QtWidgets.QDialog):
             return
         new_file_name = file_path.split('/')[-1]
         if self.links[row]['name'] != new_file_name:
-            msg = _("Filename does not match.") + "\n" + self.links[row]['name'] + "\n" + new_file_name
+            msg = _("Filename does not match.") + f"\n{self.links[row]['name']}\n{new_file_name}"
             Message(self.app, _('Wrong file'), msg, "warning").exec()
             return
         self.update_database(file_path, row)

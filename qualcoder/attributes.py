@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2022 Colin Curtain
+Copyright (c) 2024 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -63,8 +63,8 @@ class DialogManageAttributes(QtWidgets.QDialog):
         self.ui = Ui_Dialog_manage_attributes()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
-        font += '"' + self.app.settings['font'] + '";'
+        font = f'font: {self.app.settings["fontsize"]}pt '
+        font += f'"{self.app.settings["font"]}";'
         self.setStyleSheet(font)
         self.get_attributes()
         self.fill_table_widget()
@@ -103,7 +103,7 @@ class DialogManageAttributes(QtWidgets.QDialog):
         indexes = self.ui.tableWidget.selectedIndexes()
         ix = [i.row() for i in indexes]
         i = set(ix)
-        self.ui.label.setText(_("Attributes: ") + str(len(i)) + "/" + str(len(self.attributes)))
+        self.ui.label.setText(_("Attributes: ") + f"{len(i)}/{len(self.attributes)}")
 
     def add_attribute(self):
         """ When add button pressed, open addItem dialog to get new attribute text.
@@ -120,8 +120,8 @@ class DialogManageAttributes(QtWidgets.QDialog):
         ui = Ui_Dialog_assignAttribute()
         ui.setupUi(dialog_assign)
         dialog_assign.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
-        font += '"' + self.app.settings['font'] + '";'
+        font = f'font: {self.app.settings["fontsize"]}pt '
+        font += f'"{self.app.settings["font"]}";'
         dialog_assign.setStyleSheet(font)
         dialog_assign.exec()
         case_or_file = "case"
@@ -157,7 +157,7 @@ class DialogManageAttributes(QtWidgets.QDialog):
             cur.execute(sql, (item['name'], "", id_[0], case_or_file, now_date, self.app.settings['codername']))
         self.app.conn.commit()
         self.fill_table_widget()
-        self.parent_textEdit.append(_("Attribute added: ") + item['name'] + _(" to ") + _(case_or_file))
+        self.parent_textEdit.append(f"{_('Attribute added: ')}{item['name']} -> {_(case_or_file)}")
 
     def delete_attribute(self):
         """ When delete button pressed, attribute is deleted from database. """

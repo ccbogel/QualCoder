@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2023 Colin Curtain
+Copyright (c) 2024 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -86,11 +86,11 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         except KeyError:
             pass
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
-        font += '"' + self.app.settings['font'] + '";'
+        font = f'font: {self.app.settings["fontsize"]}pt '
+        font += f'"{self.app.settings["font"]}";'
         self.setStyleSheet(font)
-        font2 = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
-        font2 += '"' + self.app.settings['font'] + '";'
+        font2 = f'font: {self.app.settings["treefontsize"]}pt '
+        font2 += f'"{self.app.settings["font"]}";'
         self.ui.tableWidget.setStyleSheet(font2)
         self.ui.tableWidget.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
         self.ui.tableWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
@@ -158,11 +158,11 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         sql = "select id, name, fulltext, mediapath, memo, owner, date, av_text_id from  source order by source.name asc"
         cur.execute(sql)
         self.allfiles = cur.fetchall()
-        msg = _("Files linked: ") + str(len(self.casefiles)) + " / " + str(len(self.allfiles))
+        msg = _("Files linked: ") + f"{len(self.casefiles)} / {len(self.allfiles)}"
         self.ui.label_files_linked.setText(msg)
 
     def table_menu(self, position):
-        """ Context menu to add/remove files to case. """
+        """ Context menu to add and remove files to case. """
 
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
@@ -221,14 +221,14 @@ class DialogCaseFileManager(QtWidgets.QDialog):
                     (link['caseid'], link['fid'], link['pos0'], link['pos1']))
         result = cur.fetchall()
         if len(result) > 0:
-            msg = _("This file has already been linked to this case ") + file_[1] + "\n"
+            msg = _("This file has already been linked to this case ") + f"{file_[1]}\n"
             return msg
         # Even non-text files can be assigned to the case here
         sql = "insert into case_text (caseid, fid, pos0, pos1, owner, date, memo) values(?,?,?,?,?,?,?)"
         cur.execute(sql, (link['caseid'], link['fid'], link['pos0'], link['pos1'],
                           link['owner'], link['date'], link['memo']))
         self.app.conn.commit()
-        msg = file_[1] + _(" added to case.") + "\n"
+        msg = f'{file_[1]} {_("added to case.")}\n'
 
         # Update table entry assigned to Yes
         rows = self.ui.tableWidget.rowCount()
@@ -265,7 +265,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
             try:
                 cur.execute(sql, [self.case['caseid'], f[0]])
                 self.app.conn.commit()
-                self.parent_textEdit.append(f[1] + " removed from case " + self.case['name'])
+                self.parent_textEdit.append(f"{f[1]} removed from case {self.case['name']}")
             except Exception as e:
                 print(e)
                 logger.debug(str(e))
@@ -502,7 +502,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
             cursor.setPosition(len(self.selected_text_file[FULLTEXT]) - 1, QtGui.QTextCursor.MoveMode.KeepAnchor)
             cursor.setCharFormat(QtGui.QTextCharFormat())
         except Exception as e:
-            logger.debug((str(e) + "\n unlight, text length" + str(len(self.ui.textBrowser.toPlainText()))))
+            logger.debug(f"{e}\n Unlight, text length: {len(self.ui.textBrowser.toPlainText())}")
 
     def highlight(self):
         """ Apply text highlighting to current file.
@@ -523,9 +523,8 @@ class DialogCaseFileManager(QtWidgets.QDialog):
                 format_.setUnderlineColor(QtCore.Qt.GlobalColor.red)
                 cursor.setCharFormat(format_)
             except Exception as err:
-                msg = "highlight, text length " + str(len(self.ui.textBrowser.toPlainText()))
-                msg += "\npos0:" + str(item['pos0']) + ", pos1:" + str(item['pos1'])
-                msg += "\n" + str(err)
+                msg = f"highlight, text length {len(self.ui.textBrowser.toPlainText())}"
+                msg += f"\npos0: {item['pos0']}, pos1: {item['pos1']}\n{err}"
                 logger.debug(msg)
 
     def mark(self):
@@ -538,7 +537,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         pos1 = self.ui.textBrowser.textCursor().selectionEnd()
         if pos0 == pos1:
             return
-        # add new item to case_text list and database and update GUI
+        # Add new item to case_text list and database and update GUI
         item = {'caseid': self.case['caseid'],
                 'fid': self.selected_text_file[ID],
                 'pos0': pos0, 'pos1': pos1,
@@ -648,7 +647,7 @@ class DialogCaseFileManager(QtWidgets.QDialog):
                         text_end_iterator += 1
                 except IndexError:
                     text_end_iterator = -1
-                    warning_msg += _("Auto assign. Could not find an end mark: ") + f[1] + "  " + end_mark + "\n"
+                    warning_msg += _("Auto assign. Could not find an end mark: ") + f"{f[1]}  {end_mark}\n"
                 if text_end_iterator >= 0:
                     pos1 = text_ends[text_end_iterator]
                     item = {'caseid': self.case['caseid'], 'fid': f[0],
@@ -673,8 +672,8 @@ class DialogCaseFileManager(QtWidgets.QDialog):
         # Text file is loaded in browser then update the highlights
         self.load_case_text()
         self.highlight()
-        msg += "\n" + str(entries) + _(" sections found.")
-        Message(self.app, _("File added to case"), msg + "\n" + warning_msg + "\n" + already_assigned).exec()
+        msg += f"\n{entries}" + _(" sections found.")
+        Message(self.app, _("File added to case"), f"{msg}\n{warning_msg}\n{already_assigned}").exec()
         self.parent_textEdit.append(msg)
         self.parent_textEdit.append(warning_msg)
         self.app.delete_backup = False

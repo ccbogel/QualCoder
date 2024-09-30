@@ -30,8 +30,6 @@ import logging
 import os
 from PIL import Image
 import re
-import sys
-import traceback
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import Qt
@@ -68,14 +66,11 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         self.ui = Ui_Dialog_code_summary()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
-        font += '"' + self.app.settings['font'] + '";'
+        font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
-        docfont = 'font: ' + str(self.app.settings['docfontsize']) + 'pt '
-        docfont += '"' + self.app.settings['font'] + '";'
+        docfont = f'font: {self.app.settings["docfontsize"]}pt "{self.app.settings["font"]}";'
         self.ui.textEdit.setStyleSheet(docfont)
-        treefont = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
-        treefont += '"' + self.app.settings['font'] + '";'
+        treefont = f'font: {self.app.settings["treefontsize"]}pt "{self.app.settings["font"]}";'
         try:
             s0 = int(self.app.settings['dialogreport_code_summary_splitter0'])
             s1 = int(self.app.settings['dialogreport_code_summary_splitter1'])
@@ -129,7 +124,7 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
                 memo = ""
                 if c['memo'] != "":
                     memo = _("Memo")
-                top_item = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
+                top_item = QtWidgets.QTreeWidgetItem([c['name'], f'catid:{c["catid"]}', memo])
                 top_item.setToolTip(0, c['name'])
                 top_item.setToolTip(2, c['memo'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
@@ -147,11 +142,11 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
                 item = it.value()
                 count2 = 0
                 while item and count2 < 10000:  # while there is an item in the list
-                    if item.text(1) == 'catid:' + str(c['supercatid']):
+                    if item.text(1) == f'catid:{c["supercatid"]}':
                         memo = ""
                         if c['memo'] != "":
                             memo = _("Memo")
-                        child = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
+                        child = QtWidgets.QTreeWidgetItem([c['name'], f'catid:{c["catid"]}', memo])
                         child.setToolTip(0, c['name'])
                         child.setToolTip(2, c['memo'])
                         item.addChild(child)
@@ -170,7 +165,7 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
                 memo = ""
                 if c['memo'] != "":
                     memo = _("Memo")
-                top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
+                top_item = QtWidgets.QTreeWidgetItem([c['name'], f'cid:{c["cid"]}', memo])
                 top_item.setToolTip(0, c['name'])
                 top_item.setToolTip(2, c['memo'])
                 top_item.setBackground(0, QtGui.QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
@@ -189,11 +184,11 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
             item = it.value()
             count = 0
             while item and count < 10000:
-                if item.text(1) == 'catid:' + str(c['catid']):
+                if item.text(1) == f'catid:{c["catid"]}':
                     memo = ""
                     if c['memo'] != "":
                         memo = _("Memo")
-                    child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
+                    child = QtWidgets.QTreeWidgetItem([c['name'], f'cid:{c["cid"]}', memo])
                     child.setBackground(0, QtGui.QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
                     color = TextColor(c['color']).recommendation
                     child.setForeground(0, QtGui.QBrush(QtGui.QColor(color)))
@@ -231,9 +226,7 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
                     else:
                         item.setText(3, "")
                 except Exception as err:
-                    msg = "Fill code counts error\n" + str(err) + "\n"
-                    msg += sql + "\n"
-                    msg += "cid " + str(cid) + "\n"
+                    msg = f"Fill code counts error\n{err}\n{sql}\ncid: {cid}\n"
                     logger.debug(msg)
                     item.setText(3, "")
             it += 1
@@ -254,9 +247,9 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         if code_ is None:
             return
         cur = self.app.conn.cursor()
-        text = _("CODE: ") + code_['name'] + "  " + current.text(1)
-        text += "  " + _("COLOUR: ") + code_['color'] + "  " + _("CREATED BY: ") + code_['owner'] + "\n\n"
-        text += _("MEMO: ") + "\n" + code_['memo'] + "\n"
+        text = _("CODE: ") + f"{code_['name']}  {current.text(1)}  "
+        text += _("COLOUR: ") + f"{code_['color']}  " + _("CREATED BY: ") + f"{code_['owner']}\n\n"
+        text += _("MEMO: ") + f"\n{code_['memo']}\n"
 
         # Coding statistics
         coders = []
@@ -282,14 +275,14 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
 
         # Coders total and names
         coders = list(set(coders))
-        text += _("CODERS: ") + " " + str(len(coders))
+        text += _("CODERS: ") + f" {len(coders)}"
         for c in coders:
-            text += " | " + c
+            text += f" | {c}"
         text += "\n\n"
 
         # Sources total and names
         sources = list(set(sources))
-        text += _("FILES: ") + " " + str(len(sources))
+        text += _("FILES: ") + f" {len(sources)}"
         for s in sources:
             cur.execute("select name from source where id=?", [s])
             sourcename = cur.fetchone()
@@ -297,7 +290,7 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
                 sourcename = [""]
                 msg_ = _("Report code summary. Code_text, code_image or code_av had a coding to a deleted file")
                 self.ui.textEdit.append(msg_)
-            text += " | " + sourcename[0]
+            text += f" | {sourcename[0]}"
         text += "\n"
         text += self.text_statistics(text_res)
         text += self.image_statistics(img_res)
@@ -310,14 +303,14 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
             text_res: list of fid, seltext, pos0, pos1, owner, memo, avid
         """
 
-        text = "\n" + _("TEXT CODINGS: ") + str(len(text_res)) + "\n"
+        text = "\n" + _("TEXT CODINGS: ") + f"{len(text_res)}\n"
         if not text_res:
             return text
         total_chars = 0
         fulltext = ""
         for t in text_res:
             total_chars += len(t[1])
-            fulltext += t[1] + " "
+            fulltext += f"{t[1]} "
         avg_chars = total_chars / len(text_res)
         # Remove punctuation. Convert to lower case
         chars = ""
@@ -329,9 +322,10 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         chars = chars.lower()
         word_list = chars.split()
         msg = _(
-            "Word calculations: Words use alphabet characters and include the apostrophe. All other characters are word separators")
-        text += msg + "\n"
-        text += _("Words: ") + f"{len(word_list):,d}" + "\n"
+            "Word calculations: Words use alphabet characters and include the apostrophe."
+            "All other characters are word separators")
+        text += f"{msg}\n"
+        text += _("Words: ") + f"{len(word_list):,d}\n"
         # Word frequency
         d = {}
         for word in word_list:
@@ -341,16 +335,16 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         for key, value in d.items():
             word_freq.append((value, key))
         word_freq.sort(reverse=True)
-        text += _("Unique words: ") + str(len(word_freq)) + "\n"
+        text += _("Unique words: ") + f"{len(word_freq)}\n"
         # Top 100 or maximum of less than 100
         max_count = len(word_freq)
         if max_count > 100:
             max_count = 100
         text += _("Top 100 words") + "\n"
         for i in range(0, max_count):
-            text += word_freq[i][1] + "   " + str(word_freq[i][0]) + " | "
+            text += f"{word_freq[i][1]}   {word_freq[i][0]} | "
         text += "\n" + _("Total characters: ") + f"{total_chars:,d}"
-        text += "  " + _("Average characters: ") + str(int(avg_chars)) + "\n"
+        text += "  " + _("Average characters: ") + f"{int(avg_chars)}\n"
         return text
 
     def image_statistics(self, img_res):
@@ -359,7 +353,7 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
             img_res: list of id, x1, y1, width, height, owner, memo
         """
 
-        text = "\n" + _("IMAGE CODINGS: ") + str(len(img_res)) + "\n"
+        text = "\n" + _("IMAGE CODINGS: ") + f"{len(img_res)}\n"
         if not img_res:
             return text
         cur = self.app.conn.cursor()
@@ -394,8 +388,8 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
             percent_of_image = round(avg_area / image['area'] * 100, 3)
             if count > 0:
                 text += _("Image: ") + abs_path.split("/")[-1] + "  "
-                text += _("Count: ") + str(count) + "   " + _("Average coded area: ") + f"{avg_area:,d}" + _(" pixels")
-                text += "  " + _("Average area of image: ") + str(percent_of_image) + "%\n"
+                text += _("Count: ") + f"{count}   " + _("Average coded area: ") + f"{avg_area:,d}" + _(" pixels")
+                text += "  " + _("Average area of image: ") + f"{percent_of_image}%\n"
         return text
 
     def av_statistics(self, av_results):
@@ -445,10 +439,10 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
                 pass
             if count > 0:
                 text_ += _("Media: ") + abs_path.split("/")[-1] + "  "
-                text_ += _("Count: ") + str(count) + "   "
+                text_ += _("Count: ") + f"{count}   "
                 text_ += _("Average coded duration: ") + f"{avg_coded_secs:,d}" + _(" secs") + " "
                 if media_secs:
-                    text_ += _("Average percent of media: ") + str(round(avg_coded_secs / media_secs * 100, 3)) + "%\n"
+                    text_ += _("Average percent of media: ") + f"{round(avg_coded_secs / media_secs * 100, 3)}%\n"
         return text_
 
     def search_results_next(self):
@@ -469,7 +463,7 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         try:
             pattern = re.compile(search_text, flags)
         except re.error as e_:
-            logger.warning('re error Bad escape ' + str(e_))
+            logger.warning(f"re error Bad escape {e_}")
         if pattern is None:
             return
         for match in pattern.finditer(te_text):

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2023 Colin Curtain
+Copyright (c) 2024 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,16 +26,10 @@ https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 """
 
-from copy import copy, deepcopy
-import csv
+from copy import copy
 import logging
 import openpyxl
 import os
-#import pandas as pd
-#import plotly.express as px
-import statistics
-import sys
-import traceback
 
 from PyQt6 import QtGui, QtWidgets, QtCore
 from PyQt6.QtCore import Qt
@@ -44,8 +38,7 @@ from PyQt6.QtGui import QBrush
 from .color_selector import TextColor
 from .GUI.base64_helper import *
 from .GUI.ui_report_matching_segments import Ui_DialogMatchingTextSegments
-from .helpers import DialogCodeInText, ExportDirectoryPathDialog, Message
-from .select_items import DialogSelectItems
+from .helpers import DialogCodeInText, Message
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -96,16 +89,14 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
                 self.ui.splitter.setSizes([s0, s1])
         except KeyError:
             pass
-        info_font = 'font: 10pt "' + self.app.settings['font'] + '";'
+        info_font = f'font: 10pt "{self.app.settings["font"]}";'
         self.ui.label_instructions.setStyleSheet(info_font)
         self.ui.checkBox_any_matches.setStyleSheet(info_font)
         msg = _("Only matches where ALL codes are applied to the same text will be shown.")
         self.ui.label_instructions.setToolTip(msg)
-        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
-        font += '"' + self.app.settings['font'] + '";'
+        font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
-        font = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
-        font += '"' + self.app.settings['font'] + '";'
+        font = f'font: {self.app.settings["treefontsize"]}pt "{self.app.settings["font"]}";'
         self.ui.treeWidget.setStyleSheet(font)
         self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.SelectionMode.ExtendedSelection)
         self.fill_tree()
@@ -200,7 +191,7 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         excluded_cids_string = ""
         for excluded in self.excluded_codes:
             excluded_cids.append(excluded[0])
-            excluded_cids_string += "," + str(excluded[0])
+            excluded_cids_string += f",{excluded[0]}"
         if len(excluded_cids_string) > 0:
             excluded_cids_string = excluded_cids_string[1:]
         for i in items:
@@ -562,7 +553,7 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         remove_items = []
         for c in codes:
             if c['catid'] is None:
-                top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid'])])
+                top_item = QtWidgets.QTreeWidgetItem([c['name'], f"cid:{c['cid']}"])
                 top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
                 color = TextColor(c['color']).recommendation
                 top_item.setForeground(0, QBrush(QtGui.QColor(color)))
@@ -579,8 +570,8 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
             it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
             item = it.value()
             while item:
-                if item.text(1) == 'catid:' + str(c['catid']):
-                    child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid'])])
+                if item.text(1) == f'catid:{c["catid"]}':
+                    child = QtWidgets.QTreeWidgetItem([c['name'], f'cid:{c["cid"]}'])
                     child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
                     color = TextColor(c['color']).recommendation
                     child.setForeground(0, QBrush(QtGui.QColor(color)))
@@ -588,7 +579,7 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
                         Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEnabled)
                     child.setToolTip(0, c['name'])
                     item.addChild(child)
-                    c['catid'] = -1  # make unmatchable
+                    c['catid'] = -1  # Make unmatchable
                 it += 1
                 item = it.value()
         self.ui.treeWidget.expandAll()

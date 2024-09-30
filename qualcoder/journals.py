@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2023 Colin Curtain
+Copyright (c) 2024 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -88,11 +88,9 @@ class DialogJournals(QtWidgets.QDialog):
         self.ui = Ui_Dialog_journals()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
-        font += '"' + self.app.settings['font'] + '";'
+        font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
-        doc_font = 'font: ' + str(self.app.settings['docfontsize']) + 'pt '
-        doc_font += '"' + self.app.settings['font'] + '";'
+        doc_font = f'font: {self.app.settings["docfontsize"]}pt "{self.app.settings["font"]}";'
         self.ui.textEdit.setStyleSheet(doc_font)
         self.ui.tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         try:
@@ -203,17 +201,16 @@ class DialogJournals(QtWidgets.QDialog):
             valuetype = res[0]
             sql = "select journal.name, journal.date, jentry, journal.owner, journal.jid from journal "
             sql += "join attribute on attribute.id=journal.jid where attribute.attr_type='journal' "
-            sql += "and attribute.name='" + att_name + "'"
+            sql += f"and attribute.name='{att_name}'"
             if valuetype == "numeric":
-                sql += " order by cast(attribute.value as real) " + att_ordering
+                sql += f" order by cast(attribute.value as real) {att_ordering}"
             else:
-                sql += " order by attribute.value" + att_ordering
+                sql += f" order by attribute.value {att_ordering}"
             cur.execute(sql)
             result = cur.fetchall()
             for row in result:
                 self.journals.append({'name': row[0], 'date': row[1], 'jentry': row[2], 'owner': row[3], 'jid': row[4],
                                       'attributes': []})
-
         # Attributes and attributes in table header labels
         self.header_labels = [_("Name"), _("Modified"), _("Coder"), _("jid")]
         self.header_value_type = ["character", "character", "character", "numeric"]
@@ -281,7 +278,7 @@ class DialogJournals(QtWidgets.QDialog):
         self.app.conn.commit()
         self.load_journals()
         self.fill_table()
-        self.parent_text_edit.append(_("Attribute added to journals: ") + name + ", " + _("type") + ": " + value_type)
+        self.parent_text_edit.append(f'{_("Attribute added to journals:")} {name}, {_("type")}: {value_type}')
 
     def check_attribute_placeholders(self):
         """ Journals can be added after attributes are in the project.
@@ -344,7 +341,7 @@ class DialogJournals(QtWidgets.QDialog):
                 self.export_all_journals_as_one_file()
                 return
             if key == QtCore.Qt.Key.Key_4:
-                self.delete()
+                self.delete_journal()
                 return
             if key == QtCore.Qt.Key.Key_0:
                 self.help()
@@ -357,7 +354,6 @@ class DialogJournals(QtWidgets.QDialog):
         self.ui.tableWidget.setColumnCount(len(self.header_labels))
         self.ui.tableWidget.setHorizontalHeaderLabels(self.header_labels)
         self.ui.tableWidget.horizontalHeader().setStretchLastSection(False)
-
         rows = self.ui.tableWidget.rowCount()
         for r in range(0, rows):
             self.ui.tableWidget.removeRow(0)
@@ -429,12 +425,11 @@ class DialogJournals(QtWidgets.QDialog):
             return
         if action == action_attribute_ascending:
             attribute_name = self.header_labels[col]
-            self.load_journals(attribute_name + "| asc")
+            self.load_journals(f"{attribute_name}| asc")
             return
         if action == action_attribute_descending:
             attribute_name = self.header_labels[col]
-
-            self.load_journals(attribute_name + "|desc")
+            self.load_journals(f"{attribute_name}|desc")
             return
 
     def table_menu(self, position):
@@ -445,14 +440,11 @@ class DialogJournals(QtWidgets.QDialog):
         row = self.ui.tableWidget.currentRow()
         col = self.ui.tableWidget.currentColumn()
         item = self.ui.tableWidget.item(row, col)
-
         item_text = ""
         if item is not None:
             item_text = item.text()
-
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-
         action_name_asc = None
         action_name_desc = None
         action_show_name_like = None
@@ -460,7 +452,6 @@ class DialogJournals(QtWidgets.QDialog):
             action_name_asc = menu.addAction(_("Ascending"))
             action_name_desc = menu.addAction(_("Descending"))
             action_show_name_like = menu.addAction(_("Show name like"))
-
         action_modified_date_asc = None
         action_modified_date_desc = None
         if col == DATE_COLUMN:
@@ -503,12 +494,12 @@ class DialogJournals(QtWidgets.QDialog):
             return
         if action == action_attribute_ascending:
             attribute_name = self.header_labels[col]
-            self.load_journals(attribute_name + "| asc")
+            self.load_journals(f"{attribute_name}| asc")
             return
         if action == action_attribute_descending:
             attribute_name = self.header_labels[col]
 
-            self.load_journals(attribute_name + "|desc")
+            self.load_journals(f"{attribute_name}|desc")
             return
         if action == action_show_all:
             for r in range(0, self.ui.tableWidget.rowCount()):
@@ -626,8 +617,7 @@ class DialogJournals(QtWidgets.QDialog):
         # TODO update the visual table entry for the date
 
     def text_changed(self):
-        """ Used in combination with timer to update database entry.
-        """
+        """ Used in combination with timer to update database entry. """
 
         self.text_changed_flag = True
 
@@ -690,17 +680,15 @@ class DialogJournals(QtWidgets.QDialog):
         row = self.ui.tableWidget.currentRow()
         if row == -1:
             return
-        filename = self.journals[row]['name']
-        filename += ".txt"
-        e = ExportDirectoryPathDialog(self.app, filename)
-        filepath = e.filepath
+        filename = f"{self.journals[row]['name']}.txt"
+        export_dlg = ExportDirectoryPathDialog(self.app, filename)
+        filepath = export_dlg.filepath
         if filepath is None:
             return
         data = self.journals[row]['jentry']
-        f = open(filepath, 'w')
-        f.write(data)
-        f.close()
-        msg = _("Journal exported to: ") + str(filepath)
+        with open(filepath, 'w', encoding='utf-8') as file_:
+            file_.write(data)
+        msg = f'{_("Journal exported to:")} {filepath}'
         Message(self.app, _("Journal export"), msg, "information").exec()
         self.parent_text_edit.append(msg)
 
@@ -765,7 +753,7 @@ class DialogJournals(QtWidgets.QDialog):
                             (new_name, self.journals[row]['name']))
                 self.app.conn.commit()
                 self.parent_text_edit.append(
-                    _("Journal name changed from: ") + self.journals[row]['name'] + " to: " + new_name)
+                    _("Journal name changed from: ") + f"{self.journals[row]['name']} -> {new_name}")
                 self.journals[row]['name'] = new_name
                 self.ui.label_jname.setText(_("Journal: ") + self.journals[row]['name'])
             else:  # Put the original text in the cell
@@ -886,7 +874,7 @@ class DialogJournals(QtWidgets.QDialog):
         cursor.setPosition(prev_result[1])
         cursor.setPosition(cursor.position() + prev_result[2], QtGui.QTextCursor.MoveMode.KeepAnchor)
         self.ui.textEdit.setTextCursor(cursor)
-        self.ui.label_search_totals.setText(str(self.search_index + 1) + " / " + str(len(self.search_indices)))
+        self.ui.label_search_totals.setText(f"{self.search_index + 1} / {len(self.search_indices)}")
 
     def move_to_next_search_text(self):
         """ Push button pressed to move to next search text position. """
@@ -910,5 +898,4 @@ class DialogJournals(QtWidgets.QDialog):
         cursor.setPosition(next_result[1])
         cursor.setPosition(cursor.position() + next_result[2], QtGui.QTextCursor.MoveMode.KeepAnchor)
         self.ui.textEdit.setTextCursor(cursor)
-        self.ui.label_search_totals.setText(str(self.search_index + 1) + " / " + str(len(self.search_indices)))
-
+        self.ui.label_search_totals.setText(f"{self.search_index + 1} / {len(self.search_indices)}")

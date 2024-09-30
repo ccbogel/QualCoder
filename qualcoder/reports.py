@@ -31,8 +31,6 @@ import datetime
 import logging
 import openpyxl
 import os
-import sys
-import traceback
 
 from PyQt6 import QtGui, QtWidgets, QtCore
 from PyQt6.QtCore import Qt
@@ -82,12 +80,9 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_csv_icon), "png")
         self.ui.pushButton_exportcsv.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_select_files.pressed.connect(self.select_files)
-
-        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
-        font += '"' + self.app.settings['font'] + '";'
+        font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
-        font = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
-        font += '"' + self.app.settings['font'] + '";'
+        font = f'font: {self.app.settings["treefontsize"]}pt "{self.app.settings["font"]}";'
         self.ui.treeWidget.setStyleSheet(font)
         self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.SelectionMode.ExtendedSelection)
         self.fill_tree()
@@ -105,11 +100,11 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         tooltip = _("Files selected: ")
         self.file_ids = []
         if ok:
-            selected_files = ui.get_selected()  # list of dictionaries
+            selected_files = ui.get_selected()  # List of dictionaries
             files_text = ""
             for row in selected_files:
                 self.file_ids.append(row['id'])
-                files_text += "\n" + row['name']
+                files_text += f"\n{row['name']}"
             files_text = files_text[2:]
             tooltip += files_text
             if len(self.file_ids) > 0:
@@ -258,9 +253,8 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         filepath = e.filepath
         if filepath is None:
             return
-        f = open(filepath, 'w', encoding='utf-8-sig')
         text_ = _("Code frequencies") + "\n"
-        text_ += self.app.project_name + "\n"
+        text_ += f"{self.app.project_name}\n"
         text_ += _("Date: ") + datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S") + "\n"
         it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
         item = it.value()
@@ -274,15 +268,15 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
             for i in range(0, self.depthgauge(item)):
                 prefix += "--"
             if cat:
-                text_ += "\n" + prefix + _("Category: ") + item.text(0)  # + ", " + item.text(1)
-                text_ += ", Frequency: " + item.text(item_total_position)
+                text_ += f"\n{prefix}" + _("Category: ") + item.text(0)
+                text_ += f", Frequency: {item.text(item_total_position)}"
             else:
-                text_ += "\n" + prefix + _("Code: ") + item.text(0)  # + ", " + item.text(1)
+                text_ += f"\n{prefix}" + _("Code: ") + item.text(0)
                 text_ += _(", Frequency: ") + item.text(item_total_position)
             it += 1
             item = it.value()
-        f.write(text_)
-        f.close()
+        with open(filepath, 'w', encoding='utf-8-sig') as file_:
+            file_.write(text_)
         msg = _("Coding frequencies text file exported to: ") + filepath
         Message(self.app, _('Text file Export'), msg).exec()
         self.parent_textEdit.append(msg)
@@ -294,7 +288,6 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         for coder in self.coders:
             header.append(coder)
         header.append("Total")
-
         wb = openpyxl.Workbook()
         ws = wb.active
         # Column headings
@@ -333,7 +326,6 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         """
 
         self.ui.treeWidget.clear()
-
         cats = copy(self.categories)
         codes = copy(self.codes)
         self.ui.treeWidget.clear()
@@ -373,7 +365,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
                 it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
                 item = it.value()
                 while item:  # while there is an item in the list
-                    if item.text(1) == 'catid:' + str(c['supercatid']):
+                    if item.text(1) == f'catid:{c["supercatid"]}':
                         display_list = []
                         for i in c['display_list']:
                             display_list.append(str(i))
@@ -397,7 +389,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
                 for i in c['display_list']:
                     display_list.append(str(i))
                 if len(display_list[0]) > 62:  # Keep code name short
-                    display_list[0] = display_list[0][:30] + '..' + display_list[0][-30:]
+                    display_list[0] = f"{display_list[0][:30]}..{display_list[0][-30:]}"
                 top_item = QtWidgets.QTreeWidgetItem(display_list)
                 top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
                 color = TextColor(c['color']).recommendation
@@ -414,12 +406,12 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
             it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
             item = it.value()
             while item:
-                if item.text(1) == 'catid:' + str(c['catid']):
+                if item.text(1) == f'catid:{c["catid"]}':
                     display_list = []
                     for i in c['display_list']:
                         display_list.append(str(i))
                     if len(display_list[0]) > 62:  # Keep code name short
-                        display_list[0] = display_list[0][:30] + '..' + display_list[0][-30:]
+                        display_list[0] = f"{display_list[0][:30]}..{display_list[0][-30:]}"
                     child = QtWidgets.QTreeWidgetItem(display_list)
                     child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
                     color = TextColor(c['color']).recommendation
@@ -427,7 +419,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
                     child.setFlags(Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEnabled)
                     child.setToolTip(0, c['name'])
                     item.addChild(child)
-                    c['catid'] = -1  # make unmatchable
+                    c['catid'] = -1  # Make unmatchable
                 it += 1
                 item = it.value()
         self.ui.treeWidget.sortByColumn(0, QtCore.Qt.SortOrder.AscendingOrder)
@@ -475,11 +467,9 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         pm.loadFromData(QtCore.QByteArray.fromBase64(question_icon), "png")
         self.ui.pushButton_help1.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_help1.pressed.connect(self.information)
-        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
-        font += '"' + self.app.settings['font'] + '";'
+        font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
-        font = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
-        font += '"' + self.app.settings['font'] + '";'
+        font = f'font: {self.app.settings["treefontsize"]}pt "{self.app.settings["font"]}";'
         self.ui.treeWidget.setStyleSheet(font)
         self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.SelectionMode.ExtendedSelection)
         self.ui.comboBox_coders.insertItems(0, self.coders)
@@ -516,7 +506,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         if len(self.selected_coders) == 1 and self.selected_coders[0] != coder:
             self.selected_coders.append(coder)
             coder1 = self.ui.label_selections.text()
-            self.ui.label_selections.setText(coder1 + " , " + coder)
+            self.ui.label_selections.setText(f"{coder1} , {coder}")
         if len(self.selected_coders) == 2:
             self.ui.pushButton_run.setEnabled(True)
 
@@ -550,11 +540,10 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         filepath = export_path.filepath
         if filepath is None:
             return
-        f = open(filepath, 'w', encoding="'utf-8-sig'")
-        f.write(self.app.project_name + "\n")
-        f.write(_("Date: ") + datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S") + "\n")
-        f.write(self.comparisons)
-        f.close()
+        with open(filepath, 'w', encoding="'utf-8-sig'") as file_:
+            file_.write(f"{self.app.project_name}\n")
+            file_.write(_("Date: ") + datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S") + "\n")
+            file_.write(self.comparisons)
         msg = _("Coder comparison text file exported to: ") + filepath
         Message(self.app, _('Text file export'), msg, "information").exec()
         self.parent_textEdit.append(msg)
@@ -570,18 +559,18 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         while item:
             if item.text(1)[0:4] == 'cid:':
                 agreement = self.calculate_agreement_for_code_name(int(item.text(1)[4:]))
-                item.setText(2, str(agreement['agreement']) + "%")
-                item.setText(3, str(agreement['dual_percent']) + "%")
-                item.setText(4, str(agreement['uncoded_percent']) + "%")
-                item.setText(5, str(agreement['disagreement']) + "%")
-                item.setText(6, str(agreement['agree_coded_only']) + "%")
-                item.setText(7, str(agreement['kappa']))
-                self.comparisons += "\n" + item.text(0) + " (" + item.text(1) + ")\n"
-                self.comparisons += _("agreement: ") + str(agreement['agreement']) + "%"
-                self.comparisons += _(", dual coded: ") + str(agreement['dual_percent']) + "%"
-                self.comparisons += _(", uncoded: ") + str(agreement['uncoded_percent']) + "%"
-                self.comparisons += _(", disagreement: ") + str(agreement['disagreement']) + "%"
-                self.comparisons+= _(", agree coded only: ") + str(agreement['agree_coded_only']) + "%"
+                item.setText(2, f"{agreement['agreement']}%")
+                item.setText(3, f"{agreement['dual_percent']}%")
+                item.setText(4, f"{agreement['uncoded_percent']}%")
+                item.setText(5, f"{agreement['disagreement']}%")
+                item.setText(6, f"{agreement['agree_coded_only']}%")
+                item.setText(7, f"{agreement['kappa']}")
+                self.comparisons += f"\n{item.text(0)} ({item.text(1)})\n"
+                self.comparisons += _("agreement: ") + f"{agreement['agreement']}%"
+                self.comparisons += _(", dual coded: ") + f"{agreement['dual_percent']}%"
+                self.comparisons += _(", uncoded: ") + f"{agreement['uncoded_percent']}%"
+                self.comparisons += _(", disagreement: ") + f"{agreement['disagreement']}%"
+                self.comparisons+= _(", agree coded only: ") + f"{agreement['agree_coded_only']}%"
                 self.comparisons += ", Kappa: " + str(agreement['kappa'])
             it += 1
             item = it.value()
@@ -622,8 +611,8 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
                         total['coded0'] += 1
                     except IndexError as e_:
                         msg = "DialogReportCoderComparisons.calculate_agreement_for_code_name "
-                        msg += str(e_) + " fid:" + str(f[0]) + " len_text:" + str(f[1]) + " pos1:" + str(coded[1])
-                        msg += " cid:" + str(cid) + " coder:" + self.selected_coders[0]
+                        msg += f"{e_} fid:{f[0]} len_text:{f[1]} pos1:{coded[1]}"
+                        msg += f" cid:{cid} coder:{self.selected_coders[0]}"
                         print(msg)
                         logger.error(msg)
                         self.parent_textEdit.append(msg)
@@ -634,7 +623,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
                         total['coded1'] += 1
                     except IndexError as e_:
                         msg = "DialogReportCoderComparisons.calculate_agreement_for_code_name "
-                        msg += str(e_) + " fid:" + str(f[0]) + " len_text:" + str(f[1]) + " pos1:" + str(coded[1])
+                        msg += f"{e_} fid:{f[0]} len_text:{f[1]} pos1:{coded[1]}"
                         msg += " cid:" + str(cid) + " coder:" + self.selected_coders[0]
                         print(msg)
                         logger.error(msg)
@@ -725,9 +714,9 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         remove_list = []
         for c in cats:
             if c['supercatid'] is None:
-                top_item = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid'])])
+                top_item = QtWidgets.QTreeWidgetItem([c['name'], f'catid:{c["catid"]}'])
                 if len(c['name']) > 62:
-                    top_item.setText(0, c['name'][:30] + '..' + c['name'][-30:])
+                    top_item.setText(0, f"{c['name'][:30]}..{c['name'][-30:]}")
                 top_item.setToolTip(0, c['name'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_list.append(c)
@@ -742,10 +731,10 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
                 it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
                 item = it.value()
                 while item:  # while there is an item in the list
-                    if item.text(1) == 'catid:' + str(c['supercatid']):
-                        child = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid'])])
+                    if item.text(1) == f'catid:{c["supercatid"]}':
+                        child = QtWidgets.QTreeWidgetItem([c['name'], f'catid:{c["catid"]}'])
                         if len(c['name']) > 62:
-                            child.setText(0, c['name'][:30] + '..' + c['name'][-30:])
+                            child.setText(0, f"{c['name'][:30]}..{c['name'][-30:]}")
                         child.setToolTip(0, c['name'])
                         item.addChild(child)
                         remove_list.append(c)
@@ -758,9 +747,9 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         remove_items = []
         for c in codes:
             if c['catid'] is None:
-                top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid'])])
+                top_item = QtWidgets.QTreeWidgetItem([c['name'], f'cid:{c["cid"]}'])
                 if len(c['name']) > 62:
-                    top_item.setText(0, c['name'][:30] + '..' + c['name'][-30:])
+                    top_item.setText(0, f"{c['name'][:30]}..{c['name'][-30:]}")
                 top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
                 color = TextColor(c['color']).recommendation
                 top_item.setForeground(0, QBrush(QtGui.QColor(color)))
@@ -776,17 +765,17 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
             it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
             item = it.value()
             while item:
-                if item.text(1) == 'catid:' + str(c['catid']):
-                    child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid'])])
+                if item.text(1) == f'catid:{c["catid"]}':
+                    child = QtWidgets.QTreeWidgetItem([c['name'], f'cid:{c["cid"]}'])
                     if len(c['name']) > 62:
-                        child.setText(0, c['name'][:30] + '..' + c['name'][-30:])
+                        child.setText(0, f"{c['name'][:30]}..{c['name'][-30:]}")
                     child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
                     color = TextColor(c['color']).recommendation
                     child.setForeground(0, QBrush(QtGui.QColor(color)))
                     child.setFlags(Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEnabled)
                     child.setToolTip(0, c['name'])
                     item.addChild(child)
-                    c['catid'] = -1  # make unmatchable
+                    c['catid'] = -1  # Make unmatchable
                 it += 1
                 item = it.value()
         self.ui.treeWidget.sortByColumn(0, QtCore.Qt.SortOrder.AscendingOrder)

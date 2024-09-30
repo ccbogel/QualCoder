@@ -75,8 +75,8 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         self.case_or_file = case_or_file
         QtWidgets.QDialog.__init__(self)
 
-        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
-        font += '"' + self.app.settings['font'] + '";'
+        font = f'font: {self.app.settings["fontsize"]}pt '
+        font += f'"{self.app.settings["font"]}";'
         self.setStyleSheet(font)
         self.resize(550, 580)
         # Enable custom window hint to enable customizing window controls
@@ -137,17 +137,17 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         for row in self.text_results:
             row['file_or_case'] = self.case_or_file
             row['textedit_start'] = len(self.te.toPlainText())
-            fgc = "; color:" + TextColor(row['color']).recommendation + ";"
-            title = '<span style=\"background-color:' + row['color'] + fgc + '\">'
+            foregroundcolor = f"color:{TextColor(row['color']).recommendation};"
+            title = f'<span style="background-color:{row["color"]}; {foregroundcolor}\">'
             if self.case_or_file == "File":
                 title += _(" File: ") + row['file_or_casename']
             else:
                 title += _("Case: ") + row['file_or_casename'] + _(" File: ") + row['source_name']
             title += "</span>"
-            title += ", " + str(row['pos0']) + " - " + str(row['pos1'])
+            title += f", {row['pos0']} - {row['pos1']}"
             self.te.insertHtml(title)
             row['textedit_end'] = len(self.te.toPlainText())
-            self.te.append(row['text'] + "\n\n")
+            self.te.append(f"{row['text']}\n\n")
 
         # Get coded image by file for this coder data
         sql = "select code_name.name, color, source.name, x1, y1, width, height,"
@@ -176,8 +176,8 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         for counter, row in enumerate(self.image_results):
             row['file_or_case'] = self.case_or_file
             row['textedit_start'] = len(self.te.toPlainText())
-            fgc = "; color:" + TextColor(row['color']).recommendation + ";"
-            title = '<p><span style=\"background-color:' + row['color'] + fgc + '\">'
+            foregroundcolor = f"color:{TextColor(row['color']).recommendation};"
+            title = f'<p><span style="background-color:{row["color"]}; {foregroundcolor}">'
             if self.case_or_file == "Case":
                 title += _(" Case: ") + row['file_or_casename'] + _(" File: ") + row['mediapath']
             else:
@@ -216,8 +216,8 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         for row in self.av_results:
             row['file_or_case'] = self.case_or_file
             row['textedit_start'] = len(self.te.toPlainText())
-            fgc = "; color:" + TextColor(row['color']).recommendation + ";"
-            title = '<span style=\"background-color:' + row['color'] + fgc + '\">'
+            foregroundcolor = f"color:{TextColor(row['color']).recommendation};"
+            title = f'<span style="background-color:{row["color"]}; {foregroundcolor}">'
             if self.case_or_file == "Case":
                 title += _("Case: ") + row['file_or_casename'] + _(" File: ") + row['mediapath']
             else:
@@ -226,7 +226,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
             self.te.insertHtml(title)
             start = msecs_to_mins_and_secs(row['pos0'])
             end = msecs_to_mins_and_secs(row['pos1'])
-            self.te.insertHtml('<br />[' + start + ' - ' + end + '] ')
+            self.te.insertHtml(f'<br />[{start} - {end}] ')
             row['textedit_end'] = len(self.te.toPlainText())
             self.te.append("Memo: " + row['memo'] + "\n\n")
         self.te.blockSignals(False)
@@ -354,9 +354,6 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         """ Select and apply more codes to this coded segment. """
 
         codes = [c for c in self.codes if c['cid'] != self.code_dict['cid']]
-        '''for c in self.codes:
-            if c['cid'] != self.code_dict['cid']:
-                codes.append(c)'''
         ui = DialogSelectItems(self.app, codes, _("Select codes"), "multi")
         ok = ui.exec()
         if not ok:

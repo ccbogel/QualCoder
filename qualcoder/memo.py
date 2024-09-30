@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2022 Colin Curtain
+Copyright (c) 2024 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -28,9 +28,7 @@ https://qualcoder.wordpress.com/
 
 from PyQt6 import QtWidgets, QtCore
 import os
-import sys
 import logging
-import traceback
 
 from .GUI.ui_dialog_memo import Ui_Dialog_memo
 from .helpers import MarkdownHighlighter
@@ -50,17 +48,14 @@ class DialogMemo(QtWidgets.QDialog):
     memo = ""
 
     def __init__(self, app, title="", memo="", clear_button="show", tooltip=""):
-        """  """
-
-        super(DialogMemo, self).__init__(parent=None)  # overrride accept method
+        super(DialogMemo, self).__init__(parent=None)  # Overrride accept method
 
         self.app = app
         self.memo = memo
         self.ui = Ui_Dialog_memo()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
-        font += '"' + self.app.settings['font'] + '";'
+        font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
         self.setWindowTitle(title)
         self.ui.textEdit.setPlainText(self.memo)

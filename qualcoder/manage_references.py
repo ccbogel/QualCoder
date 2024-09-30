@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2023 Colin Curtain
+Copyright (c) 2024 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -73,14 +73,14 @@ class DialogReferenceManager(QtWidgets.QDialog):
     """
 
     app = None
-    parent_textEdit = None
+    parent_text_edit = None
     files = []
     refs = []
 
     def __init__(self, app_, parent_text_edit):
 
         self.app = app_
-        self.parent_textEdit = parent_text_edit
+        self.parent_text_edit = parent_text_edit
         self.files = []
         self.av_dialog_open = None
         self.refs = []
@@ -88,11 +88,9 @@ class DialogReferenceManager(QtWidgets.QDialog):
         self.ui = Ui_Dialog_manage_references()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
-        font += '"' + self.app.settings['font'] + '";'
+        font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
-        font2 = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
-        font2 += '"' + self.app.settings['font'] + '";'
+        font2 = f'font: {self.app.settings["treefontsize"]}pt "{self.app.settings["font"]}";'
         self.ui.tableWidget_files.setStyleSheet(font2)
         self.ui.tableWidget_files.setSelectionBehavior(QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows)
         self.ui.tableWidget_files.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
@@ -106,7 +104,6 @@ class DialogReferenceManager(QtWidgets.QDialog):
         self.ui.tableWidget_refs.customContextMenuRequested.connect(self.table_refs_menu)
         self.ui.tableWidget_refs.horizontalHeader().setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget_refs.horizontalHeader().customContextMenuRequested.connect(self.table_refs_header_menu)
-
         pm = QtGui.QPixmap()
         pm.loadFromData(QtCore.QByteArray.fromBase64(doc_import_icon), "png")
         self.ui.pushButton_import.setIcon(QtGui.QIcon(pm))
@@ -233,8 +230,8 @@ class DialogReferenceManager(QtWidgets.QDialog):
 
         if not self.files:
             return
-        index_at = self.ui.tableWidget_refs.indexAt(position)
-        col = int(index_at.column())
+        # index_at = self.ui.tableWidget_refs.indexAt(position)
+        # col = int(index_at.column())
         menu = QtWidgets.QMenu(self)
         action_files_asc = menu.addAction(_("Ascending"))
         action_files_desc = menu.addAction(_("Descending"))
@@ -251,10 +248,9 @@ class DialogReferenceManager(QtWidgets.QDialog):
             return
 
     def table_files_menu(self, position):
-        """ Context menu for showing specific rows.
-        """
+        """ Context menu for showing specific rows. """
 
-        row = self.ui.tableWidget_files.currentRow()
+        # row = self.ui.tableWidget_files.currentRow()
         menu = QtWidgets.QMenu()
         action_show_value_like = menu.addAction(_("Show value like"))
         action_file_view = menu.addAction(_("View file"))
@@ -299,7 +295,6 @@ class DialogReferenceManager(QtWidgets.QDialog):
             self.av_dialog_open.mediaplayer.stop()
             self.av_dialog_open = None
         row = self.ui.tableWidget_files.currentRow()
-        #self.ui.tableWidget_files.selectRow(x)
         if self.files[row]['mediapath'] is not None and 'docs:' != self.files[row]['mediapath'][0:5]:
             if len(self.files[row]['mediapath']) > 6 and self.files[row]['mediapath'][:7] in ("/images", "images:"):
                 self.view_image(row)
@@ -679,7 +674,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
     def import_references(self):
         """ Import RIS formatted references from .ris or .txt files """
 
-        RisImport(self.app, self.parent_textEdit)
+        RisImport(self.app, self.parent_text_edit)
         self.get_data()
 
     def keyPressEvent(self, event):
@@ -702,9 +697,6 @@ class DialogReferenceManager(QtWidgets.QDialog):
             if key == QtCore.Qt.Key.Key_5:
                 self.delete_reference()
                 return
-            '''if key == QtCore.Qt.Key.Key_0:
-                self.help()
-                return'''
 
     def eventFilter(self, object_, event):
         """ L Link files to reference.
@@ -714,7 +706,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
 
         if type(event) == QtGui.QKeyEvent:
             key = event.key()
-            #mod = event.modifiers()
+            # mod = event.modifiers()
             if key == QtCore.Qt.Key.Key_L and (self.ui.tableWidget_refs.hasFocus() or self.ui.tableWidget_files.hasFocus()):
                 self.link_reference_to_files()
                 return True
@@ -885,7 +877,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
                 self.unlink_files(file_['id'])
                 self.link_reference_to_files(ris_id, file_['id'])
         if ref_edited:
-            self.parent_textEdit.append(_("Reference edited."))
+            self.parent_text_edit.append(_("Reference edited."))
         self.get_data()
         self.fill_table_refs()
 
@@ -899,7 +891,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
             return
         # Only use first reference index row. Column 0 data
         ris_id = int(ref_row_obj[0].data())
-        note = _("Delete this reference.") + " Ref id {" + str(ris_id) + "}  \n"
+        note = _("Delete this reference.") + f" Ref id: {ris_id}\n"
         for r in self.refs:
             if r['risid'] == ris_id:
                 note += r['vancouver']
@@ -923,5 +915,5 @@ class DialogReferenceManager(QtWidgets.QDialog):
         self.get_data()
         self.fill_table_refs()
         self.fill_table_files()
-        self.parent_textEdit.append(_("Reference deleted."))
+        self.parent_text_edit.append(_("Reference deleted."))
 

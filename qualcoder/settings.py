@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2022 Colin Curtain
+Copyright (c) 2024 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,11 +26,9 @@ https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 """
 
-from PyQt6 import QtGui, QtWidgets, QtCore
-import os
-import sys
 import logging
-import traceback
+import os
+from PyQt6 import QtGui, QtWidgets, QtCore
 import copy
 
 from .GUI.ui_dialog_settings import Ui_Dialog_settings
@@ -59,8 +57,7 @@ class DialogSettings(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_settings()
         self.ui.setupUi(self)
-        font = f"font: {self.app.settings['fontsize']}pt "
-        font += '"' + self.app.settings['font'] + '";'
+        font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         new_font = QtGui.QFont(self.settings['font'], self.settings['fontsize'], QtGui.QFont.Weight.Normal)

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2022 Colin Curtain
+Copyright (c) 2024 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,18 +26,10 @@ https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 """
 
-# https://medium.com/@shauryashivam38/how-to-make-a-wordcloud-in-python-feat-stylecloud-88cdae5fc8c9
-
-import os
-# sudo python3 -m pip install pydub
-import pydub
-# sudo python3 -m pip install SpeechRecognition
-# works with wav and flac files, wav can be multiple formats, so convert all to flac
-# need to have ffmpeg or avconv installed (tricky instillation on Windows)
-import speech_recognition
-import sys
 import logging
-import traceback
+import os
+import pydub
+import speech_recognition
 
 from PyQt6 import QtCore, QtWidgets, QtGui
 
@@ -80,13 +72,12 @@ class SpeechToText(QtWidgets.QDialog):
         self.app = app
         self.text = ""
         self.filepath = av_filepath
-        # Initialize the speech recognition class
+        # Initialise the speech recognition class
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_DialogSpeechToText()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
-        font += '"' + self.app.settings['font'] + '";'
+        font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
         # Default is google free
         self.ui.comboBox_service.currentIndexChanged.connect(self.service_changed)
@@ -193,11 +184,11 @@ class SpeechToText(QtWidgets.QDialog):
         # For each chunk, save as wav, then read and run through recognize_google()
         self.strings = []
         for i, chunk in enumerate(chunks):
-            chunk.export(qc_dir + "/tmp.wav", format='wav')
-            with speech_recognition.AudioFile(qc_dir + "/tmp.wav") as source:
+            chunk.export(f"{qc_dir}/tmp.wav", format='wav')
+            with speech_recognition.AudioFile(f"{qc_dir}/tmp.wav") as source:
                 audio = r.record(source)
             self.ui.progressBar.setValue(i + 1)
-            self.ui.label_process.setText(_("Converting chunk ") + str(i + 1) + " / " + str(len(chunks)))
+            self.ui.label_process.setText(_("Converting chunk ") + f"{i + 1} / {len(chunks)}")
             s = ""
             if self.service == "google":
                 # Google limited to 50 requests per day
@@ -272,28 +263,28 @@ class SpeechToText(QtWidgets.QDialog):
         hours = int(mins / 60)
         remainder_mins = str(mins - hours * 60)
         if len(remainder_mins) == 1:
-            remainder_mins = "0" + remainder_mins
+            remainder_mins = f"0{remainder_mins}"
         hours = str(hours)
         if len(hours) == 1:
             hours = '0' + hours
         ts = "\n"
         if fmt == "[mm.ss]":
-            ts += '[' + str(mins) + '.' + secs + ']'
+            ts += f'[{mins}.{secs}]'
         if fmt == "[mm:ss]":
-            ts += '[' + str(mins) + ':' + secs + ']'
+            ts += f'[{mins}:{secs}]'
         if fmt == "[hh.mm.ss]":
-            ts += '[' + str(hours) + '.' + remainder_mins + '.' + secs + ']'
+            ts += f'[{hours}.{remainder_mins}.{secs}]'
         if fmt == "[hh:mm:ss]":
-            ts += '[' + str(hours) + ':' + remainder_mins + ':' + secs + ']'
+            ts += f'[{hours}:{remainder_mins}:{secs}]'
         if fmt == "{hh:mm:ss}":
-            ts += '{' + str(hours) + ':' + remainder_mins + ':' + secs + '}'
+            ts += '{' + f"{hours}:{remainder_mins}:{secs}" + '}'
         if fmt == "#hh:mm:ss.sss#":
             msecs = "000"
             tms_str = str(time_msecs)
             if len(tms_str) > 2:
                 msecs = tms_str[-3:]
-            ts += '#' + str(hours) + ':' + remainder_mins + ':' + secs + '.' + msecs + '#'
-        return "\n" + ts + " "
+            ts += f'#{hours}:{remainder_mins}:{secs}.{msecs}#'
+        return f"\n{ts} "
 
     def convert_to_flac(self):
         if len(self.filepath) < 5:
