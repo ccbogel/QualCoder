@@ -44,7 +44,6 @@ import traceback
 import urllib.request
 import webbrowser
 from copy import copy
-import re
 import time
 import getpass
 
@@ -89,8 +88,6 @@ from qualcoder.view_av import DialogCodeAV
 from qualcoder.view_charts import ViewCharts
 from qualcoder.view_graph import ViewGraph
 from qualcoder.view_image import DialogCodeImage
-# from qualcoder.ai_vectorstore import AiVectorstore
-# from qualcoder.ai_llm import AiLLM
 from qualcoder.ai_prompts import DialogAiEditPrompts
 
 # Check if VLC installed, for warning message for code_av
@@ -194,8 +191,7 @@ class App(object):
     ai = None
     ai_models = []
     ai_embedding_function = None # This is the sentence transformer embedding function. It is stored here so it must not be reloaded every time a project is opened. 
-    highlight_color = '#f89407' # the default color for highlighting gui elements, changes with style
-
+    
     def __init__(self):
         self.conn = None
         self.project_path = ""
@@ -1126,7 +1122,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.menubar.setNativeMenuBar(True)
         else:
             self.ui.menubar.setNativeMenuBar(False)
-        # self.get_latest_github_release()
+        self.get_latest_github_release()
         try:
             # Restore main window geometry (size, position, maximized state) from config
             geometry_hex = self.app.settings.get('mainwindow_geometry', '')
@@ -1256,8 +1252,6 @@ Click "Yes" to start now.')
         self.ui.actionMenu_Key_Shortcuts.triggered.connect(self.display_menu_key_shortcuts)
         # Ensure the action_log always scrolls to the very bottom once new log entries are added:
         self.ui.textEdit.verticalScrollBar().rangeChanged.connect(self.action_log_scroll_bottom)
-        # font = f'font: {self.app.settings["fontsize"]}pt {self.app.settings["font"]}";'
-        # self.setStyleSheet(font)
         self.ui.textEdit.setReadOnly(True)
         self.settings_report()
         
@@ -1265,12 +1259,6 @@ Click "Yes" to start now.')
         
         self.ai_chat()
         
-    def resizeEvent(self, new_size):
-        """ Update the widget size details in the app.settings variables """
-
-        self.app.settings['mainwindow_w'] = new_size.size().width()
-        self.app.settings['mainwindow_h'] = new_size.size().height()
-
     def fill_recent_projects_menu_actions(self):
         """ Get the recent projects from the .qualcoder txt file.
         Add up to five recent projects to the menu. """
@@ -1463,11 +1451,9 @@ Click "Yes" to start now.')
         msg += _("Style") + "; " + self.app.settings['stylesheet']
         if platform.system() == "Windows":
             msg += "\n" + _("Directory (folder) paths / represents \\")
-        # msg += "\n"
         self.ui.textEdit.append(msg)
         self.ui.textEdit.append("<p>&nbsp;</p>")
         self.ui.textEdit.textCursor().movePosition(QtGui.QTextCursor.MoveOperation.End)
-        self.ui.textEdit.verticalScrollBar().setValue(self.ui.textEdit.verticalScrollBar().maximum())
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
 
     def report_sql(self):
@@ -2096,6 +2082,7 @@ Click "Yes" to start now.')
         font = f"font: {self.app.settings['fontsize']}pt "
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
+        self.ai_chat_window.init_styles()
         
         if current_ai_enable != self.app.settings['ai_enable']:
             if self.app.settings['ai_enable'] == 'True':
@@ -2134,18 +2121,6 @@ Click "Yes" to start now.')
                     contents.itemAt(i).widget().close()
                     contents.itemAt(i).widget().setParent(None)
                     
-    def enable_ai(self) -> bool:
-        self.app.settings['ai_enable'] = 'True'
-        self.app.write_config_ini(self.app.settings, self.app.ai_models)
-        if self.app.prepare_ai(self):
-            if self.app.project_name != '':
-                self.app.ai.sources_vectorstore.init_vectorstore(rebuild=True)
-            self.app.ai.init_llm(self)
-        else:
-            self.app.settings['ai_enable'] = 'False'
-            self.app.write_config_ini(self.app.settings, self.app.ai_models)
-        return self.app.settings['ai_enable'] == 'True'
-
     def project_memo(self):
         """ Give the entire project a memo. """
         memo = self.app.get_project_memo()
@@ -2571,15 +2546,6 @@ Click "Yes" to start now.')
         
         # AI: init llm and update vectorstore
         self.app.ai.init_llm(self)
-        """
-        if self.app.settings['ai_enable'] == 'True':
-            if self.app.prepare_ai(self):
-                self.app.ai.init_llm(self)
-            else:
-                self.app.ai.close()
-                # self.app.settings['ai_enable'] = 'False'
-                self.ui.textEdit.append(_("AI: Error - failed to initialize."))
-        """
         self.ai_chat_window.init_ai_chat(self.app)
         
         # Fix missing folders within QualCoder project. Will cause import errors.
@@ -2627,7 +2593,8 @@ Click "Yes" to start now.')
         sql = "select memo from project"
         cur.execute(sql)
         res = cur.fetchone()
-        msg += _("Project memo: ") + f"{res[0]}\n"
+        if res[0] != "":
+            msg += _("Project memo: ") + f"\n---------------------\n{res[0]}\n---------------------\n"
         sql = "select count(id) from source"
         cur.execute(sql)
         res = cur.fetchone()

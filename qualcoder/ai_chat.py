@@ -82,24 +82,34 @@ class DialogAIChat(QtWidgets.QDialog):
         self.ui = Ui_Dialog_ai_chat()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        self.font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
-        #self.font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
-        #self.font += '"' + self.app.settings['font'] + '";'
-        self.setStyleSheet(self.font)        
         self.ui.plainTextEdit_question.installEventFilter(self)
         self.ui.pushButton_question.pressed.connect(self.button_question_clicked)
+        self.ui.progressBar_ai.setMaximum(100)
+        self.ui.plainTextEdit_question.setPlaceholderText(_('<your question>'))
+        self.ui.pushButton_new_analysis.clicked.connect(self.button_new_clicked)
+        self.ui.pushButton_delete.clicked.connect(self.delete_chat)
+        self.ui.listWidget_chat_list.itemSelectionChanged.connect(self.chat_list_selection_changed)
+        # Enable editing of items on double click and when pressing F2
+        self.ui.listWidget_chat_list.setEditTriggers(QtWidgets.QListWidget.EditTrigger.DoubleClicked | QtWidgets.QListWidget.EditTrigger.EditKeyPressed)
+        self.ui.listWidget_chat_list.itemChanged.connect(self.chat_list_item_changed)
+        self.ui.ai_output.linkHovered.connect(self.on_linkHovered)
+        self.ui.ai_output.linkActivated.connect(self.on_linkActivated)
+        self.init_styles()
+        self.ai_busy_timer = QtCore.QTimer(self)
+        self.ai_busy_timer.timeout.connect(self.update_ai_busy)
+        self.ai_busy_timer.start(100)
+        
+    def init_styles(self):
+        """Set up the stylesheets for the ui and the chat entries 
+        """
+        self.font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
+        self.setStyleSheet(self.font)        
         # set progressBar color to default highlight color
         self.ui.progressBar_ai.setStyleSheet(f"""
             QProgressBar::chunk {{
                 background-color: {self.app.highlight_color};
             }}
         """)
-        self.ui.progressBar_ai.setMaximum(100)
-        self.ui.plainTextEdit_question.setPlaceholderText(_('<your question>'))
-        # self.ui.scrollArea_ai_output.verticalScrollBar().rangeChanged.connect(self.ai_output_scroll_to_bottom)
-        # Stylesheets
-        # doc_font = 'font: ' + str(self.app.settings['docfontsize']) + 'pt '
-        # doc_font += '"' + self.app.settings['font'] + '";'
         doc_font = f'font: {self.app.settings["docfontsize"]}pt \'{self.app.settings["font"]}\';'
         if self.app.settings['stylesheet'] in ['dark', 'rainbow']:
             self.ai_response_style = f'"{doc_font} color: #8FB1D8;"'
@@ -127,17 +137,6 @@ class DialogAIChat(QtWidgets.QDialog):
         self.ui.ai_output.setStyleSheet('QWidget:focus {border: none;}')
         self.ui.ai_output.setStyleSheet(f'background-color: {default_bg_color.name()};')
         self.ui.scrollArea_ai_output.setStyleSheet(f'background-color: {default_bg_color.name()};')
-        self.ui.pushButton_new_analysis.clicked.connect(self.button_new_clicked)
-        self.ui.pushButton_delete.clicked.connect(self.delete_chat)
-        self.ui.listWidget_chat_list.itemSelectionChanged.connect(self.chat_list_selection_changed)
-        # Enable editing of items on double click and when pressing F2
-        self.ui.listWidget_chat_list.setEditTriggers(QtWidgets.QListWidget.EditTrigger.DoubleClicked | QtWidgets.QListWidget.EditTrigger.EditKeyPressed)
-        self.ui.listWidget_chat_list.itemChanged.connect(self.chat_list_item_changed)
-        self.ui.ai_output.linkHovered.connect(self.on_linkHovered)
-        self.ui.ai_output.linkActivated.connect(self.on_linkActivated)
-        self.ai_busy_timer = QtCore.QTimer(self)
-        self.ai_busy_timer.timeout.connect(self.update_ai_busy)
-        self.ai_busy_timer.start(100)
         self.update_chat_window()
         
     def init_ai_chat(self, app = None):
@@ -452,7 +451,7 @@ class DialogAIChat(QtWidgets.QDialog):
         return None    
     
     def update_ai_busy(self):
-        # update question button + progress bar
+        """update question button + progress bar"""
         if self.app.ai is None or not self.app.ai.is_busy():
             self.ui.pushButton_question.setIcon(qta.icon('mdi6.message-fast-outline', color=self.app.highlight_color))
             self.ui.pushButton_question.setToolTip(_('Send your question to the AI'))
@@ -470,8 +469,7 @@ class DialogAIChat(QtWidgets.QDialog):
             self.main_window.statusBar().showMessage('')
 
     def update_chat_window(self, scroll_to_bottom=True):
-        # self.update_ai_busy()   
-        # load current chat into self.ai_output
+        """load current chat into self.ai_output"""
         if self.current_chat_idx > -1:
             self.is_updating_chat_window = True
             try:
