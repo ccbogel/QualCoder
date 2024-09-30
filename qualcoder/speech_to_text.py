@@ -179,7 +179,7 @@ class SpeechToText(QtWidgets.QDialog):
         chunks = pydub.silence.split_on_silence(audio_file, min_silence_len=500, silence_thresh=-16)'''
         chunks = list(divide_chunks(audio_file, self.chunksize))
         self.ui.progressBar.setMaximum(len(chunks))
-        qc_dir = os.path.expanduser('~') + '/.qualcoder_ai'
+        qc_dir = os.path.expanduser('~') + '/.qualcoder'
         r = speech_recognition.Recognizer()
         # For each chunk, save as wav, then read and run through recognize_google()
         self.strings = []

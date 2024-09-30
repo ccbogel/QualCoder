@@ -101,7 +101,7 @@ Julius Reich for creating the cool QualCoder logo. \
 <h2 class="western">Other details</h2\
 <p>The qda data folder contains folders for imported documents, \
 images, audio and video. It also contains the sqlite database, named data.qda, which stores the coding data.</p>\
-<p>QualCoder creates a .qualcoder_ai folder inside your home directory. \
+<p>QualCoder creates a .qualcoder folder inside your home directory. \
 This contains QualCoder.log, config.ini (for settings) and \
 recent_project.txt. The config file contains the name of the current coder, \
 default working directory, selected font and other parameters.</p>\

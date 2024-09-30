@@ -149,7 +149,6 @@ class AiLLM():
                 else: 
                     # Success, model was selected. But since the "change_settings" function will start 
                     # a new "init_llm" anyways, we are going to quit here
-                    self.app.settings['ai_enable'] = 'True'
                     return    
             curr_model = self.app.ai_models[int(self.app.settings['ai_model_index'])]
             
@@ -160,12 +159,20 @@ class AiLLM():
             api_base = curr_model['api_base']
             api_key = curr_model['api_key']
             if api_key == '':
-                msg = "Cannot start the AI, the API-key for the AI model is empty. The AI will be disabled."
-                Message(self.app, _('AI API key'), msg).exec()
-                self._status = ''
-                self.app.settings['ai_enable'] = 'False'
-                self.parent_text_edit.append(_('AI: No API key available, AI is disabled.'))
-                return
+                msg = _('Please enter an API-key for the AI in the following dialog (or "None" if not API-key is needed).')
+                Message(self.app, _('AI API-key'), msg).exec()
+                main_window.change_settings(section='AI', enable_ai=True)
+                curr_model = self.app.ai_models[int(self.app.settings['ai_model_index'])]
+                if curr_model['api_key'] == '':
+                    # still no API-key, disable AI:
+                    self.app.settings['ai_enable'] = 'False'
+                    self.parent_text_edit.append(_('AI: No API key set, AI is disabled.'))
+                    self._status = ''
+                    return
+                else: 
+                    # Success, API-key was set. But since the "change_settings" function will start 
+                    # a new "init_llm" anyways, we are going to quit here
+                    return    
             elif api_key == 'None':
                 api_key = ''
             self.large_llm = ChatOpenAI(model=large_model, 

@@ -101,13 +101,13 @@ qualcoder_version = "QualCoder 3.6"
 
 path = os.path.abspath(os.path.dirname(__file__))
 home = os.path.expanduser('~')
-if not os.path.exists(home + '/.qualcoder_ai'):
+if not os.path.exists(home + '/.qualcoder'):
     try:
-        os.mkdir(home + '/.qualcoder_ai')
+        os.mkdir(home + '/.qualcoder')
     except Exception as e:
-        print("Cannot add .qualcoder_ai folder to home directory\n" + str(e))
+        print("Cannot add .qualcoder folder to home directory\n" + str(e))
         raise
-logfile = home + '/.qualcoder_ai/QualCoder.log'
+logfile = home + '/.qualcoder/QualCoder.log'
 # Hack for Windows 10 PermissionError that stops the rotating file handler, will produce massive files.
 try:
     log_file = open(logfile, "r")
@@ -199,7 +199,7 @@ class App(object):
         self.last_export_directory = ""
         self.delete_backup = True
         self.delete_backup_path_name = ""
-        self.confighome = os.path.expanduser('~/.qualcoder_ai')
+        self.confighome = os.path.expanduser('~/.qualcoder')
         self.configpath = os.path.join(self.confighome, 'config.ini')
         self.persist_path = os.path.join(self.confighome, 'recent_projects.txt')
         self.settings, self.ai_models = self.load_settings()
@@ -2867,7 +2867,7 @@ def gui():
         Replace 'lang' with the short language name, e.g. app_de.qm '''
         if qt_translator.isEmpty():
             print("trying to load translation qm file from .qualcoder folder")
-            qm = os.path.join(home, '.qualcoder_ai')
+            qm = os.path.join(home, '.qualcoder')
             qm = os.path.join(qm, 'app_' + lang + '.qm')
             print("qm file located at: ", qm)
             qt_translator.load(qm)
@@ -2888,8 +2888,8 @@ def gui():
             print("Error accessing python translations mo file\n", err)
             print("Locale directory for python translations: ", locale_dir)
             try:
-                print("Trying folder: home/.qualcoder_ai/" + lang + "/LC_MESSAGES/" + lang + ".mo")
-                mo_dir = os.path.join(home, '.qualcoder_ai')
+                print("Trying folder: home/.qualcoder/" + lang + "/LC_MESSAGES/" + lang + ".mo")
+                mo_dir = os.path.join(home, '.qualcoder')
                 translator = gettext.translation(lang, localedir=mo_dir, languages=[lang])
             except Exception as err2:
                 print(f"No {lang}.mo translation file loaded", err2)
@@ -2917,7 +2917,7 @@ def install_language(lang):
     Install poedit.mo file into folder .qualcoder/lang/LC_MESSAGES/lang.mo
     """
 
-    qm = os.path.join(home, '.qualcoder_ai')
+    qm = os.path.join(home, '.qualcoder')
     qm = os.path.join(qm, 'app_' + lang + '.qm')
     qm_data = None
     mo_data = None
@@ -2941,7 +2941,7 @@ def install_language(lang):
     with open(qm, 'wb') as file_:
         decoded_data = base64.decodebytes(qm_data)
         file_.write(decoded_data)
-    mo_path = os.path.join(home, '.qualcoder_ai')
+    mo_path = os.path.join(home, '.qualcoder')
     mo_path = os.path.join(mo_path, lang)
     if not os.path.exists(mo_path):
         os.mkdir(mo_path)
@@ -2957,7 +2957,7 @@ def install_language(lang):
 def install_droid_sans_mono():
     """ Install DroidSandMono ttf font for wordclouds into .qualcoder folder """
 
-    qc_folder = os.path.join(home, '.qualcoder_ai', 'DroidSansMono.ttf')
+    qc_folder = os.path.join(home, '.qualcoder', 'DroidSansMono.ttf')
     with open(qc_folder, 'wb') as file_:
         decoded_data = base64.decodebytes(DroidSansMono)
         file_.write(decoded_data)

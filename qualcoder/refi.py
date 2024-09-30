@@ -1929,7 +1929,7 @@ class RefiExport(QtWidgets.QDialog):
         """
 
         project_name = self.app.project_name[:-4]
-        prep_path = os.path.join(os.path.expanduser('~'), '.qualcoder_ai', project_name)
+        prep_path = os.path.join(os.path.expanduser('~'), '.qualcoder', project_name)
         try:
             shutil.rmtree(prep_path)
         except FileNotFoundError:

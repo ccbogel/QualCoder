@@ -16,7 +16,7 @@ class TestApp(TestCase):
 
     def setUp(self):
         # Need to mock these later when I learn howto do it
-        self.confighome = os.path.expanduser('~/.qualcoder_ai')
+        self.confighome = os.path.expanduser('~/.qualcoder')
         self.configpath = os.path.join(self.confighome, 'config.ini')
         self.persist_path = os.path.join(self.confighome, 'recent_projects.txt')
 
@@ -146,7 +146,7 @@ class TestMainWindow(TestCase):
         # Need to mock these later when I learn howto do it
         self.test_dir = tempfile.TemporaryFile()
 
-        self.confighome = os.path.expanduser('~/.qualcoder_ai')
+        self.confighome = os.path.expanduser('~/.qualcoder')
         self.configpath = os.path.join(self.confighome, 'config.ini')
         self.persist_path = os.path.join(self.confighome, 'recent_projects.txt')
 
