@@ -395,9 +395,9 @@ class DialogImportSurvey(QtWidgets.QDialog):
                 # Add the current time to the file name to ensure uniqueness and to
                 # Prevent sqlite Integrity Error. Do not use now_date which contains colons
                 now = str(datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H-%M-%S"))
-                fname = self.fields[field] + "_" + now
+                fname = f"{self.fields[field]}_{now}"
                 cur.execute(source_sql,
-                            (f"{self.fields[field]}_{now}", fulltext, "", self.app.settings['codername'], now_date))
+                            (fname, fulltext, "", self.app.settings['codername'], now_date))
                 self.app.conn.commit()
                 cur.execute("select last_insert_rowid()")
                 fid = cur.fetchone()[0]

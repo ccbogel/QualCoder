@@ -14,7 +14,6 @@ rispy
 six
 SpeechRecognition
 xmlschema
-charset-normalizer
 EbookLib
 openpyxl
 pandas
@@ -24,6 +23,7 @@ plotly
 ply
 pydub
 PyQt6
+qtawesome
 python-vlc
 rispy
 six

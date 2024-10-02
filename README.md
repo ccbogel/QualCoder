@@ -143,7 +143,7 @@ py -m pip install --upgrade pip
 Type the following to install the required modules:
 
 ```bash
-py -m pip install wheel pyqt6 chardet ebooklib openpyxl Pillow ply pdfminer.six pandas plotly pydub python-vlc rispy SpeechRecognition wordcloud xmlschema charset-normalizer
+py -m pip install wheel pyqt6 chardet ebooklib openpyxl Pillow ply pdfminer.six pandas plotly pydub python-vlc rispy SpeechRecognition wordcloud xmlschema
 ```
 
 For the AI-integration:
@@ -226,7 +226,7 @@ Note: To exit venv type `deactivate`
 
 6. Install the needed Python modules.
 
-`pip install chardet ebooklib ply openpyxl pandas pdfminer pyqt6 pillow pdfminer.six plotly pydub python-vlc rispy six SpeechRecognition xmlschema charset-normalizer`
+`pip install chardet ebooklib ply openpyxl pandas pdfminer pyqt6 pillow pdfminer.six plotly pydub python-vlc rispy six SpeechRecognition xmlschema`
 
 `pip install langchain langchain-community langchain-core langchain-chroma langchain-openai langchain-text-splitters chromadb==0.5.0 sentence-transformers fuzzysearch pydantic PyYAML json_repair`
 
@@ -258,7 +258,7 @@ It has not been tested, but please see the above instructions to build QualCoder
 
 2. Install additional python modules
 
-`sudo python3 -m pip install ebooklib plotly pydub python-vlc rispy SpeechRecognition xmlschema charset-normalizer`
+`sudo python3 -m pip install ebooklib plotly pydub python-vlc rispy SpeechRecognition xmlschema`
 `sudo python3 -m pip install langchain langchain-community langchain-core langchain-chroma langchain-openai langchain-text-splitters chromadb==0.5.0 sentence-transformers fuzzysearch pydantic PyYAML json_repair`
 
 If successful, all requirements are satisfied.
@@ -354,7 +354,7 @@ Open the Terminal App and move to the unzipped Qualcoder-ai_integration director
 
 1) Install Python dependency modules using `pip3`:
 
-`pip3 install chardet ebooklib ffmpeg-python pyqt6 pillow ply pdfminer.six openpyxl pandas plotly pydub python-vlc rispy six SpeechRecognition xmlschema charset-normalizer`
+`pip3 install chardet ebooklib ffmpeg-python pyqt6 pillow ply pdfminer.six openpyxl pandas plotly pydub python-vlc rispy six SpeechRecognition xmlschema`
 
 `pip3 install langchain langchain-community langchain-core langchain-chroma langchain-openai langchain-text-splitters chromadb==0.5.0 sentence-transformers fuzzysearch pydantic PyYAML json_repair`
 
@@ -368,7 +368,7 @@ Open the Terminal App and move to the unzipped Qualcoder-ai_integration director
 ## Dependencies
 Required:
 
-Python 3.8+ version, pyqt6, Pillow, six  (Mac OS), ebooklib, ply, chardet, pdfminer.six, openpyxl, pandas, plotly, pydub, python-vlc, rispy, SpeechRecognition, xmlschema, charset-normalizer, langchain, langchain-community, langchain-core, langchain-chroma, langchain-openai, langchain-text-splitters, chromadb==0.5.0, sentence-transformers, fuzzysearch, pydantic, PyYAML, json_repair
+Python 3.8+ version, pyqt6, Pillow, six  (Mac OS), ebooklib, ply, chardet, pdfminer.six, openpyxl, pandas, plotly, pydub, python-vlc, rispy, SpeechRecognition, xmlschema, langchain, langchain-community, langchain-core, langchain-chroma, langchain-openai, langchain-text-splitters, chromadb==0.5.0, sentence-transformers, fuzzysearch, pydantic, PyYAML, json_repair
 
 ## License
 QualCoder is distributed under the MIT LICENSE.

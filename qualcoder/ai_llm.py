@@ -28,7 +28,6 @@ https://qualcoder.wordpress.com/
 
 import os
 import logging
-import traceback
 from typing import List
 import time
 from PyQt6 import QtWidgets
@@ -36,7 +35,6 @@ from PyQt6 import QtGui
 from PyQt6 import QtCore 
 import qtawesome as qta
 
-import sqlite3
 from .ai_prompts import PromptItem
 from langchain_openai import ChatOpenAI
 from langchain_core.globals import set_llm_cache
@@ -53,7 +51,6 @@ from .ai_vectorstore import AiVectorstore
 from .GUI.base64_helper import *
 from .helpers import Message
 import fuzzysearch
-import json
 import json_repair
 
 max_memo_length = 1500 # maximum length of the memo send to the AI
@@ -271,7 +268,6 @@ class AiLLM():
     def _ai_async_error(self, exception_type, value, tb_obj):
         self.ai_async_is_errored = True
         raise exception_type(value).with_traceback(tb_obj)  # Re-raise
-        # exception_handler(exception_type, value, tb_obj)
 
     def _ai_async_finished(self):
         self.ai_async_is_finished = True

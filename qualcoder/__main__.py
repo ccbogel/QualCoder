@@ -1138,6 +1138,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.show()
         QtWidgets.QApplication.processEvents() 
         # Setup AI
+        global AiLLM
         from qualcoder.ai_llm import AiLLM
         self.app.ai = AiLLM(self.app, self.ui.textEdit)
         # First start? Ask if user wants to enable ai integration or not
@@ -2087,7 +2088,7 @@ Click "Yes" to start now.')
         if current_ai_enable != self.app.settings['ai_enable']:
             if self.app.settings['ai_enable'] == 'True':
                 # AI is newly enabled
-                self.app.ai.init_llm(self)
+                self.app.ai.init_llm(self, rebuild_vectorstore=True)
             else: # AI is disabled
                 self.app.ai.close()
         elif int(current_ai_model_index) < 0:
@@ -2829,8 +2830,6 @@ def gui():
     app = QtWidgets.QApplication(sys.argv)
     QtGui.QFontDatabase.addApplicationFont("GUI/NotoSans-hinted/NotoSans-Regular.ttf")
     QtGui.QFontDatabase.addApplicationFont("GUI/NotoSans-hinted/NotoSans-Bold.ttf")
-    if platform.system() == "Windows":
-        app.setStyle("fusion")
     stylesheet = qual_app.merge_settings_with_default_stylesheet(settings)
     app.setStyleSheet(stylesheet)
     if sys.platform != 'darwin':
@@ -2868,7 +2867,7 @@ def gui():
         if qt_translator.isEmpty():
             print("trying to load translation qm file from .qualcoder folder")
             qm = os.path.join(home, '.qualcoder')
-            qm = os.path.join(qm, 'app_' + lang + '.qm')
+            qm = os.path.join(qm, f"app_{lang}.qm")
             print("qm file located at: ", qm)
             qt_translator.load(qm)
             #if qt_translator.isEmpty():
@@ -2888,7 +2887,7 @@ def gui():
             print("Error accessing python translations mo file\n", err)
             print("Locale directory for python translations: ", locale_dir)
             try:
-                print("Trying folder: home/.qualcoder/" + lang + "/LC_MESSAGES/" + lang + ".mo")
+                print(f"Trying folder: home/.qualcoder/{lang}/LC_MESSAGES/{lang}.mo")
                 mo_dir = os.path.join(home, '.qualcoder')
                 translator = gettext.translation(lang, localedir=mo_dir, languages=[lang])
             except Exception as err2:

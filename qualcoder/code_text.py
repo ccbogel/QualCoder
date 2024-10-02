@@ -4405,8 +4405,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ai_search_analysis_counter = 0 # conter to stop analyzing after ai_search_analysis_max_count 
         self.ai_search_found = False # Becomes True if any new data has been found
         self.ai_search_analyze_next_chunk()
-        # self.ai_analyze_similar_chunks(ai_search_analysis_max_count)
-
+        
     def ai_search_analyze_next_chunk(self):
         if self.ai_search_chunks_pos < len(self.ai_search_similar_chunk_list):
             # still chunks left for analysis            
@@ -4457,7 +4456,6 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ai_search_chunks_pos += 1
         self.ai_search_analysis_counter += 1
         if not self.app.ai.ai_async_is_canceled:
-            # self.ai_search_analyze_next_chunk(show_progress_msg=(not self.ai_search_found))
             self.ai_search_analyze_next_chunk()
         else: 
             self.ai_search_running = False
@@ -4505,8 +4503,6 @@ class DialogCodeText(QtWidgets.QWidget):
                 action_item.setText('(search finished)')
 
     def ai_search_list_clicked(self):
-        #if self.ai_search_results is None or len(self.ai_search_results) == 0:
-        #    return
         row = self.ui.listWidget_ai.currentRow()
         if row < len(self.ai_search_results): # clicked on a search result
             self.ai_search_selection_changed()    

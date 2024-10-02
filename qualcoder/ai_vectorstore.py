@@ -406,16 +406,13 @@ want to continue?\
                 self.import_document(doc['id'], doc['name'], doc['fulltext'], False)
             
     def rebuild_vectorstore(self):
-        # import sentence_transformers
-        #global sentence_transformers_module
-        #if sentence_transformers_module is None:
-        #    sentence_transformers_module = importlib.import_module('sentence_transformers')
-        #self.embedding_function = E5SentenceTransformerEmbeddings(model_name=self.model_folder)
+        """Deletes all contents from chroma_db and rebuilds the vectorstore from the ground up.  
+        """
         self.app.ai._status = ''
         if self.chroma_db is None:
             logger.debug('chroma_db is None')
             return
-        msg = _('AI: Rebuilding memory. The local AI will read through all your documents, be patient.')
+        msg = _('AI: Rebuilding memory. The local AI will read through all your documents, please be patient.')
         self.parent_text_edit.append(msg)
         logger.debug(msg)
         # delete all the contents from the vectorstore

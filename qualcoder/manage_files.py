@@ -62,7 +62,6 @@ from .select_items import DialogSelectItems
 from .view_av import DialogViewAV, DialogCodeAV  # for isinstance update files
 from .view_image import DialogViewImage, DialogCodeImage  # for isinstance update files
 from .code_pdf import DialogCodePdf  # for isinstance update files
-from charset_normalizer import from_path
 
 # If VLC not installed, it will not crash
 vlc = None
@@ -1655,7 +1654,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                     Message(self.app, _("Warning"), str(import_errors) + _(" lines not imported"), "warning").exec()
         # Try importing as a plain text file.
         # TODO https://stackoverflow.com/questions/436220/how-to-determine-the-encoding-of-text
-        # ==> suggestion: use the new lib "charset_normalizer" as I did above with html-import  
+        # ==> suggestion: use the new lib "charset_normalizer"  
         # coding = chardet.detect(file.content).get('encoding')
         # text = file.content[:10000].decode(coding)
         if text_ == "":
