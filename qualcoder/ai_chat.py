@@ -107,7 +107,7 @@ class DialogAIChat(QtWidgets.QDialog):
         # set progressBar color to default highlight color
         self.ui.progressBar_ai.setStyleSheet(f"""
             QProgressBar::chunk {{
-                background-color: {self.app.highlight_color};
+                background-color: {self.app.highlight_color()};
             }}
         """)
         doc_font = f'font: {self.app.settings["docfontsize"]}pt \'{self.app.settings["font"]}\';'
@@ -191,11 +191,11 @@ class DialogAIChat(QtWidgets.QDialog):
 
             # Creating a new QListWidgetItem
             if analysis_type == 'general chat':
-                icon = self.app.ai.general_chat_icon
+                icon = self.app.ai.general_chat_icon()
             elif analysis_type == 'topic chat':
-                icon = self.app.ai.topic_analysis_icon
+                icon = self.app.ai.topic_analysis_icon()
             else: # code chat
-                icon = self.app.ai.code_analysis_icon
+                icon = self.app.ai.code_analysis_icon()
 
             item = QtWidgets.QListWidgetItem(icon, name)
             item.setToolTip(tooltip_text)
@@ -453,12 +453,12 @@ class DialogAIChat(QtWidgets.QDialog):
     def update_ai_busy(self):
         """update question button + progress bar"""
         if self.app.ai is None or not self.app.ai.is_busy():
-            self.ui.pushButton_question.setIcon(qta.icon('mdi6.message-fast-outline', color=self.app.highlight_color))
+            self.ui.pushButton_question.setIcon(qta.icon('mdi6.message-fast-outline', color=self.app.highlight_color()))
             self.ui.pushButton_question.setToolTip(_('Send your question to the AI'))
             self.ui.progressBar_ai.setRange(0, 100) # stops the animation
         else:
             if self.ui.progressBar_ai.maximum() > 0: 
-                spin_icon = qta.icon("mdi.loading", color=self.app.highlight_color, animation=qta.Spin(self.ui.pushButton_question))
+                spin_icon = qta.icon("mdi.loading", color=self.app.highlight_color(), animation=qta.Spin(self.ui.pushButton_question))
                 self.ui.pushButton_question.setIcon(spin_icon)
                 self.ui.pushButton_question.setToolTip(_('Cancel AI generation'))
                 self.ui.progressBar_ai.setRange(0, 0) # starts the animation
@@ -551,13 +551,13 @@ class DialogAIChat(QtWidgets.QDialog):
 
         # Add actions
         action_codings_analysis = menu.addAction(_('New code chat'))
-        action_codings_analysis.setIcon(self.app.ai.code_analysis_icon)
+        action_codings_analysis.setIcon(self.app.ai.code_analysis_icon())
         action_codings_analysis.setToolTip(_('Start chatting about the data in the codings for a particular code.'))
         action_topic_analysis = menu.addAction(_('New topic chat'))
-        action_topic_analysis.setIcon(self.app.ai.topic_analysis_icon)
+        action_topic_analysis.setIcon(self.app.ai.topic_analysis_icon())
         action_topic_analysis.setToolTip(_('Start chatting about data related to a free-search topic.'))
         action_general_chat = menu.addAction(_('New general chat'))
-        action_general_chat.setIcon(self.app.ai.general_chat_icon)
+        action_general_chat.setIcon(self.app.ai.general_chat_icon())
         action_general_chat.setToolTip(_('Ask the AI anything, not related to your data.'))
 
         # Obtain the bottom-left point of the button in global coordinates

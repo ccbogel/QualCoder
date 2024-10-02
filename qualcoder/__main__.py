@@ -694,7 +694,7 @@ university, ORCID, GitHub, or Google account.""",
         if len(settings_data) > dict_len:
             self.write_config_ini(settings_data, ai_models)
         return settings_data, ai_models
-
+    
     def merge_settings_with_default_stylesheet(self, settings):
         """ Stylesheet is coded to avoid potential data file import errors with pyinstaller.
         Various options for colour schemes:
@@ -810,7 +810,6 @@ university, ORCID, GitHub, or Google account.""",
         style = style.replace("QFileDialog {font-size: 12", "QFileDialog {font-size:" + str(settings.get('fontsize')))
         style = style.replace("QTreeWidget {font-size: 12",
                               "QTreeWidget {font-size: " + str(settings.get('treefontsize')))
-        self.highlight_color = '#f89407'
         if self.settings['stylesheet'] == 'dark':
             return style_dark
         style_rainbow = style_dark
@@ -828,27 +827,44 @@ university, ORCID, GitHub, or Google account.""",
         if self.settings['stylesheet'] == "orange":
             style = style.replace("#efefef", "#ffcba4")
             style = style.replace("#f89407", "#306eff")
-            self.highlight_color = "#306eff"
         if self.settings['stylesheet'] == "yellow":
             style = style.replace("#efefef", "#f9e79f")
         if self.settings['stylesheet'] == "green":
             style = style.replace("#efefef", "#c8e6c9")
             style = style.replace("#f89407", "#ea202c")
-            self.highlight_color = "#ea202c"
         if self.settings['stylesheet'] == "blue":
             style = style.replace("#efefef", "#cbe9fa")
             style = style.replace("#f89407", "#303f9f")
-            self.highlight_color = "#303f9f"
         if self.settings['stylesheet'] == "purple":
             style = style.replace("#efefef", "#dfe2ff")
             style = style.replace("#f89407", "#ca1b9a")
-            self.highlight_color = "#ca1b9a"
         if self.settings['stylesheet'] == "native":
             style = "* {font-size: 12px;}"
             style += "\nQGroupBox { border: none; background-color: transparent;}"
             palette = QtWidgets.QApplication.instance().palette()
-            self.highlight_color = palette.color(QtGui.QPalette.ColorRole.Highlight).name(QtGui.QColor.NameFormat.HexRgb)
         return style
+    
+    def highlight_color(self):
+        """ Get the default highlight color, depending on the current style
+        """
+        if self.settings['stylesheet'] == 'dark':
+            return '#f89407'
+        if self.settings['stylesheet'] == 'rainbow':
+            return '#f89407'
+        if self.settings['stylesheet'] == "orange":
+            return "#306eff"
+        if self.settings['stylesheet'] == "yellow":
+            return "#306eff"
+        if self.settings['stylesheet'] == "green":
+            return "#ea202c"
+        if self.settings['stylesheet'] == "blue":
+            return "#303f9f"
+        if self.settings['stylesheet'] == "purple":
+            return "#ca1b9a"
+        if self.settings['stylesheet'] == "native":
+            palette = QtWidgets.QApplication.instance().palette()
+            return palette.color(QtGui.QPalette.ColorRole.Highlight).name(QtGui.QColor.NameFormat.HexRgb)
+        return '#f89407' # default
 
     def load_settings(self):
         result, ai_models = self._load_config_ini()
@@ -1139,7 +1155,7 @@ class MainWindow(QtWidgets.QMainWindow):
         QtWidgets.QApplication.processEvents() 
         # Setup AI
         global AiLLM
-        from qualcoder.ai_llm import AiLLM
+        from qualcoder.ai_llm import AiLLM # import after showing the UI because this takes several seconds
         self.app.ai = AiLLM(self.app, self.ui.textEdit)
         # First start? Ask if user wants to enable ai integration or not
         if self.app.settings['ai_first_startup'] == 'True' and self.app.settings['ai_enable'] == 'False':

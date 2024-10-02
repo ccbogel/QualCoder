@@ -371,11 +371,9 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.listWidget_ai.clicked.connect(self.ai_search_list_clicked)
         
         self.ui.ai_progressBar.setVisible(False)
-        palette = self.palette()
-        highlight_color = palette.color(QtGui.QPalette.ColorRole.Highlight)
         self.ui.ai_progressBar.setStyleSheet(f"""
             QProgressBar::chunk {{
-                background-color: {highlight_color.name()};
+                background-color: {self.app.highlight_color()};
             }}
         """)
         self.ai_search_spinner_sequence = ['', '.', '..', '...']
@@ -4473,10 +4471,7 @@ class DialogCodeText(QtWidgets.QWidget):
         action_item = self.ui.listWidget_ai.item(self.ui.listWidget_ai.count() -1)
         if self.ai_search_listview_action_label is None:
             self.ai_search_listview_action_label = QtWidgets.QLabel('')
-            # set to default highlight color
-            palette = self.palette()
-            highlight_color = palette.color(QtGui.QPalette.ColorRole.Highlight)
-            self.ai_search_listview_action_label.setStyleSheet(f'QLabel {{color: {highlight_color.name()}; text-decoration: underline; margin-left: 2px; }}')
+            self.ai_search_listview_action_label.setStyleSheet(f'QLabel {{color: {self.app.highlight_color()}; text-decoration: underline; margin-left: 2px; }}')
             self.ui.listWidget_ai.setItemWidget(action_item, self.ai_search_listview_action_label)
         
         if self.ai_search_running: 

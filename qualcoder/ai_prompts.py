@@ -380,11 +380,11 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
                 type_item = QtWidgets.QTreeWidgetItem(self.ui.treeWidget_prompts)
                 type_item.setText(0, t)
                 if t == 'search':
-                    type_item.setIcon(0, self.app.ai.search_icon)
+                    type_item.setIcon(0, self.app.ai.search_icon())
                 elif t == 'code_analysis':
-                    type_item.setIcon(0, self.app.ai.code_analysis_icon)
+                    type_item.setIcon(0, self.app.ai.code_analysis_icon())
                 elif t == 'topic_analysis':
-                    type_item.setIcon(0, self.app.ai.topic_analysis_icon)
+                    type_item.setIcon(0, self.app.ai.topic_analysis_icon())
                 
                 type_item.setToolTip(0, prompt_types_descriptions[i])
                 for j in range(len(prompt_scopes)):
@@ -392,12 +392,12 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
                     scope_item = QtWidgets.QTreeWidgetItem(type_item)
                     scope_item.setText(0, s)
                     scope_item.setToolTip(0, prompt_scope_descriptions[j])
-                    scope_item.setIcon(0, self.app.ai.prompt_scope_icon)
+                    scope_item.setIcon(0, self.app.ai.prompt_scope_icon())
                     for p in self.prompts.prompts_by_type(t, s):
                         prompt_item = QtWidgets.QTreeWidgetItem(scope_item)
                         prompt_item.setText(0, p.name)
                         prompt_item.setToolTip(0, p.description)
-                        prompt_item.setIcon(0, self.app.ai.prompt_icon)
+                        prompt_item.setIcon(0, self.app.ai.prompt_icon())
                         if p == self.selected_prompt: # sel_prompt:
                             prompt_item.setSelected(True)
             self.ui.treeWidget_prompts.expandAll()

@@ -116,14 +116,26 @@ class AiLLM():
         self.threadpool = QtCore.QThreadPool()
         self.threadpool.setMaxThreadCount(1)
         self.sources_vectorstore = None
-        # Icons (https://pictogrammers.com/library/mdi/)
-        self.code_analysis_icon = qta.icon('mdi6.tag-text-outline', color=self.app.highlight_color)
-        self.topic_analysis_icon = qta.icon('mdi6.star-outline', color=self.app.highlight_color)
-        self.search_icon = qta.icon('mdi6.magnify', color=self.app.highlight_color)
-        self.general_chat_icon = qta.icon('mdi6.chat-question-outline', color=self.app.highlight_color)
-        self.prompt_scope_icon = qta.icon('mdi6.folder-open-outline', color=self.app.highlight_color)
-        self.prompt_icon = qta.icon('mdi6.script-text-outline', color=self.app.highlight_color)
-    
+
+    # Icons (https://pictogrammers.com/library/mdi/)
+    def code_analysis_icon(self):
+        return qta.icon('mdi6.tag-text-outline', color=self.app.highlight_color())
+
+    def topic_analysis_icon(self):
+        return qta.icon('mdi6.star-outline', color=self.app.highlight_color())
+
+    def search_icon(self):
+        return qta.icon('mdi6.magnify', color=self.app.highlight_color())
+
+    def general_chat_icon(self):
+        return qta.icon('mdi6.chat-question-outline', color=self.app.highlight_color())
+
+    def prompt_scope_icon(self):
+        return qta.icon('mdi6.folder-open-outline', color=self.app.highlight_color())
+
+    def prompt_icon(self):
+        return qta.icon('mdi6.script-text-outline', color=self.app.highlight_color())
+        
     def init_llm(self, main_window, rebuild_vectorstore=False, enable_ai=False):  
         self.main_window = main_window      
         if enable_ai or self.app.settings['ai_enable'] == 'True':
