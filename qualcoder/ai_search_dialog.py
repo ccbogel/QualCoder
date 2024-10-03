@@ -92,12 +92,14 @@ class DialogAiSearch(QtWidgets.QDialog):
         elif context == 'code_analysis':
             self.setWindowTitle('AI Code Analysis')
             self.ui.label_what.setText(_('Which code do you want to analyze?'))
+            self.ui.tabWidget.setCurrentIndex(0)
             self.ui.tabWidget.setTabVisible(0, True) # code search
             self.ui.tabWidget.setTabVisible(1, False) # free search
             self.ui.checkBox_coded_segments.setVisible(False) 
         elif context == 'topic_analysis':
             self.setWindowTitle('AI Topic Analysis')
             self.ui.label_what.setText(_('Which topic do you want to analyze?'))
+            self.ui.tabWidget.setCurrentIndex(1)
             self.ui.tabWidget.setTabVisible(0, False) # code search
             self.ui.tabWidget.setTabVisible(1, True) # free search 
             self.ui.checkBox_coded_segments.setVisible(False)
@@ -113,7 +115,8 @@ class DialogAiSearch(QtWidgets.QDialog):
         self.ui.listWidget_cases.setStyleSheet(treefont)
         self.ui.listWidget_cases.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
         self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.SelectionMode.SingleSelection)
-        self.fill_tree(selected_id, selected_is_code)   
+        if self.ui.tabWidget.isTabVisible(0): # code
+            self.fill_tree(selected_id, selected_is_code)   
         # prompts
         self.prompts_list = PromptsList(app_, context)
         # load last settings
@@ -131,15 +134,10 @@ class DialogAiSearch(QtWidgets.QDialog):
         self.ui.comboBox_prompts.setCurrentText(self.current_prompt.name_and_scope())
         self.ui.comboBox_prompts.setToolTip(self.current_prompt.description)
         self.ui.comboBox_prompts.currentIndexChanged.connect(self.on_prompt_selected)
-        self.ui.tabWidget.setCurrentIndex(int(self.app.settings.get(f'ai_dlg_{self.context}_last_tab_index', 0)))
+        if context == 'search':
+            self.ui.tabWidget.setCurrentIndex(int(self.app.settings.get(f'ai_dlg_{self.context}_last_tab_index', 0)))
         self.ui.lineEdit_free_topic.setText(self.app.settings.get(f'ai_dlg_{self.context}_free_topic', ''))
         self.ui.textEdit_free_description.setText(self.app.settings.get(f'ai_dlg_{self.context}_free_description', '').replace('\\n', '\n'))        
-        #print(self.ui.splitter_code_tree.sizes())
-        #self.ui.splitter_code_tree.setSizes([346, 256])
-        #self.ui.splitter_code_tree.moveSplitter(300, 0)
-        #self.ui.splitter_code_tree.moveSplitter(int(self.app.settings.get(f'ai_dlg_{self.context}_last_splitter_code_tree', 500)), 0)
-        #print(self.ui.splitter_code_tree.sizes())
-        #self.ui.splitter_case_files.moveSplitter(int(self.app.settings.get(f'ai_dlg_{self.context}_last_splitter_case_files', 220)), 0)
         self.ui.checkBox_send_memos.setChecked((self.app.settings.get(f'ai_dlg_{self.context}_send_memos', 'True') == 'True'))
         self.ui.checkBox_coded_segments.setChecked((self.app.settings.get(f'ai_dlg_{self.context}_coded_segments', 'False') == 'True'))
         # buttons
@@ -408,17 +406,8 @@ class DialogAiSearch(QtWidgets.QDialog):
             tt = ""
             cur.execute(sql_text_codings, [f['id']])
             txt_res = cur.fetchone()
-            #cur.execute(sql_av_codings, [f['id']])
-            #av_res = cur.fetchone()
-            #cur.execute(sql_image_codings, [f['id']])
-            #img_res = cur.fetchone()
             tt += _("Codings: ")
-            # if txt_res[0] > 0:
             tt += str(txt_res[0])
-            # if av_res[0] > 0:
-            #    tt += str(av_res[0])
-            #if img_res[0] > 0:
-            #    tt += str(img_res[0])
             item = QtWidgets.QListWidgetItem(f['name'])
             if f['memo'] != "":
                 tt += _("\nMEMO: ") + f['memo']
@@ -540,7 +529,8 @@ class DialogAiSearch(QtWidgets.QDialog):
         # save the settings for the next search
         self.app.settings[f'ai_dlg_{self.context}_last_prompt_name'] = self.current_prompt.name
         self.app.settings[f'ai_dlg_{self.context}_last_prompt_scope'] = self.current_prompt.scope
-        self.app.settings[f'ai_dlg_{self.context}_last_tab_index'] = self.ui.tabWidget.currentIndex()
+        if self.context == 'search':
+            self.app.settings[f'ai_dlg_{self.context}_last_tab_index'] = self.ui.tabWidget.currentIndex()
         self.app.settings[f'ai_dlg_{self.context}_free_topic'] = self.ui.lineEdit_free_topic.text()
         self.app.settings[f'ai_dlg_{self.context}_free_description'] = self.ui.textEdit_free_description.toPlainText().replace('\n', '\\n')
         self.app.settings[f'ai_dlg_{self.context}_last_splitter_code_tree'] = self.ui.splitter_code_tree.sizes()[0]
