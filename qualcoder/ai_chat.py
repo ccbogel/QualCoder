@@ -41,11 +41,7 @@ from langchain_core.callbacks.base import BaseCallbackHandler
 from datetime import datetime
 import logging
 import os
-import re
 import sqlite3
-import sys
-import traceback
-import base64
 import json
 
 from .GUI.ui_ai_chat import Ui_Dialog_ai_chat
@@ -71,8 +67,6 @@ class DialogAIChat(QtWidgets.QDialog):
     # filenames = []
 
     def __init__(self, app, parent_text_edit: QTextEdit, main_window: QtWidgets.QMainWindow):
-        """ Need to comment out the connection accept signal line in ui_Dialog_Import.py.
-         Otherwise, get a double-up of accept signals. """
 
         self.app = app
         self.parent_textEdit = parent_text_edit
