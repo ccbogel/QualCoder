@@ -29,8 +29,8 @@ https://qualcoder.wordpress.com/
 from PyQt6 import QtWidgets, QtCore, QtGui
 from copy import copy
 import difflib
-import os
 import logging
+import os
 
 from .GUI.ui_dialog_memo import Ui_Dialog_memo
 
@@ -108,6 +108,7 @@ class DialogEditTextFile(QtWidgets.QDialog):
         self.plain_text_edit.customContextMenuRequested.connect(self.textedit_menu)
         self.plain_text_edit.textChanged.connect(self.update_positions)
         self.plain_text_edit.installEventFilter(self)
+        print("HHH")
 
     def get_cases_codings_annotations(self):
         """ Get all linked cases, coded text and annotations for this file """
@@ -145,6 +146,8 @@ class DialogEditTextFile(QtWidgets.QDialog):
     def update_positions(self):
         """ Update positions for code text, annotations and case text as each character changes
         via adding or deleting.
+        difflib is very slow with large text files that are annotated, coded, cased.
+        consider diff_match_patch 20x faster
 
         Output: adding an e at pos 4:
         ---
@@ -159,12 +162,10 @@ class DialogEditTextFile(QtWidgets.QDialog):
         # No need to update positions (unless entire file is a case)
         if self.no_codes_annotes_cases:
             return
-
-        # cursor = self.ui.textEdit.textCursor()
         #self.text = self.ui.textEdit.toPlainText()
         self.text = self.plain_text_edit.toPlainText()
-        # print("cursor", cursor.position())
         # n is how many context lines to show
+        # difflib is very slow with large text files, use difflib with smaller text files?
         d = list(difflib.unified_diff(self.prev_text, self.text, n=0))
         # print(d)  # 4 items
         if len(d) < 4:
@@ -174,7 +175,6 @@ class DialogEditTextFile(QtWidgets.QDialog):
         position = d[2][4:]  # Removes prefix @@ -
         position = position[:-4]  # Removes suffix space@@\n
         # print("position", position, "char", char)
-
         previous = position.split(" ")[0]
         pre_start = int(previous.split(",")[0])
         pre_chars = None
@@ -189,6 +189,7 @@ class DialogEditTextFile(QtWidgets.QDialog):
             post_chars = post.split(",")[1]
         except IndexError:
             pass
+
         # print(char, " previous", pre_start, pre_chars, " post", post_start, post_chars)
         """
         Replacing 'way' with 'the' start position 13
@@ -222,6 +223,7 @@ class DialogEditTextFile(QtWidgets.QDialog):
         if post_chars is None:
             post_chars = 1
         post_chars = int(post_chars)  # String if not None
+
         # print("XXX", char, " previous", pre_start, pre_chars, " post", post_start, post_chars)
         # Adding characters
         if char[0] == "+":
@@ -243,6 +245,7 @@ class DialogEditTextFile(QtWidgets.QDialog):
                     c['npos1'] += pre_chars + post_chars
             for c in self.casetext:
                 changed = False
+                print(pre_chars)
                 # print("npos0", c['npos0'], "pre start", pre_start)
                 if c['npos0'] is not None and c['npos0'] >= pre_start and c['npos0'] >= pre_start + -1 * pre_chars:
                     c['npos0'] += pre_chars + post_chars
@@ -395,6 +398,7 @@ class DialogEditTextFile(QtWidgets.QDialog):
             print(e_)
             self.app.conn.rollback()  # Revert all changes
             raise
+
         super(DialogEditTextFile, self).accept()
 
     def update_casetext(self):
