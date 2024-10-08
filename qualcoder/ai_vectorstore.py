@@ -31,8 +31,8 @@ import os
 os.environ["HF_HUB_DISABLE_TELEMETRY"] = "1" # for huggingface hub
 os.environ["ANONYMIZED_TELEMETRY"] = "0" # for chromadb
 
-from langchain.embeddings.sentence_transformer import SentenceTransformerEmbeddings
-from langchain_text_splitters.character import CharacterTextSplitter, RecursiveCharacterTextSplitter
+from langchain_community.embeddings import SentenceTransformerEmbeddings
+from langchain_text_splitters.character import RecursiveCharacterTextSplitter
 from langchain_chroma.vectorstores import Chroma
 from langchain_core.documents.base import Document
 from huggingface_hub import hf_hub_url

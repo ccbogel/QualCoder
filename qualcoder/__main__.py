@@ -2102,8 +2102,8 @@ Click "Yes" to start now.')
         
         if current_ai_enable != self.app.settings['ai_enable']:
             if self.app.settings['ai_enable'] == 'True':
-                # AI is newly enabled
-                self.app.ai.init_llm(self, rebuild_vectorstore=True)
+                # AI is newly enabled:
+                self.app.ai.init_llm(self, rebuild_vectorstore=False)
             else: # AI is disabled
                 self.app.ai.close()
         elif int(current_ai_model_index) < 0:
