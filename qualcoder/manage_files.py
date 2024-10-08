@@ -952,9 +952,10 @@ class DialogManageFiles(QtWidgets.QDialog):
         icon = QtGui.QIcon(pm)
         # Check if text file is a transcription and add details
         cur.execute("select name from source where av_text_id=?", [id_])
-        tr_res = cur.fetchone()
-        if tr_res is not None:
-            metadata += _("Transcript for: ") + f"{tr_res[0]}\n"
+        transcript_res = cur.fetchone()
+        if transcript_res is not None:
+            metadata += _("Transcript for: ") + f"{transcript_res[0]}\n"
+            metadata += _("Characters: ") + str(len(res[1]))
             pm.loadFromData(QtCore.QByteArray.fromBase64(transcribed_text_icon), "png")
             icon = QtGui.QIcon(pm)
         if res[1] is not None and len(res[1]) > 0 and res[2] is None:
@@ -963,8 +964,11 @@ class DialogManageFiles(QtWidgets.QDialog):
         if res[2] is None:
             logger.debug("empty media path error")
             return icon, metadata
-        if res[1] is not None and len(res[1]) > 0 and res[2][0:5] == 'docs:':
-            metadata += _("Characters: ") + str(len([res[1]]))
+        if res[1] is not None and len(res[1]) > 5 and res[2][:6] == "/docs/":
+            metadata += _("Characters: ") + str(len(res[1]))
+            return icon, metadata
+        if res[1] is not None and len(res[1]) > 5 and res[2][:5] == "docs:":
+            metadata += _("Characters: ") + str(len(res[1]))
             pm = QtGui.QPixmap()
             pm.loadFromData(QtCore.QByteArray.fromBase64(text_link), "png")
             icon = QtGui.QIcon(pm)
@@ -1050,8 +1054,8 @@ class DialogManageFiles(QtWidgets.QDialog):
         bytes_ = 0
         try:
             bytes_ = os.path.getsize(abs_path)
-        except OSError:
-            pass
+        except OSError as e_:
+            print(e_)
         metadata += f"\nBytes: {bytes_}"
         if 1024 < bytes_ < 1024 * 1024:
             metadata += f"  {int(bytes_ / 1024)}KB"
