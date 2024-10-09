@@ -29,8 +29,9 @@ https://qualcoder.wordpress.com/
 from PyQt6 import QtWidgets, QtCore, QtGui
 from copy import copy
 import difflib
-import os
+# import diff_match_patch  # TESTING
 import logging
+import os
 
 from .GUI.ui_dialog_memo import Ui_Dialog_memo
 
@@ -41,6 +42,8 @@ logger = logging.getLogger(__name__)
 class DialogEditTextFile(QtWidgets.QDialog):
     """ Dialog to view and edit text file data.
     Needs to adjust codings annotations and cases for changed character positions.
+    The Ui_dialog_memo QTextEdit is slow with large text files, QPlainTextEdit is better,
+    so replacing with the plaintext edit here
     """
 
     app = None
@@ -70,6 +73,8 @@ class DialogEditTextFile(QtWidgets.QDialog):
         self.code_deletions = []
         self.ui = Ui_Dialog_memo()
         self.ui.setupUi(self)
+        self.plain_text_edit = QtWidgets.QPlainTextEdit()
+        self.ui.gridLayout.replaceWidget(self.ui.textEdit, self.plain_text_edit)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         font = f'font: {self.app.settings["fontsize"]}pt '
         font += f'"{self.app.settings["font"]}";'
@@ -92,21 +97,21 @@ class DialogEditTextFile(QtWidgets.QDialog):
             self.ui.pushButton_clear.hide()
         self.ui.pushButton_clear.pressed.connect(self.clear_contents)
         self.get_cases_codings_annotations()
-        self.ui.textEdit.setPlainText(self.text)
-        self.ui.textEdit.setFocus()
-        '''print("FILE:", self.name)
-        if self.casetext:
-            print("CASE\n", self.casetext)
-        if self.annotations:
-            print("ANNOTE\n", self.annotations)
-        if self.codetext:
-            print("CODETEXT\n", self.codetext)'''
+        '''self.ui.textEdit.setPlainText(self.text)
+        self.ui.textEdit.setFocus()'''
+        self.plain_text_edit.setPlainText(self.text)
+        self.plain_text_edit.setFocus()
         self.prev_text = copy(self.text)
         self.highlight()
-        self.ui.textEdit.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        '''self.ui.textEdit.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.textEdit.customContextMenuRequested.connect(self.textedit_menu)
         self.ui.textEdit.textChanged.connect(self.update_positions)
-        self.ui.textEdit.installEventFilter(self)
+        self.ui.textEdit.installEventFilter(self)'''
+        self.plain_text_edit.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        self.plain_text_edit.customContextMenuRequested.connect(self.textedit_menu)
+        self.plain_text_edit.textChanged.connect(self.update_positions)
+        self.plain_text_edit.installEventFilter(self)
+        print("HHH")
 
     def get_cases_codings_annotations(self):
         """ Get all linked cases, coded text and annotations for this file """
@@ -138,11 +143,14 @@ class DialogEditTextFile(QtWidgets.QDialog):
             self.no_codes_annotes_cases = False
 
     def clear_contents(self):
-        self.ui.textEdit.setPlainText("")
+        #self.ui.textEdit.setPlainText("")
+        self.plain_text_edit.setPlainText("")
 
     def update_positions(self):
         """ Update positions for code text, annotations and case text as each character changes
         via adding or deleting.
+        difflib is very slow with large text files that are annotated, coded, cased.
+        consider diff_match_patch 20x faster
 
         Output: adding an e at pos 4:
         ---
@@ -158,12 +166,20 @@ class DialogEditTextFile(QtWidgets.QDialog):
         # No need to update positions (unless entire file is a case)
         if self.no_codes_annotes_cases:
             return
-
-        # cursor = self.ui.textEdit.textCursor()
-        self.text = self.ui.textEdit.toPlainText()
-        # print("cursor", cursor.position())
+        #self.text = self.ui.textEdit.toPlainText()
+        self.text = self.plain_text_edit.toPlainText()
         # n is how many context lines to show
+        # difflib is very slow with large text files, use difflib with smaller text files?
         d = list(difflib.unified_diff(self.prev_text, self.text, n=0))
+
+        ''' TESTING
+        print(d)
+        diff = diff_match_patch.diff_match_patch()
+        patches = diff.patch_make(self.prev_text, self.text)
+        for p in patches:
+            print(p)
+        diff.patch_toText(patches)'''
+
         # print(d)  # 4 items
         if len(d) < 4:
             # print("D", d)
@@ -172,7 +188,6 @@ class DialogEditTextFile(QtWidgets.QDialog):
         position = d[2][4:]  # Removes prefix @@ -
         position = position[:-4]  # Removes suffix space@@\n
         # print("position", position, "char", char)
-
         previous = position.split(" ")[0]
         pre_start = int(previous.split(",")[0])
         pre_chars = None
@@ -187,6 +202,7 @@ class DialogEditTextFile(QtWidgets.QDialog):
             post_chars = post.split(",")[1]
         except IndexError:
             pass
+
         # print(char, " previous", pre_start, pre_chars, " post", post_start, post_chars)
         """
         Replacing 'way' with 'the' start position 13
@@ -220,6 +236,7 @@ class DialogEditTextFile(QtWidgets.QDialog):
         if post_chars is None:
             post_chars = 1
         post_chars = int(post_chars)  # String if not None
+
         # print("XXX", char, " previous", pre_start, pre_chars, " post", post_start, post_chars)
         # Adding characters
         if char[0] == "+":
@@ -241,6 +258,7 @@ class DialogEditTextFile(QtWidgets.QDialog):
                     c['npos1'] += pre_chars + post_chars
             for c in self.casetext:
                 changed = False
+                print(pre_chars)
                 # print("npos0", c['npos0'], "pre start", pre_start)
                 if c['npos0'] is not None and c['npos0'] >= pre_start and c['npos0'] >= pre_start + -1 * pre_chars:
                     c['npos0'] += pre_chars + post_chars
@@ -328,8 +346,10 @@ class DialogEditTextFile(QtWidgets.QDialog):
         format_.setFontFamily(self.app.settings['font'])
         format_.setFontPointSize(self.app.settings['docfontsize'])
 
-        self.ui.textEdit.blockSignals(True)
-        cursor = self.ui.textEdit.textCursor()
+        #self.ui.textEdit.blockSignals(True)
+        self.plain_text_edit.blockSignals(True)
+        #cursor = self.ui.textEdit.textCursor()
+        cursor = self.plain_text_edit.textCursor()
         for item in self.casetext:
             if item['npos0'] is not None:
                 cursor.setPosition(int(item['npos0']), QtGui.QTextCursor.MoveMode.MoveAnchor)
@@ -351,26 +371,32 @@ class DialogEditTextFile(QtWidgets.QDialog):
                 format_.setFontUnderline(True)
                 format_.setUnderlineColor(QtCore.Qt.GlobalColor.red)
                 cursor.setCharFormat(format_)
-        self.ui.textEdit.blockSignals(False)
+        #self.ui.textEdit.blockSignals(False)
+        self.plain_text_edit.blockSignals(False)
 
     def remove_formatting(self):
         """ Remove formatting from text edit on changed text.
          Useful when pasting mime data (rich text or html) from clipboard. """
 
-        self.ui.textEdit.blockSignals(True)
+        #self.ui.textEdit.blockSignals(True)
+        self.plain_text_edit.blockSignals(True)
         format_ = QtGui.QTextCharFormat()
         format_.setFontFamily(self.app.settings['font'])
         format_.setFontPointSize(self.app.settings['docfontsize'])
-        cursor = self.ui.textEdit.textCursor()
+        #cursor = self.ui.textEdit.textCursor()
+        cursor = self.plain_text_edit.textCursor()
         cursor.setPosition(0, QtGui.QTextCursor.MoveMode.MoveAnchor)
-        cursor.setPosition(len(self.ui.textEdit.toPlainText()), QtGui.QTextCursor.MoveMode.KeepAnchor)
+        #cursor.setPosition(len(self.ui.textEdit.toPlainText()), QtGui.QTextCursor.MoveMode.KeepAnchor)
+        cursor.setPosition(len(self.plain_text_edit.toPlainText()), QtGui.QTextCursor.MoveMode.KeepAnchor)
         cursor.setCharFormat(format_)
-        self.ui.textEdit.blockSignals(False)
+        #self.ui.textEdit.blockSignals(False)
+        self.plain_text_edit.blockSignals(False)
 
     def accept(self):
         """ Accepted button overridden method. """
 
-        self.text = self.ui.textEdit.toPlainText()
+        #self.text = self.ui.textEdit.toPlainText()
+        self.text = self.plain_text_edit.toPlainText()
         try:
             cur = self.app.conn.cursor()
             cur.execute("update source set fulltext=? where id=?", (self.text, self.fid))
@@ -380,9 +406,10 @@ class DialogEditTextFile(QtWidgets.QDialog):
             self.update_codings()
             self.update_annotations()
             self.update_casetext()
-            self.app.conn.commit() # commit all changes in one go to prevent inconsistencies of the database
-        except:
-            self.app.conn.rollback() # revert all changes 
+            self.app.conn.commit()  # Commit all changes in one go to prevent inconsistencies of the database
+        except Exception as e_:
+            print(e_)
+            self.app.conn.rollback()  # Revert all changes
             raise
         # update doc in vectorstore
         if self.has_changed:
@@ -430,16 +457,20 @@ class DialogEditTextFile(QtWidgets.QDialog):
     def textedit_menu(self, position):
         """ Context menu for select all and copy of text. """
 
-        if self.ui.textEdit.toPlainText() == "":
+        #if self.ui.textEdit.toPlainText() == "":
+        if self.plain_text_edit.toPlainText() == "":
             return
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         action_select_all = menu.addAction(_("Select all"))
         action_copy = menu.addAction(_("Copy"))
-        action = menu.exec(self.ui.textEdit.mapToGlobal(position))
+        #action = menu.exec(self.ui.textEdit.mapToGlobal(position))
+        action = menu.exec(self.plain_text_edit.mapToGlobal(position))
         if action == action_copy:
-            selected_text = self.ui.textEdit.textCursor().selectedText()
+            #selected_text = self.ui.textEdit.textCursor().selectedText()
+            selected_text = self.plain_text_edit.textCursor().selectedText()
             cb = QtWidgets.QApplication.clipboard()
             cb.setText(selected_text)
         if action == action_select_all:
-            self.ui.textEdit.selectAll()
+            #self.ui.textEdit.selectAll()
+            self.plain_text_edit.selectAll()
