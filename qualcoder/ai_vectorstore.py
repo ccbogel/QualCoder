@@ -394,6 +394,21 @@ want to continue?\
             logger.debug('chroma_db is None')
             return
         docs = self.app.get_file_texts()
+        
+        # check if any docs in the vectorstore have been deleted or renamed in the project
+        def search_name(docs, name):
+            for doc in docs:
+                if doc['name'] == name:
+                    return True
+            return False
+        emb = self.chroma_db.get(include=['metadatas'])
+        for i in range(len(emb['ids'])):
+            id = emb['ids'][i]
+            file_name = emb['metadatas'][i]['name']
+            if not search_name(docs, file_name):
+                self.chroma_db.delete([id])
+
+        # add new docs        
         if len(docs) == 0:
             msg = _("AI: No documents, AI is ready.")
             self.parent_text_edit.append(msg)
@@ -425,13 +440,19 @@ want to continue?\
     def delete_document(self, id):
         """Deletes all the embeddings from related to this doc 
         from the vectorstore"""
-        if self.chroma_db is None:
-            logger.debug('chroma_db is None')
-            return
-        embeddings_list = self.chroma_db.get(where={"id" : id}, include=['metadatas'])
-        if len(embeddings_list['ids']) > 0: # found it
-            self.parent_text_edit.append("AI: Forgetting " + f'"{embeddings_list["metadatas"][0]["name"]}"')
-            self.chroma_db.delete(embeddings_list['ids']) 
+        chroma_db = self.chroma_db
+        if chroma_db is None:
+            # try to create a temporary access
+            if self.app.project_path != '' and os.path.exists(self.app.project_path):
+                db_path = os.path.join(self.app.project_path, 'ai_data', 'vectorstore')
+                if os.path.exists(db_path):
+                    chroma_db = Chroma(persist_directory=db_path,
+                                       collection_name=self.collection_name)
+        if chroma_db is not None:
+            embeddings_list = chroma_db.get(where={"id" : id}, include=['metadatas'])
+            if len(embeddings_list['ids']) > 0: # found it
+                self.parent_text_edit.append("AI: Forgetting " + f'"{embeddings_list["metadatas"][0]["name"]}"')
+                chroma_db.delete(embeddings_list['ids']) 
                
     def close(self):
         """Cancels the update process if running"""
@@ -441,15 +462,20 @@ want to continue?\
         self.threadpool.clear()
         self.threadpool.waitForDone(5000)
         self.chroma_db = None
+        self._is_closing = False
         
     def ai_worker_running(self):
         return (self.import_workers_count > 0)
         #return self.threadpool.activeThreadCount() > 0
             
+    def is_open(self) -> bool:
+        """Returnes True if the vectorstore is initiated"""
+        return self.chroma_db != None and self._is_closing == False
+    
     def is_ready(self) -> bool:
         """If the vectorstore is initiated and done importing data, 
         it is ready for queries."""
-        return self.chroma_db != None and self._is_closing == False and not self.ai_worker_running()
+        return self.is_open() and not self.ai_worker_running()
         
     
         

@@ -102,20 +102,13 @@ class AiLLM():
     fast_llm_context_window = 16385
     ai_streaming_output = ''
     sources_collection = 'qualcoder' # name of the vectorstore collection for source documents
-        
-    def get_default_system_prompt(self) -> str:
-        p =  'You are assisting a team of qualitative social researchers.'
-        project_memo = extract_ai_memo(self.app.get_project_memo())
-        if self.app.settings.get('ai_send_project_memo', 'True') == 'True' and len(project_memo) > 0:
-            p +=  f' Here is some background information about the research project the team is working on:\n{project_memo}'
-        return p
-
+    
     def __init__(self, app, parent_text_edit):
         self.app = app
         self.parent_text_edit = parent_text_edit
         self.threadpool = QtCore.QThreadPool()
         self.threadpool.setMaxThreadCount(1)
-        self.sources_vectorstore = None
+        self.sources_vectorstore = AiVectorstore(self.app, self.parent_text_edit, self.sources_collection)
 
     # Icons (https://pictogrammers.com/library/mdi/)
     def code_analysis_icon(self):
@@ -202,8 +195,7 @@ class AiLLM():
             self.app.settings['ai_enable'] = 'True'
             
             # init vectorstore
-            if self.sources_vectorstore is None:
-                self.sources_vectorstore = AiVectorstore(self.app, self.parent_text_edit, self.sources_collection)
+            if not self.sources_vectorstore.is_open():
                 self.sources_vectorstore.init_vectorstore(rebuild_vectorstore)
             else:
                 self._status = ''
@@ -214,9 +206,7 @@ class AiLLM():
     def close(self):
         self._status = 'closing'
         self.cancel(False)
-        if self.sources_vectorstore is not None: 
-            self.sources_vectorstore.close()
-            self.sources_vectorstore = None
+        self.sources_vectorstore.close()
         self.large_llm = None
         self.fast_llm = None
         self._status = ''
@@ -274,6 +264,13 @@ class AiLLM():
         #            (self.fast_llm is not None) and \
         #            (not self.is_busy())
     
+    def get_default_system_prompt(self) -> str:
+        p =  'You are assisting a team of qualitative social researchers.'
+        project_memo = extract_ai_memo(self.app.get_project_memo())
+        if self.app.settings.get('ai_send_project_memo', 'True') == 'True' and len(project_memo) > 0:
+            p +=  f' Here is some background information about the research project the team is working on:\n{project_memo}'
+        return p
+        
     def _ai_async_progress(self, msg):
         self.ai_async_progress_msg = self.ai_async_progress_msg + '\n' + msg
         

@@ -551,8 +551,8 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.app.delete_backup = False
         self.update_files_in_dialogs()
         # update doc in vectorstore
+        id = int(self.ui.tableWidget.item(row, self.ID_COLUMN).text())
         if self.app.settings['ai_enable'] == 'True':
-            id = int(self.ui.tableWidget.item(row, self.ID_COLUMN).text())
             docs = self.app.get_file_texts(file_ids=[id])
             self.app.ai.sources_vectorstore.import_document(docs[0]['id'], docs[0]['name'], docs[0]['fulltext'], True)
 
@@ -635,6 +635,10 @@ class DialogManageFiles(QtWidgets.QDialog):
             entry = {'old_name': existing_name, 'name': new_name, 'fid': fid}
             self.files_renamed.append(entry)
         self.parent_text_edit.append(msg + err_msg)
+        # Updating vectorstore
+        if self.app.settings['ai_enable'] == 'True':
+            self.app.ai.sources_vectorstore.update_vectorstore()
+
         self.ui.pushButton_undo.setEnabled(True)
         self.load_file_data()
         self.app.delete_backup = False
@@ -1932,8 +1936,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 cur.execute("delete from attribute where attr_type ='file' and id=?", [s['id']])
                 self.app.conn.commit()
                 # Delete from vectorstore
-                if self.app.settings['ai_enable'] == 'True':
-                    self.app.ai.sources_vectorstore.delete_document(s['id'])    
+                self.app.ai.sources_vectorstore.delete_document(s['id'])    
             
             # Delete image, audio or video source
             if s['mediapath'] is not None and s['mediapath'][0:5] != 'docs:' and s['mediapath'][0:6] != '/docs/':
@@ -1974,8 +1977,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                     cur.execute("delete from attribute where attr_type ='file' and id=?", [res[0]])
                     self.app.conn.commit()
                     # Delete from vectorstore
-                    if self.app.settings['ai_enable'] == 'True':
-                        self.app.ai.sources_vectorstore.delete_document(res[0])    
+                    self.app.ai.sources_vectorstore.delete_document(res[0])    
 
         self.update_files_in_dialogs()
         self.check_attribute_placeholders()
@@ -2028,8 +2030,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             cur.execute("delete from attribute where attr_type ='file' and id=?", [file_id])
             self.app.conn.commit()
             # Delete from vectorstore
-            if self.app.settings['ai_enable'] == 'True':
-                self.app.ai.sources_vectorstore.delete_document(file_id)    
+            self.app.ai.sources_vectorstore.delete_document(file_id)    
 
         # Delete image, audio or video source
         # (why not simply use 'else' instead of this complicated second if-clause?)
@@ -2061,8 +2062,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             cur.execute("delete from attribute where attr_type='file' and id=?", [file_id])
             self.app.conn.commit()
             # Delete from vectorstore (this should not be necessary since it's not a text file, but just to be sure...)
-            if self.app.settings['ai_enable'] == 'True':
-                self.app.ai.sources_vectorstore.delete_document(file_id)    
+            self.app.ai.sources_vectorstore.delete_document(file_id)    
 
             # Delete transcription text file
             if av_text_id is not None:
@@ -2073,8 +2073,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 cur.execute("delete from attribute where attr_type ='file' and id=?", [res[0]])
                 self.app.conn.commit()
                 # Delete from vectorstore
-                if self.app.settings['ai_enable'] == 'True':
-                    self.app.ai.sources_vectorstore.delete_document(res[0])
+                self.app.ai.sources_vectorstore.delete_document(res[0])
 
         self.files_renamed = [x for x in self.files_renamed if not (file_id == x.get('fid'))]
         self.update_files_in_dialogs()
