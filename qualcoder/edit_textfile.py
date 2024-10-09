@@ -29,6 +29,7 @@ https://qualcoder.wordpress.com/
 from PyQt6 import QtWidgets, QtCore, QtGui
 from copy import copy
 import difflib
+# import diff_match_patch  # TESTING
 import logging
 import os
 
@@ -167,6 +168,15 @@ class DialogEditTextFile(QtWidgets.QDialog):
         # n is how many context lines to show
         # difflib is very slow with large text files, use difflib with smaller text files?
         d = list(difflib.unified_diff(self.prev_text, self.text, n=0))
+
+        ''' TESTING
+        print(d)
+        diff = diff_match_patch.diff_match_patch()
+        patches = diff.patch_make(self.prev_text, self.text)
+        for p in patches:
+            print(p)
+        diff.patch_toText(patches)'''
+
         # print(d)  # 4 items
         if len(d) < 4:
             # print("D", d)
