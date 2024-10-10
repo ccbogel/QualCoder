@@ -163,7 +163,8 @@ class DialogEditTextFile(QtWidgets.QDialog):
             [(0, 'I '), (-1, 'really'), (0, " like ...")]
 
         """
-
+        self.has_changed = True # mark contents as beeing changed
+        
         # No need to update positions
         if self.no_codes_annotes_cases:
             return

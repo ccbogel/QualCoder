@@ -397,7 +397,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
                 now = str(datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H-%M-%S"))
                 fname = f"{self.fields[field]}_{now}"
                 cur.execute(source_sql,
-                            (fname, fulltext, "", self.app.settings['codername'], now_date))
+                            (f"{self.fields[field]}_{now}", fulltext, "", self.app.settings['codername'], now_date))
                 self.app.conn.commit()
                 cur.execute("select last_insert_rowid()")
                 fid = cur.fetchone()[0]

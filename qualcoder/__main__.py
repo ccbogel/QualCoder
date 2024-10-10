@@ -135,6 +135,7 @@ lock_timeout = 30.0  # in seconds. If a project lockfile is older (= has receive
 # it is assumed that the host process has died and the project is opened anyways
 lock_heartbeat_interval = 5  # in seconds.
 
+splash = None # the splash screen on startup
 
 class ProjectLockHeartbeatWorker(QtCore.QObject):
     """
@@ -1158,6 +1159,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.app.ai = AiLLM(self.app, self.ui.textEdit)
         # First start? Ask if user wants to enable ai integration or not
         if self.app.settings['ai_first_startup'] == 'True' and self.app.settings['ai_enable'] == 'False':
+            global splash
+            if splash is not None:
+                splash.finish(None) # close splash screen
             msg = _('Welcome\n\n\
 The new AI enhanced functions in QualCoder need some additional setup. \
 Do you want to enable the AI and start the setup? \
@@ -2844,6 +2848,7 @@ def gui():
     # Show splash screen during loading
     pixmap = QtGui.QPixmap()
     pixmap.loadFromData(QtCore.QByteArray.fromBase64(qualcoder), "png")
+    global splash
     splash = QtWidgets.QSplashScreen(pixmap, QtCore.Qt.WindowType.WindowStaysOnTopHint)
     # splash.showMessage("Loading...", QtCore.Qt.AlignmentFlag.AlignCenter, QtGui.QColor('black'))
     splash.show()
@@ -2933,7 +2938,7 @@ def gui():
                 proj_path = split_[1]
             ex.open_project(path_=proj_path)
     finally:
-        splash.finish(ex)
+        splash.finish(None)
 
     sys.exit(app.exec())
     

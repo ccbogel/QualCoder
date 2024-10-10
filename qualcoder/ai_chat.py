@@ -219,6 +219,10 @@ class DialogAIChat(QtWidgets.QDialog):
         self.chat_list_selection_changed()
 
     def new_general_chat(self, name, summary):
+        if self.app.project_name == "":
+            msg = _('No project open.')
+            Message(self.app, _('AI not enabled'), msg, "warning").exec()
+            return
         if self.app.settings['ai_enable'] != 'True':
             msg = _('The AI is disabled. Go to "AI > Setup Wizard" first.')
             Message(self.app, _('AI not enabled'), msg, "warning").exec()
@@ -230,6 +234,10 @@ class DialogAIChat(QtWidgets.QDialog):
              
     def new_code_chat(self):
         """chat about codings"""
+        if self.app.project_name == "":
+            msg = _('No project open.')
+            Message(self.app, _('AI not enabled'), msg, "warning").exec()
+            return
         if self.app.settings['ai_enable'] != 'True':
             msg = _('The AI is disabled. Go to "AI > Setup Wizard" first.')
             Message(self.app, _('AI not enabled'), msg, "warning").exec()
@@ -297,7 +305,7 @@ class DialogAIChat(QtWidgets.QDialog):
                 f'Here is a list of quotes from the empirical data that have been coded with the given code:\n'
                 f'{ai_data_json}\n'
                 f'Your task is to analyze the given empirical data following these instructions: {self.ai_prompt.text}\n'
-                f'The whole discussion should be based updon the the empirical data provided and its proper interpretation. '
+                f'The whole discussion should be based upon the the empirical data provided and its proper interpretation. '
                 f'Do not make any assumptions which are not supported by the data. '
                 f'Please mention the sources that your refer to from the given empirical data, using an html anchor tag of the following form: '
                 '<a href="coding:{source_id}">{source_name}</a>\n' 
@@ -315,6 +323,10 @@ class DialogAIChat(QtWidgets.QDialog):
  
     def new_topic_chat(self):
         """chat about a free topic in the data"""
+        if self.app.project_name == "":
+            msg = _('No project open.')
+            Message(self.app, _('AI not enabled'), msg, "warning").exec()
+            return
         if self.app.settings['ai_enable'] != 'True':
             msg = _('The AI is disabled. Go to "AI > Setup Wizard" first.')
             Message(self.app, _('AI not enabled'), msg, "warning").exec()
@@ -357,11 +369,6 @@ class DialogAIChat(QtWidgets.QDialog):
             return res
         else:
             return ''
-          
-        #for file in self.filenames:
-        #    if file['id'] == id:
-        #        return file['name'] # found
-        #return '' # not found
 
     def new_topic_chat_callback(self, chunks):
         # Analyze the data found
@@ -374,7 +381,7 @@ class DialogAIChat(QtWidgets.QDialog):
             self.process_message('info', msg)
             self.update_chat_window()  
             return
-        # print(chunks)
+        
         self.ai_semantic_search_chunks = chunks                
         topic_analysis_max_chunks = 30
         msg = _('Found ') + str(len(chunks))  + _(' chunks of data which might be related to the topic. Analyzing the first ') + str(topic_analysis_max_chunks) + _(' chunks closer.')
@@ -458,7 +465,7 @@ class DialogAIChat(QtWidgets.QDialog):
                 self.ui.progressBar_ai.setRange(0, 0) # starts the animation
         # update ai status in the statusBar of the main window
         if self.app.ai is not None:
-            self.main_window.statusBar().showMessage(_('AI: ') + self.app.ai.get_status())
+            self.main_window.statusBar().showMessage(_('AI: ') + _(self.app.ai.get_status()))
         else: 
             self.main_window.statusBar().showMessage('')
 
