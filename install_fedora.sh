@@ -9,7 +9,7 @@ sudo dnf install \
 
 # Here we define which packages we install
 dnf_packages="python3-pip python3-devel python3-pdfminer.noarch python3-qt5 python3-pillow python3-openpyxl python3-pandas python3-plotly python3-pip python3-pyqt6 python3-pillow python3-vlc vlc python3-ply python3-six python3-chardet ffmpeg python3-pdfminer+image.noarch"
-pip_packages="Ebooklib pydub SpeechRecognition rispy"
+pip_packages="diff-match-patch Ebooklib pydub SpeechRecognition rispy"
 
 printf "Change the python_version in this script to a higher numbers if you have a more recent version of python installed.\n\n"
 python_version=3.12
