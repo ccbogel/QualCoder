@@ -49,12 +49,14 @@ class DialogEditTextFile(QtWidgets.QDialog):
     app = None
     text = ""
     fid = -1
+    name = ""
     codetext = []
     annotations = []
     casetext = []
     prev_text = ""
     no_codes_annotes_cases = True
     code_deletions = []
+    has_changed = False
 
     def __init__(self, app, fid, clear_button="show"):
 
@@ -67,7 +69,7 @@ class DialogEditTextFile(QtWidgets.QDialog):
         self.text = ""
         if res[0] is not None:
             self.text = res[0]
-        title = res[1]
+        self.name = res[1]
         self.code_deletions = []
         self.ui = Ui_Dialog_memo()
         self.ui.setupUi(self)
@@ -77,7 +79,7 @@ class DialogEditTextFile(QtWidgets.QDialog):
         font = f'font: {self.app.settings["fontsize"]}pt '
         font += f'"{self.app.settings["font"]}";'
         self.setStyleSheet(font)
-        self.setWindowTitle(title)
+        self.setWindowTitle(self.name)
         msg = _(
             "Avoid selecting text combinations of unmarked text sections and coded/annotated/case-assigned sections.")
         msg += " " + _("Positions may not correctly adjust.") + " "
@@ -161,7 +163,8 @@ class DialogEditTextFile(QtWidgets.QDialog):
             [(0, 'I '), (-1, 'really'), (0, " like ...")]
 
         """
-
+        self.has_changed = True # mark contents as beeing changed
+        
         # No need to update positions
         if self.no_codes_annotes_cases:
             return
@@ -569,7 +572,13 @@ class DialogEditTextFile(QtWidgets.QDialog):
             print(e_)
             self.app.conn.rollback()  # Revert all changes
             raise
-
+        # update doc in vectorstore
+        if self.has_changed:
+            if self.app.settings['ai_enable'] == 'True':
+                self.app.ai.sources_vectorstore.import_document(self.fid, self.name, self.text, update=True)
+            else:
+                # AI is disabled. Delete the file from the vectorstore. It will be reimported later when the AI is enabled again. 
+                self.app.ai.sources_vectorstore.delete_document(self.fid)
         super(DialogEditTextFile, self).accept()
 
     def update_casetext(self):

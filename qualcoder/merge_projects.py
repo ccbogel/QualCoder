@@ -92,6 +92,9 @@ class MergeProjects:
             self.insert_cases()
             self.insert_new_attribute_types()
             self.insert_attributes()
+            # Update vectorstore
+            if self.app.settings['ai_enable'] == 'True':
+                self.app.ai.sources_vectorstore.update_vectorstore()
             self.summary_msg += _("Finished merging " + self.path_s + " into " + self.path_d) + "\n"
             self.summary_msg += _(
                 "Existing values in destination project are not over-written, apart from blank attribute values.") + "\n"

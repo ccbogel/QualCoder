@@ -68,7 +68,7 @@ class CreateHelperFile:
         tmp_files = os.listdir()
         files = []
         for f in tmp_files:
-            if f[-4:] == ".png":
+            if f[-4:] == ".png" or f[-4:] == ".gif":
                 files.append(f)
         files.sort()
 

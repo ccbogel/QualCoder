@@ -395,6 +395,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
                 # Add the current time to the file name to ensure uniqueness and to
                 # Prevent sqlite Integrity Error. Do not use now_date which contains colons
                 now = str(datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H-%M-%S"))
+                fname = f"{self.fields[field]}_{now}"
                 cur.execute(source_sql,
                             (f"{self.fields[field]}_{now}", fulltext, "", self.app.settings['codername'], now_date))
                 self.app.conn.commit()
@@ -405,6 +406,9 @@ class DialogImportSurvey(QtWidgets.QDialog):
                     case_text.append(fid)
                     cur.execute(case_text_sql, case_text)
                 self.app.conn.commit()
+                # add doc to vectorstore
+                if self.app.settings['ai_enable'] == 'True':
+                    self.app.ai.sources_vectorstore.import_document(fid, fname, fulltext, update=True)
         logger.info(_("Survey imported"))
         self.parent_textEdit.append(_("Survey imported."))
         Message(self.app, _("Survey imported"), _("Survey imported")).exec()

@@ -29,6 +29,7 @@ https://qualcoder.wordpress.com/
 import logging
 import os
 from PyQt6 import QtGui, QtWidgets, QtCore
+import copy
 
 from .GUI.ui_dialog_settings import Ui_Dialog_settings
 from .helpers import Message
@@ -44,10 +45,13 @@ class DialogSettings(QtWidgets.QDialog):
     settings = {}
     current_coder = "default"
 
-    def __init__(self, app, parent=None):
+    def __init__(self, app, parent=None, section=None, enable_ai=False):
 
         self.app = app
         self.settings = app.settings
+        if enable_ai:
+            self.settings['ai_enable'] = 'True'
+        self.ai_models = copy.deepcopy(self.app.ai_models)
         self.current_coder = self.app.settings['codername']
         super(QtWidgets.QDialog, self).__init__(parent)  # overrride accept method
         QtWidgets.QDialog.__init__(self)
@@ -130,6 +134,30 @@ class DialogSettings(QtWidgets.QDialog):
         self.ui.spinBox_chars_before_after.setValue(self.settings['report_text_context_characters'])
         self.ui.pushButton_choose_directory.clicked.connect(self.choose_directory)
         self.ui.pushButton_set_coder.pressed.connect(self.new_coder_entered)
+        # AI options
+        self.ui.checkBox_AI_enable.setChecked(self.settings['ai_enable'] == 'True')
+        self.ui.checkBox_AI_enable.stateChanged.connect(self.ai_enable_state_changed)
+        self.ui.comboBox_ai_model.clear()
+        for i in range(len(self.ai_models)):
+            model = self.ai_models[i]
+            self.ui.comboBox_ai_model.addItem(model['name'])
+            self.ui.comboBox_ai_model.setItemData(i, model['desc'], QtCore.Qt.ItemDataRole.ToolTipRole)
+        self.ui.comboBox_ai_model.setCurrentIndex(int(self.settings['ai_model_index']))
+        self.ui.comboBox_ai_model.currentTextChanged.connect(self.ai_model_changed)
+        self.ai_model_changed()
+        self.ai_enable_state_changed()
+        self.ui.lineEdit_ai_api_key.textChanged.connect(self.ai_api_key_changed)
+        self.ui.checkBox_ai_project_memo.setChecked(self.settings.get('ai_send_project_memo', 'True') == 'True')
+        if section is not None and section == 'AI':
+            self.ui.scrollArea.verticalScrollBar().setValue(self.ui.scrollArea.verticalScrollBar().maximum())
+            # Use QTimers to briefly flash a yellow border around the AI settings
+            QtCore.QTimer.singleShot(200, lambda:self.ui.widget_ai.setStyleSheet('#widget_ai {\n'
+                                                                                  '   border: 3px solid yellow; \n'
+                                                                                  '   border-radius: 5px; \n'
+                                                                                  '}'))
+            QtCore.QTimer.singleShot(700, lambda: self.ui.widget_ai.setStyleSheet('#widget_ai { border: none; }'))
+        else:
+            self.ui.widget_ai.setStyleSheet('')
 
     def backup_state_changed(self):
         """ Enable and disable av backup checkbox. Only enable when checkBox_auto_backup is checked. """
@@ -138,7 +166,31 @@ class DialogSettings(QtWidgets.QDialog):
             self.ui.checkBox_backup_AV_files.setEnabled(True)
         else:
             self.ui.checkBox_backup_AV_files.setEnabled(False)
+    
+    def ai_enable_state_changed(self):
+        self.ui.comboBox_ai_model.setEnabled(self.ui.checkBox_AI_enable.isChecked())
+        self.ui.label_ai_model_desc.setEnabled(self.ui.checkBox_AI_enable.isChecked())
+        self.ui.label_ai_access_info_url.setEnabled(self.ui.checkBox_AI_enable.isChecked())
+        self.ui.lineEdit_ai_api_key.setEnabled(self.ui.checkBox_AI_enable.isChecked())
+        self.ui.checkBox_ai_project_memo.setEnabled(self.ui.checkBox_AI_enable.isChecked())
+    
+    def ai_model_changed(self):
+        ai_model_index = self.ui.comboBox_ai_model.currentIndex()
+        if ai_model_index >= 0:
+            self.curr_ai_model = self.ai_models[ai_model_index]
+            self.ui.label_ai_model_desc.setText(self.curr_ai_model['desc'])
+            self.ui.label_ai_access_info_url.setText(f'<a href="{self.curr_ai_model["access_info_url"]}">{self.curr_ai_model["access_info_url"]}</a>')
+            self.ui.lineEdit_ai_api_key.setText(self.curr_ai_model['api_key'])
+        else:
+            self.curr_ai_model = None
+            self.ui.label_ai_model_desc.setText('')
+            self.ui.label_ai_access_info_url.setText('')
+            self.ui.lineEdit_ai_api_key.setText('')            
 
+    def ai_api_key_changed(self):
+        if self.curr_ai_model is not None:
+            self.curr_ai_model['api_key'] = self.ui.lineEdit_ai_api_key.text()        
+                
     def new_coder_entered(self):
         """ New coder name entered.
         Tried to disable Enter key or catch the event. Failed. So new coder name assigned
@@ -211,6 +263,25 @@ class DialogSettings(QtWidgets.QDialog):
         self.settings['report_text_context_characters'] = self.ui.spinBox_chars_before_after.value()
         ts_index = self.ui.comboBox_text_style.currentIndex()
         self.settings['report_text_context_style'] = ['Bold', 'Italic', 'Bigger'][ts_index]
+        # AI settings
+        if self.ui.checkBox_AI_enable.isChecked():
+            self.settings['ai_enable'] = 'True'
+        else:
+            self.settings['ai_enable'] = 'False'
+        ai_model_index = self.ui.comboBox_ai_model.currentIndex() 
+        self.settings['ai_model_index'] = ai_model_index
+        if self.settings['ai_enable'] == 'True' and ai_model_index < 0:
+            msg = _('Please select an AI model or disable the AI altogether.')
+            Message(self.app, _('AI model'), msg).exec()
+            return
+        if self.settings['ai_enable'] == 'True' and self.ai_models[ai_model_index]['api_key'] == '':
+            msg = _('Please enter a valid API-key for the AI model. \n(If you are sure that your particular model does not need an API-key, enter "None" instead.)')
+            Message(self.app, _('AI model'), msg).exec()
+            return
+        if self.ui.checkBox_ai_project_memo.isChecked():
+            self.settings['ai_send_project_memo'] = 'True'
+        else: 
+            self.settings['ai_send_project_memo'] = 'False'
         self.save_settings()
         if restart_qualcoder:
             Message(self.app, _("Restart QualCoder"), _("Restart QualCoder to enact some changes")).exec()
@@ -221,4 +292,4 @@ class DialogSettings(QtWidgets.QDialog):
         Each setting has a variable identifier then a colon
         followed by the value. """
 
-        self.app.write_config_ini(self.settings)
+        self.app.write_config_ini(self.settings, self.ai_models)

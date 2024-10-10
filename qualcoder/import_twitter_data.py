@@ -279,6 +279,9 @@ class DialogImportTwitterData(QtWidgets.QDialog):
                 cur.execute("select last_insert_rowid()")
                 id_ = cur.fetchone()[0]
                 tweets += 1
+                # add to vectorstore
+                if self.app.settings['ai_enable'] == 'True':
+                    self.app.ai.sources_vectorstore.import_document(id_, str(d[header_pos['id']]), d[header_pos['full_text']], update=True)
                 # Insert tweet data attributes
                 for att_name in attribute_name_list:
                     cur.execute("insert into attribute (name, attr_type, value, id, date, owner) values(?,'file',?,?,?,?)",
