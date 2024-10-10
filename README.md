@@ -72,7 +72,7 @@ py -m pip install --upgrade pip
 Type the following to install the required modules:
 
 ```bash
-py -m pip install wheel pyqt6 chardet ebooklib openpyxl Pillow ply pdfminer.six pandas plotly pydub python-vlc rispy SpeechRecognition
+py -m pip install chardet diff-match-patch ebooklib openpyxl pyqt6 Pillow ply pdfminer.six pandas plotly pydub python-vlc rispy SpeechRecognition wheel
 ```
 
  Wait, until all modules are installed.
@@ -142,7 +142,7 @@ Note: To exit venv type `deactivate`
 
 6. Install the needed Python modules.
 
-`pip install chardet ebooklib ply openpyxl pandas pdfminer pyqt6 pillow pdfminer.six plotly pydub python-vlc rispy six SpeechRecognition`
+`pip install chardet diff-match-patch ebooklib ply openpyxl pandas pdfminer pyqt6 pillow pdfminer.six plotly pydub python-vlc rispy six SpeechRecognition`
 
 7. You must be in the QualCoder-master folder (Or the main release folder if using a release. e.g. QualCoder-3.5 folder). Install QualCoder, and type the following, the dot is important:
 
@@ -171,7 +171,7 @@ It has not been tested, but please see the above instructions to build QualCoder
 
 2. Install additional python modules
 
-`sudo python3 -m pip install ebooklib plotly pydub python-vlc rispy SpeechRecognition`
+`sudo python3 -m pip install diff-match-patch ebooklib plotly pydub python-vlc rispy SpeechRecognition`
 
 If successful, all requirements are satisfied.
 
@@ -232,7 +232,7 @@ python3 get-pip.py
 5) Install Python dependency modules using `pip`:
 
 ```sh
-pip3 install chardet ebooklib openpyxl pandas pillow ply pdfminer.six plotly pydub pyqt6 python-vlc rispy six SpeechRecognition
+pip3 install chardet diff-match-patch ebooklib openpyxl pandas pillow ply pdfminer.six plotly pydub pyqt6 python-vlc rispy six SpeechRecognition
 ```
 
 Be sure that you are in the QualCoder-Master directory before doing Step 6.
@@ -289,7 +289,7 @@ Open the Terminal App and move to the unzipped Qualcoder-Master directory, then 
 ## Dependencies
 Required:
 
-Python 3.8+ version, pyqt6, Pillow, six  (Mac OS), ebooklib, ply, chardet, pdfminer.six, openpyxl, pandas, plotly, pydub, python-vlc, rispy, SpeechRecognition
+Python 3.10+ version, diff-match-patch, pyqt6, Pillow, six  (Mac OS), ebooklib, ply, chardet, pdfminer.six, openpyxl, pandas, plotly, pydub, python-vlc, rispy, SpeechRecognition
 
 ## License
 QualCoder is distributed under the MIT LICENSE.
