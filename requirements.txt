@@ -1,4 +1,5 @@
 chardet
+diff-match-patch
 EbookLib
 openpyxl
 pandas
