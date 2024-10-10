@@ -4291,6 +4291,11 @@ class DialogCodeText(QtWidgets.QWidget):
     def ai_search_clicked(self):
         """pushButton_ai_search clicked"""
 
+        if self.ai.get_status() == 'disabled':
+            msg = _('The AI is disabled. Go to "AI > Setup Wizard" first.')
+            Message(self.app, _('AI Search'), msg, "warning").exec()
+            return           
+
         if self.ai_search_running:
             msg = _('The AI is already performing a search. Please stop it before starting a new one.')
             Message(self.app, _('AI Search'), msg, "warning").exec()

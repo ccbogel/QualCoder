@@ -220,7 +220,7 @@ class DialogAIChat(QtWidgets.QDialog):
 
     def new_general_chat(self, name, summary):
         if self.app.settings['ai_enable'] != 'True':
-            msg = _('Please enable the AI first and set it up properly.')
+            msg = _('The AI is disabled. Go to "AI > Setup Wizard" first.')
             Message(self.app, _('AI not enabled'), msg, "warning").exec()
             return
 
@@ -231,7 +231,7 @@ class DialogAIChat(QtWidgets.QDialog):
     def new_code_chat(self):
         """chat about codings"""
         if self.app.settings['ai_enable'] != 'True':
-            msg = _('Please enable the AI first and set it up properly.')
+            msg = _('The AI is disabled. Go to "AI > Setup Wizard" first.')
             Message(self.app, _('AI not enabled'), msg, "warning").exec()
             return
        
@@ -316,7 +316,7 @@ class DialogAIChat(QtWidgets.QDialog):
     def new_topic_chat(self):
         """chat about a free topic in the data"""
         if self.app.settings['ai_enable'] != 'True':
-            msg = _('Please enable the AI first and set it up properly.')
+            msg = _('The AI is disabled. Go to "AI > Setup Wizard" first.')
             Message(self.app, _('AI not enabled'), msg, "warning").exec()
             return
        
@@ -629,7 +629,7 @@ class DialogAIChat(QtWidgets.QDialog):
                     
     def send_user_question(self):
         if self.app.settings['ai_enable'] != 'True':
-            msg = _('Please enable the AI first and set it up properly.')
+            msg = _('The AI is disabled. Go to "AI > Setup Wizard" first.')
             Message(self.app, _('AI not enabled'), msg, "warning").exec()
             return
         elif self.app.ai.is_busy():
