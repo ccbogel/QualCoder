@@ -118,6 +118,7 @@ class DialogCodeText(QtWidgets.QWidget):
     edit_mode = False
     edit_pos = 0
     no_codes_annotes_cases = None
+    edit_mode_has_changed = False
 
     # Variables associated with right-hand side splitter, for project memo, code rule
     project_memo = False
@@ -3945,8 +3946,9 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.groupBox.hide()
         self.ui.groupBox_edit_mode.show()
         self.ui.listWidget.setEnabled(False)
-        self.ui.listWidget.hide()
-        self.ui.treeWidget.hide()
+        self.ui.leftsplitter.hide()
+        #self.ui.listWidget.hide()
+        #self.ui.treeWidget.hide()
         self.ui.groupBox_file_buttons.setEnabled(False)
         self.ui.groupBox_file_buttons.setMaximumSize(4000, 4000)
         self.ui.groupBox_coding_buttons.setEnabled(False)
@@ -3962,6 +3964,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.get_cases_codings_annotations()
         self.ui.textEdit.setReadOnly(False)
         self.ed_highlight()
+        self.edit_mode_has_changed = False
         self.ui.textEdit.textChanged.connect(self.update_positions)
         text_cursor = self.ui.textEdit.textCursor()
         if self.edit_pos >= len(self.text):
@@ -3981,22 +3984,31 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.groupBox_file_buttons.setMaximumSize(4000, 30)
         self.ui.groupBox_coding_buttons.setEnabled(True)
         self.ui.treeWidget.setEnabled(True)
-        self.ui.listWidget.show()
-        self.ui.treeWidget.show()
+        # self.ui.listWidget.show()
+        # self.ui.treeWidget.show()
+        self.ui.leftsplitter.show()
         self.prev_text = ""
-        self.text = self.ui.textEdit.toPlainText()
-        self.file_['fulltext'] = self.text
-        self.file_['end'] = len(self.text)
-        cur = self.app.conn.cursor()
-        cur.execute("update source set fulltext=? where id=?", (self.text, self.file_['id']))
-        self.app.conn.commit()
-        for item in self.code_deletions:
-            cur.execute(item)
-        self.app.conn.commit()
-        self.code_deletions = []
-        self.ed_update_codings()
-        self.ed_update_annotations()
-        self.ed_update_casetext()
+        if self.edit_mode_has_changed:
+            self.text = self.ui.textEdit.toPlainText()
+            self.file_['fulltext'] = self.text
+            self.file_['end'] = len(self.text)
+            cur = self.app.conn.cursor()
+            cur.execute("update source set fulltext=? where id=?", (self.text, self.file_['id']))
+            self.app.conn.commit()
+            for item in self.code_deletions:
+                cur.execute(item)
+            self.app.conn.commit()
+            self.code_deletions = []
+            self.ed_update_codings()
+            self.ed_update_annotations()
+            self.ed_update_casetext()
+            # update vectorstore
+            if self.app.settings['ai_enable'] == 'True':
+                self.app.ai.sources_vectorstore.import_document(self.file_['id'], self.file_['name'], self.text, update=True)
+            else:
+                # AI is disabled. Delete the file from the vectorstore. It will be reimported later when the AI is enabled again. 
+                self.app.ai.sources_vectorstore.delete_document(self.file_['id'])
+
         self.ui.textEdit.setReadOnly(True)
         self.ui.textEdit.installEventFilter(self.eventFilterTT)
         self.annotations = self.app.get_annotations()
@@ -4021,6 +4033,8 @@ class DialogCodeText(QtWidgets.QWidget):
 
         +e
         """
+        
+        self.edit_mode_has_changed = True
 
         # No need to update positions (unless entire file is a case)
         if self.no_codes_annotes_cases or not self.edit_mode:
@@ -4289,12 +4303,14 @@ class DialogCodeText(QtWidgets.QWidget):
         
     def ai_search_clicked(self):
         """pushButton_ai_search clicked"""
-
-        if self.ai.get_status() == 'disabled':
+        if self.edit_mode:
+            msg = _('Please finish editing the text before starting an AI search.')
+            Message(self.app, _('AI Search'), msg, "warning").exec()
+            return                       
+        if self.app.ai.get_status() == 'disabled':
             msg = _('The AI is disabled. Go to "AI > Setup Wizard" first.')
             Message(self.app, _('AI Search'), msg, "warning").exec()
             return           
-
         if self.ai_search_running:
             msg = _('The AI is already performing a search. Please stop it before starting a new one.')
             Message(self.app, _('AI Search'), msg, "warning").exec()
