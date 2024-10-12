@@ -71,7 +71,7 @@ env\Scripts\activate
 py -m pip install --upgrade pip
 ```
 
-Type the following to install the required modules:
+Type the following to install the required modules (it will take a few minutes):
 
 ```bash
 pip install -r requirements.txt
