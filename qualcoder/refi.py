@@ -423,7 +423,11 @@ class RefiImport:
         # Change the username to an owner name from the import
         if len(self.users) > 0:
             self.app.settings['codername'] = self.users[0]['name']
-            self.app.write_config_ini(self.app.settings)
+            self.app.write_config_ini(self.app.settings, self.app.ai_models)
+        # Update vectorstore
+        if self.app.settings['ai_enable'] == 'True':
+            self.app.ai.sources_vectorstore.update_vectorstore()        
+        
         self.pd.close()
         msg = _("REFI-QDA PROJECT IMPORT EXPERIMENTAL FUNCTION - NOT FULLY TESTED\n")
         msg += _("Audio/video transcripts: transcript codings and synchpoints not tested.\n")

@@ -550,6 +550,11 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.load_file_data()
         self.app.delete_backup = False
         self.update_files_in_dialogs()
+        # update doc in vectorstore
+        id = int(self.ui.tableWidget.item(row, self.ID_COLUMN).text())
+        if self.app.settings['ai_enable'] == 'True':
+            docs = self.app.get_file_texts(file_ids=[id])
+            self.app.ai.sources_vectorstore.import_document(docs[0]['id'], docs[0]['name'], docs[0]['fulltext'], True)
 
     def undo_file_rename(self):
         """ Undo file name rename. """
@@ -579,6 +584,8 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.parent_text_edit.append(_("Reversed renamed database file entry: ") +
                                      f"{selection['name']} -> {selection['old_name']}")
         self.load_file_data()
+        if self.app.settings['ai_enable'] == 'True':
+            self.app.ai.sources_vectorstore.update_vectorstore()
         self.files_renamed = [x for x in self.files_renamed if not (selection['fid'] == x.get('fid'))]
         if len(self.files_renamed) == 0:
             self.ui.pushButton_undo.setEnabled(False)
@@ -628,6 +635,10 @@ class DialogManageFiles(QtWidgets.QDialog):
             entry = {'old_name': existing_name, 'name': new_name, 'fid': fid}
             self.files_renamed.append(entry)
         self.parent_text_edit.append(msg + err_msg)
+        # Updating vectorstore
+        if self.app.settings['ai_enable'] == 'True':
+            self.app.ai.sources_vectorstore.update_vectorstore()
+
         self.ui.pushButton_undo.setEnabled(True)
         self.load_file_data()
         self.app.delete_backup = False
@@ -1564,6 +1575,10 @@ class DialogManageFiles(QtWidgets.QDialog):
             # Update av file entry with av_text_id link to this text file
             cur.execute("update source set av_text_id=? where id=?", [tr_id, id_])
             self.app.conn.commit()
+            
+            # add doc to vectorstore
+            if self.app.settings['ai_enable'] == 'True':
+                self.app.ai.sources_vectorstore.import_document(entry['id'], entry['name'], entry['fulltext'], update=True)
 
             # Add file attribute placeholders
             att_sql = 'select name from attribute_type where caseOrFile ="file"'
@@ -1647,6 +1662,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                     Message(self.app, _("Warning"), str(import_errors) + _(" lines not imported"), "warning").exec()
         # Try importing as a plain text file.
         # TODO https://stackoverflow.com/questions/436220/how-to-determine-the-encoding-of-text
+        # ==> suggestion: use the new lib "charset_normalizer"  
         # coding = chardet.detect(file.content).get('encoding')
         # text = file.content[:10000].decode(coding)
         if text_ == "":
@@ -1712,6 +1728,11 @@ class DialogManageFiles(QtWidgets.QDialog):
                             self.app.settings['codername']]
             cur.execute(insert_sql, placeholders)
             self.app.conn.commit()
+            
+        # add doc to vectorstore
+        if self.app.settings['ai_enable'] == 'True':
+            self.app.ai.sources_vectorstore.import_document(entry['id'], entry['name'], entry['fulltext'], update=True)
+            
         msg = entry['name']
         if link_path == "":
             msg += _(" imported")
@@ -1918,6 +1939,9 @@ class DialogManageFiles(QtWidgets.QDialog):
                 cur.execute("delete from case_text where fid = ?", [s['id']])
                 cur.execute("delete from attribute where attr_type ='file' and id=?", [s['id']])
                 self.app.conn.commit()
+                # Delete from vectorstore
+                self.app.ai.sources_vectorstore.delete_document(s['id'])    
+            
             # Delete image, audio or video source
             if s['mediapath'] is not None and s['mediapath'][0:5] != 'docs:' and s['mediapath'][0:6] != '/docs/':
                 # Get linked transcript file id
@@ -1956,6 +1980,9 @@ class DialogManageFiles(QtWidgets.QDialog):
                     cur.execute("delete from case_text where fid = ?", [res[0]])
                     cur.execute("delete from attribute where attr_type ='file' and id=?", [res[0]])
                     self.app.conn.commit()
+                    # Delete from vectorstore
+                    self.app.ai.sources_vectorstore.delete_document(res[0])    
+
         self.update_files_in_dialogs()
         self.check_attribute_placeholders()
         self.parent_text_edit.append(msg)
@@ -2006,6 +2033,8 @@ class DialogManageFiles(QtWidgets.QDialog):
             cur.execute("delete from case_text where fid = ?", [file_id])
             cur.execute("delete from attribute where attr_type ='file' and id=?", [file_id])
             self.app.conn.commit()
+            # Delete from vectorstore
+            self.app.ai.sources_vectorstore.delete_document(file_id)    
 
         # Delete image, audio or video source
         # (why not simply use 'else' instead of this complicated second if-clause?)
@@ -2036,6 +2065,8 @@ class DialogManageFiles(QtWidgets.QDialog):
             cur.execute("delete from code_av where id = ?", [file_id])
             cur.execute("delete from attribute where attr_type='file' and id=?", [file_id])
             self.app.conn.commit()
+            # Delete from vectorstore (this should not be necessary since it's not a text file, but just to be sure...)
+            self.app.ai.sources_vectorstore.delete_document(file_id)    
 
             # Delete transcription text file
             if av_text_id is not None:
@@ -2045,6 +2076,9 @@ class DialogManageFiles(QtWidgets.QDialog):
                 cur.execute("delete from case_text where fid = ?", [res[0]])
                 cur.execute("delete from attribute where attr_type ='file' and id=?", [res[0]])
                 self.app.conn.commit()
+                # Delete from vectorstore
+                self.app.ai.sources_vectorstore.delete_document(res[0])
+
         self.files_renamed = [x for x in self.files_renamed if not (file_id == x.get('fid'))]
         self.update_files_in_dialogs()
         self.check_attribute_placeholders()

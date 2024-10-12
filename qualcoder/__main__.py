@@ -30,6 +30,7 @@ https://qualcoder.wordpress.com/
 import base64
 import configparser
 import datetime
+import time
 import gettext
 import json  # To get the latest GitHub release information
 import logging
@@ -78,6 +79,7 @@ from qualcoder.report_file_summary import DialogReportFileSummary
 from qualcoder.report_exact_matches import DialogReportExactTextMatches
 from qualcoder.report_relations import DialogReportRelations
 from qualcoder.report_sql import DialogSQL
+from qualcoder.ai_chat import DialogAIChat
 from qualcoder.rqda import RqdaImport
 from qualcoder.settings import DialogSettings
 from qualcoder.special_functions import DialogSpecialFunctions
@@ -86,6 +88,7 @@ from qualcoder.view_av import DialogCodeAV
 from qualcoder.view_charts import ViewCharts
 from qualcoder.view_graph import ViewGraph
 from qualcoder.view_image import DialogCodeImage
+from qualcoder.ai_prompts import DialogAiEditPrompts
 
 # Check if VLC installed, for warning message for code_av
 vlc = None
@@ -132,6 +135,7 @@ lock_timeout = 30.0  # in seconds. If a project lockfile is older (= has receive
 # it is assumed that the host process has died and the project is opened anyways
 lock_heartbeat_interval = 5  # in seconds.
 
+splash = None # the splash screen on startup
 
 class ProjectLockHeartbeatWorker(QtCore.QObject):
     """
@@ -185,7 +189,10 @@ class App(object):
     delete_backup = True
     # Used as a default export location, which may be different from the working directory
     last_export_directory = ""
-
+    ai = None
+    ai_models = []
+    ai_embedding_function = None # This is the sentence transformer embedding function. It is stored here so it must not be reloaded every time a project is opened. 
+    
     def __init__(self):
         self.conn = None
         self.project_path = ""
@@ -196,7 +203,7 @@ class App(object):
         self.confighome = os.path.expanduser('~/.qualcoder')
         self.configpath = os.path.join(self.confighome, 'config.ini')
         self.persist_path = os.path.join(self.confighome, 'recent_projects.txt')
-        self.settings = self.load_settings()
+        self.settings, self.ai_models = self.load_settings()
         self.last_export_directory = copy(self.settings['directory'])
         self.version = qualcoder_version
 
@@ -295,6 +302,14 @@ class App(object):
         self.project_path = project_path
         self.project_name = project_path.split('/')[-1]
         self.conn = sqlite3.connect(os.path.join(project_path, 'data.qda'))
+        
+    def get_project_memo(self) -> str:
+        # This might be called from a different thread (ai asynch operations), so we have to create a new database connection
+        conn = sqlite3.connect(os.path.join(self.project_path, 'data.qda'))
+        cur = conn.cursor()
+        cur.execute("select memo from project")
+        memo = cur.fetchone()[0]
+        return memo
 
     def get_category_names(self):
         cur = self.conn.cursor()
@@ -481,15 +496,30 @@ class App(object):
                 bad_links.append({'name': r[1], 'mediapath': r[2], 'id': r[0]})
         return bad_links
 
-    def write_config_ini(self, settings):
+    def write_config_ini(self, settings, ai_models):
         """ Stores settings for fonts, current coder, directory, and window sizes in .qualcoder folder
         Called by qualcoder.App.load_settings, qualcoder.MainWindow.open_project, settings.DialogSettings
         """
 
         config = configparser.ConfigParser()
         config['DEFAULT'] = settings
+        # add AI models
+        if len(ai_models) == 0:
+            ai_models = self.ai_models_create_defaults()
+        for model in ai_models:
+            model_section = 'ai_model_' + model['name']
+            config[model_section] = {}
+            config[model_section]['desc'] = model['desc']
+            config[model_section]['access_info_url'] = model['access_info_url']
+            config[model_section]['large_model'] = model['large_model']
+            config[model_section]['large_model_context_window'] = model['large_model_context_window']
+            config[model_section]['fast_model'] = model['fast_model']
+            config[model_section]['fast_model_context_window'] = model['fast_model_context_window']
+            config[model_section]['api_base'] = model['api_base']
+            config[model_section]['api_key'] = model['api_key']
+        
         with open(self.configpath, 'w', encoding='utf-8') as configfile:
-            config.write(configfile)
+            config.write(configfile)            
 
     def _load_config_ini(self):
         """ load config settings, and convert some to Integer or Boolean. """
@@ -521,9 +551,77 @@ class App(object):
                 result['showids'] = True
         if 'report_text_context_characters' in default:
             result['report_text_context_characters'] = default.getint('report_text_context_characters')
-        return result
+        
+        # load AI model list
+        ai_models = []
+        for section in config.sections():
+            if section.startswith('ai_model_'):
+                model = {
+                    'name': section[9:],
+                    'desc': config[section]['desc'],
+                    'access_info_url': config[section]['access_info_url'],
+                    'large_model': config[section]['large_model'],
+                    'large_model_context_window': config[section]['large_model_context_window'],
+                    'fast_model': config[section]['fast_model'],
+                    'fast_model_context_window': config[section]['fast_model_context_window'],
+                    'api_base': config[section]['api_base'],
+                    'api_key': config[section]['api_key']
+                }
+                ai_models.append(model)
+        if len(ai_models) == 0: # no models loaded, create default
+            ai_models = self.ai_models_create_defaults()
+        return result, ai_models
 
-    def check_and_add_additional_settings(self, settings_data):
+    def ai_models_create_defaults(self):
+        """Returns a list of the default AI model parameters
+        """       
+        models = [
+            {
+                'name': 'GPT-4-turbo',
+                'desc': """The best model from OpenAI as of now for our purpose. 
+You will need an an API-key from OpenAI and have payed credits in your account. 
+OpenAI will charge a small amount for every use.""",
+                'access_info_url': 'https://platform.openai.com/api-keys',
+                'large_model': 'gpt-4-turbo',
+                'large_model_context_window': '128000',
+                'fast_model': 'gpt-4o-mini',
+                'fast_model_context_window': '128000',
+                'api_base': '',
+                'api_key': ''
+            },
+            {
+                'name': 'OpenAI_GPT4o',
+                'desc': """Faster, cheaper, but slightly less powerful than GPT-4-turbo.  
+You will need an an API-key from OpenAI and have payed credits in your account. 
+OpenAI will charge a small amount for every use.""",
+                'access_info_url': 'https://platform.openai.com/api-keys',
+                'large_model': 'gpt-4o',
+                'large_model_context_window': '128000',
+                'fast_model': 'gpt-4o-mini',
+                'fast_model_context_window': '128000',
+                'api_base': '',
+                'api_key': ''
+            },
+            {
+                'name': 'Blablador',
+                'desc': """A free and open source model (Mixtral 8x7B), excellent privacy, 
+albeit not as powerful as GPT-4. 
+Blablador is free to use and runs on a server of the Helmholtz Society, 
+a large non-profit research organization in Germany. In order to gain 
+access and get an API-key, you have to identify yourself once with your 
+university, ORCID, GitHub, or Google account.""",
+                'access_info_url': 'https://sdlaml.pages.jsc.fz-juelich.de/ai/guides/blablador_api_access/',
+                'large_model': 'alias-large',
+                'large_model_context_window': '32768',
+                'fast_model': 'alias-fast',
+                'fast_model_context_window': '32768',
+                'api_base': 'https://helmholtz-blablador.fz-juelich.de:8000/v1',
+                'api_key': ''
+            }
+        ]
+        return models
+
+    def check_and_add_additional_settings(self, settings_data, ai_models):
         """ Newer features include width and height settings for many dialogs and main window.
         timestamp format.
         dialog_crossovers IS dialog relations
@@ -560,7 +658,8 @@ class App(object):
                 'dialogreport_file_summary_splitter0', 'dialogreport_file_summary_splitter0',
                 'dialogreport_code_summary_splitter0', 'dialogreport_code_summary_splitter0',
                 'stylesheet', 'backup_num', 'codetext_chunksize',
-                'report_text_context_characters', 'report_text_context_style'
+                'report_text_context_characters', 'report_text_context_style',
+                'ai_enable', 'ai_first_startup', 'ai_model_index'
                 ]
         for key in keys:
             if key not in settings_data:
@@ -581,11 +680,22 @@ class App(object):
                     settings_data[key] = "Bold"
                 if key == 'report_text_context_characters':
                     settings_data[key] = 150
+                if key == 'ai_enable':
+                    settings_data[key] = 'False'
+                if key == 'ai_first_startup':
+                    settings_data[key] = 'True' 
+                if key == 'ai_model_index':
+                    settings_data[key] = '0'
+                    
+        # Check AI models
+        if len(ai_models) == 0: # no models loaded, create default
+            ai_models = self.ai_models_create_defaults()
+
         # Write out new ini file, if needed
         if len(settings_data) > dict_len:
-            self.write_config_ini(settings_data)
-        return settings_data
-
+            self.write_config_ini(settings_data, ai_models)
+        return settings_data, ai_models
+    
     def merge_settings_with_default_stylesheet(self, settings):
         """ Stylesheet is coded to avoid potential data file import errors with pyinstaller.
         Various options for colour schemes:
@@ -619,6 +729,7 @@ class App(object):
         QLabel#label_exports {background-color:#858585;}\n\
         QLabel#label_time_3 {background-color:#858585;}\n\
         QLabel#label_volume {background-color:#858585;}\n\
+        QLabel#ai_output {background-color: #2a2a2a;}\n\
         QLabel:disabled {color: #707070;}\n\
         QLineEdit {border: 1px solid #858585;}\n\
         QListWidget::item:selected {border-left: 3px solid red; color: #eeeeee;}\n\
@@ -691,6 +802,8 @@ class App(object):
         QTabWidget {border: none;}\n\
         QTextEdit {background-color: #fcfcfc; selection-color: #ffffff; selection-background-color:#000000;}\n\
         QTextEdit:focus {border: 2px solid #f89407;}\n\
+        QPlainTextEdit {background-color: #fcfcfc; selection-color: #ffffff; selection-background-color:#000000;}\n\
+        QPlainTextEdit:focus {border: 2px solid #f89407;}\n\
         QToolTip {background-color: #fffacd; color:#000000; border: 1px solid #f89407; }\n\
         QTreeWidget {font-size: 12px;}\n\
         QTreeView::branch:selected {border-left: 2px solid red; color: #000000;}"
@@ -730,25 +843,49 @@ class App(object):
             style = "* {font-size: 12px;}"
             style += "\nQGroupBox { border: none; background-color: transparent;}"
         return style
+    
+    def highlight_color(self):
+        """ Get the default highlight color, depending on the current style
+        """
+        if self.settings['stylesheet'] == 'dark':
+            return '#f89407'
+        if self.settings['stylesheet'] == 'rainbow':
+            return '#f89407'
+        if self.settings['stylesheet'] == "orange":
+            return "#306eff"
+        if self.settings['stylesheet'] == "yellow":
+            return "#306eff"
+        if self.settings['stylesheet'] == "green":
+            return "#ea202c"
+        if self.settings['stylesheet'] == "blue":
+            return "#303f9f"
+        if self.settings['stylesheet'] == "purple":
+            return "#ca1b9a"
+        if self.settings['stylesheet'] == "native":
+            palette = QtWidgets.QApplication.instance().palette()
+            return palette.color(QtGui.QPalette.ColorRole.Highlight).name(QtGui.QColor.NameFormat.HexRgb)
+        return '#f89407' # default
 
     def load_settings(self):
-        result = self._load_config_ini()
+        result, ai_models = self._load_config_ini()
         # Check keys
         if (not len(result) or 'codername' not in result.keys() or 'stylesheet' not in result.keys() or
                 'speakernameformat' not in result.keys()):
-            self.write_config_ini(self.default_settings)
+            # create default:
+            ai_models = self.ai_models_create_defaults()
+            self.write_config_ini(self.default_settings, ai_models)
             logger.info('Initialized config.ini')
-            result = self._load_config_ini()
+            result, ai_models = self._load_config_ini()
         # codername is also legacy, v2.8 plus keeps current coder name in database project table
         if result['codername'] == "":
             result['codername'] = "default"
-        result = self.check_and_add_additional_settings(result)
+        result, ai_models = self.check_and_add_additional_settings(result, ai_models)
         # TODO TEMPORARY delete, legacy
         if result['speakernameformat'] == 0:
             result['speakernameformat'] = "[]"
         if result['stylesheet'] == 0:
             result['stylesheet'] = "native"
-        return result
+        return result, ai_models
 
     @property
     def default_settings(self):
@@ -757,7 +894,7 @@ class App(object):
             'backup_num': 5,
             'codername': 'default',
             'font': 'Noto Sans',
-            'fontsize': 14,
+            'fontsize': 12,
             'docfontsize': 12,
             'treefontsize': 12,
             'directory': os.path.expanduser('~'),
@@ -821,6 +958,9 @@ class App(object):
             'report_text_context_chars': 150,
             'report_text_context-style': 'Bold',
             'codetext_chunksize': 50000,
+            'ai_enable': 'False',
+            'ai_first_startup': 'True',
+            'ai_model_index': -1
         }
 
     def get_file_texts(self, file_ids=None):
@@ -922,7 +1062,7 @@ class App(object):
         except sqlite3.OperationalError:
             pass
         return coder_names
-
+         
     def save_backup(self, suffix=""):
         """ Save a date and hours stamped backup.
         Do not back up if the name already exists.
@@ -1010,8 +1150,35 @@ class MainWindow(QtWidgets.QMainWindow):
         font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
         self.init_ui()
+        self.ui.tabWidget.setCurrentIndex(0)
         self.show()
-
+        QtWidgets.QApplication.processEvents() 
+        # Setup AI
+        global AiLLM
+        from qualcoder.ai_llm import AiLLM # import after showing the UI because this takes several seconds
+        self.app.ai = AiLLM(self.app, self.ui.textEdit)
+        # First start? Ask if user wants to enable ai integration or not
+        if self.app.settings['ai_first_startup'] == 'True' and self.app.settings['ai_enable'] == 'False':
+            global splash
+            if splash is not None:
+                splash.finish(None) # close splash screen
+            msg = _('Welcome\n\n\
+The new AI enhanced functions in QualCoder need some additional setup. \
+Do you want to enable the AI and start the setup? \
+You can also do this later by starting the AI Setup Wizard from the AI menu in the main window. \
+Click "Yes" to start now.')
+            msg_box = QtWidgets.QMessageBox(self)
+            msg_box.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            reply = msg_box.question(self, _('AI Integration'),
+                                            msg, QtWidgets.QMessageBox.StandardButton.Yes,
+                                            QtWidgets.QMessageBox.StandardButton.No)
+            if reply == QtWidgets.QMessageBox.StandardButton.Yes:
+                self.ai_setup_wizard() # (will also init the llm)
+        else:
+            self.app.ai.init_llm(self)      
+        self.app.settings['ai_first_startup'] = 'False'
+        self.app.write_config_ini(self.app.settings, self.app.ai_models)
+    
     def init_ui(self):
         """ Set up menu triggers """
 
@@ -1087,6 +1254,14 @@ class MainWindow(QtWidgets.QMainWindow):
         # TODO self.ui.actionText_mining.triggered.connect(self.text_mining)
         self.ui.actionSQL_statements.setShortcut('Alt+D')
         self.ui.actionSQL_statements.triggered.connect(self.report_sql)
+        # AI menu
+        self.ui.actionAI_Setup_wizard.triggered.connect(self.ai_setup_wizard)
+        self.ui.actionAI_Settings.triggered.connect(self.ai_settings)
+        self.ui.actionAI_Rebuild_internal_memory.triggered.connect(self.ai_rebuild_memory)
+        self.ui.actionAI_Edit_Project_Info.triggered.connect(self.project_memo)
+        self.ui.actionAI_Prompts.triggered.connect(self.ai_prompts)
+        self.ui.actionAI_Chat.triggered.connect(self.ai_go_chat)
+        self.ui.actionAI_Search_and_Coding.triggered.connect(self.ai_go_search)
         # Help menu
         self.ui.actionContents.setShortcut('Alt+H')
         self.ui.actionContents.triggered.connect(self.help)
@@ -1095,9 +1270,15 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.actionSpecial_functions.setShortcut('Alt+Z')
         self.ui.actionSpecial_functions.triggered.connect(self.special_functions)
         self.ui.actionMenu_Key_Shortcuts.triggered.connect(self.display_menu_key_shortcuts)
+        # Ensure the action_log always scrolls to the very bottom once new log entries are added:
+        self.ui.textEdit.verticalScrollBar().rangeChanged.connect(self.action_log_scroll_bottom)
         self.ui.textEdit.setReadOnly(True)
         self.settings_report()
-
+        
+        self.ui.tabWidget.setCurrentIndex(0)
+        
+        self.ai_chat()
+        
     def fill_recent_projects_menu_actions(self):
         """ Get the recent projects from the .qualcoder txt file.
         Add up to five recent projects to the menu. """
@@ -1283,11 +1464,15 @@ class MainWindow(QtWidgets.QMainWindow):
         msg += _("Report text context style: ") + self.app.settings['report_text_context_style'] + "\n"
         msg += _("Backup on open") + f": {self.app.settings['backup_on_open']}\n"
         msg += _("Backup AV files") + f": {self.app.settings['backup_av_files']}\n"
+        if self.app.settings['ai_enable'] == 'True':
+            msg += _("AI integration is enabled") + "\n"
+        else:
+            msg += _("AI integration is disabled") + "\n"
         msg += _("Style") + "; " + self.app.settings['stylesheet']
         if platform.system() == "Windows":
             msg += "\n" + _("Directory (folder) paths / represents \\")
-        msg += "\n"
         self.ui.textEdit.append(msg)
+        self.ui.textEdit.append("<p>&nbsp;</p>")
         self.ui.textEdit.textCursor().movePosition(QtGui.QTextCursor.MoveOperation.End)
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
 
@@ -1388,6 +1573,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui.textEdit.append(menu_shortcuts_display)
         self.ui.textEdit.append(coding_shortcuts_display)
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
+        
+    def action_log_scroll_bottom(self):
+        """Scrolls the action log to the very bottom, malking new entries visible."""
+        self.ui.textEdit.verticalScrollBar().setValue(self.ui.textEdit.verticalScrollBar().maximum())
 
     def about(self):
         """ About dialog. """
@@ -1487,9 +1676,16 @@ class MainWindow(QtWidgets.QMainWindow):
         self.journal_display = ui
         ui.show()
 
-    def text_coding(self):
+    def text_coding(self, task='documents', doc_id=None, doc_sel_start=0, doc_sel_end=0):
         """ Create edit and delete codes. Apply and remove codes and annotations to the
-        text in imported text files. """
+        text in imported text files. 
+        
+        task: "documents": The default, shows the tab with the text documents
+              "ai_search": Shows the tab "AI Search"
+        doc_id: If not None and task = "documents", this doument will be loaded in the coding window
+        doc_sel_start: The character-position of the beginning of the selection in the coding window
+        doc_sel_end: The end of the selection 
+        """
 
         files = self.app.get_text_filenames()
         if len(files) > 0:
@@ -1497,6 +1693,12 @@ class MainWindow(QtWidgets.QMainWindow):
             ui = DialogCodeText(self.app, self.ui.textEdit, self.ui.tab_reports)
             ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
             self.tab_layout_helper(self.ui.tab_coding, ui)
+            if task == 'documents':
+                ui.ui.tabWidget.setCurrentWidget(ui.ui.tab_docs)
+                if doc_id is not None:
+                    ui.open_doc_selection(doc_id, doc_sel_start, doc_sel_end)
+            elif task == 'ai_search':
+                ui.ui.tabWidget.setCurrentWidget(ui.ui.tab_ai)               
         else:
             msg = _("This project contains no text files.")
             Message(self.app, _('No text files'), msg).exec()
@@ -1566,6 +1768,12 @@ class MainWindow(QtWidgets.QMainWindow):
         ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
         self.tab_layout_helper(self.ui.tab_reports, None)
         self.tab_layout_helper(self.ui.tab_coding, ui)
+
+    def ai_chat(self):
+        """ Add AI chat to tab"""
+
+        self.ai_chat_window = DialogAIChat(self.app, self.ui.textEdit, self)
+        self.tab_layout_helper(self.ui.tab_ai_chat, self.ai_chat_window)
 
     def tab_layout_helper(self, tab_widget, ui):
         """ Used when loading a coding, report or manage dialog  in to a tab widget.
@@ -1641,6 +1849,8 @@ class MainWindow(QtWidgets.QMainWindow):
             Message(self.app, _("Project creation"), _("REFI-QDA Project not successfully created"), "warning").exec()
             return
         RefiImport(self.app, self.ui.textEdit, "qdpx")
+        if self.app.settings['ai_enable'] == 'True':
+            self.app.ai.init_llm(self, rebuild_vectorstore=True)
         self.project_summary_report()
 
     def rqda_project_import(self):
@@ -1678,7 +1888,7 @@ class MainWindow(QtWidgets.QMainWindow):
                 # self.dialog_list = None
                 # save main window geometry to config.ini
                 self.app.settings['mainwindow_geometry'] = self.saveGeometry().toHex().data().decode('utf-8') 
-                self.app.write_config_ini(self.app.settings)
+                self.app.write_config_ini(self.app.settings, self.app.ai_models)
                 if self.app.conn is not None:
                     try:
                         self.app.conn.commit()
@@ -1714,6 +1924,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.app = App()
         if self.app.settings['directory'] == "":
             self.app.settings['directory'] = os.path.expanduser('~')
+        self.app.ai = AiLLM(self.app, self.ui.textEdit)
         project_path = QtWidgets.QFileDialog.getSaveFileName(self,
                                                              _("Enter project name"), self.app.settings['directory'])
         # options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
@@ -1740,6 +1951,7 @@ class MainWindow(QtWidgets.QMainWindow):
             logger.critical(_("Project creation error ") + str(err))
             Message(self.app, _("Project"), self.app.project_path + _(" not successfully created"), "critical").exec()
             self.app = App()
+            self.app.ai = AiLLM(self.app, self.ui.textEdit)
             return
         self.app.project_name = self.app.project_path.rpartition('/')[2]
         self.app.settings['directory'] = self.app.project_path.rpartition('/')[0]
@@ -1864,22 +2076,51 @@ class MainWindow(QtWidgets.QMainWindow):
                 contents.itemAt(i).widget().close()
                 contents.itemAt(i).widget().setParent(None)
 
-    def change_settings(self):
+    def change_settings(self, section=None, enable_ai=False):
         """ Change default settings - the coder name, font, font size.
         Language, Backup options.
         As this dialog affects all others if the coder name changes, on exit of the dialog,
-        all other opened dialogs are destroyed."""
-
+        all other opened dialogs are destroyed.
+        
+        section = 'AI' moves to the AI settings at the bottom of the dialog
+        enable_ai = if True, the AI will be enabled in settings
+        """
         current_coder = self.app.settings['codername']
-        ui = DialogSettings(self.app)
+        current_ai_enable = self.app.settings['ai_enable']
+        current_ai_model_index = int(self.app.settings['ai_model_index'])
+        if current_ai_model_index >= 0:
+            current_ai_api_key = self.app.ai_models[current_ai_model_index]['api_key']
+        else:
+            current_ai_api_key = ''
+        ui = DialogSettings(self.app, section=section, enable_ai=enable_ai)
         ret = ui.exec()
         if ret == QtWidgets.QDialog.DialogCode.Rejected:  # Dialog has been canceled
             return
 
+        self.app.settings, self.app.ai_models = self.app.load_settings()
         self.settings_report()
         font = f"font: {self.app.settings['fontsize']}pt "
         font += '"' + self.app.settings['font'] + '";'
         self.setStyleSheet(font)
+        self.ai_chat_window.init_styles()
+        
+        if current_ai_enable != self.app.settings['ai_enable']:
+            if self.app.settings['ai_enable'] == 'True':
+                # AI is newly enabled:
+                self.app.ai.init_llm(self, rebuild_vectorstore=False)
+            else: # AI is disabled
+                self.app.ai.close()
+        elif int(current_ai_model_index) < 0:
+            # no model selected
+            self.app.settings['ai_enable'] = 'False'
+            self.app.ai.close()                        
+        elif current_ai_model_index != self.app.settings['ai_model_index']:
+            # current model has changed
+            self.app.ai.init_llm(self)
+        elif current_ai_api_key != self.app.ai_models[current_ai_model_index]['api_key']:
+            # ai api-key has changed
+            self.app.ai.init_llm(self)
+            
         # Name change: Close all opened dialogs as coder name needs to change everywhere
         if current_coder != self.app.settings['codername']:
             self.ui.textEdit.append(_("Coder name changed to: ") + self.app.settings['codername'])
@@ -1899,17 +2140,22 @@ class MainWindow(QtWidgets.QMainWindow):
                 for i in reversed(range(contents.count())):
                     contents.itemAt(i).widget().close()
                     contents.itemAt(i).widget().setParent(None)
-
+                    
     def project_memo(self):
         """ Give the entire project a memo. """
-
-        cur = self.app.conn.cursor()
-        cur.execute("select memo from project")
-        memo = cur.fetchone()[0]
+        memo = self.app.get_project_memo()
+        # If the memo is empty, add a template that defines all the necessary information for the AI  
+        if memo is None or memo == '':
+            memo = _('Research topic, questions and objectives: \n\n'
+                     'Methodology: \n\n'
+                     'Participants and data collected: \n\n'
+                     '#####\n'
+                     '(Everything below this mark is considered to be a personal note and will never be send to the AI.)')
         ui = DialogMemo(self.app, _("Memo for project ") + self.app.project_name,
                         memo)
         ui.exec()
         if memo != ui.memo:
+            cur = self.app.conn.cursor()
             cur.execute('update project set memo=?', (ui.memo,))
             self.app.conn.commit()
             self.ui.textEdit.append(_("Project memo entered."))
@@ -2099,7 +2345,7 @@ class MainWindow(QtWidgets.QMainWindow):
         names = self.app.get_coder_names_in_project()
         if self.app.settings['codername'] not in names and len(names) > 0:
             self.app.settings['codername'] = names[0]
-            self.app.write_config_ini(self.app.settings)
+            self.app.write_config_ini(self.app.settings, self.app.ai_models)
             self.ui.textEdit.append(_("Default coder name changed to: ") + names[0])
         # Display some project details
         self.app.append_recent_project(self.app.project_path)
@@ -2317,7 +2563,11 @@ class MainWindow(QtWidgets.QMainWindow):
         # Vacuum database
         cur.execute("vacuum")
         self.app.conn.commit()
-
+        
+        # AI: init llm and update vectorstore
+        self.app.ai.init_llm(self)
+        self.ai_chat_window.init_ai_chat(self.app)
+        
         # Fix missing folders within QualCoder project. Will cause import errors.
         span = '<span style="color:red">'
         end_span = "</span>"
@@ -2363,7 +2613,8 @@ class MainWindow(QtWidgets.QMainWindow):
         sql = "select memo from project"
         cur.execute(sql)
         res = cur.fetchone()
-        msg += _("Project memo: ") + f"{res[0]}\n"
+        if res[0] != "":
+            msg += _("Project memo: ") + f"\n---------------------\n{res[0]}\n---------------------\n"
         sql = "select count(id) from source"
         cur.execute(sql)
         res = cur.fetchone()
@@ -2436,6 +2687,10 @@ class MainWindow(QtWidgets.QMainWindow):
             self.ui.textEdit.append(_("Closing project: ") + self.app.project_name)
             self.ui.textEdit.append("========\n")
             self.app.append_recent_project(self.app.project_path)
+        # AI
+        self.ai_chat_window.close()
+        self.app.ai.close()
+        
         if self.app.conn is not None:
             try:
                 self.app.conn.commit()
@@ -2455,7 +2710,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.project = {"databaseversion": "", "date": "", "memo": "", "about": ""}
         self.hide_menu_options()
         self.setWindowTitle("QualCoder")
-        self.app.write_config_ini(self.app.settings)
+        self.app.write_config_ini(self.app.settings, self.app.ai_models)
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
         self.ui.textEdit.verticalScrollBar().setValue(self.ui.textEdit.verticalScrollBar().maximum())
 
@@ -2501,6 +2756,65 @@ class MainWindow(QtWidgets.QMainWindow):
                 print(str(err))
                 logger.warning(str(err))
 
+    # AI Menu Actions
+    def ai_setup_wizard(self):
+        """Action triggered by AI Setup Wizard menu item or at the first start of QualCoder."""
+        if self.app.settings['ai_enable'] == 'True':
+            msg = _('It seems that the AI is already setup and enabled, so there is nothing to do here. Go to AI > settings if you want to change the current model or other settings.')
+            Message(self.app, _('AI Setup Wizard'), msg).exec() 
+            return
+        self.ui.textEdit.append(_('AI: Setup Wizard'))
+        QtWidgets.QApplication.processEvents() # update ui
+        self.app.ai.init_llm(self, rebuild_vectorstore=True, enable_ai=True)
+        self.ui.textEdit.append(_('AI: Setup Wizard finished'))
+        
+    def ai_settings(self):
+        """Action triggered by AI Settings menu item."""
+        self.change_settings(section='AI')
+
+    def ai_rebuild_memory(self):
+        """Action triggered by AI Rebuild Internal Memory menu item."""
+        if self.app.settings['ai_enable'] != 'True':
+            msg = _('Please enable the AI first and set it up properly.')
+            Message(self.app, _('Rebuild AI Memory'), msg).exec() 
+            return
+        if not self.app.ai.is_ready():
+            msg = _('The AI is busy or not set up properly.')
+            Message(self.app, _('Rebuild AI Memory'), msg).exec()
+            return 
+        
+        msg = _('This will re-read all of your empirical documents, which may take some time. Do you want to continue?')
+        mb = QtWidgets.QMessageBox(self)
+        mb.setWindowTitle(_('Rebuild AI Memory'))
+        mb.setText(msg)
+        mb.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Ok|
+                            QtWidgets.QMessageBox.StandardButton.Abort)
+        mb.setStyleSheet('* {font-size: ' + str(self.app.settings['fontsize']) + 'pt}')            
+        if mb.exec() == QtWidgets.QMessageBox.StandardButton.Ok: 
+            self.ui.tabWidget.setCurrentIndex(0) # show action log
+            self.app.ai.sources_vectorstore.init_vectorstore(rebuild=True)
+    
+    def ai_prompts(self):
+        """Action triggered by AI Prompts menu item."""
+        DialogAiEditPrompts(self.app).exec()
+
+    def ai_go_chat(self):
+        """Action triggered by AI Chat menu item."""
+        if self.app.settings['ai_enable'] != 'True':
+            msg = _('Please enable the AI first and set it up properly.')
+            Message(self.app, _('Rebuild AI Memory'), msg).exec() 
+            return
+        self.ui.tabWidget.setCurrentWidget(self.ui.tab_ai_chat) 
+
+    def ai_go_search(self):
+        """Action triggered by AI Search and Coding menu item."""
+        if self.app.settings['ai_enable'] != 'True':
+            msg = _('Please enable the AI first and set it up properly.')
+            Message(self.app, _('Rebuild AI Memory'), msg).exec() 
+            return
+        self.text_coding(task='ai_search')
+        
+
     def get_latest_github_release(self):
         """ Get latest github release.
         https://stackoverflow.com/questions/24987542/is-there-a-link-to-github-for-downloading-a-file-in-the-latest-release-of-a-repo
@@ -2529,90 +2843,105 @@ class MainWindow(QtWidgets.QMainWindow):
 
 
 def gui():
-    qual_app = App()
-    settings = qual_app.load_settings()
-    project_path = qual_app.get_most_recent_projectpath()
     app = QtWidgets.QApplication(sys.argv)
-    QtGui.QFontDatabase.addApplicationFont("GUI/NotoSans-hinted/NotoSans-Regular.ttf")
-    QtGui.QFontDatabase.addApplicationFont("GUI/NotoSans-hinted/NotoSans-Bold.ttf")
-    stylesheet = qual_app.merge_settings_with_default_stylesheet(settings)
-    app.setStyleSheet(stylesheet)
-    if sys.platform != 'darwin':
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(qualcoder32), "png")
-        app.setWindowIcon(QtGui.QIcon(pm))
+    
+    # Show splash screen during loading
+    pixmap = QtGui.QPixmap()
+    pixmap.loadFromData(QtCore.QByteArray.fromBase64(qualcoder), "png")
+    global splash
+    splash = QtWidgets.QSplashScreen(pixmap, QtCore.Qt.WindowType.WindowStaysOnTopHint)
+    # splash.showMessage("Loading...", QtCore.Qt.AlignmentFlag.AlignCenter, QtGui.QColor('black'))
+    splash.show()
+    app.processEvents()
+    
+    try:
+        qual_app = App()
+        settings, ai_models = qual_app.load_settings()
+        project_path = qual_app.get_most_recent_projectpath()
 
-    # Use two character language setting
-    lang = settings.get('language', 'en')
-    # Test for pyinstall data files
-    locale_dir = os.path.join(path, 'locale')
-    # Need to get the external data directory for PyInstaller
-    if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
-        ext_data_dir = sys._MEIPASS
-        # print("ext data dir: ", ext_data_dir)
-        locale_dir = os.path.join(ext_data_dir, 'qualcoder')
-        locale_dir = os.path.join(locale_dir, 'locale')
-        # locale_dir = os.path.join(locale_dir, lang)
-        # locale_dir = os.path.join(locale_dir, 'LC_MESSAGES')
-    # print("locale dir: ", locale_dir)
-    # print("LISTDIR: ", os.listdir(locale_dir))
-    # getlang = gettext.translation('en', localedir=locale_dir, languages=['en'])
-    translator = gettext.translation(domain='default', localedir=locale_dir, fallback=True)
-    if lang in ["de", "es", "fr", "it", "pt"]:
-        # qt translator applies to ui designed GUI widgets only
-        # qt_locale_dir = os.path.join(locale_dir, lang)
-        # qt_locale_file = os.path.join(qt_locale_dir, "app_" + lang + ".qm")
-        # print("qt qm translation file: ", qt_locale_file)
-        qt_translator = QtCore.QTranslator()
-        # qt_translator.load(qt_locale_file)
-        ''' Below for pyinstaller and obtaining app_lang.qm data file from .qualcoder folder
-        A solution to this error [Errno 13] Permission denied:
-        Replace 'lang' with the short language name, e.g. app_de.qm '''
-        if qt_translator.isEmpty():
-            print("trying to load translation qm file from .qualcoder folder")
-            qm = os.path.join(home, '.qualcoder')
-            qm = os.path.join(qm, f"app_{lang}.qm")
-            print("qm file located at: ", qm)
-            qt_translator.load(qm)
+        QtGui.QFontDatabase.addApplicationFont("GUI/NotoSans-hinted/NotoSans-Regular.ttf")
+        QtGui.QFontDatabase.addApplicationFont("GUI/NotoSans-hinted/NotoSans-Bold.ttf")
+        stylesheet = qual_app.merge_settings_with_default_stylesheet(settings)
+        app.setStyleSheet(stylesheet)
+        if sys.platform != 'darwin':
+            pm = QtGui.QPixmap()
+            pm.loadFromData(QtCore.QByteArray.fromBase64(qualcoder32), "png")
+            app.setWindowIcon(QtGui.QIcon(pm))
+
+        # Use two character language setting
+        lang = settings.get('language', 'en')
+        # Test for pyinstall data files
+        locale_dir = os.path.join(path, 'locale')
+        # Need to get the external data directory for PyInstaller
+        if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+            ext_data_dir = sys._MEIPASS
+            # print("ext data dir: ", ext_data_dir)
+            locale_dir = os.path.join(ext_data_dir, 'qualcoder')
+            locale_dir = os.path.join(locale_dir, 'locale')
+            # locale_dir = os.path.join(locale_dir, lang)
+            # locale_dir = os.path.join(locale_dir, 'LC_MESSAGES')
+        # print("locale dir: ", locale_dir)
+        # print("LISTDIR: ", os.listdir(locale_dir))
+        install_language(lang) # install language files on every start, so updates are reflected
+        # getlang = gettext.translation('en', localedir=locale_dir, languages=['en'])
+        translator = gettext.translation(domain='default', localedir=locale_dir, fallback=True)
+        if lang in ["de", "es", "fr", "it", "pt"]:
+            # qt translator applies to ui designed GUI widgets only
+            # qt_locale_dir = os.path.join(locale_dir, lang)
+            # qt_locale_file = os.path.join(qt_locale_dir, "app_" + lang + ".qm")
+            # print("qt qm translation file: ", qt_locale_file)
+            qt_translator = QtCore.QTranslator()
+            # qt_translator.load(qt_locale_file)
+            ''' Below for pyinstaller and obtaining app_lang.qm data file from .qualcoder folder
+            A solution to this error [Errno 13] Permission denied:
+            Replace 'lang' with the short language name, e.g. app_de.qm '''
             if qt_translator.isEmpty():
-                # print(f"Installing app_{lang}.qm to .qualcoder folder")
-                install_language(lang)
+                print("trying to load translation qm file from .qualcoder folder")
+                qm = os.path.join(home, '.qualcoder')
+                qm = os.path.join(qm, f"app_{lang}.qm")
+                print("qm file located at: ", qm)
                 qt_translator.load(qm)
-        app.installTranslator(qt_translator)
-        '''Below for pyinstaller and obtaining mo data file from .qualcoder folder
-        A solution to this [Errno 13] Permission denied:
-        Must have the folder lang/LC_MESSAGES/lang.mo  in the .qualcoder folder
-        Replace 'lang' with the language short name e.g. de, el, es ...
-        '''
-        try:
-            translator = gettext.translation(lang, localedir=locale_dir, languages=[lang])
-            print("locale directory for python translations: ", locale_dir)
-        except Exception as err:
-            print("Error accessing python translations mo file\n", err)
-            print("Locale directory for python translations: ", locale_dir)
+                #if qt_translator.isEmpty():
+                    # print(f"Installing app_{lang}.qm to .qualcoder folder")
+                #    install_language(lang)
+                #    qt_translator.load(qm)
+            app.installTranslator(qt_translator)
+            '''Below for pyinstaller and obtaining mo data file from .qualcoder folder
+            A solution to this [Errno 13] Permission denied:
+            Must have the folder lang/LC_MESSAGES/lang.mo  in the .qualcoder folder
+            Replace 'lang' with the language short name e.g. de, el, es ...
+            '''
             try:
-                print(f"Trying folder: home/.qualcoder/{lang}/LC_MESSAGES/{lang}.mo")
-                mo_dir = os.path.join(home, '.qualcoder')
-                translator = gettext.translation(lang, localedir=mo_dir, languages=[lang])
-            except Exception as err2:
-                print(f"No {lang}.mo translation file loaded", err2)
-    translator.install()
-    # Check DroidSandMono installed  - for wordcloud
-    install_droid_sans_mono()
-    ex = MainWindow(qual_app)
-    if project_path:
-        split_ = project_path.split("|")
-        proj_path = ""
-        # Only the path - older and rarer format - legacy
-        if len(split_) == 1:
-            proj_path = split_[0]
-        # Newer datetime | path
-        if len(split_) == 2:
-            proj_path = split_[1]
-        ex.open_project(path_=proj_path)
+                translator = gettext.translation(lang, localedir=locale_dir, languages=[lang])
+                print("locale directory for python translations: ", locale_dir)
+            except Exception as err:
+                print("Error accessing python translations mo file\n", err)
+                print("Locale directory for python translations: ", locale_dir)
+                try:
+                    print(f"Trying folder: home/.qualcoder/{lang}/LC_MESSAGES/{lang}.mo")
+                    mo_dir = os.path.join(home, '.qualcoder')
+                    translator = gettext.translation(lang, localedir=mo_dir, languages=[lang])
+                except Exception as err2:
+                    print(f"No {lang}.mo translation file loaded", err2)
+        translator.install()
+        # Check DroidSandMono installed  - for wordcloud
+        install_droid_sans_mono()
+        ex = MainWindow(qual_app)
+        if project_path:
+            split_ = project_path.split("|")
+            proj_path = ""
+            # Only the path - older and rarer format - legacy
+            if len(split_) == 1:
+                proj_path = split_[0]
+            # Newer datetime | path
+            if len(split_) == 2:
+                proj_path = split_[1]
+            ex.open_project(path_=proj_path)
+    finally:
+        splash.finish(None)
+
     sys.exit(app.exec())
-
-
+    
 def install_language(lang):
     """ Mainly for pyinstaller on Windows, as cannot access language data files.
     So, recreate them from base64 data into home/.qualcoder folder.
@@ -2648,12 +2977,13 @@ def install_language(lang):
     mo_path = os.path.join(mo_path, lang)
     if not os.path.exists(mo_path):
         os.mkdir(mo_path)
-        mo_path = os.path.join(mo_path, "LC_MESSAGES")
+    mo_path = os.path.join(mo_path, "LC_MESSAGES")
+    if not os.path.exists(mo_path):
         os.mkdir(mo_path)
-        mo = os.path.join(mo_path, lang + ".mo")
-        with open(mo, 'wb') as file_:
-            decoded_data = base64.decodebytes(mo_data)
-            file_.write(decoded_data)
+    mo = os.path.join(mo_path, lang + ".mo")
+    with open(mo, 'wb') as file_:
+        decoded_data = base64.decodebytes(mo_data)
+        file_.write(decoded_data)
 
 
 def install_droid_sans_mono():

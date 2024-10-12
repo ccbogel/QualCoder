@@ -79,11 +79,11 @@ msgstr "Schriftart"
 
 #: __main__.py:1185
 msgid "Tree font size"
-msgstr "Schriftgröße des Baums"
+msgstr "Schriftgröße der Baumansicht"
 
 #: __main__.py:1186
 msgid "Working directory"
-msgstr "Arbeits-Directory-Verzeichnis"
+msgstr "Arbeitsverzeichnis"
 
 #: __main__.py:1187
 msgid "Show IDs"
@@ -103,15 +103,15 @@ msgstr "Format des Sprechernamens"
 
 #: __main__.py:1191
 msgid "Report text context characters: "
-msgstr "Textkontext-Zeichen melden:"
+msgstr "Textkontext-Zeichen in Berichten:"
 
 #: __main__.py:1192
 msgid "Report text context style: "
-msgstr "Berichtstext Kontext, Stil: "
+msgstr "Textkontext-Stil in Berichten: "
 
 #: __main__.py:1193
 msgid "Backup on open"
-msgstr "Sicherung auf offen"
+msgstr "Sicherung beim Öffnen"
 
 #: __main__.py:1194
 msgid "Backup AV files"
@@ -123,15 +123,15 @@ msgstr "Stil"
 
 #: __main__.py:1197 __main__.py:2194
 msgid "Directory (folder) paths / represents \\"
-msgstr "Verzeichnis-(Ordner-)Pfade / repräsentiert \\"
+msgstr "Verzeichnispfade: / steht für \\"
 
 #: __main__.py:1328
 msgid "Select plain text codes file"
-msgstr "Wählen Sie eine Datei mit Klartextcodes"
+msgstr "Wählen Sie eine Textdatei mit Codes"
 
 #: __main__.py:1334
 msgid "Codes list text file not imported"
-msgstr "Textdatei der Codes-Liste nicht importiert"
+msgstr "Codeliste nicht importiert"
 
 #: __main__.py:1337
 msgid "Importing codes from: "
@@ -139,7 +139,7 @@ msgstr "Codes importieren von: "
 
 #: __main__.py:1338
 msgid "Refresh codes trees via menu options for coding, reports"
-msgstr "Aktualisieren von Codebäumen über Menüoptionen für Codierung, Berichte"
+msgstr "Aktualisieren Sie Baumansicht der Codes über die Menüoptionen für Codierung, Berichte"
 
 #: __main__.py:1351
 msgid "Imported code: "
@@ -147,7 +147,7 @@ msgstr "Importierter Code: "
 
 #: __main__.py:1353
 msgid "Duplicate code not imported: "
-msgstr "Duplizierter Code wird nicht importiert: "
+msgstr "Doppelter Code wird nicht importiert: "
 
 #: __main__.py:1422
 msgid "This project contains no text files."
@@ -155,19 +155,19 @@ msgstr "Dieses Projekt enthält keine Textdateien."
 
 #: __main__.py:1423
 msgid "No text files"
-msgstr "Keine Text-Dateien"
+msgstr "Keine Textdateien"
 
 #: __main__.py:1439
 #, fuzzy
 #| msgid "This project contains no files."
 msgid "This project contains no pdf files."
-msgstr "Dieses Projekt enthält keine Dateien."
+msgstr "Dieses Projekt enthält keine PDF-Dateien."
 
 #: __main__.py:1440
 #, fuzzy
 #| msgid "No files"
 msgid "No pdf files"
-msgstr "Keine Dateien"
+msgstr "Keine PDF-Dateien"
 
 #: __main__.py:1454
 msgid "This project contains no image files."
@@ -183,7 +183,7 @@ msgstr "Dieses Projekt enthält keine Audio-/Videodateien."
 
 #: __main__.py:1464
 msgid "No a/v files"
-msgstr "Keine a/v-Dateien"
+msgstr "Keine A/V-Dateien"
 
 #: __main__.py:1467
 msgid "VLC is not installed. Cannot code audio/video files."
@@ -216,7 +216,7 @@ msgstr "REFI-QDA-Importschritte"
 
 #: __main__.py:1557 __main__.py:1573
 msgid "Project creation"
-msgstr "Projekt-Erstellung"
+msgstr "Projekterstellung"
 
 #: __main__.py:1557
 msgid "REFI-QDA Project not successfully created"
@@ -244,7 +244,7 @@ msgstr "Projekt nicht erfolgreich erstellt"
 
 #: __main__.py:1587
 msgid "Are you sure you want to quit?"
-msgstr "Sind Sie sicher, dass Sie aufhören wollen?"
+msgstr "Programm beenden?"
 
 #: __main__.py:1630
 msgid "Enter project name"
@@ -276,7 +276,7 @@ msgstr " erstellt."
 
 #: __main__.py:1736
 msgid "Opening: "
-msgstr "Öffnung: "
+msgstr "Öffne: "
 
 #: __main__.py:1746
 msgid "New Project Created"
@@ -312,7 +312,7 @@ msgstr "Memo für das Projekt "
 
 #: __main__.py:1824
 msgid "Project memo entered."
-msgstr "Projektnotiz eingegeben."
+msgstr "Projektmemo eingegeben."
 
 #: __main__.py:1847 special_functions.py:121
 msgid "Open project directory"
@@ -333,21 +333,20 @@ msgstr "Aktualisierung der Datenbank auf Version"
 
 #: __main__.py:2075
 msgid "Project Opened: "
-msgstr "Projekt eröffnet: "
+msgstr "Projekt geöffnet: "
 
 #: __main__.py:2085
 msgid "Deleting code_text coding to deleted files: "
-msgstr "Code_Textkodierung zu gelöschten Dateien löschen: "
+msgstr "Textcodierungen löschen, die zu gelöschten Dateien gehören: "
 
 #: __main__.py:2092
 msgid "Deleting code_image coding to deleted files: "
-msgstr "Löschen von code_image-Codierung in gelöschten Dateien: "
+msgstr "Bildcodierungen löschen, die zu gelöschten Dateien gehören: "
 
 #: __main__.py:2099
 msgid "Deleting code_av coding to deleted files: "
 msgstr ""
-"Löschen von code_av-Codierung in gelöschten Dateien: Löschen von code_av-"
-"Codierung in gelöschten Dateien: "
+"A/V-Codierungen löschen, die zu gelöschten Dateien gehören: "
 
 #: __main__.py:2128
 msgid "There is already a backup with this name"
@@ -376,11 +375,11 @@ msgstr "Projektpfad: "
 
 #: __main__.py:2158
 msgid "Project date: "
-msgstr "Projekt-Datum: "
+msgstr "Projektdatum: "
 
 #: __main__.py:2162
 msgid "Project memo: "
-msgstr "Projekt-Memo: "
+msgstr "Projektmemo: "
 
 #: __main__.py:2166 manage_files.py:1987
 msgid "Files: "
@@ -409,7 +408,7 @@ msgstr "Zeitschriften: "
 
 #: __main__.py:2199
 msgid "Bad links to files"
-msgstr "Schlechte Links zu Dateien"
+msgstr "Fehlerhafte Links zu Dateien"
 
 #: __main__.py:2232
 #, fuzzy
@@ -435,7 +434,7 @@ msgstr "Neueste Veröffentlichung: "
 
 #: add_attribute.py:47 add_item_name.py:48 move_resize_rectangle.py:46
 msgid "Uncaught exception"
-msgstr "Nicht erfasste Ausnahme"
+msgstr "Unbehandelter Fehler"
 
 #: add_attribute.py:48 add_item_name.py:49 attributes.py:56
 #: case_file_manager.py:64 cases.py:66 code_color_scheme.py:61
@@ -451,11 +450,11 @@ msgstr "Nicht erfasste Ausnahme"
 #: special_functions.py:55 speech_to_text.py:59 text_file_replacement.py:63
 #: view_av.py:86 view_charts.py:59 view_graph.py:70 view_image.py:73
 msgid "Uncaught Exception"
-msgstr "Nicht erfasste Ausnahme"
+msgstr "Unbehandelter Fehler"
 
 #: add_attribute.py:94
 msgid "This attribute name already exists in cases, files or journals."
-msgstr "Dieses Attribut existiert bereits in Fällen, Akten oder Journalen."
+msgstr "Dieser Attributname existiert bereits in Fällen, Dateien oder Journalen."
 
 #: add_attribute.py:95
 msgid "Or is reserved for bibliography attributes:"
@@ -478,7 +477,7 @@ msgstr "Das gibt es schon"
 #: attributes.py:53 code_pdf.py:81 code_text.py:69 report_code_summary.py:61
 #: report_file_summary.py:66
 msgid "Uncaught exception:"
-msgstr "Nicht erfasste Ausnahme: "
+msgstr "Unbehandelter Fehler:"
 
 #: attributes.py:174
 msgid "Attribute added: "
@@ -522,7 +521,7 @@ msgstr "numerisch"
 
 #: attributes.py:243
 msgid "Change to character"
-msgstr "Wechsel zum Zeichen"
+msgstr "Wechsel zum Typ Zeichen"
 
 #: attributes.py:277
 msgid "Attribute renamed from: "
@@ -558,7 +557,7 @@ msgstr "Ja"
 #: text_file_replacement.py:62 view_av.py:83 view_charts.py:56 view_graph.py:67
 #: view_image.py:70
 msgid "Uncaught exception: "
-msgstr "Nicht erfasste Ausnahme: "
+msgstr "Unbehandelter Fehler: "
 
 #: case_file_manager.py:112 code_in_all_files.py:156 code_in_all_files.py:233
 #: helpers.py:232 report_attributes.py:257 report_codes.py:2057
@@ -597,7 +596,7 @@ msgstr "Angezeigte Datei: "
 #: case_file_manager.py:464 cases.py:1121 edit_textfile.py:443
 #: report_sql.py:396
 msgid "Select all"
-msgstr "Wählen Alle"
+msgstr "Alles auswählen"
 
 #: case_file_manager.py:466
 msgid "Mark"
@@ -746,15 +745,15 @@ msgstr "Spalte ausblenden"
 
 #: cases.py:787 manage_files.py:269
 msgid "Hide columns starting with"
-msgstr "Spalten ausblenden, die mit"
+msgstr "Spalten ausblenden, die beginnen mit"
 
 #: cases.py:788 manage_files.py:270
 msgid "Show columns starting with"
-msgstr "Spalten anzeigen, die mit"
+msgstr "Spalten anzeigen, die beginnen mit"
 
 #: cases.py:800 manage_files.py:282
 msgid "Hide columns starting with:"
-msgstr "Hide columns starting with: "
+msgstr "Spalten ausblenden, die beginnen mit: "
 
 #: cases.py:801 manage_files.py:283
 msgid "Hide Columns"
@@ -762,7 +761,7 @@ msgstr "Spalten ausblenden"
 
 #: cases.py:809 manage_files.py:290
 msgid "Show columns starting with:"
-msgstr "Spalten anzeigen, die mit anfangen:"
+msgstr "Spalten anzeigen, die beginnen mit:"
 
 #: cases.py:810 manage_files.py:291
 msgid "Show Columns"
@@ -775,11 +774,11 @@ msgstr "Fall ansehen"
 #: cases.py:838 cases.py:845 manage_files.py:328 manage_files.py:333
 #: manage_files.py:337 manage_files.py:346
 msgid "Order ascending"
-msgstr "Bestellung aufsteigend"
+msgstr "Aufsteigend sortieren"
 
 #: cases.py:839 cases.py:846 manage_files.py:329 manage_files.py:347
 msgid "Order descending"
-msgstr "Bestellung absteigend"
+msgstr "Absteigend sortieren"
 
 #: cases.py:840 journals.py:446 manage_files.py:341
 msgid "Show values like"
@@ -824,7 +823,7 @@ msgstr "Minimum: "
 
 #: cases.py:954 manage_files.py:1972 report_attributes.py:438
 msgid "Maximum: "
-msgstr "Maximal: "
+msgstr "Maximum: "
 
 #: cases.py:977
 msgid "Viewing text of case: "
@@ -843,7 +842,7 @@ msgstr "Datei: "
 #: report_compare_coder_file.py:177 report_file_summary.py:138
 #: report_file_summary.py:434
 msgid "Characters: "
-msgstr "Charaktere:"
+msgstr "Zeichen: "
 
 #: cases.py:1041 report_code_summary.py:406 view_image.py:693
 msgid "Image: "
@@ -863,27 +862,27 @@ msgstr "Rechtsklick zur Ansicht"
 
 #: code_color_scheme.py:85
 msgid "Normal vision"
-msgstr "Normale Sicht"
+msgstr "Normales Sehen"
 
 #: code_color_scheme.py:85
 msgid "Red weak"
-msgstr "Rot schwach"
+msgstr "Rotschwäche"
 
 #: code_color_scheme.py:85
 msgid "Red blind"
-msgstr "Rot blind"
+msgstr "Rotblindheit"
 
 #: code_color_scheme.py:85
 msgid "Green weak"
-msgstr "Grün schwach"
+msgstr "Grünschwäche"
 
 #: code_color_scheme.py:85
 msgid "Green blind"
-msgstr "Grün blind"
+msgstr "Grünblindheit"
 
 #: code_color_scheme.py:182
 msgid "Codes tree"
-msgstr "Codes BaumCodes Baum"
+msgstr "Baumansicht Codes"
 
 #: code_color_scheme.py:182 code_pdf.py:542 code_text.py:568
 #: manage_files.py:812 report_code_summary.py:129 report_relations.py:1024
@@ -893,7 +892,7 @@ msgstr "Id"
 
 #: code_color_scheme.py:318
 msgid "Perspective: "
-msgstr "Perspektive: "
+msgstr "Sehfähigkeit: "
 
 #: code_in_all_files.py:97
 msgid "Coded files: "
@@ -957,7 +956,7 @@ msgstr "QualCoder zeigt PDFs grob an."
 msgid ""
 "Some images will not display and image masks and rotations will not work."
 msgstr ""
-"Einige Bilder werden nicht angezeigt und Bildmasken und Drehungen "
+"Einige Bilder werden nicht korrekt angezeigt, Masken und Drehungen "
 "funktionieren nicht."
 
 #: code_pdf.py:329
@@ -996,7 +995,7 @@ msgstr ""
 #: code_pdf.py:334
 msgid "This means coding stripes will show in incorrect positions."
 msgstr ""
-"Das bedeutet, dass die Kodierstreifen an den falschen Stellen angezeigt "
+"Das bedeutet, dass die Codiermarkierungen an den falschen Stellen angezeigt "
 "werden."
 
 #: code_pdf.py:335
@@ -1005,7 +1004,7 @@ msgid ""
 "affect coding stripes display."
 msgstr ""
 "Auch wenn der PDF-Klartext in irgendeiner Weise bearbeitet wurde, wirkt sich "
-"dies auf die Anzeige der Kodierstreifen aus."
+"dies auf die Anzeige der Codiermarkierungen aus."
 
 #: code_pdf.py:336 code_text.py:2966
 msgid "Information"
@@ -1013,7 +1012,7 @@ msgstr "Informationen"
 
 #: code_pdf.py:377 code_pdf.py:406 code_text.py:407 code_text.py:436
 msgid "Codings: "
-msgstr "Kodierungen: "
+msgstr "Codierungen: "
 
 #: code_pdf.py:378 code_pdf.py:407 code_text.py:408 code_text.py:437
 #: code_text.py:2858 code_text.py:2913
@@ -1040,7 +1039,7 @@ msgstr "Keine passenden Dateien gefunden"
 #: code_pdf.py:542 code_text.py:568 report_code_summary.py:129
 #: report_codes.py:391 report_relations.py:934 view_av.py:514 view_image.py:356
 msgid "Count"
-msgstr "Zählung"
+msgstr "Anzahl"
 
 #: code_pdf.py:859 code_text.py:940
 msgid "Automatic search 3 or more characters"
@@ -1080,16 +1079,16 @@ msgstr "Memo-Codierter Text (M)"
 #, fuzzy
 #| msgid "Change code end positions"
 msgid "Change code position key presses"
-msgstr "Code-Endlagen ändern"
+msgstr "Codierungsende ändern"
 
 #: code_pdf.py:947 code_text.py:1058 view_av.py:2528
 msgid "Add important mark (I)"
-msgstr "Wichtige Markierung hinzufügen (I)"
+msgstr "Markiere als wichtig (I)"
 
 #: code_pdf.py:949 code_text.py:1060 view_av.py:2530 view_av.py:3281
 #: view_image.py:1176
 msgid "Remove important mark"
-msgstr "Wichtige Markierung entfernen"
+msgstr "Wichtig-Markierung entfernen"
 
 #: code_pdf.py:950 code_text.py:1061 view_av.py:2525
 msgid "Change code"
@@ -1126,7 +1125,7 @@ msgstr "Bemerkung bearbeiten"
 
 #: code_pdf.py:981 code_text.py:1096
 msgid "Show control panel (H)"
-msgstr "Kontrollfeld anzeigen (H)"
+msgstr "Bedienfeld anzeigen (H)"
 
 #: code_pdf.py:983 code_text.py:1098
 msgid "Hide control panel (H)"
@@ -1149,12 +1148,12 @@ msgid ""
 "Change start position (extend SHIFT LEFT/ shrink ALT RIGHT)\n"
 "Change end position (extend SHIFT RIGHT/ shrink ALT LEFT)"
 msgstr ""
-"Startposition ändern (SHIFT LINKS verlängern/ ALT RECHTS verkleinern)\n"
-"Endposition ändern (SHIFT RECHTS verlängern/ ALT LINKS verkleinern)"
+"Startposition ändern (SHIFT LINKS erweitern/ ALT RECHTS verkleinern)\n"
+"Endposition ändern (SHIFT RECHTS erweitern/ ALT LINKS verkleinern)"
 
 #: code_pdf.py:1252 code_text.py:1393
 msgid "Use key presses"
-msgstr "Tastendrucke verwenden"
+msgstr "Tasten verwenden"
 
 #: code_pdf.py:1274 code_text.py:1469 view_av.py:1397 view_image.py:893
 msgid "Add new code to category"
@@ -1170,11 +1169,11 @@ msgstr "Kategorie in Kategorie zusammenführen"
 
 #: code_pdf.py:1277 code_text.py:1472 view_av.py:1400 view_image.py:896
 msgid "Add a new code"
-msgstr "Fügen Sie einen neuen Code hinzu"
+msgstr "Neuen Code hinzufügen"
 
 #: code_pdf.py:1278 code_text.py:1473 view_av.py:1401 view_image.py:897
 msgid "Add a new category"
-msgstr "Fügen Sie eine neue Kategorie hinzu"
+msgstr "Neue Kategorie hinzufügen"
 
 #: code_pdf.py:1279 code_text.py:1474 view_av.py:1402 view_image.py:898
 msgid "Rename"
@@ -4287,11 +4286,11 @@ msgstr "Regenbogen"
 
 #: settings.py:121
 msgid "native"
-msgstr "einheimische"
+msgstr "nativ"
 
 #: settings.py:138
 msgid "Bold"
-msgstr "Kühn"
+msgstr "Fett"
 
 #: settings.py:138
 msgid "Italic"

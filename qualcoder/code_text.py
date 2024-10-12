@@ -37,6 +37,7 @@ import re
 import sys
 import traceback
 import webbrowser
+import base64
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import Qt
@@ -56,6 +57,9 @@ from .reports import DialogReportCoderComparisons, DialogReportCodeFrequencies  
 from .report_codes import DialogReportCodes
 from .report_code_summary import DialogReportCodeSummary  # for isinstance()
 from .select_items import DialogSelectItems  # for isinstance()
+from .ai_search_dialog import DialogAiSearch
+
+ai_search_analysis_max_count = 10 # how many chunks of data are analysed in the second stage
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -114,11 +118,24 @@ class DialogCodeText(QtWidgets.QWidget):
     edit_mode = False
     edit_pos = 0
     no_codes_annotes_cases = None
+    edit_mode_has_changed = False
 
     # Variables associated with right-hand side splitter, for project memo, code rule
     project_memo = False
     code_rule = False
-
+    
+    # variables for ai search
+    ai_search_results = []
+    ai_search_code_name = ''
+    ai_search_code_memo = ''
+    ai_search_file_ids = []
+    ai_search_code_ids = []
+    ai_search_similar_chunk_list = []
+    ai_search_chunks_pos = 0
+    ai_search_running = False
+    ai_search_current_result_index = None
+    
+    
     def __init__(self, app, parent_textedit, tab_reports):
 
         super(DialogCodeText, self).__init__()
@@ -183,6 +200,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.lineEdit_search.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.lineEdit_search.customContextMenuRequested.connect(self.lineedit_search_menu)
         self.ui.lineEdit_search.returnPressed.connect(self.search_for_text)
+        self.ui.tabWidget.setCurrentIndex(0) # defaults to list of documents
         self.get_files()
 
         # Icons marked icon_24 icons are 24x24 px but need a button of 28
@@ -339,13 +357,31 @@ class DialogCodeText(QtWidgets.QWidget):
             v1 = int(self.app.settings['dialogcodetext_splitter_v1'])
             if v0 > 5 and v1 > 5:
                 # 30s are for the groupboxes containing buttons
-                self.ui.leftsplitter.setSizes([v1, 30, v0, 30])
+                self.ui.leftsplitter.setSizes([v1, v0, 30])
         except KeyError:
             pass
         self.ui.splitter.splitterMoved.connect(self.update_sizes)
         self.ui.leftsplitter.splitterMoved.connect(self.update_sizes)
         self.fill_tree()
+        
+        # AI search
+        self.ui.pushButton_ai_search.pressed.connect(self.ai_search_clicked)
+        self.ui.listWidget_ai.selectionModel().selectionChanged.connect(self.ai_search_selection_changed)
+        self.ai_search_listview_action_label = None
+        self.ui.listWidget_ai.clicked.connect(self.ai_search_list_clicked)
+        
+        self.ui.ai_progressBar.setVisible(False)
+        self.ui.ai_progressBar.setStyleSheet(f"""
+            QProgressBar::chunk {{
+                background-color: {self.app.highlight_color()};
+            }}
+        """)
+        self.ai_search_spinner_sequence = ['', '.', '..', '...']
+        self.ai_search_spinner_index = 0
+        self.ai_search_spinner_timer = QtCore.QTimer(self)
+        self.ai_search_spinner_timer.timeout.connect(self.ai_search_update_spinner)
 
+        
     @staticmethod
     def help():
         """ Open help for transcribe section in browser. """
@@ -3332,6 +3368,7 @@ class DialogCodeText(QtWidgets.QWidget):
         pos1 = self.ui.textEdit.textCursor().selectionEnd() + self.file_['start']
         if pos0 == pos1:
             return
+
         # Add the coded section to code text, add to database and update GUI
         coded = {'cid': cid, 'fid': int(self.file_['id']), 'seltext': selected_text,
                  'pos0': pos0, 'pos1': pos1, 'owner': self.app.settings['codername'], 'memo': "",
@@ -3355,6 +3392,33 @@ class DialogCodeText(QtWidgets.QWidget):
                                                                coded['memo'], coded['date'], coded['important']))
         self.app.conn.commit()
         self.app.delete_backup = False
+
+        # Add AI interpretation?
+        if self.ui.tabWidget.currentIndex() == 1: # ai search
+            ai_search_result = self.get_overlapping_ai_search_result()
+            if ai_search_result is not None:
+                memo = _("AI interpretation: ") + ai_search_result["interpretation"]
+                memo += _("\n\nAI search prompt: ") + self.ai_search_prompt.name_and_scope()
+                memo += _("\nAI model: ") + self.ai_search_ai_model
+
+                msg = '<p style="font-size: ' + str(self.app.settings['fontsize']) + 'pt">'
+                msg += _("Do you want to store the AI interpretation in a memo together with the coding?<br/><br/>")
+                msg += '<i>' + memo.replace('\n', '<br/>') + '</i></p>'
+                reply = QtWidgets.QMessageBox.question(
+                    self, 'AI Interpretation', msg,
+                    QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No,
+                    QtWidgets.QMessageBox.StandardButton.Yes
+                )
+                if reply == QtWidgets.QMessageBox.StandardButton.Yes:
+                    # Dictionary with cid fid seltext owner date name color memo
+                    cur = self.app.conn.cursor()
+                    cur.execute("update code_text set memo=? where cid=? and fid=? and seltext=? and pos0=? and pos1=? and owner=?",
+                                (memo, coded['cid'], coded['fid'], coded['seltext'], coded['pos0'],
+                                coded['pos1'],
+                                coded['owner']))
+                    self.app.conn.commit()
+                    self.code_text[len(self.code_text) - 1]['memo'] = memo
+
         # Update filter for tooltip and update code colours
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
@@ -3882,8 +3946,9 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.groupBox.hide()
         self.ui.groupBox_edit_mode.show()
         self.ui.listWidget.setEnabled(False)
-        self.ui.listWidget.hide()
-        self.ui.treeWidget.hide()
+        self.ui.leftsplitter.hide()
+        #self.ui.listWidget.hide()
+        #self.ui.treeWidget.hide()
         self.ui.groupBox_file_buttons.setEnabled(False)
         self.ui.groupBox_file_buttons.setMaximumSize(4000, 4000)
         self.ui.groupBox_coding_buttons.setEnabled(False)
@@ -3899,6 +3964,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.get_cases_codings_annotations()
         self.ui.textEdit.setReadOnly(False)
         self.ed_highlight()
+        self.edit_mode_has_changed = False
         self.ui.textEdit.textChanged.connect(self.update_positions)
         text_cursor = self.ui.textEdit.textCursor()
         if self.edit_pos >= len(self.text):
@@ -3918,22 +3984,31 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.groupBox_file_buttons.setMaximumSize(4000, 30)
         self.ui.groupBox_coding_buttons.setEnabled(True)
         self.ui.treeWidget.setEnabled(True)
-        self.ui.listWidget.show()
-        self.ui.treeWidget.show()
+        # self.ui.listWidget.show()
+        # self.ui.treeWidget.show()
+        self.ui.leftsplitter.show()
         self.prev_text = ""
-        self.text = self.ui.textEdit.toPlainText()
-        self.file_['fulltext'] = self.text
-        self.file_['end'] = len(self.text)
-        cur = self.app.conn.cursor()
-        cur.execute("update source set fulltext=? where id=?", (self.text, self.file_['id']))
-        self.app.conn.commit()
-        for item in self.code_deletions:
-            cur.execute(item)
-        self.app.conn.commit()
-        self.code_deletions = []
-        self.ed_update_codings()
-        self.ed_update_annotations()
-        self.ed_update_casetext()
+        if self.edit_mode_has_changed:
+            self.text = self.ui.textEdit.toPlainText()
+            self.file_['fulltext'] = self.text
+            self.file_['end'] = len(self.text)
+            cur = self.app.conn.cursor()
+            cur.execute("update source set fulltext=? where id=?", (self.text, self.file_['id']))
+            self.app.conn.commit()
+            for item in self.code_deletions:
+                cur.execute(item)
+            self.app.conn.commit()
+            self.code_deletions = []
+            self.ed_update_codings()
+            self.ed_update_annotations()
+            self.ed_update_casetext()
+            # update vectorstore
+            if self.app.settings['ai_enable'] == 'True':
+                self.app.ai.sources_vectorstore.import_document(self.file_['id'], self.file_['name'], self.text, update=True)
+            else:
+                # AI is disabled. Delete the file from the vectorstore. It will be reimported later when the AI is enabled again. 
+                self.app.ai.sources_vectorstore.delete_document(self.file_['id'])
+
         self.ui.textEdit.setReadOnly(True)
         self.ui.textEdit.installEventFilter(self.eventFilterTT)
         self.annotations = self.app.get_annotations()
@@ -3958,6 +4033,8 @@ class DialogCodeText(QtWidgets.QWidget):
 
         +e
         """
+        
+        self.edit_mode_has_changed = True
 
         # No need to update positions (unless entire file is a case)
         if self.no_codes_annotes_cases or not self.edit_mode:
@@ -4221,8 +4298,361 @@ class DialogCodeText(QtWidgets.QWidget):
             if c['npos1'] >= len(self.text):
                 cur.execute("delete from code_text where ctid=?", [c['ctid']])
         self.app.conn.commit()
+        
+    # AI functions
+        
+    def ai_search_clicked(self):
+        """pushButton_ai_search clicked"""
+        if self.edit_mode:
+            msg = _('Please finish editing the text before starting an AI search.')
+            Message(self.app, _('AI Search'), msg, "warning").exec()
+            return                       
+        if self.app.ai.get_status() == 'disabled':
+            msg = _('The AI is disabled. Go to "AI > Setup Wizard" first.')
+            Message(self.app, _('AI Search'), msg, "warning").exec()
+            return           
+        if self.ai_search_running:
+            msg = _('The AI is already performing a search. Please stop it before starting a new one.')
+            Message(self.app, _('AI Search'), msg, "warning").exec()
+            return
+        
+        if not self.app.ai.is_ready():
+            msg = _('The AI is busy, please wait a moment and retry.')
+            Message(self.app, _('AI Search'), msg, "warning").exec()
+            return
 
+        # Get currently selected item in code tree
+        code_item = self.ui.treeWidget.currentItem()
+        if code_item is None: # nothing selected
+            selected_id = -1
+            selected_is_code = False
+        elif code_item.text(1)[0:3] == 'cat': # category selected
+            selected_id = int(code_item.text(1).split(':')[1])
+            selected_is_code = False
+        else: # code selected
+            selected_id = int(code_item.text(1).split(':')[1])
+            selected_is_code = True           
+        
+        ui = DialogAiSearch(self.app, 'search', selected_id, selected_is_code)
+        ret = ui.exec()
+        if ret == QtWidgets.QDialog.DialogCode.Accepted:
+            self.ai_search_code_name = ui.selected_code_name
+            self.ai_search_code_memo = ui.selected_code_memo
+            self.ai_include_coded_segments = ui.include_coded_segments
+            self.ai_search_file_ids = ui.selected_file_ids
+            self.ai_search_code_ids = ui.selected_code_ids
+            self.ai_search_similar_chunk_list = []
+            self.ai_search_chunks_pos = 0
+            self.ai_search_results = []
+            self.ai_search_prompt = ui.current_prompt
+            self.ai_search_ai_model = self.app.ai_models[int(self.app.settings['ai_model_index'])]['name']
+            
+            # Prepare the UI
+            self.ai_search_running = True
+            self.ui.pushButton_ai_search.setText(self.ai_search_code_name)
+            self.ui.pushButton_ai_search.setStyleSheet('text-align: left')
+            self.ui.listWidget_ai.clear()
+            self.ai_search_current_result_index = None
+            self.ai_search_spinner_timer.start(500)
+            self.ui.textEdit.setText(_('Searching for related data, please wait...'))
+    
+            # Phase 1: find similar chunks of data from the vectorstore
+            self.app.ai.ai_async_is_canceled = False
+            self.ai_search_chunks_pos = 0
+            self.app.ai.retrieve_similar_data(self.ai_search_prepare_analysis,  
+                                            self.ai_search_code_name, self.ai_search_code_memo,
+                                            self.ai_search_file_ids)
+    
+    def ai_search_prepare_analysis(self, chunks):
+        # Prepare the second step of the search
+        if self.app.ai.ai_async_is_canceled:
+            self.ai_search_running = False
+            self.ui.textEdit.setText('')
+            return
+        if chunks is None or len(chunks) == 0:
+            self.ui.textEdit.setText('')
+            msg = _('AI: Sorry, no related data found for "') + self.ai_search_code_name + '".'
+            Message(self.app, _('AI Search'), msg, "warning").exec()
+            self.ai_search_running = False
+            return
 
+        # 1) Check if we search for data related to a code (instead of freetext) and filter out 
+        # chunks that are already coded with this code. This way, we find new data only.  
+        if (not self.ai_include_coded_segments) and self.ai_search_code_ids is not None and len(self.ai_search_code_ids) > 0:
+            filtered_chunks = []
+            for chunk in chunks:
+                chunk_already_coded = False
+                chunk_source_id = chunk.metadata['id']
+                chunk_start = chunk.metadata['start_index']
+                chunk_end = chunk_start + len(chunk.page_content)
+                code_ids_str = "(" + ", ".join(map(str, self.ai_search_code_ids)) + ")"
+                codings_sql = f'select pos0, pos1 from code_text where fid={chunk_source_id} AND cid in {code_ids_str}'
+                cur = self.app.conn.cursor()
+                cur.execute(codings_sql)
+                codings = cur.fetchall()
+                for row in codings:
+                    # Calculate the overlap by finding the maximum start position and the minimum end position
+                    coding_start = int(row[0])
+                    coding_end = int(row[1])
+                    overlap_start = max(chunk_start, coding_start)
+                    overlap_end = min(chunk_end, coding_end)                 
+                    if overlap_start < overlap_end:
+                        # found an overlap. If it is more then 10% of the coding, skip this chunk
+                        overlap_len = overlap_end - overlap_start
+                        coding_len = coding_end - coding_start
+                        if overlap_len > 0.1 * coding_len:
+                            chunk_already_coded = True
+                            break
+                if not chunk_already_coded:
+                    filtered_chunks.append(chunk)
+            # finally: replace the chunks list with the filtered one
+            chunks = filtered_chunks        
+
+        if len(chunks) == 0:
+            self.ui.textEdit.setText('')
+            msg = _('AI: Sorry, no new data found for "') + self.ai_search_code_name + _('" beside what has already been coded with this code.')
+            Message(self.app, _('AI Search'), msg, "warning").exec()
+            self.ai_search_running = False
+            return
+        
+        self.ui.textEdit.setText(_('Potentially related data found, inspecting it closer. Please be patient...'))
+        
+        # 2) Send the first "ai_search_analysis_max_count" chunks to the llm for further analysis 
+        self.ai_search_similar_chunk_list = chunks # save to allow analyzing more chunks later
+        self.ai_search_chunks_pos = 0 # position of the next chunk to be analyzed
+        self.ai_search_analysis_counter = 0 # conter to stop analyzing after ai_search_analysis_max_count 
+        self.ai_search_found = False # Becomes True if any new data has been found
+        self.ai_search_analyze_next_chunk()
+        
+    def ai_search_analyze_next_chunk(self):
+        if self.ai_search_chunks_pos < len(self.ai_search_similar_chunk_list):
+            # still chunks left for analysis            
+            if self.ai_search_analysis_counter < ai_search_analysis_max_count:
+            # ai_search_analysis_max_count not reached          
+                self.ai_search_running = True
+                self.app.ai.search_analyze_chunk(self.ai_search_analyze_next_chunk_callback,
+                                                 self.ai_search_similar_chunk_list[self.ai_search_chunks_pos],
+                                                 self.ai_search_code_name, 
+                                                 self.ai_search_code_memo,
+                                                 self.ai_search_prompt)
+            else: # ai_search_analysis_max_count reached 
+                self.ai_search_running = False
+                if len(self.ai_search_results) == 0: # nothing found
+                    self.ai_search_update_listview_action()
+                    self.ui.textEdit.setText('')
+                    msg = _('The closer inspection of the first ') + str(self.ai_search_chunks_pos) + \
+                        _( 'pieces of data yielded no results. You can continue to inspect more by clicking on "find more" in the list on the left.')
+                    Message(self.app, _('AI Search'), msg, "warning").exec()
+        else: # search finished
+            self.ai_search_running = False
+            if len(self.ai_search_results) == 0: # nothing found
+                self.ui.textEdit.setText('')
+                self.ai_search_update_listview_action()
+                msg = _('Upon closer inspection, no pieces of data relevant to your search query could be identified. Please start a new search.')
+                Message(self.app, _('AI Search'), msg, "warning").exec()
+
+        self.ai_search_update_listview_action()
+
+    def ai_search_analyze_next_chunk_callback(self, doc):
+        if not self.ai_search_running: # search has been cancelled
+            return
+        if doc is not None:
+            self.ai_search_results.append(doc)
+            item_text = f'{doc["metadata"]["name"]}: '
+            item_text += '"' + str(doc['quote']).replace('\n', ' ') + '"'
+            item = QtWidgets.QListWidgetItem(item_text)
+            item_tooltip = '<p>' + _('Quote: ') + f'<i>"{doc["quote"]}"</i></p>'
+            item_tooltip += '<p>' + _('AI interpretation: ') + doc["interpretation"] + '</p>'
+            item.setToolTip(item_tooltip)
+            self.ui.listWidget_ai.insertItem(len(self.ai_search_results) - 1, item)
+            if not self.ai_search_found: # first item found
+                self.ai_search_found = True
+                item.setSelected(True)
+                self.ai_search_selection_changed()
+        
+        # analyze next
+        self.ai_search_chunks_pos += 1
+        self.ai_search_analysis_counter += 1
+        if not self.app.ai.ai_async_is_canceled:
+            self.ai_search_analyze_next_chunk()
+        else: 
+            self.ai_search_running = False
+
+    def ai_search_update_listview_action(self):
+        """Adding a special item to the end of the list view that can be clicked for special actions:
+        - Find more: Shown if there are still chunks of empirical data left from stage 1 to be analyzed in stage 2 
+        - Stop search: Shown if a search is actually running in the background
+        - (search finised): Shown if all results from stage 1 have also been analyzed  
+        """
+        # add action item to the list if necessary
+        if self.ui.listWidget_ai.count() <= len(self.ai_search_results):
+            self.ui.listWidget_ai.addItem('')
+            self.ai_search_listview_action_label = None
+        action_item = self.ui.listWidget_ai.item(self.ui.listWidget_ai.count() -1)
+        if self.ai_search_listview_action_label is None:
+            self.ai_search_listview_action_label = QtWidgets.QLabel('')
+            self.ai_search_listview_action_label.setStyleSheet(f'QLabel {{color: {self.app.highlight_color()}; text-decoration: underline; margin-left: 2px; }}')
+            self.ui.listWidget_ai.setItemWidget(action_item, self.ai_search_listview_action_label)
+        
+        if self.ai_search_running: 
+            # stop search
+            action_item.setText('')
+            self.ai_search_listview_action_label.setText(_('>> Searching (click here to cancel)') + \
+                self.ai_search_spinner_sequence[self.ai_search_spinner_index])
+            self.ai_search_listview_action_label.setToolTip(_('Click here to stop the search'))
+            self.ai_search_listview_action_label.setVisible(True)
+        elif self.ai_search_chunks_pos < len(self.ai_search_similar_chunk_list): 
+            # find more
+            action_item.setText('')
+            self.ai_search_listview_action_label.setText(_('>> Find more...'))
+            self.ai_search_listview_action_label.setToolTip(_('Click here to analyze more data'))
+            self.ai_search_listview_action_label.setVisible(True)
+        else: 
+            # search finished
+            self.ai_search_listview_action_label.setText('')
+            self.ai_search_listview_action_label.setToolTip('')
+            self.ai_search_listview_action_label.setVisible(False)
+            if self.app.ai.ai_async_is_errored:
+                action_item.setText('(search aborted due to an error)')
+            else:    
+                action_item.setText('(search finished)')
+
+    def ai_search_list_clicked(self):
+        row = self.ui.listWidget_ai.currentRow()
+        if row < len(self.ai_search_results): # clicked on a search result
+            self.ai_search_selection_changed()    
+        else: # clicked on "stop search" or "find more"
+            selection_model = self.ui.listWidget_ai.selectionModel()
+            selection_model.blockSignals(True) # stop selection_change from beeing issued
+            if self.ai_search_running: # stop search
+                msg = _('Do you want to stop the search?')
+                msg_box = Message(self.app, _("Open file"), msg, "information")
+                msg_box.setStandardButtons(
+                    QtWidgets.QMessageBox.StandardButton.Ok | QtWidgets.QMessageBox.StandardButton.Abort)
+                msg_box.setDefaultButton(QtWidgets.QMessageBox.StandardButton.Ok)
+                ret = msg_box.exec()
+                if ret == QtWidgets.QMessageBox.StandardButton.Ok:
+                    self.app.ai.ai_async_is_canceled = True
+                    self.ai_search_running = False
+                    self.ai_search_update_listview_action()
+            else: # 'find more' item or "finished search"
+                if self.ai_search_chunks_pos >= len(self.ai_search_similar_chunk_list):
+                    msg = _('There are no more pieces of data to analyze for this search. Please start a new search.')
+                    Message(self.app, _('AI Search'), msg, "warning").exec()
+                elif self.ai_search_running or (not self.app.ai.is_ready()):
+                    msg = _('The AI is busy. Please wait a moment and retry.')
+                    Message(self.app, _('AI Search'), msg, "warning").exec()
+                else:              
+                    self.ai_search_analysis_counter = 0 # counter to stop analyzing after ai_search_analysis_max_count 
+                    self.ai_search_running = True
+                    self.ai_search_spinner_timer.start()
+                    self.ai_search_analyze_next_chunk()
+            # reselect the item that was active before:
+            if self.ai_search_current_result_index is not None:
+                self.ui.listWidget_ai.setCurrentRow(self.ai_search_current_result_index)
+            else:
+                self.ui.listWidget_ai.clearSelection()
+            selection_model.blockSignals(False)
+        
+    def ai_search_selection_changed(self):
+        """Load the document in the textView and select the quote."""
+        if self.ai_search_results is None or len(self.ai_search_results) == 0:
+            return
+        
+        if len(self.ui.listWidget_ai.selectedIndexes()) > 0:
+            row = self.ui.listWidget_ai.selectedIndexes()[0].row()
+        else:
+            self.ai_search_current_result_index = None
+            return
+        
+        if row == len(self.ai_search_results):
+            # out of bounds, must be the action item
+            return
+        
+        self.ai_search_current_result_index = row
+        doc = self.ai_search_results[self.ai_search_current_result_index]
+        id = doc['metadata']['id']
+        quote_start = doc['quote_start']
+        quote_end = quote_start + len(doc['quote'])
+        self.open_doc_selection(id, quote_start, quote_end)
+        
+    def open_doc_selection(self, doc_id, sel_start, sel_end):
+        # open doc and select a certain part
+        for i, f in enumerate(self.filenames):
+            if f['id'] == doc_id:
+                f['start'] = 0
+                if f['end'] != f['characters']: # partially loaded
+                    msg = _("Entire text file will be loaded")
+                    Message(self.app, _('Information'), msg).exec()
+                f['end'] = f['characters']
+                try:
+                    self.ui.listWidget.setCurrentRow(i)
+                    self.load_file(f)
+                    # Set text cursor position
+                    text_cursor = self.ui.textEdit.textCursor()
+                    text_cursor.setPosition(sel_start)
+                    endpos = sel_end
+                    if endpos < 0:
+                        endpos = 0
+                    text_cursor.setPosition(endpos, QtGui.QTextCursor.MoveMode.KeepAnchor)
+                    self.ui.textEdit.setTextCursor(text_cursor)
+                    self.ui.textEdit.verticalScrollBar().setValue(self.ui.textEdit.verticalScrollBar().value() + 200)
+                    self.ui.textEdit.setFocus()
+                except Exception as e:
+                    logger.debug(str(e))
+                break
+    
+    def ai_search_update_spinner(self):
+        if (self.app.ai.ai_async_is_finished or self.app.ai.ai_async_is_errored or self.app.ai.ai_async_is_canceled):
+            self.ai_search_running = False
+        if self.ai_search_running:
+            self.ui.ai_progressBar.setVisible(True)
+            self.ai_search_spinner_index = (self.ai_search_spinner_index + 1) % len(self.ai_search_spinner_sequence)
+            self.ai_search_update_listview_action()
+        else:
+            self.ui.ai_progressBar.setVisible(False)
+            self.ai_search_spinner_timer.stop()
+            self.ai_search_update_listview_action()
+            
+    def get_overlapping_ai_search_result(self):
+        """
+        Retrieves the single document from self.ai_search_results that has the longest overlap 
+        with the text selection defined in the text editor within the UI.
+
+        Returns:
+            best_doc (dict or None): The document with the longest overlap if overlapping documents 
+                exist; otherwise, None.
+        """
+        if self.ui.tabWidget.currentIndex() != 1: # not in ai search mode
+            return
+        
+        # Get the adjusted start and end positions from the text editor's current selection
+        pos0 = self.ui.textEdit.textCursor().selectionStart() + self.file_['start']
+        pos1 = self.ui.textEdit.textCursor().selectionEnd() + self.file_['start']
+        if pos0 == pos1:
+            return
+        
+        best_doc = None
+        max_overlap_length = 0 
+
+        for doc in self.ai_search_results:
+            quote_start = doc['quote_start']
+            quote_end = quote_start + len(doc['quote'])
+            
+            # Check for any intersection between the quote interval and the selection interval
+            if quote_start <= pos1 and quote_end >= pos0:
+                # Calculate the overlap length
+                overlap_start = max(quote_start, pos0)
+                overlap_end = min(quote_end, pos1)
+                overlap_length = overlap_end - overlap_start
+
+                # Update the best_doc if this document has a longer overlap
+                if overlap_length > max_overlap_length:
+                    max_overlap_length = overlap_length
+                    best_doc = doc
+
+        return best_doc
+        
 class ToolTipEventFilter(QtCore.QObject):
     """ Used to add a dynamic tooltip for the textEdit.
     The tool top text is changed according to its position in the text.

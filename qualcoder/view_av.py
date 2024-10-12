@@ -1012,7 +1012,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.file_['av_text_id'] = tr_id
             cur.execute("update source set av_text_id=? where id=?", [tr_id, self.file_['id']])
             self.app.conn.commit()
-            cur.execute("select id, fulltext from source where id=?", [tr_id])
+            cur.execute("select id, fulltext, name from source where id=?", [tr_id])
             self.transcription = cur.fetchone()
             '''print("transcription", self.transcription)
             if self.transcription is None:
@@ -3742,7 +3742,7 @@ class DialogViewAV(QtWidgets.QDialog):
         self.transcription = None
         cur = self.app.conn.cursor()
         if self.file_['av_text_id'] is not None:
-            cur.execute("select id, fulltext from source where id=?", [file_['av_text_id']])
+            cur.execute("select id, fulltext, name from source where id=?", [file_['av_text_id']])
             self.transcription = cur.fetchone()
         if self.transcription is not None:
             self.ui.textEdit.setText(self.transcription[1])
@@ -3777,7 +3777,7 @@ class DialogViewAV(QtWidgets.QDialog):
                     self.app.conn.conmmit()
                 except Exception as e_:
                     print(e_)
-            cur.execute("select id, fulltext from source where id=?", [tr_id])
+            cur.execute("select id, fulltext, name from source where id=?", [tr_id])
             self.transcription = cur.fetchone()
         self.get_cases_codings_annotations()
         self.text = self.transcription[1]
@@ -4543,6 +4543,10 @@ class DialogViewAV(QtWidgets.QDialog):
                 date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 cur.execute("update source set fulltext=?, date=? where id=?", [txt, date, self.transcription[0]])
                 self.app.conn.commit()
+                # update transcript in vectorstore
+                if self.app.settings['ai_enable'] == 'True': 
+                    name = self.transcription[2]
+                    self.app.ai.sources_vectorstore.import_document(self.transcription[0], name, txt, update=True)
         self.app.delete_backup = False
 
     def update_sizes(self):
