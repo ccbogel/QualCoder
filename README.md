@@ -74,7 +74,7 @@ py -m pip install --upgrade pip
 Type the following to install the required modules:
 
 ```bash
-py -m pip install chardet diff-match-patch ebooklib openpyxl pyqt6 Pillow ply pdfminer.six pandas plotly pydub python-vlc rispy SpeechRecognition wheel
+py -r requirements.txt
 ```
 
  Wait, until all modules are installed.
