@@ -8,11 +8,17 @@ Text files can be typed in manually or loaded from txt, odt, docx, html, htm, md
 This software has been used on MacOS and various Linux distros.
 Instructions and other information are available here: https://qualcoder.wordpress.com/ and on the [Github Wiki](https://github.com/ccbogel/QualCoder/wiki).
 
-It is best to download the Current Release from the Releases page, see the Releases link in the right-hand column on this page.
+It is best to download the Current Release from the Releases page: https://github.com/ccbogel/QualCoder/releases
 
 If you like QualCoder please buy me a coffee ...
 
 <a href="https://www.buymeacoffee.com/ccbogelB" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
+
+
+## Note 13 October 2024
+
+<p style="color:red">With the work of Dr.Dröge The artifciial intelligence branch has been incorporated into the main QualCoder branch, 13th October 2024.
+There may be some issues with the installation and running of QualCoder3.6 version  over then next days or weeks. Pleae use the recent release (3.5 version) from the above link to the Releases page if you are running into difficulties with this latest update.</p>
 
 
 ## INSTALLATION 
