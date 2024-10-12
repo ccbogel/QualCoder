@@ -74,7 +74,7 @@ py -m pip install --upgrade pip
 Type the following to install the required modules:
 
 ```bash
-py -r requirements.txt
+py install -r requirements.txt
 ```
 
  Wait, until all modules are installed.
