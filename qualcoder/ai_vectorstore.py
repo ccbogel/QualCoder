@@ -36,6 +36,7 @@ from langchain_text_splitters.character import RecursiveCharacterTextSplitter
 from langchain_chroma.vectorstores import Chroma
 from langchain_core.documents.base import Document
 from huggingface_hub import hf_hub_url
+from chromadb.config import Settings
 import requests
 from typing import (Any, Iterable, Optional, List)
 import logging
@@ -275,10 +276,16 @@ want to continue?\
             if self.app.ai_embedding_function is None:
                 self.app.ai_embedding_function = E5SentenceTransformerEmbeddings(model_name=self.model_folder)
             collection_metadata = {"hnsw:space": "l2"} # {"hnsw:space": "cosine"} -> defines the distance function, cosine vs. Squared L2 (default). In my limited tests, l2 gives slightly better results, although cosine is usually recommended 
-            self.chroma_db = Chroma(embedding_function=self.app.ai_embedding_function, 
-                                    persist_directory=db_path,
+            chroma_client_settings = Settings(
+                                        is_persistent=True,
+                                        persist_directory=db_path,
+                                        anonymized_telemetry=False
+                                     )
+            self.chroma_db = Chroma(client_settings=chroma_client_settings, 
+                                    embedding_function=self.app.ai_embedding_function,
                                     collection_name=self.collection_name,
-                                    collection_metadata=collection_metadata)
+                                    collection_metadata=collection_metadata
+                             )
         else:
             self.chroma_db = None
             logger.debug(f'Project path "{self.app.project_path}" not found.')
