@@ -17,7 +17,7 @@ If you like QualCoder please buy me a coffee ...
 
 ## Update 13 October 2024 branch merge
 
-**With the work of Dr.Dröge The artifciial intelligence branch has been incorporated into the main QualCoder branch, 13th October 2024.
+**With the work of Dr Dröge The artifcial intelligence branch has been incorporated into the main QualCoder branch, 13th October 2024.
 There may be some issues with the installation and running of QualCoder3.6 version  over then next days or weeks. Pleae use the recent release (3.5 version) from the above link to the Releases page if you are running into difficulties with this latest update.**
 
 
