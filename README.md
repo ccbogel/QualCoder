@@ -150,7 +150,7 @@ Note: To exit venv type `deactivate`
 
 6. Install the needed Python modules.
 
-`pip install chardet diff-match-patch ebooklib ply openpyxl pandas pdfminer pyqt6 pillow pdfminer.six plotly pydub python-vlc rispy six SpeechRecognition`
+`py -m pip install -r requirements.txt`
 
 7. You must be in the QualCoder-master folder (Or the main release folder if using a release. e.g. QualCoder-3.5 folder). Install QualCoder, and type the following, the dot is important:
 
@@ -179,7 +179,7 @@ It has not been tested, but please see the above instructions to build QualCoder
 
 2. Install additional python modules
 
-`sudo python3 -m pip install diff-match-patch ebooklib plotly pydub python-vlc rispy SpeechRecognition`
+`sudo py -m pip install -r requirements.txt`
 
 If successful, all requirements are satisfied.
 
@@ -240,7 +240,7 @@ python3 get-pip.py
 5) Install Python dependency modules using `pip`:
 
 ```sh
-pip3 install chardet diff-match-patch ebooklib openpyxl pandas pillow ply pdfminer.six plotly pydub pyqt6 python-vlc rispy six SpeechRecognition
+pip3 install -r requirements.txt
 ```
 
 Be sure that you are in the QualCoder-Master directory before doing Step 6.
