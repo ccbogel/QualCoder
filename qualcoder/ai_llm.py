@@ -39,7 +39,6 @@ from .ai_prompts import PromptItem
 from langchain_openai import ChatOpenAI
 from langchain_core.globals import set_llm_cache
 from langchain_community.cache import InMemoryCache
-from langchain.pydantic_v1 import BaseModel, Field
 from langchain_core.callbacks.base import BaseCallbackHandler
 from langchain_core.runnables.config import RunnableConfig
 from langchain_core.messages.human import HumanMessage
