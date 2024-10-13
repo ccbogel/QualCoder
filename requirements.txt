@@ -17,7 +17,7 @@ SpeechRecognition
 langchain 
 langchain-community 
 langchain-core 
-langchain-chroma>=0.12 
+langchain-chroma>=0.1.2 
 langchain-openai 
 langchain-text-splitters 
 chromadb==0.5.0
