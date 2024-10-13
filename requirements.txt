@@ -23,6 +23,5 @@ langchain-text-splitters
 chromadb>0.4.0 
 sentence-transformers 
 fuzzysearch 
-pydantic 
 PyYAML 
 json_repair
