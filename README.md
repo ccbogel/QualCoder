@@ -150,7 +150,7 @@ Note: To exit venv type `deactivate`
 
 6. Install the needed Python modules.
 
-`py -m pip install -r requirements.txt`
+`pip install -r requirements.txt`
 
 7. You must be in the QualCoder-master folder (Or the main release folder if using a release. e.g. QualCoder-3.5 folder). Install QualCoder, and type the following, the dot is important:
 
@@ -205,8 +205,8 @@ Retrieve the current package code from this repository
 2. Navigate to your preferred code directory.
 3. There, run: `git clone https://github.com/ccbogel/QualCoder.git` and
 4. enter the directory with `cd QualCoder`
-5. Make `install_fedora.sh` executable (`chmod +x install_fedora.sh`) and
-6. run the `./install_fedora.sh` script from the terminal. The script is for Python version 3.11.
+5. Make `install_fedora.sh` executable (`chmod +x install_fedora.sh`)  ! Note 13 Oct 2024: The shell script needs updating for the additonal AI modules!
+6. Finally, run the `./install_fedora.sh` script from the terminal. The script is for Python version 3.11.
 
 Then start QualCoder as any other app on your system.
 
