@@ -135,8 +135,6 @@ lock_timeout = 30.0  # in seconds. If a project lockfile is older (= has receive
 # it is assumed that the host process has died and the project is opened anyways
 lock_heartbeat_interval = 5  # in seconds.
 
-splash = None # the splash screen on startup
-
 class ProjectLockHeartbeatWorker(QtCore.QObject):
     """
     This worker thread is invoked on opening a project and will write a regular heartbeat (timestamp) 
@@ -1159,9 +1157,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.app.ai = AiLLM(self.app, self.ui.textEdit)
         # First start? Ask if user wants to enable ai integration or not
         if self.app.settings['ai_first_startup'] == 'True' and self.app.settings['ai_enable'] == 'False':
-            global splash
-            if splash is not None:
-                splash.finish(None) # close splash screen
             msg = _('Welcome\n\n\
 The new AI enhanced functions in QualCoder need some additional setup. \
 Do you want to enable the AI and start the setup? \
@@ -2843,102 +2838,89 @@ Click "Yes" to start now.')
 
 
 def gui():
-    app = QtWidgets.QApplication(sys.argv)
-    
-    # Show splash screen during loading
-    pixmap = QtGui.QPixmap()
-    pixmap.loadFromData(QtCore.QByteArray.fromBase64(qualcoder), "png")
-    global splash
-    splash = QtWidgets.QSplashScreen(pixmap, QtCore.Qt.WindowType.WindowStaysOnTopHint)
-    # splash.showMessage("Loading...", QtCore.Qt.AlignmentFlag.AlignCenter, QtGui.QColor('black'))
-    splash.show()
-    app.processEvents()
-    
-    try:
-        qual_app = App()
-        settings, ai_models = qual_app.load_settings()
-        project_path = qual_app.get_most_recent_projectpath()
+    app = QtWidgets.QApplication(sys.argv)    
+    qual_app = App()
+    settings, ai_models = qual_app.load_settings()
+    project_path = qual_app.get_most_recent_projectpath()
 
-        QtGui.QFontDatabase.addApplicationFont("GUI/NotoSans-hinted/NotoSans-Regular.ttf")
-        QtGui.QFontDatabase.addApplicationFont("GUI/NotoSans-hinted/NotoSans-Bold.ttf")
-        stylesheet = qual_app.merge_settings_with_default_stylesheet(settings)
-        app.setStyleSheet(stylesheet)
-        if sys.platform != 'darwin':
-            pm = QtGui.QPixmap()
-            pm.loadFromData(QtCore.QByteArray.fromBase64(qualcoder32), "png")
-            app.setWindowIcon(QtGui.QIcon(pm))
+    QtGui.QFontDatabase.addApplicationFont("GUI/NotoSans-hinted/NotoSans-Regular.ttf")
+    QtGui.QFontDatabase.addApplicationFont("GUI/NotoSans-hinted/NotoSans-Bold.ttf")
+    stylesheet = qual_app.merge_settings_with_default_stylesheet(settings)
+    app.setStyleSheet(stylesheet)
+    if sys.platform != 'darwin':
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(qualcoder32), "png")
+        app.setWindowIcon(QtGui.QIcon(pm))
 
-        # Use two character language setting
-        lang = settings.get('language', 'en')
-        # Test for pyinstall data files
-        locale_dir = os.path.join(path, 'locale')
-        # Need to get the external data directory for PyInstaller
-        if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
-            ext_data_dir = sys._MEIPASS
-            # print("ext data dir: ", ext_data_dir)
-            locale_dir = os.path.join(ext_data_dir, 'qualcoder')
-            locale_dir = os.path.join(locale_dir, 'locale')
-            # locale_dir = os.path.join(locale_dir, lang)
-            # locale_dir = os.path.join(locale_dir, 'LC_MESSAGES')
-        # print("locale dir: ", locale_dir)
-        # print("LISTDIR: ", os.listdir(locale_dir))
-        install_language(lang) # install language files on every start, so updates are reflected
-        # getlang = gettext.translation('en', localedir=locale_dir, languages=['en'])
-        translator = gettext.translation(domain='default', localedir=locale_dir, fallback=True)
-        if lang in ["de", "es", "fr", "it", "pt"]:
-            # qt translator applies to ui designed GUI widgets only
-            # qt_locale_dir = os.path.join(locale_dir, lang)
-            # qt_locale_file = os.path.join(qt_locale_dir, "app_" + lang + ".qm")
-            # print("qt qm translation file: ", qt_locale_file)
-            qt_translator = QtCore.QTranslator()
-            # qt_translator.load(qt_locale_file)
-            ''' Below for pyinstaller and obtaining app_lang.qm data file from .qualcoder folder
-            A solution to this error [Errno 13] Permission denied:
-            Replace 'lang' with the short language name, e.g. app_de.qm '''
-            if qt_translator.isEmpty():
-                print("trying to load translation qm file from .qualcoder folder")
-                qm = os.path.join(home, '.qualcoder')
-                qm = os.path.join(qm, f"app_{lang}.qm")
-                print("qm file located at: ", qm)
-                qt_translator.load(qm)
-                #if qt_translator.isEmpty():
-                    # print(f"Installing app_{lang}.qm to .qualcoder folder")
-                #    install_language(lang)
-                #    qt_translator.load(qm)
-            app.installTranslator(qt_translator)
-            '''Below for pyinstaller and obtaining mo data file from .qualcoder folder
-            A solution to this [Errno 13] Permission denied:
-            Must have the folder lang/LC_MESSAGES/lang.mo  in the .qualcoder folder
-            Replace 'lang' with the language short name e.g. de, el, es ...
-            '''
+    # Use two character language setting
+    lang = settings.get('language', 'en')
+    # Test for pyinstall data files
+    locale_dir = os.path.join(path, 'locale')
+    # Need to get the external data directory for PyInstaller
+    if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
+        ext_data_dir = sys._MEIPASS
+        # print("ext data dir: ", ext_data_dir)
+        locale_dir = os.path.join(ext_data_dir, 'qualcoder')
+        locale_dir = os.path.join(locale_dir, 'locale')
+        # locale_dir = os.path.join(locale_dir, lang)
+        # locale_dir = os.path.join(locale_dir, 'LC_MESSAGES')
+    # print("locale dir: ", locale_dir)
+    # print("LISTDIR: ", os.listdir(locale_dir))
+    install_language(lang) # install language files on every start, so updates are reflected
+    # getlang = gettext.translation('en', localedir=locale_dir, languages=['en'])
+    translator = gettext.translation(domain='default', localedir=locale_dir, fallback=True)
+    if lang in ["de", "es", "fr", "it", "pt"]:
+        # qt translator applies to ui designed GUI widgets only
+        # qt_locale_dir = os.path.join(locale_dir, lang)
+        # qt_locale_file = os.path.join(qt_locale_dir, "app_" + lang + ".qm")
+        # print("qt qm translation file: ", qt_locale_file)
+        qt_translator = QtCore.QTranslator()
+        # qt_translator.load(qt_locale_file)
+        ''' Below for pyinstaller and obtaining app_lang.qm data file from .qualcoder folder
+        A solution to this error [Errno 13] Permission denied:
+        Replace 'lang' with the short language name, e.g. app_de.qm '''
+        if qt_translator.isEmpty():
+            print("trying to load translation qm file from .qualcoder folder")
+            qm = os.path.join(home, '.qualcoder')
+            qm = os.path.join(qm, f"app_{lang}.qm")
+            print("qm file located at: ", qm)
+            qt_translator.load(qm)
+            #if qt_translator.isEmpty():
+                # print(f"Installing app_{lang}.qm to .qualcoder folder")
+            #    install_language(lang)
+            #    qt_translator.load(qm)
+        app.installTranslator(qt_translator)
+        '''Below for pyinstaller and obtaining mo data file from .qualcoder folder
+        A solution to this [Errno 13] Permission denied:
+        Must have the folder lang/LC_MESSAGES/lang.mo  in the .qualcoder folder
+        Replace 'lang' with the language short name e.g. de, el, es ...
+        '''
+        try:
+            translator = gettext.translation(lang, localedir=locale_dir, languages=[lang])
+            print("locale directory for python translations: ", locale_dir)
+        except Exception as err:
+            print("Error accessing python translations mo file\n", err)
+            print("Locale directory for python translations: ", locale_dir)
             try:
-                translator = gettext.translation(lang, localedir=locale_dir, languages=[lang])
-                print("locale directory for python translations: ", locale_dir)
-            except Exception as err:
-                print("Error accessing python translations mo file\n", err)
-                print("Locale directory for python translations: ", locale_dir)
-                try:
-                    print(f"Trying folder: home/.qualcoder/{lang}/LC_MESSAGES/{lang}.mo")
-                    mo_dir = os.path.join(home, '.qualcoder')
-                    translator = gettext.translation(lang, localedir=mo_dir, languages=[lang])
-                except Exception as err2:
-                    print(f"No {lang}.mo translation file loaded", err2)
-        translator.install()
-        # Check DroidSandMono installed  - for wordcloud
-        install_droid_sans_mono()
-        ex = MainWindow(qual_app)
-        if project_path:
-            split_ = project_path.split("|")
-            proj_path = ""
-            # Only the path - older and rarer format - legacy
-            if len(split_) == 1:
-                proj_path = split_[0]
-            # Newer datetime | path
-            if len(split_) == 2:
-                proj_path = split_[1]
-            ex.open_project(path_=proj_path)
-    finally:
-        splash.finish(None)
+                print(f"Trying folder: home/.qualcoder/{lang}/LC_MESSAGES/{lang}.mo")
+                mo_dir = os.path.join(home, '.qualcoder')
+                translator = gettext.translation(lang, localedir=mo_dir, languages=[lang])
+            except Exception as err2:
+                print(f"No {lang}.mo translation file loaded", err2)
+    translator.install()
+    # Check DroidSandMono installed  - for wordcloud
+    install_droid_sans_mono()
+    ex = MainWindow(qual_app)
+    if project_path:
+        split_ = project_path.split("|")
+        proj_path = ""
+        # Only the path - older and rarer format - legacy
+        if len(split_) == 1:
+            proj_path = split_[0]
+        # Newer datetime | path
+        if len(split_) == 2:
+            proj_path = split_[1]
+        ex.open_project(path_=proj_path)
 
     sys.exit(app.exec())
     
