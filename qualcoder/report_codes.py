@@ -857,9 +857,11 @@ class DialogReportCodes(QtWidgets.QDialog):
             if item['image'] is not None or item['avname'] is not None:
                 need_media_folders = True
         html_folder_name = ""
+        html_relative_name = ""
         if need_media_folders:
             # Create folder with sub-folders for images, audio and video
             html_folder_name = filepath[:-5]
+            html_relative_name = html_folder_name.split("/")[-1]
             try:
                 os.mkdir(html_folder_name)
                 os.mkdir(html_folder_name + "/images")
@@ -882,10 +884,11 @@ class DialogReportCodes(QtWidgets.QDialog):
                 image_name = item['imagename'].replace('/images/', '')
                 # print("IMG NAME: ", item['imagename'])
                 img_path = f"{html_folder_name}/images/{image_name}"
+                img_relative_link = f"{html_relative_name}/images/{image_name}"
                 # print("IMG PATH", img_path)
                 # item['image'] is  QtGui.QImage object
                 item['image'].save(img_path)
-                html = html.replace(item['imagename'], img_path)
+                html = html.replace(item['imagename'], img_relative_link)
             if item['avname'] is not None:
                 # Add audio/video to html folder
                 mediatype = "video"
@@ -901,24 +904,29 @@ class DialogReportCodes(QtWidgets.QDialog):
                     linked = True
                     av_path = av_path[6:]
                 av_destination = html_folder_name + av_path
+                relative_link = ""
                 # Copy non-linked a/v file to html folder
                 if not linked and not os.path.isfile(html_folder_name + av_path):
                     copyfile(self.app.project_path + item['avname'], html_folder_name + av_path)
                     av_destination = html_folder_name + av_path
+                    relative_link = f"{html_folder_name.split('/')[-1]}/video/{av_path.split('/')[-1]}"
                 # Copy Linked video file to html folder
                 if mediatype == "video" and linked:
                     av_destination = f"{html_folder_name}/video/{av_path.split('/')[-1]}"
+                    relative_link = f"{html_folder_name.split('/')[-1]}/video/{av_path.split('/')[-1]}"
                     if not os.path.isfile(av_destination):
                         copyfile(av_path, av_destination)
                 # Copy Linked audio file to html folder
                 if mediatype == "audio" and linked:
                     av_destination = f"{html_folder_name}/audio/{av_path.split('/')[-1]}"
+                    relative_link = f"{html_folder_name.split('/')[-1]}/audio/{av_path.split('/')[-1]}"
                     if not os.path.isfile(av_destination):
                         copyfile(av_path, av_destination)
                 # Create html to display media time positions
                 extension = item['avname'][item['avname'].rfind('.') + 1:]
                 extra = f"</p>\n<{mediatype} controls>"
-                extra += f'<source src="{av_destination}'
+                #extra += f'<source src="{av_destination}'
+                extra += f'<source src="{relative_link}'
                 extra += f'#t={item["av0"]},{item["av1"]}"'
                 extra += f' type="{mediatype}/{extension}">'
                 extra += f'</{mediatype}><p>\n'
