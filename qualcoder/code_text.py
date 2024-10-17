@@ -4449,9 +4449,11 @@ class DialogCodeText(QtWidgets.QWidget):
     # AI functions
         
     def ai_search_clicked(self):
-        """ pushButton_ai_search clicked.
-        Warn if not ready for search, or begin search."""
-
+        """ Start the AI search (if the AI is ready and edit_mode is not active).   
+        
+        This will open a DialogAISearch to collect the search parameters and then 
+        start phase 1 of the search, looking for suitable chunks of data in the vectorstore.
+        """
         if self.edit_mode:
             msg = _('Please finish editing the text before starting an AI search.')
             Message(self.app, _('AI Search'), msg, "warning").exec()
@@ -4512,7 +4514,11 @@ class DialogCodeText(QtWidgets.QWidget):
                                             self.ai_search_file_ids)
     
     def ai_search_prepare_analysis(self, chunks):
-        """ Prepare the second step of the search. """
+        """ Prepare and start the second step of the AI search. 
+        
+        This will clean up the list of data found in the first stage of the search and then 
+        start step 2, the deeper analysis with the choosen search prompt.
+        """
 
         if self.app.ai.ai_async_is_canceled:
             self.ai_search_running = False
@@ -4574,7 +4580,14 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ai_search_analyze_next_chunk()
         
     def ai_search_analyze_next_chunk(self):
-        """ Desctibe what this method does """
+        """Step 2 of the AI search: 
+        Selects the next chunk of data found in step 1 of the search and analyzes it closer, 
+        using the selected search prompt.
+        This will be repeated until: 
+        1) 'ai_search_analysis_max_count' is reached (in which case the analysis is paused and
+        the user has to click on 'find more' to continue), or 
+        2) 'len(self.ai_search_similar_chunk_list)' is reached, meaning that all the 
+        chunks found in step 1 have been analyzed and the search is finished."""
 
         if self.ai_search_chunks_pos < len(self.ai_search_similar_chunk_list):
             # still chunks left for analysis            
@@ -4605,6 +4618,10 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ai_search_update_listview_action()
 
     def ai_search_analyze_next_chunk_callback(self, doc):
+        """Callback for ai_search_analyze_next_chunk: 
+        If the AI has finished analyzing the chunk of data, this callback function collects the results, 
+        updates the UI and starts the analysis of the next chunk. 
+        """
 
         if not self.ai_search_running:  # Search has been cancelled
             return
@@ -4631,10 +4648,10 @@ class DialogCodeText(QtWidgets.QWidget):
             self.ai_search_running = False
 
     def ai_search_update_listview_action(self):
-        """Adding a special item to the end of the list view that can be clicked for special actions:
+        """Adding a special item to the end of the list view that can be clicked for certain actions:
         - Find more: Shown if there are still chunks of empirical data left from stage 1 to be analyzed in stage 2 
         - Stop search: Shown if a search is actually running in the background
-        - (search finised): Shown if all results from stage 1 have also been analyzed  
+        - (search finished): Shown if all results from stage 1 have already been analyzed  
         """
         # add action item to the list if necessary
         if self.ui.listWidget_ai.count() <= len(self.ai_search_results):
@@ -4670,7 +4687,10 @@ class DialogCodeText(QtWidgets.QWidget):
                 action_item.setText('(search finished)')
 
     def ai_search_list_clicked(self):
-        """ Describ what this method does """
+        """ Checks if the special action item at the end of the list was clicked 
+        and performs the corresponding action ('find more', 'stop search', etc.).
+        If a normal item in the list was clicked, 'self.ai_search_selection_changed()' is
+        called."""
 
         row = self.ui.listWidget_ai.currentRow()
         if row < len(self.ai_search_results):  # clicked on a search result
@@ -4709,7 +4729,8 @@ class DialogCodeText(QtWidgets.QWidget):
             selection_model.blockSignals(False)
         
     def ai_search_selection_changed(self):
-        """Load the document in the textView and select the quote."""
+        """Load the document corresponding to the selected AI search result in the textView 
+        and select the quote that the AI chose."""
 
         if self.ai_search_results is None or len(self.ai_search_results) == 0:
             return
@@ -4759,6 +4780,8 @@ class DialogCodeText(QtWidgets.QWidget):
                 break
     
     def ai_search_update_spinner(self):
+        """ Updating the ai_progressBar and the text spinner in the list view to indicate to the user that 
+        an AI search is running in the background. """
         if self.app.ai.ai_async_is_finished or self.app.ai.ai_async_is_errored or self.app.ai.ai_async_is_canceled:
             self.ai_search_running = False
         if self.ai_search_running:
@@ -4774,6 +4797,8 @@ class DialogCodeText(QtWidgets.QWidget):
         """
         Retrieves the single document from self.ai_search_results that has the longest overlap 
         with the text selection defined in the text editor within the UI.
+        This is used in 'self.mark()' to determine if the AI has analyzed a certain text passage and
+        we can suggest adding the interpretation to the coding memo.
 
         Returns:
             best_doc (dict or None): The document with the longest overlap if overlapping documents 
