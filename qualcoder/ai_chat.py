@@ -764,31 +764,39 @@ class DialogAIChat(QtWidgets.QDialog):
         if link:
             # Show tooltip when hovering over a link
             if link.startswith('coding:'):
-                coding_id = link[len('coding:'):]
-                cursor = self.app.conn.cursor()
-                sql = (f'SELECT code_text.ctid, source.name, code_text.seltext '
-                        f'FROM code_text JOIN source ON code_text.fid = source.id '
-                        f'WHERE code_text.ctid = {coding_id}')
-                cursor.execute(sql)
-                coding = cursor.fetchone()
+                try:
+                    coding_id = link[len('coding:'):]
+                    cursor = self.app.conn.cursor()
+                    sql = (f'SELECT code_text.ctid, source.name, code_text.seltext '
+                            f'FROM code_text JOIN source ON code_text.fid = source.id '
+                            f'WHERE code_text.ctid = {coding_id}')
+                    cursor.execute(sql)
+                    coding = cursor.fetchone()
+                except Exception as e:
+                    logger.debug(f'Link: "{link}" - Error: {e}')
+                    coding = None                
                 if coding is not None:
                     tooltip_txt = f'{coding[1]}:\n' # file name
                     tooltip_txt += f'"{coding[2]}"' # seltext
                 else:
-                    tooltip_txt = _('source not found')
+                    tooltip_txt = _('Invalid source reference.')
                 QtWidgets.QToolTip.showText(QCursor.pos(), tooltip_txt, self.ui.ai_output)
             elif link.startswith('chunk:'):
-                chunk_id = link[len('chunk:'):]
-                source_id, start, length = chunk_id.split('_')
-                cursor = self.app.conn.cursor()
-                sql = f'SELECT name, fulltext FROM source WHERE id = {source_id}'
-                cursor.execute(sql)
-                source = cursor.fetchone()
+                try:
+                    chunk_id = link[len('chunk:'):]
+                    source_id, start, length = chunk_id.split('_')
+                    cursor = self.app.conn.cursor()
+                    sql = f'SELECT name, fulltext FROM source WHERE id = {source_id}'
+                    cursor.execute(sql)
+                    source = cursor.fetchone()
+                except Exception as e:
+                    logger.debug(f'Link: "{link}" - Error: {e}')
+                    source = None
                 if source is not None:
                     tooltip_txt = f'{source[0]}:\n' # file name
                     tooltip_txt += f'"{source[1][int(start):int(start) + int(length)]}"' # chunk extracted from fulltext
                 else:
-                    tooltip_txt = _('source not found')
+                    tooltip_txt = _('Invalid source reference.')
                 QtWidgets.QToolTip.showText(QCursor.pos(), tooltip_txt, self.ui.ai_output)
         else:
             QtWidgets.QToolTip.hideText()
@@ -797,29 +805,41 @@ class DialogAIChat(QtWidgets.QDialog):
         if link:
             # Open doc in coding window 
             if link.startswith('coding:'):
-                coding_id = link[len('coding:'):]
-                cursor = self.app.conn.cursor()
-                sql = (f'SELECT fid, pos0, pos1 '
-                        f'FROM code_text '
-                        f'WHERE code_text.ctid = {coding_id}')
-                cursor.execute(sql)
-                coding = cursor.fetchone()
+                try:
+                    coding_id = link[len('coding:'):]
+                    cursor = self.app.conn.cursor()
+                    sql = (f'SELECT fid, pos0, pos1 '
+                            f'FROM code_text '
+                            f'WHERE code_text.ctid = {coding_id}')
+                    cursor.execute(sql)
+                    coding = cursor.fetchone()
+                except Exception as e:
+                    logger.debug(f'Link: "{link}" - Error: {e}')
+                    coding = None
                 if coding is not None:
                     self.main_window.text_coding(task='documents', 
                                                  doc_id=int(coding[0]), 
                                                  doc_sel_start=int(coding[1]), 
                                                  doc_sel_end=int(coding[2]))
                 else:
-                    msg = _('Source not found')
-                    Message(self.app, _('AI Chat'), msg).exec()
+                    msg = _('Invalid source reference.')
+                    Message(self.app, _('AI Chat'), msg, icon='critical').exec()
             elif link.startswith('chunk:'):
-                chunk_id = link[len('chunk:'):]
-                source_id, start, length = chunk_id.split('_')
-                end = int(start) + int(length)
-                self.main_window.text_coding(task='documents', 
-                                             doc_id=int(source_id), 
-                                             doc_sel_start=int(start), 
-                                             doc_sel_end=end)        
+                try:
+                    chunk_id = link[len('chunk:'):]
+                    source_id, start, length = chunk_id.split('_')
+                    end = int(start) + int(length)
+                except Exception as e:
+                    logger.debug(f'Link: "{link}" - Error: {e}')
+                    source_id = None
+                if source_id is not None:
+                    self.main_window.text_coding(task='documents', 
+                                                 doc_id=int(source_id), 
+                                                 doc_sel_start=int(start), 
+                                                 doc_sel_end=end)
+                else:
+                    msg = _('Invalid source reference.')
+                    Message(self.app, _('AI Chat'), msg, icon='critical').exec()                    
 
 ###### Helper:
 

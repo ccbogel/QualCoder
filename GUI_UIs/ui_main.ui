@@ -180,6 +180,7 @@
     <addaction name="actionCode_audio_video"/>
     <addaction name="actionCode_pdf"/>
     <addaction name="actionColour_scheme"/>
+    <addaction name="actionCode_organiser"/>
    </widget>
    <widget class="QMenu" name="menuReports">
     <property name="title">
@@ -215,7 +216,7 @@
     <addaction name="actionAI_Setup_wizard"/>
     <addaction name="actionAI_Settings"/>
     <addaction name="actionAI_Rebuild_internal_memory"/>
-    <addaction name="actionAI_Edit_Project_Info"/>
+    <addaction name="actionAI_Edit_Project_Memo"/>
     <addaction name="actionAI_Prompts"/>
     <addaction name="separator"/>
     <addaction name="actionAI_Chat"/>
@@ -535,9 +536,9 @@
     <string>Rebuild Internal Memory</string>
    </property>
   </action>
-  <action name="actionAI_Edit_Project_Info">
+  <action name="actionAI_Edit_Project_Memo">
    <property name="text">
-    <string>Project Info</string>
+    <string>Project Memo</string>
    </property>
   </action>
   <action name="actionAI_Chat">
@@ -561,6 +562,11 @@
   <action name="actionAI_Prompts">
    <property name="text">
     <string>Prompt library</string>
+   </property>
+  </action>
+  <action name="actionCode_organiser">
+   <property name="text">
+    <string>Code organiser</string>
    </property>
   </action>
  </widget>
