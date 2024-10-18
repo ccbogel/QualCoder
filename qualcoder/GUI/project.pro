@@ -1,4 +1,7 @@
 SOURCES         = ui_dialog_add_item.py \
+ui_ai_chat.py \
+ui_ai_edit_prompts.py \
+ui_ai_search.py \
 ui_attribute.py \
 ui_dialog_assign_attribute.py \
 ui_case_file_manager.py \
@@ -21,6 +24,7 @@ ui_dialog_manage_attributes.py \
 ui_dialog_manage_files.py \
 ui_dialog_manage_links.py \
 ui_dialog_memo.py \
+ui_dialog_organiser.py \
 ui_dialog_refi_export_endings.py \
 ui_dialog_report_code_frequencies.py \
 ui_dialog_report_code_summary.py \
