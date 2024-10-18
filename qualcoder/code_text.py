@@ -1754,6 +1754,8 @@ class DialogCodeText(QtWidgets.QWidget):
         key = event.key()
         mods = event.modifiers()
 
+        print("Edit mode", self.edit_mode)
+
         # Ctrl + F jump to search box
         if key == QtCore.Qt.Key.Key_F and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
             self.ui.lineEdit_search.setFocus()
@@ -3658,8 +3660,8 @@ class DialogCodeText(QtWidgets.QWidget):
                     else:
                         already_assigned += 1
             self.app.conn.commit()
-        except:
-            self.app.conn.rollback() # revert all changes
+        except Exception as e_:
+            self.app.conn.rollback()  # Revert all changes
             undo_list = [] 
             raise    
         # Add to undo auto-coding history
@@ -3911,12 +3913,13 @@ class DialogCodeText(QtWidgets.QWidget):
     def edit_mode_toggle(self):
         """ Activate or deactivate edit mode.
         When activated, hide most widgets, remove tooltips, remove text edit menu.
-        Called: event filter Ctrl+E
-        The edit mode toggle fires multiple times. so the initial edit_pos changes from the corect pos to 0
+        Called: event filter Ctrl+E, or button press
+        The edit mode toggle fires multiple times. so the initial edit_pos changes from the correct pos to 0
         """
 
         if self.file_ is None:
             return
+
         self.edit_mode = not self.edit_mode
         if self.edit_mode:
             self.edit_mode_on()
@@ -3959,8 +3962,8 @@ class DialogCodeText(QtWidgets.QWidget):
 
     def edit_mode_off(self):
         """ Show widgets.
-        Try and set cursor positon to 'current text' position.
-        but this may have changed a lot. """
+        Try and set cursor position to 'current text' position.
+        but this may have changed. """
 
         self.ui.groupBox.show()
         self.ui.groupBox_edit_mode.hide()
@@ -3985,7 +3988,7 @@ class DialogCodeText(QtWidgets.QWidget):
             self.ed_update_codings()
             self.ed_update_annotations()
             self.ed_update_casetext()
-            # update vectorstore
+            # Update vectorstore
             if self.app.settings['ai_enable'] == 'True':
                 self.app.ai.sources_vectorstore.import_document(self.file_['id'], self.file_['name'], self.text, update=True)
             else:
@@ -3997,6 +4000,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.annotations = self.app.get_annotations()
         self.load_file(self.file_)
         self.update_file_tooltip()
+        self.highlight()
         text_cursor = self.ui.textEdit.textCursor()
         if self.edit_pos > len(self.ui.textEdit.toPlainText()):
             self.edit_pos = len(self.ui.textEdit.toPlainText()) - 1
@@ -4098,7 +4102,7 @@ class DialogCodeText(QtWidgets.QWidget):
                     changed = True
                 if c['newpos0'] is not None and not changed and c['newpos0'] < preceding_pos < c['newpos1']:
                     c['newpos1'] += chars_len
-            self.highlight()
+            self.ed_highlight()
             self.prev_text = copy(self.text)
             return
         # Removing characters
@@ -4238,29 +4242,29 @@ class DialogCodeText(QtWidgets.QWidget):
         if char[0] == "+":
             for c in self.ed_codetext:
                 changed = False
-                if c['npos0'] is not None and c['npos0'] >= pre_start and c['npos0'] >= pre_start + -1 * pre_chars:
-                    c['npos0'] += pre_chars + post_chars
-                    c['npos1'] += pre_chars + post_chars
+                if c['newpos0'] is not None and c['newpos0'] >= pre_start and c['newpos0'] >= pre_start + -1 * pre_chars:
+                    c['newpos0'] += pre_chars + post_chars
+                    c['newpos1'] += pre_chars + post_chars
                     changed = True
-                if not changed and c['npos0'] < pre_start < c['npos1']:
-                    c['npos1'] += pre_chars + post_chars
+                if not changed and c['newpos0'] < pre_start < c['newpos1']:
+                    c['newpos1'] += pre_chars + post_chars
             for c in self.ed_annotations:
                 changed = False
-                if c['npos0'] is not None and c['npos0'] >= pre_start and c['npos0'] >= pre_start + -1 * pre_chars:
-                    c['npos0'] += pre_chars + post_chars
-                    c['npos1'] += pre_chars + post_chars
+                if c['newpos0'] is not None and c['newpos0'] >= pre_start and c['newpos0'] >= pre_start + -1 * pre_chars:
+                    c['newpos0'] += pre_chars + post_chars
+                    c['newpos1'] += pre_chars + post_chars
                     changed = True
-                if c['npos0'] is not None and not changed and c['npos0'] < pre_start < c['npos1']:
-                    c['npos1'] += pre_chars + post_chars
+                if c['newpos0'] is not None and not changed and c['newpos0'] < pre_start < c['newpos1']:
+                    c['newpos1'] += pre_chars + post_chars
             for c in self.ed_casetext:
                 changed = False
-                # print("npos0", c['npos0'], "pre start", pre_start)
-                if c['npos0'] is not None and c['npos0'] >= pre_start and c['npos0'] >= pre_start + -1 * pre_chars:
-                    c['npos0'] += pre_chars + post_chars
-                    c['npos1'] += pre_chars + post_chars
+                # print("newpos0", c['newpos0'], "pre start", pre_start)
+                if c['newpos0'] is not None and c['newpos0'] >= pre_start and c['newpos0'] >= pre_start + -1 * pre_chars:
+                    c['newpos0'] += pre_chars + post_chars
+                    c['newpos1'] += pre_chars + post_chars
                     changed = True
-                if c['npos0'] is not None and not changed and c['npos0'] < pre_start < c['npos1']:
-                    c['npos1'] += pre_chars + post_chars
+                if c['newpos0'] is not None and not changed and c['newpos0'] < pre_start < c['newpos1']:
+                    c['newpos1'] += pre_chars + post_chars
             self.ed_highlight()
             self.prev_text = copy(self.text)
             return
@@ -4269,73 +4273,75 @@ class DialogCodeText(QtWidgets.QWidget):
         if char[0] == "-":
             for c in self.ed_codetext:
                 changed = False
-                # print("CODE npos0", c['npos0'], "pre start", pre_start, pre_chars, post_chars)
-                if c['npos0'] is not None and c['npos0'] >= pre_start and c['npos0'] >= pre_start + -1 * pre_chars:
-                    c['npos0'] += pre_chars + post_chars
-                    c['npos1'] += pre_chars + post_chars
+                # print("CODE newpos0", c['newpos0'], "pre start", pre_start, pre_chars, post_chars)
+                if c['newpos0'] is not None and c['newpos0'] >= pre_start and c['newpos0'] >= pre_start + -1 * pre_chars:
+                    c['newpos0'] += pre_chars + post_chars
+                    c['newpos1'] += pre_chars + post_chars
                     changed = True
                 # Remove, as entire text is being removed (e.g. copy replace)
-                # print(changed, c['npos0'],  pre_start, c['npos1'], pre_chars, post_chars)
-                # print(c['npos0'], ">",  pre_start, "and", c['npos1'], "<", pre_start + -1*pre_chars + post_chars)
-                if c['npos0'] is not None and not changed and c['npos0'] >= pre_start and \
-                        c['npos1'] < pre_start + -1 * pre_chars + post_chars:
-                    c['npos0'] += pre_chars + post_chars
-                    c['npos1'] += pre_chars + post_chars
+                # print(changed, c['newpos0'],  pre_start, c['newpos1'], pre_chars, post_chars)
+                # print(c['newpos0'], ">",  pre_start, "and", c['newpos1'], "<", pre_start + -1*pre_chars + post_chars)
+                if c['newpos0'] is not None and not changed and c['newpos0'] >= pre_start and \
+                        c['newpos1'] < pre_start + -1 * pre_chars + post_chars:
+                    c['newpos0'] += pre_chars + post_chars
+                    c['newpos1'] += pre_chars + post_chars
                     changed = True
                     self.code_deletions.append("delete from code_text where ctid=" + str(c['ctid']))
-                    c['npos0'] = None
-                if c['npos0'] is not None and not changed and c['npos0'] < pre_start <= c['npos1']:
-                    c['npos1'] += pre_chars + post_chars
-                    if c['npos1'] < c['npos0']:
+                    c['newpos0'] = None
+                if c['newpos0'] is not None and not changed and c['newpos0'] < pre_start <= c['newpos1']:
+                    c['newpos1'] += pre_chars + post_chars
+                    if c['newpos1'] < c['newpos0']:
                         self.code_deletions.append("delete from code_text where ctid=" + str(c['ctid']))
-                        c['npos0'] = None
+                        c['newpos0'] = None
             for c in self.ed_annotations:
                 changed = False
-                if c['npos0'] is not None and c['npos0'] >= pre_start and c['npos0'] >= pre_start + -1 * pre_chars:
-                    c['npos0'] += pre_chars + post_chars
-                    c['npos1'] += pre_chars + post_chars
+                if c['newpos0'] is not None and c['newpos0'] >= pre_start and c['newpos0'] >= pre_start + -1 * pre_chars:
+                    c['newpos0'] += pre_chars + post_chars
+                    c['newpos1'] += pre_chars + post_chars
                     changed = True
                     # Remove, as entire text is being removed (e.g. copy replace)
-                    # print(changed, c['npos0'],  pre_start, c['npos1'], pre_chars, post_chars)
-                    # print(c['npos0'], ">",  pre_start, "and", c['npos1'], "<", pre_start + -1*pre_chars + post_chars)
-                    if not changed and c['npos0'] >= pre_start and c['npos1'] < pre_start + -1 * pre_chars + post_chars:
-                        c['npos0'] += pre_chars + post_chars
-                        c['npos1'] += pre_chars + post_chars
+                    # print(changed, c['newpos0'],  pre_start, c['newpos1'], pre_chars, post_chars)
+                    # print(c['newpos0'], ">",  pre_start, "and", c['newpos1'], "<", pre_start + -1*pre_chars + post_chars)
+                    if not changed and c['newpos0'] >= pre_start and c['newpos1'] < pre_start + -1 * pre_chars + post_chars:
+                        c['newpos0'] += pre_chars + post_chars
+                        c['newpos1'] += pre_chars + post_chars
                         changed = True
                         self.code_deletions.append("delete from annotations where anid=" + str(c['anid']))
-                        c['npos0'] = None
-                if c['npos0'] is not None and not changed and c['npos0'] < pre_start <= c['npos1']:
-                    c['npos1'] += pre_chars + post_chars
-                    if c['npos1'] < c['npos0']:
+                        c['newpos0'] = None
+                if c['newpos0'] is not None and not changed and c['newpos0'] < pre_start <= c['newpos1']:
+                    c['newpos1'] += pre_chars + post_chars
+                    if c['newpos1'] < c['newpos0']:
                         self.code_deletions.append("delete from annotation where anid=" + str(c['anid']))
-                        c['npos0'] = None
+                        c['newpos0'] = None
             for c in self.ed_casetext:
                 changed = False
-                if c['npos0'] is not None and c['npos0'] >= pre_start and c['npos0'] >= pre_start + -1 * pre_chars:
-                    c['npos0'] += pre_chars + post_chars
-                    c['npos1'] += pre_chars + post_chars
+                if c['newpos0'] is not None and c['newpos0'] >= pre_start and c['newpos0'] >= pre_start + -1 * pre_chars:
+                    c['newpos0'] += pre_chars + post_chars
+                    c['newpos1'] += pre_chars + post_chars
                     changed = True
                 # Remove, as entire text is being removed (e.g. copy replace)
-                # print(changed, c['npos0'],  pre_start, c['npos1'], pre_chars, post_chars)
-                # print(c['npos0'], ">",  pre_start, "and", c['npos1'], "<", pre_start + -1*pre_chars + post_chars)
-                if c['npos0'] is not None and not changed and c['npos0'] >= pre_start and \
-                        c['npos1'] < pre_start + -1 * pre_chars + post_chars:
-                    c['npos0'] += pre_chars + post_chars
-                    c['npos1'] += pre_chars + post_chars
+                # print(changed, c['newpos0'],  pre_start, c['nepos1'], pre_chars, post_chars)
+                # print(c['newpos0'], ">",  pre_start, "and", c['nepos1'], "<", pre_start + -1*pre_chars + post_chars)
+                if c['newpos0'] is not None and not changed and c['newpos0'] >= pre_start and \
+                        c['newpos1'] < pre_start + -1 * pre_chars + post_chars:
+                    c['newpos0'] += pre_chars + post_chars
+                    c['newpos1'] += pre_chars + post_chars
                     changed = True
                     self.code_deletions.append("delete from case_text where id=" + str(c['id']))
-                    c['npos0'] = None
-                if c['npos0'] is not None and not changed and c['npos0'] < pre_start <= c['npos1']:
-                    c['npos1'] += pre_chars + post_chars
-                    if c['npos1'] < c['npos0']:
+                    c['newpos0'] = None
+                if c['newpos0'] is not None and not changed and c['newos0'] < pre_start <= c['newpos1']:
+                    c['newpos1'] += pre_chars + post_chars
+                    if c['newpos1'] < c['newpos0']:
                         self.code_deletions.append("delete from case_text where id=" + str(c['id']))
-                        c['npos0'] = None
+                        c['newpos0'] = None
         self.ed_highlight()
         self.prev_text = copy(self.text)'''
 
     def ed_highlight(self):
         """ Add coding and annotation highlights. """
 
+        if not self.edit_mode:
+            return
         self.remove_formatting()
         format_ = QtGui.QTextCharFormat()
         format_.setFontFamily(self.app.settings['font'])
@@ -4343,23 +4349,23 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.textEdit.blockSignals(True)
         cursor = self.ui.textEdit.textCursor()
         for item in self.ed_casetext:
-            if item['npos0'] is not None:
-                cursor.setPosition(int(item['npos0']), QtGui.QTextCursor.MoveMode.MoveAnchor)
-                cursor.setPosition(int(item['npos1']), QtGui.QTextCursor.MoveMode.KeepAnchor)
+            if item['newpos0'] is not None:
+                cursor.setPosition(int(item['newpos0']), QtGui.QTextCursor.MoveMode.MoveAnchor)
+                cursor.setPosition(int(item['newpos1']), QtGui.QTextCursor.MoveMode.KeepAnchor)
                 format_.setFontUnderline(True)
                 format_.setUnderlineColor(QtCore.Qt.GlobalColor.green)
                 cursor.setCharFormat(format_)
         for item in self.ed_annotations:
-            if item['npos0'] is not None:
-                cursor.setPosition(int(item['npos0']), QtGui.QTextCursor.MoveMode.MoveAnchor)
-                cursor.setPosition(int(item['npos1']), QtGui.QTextCursor.MoveMode.KeepAnchor)
+            if item['newpos0'] is not None:
+                cursor.setPosition(int(item['newpos0']), QtGui.QTextCursor.MoveMode.MoveAnchor)
+                cursor.setPosition(int(item['newpos1']), QtGui.QTextCursor.MoveMode.KeepAnchor)
                 format_.setFontUnderline(True)
                 format_.setUnderlineColor(QtCore.Qt.GlobalColor.yellow)
                 cursor.setCharFormat(format_)
         for item in self.ed_codetext:
-            if item['npos0'] is not None:
-                cursor.setPosition(int(item['npos0']), QtGui.QTextCursor.MoveMode.MoveAnchor)
-                cursor.setPosition(int(item['npos1']), QtGui.QTextCursor.MoveMode.KeepAnchor)
+            if item['newpos0'] is not None:
+                cursor.setPosition(int(item['newpos0']), QtGui.QTextCursor.MoveMode.MoveAnchor)
+                cursor.setPosition(int(item['newpos1']), QtGui.QTextCursor.MoveMode.KeepAnchor)
                 format_.setFontUnderline(True)
                 format_.setUnderlineColor(QtCore.Qt.GlobalColor.red)
                 cursor.setCharFormat(format_)
@@ -4390,21 +4396,21 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ed_codetext = []
         for r in res:
             self.ed_codetext.append({'ctid': r[0], 'cid': r[1], 'pos0': r[2], 'pos1': r[3], 'seltext': r[4],
-                                     'owner': r[5], 'npos0': r[2], 'npos1': r[3]})
+                                     'owner': r[5], 'newpos0': r[2], 'newpos1': r[3]})
         sql = "select anid, pos0, pos1 from annotation where fid=?"
         cur.execute(sql, [self.file_['id']])
         res = cur.fetchall()
         self.ed_annotations = []
         for r in res:
             self.ed_annotations.append({'anid': r[0], 'pos0': r[1], 'pos1': r[2],
-                                        'npos0': r[1], 'npos1': r[2]})
+                                        'newpos0': r[1], 'newpos1': r[2]})
         sql = "select id, pos0, pos1 from case_text where fid=?"
         cur.execute(sql, [self.file_['id']])
         res = cur.fetchall()
         self.ed_casetext = []
         for r in res:
             self.ed_casetext.append({'id': r[0], 'pos0': r[1], 'pos1': r[2],
-                                     'npos0': r[1], 'npos1': r[2]})
+                                     'newpos0': r[1], 'newpos1': r[2]})
         self.no_codes_annotes_cases = False
         if self.ed_casetext == [] and self.ed_annotations == [] and self.ed_codetext == []:
             self.no_codes_annotes_cases = True
@@ -4415,9 +4421,9 @@ class DialogCodeText(QtWidgets.QWidget):
         sql = "update case_text set pos0=?, pos1=? where id=? and (pos0 !=? or pos1 !=?)"
         cur = self.app.conn.cursor()
         for c in self.ed_casetext:
-            if c['npos0'] is not None:
-                cur.execute(sql, [c['npos0'], c['npos1'], c['id'], c['npos0'], c['npos1']])
-            if c['npos1'] >= len(self.text):
+            if c['newpos0'] is not None:
+                cur.execute(sql, [c['newpos0'], c['newpos1'], c['id'], c['newpos0'], c['newpos1']])
+            if c['newpos1'] >= len(self.text):
                 cur.execute("delete from case_text where id=?", [c['id']])
         self.app.conn.commit()
 
@@ -4427,9 +4433,9 @@ class DialogCodeText(QtWidgets.QWidget):
         sql = "update annotation set pos0=?, pos1=? where anid=? and (pos0 !=? or pos1 !=?)"
         cur = self.app.conn.cursor()
         for a in self.ed_annotations:
-            if a['npos0'] is not None:
-                cur.execute(sql, [a['npos0'], a['npos1'], a['anid'], a['npos0'], a['npos1']])
-            if a['npos1'] >= len(self.text):
+            if a['newpos0'] is not None:
+                cur.execute(sql, [a['newpos0'], a['newpos1'], a['anid'], a['newpos0'], a['newpos1']])
+            if a['newpos1'] >= len(self.text):
                 cur.execute("delete from annotation where anid=?", [a['anid']])
         self.app.conn.commit()
 
@@ -4439,10 +4445,10 @@ class DialogCodeText(QtWidgets.QWidget):
         cur = self.app.conn.cursor()
         sql = "update code_text set pos0=?, pos1=?, seltext=? where ctid=?"
         for c in self.ed_codetext:
-            if c['npos0'] is not None:
-                seltext = self.text[c['npos0']:c['npos1']]
-                cur.execute(sql, [c['npos0'], c['npos1'], seltext, c['ctid']])
-            if c['npos1'] >= len(self.text):
+            if c['newpos0'] is not None:
+                seltext = self.text[c['newpos0']:c['newpos1']]
+                cur.execute(sql, [c['newpos0'], c['newpos1'], seltext, c['ctid']])
+            if c['newpos1'] >= len(self.text):
                 cur.execute("delete from code_text where ctid=?", [c['ctid']])
         self.app.conn.commit()
         
