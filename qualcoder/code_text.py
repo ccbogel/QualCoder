@@ -120,6 +120,13 @@ class DialogCodeText(QtWidgets.QWidget):
     edit_pos = 0
     no_codes_annotes_cases = None
     edit_mode_has_changed = False
+    # Revert to original if edit text caused problems
+    edit_original_source_id =None
+    edit_original_source = None
+    edit_original_codes = None
+    edit_original_annotations = None
+    edit_original_case_assignment = None
+    edit_original_cutoff_datetime = None
 
     # Variables associated with right-hand side splitter, for project memo, code rule
     project_memo = False
@@ -160,6 +167,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.overlap_timer = datetime.datetime.now()
         self.ui = Ui_Dialog_code_text()
         self.ui.setupUi(self)
+
         self.ui.groupBox_edit_mode.hide()
         ee = f'{_("EDITING TEXT MODE (Ctrl+E)")} '
         ee += _(
@@ -171,6 +179,13 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.label_editing.setText(ee)
         self.edit_pos = 0
         self.edit_mode = False
+        self.edit_original_source = None
+        self.edit_original_source_id = None
+        self.edit_original_codes = None
+        self.edit_original_annotations = None
+        self.edit_original_case_assignment = None
+        self.edit_original_cutoff_datetime = None
+
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         font = f"font: {self.app.settings['fontsize']}pt "
         font += '"' + self.app.settings['font'] + '";'
@@ -341,6 +356,11 @@ class DialogCodeText(QtWidgets.QWidget):
         pm.loadFromData(QtCore.QByteArray.fromBase64(pencil_icon), "png")
         self.ui.pushButton_exit_edit.setIcon(QtGui.QIcon(pm))
         self.ui.pushButton_exit_edit.pressed.connect(self.edit_mode_toggle)
+        pm = QtGui.QPixmap()
+        pm.loadFromData(QtCore.QByteArray.fromBase64(undo_icon), "png")
+        self.ui.pushButton_undo_edit.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_undo_edit.pressed.connect(self.undo_edited_text)
+        self.ui.pushButton_undo_edit.hide()  # temporary
         self.ui.label_codes_count.setEnabled(False)
         self.ui.treeWidget.setDragEnabled(True)
         self.ui.treeWidget.setAcceptDrops(True)
@@ -372,7 +392,6 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.listWidget_ai.selectionModel().selectionChanged.connect(self.ai_search_selection_changed)
         self.ai_search_listview_action_label = None
         self.ui.listWidget_ai.clicked.connect(self.ai_search_list_clicked)
-        
         self.ui.ai_progressBar.setVisible(False)
         self.ui.ai_progressBar.setStyleSheet(f"""
             QProgressBar::chunk {{
@@ -3345,6 +3364,7 @@ class DialogCodeText(QtWidgets.QWidget):
         if self.file_ is None:
             Message(self.app, _('Warning'), _("No file was selected"), "warning").exec()
             return
+        self.clear_edit_variables()
         item = self.ui.treeWidget.currentItem()
         if item is None:
             Message(self.app, _('Warning'), _("No code was selected"), "warning").exec()
@@ -3434,6 +3454,7 @@ class DialogCodeText(QtWidgets.QWidget):
 
         if not self.undo_deleted_codes:
             return
+        self.clear_edit_variables()
         cur = self.app.conn.cursor()
         for item in self.undo_deleted_codes:
             cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
@@ -3457,6 +3478,7 @@ class DialogCodeText(QtWidgets.QWidget):
 
         if self.file_ is None:
             return
+        self.clear_edit_variables()
         unmarked_list = []
         for item in self.code_text:
             if item['pos0'] <= location + self.file_['start'] <= item['pos1'] and \
@@ -3499,6 +3521,7 @@ class DialogCodeText(QtWidgets.QWidget):
         if self.file_ is None:
             Message(self.app, _('Warning'), _("No file was selected"), "warning").exec()
             return
+        self.clear_edit_variables()
         pos0 = self.ui.textEdit.textCursor().selectionStart()
         pos1 = self.ui.textEdit.textCursor().selectionEnd()
         text_length = len(self.ui.textEdit.toPlainText())
@@ -3597,6 +3620,7 @@ class DialogCodeText(QtWidgets.QWidget):
          Currently, only using the current selected file.
          Line ending text representation \\n is replaced with the actual line ending character. """
 
+        self.clear_edit_variables()
         item = self.ui.treeWidget.currentItem()
         if item is None or item.text(1)[0:3] == 'cat':
             Message(self.app, _('Warning'), _("No code was selected"), "warning").exec()
@@ -3690,8 +3714,8 @@ class DialogCodeText(QtWidgets.QWidget):
         ok = ui.exec()
         if not ok:
             return
+        self.clear_edit_variables()
         undo = ui.get_selected()
-
         # Run all sqls
         cur = self.app.conn.cursor()
         try:
@@ -3723,6 +3747,7 @@ class DialogCodeText(QtWidgets.QWidget):
         if item is None or item.text(1)[0:3] == 'cat':
             Message(self.app, _('Warning'), _("No code was selected"), "warning").exec()
             return
+        self.clear_edit_variables()
         cid = int(item.text(1).split(':')[1])
         dialog = QtWidgets.QInputDialog(None)
         dialog.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
@@ -3852,6 +3877,8 @@ class DialogCodeText(QtWidgets.QWidget):
         files = ui.get_selected()
         if len(files) == 0:
             return
+        self.clear_edit_variables()
+
         undo_list = []
         cur = self.app.conn.cursor()
         try:
@@ -3910,6 +3937,47 @@ class DialogCodeText(QtWidgets.QWidget):
         self.fill_code_counts_in_tree()
 
     # Methods for Editing mode
+    def undo_edited_text(self):
+        """ Revert to the text prior to it being edited. """
+
+        if self.edit_original_source is None:
+            print("Should not occur")
+            return
+        cursor = self.app.conn.cursor()
+        cursor.execute("update source set fulltext=? where id=?", [self.edit_original_source, self.edit_original_source_id])
+        #print("source id:", self.edit_original_source_id)
+        #print("Source: ", self.edit_original_source)
+        #print("Codes:", self.edit_original_codes)
+        for c in self.edit_original_codes:
+            cursor.execute("update code_text set seltext=?, pos0=?, pos1=? where ctid=?",
+                           [c[1], c[2], c[3], c[0]])
+        #print("annotes:", self.edit_original_annotations)
+        for a in self.edit_original_annotations:
+            cursor.execute("update annotation set pos0=?, pos1=? where anid=?",
+                           [c[1], c[2], c[0]])
+        #print("Case assignment", self.edit_original_case_assignment)
+        for ca in self.edit_original_case_assignment:
+            cursor.execute("update case_text set pos0=?, pos1=? where caseid=?",
+                           [ca[1], ca[2], ca[0]])
+        self.load_file(self.file_['id'])
+        self.clear_edit_variables()
+        msg = _("Text reverted to prior to edit")
+        Message(self.app, _("Undo last edited text"), msg).exec()
+        #self.edit_pos = 0
+
+    def clear_edit_variables(self):
+        """ Called by undo pushbutton, or any coding, annotating, unmarking """
+
+        #self.edit_pos = 0
+        #self.edit_mode = False
+        self.edit_original_source = None
+        self.edit_original_codes = None
+        self.edit_original_annotations = None
+        self.edit_original_case_assignment = None
+        self.edit_original_cutoff_datetime = None
+        self.edit_original_source_id = None
+        self.ui.pushButton_undo_edit.setEnabled(False)
+
     def edit_mode_toggle(self):
         """ Activate or deactivate edit mode.
         When activated, hide most widgets, remove tooltips, remove text edit menu.
@@ -3923,12 +3991,39 @@ class DialogCodeText(QtWidgets.QWidget):
         self.edit_mode = not self.edit_mode
         if self.edit_mode:
             self.edit_mode_on()
+            self.ui.pushButton_undo_edit.setEnabled(True)
             return
         self.edit_mode_off()
 
     def edit_mode_on(self):
         """ Hide most widgets, remove tooltips, remove text edit menu.
         Need to load entire file, if only a section is currently loaded. """
+
+        if self.file_ is None:
+            return
+
+        # Copy existing source and code_text codes and annotations and case text
+        self.edit_original_source_id = self.file_['id']
+        self.edit_original_annotations = []
+        self.edit_original_codes = []
+        self.edit_original_case_assignment = []
+        self.edit_original_cutoff_datetime = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
+        cursor = self.app.conn.cursor()
+        cursor.execute("select id, fulltext from source where id=?", [self.file_['id']])
+        res_source = cursor.fetchone()
+        self.edit_original_source = res_source[1]
+        cursor.execute("select ctid, seltext,pos0,pos1 from code_text where fid=?", [self.file_['id']])
+        res_codes = cursor.fetchall()
+        if res_codes:
+            self.edit_original_codes = res_codes
+        cursor.execute("select anid, pos0,pos1 from annotation where fid=?", [self.file_['id']])
+        res_annotations = cursor.fetchall()
+        if res_annotations:
+            self.edit_original_annotations = res_annotations
+        cursor.execute("select id,pos0,pos1 from case_text where fid=?", [self.file_['id']])
+        res_case = cursor.fetchall()
+        if res_case:
+            self.edit_original_case_assignment = res_case
 
         temp_edit_pos = self.ui.textEdit.textCursor().position() + self.file_['start']
         if temp_edit_pos > 0:
@@ -4084,10 +4179,9 @@ class DialogCodeText(QtWidgets.QWidget):
                     changed = True
                 if not changed and c['newpos0'] is not None and c['newpos0'] < preceding_pos < c['newpos1']:
                     c['newpos1'] += chars_len
-            for c in self.annotations:
+            for c in self.ed_annotations:
                 changed = False
-                if c['newpos0'] is not None and c['newpos0'] >= preceding_pos and c[
-                    'newpos0'] >= preceding_pos - pre_chars_len:
+                if c['newpos0'] is not None and c['newpos0'] >= preceding_pos and c['newpos0'] >= preceding_pos - pre_chars_len:
                     c['newpos0'] += chars_len
                     c['newpos1'] += chars_len
                     changed = True
@@ -4127,7 +4221,7 @@ class DialogCodeText(QtWidgets.QWidget):
                     if c['newpos1'] < c['newpos0']:
                         self.code_deletions.append(f"delete from code_text where ctid={c['ctid']}")
                         c['newpos0'] = None
-            for c in self.annotations:
+            for c in self.ed_annotations:
                 changed = False
                 if c['newpos0'] is not None and c['newpos0'] >= preceding_pos and c[
                     'newpos0'] >= preceding_pos - pre_chars_len:
@@ -4149,8 +4243,8 @@ class DialogCodeText(QtWidgets.QWidget):
                         c['newpos0'] = None
             for c in self.ed_casetext:
                 changed = False
-                if c['newpos0'] is not None and c['newpos0'] >= preceding_pos and c[
-                    'newpos0'] >= preceding_pos - pre_chars_len:
+                if c['newpos0'] is not None and c['newpos0'] >= preceding_pos and \
+                    c['newpos0'] >= preceding_pos - pre_chars_len:
                     c['newpos0'] -= chars_len
                     c['newpos1'] -= chars_len
                     changed = True
