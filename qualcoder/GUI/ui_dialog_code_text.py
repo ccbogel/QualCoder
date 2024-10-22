@@ -409,7 +409,7 @@ class Ui_Dialog_code_text(object):
         self.comboBox_export.setItemText(1, _translate("Dialog_code_text", "html"))
         self.comboBox_export.setItemText(2, _translate("Dialog_code_text", "odt"))
         self.comboBox_export.setItemText(3, _translate("Dialog_code_text", "txt"))
-        self.pushButton_undo_edit.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>After editing the text:</p><p>Review edited text to confirm code positions are correct. Undo edit text, if code postions are incorrect.</p><p>If the edit text button is pressed again to go into edit text. The last undo positions will be cleared.</p><p>If coding is perfomed after the last edit is undone, the coding postions will be incorrect.</p></body></html>"))
+        self.pushButton_undo_edit.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>After editing the text:</p><p>Review edited text to confirm code positions are correct. Press button to Undo edited text, if code postions are incorrect. </p></body></html>"))
         self.pushButton_exit_edit.setToolTip(_translate("Dialog_code_text", "Exit Edit text "))
         self.pushButton_latest.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>File with latest coding</p></body></html>"))
         self.pushButton_bookmark_go.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>Go to bookmark</p></body></html>"))
