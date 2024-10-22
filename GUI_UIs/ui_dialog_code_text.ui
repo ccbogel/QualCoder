@@ -535,7 +535,7 @@ As all assigned positions may be incorrect. </string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;After editing the text:&lt;/p&gt;&lt;p&gt;Review edited text to confirm code positions are correct. Undo edit text, if code postions are incorrect.&lt;/p&gt;&lt;p&gt;If the edit text button is pressed again to go into edit text. The last undo positions will be cleared.&lt;/p&gt;&lt;p&gt;If coding is perfomed after the last edit is undone, the coding postions will be incorrect.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;After editing the text:&lt;/p&gt;&lt;p&gt;Review edited text to confirm code positions are correct. Press button to Undo edited text, if code postions are incorrect. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
