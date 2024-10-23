@@ -28,9 +28,8 @@ https://qualcoder.wordpress.com/
 
 from PyQt6 import QtWidgets, QtCore
 from PyQt6.QtCore import Qt, QEvent
-from PyQt6.QtGui import QCursor, QGuiApplication, QTextCursor, QPalette  # Kai: QTextCurosr, QPalette - Unused
+from PyQt6.QtGui import QCursor, QGuiApplication
 from PyQt6.QtWidgets import QTextEdit
-from PyQt6.QtGui import QKeySequence, QPixmap, QIcon  # Kai Unused
 import qtawesome as qta
 
 from langchain_core.messages.human import HumanMessage
@@ -46,7 +45,6 @@ import sqlite3
 
 from .ai_search_dialog import DialogAiSearch
 from .GUI.ui_ai_chat import Ui_Dialog_ai_chat
-from .GUI.base64_helper import *  # Kai Unused
 from .helpers import Message
 
 path = os.path.abspath(os.path.dirname(__file__))
@@ -800,14 +798,11 @@ class DialogAIChat(QtWidgets.QDialog):
                     sql = f'SELECT name, fulltext FROM source WHERE id = {source_id}'
                     cursor.execute(sql)
                     source = cursor.fetchone()
+                    tooltip_txt = f'{source[0]}:\n'  # File name
+                    tooltip_txt += f'"{source[1][int(start):int(start) + int(length)]}"'  # Chunk extracted from fulltext                    
                 except Exception as e:
                     logger.debug(f'Link: "{link}" - Error: {e}')
                     source = None
-                if source is not None:
-                    tooltip_txt = f'{source[0]}:\n'  # File name
-                    # Kai - varriables start and length - referenced before asignment
-                    tooltip_txt += f'"{source[1][int(start):int(start) + int(length)]}"'  # Chunk extracted from fulltext
-                else:
                     tooltip_txt = _('Invalid source reference.')
                 QtWidgets.QToolTip.showText(QCursor.pos(), tooltip_txt, self.ui.ai_output)
         else:
@@ -831,6 +826,8 @@ class DialogAIChat(QtWidgets.QDialog):
                     coding = None
                 if coding is not None:
                     # Kai - Unresolved attribute reference: text_coding - ? identfied by PyCharm
+                    # @Colin - PyCharm is probably complaining because self.main_window is not a typed variable. 
+                    #         It references the main window where the function 'text_coding' indeed exists.
                     self.main_window.text_coding(task='documents', 
                                                  doc_id=int(coding[0]), 
                                                  doc_sel_start=int(coding[1]), 
@@ -843,19 +840,18 @@ class DialogAIChat(QtWidgets.QDialog):
                     chunk_id = link[len('chunk:'):]
                     source_id, start, length = chunk_id.split('_')
                     end = int(start) + int(length)
-                except Exception as e:
-                    logger.debug(f'Link: "{link}" - Error: {e}')
-                    source_id = None
-                if source_id is not None:
                     # Kai - Unresolved attribute refernce text_coding. Identifiied by PyCharm
-                    # Kai - start and end refernfed before assignment. Idnetified by PyCharm
+                    # @Colin - see above
                     self.main_window.text_coding(task='documents', 
                                                  doc_id=int(source_id), 
                                                  doc_sel_start=int(start), 
                                                  doc_sel_end=end)
-                else:
+                except Exception as e:
+                    logger.debug(f'Link: "{link}" - Error: {e}')
+                    source_id = None
                     msg = _('Invalid source reference.')
                     Message(self.app, _('AI Chat'), msg, icon='critical').exec()                    
+
 
 ###### Helper:
 

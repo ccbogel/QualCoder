@@ -366,7 +366,7 @@ class Ui_MainWindow(object):
         self.actionAI_Rebuild_internal_memory.setText(_translate("MainWindow", "Rebuild Internal Memory"))
         self.actionAI_Edit_Project_Memo.setText(_translate("MainWindow", "Project Memo"))
         self.actionAI_Chat.setText(_translate("MainWindow", "AI Chat"))
-        self.actionAI_Search_and_Coding.setText(_translate("MainWindow", "AI Search and Coding"))
+        self.actionAI_Search_and_Coding.setText(_translate("MainWindow", "AI Assisted Coding"))
         self.actionAI_Settings.setText(_translate("MainWindow", "Settings"))
         self.actionAI_Settings.setToolTip(_translate("MainWindow", "AI related Settings"))
         self.actionAI_Prompts.setText(_translate("MainWindow", "Prompt library"))

@@ -38,7 +38,7 @@ from langchain_core.documents.base import Document
 from huggingface_hub import hf_hub_url
 from chromadb.config import Settings
 import requests
-from typing import (Any, Iterable, Optional, List)  # Kai, need only List
+from typing import List
 import logging
 import traceback
 import time
@@ -270,7 +270,7 @@ want to continue?\
         worker.signals.error.connect(ai_exception_handler)
         self.threadpool.start(worker)
     
-    def _open_db(self, signals, progress_callback=None):  # Kai: signals and progresscallback not used
+    def _open_db(self, signals):  # Kai: signals and progresscallback not used | @Colin - I deleted "progresscallback", no longer used. "signals" is always added as a parameter when this is called by the Worker in ai_async_worker. I cannot omit it, even though I don't use it here. 
         if self._is_closing:
             return  # abort when closing db
         if self.app.project_path != '' and os.path.exists(self.app.project_path):

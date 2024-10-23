@@ -414,8 +414,7 @@ class AiLLM():
         code_descriptions = json_repair.loads(str(res.content))['descriptions']
         return code_descriptions
 
-    # TODO Cannot do this: doc_ids=[].  This is a mutable default arguements and will cause errors
-    def retrieve_similar_data(self, result_callback, code_name, code_memo='', doc_ids=[]):
+    def retrieve_similar_data(self, result_callback, code_name, code_memo='', doc_ids=None):
         """Retrieve pieces of data from the vectorstore that are related to the given code.
         This function will be performed in the background, following these steps:
         1) Semantic extension: Let the LLM generate a list of 10 desciptions of the code in simple language
@@ -426,22 +425,21 @@ class AiLLM():
             result_callback: Callback funtion, recieved the results as a list of documents type langchain_core.documents.base.Document
             code_name: str
             code_memo (optional): Defaults to ''.
-            doc_ids (list, optional): Filter. If not empty, only results from these documents will be returned. Defaults to [].
+            doc_ids (list, optional): Filter. If not None, only results from these documents will be returned. Defaults to [].
         """
         self.ai_async_query(self._retrieve_similar_data, result_callback, code_name, code_memo, doc_ids)
 
-    # TODO Cannot do this: doc_ids=[].  This is a mutable default arguements and will cause errors
-    def _retrieve_similar_data(self, code_name, code_memo='', doc_ids=[], progress_callback=None, signals=None) -> list:
+    def _retrieve_similar_data(self, code_name, code_memo='', doc_ids=None, progress_callback=None, signals=None) -> list:
         # 1) Get a list of code descriptions from the llm
         if progress_callback is not None:
             progress_callback.emit(_('Stage 1:\nSearching data related to "') + code_name + '"') 
         descriptions = self.generate_code_descriptions(code_name, code_memo)
         if self.ai_async_is_canceled:
-            return  # To return [] instead ? Kai
+            return []
         
         # 2) Use the list of code descriptions to retrieve related data from the vectorstore
         search_kwargs = {'score_threshold': 0.5, 'k': 50}
-        if len(doc_ids) > 0:
+        if doc_ids is not None and len(doc_ids) > 0:
             # add document filter
             search_kwargs['filter'] = {'id': {'$in': doc_ids}}
         

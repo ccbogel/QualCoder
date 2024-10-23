@@ -29,21 +29,15 @@ https://qualcoder.wordpress.com/
 from copy import deepcopy
 import logging
 import os
-import sys  # Kai not used
-import traceback  # Kai not used
-import sqlite3  # Kai not used
 
 from PyQt6 import QtWidgets, QtCore, QtGui
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QBrush
-# prompt_types, PromptItem, split_name_and_scope Not used
-from .ai_prompts import prompt_types, PromptItem, PromptsList, DialogAiEditPrompts, split_name_and_scope
+from .ai_prompts import PromptsList, DialogAiEditPrompts
 from .color_selector import TextColor
-from .report_attributes import DialogSelectAttributeParameters  # Not used
-from .select_items import DialogSelectItems  # Not used
+from .report_attributes import DialogSelectAttributeParameters
 from .GUI.ui_ai_search import Ui_Dialog_AiSearch
 from .helpers import Message
-from .report_attributes import DialogSelectAttributeParameters
 
 
 path = os.path.abspath(os.path.dirname(__file__))
@@ -131,6 +125,8 @@ class DialogAiSearch(QtWidgets.QDialog):
             Message(self.app, _('No codes'), msg, "warning").exec()
         for prompt in self.prompts_list.prompts:
             self.ui.comboBox_prompts.addItem(prompt.name_and_scope())
+            item_idx = self.ui.comboBox_prompts.count() - 1
+            self.ui.comboBox_prompts.setItemData(item_idx, prompt.description, Qt.ItemDataRole.ToolTipRole)
         self.ui.comboBox_prompts.setCurrentText(self.current_prompt.name_and_scope())
         self.ui.comboBox_prompts.setToolTip(self.current_prompt.description)
         self.ui.comboBox_prompts.currentIndexChanged.connect(self.on_prompt_selected)
@@ -313,9 +309,10 @@ class DialogAiSearch(QtWidgets.QDialog):
             item = it.value()
             count += 1
             
-    def on_prompt_selected(self, index):  # Kai, index not used
+    def on_prompt_selected(self, index):  # Kai, index not used | @Colin - 'index' is a parameter of the self.ui.comboBox_prompts.currentIndexChanged action/signal. I don't think I can omit it. 
         """ This function will be called whenever the user selects a new item in the combobox. """
         self.current_prompt = self.prompts_list.prompts[self.ui.comboBox_prompts.currentIndex()]
+        self.ui.comboBox_prompts.setToolTip(self.current_prompt.description)
             
     def change_prompt(self):
         """ Select and edit the prompt for the search. """
