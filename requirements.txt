@@ -8,7 +8,7 @@ Pillow
 plotly
 ply
 pydub
-PyQt6
+PyQt6>=6.5
 qtawesome
 python-vlc
 rispy

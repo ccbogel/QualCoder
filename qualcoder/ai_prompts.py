@@ -209,11 +209,14 @@ class PromptItem:
     
     @classmethod
     def from_dict(cls, dict_data):
+        if 'type' in dict_data:
+            dict_data['prompt_type'] = dict_data.pop('type')
         return cls(**dict_data)
 
 
 def split_name_and_scope(combined_str) -> {str, str}:
-    # helper to split "promptname (system)" into "promptname", "system"
+    """ Helper to split name and scope of a prompt, e.g. "promptname (system)" into "promptname", "system"
+    """
     name = ''
     scope = ''
     if combined_str.endswith(' (system)'):
@@ -228,33 +231,31 @@ def split_name_and_scope(combined_str) -> {str, str}:
     return name, scope
 
 
-# This type holds a list of prompts and can read/write them from/to a yaml file
 class PromptsList:
-    """ Kai. is variable 'type' a list of prompts?
-    renaming type to type_  as type isa python command word
+    """ This type holds a list of prompts and can read/write them from/to a yaml file
     """
 
-    def __init__(self, app, type_=None):
+    def __init__(self, app, prompt_type=None):
         self.prompts = []
         self.app = app
-        self.read_prompts(type_)
+        self.read_prompts(prompt_type)
 
-    def read_prompts(self, type_=None):
+    def read_prompts(self, prompt_type=None):
         self.prompts.clear()
         
         # system prompts
         yaml_data = yaml.safe_load(system_prompts)
         for prompt in yaml_data:
-            if type_ is None or type_ == prompt['type']:
+            if prompt_type is None or prompt_type == prompt['type']:
                 prompt['scope'] = 'system'
                 self.prompts.append(PromptItem.from_dict(prompt))
         
         # Read user (app-level) and project specific prompts
         self.user_prompts_path = os.path.join(self.app.confighome, 'ai_prompts.yaml')
-        self._read_from_yaml(self.user_prompts_path, type_, 'user')
+        self._read_from_yaml(self.user_prompts_path, prompt_type, 'user')
         if self.app.project_path != "":
             self.project_prompts_path = os.path.join(self.app.project_path, 'ai_data', 'ai_prompts.yaml')
-            self._read_from_yaml(self.project_prompts_path, type_, 'project')
+            self._read_from_yaml(self.project_prompts_path, prompt_type, 'project')
         else:
             self.project_prompts_path = ""
             self.project_prompts.prompts.clear()  # Unresolved attribite: project_prompts
@@ -290,13 +291,13 @@ class PromptsList:
                     found = True
         return True
 
-    def _read_from_yaml(self, filename, type_, scope):
+    def _read_from_yaml(self, filename, prompt_type, scope):
         if not os.path.exists(filename):
             return False
         with open(filename, 'r', encoding='utf-8') as yaml_file:
             yaml_data = yaml.safe_load(yaml_file)
             for prompt in yaml_data:
-                if type_ is None or type_ == prompt['type']:
+                if prompt_type is None or prompt_type == prompt['type']:
                     prompt['scope'] = scope
                     self.prompts.append(PromptItem.from_dict(prompt))
         return True
@@ -332,13 +333,13 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
     Dialog to edit the prompts for the different AI enhanced functions
     """
     
-    def __init__(self, app_, type_=None):
+    def __init__(self, app_, prompt_type=None):
         """Initializes the dialog
 
         Args:
             app_ (qualcoder App)
-            type_ (string): Only prompts of this type are shown and allowed to be created
-                           default: None (= all prompt types allowed)
+            prompt_type (string): Only prompts of this type are shown and allowed to be created
+                                  default: None (= all prompt types allowed)
         """
         self.app = app_
         QtWidgets.QDialog.__init__(self)
@@ -351,8 +352,8 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         treefont = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
         treefont += '"' + self.app.settings['font'] + '";'
         self.ui.treeWidget_prompts.setStyleSheet(treefont)
-        self.prompt_type = type_
-        self.prompts = PromptsList(app_, type_)
+        self.prompt_type = prompt_type
+        self.prompts = PromptsList(app_, prompt_type)
         self.selected_prompt = None
         self.form_updating = True
         try:
