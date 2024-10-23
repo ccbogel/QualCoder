@@ -131,6 +131,8 @@ class DialogAiSearch(QtWidgets.QDialog):
             Message(self.app, _('No codes'), msg, "warning").exec()
         for prompt in self.prompts_list.prompts:
             self.ui.comboBox_prompts.addItem(prompt.name_and_scope())
+            item_idx = self.ui.comboBox_prompts.count() - 1
+            self.ui.comboBox_prompts.setItemData(item_idx, prompt.description, Qt.ItemDataRole.ToolTipRole)
         self.ui.comboBox_prompts.setCurrentText(self.current_prompt.name_and_scope())
         self.ui.comboBox_prompts.setToolTip(self.current_prompt.description)
         self.ui.comboBox_prompts.currentIndexChanged.connect(self.on_prompt_selected)
@@ -316,6 +318,7 @@ class DialogAiSearch(QtWidgets.QDialog):
     def on_prompt_selected(self, index):
         """This function will be called whenever the user selects a new item in the combobox"""
         self.current_prompt = self.prompts_list.prompts[self.ui.comboBox_prompts.currentIndex()]
+        self.ui.comboBox_prompts.setToolTip(self.current_prompt.description)
             
     def change_prompt(self):
         """ Select and edit the prompt for the search. """
