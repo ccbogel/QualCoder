@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2023 Colin Curtain
+Copyright (c) 2024 Kai Droege, Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -28,36 +28,37 @@ https://qualcoder.wordpress.com/
 
 import os
 import logging
-from typing import List
-import time
+from typing import List  # Unused
+import time  # Unused
 from PyQt6 import QtWidgets
-from PyQt6 import QtGui
+from PyQt6 import QtGui  # Unused
 from PyQt6 import QtCore 
 import qtawesome as qta
 
 from .ai_prompts import PromptItem
 from langchain_openai import ChatOpenAI
-from langchain_core.globals import set_llm_cache
-from langchain_community.cache import InMemoryCache
+from langchain_core.globals import set_llm_cache  # Unused
+from langchain_community.cache import InMemoryCache  # Unused
 from langchain_core.callbacks.base import BaseCallbackHandler
 from langchain_core.runnables.config import RunnableConfig
 from langchain_core.messages.human import HumanMessage
-from langchain_core.messages.ai import AIMessage
+from langchain_core.messages.ai import AIMessage  # Unused
 from langchain_core.messages.system import SystemMessage
-from langchain_core.documents.base import Document
+from langchain_core.documents.base import Document  # Unused
 from .ai_async_worker import Worker
 from .ai_vectorstore import AiVectorstore
-from .GUI.base64_helper import *
+from .GUI.base64_helper import *  # Unused
 from .helpers import Message
 import fuzzysearch
 import json_repair
 
-max_memo_length = 1500 # maximum length of the memo send to the AI
+max_memo_length = 1500  # maximum length of the memo send to the AI
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
         
+
 class MyCustomSyncHandler(BaseCallbackHandler):
     def __init__(self, ai_llm):
         self.ai_llm = ai_llm
@@ -65,6 +66,7 @@ class MyCustomSyncHandler(BaseCallbackHandler):
     def on_llm_new_token(self, token: str, **kwargs) -> None:
         self.ai_llm.ai_async_progress_count += 1
     
+
 def extract_ai_memo(memo: str) -> str:
     """In any memo, any text after the mark '#####' are considered as personal notes that will not be send to the AI.
     This function extracts the text before this mark (or all text if no marking is found) 
@@ -81,6 +83,7 @@ def extract_ai_memo(memo: str) -> str:
     else:
         return memo
     
+
 class AiLLM():
     """ This manages the communication between qualcoder, the vectorstore 
     and the LLM (large language model, e.g. GPT-4)."""
@@ -100,7 +103,7 @@ class AiLLM():
     large_llm_context_window = 128000
     fast_llm_context_window = 16385
     ai_streaming_output = ''
-    sources_collection = 'qualcoder' # name of the vectorstore collection for source documents
+    sources_collection = 'qualcoder'  # name of the vectorstore collection for source documents
     
     def __init__(self, app, parent_text_edit):
         self.app = app
@@ -132,7 +135,7 @@ class AiLLM():
         self.main_window = main_window      
         if enable_ai or self.app.settings['ai_enable'] == 'True':
             self.parent_text_edit.append(_('AI: Starting up...'))
-            QtWidgets.QApplication.processEvents() # update ui
+            QtWidgets.QApplication.processEvents()  # update ui
             self._status = 'starting'
 
             # init LLMs
@@ -237,7 +240,7 @@ class AiLLM():
         - 'closing' (in the process of shutting down)
         """
         if self._status != '':
-            return self._status # 'starting' and 'closing' are set by the corresponding procedures
+            return self._status  # 'starting' and 'closing' are set by the corresponding procedures
         elif self.app.settings['ai_enable'] != 'True':
             return 'disabled'
         elif self.sources_vectorstore is None:
@@ -264,10 +267,10 @@ class AiLLM():
         #            (not self.is_busy())
     
     def get_default_system_prompt(self) -> str:
-        p =  'You are assisting a team of qualitative social researchers.'
+        p = 'You are assisting a team of qualitative social researchers.'
         project_memo = extract_ai_memo(self.app.get_project_memo())
         if self.app.settings.get('ai_send_project_memo', 'True') == 'True' and len(project_memo) > 0:
-            p +=  f' Here is some background information about the research project the team is working on:\n{project_memo}'
+            p += f' Here is some background information about the research project the team is working on:\n{project_memo}'
         return p
         
     def _ai_async_progress(self, msg):
@@ -317,7 +320,7 @@ class AiLLM():
         self.ai_streaming_output = ''
         for chunk in llm.stream(messages):
             if self.ai_async_is_canceled:
-                break # cancel the streaming
+                break  # cancel the streaming
             else:
                 self.ai_streaming_output += chunk.content
                 if signals is not None:
@@ -344,7 +347,7 @@ class AiLLM():
         self.ai_async_is_errored = False
         self.ai_async_progress_msg = ''
         self.ai_async_progress_count = -1
-        worker = Worker(func, *args, **kwargs) # Any other args, kwargs are passed to the run function
+        worker = Worker(func, *args, **kwargs)  # Any other args, kwargs are passed to the run function
         if result_callback is not None: 
             worker.signals.result.connect(result_callback)
         worker.signals.finished.connect(self._ai_async_finished)
@@ -410,7 +413,8 @@ class AiLLM():
         logger.debug(str(res.content))
         code_descriptions = json_repair.loads(str(res.content))['descriptions']
         return code_descriptions
-    
+
+    # TODO Cannot do this: doc_ids=[].  This is a mutable default arguements and will cause errors
     def retrieve_similar_data(self, result_callback, code_name, code_memo='', doc_ids=[]):
         """Retrieve pieces of data from the vectorstore that are related to the given code.
         This function will be performed in the background, following these steps:
@@ -426,19 +430,20 @@ class AiLLM():
         """
         self.ai_async_query(self._retrieve_similar_data, result_callback, code_name, code_memo, doc_ids)
 
+    # TODO Cannot do this: doc_ids=[].  This is a mutable default arguements and will cause errors
     def _retrieve_similar_data(self, code_name, code_memo='', doc_ids=[], progress_callback=None, signals=None) -> list:
         # 1) Get a list of code descriptions from the llm
-        if progress_callback != None:
+        if progress_callback is not None:
             progress_callback.emit(_('Stage 1:\nSearching data related to "') + code_name + '"') 
         descriptions = self.generate_code_descriptions(code_name, code_memo)
         if self.ai_async_is_canceled:
-            return
+            return  # To return [] instead ? Kai
         
         # 2) Use the list of code descriptions to retrieve related data from the vectorstore
         search_kwargs = {'score_threshold': 0.5, 'k': 50}
         if len(doc_ids) > 0:
             # add document filter
-            search_kwargs['filter'] = {'id': {'$in':doc_ids}}
+            search_kwargs['filter'] = {'id': {'$in': doc_ids}}
         
         chunks_meta_list = []
         for desc in descriptions:
@@ -458,8 +463,8 @@ class AiLLM():
             return chunk_str
             
         # Flatten the lists and count the frequency of each chunk
-        chunk_count_list = {} # contains the chunk count
-        chunk_master_list = [] # contains all chunks from all lists but no doubles
+        chunk_count_list = {}  # contains the chunk count
+        chunk_master_list = []  # contains all chunks from all lists but no doubles
         for lst in chunks_meta_list:
             for chunk in lst:            
                 chunk_doc = chunk[0]
@@ -500,7 +505,7 @@ class AiLLM():
         self.ai_async_query(self._search_analyze_chunk, result_callback, chunk, code_name, code_memo, search_prompt)
         
     def _search_analyze_chunk(self, chunk, code_name, code_memo, search_prompt: PromptItem, progress_callback=None, signals=None):                
-        if progress_callback != None:
+        if progress_callback is not None:
             progress_callback.emit(_("Stage 2:\nInspecting the data more closely..."))        
 
         # build up the prompt
@@ -545,8 +550,8 @@ class AiLLM():
         res_json = json_repair.loads(str(res.content))
         
         # analyse and format the answer
-        if 'related' in res_json and res_json['related'] == True and \
-           'quote' in res_json and res_json['quote'] != '': # found something
+        if 'related' in res_json and res_json['related'] is True and \
+           'quote' in res_json and res_json['quote'] != '':  # found something
             # Adjust quote_start
             i = 0
             doc = {}
@@ -554,16 +559,16 @@ class AiLLM():
                        
             # search quote with not more than 30% mismatch (Levenshtein Distance). This is done because the AI sometimes alters the text a little bit.
             quote_found = fuzzysearch.find_near_matches(res_json['quote'], chunk.page_content, 
-                             max_l_dist=round(len(res_json['quote']) * 0.3)) # result: list [Match(start=x, end=x, dist=x, matched='txt')]
+                             max_l_dist=round(len(res_json['quote']) * 0.3))  # result: list [Match(start=x, end=x, dist=x, matched='txt')]
             if len(quote_found) > 0:
                 doc['quote_start'] = quote_found[0].start + doc['metadata']['start_index']
                 doc['quote'] = quote_found[0].matched
-            else: # quote not found, make the whole chunk the quote
+            else:  # quote not found, make the whole chunk the quote
                 doc['quote_start'] = doc['metadata']['start_index']
                 doc['quote'] = chunk.page_content
         
             doc['interpretation'] = res_json['interpretation']
-        else: # No quote means the AI discarded this chunk as not relevant
+        else:  # No quote means the AI discarded this chunk as not relevant
             doc = None
         return doc   
 

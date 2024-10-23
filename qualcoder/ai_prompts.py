@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2023 Colin Curtain
+Copyright (c) 2024 Kai Droege, Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -27,15 +27,15 @@ https://qualcoder.wordpress.com/
 """
 
 import os
-import sys
+import sys  # Unused
 import logging
-import traceback
+import traceback  # Unused
 import yaml
 import copy
-import gettext
+import gettext  # Unused
 
 from PyQt6 import QtWidgets, QtCore, QtGui
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt  # Unused
 
 from .GUI.ui_ai_edit_prompts import Ui_Dialog_AiPrompts
 from .helpers import Message
@@ -189,12 +189,15 @@ prompt_scope_descriptions = [
     ('Project prompts are defined by you, but for the current project only. They go with the project files. If you or somebody else opens the same project on another machine, these prompts will be available there too.')
 ]
 
+
 # Define a prompt of a certain type
 class PromptItem:
-    def __init__(self, scope, name, type, description, text):
+    """ Define prompts of certain types. """
+
+    def __init__(self, scope, name, prompt_type, description, text):
         self.scope = scope
         self.name = name
-        self.type = type
+        self.type = prompt_type
         self.description = description
         self.text = text
         
@@ -207,7 +210,8 @@ class PromptItem:
     @classmethod
     def from_dict(cls, dict_data):
         return cls(**dict_data)
-    
+
+
 def split_name_and_scope(combined_str) -> {str, str}:
     # helper to split "promptname (system)" into "promptname", "system"
     name = ''
@@ -226,30 +230,34 @@ def split_name_and_scope(combined_str) -> {str, str}:
 
 # This type holds a list of prompts and can read/write them from/to a yaml file
 class PromptsList:
-    def __init__(self, app, type=None):
+    """ Kai. is variable 'type' a list of prompts?
+    renaming type to type_  as type isa python command word
+    """
+
+    def __init__(self, app, type_=None):
         self.prompts = []
         self.app = app
-        self.read_prompts(type)
+        self.read_prompts(type_)
 
-    def read_prompts(self, type=None):
+    def read_prompts(self, type_=None):
         self.prompts.clear()
         
         # system prompts
         yaml_data = yaml.safe_load(system_prompts)
         for prompt in yaml_data:
-            if type is None or type == prompt['type']:
+            if type_ is None or type_ == prompt['type']:
                 prompt['scope'] = 'system'
                 self.prompts.append(PromptItem.from_dict(prompt))
         
-        # read user (app-level) and project specific prompts 
+        # Read user (app-level) and project specific prompts
         self.user_prompts_path = os.path.join(self.app.confighome, 'ai_prompts.yaml')
-        self._read_from_yaml(self.user_prompts_path, type, 'user')
+        self._read_from_yaml(self.user_prompts_path, type_, 'user')
         if self.app.project_path != "":
             self.project_prompts_path = os.path.join(self.app.project_path, 'ai_data', 'ai_prompts.yaml')
-            self._read_from_yaml(self.project_prompts_path, type, 'project')
+            self._read_from_yaml(self.project_prompts_path, type_, 'project')
         else:
             self.project_prompts_path = ""
-            self.project_prompts.prompts.clear()
+            self.project_prompts.prompts.clear()  # Unresolved attribite: project_prompts
     
     def save_prompts(self):
         if self.user_prompts_path != '':
@@ -257,38 +265,38 @@ class PromptsList:
         if self.project_prompts_path != '':
             self._write_to_yaml(self.project_prompts_path, 'project')
 
-    def prompts_by_type(self, type, scope=None):
-    # Filters the prompts by type
+    def prompts_by_type(self, prompt_type, scope=None):
+        """ Filters the prompts by type """
         filtered_prompts = []
         for prompt in self.prompts:
-            if prompt.type == type:
+            if prompt.type == prompt_type:
                 if (scope is None) or (scope == prompt.scope):
                     filtered_prompts.append(prompt)
         return filtered_prompts
 
-    def find_prompt(self, name, scope, type) -> PromptItem:
+    def find_prompt(self, name, scope, prompt_type) -> PromptItem:
         for prompt in self.prompts:
-            if prompt.name == name and prompt.scope == scope and prompt.type == type:
+            if prompt.name == name and prompt.scope == scope and prompt.type == prompt_type:
                 return prompt
         return None
     
-    def is_unique_prompt_name(self, name, scope, type) -> bool:
+    def is_unique_prompt_name(self, name, scope, prompt_type) -> bool:
         found = False
         for prompt in self.prompts:
-            if prompt.name == name and prompt.scope == scope and prompt.type == type:
-                if found: # found double one
+            if prompt.name == name and prompt.scope == scope and prompt.type == prompt_type:
+                if found:  # Found double one
                     return False
                 else:
                     found = True
         return True
 
-    def _read_from_yaml(self, filename, type, scope):
+    def _read_from_yaml(self, filename, type_, scope):
         if not os.path.exists(filename):
             return False
         with open(filename, 'r', encoding='utf-8') as yaml_file:
             yaml_data = yaml.safe_load(yaml_file)
             for prompt in yaml_data:
-                if type is None or type == prompt['type']:
+                if type_ is None or type_ == prompt['type']:
                     prompt['scope'] = scope
                     self.prompts.append(PromptItem.from_dict(prompt))
         return True
@@ -303,6 +311,7 @@ class PromptsList:
         with open(filename, 'w', encoding='utf-8') as yaml_file:
             yaml.safe_dump(tmp_prompts, yaml_file)
             
+
 def get_item_level(item):
     """
     Helper: This function returns the level of the item in the tree.
@@ -317,17 +326,18 @@ def get_item_level(item):
         item = parent  # Prepare for the next iteration
     return level
     
+
 class DialogAiEditPrompts(QtWidgets.QDialog):
     """
     Dialog to edit the prompts for the different AI enhanced functions
     """
     
-    def __init__(self, app_, type=None):
+    def __init__(self, app_, type_=None):
         """Initializes the dialog
 
         Args:
             app_ (qualcoder App)
-            type (string): Only prompts of this type are shown and allowed to be created
+            type_ (string): Only prompts of this type are shown and allowed to be created
                            default: None (= all prompt types allowed)
         """
         self.app = app_
@@ -341,8 +351,8 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         treefont = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
         treefont += '"' + self.app.settings['font'] + '";'
         self.ui.treeWidget_prompts.setStyleSheet(treefont)
-        self.prompt_type = type
-        self.prompts = PromptsList(app_, type)
+        self.prompt_type = type_
+        self.prompts = PromptsList(app_, type_)
         self.selected_prompt = None
         self.form_updating = True
         try:
@@ -376,7 +386,7 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
             for i in range(len(prompt_types)):
                 t = prompt_types[i]
                 if self.prompt_type is not None and t != self.prompt_type:
-                    continue # skip unwanted prompt types
+                    continue  # skip unwanted prompt types
                 type_item = QtWidgets.QTreeWidgetItem(self.ui.treeWidget_prompts)
                 type_item.setText(0, t)
                 if t == 'search':
@@ -398,7 +408,7 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
                         prompt_item.setText(0, p.name)
                         prompt_item.setToolTip(0, p.description)
                         prompt_item.setIcon(0, self.app.ai.prompt_icon())
-                        if p == self.selected_prompt: # sel_prompt:
+                        if p == self.selected_prompt:  # sel_prompt:
                             prompt_item.setSelected(True)
             self.ui.treeWidget_prompts.expandAll()
             if len(self.ui.treeWidget_prompts.selectedItems()) > 0:
@@ -415,14 +425,14 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
             return
         if len(self.ui.treeWidget_prompts.selectedItems()) > 0:
             selected_item = self.ui.treeWidget_prompts.selectedItems()[0]
-            if get_item_level(selected_item) == 2: # is a prompt
+            if get_item_level(selected_item) == 2:  # is a prompt
                 selected_name = selected_item.text(0)
                 selected_scope = selected_item.parent().text(0)
                 selected_type = selected_item.parent().parent().text(0)
                 self.selected_prompt = self.prompts.find_prompt(selected_name, selected_scope, selected_type)                
-            else: # is type/scope   
+            else:  # is type/scope
                 self.selected_prompt = None
-        else: # no item selected
+        else:  # no item selected
             self.selected_prompt = None
 
         # update the prompt details
@@ -471,10 +481,10 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
             if len(self.ui.treeWidget_prompts.selectedItems()) > 0:
                 selected_item = self.ui.treeWidget_prompts.selectedItems()[0]
                 item_level = get_item_level(selected_item)
-                if item_level == 0: # type
+                if item_level == 0:  # type
                     new_type = selected_item.text(0)
                     new_scope = 'user'
-                elif item_level == 1: # scope
+                elif item_level == 1:  # scope
                     new_type = selected_item.parent().text(0)
                     new_scope = selected_item.text(0)
                 else:
@@ -483,14 +493,14 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
                     else:
                         new_type = 'search'
                     new_scope = 'user'
-            else: # no item selected, set default values
+            else:  # no item selected, set default values
                 if self.prompt_type is not None:
                     new_type = self.prompt_type
                 else:
                     new_type = 'search'
                 new_scope = 'user'
         if new_scope == 'system':
-            new_scope = 'user' # system prompts cannot be created by the user
+            new_scope = 'user'  # system prompts cannot be created by the user
 
         # determine a new name 
         new_name = 'my prompt'
@@ -514,7 +524,7 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         # determine the new scope
         new_scope = self.selected_prompt.scope
         if new_scope == 'system':
-            new_scope = 'user' # system prompts cannot be created by the user
+            new_scope = 'user'  # system prompts cannot be created by the user
         # determine a new name 
         new_name = self.selected_prompt.name
         i = 1
@@ -555,7 +565,7 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
             return
         if self.selected_prompt is None:
             return
-        if self.selected_prompt.scope == 'system': # system prompts are uneditable
+        if self.selected_prompt.scope == 'system':  # system prompts are uneditable
             return
         if self.ui.radioButton_user.isChecked(): 
             new_scope = 'user'
@@ -594,10 +604,10 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
                 self.selected_prompt.text = self.ui.plainTextEdit_prompt_text.toPlainText()
                 
                 # Check if tree needs update
-                if sender_widget in (self.ui.lineEdit_name, \
-                                    self.ui.radioButton_system, \
-                                    self.ui.radioButton_user, \
-                                    self.ui.radioButton_project, \
+                if sender_widget in (self.ui.lineEdit_name,
+                                    self.ui.radioButton_system,
+                                    self.ui.radioButton_user,
+                                    self.ui.radioButton_project,
                                     self.ui.comboBox_type):
                     self.fill_tree()
         finally:
@@ -626,9 +636,4 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         
     def cancel(self):
         self.reject()
-
-
-
-
-
 

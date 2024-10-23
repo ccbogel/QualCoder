@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2023 Colin Curtain
+Copyright (c) 2024 Kai Droege, Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -26,32 +26,32 @@ https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 """
 
-import os
-import sys
-import logging
-import traceback
-import sqlite3
 from copy import deepcopy
+import logging
+import os
+import sys  # Kai not used
+import traceback  # Kai not used
+import sqlite3  # Kai not used
 
 from PyQt6 import QtWidgets, QtCore, QtGui
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QBrush
-
-from .color_selector import TextColor
-from .report_attributes import DialogSelectAttributeParameters
-from .select_items import DialogSelectItems
-from .GUI.ui_ai_search import Ui_Dialog_AiSearch
-from .report_attributes import DialogSelectAttributeParameters
+# prompt_types, PromptItem, split_name_and_scope Not used
 from .ai_prompts import prompt_types, PromptItem, PromptsList, DialogAiEditPrompts, split_name_and_scope
+from .color_selector import TextColor
+from .report_attributes import DialogSelectAttributeParameters  # Not used
+from .select_items import DialogSelectItems  # Not used
+from .GUI.ui_ai_search import Ui_Dialog_AiSearch
 from .helpers import Message
+from .report_attributes import DialogSelectAttributeParameters
+
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 
 class DialogAiSearch(QtWidgets.QDialog):
-    """
-    Dialog to select the options for the AI based search
+    """ Dialog to select the options for the AI based search
     Called from code_text.py
     """
     
@@ -86,22 +86,22 @@ class DialogAiSearch(QtWidgets.QDialog):
         if context == 'search':
             self.setWindowTitle('AI Search')
             self.ui.label_what.setText(_('What do you want to search for?'))
-            self.ui.tabWidget.setTabVisible(0, True) # code search
-            self.ui.tabWidget.setTabVisible(1, True) # free search 
+            self.ui.tabWidget.setTabVisible(0, True)  # code search
+            self.ui.tabWidget.setTabVisible(1, True)  # free search
             self.ui.checkBox_coded_segments.setVisible(True)
         elif context == 'code_analysis':
             self.setWindowTitle('AI Code Analysis')
             self.ui.label_what.setText(_('Which code do you want to analyze?'))
             self.ui.tabWidget.setCurrentIndex(0)
-            self.ui.tabWidget.setTabVisible(0, True) # code search
-            self.ui.tabWidget.setTabVisible(1, False) # free search
+            self.ui.tabWidget.setTabVisible(0, True)  # code search
+            self.ui.tabWidget.setTabVisible(1, False)  # free search
             self.ui.checkBox_coded_segments.setVisible(False) 
         elif context == 'topic_analysis':
             self.setWindowTitle('AI Topic Analysis')
             self.ui.label_what.setText(_('Which topic do you want to analyze?'))
             self.ui.tabWidget.setCurrentIndex(1)
-            self.ui.tabWidget.setTabVisible(0, False) # code search
-            self.ui.tabWidget.setTabVisible(1, True) # free search 
+            self.ui.tabWidget.setTabVisible(0, False)  # code search
+            self.ui.tabWidget.setTabVisible(1, True)  # free search
             self.ui.checkBox_coded_segments.setVisible(False)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         font = 'font: ' + str(app_.settings['fontsize']) + 'pt '
@@ -115,7 +115,7 @@ class DialogAiSearch(QtWidgets.QDialog):
         self.ui.listWidget_cases.setStyleSheet(treefont)
         self.ui.listWidget_cases.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
         self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.SelectionMode.SingleSelection)
-        if self.ui.tabWidget.isTabVisible(0): # code
+        if self.ui.tabWidget.isTabVisible(0):  # code
             self.fill_tree(selected_id, selected_is_code)   
         # prompts
         self.prompts_list = PromptsList(app_, context)
@@ -315,8 +315,8 @@ class DialogAiSearch(QtWidgets.QDialog):
             item = it.value()
             count += 1
             
-    def on_prompt_selected(self, index):
-        """This function will be called whenever the user selects a new item in the combobox"""
+    def on_prompt_selected(self, index):  # Kai, index not used
+        """ This function will be called whenever the user selects a new item in the combobox. """
         self.current_prompt = self.prompts_list.prompts[self.ui.comboBox_prompts.currentIndex()]
         self.ui.comboBox_prompts.setToolTip(self.current_prompt.description)
             
@@ -332,7 +332,7 @@ class DialogAiSearch(QtWidgets.QDialog):
             if ui.selected_prompt is not None:
                 self.current_prompt = self.prompts_list.find_prompt(ui.selected_prompt.name, ui.selected_prompt.scope, ui.selected_prompt.type)
             if self.current_prompt is None:
-                self.current_prompt = self.prompts_list.prompts[0] # default
+                self.current_prompt = self.prompts_list.prompts[0]  # default
             self.ui.comboBox_prompts.setCurrentText(self.current_prompt.name_and_scope())
             self.ui.comboBox_prompts.setToolTip(self.current_prompt.description)
 
@@ -360,17 +360,17 @@ class DialogAiSearch(QtWidgets.QDialog):
         # Clear ui
         self.attribute_file_ids = []
         self.ui.label_attributes.setText('')
-        self.ui.splitter.setSizes([300, 300, 0])
+        self.ui.splitter.setSizes([300, 300, 0])  # Unresolved attribute refernce: splitter
         # Remove any selected case or file ids
         self.file_ids = ""
         for i in range(self.ui.listWidget_files.count()):
-            if i == 0: # all files
+            if i == 0:  # all files
                 self.ui.listWidget_files.item(i).setSelected(True)
             else:    
                 self.ui.listWidget_files.item(i).setSelected(False)
         self.case_ids = ""
         for i in range(self.ui.listWidget_cases.count()):
-            if i == 0: # all cases
+            if i == 0:  # all cases
                 self.ui.listWidget_cases.item(i).setSelected(True)
             else:
                 self.ui.listWidget_cases.item(i).setSelected(False)
@@ -394,8 +394,8 @@ class DialogAiSearch(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         sql = "select length(fulltext), mediapath from source where id=?"
         sql_text_codings = "select count(cid) from code_text where fid=?"
-        sql_av_codings = "select count(cid) from code_av where id=?"
-        sql_image_codings = "select count(cid) from code_image where id=?"
+        sql_av_codings = "select count(cid) from code_av where id=?"  # Not used
+        sql_image_codings = "select count(cid) from code_image where id=?"  # Not used
         item = QtWidgets.QListWidgetItem(_("<no file filter>"))
         item.setToolTip(_("Search in all textfiles"))
         item.setData(Qt.ItemDataRole.UserRole, -1)
@@ -436,9 +436,9 @@ class DialogAiSearch(QtWidgets.QDialog):
             
     def _get_codes_from_tree(self, item: QtWidgets.QTreeWidgetItem) -> list:
         res = []
-        if item.text(1)[0:3] == 'cid': # is a code
-            id = int(item.text(1).split(':')[1])
-            res.append(id)
+        if item.text(1)[0:3] == 'cid':  # is a code
+            id_ = int(item.text(1).split(':')[1])
+            res.append(id_)
         for i in range(item.childCount()):
             child = item.child(i)
             res.extend(self._get_codes_from_tree(child))
@@ -454,7 +454,7 @@ class DialogAiSearch(QtWidgets.QDialog):
             Message(self.app, _('AI not ready'), msg, "warning").exec()
             return
 
-        if self.ui.tabWidget.currentIndex() == 0: # code search selected
+        if self.ui.tabWidget.currentIndex() == 0:  # code search selected
             if len(self.ui.treeWidget.selectedItems()) == 0:
                 msg = _('Please select a code or category (or use "free search" instead).')
                 Message(self.app, _('No codes'), msg, "warning").exec()
@@ -472,7 +472,7 @@ class DialogAiSearch(QtWidgets.QDialog):
                 while item is not None and not isinstance(item, QtWidgets.QTreeWidget):
                     self.selected_code_name = f'{item.text(0)} > {self.selected_code_name}'
                     item = item.parent()               
-        else: # free search selected
+        else:  # free search selected
             self.selected_code_ids = None
             self.selected_code_name = self.ui.lineEdit_free_topic.text()
             if self.selected_code_name == '':
@@ -481,18 +481,18 @@ class DialogAiSearch(QtWidgets.QDialog):
                 return
             self.selected_code_memo = self.ui.textEdit_free_description.toPlainText()
         
-        # file selection
+        # File selection
         self.selected_file_ids = []
-        if self.ui.listWidget_files.item(0).isSelected(): # first item selected = add all files
+        if self.ui.listWidget_files.item(0).isSelected():  # first item selected = add all files
             for i in range(self.ui.listWidget_files.count()):
-                id = self.ui.listWidget_files.item(i).data(Qt.ItemDataRole.UserRole)
-                if id > -1:
-                    self.selected_file_ids.append(id)
-        else: # add only selected
+                id_ = self.ui.listWidget_files.item(i).data(Qt.ItemDataRole.UserRole)
+                if id_ > -1:
+                    self.selected_file_ids.append(id_)
+        else:  # Add only selected
             for item in self.ui.listWidget_files.selectedItems():
-                id = item.data(Qt.ItemDataRole.UserRole)
-                if id > -1:
-                    self.selected_file_ids.append(id)
+                id_ = item.data(Qt.ItemDataRole.UserRole)
+                if id_ > -1:
+                    self.selected_file_ids.append(id_)
         
         # case filter
         if not self.ui.listWidget_cases.item(0).isSelected(): 
@@ -502,9 +502,9 @@ class DialogAiSearch(QtWidgets.QDialog):
             # do not belong to the selected cases. 
             selected_cases = []
             for item in self.ui.listWidget_cases.selectedItems():
-                id = item.data(Qt.ItemDataRole.UserRole)
-                if id > -1:
-                    selected_cases.append(id)
+                id_ = item.data(Qt.ItemDataRole.UserRole)
+                if id_ > -1:
+                    selected_cases.append(id_)
             if len(selected_cases) > 0:
                 selected_cases_str = "(" + ", ".join(map(str, selected_cases)) + ")"
                 files_cases_sql = str('select distinct case_text.fid from case_text '
@@ -520,7 +520,7 @@ class DialogAiSearch(QtWidgets.QDialog):
                 # use a list comprehension to create a new list containing only elements present in both lists
                 self.selected_file_ids = [x for x in self.selected_file_ids if x in selected_cases_files]
         
-        # combine it with the attributes filter
+        # Combine ids with the attributes filter
         if len(self.attribute_file_ids) > 0:
             self.selected_file_ids = [x for x in self.selected_file_ids if x in self.attribute_file_ids]
 
@@ -529,7 +529,7 @@ class DialogAiSearch(QtWidgets.QDialog):
             Message(self.app, _('No files'), msg, "warning").exec()
             return
         
-        # save the settings for the next search
+        # Save the settings for the next search
         self.app.settings[f'ai_dlg_{self.context}_last_prompt_name'] = self.current_prompt.name
         self.app.settings[f'ai_dlg_{self.context}_last_prompt_scope'] = self.current_prompt.scope
         if self.context == 'search':
@@ -540,7 +540,6 @@ class DialogAiSearch(QtWidgets.QDialog):
         self.app.settings[f'ai_dlg_{self.context}_last_splitter_case_files'] = self.ui.splitter_case_files.sizes()[0]
         self.app.settings[f'ai_dlg_{self.context}_send_memos'] = 'True' if self.ui.checkBox_send_memos.isChecked() else 'False'
         self.app.settings[f'ai_dlg_{self.context}_coded_segments'] = 'True' if self.ui.checkBox_coded_segments.isChecked() else 'False'
-        
         self.accept()
         
     def cancel(self):
@@ -548,9 +547,4 @@ class DialogAiSearch(QtWidgets.QDialog):
         self.selected_code_memo = ''
         self.selected_file_ids = []
         self.reject()
-
-
-
-
-
 

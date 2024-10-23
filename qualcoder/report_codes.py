@@ -833,6 +833,7 @@ class DialogReportCodes(QtWidgets.QDialog):
     def export_html_file(self):
         """ Export report to a html file. Create folder of images and change refs to the
         folder.
+        Uses self.html_links
         """
 
         if len(self.ui.textEdit.document().toPlainText()) == 0:
@@ -856,20 +857,20 @@ class DialogReportCodes(QtWidgets.QDialog):
         for item in self.html_links:
             if item['image'] is not None or item['avname'] is not None:
                 need_media_folders = True
-        html_folder_name = ""
-        html_relative_name = ""
+        html_folder_path = ""
+        html_relative_path = ""
         if need_media_folders:
             # Create folder with sub-folders for images, audio and video
-            html_folder_name = filepath[:-5]
-            html_relative_name = html_folder_name.split("/")[-1]
+            html_folder_path = filepath[:-5]
+            html_relative_path = html_folder_path.split("/")[-1]
             try:
-                os.mkdir(html_folder_name)
-                os.mkdir(html_folder_name + "/images")
-                os.mkdir(html_folder_name + "/audio")
-                os.mkdir(html_folder_name + "/video")
+                os.mkdir(html_folder_path)
+                os.mkdir(html_folder_path + "/images")
+                os.mkdir(html_folder_path + "/audio")
+                os.mkdir(html_folder_path + "/video")
             except Exception as err:
                 logger.warning(_("html folder creation error ") + str(err))
-                Message(self.app, _("Folder creation"), f"{html_folder_name} {_('error ')} {err}", "critical").exec()
+                Message(self.app, _("Folder creation"), f"{html_folder_path} {_('error ')} {err}", "critical").exec()
                 return
         try:
             with open(filepath, 'r') as f:
@@ -879,14 +880,13 @@ class DialogReportCodes(QtWidgets.QDialog):
             return
 
         # Change html links to reference the html folder
+        start_pos = 0
         for item in self.html_links:
             if item['imagename'] is not None:
-                image_name = item['imagename'].replace('/images/', '')
-                # print("IMG NAME: ", item['imagename'])
-                img_path = f"{html_folder_name}/images/{image_name}"
-                img_relative_link = f"{html_relative_name}/images/{image_name}"
-                # print("IMG PATH", img_path)
-                # item['image'] is  QtGui.QImage object
+                # What if linked?
+                filename = item['imagename'].replace('/images/', '')
+                img_path = f"{html_folder_path}/images/{filename}"
+                img_relative_link = f"{html_relative_path}/images/{filename}"
                 item['image'].save(img_path)
                 html = html.replace(item['imagename'], img_relative_link)
             if item['avname'] is not None:
@@ -903,43 +903,45 @@ class DialogReportCodes(QtWidgets.QDialog):
                 if av_path[0:6] == "audio:":
                     linked = True
                     av_path = av_path[6:]
-                av_destination = html_folder_name + av_path
                 relative_link = ""
+                filename = av_path.split('/')[-1]
                 # Copy non-linked a/v file to html folder
-                if not linked and not os.path.isfile(html_folder_name + av_path):
-                    copyfile(self.app.project_path + item['avname'], html_folder_name + av_path)
-                    av_destination = html_folder_name + av_path
-                    relative_link = f"{html_folder_name.split('/')[-1]}/video/{av_path.split('/')[-1]}"
+                if not (linked and os.path.isfile(html_folder_path + av_path)):
+                    copyfile(self.app.project_path + item['avname'], html_folder_path + av_path)
+                    relative_link = f"{html_relative_path}/video/{filename}"
                 # Copy Linked video file to html folder
                 if mediatype == "video" and linked:
-                    av_destination = f"{html_folder_name}/video/{av_path.split('/')[-1]}"
-                    relative_link = f"{html_folder_name.split('/')[-1]}/video/{av_path.split('/')[-1]}"
+                    av_destination = f"{html_folder_path}/video/{filename}"
+                    relative_link = f"{html_relative_path}/video/{filename}"
                     if not os.path.isfile(av_destination):
                         copyfile(av_path, av_destination)
                 # Copy Linked audio file to html folder
                 if mediatype == "audio" and linked:
-                    av_destination = f"{html_folder_name}/audio/{av_path.split('/')[-1]}"
-                    relative_link = f"{html_folder_name.split('/')[-1]}/audio/{av_path.split('/')[-1]}"
-                    if not os.path.isfile(av_destination):
-                        copyfile(av_path, av_destination)
+                    audio_destination = f"{html_folder_path}/audio/{filename}"
+                    relative_link = f"{html_relative_path}/audio/{filename}"
+                    if not os.path.isfile(audio_destination):
+                        copyfile(av_path, audio_destination)
+
                 # Create html to display media time positions
                 extension = item['avname'][item['avname'].rfind('.') + 1:]
-                extra = f"</p>\n<{mediatype} controls>"
-                #extra += f'<source src="{av_destination}'
-                extra += f'<source src="{relative_link}'
-                extra += f'#t={item["av0"]},{item["av1"]}"'
-                extra += f' type="{mediatype}/{extension}">'
-                extra += f'</{mediatype}><p>\n'
-                # Hopefully only one location with exact audio/video/link: [mins.secs - mins.secs]
-                location = html.find(item['avtext'].replace('&', '&amp;'))
-                location = location + len(['avtext']) - 1
-                tmp = html[:location] + extra + html[location:]
-                html = tmp
+                html_controls = f"</p>\n<{mediatype} controls>"
+                html_controls += f'<source src="{relative_link}'
+                html_controls += f'#t={item["av0"]},{item["av1"]}"'
+                html_controls += f' type="{mediatype}/{extension}">'
+                html_controls += f'</{mediatype}><p>\n'
+                search_string = f"File: {filename},  Coder: "
+                coded_pos = html.find(search_string, start_pos)
+                next_p_pos = html.find("<p ", coded_pos)
+                html_tmp = html[:next_p_pos] + html_controls
+                start_pos = len(html_tmp)
+                html_tmp += html[next_p_pos:]
+                html = html_tmp
+
         with open(filepath, 'w', encoding='utf-8-sig') as f:
             f.write(html)
         msg = _("Report exported to: ") + filepath
         if need_media_folders:
-            msg += f"\n{_('Media folder:')} {html_folder_name}"
+            msg += f"\n{_('Media folder:')} {html_folder_path}"
         self.parent_textEdit.append(msg)
         Message(self.app, _('Report exported'), msg, "information").exec()
 
@@ -1298,7 +1300,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         :param: code_ids : String comma separated ids
         """
 
-        print("Search by files")
+        # print("Search by files")
         coder = self.ui.comboBox_coders.currentText()
         search_text = self.ui.lineEdit.text()
         important = self.ui.checkBox_important.isChecked()
@@ -1416,7 +1418,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         :param: code_ids : String comma separated ids
         """
 
-        print("search by cases")
+        # print("search by cases")
         coder = self.ui.comboBox_coders.currentText()
         search_text = self.ui.lineEdit.text()
         important = self.ui.checkBox_important.isChecked()

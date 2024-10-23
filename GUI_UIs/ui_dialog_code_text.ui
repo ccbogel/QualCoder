@@ -476,7 +476,7 @@ As all assigned positions may be incorrect. </string>
      <widget class="QLabel" name="label_exports">
       <property name="geometry">
        <rect>
-        <x>572</x>
+        <x>650</x>
         <y>43</y>
         <width>24</width>
         <height>24</height>
@@ -492,7 +492,7 @@ As all assigned positions may be incorrect. </string>
      <widget class="QComboBox" name="comboBox_export">
       <property name="geometry">
        <rect>
-        <x>602</x>
+        <x>680</x>
         <y>40</y>
         <width>91</width>
         <height>30</height>
@@ -521,6 +521,25 @@ As all assigned positions may be incorrect. </string>
         <string>txt</string>
        </property>
       </item>
+     </widget>
+     <widget class="QPushButton" name="pushButton_undo_edit">
+      <property name="enabled">
+       <bool>false</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>570</x>
+        <y>40</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;After editing the text:&lt;/p&gt;&lt;p&gt;Review edited text to confirm code positions are correct. Press button to Undo edited text, if code postions are incorrect. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
      </widget>
     </widget>
    </item>

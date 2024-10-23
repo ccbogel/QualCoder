@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2023 Colin Curtain
+Copyright (c) 2024 Kai Droege, Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -28,9 +28,9 @@ https://qualcoder.wordpress.com/
 
 from PyQt6 import QtWidgets, QtCore
 from PyQt6.QtCore import Qt, QEvent
-from PyQt6.QtGui import QTextCursor, QPalette, QCursor, QGuiApplication
+from PyQt6.QtGui import QCursor, QGuiApplication, QTextCursor, QPalette  # Kai: QTextCurosr, QPalette - Unused
 from PyQt6.QtWidgets import QTextEdit
-from PyQt6.QtGui import QKeySequence, QPixmap, QIcon
+from PyQt6.QtGui import QKeySequence, QPixmap, QIcon  # Kai Unused
 import qtawesome as qta
 
 from langchain_core.messages.human import HumanMessage
@@ -39,15 +39,15 @@ from langchain_core.messages.system import SystemMessage
 from langchain_core.callbacks.base import BaseCallbackHandler
 
 from datetime import datetime
+import json
 import logging
 import os
 import sqlite3
-import json
 
-from .GUI.ui_ai_chat import Ui_Dialog_ai_chat
-from .GUI.base64_helper import *
-from .helpers import Message
 from .ai_search_dialog import DialogAiSearch
+from .GUI.ui_ai_chat import Ui_Dialog_ai_chat
+from .GUI.base64_helper import *  # Kai Unused
+from .helpers import Message
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -92,38 +92,47 @@ class DialogAIChat(QtWidgets.QDialog):
         self.ai_busy_timer = QtCore.QTimer(self)
         self.ai_busy_timer.timeout.connect(self.update_ai_busy)
         self.ai_busy_timer.start(100)
-        
+
     def init_styles(self):
-        """Set up the stylesheets for the ui and the chat entries 
+        """Set up the stylesheets for the ui and the chat entries
         """
         self.font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
-        self.setStyleSheet(self.font)        
-        # set progressBar color to default highlight color
+        self.setStyleSheet(self.font)
+        # Set progressBar color to default highlight color
         self.ui.progressBar_ai.setStyleSheet(f"""
             QProgressBar::chunk {{
                 background-color: {self.app.highlight_color()};
             }}
         """)
         doc_font = f'font: {self.app.settings["docfontsize"]}pt \'{self.app.settings["font"]}\';'
+        self.ai_response_style = f'"{doc_font} color: #356399;"'
+        self.ai_user_style = f'"{doc_font} color: #287368;"'
+        self.ai_info_style = f'"{doc_font}"'
         if self.app.settings['stylesheet'] in ['dark', 'rainbow']:
             self.ai_response_style = f'"{doc_font} color: #8FB1D8;"'
-            self.ai_user_style = f'"{doc_font} color: #35998A;"'     
-            self.ai_info_style = f'"{doc_font}"'     
+            self.ai_user_style = f'"{doc_font} color: #35998A;"'
+            self.ai_info_style = f'"{doc_font}"'
         elif self.app.settings['stylesheet'] == 'native':
-            # determine wether dark or light native style is active:
+            # Determine whether dark or light native style is active:
             style_hints = QGuiApplication.styleHints()
-            if style_hints.colorScheme() == QtCore.Qt.ColorScheme.Dark:
-                self.ai_response_style = f'"{doc_font} color: #8FB1D8;"'
-                self.ai_user_style = f'"{doc_font} color: #35998A;"'     
-                self.ai_info_style = f'"{doc_font}"'     
-            else:
-                self.ai_response_style = f'"{doc_font} color: #356399;"'
-                self.ai_user_style = f'"{doc_font} color: #287368;"'     
-                self.ai_info_style = f'"{doc_font}"'     
+            # Older versions fot PyQt6 may not have QGuiApplication.styleHints().colorScheme() e.g. PtQ66 vers 6.2.3
+            try:
+                if style_hints.colorScheme() == QtCore.Qt.ColorScheme.Dark:
+                    self.ai_response_style = f'"{doc_font} color: #8FB1D8;"'
+                    self.ai_user_style = f'"{doc_font} color: #35998A;"'
+                    self.ai_info_style = f'"{doc_font}"'
+                else:
+                    self.ai_response_style = f'"{doc_font} color: #356399;"'
+                    self.ai_user_style = f'"{doc_font} color: #287368;"'
+                    self.ai_info_style = f'"{doc_font}"'
+            except AttributeError as e_:
+                print(f"Using older version of PyQT6? {e_}")
+                logger.debug(f"Using older version of PyQT6? {e_}")
+                pass
         else:
             self.ai_response_style = f'"{doc_font} color: #356399;"'
-            self.ai_user_style = f'"{doc_font} color: #287368;"'     
-            self.ai_info_style = f'"{doc_font}"'     
+            self.ai_user_style = f'"{doc_font} color: #287368;"'
+            self.ai_info_style = f'"{doc_font}"'
         self.ui.plainTextEdit_question.setStyleSheet(self.ai_user_style[1:-1])
         default_bg_color = self.ui.plainTextEdit_question.palette().color(self.ui.plainTextEdit_question.viewport().backgroundRole())
         self.ui.ai_output.setStyleSheet(doc_font)
@@ -133,7 +142,7 @@ class DialogAIChat(QtWidgets.QDialog):
         self.ui.scrollArea_ai_output.setStyleSheet(f'background-color: {default_bg_color.name()};')
         self.update_chat_window()
         
-    def init_ai_chat(self, app = None):
+    def init_ai_chat(self, app=None):
         if app is not None:
             self.app = app
         # init chat history
@@ -180,7 +189,7 @@ class DialogAIChat(QtWidgets.QDialog):
         self.get_chat_list()
         for i in range(len(self.chat_list)):
             chat = self.chat_list[i]
-            id, name, analysis_type, summary, date, analysis_prompt = chat
+            id_, name, analysis_type, summary, date, analysis_prompt = chat
             tooltip_text = f"{name}\nType: {analysis_type}\nSummary: {summary}\nDate: {date}\nPrompt: {analysis_prompt}"
 
             # Creating a new QListWidgetItem
@@ -188,7 +197,7 @@ class DialogAIChat(QtWidgets.QDialog):
                 icon = self.app.ai.general_chat_icon()
             elif analysis_type == 'topic chat':
                 icon = self.app.ai.topic_analysis_icon()
-            else: # code chat
+            else:  # code chat
                 icon = self.app.ai.code_analysis_icon()
 
             item = QtWidgets.QListWidgetItem(icon, name)
@@ -353,17 +362,17 @@ class DialogAIChat(QtWidgets.QDialog):
                                             self.ai_search_code_name, self.ai_search_code_memo,
                                             self.ai_search_file_ids)
 
-    def get_filename(self, id) -> str:
+    def get_filename(self, id_) -> str:
         """Return the filename for a source id
         Args:
-            id: source id
+            id_: source id
         Returns:
             str: name | '' if nothing found
         """
-        # This might be called from a different thread (ai asynch operations), so we have to create a new database connection
+        # This might be called from a different thread (ai asynch operations), so have to create a new database connection
         conn = sqlite3.connect(os.path.join(self.app.project_path, 'data.qda'))
         cur = conn.cursor()
-        cur.execute(f'select name from source where id = {str(id)}')
+        cur.execute(f'select name from source where id = {id_}')
         res = cur.fetchone()[0]
         if res is not None:
             return res
@@ -384,7 +393,7 @@ class DialogAIChat(QtWidgets.QDialog):
         
         self.ai_semantic_search_chunks = chunks                
         topic_analysis_max_chunks = 30
-        msg = _('Found ') + str(len(chunks))  + _(' chunks of data which might be related to the topic. Analyzing the first ') + str(topic_analysis_max_chunks) + _(' chunks closer.')
+        msg = _('Found ') + str(len(chunks)) + _(' chunks of data which might be related to the topic. Analyzing the first ') + str(topic_analysis_max_chunks) + _(' chunks closer.')
         self.process_message('info', msg)
         self.update_chat_window()
 
@@ -436,7 +445,8 @@ class DialogAIChat(QtWidgets.QDialog):
             cursor.execute('DELETE from chat_messages WHERE chat_id = ?', (chat_id,))
             cursor.execute('DELETE from chats WHERE id = ?', (chat_id,))
             self.chat_history_conn.commit()
-        except:
+        except Exception as e_:
+            print(e_)
             self.chat_history_conn.rollback()
             raise
         self.fill_chat_list()
@@ -456,13 +466,13 @@ class DialogAIChat(QtWidgets.QDialog):
         if self.app.ai is None or not self.app.ai.is_busy():
             self.ui.pushButton_question.setIcon(qta.icon('mdi6.message-fast-outline', color=self.app.highlight_color()))
             self.ui.pushButton_question.setToolTip(_('Send your question to the AI'))
-            self.ui.progressBar_ai.setRange(0, 100) # stops the animation
+            self.ui.progressBar_ai.setRange(0, 100)  # Stops the animation
         else:
             if self.ui.progressBar_ai.maximum() > 0: 
                 spin_icon = qta.icon("mdi.loading", color=self.app.highlight_color(), animation=qta.Spin(self.ui.pushButton_question))
                 self.ui.pushButton_question.setIcon(spin_icon)
                 self.ui.pushButton_question.setToolTip(_('Cancel AI generation'))
-                self.ui.progressBar_ai.setRange(0, 0) # starts the animation
+                self.ui.progressBar_ai.setRange(0, 0)  # Starts the animation
         # update ai status in the statusBar of the main window
         if self.app.ai is not None:
             self.main_window.statusBar().showMessage(_('AI: ') + _(self.app.ai.get_status()))
@@ -478,8 +488,8 @@ class DialogAIChat(QtWidgets.QDialog):
                 self.ui.plainTextEdit_question.setEnabled(True)
                 self.ui.pushButton_question.setEnabled(True)
                 chat = self.chat_list[self.current_chat_idx]
-                id, name, analysis_type, summary, date, analysis_prompt = chat
-                self.ui.ai_output.setText('') # clear chat window
+                id_, name, analysis_type, summary, date, analysis_prompt = chat
+                self.ui.ai_output.setText('')  # Clear chat window
                 # Show title
                 html += (f'<h1 style={self.ai_info_style}>{name}</h1>')
                 summary_br = summary.replace('\n', '<br />')
@@ -532,7 +542,7 @@ class DialogAIChat(QtWidgets.QDialog):
             self.ui.pushButton_delete.setEnabled(self.current_chat_idx > -1)
             self.history_update_message_list()
             self.update_chat_window(scroll_to_bottom=False)
-        else: # return to previous chat
+        else:  # return to previous chat
             self.ui.listWidget_chat_list.setCurrentRow(self.current_chat_idx)
         
     def chat_list_item_changed(self, item: QtWidgets.QListWidgetItem):
@@ -613,14 +623,14 @@ class DialogAIChat(QtWidgets.QDialog):
                 messages.append(AIMessage(content=msg[4]))
         return messages
     
-    def history_add_message(self, msg_type, msg_author, msg_content, chat_idx= None, db_conn=None):
+    def history_add_message(self, msg_type, msg_author, msg_content, chat_idx=None, db_conn=None):
         self.ai_streaming_output = ''
         if chat_idx is None:
             chat_idx = self.current_chat_idx
         if chat_idx > -1:
             curr_chat_id = self.chat_list[chat_idx][0]
             if db_conn is None:
-                db_conn=self.chat_history_conn
+                db_conn = self.chat_history_conn
             cursor = db_conn.cursor()
             # insert new message
             cursor.execute('''INSERT INTO chat_messages (chat_id, msg_type, msg_author, msg_content)
@@ -761,6 +771,7 @@ class DialogAIChat(QtWidgets.QDialog):
         return super().eventFilter(source, event)
     
     def on_linkHovered(self, link: str):
+
         if link:
             # Show tooltip when hovering over a link
             if link.startswith('coding:'):
@@ -776,8 +787,8 @@ class DialogAIChat(QtWidgets.QDialog):
                     logger.debug(f'Link: "{link}" - Error: {e}')
                     coding = None                
                 if coding is not None:
-                    tooltip_txt = f'{coding[1]}:\n' # file name
-                    tooltip_txt += f'"{coding[2]}"' # seltext
+                    tooltip_txt = f'{coding[1]}:\n'  # file name
+                    tooltip_txt += f'"{coding[2]}"'  # seltext
                 else:
                     tooltip_txt = _('Invalid source reference.')
                 QtWidgets.QToolTip.showText(QCursor.pos(), tooltip_txt, self.ui.ai_output)
@@ -793,8 +804,9 @@ class DialogAIChat(QtWidgets.QDialog):
                     logger.debug(f'Link: "{link}" - Error: {e}')
                     source = None
                 if source is not None:
-                    tooltip_txt = f'{source[0]}:\n' # file name
-                    tooltip_txt += f'"{source[1][int(start):int(start) + int(length)]}"' # chunk extracted from fulltext
+                    tooltip_txt = f'{source[0]}:\n'  # File name
+                    # Kai - varriables start and length - referenced before asignment
+                    tooltip_txt += f'"{source[1][int(start):int(start) + int(length)]}"'  # Chunk extracted from fulltext
                 else:
                     tooltip_txt = _('Invalid source reference.')
                 QtWidgets.QToolTip.showText(QCursor.pos(), tooltip_txt, self.ui.ai_output)
@@ -802,6 +814,7 @@ class DialogAIChat(QtWidgets.QDialog):
             QtWidgets.QToolTip.hideText()
             
     def on_linkActivated(self, link: str):
+
         if link:
             # Open doc in coding window 
             if link.startswith('coding:'):
@@ -817,6 +830,7 @@ class DialogAIChat(QtWidgets.QDialog):
                     logger.debug(f'Link: "{link}" - Error: {e}')
                     coding = None
                 if coding is not None:
+                    # Kai - Unresolved attribute reference: text_coding - ? identfied by PyCharm
                     self.main_window.text_coding(task='documents', 
                                                  doc_id=int(coding[0]), 
                                                  doc_sel_start=int(coding[1]), 
@@ -833,6 +847,8 @@ class DialogAIChat(QtWidgets.QDialog):
                     logger.debug(f'Link: "{link}" - Error: {e}')
                     source_id = None
                 if source_id is not None:
+                    # Kai - Unresolved attribute refernce text_coding. Identifiied by PyCharm
+                    # Kai - start and end refernfed before assignment. Idnetified by PyCharm
                     self.main_window.text_coding(task='documents', 
                                                  doc_id=int(source_id), 
                                                  doc_sel_start=int(start), 
@@ -843,6 +859,7 @@ class DialogAIChat(QtWidgets.QDialog):
 
 ###### Helper:
 
+
 class LlmCallbackHandler(BaseCallbackHandler):
     def __init__(self, dialog_ai_chat: DialogAIChat):
         self.dialog = dialog_ai_chat
@@ -851,7 +868,4 @@ class LlmCallbackHandler(BaseCallbackHandler):
         self.dialog.ai_streaming_output += token
         if not self.dialog.is_updating_chat_window:
             self.dialog.update_chat_window()        
-
-
-
 

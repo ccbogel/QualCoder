@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2023 Colin Curtain
+Copyright (c) 2024 Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -242,16 +242,16 @@ class DialogCodeImage(QtWidgets.QDialog):
         if ids is None:
             ids = []
         bad_links = self.app.check_bad_file_links()
-        bl_sql = ""
-        for bl in bad_links:
-            bl_sql += "," + str(bl['id'])
-        if len(bl_sql) > 0:
-            bl_sql = " and id not in (" + bl_sql[1:] + ") "
+        bad_link_sql = ""
+        for bad_link in bad_links:
+            bad_link_sql += f",{bad_link['id']}"
+        if len(bad_link_sql) > 0:
+            bad_link_sql = f' and id not in ({bad_link_sql[1:]}) '
 
         self.ui.listWidget.clear()
         cur = self.app.conn.cursor()
         sql = "select name, id, memo, owner, date, mediapath from source where "
-        sql += "substr(mediapath,1,7) in ('/images', 'images:') " + bl_sql + " "
+        sql += "substr(mediapath,1,7) in ('/images', 'images:') " + bad_link_sql + " "
         if ids:
             str_ids = list(map(str, ids))
             sql += " and id in (" + ",".join(str_ids) + ")"
@@ -1878,11 +1878,11 @@ class DialogViewImage(QtWidgets.QDialog):
         self.ui = Ui_Dialog_view_image()
         self.ui.setupUi(self)
         font = f"font: {self.app.settings['fontsize']}pt "
-        font += '"' + self.app.settings['font'] + '";'
+        font += f'"{self.app.settings["font"]}";'
         self.setStyleSheet(font)
         abs_path = ""
         if "images:" in self.image_data['mediapath']:
-            abs_path = self.image_data['mediapath'].split(':')[1]
+            abs_path = self.image_data['mediapath'][7:]  # Remove images:
         else:
             abs_path = self.app.project_path + self.image_data['mediapath']
         self.setWindowTitle(abs_path)
