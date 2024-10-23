@@ -769,7 +769,7 @@ As all assigned positions may be incorrect. </string>
          </size>
         </property>
         <attribute name="title">
-         <string>AI Search</string>
+         <string>AI Assistance</string>
         </attribute>
         <attribute name="toolTip">
          <string>Use the AI to find data</string>

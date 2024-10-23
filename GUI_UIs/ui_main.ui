@@ -548,7 +548,7 @@
   </action>
   <action name="actionAI_Search_and_Coding">
    <property name="text">
-    <string>AI Search and Coding</string>
+    <string>AI Assisted Coding</string>
    </property>
   </action>
   <action name="actionAI_Settings">
