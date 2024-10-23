@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2023 Colin Curtain
+Copyright (c) 2024 Kai Droege, Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -27,9 +27,9 @@ https://qualcoder.wordpress.com/
 """
 
 import os
-# turn off telemetry
-os.environ["HF_HUB_DISABLE_TELEMETRY"] = "1" # for huggingface hub
-os.environ["ANONYMIZED_TELEMETRY"] = "0" # for chromadb
+# Turn off telemetry
+os.environ["HF_HUB_DISABLE_TELEMETRY"] = "1"  # for huggingface hub
+os.environ["ANONYMIZED_TELEMETRY"] = "0"  # for chromadb
 
 from langchain_community.embeddings import SentenceTransformerEmbeddings
 from langchain_text_splitters.character import RecursiveCharacterTextSplitter
@@ -38,7 +38,7 @@ from langchain_core.documents.base import Document
 from huggingface_hub import hf_hub_url
 from chromadb.config import Settings
 import requests
-from typing import (Any, Iterable, Optional, List)
+from typing import (Any, Iterable, Optional, List)  # Kai, need only List
 import logging
 import traceback
 import time
@@ -51,6 +51,7 @@ from qualcoder.error_dlg import show_error_dlg
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
+
 def ai_exception_handler(exception_type, value, tb_obj):
     """ Show error message 
     """
@@ -58,6 +59,7 @@ def ai_exception_handler(exception_type, value, tb_obj):
     tb = '\n'.join(traceback.format_tb(tb_obj))
     logger.error(_("Uncaught exception: ") + msg + '\n' + tb)
     show_error_dlg(msg, tb)
+
 
 class E5SentenceTransformerEmbeddings(SentenceTransformerEmbeddings):
     
@@ -107,7 +109,7 @@ class AiVectorstore():
 
     app = None
     parent_text_edit = None
-    ready = False # If the chroma_db is busy indexing documents, ready will be "False" since we cannot make any queries yet.   
+    ready = False  # If the chroma_db is busy indexing documents, ready will be "False" since we cannot make any queries yet.
     import_workers_count = 0
     # Setup the database 
     model_name = "intfloat/multilingual-e5-large"
@@ -155,7 +157,7 @@ want to continue?\
             mb = QtWidgets.QMessageBox(parent=parent_window)
             mb.setWindowTitle(_('Download AI components'))
             mb.setText(model_download_msg)
-            mb.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Ok|
+            mb.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Ok |
                                 QtWidgets.QMessageBox.StandardButton.Abort)
             mb.setStyleSheet('* {font-size: ' + str(self.app.settings['fontsize']) + 'pt}')            
             if mb.exec() == QtWidgets.QMessageBox.StandardButton.Ok: 
@@ -184,7 +186,7 @@ want to continue?\
                         else:
                             pd.setValue(0)                            
                         pd.setLabelText(_('Downloading ') + msg)
-                        QtWidgets.QApplication.processEvents() # update the progress dialog
+                        QtWidgets.QApplication.processEvents()  # update the progress dialog
                         time.sleep(0.01)
                 pd.close()
             else:
@@ -201,7 +203,7 @@ want to continue?\
         """Background thread to download the embedding model to the local cache if necessary.
 
         Args:
-            progress_callback (function(msg), optional): called regulary with an update
+            progress_callback (function(msg), optional): called regularly with an update
                                                          message containing the file which
                                                          is downloaded and the percent finished. 
         """
@@ -211,24 +213,24 @@ want to continue?\
             for file_name in self.model_files:
                 local_path = os.path.join(self.model_folder, file_name)
                 if os.path.exists(local_path):
-                    continue # skip this file, already downloaded
+                    continue  # skip this file, already downloaded
                 url = hf_hub_url(self.model_name, file_name)
                 
                 # create local dir if necessary
-                local_folder = os.path.dirname(local_path) # (may contain subdir to model_folder)
+                local_folder = os.path.dirname(local_path)  # (may contain subdir to model_folder)
                 os.makedirs(local_folder, exist_ok=True)
                 tmp_filename = local_path + ".tmp"
                 
                 # download
                 r = requests.get(url, stream=True, timeout=20)
-                r.raise_for_status() # raise error on 404 etc.
+                r.raise_for_status()  # raise error on 404 etc.
                 with open(tmp_filename, "wb") as f:
                     total_length = int(r.headers.get('content-length'))
                     expected_size = (total_length/1024) + 1
                     i = 0
-                    for chunk in r.iter_content(chunk_size = 1024):
+                    for chunk in r.iter_content(chunk_size=1024):
                         if self.download_model_cancel:
-                            return # cancel the download
+                            return  # cancel the download
                         if chunk:
                             f.write(chunk)
                             i += 1
@@ -268,14 +270,14 @@ want to continue?\
         worker.signals.error.connect(ai_exception_handler)
         self.threadpool.start(worker)
     
-    def _open_db(self, signals, progress_callback=None):
+    def _open_db(self, signals, progress_callback=None):  # Kai: signals and progresscallback not used
         if self._is_closing:
-            return # abort when closing db
+            return  # abort when closing db
         if self.app.project_path != '' and os.path.exists(self.app.project_path):
             db_path = os.path.join(self.app.project_path, 'ai_data', 'vectorstore')
             if self.app.ai_embedding_function is None:
                 self.app.ai_embedding_function = E5SentenceTransformerEmbeddings(model_name=self.model_folder)
-            collection_metadata = {"hnsw:space": "l2"} # {"hnsw:space": "cosine"} -> defines the distance function, cosine vs. Squared L2 (default). In my limited tests, l2 gives slightly better results, although cosine is usually recommended 
+            collection_metadata = {"hnsw:space": "l2"}  # {"hnsw:space": "cosine"} -> defines the distance function, cosine vs. Squared L2 (default). In my limited tests, l2 gives slightly better results, although cosine is usually recommended
             chroma_client_settings = Settings(
                                         is_persistent=True,
                                         persist_directory=db_path,
@@ -303,7 +305,7 @@ want to continue?\
         self._is_closing = False        
         self.prepare_embedding_model()
         
-        if self.app.project_name == '': # no project open
+        if self.app.project_name == '':  # no project open
             self.close()
             self.parent_text_edit.append(_('AI: Finished loading (no project open).'))
             self.app.ai._status = ''
@@ -330,14 +332,14 @@ want to continue?\
             self.parent_text_edit.append(msg)
             logger.debug(msg)
     
-    def _import_document(self, id, name, text, update=False, signals=None):
+    def _import_document(self, id_, name, text, update=False, signals=None):
         if self._is_closing:
             return # abort when closing db
         if self.chroma_db is None:
             raise AIException(_('Vectorstore: Document import failed, chroma_db not present.'))
                        
         # Check if the document is already in the store:
-        embeddings_list = self.chroma_db.get(where={"id" : id}, include=['metadatas'])
+        embeddings_list = self.chroma_db.get(where={"id": id_}, include=['metadatas'])
         if len(embeddings_list['ids']) > 0: # found it
             if update or embeddings_list['metadatas'][0]['name'] != name:
                 # delete old embeddings
@@ -354,7 +356,7 @@ want to continue?\
             if signals is not None and signals.progress is not None:
                 signals.progress.emit(_('AI: Adding document to internal memory: ') + f'"{name}"')
 
-            metadata = {'id': id, 'name': name}
+            metadata = {'id': id_, 'name': name}
             document = Document(page_content=text, metadata=metadata)
             text_splitter = RecursiveCharacterTextSplitter(separators=[".", "!", "?", "\n\n", "\n", " ", ""], 
                                                         keep_separator=True, chunk_size=500, chunk_overlap=100, 
@@ -366,11 +368,11 @@ want to continue?\
                 if not self._is_closing:
                     self.chroma_db.add_texts([chunk.page_content], [chunk.metadata])  
                 else: # canceled, delete the unfinished document from the vectorstore:
-                    embeddings_list = self.chroma_db.get(where={"id" : id}, include=['metadatas'])
+                    embeddings_list = self.chroma_db.get(where={"id": id_}, include=['metadatas'])
                     self.chroma_db.delete(embeddings_list['ids'])
                     break
 
-    def import_document(self, id, name, text, update=False):
+    def import_document(self, id_, name, text, update=False):
         """Imports a document into the chroma_db. 
         If a document with the same id is already in 
         the chroma_db, it can be updated (update=True) 
@@ -380,11 +382,11 @@ want to continue?\
         until the import is finished.
 
         Args:
-            id (integer): the database id
+            id_ (integer): the database id
             update (bool, optional): defaults to False.
         """   
         
-        worker = Worker(self._import_document, id, name, text, update) # Any other args, kwargs are passed to the run function
+        worker = Worker(self._import_document, id_, name, text, update)  # Any other args, kwargs are passed to the run function
         # worker.signals.result.connect()
         worker.signals.finished.connect(self.finished_import)
         worker.signals.progress.connect(self.progress_import)
@@ -402,20 +404,20 @@ want to continue?\
             return
         docs = self.app.get_file_texts()
         
-        # check if any docs in the vectorstore have been deleted or renamed in the project
+        # Check if any docs in the vectorstore have been deleted or renamed in the project
         def search_name(docs, name):
-            for doc in docs:
-                if doc['name'] == name:
+            for document in docs:
+                if document['name'] == name:
                     return True
             return False
         emb = self.chroma_db.get(include=['metadatas'])
         for i in range(len(emb['ids'])):
-            id = emb['ids'][i]
+            emb_id = emb['ids'][i]
             file_name = emb['metadatas'][i]['name']
             if not search_name(docs, file_name):
-                self.chroma_db.delete([id])
+                self.chroma_db.delete([emb_id])
 
-        # add new docs        
+        # Add new docs
         if len(docs) == 0:
             msg = _("AI: No documents, AI is ready.")
             self.parent_text_edit.append(msg)
@@ -444,20 +446,21 @@ want to continue?\
         # rebuild vectorstore
         self.update_vectorstore()
     
-    def delete_document(self, id):
+    def delete_document(self, id_):
         """Deletes all the embeddings from related to this doc 
         from the vectorstore"""
+
         chroma_db = self.chroma_db
         if chroma_db is None:
-            # try to create a temporary access
+            # Try to create a temporary access
             if self.app.project_path != '' and os.path.exists(self.app.project_path):
                 db_path = os.path.join(self.app.project_path, 'ai_data', 'vectorstore')
                 if os.path.exists(db_path):
                     chroma_db = Chroma(persist_directory=db_path,
                                        collection_name=self.collection_name)
         if chroma_db is not None:
-            embeddings_list = chroma_db.get(where={"id" : id}, include=['metadatas'])
-            if len(embeddings_list['ids']) > 0: # found it
+            embeddings_list = chroma_db.get(where={"id": id_}, include=['metadatas'])
+            if len(embeddings_list['ids']) > 0:  # Found it
                 self.parent_text_edit.append("AI: Forgetting " + f'"{embeddings_list["metadatas"][0]["name"]}"')
                 chroma_db.delete(embeddings_list['ids']) 
                
@@ -477,7 +480,7 @@ want to continue?\
             
     def is_open(self) -> bool:
         """Returnes True if the vectorstore is initiated"""
-        return self.chroma_db != None and self._is_closing == False
+        return self.chroma_db is not None and self._is_closing is False
     
     def is_ready(self) -> bool:
         """If the vectorstore is initiated and done importing data, 
