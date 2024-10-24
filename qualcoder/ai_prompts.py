@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2024 Kai Droege, Colin Curtain
+Copyright (c) 2024 Kai Dröge, Colin Curtain
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -34,7 +34,7 @@ import yaml
 import copy
 import gettext  # Unused
 
-from PyQt6 import QtWidgets, QtCore, QtGui
+from PyQt6 import QtWidgets, QtCore, QtGui  # QtGui unused
 from PyQt6.QtCore import Qt  # Unused
 
 from .GUI.ui_ai_edit_prompts import Ui_Dialog_AiPrompts
@@ -185,8 +185,10 @@ prompt_scopes = [
 ]
 prompt_scope_descriptions = [
     ('System prompts are the defaults defined in the source code of QualCoder. They cannot be changed by the user.'),
-    ('User prompts are defined by you on the level of your particular instance of QualCoder. They are available in every project that you open on your machine.'),
-    ('Project prompts are defined by you, but for the current project only. They go with the project files. If you or somebody else opens the same project on another machine, these prompts will be available there too.')
+    ('User prompts are defined by you on the level of your particular instance of QualCoder. '
+     'They are available in every project that you open on your machine.'),
+    ('Project prompts are defined by you, but for the current project only. They go with the project files. '
+     'If you or somebody else opens the same project on another machine, these prompts will be available there too.')
 ]
 
 
@@ -200,7 +202,7 @@ class PromptItem:
         self.type = prompt_type
         self.description = description
         self.text = text
-        
+
     def name_and_scope(self) -> str:
         return self.name + f' ({self.scope})'
     
@@ -239,6 +241,8 @@ class PromptsList:
         self.prompts = []
         self.app = app
         self.read_prompts(prompt_type)
+        self.user_prompts_path = ""
+        self.project_prompts_path = ""
 
     def read_prompts(self, prompt_type=None):
         self.prompts.clear()
@@ -631,8 +635,7 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
               (self.selected_prompt is None) or (self.selected_prompt.type != self.prompt_type)):
             msg = _(f'You must select a {self.prompt_type} prompt.')
             Message(self.app, _('Edit prompts'), msg, "warning").exec()
-            return      
-                
+            return
         self.accept()
         
     def cancel(self):
