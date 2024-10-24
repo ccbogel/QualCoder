@@ -107,7 +107,7 @@ class Worker(QRunnable):
 
         try:
             pydevd.settrace(suspend=False)  # enable debugger
-        except ModuleNotFoundError:
+        except NameError:
             pass 
 
         # Retrieve args/kwargs here; and fire processing using them
