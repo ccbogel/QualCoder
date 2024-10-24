@@ -90,6 +90,14 @@ class DialogAIChat(QtWidgets.QDialog):
         self.ai_busy_timer = QtCore.QTimer(self)
         self.ai_busy_timer.timeout.connect(self.update_ai_busy)
         self.ai_busy_timer.start(100)
+        self.ai_streaming_output = ''
+        self.curr_codings = None
+        self.ai_prompt = None
+        self.ai_search_code_name = None
+        self.ai_search_code_memo = None
+        self.chat_list = []
+        self.ai_search_file_ids = []
+        self.ai_search_code_ids = []
 
     def init_styles(self):
         """Set up the stylesheets for the ui and the chat entries
@@ -397,13 +405,13 @@ class DialogAIChat(QtWidgets.QDialog):
 
         ai_data = []
         max_ai_data_length = round(0.5 * (self.app.ai.large_llm_context_window * 4)) 
-        max_ai_data_length_reached = False
+        max_ai_data_length_reached = False  # TODO varaible not used
         ai_data_length = 0
         for i in range(0, topic_analysis_max_chunks):
             if i >= len(chunks): 
                 break
             if ai_data_length >= max_ai_data_length:
-                max_ai_data_length_reached = True
+                max_ai_data_length_reached = True  # TODO variable not used
                 break
             chunk = chunks[i]
             ai_data.append({
@@ -489,9 +497,9 @@ class DialogAIChat(QtWidgets.QDialog):
                 id_, name, analysis_type, summary, date, analysis_prompt = chat
                 self.ui.ai_output.setText('')  # Clear chat window
                 # Show title
-                html += (f'<h1 style={self.ai_info_style}>{name}</h1>')
+                html += f'<h1 style={self.ai_info_style}>{name}</h1>'
                 summary_br = summary.replace('\n', '<br />')
-                html += (f"<p style={self.ai_info_style}><b>{_('Type:')}</b> {analysis_type}<br /><b>{_('Summary:')}</b> {summary_br}<br /><b>{_('Date:')}</b> {date}<br /><b>{_('Prompt:')}</b> {analysis_prompt}<br /></p>")
+                html += f"<p style={self.ai_info_style}><b>{_('Type:')}</b> {analysis_type}<br /><b>{_('Summary:')}</b> {summary_br}<br /><b>{_('Date:')}</b> {date}<br /><b>{_('Prompt:')}</b> {analysis_prompt}<br /></p>"
                 # Show chat messages:
                 for msg in self.chat_msg_list:
                     if msg[2] == 'user':
@@ -570,12 +578,12 @@ class DialogAIChat(QtWidgets.QDialog):
         action_general_chat.setToolTip(_('Ask the AI anything, not related to your data.'))
 
         # Obtain the bottom-left point of the button in global coordinates
-        buttonRect = self.ui.pushButton_new_analysis.rect()  # Get the button's rect
-        bottomLeftPoint = buttonRect.bottomLeft()  # Bottom-left point
-        globalBottomLeftPoint = self.ui.pushButton_new_analysis.mapToGlobal(bottomLeftPoint)  # Map to global
+        button_rect = self.ui.pushButton_new_analysis.rect()  # Get the button's rect
+        bottom_left_point = button_rect.bottomLeft()  # Bottom-left point
+        global_bottom_left_point = self.ui.pushButton_new_analysis.mapToGlobal(bottom_left_point)  # Map to global
 
         # Execute the menu at the calculated position
-        action = menu.exec(globalBottomLeftPoint)
+        action = menu.exec(global_bottom_left_point)
 
         # Check which action was selected and do something
         if action == action_codings_analysis:
@@ -585,7 +593,7 @@ class DialogAIChat(QtWidgets.QDialog):
         elif action == action_general_chat:
             self.new_general_chat('New general chat', '')
 
-    def ai_output_scroll_to_bottom(self, minVal=None, maxVal=None):
+    def ai_output_scroll_to_bottom(self, minVal=None, maxVal=None):  # toDO minVal, maxVal unused
         # Delay the scrolling a little to make sure that the updated text is fully rendered before scrolling to the bottom: 
         QtCore.QTimer.singleShot(0, self._ai_output_scroll_to_bottom)
         
@@ -630,9 +638,9 @@ class DialogAIChat(QtWidgets.QDialog):
             if db_conn is None:
                 db_conn = self.chat_history_conn
             cursor = db_conn.cursor()
-            # insert new message
-            cursor.execute('''INSERT INTO chat_messages (chat_id, msg_type, msg_author, msg_content)
-                            VALUES (?, ?, ?, ?)''', (curr_chat_id, msg_type, msg_author, msg_content))
+            # Insert new message
+            cursor.execute('INSERT INTO chat_messages (chat_id, msg_type, msg_author, msg_content)'
+                           ' VALUES (?, ?, ?, ?)', (curr_chat_id, msg_type, msg_author, msg_content))
             db_conn.commit()
             self.history_update_message_list()
     
@@ -681,7 +689,8 @@ class DialogAIChat(QtWidgets.QDialog):
             self.update_chat_window()
         elif msg_type == 'system':
             # system messages are only added to the chat history. They are never shown on screen. 
-            # The system message will be not be send to the AI immediately, but together with the next user message (as part of the chat history).
+            # The system message will be not be send to the AI immediately,
+            # but together with the next user message (as part of the chat history).
             self.history_add_message(msg_type, '', msg_content, chat_idx)
         elif msg_type == 'instruct':
             # instruct messages are only send to the AI, but not shown on screen
@@ -722,16 +731,16 @@ class DialogAIChat(QtWidgets.QDialog):
                 db_conn.close()
         return True    
     
-    def ai_streaming_callback(self, streamed_text):
+    def ai_streaming_callback(self, streamed_text):  # TODO streamed_text unused
         self.update_chat_window()
 
-    def _send_message(self, messages, progress_callback=None):  
-        # callback for async call    
+    def _send_message(self, messages, progress_callback=None):    # TODO progress_callback unused
+        # Callback for async call
         self.ai_streaming_output = ''
         self.current_streaming_chat_idx = self.current_chat_idx
         for chunk in self.app.ai.large_llm.stream(messages):
             if self.app.ai.ai_async_is_canceled:
-                break # cancel the streaming
+                break  # Cancel the streaming
             elif self.current_chat_idx != self.current_streaming_chat_idx:
                 # switched to another chat, cancel also
                 break
@@ -802,7 +811,7 @@ class DialogAIChat(QtWidgets.QDialog):
                     tooltip_txt += f'"{source[1][int(start):int(start) + int(length)]}"'  # Chunk extracted from fulltext                    
                 except Exception as e:
                     logger.debug(f'Link: "{link}" - Error: {e}')
-                    source = None
+                    source = None  # TODO source not used
                     tooltip_txt = _('Invalid source reference.')
                 QtWidgets.QToolTip.showText(QCursor.pos(), tooltip_txt, self.ui.ai_output)
         else:
@@ -825,9 +834,6 @@ class DialogAIChat(QtWidgets.QDialog):
                     logger.debug(f'Link: "{link}" - Error: {e}')
                     coding = None
                 if coding is not None:
-                    # Kai - Unresolved attribute reference: text_coding - ? identfied by PyCharm
-                    # @Colin - PyCharm is probably complaining because self.main_window is not a typed variable. 
-                    #         It references the main window where the function 'text_coding' indeed exists.
                     self.main_window.text_coding(task='documents', 
                                                  doc_id=int(coding[0]), 
                                                  doc_sel_start=int(coding[1]), 
@@ -840,22 +846,18 @@ class DialogAIChat(QtWidgets.QDialog):
                     chunk_id = link[len('chunk:'):]
                     source_id, start, length = chunk_id.split('_')
                     end = int(start) + int(length)
-                    # Kai - Unresolved attribute refernce text_coding. Identifiied by PyCharm
-                    # @Colin - see above
-                    self.main_window.text_coding(task='documents', 
+                    self.main_window.text_coding(task='documents',
                                                  doc_id=int(source_id), 
                                                  doc_sel_start=int(start), 
                                                  doc_sel_end=end)
                 except Exception as e:
                     logger.debug(f'Link: "{link}" - Error: {e}')
-                    source_id = None
+                    source_id = None  # TODO source_id not used
                     msg = _('Invalid source reference.')
                     Message(self.app, _('AI Chat'), msg, icon='critical').exec()                    
 
 
-###### Helper:
-
-
+# Helper:
 class LlmCallbackHandler(BaseCallbackHandler):
     def __init__(self, dialog_ai_chat: DialogAIChat):
         self.dialog = dialog_ai_chat
@@ -864,4 +866,3 @@ class LlmCallbackHandler(BaseCallbackHandler):
         self.dialog.ai_streaming_output += token
         if not self.dialog.is_updating_chat_window:
             self.dialog.update_chat_window()        
-
