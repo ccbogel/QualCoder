@@ -75,6 +75,7 @@ from qualcoder.reports import DialogReportCoderComparisons, DialogReportCodeFreq
 from qualcoder.report_code_summary import DialogReportCodeSummary
 from qualcoder.report_compare_coder_file import DialogCompareCoderByFile
 from qualcoder.report_codes import DialogReportCodes
+from qualcoder.report_codes_by_segments import DialogCodesBySegments
 from qualcoder.report_file_summary import DialogReportFileSummary
 from qualcoder.report_exact_matches import DialogReportExactTextMatches
 from qualcoder.report_relations import DialogReportRelations
@@ -134,6 +135,7 @@ qt_exception_hook =  UncaughtHook()
 lock_timeout = 30.0  # in seconds. If a project lockfile is older (= has received no heartbeat for 30 seconds),
 # it is assumed that the host process has died and the project is opened anyways
 lock_heartbeat_interval = 5  # in seconds.
+
 
 class ProjectLockHeartbeatWorker(QtCore.QObject):
     """
@@ -1242,6 +1244,7 @@ Click "Yes" to start now.')
         self.ui.actionCode_relations.setShortcut('Alt+Q')
         self.ui.actionCode_relations.triggered.connect(self.report_code_relations)
         self.ui.actionCode_text_exact_matches.triggered.connect(self.report_exact_text_matches)
+        self.ui.actionText_segments_by_codes.triggered.connect(self.text_segments_codes_table)
         self.ui.actionView_Graph.setShortcut('Alt+G')
         self.ui.actionView_Graph.triggered.connect(self.view_graph_original)
         self.ui.actionCharts.setShortcut('Alt+U')
@@ -1373,6 +1376,7 @@ Click "Yes" to start now.')
         self.ui.actionSQL_statements.setEnabled(False)
         self.ui.actionFile_summary.setEnabled(False)
         self.ui.actionCode_summary.setEnabled(False)
+        self.ui.actionText_segments_by_codes.setEnabled(False)
         self.ui.actionCategories.setEnabled(False)
         self.ui.actionView_Graph.setEnabled(False)
         self.ui.actionCharts.setEnabled(False)
@@ -1418,6 +1422,7 @@ Click "Yes" to start now.')
         self.ui.actionSQL_statements.setEnabled(True)
         self.ui.actionFile_summary.setEnabled(True)
         self.ui.actionCode_summary.setEnabled(True)
+        self.ui.actionText_segments_by_codes.setEnabled(True)
         self.ui.actionCategories.setEnabled(True)
         self.ui.actionView_Graph.setEnabled(True)
         self.ui.actionCharts.setEnabled(True)
@@ -1470,6 +1475,13 @@ Click "Yes" to start now.')
         self.ui.textEdit.append("<p>&nbsp;</p>")
         self.ui.textEdit.textCursor().movePosition(QtGui.QTextCursor.MoveOperation.End)
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
+
+    def text_segments_codes_table(self):
+        """ Show table of text segments (rows) by codes (columns). """
+
+        self.ui.label_reports.hide()
+        ui = DialogCodesBySegments(self.app, self.ui.textEdit)
+        self.tab_layout_helper(self.ui.tab_reports, ui)
 
     def report_sql(self):
         """ Run SQL statements on database. """
