@@ -114,7 +114,7 @@
      <x>0</x>
      <y>0</y>
      <width>1024</width>
-     <height>22</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuProject">
@@ -194,6 +194,7 @@
     <addaction name="actionCode_summary"/>
     <addaction name="actionCode_relations"/>
     <addaction name="actionCode_text_exact_matches"/>
+    <addaction name="actionText_segments_by_codes"/>
     <addaction name="actionView_Graph"/>
     <addaction name="actionCharts"/>
     <addaction name="actionText_mining"/>
@@ -567,6 +568,11 @@
   <action name="actionCode_organiser">
    <property name="text">
     <string>Code organiser</string>
+   </property>
+  </action>
+  <action name="actionText_segments_by_codes">
+   <property name="text">
+    <string>Codes by text segments</string>
    </property>
   </action>
  </widget>
