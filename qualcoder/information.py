@@ -83,13 +83,14 @@ Optional: Install ffmpeg for speech to text and waveform images.</p>\
 <p>Tested on: Ubuntu 22.04, Windows 10/11, used on macOS and on other Linux distros.</p>\
 <p></p>\
 <h2 class="western">Acknowledgements</h2>\
-<p>Ronggui Huang and Zhang Gehao for creating RQDA, which inspired this software. \
-Mike MacCana for the source code for the docx module. \
-User: bit4 on stackoverflow who presented the source code to convert html to text. \
-ebooklib: Aleksandar Erkalović https://github.com/aerkalov. \
-The VideoLAN team for the bindings to VLC. https://github.com/oaubert/python-vlc. \
-The ffmpeg team. https://ffmpeg.org/ used with speech to text and waveform/spectrograph images. \
-Julius Reich for creating the cool QualCoder logo. \
+<p>Ronggui Huang and Zhang Gehao for creating RQDA, which inspired this software.<br /> \
+Mike MacCana for the source code for the docx module.<br /> \
+User: bit4 on stackoverflow who presented the source code to convert html to text.<br /> \
+ebooklib: Aleksandar Erkalović https://github.com/aerkalov.<br /> \
+The VideoLAN team for the bindings to VLC. https://github.com/oaubert/python-vlc.<br /> \
+The ffmpeg team. https://ffmpeg.org/ used with speech to text and waveform/spectrograph images.<br /> \
+Julius Reich for creating the cool QualCoder logo.<br /> \
+Dr Droege for developing and testing the code to incorporate artificial intelligenc models for AI coding.<br /> \
  To various members on github for supporting this project.</p>\
 <h2 class="western">Other details</h2\
 <p>The qda data folder contains folders for imported documents, \
@@ -102,27 +103,19 @@ default working directory, selected font and other parameters.</p>\
 <p>The REFI-QDA Project import and export seem to work ok, but are still experimental. </p>\
 <p>Created by Colin Curtain BPharm GradDipComp PhD, python programmer, lecturer University of Tasmania.</p>\
 <h2>Citation</h2>\
-Curtain, C. (2023) QualCoder VERSION [Computer software]. Retrieved from https://github.com/ccbogel/QualCoder/releases/tag/VERSION\
+Curtain, C. (2023) QualCoder 3.6 [Computer software]. \
+Retrieved from https://github.com/ccbogel/QualCoder/releases/tag/3.6\
 <h2 class="western">Licenses</h2>\
-<h3>MIT License</h3>\
-<p>Copyright (c) 2023 Colin Curtain</p>\
-<p>Permission is hereby granted, free of charge, to any person<br />\
-obtaining a copy of this software and associated documentation files<br />\
-(the &quot;Software&quot;), to deal in the Software without<br />\
-restriction, including without limitation the rights to use, copy,<br />\
-modify, merge, publish, distribute, sublicense, and/or sell copies of<br />\
-the Software, and to permit persons to whom the Software is furnished<br />\
-to do so, subject to the following conditions:</p>\
-<p>The above copyright notice and this permission notice shall be <br />\
-included in all copies or substantial portions of the Software.</p>\
-<p>THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF<br />\
-ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE<br />\
-WARRANTIES OF MERCHANTABILITY,</p>\
-<p>FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT<br />\
-SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,<br />\
-DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR<br />\
-OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR<br />\
-THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>\
+<h3>LGPL-3.0 License</h3>\
+<p>This file is part of QualCoder.</p>\
+<p>QualCoder is free software: you can redistribute it and/or modify it under the \
+terms of the GNU Lesser General Public License as published by the Free Software \
+Foundation, either version 3 of the License, or (at your option) any later version. </p\
+<p>QualCoder is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; \
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. \
+See the GNU General Public License for more details.</p>\
+<p>You should have received a copy of the GNU Lesser General Public License along with QualCoder. \
+If not, see &lt;https://www.gnu.org/licenses/&gt;. </p>\
 <h3>License for highlighter.py code</h3>\
 <p>## Copyright (C) 2013 Riverbank Computing Limited.<br />\
 ## Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).<br />\
