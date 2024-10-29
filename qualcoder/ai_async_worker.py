@@ -1,25 +1,18 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2023 Colin Curtain
+This file is part of QualCoder.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+QualCoder is free software: you can redistribute it and/or modify it under the
+terms of the GNU Lesser General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later version.
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+QualCoder is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
+You should have received a copy of the GNU Lesser General Public License along with QualCoder.
+If not, see <https://www.gnu.org/licenses/>.
 
 Author: Kai Droege (kaixxx)
 https://github.com/ccbogel/QualCoder
@@ -30,14 +23,15 @@ Adopted from https://www.pythonguis.com/tutorials/multithreading-pyqt-applicatio
 """
 
 import sys
-import traceback
+import traceback  # TODO unused
 try:
-    import pydevd # for debugging
-except:
+    import pydevd  # for debugging
+except ModuleNotFoundError:
     pass
-from typing import Any
-from PyQt6.QtCore import QObject, QRunnable, QThreadPool, pyqtSignal, pyqtSlot
+from typing import Any  # TODO unused
+from PyQt6.QtCore import QObject, QRunnable, QThreadPool, pyqtSignal, pyqtSlot  # TODO QThreadPool not used
 from PyQt6 import sip
+
 
 class AIException(Exception):
     """Exception raised for AI-related errors"""
@@ -45,8 +39,9 @@ class AIException(Exception):
         self.message = message
         super().__init__(self.message)
 
+
 class WorkerSignals(QObject):
-    '''
+    """
     Defines the signals available from a running worker thread.
 
     Supported signals are:
@@ -65,8 +60,8 @@ class WorkerSignals(QObject):
         
     streaming
         str containing the current streaming response particle coming from the LLM
+    """
 
-    '''
     finished = pyqtSignal()
     error = pyqtSignal(object, object, object)
     result = pyqtSignal(object)
@@ -75,7 +70,7 @@ class WorkerSignals(QObject):
 
 
 class Worker(QRunnable):
-    '''
+    """
     Worker thread
 
     Inherits from QRunnable to handler worker thread setup, signals and wrap-up.
@@ -85,8 +80,7 @@ class Worker(QRunnable):
     :type callback: function
     :param args: Arguments to pass to the callback function
     :param kwargs: Keywords to pass to the callback function
-
-    '''
+    """
 
     def __init__(self, fn, *args, **kwargs):
         super(Worker, self).__init__()
@@ -102,12 +96,11 @@ class Worker(QRunnable):
 
     @pyqtSlot()
     def run(self):
-        '''
-        Initialise the runner function with passed args, kwargs.
-        '''
+        """ Initialise the runner function with passed args, kwargs. """
+
         try:
-            pydevd.settrace(suspend=False) # enable debugger
-        except:
+            pydevd.settrace(suspend=False)  # enable debugger
+        except NameError:
             pass 
 
         # Retrieve args/kwargs here; and fire processing using them

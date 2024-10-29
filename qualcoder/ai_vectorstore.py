@@ -1,52 +1,45 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2024 Kai Droege, Colin Curtain
+This file is part of QualCoder.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+QualCoder is free software: you can redistribute it and/or modify it under the
+terms of the GNU Lesser General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later version.
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+QualCoder is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
+You should have received a copy of the GNU Lesser General Public License along with QualCoder.
+If not, see <https://www.gnu.org/licenses/>.
 
 Author: Kai Droege (kaixxx)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 """
 
-import os
-# Turn off telemetry
-os.environ["HF_HUB_DISABLE_TELEMETRY"] = "1"  # for huggingface hub
-os.environ["ANONYMIZED_TELEMETRY"] = "0"  # for chromadb
-
+from chromadb.config import Settings
+from huggingface_hub import hf_hub_url
 from langchain_community.embeddings import SentenceTransformerEmbeddings
 from langchain_text_splitters.character import RecursiveCharacterTextSplitter
 from langchain_chroma.vectorstores import Chroma
 from langchain_core.documents.base import Document
-from huggingface_hub import hf_hub_url
-from chromadb.config import Settings
-import requests
-from typing import List
 import logging
-import traceback
+import os
+from PyQt6 import QtCore, QtWidgets
+import requests
 import time
-from PyQt6 import QtWidgets
-from PyQt6 import QtCore
+import traceback
+from typing import List
+
 from qualcoder.ai_async_worker import Worker
 from qualcoder.ai_async_worker import AIException
 from qualcoder.error_dlg import show_error_dlg
+
+# Turn off telemetry
+os.environ["HF_HUB_DISABLE_TELEMETRY"] = "1"  # for huggingface hub
+os.environ["ANONYMIZED_TELEMETRY"] = "0"  # for chromadb
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -270,14 +263,17 @@ want to continue?\
         worker.signals.error.connect(ai_exception_handler)
         self.threadpool.start(worker)
     
-    def _open_db(self, signals):  # Kai: signals and progresscallback not used | @Colin - I deleted "progresscallback", no longer used. "signals" is always added as a parameter when this is called by the Worker in ai_async_worker. I cannot omit it, even though I don't use it here. 
+    def _open_db(self, signals):
+        # "signals" is when this is called by the Worker in ai_async_worker. Cannot omit it.
         if self._is_closing:
             return  # abort when closing db
         if self.app.project_path != '' and os.path.exists(self.app.project_path):
             db_path = os.path.join(self.app.project_path, 'ai_data', 'vectorstore')
             if self.app.ai_embedding_function is None:
                 self.app.ai_embedding_function = E5SentenceTransformerEmbeddings(model_name=self.model_folder)
-            collection_metadata = {"hnsw:space": "l2"}  # {"hnsw:space": "cosine"} -> defines the distance function, cosine vs. Squared L2 (default). In my limited tests, l2 gives slightly better results, although cosine is usually recommended
+            # {"hnsw:space": "cosine"} -> defines the distance function, cosine vs. Squared L2 (default).
+            # In my limited tests, l2 gives slightly better results, although cosine is usually recommended
+            collection_metadata = {"hnsw:space": "l2"}
             chroma_client_settings = Settings(
                                         is_persistent=True,
                                         persist_directory=db_path,
@@ -334,13 +330,13 @@ want to continue?\
     
     def _import_document(self, id_, name, text, update=False, signals=None):
         if self._is_closing:
-            return # abort when closing db
+            return  # abort when closing db
         if self.chroma_db is None:
             raise AIException(_('Vectorstore: Document import failed, chroma_db not present.'))
                        
         # Check if the document is already in the store:
         embeddings_list = self.chroma_db.get(where={"id": id_}, include=['metadatas'])
-        if len(embeddings_list['ids']) > 0: # found it
+        if len(embeddings_list['ids']) > 0:  # Found document in Vectorstore
             if update or embeddings_list['metadatas'][0]['name'] != name:
                 # delete old embeddings
                 self.chroma_db.delete(embeddings_list['ids']) 
@@ -349,10 +345,10 @@ want to continue?\
                 return 
         # add to chroma_db
         if self._is_closing:
-            return # abort when closing db
+            return  # abort when closing db
         
         # split fulltext in smaller chunks 
-        if text != '': # can only add embeddings if text is not empty
+        if text != '':  # Can only add embeddings if text is not empty
             if signals is not None and signals.progress is not None:
                 signals.progress.emit(_('AI: Adding document to internal memory: ') + f'"{name}"')
 
@@ -367,7 +363,7 @@ want to continue?\
             for chunk in chunks:
                 if not self._is_closing:
                     self.chroma_db.add_texts([chunk.page_content], [chunk.metadata])  
-                else: # canceled, delete the unfinished document from the vectorstore:
+                else:  # Canceled, delete the unfinished document from the vectorstore:
                     embeddings_list = self.chroma_db.get(where={"id": id_}, include=['metadatas'])
                     self.chroma_db.delete(embeddings_list['ids'])
                     break
@@ -383,6 +379,8 @@ want to continue?\
 
         Args:
             id_ (integer): the database id
+            name (String): document name
+            text (String): document text
             update (bool, optional): defaults to False.
         """   
         
