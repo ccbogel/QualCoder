@@ -100,7 +100,7 @@ class Worker(QRunnable):
 
         try:
             pydevd.settrace(suspend=False)  # enable debugger
-        except NameError:
+        except (NameError, ConnectionRefusedError):
             pass 
 
         # Retrieve args/kwargs here; and fire processing using them
