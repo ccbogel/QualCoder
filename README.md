@@ -41,6 +41,10 @@ If you are uncomfortable with these warnings install from the source as detailed
 
 **Alternatively, install from source:**
 
+You will need a current Microfost build tools installed. Download and execture that from here:
+
+https://visualstudio.microsoft.com/visual-cpp-build-tools/
+
 Seriously consider using a virtual environment (commands in point 6 below). Not using a virtual environment may affect other Python software you may have installed.
 
 1. Download and install the Python programming language. The minimum recommended version for QualCoder is 3.10.  [Python3](https://www.python.org/downloads/). Download the file (at the bottom of the website) "Windows installer (64-bit)"
