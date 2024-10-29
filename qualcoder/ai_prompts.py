@@ -32,6 +32,7 @@ from PyQt6.QtCore import Qt  # Unused
 
 from .GUI.ui_ai_edit_prompts import Ui_Dialog_AiPrompts
 from .helpers import Message
+from .confirm_delete import DialogConfirmDelete
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -545,10 +546,14 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         if (self.selected_prompt is None) or (self.selected_prompt.scope == 'system'):
             # system prompts cannot be deleted
             return
-        else:
-            self.prompts.prompts.remove(self.selected_prompt)
-            self.fill_tree()
-            self.tree_selection_changed()       
+        msg = _('Do you really want to delete ') + '"' + self.selected_prompt.name_and_scope() + '"?'
+        ui = DialogConfirmDelete(self.app, msg, _('Delete Prompt'))
+        ok = ui.exec()
+        if not ok:
+            return
+        self.prompts.prompts.remove(self.selected_prompt)
+        self.fill_tree()
+        self.tree_selection_changed()       
 
     def set_prompt_details_editable(self, editable):
         self.ui.lineEdit_name.setReadOnly(not editable)
