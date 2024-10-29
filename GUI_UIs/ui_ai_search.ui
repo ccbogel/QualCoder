@@ -242,8 +242,11 @@
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
+               <property name="toolTip">
+                <string>Edit prompt or create your own (advanced option)</string>
+               </property>
                <property name="text">
-                <string>Edit Prompt</string>
+                <string> Edit Prompt </string>
                </property>
               </widget>
              </item>
