@@ -69,8 +69,13 @@
           </property>
           <item>
            <widget class="QLabel" name="label_what">
+            <property name="font">
+             <font>
+              <bold>true</bold>
+             </font>
+            </property>
             <property name="text">
-             <string>What do you want to search for?</string>
+             <string>1) What do you want to search for?</string>
             </property>
            </widget>
           </item>
@@ -180,6 +185,18 @@
            </widget>
           </item>
           <item>
+           <widget class="QLabel" name="label_how">
+            <property name="font">
+             <font>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>2) How to analyze the data?</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QWidget" name="widget_2" native="true">
             <layout class="QHBoxLayout" name="horizontalLayout_2">
              <property name="leftMargin">
@@ -203,7 +220,7 @@
                 </sizepolicy>
                </property>
                <property name="text">
-                <string>Prompt:</string>
+                <string>AI Prompt:</string>
                </property>
               </widget>
              </item>
@@ -225,8 +242,11 @@
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
+               <property name="toolTip">
+                <string>Edit prompt or create your own (advanced option)</string>
+               </property>
                <property name="text">
-                <string>   Change Prompt   </string>
+                <string> Edit Prompt </string>
                </property>
               </widget>
              </item>
@@ -256,9 +276,14 @@
            <number>0</number>
           </property>
           <item>
-           <widget class="QLabel" name="label_4">
+           <widget class="QLabel" name="label_filter">
+            <property name="font">
+             <font>
+              <bold>true</bold>
+             </font>
+            </property>
             <property name="text">
-             <string>Filter the data?</string>
+             <string>3) Filter the data?</string>
             </property>
            </widget>
           </item>

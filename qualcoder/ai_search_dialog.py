@@ -72,20 +72,20 @@ class DialogAiSearch(QtWidgets.QDialog):
         # adapt UI to context
         if context == 'search':
             self.setWindowTitle('AI Search')
-            self.ui.label_what.setText(_('What do you want to search for?'))
+            self.ui.label_what.setText(_('1) What do you want to search for?'))
             self.ui.tabWidget.setTabVisible(0, True)  # code search
             self.ui.tabWidget.setTabVisible(1, True)  # free search
             self.ui.checkBox_coded_segments.setVisible(True)
         elif context == 'code_analysis':
             self.setWindowTitle('AI Code Analysis')
-            self.ui.label_what.setText(_('Which code do you want to analyze?'))
+            self.ui.label_what.setText(_('1) Which code do you want to analyze?'))
             self.ui.tabWidget.setCurrentIndex(0)
             self.ui.tabWidget.setTabVisible(0, True)  # code search
             self.ui.tabWidget.setTabVisible(1, False)  # free search
             self.ui.checkBox_coded_segments.setVisible(False) 
         elif context == 'topic_analysis':
             self.setWindowTitle('AI Topic Analysis')
-            self.ui.label_what.setText(_('Which topic do you want to analyze?'))
+            self.ui.label_what.setText(_('1) Which topic do you want to analyze?'))
             self.ui.tabWidget.setCurrentIndex(1)
             self.ui.tabWidget.setTabVisible(0, False)  # code search
             self.ui.tabWidget.setTabVisible(1, True)  # free search
@@ -94,6 +94,10 @@ class DialogAiSearch(QtWidgets.QDialog):
         font = 'font: ' + str(app_.settings['fontsize']) + 'pt '
         font += '"' + app_.settings['font'] + '";'
         self.setStyleSheet(font)
+        font_bold = font + '\n' + f'font-weight: bold;\n color: {self.app.highlight_color()}'# 'font: bold ' + font[6:]
+        self.ui.label_what.setStyleSheet(font_bold)
+        self.ui.label_how.setStyleSheet(font_bold)
+        self.ui.label_filter.setStyleSheet(font_bold)
         treefont = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
         treefont += '"' + self.app.settings['font'] + '";'
         self.ui.treeWidget.setStyleSheet(treefont)
