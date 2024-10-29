@@ -189,7 +189,10 @@ class DialogAIChat(QtWidgets.QDialog):
         for i in range(len(self.chat_list)):
             chat = self.chat_list[i]
             id_, name, analysis_type, summary, date, analysis_prompt = chat
-            tooltip_text = f"{name}\nType: {analysis_type}\nSummary: {summary}\nDate: {date}\nPrompt: {analysis_prompt}"
+            if analysis_type != 'general chat':
+                tooltip_text = f"{name}\nType: {analysis_type}\nSummary: {summary}\nDate: {date}\nPrompt: {analysis_prompt}"
+            else:
+                tooltip_text = f"{name}\nType: {analysis_type}\nSummary: {summary}\nDate: {date}"
 
             # Creating a new QListWidgetItem
             if analysis_type == 'general chat':
@@ -350,7 +353,9 @@ class DialogAIChat(QtWidgets.QDialog):
             self.ai_prompt = ui.current_prompt
             # self.filenames = self.app.get_filenames()
             
-            summary = f'Analyzing the free topic "{self.ai_search_code_name}" in the data.\nDescription: {self.ai_search_code_memo}'
+            summary = f'Analyzing the free topic "{self.ai_search_code_name}" in the data.'
+            if self.ai_search_code_memo != '':
+                summary += f'\nDescription: {self.ai_search_code_memo}'
             logger.debug(f'New topic chat.')
             self.new_chat(f'Topic "{self.ai_search_code_name}"', 'topic chat', summary, self.ai_prompt.name_and_scope())
             self.process_message('system', self.app.ai.get_default_system_prompt())
@@ -498,7 +503,10 @@ class DialogAIChat(QtWidgets.QDialog):
                 # Show title
                 html += (f'<h1 style={self.ai_info_style}>{name}</h1>')
                 summary_br = summary.replace('\n', '<br />')
-                html += (f"<p style={self.ai_info_style}><b>{_('Type:')}</b> {analysis_type}<br /><b>{_('Summary:')}</b> {summary_br}<br /><b>{_('Date:')}</b> {date}<br /><b>{_('Prompt:')}</b> {analysis_prompt}<br /></p>")
+                if analysis_type != 'general chat':
+                    html += (f"<p style={self.ai_info_style}><b>{_('Type:')}</b> {analysis_type}<br /><b>{_('Summary:')}</b> {summary_br}<br /><b>{_('Date:')}</b> {date}<br /><b>{_('Prompt:')}</b> {analysis_prompt}<br /></p>")
+                else:
+                    html += (f"<p style={self.ai_info_style}><b>{_('Type:')}</b> {analysis_type}<br /><b>{_('Summary:')}</b> {summary_br}<br /><b>{_('Date:')}</b> {date}<br /></p>")
                 # Show chat messages:
                 for msg in self.chat_msg_list:
                     if msg[2] == 'user':
