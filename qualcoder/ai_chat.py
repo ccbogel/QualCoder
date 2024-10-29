@@ -46,6 +46,7 @@ import sqlite3
 from .ai_search_dialog import DialogAiSearch
 from .GUI.ui_ai_chat import Ui_Dialog_ai_chat
 from .helpers import Message
+from .confirm_delete import DialogConfirmDelete
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -438,6 +439,12 @@ class DialogAIChat(QtWidgets.QDialog):
         if self.current_chat_idx <= -1:
             return
         chat_id = int(self.chat_list[self.current_chat_idx][0])
+        chat_name = self.chat_list[self.current_chat_idx][1]
+        msg = _('Do you really want to delete ') + '"' + chat_name + '"?'
+        ui = DialogConfirmDelete(self.app, msg, _('Delete Chat'))
+        ok = ui.exec()
+        if not ok:
+            return
         cursor = self.chat_history_conn.cursor()
         try:
             cursor.execute('DELETE from chat_messages WHERE chat_id = ?', (chat_id,))
