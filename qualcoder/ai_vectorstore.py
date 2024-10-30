@@ -355,7 +355,7 @@ want to continue?\
             metadata = {'id': id_, 'name': name}
             document = Document(page_content=text, metadata=metadata)
             text_splitter = RecursiveCharacterTextSplitter(separators=[".", "!", "?", "\n\n", "\n", " ", ""], 
-                                                        keep_separator=True, chunk_size=500, chunk_overlap=100, 
+                                                        keep_separator='end', chunk_size=500, chunk_overlap=100, 
                                                         add_start_index=True)
             chunks = text_splitter.split_documents([document])
             
