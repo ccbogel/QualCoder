@@ -411,7 +411,7 @@ class DialogCodeText(QtWidgets.QWidget):
     def help():
         """ Open help for transcribe section in browser. """
 
-        url = "https://github.com/ccbogel/QualCoder/wiki/07-Coding-Text"
+        url = "https://github.com/ccbogel/QualCoder/wiki/4.1.-Coding-Text"
         webbrowser.open(url)
 
     def change_text_font_size(self):

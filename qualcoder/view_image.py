@@ -1056,7 +1056,7 @@ class DialogCodeImage(QtWidgets.QDialog):
     def help():
         """ Open help for transcribe section in browser. """
 
-        url = "https://github.com/ccbogel/QualCoder/wiki/08-Coding-Images"
+        url = "https://github.com/ccbogel/QualCoder/wiki/4.4.-Coding-Images"
         webbrowser.open(url)
 
     def eventFilter(self, object_, event):
