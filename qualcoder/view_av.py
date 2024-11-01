@@ -318,7 +318,7 @@ class DialogCodeAV(QtWidgets.QDialog):
     def help():
         """ Open help for transcribe section in browser. """
 
-        url = "https://github.com/ccbogel/QualCoder/wiki/09-Coding-audio-and-video"
+        url = "https://github.com/ccbogel/QualCoder/wiki/4.5.-Coding-Audio-and-Video"
         webbrowser.open(url)
 
     def ddialog_menu(self, position):
@@ -4041,7 +4041,7 @@ class DialogViewAV(QtWidgets.QDialog):
     def help():
         """ Open help for transcribe section in browser. """
 
-        url = "https://github.com/ccbogel/QualCoder/wiki/05-Files"
+        url = "https://github.com/ccbogel/QualCoder/wiki/3.2.-Files"
         webbrowser.open(url)
 
     def ddialog_menu(self, position):

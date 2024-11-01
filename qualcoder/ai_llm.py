@@ -231,17 +231,18 @@ class AiLLM():
         - 'busy' (in the process of sending a prompt to the LLM and streaming the response)
         - 'ready' (fully loaded and idle, ready for a task)
         - 'closing' (in the process of shutting down)
+        - 'closed' 
         """
         if self._status != '':
             return self._status  # 'starting' and 'closing' are set by the corresponding procedures
         elif self.app.settings['ai_enable'] != 'True':
             return 'disabled'
-        elif self.sources_vectorstore is None:
+        elif self.sources_vectorstore is None or not self.sources_vectorstore.is_open():
             return 'no data'
         elif self.sources_vectorstore.ai_worker_running():
             return 'reading data'
         elif self.large_llm is None or self.fast_llm is None:
-            return 'starting'
+            return 'closed'
         elif self.threadpool.activeThreadCount() > 0:
             return 'busy'
         else:

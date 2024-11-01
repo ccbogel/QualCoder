@@ -1213,6 +1213,7 @@ Click "Yes" to start now.')
         # Coding menu
         self.ui.actionCodes.triggered.connect(self.text_coding)
         self.ui.actionCodes.setShortcut('Alt+T')
+        self.ui.actionAI_assisted_coding.triggered.connect(self.ai_go_search)
         self.ui.actionCode_image.triggered.connect(self.image_coding)
         self.ui.actionCode_image.setShortcut('Alt+I')
         self.ui.actionCode_audio_video.triggered.connect(self.av_coding)

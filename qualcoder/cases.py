@@ -213,7 +213,7 @@ class DialogCases(QtWidgets.QDialog):
     def help():
         """ Open help for transcribe section in browser. """
 
-        url = "https://github.com/ccbogel/QualCoder/wiki/06-Cases"
+        url = "https://github.com/ccbogel/QualCoder/wiki/3.3.-Cases"
         webbrowser.open(url)
 
     # Revise

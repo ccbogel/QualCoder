@@ -310,7 +310,7 @@ class DialogJournals(QtWidgets.QDialog):
     def help():
         """ Open help for transcribe section in browser. """
 
-        url = "https://github.com/ccbogel/QualCoder/wiki/04-Journals"
+        url = "https://github.com/ccbogel/QualCoder/wiki/5.2.-Journals"
         webbrowser.open(url)
 
     def keyPressEvent(self, event):
