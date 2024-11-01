@@ -114,7 +114,7 @@
      <x>0</x>
      <y>0</y>
      <width>1024</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuProject">
@@ -176,6 +176,7 @@
      <string>Coding</string>
     </property>
     <addaction name="actionCodes"/>
+    <addaction name="actionAI_assisted_coding"/>
     <addaction name="actionCode_image"/>
     <addaction name="actionCode_audio_video"/>
     <addaction name="actionCode_pdf"/>
@@ -573,6 +574,11 @@
   <action name="actionText_segments_by_codes">
    <property name="text">
     <string>Codes by text segments</string>
+   </property>
+  </action>
+  <action name="actionAI_assisted_coding">
+   <property name="text">
+    <string>AI assisted coding</string>
    </property>
   </action>
  </widget>
