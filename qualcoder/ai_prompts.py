@@ -20,12 +20,10 @@ https://qualcoder.wordpress.com/
 """
 
 import os
-import sys  # Unused
 import logging
-import traceback  # Unused
 import yaml
 import copy
-import gettext  # Unused
+import webbrowser
 
 from PyQt6 import QtWidgets, QtCore, QtGui  # QtGui unused
 from PyQt6.QtCore import Qt  # Unused
@@ -375,6 +373,13 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         
         self.ui.buttonBox.accepted.connect(self.ok)
         self.ui.buttonBox.rejected.connect(self.cancel) 
+        self.ui.buttonBox.helpRequested.connect(self.help)
+        
+    @staticmethod
+    def help():
+        """ Open help in browser. """
+        url = "https://github.com/ccbogel/QualCoder/wiki/6.2.-AI-Prompt-Editing"
+        webbrowser.open(url)
         
     def fill_tree(self):
         """ Fill tree with prompts, top level items are the prompt types. """
