@@ -16,7 +16,7 @@ If not, see <https://www.gnu.org/licenses/>.
 
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
-https://qualcoder.wordpress.com/
+https://qualcoder.wordpress.com
 """
 
 from PyQt6 import QtWidgets, QtCore
@@ -123,9 +123,9 @@ class DialogImportSurvey(QtWidgets.QDialog):
             return
         self.filepath = self.filepath[0]  # A list of one name
         # Copy file into project folder
-        name_split = self.filepath.split("/")
+        name_split = os.path.split(self.filepath)[1]  # Tail
         filename = name_split[-1]
-        destination = os.path.join(self.app.project_path, "/documents/", filename)
+        destination = os.path.join(self.app.project_path, "documents", filename)
         copyfile(self.filepath, destination)
 
     def read_xlsx_file(self):
@@ -220,7 +220,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
             if not success:
                 self.parent_textEdit.append(_("Survey not imported.") + self.filepath)
                 return False
-        self.setWindowTitle(_("Importing from: ") + self.filepath.split('/')[-1])
+        self.setWindowTitle(_("Importing from: ") + self.filepath)
 
         # Clean field names
         removes = "!@#$%^&*()-+=[]{}\\|;:,.<>/?~`"
@@ -459,7 +459,6 @@ class DialogImportSurvey(QtWidgets.QDialog):
     def table_menu(self, pos):
         """ Header context menu to change data types and set primary key(s) and change field names.
         The header index idea came from:
-        http://stackoverflow.com/questions/7782071/how-can-i-get-right-click-context-menus-for-clicks-in-qtableview-header
         param:
             pos: TableWidget position
         """
