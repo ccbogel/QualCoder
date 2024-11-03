@@ -172,7 +172,7 @@ class Ui_Dialog_AiPrompts(object):
         self.horizontalLayout.addWidget(self.splitter)
         self.gridLayout_2.addWidget(self.widget, 0, 0, 1, 1)
         self.buttonBox = QtWidgets.QDialogButtonBox(parent=Dialog_AiPrompts)
-        self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.StandardButton.Cancel|QtWidgets.QDialogButtonBox.StandardButton.Ok)
+        self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.StandardButton.Cancel|QtWidgets.QDialogButtonBox.StandardButton.Help|QtWidgets.QDialogButtonBox.StandardButton.Ok)
         self.buttonBox.setObjectName("buttonBox")
         self.gridLayout_2.addWidget(self.buttonBox, 2, 0, 1, 1)
         self.line = QtWidgets.QFrame(parent=Dialog_AiPrompts)

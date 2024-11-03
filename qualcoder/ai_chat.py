@@ -35,6 +35,7 @@ import json
 import logging
 import os
 import sqlite3
+import webbrowser
 
 from .ai_search_dialog import DialogAiSearch
 from .GUI.ui_ai_chat import Ui_Dialog_ai_chat
@@ -80,6 +81,7 @@ class DialogAIChat(QtWidgets.QDialog):
         self.ui.listWidget_chat_list.itemChanged.connect(self.chat_list_item_changed)
         self.ui.ai_output.linkHovered.connect(self.on_linkHovered)
         self.ui.ai_output.linkActivated.connect(self.on_linkActivated)
+        self.ui.pushButton_help.pressed.connect(self.help)
         self.init_styles()
         self.ai_busy_timer = QtCore.QTimer(self)
         self.ai_busy_timer.timeout.connect(self.update_ai_busy)
@@ -104,6 +106,9 @@ class DialogAIChat(QtWidgets.QDialog):
                 background-color: {self.app.highlight_color()};
             }}
         """)
+        self.ui.pushButton_help.setIcon(qta.icon('mdi6.help'))
+        self.ui.pushButton_help.setFixedHeight(self.ui.pushButton_delete.height())
+        self.ui.pushButton_help.setFixedWidth(self.ui.pushButton_help.height())
         doc_font = f'font: {self.app.settings["docfontsize"]}pt \'{self.app.settings["font"]}\';'
         self.ai_response_style = f'"{doc_font} color: #356399;"'
         self.ai_user_style = f'"{doc_font} color: #287368;"'
@@ -174,6 +179,12 @@ class DialogAIChat(QtWidgets.QDialog):
     def close(self):
         if self.chat_history_conn is not None:
             self.chat_history_conn.close()
+            
+    @staticmethod
+    def help():
+        """ Open help in browser. """
+        url = "https://github.com/ccbogel/QualCoder/wiki/5.1.-AI-Chat"
+        webbrowser.open(url)
 
     def get_chat_list(self):
         """Load the current chat list from the database into self.chat_list

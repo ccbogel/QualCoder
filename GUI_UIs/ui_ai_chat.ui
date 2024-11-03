@@ -43,6 +43,9 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="toolTip">
+         <string/>
+        </property>
        </widget>
       </item>
       <item>
@@ -62,6 +65,9 @@
          </property>
          <item>
           <widget class="QPushButton" name="pushButton_new_analysis">
+           <property name="toolTip">
+            <string>Create a new chat</string>
+           </property>
            <property name="text">
             <string>New</string>
            </property>
@@ -72,8 +78,33 @@
            <property name="enabled">
             <bool>false</bool>
            </property>
+           <property name="toolTip">
+            <string>Delete the selected chat</string>
+           </property>
            <property name="text">
             <string>Delete</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButton_help">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="toolTip">
+            <string>Help</string>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>16</width>
+             <height>16</height>
+            </size>
            </property>
           </widget>
          </item>
@@ -145,6 +176,9 @@
           <width>16777215</width>
           <height>80</height>
          </size>
+        </property>
+        <property name="toolTip">
+         <string>Enter your question here and press Enter to continue the chat</string>
         </property>
         <property name="plainText">
          <string/>
