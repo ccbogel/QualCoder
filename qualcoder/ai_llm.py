@@ -29,7 +29,7 @@ from PyQt6 import QtCore
 import qtawesome as qta
 
 from .ai_prompts import PromptItem
-from langchain_openai import ChatOpenAI
+from langchain_openai import ChatOpenAI, AzureChatOpenAI
 from langchain_core.globals import set_llm_cache  # Unused
 from langchain_community.cache import InMemoryCache  # Unused
 from langchain_core.callbacks.base import BaseCallbackHandler
@@ -175,20 +175,46 @@ class AiLLM():
                     return    
             elif api_key == 'None':
                 api_key = ''
-            self.large_llm = ChatOpenAI(model=large_model, 
-                                openai_api_key=api_key, 
-                                openai_api_base=api_base, 
-                                cache=False,
-                                temperature=0.0,
-                                streaming=True
-                                )
-            self.fast_llm = ChatOpenAI(model=fast_model, 
-                                openai_api_key=api_key, 
-                                openai_api_base=api_base, 
-                                cache=False,
-                                temperature=0.0,
-                                streaming=True
-                                )
+            if api_base.find('openai.azure.com') != -1:  # using Microsoft Azure
+                self.large_llm = AzureChatOpenAI(
+                                    azure_endpoint=api_base,
+                                    azure_deployment=large_model,    
+                                    api_version="2024-02-15-preview",
+                                    api_key=api_key,
+                                    temperature=0,
+                                    max_tokens=None,
+                                    timeout=None,
+                                    max_retries=2,
+                                    cache=False,
+                                    streaming=True
+                )
+                self.small_llm = AzureChatOpenAI(
+                                    azure_endpoint=api_base,
+                                    azure_deployment=large_model,    
+                                    api_version="2024-02-15-preview",
+                                    api_key=api_key,
+                                    temperature=0,
+                                    max_tokens=None,
+                                    timeout=None,
+                                    max_retries=2,
+                                    cache=False,
+                                    streaming=True
+                )
+            else:  # OpenAI or 100% compatible api
+                self.large_llm = ChatOpenAI(model=large_model, 
+                                    openai_api_key=api_key, 
+                                    openai_api_base=api_base, 
+                                    cache=False,
+                                    temperature=0.0,
+                                    streaming=True
+                                    )
+                self.fast_llm = ChatOpenAI(model=fast_model, 
+                                    openai_api_key=api_key, 
+                                    openai_api_base=api_base, 
+                                    cache=False,
+                                    temperature=0.0,
+                                    streaming=True
+                                    )
             self.ai_streaming_output = ''
             self.app.settings['ai_enable'] = 'True'
             
