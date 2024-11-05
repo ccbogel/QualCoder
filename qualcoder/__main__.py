@@ -1178,10 +1178,17 @@ Do you want to enable the AI and start the setup? \
 You can also do this later by starting the AI Setup Wizard from the AI menu in the main window. \
 Click "Yes" to start now.')
             msg_box = QtWidgets.QMessageBox(self)
+            msg_box.setWindowTitle(_('AI Integration'))
+            msg_box.setText(msg)
             msg_box.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-            reply = msg_box.question(self, _('AI Integration'),
-                                            msg, QtWidgets.QMessageBox.StandardButton.Yes,
-                                            QtWidgets.QMessageBox.StandardButton.No)
+            msg_box.addButton(QtWidgets.QMessageBox.StandardButton.Yes)
+            msg_box.addButton(QtWidgets.QMessageBox.StandardButton.No)
+            msg_box.addButton(QtWidgets.QMessageBox.StandardButton.Help)
+            reply = None
+            while reply is None or reply == QtWidgets.QMessageBox.StandardButton.Help:
+                reply = msg_box.exec()
+                if reply == QtWidgets.QMessageBox.StandardButton.Help:
+                    webbrowser.open('https://github.com/ccbogel/QualCoder/wiki/2.3.-AI-Setup')                
             if reply == QtWidgets.QMessageBox.StandardButton.Yes:
                 self.ai_setup_wizard() # (will also init the llm)
         else:
