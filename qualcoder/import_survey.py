@@ -239,12 +239,13 @@ class DialogImportSurvey(QtWidgets.QDialog):
             for row in range(0, len(self.data)):
                 try:
                     float(self.data[row][field])
-                except ValueError:
+                except (ValueError, IndexError):
+                    # IndexError, Might be malformed csv, so presume numeric is False anyway
                     numeric = False
             if numeric:
                 self.fields_type[field] = "numeric"
 
-        # estimate if field type is qualitative, based on at least 20 different character entries
+        # Estimate if field type is qualitative, based on at least 20 different character entries
         for field in range(1, len(self.fields)):
             if self.fields_type[field] == 'character':
                 set_of_values = set()
