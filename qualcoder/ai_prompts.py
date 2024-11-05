@@ -150,13 +150,133 @@ system_prompts = """
     differences, point these out clearly. If you don''t find real differences, that''s
     also a valid result. Base your analysis firmly on the empirical data. Don''t make
     any assumptions which are not backed up by the data.'
+
+- name: Summarization
+  type: text_analysis
+  description: Paraphrases the data in a condensed form without interpreting it or
+    drawing any conclusions.
+  text: Briefly summarize the empirical data provided. Do not write an introduction,
+    do not draw any conclusions, do not use bullet points, just paraphrase the given
+    text in a condensed form, following the order in which the aspects unfold in the
+    original data. 
+    
+- name: Themes generation (Friese 2024)
+  type: text_analysis
+  description: 'This prompt will extract a list of themes from the empirical data.
+
+
+    Source:
+
+    Friese, S. (2024): Prompting for Themes. https://community.qeludra.com/posts/prompts-for-qualitative-research-prompting-for-themes'
+  text: "Please analyze the provided qualitative data, which may include interview
+    transcripts, focus groups, reports, open-ended responses, and observational
+    notes. Identify and list between 2 and 10 recurring themes. Each theme should
+    be distinct and not overlap with others.
+    
+    For each identified theme, provide
+    the following information:
+    
+        Theme 'n': 'Title': Where 'n' is the sequential
+    number of the theme and 'Title' is a concise, descriptive label for the theme.
+    
+        Description: A detailed explanation of the theme, elaborating on its significance,
+    context, and any nuances present in the data.
+    
+    Ensure that each theme is unique,
+    clearly defined, and reflective of the most prevalent patterns in the data."
+    
+- name: Analyze the Unexpected
+  type: text_analysis
+  description: This prompt will extract the most surprising, new and unexpected insights
+    from the data, using the vast common sense knowledge of Large Language Models
+    as a backdrop for comparison.
+  text: "The analysis consists of three distinct steps, each of which builds on the
+    previous one: 
+    1) Identify and name the central theme of the empirical data
+    given to you.
+    2) Take the theme identified in step 1 and briefly explain what
+    empirical results would generally be expected based on your own knowledge of
+    the phenomenon in question. 
+    3) Now analyze how the theme appears in the actual
+    empirical data given to you and pick out the aspects that are most surprising
+    and unexpected given your previously outlined expectations."
+
+- name: "Reconstructive SRP (Lieder/Sch\xE4ffer 2024)"
+  type: text_analysis
+  description: "This prompt is based of the methodological framework of the documentary
+    method. It will generate a 'formulating' and a 'reflecting interpretation'
+    of the empirical data.
+    
+    Source: Lieder, F. R. & Sch\xE4ffer, B. (2024). Reconstructive
+    Social Research Prompting (RSRP). Distributed Interpretation between AI and
+    Researchers in Qualitative Research. https://doi.org/10.31235/osf.io/d6e9m
+    
+    Note that this only implements the methodology and methods prompts as described
+    in the paper. Information about the research project and the theoretical framework
+    should be included in the project memo, which is also sent to the AI."
+  text: "Methodological background: 
+    The empirical material is interpreted using
+    the documentary method. The empirical materials can be interviews, group discussions,
+    etc. The documentary method is a procedure where you can work out individual
+    orientations with interviews and collective orientations with group discussions.
+    People act based on fundamental orientations. Orientations are based on practical,
+    implicit knowledge embedded in action and, therefore, difficult to verbalize.
+    Orientations are divided into basic orientation frameworks and action orientations.
+    Orientation frameworks refer to the primary way in which someone or a group
+    perceives themselves and the world. Expressed attitudes and opinions are based
+    on the basic orientation framework. Action orientations, on the other hand,
+    refer to questions about which orientations can be worked out concerning concrete
+    action practices. Orientation frameworks and action orientations are reconstructed
+    with interviews and group discussions by interpreting corresponding transcripts.
+    The documentary method distinguishes theoretical knowledge from orientations
+    and practical logic of action. For example, someone can use a narrative to develop
+    action orientations against the background of an orientation framework without
+    having any explicit theoretical knowledge since action orientations and orientation
+    frameworks are created as implicit knowledge documented in a narrative's content.
+    
+    Your first task: In **formulating interpretation**, the content is concisely
+    summarized in clear, generally understandable language. The question of what
+    is said in the text material is answered. In addition, an overall topic is selected
+    for the entire passage, and then various successive sub-topics are selected
+    in a detailed structure. It is essential to give proper references from the
+    source text for the various sub-topics to maintain the sequence in which the
+    topics unfold and formulate headlines for the sub-topics. In other words, the
+    aim is to reconstruct the order in which the persons under investigation organize
+    the text material and to reformulate what these persons say. What the investigated
+    persons do is not essential. Stay with what is being said only, and do not jump
+    to conclusions. Stay in the system of relevance for the persons under investigation.
+    Do not consider any context knowledge and formulate every sub-topic for itself.
+    Summarize the whole passage in a body text.
+    
+    Your second task: The **reflecting
+    interpretation** aims to explain how something is said in the transcript, i.e.,
+    how the persons under investigation deal with the topic. How the topics are
+    dealt with refers to the implicit collective orientations within which the identified
+    topics are processed. These implicit processing methods are documented in the
+    narratives and descriptions of the investigated individual's practical experiences.
+    The narratives represent sequences of actions and events with a beginning and
+    an end. They deal with a singular event characterized by specific time and place
+    references. Narratives typically begin with a reference to time and are often
+    continued with words such as 'and ... then'. Descriptions are generally characterized
+    by depicting recurring sequences of actions or fixed facts (a picture, a machine).
+    Typical references to such descriptions are 'always' or 'often'. An implicit
+    logic of action can be derived from the narrated or described experiences, which
+    cannot be derived at the explicit level but must be interpreted by you. In the
+    reflecting interpretation, you try to generate hypotheses about the implicit
+    logic of the action practice as documented in the narrated and described experiences.
+    You also try to generate hypotheses about similarities between the people that
+    go beyond the immediate context. The hypotheses could provide information about
+    possible orientation frameworks of the persons. However, you are not trying
+    to draw any conclusions about a person's motives. Support your hypotheses with
+    verbatim quotes from the transcript with references to the source."    
 """
 
 # Define different prompt types, depending on the task.  
 prompt_types = [
     'search',
     'code_analysis',
-    'topic_analysis'
+    'topic_analysis',
+    'text_analysis'
 ]
 # Descriptions of the types, used as tooltips:
 prompt_types_descriptions = [
@@ -166,6 +286,8 @@ prompt_types_descriptions = [
     ('These prompts are used in the chat to analyze the data that has been coded with a selected code.'
     ),
     ('These prompts are used in the chat to analyse the results of a free search exploring a certain topic.'
+    ),
+    ('These prompts are used in the chat to analyze a section of text from a single empirical document.'
     )
 ]
 
@@ -232,9 +354,9 @@ class PromptsList:
     def __init__(self, app, prompt_type=None):
         self.prompts = []
         self.app = app
-        self.read_prompts(prompt_type)
         self.user_prompts_path = ""
         self.project_prompts_path = ""
+        self.read_prompts(prompt_type)
 
     def read_prompts(self, prompt_type=None):
         self.prompts.clear()
@@ -355,6 +477,8 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         try:
             self.ui.comboBox_type.addItems(prompt_types)
             self.fill_tree()
+            if self.prompt_type is None:
+                self.ui.treeWidget_prompts.collapseAll()
         finally:
             self.form_updating = False
             self.tree_selection_changed()
@@ -399,6 +523,8 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
                     type_item.setIcon(0, self.app.ai.code_analysis_icon())
                 elif t == 'topic_analysis':
                     type_item.setIcon(0, self.app.ai.topic_analysis_icon())
+                elif t == 'text_analysis':
+                    type_item.setIcon(0, self.app.ai.text_analysis_icon())
                 
                 type_item.setToolTip(0, prompt_types_descriptions[i])
                 for j in range(len(prompt_scopes)):
@@ -593,8 +719,8 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
                 self.ui.lineEdit_name.setText(self.selected_prompt.name)
                 # Use QTimer.singleShot to set focus after the QMessageBox has been handled
                 QtCore.QTimer.singleShot(0, self.ui.lineEdit_name.setFocus)
-            if len(new_name) > 20:
-                Message(self.app, _('Edit prompts'), _('The name must be no longer than 20 characters.'), "warning").exec()
+            if len(new_name) > 60:
+                Message(self.app, _('Edit prompts'), _('The name must be no longer than 60 characters.'), "warning").exec()
                 # Use QTimer.singleShot to set focus after the QMessageBox has been handled
                 QtCore.QTimer.singleShot(0, self.ui.lineEdit_name.setFocus)                
             if (new_name != self.selected_prompt.name or new_scope != self.selected_prompt.scope) \

@@ -365,6 +365,26 @@ class App(object):
         for row in result:
             res.append(dict(zip(keys, row)))
         return res
+    
+    def get_text(self, id, start_pos, length) -> str:
+        """Extracts text from the database in the document with the given id.
+
+        Args:
+            id (int): document id
+            start_pos (int): position of the first character
+            length (int): number of characters to retireve
+
+        Returns:
+            str: text
+        """
+        cur = self.conn.cursor()
+        sql = f"SELECT fulltext FROM source WHERE id={id}"
+        cur.execute(sql)
+        res = cur.fetchone()
+        if res is None:
+            return ''
+        else:
+            return res[0][start_pos:start_pos + length]
 
     def get_pdf_filenames(self, ids=None):
         """ Get id, filenames, memo and mediapath of pdf text files.
@@ -2803,7 +2823,7 @@ Click "Yes" to start now.')
         """Action triggered by AI Chat menu item."""
         if self.app.settings['ai_enable'] != 'True':
             msg = _('Please enable the AI first and set it up properly.')
-            Message(self.app, _('Rebuild AI Memory'), msg).exec() 
+            Message(self.app, _('Ai Chat'), msg).exec() 
             return
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_ai_chat) 
 

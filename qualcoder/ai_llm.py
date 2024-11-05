@@ -114,6 +114,9 @@ class AiLLM():
 
     def search_icon(self):
         return qta.icon('mdi6.magnify', color=self.app.highlight_color())
+    
+    def text_analysis_icon(self):
+        return qta.icon('mdi6.text-box-outline', color=self.app.highlight_color())
 
     def general_chat_icon(self):
         return qta.icon('mdi6.chat-question-outline', color=self.app.highlight_color())
