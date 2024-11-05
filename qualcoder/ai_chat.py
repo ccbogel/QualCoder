@@ -20,7 +20,7 @@ https://qualcoder.wordpress.com/
 """
 
 from PyQt6 import QtWidgets, QtCore
-from PyQt6.QtCore import Qt, QEvent
+from PyQt6.QtCore import Qt, QEvent, QObject, pyqtSignal
 from PyQt6.QtGui import QCursor, QGuiApplication
 from PyQt6.QtWidgets import QTextEdit
 import qtawesome as qta
@@ -36,14 +36,22 @@ import logging
 import os
 import sqlite3
 import webbrowser
+import re
+import fuzzysearch
 
 from .ai_search_dialog import DialogAiSearch
 from .GUI.ui_ai_chat import Ui_Dialog_ai_chat
 from .helpers import Message
 from .confirm_delete import DialogConfirmDelete
+from .ai_prompts import PromptItem
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
+
+class AIChatSignalEmitter(QObject):
+    newTextChatSignal = pyqtSignal(int, str, str, int, object)  # will start a new text chat
+
+ai_chat_signal_emitter = AIChatSignalEmitter()  # Create a global instance of the signal emitter
 
 
 class DialogAIChat(QtWidgets.QDialog):
@@ -75,6 +83,7 @@ class DialogAIChat(QtWidgets.QDialog):
         self.ui.plainTextEdit_question.setPlaceholderText(_('<your question>'))
         self.ui.pushButton_new_analysis.clicked.connect(self.button_new_clicked)
         self.ui.pushButton_delete.clicked.connect(self.delete_chat)
+        self.ui.pushButton_delete.setShortcut('Delete')
         self.ui.listWidget_chat_list.itemSelectionChanged.connect(self.chat_list_selection_changed)
         # Enable editing of items on double click and when pressing F2
         self.ui.listWidget_chat_list.setEditTriggers(QtWidgets.QListWidget.EditTrigger.DoubleClicked | QtWidgets.QListWidget.EditTrigger.EditKeyPressed)
@@ -82,11 +91,14 @@ class DialogAIChat(QtWidgets.QDialog):
         self.ui.ai_output.linkHovered.connect(self.on_linkHovered)
         self.ui.ai_output.linkActivated.connect(self.on_linkActivated)
         self.ui.pushButton_help.pressed.connect(self.help)
+        ai_chat_signal_emitter.newTextChatSignal.connect(self.new_text_chat)
         self.init_styles()
         self.ai_busy_timer = QtCore.QTimer(self)
         self.ai_busy_timer.timeout.connect(self.update_ai_busy)
         self.ai_busy_timer.start(100)
         self.ai_streaming_output = ''
+        self.ai_stream_buffer = ""
+        self.ai_stream_in_ref = False
         self.curr_codings = None
         self.ai_prompt = None
         self.ai_search_code_name = None
@@ -94,6 +106,10 @@ class DialogAIChat(QtWidgets.QDialog):
         self.chat_list = []
         self.ai_search_file_ids = []
         self.ai_search_code_ids = []
+        self.ai_text_doc_id = None
+        self.ai_text_doc_name = ''
+        self.ai_text_text = ''
+        self.ai_text_start_pos = -1
 
     def init_styles(self):
         """Set up the stylesheets for the ui and the chat entries
@@ -211,7 +227,9 @@ class DialogAIChat(QtWidgets.QDialog):
                 icon = self.app.ai.general_chat_icon()
             elif analysis_type == 'topic chat':
                 icon = self.app.ai.topic_analysis_icon()
-            else:  # code chat
+            elif analysis_type == 'text chat':
+                icon = self.app.ai.text_analysis_icon()
+            elif analysis_type == 'code chat':
                 icon = self.app.ai.code_analysis_icon()
 
             item = QtWidgets.QListWidgetItem(icon, name)
@@ -254,7 +272,29 @@ class DialogAIChat(QtWidgets.QDialog):
         self.new_chat(name, 'general chat', summary, '')
         self.process_message('system', self.app.ai.get_default_system_prompt())
         self.update_chat_window()  
-             
+
+    def new_text_analysis(self):
+        """analyze a piece of text from an empirical document"""
+        if self.app.project_name == "":
+            msg = _('No project open.')
+            Message(self.app, _('AI not enabled'), msg, "warning").exec()
+            return
+        if self.app.settings['ai_enable'] != 'True':
+            msg = _('The AI is disabled. Go to "AI > Setup Wizard" first.')
+            Message(self.app, _('AI not enabled'), msg, "warning").exec()
+            return
+
+        msg = _('We will now switch to the text coding workspace.\n There you can open a document, select a piece of text, right click on it and choose "AI Text Analysis" from the context menu.')
+        msg_box = QtWidgets.QMessageBox(self)
+        msg_box.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        reply = msg_box.question(self, _('AI Text Analysis'),
+                                        msg, QtWidgets.QMessageBox.StandardButton.Ok,
+                                        QtWidgets.QMessageBox.StandardButton.Cancel)
+        if reply == QtWidgets.QMessageBox.StandardButton.Ok:
+            self.main_window.text_coding(task='documents')
+        else:
+            return
+
     def new_code_chat(self):
         """chat about codings"""
         if self.app.project_name == "":
@@ -269,6 +309,7 @@ class DialogAIChat(QtWidgets.QDialog):
         ui = DialogAiSearch(self.app, 'code_analysis')
         ret = ui.exec()
         if ret == QtWidgets.QDialog.DialogCode.Accepted:
+            self.ai_text_doc_id = None
             self.ai_search_code_name = ui.selected_code_name
             self.ai_search_code_memo = ui.selected_code_memo
             #self.ai_include_coded_segments = ui.include_coded_segments
@@ -329,7 +370,7 @@ class DialogAIChat(QtWidgets.QDialog):
                 f'{ai_data_json}\n'
                 f'Your task is to analyze the given empirical data following these instructions: {self.ai_prompt.text}\n'
                 f'The whole discussion should be based upon the the empirical data provided and its proper interpretation. '
-                f'Do not make any assumptions which are not supported by the data. '
+                f'Do not make any assumptions which are not supported by the data '
                 f'Please mention the sources that your refer to from the given empirical data, using an html anchor tag of the following form: '
                 '<a href="coding:{source_id}">{source_name}</a>\n' 
                 f'Always answer in the following language: "{self.app.ai.get_curr_language()}".'
@@ -358,6 +399,7 @@ class DialogAIChat(QtWidgets.QDialog):
         ui = DialogAiSearch(self.app, 'topic_analysis')
         ret = ui.exec()
         if ret == QtWidgets.QDialog.DialogCode.Accepted:
+            self.ai_text_doc_id = None
             self.ai_search_code_name = ui.selected_code_name
             self.ai_search_code_memo = ui.selected_code_memo
             
@@ -449,6 +491,54 @@ class DialogAIChat(QtWidgets.QDialog):
         self.process_message('instruct', ai_instruction)
         self.update_chat_window()   
         
+    def new_text_chat(self, doc_id, doc_name, text, start_pos, prompt: PromptItem):
+        """Analyze a text passage from an empirical document
+        """
+        if self.app.project_name == "":
+            msg = _('No project open.')
+            Message(self.app, _('AI not enabled'), msg, "warning").exec()
+            return
+        if self.app.settings['ai_enable'] != 'True':
+            msg = _('The AI is disabled. Go to "AI > Setup Wizard" first.')
+            Message(self.app, _('AI not enabled'), msg, "warning").exec()
+            return
+        # Limit the amount of data (characters) send to the ai, so the maximum context window is not exceeded.
+        # As a rough estimation, one token is about 4 characters long (in english). 
+        # We want to fill not more than half the context window with our data, so that there is enough
+        # room for the answer and further chats.
+        max_ai_data_length = round(0.5 * (self.app.ai.large_llm_context_window * 4)) 
+        if len(text) > max_ai_data_length:
+            msg = _('The text is too long to be analyzed in one go. Please select a shorter passage.')
+            Message(self.app, _('AI text analysis'), msg, "warning").exec()
+            return
+        
+        self.main_window.ai_go_chat()  # show chat dialog
+        
+        self.ai_prompt = prompt
+        self.ai_text_doc_id = doc_id
+        self.ai_text_doc_name = doc_name
+        self.ai_text_text = text
+        self.ai_text_start_pos = start_pos
+        
+        ai_instruction = (
+            f'At the end of this message, you will find a passage of text extracted from the empirical' 
+            f'document named "{doc_name}".\n'
+            f'Your task is to analyze this text based on the following instructions: \n'
+            f'"{prompt.text}"\n'
+            f'Make sure to include references to the original data where needed, following this format '
+            'definition: `[REF: "{The exact text from the original data that you want to reference to}"]`.\n'             
+            f'Always answer in the following language: "{self.app.ai.get_curr_language()}".\n'
+            f'This is the text from the empirical document:\n'
+            f'"{text}"'
+        )    
+        
+        summary = f'Analyzing text from "{doc_name}" ({len(text)} characters).'
+        logger.debug(f'New text chat. Prompt:\n{ai_instruction}')
+        self.new_chat(f'Text analysis "{doc_name}"', 'text chat', summary, prompt.name_and_scope())
+        self.process_message('system', self.app.ai.get_default_system_prompt())
+        self.process_message('instruct', ai_instruction)
+        self.update_chat_window()  
+        
     def delete_chat(self):
         """Deletes the currently selected chat, connected to the button
            'pushButton_delete'
@@ -529,7 +619,8 @@ class DialogAIChat(QtWidgets.QDialog):
                         txt = f'<b>{_("User")} ({author}):</b><br />{txt}'
                         html += f'<p style={self.ai_user_style}>{txt}</p>'
                     elif msg[2] == 'ai':
-                        txt = msg[4].replace('\n', '<br />')
+                        txt = msg[4]
+                        txt = txt.replace('\n', '<br />')
                         author = msg[3]
                         if author is None or author == '':
                             author = 'unkown'
@@ -541,7 +632,9 @@ class DialogAIChat(QtWidgets.QDialog):
                         html += f'<p style={self.ai_info_style}>{txt}</p>'
                 # add partially streamed ai response if needed
                 if len(self.app.ai.ai_streaming_output) > 0:
-                    txt = self.app.ai.ai_streaming_output.replace('\n', '<br />')
+                    txt = self.app.ai.ai_streaming_output
+                    txt = self.replace_references(txt, streaming=True)
+                    txt = txt.replace('\n', '<br />')
                     author = self.app.ai_models[int(self.app.settings['ai_model_index'])]['name']
                     if author is None or author == '':
                         author = 'unkown'
@@ -556,6 +649,33 @@ class DialogAIChat(QtWidgets.QDialog):
             self.ui.ai_output.setText('')
             self.ui.plainTextEdit_question.setEnabled(False)
             self.ui.pushButton_question.setEnabled(False)
+            
+    def replace_references(self, text, streaming=False):
+        if self.ai_text_doc_id is None: 
+            # we are not in text analysis chat
+            return text
+                
+        pattern = r'\[REF: "(.*?)"\]'  # Pattern for [REF: "QUOTE"]        
+        
+        # Replacement function
+        def replace_match(match):
+            if streaming:
+                return f'({self.ai_text_doc_name})'
+            quote = match.group(1)
+            # search quote with not more than 10% mismatch (Levenshtein Distance). This is done because the AI sometimes alters the text a little bit.
+            quote_found = fuzzysearch.find_near_matches(quote, self.ai_text_text, 
+                             max_l_dist=round(len(quote) * 0.1))  # result: list [Match(start=x, end=x, dist=x, matched='txt')]
+            if len(quote_found) > 0:
+                quote_start = quote_found[0].start + self.ai_text_start_pos
+                quote = quote_found[0].matched
+                a = f'(<a href="quote:{self.ai_text_doc_id}_{quote_start}_{len(quote)}">{self.ai_text_doc_name}</a>)'
+                return a
+            else:  # not found
+                return _('(unknown reference)')
+            
+        # Use re.sub with replacement function
+        res = re.sub(pattern, replace_match, text)
+        return res
             
     def chat_list_selection_changed(self, force_update=False):
         self.ui.pushButton_delete.setEnabled(self.current_chat_idx > -1)
@@ -584,14 +704,18 @@ class DialogAIChat(QtWidgets.QDialog):
         # Create QMenu
         menu = QtWidgets.QMenu()
         menu.setStyleSheet(self.font)
+        menu.setToolTipsVisible(True)
 
         # Add actions
-        action_codings_analysis = menu.addAction(_('New code chat'))
-        action_codings_analysis.setIcon(self.app.ai.code_analysis_icon())
-        action_codings_analysis.setToolTip(_('Start chatting about the data in the codings for a particular code.'))
+        action_text_analysis = menu.addAction(_('New text analysis'))
+        action_text_analysis.setIcon(self.app.ai.text_analysis_icon())
+        action_text_analysis.setToolTip(_('Analyse a piece of text from your empirical data together with the AI.'))
         action_topic_analysis = menu.addAction(_('New topic chat'))
         action_topic_analysis.setIcon(self.app.ai.topic_analysis_icon())
         action_topic_analysis.setToolTip(_('Start chatting about data related to a free-search topic.'))
+        action_codings_analysis = menu.addAction(_('New code chat'))
+        action_codings_analysis.setIcon(self.app.ai.code_analysis_icon())
+        action_codings_analysis.setToolTip(_('Start chatting about the data in the codings for a particular code.'))
         action_general_chat = menu.addAction(_('New general chat'))
         action_general_chat.setIcon(self.app.ai.general_chat_icon())
         action_general_chat.setToolTip(_('Ask the AI anything, not related to your data.'))
@@ -605,7 +729,9 @@ class DialogAIChat(QtWidgets.QDialog):
         action = menu.exec(global_bottom_left_point)
 
         # Check which action was selected and do something
-        if action == action_codings_analysis:
+        if action == action_text_analysis:
+            self.new_text_analysis()
+        elif action == action_codings_analysis:
             self.new_code_chat()
         elif action == action_topic_analysis:
             self.new_topic_chat()
@@ -654,6 +780,8 @@ class DialogAIChat(QtWidgets.QDialog):
             chat_idx = self.current_chat_idx
         if chat_idx > -1:
             curr_chat_id = self.chat_list[chat_idx][0]
+            if msg_type == 'ai':
+                msg_content = self.replace_references(msg_content)
             if db_conn is None:
                 db_conn = self.chat_history_conn
             cursor = db_conn.cursor()
@@ -756,6 +884,8 @@ class DialogAIChat(QtWidgets.QDialog):
     def _send_message(self, messages, progress_callback=None):    # TODO progress_callback unused
         # Callback for async call
         self.ai_streaming_output = ''
+        self.ai_stream_buffer = ""
+        self.ai_stream_in_ref = False
         self.current_streaming_chat_idx = self.current_chat_idx
         for chunk in self.app.ai.large_llm.stream(messages):
             if self.app.ai.ai_async_is_canceled:
@@ -764,10 +894,35 @@ class DialogAIChat(QtWidgets.QDialog):
                 # switched to another chat, cancel also
                 break
             else:
-                self.ai_streaming_output += str(chunk.content)
+                # check if we need to process reference:
+                curr_text = self.ai_streaming_output
+                new_data = str(chunk.content)
+                for char in new_data:
+                    if self.ai_stream_in_ref:
+                        if char == "]":
+                            # End of reference reached
+                            ref_replacement = self.ai_stream_process_reference(self.buffer)
+                            curr_text += ref_replacement
+                            self.ai_stream_buffer = ""
+                            self.ai_stream_in_ref = False
+                        else:
+                            self.ai_stream_buffer += char
+                    else:
+                        curr_text += char
+                        # Check for the start of a reference
+                        if curr_text.endswith('[REF:'):
+                            self.ai_stream_in_ref = True
+                            self.ai_stream_buffer = '[REF:'
+                            curr_text = curr_text[:-(len(self.buffer))]  
+                self.ai_streaming_output = curr_text
                 if not self.is_updating_chat_window:
                     self.update_chat_window()
         return self.ai_streaming_output
+    
+    def ai_stream_process_reference(self, reference):
+        '''Replace a reference to the empirical data woth a clicable link'''
+        return " [REFERENCE] "
+
     
     def ai_message_callback(self, ai_result):
         """Called if the AI has finished sending its response.
@@ -833,6 +988,19 @@ class DialogAIChat(QtWidgets.QDialog):
                     source = None  # TODO source not used
                     tooltip_txt = _('Invalid source reference.')
                 QtWidgets.QToolTip.showText(QCursor.pos(), tooltip_txt, self.ui.ai_output)
+            elif link.startswith('quote:'):
+                # tooltip_txt = _('Open source document')
+                tooltip_txt = ''
+                try:
+                    quote_id = link[len('quote:'):]
+                    source_id, start, length = quote_id.split('_')
+                    tooltip_txt = f'"{self.app.get_text(int(source_id), int(start), int(length))}"'
+                except Exception as e:
+                    print(e)
+                    tooltip_txt = ''
+                if tooltip_txt == '':
+                    tooltip_txt = _('Error retrieving source text')
+                QtWidgets.QToolTip.showText(QCursor.pos(), tooltip_txt, self.ui.ai_output)
         else:
             QtWidgets.QToolTip.hideText()
             
@@ -873,8 +1041,15 @@ class DialogAIChat(QtWidgets.QDialog):
                     logger.debug(f'Link: "{link}" - Error: {e}')
                     source_id = None  # TODO source_id not used
                     msg = _('Invalid source reference.')
-                    Message(self.app, _('AI Chat'), msg, icon='critical').exec()                    
-
+                    Message(self.app, _('AI Chat'), msg, icon='critical').exec()  
+            elif link.startswith('quote:'):
+                    quote_id = link[len('quote:'):]
+                    source_id, start, length = quote_id.split('_')
+                    end = int(start) + int(length)
+                    self.main_window.text_coding(task='documents',
+                                                 doc_id=int(source_id), 
+                                                 doc_sel_start=int(start), 
+                                                 doc_sel_end=end)
 
 # Helper:
 class LlmCallbackHandler(BaseCallbackHandler):

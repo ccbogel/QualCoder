@@ -7,13 +7,11 @@ pdfminer.six
 Pillow
 plotly
 ply
-pydub
 PyQt6>=6.5
 qtawesome
 python-vlc
 rispy
 six
-SpeechRecognition
 langchain>=0.2.8 
 langchain-community>=0.2.7 
 langchain-core>=0.2.19

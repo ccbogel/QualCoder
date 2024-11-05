@@ -53,7 +53,7 @@ from .report_attributes import DialogSelectAttributeParameters
 from .reports import DialogReportCoderComparisons, DialogReportCodeFrequencies  # for isinstance()
 from .report_codes import DialogReportCodes
 from .select_items import DialogSelectItems
-from .speech_to_text import SpeechToText
+# from .speech_to_text import SpeechToText  # Removed as pydub module has error re pyaudioop
 
 # If VLC not installed, it will not crash
 vlc = None
@@ -3826,8 +3826,9 @@ class DialogViewAV(QtWidgets.QDialog):
         self.ui.pushButton_next.pressed.connect(self.move_to_next_search_text)
         self.ui.pushButton_next.setEnabled(False)
         pm.loadFromData(QtCore.QByteArray.fromBase64(cogs_icon), "png")
-        self.ui.pushButton_speechtotext.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_speechtotext.pressed.connect(self.speech_to_text)
+        self.ui.pushButton_speechtotext.hide()
+        #self.ui.pushButton_speechtotext.setIcon(QtGui.QIcon(pm))
+        #self.ui.pushButton_speechtotext.pressed.connect(self.speech_to_text)
         self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
         # self.ui.lineEdit_search.setEnabled(False)
         # My solution to getting gui mouse events by putting vlc video in another dialog
@@ -3946,11 +3947,13 @@ class DialogViewAV(QtWidgets.QDialog):
         self.mediaplayer.stop()
         self.mediaplayer.audio_set_volume(100)
         # self.play_pause()
+
+        ''' Problem with pydub pyaudioop module. Nov 2024.  
         # Only try speech to text if there is no text present
         if self.text == "":
             self.ui.pushButton_speechtotext.setEnabled(True)
         else:
-            self.ui.pushButton_speechtotext.setToolTip(_("Speech to text disabled.\nTranscript contains text."))
+            self.ui.pushButton_speechtotext.setToolTip(_("Speech to text disabled.\nTranscript contains text."))'''
 
     def get_waveform(self):
         """ Create waveform image in the audio folder. Apply image to label_waveform.
@@ -4027,6 +4030,7 @@ class DialogViewAV(QtWidgets.QDialog):
         if len(self.codetext) > 0 or len(self.annotations) > 0 or len(self.casetext) > 0:
             self.no_codes_annotes_cases = False
 
+    ''' Problem with pydub pyaudioop module
     def speech_to_text(self):
         """ Convert speech to text using online service. """
 
@@ -4035,7 +4039,7 @@ class DialogViewAV(QtWidgets.QDialog):
         if not ok:
             return
         txt = ui.text
-        self.ui.textEdit.setText(txt)
+        self.ui.textEdit.setText(txt)'''
 
     @staticmethod
     def help():

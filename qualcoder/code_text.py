@@ -59,6 +59,8 @@ from .report_codes import DialogReportCodes
 from .report_code_summary import DialogReportCodeSummary  # For isinstance()
 from .select_items import DialogSelectItems  # For isinstance()
 from .ai_search_dialog import DialogAiSearch
+from .ai_prompts import PromptsList, DialogAiEditPrompts
+from .ai_chat import ai_chat_signal_emitter
 
 ai_search_analysis_max_count = 10  # How many chunks of data are analysed in the second stage
 
@@ -1029,7 +1031,8 @@ class DialogCodeText(QtWidgets.QWidget):
         cursor = self.ui.textEdit.cursorForPosition(position)
         selected_text = self.ui.textEdit.textCursor().selectedText()
         menu = QtWidgets.QMenu()
-        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        menu.setStyleSheet('font-size:' + str(self.app.settings['fontsize']) + 'pt')
+        menu.setToolTipsVisible(True)
         action_annotate = None
         action_copy = None
         action_code_memo = None
@@ -1044,6 +1047,7 @@ class DialogCodeText(QtWidgets.QWidget):
         action_unmark = None
         action_new_code = None
         action_new_invivo_code = None
+        submenu_ai_text_analysis = None
 
         # Can have multiple coded text at this position
         for item in self.code_text:
@@ -1089,12 +1093,29 @@ class DialogCodeText(QtWidgets.QWidget):
         if selected_text == "" and self.is_annotated(cursor.position()):
             action_edit_annotate = menu.addAction(_("Edit annotation"))
         action_set_bookmark = menu.addAction(_("Set bookmark (B)"))
+        if selected_text != "":
+            submenu_ai_text_analysis = menu.addMenu(_("AI Text Analysis"))
+            submenu_ai_text_analysis.setToolTipsVisible(True)
+            if self.app.ai is not None and self.app.ai.is_ready():
+                submenu_ai_text_analysis.setEnabled(True)
+                prompts_list = PromptsList(self.app, 'text_analysis')
+                for prompt in prompts_list.prompts:
+                    ac = submenu_ai_text_analysis.addAction(prompt.name_and_scope())
+                    ac.setToolTip(prompt.description)
+                    ac.setProperty('submenu', 'ai_text_analysis')
+                    ac.setData(prompt)
+                submenu_ai_text_analysis.addSeparator()
+                ac = submenu_ai_text_analysis.addAction(_('Edit text analysis prompts'))
+                ac.setProperty('submenu', 'ai_text_analysis_prompts')
+            else:
+                submenu_ai_text_analysis.setEnabled(False)   
         action_hide_top_groupbox = None
         action_show_top_groupbox = None
         if self.ui.groupBox.isHidden():
             action_show_top_groupbox = menu.addAction(_("Show control panel (H)"))
         if not self.ui.groupBox.isHidden():
             action_hide_top_groupbox = menu.addAction(_("Hide control panel (H)"))
+
         action = menu.exec(self.ui.textEdit.mapToGlobal(position))
         if action is None:
             return
@@ -1149,6 +1170,22 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         if action == action_new_invivo_code:
             self.mark_with_new_code(in_vivo=True)
+            return
+        if action.property('submenu') == 'ai_text_analysis': 
+            if self.file_ is None:
+                Message(self.app, _('Warning'), _("No file was selected"), "warning").exec()
+                return
+            selected_text = self.ui.textEdit.textCursor().selectedText()
+            start_pos = self.ui.textEdit.textCursor().selectionStart() + self.file_['start']
+            ai_chat_signal_emitter.newTextChatSignal.emit(int(self.file_['id']), 
+                                                          self.file_['name'], 
+                                                          selected_text,
+                                                          start_pos,
+                                                          action.data())
+            return
+        if action.property('submenu') == 'ai_text_analysis_prompts': 
+            ui = DialogAiEditPrompts(self.app, 'text_analysis')
+            ui.exec()
             return
         # Remaining actions will be the submenu codes
         self.recursive_set_current_item(self.ui.treeWidget.invisibleRootItem(), action.text())

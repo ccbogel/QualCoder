@@ -41,6 +41,7 @@ If you are uncomfortable with these warnings install from the source as detailed
 
 **Alternatively, install from source:**
 
+
 Seriously consider using a virtual environment (commands in point 6 below). Not using a virtual environment may affect other Python software you may have installed.
 
 1. Download and install the Python programming language. The minimum recommended version for QualCoder is 3.10.  [Python3](https://www.python.org/downloads/). Download the file (at the bottom of the website) "Windows installer (64-bit)"
@@ -285,7 +286,9 @@ Open the Terminal App and move to the unzipped Qualcoder-Master directory, then 
 
 1) Install Python dependency modules using `pip3`:
 
-`pip3 install chardet ebooklib ffmpeg-python pyqt6 pillow ply pdfminer.six openpyxl pandas plotly pydub python-vlc rispy six SpeechRecognition`
+`pip3 install chardet ebooklib ffmpeg-python pyqt6 pillow ply pdfminer.six openpyxl pandas plotly python-vlc rispy six pydub SpeechRecognition`
+
+Note: For 3.6 and up do not install pydub or SpeechRecognition. This function has been removed, as there were errors with the pydub module.
 
 2) Open the Terminal App and move to the unzipped Qualcoder-Master directory, then run the following commands:
 
