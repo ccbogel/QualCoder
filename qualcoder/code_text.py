@@ -1031,7 +1031,8 @@ class DialogCodeText(QtWidgets.QWidget):
         cursor = self.ui.textEdit.cursorForPosition(position)
         selected_text = self.ui.textEdit.textCursor().selectedText()
         menu = QtWidgets.QMenu()
-        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        menu.setStyleSheet('font-size:' + str(self.app.settings['fontsize']) + 'pt')
+        menu.setToolTipsVisible(True)
         action_annotate = None
         action_copy = None
         action_code_memo = None
@@ -1093,7 +1094,8 @@ class DialogCodeText(QtWidgets.QWidget):
             action_edit_annotate = menu.addAction(_("Edit annotation"))
         action_set_bookmark = menu.addAction(_("Set bookmark (B)"))
         if selected_text != "":
-            submenu_ai_text_analysis = menu.addMenu(_("AI text analysis"))
+            submenu_ai_text_analysis = menu.addMenu(_("AI Text Analysis"))
+            submenu_ai_text_analysis.setToolTipsVisible(True)
             if self.app.ai is not None and self.app.ai.is_ready():
                 submenu_ai_text_analysis.setEnabled(True)
                 prompts_list = PromptsList(self.app, 'text_analysis')

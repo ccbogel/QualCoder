@@ -272,7 +272,29 @@ class DialogAIChat(QtWidgets.QDialog):
         self.new_chat(name, 'general chat', summary, '')
         self.process_message('system', self.app.ai.get_default_system_prompt())
         self.update_chat_window()  
-             
+
+    def new_text_analysis(self):
+        """analyze a piece of text from an empirical document"""
+        if self.app.project_name == "":
+            msg = _('No project open.')
+            Message(self.app, _('AI not enabled'), msg, "warning").exec()
+            return
+        if self.app.settings['ai_enable'] != 'True':
+            msg = _('The AI is disabled. Go to "AI > Setup Wizard" first.')
+            Message(self.app, _('AI not enabled'), msg, "warning").exec()
+            return
+
+        msg = _('We will now switch to the text coding workspace.\n There you can open a document, select a piece of text, right click on it and choose "AI Text Analysis" from the context menu.')
+        msg_box = QtWidgets.QMessageBox(self)
+        msg_box.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        reply = msg_box.question(self, _('AI Text Analysis'),
+                                        msg, QtWidgets.QMessageBox.StandardButton.Ok,
+                                        QtWidgets.QMessageBox.StandardButton.Cancel)
+        if reply == QtWidgets.QMessageBox.StandardButton.Ok:
+            self.main_window.text_coding(task='documents')
+        else:
+            return
+
     def new_code_chat(self):
         """chat about codings"""
         if self.app.project_name == "":
@@ -682,14 +704,18 @@ class DialogAIChat(QtWidgets.QDialog):
         # Create QMenu
         menu = QtWidgets.QMenu()
         menu.setStyleSheet(self.font)
+        menu.setToolTipsVisible(True)
 
         # Add actions
-        action_codings_analysis = menu.addAction(_('New code chat'))
-        action_codings_analysis.setIcon(self.app.ai.code_analysis_icon())
-        action_codings_analysis.setToolTip(_('Start chatting about the data in the codings for a particular code.'))
+        action_text_analysis = menu.addAction(_('New text analysis'))
+        action_text_analysis.setIcon(self.app.ai.text_analysis_icon())
+        action_text_analysis.setToolTip(_('Analyse a piece of text from your empirical data together with the AI.'))
         action_topic_analysis = menu.addAction(_('New topic chat'))
         action_topic_analysis.setIcon(self.app.ai.topic_analysis_icon())
         action_topic_analysis.setToolTip(_('Start chatting about data related to a free-search topic.'))
+        action_codings_analysis = menu.addAction(_('New code chat'))
+        action_codings_analysis.setIcon(self.app.ai.code_analysis_icon())
+        action_codings_analysis.setToolTip(_('Start chatting about the data in the codings for a particular code.'))
         action_general_chat = menu.addAction(_('New general chat'))
         action_general_chat.setIcon(self.app.ai.general_chat_icon())
         action_general_chat.setToolTip(_('Ask the AI anything, not related to your data.'))
@@ -703,7 +729,9 @@ class DialogAIChat(QtWidgets.QDialog):
         action = menu.exec(global_bottom_left_point)
 
         # Check which action was selected and do something
-        if action == action_codings_analysis:
+        if action == action_text_analysis:
+            self.new_text_analysis()
+        elif action == action_codings_analysis:
             self.new_code_chat()
         elif action == action_topic_analysis:
             self.new_topic_chat()
