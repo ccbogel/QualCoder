@@ -366,7 +366,7 @@ class App(object):
             res.append(dict(zip(keys, row)))
         return res
     
-    def get_text(self, id, start_pos, length) -> str:
+    def get_text_fulltext(self, id, start_pos, length) -> str:
         """Extracts text from the database in the document with the given id.
 
         Args:

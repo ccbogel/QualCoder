@@ -995,7 +995,7 @@ class DialogAIChat(QtWidgets.QDialog):
                 try:
                     quote_id = link[len('quote:'):]
                     source_id, start, length = quote_id.split('_')
-                    tooltip_txt = f'"{self.app.get_text(int(source_id), int(start), int(length))}"'
+                    tooltip_txt = f'"{self.app.get_text_fulltext(int(source_id), int(start), int(length))}"'
                 except Exception as e:
                     print(e)
                     tooltip_txt = ''
