@@ -220,7 +220,7 @@
                 </sizepolicy>
                </property>
                <property name="text">
-                <string>AI Prompt:</string>
+                <string>Analytic Prompt:</string>
                </property>
               </widget>
              </item>
@@ -246,7 +246,7 @@
                 <string>Edit prompt or create your own (advanced option)</string>
                </property>
                <property name="text">
-                <string> Edit Prompt </string>
+                <string> Edit </string>
                </property>
               </widget>
              </item>

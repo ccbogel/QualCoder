@@ -14,7 +14,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>AI Edit Prompts</string>
+   <string>AI Prompts Library</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_2">
    <item row="0" column="0">
@@ -81,7 +81,7 @@
           <item>
            <widget class="QLabel" name="label">
             <property name="text">
-             <string>Prompts library:</string>
+             <string>Analytic Prompts:</string>
             </property>
            </widget>
           </item>
@@ -91,13 +91,13 @@
              <bool>false</bool>
             </property>
             <property name="rootIsDecorated">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="itemsExpandable">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="expandsOnDoubleClick">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <attribute name="headerVisible">
              <bool>false</bool>
@@ -188,7 +188,7 @@
              <item>
               <widget class="QLabel" name="label_2">
                <property name="text">
-                <string>Name:</string>
+                <string>Prompt Name:</string>
                </property>
               </widget>
              </item>

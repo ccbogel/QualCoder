@@ -44,9 +44,9 @@ class Ui_Dialog_AiPrompts(object):
         self.verticalLayout_3.addWidget(self.label)
         self.treeWidget_prompts = QtWidgets.QTreeWidget(parent=self.widget_3)
         self.treeWidget_prompts.setProperty("showDropIndicator", False)
-        self.treeWidget_prompts.setRootIsDecorated(False)
-        self.treeWidget_prompts.setItemsExpandable(False)
-        self.treeWidget_prompts.setExpandsOnDoubleClick(False)
+        self.treeWidget_prompts.setRootIsDecorated(True)
+        self.treeWidget_prompts.setItemsExpandable(True)
+        self.treeWidget_prompts.setExpandsOnDoubleClick(True)
         self.treeWidget_prompts.setObjectName("treeWidget_prompts")
         self.treeWidget_prompts.headerItem().setText(0, "1")
         self.treeWidget_prompts.header().setVisible(False)
@@ -186,12 +186,12 @@ class Ui_Dialog_AiPrompts(object):
 
     def retranslateUi(self, Dialog_AiPrompts):
         _translate = QtCore.QCoreApplication.translate
-        Dialog_AiPrompts.setWindowTitle(_translate("Dialog_AiPrompts", "AI Edit Prompts"))
-        self.label.setText(_translate("Dialog_AiPrompts", "Prompts library:"))
+        Dialog_AiPrompts.setWindowTitle(_translate("Dialog_AiPrompts", "AI Prompts Library"))
+        self.label.setText(_translate("Dialog_AiPrompts", "Analytic Prompts:"))
         self.pushButton_new_prompt.setText(_translate("Dialog_AiPrompts", "New"))
         self.pushButton_duplicate_prompt.setText(_translate("Dialog_AiPrompts", "Duplicate"))
         self.pushButton_delete_prompt.setText(_translate("Dialog_AiPrompts", "Delete"))
-        self.label_2.setText(_translate("Dialog_AiPrompts", "Name:"))
+        self.label_2.setText(_translate("Dialog_AiPrompts", "Prompt Name:"))
         self.label_uneditable.setText(_translate("Dialog_AiPrompts", "(Uneditable system prompt)"))
         self.label_5.setText(_translate("Dialog_AiPrompts", "Scope:"))
         self.radioButton_system.setText(_translate("Dialog_AiPrompts", "system"))

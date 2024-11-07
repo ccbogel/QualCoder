@@ -365,6 +365,26 @@ class App(object):
         for row in result:
             res.append(dict(zip(keys, row)))
         return res
+    
+    def get_text_fulltext(self, id, start_pos, length) -> str:
+        """Extracts text from the database in the document with the given id.
+
+        Args:
+            id (int): document id
+            start_pos (int): position of the first character
+            length (int): number of characters to retireve
+
+        Returns:
+            str: text
+        """
+        cur = self.conn.cursor()
+        sql = f"SELECT fulltext FROM source WHERE id={id}"
+        cur.execute(sql)
+        res = cur.fetchone()
+        if res is None:
+            return ''
+        else:
+            return res[0][start_pos:start_pos + length]
 
     def get_pdf_filenames(self, ids=None):
         """ Get id, filenames, memo and mediapath of pdf text files.
@@ -1158,10 +1178,17 @@ Do you want to enable the AI and start the setup? \
 You can also do this later by starting the AI Setup Wizard from the AI menu in the main window. \
 Click "Yes" to start now.')
             msg_box = QtWidgets.QMessageBox(self)
+            msg_box.setWindowTitle(_('AI Integration'))
+            msg_box.setText(msg)
             msg_box.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-            reply = msg_box.question(self, _('AI Integration'),
-                                            msg, QtWidgets.QMessageBox.StandardButton.Yes,
-                                            QtWidgets.QMessageBox.StandardButton.No)
+            msg_box.addButton(QtWidgets.QMessageBox.StandardButton.Yes)
+            msg_box.addButton(QtWidgets.QMessageBox.StandardButton.No)
+            msg_box.addButton(QtWidgets.QMessageBox.StandardButton.Help)
+            reply = None
+            while reply is None or reply == QtWidgets.QMessageBox.StandardButton.Help:
+                reply = msg_box.exec()
+                if reply == QtWidgets.QMessageBox.StandardButton.Help:
+                    webbrowser.open('https://github.com/ccbogel/QualCoder/wiki/2.3.-AI-Setup')                
             if reply == QtWidgets.QMessageBox.StandardButton.Yes:
                 self.ai_setup_wizard() # (will also init the llm)
         else:
@@ -2803,7 +2830,7 @@ Click "Yes" to start now.')
         """Action triggered by AI Chat menu item."""
         if self.app.settings['ai_enable'] != 'True':
             msg = _('Please enable the AI first and set it up properly.')
-            Message(self.app, _('Rebuild AI Memory'), msg).exec() 
+            Message(self.app, _('Ai Chat'), msg).exec() 
             return
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_ai_chat) 
 
