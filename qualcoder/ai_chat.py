@@ -33,6 +33,7 @@ from langchain_core.callbacks.base import BaseCallbackHandler
 from datetime import datetime
 import json
 import logging
+import traceback
 import os
 import sqlite3
 import webbrowser
@@ -44,6 +45,7 @@ from .GUI.ui_ai_chat import Ui_Dialog_ai_chat
 from .helpers import Message
 from .confirm_delete import DialogConfirmDelete
 from .ai_prompts import PromptItem
+from .error_dlg import qt_exception_hook
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -938,8 +940,15 @@ class DialogAIChat(QtWidgets.QDialog):
     def ai_error_callback(self, exception_type, value, tb_obj):
         """Called if the AI returns an error"""
         self.ai_streaming_output = ''
-        self.process_message('info', _('The AI returned an error: ') + str(value), self.current_streaming_chat_idx)    
-        raise exception_type(value).with_traceback(tb_obj)  # Re-raise a new exception with the original traceback
+        ai_model_name = self.app.ai_models[int(self.app.settings['ai_model_index'])]['name']
+        msg = _('Error communicating with ' + ai_model_name + '\n')
+        msg += exception_type.__name__ + ': ' + str(value)
+        tb = '\n'.join(traceback.format_tb(tb_obj))
+        logger.error(_("Uncaught exception: ") + msg + '\n' + tb)
+        # Error msg in chat and trigger message box show
+        self.process_message('info', msg, self.current_streaming_chat_idx)    
+        qt_exception_hook._exception_caught.emit(msg, tb)        
+        # raise exception_type(value).with_traceback(tb_obj)  # Re-raise a new exception with the original traceback
     
     def eventFilter(self, source, event):
         # Check if the event is a KeyPress, source is the lineEdit, and the key is Enter

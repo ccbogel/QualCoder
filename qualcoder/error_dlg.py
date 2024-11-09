@@ -95,3 +95,6 @@ class UncaughtHook(QtCore.QObject):
             # Trigger message box show
             self._exception_caught.emit(msg, tb)
             
+# create a global hook for uncaught exceptions
+qt_exception_hook =  UncaughtHook()
+            

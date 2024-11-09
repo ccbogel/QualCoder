@@ -122,9 +122,6 @@ logger.setLevel(logging.DEBUG)
 handler = RotatingFileHandler(logfile, maxBytes=4000, backupCount=2)
 logger.addHandler(handler)
 
-# create a global hook for uncaught exceptions
-qt_exception_hook =  UncaughtHook()
-
 lock_timeout = 30.0  # in seconds. If a project lockfile is older (= has received no heartbeat for 30 seconds),
 # it is assumed that the host process has died and the project is opened anyways
 lock_heartbeat_interval = 5  # in seconds.
