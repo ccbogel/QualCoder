@@ -49,7 +49,7 @@ path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 class AIChatSignalEmitter(QObject):
-    newTextChatSignal = pyqtSignal(int, str, str, int, object)  # will start a new text chat
+    newTextChatSignal = pyqtSignal(int, str, str, int, object)  # will start a new text analysis chat
 
 ai_chat_signal_emitter = AIChatSignalEmitter()  # Create a global instance of the signal emitter
 
@@ -534,7 +534,7 @@ class DialogAIChat(QtWidgets.QDialog):
         )    
         
         summary = f'Analyzing text from "{doc_name}" ({len(text)} characters).'
-        logger.debug(f'New text chat. Prompt:\n{ai_instruction}')
+        logger.debug(f'New text analysis chat. Prompt:\n{ai_instruction}')
         self.new_chat(f'Text analysis "{doc_name}"', 'text chat', summary, prompt.name_and_scope())
         self.process_message('system', self.app.ai.get_default_system_prompt())
         self.process_message('instruct', ai_instruction)
@@ -708,15 +708,15 @@ class DialogAIChat(QtWidgets.QDialog):
         menu.setToolTipsVisible(True)
 
         # Add actions
-        action_text_analysis = menu.addAction(_('New text analysis'))
+        action_text_analysis = menu.addAction(_('New text analysis chat'))
         action_text_analysis.setIcon(self.app.ai.text_analysis_icon())
         action_text_analysis.setToolTip(_('Analyse a piece of text from your empirical data together with the AI.'))
-        action_topic_analysis = menu.addAction(_('New topic chat'))
+        action_topic_analysis = menu.addAction(_('New topic analysis chat'))
         action_topic_analysis.setIcon(self.app.ai.topic_analysis_icon())
-        action_topic_analysis.setToolTip(_('Start chatting about data related to a free-search topic.'))
-        action_codings_analysis = menu.addAction(_('New code chat'))
+        action_topic_analysis.setToolTip(_('Analyzing a free-search topic together with the AI.'))
+        action_codings_analysis = menu.addAction(_('New code analysis chat'))
         action_codings_analysis.setIcon(self.app.ai.code_analysis_icon())
-        action_codings_analysis.setToolTip(_('Start chatting about the data in the codings for a particular code.'))
+        action_codings_analysis.setToolTip(_('Analyze the data collected under a certain code together with the AI.'))
         action_general_chat = menu.addAction(_('New general chat'))
         action_general_chat.setIcon(self.app.ai.general_chat_icon())
         action_general_chat.setToolTip(_('Ask the AI anything, not related to your data.'))
