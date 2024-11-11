@@ -542,7 +542,6 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
             self.form_updating = False
             self.tree_selection_changed()
         self.ui.treeWidget_prompts.itemSelectionChanged.connect(self.tree_selection_changed)
-        self.ui.treeWidget_prompts.doubleClicked.connect(self.ok)
         self.ui.pushButton_new_prompt.clicked.connect(self.new_prompt)
         self.ui.pushButton_duplicate_prompt.clicked.connect(self.duplicate_prompt)
         self.ui.pushButton_delete_prompt.clicked.connect(self.delete_prompt)
@@ -858,12 +857,7 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
            
     def ok(self):
         """Save the prompts, then close the dialog. 
-        """    
-        # Check if the ok button was pressed or the accept signal comes from another widget, then ignore it
-        ok_button = self.ui.buttonBox.button(QtWidgets.QDialogButtonBox.StandardButton.Ok)
-        if not ok_button.hasFocus():
-            return
-                
+        """                
         # do a final check for consistency
         for prompt in self.prompts.prompts:
             if not self.prompts.is_unique_prompt_name(prompt.name, prompt.scope, prompt.type):
