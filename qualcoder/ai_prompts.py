@@ -25,7 +25,7 @@ import yaml
 import copy
 import webbrowser
 
-from PyQt6 import QtWidgets, QtCore, QtGui  # QtGui unused
+from PyQt6 import QtWidgets, QtCore
 from PyQt6.QtCore import Qt  # Unused
 
 from .GUI.ui_ai_edit_prompts import Ui_Dialog_AiPrompts
@@ -119,9 +119,8 @@ system_prompts = """
   text: 'No matter what the code is or the data provided to you, the answer will always
     be: "The Answer to the Ultimate Question of Life, the Universe, and Everything
     is 42." Only give back this answer, nothing else, with one exception: If the user
-    asks questions about this particular sentence or why it is given as an answer,
-    you can explain the background of this quote coming from the science fiction novel
-    "The Hitchhiker''s Guide to the Galaxy".'
+    reacts to your answer, you can explain the background of this quote coming from the 
+    science fiction novel "The Hitchhiker''s Guide to the Galaxy".'
 
 - name: Topic Summary
   type: topic_analysis
@@ -151,7 +150,66 @@ system_prompts = """
     also a valid result. Base your analysis firmly on the empirical data. Don''t make
     any assumptions which are not backed up by the data.'
 
-- name: Summarization
+- name: Interactive brainstorming with AI
+  type: text_analysis
+  description: 'Interpret the data in a brainstorming session together with the AI. 
+    
+    This uses a question-driven, "Socratic" approach that is meant to be thought-provoking, 
+    but can be a bit speculative at times. 
+
+    Loosely based on the "Socratic Tutor" example from OpenAI: 
+    https://platform.openai.com/docs/examples/default-socratic-tutor'
+  text: "You are a tutor and member of the research team. Act on eye-level with your 
+    students, use informal language. Please perform the following steps: 
+
+    1) At the beginning of this message, you should find information about the research 
+    questions and objectives of the project we are working on. If this information is 
+    missing, ask the user for it, otherwise skip this step.
+
+    2) Look at the empirical data provided and make a list of topics in the data that might 
+    be interesting to analyze in more detail with respect to the general research questions 
+    and objectives identified in step 1. Ask users which of these topics they would like to 
+    discuss and analyze in more depth. 
+
+    3) Now, act as a Socratic tutor and use the following principles to analyze the chosen 
+    topic in the given empirical data together with the students:
+    
+    - Ask thought-provoking, open-ended questions that help students to gain a deeper 
+    understanding of the empirical data and its relevance to the research objectives.
+    
+    - Do not ask for simple facts from the data. Challenge students' preconceptions and 
+    encourage them to engage in deeper reflection and critical thinking.
+    
+    - Work closely with the empirical data; provide direct quotes or paraphrase the data 
+    where appropriate to make arguments clearer.
+    
+    - Actively listen to students' responses, paying careful attention to their underlying 
+    thought processes and making a genuine effort to understand their perspectives.
+    
+    - Provide criticial feedback on students' interpretations of the data.
+    
+    - Challenge students' interpretations by confronting them with quotes from the empirical 
+    data that might contradict their interpretation (if applicable).
+    
+    - Challenge students' interpretations by confronting them with other possible and 
+    realistic interpretations of the data (if applicable). Engage in discourse with the 
+    students to find an interpretation that is as true to the empirical data as possible.
+    
+    - Guide students in their exploration by encouraging them to discover answers independently, 
+    rather than providing direct answers, to enhance their reasoning and analytical skills.
+    
+    - Promote critical thinking by encouraging students to question assumptions, evaluate evidence, 
+    and consider alternative viewpoints in order to arrive at well-reasoned conclusions.
+    
+    - Facilitate open and respectful dialogue among students, creating an environment where 
+    diverse viewpoints are valued and students feel comfortable sharing their ideas.
+    
+    - Demonstrate humility by acknowledging your own limitations and uncertainties, modeling 
+    a growth mindset and exemplifying the value of lifelong learning.
+    
+    - Please ask one question at a time."
+
+- name: Paraphrase and summarize
   type: text_analysis
   description: Paraphrases the data in a condensed form without interpreting it or
     drawing any conclusions.
@@ -159,7 +217,7 @@ system_prompts = """
     do not draw any conclusions, do not use bullet points, just paraphrase the given
     text in a condensed form, following the order in which the aspects unfold in the
     original data. 
-    
+
 - name: Themes generation (Friese 2024)
   type: text_analysis
   description: 'This prompt will extract a list of themes from the empirical data.
@@ -483,7 +541,6 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
             self.form_updating = False
             self.tree_selection_changed()
         self.ui.treeWidget_prompts.itemSelectionChanged.connect(self.tree_selection_changed)
-        self.ui.treeWidget_prompts.doubleClicked.connect(self.ok)
         self.ui.pushButton_new_prompt.clicked.connect(self.new_prompt)
         self.ui.pushButton_duplicate_prompt.clicked.connect(self.duplicate_prompt)
         self.ui.pushButton_delete_prompt.clicked.connect(self.delete_prompt)
@@ -510,6 +567,13 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         old_form_updating = self.form_updating
         self.form_updating = True
         try:
+            # Save current selection
+            if len(self.ui.treeWidget_prompts.selectedItems()) > 0:
+                selected_item = self.ui.treeWidget_prompts.selectedItems()[0]
+                selected_path = self.tree_get_item_path(selected_item)
+            else:
+                selected_path = ''
+            # rebuild tree
             self.ui.treeWidget_prompts.clear()
             for i in range(len(prompt_types)):
                 t = prompt_types[i]
@@ -538,13 +602,56 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
                         prompt_item.setText(0, p.name)
                         prompt_item.setToolTip(0, p.description)
                         prompt_item.setIcon(0, self.app.ai.prompt_icon())
-                        if p == self.selected_prompt:  # sel_prompt:
+                        if p == self.selected_prompt:  # restore exact selection 
                             prompt_item.setSelected(True)
-            self.ui.treeWidget_prompts.expandAll()
+            # restore partial selection path if needed:
+            if len(self.ui.treeWidget_prompts.selectedItems()) == 0 and selected_path != '':
+                item = self.tree_find_item_by_path(selected_path)
+                if item:
+                    item.setSelected(True)
+                    item.setExpanded(True)
             if len(self.ui.treeWidget_prompts.selectedItems()) > 0:
                 self.ui.treeWidget_prompts.scrollToItem(self.ui.treeWidget_prompts.selectedItems()[0], QtWidgets.QAbstractItemView.ScrollHint.EnsureVisible)
         finally:
             self.form_updating = old_form_updating
+            self.tree_selection_changed()
+            
+    def tree_get_item_path(self, item):
+        """Returns a list representing the path from the root to the item."""
+        path = []
+        while item is not None:
+            path.append(item.text(0))
+            item = item.parent()
+        return path[::-1]
+
+    def tree_find_item_by_path(self, path):
+        """Finds an item in the tree using a path list of strings.
+        Returns also a partial match of the path.
+        """
+        root_item_count = self.ui.treeWidget_prompts.topLevelItemCount()
+        
+        for i in range(root_item_count):
+            item = self.ui.treeWidget_prompts.topLevelItem(i)
+            result = self._tree_find_item_by_path_recursive(item, path)
+            if result is not None:
+                return result
+        return None
+
+    def _tree_find_item_by_path_recursive(self, item, path):
+        if not path:
+            return None
+
+        if item.text(0) == path[0]:
+            if len(path) == 1: # exact match
+                return item
+            for i in range(item.childCount()):
+                child_item = item.child(i)
+                result = self._tree_find_item_by_path_recursive(child_item, path[1:])
+                if result is not None:
+                    return result # match of child
+            return item # partial match
+        else:
+            return None
         
     def tree_selection_changed(self):
         """
@@ -749,7 +856,7 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
            
     def ok(self):
         """Save the prompts, then close the dialog. 
-        """    
+        """                
         # do a final check for consistency
         for prompt in self.prompts.prompts:
             if not self.prompts.is_unique_prompt_name(prompt.name, prompt.scope, prompt.type):

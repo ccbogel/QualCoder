@@ -33,6 +33,7 @@ from langchain_core.callbacks.base import BaseCallbackHandler
 from datetime import datetime
 import json
 import logging
+import traceback
 import os
 import sqlite3
 import webbrowser
@@ -44,12 +45,13 @@ from .GUI.ui_ai_chat import Ui_Dialog_ai_chat
 from .helpers import Message
 from .confirm_delete import DialogConfirmDelete
 from .ai_prompts import PromptItem
+from .error_dlg import qt_exception_hook
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 class AIChatSignalEmitter(QObject):
-    newTextChatSignal = pyqtSignal(int, str, str, int, object)  # will start a new text chat
+    newTextChatSignal = pyqtSignal(int, str, str, int, object)  # will start a new text analysis chat
 
 ai_chat_signal_emitter = AIChatSignalEmitter()  # Create a global instance of the signal emitter
 
@@ -524,17 +526,20 @@ class DialogAIChat(QtWidgets.QDialog):
             f'At the end of this message, you will find a passage of text extracted from the empirical ' 
             f'document named "{doc_name}".\n'
             f'Your task is to analyze this text based on the following instructions: \n'
+            f'-- BEGIN ANALYTIC INSTRUCTIONS --'
             f'"{prompt.text}"\n'
-            f'Make sure to include references to the original data where needed, following this format '
-            'definition: `[REF: "{The exact text from the original data that you want to reference to, '
-            'word by word, without any gaps}"]`.\n'             
+            f'-- END ANALYTIC INSTRUCTIONS --'
             f'Always answer in the following language: "{self.app.ai.get_curr_language()}".\n'
+            f'Be sure to include references to the original data in appropriate places, using this format '
+            'definition: `[REF: "{The exact text from the original data that you want to reference, '
+            'word for word. Do not translate!}"]`.\n'             
             f'This is the text from the empirical document:\n'
+            f'-- BEGIN EMPIRICAL DATA --'
             f'"{text}"'
         )    
         
         summary = f'Analyzing text from "{doc_name}" ({len(text)} characters).'
-        logger.debug(f'New text chat. Prompt:\n{ai_instruction}')
+        logger.debug(f'New text analysis chat. Prompt:\n{ai_instruction}')
         self.new_chat(f'Text analysis "{doc_name}"', 'text chat', summary, prompt.name_and_scope())
         self.process_message('system', self.app.ai.get_default_system_prompt())
         self.process_message('instruct', ai_instruction)
@@ -708,15 +713,15 @@ class DialogAIChat(QtWidgets.QDialog):
         menu.setToolTipsVisible(True)
 
         # Add actions
-        action_text_analysis = menu.addAction(_('New text analysis'))
+        action_topic_analysis = menu.addAction(_('New topic analysis chat'))
+        action_topic_analysis.setIcon(self.app.ai.topic_analysis_icon())
+        action_topic_analysis.setToolTip(_('Analyzing a free-search topic together with the AI.'))
+        action_text_analysis = menu.addAction(_('New text analysis chat'))
         action_text_analysis.setIcon(self.app.ai.text_analysis_icon())
         action_text_analysis.setToolTip(_('Analyse a piece of text from your empirical data together with the AI.'))
-        action_topic_analysis = menu.addAction(_('New topic chat'))
-        action_topic_analysis.setIcon(self.app.ai.topic_analysis_icon())
-        action_topic_analysis.setToolTip(_('Start chatting about data related to a free-search topic.'))
-        action_codings_analysis = menu.addAction(_('New code chat'))
+        action_codings_analysis = menu.addAction(_('New code analysis chat'))
         action_codings_analysis.setIcon(self.app.ai.code_analysis_icon())
-        action_codings_analysis.setToolTip(_('Start chatting about the data in the codings for a particular code.'))
+        action_codings_analysis.setToolTip(_('Analyze the data collected under a certain code together with the AI.'))
         action_general_chat = menu.addAction(_('New general chat'))
         action_general_chat.setIcon(self.app.ai.general_chat_icon())
         action_general_chat.setToolTip(_('Ask the AI anything, not related to your data.'))
@@ -938,8 +943,15 @@ class DialogAIChat(QtWidgets.QDialog):
     def ai_error_callback(self, exception_type, value, tb_obj):
         """Called if the AI returns an error"""
         self.ai_streaming_output = ''
-        self.process_message('info', _('The AI returned an error: ') + str(value), self.current_streaming_chat_idx)    
-        raise exception_type(value).with_traceback(tb_obj)  # Re-raise a new exception with the original traceback
+        ai_model_name = self.app.ai_models[int(self.app.settings['ai_model_index'])]['name']
+        msg = _('Error communicating with ' + ai_model_name + '\n')
+        msg += exception_type.__name__ + ': ' + str(value)
+        tb = '\n'.join(traceback.format_tb(tb_obj))
+        logger.error(_("Uncaught exception: ") + msg + '\n' + tb)
+        # Error msg in chat and trigger message box show
+        self.process_message('info', msg, self.current_streaming_chat_idx)    
+        qt_exception_hook._exception_caught.emit(msg, tb)        
+        # raise exception_type(value).with_traceback(tb_obj)  # Re-raise a new exception with the original traceback
     
     def eventFilter(self, source, event):
         # Check if the event is a KeyPress, source is the lineEdit, and the key is Enter

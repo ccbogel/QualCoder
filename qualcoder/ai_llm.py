@@ -21,6 +21,7 @@ https://qualcoder.wordpress.com/
 
 import os
 import logging
+import traceback
 from typing import List  # Unused
 import time  # Unused
 from PyQt6 import QtWidgets
@@ -42,6 +43,7 @@ from .ai_async_worker import Worker
 from .ai_vectorstore import AiVectorstore
 from .GUI.base64_helper import *  # Unused
 from .helpers import Message
+from .error_dlg import qt_exception_hook
 import fuzzysearch
 import json_repair
 
@@ -301,7 +303,14 @@ class AiLLM():
         
     def _ai_async_error(self, exception_type, value, tb_obj):
         self.ai_async_is_errored = True
-        raise exception_type(value).with_traceback(tb_obj)  # Re-raise
+        ai_model_name = self.app.ai_models[int(self.app.settings['ai_model_index'])]['name']
+        msg = _('Error communicating with ' + ai_model_name + '\n')
+        msg += exception_type.__name__ + ': ' + str(value)
+        tb = '\n'.join(traceback.format_tb(tb_obj))
+        logger.error(_("Uncaught exception: ") + msg + '\n' + tb)
+        # Trigger message box show
+        qt_exception_hook._exception_caught.emit(msg, tb)        
+        # raise exception_type(value).with_traceback(tb_obj)  # Re-raise
 
     def _ai_async_finished(self):
         self.ai_async_is_finished = True
