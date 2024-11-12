@@ -2015,7 +2015,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 if self.source[row]['mediapath']:
                     # Legacy for older QualCoder Projects < 3.3
                     os.remove(self.app.project_path + "/documents/" + self.source[row]['name'])
-                if self.source[row]['mediapath'][0:6] == '/docs/':
+                if self.source[row]['mediapath'] is not None and self.source[row]['mediapath'][0:6] == '/docs/':
                     os.remove(self.app.project_path + "/documents/" + self.source[row]['mediapath'][6:])
             except OSError as err:
                 logger.warning(_("Deleting file error: ") + str(err))
