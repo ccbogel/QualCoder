@@ -119,9 +119,8 @@ system_prompts = """
   text: 'No matter what the code is or the data provided to you, the answer will always
     be: "The Answer to the Ultimate Question of Life, the Universe, and Everything
     is 42." Only give back this answer, nothing else, with one exception: If the user
-    asks questions about this particular sentence or why it is given as an answer,
-    you can explain the background of this quote coming from the science fiction novel
-    "The Hitchhiker''s Guide to the Galaxy".'
+    reacts to your answer, you can explain the background of this quote coming from the 
+    science fiction novel "The Hitchhiker''s Guide to the Galaxy".'
 
 - name: Topic Summary
   type: topic_analysis
@@ -151,7 +150,7 @@ system_prompts = """
     also a valid result. Base your analysis firmly on the empirical data. Don''t make
     any assumptions which are not backed up by the data.'
 
-- name: Interactive brainstorming with the AI
+- name: Interactive brainstorming with AI
   type: text_analysis
   description: 'Interpret the data in a brainstorming session together with the AI. 
     
@@ -210,7 +209,7 @@ system_prompts = """
     
     - Please ask one question at a time."
 
-- name: Paraphrasing and summary
+- name: Paraphrase and summarize
   type: text_analysis
   description: Paraphrases the data in a condensed form without interpreting it or
     drawing any conclusions.

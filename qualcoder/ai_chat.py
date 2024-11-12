@@ -713,12 +713,12 @@ class DialogAIChat(QtWidgets.QDialog):
         menu.setToolTipsVisible(True)
 
         # Add actions
-        action_text_analysis = menu.addAction(_('New text analysis chat'))
-        action_text_analysis.setIcon(self.app.ai.text_analysis_icon())
-        action_text_analysis.setToolTip(_('Analyse a piece of text from your empirical data together with the AI.'))
         action_topic_analysis = menu.addAction(_('New topic analysis chat'))
         action_topic_analysis.setIcon(self.app.ai.topic_analysis_icon())
         action_topic_analysis.setToolTip(_('Analyzing a free-search topic together with the AI.'))
+        action_text_analysis = menu.addAction(_('New text analysis chat'))
+        action_text_analysis.setIcon(self.app.ai.text_analysis_icon())
+        action_text_analysis.setToolTip(_('Analyse a piece of text from your empirical data together with the AI.'))
         action_codings_analysis = menu.addAction(_('New code analysis chat'))
         action_codings_analysis.setIcon(self.app.ai.code_analysis_icon())
         action_codings_analysis.setToolTip(_('Analyze the data collected under a certain code together with the AI.'))
