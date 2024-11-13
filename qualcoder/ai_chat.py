@@ -526,11 +526,9 @@ class DialogAIChat(QtWidgets.QDialog):
             f'At the end of this message, you will find a passage of text extracted from the empirical ' 
             f'document named "{doc_name}".\n'
             f'Your task is to analyze this text based on the following instructions: \n'
-            f'-- BEGIN ANALYTIC INSTRUCTIONS --'
-            f'"{prompt.text}"\n'
-            f'-- END ANALYTIC INSTRUCTIONS --'
+            f'"{prompt.text}"\n\n'
             f'Always answer in the following language: "{self.app.ai.get_curr_language()}".\n'
-            f'Be sure to include references to the original data in appropriate places, using this format '
+            f'Be sure to include references to the original data, using this format '
             'definition: `[REF: "{The exact text from the original data that you want to reference, '
             'word for word. Do not translate!}"]`.\n'             
             f'This is the text from the empirical document:\n'
@@ -538,7 +536,9 @@ class DialogAIChat(QtWidgets.QDialog):
             f'"{text}"'
         )    
         
-        summary = f'Analyzing text from "{doc_name}" ({len(text)} characters).'
+        summary = _('Analyzing text from ') + \
+                  f'<a href="quote:{doc_id}_{start_pos}_{len(text)}">{doc_name}</a> (' + \
+                  str(len(text)) + _(' characters).')
         logger.debug(f'New text analysis chat. Prompt:\n{ai_instruction}')
         self.new_chat(f'Text analysis "{doc_name}"', 'text chat', summary, prompt.name_and_scope())
         self.process_message('system', self.app.ai.get_default_system_prompt())
