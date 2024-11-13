@@ -314,7 +314,6 @@ class DialogAIChat(QtWidgets.QDialog):
             self.ai_text_doc_id = None
             self.ai_search_code_name = ui.selected_code_name
             self.ai_search_code_memo = ui.selected_code_memo
-            #self.ai_include_coded_segments = ui.include_coded_segments
             self.ai_search_file_ids = ui.selected_file_ids
             self.ai_search_code_ids = ui.selected_code_ids
             self.ai_prompt = ui.current_prompt
@@ -333,13 +332,14 @@ class DialogAIChat(QtWidgets.QDialog):
             # The JOIN also adds the source.name so that the AI can refer to a certain document
             # by its name.     
             sql = f"""
-                SELECT ordered.*, source.name
+                SELECT ordered.*, source.name, code_name.name AS code_name
                 FROM (
                 SELECT *, ROW_NUMBER() OVER (PARTITION BY fid ORDER BY ctid) as rn
                 FROM code_text
                 WHERE cid IN {code_ids_str} AND fid IN {file_ids_str}
                 ) AS ordered
                 JOIN source ON ordered.fid = source.id
+                JOIN code_name ON ordered.cid = code_name.cid
                 ORDER BY ordered.rn, ordered.fid;
                 """
             cursor = self.app.conn.cursor()
@@ -361,14 +361,15 @@ class DialogAIChat(QtWidgets.QDialog):
                 ai_data.append({
                     'source_id': row[0],
                     'source_name': row[12],
-                    'quote': row[3]
+                    'quote': row[3],
+                    'code_name': row[13]
                 })
                 ai_data_length = ai_data_length + len(row[3])
             ai_data_json = json.dumps(ai_data)
             
             ai_instruction = (
-                f'You are discussing the code named "{self.ai_search_code_name}" with the following code memo: "{self.ai_search_code_memo}". \n'
-                f'Here is a list of quotes from the empirical data that have been coded with the given code:\n'
+                f'You are discussing the code or category named "{self.ai_search_code_name}" with the following code memo: "{self.ai_search_code_memo}". \n'
+                f'Here is a list of quotes from the empirical data that have been coded with the given code or with subcodes under the given category:\n'
                 f'{ai_data_json}\n'
                 f'Your task is to analyze the given empirical data following these instructions: {self.ai_prompt.text}\n'
                 f'The whole discussion should be based upon the the empirical data provided and its proper interpretation. '
