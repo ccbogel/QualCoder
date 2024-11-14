@@ -221,7 +221,7 @@ The instructions work on Mac Monterey. It is recommended to use a virtual enviro
 
 You will need to install developer tools for macOS. [See https://www.cnet.com/tech/computing/install-command-line-developer-tools-in-os-x/](https://www.cnet.com/tech/computing/install-command-line-developer-tools-in-os-x/)
 
-1) Install recent versions of [Python3](https://www.python.org/downloads/) (note: Python 3.13 is not yet supported) and [VLC](https://www.videolan.org/vlc/).
+1) Install recent versions of [Python3](https://www.python.org/downloads/) (Note: Python 3.13 is not supported yet) and [VLC](https://www.videolan.org/vlc/).
 
 2) Download the latest release "Source code" version in ZIP format, from the releases section of the project here on Github: https://github.com/ccbogel/QualCoder/releases/tag/3.5 and extract it into /Applications
 
