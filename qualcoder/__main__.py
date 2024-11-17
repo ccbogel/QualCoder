@@ -2171,11 +2171,11 @@ Click "Yes" to start now.')
         memo = self.app.get_project_memo()
         # If the memo is empty, add a template that defines all the necessary information for the AI  
         if memo is None or memo == '':
-            memo = _('Research topic, questions and objectives: \n\n'
-                     'Methodology: \n\n'
-                     'Participants and data collected: \n\n'
+            memo = _('**Research topic, questions and objectives:** \n\n'
+                     '**Methodology:** \n\n'
+                     '**Participants and data collected:** \n\n'
                      '#####\n'
-                     '(Everything below this mark is considered to be a personal note and will never be send to the AI.)')
+                     '(Everything below this mark is considered to be a personal note and will never be sent to the AI.)')
         ui = DialogMemo(self.app, _("Memo for project ") + self.app.project_name,
                         memo)
         ui.exec()
