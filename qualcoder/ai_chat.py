@@ -365,6 +365,10 @@ class DialogAIChat(QtWidgets.QDialog):
                     'code_name': row[13]
                 })
                 ai_data_length = ai_data_length + len(row[3])
+            if len(ai_data) == 0:
+                msg = _('No coded text found. Please select another code or category or refine you filters.')
+                Message(self.app, _('AI code analysis'), msg, "warning").exec()
+                return    
             ai_data_json = json.dumps(ai_data)
             
             ai_instruction = (
