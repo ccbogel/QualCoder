@@ -2194,6 +2194,8 @@ class DialogCodeText(QtWidgets.QWidget):
                     return
             if len(codes_here) == 1:
                 code_ = codes_here[0]
+            if not code_:  # key was pressed outside of any codings, return to default handling
+                return False 
             # Key event can be too sensitive, adjusted  for 150 millisecond gap
             self.code_resize_timer = datetime.datetime.now()
             if key == QtCore.Qt.Key.Key_Left and mod == QtCore.Qt.KeyboardModifier.AltModifier:
