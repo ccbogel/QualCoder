@@ -92,7 +92,7 @@
               <item>
                <widget class="QTreeWidget" name="treeWidget">
                 <property name="toolTip">
-                 <string>Select the code for which you want to find more data</string>
+                 <string>Please select a code or category</string>
                 </property>
                 <column>
                  <property name="text">
