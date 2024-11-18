@@ -45,6 +45,7 @@ from .GUI.ui_ai_chat import Ui_Dialog_ai_chat
 from .helpers import Message
 from .confirm_delete import DialogConfirmDelete
 from .ai_prompts import PromptItem
+from .ai_llm import extract_ai_memo
 from .error_dlg import qt_exception_hook
 
 path = os.path.abspath(os.path.dirname(__file__))
@@ -366,7 +367,7 @@ class DialogAIChat(QtWidgets.QDialog):
                 })
                 ai_data_length = ai_data_length + len(row[3])
             if len(ai_data) == 0:
-                msg = _('No coded text found. Please select another code or category or refine you filters.')
+                msg = _('No coded text found. Please select another code or category, or refine you filters.')
                 Message(self.app, _('AI code analysis'), msg, "warning").exec()
                 return    
             ai_data_json = json.dumps(ai_data)
@@ -388,6 +389,14 @@ class DialogAIChat(QtWidgets.QDialog):
                 summary += f'\nATTENTION: There was more coded data found, but it had to be truncated because of the limited context window of the AI.'
             logger.debug(f'New code chat. Prompt:\n{ai_instruction}')
             self.new_chat(f'Code "{self.ai_search_code_name}"', 'code chat', summary, self.ai_prompt.name_and_scope())
+            # warn if project memo empty 
+            project_memo = extract_ai_memo(self.app.get_project_memo())
+            if self.app.settings.get('ai_send_project_memo', 'True') == 'True' and len(project_memo) == 0:
+                msg = _('Note that it is highly recommended to use the project memo (Menu "Project > Project Memo") \
+to include a short description of your project\'s research topics, questions, objectives, and the empirical \
+data collected. This information will accompany every prompt sent to the AI, resulting in much more targeted results.')
+                self.process_message('info', msg)
+            # start analysis
             self.process_message('system', self.app.ai.get_default_system_prompt())
             self.process_message('instruct', ai_instruction)
             self.update_chat_window()  
@@ -419,6 +428,14 @@ class DialogAIChat(QtWidgets.QDialog):
                 summary += f'\nDescription: {self.ai_search_code_memo}'
             logger.debug(f'New topic chat.')
             self.new_chat(f'Topic "{self.ai_search_code_name}"', 'topic chat', summary, self.ai_prompt.name_and_scope())
+            # warn if project memo empty 
+            project_memo = extract_ai_memo(self.app.get_project_memo())
+            if self.app.settings.get('ai_send_project_memo', 'True') == 'True' and len(project_memo) == 0:
+                msg = _('Note that it is highly recommended to use the project memo (Menu "Project > Project Memo") \
+to include a short description of your project\'s research topics, questions, objectives, and the empirical \
+data collected. This information will accompany every prompt sent to the AI, resulting in much more targeted results.')
+                self.process_message('info', msg)
+            # start analysis
             self.process_message('system', self.app.ai.get_default_system_prompt())
             self.process_message('info', _('Searching for related data...'))
             self.update_chat_window()  
