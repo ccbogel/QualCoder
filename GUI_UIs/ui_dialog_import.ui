@@ -85,7 +85,7 @@
      <widget class="QLineEdit" name="lineEdit_delimiter">
       <property name="geometry">
        <rect>
-        <x>170</x>
+        <x>160</x>
         <y>30</y>
         <width>71</width>
         <height>31</height>
@@ -123,9 +123,9 @@
      <widget class="QLabel" name="label_quotefmt">
       <property name="geometry">
        <rect>
-        <x>310</x>
+        <x>240</x>
         <y>30</y>
-        <width>211</width>
+        <width>191</width>
         <height>31</height>
        </rect>
       </property>
@@ -139,7 +139,7 @@
      <widget class="QComboBox" name="comboBox_quote">
       <property name="geometry">
        <rect>
-        <x>530</x>
+        <x>440</x>
         <y>30</y>
         <width>151</width>
         <height>31</height>
@@ -177,6 +177,25 @@
        <string>Changes made on the top row will override any user changes to field names and field types below. Right-click on a column heading below to change the column name or to change from Character (attribute) to Qualitative (creates a text file from the text).</string>
       </property>
       <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBox">
+      <property name="geometry">
+       <rect>
+        <x>600</x>
+        <y>31</y>
+        <width>321</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If checked: All the rows of a qualitative column will be collated into one text file.&lt;/p&gt;&lt;p&gt;If unchecked: Each qualtiatve answer will be an individual text file within the database.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string>One file per qualitative column</string>
+      </property>
+      <property name="checked">
        <bool>true</bool>
       </property>
      </widget>
