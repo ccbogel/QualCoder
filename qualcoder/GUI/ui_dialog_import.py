@@ -73,7 +73,7 @@ class Ui_Dialog_Import(object):
         self.tableWidget.setRowCount(0)
         self.gridLayout.addWidget(self.tableWidget, 5, 0, 1, 1)
         self.checkBox_collate = QtWidgets.QCheckBox(parent=Dialog_Import)
-        self.checkBox_collate.setChecked(True)
+        self.checkBox_collate.setChecked(False)
         self.checkBox_collate.setObjectName("checkBox_collate")
         self.gridLayout.addWidget(self.checkBox_collate, 4, 0, 1, 1)
 
