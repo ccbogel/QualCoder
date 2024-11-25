@@ -193,7 +193,7 @@ class Ui_Dialog_AiSearch(object):
         _translate = QtCore.QCoreApplication.translate
         Dialog_AiSearch.setWindowTitle(_translate("Dialog_AiSearch", "AI search"))
         self.label_what.setText(_translate("Dialog_AiSearch", "1) What do you want to search for?"))
-        self.treeWidget.setToolTip(_translate("Dialog_AiSearch", "Select the code for which you want to find more data"))
+        self.treeWidget.setToolTip(_translate("Dialog_AiSearch", "Please select a code or category"))
         self.checkBox_send_memos.setStatusTip(_translate("Dialog_AiSearch", "Send not only the name but also the memo associated with a code to the AI?"))
         self.checkBox_send_memos.setText(_translate("Dialog_AiSearch", "Send memo to AI"))
         self.checkBox_coded_segments.setToolTip(_translate("Dialog_AiSearch", "If deselected (default), the AI searches for new material only. Segments already coded with this code are excluded from the results."))
