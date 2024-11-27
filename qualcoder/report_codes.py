@@ -25,10 +25,9 @@ import logging
 import openpyxl
 import os
 from PIL import Image
+import qtawesome as qta  # See https://pictogrammers.com/library/mdi/
 import re
 from shutil import copyfile
-import sys
-import traceback
 
 from PyQt6 import QtGui, QtWidgets, QtCore
 from PyQt6.QtCore import Qt
@@ -36,7 +35,6 @@ from PyQt6.QtGui import QBrush
 
 from .color_selector import TextColor
 from .confirm_delete import DialogConfirmDelete
-from .GUI.base64_helper import *
 from .GUI.ui_dialog_report_codings import Ui_Dialog_reportCodings
 from .helpers import Message, msecs_to_hours_mins_secs, DialogCodeInImage, DialogCodeInAV, DialogCodeInText, \
     ExportDirectoryPathDialog
@@ -119,25 +117,15 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.comboBox_coders.insertItems(0, self.coders)
         self.fill_tree()
         self.ui.pushButton_run_report.clicked.connect(self.search)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
-        self.ui.pushButton_run_report.setIcon(QtGui.QIcon(pm))
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_icon), "png")
-        self.ui.label_exports.setPixmap(pm.scaled(22, 22))
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(attributes_icon), "png")
-        self.ui.pushButton_attributeselect.setIcon(QtGui.QIcon(pm))
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(rate_up_icon), "png")
-        self.ui.pushButton_search_next.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_run_report.setIcon(qta.icon('mdi6.play'))
+        self.ui.label_exports.setPixmap(qta.icon('mdi6.export').pixmap(22, 22))
+        self.ui.pushButton_attributeselect.setIcon(qta.icon('mdi6.line-scan'))
+        self.ui.pushButton_search_next.setIcon(qta.icon('mdi6.arrow-right'))
         self.ui.pushButton_search_next.pressed.connect(self.search_results_next)
         options = ["", _("Top categories by case"), _("Top categories by file"), _("Categories by case"),
                    _("Categories by file"), _("Codes by case"), _("Codes by file")]
         self.ui.comboBox_matrix.addItems(options)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(notepad_pencil_red_icon), "png")
-        self.ui.label_memos.setPixmap(pm)
+        self.ui.label_memos.setPixmap(qta.icon('mdi6.text-box-outline').pixmap(22, 22))
         options = [_("None"), _("Also code memos"), _("Also coded memos"), _("Also all memos"), _("Only memos"),
                    _("Only coded memos"), _("Annotations"), _("Codebook memos")]
         self.ui.comboBox_memos.addItems(options)
@@ -578,11 +566,11 @@ class DialogReportCodes(QtWidgets.QDialog):
             return
         wb = openpyxl.Workbook()
         ws = wb.active
-        # Headers
+        # Column header
         for c in range(0, col_count):
             cell = ws.cell(row=1, column=c + 2)
             cell.value = self.ui.tableWidget.horizontalHeaderItem(c).text()
-
+        # Row header
         for r in range(0, row_count):
             cell = ws.cell(row=r + 2, column=1)
             cell.value = self.ui.tableWidget.verticalHeaderItem(r).text()
@@ -843,7 +831,6 @@ class DialogReportCodes(QtWidgets.QDialog):
         tw = QtGui.QTextDocumentWriter()
         tw.setFileName(filepath)
         tw.setFormat(b'HTML')  # byte array needed for Windows 10
-        # print("Trying without QTextCodec")
         # tw.setCodec(QTextCodec.codecForName('UTF-8'))  # for Windows 10
         tw.write(self.ui.textEdit.document())
         need_media_folders = False
@@ -1119,26 +1106,22 @@ class DialogReportCodes(QtWidgets.QDialog):
         ok = attr_ui.exec()
         if not ok:
             self.attributes = temp_attributes
-            pm = QtGui.QPixmap()
-            pm.loadFromData(QtCore.QByteArray.fromBase64(attributes_icon), "png")
-            self.ui.pushButton_attributeselect.setIcon(QtGui.QIcon(pm))
+            '''pm = QtGui.QPixmap()
+            pm.loadFromData(QtCore.QByteArray.fromBase64(attributes_icon), "png")'''
+            self.ui.pushButton_attributeselect.setIcon(qta.icon('mdi6.line-scan'))  #QtGui.QIcon(pm))
             self.ui.pushButton_attributeselect.setToolTip(_("Attributes"))
             if self.attributes:
-                pm = QtGui.QPixmap()
-                pm.loadFromData(QtCore.QByteArray.fromBase64(attributes_selected_icon), "png")
-                self.ui.pushButton_attributeselect.setIcon(QtGui.QIcon(pm))
+                #pm = QtGui.QPixmap()
+                #pm.loadFromData(QtCore.QByteArray.fromBase64(attributes_selected_icon), "png")
+                self.ui.pushButton_attributeselect.setIcon(qta.icon('mdi6.variable'))  #QtGui.QIcon(pm))
             return
         # As List containing (1) list of attributes, within (2) [List of attributes, boolean type]
         self.attributes = attr_ui.parameters
         if len(self.attributes) == 1:  # The and /or boolean operator only
-            pm = QtGui.QPixmap()
-            pm.loadFromData(QtCore.QByteArray.fromBase64(attributes_icon), "png")
-            self.ui.pushButton_attributeselect.setIcon(QtGui.QIcon(pm))
+            self.ui.pushButton_attributeselect.setIcon(qta.icon('mdi6.line-scan'))
             self.ui.pushButton_attributeselect.setToolTip(_("Attributes"))
             return
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(attributes_selected_icon), "png")
-        self.ui.pushButton_attributeselect.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_attributeselect.setIcon(qta.icon('mdi6.variable'))
         self.ui.pushButton_attributeselect.setToolTip(attr_ui.tooltip_msg)
         self.attributes_msg = attr_ui.tooltip_msg
         self.attribute_file_ids = attr_ui.result_file_ids
@@ -1293,7 +1276,6 @@ class DialogReportCodes(QtWidgets.QDialog):
         :param: code_ids : String comma separated ids
         """
 
-        # print("Search by files")
         coder = self.ui.comboBox_coders.currentText()
         search_text = self.ui.lineEdit.text()
         important = self.ui.checkBox_important.isChecked()
@@ -1411,7 +1393,6 @@ class DialogReportCodes(QtWidgets.QDialog):
         :param: code_ids : String comma separated ids
         """
 
-        # print("search by cases")
         coder = self.ui.comboBox_coders.currentText()
         search_text = self.ui.lineEdit.text()
         important = self.ui.checkBox_important.isChecked()
