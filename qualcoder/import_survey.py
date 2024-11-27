@@ -105,6 +105,8 @@ class DialogImportSurvey(QtWidgets.QDialog):
         else:
             self.ui.groupBox.hide()
             self.ui.tableWidget.hide()
+            self.ui.checkBox_collate.hide()
+            self.ui.buttonBox.hide()
             self.ui.label_msg.setText(_("No survey selected."))
             self.ui.label_msg.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
             self.close()
