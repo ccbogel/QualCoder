@@ -26,11 +26,12 @@ import ebooklib
 from ebooklib import epub
 import PIL
 from PIL import Image
+import qtawesome as qta
 from typing import Iterable, Any
-import webbrowser
-import zipfile
 from shutil import copyfile, move
 from urllib.parse import urlparse
+import webbrowser
+import zipfile
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 from pdfminer.converter import PDFPageAggregator
@@ -109,58 +110,31 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.av_dialog_open = None
         font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(pencil_icon), "png")
-        self.ui.pushButton_create.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_create.setIcon(qta.icon('mdi6.pencil-outline'))
         self.ui.pushButton_create.clicked.connect(self.create_text_file)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(eye_icon), "png")
-        self.ui.pushButton_view.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_view.setIcon(qta.icon('mdi6.magnify'))
         self.ui.pushButton_view.clicked.connect(self.view)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(delete_icon), "png")
-        self.ui.pushButton_delete.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_delete.setIcon(qta.icon('mdi6.delete-outline'))
         self.ui.pushButton_delete.clicked.connect(self.delete_button_multiple_files)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_import_icon), "png")
-        self.ui.pushButton_import.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_import.setIcon(qta.icon('mdi6.file-document-plus-outline'))
         self.ui.pushButton_import.clicked.connect(self.import_files)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(link_icon), "png")
-        self.ui.pushButton_link.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_link.setIcon(qta.icon('mdi6.link-variant'))
         self.ui.pushButton_link.clicked.connect(self.link_files)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(linked_import_icon), "png")
-        self.ui.pushButton_import_from_linked.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_import_from_linked.setIcon(qta.icon('mdi6.link-variant-minus'))
         self.ui.pushButton_import_from_linked.clicked.connect(self.button_import_linked_file)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(to_link_icon), "png")
-        self.ui.pushButton_export_to_linked.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_export_to_linked.setIcon(qta.icon('mdi6.link-variant-plus'))
         self.ui.pushButton_export_to_linked.clicked.connect(self.button_export_file_as_linked_file)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_icon), "png")
-        self.ui.pushButton_export.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_export.setIcon(qta.icon('mdi6.export'))
         self.ui.pushButton_export.clicked.connect(self.export)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(plus_icon), "png")
-        self.ui.pushButton_add_attribute.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_add_attribute.setIcon(qta.icon('mdi6.variable'))
         self.ui.pushButton_add_attribute.clicked.connect(self.add_attribute)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_csv_icon), "png")
-        self.ui.pushButton_export_attributes.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_export_attributes.setIcon(qta.icon('mdi6.file-export-outline'))
         self.ui.pushButton_export_attributes.clicked.connect(self.export_attributes)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(undo_icon), "png")
-        self.ui.pushButton_undo.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_undo.setIcon(qta.icon('mdi6.undo'))
         self.ui.pushButton_undo.clicked.connect(self.undo_file_rename)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(text_letter_t_icon), "png")
-        self.ui.pushButton_bulk_rename.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_bulk_rename.setIcon(qta.icon('mdi6.file-multiple-outline'))
         self.ui.pushButton_bulk_rename.clicked.connect(self.bulk_rename_database_entry)
-
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(question_icon), "png")
-        self.ui.pushButton_help.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_help.setIcon(qta.icon('mdi6.help'))
         self.ui.pushButton_help.pressed.connect(self.help)
         self.ui.tableWidget.setTabKeyNavigation(False)
         self.ui.tableWidget.itemChanged.connect(self.cell_modified)
