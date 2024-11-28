@@ -30,8 +30,7 @@ import datetime
 import logging
 from openpyxl import load_workbook
 import os
-import sys
-import traceback
+import qtawesome as qta
 from urllib.parse import urlparse
 import webbrowser
 
@@ -59,7 +58,7 @@ class DialogCases(QtWidgets.QDialog):
     Assign entire text files or portions of files to cases.
     Assign attributes to cases. """
 
-    NAME_COLUMN = 0  # also primary key
+    NAME_COLUMN = 0  # Also primary key
     MEMO_COLUMN = 1
     ID_COLUMN = 2
     FILES_COLUMN = 3
@@ -91,37 +90,23 @@ class DialogCases(QtWidgets.QDialog):
         doc_font = f'font: {self.app.settings["docfontsize"]}pt '
         doc_font += f'"{self.app.settings["font"]}";'
         self.ui.textBrowser.setStyleSheet(doc_font)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(pencil_icon), "png")
-        self.ui.pushButton_add.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_add.setIcon(qta.icon('mdi6.pencil-outline'))
         self.ui.pushButton_add.clicked.connect(self.add_case)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(delete_icon), "png")
-        self.ui.pushButton_delete.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_delete.setIcon(qta.icon('mdi6.delete-outline'))
         self.ui.pushButton_delete.clicked.connect(self.delete_case)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(clipboard_copy_icon), "png")
-        self.ui.pushButton_file_manager.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_file_manager.setIcon(qta.icon('mdi6.text-box-multiple-outline'))
         self.ui.pushButton_file_manager.pressed.connect(self.case_file_manager)
         self.ui.tableWidget.itemChanged.connect(self.cell_modified)
         self.ui.tableWidget.cellClicked.connect(self.cell_selected)
         self.ui.tableWidget.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(plus_icon), "png")
-        self.ui.pushButton_add_attribute.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_add_attribute.setIcon(qta.icon('mdi6.variable'))
         self.ui.pushButton_add_attribute.clicked.connect(self.add_attribute)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_import_icon), "png")
-        self.ui.pushButton_import_cases.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_import_cases.setIcon(qta.icon('mdi6.file-import-outline'))
         self.ui.pushButton_import_cases.clicked.connect(self.import_cases_and_attributes)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_csv_icon), "png")
-        self.ui.pushButton_export_attributes.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_export_attributes.setIcon(qta.icon('mdi6.file-export-outline'))
         self.ui.pushButton_export_attributes.clicked.connect(self.export_attributes)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(question_icon), "png")
-        self.ui.pushButton_help.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_help.setIcon(qta.icon('mdi6.help'))
         self.ui.pushButton_help.pressed.connect(self.help)
         self.ui.textBrowser.setText("")
         self.ui.textBrowser.setAutoFillBackground(True)
