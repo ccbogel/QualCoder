@@ -39,7 +39,6 @@ from pdfminer.layout import LAParams, LTTextLine
 from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
 from pdfminer.pdfpage import PDFPage
 
-from .GUI.base64_helper import *
 from .GUI.ui_dialog_manage_files import Ui_Dialog_manage_files
 from .add_attribute import DialogAddAttribute
 from .add_item_name import DialogAddItemName
@@ -925,17 +924,14 @@ class DialogManageFiles(QtWidgets.QDialog):
         cur.execute("select name, fulltext, mediapath from source where id=?", [id_])
         res = cur.fetchone()
         metadata = res[0] + "\n"
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(text), "png")
-        icon = QtGui.QIcon(pm)
+        icon = QtGui.QIcon(qta.icon('mdi6.text-box-outline'))
         # Check if text file is a transcription and add details
         cur.execute("select name from source where av_text_id=?", [id_])
         transcript_res = cur.fetchone()
         if transcript_res is not None:
             metadata += _("Transcript for: ") + f"{transcript_res[0]}\n"
             metadata += _("Characters: ") + str(len(res[1]))
-            pm.loadFromData(QtCore.QByteArray.fromBase64(transcribed_text_icon), "png")
-            icon = QtGui.QIcon(pm)
+            icon = QtGui.QIcon(qta.icon('mdi6.text'))
         if res[1] is not None and len(res[1]) > 0 and res[2] is None:
             metadata += _("Characters: ") + str(len(res[1]))
             return icon, metadata
@@ -947,9 +943,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             return icon, metadata
         if res[1] is not None and len(res[1]) > 5 and res[2][:5] == "docs:":
             metadata += _("Characters: ") + str(len(res[1]))
-            pm = QtGui.QPixmap()
-            pm.loadFromData(QtCore.QByteArray.fromBase64(text_link), "png")
-            icon = QtGui.QIcon(pm)
+            icon = QtGui.QIcon(qta.icon('mdi6.text-box-check-outline'))
             return icon, metadata
 
         abs_path = ""
@@ -963,11 +957,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             abs_path = self.app.project_path + res[2]
 
         if res[2][:8] == "/images/":
-            pm = QtGui.QPixmap()
-            pm.loadFromData(QtCore.QByteArray.fromBase64(picture), "png")
-            icon = QtGui.QIcon(pm)
-            # w = 0
-            # h = 0
+            icon = QtGui.QIcon(qta.icon('mdi6.image-outline'))
             try:
                 image = Image.open(abs_path)
                 w, h = image.size
@@ -976,11 +966,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 return icon, metadata
             metadata += f"W: {w} x H: {h}"
         if res[2][:7] == "images:":
-            pm = QtGui.QPixmap()
-            pm.loadFromData(QtCore.QByteArray.fromBase64(picture_link), "png")
-            icon = QtGui.QIcon(pm)
-            # w = 0
-            # h = 0
+            icon = QtGui.QIcon(qta.icon('mdi6.image-check-outline'))
             try:
                 image = Image.open(abs_path)
                 w, h = image.size
@@ -989,21 +975,13 @@ class DialogManageFiles(QtWidgets.QDialog):
                 return icon, metadata
             metadata += f"W: {w} x H: {h}"
         if res[2][:7] == "/video/":
-            pm = QtGui.QPixmap()
-            pm.loadFromData(QtCore.QByteArray.fromBase64(play), "png")
-            icon = QtGui.QIcon(pm)
+            icon = QtGui.QIcon(qta.icon('mdi6.video-outline'))
         if res[2][:6] == "video:":
-            pm = QtGui.QPixmap()
-            pm.loadFromData(QtCore.QByteArray.fromBase64(play_link), "png")
-            icon = QtGui.QIcon(pm)
+            icon = QtGui.QIcon(qta.icon('mdi6.video-check-outline'))
         if res[2][:7] == "/audio/":
-            pm = QtGui.QPixmap()
-            pm.loadFromData(QtCore.QByteArray.fromBase64(sound), "png")
-            icon = QtGui.QIcon(pm)
+            icon = QtGui.QIcon(qta.icon('mdi6.play'))
         if res[2][:6] == "audio:":
-            pm = QtGui.QPixmap()
-            pm.loadFromData(QtCore.QByteArray.fromBase64(sound_link), "png")
-            icon = QtGui.QIcon(pm)
+            icon = QtGui.QIcon(qta.icon('mdi6.play-protected-content'))
         if res[2][:6] in ("/audio", "audio:", "/video", "video:"):
             if not os.path.exists(abs_path):
                 metadata += _("Cannot locate media. ") + abs_path
