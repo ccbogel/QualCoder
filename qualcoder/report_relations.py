@@ -26,9 +26,8 @@ import openpyxl
 import os
 import pandas as pd
 import plotly.express as px
+import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 import statistics
-import sys
-import traceback
 
 from PyQt6 import QtGui, QtWidgets, QtCore
 from PyQt6.QtCore import Qt
@@ -77,38 +76,24 @@ class DialogReportRelations(QtWidgets.QDialog):
                 self.ui.splitter.setSizes([s0, s1])
         except KeyError:
             pass
-        font = 'font: ' + str(self.app.settings['fontsize']) + 'pt '
-        font += '"' + self.app.settings['font'] + '";'
+        font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
-        font = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
-        font += '"' + self.app.settings['font'] + '";'
+        font = f'font: {self.app.settings["treefontsize"]}pt "{self.app.settings["font"]}";'
         self.ui.treeWidget.setStyleSheet(font)
         self.ui.label_codes.setStyleSheet(font)
         self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.SelectionMode.ExtendedSelection)
         self.fill_tree()
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_csv_icon), "png")
-        self.ui.pushButton_exportcsv.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_exportcsv.setIcon(qta.icon('mdi6.export'))
         self.ui.pushButton_exportcsv.pressed.connect(self.export_csv_file)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_csv_icon), "png")
-        self.ui.pushButton_export_exact.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_export_exact.setIcon(qta.icon('mdi6.export-variant'))
         self.ui.pushButton_export_exact.pressed.connect(self.export_exact_excel_file)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(cogs_icon), "png")
-        self.ui.pushButton_calculate.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_calculate.setIcon(qta.icon('mdi6.calculator'))
         self.ui.pushButton_calculate.pressed.connect(self.calculate_code_relations)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(notepad_2_icon_24), "png")
-        self.ui.pushButton_select_files.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_select_files.setIcon(qta.icon('mdi6.file-outline'))
         self.ui.pushButton_select_files.pressed.connect(self.select_files)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_color_grid_icon_24), "png")
-        self.ui.pushButton_boxplots.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_boxplots.setIcon(qta.icon('mdi6.chart-bar'))
         self.ui.pushButton_boxplots.pressed.connect(self.create_boxplots)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
-        self.ui.pushButton_search_next.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_search_next.setIcon(qta.icon('mdi6.play'))
         self.ui.pushButton_search_next.clicked.connect(self.search_text)
         self.ui.tableWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
