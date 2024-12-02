@@ -109,7 +109,7 @@ class DialogJournals(QtWidgets.QDialog):
         self.ui.pushButton_export_all.clicked.connect(self.export_all_journals_as_one_file)
         self.ui.pushButton_help.setIcon(qta.icon('mdi6.help'))
         self.ui.pushButton_help.pressed.connect(self.help)
-        self.ui.pushButton_add_attribute.setIcon(qta.icon('mdi6.application-variable-outline'))
+        self.ui.pushButton_add_attribute.setIcon(qta.icon('mdi6.variable'))
         self.ui.pushButton_add_attribute.clicked.connect(self.add_attribute)
 
         # Search text in journals
