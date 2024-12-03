@@ -43,6 +43,7 @@ import webbrowser
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QBrush, QColor
+from .lineNumberWidget import LineNumberWidget
 
 from .add_item_name import DialogAddItemName
 from .code_in_all_files import DialogCodeInAllFiles
@@ -381,11 +382,20 @@ class DialogCodeText(QtWidgets.QWidget):
             v1 = int(self.app.settings['dialogcodetext_splitter_v1'])
             if v0 > 5 and v1 > 5:
                 # 30s are for the groupboxes containing buttons
-                self.ui.leftsplitter.setSizes([v1, v0, 30])
+                self.ui.leftsplitter.setSizes([v0, v1, 30])
         except KeyError:
             pass
         self.ui.splitter.splitterMoved.connect(self.update_sizes)
         self.ui.leftsplitter.splitterMoved.connect(self.update_sizes)
+
+        # Add paragraph numbers widget
+        self.ui.textEdit.textChanged.connect(self._line_widget_line_count_changed)
+        self.lineNumberWidget = LineNumberWidget(self.ui.textEdit)
+        layout = QtWidgets.QVBoxLayout(self.ui.lineNumbers)
+        layout.setContentsMargins(0, 0, 0, 0)  # Remove margins if needed
+        layout.addWidget(self.lineNumberWidget)
+        self.ui.lineNumbers.setLayout(layout) 
+
         self.fill_tree()
 
         # AI search
@@ -408,6 +418,11 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ai_search_found = False
         self.ai_include_coded_segments = None
         self.ai_search_analysis_counter = 0
+    
+    def _line_widget_line_count_changed(self):
+        if self.lineNumberWidget:
+            n = int(self.ui.textEdit.document().lineCount())
+            self.lineNumberWidget.changeLineCount(n)
 
     @staticmethod
     def help():
@@ -543,7 +558,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.app.settings['dialogcodetext_splitter1'] = sizes[1]
         v_sizes = self.ui.leftsplitter.sizes()
         self.app.settings['dialogcodetext_splitter_v0'] = v_sizes[0]
-        self.app.settings['dialogcodetext_splitter_v1'] = v_sizes[2]
+        self.app.settings['dialogcodetext_splitter_v1'] = v_sizes[1]
 
     def fill_code_label_undo_show_selected_code(self):
         """ Fill code label with currently selected item's code name and colour.
