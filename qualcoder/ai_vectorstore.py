@@ -19,11 +19,13 @@ https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 """
 
-from chromadb.config import Settings
+# from chromadb.config import Settings
 from huggingface_hub import hf_hub_url
 from langchain_community.embeddings import SentenceTransformerEmbeddings
 from langchain_text_splitters.character import RecursiveCharacterTextSplitter
-from langchain_chroma.vectorstores import Chroma
+import faiss
+from langchain_community.docstore.in_memory import InMemoryDocstore
+from langchain_community.vectorstores import FAISS
 from langchain_core.documents.base import Document
 import logging
 import os
@@ -32,6 +34,7 @@ import requests
 import time
 import traceback
 from typing import List
+from uuid import uuid4
 
 from qualcoder.ai_async_worker import Worker
 from qualcoder.ai_async_worker import AIException
@@ -39,7 +42,7 @@ from qualcoder.error_dlg import show_error_dlg
 
 # Turn off telemetry
 os.environ["HF_HUB_DISABLE_TELEMETRY"] = "1"  # for huggingface hub
-os.environ["ANONYMIZED_TELEMETRY"] = "0"  # for chromadb
+# os.environ["ANONYMIZED_TELEMETRY"] = "0"  # for chromadb
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -93,7 +96,7 @@ class E5SentenceTransformerEmbeddings(SentenceTransformerEmbeddings):
     
 class AiVectorstore():
     """ This is the memory of the AI. 
-    It manages a chromadb vectorstore with embeddings for all text based 
+    It manages a FAISS vectorstore with embeddings for all text based 
     source data in the project. This allows for semantic search and retrieval 
     of chunks of data which can then be further processed with a large 
     language model like GPT-4. 
@@ -102,7 +105,7 @@ class AiVectorstore():
 
     app = None
     parent_text_edit = None
-    ready = False  # If the chroma_db is busy indexing documents, ready will be "False" since we cannot make any queries yet.
+    ready = False  # If FAISS is busy indexing documents, ready will be "False" since we cannot make any queries yet.
     import_workers_count = 0
     # Setup the database 
     model_name = "intfloat/multilingual-e5-large"
@@ -124,7 +127,7 @@ class AiVectorstore():
     download_model_running = False
     download_model_cancel = False
     download_model_msg = ''
-    chroma_db = None
+    faiss_db = None
     _is_closing = False
     collection_name = ''
     
@@ -268,27 +271,42 @@ want to continue?\
         if self._is_closing:
             return  # abort when closing db
         if self.app.project_path != '' and os.path.exists(self.app.project_path):
-            db_path = os.path.join(self.app.project_path, 'ai_data', 'vectorstore')
             if self.app.ai_embedding_function is None:
                 self.app.ai_embedding_function = E5SentenceTransformerEmbeddings(model_name=self.model_folder)
-            # {"hnsw:space": "cosine"} -> defines the distance function, cosine vs. Squared L2 (default).
-            # In my limited tests, l2 gives slightly better results, although cosine is usually recommended
-            collection_metadata = {"hnsw:space": "l2"}
-            chroma_client_settings = Settings(
-                                        is_persistent=True,
-                                        persist_directory=db_path,
-                                        anonymized_telemetry=False
-                                     )
-            self.chroma_db = Chroma(client_settings=chroma_client_settings, 
-                                    embedding_function=self.app.ai_embedding_function,
-                                    collection_name=self.collection_name,
-                                    collection_metadata=collection_metadata
-                             )
+            self.faiss_db_path = os.path.join(self.app.project_path, 'ai_data', 'vectorstore', 'faiss_index')
+            if os.path.exists(self.faiss_db_path): 
+                # load existing faiss db
+                self.faiss_db = FAISS.load_local(
+                    folder_path=self.faiss_db_path,
+                    embeddings=self.app.ai_embedding_function,
+                    allow_dangerous_deserialization=True
+                )
+            else:
+                # create new faiss db
+                embedding_size = len(self.app.ai_embedding_function.embed_query("example"))
+                print(embedding_size)
+                faiss_index = faiss.IndexFlatL2(embedding_size) # 1024 is the embedding size of the used model: https://huggingface.co/intfloat/multilingual-e5-large
+                self.faiss_db = FAISS(
+                    embedding_function=self.app.ai_embedding_function,
+                    index=faiss_index,
+                    docstore=InMemoryDocstore(),
+                    index_to_docstore_id={},
+                )
+                self.faiss_save()
         else:
-            self.chroma_db = None
+            self.faiss_db = None
             logger.debug(f'Project path "{self.app.project_path}" not found.')
             raise FileNotFoundError(f'AI Vectorstore: project path "{self.app.project_path}" not found.')
         self.app.ai._status = ''
+    
+    def faiss_save(self):
+        if self.faiss_db is None:
+            return
+        if self.faiss_db_path is None:
+            raise FileNotFoundError(f'AI Vectorstore: faiss path not found.')
+        self.faiss_db.save_local(
+            folder_path=self.faiss_db_path
+        )    
 
     def init_vectorstore(self, rebuild=False):
         """Initializes the vectorstore and checks if all text sources are stored.
@@ -327,27 +345,45 @@ want to continue?\
             msg = _("AI: Checked all documents, memory is up to date.")
             self.parent_text_edit.append(msg)
             logger.debug(msg)
+            
+    def faiss_db_search_file_id(self, file_id):
+        """Returns a list of embedding-ids for a certain file id or an empty list if nothing is found."""
+        if self.faiss_db is None:
+            return []
+        res = []
+        for idx, doc_id in self.faiss_db.index_to_docstore_id:
+            doc = self.faiss_db.docstore.search(doc_id)
+            if isinstance(doc, Document):
+                if doc.metadata['id'] == file_id:
+                    res.append(idx)
+        return res
     
     def _import_document(self, id_, name, text, update=False, signals=None):
+        print('_import_document()')               
         if self._is_closing:
             return  # abort when closing db
-        if self.chroma_db is None:
-            raise AIException(_('Vectorstore: Document import failed, chroma_db not present.'))
-                       
-        # Check if the document is already in the store:
-        embeddings_list = self.chroma_db.get(where={"id": id_}, include=['metadatas'])
-        if len(embeddings_list['ids']) > 0:  # Found document in Vectorstore
-            if update or embeddings_list['metadatas'][0]['name'] != name:
+        if self.faiss_db is None:
+            raise AIException(_('Vectorstore: Document import failed, faiss_db not present.'))
+        ai_embedding_function = E5SentenceTransformerEmbeddings(model_name=self.model_folder)
+        print('loaded E5')
+        # Check if the document is already in the store and delete if needed:        
+        embeddings_list = self.faiss_db_search_file_id(id_)
+        if len(embeddings_list) > 0:
+            # get first doc
+            _id = self.faiss_db.index_to_docstore_id[embeddings_list[0]]
+            doc = self.faiss_db.docstore.search(_id)
+            if update or doc.metadata['name'] != name:
                 # delete old embeddings
-                self.chroma_db.delete(embeddings_list['ids']) 
+                self.faiss_db.delete(embeddings_list)
+                self.faiss_save()
             else:
                 # skip the doc
                 return 
-        # add to chroma_db
+        # add to faiss_db
         if self._is_closing:
             return  # abort when closing db
         
-        # split fulltext in smaller chunks 
+        # split fulltext into smaller chunks 
         if text != '':  # Can only add embeddings if text is not empty
             if signals is not None and signals.progress is not None:
                 signals.progress.emit(_('AI: Adding document to internal memory: ') + f'"{name}"')
@@ -359,19 +395,31 @@ want to continue?\
                                                         add_start_index=True)
             chunks = text_splitter.split_documents([document])
             
-            # create embeddings for these chunks and store them in the chroma_db (with metadata)
+            # create embeddings for these chunks and store them in the faiss_db (with metadata)
             for chunk in chunks:
                 if not self._is_closing:
-                    self.chroma_db.add_texts([chunk.page_content], [chunk.metadata])  
+                    txt = chunk.page_content.replace('\n', ' ')
+                    txt = 'test'
+                    print(txt)
+                    uid = str(uuid4())
+                    # self.faiss_db.add_documents(documents=[chunk], ids=[uid]) # add_texts([chunk.page_content], [chunk.metadata])  
+                    # self.faiss_db.add_texts(texts=[chunk.page_content], metadatas=[chunk.metadata], ids=[uid])  
+                    embed_list = ai_embedding_function.embed_documents(txt)
+                    print(embed_list)
+                    embed = embed_list[0]
+                    print(embed)
+                    self.faiss_db.add_embeddings(text_embeddings=[{chunk.page_content:embed}], metadatas=[chunk.metadata])
                 else:  # Canceled, delete the unfinished document from the vectorstore:
-                    embeddings_list = self.chroma_db.get(where={"id": id_}, include=['metadatas'])
-                    self.chroma_db.delete(embeddings_list['ids'])
+                    embeddings_list = self.faiss_db_search_file_id(id_)
+                    if len(embeddings_list) > 0:
+                        self.faiss_db.delete(embeddings_list)
                     break
+            self.faiss_save()
 
     def import_document(self, id_, name, text, update=False):
-        """Imports a document into the chroma_db. 
+        """Imports a document into the faiss_db. 
         If a document with the same id is already in 
-        the chroma_db, it can be updated (update=True) 
+        the faiss_db, it can be updated (update=True) 
         or skipped (update=False).
         This is an async process running in a background
         thread. AiVectorstore.is_ready() will return False
@@ -393,12 +441,12 @@ want to continue?\
         self.threadpool.start(worker)
 
     def update_vectorstore(self):
-        """Collects all text sources from the database and adds them to the chroma_db if 
+        """Collects all text sources from the database and adds them to the faiss_db if 
         not already in there.  
         """
         self.app.ai._status = ''
-        if self.chroma_db is None:
-            logger.debug('chroma_db is None')
+        if self.faiss_db is None:
+            logger.debug('faiss_db is None')
             return
         docs = self.app.get_file_texts()
         
@@ -408,12 +456,12 @@ want to continue?\
                 if document['name'] == name:
                     return True
             return False
-        emb = self.chroma_db.get(include=['metadatas'])
-        for i in range(len(emb['ids'])):
-            emb_id = emb['ids'][i]
-            file_name = emb['metadatas'][i]['name']
-            if not search_name(docs, file_name):
-                self.chroma_db.delete([emb_id])
+
+        for idx, doc_id in self.faiss_db.index_to_docstore_id:
+            doc = self.faiss_db.docstore.search(doc_id)
+            if isinstance(doc, Document):
+                if not search_name(docs, doc.metadata['name']):
+                    self.faiss_db.delete([idx])
 
         # Add new docs
         if len(docs) == 0:
@@ -428,19 +476,18 @@ want to continue?\
                 self.import_document(doc['id'], doc['name'], doc['fulltext'], False)
             
     def rebuild_vectorstore(self):
-        """Deletes all contents from chroma_db and rebuilds the vectorstore from the ground up.  
+        """Deletes all contents from faiss_db and rebuilds the vectorstore from the ground up.  
         """
         self.app.ai._status = ''
-        if self.chroma_db is None:
-            logger.debug('chroma_db is None')
+        if self.faiss_db is None:
+            logger.debug('faiss_db is None')
             return
         msg = _('AI: Rebuilding memory. The local AI will read through all your documents, please be patient.')
         self.parent_text_edit.append(msg)
         logger.debug(msg)
         # delete all the contents from the vectorstore
-        ids = self.chroma_db.get(include=[])['ids']
-        if len(ids) > 0:
-            self.chroma_db.delete(ids)
+        self.faiss_db.delete(self.faiss_db.index_to_docstore_id.keys())
+        self.faiss_save()
         # rebuild vectorstore
         self.update_vectorstore()
     
@@ -448,19 +495,22 @@ want to continue?\
         """Deletes all the embeddings from related to this doc 
         from the vectorstore"""
 
-        chroma_db = self.chroma_db
-        if chroma_db is None:
+        faiss_db = self.faiss_db
+        if faiss_db is None:
             # Try to create a temporary access
             if self.app.project_path != '' and os.path.exists(self.app.project_path):
-                db_path = os.path.join(self.app.project_path, 'ai_data', 'vectorstore')
-                if os.path.exists(db_path):
-                    chroma_db = Chroma(persist_directory=db_path,
-                                       collection_name=self.collection_name)
-        if chroma_db is not None:
-            embeddings_list = chroma_db.get(where={"id": id_}, include=['metadatas'])
-            if len(embeddings_list['ids']) > 0:  # Found it
-                self.parent_text_edit.append("AI: Forgetting " + f'"{embeddings_list["metadatas"][0]["name"]}"')
-                chroma_db.delete(embeddings_list['ids']) 
+                faiss_db_path = os.path.join(self.app.project_path, 'ai_data', 'vectorstore', 'faiss_index')
+                if os.path.exists(self.faiss_db_path): 
+                    faiss_db = FAISS.load_local(
+                        folder_path=self.faiss_db_path,
+                        embeddings=self.app.ai_embedding_function,
+                        allow_dangerous_deserialization=True
+                    )
+        if faiss_db is not None:
+            embeddings_list = self.faiss_db_search_file_id(id_)
+            if len(embeddings_list) > 0:
+                self.faiss_db.delete(embeddings_list)
+                self.faiss_save()
                
     def close(self):
         """Cancels the update process if running"""
@@ -469,7 +519,7 @@ want to continue?\
         # cancel all waiting threads:
         self.threadpool.clear()
         self.threadpool.waitForDone(5000)
-        self.chroma_db = None
+        self.faiss_db = None
         self._is_closing = False
         
     def ai_worker_running(self):
@@ -478,7 +528,7 @@ want to continue?\
             
     def is_open(self) -> bool:
         """Returnes True if the vectorstore is initiated"""
-        return self.chroma_db is not None and self._is_closing is False
+        return self.faiss_db is not None and self._is_closing is False
     
     def is_ready(self) -> bool:
         """If the vectorstore is initiated and done importing data, 
