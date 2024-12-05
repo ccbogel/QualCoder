@@ -21,6 +21,7 @@ https://qualcoder.wordpress.com/
 
 # from chromadb.config import Settings
 from huggingface_hub import hf_hub_url
+import sentence_transformers  # This is used in a subthread. But we must keep a reference here so that it is not garbage collected.
 from langchain_community.embeddings import SentenceTransformerEmbeddings
 from langchain_text_splitters.character import RecursiveCharacterTextSplitter
 import faiss
@@ -273,14 +274,23 @@ want to continue?\
         if self.app.project_path != '' and os.path.exists(self.app.project_path):
             if self.app.ai_embedding_function is None:
                 self.app.ai_embedding_function = E5SentenceTransformerEmbeddings(model_name=self.model_folder)
-            self.faiss_db_path = os.path.join(self.app.project_path, 'ai_data', 'vectorstore', 'faiss_index')
+            self.faiss_db_path = os.path.join(self.app.project_path, 'ai_data', 'vectorstore', 'faiss_store.bin')
             if os.path.exists(self.faiss_db_path): 
                 # load existing faiss db
-                self.faiss_db = FAISS.load_local(
-                    folder_path=self.faiss_db_path,
+                with open(self.faiss_db_path, 'rb') as f:
+                    serialized_bytes_loaded = f.read()
+
+                # Deserialize to reconstruct the FAISS vector store
+                self.faiss_db = FAISS.deserialize_from_bytes(
+                    serialized=serialized_bytes_loaded,
                     embeddings=self.app.ai_embedding_function,
                     allow_dangerous_deserialization=True
-                )
+                )                
+                #self.faiss_db = FAISS.load_local(
+                #    folder_path=self.faiss_db_path,
+                #    embeddings=self.app.ai_embedding_function,
+                #    allow_dangerous_deserialization=True
+                #)
             else:
                 # create new faiss db
                 embedding_size = len(self.app.ai_embedding_function.embed_query("example"))
@@ -304,9 +314,12 @@ want to continue?\
             return
         if self.faiss_db_path is None:
             raise FileNotFoundError(f'AI Vectorstore: faiss path not found.')
-        self.faiss_db.save_local(
-            folder_path=self.faiss_db_path
-        )    
+        #self.faiss_db.save_local(
+        #    folder_path=self.faiss_db_path
+        #)
+        serialized_bytes = self.faiss_db.serialize_to_bytes()
+        with open(self.faiss_db_path, 'wb') as f:
+            f.write(serialized_bytes)    
 
     def init_vectorstore(self, rebuild=False):
         """Initializes the vectorstore and checks if all text sources are stored.
@@ -351,7 +364,7 @@ want to continue?\
         if self.faiss_db is None:
             return []
         res = []
-        for idx, doc_id in self.faiss_db.index_to_docstore_id:
+        for idx, doc_id in self.faiss_db.index_to_docstore_id.items():
             doc = self.faiss_db.docstore.search(doc_id)
             if isinstance(doc, Document):
                 if doc.metadata['id'] == file_id:
@@ -359,13 +372,10 @@ want to continue?\
         return res
     
     def _import_document(self, id_, name, text, update=False, signals=None):
-        print('_import_document()')               
         if self._is_closing:
             return  # abort when closing db
         if self.faiss_db is None:
             raise AIException(_('Vectorstore: Document import failed, faiss_db not present.'))
-        ai_embedding_function = E5SentenceTransformerEmbeddings(model_name=self.model_folder)
-        print('loaded E5')
         # Check if the document is already in the store and delete if needed:        
         embeddings_list = self.faiss_db_search_file_id(id_)
         if len(embeddings_list) > 0:
@@ -398,17 +408,9 @@ want to continue?\
             # create embeddings for these chunks and store them in the faiss_db (with metadata)
             for chunk in chunks:
                 if not self._is_closing:
-                    txt = chunk.page_content.replace('\n', ' ')
-                    txt = 'test'
-                    print(txt)
                     uid = str(uuid4())
-                    # self.faiss_db.add_documents(documents=[chunk], ids=[uid]) # add_texts([chunk.page_content], [chunk.metadata])  
+                    self.faiss_db.add_documents([chunk], ids=[uid])
                     # self.faiss_db.add_texts(texts=[chunk.page_content], metadatas=[chunk.metadata], ids=[uid])  
-                    embed_list = ai_embedding_function.embed_documents(txt)
-                    print(embed_list)
-                    embed = embed_list[0]
-                    print(embed)
-                    self.faiss_db.add_embeddings(text_embeddings=[{chunk.page_content:embed}], metadatas=[chunk.metadata])
                 else:  # Canceled, delete the unfinished document from the vectorstore:
                     embeddings_list = self.faiss_db_search_file_id(id_)
                     if len(embeddings_list) > 0:
@@ -457,7 +459,7 @@ want to continue?\
                     return True
             return False
 
-        for idx, doc_id in self.faiss_db.index_to_docstore_id:
+        for idx, doc_id in self.faiss_db.index_to_docstore_id.items():
             doc = self.faiss_db.docstore.search(doc_id)
             if isinstance(doc, Document):
                 if not search_name(docs, doc.metadata['name']):

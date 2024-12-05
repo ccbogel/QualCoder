@@ -470,14 +470,19 @@ class AiLLM():
             return []
         
         # 2) Use the list of code descriptions to retrieve related data from the vectorstore
-        search_kwargs = {'score_threshold': 0.5, 'k': 50}
-        if doc_ids is not None and len(doc_ids) > 0:
-            # add document filter
-            search_kwargs['filter'] = {'id': {'$in': doc_ids}}
-        
+        search_kwargs = {'score_threshold': 0.5, 'k': 50} # 'score_threshold' was 0.5       
         chunks_meta_list = []
         for desc in descriptions:
-            chunks_meta_list.append(self.sources_vectorstore.chroma_db.similarity_search_with_relevance_scores(desc, **search_kwargs))
+            res = self.sources_vectorstore.faiss_db.similarity_search_with_relevance_scores(desc, **search_kwargs)
+            if doc_ids is not None and len(doc_ids) > 0:
+                # filter results by document ids
+                res_filtered = []
+                for chunk in res:
+                    if chunk[0].metadata['id'] in doc_ids:
+                        res_filtered.append(chunk)
+                chunks_meta_list.append(res_filtered)
+            else: 
+                chunks_meta_list.append(res)
 
         # 3) Consolidate and rank results:
         # Flatten the lists of chunks in chunks_lists and collect all the chunks in a master list.
