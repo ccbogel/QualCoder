@@ -26,16 +26,14 @@ import difflib
 import logging
 import os
 import platform
+import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 from random import randint
 import re
 import subprocess
-import sys
 import time
-import traceback
 import webbrowser
 
 from PyQt6 import QtCore, QtGui, QtWidgets
-# from PyQt6.QtGui import QHelpEvent
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QBrush, QColor
 
@@ -44,7 +42,6 @@ from .code_in_all_files import DialogCodeInAllFiles
 from .color_selector import DialogColorSelect
 from .color_selector import colors, TextColor
 from .confirm_delete import DialogConfirmDelete
-from .GUI.base64_helper import *
 from .GUI.ui_dialog_code_av import Ui_Dialog_code_av
 from .GUI.ui_dialog_view_av import Ui_Dialog_view_av
 from .helpers import msecs_to_hours_mins_secs, Message, ExportDirectoryPathDialog
@@ -135,8 +132,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.play_segment_end = None
         self.segments = []
         self.media_duration_text = ""
-        '''self.text_for_segment = {'cid': None, 'fid': None, 'seltext': None, 'pos0': None, 'pos1': None,
-                'owner': None, 'memo': '', 'date': None, 'avid': None}'''
         self.segment_for_text = None
         self.undo_deleted_codes = []
         self.get_codes_and_categories()
@@ -157,59 +152,31 @@ class DialogCodeAV(QtWidgets.QDialog):
             pass
         self.ui.splitter.splitterMoved.connect(self.update_sizes)
         self.ui.splitter_2.splitterMoved.connect(self.update_sizes)
-        # Labels need to be 32x32 pixels for 32x32 icons
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(sound_high_icon), "png")
-        self.ui.label_volume.setPixmap(QtGui.QPixmap(pm).scaled(22, 22))
-        # Buttons need to be 36x36 pixels for 32x32 icons
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
-        self.ui.pushButton_play.setIcon(QtGui.QIcon(pm))
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(rewind_30_icon), "png")
-        self.ui.pushButton_rewind_30.setIcon(QtGui.QIcon(pm))
+        self.ui.label_volume.setPixmap(qta.icon('mdi6.volume-high').pixmap(22, 22))
+        self.ui.pushButton_play.setIcon(qta.icon('mdi6.play'))
+        self.ui.pushButton_rewind_30.setIcon(qta.icon('mdi6.rewind-30'))
         self.ui.pushButton_rewind_30.pressed.connect(self.rewind_30_seconds)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(rewind_5_icon), "png")
-        self.ui.pushButton_rewind_5.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_rewind_5.setIcon(qta.icon('mdi6.rewind-5'))
         self.ui.pushButton_rewind_5.pressed.connect(self.rewind_5_seconds)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(forward_30_icon), "png")
-        self.ui.pushButton_forward_30.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_forward_30.setIcon(qta.icon('mdi6.fast-forward-30'))
         self.ui.pushButton_forward_30.pressed.connect(self.forward_30_seconds)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(rate_down_icon), "png")
-        self.ui.pushButton_rate_down.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_rate_down.setIcon(qta.icon('mdi6.speedometer-slow'))
         self.ui.pushButton_rate_down.pressed.connect(self.decrease_play_rate)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(rate_up_icon), "png")
-        self.ui.pushButton_rate_up.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_rate_up.setIcon(qta.icon('mdi6.speedometer'))
         self.ui.pushButton_rate_up.pressed.connect(self.increase_play_rate)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(question_icon), "png")
-        self.ui.pushButton_help.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_help.setIcon(qta.icon('mdi6.help'))
         self.ui.pushButton_help.pressed.connect(self.help)
 
         # The buttons in the splitter are smaller 24x24 pixels
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(playback_next_icon_24), "png")
-        self.ui.pushButton_latest.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_latest.setIcon(qta.icon('mdi6.arrow-collapse-right'))
         self.ui.pushButton_latest.pressed.connect(self.go_to_latest_coded_file)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(playback_play_icon_24), "png")
-        self.ui.pushButton_next_file.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_next_file.setIcon(qta.icon('mdi6.arrow-right'))
         self.ui.pushButton_next_file.pressed.connect(self.go_to_next_file)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(notepad_2_icon_24), "png")
-        self.ui.pushButton_document_memo.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_document_memo.setIcon(qta.icon('mdi6.text-box-outline'))
         self.ui.pushButton_document_memo.pressed.connect(self.active_file_memo)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(star_icon32), "png")
-        self.ui.pushButton_important.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_important.setIcon(qta.icon('mdi6.star-outline'))
         self.ui.pushButton_important.pressed.connect(self.show_important_coded)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(tag_icon32), "png")
-        self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.tag-outline'))
         self.ui.pushButton_file_attributes.pressed.connect(self.get_files_from_attributes)
 
         # Until any media is selected disable some widgets
@@ -230,14 +197,11 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.textEdit.customContextMenuRequested.connect(self.textedit_menu)
         self.ui.pushButton_segment_menu.pressed.connect(self.label_segment_menu)
 
-        font = f"font: {self.app.settings['fontsize']}pt "
-        font += '"' + self.app.settings['font'] + '";'
+        font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
-        tree_font = f"font: {self.app.settings['treefontsize']}pt "
-        tree_font += '"' + self.app.settings['font'] + '";'
+        tree_font = f'font: {self.app.settings["treefontsize"]}pt "{self.app.settings["font"]}";'
         self.ui.treeWidget.setStyleSheet(tree_font)
-        doc_font = f"font: {self.app.settings['docfontsize']}pt "
-        doc_font += '"' + self.app.settings['font'] + '";'
+        doc_font = f'font: {self.app.settings["docfontsize"]}pt "{self.app.settings["font"]}";'
         self.ui.textEdit.setStyleSheet(doc_font)
         self.ui.label_coder.setText(_("Coder: ") + self.app.settings['codername'])
         self.setWindowTitle(_("Media coding"))
@@ -404,33 +368,23 @@ class DialogCodeAV(QtWidgets.QDialog):
         ok = ui.exec()
         if not ok:
             self.attributes = temp_attributes
-            pm = QtGui.QPixmap()
-            pm.loadFromData(QtCore.QByteArray.fromBase64(tag_icon32), "png")
-            self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
+            self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.tag-outline'))
             self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
             if self.attributes:
-                pm = QtGui.QPixmap()
-                pm.loadFromData(QtCore.QByteArray.fromBase64(tag_iconyellow32), "png")
-                self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
+                self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.tag'))
             return
         self.attributes = ui.parameters
         if len(self.attributes) == 1:
-            pm = QtGui.QPixmap()
-            pm.loadFromData(QtCore.QByteArray.fromBase64(tag_icon32), "png")
-            self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
+            self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.tag-outline'))
             self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
             self.get_files()
             return
         if not ui.result_file_ids:
             Message(self.app, _("Nothing found") + " " * 20, _("No matching files found")).exec()
-            pm = QtGui.QPixmap()
-            pm.loadFromData(QtCore.QByteArray.fromBase64(tag_icon32), "png")
-            self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
+            self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.tag-outline'))
             self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
             return
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(tag_iconyellow32), "png")
-        self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.tag'))
         self.ui.pushButton_file_attributes.setToolTip(ui.tooltip_msg)
         self.get_files(ui.result_file_ids)
 
@@ -441,14 +395,12 @@ class DialogCodeAV(QtWidgets.QDialog):
         if self.media is None:
             return
         self.important = not self.important
-        pm = QtGui.QPixmap()
         if self.important:
-            pm.loadFromData(QtCore.QByteArray.fromBase64(star_icon_yellow32), "png")
             self.ui.pushButton_important.setToolTip(_("Showing important codings"))
+            self.ui.pushButton_important.setIcon(qta.icon('mdi6.star'))
         else:
-            pm.loadFromData(QtCore.QByteArray.fromBase64(star_icon32), "png")
             self.ui.pushButton_important.setToolTip(_("Show codings flagged important"))
-        self.ui.pushButton_important.setIcon(QtGui.QIcon(pm))
+            self.ui.pushButton_important.setIcon(qta.icon('mdi6.star-outline'))
         self.get_coded_text_update_eventfilter_tooltips()
 
         # Draw coded segments in scene
@@ -1185,9 +1137,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.update_sizes()
         if self.mediaplayer.is_playing():
             self.mediaplayer.pause()
-            pm = QtGui.QPixmap()
-            pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
-            self.ui.pushButton_play.setIcon(QtGui.QIcon(pm))
+            self.ui.pushButton_play.setIcon(qta.icon('mdi6.play'))
             self.is_paused = True
             self.timer.stop()
         else:
@@ -1204,9 +1154,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             msecs = self.mediaplayer.get_time()
             self.ui.label_time.setText(msecs_to_hours_mins_secs(msecs) + self.media_duration_text)
             self.mediaplayer.play()
-            pm = QtGui.QPixmap()
-            pm.loadFromData(QtCore.QByteArray.fromBase64(playback_pause_icon), "png")
-            self.ui.pushButton_play.setIcon(QtGui.QIcon(pm))
+            self.ui.pushButton_play.setIcon(qta.icon('mdi6.pause'))
             self.timer.start()
             self.is_paused = False
             self.play_segment_end = None
@@ -1221,9 +1169,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         if self.mediaplayer is None:
             return
         self.mediaplayer.stop()
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
-        self.ui.pushButton_play.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_play.setIcon(qta.icon('mdi6.play'))
         self.timer.stop()
         self.ui.horizontalSlider.setProperty("value", 0)
         self.play_segment_end = None
@@ -1282,9 +1228,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         # No need to call this function if nothing is played
         if not self.mediaplayer.is_playing():
             self.timer.stop()
-            pm = QtGui.QPixmap()
-            pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
-            self.ui.pushButton_play.setIcon(QtGui.QIcon(pm))
+            self.ui.pushButton_play.setIcon(qta.icon('mdi6.play'))
             # After the video finished, the play button stills shows "Pause",
             # which is not the desired behavior of a media player.
             # This fixes that "bug".
@@ -2826,9 +2770,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.mediaplayer.play()
         self.mediaplayer.set_position(pos)
         self.is_paused = False
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(playback_pause_icon), "png")
-        self.ui.pushButton_play.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_play.setIcon(qta.icon('mdi6.pause'))
         self.play_segment_end = segment['pos1']
         self.timer.start()
 
@@ -3144,10 +3086,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.mediaplayer.play()
         self.mediaplayer.set_position(pos)
         self.is_paused = False
-
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(playback_pause_icon), "png")
-        self.ui.pushButton_play.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_play.setIcon(qta.icon('mdi6.pause'))
         self.play_segment_end = segment['pos1']
         self.timer.start()
 
@@ -3552,10 +3491,7 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         self.code_av_dialog.mediaplayer.play()
         self.code_av_dialog.mediaplayer.set_position(pos)
         self.code_av_dialog.is_paused = False
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(playback_pause_icon), "png")
-        icon = QtGui.QIcon(QtGui.QPixmap(pm))
-        self.code_av_dialog.ui.pushButton_play.setIcon(icon)
+        self.code_av_dialog.ui.pushButton_play.setIcon(qta.icon('mdi6.pause'))
         self.code_av_dialog.play_segment_end = self.segment['pos1']
         self.code_av_dialog.timer.start()
 
@@ -3778,59 +3714,31 @@ class DialogViewAV(QtWidgets.QDialog):
         self.prev_text = copy(self.text)
         self.highlight()
 
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(clock_icon), "png")
-        self.ui.label_time_3.setPixmap(QtGui.QPixmap(pm).scaled(22, 22))
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(sound_high_icon), "png")
-        self.ui.label_volume.setPixmap(QtGui.QPixmap(pm).scaled(22, 22))
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
-        self.ui.pushButton_play.setIcon(QtGui.QIcon(pm))
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(rewind_30_icon), "png")
-        self.ui.pushButton_rewind_30.setIcon(QtGui.QIcon(pm))
+        self.ui.label_time_3.setPixmap(qta.icon('mdi6.clock-outline').pixmap(22, 22))
+        self.ui.label_volume.setPixmap(qta.icon('mdi6.volume-high').pixmap(22, 22))
+        self.ui.pushButton_play.setIcon(qta.icon('mdi6.play'))
+        self.ui.pushButton_rewind_30.setIcon(qta.icon('mdi6.rewind-30'))
         self.ui.pushButton_rewind_30.pressed.connect(self.rewind_30_seconds)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(rewind_5_icon), "png")
-        self.ui.pushButton_rewind_5.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_rewind_5.setIcon(qta.icon('mdi6.rewind-5'))
         self.ui.pushButton_rewind_5.pressed.connect(self.rewind_5_seconds)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(forward_30_icon), "png")
-        self.ui.pushButton_forward_30.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_forward_30.setIcon(qta.icon('mdi6.fast-forward-30'))
         self.ui.pushButton_forward_30.pressed.connect(self.forward_30_seconds)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(rate_down_icon), "png")
-        self.ui.pushButton_rate_down.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_rate_down.setIcon(qta.icon('mdi6.speedometer-slow'))
         self.ui.pushButton_rate_down.pressed.connect(self.decrease_play_rate)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(rate_up_icon), "png")
-        self.ui.pushButton_rate_up.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_rate_up.setIcon(qta.icon('mdi6.speedometer'))
         self.ui.pushButton_rate_up.pressed.connect(self.increase_play_rate)
         # Search text in transcription
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(question_icon), "png")
-        self.ui.label_search_regex.setPixmap(QtGui.QPixmap(pm).scaled(22, 22))
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(playback_back_icon), "png")
-        self.ui.pushButton_previous.setIcon(QtGui.QIcon(pm))
+        self.ui.label_search_regex.setPixmap(qta.icon('mdi6.text-search').pixmap(22, 22))
+        self.ui.pushButton_previous.setIcon(qta.icon('mdi6.arrow-left'))
         self.ui.pushButton_previous.setEnabled(False)
         self.ui.pushButton_previous.pressed.connect(self.move_to_previous_search_text)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(question_icon), "png")
-        self.ui.pushButton_help.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_help.setIcon(qta.icon('mdi6.help'))
         self.ui.pushButton_help.pressed.connect(self.help)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(playback_play_icon), "png")
-        self.ui.pushButton_next.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_next.setIcon(qta.icon('mdi6.arrow-right'))
         self.ui.pushButton_next.pressed.connect(self.move_to_next_search_text)
         self.ui.pushButton_next.setEnabled(False)
-        pm.loadFromData(QtCore.QByteArray.fromBase64(cogs_icon), "png")
-        self.ui.pushButton_speechtotext.hide()
-        #self.ui.pushButton_speechtotext.setIcon(QtGui.QIcon(pm))
-        #self.ui.pushButton_speechtotext.pressed.connect(self.speech_to_text)
+        self.ui.pushButton_speechtotext.hide()  # Superceeded TODO remove from ui
         self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
-        # self.ui.lineEdit_search.setEnabled(False)
         # My solution to getting gui mouse events by putting vlc video in another dialog
         self.ddialog = QtWidgets.QDialog()
         # Enable custom window hint - must be set to enable customizing window controls
@@ -4424,9 +4332,7 @@ class DialogViewAV(QtWidgets.QDialog):
         self.update_sizes()
         if self.mediaplayer.is_playing():
             self.mediaplayer.pause()
-            pm = QtGui.QPixmap()
-            pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
-            self.ui.pushButton_play.setIcon(QtGui.QIcon(pm))
+            self.ui.pushButton_play.setIcon(qta.icon('mdi6.play'))
             self.is_paused = True
             self.timer.stop()
         else:
@@ -4443,9 +4349,7 @@ class DialogViewAV(QtWidgets.QDialog):
             msecs = self.mediaplayer.get_time()
             self.ui.label_time.setText(msecs_to_hours_mins_secs(msecs) + self.media_duration_text)
             self.mediaplayer.play()
-            pm = QtGui.QPixmap()
-            pm.loadFromData(QtCore.QByteArray.fromBase64(playback_pause_icon), "png")
-            self.ui.pushButton_play.setIcon(QtGui.QIcon(pm))
+            self.ui.pushButton_play.setIcon(qta.icon('mdi6.pause'))
             self.timer.start()
             self.is_paused = False
 
@@ -4455,9 +4359,7 @@ class DialogViewAV(QtWidgets.QDialog):
 
         if self.mediaplayer.is_playing():
             self.mediaplayer.pause()
-            pm = QtGui.QPixmap()
-            pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
-            self.ui.pushButton_play.setIcon(QtGui.QIcon(pm))
+            self.ui.pushButton_play.setIcon(qta.icon('mdi6.play'))
             self.is_paused = True
             self.timer.stop()
 
@@ -4468,11 +4370,9 @@ class DialogViewAV(QtWidgets.QDialog):
          Programmatically setting the audio track to other values does not work. """
 
         self.mediaplayer.stop()
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
-        self.ui.pushButton_play.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_play.setIcon(qta.icon('mdi6.play'))
         self.ui.horizontalSlider.setProperty("value", 0)
-        # set combobox display of audio track to the first one, or leave it blank if it contains no items
+        # Set combobox display of audio track to the first one, or leave it blank if it contains no items
         if self.ui.comboBox_tracks.count() > 0:
             self.ui.comboBox_tracks.setCurrentIndex(0)
 
