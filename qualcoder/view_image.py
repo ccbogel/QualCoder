@@ -24,10 +24,9 @@ import datetime
 import html
 import logging
 import os
+import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 from random import randint
 import sqlite3
-import sys
-import traceback
 import webbrowser
 
 from PyQt6 import QtCore, QtGui, QtWidgets
@@ -39,7 +38,6 @@ from .code_in_all_files import DialogCodeInAllFiles
 from .color_selector import DialogColorSelect
 from .color_selector import colors, TextColor
 from .confirm_delete import DialogConfirmDelete
-from .GUI.base64_helper import *
 from .GUI.ui_dialog_code_image import Ui_Dialog_code_image
 from .GUI.ui_dialog_view_image import Ui_Dialog_view_image
 from .move_resize_rectangle import DialogMoveResizeRectangle
@@ -72,7 +70,7 @@ class DialogCodeImage(QtWidgets.QDialog):
     important = False  # Show/hide important flagged codes
     attributes = []
     undo_deleted_code = None  # Undo last deleted code
-    degrees = 0  # for rotation
+    degrees = 0  # For image rotation
 
     def __init__(self, app, parent_textedit, tab_reports):
         """ Show list of image files.
@@ -109,25 +107,18 @@ class DialogCodeImage(QtWidgets.QDialog):
         # Need this otherwise small images are centred on screen, and affect context menu position points
         self.ui.graphicsView.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignTop)
         self.scene.installEventFilter(self)
-        font = f"font: {self.app.settings['fontsize']}pt "
-        font += '"' + self.app.settings['font'] + '";'
+        font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
-        tree_font = f"font: {self.app.settings['treefontsize']}pt "
-        tree_font += '"' + self.app.settings['font'] + '";'
+        tree_font = f'font: {self.app.settings["treefontsize"]}pt "{self.app.settings["font"]}";'
         self.ui.treeWidget.setStyleSheet(tree_font)
         self.ui.label_image.setStyleSheet(tree_font)  # Usually smaller font
         self.setWindowTitle(_("Image coding"))
         self.ui.horizontalSlider.valueChanged[int].connect(self.redraw_scene)
         self.ui.horizontalSlider.setToolTip(_("Key + or W zoom in. Key - or Q zoom out"))
-        # Icon images are 32x32 pixels within 36x36 pixel button
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(notepad_2_icon), "png")
-        self.ui.pushButton_memo.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_memo.setIcon(qta.icon('mdi6.text-box-edit-outline'))
         self.ui.pushButton_memo.pressed.connect(self.active_file_memo)
         self.ui.pushButton_memo.setEnabled(False)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_icon), "png")
-        self.ui.pushButton_export.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_export.setIcon(qta.icon('mdi6.export'))
         self.ui.pushButton_export.pressed.connect(self.export_html_file)
         self.ui.pushButton_export.setEnabled(False)
         self.ui.listWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
@@ -142,29 +133,16 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.ui.listWidget.installEventFilter(self)
         self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
-        # The buttons in the splitter are smaller 24x24 pixels
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(playback_next_icon_24), "png")
-        self.ui.pushButton_latest.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_latest.setIcon(qta.icon('mdi6.arrow-collapse-right'))
         self.ui.pushButton_latest.pressed.connect(self.go_to_latest_coded_file)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(playback_play_icon_24), "png")
-        self.ui.pushButton_next_file.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_next_file.setIcon(qta.icon('mdi6.arrow-right'))
         self.ui.pushButton_next_file.pressed.connect(self.go_to_next_file)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(notepad_2_icon_24), "png")
-        self.ui.pushButton_document_memo.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_document_memo.setIcon(qta.icon('mdi6.text-box-outline'))
         self.ui.pushButton_document_memo.pressed.connect(self.active_file_memo)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_color_grid_icon_24), "png")
-        self.ui.label_coded_area_icon.setPixmap(pm)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(tag_icon32), "png")
-        self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
+        self.ui.label_coded_area_icon.setPixmap(qta.icon('mdi6.grid').pixmap(22,22))
+        self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.tag-outline'))
         self.ui.pushButton_file_attributes.pressed.connect(self.get_files_from_attributes)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(star_icon32), "png")
-        self.ui.pushButton_important.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_important.setIcon(qta.icon('mdi6.star-outline'))
         self.ui.pushButton_important.pressed.connect(self.show_important_coded)
         try:
             s0 = int(self.app.settings['dialogcodeimage_splitter0'])
@@ -200,14 +178,12 @@ class DialogCodeImage(QtWidgets.QDialog):
         """ Show codes flagged as important. """
 
         self.important = not self.important
-        pm = QtGui.QPixmap()
         if self.important:
-            pm.loadFromData(QtCore.QByteArray.fromBase64(star_icon_yellow32), "png")
             self.ui.pushButton_important.setToolTip(_("Showing important codings"))
+            self.ui.pushButton_important.setIcon(qta.icon('mdi6.star'))
         else:
-            pm.loadFromData(QtCore.QByteArray.fromBase64(star_icon32), "png")
             self.ui.pushButton_important.setToolTip(_("Show codings flagged important"))
-        self.ui.pushButton_important.setIcon(QtGui.QIcon(pm))
+            self.ui.pushButton_important.setIcon(qta.icon('mdi6.star-outline'))
         self.redraw_scene()
 
     def get_coded_areas(self):
@@ -277,33 +253,23 @@ class DialogCodeImage(QtWidgets.QDialog):
         ok = ui.exec()
         if not ok:
             self.attributes = temp_attributes
-            pm = QtGui.QPixmap()
-            pm.loadFromData(QtCore.QByteArray.fromBase64(tag_icon32), "png")
-            self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
+            self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.tag-outline'))
             self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
             if self.attributes:
-                pm = QtGui.QPixmap()
-                pm.loadFromData(QtCore.QByteArray.fromBase64(tag_iconyellow32), "png")
-                self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
+                self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.tag'))
             return
         self.attributes = ui.parameters
         if len(self.attributes) == 1:
-            pm = QtGui.QPixmap()
-            pm.loadFromData(QtCore.QByteArray.fromBase64(tag_icon32), "png")
-            self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
+            self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.tag-outline'))
             self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
             self.get_files()
             return
         if not ui.result_file_ids:
             Message(self.app, _("Nothing found") + " " * 20, _("No matching files found")).exec()
-            pm = QtGui.QPixmap()
-            pm.loadFromData(QtCore.QByteArray.fromBase64(tag_icon32), "png")
-            self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
+            self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.tag-outline'))
             self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
             return
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(tag_iconyellow32), "png")
-        self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.tag-outline'))
         self.ui.pushButton_file_attributes.setToolTip(ui.tooltip_msg)
         self.get_files(ui.result_file_ids)
 
