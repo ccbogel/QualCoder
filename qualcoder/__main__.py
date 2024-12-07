@@ -23,7 +23,6 @@ https://qualcoder.wordpress.com/
 import base64
 import configparser
 import datetime
-import time
 import gettext
 import json  # To get the latest GitHub release information
 import logging
@@ -33,7 +32,6 @@ import platform
 import shutil
 import sys
 import sqlite3
-import traceback
 import urllib.request
 import webbrowser
 from copy import copy
@@ -50,7 +48,6 @@ from qualcoder.code_color_scheme import DialogCodeColorScheme
 from qualcoder.code_organiser import CodeOrganiser
 from qualcoder.code_text import DialogCodeText
 from qualcoder.code_pdf import DialogCodePdf
-from qualcoder.GUI.base64_helper import *
 from qualcoder.GUI.base64_droidsansmono_helper import DroidSansMono
 from qualcoder.GUI.ui_main import Ui_MainWindow
 from qualcoder.helpers import Message, ImportPlainTextCodes
@@ -92,7 +89,6 @@ except Exception as e:
     print(e)
 
 qualcoder_version = "QualCoder 3.6"
-
 path = os.path.abspath(os.path.dirname(__file__))
 home = os.path.expanduser('~')
 if not os.path.exists(home + '/.qualcoder'):
@@ -181,7 +177,8 @@ class App(object):
     last_export_directory = ""
     ai = None
     ai_models = []
-    ai_embedding_function = None # This is the sentence transformer embedding function. It is stored here so it must not be reloaded every time a project is opened. 
+    # This is the sentence transformer embedding function. It is stored here so it must not be reloaded every time a project is opened.
+    ai_embedding_function = None
     
     def __init__(self):
         self.conn = None
@@ -294,7 +291,7 @@ class App(object):
         self.conn = sqlite3.connect(os.path.join(project_path, 'data.qda'))
         
     def get_project_memo(self) -> str:
-        # This might be called from a different thread (ai asynch operations), so we have to create a new database connection
+        # Might be called from a different thread (ai asynch operations), so have to create a new database connection
         conn = sqlite3.connect(os.path.join(self.project_path, 'data.qda'))
         cur = conn.cursor()
         cur.execute("select memo from project")
@@ -363,11 +360,11 @@ class App(object):
             res.append(dict(zip(keys, row)))
         return res
     
-    def get_text_fulltext(self, id, start_pos, length) -> str:
-        """Extracts text from the database in the document with the given id.
+    def get_text_fulltext(self, id_, start_pos, length) -> str:
+        """Extracts text from the database in the document with the given id_.
 
         Args:
-            id (int): document id
+            id_ (int): document id
             start_pos (int): position of the first character
             length (int): number of characters to retireve
 
@@ -375,7 +372,7 @@ class App(object):
             str: text
         """
         cur = self.conn.cursor()
-        sql = f"SELECT fulltext FROM source WHERE id={id}"
+        sql = f"SELECT fulltext FROM source WHERE id={id_}"
         cur.execute(sql)
         res = cur.fetchone()
         if res is None:
@@ -578,7 +575,7 @@ class App(object):
                     'api_key': config[section]['api_key']
                 }
                 ai_models.append(model)
-        if len(ai_models) == 0: # no models loaded, create default
+        if len(ai_models) == 0:  # no models loaded, create default
             ai_models = self.ai_models_create_defaults()
         return result, ai_models
 
@@ -636,6 +633,7 @@ university, ORCID, GitHub, or Google account.""",
         timestamp format.
         dialog_crossovers IS dialog relations
         :param settings_data:  dictionary of most or all settings
+        :param ai_models:
         :return: dictionary of all settings
         """
 
@@ -698,7 +696,7 @@ university, ORCID, GitHub, or Google account.""",
                     settings_data[key] = '0'
                     
         # Check AI models
-        if len(ai_models) == 0: # no models loaded, create default
+        if len(ai_models) == 0:  # No models loaded, create default
             ai_models = self.ai_models_create_defaults()
 
         # Write out new ini file, if needed
@@ -874,7 +872,7 @@ university, ORCID, GitHub, or Google account.""",
         if self.settings['stylesheet'] == "native":
             palette = QtWidgets.QApplication.instance().palette()
             return palette.color(QtGui.QPalette.ColorRole.Highlight).name(QtGui.QColor.NameFormat.HexRgb)
-        return '#f89407' # default
+        return '#f89407'  # Default
 
     def load_settings(self):
         result, ai_models = self._load_config_ini()
@@ -1133,10 +1131,11 @@ class MainWindow(QtWidgets.QMainWindow):
         self.heartbeat_thread = None
         self.heartbeat_worker = None
         self.lock_file_path = ''
+        self.ai_chat_window = None
         
         if platform.system() == "Windows" and self.app.settings['stylesheet'] == "native":
-            # Make 'Fusion' the standard native style on Windows, as Qt recommends here: https://www.qt.io/blog/dark-mode-on-windows-11-with-qt-6.5 
-            # The default 'Windows' style seems partially broken at the moment, especially in combination with the native dark mode. 
+            # Make 'Fusion' the standard native style on Windows https://www.qt.io/blog/dark-mode-on-windows-11-with-qt-6.5
+            # The default 'Windows' style seems partially broken at the moment, in combination with the native dark mode.
             # On macOS, 'Fusion' is the default style anyways (automatically chosen by Qt).
             QtWidgets.QApplication.instance().setStyle("Fusion")
        
@@ -1165,7 +1164,7 @@ class MainWindow(QtWidgets.QMainWindow):
         QtWidgets.QApplication.processEvents() 
         # Setup AI
         global AiLLM
-        from qualcoder.ai_llm import AiLLM # import after showing the UI because this takes several seconds
+        from qualcoder.ai_llm import AiLLM  # import after showing the UI because this takes several seconds
         self.app.ai = AiLLM(self.app, self.ui.textEdit)
         # First start? Ask if user wants to enable ai integration or not
         if self.app.settings['ai_first_startup'] == 'True' and self.app.settings['ai_enable'] == 'False':
@@ -1177,7 +1176,7 @@ Click "Yes" to start now.')
             msg_box = QtWidgets.QMessageBox(self)
             msg_box.setWindowTitle(_('AI Integration'))
             msg_box.setText(msg)
-            msg_box.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            msg_box.setStyleSheet(f"* {{font-size:{self.app.settings['fontsize']}pt}} ")
             msg_box.addButton(QtWidgets.QMessageBox.StandardButton.Yes)
             msg_box.addButton(QtWidgets.QMessageBox.StandardButton.No)
             msg_box.addButton(QtWidgets.QMessageBox.StandardButton.Help)
@@ -1187,7 +1186,7 @@ Click "Yes" to start now.')
                 if reply == QtWidgets.QMessageBox.StandardButton.Help:
                     webbrowser.open('https://github.com/ccbogel/QualCoder/wiki/2.3.-AI-Setup')                
             if reply == QtWidgets.QMessageBox.StandardButton.Yes:
-                self.ai_setup_wizard() # (will also init the llm)
+                self.ai_setup_wizard()  # (will also init the llm)
         else:
             self.app.ai.init_llm(self)      
         self.app.settings['ai_first_startup'] = 'False'
@@ -1292,7 +1291,6 @@ Click "Yes" to start now.')
         self.settings_report()
         
         self.ui.tabWidget.setCurrentIndex(0)
-        
         self.ai_chat()
         
     def fill_recent_projects_menu_actions(self):
@@ -1795,7 +1793,7 @@ Click "Yes" to start now.')
         self.tab_layout_helper(self.ui.tab_coding, ui)
 
     def ai_chat(self):
-        """ Add AI chat to tab"""
+        """ Add AI chat to tab. """
 
         self.ai_chat_window = DialogAIChat(self.app, self.ui.textEdit, self)
         self.tab_layout_helper(self.ui.tab_ai_chat, self.ai_chat_window)
@@ -2133,7 +2131,7 @@ Click "Yes" to start now.')
             if self.app.settings['ai_enable'] == 'True':
                 # AI is newly enabled:
                 self.app.ai.init_llm(self, rebuild_vectorstore=False)
-            else: # AI is disabled
+            else:  # AI is disabled
                 self.app.ai.close()
         elif int(current_ai_model_index) < 0:
             # no model selected
@@ -2175,7 +2173,7 @@ Click "Yes" to start now.')
                      '**Methodology:** \n\n'
                      '**Participants and data collected:** \n\n'
                      '#####\n'
-                     '(Everything below this mark is considered to be a personal note and will never be sent to the AI.)')
+                     '(Everything below this mark is a personal note and will never be sent to the AI.)')
         ui = DialogMemo(self.app, _("Memo for project ") + self.app.project_name,
                         memo)
         ui.exec()
@@ -2707,7 +2705,7 @@ Click "Yes" to start now.')
             for i in reversed(range(contents.count())):
                 contents.itemAt(i).widget().close()
                 contents.itemAt(i).widget().setParent(None)
-        # Added if statement for the first opening of QualCoder. Otherwise, looks odd closing a project that is not there.
+        # Added if statement for the first opening of QualCoder. Looks odd closing a project that is not there.
         if self.app.project_name != "":
             self.ui.textEdit.append(_("Closing project: ") + self.app.project_name)
             self.ui.textEdit.append("========\n")
@@ -2789,7 +2787,7 @@ Click "Yes" to start now.')
             Message(self.app, _('AI Setup Wizard'), msg).exec() 
             return
         self.ui.textEdit.append(_('AI: Setup Wizard'))
-        QtWidgets.QApplication.processEvents() # update ui
+        QtWidgets.QApplication.processEvents()  # update ui
         self.app.ai.init_llm(self, rebuild_vectorstore=True, enable_ai=True)
         self.ui.textEdit.append(_('AI: Setup Wizard finished'))
         
@@ -2812,11 +2810,11 @@ Click "Yes" to start now.')
         mb = QtWidgets.QMessageBox(self)
         mb.setWindowTitle(_('Rebuild AI Memory'))
         mb.setText(msg)
-        mb.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Ok|
+        mb.setStandardButtons(QtWidgets.QMessageBox.StandardButton.Ok |
                             QtWidgets.QMessageBox.StandardButton.Abort)
-        mb.setStyleSheet('* {font-size: ' + str(self.app.settings['fontsize']) + 'pt}')            
+        mb.setStyleSheet(f'* {{font-size: {self.app.settings["fontsize"]}pt}}')
         if mb.exec() == QtWidgets.QMessageBox.StandardButton.Ok: 
-            self.ui.tabWidget.setCurrentIndex(0) # show action log
+            self.ui.tabWidget.setCurrentIndex(0)  # Show action log
             self.app.ai.sources_vectorstore.init_vectorstore(rebuild=True)
     
     def ai_prompts(self):
@@ -2838,7 +2836,6 @@ Click "Yes" to start now.')
             Message(self.app, _('Rebuild AI Memory'), msg).exec() 
             return
         self.text_coding(task='ai_search')
-        
 
     def get_latest_github_release(self):
         """ Get latest github release.
@@ -2878,8 +2875,9 @@ def gui():
     stylesheet = qual_app.merge_settings_with_default_stylesheet(settings)
     app.setStyleSheet(stylesheet)
     if sys.platform != 'darwin':
+        qualcoder32_icon = b'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CiAgICB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIKICAgIHhtbG5zOnN0RXZ0PSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VFdmVudCMiCiAgICB4bWxuczpzdFJlZj0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL3NUeXBlL1Jlc291cmNlUmVmIyIKICAgIHhtbG5zOnBsdXM9Imh0dHA6Ly9ucy51c2VwbHVzLm9yZy9sZGYveG1wLzEuMC8iCiAgICB4bWxuczpHSU1QPSJodHRwOi8vd3d3LmdpbXAub3JnL3htcC8iCiAgICB4bWxuczpkYz0iaHR0cDovL3B1cmwub3JnL2RjL2VsZW1lbnRzLzEuMS8iCiAgICB4bWxuczpleGlmPSJodHRwOi8vbnMuYWRvYmUuY29tL2V4aWYvMS4wLyIKICAgIHhtbG5zOnBob3Rvc2hvcD0iaHR0cDovL25zLmFkb2JlLmNvbS9waG90b3Nob3AvMS4wLyIKICAgIHhtbG5zOnRpZmY9Imh0dHA6Ly9ucy5hZG9iZS5jb20vdGlmZi8xLjAvIgogICAgeG1sbnM6eG1wPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvIgogICB4bXBNTTpEb2N1bWVudElEPSJhZG9iZTpkb2NpZDpwaG90b3Nob3A6ZWU1YjRlNWUtNGU1MS02NzRkLTk1ZDItNTIwMzA3YWQ0MWFhIgogICB4bXBNTTpJbnN0YW5jZUlEPSJ4bXAuaWlkOmJjMTRjZDA2LTQzYzItNDBhOS1iOGExLWY3NjZjMGI0NzVkMSIKICAgeG1wTU06T3JpZ2luYWxEb2N1bWVudElEPSJ4bXAuZGlkOmE1ZTMzYzY4LTAyNGEtNzk0MS05N2VmLWZhN2NjODExODdlOSIKICAgR0lNUDpBUEk9IjIuMCIKICAgR0lNUDpQbGF0Zm9ybT0iTGludXgiCiAgIEdJTVA6VGltZVN0YW1wPSIxNjM2MTUzNzY5NTY3OTIyIgogICBHSU1QOlZlcnNpb249IjIuMTAuMTgiCiAgIGRjOkZvcm1hdD0iaW1hZ2UvcG5nIgogICBleGlmOlBpeGVsWERpbWVuc2lvbj0iNTEyIgogICBleGlmOlBpeGVsWURpbWVuc2lvbj0iNTEyIgogICBwaG90b3Nob3A6Q29sb3JNb2RlPSIzIgogICB0aWZmOk9yaWVudGF0aW9uPSIxIgogICB0aWZmOlJlc29sdXRpb25Vbml0PSIyIgogICB0aWZmOlhSZXNvbHV0aW9uPSI3MjAwMDAvMTAwMDAiCiAgIHRpZmY6WVJlc29sdXRpb249IjcyMDAwMC8xMDAwMCIKICAgeG1wOkNyZWF0ZURhdGU9IjIwMjEtMTEtMDVUMTE6MzU6NDkrMDE6MDAiCiAgIHhtcDpDcmVhdG9yVG9vbD0iR0lNUCAyLjEwIgogICB4bXA6TWV0YWRhdGFEYXRlPSIyMDIxLTExLTA1VDEyOjM0OjMxKzAxOjAwIgogICB4bXA6TW9kaWZ5RGF0ZT0iMjAyMS0xMS0wNVQxMjozNDozMSswMTowMCI+CiAgIDxpcHRjRXh0OkxvY2F0aW9uQ3JlYXRlZD4KICAgIDxyZGY6QmFnLz4KICAgPC9pcHRjRXh0OkxvY2F0aW9uQ3JlYXRlZD4KICAgPGlwdGNFeHQ6TG9jYXRpb25TaG93bj4KICAgIDxyZGY6QmFnLz4KICAgPC9pcHRjRXh0OkxvY2F0aW9uU2hvd24+CiAgIDxpcHRjRXh0OkFydHdvcmtPck9iamVjdD4KICAgIDxyZGY6QmFnLz4KICAgPC9pcHRjRXh0OkFydHdvcmtPck9iamVjdD4KICAgPGlwdGNFeHQ6UmVnaXN0cnlJZD4KICAgIDxyZGY6QmFnLz4KICAgPC9pcHRjRXh0OlJlZ2lzdHJ5SWQ+CiAgIDx4bXBNTTpIaXN0b3J5PgogICAgPHJkZjpTZXE+CiAgICAgPHJkZjpsaQogICAgICBzdEV2dDphY3Rpb249ImNyZWF0ZWQiCiAgICAgIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6YTVlMzNjNjgtMDI0YS03OTQxLTk3ZWYtZmE3Y2M4MTE4N2U5IgogICAgICBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIgogICAgICBzdEV2dDp3aGVuPSIyMDIxLTExLTA1VDExOjM1OjQ5KzAxOjAwIi8+CiAgICAgPHJkZjpsaQogICAgICBzdEV2dDphY3Rpb249ImNvbnZlcnRlZCIKICAgICAgc3RFdnQ6cGFyYW1ldGVycz0iZnJvbSBpbWFnZS9wbmcgdG8gYXBwbGljYXRpb24vdm5kLmFkb2JlLnBob3Rvc2hvcCIvPgogICAgIDxyZGY6bGkKICAgICAgc3RFdnQ6YWN0aW9uPSJzYXZlZCIKICAgICAgc3RFdnQ6Y2hhbmdlZD0iLyIKICAgICAgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDo0NTJhODhhNi1iYWVjLTgzNDktODZjNy0xMWM0NWVmY2IyNDEiCiAgICAgIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkFkb2JlIFBob3Rvc2hvcCBDQyAoV2luZG93cykiCiAgICAgIHN0RXZ0OndoZW49IjIwMjEtMTEtMDVUMTI6MjQ6MTMrMDE6MDAiLz4KICAgICA8cmRmOmxpCiAgICAgIHN0RXZ0OmFjdGlvbj0ic2F2ZWQiCiAgICAgIHN0RXZ0OmNoYW5nZWQ9Ii8iCiAgICAgIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6MDU3OGM4ZTMtYjllNC03ZjRiLWEyOGMtYWExNmYzOGJmZjA5IgogICAgICBzdEV2dDpzb2Z0d2FyZUFnZW50PSJBZG9iZSBQaG90b3Nob3AgQ0MgKFdpbmRvd3MpIgogICAgICBzdEV2dDp3aGVuPSIyMDIxLTExLTA1VDEyOjM0OjMxKzAxOjAwIi8+CiAgICAgPHJkZjpsaQogICAgICBzdEV2dDphY3Rpb249ImNvbnZlcnRlZCIKICAgICAgc3RFdnQ6cGFyYW1ldGVycz0iZnJvbSBhcHBsaWNhdGlvbi92bmQuYWRvYmUucGhvdG9zaG9wIHRvIGltYWdlL3BuZyIvPgogICAgIDxyZGY6bGkKICAgICAgc3RFdnQ6YWN0aW9uPSJkZXJpdmVkIgogICAgICBzdEV2dDpwYXJhbWV0ZXJzPSJjb252ZXJ0ZWQgZnJvbSBhcHBsaWNhdGlvbi92bmQuYWRvYmUucGhvdG9zaG9wIHRvIGltYWdlL3BuZyIvPgogICAgIDxyZGY6bGkKICAgICAgc3RFdnQ6YWN0aW9uPSJzYXZlZCIKICAgICAgc3RFdnQ6Y2hhbmdlZD0iLyIKICAgICAgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDo1ZGM3ZDg0Ny1kNGRhLTk1NGUtYTQ0NC00NzhmOGVhZjY3MDEiCiAgICAgIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkFkb2JlIFBob3Rvc2hvcCBDQyAoV2luZG93cykiCiAgICAgIHN0RXZ0OndoZW49IjIwMjEtMTEtMDVUMTI6MzQ6MzErMDE6MDAiLz4KICAgICA8cmRmOmxpCiAgICAgIHN0RXZ0OmFjdGlvbj0ic2F2ZWQiCiAgICAgIHN0RXZ0OmNoYW5nZWQ9Ii8iCiAgICAgIHN0RXZ0Omluc3RhbmNlSUQ9InhtcC5paWQ6YzJlMmQyMmEtZWUyNy00MTEzLTg0OTQtYTRhZDYzMjhkOTBmIgogICAgICBzdEV2dDpzb2Z0d2FyZUFnZW50PSJHaW1wIDIuMTAgKExpbnV4KSIKICAgICAgc3RFdnQ6d2hlbj0iKzExOjAwIi8+CiAgICA8L3JkZjpTZXE+CiAgIDwveG1wTU06SGlzdG9yeT4KICAgPHhtcE1NOkRlcml2ZWRGcm9tCiAgICBzdFJlZjpkb2N1bWVudElEPSJhZG9iZTpkb2NpZDpwaG90b3Nob3A6N2YxMDM5N2ItZTBmZi05NzRlLThkMjktY2VmZDU3MGFiNDFiIgogICAgc3RSZWY6aW5zdGFuY2VJRD0ieG1wLmlpZDowNTc4YzhlMy1iOWU0LTdmNGItYTI4Yy1hYTE2ZjM4YmZmMDkiCiAgICBzdFJlZjpvcmlnaW5hbERvY3VtZW50SUQ9InhtcC5kaWQ6YTVlMzNjNjgtMDI0YS03OTQxLTk3ZWYtZmE3Y2M4MTE4N2U5Ii8+CiAgIDxwbHVzOkltYWdlU3VwcGxpZXI+CiAgICA8cmRmOlNlcS8+CiAgIDwvcGx1czpJbWFnZVN1cHBsaWVyPgogICA8cGx1czpJbWFnZUNyZWF0b3I+CiAgICA8cmRmOlNlcS8+CiAgIDwvcGx1czpJbWFnZUNyZWF0b3I+CiAgIDxwbHVzOkNvcHlyaWdodE93bmVyPgogICAgPHJkZjpTZXEvPgogICA8L3BsdXM6Q29weXJpZ2h0T3duZXI+CiAgIDxwbHVzOkxpY2Vuc29yPgogICAgPHJkZjpTZXEvPgogICA8L3BsdXM6TGljZW5zb3I+CiAgPC9yZGY6RGVzY3JpcHRpb24+CiA8L3JkZjpSREY+CjwveDp4bXBtZXRhPgogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAKICAgICAgICAgICAgICAgICAgICAgICAgICAgCjw/eHBhY2tldCBlbmQ9InciPz7mcyShAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH5QsFFwkdYf6D1wAAA2NJREFUSMftVl9IU1EYP7fd1VX8y8r/yMAtcoWDwGES5EAoTGeUkFGSrD0k+rKRCQ7qRV+ESkEMQXQPqSAo+K8xZuGQ8s9Q9CpqugkhUyduNtfm5p07PUyOh+t0+iC9+OM83Hu+7/f9zvnu+b5zCQghOE9cAueMC4H/L0AGnTWZTLOzszMzM16vFwDA5XLFYnFGRoZAICAIwu/bt61s2pY3HSvbft8+ACCKHxubdvXa9UQuxWWFIljH1GQyNTQ0NDY2BhVWKBQvH7/wfLV71z1HrZwoMu2ZKE164xLJCS4wODiYn58fctfK269z+Hc5RPD0Rt6MkbzJoSLD2AJ9fX2FhYXILzMzUy6XJycnEwSxtrbW0dFhMBiQtUL86lFOQVx2EhnG9fv8mxNr7mUnsoYLI7PVuVciKAAAgBBCCBcXF/FVaDSa3d1diGFvb0+r1eI+BoMBd9iYt+jLewaedATG6KdvgXkAIfT5fAqFAjF7enrgMZicnERuEonE7XbjVve2C9ewTP8+EJibm0M0lUrl9/vh8Whvb0fOQ0NDLKt1wYIERmp1BwLNzc2IMzU1BU+E3W5HzlVVVTAUAIRQLpcjjtPpDMnB8xnSmQQAtLa2IoLD4TAajVarlWEYiqIEAkF6ejpFUfjnjY+PR882m43H452hklNSUlgzEomkpqZGKpWSJIlWfVhHBBGiaiCExcXFIYtLrVbv7OwEdi2TyU6fIgAhbGpqQgSRSFRXV9fV1dXZ2alSqXCNkpKS9fX1hYUFNFNZWXkqgenpacSprq7GzVtbW/X19Xi6SktL0ater2eF+2Ox//wwFBhTmh8HAgzD4Fnq7e1l0fr7+48mLSsri1VoXpdnWD2A6mBl5NeBAIRwfn4eJ7e0tLhcLpys0+lYAuPj47iDc9NheDeIon9/2+fzMhDCw2bX3d1dVFSE+Hw+X6lU8vl8DodjsVja2trGxsZwgfLyctmDgoSkhPC/lx3Ltg3t6mHfjiTv1OZGJ8Wy2zWroZ4SXx5+jqGiDw9+NFfyXhqbygtyZcpksqWlpYqKiuNilZWVDQ8Pn3CsE/NS733MQ9GD3GgBmM1mmqZpmvZ4PPiVKRQKAQAMw9A0bRydMC+ZV/Xm5/efxgkSeKL4hFvJEXFRIa7Mi9+WC4Gz4x8imSOgwBMa1AAAAABJRU5ErkJggg=='
         pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(qualcoder32), "png")
+        pm.loadFromData(QtCore.QByteArray.fromBase64(qualcoder32_icon), "png")
         app.setWindowIcon(QtGui.QIcon(pm))
 
     # Use two character language setting
@@ -2889,14 +2887,12 @@ def gui():
     # Need to get the external data directory for PyInstaller
     if getattr(sys, 'frozen', False) and hasattr(sys, '_MEIPASS'):
         ext_data_dir = sys._MEIPASS
-        # print("ext data dir: ", ext_data_dir)
         locale_dir = os.path.join(ext_data_dir, 'qualcoder')
         locale_dir = os.path.join(locale_dir, 'locale')
         # locale_dir = os.path.join(locale_dir, lang)
         # locale_dir = os.path.join(locale_dir, 'LC_MESSAGES')
-    # print("locale dir: ", locale_dir)
     # print("LISTDIR: ", os.listdir(locale_dir))
-    install_language(lang) # install language files on every start, so updates are reflected
+    install_language(lang)  # Install language files on every start, so updates are reflected
     # getlang = gettext.translation('en', localedir=locale_dir, languages=['en'])
     translator = gettext.translation(domain='default', localedir=locale_dir, fallback=True)
     if lang in ["de", "es", "fr", "it", "pt"]:
@@ -2915,10 +2911,10 @@ def gui():
             qm = os.path.join(qm, f"app_{lang}.qm")
             print("qm file located at: ", qm)
             qt_translator.load(qm)
-            #if qt_translator.isEmpty():
-                # print(f"Installing app_{lang}.qm to .qualcoder folder")
-            #    install_language(lang)
-            #    qt_translator.load(qm)
+            '''if qt_translator.isEmpty():
+                print(f"Installing app_{lang}.qm to .qualcoder folder")
+                install_language(lang)
+                qt_translator.load(qm)'''
         app.installTranslator(qt_translator)
         '''Below for pyinstaller and obtaining mo data file from .qualcoder folder
         A solution to this [Errno 13] Permission denied:
@@ -2953,7 +2949,8 @@ def gui():
         ex.open_project(path_=proj_path)
 
     sys.exit(app.exec())
-    
+
+
 def install_language(lang):
     """ Mainly for pyinstaller on Windows, as cannot access language data files.
     So, recreate them from base64 data into home/.qualcoder folder.
