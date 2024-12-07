@@ -3737,7 +3737,6 @@ class DialogViewAV(QtWidgets.QDialog):
         self.ui.pushButton_next.setIcon(qta.icon('mdi6.arrow-right'))
         self.ui.pushButton_next.pressed.connect(self.move_to_next_search_text)
         self.ui.pushButton_next.setEnabled(False)
-        self.ui.pushButton_speechtotext.hide()  # Superceeded TODO remove from ui
         self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
         # My solution to getting gui mouse events by putting vlc video in another dialog
         self.ddialog = QtWidgets.QDialog()
@@ -3752,9 +3751,6 @@ class DialogViewAV(QtWidgets.QDialog):
         # NOT using QVideoWidget - too difficult to use
         self.ddialog.dframe = QtWidgets.QFrame(self.ddialog)
         self.ddialog.dframe.setObjectName("frame")
-        # TODO commented out code does not work
-        '''if platform.system() == "Darwin":  # for MacOS
-            self.ddialog.dframe = QtWidgets.QMacCocoaViewContainer(0)'''
         self.palette = self.ddialog.dframe.palette()
         self.palette.setColor(QtGui.QPalette.ColorRole.Window, QColor(30, 30, 30))
         self.ddialog.dframe.setPalette(self.palette)
@@ -3819,7 +3815,7 @@ class DialogViewAV(QtWidgets.QDialog):
         self.media.parse()
         self.mediaplayer.video_set_mouse_input(False)
         self.mediaplayer.video_set_key_input(False)
-        # TODO consider using QVideoWidget
+        # Did not use QVideoWidget - tried and did not work well
         # The media player has to be connected to the QFrame (otherwise the
         # video would be displayed in it's own window). This is platform
         # specific, so we must give the ID of the QFrame (or similar object) to
