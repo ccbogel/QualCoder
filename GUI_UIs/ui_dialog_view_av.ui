@@ -462,25 +462,6 @@ red underline = Assigned to code or annotation</string>
        <set>Qt::AlignCenter</set>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_speechtotext">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="geometry">
-       <rect>
-        <x>430</x>
-        <y>3</y>
-        <width>28</width>
-        <height>28</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>Convert speech to text using online service</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
     </widget>
    </item>
    <item row="8" column="0">
@@ -527,7 +508,6 @@ red underline = Assigned to code or annotation</string>
   <tabstop>lineEdit_search</tabstop>
   <tabstop>pushButton_previous</tabstop>
   <tabstop>pushButton_next</tabstop>
-  <tabstop>pushButton_speechtotext</tabstop>
  </tabstops>
  <resources/>
  <connections/>
