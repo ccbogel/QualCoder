@@ -186,13 +186,13 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.pushButton_document_memo.setIcon(qta.icon('mdi6.text-box-outline'))
         self.ui.pushButton_document_memo.pressed.connect(self.file_memo)
         # This function does not work
-        self.ui.pushButton_show_selected_code.setIcon(qta.icon('mdi6.eye'))# TODO remove ui
+        '''self.ui.pushButton_show_selected_code.setIcon(qta.icon('mdi6.eye'))# TODO remove ui
         #self.ui.pushButton_show_selected_code.pressed.connect(self.show_selected_code)
         #TODO use to show only this coding
         self.ui.pushButton_show_selected_code.hide()
-
         self.ui.pushButton_show_all_codings.setIcon(qta.icon('mdi6.grid-large'))
-        self.ui.pushButton_show_all_codings.pressed.connect(self.show_all_codes_in_text)
+        self.ui.pushButton_show_all_codings.pressed.connect(self.show_all_codes_in_text)'''
+
         self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
         self.ui.lineEdit_search.setEnabled(False)
         self.ui.checkBox_search_case.stateChanged.connect(self.search_for_text)
@@ -222,7 +222,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.treeWidget.viewport().installEventFilter(self)
         self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
-        self.ui.treeWidget.itemClicked.connect(self.fill_code_label_undo_show_selected_code)
+        self.ui.treeWidget.itemClicked.connect(self.fill_code_label)
         self.ui.textEdit_2.setReadOnly(True)  # Code examples
         self.ui.splitter.setSizes([150, 400, 150])
         self.ui.splitter_2.setSizes([100, 0])
@@ -373,7 +373,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.pushButton_file_attributes.setToolTip(ui.tooltip_msg)
         self.get_files(ui.result_file_ids)
 
-    def fill_code_label_undo_show_selected_code(self):
+    def fill_code_label(self):
         """ Fill code label with currently selected item's code name and colour.
          Also, if text or graphics textbox(es) is highlighted, assign the text to this code.
 
@@ -1402,9 +1402,9 @@ class DialogCodePdf(QtWidgets.QWidget):
             if key == QtCore.Qt.Key.Key_5:
                 self.get_files_from_attributes()
                 return
-            if key == QtCore.Qt.Key.Key_8:
-                self.show_all_codes_in_text()
-                return
+            '''if key == QtCore.Qt.Key.Key_8:
+                self.show_all_codes_in_text()  # Not used
+                return'''
             if key == QtCore.Qt.Key.Key_9:
                 self.show_important_coded()
                 return
@@ -1606,9 +1606,9 @@ class DialogCodePdf(QtWidgets.QWidget):
         """
 
         if object_ is self.ui.treeWidget.viewport():
-            # If a show selected code was active, then clicking on a code in code tree, shows all codes and all tooltips
+            '''# If a show selected code was active, then clicking on a code in code tree, shows all codes and all tooltips
             if event.type() == QtCore.QEvent.Type.MouseButtonPress:
-                self.show_all_codes_in_text()
+                self.show_all_codes_in_text()'''
             if event.type() == QtCore.QEvent.Type.Drop:
                 item = self.ui.treeWidget.currentItem()
                 # event position is QPointF, itemAt requires toPoint
@@ -1722,12 +1722,12 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.get_coded_text_update_eventfilter_tooltips()
         self.display_page_text_objects()
 
-    def show_all_codes_in_text(self):
+    '''def show_all_codes_in_text(self):
         """ Opposes show selected code methods.
         Highlights all the codes in the text. """
 
         self.ui.pushButton_show_all_codings.setIcon(qta.icon('mdi6.grid-large'))
-        self.get_coded_text_update_eventfilter_tooltips()
+        self.get_coded_text_update_eventfilter_tooltips()'''
 
     def coded_media_dialog(self, code_dict):
         """ Display all coded media for this code, in a separate modal dialog.
@@ -2406,7 +2406,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         # self.text = file_result['fulltext'][self.file_['start']:self.file_['end']]  # tod remove
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
-        self.show_all_codes_in_text()  # Deactivates the show_selected_code if this is active
+        #self.show_all_codes_in_text()  # Deactivates the show_selected_code if this is active. Show selected Not used
         self.setWindowTitle(_("Code text: ") + self.file_['name'])
         self.ui.lineEdit_search.setEnabled(True)
         self.ui.checkBox_search_case.setEnabled(True)
@@ -2605,7 +2605,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.scene.setSceneRect(QtCore.QRectF(0, 0, page_rect[2], page_rect[3]))
         self.ui.graphicsView.setScene(self.scene)
         self.scene.setBackgroundBrush(QtCore.Qt.GlobalColor.white)
-        self.scene.installEventFilter(self)  # TODO Later
+        self.scene.installEventFilter(self)
         gray_pen = QtGui.QPen(QtCore.Qt.GlobalColor.gray, 1, QtCore.Qt.PenStyle.SolidLine)
         self.scene.addRect(0, 0, page_rect[2], page_rect[3], gray_pen)
         counter = 0
