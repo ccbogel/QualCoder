@@ -1779,7 +1779,7 @@ Click "Yes" to start now.')
     def code_color_scheme(self):
         """ Edit code color scheme. """
 
-        ui = DialogCodeColorScheme(self.app, self.ui.textEdit, self.ui.tab_reports)
+        ui = DialogCodeColorScheme(self.app, self.ui.textEdit)
         ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
         self.tab_layout_helper(self.ui.tab_coding, ui)
 
