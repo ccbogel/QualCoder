@@ -70,7 +70,7 @@
       <property name="geometry">
        <rect>
         <x>543</x>
-        <y>34</y>
+        <y>0</y>
         <width>51</width>
         <height>51</height>
        </rect>
@@ -124,7 +124,7 @@
      <widget class="QLabel" name="label_exports">
       <property name="geometry">
        <rect>
-        <x>831</x>
+        <x>741</x>
         <y>89</y>
         <width>24</width>
         <height>24</height>
@@ -140,7 +140,7 @@
      <widget class="QComboBox" name="comboBox_export">
       <property name="geometry">
        <rect>
-        <x>860</x>
+        <x>770</x>
         <y>86</y>
         <width>91</width>
         <height>30</height>
@@ -296,7 +296,7 @@
      <widget class="QLineEdit" name="lineEdit_search_results">
       <property name="geometry">
        <rect>
-        <x>617</x>
+        <x>537</x>
         <y>85</y>
         <width>161</width>
         <height>30</height>
@@ -309,7 +309,7 @@
      <widget class="QLabel" name="label_search_results">
       <property name="geometry">
        <rect>
-        <x>617</x>
+        <x>537</x>
         <y>58</y>
         <width>101</width>
         <height>22</height>
@@ -328,7 +328,7 @@
      <widget class="QPushButton" name="pushButton_search_next">
       <property name="geometry">
        <rect>
-        <x>780</x>
+        <x>700</x>
         <y>85</y>
         <width>34</width>
         <height>30</height>
@@ -377,7 +377,7 @@
      <widget class="QLabel" name="label_search_export">
       <property name="geometry">
        <rect>
-        <x>830</x>
+        <x>740</x>
         <y>58</y>
         <width>121</width>
         <height>22</height>
@@ -391,6 +391,22 @@
       </property>
       <property name="wordWrap">
        <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBox_variables">
+      <property name="geometry">
+       <rect>
+        <x>870</x>
+        <y>90</y>
+        <width>171</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export file  or case variables in columns for CSV or XLSX export&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string>Variables CSV / XLSX</string>
       </property>
      </widget>
     </widget>
