@@ -97,20 +97,17 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui = Ui_Dialog_reportCodings()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        font = f"font: {self.app.settings['fontsize']}pt "
-        font += f'"{self.app.settings["font"]}";'
+        font = f'font: {self.app.settings["fontsize"]}pt {self.app.settings["font"]}";'
         self.setStyleSheet(font)
-        treefont = f'font: {self.app.settings["treefontsize"]}pt '
-        treefont += f'"{self.app.settings["font"]}";'
-        self.ui.treeWidget.setStyleSheet(treefont)
-        doc_font = f'font: {self.app.settings["docfontsize"]}pt '
-        doc_font += f'"{self.app.settings["font"]}";'
+        tree_font = f'font: {self.app.settings["treefontsize"]}pt "{self.app.settings["font"]}";'
+        self.ui.treeWidget.setStyleSheet(tree_font)
+        doc_font = f'font: {self.app.settings["docfontsize"]}pt {self.app.settings["font"]}";'
         self.ui.textEdit.setStyleSheet(doc_font)
         self.ui.treeWidget.installEventFilter(self)  # For H key
-        self.ui.listWidget_files.setStyleSheet(treefont)
+        self.ui.listWidget_files.setStyleSheet(tree_font)
         self.ui.listWidget_files.installEventFilter(self)  # For H key
         self.ui.listWidget_files.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
-        self.ui.listWidget_cases.setStyleSheet(treefont)
+        self.ui.listWidget_cases.setStyleSheet(tree_font)
         self.ui.listWidget_cases.installEventFilter(self)  # For H key
         self.ui.listWidget_cases.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
         self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.SelectionMode.ExtendedSelection)
@@ -736,6 +733,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         First need to determine number of columns based on the distinct number of codes in the results.
         Then the number of rows based on the most frequently assigned code.
         Each data cell contains coded text, or the memo if A/V or image and the file or case name.
+        Checkbox for optionally exporting file and case variables
         """
 
         if not self.results:
@@ -746,6 +744,15 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         # Column headings
         col_headings = ["File/case", "Coder", "Coded", "Id", "Codename", "Coded_Memo"]
+
+        # Number of categories
+        total_categories = 0
+        for data in self.results:
+            if len(self.categories_of_code(data['cid'])) > total_categories:
+                total_categories = len(self.categories_of_code(data['cid']))
+        if total_categories > 0:
+            col_headings.append(["Category"] * total_categories)
+
         row = 1
         for col, code in enumerate(col_headings):
             ws.cell(column=col + 1, row=row, value=code)
@@ -769,7 +776,11 @@ class DialogReportCodes(QtWidgets.QDialog):
             categories = self.categories_of_code(data['cid'])
             for i, category in enumerate(categories):
                 ws.cell(column=7 + i, row=row + 2, value=category)
-                ws.cell(column=7 + i, row=1, value='Category')  # Headings
+                #ws.cell(column=7 + i, row=1, value='Category')  # Headings
+            # Variables
+            vars_start_column = 7 + total_categories
+            ws.cell(column=vars_start_column, row=1, value="VAR1")
+
         filepath, ok = QtWidgets.QFileDialog.getSaveFileName(self,
                                                             _("Save Excel File"), self.app.settings['directory'],
                                                             "XLSX Files(*.xlsx)")
@@ -1106,14 +1117,10 @@ class DialogReportCodes(QtWidgets.QDialog):
         ok = attr_ui.exec()
         if not ok:
             self.attributes = temp_attributes
-            '''pm = QtGui.QPixmap()
-            pm.loadFromData(QtCore.QByteArray.fromBase64(attributes_icon), "png")'''
-            self.ui.pushButton_attributeselect.setIcon(qta.icon('mdi6.line-scan'))  #QtGui.QIcon(pm))
+            self.ui.pushButton_attributeselect.setIcon(qta.icon('mdi6.line-scan'))
             self.ui.pushButton_attributeselect.setToolTip(_("Attributes"))
             if self.attributes:
-                #pm = QtGui.QPixmap()
-                #pm.loadFromData(QtCore.QByteArray.fromBase64(attributes_selected_icon), "png")
-                self.ui.pushButton_attributeselect.setIcon(qta.icon('mdi6.variable'))  #QtGui.QIcon(pm))
+                self.ui.pushButton_attributeselect.setIcon(qta.icon('mdi6.variable'))
             return
         # As List containing (1) list of attributes, within (2) [List of attributes, boolean type]
         self.attributes = attr_ui.parameters
