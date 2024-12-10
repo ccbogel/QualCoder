@@ -169,7 +169,7 @@ class Ui_Dialog_reportCodings(object):
         self.label_text_limiter.setText(_translate("Dialog_reportCodings", "Text limiter:"))
         self.pushButton_run_report.setToolTip(_translate("Dialog_reportCodings", "<html><head/><body><p>Run report</p></body></html>"))
         self.label_coder.setText(_translate("Dialog_reportCodings", "Coder:"))
-        self.pushButton_attributeselect.setToolTip(_translate("Dialog_reportCodings", "Attributes"))
+        self.pushButton_attributeselect.setToolTip(_translate("Dialog_reportCodings", "<html><head/><body><p>Attributes. </p><p>Attribute selection will override files or cases selected in the left-hand-side lists.</p></body></html>"))
         self.label_exports.setToolTip(_translate("Dialog_reportCodings", "<html><head/><body><p>Export</p></body></html>"))
         self.comboBox_export.setItemText(1, _translate("Dialog_reportCodings", "html"))
         self.comboBox_export.setItemText(2, _translate("Dialog_reportCodings", "txt"))
