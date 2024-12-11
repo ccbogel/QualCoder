@@ -258,7 +258,6 @@ class DialogReportCodes(QtWidgets.QDialog):
 
     def get_selected_files_and_cases(self):
         """ Fill file_ids and case_ids Strings used in the search.
-        Clear attribute selection.
          Called by: search """
 
         selected_files = []
@@ -1152,6 +1151,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.pushButton_attributeselect.setIcon(qta.icon('mdi6.variable'))
         self.ui.pushButton_attributeselect.setToolTip(attr_ui.tooltip_msg)
         self.attributes_msg = attr_ui.tooltip_msg
+        # Used ..?
         self.attribute_file_ids = attr_ui.result_file_ids
         self.attribute_case_ids = attr_ui.result_case_ids
 
@@ -1183,7 +1183,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             Message(self.app, _('No codes'), msg, "warning").exec()
             return
         if self.file_ids_string == "" and self.case_ids_string == "" and self.attributes == []:
-            msg = _("No files, cases or attributes have been selected.")
+            msg = _("No files, cases found.")
             Message(self.app, _('Nothing selected'), msg, "warning").exec()
             return
 
@@ -1226,6 +1226,10 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         cur = self.app.conn.cursor()
         parameters_display = ""
+        if self.attributes:
+            parameters_display += f"\n{_('Attributes:')}\n {self.attributes_msg}\n"
+            if not (self.attribute_file_ids and self.attribute_case_ids):
+                parameters_display += "No cases or files match attribute selection\n"
         if self.attribute_file_ids or self.attribute_case_ids:
             self.file_ids_string = ""
             self.case_ids_string = ""
@@ -1240,7 +1244,6 @@ class DialogReportCodes(QtWidgets.QDialog):
                 self.ui.listWidget_files.item(i).setSelected(False)
             for i in range(self.ui.listWidget_cases.count()):
                 self.ui.listWidget_cases.item(i).setSelected(False)
-            parameters_display += f"\n{_('Attributes:')}\n {self.attributes_msg}\n"
 
         if self.file_ids_string != "":
             parameters_display += _("\nFiles:\n")
@@ -1910,10 +1913,6 @@ class DialogReportCodes(QtWidgets.QDialog):
         fmt_larger.setFontPointSize(self.app.settings['docfontsize'] + 2)
         # memo_choice, use current index, as other languages will not match
         memo_choice_index = self.ui.comboBox_memos.currentIndex()
-        '''                 
-        [_("None"), _("Also code memos"), _("Also coded memos"), _("Also all memos"), _("Only memos"),
-        _("Only coded memos"), _("Annotations"), _("Codebook memos")]
-        '''
 
         for i, row in enumerate(self.results):
             self.heading(row)
