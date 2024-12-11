@@ -97,11 +97,11 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui = Ui_Dialog_reportCodings()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        font = f'font: {self.app.settings["fontsize"]}pt {self.app.settings["font"]}";'
+        font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
         tree_font = f'font: {self.app.settings["treefontsize"]}pt "{self.app.settings["font"]}";'
         self.ui.treeWidget.setStyleSheet(tree_font)
-        doc_font = f'font: {self.app.settings["docfontsize"]}pt {self.app.settings["font"]}";'
+        doc_font = f'font: {self.app.settings["docfontsize"]}pt "{self.app.settings["font"]}";'
         self.ui.textEdit.setStyleSheet(doc_font)
         self.ui.treeWidget.installEventFilter(self)  # For H key
         self.ui.listWidget_files.setStyleSheet(tree_font)
@@ -740,24 +740,36 @@ class DialogReportCodes(QtWidgets.QDialog):
             return
         wb = openpyxl.Workbook()
         ws = wb.active
-        # Columns file/case, coder, coded text/img/av, id, codename .... categories
+        # Columns file/case, coder, coded text/img/av, id, codename .... categories ... file variables ... case variables
 
         # Column headings
         col_headings = ["File/case", "Coder", "Coded", "Id", "Codename", "Coded_Memo"]
 
-        # Number of categories
+        # Number of categories, for category column headings
         total_categories = 0
         for data in self.results:
             if len(self.categories_of_code(data['cid'])) > total_categories:
                 total_categories = len(self.categories_of_code(data['cid']))
         if total_categories > 0:
-            col_headings.append(["Category"] * total_categories)
+            col_headings += ["Category"] * total_categories
+
+        #if self.ui.checkBox_variables.isChecked():
+        # Number of file variables, for variable column headings
+        cur = self.app.conn.cursor()
+        cur.execute("select name from attribute_type where caseOrFile='file' order by name")
+        result = cur.fetchall()
+        file_variables = []
+        for var_heading in result:
+            col_headings.append("FileVar_" + var_heading[0])
+            file_variables.append(var_heading[0])
 
         row = 1
-        for col, code in enumerate(col_headings):
-            ws.cell(column=col + 1, row=row, value=code)
+        for col, col_heading in enumerate(col_headings):
+            ws.cell(column=col + 1, row=row, value=col_heading)
 
+        # Fill Excel Worksheet
         for row, data in enumerate(self.results):
+            print(data)
             ws.cell(column=1, row=row + 2, value=data['file_or_casename'])
             ws.cell(column=2, row=row + 2, value=data['coder'])
             coding_id = ""
@@ -776,10 +788,19 @@ class DialogReportCodes(QtWidgets.QDialog):
             categories = self.categories_of_code(data['cid'])
             for i, category in enumerate(categories):
                 ws.cell(column=7 + i, row=row + 2, value=category)
-                #ws.cell(column=7 + i, row=1, value='Category')  # Headings
-            # Variables
+
+            #if self.ui.checkBox_variables.isChecked():
+            # File variables
             vars_start_column = 7 + total_categories
-            ws.cell(column=vars_start_column, row=1, value="VAR1")
+            for file_var_pos, file_var_name in enumerate(file_variables):
+                cur.execute("select value from attribute where attr_type='file' and name=? and id=?"
+                            , [file_var_name, data['fid']])
+                value = ""
+                file_var_value = cur.fetchone()
+                if file_var_value:  # Could potentially be None
+                    value = file_var_value[0]
+                ws.cell(column=vars_start_column + file_var_pos, row=row + 2, value=value)
+            # Case variables
 
         filepath, ok = QtWidgets.QFileDialog.getSaveFileName(self,
                                                             _("Save Excel File"), self.app.settings['directory'],
@@ -1407,7 +1428,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         parameters = []
 
         # Coded text
-        sql = "select code_name.name, color, cases.name, "
+        sql = "select code_name.name, color, cases.name, cases.caseid, "
         sql += "code_text.pos0, code_text.pos1, seltext, code_text.owner, code_text.fid, "
         sql += "ifnull(cases.memo,''), ifnull(code_text.memo,''), ifnull(code_name.memo,''), "
         sql += "ifnull(source.memo,''), ctid, code_name.cid "
@@ -1434,7 +1455,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         else:
             cur.execute(sql, parameters)
         results = cur.fetchall()
-        keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'text', 'coder', 'fid', \
+        keys = 'codename', 'color', 'file_or_casename', 'caseid', 'pos0', 'pos1', 'text', 'coder', 'fid', \
             'cases_memo', 'coded_memo', 'codename_memo', 'source_memo', 'ctid', 'cid'
         for row in results:
             tmp = dict(zip(keys, row))
@@ -1448,7 +1469,7 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         # Coded images
         parameters = []
-        sql = "select code_name.name, color, cases.name, "
+        sql = "select code_name.name, color, cases.name, cases.caseid, "
         sql += "x1, y1, width, height, code_image.owner,source.mediapath, source.id, "
         sql += "ifnull(code_image.memo,''), ifnull(cases.memo,''), ifnull(code_name.memo,''), "
         sql += "ifnull(source.memo,''), imid, code_name.cid "
@@ -1473,10 +1494,10 @@ class DialogReportCodes(QtWidgets.QDialog):
             cur.execute(sql)
         else:
             cur.execute(sql, parameters)
-        imgresults = cur.fetchall()
-        keys = 'codename', 'color', 'file_or_casename', 'x1', 'y1', 'width', 'height', 'coder', 'mediapath', \
-            'fid', 'coded_memo', 'case_memo', 'codename_memo', 'source_memo', 'imid', 'cid'
-        for row in imgresults:
+        image_results = cur.fetchall()
+        keys = ('codename', 'color', 'file_or_casename', 'caseid', 'x1', 'y1', 'width', 'height', 'coder',
+                'mediapath', 'fid', 'coded_memo', 'case_memo', 'codename_memo', 'source_memo', 'imid', 'cid')
+        for row in image_results:
             tmp = dict(zip(keys, row))
             tmp['result_type'] = 'image'
             tmp['file_or_case'] = "Case"
@@ -1484,7 +1505,7 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         # Coded audio and video
         parameters = []
-        av_sql = "select distinct code_name.name, color, cases.name as case_name, "
+        av_sql = "select distinct code_name.name, color, cases.name as case_name, cases.caseid, "
         av_sql += "code_av.pos0, code_av.pos1, code_av.owner,source.mediapath, source.id, "
         av_sql += "ifnull(code_av.memo,'') as coded_memo, ifnull(cases.memo,'') as case_memo, "
         av_sql += "ifnull(code_name.memo,''), ifnull(source.memo,''), avid, "
@@ -1510,10 +1531,10 @@ class DialogReportCodes(QtWidgets.QDialog):
             cur.execute(av_sql)
         else:
             cur.execute(av_sql, parameters)
-        avresults = cur.fetchall()
-        keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'coder', 'mediapath', \
+        av_results = cur.fetchall()
+        keys = 'codename', 'color', 'file_or_casename', 'caseid', 'pos0', 'pos1', 'coder', 'mediapath', \
             'fid', 'coded_memo', 'case_memo', 'codename_memo', 'source_memo', 'avid', 'cid'
-        for row in avresults:
+        for row in av_results:
             tmp = dict(zip(keys, row))
             tmp['result_type'] = 'av'
             tmp['file_or_case'] = "Case"
