@@ -639,111 +639,17 @@ class DialogReportCodes(QtWidgets.QDialog):
         Message(self.app, _('Report exported'), msg, "information").exec()
 
     def export_csv_file(self):
-        """ Export report to csv file.
-        Export coded data as csv with codes as column headings.
-        Draw data from self.text_results, self.image_results, self.av_results
-        First need to determine number of columns based on the distinct number of codes in the results.
-        Then the number of rows based on the most frequently assigned code.
-        Each data cell contains coded text, or the memo if A/V or image and the file or case name.
-        """
-
-        if not self.results:
-            return
-        codes_all = [i['codename'] for i in self.results]
-        codes_set = list(set(codes_all))
-        codes_set.sort()
-        codes_freq_list = [codes_all.count(x) for x in codes_set]
-        ncols = len(codes_set)
-        nrows = sorted(codes_freq_list)[-1]
-
-        # Prepare data rows for csv writer
-        csv_data = []
-        for r in range(0, nrows):
-            row = ["" for c in range(0, ncols)]
-            csv_data.append(row)
-
-        # Look at each code and fill column with data
-        for col, code in enumerate(codes_set):
-            row = 0
-            for i in self.results:
-                if i['codename'] == code:
-                    if i['result_type'] == 'text':
-                        d = f"{i['text']}\n{i['file_or_casename']}"
-                        # Add file id if results are based on attribute selection
-                        if i['file_or_case'] == "":
-                            d += f" fid:{i['fid']}"
-                        csv_data[row][col] = d
-                        row += 1
-                    if i['result_type'] == 'image':
-                        d = ""
-                        try:
-                            d = i['memo']
-                        except KeyError:
-                            pass
-                        if d == "":
-                            d = _("NO MEMO")
-                        d += f"\n{i['file_or_casename']}"
-                        # Add filename if results are based on attribute selection
-                        if i['file_or_case'] == "":
-                            d += f" {i['mediapath'][8:]}"
-                        csv_data[row][col] = d
-                        row += 1
-                    if i['result_type'] == 'av':
-                        d = ""
-                        try:
-                            d = i['memo']
-                        except KeyError:
-                            pass
-                        if d == "":
-                            d = _("NO MEMO")
-                        d += "\n"
-                        # av 'text' contains video/filename, time slot and memo, so trim some out
-                        trimmed = i['text'][6:]
-                        pos = trimmed.find(']')
-                        trimmed = trimmed[:pos + 1]
-                        # Add case name as well as file name and time slot
-                        if i['file_or_case'] != "File":
-                            trimmed = f"{i['file_or_casename']} {trimmed}"
-                        d += trimmed
-                        csv_data[row][col] = d
-                        row += 1
-        filepath, ok = QtWidgets.QFileDialog.getSaveFileName(self,
-                                                            _("Save CSV File"), self.app.settings['directory'],
-                                                            "CSV Files(*.csv)")
-        # options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
-        if filepath is None or not ok:
-            return
-        if filepath[-4:] != ".csv":
-            filepath += ".csv"
-        with open(filepath, 'w', encoding='utf-8-sig', newline='') as csvfile:
-            filewriter = csv.writer(csvfile, delimiter=',',
-                                    quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            filewriter.writerow(codes_set)  # header row
-            for row in csv_data:
-                filewriter.writerow(row)
-        msg = _('Report exported: ') + filepath
-        Message(self.app, _('Report exported'), msg, "information").exec()
-        self.parent_textEdit.append(msg)
-
-    def export_xlsx_file(self):
-        """ Export report to xlsx file.
-        Export coded data as csv with codes as column headings.
-        Draw data from self.text_results, self.image_results, self.av_results
-        First need to determine number of columns based on the distinct number of codes in the results.
-        Then the number of rows based on the most frequently assigned code.
-        Each data cell contains coded text, or the memo if A/V or image and the file or case name.
+        """ Export report to csv file. Comma delimited and all cells quoted.
+        Columns file/case, coder, coded text/img/av, id, codename, categories ... {file variables ... case variables}
+        Draw data from self.results
         Checkbox for optionally exporting file and case variables
         """
 
         if not self.results:
             return
-        wb = openpyxl.Workbook()
-        ws = wb.active
-        # Columns file/case, coder, coded text/img/av, id, codename .... categories ... file variables ... case variables
 
         # Column headings
         col_headings = ["File/case", "Coder", "Coded", "Id", "Codename", "Coded_Memo"]
-
         # Number of categories, for category column headings
         total_categories = 0
         for data in self.results:
@@ -752,15 +658,128 @@ class DialogReportCodes(QtWidgets.QDialog):
         if total_categories > 0:
             col_headings += ["Category"] * total_categories
 
-        #if self.ui.checkBox_variables.isChecked():
-        # Number of file variables, for variable column headings
         cur = self.app.conn.cursor()
-        cur.execute("select name from attribute_type where caseOrFile='file' order by name")
-        result = cur.fetchall()
+
+        # Number of file and case variables, for variable column headings
         file_variables = []
-        for var_heading in result:
-            col_headings.append("FileVar_" + var_heading[0])
-            file_variables.append(var_heading[0])
+        case_variables = []
+        if self.ui.checkBox_variables.isChecked():
+            cur.execute("select name from attribute_type where caseOrFile='file' order by name")
+            result = cur.fetchall()
+            for var_heading in result:
+                col_headings.append("FileVar_" + var_heading[0])
+                file_variables.append(var_heading[0])
+            # Number of case variables, for variable column headings
+            cur.execute("select name from attribute_type where caseOrFile='case' order by name")
+            result = cur.fetchall()
+            for var_heading in result:
+                col_headings.append("CaseVar_" + var_heading[0])
+                case_variables.append(var_heading[0])
+
+        # Create data rows
+        csv_data = []
+        for row, data in enumerate(self.results):
+            csv_data_row = []
+            csv_data_row.append(data['file_or_casename'])  # col 0
+            csv_data_row.append(data['coder'])  # col 1
+            coding_id = ""
+            if data['result_type'] == 'text':
+                coding_id = f"ctid:{data['ctid']}"
+                csv_data_row.append(data['text'])
+            if data['result_type'] == 'image':
+                coding_id = f"imid:{data['imid']}"
+                csv_data_row.append("image")
+            if data['result_type'] == 'av':
+                coding_id = f"avid:{data['avid']}"
+                csv_data_row.append("a/v")
+            csv_data_row.append(coding_id)  # col 3
+            csv_data_row.append(data['codename'])  # col 4
+            csv_data_row.append(data['coded_memo'])  # col 5
+            categories = self.categories_of_code(data['cid'])
+            for i, category in enumerate(categories):
+                csv_data_row.append(category)
+
+            if self.ui.checkBox_variables.isChecked():
+                # File variables
+                for file_var_pos, file_var_name in enumerate(file_variables):
+                    cur.execute("select value from attribute where attr_type='file' and name=? and id=?"
+                                , [file_var_name, data['fid']])
+                    value = ""
+                    file_var_value = cur.fetchone()
+                    if file_var_value:  # Could potentially be None
+                        value = file_var_value[0]
+                    csv_data_row.append(value)
+                # Case variables
+                for case_var_pos, case_var_name in enumerate(case_variables):
+                    cur.execute("select value from attribute where attr_type='case' and name=? and id=?"
+                                , [case_var_name, data['caseid']])
+                    value = ""
+                    case_var_value = cur.fetchone()
+                    if case_var_value:  # Could potentially be None
+                        value = case_var_value[0]
+                    csv_data_row.append(value)
+            csv_data.append(csv_data_row)
+
+        filepath, ok = QtWidgets.QFileDialog.getSaveFileName(self,
+                                                             _("Save CSV File"), self.app.settings['directory'],
+                                                             "CSV Files(*.csv)")
+        # options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
+        if filepath is None or not ok:
+            return
+        if filepath[-4:] != ".csv":
+            filepath += ".csv"
+        with open(filepath, 'w', encoding='utf-8-sig', newline='') as csvfile:
+            filewriter = csv.writer(csvfile, delimiter=',', quotechar='"', quoting=csv.QUOTE_ALL)
+            filewriter.writerow(col_headings)
+            for row in csv_data:
+                filewriter.writerow(row)
+
+        msg = _("Each row contains filename, coder, coded, codename and categories.") + "\n"
+        if self.ui.checkBox_variables.isChecked():
+            msg += _("And file and case variables") + "\n"
+        msg += _('Report exported: ') + filepath
+        Message(self.app, _('Report exported'), msg, "information").exec()
+        self.parent_textEdit.append(msg)
+
+    def export_xlsx_file(self):
+        """ Export report to xlsx file.
+        Columns file/case, coder, coded text/img/av, id, codename, categories ... {file variables ... case variables}
+        Draw data from self.results
+        Checkbox for optionally exporting file and case variables
+        """
+
+        if not self.results:
+            return
+        wb = openpyxl.Workbook()
+        ws = wb.active
+
+        # Column headings
+        col_headings = ["File/case", "Coder", "Coded", "Id", "Codename", "Coded_Memo"]
+        # Number of categories, for category column headings
+        total_categories = 0
+        for data in self.results:
+            if len(self.categories_of_code(data['cid'])) > total_categories:
+                total_categories = len(self.categories_of_code(data['cid']))
+        if total_categories > 0:
+            col_headings += ["Category"] * total_categories
+
+        cur = self.app.conn.cursor()
+
+        # Number of file variables, for variable column headings
+        file_variables = []
+        case_variables = []
+        if self.ui.checkBox_variables.isChecked():
+            cur.execute("select name from attribute_type where caseOrFile='file' order by name")
+            result = cur.fetchall()
+            for var_heading in result:
+                col_headings.append("FileVar_" + var_heading[0])
+                file_variables.append(var_heading[0])
+            # Number of case variables, for variable column headings
+            cur.execute("select name from attribute_type where caseOrFile='case' order by name")
+            result = cur.fetchall()
+            for var_heading in result:
+                col_headings.append("CaseVar_" + var_heading[0])
+                case_variables.append(var_heading[0])
 
         row = 1
         for col, col_heading in enumerate(col_headings):
@@ -768,18 +787,17 @@ class DialogReportCodes(QtWidgets.QDialog):
 
         # Fill Excel Worksheet
         for row, data in enumerate(self.results):
-            print(data)
             ws.cell(column=1, row=row + 2, value=data['file_or_casename'])
             ws.cell(column=2, row=row + 2, value=data['coder'])
             coding_id = ""
             if data['result_type'] == 'text':
-                coding_id = "ctid:" + str(data['ctid'])
+                coding_id = f"ctid:{data['ctid']}"
                 ws.cell(column=3, row=row + 2, value=data['text'])
             if data['result_type'] == 'image':
-                coding_id = "imid:" + str(data['imid'])
+                coding_id = f"imid:{data['imid']}"
                 ws.cell(column=3, row=row + 2, value="image")
             if data['result_type'] == 'av':
-                coding_id = "avid:" + str(data['avid'])
+                coding_id = f"avid:{data['avid']}"
                 ws.cell(column=3, row=row + 2, value="a/v")
             ws.cell(column=4, row=row + 2, value=coding_id)
             ws.cell(column=5, row=row + 2, value=data['codename'])
@@ -788,18 +806,27 @@ class DialogReportCodes(QtWidgets.QDialog):
             for i, category in enumerate(categories):
                 ws.cell(column=7 + i, row=row + 2, value=category)
 
-            #if self.ui.checkBox_variables.isChecked():
-            # File variables
-            vars_start_column = 7 + total_categories
-            for file_var_pos, file_var_name in enumerate(file_variables):
-                cur.execute("select value from attribute where attr_type='file' and name=? and id=?"
-                            , [file_var_name, data['fid']])
-                value = ""
-                file_var_value = cur.fetchone()
-                if file_var_value:  # Could potentially be None
-                    value = file_var_value[0]
-                ws.cell(column=vars_start_column + file_var_pos, row=row + 2, value=value)
-            # Case variables
+            if self.ui.checkBox_variables.isChecked():
+                # File variables
+                file_vars_start_column = 7 + total_categories
+                for file_var_pos, file_var_name in enumerate(file_variables):
+                    cur.execute("select value from attribute where attr_type='file' and name=? and id=?"
+                                , [file_var_name, data['fid']])
+                    value = ""
+                    file_var_value = cur.fetchone()
+                    if file_var_value:  # Could potentially be None
+                        value = file_var_value[0]
+                    ws.cell(column=file_vars_start_column + file_var_pos, row=row + 2, value=value)
+                # Case variables
+                case_vars_start_column = 7 + total_categories + len(file_variables)
+                for case_var_pos, case_var_name in enumerate(case_variables):
+                    cur.execute("select value from attribute where attr_type='case' and name=? and id=?"
+                                , [case_var_name, data['caseid']])
+                    value = ""
+                    case_var_value = cur.fetchone()
+                    if case_var_value:  # Could potentially be None
+                        value = case_var_value[0]
+                    ws.cell(column=case_vars_start_column + case_var_pos, row=row + 2, value=value)
 
         filepath, ok = QtWidgets.QFileDialog.getSaveFileName(self,
                                                             _("Save Excel File"), self.app.settings['directory'],
@@ -1342,6 +1369,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             tmp['file_or_case'] = "File"
             tmp['pretext'] = ""
             tmp['posttext'] = ""
+            tmp['caseid'] = -1  # Need a placeholder if export vars is checked
             self.results.append(tmp)
         if self.ui.checkBox_text_context.isChecked():
             self.get_prettext_and_posttext()
@@ -1375,6 +1403,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             tmp = dict(zip(keys, row))
             tmp['result_type'] = 'image'
             tmp['file_or_case'] = "File"
+            tmp['caseid'] = -1  # Need a placeholder if export vars is checked
             self.results.append(tmp)
 
         # Coded audio and video, also looks for search_text in coded segment memo
@@ -1411,6 +1440,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                 text_ += "\nMEMO: " + tmp['coded_memo']
             text_ += " " + msecs_to_hours_mins_secs(tmp['pos0']) + " - " + msecs_to_hours_mins_secs(tmp['pos1'])
             tmp['text'] = text_
+            tmp['caseid'] = -1  # Need a placeholder if export vars is checked
             self.html_links.append({'imagename': None, 'image': None,
                                     'avname': tmp['mediapath'], 'av0': str(int(tmp['pos0'] / 1000)),
                                     'av1': str(int(tmp['pos1'] / 1000)), 'avtext': text_})
