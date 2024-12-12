@@ -124,7 +124,7 @@
      <widget class="QLabel" name="label_exports">
       <property name="geometry">
        <rect>
-        <x>741</x>
+        <x>731</x>
         <y>89</y>
         <width>24</width>
         <height>24</height>
@@ -140,7 +140,7 @@
      <widget class="QComboBox" name="comboBox_export">
       <property name="geometry">
        <rect>
-        <x>770</x>
+        <x>760</x>
         <y>86</y>
         <width>91</width>
         <height>30</height>
@@ -253,7 +253,7 @@
        <rect>
         <x>390</x>
         <y>46</y>
-        <width>141</width>
+        <width>131</width>
         <height>26</height>
        </rect>
       </property>
@@ -282,7 +282,7 @@
        <rect>
         <x>390</x>
         <y>80</y>
-        <width>141</width>
+        <width>131</width>
         <height>26</height>
        </rect>
       </property>
@@ -296,7 +296,7 @@
      <widget class="QLineEdit" name="lineEdit_search_results">
       <property name="geometry">
        <rect>
-        <x>537</x>
+        <x>527</x>
         <y>85</y>
         <width>161</width>
         <height>30</height>
@@ -309,7 +309,7 @@
      <widget class="QLabel" name="label_search_results">
       <property name="geometry">
        <rect>
-        <x>537</x>
+        <x>527</x>
         <y>58</y>
         <width>101</width>
         <height>22</height>
@@ -328,7 +328,7 @@
      <widget class="QPushButton" name="pushButton_search_next">
       <property name="geometry">
        <rect>
-        <x>700</x>
+        <x>690</x>
         <y>85</y>
         <width>34</width>
         <height>30</height>
@@ -377,7 +377,7 @@
      <widget class="QLabel" name="label_search_export">
       <property name="geometry">
        <rect>
-        <x>740</x>
+        <x>730</x>
         <y>58</y>
         <width>121</width>
         <height>22</height>
@@ -396,9 +396,9 @@
      <widget class="QCheckBox" name="checkBox_variables">
       <property name="geometry">
        <rect>
-        <x>870</x>
+        <x>860</x>
         <y>90</y>
-        <width>171</width>
+        <width>191</width>
         <height>20</height>
        </rect>
       </property>
