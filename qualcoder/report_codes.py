@@ -640,8 +640,11 @@ class DialogReportCodes(QtWidgets.QDialog):
 
     def export_csv_file(self):
         """ Export report to csv file. Comma delimited and all cells quoted.
-        Columns file/case, coder, coded text/img/av, id, codename, categories ... {file variables ... case variables}
-        Draw data from self.results
+        Columns file, coder, coded text/img/av, id, codename, categories .. {file variables .. case variables}
+        OR
+        Columns case, filename, coder, coded text/img/av, id, codename, categories .. {file variables .. case variables}
+
+        Draw data from self.results, with optional data from attributes table
         Checkbox for optionally exporting file and case variables
         """
 
@@ -649,7 +652,12 @@ class DialogReportCodes(QtWidgets.QDialog):
             return
 
         # Column headings
-        col_headings = ["File/case", "Coder", "Coded", "Id", "Codename", "Coded_Memo"]
+        col_headings = [self.results[0]['file_or_case'], "Coder", "Coded", "Id", "Codename", "Coded_Memo"]
+        inserted_col = 0
+        if self.results[0]['file_or_case'] == 'Case':
+            inserted_col = 1
+            col_headings.insert(1, "Filename")
+
         # Number of categories, for category column headings
         total_categories = 0
         for data in self.results:
@@ -669,19 +677,22 @@ class DialogReportCodes(QtWidgets.QDialog):
             for var_heading in result:
                 col_headings.append("FileVar_" + var_heading[0])
                 file_variables.append(var_heading[0])
-            # Number of case variables, for variable column headings
-            cur.execute("select name from attribute_type where caseOrFile='case' order by name")
-            result = cur.fetchall()
-            for var_heading in result:
-                col_headings.append("CaseVar_" + var_heading[0])
-                case_variables.append(var_heading[0])
+            # Number of case variables, for variable column headings, only if Case results (not File results) provided
+            if self.results[0]['file_or_case'] == "Case":
+                cur.execute("select name from attribute_type where caseOrFile='case' order by name")
+                result = cur.fetchall()
+                for var_heading in result:
+                    col_headings.append("CaseVar_" + var_heading[0])
+                    case_variables.append(var_heading[0])
 
         # Create data rows
         csv_data = []
         for row, data in enumerate(self.results):
             csv_data_row = []
-            csv_data_row.append(data['file_or_casename'])  # col 0
-            csv_data_row.append(data['coder'])  # col 1
+            csv_data_row.append(data['file_or_casename'])
+            if inserted_col == 1:  # For Case results, insert the Filename data
+                csv_data_row.append(data['filename'])
+            csv_data_row.append(data['coder'])
             coding_id = ""
             if data['result_type'] == 'text':
                 coding_id = f"ctid:{data['ctid']}"
@@ -692,9 +703,9 @@ class DialogReportCodes(QtWidgets.QDialog):
             if data['result_type'] == 'av':
                 coding_id = f"avid:{data['avid']}"
                 csv_data_row.append("a/v")
-            csv_data_row.append(coding_id)  # col 3
-            csv_data_row.append(data['codename'])  # col 4
-            csv_data_row.append(data['coded_memo'])  # col 5
+            csv_data_row.append(coding_id)
+            csv_data_row.append(data['codename'])
+            csv_data_row.append(data['coded_memo'])
             categories = self.categories_of_code(data['cid'])
             for i, category in enumerate(categories):
                 csv_data_row.append(category)
@@ -743,8 +754,11 @@ class DialogReportCodes(QtWidgets.QDialog):
 
     def export_xlsx_file(self):
         """ Export report to xlsx file.
-        Columns file/case, coder, coded text/img/av, id, codename, categories ... {file variables ... case variables}
-        Draw data from self.results
+        Columns file, coder, coded text/img/av, id, codename, categories .. {file variables .. case variables}
+        OR
+        Columns case, filename, coder, coded text/img/av, id, codename, categories .. {file variables .. case variables}
+
+        Draw data from self.results, with optional data from attributes table
         Checkbox for optionally exporting file and case variables
         """
 
@@ -754,7 +768,11 @@ class DialogReportCodes(QtWidgets.QDialog):
         ws = wb.active
 
         # Column headings
-        col_headings = ["File/case", "Coder", "Coded", "Id", "Codename", "Coded_Memo"]
+        col_headings = [self.results[0]['file_or_case'], "Coder", "Coded", "Id", "Codename", "Coded_Memo"]
+        inserted_col = 0
+        if self.results[0]['file_or_case'] == 'Case':
+            inserted_col = 1
+            col_headings.insert(1, "Filename")
         # Number of categories, for category column headings
         total_categories = 0
         for data in self.results:
@@ -774,12 +792,13 @@ class DialogReportCodes(QtWidgets.QDialog):
             for var_heading in result:
                 col_headings.append("FileVar_" + var_heading[0])
                 file_variables.append(var_heading[0])
-            # Number of case variables, for variable column headings
-            cur.execute("select name from attribute_type where caseOrFile='case' order by name")
-            result = cur.fetchall()
-            for var_heading in result:
-                col_headings.append("CaseVar_" + var_heading[0])
-                case_variables.append(var_heading[0])
+            # Number of case variables, for variable column headings, only if Case results (not File results) provided
+            if self.results[0]['file_or_case'] == "Case":
+                cur.execute("select name from attribute_type where caseOrFile='case' order by name")
+                result = cur.fetchall()
+                for var_heading in result:
+                    col_headings.append("CaseVar_" + var_heading[0])
+                    case_variables.append(var_heading[0])
 
         row = 1
         for col, col_heading in enumerate(col_headings):
@@ -788,27 +807,29 @@ class DialogReportCodes(QtWidgets.QDialog):
         # Fill Excel Worksheet
         for row, data in enumerate(self.results):
             ws.cell(column=1, row=row + 2, value=data['file_or_casename'])
-            ws.cell(column=2, row=row + 2, value=data['coder'])
+            if inserted_col == 1:  # For Case results, insert the Filename data
+                ws.cell(column=2, row=row + 2, value=data['filename'])
+            ws.cell(column=2 + inserted_col, row=row + 2, value=data['coder'])
             coding_id = ""
             if data['result_type'] == 'text':
                 coding_id = f"ctid:{data['ctid']}"
-                ws.cell(column=3, row=row + 2, value=data['text'])
+                ws.cell(column=3 + inserted_col, row=row + 2, value=data['text'])
             if data['result_type'] == 'image':
                 coding_id = f"imid:{data['imid']}"
-                ws.cell(column=3, row=row + 2, value="image")
+                ws.cell(column=3 + inserted_col, row=row + 2, value="image")
             if data['result_type'] == 'av':
                 coding_id = f"avid:{data['avid']}"
-                ws.cell(column=3, row=row + 2, value="a/v")
-            ws.cell(column=4, row=row + 2, value=coding_id)
-            ws.cell(column=5, row=row + 2, value=data['codename'])
-            ws.cell(column=6, row=row + 2, value=data['coded_memo'])
+                ws.cell(column=3 + inserted_col + inserted_col, row=row + 2, value="a/v")
+            ws.cell(column=4 + inserted_col, row=row + 2, value=coding_id)
+            ws.cell(column=5 + inserted_col, row=row + 2, value=data['codename'])
+            ws.cell(column=6 + inserted_col, row=row + 2, value=data['coded_memo'])
             categories = self.categories_of_code(data['cid'])
             for i, category in enumerate(categories):
-                ws.cell(column=7 + i, row=row + 2, value=category)
+                ws.cell(column=7 + inserted_col + i, row=row + 2, value=category)
 
             if self.ui.checkBox_variables.isChecked():
                 # File variables
-                file_vars_start_column = 7 + total_categories
+                file_vars_start_column = 7 + inserted_col + total_categories
                 for file_var_pos, file_var_name in enumerate(file_variables):
                     cur.execute("select value from attribute where attr_type='file' and name=? and id=?"
                                 , [file_var_name, data['fid']])
@@ -818,7 +839,7 @@ class DialogReportCodes(QtWidgets.QDialog):
                         value = file_var_value[0]
                     ws.cell(column=file_vars_start_column + file_var_pos, row=row + 2, value=value)
                 # Case variables
-                case_vars_start_column = 7 + total_categories + len(file_variables)
+                case_vars_start_column = 7 + inserted_col + total_categories + len(file_variables)
                 for case_var_pos, case_var_name in enumerate(case_variables):
                     cur.execute("select value from attribute where attr_type='case' and name=? and id=?"
                                 , [case_var_name, data['caseid']])
@@ -1449,7 +1470,10 @@ class DialogReportCodes(QtWidgets.QDialog):
     def search_by_cases(self, code_ids):
         """ Search by cases and if attributes file ids are selected.
         Called by search() if self.case_ids_string is not empty.
-        Also uses self.file_ids_string to limit results
+        Also uses self.file_ids_string to limit results.
+
+        Unlike search_by_files, the results by case also include a 'filename' key value.
+        This is used when exporting Excel (XLSX) and CSV spreadsheet data, so that case name and file name are displayed.
 
         :param: code_ids : String comma separated ids
         """
@@ -1464,7 +1488,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         sql = "select code_name.name, color, cases.name, cases.caseid, "
         sql += "code_text.pos0, code_text.pos1, seltext, code_text.owner, code_text.fid, "
         sql += "ifnull(cases.memo,''), ifnull(code_text.memo,''), ifnull(code_name.memo,''), "
-        sql += "ifnull(source.memo,''), ctid, code_name.cid "
+        sql += "ifnull(source.memo,''), ctid, code_name.cid, source.name "
         sql += "from code_text join code_name on code_name.cid = code_text.cid "
         sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
         sql += "code_text.fid = case_text.fid "
@@ -1489,7 +1513,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             cur.execute(sql, parameters)
         results = cur.fetchall()
         keys = 'codename', 'color', 'file_or_casename', 'caseid', 'pos0', 'pos1', 'text', 'coder', 'fid', \
-            'cases_memo', 'coded_memo', 'codename_memo', 'source_memo', 'ctid', 'cid'
+            'cases_memo', 'coded_memo', 'codename_memo', 'source_memo', 'ctid', 'cid', 'filename'
         for row in results:
             tmp = dict(zip(keys, row))
             tmp['result_type'] = 'text'
@@ -1505,7 +1529,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         sql = "select code_name.name, color, cases.name, cases.caseid, "
         sql += "x1, y1, width, height, code_image.owner,source.mediapath, source.id, "
         sql += "ifnull(code_image.memo,''), ifnull(cases.memo,''), ifnull(code_name.memo,''), "
-        sql += "ifnull(source.memo,''), imid, code_name.cid "
+        sql += "ifnull(source.memo,''), imid, code_name.cid, source.name "
         sql += "from code_image join code_name on code_name.cid = code_image.cid "
         sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
         sql += "code_image.id = case_text.fid "
@@ -1529,7 +1553,8 @@ class DialogReportCodes(QtWidgets.QDialog):
             cur.execute(sql, parameters)
         image_results = cur.fetchall()
         keys = ('codename', 'color', 'file_or_casename', 'caseid', 'x1', 'y1', 'width', 'height', 'coder',
-                'mediapath', 'fid', 'coded_memo', 'case_memo', 'codename_memo', 'source_memo', 'imid', 'cid')
+                'mediapath', 'fid', 'coded_memo', 'case_memo', 'codename_memo', 'source_memo', 'imid', 'cid',
+                'filename')
         for row in image_results:
             tmp = dict(zip(keys, row))
             tmp['result_type'] = 'image'
@@ -1542,7 +1567,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         av_sql += "code_av.pos0, code_av.pos1, code_av.owner,source.mediapath, source.id, "
         av_sql += "ifnull(code_av.memo,'') as coded_memo, ifnull(cases.memo,'') as case_memo, "
         av_sql += "ifnull(code_name.memo,''), ifnull(source.memo,''), avid, "
-        av_sql += "code_name.cid "
+        av_sql += "code_name.cid, source.name "
         av_sql += "from code_av join code_name on code_name.cid = code_av.cid "
         av_sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
         av_sql += "code_av.id = case_text.fid "
@@ -1566,7 +1591,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             cur.execute(av_sql, parameters)
         av_results = cur.fetchall()
         keys = 'codename', 'color', 'file_or_casename', 'caseid', 'pos0', 'pos1', 'coder', 'mediapath', \
-            'fid', 'coded_memo', 'case_memo', 'codename_memo', 'source_memo', 'avid', 'cid'
+            'fid', 'coded_memo', 'case_memo', 'codename_memo', 'source_memo', 'avid', 'cid', 'filename'
         for row in av_results:
             tmp = dict(zip(keys, row))
             tmp['result_type'] = 'av'
