@@ -291,7 +291,7 @@ Note: For 3.6 and up do not install pydub or SpeechRecognition. This function ha
 
 **Third option to run on macOS:**
 
-Install Wine for macOS and run a QualCoder exe - see the [releases page](https://github.com/ccbogel/QualCoder/releases). e.g. QualCoder-3.5.exe
+Install Wine for macOS and run a QualCoder exe, e.g. QualCoder-3.5.exe - see the [releases page](https://github.com/ccbogel/QualCoder/releases).
 
 Wine is available through: https://www.winehq.org/
  
