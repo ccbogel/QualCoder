@@ -14,13 +14,6 @@ If you like QualCoder please buy me a coffee ...
 
 <a href="https://www.buymeacoffee.com/ccbogelB" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
 
-
-## Update 13 October 2024 branch merge
-
-**With the work of Dr Dröge The artifcial intelligence branch has been incorporated into the main QualCoder branch, 13th October 2024.
-There may be some issues with the installation and running of QualCoder3.6 AI version over then next days. Please use the recent release (3.5 version) from the above link to the Releases page if you are running into difficulties with this latest update.**
-
-
 ## INSTALLATION 
 
 ### Prerequisites
@@ -280,7 +273,7 @@ You can install QualCoder anywhere you want, so the path above depends on where 
 Another option to run Qualcoder is shown here: [https://www.maketecheasier.com/run-python-script-in-mac/](https://www.maketecheasier.com/run-python-script-in-mac/). This means you can right-click on the qualcoder.py file and open with --> python launcher. 
 You can make an alias to the file and place it on your desktop.
 
-**Another option to install on Mac:**
+**Second option to install on macOS:**
 
 Open the Terminal App and move to the unzipped Qualcoder-Master directory, then run the following commands:
 
@@ -296,6 +289,11 @@ Note: For 3.6 and up do not install pydub or SpeechRecognition. This function ha
 
 `python3 setup.py py2app`
 
+**Third option to run on macOS:**
+
+Install Wine for macOS and run a QualCoder exe - see the releases page. e.g. QualCoder-3.5.exe
+
+Wine is avaiable through: https://www.winehq.org/
  
 ## Dependencies
 See requirements.txt file
@@ -314,8 +312,8 @@ QualCoder is distributed under the MIT LICENSE.
 
 ##  Citation APA style
 
-Curtain, C. (2023) QualCoder 3.5 [Computer software]. Retrieved from
-https://github.com/ccbogel/QualCoder/releases/tag/3.5
+Curtain, C. (2023) QualCoder 3.6 [Computer software]. Retrieved from
+https://github.com/ccbogel/QualCoder/releases/tag/3.6
 
 ## Creator
 
