@@ -713,6 +713,18 @@ where \n\
 -- and case_text.caseid in ( case_ids ) -- provide your case ids \n\
 -- and \n\
 (code_text.pos0 >= case_text.pos0 and code_text.pos1 <= case_text.pos1)',
+               '-- CODED TEXT WITH EACH CASE, LIMITED BY CASE ATTRUBIUTES - EXAMPLE SQL\n\
+               select distinct code_name.name as codename, cases.name as casename, code_text.pos0, code_text.pos1,\n\
+ code_text.fid, seltext as "coded text", code_text.owner \n\
+from code_text join code_name on code_name.cid = code_text.cid \n\
+join (case_text join cases on cases.caseid = case_text.caseid) on code_text.fid = case_text.fid\n\
+join attribute on  attribute.id =  case_text.caseid \n\
+join attribute as attribute2 on  attribute2.id =  case_text.caseid \n\
+ where \n\
+ attribute.attr_type ="case" and attribute.name = "Gender" and attribute.value = "male" and -- first attribute\n\
+ attribute2.attr_type ="case" and attribute2.name = "Age" and cast(attribute2.value as integer) < 30 and --second attribute \n\
+-- code_name.name in ( "Aggression", "Increased workload") and -- uncomment and put code names in list here to filter by code names \n\
+(code_text.pos0 >= case_text.pos0 and code_text.pos1 <= case_text.pos1)',
 
                '-- ALL OR SELECTED ANNOTATIONS\nselect annotation.anid as "Annotation ID" , annotation.memo as "Annotation text", \n\
 annotation.fid as "File ID" , source.name as "File name", annotation.pos0 as "Start position", \n\

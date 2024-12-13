@@ -41,7 +41,6 @@ from .add_attribute import DialogAddAttribute
 from .add_item_name import DialogAddItemName
 from .case_file_manager import DialogCaseFileManager
 from .confirm_delete import DialogConfirmDelete
-from .GUI.base64_helper import *
 from .GUI.ui_dialog_cases import Ui_Dialog_cases
 from .helpers import Message, ExportDirectoryPathDialog
 
@@ -84,11 +83,9 @@ class DialogCases(QtWidgets.QDialog):
         self.ui = Ui_Dialog_cases()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        font = f'font: {self.app.settings["fontsize"]}pt '
-        font += f'"{self.app.settings["font"]}";'
+        font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
-        doc_font = f'font: {self.app.settings["docfontsize"]}pt '
-        doc_font += f'"{self.app.settings["font"]}";'
+        doc_font = f'font: {self.app.settings["docfontsize"]}pt "{self.app.settings["font"]}";'
         self.ui.textBrowser.setStyleSheet(doc_font)
         self.ui.pushButton_add.setIcon(qta.icon('mdi6.pencil-outline'))
         self.ui.pushButton_add.clicked.connect(self.add_case)

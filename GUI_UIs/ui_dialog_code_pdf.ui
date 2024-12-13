@@ -571,38 +571,6 @@
        <property name="title">
         <string/>
        </property>
-       <widget class="QPushButton" name="pushButton_show_all_codings">
-        <property name="geometry">
-         <rect>
-          <x>90</x>
-          <y>0</y>
-          <width>28</width>
-          <height>28</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show all codings&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="pushButton_show_selected_code">
-        <property name="geometry">
-         <rect>
-          <x>50</x>
-          <y>0</y>
-          <width>28</width>
-          <height>28</height>
-         </rect>
-        </property>
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show selected_code&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
        <widget class="QPushButton" name="pushButton_important">
         <property name="geometry">
          <rect>
@@ -698,8 +666,6 @@
   <tabstop>pushButton_document_memo</tabstop>
   <tabstop>pushButton_file_attributes</tabstop>
   <tabstop>treeWidget</tabstop>
-  <tabstop>pushButton_show_selected_code</tabstop>
-  <tabstop>pushButton_show_all_codings</tabstop>
   <tabstop>pushButton_important</tabstop>
   <tabstop>scrollArea</tabstop>
   <tabstop>textEdit</tabstop>

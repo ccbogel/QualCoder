@@ -1,25 +1,18 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2024 Colin Curtain
+This file is part of QualCoder.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+QualCoder is free software: you can redistribute it and/or modify it under the
+terms of the GNU Lesser General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later version.
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+QualCoder is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
+You should have received a copy of the GNU Lesser General Public License along with QualCoder.
+If not, see <https://www.gnu.org/licenses/>.
 
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
@@ -29,8 +22,6 @@ https://qualcoder.wordpress.com/
 from PyQt6 import QtCore, QtWidgets
 import logging
 import os
-import sys
-import traceback
 
 from .GUI.ui_report_attribute_parameters import Ui_Dialog_report_attribute_parameters
 from .helpers import Message
@@ -100,16 +91,17 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
         keys = 'name', 'valuetype', 'memo', 'caseOrFile'
         for row in cur.fetchall():
             self.attribute_type.append(dict(zip(keys, row)))
-        # Add the case name as an 'attribute' to files attributes
-        if self.limiter == "file":
+        # Add the case name as an 'attribute' attributes - reivew this
+        cur.execute("select count(*) from cases")
+        cases_present = cur.fetchone()
+        if cases_present:
             casenames = {'name': 'case name', 'valuetype': 'character', 'memo': '', 'caseOrFile': 'case'}
             self.attribute_type.append(casenames)
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_report_attribute_parameters()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        font = f"font: {self.app.settings['fontsize']}pt "
-        font += f'"{self.app.settings["font"]}";'
+        font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
         self.fill_table_widget()
         self.ui.tableWidget.cellChanged.connect(self.cell_modified)
@@ -183,7 +175,7 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
                         not_numeric = True
             if not_numeric:
                 values = []
-            # add single quotes to character values
+            # Add single quotes to character values
             if type_ == "character":
                 for i in range(0, len(values)):
                     values[i] = f"'{values[i]}'"
@@ -200,12 +192,29 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
     def get_results_case_ids(self):
         """ Consolidate list of case ids from case parameters. """
 
+        #print("get results case ids")
         self.result_case_ids = []
         boolean_and_or = self.parameters[0][0]
         cur = self.app.conn.cursor()
         if boolean_and_or == "BOOLEAN_OR":
             for a in self.parameters:
-                if len(a) > 1 and a[1] == 'case':
+                # case name attribute
+                if len(a) > 1 and a[0] == 'case name' and a[1] == 'case':
+                    case_sql = "select distinct cases.caseid from cases where "
+                    case_sql += f"cases.name {a[3]} "
+                    if a[3] == 'between':
+                        case_sql += f"{a[4][0]} and {a[4][1]} "
+                    if a[3] in ('in', 'not in'):
+                        case_sql += "(" + ','.join(a[4]) + ") "  # One item the comma is skipped
+                    if a[3] not in ('between', 'in', 'not in'):
+                        case_sql += a[4][0]
+                    cur.execute(case_sql)
+                    result = cur.fetchall()
+                    #print("case name Res", result)
+                    for i in result:
+                        self.result_case_ids.append(i[0])
+                # Most case attributes
+                if len(a) > 1 and a[0] != 'case name' and a[1] == 'case':
                     # Case text table also links av and images
                     case_sql = "select distinct cases.caseid from cases "
                     case_sql += "join attribute on cases.caseid=attribute.id "
@@ -224,7 +233,7 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
                     #print("Attribute selected: ", a)
                     cur.execute(case_sql)
                     result = cur.fetchall()
-                    print("Res", result)
+                    #print("Res", result)
                     for i in result:
                         self.result_case_ids.append(i[0])
             #print("Case ids", self.result_case_ids)
@@ -232,6 +241,22 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
         # Boolean and
         list_of_sets = []
         for a in self.parameters:
+            # case name attribute
+            if len(a) > 1 and a[0] == 'case name' and a[1] == 'case':
+                case_sql = "select distinct cases.caseid from cases where "
+                case_sql += f"cases.name {a[3]} "
+                if a[3] == 'between':
+                    case_sql += f"{a[4][0]} and {a[4][1]} "
+                if a[3] in ('in', 'not in'):
+                    case_sql += "(" + ','.join(a[4]) + ") "  # One item the comma is skipped
+                if a[3] not in ('between', 'in', 'not in'):
+                    case_sql += a[4][0]
+                cur.execute(case_sql)
+                result = cur.fetchall()
+                #print("case name Res", result)
+                for i in result:
+                    self.result_case_ids.append(i[0])
+            # All other case attributes
             if len(a) > 1 and a[1] == 'case':
                 attribute_set = set()
                 # Case text table also links av and images
@@ -266,9 +291,12 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
     def get_results_file_ids(self):
         """ Consolidate list of file ids from file and case parameters. """
 
+        #print("get file ids")
         # Get file id's for case attributes and for file attributes
         file_ids = self.select_attributes_file_ids()
         case_file_ids = self.select_attributes_case_file_ids()
+        #print("file ids", file_ids)
+        #print("case ids", case_file_ids)
         # Consolidate case and file ids, using 'and' or 'or'
         if file_ids == [] and case_file_ids == []:
             return
@@ -380,7 +408,24 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         if boolean_and_or == "BOOLEAN_OR":
             for a in self.parameters:
-                if len(a) > 1 and a[1] == 'case':
+                # case name attribute
+                if len(a) > 1 and a[0] == 'case name' and a[1] == 'case':
+                    case_sql = "select distinct case_text.fid from cases "
+                    case_sql += "join case_text on case_text.caseid=cases.caseid where "
+                    case_sql += f"cases.name {a[3]} "
+                    if a[3] == 'between':
+                        case_sql += f"{a[4][0]} and {a[4][1]} "
+                    if a[3] in ('in', 'not in'):
+                        case_sql += "(" + ','.join(a[4]) + ") "  # One item the comma is skipped
+                    if a[3] not in ('between', 'in', 'not in'):
+                        case_sql += a[4][0]
+                    cur.execute(case_sql)
+                    result = cur.fetchall()
+                    #print("select case file ids OR: case name Res", result)
+                    for i in result:
+                        case_file_ids.append(i[0])
+                # Other case attributes
+                if len(a) > 1 and a[0] != 'case name' and a[1] == 'case':
                     # Case text table also links av and images
                     case_sql = "select distinct case_text.fid from cases "
                     case_sql += "join case_text on case_text.caseid=cases.caseid "
@@ -407,7 +452,27 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
         # Boolean and
         list_of_sets = []
         for a in self.parameters:
-            if len(a) > 1 and a[1] == 'case':
+            # case name attribute
+            if len(a) > 1 and a[0] == 'case name' and a[1] == 'case':
+                attribute_set = set()
+                case_sql = "select distinct case_text.fid from cases "
+                case_sql += "join case_text on case_text.caseid=cases.caseid where "
+                case_sql += f"cases.name {a[3]} "
+                if a[3] == 'between':
+                    case_sql += f"{a[4][0]} and {a[4][1]} "
+                if a[3] in ('in', 'not in'):
+                    case_sql += "(" + ','.join(a[4]) + ") "  # One item the comma is skipped
+                if a[3] not in ('between', 'in', 'not in'):
+                    case_sql += a[4][0]
+                cur.execute(case_sql)
+                results = cur.fetchall()
+                #print("select case file ids AND: case name Res", results)
+                for res in results:
+                    attribute_set.add(res[0])
+                if attribute_set != {}:
+                    list_of_sets.append(attribute_set)
+            # All other case attributes
+            if len(a) > 1 and a[0] != 'case name' and a[1] == 'case':
                 attribute_set = set()
                 # Case text table also links av and images
                 case_sql = "select distinct case_text.fid from cases "

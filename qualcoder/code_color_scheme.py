@@ -29,8 +29,7 @@ https://qualcoder.wordpress.com/
 from copy import deepcopy, copy
 import logging
 import os
-import sys
-import traceback
+import qtawesome as qta
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import Qt
@@ -38,7 +37,6 @@ from PyQt6.QtGui import QBrush
 
 
 from .color_selector import colors, colors_red_weak, colors_red_blind, colors_green_weak, colors_green_blind, TextColor
-from .GUI.base64_helper import undo_icon
 from .GUI.ui_dialog_code_colours import Ui_Dialog_code_colors
 
 
@@ -57,9 +55,8 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
     original_code_colors = []
     selected_colors = []
 
-    def __init__(self, app, parent_textedit, tab_reports):
-        """
-        """
+    def __init__(self, app, parent_textedit):
+        """ """
 
         super(DialogCodeColorScheme, self).__init__()
         self.app = app
@@ -75,12 +72,9 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         self.ui.splitter.setSizes([100, 300])
-
-        font = f'font: {self.app.settings["fontsize"]}pt '
-        font += f'"{self.app.settings["font"]}";'
+        font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
-        tree_font = f'font: {self.app.settings["treefontsize"]}pt '
-        tree_font += f'"{self.app.settings["font"]}";'
+        tree_font = f'font: {self.app.settings["treefontsize"]}pt "{self.app.settings["font"]}";'
         self.ui.treeWidget.setStyleSheet(tree_font)
         self.ui.treeWidget.viewport().installEventFilter(self)
         self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
@@ -94,9 +88,7 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
         self.fill_table()
         self.ui.pushButton_perspective.pressed.connect(self.change_perspective)
         self.ui.pushButton_apply.pressed.connect(self.apply_colors_to_codes)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(undo_icon), "png")
-        self.ui.pushButton_undo.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_undo.setIcon(qta.icon('mdi6.undo'))
         self.ui.pushButton_undo.pressed.connect(self.undo_color_changes)
 
     def get_codes_and_categories(self):

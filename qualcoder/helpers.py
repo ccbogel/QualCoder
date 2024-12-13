@@ -420,9 +420,9 @@ class DialogCodeInAV(QtWidgets.QDialog):
             if self.data['mediapath'][0:6] in ('audio:', 'video:'):
                 self.media = self.instance.media_new(self.data['mediapath'][6:])
         except Exception as err:
-            logger.warning((str(err)))
-            print(err)
             msg = f"{e}\n{self.app.project_path}{self.data['mediapath']}"
+            logger.warning((msg))
+            print(msg)
             Message(self.app, _('Media not found'), msg,
                     "warning").exec()
             self.close()
