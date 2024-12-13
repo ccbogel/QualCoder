@@ -44,6 +44,7 @@ from .ai_vectorstore import AiVectorstore
 from .GUI.base64_helper import *  # Unused
 from .helpers import Message
 from .error_dlg import qt_exception_hook
+from .html_parser import html_to_text
 import fuzzysearch
 import json_repair
 
@@ -303,14 +304,13 @@ class AiLLM():
         
     def _ai_async_error(self, exception_type, value, tb_obj):
         self.ai_async_is_errored = True
-        ai_model_name = self.app.ai_models[int(self.app.settings['ai_model_index'])]['name']
-        msg = _('Error communicating with ' + ai_model_name + '\n')
+        value = html_to_text(value)
+        msg = _('AI Error:\n')
         msg += exception_type.__name__ + ': ' + str(value)
         tb = '\n'.join(traceback.format_tb(tb_obj))
         logger.error(_("Uncaught exception: ") + msg + '\n' + tb)
         # Trigger message box show
         qt_exception_hook._exception_caught.emit(msg, tb)        
-        # raise exception_type(value).with_traceback(tb_obj)  # Re-raise
 
     def _ai_async_finished(self):
         self.ai_async_is_finished = True
@@ -450,7 +450,7 @@ class AiLLM():
         """Retrieve pieces of data from the vectorstore that are related to the given code.
         This function will be performed in the background, following these steps:
         1) Semantic extension: Let the LLM generate a list of 10 desciptions of the code in simple language
-        2) Semantic search: Search in the vectorstore for data that has a semantic similarity ti these descriptions
+        2) Semantic search: Search in the vectorstore for data that has a semantic similarity to these descriptions
         3) Ranking: Sort the results for relevance
 
         Args:
@@ -470,7 +470,7 @@ class AiLLM():
             return []
         
         # 2) Use the list of code descriptions to retrieve related data from the vectorstore
-        search_kwargs = {'score_threshold': 0.5, 'k': 50} # 'score_threshold' was 0.5       
+        search_kwargs = {'score_threshold': 0.5, 'k': 50}       
         chunks_meta_list = []
         for desc in descriptions:
             res = self.sources_vectorstore.faiss_db.similarity_search_with_relevance_scores(desc, **search_kwargs)

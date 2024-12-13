@@ -19,7 +19,11 @@ https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 """
 
-# from chromadb.config import Settings
+import os
+os.environ['FAISS_NO_AVX2'] = '1' 
+# Must be set before importing faiss. This tells faiss not to use AVX2, which makes the resulting
+# index also compatible with older machines and non-intel platforms.    
+
 from huggingface_hub import hf_hub_url
 import sentence_transformers  # This is used in a subthread. But we must keep a reference here so that it is not garbage collected.
 from langchain_community.embeddings import SentenceTransformerEmbeddings
@@ -43,7 +47,6 @@ from qualcoder.error_dlg import show_error_dlg
 
 # Turn off telemetry
 os.environ["HF_HUB_DISABLE_TELEMETRY"] = "1"  # for huggingface hub
-# os.environ["ANONYMIZED_TELEMETRY"] = "0"  # for chromadb
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -129,6 +132,7 @@ class AiVectorstore():
     download_model_cancel = False
     download_model_msg = ''
     faiss_db = None
+    faiss_db_path = None
     _is_closing = False
     collection_name = ''
     
@@ -277,20 +281,7 @@ want to continue?\
             self.faiss_db_path = os.path.join(self.app.project_path, 'ai_data', 'vectorstore', 'faiss_store.bin')
             if os.path.exists(self.faiss_db_path): 
                 # load existing faiss db
-                with open(self.faiss_db_path, 'rb') as f:
-                    serialized_bytes_loaded = f.read()
-
-                # Deserialize to reconstruct the FAISS vector store
-                self.faiss_db = FAISS.deserialize_from_bytes(
-                    serialized=serialized_bytes_loaded,
-                    embeddings=self.app.ai_embedding_function,
-                    allow_dangerous_deserialization=True
-                )                
-                #self.faiss_db = FAISS.load_local(
-                #    folder_path=self.faiss_db_path,
-                #    embeddings=self.app.ai_embedding_function,
-                #    allow_dangerous_deserialization=True
-                #)
+                self.faiss_db = self.faiss_load(self.faiss_db_path)
             else:
                 # create new faiss db
                 embedding_size = len(self.app.ai_embedding_function.embed_query("example"))
@@ -309,16 +300,29 @@ want to continue?\
             raise FileNotFoundError(f'AI Vectorstore: project path "{self.app.project_path}" not found.')
         self.app.ai._status = ''
     
-    def faiss_save(self):
-        if self.faiss_db is None:
+    def faiss_load(self, file_path) -> FAISS:
+        """ load and return existing faiss db """
+        with open(file_path, 'rb') as f:
+            serialized_bytes_loaded = f.read()
+        # Deserialize to reconstruct the FAISS vector store
+        return FAISS.deserialize_from_bytes(
+            serialized=serialized_bytes_loaded,
+            embeddings=self.app.ai_embedding_function,
+            allow_dangerous_deserialization=True
+        )
+
+    def faiss_save(self, faiss_db=None, faiss_db_path=None):
+        """ Save faiss index and docstore to a binary file."""
+        if faiss_db is None:
+            faiss_db = self.faiss_db
+        if faiss_db is None:
             return
-        if self.faiss_db_path is None:
-            raise FileNotFoundError(f'AI Vectorstore: faiss path not found.')
-        #self.faiss_db.save_local(
-        #    folder_path=self.faiss_db_path
-        #)
-        serialized_bytes = self.faiss_db.serialize_to_bytes()
-        with open(self.faiss_db_path, 'wb') as f:
+        if faiss_db_path is None:
+            faiss_db_path = self.faiss_db_path
+        if faiss_db_path is None:
+            raise FileNotFoundError(f'AI Vectorstore: faiss path not found.') 
+        serialized_bytes = faiss_db.serialize_to_bytes()
+        with open(faiss_db_path, 'wb') as f:
             f.write(serialized_bytes)    
 
     def init_vectorstore(self, rebuild=False):
@@ -359,16 +363,19 @@ want to continue?\
             self.parent_text_edit.append(msg)
             logger.debug(msg)
             
-    def faiss_db_search_file_id(self, file_id):
-        """Returns a list of embedding-ids for a certain file id or an empty list if nothing is found."""
-        if self.faiss_db is None:
+    def faiss_db_search_file_id(self, file_id, faiss_db=None):
+        """Returns a list of embedded chunk ids (doc_id) for a certain file id 
+        or an empty list if nothing is found."""
+        if faiss_db is None:
+            faiss_db = self.faiss_db
+        if faiss_db is None:
             return []
         res = []
-        for idx, doc_id in self.faiss_db.index_to_docstore_id.items():
-            doc = self.faiss_db.docstore.search(doc_id)
+        for doc_id in faiss_db.index_to_docstore_id.values():
+            doc = faiss_db.docstore.search(doc_id)
             if isinstance(doc, Document):
                 if doc.metadata['id'] == file_id:
-                    res.append(idx)
+                    res.append(str(doc_id))
         return res
     
     def _import_document(self, id_, name, text, update=False, signals=None):
@@ -379,12 +386,14 @@ want to continue?\
         # Check if the document is already in the store and delete if needed:        
         embeddings_list = self.faiss_db_search_file_id(id_)
         if len(embeddings_list) > 0:
-            # get first doc
-            _id = self.faiss_db.index_to_docstore_id[embeddings_list[0]]
-            doc = self.faiss_db.docstore.search(_id)
+            # check name of first embedded chunk 
+            doc = self.faiss_db.docstore.search(embeddings_list[0])
             if update or doc.metadata['name'] != name:
                 # delete old embeddings
-                self.faiss_db.delete(embeddings_list)
+                try:
+                    self.faiss_db.delete(embeddings_list)
+                except ValueError as e:
+                    logger.debug(f'Error deleting document from faiss vector store: {e}')
                 self.faiss_save()
             else:
                 # skip the doc
@@ -410,11 +419,13 @@ want to continue?\
                 if not self._is_closing:
                     uid = str(uuid4())
                     self.faiss_db.add_documents([chunk], ids=[uid])
-                    # self.faiss_db.add_texts(texts=[chunk.page_content], metadatas=[chunk.metadata], ids=[uid])  
                 else:  # Canceled, delete the unfinished document from the vectorstore:
                     embeddings_list = self.faiss_db_search_file_id(id_)
                     if len(embeddings_list) > 0:
-                        self.faiss_db.delete(embeddings_list)
+                        try:
+                            self.faiss_db.delete(embeddings_list)
+                        except ValueError as e:
+                            logger.debug(f'Error deleting document from faiss vector store: {e}')
                     break
             self.faiss_save()
 
@@ -463,7 +474,10 @@ want to continue?\
             doc = self.faiss_db.docstore.search(doc_id)
             if isinstance(doc, Document):
                 if not search_name(docs, doc.metadata['name']):
-                    self.faiss_db.delete([idx])
+                    try:
+                        self.faiss_db.delete([idx])
+                    except ValueError as e:
+                        logger.debug(f'Error deleting document from faiss vector store: {e}')
 
         # Add new docs
         if len(docs) == 0:
@@ -488,7 +502,10 @@ want to continue?\
         self.parent_text_edit.append(msg)
         logger.debug(msg)
         # delete all the contents from the vectorstore
-        self.faiss_db.delete(self.faiss_db.index_to_docstore_id.keys())
+        try:
+            self.faiss_db.delete(self.faiss_db.index_to_docstore_id.keys())
+        except ValueError as e:
+            logger.debug(f'Error deleting document from faiss vector store: {e}')
         self.faiss_save()
         # rebuild vectorstore
         self.update_vectorstore()
@@ -498,21 +515,20 @@ want to continue?\
         from the vectorstore"""
 
         faiss_db = self.faiss_db
+        faiss_db_path = self.faiss_db_path
         if faiss_db is None:
             # Try to create a temporary access
-            if self.app.project_path != '' and os.path.exists(self.app.project_path):
-                faiss_db_path = os.path.join(self.app.project_path, 'ai_data', 'vectorstore', 'faiss_index')
-                if os.path.exists(self.faiss_db_path): 
-                    faiss_db = FAISS.load_local(
-                        folder_path=self.faiss_db_path,
-                        embeddings=self.app.ai_embedding_function,
-                        allow_dangerous_deserialization=True
-                    )
+            faiss_db_path = os.path.join(self.app.project_path, 'ai_data', 'vectorstore', 'faiss_store.bin')
+            if os.path.exists(faiss_db_path): 
+                faiss_db = self.faiss_load(faiss_db_path)
         if faiss_db is not None:
-            embeddings_list = self.faiss_db_search_file_id(id_)
+            embeddings_list = self.faiss_db_search_file_id(id_, faiss_db=faiss_db)
             if len(embeddings_list) > 0:
-                self.faiss_db.delete(embeddings_list)
-                self.faiss_save()
+                try:
+                    faiss_db.delete(embeddings_list)
+                except ValueError as e:
+                    logger.debug(f'Error deleting document from faiss vector store: {e}')
+                self.faiss_save(faiss_db=faiss_db, faiss_db_path=faiss_db_path)
                
     def close(self):
         """Cancels the update process if running"""
