@@ -1,44 +1,36 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2024 Colin Curtain
+This file is part of QualCoder.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+QualCoder is free software: you can redistribute it and/or modify it under the
+terms of the GNU Lesser General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later version.
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+QualCoder is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
+You should have received a copy of the GNU Lesser General Public License along with QualCoder.
+If not, see <https://www.gnu.org/licenses/>.
 
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 """
+
 import sqlite3
 from copy import copy, deepcopy
 import datetime
-# import difflib  # Slow, using diff_match_patch
+# import difflib  # Slow, kept this in case need to revert to it. Now using diff_match_patch
 import diff_match_patch
 import html
 import logging
 from operator import itemgetter
 import os
+import qtawesome as qta
 from random import randint
 import re
-# import sys
-# import traceback
 import webbrowser
-# import base64
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import Qt
@@ -50,7 +42,6 @@ from .color_selector import DialogColorSelect
 from .color_selector import colors, TextColor
 from .confirm_delete import DialogConfirmDelete
 from .helpers import Message, DialogGetStartAndEndMarks, ExportDirectoryPathDialog, MarkdownHighlighter
-from .GUI.base64_helper import *
 from .GUI.ui_dialog_code_text import Ui_Dialog_code_text
 from .memo import DialogMemo
 from .report_attributes import DialogSelectAttributeParameters
@@ -134,7 +125,7 @@ class DialogCodeText(QtWidgets.QWidget):
     project_memo = False
     code_rule = False
 
-    # variables for ai search
+    # Variables for ai search
     ai_search_results = []
     ai_search_code_name = ''
     ai_search_code_memo = ''
@@ -189,16 +180,13 @@ class DialogCodeText(QtWidgets.QWidget):
         self.edit_original_cutoff_datetime = None
 
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        font = f"font: {self.app.settings['fontsize']}pt "
-        font += '"' + self.app.settings['font'] + '";'
+        font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
-        tree_font = f"font: {self.app.settings['treefontsize']}pt "
-        tree_font += '"' + self.app.settings['font'] + '";'
+        tree_font = f'font: {self.app.settings["treefontsize"]}pt "{self.app.settings["font"]}";'
         self.ui.treeWidget.setStyleSheet(tree_font)
-        doc_font = f"font: {self.app.settings['docfontsize']}pt "
-        doc_font += '"' + self.app.settings['font'] + '";'
+        doc_font = f'font: {self.app.settings["docfontsize"]}pt "{self.app.settings["font"]}";'
         self.ui.textEdit.setStyleSheet(doc_font)
-        self.ui.label_coder.setText("Coder: " + self.app.settings['codername'])
+        self.ui.label_coder.setText(f"Coder: {self.app.settings['codername']}")
         self.ui.textEdit.setPlainText("")
         self.ui.textEdit.setAutoFillBackground(True)
         self.ui.textEdit.setToolTip("")
@@ -216,92 +204,53 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.listWidget.customContextMenuRequested.connect(self.file_menu)
         self.ui.listWidget.setStyleSheet(tree_font)
         self.ui.listWidget.selectionModel().selectionChanged.connect(self.file_selection_changed)
-        self.search_type = "3"
+        self.search_type = "3"  # 3 character threshold for text search
         self.ui.lineEdit_search.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.lineEdit_search.customContextMenuRequested.connect(self.lineedit_search_menu)
         self.ui.lineEdit_search.returnPressed.connect(self.search_for_text)
         self.ui.tabWidget.setCurrentIndex(0)  # Defaults to list of documents
         self.get_files()
 
-        # Icons marked icon_24 icons are 24x24 px but need a button of 28
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(playback_next_icon_24), "png")
-        self.ui.pushButton_latest.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_latest.setIcon(qta.icon('mdi6.arrow-collapse-right'))
         self.ui.pushButton_latest.pressed.connect(self.go_to_latest_coded_file)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(playback_play_icon_24), "png")
-        self.ui.pushButton_next_file.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_next_file.setIcon(qta.icon('mdi6.arrow-right'))
         self.ui.pushButton_next_file.pressed.connect(self.go_to_next_file)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(bookmark_icon_24), "png")
-        self.ui.pushButton_bookmark_go.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_bookmark_go.setIcon(qta.icon('mdi6.bookmark'))
         self.ui.pushButton_bookmark_go.pressed.connect(self.go_to_bookmark)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(notepad_2_icon_24), "png")
-        self.ui.pushButton_document_memo.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_document_memo.setIcon(qta.icon('mdi6.text-long'))
         self.ui.pushButton_document_memo.pressed.connect(self.active_file_memo)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(round_arrow_right_icon_24), "png")
-        self.ui.pushButton_show_codings_next.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_show_codings_next.setIcon(qta.icon('mdi6.arrow-right'))
         self.ui.pushButton_show_codings_next.pressed.connect(self.show_selected_code_in_text_next)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(round_arrow_left_icon_24), "png")
-        self.ui.pushButton_show_codings_prev.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_show_codings_prev.setIcon(qta.icon('mdi6.arrow-left'))
         self.ui.pushButton_show_codings_prev.pressed.connect(self.show_selected_code_in_text_previous)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_grid_icon_24), "png")
-        self.ui.pushButton_show_all_codings.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_show_all_codings.setIcon(qta.icon('mdi6.text-search'))
         self.ui.pushButton_show_all_codings.pressed.connect(self.show_all_codes_in_text)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(notepad_pencil_icon), "png")
-        self.ui.pushButton_annotate.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_annotate.setIcon(qta.icon('mdi6.text-box-edit-outline'))
         self.ui.pushButton_annotate.pressed.connect(self.annotate)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(eye_doc_icon), "png")
-        self.ui.pushButton_show_annotations.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_show_annotations.setIcon(qta.icon('mdi6.text-search-variant'))
         self.ui.pushButton_show_annotations.pressed.connect(self.show_annotations)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(notepad_pencil_red_icon), "png")
-        self.ui.pushButton_coding_memo.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_coding_memo.setIcon(qta.icon('mdi6.text-box-edit'))
         self.ui.pushButton_coding_memo.pressed.connect(self.coded_text_memo)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(eye_doc_icon), "png")
-        self.ui.pushButton_show_memos.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_show_memos.setIcon(qta.icon('mdi6.text-search'))
         self.ui.pushButton_show_memos.pressed.connect(self.show_memos)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(magic_wand_icon), "png")
-        self.ui.pushButton_auto_code.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_auto_code.setIcon(qta.icon('mdi6.mace'))
         self.ui.pushButton_auto_code.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.pushButton_auto_code.customContextMenuRequested.connect(self.button_auto_code_menu)
         self.ui.pushButton_auto_code.clicked.connect(self.auto_code)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(wand_one_file_icon), "png")
-        self.ui.pushButton_auto_code_frag_this_file.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_auto_code_frag_this_file.setIcon(qta.icon('mdi6.magic-staff'))
         self.ui.pushButton_auto_code_frag_this_file.pressed.connect(self.button_autocode_sentences_this_file)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(wand_all_files_icon), "png")
-        self.ui.pushButton_auto_code_frag_all_files.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_auto_code_frag_all_files.setIcon(qta.icon('mdi6.mace'))  # TODO REVISE
         self.ui.pushButton_auto_code_frag_all_files.pressed.connect(self.button_autocode_sentences_all_files)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(wand_one_file_brackets_icon), "png")
-        self.ui.pushButton_auto_code_surround.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_auto_code_surround.setIcon(qta.icon('mdi6.spear'))
         self.ui.pushButton_auto_code_surround.pressed.connect(self.button_autocode_surround)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(undo_icon), "png")
-        self.ui.pushButton_auto_code_undo.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_auto_code_undo.setIcon(qta.icon('mdi6.undo'))
         self.ui.pushButton_auto_code_undo.pressed.connect(self.undo_autocoding)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_icon), "png")
-        self.ui.label_exports.setPixmap(pm.scaled(22, 22))
+        self.ui.label_exports.setPixmap(qta.icon('mdi6.export').pixmap(22, 22))
         # Right hand side splitter buttons
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(coding_icon), "png")
-        self.ui.pushButton_code_rule.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_code_rule.setIcon(qta.icon('mdi6.text-shadow'))
         self.ui.pushButton_code_rule.pressed.connect(self.show_code_rule)
         self.ui.pushButton_journal.hide()
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(project_icon), "png")
-        self.ui.pushButton_project_memo.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_project_memo.setIcon(qta.icon('mdi6.file-document-outline'))
         self.ui.pushButton_project_memo.pressed.connect(self.show_project_memo)
         self.ui.textEdit_info.tabChangesFocus()
         self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
@@ -310,57 +259,31 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.checkBox_search_all_files.setEnabled(False)
         self.ui.checkBox_search_case.stateChanged.connect(self.search_for_text)
         self.ui.checkBox_search_case.setEnabled(False)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(question_icon), "png")
-        self.ui.label_search_regex.setPixmap(QtGui.QPixmap(pm).scaled(22, 22))
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(text_letter_t_icon), "png")
-        self.ui.label_search_case_sensitive.setPixmap(QtGui.QPixmap(pm).scaled(22, 22))
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(clipboard_copy_icon), "png")
-        self.ui.label_search_all_files.setPixmap(QtGui.QPixmap(pm).scaled(22, 22))
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(font_size_icon), "png")
-        self.ui.label_font_size.setPixmap(QtGui.QPixmap(pm).scaled(22, 22))
+        self.ui.label_search_regex.setPixmap(qta.icon('mdi6.help').pixmap(22, 22))
+        self.ui.label_search_case_sensitive.setPixmap(qta.icon('mdi6.format-letter-case').pixmap(22, 22))
+        self.ui.label_search_all_files.setPixmap(qta.icon('mdi6.text-box-multiple-outline').pixmap(22, 22))
+        self.ui.label_font_size.setPixmap(qta.icon('mdi6.format-size').pixmap(22, 22))
         self.ui.spinBox_font_size.setValue(self.app.settings['docfontsize'])
         self.ui.spinBox_font_size.valueChanged.connect(self.change_text_font_size)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(playback_back_icon), "png")
-        self.ui.pushButton_previous.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_previous.setIcon(qta.icon('mdi6.arrow-left'))
         self.ui.pushButton_previous.setEnabled(False)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(playback_play_icon), "png")
-        self.ui.pushButton_next.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_next.setIcon(qta.icon('mdi6.arrow-right'))
         self.ui.pushButton_next.setEnabled(False)
         self.ui.pushButton_next.pressed.connect(self.move_to_next_search_text)
         self.ui.pushButton_previous.pressed.connect(self.move_to_previous_search_text)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(question_icon), "png")
-        self.ui.pushButton_help.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_help.setIcon(qta.icon('mdi6.help'))
         self.ui.pushButton_help.pressed.connect(self.help)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(delete_icon), "png")
-        self.ui.pushButton_delete_all_codes.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_delete_all_codes.setIcon(qta.icon('mdi6.delete-outline'))
         self.ui.pushButton_delete_all_codes.pressed.connect(self.delete_all_codes_from_file)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(tag_icon32), "png")
-        self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.tag-outline'))
         self.ui.pushButton_file_attributes.pressed.connect(self.get_files_from_attributes)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(star_icon32), "png")
-        self.ui.pushButton_important.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_important.setIcon(qta.icon('mdi6.star-outline'))
         self.ui.pushButton_important.pressed.connect(self.show_important_coded)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(pencil_icon), "png")
-        self.ui.pushButton_edit.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_edit.setIcon(qta.icon('mdi6.text-box-edit-outline'))
         self.ui.pushButton_edit.pressed.connect(self.edit_mode_toggle)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(pencil_icon), "png")
-        self.ui.pushButton_exit_edit.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_exit_edit.setIcon(qta.icon('mdi6.text-box-check-outline'))
         self.ui.pushButton_exit_edit.pressed.connect(self.edit_mode_toggle)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(undo_icon), "png")
-        self.ui.pushButton_undo_edit.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_undo_edit.setIcon(qta.icon('mdi6.undo'))
         self.ui.pushButton_undo_edit.pressed.connect(self.undo_edited_text)
         self.ui.label_codes_count.setEnabled(False)
         self.ui.treeWidget.setDragEnabled(True)
@@ -419,8 +342,7 @@ class DialogCodeText(QtWidgets.QWidget):
     def change_text_font_size(self):
         """ Spinbox font size changed, range: 6 - 32 points. """
 
-        font = 'font: ' + str(self.ui.spinBox_font_size.value()) + 'pt '
-        font += '"' + self.app.settings['font'] + '";'
+        font = f'font: {self.ui.spinBox_font_size.value()}pt "{self.app.settings["font"]}";'
         self.ui.textEdit.setStyleSheet(font)
 
     def get_files(self, ids=None):
@@ -505,33 +427,23 @@ class DialogCodeText(QtWidgets.QWidget):
         ok = ui.exec()
         if not ok:
             self.attributes = temp_attributes
-            pm = QtGui.QPixmap()
-            pm.loadFromData(QtCore.QByteArray.fromBase64(tag_icon32), "png")
-            self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
+            self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.tag-outline'))
             self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
             if self.attributes:
-                pm = QtGui.QPixmap()
-                pm.loadFromData(QtCore.QByteArray.fromBase64(tag_iconyellow32), "png")
-                self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
+                self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.tag'))
             return
         self.attributes = ui.parameters
         if len(self.attributes) == 1:  # Boolean parameter, no attributes
-            pm = QtGui.QPixmap()
-            pm.loadFromData(QtCore.QByteArray.fromBase64(tag_icon32), "png")
-            self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
+            self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.tag-outline'))
             self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
             self.get_files()
             return
         if not ui.result_file_ids:
             Message(self.app, _("Nothing found") + " " * 20, _("No matching files found")).exec()
-            pm = QtGui.QPixmap()
-            pm.loadFromData(QtCore.QByteArray.fromBase64(tag_icon32), "png")
-            self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
+            self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.tag-outline'))
             self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
             return
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(tag_iconyellow32), "png")
-        self.ui.pushButton_file_attributes.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.tag'))
         self.ui.pushButton_file_attributes.setToolTip(ui.tooltip_msg)
         self.get_files(ui.result_file_ids)
 
@@ -578,12 +490,8 @@ class DialogCodeText(QtWidgets.QWidget):
         # When a code is selected undo the show selected code features
         self.highlight()
         # Reload button icons as they disappear on Windows
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(round_arrow_left_icon_24), "png")
-        self.ui.pushButton_show_codings_prev.setIcon(QtGui.QIcon(pm))
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(round_arrow_right_icon_24), "png")
-        self.ui.pushButton_show_codings_next.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_show_codings_prev.setIcon(qta.icon('mdi6.arrow-left'))
+        self.ui.pushButton_show_codings_next.setIcon(qta.icon('mdi6.arrow-right'))
 
     def tree_traverse_for_non_expanded(self, item, non_expanded):
         """ Find all categories and codes
@@ -1737,14 +1645,12 @@ class DialogCodeText(QtWidgets.QWidget):
         """ Show codes flagged as important. """
 
         self.important = not self.important
-        pm = QtGui.QPixmap()
         if self.important:
-            pm.loadFromData(QtCore.QByteArray.fromBase64(star_icon_yellow32), "png")
             self.ui.pushButton_important.setToolTip(_("Showing important codings"))
+            self.ui.pushButton_important.setIcon(qta.icon('mdi6.star'))
         else:
-            pm.loadFromData(QtCore.QByteArray.fromBase64(star_icon32), "png")
             self.ui.pushButton_important.setToolTip(_("Show codings flagged important"))
-        self.ui.pushButton_important.setIcon(QtGui.QIcon(pm))
+            self.ui.pushButton_important.setIcon(qta.icon('mdi6.star-outline'))
         self.get_coded_text_update_eventfilter_tooltips()
 
     def show_codes_like(self):
@@ -2194,8 +2100,6 @@ class DialogCodeText(QtWidgets.QWidget):
                     return
             if len(codes_here) == 1:
                 code_ = codes_here[0]
-            if not code_:  # key was pressed outside of any codings, return to default handling
-                return False 
             # Key event can be too sensitive, adjusted  for 150 millisecond gap
             self.code_resize_timer = datetime.datetime.now()
             if key == QtCore.Qt.Key.Key_Left and mod == QtCore.Qt.KeyboardModifier.AltModifier:
@@ -2345,22 +2249,16 @@ class DialogCodeText(QtWidgets.QWidget):
         # Update tooltips to show only this code
         self.eventFilterTT.set_codes_and_annotations(self.app, tt_code_text, self.codes, self.annotations,
                                                      self.file_)
-        # Need to reload arrow icons as they dissappear on Windows
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_color_grid_icon_24), "png")
-        self.ui.pushButton_show_all_codings.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_show_codings_prev.setStyleSheet("background-color : " + color + ";color:" + foreground_color)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(round_arrow_left_icon_24), "png")
-        self.ui.pushButton_show_codings_prev.setIcon(QtGui.QIcon(pm))
+        # Need to reload icons as they disappear on Windows
+        self.ui.pushButton_show_all_codings.setIcon(qta.icon('mdi6.grid'))
+        self.ui.pushButton_show_codings_prev.setStyleSheet(f"background-color: {color}; color:{foreground_color}")
+        self.ui.pushButton_show_codings_prev.setIcon(qta.icon('mdi6.arrow-left'))
         tt = _("Show previous coding of selected code") + msg
         self.ui.pushButton_show_codings_prev.setToolTip(tt)
-        self.ui.pushButton_show_codings_next.setStyleSheet("background-color : " + color + ";color:" + foreground_color)
+        self.ui.pushButton_show_codings_next.setStyleSheet(f"background-color: {color}; color:{foreground_color}")
         tt = _("Show next coding of selected code") + msg
         self.ui.pushButton_show_codings_next.setToolTip(tt)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(round_arrow_right_icon_24), "png")
-        self.ui.pushButton_show_codings_next.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_show_codings_next.setIcon(qta.icon('mdi6.arrow-right'))
 
     def show_selected_code_in_text_previous(self):
         """ Highlight only the selected code in the text. Move to previous instance in text from
@@ -2416,26 +2314,20 @@ class DialogCodeText(QtWidgets.QWidget):
         brush = QBrush(QColor(color))
         fmt = QtGui.QTextCharFormat()
         fmt.setBackground(brush)
-        foregroundcol = TextColor(color).recommendation
-        fmt.setForeground(QBrush(QColor(foregroundcol)))
+        foreground_colour = TextColor(color).recommendation
+        fmt.setForeground(QBrush(QColor(foreground_colour)))
         cursor.mergeCharFormat(fmt)
         # Update tooltips to show only this code
         self.eventFilterTT.set_codes_and_annotations(self.app, tt_code_text, self.codes, self.annotations,
                                                      self.file_)
-        # Need to reload arrow icons as they dissapear on Windows
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_color_grid_icon_24), "png")
-        self.ui.pushButton_show_all_codings.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_show_codings_prev.setStyleSheet("background-color : " + color + ";color:" + foregroundcol)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(round_arrow_left_icon_24), "png")
-        self.ui.pushButton_show_codings_prev.setIcon(QtGui.QIcon(pm))
+        # Need to reload icons as they disapear on Windows
+        self.ui.pushButton_show_all_codings.setIcon(qta.icon('mdi6.grid'))
+        self.ui.pushButton_show_codings_prev.setStyleSheet(f"background-color: {color};color:{foreground_colour}")
+        self.ui.pushButton_show_codings_prev.setIcon(qta.icon('mdi6.arrow-left'))
         tt = _("Show previous coding of selected code") + msg
         self.ui.pushButton_show_codings_prev.setToolTip(tt)
-        self.ui.pushButton_show_codings_next.setStyleSheet("background-color : " + color + ";color:" + foregroundcol)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(round_arrow_right_icon_24), "png")
-        self.ui.pushButton_show_codings_next.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_show_codings_next.setStyleSheet(f"background-color: {color};color:{foreground_colour}")
+        self.ui.pushButton_show_codings_next.setIcon(qta.icon('mdi6.arrow-right'))
         tt = _("Show next coding of selected code") + msg
         self.ui.pushButton_show_codings_next.setToolTip(tt)
 
@@ -2443,19 +2335,13 @@ class DialogCodeText(QtWidgets.QWidget):
         """ Opposes show selected code methods.
         Highlights all the codes in the text. """
 
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_grid_icon_24), "png")
-        self.ui.pushButton_show_all_codings.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_show_all_codings.setIcon(qta.icon('mdi6.grid-off'))
         self.ui.pushButton_show_codings_prev.setStyleSheet("")
         self.ui.pushButton_show_codings_next.setStyleSheet("")
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(round_arrow_left_icon_24), "png")
-        self.ui.pushButton_show_codings_prev.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_show_codings_prev.setIcon(qta.icon('mdi6.arrow-left'))
         tt = _("Show previous coding of selected code")
         self.ui.pushButton_show_codings_prev.setToolTip(tt)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(round_arrow_right_icon_24), "png")
-        self.ui.pushButton_show_codings_next.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_show_codings_next.setIcon(qta.icon('mdi6.arrow-right'))
         tt = _("Show next coding of selected code")
         self.ui.pushButton_show_codings_next.setToolTip(tt)
         self.get_coded_text_update_eventfilter_tooltips()
@@ -3691,7 +3577,7 @@ class DialogCodeText(QtWidgets.QWidget):
         cur = self.app.conn.cursor()
         try:
             for start_pos in text_starts:
-                pos1 = -1  # Default if not found
+                # pos1 = -1  # Default if not found. Not Used
                 text_end_iterator = 0
                 try:
                     while start_pos >= text_ends[text_end_iterator]:
@@ -3867,7 +3753,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.parent_textEdit.append(_("Automatic code sentence in files:")
                                     + _("\nCode: ") + item.text(0)
                                     + _("\nWith text fragment: ")
-                                    + text.decode("utf-8")
+                                    + text_.decode("utf-8")
                                     + _("\nUsing line ending: ")
                                     + ending + "\n" + msg)
         self.app.delete_backup = False
