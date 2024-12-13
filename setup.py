@@ -67,9 +67,8 @@ setup(
         'ply',
         'pandas',
         'plotly',
-        'pydub',
-        'rispy',
-        'SpeechRecognition'
+        'qtawesome',
+        'rispy'
     ],
     package_data={
         'qualcoder':['Codebook.xsd', 'Project-mrt2019.xsd',
