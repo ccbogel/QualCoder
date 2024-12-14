@@ -44,6 +44,7 @@ from uuid import uuid4
 from qualcoder.ai_async_worker import Worker
 from qualcoder.ai_async_worker import AIException
 from qualcoder.error_dlg import show_error_dlg
+from qualcoder.helpers import Message
 
 # Turn off telemetry
 os.environ["HF_HUB_DISABLE_TELEMETRY"] = "1"  # for huggingface hub
@@ -282,11 +283,9 @@ want to continue?\
             if os.path.exists(self.faiss_db_path): 
                 # load existing faiss db
                 self.faiss_db = self.faiss_load(self.faiss_db_path)
-            else:
-                # create new faiss db
-                embedding_size = len(self.app.ai_embedding_function.embed_query("example"))
-                print(embedding_size)
-                faiss_index = faiss.IndexFlatL2(embedding_size) # 1024 is the embedding size of the used model: https://huggingface.co/intfloat/multilingual-e5-large
+            else: # create new faiss db
+                embedding_size = 1024 # embedding size of the used model: https://huggingface.co/intfloat/multilingual-e5-large
+                faiss_index = faiss.IndexFlatL2(embedding_size) 
                 self.faiss_db = FAISS(
                     embedding_function=self.app.ai_embedding_function,
                     index=faiss_index,
@@ -322,6 +321,7 @@ want to continue?\
         if faiss_db_path is None:
             raise FileNotFoundError(f'AI Vectorstore: faiss path not found.') 
         serialized_bytes = faiss_db.serialize_to_bytes()
+        os.makedirs(os.path.dirname((faiss_db_path)), exist_ok=True)
         with open(faiss_db_path, 'wb') as f:
             f.write(serialized_bytes)    
 
@@ -344,6 +344,20 @@ want to continue?\
             self.open_db(rebuild)
             
     def open_db(self, rebuild=False):
+        """ Opens an existing vectorstore. 
+        If rebuild is True, all documents will be read in again. """
+         
+        # Check if conversion chromadb to faiss vectorstore is necessary
+        vectorstore_path = os.path.join(self.app.project_path, 'ai_data', 'vectorstore')
+        faiss_path = os.path.join(vectorstore_path, 'faiss_store.bin') 
+        if os.path.exists(vectorstore_path) and (not os.path.exists(faiss_path)):
+            msg = _('It appears that you have already used the AI features with this project before. '
+                    'Meanwhile, we had to change the internal implementation of the local AI memory '
+                    'to make it more robust. As a result, the AI has to read through all your '
+                    'empirical documents again to rebuild the local memory. This may take a while. '
+                    'Sorry for the inconvenience.')
+            Message(self.app, _('AI memory'), msg).exec()
+        
         worker = Worker(self._open_db)  
         if rebuild:
             worker.signals.finished.connect(self.rebuild_vectorstore)
