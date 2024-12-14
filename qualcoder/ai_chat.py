@@ -47,6 +47,7 @@ from .confirm_delete import DialogConfirmDelete
 from .ai_prompts import PromptItem
 from .ai_llm import extract_ai_memo
 from .error_dlg import qt_exception_hook
+from .html_parser import html_to_text
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -202,7 +203,7 @@ class DialogAIChat(QtWidgets.QDialog):
     @staticmethod
     def help():
         """ Open help in browser. """
-        url = "https://github.com/ccbogel/QualCoder/wiki/5.1.-AI-Chat"
+        url = "https://github.com/ccbogel/QualCoder/wiki/5.1.-AI-chat-based-analysis"
         webbrowser.open(url)
 
     def get_chat_list(self):
@@ -966,6 +967,7 @@ data collected. This information will accompany every prompt sent to the AI, res
         """Called if the AI returns an error"""
         self.ai_streaming_output = ''
         ai_model_name = self.app.ai_models[int(self.app.settings['ai_model_index'])]['name']
+        value = html_to_text(value)
         msg = _('Error communicating with ' + ai_model_name + '\n')
         msg += exception_type.__name__ + ': ' + str(value)
         tb = '\n'.join(traceback.format_tb(tb_obj))
