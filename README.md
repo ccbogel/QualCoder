@@ -148,17 +148,13 @@ Note: To exit venv type `deactivate`
 
 `pip install --upgrade pip`
 
-6. Install the needed Python modules.
-
-`pip install -r requirements.txt`
-
-7. You must be in the QualCoder-master folder (Or the main release folder if using a release. e.g. QualCoder-3.5 folder). Install QualCoder, and type the following, the dot is important:
+6. You must be in the QualCoder-master folder (Or the main release folder if using a release. e.g. QualCoder-3.5 folder). Install QualCoder, and type the following, the dot is important:
 
 `python3 -m pip install .`
 
 You may get a warning which can be ignored: WARNING: Building wheel for Qualcoder failed
 
-8. To run type
+7. To run type
 
 `qualcoder`
 
