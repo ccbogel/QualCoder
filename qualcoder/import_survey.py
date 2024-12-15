@@ -105,6 +105,8 @@ class DialogImportSurvey(QtWidgets.QDialog):
         else:
             self.ui.groupBox.hide()
             self.ui.tableWidget.hide()
+            self.ui.checkBox_collate.hide()
+            self.ui.buttonBox.hide()
             self.ui.label_msg.setText(_("No survey selected."))
             self.ui.label_msg.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
             self.close()
@@ -130,7 +132,9 @@ class DialogImportSurvey(QtWidgets.QDialog):
 
     def read_xlsx_file(self):
         """ Read the data from the xlsx file.
-        Fill Class variables self.fields, self.data """
+        Fill Class variables self.fields, self.data
+        Called by: prepare_fields
+        """
 
         self.data = []
         wb = load_workbook(filename=self.filepath)
@@ -165,7 +169,9 @@ class DialogImportSurvey(QtWidgets.QDialog):
 
     def read_csv_file(self):
         """ Read the data from the csv file.
-         Fill Class variables self.fields, self.data """
+         Fill Class variables self.fields, self.data
+          Called by: prepare_fields, options_changed
+        """
 
         self.data = []
         with open(self.filepath, 'r', newline='') as f:
@@ -370,13 +376,13 @@ class DialogImportSurvey(QtWidgets.QDialog):
             QtWidgets.QApplication.processEvents()
         self.app.conn.commit()
 
-        # insert qualitative data into source table
-        self.ui.label_msg.setText(_("Creating qualitative text file"))
+        # Insert qualitative data into source table
+        self.ui.label_msg.setText(_("Creating qualitative text file(s)"))
         source_sql = "insert into source(name,fulltext,memo,owner,date, mediapath) values(?,?,?,?,?, Null)"
         for field in range(1, len(self.fields)):  # column 0 is for identifiers
             case_text_list = []
-            if self.fields_type[field] == "qualitative":
-                # Create one text file combining each row, prefix [case identifier] to each row.
+            # Create one text file combining each row, prefix [case identifier] to each row.
+            if self.fields_type[field] == "qualitative" and self.ui.checkBox_collate.isChecked():
                 fulltext = ""
                 for row in range(0, len(self.data)):
                     if self.data[row][field] != "":
@@ -389,7 +395,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
                 # Add the current time to the file name to ensure uniqueness and to
                 # Prevent sqlite Integrity Error. Do not use now_date which contains colons
                 now = str(datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H-%M-%S"))
-                fname = f"{self.fields[field]}_{now}"
+                qual_file_name = f"{self.fields[field]}_{now}"
                 cur.execute(source_sql,
                             (f"{self.fields[field]}_{now}", fulltext, "", self.app.settings['codername'], now_date))
                 self.app.conn.commit()
@@ -400,9 +406,28 @@ class DialogImportSurvey(QtWidgets.QDialog):
                     case_text.append(fid)
                     cur.execute(case_text_sql, case_text)
                 self.app.conn.commit()
-                # add doc to vectorstore
+                # Add doc to vectorstore
                 if self.app.settings['ai_enable'] == 'True':
-                    self.app.ai.sources_vectorstore.import_document(fid, fname, fulltext, update=True)
+                    self.app.ai.sources_vectorstore.import_document(fid, qual_file_name, fulltext, update=True)
+
+            # Create one text file per row, prefix [case identifier] to each row.
+            if self.fields_type[field] == "qualitative" and not self.ui.checkBox_collate.isChecked():
+                for row in range(0, len(self.data)):
+                    qual_file_name = f"{self.data[row][0]}_{self.fields[field]}"
+                    fulltext = f"{self.data[row][field]}"
+                    cur.execute(source_sql,
+                                (qual_file_name, fulltext, "", self.app.settings['codername'], now_date))
+                    self.app.conn.commit()
+                    cur.execute("select last_insert_rowid()")
+                    fid = cur.fetchone()[0]
+                    case_text_sql = "insert into case_text (owner, date, memo, pos0, pos1, caseid, fid) values(?,?,?,?,?,?,?)"
+                    cur.execute(case_text_sql, [self.app.settings['codername'], now_date, "", 0, len(fulltext),
+                                                name_and_caseids[row][1], fid])
+                    self.app.conn.commit()
+                    # Add doc to vectorstore
+                    if self.app.settings['ai_enable'] == 'True':
+                        self.app.ai.sources_vectorstore.import_document(fid, qual_file_name, fulltext, update=True)
+
         logger.info(_("Survey imported"))
         self.parent_textEdit.append(_("Survey imported."))
         Message(self.app, _("Survey imported"), _("Survey imported")).exec()

@@ -14,13 +14,6 @@ If you like QualCoder please buy me a coffee ...
 
 <a href="https://www.buymeacoffee.com/ccbogelB" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="41" width="174"></a>
 
-
-## Update 13 October 2024 branch merge
-
-**With the work of Dr Dröge The artifcial intelligence branch has been incorporated into the main QualCoder branch, 13th October 2024.
-There may be some issues with the installation and running of QualCoder3.6 AI version over then next days. Please use the recent release (3.5 version) from the above link to the Releases page if you are running into difficulties with this latest update.**
-
-
 ## INSTALLATION 
 
 ### Prerequisites
@@ -44,7 +37,7 @@ If you are uncomfortable with these warnings install from the source as detailed
 
 Seriously consider using a virtual environment (commands in point 6 below). Not using a virtual environment may affect other Python software you may have installed.
 
-1. Download and install the Python programming language. The minimum recommended version for QualCoder is 3.10.  [Python3](https://www.python.org/downloads/). Download the file (at the bottom of the website) "Windows installer (64-bit)"
+1. Download and install the Python programming language. Please use Python 3.10 on Windows, older or newer versions may cause issues  [Python3](https://www.python.org/downloads/). Download the file (at the bottom of the website) "Windows installer (64-bit)"
 
 IMPORTANT: in the first window of the installation mark the option "Add Python to PATH"
 
@@ -114,6 +107,12 @@ If you are using a virtual environment:
 
 `py -m qualcoder`
 
+## Linux
+
+Hopefully an easy way to run QualCoder on the following Linux distributions is to use Wine, https://www.winehq.org/.
+There are binary packages for Ubuntu, Debian, Fedora, SUSE, Slackware FreeBSD.
+Once installed, run a QualCoder exe file, e.g. QualCoder-3.5.exe - see the [releases page](https://github.com/ccbogel/QualCoder/releases).
+
 ### Debian/Ubuntu Linux
 
 There is an executable file (double-click to run) for Ubuntu 22 in the 3.5 release. Alternatively, install from source code below.
@@ -149,17 +148,13 @@ Note: To exit venv type `deactivate`
 
 `pip install --upgrade pip`
 
-6. Install the needed Python modules.
-
-`pip install -r requirements.txt`
-
-7. You must be in the QualCoder-master folder (Or the main release folder if using a release. e.g. QualCoder-3.5 folder). Install QualCoder, and type the following, the dot is important:
+6. You must be in the QualCoder-master folder (Or the main release folder if using a release. e.g. QualCoder-3.5 folder). Install QualCoder, and type the following, the dot is important:
 
 `python3 -m pip install .`
 
 You may get a warning which can be ignored: WARNING: Building wheel for Qualcoder failed
 
-8. To run type
+7. To run type
 
 `qualcoder`
 
@@ -221,9 +216,9 @@ The instructions work on Mac Monterey. It is recommended to use a virtual enviro
 
 You will need to install developer tools for macOS. [See https://www.cnet.com/tech/computing/install-command-line-developer-tools-in-os-x/](https://www.cnet.com/tech/computing/install-command-line-developer-tools-in-os-x/)
 
-1) Install recent versions of [Python3](https://www.python.org/downloads/) and [VLC](https://www.videolan.org/vlc/).
+1) Install a recent version of [Python3](https://www.python.org/downloads/) e.g. 3.10, 3.11 or 3.12, (Note: Python 3.13 is not supported yet) and [VLC](https://www.videolan.org/vlc/).
 
-2) Download the latest release "Source code" version in ZIP format, from the releases section of the project here on Github: https://github.com/ccbogel/QualCoder/releases/tag/3.5 and extract it into /Applications
+2)  Download the QualCoder software from: https://github.com/ccbogel/QualCoder from the Green Code button. This is the newest, but not yet officially released code (occasionally coding errors creep in).  Click the green button "Code", and then "Download ZIP". **Alternatively**, choose the most recent release zip, see the right-hand side of this page for the link to Releases. If you want to use this version, follow the installation instructions in the Readme.md included in the downloaded zip.
 
 3) Open the Terminal app (or any other command shell)
 
@@ -248,17 +243,17 @@ Be sure that you are in the QualCoder-Master directory before doing Step 6.
 
 To change the directory, enter or copy and run the script below.
 
-`cd /Applications/QualCoder-3.5`
+`cd /Applications/QualCoder-master`
 
 6) From the QualCoder-Master directory run the setup script:
 
 `python3 -m pip install .`
 
 
-Assuming you downloaded the 3.5 version. You can now run with:
+Assuming you downloaded the Qualcoder-master version. You can now run with:
 
 ```
-python3 /applications/QualCoder-3.5/qualcoder/__main__.py
+python3 /applications/QualCoder-master/qualcoder/__main__.py
 ```
 
 Alternative commands to run QualCoder (Suggestions):
@@ -280,7 +275,7 @@ You can install QualCoder anywhere you want, so the path above depends on where 
 Another option to run Qualcoder is shown here: [https://www.maketecheasier.com/run-python-script-in-mac/](https://www.maketecheasier.com/run-python-script-in-mac/). This means you can right-click on the qualcoder.py file and open with --> python launcher. 
 You can make an alias to the file and place it on your desktop.
 
-**Another option to install on Mac:**
+**Second option to install on macOS:**
 
 Open the Terminal App and move to the unzipped Qualcoder-Master directory, then run the following commands:
 
@@ -296,6 +291,11 @@ Note: For 3.6 and up do not install pydub or SpeechRecognition. This function ha
 
 `python3 setup.py py2app`
 
+**Third option to run on macOS:**
+
+Install Wine for macOS and run a QualCoder exe, e.g. QualCoder-3.5.exe - see the [releases page](https://github.com/ccbogel/QualCoder/releases).
+
+Wine is available through: https://www.winehq.org/
  
 ## Dependencies
 See requirements.txt file
@@ -314,8 +314,8 @@ QualCoder is distributed under the MIT LICENSE.
 
 ##  Citation APA style
 
-Curtain, C. (2023) QualCoder 3.5 [Computer software]. Retrieved from
-https://github.com/ccbogel/QualCoder/releases/tag/3.5
+Curtain, C. (2023) QualCoder 3.6 [Computer software]. Retrieved from
+https://github.com/ccbogel/QualCoder/releases/tag/3.6
 
 ## Creator
 

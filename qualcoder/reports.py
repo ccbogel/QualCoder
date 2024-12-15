@@ -24,13 +24,13 @@ import datetime
 import logging
 import openpyxl
 import os
+import qtawesome as qta
 
 from PyQt6 import QtGui, QtWidgets, QtCore
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QBrush
 
 from .color_selector import TextColor
-from .GUI.base64_helper import *
 from .GUI.ui_dialog_report_comparisons import Ui_Dialog_reportComparisons
 from .GUI.ui_dialog_report_code_frequencies import Ui_Dialog_reportCodeFrequencies
 from .helpers import Message, ExportDirectoryPathDialog
@@ -65,13 +65,9 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         self.ui.pushButton_exportcsv.setToolTip(_("Export Excel file"))
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         self.ui.pushButton_exporttext.pressed.connect(self.export_text_file)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_icon), "png")
-        self.ui.pushButton_exporttext.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_exporttext.setIcon(qta.icon('mdi6.export-variant'))
         self.ui.pushButton_exportcsv.pressed.connect(self.export_excel_file)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_csv_icon), "png")
-        self.ui.pushButton_exportcsv.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_exportcsv.setIcon(qta.icon('mdi6.export'))
         self.ui.pushButton_select_files.pressed.connect(self.select_files)
         font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
@@ -445,20 +441,12 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         self.ui.pushButton_run.setEnabled(False)
         self.ui.pushButton_run.pressed.connect(self.calculate_statistics)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
-        self.ui.pushButton_run.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_run.setIcon(qta.icon('mdi6.play'))
         self.ui.pushButton_clear.pressed.connect(self.clear_selection)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(clear_icon), "png")
-        self.ui.pushButton_clear.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_clear.setIcon(qta.icon('mdi6.refresh'))
         self.ui.pushButton_exporttext.pressed.connect(self.export_text_file)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_icon), "png")
-        self.ui.pushButton_exporttext.setIcon(QtGui.QIcon(pm))
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(question_icon), "png")
-        self.ui.pushButton_help1.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_exporttext.setIcon(qta.icon('mdi6.export'))
+        self.ui.pushButton_help1.setIcon(qta.icon('mdi6.help'))
         self.ui.pushButton_help1.pressed.connect(self.information)
         font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)

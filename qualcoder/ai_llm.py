@@ -22,11 +22,8 @@ https://qualcoder.wordpress.com/
 import os
 import logging
 import traceback
-from typing import List  # Unused
-import time  # Unused
 from PyQt6 import QtWidgets
-from PyQt6 import QtGui  # Unused
-from PyQt6 import QtCore 
+from PyQt6 import QtCore
 import qtawesome as qta
 
 from .ai_prompts import PromptItem
@@ -41,13 +38,13 @@ from langchain_core.messages.system import SystemMessage
 from langchain_core.documents.base import Document  # Unused
 from .ai_async_worker import Worker
 from .ai_vectorstore import AiVectorstore
-from .GUI.base64_helper import *  # Unused
 from .helpers import Message
 from .error_dlg import qt_exception_hook
+from .html_parser import html_to_text
 import fuzzysearch
 import json_repair
 
-max_memo_length = 1500  # maximum length of the memo send to the AI
+max_memo_length = 1500  # Maximum length of the memo send to the AI
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -143,14 +140,14 @@ class AiLLM():
 
                 main_window.change_settings(section='AI', enable_ai=True)
                 if int(self.app.settings['ai_model_index']) < 0:
-                    # still no model selected, disable AI:
+                    # Still no model selected, disable AI:
                     self.app.settings['ai_enable'] = 'False'
                     self.parent_text_edit.append(_('AI: No model selected, AI is disabled.'))
                     self._status = ''
                     return
                 else: 
                     # Success, model was selected. But since the "change_settings" function will start 
-                    # a new "init_llm" anyways, we are going to quit here
+                    # a new "init_llm" anyway, we are going to quit here
                     return    
             curr_model = self.app.ai_models[int(self.app.settings['ai_model_index'])]
             
@@ -303,14 +300,13 @@ class AiLLM():
         
     def _ai_async_error(self, exception_type, value, tb_obj):
         self.ai_async_is_errored = True
-        ai_model_name = self.app.ai_models[int(self.app.settings['ai_model_index'])]['name']
-        msg = _('Error communicating with ' + ai_model_name + '\n')
+        value = html_to_text(value)
+        msg = _('AI Error:\n')
         msg += exception_type.__name__ + ': ' + str(value)
         tb = '\n'.join(traceback.format_tb(tb_obj))
         logger.error(_("Uncaught exception: ") + msg + '\n' + tb)
         # Trigger message box show
         qt_exception_hook._exception_caught.emit(msg, tb)        
-        # raise exception_type(value).with_traceback(tb_obj)  # Re-raise
 
     def _ai_async_finished(self):
         self.ai_async_is_finished = True
@@ -419,10 +415,10 @@ class AiLLM():
 
         code_descriptions_prompt = [
             SystemMessage(
-                content = self.get_default_system_prompt()
+                content=self.get_default_system_prompt()
             ),
             HumanMessage(
-                content= (f'We are searching for empirical data that fits a code named "{code_name}" '
+                content=(f'We are searching for empirical data that fits a code named "{code_name}" '
                     f'with the following code memo: "{extract_ai_memo(code_memo)}". \n'
                     'Your task: Give back a list of 10 short descriptions of the meaning of this code. '
                     'Try to give a variety of diverse code-descriptions. Use simple language. '
@@ -439,7 +435,7 @@ class AiLLM():
         # callback to show percentage done    
         config = RunnableConfig()
         config['callbacks'] = [MyCustomSyncHandler(self)]
-        self.ai_async_progress_max = round(1000 / 4) # estimated token count of the result (1000 chars)
+        self.ai_async_progress_max = round(1000 / 4)  # estimated token count of the result (1000 chars)
 
         res = self.large_llm.invoke(code_descriptions_prompt, response_format={"type": "json_object"}, config=config)
         logger.debug(str(res.content))
@@ -450,7 +446,7 @@ class AiLLM():
         """Retrieve pieces of data from the vectorstore that are related to the given code.
         This function will be performed in the background, following these steps:
         1) Semantic extension: Let the LLM generate a list of 10 desciptions of the code in simple language
-        2) Semantic search: Search in the vectorstore for data that has a semantic similarity ti these descriptions
+        2) Semantic search: Search in the vectorstore for data that has a semantic similarity to these descriptions
         3) Ranking: Sort the results for relevance
 
         Args:
@@ -470,14 +466,19 @@ class AiLLM():
             return []
         
         # 2) Use the list of code descriptions to retrieve related data from the vectorstore
-        search_kwargs = {'score_threshold': 0.5, 'k': 50}
-        if doc_ids is not None and len(doc_ids) > 0:
-            # add document filter
-            search_kwargs['filter'] = {'id': {'$in': doc_ids}}
-        
+        search_kwargs = {'score_threshold': 0.5, 'k': 50}       
         chunks_meta_list = []
         for desc in descriptions:
-            chunks_meta_list.append(self.sources_vectorstore.chroma_db.similarity_search_with_relevance_scores(desc, **search_kwargs))
+            res = self.sources_vectorstore.faiss_db.similarity_search_with_relevance_scores(desc, **search_kwargs)
+            if doc_ids is not None and len(doc_ids) > 0:
+                # filter results by document ids
+                res_filtered = []
+                for chunk in res:
+                    if chunk[0].metadata['id'] in doc_ids:
+                        res_filtered.append(chunk)
+                chunks_meta_list.append(res_filtered)
+            else: 
+                chunks_meta_list.append(res)
 
         # 3) Consolidate and rank results:
         # Flatten the lists of chunks in chunks_lists and collect all the chunks in a master list.
@@ -573,7 +574,7 @@ class AiLLM():
         # callback to show percentage done    
         config = RunnableConfig()
         config['callbacks'] = [MyCustomSyncHandler(self)]
-        self.ai_async_progress_max = 130 # estimated average token count of the result
+        self.ai_async_progress_max = 130  # estimated average token count of the result
         
         # send the query to the llm 
         res = self.large_llm.invoke(f'{prompt}', response_format={"type": "json_object"}, config=config)
@@ -583,11 +584,12 @@ class AiLLM():
         if 'related' in res_json and res_json['related'] is True and \
            'quote' in res_json and res_json['quote'] != '':  # found something
             # Adjust quote_start
-            i = 0
+            i = 0  # TODO i not used
             doc = {}
             doc['metadata'] = chunk.metadata
                        
-            # search quote with not more than 30% mismatch (Levenshtein Distance). This is done because the AI sometimes alters the text a little bit.
+            # search quote with not more than 30% mismatch (Levenshtein Distance).
+            # This is done because the AI sometimes alters the text a little bit.
             quote_found = fuzzysearch.find_near_matches(res_json['quote'], chunk.page_content, 
                              max_l_dist=round(len(res_json['quote']) * 0.3))  # result: list [Match(start=x, end=x, dist=x, matched='txt')]
             if len(quote_found) > 0:

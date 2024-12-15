@@ -23,13 +23,13 @@ from copy import deepcopy
 import logging
 import openpyxl
 import os
+import qtawesome as qta
 
 from PyQt6 import QtGui, QtWidgets, QtCore
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QBrush
 
 from .color_selector import TextColor
-from .GUI.base64_helper import *
 from .GUI.ui_report_codes_by_segments import Ui_DialogSegmentCodings
 from .helpers import Message
 
@@ -84,12 +84,8 @@ class DialogCodesBySegments(QtWidgets.QDialog):
         self.ui.comboBox_coders.insertItems(0, self.coders)
         self.fill_tree()
         self.ui.pushButton_run_report.clicked.connect(self.search)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
-        self.ui.pushButton_run_report.setIcon(QtGui.QIcon(pm))
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_icon), "png")
-        self.ui.pushButton_export_xlsx.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_run_report.setIcon(qta.icon('mdi6.play'))
+        self.ui.pushButton_export_xlsx.setIcon(qta.icon('mdi6.export'))
         self.ui.pushButton_export_xlsx.clicked.connect(self.export_xlsx_file)
 
         self.get_files_and_cases()

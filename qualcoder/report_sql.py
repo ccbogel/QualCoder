@@ -25,10 +25,11 @@ from PyQt6.QtCore import Qt
 import csv
 from datetime import datetime
 import logging
+import openpyxl
 import os
+import qtawesome as qta
 import sqlite3
 
-from .GUI.base64_helper import *
 from .GUI.ui_dialog_SQL import Ui_Dialog_sql
 from .save_sql_query import DialogSaveSql
 from .helpers import ExportDirectoryPathDialog, Message
@@ -91,15 +92,14 @@ class DialogSQL(QtWidgets.QDialog):
         self.ui.treeWidget.itemClicked.connect(self.get_item)
         self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
-
+        # qtawsome see: https://pictogrammers.com/library/mdi/
+        self.ui.pushButton_runSQL.setIcon(qta.icon('mdi6.play'))
         self.ui.pushButton_runSQL.clicked.connect(self.run_sql)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
-        self.ui.pushButton_runSQL.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_export.clicked.connect(self.export_file)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_csv_icon), "png")
-        self.ui.pushButton_export.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_csv.setIcon(qta.icon('mdi6.export'))
+        self.ui.pushButton_csv.clicked.connect(self.export_csv_file)
+        self.ui.pushButton_excel.setIcon(qta.icon('mdi6.export'))
+        self.ui.pushButton_excel.clicked.connect(self.export_excel_file)
+
         self.ui.splitter.setSizes([20, 180])
         try:
             s0 = int(self.app.settings['dialogsql_splitter_h0'])
@@ -129,12 +129,66 @@ class DialogSQL(QtWidgets.QDialog):
         self.app.settings['dialogsql_splitter_v0'] = sizes[0]
         self.app.settings['dialogsql_splitter_v1'] = sizes[1]
 
-    def export_file(self):
+    def export_excel_file(self):
+        """ Load result set and export to Excel file. """
+
+        cur = self.app.conn.cursor()
+        sql = self.ui.textEdit_sql.toPlainText()
+        if "select" not in sql.lower():
+            Message(self.app, _("No select query"), _("No data to export")).exec()
+            return
+        try:
+            cur.execute(sql)
+        except Exception as e:
+            Message(self.app, _("SQL error"), str(e), "warning").exec()
+            return
+
+        results = cur.fetchall()
+        header = []
+        if cur.description is not None:
+            header = list(map(lambda x: x[0], cur.description))  # Gets column names
+        filename = "sql_report.xlsx"
+        export_dir = ExportDirectoryPathDialog(self.app, filename)
+        filepath = export_dir.filepath
+        if filepath is None:
+            return
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        # Excel headers
+        for col, col_name in enumerate(header):
+            cell = ws.cell(row=1, column=col + 2)
+            cell.value = col_name
+
+        # Data
+        for row, row_data in enumerate(results):
+            for col, col_data in enumerate(row_data):
+                cell = ws.cell(row=row + 2, column=col + 2)
+                cell.value = col_data
+
+        '''for c in range(0, col_count):
+            for r in range(0, row_count):
+                te = self.te[r][c]
+                try:
+                    data_text = te.toPlainText()
+                except AttributeError:  # None type error
+                    data_text = ""
+                cell = ws.cell(row=r + 2, column=c + 2)
+                cell.value = data_text'''
+
+        wb.save(filepath)
+        msg = _('Results exported: ') + filepath
+        Message(self.app, _('Results exported'), msg, "information").exec()
+        self.parent_textEdit.append(msg)
+
+    def export_csv_file(self):
         """ Load result set and export results to a delimited .csv file
         using \r\n as line separators. """
 
         cur = self.app.conn.cursor()
         sql = self.ui.textEdit_sql.toPlainText()
+        if "select" not in sql.lower():
+            Message(self.app, _("No select query"), _("No data to export")).exec()
+            return
         try:
             cur.execute(sql)
         except Exception as e:
@@ -658,6 +712,18 @@ where \n\
 -- code_name.cid in ( code_ids ) -- provide your code ids \n\
 -- and case_text.caseid in ( case_ids ) -- provide your case ids \n\
 -- and \n\
+(code_text.pos0 >= case_text.pos0 and code_text.pos1 <= case_text.pos1)',
+               '-- CODED TEXT WITH EACH CASE, LIMITED BY CASE ATTRUBIUTES - EXAMPLE SQL\n\
+               select distinct code_name.name as codename, cases.name as casename, code_text.pos0, code_text.pos1,\n\
+ code_text.fid, seltext as "coded text", code_text.owner \n\
+from code_text join code_name on code_name.cid = code_text.cid \n\
+join (case_text join cases on cases.caseid = case_text.caseid) on code_text.fid = case_text.fid\n\
+join attribute on  attribute.id =  case_text.caseid \n\
+join attribute as attribute2 on  attribute2.id =  case_text.caseid \n\
+ where \n\
+ attribute.attr_type ="case" and attribute.name = "Gender" and attribute.value = "male" and -- first attribute\n\
+ attribute2.attr_type ="case" and attribute2.name = "Age" and cast(attribute2.value as integer) < 30 and --second attribute \n\
+-- code_name.name in ( "Aggression", "Increased workload") and -- uncomment and put code names in list here to filter by code names \n\
 (code_text.pos0 >= case_text.pos0 and code_text.pos1 <= case_text.pos1)',
 
                '-- ALL OR SELECTED ANNOTATIONS\nselect annotation.anid as "Annotation ID" , annotation.memo as "Annotation text", \n\

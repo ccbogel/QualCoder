@@ -29,12 +29,12 @@ from copy import deepcopy
 import logging
 import os
 from PIL import Image
+import qtawesome as qta
 import re
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import Qt
 
-from .GUI.base64_helper import *
 from .GUI.ui_dialog_report_code_summary import Ui_Dialog_code_summary
 from .color_selector import TextColor
 
@@ -78,9 +78,7 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         except KeyError:
             pass
         self.ui.splitter.splitterMoved.connect(self.splitter_sizes)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
-        self.ui.pushButton_search_next.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_search_next.setIcon(qta.icon('mdi6.play'))
         self.ui.pushButton_search_next.pressed.connect(self.search_results_next)
         self.ui.treeWidget.setStyleSheet(treefont)
         self.ui.treeWidget.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)

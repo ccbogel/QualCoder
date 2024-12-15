@@ -23,9 +23,8 @@ from copy import deepcopy
 import datetime
 import logging
 import os
+import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 import sqlite3
-import sys
-import traceback
 
 from PyQt6 import QtCore, QtWidgets, QtGui
 from PyQt6.QtWidgets import QDialog
@@ -33,7 +32,6 @@ from PyQt6.QtWidgets import QDialog
 from .code_in_all_files import DialogCodeInAllFiles
 from .color_selector import TextColor
 from .confirm_delete import DialogConfirmDelete
-from .GUI.base64_helper import *
 from .GUI.ui_dialog_graph import Ui_DialogGraph
 from .helpers import DialogCodeInAV, DialogCodeInImage, DialogCodeInText, \
     ExportDirectoryPathDialog, Message
@@ -76,73 +74,41 @@ class ViewGraph(QDialog):
         self.ui = Ui_DialogGraph()
         self.ui.setupUi(self)
         font = f"font: {self.app.settings['fontsize']}pt "
-        font += '"' + self.app.settings['font'] + '";'
+        font += f'"{self.app.settings["font"]}";'
         self.setStyleSheet(font)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_icon), "png")
-        self.ui.pushButton_export.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_export.setIcon(qta.icon('mdi6.image-move'))
         self.ui.pushButton_export.pressed.connect(self.export_image)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(zoom_icon), "png")
-        self.ui.label_zoom.setPixmap(pm.scaled(26, 26))
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(eye_icon), "png")
-        self.ui.pushButton_reveal.setIcon(QtGui.QIcon(pm))
+        self.ui.label_zoom.setPixmap(qta.icon('mdi6.magnify').pixmap(22, 22))
+        self.ui.pushButton_reveal.setIcon(qta.icon('mdi6.eye'))
         self.ui.pushButton_reveal.pressed.connect(self.reveal_hidden_items)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(clear_icon), "png")
-        self.ui.pushButton_clear.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_clear.setIcon(qta.icon('mdi6.undo'))
         self.ui.pushButton_clear.pressed.connect(self.clear_items)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(plus_icon), "png")
-        self.ui.pushButton_selectbranch.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_selectbranch.setIcon(qta.icon('mdi6.file-tree'))
         self.ui.pushButton_selectbranch.pressed.connect(self.select_tree_branch)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(notepad_2_icon), "png")
-        self.ui.pushButton_freetextitem.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_freetextitem.setIcon(qta.icon('mdi6.text-box-edit-outline'))
         self.ui.pushButton_freetextitem.pressed.connect(self.add_text_item_to_graph)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(sq_plus_icon), "png")
-        self.ui.pushButton_addfile.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_addfile.setIcon(qta.icon('mdi6.file-plus-outline'))
         self.ui.pushButton_addfile.pressed.connect(self.add_files_to_graph)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(sq_plus_icon), "png")
-        self.ui.pushButton_addcase.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_addcase.setIcon(qta.icon('mdi6.briefcase-plus-outline'))
         self.ui.pushButton_addcase.pressed.connect(self.add_cases_to_graph)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(line_icon), "png")
-        self.ui.pushButton_addline.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_addline.setIcon(qta.icon('mdi6.chart-line-variant'))
         self.ui.pushButton_addline.pressed.connect(self.add_lines_to_graph)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(arrow_up_icon), "png")
-        self.ui.pushButton_loadgraph.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_loadgraph.setIcon(qta.icon('mdi6.file-outline'))
         self.ui.pushButton_loadgraph.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.pushButton_loadgraph.customContextMenuRequested.connect(self.load_graph_menu)
         self.ui.pushButton_loadgraph.pressed.connect(self.load_graph)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(arrow_down_icon), "png")
-        self.ui.pushButton_savegraph.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_savegraph.setIcon(qta.icon('mdi6.file-plus-outline'))
         self.ui.pushButton_savegraph.pressed.connect(self.save_graph)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(delete_icon), "png")
-        self.ui.pushButton_deletegraph.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_deletegraph.setIcon(qta.icon('mdi6.file-minus-outline'))
         self.ui.pushButton_deletegraph.pressed.connect(self.delete_saved_graph)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_color_grid_icon_24), "png")
-        self.ui.pushButton_codes_of_text.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_codes_of_text.setIcon(qta.icon('mdi6.text'))
         self.ui.pushButton_codes_of_text.pressed.connect(self.add_coded_text_of_text_files)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(picture), "png")
-        self.ui.pushButton_codes_of_images.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_codes_of_images.setIcon(qta.icon('mdi6.image-outline'))
         self.ui.pushButton_codes_of_images.pressed.connect(self.add_codes_of_image_files)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
-        self.ui.pushButton_codes_of_av.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_codes_of_av.setIcon(qta.icon('mdi6.play'))
         self.ui.pushButton_codes_of_av.pressed.connect(self.add_codes_of_av_files)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(a2x2_grid_icon_24), "png")
-        self.ui.pushButton_memos_of_file.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_memos_of_file.setIcon(qta.icon('mdi6.text-long'))
         self.ui.pushButton_memos_of_file.pressed.connect(self.add_memos_of_coded)
 
         # Set the scene
@@ -710,8 +676,8 @@ class ViewGraph(QDialog):
                             if item.memo_imid == r[7]:
                                 coding_memo_displayed = True
                     if not coding_memo_displayed:
-                        tt = _("Memo for area: ") + "x:" + str(int(r[2])) + " y:" + str(int(r[3])) + " " + _("width:") \
-                             + str(int(r[4])) + " " + _("height:") + str(int(r[5]))
+                        tt = _("Memo for area: ") + "x:" + f"{r[2]}" + " y:" + f"{r[3]}" + " " + _("width:") \
+                             + f"{r[4]} " + _("height:") + f"{r[5]}"
                         memos.append({'cid': r[0], 'fid': r[1], 'tooltip': tt, 'name': r[6], 'filetype': 'image',
                                       'codename': code['name'], 'filename': file_['name'], 'imid': r[7], 'avid': None,
                                       'ctid': None})
@@ -1300,7 +1266,7 @@ class ViewGraph(QDialog):
             try:
                 tt = _("File: ") + r[1] + "\n"
                 tt += _("Code: ") + r[2] + "\n"
-                tt += str(r[3]) + " - " + str(r[4]) + "\n"
+                tt += f"{r[3]} - {r[4]}\n"
                 if self.app.settings['showids']:
                     tt += f"avid: {r[6]}\n"
                 tt += _("Memo: ") + r[5]
@@ -1394,7 +1360,7 @@ class ViewGraph(QDialog):
                 tt += _("Code: ") + r[2] + "\n"
                 if self.app.settings['showids']:
                     tt += f"avid: {r[5]}\n"
-                tt += _("Memo for duration: ") + str(int(r[3])) + "  - " + str(int(r[4])) + _("msecs")
+                tt += _("Memo for duration: ") + f"{int(r[3])}  - {int(r[4])}" + _("msecs")
                 cur.execute("update gr_free_text_item set tooltip=? where gfreeid=?", [tt, r[0]])
                 self.app.conn.commit()
             except IndexError:
@@ -1728,7 +1694,8 @@ class ViewGraph(QDialog):
                 cur.execute("delete from gr_pix_item where grid = ?", [s['grid']])
                 cur.execute("delete from gr_av_item where grid = ?", [s['grid']])
             self.app.conn.commit()
-        except:
+        except Exception as e_:
+            print(e_)
             self.app.conn.rollback() # revert all changes 
             raise
         self.app.delete_backup = False
@@ -2675,9 +2642,7 @@ class AVGraphicsItem(QtWidgets.QGraphicsPixmapItem):
         self.abs_path_ = self.app.project_path + path_
         if path_[0:7] in ("audio:", "video:"):
             self.abs_path_ = path_[7:]
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
-        self.setPixmap(pm)
+        self.setPixmap(qta.icon('mdi6.play'))
         self.setPos(x, y)
         self.settings = app.settings
         self.project_path = app.project_path

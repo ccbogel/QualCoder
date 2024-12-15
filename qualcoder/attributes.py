@@ -20,16 +20,14 @@ https://github.com/ccbogel/QualCoder
 
 import datetime
 import os
-import sys
 import logging
-import traceback
+import qtawesome as qta
 
-from PyQt6 import QtCore, QtGui, QtWidgets
+from PyQt6 import QtCore, QtWidgets
 
 from .add_attribute import DialogAddAttribute
 from .confirm_delete import DialogConfirmDelete
 from .memo import DialogMemo
-from .GUI.base64_helper import *
 from .GUI.ui_dialog_manage_attributes import Ui_Dialog_manage_attributes
 from .GUI.ui_dialog_assign_attribute import Ui_Dialog_assignAttribute
 
@@ -63,13 +61,9 @@ class DialogManageAttributes(QtWidgets.QDialog):
         self.fill_table_widget()
         # Initial resize of table columns
         self.ui.tableWidget.resizeColumnsToContents()
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(plus_icon), "png")
-        self.ui.pushButton_add.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_add.setIcon(qta.icon('mdi6.variable'))
         self.ui.pushButton_add.clicked.connect(self.add_attribute)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(delete_icon), "png")
-        self.ui.pushButton_delete.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_delete.setIcon(qta.icon('mdi6.delete-outline'))
         self.ui.pushButton_delete.clicked.connect(self.delete_attribute)
         self.ui.tableWidget.cellClicked.connect(self.cell_selected)
         self.ui.tableWidget.cellChanged.connect(self.cell_modified)

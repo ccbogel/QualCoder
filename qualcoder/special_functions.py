@@ -20,12 +20,12 @@ https://github.com/ccbogel/QualCoder
 
 import logging
 import os
+import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 
 from PyQt6 import QtGui, QtWidgets, QtCore
 
 from .code_text import DialogCodeText  # for isinstance()
 from .confirm_delete import DialogConfirmDelete
-from .GUI.base64_helper import *
 from .GUI.ui_special_functions import Ui_Dialog_special_functions
 from .helpers import Message
 from .merge_projects import MergeProjects
@@ -65,25 +65,21 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
         font = f'font: {app.settings["fontsize"]}pt "{app.settings["font"]}";'
         self.setStyleSheet(font)
         self.merge_project_path = ""
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(question_icon), "png")
-        self.ui.pushButton_select_text_file.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_select_text_file.setIcon(qta.icon('mdi6.file-search'))
         self.ui.pushButton_select_text_file.setFocus()
-        self.ui.pushButton_select_replacement_text_file.setIcon(QtGui.QIcon(pm))
-        self.ui.pushButton_select_project.setIcon(QtGui.QIcon(pm))
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
-        self.ui.pushButton_text_starts.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_select_replacement_text_file.setIcon(qta.icon('mdi6.file-search'))
+        self.ui.pushButton_select_project.setIcon(qta.icon('mdi6.file-search'))
+        self.ui.pushButton_text_starts.setIcon(qta.icon('mdi6.play'))
         self.ui.pushButton_text_starts.clicked.connect(self.change_text_code_start_positions)
-        self.ui.pushButton_text_ends.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_text_ends.setIcon(qta.icon('mdi6.play'))
         self.ui.pushButton_text_ends.clicked.connect(self.change_text_code_end_positions)
-        self.ui.pushButton_text_update.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_text_update.setIcon(qta.icon('mdi6.play'))
         self.ui.groupBox_text_positions.hide()
         self.ui.pushButton_select_text_file.pressed.connect(self.select_original_text_file)
         self.ui.pushButton_select_replacement_text_file.pressed.connect(self.select_replacement_text_file)
         self.ui.pushButton_text_update.setEnabled(False)
         self.ui.pushButton_text_update.pressed.connect(self.replace_file_update_codings)
-        self.ui.pushButton_merge.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_merge.setIcon(qta.icon('mdi6.play'))
         self.ui.pushButton_select_project.pressed.connect(self.select_project_folder)
         self.ui.pushButton_merge.setEnabled(False)
         self.ui.pushButton_merge.pressed.connect(self.merge_projects)
@@ -108,7 +104,7 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
         if self.merge_project_path == self.app.project_path:
             Message(self.app, _("Error"), _("The same project")).exec()
             return
-        msg = _("Merge") + "\n" + self.merge_project_path + "\n" + _("into") + "\n" + self.app.project_path + "\n"
+        msg = _("Merge") + f"\n{self.merge_project_path}\n" + _("into") + f"\n{self.app.project_path}\n"
         msg += _("Press Run Button to merge projects")
         Message(self.app, _("Merge projects"), msg).exec()
         self.ui.pushButton_merge.setEnabled(True)

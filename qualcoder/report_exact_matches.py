@@ -23,13 +23,13 @@ from copy import copy
 import logging
 import openpyxl
 import os
+import qtawesome as qta
 
 from PyQt6 import QtGui, QtWidgets, QtCore
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QBrush
 
 from .color_selector import TextColor
-from .GUI.base64_helper import *
 from .GUI.ui_report_matching_segments import Ui_DialogMatchingTextSegments
 from .helpers import DialogCodeInText, Message
 
@@ -63,16 +63,10 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         self.ui = Ui_DialogMatchingTextSegments()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
-        self.ui.pushButton_run.setIcon(QtGui.QIcon(pm))
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_icon), "png")
-        self.ui.pushButton_export.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_run.setIcon(qta.icon('mdi6.play'))
+        self.ui.pushButton_export.setIcon(qta.icon('mdi6.export'))
         self.ui.pushButton_export.pressed.connect(self.export_excel_file)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(delete_icon))
-        self.excluded_icon = QtGui.QIcon(pm)
+        self.excluded_icon = qta.icon('mdi6.window-close')
         self.get_data()
 
         try:

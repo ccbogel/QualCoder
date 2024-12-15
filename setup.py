@@ -7,6 +7,9 @@ here = path.abspath(path.dirname(__file__))
 # Get the long description from the README file
 with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
+# Get requirements
+with open('requirements.txt') as f:
+    required_modules = f.read().splitlines()
 
 mainscript = 'qualcoder/__main__.py'
 OPTIONS = {
@@ -56,21 +59,7 @@ setup(
     keywords='qualitative data analysis',
     packages=find_namespace_packages(include=['qualcoder','qualcoder.*']),
     python_requires='>=3.10',
-    install_requires=[
-        'chardet',
-        'diff-match-patch',
-        'ebooklib',
-        'openpyxl',
-        'pyqt6',
-        'Pillow',
-        'pdfminer.six',
-        'ply',
-        'pandas',
-        'plotly',
-        'pydub',
-        'rispy',
-        'SpeechRecognition'
-    ],
+    install_requires=required_modules,
     package_data={
         'qualcoder':['Codebook.xsd', 'Project-mrt2019.xsd',
         'GUI/*.html', 'GUI/NotoSans-hinted/*.ttf',

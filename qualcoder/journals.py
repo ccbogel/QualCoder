@@ -23,16 +23,14 @@ from PyQt6 import QtCore, QtWidgets, QtGui
 import datetime
 import os
 import re
-import sys
 import logging
-#from spellchecker import SpellChecker
-import traceback
+# from spellchecker import SpellChecker
+import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 import webbrowser
 
 from .add_item_name import DialogAddItemName
 from .add_attribute import DialogAddAttribute
 from .confirm_delete import DialogConfirmDelete
-from .GUI.base64_helper import *
 from .GUI.ui_dialog_journals import Ui_Dialog_journals
 from .helpers import Message, ExportDirectoryPathDialog, MarkdownHighlighter
 from .memo import DialogMemo
@@ -101,46 +99,26 @@ class DialogJournals(QtWidgets.QDialog):
         self.load_journals()
         self.ui.tableWidget.itemChanged.connect(self.cell_modified)
         self.ui.tableWidget.itemSelectionChanged.connect(self.table_selection_changed)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(pencil_icon), "png")
-        self.ui.pushButton_create.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_create.setIcon(qta.icon('mdi6.pencil-outline'))
         self.ui.pushButton_create.clicked.connect(self.create_journal)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_icon), "png")
-        self.ui.pushButton_export.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_export.setIcon(qta.icon('mdi6.export'))
         self.ui.pushButton_export.clicked.connect(self.export)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(delete_icon), "png")
-        self.ui.pushButton_delete.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_delete.setIcon(qta.icon('mdi6.delete-outline'))
         self.ui.pushButton_delete.clicked.connect(self.delete_journal)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_csv_icon), "png")
-        self.ui.pushButton_export_all.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_export_all.setIcon(qta.icon('mdi6.export-variant'))
         self.ui.pushButton_export_all.clicked.connect(self.export_all_journals_as_one_file)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(question_icon), "png")
-        self.ui.pushButton_help.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_help.setIcon(qta.icon('mdi6.help'))
         self.ui.pushButton_help.pressed.connect(self.help)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(plus_icon), "png")
-        self.ui.pushButton_add_attribute.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_add_attribute.setIcon(qta.icon('mdi6.variable'))
         self.ui.pushButton_add_attribute.clicked.connect(self.add_attribute)
 
         # Search text in journals
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(question_icon), "png")
-        self.ui.label_search_regex.setPixmap(QtGui.QPixmap(pm).scaled(22, 22))
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(clipboard_copy_icon), "png")
-        self.ui.label_search_all_journals.setPixmap(QtGui.QPixmap(pm).scaled(22, 22))
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(playback_back_icon), "png")
-        self.ui.pushButton_previous.setIcon(QtGui.QIcon(pm))
+        self.ui.label_search_regex.setPixmap(qta.icon('mdi6.text-search').pixmap(22, 22))
+        self.ui.label_search_all_journals.setPixmap(qta.icon('mdi6.text-box-multiple-outline').pixmap(22, 22))
+        self.ui.pushButton_previous.setIcon(qta.icon('mdi6.arrow-left'))
         self.ui.pushButton_previous.setEnabled(False)
         self.ui.pushButton_previous.pressed.connect(self.move_to_previous_search_text)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(playback_play_icon), "png")
-        self.ui.pushButton_next.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_next.setIcon(qta.icon('mdi6.arrow-right'))
         self.ui.pushButton_next.setEnabled(False)
         self.ui.pushButton_next.pressed.connect(self.move_to_next_search_text)
         self.ui.lineEdit_search.textEdited.connect(self.search_for_text)

@@ -22,11 +22,11 @@ import logging
 import os
 from PIL import Image
 from PIL.ExifTags import TAGS
+import qtawesome as qta
 import re
 
 from PyQt6 import QtCore, QtWidgets, QtGui
 
-from .GUI.base64_helper import *
 from .GUI.ui_dialog_report_file_summary import Ui_Dialog_file_summary
 from .helpers import msecs_to_hours_mins_secs
 
@@ -75,9 +75,7 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         except KeyError:
             pass
         self.ui.splitter.splitterMoved.connect(self.splitter_sizes)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(play_icon), "png")
-        self.ui.pushButton_search_next.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_search_next.setIcon(qta.icon('mdi6.play'))
         self.ui.pushButton_search_next.pressed.connect(self.search_results_next)
         self.ui.listWidget.setStyleSheet(treefont)
         self.ui.listWidget.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)

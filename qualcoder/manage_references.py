@@ -20,15 +20,13 @@ https://github.com/ccbogel/QualCoder
 
 import os
 from rispy import TAG_KEY_MAPPING
-# import sys
 import logging
 from operator import itemgetter
+import qtawesome as qta
 import re
-# import traceback
 
 from PyQt6 import QtWidgets, QtCore, QtGui
 
-from .GUI.base64_helper import *
 from .GUI.ui_reference_editor import Ui_DialogReferenceEditor
 from .GUI.ui_manage_references import Ui_Dialog_manage_references
 from .confirm_delete import DialogConfirmDelete
@@ -97,34 +95,20 @@ class DialogReferenceManager(QtWidgets.QDialog):
         self.ui.tableWidget_refs.customContextMenuRequested.connect(self.table_refs_menu)
         self.ui.tableWidget_refs.horizontalHeader().setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget_refs.horizontalHeader().customContextMenuRequested.connect(self.table_refs_header_menu)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_import_icon), "png")
-        self.ui.pushButton_import.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_import.setIcon(qta.icon('mdi.file-import-outline'))
         self.ui.pushButton_import.pressed.connect(self.import_references)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(link_icon), "png")
-        self.ui.pushButton_link.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_link.setIcon(QtGui.QIcon(qta.icon('mdi6.link')))
         self.ui.pushButton_link.pressed.connect(self.link_reference_to_files)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(undo_icon), "png")
-        self.ui.pushButton_unlink_files.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_unlink_files.setIcon(qta.icon('mdi6.undo'))
         self.ui.pushButton_unlink_files.pressed.connect(self.unlink_files)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(pencil_icon), "png")
-        self.ui.pushButton_edit_ref.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_edit_ref.setIcon(qta.icon('mdi6.pencil-outline'))
         self.ui.pushButton_edit_ref.pressed.connect(self.edit_reference)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(delete_icon), "png")
-        self.ui.pushButton_delete_ref.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_delete_ref.setIcon(qta.icon('mdi6.delete-outline'))
         self.ui.pushButton_delete_ref.pressed.connect(self.delete_reference)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_delete_icon), "png")
-        self.ui.pushButton_delete_unused_refs.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_delete_unused_refs.setIcon(qta.icon('mdi6.file-document-remove-outline'))
         self.ui.pushButton_delete_unused_refs.setEnabled(False)
         self.ui.pushButton_delete_unused_refs.hide()
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(magic_wand_icon), "png")
-        self.ui.pushButton_auto_link.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_auto_link.setIcon(qta.icon('mdi6.magic-staff'))
         self.ui.pushButton_auto_link.pressed.connect(self.auto_link_files_to_references)
 
         self.get_data()

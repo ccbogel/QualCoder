@@ -41,21 +41,17 @@ a = Analysis(
     cipher=block_cipher,
     noarchive=False,
 )
-pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 
-#splash = Splash('qualcoder.png',
-#                binaries=a.binaries,
-#                datas=a.datas,
-#                text_pos=(10, 50),
-#                text_size=12,
-#                text_color='black')
+pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 
 exe = EXE(
     pyz,
-#    splash,
     a.scripts,
+    a.binaries,
+    a.zipfiles,
+    a.datas,
     [],
-    exclude_binaries=True,
+    exclude_binaries=False,  # This sets onefile mode
     name='QualCoder',
     debug=False,
     bootloader_ignore_signals=False,
@@ -70,19 +66,9 @@ exe = EXE(
     icon='qualcoder.png'
 )
 
-coll = COLLECT(
+app = BUNDLE(
     exe,
-#    splash.binaries,
-    a.binaries,
-    a.zipfiles,
-    a.datas,
-    strip=False,
-    upx=True,
-    upx_exclude=[],
-    name='__main__',
+    name='Qualcoder.app',
+    icon='qualcoder/GUI/qualcoder.icns',
+    bundle_identifier='org.ccbogel.qualcoder'
 )
-
-app = BUNDLE(coll,
-             name='Qualcoder.app',
-             icon='qualcoder/GUI/qualcoder.icns',
-             bundle_identifier='org.ccbogel.qualcoder')

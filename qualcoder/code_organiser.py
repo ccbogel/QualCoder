@@ -28,12 +28,9 @@ https://qualcoder.wordpress.com/
 import sqlite3
 from copy import deepcopy
 import datetime
-#import logging
 import os
+import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 from random import randint
-#import sqlite3
-#import sys
-#import traceback
 
 from PyQt6 import QtCore, QtWidgets, QtGui
 from PyQt6.QtWidgets import QDialog
@@ -41,8 +38,6 @@ from PyQt6.QtWidgets import QDialog
 from .add_item_name import DialogAddItemName
 from .code_in_all_files import DialogCodeInAllFiles
 from .color_selector import TextColor
-#from .confirm_delete import DialogConfirmDelete
-from .GUI.base64_helper import *
 from .GUI.ui_dialog_organiser import Ui_DialogOrganiser
 from .helpers import ExportDirectoryPathDialog, Message
 from .memo import DialogMemo
@@ -81,24 +76,15 @@ class CodeOrganiser(QDialog):
         # Set up the user interface from Designer.
         self.ui = Ui_DialogOrganiser()
         self.ui.setupUi(self)
-        font = f"font: {self.app.settings['fontsize']}pt "
-        font += '"' + self.app.settings['font'] + '";'
+        font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(doc_export_icon), "png")
-        self.ui.pushButton_export.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_export.setIcon(qta.icon('mdi6.export'))
         self.ui.pushButton_export.pressed.connect(self.export_image)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(zoom_icon), "png")
-        self.ui.label_zoom.setPixmap(pm.scaled(26, 26))
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(plus_icon), "png")
-        self.ui.pushButton_selectbranch.setIcon(QtGui.QIcon(pm))
+        self.ui.label_zoom.setPixmap(qta.icon('mdi6.magnify').pixmap(26, 26))
+        self.ui.pushButton_selectbranch.setIcon(qta.icon('mdi6.file-tree'))
         self.ui.pushButton_selectbranch.pressed.connect(self.select_tree_branch)
-        pm = QtGui.QPixmap()
-        pm.loadFromData(QtCore.QByteArray.fromBase64(sq_plus_icon), "png")
-        self.ui.pushButton_create_category.setIcon(QtGui.QIcon(pm))
+        self.ui.pushButton_create_category.setIcon(qta.icon('mdi6.pencil-plus-outline'))
         self.ui.pushButton_create_category.pressed.connect(self.create_category)
         self.ui.pushButton_apply.setEnabled(False)
         self.ui.pushButton_apply.pressed.connect(self.apply_model_changes)
