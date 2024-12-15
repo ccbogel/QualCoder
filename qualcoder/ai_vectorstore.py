@@ -524,7 +524,7 @@ want to continue?\
         logger.debug(msg)
         # delete all the contents from the vectorstore
         try:
-            self.faiss_db.delete(self.faiss_db.index_to_docstore_id.keys())
+            self.faiss_db.delete(self.faiss_db.index_to_docstore_id.values())
         except ValueError as e:
             logger.debug(f'Error deleting document from faiss vector store: {e}')
         self.faiss_save()
