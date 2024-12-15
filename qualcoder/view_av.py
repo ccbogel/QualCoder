@@ -1023,13 +1023,13 @@ class DialogCodeAV(QtWidgets.QDialog):
         Converts hh mm ss to milliseconds with text positions stored in a list
         The list contains lists of [text_pos0, text_pos1, milliseconds] """
 
-        mmss1 = "\[[0-9]?[0-9]:[0-9][0-9]\]"
-        hhmmss1 = "\[[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\]"
-        mmss2 = "\[[0-9]?[0-9]\.[0-9][0-9]\]"
-        hhmmss2 = "\[[0-9][0-9]\.[0-9][0-9]\.[0-9][0-9]\]"
-        hhmmss3 = "\{[0-9][0-9]\:[0-9][0-9]\:[0-9][0-9]\}"
-        hhmmss_sss = "#[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\.[0-9]{1,3}#"  # allow for 1 to 3 msecs digits
-        srt = "[0-9][0-9]:[0-9][0-9]:[0-9][0-9],[0-9][0-9][0-9]\s-->\s[0-9][0-9]:[0-9][0-9]:[0-9][0-9],[0-9][0-9][0-9]"
+        mmss1 = r"\[[0-9]?[0-9]:[0-9][0-9]\]"
+        hhmmss1 = r"\[[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\]"
+        mmss2 = r"\[[0-9]?[0-9]\.[0-9][0-9]\]"
+        hhmmss2 = r"\[[0-9][0-9]\.[0-9][0-9]\.[0-9][0-9]\]"
+        hhmmss3 = r"\{[0-9][0-9]\:[0-9][0-9]\:[0-9][0-9]\}"
+        hhmmss_sss = r"#[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\.[0-9]{1,3}#"  # allow for 1 to 3 msecs digits
+        srt = r"[0-9][0-9]:[0-9][0-9]:[0-9][0-9],[0-9][0-9][0-9]\s-->\s[0-9][0-9]:[0-9][0-9]:[0-9][0-9],[0-9][0-9][0-9]"
 
         self.time_positions = []
         for match in re.finditer(mmss1, self.transcription[1]):
@@ -3249,8 +3249,8 @@ class ToolTipEventFilter(QtCore.QObject):
                         text_ += "</p>"
                         multiple += 1
                     except KeyError as e_:
-                        msg_ = "Codes ToolTipEventFilter " + str(e_) + ". Key error: "
-                        msg_ += str(item) + "\n" + str(self.code_text)
+                        msg_ = f"Codes ToolTipEventFilter {e_}. Key error: "
+                        msg_ += f"{item}\n{self.code_text}"
                         logger.error(msg_)
             if multiple > 1:
                 text_ = multiple_msg + text_
@@ -3508,7 +3508,7 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
                 mediapath = self.code_av_dialog.file_['mediapath'][6:]
         except Exception as e_:
             Message(self.app, _('Media not found'),
-                    str(e_) + "\n" + self.app.project_path + self.code_av_dialog.file_['mediapath'],
+                    f"{e_}\n{self.app.project_path}{self.code_av_dialog.file_['mediapath']}",
                     "warning").exec()
             return
         ffmpeg_command = 'ffmpeg -i "' + mediapath + '" -ss '
@@ -3694,7 +3694,7 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         seg_time += msecs_to_hours_mins_secs(self.segment['pos1']) + "]"
         tooltip += seg_time
         if self.app.settings['showids']:
-            tooltip += " [avid:" + str(self.segment['avid']) + "]"
+            tooltip += f" [avid:{self.segment['avid']}]"
         if self.segment['memo'] != "":
             tooltip += "\n" + _("MEMO: ") + self.segment['memo']
         if self.segment['seltext'] is not None and self.segment['seltext'] != "":
@@ -3935,7 +3935,7 @@ class DialogViewAV(QtWidgets.QDialog):
         try:
             self.media = self.instance.media_new(self.abs_path)
         except Exception as e_:
-            Message(self.app, _('Media not found'), str(e_) + "\n" + self.abs_path).exec()
+            Message(self.app, _('Media not found'), f"{e_}\n{self.abs_path}").exec()
             self.closeEvent()
             return
         if self.file_['mediapath'][0:7] not in ("/audio", "audio:"):
@@ -4327,22 +4327,22 @@ class DialogViewAV(QtWidgets.QDialog):
         total_mins = int(hours) * 60 + int(mins)
         ts = "\n"
         if fmt == "[mm.ss]":
-            ts += '[' + str(total_mins) + '.' + secs + ']'
+            ts += f'[{total_mins}.{secs}]'
         if fmt == "[mm:ss]":
-            ts += '[' + str(total_mins) + ':' + secs + ']'
+            ts += f'[{total_mins}:{secs}]'
         if fmt == "[hh.mm.ss]":
-            ts += '[' + str(hours) + '.' + mins + '.' + secs + ']'
+            ts += f'[{hours}.{mins}.{secs}]'
         if fmt == "[hh:mm:ss]":
-            ts += '[' + str(hours) + ':' + mins + ':' + secs + ']'
+            ts += f'[{hours}:{mins}:{secs}]'
         if fmt == "{hh:mm:ss}":
-            ts += '{' + str(hours) + ':' + mins + ':' + secs + '}'
+            ts += f'{{{hours}:{mins}:{secs}}}'
         if fmt == "#hh:mm:ss.sss#":
             msecs = "000"
             tms_str = str(time_msecs)
             if len(tms_str) > 2:
                 msecs = tms_str[-3:]
-            ts += '#' + str(hours) + ':' + mins + ':' + secs + '.' + msecs + '#'
-        self.ui.textEdit.insertPlainText("\n" + ts + " ")
+            ts += f'#{hours}:{mins}:{secs}.{msecs}#'
+        self.ui.textEdit.insertPlainText(f"\n{ts} ")
         # Code here makes the current text location visible on the textEdit pane
         text_cursor = self.ui.textEdit.textCursor()
         pos = text_cursor.position()
@@ -4357,7 +4357,7 @@ class DialogViewAV(QtWidgets.QDialog):
         for i, n in enumerate(self.speaker_list):
             if i == 4:
                 txt += "\n"
-            txt += str(i + 1) + ": " + n + "  "
+            txt += f"{i + 1}: {n}  "
         self.ui.label_speakers.setText(txt)
 
     def scroll_transcribed_checkbox_changed(self):
@@ -4381,13 +4381,13 @@ class DialogViewAV(QtWidgets.QDialog):
         Converts hh mm ss to milliseconds with text positions stored in a list
         The list contains lists of [text_pos0, text_pos1, milliseconds] """
 
-        mmss1 = "\[[0-9]?[0-9]:[0-9][0-9]\]"
-        hhmmss1 = "\[[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\]"
-        mmss2 = "\[[0-9]?[0-9]\.[0-9][0-9]\]"
-        hhmmss2 = "\[[0-9][0-9]\.[0-9][0-9]\.[0-9][0-9]\]"
-        hhmmss3 = "\{[0-9][0-9]\:[0-9][0-9]\:[0-9][0-9]\}"
-        hhmmss_sss = "#[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\.[0-9][0-9][0-9]#"
-        srt = "[0-9][0-9]:[0-9][0-9]:[0-9][0-9],[0-9][0-9][0-9]\s-->\s[0-9][0-9]:[0-9][0-9]:[0-9][0-9],[0-9][0-9][0-9]"
+        mmss1 = r"\[[0-9]?[0-9]:[0-9][0-9]\]"
+        hhmmss1 = r"\[[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\]"
+        mmss2 = r"\[[0-9]?[0-9]\.[0-9][0-9]\]"
+        hhmmss2 = r"\[[0-9][0-9]\.[0-9][0-9]\.[0-9][0-9]\]"
+        hhmmss3 = r"\{[0-9][0-9]\:[0-9][0-9]\:[0-9][0-9]\}"
+        hhmmss_sss = r"#[0-9][0-9]:[0-9][0-9]:[0-9][0-9]\.[0-9][0-9][0-9]#"
+        srt = r"[0-9][0-9]:[0-9][0-9]:[0-9][0-9],[0-9][0-9][0-9]\s-->\s[0-9][0-9]:[0-9][0-9]:[0-9][0-9],[0-9][0-9][0-9]"
 
         transcription = self.ui.textEdit.toPlainText()
         self.time_positions = []

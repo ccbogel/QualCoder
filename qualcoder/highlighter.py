@@ -131,7 +131,7 @@ class Highlighter(QSyntaxHighlighter):
         if dark:
             brush = QBrush(Qt.GlobalColor.yellow, Qt.BrushStyle.SolidPattern)
         comment_format.setForeground(brush)
-        self.highlighting_rules += [(QRegularExpression("--[^\n]*"), comment_format)]
+        self.highlighting_rules += [(QRegularExpression(r"--[^\n]*"), comment_format)]
 
         # Multi-line comment
         multi_comment_format = QTextCharFormat()
@@ -145,13 +145,13 @@ class Highlighter(QSyntaxHighlighter):
         string_format = QTextCharFormat()
         brush = QBrush(Qt.GlobalColor.magenta, Qt.BrushStyle.SolidPattern)
         string_format.setForeground(brush)
-        self.highlighting_rules += [(QRegularExpression("\".*\""), string_format)]
+        self.highlighting_rules += [(QRegularExpression(r"\".*\""), string_format)]
 
         # Single quoted String
         string2_format = QTextCharFormat()
         brush = QBrush(Qt.GlobalColor.magenta, Qt.BrushStyle.SolidPattern)
         string2_format.setForeground(brush)
-        self.highlighting_rules += [(QRegularExpression("\'.*\'"), string2_format)]
+        self.highlighting_rules += [(QRegularExpression(r"\'.*\'"), string2_format)]
 
     def highlightBlock(self, text):
         """ from https://doc.qt.io/qtforpython/PySide6/QtCore/QRegularExpressionMatchIterator.html """
