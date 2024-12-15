@@ -585,9 +585,9 @@ class App(object):
         models = [
             {
                 'name': 'GPT-4-turbo',
-                'desc': """The best model from OpenAI as of now for our purpose. 
-You will need an an API-key from OpenAI and have payed credits in your account. 
-OpenAI will charge a small amount for every use.""",
+                'desc': """The best model from OpenAI for now. 
+                You need an API-key from OpenAI and have paid for credits in your account. 
+                OpenAI will charge a small amount for every use.""",
                 'access_info_url': 'https://platform.openai.com/api-keys',
                 'large_model': 'gpt-4-turbo',
                 'large_model_context_window': '128000',
@@ -599,8 +599,8 @@ OpenAI will charge a small amount for every use.""",
             {
                 'name': 'OpenAI_GPT4o',
                 'desc': """Faster, cheaper, but slightly less powerful than GPT-4-turbo.  
-You will need an an API-key from OpenAI and have payed credits in your account. 
-OpenAI will charge a small amount for every use.""",
+                You need an API-key from OpenAI and have paid for credits in your account. 
+                OpenAI will charge a small amount for every use.""",
                 'access_info_url': 'https://platform.openai.com/api-keys',
                 'large_model': 'gpt-4o',
                 'large_model_context_window': '128000',
@@ -612,9 +612,9 @@ OpenAI will charge a small amount for every use.""",
             {
                 'name': 'Blablador',
                 'desc': """A free and open source model (Mixtral 8x7B), excellent privacy, 
-albeit not as powerful as GPT-4. 
+but not as powerful as GPT-4. 
 Blablador is free to use and runs on a server of the Helmholtz Society, 
-a large non-profit research organization in Germany. In order to gain 
+a large non-profit research organization in Germany. To gain 
 access and get an API-key, you have to identify yourself once with your 
 university, ORCID, GitHub, or Google account.""",
                 'access_info_url': 'https://sdlaml.pages.jsc.fz-juelich.de/ai/guides/blablador_api_access/',
@@ -2783,7 +2783,8 @@ Click "Yes" to start now.')
     def ai_setup_wizard(self):
         """Action triggered by AI Setup Wizard menu item or at the first start of QualCoder."""
         if self.app.settings['ai_enable'] == 'True':
-            msg = _('It seems that the AI is already setup and enabled, so there is nothing to do here. Go to AI > settings if you want to change the current model or other settings.')
+            msg = _('The AI is setup and enabled, so there is nothing to do here. '
+                    'Go to AI > settings to change the current model or other settings.')
             Message(self.app, _('AI Setup Wizard'), msg).exec() 
             return
         self.ui.textEdit.append(_('AI: Setup Wizard'))
@@ -2798,11 +2799,11 @@ Click "Yes" to start now.')
     def ai_rebuild_memory(self):
         """Action triggered by AI Rebuild Internal Memory menu item."""
         if self.app.settings['ai_enable'] != 'True':
-            msg = _('Please enable the AI first and set it up properly.')
+            msg = _('Please enable the AI first and set it in Settings.')
             Message(self.app, _('Rebuild AI Memory'), msg).exec() 
             return
         if not self.app.ai.is_ready():
-            msg = _('The AI is busy or not set up properly.')
+            msg = _('The AI is busy or not set up correctly.')
             Message(self.app, _('Rebuild AI Memory'), msg).exec()
             return 
         
@@ -2824,7 +2825,7 @@ Click "Yes" to start now.')
     def ai_go_chat(self):
         """Action triggered by AI Chat menu item."""
         if self.app.settings['ai_enable'] != 'True':
-            msg = _('Please enable the AI first and set it up properly.')
+            msg = _('Please enable the AI first and set it up in Settings.')
             Message(self.app, _('Ai Chat'), msg).exec() 
             return
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_ai_chat) 
@@ -2832,7 +2833,7 @@ Click "Yes" to start now.')
     def ai_go_search(self):
         """Action triggered by AI Search and Coding menu item."""
         if self.app.settings['ai_enable'] != 'True':
-            msg = _('Please enable the AI first and set it up properly.')
+            msg = _('Please enable the AI first and set it up in Settings.')
             Message(self.app, _('Rebuild AI Memory'), msg).exec() 
             return
         self.text_coding(task='ai_search')
