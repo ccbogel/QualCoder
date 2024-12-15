@@ -176,12 +176,12 @@
      <string>Coding</string>
     </property>
     <addaction name="actionCodes"/>
+    <addaction name="actionAI_assisted_coding"/>
     <addaction name="actionCode_image"/>
     <addaction name="actionCode_audio_video"/>
     <addaction name="actionCode_pdf"/>
     <addaction name="actionColour_scheme"/>
     <addaction name="actionCode_organiser"/>
-    <addaction name="actionAI_assisted_coding"/>
    </widget>
    <widget class="QMenu" name="menuReports">
     <property name="title">
