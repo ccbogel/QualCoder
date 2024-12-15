@@ -22,15 +22,17 @@ https://qualcoder.wordpress.com/
 from copy import deepcopy
 import datetime
 import html
+from io import BytesIO
 import logging
 import os
+from PIL import Image, ImageOps
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 from random import randint
 import sqlite3
 import webbrowser
 
 from PyQt6 import QtCore, QtGui, QtWidgets
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QBuffer
 from PyQt6.QtGui import QBrush
 
 from .add_item_name import DialogAddItemName
@@ -776,7 +778,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         painter.end()
         # Convert to base64 as String not bytes
         byte_array = QtCore.QByteArray()
-        buffer = QtCore.QBuffer(byte_array)
+        buffer = QBuffer(byte_array)
         buffer.open(QtCore.QIODevice.OpenModeFlag.WriteOnly)
         image.save(buffer, 'PNG')
         base64_string = byte_array.toBase64().data().decode("UTF-8")
@@ -998,8 +1000,11 @@ class DialogCodeImage(QtWidgets.QDialog):
                 return
             self.ui.horizontalSlider.setValue(v)
             return
-        # Ctrl 0 to 9
+        # Ctrl 0 to 9, G
         if mods & QtCore.Qt.KeyboardModifier.ControlModifier:
+            if key == QtCore.Qt.Key.Key_G:
+                self.gray_image()
+                return
             if key == QtCore.Qt.Key.Key_1:
                 self.go_to_next_file()
                 return
@@ -1018,6 +1023,19 @@ class DialogCodeImage(QtWidgets.QDialog):
             if key == QtCore.Qt.Key.Key_0:
                 self.help()
                 return
+
+    def gray_image(self):
+        """ Gray image with coloured coded highlights. """
+
+        print("Gray image to do")
+        img = self.pixmap.toImage()
+        buffer = QBuffer()
+        buffer.open(QBuffer.ReadWrite)
+        img.save(buffer, "PNG")
+        pil_img = Image.open(BytesIO(buffer.data()))
+        print(type(pil_img))
+        gray_img = ImageOps.grayscale(pil_img)
+        gray_img.show()
 
     @staticmethod
     def help():
@@ -1928,9 +1946,11 @@ class DialogViewImage(QtWidgets.QDialog):
                 if self.degrees < 0:
                     self.degrees = 270
                 self.redraw_scene()
+                return True
             if key == QtCore.Qt.Key.Key_R:
                 self.degrees += 90
                 if self.degrees > 270:
                     self.degrees = 0
                 self.redraw_scene()
+                return True
         return False
