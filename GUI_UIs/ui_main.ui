@@ -114,7 +114,7 @@
      <x>0</x>
      <y>0</y>
      <width>1024</width>
-     <height>22</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuProject">
@@ -176,12 +176,12 @@
      <string>Coding</string>
     </property>
     <addaction name="actionCodes"/>
-    <addaction name="actionAI_assisted_coding"/>
     <addaction name="actionCode_image"/>
     <addaction name="actionCode_audio_video"/>
     <addaction name="actionCode_pdf"/>
     <addaction name="actionColour_scheme"/>
     <addaction name="actionCode_organiser"/>
+    <addaction name="actionAI_assisted_coding"/>
    </widget>
    <widget class="QMenu" name="menuReports">
     <property name="title">
