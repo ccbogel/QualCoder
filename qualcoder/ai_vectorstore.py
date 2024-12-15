@@ -167,10 +167,10 @@ want to continue?\
                     labelText='                              ', 
                     minimum=0, maximum=100, 
                     parent=parent_window)
-                pd.setWindowModality(QtCore.Qt.WindowModality.WindowModal)
                 pd.setStyleSheet('* {font-size: ' + str(self.app.settings['fontsize']) + 'pt}')
                 pd.setWindowTitle(_('Download AI components'))
                 pd.setAutoClose(False)
+                pd.setModal(True)
                 pd.show()
                 self.download_embedding_model()
                 while self.download_model_running:
@@ -199,7 +199,10 @@ want to continue?\
     def embedding_model_is_cached(self) -> bool:
         """Checks if the embeddings model from huggingface is already downloaded 
         and in the local cache."""
-        return os.path.exists(os.path.join(self.model_folder, self.model_files[-1]))
+        for model_file in self.model_files:
+            if not os.path.exists(os.path.join(self.model_folder, model_file)):
+                return False 
+        return True
     
     def _download_embedding_model(self, signals=None):
         """Background thread to download the embedding model to the local cache if necessary.
@@ -335,6 +338,10 @@ want to continue?\
         """
         self._is_closing = False        
         self.prepare_embedding_model()
+        if self.app.settings['ai_enable'] == 'False':
+            self.close()
+            self.app.ai._status = ''
+            return
         
         if self.app.project_name == '':  # no project open
             self.close()
@@ -517,7 +524,7 @@ want to continue?\
         logger.debug(msg)
         # delete all the contents from the vectorstore
         try:
-            self.faiss_db.delete(self.faiss_db.index_to_docstore_id.keys())
+            self.faiss_db.delete(self.faiss_db.index_to_docstore_id.values())
         except ValueError as e:
             logger.debug(f'Error deleting document from faiss vector store: {e}')
         self.faiss_save()
