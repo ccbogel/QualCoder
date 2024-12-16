@@ -360,10 +360,15 @@ class DialogAIChat(QtWidgets.QDialog):
                 if ai_data_length >= max_ai_data_length:
                     max_ai_data_length_reached = True
                     break
+                
+                fulltext = self.app.get_text_fulltext(row[2])
+                line_start, line_end = self.app.get_line_numbers(fulltext, row[4], row[5])
                 ai_data.append({
                     'source_id': row[0],
                     'source_name': row[12],
                     'quote': row[3],
+                    'line_start': line_start,
+                    'line_end': line_end,
                     'code_name': row[13]
                 })
                 ai_data_length = ai_data_length + len(row[3])
@@ -381,7 +386,7 @@ class DialogAIChat(QtWidgets.QDialog):
                 f'The whole discussion should be based upon the the empirical data provided and its proper interpretation. '
                 f'Do not make any assumptions which are not supported by the data '
                 f'Please mention the sources that your refer to from the given empirical data, using an html anchor tag of the following form: '
-                '<a href="coding:{source_id}">{source_name}</a>\n' 
+                '<a href="coding:{source_id}">{source_name}: {line_start} - {line_end}</a>\n' 
                 f'Always answer in the following language: "{self.app.ai.get_curr_language()}".'
             )    
             
@@ -491,10 +496,16 @@ data collected. This information will accompany every prompt sent to the AI, res
                 max_ai_data_length_reached = True  # TODO variable not used
                 break
             chunk = chunks[i]
+            fulltext = self.app.get_text_fulltext(chunk.metadata["id"])
+            line_start, line_end = self.app.get_line_numbers(fulltext, 
+                                                             chunk.metadata["start_index"], 
+                                                             chunk.metadata["start_index"] + len(chunk.page_content))
             ai_data.append({
-                'source_id': f'{chunk.metadata["id"]}_{chunk.metadata["start_index"]}_{len(chunk.page_content)}',
+                'source_id': f'{chunk.metadata["id"]}_{chunk.metadata["start_index"]}_{len(chunk.page_content)}_{line_start}_{line_end}',
                 'source_name': self.get_filename(int(chunk.metadata['id'])),
-                'quote': chunk.page_content
+                'quote': chunk.page_content,
+                'line_start': line_start,
+                'line_end': line_end
             })
             ai_data_length += len(chunk.page_content)
         
@@ -509,7 +520,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             f'The whole discussion should be based updon the the empirical data provided and its proper interpretation. '
             f'Do not make any assumptions which are not supported by the data. '
             f'Please mention the sources that your refer to from the given empirical data, using an html anchor tag of the following form: '
-            '<a href="chunk:{source_id}">{source_name}</a>\n' 
+            '<a href="chunk:{source_id}">{source_name}: {line_start} - {line_end}</a>\n' 
             f'Always answer in the following language: "{self.app.ai.get_curr_language()}".'
         )    
         logger.debug(f'Topic chat prompt:\n{ai_instruction}')
@@ -697,7 +708,15 @@ data collected. This information will accompany every prompt sent to the AI, res
             if len(quote_found) > 0:
                 quote_start = quote_found[0].start + self.ai_text_start_pos
                 quote = quote_found[0].matched
-                a = f'(<a href="quote:{self.ai_text_doc_id}_{quote_start}_{len(quote)}">{self.ai_text_doc_name}</a>)'
+                fulltext = self.app.get_text_fulltext(self.ai_text_doc_id)
+                line_start, line_end = self.app.get_line_numbers(fulltext, quote_start, quote_start + len(quote))
+                if line_start + line_end > 0:
+                    if line_start == line_end:  # one line
+                        a = f'(<a href="quote:{self.ai_text_doc_id}_{quote_start}_{len(quote)}">{self.ai_text_doc_name}: {line_start}</a>)'
+                    else:  # multiple lines
+                        a = f'(<a href="quote:{self.ai_text_doc_id}_{quote_start}_{len(quote)}">{self.ai_text_doc_name}: {line_start} - {line_end}</a>)'
+                else:  # no lines found
+                    a = f'(<a href="quote:{self.ai_text_doc_id}_{quote_start}_{len(quote)}">{self.ai_text_doc_name}</a>)'
                 return a
             else:  # not found
                 return _('(unknown reference)')
@@ -1013,12 +1032,18 @@ data collected. This information will accompany every prompt sent to the AI, res
             elif link.startswith('chunk:'):
                 try:
                     chunk_id = link[len('chunk:'):]
-                    source_id, start, length = chunk_id.split('_')
+                    chunk_id_elem = chunk_id.split('_')
+                    if len(chunk_id_elem) == 3:  # legacy format
+                        source_id, start, length = chunk_id_elem
+                        line_start = 0
+                        line_end = 0
+                    else:
+                        source_id, start, length, line_start, line_end = chunk_id_elem
                     cursor = self.app.conn.cursor()
                     sql = f'SELECT name, fulltext FROM source WHERE id = {source_id}'
                     cursor.execute(sql)
                     source = cursor.fetchone()
-                    tooltip_txt = f'{source[0]}:\n'  # File name
+                    tooltip_txt = f'{source[0]}: {line_start} - {line_end}\n'  # File name
                     tooltip_txt += f'"{source[1][int(start):int(start) + int(length)]}"'  # Chunk extracted from fulltext                    
                 except Exception as e:
                     logger.debug(f'Link: "{link}" - Error: {e}')
@@ -1068,7 +1093,13 @@ data collected. This information will accompany every prompt sent to the AI, res
             elif link.startswith('chunk:'):
                 try:
                     chunk_id = link[len('chunk:'):]
-                    source_id, start, length = chunk_id.split('_')
+                    chunk_id_elem = chunk_id.split('_')
+                    if len(chunk_id_elem) == 3:  # legacy format
+                        source_id, start, length = chunk_id_elem
+                        line_start = 0
+                        line_end = 0
+                    else:
+                        source_id, start, length, line_start, line_end = chunk_id_elem
                     end = int(start) + int(length)
                     self.main_window.text_coding(task='documents',
                                                  doc_id=int(source_id), 
