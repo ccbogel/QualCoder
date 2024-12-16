@@ -21,9 +21,7 @@ https://qualcoder.wordpress.com/
 
 from PyQt6 import QtWidgets, QtCore
 import os
-import sys
 import logging
-import traceback
 
 from .GUI.ui_dialog_information import Ui_Dialog_information
 
@@ -53,8 +51,7 @@ class DialogInformation(QtWidgets.QDialog):
         self.ui = Ui_Dialog_information()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        font = 'font: ' + str(app_.settings['fontsize']) + 'pt '
-        font += '"' + app_.settings['font'] + '";'
+        font = f'font: {app_.settings["fontsize"]}pt "{app_.settings["font"]}";'
         self.setStyleSheet(font)
         self.setWindowTitle(title)
         if html == "":
@@ -79,8 +76,8 @@ about = '<h1 class="western">About QualCoder</h1>\
 <h2 class="western">Version:</h2>\
 <p>QualCoderVersion</p>\
 <p>Optional: Install VLC for audio and video coding.<br /> \
-Optional: Install ffmpeg for speech to text and waveform images.</p>\
-<p>Tested on: Ubuntu 22.04, Windows 10/11, used on macOS and on other Linux distros.</p>\
+Optional: Install ffmpeg for waveform images.</p>\
+<p>Tested on: Ubuntu 24.04, Windows 11, used on macOS and on other Linux distros.</p>\
 <p></p>\
 <h2 class="western">Acknowledgements</h2>\
 <p>Ronggui Huang and Zhang Gehao for creating RQDA, which inspired this software.<br /> \
@@ -88,9 +85,9 @@ Mike MacCana for the source code for the docx module.<br /> \
 User: bit4 on stackoverflow who presented the source code to convert html to text.<br /> \
 ebooklib: Aleksandar Erkalović https://github.com/aerkalov.<br /> \
 The VideoLAN team for the bindings to VLC. https://github.com/oaubert/python-vlc.<br /> \
-The ffmpeg team. https://ffmpeg.org/ used with speech to text and waveform/spectrograph images.<br /> \
-Julius Reich for creating the cool QualCoder logo.<br /> \
-Dr Droege for developing and testing the code to incorporate artificial intelligenc models for AI coding.<br /> \
+The ffmpeg team. https://ffmpeg.org/ used with waveform and spectrograph images.<br /> \
+Julius Reich for creating the QualCoder logo.<br /> \
+Dr Droege for developing and testing the code to incorporate artificial intelligence models for AI coding.<br /> \
  To various members on github for supporting this project.</p>\
 <h2 class="western">Other details</h2\
 <p>The qda data folder contains folders for imported documents, \
@@ -100,10 +97,10 @@ This contains QualCoder.log, config.ini (for settings) and \
 recent_project.txt. The config file contains the name of the current coder, \
 default working directory, selected font and other parameters.</p>\
 <p>QualCoder is written in python3 using Qt6 for the graphical interface.</p>\
-<p>The REFI-QDA Project import and export seem to work ok, but are still experimental. </p>\
-<p>Created by Colin Curtain BPharm GradDipComp PhD, python programmer, lecturer University of Tasmania.</p>\
+<p>The REFI-QDA Project import and export seem to work ok, but are not guaranteed to work.</p>\
+<p>Created by Colin Curtain BPharm GradDipComp PhD, python programmer, Lecturer University of Tasmania.</p>\
 <h2>Citation</h2>\
-Curtain, C. (2023) QualCoder 3.6 [Computer software]. \
+Curtain, C. (2024) QualCoder 3.6 [Computer software]. \
 Retrieved from https://github.com/ccbogel/QualCoder/releases/tag/3.6\
 <h2 class="western">Licenses</h2>\
 <h3>LGPL-3.0 License</h3>\
