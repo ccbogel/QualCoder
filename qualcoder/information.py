@@ -263,8 +263,10 @@ Ctrl 4 Filter files by attributes<br />\
 Ctrl 5 Show codes marked important<br />\
 Ctrl 0 Help - opens in browser<br />\
 Ctrl Z The last code is unmarked, undo and restore that coding<br />\
+Ctrl G Create a grayed-out image with coloured coded highlights (Wait a few seconds)<br />\
 Minus or Q Zoom out<br />\
-Plus or W Zoom in'
+Plus or W Zoom in<br />\
+Right-click on image for menu to rotate image'
 
 coding_av_shortcuts = '<h2>Code audio/video key shortcuts</h2>\
 Ctrl 1 Next file<br />\

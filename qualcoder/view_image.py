@@ -97,7 +97,6 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.attributes = []
         self.degrees = 0
         self.get_codes_and_categories()
-        self.get_coded_areas()
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_code_image()
         self.ui.setupUi(self)
@@ -190,18 +189,21 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.redraw_scene()
 
     def get_coded_areas(self):
-        """ Get the coded area details for the rectangles for all image files by all coders.
+        """ Get the coded area details for the rectangles for the image file by current coder.
         Order by area descending so when items are drawn to the scene. First largest to smallest on top.
-        Called by init and by unmark. """
+        Called by load file, update_dialog_codes_and_categories,coded_media_dialog, undo_last_unmarked_code.
+        """
 
         self.code_areas = []
         sql = "select imid,id,x1, y1, width, height, code_image.memo, code_image.date, code_image.owner, " \
-              "code_image.cid, important, code_name.name from code_image join code_name on code_name.cid=code_image.cid" \
+              "code_image.cid, important, code_name.name, code_name.color from code_image " \
+              "join code_name on code_name.cid=code_image.cid " \
+              " where code_image.id=? and code_image.owner=? and width > 0 and height > 0" \
               " order by width*height desc"
         cur = self.app.conn.cursor()
-        cur.execute(sql)
+        cur.execute(sql, [self.file_['id'], self.app.settings['codername']])
         results = cur.fetchall()
-        keys = 'imid', 'id', 'x1', 'y1', 'width', 'height', 'memo', 'date', 'owner', 'cid', 'important', 'name'
+        keys = 'imid', 'id', 'x1', 'y1', 'width', 'height', 'memo', 'date', 'owner', 'cid', 'important', 'name', 'color'
         for row in results:
             self.code_areas.append(dict(zip(keys, row)))
 
@@ -657,6 +659,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             if slider_value > 100:
                 slider_value = 100
             self.ui.horizontalSlider.setValue(slider_value)
+        self.get_coded_areas()
         self.draw_coded_areas()
         self.fill_code_counts_in_tree()
 
@@ -974,6 +977,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         + or W  Zoom out
         - or Q Zoom in
         Ctrl 0 to Ctrl 5 Buttons and Help
+        Ctrl G - Gray image with highlighted codings
         """
 
         key = event.key()
@@ -1034,8 +1038,25 @@ class DialogCodeImage(QtWidgets.QDialog):
         img.save(buffer, "PNG")
         pil_img = Image.open(BytesIO(buffer.data()))
         print(type(pil_img))
-        gray_img = ImageOps.grayscale(pil_img)
-        gray_img.show()
+        background = ImageOps.grayscale(pil_img)
+        background.convert('RGB')
+        highlights = Image.new('RGB', (background.width, background.height))
+        highlights.paste(background, (0, 0))
+        for ca in self.code_areas:
+            #print("====\n", ca)
+            try:
+                # Needs tuple of left, top, right, bottom
+                coded_img = pil_img.crop((ca['x1'], ca['y1'], ca['x1'] + ca['width'], ca['y1'] + ca['height']))
+                img_with_border = ImageOps.expand(coded_img, border=3, fill=ca['color'])
+                #coded_img.show()
+                #highlights.paste(coded_img, (int(ca['x1']), int(ca['y1'])))
+                highlights.paste(img_with_border, (int(ca['x1']), int(ca['y1'])))
+            except SystemError as e_:
+                logger.debug(e_)
+                print(e_)
+                print("Crop img: x1", ca['x1'], "y1", ca['y1'], "x2", ca['x1'] + ca['width'], "y2", ca['y1'] + ca['height'])
+                print("Main img: w", background.width, "h", background.height)
+        highlights.show()
 
     @staticmethod
     def help():
