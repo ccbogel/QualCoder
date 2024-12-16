@@ -360,13 +360,13 @@ class App(object):
             res.append(dict(zip(keys, row)))
         return res
     
-    def get_text_fulltext(self, id_, start_pos, length) -> str:
+    def get_text_fulltext(self, id_, start_pos=None, length=None) -> str:
         """Extracts text from the database in the document with the given id_.
 
         Args:
             id_ (int): document id
-            start_pos (int): position of the first character
-            length (int): number of characters to retireve
+            start_pos (int): position of the first character, 0 if None
+            length (int): number of characters to retrieve, all if None
 
         Returns:
             str: text
@@ -378,7 +378,40 @@ class App(object):
         if res is None:
             return ''
         else:
+            if start_pos is None:
+                start_pos = 0
+            if length is None:
+                length = len(res[0])
             return res[0][start_pos:start_pos + length]
+
+    def get_line_numbers(self, full_text, quote_start, quote_end):
+        """Determines line numbers of a quote
+
+        Args:
+            full_text (str): doc fulltext
+            quote_start (int): character position where the quote starts
+            quote_end (int): end position
+
+        Returns:
+            int, int: line numbers of start and end position of quote
+        """
+        lines = full_text.splitlines()
+        cumulative_length = 0
+        start_line_number = 0
+        end_line_number = 0
+        
+        # Iterate through each line and find the line numbers
+        for i, line in enumerate(lines):
+            cumulative_length += len(line) + 1  # +1 for the newline character          
+            # Determine if the start position falls within this line
+            if start_line_number == 0 and cumulative_length > quote_start:
+                start_line_number = i + 1  # Line numbers are usually 1-indexed
+            # Determine if the end position falls within this line
+            if end_line_number == 0 and cumulative_length > quote_end:
+                end_line_number = i + 1  # Line numbers are usually 1-indexed
+                break  # We can break early since both start and end line numbers are found
+                
+        return start_line_number, end_line_number
 
     def get_pdf_filenames(self, ids=None):
         """ Get id, filenames, memo and mediapath of pdf text files.
