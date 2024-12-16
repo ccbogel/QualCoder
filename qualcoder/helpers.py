@@ -818,3 +818,121 @@ class MarkdownHighlighter(QtGui.QSyntaxHighlighter):
             while i.hasNext():
                 match = i.next()
                 self.setFormat(match.capturedStart(), match.capturedLength(), format_)
+
+class NumberBar(QtWidgets.QFrame):
+    """
+    NumberBar is a QWidget subclass providing a sidebar with line numbers
+    for a QTextEdit widget. It visually aligns with the text editor to
+    display line numbers alongside text content, offering a useful guide
+    for text navigation.
+    Loosely based on https://nachtimwald.com/2009/08/15/qtextedit-with-line-numbers/
+
+    Attributes:
+        text_edit (QTextEdit): The text editor widget that this NumberBar
+                               is associated with.
+    """    
+    
+    def __init__(self, text_edit: QtWidgets.QTextEdit, *args):
+        super().__init__(*args)
+        self.text_edit = text_edit
+        background_color = text_edit.palette().color(QtGui.QPalette.ColorRole.Base)
+        self.setStyleSheet(f"background-color: {background_color.name()};")
+        # The highest line that is currently visibile, used to update the width of the control
+        self.highest_line = 0
+        self.digits = 0
+
+        # Install event filter
+        class EventFilter(QtCore.QObject):
+            def eventFilter(filter_self, source: QtCore.QObject, event: QtCore.QEvent):
+                if source == self.text_edit or source == self.text_edit.viewport():
+                    if event.type() in (QtCore.QEvent.Type.UpdateRequest, 
+                                        QtCore.QEvent.Type.Paint, 
+                                        QtCore.QEvent.Type.Resize, 
+                                        QtCore.QEvent.Type.KeyPress, 
+                                        QtCore.QEvent.Type.Wheel):
+                        self.update()
+                return super(EventFilter, filter_self).eventFilter(source, event)
+
+        self.event_filter = EventFilter(self)
+        self.text_edit.installEventFilter(self.event_filter)
+        self.text_edit.viewport().installEventFilter(self.event_filter)
+
+    def adjustWidth(self):
+        """ 
+        Adjust the with of the NumberBar according to the length of the highest number. 
+        The mimimum width is 3 digits. 
+        Will try to adjust the scrolling position accordingly so that the visible text is 
+        not jumping too much.
+        """
+        if self.highest_line < 1000:
+            digits = 3  # minimum width 3 digits
+        else:
+            digits = len(str(self.highest_line)) 
+        new_digits = digits - self.digits
+        if new_digits <= 0:
+            return  # no width adjustment needed
+        self.digits = digits
+        font = self.font()
+        font.setFamily('Monospace')
+        font.setStyleHint(QtGui.QFont.StyleHint.TypeWriter)
+        font_metrics = QtGui.QFontMetrics(font)
+        width = font_metrics.boundingRect('0' * digits).width() + 16
+        self.setFixedWidth(width)
+        # adjust scroll position
+        magic_number = 0.00947327480831203467051894654962
+        new_pos = round(self.text_edit.verticalScrollBar().value() * (1 + new_digits * magic_number))
+        if new_pos > 0:
+            QtCore.QTimer.singleShot(100, lambda: self.text_edit.verticalScrollBar().setValue(new_pos))
+        
+    def showEvent(self, event):
+        """Adjusts the width based on the current font size"""
+        super().showEvent(event)
+        self.adjustWidth()
+
+    def update(self, *args):
+        """
+        Updates the number bar to display the current set of numbers.
+        Also, adjusts the width of the number bar if necessary.
+        """
+        self.adjustWidth()
+        QtWidgets.QWidget.update(self, *args)
+           
+    def paintEvent(self, event):
+        """Custom painting logic for rendering the line numbers
+        based on the currently visible text blocks in the QTextEdit."""
+        
+        contents_y = self.text_edit.verticalScrollBar().value()
+        page_bottom = contents_y + self.text_edit.viewport().height()
+        text_edit_font_metrics = self.text_edit.fontMetrics()
+
+        painter = QtGui.QPainter(self)
+        font = self.font()
+        font.setFamily('Monospace')
+        font.setStyleHint(QtGui.QFont.StyleHint.TypeWriter)
+        text_color = self.palette().color(QtGui.QPalette.ColorGroup.Disabled, QtGui.QPalette.ColorRole.Text)
+        painter.setPen(text_color)
+        painter.setFont(font)
+        font_metrics = painter.fontMetrics()
+
+        line_count = 0
+        block = self.text_edit.document().begin()
+
+        while block.isValid():
+            line_count += 1
+            position = self.text_edit.document().documentLayout().blockBoundingRect(block).topLeft()
+            if position.y() > page_bottom:
+                break
+
+            line_number = str(line_count)
+            painter.drawText(
+                self.width() - font_metrics.boundingRect(line_number).width() - 8, 
+                round(position.y()) - contents_y + text_edit_font_metrics.ascent(), 
+                line_number
+            )
+                            
+            block = block.next()
+            if line_count > self.highest_line:
+                self.highest_line = line_count
+
+        painter.end()
+        QtWidgets.QWidget.paintEvent(self, event)

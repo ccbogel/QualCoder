@@ -608,10 +608,25 @@ As all assigned positions may be incorrect. </string>
    <item>
     <widget class="QWidget" name="widget_mainWindow" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
       <item>
        <widget class="QSplitter" name="splitter">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="handleWidth">
+         <number>9</number>
         </property>
         <widget class="QWidget" name="widget_left" native="true">
          <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -1035,7 +1050,19 @@ As all assigned positions may be incorrect. </string>
           <string/>
          </property>
          <layout class="QGridLayout" name="gridLayout">
-          <item row="0" column="1">
+          <item row="2" column="0">
+           <widget class="QSplitter" name="splitter_2">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <widget class="QTextEdit" name="textEdit_info">
+             <property name="tabChangesFocus">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </widget>
+          </item>
+          <item row="0" column="0">
            <widget class="QGroupBox" name="groupBox_2">
             <property name="minimumSize">
              <size>
@@ -1096,7 +1123,7 @@ As all assigned positions may be incorrect. </string>
             </widget>
            </widget>
           </item>
-          <item row="1" column="1">
+          <item row="1" column="0">
            <widget class="QLabel" name="label_info">
             <property name="minimumSize">
              <size>
@@ -1114,21 +1141,6 @@ As all assigned positions may be incorrect. </string>
              <string>.</string>
             </property>
            </widget>
-          </item>
-          <item row="2" column="1">
-           <widget class="QSplitter" name="splitter_2">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <widget class="QTextEdit" name="textEdit_info">
-             <property name="tabChangesFocus">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QWidget" name="widget" native="true"/>
           </item>
          </layout>
         </widget>

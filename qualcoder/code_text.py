@@ -35,14 +35,13 @@ import webbrowser
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QBrush, QColor
-from .lineNumberWidget import LineNumberWidget
 
 from .add_item_name import DialogAddItemName
 from .code_in_all_files import DialogCodeInAllFiles
 from .color_selector import DialogColorSelect
 from .color_selector import colors, TextColor
 from .confirm_delete import DialogConfirmDelete
-from .helpers import Message, DialogGetStartAndEndMarks, ExportDirectoryPathDialog, MarkdownHighlighter
+from .helpers import Message, DialogGetStartAndEndMarks, ExportDirectoryPathDialog, MarkdownHighlighter, NumberBar
 from .GUI.ui_dialog_code_text import Ui_Dialog_code_text
 from .memo import DialogMemo
 from .report_attributes import DialogSelectAttributeParameters
@@ -312,12 +311,11 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.leftsplitter.splitterMoved.connect(self.update_sizes)
 
         # Add paragraph numbers widget
-        self.ui.textEdit.textChanged.connect(self._line_widget_line_count_changed)
-        self.lineNumberWidget = LineNumberWidget(self.ui.textEdit)
+        number_bar = NumberBar(self.ui.textEdit)
         layout = QtWidgets.QVBoxLayout(self.ui.lineNumbers)
         layout.setContentsMargins(0, 0, 0, 0)  # Remove margins if needed
-        layout.addWidget(self.lineNumberWidget)
-        self.ui.lineNumbers.setLayout(layout) 
+        layout.addWidget(number_bar)
+        self.ui.lineNumbers.setLayout(layout)
 
         self.fill_tree()
 
@@ -342,11 +340,6 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ai_include_coded_segments = None
         self.ai_search_analysis_counter = 0
     
-    def _line_widget_line_count_changed(self):
-        if self.lineNumberWidget:
-            n = int(self.ui.textEdit.document().lineCount())
-            self.lineNumberWidget.changeLineCount(n)
-
     @staticmethod
     def help():
         """ Open help for transcribe section in browser. """
@@ -2813,6 +2806,8 @@ class DialogCodeText(QtWidgets.QWidget):
             position : """
 
         selected = self.ui.listWidget.currentItem()
+        if selected is None:
+            return
         file_ = None
         for f in self.filenames:
             if selected.text() == f['name']:
@@ -3978,7 +3973,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.groupBox.hide()
         self.ui.groupBox_edit_mode.show()
         self.ui.listWidget.setEnabled(False)
-        self.ui.leftsplitter.hide()
+        self.ui.widget_left.hide()
         self.ui.groupBox_file_buttons.setEnabled(False)
         self.ui.groupBox_file_buttons.setMaximumSize(4000, 4000)
         self.ui.groupBox_coding_buttons.setEnabled(False)
@@ -4014,7 +4009,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.groupBox_file_buttons.setMaximumSize(4000, 30)
         self.ui.groupBox_coding_buttons.setEnabled(True)
         self.ui.treeWidget.setEnabled(True)
-        self.ui.leftsplitter.show()
+        self.ui.widget_left.show()
         self.prev_text = ""
         if self.edit_mode_has_changed:
             self.text = self.ui.textEdit.toPlainText()
@@ -4828,11 +4823,22 @@ class DialogCodeText(QtWidgets.QWidget):
                         endpos = 0
                     text_cursor.setPosition(endpos, QtGui.QTextCursor.MoveMode.KeepAnchor)
                     self.ui.textEdit.setTextCursor(text_cursor)
-                    self.ui.textEdit.verticalScrollBar().setValue(self.ui.textEdit.verticalScrollBar().value() + 200)
                     self.ui.textEdit.setFocus()
+                    QtCore.QTimer.singleShot(20, self.scroll_text_into_view)  # scroll into view after window is updated
                 except Exception as e:
                     logger.debug(str(e))
                 break
+
+    def scroll_text_into_view(self):
+        # Scroll so the selection is in the middle of the screen
+        cursor = self.ui.textEdit.textCursor()
+        if cursor.hasSelection():
+            cursor_rect = self.ui.textEdit.cursorRect(cursor)
+            vertical_center = cursor_rect.center().y()
+            vertical_scrollbar = self.ui.textEdit.verticalScrollBar()
+            current_scroll_pos = vertical_scrollbar.value()
+            desired_scroll_pos = current_scroll_pos + (vertical_center - self.ui.textEdit.viewport().height() // 2)
+            vertical_scrollbar.setValue(desired_scroll_pos)
 
     def ai_search_update_spinner(self):
         """ Updating the ai_progressBar and the text spinner in the list view to indicate to the user that 
