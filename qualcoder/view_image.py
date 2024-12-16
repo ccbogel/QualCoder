@@ -835,7 +835,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         Add, rename, memo, move or delete code or category. Change code color. """
 
         menu = QtWidgets.QMenu()
-        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
         selected = self.ui.treeWidget.currentItem()
         action_add_code_to_category = None
         action_add_category_to_category = None
@@ -1007,7 +1007,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         # Ctrl 0 to 9, G
         if mods & QtCore.Qt.KeyboardModifier.ControlModifier:
             if key == QtCore.Qt.Key.Key_G:
-                self.gray_image()
+                self.gray_image_highlights()
                 return
             if key == QtCore.Qt.Key.Key_1:
                 self.go_to_next_file()
@@ -1028,34 +1028,44 @@ class DialogCodeImage(QtWidgets.QDialog):
                 self.help()
                 return
 
-    def gray_image(self):
-        """ Gray image with coloured coded highlights. """
+    def gray_image_highlights(self, coded_area=None):
+        """ Gray image with coloured coded highlight(s).
+        Takes a few seconds to build and show image.
+        :param: coded_area Dictionary of coded area
+        """
 
-        print("Gray image to do")
         img = self.pixmap.toImage()
         buffer = QBuffer()
         buffer.open(QBuffer.ReadWrite)
         img.save(buffer, "PNG")
         pil_img = Image.open(BytesIO(buffer.data()))
-        print(type(pil_img))
         background = ImageOps.grayscale(pil_img)
-        background.convert('RGB')
+        #background.convert('RGB')
         highlights = Image.new('RGB', (background.width, background.height))
         highlights.paste(background, (0, 0))
-        for ca in self.code_areas:
-            #print("====\n", ca)
+        if coded_area:
             try:
                 # Needs tuple of left, top, right, bottom
-                coded_img = pil_img.crop((ca['x1'], ca['y1'], ca['x1'] + ca['width'], ca['y1'] + ca['height']))
-                img_with_border = ImageOps.expand(coded_img, border=3, fill=ca['color'])
-                #coded_img.show()
-                #highlights.paste(coded_img, (int(ca['x1']), int(ca['y1'])))
-                highlights.paste(img_with_border, (int(ca['x1']), int(ca['y1'])))
+                coded_img = pil_img.crop((coded_area['x1'], coded_area['y1'], coded_area['x1'] + coded_area['width'],
+                                          coded_area['y1'] + coded_area['height']))
+                img_with_border = ImageOps.expand(coded_img, border=3, fill=coded_area['color'])
+                # highlights.paste(coded_img, (int(ca['x1']), int(ca['y1']))) # No border
+                highlights.paste(img_with_border, (int(coded_area['x1']), int(coded_area['y1'])))
             except SystemError as e_:
                 logger.debug(e_)
-                print(e_)
-                print("Crop img: x1", ca['x1'], "y1", ca['y1'], "x2", ca['x1'] + ca['width'], "y2", ca['y1'] + ca['height'])
-                print("Main img: w", background.width, "h", background.height)
+        else:
+            for ca in self.code_areas:
+                try:
+                    # Needs tuple of left, top, right, bottom
+                    coded_img = pil_img.crop((ca['x1'], ca['y1'], ca['x1'] + ca['width'], ca['y1'] + ca['height']))
+                    img_with_border = ImageOps.expand(coded_img, border=3, fill=ca['color'])
+                    #highlights.paste(coded_img, (int(ca['x1']), int(ca['y1']))) # No border
+                    highlights.paste(img_with_border, (int(ca['x1']), int(ca['y1'])))
+                except SystemError as e_:
+                    logger.debug(e_)
+                    print(e_)
+                    print("Crop img: x1", ca['x1'], "y1", ca['y1'], "x2", ca['x1'] + ca['width'], "y2", ca['y1'] + ca['height'])
+                    print("Main img: w", background.width, "h", background.height)
         highlights.show()
 
     @staticmethod
@@ -1159,9 +1169,12 @@ class DialogCodeImage(QtWidgets.QDialog):
         action_not_important = None
         if item['important'] == 1:
             action_not_important = menu.addAction(_("Remove important mark"))
+        action_highlight_on_gray = menu.addAction(_("Export highlight on gray"))
         action = menu.exec(global_pos)
         if action is None:
             return
+        if action == action_highlight_on_gray:
+            self.gray_image_highlights(item)
         if action == action_memo:
             self.coded_area_memo(item)
         if action == action_unmark:
@@ -1393,7 +1406,10 @@ class DialogCodeImage(QtWidgets.QDialog):
         item = {'imid': None, 'id': self.file_['id'], 'x1': x_unscaled, 'y1': y_unscaled,
                 'width': width_unscaled, 'height': height_unscaled, 'owner': self.app.settings['codername'],
                 'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),
-                'cid': cid, 'memo': '', 'important': None, 'name': code_name}
+                'cid': cid, 'memo': '', 'important': None, 'name': code_name, 'color': '#777777'}
+        for c in self.codes:
+            if c['cid'] == cid:
+                item['color'] = c['color']
         cur = self.app.conn.cursor()
         cur.execute(
             "insert into code_image (id,x1,y1,width,height,cid,memo,date,owner, important) values(?,?,?,?,?,?,?,?,?,"
