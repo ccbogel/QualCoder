@@ -1028,10 +1028,12 @@ class DialogCodeImage(QtWidgets.QDialog):
                 self.help()
                 return
 
-    def gray_image_highlights(self, coded_area=None):
+    def gray_image_highlights(self, coded_area=None, code_id=None):
         """ Gray image with coloured coded highlight(s).
+        Highlight all coded area, or selected coded area, or all areas coded by one specific code.
         Takes a few seconds to build and show image.
         :param: coded_area Dictionary of coded area
+        :param: coded_id Integer code id
         """
 
         img = self.pixmap.toImage()
@@ -1059,8 +1061,10 @@ class DialogCodeImage(QtWidgets.QDialog):
                     # Needs tuple of left, top, right, bottom
                     coded_img = pil_img.crop((ca['x1'], ca['y1'], ca['x1'] + ca['width'], ca['y1'] + ca['height']))
                     img_with_border = ImageOps.expand(coded_img, border=3, fill=ca['color'])
-                    #highlights.paste(coded_img, (int(ca['x1']), int(ca['y1']))) # No border
-                    highlights.paste(img_with_border, (int(ca['x1']), int(ca['y1'])))
+                    if code_id == ca['cid']:
+                        highlights.paste(img_with_border, (int(ca['x1']), int(ca['y1'])))
+                    if not code_id:
+                        highlights.paste(img_with_border, (int(ca['x1']), int(ca['y1'])))
                 except SystemError as e_:
                     logger.debug(e_)
                     print(e_)
@@ -1169,12 +1173,15 @@ class DialogCodeImage(QtWidgets.QDialog):
         action_not_important = None
         if item['important'] == 1:
             action_not_important = menu.addAction(_("Remove important mark"))
-        action_highlight_on_gray = menu.addAction(_("Export highlight on gray"))
+        action_highlight_on_gray = menu.addAction(_("Highlight area on gray"))
+        action_highlight_code_on_gray = menu.addAction(_("Highlight this code on gray"))
         action = menu.exec(global_pos)
         if action is None:
             return
         if action == action_highlight_on_gray:
             self.gray_image_highlights(item)
+        if action == action_highlight_code_on_gray:
+            self.gray_image_highlights(None, item['cid'])
         if action == action_memo:
             self.coded_area_memo(item)
         if action == action_unmark:
