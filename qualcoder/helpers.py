@@ -872,7 +872,7 @@ class NumberBar(QtWidgets.QFrame):
         if new_digits <= 0:
             return  # no width adjustment needed
         self.digits = digits
-        font = self.font()
+        font = self.text_edit.font()
         font.setFamily('Monospace')
         font.setStyleHint(QtGui.QFont.StyleHint.TypeWriter)
         font_metrics = QtGui.QFontMetrics(font)
@@ -906,7 +906,7 @@ class NumberBar(QtWidgets.QFrame):
         text_edit_font_metrics = self.text_edit.fontMetrics()
 
         painter = QtGui.QPainter(self)
-        font = self.font()
+        font = self.text_edit.font()
         font.setFamily('Monospace')
         font.setStyleHint(QtGui.QFont.StyleHint.TypeWriter)
         text_color = self.palette().color(QtGui.QPalette.ColorGroup.Disabled, QtGui.QPalette.ColorRole.Text)
