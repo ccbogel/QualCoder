@@ -311,10 +311,10 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.leftsplitter.splitterMoved.connect(self.update_sizes)
 
         # Add paragraph numbers widget
-        number_bar = NumberBar(self.ui.textEdit)
+        self.number_bar = NumberBar(self.ui.textEdit)
         layout = QtWidgets.QVBoxLayout(self.ui.lineNumbers)
         layout.setContentsMargins(0, 0, 0, 0)  # Remove margins if needed
-        layout.addWidget(number_bar)
+        layout.addWidget(self.number_bar)
         self.ui.lineNumbers.setLayout(layout)
 
         self.fill_tree()
@@ -2945,7 +2945,7 @@ class DialogCodeText(QtWidgets.QWidget):
         i = 0
         try:
             while file_['start'] + i < file_['end'] and not line_ending:
-                if file_['fulltext'][file_['start'] + i] == "\n":
+                if file_['fulltext'][file_['start'] + i - 1] == "\n": # ... + i - 1] because we want to include the line break in the chunk, and text[start:i] would otherwise exclude it
                     line_ending = True
                 else:
                     i += 1
@@ -2975,7 +2975,7 @@ class DialogCodeText(QtWidgets.QWidget):
             i = self.app.settings['codetext_chunksize']
             line_ending = False
             while i > 0 and not line_ending:
-                if file_['fulltext'][i] == "\n":
+                if file_['fulltext'][i - 1] == "\n":  # [i - 1] because we want to include the line break in the chunk, and text[start:i] would otherwise exclude it
                     line_ending = True
                 else:
                     i -= 1
@@ -2989,7 +2989,7 @@ class DialogCodeText(QtWidgets.QWidget):
             line_ending = False
             try:
                 while file_['start'] > 0 and not line_ending:
-                    if file_['fulltext'][file_['start']] == "\n":
+                    if file_['fulltext'][file_['start'] - 1] == "\n":
                         line_ending = True
                     else:
                         file_['start'] -= 1
@@ -3001,7 +3001,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 i = file_['characters'] - file_['start'] - 1  # To prevent Index out of range error
             line_ending = False
             while i > 0 and not line_ending:
-                if file_['fulltext'][file_['start'] + i] == "\n":
+                if file_['fulltext'][file_['start'] + i - 1] == "\n":
                     line_ending = True
                 else:
                     i -= 1
@@ -3136,7 +3136,17 @@ class DialogCodeText(QtWidgets.QWidget):
         if "end" not in self.file_:
             self.file_['end'] = len(file_result['fulltext'])
         sql_values.append(int(file_result['id']))
+        # determine start line
+        if self.file_['start'] == 0:
+            self.file_['start_line'] = 1
+        else:    
+            text_before = file_result['fulltext'][0:self.file_['start']]
+            lines = text_before.splitlines()
+            self.file_['start_line'] = len(lines) + 1
+        self.number_bar.set_first_line(self.file_['start_line'], do_update=False)
         self.text = file_result['fulltext'][self.file_['start']:self.file_['end']]
+        if self.text.endswith('\n'):
+            self.text = self.text[:-1]  # having '\n' at the end of the text sometimes creates an empty line in QTextEdit, so we omit it
         self.ui.textEdit.setPlainText(self.text)
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
