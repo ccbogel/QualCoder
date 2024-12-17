@@ -21,8 +21,10 @@ https://qualcoder.wordpress.com/
 
 import csv
 import datetime
+from io import BytesIO
 import logging
 import os
+from PIL import Image, ImageOps
 import platform
 from random import randint
 import sqlite3
@@ -500,8 +502,7 @@ class DialogCodeInImage(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_code_context_image()
         self.ui.setupUi(self)
-        font = f"font: {self.app.settings['fontsize']}pt "
-        font += '"' + self.app.settings['font'] + '";'
+        font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
         abs_path = ""
         if "images:" in self.data['mediapath']:
@@ -614,6 +615,11 @@ class DialogCodeInImage(QtWidgets.QDialog):
         E Export image
         """
 
+        if type(event) == QtWidgets.QGraphicsSceneMouseEvent and event.button() == QtCore.Qt.MouseButton.RightButton:
+            if event.type() == QtCore.QEvent.Type.GraphicsSceneMousePress:
+                p = event.buttonDownScenePos(QtCore.Qt.MouseButton.RightButton)
+                self.scene_context_menu(p)
+                return True
         if type(event) == QtGui.QKeyEvent:
             key = event.key()
             # mod = event.modifiers()
@@ -653,9 +659,63 @@ class DialogCodeInImage(QtWidgets.QDialog):
                 return True
         return False
 
+    def scene_context_menu(self, pos):
+        """ Scene context menu for rotation and image export. """
+
+        global_pos = QtGui.QCursor.pos()
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet(f'QMenu {{font-size:{self.app.settings["fontsize"]}"pt}} ')
+        action_rotate = menu.addAction(_("Rotate clockwise R"))
+        action_rotate_counter = menu.addAction(_("Rotate counter-clockwise L"))
+        action_highlight_on_gray = menu.addAction(_("Highlight area on gray"))
+        action_export_image = menu.addAction(_("Export image E"))
+        action = menu.exec(global_pos)
+        if action is None:
+            return
+
+        if action == action_highlight_on_gray:
+            self.gray_image_highlight()
+        if action == action_rotate:
+            self.degrees += 90
+            if self.degrees > 270:
+                self.degrees = 0
+            self.draw_scene()
+        if action == action_rotate_counter:
+            self.degrees -= 90
+            if self.degrees < 0:
+                self.degrees = 270
+            self.draw_scene()
+        if action == action_export_image:
+            self.export_image()
+
+    def gray_image_highlight(self):
+        """ Gray image with coloured coded highlight.
+        Takes a few seconds to build and show image.
+        """
+
+        img = self.pixmap.toImage()
+        buffer = QtCore.QBuffer()
+        buffer.open(QtCore.QBuffer.ReadWrite)
+        img.save(buffer, "PNG")
+        pil_img = Image.open(BytesIO(buffer.data()))
+        background = ImageOps.grayscale(pil_img)
+        #background.convert('RGB')
+        highlights = Image.new('RGB', (background.width, background.height))
+        highlights.paste(background, (0, 0))
+        try:
+            # Needs tuple of left, top, right, bottom
+            coded_img = pil_img.crop((self.data['x1'], self.data['y1'], self.data['x1'] + self.data['width'],
+                                      self.data['y1'] + self.data['height']))
+            img_with_border = ImageOps.expand(coded_img, border=3, fill=self.data['color'])
+            # highlights.paste(coded_img, (int(ca['x1']), int(ca['y1']))) # No border
+            highlights.paste(img_with_border, (int(self.data['x1']), int(self.data['y1'])))
+        except SystemError as e_:
+            logger.debug(e_)
+        highlights.show()
+
     def export_image(self):
         """ Export the QGraphicsScene as a png image with transparent background.
-        Called by QButton_export.
+        Called by key press E.
         """
 
         filename = "Image_with_code.png"
