@@ -229,10 +229,10 @@ class DialogImportSurvey(QtWidgets.QDialog):
         self.setWindowTitle(_("Importing from: ") + self.filepath)
 
         # Clean field names
-        removes = "!@#$%^&*()-+=[]{}\\|;:,.<>/?~`"
+        removes = r"!@#$%^&*()-+=[]{}\\|;:,.<>/?~`"
         for i in range(0, len(self.fields)):
             self.fields[i] = self.fields[i].replace('\t', '')
-            self.fields[i] = self.fields[i].replace('\xa0', '')
+            self.fields[i] = self.fields[i].replace(r'\xa0', '')
             for r in removes:
                 self.fields[i] = self.fields[i].replace(r, '')
             if self.fields[i] in self.preexisting_fields:
@@ -530,7 +530,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
         if not ok:
             return
         # Check for valid values
-        if re.match("^[a-zA-Z_\s][a-zA-Z0-9_\s]*$", fieldname) is None or fieldname == "":
+        if re.match(r"^[a-zA-Z_\s][a-zA-Z0-9_\s]*$", fieldname) is None or fieldname == "":
             msg = _("Name must contain only letters and numbers or '_' and must not start with a number")
             Message(self.app, _("Field name invalid"), msg, "warning").exec()
             return
