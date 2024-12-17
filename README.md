@@ -28,7 +28,7 @@ On the first start of QualCoder, you may want to [setup the AI enhanced features
 
 **Use the exe**
 
-Newer releases contain an exe file (created on Windows 10, 64-bit). Double-click to run. Look for the Releases link on the right-hand side of this page. I have had feedback on one instance on Windows where an anti-virus affected the importing and moving of files by QualCoder (AVG). 
+Newer releases contain an exe file (created on Windows 10, 64-bit). Double-click to run, it takes up to 20 seconds to start. Look for the Releases link on the right-hand side of this page. I have had feedback on one instance on Windows where an anti-virus affected the importing and moving of files by QualCoder (AVG). 
 An online virus testing site www.virustotal.com indicated 2 vendors out of many detected a potential problem due to their detection methods (false positives), 5 March 2022. Always check the MD5 checksum on downloading the exe. I have not got the exe Microsoft certified (I am not sure of the processes or cost involved).
 If you are uncomfortable with these warnings install from the source as detailed next.
 
