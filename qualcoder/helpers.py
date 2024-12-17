@@ -840,6 +840,7 @@ class NumberBar(QtWidgets.QFrame):
         # The highest line that is currently visibile, used to update the width of the control
         self.highest_line = 0
         self.digits = 0
+        self.first_line = 1
 
         # Install event filter
         class EventFilter(QtCore.QObject):
@@ -864,6 +865,8 @@ class NumberBar(QtWidgets.QFrame):
         Will try to adjust the scrolling position accordingly so that the visible text is 
         not jumping too much.
         """
+        if self.first_line > self.highest_line:
+            self. highest_line = self.first_line
         if self.highest_line < 1000:
             digits = 3  # minimum width 3 digits
         else:
@@ -872,7 +875,7 @@ class NumberBar(QtWidgets.QFrame):
         if new_digits <= 0:
             return  # no width adjustment needed
         self.digits = digits
-        font = self.font()
+        font = self.text_edit.font()
         font.setFamily('Monospace')
         font.setStyleHint(QtGui.QFont.StyleHint.TypeWriter)
         font_metrics = QtGui.QFontMetrics(font)
@@ -906,7 +909,7 @@ class NumberBar(QtWidgets.QFrame):
         text_edit_font_metrics = self.text_edit.fontMetrics()
 
         painter = QtGui.QPainter(self)
-        font = self.font()
+        font = self.text_edit.font()
         font.setFamily('Monospace')
         font.setStyleHint(QtGui.QFont.StyleHint.TypeWriter)
         text_color = self.palette().color(QtGui.QPalette.ColorGroup.Disabled, QtGui.QPalette.ColorRole.Text)
@@ -914,7 +917,7 @@ class NumberBar(QtWidgets.QFrame):
         painter.setFont(font)
         font_metrics = painter.fontMetrics()
 
-        line_count = 0
+        line_count = self.first_line - 1
         block = self.text_edit.document().begin()
 
         while block.isValid():
@@ -936,3 +939,12 @@ class NumberBar(QtWidgets.QFrame):
 
         painter.end()
         QtWidgets.QWidget.paintEvent(self, event)
+    
+    def set_first_line(self, line: int, do_update=True):
+        """
+        Defines the number of the first line. 
+        Used when loading long texts in chunks.
+        """
+        self.first_line = line
+        if do_update:
+            self.update()
