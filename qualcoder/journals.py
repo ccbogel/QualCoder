@@ -605,18 +605,12 @@ class DialogJournals(QtWidgets.QDialog):
         self.jid = None
         self.ui.textEdit.setPlainText("")
         self.ui.tableWidget.clearSelection()
-        reg_exp = QtCore.QRegularExpression("^[\ \w-]+$")
+        reg_exp = QtCore.QRegularExpression(r"^[\ \w-]+$")
         ui = DialogAddItemName(self.app, self.journals, _('New Journal'), _('Journal name'), reg_exp)
         ui.exec()
         name = ui.get_new_name()
         if name is None:
             return
-        '''# Check for unusual characters in filename that would affect exporting
-        valid = re.match('^[\ \w-]+$', name) is not None
-        if not valid:
-            msg = _("In the journal name use only: a-z, A-z 0-9 - space")
-            Message(self.app, _('Warning - invalid characters'), msg, "warning").exec()
-            return'''
         # Update database
         journal = {'name': name, 'jentry': '', 'owner': self.app.settings['codername'],
                    'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'jid': None}
@@ -712,7 +706,7 @@ class DialogJournals(QtWidgets.QDialog):
                     Message(self.app, _('Warning'), _("Journal name in use"), "warning").exec()
                     update = False
             # Check for unusual characters in filename that would affect exporting
-            valid = re.match('^[\ \w-]+$', new_name) is not None
+            valid = re.match(r'^[\ \w-]+$', new_name) is not None
             if not valid:
                 Message(self.app, _('Warning - invalid characters'),
                         _("In the journal name use only: a-z, A-z 0-9 - space"), "warning").exec()
