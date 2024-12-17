@@ -108,7 +108,7 @@ class Message(QtWidgets.QMessageBox):
     def __init__(self, app, title, text, icon=None):
         QtWidgets.QMessageBox.__init__(self)
 
-        self.setStyleSheet("* {font-size:" + str(app.settings['fontsize']) + "pt} ")
+        self.setStyleSheet(f"* {{font-size:{app.settings['fontsize']}pt}} ")
         self.setWindowTitle(title)
         self.setText(text)
         if icon == "warning":
@@ -189,7 +189,7 @@ class DialogCodeInText(QtWidgets.QDialog):
     code_resize_timer = 0
     event_filter_on = True
 
-    def __init__(self, app, data, parent=None):
+    def __init__(self, app, data):
         """ Prepare QDialog window.
         param:
             data : dictionary: codename, color, file_or_casename, pos0, pos1, text, coder, fid, file_or_case,
@@ -383,7 +383,7 @@ class DialogCodeInAV(QtWidgets.QDialog):
     data = None
     frame = None
 
-    def __init__(self, app, data, parent=None):
+    def __init__(self, app, data):
         """ View audio/video segment in a dialog window.
         mediapath may be a link as: 'video:path'
         param:
@@ -395,11 +395,10 @@ class DialogCodeInAV(QtWidgets.QDialog):
         self.app = app
         self.data = data
         QtWidgets.QDialog.__init__(self)
-        font = f'font: {self.app.settings["fontsize"]}pt '
-        font += f'"{self.app.settings["font"]}";'
+        font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
         self.resize(400, 300)
-        # Enable custom window hint to enable customizing window controls
+        # Enable custom window hint to enable customising window controls
         self.setWindowFlags(self.windowFlags() | QtCore.Qt.WindowType.CustomizeWindowHint)
         self.setWindowTitle(self.data['file_or_casename'])
         self.gridLayout = QtWidgets.QGridLayout(self)
@@ -420,8 +419,8 @@ class DialogCodeInAV(QtWidgets.QDialog):
             if self.data['mediapath'][0:6] in ('audio:', 'video:'):
                 self.media = self.instance.media_new(self.data['mediapath'][6:])
         except Exception as err:
-            msg = f"{e}\n{self.app.project_path}{self.data['mediapath']}"
-            logger.warning((msg))
+            msg = f"{err}\n{self.app.project_path}{self.data['mediapath']}"
+            logger.warning(msg)
             print(msg)
             Message(self.app, _('Media not found'), msg,
                     "warning").exec()
@@ -485,7 +484,7 @@ class DialogCodeInImage(QtWidgets.QDialog):
     degrees = 0
     export_key_timer = 0
 
-    def __init__(self, app, data, parent=None):
+    def __init__(self, app, data):
         """ Image_data contains details to show the image and the coded section.
         mediapath may be a link as: 'images:path'
         param:
@@ -805,11 +804,11 @@ class MarkdownHighlighter(QtGui.QSyntaxHighlighter):
         # Italic
         italic_format = QtGui.QTextCharFormat()
         italic_format.setFontItalic(True)
-        self.highlighting_rules += [(QtCore.QRegularExpression("\*.*\*"), italic_format)]
+        self.highlighting_rules += [(QtCore.QRegularExpression(r"\*.*\*"), italic_format)]
         # Bold
         bold_format = QtGui.QTextCharFormat()
         bold_format.setFontWeight(QtGui.QFont.Weight.Bold)
-        self.highlighting_rules += [(QtCore.QRegularExpression("\*\*.*\*\*"), bold_format)]
+        self.highlighting_rules += [(QtCore.QRegularExpression(r"\*\*.*\*\*"), bold_format)]
 
     def highlightBlock(self, text):
         for pattern, format_ in self.highlighting_rules:
@@ -818,6 +817,7 @@ class MarkdownHighlighter(QtGui.QSyntaxHighlighter):
             while i.hasNext():
                 match = i.next()
                 self.setFormat(match.capturedStart(), match.capturedLength(), format_)
+
 
 class NumberBar(QtWidgets.QFrame):
     """
@@ -837,7 +837,7 @@ class NumberBar(QtWidgets.QFrame):
         self.text_edit = text_edit
         background_color = text_edit.palette().color(QtGui.QPalette.ColorRole.Base)
         self.setStyleSheet(f"background-color: {background_color.name()};")
-        # The highest line that is currently visibile, used to update the width of the control
+        # The highest line that is currently visible, used to update the width of the control
         self.highest_line = 0
         self.digits = 0
         self.first_line = 1
@@ -861,7 +861,7 @@ class NumberBar(QtWidgets.QFrame):
     def adjustWidth(self):
         """ 
         Adjust the with of the NumberBar according to the length of the highest number. 
-        The mimimum width is 3 digits. 
+        The minimum width is 3 digits.
         Will try to adjust the scrolling position accordingly so that the visible text is 
         not jumping too much.
         """
