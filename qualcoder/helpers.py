@@ -24,7 +24,7 @@ import datetime
 from io import BytesIO
 import logging
 import os
-from PIL import Image, ImageOps
+from PIL import Image, ImageOps, ImageFilter
 import platform
 from random import randint
 import sqlite3
@@ -502,7 +502,7 @@ class DialogCodeInImage(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_code_context_image()
         self.ui.setupUi(self)
-        font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
+        font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}"; '
         self.setStyleSheet(font)
         abs_path = ""
         if "images:" in self.data['mediapath']:
@@ -517,6 +517,8 @@ class DialogCodeInImage(QtWidgets.QDialog):
             return
         self.scene = QtWidgets.QGraphicsScene()
         self.ui.graphicsView.setScene(self.scene)
+        self.ui.graphicsView.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        self.ui.graphicsView.customContextMenuRequested.connect(self.scene_context_menu)
         tt = _("L rotate clockwise\nR rotate anti-clockwise\n+ - zoom in and out\nE Export Image")
         self.ui.graphicsView.setToolTip(tt)
         self.ui.graphicsView.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignTop)
@@ -615,11 +617,6 @@ class DialogCodeInImage(QtWidgets.QDialog):
         E Export image
         """
 
-        if type(event) == QtWidgets.QGraphicsSceneMouseEvent and event.button() == QtCore.Qt.MouseButton.RightButton:
-            if event.type() == QtCore.QEvent.Type.GraphicsSceneMousePress:
-                p = event.buttonDownScenePos(QtCore.Qt.MouseButton.RightButton)
-                self.scene_context_menu(p)
-                return True
         if type(event) == QtGui.QKeyEvent:
             key = event.key()
             # mod = event.modifiers()
@@ -664,17 +661,23 @@ class DialogCodeInImage(QtWidgets.QDialog):
 
         global_pos = QtGui.QCursor.pos()
         menu = QtWidgets.QMenu()
-        menu.setStyleSheet(f'QMenu {{font-size:{self.app.settings["fontsize"]}"pt}} ')
+        menu.setStyleSheet(f'QMenu {{font-size:{self.app.settings["fontsize"]}pt}} ')
         action_rotate = menu.addAction(_("Rotate clockwise R"))
         action_rotate_counter = menu.addAction(_("Rotate counter-clockwise L"))
-        action_highlight_on_gray = menu.addAction(_("Highlight area on gray"))
+        action_highlight_gray = menu.addAction(_("Highlight area - gray"))
+        action_highlight_solarize = menu.addAction(_("Highlight area - solarize"))
+        action_highlight_blur = menu.addAction(_("Highlight area - blur"))
         action_export_image = menu.addAction(_("Export image E"))
         action = menu.exec(global_pos)
         if action is None:
             return
 
-        if action == action_highlight_on_gray:
-            self.gray_image_highlight()
+        if action == action_highlight_gray:
+            self.image_highlight()
+        if action == action_highlight_solarize:
+            self.image_highlight("solarize")
+        if action == action_highlight_blur:
+            self.image_highlight("blur")
         if action == action_rotate:
             self.degrees += 90
             if self.degrees > 270:
@@ -688,7 +691,7 @@ class DialogCodeInImage(QtWidgets.QDialog):
         if action == action_export_image:
             self.export_image()
 
-    def gray_image_highlight(self):
+    def image_highlight(self, background_op=""):
         """ Gray image with coloured coded highlight.
         Takes a few seconds to build and show image.
         """
@@ -698,7 +701,11 @@ class DialogCodeInImage(QtWidgets.QDialog):
         buffer.open(QtCore.QBuffer.ReadWrite)
         img.save(buffer, "PNG")
         pil_img = Image.open(BytesIO(buffer.data()))
-        background = ImageOps.grayscale(pil_img)
+        background = ImageOps.grayscale(pil_img)    # Default
+        if background_op == "solarize":
+            background = ImageOps.solarize(pil_img)  # Invert all pixel values above a threshold.
+        if background_op == "blur":
+            background = pil_img.filter(ImageFilter.GaussianBlur(radius=10))
         #background.convert('RGB')
         highlights = Image.new('RGB', (background.width, background.height))
         highlights.paste(background, (0, 0))
