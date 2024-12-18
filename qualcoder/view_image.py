@@ -25,7 +25,7 @@ import html
 from io import BytesIO
 import logging
 import os
-from PIL import Image, ImageOps
+from PIL import Image, ImageOps, ImageFilter
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 from random import randint
 import sqlite3
@@ -1007,7 +1007,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         # Ctrl 0 to 9, G
         if mods & QtCore.Qt.KeyboardModifier.ControlModifier:
             if key == QtCore.Qt.Key.Key_G:
-                self.gray_image_highlights()
+                self.gray_image_highlight("gray")
                 return
             if key == QtCore.Qt.Key.Key_1:
                 self.go_to_next_file()
@@ -1028,8 +1028,8 @@ class DialogCodeImage(QtWidgets.QDialog):
                 self.help()
                 return
 
-    def gray_image_highlights(self, coded_area=None, code_id=None):
-        """ Gray image with coloured coded highlight(s).
+    def image_highlight(self, image_operation = "gray", coded_area=None, code_id=None):
+        """ Gray, blurred or solarised image with coloured coded highlight(s).
         Highlight all coded area, or selected coded area, or all areas coded by one specific code.
         Takes a few seconds to build and show image.
         :param: coded_area Dictionary of coded area
@@ -1041,7 +1041,11 @@ class DialogCodeImage(QtWidgets.QDialog):
         buffer.open(QBuffer.ReadWrite)
         img.save(buffer, "PNG")
         pil_img = Image.open(BytesIO(buffer.data()))
-        background = ImageOps.grayscale(pil_img)
+        background = ImageOps.grayscale(pil_img)  # Default gray
+        if image_operation == "solarize":
+            background = ImageOps.solarize(pil_img)  # Invert all pixel values above a threshold.
+        if image_operation == "blur":
+            background = pil_img.filter(ImageFilter.GaussianBlur(radius=10))
         #background.convert('RGB')
         highlights = Image.new('RGB', (background.width, background.height))
         highlights.paste(background, (0, 0))
@@ -1131,6 +1135,9 @@ class DialogCodeImage(QtWidgets.QDialog):
             menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
             action_rotate = menu.addAction(_("Rotate clockwise"))
             action_rotate_counter = menu.addAction(_("Rotate counter-clockwise"))
+            action_highlight_gray = menu.addAction(_("Highlight area - gray"))
+            action_highlight_solarize = menu.addAction(_("Highlight area - solarize"))
+            action_highlight_blur = menu.addAction(_("Highlight area - blur"))
             action_hide_top_groupbox = None
             action_show_top_groupbox = None
             if self.ui.groupBox_2.isHidden():
@@ -1140,6 +1147,12 @@ class DialogCodeImage(QtWidgets.QDialog):
             action = menu.exec(global_pos)
             if action is None:
                 return
+            if action == action_highlight_gray:
+                self.image_highlight()
+            if action == action_highlight_solarize:
+                self.image_highlight("solarize")
+            if action == action_highlight_blur:
+                self.image_highlight("blur")
             if action == action_show_top_groupbox:
                 self.ui.groupBox_2.setVisible(True)
             if action == action_hide_top_groupbox:
@@ -1173,15 +1186,29 @@ class DialogCodeImage(QtWidgets.QDialog):
         action_not_important = None
         if item['important'] == 1:
             action_not_important = menu.addAction(_("Remove important mark"))
-        action_highlight_on_gray = menu.addAction(_("Highlight area on gray"))
-        action_highlight_code_on_gray = menu.addAction(_("Highlight this code on gray"))
+        action_highlight_gray = menu.addAction(_("Highlight this area - gray"))
+        action_highlight_solarize = menu.addAction(_("Highlight this area - solarize"))
+        action_highlight_blur = menu.addAction(_("Highlight this area - blur"))
+        action_highlight_code_gray = menu.addAction(_("Highlight this code - gray"))
+        action_highlight_code_solarize = menu.addAction(_("Highlight this code - solarize"))
+        action_highlight_code_blur = menu.addAction(_("Highlight this code - blur"))
+
         action = menu.exec(global_pos)
         if action is None:
             return
-        if action == action_highlight_on_gray:
-            self.gray_image_highlights(item)
-        if action == action_highlight_code_on_gray:
-            self.gray_image_highlights(None, item['cid'])
+        if action == action_highlight_gray:
+            self.image_highlight("gray", item)
+        if action == action_highlight_code_gray:
+            self.image_highlight("gray", None, item['cid'])
+        if action == action_highlight_solarize:
+            self.image_highlight("solarize", item)
+        if action == action_highlight_code_solarize:
+            self.image_highlight("solarize", None, item['cid'])
+        if action == action_highlight_blur:
+            self.image_highlight("blur", item)
+        if action == action_highlight_code_blur:
+            self.image_highlight("blur", None, item['cid'])
+
         if action == action_memo:
             self.coded_area_memo(item)
         if action == action_unmark:
