@@ -152,15 +152,13 @@ Note: To exit venv type `deactivate`
 
 `python3 -m pip install .`
 
-You may get a warning which can be ignored: WARNING: Building wheel for Qualcoder failed
-
 7. To run type
 
 `qualcoder`
 
 After all this is done, you can `deactivate` to exit the virtual environment.
 At any time to start QualCoder in the virtual environment, cd to the Qualcoder-master (or Qualcoder release folder), then type:
-`source qualcoder/bin/activate`
+`source env/bin/activate`
 Then type
 `qualcoder`
 
