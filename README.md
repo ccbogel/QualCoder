@@ -127,9 +127,9 @@ It is best to run QualCoder inside a Python virtual environment so that the syst
 `sudo apt install python3-pip`
 
 1. Install venv
-I am using python3.10  you can choose another recent version if you prefer, and if more recent versions are in the Ubuntu repository.
+I am using python3.12  you can choose another recent version if you prefer, and if more recent versions are in the Ubuntu repository.
 
-`sudo apt install python3.10-venv`
+`sudo apt install python3.12-venv`
 
 3. Download and unzip the Qualcoder folder.
 
@@ -137,12 +137,12 @@ I am using python3.10  you can choose another recent version if you prefer, and 
 You should be inside the QualCoder-master folder or if using a release, e.g. the Qualcoder-3.5 folder.
 Inside the QualCoder-master folder:
 
-`python3.10 -m venv qualcoder`
+`python3.12 -m venv env`
 
 Activate venv, this changes the command prompt display using (brackets): (qualcoder) 
 Note: To exit venv type `deactivate`
 
-`source qualcoder/bin/activate`
+`source env/bin/activate`
 
 5. Update pip so that it installs the most recent Python packages.
 
