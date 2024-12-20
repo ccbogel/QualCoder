@@ -66,6 +66,10 @@ class DialogAiSearch(QtWidgets.QDialog):
         self.app = app_
         self.code_names, self.categories = self.app.get_codes_categories()
         self.context = context
+        self.file_ids = ""
+        self.case_ids = ""
+        self.files = []
+        self.cases = []
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_AiSearch()
         self.ui.setupUi(self)
@@ -91,15 +95,13 @@ class DialogAiSearch(QtWidgets.QDialog):
             self.ui.tabWidget.setTabVisible(1, True)  # free search
             self.ui.checkBox_coded_segments.setVisible(False)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        font = 'font: ' + str(app_.settings['fontsize']) + 'pt '
-        font += '"' + app_.settings['font'] + '";'
+        font = f'font: {app_.settings["fontsize"]}pt "{app_.settings["font"]}";'
         self.setStyleSheet(font)
-        font_bold = font + '\n' + f'font-weight: bold;\n color: {self.app.highlight_color()}'# 'font: bold ' + font[6:]
+        font_bold = f'{font}\nfont-weight: bold;\n color: {self.app.highlight_color()}'  # 'font: bold ' + font[6:]
         self.ui.label_what.setStyleSheet(font_bold)
         self.ui.label_how.setStyleSheet(font_bold)
         self.ui.label_filter.setStyleSheet(font_bold)
-        treefont = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
-        treefont += '"' + self.app.settings['font'] + '";'
+        treefont = f'font: {self.app.settings["treefontsize"]}pt "{self.app.settings["font"]}";'
         self.ui.treeWidget.setStyleSheet(treefont)
         self.ui.listWidget_files.setStyleSheet(treefont)
         self.ui.listWidget_files.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
@@ -306,7 +308,7 @@ class DialogAiSearch(QtWidgets.QDialog):
             item = it.value()
             count += 1
             
-    def on_prompt_selected(self, index):  # Kai, index not used | @Colin - 'index' is a parameter of the self.ui.comboBox_prompts.currentIndexChanged action/signal. I don't think I can omit it. 
+    def on_prompt_selected(self, index):
         """ This function will be called whenever the user selects a new item in the combobox. """
         self.current_prompt = self.prompts_list.prompts[self.ui.comboBox_prompts.currentIndex()]
         self.ui.comboBox_prompts.setToolTip(self.current_prompt.description)
