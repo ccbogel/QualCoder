@@ -106,7 +106,7 @@ class CodeOrganiser(QDialog):
                   "Add categories, rename codes and categories, update memos, merge codes, "
                   "merge categories, delete categories.\n"
                   "\n"
-                  "This is a new feature (11 August 2024). It has been tested, but potential for unexpected errors could occur.\n"
+                  "Potential for unexpected errors could occur.\n"
                   "THERE IS NO UNDO OPTION AFTER APPLYING CHANGES WITH THE APPLY BUTTON.")
         Message(self.app, "Code organiser", text_).exec()
 
