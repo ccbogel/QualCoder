@@ -10,6 +10,7 @@ ply
 PyQt6>=6.5
 qtawesome
 python-vlc
+requests
 rispy
 six
 langchain>=0.2.8 
