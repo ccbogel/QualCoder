@@ -26,7 +26,7 @@ import copy
 import webbrowser
 
 from PyQt6 import QtWidgets, QtCore
-from PyQt6.QtCore import Qt  # Unused
+# from PyQt6.QtCore import Qt  # Unused
 
 from .GUI.ui_ai_edit_prompts import Ui_Dialog_AiPrompts
 from .helpers import Message
@@ -338,15 +338,11 @@ prompt_types = [
 ]
 # Descriptions of the types, used as tooltips:
 prompt_types_descriptions = [
-    ('These prompts are used in the AI search. They instruct the AI on how to decide \n'
-     'wether a chunk of empirical data is related to a given code/search string or not.'
-    ),
-    ('These prompts are used in the chat to analyze the data that has been coded with a selected code.'
-    ),
-    ('These prompts are used in the chat to analyse the results of a free search exploring a certain topic.'
-    ),
-    ('These prompts are used in the chat to analyze a section of text from a single empirical document.'
-    )
+    _('These prompts are used in the AI search. They instruct the AI on how to decide \n'
+     'whether a chunk of empirical data is related to a given code/search string or not.'),
+    _('These prompts are used in the chat to analyze the data that has been coded with a selected code.'),
+    _('These prompts are used in the chat to analyse the results of a free search exploring a certain topic.'),
+    _('These prompts are used in the chat to analyze a section of text from a single empirical document.')
 ]
 
 # Define the scope of a prompt: system-defined, user-level, project-level
@@ -356,10 +352,10 @@ prompt_scopes = [
     'project'
 ]
 prompt_scope_descriptions = [
-    ('System prompts are the defaults defined in the source code of QualCoder. They cannot be changed by the user.'),
-    ('User prompts are defined by you on the level of your particular instance of QualCoder. '
+    _('System prompts are the defaults defined in the source code of QualCoder. They cannot be changed by the user.'),
+    _('User prompts are defined by you on the level of your particular instance of QualCoder. '
      'They are available in every project that you open on your machine.'),
-    ('Project prompts are defined by you, but for the current project only. They go with the project files. '
+    _('Project prompts are defined by you, but for the current project only. They go with the project files. '
      'If you or somebody else opens the same project on another machine, these prompts will be available there too.')
 ]
 
@@ -434,7 +430,7 @@ class PromptsList:
             self._read_from_yaml(self.project_prompts_path, prompt_type, 'project')
         else:
             self.project_prompts_path = ""
-            self.project_prompts.prompts.clear()  # Unresolved attribite: project_prompts
+            self.project_prompts.prompts.clear()  # Unresolved attribute: project_prompts
     
     def save_prompts(self):
         if self.user_prompts_path != '':
@@ -522,11 +518,9 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         self.ui = Ui_Dialog_AiPrompts()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        font = 'font: ' + str(app_.settings['fontsize']) + 'pt '
-        font += '"' + app_.settings['font'] + '";'
+        font = f'font: {app_.settings["fontsize"]}pt "{app_.settings["font"]}";'
         self.setStyleSheet(font)
-        treefont = 'font: ' + str(self.app.settings['treefontsize']) + 'pt '
-        treefont += '"' + self.app.settings['font'] + '";'
+        treefont = f'font: {self.app.settings["treefontsize"]}pt "{self.app.settings["font"]}";'
         self.ui.treeWidget_prompts.setStyleSheet(treefont)
         self.prompt_type = prompt_type
         self.prompts = PromptsList(app_, prompt_type)
@@ -618,13 +612,13 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
             
     def tree_get_item_path(self, item):
         """Returns a list representing the path from the root to the item."""
-        path = []
+        path_ = []
         while item is not None:
             path.append(item.text(0))
             item = item.parent()
-        return path[::-1]
+        return path_[::-1]
 
-    def tree_find_item_by_path(self, path):
+    def tree_find_item_by_path(self, path_):
         """Finds an item in the tree using a path list of strings.
         Returns also a partial match of the path.
         """
@@ -632,24 +626,24 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         
         for i in range(root_item_count):
             item = self.ui.treeWidget_prompts.topLevelItem(i)
-            result = self._tree_find_item_by_path_recursive(item, path)
+            result = self._tree_find_item_by_path_recursive(item, path_)
             if result is not None:
                 return result
         return None
 
-    def _tree_find_item_by_path_recursive(self, item, path):
-        if not path:
+    def _tree_find_item_by_path_recursive(self, item, path_):
+        if not path_:
             return None
 
-        if item.text(0) == path[0]:
-            if len(path) == 1: # exact match
+        if item.text(0) == path_[0]:
+            if len(path_) == 1:  # exact match
                 return item
             for i in range(item.childCount()):
                 child_item = item.child(i)
-                result = self._tree_find_item_by_path_recursive(child_item, path[1:])
+                result = self._tree_find_item_by_path_recursive(child_item, path_[1:])
                 if result is not None:
-                    return result # match of child
-            return item # partial match
+                    return result  # match of child
+            return item  # partial match
         else:
             return None
         
@@ -784,7 +778,7 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         if (self.selected_prompt is None) or (self.selected_prompt.scope == 'system'):
             # system prompts cannot be deleted
             return
-        msg = _('Do you really want to delete ') + '"' + self.selected_prompt.name_and_scope() + '"?'
+        msg = _('Do you really want to delete ') + f'"{self.selected_prompt.name_and_scope()}"?'
         ui = DialogConfirmDelete(self.app, msg, _('Delete Prompt'))
         ok = ui.exec()
         if not ok:
