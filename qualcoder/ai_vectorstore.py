@@ -286,8 +286,8 @@ want to continue?\
             if os.path.exists(self.faiss_db_path): 
                 # load existing faiss db
                 self.faiss_db = self.faiss_load(self.faiss_db_path)
-            else: # create new faiss db
-                embedding_size = 1024 # embedding size of the used model: https://huggingface.co/intfloat/multilingual-e5-large
+            else:  # create new faiss db
+                embedding_size = 1024  # embedding size of the used model: https://huggingface.co/intfloat/multilingual-e5-large
                 faiss_index = faiss.IndexFlatL2(embedding_size) 
                 self.faiss_db = FAISS(
                     embedding_function=self.app.ai_embedding_function,
@@ -324,7 +324,7 @@ want to continue?\
         if faiss_db_path is None:
             raise FileNotFoundError(f'AI Vectorstore: faiss path not found.') 
         serialized_bytes = faiss_db.serialize_to_bytes()
-        os.makedirs(os.path.dirname((faiss_db_path)), exist_ok=True)
+        os.makedirs(os.path.dirname(faiss_db_path), exist_ok=True)
         with open(faiss_db_path, 'wb') as f:
             f.write(serialized_bytes)    
 
@@ -485,8 +485,8 @@ want to continue?\
         docs = self.app.get_file_texts()
         
         # Check if any docs in the vectorstore have been deleted or renamed in the project
-        def search_name(docs, name):
-            for document in docs:
+        def search_name(docs_, name):
+            for document in docs_:
                 if document['name'] == name:
                     return True
             return False
