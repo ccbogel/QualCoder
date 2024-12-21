@@ -6,16 +6,17 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-12-21 09:09+1100\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"PO-Revision-Date: 2024-12-21 17:36+1100\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.5\n"
 
 #: __main__.py:1083 __main__.py:1126
 msgid "There is already a backup with this name"
@@ -3404,8 +3405,8 @@ msgstr "CODAGES DES TEXTES : "
 #| "Word calculations: Words use alphabet characters and include the "
 #| "apostrophe. All other characters are word separators"
 msgid ""
-"Word calculations: Words use alphabet characters and include the "
-"apostrophe.All other characters are word separators"
+"Word calculations: Words use alphabet characters and include the apostrophe."
+"All other characters are word separators"
 msgstr ""
 "Calcul des mots : Les mots utilisent les caractères de l'alphabet et "
 "incluent l'apostrophe. Tous les autres caractères sont des séparateurs de "
@@ -5949,58 +5950,69 @@ msgid ""
 "(Everything below this mark is a personal note and will never be sent to the "
 "AI.)"
 msgstr ""
+"**Thème, questions et objectifs de la recherche:** \n"
+"\n"
+"**Méthodologie:** \n"
+"\n"
+"**Participants et données collectées:** \n"
+"\n"
+"#####\n"
+"(Tout ce qui est en dessous de cette marque est une note personnelle et ne "
+"sera jamais envoyé à l'IA)."
 
 #: __main__.py:2585
 msgid "Project Opened: "
-msgstr ""
+msgstr "Projet ouvert : "
 
 #: __main__.py:2667
 msgid "Project path: "
-msgstr ""
+msgstr "Chemin du projet : "
 
 #: __main__.py:2668
 msgid "Project date: "
-msgstr ""
+msgstr "Date du projet : "
 
 #: __main__.py:2685
 msgid "Code categories: "
-msgstr ""
+msgstr "Catégories de codes : "
 
 #: __main__.py:2819
 msgid ""
 "The AI is setup and enabled, so there is nothing to do here. Go to AI > "
 "settings to change the current model or other settings."
 msgstr ""
+"L'IA est configurée et activée, il n'y a donc rien à faire ici. Allez dans "
+"AI > paramètres pour modifier le modèle actuel ou d'autres paramètres."
 
 #: __main__.py:2835
 msgid "Please enable the AI first and set it in Settings."
-msgstr ""
+msgstr "Veuillez d'abord activer l'IA et la définir dans les paramètres."
 
 #: __main__.py:2839
 msgid "The AI is busy or not set up correctly."
-msgstr ""
+msgstr "L'IA est occupée ou n'est pas configurée correctement."
 
 #: __main__.py:2861 __main__.py:2869
 msgid "Please enable the AI first and set it up in Settings."
-msgstr ""
+msgstr "Veuillez d'abord activer l'IA et la configurer dans les paramètres."
 
 #: __main__.py:2862
 msgid "Ai Chat"
-msgstr ""
+msgstr "Chat sur l'IA"
 
 #: ai_chat.py:87
 msgid "<your question>"
-msgstr ""
+msgstr "<votre question>"
 
 #: ai_chat.py:268 ai_chat.py:283 ai_chat.py:305 ai_chat.py:413 ai_chat.py:534
 msgid "No project open."
-msgstr ""
+msgstr "Aucun projet n'est ouvert."
 
 #: ai_chat.py:269 ai_chat.py:273 ai_chat.py:284 ai_chat.py:288 ai_chat.py:306
 #: ai_chat.py:310 ai_chat.py:414 ai_chat.py:418 ai_chat.py:535 ai_chat.py:539
 #: ai_chat.py:851
 msgid "AI not enabled"
-msgstr ""
+msgstr "L'IA n'est pas activée"
 
 #: ai_chat.py:291
 msgid ""
@@ -6008,20 +6020,25 @@ msgid ""
 " There you can open a document, select a piece of text, right click on it "
 "and choose \"AI Text Analysis\" from the context menu."
 msgstr ""
+"Nous allons maintenant passer à l'espace de travail de codage de texte.\n"
+" Vous pouvez y ouvrir un document, sélectionner un morceau de texte, faire "
+"un clic droit dessus et choisir « AI Text Analysis » dans le menu contextuel."
 
 #: ai_chat.py:294 code_text.py:1013
 msgid "AI Text Analysis"
-msgstr ""
+msgstr "Analyse de texte l'IA"
 
 #: ai_chat.py:376
 msgid ""
 "No coded text found. Please select another code or category, or refine you "
 "filters."
 msgstr ""
+"Aucun texte codé n'a été trouvé. Veuillez sélectionner un autre code ou une "
+"autre catégorie, ou affiner vos filtres."
 
 #: ai_chat.py:377
 msgid "AI code analysis"
-msgstr ""
+msgstr "Analyse du code de l'IA"
 
 #: ai_chat.py:401 ai_chat.py:440
 msgid ""
@@ -6031,243 +6048,267 @@ msgid ""
 "information will accompany every prompt sent to the AI, resulting in much "
 "more targeted results."
 msgstr ""
+"Il est fortement recommandé d'utiliser la note de projet (Menu « Projet > "
+"Note de projet ») pour inclure une brève description des sujets de "
+"recherche, des questions, des objectifs et des données empiriques collectées "
+"dans le cadre de votre projet. Ces informations accompagneront chaque "
+"demande envoyée à l'IA, ce qui permettra d'obtenir des résultats beaucoup "
+"plus ciblés."
 
 #: ai_chat.py:446
 msgid "Searching for related data..."
-msgstr ""
+msgstr "Recherche de données connexes..."
 
 #: ai_chat.py:473
 msgid "Chat has been canceled by the user."
-msgstr ""
+msgstr "Le chat a été annulé par l'utilisateur."
 
 #: ai_chat.py:477
 msgid "Sorry, the AI could could not find any data related to \""
-msgstr ""
+msgstr "L'IA n'a pu trouver aucune donnée relative à  »"
 
 #: ai_chat.py:484
 msgid "Found "
-msgstr ""
+msgstr "Trouvé "
 
 #: ai_chat.py:484
 msgid ""
 " chunks of data which might be related to the topic. Analyzing the first "
 msgstr ""
+" des morceaux de données susceptibles d'être liés au sujet. L'analyse du "
+"premier "
 
 #: ai_chat.py:484
 msgid " chunks closer."
-msgstr ""
+msgstr " des morceaux plus proches."
 
 #: ai_chat.py:547
 msgid ""
 "The text is too long to be analyzed in one go. Please select a shorter "
 "passage."
 msgstr ""
+"Le texte est trop long pour être analysé en une seule fois. Veuillez choisir "
+"un passage plus court."
 
 #: ai_chat.py:548
 msgid "AI text analysis"
-msgstr ""
+msgstr "Analyse de texte par l'IA"
 
 #: ai_chat.py:573
 msgid "Analyzing text from "
-msgstr ""
+msgstr "Analyser un texte de "
 
 #: ai_chat.py:575
 msgid " characters)."
-msgstr ""
+msgstr " caractères)."
 
 #: ai_chat.py:590 ai_prompts.py:781
 msgid "Do you really want to delete "
-msgstr ""
+msgstr "Voulez-vous vraiment supprimer "
 
 #: ai_chat.py:591
 msgid "Delete Chat"
-msgstr ""
+msgstr "Supprimer le chat"
 
 #: ai_chat.py:620
 msgid "Send your question to the AI"
-msgstr ""
+msgstr "Envoyez votre question à l'IA"
 
 #: ai_chat.py:626
 msgid "Cancel AI generation"
-msgstr ""
+msgstr "Annuler la génération d'IA"
 
 #: ai_chat.py:630
 msgid "AI: "
-msgstr ""
+msgstr "IA :"
 
 #: ai_chat.py:649 ai_chat.py:651
 msgid "Type:"
-msgstr ""
+msgstr "Type:"
 
 #: ai_chat.py:649 ai_chat.py:651
 msgid "Summary:"
-msgstr ""
+msgstr "Résumé :"
 
 #: ai_chat.py:649 ai_chat.py:651
 msgid "Date:"
-msgstr ""
+msgstr "Date : "
 
 #: ai_chat.py:649
 msgid "Prompt:"
-msgstr ""
+msgstr "Prompt :"
 
 #: ai_chat.py:659
 msgid "User"
-msgstr ""
+msgstr "Utilisateur"
 
 #: ai_chat.py:667
 msgid "AI"
-msgstr ""
+msgstr "IA"
 
 #: ai_chat.py:671
 msgid "Info:"
-msgstr ""
+msgstr "Info :"
 
 #: ai_chat.py:722
 msgid "(unknown reference)"
-msgstr ""
+msgstr "(référence inconnue)"
 
 #: ai_chat.py:758
 msgid "New topic analysis chat"
-msgstr ""
+msgstr "Nouveau chat d'analyse thématique"
 
 #: ai_chat.py:760
 msgid "Analyzing a free-search topic together with the AI."
-msgstr ""
+msgstr "Analyse d'un sujet de recherche libre avec l'IA."
 
 #: ai_chat.py:761
 msgid "New text analysis chat"
-msgstr ""
+msgstr "Nouveau chat d'analyse de texte"
 
 #: ai_chat.py:763
 msgid "Analyse a piece of text from your empirical data together with the AI."
 msgstr ""
+"Analysez un texte à partir de vos données empiriques en collaboration avec "
+"l'IA."
 
 #: ai_chat.py:764
 msgid "New code analysis chat"
-msgstr ""
+msgstr "Nouveau chat d'analyse de code"
 
 #: ai_chat.py:766
 msgid "Analyze the data collected under a certain code together with the AI."
-msgstr ""
+msgstr "Analyser les données collectées sous un certain code avec l'IA."
 
 #: ai_chat.py:767
 msgid "New general chat"
-msgstr ""
+msgstr "Nouveau chat général"
 
 #: ai_chat.py:769
 msgid "Ask the AI anything, not related to your data."
-msgstr ""
+msgstr "Demandez à l'IA tout ce qui n'est pas lié à vos données."
 
 #: ai_chat.py:854
 msgid ""
 "The AI is busy generating a response. Click on the button on the right to "
 "stop."
 msgstr ""
+"L'IA est occupée à générer une réponse. Cliquez sur le bouton de droite pour "
+"l'arrêter."
 
 #: ai_chat.py:855
 msgid "AI busy"
-msgstr ""
+msgstr "L'IA occupée"
 
 #: ai_chat.py:858
 msgid "The AI not yet fully loaded. Please wait and retry."
 msgstr ""
+"L'IA n'est pas encore complètement chargée. Veuillez patienter et réessayer."
 
 #: ai_chat.py:859 ai_search_dialog.py:447
 msgid "AI not ready"
-msgstr ""
+msgstr "L'IA n'est pas prête"
 
 #: ai_chat.py:877
 msgid "Please select a chat or create a new one."
-msgstr ""
+msgstr "Veuillez sélectionner un chat ou en créer un nouveau."
 
 #: ai_chat.py:878
 msgid "Chat selection"
-msgstr ""
+msgstr "Sélection du chat"
 
 #: ai_chat.py:983
 msgid ""
 "Error: The AI returned an empty result. This may indicate that the AI model "
 "is not available at the moment. Try again later or choose a different model."
 msgstr ""
+"Erreur : L'IA a renvoyé un résultat vide. Cela peut indiquer que le modèle "
+"d'IA n'est pas disponible pour le moment. Réessayez plus tard ou choisissez "
+"un autre modèle."
 
 #: ai_chat.py:990
 msgid "Error communicating with "
-msgstr ""
+msgstr "Erreur de communication avec "
 
 #: ai_chat.py:993 ai_llm.py:307 ai_vectorstore.py:61
 msgid "Uncaught exception: "
-msgstr ""
+msgstr "Exception non prise : "
 
 #: ai_chat.py:1030 ai_chat.py:1051 ai_chat.py:1091 ai_chat.py:1111
 msgid "Invalid source reference."
-msgstr ""
+msgstr "Référence source invalide."
 
 #: ai_chat.py:1064
 msgid "Error retrieving source text"
-msgstr ""
+msgstr "Erreur de récupération du texte source"
 
 #: ai_chat.py:1092 ai_chat.py:1112
 msgid "AI Chat"
-msgstr ""
+msgstr "Chat sur l'IA"
 
 #: ai_llm.py:132
 msgid "AI: Starting up..."
-msgstr ""
+msgstr "AI : Démarrage..."
 
 #: ai_llm.py:139
 msgid "AI: Please set up the AI model"
-msgstr ""
+msgstr "AI : Veuillez configurer le modèle d'IA"
 
 #: ai_llm.py:145
 msgid "AI: No model selected, AI is disabled."
-msgstr ""
+msgstr "AI : Aucun modèle n'est sélectionné, l'IA est désactivée."
 
 #: ai_llm.py:161
 msgid ""
 "Please enter an API-key for the AI in the following dialog (or \"None\" if "
 "not API-key is needed)."
 msgstr ""
+"Veuillez saisir une clé API pour l'IA dans la boîte de dialogue suivante (ou "
+"« Aucune » si aucune clé API n'est nécessaire)."
 
 #: ai_llm.py:162
 msgid "AI API-key"
-msgstr ""
+msgstr "Clé API AI"
 
 #: ai_llm.py:168
 msgid "AI: No API key set, AI is disabled."
-msgstr ""
+msgstr "AI : Aucune clé API n'a été définie, l'AI est désactivée."
 
 #: ai_llm.py:225
 msgid "AI: Ready"
-msgstr ""
+msgstr "AI : Prêt"
 
 #: ai_llm.py:241
 msgid "Do you really want to cancel the AI operation?"
-msgstr ""
+msgstr "Voulez-vous annuler l'opération AI ?"
 
 #: ai_llm.py:304
 msgid "AI Error:\n"
-msgstr ""
+msgstr "Erreur AI :\n"
 
 #: ai_llm.py:432
 msgid "AI generate_code_descriptions\n"
-msgstr ""
+msgstr "L'IA génère des descriptions de codes\n"
 
 #: ai_llm.py:433
 msgid "Prompt:\n"
-msgstr ""
+msgstr "Prompt:\n"
 
 #: ai_llm.py:463
 msgid ""
 "Stage 1:\n"
 "Searching data related to \""
 msgstr ""
+"Étape 1 :\n"
+"Recherche de données relatives à  »"
 
 #: ai_llm.py:540
 msgid ""
 "Stage 2:\n"
 "Inspecting the data more closely..."
 msgstr ""
+"Étape 2 :\n"
+"Examiner les données de plus près..."
 
 #: ai_prompts.py:341
 msgid ""
@@ -6276,36 +6317,51 @@ msgid ""
 "whether a chunk of empirical data is related to a given code/search string "
 "or not."
 msgstr ""
+"Ces invites sont utilisées dans la recherche de l'IA. Elles indiquent à l'IA "
+"comment décider \n"
+"si un ensemble de données empiriques est lié ou non à un code/une chaîne de "
+"recherche donné(e)."
 
 #: ai_prompts.py:343
 msgid ""
 "These prompts are used in the chat to analyze the data that has been coded "
 "with a selected code."
 msgstr ""
+"Ces invites sont utilisées dans le chat pour analyser les données qui ont "
+"été codées avec un code sélectionné."
 
 #: ai_prompts.py:344
 msgid ""
 "These prompts are used in the chat to analyse the results of a free search "
 "exploring a certain topic."
 msgstr ""
+"Ces messages sont utilisés dans le chat pour analyser les résultats d'une "
+"recherche libre portant sur un certain sujet."
 
 #: ai_prompts.py:345
 msgid ""
 "These prompts are used in the chat to analyze a section of text from a "
 "single empirical document."
 msgstr ""
+"Ces invites sont utilisées dans le chat pour analyser une section de texte "
+"provenant d'un seul document empirique."
 
 #: ai_prompts.py:355
 msgid ""
 "System prompts are the defaults defined in the source code of QualCoder. "
 "They cannot be changed by the user."
 msgstr ""
+"Les invites du système sont les valeurs par défaut définies dans le code "
+"source de QualCoder. Elles ne peuvent pas être modifiées par l'utilisateur."
 
 #: ai_prompts.py:356
 msgid ""
 "User prompts are defined by you on the level of your particular instance of "
 "QualCoder. They are available in every project that you open on your machine."
 msgstr ""
+"Les invites utilisateur sont définies par vous au niveau de votre instance "
+"particulière de QualCoder. Elles sont disponibles dans chaque projet que "
+"vous ouvrez sur votre machine."
 
 #: ai_prompts.py:358
 msgid ""
@@ -6313,93 +6369,105 @@ msgid ""
 "go with the project files. If you or somebody else opens the same project on "
 "another machine, these prompts will be available there too."
 msgstr ""
+"Les invites de projet sont définies par vous, mais uniquement pour le projet "
+"en cours. Elles accompagnent les fichiers du projet. Si vous ou quelqu'un "
+"d'autre ouvrez le même projet sur une autre machine, ces invites seront "
+"également disponibles sur cette machine."
 
 #: ai_prompts.py:782
 msgid "Delete Prompt"
-msgstr ""
+msgstr "Supprimer l'invite"
 
 #: ai_prompts.py:819 ai_prompts.py:824 ai_prompts.py:830 ai_prompts.py:859
 #: ai_prompts.py:867
 msgid "Edit prompts"
-msgstr ""
+msgstr "Modifier les invites"
 
 #: ai_prompts.py:819
 msgid "The name cannot be empty"
-msgstr ""
+msgstr "Le nom ne peut pas être vide"
 
 #: ai_prompts.py:824
 msgid "The name must be no longer than 60 characters."
-msgstr ""
+msgstr "Le nom ne doit pas comporter plus de 60 caractères."
 
 #: ai_prompts.py:830
 msgid "The name of the prompt must be unique within its type and scope."
 msgstr ""
+"Le nom de l'invite doit être unique dans son type et son champ d'application."
 
 #: ai_prompts.py:857
 msgid "Names of prompts must be unique within its type and scope. "
 msgstr ""
+"Les noms des invites doivent être uniques au sein de leur type et de leur "
+"champ d'application. "
 
 #: ai_search_dialog.py:79
 msgid "1) What do you want to search for?"
-msgstr ""
+msgstr "1) Que voulez-vous rechercher ?"
 
 #: ai_search_dialog.py:85
 msgid "1) Which code do you want to analyze?"
-msgstr ""
+msgstr "1) Quel code voulez-vous analyser ?"
 
 #: ai_search_dialog.py:92
 msgid "1) Which topic do you want to analyze?"
-msgstr ""
+msgstr "1) Quel sujet voulez-vous analyser ?"
 
 #: ai_search_dialog.py:121
 msgid "The last used prompt"
-msgstr ""
+msgstr "La dernière invite utilisée"
 
 #: ai_search_dialog.py:123
 msgid "could not be found. The prompt will be reset to the default."
 msgstr ""
+"n'a pas été trouvé. L'invite sera réinitialisée à la valeur par défaut."
 
 #: ai_search_dialog.py:392
 msgid "<no file filter>"
-msgstr ""
+msgstr "<pas de filtre de fichier>"
 
 #: ai_search_dialog.py:393
 msgid "Search in all textfiles"
-msgstr ""
+msgstr "Recherche dans tous les fichiers texte"
 
 #: ai_search_dialog.py:405
 msgid "Codings: "
-msgstr ""
+msgstr "Codifications : "
 
 #: ai_search_dialog.py:417
 msgid "Search in all cases"
-msgstr ""
+msgstr "Recherche dans tous les cas"
 
 #: ai_search_dialog.py:446
 msgid "The AI ist not ready to fulfill your request (status: "
-msgstr ""
+msgstr "L'IA n'est pas prête à répondre à votre demande (statut : "
 
 #: ai_search_dialog.py:446
 msgid ")."
-msgstr ""
+msgstr ")."
 
 #: ai_search_dialog.py:452
 msgid "Please select a code or category (or use \"free search\" instead)."
 msgstr ""
+"Veuillez sélectionner un code ou une catégorie (ou utilisez plutôt la "
+"« recherche libre »)."
 
 #: ai_search_dialog.py:472
 msgid "Please enter text in the \"topic\" field."
-msgstr ""
+msgstr "Veuillez saisir un texte dans le champ « sujet »."
 
 #: ai_search_dialog.py:521
 msgid ""
 "After combining all filters, there are not files left for the search. Please "
 "check your settings."
 msgstr ""
+"Après avoir combiné tous les filtres, il ne reste plus de fichiers pour la "
+"recherche. Veuillez vérifier vos paramètres."
 
 #: ai_search_dialog.py:522
 msgid "No files"
-msgstr ""
+msgstr "Aucun dossier"
 
 #: ai_vectorstore.py:151
 msgid ""
@@ -6409,28 +6477,35 @@ msgid ""
 "This will download about 2.5 GB of data. Do you \n"
 "want to continue?"
 msgstr ""
+"Comme vous utilisez l'intégration de l'IA pour la première fois, QualCoder "
+"doit télécharger et installer quelques composants supplémentaires. \n"
+"\n"
+"Cela entraînera le téléchargement d'environ 2,5 Go de données. Voulez-vous \n"
+"voulez-vous continuer ?"
 
 #: ai_vectorstore.py:160 ai_vectorstore.py:171
 msgid "Download AI components"
-msgstr ""
+msgstr "Télécharger les composants de l'IA"
 
 #: ai_vectorstore.py:190
 msgid "Downloading "
-msgstr ""
+msgstr "Téléchargement"
 
 #: ai_vectorstore.py:261
 msgid ""
 "AI: Could not download all the necessary components, the AI integration will "
 "be disabled."
 msgstr ""
+"IA : Impossible de télécharger tous les composants nécessaires, "
+"l'intégration de l'IA sera désactivée."
 
 #: ai_vectorstore.py:263
 msgid "AI: Success, components downloaded and installed."
-msgstr ""
+msgstr "IA : Succès, les composants ont été téléchargés et installés."
 
 #: ai_vectorstore.py:348
 msgid "AI: Finished loading (no project open)."
-msgstr ""
+msgstr "IA : Chargement terminé (aucun projet ouvert)."
 
 #: ai_vectorstore.py:361
 msgid ""
@@ -6440,72 +6515,81 @@ msgid ""
 "all your empirical documents again to rebuild the local memory. This may "
 "take a while. Sorry for the inconvenience."
 msgstr ""
+"Il semble que vous ayez déjà utilisé les fonctions d'IA dans le cadre de ce "
+"projet. Entre-temps, nous avons dû modifier l'implémentation interne de la "
+"mémoire locale de l'IA pour la rendre plus robuste. Par conséquent, l'IA "
+"doit à nouveau lire tous vos documents empiriques pour reconstruire la "
+"mémoire locale. Cela peut prendre un certain temps. Nous sommes désolés pour "
+"ce désagrément."
 
 #: ai_vectorstore.py:366
 msgid "AI memory"
-msgstr ""
+msgstr "Mémoire de l'IA"
 
 #: ai_vectorstore.py:383
 msgid "AI: Checked all documents, memory is up to date."
-msgstr ""
+msgstr "IA : J'ai vérifié tous les documents, la mémoire est à jour."
 
 #: ai_vectorstore.py:406
 msgid "Vectorstore: Document import failed, faiss_db not present."
 msgstr ""
+"Vectorstore : L'importation du document a échoué, faiss_db n'est pas présent."
 
 #: ai_vectorstore.py:429
 msgid "AI: Adding document to internal memory: "
-msgstr ""
+msgstr "IA : Ajout d'un document dans la mémoire interne : "
 
 #: ai_vectorstore.py:505
 msgid "AI: No documents, AI is ready."
-msgstr ""
+msgstr "IA : Pas de documents, l'IA est prête."
 
 #: ai_vectorstore.py:509
 msgid "AI: Checking for new documents"
-msgstr ""
+msgstr "IA : Vérification de l'existence de nouveaux documents"
 
 #: ai_vectorstore.py:522
 msgid ""
 "AI: Rebuilding memory. The local AI will read through all your documents, "
 "please be patient."
 msgstr ""
+"IA : Reconstruction de la mémoire. L'IA locale va lire tous vos documents, "
+"soyez patient."
 
 #: attributes.py:147
 msgid "Attribute added: "
-msgstr ""
+msgstr "Attribut ajouté : "
 
 #: case_file_manager.py:231
 msgid "added to case."
-msgstr ""
+msgstr "ajouté au dossier."
 
 #: cases.py:365
 msgid "type:"
-msgstr ""
+msgstr "type :"
 
 #: cases.py:912 report_attributes.py:556
 msgid "Minimum:"
-msgstr ""
+msgstr "Minimum :"
 
 #: cases.py:912 report_attributes.py:556
 msgid "Maximum:"
-msgstr ""
+msgstr "Maximum :"
 
 #: cases.py:982 report_codes.py:2452
 msgid "File:"
-msgstr ""
+msgstr "Fichier :"
 
 #: cases.py:982
 msgid "Characters:"
-msgstr ""
+msgstr "Caractères :"
 
 #: cases.py:997
 msgid "Image:"
-msgstr ""
+msgstr "Image :"
 
 #: cases.py:1009
 msgid "AV media:"
-msgstr ""
+msgstr "Médias AV :"
 
 #: code_organiser.py:102
 msgid ""
@@ -6520,383 +6604,400 @@ msgid ""
 "for unexpected errors could occur.\n"
 "THERE IS NO UNDO OPTION AFTER APPLYING CHANGES WITH THE APPLY BUTTON."
 msgstr ""
+"SAUVEGARDEZ LE PROJET avant d'appliquer des changements à l'arbre des "
+"codes.\n"
+"L'organisateur de codes est principalement utilisé avec la théorie ancrée "
+"pour vous aider à développer et à organiser les concepts de codage et leur "
+"hiérarchie.\n"
+"Sélectionnez une branche de code ou Tous, puis cliquez avec le bouton droit "
+"de la souris pour :\n"
+"Ajouter des catégories, renommer des codes et des catégories, mettre à jour "
+"des mémos, fusionner des codes, fusionner des catégories, supprimer des "
+"catégories.\n"
+"\n"
+"Elle a été testée, mais des erreurs inattendues peuvent survenir.\n"
+"IL N'Y A PAS D'OPTION D'ANNULATION APRÈS AVOIR APPLIQUÉ DES MODIFICATIONS À "
+"L'AIDE DU BOUTON « APPLIQUER »."
 
 #: code_organiser.py:166
 msgid "Branch has been selected"
-msgstr ""
+msgstr "La branche a été sélectionnée"
 
 #: code_organiser.py:415
 msgid "Add category"
-msgstr ""
+msgstr "Ajouter une catégorie"
 
 #: code_organiser.py:586
 msgid "Code tree re-organised."
-msgstr ""
+msgstr "Réorganisation de l'arborescence du code."
 
 #: code_organiser.py:931
 msgid "Link code to category"
-msgstr ""
+msgstr "Code de lien vers la catégorie"
 
 #: code_organiser.py:932
 msgid "Merge code into code"
-msgstr ""
+msgstr "Fusionner le code dans le code"
 
 #: code_organiser.py:934
 msgid "Remove code from category"
-msgstr ""
+msgstr "Supprimer le code de la catégorie"
 
 #: code_organiser.py:935
 msgid "Coded text and media"
-msgstr ""
+msgstr "Textes et médias codés"
 
 #: code_organiser.py:936
 msgid "Case text and media"
-msgstr ""
+msgstr "Texte de l'affaire et médias"
 
 #: code_organiser.py:938
 msgid "Link category under category"
-msgstr ""
+msgstr "Lier une catégorie à une autre"
 
 #: code_organiser.py:941
 msgid "Remove category from category"
-msgstr ""
+msgstr "Supprimer une catégorie d'une catégorie"
 
 #: code_organiser.py:980
 msgid "Update name"
-msgstr ""
+msgstr "Mise à jour du nom"
 
 #: code_organiser.py:1020
 msgid "Link code: Select category"
-msgstr ""
+msgstr "Code de lien : Sélectionnez une catégorie"
 
 #: code_organiser.py:1046
 msgid "Merge into: Select code"
-msgstr ""
+msgstr "Fusionner dans : Sélectionner le code"
 
 #: code_organiser.py:1104
 msgid "Link under: Select category"
-msgstr ""
+msgstr "Lien sous : Sélectionnez une catégorie"
 
 #: code_organiser.py:1128
 msgid "Merge into: Select category"
-msgstr ""
+msgstr "Fusionner dans : Sélectionnez une catégorie"
 
 #: code_text.py:165
 msgid "EDITING TEXT MODE (Ctrl+E)"
-msgstr ""
+msgstr "ÉDITER LE MODE TEXTE (Ctrl+E)"
 
 #: code_text.py:383 code_text.py:412 code_pdf.py:301 code_pdf.py:330
 msgid "Codings:"
-msgstr ""
+msgstr "Codifications :"
 
 #: code_text.py:384 code_text.py:413 code_pdf.py:302 code_pdf.py:331
 msgid "From:"
-msgstr ""
+msgstr "De :"
 
 #: code_text.py:1024
 msgid "Edit text analysis prompts"
-msgstr ""
+msgstr "Éditer les messages d'analyse de texte"
 
 #: code_text.py:2102
 msgid "Select a code"
-msgstr ""
+msgstr "Sélectionner un code"
 
 #: code_text.py:3919
 msgid "Text reverted to prior to edit"
-msgstr ""
+msgstr "Texte rétabli à l'état antérieur à la modification"
 
 #: code_text.py:3920
 msgid "Undo last edited text"
-msgstr ""
+msgstr "Annuler le dernier texte édité"
 
 #: code_pdf.py:1348
 msgid "CODE:"
-msgstr ""
+msgstr "CODE :"
 
 #: code_pdf.py:1348 report_codes.py:2007 report_codes.py:2697
 msgid "MEMO:"
-msgstr ""
+msgstr "MEMO :"
 
 #: code_pdf.py:1351
 msgid "EXAMPLES:"
-msgstr ""
+msgstr "EXEMPLES :"
 
 #: code_pdf.py:2106
 msgid "Code renamed:"
-msgstr ""
+msgstr "Code renommé :"
 
 #: code_pdf.py:2141
 msgid "Category renamed:"
-msgstr ""
+msgstr "Catégorie renommée :"
 
 #: code_pdf.py:2417
 msgid "Pages:"
-msgstr ""
+msgstr "Pages :"
 
 #: code_pdf.py:3306 code_pdf.py:3334
 msgid "for:"
-msgstr ""
+msgstr "pour :"
 
 #: codebook.py:210
 msgid "Codebook for"
-msgstr ""
+msgstr "Codebook for"
 
 #: codebook.py:225
 msgid "Category:"
-msgstr ""
+msgstr "Catégorie :"
 
 #: helpers.py:606
 msgid "Scale:"
-msgstr ""
+msgstr "Échelle :"
 
 #: helpers.py:665
 msgid "Rotate clockwise R"
-msgstr ""
+msgstr "Rotation dans le sens des aiguilles d'une montre R"
 
 #: helpers.py:666
 msgid "Rotate counter-clockwise L"
-msgstr ""
+msgstr "Tourner dans le sens inverse des aiguilles d'une montre L"
 
 #: helpers.py:667 view_image.py:1138
 msgid "Highlight area - gray"
-msgstr ""
+msgstr "Zone de surbrillance - grise"
 
 #: helpers.py:668 view_image.py:1139
 msgid "Highlight area - solarize"
-msgstr ""
+msgstr "Zone de surbrillance - solariser"
 
 #: helpers.py:669 view_image.py:1140
 msgid "Highlight area - blur"
-msgstr ""
+msgstr "Zone de surbrillance - flou"
 
 #: helpers.py:670
 msgid "Export image E"
-msgstr ""
+msgstr "Exporter l'image E"
 
 #: import_survey.py:282
 msgid "Survey file:"
-msgstr ""
+msgstr "Dossier d'enquête :"
 
 #: import_survey.py:283
 msgid "Fields:"
-msgstr ""
+msgstr "Champs :"
 
 #: import_survey.py:283
 msgid "Rows:"
-msgstr ""
+msgstr "Rangs :"
 
 #: import_survey.py:380
 msgid "Creating qualitative text file(s)"
-msgstr ""
+msgstr "Création de fichier(s) texte(s) qualitatif(s)"
 
 #: journals.py:252
 msgid "Attribute added to journals:"
-msgstr ""
+msgstr "Attribut ajouté aux journaux :"
 
 #: journals.py:252 manage_files.py:1089
 msgid "type"
-msgstr ""
+msgstr "type"
 
 #: journals.py:656
 msgid "Journal exported to:"
-msgstr ""
+msgstr "Journal exporté vers :"
 
 #: manage_files.py:596
 msgid "Renamed database file entry:"
-msgstr ""
+msgstr "Renommer l'entrée du fichier de la base de données :"
 
 #: manage_files.py:669
 msgid "Export to"
-msgstr ""
+msgstr "Exporter vers"
 
 #: manage_files.py:1023
 msgid "Case linked:"
-msgstr ""
+msgstr "Cas lié :"
 
 #: manage_files.py:1089
 msgid "Attribute added to files:"
-msgstr ""
+msgstr "Attribut ajouté aux fichiers :"
 
 #: report_codes.py:750
 msgid "And file and case variables"
-msgstr ""
+msgstr "Et les variables de fichier et de cas"
 
 #: report_codes.py:932
 msgid "error "
-msgstr ""
+msgstr "erreur "
 
 #: report_codes.py:1003
 msgid "Media folder:"
-msgstr ""
+msgstr "Dossier de presse :"
 
 #: report_codes.py:1154
 msgid "DATE:"
-msgstr ""
+msgstr "DATE :"
 
 #: report_codes.py:1155
 msgid "Position"
-msgstr ""
+msgstr "Position"
 
 #: report_codes.py:1156
 msgid "TEXT"
-msgstr ""
+msgstr "TEXTE"
 
 #: report_codes.py:1157
 msgid "ANNOTATION"
-msgstr ""
+msgstr "ANNOTATION"
 
 #: report_codes.py:1234
 msgid "No files, cases found."
-msgstr ""
+msgstr "Aucun dossier, aucune affaire n'a été trouvée."
 
 #: report_codes.py:1263
 msgid "Coding by: All coders"
-msgstr ""
+msgstr "Codage par : Tous les codeurs"
 
 #: report_codes.py:1265
 msgid "Coding by: "
-msgstr ""
+msgstr "Codage par : "
 
 #: report_codes.py:1278
 msgid "Attributes:"
-msgstr ""
+msgstr "Attributs :"
 
 #: report_codes.py:1302
 msgid " Files: "
-msgstr ""
+msgstr " Fichiers : "
 
 #: report_codes.py:1726 report_codes.py:1788 report_codes.py:1863
 msgid "Count:"
-msgstr ""
+msgstr "Compter :"
 
 #: report_codes.py:1727 report_codes.py:1789 report_codes.py:1865
 msgid "Percent of file:"
-msgstr ""
+msgstr "Pourcentage du dossier :"
 
 #: report_codes.py:1905
 msgid "Code count totals"
-msgstr ""
+msgstr "Totaux de comptage des codes"
 
 #: report_codes.py:2338
 msgid "Delete coded section."
-msgstr ""
+msgstr "Supprimer la section codée."
 
 #: report_codes.py:2454
 msgid "FILE MEMO:"
-msgstr ""
+msgstr "DOSSIER MEMO :"
 
 #: report_codes.py:2462
 msgid "CASE MEMO:"
-msgstr ""
+msgstr "CASE MEMO :"
 
 #: report_exact_matches.py:82
 msgid ""
 "Only matches where ALL codes are applied to the same text will be shown."
 msgstr ""
+"Seules les correspondances où TOUS les codes sont appliqués au même texte "
+"seront affichées."
 
 #: report_exact_matches.py:172
 msgid "No file has been selected."
-msgstr ""
+msgstr "Aucun fichier n'a été sélectionné."
 
 #: report_exact_matches.py:173
 msgid "No file"
-msgstr ""
+msgstr "Pas de fichier"
 
 #: report_exact_matches.py:194
 msgid "Only one code has been selected."
-msgstr ""
+msgstr "Un seul code a été sélectionné."
 
 #: report_exact_matches.py:195
 msgid "One code selected"
-msgstr ""
+msgstr "Un code sélectionné"
 
 #: report_exact_matches.py:265
 msgid "ALL selected codes need to be exactly overlapping."
-msgstr ""
+msgstr "TOUS les codes sélectionnés doivent se chevaucher exactement."
 
 #: report_exact_matches.py:407
 msgid "code name"
-msgstr ""
+msgstr "nom de code"
 
 #: report_exact_matches.py:407
 msgid "text"
-msgstr ""
+msgstr "texte"
 
 #: report_exact_matches.py:407
 msgid "Coded memo"
-msgstr ""
+msgstr "Mémo codé"
 
 #: report_exact_matches.py:407
 msgid "File name"
-msgstr ""
+msgstr "Nom du fichier"
 
 #: report_exact_matches.py:487
 msgid "Report of exact matches for text codings for file"
 msgstr ""
+"Rapport sur les correspondances exactes pour les codages textuels du fichier"
 
 #: report_exact_matches.py:582
 msgid "Clear all"
-msgstr ""
+msgstr "Tout effacer"
 
 #: report_exact_matches.py:585
 msgid "Exclude code"
-msgstr ""
+msgstr "Exclure le code"
 
 #: report_sql.py:138 report_sql.py:190
 msgid "No select query"
-msgstr ""
+msgstr "Pas de requête de sélection"
 
 #: report_sql.py:138 report_sql.py:190
 msgid "No data to export"
-msgstr ""
+msgstr "Pas de données à exporter"
 
 #: report_sql.py:179
 msgid "Results exported: "
-msgstr ""
+msgstr "Résultats exportés : "
 
 #: report_sql.py:180
 msgid "Results exported"
-msgstr ""
+msgstr "Résultats exportés : "
 
 #: view_av.py:3057
 msgid "Important mark"
-msgstr ""
+msgstr "Marque importante"
 
 #: view_av.py:3058
 msgid "Edit start position"
-msgstr ""
+msgstr "Modifier la position de départ"
 
 #: view_av.py:3059
 msgid "Edit end position"
-msgstr ""
+msgstr "Modifier la position finale"
 
 #: view_av.py:3383
 msgid "Segment menu"
-msgstr ""
+msgstr "Menu du segment"
 
 #: view_image.py:1189
 msgid "Highlight this area - gray"
-msgstr ""
+msgstr "Mettre en évidence cette zone - grise"
 
 #: view_image.py:1190
 msgid "Highlight this area - solarize"
-msgstr ""
+msgstr "Mettre en évidence cette zone - solariser"
 
 #: view_image.py:1191
 msgid "Highlight this area - blur"
-msgstr ""
+msgstr "Mettre en évidence cette zone - estomper"
 
 #: view_image.py:1192
 msgid "Highlight this code - gray"
-msgstr ""
+msgstr "Surligner ce code - gris"
 
 #: view_image.py:1193
 msgid "Highlight this code - solarize"
-msgstr ""
+msgstr "Surligner ce code - solariser"
 
 #: view_image.py:1194
 msgid "Highlight this code - blur"
-msgstr ""
+msgstr "Surligner ce code - flou"
 
 #: code_organiser.py:102
 msgid ""
@@ -6910,3 +7011,17 @@ msgid ""
 "Potential for unexpected errors could occur.\n"
 "THERE IS NO UNDO OPTION AFTER APPLYING CHANGES WITH THE APPLY BUTTON."
 msgstr ""
+"SAUVEGARDEZ LE PROJET avant d'appliquer des changements à l'arbre des "
+"codes.\n"
+"L'organisateur de codes est principalement utilisé avec la théorie ancrée "
+"pour vous aider à développer et à organiser les concepts de codage et leur "
+"hiérarchie.\n"
+"Sélectionnez une branche de code ou Tous, puis cliquez avec le bouton droit "
+"de la souris pour :\n"
+"Ajouter des catégories, renommer des codes et des catégories, mettre à jour "
+"des mémos, fusionner des codes, fusionner des catégories, supprimer des "
+"catégories.\n"
+"\n"
+"Des erreurs inattendues peuvent survenir.\n"
+"IL N'Y A PAS D'OPTION D'ANNULATION APRÈS AVOIR APPLIQUÉ DES MODIFICATIONS À "
+"L'AIDE DU BOUTON « APPLIQUER »."
