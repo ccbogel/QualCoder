@@ -336,13 +336,13 @@ prompt_types = [
     'topic_analysis',
     'text_analysis'
 ]
-# Descriptions of the types, used as tooltips:
+# Descriptions of the types, used as tooltips:  Colin: These need to be string in tuples?, used in qTreeWidget
 prompt_types_descriptions = [
-    _('These prompts are used in the AI search. They instruct the AI on how to decide \n'
+    ('These prompts are used in the AI search. They instruct the AI on how to decide \n'
      'whether a chunk of empirical data is related to a given code/search string or not.'),
-    _('These prompts are used in the chat to analyze the data that has been coded with a selected code.'),
-    _('These prompts are used in the chat to analyse the results of a free search exploring a certain topic.'),
-    _('These prompts are used in the chat to analyze a section of text from a single empirical document.')
+    ('These prompts are used in the chat to analyze the data that has been coded with a selected code.'),
+    ('These prompts are used in the chat to analyse the results of a free search exploring a certain topic.'),
+    ('These prompts are used in the chat to analyze a section of text from a single empirical document.')
 ]
 
 # Define the scope of a prompt: system-defined, user-level, project-level
