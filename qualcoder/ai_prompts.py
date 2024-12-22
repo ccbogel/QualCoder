@@ -352,10 +352,10 @@ prompt_scopes = [
     'project'
 ]
 prompt_scope_descriptions = [
-    _('System prompts are the defaults defined in the source code of QualCoder. They cannot be changed by the user.'),
-    _('User prompts are defined by you on the level of your particular instance of QualCoder. '
+    ('System prompts are the defaults defined in the source code of QualCoder. They cannot be changed by the user.'),
+    ('User prompts are defined by you on the level of your particular instance of QualCoder. '
      'They are available in every project that you open on your machine.'),
-    _('Project prompts are defined by you, but for the current project only. They go with the project files. '
+    ('Project prompts are defined by you, but for the current project only. They go with the project files. '
      'If you or somebody else opens the same project on another machine, these prompts will be available there too.')
 ]
 
