@@ -425,9 +425,6 @@ want to continue?\
         
         # split fulltext into smaller chunks 
         if text != '':  # Can only add embeddings if text is not empty
-            if signals is not None and signals.progress is not None:
-                signals.progress.emit(_('AI: Adding document to internal memory: ') + f'"{name}"')
-
             metadata = {'id': id_, 'name': name}
             document = Document(page_content=text, metadata=metadata)
             text_splitter = RecursiveCharacterTextSplitter(separators=[".", "!", "?", "\n\n", "\n", " ", ""], 
@@ -435,6 +432,12 @@ want to continue?\
                                                         add_start_index=True)
             chunks = text_splitter.split_documents([document])
             
+            if len(chunks) == 0:  # empty doc
+                return
+            
+            if signals is not None and signals.progress is not None:
+                signals.progress.emit(_('AI: Adding document to internal memory: ') + f'"{name}"')
+
             # create embeddings for these chunks and store them in the faiss_db (with metadata)
             for chunk in chunks:
                 if not self._is_closing:
