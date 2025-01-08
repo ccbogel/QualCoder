@@ -279,14 +279,25 @@ want to continue?\
         # "signals" is when this is called by the Worker in ai_async_worker. Cannot omit it.
         if self._is_closing:
             return  # abort when closing db
+        self.faiss_db = None
         if self.app.project_path != '' and os.path.exists(self.app.project_path):
             if self.app.ai_embedding_function is None:
                 self.app.ai_embedding_function = E5SentenceTransformerEmbeddings(model_name=self.model_folder)
             self.faiss_db_path = os.path.join(self.app.project_path, 'ai_data', 'vectorstore', 'faiss_store.bin')
             if os.path.exists(self.faiss_db_path): 
                 # load existing faiss db
-                self.faiss_db = self.faiss_load(self.faiss_db_path)
-            else:  # create new faiss db
+                try:
+                    self.faiss_db = self.faiss_load(self.faiss_db_path)
+                except ModuleNotFoundError:  # This happens if an index with AVX2-optimization is loaded. We turned AVX2-optimization off because it is not cross-compatible with newer macs.
+                    self.faiss_db = None
+                    if signals is not None and signals.progress is not None:
+                        msg = _('It appears that you have already used the AI features with this project before. '
+                                'Meanwhile, we had to change the internal implementation of the local AI memory '
+                                'to make it more robust. As a result, the AI has to read through all your '
+                                'empirical documents again to rebuild the local memory. This may take a while. '
+                                'Sorry for the inconvenience.')                        
+                        signals.progress.emit(msg)
+            if self.faiss_db is None:  # create new faiss db
                 embedding_size = 1024  # embedding size of the used model: https://huggingface.co/intfloat/multilingual-e5-large
                 faiss_index = faiss.IndexFlatL2(embedding_size) 
                 self.faiss_db = FAISS(
@@ -371,7 +382,11 @@ want to continue?\
         else:
             worker.signals.finished.connect(self.update_vectorstore)
         worker.signals.error.connect(ai_exception_handler)
+        worker.signals.progress.connect(self.open_progress)
         self.threadpool.start(worker)
+    
+    def open_progress(self, msg):
+        Message(self.app, _('AI memory'), msg).exec()    
  
     def progress_import(self, msg):
         self.parent_text_edit.append(msg)
@@ -544,7 +559,10 @@ want to continue?\
             # Try to create a temporary access
             faiss_db_path = os.path.join(self.app.project_path, 'ai_data', 'vectorstore', 'faiss_store.bin')
             if os.path.exists(faiss_db_path): 
-                faiss_db = self.faiss_load(faiss_db_path)
+                try:
+                    faiss_db = self.faiss_load(faiss_db_path)
+                except ModuleNotFoundError:
+                    faiss_db = None
         if faiss_db is not None:
             embeddings_list = self.faiss_db_search_file_id(id_, faiss_db=faiss_db)
             if len(embeddings_list) > 0:
@@ -565,7 +583,7 @@ want to continue?\
         self._is_closing = False
         
     def ai_worker_running(self):
-        return (self.import_workers_count > 0)
+        return self.import_workers_count
         #return self.threadpool.activeThreadCount() > 0
             
     def is_open(self) -> bool:
