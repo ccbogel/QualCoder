@@ -627,7 +627,10 @@ data collected. This information will accompany every prompt sent to the AI, res
                 self.ui.progressBar_ai.setRange(0, 0)  # Starts the animation
         # update ai status in the statusBar of the main window
         if self.app.ai is not None:
-            self.main_window.statusBar().showMessage(_('AI: ') + _(self.app.ai.get_status()))
+            if self.app.ai.get_status() == 'reading data':
+                self.main_window.statusBar().showMessage(_('AI: ') + _('reading data (') + str(self.app.ai.sources_vectorstore.ai_worker_running()) + _(' documents left to go)...'))
+            else:
+                self.main_window.statusBar().showMessage(_('AI: ') + _(self.app.ai.get_status()))
         else: 
             self.main_window.statusBar().showMessage('')
 
