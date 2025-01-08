@@ -18,7 +18,7 @@ langchain-community>=0.2.7
 langchain-core>=0.2.19
 langchain-openai>=0.1.16
 langchain-text-splitters>=0.2.2 
-faiss-cpu<=1.7.2
+faiss-cpu
 sentence-transformers 
 fuzzysearch 
 PyYAML 

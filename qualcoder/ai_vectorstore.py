@@ -20,7 +20,8 @@ https://qualcoder.wordpress.com/
 """
 
 import os
-os.environ['FAISS_NO_AVX2'] = '1' 
+os.environ['FAISS_NO_AVX2'] = '1'  # This is suggested by Langchain, but will in fact NOT WORK
+os.environ['FAISS_OPT_LEVEL'] = ''  # This will atually create a 'generic' index. It is a poorly documented feature introduced here: https://github.com/facebookresearch/faiss/commit/eefa39105eda498ab5fcd82ea0e11b18fd3fc0d7
 # Must be set before importing faiss. This tells faiss not to use AVX2, which makes the resulting
 # index also compatible with older machines and non-intel platforms.    
 
