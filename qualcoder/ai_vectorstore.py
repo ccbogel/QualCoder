@@ -137,6 +137,7 @@ class AiVectorstore():
     faiss_db_path = None
     _is_closing = False
     collection_name = ''
+    reading_doc = ''
     
     def __init__(self, app, parent_text_edit, collection_name):
         self.app = app
@@ -448,26 +449,26 @@ want to continue?\
                                                         add_start_index=True)
             chunks = text_splitter.split_documents([document])
             
-            if len(chunks) == 0:  # empty doc
-                return
-            
-            if signals is not None and signals.progress is not None:
-                signals.progress.emit(_('AI: Adding document to internal memory: ') + f'"{name}"')
+            if len(chunks) > 0:  # doc not empty 
+                if signals is not None and signals.progress is not None:
+                    self.reading_doc = name
+                    signals.progress.emit(_('AI: Adding document to internal memory: ') + f'"{name}"')
 
-            # create embeddings for these chunks and store them in the faiss_db (with metadata)
-            for chunk in chunks:
-                if not self._is_closing:
-                    uid = str(uuid4())
-                    self.faiss_db.add_documents([chunk], ids=[uid])
-                else:  # Canceled, delete the unfinished document from the vectorstore:
-                    embeddings_list = self.faiss_db_search_file_id(id_)
-                    if len(embeddings_list) > 0:
-                        try:
-                            self.faiss_db.delete(embeddings_list)
-                        except ValueError as e:
-                            logger.debug(f'Error deleting document from faiss vector store: {e}')
-                    break
-            self.faiss_save()
+                # create embeddings for these chunks and store them in the faiss_db (with metadata)
+                for chunk in chunks:
+                    if not self._is_closing:
+                        uid = str(uuid4())
+                        self.faiss_db.add_documents([chunk], ids=[uid])
+                    else:  # Canceled, delete the unfinished document from the vectorstore:
+                        embeddings_list = self.faiss_db_search_file_id(id_)
+                        if len(embeddings_list) > 0:
+                            try:
+                                self.faiss_db.delete(embeddings_list)
+                            except ValueError as e:
+                                logger.debug(f'Error deleting document from faiss vector store: {e}')
+                        break
+                self.faiss_save()
+        self.reading_doc = ''
 
     def import_document(self, id_, name, text, update=False):
         """Imports a document into the faiss_db. 
@@ -541,11 +542,15 @@ want to continue?\
         msg = _('AI: Rebuilding memory. The local AI will read through all your documents, please be patient.')
         self.parent_text_edit.append(msg)
         logger.debug(msg)
-        # delete all the contents from the vectorstore
-        try:
-            self.faiss_db.delete(self.faiss_db.index_to_docstore_id.values())
-        except ValueError as e:
-            logger.debug(f'Error deleting document from faiss vector store: {e}')
+        # create a new, empty database:
+        embedding_size = 1024  # embedding size of the used model: https://huggingface.co/intfloat/multilingual-e5-large
+        faiss_index = faiss.IndexFlatL2(embedding_size) 
+        self.faiss_db = FAISS(
+            embedding_function=self.app.ai_embedding_function,
+            index=faiss_index,
+            docstore=InMemoryDocstore(),
+            index_to_docstore_id={},
+        )
         self.faiss_save()
         # rebuild vectorstore
         self.update_vectorstore()
