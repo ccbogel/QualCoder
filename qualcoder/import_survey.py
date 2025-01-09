@@ -265,7 +265,11 @@ class DialogImportSurvey(QtWidgets.QDialog):
                         logger.debug(msg)
                     set_of_values.add(value)
                 if len(set_of_values) > 19:
-                    self.fields_type[field] = "qualitative"
+                    try:
+                        self.fields_type[field] = "qualitative"
+                    except IndexError:
+                        # Occurs if the delimiter or quoting incorrect. Or if the rows fields length does not match
+                        pass
         # Check first column has unique identifiers
         ids = []
         for row in self.data:
@@ -301,14 +305,14 @@ class DialogImportSurvey(QtWidgets.QDialog):
             self.fields = []
             return
 
-        # check for appropriate quote format
-        # inappropriate may produce error IndexError: list index out of range
-        quote_format_error = False
-        for val in self.data:
-            if len(val) != len(self.fields_type):
-                quote_format_error = True
-        if quote_format_error:
+        # Check for appropriate quote format
+        row_length_error = ""
+        for i, row in enumerate(self.data):
+            if len(row) != len(self.fields):
+                row_length_error += f"\nError row {i + 1} length does not match fields length"
+        if row_length_error != "":
             msg = _("Number of fields does not match header\nPossible wrong quote format")
+            msg += row_length_error
             logger.error(_("Survey not loaded: ") + msg)
             Message(self.app, _("Survey not loaded"), msg, "warning").exec()
             return

@@ -236,7 +236,10 @@ python3 get-pip.py
 ```sh
 pip3 install -r requirements.txt
 ```
-
+If you are on an older, Intel-based Mac, you must perform the following step after installing all the other requirements:
+```
+pip install "numpy<2" # don't forget the quotation marks
+```
 Be sure that you are in the QualCoder-Master directory before doing Step 6.
 
 To change the directory, enter or copy and run the script below.
