@@ -614,7 +614,7 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         """Returns a list representing the path from the root to the item."""
         path_ = []
         while item is not None:
-            path.append(item.text(0))
+            path_.append(item.text(0))
             item = item.parent()
         return path_[::-1]
 
