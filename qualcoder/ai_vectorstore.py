@@ -20,7 +20,8 @@ https://qualcoder.wordpress.com/
 """
 
 import os
-os.environ['FAISS_NO_AVX2'] = '1' 
+os.environ['FAISS_NO_AVX2'] = '1'  # This is suggested by Langchain, but will in fact NOT WORK
+os.environ['FAISS_OPT_LEVEL'] = ''  # This will atually create a 'generic' index. It is a poorly documented feature introduced here: https://github.com/facebookresearch/faiss/commit/eefa39105eda498ab5fcd82ea0e11b18fd3fc0d7
 # Must be set before importing faiss. This tells faiss not to use AVX2, which makes the resulting
 # index also compatible with older machines and non-intel platforms.    
 
@@ -136,6 +137,7 @@ class AiVectorstore():
     faiss_db_path = None
     _is_closing = False
     collection_name = ''
+    reading_doc = ''
     
     def __init__(self, app, parent_text_edit, collection_name):
         self.app = app
@@ -279,14 +281,25 @@ want to continue?\
         # "signals" is when this is called by the Worker in ai_async_worker. Cannot omit it.
         if self._is_closing:
             return  # abort when closing db
+        self.faiss_db = None
         if self.app.project_path != '' and os.path.exists(self.app.project_path):
             if self.app.ai_embedding_function is None:
                 self.app.ai_embedding_function = E5SentenceTransformerEmbeddings(model_name=self.model_folder)
             self.faiss_db_path = os.path.join(self.app.project_path, 'ai_data', 'vectorstore', 'faiss_store.bin')
             if os.path.exists(self.faiss_db_path): 
                 # load existing faiss db
-                self.faiss_db = self.faiss_load(self.faiss_db_path)
-            else:  # create new faiss db
+                try:
+                    self.faiss_db = self.faiss_load(self.faiss_db_path)
+                except ModuleNotFoundError:  # This happens if an index with AVX2-optimization is loaded. We turned AVX2-optimization off because it is not cross-compatible with newer macs.
+                    self.faiss_db = None
+                    if signals is not None and signals.progress is not None:
+                        msg = _('It appears that you have already used the AI features with this project before. '
+                                'Meanwhile, we had to change the internal implementation of the local AI memory '
+                                'to make it more robust. As a result, the AI has to read through all your '
+                                'empirical documents again to rebuild the local memory. This may take a while. '
+                                'Sorry for the inconvenience.')                        
+                        signals.progress.emit(msg)
+            if self.faiss_db is None:  # create new faiss db
                 embedding_size = 1024  # embedding size of the used model: https://huggingface.co/intfloat/multilingual-e5-large
                 faiss_index = faiss.IndexFlatL2(embedding_size) 
                 self.faiss_db = FAISS(
@@ -371,7 +384,11 @@ want to continue?\
         else:
             worker.signals.finished.connect(self.update_vectorstore)
         worker.signals.error.connect(ai_exception_handler)
+        worker.signals.progress.connect(self.open_progress)
         self.threadpool.start(worker)
+    
+    def open_progress(self, msg):
+        Message(self.app, _('AI memory'), msg).exec()    
  
     def progress_import(self, msg):
         self.parent_text_edit.append(msg)
@@ -425,9 +442,6 @@ want to continue?\
         
         # split fulltext into smaller chunks 
         if text != '':  # Can only add embeddings if text is not empty
-            if signals is not None and signals.progress is not None:
-                signals.progress.emit(_('AI: Adding document to internal memory: ') + f'"{name}"')
-
             metadata = {'id': id_, 'name': name}
             document = Document(page_content=text, metadata=metadata)
             text_splitter = RecursiveCharacterTextSplitter(separators=[".", "!", "?", "\n\n", "\n", " ", ""], 
@@ -435,20 +449,26 @@ want to continue?\
                                                         add_start_index=True)
             chunks = text_splitter.split_documents([document])
             
-            # create embeddings for these chunks and store them in the faiss_db (with metadata)
-            for chunk in chunks:
-                if not self._is_closing:
-                    uid = str(uuid4())
-                    self.faiss_db.add_documents([chunk], ids=[uid])
-                else:  # Canceled, delete the unfinished document from the vectorstore:
-                    embeddings_list = self.faiss_db_search_file_id(id_)
-                    if len(embeddings_list) > 0:
-                        try:
-                            self.faiss_db.delete(embeddings_list)
-                        except ValueError as e:
-                            logger.debug(f'Error deleting document from faiss vector store: {e}')
-                    break
-            self.faiss_save()
+            if len(chunks) > 0:  # doc not empty 
+                if signals is not None and signals.progress is not None:
+                    self.reading_doc = name
+                    signals.progress.emit(_('AI: Adding document to internal memory: ') + f'"{name}"')
+
+                # create embeddings for these chunks and store them in the faiss_db (with metadata)
+                for chunk in chunks:
+                    if not self._is_closing:
+                        uid = str(uuid4())
+                        self.faiss_db.add_documents([chunk], ids=[uid])
+                    else:  # Canceled, delete the unfinished document from the vectorstore:
+                        embeddings_list = self.faiss_db_search_file_id(id_)
+                        if len(embeddings_list) > 0:
+                            try:
+                                self.faiss_db.delete(embeddings_list)
+                            except ValueError as e:
+                                logger.debug(f'Error deleting document from faiss vector store: {e}')
+                        break
+                self.faiss_save()
+        self.reading_doc = ''
 
     def import_document(self, id_, name, text, update=False):
         """Imports a document into the faiss_db. 
@@ -522,11 +542,15 @@ want to continue?\
         msg = _('AI: Rebuilding memory. The local AI will read through all your documents, please be patient.')
         self.parent_text_edit.append(msg)
         logger.debug(msg)
-        # delete all the contents from the vectorstore
-        try:
-            self.faiss_db.delete(self.faiss_db.index_to_docstore_id.values())
-        except ValueError as e:
-            logger.debug(f'Error deleting document from faiss vector store: {e}')
+        # create a new, empty database:
+        embedding_size = 1024  # embedding size of the used model: https://huggingface.co/intfloat/multilingual-e5-large
+        faiss_index = faiss.IndexFlatL2(embedding_size) 
+        self.faiss_db = FAISS(
+            embedding_function=self.app.ai_embedding_function,
+            index=faiss_index,
+            docstore=InMemoryDocstore(),
+            index_to_docstore_id={},
+        )
         self.faiss_save()
         # rebuild vectorstore
         self.update_vectorstore()
@@ -541,7 +565,10 @@ want to continue?\
             # Try to create a temporary access
             faiss_db_path = os.path.join(self.app.project_path, 'ai_data', 'vectorstore', 'faiss_store.bin')
             if os.path.exists(faiss_db_path): 
-                faiss_db = self.faiss_load(faiss_db_path)
+                try:
+                    faiss_db = self.faiss_load(faiss_db_path)
+                except ModuleNotFoundError:
+                    faiss_db = None
         if faiss_db is not None:
             embeddings_list = self.faiss_db_search_file_id(id_, faiss_db=faiss_db)
             if len(embeddings_list) > 0:
@@ -562,7 +589,7 @@ want to continue?\
         self._is_closing = False
         
     def ai_worker_running(self):
-        return (self.import_workers_count > 0)
+        return self.import_workers_count
         #return self.threadpool.activeThreadCount() > 0
             
     def is_open(self) -> bool:
