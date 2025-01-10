@@ -3807,7 +3807,8 @@ class DialogViewAV(QtWidgets.QDialog):
         self.ui.label_note.setToolTip(tt)
         self.ui.textEdit.installEventFilter(self)
         self.installEventFilter(self)  # for rewind, play/stop
-        self.get_waveform()
+        if platform.system() in ("Windows", "Darwin"):
+            self.get_waveform()  # Crashes on Fedora 40, segmentation fault with ffmpeg
         # Get the transcription text and fill textedit
         self.transcription = None
         cur = self.app.conn.cursor()
@@ -4007,18 +4008,17 @@ class DialogViewAV(QtWidgets.QDialog):
         Requires installed ffmpeg
         ffmpeg is much slower on Windows han Ubuntu """
 
-        waveform_path = self.app.project_path + "/audio/waveform.png"
+        waveform_path = os.path.join(self.app.project_path, "audio", "waveform.png")
         if os.path.exists(waveform_path):
             os.remove(waveform_path)
-        wf_command = 'ffmpeg -i "' + self.abs_path + '"'
-        wf_command += ' -filter_complex'
+        wf_command = f'ffmpeg -i "{self.abs_path}" -filter_complex'
         wf_command += ' "aformat=channel_layouts=mono,showwavespic=s=1020x100'
         if self.app.settings['stylesheet'] in ("dark", "rainbow"):
             wf_command += ':colors=#f89407"'
         else:
             wf_command += ':colors=#0A0A0A"'
         wf_command += ' -frames:v 1'
-        wf_command += ' "' + waveform_path + '"'
+        wf_command += f' "{waveform_path}"'
         try:
             subprocess.run(wf_command, timeout=15, shell=True)
         except Exception as e_:
