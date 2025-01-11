@@ -21,7 +21,7 @@ https://qualcoder.wordpress.com/
 
 from PyQt6 import QtWidgets, QtCore
 from PyQt6.QtCore import Qt, QEvent, QObject, pyqtSignal
-from PyQt6.QtGui import QCursor, QGuiApplication
+from PyQt6.QtGui import QCursor, QGuiApplication, QAction
 from PyQt6.QtWidgets import QTextEdit
 import qtawesome as qta
 
@@ -69,6 +69,7 @@ class DialogAIChat(QtWidgets.QDialog):
     chat_msg_list = [] 
     is_updating_chat_window = False
     ai_semantic_search_chunks = []
+    last_export_dir = ''
     # filenames = []
 
     def __init__(self, app, parent_text_edit: QTextEdit, main_window: QtWidgets.QMainWindow):
@@ -92,6 +93,8 @@ class DialogAIChat(QtWidgets.QDialog):
         # Enable editing of items on double click and when pressing F2
         self.ui.listWidget_chat_list.setEditTriggers(QtWidgets.QListWidget.EditTrigger.DoubleClicked | QtWidgets.QListWidget.EditTrigger.EditKeyPressed)
         self.ui.listWidget_chat_list.itemChanged.connect(self.chat_list_item_changed)
+        self.ui.listWidget_chat_list.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        self.ui.listWidget_chat_list.customContextMenuRequested.connect(self.open_context_menu)
         self.ui.ai_output.linkHovered.connect(self.on_linkHovered)
         self.ui.ai_output.linkActivated.connect(self.on_linkActivated)
         self.ui.pushButton_help.pressed.connect(self.help)
@@ -750,6 +753,93 @@ data collected. This information will accompany every prompt sent to the AI, res
         self.chat_history_conn.commit()
         self.get_chat_list()
         self.update_chat_window()
+
+    def open_context_menu(self, position):
+        context_menu = QtWidgets.QMenu(self)
+        if self.ui.listWidget_chat_list.count() > 0:
+            if self.current_chat_idx > -1:
+                edit_action = QAction("Edit Title", self)
+                delete_action = QAction("Delete Chat", self)
+                export_action = QAction("Export Chat", self)
+                context_menu.addAction(edit_action)
+                context_menu.addAction(delete_action)
+                context_menu.addAction(export_action)
+                edit_action.triggered.connect(self.edit_title)
+                delete_action.triggered.connect(self.delete_chat)
+                export_action.triggered.connect(self.export_chat)
+
+            # The search function will be implemented later:
+            # search_action = QAction("Search all Chats", self)
+            # context_menu.addAction(search_action)
+            # search_action.triggered.connect(self.search_chat)
+
+        if len(context_menu.actions()) > 0:
+            context_menu.exec(self.ui.listWidget_chat_list.mapToGlobal(position))
+
+    def edit_title(self):
+        """Edit the title of the current chat"""
+        selected_item = self.ui.listWidget_chat_list.currentItem()
+        if selected_item:
+            self.ui.listWidget_chat_list.editItem(selected_item)
+
+    def export_chat(self):
+        """Export the current chat into a html or txt file"""
+        chat_content = self.ui.ai_output.text()
+        default_file_name = self.chat_list[self.current_chat_idx][1]
+        default_file_name = default_file_name.replace('"', '')
+        if self.last_export_dir != '':
+            default_file_name = os.path.join(self.last_export_dir, default_file_name)
+        else:
+            default_file_name = os.path.join(os.path.dirname(self.app.project_path), default_file_name)
+        options = QtWidgets.QFileDialog.Options()
+        options |= QtWidgets.QFileDialog.Option.DontUseNativeDialog
+        file_name, selected_filter = QtWidgets.QFileDialog.getSaveFileName(
+            self, 
+            _("Export Chat"), 
+            default_file_name, 
+            "HTML (*.html);;Text only (*.txt)", 
+            options=options            
+        )                
+        if file_name:
+            self.last_export_dir = os.path.dirname(file_name)
+            if not any(file_name.endswith(ext) for ext in [".html", ".txt"]):
+                if "HTML" in selected_filter:
+                    file_name += ".html"
+                elif "Text" in selected_filter:
+                    file_name += ".txt"
+            if os.path.exists(file_name):
+                msg = _('The file already exists. Do you want to override it?')
+                msg_box = Message(self.app, _('Export Chat'), msg, "critical")
+                if msg_box.question(self, _('Export Chat'), msg) == QtWidgets.QMessageBox.StandardButton.No:
+                    return
+            if file_name.endswith(".html"):
+                self._export_to_html(file_name, chat_content)
+            elif file_name.endswith(".txt"):
+                self._export_to_txt(file_name, chat_content)
+
+    def _export_to_html(self, file_name, content):
+        # Write the chat content as HTML
+        with open(file_name, 'w', encoding='utf-8') as file:
+            file.write("<html><head><meta charset='utf-8'></head><body>")
+            file.write(content)
+            file.write("</body></html>")
+
+    def _export_to_txt(self, file_name, content):
+        # Strip tags for plain text export and write the content as plain text
+        from PyQt6.QtGui import QTextDocument
+        document = QTextDocument()
+        document.setHtml(content)
+        plain_text_content = document.toPlainText()
+        with open(file_name, 'w', encoding='utf-8') as file:
+            file.write(plain_text_content)        
+    
+    """    
+    def search_chat(self):
+        # Fulll text search over all chats, will be implemented later
+        selected_item = self.ui.listWidget_chat_list.currentItem()
+        if selected_item:
+            print(f"Searching chat: {selected_item.text()}")
+    """
 
     def button_new_clicked(self):
         # Create QMenu
