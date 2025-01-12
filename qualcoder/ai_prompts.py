@@ -26,7 +26,9 @@ import copy
 import webbrowser
 
 from PyQt6 import QtWidgets, QtCore
-# from PyQt6.QtCore import Qt  # Unused
+from PyQt6.QtGui import QClipboard, QShortcut, QKeySequence
+from PyQt6.QtCore import Qt 
+import qtawesome as qta
 
 from .GUI.ui_ai_edit_prompts import Ui_Dialog_AiPrompts
 from .helpers import Message
@@ -382,7 +384,16 @@ class PromptItem:
         if 'type' in dict_data:
             dict_data['prompt_type'] = dict_data.pop('type')
         return cls(**dict_data)
-
+    
+    def copy_to_clipboard(self):
+        """
+        Copies a PromptItem to the clipboard in YAML format using PyQt6.
+        """
+        prompt_dict = self.to_dict()
+        yaml_data = yaml.dump(prompt_dict)
+        app = QtWidgets.QApplication.instance()
+        clipboard: QClipboard = app.clipboard()
+        clipboard.setText(yaml_data)
 
 def split_name_and_scope(combined_str) -> {str, str}:
     """ Helper to split name and scope of a prompt, e.g. "promptname (system)" into "promptname", "system"
@@ -537,7 +548,18 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         self.ui.treeWidget_prompts.itemSelectionChanged.connect(self.tree_selection_changed)
         self.ui.pushButton_new_prompt.clicked.connect(self.new_prompt)
         self.ui.pushButton_duplicate_prompt.clicked.connect(self.duplicate_prompt)
-        self.ui.pushButton_delete_prompt.clicked.connect(self.delete_prompt)
+        self.ui.toolButton_copy.setIcon(qta.icon('mdi6.content-copy'))
+        self.ui.toolButton_copy.setFixedHeight(self.ui.pushButton_new_prompt.height())
+        self.ui.toolButton_copy.setFixedWidth(self.ui.pushButton_new_prompt.height())
+        self.ui.toolButton_copy.clicked.connect(self.copy_prompt_to_clipboard)
+        self.ui.toolButton_paste.setFixedHeight(self.ui.pushButton_new_prompt.height())
+        self.ui.toolButton_paste.setFixedWidth(self.ui.pushButton_new_prompt.height())
+        self.ui.toolButton_paste.setIcon(qta.icon('mdi6.content-paste'))
+        self.ui.toolButton_paste.clicked.connect(self.paste_prompt_from_clipboard)
+        self.ui.toolButton_delete.setFixedHeight(self.ui.pushButton_new_prompt.height())
+        self.ui.toolButton_delete.setFixedWidth(self.ui.pushButton_new_prompt.height())
+        self.ui.toolButton_delete.setIcon(qta.icon('mdi6.trash-can-outline'))
+        self.ui.toolButton_delete.clicked.connect(self.delete_prompt)
         self.ui.lineEdit_name.editingFinished.connect(self.prompt_details_edited)
         self.ui.radioButton_system.toggled.connect(self.prompt_details_edited)
         self.ui.radioButton_user.toggled.connect(self.prompt_details_edited)
@@ -549,6 +571,15 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         self.ui.buttonBox.accepted.connect(self.ok)
         self.ui.buttonBox.rejected.connect(self.cancel) 
         self.ui.buttonBox.helpRequested.connect(self.help)
+        
+        # Keyboard shortcuts
+        copy_shortcut = QShortcut(QKeySequence(QKeySequence.StandardKey.Copy), self.ui.treeWidget_prompts)
+        copy_shortcut.setContext(Qt.ShortcutContext.WidgetShortcut)
+        copy_shortcut.activated.connect(self.copy_prompt_to_clipboard)
+
+        paste_shortcut = QShortcut(QKeySequence(QKeySequence.StandardKey.Paste), self.ui.treeWidget_prompts)
+        paste_shortcut.setContext(Qt.ShortcutContext.WidgetShortcut)
+        paste_shortcut.activated.connect(self.paste_prompt_from_clipboard)
         
     @staticmethod
     def help():
@@ -682,12 +713,14 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
                 self.ui.plainTextEdit_description.setPlainText(self.selected_prompt.description)
                 self.ui.plainTextEdit_prompt_text.setPlainText(self.selected_prompt.text)
                 self.ui.pushButton_duplicate_prompt.setEnabled(True)
+                self.ui.toolButton_copy.setEnabled(True)
+                self.ui.toolButton_paste.setEnabled(True)
                 if self.selected_prompt.scope == 'system':
                     self.ui.label_uneditable.show()
-                    self.ui.pushButton_delete_prompt.setEnabled(False)
+                    self.ui.toolButton_delete.setEnabled(False)
                 else:
                     self.ui.label_uneditable.hide()
-                    self.ui.pushButton_delete_prompt.setEnabled(True)
+                    self.ui.toolButton_delete.setEnabled(True)
             else:
                 self.ui.widget_prompt_details.setEnabled(False)
                 self.ui.lineEdit_name.setText('')
@@ -699,49 +732,61 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
                 self.ui.plainTextEdit_prompt_text.setPlainText('')
                 self.ui.label_uneditable.hide()
                 self.ui.pushButton_duplicate_prompt.setEnabled(False)
-                self.ui.pushButton_delete_prompt.setEnabled(False)
+                self.ui.toolButton_copy.setEnabled(False)
+                self.ui.toolButton_paste.setEnabled(False)                
+                self.ui.toolButton_delete.setEnabled(False)
         finally:
             self.form_updating = old_form_updating
             
-    def new_prompt(self):
+    def new_prompt(self, clicked: bool = False, pasted_prompt: PromptItem = None):
         # determine type and scope
-        if self.selected_prompt is not None:
-            new_type = self.selected_prompt.type
-            new_scope = self.selected_prompt.scope
-        else:
-            if len(self.ui.treeWidget_prompts.selectedItems()) > 0:
-                selected_item = self.ui.treeWidget_prompts.selectedItems()[0]
-                item_level = get_item_level(selected_item)
-                if item_level == 0:  # type
-                    new_type = selected_item.text(0)
-                    new_scope = 'user'
-                elif item_level == 1:  # scope
-                    new_type = selected_item.parent().text(0)
-                    new_scope = selected_item.text(0)
-                else:
+        if pasted_prompt is None:
+            if self.selected_prompt is not None:
+                new_type = self.selected_prompt.type
+                new_scope = self.selected_prompt.scope
+            else:
+                if len(self.ui.treeWidget_prompts.selectedItems()) > 0:
+                    selected_item = self.ui.treeWidget_prompts.selectedItems()[0]
+                    item_level = get_item_level(selected_item)
+                    if item_level == 0:  # type
+                        new_type = selected_item.text(0)
+                        new_scope = 'user'
+                    elif item_level == 1:  # scope
+                        new_type = selected_item.parent().text(0)
+                        new_scope = selected_item.text(0)
+                    else:
+                        if self.prompt_type is not None:
+                            new_type = self.prompt_type
+                        else:
+                            new_type = 'search'
+                        new_scope = 'user'
+                else:  # no item selected, set default values
                     if self.prompt_type is not None:
                         new_type = self.prompt_type
                     else:
                         new_type = 'search'
                     new_scope = 'user'
-            else:  # no item selected, set default values
-                if self.prompt_type is not None:
-                    new_type = self.prompt_type
-                else:
-                    new_type = 'search'
-                new_scope = 'user'
+        else:  # pasted_prompt not None
+            new_type = pasted_prompt.type
+            new_scope = pasted_prompt.scope
         if new_scope == 'system':
             new_scope = 'user'  # system prompts cannot be created by the user
 
         # determine a new name 
-        new_name = 'my prompt'
+        if pasted_prompt is None:
+            new_name = 'my prompt'
+        else:
+            new_name = pasted_prompt.name
         if self.prompts.find_prompt(new_name, new_scope, new_type) is not None:
             i = 1
             while self.prompts.find_prompt(f'{new_name}{i}', new_scope, new_type) is not None:
                 i += 1
             new_name = f'{new_name}{i}'
         # add new prompt
-        new_prompt = PromptItem(new_scope, new_name, new_type, '', '')
+        if pasted_prompt is None:
+            new_prompt = PromptItem(new_scope, new_name, new_type, '', '')
+        else:
+            new_prompt = PromptItem(new_scope, new_name, new_type, pasted_prompt.description, pasted_prompt.text)
         self.prompts.prompts.append(new_prompt)
         self.selected_prompt = new_prompt
         self.fill_tree()
@@ -752,27 +797,26 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
     def duplicate_prompt(self):
         if self.selected_prompt is None:
             return
-        # determine the new scope
-        new_scope = self.selected_prompt.scope
-        if new_scope == 'system':
-            new_scope = 'user'  # system prompts cannot be created by the user
-        # determine a new name 
-        new_name = self.selected_prompt.name
-        i = 1
-        while self.prompts.find_prompt(f'{new_name}{i}', new_scope, self.selected_prompt.type) is not None:
-            i += 1
-        new_name = f'{new_name}{i}'
-        # add new prompt
-        new_prompt = PromptItem(new_scope, 
-                                new_name, 
-                                self.selected_prompt.type, 
-                                self.selected_prompt.description, self.selected_prompt.text)
-        self.prompts.prompts.append(new_prompt)
-        self.selected_prompt = new_prompt
-        self.fill_tree()
-        self.tree_selection_changed()
-        self.ui.lineEdit_name.setFocus()
-        self.ui.lineEdit_name.selectAll()
+        else:
+            self.new_prompt(pasted_prompt=self.selected_prompt)
+    
+    def copy_prompt_to_clipboard(self):
+        if self.selected_prompt is not None:
+            self.selected_prompt.copy_to_clipboard()
+    
+    def paste_prompt_from_clipboard(self):
+        """
+        Creates a new PromptItem from a YAML string in the clipboard and adds it to the library.
+        """
+        # Access the clipboard
+        app = QtWidgets.QApplication.instance()
+        clipboard: QClipboard = app.clipboard()
+        yaml_data = clipboard.text()
+        # Create a temporary PromptItem from the yaml data
+        prompt_dict = yaml.safe_load(yaml_data)
+        prompt_item = PromptItem.from_dict(prompt_dict)
+        # add it
+        self.new_prompt(pasted_prompt=prompt_item)
         
     def delete_prompt(self):
         if (self.selected_prompt is None) or (self.selected_prompt.scope == 'system'):

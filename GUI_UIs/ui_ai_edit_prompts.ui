@@ -139,9 +139,32 @@
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="pushButton_delete_prompt">
+              <widget class="QToolButton" name="toolButton_copy">
+               <property name="toolTip">
+                <string>Copy prompt to clipboard</string>
+               </property>
                <property name="text">
-                <string>Delete</string>
+                <string>...</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QToolButton" name="toolButton_paste">
+               <property name="toolTip">
+                <string>Paste prompt from clipboard</string>
+               </property>
+               <property name="text">
+                <string>...</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QToolButton" name="toolButton_delete">
+               <property name="toolTip">
+                <string>Delete prompt</string>
+               </property>
+               <property name="text">
+                <string>...</string>
                </property>
               </widget>
              </item>
