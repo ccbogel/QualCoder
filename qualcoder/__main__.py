@@ -1305,7 +1305,7 @@ Click "Yes" to start now.')
         self.ui.actionSQL_statements.triggered.connect(self.report_sql)
         # AI menu
         self.ui.actionAI_Setup_wizard.triggered.connect(self.ai_setup_wizard)
-        self.ui.actionAI_Settings.triggered.connect(self.ai_settings)
+        self.ui.actionAI_Configuration.triggered.connect(self.ai_settings)
         self.ui.actionAI_Rebuild_internal_memory.triggered.connect(self.ai_rebuild_memory)
         self.ui.actionAI_Edit_Project_Memo.triggered.connect(self.project_memo)
         self.ui.actionAI_Prompts.triggered.connect(self.ai_prompts)

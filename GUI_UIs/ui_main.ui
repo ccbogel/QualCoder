@@ -114,7 +114,7 @@
      <x>0</x>
      <y>0</y>
      <width>1024</width>
-     <height>26</height>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuProject">
@@ -216,7 +216,7 @@
      <string>AI</string>
     </property>
     <addaction name="actionAI_Setup_wizard"/>
-    <addaction name="actionAI_Settings"/>
+    <addaction name="actionAI_Configuration"/>
     <addaction name="actionAI_Rebuild_internal_memory"/>
     <addaction name="actionAI_Edit_Project_Memo"/>
     <addaction name="actionAI_Prompts"/>
@@ -532,6 +532,9 @@
    <property name="text">
     <string>Setup Wizard</string>
    </property>
+   <property name="menuRole">
+    <enum>QAction::NoRole</enum>
+   </property>
   </action>
   <action name="actionAI_Rebuild_internal_memory">
    <property name="text">
@@ -553,12 +556,15 @@
     <string>AI Assisted Coding</string>
    </property>
   </action>
-  <action name="actionAI_Settings">
+  <action name="actionAI_Configuration">
    <property name="text">
     <string>Settings</string>
    </property>
    <property name="toolTip">
     <string>AI related Settings</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::NoRole</enum>
    </property>
   </action>
   <action name="actionAI_Prompts">
