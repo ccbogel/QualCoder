@@ -585,6 +585,7 @@ want to continue?\
         # cancel all waiting threads:
         self.threadpool.clear()
         self.threadpool.waitForDone(5000)
+        self.import_workers_count = 0
         self.faiss_db = None
         self._is_closing = False
         
