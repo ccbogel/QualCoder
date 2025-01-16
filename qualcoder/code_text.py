@@ -208,6 +208,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.lineEdit_search.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.lineEdit_search.customContextMenuRequested.connect(self.lineedit_search_menu)
         self.ui.lineEdit_search.returnPressed.connect(self.search_for_text)
+        self.ui.tabWidget.currentChanged.connect(self.tab_changed)
         self.ui.tabWidget.setCurrentIndex(0)  # Defaults to list of documents
         self.get_files()
 
@@ -645,13 +646,18 @@ class DialogCodeText(QtWidgets.QWidget):
 
     def fill_code_counts_in_tree(self):
         """ Count instances of each code for current coder and in the selected file.
-        Called by: fill_tree
+        If the tab 'AI assisted coding' is active, the codings will be counted
+        across all files, not only the currently selected one, because the AI assisted 
+        coding is not working on a per-file basis.    
+        Called by: fill_tree, tab_changed
         """
 
-        if self.file_ is None:
-            return
+        ai_mode = self.ui.tabWidget.currentIndex() == 1
         cur = self.app.conn.cursor()
-        sql = "select count(cid) from code_text where cid=? and fid=? and owner=?"
+        if ai_mode:
+            sql = "select count(cid) from code_text where cid=? and owner=?"
+        else:  # documents
+            sql = "select count(cid) from code_text where cid=? and fid=? and owner=?"
         it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
         item = it.value()
         count = 0
@@ -659,8 +665,15 @@ class DialogCodeText(QtWidgets.QWidget):
             if item.text(1)[0:4] == "cid:":
                 cid = str(item.text(1)[4:])
                 try:
-                    cur.execute(sql, [cid, self.file_['id'], self.app.settings['codername']])
-                    result = cur.fetchone()
+                    if ai_mode:
+                        cur.execute(sql, [cid, self.app.settings['codername']])
+                        result = cur.fetchone()
+                    else:  # document mode
+                        if self.file_ is None:
+                            result = [0]  # will delete the count because no file is selected
+                        else:
+                            cur.execute(sql, [cid, self.file_['id'], self.app.settings['codername']])
+                            result = cur.fetchone()
                     if result[0] > 0:
                         item.setText(3, str(result[0]))
                         item.setToolTip(3, self.app.settings['codername'])
@@ -668,7 +681,10 @@ class DialogCodeText(QtWidgets.QWidget):
                         item.setText(3, "")
                 except Exception as e:
                     msg = f"Fill code counts error\n{e}\n{sql}\ncid: {cid}\n"
-                    msg += f"self.file_['id']: {self.file_['id']}\n"
+                    if not ai_mode:
+                        msg += f"self.file_['id']: {self.file_['id']}\n"
+                    else:
+                        msg += '(AI assisted coding)\n'
                     logger.debug(msg)
                     item.setText(3, "")
             it += 1
@@ -4501,6 +4517,12 @@ class DialogCodeText(QtWidgets.QWidget):
         self.app.conn.commit()
 
     # AI functions
+    
+    def tab_changed(self):
+        """Will be called when the user changes between the tabs "documents" and
+        "AI assistance"
+        """
+        self.fill_code_counts_in_tree()
 
     def ai_search_clicked(self):
         """ Start the AI search (if the AI is ready and edit_mode is not active).   

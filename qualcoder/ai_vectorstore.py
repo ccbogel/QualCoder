@@ -41,6 +41,7 @@ import time
 import traceback
 from typing import List
 from uuid import uuid4
+import inspect
 
 from qualcoder.ai_async_worker import Worker
 from qualcoder.ai_async_worker import AIException
@@ -290,7 +291,14 @@ want to continue?\
                 # load existing faiss db
                 try:
                     self.faiss_db = self.faiss_load(self.faiss_db_path)
-                except ModuleNotFoundError:  # This happens if an index with AVX2-optimization is loaded. We turned AVX2-optimization off because it is not cross-compatible with newer macs.
+                    # Signature of 'self.faiss_db.index.search' for
+                    # generic index: (x, k, *, params=None, D=None, I=None)
+                    # AVX2-index:    (n, x, k, distances, labels, params=None)
+                    # Check based on that if the index is AVX2 and need rebuilding in generic format
+                    if str(inspect.signature(self.faiss_db.index.search)).find('n, x, k') != -1:
+                        # print(inspect.signature(self.faiss_db.index.search))
+                        raise ValueError('faiss: AVX2 index cannot be used')
+                except (ModuleNotFoundError, ValueError):  # This happens if an index with AVX2-optimization is loaded. We turned AVX2-optimization off because it is not cross-compatible with newer macs.
                     self.faiss_db = None
                     if signals is not None and signals.progress is not None:
                         msg = _('It appears that you have already used the AI features with this project before. '
@@ -585,6 +593,7 @@ want to continue?\
         # cancel all waiting threads:
         self.threadpool.clear()
         self.threadpool.waitForDone(5000)
+        self.import_workers_count = 0
         self.faiss_db = None
         self._is_closing = False
         

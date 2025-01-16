@@ -39,6 +39,7 @@ import time
 import getpass
 
 from PyQt6 import QtCore, QtGui, QtWidgets
+import qtawesome as qta
 
 from qualcoder.error_dlg import UncaughtHook
 from qualcoder.attributes import DialogManageAttributes
@@ -1304,7 +1305,7 @@ Click "Yes" to start now.')
         self.ui.actionSQL_statements.triggered.connect(self.report_sql)
         # AI menu
         self.ui.actionAI_Setup_wizard.triggered.connect(self.ai_setup_wizard)
-        self.ui.actionAI_Settings.triggered.connect(self.ai_settings)
+        self.ui.actionAI_Configuration.triggered.connect(self.ai_settings)
         self.ui.actionAI_Rebuild_internal_memory.triggered.connect(self.ai_rebuild_memory)
         self.ui.actionAI_Edit_Project_Memo.triggered.connect(self.project_memo)
         self.ui.actionAI_Prompts.triggered.connect(self.ai_prompts)
@@ -1325,6 +1326,15 @@ Click "Yes" to start now.')
         
         self.ui.tabWidget.setCurrentIndex(0)
         self.ai_chat()
+        # add tab widget icons
+        try:
+            self.ui.tabWidget.setTabIcon(0, qta.icon('mdi6.cog', color=self.app.highlight_color()))  # Action Log
+            self.ui.tabWidget.setTabIcon(1, qta.icon('mdi6.file-outline', color=self.app.highlight_color()))  # Manage
+            self.ui.tabWidget.setTabIcon(2, qta.icon('mdi6.tag-text-outline', color=self.app.highlight_color()))  # Coding
+            self.ui.tabWidget.setTabIcon(3, qta.icon('mdi6.format-list-group', color=self.app.highlight_color()))  # Reports
+            self.ui.tabWidget.setTabIcon(4, qta.icon('mdi6.message-processing-outline', color=self.app.highlight_color()))  # Ai Chat
+        except Exception as e:
+            logger.log(e)
         
     def fill_recent_projects_menu_actions(self):
         """ Get the recent projects from the .qualcoder txt file.
