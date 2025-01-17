@@ -6,16 +6,17 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-12-21 09:09+1100\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"PO-Revision-Date: 2025-01-18 09:42+1100\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.5\n"
 
 #: __main__.py:1182 __main__.py:1503
 msgid "Settings"
@@ -2305,7 +2306,7 @@ msgstr "Geändert"
 
 #: journals.py:230 journals.py:186
 msgid "jid"
-msgstr ""
+msgstr "jid"
 
 #: journals.py:253 journals.py:493 journals.py:508 journals.py:531
 #: journals.py:542 journals.py:698 journals.py:736 journals.py:209
@@ -5669,18 +5670,25 @@ msgid ""
 "starting the AI Setup Wizard from the AI menu in the main window. Click "
 "\"Yes\" to start now."
 msgstr ""
+"Willkommen\n"
+"\n"
+"Die neuen erweiterten KI-Funktionen in QualCoder erfordern einige "
+"zusätzliche Einstellungen. Möchten Sie die KI aktivieren und die Einrichtung "
+"starten? Sie können dies auch später tun, indem Sie den KI-Setup-Assistenten "
+"über das KI-Menü im Hauptfenster starten. Klicken Sie auf \"Ja\", um jetzt "
+"zu beginnen."
 
 #: __main__.py:1210
 msgid "AI Integration"
-msgstr ""
+msgstr "KI-Integration"
 
 #: __main__.py:1517
 msgid "AI integration is enabled"
-msgstr ""
+msgstr "KI-Integration ist aktiviert"
 
 #: __main__.py:1519
 msgid "AI integration is disabled"
-msgstr ""
+msgstr "Die KI-Integration ist deaktiviert"
 
 #: __main__.py:2205
 msgid ""
@@ -5694,107 +5702,133 @@ msgid ""
 "(Everything below this mark is a personal note and will never be sent to the "
 "AI.)"
 msgstr ""
+"**Forschungsthema, Fragen und Ziele:**\n"
+"\n"
+"**Methodik:**\n"
+"\n"
+"**Teilnehmer und erhobene Daten:**\n"
+"\n"
+"#####\n"
+"(Alles, was unter dieser Markierung steht, ist eine persönliche Notiz und "
+"wird niemals an die KI weitergeleitet)"
 
 #: __main__.py:2247
 msgid ""
 "An error occured while writing to the project folder. Please close the "
 "project and try to open it again."
 msgstr ""
+"Beim Schreiben in den Projektordner ist ein Fehler aufgetreten. Bitte "
+"schließen Sie das Projekt und versuchen Sie, es erneut zu öffnen."
 
 #: __main__.py:2249
 msgid "I/O Error"
-msgstr ""
+msgstr "E/A-Fehler"
 
 #: __main__.py:2250
 msgid "Close"
-msgstr ""
+msgstr "Schließen"
 
 #: __main__.py:2345
 msgid ""
 "QualCoder detected that the project was not properly closed the last time it "
 "was used by \""
 msgstr ""
+"QualCoder hat festgestellt, dass das Projekt nicht ordnungsgemäß geschlossen "
+"wurde, als es das letzte Mal von \""
 
 #: __main__.py:2347
 msgid ""
 "In most cases, you can still continue your work as usual. If you encounter "
 "any problems, search for a recent backup in the project folder."
 msgstr ""
+"In den meisten Fällen können Sie Ihre Arbeit wie gewohnt fortsetzen. Sollten "
+"Probleme auftreten, suchen Sie im Projektordner nach einer aktuellen "
+"Sicherung."
 
 #: __main__.py:2361
 msgid "Project cannot be opened since it's already in use by \""
 msgstr ""
+"Das Projekt kann nicht geöffnet werden, da es bereits von verwendet wird."
 
 #: __main__.py:2362
 msgid "\". Please retry later."
-msgstr ""
+msgstr "Bitte versuchen Sie es später erneut."
 
 #: __main__.py:2648
 msgid "QualCoder project missing folders. Created empty folders"
-msgstr ""
+msgstr "Im QualCoder-Projekt fehlen Ordner. Leere Ordner erstellt"
 
 #: __main__.py:2819
 msgid ""
 "The AI is setup and enabled, so there is nothing to do here. Go to AI > "
 "settings to change the current model or other settings."
 msgstr ""
+"Die künstliche Intelligenz ist eingerichtet und aktiviert, es gibt also "
+"nichts zu tun. Gehen Sie zu KI > Einstellungen, um das aktuelle Modell oder "
+"andere Einstellungen zu ändern."
 
 #: __main__.py:2821
 msgid "AI Setup Wizard"
-msgstr ""
+msgstr "KI-Einrichtungsassistent"
 
 #: __main__.py:2823
 msgid "AI: Setup Wizard"
-msgstr ""
+msgstr "KI-Einrichtungsassistent"
 
 #: __main__.py:2826
 msgid "AI: Setup Wizard finished"
-msgstr ""
+msgstr "KI: Setup-Assistent beendet"
 
 #: __main__.py:2835
 msgid "Please enable the AI first and set it in Settings."
 msgstr ""
+"Bitte aktivieren Sie zuerst die KI und stellen Sie sie in den Einstellungen "
+"ein."
 
 #: __main__.py:2836 __main__.py:2840 __main__.py:2845 __main__.py:2870
 msgid "Rebuild AI Memory"
-msgstr ""
+msgstr "KI-Speicher wiederherstellen"
 
 #: __main__.py:2839
 msgid "The AI is busy or not set up correctly."
-msgstr ""
+msgstr "Die KI ist beschäftigt oder nicht richtig eingestellt."
 
 #: __main__.py:2843
 msgid ""
 "This will re-read all of your empirical documents, which may take some time. "
 "Do you want to continue?"
 msgstr ""
+"Dadurch werden alle Ihre empirischen Dokumente erneut gelesen, was einige "
+"Zeit dauern kann. Möchten Sie fortfahren?"
 
 #: __main__.py:2861 __main__.py:2869
 msgid "Please enable the AI first and set it up in Settings."
 msgstr ""
+"Bitte aktivieren Sie zunächst die KI und richten Sie sie in Settings.uments "
+"ein, was einige Zeit dauern kann. Möchten Sie fortfahren?"
 
 #: __main__.py:2862
 msgid "Ai Chat"
-msgstr ""
+msgstr "KI Schwätzer"
 
 #: ai_chat.py:87
 msgid "<your question>"
-msgstr ""
+msgstr "<Ihre Frage>"
 
 #: ai_chat.py:268 ai_chat.py:283 ai_chat.py:305 ai_chat.py:413 ai_chat.py:534
 msgid "No project open."
-msgstr ""
+msgstr "Kein Projekt geöffnet."
 
 #: ai_chat.py:269 ai_chat.py:273 ai_chat.py:284 ai_chat.py:288 ai_chat.py:306
 #: ai_chat.py:310 ai_chat.py:414 ai_chat.py:418 ai_chat.py:535 ai_chat.py:539
 #: ai_chat.py:851
 msgid "AI not enabled"
-msgstr ""
+msgstr "KI nicht aktiviert"
 
 #: ai_chat.py:272 ai_chat.py:287 ai_chat.py:309 ai_chat.py:417 ai_chat.py:538
 #: ai_chat.py:850 code_text.py:4516
 msgid "The AI is disabled. Go to \"AI > Setup Wizard\" first."
-msgstr ""
+msgstr "Die KI ist deaktiviert. Gehen Sie zuerst zu \"KI > Setup Wizard“."
 
 #: ai_chat.py:291
 msgid ""
@@ -5802,20 +5836,26 @@ msgid ""
 " There you can open a document, select a piece of text, right click on it "
 "and choose \"AI Text Analysis\" from the context menu."
 msgstr ""
+"Wechseln Sie in den Arbeitsbereich für die Textkodierung.\n"
+" Dort können Sie ein Dokument öffnen, einen Textabschnitt markieren, mit der "
+"rechten Maustaste darauf klicken und aus dem Kontextmenü \"KI-Textanalyse“ "
+"wählen."
 
 #: ai_chat.py:294 code_text.py:1013
 msgid "AI Text Analysis"
-msgstr ""
+msgstr "KI Textanalyse"
 
 #: ai_chat.py:376
 msgid ""
 "No coded text found. Please select another code or category, or refine you "
 "filters."
 msgstr ""
+"Kein kodierter Text gefunden. Bitte wählen Sie einen anderen Code oder eine "
+"andere Kategorie, oder verfeinern Sie Ihre Filter."
 
 #: ai_chat.py:377
 msgid "AI code analysis"
-msgstr ""
+msgstr "KI Code Analyse"
 
 #: ai_chat.py:401 ai_chat.py:440
 msgid ""
@@ -5825,97 +5865,106 @@ msgid ""
 "information will accompany every prompt sent to the AI, resulting in much "
 "more targeted results."
 msgstr ""
+"Beachten Sie, dass es sehr empfehlenswert ist, das Projektmemo (Menü "
+"„Projekt > Projektmemo“) zu verwenden, um eine kurze Beschreibung der "
+"Forschungsthemen, Fragen, Ziele und der gesammelten empirischen Daten Ihres "
+"Projekts aufzunehmen. Diese Informationen werden jeder an das KI gesendeten "
+"Anfrage beigefügt, was zu sehr viel gezielteren Ergebnissen führt."
 
 #: ai_chat.py:446
 msgid "Searching for related data..."
-msgstr ""
+msgstr "Die Suche nach verwandten Daten..."
 
 #: ai_chat.py:473
 msgid "Chat has been canceled by the user."
-msgstr ""
+msgstr "Der Chat wurde vom Benutzer abgebrochen."
 
 #: ai_chat.py:477
 msgid "Sorry, the AI could could not find any data related to \""
-msgstr ""
+msgstr "Leider konnte die KI keine Daten zum Thema \""
 
 #: ai_chat.py:484
 msgid "Found "
-msgstr ""
+msgstr "Gefunden "
 
 #: ai_chat.py:484
 msgid ""
 " chunks of data which might be related to the topic. Analyzing the first "
 msgstr ""
+" Datenpakete, die mit dem Thema in Zusammenhang stehen könnten. Die Analyse "
+"der ersten "
 
 #: ai_chat.py:484
 msgid " chunks closer."
-msgstr ""
+msgstr " Brocken näher."
 
 #: ai_chat.py:547
 msgid ""
 "The text is too long to be analyzed in one go. Please select a shorter "
 "passage."
 msgstr ""
+"Der Text ist zu lang, um ihn in einem Zug zu analysieren. Bitte wählen Sie "
+"eine kürzere Passage."
 
 #: ai_chat.py:548
 msgid "AI text analysis"
-msgstr ""
+msgstr "KI Textanalyse"
 
 #: ai_chat.py:573
 msgid "Analyzing text from "
-msgstr ""
+msgstr "Analysieren von Texten aus "
 
 #: ai_chat.py:575
 msgid " characters)."
-msgstr ""
+msgstr " Zeichen)."
 
 #: ai_chat.py:590 ai_prompts.py:781
 msgid "Do you really want to delete "
-msgstr ""
+msgstr "Wollen Sie wirklich löschen "
 
 #: ai_chat.py:591
 msgid "Delete Chat"
-msgstr ""
+msgstr "Chat löschen"
 
 #: ai_chat.py:620
 msgid "Send your question to the AI"
-msgstr ""
+msgstr "Senden Sie Ihre Frage an die KI"
 
 #: ai_chat.py:626
 msgid "Cancel AI generation"
-msgstr ""
+msgstr "KI Erzeugung abbrechen"
 
 #: ai_chat.py:630
 msgid "AI: "
-msgstr ""
+msgstr "KI: "
 
 #: ai_chat.py:649 ai_chat.py:651
 msgid "Type:"
-msgstr ""
+msgstr "Art:"
 
 #: ai_chat.py:649 ai_chat.py:651
 msgid "Summary:"
-msgstr ""
+msgstr "Zusammenfassung:"
 
 #: ai_chat.py:649
 msgid "Prompt:"
-msgstr ""
+msgstr "Aufforderung:"
 
 #: ai_chat.py:659
 msgid "User"
-msgstr ""
+msgstr "Benutzer"
 
 #: ai_chat.py:667
 msgid "AI"
-msgstr ""
+msgstr "KI"
 
 #: ai_chat.py:671
 msgid "Info:"
-msgstr ""
+msgstr "Info:"
 
 #: ai_chat.py:722
 msgid "(unknown reference)"
-msgstr ""
+msgstr "(unbekannte Referenz)"
 
 #: ai_chat.py:758
 msgid "New topic analysis chat"
@@ -6743,8 +6792,8 @@ msgstr ""
 
 #: report_code_summary.py:323
 msgid ""
-"Word calculations: Words use alphabet characters and include the "
-"apostrophe.All other characters are word separators"
+"Word calculations: Words use alphabet characters and include the apostrophe."
+"All other characters are word separators"
 msgstr ""
 
 #: report_exact_matches.py:82
