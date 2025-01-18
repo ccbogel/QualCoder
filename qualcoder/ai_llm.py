@@ -174,13 +174,16 @@ class AiLLM():
                     return    
             elif api_key == 'None':
                 api_key = ''
+            temp = float(self.app.settings.get('ai_temperature', '1.0'))
+            top_p = float(self.app.settings.get('ai_top_p', '1.0'))
             if api_base.find('openai.azure.com') != -1:  # using Microsoft Azure
                 self.large_llm = AzureChatOpenAI(
                                     azure_endpoint=api_base,
                                     azure_deployment=large_model,    
                                     api_version="2024-02-15-preview",
                                     api_key=api_key,
-                                    temperature=0,
+                                    temperature=temp,
+                                    top_p=top_p,
                                     max_tokens=None,
                                     timeout=None,
                                     max_retries=2,
@@ -192,7 +195,8 @@ class AiLLM():
                                     azure_deployment=large_model,    
                                     api_version="2024-02-15-preview",
                                     api_key=api_key,
-                                    temperature=0,
+                                    temperature=temp,
+                                    top_p=top_p,
                                     max_tokens=None,
                                     timeout=None,
                                     max_retries=2,
@@ -204,14 +208,16 @@ class AiLLM():
                                     openai_api_key=api_key, 
                                     openai_api_base=api_base, 
                                     cache=False,
-                                    temperature=0.0,
+                                    temperature=temp,
+                                    top_p=top_p,
                                     streaming=True
                                     )
                 self.fast_llm = ChatOpenAI(model=fast_model, 
                                     openai_api_key=api_key, 
                                     openai_api_base=api_base, 
                                     cache=False,
-                                    temperature=0.0,
+                                    temperature=temp,
+                                    top_p=top_p,
                                     streaming=True
                                     )
             self.ai_streaming_output = ''
