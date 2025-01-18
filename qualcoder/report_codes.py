@@ -139,6 +139,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.textEdit.setReadOnly(True)
         self.ui.textEdit.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.textEdit.customContextMenuRequested.connect(self.text_edit_menu)
+        self.ui.pushButton_export_matrix.clicked.connect(self.export_matrix)
         self.ui.splitter.setSizes([100, 200, 0])
         try:
             s0 = int(self.app.settings['dialogreportcodes_splitter0'])
@@ -525,7 +526,9 @@ class DialogReportCodes(QtWidgets.QDialog):
                     tree_item.setSelected(True)
 
     def export_option_selected(self):
-        """ ComboBox export option selected. """
+        """ ComboBox export option selected.
+        Exporta main tex tedit results.
+        Separate action to export matrix results. """
 
         text_ = self.ui.comboBox_export.currentText()
         if text_ == "":
@@ -541,12 +544,6 @@ class DialogReportCodes(QtWidgets.QDialog):
         if text_ == "xlsx":
             self.export_xlsx_file()
         self.ui.comboBox_export.setCurrentIndex(0)
-        if self.te:
-            reply = QtWidgets.QMessageBox.question(self, _("Export Matrix"), _("Export matrix results"),
-                                                   QtWidgets.QMessageBox.StandardButton.Yes,
-                                                   QtWidgets.QMessageBox.StandardButton.No)
-            if reply == QtWidgets.QMessageBox.StandardButton.Yes:
-                self.export_matrix()
 
     def export_matrix(self):
         """ Export matrix as xlsx spreadsheet. """
@@ -554,6 +551,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         row_count = self.ui.tableWidget.rowCount()
         col_count = self.ui.tableWidget.columnCount()
         if row_count == 0 or col_count == 0:
+            Message(self.app, _("No matrix"), _("No matrix results to export")).exec()
             return
         filename = "Report_matrix.xlsx"
         exp_dlg = ExportDirectoryPathDialog(self.app, filename)

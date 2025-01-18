@@ -193,7 +193,7 @@
      <widget class="QComboBox" name="comboBox_matrix">
       <property name="geometry">
        <rect>
-        <x>617</x>
+        <x>610</x>
         <y>25</y>
         <width>281</width>
         <height>29</height>
@@ -374,7 +374,7 @@
        </property>
       </item>
      </widget>
-     <widget class="QLabel" name="label_search_export">
+     <widget class="QLabel" name="label_export">
       <property name="geometry">
        <rect>
         <x>730</x>
@@ -407,6 +407,19 @@
       </property>
       <property name="text">
        <string>Variables CSV / XLSX</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_export_matrix">
+      <property name="geometry">
+       <rect>
+        <x>892</x>
+        <y>23</y>
+        <width>151</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Export matrix</string>
       </property>
      </widget>
     </widget>
