@@ -740,6 +740,14 @@ left join code_name on code_name.cid = code_text.cid where code_text.memo != "" 
 -- TO DISPLAY CODING FOR SELECTED CODE OR FILE, UNCOMMENT THE FOLLOWING:\n\
 -- AND code_name.name = "CODE NAME"  -- TO SELECT SPECIFIC CODE\n\
 -- AND source.name = "FILE NAME" -- TO SELECT SPECIFIC FILE',
+               '-- ALL OR SELECTED CATEGORY MEMOS\n\
+select code_cat.memo as "Category memo", code_cat.catid as "Cat ID", code_cat.name as "Name", \n\
+code_cat.owner as "Coder name", code_cat.date as "Date" from  code_cat \n\n\
+-- TO FILTER UNCOMMENT THE FOLLOWING:\n\
+-- MUST HAVE "where" TO START THIS SECTION\n\
+-- where \n\
+--- code_cat.name = "abilities"  -- TO SELECT SPECIFIC CATEGORY\n\
+-- AND code_cat.memo  like "%filter words for memo text%" -- TO SELECT MEMOS CONTAINING SPECIFIED TEXT',
 
                '-- FILES THAT ARE NOT CODED with code id 1\n\
 select source.name from source where source.id not in\n\
