@@ -147,7 +147,11 @@ class DialogSettings(QtWidgets.QDialog):
         self.ai_model_changed()
         self.ai_enable_state_changed()
         self.ui.lineEdit_ai_api_key.textChanged.connect(self.ai_api_key_changed)
-        self.ui.checkBox_ai_project_memo.setChecked(self.settings.get('ai_send_project_memo', 'True') == 'True')
+        self.ui.checkBox_ai_project_memo.setChecked(self.settings.get('ai_send_project_memo', 'True') == 'True')        
+        self.ui.doubleSpinBox_ai_temperature.setValue(float(self.settings.get('ai_temperature', '1.0')))
+        self.ui.doubleSpinBox_top_p.setValue(float(self.settings.get('ai_top_k', '1.0')))        
+        
+        # Move to AI settings if requested
         if section is not None and section == 'AI':
             self.ui.scrollArea.verticalScrollBar().setValue(self.ui.scrollArea.verticalScrollBar().maximum())
             # Use QTimers to briefly flash a yellow border around the AI settings
@@ -173,6 +177,8 @@ class DialogSettings(QtWidgets.QDialog):
         self.ui.label_ai_access_info_url.setEnabled(self.ui.checkBox_AI_enable.isChecked())
         self.ui.lineEdit_ai_api_key.setEnabled(self.ui.checkBox_AI_enable.isChecked())
         self.ui.checkBox_ai_project_memo.setEnabled(self.ui.checkBox_AI_enable.isChecked())
+        self.ui.doubleSpinBox_ai_temperature.setEnabled(self.ui.checkBox_AI_enable.isChecked())
+        self.ui.doubleSpinBox_top_p.setEnabled(self.ui.checkBox_AI_enable.isChecked())  
     
     def ai_model_changed(self):
         ai_model_index = self.ui.comboBox_ai_model.currentIndex()
@@ -282,6 +288,8 @@ class DialogSettings(QtWidgets.QDialog):
             self.settings['ai_send_project_memo'] = 'True'
         else: 
             self.settings['ai_send_project_memo'] = 'False'
+        self.settings['ai_temperature'] = str(self.ui.doubleSpinBox_ai_temperature.value())
+        self.settings['ai_top_k'] = str(self.ui.doubleSpinBox_top_p.value())
         self.save_settings()
         if restart_qualcoder:
             Message(self.app, _("Restart QualCoder"), _("Restart QualCoder to enact some changes")).exec()

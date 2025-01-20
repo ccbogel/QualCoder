@@ -20,6 +20,7 @@ https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 """
 
+import multiprocessing
 import base64
 import configparser
 import datetime
@@ -3048,4 +3049,6 @@ def install_droid_sans_mono():
 
 
 if __name__ == "__main__":
+     # Pyinstaller fix
+    multiprocessing.freeze_support()
     gui()
