@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-12-21 09:09+1100\n"
-"PO-Revision-Date: 2025-01-20 08:09+1100\n"
+"PO-Revision-Date: 2025-01-21 07:48+1100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: de\n"
@@ -1609,8 +1609,6 @@ msgid "Important"
 msgstr "Wichtig"
 
 #: code_pdf.py:3118 code_pdf.py:2820
-#, fuzzy
-#| msgid "Code memo: "
 msgid "Code memo"
 msgstr "Code-Memo: "
 
@@ -6841,7 +6839,7 @@ msgstr "Referenz bearbeiten"
 
 #: report_codes.py:750
 msgid "And file and case variables"
-msgstr ""
+msgstr "Und Datei- und Fallvariablen"
 
 #: report_codes.py:932
 msgid "error "
@@ -6865,7 +6863,7 @@ msgstr "Attribute:"
 
 #: report_codes.py:1726 report_codes.py:1788 report_codes.py:1863
 msgid "Count:"
-msgstr ""
+msgstr "Anzahl:"
 
 #: report_codes.py:1727 report_codes.py:1789 report_codes.py:1865
 msgid "Percent of file:"
@@ -6877,15 +6875,15 @@ msgstr "Code ändern in"
 
 #: report_codes.py:2338
 msgid "Delete coded section."
-msgstr ""
+msgstr "Codierten Abschnitt löschen."
 
 #: report_codes.py:2454
 msgid "FILE MEMO:"
-msgstr ""
+msgstr "DATEI MEMO:"
 
 #: report_codes.py:2462
 msgid "CASE MEMO:"
-msgstr ""
+msgstr "CASE MEMO:"
 
 #: report_code_summary.py:323
 msgid ""
@@ -6904,7 +6902,7 @@ msgstr ""
 
 #: report_exact_matches.py:172
 msgid "No file has been selected."
-msgstr ""
+msgstr "Es wurde keine Datei ausgewählt."
 
 #: report_exact_matches.py:173
 msgid "No file"
@@ -6912,7 +6910,7 @@ msgstr "Keine Datei"
 
 #: report_exact_matches.py:194
 msgid "Only one code has been selected."
-msgstr ""
+msgstr "Es wurde nur ein Code ausgewählt."
 
 #: report_exact_matches.py:195
 msgid "One code selected"
@@ -6924,11 +6922,11 @@ msgstr "ALLE ausgewählten Codes müssen sich genau überschneiden."
 
 #: report_exact_matches.py:407
 msgid "code name"
-msgstr ""
+msgstr "codename"
 
 #: report_exact_matches.py:407
 msgid "text"
-msgstr ""
+msgstr "Text"
 
 #: report_exact_matches.py:407
 msgid "Coded memo"
@@ -6936,7 +6934,7 @@ msgstr "Codiertes Memo"
 
 #: report_exact_matches.py:407
 msgid "File name"
-msgstr ""
+msgstr "Dateiname"
 
 #: report_exact_matches.py:487
 msgid "Report of exact matches for text codings for file"
@@ -6944,39 +6942,39 @@ msgstr "Bericht über exakte Übereinstimmungen bei Textkodierungen für Datei"
 
 #: report_exact_matches.py:582
 msgid "Clear all"
-msgstr ""
+msgstr "Alle löschen"
 
 #: report_exact_matches.py:585
 msgid "Exclude code"
-msgstr ""
+msgstr "Code ausschließen"
 
 #: reports.py:65
 msgid "Export Excel file"
-msgstr ""
+msgstr "Excel-Datei exportieren"
 
 #: reports.py:309
 msgid "Coding frequencies exported to: "
-msgstr ""
+msgstr "Kodierungsfrequenzen, die exportiert werden:"
 
 #: reports.py:310
 msgid "File export"
-msgstr ""
+msgstr "Datei Export"
 
 #: report_sql.py:138 report_sql.py:190
 msgid "No select query"
-msgstr ""
+msgstr "Keine Select-Abfrage"
 
 #: report_sql.py:138 report_sql.py:190
 msgid "No data to export"
-msgstr ""
+msgstr "Keine Daten zu exportieren"
 
 #: report_sql.py:179
 msgid "Results exported: "
-msgstr ""
+msgstr "Exportierte Ergebnisse: "
 
 #: report_sql.py:180
 msgid "Results exported"
-msgstr ""
+msgstr "Exportierte Ergebnisse"
 
 #: settings.py:274
 msgid "Please select an AI model or disable the AI altogether."
@@ -6984,7 +6982,7 @@ msgstr "Bitte wählen Sie ein KI-Modell oder deaktivieren Sie die KI ganz."
 
 #: settings.py:275 settings.py:279
 msgid "AI model"
-msgstr ""
+msgstr "KI Modell:"
 
 #: settings.py:278
 msgid ""
@@ -6998,51 +6996,51 @@ msgstr ""
 
 #: view_av.py:258 view_av.py:3922
 msgid "QualCoder will crash"
-msgstr ""
+msgstr "QualCoder wird abstürzen"
 
 #: view_av.py:3057
 msgid "Important mark"
-msgstr ""
+msgstr "Wichtiges Zeichen"
 
 #: view_av.py:3058
 msgid "Edit start position"
-msgstr ""
+msgstr "Startposition bearbeiten"
 
 #: view_av.py:3059
 msgid "Edit end position"
-msgstr ""
+msgstr "Endposition bearbeiten"
 
 #: view_av.py:3383
 msgid "Segment menu"
-msgstr ""
+msgstr "Segment-Menü"
 
 #: view_charts.py:146
 msgid "Word cloud made from coded text segments"
-msgstr ""
+msgstr "Wortwolke aus kodierten Textsegmenten"
 
 #: view_image.py:1189
 msgid "Highlight this area - gray"
-msgstr ""
+msgstr "Diesen Bereich hervorheben - grau"
 
 #: view_image.py:1190
 msgid "Highlight this area - solarize"
-msgstr ""
+msgstr "Diesen Bereich hervorheben - solarisieren"
 
 #: view_image.py:1191
 msgid "Highlight this area - blur"
-msgstr ""
+msgstr "Diesen Bereich markieren - verwischen"
 
 #: view_image.py:1192
 msgid "Highlight this code - gray"
-msgstr ""
+msgstr "Diesen Code hervorheben - grau"
 
 #: view_image.py:1193
 msgid "Highlight this code - solarize"
-msgstr ""
+msgstr "Diesen Code hervorheben - solarisieren"
 
 #: view_image.py:1194
 msgid "Highlight this code - blur"
-msgstr ""
+msgstr "Diesen Code hervorheben - verwischen"
 
 #: code_organiser.py:102
 msgid ""
@@ -7056,3 +7054,15 @@ msgid ""
 "Potential for unexpected errors could occur.\n"
 "THERE IS NO UNDO OPTION AFTER APPLYING CHANGES WITH THE APPLY BUTTON."
 msgstr ""
+"SICHERN Sie Ihr Projekt, bevor Sie Änderungen am Codebaum vornehmen.\n"
+"Der Code-Organisator wird vor allem bei der Grounded Theory verwendet, um "
+"Ihnen bei der Entwicklung und Organisation der Kodierungskonzepte und ihrer "
+"Hierarchie zu helfen.\n"
+"Wählen Sie einen Codezweig oder Alle und klicken Sie dann mit der rechten "
+"Maustaste, um:\n"
+"Kategorien hinzufügen, Codes und Kategorien umbenennen, Memos aktualisieren, "
+"Codes zusammenführen, Kategorien zusammenführen, Kategorien löschen.\n"
+"\n"
+"Es kann zu unerwarteten Fehlern kommen.\n"
+"ES GIBT KEINE MÖGLICHKEIT, ÄNDERUNGEN RÜCKGÄNGIG ZU MACHEN, NACHDEM SIE ÜBER "
+"DIE SCHALTFLÄCHE „ANWENDEN“ VORGENOMMEN WURDEN."
