@@ -885,20 +885,20 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.setDefaultTextColor(QtGui.QColor(TextColor(self.code_or_cat['color']).recommendation))
         self.setFont(QtGui.QFont(self.settings['font'], 9, QtGui.QFont.Weight.Normal))
         self.setToolTip(self.code_or_cat['memo'])
+        self.text = self.code_or_cat['name']
+        if self.app.settings['showids']:
+            self.text += "\n"
+            if self.code_or_cat['cid'] is not None:
+                self.text += f"catid[{self.code_or_cat['catid']}] cid[{self.code_or_cat['cid']}]"
+            if self.code_or_cat['cid'] is None:
+                self.text += f"catid[{self.code_or_cat['catid']}]"
+                self.text += f" supercatid[{self.code_or_cat['supercatid']}]"
         self.set_text()
 
     def set_text(self):
         """ Set viewable text """
 
-        text_ = self.code_or_cat['name']
-        if self.app.settings['showids']:
-            text_ += "\n"
-            if self.code_or_cat['cid'] is not None:
-                text_ += f"catid[{self.code_or_cat['catid']}] cid[{self.code_or_cat['cid']}]"
-            if self.code_or_cat['cid'] is None:
-                text_ += f"catid[{self.code_or_cat['catid']}]"
-                text_ += f" supercatid[{self.code_or_cat['supercatid']}]"
-        self.setPlainText(text_)
+        self.setPlainText(self.text)
 
     def paint(self, painter, option, widget):
         """  """
@@ -927,6 +927,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         link_category_under_category_action = None
         merge_category_into_category_action = None
         remove_category_from_category_action = None
+        show_memo_action = None
         if self.code_or_cat['cid'] is not None:
             link_code_to_category_action = menu.addAction(_('Link code to category'))
             merge_code_into_code_action = menu.addAction(_('Merge code into code'))
@@ -941,9 +942,22 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
                 remove_category_from_category_action = menu.addAction(_('Remove category from category'))
         memo_action = menu.addAction(_('Memo'))
         rename_action = menu.addAction(_('Rename'))
+        if self.code_or_cat['memo'] != "":
+            show_memo_action = menu.addAction(_("Display memo"))
         action = menu.exec(QtGui.QCursor.pos())
         if action is None:
             return
+        if action == show_memo_action:
+            self.text = self.code_or_cat['name']
+            if self.app.settings['showids']:
+                self.text += "\n"
+                if self.code_or_cat['cid'] is not None:
+                    self.text += f"catid[{self.code_or_cat['catid']}] cid[{self.code_or_cat['cid']}]"
+                if self.code_or_cat['cid'] is None:
+                    self.text += f"catid[{self.code_or_cat['catid']}]"
+                    self.text += f" supercatid[{self.code_or_cat['supercatid']}]"
+            self.text += f"\nMEMO: {self.code_or_cat['memo']}"
+            self.set_text()
         if action == memo_action:
             self.update_memo()
         if action == rename_action:
