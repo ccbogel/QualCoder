@@ -5670,8 +5670,8 @@ msgid ""
 msgstr ""
 "Willkommen\n"
 "\n"
-"Die neuen erweiterten KI-Funktionen in QualCoder erfordern einige "
-"zusätzliche Einstellungen. Möchten Sie die KI aktivieren und die Einrichtung "
+"Die neuen KI-Funktionen in QualCoder erfordern "
+"zusätzliche Einstellungen. Möchten Sie die KI-Integration aktivieren und die Einrichtung "
 "starten? Sie können dies auch später tun, indem Sie den KI-Setup-Assistenten "
 "über das KI-Menü im Hauptfenster starten. Klicken Sie auf \"Ja\", um jetzt "
 "zu beginnen."
@@ -5686,7 +5686,7 @@ msgstr "KI-Integration ist aktiviert"
 
 #: __main__.py:1519
 msgid "AI integration is disabled"
-msgstr "Die KI-Integration ist deaktiviert"
+msgstr "KI-Integration ist deaktiviert"
 
 #: __main__.py:2205
 msgid ""
@@ -5702,13 +5702,13 @@ msgid ""
 msgstr ""
 "**Forschungsthema, Fragen und Ziele:**\n"
 "\n"
-"**Methodik:**\n"
+"**Methode:**\n"
 "\n"
 "**Teilnehmer und erhobene Daten:**\n"
 "\n"
 "#####\n"
-"(Alles, was unter dieser Markierung steht, ist eine persönliche Notiz und "
-"wird niemals an die KI weitergeleitet)"
+"(Alles, was unterhalb dieser Markierung steht, ist eine persönliche Notiz und "
+"wird nie an die KI weitergeleitet)"
 
 #: __main__.py:2247
 msgid ""
@@ -5732,7 +5732,7 @@ msgid ""
 "was used by \""
 msgstr ""
 "QualCoder hat festgestellt, dass das Projekt nicht ordnungsgemäß geschlossen "
-"wurde, als es das letzte Mal von \""
+"wurde, als es das letzte Mal genutzt wurde von \""
 
 #: __main__.py:2347
 msgid ""
@@ -5746,11 +5746,11 @@ msgstr ""
 #: __main__.py:2361
 msgid "Project cannot be opened since it's already in use by \""
 msgstr ""
-"Das Projekt kann nicht geöffnet werden, da es bereits von verwendet wird."
+"Das Projekt kann nicht geöffnet werden, da es bereits von verwendet wird von "
 
 #: __main__.py:2362
 msgid "\". Please retry later."
-msgstr "Bitte versuchen Sie es später erneut."
+msgstr ". Bitte versuchen Sie es später erneut."
 
 #: __main__.py:2648
 msgid "QualCoder project missing folders. Created empty folders"
@@ -5761,8 +5761,8 @@ msgid ""
 "The AI is setup and enabled, so there is nothing to do here. Go to AI > "
 "settings to change the current model or other settings."
 msgstr ""
-"Die künstliche Intelligenz ist eingerichtet und aktiviert, es gibt also "
-"nichts zu tun. Gehen Sie zu KI > Einstellungen, um das aktuelle Modell oder "
+"Die KI-Integration ist eingerichtet und aktiviert, es gibt "
+"nichts weiter zu tun. Gehen Sie zu KI > Einstellungen, um das aktuelle Modell oder "
 "andere Einstellungen zu ändern."
 
 #: __main__.py:2821
@@ -5771,43 +5771,41 @@ msgstr "KI-Einrichtungsassistent"
 
 #: __main__.py:2823
 msgid "AI: Setup Wizard"
-msgstr "KI-Einrichtungsassistent"
+msgstr "KI: Einrichtungsassistent"
 
 #: __main__.py:2826
 msgid "AI: Setup Wizard finished"
-msgstr "KI: Setup-Assistent beendet"
+msgstr "KI: Einrichtungsassistent beendet"
 
 #: __main__.py:2835
 msgid "Please enable the AI first and set it in Settings."
 msgstr ""
-"Bitte aktivieren Sie zuerst die KI und stellen Sie sie in den Einstellungen "
-"ein."
+"Bitte aktivieren und konfigurieren Sie die KI-Integration in den Einstellungen."
 
 #: __main__.py:2836 __main__.py:2840 __main__.py:2845 __main__.py:2870
 msgid "Rebuild AI Memory"
-msgstr "KI-Speicher wiederherstellen"
+msgstr "Lokalen KI-Speicher wiederherstellen"
 
 #: __main__.py:2839
 msgid "The AI is busy or not set up correctly."
-msgstr "Die KI ist beschäftigt oder nicht richtig eingestellt."
+msgstr "Die KI ist beschäftigt oder nicht richtig konfiguriert."
 
 #: __main__.py:2843
 msgid ""
 "This will re-read all of your empirical documents, which may take some time. "
 "Do you want to continue?"
 msgstr ""
-"Dadurch werden alle Ihre empirischen Dokumente erneut gelesen, was einige "
+"Dadurch werden alle Ihre empirischen Dokumente erneut von der KI eingelesen, was einige "
 "Zeit dauern kann. Möchten Sie fortfahren?"
 
 #: __main__.py:2861 __main__.py:2869
 msgid "Please enable the AI first and set it up in Settings."
 msgstr ""
-"Bitte aktivieren Sie zunächst die KI und richten Sie sie in Settings.uments "
-"ein, was einige Zeit dauern kann. Möchten Sie fortfahren?"
+"Bitte aktivieren und konfigurieren Sie die KI-Integration in den Einstellungen."
 
 #: __main__.py:2862
 msgid "Ai Chat"
-msgstr "KI Schwätzer"
+msgstr "KI Chat"
 
 #: ai_chat.py:87
 msgid "<your question>"
@@ -5826,7 +5824,7 @@ msgstr "KI nicht aktiviert"
 #: ai_chat.py:272 ai_chat.py:287 ai_chat.py:309 ai_chat.py:417 ai_chat.py:538
 #: ai_chat.py:850 code_text.py:4516
 msgid "The AI is disabled. Go to \"AI > Setup Wizard\" first."
-msgstr "Die KI ist deaktiviert. Gehen Sie zuerst zu \"KI > Setup Wizard“."
+msgstr "Die KI ist deaktiviert. Gehen Sie zuerst zu \"KI > Einrichtungsassistent“."
 
 #: ai_chat.py:291
 msgid ""
@@ -5834,7 +5832,7 @@ msgid ""
 " There you can open a document, select a piece of text, right click on it "
 "and choose \"AI Text Analysis\" from the context menu."
 msgstr ""
-"Wechseln Sie in den Arbeitsbereich für die Textkodierung.\n"
+"QualCoder wird in den Arbeitsbereich für die Textkodierung wechseln.\n"
 " Dort können Sie ein Dokument öffnen, einen Textabschnitt markieren, mit der "
 "rechten Maustaste darauf klicken und aus dem Kontextmenü \"KI-Textanalyse“ "
 "wählen."
@@ -5849,7 +5847,7 @@ msgid ""
 "filters."
 msgstr ""
 "Kein kodierter Text gefunden. Bitte wählen Sie einen anderen Code oder eine "
-"andere Kategorie, oder verfeinern Sie Ihre Filter."
+"andere Kategorie, oder passen Sie Ihre Filter an."
 
 #: ai_chat.py:377
 msgid "AI code analysis"
@@ -5863,15 +5861,15 @@ msgid ""
 "information will accompany every prompt sent to the AI, resulting in much "
 "more targeted results."
 msgstr ""
-"Beachten Sie, dass es sehr empfehlenswert ist, das Projektmemo (Menü "
-"„Projekt > Projektmemo“) zu verwenden, um eine kurze Beschreibung der "
-"Forschungsthemen, Fragen, Ziele und der gesammelten empirischen Daten Ihres "
-"Projekts aufzunehmen. Diese Informationen werden jeder an das KI gesendeten "
-"Anfrage beigefügt, was zu sehr viel gezielteren Ergebnissen führt."
+"Achtung: Es ist ratsam, ein Projektmemo (Menü "
+"„Projekt > Projektmemo“) anzulegen mit einer kurzen Beschreibung des "
+"Forschungsthemas, der Fragen, Ziele und empirischen Daten Ihres "
+"Projekts. Diese Informationen werden mit jeder Anfrage an die KI gesendet, "
+"was zu sehr viel zielgerichteteren Ergebnissen führt."
 
 #: ai_chat.py:446
 msgid "Searching for related data..."
-msgstr "Die Suche nach verwandten Daten..."
+msgstr "Die Suche nach relevanten Daten..."
 
 #: ai_chat.py:473
 msgid "Chat has been canceled by the user."
@@ -5879,22 +5877,22 @@ msgstr "Der Chat wurde vom Benutzer abgebrochen."
 
 #: ai_chat.py:477
 msgid "Sorry, the AI could could not find any data related to \""
-msgstr "Leider konnte die KI keine Daten zum Thema \""
+msgstr "Leider konnte die KI keine Daten finden zum Thema \""
 
 #: ai_chat.py:484
 msgid "Found "
-msgstr "Gefunden "
+msgstr ""
 
 #: ai_chat.py:484
 msgid ""
 " chunks of data which might be related to the topic. Analyzing the first "
 msgstr ""
-" Datenpakete, die mit dem Thema in Zusammenhang stehen könnten. Die Analyse "
-"der ersten "
+" Datenfragmente gefunden, die mit dem Thema in Zusammenhang stehen könnten. "
+"Die ersten "
 
 #: ai_chat.py:484
 msgid " chunks closer."
-msgstr " Brocken näher."
+msgstr "Fragemente werden nun genauer analysiert."
 
 #: ai_chat.py:547
 msgid ""
@@ -5910,7 +5908,7 @@ msgstr "KI Textanalyse"
 
 #: ai_chat.py:573
 msgid "Analyzing text from "
-msgstr "Analysieren von Texten aus "
+msgstr "Analysieren Text aus "
 
 #: ai_chat.py:575
 msgid " characters)."
@@ -5926,7 +5924,7 @@ msgstr "Chat löschen"
 
 #: ai_chat.py:620
 msgid "Send your question to the AI"
-msgstr "Senden Sie Ihre Frage an die KI"
+msgstr "Senden Sie Ihre Anfrage an die KI"
 
 #: ai_chat.py:626
 msgid "Cancel AI generation"
@@ -5938,7 +5936,7 @@ msgstr "KI: "
 
 #: ai_chat.py:649 ai_chat.py:651
 msgid "Type:"
-msgstr "Art:"
+msgstr "Typ:"
 
 #: ai_chat.py:649 ai_chat.py:651
 msgid "Summary:"
@@ -5946,7 +5944,7 @@ msgstr "Zusammenfassung:"
 
 #: ai_chat.py:649
 msgid "Prompt:"
-msgstr "Aufforderung:"
+msgstr "Prompt:"
 
 #: ai_chat.py:659
 msgid "User"
@@ -5966,11 +5964,11 @@ msgstr "(unbekannte Referenz)"
 
 #: ai_chat.py:758
 msgid "New topic analysis chat"
-msgstr "Neuer Themenanalyse-Chat"
+msgstr "Neue thematischer Chat"
 
 #: ai_chat.py:760
 msgid "Analyzing a free-search topic together with the AI."
-msgstr "Analyse eines Themas der freien Suche zusammen mit der KI."
+msgstr "Analyse eines frei gewählten Themas zusammen mit der KI."
 
 #: ai_chat.py:761
 msgid "New text analysis chat"
@@ -5979,11 +5977,11 @@ msgstr "Neuer Textanalyse-Chat"
 #: ai_chat.py:763
 msgid "Analyse a piece of text from your empirical data together with the AI."
 msgstr ""
-"Analysieren Sie gemeinsam mit der KI einen Text aus Ihren empirischen Daten."
+"Analysieren Sie gemeinsam mit der KI eine Textpassage aus Ihren empirischen Daten."
 
 #: ai_chat.py:764
 msgid "New code analysis chat"
-msgstr "Neuer Chat zur Codeanalyse"
+msgstr "Neuer Codeanalyse Chat"
 
 #: ai_chat.py:766
 msgid "Analyze the data collected under a certain code together with the AI."
@@ -5997,7 +5995,7 @@ msgstr "Neuer allgemeiner Chat"
 
 #: ai_chat.py:769
 msgid "Ask the AI anything, not related to your data."
-msgstr "Fragen Sie die KI alles, was nicht mit Ihren Daten zu tun hat."
+msgstr "Stellen Sie der KI eine beliebige Frage, ohne direkten Bezug zu Ihren Daten."
 
 #: ai_chat.py:854
 msgid ""
@@ -6005,20 +6003,20 @@ msgid ""
 "stop."
 msgstr ""
 "Die KI ist damit beschäftigt, eine Antwort zu erzeugen. Klicken Sie auf die "
-"Schaltfläche rechts, um anzuhalten."
+"Schaltfläche rechts, um den Prozess abzubrechen."
 
 #: ai_chat.py:855
 msgid "AI busy"
-msgstr "KI beschäftigt"
+msgstr "KI ist beschäftigt"
 
 #: ai_chat.py:858
 msgid "The AI not yet fully loaded. Please wait and retry."
 msgstr ""
-"Die KI ist noch nicht vollständig geladen. Bitte warten und erneut versuchen."
+"Die KI ist noch nicht vollständig geladen. Bitte versuchen Sie es später erneut."
 
 #: ai_chat.py:859 ai_search_dialog.py:447
 msgid "AI not ready"
-msgstr "KI nicht bereit"
+msgstr "KI noch nicht bereit"
 
 #: ai_chat.py:877
 msgid "Please select a chat or create a new one."
@@ -6033,8 +6031,8 @@ msgid ""
 "Error: The AI returned an empty result. This may indicate that the AI model "
 "is not available at the moment. Try again later or choose a different model."
 msgstr ""
-"Fehler: Die KI hat ein leeres Ergebnis geliefert. Dies kann darauf "
-"hinweisen, dass das KI-Modell im Moment nicht verfügbar ist. Versuchen Sie "
+"Fehler: Die KI hat ein leeres Ergebnis geliefert. Möglicherweise "
+"ist das KI-Modell im Moment nicht verfügbar. Versuchen Sie "
 "es später erneut oder wählen Sie ein anderes Modell."
 
 #: ai_chat.py:990
@@ -6051,11 +6049,11 @@ msgstr "Fehler beim Abrufen des Quelltextes"
 
 #: ai_chat.py:1092 ai_chat.py:1112
 msgid "AI Chat"
-msgstr "KI Schwätzer"
+msgstr "KI Chat"
 
 #: ai_llm.py:132
 msgid "AI: Starting up..."
-msgstr "KI: Anfahren..."
+msgstr "KI: Start..."
 
 #: ai_llm.py:139
 msgid "AI: Please set up the AI model"
@@ -6070,8 +6068,8 @@ msgid ""
 "Please enter an API-key for the AI in the following dialog (or \"None\" if "
 "not API-key is needed)."
 msgstr ""
-"Bitte geben Sie im folgenden Dialog einen API-Schlüssel für das KI ein (oder "
-"\"Keine\", wenn kein API-Schlüssel benötigt wird)."
+"Bitte geben Sie im folgenden Dialog einen API-Schlüssel für die KI ein (oder "
+"\"None\", wenn kein API-Schlüssel benötigt wird)."
 
 #: ai_llm.py:162
 msgid "AI API-key"
@@ -6079,7 +6077,7 @@ msgstr "KI API-Schlüssel"
 
 #: ai_llm.py:168
 msgid "AI: No API key set, AI is disabled."
-msgstr "KI: Kein API-Schlüssel gesetzt, KI ist deaktiviert."
+msgstr "KI: Kein API-Schlüssel eingegeben, KI ist deaktiviert."
 
 #: ai_llm.py:225
 msgid "AI: Ready"
@@ -6099,14 +6097,14 @@ msgstr "KI generate_code_descriptions\n"
 
 #: ai_llm.py:433
 msgid "Prompt:\n"
-msgstr "Aufforderung:\n"
+msgstr "Prompt:\n"
 
 #: ai_llm.py:463
 msgid ""
 "Stage 1:\n"
 "Searching data related to \""
 msgstr ""
-"Stufe 1:\n"
+"Schritt 1:\n"
 "Suche nach Daten zum Thema \""
 
 #: ai_llm.py:540
@@ -6114,8 +6112,8 @@ msgid ""
 "Stage 2:\n"
 "Inspecting the data more closely..."
 msgstr ""
-"Stufe 2:\n"
-"Genauere Betrachtung der Daten..."
+"Schritt 2:\n"
+"Genauere Analyse der Daten..."
 
 #: ai_prompts.py:341
 msgid ""
@@ -6124,10 +6122,10 @@ msgid ""
 "whether a chunk of empirical data is related to a given code/search string "
 "or not."
 msgstr ""
-"Diese Eingabeaufforderungen werden bei der KI-Suche verwendet. Sie weisen "
-"die KI an, wie sie entscheiden soll\n"
-"ob ein Stück empirischer Daten mit einem bestimmten Code/Suchstring in "
-"Verbindung steht oder nicht."
+"Diese Prompts werden bei der KI-Suche verwendet. Sie definieren, "
+"wie die KI entscheiden soll,\n"
+"ob ein empirisches Datenfragment relevant ist für einen Code/ein Thema "
+"oder nicht."
 
 #: ai_prompts.py:343
 msgid ""
@@ -6142,7 +6140,7 @@ msgid ""
 "These prompts are used in the chat to analyse the results of a free search "
 "exploring a certain topic."
 msgstr ""
-"Diese Eingabeaufforderungen werden im Chat verwendet, um die Ergebnisse "
+"Diese Prompts werden im Chat verwendet, um die Ergebnisse "
 "einer freien Suche zu einem bestimmten Thema zu analysieren."
 
 #: ai_prompts.py:345
@@ -6150,25 +6148,25 @@ msgid ""
 "These prompts are used in the chat to analyze a section of text from a "
 "single empirical document."
 msgstr ""
-"Diese Eingabeaufforderungen werden im Chat verwendet, um einen Textabschnitt "
-"aus einem einzigen empirischen Dokument zu analysieren."
+"Diese Promtps werden im Chat verwendet, um ein Textpassage "
+"aus einem einzelnen empirischen Dokument zu analysieren."
 
 #: ai_prompts.py:355
 msgid ""
 "System prompts are the defaults defined in the source code of QualCoder. "
 "They cannot be changed by the user."
 msgstr ""
-"Systemaufforderungen sind die im Quellcode von QualCoder definierten "
-"Standardwerte. Sie können vom Benutzer nicht geändert werden."
+"System Prompts sind fest vorgegeben "
+"und können vom Benutzer nicht geändert werden."
 
 #: ai_prompts.py:356
 msgid ""
 "User prompts are defined by you on the level of your particular instance of "
 "QualCoder. They are available in every project that you open on your machine."
 msgstr ""
-"Die Benutzerführung wird von Ihnen auf der Ebene Ihrer speziellen Instanz "
-"von QualCoder definiert. Sie sind in jedem Projekt verfügbar, das Sie auf "
-"Ihrem Rechner öffnen."
+"User Prompts werden von Ihnen definiert und auf diesem Rechner gespeichert. "
+"Sie sind in jedem Projekt verfügbar, das Sie hier "
+"öffnen."
 
 #: ai_prompts.py:358
 msgid ""
@@ -6176,19 +6174,19 @@ msgid ""
 "go with the project files. If you or somebody else opens the same project on "
 "another machine, these prompts will be available there too."
 msgstr ""
-"Projekt-Prompts werden von Ihnen definiert, aber nur für das aktuelle "
-"Projekt. Sie gehören zu den Projektdateien. Wenn Sie oder eine andere Person "
+"Project Prompts werden von Ihnen definiert, aber nur für das aktuelle "
+"Projekt. Wenn Sie oder eine andere Person "
 "dasselbe Projekt auf einem anderen Rechner öffnen, sind diese Prompts auch "
 "dort verfügbar."
 
 #: ai_prompts.py:782
 msgid "Delete Prompt"
-msgstr "Aufforderung löschen"
+msgstr "Prompt löschen"
 
 #: ai_prompts.py:819 ai_prompts.py:824 ai_prompts.py:830 ai_prompts.py:859
 #: ai_prompts.py:867
 msgid "Edit prompts"
-msgstr "Aufforderungen zum Bearbeiten"
+msgstr "Prompts bearbeiten"
 
 #: ai_prompts.py:819
 msgid "The name cannot be empty"
@@ -6201,13 +6199,12 @@ msgstr "Der Name darf nicht länger als 60 Zeichen sein."
 #: ai_prompts.py:830
 msgid "The name of the prompt must be unique within its type and scope."
 msgstr ""
-"Der Name des Prompts muss innerhalb seines Typs und Bereichs eindeutig sein."
+"Der Name des Prompts muss innerhalb seines Typs und Bereichs einzigartig sein."
 
 #: ai_prompts.py:857
 msgid "Names of prompts must be unique within its type and scope. "
 msgstr ""
-"Die Namen der Prompts müssen innerhalb ihres Typs und Bereichs eindeutig "
-"sein."
+"Der Name des Prompts muss innerhalb seines Typs und Bereichs einzigartig sein."
 
 #: ai_search_dialog.py:79
 msgid "1) What do you want to search for?"
@@ -6223,12 +6220,12 @@ msgstr "1) Welches Thema möchten Sie analysieren?"
 
 #: ai_search_dialog.py:121
 msgid "The last used prompt"
-msgstr "Die zuletzt verwendete Eingabeaufforderung"
+msgstr "Der zuletzt verwendete Prompt"
 
 #: ai_search_dialog.py:123
 msgid "could not be found. The prompt will be reset to the default."
 msgstr ""
-"konnte nicht gefunden werden. Die Eingabeaufforderung wird auf den "
+"konnte nicht gefunden werden. Der Prompt wird auf den "
 "Standardwert zurückgesetzt."
 
 #: ai_search_dialog.py:392
@@ -6245,7 +6242,7 @@ msgstr "Suche in allen Fällen"
 
 #: ai_search_dialog.py:446
 msgid "The AI ist not ready to fulfill your request (status: "
-msgstr "Die KI ist nicht bereit, Ihre Anfrage zu erfüllen (Status:"
+msgstr "Die KI ist nicht verfügbar (Status: "
 
 #: ai_search_dialog.py:446
 msgid ")."
@@ -6255,7 +6252,7 @@ msgstr ")."
 msgid "Please select a code or category (or use \"free search\" instead)."
 msgstr ""
 "Bitte wählen Sie einen Code oder eine Kategorie aus (oder verwenden Sie "
-"stattdessen \"freie Suche\")."
+"stattdessen die \"freie Suche\")."
 
 #: ai_search_dialog.py:472
 msgid "Please enter text in the \"topic\" field."
@@ -6284,8 +6281,7 @@ msgstr ""
 "Da Sie die KI-Integration zum ersten Mal verwenden, muss QualCoder einige "
 "zusätzliche Komponenten herunterladen und installieren.\n"
 "\n"
-"Dabei werden etwa 2,5 GB an Daten heruntergeladen. Möchten Sie\n"
-"wollen Sie fortfahren?"
+"Dabei werden etwa 2,5 GB an Daten heruntergeladen. Möchten Sie fortfahren?"
 
 #: ai_vectorstore.py:160 ai_vectorstore.py:171
 msgid "Download AI components"
@@ -6300,16 +6296,16 @@ msgid ""
 "AI: Could not download all the necessary components, the AI integration will "
 "be disabled."
 msgstr ""
-"AI: Es konnten nicht alle erforderlichen Komponenten heruntergeladen werden, "
-"die AI-Integration wird deaktiviert."
+"KI: Es konnten nicht alle erforderlichen Komponenten heruntergeladen werden, "
+"die KI-Integration wird deaktiviert."
 
 #: ai_vectorstore.py:263
 msgid "AI: Success, components downloaded and installed."
-msgstr "AI: Erfolg, Komponenten heruntergeladen und installiert."
+msgstr "KI: Erfolg, Komponenten heruntergeladen und installiert."
 
 #: ai_vectorstore.py:348
 msgid "AI: Finished loading (no project open)."
-msgstr "AI: Beendetes Laden (kein Projekt geöffnet)."
+msgstr "KI: fertig geladen (kein Projekt geöffnet)."
 
 #: ai_vectorstore.py:361
 msgid ""
@@ -6322,8 +6318,8 @@ msgstr ""
 "Es scheint, dass Sie die KI-Funktionen mit diesem Projekt bereits zuvor "
 "verwendet haben. Inzwischen mussten wir die interne Implementierung des "
 "lokalen KI-Speichers ändern, um ihn robuster zu machen. Das hat zur Folge, "
-"dass die KI alle Ihre empirischen Dokumente erneut durchlesen muss, um den "
-"lokalen Speicher wieder aufzubauen. Das kann eine Weile dauern. Wir "
+"dass die KI alle Ihre empirischen Dokumente erneut einlesen muss. "
+"Dies kann eine Weile dauern. Wir "
 "entschuldigen uns für die Unannehmlichkeiten."
 
 #: ai_vectorstore.py:366
@@ -6333,7 +6329,7 @@ msgstr "KI-Speicher"
 #: ai_vectorstore.py:383
 msgid "AI: Checked all documents, memory is up to date."
 msgstr ""
-"AI: Ich habe alle Dokumente überprüft, der Speicher ist auf dem neuesten "
+"KI: Alle Dokumente überprüft, der Speicher ist auf dem neuesten "
 "Stand."
 
 #: ai_vectorstore.py:406
@@ -6343,7 +6339,7 @@ msgstr ""
 
 #: ai_vectorstore.py:429
 msgid "AI: Adding document to internal memory: "
-msgstr "AI: Hinzufügen eines Dokuments zum internen Speicher:"
+msgstr "KI: Einlesen eines Dokuments in den internen Speicher:"
 
 #: ai_vectorstore.py:505
 msgid "AI: No documents, AI is ready."
@@ -6358,8 +6354,8 @@ msgid ""
 "AI: Rebuilding memory. The local AI will read through all your documents, "
 "please be patient."
 msgstr ""
-"AI: Speicher wiederherstellen. Die lokale KI wird alle Ihre Dokumente "
-"durchlesen, bitte haben Sie etwas Geduld."
+"KI: Speicher wiederherstellen. Die lokale KI wird alle Ihre Dokumente "
+"einlesen. Bitte haben Sie etwas Geduld."
 
 #: case_file_manager.py:231
 msgid "added to case."
@@ -6403,7 +6399,7 @@ msgstr "Von:"
 
 #: code_text.py:1024
 msgid "Edit text analysis prompts"
-msgstr "Eingabeaufforderungen zur Textanalyse bearbeiten"
+msgstr "Prompts zur Textanalyse bearbeiten"
 
 #: code_text.py:1991
 msgid "Coded html file exported"
@@ -6415,7 +6411,7 @@ msgstr "Wählen Sie einen Code"
 
 #: code_text.py:3348 code_text.py:4693
 msgid "AI interpretation: "
-msgstr "AI-Interpretation:"
+msgstr "KI-Interpretation:"
 
 #: code_text.py:3349
 msgid ""
@@ -6425,7 +6421,7 @@ msgid ""
 msgstr ""
 "\n"
 "\n"
-"AI-Suchanfrage:"
+"KI Prompt:"
 
 #: code_text.py:3350
 msgid ""
@@ -6454,7 +6450,7 @@ msgstr "Zuletzt bearbeiteten Text rückgängig machen"
 #: code_text.py:4512
 msgid "Please finish editing the text before starting an AI search."
 msgstr ""
-"Bitte beenden Sie die Bearbeitung des Textes, bevor Sie eine AI-Suche "
+"Bitte beenden Sie die Bearbeitung des Textes, bevor Sie eine KI-Suche "
 "starten."
 
 #: code_text.py:4513 code_text.py:4517 code_text.py:4521 code_text.py:4525
@@ -6468,7 +6464,7 @@ msgid ""
 "The AI is already performing a search. Please stop it before starting a new "
 "one."
 msgstr ""
-"Die KI führt bereits eine Suche durch. Bitte beenden Sie sie, bevor Sie eine "
+"Die KI führt bereits eine Suche durch. Bitte beenden Sie diese, bevor Sie eine "
 "neue Suche starten."
 
 #: code_text.py:4524
@@ -6479,45 +6475,45 @@ msgstr ""
 
 #: code_text.py:4561
 msgid "Searching for related data, please wait..."
-msgstr "Suche nach verwandten Daten, bitte warten..."
+msgstr "Suche nach relevanten Daten, bitte warten..."
 
 #: code_text.py:4583
 msgid "AI: No related data found for \""
-msgstr "AI: Keine verwandten Daten gefunden für \""
+msgstr "KI: Keine relevanten Daten gefunden für \""
 
 #: code_text.py:4623
 msgid "AI: No new data found for \""
-msgstr "AI: Keine neuen Daten gefunden für \""
+msgstr "KI: Keine neuen Daten gefunden für \""
 
 #: code_text.py:4624
 msgid "\" beside what has already been coded with this code."
-msgstr "\" neben dem, was bereits mit diesem Code kodiert wurde."
+msgstr "\" außer jenen, die bereits mit diesem Code kodiert wurden."
 
 #: code_text.py:4629
 msgid ""
 "Potentially related data found, inspecting it closer. Please be patient..."
 msgstr ""
-"Potenziell verwandte Daten gefunden, die näher untersucht werden. Bitte "
+"Potenziell relevante Daten gefunden. Die genauere Analyse läuft. Bitte "
 "haben Sie Geduld..."
 
 #: code_text.py:4663
 msgid "The closer inspection of the first "
-msgstr "Die nähere Betrachtung der ersten"
+msgstr "Die genauere Analyse der ersten "
 
 #: code_text.py:4664
 msgid ""
 "pieces of data yielded no results. You can continue to inspect more by "
 "clicking on \"find more\" in the list on the left."
 msgstr ""
-"daten ergaben keine Ergebnisse. Sie können die Suche fortsetzen, indem Sie "
-"in der Liste auf der linken Seite auf \"Mehr finden\" klicken."
+"Datenfragmente ergab keine Ergebnisse. Sie können die Suche fortsetzen, indem Sie "
+"in der Liste auf der linken Seite auf \"weiter suchen\" klicken."
 
 #: code_text.py:4673
 msgid ""
 "Upon closer inspection, no pieces of data relevant to your search query "
 "could be identified. Please start a new search."
 msgstr ""
-"Bei näherer Betrachtung konnten keine für Ihre Suchanfrage relevanten Daten "
+"Bei näherer Analyse konnten keine für Ihre Suchanfrage relevanten Daten "
 "identifiziert werden. Bitte starten Sie eine neue Suche."
 
 #: code_text.py:4692
@@ -6534,7 +6530,7 @@ msgstr "Klicken Sie hier, um die Suche zu beenden"
 
 #: code_text.py:4736
 msgid ">> Find more..."
-msgstr ">> Mehr finden..."
+msgstr ">> Weiter suchen..."
 
 #: code_text.py:4737
 msgid "Click here to analyze more data"
@@ -6542,14 +6538,14 @@ msgstr "Klicken Sie hier, um weitere Daten zu analysieren"
 
 #: code_text.py:4762
 msgid "Do you want to stop the search?"
-msgstr "Möchten Sie die Suche beenden?"
+msgstr "Möchten Sie die Suche abbrechen?"
 
 #: code_text.py:4774
 msgid ""
 "There are no more pieces of data to analyze for this search. Please start a "
 "new search."
 msgstr ""
-"Es gibt keine weiteren Daten für diese Suche zu analysieren. Bitte starten "
+"Es gibt keine weiteren potenziell relevanten Daten für diese Suche zu analysieren. Bitte starten "
 "Sie eine neue Suche."
 
 #: code_text.py:4777
@@ -6573,12 +6569,12 @@ msgid ""
 msgstr ""
 "SICHERN Sie Ihr Projekt, bevor Sie Änderungen am Codebaum vornehmen.\n"
 "Der Code-Organisator wird vor allem bei der Grounded Theory verwendet, um "
-"Ihnen bei der Entwicklung und Organisation der Kodierungskonzepte und ihrer "
+"Ihnen bei der Entwicklung und Organisation der Kodes und ihrer "
 "Hierarchie zu helfen.\n"
 "Wählen Sie einen Codezweig oder Alle und klicken Sie dann mit der rechten "
 "Maustaste, um:\n"
-"Kategorien hinzufügen, Codes und Kategorien umbenennen, Memos aktualisieren, "
-"Codes zusammenführen, Kategorien zusammenführen, Kategorien löschen.\n"
+"Kategorien hinzuzufügen, Codes und Kategorien umzubenennen, Memos zu aktualisieren, "
+"Codes zusammenzuführen, Kategorien zusammenzuführen, Kategorien zu löschen.\n"
 "\n"
 "Dies ist eine neue Funktion. Sie wurde getestet, aber es könnten unerwartete "
 "Fehler auftreten.\n"
@@ -6978,7 +6974,7 @@ msgstr "Exportierte Ergebnisse"
 
 #: settings.py:274
 msgid "Please select an AI model or disable the AI altogether."
-msgstr "Bitte wählen Sie ein KI-Modell oder deaktivieren Sie die KI ganz."
+msgstr "Bitte wählen Sie ein KI-Modell aus oder deaktivieren Sie die KI-Integration."
 
 #: settings.py:275 settings.py:279
 msgid "AI model"
@@ -6992,7 +6988,7 @@ msgid ""
 msgstr ""
 "Bitte geben Sie einen gültigen API-Schlüssel für das KI Modell ein. \n"
 "(Wenn Sie sicher sind, dass Ihr spezielles Modell keinen API-Schlüssel "
-"benötigt, geben Sie stattdessen „Keine“ ein)."
+"benötigt, geben Sie stattdessen „None“ ein)."
 
 #: view_av.py:258 view_av.py:3922
 msgid "QualCoder will crash"
