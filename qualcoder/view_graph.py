@@ -2836,7 +2836,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
          param: code_or_cat  : Dictionary of the code details: name, memo, color etc
          param: font_size : Integer
          param: bold : boolean
-         parap: isvisible : boolean
+         param: isvisible : boolean
          """
 
         super(TextGraphicsItem, self).__init__(None)
@@ -2907,9 +2907,12 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         memo_action = menu.addAction('Memo')
         coded_action = None
         case_action = None
+        show_memo_action = None
         if self.code_or_cat['cid'] is not None:
             coded_action = menu.addAction('Coded text and media')
             case_action = menu.addAction('Case text and media')
+        if self.code_or_cat['memo'] != "":
+            show_memo_action = menu.addAction(_("Display memo"))
         font_larger_action = menu.addAction(_("Larger font"))
         font_smaller_action = menu.addAction(_("Smaller font"))
         bold_action = menu.addAction(_("Bold toggle"))
@@ -2917,6 +2920,9 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         action = menu.exec(QtGui.QCursor.pos())
         if action is None:
             return
+        if action == show_memo_action:
+            self.text = f"{self.code_or_cat['name']}\nMEMO: {self.code_or_cat['memo']}"
+            self.setPlainText(self.text)
         if action == bold_action:
             self.bold = not self.bold
             fontweight = QtGui.QFont.Weight.Normal
