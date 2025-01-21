@@ -1,6 +1,5 @@
 """
-This simple helper script checks if any of the .ui-files has been updated and needs recompiling.
-If so, pyuic6 is used to compile it, the result is placed in "qualcoder/GUI"
+This simple helper script checks if any of the .po- or .mo-files has been updated and needs recompiling.
 
 Kai Dröge 2024
 """
