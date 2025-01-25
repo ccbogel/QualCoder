@@ -153,16 +153,16 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.splitter.splitterMoved.connect(self.update_sizes)
         self.ui.splitter_2.splitterMoved.connect(self.update_sizes)
         self.ui.label_volume.setPixmap(qta.icon('mdi6.volume-high').pixmap(22, 22))
-        self.ui.pushButton_play.setIcon(qta.icon('mdi6.play'))
-        self.ui.pushButton_rewind_30.setIcon(qta.icon('mdi6.rewind-30'))
+        self.ui.pushButton_play.setIcon(qta.icon('mdi6.play', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_rewind_30.setIcon(qta.icon('mdi6.rewind-30', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_rewind_30.pressed.connect(self.rewind_30_seconds)
-        self.ui.pushButton_rewind_5.setIcon(qta.icon('mdi6.rewind-5'))
+        self.ui.pushButton_rewind_5.setIcon(qta.icon('mdi6.rewind-5', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_rewind_5.pressed.connect(self.rewind_5_seconds)
-        self.ui.pushButton_forward_30.setIcon(qta.icon('mdi6.fast-forward-30'))
+        self.ui.pushButton_forward_30.setIcon(qta.icon('mdi6.fast-forward-30', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_forward_30.pressed.connect(self.forward_30_seconds)
-        self.ui.pushButton_rate_down.setIcon(qta.icon('mdi6.speedometer-slow'))
+        self.ui.pushButton_rate_down.setIcon(qta.icon('mdi6.speedometer-slow', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_rate_down.pressed.connect(self.decrease_play_rate)
-        self.ui.pushButton_rate_up.setIcon(qta.icon('mdi6.speedometer'))
+        self.ui.pushButton_rate_up.setIcon(qta.icon('mdi6.speedometer', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_rate_up.pressed.connect(self.increase_play_rate)
         self.ui.pushButton_help.setIcon(qta.icon('mdi6.help'))
         self.ui.pushButton_help.pressed.connect(self.help)
@@ -1137,7 +1137,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.update_sizes()
         if self.mediaplayer.is_playing():
             self.mediaplayer.pause()
-            self.ui.pushButton_play.setIcon(qta.icon('mdi6.play'))
+            self.ui.pushButton_play.setIcon(qta.icon('mdi6.play', options=[{'scale_factor': 1.4}]))
             self.is_paused = True
             self.timer.stop()
         else:
@@ -1169,7 +1169,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         if self.mediaplayer is None:
             return
         self.mediaplayer.stop()
-        self.ui.pushButton_play.setIcon(qta.icon('mdi6.play'))
+        self.ui.pushButton_play.setIcon(qta.icon('mdi6.play', options=[{'scale_factor': 1.4}]))
         self.timer.stop()
         self.ui.horizontalSlider.setProperty("value", 0)
         self.play_segment_end = None
@@ -1228,7 +1228,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         # No need to call this function if nothing is played
         if not self.mediaplayer.is_playing():
             self.timer.stop()
-            self.ui.pushButton_play.setIcon(qta.icon('mdi6.play'))
+            self.ui.pushButton_play.setIcon(qta.icon('mdi6.play', options=[{'scale_factor': 1.4}]))
             # After the video finished, the play button stills shows "Pause",
             # which is not the desired behavior of a media player.
             # This fixes that "bug".
@@ -3858,7 +3858,7 @@ class DialogViewAV(QtWidgets.QDialog):
 
         self.ui.label_time_3.setPixmap(qta.icon('mdi6.clock-outline').pixmap(22, 22))
         self.ui.label_volume.setPixmap(qta.icon('mdi6.volume-high').pixmap(22, 22))
-        self.ui.pushButton_play.setIcon(qta.icon('mdi6.play'))
+        self.ui.pushButton_play.setIcon(qta.icon('mdi6.play', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_rewind_30.setIcon(qta.icon('mdi6.rewind-30'))
         self.ui.pushButton_rewind_30.pressed.connect(self.rewind_30_seconds)
         self.ui.pushButton_rewind_5.setIcon(qta.icon('mdi6.rewind-5'))
@@ -4469,7 +4469,7 @@ class DialogViewAV(QtWidgets.QDialog):
         self.update_sizes()
         if self.mediaplayer.is_playing():
             self.mediaplayer.pause()
-            self.ui.pushButton_play.setIcon(qta.icon('mdi6.play'))
+            self.ui.pushButton_play.setIcon(qta.icon('mdi6.play', options=[{'scale_factor': 1.4}]))
             self.is_paused = True
             self.timer.stop()
         else:
@@ -4496,7 +4496,7 @@ class DialogViewAV(QtWidgets.QDialog):
 
         if self.mediaplayer.is_playing():
             self.mediaplayer.pause()
-            self.ui.pushButton_play.setIcon(qta.icon('mdi6.play'))
+            self.ui.pushButton_play.setIcon(qta.icon('mdi6.play', options=[{'scale_factor': 1.4}]))
             self.is_paused = True
             self.timer.stop()
 
@@ -4507,7 +4507,7 @@ class DialogViewAV(QtWidgets.QDialog):
          Programmatically setting the audio track to other values does not work. """
 
         self.mediaplayer.stop()
-        self.ui.pushButton_play.setIcon(qta.icon('mdi6.play'))
+        self.ui.pushButton_play.setIcon(qta.icon('mdi6.play', options=[{'scale_factor': 1.4}]))
         self.ui.horizontalSlider.setProperty("value", 0)
         # Set combobox display of audio track to the first one, or leave it blank if it contains no items
         if self.ui.comboBox_tracks.count() > 0:

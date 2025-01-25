@@ -441,11 +441,11 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         self.ui.pushButton_run.setEnabled(False)
         self.ui.pushButton_run.pressed.connect(self.calculate_statistics)
-        self.ui.pushButton_run.setIcon(qta.icon('mdi6.play'))
+        self.ui.pushButton_run.setIcon(qta.icon('mdi6.play', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_clear.pressed.connect(self.clear_selection)
         self.ui.pushButton_clear.setIcon(qta.icon('mdi6.refresh'))
         self.ui.pushButton_exporttext.pressed.connect(self.export_text_file)
-        self.ui.pushButton_exporttext.setIcon(qta.icon('mdi6.export'))
+        self.ui.pushButton_exporttext.setIcon(qta.icon('mdi6.export', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_help1.setIcon(qta.icon('mdi6.help'))
         self.ui.pushButton_help1.pressed.connect(self.information)
         font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'

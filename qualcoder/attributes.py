@@ -54,16 +54,15 @@ class DialogManageAttributes(QtWidgets.QDialog):
         self.ui = Ui_Dialog_manage_attributes()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        font = f'font: {self.app.settings["fontsize"]}pt '
-        font += f'"{self.app.settings["font"]}";'
+        font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
         self.get_attributes()
         self.fill_table_widget()
         # Initial resize of table columns
         self.ui.tableWidget.resizeColumnsToContents()
-        self.ui.pushButton_add.setIcon(qta.icon('mdi6.variable'))
+        self.ui.pushButton_add.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_add.clicked.connect(self.add_attribute)
-        self.ui.pushButton_delete.setIcon(qta.icon('mdi6.delete-outline'))
+        self.ui.pushButton_delete.setIcon(qta.icon('mdi6.delete-outline', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_delete.clicked.connect(self.delete_attribute)
         self.ui.tableWidget.cellClicked.connect(self.cell_selected)
         self.ui.tableWidget.cellChanged.connect(self.cell_modified)
