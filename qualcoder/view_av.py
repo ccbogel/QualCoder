@@ -168,15 +168,15 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.pushButton_help.pressed.connect(self.help)
 
         # The buttons in the splitter are smaller 24x24 pixels
-        self.ui.pushButton_latest.setIcon(qta.icon('mdi6.arrow-collapse-right'))
+        self.ui.pushButton_latest.setIcon(qta.icon('mdi6.arrow-collapse-right', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_latest.pressed.connect(self.go_to_latest_coded_file)
-        self.ui.pushButton_next_file.setIcon(qta.icon('mdi6.arrow-right'))
+        self.ui.pushButton_next_file.setIcon(qta.icon('mdi6.arrow-right', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_next_file.pressed.connect(self.go_to_next_file)
-        self.ui.pushButton_document_memo.setIcon(qta.icon('mdi6.text-box-outline'))
+        self.ui.pushButton_document_memo.setIcon(qta.icon('mdi6.text-box-outline', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_document_memo.pressed.connect(self.active_file_memo)
-        self.ui.pushButton_important.setIcon(qta.icon('mdi6.star-outline'))
+        self.ui.pushButton_important.setIcon(qta.icon('mdi6.star-outline', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_important.pressed.connect(self.show_important_coded)
-        self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.tag-outline'))
+        self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.tag-outline', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_file_attributes.pressed.connect(self.get_files_from_attributes)
 
         # Until any media is selected disable some widgets

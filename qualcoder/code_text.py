@@ -266,9 +266,9 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.label_font_size.setPixmap(qta.icon('mdi6.format-size').pixmap(22, 22))
         self.ui.spinBox_font_size.setValue(self.app.settings['docfontsize'])
         self.ui.spinBox_font_size.valueChanged.connect(self.change_text_font_size)
-        self.ui.pushButton_previous.setIcon(qta.icon('mdi6.arrow-left'))
+        self.ui.pushButton_previous.setIcon(qta.icon('mdi6.arrow-left', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_previous.setEnabled(False)
-        self.ui.pushButton_next.setIcon(qta.icon('mdi6.arrow-right'))
+        self.ui.pushButton_next.setIcon(qta.icon('mdi6.arrow-right', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_next.setEnabled(False)
         self.ui.pushButton_next.pressed.connect(self.move_to_next_search_text)
         self.ui.pushButton_previous.pressed.connect(self.move_to_previous_search_text)
@@ -276,15 +276,15 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_help.pressed.connect(self.help)
         self.ui.pushButton_delete_all_codes.setIcon(qta.icon('mdi6.delete-outline', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_delete_all_codes.pressed.connect(self.delete_all_codes_from_file)
-        self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.tag-outline'))
+        self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.tag-outline', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_file_attributes.pressed.connect(self.get_files_from_attributes)
-        self.ui.pushButton_important.setIcon(qta.icon('mdi6.star-outline'))
+        self.ui.pushButton_important.setIcon(qta.icon('mdi6.star-outline', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_important.pressed.connect(self.show_important_coded)
-        self.ui.pushButton_edit.setIcon(qta.icon('mdi6.text-box-edit-outline'))
+        self.ui.pushButton_edit.setIcon(qta.icon('mdi6.text-box-edit-outline', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_edit.pressed.connect(self.edit_mode_toggle)
-        self.ui.pushButton_exit_edit.setIcon(qta.icon('mdi6.text-box-check-outline'))
+        self.ui.pushButton_exit_edit.setIcon(qta.icon('mdi6.text-box-check-outline', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_exit_edit.pressed.connect(self.edit_mode_toggle)
-        self.ui.pushButton_undo_edit.setIcon(qta.icon('mdi6.undo'))
+        self.ui.pushButton_undo_edit.setIcon(qta.icon('mdi6.undo', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_undo_edit.pressed.connect(self.undo_edited_text)
         self.ui.label_codes_count.setEnabled(False)
         self.ui.treeWidget.setDragEnabled(True)
@@ -436,23 +436,23 @@ class DialogCodeText(QtWidgets.QWidget):
         ok = ui.exec()
         if not ok:
             self.attributes = temp_attributes
-            self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.tag-outline'))
+            self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.tag-outline', options=[{'scale_factor': 1.3}]))
             self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
             if self.attributes:
-                self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.tag'))
+                self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.tag', options=[{'scale_factor': 1.3}]))
             return
         self.attributes = ui.parameters
         if len(self.attributes) == 1:  # Boolean parameter, no attributes
-            self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.tag-outline'))
+            self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.tag-outline', options=[{'scale_factor': 1.3}]))
             self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
             self.get_files()
             return
         if not ui.result_file_ids:
             Message(self.app, _("Nothing found") + " " * 20, _("No matching files found")).exec()
-            self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.tag-outline'))
+            self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.tag-outline', options=[{'scale_factor': 1.3}]))
             self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
             return
-        self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.tag'))
+        self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.tag', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_file_attributes.setToolTip(ui.tooltip_msg)
         self.get_files(ui.result_file_ids)
 
@@ -499,8 +499,8 @@ class DialogCodeText(QtWidgets.QWidget):
         # When a code is selected undo the show selected code features
         self.highlight()
         # Reload button icons as they disappear on Windows
-        self.ui.pushButton_show_codings_prev.setIcon(qta.icon('mdi6.arrow-left'))
-        self.ui.pushButton_show_codings_next.setIcon(qta.icon('mdi6.arrow-right'))
+        self.ui.pushButton_show_codings_prev.setIcon(qta.icon('mdi6.arrow-left', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_show_codings_next.setIcon(qta.icon('mdi6.arrow-right', options=[{'scale_factor': 1.3}]))
 
     def tree_traverse_for_non_expanded(self, item, non_expanded):
         """ Find all categories and codes
@@ -508,7 +508,7 @@ class DialogCodeText(QtWidgets.QWidget):
         Called by: fill_tree
         param:
             item: a QTreeWidgetItem
-            list of non-expanded categories as Sring if catid:#
+            list of non-expanded categories as String if catid:#
         """
 
         child_count = item.childCount()
