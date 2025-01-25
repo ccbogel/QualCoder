@@ -84,8 +84,8 @@ class DialogCodesBySegments(QtWidgets.QDialog):
         self.ui.comboBox_coders.insertItems(0, self.coders)
         self.fill_tree()
         self.ui.pushButton_run_report.clicked.connect(self.search)
-        self.ui.pushButton_run_report.setIcon(qta.icon('mdi6.play'))
-        self.ui.pushButton_export_xlsx.setIcon(qta.icon('mdi6.export'))
+        self.ui.pushButton_run_report.setIcon(qta.icon('mdi6.play', options=[{'scale_factor': 2}]))
+        self.ui.pushButton_export_xlsx.setIcon(qta.icon('mdi6.export', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_export_xlsx.clicked.connect(self.export_xlsx_file)
 
         self.get_files_and_cases()
