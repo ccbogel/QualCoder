@@ -427,6 +427,8 @@ class DialogImportSurvey(QtWidgets.QDialog):
                 for case_text in case_text_list:
                     case_text.append(fid)
                     cur.execute(case_text_sql, case_text)
+                    self.app.conn.commit()
+
                     # Insert code text for this qualitative column item
                     if res_code_cid:
                         try:
@@ -445,7 +447,6 @@ class DialogImportSurvey(QtWidgets.QDialog):
                             print(e_)
                             logger.debug(e_)
 
-                self.app.conn.commit()
                 # Add doc to vectorstore
                 if self.app.settings['ai_enable'] == 'True':
                     self.app.ai.sources_vectorstore.import_document(fid, qual_file_name, fulltext, update=True)
