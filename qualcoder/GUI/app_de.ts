@@ -21,7 +21,7 @@
     <message>
         <location filename="ui_attribute.py" line="42"/>
         <source>Attribute name:</source>
-        <translation type="unfinished"></translation>
+        <translation>Attribute Name:</translation>
     </message>
 </context>
 <context>
@@ -162,12 +162,12 @@ wordcloud</source>
     <message>
         <location filename="ui_dialog_charts.py" line="323"/>
         <source>Width</source>
-        <translation type="unfinished"></translation>
+        <translation>Breite</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="324"/>
         <source>Height</source>
-        <translation type="unfinished"></translation>
+        <translation>Höhe</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="325"/>
@@ -192,7 +192,7 @@ wordcloud</source>
     <message>
         <location filename="ui_dialog_charts.py" line="330"/>
         <source>n-grams</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="331"/>
@@ -360,7 +360,7 @@ Rechtsklick für Optionen</translation>
     <message>
         <location filename="ui_report_matching_segments.py" line="110"/>
         <source>Coder</source>
-        <translation type="unfinished">Coder</translation>
+        <translation>Coder</translation>
     </message>
     <message>
         <location filename="ui_report_matching_segments.py" line="111"/>
@@ -370,7 +370,7 @@ Rechtsklick für Optionen</translation>
     <message>
         <location filename="ui_report_matching_segments.py" line="112"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Run&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">Lauf</translation>
+        <translation>Lauf</translation>
     </message>
     <message>
         <location filename="ui_report_matching_segments.py" line="113"/>
@@ -409,17 +409,17 @@ Checked - any selected codes must match exactly.</source>
     <message>
         <location filename="ui_dialog_organiser.py" line="62"/>
         <source>Graph Visualisation</source>
-        <translation type="unfinished">Diagramm Visualisierung</translation>
+        <translation>Diagramm Visualisierung</translation>
     </message>
     <message>
         <location filename="ui_dialog_organiser.py" line="63"/>
         <source>Export image</source>
-        <translation type="unfinished">Bild exportieren</translation>
+        <translation>Bild exportieren</translation>
     </message>
     <message>
         <location filename="ui_dialog_organiser.py" line="64"/>
         <source>Click on the graph area and press + or W to zoom in. Press - or Q to zoom in or zoom out.</source>
-        <translation type="unfinished">Klicken Sie auf den Diagrammbereich und drücken Sie + oder W, um die Ansicht zu vergrößern. Drücken Sie - oder Q zum Vergrößern oder Verkleinern.</translation>
+        <translation>Klicken Sie auf den Diagrammbereich und drücken Sie + oder W, um die Ansicht zu vergrößern. Drücken Sie - oder Q zum Vergrößern oder Verkleinern.</translation>
     </message>
     <message>
         <location filename="ui_dialog_organiser.py" line="65"/>
@@ -429,7 +429,7 @@ Checked - any selected codes must match exactly.</source>
     <message>
         <location filename="ui_dialog_organiser.py" line="66"/>
         <source>Select code branch</source>
-        <translation type="unfinished">Code-Zweig auswählen</translation>
+        <translation>Code-Zweig auswählen</translation>
     </message>
     <message>
         <location filename="ui_dialog_organiser.py" line="67"/>
@@ -444,7 +444,7 @@ Checked - any selected codes must match exactly.</source>
     <message>
         <location filename="ui_dialog_organiser.py" line="69"/>
         <source>Apply</source>
-        <translation type="unfinished">Anwenden</translation>
+        <translation>Anwenden</translation>
     </message>
 </context>
 <context>
@@ -592,7 +592,7 @@ en-AU</translation>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="204"/>
         <source>...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">...</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="201"/>
@@ -632,12 +632,12 @@ en-AU</translation>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="210"/>
         <source>project</source>
-        <translation type="unfinished"></translation>
+        <translation>Projekt</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="211"/>
         <source>Type:</source>
-        <translation type="unfinished"></translation>
+        <translation>Typ:</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="212"/>
@@ -901,7 +901,7 @@ en-AU</translation>
     <message>
         <location filename="ui_dialog_import.py" line="94"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delimiter must be a single character.&lt;/p&gt;&lt;p&gt;Enter &apos;ta&apos; for &apos;tab&apos;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Trennzeichen muss ein einzelnes Zeichen sein.&amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Eingeben 'ta' zum 'tab'</translation>
+        <translation>Trennzeichen muss ein einzelnes Zeichen sein.&amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Eingeben &apos;ta&apos; zum &apos;tab&apos;</translation>
     </message>
     <message>
         <location filename="ui_dialog_import.py" line="95"/>
@@ -971,7 +971,7 @@ en-AU</translation>
     <message>
         <location filename="ui_dialog_import.py" line="104"/>
         <source>One file per qualitative column</source>
-        <translation type="unfinished"></translation>
+        <translation>Eine Datei pro qualitativer Spalte</translation>
     </message>
 </context>
 <context>
@@ -1086,7 +1086,7 @@ en-AU</translation>
     <message>
         <location filename="ui_ai_chat.py" line="148"/>
         <source>New</source>
-        <translation type="unfinished"></translation>
+        <translation>Neu</translation>
     </message>
     <message>
         <location filename="ui_ai_chat.py" line="149"/>
@@ -1096,12 +1096,12 @@ en-AU</translation>
     <message>
         <location filename="ui_ai_chat.py" line="150"/>
         <source>Delete</source>
-        <translation type="unfinished">Löschen</translation>
+        <translation>Löschen</translation>
     </message>
     <message>
         <location filename="ui_ai_chat.py" line="151"/>
         <source>Help</source>
-        <translation type="unfinished">Hilfe</translation>
+        <translation>Hilfe</translation>
     </message>
     <message>
         <location filename="ui_ai_chat.py" line="152"/>
@@ -1134,7 +1134,7 @@ en-AU</translation>
     <message>
         <location filename="ui_dialog_assign_attribute.py" line="49"/>
         <source>Journals</source>
-        <translation type="unfinished">Tagebuch</translation>
+        <translation>Tagebuch</translation>
     </message>
 </context>
 <context>
@@ -1534,12 +1534,12 @@ Key shortcut: Ctrl S</source>
     <message>
         <location filename="ui_dialog_code_av.py" line="207"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Button to select a segment. &lt;/p&gt;&lt;p&gt;Then a menu of options will open.&lt;/p&gt;&lt;p&gt;(This button is a work around if the right-click to open menus on the segment bars below does not work)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Schaltfläche zur Auswahl eines Segments. Dann öffnet sich ein Menü mit Optionen. (Diese Schaltfläche ist eine Ausweichlösung, wenn der Rechtsklick zum Öffnen von Menüs auf den Segmentleisten unten nicht funktioniert)</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_av.py" line="208"/>
         <source>S</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1866,18 +1866,19 @@ Markieren Sie Alle Dateien für die Suche nach allen Dateien. Klicken Sie mit de
     <message>
         <location filename="ui_dialog_code_pdf.py" line="226"/>
         <source>Code Text</source>
-        <translation type="unfinished">Code Text</translation>
+        <translation>Text codieren</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="227"/>
         <source>Coder:</source>
-        <translation type="unfinished">Coder:</translation>
+        <translation>Coder:</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="228"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search for text.&lt;/p&gt;&lt;p&gt;check &lt;span style=&quot; font-weight:600;&quot;&gt;Case sensitive&lt;/span&gt; for case sensitive search&lt;/p&gt;&lt;p&gt;check &lt;span style=&quot; font-weight:600;&quot;&gt;All files&lt;/span&gt; for searching all files search&lt;/p&gt;
 &lt;p&gt;Right-click to change automatic searching options&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Suchen Sie nach Text. Aktivieren Sie Groß-/Kleinschreibung für die Suche nach Groß-/Kleinschreibung.
+Markieren Sie Alle Dateien für die Suche nach allen Dateien. Klicken Sie mit der rechten Maustaste, um die automatischen Suchoptionen zu ändern</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="230"/>
@@ -1887,22 +1888,22 @@ Markieren Sie Alle Dateien für die Suche nach allen Dateien. Klicken Sie mit de
     <message>
         <location filename="ui_dialog_code_pdf.py" line="231"/>
         <source>0 / 0</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="232"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Previous&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Bisherige</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="233"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Nächster</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="234"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search text. Case sensitive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Suchtext. Groß- und Kleinschreibung beachten</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="235"/>
@@ -1912,32 +1913,32 @@ Markieren Sie Alle Dateien für die Suche nach allen Dateien. Klicken Sie mit de
     <message>
         <location filename="ui_dialog_code_pdf.py" line="236"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. &lt;/p&gt;&lt;p&gt;A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A ‘*’ after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;‘&lt;/span&gt;\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: www.rexegg.com/regex-quickstart.html&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Suche verwendet Regex-Funktionen. </translation>
     </message>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="237"/>
         <source>Help</source>
-        <translation type="unfinished">Hilfe</translation>
+        <translation>Hilfe</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="238"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Page&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Seite</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="239"/>
         <source>Curves</source>
-        <translation type="unfinished"></translation>
+        <translation>Kurven</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="240"/>
         <source>Lines</source>
-        <translation type="unfinished"></translation>
+        <translation>Zeilen</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="241"/>
         <source>Images</source>
-        <translation type="unfinished"></translation>
+        <translation>Bilder</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="242"/>
@@ -1947,17 +1948,17 @@ Markieren Sie Alle Dateien für die Suche nach allen Dateien. Klicken Sie mit de
     <message>
         <location filename="ui_dialog_code_pdf.py" line="243"/>
         <source>Black Text</source>
-        <translation type="unfinished"></translation>
+        <translation>Schwarzer Text</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="244"/>
         <source>Text</source>
-        <translation type="unfinished"></translation>
+        <translation>Text</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="245"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rectangle objects&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Rechteckige Objekte</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="246"/>
@@ -1972,7 +1973,7 @@ Markieren Sie Alle Dateien für die Suche nach allen Dateien. Klicken Sie mit de
     <message>
         <location filename="ui_dialog_code_pdf.py" line="248"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Pages&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Seiten</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="249"/>
@@ -1982,42 +1983,42 @@ Markieren Sie Alle Dateien für die Suche nach allen Dateien. Klicken Sie mit de
     <message>
         <location filename="ui_dialog_code_pdf.py" line="250"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export image&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Bild exportieren</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="251"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File with latest coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">Datei mit der neuesten Codierung</translation>
+        <translation>Datei mit der neuesten Codierung</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="252"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Go to bookmark&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">Zum Lesezeichen gehen</translation>
+        <translation>Zum Lesezeichen gehen</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="253"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">Nächste Datei</translation>
+        <translation>Nächste Datei</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="254"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File memo&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Datei-Memo</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="255"/>
         <source>Show files with file attributes</source>
-        <translation type="unfinished">Dateien mit Dateiattributen anzeigen</translation>
+        <translation>Dateien mit Dateiattributen anzeigen</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="256"/>
         <source>Show codings flagged important</source>
-        <translation type="unfinished">Als wichtig markierte Codierungen anzeigen</translation>
+        <translation>Als wichtig markierte Codierungen anzeigen</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="257"/>
         <source>Right click below to create new codes and categories</source>
-        <translation type="unfinished">Klicken mit der rechten Maustaste unten, um neue Codes und Kategorien zu erstellen</translation>
+        <translation>Klicken mit der rechten Maustaste unten, um neue Codes und Kategorien zu erstellen</translation>
     </message>
 </context>
 <context>
@@ -2218,7 +2219,7 @@ Markieren Sie Alle Dateien für die Suche nach allen Dateien. Klicken Sie mit de
     <message>
         <location filename="ui_dialog_code_text.py" line="251"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;A dot â.â is used as a wild card, e.g. â.earsâ will match âbearsâ and âyearsâ. &amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;A â?â after a character will match one or none times that character, e.g. âbears?â will match âbearâ and âbearsâ &amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;&amp;lt;span style=&amp;quot; background-color:transparent;&amp;quot;&amp;gt;A â*â after a character will match zero or more times. &amp;lt;/span&amp;gt;&amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;&amp;lt;span style=&amp;quot; background-color:transparent;&amp;quot;&amp;gt;â&amp;lt;/span&amp;gt;\. will match the dot symbol, â\?â will match the question mark. â\nâ will match the line ending symbol. &amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Regex cheatsheet: &amp;lt;a href=&amp;quot;http://www.rexegg.com/regex-quickstart.html&amp;quot;&amp;gt;&amp;lt;span style=&amp;quot; text-decoration: underline; color:#000080;&amp;quot;&amp;gt;www.rexegg.com/regex-quickstart.html&amp;lt;/span&amp;gt;&amp;lt;/a&amp;gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Die Suche verwendet Regex-Funktionen. &amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Ein Punkt '.' wird als Platzhalter verwendet, z. B. '.ears' passt zu 'bears' und 'years'. &amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Ein '?' nach einem Zeichen entspricht einem oder keinem Mal diesem Zeichen, z.B. 'Bären?' entspricht 'Bär' und 'Bären' &amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;&amp;lt;span style=&amp;quot; background-color:transparent;&amp;quot;&amp;gt;Ein '*' nach einem Zeichen entspricht null oder mehr Mal. &amp;lt;/span&amp;gt;&amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;&amp;lt;span style=&amp;quot; background-color:transparent;&amp;quot;&amp;gt;'&amp;lt;/span&amp;gt;' passt auf das Punktsymbol, '\?' passt auf das Fragezeichen. '\n' passt auf das Zeilenendsymbol. &amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Regex-Spickzettel: &amp;lt;a href=&amp;quot;http://www.rexegg.com/regex-quickstart.html&amp;quot;&amp;gt;&amp;lt;span style=&amp;quot; text-decoration: underline; color:#000080;&amp;quot;&amp;gt;www.rexegg.com/regex-quickstart.html&amp;lt;/span&amp;gt;&amp;lt;/a&amp;gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
+        <translation type="obsolete">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Die Suche verwendet Regex-Funktionen. &amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Ein Punkt &apos;.&apos; wird als Platzhalter verwendet, z. B. &apos;.ears&apos; passt zu &apos;bears&apos; und &apos;years&apos;. &amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Ein &apos;?&apos; nach einem Zeichen entspricht einem oder keinem Mal diesem Zeichen, z.B. &apos;Bären?&apos; entspricht &apos;Bär&apos; und &apos;Bären&apos; &amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;&amp;lt;span style=&amp;quot; background-color:transparent;&amp;quot;&amp;gt;Ein &apos;*&apos; nach einem Zeichen entspricht null oder mehr Mal. &amp;lt;/span&amp;gt;&amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;&amp;lt;span style=&amp;quot; background-color:transparent;&amp;quot;&amp;gt;&apos;&amp;lt;/span&amp;gt;&apos; passt auf das Punktsymbol, &apos;\?&apos; passt auf das Fragezeichen. &apos;\n&apos; passt auf das Zeilenendsymbol. &amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Regex-Spickzettel: &amp;lt;a href=&amp;quot;http://www.rexegg.com/regex-quickstart.html&amp;quot;&amp;gt;&amp;lt;span style=&amp;quot; text-decoration: underline; color:#000080;&amp;quot;&amp;gt;www.rexegg.com/regex-quickstart.html&amp;lt;/span&amp;gt;&amp;lt;/a&amp;gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
 </translation>
     </message>
     <message>
@@ -2326,7 +2327,7 @@ As all assigned positions may be incorrect. </translation>
     <message>
         <location filename="ui_dialog_code_text.py" line="425"/>
         <source>txt</source>
-        <translation type="unfinished"></translation>
+        <translation>txt</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="426"/>
@@ -2336,12 +2337,12 @@ As all assigned positions may be incorrect. </translation>
     <message>
         <location filename="ui_dialog_code_text.py" line="433"/>
         <source>Documents</source>
-        <translation type="unfinished"></translation>
+        <translation>Dokumente</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="434"/>
         <source>Select a document</source>
-        <translation type="unfinished"></translation>
+        <translation>Dokument auswählen</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="435"/>
@@ -2591,17 +2592,17 @@ As all assigned positions may be incorrect. </translation>
     <message>
         <location filename="ui_dialog_journals.py" line="132"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. &lt;/p&gt;&lt;p&gt;A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A ‘*’ after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;‘&lt;/span&gt;\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Suche verwendet Regex-Funktionen. </translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="140"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add Attribute&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Attribute hinzufügen</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="144"/>
         <source>Modified</source>
-        <translation type="unfinished"></translation>
+        <translation>Geändert</translation>
     </message>
 </context>
 <context>
@@ -2657,7 +2658,7 @@ As all assigned positions may be incorrect. </translation>
     <message>
         <location filename="." line="1635122144"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Make sure the file name does not contain unusual characters such as &apos;: ; &amp;quot; &apos; otherwise it will raise an error when trying to save this file. Rename the file if needed.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Stellen Sie sicher, dass der Dateiname keine ungewöhnlichen Zeichen enthält, wie ': ; &amp;quot; ' Andernfalls wird beim Speichern dieser Datei ein Fehler ausgegeben. Benennen Sie die Datei bei Bedarf um.</translation>
+        <translation type="obsolete">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Stellen Sie sicher, dass der Dateiname keine ungewöhnlichen Zeichen enthält, wie &apos;: ; &amp;quot; &apos; Andernfalls wird beim Speichern dieser Datei ein Fehler ausgegeben. Benennen Sie die Datei bei Bedarf um.</translation>
     </message>
     <message>
         <location filename="." line="1635122144"/>
@@ -2776,7 +2777,7 @@ Texttranskriptionsdatei, die mit einer Audio- oder Videodatei verbunden ist, kan
     <message>
         <location filename="ui_dialog_manage_links.py" line="45"/>
         <source>Manage bad links to files</source>
-        <translation type="unfinished">Verwalten Sie fehlerhafte Links zu Dateien</translation>
+        <translation>Verwalten Sie fehlerhafte Links zu Dateien</translation>
     </message>
     <message>
         <location filename="ui_dialog_manage_links.py" line="47"/>
@@ -3252,7 +3253,7 @@ Texttranskriptionsdatei, die mit einer Audio- oder Videodatei verbunden ist, kan
     <message>
         <location filename="ui_dialog_report_codings.py" line="173"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Run report&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Bericht ausführen</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_codings.py" line="175"/>
@@ -3267,12 +3268,12 @@ Texttranskriptionsdatei, die mit einer Audio- oder Videodatei verbunden ist, kan
     <message>
         <location filename="ui_dialog_report_codings.py" line="203"/>
         <source>Variables CSV / XLSX</source>
-        <translation type="unfinished"></translation>
+        <translation>Variablen CSV / XLSX</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_codings.py" line="204"/>
         <source>Export matrix</source>
-        <translation type="unfinished"></translation>
+        <translation>Matrix exportieren</translation>
     </message>
 </context>
 <context>
@@ -3436,7 +3437,7 @@ Wählen Sie zwei Codierer, eine Datei, einen Code.</translation>
 The value list can be a single value  or a list where each list item is separated by a semi-colon &apos;;&apos;.
 Wildcards for &apos;like&apos; are % and _</source>
         <translation type="obsolete">Wählen Parameter aus, um Berichte für die unten aufgeführten Attribute einzuschränken.
-Die Werteliste kann ein einzelner Wert oder eine Liste sein, bei der jedes Listenelement durch ein Semikolon ';'
+Die Werteliste kann ein einzelner Wert oder eine Liste sein, bei der jedes Listenelement durch ein Semikolon &apos;;&apos;
 Platzhalter für &amp;quot;Gefällt mir&amp;quot; sind% und _</translation>
     </message>
     <message>
@@ -3706,7 +3707,7 @@ Nicht empfohlen, es sei denn, Sie haben viele große Dateien, die die Sicherung 
     <message>
         <location filename="ui_dialog_settings.py" line="426"/>
         <source>Description:</source>
-        <translation type="unfinished"></translation>
+        <translation>Beschreibung:</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="427"/>
@@ -3716,12 +3717,12 @@ Nicht empfohlen, es sei denn, Sie haben viele große Dateien, die die Sicherung 
     <message>
         <location filename="ui_dialog_settings.py" line="428"/>
         <source>API key</source>
-        <translation type="unfinished"></translation>
+        <translation>API Schlüssel</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="429"/>
         <source>AI Model</source>
-        <translation type="unfinished"></translation>
+        <translation>KI Modell</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="430"/>
@@ -3736,7 +3737,7 @@ Nicht empfohlen, es sei denn, Sie haben viele große Dateien, die die Sicherung 
     <message>
         <location filename="ui_dialog_settings.py" line="432"/>
         <source>Temperature:</source>
-        <translation type="unfinished"></translation>
+        <translation>Temperatur:</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="435"/>
@@ -3746,7 +3747,7 @@ Nicht empfohlen, es sei denn, Sie haben viele große Dateien, die die Sicherung 
     <message>
         <location filename="ui_dialog_settings.py" line="434"/>
         <source>   Top_p:</source>
-        <translation type="unfinished"></translation>
+        <translation>   Top_p:</translation>
     </message>
 </context>
 <context>
@@ -3912,12 +3913,12 @@ Nicht empfohlen, es sei denn, Sie haben viele große Dateien, die die Sicherung 
     <message>
         <location filename="ui_dialog_SQL.py" line="84"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export to Excel&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Excel exportieren</translation>
     </message>
     <message>
         <location filename="ui_dialog_SQL.py" line="85"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export to CSV file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Csv-Datei exportieren</translation>
     </message>
 </context>
 <context>
@@ -4123,7 +4124,7 @@ Nicht empfohlen, es sei denn, Sie haben viele große Dateien, die die Sicherung 
     <message>
         <location filename="ui_dialog_view_av.py" line="187"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;A dot â.â is used as a wild card, e.g. â.earsâ will match âbearsâ and âyearsâ. &amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;A â?â after a character will match one or none times that character, e.g. âbears?â will match âbearâ and âbearsâ &amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;&amp;lt;span style=&amp;quot; background-color:transparent;&amp;quot;&amp;gt;A â*â after a character will match zero or more times. &amp;lt;/span&amp;gt;&amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;&amp;lt;span style=&amp;quot; background-color:transparent;&amp;quot;&amp;gt;â&amp;lt;/span&amp;gt;\. will match the dot symbol, â\?â will match the question mark. â\nâ will match the line ending symbol. &amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Regex cheatsheet: &amp;lt;a href=&amp;quot;http://www.rexegg.com/regex-quickstart.html&amp;quot;&amp;gt;&amp;lt;span style=&amp;quot; text-decoration: underline; color:#000080;&amp;quot;&amp;gt;www.rexegg.com/regex-quickstart.html&amp;lt;/span&amp;gt;&amp;lt;/a&amp;gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Die Suche verwendet Regex-Funktionen. &amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Ein Punkt '.' wird als Platzhalter verwendet, z. B. '.ears' passt zu 'bears' und 'years'. &amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Ein '?' nach einem Zeichen entspricht einem oder keinem Mal diesem Zeichen, z.B. 'Bären?' entspricht 'Bär' und 'Bären' &amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;&amp;lt;span style=&amp;quot; background-color:transparent;&amp;quot;&amp;gt;Ein '*' nach einem Zeichen entspricht null oder mehr Mal. &amp;lt;/span&amp;gt;&amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;&amp;lt;span style=&amp;quot; background-color:transparent;&amp;quot;&amp;gt;'&amp;lt;/span&amp;gt;' passt auf das Punktsymbol, '\?' passt auf das Fragezeichen. '\n' passt auf das Zeilenendsymbol. &amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Regex-Spickzettel: &amp;lt;a href=&amp;quot;http://www.rexegg.com/regex-quickstart.html&amp;quot;&amp;gt;&amp;lt;span style=&amp;quot; text-decoration: underline; color:#000080;&amp;quot;&amp;gt;www.rexegg.com/regex-quickstart.html&amp;lt;/span&amp;gt;&amp;lt;/a&amp;gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
+        <translation type="obsolete">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Die Suche verwendet Regex-Funktionen. &amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Ein Punkt &apos;.&apos; wird als Platzhalter verwendet, z. B. &apos;.ears&apos; passt zu &apos;bears&apos; und &apos;years&apos;. &amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Ein &apos;?&apos; nach einem Zeichen entspricht einem oder keinem Mal diesem Zeichen, z.B. &apos;Bären?&apos; entspricht &apos;Bär&apos; und &apos;Bären&apos; &amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;&amp;lt;span style=&amp;quot; background-color:transparent;&amp;quot;&amp;gt;Ein &apos;*&apos; nach einem Zeichen entspricht null oder mehr Mal. &amp;lt;/span&amp;gt;&amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;&amp;lt;span style=&amp;quot; background-color:transparent;&amp;quot;&amp;gt;&apos;&amp;lt;/span&amp;gt;&apos; passt auf das Punktsymbol, &apos;\?&apos; passt auf das Fragezeichen. &apos;\n&apos; passt auf das Zeilenendsymbol. &amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Regex-Spickzettel: &amp;lt;a href=&amp;quot;http://www.rexegg.com/regex-quickstart.html&amp;quot;&amp;gt;&amp;lt;span style=&amp;quot; text-decoration: underline; color:#000080;&amp;quot;&amp;gt;www.rexegg.com/regex-quickstart.html&amp;lt;/span&amp;gt;&amp;lt;/a&amp;gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;
 </translation>
     </message>
     <message>
@@ -4161,7 +4162,7 @@ rot unterstrichen = Dem Code oder der Anmerkung zugewiesen</translation>
     <message>
         <location filename="ui_dialog_view_av.py" line="191"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. &lt;/p&gt;&lt;p&gt;A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A ‘*’ after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;‘&lt;/span&gt;\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Suche verwendet Regex-Funktionen. </translation>
     </message>
 </context>
 <context>
@@ -4232,8 +4233,8 @@ Codieren Sie diesen Text erst, wenn Sie Codieren - Text codieren aus der Menüle
     </message>
     <message>
         <location filename="ui_dialog_view_text.py" line="79"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot &#xe2;&#x80;&#x98;.&#xe2;&#x80;&#x99; is used as a wild card, e.g. &#xe2;&#x80;&#x98;.ears&#xe2;&#x80;&#x99; will match &#xe2;&#x80;&#x98;bears&#xe2;&#x80;&#x99; and &#xe2;&#x80;&#x98;years&#xe2;&#x80;&#x99;. &lt;/p&gt;&lt;p&gt;A &#xe2;&#x80;&#x98;?&#xe2;&#x80;&#x99; after a character will match one or none times that character, e.g. &#xe2;&#x80;&#x98;bears?&#xe2;&#x80;&#x99; will match &#xe2;&#x80;&#x98;bear&#xe2;&#x80;&#x99; and &#xe2;&#x80;&#x98;bears&#xe2;&#x80;&#x99; &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A &#xe2;&#x80;&#x98;*&#xe2;&#x80;&#x99; after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;&#xe2;&#x80;&#x98;&lt;/span&gt;\. will match the dot symbol, &#xe2;&#x80;&#x98;\?&#xe2;&#x80;&#x99; will match the question mark. &#xe2;&#x80;&#x98;\n&#xe2;&#x80;&#x99; will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot â.â is used as a wild card, e.g. â.earsâ will match âbearsâ and âyearsâ. &lt;/p&gt;&lt;p&gt;A â?â after a character will match one or none times that character, e.g. âbears?â will match âbearâ and âbearsâ &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A â*â after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;â&lt;/span&gt;\. will match the dot symbol, â\?â will match the question mark. â\nâ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>Die Suche verwendet Regex-Funktionen. </translation>
     </message>
 </context>
 <context>
@@ -4707,7 +4708,7 @@ Codieren Sie diesen Text erst, wenn Sie Codieren - Text codieren aus der Menüle
     <message>
         <location filename="ui_main.py" line="381"/>
         <source>Code organiser</source>
-        <translation type="unfinished"></translation>
+        <translation>Code Organisator</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="382"/>
