@@ -34,7 +34,7 @@
      <widget class="QPushButton" name="pushButton_auto_code">
       <property name="geometry">
        <rect>
-        <x>540</x>
+        <x>510</x>
         <y>0</y>
         <width>28</width>
         <height>28</height>
@@ -52,7 +52,7 @@
        <rect>
         <x>10</x>
         <y>0</y>
-        <width>281</width>
+        <width>251</width>
         <height>28</height>
        </rect>
       </property>
@@ -223,7 +223,7 @@
      <widget class="QPushButton" name="pushButton_auto_code_frag_this_file">
       <property name="geometry">
        <rect>
-        <x>570</x>
+        <x>540</x>
         <y>0</y>
         <width>28</width>
         <height>28</height>
@@ -239,7 +239,7 @@
      <widget class="QPushButton" name="pushButton_auto_code_frag_all_files">
       <property name="geometry">
        <rect>
-        <x>600</x>
+        <x>570</x>
         <y>0</y>
         <width>28</width>
         <height>28</height>
@@ -255,7 +255,7 @@
      <widget class="QPushButton" name="pushButton_auto_code_undo">
       <property name="geometry">
        <rect>
-        <x>660</x>
+        <x>630</x>
         <y>0</y>
         <width>28</width>
         <height>28</height>
@@ -287,7 +287,7 @@
      <widget class="QPushButton" name="pushButton_annotate">
       <property name="geometry">
        <rect>
-        <x>310</x>
+        <x>280</x>
         <y>0</y>
         <width>28</width>
         <height>28</height>
@@ -303,7 +303,7 @@
      <widget class="QPushButton" name="pushButton_coding_memo">
       <property name="geometry">
        <rect>
-        <x>370</x>
+        <x>340</x>
         <y>0</y>
         <width>28</width>
         <height>28</height>
@@ -319,7 +319,7 @@
      <widget class="QLabel" name="label_font_size">
       <property name="geometry">
        <rect>
-        <x>440</x>
+        <x>410</x>
         <y>2</y>
         <width>24</width>
         <height>24</height>
@@ -344,7 +344,7 @@
      <widget class="QSpinBox" name="spinBox_font_size">
       <property name="geometry">
        <rect>
-        <x>470</x>
+        <x>440</x>
         <y>0</y>
         <width>53</width>
         <height>30</height>
@@ -391,7 +391,7 @@
      <widget class="QPushButton" name="pushButton_auto_code_surround">
       <property name="geometry">
        <rect>
-        <x>630</x>
+        <x>600</x>
         <y>0</y>
         <width>28</width>
         <height>28</height>
@@ -407,7 +407,7 @@
      <widget class="QPushButton" name="pushButton_help">
       <property name="geometry">
        <rect>
-        <x>740</x>
+        <x>710</x>
         <y>0</y>
         <width>28</width>
         <height>28</height>
@@ -423,7 +423,7 @@
      <widget class="QPushButton" name="pushButton_show_memos">
       <property name="geometry">
        <rect>
-        <x>400</x>
+        <x>370</x>
         <y>0</y>
         <width>28</width>
         <height>28</height>
@@ -439,7 +439,7 @@
      <widget class="QPushButton" name="pushButton_show_annotations">
       <property name="geometry">
        <rect>
-        <x>340</x>
+        <x>310</x>
         <y>0</y>
         <width>28</width>
         <height>28</height>
@@ -536,6 +536,22 @@ As all assigned positions may be incorrect. </string>
       </property>
       <property name="toolTip">
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;After editing the text:&lt;/p&gt;&lt;p&gt;Review edited text to confirm code positions are correct. Press button to Undo edited text, if code postions are incorrect. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_default_new_code_color">
+      <property name="geometry">
+       <rect>
+        <x>610</x>
+        <y>40</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set default colour for new codes&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
