@@ -30,8 +30,8 @@ import os
 import re
 from shutil import copyfile
 import sqlite3
-import sys
-import traceback
+# import sys
+# import traceback
 
 from .GUI.ui_dialog_import import Ui_Dialog_Import
 from .helpers import Message
@@ -48,7 +48,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
     Each column can be categorised as an attribute OR as qualitative.
     Text from each qualitative colums are treated as individual files and loaded into the
     source table.
-    Some GUI elements cannot be changed to anotherlanguage:
+    Some GUI elements cannot be changed to another language:
     Quote format: NONE, MINIMAL, ALL
     Field type: character, numeric qualitative
     """
@@ -58,11 +58,11 @@ class DialogImportSurvey(QtWidgets.QDialog):
     fields_type = []
     delimiter = ""
     filepath = ""
-    headerIndex = 0  # table column index for header context menu actions
-    data = []  # obtained from csv file
-    preexisting_fields = []  # atribute names already in database
+    headerIndex = 0  # Table column index for header context menu actions
+    data = []  # Obtained from csv file
+    preexisting_fields = []  # attribute names already in database
     parent_textEdit = None
-    success = False  # ability to load file and has individual ids in first column
+    success = False  # Ability to load file and has individual ids in first column
 
     def __init__(self, app, parent_text_edit):
         """ Need to comment out the connection accept signal line in ui_Dialog_Import.py.
@@ -80,8 +80,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
         self.ui = Ui_Dialog_Import()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        font = f'font: {self.app.settings["fontsize"]}pt '
-        font += f'"{self.app.settings["font"]}";'
+        font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
         self.ui.lineEdit_delimiter.setText(self.delimiter)
         self.ui.lineEdit_delimiter.textChanged.connect(self.options_changed)
@@ -380,11 +379,30 @@ class DialogImportSurvey(QtWidgets.QDialog):
             QtWidgets.QApplication.processEvents()
         self.app.conn.commit()
 
+        # Create and insert qualitative codes from qualitative column names
+        for field in range(1, len(self.fields)):  # column 0 is for identifiers
+            # Create one text file combining each row, prefix [case identifier] to each row.
+            if self.fields_type[field] == "qualitative" and self.fields[field] != "":
+                try:
+                    cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,?,?,?,?)",
+                                (self.fields[field], "", self.app.settings['codername'],
+                                 datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),
+                                 None, "#B8B8B8"))
+                    self.app.conn.commit()
+                except Exception as e_:  # Codename might exist - sqlite.Integrityerror
+                    print(e_)
+                    logger.warning("Survey Insert code name from qual column " + str(e_))
+
         # Insert qualitative data into source table
         self.ui.label_msg.setText(_("Creating qualitative text file(s)"))
         source_sql = "insert into source(name,fulltext,memo,owner,date, mediapath) values(?,?,?,?,?, Null)"
         for field in range(1, len(self.fields)):  # column 0 is for identifiers
+            # More robust method to get code cid, e.g. if appending to existing survey, and codes already present.
+            cur.execute("select cid from code_name where name=?", [self.fields[field]])
+            res_code_cid = cur.fetchone()  # Either [cid] or None
+
             case_text_list = []
+
             # Create one text file combining each row, prefix [case identifier] to each row.
             if self.fields_type[field] == "qualitative" and self.ui.checkBox_collate.isChecked():
                 fulltext = ""
@@ -409,6 +427,24 @@ class DialogImportSurvey(QtWidgets.QDialog):
                 for case_text in case_text_list:
                     case_text.append(fid)
                     cur.execute(case_text_sql, case_text)
+                    # Insert code text for this qualitative column item
+                    if res_code_cid:
+                        try:
+                            cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
+                                        memo,date, important) values(?,?,?,?,?,?,?,?,?)", (res_code_cid[0],
+                                                                                           fid,
+                                                                                           fulltext[case_text[3]:case_text[4]],
+                                                                                           case_text[3],
+                                                                                           case_text[4],
+                                                                                           self.app.settings['codername'],
+                                                                                           "",
+                                                                                           now_date,
+                                                                                           None))
+                            self.app.conn.commit()
+                        except Exception as e_:
+                            print(e_)
+                            logger.debug(e_)
+
                 self.app.conn.commit()
                 # Add doc to vectorstore
                 if self.app.settings['ai_enable'] == 'True':
@@ -428,6 +464,24 @@ class DialogImportSurvey(QtWidgets.QDialog):
                     cur.execute(case_text_sql, [self.app.settings['codername'], now_date, "", 0, len(fulltext),
                                                 name_and_caseids[row][1], fid])
                     self.app.conn.commit()
+                    # Insert code text for this qualitative column
+                    if res_code_cid:
+                        try:
+                            cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
+                                        memo,date, important) values(?,?,?,?,?,?,?,?,?)", (res_code_cid[0],
+                                                                                           fid,
+                                                                                           fulltext,
+                                                                                           0,
+                                                                                           len(fulltext),
+                                                                                           self.app.settings['codername'],
+                                                                                           "",
+                                                                                           now_date,
+                                                                                           None))
+                            self.app.conn.commit()
+                        except Exception as e_:
+                            print(e_)
+                            logger.debug(e_)
+
                     # Add doc to vectorstore
                     if self.app.settings['ai_enable'] == 'True':
                         self.app.ai.sources_vectorstore.import_document(fid, qual_file_name, fulltext, update=True)
