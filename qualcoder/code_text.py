@@ -152,6 +152,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.recent_codes = []
         self.autocode_history = []
         self.undo_deleted_codes = []
+        self.default_new_code_color = None
         self.project_memo = False
         self.code_rule = False
         self.important = False
@@ -246,6 +247,8 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_auto_code_surround.pressed.connect(self.button_autocode_surround)
         self.ui.pushButton_auto_code_undo.setIcon(qta.icon('mdi6.undo'))
         self.ui.pushButton_auto_code_undo.pressed.connect(self.undo_autocoding)
+        self.ui.pushButton_default_new_code_color.setIcon(qta.icon('mdi6.palette', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_default_new_code_color.pressed.connect(self.set_default_new_code_color)
         self.ui.label_exports.setPixmap(qta.icon('mdi6.export').pixmap(22, 22))
         # Right hand side splitter buttons
         self.ui.pushButton_code_rule.setIcon(qta.icon('mdi6.text-shadow'))
@@ -347,6 +350,20 @@ class DialogCodeText(QtWidgets.QWidget):
 
         url = "https://github.com/ccbogel/QualCoder/wiki/4.1.-Coding-Text"
         webbrowser.open(url)
+
+    def set_default_new_code_color(self):
+        """ New code colours are usually generated randomly.
+         This overides the random approach, by setting a colout. """
+
+        tmp_code = {'name': 'new', 'color': None}
+        ui = DialogColorSelect(self.app, tmp_code)
+        ok = ui.exec()
+        if not ok:
+            return
+        color = ui.get_color()
+        if color is not None:
+            self.ui.pushButton_default_new_code_color.setStyleSheet(f'background-color: {color}')
+        self.default_new_code_color = color
 
     def change_text_font_size(self):
         """ Spinbox font size changed, range: 6 - 32 points. """
@@ -2502,7 +2519,7 @@ class DialogCodeText(QtWidgets.QWidget):
 
     def add_code(self, catid=None, code_name=""):
         """ Use add_item dialog to get new code text. Add_code_name dialog checks for
-        duplicate code name. A random color is selected for the code.
+        duplicate code name. A random color is selected for the code, or a color has been pre-set by the user.
         New code is added to data and database.
         param:
             catid : None to add to without category, catid to add to category.
@@ -2518,6 +2535,8 @@ class DialogCodeText(QtWidgets.QWidget):
             if code_name is None:
                 return False
         code_color = colors[randint(0, len(colors) - 1)]
+        if self.default_new_code_color:
+            code_color = self.default_new_code_color
         item = {'name': code_name, 'memo': "", 'owner': self.app.settings['codername'],
                 'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'catid': catid,
                 'color': code_color}
