@@ -1,25 +1,18 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2024 Colin Curtain
+This file is part of QualCoder.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+QualCoder is free software: you can redistribute it and/or modify it under the
+terms of the GNU Lesser General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later version.
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+QualCoder is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
+You should have received a copy of the GNU Lesser General Public License along with QualCoder.
+If not, see <https://www.gnu.org/licenses/>.
 
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
@@ -35,6 +28,7 @@ from .GUI.ui_dialog_colour_selector import Ui_Dialog_colour_selector
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
+
 
 class TextColor:
     """ Returns light or dark depending on the code color. """
@@ -184,9 +178,10 @@ class DialogColorSelect(QtWidgets.QDialog):
         self.used_colors = cur.fetchall()
         self.fill_table()
         # Preset with the current colour
-        fg_color = TextColor(code_['color']).recommendation
-        style = "QLabel {background-color :" + code_['color'] + "; color : " + fg_color + ";}"
-        self.ui.label_colour_old.setStyleSheet(style)
+        if code_['color']:
+            fg_color = TextColor(code_['color']).recommendation
+            style = "QLabel {background-color :" + code_['color'] + "; color : " + fg_color + ";}"
+            self.ui.label_colour_old.setStyleSheet(style)
         self.ui.label_colour_old.setAutoFillBackground(True)
         self.ui.label_colour_old.setToolTip(_("Current colour"))
         self.ui.label_colour_old.setText(code_['name'])
