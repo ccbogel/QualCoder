@@ -89,6 +89,8 @@ class DialogImportSurvey(QtWidgets.QDialog):
         self.ui.tableWidget.horizontalHeader().setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget.horizontalHeader().customContextMenuRequested.connect(self.table_menu)
         self.ui.tableWidget.setTabKeyNavigation(False)
+        # One qual file per column causes multiple imports with name_differing_datetime when same data) is imported multiple times
+        self.ui.checkBox_collate.hide()
 
         cur = self.app.conn.cursor()
         cur.execute("select name from attribute_type where caseOrFile='case'")
@@ -382,8 +384,11 @@ class DialogImportSurvey(QtWidgets.QDialog):
                 if name_id[0] == val[0]:
                     for col in range(1, len(val)):
                         if self.fields_type[col] != "qualitative":
-                            cur.execute(sql, (self.fields[col], val[col], name_id[1], 'case',
+                            try:
+                                cur.execute(sql, (self.fields[col], val[col], name_id[1], 'case',
                                               now_date, self.app.settings['codername']))
+                            except sqlite3.IntegrityError as e_:
+                                logger.warning(str(e_) + "Survey import - attribute exists")
             QtWidgets.QApplication.processEvents()
         self.app.conn.commit()
 
@@ -411,7 +416,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
 
             case_text_list = []
 
-            # Create one text file combining each row, prefix [case identifier] to each row.
+            '''# Create one text file combining each row, prefix [case identifier] to each row.
             if self.fields_type[field] == "qualitative" and self.ui.checkBox_collate.isChecked():
                 fulltext = ""
                 for row in range(0, len(self.data)):
@@ -457,23 +462,28 @@ class DialogImportSurvey(QtWidgets.QDialog):
 
                 # Add doc to vectorstore
                 if self.app.settings['ai_enable'] == 'True':
-                    self.app.ai.sources_vectorstore.import_document(fid, qual_file_name, fulltext, update=True)
+                    self.app.ai.sources_vectorstore.import_document(fid, qual_file_name, fulltext, update=True)'''
 
             # Create one text file per row, prefix [case identifier] to each row.
             if self.fields_type[field] == "qualitative" and not self.ui.checkBox_collate.isChecked():
                 for row in range(0, len(self.data)):
                     qual_file_name = f"{self.data[row][0]}_{self.fields[field]}"
                     fulltext = f"{self.data[row][field]}"
-                    cur.execute(source_sql,
-                                (qual_file_name, fulltext, "", self.app.settings['codername'], now_date))
-                    self.app.conn.commit()
-                    cur.execute("select last_insert_rowid()")
+                    integrity_error = None
+                    try:
+                        cur.execute(source_sql,
+                                    (qual_file_name, fulltext, "", self.app.settings['codername'], now_date))
+                        self.app.conn.commit()
+                    except sqlite3.IntegrityError as integrity_error:
+                        logger.warning(integrity_error)
+                    cur.execute("select id from source where name=?", [qual_file_name])  # may be pre-existing
                     fid = cur.fetchone()[0]
                     case_text_sql = "insert into case_text (owner, date, memo, pos0, pos1, caseid, fid) values(?,?,?,?,?,?,?)"
                     # If name_and_caseids[row][1] is None, then the text will not be linked to a file. Potential issue.
                     cur.execute(case_text_sql, [self.app.settings['codername'], now_date, "", 0, len(fulltext),
                                                 name_and_caseids[row][1], fid])
                     self.app.conn.commit()
+
                     # Insert code text for this qualitative column
                     if res_code_cid:
                         try:
