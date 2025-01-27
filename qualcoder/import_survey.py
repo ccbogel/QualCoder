@@ -324,6 +324,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
         now_date = str(datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"))
         cur = self.app.conn.cursor()
         name_and_caseids = []
+        duplicates_warning = ""
         for i, c in enumerate(self.data):
             try:
                 self.ui.label_msg.setText(_("Inserting cases: " + str(i)))
@@ -334,12 +335,16 @@ class DialogImportSurvey(QtWidgets.QDialog):
                 name_and_caseids.append([c[0], cur.fetchone()[0]])
                 QtWidgets.QApplication.processEvents()
             except sqlite3.IntegrityError as e:
-                fail_msg = str(e) + _(
-                    " - Duplicate case names, either in the file, or duplicates with existing cases in the project")
-                logger.error(_("Survey not loaded: ") + fail_msg)
-                Message(self.app, _('Survey not loaded'), fail_msg, "warning").exec()
-                self.parent_textEdit.append(_("Survey not loaded: ") + fail_msg)
-                return
+                cur.execute("select caseid from cases where name=?", [c[0]])
+                caseid_res = cur.fetchone()
+                name_and_caseids.append([c[0], caseid_res[0]])  # potentially could be None
+                fail_msg = c[0] + ": " + str(e) + _(" Duplicate case names, either in the file, or with existing project cases")
+                logger.warning(fail_msg)
+                duplicates_warning += fail_msg + "\n"
+        if duplicates_warning != "":
+            Message(self.app, _('Duplicate case names warning'), duplicates_warning, "warning").exec()
+            self.parent_textEdit.append(_("Survey import warning: ") + duplicates_warning)
+
         # Insert non-qualitative attribute types, except if they are already present
         sql = "select name from attribute_type where caseOrFile='case'"
         cur.execute(sql)
@@ -462,6 +467,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
                     cur.execute("select last_insert_rowid()")
                     fid = cur.fetchone()[0]
                     case_text_sql = "insert into case_text (owner, date, memo, pos0, pos1, caseid, fid) values(?,?,?,?,?,?,?)"
+                    # If name_and_caseids[row][1] is None, then the text will not be linked to a file. Potential issue.
                     cur.execute(case_text_sql, [self.app.settings['codername'], now_date, "", 0, len(fulltext),
                                                 name_and_caseids[row][1], fid])
                     self.app.conn.commit()
