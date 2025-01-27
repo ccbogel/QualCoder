@@ -1365,6 +1365,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         Q Quick Mark with code - for current selection
         H Hide / Unhide top groupbox
         I Tag important
+        L Show codes like
         M memo code - at clicked position - text edit only
         O Shortcut to cycle through overlapping codes - at clicked position- text edit only
         S search text - may include current selection
@@ -1422,41 +1423,44 @@ class DialogCodePdf(QtWidgets.QWidget):
                     return
                 self.ui.graphicsView.scale(0.9, 0.9)
                 return
-            # Hide unHide top groupbox
-            if key == QtCore.Qt.Key.Key_H:
-                self.ui.groupBox.setHidden(not (self.ui.groupBox.isHidden()))
+        # Hide unHide top groupbox
+        if key == QtCore.Qt.Key.Key_H:
+            self.ui.groupBox.setHidden(not (self.ui.groupBox.isHidden()))
+            return
+        # Show codes like
+        if key == QtCore.Qt.Key.Key_L:
+            self.show_codes_like()
+        # Quick mark selected
+        if key == QtCore.Qt.Key.Key_Q:
+            self.selected_graphic_textboxes = self.scene.selectedItems()
+            if len(self.selected_graphic_textboxes) == 0:
                 return
-            # Quick mark selected
-            if key == QtCore.Qt.Key.Key_Q:
-                self.selected_graphic_textboxes = self.scene.selectedItems()
-                if len(self.selected_graphic_textboxes) == 0:
-                    return
-                self.mark(by_text_boxes=True)
+            self.mark(by_text_boxes=True)
+            return
+        # Recent codes selection
+        if key == QtCore.Qt.Key.Key_R and len(self.recent_codes) > 0:
+            self.selected_graphic_textboxes = self.scene.selectedItems()
+            if len(self.selected_graphic_textboxes) == 0:
                 return
-            # Recent codes selection
-            if key == QtCore.Qt.Key.Key_R and len(self.recent_codes) > 0:
-                self.selected_graphic_textboxes = self.scene.selectedItems()
-                if len(self.selected_graphic_textboxes) == 0:
-                    return
-                # Can only be single selection, as text boxes re-drawn selection is lost.
-                ui = DialogSelectItems(self.app, self.recent_codes, _("Select code"), "single")
-                ok = ui.exec()
-                if not ok:
-                    return
-                selection = ui.get_selected()
-                self.recursive_set_current_item(self.ui.treeWidget.invisibleRootItem(), selection['name'])
-                self.mark(by_text_boxes=True)
+            # Can only be single selection, as text boxes re-drawn selection is lost.
+            ui = DialogSelectItems(self.app, self.recent_codes, _("Select code"), "single")
+            ok = ui.exec()
+            if not ok:
                 return
-            # Unmark text boxes
-            ''' Review graphicsview_menu for code for this action '''
-            '''if key == QtCore.Qt.Key.Key_U:
-                self.selected_graphic_textboxes = self.scene.selectedItems()
-                if len(self.selected_graphic_textboxes) == 0:
-                    return
-                print("U")
-                #self.unmark(cursor_pos)
+            selection = ui.get_selected()
+            self.recursive_set_current_item(self.ui.treeWidget.invisibleRootItem(), selection['name'])
+            self.mark(by_text_boxes=True)
+            return
+        # Unmark text boxes
+        ''' Review graphicsview_menu for code for this action '''
+        '''if key == QtCore.Qt.Key.Key_U:
+            self.selected_graphic_textboxes = self.scene.selectedItems()
+            if len(self.selected_graphic_textboxes) == 0:
                 return
-            # TODO MORE'''
+            print("U")
+            #self.unmark(cursor_pos)
+            return
+        # TODO MORE'''
 
         if not self.ui.textEdit.hasFocus():
             return
