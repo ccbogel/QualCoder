@@ -895,7 +895,8 @@ class DialogReportRelations(QtWidgets.QDialog):
         fig.show()
 
     def fill_table_statistics(self):
-        """ Fill statistics table with statistical summary of results """
+        """ Fill statistics table with statistical summary of results.
+         """
 
         col_stats_names = [_("Code") + " 0", _("Code") + " 1", _("Count"), "Min", "1st Q",
                            "Median", "3rd Q", "Max", "mean", "std dev"]
@@ -905,14 +906,14 @@ class DialogReportRelations(QtWidgets.QDialog):
         for row, rel in enumerate(self.result_summary):
             self.ui.tableWidget_statistics.insertRow(row)
             item = QtWidgets.QTableWidgetItem()
-            item.setData(QtCore.Qt.ItemDataRole.DisplayRole, rel['cid0'])
+            item.setData(QtCore.Qt.ItemDataRole.DisplayRole, rel['c0_name'])
             item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
-            item.setToolTip(rel['c0_name'])
+            item.setToolTip(f"cid:{rel['cid0']}")
             self.ui.tableWidget_statistics.setItem(row, 0, item)
             item = QtWidgets.QTableWidgetItem()
-            item.setData(QtCore.Qt.ItemDataRole.DisplayRole, rel['cid1'])
+            item.setData(QtCore.Qt.ItemDataRole.DisplayRole, rel['c1_name'])
             item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
-            item.setToolTip(rel['c1_name'])
+            item.setToolTip(f"cid:{rel['cid1']}")
             self.ui.tableWidget_statistics.setItem(row, 1, item)
             item = QtWidgets.QTableWidgetItem()
             item.setData(QtCore.Qt.ItemDataRole.DisplayRole, rel['count'])
