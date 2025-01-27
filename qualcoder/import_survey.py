@@ -368,7 +368,10 @@ class DialogImportSurvey(QtWidgets.QDialog):
             if name not in survey_field_names:
                 for name_id in name_and_caseids:
                     sql = "insert into attribute (name, value, id, attr_type, date, owner) values (?,'',?,?,?,?)"
-                    cur.execute(sql, (name, name_id[1], 'case', now_date, self.app.settings['codername']))
+                    try:
+                        cur.execute(sql, (name, name_id[1], 'case', now_date, self.app.settings['codername']))
+                    except sqlite3.IntegrityError as e_:
+                        logger.warning(str(e_) + "Survey import - attribute exists")
         self.app.conn.commit()
 
         # Insert non-qualitative values to each case using caseids
