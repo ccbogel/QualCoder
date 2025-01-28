@@ -217,7 +217,7 @@ You will need to install developer tools for macOS. [See https://www.cnet.com/te
 
 1) Install a recent version of [Python3](https://www.python.org/downloads/) e.g. 3.10, 3.11 or 3.12, (Note: Python 3.13 is not supported yet) and [VLC](https://www.videolan.org/vlc/).
 
-2)  Download the QualCoder software from: https://github.com/ccbogel/QualCoder from the Green Code button. This is the newest, but not yet officially released code (occasionally coding errors creep in).  Click the green button "Code", and then "Download ZIP". **Alternatively**, choose the most recent release zip (e.g. 3.6 release), see the right-hand side of this page for the link to Releases. If you want to use this version, follow the installation instructions in the Readme.md included in the downloaded zip. Unzip it into the /Applications directory.
+2)  Download the QualCoder software from: https://github.com/ccbogel/QualCoder from the Green Code button. This is the newest, but not yet officially released code (occasionally coding errors creep in).  Click the green button "Code", and then "Download ZIP". **Alternatively**, choose the most recent release zip (e.g. source QualCoder-3.6.zip release), see the right-hand side of this page for the link to Releases. If you want to use this version, follow the installation instructions in the Readme.md included in the downloaded zip. Unzip it into the /Applications directory.
 
 3) Open the Terminal app (or any other command shell). Install PIP using these commands (if not already installed). Check pip is installed: try typing `pip3 --version` and hit ENTER) 
 
