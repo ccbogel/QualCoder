@@ -213,7 +213,7 @@ Note 2: Fedora uses Wayland which does not work well with the Qt graphical inter
 
 The instructions work on Mac Monterey. It is recommended to use a virtual environment, see: https://sourabhbajaj.com/mac-setup/Python/virtualenv.html The below instructions can be used inside a virtual environment folder instead of placed in Applications.
 
-You will need to install developer tools for macOS. [See https://www.cnet.com/tech/computing/install-command-line-developer-tools-in-os-x/](https://www.cnet.com/tech/computing/install-command-line-developer-tools-in-os-x/)
+You will need to install developer tools for macOS. [See https://www.cnet.com/tech/computing/install-command-line-developer-tools-in-os-x/](https://www.cnet.com/tech/computing/install-command-line-developer-tools-in-os-x/)  If you do not have the developer code, just start the installation process below and you will be prompted to install the developer code. This may be easier than figuring out if you have it or how to get it. Expect this process to take a long time.
 
 1) Install a recent version of [Python3](https://www.python.org/downloads/) e.g. 3.10, 3.11 or 3.12, (Note: Python 3.13 is not supported yet) and [VLC](https://www.videolan.org/vlc/).
 
