@@ -221,7 +221,13 @@ You will need to install developer tools for macOS. [See https://www.cnet.com/te
 
 3) Open the Terminal app (or any other command shell)
 
-4) Install PIP using these commands (if not already installed). Check pip is installed: try typing `pip3 --version` and hit ENTER) 
+   Be sure that you are in the QualCoder-Master directory.
+
+   To change the directory, enter or copy and run the script below.
+
+   `cd /Applications/QualCoder-master`
+
+5) Install PIP using these commands (if not already installed). Check pip is installed: try typing `pip3 --version` and hit ENTER) 
 
 ```sh
 curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
@@ -241,11 +247,6 @@ If you are on an older, Intel-based Mac, you must perform the following step aft
 ```
 pip install "numpy<2" # don't forget the quotation marks
 ```
-Be sure that you are in the QualCoder-Master directory before doing Step 6.
-
-To change the directory, enter or copy and run the script below.
-
-`cd /Applications/QualCoder-master`
 
 6) From the QualCoder-Master directory run the setup script:
 
