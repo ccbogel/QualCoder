@@ -16,6 +16,7 @@ ui_dialog_code_relations.py \
 ui_dialog_code_text.py \
 ui_dialog_colour_selector.py \
 ui_dialog_confirm_delete.py \
+ui_dialog_cooccurrence.py \
 ui_dialog_graph.py \
 ui_dialog_import.py \
 ui_dialog_information.py \
