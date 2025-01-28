@@ -217,49 +217,50 @@ You will need to install developer tools for macOS. [See https://www.cnet.com/te
 
 1) Install a recent version of [Python3](https://www.python.org/downloads/) e.g. 3.10, 3.11 or 3.12, (Note: Python 3.13 is not supported yet) and [VLC](https://www.videolan.org/vlc/).
 
-2)  Download the QualCoder software from: https://github.com/ccbogel/QualCoder from the Green Code button. This is the newest, but not yet officially released code (occasionally coding errors creep in).  Click the green button "Code", and then "Download ZIP". **Alternatively**, choose the most recent release zip, see the right-hand side of this page for the link to Releases. If you want to use this version, follow the installation instructions in the Readme.md included in the downloaded zip.
+2)  Download the QualCoder software from: https://github.com/ccbogel/QualCoder from the Green Code button. This is the newest, but not yet officially released code (occasionally coding errors creep in).  Click the green button "Code", and then "Download ZIP". **Alternatively**, choose the most recent release zip (e.g. 3.6 release), see the right-hand side of this page for the link to Releases. If you want to use this version, follow the installation instructions in the Readme.md included in the downloaded zip.
 
-3) Open the Terminal app (or any other command shell)
-
-   Be sure that you are in the QualCoder-Master directory.
-
-   To change the directory, enter or copy and run the script below.
-
-   `cd /Applications/QualCoder-master`
-
-5) Install PIP using these commands (if not already installed). Check pip is installed: try typing `pip3 --version` and hit ENTER) 
+3) Open the Terminal app (or any other command shell). Install PIP using these commands (if not already installed). Check pip is installed: try typing `pip3 --version` and hit ENTER) 
 
 ```sh
 curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
 
-
 python3 get-pip.py
 ```
 
--> You should now be able to run `pip3` as above.
+You should now be able to run `pip3` as above.
 
-5) Install Python dependency modules using `pip`:
+4) In the terminal or command line move to the QualCoder directory. Be sure that you are in the QualCoder-Master directory. Or with a release, the Qualcode-3.6 directory, for example. 
+
+   To move to the directory, run the script below.
+
+   `cd /Applications/QualCoder-master`
+
+   Or with a release
+
+  `cd /Applications/QualCoder-3.6`
+
+5) Install Python dependency modules using `pip`, from the QualCoder-master directory. Or from the release directort QualCoder-3.6 directory:
 
 ```sh
 pip3 install -r requirements.txt
 ```
 If you are on an older, Intel-based Mac, you must perform the following step after installing all the other requirements:
 ```
-pip install "numpy<2" # don't forget the quotation marks
+pip install "numpy<2" # Don't forget the quotation marks
 ```
 
-6) From the QualCoder-Master directory run the setup script:
+6) From the QualCoder-Master directory (or the QualCode-3.6 release directory) run the setup script:
 
 `python3 -m pip install .`
 
 
-Assuming you downloaded the Qualcoder-master version. You can now run with:
+7) Run QualCoder. You can now run with the below commands (if you used a release, replace QualCoder-master with QuyalCoder-3.6 or other release number):
 
 ```
 python3 /applications/QualCoder-master/qualcoder/__main__.py
 ```
 
-Alternative commands to run QualCoder (Suggestions):
+Alternative suggested commands to run QualCoder:
 
 From any directory:
 
@@ -272,8 +273,6 @@ From the QualCoder-Master directory:
 or
 
 `python3 qualcoder/__main__.py`
-
-You can install QualCoder anywhere you want, so the path above depends on where you extracted the archive.
 
 Another option to run Qualcoder is shown here: [https://www.maketecheasier.com/run-python-script-in-mac/](https://www.maketecheasier.com/run-python-script-in-mac/). This means you can right-click on the qualcoder.py file and open with --> python launcher. 
 You can make an alias to the file and place it on your desktop.
