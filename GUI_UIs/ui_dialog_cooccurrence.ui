@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Dialog_Coocurrence</class>
+ <widget class="QDialog" name="Dialog_Coocurrence">
+  <property name="windowModality">
+   <enum>Qt::NonModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>694</width>
+    <height>543</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Code Co-occurence</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="leftMargin">
+    <number>6</number>
+   </property>
+   <property name="rightMargin">
+    <number>6</number>
+   </property>
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>75</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>75</height>
+      </size>
+     </property>
+     <property name="title">
+      <string/>
+     </property>
+     <widget class="QLabel" name="label_selections">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>3</y>
+        <width>261</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>22</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777213</width>
+        <height>22</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show the overlapping codes.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string>Code co-occurence</string>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_export">
+      <property name="geometry">
+       <rect>
+        <x>290</x>
+        <y>1</y>
+        <width>32</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>32</width>
+        <height>32</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>32</width>
+        <height>32</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export to file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBox_hide_blanks">
+      <property name="geometry">
+       <rect>
+        <x>340</x>
+        <y>10</y>
+        <width>201</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Hide blank lines</string>
+      </property>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string/>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <property name="leftMargin">
+       <number>6</number>
+      </property>
+      <property name="topMargin">
+       <number>6</number>
+      </property>
+      <property name="rightMargin">
+       <number>6</number>
+      </property>
+      <property name="bottomMargin">
+       <number>6</number>
+      </property>
+      <item row="0" column="0">
+       <widget class="QTableWidget" name="tableWidget"/>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>pushButton_export</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

@@ -114,7 +114,7 @@
      <x>0</x>
      <y>0</y>
      <width>1024</width>
-     <height>24</height>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuProject">
@@ -194,6 +194,7 @@
     <addaction name="actionFile_summary"/>
     <addaction name="actionCode_summary"/>
     <addaction name="actionCode_relations"/>
+    <addaction name="actionCode_co_occurrence"/>
     <addaction name="actionCode_text_exact_matches"/>
     <addaction name="actionText_segments_by_codes"/>
     <addaction name="actionView_Graph"/>
@@ -585,6 +586,11 @@
   <action name="actionAI_assisted_coding">
    <property name="text">
     <string>AI assisted coding</string>
+   </property>
+  </action>
+  <action name="actionCode_co_occurrence">
+   <property name="text">
+    <string>Code co-occurrence</string>
    </property>
   </action>
  </widget>
