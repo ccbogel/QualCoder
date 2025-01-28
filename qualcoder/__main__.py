@@ -1295,6 +1295,7 @@ Click "Yes" to start now.')
         self.ui.actionCode_summary.triggered.connect(self.report_code_summary)
         self.ui.actionCode_relations.setShortcut('Alt+Q')
         self.ui.actionCode_relations.triggered.connect(self.report_code_relations)
+        self.ui.actionCode_co_occurrence.triggered.connect(self.co_occurence)
         self.ui.actionCode_text_exact_matches.triggered.connect(self.report_exact_text_matches)
         self.ui.actionText_segments_by_codes.triggered.connect(self.text_segments_codes_table)
         self.ui.actionView_Graph.setShortcut('Alt+G')
@@ -1431,6 +1432,7 @@ Click "Yes" to start now.')
         self.ui.actionCoding_comparison_by_file.setEnabled(False)
         self.ui.actionCode_frequencies.setEnabled(False)
         self.ui.actionCode_relations.setEnabled(False)
+        self.ui.actionCode_co_occurrence.setEnabled(False)
         self.ui.actionCode_text_exact_matches.setEnabled(False)
         self.ui.actionText_mining.setEnabled(False)
         self.ui.actionSQL_statements.setEnabled(False)
@@ -1478,6 +1480,7 @@ Click "Yes" to start now.')
         self.ui.actionCoding_comparison_by_file.setEnabled(True)
         self.ui.actionCode_frequencies.setEnabled(True)
         self.ui.actionCode_relations.setEnabled(True)
+        self.ui.actionCode_co_occurrence.setEnabled(True)
         self.ui.actionCode_text_exact_matches.setEnabled(True)
         self.ui.actionSQL_statements.setEnabled(True)
         self.ui.actionFile_summary.setEnabled(True)
@@ -1585,6 +1588,14 @@ Click "Yes" to start now.')
         self.ui.label_reports.hide()
         ui = DialogReportRelations(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_reports, ui)
+
+    def co_occurence(self):
+        """ Show overlapping codes in text files. """
+
+        Message(self.app, "Co-occurrence", "Work in progress").exec()
+        self.ui.label_reports.hide()
+        #ui = DialogReportRelations(self.app, self.ui.textEdit)
+        #self.tab_layout_helper(self.ui.tab_reports, ui)
 
     def report_exact_text_matches(self):
         """ Show exact text coding matches in text files. """
