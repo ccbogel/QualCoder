@@ -229,7 +229,7 @@ python3 get-pip.py
 
 You should now be able to run `pip3` as above.
 
-4) In the terminal or command line move to the QualCoder directory. Be sure that you are in the QualCoder-Master directory. Or with a release, the Qualcode-3.6 directory, for example. 
+4) In the terminal or command line move to the QualCoder directory. Be sure that you are in the QualCoder-Master directory. Or with a release, the Qualcode-3.6 directory, for example. An alternative way to open Terminal in the correct location is to do this: Open Finder, open Applications, and right click on the QualCoder-master folder and select "New Terminal at Folder"
 
    To move to the directory, run the script below.
 
