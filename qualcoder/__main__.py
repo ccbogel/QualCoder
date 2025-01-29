@@ -68,6 +68,7 @@ from qualcoder.report_code_summary import DialogReportCodeSummary
 from qualcoder.report_compare_coder_file import DialogCompareCoderByFile
 from qualcoder.report_codes import DialogReportCodes
 from qualcoder.report_codes_by_segments import DialogCodesBySegments
+from qualcoder.report_cooccurrence import DialogReportCooccurrence
 from qualcoder.report_file_summary import DialogReportFileSummary
 from qualcoder.report_exact_matches import DialogReportExactTextMatches
 from qualcoder.report_relations import DialogReportRelations
@@ -1592,10 +1593,9 @@ Click "Yes" to start now.')
     def co_occurence(self):
         """ Show overlapping codes in text files. """
 
-        Message(self.app, "Co-occurrence", "Work in progress").exec()
         self.ui.label_reports.hide()
-        #ui = DialogReportRelations(self.app, self.ui.textEdit)
-        #self.tab_layout_helper(self.ui.tab_reports, ui)
+        ui = DialogReportCooccurrence(self.app, self.ui.textEdit)
+        self.tab_layout_helper(self.ui.tab_reports, ui)
 
     def report_exact_text_matches(self):
         """ Show exact text coding matches in text files. """
