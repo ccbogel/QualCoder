@@ -233,6 +233,9 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.pushButton_previous_page.setIcon(qta.icon('mdi6.page-previous-outline', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_next_page.setIcon(qta.icon('mdi6.page-next-outline', options=[{'scale_factor': 1.3}]))
 
+        self.ui.comboBox_fontsize.setCurrentIndex(2)
+        self.ui.comboBox_fontsize.currentIndexChanged.connect(self.update_page)
+
         self.get_files()
         self.fill_tree()
         msg = _("QualCoder roughly displays PDFs.")
