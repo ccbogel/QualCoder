@@ -341,28 +341,6 @@
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QSpinBox" name="spinBox_font_size">
-      <property name="geometry">
-       <rect>
-        <x>440</x>
-        <y>0</y>
-        <width>53</width>
-        <height>30</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Text font size&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-      <property name="minimum">
-       <number>6</number>
-      </property>
-      <property name="maximum">
-       <number>32</number>
-      </property>
-      <property name="value">
-       <number>12</number>
-      </property>
-     </widget>
      <widget class="QLabel" name="label_search_regex">
       <property name="geometry">
        <rect>
@@ -556,6 +534,56 @@ As all assigned positions may be incorrect. </string>
       <property name="text">
        <string/>
       </property>
+     </widget>
+     <widget class="QComboBox" name="comboBox_fontsize">
+      <property name="geometry">
+       <rect>
+        <x>440</x>
+        <y>0</y>
+        <width>61</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <item>
+       <property name="text">
+        <string>8</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>10</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>12</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>14</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>16</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>18</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>20</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>22</string>
+       </property>
+      </item>
      </widget>
     </widget>
    </item>
@@ -1172,7 +1200,6 @@ As all assigned positions may be incorrect. </string>
   <tabstop>pushButton_show_annotations</tabstop>
   <tabstop>pushButton_coding_memo</tabstop>
   <tabstop>pushButton_show_memos</tabstop>
-  <tabstop>spinBox_font_size</tabstop>
   <tabstop>pushButton_auto_code</tabstop>
   <tabstop>pushButton_auto_code_frag_this_file</tabstop>
   <tabstop>pushButton_auto_code_frag_all_files</tabstop>
