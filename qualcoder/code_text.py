@@ -267,8 +267,14 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.label_search_case_sensitive.setPixmap(qta.icon('mdi6.format-letter-case').pixmap(22, 22))
         self.ui.label_search_all_files.setPixmap(qta.icon('mdi6.text-box-multiple-outline').pixmap(22, 22))
         self.ui.label_font_size.setPixmap(qta.icon('mdi6.format-size').pixmap(22, 22))
-        self.ui.spinBox_font_size.setValue(self.app.settings['docfontsize'])
-        self.ui.spinBox_font_size.valueChanged.connect(self.change_text_font_size)
+
+        index = self.ui.comboBox_fontsize.findText(str(self.app.settings['docfontsize']),
+                                                      QtCore.Qt.MatchFlag.MatchFixedString)
+        if index == -1:
+            index = 0
+        self.ui.comboBox_fontsize.setCurrentIndex(index)
+        self.ui.comboBox_fontsize.currentTextChanged.connect(self.change_text_font_size)
+
         self.ui.pushButton_previous.setIcon(qta.icon('mdi6.arrow-left', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_previous.setEnabled(False)
         self.ui.pushButton_next.setIcon(qta.icon('mdi6.arrow-right', options=[{'scale_factor': 1.3}]))
@@ -366,9 +372,9 @@ class DialogCodeText(QtWidgets.QWidget):
         self.default_new_code_color = color
 
     def change_text_font_size(self):
-        """ Spinbox font size changed, range: 6 - 32 points. """
+        """ Combobox font size changed, range: 8 - 22 points. """
 
-        font = f'font: {self.ui.spinBox_font_size.value()}pt "{self.app.settings["font"]}";'
+        font = f'font: {self.ui.comboBox_fontsize.currentText()}pt "{self.app.settings["font"]}";'
         self.ui.textEdit.setStyleSheet(font)
 
     def get_files(self, ids=None):
