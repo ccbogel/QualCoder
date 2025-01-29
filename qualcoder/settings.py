@@ -1,25 +1,18 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2024 Colin Curtain
+This file is part of QualCoder.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+QualCoder is free software: you can redistribute it and/or modify it under the
+terms of the GNU Lesser General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later version.
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+QualCoder is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
+You should have received a copy of the GNU Lesser General Public License along with QualCoder.
+If not, see <https://www.gnu.org/licenses/>.
 
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
@@ -94,9 +87,27 @@ class DialogSettings(QtWidgets.QDialog):
         for index, snf in enumerate(speakernameformats):
             if snf == self.settings['speakernameformat']:
                 self.ui.comboBox_speaker.setCurrentIndex(index)
-        self.ui.spinBox.setValue(self.settings['fontsize'])
-        self.ui.spinBox_treefontsize.setValue(self.settings['treefontsize'])
-        self.ui.spinBox_docfontsize.setValue(self.settings['docfontsize'])
+
+        #self.ui.spinBox.setValue(self.settings['fontsize'])
+        index = self.ui.comboBox_fontsize.findText(str(self.settings['fontsize']),
+                                                          QtCore.Qt.MatchFlag.MatchFixedString)
+        if index == -1:
+            index = 0
+        self.ui.comboBox_fontsize.setCurrentIndex(index)
+
+        #self.ui.spinBox_treefontsize.setValue(self.settings['treefontsize'])
+        index = self.ui.comboBox_codetreefontsize.findText(str(self.settings['treefontsize']),
+                                                          QtCore.Qt.MatchFlag.MatchFixedString)
+        if index == -1:
+            index = 0
+        self.ui.comboBox_codetreefontsize.setCurrentIndex(index)
+
+        index = self.ui.comboBox_docfontsize.findText(str(self.settings['docfontsize']),
+                                                          QtCore.Qt.MatchFlag.MatchFixedString)
+        if index == -1:
+            index = 0
+        self.ui.comboBox_docfontsize.setCurrentIndex(index)
+
         self.ui.comboBox_coders.currentIndexChanged.connect(self.combobox_coder_changed)
         index = self.ui.comboBox_text_chunk_size.findText(str(self.settings['codetext_chunksize']),
                                                           QtCore.Qt.MatchFlag.MatchFixedString)
@@ -122,7 +133,13 @@ class DialogSettings(QtWidgets.QDialog):
             self.ui.checkBox_backup_AV_files.setChecked(True)
         else:
             self.ui.checkBox_backup_AV_files.setChecked(False)
-        self.ui.spinBox_backups.setValue(self.settings['backup_num'])
+
+        index = self.ui.comboBox_backups.findText(str(self.settings['backup_num']),
+                                                      QtCore.Qt.MatchFlag.MatchFixedString)
+        if index == -1:
+            index = 0
+        self.ui.comboBox_backups.setCurrentIndex(index)
+
         if self.settings['directory'] == "":
             self.settings['directory'] = os.path.expanduser("~")
         self.ui.label_directory.setText(self.settings['directory'])
@@ -131,7 +148,13 @@ class DialogSettings(QtWidgets.QDialog):
         for index, text_style in enumerate(text_styles):
             if text_style == self.settings['report_text_context_style']:
                 self.ui.comboBox_text_style.setCurrentIndex(index)
-        self.ui.spinBox_chars_before_after.setValue(self.settings['report_text_context_characters'])
+
+        index = self.ui.comboBox_surrounding_chars.findText(str(self.settings['report_text_context_characters']),
+                                                      QtCore.Qt.MatchFlag.MatchFixedString)
+        if index == -1:
+            index = 0
+        self.ui.comboBox_surrounding_chars.setCurrentIndex(index)
+
         self.ui.pushButton_choose_directory.clicked.connect(self.choose_directory)
         self.ui.pushButton_set_coder.pressed.connect(self.new_coder_entered)
         # AI options
@@ -147,7 +170,8 @@ class DialogSettings(QtWidgets.QDialog):
         self.ai_model_changed()
         self.ai_enable_state_changed()
         self.ui.lineEdit_ai_api_key.textChanged.connect(self.ai_api_key_changed)
-        self.ui.checkBox_ai_project_memo.setChecked(self.settings.get('ai_send_project_memo', 'True') == 'True')        
+        self.ui.checkBox_ai_project_memo.setChecked(self.settings.get('ai_send_project_memo', 'True') == 'True')
+        # TODO
         self.ui.doubleSpinBox_ai_temperature.setValue(float(self.settings.get('ai_temperature', '1.0')))
         self.ui.doubleSpinBox_top_p.setValue(float(self.settings.get('ai_top_k', '1.0')))        
         
@@ -238,9 +262,10 @@ class DialogSettings(QtWidgets.QDialog):
             cur.execute('update project set codername=?', [self.settings['codername']])
             self.app.conn.commit()
         self.settings['font'] = self.ui.fontComboBox.currentText()
-        self.settings['fontsize'] = self.ui.spinBox.value()
-        self.settings['treefontsize'] = self.ui.spinBox_treefontsize.value()
-        self.settings['docfontsize'] = self.ui.spinBox_docfontsize.value()
+        self.settings['fontsize'] = int(self.ui.comboBox_fontsize.currentText())
+        self.settings['treefontsize'] = int(self.ui.comboBox_codetreefontsize.currentText())
+        self.settings['docfontsize'] = int(self.ui.comboBox_docfontsize.currentText())
+
         self.settings['directory'] = self.ui.label_directory.text()
         if self.ui.checkBox.isChecked():
             self.settings['showids'] = 'True'
@@ -265,8 +290,8 @@ class DialogSettings(QtWidgets.QDialog):
             self.settings['backup_av_files'] = 'True'
         else:
             self.settings['backup_av_files'] = 'False'
-        self.settings['backup_num'] = self.ui.spinBox_backups.value()
-        self.settings['report_text_context_characters'] = self.ui.spinBox_chars_before_after.value()
+        self.settings['backup_num'] = int(self.ui.comboBox_backups.currentText())
+        self.settings['report_text_context_characters'] = int(self.ui.comboBox_surrounding_chars.currentText())
         ts_index = self.ui.comboBox_text_style.currentIndex()
         self.settings['report_text_context_style'] = ['Bold', 'Italic', 'Bigger'][ts_index]
         # AI settings
