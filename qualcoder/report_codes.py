@@ -114,7 +114,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.comboBox_coders.insertItems(0, self.coders)
         self.fill_tree()
         self.ui.pushButton_run_report.clicked.connect(self.search)
-        self.ui.pushButton_run_report.setIcon(qta.icon('mdi6.play'))
+        self.ui.pushButton_run_report.setIcon(qta.icon('mdi6.play', options=[{'scale_factor': 2}]))
         self.ui.label_exports.setPixmap(qta.icon('mdi6.export').pixmap(22, 22))
         self.ui.pushButton_attributeselect.setIcon(qta.icon('mdi6.line-scan'))
         self.ui.pushButton_search_next.setIcon(qta.icon('mdi6.arrow-right'))
