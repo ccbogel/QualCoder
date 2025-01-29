@@ -242,7 +242,7 @@ Q Quick Mark with code - for current selection<br />\
 B Create bookmark - at clicked position<br />\
 H Hide / Unhide top groupbox<br />\
 I Tag code at clicked position as important<br />\
-L Show codes like (when text coding area is in focus)\n\
+L Show codes like (when text coding area is in focus)<br />\
 M Memo code - at clicked position<br />\
 O Shortcut to cycle through overlapping codes - at clicked position<br />\
 S Search text - may include current selection<br />\
@@ -263,7 +263,7 @@ Ctrl 3 Open file memo<br />\
 Ctrl 4 Filter files by attributes<br />\
 Ctrl 5 Show codes marked important<br />\
 Ctrl 0 Help - opens in browser<br />\
-L Show codes like (when coding area is in focus)\n\
+L Show codes like (when coding area is in focus)<br />\
 Ctrl Z The last code is unmarked, undo and restore that coding<br />\
 Ctrl G Create a grayed-out image with coloured coded highlights (Wait a few seconds)<br />\
 Minus or Q Zoom out<br />\
@@ -280,7 +280,7 @@ Ctrl 0 Help - opens in browser<br />\
 A annotate - for current selection<br />\
 Q Quick Mark with code - for current selection<br />\
 I Tag important<br />\
-L Show codes like (when text coding area is in focus)\n\
+L Show codes like (when text coding area is in focus)<br />\
 M memo code - at clicked position<br />\
 O Shortcut to cycle through overlapping codes - at clicked position<br />\
 S search text - may include current selection<br />\
