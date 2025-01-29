@@ -41,9 +41,9 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>-105</y>
-        <width>795</width>
-        <height>706</height>
+        <y>0</y>
+        <width>787</width>
+        <height>755</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -123,19 +123,6 @@
              <item row="2" column="0" colspan="2">
               <widget class="QFontComboBox" name="fontComboBox"/>
              </item>
-             <item row="2" column="2">
-              <widget class="QSpinBox" name="spinBox">
-               <property name="minimum">
-                <number>8</number>
-               </property>
-               <property name="maximum">
-                <number>32</number>
-               </property>
-               <property name="singleStep">
-                <number>2</number>
-               </property>
-              </widget>
-             </item>
              <item row="3" column="0" colspan="2">
               <widget class="QLabel" name="label_3">
                <property name="text">
@@ -149,19 +136,6 @@
                </property>
               </widget>
              </item>
-             <item row="3" column="2">
-              <widget class="QSpinBox" name="spinBox_treefontsize">
-               <property name="minimum">
-                <number>8</number>
-               </property>
-               <property name="maximum">
-                <number>32</number>
-               </property>
-               <property name="singleStep">
-                <number>2</number>
-               </property>
-              </widget>
-             </item>
              <item row="4" column="0" colspan="2">
               <widget class="QLabel" name="label_7">
                <property name="text">
@@ -172,19 +146,6 @@
                </property>
                <property name="wordWrap">
                 <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item row="4" column="2">
-              <widget class="QSpinBox" name="spinBox_docfontsize">
-               <property name="minimum">
-                <number>8</number>
-               </property>
-               <property name="maximum">
-                <number>32</number>
-               </property>
-               <property name="singleStep">
-                <number>2</number>
                </property>
               </widget>
              </item>
@@ -205,22 +166,6 @@
                </property>
               </widget>
              </item>
-             <item row="6" column="2">
-              <widget class="QSpinBox" name="spinBox_chars_before_after">
-               <property name="minimum">
-                <number>20</number>
-               </property>
-               <property name="maximum">
-                <number>300</number>
-               </property>
-               <property name="singleStep">
-                <number>5</number>
-               </property>
-               <property name="value">
-                <number>150</number>
-               </property>
-              </widget>
-             </item>
              <item row="7" column="0" colspan="2">
               <widget class="QLabel" name="label_coded_text_style">
                <property name="text">
@@ -233,6 +178,142 @@
              </item>
              <item row="7" column="2">
               <widget class="QComboBox" name="comboBox_text_style"/>
+             </item>
+             <item row="2" column="2">
+              <widget class="QComboBox" name="comboBox_fontsize">
+               <item>
+                <property name="text">
+                 <string>8</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>10</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>12</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>14</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>16</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>18</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>20</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item row="3" column="2">
+              <widget class="QComboBox" name="comboBox_codetreefontsize">
+               <item>
+                <property name="text">
+                 <string>8</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>10</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>12</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>14</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>16</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>18</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>20</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item row="4" column="2">
+              <widget class="QComboBox" name="comboBox_docfontsize">
+               <item>
+                <property name="text">
+                 <string>8</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>10</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>12</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>14</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>16</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>18</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>20</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+             <item row="6" column="2">
+              <widget class="QComboBox" name="comboBox_surrounding_chars">
+               <item>
+                <property name="text">
+                 <string>100</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>200</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>300</string>
+                </property>
+               </item>
+              </widget>
              </item>
             </layout>
            </widget>
@@ -471,28 +552,43 @@ Not recommended unless you have many large files slowing the backup.</string>
                  </widget>
                 </item>
                 <item>
-                 <widget class="QSpinBox" name="spinBox_backups">
-                  <property name="sizePolicy">
-                   <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                    <horstretch>0</horstretch>
-                    <verstretch>0</verstretch>
-                   </sizepolicy>
-                  </property>
+                 <widget class="QComboBox" name="comboBox_backups">
                   <property name="minimumSize">
                    <size>
-                    <width>40</width>
+                    <width>50</width>
                     <height>0</height>
                    </size>
                   </property>
-                  <property name="minimum">
-                   <number>1</number>
-                  </property>
-                  <property name="maximum">
-                   <number>10</number>
-                  </property>
-                  <property name="value">
-                   <number>5</number>
-                  </property>
+                  <item>
+                   <property name="text">
+                    <string>0</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>1</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>2</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>3</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>4</string>
+                   </property>
+                  </item>
+                  <item>
+                   <property name="text">
+                    <string>5</string>
+                   </property>
+                  </item>
                  </widget>
                 </item>
                 <item>
@@ -659,6 +755,7 @@ Not recommended unless you have many large files slowing the backup.</string>
             </property>
             <property name="font">
              <font>
+              <weight>50</weight>
               <bold>false</bold>
              </font>
             </property>
