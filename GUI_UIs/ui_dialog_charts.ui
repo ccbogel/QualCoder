@@ -543,15 +543,17 @@ Codings from the entire text file are used for the calculations.</string>
   <widget class="QPushButton" name="pushButton_wordcloud">
    <property name="geometry">
     <rect>
-     <x>582</x>
-     <y>490</y>
-     <width>120</width>
+     <x>580</x>
+     <y>493</y>
+     <width>50</width>
      <height>50</height>
     </rect>
    </property>
+   <property name="toolTip">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Make Word Cloud&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
    <property name="text">
-    <string>Make
-wordcloud</string>
+    <string/>
    </property>
   </widget>
   <widget class="QLabel" name="label_width">
@@ -559,7 +561,7 @@ wordcloud</string>
     <rect>
      <x>380</x>
      <y>442</y>
-     <width>55</width>
+     <width>71</width>
      <height>16</height>
     </rect>
    </property>
@@ -570,9 +572,9 @@ wordcloud</string>
   <widget class="QLabel" name="label_height">
    <property name="geometry">
     <rect>
-     <x>450</x>
+     <x>470</x>
      <y>442</y>
-     <width>55</width>
+     <width>61</width>
      <height>16</height>
     </rect>
    </property>
@@ -583,7 +585,7 @@ wordcloud</string>
   <widget class="QLabel" name="label_max_words">
    <property name="geometry">
     <rect>
-     <x>510</x>
+     <x>560</x>
      <y>440</y>
      <width>91</width>
      <height>20</height>
@@ -591,72 +593,6 @@ wordcloud</string>
    </property>
    <property name="text">
     <string>Max words</string>
-   </property>
-  </widget>
-  <widget class="QSpinBox" name="spinBox_cloud_width">
-   <property name="geometry">
-    <rect>
-     <x>380</x>
-     <y>460</y>
-     <width>61</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <property name="minimum">
-    <number>400</number>
-   </property>
-   <property name="maximum">
-    <number>2000</number>
-   </property>
-   <property name="singleStep">
-    <number>100</number>
-   </property>
-   <property name="value">
-    <number>800</number>
-   </property>
-  </widget>
-  <widget class="QSpinBox" name="spinBox_cloud_height">
-   <property name="geometry">
-    <rect>
-     <x>450</x>
-     <y>460</y>
-     <width>61</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <property name="minimum">
-    <number>200</number>
-   </property>
-   <property name="maximum">
-    <number>2000</number>
-   </property>
-   <property name="singleStep">
-    <number>100</number>
-   </property>
-   <property name="value">
-    <number>600</number>
-   </property>
-  </widget>
-  <widget class="QSpinBox" name="spinBox_cloud_max_words">
-   <property name="geometry">
-    <rect>
-     <x>520</x>
-     <y>460</y>
-     <width>61</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <property name="minimum">
-    <number>50</number>
-   </property>
-   <property name="maximum">
-    <number>500</number>
-   </property>
-   <property name="singleStep">
-    <number>50</number>
-   </property>
-   <property name="value">
-    <number>200</number>
    </property>
   </widget>
   <widget class="QCheckBox" name="checkBox_reverse_range">
@@ -696,7 +632,7 @@ wordcloud</string>
     <rect>
      <x>425</x>
      <y>523</y>
-     <width>151</width>
+     <width>121</width>
      <height>25</height>
     </rect>
    </property>
@@ -742,20 +678,44 @@ wordcloud</string>
     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
    </property>
   </widget>
-  <widget class="QSpinBox" name="spinBox_count_max">
+  <widget class="QLineEdit" name="lineEdit_width">
    <property name="geometry">
     <rect>
-     <x>210</x>
-     <y>301</y>
-     <width>61</width>
-     <height>26</height>
+     <x>380</x>
+     <y>460</y>
+     <width>71</width>
+     <height>22</height>
     </rect>
    </property>
-   <property name="maximum">
-    <number>500</number>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit_height">
+   <property name="geometry">
+    <rect>
+     <x>470</x>
+     <y>460</y>
+     <width>71</width>
+     <height>22</height>
+    </rect>
    </property>
-   <property name="singleStep">
-    <number>50</number>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit_max_words">
+   <property name="geometry">
+    <rect>
+     <x>560</x>
+     <y>460</y>
+     <width>71</width>
+     <height>22</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit_count_limiter">
+   <property name="geometry">
+    <rect>
+     <x>260</x>
+     <y>300</y>
+     <width>71</width>
+     <height>22</height>
+    </rect>
    </property>
   </widget>
   <zorder>groupBox</zorder>
@@ -799,15 +759,15 @@ wordcloud</string>
   <zorder>label_width</zorder>
   <zorder>label_height</zorder>
   <zorder>label_max_words</zorder>
-  <zorder>spinBox_cloud_width</zorder>
-  <zorder>spinBox_cloud_height</zorder>
-  <zorder>spinBox_cloud_max_words</zorder>
   <zorder>checkBox_reverse_range</zorder>
   <zorder>label_reverse_range</zorder>
   <zorder>label_ngrams</zorder>
   <zorder>comboBox_ngrams</zorder>
   <zorder>label_upper_count</zorder>
-  <zorder>spinBox_count_max</zorder>
+  <zorder>lineEdit_width</zorder>
+  <zorder>lineEdit_height</zorder>
+  <zorder>lineEdit_max_words</zorder>
+  <zorder>lineEdit_count_limiter</zorder>
  </widget>
  <tabstops>
   <tabstop>checkBox_export_html</tabstop>
