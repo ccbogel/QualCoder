@@ -24,8 +24,7 @@ import logging
 import os
 import pandas as pd
 import plotly.express as px
-import sys
-import traceback
+import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtWidgets import QDialog
@@ -70,8 +69,7 @@ class ViewCharts(QDialog):
         self.ui.setupUi(self)
         integers = QtGui.QIntValidator()
         self.ui.lineEdit_filter.setValidator(integers)
-        font = f"font: {self.app.settings['fontsize']}pt "
-        font += '"' + self.app.settings['font'] + '";'
+        font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         self.ui.pushButton_attributes.pressed.connect(self.select_attributes)
@@ -142,6 +140,9 @@ class ViewCharts(QDialog):
         for c in self.categories:
             categories_combobox_list.append(c['name'])
         self.ui.comboBox_category.addItems(categories_combobox_list)
+        # QIntValidator does not use upper limits, it is based on number of digits entered. eg 99 possible
+        self.ui.lineEdit_count_limiter.setValidator(QtGui.QIntValidator(0, 50))
+        self.ui.lineEdit_count_limiter.setText("0")
 
         self.ui.label_word_clouds.setToolTip(_("Word cloud made from coded text segments"))
         wordcloud_backgrounds = ['Black', 'White']  # Do not translate!
@@ -156,6 +157,15 @@ class ViewCharts(QDialog):
         self.ui.comboBox_wordcloud_foreground.addItems(wordcloud_foregrounds)
         wordcloud_ngram_options = ["1", "2", "3", "4"]
         self.ui.comboBox_ngrams.addItems(wordcloud_ngram_options)
+        # QIntValidator does not use upper limits, it is based on number of digits entered. eg 999 possible
+        self.ui.lineEdit_max_words.setValidator(QtGui.QIntValidator(50, 500))
+        self.ui.lineEdit_max_words.setText("200")
+        # QIntValidator does not use upper limits, it is based on number of digits entered. eg 9999 possible
+        self.ui.lineEdit_height.setValidator(QtGui.QIntValidator(100, 2000))
+        self.ui.lineEdit_width.setText("800")
+        self.ui.lineEdit_width.setValidator(QtGui.QIntValidator(100, 2000))
+        self.ui.lineEdit_height.setText("600")
+        self.ui.pushButton_wordcloud.setIcon(qta.icon('mdi6.play', options=[{'scale_factor': 2}]))
         self.ui.pushButton_wordcloud.pressed.connect(self.show_word_cloud)
 
         # Attributes comboboxes. Initial radio button checked is Files
@@ -193,7 +203,7 @@ class ViewCharts(QDialog):
         Results stored in attribute_file_ids as list of file_id integers
         """
 
-        self.attribute_case_ids = []  # TODO unsure here
+        self.attribute_case_ids = []  # TODO unsure here, Not used yet
         self.attribute_file_ids = []
         self.attributes_msg = ""
         ui = DialogSelectAttributeParameters(self.app)
@@ -372,11 +382,22 @@ class ViewCharts(QDialog):
         text = " ".join(values)
         background = self.ui.comboBox_wordcloud_background.currentText()
         foreground = self.ui.comboBox_wordcloud_foreground.currentText()
-        width = int(self.ui.spinBox_cloud_width.text())
-        height = int(self.ui.spinBox_cloud_height.text())
-        max_words = int(self.ui.spinBox_cloud_max_words.text())
+        try:
+            width = int(self.ui.lineEdit_width.text())
+        except ValueError:
+            width = 800
+            self.ui.lineEdit_width.setText("800")
+        try:
+            height = int(self.ui.lineEdit_height.text())
+        except ValueError:
+            height = 600
+            self.ui.lineEdit_height.setText("600")
+        try:
+            max_words = int(self.ui.lineEdit_max_words.text())
+        except ValueError:
+            max_words = 200
+            self.ui.lineEdit_max_words.setText("200")
         reverse_colors = self.ui.checkBox_reverse_range.isChecked()
-        # TODO change to combobox Options 1,2,3,4 ngrams
         ngrams = int( self.ui.comboBox_ngrams.currentText())
         Wordcloud(self.app, text, width=width, height=height, max_words=max_words, background_color=background,
                   text_color=foreground, reverse_colors=reverse_colors, ngrams=ngrams)
@@ -1217,7 +1238,7 @@ class ViewCharts(QDialog):
          This is to allow a wider spread of head map colours when there are extreme count differences.
          """
 
-        max_count = self.ui.spinBox_count_max.value()
+        max_count = int(self.ui.lineEdit_count_limiter.text())
         count = 0
         cur = self.app.conn.cursor()
         sql_t = "select count(cid) from code_text where owner like ? and cid=? and fid=?"
