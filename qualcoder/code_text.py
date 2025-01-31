@@ -283,6 +283,8 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_previous.pressed.connect(self.move_to_previous_search_text)
         self.ui.pushButton_help.setIcon(qta.icon('mdi6.help'))
         self.ui.pushButton_help.pressed.connect(self.help)
+        self.ui.pushButton_right_side_pane.setIcon(qta.icon('mdi6.arrow-expand-left', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_right_side_pane.pressed.connect(self.show_right_side_pane)
         self.ui.pushButton_delete_all_codes.setIcon(qta.icon('mdi6.delete-outline', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_delete_all_codes.pressed.connect(self.delete_all_codes_from_file)
         self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.tag-outline', options=[{'scale_factor': 1.3}]))
@@ -356,6 +358,11 @@ class DialogCodeText(QtWidgets.QWidget):
 
         url = "https://github.com/ccbogel/QualCoder/wiki/4.1.-Coding-Text"
         webbrowser.open(url)
+
+    def show_right_side_pane(self):
+        """ Button press to show hidden right side pane. """
+
+        self.ui.splitter.setSizes([150, 300, 100])
 
     def set_default_new_code_color(self):
         """ New code colours are usually generated randomly.
