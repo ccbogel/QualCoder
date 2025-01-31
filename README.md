@@ -71,7 +71,7 @@ env\Scripts\activate
 py -m pip install --upgrade pip
 ```
 
-Type the following to install the required modules (it will take a minute or two):
+Type the following to install the required modules (it will take 10 minutes):
 
 ```bash
 py -m pip install -r requirements.txt
