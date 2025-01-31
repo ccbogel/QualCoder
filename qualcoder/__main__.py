@@ -1999,32 +1999,34 @@ Click "Yes" to start now.')
         """
 
         self.journal_display = None
+        previous_app = self.app
         self.app = App()
         if self.app.settings['directory'] == "":
             self.app.settings['directory'] = os.path.expanduser('~')
         self.app.ai = AiLLM(self.app, self.ui.textEdit)
-        project_path = QtWidgets.QFileDialog.getSaveFileName(self,
+        project_path, ok = QtWidgets.QFileDialog.getSaveFileName(self,
                                                              _("Enter project name"), self.app.settings['directory'])
         # options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
-        project_path = project_path[0]
         if project_path == "":
+            self.app = previous_app
             Message(self.app, _("Project"), _("No project created."), "critical").exec()
             return
+
         # Add suffix to project name if it already exists
         counter = 0
         extension = ""
         while os.path.exists(project_path + extension + ".qda"):
             # print("C", counter, project_path + extension + ".qda")
             if counter > 0:
-                extension = "_" + str(counter)
+                extension = f"_{counter}"
             counter += 1
         self.app.project_path = project_path + extension + ".qda"
         try:
             os.mkdir(self.app.project_path)
-            os.mkdir(self.app.project_path + "/images")
-            os.mkdir(self.app.project_path + "/audio")
-            os.mkdir(self.app.project_path + "/video")
-            os.mkdir(self.app.project_path + "/documents")
+            os.mkdir(os.path.join(self.app.project_path, "images"))
+            os.mkdir(os.path.join(self.app.project_path, "audio"))
+            os.mkdir(os.path.join(self.app.project_path, "video"))
+            os.mkdir(os.path.join(self.app.project_path, "documents"))
         except Exception as err:
             logger.critical(_("Project creation error ") + str(err))
             Message(self.app, _("Project"), self.app.project_path + _(" not successfully created"), "critical").exec()
@@ -2177,8 +2179,7 @@ Click "Yes" to start now.')
 
         self.app.settings, self.app.ai_models = self.app.load_settings()
         self.settings_report()
-        font = f"font: {self.app.settings['fontsize']}pt "
-        font += '"' + self.app.settings['font'] + '";'
+        font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
         self.ai_chat_window.init_styles()
         
@@ -2298,10 +2299,9 @@ Click "Yes" to start now.')
                 self.heartbeat_worker.stop()
                 if wait:
                     self.heartbeat_thread.wait()  # Wait for the thread to properly finish
-            except Exception as e_:  # TODO determine actual exception, to add here, so printing e_
+            except Exception as e_:  # TODO determine actual exception
                 print(e_)
                 logger.debug(e_)
-
         self.delete_lock_file()
         self.lock_file_path = ''
 
@@ -2333,12 +2333,12 @@ Click "Yes" to start now.')
         msg = ""
         # New path variable from recent_projects.txt contains time | path
         # Older variable only listed the project path
-        splt = path_.split("|")
+        path_split = path_.split("|")
         proj_path = ""
-        if len(splt) == 1:
-            proj_path = splt[0]
-        if len(splt) == 2:
-            proj_path = splt[1]
+        if len(path_split) == 1:
+            proj_path = path_split[0]
+        if len(path_split) == 2:
+            proj_path = path_split[1]
         if len(path) > 3 and proj_path[-4:] == ".qda":
             # Lock file management
             self.lock_file_path = os.path.normpath(proj_path + '/project_in_use.lock')
@@ -2690,13 +2690,16 @@ Click "Yes" to start now.')
         msg += f"{_('Project date: ')}{self.project['date']}\n"
         sql = "select memo from project"
         cur.execute(sql)
-        res = cur.fetchone()
-        if res[0] != "":
-            msg += _("Project memo: ") + f"\n---------------------\n{res[0]}\n---------------------\n"
+        memo_res = cur.fetchone()
+        if memo_res[0] != "":
+            msg += _("Project memo: ") + f"\n---------------------\n{memo_res[0]}\n---------------------\n"
         sql = "select count(id) from source"
         cur.execute(sql)
-        res = cur.fetchone()
-        msg += _("Files: ") + f"{res[0]}\n"
+        files_res = cur.fetchone()
+        text_res = self.app.get_text_filenames()
+        image_res = self.app.get_image_filenames()
+        av_res = self.app.get_av_filenames()
+        msg += _("Files: ") + f"{files_res[0]}. Text files: {len(text_res)}. Image files: {len(image_res)}. AV files: {len(av_res)}\n"
         sql = "select count(caseid) from cases"
         cur.execute(sql)
         res = cur.fetchone()
