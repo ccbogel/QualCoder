@@ -21,9 +21,8 @@ https://github.com/ccbogel/QualCoder
 import logging
 import os
 import qtawesome as qta
-import re
 
-from PyQt6 import QtCore, QtWidgets, QtGui
+from PyQt6 import QtCore, QtWidgets
 
 from .GUI.ui_dialog_cooccurrence import Ui_Dialog_Coocurrence
 from .helpers import Message
@@ -51,39 +50,76 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         self.setStyleSheet(font)
         self.ui.pushButton_export.setIcon(qta.icon('mdi6.export', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_run.setIcon(qta.icon('mdi6.play', options=[{'scale_factor': 1.4}]))
-        self.ui.pushButton_run.pressed.connect(self.calculate_code_relations_start)
+        self.ui.pushButton_run.pressed.connect(self.process_data)
         #docfont = f'font: {self.app.settings["docfontsize"]}pt "{self.app.settings["font"]}";'
         #self.ui.textEdit.setStyleSheet(docfont)
-        #treefont = f'font: {self.app.settings["treefontsize"]}pt "{self.app.settings["font"]}";'
+        treefont = f'font: {self.app.settings["treefontsize"]}pt "{self.app.settings["font"]}";'
+        tablefont = f'font: 7pt "{self.app.settings["font"]}";'
+        self.ui.tableWidget.setStyleSheet(tablefont)  # should be smaller
 
         Message(self.app, "Co-occurrence", "Work in progress").exec()
         self.codes = []
         self.categories = []
 
-    def calculate_code_relations_start(self):
+    def process_data(self):
         """ Calculate the relations for selected codes for ALL coders (or THIS coder - TODO).
         For text codings only. """
 
-        # TODO select all codes
-        sel_codes = []
         code_names_str = ""
         code_ids_str = ""
 
         self.codes, self.categories = self.app.get_codes_categories()
+        code_names_list = []
         for c in self.codes:
+            code_names_list.append(c['name'])
             code_names_str += f"{c['name']}|"
             code_ids_str += f",{c['cid']}"
-        '''for i in items:
-            if i.text(1)[:3] == "cid":
-                sel_codes.append({"name": i.text(0), "cid": int(i.text(1)[4:])})
-                codes_str += i.text(0) + "|"
-                code_ids += "," + i.text(1)[4:]'''
         code_ids_str = code_ids_str[1:]
         self.result_relations = []
         self.calculate_relations(code_ids_str)
         for r in self.result_relations:
-            print(r)
-        # TODO self.fill_table()
+            #print(r)
+            print(r['cid0'], r['c0_name'], r['ctid0'], r['cid1'], r['c1_name'], r['ctid1'], r['fid'], r['file_name'])
+
+        # Create data matrix zeroed, codes are ordered alphabetically by name
+        self.data = []
+        for row in self.codes:
+            self.data.append([0] * len(self.codes))
+
+        for r in self.result_relations:
+            row_pos = code_names_list.index(r['c0_name'])
+            col_pos = code_names_list.index(r['c1_name'])
+            self.data[row_pos][col_pos] += 1
+
+
+        for d in self.data:
+            print(d)
+
+        self.fill_table()
+
+    def fill_table(self):
+        """ Fill table using code names alphabetically (case insensitive), using self.data """
+
+        rows = self.ui.tableWidget.rowCount()
+        for r in range(0, rows):
+            self.ui.tableWidget.removeRow(0)
+
+        header_labels = []
+        for code_ in self.codes:
+            header_labels.append(code_['name'])
+        self.ui.tableWidget.setColumnCount(len(header_labels))
+        self.ui.tableWidget.setHorizontalHeaderLabels(header_labels)
+        self.ui.tableWidget.setRowCount(len(header_labels))
+        self.ui.tableWidget.setVerticalHeaderLabels(header_labels)
+        for row, row_data in enumerate(self.data):
+            for col, cell_data in enumerate(row_data):
+                item = QtWidgets.QTableWidgetItem()
+                #if cell_data > 0:
+                item.setData(QtCore.Qt.ItemDataRole.DisplayRole, cell_data)
+                item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
+                self.ui.tableWidget.setItem(row, col, item)
+
+
 
     def calculate_relations(self, code_ids_str):
         """ Calculate the relations for selected codes for all coders.
