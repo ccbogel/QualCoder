@@ -241,7 +241,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_auto_code.clicked.connect(self.auto_code)
         self.ui.pushButton_auto_code_frag_this_file.setIcon(qta.icon('mdi6.magic-staff'))
         self.ui.pushButton_auto_code_frag_this_file.pressed.connect(self.button_autocode_sentences_this_file)
-        self.ui.pushButton_auto_code_frag_all_files.setIcon(qta.icon('mdi6.mace'))  # TODO REVISE
+        self.ui.pushButton_auto_code_frag_all_files.setIcon(qta.icon('mdi6.mace'))
         self.ui.pushButton_auto_code_frag_all_files.pressed.connect(self.button_autocode_sentences_all_files)
         self.ui.pushButton_auto_code_surround.setIcon(qta.icon('mdi6.spear'))
         self.ui.pushButton_auto_code_surround.pressed.connect(self.button_autocode_surround)
@@ -3610,18 +3610,17 @@ class DialogCodeText(QtWidgets.QWidget):
 
     def button_autocode_surround(self):
         """ Autocode with selected code using start and end marks.
-         Currently, only using the current selected file.
-         Line ending text representation \\n is replaced with the actual line ending character. """
+         Uses selected files.
+         Line ending text representation \\n is replaced with the actual line ending character.
+         Activated by: self.ui.pushButton_auto_code_surround
+         """
 
         self.clear_edit_variables()
         item = self.ui.treeWidget.currentItem()
         if item is None or item.text(1)[0:3] == 'cat':
             Message(self.app, _('Warning'), _("No code was selected"), "warning").exec()
             return
-        if self.file_ is None:
-            Message(self.app, _('Warning'), _("No file was selected"), "warning").exec()
-            return
-        ui = DialogGetStartAndEndMarks(self.file_['name'], self.file_['name'])
+        ui = DialogGetStartAndEndMarks("Autocoding", "Autocoding surround")  #self.file_['name'], self.file_['name'])
         ok = ui.exec()
         if not ok:
             return
@@ -3635,59 +3634,70 @@ class DialogCodeText(QtWidgets.QWidget):
             Message(self.app, _('Warning'), _("Cannot have blank text marks"), "warning").exec()
             return
 
-        msg = _("Code text using start and end marks: ") + self.file_['name']
-        msg += _("\nUsing ") + start_mark + _(" and ") + end_mark + "\n"
+        ui = DialogSelectItems(self.app, self.filenames, _("Select files to code"), "many")
+        ok = ui.exec()
+        if not ok:
+            return
+        files = ui.get_selected()
+        if len(files) == 0:
+            return
 
-        text_starts = [match.start() for match in re.finditer(re.escape(start_mark), self.file_['fulltext'])]
-        text_ends = [match.start() for match in re.finditer(re.escape(end_mark), self.file_['fulltext'])]
-        # Find and insert into database
-        already_assigned = 0
+        msg = _("Code text using start and end marks: ")  # + self.file_['name']
+        msg += _("\nUsing ") + start_mark + _(" and ") + end_mark + "\n"
+        cur = self.app.conn.cursor()
         cid = int(item.text(1)[4:])
         now_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
+
+        # Find text chunks and insert coded into database
+        already_assigned = 0
         entries = 0
         undo_list = []
-        cur = self.app.conn.cursor()
-        try:
-            for start_pos in text_starts:
-                # pos1 = -1  # Default if not found. Not Used
-                text_end_iterator = 0
-                try:
-                    while start_pos >= text_ends[text_end_iterator]:
-                        text_end_iterator += 1
-                except IndexError:
-                    text_end_iterator = -1
-                if text_end_iterator >= 0:
-                    pos1 = text_ends[text_end_iterator]
-                    # Check if already coded in this file for this coder
-                    sql = "select cid from code_text where cid=? and fid=? and pos0=? and pos1=? and owner=?"
-                    cur.execute(sql, [cid, self.file_['id'], start_pos, pos1, self.app.settings['codername']])
-                    res = cur.fetchone()
-                    if res is None:
-                        seltext = self.file_['fulltext'][start_pos: pos1]
-                        sql = "insert into code_text (cid, fid, seltext, pos0, pos1, owner, date, memo) values(?,?,?,?,?,?,?,?)"
-                        cur.execute(sql, (cid, self.file_['id'], seltext, start_pos, pos1,
-                                          self.app.settings['codername'], now_date, ""))
-                        # Add to undo auto-coding history
-                        undo = {"sql": "delete from code_text where cid=? and fid=? and pos0=? and pos1=? and owner=?",
-                                "cid": cid, "fid": self.file_['id'], "pos0": start_pos, "pos1": pos1,
-                                "owner": self.app.settings['codername']
-                                }
-                        undo_list.append(undo)
-                        entries += 1
-                    else:
-                        already_assigned += 1
-            self.app.conn.commit()
-        except Exception as e_:
-            print(e_)
-            self.app.conn.rollback()  # Revert all changes
-            undo_list = []
-            raise
-            # Add to undo auto-coding history
+        for f in files:
+            text_starts = [match.start() for match in re.finditer(re.escape(start_mark), f['fulltext'])]
+            text_ends = [match.start() for match in re.finditer(re.escape(end_mark), f['fulltext'])]
+            try:
+                for start_pos in text_starts:
+                    # pos1 = -1  # Default if not found. Not Used
+                    text_end_iterator = 0
+                    try:
+                        while start_pos >= text_ends[text_end_iterator]:
+                            text_end_iterator += 1
+                    except IndexError:
+                        text_end_iterator = -1
+                    if text_end_iterator >= 0:
+                        pos1 = text_ends[text_end_iterator]
+                        # Check if already coded in this file for this coder
+                        sql = "select cid from code_text where cid=? and fid=? and pos0=? and pos1=? and owner=?"
+                        cur.execute(sql, [cid, f['id'], start_pos, pos1, self.app.settings['codername']])
+                        res = cur.fetchone()
+                        if res is None:
+                            seltext = f['fulltext'][start_pos: pos1]
+                            sql = "insert into code_text (cid, fid, seltext, pos0, pos1, owner, date, memo) values(?,?,?,?,?,?,?,?)"
+                            '''cur.execute(sql, (cid, self.file_['id'], seltext, start_pos, pos1,
+                                              self.app.settings['codername'], now_date, ""))'''
+                            cur.execute(sql, (cid, f['id'], seltext, start_pos, pos1,
+                                              self.app.settings['codername'], now_date, ""))
+                            # Add to undo auto-coding history
+                            undo = {"sql": "delete from code_text where cid=? and fid=? and pos0=? and pos1=? and owner=?",
+                                    "cid": cid, "fid": f['id'], "pos0": start_pos, "pos1": pos1,
+                                    "owner": self.app.settings['codername']
+                                    }
+                            undo_list.append(undo)
+                            entries += 1
+                        else:
+                            already_assigned += 1
+                self.app.conn.commit()
+            except Exception as e_:
+                print(e_)
+                self.app.conn.rollback()  # Revert all changes
+                raise
+        # Add to undo auto-coding history
         if len(undo_list) > 0:
             name = _("Coding using start and end marks") + _("\nCode: ") + item.text(0)
             name += _("\nWith start mark: ") + start_mark + _("\nEnd mark: ") + end_mark
             undo_dict = {"name": name, "sql_list": undo_list}
             self.autocode_history.insert(0, undo_dict)
+
         # Update filter for tooltip and update code colours
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
@@ -3695,6 +3705,7 @@ class DialogCodeText(QtWidgets.QWidget):
         if already_assigned > 0:
             msg += str(already_assigned) + " " + _("previously coded.") + "\n"
         self.parent_textEdit.append(msg)
+        Message(self.app,"Autocode surround", msg).exec()
         self.app.delete_backup = False
 
     def undo_autocoding(self):
@@ -3729,6 +3740,8 @@ class DialogCodeText(QtWidgets.QWidget):
 
     def code_sentences(self, all_=""):
         """ Code full sentence based on text fragment.
+        Activated via self.ui.pushButton_auto_code_frag_this_file -> button_autocode_sentences_this_file()
+        Activated via self.ui.pushButton_auto_code_frag_this_file -> button_autocode_sentences_all_files()
 
         param:
             all = "" :  for this text file only.
@@ -3836,7 +3849,10 @@ class DialogCodeText(QtWidgets.QWidget):
     def auto_code(self):
         """ Autocode text in one file or all files with currently selected code.
         Button menu option to auto-code all, first or last instances in files.
+        Activated using self.ui.pushButton_auto_code
         """
+
+        print("fffff here")
 
         code_item = self.ui.treeWidget.currentItem()
         if code_item is None or code_item.text(1)[0:3] == 'cat':
