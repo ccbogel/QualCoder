@@ -185,12 +185,21 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.checkBox_search_case.setEnabled(False)
         self.ui.label_search_regex.setPixmap(qta.icon('mdi6.text-search').pixmap(22, 22))
         self.ui.label_search_case_sensitive.setPixmap(qta.icon('mdi6.format-letter-case').pixmap(22, 22))
-        self.ui.label_pages.setPixmap(qta.icon('mdi6.book-open-variant').pixmap(22, 22))
         self.ui.pushButton_export.setIcon(qta.icon('mdi6.export', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_export.pressed.connect(self.export_pdf_image)
         self.ui.label_font_size.setPixmap(qta.icon('mdi6.format-size').pixmap(22, 22))
+
+        # Pages widgets
+        self.ui.label_pages.setText("")
+        self.ui.pushButton_next_page.setIcon(qta.icon('mdi6.arrow-right', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_next_page.pressed.connect(self.next_page)
+        self.ui.pushButton_previous_page.setIcon(qta.icon('mdi6.arrow-left', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_previous_page.pressed.connect(self.previous_page)
+        self.ui.pushButton_last_page.setIcon(qta.icon('mdi6.arrow-collapse-right', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_last_page.pressed.connect(self.last_page)
+        self.ui.pushButton_goto_page.setIcon(qta.icon('mdi6.book-search-outline', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_goto_page.pressed.connect(self.goto_page)
+
         self.ui.pushButton_previous.setIcon(qta.icon('mdi6.arrow-left', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_previous.setEnabled(False)
         self.ui.pushButton_previous.pressed.connect(self.move_to_previous_search_text)
@@ -228,11 +237,6 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.checkBox_text.stateChanged.connect(self.update_page)
         self.ui.checkBox_line.stateChanged.connect(self.update_page)
         self.ui.checkBox_black_text.stateChanged.connect(self.update_page)
-
-        self.ui.label_pages.setText("")
-        self.ui.pushButton_previous_page.setIcon(qta.icon('mdi6.page-previous-outline', options=[{'scale_factor': 1.3}]))
-        self.ui.pushButton_next_page.setIcon(qta.icon('mdi6.page-next-outline', options=[{'scale_factor': 1.3}]))
-
         self.ui.comboBox_fontsize.setCurrentIndex(2)
         self.ui.comboBox_fontsize.currentIndexChanged.connect(self.update_page)
 
@@ -249,12 +253,29 @@ class DialogCodePdf(QtWidgets.QWidget):
         msg += "\n" + _("Similarly, if the PDF plain text has beeen edited in any way, this will affect coding stripes display.")
         Message(self.app, _("Information") + " " * 20, msg).exec()
 
+    def goto_page(self):
+        if self.pages:
+            text, ok = QtWidgets.QInputDialog.getInt(None, 'Go to page', f'1 - {len(self.pages)}')
+            if not ok or not text:
+                return
+            if int(text) < 1 or int(text) > len(self.pages) - 1:
+                return
+            self.page_num = int(text) - 1
+            self.ui.label_pages.setText(f"{self.page_num + 1}/{len(self.pages)}")
+            self.show_page()
+
+    def last_page(self):
+        if self.pages:
+            self.page_num = len(self.pages) - 1
+            self.ui.label_pages.setText(f"{self.page_num + 1}/{len(self.pages)}")
+            self.show_page()
+
     def next_page(self):
         if self.pages:
             self.page_num += 1
             if self.page_num > len(self.pages) - 1:
                 self.page_num = len(self.pages) - 1
-            self.ui.label_pages.setText(f"{self.page_num + 1}")
+            self.ui.label_pages.setText(f"{self.page_num + 1}/{len(self.pages)}")
             self.show_page()
 
     def previous_page(self):
@@ -262,7 +283,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             self.page_num -= 1
             if self.page_num < 0:
                 self.page_num = 0
-            self.ui.label_pages.setText(f"{self.page_num + 1}")
+            self.ui.label_pages.setText(f"{self.page_num + 1}/{len(self.pages)}")
             self.show_page()
 
     def update_page(self):
