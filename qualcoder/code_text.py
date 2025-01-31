@@ -3825,7 +3825,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.parent_textEdit.append(_("Automatic code sentence in files:")
                                     + _("\nCode: ") + item.text(0)
                                     + _("\nWith text fragment: ")
-                                    + text_.decode("utf-8")
+                                    + text_
                                     + _("\nUsing line ending: ")
                                     + ending + "\n" + msg)
         self.app.delete_backup = False
