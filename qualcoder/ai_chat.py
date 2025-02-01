@@ -393,11 +393,11 @@ class DialogAIChat(QtWidgets.QDialog):
                 f'Always answer in the following language: "{self.app.ai.get_curr_language()}".'
             )    
             
-            summary = f'Analyzing the data coded as "{self.ai_search_code_name}" ({len(ai_data)} pieces of data sent to the AI.)'
+            summary = _('Analyzing the data coded as "{}" ({} pieces of data sent to the AI.)').format(self.ai_search_code_name, len(ai_data))
             if max_ai_data_length_reached:
-                summary += f'\nATTENTION: There was more coded data found, but it had to be truncated because of the limited context window of the AI.'
+                summary += _('\nATTENTION: There was more coded data found, but it had to be truncated because of the limited context window of the AI.')
             logger.debug(f'New code chat. Prompt:\n{ai_instruction}')
-            self.new_chat(f'Code "{self.ai_search_code_name}"', 'code chat', summary, self.ai_prompt.name_and_scope())
+            self.new_chat(_('Code') + f' "{self.ai_search_code_name}"', 'code chat', summary, self.ai_prompt.name_and_scope())
             # warn if project memo empty 
             project_memo = extract_ai_memo(self.app.get_project_memo())
             if self.app.settings.get('ai_send_project_memo', 'True') == 'True' and len(project_memo) == 0:
@@ -432,11 +432,11 @@ data collected. This information will accompany every prompt sent to the AI, res
             self.ai_prompt = ui.current_prompt
             # self.filenames = self.app.get_filenames()
             
-            summary = f'Analyzing the free topic "{self.ai_search_code_name}" in the data.'
+            summary = _('Analyzing the free topic "{}" in the data.').format(self.ai_search_code_name)
             if self.ai_search_code_memo != '':
-                summary += f'\nDescription: {self.ai_search_code_memo}'
+                summary += _('\nDescription:') + ' ' + {self.ai_search_code_memo}
             logger.debug(f'New topic chat.')
-            self.new_chat(f'Topic "{self.ai_search_code_name}"', 'topic chat', summary, self.ai_prompt.name_and_scope())
+            self.new_chat(_('Topic') + f'"{self.ai_search_code_name}"', 'topic chat', summary, self.ai_prompt.name_and_scope())
             # warn if project memo empty 
             project_memo = extract_ai_memo(self.app.get_project_memo())
             if self.app.settings.get('ai_send_project_memo', 'True') == 'True' and len(project_memo) == 0:
@@ -484,7 +484,7 @@ data collected. This information will accompany every prompt sent to the AI, res
         
         self.ai_semantic_search_chunks = chunks                
         topic_analysis_max_chunks = 30
-        msg = _('Found ') + str(len(chunks)) + _(' chunks of data which might be related to the topic. Analyzing the first ') + str(topic_analysis_max_chunks) + _(' chunks closer.')
+        msg = _('Found related data. Analyzing the most relevant segments closer.')
         self.process_message('info', msg)
         self.update_chat_window()
 
@@ -577,7 +577,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                   f'<a href="quote:{doc_id}_{start_pos}_{len(text)}">{doc_name}</a> (' + \
                   str(len(text)) + _(' characters).')
         logger.debug(f'New text analysis chat. Prompt:\n{ai_instruction}')
-        self.new_chat(f'Text analysis "{doc_name}"', 'text chat', summary, prompt.name_and_scope())
+        self.new_chat(_('Text analysis') + f' "{doc_name}"', 'text chat', summary, prompt.name_and_scope())
         self.process_message('system', self.app.ai.get_default_system_prompt())
         self.process_message('instruct', ai_instruction)
         self.update_chat_window()  
