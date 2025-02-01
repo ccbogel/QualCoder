@@ -20,7 +20,7 @@ https://github.com/ccbogel/QualCoder
 
 import logging
 import os
-import qtawesome as qta
+import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 
 from PyQt6 import QtCore, QtWidgets, QtGui
 
@@ -49,12 +49,13 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
         self.ui.pushButton_export.setIcon(qta.icon('mdi6.export', options=[{'scale_factor': 1.4}]))
-        #self.ui.pushButton_run.setIcon(qta.icon('mdi6.play', options=[{'scale_factor': 1.4}]))
-        #self.ui.pushButton_run.pressed.connect(self.process_data)
-        self.ui.pushButton_run.hide()
-        # treefont = f'font: {self.app.settings["treefontsize"]}pt "{self.app.settings["font"]}";'
         tablefont = f'font: 7pt "{self.app.settings["font"]}";'
         self.ui.tableWidget.setStyleSheet(tablefont)  # should be smaller
+        self.ui.tableWidget.cellClicked.connect(self.cell_selected)
+        #self.ui.tableWidget.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        #self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
+        self.ui.splitter.setSizes([500, 0])
+
         self.codes = []
         self.categories = []
         self.result_relations = []
@@ -81,9 +82,10 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         code_ids_str = code_ids_str[1:]
         self.result_relations = []
         self.calculate_relations(code_ids_str)
+
+        # Tmp for testing
         for r in self.result_relations:
-            #print(r)
-            print(r['cid0'], r['c0_name'], r['ctid0'], r['cid1'], r['c1_name'], r['ctid1'], r['fid'], r['file_name'], r['owners'])
+            print(r)
 
         # Create data matrices zeroed, codes are ordered alphabetically by name
         self.data_counts = []
@@ -92,7 +94,11 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         for row in self.codes:
             self.data_counts.append([0] * len(self.codes))
             self.data_colors.append([""] * len(self.codes))
-            #self.data_details.append([""] * len(self.codes))  # TODO think what is needed
+            self.data_details.append(["."] * len(self.codes))
+
+        '''print("Data details")
+        for r in self.data_details:
+            print(r)'''
 
         self.max_count = 0
         for r in self.result_relations:
@@ -101,7 +107,15 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
             self.data_counts[row_pos][col_pos] += 1
             if self.data_counts[row_pos][col_pos] > self.max_count:
                 self.max_count = self.data_counts[row_pos][col_pos]
-            #self.data_details[row_pos][col_pos] += r  # TODO think what is needed, re quotes etc
+            print(r['cid0'], r['c0_name'], r['ctid0'], r['cid1'], r['c1_name'], r['ctid1'], r['fid'], r['file_name'],
+                  r['owners'], r['c0_pos0'], r['c0_pos1'], r['c1_pos0'], r['c1_pos1'])
+            res_list = [r['cid0'], r['c0_name'], r['ctid0'], r['cid1'], r['c1_name'], r['ctid1'], r['fid'], r['file_name'],
+                  r['owners'], r['c0_pos0'], r['c0_pos1'], r['c1_pos0'], r['c1_pos1'], r['ctid0'], r['ctid1'],
+                        r['text_before'], r['text_overlap'], r['text_after']]
+            if self.data_details[row_pos][col_pos] == ".":
+                self.data_details[row_pos][col_pos] = [res_list]
+            else:
+                self.data_details[row_pos][col_pos].append(res_list)
 
         # Color heat map for spread across 5 colours
         colors = ["#F8E0E0", "#F6CECE", "#F5A9A9", "#F78181", "#FA5858"]  # light to dark red
@@ -113,11 +127,45 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
                         color_range_index = 0
                     self.data_colors[row][col] = colors[color_range_index]
 
-        print("Summary counts table")
+        '''print("Summary counts table")
         for d in self.data_counts:
             print(d)
+        print("Summary data details table")
+        for d in self.data_details:
+            print(d)'''
 
         self.fill_table()
+
+    def cell_selected(self):
+        """ When the table widget memo cell is selected display the memo.
+        Update memo text, or delete memo by clearing text.
+        If a new memo, also show in table widget by displaying MEMO in the memo column. """
+
+        row = self.ui.tableWidget.currentRow()
+        col = self.ui.tableWidget.currentColumn()
+        text = self.ui.tableWidget.item(row, col).text()
+        if text == "":
+            return
+        #print(row, col, text)
+        data_list = self.data_details[row][col]
+        for overlap in data_list:
+            print(overlap)
+
+
+    '''def table_menu(self, position):
+        """ Context menu for displaying table cell coding details.
+        """
+
+        row = self.ui.tableWidget.currentRow()
+        col = self.ui.tableWidget.currentColumn()
+        text = self.ui.tableWidget.item(row, col).text()
+        print(row, col, text)
+
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        action_view = menu.addAction(_("View"))'''
+
+
 
     def fill_table(self):
         """ Fill table using code names alphabetically (case insensitive), using self.data """
@@ -145,6 +193,8 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
                     item.setData(QtCore.Qt.ItemDataRole.DisplayRole, cell_data)
                 item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
                 self.ui.tableWidget.setItem(row, col, item)
+        # self.ui.tableWidget.resizeColumnsToContents()  # Doesnt look great
+        self.ui.tableWidget.resizeRowsToContents()
 
 
 
