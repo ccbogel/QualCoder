@@ -2291,7 +2291,7 @@ msgstr "Tweet-Feld: "
 
 #: import_twitter_data.py:173 import_twitter_data.py:150
 msgid "User field: "
-msgstr "Benutzer-Feld:"
+msgstr "Benutzer:innen-Feld:"
 
 #: import_twitter_data.py:245 import_twitter_data.py:246
 #: import_twitter_data.py:222 import_twitter_data.py:223
@@ -2894,7 +2894,7 @@ msgstr "Projekt-Import"
 
 #: refi.py:369 refi.py:353
 msgid "Parse users. Loaded: "
-msgstr "Benutzer parsen. Geladen: "
+msgstr "Benutzer:innen parsen. Geladen: "
 
 #: refi.py:377 refi.py:360
 msgid "Parse codes and categories. Loaded: "
@@ -5873,7 +5873,7 @@ msgstr "Die Suche nach relevanten Daten..."
 
 #: ai_chat.py:473
 msgid "Chat has been canceled by the user."
-msgstr "Der Chat wurde vom Benutzer abgebrochen."
+msgstr "Der Chat wurde abgebrochen."
 
 #: ai_chat.py:477
 msgid "Sorry, the AI could could not find any data related to \""
@@ -5948,7 +5948,7 @@ msgstr "Prompt:"
 
 #: ai_chat.py:659
 msgid "User"
-msgstr "Benutzer"
+msgstr "Benutzer:in"
 
 #: ai_chat.py:667
 msgid "AI"
@@ -6157,7 +6157,7 @@ msgid ""
 "They cannot be changed by the user."
 msgstr ""
 "System Prompts sind fest vorgegeben "
-"und können vom Benutzer nicht geändert werden."
+"und können nicht geändert werden."
 
 #: ai_prompts.py:356
 msgid ""
