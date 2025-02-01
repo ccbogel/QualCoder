@@ -22,10 +22,10 @@ import logging
 import os
 import qtawesome as qta
 
-from PyQt6 import QtCore, QtWidgets
+from PyQt6 import QtCore, QtWidgets, QtGui
 
 from .GUI.ui_dialog_cooccurrence import Ui_Dialog_Coocurrence
-from .helpers import Message
+# from .helpers import Message
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -49,20 +49,24 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
         self.ui.pushButton_export.setIcon(qta.icon('mdi6.export', options=[{'scale_factor': 1.4}]))
-        self.ui.pushButton_run.setIcon(qta.icon('mdi6.play', options=[{'scale_factor': 1.4}]))
-        self.ui.pushButton_run.pressed.connect(self.process_data)
-        #docfont = f'font: {self.app.settings["docfontsize"]}pt "{self.app.settings["font"]}";'
-        #self.ui.textEdit.setStyleSheet(docfont)
-        treefont = f'font: {self.app.settings["treefontsize"]}pt "{self.app.settings["font"]}";'
+        #self.ui.pushButton_run.setIcon(qta.icon('mdi6.play', options=[{'scale_factor': 1.4}]))
+        #self.ui.pushButton_run.pressed.connect(self.process_data)
+        self.ui.pushButton_run.hide()
+        # treefont = f'font: {self.app.settings["treefontsize"]}pt "{self.app.settings["font"]}";'
         tablefont = f'font: 7pt "{self.app.settings["font"]}";'
         self.ui.tableWidget.setStyleSheet(tablefont)  # should be smaller
-
-        Message(self.app, "Co-occurrence", "Work in progress").exec()
         self.codes = []
         self.categories = []
+        self.result_relations = []
+        self.max_count = 0
+        self.data_counts = []
+        self.data_colors = []
+        self.data_details = []
+
+        self.process_data()
 
     def process_data(self):
-        """ Calculate the relations for selected codes for ALL coders (or THIS coder - TODO).
+        """ Calculate the relations for selected codes for ALL coders (or only THIS coder - TODO).
         For text codings only. """
 
         code_names_str = ""
@@ -79,20 +83,38 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         self.calculate_relations(code_ids_str)
         for r in self.result_relations:
             #print(r)
-            print(r['cid0'], r['c0_name'], r['ctid0'], r['cid1'], r['c1_name'], r['ctid1'], r['fid'], r['file_name'])
+            print(r['cid0'], r['c0_name'], r['ctid0'], r['cid1'], r['c1_name'], r['ctid1'], r['fid'], r['file_name'], r['owners'])
 
-        # Create data matrix zeroed, codes are ordered alphabetically by name
-        self.data = []
+        # Create data matrices zeroed, codes are ordered alphabetically by name
+        self.data_counts = []
+        self.data_colors = []
+        self.data_details = []
         for row in self.codes:
-            self.data.append([0] * len(self.codes))
+            self.data_counts.append([0] * len(self.codes))
+            self.data_colors.append([""] * len(self.codes))
+            #self.data_details.append([""] * len(self.codes))  # TODO think what is needed
 
+        self.max_count = 0
         for r in self.result_relations:
             row_pos = code_names_list.index(r['c0_name'])
             col_pos = code_names_list.index(r['c1_name'])
-            self.data[row_pos][col_pos] += 1
+            self.data_counts[row_pos][col_pos] += 1
+            if self.data_counts[row_pos][col_pos] > self.max_count:
+                self.max_count = self.data_counts[row_pos][col_pos]
+            #self.data_details[row_pos][col_pos] += r  # TODO think what is needed, re quotes etc
 
+        # Color heat map for spread across 5 colours
+        colors = ["#F8E0E0", "#F6CECE", "#F5A9A9", "#F78181", "#FA5858"]  # light to dark red
+        for row, row_data in enumerate(self.data_counts):
+            for col, item_data in enumerate(row_data):
+                if self.data_counts[row][col] > 0:
+                    color_range_index = int(self.data_counts[row][col] / self.max_count * 5) - 1
+                    if color_range_index < 0:
+                        color_range_index = 0
+                    self.data_colors[row][col] = colors[color_range_index]
 
-        for d in self.data:
+        print("Summary counts table")
+        for d in self.data_counts:
             print(d)
 
         self.fill_table()
@@ -106,16 +128,21 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
 
         header_labels = []
         for code_ in self.codes:
-            header_labels.append(code_['name'])
+            name_split_50 = [code_['name'][y - 50:y] for y in range(50, len(code_['name']) + 50, 50)]
+            # header_labels.append(code_['name'])  # OLD, needed line separators
+            header_labels.append("\n".join(name_split_50))
         self.ui.tableWidget.setColumnCount(len(header_labels))
         self.ui.tableWidget.setHorizontalHeaderLabels(header_labels)
         self.ui.tableWidget.setRowCount(len(header_labels))
         self.ui.tableWidget.setVerticalHeaderLabels(header_labels)
-        for row, row_data in enumerate(self.data):
+        for row, row_data in enumerate(self.data_counts):
             for col, cell_data in enumerate(row_data):
                 item = QtWidgets.QTableWidgetItem()
-                #if cell_data > 0:
-                item.setData(QtCore.Qt.ItemDataRole.DisplayRole, cell_data)
+                if self.data_colors[row][col] != "":
+                    item.setBackground(QtGui.QBrush(QtGui.QColor(self.data_colors[row][col])))
+                    item.setForeground(QtGui.QBrush(QtGui.QColor("#000000")))
+                if cell_data > 0:
+                    item.setData(QtCore.Qt.ItemDataRole.DisplayRole, cell_data)
                 item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
                 self.ui.tableWidget.setItem(row, col, item)
 
@@ -127,25 +154,17 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
 
         id1, id2, overlapindex, unionindex, distance, whichmin, whichmax, fid
         relation is 1 character: Inclusion, Overlap, Exact, (Proximity - not used)
+        owners is a combination of: owner of ctid0 pipe owner of ctid1
         """
 
         selected_relations = ['E', 'I', 'O']
-
-        # Select File ids
-        selected_fids = ""
         file_ids_names = self.app.get_text_filenames()
 
-        '''for f in file_ids_names:
-            selected_fids += f",{f['id']}"
-        try:
-            selected_fids = selected_fids[1:]
-        except IndexError:
-            return'''
-
-        cur = self.app.conn.cursor()
         # Get codings for each selected text file
+        cur = self.app.conn.cursor()
         for fid in file_ids_names:
-            sql = "select fid, code_text.cid, pos0, pos1, name, ctid,seltext, ifnull(code_text.memo,'') from code_text " \
+            sql = "select fid, code_text.cid, pos0, pos1, name, ctid,seltext, ifnull(code_text.memo,''), code_text.owner " \
+                  "from code_text " \
                   "join code_name on code_name.cid=code_text.cid where fid=? " \
                   "and code_text.cid in (" + code_ids_str + ") order by code_text.cid"
             cur.execute(sql, [fid['id']])
@@ -160,6 +179,7 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
             ctid = 5
             seltext = 6
             coded_memo = 7
+            owner = 8
             while len(coded) > 0:
                 c0 = coded.pop()
                 for c1 in coded:
@@ -174,7 +194,7 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
                         relation['c0_pos1'] = c0[pos1]
                         relation['c1_pos0'] = c1[pos0]
                         relation['c1_pos1'] = c1[pos1]
-                        relation['owner'] = "TODO"  # coder_name
+                        relation['owners'] = f"{c0[owner]}|{c1[owner]}"
                         relation['ctid0'] = c0[ctid]
                         relation['ctid0_text'] = c0[seltext]
                         relation['ctid1'] = c1[ctid]
