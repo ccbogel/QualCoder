@@ -978,6 +978,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         - or Q Zoom in
         Ctrl 0 to Ctrl 5 Buttons and Help
         Ctrl G - Gray image with highlighted codings
+        L Show codes like
         """
 
         key = event.key()
@@ -986,6 +987,9 @@ class DialogCodeImage(QtWidgets.QDialog):
         if key == QtCore.Qt.Key.Key_H:
             self.ui.groupBox_2.setHidden(not (self.ui.groupBox_2.isHidden()))
             return
+        # Show codes like
+        if key == QtCore.Qt.Key.Key_L:
+            self.show_codes_like()
         # Ctrl Z undo last unmarked coding
         if key == QtCore.Qt.Key.Key_Z and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
             self.undo_last_unmarked_code()
@@ -1392,6 +1396,8 @@ class DialogCodeImage(QtWidgets.QDialog):
         param:
             p1 : QtCore.QPointF of mouse release """
 
+        if self.pixmap is None:
+            return
         code_ = self.ui.treeWidget.currentItem()
         if code_ is None:
             return

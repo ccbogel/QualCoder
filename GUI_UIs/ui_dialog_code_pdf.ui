@@ -166,28 +166,6 @@
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QSpinBox" name="spinBox_font_adjuster">
-      <property name="geometry">
-       <rect>
-        <x>328</x>
-        <y>0</y>
-        <width>53</width>
-        <height>30</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Adjust text font size in pdf.&lt;/p&gt;&lt;p&gt;Reduces text overlaps.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-      <property name="minimum">
-       <number>-10</number>
-      </property>
-      <property name="maximum">
-       <number>0</number>
-      </property>
-      <property name="value">
-       <number>-2</number>
-      </property>
-     </widget>
      <widget class="QLabel" name="label_search_regex">
       <property name="geometry">
        <rect>
@@ -232,23 +210,10 @@
        <string/>
       </property>
      </widget>
-     <widget class="QSpinBox" name="spinBox">
-      <property name="geometry">
-       <rect>
-        <x>220</x>
-        <y>0</y>
-        <width>51</width>
-        <height>30</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Page&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-     </widget>
      <widget class="QCheckBox" name="checkBox_curve">
       <property name="geometry">
        <rect>
-        <x>640</x>
+        <x>660</x>
         <y>6</y>
         <width>81</width>
         <height>26</height>
@@ -264,7 +229,7 @@
      <widget class="QCheckBox" name="checkBox_line">
       <property name="geometry">
        <rect>
-        <x>730</x>
+        <x>750</x>
         <y>6</y>
         <width>61</width>
         <height>26</height>
@@ -280,7 +245,7 @@
      <widget class="QCheckBox" name="checkBox_image">
       <property name="geometry">
        <rect>
-        <x>480</x>
+        <x>500</x>
         <y>6</y>
         <width>80</width>
         <height>26</height>
@@ -296,7 +261,7 @@
      <widget class="QCheckBox" name="checkBox_black_text">
       <property name="geometry">
        <rect>
-        <x>800</x>
+        <x>820</x>
         <y>6</y>
         <width>111</width>
         <height>26</height>
@@ -312,7 +277,7 @@
      <widget class="QCheckBox" name="checkBox_text">
       <property name="geometry">
        <rect>
-        <x>410</x>
+        <x>430</x>
         <y>6</y>
         <width>61</width>
         <height>26</height>
@@ -328,7 +293,7 @@
      <widget class="QCheckBox" name="checkBox_rect">
       <property name="geometry">
        <rect>
-        <x>570</x>
+        <x>590</x>
         <y>6</y>
         <width>61</width>
         <height>26</height>
@@ -347,7 +312,7 @@
      <widget class="QLabel" name="label_font_size">
       <property name="geometry">
        <rect>
-        <x>300</x>
+        <x>320</x>
         <y>3</y>
         <width>24</width>
         <height>24</height>
@@ -375,10 +340,10 @@
      <widget class="QLabel" name="label_pages">
       <property name="geometry">
        <rect>
-        <x>190</x>
-        <y>3</y>
-        <width>24</width>
-        <height>24</height>
+        <x>227</x>
+        <y>2</y>
+        <width>51</width>
+        <height>26</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -394,7 +359,7 @@
        <string/>
       </property>
       <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       <set>Qt::AlignCenter</set>
       </property>
       <property name="wordWrap">
        <bool>true</bool>
@@ -427,6 +392,73 @@
       </property>
       <property name="toolTip">
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export image&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="comboBox_fontsize">
+      <property name="geometry">
+       <rect>
+        <x>352</x>
+        <y>2</y>
+        <width>61</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <item>
+       <property name="text">
+        <string>0</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>-1</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>-2</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>-3</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>-4</string>
+       </property>
+      </item>
+     </widget>
+     <widget class="QPushButton" name="pushButton_previous_page">
+      <property name="geometry">
+       <rect>
+        <x>192</x>
+        <y>0</y>
+        <width>30</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_next_page">
+      <property name="geometry">
+       <rect>
+        <x>280</x>
+        <y>0</y>
+        <width>30</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -653,7 +685,6 @@
   </layout>
  </widget>
  <tabstops>
-  <tabstop>spinBox_font_adjuster</tabstop>
   <tabstop>pushButton_help</tabstop>
   <tabstop>lineEdit_search</tabstop>
   <tabstop>checkBox_search_case</tabstop>

@@ -1,25 +1,18 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2024 Colin Curtain
+This file is part of QualCoder.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+QualCoder is free software: you can redistribute it and/or modify it under the
+terms of the GNU Lesser General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later version.
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+QualCoder is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
+You should have received a copy of the GNU Lesser General Public License along with QualCoder.
+If not, see <https://www.gnu.org/licenses/>.
 
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
@@ -185,13 +178,6 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.pushButton_view_original.setToolTip(_("View original file"))
         self.ui.pushButton_document_memo.setIcon(qta.icon('mdi6.text-box-outline', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_document_memo.pressed.connect(self.file_memo)
-        # This function does not work
-        '''self.ui.pushButton_show_selected_code.setIcon(qta.icon('mdi6.eye'))# TODO remove ui
-        #self.ui.pushButton_show_selected_code.pressed.connect(self.show_selected_code)
-        #TODO use to show only this coding
-        self.ui.pushButton_show_selected_code.hide()
-        self.ui.pushButton_show_all_codings.setIcon(qta.icon('mdi6.grid-large'))
-        self.ui.pushButton_show_all_codings.pressed.connect(self.show_all_codes_in_text)'''
 
         self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
         self.ui.lineEdit_search.setEnabled(False)
@@ -203,7 +189,8 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.pushButton_export.setIcon(qta.icon('mdi6.export', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_export.pressed.connect(self.export_pdf_image)
         self.ui.label_font_size.setPixmap(qta.icon('mdi6.format-size').pixmap(22, 22))
-        self.ui.spinBox_font_adjuster.valueChanged.connect(self.update_page)
+        self.ui.pushButton_next_page.pressed.connect(self.next_page)
+        self.ui.pushButton_previous_page.pressed.connect(self.previous_page)
         self.ui.pushButton_previous.setIcon(qta.icon('mdi6.arrow-left', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_previous.setEnabled(False)
         self.ui.pushButton_previous.pressed.connect(self.move_to_previous_search_text)
@@ -242,9 +229,12 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.checkBox_line.stateChanged.connect(self.update_page)
         self.ui.checkBox_black_text.stateChanged.connect(self.update_page)
 
-        self.ui.spinBox.setEnabled(False)
-        self.ui.spinBox.setMinimum(1)
-        self.ui.spinBox.valueChanged.connect(self.spin_page_changed)
+        self.ui.label_pages.setText("")
+        self.ui.pushButton_previous_page.setIcon(qta.icon('mdi6.page-previous-outline', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_next_page.setIcon(qta.icon('mdi6.page-next-outline', options=[{'scale_factor': 1.3}]))
+
+        self.ui.comboBox_fontsize.setCurrentIndex(2)
+        self.ui.comboBox_fontsize.currentIndexChanged.connect(self.update_page)
 
         self.get_files()
         self.fill_tree()
@@ -259,10 +249,20 @@ class DialogCodePdf(QtWidgets.QWidget):
         msg += "\n" + _("Similarly, if the PDF plain text has beeen edited in any way, this will affect coding stripes display.")
         Message(self.app, _("Information") + " " * 20, msg).exec()
 
-    def spin_page_changed(self):
-        pass
+    def next_page(self):
         if self.pages:
-            self.page_num = self.ui.spinBox.value() - 1
+            self.page_num += 1
+            if self.page_num > len(self.pages) - 1:
+                self.page_num = len(self.pages) - 1
+            self.ui.label_pages.setText(f"{self.page_num + 1}")
+            self.show_page()
+
+    def previous_page(self):
+        if self.pages:
+            self.page_num -= 1
+            if self.page_num < 0:
+                self.page_num = 0
+            self.ui.label_pages.setText(f"{self.page_num + 1}")
             self.show_page()
 
     def update_page(self):
@@ -660,7 +660,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         for p in self.pages:
             if p['plain_text_start'] <= next_result[0] < p['plain_text_end']:
                 self.page_num = p['pagenum']
-                self.ui.spinBox.setValue(self.page_num + 1)
+                self.ui.label_pages.setText(f"{self.page_num + 1}")
                 self.show_page()
                 break
         # Highlight selected text
@@ -697,7 +697,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         for p in self.pages:
             if p['plain_text_start'] <= previous_result[0] < p['plain_text_end']:
                 self.page_num = p['pagenum']
-                self.ui.spinBox.setValue(self.page_num + 1)
+                self.ui.label_pages.setText(f"{self.page_num + 1}")
                 self.show_page()
                 break
         # Highlight selected text
@@ -1365,6 +1365,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         Q Quick Mark with code - for current selection
         H Hide / Unhide top groupbox
         I Tag important
+        L Show codes like
         M memo code - at clicked position - text edit only
         O Shortcut to cycle through overlapping codes - at clicked position- text edit only
         S search text - may include current selection
@@ -1422,41 +1423,44 @@ class DialogCodePdf(QtWidgets.QWidget):
                     return
                 self.ui.graphicsView.scale(0.9, 0.9)
                 return
-            # Hide unHide top groupbox
-            if key == QtCore.Qt.Key.Key_H:
-                self.ui.groupBox.setHidden(not (self.ui.groupBox.isHidden()))
+        # Hide unHide top groupbox
+        if key == QtCore.Qt.Key.Key_H:
+            self.ui.groupBox.setHidden(not (self.ui.groupBox.isHidden()))
+            return
+        # Show codes like
+        if key == QtCore.Qt.Key.Key_L:
+            self.show_codes_like()
+        # Quick mark selected
+        if key == QtCore.Qt.Key.Key_Q:
+            self.selected_graphic_textboxes = self.scene.selectedItems()
+            if len(self.selected_graphic_textboxes) == 0:
                 return
-            # Quick mark selected
-            if key == QtCore.Qt.Key.Key_Q:
-                self.selected_graphic_textboxes = self.scene.selectedItems()
-                if len(self.selected_graphic_textboxes) == 0:
-                    return
-                self.mark(by_text_boxes=True)
+            self.mark(by_text_boxes=True)
+            return
+        # Recent codes selection
+        if key == QtCore.Qt.Key.Key_R and len(self.recent_codes) > 0:
+            self.selected_graphic_textboxes = self.scene.selectedItems()
+            if len(self.selected_graphic_textboxes) == 0:
                 return
-            # Recent codes selection
-            if key == QtCore.Qt.Key.Key_R and len(self.recent_codes) > 0:
-                self.selected_graphic_textboxes = self.scene.selectedItems()
-                if len(self.selected_graphic_textboxes) == 0:
-                    return
-                # Can only be single selection, as text boxes re-drawn selection is lost.
-                ui = DialogSelectItems(self.app, self.recent_codes, _("Select code"), "single")
-                ok = ui.exec()
-                if not ok:
-                    return
-                selection = ui.get_selected()
-                self.recursive_set_current_item(self.ui.treeWidget.invisibleRootItem(), selection['name'])
-                self.mark(by_text_boxes=True)
+            # Can only be single selection, as text boxes re-drawn selection is lost.
+            ui = DialogSelectItems(self.app, self.recent_codes, _("Select code"), "single")
+            ok = ui.exec()
+            if not ok:
                 return
-            # Unmark text boxes
-            ''' Review graphicsview_menu for code for this action '''
-            '''if key == QtCore.Qt.Key.Key_U:
-                self.selected_graphic_textboxes = self.scene.selectedItems()
-                if len(self.selected_graphic_textboxes) == 0:
-                    return
-                print("U")
-                #self.unmark(cursor_pos)
+            selection = ui.get_selected()
+            self.recursive_set_current_item(self.ui.treeWidget.invisibleRootItem(), selection['name'])
+            self.mark(by_text_boxes=True)
+            return
+        # Unmark text boxes
+        ''' Review graphicsview_menu for code for this action '''
+        '''if key == QtCore.Qt.Key.Key_U:
+            self.selected_graphic_textboxes = self.scene.selectedItems()
+            if len(self.selected_graphic_textboxes) == 0:
                 return
-            # TODO MORE'''
+            print("U")
+            #self.unmark(cursor_pos)
+            return
+        # TODO MORE'''
 
         if not self.ui.textEdit.hasFocus():
             return
@@ -2412,10 +2416,8 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.checkBox_search_case.setEnabled(True)
         self.search_for_text()
         self.load_pdf_pages()
-        self.ui.spinBox.setMinimum(1)
-        self.ui.spinBox.setMaximum(len(self.pages))
-        self.ui.spinBox.setToolTip(f'{_("Pages:")} {len(self.pages)}')
-        self.ui.spinBox.setEnabled(True)
+        self.ui.label_pages.setText("1")
+        self.ui.label_pages.setToolTip(_("Pages: ") + f"{len(self.pages)}")
         self.show_page()
 
     def load_pdf_pages(self):
@@ -2425,7 +2427,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         Called by: next_search_result
         """
 
-        self.ui.spinBox.setValue(1)
+        self.ui.label_pages.setText("1")
         filepath = None
         if self.file_['mediapath'][:6] == "/docs/":
             filepath = f"{self.app.project_path}/documents/{self.file_['mediapath'][6:]}"
@@ -2705,7 +2707,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             item.setPos(text_box['left'], text_box['top'])
             '''print(i['fontname'], type(t['fontname']), t['fontsize'], type(t['fontsize']))
             font = QtGui.QFont(t['fontname'], t['fontsize']) '''
-            adjustment = self.ui.spinBox_font_adjuster.value()
+            adjustment = int(self.ui.comboBox_fontsize.currentText())
             font_size = text_box['fontsize'] + adjustment  # e.g. minus 2 helps stop text overlaps
             if font_size < 4:
                 font_size = 4

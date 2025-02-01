@@ -1488,6 +1488,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         A annotate - for current selection
         Q Quick Mark with code - for current selection
         I Tag important
+        L Show codes like
         M memo code - at clicked position
         O Shortcut to cycle through overlapping codes - at clicked position
         S search text - may include current selection
@@ -1591,6 +1592,9 @@ class DialogCodeAV(QtWidgets.QDialog):
         if key == QtCore.Qt.Key.Key_I:
             self.set_important(cursor_pos)
             return
+        # Show codes like
+        if key == QtCore.Qt.Key.Key_L:
+            self.show_codes_like()
         # Memo for current code
         if key == QtCore.Qt.Key.Key_M:
             self.coded_text_memo(cursor_pos)
