@@ -83,9 +83,9 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         self.result_relations = []
         self.calculate_relations(code_ids_str)
 
-        # Tmp for testing
+        '''# Tmp for testing
         for r in self.result_relations:
-            print(r)
+            print(r)'''
 
         # Create data matrices zeroed, codes are ordered alphabetically by name
         self.data_counts = []
@@ -110,7 +110,7 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
             print(r['cid0'], r['c0_name'], r['ctid0'], r['cid1'], r['c1_name'], r['ctid1'], r['fid'], r['file_name'],
                   r['owners'], r['c0_pos0'], r['c0_pos1'], r['c1_pos0'], r['c1_pos1'])
             res_list = [r['cid0'], r['c0_name'], r['ctid0'], r['cid1'], r['c1_name'], r['ctid1'], r['fid'], r['file_name'],
-                  r['owners'], r['c0_pos0'], r['c0_pos1'], r['c1_pos0'], r['c1_pos1'], r['ctid0'], r['ctid1'],
+                  r['owners'], r['c0_pos0'], r['c0_pos1'], r['c1_pos0'], r['c1_pos1'],
                         r['text_before'], r['text_overlap'], r['text_after']]
             if self.data_details[row_pos][col_pos] == ".":
                 self.data_details[row_pos][col_pos] = [res_list]
@@ -146,10 +146,28 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         text = self.ui.tableWidget.item(row, col).text()
         if text == "":
             return
-        #print(row, col, text)
+        self.ui.textEdit.clear()
         data_list = self.data_details[row][col]
-        for overlap in data_list:
-            print(overlap)
+        '''
+        0 - 5 [r['cid0'], r['c0_name'], r['ctid0'], r['cid1'], r['c1_name'], r['ctid1'], 
+        6 - 8 r['fid'], r['file_name'], r['owners'], 
+        9 - 12 r['c0_pos0'], r['c0_pos1'], r['c1_pos0'], r['c1_pos1'],
+        13 - 15 r['text_before'], r['text_overlap'], r['text_after']]
+        '''
+        for data in data_list:
+            print(data)
+            msg = f"Codes: {data[1]} ({data[9]} - {data[10]})| {data[4]} ({data[11]} - {data[12]})\n"
+            msg += f"Coders: {data[8]}. (ctid0: {data[2]} | ctid1: {data[5]})\n"
+            msg += f"File (fid {data[6]}): {data[7]}\n\n"
+            msg += f"{data[13]}{data[14]}{data[15]}\n"
+
+            msg += "========\n"
+
+            self.ui.textEdit.append(msg)
+
+        print("SP", self.ui.splitter.sizes())
+        self.ui.splitter.setSizes([300, 200])
+
 
 
     '''def table_menu(self, position):
