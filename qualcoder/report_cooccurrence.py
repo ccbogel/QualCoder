@@ -156,31 +156,30 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
             name_split_50 = [code_['name'][y - 50:y] for y in range(50, len(code_['name']) + 50, 50)]
             # header_labels.append(code_['name'])  # OLD, need line separators
             header.append("\n".join(name_split_50))
-
         wb = openpyxl.Workbook()
         ws = wb.active
+        ws.title = "Counts"
+        wb.create_sheet("Details")
+        ws2 = wb["Details"]
+
         for col, col_name in enumerate(header):
             h_cell = ws.cell(row=1, column=col + 2)
             h_cell.value = col_name
+            h_cell2 = ws2.cell(row=1, column=col + 2)
+            h_cell2.value = col_name
             v_cell = ws.cell(row=col + 2, column=1)
             v_cell.value = col_name
-
-
-        # Data
-        '''for row, row_data in enumerate(results):
+            v_cell2 = ws2.cell(row=col + 2, column=1)
+            v_cell2.value = col_name
+        # Co-occurrence counts
+        for row, row_data in enumerate(self.data_counts):
             for col, col_data in enumerate(row_data):
                 cell = ws.cell(row=row + 2, column=col + 2)
-                cell.value = col_data'''
-
-        '''for c in range(0, col_count):
-            for r in range(0, row_count):
-                te = self.te[r][c]
-                try:
-                    data_text = te.toPlainText()
-                except AttributeError:  # None type error
-                    data_text = ""
-                cell = ws.cell(row=r + 2, column=c + 2)
-                cell.value = data_text'''
+                cell.value = col_data
+        # Details
+        # TODO
+        v_cell = ws2.cell(row=2, column=2)
+        v_cell.value = "TEST"
 
         wb.save(filepath)
         msg = _('Co-occurrence exported: ') + filepath
