@@ -159,10 +159,25 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
             msg = f"Codes: {data[1]} ({data[9]} - {data[10]})| {data[4]} ({data[11]} - {data[12]})\n"
             msg += f"Coders: {data[8]}. (ctid0: {data[2]} | ctid1: {data[5]})\n"
             msg += f"File (fid {data[6]}): {data[7]}\n\n"
-            msg += f"{data[13]}{data[14]}{data[15]}\n"
+            self.ui.textEdit.append(msg)
 
-            msg += "========\n"
+            start_pos = len(self.ui.textEdit.toPlainText())
+            msg = f"{data[13]}{data[14]}{data[15]}\n"
+            self.ui.textEdit.append(msg)
+            start_pos += len(data[13])
+            end_pos = start_pos + len(data[14])
+            cursor = self.ui.textEdit.textCursor()
+            fmt = QtGui.QTextCharFormat()
+            fmt.setUnderlineStyle(QtGui.QTextCharFormat.UnderlineStyle.SingleUnderline)
+            if self.app.settings['stylesheet'] == 'dark':
+                fmt.setUnderlineColor(QtGui.QColor("#FF0000"))
+            else:
+                fmt.setUnderlineColor(QtGui.QColor("#FF00000"))
+            cursor.setPosition(start_pos, QtGui.QTextCursor.MoveMode.MoveAnchor)
+            cursor.setPosition(end_pos, QtGui.QTextCursor.MoveMode.KeepAnchor)
+            cursor.mergeCharFormat(fmt)
 
+            msg = "========\n"
             self.ui.textEdit.append(msg)
 
         print("SP", self.ui.splitter.sizes())
