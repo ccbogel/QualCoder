@@ -19,13 +19,15 @@ https://github.com/ccbogel/QualCoder
 """
 
 import logging
+import openpyxl
 import os
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 
 from PyQt6 import QtCore, QtWidgets, QtGui
 
 from .GUI.ui_dialog_cooccurrence import Ui_Dialog_Coocurrence
-# from .helpers import Message
+from .helpers import ExportDirectoryPathDialog, Message
+
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -49,6 +51,8 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
         self.ui.pushButton_export.setIcon(qta.icon('mdi6.export', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_export.pressed.connect(self.export_to_excel)
+        self.ui.checkBox_hide_blanks.stateChanged.connect(self.show_or_hide_empty_rows_and_cols)
         tablefont = f'font: 7pt "{self.app.settings["font"]}";'
         self.ui.tableWidget.setStyleSheet(tablefont)  # should be smaller
         self.ui.tableWidget.cellClicked.connect(self.cell_selected)
@@ -135,6 +139,76 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
             print(d)'''
 
         self.fill_table()
+
+    def export_to_excel(self):
+        """ Export to Excel file. """
+
+        filename = "Code_cooccurrence.xlsx"
+        export_dir = ExportDirectoryPathDialog(self.app, filename)
+        filepath = export_dir.filepath
+        if filepath is None:
+            return
+
+
+        # Excel headers
+        header = []
+        for code_ in self.codes:
+            name_split_50 = [code_['name'][y - 50:y] for y in range(50, len(code_['name']) + 50, 50)]
+            # header_labels.append(code_['name'])  # OLD, need line separators
+            header.append("\n".join(name_split_50))
+
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        for col, col_name in enumerate(header):
+            h_cell = ws.cell(row=1, column=col + 2)
+            h_cell.value = col_name
+            v_cell = ws.cell(row=col + 2, column=1)
+            v_cell.value = col_name
+
+
+        # Data
+        '''for row, row_data in enumerate(results):
+            for col, col_data in enumerate(row_data):
+                cell = ws.cell(row=row + 2, column=col + 2)
+                cell.value = col_data'''
+
+        '''for c in range(0, col_count):
+            for r in range(0, row_count):
+                te = self.te[r][c]
+                try:
+                    data_text = te.toPlainText()
+                except AttributeError:  # None type error
+                    data_text = ""
+                cell = ws.cell(row=r + 2, column=c + 2)
+                cell.value = data_text'''
+
+        wb.save(filepath)
+        msg = _('Co-occurrence exported: ') + filepath
+        Message(self.app, _('Co-occurrence exported'), msg, "information").exec()
+        self.parent_textEdit.append(msg)
+
+    def show_or_hide_empty_rows_and_cols(self):
+        """ Unchecked - show all rows and columns.
+        Checked - hide rows and columns with no code co-occurrences. """
+
+        if self.ui.checkBox_hide_blanks.isChecked():
+            for row, row_data in enumerate(self.data_counts):
+                print(row_data)
+                if sum(row_data) == 0:
+                    self.ui.tableWidget.hideRow(row)
+
+            for col in range(len(self.data_counts)):
+                col_sum = 0
+                for row, row_data in enumerate(self.data_counts):
+                    col_sum += row_data[col]
+                if col_sum == 0:
+                    self.ui.tableWidget.hideColumn(col)
+
+        if not self.ui.checkBox_hide_blanks.isChecked():
+            for row, row_data in enumerate(self.data_counts):
+                self.ui.tableWidget.showRow(row)
+                self.ui.tableWidget.showColumn(row)
+
 
     def cell_selected(self):
         """ When the table widget memo cell is selected display the memo.
