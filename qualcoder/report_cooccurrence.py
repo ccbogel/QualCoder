@@ -176,10 +176,25 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
             for col, col_data in enumerate(row_data):
                 cell = ws.cell(row=row + 2, column=col + 2)
                 cell.value = col_data
-        # Details
-        # TODO
-        v_cell = ws2.cell(row=2, column=2)
-        v_cell.value = "TEST"
+                # Details list
+                if self.data_details[row][col] == ".":
+                    continue
+                details = ""
+                for dets in self.data_details[row][col]:
+                    '''
+                    0 - 5 [r['cid0'], r['c0_name'], r['ctid0'], r['cid1'], r['c1_name'], r['ctid1'], 
+                    6 - 8 r['fid'], r['file_name'], r['owners'], 
+                    9 - 12 r['c0_pos0'], r['c0_pos1'], r['c1_pos0'], r['c1_pos1'],
+                    13 - 15 r['text_before'], r['text_overlap'], r['text_after']]
+                    '''
+                    print(dets)
+                    details += f"Codes: {dets[1]} ({dets[9]} - {dets[10]})| {dets[4]} ({dets[11]} - {dets[12]})\n"
+                    details += f"Coders: {dets[8]}. (ctid0: {dets[2]} | ctid1: {dets[5]})\n"
+                    details += f"File (fid {dets[6]}): {dets[7]}\n"
+                    details += f"{dets[13]}[[{dets[14]}]]{dets[15]}\n========\n"
+
+                d_cell = ws2.cell(row=row + 2, column=col + 2)
+                d_cell.value = details
 
         wb.save(filepath)
         msg = _('Co-occurrence exported: ') + filepath
@@ -208,7 +223,6 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
                 self.ui.tableWidget.showRow(row)
                 self.ui.tableWidget.showColumn(row)
 
-
     def cell_selected(self):
         """ When the table widget memo cell is selected display the memo.
         Update memo text, or delete memo by clearing text.
@@ -228,32 +242,52 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         13 - 15 r['text_before'], r['text_overlap'], r['text_after']]
         '''
         for data in data_list:
-            print(data)
+            #print(data)
             msg = f"Codes: {data[1]} ({data[9]} - {data[10]})| {data[4]} ({data[11]} - {data[12]})\n"
             msg += f"Coders: {data[8]}. (ctid0: {data[2]} | ctid1: {data[5]})\n"
-            msg += f"File (fid {data[6]}): {data[7]}\n\n"
+            msg += f"File (fid {data[6]}): {data[7]}\n"
             self.ui.textEdit.append(msg)
 
-            start_pos = len(self.ui.textEdit.toPlainText())
-            msg = f"{data[13]}{data[14]}{data[15]}\n"
+            # Prepare colours for overlapping and non-overlapping text
+            color_yellow = "#F4FA58"  # Coder0 - first and usually lowest pos0
+            brush_yellow = QtGui.QBrush(QtGui.QColor(color_yellow))
+            color_blue = "#81BEF7"  # Coder1 - second and usually highest pos1
+            brush_blue = QtGui.QBrush(QtGui.QColor(color_blue))
+            color_green = "#81F781"  # Overlap color
+            brush_green = QtGui.QBrush(QtGui.QColor(color_green))
+            start_pos_yellow = len(self.ui.textEdit.toPlainText())
+            end_pos_yellow = start_pos_yellow + len(data[13]) + 1
+            start_pos_green = end_pos_yellow
+            end_pos_green = start_pos_green + len(data[14]) + 1
+            start_pos_blue = end_pos_green
+            end_pos_blue = start_pos_blue + len(data[15]) + 1
+
+            msg = f"{data[13]}{data[14]}{data[15]}"
             self.ui.textEdit.append(msg)
-            start_pos += len(data[13])
-            end_pos = start_pos + len(data[14])
+
+            # Not working correctly
             cursor = self.ui.textEdit.textCursor()
-            fmt = QtGui.QTextCharFormat()
-            fmt.setUnderlineStyle(QtGui.QTextCharFormat.UnderlineStyle.SingleUnderline)
-            if self.app.settings['stylesheet'] == 'dark':
-                fmt.setUnderlineColor(QtGui.QColor("#FF0000"))
-            else:
-                fmt.setUnderlineColor(QtGui.QColor("#FF00000"))
-            cursor.setPosition(start_pos, QtGui.QTextCursor.MoveMode.MoveAnchor)
-            cursor.setPosition(end_pos, QtGui.QTextCursor.MoveMode.KeepAnchor)
-            cursor.mergeCharFormat(fmt)
+            fmt_yellow = QtGui.QTextCharFormat()
+            cursor.setPosition(start_pos_yellow, QtGui.QTextCursor.MoveMode.MoveAnchor)
+            cursor.setPosition(end_pos_yellow, QtGui.QTextCursor.MoveMode.KeepAnchor)
+            fmt_yellow.setBackground(brush_yellow)
+            cursor.mergeCharFormat(fmt_yellow)
 
-            msg = "========\n"
+            fmt_green = QtGui.QTextCharFormat()
+            cursor.setPosition(start_pos_green, QtGui.QTextCursor.MoveMode.MoveAnchor)
+            cursor.setPosition(end_pos_green, QtGui.QTextCursor.MoveMode.KeepAnchor)
+            fmt_green.setBackground(brush_green)
+            cursor.mergeCharFormat(fmt_green)
+
+            fmt_blue = QtGui.QTextCharFormat()
+            cursor.setPosition(start_pos_blue, QtGui.QTextCursor.MoveMode.MoveAnchor)
+            cursor.setPosition(end_pos_blue, QtGui.QTextCursor.MoveMode.KeepAnchor)
+            fmt_blue.setBackground(brush_blue)
+            cursor.mergeCharFormat(fmt_blue)
+
+            msg = "========"
             self.ui.textEdit.append(msg)
 
-        print("SP", self.ui.splitter.sizes())
         self.ui.splitter.setSizes([300, 200])
 
 
