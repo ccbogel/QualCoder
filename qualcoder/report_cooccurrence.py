@@ -87,10 +87,6 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         self.result_relations = []
         self.calculate_relations(code_ids_str)
 
-        '''# Tmp for testing
-        for r in self.result_relations:
-            print(r)'''
-
         # Create data matrices zeroed, codes are ordered alphabetically by name
         self.data_counts = []
         self.data_colors = []
@@ -111,8 +107,8 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
             self.data_counts[row_pos][col_pos] += 1
             if self.data_counts[row_pos][col_pos] > self.max_count:
                 self.max_count = self.data_counts[row_pos][col_pos]
-            print(r['cid0'], r['c0_name'], r['ctid0'], r['cid1'], r['c1_name'], r['ctid1'], r['fid'], r['file_name'],
-                  r['owners'], r['c0_pos0'], r['c0_pos1'], r['c1_pos0'], r['c1_pos1'])
+            '''print(r['cid0'], r['c0_name'], r['ctid0'], r['cid1'], r['c1_name'], r['ctid1'], r['fid'], r['file_name'],
+                  r['owners'], r['c0_pos0'], r['c0_pos1'], r['c1_pos0'], r['c1_pos1'])'''
             res_list = [r['cid0'], r['c0_name'], r['ctid0'], r['cid1'], r['c1_name'], r['ctid1'], r['fid'], r['file_name'],
                   r['owners'], r['c0_pos0'], r['c0_pos1'], r['c1_pos0'], r['c1_pos1'],
                         r['text_before'], r['text_overlap'], r['text_after']]
@@ -131,13 +127,6 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
                         color_range_index = 0
                     self.data_colors[row][col] = colors[color_range_index]
 
-        '''print("Summary counts table")
-        for d in self.data_counts:
-            print(d)
-        print("Summary data details table")
-        for d in self.data_details:
-            print(d)'''
-
         self.fill_table()
 
     def export_to_excel(self):
@@ -149,8 +138,7 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         if filepath is None:
             return
 
-
-        # Excel headers
+        # Excel vertical and horizontal headers
         header = []
         for code_ in self.codes:
             name_split_50 = [code_['name'][y - 50:y] for y in range(50, len(code_['name']) + 50, 50)]
@@ -161,7 +149,6 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         ws.title = "Counts"
         wb.create_sheet("Details")
         ws2 = wb["Details"]
-
         for col, col_name in enumerate(header):
             h_cell = ws.cell(row=1, column=col + 2)
             h_cell.value = col_name
@@ -180,19 +167,17 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
                 if self.data_details[row][col] == ".":
                     continue
                 details = ""
-                for dets in self.data_details[row][col]:
+                for data in self.data_details[row][col]:
                     '''
                     0 - 5 [r['cid0'], r['c0_name'], r['ctid0'], r['cid1'], r['c1_name'], r['ctid1'], 
                     6 - 8 r['fid'], r['file_name'], r['owners'], 
                     9 - 12 r['c0_pos0'], r['c0_pos1'], r['c1_pos0'], r['c1_pos1'],
                     13 - 15 r['text_before'], r['text_overlap'], r['text_after']]
                     '''
-                    print(dets)
-                    details += f"Codes: {dets[1]} ({dets[9]} - {dets[10]})| {dets[4]} ({dets[11]} - {dets[12]})\n"
-                    details += f"Coders: {dets[8]}. (ctid0: {dets[2]} | ctid1: {dets[5]})\n"
-                    details += f"File (fid {dets[6]}): {dets[7]}\n"
-                    details += f"{dets[13]}[[{dets[14]}]]{dets[15]}\n========\n"
-
+                    details += f"Codes: {data[1]} ({data[9]} - {data[10]})| {data[4]} ({data[11]} - {data[12]})\n"
+                    details += f"Coders: {data[8]}. (ctid0: {data[2]} | ctid1: {data[5]})\n"
+                    details += f"File (fid {data[6]}): {data[7]}\n"
+                    details += f"{data[13]}[[{data[14]}]]{data[15]}\n========\n"
                 d_cell = ws2.cell(row=row + 2, column=col + 2)
                 d_cell.value = details
 
@@ -207,7 +192,6 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
 
         if self.ui.checkBox_hide_blanks.isChecked():
             for row, row_data in enumerate(self.data_counts):
-                print(row_data)
                 if sum(row_data) == 0:
                     self.ui.tableWidget.hideRow(row)
 
@@ -226,7 +210,8 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
     def cell_selected(self):
         """ When the table widget memo cell is selected display the memo.
         Update memo text, or delete memo by clearing text.
-        If a new memo, also show in table widget by displaying MEMO in the memo column. """
+        If a new memo, also show in table widget by displaying MEMO in the memo column.
+        """
 
         row = self.ui.tableWidget.currentRow()
         col = self.ui.tableWidget.currentColumn()
@@ -241,31 +226,31 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         9 - 12 r['c0_pos0'], r['c0_pos1'], r['c1_pos0'], r['c1_pos1'],
         13 - 15 r['text_before'], r['text_overlap'], r['text_after']]
         '''
+        # Colours for overlapping and non-overlapping text
+        color_yellow = "#F4FA58"  # Coder0 - first and usually lowest pos0
+        brush_yellow = QtGui.QBrush(QtGui.QColor(color_yellow))
+        color_blue = "#81BEF7"  # Coder1 - second and usually highest pos1
+        brush_blue = QtGui.QBrush(QtGui.QColor(color_blue))
+        color_green = "#81F781"  # Overlap color
+        brush_green = QtGui.QBrush(QtGui.QColor(color_green))
+
         for data in data_list:
-            #print(data)
             msg = f"Codes: {data[1]} ({data[9]} - {data[10]})| {data[4]} ({data[11]} - {data[12]})\n"
             msg += f"Coders: {data[8]}. (ctid0: {data[2]} | ctid1: {data[5]})\n"
             msg += f"File (fid {data[6]}): {data[7]}\n"
             self.ui.textEdit.append(msg)
 
-            # Prepare colours for overlapping and non-overlapping text
-            color_yellow = "#F4FA58"  # Coder0 - first and usually lowest pos0
-            brush_yellow = QtGui.QBrush(QtGui.QColor(color_yellow))
-            color_blue = "#81BEF7"  # Coder1 - second and usually highest pos1
-            brush_blue = QtGui.QBrush(QtGui.QColor(color_blue))
-            color_green = "#81F781"  # Overlap color
-            brush_green = QtGui.QBrush(QtGui.QColor(color_green))
+            # Coded text highlights - yellow code 0, green overlap, blue code 1
             start_pos_yellow = len(self.ui.textEdit.toPlainText())
             end_pos_yellow = start_pos_yellow + len(data[13]) + 1
             start_pos_green = end_pos_yellow
-            end_pos_green = start_pos_green + len(data[14]) + 1
+            end_pos_green = start_pos_green + len(data[14])
             start_pos_blue = end_pos_green
-            end_pos_blue = start_pos_blue + len(data[15]) + 1
+            end_pos_blue = start_pos_blue + len(data[15])
 
             msg = f"{data[13]}{data[14]}{data[15]}"
             self.ui.textEdit.append(msg)
 
-            # Not working correctly
             cursor = self.ui.textEdit.textCursor()
             fmt_yellow = QtGui.QTextCharFormat()
             cursor.setPosition(start_pos_yellow, QtGui.QTextCursor.MoveMode.MoveAnchor)
@@ -284,15 +269,13 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
             cursor.setPosition(end_pos_blue, QtGui.QTextCursor.MoveMode.KeepAnchor)
             fmt_blue.setBackground(brush_blue)
             cursor.mergeCharFormat(fmt_blue)
-
             msg = "========"
             self.ui.textEdit.append(msg)
 
         self.ui.splitter.setSizes([300, 200])
 
-
-
-    '''def table_menu(self, position):
+    ''' TODO for future expansion maybe.
+    def table_menu(self, position):
         """ Context menu for displaying table cell coding details.
         """
 
@@ -304,8 +287,6 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         action_view = menu.addAction(_("View"))'''
-
-
 
     def fill_table(self):
         """ Fill table using code names alphabetically (case insensitive), using self.data """
