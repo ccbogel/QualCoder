@@ -13,7 +13,7 @@ lrelease_path = "C:\\Users\\kai\\anaconda3\\envs\\QualCOder\\Lib\\site-packages\
 
 language_list = ['de', 'en', 'es', 'fr', 'it', 'pt']
 
-# MO TRANSLATION
+# GETTEXT TRANSLATION
 
 # .po-files
 po_dir = os.path.join(script_dir, "qualcoder")

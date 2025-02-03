@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="fr" sourcelanguage="en">
+<TS version="2.1" language="fr_FR" sourcelanguage="en_US">
 <context>
     <name>DialogAddAttribute</name>
     <message>
@@ -566,12 +566,12 @@ en-AU</translation>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="195"/>
         <source>AI Prompts Library</source>
-        <translation>Bibliothèque message IA</translation>
+        <translation>Bibliothèque d&apos;invites IA</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="196"/>
         <source>Analytic Prompts:</source>
-        <translation>Message à l&apos;analyse:</translation>
+        <translation>Invitations à l&apos;analyse de l&apos;IA :</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="197"/>
@@ -586,7 +586,7 @@ en-AU</translation>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="199"/>
         <source>Copy prompt to clipboard</source>
-        <translation>Copier l&apos;message dans le presse-papiers</translation>
+        <translation>Copier l&apos;invite dans le presse-papiers</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="204"/>
@@ -596,22 +596,22 @@ en-AU</translation>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="201"/>
         <source>Paste prompt from clipboard</source>
-        <translation>Coller l&apos;message à partir du presse-papiers</translation>
+        <translation>Coller l&apos;invite à partir du presse-papiers</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="203"/>
         <source>Delete prompt</source>
-        <translation>Supprimer message</translation>
+        <translation>Supprimer l&apos;invite</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="205"/>
         <source>Prompt Name:</source>
-        <translation>Nom de message:</translation>
+        <translation>Nom de l&apos;invite :</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="206"/>
         <source>(Uneditable system prompt)</source>
-        <translation>( Message système non éditable)</translation>
+        <translation>( Invite non éditable )</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="207"/>
@@ -641,7 +641,7 @@ en-AU</translation>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="212"/>
         <source>Prompt description:</source>
-        <translation>Message description :</translation>
+        <translation>Description de l&apos;invite IA :</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="213"/>
@@ -4732,7 +4732,7 @@ Ne codez pas ce texte avant d&apos;avoir rechargé Codage - Texte de code dans l
     <message>
         <location filename="ui_main.py" line="380"/>
         <source>Prompt library</source>
-        <translation>Bibliothèque des messages-guides</translation>
+        <translation>Bibliothèque d&apos;invites AI</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="381"/>

@@ -436,7 +436,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             if self.ai_search_code_memo != '':
                 summary += _('\nDescription:') + ' ' + {self.ai_search_code_memo}
             logger.debug(f'New topic chat.')
-            self.new_chat(_('Topic') + f'"{self.ai_search_code_name}"', 'topic chat', summary, self.ai_prompt.name_and_scope())
+            self.new_chat(_('Topic') + f' "{self.ai_search_code_name}"', 'topic chat', summary, self.ai_prompt.name_and_scope())
             # warn if project memo empty 
             project_memo = extract_ai_memo(self.app.get_project_memo())
             if self.app.settings.get('ai_send_project_memo', 'True') == 'True' and len(project_memo) == 0:
