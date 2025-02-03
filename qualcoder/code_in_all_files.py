@@ -1,25 +1,18 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2022 Colin Curtain
+This file is part of QualCoder.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+QualCoder is free software: you can redistribute it and/or modify it under the
+terms of the GNU Lesser General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later version.
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+QualCoder is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
+You should have received a copy of the GNU Lesser General Public License along with QualCoder.
+If not, see <https://www.gnu.org/licenses/>.
 
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
@@ -30,13 +23,12 @@ import datetime
 import logging
 import os
 import sqlite3
-import sys
-import traceback
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 
 from .color_selector import TextColor
-from .helpers import msecs_to_mins_and_secs, DialogCodeInAV, DialogCodeInImage, DialogCodeInText
+from .helpers import msecs_to_mins_and_secs, DialogCodeInAV, DialogCodeInImage, DialogCodeInText, \
+    ExportDirectoryPathDialog, Message
 from .select_items import DialogSelectItems
 
 path = os.path.abspath(os.path.dirname(__file__))
@@ -48,7 +40,6 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
     Coded media comes from ALL files for this coder.
     Need to store textedit start and end positions so that code in context can be used.
     Called from code_text, code_av, code_image.
-
     """
 
     app = None
@@ -75,8 +66,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         self.case_or_file = case_or_file
         QtWidgets.QDialog.__init__(self)
 
-        font = f'font: {self.app.settings["fontsize"]}pt '
-        font += f'"{self.app.settings["font"]}";'
+        font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
         self.resize(550, 580)
         # Enable custom window hint to enable customizing window controls
@@ -324,15 +314,19 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
             if row['textedit_start'] <= pos < row['textedit_end']:
                 item = {'type': 'av', 'res': row}
                 break
-        if not item:
-            return
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-        action_mark = menu.addAction(_("Appy more codes to this segment"))
-        action_unmark = menu.addAction(_("Remove code"))
+        action_mark = None
+        action_unmark = None
+        if item:
+            action_mark = menu.addAction(_("Appy more codes to this segment"))
+            action_unmark = menu.addAction(_("Remove code"))
+        action_export_odt = menu.addAction((_("Export to ODT file")))
         action = menu.exec(self.te.mapToGlobal(position))
         if action is None:
             return
+        if action == action_export_odt:
+            self.export_odt()
         if action == action_mark:
             self.mark_with_more_codes(item)
             return
@@ -349,6 +343,21 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
                 self.app.conn.commit()
             self.get_coded_segments_all_files()
             return
+
+    def export_odt(self):
+        """ Export all contents to ODT file. """
+
+        filename = "Coded_media.odt"
+        exp_dir = ExportDirectoryPathDialog(self.app, filename)
+        filepath = exp_dir.filepath
+        if filepath is None:
+            return
+        tw = QtGui.QTextDocumentWriter()
+        tw.setFileName(filepath)
+        tw.setFormat(b'ODF')  # byte array needed for Windows 10
+        tw.write(self.te.document())
+        msg = _("Coded text file exported: ") + filepath
+        Message(self.app, _('Coded text file exported'), msg, "information").exec()
 
     def mark_with_more_codes(self, item):
         """ Select and apply more codes to this coded segment. """
