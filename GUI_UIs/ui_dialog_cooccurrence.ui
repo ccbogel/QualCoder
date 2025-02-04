@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>694</width>
-    <height>543</height>
+    <width>839</width>
+    <height>540</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -45,7 +45,7 @@
        <rect>
         <x>10</x>
         <y>3</y>
-        <width>161</width>
+        <width>151</width>
         <height>22</height>
        </rect>
       </property>
@@ -74,7 +74,7 @@
      <widget class="QPushButton" name="pushButton_export">
       <property name="geometry">
        <rect>
-        <x>360</x>
+        <x>450</x>
         <y>1</y>
         <width>32</width>
         <height>32</height>
@@ -102,14 +102,98 @@
      <widget class="QCheckBox" name="checkBox_hide_blanks">
       <property name="geometry">
        <rect>
-        <x>180</x>
+        <x>170</x>
         <y>4</y>
-        <width>171</width>
+        <width>151</width>
         <height>20</height>
        </rect>
       </property>
       <property name="text">
        <string>Hide blank lines</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_select_files">
+      <property name="geometry">
+       <rect>
+        <x>330</x>
+        <y>1</y>
+        <width>32</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>32</width>
+        <height>32</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>32</width>
+        <height>32</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select files&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_select_categories">
+      <property name="geometry">
+       <rect>
+        <x>410</x>
+        <y>1</y>
+        <width>32</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>32</width>
+        <height>32</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>32</width>
+        <height>32</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select categories&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_select_codes">
+      <property name="geometry">
+       <rect>
+        <x>370</x>
+        <y>1</y>
+        <width>32</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>32</width>
+        <height>32</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>32</width>
+        <height>32</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select codes&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string/>
       </property>
      </widget>
     </widget>
