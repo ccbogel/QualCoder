@@ -24,6 +24,7 @@ import datetime
 import sqlite3
 import ebooklib
 from ebooklib import epub
+import openpyxl
 import PIL
 from PIL import Image
 import qtawesome as qta
@@ -772,13 +773,13 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.app.conn.commit()
 
     def export_attributes(self):
-        """ Export attributes from table as a csv file. """
+        """ Export attributes from table to an Excel file. """
 
         if self.av_dialog_open is not None:
             self.av_dialog_open.mediaplayer.stop()
             self.av_dialog_open = None
         shortname = self.app.project_name.split(".qda")[0]
-        filename = f"{shortname}_file_attributes.csv"
+        filename = f"{shortname}_file_attributes.xlsx"
         exp_dlg = ExportDirectoryPathDialog(self.app, filename)
         filepath = exp_dlg.filepath
         if filepath is None:
@@ -786,22 +787,24 @@ class DialogManageFiles(QtWidgets.QDialog):
         cols = self.ui.tableWidget.columnCount()
         rows = self.ui.tableWidget.rowCount()
         header = [self.ui.tableWidget.horizontalHeaderItem(i).text() for i in range(0, cols)]
-        with open(filepath, mode='w', encoding='utf-8') as f:
-            writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            writer.writerow(header)
-            for r in range(0, rows):
-                data = []
-                for c in range(0, cols):
-                    # Table cell may be a None type
-                    cell = ""
-                    try:
-                        cell = self.ui.tableWidget.item(r, c).text()
-                    except AttributeError:
-                        pass
-                    data.append(cell)
-                writer.writerow(data)
-        msg = _("File attributes csv file exported to: ") + filepath
-        Message(self.app, _('Csv file Export'), msg).exec()
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "File Attributes"
+        for col, col_name in enumerate(header):
+            h_cell = ws.cell(row=1, column=col + 1)
+            h_cell.value = col_name
+        for row in range(rows):
+            for col in range(cols):
+                cell = ws.cell(row=row + 2, column=col + 1)
+                data = ""
+                try:
+                    data = self.ui.tableWidget.item(row, col).text()
+                except AttributeError:
+                    pass
+                cell.value = data
+        wb.save(filepath)
+        msg = _("File attributes exported to: ") + filepath
+        Message(self.app, _('File Export'), msg).exec()
         self.parent_text_edit.append(msg)
 
     def load_file_data(self, order_by=""):

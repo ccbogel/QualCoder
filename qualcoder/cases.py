@@ -1,25 +1,18 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2024 Colin Curtain
+This file is part of QualCoder.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+QualCoder is free software: you can redistribute it and/or modify it under the
+terms of the GNU Lesser General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later version.
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+QualCoder is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
+You should have received a copy of the GNU Lesser General Public License along with QualCoder.
+If not, see <https://www.gnu.org/licenses/>.
 
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
@@ -28,6 +21,7 @@ https://github.com/ccbogel/QualCoder
 import csv
 import datetime
 import logging
+import openpyxl
 from openpyxl import load_workbook
 import os
 import qtawesome as qta
@@ -213,10 +207,10 @@ class DialogCases(QtWidgets.QDialog):
         return i
 
     def export_attributes(self):
-        """ Export attributes from table as a csv file. """
+        """ Export attributes from table as an Excel file. """
 
         shortname = self.app.project_name.split(".qda")[0]
-        filename = shortname + "_case_attributes.csv"
+        filename = shortname + "_case_attributes.xlsx"
         e = ExportDirectoryPathDialog(self.app, filename)
         filepath = e.filepath
         if filepath is None:
@@ -224,7 +218,23 @@ class DialogCases(QtWidgets.QDialog):
         cols = self.ui.tableWidget.columnCount()
         rows = self.ui.tableWidget.rowCount()
         header = [self.ui.tableWidget.horizontalHeaderItem(i).text() for i in range(0, cols)]
-        with open(filepath, mode='w') as f:
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Case Attributes"
+        for col, col_name in enumerate(header):
+            h_cell = ws.cell(row=1, column=col + 1)
+            h_cell.value = col_name
+        for row in range(rows):
+            for col in range(cols):
+                cell = ws.cell(row=row + 2, column=col + 1)
+                data = ""
+                try:
+                    data = self.ui.tableWidget.item(row, col).text()
+                except AttributeError:
+                    pass
+                cell.value = data
+        wb.save(filepath)
+        '''with open(filepath, mode='w') as f:
             writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             writer.writerow(header)
             for r in range(0, rows):
@@ -237,9 +247,9 @@ class DialogCases(QtWidgets.QDialog):
                     except AttributeError:
                         pass
                     data.append(cell)
-                writer.writerow(data)
-        msg = _("Case attributes csv file exported to: ") + filepath
-        Message(self.app, _('Csv file Export'), msg).exec()
+                writer.writerow(data)'''
+        msg = _("Case attributes file exported to: ") + filepath
+        Message(self.app, _('File export'), msg).exec()
         self.parent_text_edit.append(msg)
 
     def load_cases_data(self, order_by="asc"):
