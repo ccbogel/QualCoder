@@ -116,7 +116,7 @@ class Ui_Dialog_manage_files(object):
         self.pushButton_import_from_linked.setToolTip(_translate("Dialog_manage_files", "<html><head/><body><p>Import linked file into project folder</p></body></html>"))
         self.pushButton_export_to_linked.setToolTip(_translate("Dialog_manage_files", "Export file from project folder as a linked file.\n"
 "Cannot export text transcription file associated with an audio or video as a linked file."))
-        self.pushButton_export_attributes.setToolTip(_translate("Dialog_manage_files", "<html><head/><body><p>Export attributes as csv file</p></body></html>"))
+        self.pushButton_export_attributes.setToolTip(_translate("Dialog_manage_files", "<html><head/><body><p>Export attributes to file</p></body></html>"))
         self.pushButton_help.setToolTip(_translate("Dialog_manage_files", "Help"))
         self.label_fcount.setText(_translate("Dialog_manage_files", "Files:"))
         self.pushButton_undo.setToolTip(_translate("Dialog_manage_files", "<html><head/><body><p>Undo file rename</p></body></html>"))
