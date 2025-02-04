@@ -18,6 +18,7 @@ Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 """
 
+from copy import deepcopy
 import logging
 import openpyxl
 import os
@@ -27,6 +28,7 @@ from PyQt6 import QtCore, QtWidgets, QtGui
 
 from .GUI.ui_dialog_cooccurrence import Ui_Dialog_Coocurrence
 from .helpers import ExportDirectoryPathDialog, Message
+from .select_items import DialogSelectItems
 
 
 path = os.path.abspath(os.path.dirname(__file__))
@@ -52,21 +54,88 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         self.setStyleSheet(font)
         self.ui.pushButton_export.setIcon(qta.icon('mdi6.export', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_export.pressed.connect(self.export_to_excel)
+        self.ui.pushButton_select_files.setIcon(qta.icon('mdi6.file-multiple', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_select_files.pressed.connect(self.select_files)
+        self.ui.pushButton_select_codes.setIcon(qta.icon('mdi6.text', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_select_codes.pressed.connect(self.select_codes)
+        self.ui.pushButton_select_categories.setIcon(qta.icon('mdi6.file-tree', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_select_categories.hide()
         self.ui.checkBox_hide_blanks.stateChanged.connect(self.show_or_hide_empty_rows_and_cols)
-        tablefont = f'font: 7pt "{self.app.settings["font"]}";'
+        tablefont = f'font: 10pt "{self.app.settings["font"]}";'
         self.ui.tableWidget.setStyleSheet(tablefont)  # should be smaller
         self.ui.tableWidget.cellClicked.connect(self.cell_selected)
         #self.ui.tableWidget.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         #self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
         self.ui.splitter.setSizes([500, 0])
 
-        self.codes = []
-        self.categories = []
+        self.codes, self.categories = self.app.get_codes_categories()
+        self.code_names_list = []
+        self.code_names_str = ""
+        self.code_ids_str = ""
+        for c in self.codes:
+            self.code_names_list.append(c['name'])
+            self.code_names_str += f"{c['name']}|"
+            self.code_ids_str += f",{c['cid']}"
+        self.code_ids_str = self.code_ids_str[1:]
+
         self.result_relations = []
         self.max_count = 0
         self.data_counts = []
         self.data_colors = []
         self.data_details = []
+        self.file_ids_names = self.app.get_text_filenames()
+        self.process_data()
+
+    def select_files(self):
+        """ Select files, stored in self.file_ids_names, then re-load data. """
+
+        selection_list = [{'id': -1, 'name': ''}]
+        for file_name in self.app.get_text_filenames():
+            selection_list.append(file_name)
+        ui = DialogSelectItems(self.app, selection_list, _("Select files"), "multi")
+        ok = ui.exec()
+        if not ok:
+            return
+        selected = ui.get_selected()
+        if not selected or selected[0]['name'] == '':
+            self.file_ids_names = self.app.get_text_filenames()
+            Message(self.app, _("Files selected"), _("All files selected")).exec()
+        else:
+            self.file_ids_names = selected
+            msg = ""
+            for item in self.file_ids_names:
+                msg += f"{item['name']}\n"
+            Message(self.app, _("Files selected"), msg).exec()
+        self.process_data()
+
+    def select_codes(self):
+        """ Select codes. """
+
+        selection_list = [{'id': -1, 'name': ''}]
+        for code_ in self.codes:
+            selection_list.append(code_)
+        ui = DialogSelectItems(self.app, selection_list, _("Select codes"), "multi")
+        ok = ui.exec()
+        if not ok:
+            return
+        selected = ui.get_selected()
+        if not selected or selected[0]['name'] == '':
+            selected = deepcopy(self.codes)
+            Message(self.app, _("Codes selected"), _("All codes selected")).exec()
+        else:
+            msg = ""
+            for s in selected:
+                msg += f"{s['name']}\n"
+            Message(self.app, _("Codes selected"), msg).exec()
+
+        self.code_ids_str = ""
+        self.code_names_str = ""
+        self.code_names_list = []
+        for code_ in selected:
+            self.code_names_list.append(code_['name'])
+            self.code_names_str += f"{code_['name']}|"
+            self.code_ids_str += f",{code_['cid']}"
+        self.code_ids_str = self.code_ids_str[1:]
 
         self.process_data()
 
@@ -74,18 +143,11 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         """ Calculate the relations for selected codes for ALL coders (or only THIS coder - TODO).
         For text codings only. """
 
-        code_names_str = ""
-        code_ids_str = ""
+        self.ui.checkBox_hide_blanks.setChecked(False)
+        self.ui.splitter.setSizes([500, 0])
 
-        self.codes, self.categories = self.app.get_codes_categories()
-        code_names_list = []
-        for c in self.codes:
-            code_names_list.append(c['name'])
-            code_names_str += f"{c['name']}|"
-            code_ids_str += f",{c['cid']}"
-        code_ids_str = code_ids_str[1:]
         self.result_relations = []
-        self.calculate_relations(code_ids_str)
+        self.calculate_relations(self.code_ids_str)
 
         # Create data matrices zeroed, codes are ordered alphabetically by name
         self.data_counts = []
@@ -102,16 +164,16 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
 
         self.max_count = 0
         for r in self.result_relations:
-            row_pos = code_names_list.index(r['c0_name'])
-            col_pos = code_names_list.index(r['c1_name'])
+            row_pos = self.code_names_list.index(r['c0_name'])
+            col_pos = self.code_names_list.index(r['c1_name'])
             self.data_counts[row_pos][col_pos] += 1
             if self.data_counts[row_pos][col_pos] > self.max_count:
                 self.max_count = self.data_counts[row_pos][col_pos]
             '''print(r['cid0'], r['c0_name'], r['ctid0'], r['cid1'], r['c1_name'], r['ctid1'], r['fid'], r['file_name'],
                   r['owners'], r['c0_pos0'], r['c0_pos1'], r['c1_pos0'], r['c1_pos1'])'''
-            res_list = [r['cid0'], r['c0_name'], r['ctid0'], r['cid1'], r['c1_name'], r['ctid1'], r['fid'], r['file_name'],
-                  r['owners'], r['c0_pos0'], r['c0_pos1'], r['c1_pos0'], r['c1_pos1'],
-                        r['text_before'], r['text_overlap'], r['text_after']]
+            res_list = [r['cid0'], r['c0_name'], r['ctid0'], r['cid1'], r['c1_name'], r['ctid1'], r['fid'],
+                        r['file_name'], r['owners'], r['c0_pos0'], r['c0_pos1'], r['c1_pos0'], r['c1_pos1'],
+                        r['text_before'], r['text_overlap'], r['text_after'], r['relation']]
             if self.data_details[row_pos][col_pos] == ".":
                 self.data_details[row_pos][col_pos] = [res_list]
             else:
@@ -172,7 +234,7 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
                     0 - 5 [r['cid0'], r['c0_name'], r['ctid0'], r['cid1'], r['c1_name'], r['ctid1'], 
                     6 - 8 r['fid'], r['file_name'], r['owners'], 
                     9 - 12 r['c0_pos0'], r['c0_pos1'], r['c1_pos0'], r['c1_pos1'],
-                    13 - 15 r['text_before'], r['text_overlap'], r['text_after']]
+                    13 - 16 r['text_before'], r['text_overlap'], r['text_after'], r['relation']]
                     '''
                     details += f"Codes: {data[1]} ({data[9]} - {data[10]})| {data[4]} ({data[11]} - {data[12]})\n"
                     details += f"Coders: {data[8]}. (ctid0: {data[2]} | ctid1: {data[5]})\n"
@@ -224,7 +286,7 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         0 - 5 [r['cid0'], r['c0_name'], r['ctid0'], r['cid1'], r['c1_name'], r['ctid1'], 
         6 - 8 r['fid'], r['file_name'], r['owners'], 
         9 - 12 r['c0_pos0'], r['c0_pos1'], r['c1_pos0'], r['c1_pos1'],
-        13 - 15 r['text_before'], r['text_overlap'], r['text_after']]
+        13 - 16 r['text_before'], r['text_overlap'], r['text_after'], r['relation']
         '''
         # Colours for overlapping and non-overlapping text
         color_yellow = "#F4FA58"  # Coder0 - first and usually lowest pos0
@@ -238,6 +300,7 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
             msg = f"Codes: {data[1]} ({data[9]} - {data[10]})| {data[4]} ({data[11]} - {data[12]})\n"
             msg += f"Coders: {data[8]}. (ctid0: {data[2]} | ctid1: {data[5]})\n"
             msg += f"File (fid {data[6]}): {data[7]}\n"
+            # msg += f"\nrelation: {data[16]}\n"  # testing
             self.ui.textEdit.append(msg)
 
             # Coded text highlights - yellow code 0, green overlap, blue code 1
@@ -252,23 +315,26 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
             self.ui.textEdit.append(msg)
 
             cursor = self.ui.textEdit.textCursor()
-            fmt_yellow = QtGui.QTextCharFormat()
+            fmt_before = QtGui.QTextCharFormat()
             cursor.setPosition(start_pos_yellow, QtGui.QTextCursor.MoveMode.MoveAnchor)
             cursor.setPosition(end_pos_yellow, QtGui.QTextCursor.MoveMode.KeepAnchor)
-            fmt_yellow.setBackground(brush_yellow)
-            cursor.mergeCharFormat(fmt_yellow)
+            fmt_before.setBackground(brush_yellow)
+            cursor.mergeCharFormat(fmt_before)
 
-            fmt_green = QtGui.QTextCharFormat()
+            fmt_overlap = QtGui.QTextCharFormat()
             cursor.setPosition(start_pos_green, QtGui.QTextCursor.MoveMode.MoveAnchor)
             cursor.setPosition(end_pos_green, QtGui.QTextCursor.MoveMode.KeepAnchor)
-            fmt_green.setBackground(brush_green)
-            cursor.mergeCharFormat(fmt_green)
+            fmt_overlap.setBackground(brush_green)
+            cursor.mergeCharFormat(fmt_overlap)
 
-            fmt_blue = QtGui.QTextCharFormat()
+            # may need yellow or blue
+            fmt_after = QtGui.QTextCharFormat()
             cursor.setPosition(start_pos_blue, QtGui.QTextCursor.MoveMode.MoveAnchor)
             cursor.setPosition(end_pos_blue, QtGui.QTextCursor.MoveMode.KeepAnchor)
-            fmt_blue.setBackground(brush_blue)
-            cursor.mergeCharFormat(fmt_blue)
+            fmt_after.setBackground(brush_blue)
+            if data[16] == "I":  # A code is Included inside another code
+                fmt_after.setBackground(brush_yellow)
+            cursor.mergeCharFormat(fmt_after)
             msg = "========"
             self.ui.textEdit.append(msg)
 
@@ -317,8 +383,6 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         # self.ui.tableWidget.resizeColumnsToContents()  # Doesnt look great
         self.ui.tableWidget.resizeRowsToContents()
 
-
-
     def calculate_relations(self, code_ids_str):
         """ Calculate the relations for selected codes for all coders.
         For codings in code_text only.
@@ -326,16 +390,20 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         id1, id2, overlapindex, unionindex, distance, whichmin, whichmax, fid
         relation is 1 character: Inclusion, Overlap, Exact, (Proximity - not used)
         owners is a combination of: owner of ctid0 pipe owner of ctid1
+
+        Args:
+            code_ids_str (String): comma separated code ids
         """
 
         selected_relations = ['E', 'I', 'O']
-        file_ids_names = self.app.get_text_filenames()
+        if self.file_ids_names is None:
+            self.file_ids_names = self.app.get_text_filenames()
 
         # Get codings for each selected text file
         cur = self.app.conn.cursor()
-        for fid in file_ids_names:
-            sql = "select fid, code_text.cid, pos0, pos1, name, ctid,seltext, ifnull(code_text.memo,''), code_text.owner " \
-                  "from code_text " \
+        for fid in self.file_ids_names:
+            sql = "select fid, code_text.cid, pos0, pos1, name, ctid,seltext, ifnull(code_text.memo,''), " \
+                  "code_text.owner from code_text " \
                   "join code_name on code_name.cid=code_text.cid where fid=? " \
                   "and code_text.cid in (" + code_ids_str + ") order by code_text.cid"
             cur.execute(sql, [fid['id']])
