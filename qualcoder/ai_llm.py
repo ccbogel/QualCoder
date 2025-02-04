@@ -393,10 +393,14 @@ class AiLLM():
         """Determine the current language of the UI and/or the project. 
         Used to instruct the AI answering in the correct language. 
         """ 
-        lang_long = {"de": "Deutsch", "en": "English", "es": "Español", "fr": "Français", "it": "Italiano", "pt": "Português"}
-        lang = lang_long[self.app.settings['language']] 
-        if lang is None:
-            lang = 'English'
+        if self.app.settings.get('ai_language_ui', 'True') == 'True':
+            # get ui language
+            lang_long = {"de": "Deutsch", "en": "English", "es": "Español", "fr": "Français", "it": "Italiano", "pt": "Português"}
+            lang = lang_long[self.app.settings['language']] 
+            if lang is None:
+                lang = 'English'
+        else:
+            lang = self.app.settings.get('ai_language', 'English')
         return lang
     
     def generate_code_descriptions(self, code_name, code_memo='') -> list:

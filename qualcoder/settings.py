@@ -171,9 +171,14 @@ class DialogSettings(QtWidgets.QDialog):
         self.ai_enable_state_changed()
         self.ui.lineEdit_ai_api_key.textChanged.connect(self.ai_api_key_changed)
         self.ui.checkBox_ai_project_memo.setChecked(self.settings.get('ai_send_project_memo', 'True') == 'True')
-        # TODO
-        self.ui.doubleSpinBox_ai_temperature.setValue(float(self.settings.get('ai_temperature', '1.0')))
-        self.ui.doubleSpinBox_top_p.setValue(float(self.settings.get('ai_top_k', '1.0')))        
+        self.ui.checkBox_AI_language_ui.setChecked(self.settings.get('ai_language_ui', 'True') == 'True')
+        self.ui.checkBox_AI_language_ui.stateChanged.connect(self.ai_language_ui_changed)
+        self.ui.lineEdit_AI_language.setText(self.settings.get('ai_language', ''))
+        self.ui.lineEdit_AI_language.setEnabled(not self.ui.checkBox_AI_language_ui.isChecked())
+        self.ui.lineEdit_ai_temperature.setText(self.settings.get('ai_temperature', '1.0'))
+        self.ui.lineEdit_ai_temperature.editingFinished.connect(self.validate_ai_temperature)
+        self.ui.lineEdit_top_p.setText(self.settings.get('ai_top_p', '1.0'))
+        self.ui.lineEdit_top_p.editingFinished.connect(self.validate_ai_top_p)
         
         # Move to AI settings if requested
         if section is not None and section == 'AI':
@@ -201,8 +206,10 @@ class DialogSettings(QtWidgets.QDialog):
         self.ui.label_ai_access_info_url.setEnabled(self.ui.checkBox_AI_enable.isChecked())
         self.ui.lineEdit_ai_api_key.setEnabled(self.ui.checkBox_AI_enable.isChecked())
         self.ui.checkBox_ai_project_memo.setEnabled(self.ui.checkBox_AI_enable.isChecked())
-        self.ui.doubleSpinBox_ai_temperature.setEnabled(self.ui.checkBox_AI_enable.isChecked())
-        self.ui.doubleSpinBox_top_p.setEnabled(self.ui.checkBox_AI_enable.isChecked())  
+        self.ui.lineEdit_ai_temperature.setEnabled(self.ui.checkBox_AI_enable.isChecked())
+        self.ui.lineEdit_top_p.setEnabled(self.ui.checkBox_AI_enable.isChecked())
+        self.ui.checkBox_AI_language_ui.setEnabled(self.ui.checkBox_AI_enable.isChecked())
+        self.ui.lineEdit_AI_language.setEnabled(self.ui.checkBox_AI_enable.isChecked() and (not self.ui.checkBox_AI_language_ui.isChecked()))
     
     def ai_model_changed(self):
         ai_model_index = self.ui.comboBox_ai_model.currentIndex()
@@ -220,7 +227,33 @@ class DialogSettings(QtWidgets.QDialog):
     def ai_api_key_changed(self):
         if self.curr_ai_model is not None:
             self.curr_ai_model['api_key'] = self.ui.lineEdit_ai_api_key.text()        
+
+    def ai_language_ui_changed(self):
+        self.ui.lineEdit_AI_language.setEnabled(not self.ui.checkBox_AI_language_ui.isChecked())
+        self.ui.lineEdit_AI_language.setFocus()
                 
+    def validate_ai_temperature(self):
+        text = self.ui.lineEdit_ai_temperature.text()
+        # Check if the input text is numeric
+        if not text:
+            return
+        value = float(text)
+        if not (0.0 <= value <= 2.0):
+            Message.warning(self, "Invalid input", "AI temperature parameter must be between 0.0 and 2.0.")
+            self.ui.lineEdit_ai_temperature.setFocus()
+            self.ui.lineEdit_ai_temperature.selectAll()
+            
+    def validate_ai_top_p(self):
+        text = self.ui.lineEdit_top_p.text()
+        # Check if the input text is numeric
+        if not text:
+            return
+        value = float(text)
+        if not (0.0 <= value <= 1.0):
+            Message.warning(self, "Invalid input", "AI top_p parameter must be between 0.0 and 1.0.")
+            self.ui.lineEdit_top_p.setFocus()
+            self.ui.lineEdit_top_p.selectAll()
+            
     def new_coder_entered(self):
         """ New coder name entered.
         Tried to disable Enter key or catch the event. Failed. So new coder name assigned
@@ -313,8 +346,10 @@ class DialogSettings(QtWidgets.QDialog):
             self.settings['ai_send_project_memo'] = 'True'
         else: 
             self.settings['ai_send_project_memo'] = 'False'
-        self.settings['ai_temperature'] = str(self.ui.doubleSpinBox_ai_temperature.value())
-        self.settings['ai_top_k'] = str(self.ui.doubleSpinBox_top_p.value())
+        self.settings['ai_language_ui'] = 'True' if self.ui.checkBox_AI_language_ui.isChecked() else 'False'
+        self.settings['ai_language'] =  self.ui.lineEdit_AI_language.text()
+        self.settings['ai_temperature'] = self.ui.lineEdit_ai_temperature.text()
+        self.settings['ai_top_p'] = self.ui.lineEdit_top_p.text()
         self.save_settings()
         if restart_qualcoder:
             Message(self.app, _("Restart QualCoder"), _("Restart QualCoder to enact some changes")).exec()
