@@ -28,8 +28,7 @@ On the first start of QualCoder, you may want to [setup the AI enhanced features
 
 **Use the exe**
 
-Newer releases contain an exe file (created on Windows 10, 64-bit). Double-click to run, it takes up to 20 seconds to start. Look for the Releases link on the right-hand side of this page. I have had feedback on one instance on Windows where an anti-virus affected the importing and moving of files by QualCoder (AVG). 
-An online virus testing site www.virustotal.com indicated 2 vendors out of many detected a potential problem due to their detection methods (false positives), 5 March 2022. Always check the MD5 checksum on downloading the exe. I have not got the exe Microsoft certified (I am not sure of the processes or cost involved).
+Newer releases contain an exe file (created on Windows 10, 64-bit). Double-click to run, it takes up to 20 seconds to start. Look for the Releases link on the right-hand side of this page. Always check the MD5 checksum on downloading the exe. I have not got the exe Microsoft certified (cost involved).
 If you are uncomfortable with these warnings install from the source as detailed next.
 
 **Alternatively, install from source:**
@@ -115,8 +114,8 @@ Once installed, run a QualCoder exe file, e.g. QualCoder-3.5.exe - see the [rele
 
 ### Debian/Ubuntu Linux
 
-There is an executable file (double-click to run) for Ubuntu 22 in the 3.5 release. Alternatively, install from source code below.
-It is best to run QualCoder inside a Python virtual environment so that the system-installed python modules do not clash and cause problems. If you are using the alternative Ubuntu Desktop manager **Xfce** you may need to run this: `sudo apt install libxcb-cursor0`
+There is an executable file (double-click to run) for Ubuntu in the release. Alternatively, install from source code below.
+When running fro source code, it is best to run QualCoder inside a Python virtual environment so that the system-installed python modules do not clash and cause problems. If you are using the alternative Ubuntu Desktop manager **Xfce** you may need to run this: `sudo apt install libxcb-cursor0`
 
 1. Recommend that you install vlc (download from site) or:
 
