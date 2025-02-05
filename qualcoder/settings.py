@@ -230,7 +230,9 @@ class DialogSettings(QtWidgets.QDialog):
 
     def ai_language_ui_changed(self):
         self.ui.lineEdit_AI_language.setEnabled(not self.ui.checkBox_AI_language_ui.isChecked())
-        self.ui.lineEdit_AI_language.setFocus()
+        if not self.ui.checkBox_AI_language_ui.isChecked():
+            self.ui.lineEdit_AI_language.setFocus()
+            self.ui.lineEdit_AI_language.selectAll()
                 
     def validate_ai_temperature(self):
         text = self.ui.lineEdit_ai_temperature.text()
