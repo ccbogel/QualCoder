@@ -2,25 +2,18 @@
 # -*- coding: utf-8 -*-
 
 """
-Copyright (c) 2023 Colin Curtain
+This file is part of QualCoder.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+QualCoder is free software: you can redistribute it and/or modify it under the
+terms of the GNU Lesser General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later version.
 
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
+QualCoder is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
+You should have received a copy of the GNU Lesser General Public License along with QualCoder.
+If not, see <https://www.gnu.org/licenses/>.
 
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
@@ -35,29 +28,22 @@ languages = ['de', 'es', 'fr', 'it', 'pt']
 class CreateHelperFile:
     """ Create an output python file with converted languages into base64
     The output file is used as a helper file in QualCoder
-    This helps to get around translation data failing to load depending on where qualcoder
+    This helps to get around translation data failing to load depending on where QualCoder
     is called from. Important for use with pyinstaller as accessing data files does not work well.
     """
 
     def __init__(self):
 
         header = '#!/usr/bin/python\n# -*- coding: utf-8 -*-\n\
-        \n"""\nCopyright (c) 2023 Colin Curtain\n\n\
-        Permission is hereby granted, free of charge, to any person obtaining a copy\n\
-        of this software and associated documentation files (the "Software"), to deal\n\
-        in the Software without restriction, including without limitation the rights\n\
-        to use, copy, modify, merge, publish, distribute, sublicense, and/or sell\n\
-        copies of the Software, and to permit persons to whom the Software is\n\
-        furnished to do so, subject to the following conditions:\n\n\
-        The above copyright notice and this permission notice shall be included in\n\
-        all copies or substantial portions of the Software.\n\n\
-        THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n\
-        IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n\
-        FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n\
-        AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n\
-        LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n\
-        OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN\n\
-        THE SOFTWARE.\n\n\
+        \n"""\nThis file is part of QualCoder.\n\
+        QualCoder is free software: you can redistribute it and/or modify it under the\n\
+        terms of the GNU Lesser General Public License as published by the Free Software\n\
+        Foundation, either version 3 of the License, or (at your option) any later version.\n\n\
+        QualCoder is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;\n\
+        without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
+        See the GNU General Public License for more details.\n\n\
+        You should have received a copy of the GNU Lesser General Public License along with QualCoder.\n\
+        If not, see <https://www.gnu.org/licenses/>.\n\n\
         Author: Colin Curtain (ccbogel)\n\
         https://github.com/ccbogel/QualCoder\n\
         https://qualcoder.wordpress.com/\n\n\
