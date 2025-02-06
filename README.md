@@ -46,7 +46,7 @@ IMPORTANT: in the first window of the installation mark the option "Add Python t
 
 4. Use the Windows command prompt. Type "cmd" in the Windows Start search engine, and click on the black software "cmd.exe" - the command console for Windows. In the console type or paste, using the right-click mouse copy and paste (ctrl+v does not work)
 
-5. In the command prompt, move (using the `cd` command) into the QualCoder folder. You should be inside the QualCoder-master folder or if using a release (the Qualcoder-3.5 folder). e.g. 
+5. In the command prompt, move (using the `cd` command) into the QualCoder folder. You should be inside the QualCoder-master folder or if using a release (the Qualcoder-3.65 folder). e.g. 
 
 ```bash
 cd Downloads\QualCoder-master
@@ -110,12 +110,12 @@ If you are using a virtual environment:
 
 Hopefully an easy way to run QualCoder on the following Linux distributions is to use Wine, https://www.winehq.org/.
 There are binary packages for Ubuntu, Debian, Fedora, SUSE, Slackware FreeBSD.
-Once installed, run a QualCoder exe file, e.g. QualCoder-3.5.exe - see the [releases page](https://github.com/ccbogel/QualCoder/releases).
+Once installed, run a Windows QualCoder exe file, e.g. QualCoder-3.6.exe - see the [releases page](https://github.com/ccbogel/QualCoder/releases).
 
 ### Debian/Ubuntu Linux
 
 There is an executable file (double-click to run) for Ubuntu in the release. Alternatively, install from source code below.
-When running fro source code, it is best to run QualCoder inside a Python virtual environment so that the system-installed python modules do not clash and cause problems. If you are using the alternative Ubuntu Desktop manager **Xfce** you may need to run this: `sudo apt install libxcb-cursor0`
+When running from source code, it is best to run QualCoder inside a Python virtual environment so that the system-installed python modules do not clash and cause problems. If you are using the alternative Ubuntu Desktop manager **Xfce** you may need to run this: `sudo apt install libxcb-cursor0`
 
 1. Recommend that you install vlc (download from site) or:
 
@@ -133,7 +133,7 @@ I am using python3.12  you can choose another recent version if you prefer, and 
 3. Download and unzip the Qualcoder folder.
 
 4. Open a terminal and move (cd) into that folder. 
-You should be inside the QualCoder-master folder or if using a release, e.g. the Qualcoder-3.5 folder.
+You should be inside the QualCoder-master folder or if using a release, e.g. the Qualcoder-3.6 folder.
 Inside the QualCoder-master folder:
 
 `python3.12 -m venv env`
@@ -147,7 +147,7 @@ Note: To exit venv type `deactivate`
 
 `pip install --upgrade pip`
 
-6. You must be in the QualCoder-master folder (Or the main release folder if using a release. e.g. QualCoder-3.5 folder). Install QualCoder, and type the following, the dot is important:
+6. You must be in the QualCoder-master folder (Or the main release folder if using a release. e.g. QualCoder-3.6 folder). Install QualCoder, and type the following, the dot is important:
 
 `python3 -m pip install .`
 
@@ -294,7 +294,7 @@ Note: For 3.6 and up do not install pydub or SpeechRecognition. This function ha
 
 **Third option to run on macOS:**
 
-Install Wine for macOS and run a QualCoder exe, e.g. QualCoder-3.5.exe - see the [releases page](https://github.com/ccbogel/QualCoder/releases).
+Install Wine for macOS and run a QualCoder exe, e.g. QualCoder-3.6.exe - see the [releases page](https://github.com/ccbogel/QualCoder/releases).
 
 Wine is available through: https://www.winehq.org/
  
@@ -320,7 +320,7 @@ https://github.com/ccbogel/QualCoder/releases/tag/3.6
 
 ## Creator
 
-Dr. Colin Curtain BPharm GradDipComp Ph.D. Pharmacy lecturer at the University of Tasmania. I obtained a Graduate Diploma in Computing in 2011. I have developed my Python programming skills from this time onwards. The QualCoder project originated from my use of RQDA during my PhD - *Evaluation of clinical decision support provided by medication review software*. My original and now completely deprecated PyQDA software on PyPI was my first attempt at creating qualitative software. The reason for creating the software was that during my PhD RQDA did not always install or work well for me, but I did realise that I could use the same SQLite database and access it with Python. The current database is different from the older RQDA version. This is an ongoing hobby project, perhaps a labour of love, which I utilize with some of the Masters's and Ph.D. students I supervise. I do most of my programming on Ubuntu using the PyCharm editor, and I do a small amount of testing on Windows. I do not have a Mac or other operating system to check how well the software works regards installation and usage.
+Dr. Colin Curtain BPharm GradDipComp PhD Pharmacy lecturer at the University of Tasmania. I obtained a Graduate Diploma in Computing in 2011. I have developed my Python programming skills from this time onwards. The QualCoder project originated from my use of RQDA during my PhD - *Evaluation of clinical decision support provided by medication review software*. My original and now completely deprecated PyQDA software on PyPI was my first attempt at creating qualitative software. The reason for creating the software was that during my PhD RQDA did not always install or work well for me, but I did realise that I could use the same SQLite database and access it with Python. The current database is different from the older RQDA version. This is an ongoing hobby project, perhaps a labour of love, which I utilize with some of the Masters's and Ph.D. students I supervise. I do most of my programming on Ubuntu using the PyCharm editor, and I do a small amount of testing on Windows. I do not have a Mac or other operating system to check how well the software works regards installation and usage.
 
 https://www.utas.edu.au/profiles/staff/umore/colin-curtain
 
