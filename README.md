@@ -102,7 +102,7 @@ If you are using a virtual environment:
 
 `cd` to the Qualcoder-master (or Qualcoder release folder), then type:
 
-`env\Scripts\activate.bat `
+`env\Scripts\activate `
 
 `py -m qualcoder`
 
