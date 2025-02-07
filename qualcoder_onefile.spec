@@ -1,5 +1,7 @@
 # -*- mode: python ; coding: utf-8 -*-
 from PyInstaller.utils.hooks import collect_data_files, copy_metadata, collect_submodules
+import sys
+sys.setrecursionlimit(sys.getrecursionlimit() * 5)
 
 block_cipher = None
 
@@ -25,6 +27,7 @@ datas += [('LICENSE.txt', '.')]
 
 hiddenimports = collect_submodules('transformers')
 hiddenimports += collect_submodules('pydantic')
+hiddenimports += ['scipy._lib.array_api_compat.numpy.fft']
 
 a = Analysis(
     ['qualcoder/__main__.py'],
