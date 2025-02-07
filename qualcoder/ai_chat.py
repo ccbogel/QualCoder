@@ -1079,15 +1079,17 @@ data collected. This information will accompany every prompt sent to the AI, res
         """Called if the AI returns an error"""
         self.ai_streaming_output = ''
         ai_model_name = self.app.ai_models[int(self.app.settings['ai_model_index'])]['name']
-        value = html_to_text(value)
         msg = _('Error communicating with ' + ai_model_name + '\n')
-        msg += exception_type.__name__ + ': ' + str(value)
+        msg += exception_type.__name__ + ': ' + str(html_to_text(value))
+        if hasattr(value, 'message'):
+            msg += f' {value.message}'
         tb = '\n'.join(traceback.format_tb(tb_obj))
+        if hasattr(value, 'body'):
+            tb += f'\n{value.body}\n'
         logger.error(_("Uncaught exception: ") + msg + '\n' + tb)
         # Error msg in chat and trigger message box show
         self.process_message('info', msg, self.current_streaming_chat_idx)    
         qt_exception_hook._exception_caught.emit(msg, tb)        
-        # raise exception_type(value).with_traceback(tb_obj)  # Re-raise a new exception with the original traceback
     
     def eventFilter(self, source, event):
         # Check if the event is a KeyPress, source is the lineEdit, and the key is Enter
