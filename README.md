@@ -36,7 +36,7 @@ If you are uncomfortable with these warnings install from the source as detailed
 
 Seriously consider using a virtual environment (commands in point 6 below). Not using a virtual environment may affect other Python software you may have installed.
 
-1. Download and install the Python programming language. Please use Python 3.10 on Windows, older or newer versions may cause issues  [Python3](https://www.python.org/downloads/). Download the file (at the bottom of the website) "Windows installer (64-bit)"
+1. Download and install the Python programming language. Please use Python 3.10, 3.11 or 3.12 on Windows, other versions may cause issues  [Python3](https://www.python.org/downloads/). Download the file (at the bottom of the website) "Windows installer (64-bit)"
 
 IMPORTANT: in the first window of the installation mark the option "Add Python to PATH"
 
