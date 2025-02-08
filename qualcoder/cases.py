@@ -672,6 +672,7 @@ class DialogCases(QtWidgets.QDialog):
         # Add list of attribute values to files, order matches header columns
         sql = "select ifnull(value, '') from attribute where attr_type='case' and attribute.name=? and id=?"
         self.cases[x]['attributes'] = []
+        cur = self.app.conn.cursor()
         for att_name in self.attribute_labels_ordered:
             cur.execute(sql, [att_name, self.cases[x]['caseid']])
             res = cur.fetchone()
