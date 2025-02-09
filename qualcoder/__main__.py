@@ -620,21 +620,8 @@ class App(object):
         """       
         models = [
             {
-                'name': 'GPT-4-turbo',
-                'desc': """The best model from OpenAI for now. 
-                You need an API-key from OpenAI and have paid for credits in your account. 
-                OpenAI will charge a small amount for every use.""",
-                'access_info_url': 'https://platform.openai.com/api-keys',
-                'large_model': 'gpt-4-turbo',
-                'large_model_context_window': '128000',
-                'fast_model': 'gpt-4o-mini',
-                'fast_model_context_window': '128000',
-                'api_base': '',
-                'api_key': ''
-            },
-            {
                 'name': 'OpenAI_GPT4o',
-                'desc': """Faster, cheaper, but slightly less powerful than GPT-4-turbo.  
+                'desc': """Current default model from OpenAI, faster and cheaper than GPT4-turbo.  
                 You need an API-key from OpenAI and have paid for credits in your account. 
                 OpenAI will charge a small amount for every use.""",
                 'access_info_url': 'https://platform.openai.com/api-keys',
@@ -646,8 +633,21 @@ class App(object):
                 'api_key': ''
             },
             {
+                'name': 'GPT-4-turbo',
+                'desc': """Classic model from OpenAI, still very capable. 
+                You need an API-key from OpenAI and have paid for credits in your account. 
+                OpenAI will charge a small amount for every use.""",
+                'access_info_url': 'https://platform.openai.com/api-keys',
+                'large_model': 'gpt-4-turbo',
+                'large_model_context_window': '128000',
+                'fast_model': 'gpt-4o-mini',
+                'fast_model_context_window': '128000',
+                'api_base': '',
+                'api_key': ''
+            },
+            {
                 'name': 'Blablador',
-                'desc': """A free and open source model (Mixtral 8x7B), excellent privacy, 
+                'desc': """A free and open source model, excellent privacy, 
 but not as powerful as GPT-4. 
 Blablador is free to use and runs on a server of the Helmholtz Society, 
 a large non-profit research organization in Germany. To gain 
