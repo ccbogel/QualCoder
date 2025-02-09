@@ -109,7 +109,7 @@ If you are using a virtual environment:
 ## Linux
 
 Hopefully an easy way to run QualCoder on the following Linux distributions is to use Wine, https://www.winehq.org/.
-There are binary packages for Ubuntu, Debian, Fedora, SUSE, Slackware FreeBSD.
+There are binary Wine packages for Ubuntu, Debian, Fedora, SUSE, Slackware FreeBSD.
 Once installed, run a Windows QualCoder exe file, e.g. QualCoder-3.6.exe - see the [releases page](https://github.com/ccbogel/QualCoder/releases).
 
 ### Debian/Ubuntu Linux
