@@ -18,7 +18,7 @@ If you like QualCoder please buy me a coffee ...
 
 ### Prerequisites
 Optional: VLC for audio/video coding. 
-Optional: ffmpeg installed for speech-to-text and waveform image see here to install ffmpeg on Windows:  https://phoenixnap.com/kb/ffmpeg-windows. 
+Optional: ffmpeg installed for waveform image see here to install ffmpeg on Windows:  https://phoenixnap.com/kb/ffmpeg-windows. 
 
 On the first start of QualCoder, you may want to [setup the AI enhanced features](#setup-of-the-ai-features) as described below.
 
