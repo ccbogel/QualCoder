@@ -28,7 +28,7 @@ On the first start of QualCoder, you may want to [setup the AI enhanced features
 
 **Use the exe**
 
-Newer releases contain an exe file (created on Windows 10, 64-bit). Double-click to run, it takes up to 20 seconds to start. Look for the Releases link on the right-hand side of this page. Always check the MD5 checksum on downloading the exe. I have not got the exe Microsoft certified (cost involved).
+Newer releases contain an exe file created on Windows 11, and QualCoder 3.6 will also have a Windows installer. Double-click to run, it takes up to 20 seconds to start. Look for the Releases link on the right-hand side of this page. Always check the MD5 checksum on downloading the exe. I have not got the exe Microsoft certified (cost involved).
 If you are uncomfortable with these warnings install from the source as detailed next.
 
 **Alternatively, install from source:**
