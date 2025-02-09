@@ -20,8 +20,6 @@ If you like QualCoder please buy me a coffee ...
 Optional: VLC for audio/video coding. 
 Optional: ffmpeg installed for speech-to-text and waveform image see here to install ffmpeg on Windows:  https://phoenixnap.com/kb/ffmpeg-windows. 
 
-For installing from source you will need to have Python 3.10 or a newer version installed.
-
 On the first start of QualCoder, you may want to [setup the AI enhanced features](#setup-of-the-ai-features) as described below.
 
 ### Windows
