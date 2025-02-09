@@ -558,7 +558,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
             msg = _("Number of fields in row error.") + "\n"
             msg += _("Use another quote format OR another delimiter")
             self.ui.label_msg.setText(msg)
-            self.ui.comboBox_quote.setFocus(True)
+            self.ui.comboBox_quote.setFocus()
 
     def table_menu(self, pos):
         """ Header context menu to change data types and set primary key(s) and change field names.
