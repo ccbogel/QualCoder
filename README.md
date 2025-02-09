@@ -164,7 +164,7 @@ Then type
 
 ### Arch/Manjaro Linux
 
-It has not been tested, but please see the above instructions to build QualCoder inside a virtual environment. The below installation instructions may affect system-installed python modules.
+Please see the above instructions to build QualCoder inside a virtual environment. The below installation instructions are untested andshould be run inside a virual environment. The best approach may be to run the Windows exe with Wine.
 
 1. Install modules from the command line
 
@@ -190,7 +190,7 @@ Or install from AUR as follows:
 
 ### Fedora/CentOS/RHEL linux
 
-It has not been tested, but please see the above instructions to build QualCoder inside a virtual environment. The below installation instructions may affect system-installed Python modules.
+Please see the above instructions to build QualCoder inside a virtual environment. The below installation instructions are untested andshould be run inside a virual environment. The best approach may be to run the Windows exe with Wine.
 
 Retrieve the current package code from this repository
 
@@ -198,9 +198,7 @@ Retrieve the current package code from this repository
 2. Navigate to your preferred code directory.
 3. There, run: `git clone https://github.com/ccbogel/QualCoder.git` and
 4. enter the directory with `cd QualCoder`
-5. You need to install these latest requirments `sudo py -m pip install -r requirements.txt`  I hope this works, as not yet tested on Fedora.
-6. ** OUTDATED DONT USE YET TRY POINT 5 ABOVE Make `install_fedora.sh` executable (`chmod +x install_fedora.sh`)  ! Note 13 Oct 2024: The shell script needs updating for the additonal AI modules!
-7. ** OUTDATED DONT USE YET TRY POINT 5 ABOVE Finally, run the `./install_fedora.sh` script from the terminal. The script is for Python version 3.11.
+5. You need to install these latest requirements `sudo py -m pip install -r requirements.txt`  I hope this works, as not yet tested on Fedora.
 
 Then start QualCoder as any other app on your system.
 
@@ -210,7 +208,9 @@ Note 2: Fedora uses Wayland which does not work well with the Qt graphical inter
 
 ### MacOS
 
-The instructions work on Mac Monterey. It is recommended to use a virtual environment, see: https://sourabhbajaj.com/mac-setup/Python/virtualenv.html The below instructions can be used inside a virtual environment folder instead of placed in Applications.
+There will be a macOS app avaible for this release. Please use the app first, as installation, as described below may not always work on all recent macs.
+
+It is recommended to use a virtual environment, see: https://sourabhbajaj.com/mac-setup/Python/virtualenv.html The below instructions can be used inside a virtual environment folder instead of placed in Applications.
 
 You will need to install developer tools for macOS. [See https://www.cnet.com/tech/computing/install-command-line-developer-tools-in-os-x/](https://www.cnet.com/tech/computing/install-command-line-developer-tools-in-os-x/)  If you do not have the developer code, just start the installation process below and you will be prompted to install the developer code. This may be easier than figuring out if you have it or how to get it. Expect this process to take a long time.
 
