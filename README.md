@@ -24,15 +24,13 @@ On the first start of QualCoder, you may want to [setup the AI enhanced features
 
 ### Windows
 
-**Use the exe or the installed vaersion**
+You have two options, see Releases link on the right-hand side of this page:
+- Newer releases contain an **exe file** created on Windows 11. Double-click to run, it takes up to 20 seconds to start.
+- Since version 3.6, there will also be a **Windows installer** available at the release page. 
 
-Newer releases contain an exe file created on Windows 11. Double-click to run, it takes up to 20 seconds to start. Look for the Releases link on the right-hand side of this page. Always check the MD5 checksum on downloading the exe. I have not got the exe Microsoft certified (cost involved).
-If you are uncomfortable with these warnings install from the source as detailed next.
-
-This 3.6 release will also have an option to install QualCoder, this is sepaarate form the exe described above, please see the release page for more details.
+On first use of the exe, Windows may ask you to allow to run QualCoder. This is because it is from an unknown publisher. It costs a lot of money to get a trusted publisher certificate - so that will not be possible for the foreseeable future. If you are uncomfortable with these warnings install from the source as detailed next.
 
 **Alternatively, install from source:**
-
 
 Seriously consider using a virtual environment (commands in point 6 below). Not using a virtual environment may affect other Python software you may have installed.
 
@@ -108,7 +106,18 @@ If you are using a virtual environment:
 
 ## MacOS
 
-There will be a macOS app avaible for this release. Please use the app first, as installation, as described below may not always work on all recent macs.
+Attached to the current release linked at the right side of this page, you will find two options ('X' representing the current version):
+- **QualCoder_X_arm64.dmg**: App bundle for newer Macs with Apple Silicon (M1 ... M4 processors)
+- **QualCoder_X_x86_64.dmg**: App bundle for the older Intel-based Macs.
+
+We are currently not able to sign the app bundles, so you will get a warning that QualCoder is from an unregistered developer. You have to manually allow the app to be executed, if your Gatekeeper is active. Follow these steps:
+- Double-click the downloaded dmg-file.
+- Drag QualCoder into the link to your applications (ignore the `__main__` folder also in the window).
+- Start QualCoder by double-clicking the app within your applications folder. You will get an error that QualCoder is from an unregistered developer. The app will not start.
+- Go to Settings -> Privacy and Security -> Scroll down until you see a message stating QualCoder was prevented from starting. Click on "open anyway".
+- From now on, QualCoder should start without issues.
+
+If these app bundles do not work for you and you want to **run QualCoder from source,** follow these steps: 
 
 It is recommended to use a virtual environment, see: https://sourabhbajaj.com/mac-setup/Python/virtualenv.html The below instructions can be used inside a virtual environment folder instead of placed in Applications.
 
