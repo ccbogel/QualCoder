@@ -108,7 +108,7 @@ If you are using a virtual environment:
 
 Attached to the current release linked at the right side of this page, you will find two options ('X' representing the current version):
 - **QualCoder_X_arm64.dmg**: App bundle for newer Macs with Apple Silicon (M1 ... M4 processors)
-- **QualCoder_X_x86_64.dmg**: App bundle for the older Intel-based Macs.
+- **QualCoder_X_x86_64.dmg**: App bundle for the older Macs with Intel processor (core i5, i7, etc).
 
 We are currently not able to sign the app bundles, so you will get a warning that QualCoder is from an unregistered developer. You have to manually allow the app to be executed, if your Gatekeeper is active. Follow these steps:
 - Double-click the downloaded dmg-file.
