@@ -4,6 +4,8 @@ authors:
   - family-names: Curtain
     given-names: Colin
     orcid: https://orcid.org/0000-0001-5029-7541
+  - family-names: Droege
+    given-names: Kai
 title: "QualCoder"
 version: 3.6
 keywords: qualitative
