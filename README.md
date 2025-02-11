@@ -110,7 +110,9 @@ Attached to the current release linked at the right side of this page, you will 
 - **QualCoder_X_arm64.dmg**: App bundle for newer Macs with Apple Silicon (M1 ... M4 processors)
 - **QualCoder_X_x86_64.dmg**: App bundle for the older Macs with Intel processor (core i5, i7, etc).
 
-We are currently not able to sign the app bundles, so you will get a warning that QualCoder is from an unregistered developer. You have to manually allow the app to be executed, if your Gatekeeper is active. Follow these steps:
+The app bundels are compiled on macOS Sequoia. They might also work on Sonoma and Ventura. If you are on an older version, consider updating your OS or install QualCoder from source as described in the wiki: https://github.com/ccbogel/QualCoder/wiki/2.1.-Installation#macos 
+
+Note: We are currently not able to sign the app bundles, so you will get a warning that QualCoder is from an unregistered developer. You have to manually allow the app to be executed, if your Gatekeeper is active. Follow these steps:
 - Double-click the downloaded dmg-file.
 - Drag QualCoder into the link to your applications (ignore the `__main__` folder also in the window).
 - Start QualCoder by double-clicking the app within your applications folder. You will get an error that QualCoder is from an unregistered developer. The app will not start.
