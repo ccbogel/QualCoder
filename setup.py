@@ -44,9 +44,9 @@ else:
 
 setup(
     name='Qualcoder',
-    version='3.6',
+    version='3.7',
     url='http://github.com/ccbogel/QualCoder',
-    author='Colin Curtain',
+    author='Colin Curtain and Kai Droege',
     author_email='ccbogel@hotmail.com',
     description='Qualitative data analysis',
     long_description=long_description,
