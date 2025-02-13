@@ -1,4 +1,4 @@
-"Case","Age","Gender","Interest","Free-text"
-"ID4",24,"f","shopping","I wanted to do some more studies but after leaving school and start working, I really lost the interest."
-"ID5",54,"m","golf","I needed to upskill in some areas for my work. But work and family life have prevented me from having enough time."
-"ID6",67,"m","gardening","I did not enrol in any studies, even though I am retired. Currently, I am mainly enjoying being away from work and doing my gardening. "
+Case,Age,Gender,Interest,freetext
+ID4,24,f,shopping,"I wanted to do some more studies but after leaving school and start working, I really lost the interest."
+ID5,,m,golf,I needed to upskill in some areas for my work. But work and family life have prevented me from having enough time.
+ID6,67,m,gardening,"I did not enrol in any studies, even though I am retired. Currently, I am mainly enjoying being away from work and doing my gardening. "
