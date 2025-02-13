@@ -81,7 +81,7 @@ class DialogCodeColorScheme(QtWidgets.QDialog):
         self.fill_table()
         self.ui.pushButton_perspective.pressed.connect(self.change_perspective)
         self.ui.pushButton_apply.pressed.connect(self.apply_colors_to_codes)
-        self.ui.pushButton_undo.setIcon(qta.icon('mdi6.undo'))
+        self.ui.pushButton_undo.setIcon(qta.icon('mdi6.undo', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_undo.pressed.connect(self.undo_color_changes)
 
     def get_codes_and_categories(self):
