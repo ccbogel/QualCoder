@@ -132,7 +132,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.ui.pushButton_export_attributes.clicked.connect(self.export_attributes)
         self.ui.pushButton_undo.setIcon(qta.icon('mdi6.undo', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_undo.clicked.connect(self.undo_file_rename)
-        self.ui.pushButton_bulk_rename.setIcon(qta.icon('mdi6.file-multiple-outline', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_bulk_rename.setIcon(qta.icon('mdi6.file-multiple-outline', options=[{'scale_factor': 1.2}]))
         self.ui.pushButton_bulk_rename.clicked.connect(self.bulk_rename_database_entry)
         self.ui.pushButton_help.setIcon(qta.icon('mdi6.help'))
         self.ui.pushButton_help.pressed.connect(self.help)
