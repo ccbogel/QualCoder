@@ -580,6 +580,7 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         selected = self.ui.treeWidget.currentItem()
         action_clear_selected = menu.addAction(_("Clear all"))
+        action_select_all = menu.addAction(_("Select all"))
         action_exclude_code = None
         if selected is not None and selected.text(1)[0:3] == 'cid':
             action_exclude_code = menu.addAction(_("Exclude code"))
@@ -593,7 +594,8 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
                 item[1].setIcon(0, QtGui.QIcon())
             self.excluded_codes = []
             return
-
+        if action == action_select_all:
+            self.ui.treeWidget.selectAll()
         if action == action_exclude_code:
             if selected.text(1)[0:3] != 'cid':
                 return

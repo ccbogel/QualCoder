@@ -100,6 +100,8 @@ class DialogReportRelations(QtWidgets.QDialog):
         self.ui.tableWidget_statistics.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget_statistics.customContextMenuRequested.connect(self.table_statistics_menu)
         self.ui.tableWidget_statistics.setTabKeyNavigation(False)
+        self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
 
         # Default to select all files
         cur = self.app.conn.cursor()
@@ -440,6 +442,25 @@ class DialogReportRelations(QtWidgets.QDialog):
                 result['text_after'] = txt_after[0]
             result['distance'] = 0
             return result
+
+    def tree_menu(self, position):
+        """ Context menu for treewidget code/category items.
+        Select all codes. """
+
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        selected = self.ui.treeWidget.currentItem()
+        action_clear_selected = menu.addAction(_("Clear all"))
+        action_select_all = menu.addAction(_("Select all"))
+
+        action = menu.exec(self.ui.treeWidget.mapToGlobal(position))
+        if action == action_clear_selected:
+            selected = self.ui.treeWidget.selectedItems()
+            for tree_item in selected:
+                tree_item.setSelected(False)
+            return
+        if action == action_select_all:
+            self.ui.treeWidget.selectAll()
 
     def search_text(self):
         """ Search for text in the results. """
