@@ -326,7 +326,7 @@ QualCoder is distributed under the LGPLv3 LICENSE.
 
 ##  Citation APA style
 
-Curtain, C. (2025) QualCoder 3.6 [Computer software]. Retrieved from
+Curtain, C. Dröge K. (2025) QualCoder 3.6 [Computer software]. Retrieved from
 https://github.com/ccbogel/QualCoder/releases/tag/3.6
 
 ## Creator
