@@ -89,7 +89,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
         self.ui.tableWidget.horizontalHeader().setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget.horizontalHeader().customContextMenuRequested.connect(self.table_menu)
         self.ui.tableWidget.setTabKeyNavigation(False)
-        # One qual file per column causes multiple imports with name_differing_datetime when same data) is imported multiple times
+        # TODO remove checkbox from UI files
         self.ui.checkBox_collate.hide()
 
         cur = self.app.conn.cursor()
@@ -244,11 +244,12 @@ class DialogImportSurvey(QtWidgets.QDialog):
         for field in range(0, len(self.fields)):
             numeric = True
             for row in range(0, len(self.data)):
-                try:
-                    float(self.data[row][field])
-                except (ValueError, IndexError):
-                    # IndexError, Might be malformed csv, so presume numeric is False anyway
-                    numeric = False
+                if self.data[row][field] != "":  # Need ot be OK with 'Null' values
+                    try:
+                        float(self.data[row][field])
+                    except (ValueError, IndexError):
+                        # IndexError, Might be malformed csv, so presume numeric is False anyway
+                        numeric = False
             if numeric:
                 self.fields_type[field] = "numeric"
 
@@ -326,7 +327,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
         now_date = str(datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"))
         cur = self.app.conn.cursor()
         name_and_caseids = []
-        duplicates_warning = ""
+        duplicate_names_counter = 0
         for i, c in enumerate(self.data):
             try:
                 self.ui.label_msg.setText(_("Inserting cases: " + str(i)))
@@ -336,14 +337,13 @@ class DialogImportSurvey(QtWidgets.QDialog):
                 cur.execute("select last_insert_rowid()")
                 name_and_caseids.append([c[0], cur.fetchone()[0]])
                 QtWidgets.QApplication.processEvents()
-            except sqlite3.IntegrityError as e:
+            except sqlite3.IntegrityError:
                 cur.execute("select caseid from cases where name=?", [c[0]])
                 caseid_res = cur.fetchone()
                 name_and_caseids.append([c[0], caseid_res[0]])  # potentially could be None
-                fail_msg = c[0] + ": " + str(e) + _(" Duplicate case names, either in the file, or with existing project cases")
-                logger.warning(fail_msg)
-                duplicates_warning += fail_msg + "\n"
-        if duplicates_warning != "":
+                duplicate_names_counter += 1
+        if duplicate_names_counter > 0:
+            duplicates_warning = str(duplicate_names_counter) + _(" Duplicate case names, either in the file, or with existing project cases")
             Message(self.app, _('Duplicate case names warning'), duplicates_warning, "warning").exec()
             self.parent_textEdit.append(_("Survey import warning: ") + duplicates_warning)
 
@@ -414,9 +414,8 @@ class DialogImportSurvey(QtWidgets.QDialog):
             cur.execute("select cid from code_name where name=?", [self.fields[field]])
             res_code_cid = cur.fetchone()  # Either [cid] or None
 
-            case_text_list = []
-
-            '''# Create one text file combining each row, prefix [case identifier] to each row.
+            '''case_text_list = []
+            # Create one text file combining each row, prefix [case identifier] to each row.
             if self.fields_type[field] == "qualitative" and self.ui.checkBox_collate.isChecked():
                 fulltext = ""
                 for row in range(0, len(self.data)):
@@ -469,7 +468,6 @@ class DialogImportSurvey(QtWidgets.QDialog):
                 for row in range(0, len(self.data)):
                     qual_file_name = f"{self.data[row][0]}_{self.fields[field]}"
                     fulltext = f"{self.data[row][field]}"
-                    integrity_error = None
                     try:
                         cur.execute(source_sql,
                                     (qual_file_name, fulltext, "", self.app.settings['codername'], now_date))
