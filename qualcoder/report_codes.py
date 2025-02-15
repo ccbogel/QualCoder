@@ -2490,6 +2490,9 @@ class DialogReportCodes(QtWidgets.QDialog):
         # Need a top key
         for r in results:
             r['top'] = r['codename']
+            # Add 'shortened' name key value to code, for matrix
+            if len(r['top']) > 52:
+                r['top'] = f"{r['codename'][:25]}..{r['codename'][-25:]}"
         # Get selected codes (Matrix columns)
         items = self.ui.treeWidget.selectedItems()
         horizontal_labels = [item.text(0) for item in items if item.text(1)[:3] == "cid"]
@@ -2522,38 +2525,39 @@ class DialogReportCodes(QtWidgets.QDialog):
         results = deepcopy(results_)
         # All categories within selection
         items = self.ui.treeWidget.selectedItems()
-        top_level = []  # Categories at any level
+        top_categories = []  # Categories at any level
         horizontal_labels = []
         sub_codes = []
         for item in items:
             if item.text(1)[0:3] == "cat":
-                top_level.append({'name': item.text(0), 'cat': item.text(1)})
+                top_categories.append({'name': item.text(0), 'cat': item.text(1)})
                 horizontal_labels.append(item.text(0))
             # Find sub-code and traverse upwards to map to category
             if item.text(1)[0:3] == 'cid':
-                sub_code = {'codename': item.text(0), 'cid': item.text(1)}
+                sub_code = {'codename': item.text(0), 'cid': int(item.text(1)[4:])}
                 # Maybe None of a top level code - as this will have no parent
                 if item.parent() is not None:
+                    # Top Can be shortenend e.g. longtext .. longtext
                     sub_code['top'] = item.parent().text(0)
                     sub_codes.append(sub_code)
                     add_cat = True
-                    for tl in top_level:
-                        if tl['name'] == item.parent().text(0):
+                    for top_level in top_categories:
+                        if top_level['name'] == item.parent().text(0):
                             add_cat = False
                     if add_cat:
-                        top_level.append({'name': item.parent().text(0), 'cat': item.parent().text(1)})
+                        top_categories.append({'name': item.parent().text(0), 'cat': item.parent().text(1)})
                         horizontal_labels.append(item.parent().text(0))
 
         # Add category name - which will match the tableWidget column category name
         res_categories = []
-        for i in results:
+        for res in results:
             # Replaces the top-level name by mapping to the correct top-level category name (column)
             # Codes will not have 'top' key
-            for s in sub_codes:
-                if i['codename'] == s['codename']:
-                    i['top'] = s['top']
-            if "top" in i:
-                res_categories.append(i)
+            for code_ in sub_codes:
+                if res['cid'] == code_['cid']:
+                    res['top'] = code_['top']
+            if "top" in res:
+                res_categories.append(res)
         # Only show categories in the results
         results = res_categories
         cur = self.app.conn.cursor()
@@ -2563,8 +2567,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         cur.execute(sql)
         id_and_name = cur.fetchall()
         vertical_labels = []
-        for c in id_and_name:
-            vertical_labels.append(c[1])
+        for file_or_case in id_and_name:
+            vertical_labels.append(file_or_case[1])
         transpose = self.ui.checkBox_matrix_transpose.isChecked()
         if transpose:
             vertical_labels, horizontal_labels = horizontal_labels, vertical_labels
@@ -2585,18 +2589,18 @@ class DialogReportCodes(QtWidgets.QDialog):
         results = deepcopy(results_)
         # Get top level categories
         items = self.ui.treeWidget.selectedItems()
-        top_level = []
+        top_categories = []
         horizontal_labels = []
         sub_codes = []
         for item in items:
             root = self.ui.treeWidget.indexOfTopLevelItem(item)
             if root > -1 and item.text(1)[0:3] == "cat":
-                top_level.append({'name': item.text(0), 'cat': item.text(1)})
+                top_categories.append({'name': item.text(0), 'cat': item.text(1)})
                 horizontal_labels.append(item.text(0))
             # Find sub-code and traverse upwards to map to top-level category
             if root == -1 and item.text(1)[0:3] == 'cid':
                 not_top = True
-                sub_code = {'codename': item.text(0), 'cid': item.text(1)}
+                sub_code = {'codename': item.text(0), 'cid': int(item.text(1)[4:])}
                 top_id = None
                 while not_top:
                     item = item.parent()
@@ -2606,23 +2610,24 @@ class DialogReportCodes(QtWidgets.QDialog):
                         top_id = item.text(1)
                         sub_codes.append(sub_code)
                 add_cat = True
-                for tl in top_level:
-                    if tl['name'] == sub_code['top']:
+                for top_category in top_categories:
+                    if top_category['name'] == sub_code['top']:
                         add_cat = False
                 if add_cat and top_id is not None:
-                    top_level.append({'name': sub_code['top'], 'cat': top_id})
+                    top_categories.append({'name': sub_code['top'], 'cat': top_id})
                     horizontal_labels.append(sub_code['top'])
 
         # Add the top-level name - which will match the tableWidget column category name
         res_categories = []
-        for i in results:
+        for res in results:
             # Replaces the top-level code name by mapping to the correct top-level category name (column)
             # Codes will not have 'top' key, so add it in.
-            for s in sub_codes:
-                if i['codename'] == s['codename']:
-                    i['top'] = s['top']
-            if "top" in i:
-                res_categories.append(i)
+            for code_ in sub_codes:
+                if res['cid'] == code_['cid']:
+                    res['top'] = code_['top']
+            if "top" in res:
+                res_categories.append(res)
+
         # Ony show top level categories
         results = res_categories
 
@@ -2633,8 +2638,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         cur.execute(sql)
         id_and_name = cur.fetchall()
         vertical_labels = []
-        for c in id_and_name:
-            vertical_labels.append(c[1])
+        for file_or_case in id_and_name:
+            vertical_labels.append(file_or_case[1])
 
         transpose = self.ui.checkBox_matrix_transpose.isChecked()
         if transpose:
@@ -2647,8 +2652,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         """
 
         # Clear and fill tableWidget
-        doc_font = 'font: ' + str(self.app.settings['docfontsize']) + 'pt '
-        doc_font += '"' + self.app.settings['font'] + '";'
+        doc_font = f'font: {self.app.settings["docfontsize"]}pt "{self.app.settings["font"]}";'
         self.ui.tableWidget.setStyleSheet(doc_font)
         self.ui.tableWidget.setColumnCount(len(horizontal_labels))
         # Keep horizontal labels to 80 chars per line
