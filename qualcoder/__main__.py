@@ -66,6 +66,7 @@ from qualcoder.refi import RefiExport, RefiImport
 from qualcoder.reports import DialogReportCoderComparisons, DialogReportCodeFrequencies
 from qualcoder.report_code_summary import DialogReportCodeSummary
 from qualcoder.report_compare_coder_file import DialogCompareCoderByFile
+from qualcoder.report_comparison_table import DialogReportComparisonTable
 from qualcoder.report_codes import DialogReportCodes
 from qualcoder.report_codes_by_segments import DialogCodesBySegments
 from qualcoder.report_cooccurrence import DialogReportCooccurrence
@@ -783,6 +784,7 @@ university, ORCID, GitHub, or Google account.""",
         QMenu::item:disabled {color: #707070;}\n\
         QPushButton {background-color: #858585;}\n\
         QPushButton:hover {border: 2px solid #ffaa00;}\n\
+        QPushButton::icon {color: #FFFFFF;}\n\
         QRadioButton::indicator {border: 1px solid #858585; background-color: #2a2a2a;}\n\
         QRadioButton::indicator::checked {border: 2px solid #858585; background-color: orange;}\n\
         QSlider::handle:horizontal {background-color: #f89407;}\n\
@@ -811,7 +813,6 @@ university, ORCID, GitHub, or Google account.""",
                                         "QFileDialog {font-size:" + str(settings.get('fontsize')))
         style_dark = style_dark.replace("QTreeWidget {font-size: 12",
                                         "QTreeWidget {font-size: " + str(settings.get('treefontsize')))
-
         style = "* {font-size: 12px; color: #000000;}\n\
         QWidget {background-color: #efefef; color: #000000; border: none;}\n\
         QWidget:focus {border: 1px solid #f89407;}\n\
@@ -823,6 +824,7 @@ university, ORCID, GitHub, or Google account.""",
         QGroupBox:focus {border: 3px solid #f89407;}\n\
         QPushButton {border-style: outset; border-width: 2px; border-radius: 2px; border-color: beige; padding: 2px;}\n\
         QPushButton:pressed {border-style: inset; background-color: white;}\n\
+        QPushButton::icon {color: #000000;)\n\
         QGraphicsView {border: 1px solid #808080}\n\
         QHeaderView::section {background-color: #f9f9f9}\n\
         QLineEdit {border: 1px solid #707070; background-color: #fafafa;}\n\
@@ -1288,6 +1290,7 @@ Click "Yes" to start now.')
         self.ui.actionCoding_comparison.triggered.connect(self.report_coding_comparison)
         self.ui.actionCoding_comparison_by_file.setShortcut('Alt+M')
         self.ui.actionCoding_comparison_by_file.triggered.connect(self.report_compare_coders_by_file)
+        self.ui.actionCode_comparison_table.triggered.connect(self.report_comparison_table)
         self.ui.actionCode_frequencies.setShortcut('Alt+N')
         self.ui.actionCode_frequencies.triggered.connect(self.report_code_frequencies)
         self.ui.actionFile_summary.setShortcut('Alt+O')
@@ -1434,6 +1437,7 @@ Click "Yes" to start now.')
         self.ui.actionCode_frequencies.setEnabled(False)
         self.ui.actionCode_relations.setEnabled(False)
         self.ui.actionCode_co_occurrence.setEnabled(False)
+        self.ui.actionCode_comparison_table.setEnabled(False)
         self.ui.actionCode_text_exact_matches.setEnabled(False)
         self.ui.actionText_mining.setEnabled(False)
         self.ui.actionSQL_statements.setEnabled(False)
@@ -1479,6 +1483,7 @@ Click "Yes" to start now.')
         self.ui.actionCoding_reports.setEnabled(True)
         self.ui.actionCoding_comparison.setEnabled(True)
         self.ui.actionCoding_comparison_by_file.setEnabled(True)
+        self.ui.actionCode_comparison_table.setEnabled(True)
         self.ui.actionCode_frequencies.setEnabled(True)
         self.ui.actionCode_relations.setEnabled(True)
         self.ui.actionCode_co_occurrence.setEnabled(True)
@@ -1567,6 +1572,11 @@ Click "Yes" to start now.')
 
         self.ui.label_reports.hide()
         ui = DialogReportCoderComparisons(self.app, self.ui.textEdit)
+        self.tab_layout_helper(self.ui.tab_reports, ui)
+
+    def report_comparison_table(self):
+        self.ui.label_reports.hide()
+        ui = DialogReportComparisonTable(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_reports, ui)
 
     def report_compare_coders_by_file(self):
