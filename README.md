@@ -268,26 +268,35 @@ Then type
 
 ### Fedora 41
 
-`sudo dnf install py`
+The instructions below are to run from source code inside a virtual environment. Note: Fedora uses Wayland which may not work well with the Qt graphical interface. It is suggested you also install Xwayland.
+
+`sudo dnf install python3.12`
+
 `virtualenv env_QualCoder`
 
 `source env_QualCoder/bin/activate `
+
 `pip3 install –upgrade pip`
+
 `git clone https://github.com/ccbogel/QualCoder.git`
+
 `cd QualCoder`
-`py -m pip install -r requirements.txt`
-`py -m qualcoder`
+
+`python3.12 -m pip install -r requirements.txt`
+
+`python3.12 -m qualcoder`
+
 `deactivate # To exit this virtual environment`
 
-Usage:
+**Usage:**
 
 `source env_QualCoder/bin/activate`
+
 `cd QualCoder`
-`py -m qualcoder`
+
+`python3.12 -m qualcoder`
+
 `deactivate`
-
-Note: Fedora uses Wayland which does not work well with the Qt graphical interface (for now). I suggest you also install Xwayland.
-
 
 ### Arch/Manjaro Linux
 
