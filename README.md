@@ -231,7 +231,7 @@ Alternatively, install from source code below. When running from source code, it
 
 3. Download and unzip the Qualcoder folder. Then `cd` to the QualCoder folder.
 
-4. Set up virtual environment and install python modules. Installing required modules takes a while.
+4. Set up virtual environment and install python modules. The virtual environment will be in its own folder called env_qc. Installing required modules takes a while.
 
 `python3.12 -m venv env_qc`
 
@@ -241,7 +241,7 @@ Alternatively, install from source code below. When running from source code, it
 
 `pip install -r requirements.txt`
 
-5. The command to start QualCoder:
+5. Now, the command to start QualCoder:
 
 `python3.12 -m qualcoder`
 
@@ -260,14 +260,6 @@ Alternatively, install from source code below. When running from source code, it
 `deactivate`
 
 
-
-old xxx `python3 -m pip install .`
-
-old xxx To run type
-
-old xxx   `qualcoder`
-
-
 **Usage:**
 
 At any time `cd` to the Qualcoder folder and enter the following commands. On finishing type `deactivate` to exit the virtual environment.
@@ -278,7 +270,7 @@ At any time `cd` to the Qualcoder folder and enter the following commands. On fi
 
 ### Fedora 41
 
-The instructions below are to run from source code inside a virtual environment. Note: Fedora uses Wayland which may not work well with the Qt graphical interface. It is suggested you also install Xwayland.
+The instructions below are to run from source code inside a virtual environment. These instructions download the current source code directly from GitHub. Note: Fedora uses Wayland which may not work well with the Qt graphical interface. It is suggested you also install Xwayland.
 
 `sudo dnf install python3.12`
 
