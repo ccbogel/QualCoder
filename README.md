@@ -217,10 +217,9 @@ Once installed, run a Windows QualCoder exe file, e.g. QualCoder-3.6.exe - see t
 
 ### Ubuntu Linux
 
-There is an executable file (double-click to run) for Ubuntu in the older 3.5 release. 
+There is a link to an executable file (double-click to run) for Ubuntu in the 3.6 release. 
 
-Alternatively, install from source code below.
-When running from source code, it is best to run QualCoder inside a Python virtual environment so that the system-installed python modules do not clash and cause problems. If you are using the alternative Ubuntu Desktop manager **Xfce** you may need to run this: `sudo apt install libxcb-cursor0`
+Alternatively, install from source code below. When running from source code, it is best to run QualCoder inside a Python virtual environment so that the system-installed python modules do not clash and cause problems. If you are using the alternative Ubuntu Desktop manager **Xfce** you may need to run this: `sudo apt install libxcb-cursor0`
 
 1. Recommend that you install vlc (download from site) or: `sudo apt install vlc`
 
@@ -239,11 +238,7 @@ When running from source code, it is best to run QualCoder inside a Python virtu
 
 `pip3 install –upgrade pip`
 
-`git clone https://github.com/ccbogel/QualCoder.git`
-
-`cd QualCoder`
-
-`python3.12 -m pip install -r requirements.txt`
+`pip install -r requirements.txt`
 
 `python3.12 -m qualcoder`
 
