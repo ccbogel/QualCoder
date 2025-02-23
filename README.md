@@ -225,9 +225,7 @@ To install from source code below, inside a virtual environment. If you are usin
 
 2. Install pip and venv
 
-`sudo apt install python3-pip`
-
-`sudo apt install python3.12-venv`
+`sudo apt install python3-pip python3.12-venv`
 
 3. Download and unzip the Qualcoder folder. Then `cd` to the QualCoder folder.
 
