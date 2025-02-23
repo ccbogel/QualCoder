@@ -221,7 +221,7 @@ There is a link to an executable file (double-click to run) for Ubuntu in the 3.
 
 Alternatively, install from source code below. When running from source code, it is best to run QualCoder inside a Python virtual environment so that the system-installed python modules do not clash and cause problems. If you are using the alternative Ubuntu Desktop manager **Xfce** you may need to run this: `sudo apt install libxcb-cursor0`
 
-1. Recommend that you install vlc (download from site) or: `sudo apt install vlc`
+1. If you are using audio or video, install vlc (download from site) or: `sudo apt install vlc`
 
 2. Install pip and venv
 
@@ -231,7 +231,7 @@ Alternatively, install from source code below. When running from source code, it
 
 3. Download and unzip the Qualcoder folder. Then `cd` to the QualCoder folder.
 
-4. Set up virtual environment
+4. Set up virtual environment and install python modules. Installing required modules takes a while.
 
 `python3.12 -m venv env_qc`
 
