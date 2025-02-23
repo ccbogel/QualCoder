@@ -222,59 +222,20 @@ There is an executable file (double-click to run) for Ubuntu in the older 3.5 re
 Alternatively, install from source code below.
 When running from source code, it is best to run QualCoder inside a Python virtual environment so that the system-installed python modules do not clash and cause problems. If you are using the alternative Ubuntu Desktop manager **Xfce** you may need to run this: `sudo apt install libxcb-cursor0`
 
-1. Recommend that you install vlc (download from site) or:
+1. Recommend that you install vlc (download from site) or: `sudo apt install vlc`
 
-`sudo apt install vlc`
-
-2. Install pip
+2. Install pip and venv
 
 `sudo apt install python3-pip`
 
-1. Install venv
-I am using python3.12  you can choose another recent version if you prefer, and if more recent versions are in the Ubuntu repository.
-
 `sudo apt install python3.12-venv`
 
-3. Download and unzip the Qualcoder folder.
+3. Download and unzip the Qualcoder folder. Then `cd` to the QualCoder folder.
 
-4. Open a terminal and move (cd) into that folder. 
-You should be inside the QualCoder-master folder or if using a release, e.g. the Qualcoder-3.6 folder.
-Inside the QualCoder-master folder:
-
+4. Set up virtual environment
 `python3.12 -m venv env`
 
-Activate venv, this changes the command prompt display using (brackets): (qualcoder) 
-Note: To exit venv type `deactivate`
-
 `source env/bin/activate`
-
-5. Update pip so that it installs the most recent Python packages.
-
-`pip install --upgrade pip`
-
-6. You must be in the QualCoder-master folder (Or the main release folder if using a release. e.g. QualCoder-3.6 folder). Install QualCoder, and type the following, the dot is important:
-
-`python3 -m pip install .`
-
-7. To run type
-
-`qualcoder`
-
-After all this is done, you can `deactivate` to exit the virtual environment.
-At any time to start QualCoder in the virtual environment, cd to the Qualcoder-master (or Qualcoder release folder), then type:
-`source env/bin/activate`
-Then type
-`qualcoder`
-
-### Fedora 41
-
-The instructions below are to run from source code inside a virtual environment. Note: Fedora uses Wayland which may not work well with the Qt graphical interface. It is suggested you also install Xwayland.
-
-`sudo dnf install python3.12`
-
-`virtualenv env_QualCoder`
-
-`source env_QualCoder/bin/activate `
 
 `pip3 install –upgrade pip`
 
@@ -297,6 +258,67 @@ The instructions below are to run from source code inside a virtual environment.
 `python3.12 -m qualcoder`
 
 `deactivate`
+
+
+4. Open a terminal and move (cd) into that folder. 
+You should be inside the QualCoder-master folder or if using a release, e.g. the Qualcoder-3.6 folder.
+Inside the QualCoder-master folder:
+
+`python3.12 -m venv env_qc`
+
+Note: To exit venv type `deactivate`
+
+`source env_qc/bin/activate`
+
+`pip install --upgrade pip`
+
+6. You must be in the QualCoder-master folder (Or the main release folder if using a release. e.g. QualCoder-3.6 folder). Install QualCoder, and type the following, the dot is important:
+
+`python3 -m pip install .`
+
+7. To run type
+
+`qualcoder`
+
+After all this is done, you can `deactivate` to exit the virtual environment.
+
+**Usage:**
+
+At any time `cd` to the Qualcoder folder and enter the following commands. On finishing type `deactivate` to exit the virtual environment.
+
+`source env_qc/bin/activate`
+
+`qualcoder`
+
+### Fedora 41
+
+The instructions below are to run from source code inside a virtual environment. Note: Fedora uses Wayland which may not work well with the Qt graphical interface. It is suggested you also install Xwayland.
+
+`sudo dnf install python3.12`
+
+`virtualenv env_qc`
+
+`source env_qc/bin/activate `
+
+`pip3 install –upgrade pip`
+
+`git clone https://github.com/ccbogel/QualCoder.git`
+
+`cd QualCoder`
+
+`python3.12 -m pip install -r requirements.txt`
+
+`python3.12 -m qualcoder`
+
+`deactivate` 
+
+**Usage:**
+
+At any time `cd` to the Qualcoder folder and enter the following commands. On finishing type `deactivate` to exit the virtual environment.
+
+`source env_qc/bin/activate`
+
+`python3.12 -m qualcoder`
 
 ### Arch/Manjaro Linux
 
