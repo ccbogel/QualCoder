@@ -232,6 +232,7 @@ Alternatively, install from source code below. When running from source code, it
 3. Download and unzip the Qualcoder folder. Then `cd` to the QualCoder folder.
 
 4. Set up virtual environment
+
 `python3.12 -m venv env_qc`
 
 `source env_qc/bin/activate`
@@ -240,9 +241,13 @@ Alternatively, install from source code below. When running from source code, it
 
 `pip install -r requirements.txt`
 
+5. The command to start QualCoder:
+
 `python3.12 -m qualcoder`
 
-`deactivate # To exit this virtual environment`
+6. After using QualCoder deactiatve the virtual environment.
+
+`deactivate`
 
 **Usage:**
 
@@ -255,27 +260,13 @@ Alternatively, install from source code below. When running from source code, it
 `deactivate`
 
 
-4. Open a terminal and move (cd) into that folder. 
-You should be inside the QualCoder-master folder or if using a release, e.g. the Qualcoder-3.6 folder.
-Inside the QualCoder-master folder:
 
-`python3.12 -m venv env_qc`
+old xxx `python3 -m pip install .`
 
-Note: To exit venv type `deactivate`
+old xxx To run type
 
-`source env_qc/bin/activate`
+old xxx   `qualcoder`
 
-`pip install --upgrade pip`
-
-6. You must be in the QualCoder-master folder (Or the main release folder if using a release. e.g. QualCoder-3.6 folder). Install QualCoder, and type the following, the dot is important:
-
-`python3 -m pip install .`
-
-7. To run type
-
-`qualcoder`
-
-After all this is done, you can `deactivate` to exit the virtual environment.
 
 **Usage:**
 
