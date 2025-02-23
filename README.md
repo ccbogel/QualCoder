@@ -232,9 +232,9 @@ Alternatively, install from source code below. When running from source code, it
 3. Download and unzip the Qualcoder folder. Then `cd` to the QualCoder folder.
 
 4. Set up virtual environment
-`python3.12 -m venv env`
+`python3.12 -m venv env_qc`
 
-`source env/bin/activate`
+`source env_qc/bin/activate`
 
 `pip3 install –upgrade pip`
 
@@ -246,7 +246,7 @@ Alternatively, install from source code below. When running from source code, it
 
 **Usage:**
 
-`source env_QualCoder/bin/activate`
+`source env_qc/bin/activate`
 
 `cd QualCoder`
 
