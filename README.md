@@ -266,51 +266,32 @@ At any time to start QualCoder in the virtual environment, cd to the Qualcoder-m
 Then type
 `qualcoder`
 
+### Fedora 41
+
+`sudo dnf install py`
+`virtualenv env_QualCoder`
+
+`source env_QualCoder/bin/activate `
+`pip3 install –upgrade pip`
+`git clone https://github.com/ccbogel/QualCoder.git`
+`cd QualCoder`
+`py -m pip install -r requirements.txt`
+`py -m qualcoder`
+`deactivate # To exit this virtual environment`
+
+Usage:
+
+`source env_QualCoder/bin/activate`
+`cd QualCoder`
+`py -m qualcoder`
+`deactivate`
+
+Note: Fedora uses Wayland which does not work well with the Qt graphical interface (for now). I suggest you also install Xwayland.
+
 
 ### Arch/Manjaro Linux
 
-Please see the above instructions to build QualCoder inside a virtual environment. The below installation instructions are untested andshould be run inside a virual environment. The best approach may be to run the Windows exe with Wine.
-
-1. Install modules from the command line
-
-`sudo pacman -S python python-chardet python-openpyxl python-pdfminer python-pandas python-pillow python-ply python-pyqt6 python-pip`
-
-2. Install additional python modules
-
-`sudo py -m pip install -r requirements.txt`
-
-If successful, all requirements are satisfied.
-
-3. Build and install QualCoder, from the downloaded folder type
-
-`sudo python setup.py install`
-
-4. To run type:
-
-`qualcoder`
-
-Or install from AUR as follows:
-
-`yay -S qualcoder`
-
-### Fedora/CentOS/RHEL linux
-
-Please see the above instructions to build QualCoder inside a virtual environment. The below installation instructions are untested andshould be run inside a virual environment. The best approach may be to run the Windows exe with Wine.
-
-Retrieve the current package code from this repository
-
-1. Open your preferred shell (terminal).
-2. Navigate to your preferred code directory.
-3. There, run: `git clone https://github.com/ccbogel/QualCoder.git` and
-4. enter the directory with `cd QualCoder`
-5. You need to install these latest requirements `sudo py -m pip install -r requirements.txt`  I hope this works, as not yet tested on Fedora.
-
-Then start QualCoder as any other app on your system.
-
-Note 1_ This script installs the dependencies using dnf and the ebook libraries with a work-around, specified at https://github.com/ccbogel/QualCoder/issues/72#issuecomment-695962784.
-
-Note 2: Fedora uses Wayland which does not work well with the Qt graphical interface (for now). I suggest you also install Xwayland.
-
+The best approach may be to run the Windows exe with Wine.
  
 ## Setup of the AI features
 If you want to use the AI-enhaced features in QualCoder, additional setup is needed. When you start the app for the first time, a wizard will lead you through the setup process. You can also start this later via the menu by clicking on AI > Setup Wizard. These are the main steps:
