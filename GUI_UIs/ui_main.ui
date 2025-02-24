@@ -190,6 +190,7 @@
     <addaction name="actionCoding_reports"/>
     <addaction name="actionCoding_comparison"/>
     <addaction name="actionCoding_comparison_by_file"/>
+    <addaction name="actionCode_comparison_table"/>
     <addaction name="actionCode_frequencies"/>
     <addaction name="actionFile_summary"/>
     <addaction name="actionCode_summary"/>
@@ -591,6 +592,11 @@
   <action name="actionCode_co_occurrence">
    <property name="text">
     <string>Code co-occurrence</string>
+   </property>
+  </action>
+  <action name="actionCode_comparison_table">
+   <property name="text">
+    <string>Code comparison table</string>
    </property>
   </action>
  </widget>
