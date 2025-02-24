@@ -220,6 +220,8 @@ class Ui_MainWindow(object):
         self.actionAI_assisted_coding.setObjectName("actionAI_assisted_coding")
         self.actionCode_co_occurrence = QtGui.QAction(parent=MainWindow)
         self.actionCode_co_occurrence.setObjectName("actionCode_co_occurrence")
+        self.actionCode_comparison_table = QtGui.QAction(parent=MainWindow)
+        self.actionCode_comparison_table.setObjectName("actionCode_comparison_table")
         self.menuOpen_Recent_Project.addAction(self.actionNone)
         self.menuExport.addAction(self.actionProject_Exchange_Export)
         self.menuExport.addAction(self.actionREFI_Codebook_export)
@@ -259,6 +261,7 @@ class Ui_MainWindow(object):
         self.menuReports.addAction(self.actionCoding_reports)
         self.menuReports.addAction(self.actionCoding_comparison)
         self.menuReports.addAction(self.actionCoding_comparison_by_file)
+        self.menuReports.addAction(self.actionCode_comparison_table)
         self.menuReports.addAction(self.actionCode_frequencies)
         self.menuReports.addAction(self.actionFile_summary)
         self.menuReports.addAction(self.actionCode_summary)
@@ -385,6 +388,7 @@ class Ui_MainWindow(object):
         self.actionText_segments_by_codes.setText(_translate("MainWindow", "Codes by text segments"))
         self.actionAI_assisted_coding.setText(_translate("MainWindow", "AI assisted coding"))
         self.actionCode_co_occurrence.setText(_translate("MainWindow", "Code co-occurrence"))
+        self.actionCode_comparison_table.setText(_translate("MainWindow", "Code comparison table"))
 
 
 if __name__ == "__main__":
