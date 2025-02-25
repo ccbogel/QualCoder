@@ -90,10 +90,6 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
 
         pass
 
-    def select_categories(self):
-        """  """
-        pass
-
     def select_files(self):
         """ Select files, stored in self.file_ids_names, then load data and fill table. """
 
@@ -253,17 +249,58 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
                 msg += f"{selected_code['name']}\n"
             Message(self.app, _("Codes selected"), msg).exec()
 
-        '''self.code_ids_str = ""
-        self.code_ids = []
-        #self.code_names_str = ""
-        self.code_names_list = []
-        for code_ in selected:
-            self.code_names_list.append(code_['name'])
-            #self.code_names_str += f"{code_['name']}|"
-            self.code_ids_str += f",{code_['cid']}"
-            self.code_ids.append(code_['cid'])
-        self.code_ids_str = self.code_ids_str[1:]'''
-        #self.process_files_data()
+    def select_categories(self):
+        """ TODO Select all codes in selected categories. """
+
+        selection_list = [{'id': -1, 'name': ''}]
+        codes, categories = self.app.get_codes_categories()
+        for category in categories:
+            selection_list.append(category)
+        ui = DialogSelectItems(self.app, selection_list, _("Select one category"), "single")
+        ok = ui.exec()
+        if not ok:
+            return
+        category = ui.get_selected()
+        self.codes = self.get_children_of_category(category)
+
+    def get_children_of_category(self, node):
+        """ Get child categories and codes of this category node.
+        Only keep the category or code name. Used to reposition TextGraphicsItems on moving a category.
+
+        param: node : Dictionary of category
+
+        return: child_codes : List of Dictionaries
+        """
+
+        child_names = []
+        codes, categories = self.app.get_codes_categories()
+
+        """ Create a list of this category (node) and all its category children.
+        Maximum depth of 200. """
+        selected_categories = [node]
+        i = 0  # Ensure an exit from loop
+        new_model_changed = True
+        while categories != [] and new_model_changed and i < 200:
+            new_model_changed = False
+            append_list = []
+            for n in selected_categories:
+                for m in categories:
+                    if m['supercatid'] == n['catid']:
+                        append_list.append(m)
+                        child_names.append(m['name'])
+            for n in append_list:
+                selected_categories.append(n)
+                categories.remove(n)
+                new_model_changed = True
+            i += 1
+        categories = selected_categories
+        # Remove codes that are not associated with these categories
+        selected_codes = []
+        for cat in categories:
+            for code in codes:
+                if code['catid'] == cat['catid']:
+                    selected_codes.append(code)
+        return selected_codes
 
     def export_to_excel(self):
         """ Export to Excel file. """
@@ -274,26 +311,30 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         if filepath is None:
             return
 
-        # Excel vertical and horizontal headers
-        header = []
+        # Excel row headers
+        row_header = []
         for code_ in self.codes:
             name_split_50 = [code_['name'][y - 50:y] for y in range(50, len(code_['name']) + 50, 50)]
             # header_labels.append(code_['name'])  # OLD, need line separators
-            header.append("\n".join(name_split_50))
+            row_header.append("\n".join(name_split_50))
         wb = openpyxl.Workbook()
         ws = wb.active
         ws.title = "Counts"
         wb.create_sheet("Details")
         ws2 = wb["Details"]
-        for col, col_name in enumerate(header):
+        for row, row_name in enumerate(row_header):
+            v_cell = ws.cell(row=row + 2, column=1)
+            v_cell.value = row_name
+            v_cell2 = ws2.cell(row=row + 2, column=1)
+            v_cell2.value = row_name
+
+        # Excel column headers
+        for col, file_ in enumerate(self.files):
             h_cell = ws.cell(row=1, column=col + 2)
-            h_cell.value = col_name
+            h_cell.value = file_['name']
             h_cell2 = ws2.cell(row=1, column=col + 2)
-            h_cell2.value = col_name
-            v_cell = ws.cell(row=col + 2, column=1)
-            v_cell.value = col_name
-            v_cell2 = ws2.cell(row=col + 2, column=1)
-            v_cell2.value = col_name
+            h_cell2.value = file_['name']
+
         # Co-occurrence counts
         for row, row_data in enumerate(self.data_counts):
             for col, col_data in enumerate(row_data):
