@@ -57,12 +57,15 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         self.ui.pushButton_select_files.pressed.connect(self.select_files)
         self.ui.pushButton_select_cases.setIcon(qta.icon('mdi6.briefcase-outline', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_select_cases.pressed.connect(self.select_cases)
+        self.ui.pushButton_select_cases.hide()  # TODO
         self.ui.pushButton_select_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_select_attributes.pressed.connect(self.select_attributes)
+        self.ui.pushButton_select_attributes.hide()  # TODO
         self.ui.pushButton_select_codes.setIcon(qta.icon('mdi6.text', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_select_codes.pressed.connect(self.select_codes)
         self.ui.pushButton_select_categories.setIcon(qta.icon('mdi6.file-tree', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_select_categories.pressed.connect(self.select_categories)
+        self.ui.pushButton_select_attributes.hide()  # TODO
         self.ui.checkBox_hide_blanks.stateChanged.connect(self.show_or_hide_empty_rows_and_cols)
         self.ui.listWidget.itemPressed.connect(self.show_list_item)
         #self.ui.listWidget.setSelectionMode()
@@ -80,7 +83,7 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         self.max_count = 0
         self.data_counts = []
         self.data_colors = []
-        self.data_list_widget = []   # Used with listed widget display and with sleected lis widget item
+        self.data_list_widget = []   # Used to transfer data from list widget item to DialogCodeIn...
 
     def select_attributes(self):
         """  """
@@ -113,11 +116,11 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
             Message(self.app, _("Files selected"), msg).exec()
 
         # Prep
-        print("Files\n", self.files)
+        '''print("Files\n", self.files)
 
         print("Codes\n")
         for c in self.codes:
-            print(c['cid'], c['name'])
+            print(c['cid'], c['name'])'''
 
         self.process_files_data()
 
@@ -197,7 +200,6 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
                 for res in results_av:
                     av_data.append(dict(zip(keys_av, res)))
 
-
                 result_length = len(results_text) + len(results_image) + len(results_av)
                 if result_length > self.max_count:
                     self.max_count = result_length
@@ -266,7 +268,7 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
     def export_to_excel(self):
         """ Export to Excel file. """
 
-        filename = "Code_comarisons.xlsx"
+        filename = "Code_comparisons.xlsx"
         export_dir = ExportDirectoryPathDialog(self.app, filename)
         filepath = export_dir.filepath
         if filepath is None:
@@ -298,20 +300,21 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
                 cell = ws.cell(row=row + 2, column=col + 2)
                 cell.value = col_data
                 # Details list
-                if self.data_details[row][col] == ".":
+                if self.data[row][col] == ".":
                     continue
                 details = ""
-                for data in self.data_details[row][col]:
-                    '''
-                    0 - 5 [r['cid0'], r['c0_name'], r['ctid0'], r['cid1'], r['c1_name'], r['ctid1'], 
-                    6 - 8 r['fid'], r['file_name'], r['owners'], 
-                    9 - 12 r['c0_pos0'], r['c0_pos1'], r['c1_pos0'], r['c1_pos1'],
-                    13 - 16 r['text_before'], r['text_overlap'], r['text_after'], r['relation']]
-                    '''
-                    details += f"Codes: {data[1]} ({data[9]} - {data[10]})| {data[4]} ({data[11]} - {data[12]})\n"
-                    details += f"Coders: {data[8]}. (ctid0: {data[2]} | ctid1: {data[5]})\n"
-                    details += f"File (fid {data[6]}): {data[7]}\n"
-                    details += f"{data[13]}[[{data[14]}]]{data[15]}\n========\n"
+                for data in self.data[row][col]:
+                    details += f"Code:{data['codename']} File/Case: {data['file_or_casename']}\n"
+                    if data['result_type'] == "text":
+                        details += f"Pos0: {data['pos0']} - Pos1: {data['pos1']}\n"
+                        details += f"{data['text']}"
+                    if data['result_type'] == "av":
+                        details += f"Pos0: {data['pos0']} - Pos1: {data['pos1']} msecs\n"
+                        details += f"Memo: {data['memo']}"
+                    if data['result_type'] == "image":
+                        details += f"X, Y: {data['x1']}, {data['y1']}. Width: {data['width']}. Height: {data['height']}\n"
+                        details += f"Memo: {data['memo']}"
+                    details += f"\n========\n"
                 d_cell = ws2.cell(row=row + 2, column=col + 2)
                 d_cell.value = details
 
@@ -339,7 +342,9 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         self.ui.tableWidget.setHorizontalHeaderLabels(column_header_labels)
         row_header = []
         for code_ in self.codes:
-            row_header.append(code_['name'])
+            # row_header.append(code_['name'])  # original
+            name_split_50 = [code_['name'][y - 50:y] for y in range(50, len(code_['name']) + 50, 50)]
+            row_header.append("\n".join(name_split_50))
         self.ui.tableWidget.setRowCount(len(row_header))
         self.ui.tableWidget.setVerticalHeaderLabels(row_header)
         for row, row_data in enumerate(self.data_counts):
@@ -395,7 +400,6 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         self.data_list_widget = self.data[row][col]
         self.ui.listWidget.clear()
         for row, data in enumerate(self.data_list_widget):
-            print("DATA", data)
             display = f"{data['file_or_casename']} | {data['codename']}\n"
             if data['result_type'] == "text":
                 display += f"{data['pos0']} - {data['pos1']}. Coder: {data['owner']}\n"
@@ -427,7 +431,6 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
             ui.exec()
 
 
-
     ''' TODO for future expansion maybe.
     def table_menu(self, position):
         """ Context menu for displaying table cell coding details.
@@ -442,300 +445,3 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         action_view = menu.addAction(_("View"))'''
 
-    # OLD
-    def calculate_relations(self, code_ids_str):
-        """ Calculate the relations for selected codes for all coders.
-        For codings in code_text only.
-
-        id1, id2, overlapindex, unionindex, distance, whichmin, whichmax, fid
-        relation is 1 character: Inclusion, Overlap, Exact, (Proximity - not used)
-        owners is a combination of: owner of ctid0 pipe owner of ctid1
-
-        Args:
-            code_ids_str (String): comma separated code ids
-        """
-
-        selected_relations = ['E', 'I', 'O']
-        if self.file_ids_names is None:
-            self.file_ids_names = self.app.get_text_filenames()
-
-        # Get codings for each selected text file
-        cur = self.app.conn.cursor()
-        for fid in self.file_ids_names:
-            sql = "select fid, code_text.cid, pos0, pos1, name, ctid,seltext, ifnull(code_text.memo,''), " \
-                  "code_text.owner from code_text " \
-                  "join code_name on code_name.cid=code_text.cid where fid=? " \
-                  "and code_text.cid in (" + code_ids_str + ") order by code_text.cid"
-            cur.execute(sql, [fid['id']])
-            result = cur.fetchall()
-            coded = [row for row in result if row[0] == fid['id']]
-
-            # Look at each code again other codes, when done remove from list of codes
-            cid = 1
-            pos0 = 2
-            pos1 = 3
-            name = 4
-            ctid = 5
-            seltext = 6
-            coded_memo = 7
-            owner = 8
-            while len(coded) > 0:
-                c0 = coded.pop()
-                for c1 in coded:
-                    if c0[cid] != c1[cid]:
-                        relation = self.relation(c0, c1)
-                        # Add extra details for output
-                        relation['c0_name'] = c0[name]
-                        relation['c1_name'] = c1[name]
-                        relation['fid'] = fid['id']
-                        relation['file_name'] = fid['name']
-                        relation['c0_pos0'] = c0[pos0]
-                        relation['c0_pos1'] = c0[pos1]
-                        relation['c1_pos0'] = c1[pos0]
-                        relation['c1_pos1'] = c1[pos1]
-                        relation['owners'] = f"{c0[owner]}|{c1[owner]}"
-                        relation['ctid0'] = c0[ctid]
-                        relation['ctid0_text'] = c0[seltext]
-                        relation['ctid1'] = c1[ctid]
-                        relation['ctid1_text'] = c1[seltext]
-                        relation['coded_memo0'] = c0[coded_memo]
-                        relation['coded_memo1'] = c1[coded_memo]
-                        # Append relation based on comboBox selection
-                        if relation['relation'] in selected_relations:
-                            self.result_relations.append(relation)
-
-    # OLD
-    def relation(self, c0, c1):
-        """ Relation function as in RQDA
-
-        whichmin is the code with the lowest pos0, or None if equal
-        whichmax is the code with the highest pos1 or None if equal
-        operlapindex is the combined lowest to the highest positions. Only used for E, O, P
-        unionindex is the lowest and highest positions of the union of overlap. Only used for E, O
-
-        Called by:
-            calculate_relations_for_coder_and_selected_codes
-
-        Returns:
-        id1, id2, overlapindex, unionindex, distance, whichmin, min, whichmax, max, fid
-        relation is 1 character: Inclusion, Overlap, Exact, Proximity
-        actual text as before, overlap, after
-        """
-
-        # fid = 0
-        cid = 1
-        pos0 = 2
-        pos1 = 3
-        result = {"cid0": c0[cid], "cid1": c1[cid], "relation": "", "whichmin": None, "min": 0,
-                  "whichmax": None, "max": 0, "overlapindex": None, "unionindex": None, "distance": None,
-                  "text_before": "", "text_overlap": "", "text_after": ""}
-
-        cur = self.app.conn.cursor()
-
-        # Which min
-        if c0[pos0] < c1[pos0]:
-            result['whichmin'] = c0[cid]
-            result['min'] = c0[pos0]
-        if c1[pos0] < c0[pos0]:
-            result['whichmin'] = c1[cid]
-            result['min'] = c1[pos0]
-
-        # Which max
-        if c0[pos1] > c1[pos1]:
-            result['whichmax'] = c0[cid]
-            result['max'] = c0[pos1]
-        if c1[pos1] > c0[pos1]:
-            result['whichmax'] = c1[cid]
-            result['max'] = c1[pos1]
-
-        # Check for Exact
-        if c0[pos0] == c1[pos0] and c0[pos1] == c1[pos1]:
-            result['relation'] = "E"
-            result['overlapindex'] = [c0[pos0], c0[pos1]]
-            result['unionindex'] = [c0[pos0], c0[pos1]]
-            cur.execute("select substr(fulltext,?,?) from source where source.id=?",
-                        [c0[pos0] + 1, c0[pos1] - c0[pos0], c0[0]])
-            txt = cur.fetchone()
-            if txt is not None:
-                result['text_overlap'] = txt[0]
-                result['text_before'] = ""
-                result['text_after'] = ""
-                result['distance'] = 0
-            return result
-
-        # Check for Proximity
-        if c0[pos1] < c1[pos0]:
-            result['relation'] = "P"
-            result['distance'] = c1[pos0] - c0[pos1]
-            result['text_overlap'] = ""
-            result['text_before'] = ""
-            result['text_after'] = ""
-            return result
-        if c0[pos0] > c1[pos1]:
-            result['relation'] = "P"
-            result['distance'] = c0[pos0] - c1[pos1]
-            result['text_overlap'] = ""
-            result['text_before'] = ""
-            result['text_after'] = ""
-            return result
-
-        # Check for Inclusion
-        # Exact has been resolved above
-        # c0 inside c1
-        if c0[pos0] >= c1[pos0] and c0[pos1] <= c1[pos1]:
-            result['relation'] = "I"
-            result['overlapindex'] = [c0[pos0], c0[pos1]]
-            result['unionindex'] = [c0[pos0], c0[pos1]]
-            cur.execute("select substr(fulltext,?,?) from source where source.id=?",
-                        [c0[pos0] + 1, c0[pos1] - c0[pos0], c0[0]])
-            txt = cur.fetchone()
-            if txt is not None:
-                result['text_overlap'] = txt[0]
-            cur.execute("select substr(fulltext,?,?) from source where source.id=?",
-                        [c1[pos0] + 1, c0[pos0] - c1[pos0], c0[0]])
-            txt_before = cur.fetchone()
-            if txt_before is not None:
-                result['text_before'] = txt_before[0]
-            cur.execute("select substr(fulltext,?,?) from source where source.id=?",
-                        [c0[pos1] + 1, c1[pos1] - c0[pos1], c0[0]])
-            txt_after = cur.fetchone()
-            if txt_after is not None:
-                result['text_after'] = txt_after[0]
-            result['distance'] = 0
-            return result
-
-        # c1 inside c0
-        if c1[pos0] >= c0[pos0] and c1[pos1] <= c0[pos1]:
-            result['relation'] = "I"
-            result['overlapindex'] = [c1[pos0], c1[pos1]]
-            result['unionindex'] = [c1[pos0], c1[pos1]]
-            cur.execute("select substr(fulltext,?,?) from source where source.id=?",
-                        [c1[pos0] + 1, c1[pos1] - c1[pos0], c0[0]])
-            txt = cur.fetchone()
-            if txt is not None:
-                result['text_overlap'] = txt[0]
-            cur.execute("select substr(fulltext,?,?) from source where source.id=?",
-                        [c0[pos0] + 1, c1[pos0] - c0[pos0], c0[0]])
-            txt_before = cur.fetchone()
-            if txt_before is not None:
-                result['text_before'] = txt_before[0]
-            cur.execute("select substr(fulltext,?,?) from source where source.id=?",
-                        [c1[pos1] + 1, c0[pos1] - c1[pos1], c0[0]])
-            txt_after = cur.fetchone()
-            if txt_after is not None:
-                result['text_after'] = txt_after[0]
-            result['distance'] = 0
-            return result
-
-        # Check for Overlap
-        # Should be all that is remaining
-        # c0 overlaps on the right side, left side is not overlapping
-        if c0[pos0] < c1[pos0] and c0[pos1] < c1[pos1]:
-            '''print("c0 overlaps on the right side, left side is not overlapping")
-            print("c0", c0)
-            print("C1", c1)'''
-            result['relation'] = "O"
-            # Reorder lowest to highest
-            result['overlapindex'] = sorted([c0[pos0], c1[pos1]])
-            result['unionindex'] = sorted([c0[pos1], c1[pos0]])
-            overlap_length = result['unionindex'][1] - result['unionindex'][0]
-            cur.execute("select substr(fulltext,?,?) from source where source.id=?",
-                        [c1[pos0] + 1, overlap_length, c0[0]])
-            txt = cur.fetchone()
-            if txt is not None:
-                result['text_overlap'] = txt[0]
-            cur.execute("select substr(fulltext,?,?) from source where source.id=?",
-                        [c0[pos0] + 1, c1[pos0] - c0[pos0], c0[0]])
-            txt_before = cur.fetchone()
-            if txt_before is not None:
-                result['text_before'] = txt_before[0]
-            cur.execute("select substr(fulltext,?,?) from source where source.id=?",
-                        [c0[pos1] + 1, c1[pos1] - c0[pos1], c0[0]])
-            txt_after = cur.fetchone()
-            if txt_after is not None:
-                result['text_after'] = txt_after[0]
-            result['distance'] = 0
-            return result
-
-        # c1 overlaps on the right side, left side is not overlapping
-        if c1[pos0] < c0[pos0] and c1[pos1] < c0[pos1]:
-            result['relation'] = "O"
-            result['overlapindex'] = sorted([c1[pos0], c0[pos1]])
-            result['unionindex'] = sorted([c1[pos1], c0[pos0]])
-            overlap_length = result['unionindex'][1] - result['unionindex'][0]
-            '''print("TODO c1 overlaps on the right, the left side is not overlapping")
-            print("C0", c0)
-            print("C1", c1)'''
-            cur.execute("select substr(fulltext,?,?) from source where source.id=?",
-                        [c0[pos0] + 1, overlap_length, c0[0]])
-            txt = cur.fetchone()
-            if txt is not None:
-                result['text_overlap'] = txt[0]
-            cur.execute("select substr(fulltext,?,?) from source where source.id=?",
-                        [c1[pos0] + 1, c0[pos0] - c1[pos0], c0[0]])
-            txt_before = cur.fetchone()
-            if txt_before is not None:
-                result['text_before'] = txt_before[0]
-            cur.execute("select substr(fulltext,?,?) from source where source.id=?",
-                        [c1[pos1] + 1, c0[pos1] - c1[pos1], c0[0]])
-            txt_after = cur.fetchone()
-            if txt_after is not None:
-                result['text_after'] = txt_after[0]
-            result['distance'] = 0
-            return result
-
-    # OLD
-    def process_data(self):
-        """ Calculate the relations for selected codes for ALL coders (or only THIS coder - TODO).
-        For text codings only. """
-
-        # OLD
-        return
-
-        self.ui.checkBox_hide_blanks.setChecked(False)
-        self.ui.splitter.setSizes([500, 0])
-
-        self.result_relations = []
-        self.calculate_relations(self.code_ids_str)
-
-        # Create data matrices zeroed, codes are ordered alphabetically by name
-        self.data_counts = []
-        self.data_colors = []
-        self.data_details = []
-        for row in self.codes:
-            self.data_counts.append([0] * len(self.codes))
-            self.data_colors.append([""] * len(self.codes))
-            self.data_details.append(["."] * len(self.codes))
-
-        '''print("Data details")
-        for r in self.data_details:
-            print(r)'''
-
-        self.max_count = 0
-        for r in self.result_relations:
-            row_pos = self.code_names_list.index(r['c0_name'])
-            col_pos = self.code_names_list.index(r['c1_name'])
-            self.data_counts[row_pos][col_pos] += 1
-            if self.data_counts[row_pos][col_pos] > self.max_count:
-                self.max_count = self.data_counts[row_pos][col_pos]
-            '''print(r['cid0'], r['c0_name'], r['ctid0'], r['cid1'], r['c1_name'], r['ctid1'], r['fid'], r['file_name'],
-                  r['owners'], r['c0_pos0'], r['c0_pos1'], r['c1_pos0'], r['c1_pos1'])'''
-            res_list = [r['cid0'], r['c0_name'], r['ctid0'], r['cid1'], r['c1_name'], r['ctid1'], r['fid'],
-                        r['file_name'], r['owners'], r['c0_pos0'], r['c0_pos1'], r['c1_pos0'], r['c1_pos1'],
-                        r['text_before'], r['text_overlap'], r['text_after'], r['relation']]
-            if self.data_details[row_pos][col_pos] == ".":
-                self.data_details[row_pos][col_pos] = [res_list]
-            else:
-                self.data_details[row_pos][col_pos].append(res_list)
-
-        # Color heat map for spread across 5 colours
-        colors = ["#F8E0E0", "#F6CECE", "#F5A9A9", "#F78181", "#FA5858"]  # light to dark red
-        for row, row_data in enumerate(self.data_counts):
-            for col, item_data in enumerate(row_data):
-                if self.data_counts[row][col] > 0:
-                    color_range_index = int(self.data_counts[row][col] / self.max_count * 5) - 1
-                    if color_range_index < 0:
-                        color_range_index = 0
-                    self.data_colors[row][col] = colors[color_range_index]
-
-        self.fill_table()
