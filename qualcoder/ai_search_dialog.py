@@ -353,7 +353,7 @@ class DialogAiSearch(QtWidgets.QDialog):
         # Clear ui
         self.attribute_file_ids = []
         self.ui.label_attributes.setText('')
-        self.ui.splitter.setSizes([300, 300, 0])  # Unresolved attribute refernce: splitter
+        # self.ui.splitter.setSizes([300, 300, 0])  # Unresolved attribute refernce: splitter
         # Remove any selected case or file ids
         self.file_ids = ""
         for i in range(self.ui.listWidget_files.count()):
