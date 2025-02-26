@@ -249,9 +249,9 @@ To install from source code below, inside a virtual environment. If you are usin
 
 **Usage:**
 
-`source env_qc/bin/activate`
-
 `cd QualCoder`
+
+`source env_qc/bin/activate`
 
 `python3.12 -m qualcoder`
 
