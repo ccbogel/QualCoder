@@ -57,7 +57,7 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         self.ui.pushButton_select_files.pressed.connect(self.select_files)
         self.ui.pushButton_select_cases.setIcon(qta.icon('mdi6.briefcase-outline', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_select_cases.pressed.connect(self.select_cases)
-        self.ui.pushButton_select_cases.hide()  # TODO
+        self.ui.pushButton_select_cases.hide()  # TODO underway
         self.ui.pushButton_select_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_select_attributes.pressed.connect(self.select_attributes)
         self.ui.pushButton_select_attributes.hide()  # TODO
@@ -110,14 +110,6 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
             for item in self.files:
                 msg += f"{item['name']}\n"
             Message(self.app, _("Files selected"), msg).exec()
-
-        # Prep
-        '''print("Files\n", self.files)
-
-        print("Codes\n")
-        for c in self.codes:
-            print(c['cid'], c['name'])'''
-
         self.process_files_data()
 
     def process_files_data(self):
@@ -132,7 +124,6 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         For DialogCodeInImage
                 dictionary {codename, color, file_or_casename, x1, y1, width, height, coder,
                  mediapath, fid, memo, file_or_case}
-
         """
 
         self.ui.checkBox_hide_blanks.setChecked(False)
@@ -222,8 +213,20 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         self.fill_table(self.files)
 
     def select_cases(self):
-        """  """
-        pass
+        """ Select cases to display relevant files. """
+
+        cases = self.app.get_casenames()
+        selection_list = [{'id': -1, 'name': ''}]
+        for case in cases:
+            selection_list.append(case)
+        ui = DialogSelectItems(self.app, selection_list, _("Select cases"), "multi")
+        ok = ui.exec()
+        if not ok:
+            return
+        selected = ui.get_selected()
+        # Tmp
+        for s in selected:
+            print(s)
 
     def select_codes(self):
         """ Select codes. """
@@ -250,7 +253,7 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
             Message(self.app, _("Codes selected"), msg).exec()
 
     def select_categories(self):
-        """ TODO Select all codes in selected categories. """
+        """ Select all codes in selected categories. """
 
         selection_list = [{'id': -1, 'name': ''}]
         codes, categories = self.app.get_codes_categories()
@@ -262,6 +265,8 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
             return
         category = ui.get_selected()
         self.codes = self.get_children_of_category(category)
+        for code_ in self.codes:
+            code_['name'] = f"{category['name']}:\n{code_['name']}"
 
     def get_children_of_category(self, node):
         """ Get child categories and codes of this category node.
