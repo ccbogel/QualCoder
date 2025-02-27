@@ -39,9 +39,6 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
     """ Provide a co-occurrence report.
     """
 
-    app = None
-    parent_tetEdit = None
-
     def __init__(self, app, parent_text_edit):
         self.app = app
         self.parent_textEdit = parent_text_edit
@@ -57,15 +54,13 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         self.ui.pushButton_select_files.pressed.connect(self.select_files)
         self.ui.pushButton_select_cases.setIcon(qta.icon('mdi6.briefcase-outline', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_select_cases.pressed.connect(self.select_cases)
-        # self.ui.pushButton_select_cases.hide()  # TODO underway
         self.ui.pushButton_select_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_select_attributes.pressed.connect(self.select_attributes)
-        self.ui.pushButton_select_attributes.hide()  # TODO
+        self.ui.label_arrow.setPixmap(qta.icon('mdi6.arrow-right').pixmap(24, 24))
         self.ui.pushButton_select_codes.setIcon(qta.icon('mdi6.text', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_select_codes.pressed.connect(self.select_codes)
         self.ui.pushButton_select_categories.setIcon(qta.icon('mdi6.file-tree', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_select_categories.pressed.connect(self.select_categories)
-        self.ui.pushButton_select_attributes.hide()  # TODO
         self.ui.checkBox_hide_blanks.stateChanged.connect(self.show_or_hide_empty_rows_and_cols)
         self.ui.listWidget.itemPressed.connect(self.show_list_item)
         #self.ui.listWidget.setSelectionMode()
@@ -85,10 +80,20 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         self.data_colors = []
         self.data_list_widget = []   # Used to transfer data from list widget item to DialogCodeIn...
 
+    def clear_table_and_data(self):
+        self.data = []
+        self.max_count = 0
+        self.data_counts = []
+        self.data_colors = []
+        self.data_list_widget = []   # Used to transfer data from list widget item to DialogCodeIn...
+        self.ui.tableWidget.setRowCount(0)
+        self.ui.tableWidget.setColumnCount(0)
+        self.ui.listWidget.clear()
+
     def select_attributes(self):
         """  """
 
-        pass
+        Message(self.app,"TODO","Work in progress").exec()
 
     def select_files(self):
         """ Select files, stored in self.file_ids_names, then load data and fill table. """
@@ -194,12 +199,6 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
 
                 self.data[row][col] = text_data + image_data + av_data
 
-        '''print("===============")
-        print("Data counts POST")
-        for r in self.data_counts:
-            print(r)
-        print("===============")'''
-
         # Color heat map for spread across 5 colours
         colors = ["#F8E0E0", "#F6CECE", "#F5A9A9", "#F78181", "#FA5858"]  # light to dark red
         for row, row_data in enumerate(self.data_counts):
@@ -209,7 +208,6 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
                     if color_range_index < 0:
                         color_range_index = 0
                     self.data_colors[row][col] = colors[color_range_index]
-
         self.fill_table(self.files)
 
     def select_cases(self):
@@ -240,12 +238,7 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         msg = f"Selection\nCases: {len(cases)}. Files: {len(self.files)}"
         Message(self.app, _("Selection"), msg).exec()
         if not self.files:
-            self.ui.tableWidget.setRowCount(0)
-            self.ui.tableWidget.setColumnCount(0)
-            self.ui.listWidget.clear()
-            self.data = []
-            self.data_colors = []
-            self.data_counts = []
+            self.clear_table_and_data()
             return
         self.process_files_data()
 
@@ -272,6 +265,7 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
                 self.codes.append(selected_code)
                 msg += f"{selected_code['name']}\n"
             Message(self.app, _("Codes selected"), msg).exec()
+        self.clear_table_and_data()
 
     def select_categories(self):
         """ Select all codes in selected categories. """
@@ -288,14 +282,17 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         self.codes = self.get_children_of_category(category)
         for code_ in self.codes:
             code_['name'] = f"{category['name']}:\n{code_['name']}"
+        self.clear_table_and_data()
 
     def get_children_of_category(self, node):
         """ Get child categories and codes of this category node.
         Only keep the category or code name. Used to reposition TextGraphicsItems on moving a category.
 
-        param: node : Dictionary of category
+        Args:
+             node : Dictionary of category
 
-        return: child_codes : List of Dictionaries
+        Returns:
+             child_codes : List of Dictionaries
         """
 
         child_names = []
@@ -395,8 +392,8 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         header columns can be files, or ... MORE ?
         using self.data
 
-        args:
-            header: List of dictionary containing 'name'
+        Args:
+            column_header: List of dictionary items containing 'name' for the table columns header
         """
 
         rows = self.ui.tableWidget.rowCount()
