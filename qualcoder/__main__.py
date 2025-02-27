@@ -303,6 +303,10 @@ class App(object):
         return memo
 
     def get_category_names(self):
+        """
+        Returns:
+            List of dictionaries of catid, name memo, date, supercatid, owner
+        """
         cur = self.conn.cursor()
         cur.execute("select name, ifnull(memo,''), owner, date, catid, supercatid from code_cat order by lower(name)")
         result = cur.fetchall()
@@ -313,6 +317,11 @@ class App(object):
         return res
 
     def get_code_names(self):
+        """
+        Returns:
+            List of dictionaries of cid, name memo, date, catid, color, owner
+        """
+
         cur = self.conn.cursor()
         cur.execute("select name, ifnull(memo,''), owner, date, cid, catid, color from code_name order by lower(name)")
         result = cur.fetchall()
@@ -323,7 +332,12 @@ class App(object):
         return res
 
     def get_filenames(self):
-        """ Get all filenames. As id, name, memo """
+        """ Get all filenames. As id, name, memo
+
+        Returns:
+            List of dictionaries of id, name memo, mediapath
+        """
+
         cur = self.conn.cursor()
         cur.execute("select id, name, ifnull(memo,'') from source order by lower(name)")
         result = cur.fetchall()
@@ -333,7 +347,11 @@ class App(object):
         return res
 
     def get_casenames(self):
-        """ Get all case names. As id, name, memo. """
+        """ Get all case names. As id, name, memo.
+        Returns:
+            List of dictionaries of name memo, id
+        """
+
         cur = self.conn.cursor()
         cur.execute("select caseid, name, ifnull(memo,'') from cases order by lower(name)")
         result = cur.fetchall()
@@ -344,8 +362,13 @@ class App(object):
 
     def get_text_filenames(self, ids=None):
         """ Get filenames, id, memo and mediapath of text files.
-        param:
-            ids: list of Integer ids for a restricted list of files. """
+
+        Args:
+            ids: list of Integer ids for a restricted list of files.
+
+        Returns:
+            List of dictionaries of id, name memo, mediapath
+        """
 
         if ids is None:
             ids = []
@@ -419,8 +442,11 @@ class App(object):
 
     def get_pdf_filenames(self, ids=None):
         """ Get id, filenames, memo and mediapath of pdf text files.
-        param:
-            ids: list of Integer ids for a restricted list of files. """
+        Args:
+            ids: list of Integer ids for a restricted list of files.
+        Returns:
+            List of dictionaries of id, name memo, mediapath
+        """
 
         if ids is None:
             ids = []
@@ -441,8 +467,11 @@ class App(object):
 
     def get_image_filenames(self, ids=None):
         """ Get filenames of image files only.
-        param:
-            ids: list of Integer ids for a restricted list of files. """
+        Args:
+            ids: list of Integer ids for a restricted list of files.
+        Returns:
+            List of dictionaries of id, name, memo
+        """
 
         if ids is None:
             ids = []
@@ -461,8 +490,11 @@ class App(object):
 
     def get_av_filenames(self, ids=None):
         """ Get filenames of audio video files only.
-        param:
-            ids: list of Integer ids for a restricted list of files. """
+        Args:
+            ids: list of Integer ids for a restricted list of files.
+        Returns:
+            List of dictionaries of id, name, memo
+        """
 
         if ids is None:
             ids = []
@@ -481,7 +513,10 @@ class App(object):
         return res
 
     def get_annotations(self):
-        """ Get annotations for text files. """
+        """ Get annotations for text files.
+        Returns:
+            List of dictionaries of anid, fid, memo, date, pos0, pos1, owner
+        """
 
         cur = self.conn.cursor()
         cur.execute("select anid, fid, pos0, pos1, memo, owner, date from annotation where owner=?",
@@ -495,7 +530,11 @@ class App(object):
 
     def get_codes_categories(self):
         """ Gets all the codes, categories.
-        Called from code_text, code_av, code_image, reports, report_relations """
+        Called from code_text, code_av, code_image, reports, report_relations.
+        Returns:
+            List of dictionaries of Codes cid, name, memo, date, catid, color, owner
+            List of dictionaries of Categories catid, name, memo, date, supercatid, owner
+        """
 
         cur = self.conn.cursor()
         categories = []

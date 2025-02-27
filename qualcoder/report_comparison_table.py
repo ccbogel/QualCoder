@@ -57,7 +57,7 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         self.ui.pushButton_select_files.pressed.connect(self.select_files)
         self.ui.pushButton_select_cases.setIcon(qta.icon('mdi6.briefcase-outline', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_select_cases.pressed.connect(self.select_cases)
-        self.ui.pushButton_select_cases.hide()  # TODO underway
+        # self.ui.pushButton_select_cases.hide()  # TODO underway
         self.ui.pushButton_select_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_select_attributes.pressed.connect(self.select_attributes)
         self.ui.pushButton_select_attributes.hide()  # TODO
@@ -224,9 +224,30 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         if not ok:
             return
         selected = ui.get_selected()
-        # Tmp
-        for s in selected:
-            print(s)
+        if selected and selected[0]['name'] != '':
+            cases = []
+            for item in selected:
+                cases.append(item)
+        self.files = []
+        cur = self.app.conn.cursor()
+        sql = "select case_text.fid, source.name, source.memo from case_text " \
+              "join source on source.id=case_text.fid where case_text.caseid=?"
+        for case in cases:
+            cur.execute(sql, [case['id']])
+            res = cur.fetchall()
+            for r in res:
+                self.files.append({'id': r[0], 'name': f"{case['name']}\n{r[1]}", 'memo': r[2]})
+        msg = f"Selection\nCases: {len(cases)}. Files: {len(self.files)}"
+        Message(self.app, _("Selection"), msg).exec()
+        if not self.files:
+            self.ui.tableWidget.setRowCount(0)
+            self.ui.tableWidget.setColumnCount(0)
+            self.ui.listWidget.clear()
+            self.data = []
+            self.data_colors = []
+            self.data_counts = []
+            return
+        self.process_files_data()
 
     def select_codes(self):
         """ Select codes. """
