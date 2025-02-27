@@ -74,7 +74,7 @@
      <widget class="QPushButton" name="pushButton_export">
       <property name="geometry">
        <rect>
-        <x>470</x>
+        <x>520</x>
         <y>1</y>
         <width>32</width>
         <height>32</height>
@@ -115,7 +115,7 @@
      <widget class="QPushButton" name="pushButton_select_files">
       <property name="geometry">
        <rect>
-        <x>240</x>
+        <x>350</x>
         <y>1</y>
         <width>32</width>
         <height>32</height>
@@ -143,7 +143,7 @@
      <widget class="QPushButton" name="pushButton_select_categories">
       <property name="geometry">
        <rect>
-        <x>400</x>
+        <x>270</x>
         <y>1</y>
         <width>32</width>
         <height>32</height>
@@ -171,7 +171,7 @@
      <widget class="QPushButton" name="pushButton_select_codes">
       <property name="geometry">
        <rect>
-        <x>320</x>
+        <x>230</x>
         <y>1</y>
         <width>32</width>
         <height>32</height>
@@ -199,7 +199,7 @@
      <widget class="QPushButton" name="pushButton_select_attributes">
       <property name="geometry">
        <rect>
-        <x>360</x>
+        <x>430</x>
         <y>1</y>
         <width>32</width>
         <height>32</height>
@@ -227,7 +227,7 @@
      <widget class="QPushButton" name="pushButton_select_cases">
       <property name="geometry">
        <rect>
-        <x>280</x>
+        <x>390</x>
         <y>1</y>
         <width>32</width>
         <height>32</height>
@@ -247,6 +247,19 @@
       </property>
       <property name="toolTip">
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select cases&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_arrow">
+      <property name="geometry">
+       <rect>
+        <x>310</x>
+        <y>1</y>
+        <width>30</width>
+        <height>30</height>
+       </rect>
       </property>
       <property name="text">
        <string/>
