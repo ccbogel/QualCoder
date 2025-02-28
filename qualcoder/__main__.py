@@ -823,7 +823,6 @@ university, ORCID, GitHub, or Google account.""",
         QMenu::item:disabled {color: #707070;}\n\
         QPushButton {background-color: #858585;}\n\
         QPushButton:hover {border: 2px solid #ffaa00;}\n\
-        QPushButton::icon {color: #FFFFFF;}\n\
         QRadioButton::indicator {border: 1px solid #858585; background-color: #2a2a2a;}\n\
         QRadioButton::indicator::checked {border: 2px solid #858585; background-color: orange;}\n\
         QSlider::handle:horizontal {background-color: #f89407;}\n\
@@ -975,6 +974,7 @@ university, ORCID, GitHub, or Google account.""",
     @property
     def default_settings(self):
         """ Standard Settings for config.ini file. """
+
         return {
             'backup_num': 5,
             'codername': 'default',
@@ -1051,8 +1051,10 @@ university, ORCID, GitHub, or Google account.""",
     def get_file_texts(self, file_ids=None):
         """ Get the texts of all text files as a list of dictionaries.
         Called by DialogCodeText.search_for_text
-        param:
+        Args:
             fileids - a list of fileids or None
+        Returns:
+            List of Dictionaries of file details
         """
 
         cur = self.conn.cursor()
@@ -1073,8 +1075,10 @@ university, ORCID, GitHub, or Google account.""",
     def get_pdf_file_texts(self, file_ids=None):
         """ Get the texts of all text files as a list of dictionaries.
         Called by DialogCodePdf.search_for_text
-        param:
+        Args:
             fileids - a list of fileids or None
+        Returns:
+            List of Dictionaries of pdf file details
         """
 
         cur = self.conn.cursor()
@@ -1099,8 +1103,10 @@ university, ORCID, GitHub, or Google account.""",
     def get_journal_texts(self, journal_ids=None):
         """ Get the texts of all journals as a list of dictionaries.
         Called by DialogJournals.search_for_text
-        param:
-            jids - a list of jids or None
+        Args:
+            jids - a list of journal jids or None
+        Returns:
+            List of Dictironaries of journal data
         """
 
         cur = self.conn.cursor()
@@ -1122,6 +1128,9 @@ university, ORCID, GitHub, or Google account.""",
         Design flaw is that current codername is not stored in a specific table in Database Versions 1 to 4.
         Coder name is stored in Database version 5.
         Current coder name is in position 0.
+
+        Returns:
+            List of String coder names
         """
 
         # Try except, as there may not be an open project, and might be an older <= v4 database
@@ -1152,8 +1161,11 @@ university, ORCID, GitHub, or Google account.""",
         """ Save a date and hours stamped backup.
         Do not back up if the name already exists.
         A backup can be generated in the subsequent hour.
-        params:
+        Args:
             suffix : String to add to end of backup name. Use this for special ops
+        Returns:
+            msg: String: for textedit display
+            backup: String: full project path for backup
         """
 
         nowdate = datetime.datetime.now().astimezone().strftime("%Y%m%d_%H")  # -%S")
@@ -1543,6 +1555,7 @@ Click "Yes" to start now.')
 
     def keyPressEvent(self, event):
         """ Used to open top level menus. """
+
         key = event.key()
         mods = QtWidgets.QApplication.keyboardModifiers()
         if mods & QtCore.Qt.KeyboardModifier.AltModifier and key == QtCore.Qt.Key.Key_1:
@@ -1560,8 +1573,8 @@ Click "Yes" to start now.')
         """ Display general settings and project summary """
 
         self.ui.textEdit.append("<h1>" + _("Settings") + "</h1>")
-        msg = _("Coder") + ": " + self.app.settings['codername'] + "\n"
-        msg += _("Font") + ": " + f"{self.app.settings['font']} {self.app.settings['fontsize']}\n"
+        msg = _("Coder") + f": {self.app.settings['codername']}\n"
+        msg += _("Font") + f": {self.app.settings['font']} {self.app.settings['fontsize']}\n"
         msg += _("Tree font size") + f": {self.app.settings['treefontsize']}\n"
         msg += _("Working directory") + f": {self.app.settings['directory']}\n"
         msg += _("Show IDs") + f": {self.app.settings['showids']}\n"
@@ -1576,7 +1589,7 @@ Click "Yes" to start now.')
             msg += _("AI integration is enabled") + "\n"
         else:
             msg += _("AI integration is disabled") + "\n"
-        msg += _("Style") + "; " + self.app.settings['stylesheet']
+        msg += _("Style") + f"; {self.app.settings['stylesheet']}"
         if platform.system() == "Windows":
             msg += "\n" + _("Directory (folder) paths / represents \\")
         self.ui.textEdit.append(msg)
@@ -1925,8 +1938,7 @@ Click "Yes" to start now.')
                 contents.addWidget(ui)
 
     def codebook(self):
-        """ Export a text file code book of categories and codes.
-        """
+        """ Export a text file code book of categories and codes. """
 
         Codebook(self.app, self.ui.textEdit)
 
@@ -1963,7 +1975,7 @@ Click "Yes" to start now.')
         Follows the REFI standard.
         CURRENTLY IN TESTING AND NOT COMPLETE NOR VALIDATED.
          NEED TO TEST RELATIVE EXPORTS, TIMESTAMPS AND TRANSCRIPTION
-         """
+        """
 
         self.close_project()
         self.ui.textEdit.append(_("IMPORTING REFI-QDA PROJECT"))
@@ -1989,7 +2001,7 @@ Click "Yes" to start now.')
             "Step 1: You will be asked for a new QualCoder project name.\nStep 2: You will be asked for the RQDA file.")
         Message(self.app, _('RQDA import steps'), msg).exec()
         self.new_project()
-        # check project created successfully
+        # Check project created successfully
         if self.app.project_name == "":
             Message(self.app, _('Project creation'), _("Project not successfully created"), "critical").exec()
             return
@@ -2348,7 +2360,7 @@ Click "Yes" to start now.')
                 self.heartbeat_worker.stop()
                 if wait:
                     self.heartbeat_thread.wait()  # Wait for the thread to properly finish
-            except Exception as e_:  # TODO determine actual exception
+            except Exception as e_:  # TODO determine actual exceptions
                 print(e_)
                 logger.debug(e_)
         self.delete_lock_file()
@@ -2900,11 +2912,11 @@ Click "Yes" to start now.')
         self.ui.textEdit.append(_('AI: Setup Wizard finished'))
         
     def ai_settings(self):
-        """Action triggered by AI Settings menu item."""
+        """ Action triggered by AI Settings menu item."""
         self.change_settings(section='AI')
 
     def ai_rebuild_memory(self):
-        """Action triggered by AI Rebuild Internal Memory menu item."""
+        """ Action triggered by AI Rebuild Internal Memory menu item."""
         if self.app.settings['ai_enable'] != 'True':
             msg = _('Please enable the AI first and set it in Settings.')
             Message(self.app, _('Rebuild AI Memory'), msg).exec() 
@@ -2926,11 +2938,11 @@ Click "Yes" to start now.')
             self.app.ai.sources_vectorstore.init_vectorstore(rebuild=True)
     
     def ai_prompts(self):
-        """Action triggered by AI Prompts menu item."""
+        """ Action triggered by AI Prompts menu item."""
         DialogAiEditPrompts(self.app).exec()
 
     def ai_go_chat(self):
-        """Action triggered by AI Chat menu item."""
+        """ Action triggered by AI Chat menu item."""
         if self.app.settings['ai_enable'] != 'True':
             msg = _('Please enable the AI first and set it up in Settings.')
             Message(self.app, _('Ai Chat'), msg).exec() 
@@ -2938,7 +2950,7 @@ Click "Yes" to start now.')
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_ai_chat) 
 
     def ai_go_search(self):
-        """Action triggered by AI Search and Coding menu item."""
+        """ Action triggered by AI Search and Coding menu item."""
         if self.app.settings['ai_enable'] != 'True':
             msg = _('Please enable the AI first and set it up in Settings.')
             Message(self.app, _('Rebuild AI Memory'), msg).exec() 
