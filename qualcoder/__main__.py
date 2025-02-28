@@ -852,13 +852,14 @@ university, ORCID, GitHub, or Google account.""",
         style_dark = style_dark.replace("QTreeWidget {font-size: 12",
                                         "QTreeWidget {font-size: " + str(settings.get('treefontsize')))
         style = "* {font-size: 12px; color: #000000;}\n\
-        QWidget {background-color: #efefef; color: #000000; border: none;}\n\
+        QWidget {color: #000000; border: none;}\n\
         QWidget:focus {border: 1px solid #f89407;}\n\
-        QDialog {border: 1px solid #808080;}\n\
+        QMainWindow {background-color: #efefef}\n\
+        QDialog {border: 1px solid #808080; background-color: #efefef;}\n\
         QFileDialog {font-size: 12px}\n\
         QComboBox {border: 1px solid #707070; background-color: #fafafa;}\n\
         QComboBox:hover,QPushButton:hover {border: 2px solid #f89407;}\n\
-        QGroupBox {border-right: 1px solid #707070; border-bottom: 1px solid #707070;}\n\
+        QGroupBox {border-right: 1px solid #707070; border-bottom: 1px solid #707070; background-color: #efefef}\n\
         QGroupBox:focus {border: 3px solid #f89407;}\n\
         QPushButton {border-style: outset; border-width: 2px; border-radius: 2px; border-color: beige; padding: 2px;}\n\
         QPushButton:pressed {border-style: inset; background-color: white;}\n\
@@ -878,12 +879,12 @@ university, ORCID, GitHub, or Google account.""",
         QSplitter::handle:horizontal:hover {background-color: red;}\n\
         QSplitter::handle:vertical:hover {background-color: red;}\n\
         QSplitter::handle:pressed {background-color: red;}\n\
-        QTableWidget {border: 1px solid #f89407; gridline-color: #707070;}\n\
+        QTableWidget {border: 1px solid #f89407; gridline-color: #707070}\n\
         QTableWidget:focus {border: 3px solid #f89407;}\n\
         QTabBar {border: 2px solid #808080;}\n\
         QTabBar::tab {background-color: #f9f9f9; border-top: #f9f9f9 4px solid; padding-left: 6px; padding-right: 6px;}\n\
         QTabBar::tab:selected {background-color: #f9f9f9; border-top: 3px solid #f89407; border-bottom: 3px solid #f89407;}\n\
-        QTabWidget {border: none;}\n\
+        QTabWidget {border: none}\n\
         QTextEdit {background-color: #fcfcfc; selection-color: #ffffff; selection-background-color:#000000;}\n\
         QTextEdit:focus {border: 2px solid #f89407;}\n\
         QPlainTextEdit {background-color: #fcfcfc; selection-color: #ffffff; selection-background-color:#000000;}\n\
@@ -926,6 +927,7 @@ university, ORCID, GitHub, or Google account.""",
         if self.settings['stylesheet'] == "native":
             style = "* {font-size: 12px;}"
             style += "\nQGroupBox { border: none; background-color: transparent;}"
+        print(style)
         return style
     
     def highlight_color(self):

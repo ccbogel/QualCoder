@@ -428,6 +428,8 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         """ Unchecked - show all rows and columns.
         Checked - hide rows and columns with no code co-occurrences. """
 
+        if not self.data_counts:
+            return
         if self.ui.checkBox_hide_blanks.isChecked():
             for row, row_data in enumerate(self.data_counts):
                 if sum(row_data) == 0:
