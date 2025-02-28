@@ -927,7 +927,6 @@ university, ORCID, GitHub, or Google account.""",
         if self.settings['stylesheet'] == "native":
             style = "* {font-size: 12px;}"
             style += "\nQGroupBox { border: none; background-color: transparent;}"
-        print(style)
         return style
     
     def highlight_color(self):
