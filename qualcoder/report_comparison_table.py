@@ -21,6 +21,7 @@ https://github.com/ccbogel/QualCoder
 from copy import deepcopy
 import logging
 import openpyxl
+from openpyxl.styles import Alignment, PatternFill
 import os
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 
@@ -36,8 +37,7 @@ logger = logging.getLogger(__name__)
 
 
 class DialogReportComparisonTable(QtWidgets.QDialog):
-    """ Provide a co-occurrence report.
-    """
+    """ Provide a co-occurrence table with codes rows and files columns. """
 
     def __init__(self, app, parent_text_edit):
         self.app = app
@@ -48,6 +48,7 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
+
         self.ui.pushButton_export.setIcon(qta.icon('mdi6.export', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_export.pressed.connect(self.export_to_excel)
         self.ui.pushButton_select_files.setIcon(qta.icon('mdi6.file-multiple', options=[{'scale_factor': 1.2}]))
@@ -73,6 +74,22 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
 
         self.codes, self.categories = self.app.get_codes_categories()
         self.files = self.app.get_text_filenames()
+        # TODO TEMP for now limit to character values
+        sql = "select name, valuetype, caseOrFile,0,0 from attribute_type where caseOrFile!='journal'and valuetype='character'"
+        cur = self.app.conn.cursor()
+        cur.execute(sql)
+        self.attributes = []
+        keys = 'name', 'valuetype', 'caseOrFile', 'min', 'max'
+        for row in cur.fetchall():
+            self.attributes.append(dict(zip(keys, row)))
+        for attribute in self.attributes:
+            if attribute['valuetype'] == 'numeric':
+                sql = "select min(cast(value as real)), max(cast(value as real)) from attribute where name=?"
+                cur.execute(sql, [attribute['name']])
+                res = cur.fetchone()
+                if res:
+                    attribute['min'] = res[0]
+                    attribute['max'] = res[1]
 
         self.data = []
         self.max_count = 0
@@ -91,9 +108,56 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         self.ui.listWidget.clear()
 
     def select_attributes(self):
-        """  """
+        """ Select an attribute.
+        {'name': 'Age', 'valuetype': 'numeric', 'memo': '', 'caseOrFile': 'case'}
+        {'name': 'gender', 'valuetype': 'character', 'memo': '', 'caseOrFile': 'case'}
+        """
 
-        Message(self.app,"TODO","Work in progress").exec()
+        ui = DialogSelectItems(self.app, self.attributes, _("Select Attribute"), "single")
+        ok = ui.exec()
+        if not ok:
+            return
+        attribute = ui.get_selected()
+        split_value = None
+        if attribute['valuetype'] == 'numeric':
+            title = f"{attribute['name']}[{attribute['caseOrFile']}] Min: {attribute['min']} - Max: {attribute['max']}"
+            split_value, ok = QtWidgets.QInputDialog.getDouble(self, title, 'Enter split number:')
+            if ok and split_value:
+                print(split_value)
+            else:
+                self.clear_table_and_data()
+                return
+
+        print("Selected attribute: ", attribute, split_value)
+
+        self.files = []
+        cur = self.app.conn.cursor()
+        if attribute['caseOrFile'] == 'case' and attribute['valuetype'] == 'character':
+            sql = "select fid, source.name, cases.name, value from attribute join cases on cases.caseid=attribute.id " \
+                  "join case_text on cases.caseid=case_text.caseid " \
+                  "join source on source.id=case_text.fid " \
+                  "where attr_type='case' and attribute.name=? " \
+                  "order by value, cases.name, source.name asc"
+            cur.execute(sql, [attribute['name']])
+            res = cur.fetchall()
+            for r in res:
+                print(r)
+                self.files.append({'id': r[0], 'name': f"{r[3]}\nCase: {r[2]}\n{r[1]}", 'memo': ""})
+        if attribute['caseOrFile'] == 'file' and attribute['valuetype'] == 'character':
+            sql = "select source.id, source.name, value from attribute " \
+                  "join source on source.id=attribute.id " \
+                  "where attr_type='file' and attribute.name=? " \
+                  "order by value, source.name asc"
+            cur.execute(sql, [attribute['name']])
+            res = cur.fetchall()
+            for r in res:
+                print(r)
+                self.files.append({'id': r[0], 'name': f"{r[2]}\n{r[1]}", 'memo': ""})
+
+        if not self.files:
+            self.clear_table_and_data()
+            return
+        self.process_files_data()
 
     def select_files(self):
         """ Select files, stored in self.file_ids_names, then load data and fill table. """
@@ -338,7 +402,6 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         row_header = []
         for code_ in self.codes:
             name_split_50 = [code_['name'][y - 50:y] for y in range(50, len(code_['name']) + 50, 50)]
-            # header_labels.append(code_['name'])  # OLD, need line separators
             row_header.append("\n".join(name_split_50))
         wb = openpyxl.Workbook()
         ws = wb.active
@@ -363,6 +426,8 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
             for col, col_data in enumerate(row_data):
                 cell = ws.cell(row=row + 2, column=col + 2)
                 cell.value = col_data
+                if self.data_colors[row][col] != "":
+                    cell.fill = PatternFill(start_color=self.data_colors[row][col][1:], end_color=self.data_colors[row][col][1:], fill_type="solid")
                 # Details list
                 if self.data[row][col] == ".":
                     continue
@@ -381,6 +446,7 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
                     details += f"\n========\n"
                 d_cell = ws2.cell(row=row + 2, column=col + 2)
                 d_cell.value = details
+                d_cell.alignment = Alignment(wrap_text=True, vertical='top')
 
         wb.save(filepath)
         msg = _('Co-occurrence exported: ') + filepath
@@ -421,7 +487,7 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
                     item.setData(QtCore.Qt.ItemDataRole.DisplayRole, cell_data)
                 item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
                 self.ui.tableWidget.setItem(row, col, item)
-        # self.ui.tableWidget.resizeColumnsToContents()  # Doesnt look great
+        self.ui.tableWidget.resizeColumnsToContents()  # Doesnt look great
         self.ui.tableWidget.resizeRowsToContents()
 
     def show_or_hide_empty_rows_and_cols(self):
