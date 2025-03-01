@@ -23,6 +23,7 @@ from copy import deepcopy
 import csv
 import logging
 import openpyxl
+from openpyxl.styles import Alignment, PatternFill
 import os
 from PIL import Image
 import qtawesome as qta  # See https://pictogrammers.com/library/mdi/
@@ -808,6 +809,10 @@ class DialogReportCodes(QtWidgets.QDialog):
             if inserted_col == 1:  # For Case results, insert the Filename data
                 ws.cell(column=2, row=row + 2, value=data['filename'])
             ws.cell(column=2 + inserted_col, row=row + 2, value=data['coder'])
+            #tODO
+            '''align_cell = ws.cell(column=2 + inserted_col, row=row + 2)
+            align_cell.value = data['coder']
+            align_cell.alignment = Alignment(wrap_text=True, vertical='top')'''
             coding_id = ""
             if data['result_type'] == 'text':
                 coding_id = f"ctid:{data['ctid']}"
