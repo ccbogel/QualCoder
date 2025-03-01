@@ -96,7 +96,7 @@
        <string/>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_exportcsv">
+     <widget class="QPushButton" name="pushButton_export_excel">
       <property name="geometry">
        <rect>
         <x>330</x>
@@ -118,7 +118,7 @@
        </size>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export csv file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export Excel&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -206,7 +206,7 @@
  <tabstops>
   <tabstop>pushButton_select_files</tabstop>
   <tabstop>pushButton_exporttext</tabstop>
-  <tabstop>pushButton_exportcsv</tabstop>
+  <tabstop>pushButton_export_excel</tabstop>
   <tabstop>radioButton</tabstop>
   <tabstop>radioButton_2</tabstop>
   <tabstop>treeWidget</tabstop>
