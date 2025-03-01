@@ -23,6 +23,7 @@ from copy import copy
 import datetime
 import logging
 import openpyxl
+from openpyxl.styles import Font, PatternFill
 import os
 import qtawesome as qta
 
@@ -103,7 +104,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         self.fill_tree()
 
     def get_data(self):
-        """ Called from init. gets coders, code_names and categories.
+        """ Called from init.
         Calls calculate_code_frequency - for each code.
         Adds a list item that is ready to be used by the treeWidget to display multiple
         columns with the coder frequencies.
@@ -280,18 +281,26 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         wb = openpyxl.Workbook()
         ws = wb.active
         # Column headings
-        row = 1
         for col, code in enumerate(header):
-            ws.cell(column=col + 1, row=row, value=code)
-
+            ws.cell(column=col + 1, row=1, value=code)
+            ws.cell(column=col + 1, row=1).font = Font(b=True)
         # Data
         data = []
+        code_colors = []
         it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
         item = it.value()
         while item:
             row = []
             for i in range(0, len(header)):
                 row.append(item.text(i))
+            if row[1][:3] == "cid":
+                cid = int(row[1][4:])
+                for code_ in self.codes:
+                    if cid == code_['cid']:
+                        row[0] = code_['name']  # Full not abbreviated name
+                        code_colors.append(code_['color'][1:])
+            else:
+                code_colors.append(None)
             it += 1
             item = it.value()
             data.append(row)
@@ -299,7 +308,9 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         for row, data_row in enumerate(data):
             for col, datum in enumerate(data_row):
                 ws.cell(column=col + 1, row=row + 2, value=datum)
-
+            if code_colors[row]:
+                pf = PatternFill(start_color=code_colors[row], end_color=code_colors[row], fill_type="solid")
+                ws.cell(column=1, row=row + 2).fill = pf
         filename = "Code_frequencies.xlsx"
         export_dir = ExportDirectoryPathDialog(self.app, filename)
         filepath = export_dir.filepath
@@ -311,8 +322,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         self.parent_textEdit.append(msg)
 
     def fill_tree(self):
-        """ Fill tree widget, top level items are main categories and unlinked codes.
-        """
+        """ Fill tree widget, top level items are main categories and unlinked codes. """
 
         self.ui.treeWidget.clear()
         cats = copy(self.categories)
@@ -418,22 +428,17 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
 class DialogReportCoderComparisons(QtWidgets.QDialog):
     """ Compare coded text sequences between coders using Cohen's Kappa. """
 
-    app = None
-    parent_textEdit = None
-    coders = []
-    selected_coders = []
-    categories = []
-    code_names = []
-    file_summaries = []
-    comparisons = ""
-
     def __init__(self, app, parent_textedit):
 
         self.app = app
         self.parent_textEdit = parent_textedit
-        self.comparisons = ""
+        self.text_data = ""
+        self.excel_data = []
+        self.coders = []
         self.selected_coders = []
         self.file_summaries = []
+        self.codes = []
+        self.categories = []
         self.get_data()
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_reportComparisons()
@@ -444,7 +449,8 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         self.ui.pushButton_run.setIcon(qta.icon('mdi6.play', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_clear.pressed.connect(self.clear_selection)
         self.ui.pushButton_clear.setIcon(qta.icon('mdi6.refresh', options=[{'scale_factor': 1.4}]))
-        self.ui.pushButton_exporttext.pressed.connect(self.export_text_file)
+        self.ui.pushButton_exporttext.pressed.connect(self.export_excel)  # export_text_file)
+        self.ui.pushButton_exporttext.setToolTip(_("Export Excel"))
         self.ui.pushButton_exporttext.setIcon(qta.icon('mdi6.export', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_help1.setIcon(qta.icon('mdi6.help'))
         self.ui.pushButton_help1.pressed.connect(self.information)
@@ -461,10 +467,10 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         self.fill_tree()
 
     def get_data(self):
-        """ Called from init. gets coders, code_names, categories, file_summaries.
+        """ Called from init. gets coders, codes, categories, file_summaries.
         Images and A/V files are not used. """
 
-        self.code_names, self.categories = self.app.get_codes_categories()
+        self.codes, self.categories = self.app.get_codes_categories()
         cur = self.app.conn.cursor()
         cur.execute("select id, length(fulltext) from source where fulltext is not null")
         self.file_summaries = cur.fetchall()
@@ -513,8 +519,42 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
             item = it.value()
         self.ui.label_selections.setText(_("No coders selected"))
 
+    def export_excel(self):
+        """ Export to Excel. """
+
+        filename = "Coder_comparison.xlsx"
+        export_path = ExportDirectoryPathDialog(self.app, filename)
+        filepath = export_path.filepath
+        if filepath is None:
+            return
+
+        wb = openpyxl.Workbook()
+        ws = wb.active
+
+        #file_.write(f"{self.app.project_name}\n")
+        #file_.write(_("Date: ") + datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S") + "\n")
+        #file_.write(self.comparisons)
+
+        ws.cell(column=1, row=1, value=f"Coder Comparison: {self.selected_coders[0]}, {self.selected_coders[1]}")
+
+        headings = ["Code tree", "Agree %", "A and B %", "Not A Not B %", "Disagree %", "Agree coded only %", "Kappa"]
+        for col, heading in enumerate(headings):
+            ws.cell(column=col + 1, row=2, value=heading)
+            ws.cell(column=col + 1, row=2).font = Font(b=True)
+        for row in range(len(self.excel_data)):
+            for col in range(7):
+                ws.cell(column=col + 1, row=3 + row, value=self.excel_data[row][col])
+            if self.excel_data[row][7] != "Category":
+                pf = PatternFill(start_color=self.excel_data[row][7], end_color=self.excel_data[row][7], fill_type="solid")
+                ws.cell(column=1, row=3 + row).fill = pf
+
+        wb.save(filepath)
+        msg = _('Coder comparisons report exported: ') + filepath
+        Message(self.app, _('Report exported'), msg, "information").exec()
+        self.parent_textEdit.append(msg)
+
     def export_text_file(self):
-        """ Export coding comparison statistics to text file. """
+        """ OLD Export coding comparison statistics to text file. """
 
         filename = "Coder_comparison.txt"
         export_path = ExportDirectoryPathDialog(self.app, filename)
@@ -524,39 +564,58 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         with open(filepath, 'w', encoding="'utf-8-sig'") as file_:
             file_.write(f"{self.app.project_name}\n")
             file_.write(_("Date: ") + datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S") + "\n")
-            file_.write(self.comparisons)
+            file_.write(self.text_data)
         msg = _("Coder comparison text file exported to: ") + filepath
         Message(self.app, _('Text file export'), msg, "information").exec()
         self.parent_textEdit.append(msg)
 
     def calculate_statistics(self):
         """ Iterate through tree widget, for all cids
-        For each code_name calculate the two-coder comparison statistics. """
+        For each code calculate the two-coder comparison statistics. """
 
-        self.comparisons = "====" + _("CODER COMPARISON") + "====\n" + _("Selected coders: ")
-        self.comparisons += self.selected_coders[0] + ", " + self.selected_coders[1] + "\n"
+        self.text_data = "====" + _("CODER COMPARISON") + "====\n" + _("Selected coders: ")
+        self.text_data += self.selected_coders[0] + ", " + self.selected_coders[1] + "\n"
+        self.excel_data = []
         it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
         item = it.value()
+        row = 0
         while item:
             if item.text(1)[0:4] == 'cid:':
-                agreement = self.calculate_agreement_for_code_name(int(item.text(1)[4:]))
+                excel_row = []
+                agreement = self.calculate_agreement_for_code(int(item.text(1)[4:]))
                 item.setText(2, f"{agreement['agreement']}%")
                 item.setText(3, f"{agreement['dual_percent']}%")
                 item.setText(4, f"{agreement['uncoded_percent']}%")
                 item.setText(5, f"{agreement['disagreement']}%")
                 item.setText(6, f"{agreement['agree_coded_only']}%")
                 item.setText(7, f"{agreement['kappa']}")
-                self.comparisons += f"\n{item.text(0)} ({item.text(1)})\n"
-                self.comparisons += _("agreement: ") + f"{agreement['agreement']}%"
-                self.comparisons += _(", dual coded: ") + f"{agreement['dual_percent']}%"
-                self.comparisons += _(", uncoded: ") + f"{agreement['uncoded_percent']}%"
-                self.comparisons += _(", disagreement: ") + f"{agreement['disagreement']}%"
-                self.comparisons+= _(", agree coded only: ") + f"{agreement['agree_coded_only']}%"
-                self.comparisons += ", Kappa: " + str(agreement['kappa'])
+                self.text_data += f"\n{item.text(0)} ({item.text(1)})\n"
+                excel_row.append(item.text(0))
+                self.text_data += _("agreement: ") + f"{agreement['agreement']}%"
+                excel_row.append(f"{agreement['agreement']}%")
+                self.text_data += _(", dual coded: ") + f"{agreement['dual_percent']}%"
+                excel_row.append(f"{agreement['dual_percent']}%")
+                self.text_data += _(", uncoded: ") + f"{agreement['uncoded_percent']}%"
+                excel_row.append(f"{agreement['uncoded_percent']}%")
+                self.text_data += _(", disagreement: ") + f"{agreement['disagreement']}%"
+                excel_row.append(f"{agreement['disagreement']}%")
+                self.text_data += _(", agree coded only: ") + f"{agreement['agree_coded_only']}%"
+                excel_row.append(f"{agreement['agree_coded_only']}%")
+                self.text_data += f", Kappa: {agreement['kappa']}"
+                excel_row.append(agreement['kappa'])
+                # Fix codename, add color
+                cid = int(item.text(1)[4:])
+                for code_ in self.codes:
+                    if cid == code_['cid']:
+                        excel_row.append(code_['color'][1:])
+                self.excel_data.append(excel_row)
+            else:  # Category
+                self.excel_data.append([item.text(0), "", "", "", "", "", "", "Category"])
             it += 1
             item = it.value()
+            row += 1
 
-    def calculate_agreement_for_code_name(self, cid):
+    def calculate_agreement_for_code(self, cid):
         """ Calculate the two-coder statistics for this cid
         Percentage agreement.
         Get the start and end positions in all files (source table) for this cid.
@@ -591,7 +650,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
                         char_list[char] += 1
                         total['coded0'] += 1
                     except IndexError as e_:
-                        msg = "DialogReportCoderComparisons.calculate_agreement_for_code_name "
+                        msg = "DialogReportCoderComparisons.calculate_agreement_for_code "
                         msg += f"{e_} fid:{f[0]} len_text:{f[1]} pos1:{coded[1]}"
                         msg += f" cid:{cid} coder:{self.selected_coders[0]}"
                         print(msg)
@@ -603,7 +662,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
                         char_list[char] += 1
                         total['coded1'] += 1
                     except IndexError as e_:
-                        msg = "DialogReportCoderComparisons.calculate_agreement_for_code_name "
+                        msg = "DialogReportCoderComparisons.calculate_agreement_for_code "
                         msg += f"{e_} fid:{f[0]} len_text:{f[1]} pos1:{coded[1]}"
                         msg += " cid:" + str(cid) + " coder:" + self.selected_coders[0]
                         print(msg)
@@ -681,7 +740,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         """ Fill tree widget, top level items are main categories and unlinked codes. """
 
         cats = copy(self.categories)
-        codes = copy(self.code_names)
+        codes = copy(self.codes)
         self.ui.treeWidget.clear()
         self.ui.treeWidget.setColumnCount(7)
         self.ui.treeWidget.setHeaderLabels(
