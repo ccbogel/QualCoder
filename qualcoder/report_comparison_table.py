@@ -18,8 +18,8 @@ Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 """
 
-from copy import deepcopy
 import logging
+from math import isclose
 import openpyxl
 from openpyxl.styles import Alignment, PatternFill
 import os
@@ -56,7 +56,7 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         self.ui.pushButton_select_cases.setIcon(qta.icon('mdi6.briefcase-outline', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_select_cases.pressed.connect(self.select_cases)
         self.ui.pushButton_select_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.4}]))
-        self.ui.pushButton_select_attributes.pressed.connect(self.select_attributes)
+        self.ui.pushButton_select_attributes.pressed.connect(self.select_attribute)
         self.ui.label_arrow.setPixmap(qta.icon('mdi6.arrow-right').pixmap(24, 24))
         self.ui.pushButton_select_codes.setIcon(qta.icon('mdi6.text', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_select_codes.pressed.connect(self.select_codes)
@@ -74,22 +74,24 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
 
         self.codes, self.categories = self.app.get_codes_categories()
         self.files = self.app.get_text_filenames()
-        # TODO TEMP for now limit to character values
-        sql = "select name, valuetype, caseOrFile,0,0 from attribute_type where caseOrFile!='journal'and valuetype='character'"
+        # Get attributes
+        sql = "select name, valuetype, caseOrFile,0,0 from attribute_type where caseOrFile!='journal'"
         cur = self.app.conn.cursor()
         cur.execute(sql)
         self.attributes = []
-        keys = 'name', 'valuetype', 'caseOrFile', 'min', 'max'
+        keys = 'true_name', 'valuetype', 'caseOrFile', 'min', 'max'
         for row in cur.fetchall():
             self.attributes.append(dict(zip(keys, row)))
         for attribute in self.attributes:
+            attribute['name'] = f"{attribute['true_name']} [{attribute['caseOrFile']}]"
             if attribute['valuetype'] == 'numeric':
-                sql = "select min(cast(value as real)), max(cast(value as real)) from attribute where name=?"
-                cur.execute(sql, [attribute['name']])
-                res = cur.fetchone()
-                if res:
-                    attribute['min'] = res[0]
-                    attribute['max'] = res[1]
+                sql = "select cast(value as real) from attribute where name=? and attr_type=? and value is not null order by cast(value as real) asc"
+                cur.execute(sql, [attribute['true_name'], attribute['caseOrFile']])
+                res = cur.fetchall()
+                range = [r[0] for r in res]
+                if range:
+                    attribute['min'] = range[0]
+                    attribute['max'] = range[-1]
 
         self.data = []
         self.max_count = 0
@@ -107,7 +109,7 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         self.ui.tableWidget.setColumnCount(0)
         self.ui.listWidget.clear()
 
-    def select_attributes(self):
+    def select_attribute(self):
         """ Select an attribute.
         {'name': 'Age', 'valuetype': 'numeric', 'memo': '', 'caseOrFile': 'case'}
         {'name': 'gender', 'valuetype': 'character', 'memo': '', 'caseOrFile': 'case'}
@@ -120,15 +122,12 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         attribute = ui.get_selected()
         split_value = None
         if attribute['valuetype'] == 'numeric':
-            title = f"{attribute['name']}[{attribute['caseOrFile']}] Min: {attribute['min']} - Max: {attribute['max']}"
-            split_value, ok = QtWidgets.QInputDialog.getDouble(self, title, 'Enter split number:')
-            if ok and split_value:
-                print(split_value)
-            else:
+            title = f"{attribute['name']}[{attribute['caseOrFile']}]"
+            msg = f"Enter split number (Min: {attribute['min']} - Max: {attribute['max']}):"
+            split_value, ok = QtWidgets.QInputDialog.getDouble(self, title, msg)
+            if not ok or not split_value:
                 self.clear_table_and_data()
                 return
-
-        print("Selected attribute: ", attribute, split_value)
 
         self.files = []
         cur = self.app.conn.cursor()
@@ -138,21 +137,56 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
                   "join source on source.id=case_text.fid " \
                   "where attr_type='case' and attribute.name=? " \
                   "order by value, cases.name, source.name asc"
-            cur.execute(sql, [attribute['name']])
+            cur.execute(sql, [attribute['true_name']])
             res = cur.fetchall()
             for r in res:
-                print(r)
-                self.files.append({'id': r[0], 'name': f"{r[3]}\nCase: {r[2]}\n{r[1]}", 'memo': ""})
+                self.files.append({'id': r[0], 'name': f"{attribute['true_name']}: {r[3]}\nCase: {r[2]}\n{r[1]}", 'memo': ""})
+
+        if attribute['caseOrFile'] == 'case' and attribute['valuetype'] == 'numeric':
+            sql = "select fid, source.name, cases.name, cast(value as real) from attribute " \
+                  "join cases on cases.caseid=attribute.id " \
+                  "join case_text on cases.caseid=case_text.caseid " \
+                  "join source on source.id=case_text.fid " \
+                  "where attr_type='case' and attribute.name=? " \
+                  "order by cast(value as real), cases.name, source.name asc"
+            cur.execute(sql, [attribute['true_name']])
+            res = cur.fetchall()
+            for r in res:
+                attr_split_msg = attribute['true_name'] + " "
+                if r[3] is None or r[3] < split_value:
+                    attr_split_msg += f"< {split_value}"
+                elif isclose(r[3], split_value):
+                    attr_split_msg += f"= {split_value}"
+                else:
+                    attr_split_msg += f"> {split_value}"
+                self.files.append({'id': r[0], 'name': f"{attr_split_msg}\nCase: {r[2]}\n{r[1]}", 'memo': ""})
+
         if attribute['caseOrFile'] == 'file' and attribute['valuetype'] == 'character':
             sql = "select source.id, source.name, value from attribute " \
                   "join source on source.id=attribute.id " \
                   "where attr_type='file' and attribute.name=? " \
                   "order by value, source.name asc"
-            cur.execute(sql, [attribute['name']])
+            cur.execute(sql, [attribute['true_name']])
             res = cur.fetchall()
             for r in res:
-                print(r)
-                self.files.append({'id': r[0], 'name': f"{r[2]}\n{r[1]}", 'memo': ""})
+                self.files.append({'id': r[0], 'name': f"{attribute['true_name']}: {r[2]}\n{r[1]}", 'memo': ""})
+
+        if attribute['caseOrFile'] == 'file' and attribute['valuetype'] == 'numeric':
+            sql = "select source.id, source.name, cast(value as real) from attribute " \
+                  "join source on source.id=attribute.id " \
+                  "where attr_type='file' and attribute.name=? " \
+                  "order by cast(value as real), source.name asc"
+            cur.execute(sql, [attribute['true_name']])
+            res = cur.fetchall()
+            for r in res:
+                attr_split_msg = attribute['true_name'] + " "
+                if r[2] is None or r[2] < split_value:
+                    attr_split_msg += f"< {split_value}"
+                elif isclose(r[2], split_value):
+                    attr_split_msg += f"= {split_value}"
+                else:
+                    attr_split_msg += f"> {split_value}"
+                self.files.append({'id': r[0], 'name': f"{attr_split_msg}\n{r[1]}", 'memo': ""})
 
         if not self.files:
             self.clear_table_and_data()
