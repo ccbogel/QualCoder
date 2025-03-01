@@ -34,7 +34,7 @@
      <property name="title">
       <string/>
      </property>
-     <widget class="QPushButton" name="pushButton_exporttext">
+     <widget class="QPushButton" name="pushButton_export">
       <property name="geometry">
        <rect>
         <x>400</x>
@@ -44,7 +44,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export text file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export Excel&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -206,7 +206,7 @@
   <tabstop>comboBox_coders</tabstop>
   <tabstop>pushButton_run</tabstop>
   <tabstop>pushButton_clear</tabstop>
-  <tabstop>pushButton_exporttext</tabstop>
+  <tabstop>pushButton_export</tabstop>
   <tabstop>pushButton_help1</tabstop>
   <tabstop>treeWidget</tabstop>
  </tabstops>
