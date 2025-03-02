@@ -23,7 +23,8 @@ from copy import deepcopy
 import csv
 import logging
 import openpyxl
-from openpyxl.styles import Alignment, PatternFill
+from openpyxl.styles import Font, Alignment
+from openpyxl.utils import get_column_letter
 import os
 from PIL import Image
 import qtawesome as qta  # See https://pictogrammers.com/library/mdi/
@@ -562,13 +563,17 @@ class DialogReportCodes(QtWidgets.QDialog):
         wb = openpyxl.Workbook()
         ws = wb.active
         # Column header
-        for c in range(0, col_count):
-            cell = ws.cell(row=1, column=c + 2)
-            cell.value = self.ui.tableWidget.horizontalHeaderItem(c).text()
+        for col in range(0, col_count):
+            cell = ws.cell(column=col + 2, row=1)
+            cell.value = self.ui.tableWidget.horizontalHeaderItem(col).text()
+            cell.font = Font(b=True)
+            ws.column_dimensions[get_column_letter(col + 1)].width = 30
         # Row header
-        for r in range(0, row_count):
-            cell = ws.cell(row=r + 2, column=1)
-            cell.value = self.ui.tableWidget.verticalHeaderItem(r).text()
+        for row in range(0, row_count):
+            cell = ws.cell(column=1, row=row + 2)
+            cell.value = self.ui.tableWidget.verticalHeaderItem(row).text()
+            cell.font = Font(b=True)
+
         # Data
         for c in range(0, col_count):
             for r in range(0, row_count):
@@ -579,6 +584,8 @@ class DialogReportCodes(QtWidgets.QDialog):
                     data_text = ""
                 cell = ws.cell(row=r + 2, column=c + 2)
                 cell.value = data_text
+                cell.alignment = Alignment(wrap_text=True, vertical='top')
+
         wb.save(filepath)
         msg = _('Matrix exported: ') + filepath
         Message(self.app, _('Matrix exported'), msg, "information").exec()
@@ -2448,10 +2455,9 @@ class DialogReportCodes(QtWidgets.QDialog):
         if res is not None:
             filename = res[0]
         memo_choice = self.ui.comboBox_memos.currentText()
-        head = "\n" + _("[VIEW] ")
-        head += item['codename'] + ", "
+        head = f"\n{item['codename']}, "
         if memo_choice in (_("Also all memos"), _("Also code memos"), _("Only memos")) and item['codename_memo'] != "":
-            head += _("CODE MEMO: All memo") + item['codename_memo'] + "<br />"
+            head += _("CODE MEMO: All memo") + f"{item['codename_memo']}<br />"
         head += f"{_('File:')} {filename}, "
         if memo_choice in (_("Also alll memos"), _("Only memos")) and item['source_memo'] != "":
             head += f" {_('FILE MEMO:')} {item['source_memo']}"
