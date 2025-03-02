@@ -21,6 +21,8 @@ https://github.com/ccbogel/QualCoder
 from copy import deepcopy
 import logging
 import openpyxl
+from openpyxl.utils import get_column_letter
+from openpyxl.styles import Alignment, PatternFill
 import os
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 
@@ -36,8 +38,7 @@ logger = logging.getLogger(__name__)
 
 
 class DialogReportCooccurrence(QtWidgets.QDialog):
-    """ Provide a co-occurrence report.
-    """
+    """ Provide a co-occurrence report. """
 
     app = None
     parent_tetEdit = None
@@ -140,7 +141,7 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         self.process_data()
 
     def process_data(self):
-        """ Calculate the relations for selected codes for ALL coders (or only THIS coder - TODO).
+        """ Calculate the relations for selected codes for ALL coders (TODO only THIS coder).
         For text codings only. """
 
         self.ui.checkBox_hide_blanks.setChecked(False)
@@ -211,6 +212,9 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         ws.title = "Counts"
         wb.create_sheet("Details")
         ws2 = wb["Details"]
+        for col in range(len(self.codes)):
+            ws.column_dimensions[get_column_letter(col + 1)].width = 20
+            ws2.column_dimensions[get_column_letter(col + 1)].width = 20
         for col, col_name in enumerate(header):
             h_cell = ws.cell(row=1, column=col + 2)
             h_cell.value = col_name
@@ -225,6 +229,8 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
             for col, col_data in enumerate(row_data):
                 cell = ws.cell(row=row + 2, column=col + 2)
                 cell.value = col_data
+                if self.data_colors[row][col] != "":
+                    cell.fill = PatternFill(start_color=self.data_colors[row][col][1:], end_color=self.data_colors[row][col][1:], fill_type="solid")
                 # Details list
                 if self.data_details[row][col] == ".":
                     continue

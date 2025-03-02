@@ -21,6 +21,7 @@ https://github.com/ccbogel/QualCoder
 import logging
 from math import isclose
 import openpyxl
+from openpyxl.utils import get_column_letter
 from openpyxl.styles import Alignment, PatternFill
 import os
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
@@ -454,6 +455,8 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
             h_cell.value = file_['name']
             h_cell2 = ws2.cell(row=1, column=col + 2)
             h_cell2.value = file_['name']
+            ws.column_dimensions[get_column_letter(col + 1)].width = 20
+            ws2.column_dimensions[get_column_letter(col + 1)].width = 20
 
         # Co-occurrence counts
         for row, row_data in enumerate(self.data_counts):
