@@ -387,6 +387,11 @@ class DialogManageFiles(QtWidgets.QDialog):
                 if compare_text != text_:
                     self.ui.tableWidget.setRowHidden(r, True)
             self.rows_hidden = True
+            rows_showing = 0
+            for r in range(self.ui.tableWidget.rowCount()):
+                if not self.ui.tableWidget.isRowHidden(r):
+                    rows_showing += 1
+            self.ui.label_fcount.setText(f"Files: {rows_showing} / {self.ui.tableWidget.rowCount()}")
             return
         if action == action_show_values_like:
             text_value, ok = QtWidgets.QInputDialog.getText(self, _("Text filter"), _("Show values like:"),
@@ -396,6 +401,11 @@ class DialogManageFiles(QtWidgets.QDialog):
                 for r in range(0, self.ui.tableWidget.rowCount()):
                     if self.ui.tableWidget.item(r, col).text().find(text_value) == -1:
                         self.ui.tableWidget.setRowHidden(r, True)
+            rows_showing = 0
+            for r in range(self.ui.tableWidget.rowCount()):
+                if not self.ui.tableWidget.isRowHidden(r):
+                    rows_showing += 1
+            self.ui.label_fcount.setText(f"Files: {rows_showing} / {self.ui.tableWidget.rowCount()}")
             return
         if action == action_hide_values_like:
             text_value, ok = QtWidgets.QInputDialog.getText(self, _("Text filter"), _("Hide values like:"),
@@ -405,11 +415,17 @@ class DialogManageFiles(QtWidgets.QDialog):
                 for r in range(0, self.ui.tableWidget.rowCount()):
                     if self.ui.tableWidget.item(r, col).text().find(text_value) != -1:
                         self.ui.tableWidget.setRowHidden(r, True)
+            rows_showing = 0
+            for r in range(self.ui.tableWidget.rowCount()):
+                if not self.ui.tableWidget.isRowHidden(r):
+                    rows_showing += 1
+            self.ui.label_fcount.setText(f"Files: {rows_showing} / {self.ui.tableWidget.rowCount()}")
             return
         if action == action_show_all:
             for r in range(0, self.ui.tableWidget.rowCount()):
                 self.ui.tableWidget.setRowHidden(r, False)
             self.rows_hidden = False
+            self.ui.label_fcount.setText(f"Files: {self.ui.tableWidget.rowCount()}")
             return
         if action == action_url:
             webbrowser.open(item_text)
@@ -2067,7 +2083,6 @@ class DialogManageFiles(QtWidgets.QDialog):
         """ Fill the table widget with file details. """
 
         self.ui.tableWidget.blockSignals(True)
-        self.ui.label_fcount.setText(_("Files: ") + str(len(self.source)))
         self.ui.tableWidget.setColumnCount(len(self.header_labels))
         self.ui.tableWidget.setHorizontalHeaderLabels(self.header_labels)
         self.ui.tableWidget.horizontalHeader().setStretchLastSection(False)
@@ -2131,4 +2146,6 @@ class DialogManageFiles(QtWidgets.QDialog):
             tt = self.get_tooltip_values(attribute_name)
             self.ui.tableWidget.horizontalHeaderItem(self.ATTRIBUTE_START_COLUMN + i).setToolTip(
                 _("Right click header row to hide columns") + "\n" + tt)
+
+        self.ui.label_fcount.setText(_("Files: ") + str(len(self.source)))
         self.ui.tableWidget.blockSignals(False)
