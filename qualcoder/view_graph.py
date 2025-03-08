@@ -22,6 +22,7 @@ https://qualcoder.wordpress.com/
 from copy import deepcopy
 import datetime
 import logging
+from math import atan2, pi
 import os
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 import sqlite3
@@ -2452,7 +2453,200 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         super().paint(painter, option, widget)
 
 
-class FreeLineGraphicsItem(QtWidgets.QGraphicsLineItem):
+class FreeLineGraphicsItem(QtWidgets.QGraphicsPolygonItem):
+    """ Polygon with arrow head. """
+
+    from_widget = None
+    from_pos = None
+    to_widget = None
+    to_pos = None
+    line_width = 2
+    line_type = QtCore.Qt.PenStyle.SolidLine
+    color = "gray"
+    tooltip = ""
+    remove = False
+
+    def __init__(self, from_widget, to_widget, color="gray", line_width=2, line_type="solid"):
+        """ User created connecting line, with arrow.
+         param:
+            from_widget : FreeTextGraphicsItem, TextGraphicsItem, AVGraphicsItem, PixmapGraphicsItem,
+                FileTextGraphicsItem, CaseTextGraphicsItem
+            to_widget : FreeTextGraphicsItem, TextGraphicsItem, AVGraphicsItem, PixmapGraphicsItem,
+                FileTextGraphicsItem, CaseTextGraphicsItem
+            color : String
+            line_width : Integer
+            line_type : String
+        """
+
+        super(FreeLineGraphicsItem, self).__init__(None)
+
+        self.from_widget = from_widget
+        self.to_widget = to_widget
+        self.line_width = line_width
+        self.remove = False
+        self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
+        self.calculate_points_and_draw()
+        self.color = color
+        self.line_type = QtCore.Qt.PenStyle.SolidLine
+        if line_type == "dotted":
+            self.line_type = QtCore.Qt.PenStyle.DotLine
+        color_obj = colors[color]
+        self.setPen(QtGui.QPen(color_obj, self.line_width, self.line_type))
+
+    def contextMenuEvent(self, event):
+        menu = QtWidgets.QMenu()
+        thicker_action = menu.addAction(_('Thicker'))
+        thinner_action = menu.addAction(_('Thinner'))
+        dotted_action = menu.addAction(_('Dotted'))
+        red_action = menu.addAction(_('Red'))
+        yellow_action = menu.addAction(_('Yellow'))
+        green_action = menu.addAction(_('Green'))
+        blue_action = menu.addAction(_('Blue'))
+        cyan_action = menu.addAction(_('Cyan'))
+        magenta_action = menu.addAction(_('Magenta'))
+        orange_action = menu.addAction(_("Orange"))
+        gray_action = menu.addAction(_("Gray"))
+        remove_action = menu.addAction(_('Remove'))
+        action = menu.exec(QtGui.QCursor.pos())
+        if action is None:
+            return
+        if action == thicker_action:
+            self.line_width = self.line_width + 1
+            if self.line_width > 8:
+                self.line_width = 8
+            self.redraw()
+        if action == thinner_action:
+            self.line_width = self.line_width - 1
+            if self.line_width < 2:
+                self.line_width = 2
+            self.redraw()
+        if action == dotted_action:
+            self.line_type = QtCore.Qt.PenStyle.DotLine
+            self.redraw()
+        if action == red_action:
+            self.color = "red"
+            self.redraw()
+        if action == yellow_action:
+            self.color = "yellow"
+            self.redraw()
+        if action == green_action:
+            self.color = "green"
+            self.redraw()
+        if action == blue_action:
+            self.color = "blue"
+            self.redraw()
+        if action == orange_action:
+            self.color = "orange"
+            self.redraw()
+        if action == cyan_action:
+            self.color = "cyan"
+            self.redraw()
+        if action == magenta_action:
+            self.color = "magenta"
+            self.redraw()
+        if action == gray_action:
+            self.color = "gray"
+            self.redraw()
+        if action == remove_action:
+            self.remove = True
+
+    def redraw(self):
+        """ Called from mouse move and release events. """
+
+        self.calculate_points_and_draw()
+
+    def calculate_points_and_draw(self):
+        """ Calculate the to x and y and from x and y points. Draw line between the
+        widgets. Join the line to appropriate side of widget.
+         Arrowhead direction changes every 30 degrees based on theta arctangent. """
+
+        to_x = self.to_widget.pos().x()
+        to_y = self.to_widget.pos().y()
+        from_x = self.from_widget.pos().x()
+        from_y = self.from_widget.pos().y()
+
+        x_overlap = False
+        # fix from_x value to middle of from widget if to_widget overlaps in x position
+        if from_x < to_x < from_x + self.from_widget.boundingRect().width():
+            from_x = from_x + self.from_widget.boundingRect().width() / 2
+            x_overlap = True
+        # fix to_x value to middle of to widget if from_widget overlaps in x position
+        if to_x < from_x < to_x + self.to_widget.boundingRect().width():
+            to_x = to_x + self.to_widget.boundingRect().width() / 2
+            x_overlap = True
+
+        # Fix from_x value to right-hand side of from widget if to_widget on the right of the from_widget
+        if not x_overlap and to_x > from_x + self.from_widget.boundingRect().width():
+            from_x = from_x + self.from_widget.boundingRect().width()
+        # Fix to_x value to right-hand side if from_widget on the right of the to widget
+        elif not x_overlap and from_x > to_x + self.to_widget.boundingRect().width():
+            to_x = to_x + self.to_widget.boundingRect().width()
+
+        y_overlap = False
+        # Fix from_y value to middle of from widget if to_widget overlaps in y position
+        if from_y < to_y < from_y + self.from_widget.boundingRect().height():
+            from_y = from_y + self.from_widget.boundingRect().height() / 2
+            y_overlap = True
+        # Fix from_y value to middle of to widget if from_widget overlaps in y position
+        if to_y < from_y < to_y + self.to_widget.boundingRect().height():
+            to_y = to_y + self.to_widget.boundingRect().height() / 2
+            y_overlap = True
+
+        # Fix from_y value if to_widget is above the from_widget
+        if not y_overlap and to_y > from_y:
+            from_y = from_y + self.from_widget.boundingRect().height()
+        # Fix to_y value if from_widget is below the to widget
+        elif not y_overlap and from_y > to_y:
+            to_y = to_y + self.to_widget.boundingRect().height()
+        color_obj = colors[self.color]
+        self.setPen(QtGui.QPen(color_obj, self.line_width, self.line_type))
+
+        dx = from_x - to_x
+        dy = from_y - to_y
+        theta = atan2(dy, dx)
+        theta *= 180 / pi  # rads to degs
+        self.setToolTip("THETA " + str(round(theta, 1)))
+        polygon = QtGui.QPolygonF()
+        polygon.append(QtCore.QPointF(from_x, from_y))
+        polygon.append(QtCore.QPointF(to_x, to_y))
+        if -180 <= theta < -150:
+            polygon.append(QtCore.QPointF(to_x - 5, to_y - 5))
+            polygon.append(QtCore.QPointF(to_x, to_y))
+            polygon.append(QtCore.QPointF(to_x - 5, to_y + 5))
+        if -150 <= theta <= -120:
+            polygon.append(QtCore.QPointF(to_x - 6, to_y))
+            polygon.append(QtCore.QPointF(to_x, to_y))
+            polygon.append(QtCore.QPointF(to_x, to_y - 6))
+        if -120 < theta <= -60:
+            polygon.append(QtCore.QPointF(to_x - 5, to_y - 5))
+            polygon.append(QtCore.QPointF(to_x, to_y))
+            polygon.append(QtCore.QPointF(to_x + 5, to_y - 5))
+        if -60 < theta < 0:
+            polygon.append(QtCore.QPointF(to_x + 5, to_y - 5))
+            polygon.append(QtCore.QPointF(to_x, to_y))
+            polygon.append(QtCore.QPointF(to_x + 5, to_y + 5))
+        if 0 < theta < 60:
+            polygon.append(QtCore.QPointF(to_x + 5, to_y - 5))
+            polygon.append(QtCore.QPointF(to_x, to_y))
+            polygon.append(QtCore.QPointF(to_x + 5, to_y + 5))
+        if 60 <= theta < 120:
+            polygon.append(QtCore.QPointF(to_x - 5, to_y + 5))
+            polygon.append(QtCore.QPointF(to_x, to_y))
+            polygon.append(QtCore.QPointF(to_x + 5, to_y + 5))
+        if 120 <= theta < 150:
+            polygon.append(QtCore.QPointF(to_x - 6, to_y))
+            polygon.append(QtCore.QPointF(to_x, to_y))
+            polygon.append(QtCore.QPointF(to_x, to_y + 6))
+        if 150 <= theta <= 180:
+            polygon.append(QtCore.QPointF(to_x - 5, to_y - 5))
+            polygon.append(QtCore.QPointF(to_x, to_y))
+            polygon.append(QtCore.QPointF(to_x - 5, to_y + 5))
+
+        polygon.append(QtCore.QPointF(to_x, to_y))
+        self.setPolygon(polygon)
+
+
+class XFreeLineGraphicsItem(QtWidgets.QGraphicsLineItem):
     """ Takes the coordinate from two TextGraphicsItems. """
 
     from_widget = None
