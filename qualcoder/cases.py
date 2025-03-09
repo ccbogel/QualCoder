@@ -56,18 +56,7 @@ class DialogCases(QtWidgets.QDialog):
     ID_COLUMN = 2
     FILES_COLUMN = 3
     ATTRIBUTE_START_COLUMN = 4
-    header_labels = []
-    attribute_labels_ordered = []
-    app = None
-    parent_text_edit = None
-    source = []
-    sourceText = ""
     cases = []
-    case_text = []
-    selected_case = None
-    selected_file = None
-    display_text_links = []  # Clickable links for A/V images as dictionaries of pos0, pos1, file id
-    attributes = []
 
     def __init__(self, app, parent_text_edit):
 
@@ -111,6 +100,18 @@ class DialogCases(QtWidgets.QDialog):
         self.ui.tableWidget.horizontalHeader().customContextMenuRequested.connect(self.table_header_menu)
         self.ui.tableWidget.installEventFilter(self)
         self.ui.tableWidget.setTabKeyNavigation(False)
+
+        self.header_labels = []
+        self.attribute_labels_ordered = []
+        self.source = []
+        self.cases = []
+        self.case_text = []
+        self.display_text_links = []  # Clickable links for A/V images as dictionaries of pos0, pos1, file id
+        self.attributes = []
+        self.selected_case = None
+        self.selected_file = None
+        self.clipboard_text = ""  # Used to copy text into another cell
+
         self.load_cases_data()
         self.fill_table()
         # Initial resize of table columns
@@ -121,7 +122,7 @@ class DialogCases(QtWidgets.QDialog):
 
     def keyPressEvent(self, event):
         """ Used to activate buttons.
-        Ctrl 0 to 6
+        Ctrl 0 to 6 for some functions and Ctrl C and Ctrl V for copy paste
         """
         key = event.key()
         mods = QtWidgets.QApplication.keyboardModifiers()
@@ -147,6 +148,18 @@ class DialogCases(QtWidgets.QDialog):
                 return
             if key == QtCore.Qt.Key.Key_0:
                 self.help()
+                return
+            if key == QtCore.Qt.Key.Key_C:
+                x = self.ui.tableWidget.currentRow()
+                y = self.ui.tableWidget.currentColumn()
+                self.clipboard_text = self.ui.tableWidget.item(x, y).text()
+                if self.clipboard_text is None:
+                    self.clipboard_text = ""
+                return
+            if key == QtCore.Qt.Key.Key_V:
+                x = self.ui.tableWidget.currentRow()
+                y = self.ui.tableWidget.currentColumn()
+                self.ui.tableWidget.item(x, y).setText(self.clipboard_text)
                 return
 
     def eventFilter(self, object_, event):
@@ -234,7 +247,7 @@ class DialogCases(QtWidgets.QDialog):
                     pass
                 cell.value = data
         wb.save(filepath)
-        '''with open(filepath, mode='w') as f:
+        '''with open(filepath, mode='w') as f: # OLD csv save
             writer = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
             writer.writerow(header)
             for r in range(0, rows):
@@ -839,6 +852,8 @@ class DialogCases(QtWidgets.QDialog):
         if action == action_equals_value:
             # Hide rows that do not match this value
             item_to_compare = self.ui.tableWidget.item(row, col)
+            if item_to_compare is None:
+                item_to_compare = ""
             compare_text = item_to_compare.text()
             for r in range(0, self.ui.tableWidget.rowCount()):
                 item = self.ui.tableWidget.item(r, col)
