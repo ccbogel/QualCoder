@@ -74,40 +74,35 @@ class DialogManageFiles(QtWidgets.QDialog):
     Option to link to external files.
     """
 
-    source = []
-    app = None
-    parent_text_edit = None
-    tab_coding = None  # Tab widget coding tab for updates
-    tab_reports = None  # Tab widget reports for updates
-    text_view = None
-    header_labels = []
     NAME_COLUMN = 0
     MEMO_COLUMN = 1
     DATE_COLUMN = 2
     ID_COLUMN = 3
     CASE_COLUMN = 4
     ATTRIBUTE_START_COLUMN = 5
-    rows_hidden = False
-    default_import_directory = os.path.expanduser("~")
-    attribute_names = []  # list of dictionary name:value for AddAtribute dialog
-    attribute_labels_ordered = []  # helps with filling table data
-    av_dialog_open = None  # Used for opened AV dialog
-    files_renamed = []  # list of dictionaries of old and new names and fid
-    pdf_page_text = ""  # Used when loading pdf text
 
     def __init__(self, app, parent_text_edit, tab_coding, tab_reports):
 
         self.app = app
         self.parent_text_edit = parent_text_edit
-        self.tab_coding = tab_coding
-        self.tab_reports = tab_reports
+        self.tab_coding = tab_coding  # Tab widget coding for updates
+        self.tab_reports = tab_reports  # Tab widget reports for updates
+        self.rows_hidden = False
+        self.source = []  # Dictionaries of source files
+        self.header_labels = []
+        self.default_import_directory = os.path.expanduser("~")
+        self.attribute_names = []  # list of dictionary name:value for AddAtribute dialog
+        self.attribute_labels_ordered = []  # helps with filling table data
+        self.files_renamed = []  # list of dictionaries of old and new names and fid
+        self.pdf_page_text = ""  # Used when loading pdf text
+        self.clipboard_text = ""  # used to copy text into another cell
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_manage_files()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         self.default_import_directory = self.app.settings['directory']
         self.attribute_labels_ordered = []
-        self.av_dialog_open = None
+        self.av_dialog_open = None  # Used for opened AV dialog
         font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
         self.ui.pushButton_create.setIcon(qta.icon('mdi6.pencil-outline', options=[{'scale_factor': 1.4}]))
@@ -193,6 +188,16 @@ class DialogManageFiles(QtWidgets.QDialog):
                 return
             if key == QtCore.Qt.Key.Key_0:
                 self.help()
+                return
+            if key == QtCore.Qt.Key.Key_C:
+                x = self.ui.tableWidget.currentRow()
+                y = self.ui.tableWidget.currentColumn()
+                self.clipboard_text = self.ui.tableWidget.item(x, y).text()
+                return
+            if key == QtCore.Qt.Key.Key_V:
+                x = self.ui.tableWidget.currentRow()
+                y = self.ui.tableWidget.currentColumn()
+                self.ui.tableWidget.item(x, y).setText(self.clipboard_text)
                 return
 
     def eventFilter(self, object_, event):
