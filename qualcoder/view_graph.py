@@ -2558,7 +2558,9 @@ class FreeLineGraphicsItem(QtWidgets.QGraphicsPolygonItem):
     def calculate_points_and_draw(self):
         """ Calculate the to x and y and from x and y points. Draw line between the
         widgets. Join the line to appropriate side of widget.
-         Arrowhead direction changes every 30 degrees based on theta arctangent. """
+         Arrowhead direction changes every 30 degrees based on theta arctangent:
+        > -150:-180 and 150:180, ˩ -150:-120, v -120:-60, L -30:-60, < -30:30, ⌈ 30:60, ^ 60:120, ˥ 120:150
+         """
 
         to_x = self.to_widget.pos().x()
         to_y = self.to_widget.pos().y()
@@ -2604,8 +2606,7 @@ class FreeLineGraphicsItem(QtWidgets.QGraphicsPolygonItem):
         dx = from_x - to_x
         dy = from_y - to_y
         theta = atan2(dy, dx)
-        theta *= 180 / pi  # rads to degs
-        self.setToolTip("THETA " + str(round(theta, 1)))
+        theta *= 180 / pi  # radians to degrees
         polygon = QtGui.QPolygonF()
         polygon.append(QtCore.QPointF(from_x, from_y))
         polygon.append(QtCore.QPointF(to_x, to_y))
@@ -2617,18 +2618,26 @@ class FreeLineGraphicsItem(QtWidgets.QGraphicsPolygonItem):
             polygon.append(QtCore.QPointF(to_x - 6, to_y))
             polygon.append(QtCore.QPointF(to_x, to_y))
             polygon.append(QtCore.QPointF(to_x, to_y - 6))
-        if -120 < theta <= -60:
+        if -120 < theta < -60:
             polygon.append(QtCore.QPointF(to_x - 5, to_y - 5))
             polygon.append(QtCore.QPointF(to_x, to_y))
             polygon.append(QtCore.QPointF(to_x + 5, to_y - 5))
-        if -60 < theta < 0:
+        if -60 <= theta < -30:
+            polygon.append(QtCore.QPointF(to_x + 6, to_y))
+            polygon.append(QtCore.QPointF(to_x, to_y))
+            polygon.append(QtCore.QPointF(to_x, to_y - 6))
+        if -30 <= theta < 0:
             polygon.append(QtCore.QPointF(to_x + 5, to_y - 5))
             polygon.append(QtCore.QPointF(to_x, to_y))
             polygon.append(QtCore.QPointF(to_x + 5, to_y + 5))
-        if 0 < theta < 60:
+        if 0 <= theta < 30:
             polygon.append(QtCore.QPointF(to_x + 5, to_y - 5))
             polygon.append(QtCore.QPointF(to_x, to_y))
             polygon.append(QtCore.QPointF(to_x + 5, to_y + 5))
+        if 30 <= theta < 60:
+            polygon.append(QtCore.QPointF(to_x + 6, to_y))
+            polygon.append(QtCore.QPointF(to_x, to_y))
+            polygon.append(QtCore.QPointF(to_x, to_y + 6))
         if 60 <= theta < 120:
             polygon.append(QtCore.QPointF(to_x - 5, to_y + 5))
             polygon.append(QtCore.QPointF(to_x, to_y))
@@ -2641,13 +2650,14 @@ class FreeLineGraphicsItem(QtWidgets.QGraphicsPolygonItem):
             polygon.append(QtCore.QPointF(to_x - 5, to_y - 5))
             polygon.append(QtCore.QPointF(to_x, to_y))
             polygon.append(QtCore.QPointF(to_x - 5, to_y + 5))
-
         polygon.append(QtCore.QPointF(to_x, to_y))
+        # self.setToolTip(f"THETA {round(theta, 1)} Pts:{len(polygon)}")
         self.setPolygon(polygon)
 
 
 class XFreeLineGraphicsItem(QtWidgets.QGraphicsLineItem):
-    """ Takes the coordinate from two TextGraphicsItems. """
+    """ Takes the coordinate from two TextGraphicsItems.
+    OLD. Replaced with arrowhead line: FreeLineGraphicsItem. """
 
     from_widget = None
     from_pos = None
@@ -2671,7 +2681,7 @@ class XFreeLineGraphicsItem(QtWidgets.QGraphicsLineItem):
             line_type : String
         """
 
-        super(FreeLineGraphicsItem, self).__init__(None)
+        super(XFreeLineGraphicsItem, self).__init__(None)
 
         self.from_widget = from_widget
         self.to_widget = to_widget
