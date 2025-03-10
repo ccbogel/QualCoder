@@ -172,8 +172,8 @@ class AiLLM():
                     # Success, API-key was set. But since the "change_settings" function will start 
                     # a new "init_llm" anyways, we are going to quit here
                     return    
-            elif api_key == 'None':
-                api_key = ''
+            #elif api_key == 'None':
+            #    api_key = ''
             temp = float(self.app.settings.get('ai_temperature', '1.0'))
             top_p = float(self.app.settings.get('ai_top_p', '1.0'))
             if api_base.find('openai.azure.com') != -1:  # using Microsoft Azure
