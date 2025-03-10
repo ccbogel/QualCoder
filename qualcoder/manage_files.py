@@ -95,7 +95,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.attribute_labels_ordered = []  # helps with filling table data
         self.files_renamed = []  # list of dictionaries of old and new names and fid
         self.pdf_page_text = ""  # Used when loading pdf text
-        self.clipboard_text = ""  # used to copy text into another cell
+        self.clipboard_text = ""  # Used to copy text into another cell
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_manage_files()
         self.ui.setupUi(self)
@@ -911,12 +911,13 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         self.header_labels = [_("Name"), _("Memo"), _("Date"), _("Id"), _("Case")]
         # Attributes
-        sql = "select name from attribute_type where caseOrFile='file'"
+        sql = "select name from attribute_type where caseOrFile='file' order by upper(name)"
         cur.execute(sql)
         attribute_names_res = cur.fetchall()
         self.attribute_names = []  # For AddAttribute dialog
         self.attribute_labels_ordered = []  # Help filling table more quickly
         for att_name in attribute_names_res:
+            print(att_name[0])
             self.header_labels.append(att_name[0])
             self.attribute_labels_ordered.append(att_name[0])
             self.attribute_names.append({'name': att_name[0]})  # For AddAttribute dialog
