@@ -331,7 +331,7 @@ class DialogCases(QtWidgets.QDialog):
             files_res = cur.fetchall()
             self.cases.append({'name': row[0], 'memo': row[1], 'owner': row[2], 'date': row[3],
                                'caseid': row[4], 'files': files_res, 'attributes': []})
-        cur.execute("select name from attribute_type where caseOrFile='case'")
+        cur.execute("select name from attribute_type where caseOrFile='case' order by upper(name)")
         attribute_names_res = cur.fetchall()
         self.header_labels = ["Name", "Memo", "Id", "Files"]
         self.attribute_labels_ordered = []

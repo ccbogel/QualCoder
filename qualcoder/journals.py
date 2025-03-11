@@ -186,7 +186,7 @@ class DialogJournals(QtWidgets.QDialog):
         self.header_labels = [_("Name"), _("Modified"), _("Coder"), _("jid")]
         self.header_value_type = ["character", "character", "character", "numeric"]
 
-        sql = "select name, valuetype from attribute_type where caseOrFile='journal'"
+        sql = "select name, valuetype from attribute_type where caseOrFile='journal' order by upper(name)"
         cur.execute(sql)
         attribute_names_res = cur.fetchall()
         self.attribute_names = []  # For AddAttribute dialog
