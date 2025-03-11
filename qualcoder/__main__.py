@@ -42,7 +42,7 @@ import getpass
 from PyQt6 import QtCore, QtGui, QtWidgets
 import qtawesome as qta
 
-from qualcoder.error_dlg import UncaughtHook
+from qualcoder.error_dlg import qt_exception_hook
 from qualcoder.attributes import DialogManageAttributes
 from qualcoder.cases import DialogCases
 from qualcoder.codebook import Codebook
@@ -1253,34 +1253,41 @@ class MainWindow(QtWidgets.QMainWindow):
         self.show()
         QtWidgets.QApplication.processEvents() 
         # Setup AI
-        global AiLLM
-        from qualcoder.ai_llm import AiLLM  # import after showing the UI because this takes several seconds
-        self.app.ai = AiLLM(self.app, self.ui.textEdit)
-        # First start? Ask if user wants to enable ai integration or not
-        if self.app.settings['ai_first_startup'] == 'True' and self.app.settings['ai_enable'] == 'False':
-            msg = _('Welcome\n\n\
+        try:
+            global AiLLM
+            from qualcoder.ai_llm import AiLLM  # import after showing the UI because this takes several seconds
+            self.app.ai = AiLLM(self.app, self.ui.textEdit)
+            # First start? Ask if user wants to enable ai integration or not
+            if self.app.settings['ai_first_startup'] == 'True' and self.app.settings['ai_enable'] == 'False':
+                msg = _('Welcome\n\n\
 The new AI enhanced functions in QualCoder need some additional setup. \
 Do you want to enable the AI and start the setup? \
 You can also do this later by starting the AI Setup Wizard from the AI menu in the main window. \
 Click "Yes" to start now.')
-            msg_box = QtWidgets.QMessageBox(self)
-            msg_box.setWindowTitle(_('AI Integration'))
-            msg_box.setText(msg)
-            msg_box.setStyleSheet(f"* {{font-size:{self.app.settings['fontsize']}pt}} ")
-            msg_box.addButton(QtWidgets.QMessageBox.StandardButton.Yes)
-            msg_box.addButton(QtWidgets.QMessageBox.StandardButton.No)
-            msg_box.addButton(QtWidgets.QMessageBox.StandardButton.Help)
-            reply = None
-            while reply is None or reply == QtWidgets.QMessageBox.StandardButton.Help:
-                reply = msg_box.exec()
-                if reply == QtWidgets.QMessageBox.StandardButton.Help:
-                    webbrowser.open('https://github.com/ccbogel/QualCoder/wiki/2.3.-AI-Setup')                
-            if reply == QtWidgets.QMessageBox.StandardButton.Yes:
-                self.ai_setup_wizard()  # (will also init the llm)
-        else:
-            self.app.ai.init_llm(self)      
-        self.app.settings['ai_first_startup'] = 'False'
-        self.app.write_config_ini(self.app.settings, self.app.ai_models)
+                msg_box = QtWidgets.QMessageBox(self)
+                msg_box.setWindowTitle(_('AI Integration'))
+                msg_box.setText(msg)
+                msg_box.setStyleSheet(f"* {{font-size:{self.app.settings['fontsize']}pt}} ")
+                msg_box.addButton(QtWidgets.QMessageBox.StandardButton.Yes)
+                msg_box.addButton(QtWidgets.QMessageBox.StandardButton.No)
+                msg_box.addButton(QtWidgets.QMessageBox.StandardButton.Help)
+                reply = None
+                while reply is None or reply == QtWidgets.QMessageBox.StandardButton.Help:
+                    reply = msg_box.exec()
+                    if reply == QtWidgets.QMessageBox.StandardButton.Help:
+                        webbrowser.open('https://github.com/ccbogel/QualCoder/wiki/2.3.-AI-Setup')                
+                if reply == QtWidgets.QMessageBox.StandardButton.Yes:
+                    self.ai_setup_wizard()  # (will also init the llm)
+            else:
+                self.app.ai.init_llm(self)      
+            self.app.settings['ai_first_startup'] = 'False'
+            self.app.write_config_ini(self.app.settings, self.app.ai_models)
+        except Exception as e:
+            type_e = type(e)
+            value = e
+            tb_obj = e.__traceback__
+            # log the exception and show error msg
+            qt_exception_hook.exception_hook(type_e, value, tb_obj)
     
     def init_ui(self):
         """ Set up menu triggers """
@@ -3057,16 +3064,23 @@ def gui():
     # Check DroidSandMono installed  - for wordcloud
     install_droid_sans_mono()
     ex = MainWindow(qual_app)
-    if project_path:
-        split_ = project_path.split("|")
-        proj_path = ""
-        # Only the path - older and rarer format - legacy
-        if len(split_) == 1:
-            proj_path = split_[0]
-        # Newer datetime | path
-        if len(split_) == 2:
-            proj_path = split_[1]
-        ex.open_project(path_=proj_path)
+    try:
+        if project_path:
+            split_ = project_path.split("|")
+            proj_path = ""
+            # Only the path - older and rarer format - legacy
+            if len(split_) == 1:
+                proj_path = split_[0]
+            # Newer datetime | path
+            if len(split_) == 2:
+                proj_path = split_[1]
+            ex.open_project(path_=proj_path)
+    except Exception as e:
+        type_e = type(e)
+        value = e
+        tb_obj = e.__traceback__
+        # log the exception and show error msg
+        qt_exception_hook.exception_hook(type_e, value, tb_obj)
 
     sys.exit(app.exec())
 
