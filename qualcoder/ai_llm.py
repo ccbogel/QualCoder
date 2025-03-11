@@ -127,110 +127,124 @@ class AiLLM():
         return qta.icon('mdi6.script-text-outline', color=self.app.highlight_color())
         
     def init_llm(self, main_window, rebuild_vectorstore=False, enable_ai=False):  
-        self.main_window = main_window      
-        if enable_ai or self.app.settings['ai_enable'] == 'True':
-            self.parent_text_edit.append(_('AI: Starting up...'))
-            QtWidgets.QApplication.processEvents()  # update ui
-            self._status = 'starting'
+        try:
+            self.main_window = main_window      
+            if enable_ai or self.app.settings['ai_enable'] == 'True':
+                self.parent_text_edit.append(_('AI: Starting up...'))
+                QtWidgets.QApplication.processEvents()  # update ui
+                self._status = 'starting'
 
-            # init LLMs
-            # set_llm_cache(InMemoryCache())
-            if int(self.app.settings['ai_model_index']) < 0:
-                self.parent_text_edit.append(_('AI: Please set up the AI model'))
-
-                main_window.change_settings(section='AI', enable_ai=True)
+                # init LLMs
+                # set_llm_cache(InMemoryCache())
+                if int(self.app.settings['ai_model_index']) >= len(self.app.ai_models): # model index out of range
+                    self.app.settings['ai_model_index'] = -1
                 if int(self.app.settings['ai_model_index']) < 0:
-                    # Still no model selected, disable AI:
-                    self.app.settings['ai_enable'] = 'False'
-                    self.parent_text_edit.append(_('AI: No model selected, AI is disabled.'))
-                    self._status = ''
-                    return
-                else: 
-                    # Success, model was selected. But since the "change_settings" function will start 
-                    # a new "init_llm" anyway, we are going to quit here
-                    return    
-            curr_model = self.app.ai_models[int(self.app.settings['ai_model_index'])]
-            
-            large_model = curr_model['large_model']
-            self.large_llm_context_window = int(curr_model['large_model_context_window'])
-            fast_model = curr_model['fast_model']
-            self.fast_llm_context_window = int(curr_model['fast_model_context_window'])
-            api_base = curr_model['api_base']
-            api_key = curr_model['api_key']
-            if api_key == '':
-                msg = _('Please enter an API-key for the AI in the following dialog (or "None" if not API-key is needed).')
-                Message(self.app, _('AI API-key'), msg).exec()
-                main_window.change_settings(section='AI', enable_ai=True)
+                    msg = _('AI: Please set up the AI model')
+                    Message(self.app, _('AI Setup'), msg).exec()
+
+                    main_window.change_settings(section='AI', enable_ai=True)
+                    if int(self.app.settings['ai_model_index']) < 0:
+                        # Still no model selected, disable AI:
+                        self.app.settings['ai_enable'] = 'False'
+                        self.parent_text_edit.append(_('AI: No model selected, AI is disabled.'))
+                        self._status = ''
+                        return
+                    else: 
+                        # Success, model was selected. But since the "change_settings" function will start 
+                        # a new "init_llm" anyway, we are going to quit here
+                        return    
                 curr_model = self.app.ai_models[int(self.app.settings['ai_model_index'])]
-                if curr_model['api_key'] == '':
-                    # still no API-key, disable AI:
-                    self.app.settings['ai_enable'] = 'False'
-                    self.parent_text_edit.append(_('AI: No API key set, AI is disabled.'))
+                
+                large_model = curr_model['large_model']
+                self.large_llm_context_window = int(curr_model['large_model_context_window'])
+                fast_model = curr_model['fast_model']
+                self.fast_llm_context_window = int(curr_model['fast_model_context_window'])
+                api_base = curr_model['api_base']
+                api_key = curr_model['api_key']
+                if api_key == '':
+                    msg = _('Please enter an API-key for the AI in the following dialog (or "None" if not API-key is needed).')
+                    Message(self.app, _('AI API-key'), msg).exec()
+                    main_window.change_settings(section='AI', enable_ai=True)
+                    curr_model = self.app.ai_models[int(self.app.settings['ai_model_index'])]
+                    if curr_model['api_key'] == '':
+                        # still no API-key, disable AI:
+                        self.app.settings['ai_enable'] = 'False'
+                        self.parent_text_edit.append(_('AI: No API key set, AI is disabled.'))
+                        self._status = ''
+                        return
+                    else: 
+                        # Success, API-key was set. But since the "change_settings" function will start 
+                        # a new "init_llm" anyways, we are going to quit here
+                        return    
+                #elif api_key == 'None':
+                #    api_key = ''
+                temp = float(self.app.settings.get('ai_temperature', '1.0'))
+                top_p = float(self.app.settings.get('ai_top_p', '1.0'))
+                if api_base.find('openai.azure.com') != -1:  # using Microsoft Azure
+                    self.large_llm = AzureChatOpenAI(
+                                        azure_endpoint=api_base,
+                                        azure_deployment=large_model,    
+                                        api_version="2024-02-15-preview",
+                                        api_key=api_key,
+                                        temperature=temp,
+                                        top_p=top_p,
+                                        max_tokens=None,
+                                        timeout=None,
+                                        max_retries=2,
+                                        cache=False,
+                                        streaming=True
+                    )
+                    self.small_llm = AzureChatOpenAI(
+                                        azure_endpoint=api_base,
+                                        azure_deployment=large_model,    
+                                        api_version="2024-02-15-preview",
+                                        api_key=api_key,
+                                        temperature=temp,
+                                        top_p=top_p,
+                                        max_tokens=None,
+                                        timeout=None,
+                                        max_retries=2,
+                                        cache=False,
+                                        streaming=True
+                    )
+                else:  # OpenAI or 100% compatible api
+                    self.large_llm = ChatOpenAI(model=large_model, 
+                                        openai_api_key=api_key, 
+                                        openai_api_base=api_base, 
+                                        cache=False,
+                                        temperature=temp,
+                                        top_p=top_p,
+                                        streaming=True
+                                        )
+                    self.fast_llm = ChatOpenAI(model=fast_model, 
+                                        openai_api_key=api_key, 
+                                        openai_api_base=api_base, 
+                                        cache=False,
+                                        temperature=temp,
+                                        top_p=top_p,
+                                        streaming=True
+                                        )
+                self.ai_streaming_output = ''
+                self.app.settings['ai_enable'] = 'True'
+                
+                # init vectorstore
+                if not self.sources_vectorstore.is_open():
+                    self.sources_vectorstore.init_vectorstore(rebuild_vectorstore)
+                else:
                     self._status = ''
-                    return
-                else: 
-                    # Success, API-key was set. But since the "change_settings" function will start 
-                    # a new "init_llm" anyways, we are going to quit here
-                    return    
-            elif api_key == 'None':
-                api_key = ''
-            temp = float(self.app.settings.get('ai_temperature', '1.0'))
-            top_p = float(self.app.settings.get('ai_top_p', '1.0'))
-            if api_base.find('openai.azure.com') != -1:  # using Microsoft Azure
-                self.large_llm = AzureChatOpenAI(
-                                    azure_endpoint=api_base,
-                                    azure_deployment=large_model,    
-                                    api_version="2024-02-15-preview",
-                                    api_key=api_key,
-                                    temperature=temp,
-                                    top_p=top_p,
-                                    max_tokens=None,
-                                    timeout=None,
-                                    max_retries=2,
-                                    cache=False,
-                                    streaming=True
-                )
-                self.small_llm = AzureChatOpenAI(
-                                    azure_endpoint=api_base,
-                                    azure_deployment=large_model,    
-                                    api_version="2024-02-15-preview",
-                                    api_key=api_key,
-                                    temperature=temp,
-                                    top_p=top_p,
-                                    max_tokens=None,
-                                    timeout=None,
-                                    max_retries=2,
-                                    cache=False,
-                                    streaming=True
-                )
-            else:  # OpenAI or 100% compatible api
-                self.large_llm = ChatOpenAI(model=large_model, 
-                                    openai_api_key=api_key, 
-                                    openai_api_base=api_base, 
-                                    cache=False,
-                                    temperature=temp,
-                                    top_p=top_p,
-                                    streaming=True
-                                    )
-                self.fast_llm = ChatOpenAI(model=fast_model, 
-                                    openai_api_key=api_key, 
-                                    openai_api_base=api_base, 
-                                    cache=False,
-                                    temperature=temp,
-                                    top_p=top_p,
-                                    streaming=True
-                                    )
-            self.ai_streaming_output = ''
-            self.app.settings['ai_enable'] = 'True'
-            
-            # init vectorstore
-            if not self.sources_vectorstore.is_open():
-                self.sources_vectorstore.init_vectorstore(rebuild_vectorstore)
+                    self.parent_text_edit.append(_('AI: Ready'))
             else:
-                self._status = ''
-                self.parent_text_edit.append(_('AI: Ready'))
-        else:
+                self.close()
+        except Exception as e:
+            type_e = type(e)
+            value = e
+            tb_obj = e.__traceback__
+            # log the exception and show error msg
+            qt_exception_hook.exception_hook(type_e, value, tb_obj)
             self.close()
+            self.app.settings['ai_enable'] = 'False'
+            msg = _('An error occured during AI initialization. The AI features will be disabled. Click on Project > Settings to reenable them.')
+            Message(self.app, _('AI Initialization'), msg, 'Information').exec()
         
     def close(self):
         self._status = 'closing'
