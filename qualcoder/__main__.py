@@ -2235,12 +2235,6 @@ Click "Yes" to start now.')
         enable_ai = if True, the AI will be enabled in settings
         """
         current_coder = self.app.settings['codername']
-        current_ai_enable = self.app.settings['ai_enable']
-        current_ai_model_index = int(self.app.settings['ai_model_index'])
-        if current_ai_model_index >= 0:
-            current_ai_api_key = self.app.ai_models[current_ai_model_index]['api_key']
-        else:
-            current_ai_api_key = ''
         ui = DialogSettings(self.app, section=section, enable_ai=enable_ai)
         ret = ui.exec()
         if ret == QtWidgets.QDialog.DialogCode.Rejected:  # Dialog has been canceled
@@ -2252,22 +2246,10 @@ Click "Yes" to start now.')
         self.setStyleSheet(font)
         self.ai_chat_window.init_styles()
         
-        if current_ai_enable != self.app.settings['ai_enable']:
-            if self.app.settings['ai_enable'] == 'True':
-                # AI is newly enabled:
-                self.app.ai.init_llm(self, rebuild_vectorstore=False)
-            else:  # AI is disabled
-                self.app.ai.close()
-        elif int(current_ai_model_index) < 0:
-            # no model selected
-            self.app.settings['ai_enable'] = 'False'
-            self.app.ai.close()                        
-        elif current_ai_model_index != self.app.settings['ai_model_index']:
-            # current model has changed
-            self.app.ai.init_llm(self)
-        elif current_ai_api_key != self.app.ai_models[current_ai_model_index]['api_key']:
-            # ai api-key has changed
-            self.app.ai.init_llm(self)
+        if self.app.settings['ai_enable'] == 'True':
+            self.app.ai.init_llm(self, rebuild_vectorstore=False)
+        else:  
+            self.app.ai.close()
             
         # Name change: Close all opened dialogs as coder name needs to change everywhere
         if current_coder != self.app.settings['codername']:

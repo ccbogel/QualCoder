@@ -136,8 +136,11 @@ class AiLLM():
 
                 # init LLMs
                 # set_llm_cache(InMemoryCache())
+                if int(self.app.settings['ai_model_index']) >= len(self.app.ai_models): # model index out of range
+                    self.app.settings['ai_model_index'] = -1
                 if int(self.app.settings['ai_model_index']) < 0:
-                    self.parent_text_edit.append(_('AI: Please set up the AI model'))
+                    msg = _('AI: Please set up the AI model')
+                    Message(self.app, _('AI Setup'), msg).exec()
 
                     main_window.change_settings(section='AI', enable_ai=True)
                     if int(self.app.settings['ai_model_index']) < 0:
