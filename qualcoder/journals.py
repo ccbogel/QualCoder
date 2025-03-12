@@ -840,6 +840,7 @@ class DialogJournals(QtWidgets.QDialog):
         cursor.setPosition(cursor.position() + prev_result[2], QtGui.QTextCursor.MoveMode.KeepAnchor)
         self.ui.textEdit.setTextCursor(cursor)
         self.ui.label_search_totals.setText(f"{self.search_index + 1} / {len(self.search_indices)}")
+        self.scroll_text_into_view()
 
     def move_to_next_search_text(self):
         """ Push button pressed to move to next search text position. """
@@ -864,3 +865,15 @@ class DialogJournals(QtWidgets.QDialog):
         cursor.setPosition(cursor.position() + next_result[2], QtGui.QTextCursor.MoveMode.KeepAnchor)
         self.ui.textEdit.setTextCursor(cursor)
         self.ui.label_search_totals.setText(f"{self.search_index + 1} / {len(self.search_indices)}")
+        self.scroll_text_into_view()
+
+    def scroll_text_into_view(self):
+        """ Scroll so the selection is in the middle of the screen. """
+        cursor = self.ui.textEdit.textCursor()
+        if cursor.hasSelection():
+            cursor_rect = self.ui.textEdit.cursorRect(cursor)
+            vertical_center = cursor_rect.center().y()
+            vertical_scrollbar = self.ui.textEdit.verticalScrollBar()
+            current_scroll_pos = vertical_scrollbar.value()
+            desired_scroll_pos = current_scroll_pos + (vertical_center - self.ui.textEdit.viewport().height() // 2)
+            vertical_scrollbar.setValue(desired_scroll_pos)
