@@ -881,6 +881,7 @@ class DialogCodeText(QtWidgets.QWidget):
         cursor.setPosition(cursor.position() + next_result[2], QtGui.QTextCursor.MoveMode.KeepAnchor)
         self.ui.textEdit.setTextCursor(cursor)
         self.ui.label_search_totals.setText(f"{self.search_index + 1} / {len(self.search_indices)}")
+        self.scroll_text_into_view()
 
     def move_to_previous_search_text(self):
         """ Push button pressed to move to previous search text position. """
@@ -901,6 +902,7 @@ class DialogCodeText(QtWidgets.QWidget):
         cursor.setPosition(cursor.position() + prev_result[2], QtGui.QTextCursor.MoveMode.KeepAnchor)
         self.ui.textEdit.setTextCursor(cursor)
         self.ui.label_search_totals.setText(f"{self.search_index + 1} / {len(self.search_indices)}")
+        self.scroll_text_into_view()
 
     def lineedit_search_menu(self, position):
         """ Option to change from automatic search on 3 characters or 5 character to search.
@@ -4197,9 +4199,13 @@ class DialogCodeText(QtWidgets.QWidget):
                         c['newpos0'] >= preceding_pos - pre_chars_len:
                     c['newpos0'] += chars_len
                     c['newpos1'] += chars_len
+                    # Also check and apply start of code is at start of text
+                    if c['pos0'] == 0:
+                        c['newpos0'] = 0
                     changed = True
                 if not changed and c['newpos0'] is not None and c['newpos0'] < preceding_pos < c['newpos1']:
                     c['newpos1'] += chars_len
+
             for c in self.ed_annotations:
                 changed = False
                 if c['newpos0'] is not None and c['newpos0'] >= preceding_pos and \
@@ -4209,11 +4215,15 @@ class DialogCodeText(QtWidgets.QWidget):
                     changed = True
                 if c['newpos0'] is not None and not changed and c['newpos0'] < preceding_pos < c['newpos1']:
                     c['newpos1'] += chars_len
+
             for c in self.ed_casetext:
                 changed = False
                 if c['newpos0'] is not None and c['newpos0'] >= preceding_pos and \
                         c['newpos0'] >= preceding_pos - pre_chars_len:
                     c['newpos0'] += chars_len
+                    # check and apply start of case is included
+                    if c['pos0'] == 0:
+                        c['newpos0'] = 0
                     c['newpos1'] += chars_len
                     changed = True
                 if c['newpos0'] is not None and not changed and c['newpos0'] < preceding_pos < c['newpos1']:
@@ -4228,12 +4238,16 @@ class DialogCodeText(QtWidgets.QWidget):
                 if c['newpos0'] is not None and c['newpos0'] >= preceding_pos and \
                         c['newpos0'] >= preceding_pos - pre_chars_len:
                     c['newpos0'] -= chars_len
+                    if c['newpos0'] < 0:
+                        c['newpos0'] = 0
                     c['newpos1'] -= chars_len
                     changed = True
                 # Remove, as entire text is being removed (e.g. copy replace)
                 if c['newpos0'] is not None and not changed and c['newpos0'] >= preceding_pos and \
                         c['newpos1'] < preceding_pos - pre_chars_len + post_chars_len:
                     c['newpos0'] -= chars_len
+                    if c['newpos0'] < 0:
+                        c['newpos0'] = 0
                     c['newpos1'] -= chars_len
                     changed = True
                     self.code_deletions.append(f"delete from code_text where ctid={c['ctid']}")
@@ -4243,11 +4257,14 @@ class DialogCodeText(QtWidgets.QWidget):
                     if c['newpos1'] < c['newpos0']:
                         self.code_deletions.append(f"delete from code_text where ctid={c['ctid']}")
                         c['newpos0'] = None
+
             for c in self.ed_annotations:
                 changed = False
                 if c['newpos0'] is not None and c['newpos0'] >= preceding_pos and \
                         c['newpos0'] >= preceding_pos - pre_chars_len:
                     c['newpos0'] -= chars_len
+                    if c['newpos0'] < 0:
+                        c['newpos0'] = 0
                     c['newpos1'] -= chars_len
                     changed = True
                     # Remove, as entire text is being removed (e.g. copy replace)
@@ -4263,17 +4280,22 @@ class DialogCodeText(QtWidgets.QWidget):
                     if c['newpos1'] < c['newpos0']:
                         self.code_deletions.append(f"delete from annotation where anid={c['anid']}")
                         c['newpos0'] = None
+
             for c in self.ed_casetext:
                 changed = False
                 if c['newpos0'] is not None and c['newpos0'] >= preceding_pos and \
                         c['newpos0'] >= preceding_pos - pre_chars_len:
                     c['newpos0'] -= chars_len
+                    if c['newpos0'] < 0:
+                        c['newpos0'] = 0
                     c['newpos1'] -= chars_len
                     changed = True
                 # Remove, as entire text is being removed (e.g. copy replace)
                 if c['newpos0'] is not None and not changed and c['newpos0'] >= preceding_pos and \
                         c['newpos1'] < preceding_pos - pre_chars_len + post_chars_len:
                     c['newpos0'] -= chars_len
+                    if c['newpos0'] < 0:
+                        c['newpos0'] = 0
                     c['newpos1'] -= chars_len
                     changed = True
                     self.code_deletions.append(f"delete from case_text where id={c['id']}")
@@ -4537,9 +4559,11 @@ class DialogCodeText(QtWidgets.QWidget):
         sql = "update case_text set pos0=?, pos1=? where id=? and (pos0 !=? or pos1 !=?)"
         cur = self.app.conn.cursor()
         for c in self.ed_casetext:
+            if c['newpos1'] >= len(self.text):
+                c['newpos1'] = len(self.text)
             if c['newpos0'] is not None:
                 cur.execute(sql, [c['newpos0'], c['newpos1'], c['id'], c['newpos0'], c['newpos1']])
-            if c['newpos1'] >= len(self.text):
+            else:
                 cur.execute("delete from case_text where id=?", [c['id']])
         self.app.conn.commit()
 
@@ -4551,7 +4575,7 @@ class DialogCodeText(QtWidgets.QWidget):
         for a in self.ed_annotations:
             if a['newpos0'] is not None:
                 cur.execute(sql, [a['newpos0'], a['newpos1'], a['anid'], a['newpos0'], a['newpos1']])
-            if a['newpos1'] >= len(self.text):
+            if a['newpos1'] is None:
                 cur.execute("delete from annotation where anid=?", [a['anid']])
         self.app.conn.commit()
 
@@ -4914,7 +4938,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 break
 
     def scroll_text_into_view(self):
-        # Scroll so the selection is in the middle of the screen
+        """ Scroll so the selection is in the middle of the screen. """
         cursor = self.ui.textEdit.textCursor()
         if cursor.hasSelection():
             cursor_rect = self.ui.textEdit.cursorRect(cursor)
