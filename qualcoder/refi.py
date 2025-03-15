@@ -1533,6 +1533,8 @@ class RefiImport:
         create_date = element.get("creationDateTime")
         if create_date is None:
             create_date = element.get("modifiedDateTime")
+        if create_date is None:  # Still a problem getting the date, make a new one
+            create_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%dT%H:%M:%SZ")
         create_date = create_date.replace('T', ' ')
         create_date = create_date.replace('Z', '')
         creating_user_guid = element.get("creatingUser")
