@@ -3854,8 +3854,6 @@ class DialogCodeText(QtWidgets.QWidget):
         Activated using self.ui.pushButton_auto_code
         """
 
-        print("fffff here")
-
         code_item = self.ui.treeWidget.currentItem()
         if code_item is None or code_item.text(1)[0:3] == 'cat':
             Message(self.app, _('Warning'), _("No code was selected"), "warning").exec()
