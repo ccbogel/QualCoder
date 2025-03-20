@@ -66,6 +66,7 @@ class DialogCodeImage(QtWidgets.QDialog):
     file_ = None  # Dictionary with name, memo, id, mediapath?
     codes = []
     categories = []
+    tree_sort_option = "all asc"  # all desc, cat then code asc
     selection = None  # Initial code rectangle point
     scale = 1.0
     code_areas = []
@@ -97,6 +98,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.attributes = []
         self.degrees = 0
         self.get_codes_and_categories()
+        self.tree_sort_option = "all asc"
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_code_image()
         self.ui.setupUi(self)
@@ -323,7 +325,7 @@ class DialogCodeImage(QtWidgets.QDialog):
                     top_item.setToolTip(0, c['name'])
                 top_item.setToolTip(2, c['memo'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
-                if 'catid:' + str(c['catid']) in non_expanded:
+                if f"catid:{c['catid']}" in non_expanded:
                     top_item.setExpanded(False)
                 else:
                     top_item.setExpanded(True)
@@ -341,18 +343,18 @@ class DialogCodeImage(QtWidgets.QDialog):
                 item = it.value()
                 count2 = 0
                 while item and count2 < 10000:  # while there is an item in the list
-                    if item.text(1) == 'catid:' + str(c['supercatid']):
+                    if item.text(1) == f"catid:{c['supercatid']}":
                         memo = ""
                         if c['memo'] != "":
                             memo = "Memo"
-                        child = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
+                        child = QtWidgets.QTreeWidgetItem([c['name'], f"catid:{c['catid']}", memo])
                         child.setToolTip(0, c['name'])
                         if len(c['name']) > 52:
                             child.setText(0, c['name'][:25] + '..' + c['name'][-25:])
                             child.setToolTip(0, c['name'])
                         child.setToolTip(2, c['memo'])
                         item.addChild(child)
-                        if 'catid:' + str(c['catid']) in non_expanded:
+                        if f"catid:{c['catid']}" in non_expanded:
                             child.setExpanded(False)
                         else:
                             child.setExpanded(True)
@@ -371,7 +373,7 @@ class DialogCodeImage(QtWidgets.QDialog):
                 memo = ""
                 if c['memo'] != "":
                     memo = "Memo"
-                top_item = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
+                top_item = QtWidgets.QTreeWidgetItem([c['name'], f"cid:{c['cid']}", memo])
                 top_item.setToolTip(0, c['name'])
                 if len(c['name']) > 52:
                     top_item.setText(0, c['name'][:25] + '..' + c['name'][-25:])
@@ -394,11 +396,11 @@ class DialogCodeImage(QtWidgets.QDialog):
             item = it.value()
             count = 0
             while item and count < 10000:
-                if item.text(1) == 'catid:' + str(c['catid']):
+                if item.text(1) == f"catid:{c['catid']}":
                     memo = ""
                     if c['memo'] != "":
                         memo = "Memo"
-                    child = QtWidgets.QTreeWidgetItem([c['name'], 'cid:' + str(c['cid']), memo])
+                    child = QtWidgets.QTreeWidgetItem([c['name'], f"cid:{c['cid']}", memo])
                     child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
                     color = TextColor(c['color']).recommendation
                     child.setForeground(0, QBrush(QtGui.QColor(color)))
@@ -416,7 +418,10 @@ class DialogCodeImage(QtWidgets.QDialog):
                 item = it.value()
                 count += 1
         # self.ui.treeWidget.expandAll()
-        self.ui.treeWidget.sortByColumn(0, QtCore.Qt.SortOrder.AscendingOrder)
+        if self.tree_sort_option == "all asc":
+            self.ui.treeWidget.sortByColumn(0, QtCore.Qt.SortOrder.AscendingOrder)
+        if self.tree_sort_option == "all desc":
+            self.ui.treeWidget.sortByColumn(0, QtCore.Qt.SortOrder.DescendingOrder)
         self.fill_code_counts_in_tree()
 
     def fill_code_counts_in_tree(self):
@@ -857,8 +862,23 @@ class DialogCodeImage(QtWidgets.QDialog):
             action_move_code = menu.addAction(_("Move code to"))
             action_show_coded_media = menu.addAction(_("Show coded text and media"))
         action_show_codes_like = menu.addAction(_("Show codes like"))
+        action_all_asc = menu.addAction(_("Sort ascending"))
+        action_all_desc = menu.addAction(_("Sort descending"))
+        action_cat_then_code_asc = menu.addAction(_("Sort category then code ascending"))
         action = menu.exec(self.ui.treeWidget.mapToGlobal(position))
         if action is None:
+            return
+        if action == action_all_asc:
+            self.tree_sort_option = "all asc"
+            self.fill_tree()
+            return
+        if action == action_all_desc:
+            self.tree_sort_option = "all desc"
+            self.fill_tree()
+            return
+        if action == action_cat_then_code_asc:
+            self.tree_sort_option = "cat and code asc"
+            self.fill_tree()
             return
         if selected is not None and selected.text(1)[0:3] == 'cid' and action == action_color:
             self.change_code_color(selected)
