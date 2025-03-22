@@ -38,7 +38,7 @@ from PyQt6.QtGui import QBrush
 from .add_item_name import DialogAddItemName
 from .code_in_all_files import DialogCodeInAllFiles
 from .color_selector import DialogColorSelect
-from .color_selector import colors, TextColor
+from .color_selector import colors, TextColor, colour_ranges, show_codes_of_colour_range
 from .confirm_delete import DialogConfirmDelete
 from .GUI.ui_dialog_code_image import Ui_Dialog_code_image
 from .GUI.ui_dialog_view_image import Ui_Dialog_view_image
@@ -862,11 +862,15 @@ class DialogCodeImage(QtWidgets.QDialog):
             action_move_code = menu.addAction(_("Move code to"))
             action_show_coded_media = menu.addAction(_("Show coded text and media"))
         action_show_codes_like = menu.addAction(_("Show codes like"))
+        action_show_codes_of_colour = menu.addAction(_("Show codes of colour"))
         action_all_asc = menu.addAction(_("Sort ascending"))
         action_all_desc = menu.addAction(_("Sort descending"))
         action_cat_then_code_asc = menu.addAction(_("Sort category then code ascending"))
         action = menu.exec(self.ui.treeWidget.mapToGlobal(position))
         if action is None:
+            return
+        if action == action_show_codes_of_colour:
+            self.show_codes_of_color()
             return
         if action == action_all_asc:
             self.tree_sort_option = "all asc"
@@ -970,6 +974,18 @@ class DialogCodeImage(QtWidgets.QDialog):
         txt = str(dialog.textValue())
         root = self.ui.treeWidget.invisibleRootItem()
         self.recursive_traverse(root, txt)
+
+    def show_codes_of_color(self):
+        """ Show all codes in colour range in code tree., ir all codes if no selection.
+        Show selected codes that are of a selected colour.
+        """
+
+        ui = DialogSelectItems(self.app, colour_ranges, _("Select code colors"), "single")
+        ok = ui.exec()
+        if not ok:
+            return
+        selected_color = ui.get_selected()
+        show_codes_of_colour_range(self.app, self.ui.treeWidget, self.codes, selected_color)
 
     def recursive_traverse(self, item, text_):
         """ Find all children codes of this item that match or not and hide or unhide based on 'text'.
