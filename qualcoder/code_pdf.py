@@ -181,6 +181,11 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.pushButton_document_memo.setIcon(qta.icon('mdi6.text-box-outline', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_document_memo.pressed.connect(self.file_memo)
 
+        self.ui.pushButton_zoom_in.setIcon(qta.icon('mdi6.magnify-plus-outline', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_zoom_in.pressed.connect(self.zoom_in)
+        self.ui.pushButton_zoom_out.setIcon(qta.icon('mdi6.magnify-minus-outline', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_zoom_out.pressed.connect(self.zoom_out)
+
         self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
         self.ui.lineEdit_search.setEnabled(False)
         self.ui.checkBox_search_case.stateChanged.connect(self.search_for_text)
@@ -1430,8 +1435,8 @@ class DialogCodePdf(QtWidgets.QWidget):
         V assign 'in vivo' code to selected text - text edit only
         Ctrl 0 to Ctrl 9 - button presses
         # Display Clicked character position
-        + Zoom in
-        -Zoom out
+        Shift + Zoom in
+        Ctrl - Zoom out
         """
 
         key = event.key()
@@ -1470,14 +1475,10 @@ class DialogCodePdf(QtWidgets.QWidget):
                 return
         if self.ui.graphicsView.hasFocus() and self.scene is not None:
             if key == QtCore.Qt.Key.Key_Plus:
-                if self.ui.graphicsView.transform().isScaling() and self.ui.graphicsView.transform().determinant() > 10:
-                    return
-                self.ui.graphicsView.scale(1.1, 1.1)
+                self.zoom_in()
                 return
             if key == QtCore.Qt.Key.Key_Minus:
-                if self.ui.graphicsView.transform().isScaling() and self.ui.graphicsView.transform().determinant() < 0.1:
-                    return
-                self.ui.graphicsView.scale(0.9, 0.9)
+                self.zoom_out()
                 return
         # Hide unHide top groupbox
         if key == QtCore.Qt.Key.Key_H:
@@ -1507,16 +1508,6 @@ class DialogCodePdf(QtWidgets.QWidget):
             self.recursive_set_current_item(self.ui.treeWidget.invisibleRootItem(), selection['name'])
             self.mark(by_text_boxes=True)
             return
-        # Unmark text boxes
-        ''' Review graphicsview_menu for code for this action '''
-        '''if key == QtCore.Qt.Key.Key_U:
-            self.selected_graphic_textboxes = self.scene.selectedItems()
-            if len(self.selected_graphic_textboxes) == 0:
-                return
-            print("U")
-            #self.unmark(cursor_pos)
-            return
-        # TODO MORE'''
 
         if not self.ui.textEdit.hasFocus():
             return
@@ -1585,6 +1576,20 @@ class DialogCodePdf(QtWidgets.QWidget):
                 self.ui.lineEdit_search.setText(selected_text)
                 self.search_for_text()
                 self.ui.pushButton_next.setFocus()
+
+    def zoom_in(self):
+        if self.scene is None:
+            return
+        if self.ui.graphicsView.transform().isScaling() and self.ui.graphicsView.transform().determinant() > 10:
+            return
+        self.ui.graphicsView.scale(1.1, 1.1)
+
+    def zoom_out(self):
+        if self.scene is None:
+            return
+        if self.ui.graphicsView.transform().isScaling() and self.ui.graphicsView.transform().determinant() < 0.1:
+            return
+        self.ui.graphicsView.scale(0.9, 0.9)
 
     def highlight_selected_overlap(self):
         """ Highlight the current overlapping text code, by placing formatting on top. """
