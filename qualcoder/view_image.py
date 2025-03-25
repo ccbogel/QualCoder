@@ -74,6 +74,7 @@ class DialogCodeImage(QtWidgets.QDialog):
     attributes = []
     undo_deleted_code = None  # Undo last deleted code
     degrees = 0  # For image rotation
+    show_code_captions = False
 
     def __init__(self, app, parent_textedit, tab_reports):
         """ Show list of image files.
@@ -99,6 +100,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.degrees = 0
         self.get_codes_and_categories()
         self.tree_sort_option = "all asc"
+        self.show_code_captions = False
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_code_image()
         self.ui.setupUi(self)
@@ -148,6 +150,18 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.ui.pushButton_file_attributes.pressed.connect(self.get_files_from_attributes)
         self.ui.pushButton_important.setIcon(qta.icon('mdi6.star-outline', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_important.pressed.connect(self.show_important_coded)
+
+        self.ui.pushButton_captions.setIcon(qta.icon('mdi6.closed-caption-outline', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_captions.pressed.connect(self.captions_flag)
+        self.ui.pushButton_zoom_in.setIcon(qta.icon('mdi6.magnify-plus-outline', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_zoom_in.pressed.connect(self.zoom_in)
+        self.ui.pushButton_zoom_out.setIcon(qta.icon('mdi6.magnify-minus-outline', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_zoom_out.pressed.connect(self.zoom_out)
+        self.ui.pushButton_rotate_counter.setIcon(qta.icon('mdi6.file-rotate-left-outline', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_rotate_counter.pressed.connect(self.rotate_counter)
+        self.ui.pushButton_rotate_clock.setIcon(qta.icon('mdi6.file-rotate-right-outline', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_rotate_clock.pressed.connect(self.rotate_clockwise)
+
         try:
             s0 = int(self.app.settings['dialogcodeimage_splitter0'])
             s1 = int(self.app.settings['dialogcodeimage_splitter1'])
@@ -710,7 +724,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         scale_text = _("Scale: ") + f"{int(self.scale * 100)}%"
         self.ui.horizontalSlider.setToolTip(scale_text)
         msg = _("Width") + f": {self.pixmap.width()} " + _("Height") + f": {self.pixmap.height()}\n"
-        msg += scale_text + " " + _("Rotation") + ": " + str(self.degrees) + "\u00b0"
+        msg += f"{scale_text} " + _("Rotation") + f": {self.degrees}\u00b0"
         self.ui.label_image.setText(msg)
 
     def draw_coded_areas(self):
@@ -724,8 +738,10 @@ class DialogCodeImage(QtWidgets.QDialog):
             if item['id'] == self.file_['id']:
                 color = None
                 tooltip = ""
+                code_name = ""
                 for c in self.codes:
                     if c['cid'] == item['cid']:
+                        code_name = c['name']
                         tooltip = f"{c['name']} ({item['owner']})"
                         if self.app.settings['showids']:
                             tooltip += f"[imid:{item['imid']}]"
@@ -762,6 +778,24 @@ class DialogCodeImage(QtWidgets.QDialog):
                         self.scene.addItem(rect_item)
                     if not self.important:
                         self.scene.addItem(rect_item)
+                if self.show_code_captions:
+                    self.caption(x, y, code_name)
+
+    def captions_flag(self):
+        """ Show / hide code captions. """
+
+        self.show_code_captions = not self.show_code_captions
+        self.redraw_scene()
+
+    def caption(self, x, y, code_name):
+        """ Add captions to coded areas. """
+
+        text_item = QtWidgets.QGraphicsTextItem()
+        text_item.setDefaultTextColor(QtGui.QColor("#000000"))
+        text_item.setHtml(f"<div style='background-color:#FFFFFF;'>{code_name}</div>")
+        # Style.StyleNormal 400  Segoe UI 9
+        text_item.setPos(x, y)
+        self.scene.addItem(text_item)
 
     def export_html_file(self):
         """ Export the QGraphicsScene as a png image with transparent background.
@@ -1031,18 +1065,10 @@ class DialogCodeImage(QtWidgets.QDialog):
             self.undo_last_unmarked_code()
             return
         if key == QtCore.Qt.Key.Key_Minus or key == QtCore.Qt.Key.Key_Q:
-            v = self.ui.horizontalSlider.value()
-            v -= 3
-            if v < self.ui.horizontalSlider.minimum():
-                return
-            self.ui.horizontalSlider.setValue(v)
+            self.zoom_out()
             return
         if key == QtCore.Qt.Key.Key_Plus or key == QtCore.Qt.Key.Key_W:
-            v = self.ui.horizontalSlider.value()
-            v += 3
-            if v > self.ui.horizontalSlider.maximum():
-                return
-            self.ui.horizontalSlider.setValue(v)
+            self.zoom_in()
             return
         # Ctrl 0 to 9, G
         if mods & QtCore.Qt.KeyboardModifier.ControlModifier:
@@ -1067,6 +1093,20 @@ class DialogCodeImage(QtWidgets.QDialog):
             if key == QtCore.Qt.Key.Key_0:
                 self.help()
                 return
+
+    def zoom_out(self):
+        v = self.ui.horizontalSlider.value()
+        v -= 3
+        if v < self.ui.horizontalSlider.minimum():
+            return
+        self.ui.horizontalSlider.setValue(v)
+
+    def zoom_in(self):
+        v = self.ui.horizontalSlider.value()
+        v += 3
+        if v > self.ui.horizontalSlider.maximum():
+            return
+        self.ui.horizontalSlider.setValue(v)
 
     def image_highlight(self, image_operation = "gray", coded_area=None, code_id=None):
         """ Gray, blurred or solarised image with coloured coded highlight(s).
@@ -1198,15 +1238,9 @@ class DialogCodeImage(QtWidgets.QDialog):
             if action == action_hide_top_groupbox:
                 self.ui.groupBox_2.setVisible(False)
             if action == action_rotate:
-                self.degrees += 90
-                if self.degrees > 270:
-                    self.degrees = 0
-                self.redraw_scene()
+                self.rotate_clockwise()
             if action == action_rotate_counter:
-                self.degrees -= 90
-                if self.degrees < 0:
-                    self.degrees = 270
-                self.redraw_scene()
+                self.rotate_counter()
             return
         item = items[0]
         if len(items) > 1:
@@ -1262,6 +1296,17 @@ class DialogCodeImage(QtWidgets.QDialog):
         items = self.find_coded_areas_for_pos(pos)
         self.fill_coded_area_label(items)
 
+    def rotate_clockwise(self):
+        self.degrees += 90
+        if self.degrees > 270:
+            self.degrees = 0
+        self.redraw_scene()
+
+    def rotate_counter(self):
+        self.degrees -= 90
+        if self.degrees < 0:
+            self.degrees = 270
+        self.redraw_scene()
     def move_or_resize_coding(self, item):
         """ Move or resize a coding rectangle, in pixels.
 
@@ -1616,7 +1661,8 @@ class DialogCodeImage(QtWidgets.QDialog):
             for orphan in orphans:
                 cur.execute(sql, [orphan[0]])
             self.app.conn.commit()
-        except:
+        except Exception as e_:
+            print(e_)
             self.app.conn.rollback() # revert all changes 
             self.update_dialog_codes_and_categories()
             raise            
@@ -2030,6 +2076,20 @@ class DialogViewImage(QtWidgets.QDialog):
         msg = w_h + _(" Scale: ") + str(int(scale * 100)) + "%"
         self.ui.horizontalSlider.setToolTip(msg)
 
+    def zoom_out(self):
+        v = self.ui.horizontalSlider.value()
+        v -= 3
+        if v < self.ui.horizontalSlider.minimum():
+            return
+        self.ui.horizontalSlider.setValue(v)
+
+    def zoom_in(self):
+        v = self.ui.horizontalSlider.value()
+        v += 3
+        if v > self.ui.horizontalSlider.maximum():
+            return
+        self.ui.horizontalSlider.setValue(v)
+
     def eventFilter(self, object_, event):
         """ Using this event filter to apply key events.
         Key events on scene
@@ -2041,18 +2101,10 @@ class DialogViewImage(QtWidgets.QDialog):
         if type(event) == QtGui.QKeyEvent:
             key = event.key()
             if key == QtCore.Qt.Key.Key_Minus or key == QtCore.Qt.Key.Key_Q:
-                v = self.ui.horizontalSlider.value()
-                v -= 3
-                if v < self.ui.horizontalSlider.minimum():
-                    return True
-                self.ui.horizontalSlider.setValue(v)
+                self.zoom_out()
                 return True
             if key == QtCore.Qt.Key.Key_Plus or key == QtCore.Qt.Key.Key_W:
-                v = self.ui.horizontalSlider.value()
-                v += 3
-                if v > self.ui.horizontalSlider.maximum():
-                    return True
-                self.ui.horizontalSlider.setValue(v)
+                self.zoom_in()
                 return True
             if key == QtCore.Qt.Key.Key_L:
                 self.degrees -= 90
