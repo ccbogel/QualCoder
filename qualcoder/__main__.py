@@ -2108,7 +2108,7 @@ Click "Yes" to start now.')
         cur = self.app.conn.cursor()
         cur.execute(
             "CREATE TABLE project (databaseversion text, date text, memo text,about text, bookmarkfile integer, "
-            "bookmarkpos integer, codername text)")
+            "bookmarkpos integer, codername text, recently_used_codes text)")
         cur.execute(
             "CREATE TABLE source (id integer primary key, name text, fulltext text, mediapath text, memo text, "
             "owner text, date text, av_text_id integer, risid integer, unique(name))")
@@ -2176,7 +2176,7 @@ Click "Yes" to start now.')
                     "x integer, y integer, pos0 integer, pos1 integer, filepath text, tooltip text, color text);")
         cur.execute("CREATE TABLE ris (risid integer, tag text, longtag text, value text);")
         cur.execute("INSERT INTO project VALUES(?,?,?,?,?,?,?)",
-                    ('v8', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', qualcoder_version, 0,
+                    ('v9', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', qualcoder_version, 0,
                      0, self.app.settings['codername']))
         self.app.conn.commit()
         try:
@@ -2466,7 +2466,7 @@ Click "Yes" to start now.')
             self.close_project()
             return
 
-        # Potential design flaw to have the current coders name in the config.ini file
+        # Potential design flaw to have the current coders name in the config.ini file (early versions of QC).
         # as it would change to this coder when opening different projects
         # Check that the coder name from setting ini file is in the project
         # If not then replace with a name in the project
@@ -2614,7 +2614,7 @@ Click "Yes" to start now.')
             self.app.conn.commit()
             cur.execute('update project set databaseversion="v6", about=?', [qualcoder_version])
             self.ui.textEdit.append(_("Updating database to version") + " v6")
-        # Database v7
+        # Database version v7
         db7_update = False
         try:
             cur.execute("select memo_ctid from gr_free_text_item")
@@ -2650,6 +2650,14 @@ Click "Yes" to start now.')
             cur.execute("select risid from source")
         except sqlite3.OperationalError:
             cur.execute('ALTER TABLE source ADD risid integer')
+        # Database version v9
+        try:
+            cur.execute("select recently_used_codes from project")
+        except sqlite3.OperationalError:
+            cur.execute('ALTER TABLE project ADD recently_used_codes text')  # codes ids split by space
+            cur.execute('update project set databaseversion="v9", about=?', [qualcoder_version])
+            self.app.conn.commit()
+            self.ui.textEdit.append(_("Updating database to version") + " v9")
 
         # Save a date and 24 hour stamped backup
         if self.app.settings['backup_on_open'] == 'True' and newproject == "no":
@@ -2975,6 +2983,9 @@ Click "Yes" to start now.')
 
 
 def gui():
+    #print("Qt version: " + str(QtCore.qVersion()))
+    #if platform.system() == "Windows":
+    #    os.putenv('QT_QPA_PLATFORM', 'windows:darkmode=0')
     app = QtWidgets.QApplication(sys.argv)    
     qual_app = App()
     settings, ai_models = qual_app.load_settings()
