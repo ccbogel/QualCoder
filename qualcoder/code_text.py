@@ -148,9 +148,9 @@ class DialogCodeText(QtWidgets.QWidget):
         self.search_indices = []
         self.search_index = 0
         self.codes, self.categories = self.app.get_codes_categories()
+        self.get_recent_codes()  # After codes obtained!
         self.tree_sort_option = "all asc"
         self.annotations = self.app.get_annotations()
-        self.recent_codes = []
         self.autocode_history = []
         self.undo_deleted_codes = []
         self.default_new_code_color = None
@@ -385,6 +385,29 @@ class DialogCodeText(QtWidgets.QWidget):
 
         font = f'font: {self.ui.comboBox_fontsize.currentText()}pt "{self.app.settings["font"]}";'
         self.ui.textEdit.setStyleSheet(font)
+
+    def get_recent_codes(self):
+        """ Get recently used codes. Must have loaded all codes first.
+        recent codes are stored as space delimited text in project table.
+        Add code id to recent codes list, if code is present. """
+
+        self.recent_codes = []
+        cur = self.app.conn.cursor()
+        cur.execute("select recently_used_codes from project")
+        res = cur.fetchone()
+        if not res:
+            return
+        if res[0] == "" or res[0] is None:
+            return
+        recent_codes_text = res[0].split()
+        for code_id in recent_codes_text:
+            try:
+                cid = int(code_id)
+                for code_ in self.codes:
+                    if cid == code_['cid']:
+                        self.recent_codes.append(code_)
+            except ValueError:
+                pass
 
     def get_files(self, ids=None):
         """ Get files with additional details and fill list widget.
@@ -2215,7 +2238,6 @@ class DialogCodeText(QtWidgets.QWidget):
         param:
             code_ """
 
-        print("code_", code_)
         if code_['pos0'] < 1:
             return
         code_['pos0'] -= 1
@@ -2698,6 +2720,7 @@ class DialogCodeText(QtWidgets.QWidget):
         for item in self.recent_codes:
             if item['name'] == code_['name']:
                 self.recent_codes.remove(item)
+                # TODO update project
                 break
         self.update_dialog_codes_and_categories()
 
@@ -2961,7 +2984,7 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         if self.file_['mediapath'][:5] == "docs:":
             doc_path = self.file_['mediapath'][5:]
-            print("TO open external ", doc_path)
+            #print("TO open external ", doc_path)
             webbrowser.open(doc_path)
             return
         logger.error("Cannot open text file in browser " + self.file_['mediapath'])
@@ -3469,7 +3492,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 tmp_code = c
         if tmp_code is None:
             return
-        # Need to remove from recent_codes, if there and add back in first position
+        # Need to remove from recent_codes, if there and add back in first position, and update project recently_used_codes
         for item in self.recent_codes:
             if item == tmp_code:
                 self.recent_codes.remove(item)
@@ -3477,7 +3500,14 @@ class DialogCodeText(QtWidgets.QWidget):
         self.recent_codes.insert(0, tmp_code)
         if len(self.recent_codes) > 10:
             self.recent_codes = self.recent_codes[:10]
-        self.update_file_tooltip()
+        recent_codes_string = ""
+        for r in self.recent_codes:
+            recent_codes_string += f" {r['cid']}"
+        recent_codes_string = recent_codes_string[1:]
+        cur.execute("update project set recently_used_codes=?", [recent_codes_string])
+        self.app.conn.commit()
+
+        self.update_file_tooltip()  # Number of codes applied
 
     def undo_last_unmarked_code(self):
         """ Restore the last deleted code(s).
