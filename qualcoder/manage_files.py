@@ -917,7 +917,6 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.attribute_names = []  # For AddAttribute dialog
         self.attribute_labels_ordered = []  # Help filling table more quickly
         for att_name in attribute_names_res:
-            print(att_name[0])
             self.header_labels.append(att_name[0])
             self.attribute_labels_ordered.append(att_name[0])
             self.attribute_names.append({'name': att_name[0]})  # For AddAttribute dialog
