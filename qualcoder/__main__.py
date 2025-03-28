@@ -863,7 +863,6 @@ university, ORCID, GitHub, or Google account.""",
         QGroupBox:focus {border: 3px solid #f89407;}\n\
         QPushButton {border-style: outset; border-width: 2px; border-radius: 2px; border-color: beige; padding: 2px;}\n\
         QPushButton:pressed {border-style: inset; background-color: white;}\n\
-        QPushButton::icon {color: #000000;)\n\
         QGraphicsView {border: 1px solid #808080}\n\
         QHeaderView::section {background-color: #f9f9f9}\n\
         QLineEdit {border: 1px solid #707070; background-color: #fafafa;}\n\
@@ -899,6 +898,10 @@ university, ORCID, GitHub, or Google account.""",
         if self.settings['stylesheet'] == 'dark':
             return style_dark
         style_rainbow = style_dark
+        if self.settings['stylesheet'] == 'original':
+            # This background may work with white or black icon colours
+            style = style.replace("QPushButton {border-style: outset; ",
+                                  "QPushButton {border-style: outset; background-color: #dddddd;")
         if self.settings['stylesheet'] == 'rainbow':
             style_rainbow += "\nQDialog {background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0.2 black, " \
                              "stop:0.27 red, stop:0.31 yellow, stop:0.35 green, stop:0.39 #306eff, stop:0.42 blue, " \
@@ -927,6 +930,13 @@ university, ORCID, GitHub, or Google account.""",
         if self.settings['stylesheet'] == "native":
             style = "* {font-size: 12px;}"
             style += "\nQGroupBox { border: none; background-color: transparent;}"
+        ''' # Keep this as a test area for parsable / unparsable style sheet lines
+        style_lines = style.split("\n")
+        for i, sl in enumerate(style_lines):
+            print(i + 1, sl)
+        style_lines = style_lines[0:15]  # Test bed for parsing
+        style = "\n".join(style_lines)
+        print("\nSTYLE\n", style)'''
         return style
     
     def highlight_color(self):
