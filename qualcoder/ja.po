@@ -6,28 +6,31 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-27 07:52+1100\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"PO-Revision-Date: 2025-03-29 15:53+1100\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: ja\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.5\n"
 
 #: __main__.py:1183
 msgid "There is already a backup with this name"
-msgstr ""
+msgstr "この名前のバックアップはすでにある"
 
 #: __main__.py:1192
 msgid "WARNING: audio and video files NOT backed up. See settings."
 msgstr ""
+"警告：オーディオファイルとビデオファイルはバックアップされません。設定を参照"
+"してください。"
 
 #: __main__.py:1194
 msgid "Project backup created: "
-msgstr ""
+msgstr "プロジェクトのバックアップを作成： "
 
 #: __main__.py:1262
 msgid ""
@@ -38,98 +41,104 @@ msgid ""
 "starting the AI Setup Wizard from the AI menu in the main window. Click "
 "\"Yes\" to start now."
 msgstr ""
+"ようこそ\n"
+"\n"
+"QualCoderの新しいAI拡張機能には、いくつかの追加設定が必要です。AIを有効にして"
+"セットアップを開始しますか？メインウィンドウのAIメニューからAIセットアップ"
+"ウィザードを開始することで、後でこれを行うこともできます。今すぐ開始するには"
+"「はい」をクリックしてください。"
 
 #: __main__.py:1268
 msgid "AI Integration"
-msgstr ""
+msgstr "人工知能の統合"
 
 #: __main__.py:1583
 msgid "Settings"
-msgstr ""
+msgstr "設定"
 
 #: __main__.py:1584 journals.py:186 report_exact_matches.py:407
 msgid "Coder"
-msgstr ""
+msgstr "コーダー"
 
 #: __main__.py:1585
 msgid "Font"
-msgstr ""
+msgstr "フォント"
 
 #: __main__.py:1586
 msgid "Tree font size"
-msgstr ""
+msgstr "ツリーのフォントサイズ"
 
 #: __main__.py:1587
 msgid "Working directory"
-msgstr ""
+msgstr "作業ディレクトリ"
 
 #: __main__.py:1588
 msgid "Show IDs"
-msgstr ""
+msgstr "IDを表示する"
 
 #: __main__.py:1589
 msgid "Language"
-msgstr ""
+msgstr "言語"
 
 #: __main__.py:1590
 msgid "Timestamp format"
-msgstr ""
+msgstr "タイムスタンプ形式"
 
 #: __main__.py:1591
 msgid "Speaker name format"
-msgstr ""
+msgstr "スピーカー名フォーマット"
 
 #: __main__.py:1592
 msgid "Report text context characters: "
-msgstr ""
+msgstr "テキストコンテキストの文字を報告する： "
 
 #: __main__.py:1593
 msgid "Report text context style: "
-msgstr ""
+msgstr "レポートテキストのコンテキストスタイル： "
 
 #: __main__.py:1594
 msgid "Backup on open"
-msgstr ""
+msgstr "オープン時のバックアップ"
 
 #: __main__.py:1595
 msgid "Backup AV files"
-msgstr ""
+msgstr "オーディオ/ビデオファイルのバックアップ"
 
 #: __main__.py:1597
 msgid "AI integration is enabled"
-msgstr ""
+msgstr "人工知能の統合が可能に"
 
 #: __main__.py:1599
 msgid "AI integration is disabled"
-msgstr ""
+msgstr "人工知能の統合は無効"
 
 #: __main__.py:1600
 msgid "Style"
-msgstr ""
+msgstr "スタイル"
 
 #: __main__.py:1602 __main__.py:2780
 msgid "Directory (folder) paths / represents \\"
-msgstr ""
+msgstr "ディレクトリ(フォルダ)パス / を表します。"
 
 #: __main__.py:1851
 msgid "This project contains no text files."
-msgstr ""
+msgstr "このプロジェクトにはテキストファイルは含まれていません。"
 
 #: __main__.py:1852
 msgid "No text files"
-msgstr ""
+msgstr "テキストファイルなし"
 
 #: __main__.py:1865
 msgid "This project contains no pdf files."
-msgstr ""
+msgstr "このプロジェクトにはpdfファイルは含まれていません。"
 
 #: __main__.py:1866
 msgid "No pdf files"
-msgstr ""
+msgstr "PDFファイルなし"
 
 #: __main__.py:1879
 msgid "This project contains no image files."
-msgstr ""
+msgstr "このプロジェクトには画像ファイルは含まれていません。"
 
 #: __main__.py:1880
 msgid "No image files"
@@ -137,127 +146,133 @@ msgstr ""
 
 #: __main__.py:1888
 msgid "This project contains no audio/video files."
-msgstr ""
+msgstr "このプロジェクトにはオーディオ/ビデオファイルは含まれていません。"
 
 #: __main__.py:1889
 msgid "No a/v files"
-msgstr ""
+msgstr "オーディオ/ビデオファイルなし"
 
 #: __main__.py:1892
 msgid "VLC is not installed. Cannot code audio/video files."
 msgstr ""
+"VLCがインストールされていません。オーディオ/ビデオファイルをコーディングでき"
+"ない。"
 
 #: __main__.py:1893
 msgid "Install VLC"
-msgstr ""
+msgstr "VLCをインストールする"
 
 #: __main__.py:1902
 msgid "A/V Coding"
-msgstr ""
+msgstr "オーディオ／ビデオ・コーディング"
 
 #: __main__.py:1989
 msgid "IMPORTING REFI-QDA PROJECT"
-msgstr ""
+msgstr "refi-qdaプロジェクトのインポート"
 
 #: __main__.py:1991
 msgid ""
 "Step 1: You will be asked for a new QualCoder project name.\n"
 "Step 2: You will be asked for the QDPX file."
 msgstr ""
+"ステップ1：新しいQualCoderプロジェクト名を尋ねられます。\n"
+"ステップ2： QDPXファイルの入力を求められます。"
 
 #: __main__.py:1992
 msgid "REFI-QDA import steps"
-msgstr ""
+msgstr "REFI-QDAインポート手順"
 
 #: __main__.py:1996 __main__.py:2014
 msgid "Project creation"
-msgstr ""
+msgstr "プロジェクト作成"
 
 #: __main__.py:1996
 msgid "REFI-QDA Project not successfully created"
-msgstr ""
+msgstr "REFI-QDAプロジェクトが正常に作成されない"
 
 #: __main__.py:2007
 msgid "IMPORTING RQDA PROJECT"
-msgstr ""
+msgstr "RQDAプロジェクトのインポート"
 
 #: __main__.py:2009
 msgid ""
 "Step 1: You will be asked for a new QualCoder project name.\n"
 "Step 2: You will be asked for the RQDA file."
 msgstr ""
+"ステップ1：新しいQualCoderプロジェクト名を尋ねられます。\n"
+"ステップ2： RQDAファイルの入力を求められます。"
 
 #: __main__.py:2010
 msgid "RQDA import steps"
-msgstr ""
+msgstr "RQDAインポート手順"
 
 #: __main__.py:2014
 msgid "Project not successfully created"
-msgstr ""
+msgstr "プロジェクトが正常に作成されない"
 
 #: __main__.py:2028
 msgid "Are you sure you want to quit?"
-msgstr ""
+msgstr "本当に辞めたいのか？"
 
 #: __main__.py:2077
 msgid "Enter project name"
-msgstr ""
+msgstr "プロジェクト名を入力"
 
 #: __main__.py:2081 __main__.py:2101 refi.py:1937 refi.py:1943
 msgid "Project"
-msgstr ""
+msgstr "プロジェクト"
 
 #: __main__.py:2081
 msgid "No project created."
-msgstr ""
+msgstr "プロジェクトは作成されていない。"
 
 #: __main__.py:2100
 msgid "Project creation error "
-msgstr ""
+msgstr "プロジェクト作成エラー "
 
 #: __main__.py:2101
 msgid " not successfully created"
-msgstr ""
+msgstr " 正常に作成されない"
 
 #: __main__.py:2184
 msgid "New project: "
-msgstr ""
+msgstr "新プロジェクト "
 
 #: __main__.py:2184 manage_files.py:1564
 msgid " created."
-msgstr ""
+msgstr " を作成した。"
 
 #: __main__.py:2185
 msgid "Opening: "
-msgstr ""
+msgstr "オープニング： "
 
 #: __main__.py:2195
 msgid "New Project Created"
-msgstr ""
+msgstr "新しいプロジェクトを作成しました： "
 
 #: __main__.py:2196
 msgid "DB Version:"
-msgstr ""
+msgstr "データベースバージョン："
 
 #: __main__.py:2197 report_file_summary.py:158 reports.py:247 reports.py:565
 msgid "Date: "
-msgstr ""
+msgstr "日付 "
 
 #: __main__.py:2198
 msgid "About: "
-msgstr ""
+msgstr "についてだ： "
 
 #: __main__.py:2199 report_codes.py:1164
 msgid "Coder:"
-msgstr ""
+msgstr "コーダー"
 
 #: __main__.py:2202
 msgid "Problem creating database "
-msgstr ""
+msgstr "データベース作成の問題 "
 
 #: __main__.py:2256
 msgid "Coder name changed to: "
-msgstr ""
+msgstr "コーダー名が変更された： "
 
 #: __main__.py:2279
 msgid ""
@@ -271,156 +286,171 @@ msgid ""
 "(Everything below this mark is a personal note and will never be sent to the "
 "AI.)"
 msgstr ""
+"研究テーマ、質問、目的：***研究テーマ、質問、目的：***研究テーマ、質問、目"
+"的：***研究テーマ、質問、目的 \n"
+"\n"
+"**方法論：*** \n"
+"\n"
+"**参加者と収集データ：***．\n"
+"\n"
+"#####\n"
+"(このマーク以下は個人的なメモであり、AIに送られることはない)"
 
 #: __main__.py:2284
 msgid "Memo for project "
-msgstr ""
+msgstr "プロジェクト・メモ "
 
 #: __main__.py:2291
 msgid "Project memo entered."
-msgstr ""
+msgstr "プロジェクトメモを入力。"
 
 #: __main__.py:2321
 msgid ""
 "An error occured while writing to the project folder. Please close the "
 "project and try to open it again."
 msgstr ""
+"プロジェクトフォルダへの書き込み中にエラーが発生しました。プロジェクトを閉じ"
+"て、もう一度開いてみてください。"
 
 #: __main__.py:2323
 msgid "I/O Error"
-msgstr ""
+msgstr "I/Oエラー"
 
 #: __main__.py:2324
 msgid "Close"
-msgstr ""
+msgstr "閉じる"
 
 #: __main__.py:2380 special_functions.py:96
 msgid "Open project directory"
-msgstr ""
+msgstr "プロジェクトのディレクトリを開く"
 
 #: __main__.py:2418
 msgid ""
 "QualCoder detected that the project was not properly closed the last time it "
 "was used by \""
-msgstr ""
+msgstr "QualCoderは、プロジェクトが」"
 
 #: __main__.py:2420
 msgid ""
 "In most cases, you can still continue your work as usual. If you encounter "
 "any problems, search for a recent backup in the project folder."
 msgstr ""
+"ほとんどの場合、通常通り作業を続けることができます。問題が発生した場合は、プ"
+"ロジェクトフォルダ内の最近のバックアップを検索してください。"
 
 #: __main__.py:2422 code_text.py:4897 manage_files.py:1378
 msgid "Open file"
-msgstr ""
+msgstr "ファイルを開く"
 
 #: __main__.py:2434
 msgid "Project cannot be opened since it's already in use by \""
-msgstr ""
+msgstr "によってすでに使用されているため、プロジェクトを開くことはできない。"
 
 #: __main__.py:2435
 msgid "\". Please retry later."
-msgstr ""
+msgstr "「. 後で再試行してください。"
 
 #: __main__.py:2437 __main__.py:2450
 msgid "Cannot open file"
-msgstr ""
+msgstr "ファイルを開けません"
 
 #: __main__.py:2478
 msgid "Default coder name changed to: "
-msgstr ""
+msgstr "デフォルトのコーダー名を変更： "
 
 #: __main__.py:2502 __main__.py:2531 __main__.py:2551 __main__.py:2576
 #: __main__.py:2616 __main__.py:2640 __main__.py:2648
 msgid "Updating database to version"
-msgstr ""
+msgstr "データベースのバージョンアップ"
 
 #: __main__.py:2658
 msgid "Project Opened: "
-msgstr ""
+msgstr "プロジェクト開始： "
 
 #: __main__.py:2668
 msgid "Deleting code_text coding to deleted files: "
-msgstr ""
+msgstr "削除されたファイルへの code_text コーディングの削除： "
 
 #: __main__.py:2675
 msgid "Deleting code_image coding to deleted files: "
-msgstr ""
+msgstr "削除されたファイルへの code_image コーディングの削除： "
 
 #: __main__.py:2682
 msgid "Deleting code_av coding to deleted files: "
-msgstr ""
+msgstr "削除されたファイルへの code_av コーディングの削除： "
 
 #: __main__.py:2721 code_text.py:3159 code_text.py:4957 code_pdf.py:261
 msgid "Information"
-msgstr ""
+msgstr "インフォメーション"
 
 #: __main__.py:2721
 msgid "QualCoder project missing folders. Created empty folders"
-msgstr ""
+msgstr "QualCoderプロジェクトにフォルダがない。空のフォルダを作成"
 
 #: __main__.py:2737
 msgid "Project summary"
-msgstr ""
+msgstr "プロジェクト概要"
 
 #: __main__.py:2738
 msgid "Date time now: "
-msgstr ""
+msgstr "デートの時間だ： "
 
 #: __main__.py:2740
 msgid "Project path: "
-msgstr ""
+msgstr "プロジェクト・パス : "
 
 #: __main__.py:2741
 msgid "Project date: "
-msgstr ""
+msgstr "プロジェクト開始日 : "
 
 #: __main__.py:2746
 msgid "Project memo: "
-msgstr ""
+msgstr "プロジェクトのメモ： "
 
 #: __main__.py:2753 manage_files.py:2156
 msgid "Files: "
-msgstr ""
+msgstr "ファイル："
 
 #: __main__.py:2757 cases.py:357 import_twitter_data.py:104
 msgid "Cases: "
-msgstr ""
+msgstr "ケース : "
 
 #: __main__.py:2761
 msgid "Code categories: "
-msgstr ""
+msgstr "コードのカテゴリー："
 
 #: __main__.py:2765 report_codes.py:1276 report_codes.py:1282
 #: report_relations.py:167 report_relations.py:168
 msgid "Codes: "
-msgstr ""
+msgstr "コード："
 
 #: __main__.py:2769 attributes.py:92 attributes.py:257 view_charts.py:259
 msgid "Attributes: "
-msgstr ""
+msgstr "属性："
 
 #: __main__.py:2773 journals.py:359
 msgid "Journals: "
-msgstr ""
+msgstr "雑誌："
 
 #: __main__.py:2785
 msgid "Bad links to files"
-msgstr ""
+msgstr "ファイルへの不正なリンク"
 
 #: __main__.py:2819
 msgid "Closing project: "
-msgstr ""
+msgstr "クロージング・プロジェクト： "
 
 #: __main__.py:2886
 msgid "Deleting: "
-msgstr ""
+msgstr "削除する： "
 
 #: __main__.py:2895
 msgid ""
 "The AI is setup and enabled, so there is nothing to do here. Go to AI > "
 "settings to change the current model or other settings."
 msgstr ""
+"人工知能は設定され有効になっているので、ここですることは何もない。現在のモデ"
+"ルやその他の設定を変更するには、人工知能 > 設定に進みます。"
 
 #: __main__.py:2897
 msgid "AI Setup Wizard"
@@ -470,7 +500,7 @@ msgstr ""
 
 #: __main__.py:2970
 msgid "Latest Release: "
-msgstr ""
+msgstr "最新リリース："
 
 #: add_attribute.py:74
 msgid "This attribute name already exists in cases, files or journals."
@@ -4176,8 +4206,8 @@ msgstr ""
 
 #: report_code_summary.py:316
 msgid ""
-"Word calculations: Words use alphabet characters and include the "
-"apostrophe.All other characters are word separators"
+"Word calculations: Words use alphabet characters and include the apostrophe."
+"All other characters are word separators"
 msgstr ""
 
 #: report_code_summary.py:319 report_file_summary.py:427
