@@ -6,28 +6,29 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-27 07:53+1100\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"PO-Revision-Date: 2025-03-29 15:28+1100\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: zh\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.5\n"
 
 #: __main__.py:1183
 msgid "There is already a backup with this name"
-msgstr ""
+msgstr "已经有一个使用此名称的备份"
 
 #: __main__.py:1192
 msgid "WARNING: audio and video files NOT backed up. See settings."
-msgstr ""
+msgstr "警告：不备份音频和视频文件。请参见设置。"
 
 #: __main__.py:1194
 msgid "Project backup created: "
-msgstr ""
+msgstr "创建项目备份： "
 
 #: __main__.py:1262
 msgid ""
@@ -38,46 +39,50 @@ msgid ""
 "starting the AI Setup Wizard from the AI menu in the main window. Click "
 "\"Yes\" to start now."
 msgstr ""
+"欢迎\n"
+"\n"
+"QualCoder 中的新人工智能增强功能需要一些额外设置。您想启用 AI 并开始设置吗？"
+"您也可以稍后从主窗口的 AI 菜单启动 AI 设置向导。点击 “是 ”立即开始。"
 
 #: __main__.py:1268
 msgid "AI Integration"
-msgstr ""
+msgstr "人工智能集成"
 
 #: __main__.py:1583
 msgid "Settings"
-msgstr ""
+msgstr "设置"
 
 #: __main__.py:1584 journals.py:186 report_exact_matches.py:407
 msgid "Coder"
-msgstr ""
+msgstr "编码器"
 
 #: __main__.py:1585
 msgid "Font"
-msgstr ""
+msgstr "字体"
 
 #: __main__.py:1586
 msgid "Tree font size"
-msgstr ""
+msgstr "树木字体大小"
 
 #: __main__.py:1587
 msgid "Working directory"
-msgstr ""
+msgstr "工作目录"
 
 #: __main__.py:1588
 msgid "Show IDs"
-msgstr ""
+msgstr "显示 ID"
 
 #: __main__.py:1589
 msgid "Language"
-msgstr ""
+msgstr "语言"
 
 #: __main__.py:1590
 msgid "Timestamp format"
-msgstr ""
+msgstr "时间戳格式"
 
 #: __main__.py:1591
 msgid "Speaker name format"
-msgstr ""
+msgstr "扬声器名称格式"
 
 #: __main__.py:1592
 msgid "Report text context characters: "
@@ -4176,8 +4181,8 @@ msgstr ""
 
 #: report_code_summary.py:316
 msgid ""
-"Word calculations: Words use alphabet characters and include the "
-"apostrophe.All other characters are word separators"
+"Word calculations: Words use alphabet characters and include the apostrophe."
+"All other characters are word separators"
 msgstr ""
 
 #: report_code_summary.py:319 report_file_summary.py:427
