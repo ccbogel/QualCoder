@@ -1408,8 +1408,8 @@ Click "Yes" to start now.')
             self.ui.tabWidget.setTabIcon(2, qta.icon('mdi6.tag-text-outline', color=self.app.highlight_color()))  # Coding
             self.ui.tabWidget.setTabIcon(3, qta.icon('mdi6.format-list-group', color=self.app.highlight_color()))  # Reports
             self.ui.tabWidget.setTabIcon(4, qta.icon('mdi6.message-processing-outline', color=self.app.highlight_color()))  # Ai Chat
-        except Exception as e:
-            logger.log(e)
+        except Exception as e_:
+            logger.log(e_)
         
     def fill_recent_projects_menu_actions(self):
         """ Get the recent projects from the .qualcoder txt file.
@@ -1591,8 +1591,8 @@ Click "Yes" to start now.')
         """ Display general settings and project summary """
 
         self.ui.textEdit.append("<h1>" + _("Settings") + "</h1>")
-        msg = _("Coder") + f": {self.app.settings['codername']}\n"
-        msg += _("Font") + f": {self.app.settings['font']} {self.app.settings['fontsize']}\n"
+        self.ui.textEdit.append("<p>" + _("Coder") + f": {self.app.settings['codername']}</p>")
+        msg = _("Font") + f": {self.app.settings['font']} {self.app.settings['fontsize']}\n"
         msg += _("Tree font size") + f": {self.app.settings['treefontsize']}\n"
         msg += _("Working directory") + f": {self.app.settings['directory']}\n"
         msg += _("Show IDs") + f": {self.app.settings['showids']}\n"
@@ -1608,9 +1608,9 @@ Click "Yes" to start now.')
         else:
             msg += _("AI integration is disabled") + "\n"
         msg += _("Style") + f"; {self.app.settings['stylesheet']}"
-        if platform.system() == "Windows":
-            msg += "\n" + _("Directory (folder) paths / represents \\")
         self.ui.textEdit.append(msg)
+        if platform.system() == "Windows":
+            self.ui.textEdit.append("<p>" + _("Directory (folder) paths / represents backslash") + "</p>")
         self.ui.textEdit.append("<p>&nbsp;</p>")
         self.ui.textEdit.textCursor().movePosition(QtGui.QTextCursor.MoveOperation.End)
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
@@ -3025,7 +3025,7 @@ def gui():
     install_language(lang)  # Install language files on every start, so updates are reflected
     # getlang = gettext.translation('en', localedir=locale_dir, languages=['en'])
     translator = gettext.translation(domain='default', localedir=locale_dir, fallback=True)
-    if lang in ["de", "es", "fr", "it", "pt"]:
+    if lang in ["de", "es", "fr", "it", "ja", "pt", "sv", "zh"]:
         # qt translator applies to ui designed GUI widgets only
         # qt_locale_dir = os.path.join(locale_dir, lang)
         # qt_locale_file = os.path.join(qt_locale_dir, "app_" + lang + ".qm")
@@ -3078,10 +3078,10 @@ def gui():
             if len(split_) == 2:
                 proj_path = split_[1]
             ex.open_project(path_=proj_path)
-    except Exception as e:
-        type_e = type(e)
-        value = e
-        tb_obj = e.__traceback__
+    except Exception as err:
+        type_e = type(err)
+        value = err
+        tb_obj = err.__traceback__
         # log the exception and show error msg
         qt_exception_hook.exception_hook(type_e, value, tb_obj)
 
@@ -3111,9 +3111,18 @@ def install_language(lang):
     if lang == "it":
         qm_data = it_qm
         mo_data = it_mo
+    if lang == "ja":
+        qm_data = ja_qm
+        mo_data = ja_mo
     if lang == "pt":
         qm_data = pt_qm
         mo_data = pt_mo
+    if lang == "sv":
+        qm_data = sv_qm
+        mo_data = sv_mo
+    if lang == "zh":
+        qm_data = zh_qm
+        mo_data = zh_mo
     if qm_data is None or mo_data is None:
         return
     with open(qm, 'wb') as file_:
