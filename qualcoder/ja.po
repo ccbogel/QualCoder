@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-27 07:52+1100\n"
-"PO-Revision-Date: 2025-03-29 15:53+1100\n"
+"PO-Revision-Date: 2025-03-30 08:40+1100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: ja\n"
@@ -505,41 +505,44 @@ msgstr "最新リリース："
 #: add_attribute.py:74
 msgid "This attribute name already exists in cases, files or journals."
 msgstr ""
+"この属性名は、ケース、ファイル、またはジャーナルにすでに存在しています。"
 
 #: add_attribute.py:75
 msgid "Or is reserved for bibliography attributes:"
-msgstr ""
+msgstr "または、書誌属性用に予約されています："
 
 #: add_attribute.py:77
 msgid "Duplicate"
-msgstr ""
+msgstr "重複"
 
 #: add_item_name.py:78
 msgid "Duplicated"
-msgstr ""
+msgstr "重複"
 
 #: add_item_name.py:78
 msgid "This already exists"
-msgstr ""
+msgstr "これはすでに存在する"
 
 #: ai_chat.py:88
 msgid "<your question>"
-msgstr ""
+msgstr "<ご質問"
 
 #: ai_chat.py:271 ai_chat.py:286 ai_chat.py:308 ai_chat.py:416 ai_chat.py:537
 msgid "No project open."
-msgstr ""
+msgstr "プロジェクトが開かれていない。"
 
 #: ai_chat.py:272 ai_chat.py:276 ai_chat.py:287 ai_chat.py:291 ai_chat.py:309
 #: ai_chat.py:313 ai_chat.py:417 ai_chat.py:421 ai_chat.py:538 ai_chat.py:542
 #: ai_chat.py:944
 msgid "AI not enabled"
-msgstr ""
+msgstr "人工知能は使用不可"
 
 #: ai_chat.py:275 ai_chat.py:290 ai_chat.py:312 ai_chat.py:420 ai_chat.py:541
 #: ai_chat.py:943 code_text.py:4650
 msgid "The AI is disabled. Go to \"AI > Setup Wizard\" first."
 msgstr ""
+"人工知能が無効になっています。まず「人工知能 > セットアップウィザード」に進ん"
+"でください。"
 
 #: ai_chat.py:294
 msgid ""
@@ -547,24 +550,29 @@ msgid ""
 " There you can open a document, select a piece of text, right click on it "
 "and choose \"AI Text Analysis\" from the context menu."
 msgstr ""
+"ここでテキスト・コーディング・ワークスペースに切り替えます。\n"
+" そこでドキュメントを開き、テキストの一部を選択して右クリックし、コンテキスト"
+"メニューから「AIテキスト分析」を選択します。"
 
 #: ai_chat.py:297 code_text.py:1066
 msgid "AI Text Analysis"
-msgstr ""
+msgstr "人工知能テキスト分析"
 
 #: ai_chat.py:379
 msgid ""
 "No coded text found. Please select another code or category, or refine you "
 "filters."
 msgstr ""
+"コード化されたテキストが見つかりません。別のコードまたはカテゴリを選択する"
+"か、フィルタを絞り込んでください。"
 
 #: ai_chat.py:380
 msgid "AI code analysis"
-msgstr ""
+msgstr "人工知能コード解析"
 
 #: ai_chat.py:396
 msgid "Analyzing the data coded as \"{}\" ({} pieces of data sent to the AI.)"
-msgstr ""
+msgstr "としてコード化されたデータを分析する。"
 
 #: ai_chat.py:398
 msgid ""
@@ -572,11 +580,14 @@ msgid ""
 "ATTENTION: There was more coded data found, but it had to be truncated "
 "because of the limited context window of the AI."
 msgstr ""
+"\n"
+"注意：さらに多くのコード化されたデータが見つかったが、AIのコンテキストウィン"
+"ドウが限られていたため、切り捨てざるを得なかった。"
 
 #: ai_chat.py:400 report_relations.py:617 report_relations.py:922
 #: view_graph.py:1654 view_graph.py:3080 view_graph.py:3082
 msgid "Code"
-msgstr ""
+msgstr "コード"
 
 #: ai_chat.py:404 ai_chat.py:443
 msgid ""
@@ -586,86 +597,94 @@ msgid ""
 "information will accompany every prompt sent to the AI, resulting in much "
 "more targeted results."
 msgstr ""
+"プロジェクト・メモ（メニュー「プロジェクト > プロジェクト・メモ」）を使って、"
+"プロ ジェクトの研究テーマ、質問、目的、収集した実証データについて簡単に説明す"
+"ることを強くお勧めします。この情報は、AIに送信されるすべてのプロンプトに添付"
+"され、より的を絞った結果をもたらします。"
 
 #: ai_chat.py:435
 msgid "Analyzing the free topic \"{}\" in the data."
-msgstr ""
+msgstr "データ中のフリートピック「{}」を分析する。"
 
 #: ai_chat.py:437
 msgid ""
 "\n"
 "Description:"
 msgstr ""
+"\n"
+"説明"
 
 #: ai_chat.py:439
 msgid "Topic"
-msgstr ""
+msgstr "トピック"
 
 #: ai_chat.py:449
 msgid "Searching for related data..."
-msgstr ""
+msgstr "関連データを検索..."
 
 #: ai_chat.py:476
 msgid "Chat has been canceled by the user."
-msgstr ""
+msgstr "チャットはユーザーによってキャンセルされました。"
 
 #: ai_chat.py:480
 msgid "Sorry, the AI could could not find any data related to \""
 msgstr ""
+"申し訳ありませんが、AIは「」に関連するデータを見つけることができませんでし"
+"た。"
 
 #: ai_chat.py:487
 msgid "Found related data. Analyzing the most relevant segments closer."
-msgstr ""
+msgstr "関連データを発見。最も関連性の高いセグメントを詳しく分析"
 
 #: ai_chat.py:550
 msgid ""
 "The text is too long to be analyzed in one go. Please select a shorter "
 "passage."
-msgstr ""
+msgstr "文章が長すぎて一度に分析できません。もっと短い文章を選んでください。"
 
 #: ai_chat.py:551
 msgid "AI text analysis"
-msgstr ""
+msgstr "人工知能によるテキスト分析"
 
 #: ai_chat.py:576
 msgid "Analyzing text from "
-msgstr ""
+msgstr "テキストを分析する "
 
 #: ai_chat.py:578
 msgid " characters)."
-msgstr ""
+msgstr " 文字）。"
 
 #: ai_chat.py:580
 msgid "Text analysis"
-msgstr ""
+msgstr "テキスト分析"
 
 #: ai_chat.py:593 ai_prompts.py:825
 msgid "Do you really want to delete "
-msgstr ""
+msgstr "本当に削除したいのか？"
 
 #: ai_chat.py:594
 msgid "Delete Chat"
-msgstr ""
+msgstr "チャット削除"
 
 #: ai_chat.py:623
 msgid "Send your question to the AI"
-msgstr ""
+msgstr "人工知能への質問を送る"
 
 #: ai_chat.py:629
 msgid "Cancel AI generation"
-msgstr ""
+msgstr "人工知能世代の中止"
 
 #: ai_chat.py:634 ai_chat.py:636
 msgid "AI: "
-msgstr ""
+msgstr "人工知能： "
 
 #: ai_chat.py:634
 msgid "reading data"
-msgstr ""
+msgstr "読書データ"
 
 #: ai_chat.py:655 ai_chat.py:657
 msgid "Type:"
-msgstr ""
+msgstr "タイプ："
 
 #: ai_chat.py:655 ai_chat.py:657
 msgid "Summary:"
@@ -673,19 +692,19 @@ msgstr ""
 
 #: ai_chat.py:655 ai_chat.py:657
 msgid "Date:"
-msgstr ""
+msgstr "日付："
 
 #: ai_chat.py:655
 msgid "Prompt:"
-msgstr ""
+msgstr "プロンプト："
 
 #: ai_chat.py:665
 msgid "User"
-msgstr ""
+msgstr "ユーザー"
 
 #: ai_chat.py:673
 msgid "AI"
-msgstr ""
+msgstr "人工知能"
 
 #: ai_chat.py:677
 msgid "Info:"
@@ -967,6 +986,8 @@ msgid ""
 "\n"
 "MEMO: "
 msgstr ""
+"\n"
+"メモ："
 
 #: ai_search_dialog.py:417
 msgid "Search in all cases"
@@ -977,7 +998,7 @@ msgstr ""
 #: report_code_summary.py:243 report_codes_by_segments.py:136
 #: report_file_summary.py:153 view_av.py:3285 view_av.py:3738
 msgid "MEMO: "
-msgstr ""
+msgstr "メモ："
 
 #: ai_search_dialog.py:446
 msgid "The AI ist not ready to fulfill your request (status: "
@@ -985,7 +1006,7 @@ msgstr ""
 
 #: ai_search_dialog.py:446
 msgid ")."
-msgstr ""
+msgstr ")."
 
 #: ai_search_dialog.py:452
 msgid "Please select a code or category (or use \"free search\" instead)."
