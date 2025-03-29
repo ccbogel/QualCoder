@@ -114,7 +114,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.tab_reports = tab_reports
         self.parent_textEdit = parent_text_edit
         self.codes = []
-        self.recent_codes = []
         self.categories = []
         self.tree_sort_option = "all asc"
         self.annotations = []
@@ -136,6 +135,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.segment_for_text = None
         self.undo_deleted_codes = []
         self.get_codes_and_categories()
+        self.get_recent_codes()  # After codes obtained!
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_code_av()
         self.ui.setupUi(self)
@@ -316,6 +316,29 @@ class DialogCodeAV(QtWidgets.QDialog):
         """ Called from init, delete category/code, event_filter. """
 
         self.codes, self.categories = self.app.get_codes_categories()
+
+    def get_recent_codes(self):
+        """ Get recently used codes. Must have loaded all codes first.
+        recent codes are stored as space delimited text in project table.
+        Add code id to recent codes list, if code is present. """
+
+        self.recent_codes = []
+        cur = self.app.conn.cursor()
+        cur.execute("select recently_used_codes from project")
+        res = cur.fetchone()
+        if not res:
+            return
+        if res[0] == "" or res[0] is None:
+            return
+        recent_codes_text = res[0].split()
+        for code_id in recent_codes_text:
+            try:
+                cid = int(code_id)
+                for code_ in self.codes:
+                    if cid == code_['cid']:
+                        self.recent_codes.append(code_)
+            except ValueError:
+                pass
 
     def get_files(self, ids=None):
         """ Get AV files and exclude those with bad links.
@@ -2912,8 +2935,14 @@ class DialogCodeAV(QtWidgets.QDialog):
                 self.recent_codes.remove(item)
                 break
         self.recent_codes.insert(0, tmp_code)
-        if len(self.recent_codes) > 5:
-            self.recent_codes = self.recent_codes[:5]
+        if len(self.recent_codes) > 10:
+            self.recent_codes = self.recent_codes[:10]
+        recent_codes_string = ""
+        for r in self.recent_codes:
+            recent_codes_string += f" {r['cid']}"
+        recent_codes_string = recent_codes_string[1:]
+        cur.execute("update project set recently_used_codes=?", [recent_codes_string])
+        self.app.conn.commit()
 
     def restore_unmarked_segment(self):
         """ Restore the last deleted coded segment.
