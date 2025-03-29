@@ -6,22 +6,22 @@
     <message>
         <location filename="ui_attribute.py" line="41"/>
         <source>Add Attribute</source>
-        <translation type="unfinished"></translation>
+        <translation>添加属性</translation>
     </message>
     <message>
         <location filename="ui_attribute.py" line="42"/>
         <source>Attribute name:</source>
-        <translation type="unfinished"></translation>
+        <translation>属性名称：</translation>
     </message>
     <message>
         <location filename="ui_attribute.py" line="43"/>
         <source>Character</source>
-        <translation type="unfinished"></translation>
+        <translation>人物形象</translation>
     </message>
     <message>
         <location filename="ui_attribute.py" line="44"/>
         <source>Numeric</source>
-        <translation type="unfinished"></translation>
+        <translation>数字</translation>
     </message>
 </context>
 <context>
@@ -2060,102 +2060,102 @@ As all assigned positions may be incorrect. </source>
     <message>
         <location filename="ui_dialog_journals.py" line="125"/>
         <source>Journals</source>
-        <translation type="unfinished"></translation>
+        <translation>期刊</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="126"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Create&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>创建</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="127"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>出口</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="128"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>删除</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="129"/>
         <source>Journal:</source>
-        <translation type="unfinished"></translation>
+        <translation>期刊 :</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="130"/>
         <source>Journals: </source>
-        <translation type="unfinished"></translation>
+        <translation>期刊 :</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="131"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export all journals as single text file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>将所有期刊导出为单一文本文件</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="132"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. &lt;/p&gt;&lt;p&gt;A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A ‘*’ after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;‘&lt;/span&gt;\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>搜索使用 Regex 函数</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="133"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>下一页</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="134"/>
         <source>0 / 0</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="135"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search for text.&lt;/p&gt;&lt;p&gt;check &lt;span style=&quot; font-weight:600;&quot;&gt;All journals&lt;/span&gt; for searching all journals&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>搜索文本。</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="136"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;search all journals&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>搜索所有期刊</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="137"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Previous&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>上一页</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="138"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search all journals&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>搜索所有期刊</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="139"/>
         <source>Help</source>
-        <translation type="unfinished"></translation>
+        <translation>帮助</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="140"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add Attribute&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>添加属性</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="142"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>名称</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="144"/>
         <source>Modified</source>
-        <translation type="unfinished"></translation>
+        <translation>改装</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="146"/>
         <source>Coder</source>
-        <translation type="unfinished"></translation>
+        <translation>编码员</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="148"/>
         <source>jid</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2181,85 +2181,88 @@ As all assigned positions may be incorrect. </source>
     <message>
         <location filename="ui_dialog_manage_files.py" line="106"/>
         <source>Files</source>
-        <translation type="unfinished"></translation>
+        <translation>文件</translation>
     </message>
     <message>
         <location filename="ui_dialog_manage_files.py" line="107"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;View file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>查看文件</translation>
     </message>
     <message>
         <location filename="ui_dialog_manage_files.py" line="108"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Create a text file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>创建文本文件</translation>
     </message>
     <message>
         <location filename="ui_dialog_manage_files.py" line="109"/>
         <source>Export selected file.
 Text files (from any source) are exported from the text stored in the database as .txt files.
 (You can open the project folder and copy/paste the orignal text file if preferred.)</source>
-        <translation type="unfinished"></translation>
+        <translation>导出选定文件。
+文本文件（来自任何来源）将以 .txt 文件的形式从数据库中存储的文本中导出。
+(如果愿意，可以打开项目文件夹并复制/粘贴原始文本文件）。</translation>
     </message>
     <message>
         <location filename="ui_dialog_manage_files.py" line="112"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select files for deletion&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>选择要删除的文件</translation>
     </message>
     <message>
         <location filename="ui_dialog_manage_files.py" line="113"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Import file into project folder&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>将文件导入项目文件夹</translation>
     </message>
     <message>
         <location filename="ui_dialog_manage_files.py" line="114"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add attribute&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>添加属性</translation>
     </message>
     <message>
         <location filename="ui_dialog_manage_files.py" line="115"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Link to a file that is outside the project folder&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>链接到项目文件夹之外的文件</translation>
     </message>
     <message>
         <location filename="ui_dialog_manage_files.py" line="116"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Import linked file into project folder&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>将链接文件导入项目文件夹</translation>
     </message>
     <message>
         <location filename="ui_dialog_manage_files.py" line="117"/>
         <source>Export file from project folder as a linked file.
 Cannot export text transcription file associated with an audio or video as a linked file.</source>
-        <translation type="unfinished"></translation>
+        <translation>将项目文件夹中的文件导出为链接文件。
+无法将与音频或视频相关联的文本转录文件作为链接文件导出。</translation>
     </message>
     <message>
         <location filename="ui_dialog_manage_files.py" line="119"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export attributes to file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>将属性导出到文件</translation>
     </message>
     <message>
         <location filename="ui_dialog_manage_files.py" line="120"/>
         <source>Help</source>
-        <translation type="unfinished"></translation>
+        <translation>帮助</translation>
     </message>
     <message>
         <location filename="ui_dialog_manage_files.py" line="121"/>
         <source>Files:</source>
-        <translation type="unfinished"></translation>
+        <translation>文件 :</translation>
     </message>
     <message>
         <location filename="ui_dialog_manage_files.py" line="122"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Undo file rename&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>撤销文件重命名</translation>
     </message>
     <message>
         <location filename="ui_dialog_manage_files.py" line="123"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Bulk rename of database name file entries.&lt;/p&gt;&lt;p&gt;Only rename visible file rows. Can show only some rows by using attribute selection, or show/hide value like...&lt;/p&gt;&lt;p&gt;Renamed as: User chosen prefix and numbered suffix _nnn.&lt;/p&gt;&lt;p&gt;e.g. interview_001&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;批量重命名数据库名称文件条目。&lt;/p&gt;&lt;p&gt;只重命名可见的文件行。&lt;/p&gt;&lt;p&gt; 仅重命名可见的文件行。可通过使用属性选择或显示/隐藏值（如......）只显示某些行： 用户选择的前缀和编号后缀 _nnn.&lt;/p&gt;&lt;p&gt; 例如：interview_001&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;。</translation>
     </message>
     <message>
         <location filename="ui_dialog_manage_files.py" line="124"/>
         <source>File:</source>
-        <translation type="unfinished"></translation>
+        <translation>文件 :</translation>
     </message>
 </context>
 <context>
@@ -2819,334 +2822,336 @@ Wildcards for &apos;like&apos; are % and _</source>
     <message>
         <location filename="ui_dialog_settings.py" line="421"/>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>设置</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="422"/>
         <source>Backup project folder every time project is opened</source>
-        <translation type="unfinished"></translation>
+        <translation>每次打开项目时备份项目文件夹</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="423"/>
         <source>Default project directory</source>
-        <translation type="unfinished"></translation>
+        <translation>默认项目目录</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="424"/>
         <source>Backup video and audio files. Uncheck to speed up backups.
 Not recommended unless you have many large files slowing the backup.</source>
-        <translation type="unfinished"></translation>
+        <translation>备份视频和音频文件。取消选中可加快备份速度。
+不建议这样做，除非有很多大文件会减慢备份速度。</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="426"/>
         <source>Backups</source>
-        <translation type="unfinished"></translation>
+        <translation>备份</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="427"/>
         <source>0</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="428"/>
         <source>1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="429"/>
         <source>2</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="430"/>
         <source>3</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="431"/>
         <source>4</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="432"/>
         <source>5</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="433"/>
         <source>Select another coder in this project</source>
-        <translation type="unfinished"></translation>
+        <translation>在此项目中选择另一位编码员</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="434"/>
         <source>Other coders</source>
-        <translation type="unfinished"></translation>
+        <translation>其他编码员</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="435"/>
         <source>New coder</source>
-        <translation type="unfinished"></translation>
+        <translation>新编码员</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="436"/>
         <source>Set this name as the current coder.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>将此名称设置为当前编码器。</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="438"/>
         <source>Apply</source>
-        <translation type="unfinished"></translation>
+        <translation>申请</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="439"/>
         <source>Current coder: </source>
-        <translation type="unfinished"></translation>
+        <translation>现任编码员： </translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="440"/>
         <source>/</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="441"/>
         <source>Language</source>
-        <translation type="unfinished"></translation>
+        <translation>语言</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="442"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Close and open the software for the change in language to occur.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>关闭并打开软件，语言才会发生变化。</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="443"/>
         <source>General font and size</source>
-        <translation type="unfinished"></translation>
+        <translation>一般字体和大小</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="444"/>
         <source>Font size for codes tree</source>
-        <translation type="unfinished"></translation>
+        <translation>代码树的字体大小</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="445"/>
         <source>Font size for documents</source>
-        <translation type="unfinished"></translation>
+        <translation>文件字体大小</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="446"/>
         <source>Reports with text context</source>
-        <translation type="unfinished"></translation>
+        <translation>带文本上下文的报告</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="447"/>
         <source>Characters before and after</source>
-        <translation type="unfinished"></translation>
+        <translation>前后字符</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="448"/>
         <source>Text context, coded text style</source>
-        <translation type="unfinished"></translation>
+        <translation>文本上下文、编码文本样式</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="463"/>
         <source>8</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="464"/>
         <source>10</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="465"/>
         <source>12</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="466"/>
         <source>14</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="467"/>
         <source>16</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="468"/>
         <source>18</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="469"/>
         <source>20</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="470"/>
         <source>100</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="471"/>
         <source>200</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="472"/>
         <source>300</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="473"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show the identifying numbers for files, cases, codes, et cetera.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>显示档案、案件、代码等的识别编号</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="474"/>
         <source>Show IDs</source>
-        <translation type="unfinished"></translation>
+        <translation>显示 ID</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="475"/>
         <source>50000</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="476"/>
         <source>40000</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="477"/>
         <source>30000</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="478"/>
         <source>20000</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="479"/>
         <source>Style</source>
-        <translation type="unfinished"></translation>
+        <translation>风格</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="480"/>
         <source>Very large text documents. Load text chunks by number of characters.</source>
-        <translation type="unfinished"></translation>
+        <translation>超大文本文档。按字符数加载文本块。</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="481"/>
         <source>Code text chunk size</source>
-        <translation type="unfinished"></translation>
+        <translation>代码文本块大小</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="482"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Used when entering time position in transcription&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>用于在转录中输入时间位置</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="483"/>
         <source>Time format</source>
-        <translation type="unfinished"></translation>
+        <translation>时间格式</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="484"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Used when entering speaker name in transcription&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>在转录中输入发言者姓名时使用</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="485"/>
         <source>Speaker format</source>
-        <translation type="unfinished"></translation>
+        <translation>演讲形式</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="486"/>
         <source>AI Integration</source>
-        <translation type="unfinished"></translation>
+        <translation>人工智能集成</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="487"/>
         <source>enable AI integration</source>
-        <translation type="unfinished"></translation>
+        <translation>实现人工智能集成</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="488"/>
         <source>Description:</source>
-        <translation type="unfinished"></translation>
+        <translation>说明：</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="489"/>
         <source>Get Access:</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>获取访问权限：</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="490"/>
         <source>API key</source>
-        <translation type="unfinished"></translation>
+        <translation>API 密钥</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="491"/>
         <source>AI Model</source>
-        <translation type="unfinished"></translation>
+        <translation>人工智能模型</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="492"/>
         <source>You can use the Project Memo (found in the menu: Project &gt; Project Memo) to convey background information about your research, including objectives, methodology, and data, to the AI. This will help the AI generate more accurate and relevant responses. Deselect this option if you use the Project Memo for other purposes.</source>
-        <translation type="unfinished"></translation>
+        <translation>您可以使用 “项目备忘录”（可在菜单 “项目 &gt; 项目备忘录 ”中找到）向人工智能传达有关您的研究的背景信息，包括目标、方法和数据。这将有助于人工智能生成更准确、更相关的回复。如果将项目备忘录用于其他目的，请取消选择此选项。</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="493"/>
         <source>Send project memo to AI</source>
-        <translation type="unfinished"></translation>
+        <translation>向人工智能发送项目备忘录</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="494"/>
         <source>Language for AI conversations: </source>
-        <translation type="unfinished"></translation>
+        <translation>人工智能对话语言 </translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="495"/>
         <source>If selected, the conversations will be in the same language as the rest of the user interface. You can select this language at the top of this window.</source>
-        <translation type="unfinished"></translation>
+        <translation>如果选中，对话将使用与用户界面其他部分相同的语言。您可以在此窗口顶部选择这种语言。</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="496"/>
         <source>same as UI</source>
-        <translation type="unfinished"></translation>
+        <translation>与用户界面相同</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="497"/>
         <source>Enter the name of your language here</source>
-        <translation type="unfinished"></translation>
+        <translation>在此处输入您的语言名称</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="498"/>
         <source>Temperature:</source>
-        <translation type="unfinished"></translation>
+        <translation>温度</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="499"/>
         <source>Advanced option. Only change when you know whatr you are doing.</source>
-        <translation type="unfinished"></translation>
+        <translation>高级选项。只有当你知道自己在做什么时，才能进行更改。</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="503"/>
         <source>D.9</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="504"/>
         <source>1.0</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="502"/>
         <source>   Top_p:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
