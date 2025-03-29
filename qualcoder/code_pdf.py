@@ -115,9 +115,9 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.search_indices = []
         self.search_index = 0
         self.codes, self.categories = self.app.get_codes_categories()
+        self.get_recent_codes()  # After codes obtained!
         self.tree_sort_option = "all asc"
         self.annotations = self.app.get_annotations()
-        self.recent_codes = []
         self.autocode_history = []
         self.undo_deleted_codes = []
         self.journal = False
@@ -298,6 +298,29 @@ class DialogCodePdf(QtWidgets.QWidget):
 
         if self.pages:
             self.show_page()
+
+    def get_recent_codes(self):
+        """ Get recently used codes. Must have loaded all codes first.
+        recent codes are stored as space delimited text in project table.
+        Add code id to recent codes list, if code is present. """
+
+        self.recent_codes = []
+        cur = self.app.conn.cursor()
+        cur.execute("select recently_used_codes from project")
+        res = cur.fetchone()
+        if not res:
+            return
+        if res[0] == "" or res[0] is None:
+            return
+        recent_codes_text = res[0].split()
+        for code_id in recent_codes_text:
+            try:
+                cid = int(code_id)
+                for code_ in self.codes:
+                    if cid == code_['cid']:
+                        self.recent_codes.append(code_)
+            except ValueError:
+                pass
 
     def get_files(self, ids=None):
         """ Get pdf files with additional details and fill list widget.
@@ -3233,6 +3256,12 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.recent_codes.insert(0, tmp_code)
         if len(self.recent_codes) > 10:
             self.recent_codes = self.recent_codes[:10]
+        recent_codes_string = ""
+        for r in self.recent_codes:
+            recent_codes_string += f" {r['cid']}"
+        recent_codes_string = recent_codes_string[1:]
+        cur.execute("update project set recently_used_codes=?", [recent_codes_string])
+        self.app.conn.commit()
         self.update_file_tooltip()
         self.display_page_text_objects()
 
