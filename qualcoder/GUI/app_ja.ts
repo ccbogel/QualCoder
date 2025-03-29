@@ -1,27 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1">
+<TS version="2.1" language="ja">
 <context>
     <name>DialogAddAttribute</name>
     <message>
         <location filename="ui_attribute.py" line="41"/>
         <source>Add Attribute</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>属性の追加</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_attribute.py" line="42"/>
         <source>Attribute name:</source>
-        <translation type="unfinished"></translation>
+        <translation>属性名：</translation>
     </message>
     <message>
         <location filename="ui_attribute.py" line="43"/>
         <source>Character</source>
-        <translation type="unfinished"></translation>
+        <translation>キャラクター</translation>
     </message>
     <message>
         <location filename="ui_attribute.py" line="44"/>
         <source>Numeric</source>
-        <translation type="unfinished"></translation>
+        <translation>数値</translation>
     </message>
 </context>
 <context>
@@ -2181,85 +2182,88 @@ As all assigned positions may be incorrect. </source>
     <message>
         <location filename="ui_dialog_manage_files.py" line="106"/>
         <source>Files</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイル</translation>
     </message>
     <message>
         <location filename="ui_dialog_manage_files.py" line="107"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;View file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイルを見る</translation>
     </message>
     <message>
         <location filename="ui_dialog_manage_files.py" line="108"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Create a text file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>テキストファイルの作成</translation>
     </message>
     <message>
         <location filename="ui_dialog_manage_files.py" line="109"/>
         <source>Export selected file.
 Text files (from any source) are exported from the text stored in the database as .txt files.
 (You can open the project folder and copy/paste the orignal text file if preferred.)</source>
-        <translation type="unfinished"></translation>
+        <translation>選択したファイルをエクスポートします。
+テキストファイル(ソースは問いません)は、データベースに保存されているテキストから.txtファイルとしてエクスポートされます。
+(必要であれば、プロジェクトフォルダを開き、元のテキストファイルをコピー/ペーストすることもできます)。</translation>
     </message>
     <message>
         <location filename="ui_dialog_manage_files.py" line="112"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select files for deletion&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>削除するファイルを選択する</translation>
     </message>
     <message>
         <location filename="ui_dialog_manage_files.py" line="113"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Import file into project folder&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイルをプロジェクトフォルダにインポートする</translation>
     </message>
     <message>
         <location filename="ui_dialog_manage_files.py" line="114"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add attribute&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>属性の追加</translation>
     </message>
     <message>
         <location filename="ui_dialog_manage_files.py" line="115"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Link to a file that is outside the project folder&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>プロジェクトフォルダ外のファイルへのリンク</translation>
     </message>
     <message>
         <location filename="ui_dialog_manage_files.py" line="116"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Import linked file into project folder&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>リンクされたファイルをプロジェクトフォルダにインポートする</translation>
     </message>
     <message>
         <location filename="ui_dialog_manage_files.py" line="117"/>
         <source>Export file from project folder as a linked file.
 Cannot export text transcription file associated with an audio or video as a linked file.</source>
-        <translation type="unfinished"></translation>
+        <translation>プロジェクトフォルダからファイルをリンクファイルとして書き出すことができません。
+オーディオまたはビデオに関連付けられたテキスト書き起こしファイルを、リンクファイルとして書き出すことができません。</translation>
     </message>
     <message>
         <location filename="ui_dialog_manage_files.py" line="119"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export attributes to file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>属性をファイルにエクスポート</translation>
     </message>
     <message>
         <location filename="ui_dialog_manage_files.py" line="120"/>
         <source>Help</source>
-        <translation type="unfinished"></translation>
+        <translation>ヘルプ</translation>
     </message>
     <message>
         <location filename="ui_dialog_manage_files.py" line="121"/>
         <source>Files:</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイル:</translation>
     </message>
     <message>
         <location filename="ui_dialog_manage_files.py" line="122"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Undo file rename&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイル名変更の取り消し</translation>
     </message>
     <message>
         <location filename="ui_dialog_manage_files.py" line="123"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Bulk rename of database name file entries.&lt;/p&gt;&lt;p&gt;Only rename visible file rows. Can show only some rows by using attribute selection, or show/hide value like...&lt;/p&gt;&lt;p&gt;Renamed as: User chosen prefix and numbered suffix _nnn.&lt;/p&gt;&lt;p&gt;e.g. interview_001&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;データベース名ファイルエントリの一括リネーム&lt;/p&gt;&lt;p&gt;表示されているファイル行のリネームのみ行います。&lt;/p&gt;&lt;p&gt; &lt;/p&gt;&lt;p&gt;名前の変更： &lt;/p&gt;&lt;p&gt;例: interview_001&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_manage_files.py" line="124"/>
         <source>File:</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイル:</translation>
     </message>
 </context>
 <context>
@@ -2295,57 +2299,57 @@ Cannot export text transcription file associated with an audio or video as a lin
     <message>
         <location filename="ui_manage_references.py" line="90"/>
         <source>Reference manager</source>
-        <translation type="unfinished"></translation>
+        <translation>リファレンス・マネージャー</translation>
     </message>
     <message>
         <location filename="ui_manage_references.py" line="91"/>
         <source>Assign selected file(s) to selected reference. Press L or Link button below.</source>
-        <translation type="unfinished"></translation>
+        <translation>選択したファイルを選択した参照に割り当てます。下のLまたはLinkボタンを押してください。</translation>
     </message>
     <message>
         <location filename="ui_manage_references.py" line="92"/>
         <source>Hide assigned files</source>
-        <translation type="unfinished"></translation>
+        <translation>割り当てられたファイルを隠す</translation>
     </message>
     <message>
         <location filename="ui_manage_references.py" line="93"/>
         <source>Hide assigned references</source>
-        <translation type="unfinished"></translation>
+        <translation>割り当てられた参照を隠す</translation>
     </message>
     <message>
         <location filename="ui_manage_references.py" line="94"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete selected reference&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>選択した参照を削除する</translation>
     </message>
     <message>
         <location filename="ui_manage_references.py" line="95"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Link selected files to selected reference&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>選択したファイルを選択したリファレンスにリンクする</translation>
     </message>
     <message>
         <location filename="ui_manage_references.py" line="96"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Unlink selected files from references&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>選択したリファレンスから選択したファイルを削除する</translation>
     </message>
     <message>
         <location filename="ui_manage_references.py" line="97"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete all references that are not assigned to files&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイルに割り当てられていないすべての参照を削除する。</translation>
     </message>
     <message>
         <location filename="ui_manage_references.py" line="98"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Edit reference&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>参考文献を編集する</translation>
     </message>
     <message>
         <location filename="ui_manage_references.py" line="99"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Import references. RIS format.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>参考文献のインポート RISフォーマット。</translation>
     </message>
     <message>
         <location filename="ui_manage_references.py" line="100"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Automatically link references to unassigned file names.&lt;/p&gt;&lt;p&gt;Word matching uses words from reference title.&lt;/p&gt;&lt;p&gt;Strong matches with 70% or more matching words are linked.&lt;/p&gt;&lt;p&gt;Linking may be incorrect. &lt;/p&gt;&lt;p&gt;Review after applying the function.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;未割り当てのファイル名へのリファレンスを自動的にリンクします。&lt;/p&gt;&lt;p&gt;ワードマッチはリファレンスタイトルの単語を使用します。&lt;/p&gt;&lt;p&gt;70%以上の単語が一致する強いマッチがリンクされます。&lt;/p&gt;&lt;p&gt;リンクが正しくない場合があります。&lt;/p&gt;&lt;p&gt;機能適用後に見直してください。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -2353,12 +2357,12 @@ Cannot export text transcription file associated with an audio or video as a lin
     <message>
         <location filename="ui_dialog_memo.py" line="43"/>
         <source>Memo</source>
-        <translation type="unfinished"></translation>
+        <translation>メモ</translation>
     </message>
     <message>
         <location filename="ui_dialog_memo.py" line="44"/>
         <source>Clear</source>
-        <translation type="unfinished"></translation>
+        <translation>クリア</translation>
     </message>
 </context>
 <context>
@@ -2819,99 +2823,100 @@ Wildcards for &apos;like&apos; are % and _</source>
     <message>
         <location filename="ui_dialog_settings.py" line="421"/>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>設定</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="422"/>
         <source>Backup project folder every time project is opened</source>
-        <translation type="unfinished"></translation>
+        <translation>プロジェクトを開くたびにプロジェクトフォルダをバックアップ</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="423"/>
         <source>Default project directory</source>
-        <translation type="unfinished"></translation>
+        <translation>デフォルトのプロジェクトディレクトリ</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="424"/>
         <source>Backup video and audio files. Uncheck to speed up backups.
 Not recommended unless you have many large files slowing the backup.</source>
-        <translation type="unfinished"></translation>
+        <translation>ビデオファイルとオーディオファイルをバックアップします。チェックを外すとバックアップが高速化されます。
+バックアップに時間がかかる大きなファイルが多数ある場合を除き、お勧めしません。</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="426"/>
         <source>Backups</source>
-        <translation type="unfinished"></translation>
+        <translation>バックアップ</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="427"/>
         <source>0</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="428"/>
         <source>1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="429"/>
         <source>2</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="430"/>
         <source>3</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="431"/>
         <source>4</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="432"/>
         <source>5</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="433"/>
         <source>Select another coder in this project</source>
-        <translation type="unfinished"></translation>
+        <translation>このプロジェクトの別のコーダーを選択する</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="434"/>
         <source>Other coders</source>
-        <translation type="unfinished"></translation>
+        <translation>その他のコーダー</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="435"/>
         <source>New coder</source>
-        <translation type="unfinished"></translation>
+        <translation>新人コーダー</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="436"/>
         <source>Set this name as the current coder.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>この名前を現在のコーダーとして設定する。</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="438"/>
         <source>Apply</source>
-        <translation type="unfinished"></translation>
+        <translation>応募する</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="439"/>
         <source>Current coder: </source>
-        <translation type="unfinished"></translation>
+        <translation>現在のコーダー </translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="440"/>
         <source>/</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="441"/>
         <source>Language</source>
-        <translation type="unfinished"></translation>
+        <translation>言語</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="442"/>
@@ -2951,52 +2956,52 @@ Not recommended unless you have many large files slowing the backup.</source>
     <message>
         <location filename="ui_dialog_settings.py" line="463"/>
         <source>8</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="464"/>
         <source>10</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="465"/>
         <source>12</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="466"/>
         <source>14</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="467"/>
         <source>16</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="468"/>
         <source>18</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="469"/>
         <source>20</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="470"/>
         <source>100</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="471"/>
         <source>200</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="472"/>
         <source>300</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="473"/>
@@ -3011,142 +3016,142 @@ Not recommended unless you have many large files slowing the backup.</source>
     <message>
         <location filename="ui_dialog_settings.py" line="475"/>
         <source>50000</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="476"/>
         <source>40000</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="477"/>
         <source>30000</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="478"/>
         <source>20000</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="479"/>
         <source>Style</source>
-        <translation type="unfinished"></translation>
+        <translation>スタイル</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="480"/>
         <source>Very large text documents. Load text chunks by number of characters.</source>
-        <translation type="unfinished"></translation>
+        <translation>非常に大きなテキスト文書。文字数でテキストチャンクを読み込む。</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="481"/>
         <source>Code text chunk size</source>
-        <translation type="unfinished"></translation>
+        <translation>コードテキストのチャンクサイズ</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="482"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Used when entering time position in transcription&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>トランスクリプションで時間位置を入力する際に使用</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="483"/>
         <source>Time format</source>
-        <translation type="unfinished"></translation>
+        <translation>時間形式</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="484"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Used when entering speaker name in transcription&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>トランスクリプションでスピーカー名を入力する際に使用</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="485"/>
         <source>Speaker format</source>
-        <translation type="unfinished"></translation>
+        <translation>スピーカー形式</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="486"/>
         <source>AI Integration</source>
-        <translation type="unfinished"></translation>
+        <translation>人工知能の統合</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="487"/>
         <source>enable AI integration</source>
-        <translation type="unfinished"></translation>
+        <translation>人工知能の統合を可能にする</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="488"/>
         <source>Description:</source>
-        <translation type="unfinished"></translation>
+        <translation>説明 :</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="489"/>
         <source>Get Access:</source>
-        <translation type="unfinished"></translation>
+        <translation>アクセス :</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="490"/>
         <source>API key</source>
-        <translation type="unfinished"></translation>
+        <translation>APIキー</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="491"/>
         <source>AI Model</source>
-        <translation type="unfinished"></translation>
+        <translation>人工知能モデル</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="492"/>
         <source>You can use the Project Memo (found in the menu: Project &gt; Project Memo) to convey background information about your research, including objectives, methodology, and data, to the AI. This will help the AI generate more accurate and relevant responses. Deselect this option if you use the Project Memo for other purposes.</source>
-        <translation type="unfinished"></translation>
+        <translation>プロジェクトメモ（メニュー：プロジェクト＞プロジェクトメモ）を使って、研究の目的、方法論、データなど、研究の背景情報をAIに伝えることができます。これは、AI がより正確で適切な回答を生成するのに役立ちます。プロジェクトメモを他の目的で使用する場合は、このオプションの選択を解除してください。</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="493"/>
         <source>Send project memo to AI</source>
-        <translation type="unfinished"></translation>
+        <translation>プロジェクト・メモを人工知能に送る</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="494"/>
         <source>Language for AI conversations: </source>
-        <translation type="unfinished"></translation>
+        <translation>人工知能の会話のための言語： </translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="495"/>
         <source>If selected, the conversations will be in the same language as the rest of the user interface. You can select this language at the top of this window.</source>
-        <translation type="unfinished"></translation>
+        <translation>選択した場合、会話は他のユーザーインターフェイスと同じ言語で表示されます。この言語は、このウィンドウの上部で選択できます。</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="496"/>
         <source>same as UI</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザーインターフェースと同じ</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="497"/>
         <source>Enter the name of your language here</source>
-        <translation type="unfinished"></translation>
+        <translation>ここに言語名を入力してください</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="498"/>
         <source>Temperature:</source>
-        <translation type="unfinished"></translation>
+        <translation>温度だ：</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="499"/>
         <source>Advanced option. Only change when you know whatr you are doing.</source>
-        <translation type="unfinished"></translation>
+        <translation>高度なオプション。自分が何をしているかわかっているときだけ変更してください。</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="503"/>
         <source>D.9</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="504"/>
         <source>1.0</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="502"/>
         <source>   Top_p:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -3541,412 +3546,412 @@ Do not code this text until you reload Coding - Code Text from the menu bar.</so
     <message>
         <location filename="ui_main.py" line="302"/>
         <source>QualCoder</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_main.py" line="303"/>
         <source>Action Log</source>
-        <translation type="unfinished"></translation>
+        <translation>行動ログ</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="304"/>
         <source>Select an option in the Files and Cases menu. </source>
-        <translation type="unfinished"></translation>
+        <translation>ファイルとケース」メニューからオプションを選択します。</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="315"/>
         <source>Manage</source>
-        <translation type="unfinished"></translation>
+        <translation>管理</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="306"/>
         <source>Select an option in the Coding menu. </source>
-        <translation type="unfinished"></translation>
+        <translation>コーディングメニューでオプションを選択します。</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="316"/>
         <source>Coding</source>
-        <translation type="unfinished"></translation>
+        <translation>コーディング</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="308"/>
         <source>Select an option in the Reports menu. </source>
-        <translation type="unfinished"></translation>
+        <translation>レポートメニューからオプションを選択する。</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="317"/>
         <source>Reports</source>
-        <translation type="unfinished"></translation>
+        <translation>レポート</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="382"/>
         <source>AI Chat</source>
-        <translation type="unfinished"></translation>
+        <translation>人工知能 チャット</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="311"/>
         <source>Project</source>
-        <translation type="unfinished"></translation>
+        <translation>プロジェクト</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="312"/>
         <source>Open Recent Project</source>
-        <translation type="unfinished"></translation>
+        <translation>最近のプロジェクトを開く</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="313"/>
         <source>Export</source>
-        <translation type="unfinished"></translation>
+        <translation>輸出</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="314"/>
         <source>Import</source>
-        <translation type="unfinished"></translation>
+        <translation>輸入</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="318"/>
         <source>Help</source>
-        <translation type="unfinished"></translation>
+        <translation>ヘルプ</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="319"/>
         <source>AI</source>
-        <translation type="unfinished"></translation>
+        <translation>人工知能</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="320"/>
         <source>Create New Project</source>
-        <translation type="unfinished"></translation>
+        <translation>新規プロジェクトの作成</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="321"/>
         <source>Open Project</source>
-        <translation type="unfinished"></translation>
+        <translation>オープン・プロジェクト</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="322"/>
         <source>Close Project</source>
-        <translation type="unfinished"></translation>
+        <translation>プロジェクト終了</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="381"/>
         <source>Project Memo</source>
-        <translation type="unfinished"></translation>
+        <translation>プロジェクト・メモ</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="384"/>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>設定</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="325"/>
         <source>Exit</source>
-        <translation type="unfinished"></translation>
+        <translation>出口</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="326"/>
         <source>Manage files</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイルの管理</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="327"/>
         <source>Manage cases</source>
-        <translation type="unfinished"></translation>
+        <translation>ケースの管理</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="328"/>
         <source>File categories</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイルカテゴリー</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="329"/>
         <source>Manage journals</source>
-        <translation type="unfinished"></translation>
+        <translation>ジャーナル管理</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="330"/>
         <source>Code text</source>
-        <translation type="unfinished"></translation>
+        <translation>コード・テキスト</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="331"/>
         <source>Categories</source>
-        <translation type="unfinished"></translation>
+        <translation>カテゴリー</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="332"/>
         <source>Codebook</source>
-        <translation type="unfinished"></translation>
+        <translation>コードブック</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="333"/>
         <source>Assign Attributes</source>
-        <translation type="unfinished"></translation>
+        <translation>属性の割り当て</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="334"/>
         <source>Manage Attributes</source>
-        <translation type="unfinished"></translation>
+        <translation>属性の管理</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="335"/>
         <source>Import Attributes</source>
-        <translation type="unfinished"></translation>
+        <translation>インポート属性</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="336"/>
         <source>Coding reports</source>
-        <translation type="unfinished"></translation>
+        <translation>コーディング・レポート</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="337"/>
         <source>Coding summary</source>
-        <translation type="unfinished"></translation>
+        <translation>コーディングの概要</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="338"/>
         <source>Database queries</source>
-        <translation type="unfinished"></translation>
+        <translation>データベースクエリ</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="339"/>
         <source>Contents</source>
-        <translation type="unfinished"></translation>
+        <translation>内容</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="340"/>
         <source>About</source>
-        <translation type="unfinished"></translation>
+        <translation>について</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="374"/>
         <source>Import survey</source>
-        <translation type="unfinished"></translation>
+        <translation>輸入調査</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="342"/>
         <source>Manage attributes</source>
-        <translation type="unfinished"></translation>
+        <translation>属性の管理</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="343"/>
         <source>Frequency table</source>
-        <translation type="unfinished"></translation>
+        <translation>度数表</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="344"/>
         <source>Coding comparison</source>
-        <translation type="unfinished"></translation>
+        <translation>コーディング比較</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="345"/>
         <source>Text mining</source>
-        <translation type="unfinished"></translation>
+        <translation>テキストマイニング</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="346"/>
         <source>View Graph</source>
-        <translation type="unfinished"></translation>
+        <translation>グラフを見る</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="347"/>
         <source>Export codebook as ODT file</source>
-        <translation type="unfinished"></translation>
+        <translation>コードブックをODTファイルとしてエクスポート</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="348"/>
         <source>Code image</source>
-        <translation type="unfinished"></translation>
+        <translation>コード画像</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="349"/>
         <source>Code frequencies</source>
-        <translation type="unfinished"></translation>
+        <translation>コード周波数</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="350"/>
         <source>Coding Matrix</source>
-        <translation type="unfinished"></translation>
+        <translation>コーディング・マトリクス</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="351"/>
         <source>Code audio/video</source>
-        <translation type="unfinished"></translation>
+        <translation>コード・オーディオ/ビデオ</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="353"/>
         <source>REFI-QDA Project export</source>
-        <translation type="unfinished"></translation>
+        <translation>REFI-QDAプロジェクト輸出</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="354"/>
         <source>REFI-QDA Codebook export</source>
-        <translation type="unfinished"></translation>
+        <translation>REFI-QDAコードブックのエクスポート</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="355"/>
         <source>REFI-QDA Codebook import</source>
-        <translation type="unfinished"></translation>
+        <translation>REFI-QDAコードブックのインポート</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="356"/>
         <source>REFI-QDA Project import</source>
-        <translation type="unfinished"></translation>
+        <translation>REFI-QDAプロジェクトのインポート</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="357"/>
         <source>RQDA Project import</source>
-        <translation type="unfinished"></translation>
+        <translation>RQDAプロジェクト輸入</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="358"/>
         <source>Project summary</source>
-        <translation type="unfinished"></translation>
+        <translation>プロジェクト概要</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="359"/>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_main.py" line="360"/>
         <source>Code relations</source>
-        <translation type="unfinished"></translation>
+        <translation>コード関係</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="361"/>
         <source>Export coded text as html</source>
-        <translation type="unfinished"></translation>
+        <translation>コード化されたテキストをhtmlとしてエクスポート</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="362"/>
         <source>Manage bad links to files</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイルへの不正リンクの管理</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="363"/>
         <source>Special functions</source>
-        <translation type="unfinished"></translation>
+        <translation>特殊機能</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="364"/>
         <source>File summary</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイル概要</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="365"/>
         <source>Code summary</source>
-        <translation type="unfinished"></translation>
+        <translation>コード概要</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="366"/>
         <source>Coding comparison by file</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイル別コーディング比較</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="367"/>
         <source>Code by case</source>
-        <translation type="unfinished"></translation>
+        <translation>ケース別コード</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="368"/>
         <source>Charts</source>
-        <translation type="unfinished"></translation>
+        <translation>チャート</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="369"/>
         <source>Export codebook with memos as ODT file</source>
-        <translation type="unfinished"></translation>
+        <translation>メモを含むコードブックをODTファイルとしてエクスポート</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="370"/>
         <source>Import references RIS format</source>
-        <translation type="unfinished"></translation>
+        <translation>参考文献のインポート RISフォーマット</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="371"/>
         <source>Manage references</source>
-        <translation type="unfinished"></translation>
+        <translation>リファレンスの管理</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="372"/>
         <source>Colour scheme</source>
-        <translation type="unfinished"></translation>
+        <translation>カラースキーム</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="373"/>
         <source>Import plain text codes list</source>
-        <translation type="unfinished"></translation>
+        <translation>プレーンテキストコードリストのインポート</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="375"/>
         <source>Menu Key Shortcuts</source>
-        <translation type="unfinished"></translation>
+        <translation>ショートカットキー</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="376"/>
         <source>Import twitter data</source>
-        <translation type="unfinished"></translation>
+        <translation>ツイッターデータのインポート</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="377"/>
         <source>Code pdf</source>
-        <translation type="unfinished"></translation>
+        <translation>コードpdf</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="378"/>
         <source>Code text exact matches</source>
-        <translation type="unfinished"></translation>
+        <translation>コードテキストの完全一致</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="379"/>
         <source>Setup Wizard</source>
-        <translation type="unfinished"></translation>
+        <translation>セットアップ・ウィザード</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="380"/>
         <source>Rebuild Internal Memory</source>
-        <translation type="unfinished"></translation>
+        <translation>内部メモリーの再構築</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="383"/>
         <source>AI Assisted Coding</source>
-        <translation type="unfinished"></translation>
+        <translation>人工知能によるコーディング支援</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="385"/>
         <source>AI related Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>人工知能関連の設定</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="386"/>
         <source>Prompt library</source>
-        <translation type="unfinished"></translation>
+        <translation>プロンプト・ライブラリー</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="387"/>
         <source>Code organiser</source>
-        <translation type="unfinished"></translation>
+        <translation>コード・オーガナイザー</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="388"/>
         <source>Codes by text segments</source>
-        <translation type="unfinished"></translation>
+        <translation>テキストセグメントによるコード</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="389"/>
         <source>AI assisted coding</source>
-        <translation type="unfinished"></translation>
+        <translation>人工知能によるコーディング支援</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="390"/>
         <source>Code co-occurrence</source>
-        <translation type="unfinished"></translation>
+        <translation>コード共起</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="391"/>
         <source>Code comparison table</source>
-        <translation type="unfinished"></translation>
+        <translation>コード比較表</translation>
     </message>
 </context>
 </TS>
