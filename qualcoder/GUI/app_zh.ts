@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1">
+<TS version="2.1" language="zh">
 <context>
     <name>DialogAddAttribute</name>
     <message>
@@ -3541,412 +3541,412 @@ Do not code this text until you reload Coding - Code Text from the menu bar.</so
     <message>
         <location filename="ui_main.py" line="302"/>
         <source>QualCoder</source>
-        <translation type="unfinished"></translation>
+        <translation>QualCoder</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="303"/>
         <source>Action Log</source>
-        <translation type="unfinished"></translation>
+        <translation>行动日志</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="304"/>
         <source>Select an option in the Files and Cases menu. </source>
-        <translation type="unfinished"></translation>
+        <translation>在文件和案例菜单中选择一个选项。</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="315"/>
         <source>Manage</source>
-        <translation type="unfinished"></translation>
+        <translation>管理</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="306"/>
         <source>Select an option in the Coding menu. </source>
-        <translation type="unfinished"></translation>
+        <translation>在编码菜单中选择一个选项。</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="316"/>
         <source>Coding</source>
-        <translation type="unfinished"></translation>
+        <translation>编码</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="308"/>
         <source>Select an option in the Reports menu. </source>
-        <translation type="unfinished"></translation>
+        <translation>在报告菜单中选择一个选项。</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="317"/>
         <source>Reports</source>
-        <translation type="unfinished"></translation>
+        <translation>报告</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="382"/>
         <source>AI Chat</source>
-        <translation type="unfinished"></translation>
+        <translation>人工智能聊天</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="311"/>
         <source>Project</source>
-        <translation type="unfinished"></translation>
+        <translation>项目</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="312"/>
         <source>Open Recent Project</source>
-        <translation type="unfinished"></translation>
+        <translation>打开近期项目</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="313"/>
         <source>Export</source>
-        <translation type="unfinished"></translation>
+        <translation>出口</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="314"/>
         <source>Import</source>
-        <translation type="unfinished"></translation>
+        <translation>进口</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="318"/>
         <source>Help</source>
-        <translation type="unfinished"></translation>
+        <translation>帮助</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="319"/>
         <source>AI</source>
-        <translation type="unfinished"></translation>
+        <translation>人工智能</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="320"/>
         <source>Create New Project</source>
-        <translation type="unfinished"></translation>
+        <translation>创建新项目</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="321"/>
         <source>Open Project</source>
-        <translation type="unfinished"></translation>
+        <translation>开放项目</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="322"/>
         <source>Close Project</source>
-        <translation type="unfinished"></translation>
+        <translation>关闭项目</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="381"/>
         <source>Project Memo</source>
-        <translation type="unfinished"></translation>
+        <translation>项目备忘录</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="384"/>
         <source>Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>设置</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="325"/>
         <source>Exit</source>
-        <translation type="unfinished"></translation>
+        <translation>退出</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="326"/>
         <source>Manage files</source>
-        <translation type="unfinished"></translation>
+        <translation>管理文件</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="327"/>
         <source>Manage cases</source>
-        <translation type="unfinished"></translation>
+        <translation>管理案件</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="328"/>
         <source>File categories</source>
-        <translation type="unfinished"></translation>
+        <translation>文件类别</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="329"/>
         <source>Manage journals</source>
-        <translation type="unfinished"></translation>
+        <translation>管理期刊</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="330"/>
         <source>Code text</source>
-        <translation type="unfinished"></translation>
+        <translation>代码文本</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="331"/>
         <source>Categories</source>
-        <translation type="unfinished"></translation>
+        <translation>类别</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="332"/>
         <source>Codebook</source>
-        <translation type="unfinished"></translation>
+        <translation>密码本</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="333"/>
         <source>Assign Attributes</source>
-        <translation type="unfinished"></translation>
+        <translation>指定属性</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="334"/>
         <source>Manage Attributes</source>
-        <translation type="unfinished"></translation>
+        <translation>管理属性</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="335"/>
         <source>Import Attributes</source>
-        <translation type="unfinished"></translation>
+        <translation>导入属性</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="336"/>
         <source>Coding reports</source>
-        <translation type="unfinished"></translation>
+        <translation>编码报告</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="337"/>
         <source>Coding summary</source>
-        <translation type="unfinished"></translation>
+        <translation>编码概要</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="338"/>
         <source>Database queries</source>
-        <translation type="unfinished"></translation>
+        <translation>数据库查询</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="339"/>
         <source>Contents</source>
-        <translation type="unfinished"></translation>
+        <translation>目录</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="340"/>
         <source>About</source>
-        <translation type="unfinished"></translation>
+        <translation>关于</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="374"/>
         <source>Import survey</source>
-        <translation type="unfinished"></translation>
+        <translation>进口调查</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="342"/>
         <source>Manage attributes</source>
-        <translation type="unfinished"></translation>
+        <translation>管理属性</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="343"/>
         <source>Frequency table</source>
-        <translation type="unfinished"></translation>
+        <translation>频率表</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="344"/>
         <source>Coding comparison</source>
-        <translation type="unfinished"></translation>
+        <translation>编码比较</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="345"/>
         <source>Text mining</source>
-        <translation type="unfinished"></translation>
+        <translation>文本挖掘</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="346"/>
         <source>View Graph</source>
-        <translation type="unfinished"></translation>
+        <translation>查看图表</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="347"/>
         <source>Export codebook as ODT file</source>
-        <translation type="unfinished"></translation>
+        <translation>将代码集导出为 ODT 文件</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="348"/>
         <source>Code image</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_main.py" line="349"/>
         <source>Code frequencies</source>
-        <translation type="unfinished"></translation>
+        <translation>代码频率</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="350"/>
         <source>Coding Matrix</source>
-        <translation type="unfinished"></translation>
+        <translation>编码矩阵</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="351"/>
         <source>Code audio/video</source>
-        <translation type="unfinished"></translation>
+        <translation>音频/视频代码</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="353"/>
         <source>REFI-QDA Project export</source>
-        <translation type="unfinished"></translation>
+        <translation>REFI-QDA 项目出口</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="354"/>
         <source>REFI-QDA Codebook export</source>
-        <translation type="unfinished"></translation>
+        <translation>导出 REFI-QDA 代码手册</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="355"/>
         <source>REFI-QDA Codebook import</source>
-        <translation type="unfinished"></translation>
+        <translation>REFI-QDA 代码库导入</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="356"/>
         <source>REFI-QDA Project import</source>
-        <translation type="unfinished"></translation>
+        <translation>REFI-QDA 项目导入</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="357"/>
         <source>RQDA Project import</source>
-        <translation type="unfinished"></translation>
+        <translation>RQDA 项目导入</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="358"/>
         <source>Project summary</source>
-        <translation type="unfinished"></translation>
+        <translation>项目摘要</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="359"/>
         <source>None</source>
-        <translation type="unfinished"></translation>
+        <translation>无</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="360"/>
         <source>Code relations</source>
-        <translation type="unfinished"></translation>
+        <translation>代码关系</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="361"/>
         <source>Export coded text as html</source>
-        <translation type="unfinished"></translation>
+        <translation>将编码文本导出为 HTML</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="362"/>
         <source>Manage bad links to files</source>
-        <translation type="unfinished"></translation>
+        <translation>管理指向文件的不良链接</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="363"/>
         <source>Special functions</source>
-        <translation type="unfinished"></translation>
+        <translation>特殊功能</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="364"/>
         <source>File summary</source>
-        <translation type="unfinished"></translation>
+        <translation>文件摘要</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="365"/>
         <source>Code summary</source>
-        <translation type="unfinished"></translation>
+        <translation>代码概要</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="366"/>
         <source>Coding comparison by file</source>
-        <translation type="unfinished"></translation>
+        <translation>按文件进行编码比较</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="367"/>
         <source>Code by case</source>
-        <translation type="unfinished"></translation>
+        <translation>个案代码</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="368"/>
         <source>Charts</source>
-        <translation type="unfinished"></translation>
+        <translation>图表</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="369"/>
         <source>Export codebook with memos as ODT file</source>
-        <translation type="unfinished"></translation>
+        <translation>将带有备忘录的代码簿导出为 ODT 文件</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="370"/>
         <source>Import references RIS format</source>
-        <translation type="unfinished"></translation>
+        <translation>导入参考文献 RIS 格式</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="371"/>
         <source>Manage references</source>
-        <translation type="unfinished"></translation>
+        <translation>管理参考资料</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="372"/>
         <source>Colour scheme</source>
-        <translation type="unfinished"></translation>
+        <translation>颜色方案</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="373"/>
         <source>Import plain text codes list</source>
-        <translation type="unfinished"></translation>
+        <translation>导入纯文本代码列表</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="375"/>
         <source>Menu Key Shortcuts</source>
-        <translation type="unfinished"></translation>
+        <translation>快捷键</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="376"/>
         <source>Import twitter data</source>
-        <translation type="unfinished"></translation>
+        <translation>导入 twitter 数据</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="377"/>
         <source>Code pdf</source>
-        <translation type="unfinished"></translation>
+        <translation>代码 pdf</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="378"/>
         <source>Code text exact matches</source>
-        <translation type="unfinished"></translation>
+        <translation>代码文本完全匹配</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="379"/>
         <source>Setup Wizard</source>
-        <translation type="unfinished"></translation>
+        <translation>设置向导</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="380"/>
         <source>Rebuild Internal Memory</source>
-        <translation type="unfinished"></translation>
+        <translation>重建内部存储器</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="383"/>
         <source>AI Assisted Coding</source>
-        <translation type="unfinished"></translation>
+        <translation>人工智能辅助编码</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="385"/>
         <source>AI related Settings</source>
-        <translation type="unfinished"></translation>
+        <translation>人工智能相关设置</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="386"/>
         <source>Prompt library</source>
-        <translation type="unfinished"></translation>
+        <translation>提示图书馆</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="387"/>
         <source>Code organiser</source>
-        <translation type="unfinished"></translation>
+        <translation>代码组织者</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="388"/>
         <source>Codes by text segments</source>
-        <translation type="unfinished"></translation>
+        <translation>按文本段编码</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="389"/>
         <source>AI assisted coding</source>
-        <translation type="unfinished"></translation>
+        <translation>人工智能辅助编码</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="390"/>
         <source>Code co-occurrence</source>
-        <translation type="unfinished"></translation>
+        <translation>代码共现</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="391"/>
         <source>Code comparison table</source>
-        <translation type="unfinished"></translation>
+        <translation>代码对照表</translation>
     </message>
 </context>
 </TS>
