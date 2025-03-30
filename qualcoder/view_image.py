@@ -25,7 +25,7 @@ import html
 from io import BytesIO
 import logging
 import os
-from PIL import Image, ImageOps, ImageFilter
+from PIL import Image, ImageDraw, ImageFilter, ImageFont, ImageOps
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 from random import randint
 import sqlite3
@@ -74,7 +74,7 @@ class DialogCodeImage(QtWidgets.QDialog):
     attributes = []
     undo_deleted_code = None  # Undo last deleted code
     degrees = 0  # For image rotation
-    show_code_captions = False
+    show_code_captions = 0  # 0 = no, 1 = code name, 2 = codename + memo
 
     def __init__(self, app, parent_textedit, tab_reports):
         """ Show list of image files.
@@ -100,7 +100,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.degrees = 0
         self.get_codes_and_categories()
         self.tree_sort_option = "all asc"
-        self.show_code_captions = False
+        self.show_code_captions = 0
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_code_image()
         self.ui.setupUi(self)
@@ -152,7 +152,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.ui.pushButton_important.pressed.connect(self.show_important_coded)
 
         self.ui.pushButton_captions.setIcon(qta.icon('mdi6.closed-caption-outline', options=[{'scale_factor': 1.4}]))
-        self.ui.pushButton_captions.pressed.connect(self.captions_flag)
+        self.ui.pushButton_captions.pressed.connect(self.captions_options)
         self.ui.pushButton_zoom_in.setIcon(qta.icon('mdi6.magnify-plus-outline', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_zoom_in.pressed.connect(self.zoom_in)
         self.ui.pushButton_zoom_out.setIcon(qta.icon('mdi6.magnify-minus-outline', options=[{'scale_factor': 1.4}]))
@@ -734,57 +734,64 @@ class DialogCodeImage(QtWidgets.QDialog):
 
         if self.file_ is None:
             return
-        for item in self.code_areas:
-            if item['id'] == self.file_['id']:
+        for coded in self.code_areas:
+            if coded['id'] == self.file_['id']:
                 color = None
                 tooltip = ""
                 code_name = ""
+                code_memo = ""
                 for c in self.codes:
-                    if c['cid'] == item['cid']:
+                    if c['cid'] == coded['cid']:
                         code_name = c['name']
-                        tooltip = f"{c['name']} ({item['owner']})"
+                        code_memo = c['memo']
+                        tooltip = f"{c['name']} ({coded['owner']})"
                         if self.app.settings['showids']:
-                            tooltip += f"[imid:{item['imid']}]"
-                        if item['memo'] != "":
-                            tooltip += f"\nMemo: {item['memo']}"
-                        if item['important'] == 1:
+                            tooltip += f"[imid:{coded['imid']}]"
+                        if coded['memo'] != "":
+                            tooltip += f"\nMemo: {coded['memo']}"
+                            code_memo = f"\nMemo: {coded['memo']}"
+                        if coded['important'] == 1:
                             tooltip += "\n" + _("IMPORTANT")
                         color = QtGui.QColor(c['color'])
                 # Degrees 0
-                x = item['x1'] * self.scale
-                y = item['y1'] * self.scale
-                width = item['width'] * self.scale
-                height = item['height'] * self.scale
+                x = coded['x1'] * self.scale
+                y = coded['y1'] * self.scale
+                width = coded['width'] * self.scale
+                height = coded['height'] * self.scale
                 if self.degrees == 90:
-                    y = (item['x1']) * self.scale
-                    x = (self.pixmap.height() - item['y1'] - item['height']) * self.scale
-                    height = item['width'] * self.scale
-                    width = item['height'] * self.scale
+                    y = (coded['x1']) * self.scale
+                    x = (self.pixmap.height() - coded['y1'] - coded['height']) * self.scale
+                    height = coded['width'] * self.scale
+                    width = coded['height'] * self.scale
                 if self.degrees == 180:
-                    x = (self.pixmap.width() - item['x1'] - item['width']) * self.scale
-                    y = (self.pixmap.height() - item['y1'] - item['height']) * self.scale
-                    width = item['width'] * self.scale
-                    height = item['height'] * self.scale
+                    x = (self.pixmap.width() - coded['x1'] - coded['width']) * self.scale
+                    y = (self.pixmap.height() - coded['y1'] - coded['height']) * self.scale
+                    width = coded['width'] * self.scale
+                    height = coded['height'] * self.scale
                 if self.degrees == 270:
-                    y = (self.pixmap.width() - item['x1'] - item['width']) * self.scale
-                    x = (item['y1']) * self.scale
-                    height = item['width'] * self.scale
-                    width = item['height'] * self.scale
+                    y = (self.pixmap.width() - coded['x1'] - coded['width']) * self.scale
+                    x = (coded['y1']) * self.scale
+                    height = coded['width'] * self.scale
+                    width = coded['height'] * self.scale
                 rect_item = QtWidgets.QGraphicsRectItem(x, y, width, height)
                 rect_item.setPen(QtGui.QPen(color, 2, QtCore.Qt.PenStyle.DashLine))
                 rect_item.setToolTip(tooltip)
-                if item['owner'] == self.app.settings['codername']:
-                    if self.important and item['important'] == 1:
+                if coded['owner'] == self.app.settings['codername']:
+                    if self.important and coded['important'] == 1:
                         self.scene.addItem(rect_item)
                     if not self.important:
                         self.scene.addItem(rect_item)
-                if self.show_code_captions:
+                if self.show_code_captions == 1:
                     self.caption(x, y, code_name)
+                if self.show_code_captions == 2:
+                    self.caption(x, y, code_name + code_memo)
 
-    def captions_flag(self):
-        """ Show / hide code captions. """
+    def captions_options(self):
+        """ Hide captions (0). Show captions (1). Show captions with memos (2) """
 
-        self.show_code_captions = not self.show_code_captions
+        self.show_code_captions += 1
+        if self.show_code_captions > 2:
+            self.show_code_captions = 0
         self.redraw_scene()
 
     def caption(self, x, y, code_name):
@@ -792,7 +799,8 @@ class DialogCodeImage(QtWidgets.QDialog):
 
         text_item = QtWidgets.QGraphicsTextItem()
         text_item.setDefaultTextColor(QtGui.QColor("#000000"))
-        text_item.setHtml(f"<div style='background-color:#FFFFFF;'>{code_name}</div>")
+        html_text = code_name.replace('\n', '<br />')
+        text_item.setHtml(f"<div style='background-color:#FFFFFF;'>{html_text}</div>")
         # Style.StyleNormal 400  Segoe UI 9
         text_item.setPos(x, y)
         self.scene.addItem(text_item)
@@ -1126,10 +1134,11 @@ class DialogCodeImage(QtWidgets.QDialog):
             background = ImageOps.solarize(pil_img)  # Invert all pixel values above a threshold.
         if image_operation == "blur":
             background = pil_img.filter(ImageFilter.GaussianBlur(radius=10))
-        #background.convert('RGB')
         highlights = Image.new('RGB', (background.width, background.height))
         highlights.paste(background, (0, 0))
+        draw = ImageDraw.Draw(highlights)
         if coded_area:
+            # Highlight ONE coded area
             try:
                 # Needs tuple of left, top, right, bottom
                 coded_img = pil_img.crop((coded_area['x1'], coded_area['y1'], coded_area['x1'] + coded_area['width'],
@@ -1137,24 +1146,47 @@ class DialogCodeImage(QtWidgets.QDialog):
                 img_with_border = ImageOps.expand(coded_img, border=3, fill=coded_area['color'])
                 # highlights.paste(coded_img, (int(ca['x1']), int(ca['y1']))) # No border
                 highlights.paste(img_with_border, (int(coded_area['x1']), int(coded_area['y1'])))
+                self.text_box(draw, background.width, (coded_area['x1'], coded_area['y1']), coded_area['name'], coded_area['memo'])
             except SystemError as e_:
                 logger.debug(e_)
         else:
-            for ca in self.code_areas:
+            # Highlight all coded areas
+            for coded in self.code_areas:
                 try:
                     # Needs tuple of left, top, right, bottom
-                    coded_img = pil_img.crop((ca['x1'], ca['y1'], ca['x1'] + ca['width'], ca['y1'] + ca['height']))
-                    img_with_border = ImageOps.expand(coded_img, border=3, fill=ca['color'])
-                    if code_id == ca['cid']:
-                        highlights.paste(img_with_border, (int(ca['x1']), int(ca['y1'])))
+                    coded_img = pil_img.crop((coded['x1'], coded['y1'], coded['x1'] + coded['width'], coded['y1'] + coded['height']))
+                    img_with_border = ImageOps.expand(coded_img, border=3, fill=coded['color'])
+                    if code_id == coded['cid']:
+                        # Specific code id selected to highlight all of this code
+                        highlights.paste(img_with_border, (int(coded['x1']), int(coded['y1'])))
+                        self.text_box(draw, background.width, (coded['x1'], coded['y1']), coded['name'], coded['memo'])
                     if not code_id:
-                        highlights.paste(img_with_border, (int(ca['x1']), int(ca['y1'])))
+                        # No specific code or coded area selected.
+                        highlights.paste(img_with_border, (int(coded['x1']), int(coded['y1'])))
+                        self.text_box(draw, background.width, (coded['x1'], coded['y1']), coded['name'], coded['memo'])
                 except SystemError as e_:
                     logger.debug(e_)
                     print(e_)
-                    print("Crop img: x1", ca['x1'], "y1", ca['y1'], "x2", ca['x1'] + ca['width'], "y2", ca['y1'] + ca['height'])
+                    print("Crop img: x1", coded['x1'], "y1", coded['y1'], "x2", coded['x1'] + coded['width'], "y2", coded['y1'] + coded['height'])
                     print("Main img: w", background.width, "h", background.height)
         highlights.show()
+
+    def text_box(self, draw, background_width, position, text, memo):
+        """ Draw codename cation if show_code_captions=1, or codename plus memo if show_code_captions=2. """
+
+        if self.show_code_captions == 0:
+            return
+        font = ImageFont.load_default()
+        try:
+            font_path = os.path.join(self.app.confighome, 'DroidSansMono.ttf')
+            font = ImageFont.truetype(font_path, size=int(background_width / 90))
+        except OSError:
+            pass
+        if self.show_code_captions == 2 and memo != "":
+            text += "\n" + memo
+        bounding_box = draw.textbbox(position, text, font=font)
+        draw.rectangle(bounding_box, fill="white")
+        draw.text(position, text, font=font, fill="black")
 
     @staticmethod
     def help():
