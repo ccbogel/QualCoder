@@ -276,7 +276,7 @@ The instructions below are to run from source code inside a virtual environment.
 
 `source env_qc/bin/activate `
 
-`pip3 install –upgrade pip`
+`pip3 install -–upgrade pip`
 
 `git clone https://github.com/ccbogel/QualCoder.git`
 
