@@ -235,7 +235,7 @@ To install from source code below, inside a virtual environment. If you are usin
 
 `source env_qc/bin/activate`
 
-`pip3 install –upgrade pip`
+`pip3 install -–upgrade pip`
 
 `pip install -r requirements.txt`
 
