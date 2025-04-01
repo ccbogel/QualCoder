@@ -316,14 +316,22 @@ class App(object):
             res.append(dict(zip(keys, row)))
         return res
 
-    def get_code_names(self):
+    def get_code_names(self, cids=None):
         """
+        Args:
+            cids : List of cids as Integers, or None for all
         Returns:
             List of dictionaries of cid, name memo, date, catid, color, owner
         """
 
         cur = self.conn.cursor()
-        cur.execute("select name, ifnull(memo,''), owner, date, cid, catid, color from code_name order by lower(name)")
+        if not cids:
+            cur.execute("select name, ifnull(memo,''), owner, date, cid, catid, color from code_name order by lower(name)")
+        if cids:
+            cids_str = ",".join(map(str, cids))
+            sql = "select name, ifnull(memo,''), owner, date, cid, catid, color from code_name where "
+            sql += f"cid in ({cids_str}) order by lower(name)"
+            cur.execute(sql)
         result = cur.fetchall()
         res = []
         keys = 'name', 'memo', 'owner', 'date', 'cid', 'catid', 'color'
@@ -375,8 +383,8 @@ class App(object):
         sql = "select id, name, ifnull(memo,''), mediapath from source where (mediapath is Null or mediapath " \
               "like '/docs/%' or mediapath like 'docs:%') "
         if ids:
-            str_ids = list(map(str, ids))
-            sql += " and id in (" + ",".join(str_ids) + ")"
+            ids_str = ",".join(map(str, ids))
+            sql += f" and id in ({ids_str}) "
         sql += "order by lower(name)"
         cur = self.conn.cursor()
         cur.execute(sql)
@@ -443,7 +451,7 @@ class App(object):
     def get_pdf_filenames(self, ids=None):
         """ Get id, filenames, memo and mediapath of pdf text files.
         Args:
-            ids: list of Integer ids for a restricted list of files.
+            ids: list of Integer ids for a restricted list of files, or None.
         Returns:
             List of dictionaries of id, name memo, mediapath
         """
@@ -453,8 +461,8 @@ class App(object):
         sql = "select id, name, ifnull(memo,''), mediapath from source where mediapath is not Null and(mediapath " \
               "like '/docs/%' or mediapath like 'docs:%') and (mediapath like '%.pdf' or mediapath like '%.PDF')"
         if ids:
-            str_ids = list(map(str, ids))
-            sql += " and id in (" + ",".join(str_ids) + ")"
+            ids_str = ",".join(map(str, ids))
+            sql += f" and id in ({ids_str})"
         sql += "order by lower(name)"
         cur = self.conn.cursor()
         cur.execute(sql)
@@ -468,7 +476,7 @@ class App(object):
     def get_image_filenames(self, ids=None):
         """ Get filenames of image files only.
         Args:
-            ids: list of Integer ids for a restricted list of files.
+            ids: list of Integer ids for a restricted list of files, or Nonew.
         Returns:
             List of dictionaries of id, name, memo
         """
@@ -477,8 +485,8 @@ class App(object):
             ids = []
         sql = "select id, name, ifnull(memo,'') from source where mediapath like '/images/%' or mediapath like 'images:%'"
         if ids:
-            str_ids = list(map(str, ids))
-            sql += " and id in (" + ",".join(str_ids) + ")"
+            ids_str = ",".join(map(str, ids))
+            sql += f" and id in ({ids_str})"
         sql += " order by lower(name)"
         cur = self.conn.cursor()
         cur.execute(sql)
@@ -501,8 +509,8 @@ class App(object):
         sql = "select id, name, ifnull(memo,'') from source where "
         sql += "(mediapath like '/audio/%' or mediapath like 'audio:%' or mediapath like '/video/%' or mediapath like 'video:%') "
         if ids:
-            str_ids = list(map(str, ids))
-            sql += " and id in (" + ",".join(str_ids) + ")"
+            ids_str = ",".join(map(str, ids))
+            sql += f" and id in ({ids_str})"
         sql += " order by lower(name)"
         cur = self.conn.cursor()
         cur.execute(sql)
