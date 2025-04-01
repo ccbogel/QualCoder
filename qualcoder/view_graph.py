@@ -24,6 +24,7 @@ import datetime
 import logging
 from math import atan2, pi
 import os
+# from PIL import Image, ImageFont, ImageDraw
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 import sqlite3
 
@@ -455,17 +456,31 @@ class ViewGraph(QDialog):
             self.add_cases_to_graph()
 
     def add_codes_of_av_files(self, x=10, y=10):
-        """ Show selected codes of selected audio/video files as av graphics items. """
+        """ Show selected codes of selected audio/video files as av graphics items.
+        Args:
+            x: Integer
+            y: Integer
+        """
 
-        # Select files
+        # Select file
         files_wth_names = self.app.get_av_filenames()
-        ui = DialogSelectItems(self.app, files_wth_names, _("Select audio/video files"), "multi")
+        ui = DialogSelectItems(self.app, files_wth_names, _("Select audio/video files"), "single")
         ok = ui.exec()
         if not ok:
             return
-        selected_files = ui.get_selected()
-        # Select codes
-        code_names = self.app.get_code_names()
+        selected_file = ui.get_selected()
+        cur = self.app.conn.cursor()
+        cur.execute("select mediapath from source where id=?", [selected_file['id']])
+        selected_file['path'] = ""
+        res_path = cur.fetchone()
+        if res_path:
+            selected_file['path'] = res_path[0]
+
+        # Select from codes that are assigned to this audio/video file
+        cur.execute("select cid from code_av where id=?", [selected_file['id']])
+        res_assigned_codes = cur.fetchall()
+        cids = [r[0] for r in res_assigned_codes]
+        code_names = self.app.get_code_names(cids)
         ui = DialogSelectItems(self.app, code_names, _("Select codes"), "multi")
         ok = ui.exec()
         if not ok:
@@ -473,29 +488,22 @@ class ViewGraph(QDialog):
         selected_codes = ui.get_selected()
         # Select one or more codings, or coding memos
         codings = []
-        cur = self.app.conn.cursor()
-        for file_ in selected_files:
-            cur.execute("select mediapath from source where id=?", [file_['id']])
-            file_['path'] = ""
-            pth = cur.fetchone()
-            if pth:
-                file_['path'] = pth[0]
-            for code in selected_codes:
-                sql = "select cid,id,pos0,pos1, ifnull(memo,''), avid from code_av where cid=? and id=?"
-                cur.execute(sql, [code['cid'], file_['id']])
-                res = cur.fetchall()
-                for r in res:
-                    coding_displayed = False
-                    for item in self.scene.items():
-                        if isinstance(item, AVGraphicsItem):
-                            if item.avid == r[5]:
-                                coding_displayed = True
-                    if not coding_displayed:
-                        name = file_['name'] + ': ' + str(int(r[2])) + ' to ' + str(int(r[3])) + _(" msecs")
-                        codings.append({'cid': r[0], 'fid': r[1], 'pos0': int(r[2]), 'pos1': int(r[3]),
-                                        'memo': r[4], 'filename': file_['name'],
-                                        'codename': code['name'], 'name': name,
-                                        'path': file_['path'], 'avid': r[5]})
+        for code in selected_codes:
+            sql = "select cid,id,pos0,pos1, ifnull(memo,''), avid from code_av where cid=? and id=?"
+            cur.execute(sql, [code['cid'], selected_file['id']])
+            res = cur.fetchall()
+            for r in res:
+                coding_displayed = False
+                for item in self.scene.items():
+                    if isinstance(item, AVGraphicsItem):
+                        if item.avid == r[5]:
+                            coding_displayed = True
+                if not coding_displayed:
+                    name = selected_file['name'] + ': ' + str(int(r[2])) + ' to ' + str(int(r[3])) + _(" msecs")
+                    codings.append({'cid': r[0], 'fid': r[1], 'pos0': int(r[2]), 'pos1': int(r[3]),
+                                    'memo': r[4], 'filename': selected_file['name'],
+                                    'codename': code['name'], 'name': name,
+                                    'path': selected_file['path'], 'avid': r[5]})
         if not codings:
             Message(self.app, _("No codes"), _("No coded segments for selection")).exec()
             return
@@ -508,25 +516,39 @@ class ViewGraph(QDialog):
             x += 10
             y += 10
             item = AVGraphicsItem(self.app, s['avid'], x, y, s['pos0'], s['pos1'], s['path'])
-            msg = "AVID:" + str(s['avid']) + " " + _("File: ") + s['filename'] + "\n" + _("Code: ") + s['codename']
-            msg += "\n" + str(s['pos0']) + " - " + str(s['pos1']) + _("msecs")
+            msg = f"AVID:{s['avid']} " + _("File: ") + f"{s['filename']}\n" + _("Code: ") + s['codename']
+            msg += f"\n{s['pos0']} - {s['pos1']}" + _("msecs")
             if s['memo'] != "":
                 msg += "\n" + _("Memo: ") + s['memo']
             item.setToolTip(msg)
             self.scene.addItem(item)
 
     def add_codes_of_image_files(self, x=10, y=10):
-        """ Show selected codes of selected image files as pixmap graphics items. """
+        """ Show selected codes of selected image file as pixmap graphics items.
+        Args:
+            x: Integer
+            y: Integer
+        """
 
-        # Select files
+        # Select image file
         files_wth_names = self.app.get_image_filenames()
-        ui = DialogSelectItems(self.app, files_wth_names, _("Select image files"), "multi")
+        ui = DialogSelectItems(self.app, files_wth_names, _("Select image files"), "single")
         ok = ui.exec()
         if not ok:
             return
-        selected_files = ui.get_selected()
-        # Select codes
-        code_names = self.app.get_code_names()
+        selected_file = ui.get_selected()
+        cur = self.app.conn.cursor()
+        cur.execute("select mediapath from source where id=?", [selected_file['id']])
+        selected_file['path'] = ""
+        res_path = cur.fetchone()
+        if res_path:
+            selected_file['path'] = res_path[0]
+
+        # Select from codes that are assigned to this image
+        cur.execute("select cid from code_image where id=?", [selected_file['id']])
+        res_assigned_codes = cur.fetchall()
+        cids = [r[0] for r in res_assigned_codes]
+        code_names = self.app.get_code_names(cids)
         ui = DialogSelectItems(self.app, code_names, _("Select codes"), "multi")
         ok = ui.exec()
         if not ok:
@@ -534,30 +556,24 @@ class ViewGraph(QDialog):
         selected_codes = ui.get_selected()
         # Select one or more codings, or coding memos
         codings = []
-        cur = self.app.conn.cursor()
-        for file_ in selected_files:
-            cur.execute("select mediapath from source where id=?", [file_['id']])
-            file_['path'] = ""
-            p = cur.fetchone()
-            if p:
-                file_['path'] = p[0]
-            for code in selected_codes:
-                sql = "select cid,id,x1,y1,width,height,ifnull(memo,''), imid from code_image where cid=? and id=?"
-                cur.execute(sql, [code['cid'], file_['id']])
-                res = cur.fetchall()
-                for r in res:
-                    coding_displayed = False
-                    for item in self.scene.items():
-                        if isinstance(item, PixmapGraphicsItem):
-                            if item.imid == r[7]:
-                                coding_displayed = True
-                    if not coding_displayed:
-                        name = file_['name'] + ' x:' + str(int(r[2])) + ' y:' + str(int(r[3]))
-                        name += _(" width") + str(int(r[4])) + _(" height:") + str(int(r[5]))
-                        codings.append({'cid': r[0], 'fid': r[1], 'x': int(r[2]), 'y': int(r[3]), 'width': int(r[4]),
-                                        'height': int(r[5]), 'memo': r[6], 'filename': file_['name'],
-                                        'codename': code['name'], 'name': name,
-                                        'path': file_['path'], 'imid': r[7]})
+
+        for code in selected_codes:
+            sql = "select cid,id,x1,y1,width,height,ifnull(memo,''), imid from code_image where cid=? and id=?"
+            cur.execute(sql, [code['cid'], selected_file['id']])
+            res = cur.fetchall()
+            for r in res:
+                coding_displayed = False
+                for item in self.scene.items():
+                    if isinstance(item, PixmapGraphicsItem):
+                        if item.imid == r[7]:
+                            coding_displayed = True
+                if not coding_displayed:
+                    name = f"{selected_file['name']} x:{int(r[2])} y:{int(r[3])}"
+                    name += _(" width") + str(int(r[4])) + _(" height:") + str(int(r[5]))
+                    codings.append({'cid': r[0], 'fid': r[1], 'x': int(r[2]), 'y': int(r[3]), 'width': int(r[4]),
+                                    'height': int(r[5]), 'memo': r[6], 'filename': selected_file['name'],
+                                    'codename': code['name'], 'name': name,
+                                    'path': selected_file['path'], 'imid': r[7]})
         if not codings:
             Message(self.app, _("No codes"), _("No coded segments for selection")).exec()
             return
@@ -569,14 +585,19 @@ class ViewGraph(QDialog):
         for s in selected_codings:
             x += 10
             y += 10
+            # TODO maybe add captions - see view_image - code_image
             item = PixmapGraphicsItem(self.app, s['imid'], x, y, s['x'], s['y'], s['width'], s['height'], s['path'])
-            msg = "IMID:" + str(s['imid']) + " " + _("File: ") + s['filename'] + "\n" + _("Code: ") + s['codename']
-            msg += "\n" + _("Memo: ") + s['memo']
+            msg = f"IMID:{s['imid']} " + _("File: ") + f"{s['filename']}\n" + _("Code: ") + f"{s['codename']}\n"
+            msg += _("Memo: ") + s['memo']
             item.setToolTip(msg)
             self.scene.addItem(item)
 
     def add_coded_text_of_text_files(self, x=10, y=10):
-        """ Show selected codes of selected text files as free text graphics items. """
+        """ Show selected codes of selected text files as free text graphics items.
+        Args:
+            x: Integer
+            y: Integer
+        """
 
         # Select files
         files_wth_names = self.app.get_text_filenames()
@@ -635,7 +656,11 @@ class ViewGraph(QDialog):
             self.scene.addItem(item)
 
     def add_memos_of_coded(self, x=10, y=10):
-        """ Show selected memos of coded segments of selected files in free text items. """
+        """ Show selected memos of coded segments of selected files in free text items.
+        Args:
+            x: Integer
+            y: Integer
+        """
 
         files_wth_names = self.app.get_filenames()
         ui = DialogSelectItems(self.app, files_wth_names, _("Select files"), "multi")
@@ -717,7 +742,7 @@ class ViewGraph(QDialog):
                         freetextid = item.freetextid + 1
             item = FreeTextGraphicsItem(self.app, freetextid, x, y, s['name'], 9, color, False, -1,
                                         s['ctid'], s['imid'], s['avid'])
-            msg = _("File: ") + s['filename'] + "\n" + _("Code: ") + s['codename']
+            msg = _("File: ") + f"{s['filename']}\n" + _("Code: ") + s['codename']
             if s['tooltip'] != "":
                 msg += "\n" + _("Memo for: ") + s['tooltip']
             item.setToolTip(msg)
@@ -776,9 +801,11 @@ class ViewGraph(QDialog):
         """ Get a color for Free text items and Free lines.
          Called by: add_lines_to_graph, show_codes, show_memos.
          If obj_type is line, limit choices, otherwise include black and white.
-         param: obj_type : String
-
-         return: color : String """
+         Args:
+             obj_type : String
+         Returns:
+             color : String
+        """
 
         # Line color selection
         names = [_("gray"), _("blue"), _("cyan"), _("magenta"), _("green"), _("red"), _("yellow"), _("orange")]
@@ -796,7 +823,11 @@ class ViewGraph(QDialog):
         return selected_color['name']
 
     def add_text_item_to_graph(self, x=20, y=20):
-        """ Add text item to graph. """
+        """ Add text item to graph.
+        Args:
+            x: Integer
+            y: integer
+        """
 
         freetextid = 1
         for item in self.scene.items():
@@ -2838,7 +2869,7 @@ class AVGraphicsItem(QtWidgets.QGraphicsPixmapItem):
         super(AVGraphicsItem, self).__init__(None)
         self.app = app
         self.avid = avid
-        self.text = "AVID:" + str(self.avid)
+        self.text = f"AVID:{self.avid}"
         self.pos0 = pos0
         self.pos1 = pos1
         self.path_ = path_
@@ -2846,7 +2877,12 @@ class AVGraphicsItem(QtWidgets.QGraphicsPixmapItem):
         self.abs_path_ = self.app.project_path + path_
         if path_[0:7] in ("audio:", "video:"):
             self.abs_path_ = path_[7:]
-        self.setPixmap(qta.icon('mdi6.play'))
+        '''img = Image.new('RGB', (200, 40), color=(220, 220, 220))
+        img.paste(qta.icon('mdi6.play').pixmap(28, 28), (0, 0))
+        from PIL.ImageQt import ImageQt
+        qtimg = ImageQt(img)
+        self.setPixmap(QtGui.QPixmap.fromImage(qtimg))'''
+        self.setPixmap(qta.icon('mdi6.play').pixmap(28, 28))
         self.setPos(x, y)
         self.settings = app.settings
         self.project_path = app.project_path
