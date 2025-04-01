@@ -2193,9 +2193,9 @@ Click "Yes" to start now.')
         cur.execute("CREATE TABLE gr_av_item (gr_avid integer primary key, grid integer, avid integer,"
                     "x integer, y integer, pos0 integer, pos1 integer, filepath text, tooltip text, color text);")
         cur.execute("CREATE TABLE ris (risid integer, tag text, longtag text, value text);")
-        cur.execute("INSERT INTO project VALUES(?,?,?,?,?,?,?)",
+        cur.execute("INSERT INTO project VALUES(?,?,?,?,?,?,?,?)",
                     ('v9', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', qualcoder_version, 0,
-                     0, self.app.settings['codername']))
+                     0, self.app.settings['codername'], ""))
         self.app.conn.commit()
         try:
             # Get and display some project details
