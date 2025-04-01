@@ -1184,7 +1184,11 @@ class DialogCodeText(QtWidgets.QWidget):
         self.mark()
 
     def change_code_start_or_end_position(self, position, start_or_end):
-        """ change start or end pos of code. """
+        """ Change start or end pos of code.
+        Args:
+            position: Integer - text cursor position
+            start_or_end: String - 'start' or 'end'
+        """
 
         if self.file_ is None:
             return
@@ -1239,7 +1243,7 @@ class DialogCodeText(QtWidgets.QWidget):
 
     def mark_with_new_code(self, in_vivo=False):
         """ Create new code and mark selected text.
-        param:
+        Args:
             in_vivo : Boolean if True use in vivio text selection as code name """
 
         codes_copy = deepcopy(self.codes)
@@ -1264,7 +1268,10 @@ class DialogCodeText(QtWidgets.QWidget):
         self.mark()
 
     def change_code_to_another_code(self, position):
-        """ Change code to another code """
+        """ Change code to another code.
+        Args:
+            position: Integer - text cursor position
+        """
 
         # Get coded segments at this position
         if self.file_ is None:
@@ -1319,7 +1326,7 @@ class DialogCodeText(QtWidgets.QWidget):
         Tried to use QTreeWidget.finditems - but this did not find matching item text
         Called by: textEdit recent codes menu option
         Required for: mark()
-        param:
+        Args:
             item : QTreeWidgetItem - usually root
             text_ : String
         """
@@ -1333,7 +1340,11 @@ class DialogCodeText(QtWidgets.QWidget):
 
     def is_annotated(self, position):
         """ Check if position is annotated to provide annotation menu option.
-        Returns True or False """
+        Args:
+            position: Integer - location in text document
+        Returns:
+            True or False
+        """
 
         for note in self.annotations:
             if (note['pos0'] <= position + self.file_['start'] <= note['pos1']) \
@@ -1344,7 +1355,7 @@ class DialogCodeText(QtWidgets.QWidget):
     def set_important(self, position, important=True):
         """ Set or unset importance to coded text.
         Importance is denoted using '1'
-        params:
+        Args:
             position: textEdit character cursor position
             important: boolean, default True """
 
@@ -1396,7 +1407,8 @@ class DialogCodeText(QtWidgets.QWidget):
         """ Open file memo to view or edit.
         Called by pushButton_document_memo for loaded text, via active_file_memo
         and through file_menu for any file.
-        param: file_ : Dictionary of file values
+        Args:
+            file_ : Dictionary of file values
         """
 
         if file_ is None:
@@ -1470,7 +1482,10 @@ class DialogCodeText(QtWidgets.QWidget):
         """ After a text file is edited - text added or deleted, code positions may be inaccurate.
          enter a positive or negative integer to shift code positions for all codes after a click position in the
          document.
-         Activated by ^ At key press"""
+         Activated by ^ At key press
+         Args:
+            position : Integer - location  in text, characters
+         """
 
         if self.file_ is None:
             return
@@ -1628,8 +1643,8 @@ class DialogCodeText(QtWidgets.QWidget):
 
     def merge_category(self, catid):
         """ Select another category to merge this category into.
-        param:
-            catid : Integer cateogry identfier
+        Args:
+            catid : Integer cateogry identifier
         """
 
         do_not_merge_list = []
@@ -1676,7 +1691,7 @@ class DialogCodeText(QtWidgets.QWidget):
     def move_code(self, selected):
         """ Move code to another category or to no category.
         Uses a list selection.
-        param:
+        Args:
             selected : QTreeWidgetItem
          """
 
@@ -1711,9 +1726,9 @@ class DialogCodeText(QtWidgets.QWidget):
         if not res:
             return
         for r in res:
-            text_ += '[' + str(r[1]) + '-' + str(r[2]) + '] ' + _("Code: ") + r[0] + "\n"
-            text_ += _("Text: ") + r[3] + "\n"
-            text_ += _("Memo: ") + r[4] + "\n\n"
+            text_ += f'[{r[1]}-{r[2]}] ' + _("Code: ") + f'{r[0]}\n'
+            text_ += _("Text: ") + f"{r[3]}\n"
+            text_ += _("Memo: ") + f"{r[4]}\n\n"
         ui = DialogMemo(self.app, _("Memos for file: ") + self.file_['name'], text_)
         ui.ui.pushButton_clear.hide()
         ui.ui.textEdit.setReadOnly(True)
@@ -1734,7 +1749,7 @@ class DialogCodeText(QtWidgets.QWidget):
         if not res:
             return
         for r in res:
-            text_ += '[' + str(r[1]) + '-' + str(r[2]) + '] ' + "\n"
+            text_ += f"[{r[1]}-{r[2]}] \n"
             text_ += _("Text: ") + r[0] + "\n"
             text_ += _("Annotation: ") + r[3] + "\n\n"
         ui = DialogMemo(self.app, _("Annotations for file: ") + self.file_['name'], text_)
@@ -1791,7 +1806,7 @@ class DialogCodeText(QtWidgets.QWidget):
         is not shortened.
         Recurse through all child categories.
         Called by: show_codes_like
-        param:
+        Args:
             item: a QTreeWidgetItem
             text:  Text string for matching with code names
         """
@@ -1945,10 +1960,6 @@ class DialogCodeText(QtWidgets.QWidget):
         if key == QtCore.Qt.Key.Key_S and self.file_ is not None:
             if selected_text == "":
                 self.ui.lineEdit_search.setFocus()
-            '''else:
-                self.ui.lineEdit_search.setText(selected_text)
-                self.search_for_text()
-                self.ui.pushButton_next.setFocus()'''
 
     def highlight_selected_overlap(self):
         """ Highlight the current overlapping text code, by placing formatting on top. """
@@ -2016,7 +2027,7 @@ class DialogCodeText(QtWidgets.QWidget):
 
         if len(self.ui.textEdit.document().toPlainText()) == 0:
             return
-        filename = self.file_['name'] + ".odt"
+        filename = f"{self.file_['name']}.odt"
         exp_dir = ExportDirectoryPathDialog(self.app, filename)
         filepath = exp_dir.filepath
         if filepath is None:
@@ -2235,8 +2246,9 @@ class DialogCodeText(QtWidgets.QWidget):
 
     def extend_left(self, code_):
         """ Shift left arrow.
-        param:
-            code_ """
+        Args:
+            code_: code Dictionary
+        """
 
         if code_['pos0'] < 1:
             return
@@ -2252,7 +2264,10 @@ class DialogCodeText(QtWidgets.QWidget):
         self.get_coded_text_update_eventfilter_tooltips()
 
     def extend_right(self, code_):
-        """ Shift right arrow. """
+        """ Shift right arrow.
+        Args:
+            code_: code Dictionary
+        """
 
         if code_['pos1'] + 1 >= len(self.ui.textEdit.toPlainText()):
             return
@@ -2269,7 +2284,10 @@ class DialogCodeText(QtWidgets.QWidget):
         self.get_coded_text_update_eventfilter_tooltips()
 
     def shrink_to_left(self, code_):
-        """ Alt left arrow, shrinks code from the right end of the code. """
+        """ Alt left arrow, shrinks code from the right end of the code.
+        Args:
+            code_: code Dictionary
+        """
 
         if code_['pos1'] <= code_['pos0'] + 1:
             return
@@ -2285,7 +2303,10 @@ class DialogCodeText(QtWidgets.QWidget):
         self.get_coded_text_update_eventfilter_tooltips()
 
     def shrink_to_right(self, code_):
-        """ Alt right arrow shrinks code from the left end of the code. """
+        """ Alt right arrow shrinks code from the left end of the code.
+        Args:
+            code_: code Dictionary
+        """
 
         if code_['pos0'] >= code_['pos1'] - 1:
             return
@@ -2401,7 +2422,7 @@ class DialogCodeText(QtWidgets.QWidget):
         cur_pos = cursor.position()
         end_pos = 0
         found_smaller = False
-        msg = "/" + str(len(indexes))
+        msg = f"/{len(indexes)}"
         for i, index in enumerate(indexes):
             if index['pos0'] - self.file_['start'] < cur_pos - 1:
                 cur_pos = index['pos0'] - self.file_['start']
@@ -2468,7 +2489,7 @@ class DialogCodeText(QtWidgets.QWidget):
         Need to store textedit start and end positions so that code in context can be used.
         Called from tree_menu.
         Re-load coded text as codes may have changed.
-        param:
+        Args:
             code_dict : code dictionary
         """
 
@@ -2478,7 +2499,11 @@ class DialogCodeText(QtWidgets.QWidget):
     def item_moved_update_data(self, item, parent):
         """ Called from drop event in treeWidget view port.
         identify code or category to move.
-        Also merge codes if one code is dropped on another code. """
+        Also merge codes if one code is dropped on another code.
+        Args:
+            item : QTreeWidgetItem
+            parent : QTreeWidgetItem
+        """
 
         # Find the category in the list
         if item.text(1)[0:3] == 'cat':
@@ -2536,7 +2561,7 @@ class DialogCodeText(QtWidgets.QWidget):
         """ Merge code with another code.
         Called by item_moved_update_data when a code is moved onto another code.
         code text unique(cid,fid,pos0,pos1, owner)
-        param:
+        Args:
             item : Dictionary code item
             parent : QTreeWidgetItem
         """
@@ -2596,10 +2621,10 @@ class DialogCodeText(QtWidgets.QWidget):
         """ Use add_item dialog to get new code text. Add_code_name dialog checks for
         duplicate code name. A random color is selected for the code, or a color has been pre-set by the user.
         New code is added to data and database.
-        param:
+        Args:
             catid : None to add to without category, catid to add to category.
             code_name : String : Used for 'in vivo' coding where name is preset by in vivo text selection.
-        return:
+        Returns:
             True  - new code added, False - code exists or could not be added
         """
 
@@ -2663,7 +2688,7 @@ class DialogCodeText(QtWidgets.QWidget):
     def add_category(self, supercatid=None):
         """ When button pressed, add a new category.
         Note: the addItem dialog does the checking for duplicate category names
-        param:
+        Args:
             supercatid : None to add without category, supercatid to add to category. """
 
         ui = DialogAddItemName(self.app, self.categories, _("Category"), _("Category name"))
@@ -2683,7 +2708,10 @@ class DialogCodeText(QtWidgets.QWidget):
         self.parent_textEdit.append(_("New category: ") + item['name'])
 
     def delete_category_or_code(self, selected):
-        """ Determine if selected item is a code or category before deletion. """
+        """ Determine if selected item is a code or category before deletion.
+        Args:
+            selected: QTreeWidgetItem
+        """
 
         if selected.text(1)[0:3] == 'cat':
             self.delete_category(selected)
@@ -2693,6 +2721,8 @@ class DialogCodeText(QtWidgets.QWidget):
 
     def delete_code(self, selected):
         """ Find code, remove from database, refresh and code data and fill treeWidget.
+        Args:
+            selected: QTreeWidgetItem
         """
 
         # Find the code in the list, check to delete
@@ -2720,13 +2750,16 @@ class DialogCodeText(QtWidgets.QWidget):
         for item in self.recent_codes:
             if item['name'] == code_['name']:
                 self.recent_codes.remove(item)
-                # TODO update project
                 break
         self.update_dialog_codes_and_categories()
+        self.app.delete_backup = False
 
     def delete_category(self, selected):
         """ Find category, remove from database, refresh categories and code data
-        and fill treeWidget. """
+        and fill treeWidget.
+        Args:
+            selected: QTreeWidgetItem
+        """
 
         found = -1
         for i in range(0, len(self.categories)):
@@ -2749,7 +2782,10 @@ class DialogCodeText(QtWidgets.QWidget):
         self.parent_textEdit.append(_("Category deleted: ") + category['name'])
 
     def add_edit_cat_or_code_memo(self, selected):
-        """ View and edit a memo for a category or code. """
+        """ View and edit a memo for a category or code.
+        Args:
+            selected: QTreeWidgetItem
+        """
 
         if selected.text(1)[0:3] == 'cid':
             # Find the code in the list
@@ -2802,7 +2838,7 @@ class DialogCodeText(QtWidgets.QWidget):
     def rename_category_or_code(self, selected):
         """ Rename a code or category.
         Check that the code or category name is not currently in use.
-        param:
+        Args:
             selected : QTreeWidgetItem """
 
         if selected.text(1)[0:3] == 'cid':
@@ -2879,7 +2915,7 @@ class DialogCodeText(QtWidgets.QWidget):
 
     def change_code_color(self, selected):
         """ Change the colour of the currently selected code.
-        param:
+        Args:
             selected : QTreeWidgetItem """
 
         cid = int(selected.text(1)[4:])
@@ -2913,7 +2949,7 @@ class DialogCodeText(QtWidgets.QWidget):
         {'id', 'name', 'memo', 'characters'= number of characters in the file,
         'start' = showing characters from this position, 'end' = showing characters to this position}
 
-        param:
+        Args:
             position : """
 
         selected = self.ui.listWidget.currentItem()
@@ -2937,8 +2973,9 @@ class DialogCodeText(QtWidgets.QWidget):
         if file_ is not None and file_['mediapath'] is not None and len(file_['mediapath']) > 6 and \
                 (file_['mediapath'][:6] == '/docs/' or file_['mediapath'][:5] == 'docs:'):
             action_view_original_text = menu.addAction(_("view original text file"))
-        if len(self.filenames) > 1:
-            action_next = menu.addAction(_("Next file"))
+        if len(self.app.get_text_filenames()) > 1:
+            if len(self.filenames) != 1:
+                action_next = menu.addAction(_("Next file"))
             action_latest = menu.addAction(_("File with latest coding"))
             action_show_files_like = menu.addAction(_("Show files like"))
             action_show_by_attribute = menu.addAction(_("Show files by attributes"))
