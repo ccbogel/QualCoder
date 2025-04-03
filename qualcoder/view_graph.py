@@ -24,7 +24,8 @@ import datetime
 import logging
 from math import atan2, pi
 import os
-# from PIL import Image, ImageFont, ImageDraw
+from PIL import Image, ImageFont, ImageDraw
+from PIL.ImageQt import ImageQt
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 import sqlite3
 
@@ -106,8 +107,12 @@ class ViewGraph(QDialog):
         self.ui.pushButton_deletegraph.pressed.connect(self.delete_saved_graph)
         self.ui.pushButton_codes_of_text.setIcon(qta.icon('mdi6.text', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_codes_of_text.pressed.connect(self.add_coded_text_of_text_files)
+        if not self.app.get_image_filenames():
+            self.ui.pushButton_codes_of_images.setEnabled(False)
         self.ui.pushButton_codes_of_images.setIcon(qta.icon('mdi6.image-outline', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_codes_of_images.pressed.connect(self.add_codes_of_image_files)
+        if not self.app.get_av_filenames():
+            self.ui.pushButton_codes_of_av.setEnabled(False)
         self.ui.pushButton_codes_of_av.setIcon(qta.icon('mdi6.play', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_codes_of_av.pressed.connect(self.add_codes_of_av_files)
         self.ui.pushButton_memos_of_file.setIcon(qta.icon('mdi6.text-long', options=[{'scale_factor': 1.4}]))
@@ -585,7 +590,6 @@ class ViewGraph(QDialog):
         for s in selected_codings:
             x += 10
             y += 10
-            # TODO maybe add captions - see view_image - code_image
             item = PixmapGraphicsItem(self.app, s['imid'], x, y, s['x'], s['y'], s['width'], s['height'], s['path'])
             msg = f"IMID:{s['imid']} " + _("File: ") + f"{s['filename']}\n" + _("Code: ") + f"{s['codename']}\n"
             msg += _("Memo: ") + s['memo']
@@ -2877,11 +2881,6 @@ class AVGraphicsItem(QtWidgets.QGraphicsPixmapItem):
         self.abs_path_ = self.app.project_path + path_
         if path_[0:7] in ("audio:", "video:"):
             self.abs_path_ = path_[7:]
-        '''img = Image.new('RGB', (200, 40), color=(220, 220, 220))
-        img.paste(qta.icon('mdi6.play').pixmap(28, 28), (0, 0))
-        from PIL.ImageQt import ImageQt
-        qtimg = ImageQt(img)
-        self.setPixmap(QtGui.QPixmap.fromImage(qtimg))'''
         self.setPixmap(qta.icon('mdi6.play').pixmap(28, 28))
         self.setPos(x, y)
         self.settings = app.settings
