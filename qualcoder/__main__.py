@@ -649,14 +649,14 @@ class App(object):
             if section.startswith('ai_model_'):
                 model = {
                     'name': section[9:],
-                    'desc': config[section]['desc'],
-                    'access_info_url': config[section]['access_info_url'],
-                    'large_model': config[section]['large_model'],
-                    'large_model_context_window': config[section]['large_model_context_window'],
-                    'fast_model': config[section]['fast_model'],
-                    'fast_model_context_window': config[section]['fast_model_context_window'],
-                    'api_base': config[section]['api_base'],
-                    'api_key': config[section]['api_key']
+                    'desc': config[section].get('desc', ''),
+                    'access_info_url': config[section].get('access_info_url', ''),
+                    'large_model': config[section].get('large_model', ''),
+                    'large_model_context_window': config[section].get('large_model_context_window', '32768'),
+                    'fast_model': config[section].get('fast_model', ''),
+                    'fast_model_context_window': config[section].get('fast_model_context_window', '32768'),
+                    'api_base': config[section].get('api_base', ''),
+                    'api_key': config[section].get('api_key', '')
                 }
                 ai_models.append(model)
         if len(ai_models) == 0:  # no models loaded, create default

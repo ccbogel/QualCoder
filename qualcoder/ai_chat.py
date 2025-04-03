@@ -82,6 +82,7 @@ class DialogAIChat(QtWidgets.QDialog):
         self.ui = Ui_Dialog_ai_chat()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
+        # self.ui.scrollArea_ai_output.verticalScrollBar().rangeChanged.connect(self.ai_output_scroll_to_bottom)
         self.ui.plainTextEdit_question.installEventFilter(self)
         self.ui.pushButton_question.pressed.connect(self.button_question_clicked)
         self.ui.progressBar_ai.setMaximum(100)
@@ -681,7 +682,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                     txt = self.app.ai.ai_streaming_output
                     txt = self.replace_references(txt, streaming=True)
                     txt = txt.replace('\n', '<br />')
-                    author = self.app.ai_models[int(self.app.settings['ai_model_index'])]['name']
+                    author = self.app.ai_models[int(self.app.settings['ai_model_index'])]['name'] + ' - ' + self.app.ai_models[int(self.app.settings['ai_model_index'])]['large_model']
                     if author is None or author == '':
                         author = 'unkown'
                     txt = f'<b>AI ({author}):</b><br />{txt}'                        
@@ -690,6 +691,8 @@ data collected. This information will accompany every prompt sent to the AI, res
             finally:
                 if scroll_to_bottom:
                     self.ai_output_scroll_to_bottom()
+                else:
+                    self.ui.scrollArea_ai_output.verticalScrollBar().setValue(0)
                 self.is_updating_chat_window = False
         else:
             self.ui.ai_output.setText('')
@@ -880,11 +883,13 @@ data collected. This information will accompany every prompt sent to the AI, res
             self.new_general_chat('New general chat', '')
 
     def ai_output_scroll_to_bottom(self, minVal=None, maxVal=None):  # toDO minVal, maxVal unused
+        #self._ai_output_scroll_to_bottom()
         # Delay the scrolling a little to make sure that the updated text is fully rendered before scrolling to the bottom: 
-        QtCore.QTimer.singleShot(0, self._ai_output_scroll_to_bottom)
+        QtCore.QTimer.singleShot(200, self._ai_output_scroll_to_bottom)
         
     def _ai_output_scroll_to_bottom(self):
-        self.ui.scrollArea_ai_output.ensureVisible(0, self.ui.scrollArea_ai_output.widget().height())
+        self.ui.scrollArea_ai_output.verticalScrollBar().setValue(self.ui.scrollArea_ai_output.verticalScrollBar().maximum())
+        #self.ui.scrollArea_ai_output.ensureVisible(0, self.ui.scrollArea_ai_output.widget().height())
                                 
     def history_update_message_list(self, db_conn=None):
         """Update sel.chat_msg_list from the database
@@ -1011,7 +1016,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             # create temporary db connection to make it thread safe
             db_conn = sqlite3.connect(self.chat_history_path)
             try: 
-                ai_model_name = self.app.ai_models[int(self.app.settings['ai_model_index'])]['name']
+                ai_model_name = self.app.ai_models[int(self.app.settings['ai_model_index'])]['name'] + ' - ' + self.app.ai_models[int(self.app.settings['ai_model_index'])]['large_model']
                 self.history_add_message(msg_type, ai_model_name, msg_content, chat_idx, db_conn)
                 self.ai_streaming_output = ''
                 self.update_chat_window()
@@ -1073,12 +1078,15 @@ data collected. This information will accompany every prompt sent to the AI, res
         if ai_result != '':
             self.process_message('ai', ai_result, self.current_streaming_chat_idx)
         else:
-            self.process_message('info', _('Error: The AI returned an empty result. This may indicate that the AI model is not available at the moment. Try again later or choose a different model.'), self.current_streaming_chat_idx)
+            if self.app.ai.ai_async_is_canceled:
+                self.process_message('info', _('Chat has been canceled by the user.'))
+            else:
+                self.process_message('info', _('Error: The AI returned an empty result. This may indicate that the AI model is not available at the moment. Try again later or choose a different model.'), self.current_streaming_chat_idx)
             
     def ai_error_callback(self, exception_type, value, tb_obj):
         """Called if the AI returns an error"""
         self.ai_streaming_output = ''
-        ai_model_name = self.app.ai_models[int(self.app.settings['ai_model_index'])]['name']
+        ai_model_name = self.app.ai_models[int(self.app.settings['ai_model_index'])]['name'] + ' - ' + self.app.ai_models[int(self.app.settings['ai_model_index'])]['large_model']
         msg = _('Error communicating with ' + ai_model_name + '\n')
         msg += exception_type.__name__ + ': ' + str(html_to_text(value))
         if hasattr(value, 'message'):
