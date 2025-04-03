@@ -22,7 +22,7 @@ https://qualcoder.wordpress.com/
 
 import base64
 
-languages = ['de', 'es', 'fr', 'it', 'pt']
+languages = ['de', 'es', 'fr', 'it', 'ja', 'pt', 'sv', 'zh']
 
 
 class CreateHelperFile:

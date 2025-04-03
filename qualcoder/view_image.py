@@ -25,7 +25,7 @@ import html
 from io import BytesIO
 import logging
 import os
-from PIL import Image, ImageOps, ImageFilter
+from PIL import Image, ImageDraw, ImageFilter, ImageFont, ImageOps
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 from random import randint
 import sqlite3
@@ -38,7 +38,7 @@ from PyQt6.QtGui import QBrush
 from .add_item_name import DialogAddItemName
 from .code_in_all_files import DialogCodeInAllFiles
 from .color_selector import DialogColorSelect
-from .color_selector import colors, TextColor
+from .color_selector import colors, TextColor, colour_ranges, show_codes_of_colour_range
 from .confirm_delete import DialogConfirmDelete
 from .GUI.ui_dialog_code_image import Ui_Dialog_code_image
 from .GUI.ui_dialog_view_image import Ui_Dialog_view_image
@@ -74,6 +74,7 @@ class DialogCodeImage(QtWidgets.QDialog):
     attributes = []
     undo_deleted_code = None  # Undo last deleted code
     degrees = 0  # For image rotation
+    show_code_captions = 0  # 0 = no, 1 = code name, 2 = codename + memo
 
     def __init__(self, app, parent_textedit, tab_reports):
         """ Show list of image files.
@@ -99,6 +100,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.degrees = 0
         self.get_codes_and_categories()
         self.tree_sort_option = "all asc"
+        self.show_code_captions = 0
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_code_image()
         self.ui.setupUi(self)
@@ -148,6 +150,18 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.ui.pushButton_file_attributes.pressed.connect(self.get_files_from_attributes)
         self.ui.pushButton_important.setIcon(qta.icon('mdi6.star-outline', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_important.pressed.connect(self.show_important_coded)
+
+        self.ui.pushButton_captions.setIcon(qta.icon('mdi6.closed-caption-outline', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_captions.pressed.connect(self.captions_options)
+        self.ui.pushButton_zoom_in.setIcon(qta.icon('mdi6.magnify-plus-outline', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_zoom_in.pressed.connect(self.zoom_in)
+        self.ui.pushButton_zoom_out.setIcon(qta.icon('mdi6.magnify-minus-outline', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_zoom_out.pressed.connect(self.zoom_out)
+        self.ui.pushButton_rotate_counter.setIcon(qta.icon('mdi6.file-rotate-left-outline', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_rotate_counter.pressed.connect(self.rotate_counter)
+        self.ui.pushButton_rotate_clock.setIcon(qta.icon('mdi6.file-rotate-right-outline', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_rotate_clock.pressed.connect(self.rotate_clockwise)
+
         try:
             s0 = int(self.app.settings['dialogcodeimage_splitter0'])
             s1 = int(self.app.settings['dialogcodeimage_splitter1'])
@@ -710,7 +724,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         scale_text = _("Scale: ") + f"{int(self.scale * 100)}%"
         self.ui.horizontalSlider.setToolTip(scale_text)
         msg = _("Width") + f": {self.pixmap.width()} " + _("Height") + f": {self.pixmap.height()}\n"
-        msg += scale_text + " " + _("Rotation") + ": " + str(self.degrees) + "\u00b0"
+        msg += f"{scale_text} " + _("Rotation") + f": {self.degrees}\u00b0"
         self.ui.label_image.setText(msg)
 
     def draw_coded_areas(self):
@@ -720,48 +734,76 @@ class DialogCodeImage(QtWidgets.QDialog):
 
         if self.file_ is None:
             return
-        for item in self.code_areas:
-            if item['id'] == self.file_['id']:
+        for coded in self.code_areas:
+            if coded['id'] == self.file_['id']:
                 color = None
                 tooltip = ""
+                code_name = ""
+                code_memo = ""
                 for c in self.codes:
-                    if c['cid'] == item['cid']:
-                        tooltip = f"{c['name']} ({item['owner']})"
+                    if c['cid'] == coded['cid']:
+                        code_name = c['name']
+                        code_memo = c['memo']
+                        tooltip = f"{c['name']} ({coded['owner']})"
                         if self.app.settings['showids']:
-                            tooltip += f"[imid:{item['imid']}]"
-                        if item['memo'] != "":
-                            tooltip += f"\nMemo: {item['memo']}"
-                        if item['important'] == 1:
+                            tooltip += f"[imid:{coded['imid']}]"
+                        if coded['memo'] != "":
+                            tooltip += f"\nMemo: {coded['memo']}"
+                            code_memo = f"\nMemo: {coded['memo']}"
+                        if coded['important'] == 1:
                             tooltip += "\n" + _("IMPORTANT")
                         color = QtGui.QColor(c['color'])
                 # Degrees 0
-                x = item['x1'] * self.scale
-                y = item['y1'] * self.scale
-                width = item['width'] * self.scale
-                height = item['height'] * self.scale
+                x = coded['x1'] * self.scale
+                y = coded['y1'] * self.scale
+                width = coded['width'] * self.scale
+                height = coded['height'] * self.scale
                 if self.degrees == 90:
-                    y = (item['x1']) * self.scale
-                    x = (self.pixmap.height() - item['y1'] - item['height']) * self.scale
-                    height = item['width'] * self.scale
-                    width = item['height'] * self.scale
+                    y = (coded['x1']) * self.scale
+                    x = (self.pixmap.height() - coded['y1'] - coded['height']) * self.scale
+                    height = coded['width'] * self.scale
+                    width = coded['height'] * self.scale
                 if self.degrees == 180:
-                    x = (self.pixmap.width() - item['x1'] - item['width']) * self.scale
-                    y = (self.pixmap.height() - item['y1'] - item['height']) * self.scale
-                    width = item['width'] * self.scale
-                    height = item['height'] * self.scale
+                    x = (self.pixmap.width() - coded['x1'] - coded['width']) * self.scale
+                    y = (self.pixmap.height() - coded['y1'] - coded['height']) * self.scale
+                    width = coded['width'] * self.scale
+                    height = coded['height'] * self.scale
                 if self.degrees == 270:
-                    y = (self.pixmap.width() - item['x1'] - item['width']) * self.scale
-                    x = (item['y1']) * self.scale
-                    height = item['width'] * self.scale
-                    width = item['height'] * self.scale
+                    y = (self.pixmap.width() - coded['x1'] - coded['width']) * self.scale
+                    x = (coded['y1']) * self.scale
+                    height = coded['width'] * self.scale
+                    width = coded['height'] * self.scale
                 rect_item = QtWidgets.QGraphicsRectItem(x, y, width, height)
                 rect_item.setPen(QtGui.QPen(color, 2, QtCore.Qt.PenStyle.DashLine))
                 rect_item.setToolTip(tooltip)
-                if item['owner'] == self.app.settings['codername']:
-                    if self.important and item['important'] == 1:
+                if coded['owner'] == self.app.settings['codername']:
+                    if self.important and coded['important'] == 1:
                         self.scene.addItem(rect_item)
                     if not self.important:
                         self.scene.addItem(rect_item)
+                if self.show_code_captions == 1:
+                    self.caption(x, y, code_name)
+                if self.show_code_captions == 2:
+                    self.caption(x, y, code_name + code_memo)
+
+    def captions_options(self):
+        """ Hide captions (0). Show captions (1). Show captions with memos (2) """
+
+        self.show_code_captions += 1
+        if self.show_code_captions > 2:
+            self.show_code_captions = 0
+        self.redraw_scene()
+
+    def caption(self, x, y, code_name):
+        """ Add captions to coded areas. """
+
+        text_item = QtWidgets.QGraphicsTextItem()
+        text_item.setDefaultTextColor(QtGui.QColor("#000000"))
+        html_text = code_name.replace('\n', '<br />')
+        text_item.setHtml(f"<div style='background-color:#FFFFFF;'>{html_text}</div>")
+        # Style.StyleNormal 400  Segoe UI 9
+        text_item.setPos(x, y)
+        self.scene.addItem(text_item)
 
     def export_html_file(self):
         """ Export the QGraphicsScene as a png image with transparent background.
@@ -862,11 +904,15 @@ class DialogCodeImage(QtWidgets.QDialog):
             action_move_code = menu.addAction(_("Move code to"))
             action_show_coded_media = menu.addAction(_("Show coded text and media"))
         action_show_codes_like = menu.addAction(_("Show codes like"))
+        action_show_codes_of_colour = menu.addAction(_("Show codes of colour"))
         action_all_asc = menu.addAction(_("Sort ascending"))
         action_all_desc = menu.addAction(_("Sort descending"))
         action_cat_then_code_asc = menu.addAction(_("Sort category then code ascending"))
         action = menu.exec(self.ui.treeWidget.mapToGlobal(position))
         if action is None:
+            return
+        if action == action_show_codes_of_colour:
+            self.show_codes_of_color()
             return
         if action == action_all_asc:
             self.tree_sort_option = "all asc"
@@ -971,6 +1017,18 @@ class DialogCodeImage(QtWidgets.QDialog):
         root = self.ui.treeWidget.invisibleRootItem()
         self.recursive_traverse(root, txt)
 
+    def show_codes_of_color(self):
+        """ Show all codes in colour range in code tree., ir all codes if no selection.
+        Show selected codes that are of a selected colour.
+        """
+
+        ui = DialogSelectItems(self.app, colour_ranges, _("Select code colors"), "single")
+        ok = ui.exec()
+        if not ok:
+            return
+        selected_color = ui.get_selected()
+        show_codes_of_colour_range(self.app, self.ui.treeWidget, self.codes, selected_color)
+
     def recursive_traverse(self, item, text_):
         """ Find all children codes of this item that match or not and hide or unhide based on 'text'.
         Recurse through all child categories.
@@ -1015,18 +1073,10 @@ class DialogCodeImage(QtWidgets.QDialog):
             self.undo_last_unmarked_code()
             return
         if key == QtCore.Qt.Key.Key_Minus or key == QtCore.Qt.Key.Key_Q:
-            v = self.ui.horizontalSlider.value()
-            v -= 3
-            if v < self.ui.horizontalSlider.minimum():
-                return
-            self.ui.horizontalSlider.setValue(v)
+            self.zoom_out()
             return
         if key == QtCore.Qt.Key.Key_Plus or key == QtCore.Qt.Key.Key_W:
-            v = self.ui.horizontalSlider.value()
-            v += 3
-            if v > self.ui.horizontalSlider.maximum():
-                return
-            self.ui.horizontalSlider.setValue(v)
+            self.zoom_in()
             return
         # Ctrl 0 to 9, G
         if mods & QtCore.Qt.KeyboardModifier.ControlModifier:
@@ -1052,6 +1102,20 @@ class DialogCodeImage(QtWidgets.QDialog):
                 self.help()
                 return
 
+    def zoom_out(self):
+        v = self.ui.horizontalSlider.value()
+        v -= 3
+        if v < self.ui.horizontalSlider.minimum():
+            return
+        self.ui.horizontalSlider.setValue(v)
+
+    def zoom_in(self):
+        v = self.ui.horizontalSlider.value()
+        v += 3
+        if v > self.ui.horizontalSlider.maximum():
+            return
+        self.ui.horizontalSlider.setValue(v)
+
     def image_highlight(self, image_operation = "gray", coded_area=None, code_id=None):
         """ Gray, blurred or solarised image with coloured coded highlight(s).
         Highlight all coded area, or selected coded area, or all areas coded by one specific code.
@@ -1070,10 +1134,11 @@ class DialogCodeImage(QtWidgets.QDialog):
             background = ImageOps.solarize(pil_img)  # Invert all pixel values above a threshold.
         if image_operation == "blur":
             background = pil_img.filter(ImageFilter.GaussianBlur(radius=10))
-        #background.convert('RGB')
         highlights = Image.new('RGB', (background.width, background.height))
         highlights.paste(background, (0, 0))
+        draw = ImageDraw.Draw(highlights)
         if coded_area:
+            # Highlight ONE coded area
             try:
                 # Needs tuple of left, top, right, bottom
                 coded_img = pil_img.crop((coded_area['x1'], coded_area['y1'], coded_area['x1'] + coded_area['width'],
@@ -1081,24 +1146,47 @@ class DialogCodeImage(QtWidgets.QDialog):
                 img_with_border = ImageOps.expand(coded_img, border=3, fill=coded_area['color'])
                 # highlights.paste(coded_img, (int(ca['x1']), int(ca['y1']))) # No border
                 highlights.paste(img_with_border, (int(coded_area['x1']), int(coded_area['y1'])))
+                self.text_box(draw, background.width, (coded_area['x1'], coded_area['y1']), coded_area['name'], coded_area['memo'])
             except SystemError as e_:
                 logger.debug(e_)
         else:
-            for ca in self.code_areas:
+            # Highlight all coded areas
+            for coded in self.code_areas:
                 try:
                     # Needs tuple of left, top, right, bottom
-                    coded_img = pil_img.crop((ca['x1'], ca['y1'], ca['x1'] + ca['width'], ca['y1'] + ca['height']))
-                    img_with_border = ImageOps.expand(coded_img, border=3, fill=ca['color'])
-                    if code_id == ca['cid']:
-                        highlights.paste(img_with_border, (int(ca['x1']), int(ca['y1'])))
+                    coded_img = pil_img.crop((coded['x1'], coded['y1'], coded['x1'] + coded['width'], coded['y1'] + coded['height']))
+                    img_with_border = ImageOps.expand(coded_img, border=3, fill=coded['color'])
+                    if code_id == coded['cid']:
+                        # Specific code id selected to highlight all of this code
+                        highlights.paste(img_with_border, (int(coded['x1']), int(coded['y1'])))
+                        self.text_box(draw, background.width, (coded['x1'], coded['y1']), coded['name'], coded['memo'])
                     if not code_id:
-                        highlights.paste(img_with_border, (int(ca['x1']), int(ca['y1'])))
+                        # No specific code or coded area selected.
+                        highlights.paste(img_with_border, (int(coded['x1']), int(coded['y1'])))
+                        self.text_box(draw, background.width, (coded['x1'], coded['y1']), coded['name'], coded['memo'])
                 except SystemError as e_:
                     logger.debug(e_)
                     print(e_)
-                    print("Crop img: x1", ca['x1'], "y1", ca['y1'], "x2", ca['x1'] + ca['width'], "y2", ca['y1'] + ca['height'])
+                    print("Crop img: x1", coded['x1'], "y1", coded['y1'], "x2", coded['x1'] + coded['width'], "y2", coded['y1'] + coded['height'])
                     print("Main img: w", background.width, "h", background.height)
         highlights.show()
+
+    def text_box(self, draw, background_width, position, text, memo):
+        """ Draw codename cation if show_code_captions=1, or codename plus memo if show_code_captions=2. """
+
+        if self.show_code_captions == 0:
+            return
+        font = ImageFont.load_default()
+        try:
+            font_path = os.path.join(self.app.confighome, 'DroidSansMono.ttf')
+            font = ImageFont.truetype(font_path, size=int(background_width / 90))
+        except OSError:
+            pass
+        if self.show_code_captions == 2 and memo != "":
+            text += "\n" + memo
+        bounding_box = draw.textbbox(position, text, font=font)
+        draw.rectangle(bounding_box, fill="white")
+        draw.text(position, text, font=font, fill="black")
 
     @staticmethod
     def help():
@@ -1182,15 +1270,9 @@ class DialogCodeImage(QtWidgets.QDialog):
             if action == action_hide_top_groupbox:
                 self.ui.groupBox_2.setVisible(False)
             if action == action_rotate:
-                self.degrees += 90
-                if self.degrees > 270:
-                    self.degrees = 0
-                self.redraw_scene()
+                self.rotate_clockwise()
             if action == action_rotate_counter:
-                self.degrees -= 90
-                if self.degrees < 0:
-                    self.degrees = 270
-                self.redraw_scene()
+                self.rotate_counter()
             return
         item = items[0]
         if len(items) > 1:
@@ -1246,6 +1328,17 @@ class DialogCodeImage(QtWidgets.QDialog):
         items = self.find_coded_areas_for_pos(pos)
         self.fill_coded_area_label(items)
 
+    def rotate_clockwise(self):
+        self.degrees += 90
+        if self.degrees > 270:
+            self.degrees = 0
+        self.redraw_scene()
+
+    def rotate_counter(self):
+        self.degrees -= 90
+        if self.degrees < 0:
+            self.degrees = 270
+        self.redraw_scene()
     def move_or_resize_coding(self, item):
         """ Move or resize a coding rectangle, in pixels.
 
@@ -1600,7 +1693,8 @@ class DialogCodeImage(QtWidgets.QDialog):
             for orphan in orphans:
                 cur.execute(sql, [orphan[0]])
             self.app.conn.commit()
-        except:
+        except Exception as e_:
+            print(e_)
             self.app.conn.rollback() # revert all changes 
             self.update_dialog_codes_and_categories()
             raise            
@@ -2014,6 +2108,20 @@ class DialogViewImage(QtWidgets.QDialog):
         msg = w_h + _(" Scale: ") + str(int(scale * 100)) + "%"
         self.ui.horizontalSlider.setToolTip(msg)
 
+    def zoom_out(self):
+        v = self.ui.horizontalSlider.value()
+        v -= 3
+        if v < self.ui.horizontalSlider.minimum():
+            return
+        self.ui.horizontalSlider.setValue(v)
+
+    def zoom_in(self):
+        v = self.ui.horizontalSlider.value()
+        v += 3
+        if v > self.ui.horizontalSlider.maximum():
+            return
+        self.ui.horizontalSlider.setValue(v)
+
     def eventFilter(self, object_, event):
         """ Using this event filter to apply key events.
         Key events on scene
@@ -2025,18 +2133,10 @@ class DialogViewImage(QtWidgets.QDialog):
         if type(event) == QtGui.QKeyEvent:
             key = event.key()
             if key == QtCore.Qt.Key.Key_Minus or key == QtCore.Qt.Key.Key_Q:
-                v = self.ui.horizontalSlider.value()
-                v -= 3
-                if v < self.ui.horizontalSlider.minimum():
-                    return True
-                self.ui.horizontalSlider.setValue(v)
+                self.zoom_out()
                 return True
             if key == QtCore.Qt.Key.Key_Plus or key == QtCore.Qt.Key.Key_W:
-                v = self.ui.horizontalSlider.value()
-                v += 3
-                if v > self.ui.horizontalSlider.maximum():
-                    return True
-                self.ui.horizontalSlider.setValue(v)
+                self.zoom_in()
                 return True
             if key == QtCore.Qt.Key.Key_L:
                 self.degrees -= 90

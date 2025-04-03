@@ -47,7 +47,7 @@ from PyQt6.QtGui import QBrush, QColor
 from .add_item_name import DialogAddItemName
 from .code_in_all_files import DialogCodeInAllFiles
 from .color_selector import DialogColorSelect
-from .color_selector import colors, TextColor
+from .color_selector import colors, TextColor, colour_ranges, show_codes_of_colour_range
 from .confirm_delete import DialogConfirmDelete
 from .helpers import Message, ExportDirectoryPathDialog
 from .GUI.ui_dialog_code_pdf import Ui_Dialog_code_pdf
@@ -115,9 +115,9 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.search_indices = []
         self.search_index = 0
         self.codes, self.categories = self.app.get_codes_categories()
+        self.get_recent_codes()  # After codes obtained!
         self.tree_sort_option = "all asc"
         self.annotations = self.app.get_annotations()
-        self.recent_codes = []
         self.autocode_history = []
         self.undo_deleted_codes = []
         self.journal = False
@@ -180,6 +180,11 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.pushButton_view_original.setToolTip(_("View original file"))
         self.ui.pushButton_document_memo.setIcon(qta.icon('mdi6.text-box-outline', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_document_memo.pressed.connect(self.file_memo)
+
+        self.ui.pushButton_zoom_in.setIcon(qta.icon('mdi6.magnify-plus-outline', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_zoom_in.pressed.connect(self.zoom_in)
+        self.ui.pushButton_zoom_out.setIcon(qta.icon('mdi6.magnify-minus-outline', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_zoom_out.pressed.connect(self.zoom_out)
 
         self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
         self.ui.lineEdit_search.setEnabled(False)
@@ -293,6 +298,29 @@ class DialogCodePdf(QtWidgets.QWidget):
 
         if self.pages:
             self.show_page()
+
+    def get_recent_codes(self):
+        """ Get recently used codes. Must have loaded all codes first.
+        recent codes are stored as space delimited text in project table.
+        Add code id to recent codes list, if code is present. """
+
+        self.recent_codes = []
+        cur = self.app.conn.cursor()
+        cur.execute("select recently_used_codes from project")
+        res = cur.fetchone()
+        if not res:
+            return
+        if res[0] == "" or res[0] is None:
+            return
+        recent_codes_text = res[0].split()
+        for code_id in recent_codes_text:
+            try:
+                cid = int(code_id)
+                for code_ in self.codes:
+                    if cid == code_['cid']:
+                        self.recent_codes.append(code_)
+            except ValueError:
+                pass
 
     def get_files(self, ids=None):
         """ Get pdf files with additional details and fill list widget.
@@ -1182,11 +1210,15 @@ class DialogCodePdf(QtWidgets.QWidget):
             action_show_coded_media = menu.addAction(_("Show coded files"))
             action_move_code = menu.addAction(_("Move code to"))
         action_show_codes_like = menu.addAction(_("Show codes like"))
+        action_show_codes_of_colour = menu.addAction(_("Show codes of colour"))
         action_all_asc = menu.addAction(_("Sort ascending"))
         action_all_desc = menu.addAction(_("Sort descending"))
         action_cat_then_code_asc = menu.addAction(_("Sort category then code ascending"))
         action = menu.exec(self.ui.treeWidget.mapToGlobal(position))
         if action is not None:
+            if action == action_show_codes_of_colour:
+                self.show_codes_of_color()
+                return
             if action == action_all_asc:
                 self.tree_sort_option = "all asc"
                 self.fill_tree()
@@ -1352,6 +1384,18 @@ class DialogCodePdf(QtWidgets.QWidget):
         root = self.ui.treeWidget.invisibleRootItem()
         self.recursive_traverse(root, text_)
 
+    def show_codes_of_color(self):
+        """ Show all codes in colour range in code tree., ir all codes if no selection.
+        Show selected codes that are of a selected colour.
+        """
+
+        ui = DialogSelectItems(self.app, colour_ranges, _("Select code colors"), "single")
+        ok = ui.exec()
+        if not ok:
+            return
+        selected_color = ui.get_selected()
+        show_codes_of_colour_range(self.app, self.ui.treeWidget, self.codes, selected_color)
+
     def recursive_traverse(self, item, text_):
         """ Find all children codes of this item that match or not and hide or unhide based on 'text'.
         Looks at tooltip also because the code text may be shortened to 50 characters for display, and the tooltip
@@ -1414,8 +1458,8 @@ class DialogCodePdf(QtWidgets.QWidget):
         V assign 'in vivo' code to selected text - text edit only
         Ctrl 0 to Ctrl 9 - button presses
         # Display Clicked character position
-        + Zoom in
-        -Zoom out
+        Shift + Zoom in
+        Ctrl - Zoom out
         """
 
         key = event.key()
@@ -1454,14 +1498,10 @@ class DialogCodePdf(QtWidgets.QWidget):
                 return
         if self.ui.graphicsView.hasFocus() and self.scene is not None:
             if key == QtCore.Qt.Key.Key_Plus:
-                if self.ui.graphicsView.transform().isScaling() and self.ui.graphicsView.transform().determinant() > 10:
-                    return
-                self.ui.graphicsView.scale(1.1, 1.1)
+                self.zoom_in()
                 return
             if key == QtCore.Qt.Key.Key_Minus:
-                if self.ui.graphicsView.transform().isScaling() and self.ui.graphicsView.transform().determinant() < 0.1:
-                    return
-                self.ui.graphicsView.scale(0.9, 0.9)
+                self.zoom_out()
                 return
         # Hide unHide top groupbox
         if key == QtCore.Qt.Key.Key_H:
@@ -1491,16 +1531,6 @@ class DialogCodePdf(QtWidgets.QWidget):
             self.recursive_set_current_item(self.ui.treeWidget.invisibleRootItem(), selection['name'])
             self.mark(by_text_boxes=True)
             return
-        # Unmark text boxes
-        ''' Review graphicsview_menu for code for this action '''
-        '''if key == QtCore.Qt.Key.Key_U:
-            self.selected_graphic_textboxes = self.scene.selectedItems()
-            if len(self.selected_graphic_textboxes) == 0:
-                return
-            print("U")
-            #self.unmark(cursor_pos)
-            return
-        # TODO MORE'''
 
         if not self.ui.textEdit.hasFocus():
             return
@@ -1569,6 +1599,20 @@ class DialogCodePdf(QtWidgets.QWidget):
                 self.ui.lineEdit_search.setText(selected_text)
                 self.search_for_text()
                 self.ui.pushButton_next.setFocus()
+
+    def zoom_in(self):
+        if self.scene is None:
+            return
+        if self.ui.graphicsView.transform().isScaling() and self.ui.graphicsView.transform().determinant() > 10:
+            return
+        self.ui.graphicsView.scale(1.1, 1.1)
+
+    def zoom_out(self):
+        if self.scene is None:
+            return
+        if self.ui.graphicsView.transform().isScaling() and self.ui.graphicsView.transform().determinant() < 0.1:
+            return
+        self.ui.graphicsView.scale(0.9, 0.9)
 
     def highlight_selected_overlap(self):
         """ Highlight the current overlapping text code, by placing formatting on top. """
@@ -3212,6 +3256,12 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.recent_codes.insert(0, tmp_code)
         if len(self.recent_codes) > 10:
             self.recent_codes = self.recent_codes[:10]
+        recent_codes_string = ""
+        for r in self.recent_codes:
+            recent_codes_string += f" {r['cid']}"
+        recent_codes_string = recent_codes_string[1:]
+        cur.execute("update project set recently_used_codes=?", [recent_codes_string])
+        self.app.conn.commit()
         self.update_file_tooltip()
         self.display_page_text_objects()
 

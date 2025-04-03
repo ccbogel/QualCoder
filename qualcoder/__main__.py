@@ -316,14 +316,22 @@ class App(object):
             res.append(dict(zip(keys, row)))
         return res
 
-    def get_code_names(self):
+    def get_code_names(self, cids=None):
         """
+        Args:
+            cids : List of cids as Integers, or None for all
         Returns:
             List of dictionaries of cid, name memo, date, catid, color, owner
         """
 
         cur = self.conn.cursor()
-        cur.execute("select name, ifnull(memo,''), owner, date, cid, catid, color from code_name order by lower(name)")
+        if not cids:
+            cur.execute("select name, ifnull(memo,''), owner, date, cid, catid, color from code_name order by lower(name)")
+        if cids:
+            cids_str = ",".join(map(str, cids))
+            sql = "select name, ifnull(memo,''), owner, date, cid, catid, color from code_name where "
+            sql += f"cid in ({cids_str}) order by lower(name)"
+            cur.execute(sql)
         result = cur.fetchall()
         res = []
         keys = 'name', 'memo', 'owner', 'date', 'cid', 'catid', 'color'
@@ -375,8 +383,8 @@ class App(object):
         sql = "select id, name, ifnull(memo,''), mediapath from source where (mediapath is Null or mediapath " \
               "like '/docs/%' or mediapath like 'docs:%') "
         if ids:
-            str_ids = list(map(str, ids))
-            sql += " and id in (" + ",".join(str_ids) + ")"
+            ids_str = ",".join(map(str, ids))
+            sql += f" and id in ({ids_str}) "
         sql += "order by lower(name)"
         cur = self.conn.cursor()
         cur.execute(sql)
@@ -443,7 +451,7 @@ class App(object):
     def get_pdf_filenames(self, ids=None):
         """ Get id, filenames, memo and mediapath of pdf text files.
         Args:
-            ids: list of Integer ids for a restricted list of files.
+            ids: list of Integer ids for a restricted list of files, or None.
         Returns:
             List of dictionaries of id, name memo, mediapath
         """
@@ -453,8 +461,8 @@ class App(object):
         sql = "select id, name, ifnull(memo,''), mediapath from source where mediapath is not Null and(mediapath " \
               "like '/docs/%' or mediapath like 'docs:%') and (mediapath like '%.pdf' or mediapath like '%.PDF')"
         if ids:
-            str_ids = list(map(str, ids))
-            sql += " and id in (" + ",".join(str_ids) + ")"
+            ids_str = ",".join(map(str, ids))
+            sql += f" and id in ({ids_str})"
         sql += "order by lower(name)"
         cur = self.conn.cursor()
         cur.execute(sql)
@@ -468,7 +476,7 @@ class App(object):
     def get_image_filenames(self, ids=None):
         """ Get filenames of image files only.
         Args:
-            ids: list of Integer ids for a restricted list of files.
+            ids: list of Integer ids for a restricted list of files, or Nonew.
         Returns:
             List of dictionaries of id, name, memo
         """
@@ -477,8 +485,8 @@ class App(object):
             ids = []
         sql = "select id, name, ifnull(memo,'') from source where mediapath like '/images/%' or mediapath like 'images:%'"
         if ids:
-            str_ids = list(map(str, ids))
-            sql += " and id in (" + ",".join(str_ids) + ")"
+            ids_str = ",".join(map(str, ids))
+            sql += f" and id in ({ids_str})"
         sql += " order by lower(name)"
         cur = self.conn.cursor()
         cur.execute(sql)
@@ -501,8 +509,8 @@ class App(object):
         sql = "select id, name, ifnull(memo,'') from source where "
         sql += "(mediapath like '/audio/%' or mediapath like 'audio:%' or mediapath like '/video/%' or mediapath like 'video:%') "
         if ids:
-            str_ids = list(map(str, ids))
-            sql += " and id in (" + ",".join(str_ids) + ")"
+            ids_str = ",".join(map(str, ids))
+            sql += f" and id in ({ids_str})"
         sql += " order by lower(name)"
         cur = self.conn.cursor()
         cur.execute(sql)
@@ -863,7 +871,6 @@ university, ORCID, GitHub, or Google account.""",
         QGroupBox:focus {border: 3px solid #f89407;}\n\
         QPushButton {border-style: outset; border-width: 2px; border-radius: 2px; border-color: beige; padding: 2px;}\n\
         QPushButton:pressed {border-style: inset; background-color: white;}\n\
-        QPushButton::icon {color: #000000;)\n\
         QGraphicsView {border: 1px solid #808080}\n\
         QHeaderView::section {background-color: #f9f9f9}\n\
         QLineEdit {border: 1px solid #707070; background-color: #fafafa;}\n\
@@ -899,6 +906,10 @@ university, ORCID, GitHub, or Google account.""",
         if self.settings['stylesheet'] == 'dark':
             return style_dark
         style_rainbow = style_dark
+        if self.settings['stylesheet'] == 'original':
+            # This background may work with white or black icon colours
+            style = style.replace("QPushButton {border-style: outset; ",
+                                  "QPushButton {border-style: outset; background-color: #dddddd;")
         if self.settings['stylesheet'] == 'rainbow':
             style_rainbow += "\nQDialog {background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0.2 black, " \
                              "stop:0.27 red, stop:0.31 yellow, stop:0.35 green, stop:0.39 #306eff, stop:0.42 blue, " \
@@ -927,6 +938,13 @@ university, ORCID, GitHub, or Google account.""",
         if self.settings['stylesheet'] == "native":
             style = "* {font-size: 12px;}"
             style += "\nQGroupBox { border: none; background-color: transparent;}"
+        ''' # Keep this as a test area for parsable / unparsable style sheet lines
+        style_lines = style.split("\n")
+        for i, sl in enumerate(style_lines):
+            print(i + 1, sl)
+        style_lines = style_lines[0:15]  # Test bed for parsing
+        style = "\n".join(style_lines)
+        print("\nSTYLE\n", style)'''
         return style
     
     def highlight_color(self):
@@ -1398,8 +1416,8 @@ Click "Yes" to start now.')
             self.ui.tabWidget.setTabIcon(2, qta.icon('mdi6.tag-text-outline', color=self.app.highlight_color()))  # Coding
             self.ui.tabWidget.setTabIcon(3, qta.icon('mdi6.format-list-group', color=self.app.highlight_color()))  # Reports
             self.ui.tabWidget.setTabIcon(4, qta.icon('mdi6.message-processing-outline', color=self.app.highlight_color()))  # Ai Chat
-        except Exception as e:
-            logger.log(e)
+        except Exception as e_:
+            logger.log(e_)
         
     def fill_recent_projects_menu_actions(self):
         """ Get the recent projects from the .qualcoder txt file.
@@ -1581,8 +1599,8 @@ Click "Yes" to start now.')
         """ Display general settings and project summary """
 
         self.ui.textEdit.append("<h1>" + _("Settings") + "</h1>")
-        msg = _("Coder") + f": {self.app.settings['codername']}\n"
-        msg += _("Font") + f": {self.app.settings['font']} {self.app.settings['fontsize']}\n"
+        self.ui.textEdit.append("<p>" + _("Coder") + f": {self.app.settings['codername']}</p>")
+        msg = _("Font") + f": {self.app.settings['font']} {self.app.settings['fontsize']}\n"
         msg += _("Tree font size") + f": {self.app.settings['treefontsize']}\n"
         msg += _("Working directory") + f": {self.app.settings['directory']}\n"
         msg += _("Show IDs") + f": {self.app.settings['showids']}\n"
@@ -1598,9 +1616,9 @@ Click "Yes" to start now.')
         else:
             msg += _("AI integration is disabled") + "\n"
         msg += _("Style") + f"; {self.app.settings['stylesheet']}"
-        if platform.system() == "Windows":
-            msg += "\n" + _("Directory (folder) paths / represents \\")
         self.ui.textEdit.append(msg)
+        if platform.system() == "Windows":
+            self.ui.textEdit.append("<p>" + _("Directory (folder) paths / represents backslash") + "</p>")
         self.ui.textEdit.append("<p>&nbsp;</p>")
         self.ui.textEdit.textCursor().movePosition(QtGui.QTextCursor.MoveOperation.End)
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
@@ -2108,7 +2126,7 @@ Click "Yes" to start now.')
         cur = self.app.conn.cursor()
         cur.execute(
             "CREATE TABLE project (databaseversion text, date text, memo text,about text, bookmarkfile integer, "
-            "bookmarkpos integer, codername text)")
+            "bookmarkpos integer, codername text, recently_used_codes text)")
         cur.execute(
             "CREATE TABLE source (id integer primary key, name text, fulltext text, mediapath text, memo text, "
             "owner text, date text, av_text_id integer, risid integer, unique(name))")
@@ -2175,9 +2193,9 @@ Click "Yes" to start now.')
         cur.execute("CREATE TABLE gr_av_item (gr_avid integer primary key, grid integer, avid integer,"
                     "x integer, y integer, pos0 integer, pos1 integer, filepath text, tooltip text, color text);")
         cur.execute("CREATE TABLE ris (risid integer, tag text, longtag text, value text);")
-        cur.execute("INSERT INTO project VALUES(?,?,?,?,?,?,?)",
-                    ('v8', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', qualcoder_version, 0,
-                     0, self.app.settings['codername']))
+        cur.execute("INSERT INTO project VALUES(?,?,?,?,?,?,?,?)",
+                    ('v9', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', qualcoder_version, 0,
+                     0, self.app.settings['codername'], ""))
         self.app.conn.commit()
         try:
             # Get and display some project details
@@ -2466,7 +2484,7 @@ Click "Yes" to start now.')
             self.close_project()
             return
 
-        # Potential design flaw to have the current coders name in the config.ini file
+        # Potential design flaw to have the current coders name in the config.ini file (early versions of QC).
         # as it would change to this coder when opening different projects
         # Check that the coder name from setting ini file is in the project
         # If not then replace with a name in the project
@@ -2614,7 +2632,7 @@ Click "Yes" to start now.')
             self.app.conn.commit()
             cur.execute('update project set databaseversion="v6", about=?', [qualcoder_version])
             self.ui.textEdit.append(_("Updating database to version") + " v6")
-        # Database v7
+        # Database version v7
         db7_update = False
         try:
             cur.execute("select memo_ctid from gr_free_text_item")
@@ -2650,6 +2668,14 @@ Click "Yes" to start now.')
             cur.execute("select risid from source")
         except sqlite3.OperationalError:
             cur.execute('ALTER TABLE source ADD risid integer')
+        # Database version v9
+        try:
+            cur.execute("select recently_used_codes from project")
+        except sqlite3.OperationalError:
+            cur.execute('ALTER TABLE project ADD recently_used_codes text')  # codes ids split by space
+            cur.execute('update project set databaseversion="v9", about=?', [qualcoder_version])
+            self.app.conn.commit()
+            self.ui.textEdit.append(_("Updating database to version") + " v9")
 
         # Save a date and 24 hour stamped backup
         if self.app.settings['backup_on_open'] == 'True' and newproject == "no":
@@ -2975,6 +3001,9 @@ Click "Yes" to start now.')
 
 
 def gui():
+    #print("Qt version: " + str(QtCore.qVersion()))
+    #if platform.system() == "Windows":
+    #    os.putenv('QT_QPA_PLATFORM', 'windows:darkmode=0')
     app = QtWidgets.QApplication(sys.argv)    
     qual_app = App()
     settings, ai_models = qual_app.load_settings()
@@ -3004,7 +3033,7 @@ def gui():
     install_language(lang)  # Install language files on every start, so updates are reflected
     # getlang = gettext.translation('en', localedir=locale_dir, languages=['en'])
     translator = gettext.translation(domain='default', localedir=locale_dir, fallback=True)
-    if lang in ["de", "es", "fr", "it", "pt"]:
+    if lang in ["de", "es", "fr", "it", "ja", "pt", "sv", "zh"]:
         # qt translator applies to ui designed GUI widgets only
         # qt_locale_dir = os.path.join(locale_dir, lang)
         # qt_locale_file = os.path.join(qt_locale_dir, "app_" + lang + ".qm")
@@ -3057,10 +3086,10 @@ def gui():
             if len(split_) == 2:
                 proj_path = split_[1]
             ex.open_project(path_=proj_path)
-    except Exception as e:
-        type_e = type(e)
-        value = e
-        tb_obj = e.__traceback__
+    except Exception as err:
+        type_e = type(err)
+        value = err
+        tb_obj = err.__traceback__
         # log the exception and show error msg
         qt_exception_hook.exception_hook(type_e, value, tb_obj)
 
@@ -3090,9 +3119,18 @@ def install_language(lang):
     if lang == "it":
         qm_data = it_qm
         mo_data = it_mo
+    if lang == "ja":
+        qm_data = ja_qm
+        mo_data = ja_mo
     if lang == "pt":
         qm_data = pt_qm
         mo_data = pt_mo
+    if lang == "sv":
+        qm_data = sv_qm
+        mo_data = sv_mo
+    if lang == "zh":
+        qm_data = zh_qm
+        mo_data = zh_mo
     if qm_data is None or mo_data is None:
         return
     with open(qm, 'wb') as file_:
