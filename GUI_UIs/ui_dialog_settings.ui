@@ -20,6 +20,9 @@
    <string>Settings</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="sizeConstraint">
+    <enum>QLayout::SetDefaultConstraint</enum>
+   </property>
    <item>
     <widget class="QScrollArea" name="scrollArea">
      <property name="sizePolicy">
@@ -41,9 +44,9 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>-132</y>
+        <y>-229</y>
         <width>795</width>
-        <height>733</height>
+        <height>838</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -777,7 +780,7 @@ Not recommended unless you have many large files slowing the backup.</string>
            </widget>
           </item>
           <item>
-           <widget class="QWidget" name="widget_ai_model" native="true">
+           <widget class="QWidget" name="widget_ai_provider" native="true">
             <layout class="QGridLayout" name="gridLayout_6">
              <property name="leftMargin">
               <number>0</number>
@@ -794,20 +797,17 @@ Not recommended unless you have many large files slowing the backup.</string>
              <property name="horizontalSpacing">
               <number>6</number>
              </property>
-             <item row="3" column="1">
-              <widget class="QLineEdit" name="lineEdit_ai_api_key"/>
-             </item>
-             <item row="1" column="0">
-              <widget class="QLabel" name="label_11">
+             <item row="0" column="0">
+              <widget class="QLabel" name="label_10">
                <property name="text">
-                <string>Description:</string>
+                <string>AI Provider:</string>
                </property>
                <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                </property>
               </widget>
              </item>
-             <item row="2" column="1">
+             <item row="4" column="1">
               <widget class="QLabel" name="label_ai_access_info_url">
                <property name="text">
                 <string/>
@@ -820,27 +820,20 @@ Not recommended unless you have many large files slowing the backup.</string>
                </property>
               </widget>
              </item>
-             <item row="1" column="1">
-              <widget class="QLabel" name="label_ai_model_desc">
+             <item row="3" column="0">
+              <widget class="QLabel" name="label_11">
                <property name="text">
-                <string/>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="0">
-              <widget class="QLabel" name="label_12">
-               <property name="text">
-                <string>Get Access:</string>
+                <string>Description:</string>
                </property>
                <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
                </property>
               </widget>
              </item>
-             <item row="0" column="1">
-              <widget class="QComboBox" name="comboBox_ai_model"/>
+             <item row="5" column="1">
+              <widget class="QLineEdit" name="lineEdit_ai_api_key"/>
              </item>
-             <item row="3" column="0">
+             <item row="5" column="0">
               <widget class="QLabel" name="label_ai_api_key">
                <property name="text">
                 <string>API key</string>
@@ -850,35 +843,52 @@ Not recommended unless you have many large files slowing the backup.</string>
                </property>
               </widget>
              </item>
-             <item row="0" column="0">
-              <widget class="QLabel" name="label_10">
+             <item row="4" column="0">
+              <widget class="QLabel" name="label_12">
                <property name="text">
-                <string>AI Model</string>
+                <string>Get Access:</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                </property>
               </widget>
              </item>
+             <item row="3" column="1">
+              <widget class="QLabel" name="label_ai_model_desc">
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QComboBox" name="comboBox_ai_provider"/>
+             </item>
             </layout>
            </widget>
           </item>
           <item>
-           <widget class="QCheckBox" name="checkBox_ai_project_memo">
-            <property name="toolTip">
-             <string>You can use the Project Memo (found in the menu: Project &gt; Project Memo) to convey background information about your research, including objectives, methodology, and data, to the AI. This will help the AI generate more accurate and relevant responses. Deselect this option if you use the Project Memo for other purposes.</string>
+           <spacer name="verticalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
             </property>
-            <property name="text">
-             <string>Send project memo to AI</string>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>6</height>
+             </size>
             </property>
-            <property name="checked">
-             <bool>true</bool>
+           </spacer>
+          </item>
+          <item>
+           <widget class="Line" name="line_4">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QWidget" name="widget_3" native="true">
-            <layout class="QHBoxLayout" name="horizontalLayout_5">
+           <widget class="QWidget" name="widget_5" native="true">
+            <layout class="QHBoxLayout" name="horizontalLayout_6">
              <property name="leftMargin">
               <number>0</number>
              </property>
@@ -892,40 +902,20 @@ Not recommended unless you have many large files slowing the backup.</string>
               <number>0</number>
              </property>
              <item>
-              <widget class="QLabel" name="label_13">
+              <widget class="QPushButton" name="pushButton_advanced_AI_options">
                <property name="text">
-                <string>Language for AI conversations: </string>
+                <string>Advanced AI Options...</string>
                </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QCheckBox" name="checkBox_AI_language_ui">
-               <property name="toolTip">
-                <string>If selected, the conversations will be in the same language as the rest of the user interface. You can select this language at the top of this window.</string>
-               </property>
-               <property name="text">
-                <string>same as UI</string>
-               </property>
-               <property name="checked">
+               <property name="checkable">
                 <bool>true</bool>
                </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLineEdit" name="lineEdit_AI_language">
-               <property name="enabled">
+               <property name="checked">
                 <bool>false</bool>
                </property>
-               <property name="toolTip">
-                <string>Enter the name of your language here</string>
-               </property>
-               <property name="placeholderText">
-                <string/>
-               </property>
               </widget>
              </item>
              <item>
-              <spacer name="horizontalSpacer_4">
+              <spacer name="horizontalSpacer_6">
                <property name="orientation">
                 <enum>Qt::Horizontal</enum>
                </property>
@@ -941,8 +931,11 @@ Not recommended unless you have many large files slowing the backup.</string>
            </widget>
           </item>
           <item>
-           <widget class="QWidget" name="widget_2" native="true">
-            <layout class="QHBoxLayout" name="horizontalLayout_4">
+           <widget class="QWidget" name="widget_AI_advanced_options" native="true">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <layout class="QVBoxLayout" name="verticalLayout_3">
              <property name="leftMargin">
               <number>0</number>
              </property>
@@ -956,66 +949,336 @@ Not recommended unless you have many large files slowing the backup.</string>
               <number>0</number>
              </property>
              <item>
-              <widget class="QLabel" name="label_AI_temperature">
-               <property name="text">
-                <string>Temperature:</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLineEdit" name="lineEdit_ai_temperature">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
+              <widget class="QCheckBox" name="checkBox_ai_project_memo">
                <property name="toolTip">
-                <string>Advanced option. Only change when you know whatr you are doing.</string>
-               </property>
-               <property name="inputMask">
-                <string>D.9</string>
+                <string>You can use the Project Memo (found in the menu: Project &gt; Project Memo) to convey background information about your research, including objectives, methodology, and data, to the AI. This will help the AI generate more accurate and relevant responses. Deselect this option if you use the Project Memo for other purposes.</string>
                </property>
                <property name="text">
-                <string>1.0</string>
+                <string>Send project memo to AI</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
                </property>
               </widget>
              </item>
              <item>
-              <widget class="QLabel" name="label_9">
-               <property name="text">
-                <string>   Top_p:</string>
-               </property>
+              <widget class="QWidget" name="widget_3" native="true">
+               <layout class="QHBoxLayout" name="horizontalLayout_5">
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>0</number>
+                </property>
+                <item>
+                 <widget class="QLabel" name="label_13">
+                  <property name="text">
+                   <string>Language for AI conversations: </string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QCheckBox" name="checkBox_AI_language_ui">
+                  <property name="toolTip">
+                   <string>If selected, the conversations will be in the same language as the rest of the user interface. You can select this language at the top of this window.</string>
+                  </property>
+                  <property name="text">
+                   <string>same as UI</string>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="lineEdit_AI_language">
+                  <property name="enabled">
+                   <bool>false</bool>
+                  </property>
+                  <property name="toolTip">
+                   <string>Enter the name of your language here</string>
+                  </property>
+                  <property name="placeholderText">
+                   <string/>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_4">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
               </widget>
              </item>
              <item>
-              <widget class="QLineEdit" name="lineEdit_top_p">
+              <widget class="QWidget" name="widget_4" native="true">
                <property name="sizePolicy">
-                <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                  <horstretch>0</horstretch>
                  <verstretch>0</verstretch>
                 </sizepolicy>
                </property>
-               <property name="inputMask">
-                <string>D.9</string>
-               </property>
-               <property name="text">
-                <string>1.0</string>
-               </property>
+               <layout class="QGridLayout" name="gridLayout_5">
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>0</number>
+                </property>
+                <item row="0" column="0">
+                 <widget class="QLabel" name="label_14">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="text">
+                   <string>Large Model:</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1" rowspan="2">
+                 <widget class="QWidget" name="widget_models" native="true">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <layout class="QGridLayout" name="gridLayout_8">
+                   <property name="leftMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="topMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="rightMargin">
+                    <number>0</number>
+                   </property>
+                   <property name="bottomMargin">
+                    <number>0</number>
+                   </property>
+                   <item row="1" column="2">
+                    <spacer name="horizontalSpacer_5">
+                     <property name="orientation">
+                      <enum>Qt::Horizontal</enum>
+                     </property>
+                     <property name="sizeType">
+                      <enum>QSizePolicy::Fixed</enum>
+                     </property>
+                     <property name="sizeHint" stdset="0">
+                      <size>
+                       <width>20</width>
+                       <height>20</height>
+                      </size>
+                     </property>
+                    </spacer>
+                   </item>
+                   <item row="1" column="1">
+                    <widget class="QLineEdit" name="lineEdit_ai_large_context_window"/>
+                   </item>
+                   <item row="0" column="3" colspan="2">
+                    <widget class="QComboBox" name="comboBox_AI_model_fast">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="maximumSize">
+                      <size>
+                       <width>200</width>
+                       <height>16777215</height>
+                      </size>
+                     </property>
+                     <property name="toolTip">
+                      <string>Select an available AI model (can be the same as the large model). The fast model is used for simple tasks only.</string>
+                     </property>
+                     <property name="editable">
+                      <bool>true</bool>
+                     </property>
+                     <property name="insertPolicy">
+                      <enum>QComboBox::NoInsert</enum>
+                     </property>
+                     <property name="placeholderText">
+                      <string>&lt;select available model&gt;</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="2">
+                    <widget class="QLabel" name="label_15">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="text">
+                      <string>   Fast Model:</string>
+                     </property>
+                     <property name="alignment">
+                      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="0">
+                    <widget class="QLabel" name="label_ai_large_contex_window">
+                     <property name="text">
+                      <string>context window:</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="0" column="0" colspan="2">
+                    <widget class="QComboBox" name="comboBox_AI_model_large">
+                     <property name="sizePolicy">
+                      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                       <horstretch>0</horstretch>
+                       <verstretch>0</verstretch>
+                      </sizepolicy>
+                     </property>
+                     <property name="maximumSize">
+                      <size>
+                       <width>200</width>
+                       <height>16777215</height>
+                      </size>
+                     </property>
+                     <property name="toolTip">
+                      <string>Select an available AI model. The large model is used for most of the AI features in QualCoder.</string>
+                     </property>
+                     <property name="editable">
+                      <bool>true</bool>
+                     </property>
+                     <property name="insertPolicy">
+                      <enum>QComboBox::NoInsert</enum>
+                     </property>
+                     <property name="sizeAdjustPolicy">
+                      <enum>QComboBox::AdjustToContentsOnFirstShow</enum>
+                     </property>
+                     <property name="placeholderText">
+                      <string>&lt;select available model&gt;</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="3">
+                    <widget class="QLabel" name="label_ai_fast_contex_window">
+                     <property name="text">
+                      <string>context window:</string>
+                     </property>
+                    </widget>
+                   </item>
+                   <item row="1" column="4">
+                    <widget class="QLineEdit" name="lineEdit_ai_fast_context_window"/>
+                   </item>
+                  </layout>
+                 </widget>
+                </item>
+               </layout>
               </widget>
              </item>
              <item>
-              <spacer name="horizontalSpacer_3">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>10</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
+              <widget class="QWidget" name="widget_2" native="true">
+               <layout class="QHBoxLayout" name="horizontalLayout_4">
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>0</number>
+                </property>
+                <item>
+                 <widget class="QLabel" name="label_AI_temperature">
+                  <property name="text">
+                   <string>Temperature:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="lineEdit_ai_temperature">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="toolTip">
+                   <string>Advanced option. Only change when you know whatr you are doing.</string>
+                  </property>
+                  <property name="inputMask">
+                   <string>D.9</string>
+                  </property>
+                  <property name="text">
+                   <string>1.0</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_9">
+                  <property name="text">
+                   <string>   Top_p:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="lineEdit_top_p">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="inputMask">
+                   <string>D.9</string>
+                  </property>
+                  <property name="text">
+                   <string>1.0</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_3">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>10</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </widget>
              </item>
             </layout>
            </widget>

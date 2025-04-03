@@ -26,6 +26,7 @@ from PyQt6 import QtWidgets
 from PyQt6 import QtCore
 import qtawesome as qta
 
+from openai import OpenAI
 from .ai_prompts import PromptItem
 from langchain_openai import ChatOpenAI, AzureChatOpenAI
 from langchain_core.globals import set_llm_cache  # Unused
@@ -43,6 +44,7 @@ from .error_dlg import qt_exception_hook
 from .html_parser import html_to_text
 import fuzzysearch
 import json_repair
+import asyncio
 
 max_memo_length = 1500  # Maximum length of the memo send to the AI
 
@@ -75,6 +77,15 @@ def extract_ai_memo(memo: str) -> str:
     else:
         return memo
     
+def get_available_models(api_base: str, api_key: str) -> list:
+    """Queries the API and returns a list of all AI models available from this provider."""
+    if api_base == '':
+        api_base = None
+    client = OpenAI(api_key=api_key, base_url=api_base)
+    response = client.models.list(timeout=6.0)
+    model_dict = response.model_dump().get('data', [])
+    model_list = sorted([model['id'] for model in model_dict])
+    return model_list
 
 class AiLLM():
     """ This manages the communication between qualcoder, the vectorstore 
@@ -178,8 +189,25 @@ class AiLLM():
                         return    
                 #elif api_key == 'None':
                 #    api_key = ''
+                if large_model == '' or fast_model == '':
+                    msg = _('In the following dialog, go to "Advanced AI Options" and select a large and a fast AI model (both can be the same).')
+                    Message(self.app, _('AI Model Selection'), msg).exec()
+                    main_window.change_settings(section='advanced AI', enable_ai=True)
+                    curr_model = self.app.ai_models[int(self.app.settings['ai_model_index'])]
+                    if curr_model['large_model'] == '' or curr_model['fast_model'] == '':
+                        # still no model chosen, disable AI:
+                        self.app.settings['ai_enable'] = 'False'
+                        self.parent_text_edit.append(_('AI: No large/fast model selected, AI is disabled.'))
+                        self._status = ''
+                        return
+                    else: 
+                        # Success, models were selected. But since the "change_settings" function will start 
+                        # a new "init_llm" anyways, we are going to quit here
+                        return
                 temp = float(self.app.settings.get('ai_temperature', '1.0'))
                 top_p = float(self.app.settings.get('ai_top_p', '1.0'))
+                timeout = float(self.app.settings.get('ai_timeout', '30.0'))
+                self.app.settings['ai_timeout'] = str(timeout)
                 if api_base.find('openai.azure.com') != -1:  # using Microsoft Azure
                     self.large_llm = AzureChatOpenAI(
                                         azure_endpoint=api_base,
@@ -189,7 +217,7 @@ class AiLLM():
                                         temperature=temp,
                                         top_p=top_p,
                                         max_tokens=None,
-                                        timeout=None,
+                                        timeout=timeout,
                                         max_retries=2,
                                         cache=False,
                                         streaming=True
@@ -202,7 +230,7 @@ class AiLLM():
                                         temperature=temp,
                                         top_p=top_p,
                                         max_tokens=None,
-                                        timeout=None,
+                                        timeout=timeout,
                                         max_retries=2,
                                         cache=False,
                                         streaming=True
@@ -214,7 +242,8 @@ class AiLLM():
                                         cache=False,
                                         temperature=temp,
                                         top_p=top_p,
-                                        streaming=True
+                                        streaming=True,
+                                        timeout=timeout,
                                         )
                     self.fast_llm = ChatOpenAI(model=fast_model, 
                                         openai_api_key=api_key, 
@@ -222,7 +251,8 @@ class AiLLM():
                                         cache=False,
                                         temperature=temp,
                                         top_p=top_p,
-                                        streaming=True
+                                        streaming=True,
+                                        timeout=timeout,
                                         )
                 self.ai_streaming_output = ''
                 self.app.settings['ai_enable'] = 'True'
@@ -268,6 +298,10 @@ class AiLLM():
         self.threadpool.clear()
         self.ai_async_is_canceled = True
         self.threadpool.waitForDone(5000)
+        if ask and self.is_busy():
+            msg = _('The AI operation could not be aborted immediately. It may take a moment for the AI to be ready again.')
+            msg_box = Message(self.app, 'AI Cancel', msg)
+            msg_box.exec()            
         return True
 
     def get_status(self) -> str:
