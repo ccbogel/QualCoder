@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-27 07:52+1100\n"
-"PO-Revision-Date: 2025-03-30 08:40+1100\n"
+"PO-Revision-Date: 2025-04-04 08:17+1100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: ja\n"
@@ -142,7 +142,7 @@ msgstr "このプロジェクトには画像ファイルは含まれていませ
 
 #: __main__.py:1880
 msgid "No image files"
-msgstr ""
+msgstr "画像ファイルなし"
 
 #: __main__.py:1888
 msgid "This project contains no audio/video files."
@@ -454,49 +454,51 @@ msgstr ""
 
 #: __main__.py:2897
 msgid "AI Setup Wizard"
-msgstr ""
+msgstr "人工知能セットアップ・ウィザード"
 
 #: __main__.py:2899
 msgid "AI: Setup Wizard"
-msgstr ""
+msgstr "人工知能セットアップ・ウィザード"
 
 #: __main__.py:2902
 msgid "AI: Setup Wizard finished"
-msgstr ""
+msgstr "人工知能セットアップウィザード終了"
 
 #: __main__.py:2911
 msgid "Please enable the AI first and set it in Settings."
-msgstr ""
+msgstr "まず人工知能を有効にして、「設定」で設定してください。"
 
 #: __main__.py:2912 __main__.py:2916 __main__.py:2921 __main__.py:2946
 msgid "Rebuild AI Memory"
-msgstr ""
+msgstr "人工知能メモリの再構築"
 
 #: __main__.py:2915
 msgid "The AI is busy or not set up correctly."
-msgstr ""
+msgstr "人工知能が忙しいか、正しく設定されていない。"
 
 #: __main__.py:2919
 msgid ""
 "This will re-read all of your empirical documents, which may take some time. "
 "Do you want to continue?"
 msgstr ""
+"これにより、経験的な文書がすべて読み直され、時間がかかる場合があります。続け"
+"ますか？"
 
 #: __main__.py:2937 __main__.py:2945
 msgid "Please enable the AI first and set it up in Settings."
-msgstr ""
+msgstr "まず人工知能を有効にして、「設定」で設定してください。"
 
 #: __main__.py:2938
 msgid "Ai Chat"
-msgstr ""
+msgstr "人工知能チャット"
 
 #: __main__.py:2958
 msgid "This version: "
-msgstr ""
+msgstr "このバージョン"
 
 #: __main__.py:2965
 msgid "Newer release available: "
-msgstr ""
+msgstr "新しいリリースが利用可能："
 
 #: __main__.py:2970
 msgid "Latest Release: "
@@ -688,7 +690,7 @@ msgstr "タイプ："
 
 #: ai_chat.py:655 ai_chat.py:657
 msgid "Summary:"
-msgstr ""
+msgstr "要約:"
 
 #: ai_chat.py:655 ai_chat.py:657
 msgid "Date:"
@@ -708,159 +710,169 @@ msgstr "人工知能"
 
 #: ai_chat.py:677
 msgid "Info:"
-msgstr ""
+msgstr "インフォメーション:"
 
 #: ai_chat.py:728
 msgid "(unknown reference)"
-msgstr ""
+msgstr "(参考文献不明)"
 
 #: ai_chat.py:798 ai_chat.py:812 ai_chat.py:813
 msgid "Export Chat"
-msgstr ""
+msgstr "輸出チャット"
 
 #: ai_chat.py:811
 msgid "The file already exists. Do you want to override it?"
-msgstr ""
+msgstr "ファイルはすでに存在します。上書きしますか？"
 
 #: ai_chat.py:851
 msgid "New topic analysis chat"
-msgstr ""
+msgstr "新しいトピック分析チャット"
 
 #: ai_chat.py:853
 msgid "Analyzing a free-search topic together with the AI."
-msgstr ""
+msgstr "人工知能による自由検索トピックの分析。"
 
 #: ai_chat.py:854
 msgid "New text analysis chat"
-msgstr ""
+msgstr "新しいテキスト分析チャット"
 
 #: ai_chat.py:856
 msgid "Analyse a piece of text from your empirical data together with the AI."
-msgstr ""
+msgstr "人工知能を使って、経験的データからテキストの一部を分析します。"
 
 #: ai_chat.py:857
 msgid "New code analysis chat"
-msgstr ""
+msgstr "新しいコード解析チャット"
 
 #: ai_chat.py:859
 msgid "Analyze the data collected under a certain code together with the AI."
-msgstr ""
+msgstr "あるコードの下で収集されたデータを人工知能と一緒に分析する。"
 
 #: ai_chat.py:860
 msgid "New general chat"
-msgstr ""
+msgstr "新しい一般チャット"
 
 #: ai_chat.py:862
 msgid "Ask the AI anything, not related to your data."
-msgstr ""
+msgstr "あなたのデータに関係ないことでも、人工知能に何でも聞いてみよう。"
 
 #: ai_chat.py:947
 msgid ""
 "The AI is busy generating a response. Click on the button on the right to "
 "stop."
 msgstr ""
+"人工知能は応答生成に追われています。停止するには右のボタンをクリックしてくだ"
+"さい。"
 
 #: ai_chat.py:948
 msgid "AI busy"
-msgstr ""
+msgstr "忙しい人工知能"
 
 #: ai_chat.py:951
 msgid "The AI not yet fully loaded. Please wait and retry."
 msgstr ""
+"人工知能が完全にロードされていません。しばらく待ってから再試行してください。"
 
 #: ai_chat.py:952 ai_search_dialog.py:447
 msgid "AI not ready"
-msgstr ""
+msgstr "人工知能はまだ準備ができていない"
 
 #: ai_chat.py:970
 msgid "Please select a chat or create a new one."
-msgstr ""
+msgstr "チャットを選択するか、新規チャットを作成してください。"
 
 #: ai_chat.py:971
 msgid "Chat selection"
-msgstr ""
+msgstr "チャット選択"
 
 #: ai_chat.py:1076
 msgid ""
 "Error: The AI returned an empty result. This may indicate that the AI model "
 "is not available at the moment. Try again later or choose a different model."
 msgstr ""
+"エラー： 人工知能が空の結果を返しました。これは、そのモデルが現在利用できない"
+"ことを示している可能性があります。後で再試行するか、別のモデルを選択してくだ"
+"さい。"
 
 #: ai_chat.py:1082
 msgid "Error communicating with "
-msgstr ""
+msgstr "との通信エラー "
 
 #: ai_chat.py:1089 ai_llm.py:327 ai_vectorstore.py:63
 msgid "Uncaught exception: "
-msgstr ""
+msgstr "捕捉されない例外： "
 
 #: ai_chat.py:1125 ai_chat.py:1146 ai_chat.py:1186 ai_chat.py:1206
 msgid "Invalid source reference."
-msgstr ""
+msgstr "ソース参照が無効です。"
 
 #: ai_chat.py:1159
 msgid "Error retrieving source text"
-msgstr ""
+msgstr "ソース・テキストの取得エラー"
 
 #: ai_chat.py:1187 ai_chat.py:1207
 msgid "AI Chat"
-msgstr ""
+msgstr "人工知能の準備"
 
 #: ai_llm.py:133
 msgid "AI: Starting up..."
-msgstr ""
+msgstr "人工知能が始動..."
 
 #: ai_llm.py:142
 msgid "AI: Please set up the AI model"
-msgstr ""
+msgstr "人工知能： 人工知能モデルをセットアップしてください"
 
 #: ai_llm.py:143
 msgid "AI Setup"
-msgstr ""
+msgstr "人工知能のセットアップ"
 
 #: ai_llm.py:149
 msgid "AI: No model selected, AI is disabled."
-msgstr ""
+msgstr "人工知能： モデルが選択されていない。"
 
 #: ai_llm.py:165
 msgid ""
 "Please enter an API-key for the AI in the following dialog (or \"None\" if "
 "not API-key is needed)."
 msgstr ""
+"以下のダイアログに人工知能のAPI-keyを入力してください（API-keyが不要な場合は"
+"「None」）。"
 
 #: ai_llm.py:166
 msgid "AI API-key"
-msgstr ""
+msgstr "人工知能： APIキー"
 
 #: ai_llm.py:172
 msgid "AI: No API key set, AI is disabled."
-msgstr ""
+msgstr "人工知能： APIキーが設定されていません。人工知能は無効です。"
 
 #: ai_llm.py:235
 msgid "AI: Ready"
-msgstr ""
+msgstr "人工知能：準備完了"
 
 #: ai_llm.py:246
 msgid ""
 "An error occured during AI initialization. The AI features will be disabled. "
 "Click on Project > Settings to reenable them."
 msgstr ""
+"人工知能の初期化中にエラーが発生しました。人工知能機能が無効になります。プロ"
+"ジェクト＞設定をクリックして、再度有効にしてください。"
 
 #: ai_llm.py:247
 msgid "AI Initialization"
-msgstr ""
+msgstr "人工知能の初期化"
 
 #: ai_llm.py:261
 msgid "Do you really want to cancel the AI operation?"
-msgstr ""
+msgstr "人工知能の操作をキャンセルしますか？"
 
 #: ai_llm.py:324
 msgid "AI Error:\n"
-msgstr ""
+msgstr "人工知能のエラー：\n"
 
 #: ai_llm.py:456
 msgid "AI generate_code_descriptions\n"
-msgstr ""
+msgstr "人工知能がコード記述を生成\n"
 
 #: ai_llm.py:457
 msgid "Prompt:\n"
@@ -927,14 +939,14 @@ msgstr ""
 #: report_codes.py:1241 report_exact_matches.py:191 view_graph.py:500
 #: view_graph.py:562 view_graph.py:613
 msgid "No codes"
-msgstr ""
+msgstr "コードなし"
 
 #: ai_search_dialog.py:172 attributes.py:262 code_organiser.py:987
 #: code_text.py:563 code_pdf.py:468 journals.py:186 manage_files.py:912
 #: report_codes.py:362 report_code_summary.py:104
 #: report_codes_by_segments.py:253 view_av.py:452 view_image.py:321
 msgid "Name"
-msgstr ""
+msgstr "名称"
 
 #: ai_search_dialog.py:172 ai_search_dialog.py:186 ai_search_dialog.py:264
 #: attributes.py:200 attributes.py:262 cases.py:737 cases.py:895
@@ -953,33 +965,33 @@ msgstr ""
 #: view_av.py:2292 view_image.py:321 view_image.py:1254 view_image.py:1863
 #: view_image.py:1887
 msgid "Memo"
-msgstr ""
+msgstr "メモ"
 
 #: ai_search_dialog.py:172 code_text.py:563 code_pdf.py:468 report_codes.py:362
 #: report_code_summary.py:104 report_codes_by_segments.py:253
 #: report_relations.py:922 view_av.py:452 view_image.py:321
 msgid "Count"
-msgstr ""
+msgstr "カウント"
 
 #: ai_search_dialog.py:173 report_codes.py:363 report_codes_by_segments.py:254
 msgid "Codes and categories"
-msgstr ""
+msgstr "コードとカテゴリー"
 
 #: ai_search_dialog.py:375 report_attributes.py:324
 msgid "Show files:"
-msgstr ""
+msgstr "ファイルを表示する："
 
 #: ai_search_dialog.py:392
 msgid "<no file filter>"
-msgstr ""
+msgstr "<ファイルフィルターなし"
 
 #: ai_search_dialog.py:393
 msgid "Search in all textfiles"
-msgstr ""
+msgstr "すべてのテキストファイルを検索"
 
 #: ai_search_dialog.py:405
 msgid "Codings: "
-msgstr ""
+msgstr "コーディング： "
 
 #: ai_search_dialog.py:409 report_codes.py:233 report_codes_by_segments.py:123
 msgid ""
@@ -991,7 +1003,7 @@ msgstr ""
 
 #: ai_search_dialog.py:417
 msgid "Search in all cases"
-msgstr ""
+msgstr "すべてのケースで検索"
 
 #: ai_search_dialog.py:425 code_text.py:5124 code_pdf.py:3550
 #: report_codes.py:246 report_codes.py:2137 report_codes.py:2734
@@ -1002,7 +1014,7 @@ msgstr "メモ："
 
 #: ai_search_dialog.py:446
 msgid "The AI ist not ready to fulfill your request (status: "
-msgstr ""
+msgstr "人工知能はあなたの要求を満たす準備ができていません（ステータス： "
 
 #: ai_search_dialog.py:446
 msgid ")."
@@ -1011,20 +1023,24 @@ msgstr ")."
 #: ai_search_dialog.py:452
 msgid "Please select a code or category (or use \"free search\" instead)."
 msgstr ""
+"コードまたはカテゴリを選択してください（または代わりに「フリー検索」を使用し"
+"てください）。"
 
 #: ai_search_dialog.py:472
 msgid "Please enter text in the \"topic\" field."
-msgstr ""
+msgstr "トピック」欄にテキストを入力してください。"
 
 #: ai_search_dialog.py:521
 msgid ""
 "After combining all filters, there are not files left for the search. Please "
 "check your settings."
 msgstr ""
+"すべてのフィルタを組み合わせた後、検索するファイルが残っていません。設定を確"
+"認してください。"
 
 #: ai_search_dialog.py:522
 msgid "No files"
-msgstr ""
+msgstr "ファイルなし"
 
 #: ai_vectorstore.py:154
 msgid ""
@@ -1098,86 +1114,86 @@ msgstr ""
 
 #: attributes.py:146
 msgid "Attribute added: "
-msgstr ""
+msgstr "属性が追加された： "
 
 #: attributes.py:167
 msgid "Attribute deleted: "
-msgstr ""
+msgstr "属性が削除された： "
 
 #: attributes.py:178
 msgid "Attributes deleted: "
-msgstr ""
+msgstr "属性は削除された： "
 
 #: attributes.py:188
 msgid "Memo for Attribute "
-msgstr ""
+msgstr "属性メモ "
 
 #: attributes.py:214
 msgid "numeric"
-msgstr ""
+msgstr "数値"
 
 #: attributes.py:215
 msgid "Change to character"
-msgstr ""
+msgstr "キャラクターへの変更"
 
 #: attributes.py:249
 msgid "Attribute renamed from: "
-msgstr ""
+msgstr "属性名が変更された： "
 
 #: attributes.py:249 code_text.py:3050 code_text.py:3106
 msgid " to "
-msgstr ""
+msgstr "への"
 
 #: attributes.py:262
 msgid "Assigned to"
-msgstr ""
+msgstr "担当"
 
 #: attributes.py:262 manage_links.py:188 manage_references.py:384
 msgid "Type"
-msgstr ""
+msgstr "タイプ"
 
 #: attributes.py:274 case_file_manager.py:231 case_file_manager.py:304
 msgid "Yes"
-msgstr ""
+msgstr "はい"
 
 #: case_file_manager.py:94 code_in_all_files.py:135 code_in_all_files.py:212
 #: helpers.py:217 report_attributes.py:339 report_codes.py:2164
 #: view_charts.py:283 view_graph.py:1543
 msgid "Case: "
-msgstr ""
+msgstr "ケース："
 
 #: case_file_manager.py:154
 msgid "Files linked: "
-msgstr ""
+msgstr "リンクされたファイル："
 
 #: case_file_manager.py:162
 msgid "Add files to case"
-msgstr ""
+msgstr "ケースにファイルを追加する"
 
 #: case_file_manager.py:163
 msgid "Remove files from case"
-msgstr ""
+msgstr "ケースからファイルを削除する"
 
 #: case_file_manager.py:191 case_file_manager.py:669
 msgid "File added to case"
-msgstr ""
+msgstr "ファイルをケースに追加"
 
 #: case_file_manager.py:217
 msgid "This file has already been linked to this case "
-msgstr ""
+msgstr "このファイルはすでにこのケースにリンクされている "
 
 #: case_file_manager.py:224
 msgid "added to case."
-msgstr ""
+msgstr "ケースに追加された。"
 
 #: case_file_manager.py:351
 msgid "Displayed file: "
-msgstr ""
+msgstr "表示されるファイル："
 
 #: case_file_manager.py:446 cases.py:1103 edit_textfile.py:582
 #: report_exact_matches.py:583 report_relations.py:454 report_sql.py:414
 msgid "Select all"
-msgstr ""
+msgstr "すべて選択"
 
 #: case_file_manager.py:448
 msgid "Mark"
