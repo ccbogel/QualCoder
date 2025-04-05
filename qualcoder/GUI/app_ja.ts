@@ -965,12 +965,12 @@ Checked - any selected codes must match exactly.</source>
     <message>
         <location filename="ui_dialog_add_item.py" line="40"/>
         <source>Add Code</source>
-        <translation type="unfinished"></translation>
+        <translation>コードを追加</translation>
     </message>
     <message>
         <location filename="ui_dialog_add_item.py" line="41"/>
         <source>Enter text below:</source>
-        <translation type="unfinished"></translation>
+        <translation>以下にテキストを入力してください：</translation>
     </message>
 </context>
 <context>
@@ -1016,27 +1016,27 @@ Checked - any selected codes must match exactly.</source>
     <message>
         <location filename="ui_dialog_assign_attribute.py" line="45"/>
         <source>Assign attribute</source>
-        <translation type="unfinished"></translation>
+        <translation>属性の割り当て</translation>
     </message>
     <message>
         <location filename="ui_dialog_assign_attribute.py" line="46"/>
         <source>Cases</source>
-        <translation type="unfinished"></translation>
+        <translation>事例</translation>
     </message>
     <message>
         <location filename="ui_dialog_assign_attribute.py" line="47"/>
         <source>Files</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイル</translation>
     </message>
     <message>
         <location filename="ui_dialog_assign_attribute.py" line="48"/>
         <source>Assign attribute to:</source>
-        <translation type="unfinished"></translation>
+        <translation>属性の割り当て:</translation>
     </message>
     <message>
         <location filename="ui_dialog_assign_attribute.py" line="49"/>
         <source>Journals</source>
-        <translation type="unfinished"></translation>
+        <translation>雑誌</translation>
     </message>
 </context>
 <context>
@@ -1102,57 +1102,57 @@ Checked - any selected codes must match exactly.</source>
     <message>
         <location filename="ui_dialog_cases.py" line="104"/>
         <source>Cases</source>
-        <translation type="unfinished"></translation>
+        <translation>事例</translation>
     </message>
     <message>
         <location filename="ui_dialog_cases.py" line="105"/>
         <source>Double click case name to change the name. Click on Memo to edit a memo for the case. Click on Files to link files and file text to the case.</source>
-        <translation type="unfinished"></translation>
+        <translation>ケース名をダブルクリックして、名前を変更します。メモ]をクリックすると、ケースのメモを編集できます。ファイル]をクリックして、ファイルとファイルテキストをケースにリンクします。</translation>
     </message>
     <message>
         <location filename="ui_dialog_cases.py" line="106"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add case&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>ケースを追加する</translation>
     </message>
     <message>
         <location filename="ui_dialog_cases.py" line="107"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete case&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>ケースを削除</translation>
     </message>
     <message>
         <location filename="ui_dialog_cases.py" line="108"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Import cases&lt;/p&gt;&lt;p&gt;Import from a csv or xlsx file.&lt;/p&gt;&lt;p&gt;The file must have a header row and the first column must have the unique case names or identifiers. Subsequent columns are attributes for each case.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>輸入事例</translation>
     </message>
     <message>
         <location filename="ui_dialog_cases.py" line="109"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add attribute&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>属性の追加</translation>
     </message>
     <message>
         <location filename="ui_dialog_cases.py" line="110"/>
         <source>.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_cases.py" line="111"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Case file manager&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>ケースファイルマネージャー</translation>
     </message>
     <message>
         <location filename="ui_dialog_cases.py" line="112"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export attributes to file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>属性をファイルにエクスポート</translation>
     </message>
     <message>
         <location filename="ui_dialog_cases.py" line="113"/>
         <source>Help</source>
-        <translation type="unfinished"></translation>
+        <translation>ヘルプ</translation>
     </message>
     <message>
         <location filename="ui_dialog_cases.py" line="114"/>
         <source>Cases: </source>
-        <translation type="unfinished"></translation>
+        <translation>事例: </translation>
     </message>
 </context>
 <context>
@@ -1304,42 +1304,42 @@ Key shortcut: Ctrl S</source>
     <message>
         <location filename="ui_dialog_code_colours.py" line="95"/>
         <source>Code colour scheme</source>
-        <translation type="unfinished"></translation>
+        <translation>コードの配色</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_colours.py" line="96"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This coded area&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>このコード化された領域</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_colours.py" line="97"/>
         <source>Codes colour scheme. Select colours in order. Select codes. Apply.</source>
-        <translation type="unfinished"></translation>
+        <translation>コード配色。順番に色を選択します。コードを選択します。適用する。</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_colours.py" line="98"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Undo all changes.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>すべての変更を元に戻す。</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_colours.py" line="102"/>
         <source>Clear selection</source>
-        <translation type="unfinished"></translation>
+        <translation>クリアセレクション</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_colours.py" line="100"/>
         <source>Apply colours to codes</source>
-        <translation type="unfinished"></translation>
+        <translation>コードに色を付ける</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_colours.py" line="101"/>
         <source>Perspective: normal vision</source>
-        <translation type="unfinished"></translation>
+        <translation>遠近法：通常の視力</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_colours.py" line="103"/>
         <source>Change perspective</source>
-        <translation type="unfinished"></translation>
+        <translation>視点を変える</translation>
     </message>
 </context>
 <context>
@@ -1632,27 +1632,27 @@ Key shortcut: Ctrl S</source>
     <message>
         <location filename="ui_dialog_report_code_summary.py" line="64"/>
         <source>Code summary</source>
-        <translation type="unfinished"></translation>
+        <translation>コード概要</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_code_summary.py" line="65"/>
         <source>Search for next occurence in results</source>
-        <translation type="unfinished"></translation>
+        <translation>結果内の次の語句を検索</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_code_summary.py" line="66"/>
         <source>Search results for text</source>
-        <translation type="unfinished"></translation>
+        <translation>テキストの検索結果</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_code_summary.py" line="67"/>
         <source>Search:</source>
-        <translation type="unfinished"></translation>
+        <translation>検索：</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_code_summary.py" line="68"/>
         <source>Code summary report</source>
-        <translation type="unfinished"></translation>
+        <translation>コード・サマリー・レポート</translation>
     </message>
 </context>
 <context>
@@ -1660,118 +1660,118 @@ Key shortcut: Ctrl S</source>
     <message>
         <location filename="ui_dialog_code_text.py" line="402"/>
         <source>Code Text</source>
-        <translation type="unfinished"></translation>
+        <translation>コード・テキスト</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="403"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Auto code with exact text.&lt;/p&gt;&lt;p&gt;Right click for options: all, first, last.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>正確なテキストで自動コード。右クリックでオプション：すべて、最初、最後</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="404"/>
         <source>Coder:</source>
-        <translation type="unfinished"></translation>
+        <translation>コーダー</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="405"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search for text.&lt;/p&gt;&lt;p&gt;check &lt;span style=&quot; font-weight:600;&quot;&gt;Case sensitive&lt;/span&gt; for case sensitive search&lt;/p&gt;&lt;p&gt;check &lt;span style=&quot; font-weight:600;&quot;&gt;All files&lt;/span&gt; for searching all files search&lt;/p&gt;
 &lt;p&gt;Right-click to change automatic searching options&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>テキストを検索します。</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="407"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;search case sensitive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>大文字と小文字を区別する</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="408"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;search all files&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>すべてのファイルを検索</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="409"/>
         <source>0 / 0</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="410"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Previous&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>前へ</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="411"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>次へ</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="412"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search text. All text files.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>検索テキスト すべてのテキストファイル</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="413"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search text. Case sensitive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>検索テキスト 大文字と小文字を区別する</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="414"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Text fragment to auto code sentences. This file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>文章をオートコード化するためのテキストフラグメント。このファイル</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="415"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Text fragment to auto code sentences. All files.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>テキストの断片を自動コード文に。</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="416"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Undo auto coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>自動コーディングの取り消し</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="417"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete all codes by this coder from this file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>このコーダーによるすべてのコードをこのファイルから削除する。</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="418"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Annotate selection&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>選択範囲に注釈を付ける</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="419"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Memo for this coded section&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>このコード化されたセクションのメモ</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="420"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Text font size.&lt;/p&gt;&lt;p&gt;A default size can be set in Settings.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>デフォルトのサイズは「設定」で設定できます。</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="421"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. &lt;/p&gt;&lt;p&gt;A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A ‘*’ after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;‘&lt;/span&gt;\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: www.rexegg.com/regex-quickstart.html&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>検索には Regex 関数を使用します。</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="422"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Auto code using start and end marks.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>開始記号と終了記号を使ったオートコード。</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="423"/>
         <source>Help</source>
-        <translation type="unfinished"></translation>
+        <translation>ヘルプ</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="424"/>
         <source>Show memos</source>
-        <translation type="unfinished"></translation>
+        <translation>メモを表示する</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="425"/>
         <source>Show annotations</source>
-        <translation type="unfinished"></translation>
+        <translation>注釈の表示</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="426"/>
@@ -1781,187 +1781,192 @@ Select text that is not underlined and delete or paste over.
 Avoid selecting text to delete or paste over if the selected text is underlined:
 (coded - red, annotated - yellow, case-assigned - green)
 As all assigned positions may be incorrect. </source>
-        <translation type="unfinished"></translation>
+        <translation>テキストの編集 
+テキストを選択せずに位置をクリックすると、テキストの入力、削除、貼り付けができます。
+下線が引かれていないテキストを選択し、削除またはペーストします。
+選択したテキストに下線が引かれている場合は、テキストを選択して削除または貼り付けることは避けてください：
+(コード化 - 赤、注釈 - 黄、ケース指定 - 緑）。
+割り当てられた位置がすべて正しくない可能性があるためです。</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="433"/>
         <source>Export</source>
-        <translation type="unfinished"></translation>
+        <translation>輸出</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="434"/>
         <source>html</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="435"/>
         <source>odt</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="436"/>
         <source>txt</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="437"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;After editing the text:&lt;/p&gt;&lt;p&gt;Review edited text to confirm code positions are correct. Press button to Undo edited text, if code postions are incorrect. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>テキストを編集した後 &gt;編集したテキストを見直して、コードの位置が正しいことを確認する。コード位置が正しくない場合は、ボタンを押して編集したテキストを元に戻す。</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="438"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set default colour for new codes&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>新しいコードのデフォルトカラーを設定する</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="439"/>
         <source>8</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="440"/>
         <source>10</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="441"/>
         <source>12</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="442"/>
         <source>14</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="443"/>
         <source>16</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="444"/>
         <source>18</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="445"/>
         <source>20</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="446"/>
         <source>22</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="447"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show side pane&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>サイドペインの表示</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="448"/>
         <source>Exit Edit text </source>
-        <translation type="unfinished"></translation>
+        <translation>テキストの編集を終了する </translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="449"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File with latest coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>最新のコーディングファイル</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="450"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Go to bookmark&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>ブックマークへ</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="451"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>次のファイル</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="452"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File memo&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイルメモ</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="453"/>
         <source>Show files with file attributes</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイル属性を持つファイルを表示する</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="454"/>
         <source>Documents</source>
-        <translation type="unfinished"></translation>
+        <translation>書類</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="455"/>
         <source>Select a document</source>
-        <translation type="unfinished"></translation>
+        <translation>ドキュメントを選択する</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="456"/>
         <source>Click here to define the options for the AI based search</source>
-        <translation type="unfinished"></translation>
+        <translation>人工知能ベースの検索オプションを定義するには、ここをクリックしてください。</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="457"/>
         <source>&lt;Start AI Search&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>人工知能の検索を開始する</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="458"/>
         <source>AI Assistance</source>
-        <translation type="unfinished"></translation>
+        <translation>人工知能による支援</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="459"/>
         <source>Use the AI to find data</source>
-        <translation type="unfinished"></translation>
+        <translation>人工知能を使ってデータを見つける</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="460"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show all codings&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>すべてのコーディングを表示する</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="461"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show previous coding of selected code&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>選択したコードの以前のコーディングを表示する</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="462"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show next coding of selected code.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>選択したコードの次のコーディングを表示する</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="463"/>
         <source>Show codings flagged important</source>
-        <translation type="unfinished"></translation>
+        <translation>重要なフラグを付けたコーディングを表示する</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="464"/>
         <source>Right click below to create new codes and categories</source>
-        <translation type="unfinished"></translation>
+        <translation>新しいコードとカテゴリーを作成するには、以下を右クリックしてください。</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="465"/>
         <source>Code rule with examples</source>
-        <translation type="unfinished"></translation>
+        <translation>コード・ルールとその例</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="466"/>
         <source>Current journal</source>
-        <translation type="unfinished"></translation>
+        <translation>現在のジャーナル</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="467"/>
         <source>Project memo</source>
-        <translation type="unfinished"></translation>
+        <translation>プロジェクトメモ</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="468"/>
         <source>.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2012,12 +2017,12 @@ As all assigned positions may be incorrect. </source>
     <message>
         <location filename="ui_dialog_confirm_delete.py" line="34"/>
         <source>Confirm Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>削除の確認</translation>
     </message>
     <message>
         <location filename="ui_dialog_confirm_delete.py" line="35"/>
         <source>.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2025,27 +2030,27 @@ As all assigned positions may be incorrect. </source>
     <message>
         <location filename="ui_dialog_report_file_summary.py" line="64"/>
         <source>File summary</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイル概要</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_file_summary.py" line="65"/>
         <source>Search:</source>
-        <translation type="unfinished"></translation>
+        <translation>検索：</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_file_summary.py" line="66"/>
         <source>Search results for text</source>
-        <translation type="unfinished"></translation>
+        <translation>テキストの検索結果</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_file_summary.py" line="67"/>
         <source>Search for next occurence in results</source>
-        <translation type="unfinished"></translation>
+        <translation>結果内の次の語句を検索</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_file_summary.py" line="68"/>
         <source>File summary report</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイル概要レポート</translation>
     </message>
 </context>
 <context>
@@ -2053,7 +2058,7 @@ As all assigned positions may be incorrect. </source>
     <message>
         <location filename="ui_dialog_information.py" line="34"/>
         <source>Information</source>
-        <translation type="unfinished"></translation>
+        <translation>インフォメーション</translation>
     </message>
 </context>
 <context>
@@ -2061,102 +2066,102 @@ As all assigned positions may be incorrect. </source>
     <message>
         <location filename="ui_dialog_journals.py" line="125"/>
         <source>Journals</source>
-        <translation type="unfinished"></translation>
+        <translation>雑誌</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="126"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Create&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>作成</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="127"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>輸出</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="128"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>削除</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="129"/>
         <source>Journal:</source>
-        <translation type="unfinished"></translation>
+        <translation>ジャーナル:</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="130"/>
         <source>Journals: </source>
-        <translation type="unfinished"></translation>
+        <translation>雑誌: </translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="131"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export all journals as single text file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>すべてのジャーナルを単一のテキストファイルとしてエクスポート</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="132"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. &lt;/p&gt;&lt;p&gt;A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A ‘*’ after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;‘&lt;/span&gt;\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>検索には Regex 関数を使用します。</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="133"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>次へ</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="134"/>
         <source>0 / 0</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="135"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search for text.&lt;/p&gt;&lt;p&gt;check &lt;span style=&quot; font-weight:600;&quot;&gt;All journals&lt;/span&gt; for searching all journals&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>テキストを検索する。</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="136"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;search all journals&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>すべてのジャーナルを検索</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="137"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Previous&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>前へ</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="138"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search all journals&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>すべてのジャーナルを検索</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="139"/>
         <source>Help</source>
-        <translation type="unfinished"></translation>
+        <translation>ヘルプ</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="140"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add Attribute&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>属性の追加</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="142"/>
         <source>Name</source>
-        <translation type="unfinished"></translation>
+        <translation>名称</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="144"/>
         <source>Modified</source>
-        <translation type="unfinished"></translation>
+        <translation>変形</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="146"/>
         <source>Coder</source>
-        <translation type="unfinished"></translation>
+        <translation>コーダー</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="148"/>
         <source>jid</source>
-        <translation type="unfinished"></translation>
+        <translation>jid</translation>
     </message>
 </context>
 <context>
@@ -2164,17 +2169,17 @@ As all assigned positions may be incorrect. </source>
     <message>
         <location filename="ui_dialog_manage_attributes.py" line="47"/>
         <source>Attributes</source>
-        <translation type="unfinished"></translation>
+        <translation>属性</translation>
     </message>
     <message>
         <location filename="ui_dialog_manage_attributes.py" line="48"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>追加</translation>
     </message>
     <message>
         <location filename="ui_dialog_manage_attributes.py" line="49"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>削除</translation>
     </message>
 </context>
 <context>
@@ -2815,7 +2820,7 @@ Wildcards for &apos;like&apos; are % and _</source>
     <message>
         <location filename="ui_dialog_select_items.py" line="38"/>
         <source>Select Items</source>
-        <translation type="unfinished"></translation>
+        <translation>項目を選択</translation>
     </message>
 </context>
 <context>
@@ -2921,37 +2926,37 @@ Not recommended unless you have many large files slowing the backup.</source>
     <message>
         <location filename="ui_dialog_settings.py" line="442"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Close and open the software for the change in language to occur.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>言語を変更するために、ソフトウェアを一旦終了し、開いてください。</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="443"/>
         <source>General font and size</source>
-        <translation type="unfinished"></translation>
+        <translation>一般的なフォントとサイズ</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="444"/>
         <source>Font size for codes tree</source>
-        <translation type="unfinished"></translation>
+        <translation>コードツリーのフォントサイズ</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="445"/>
         <source>Font size for documents</source>
-        <translation type="unfinished"></translation>
+        <translation>文書のフォントサイズ</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="446"/>
         <source>Reports with text context</source>
-        <translation type="unfinished"></translation>
+        <translation>テキスト・コンテキスト付きレポート</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="447"/>
         <source>Characters before and after</source>
-        <translation type="unfinished"></translation>
+        <translation>前後の文字</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="448"/>
         <source>Text context, coded text style</source>
-        <translation type="unfinished"></translation>
+        <translation>テキストコンテキスト、コード化されたテキストスタイル</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="463"/>
@@ -3006,12 +3011,12 @@ Not recommended unless you have many large files slowing the backup.</source>
     <message>
         <location filename="ui_dialog_settings.py" line="473"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show the identifying numbers for files, cases, codes, et cetera.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイル、ケース、コードなどの識別番号を示す。</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="474"/>
         <source>Show IDs</source>
-        <translation type="unfinished"></translation>
+        <translation>識別子を表示</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="475"/>
@@ -3237,62 +3242,62 @@ Not recommended unless you have many large files slowing the backup.</source>
     <message>
         <location filename="ui_dialog_SQL.py" line="81"/>
         <source>SQL_statements</source>
-        <translation type="unfinished"></translation>
+        <translation>SQL_ステートメント</translation>
     </message>
     <message>
         <location filename="ui_dialog_SQL.py" line="82"/>
         <source>SQL reports</source>
-        <translation type="unfinished"></translation>
+        <translation>SQLレポート</translation>
     </message>
     <message>
         <location filename="ui_dialog_SQL.py" line="83"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Run&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>実行する</translation>
     </message>
     <message>
         <location filename="ui_dialog_SQL.py" line="84"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export to Excel&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Excelへのエクスポート</translation>
     </message>
     <message>
         <location filename="ui_dialog_SQL.py" line="85"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export to CSV file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>CSVファイルへのエクスポート</translation>
     </message>
     <message>
         <location filename="ui_dialog_SQL.py" line="86"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delimiter for export&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>輸出用デリミター</translation>
     </message>
     <message>
         <location filename="ui_dialog_SQL.py" line="87"/>
         <source>tab</source>
-        <translation type="unfinished"></translation>
+        <translation>タブ</translation>
     </message>
     <message>
         <location filename="ui_dialog_SQL.py" line="88"/>
         <source>,</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_SQL.py" line="89"/>
         <source>;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_SQL.py" line="90"/>
         <source>|</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_SQL.py" line="91"/>
         <source>All fields quoted with quotation marks.</source>
-        <translation type="unfinished"></translation>
+        <translation>すべてのフィールドを引用符で囲む。</translation>
     </message>
     <message>
         <location filename="ui_dialog_SQL.py" line="92"/>
         <source>Quote</source>
-        <translation type="unfinished"></translation>
+        <translation>引用</translation>
     </message>
 </context>
 <context>
@@ -3388,7 +3393,7 @@ Not recommended unless you have many large files slowing the backup.</source>
     <message>
         <location filename="ui_dialog_view_av.py" line="176"/>
         <source>1.0x</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="177"/>
@@ -3469,7 +3474,7 @@ red underline = Assigned to code or annotation</source>
     <message>
         <location filename="ui_dialog_view_av.py" line="193"/>
         <source>0 / 0</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -3490,55 +3495,58 @@ red underline = Assigned to code or annotation</source>
     <message>
         <location filename="ui_dialog_view_text.py" line="73"/>
         <source>View and Edit Text</source>
-        <translation type="unfinished"></translation>
+        <translation>テキストの表示と編集</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_text.py" line="74"/>
         <source>Clear all text</source>
-        <translation type="unfinished"></translation>
+        <translation>すべてのテキストを消去する</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_text.py" line="75"/>
         <source>Clear</source>
-        <translation type="unfinished"></translation>
+        <translation>クリア</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_text.py" line="76"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>次へ</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_text.py" line="77"/>
         <source>Search for text.</source>
-        <translation type="unfinished"></translation>
+        <translation>テキストを検索する。</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_text.py" line="78"/>
         <source>0 / 0</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_view_text.py" line="79"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. &lt;/p&gt;&lt;p&gt;A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A ‘*’ after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;‘&lt;/span&gt;\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>検索には Regex 関数を使用します。</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_text.py" line="80"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Previous&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>前へ</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_text.py" line="81"/>
         <source>Avoid selecting sections of text with a combination of not underlined (not coded / annotated / case-assigned) and underlined (coded, annotated, case-assigned).
 Positions of the underlying codes / annotations / case-assigned may not correctly adjust if text is typed over or deleted.
 Do not code this text until you reload Coding - Code Text from the menu bar.</source>
-        <translation type="unfinished"></translation>
+        <translation>下線なし（コードなし／注釈あり／ケース指定あり）と下線あり（コードあり／注釈あり／ケース指定あり）の組み合わせでテキストのセクションを選択することは避けてください。
+テキストを打ち直したり、削除したりすると、コード/注釈/大文字小文字の位置が正しく調整されないことがあります。
+メニューバーから「コーディング - コードテキスト」を再読み込みするまで、このテキストをコーディングしないでください。</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_text.py" line="84"/>
         <source>Do not select sections of text with a combination of not underlined (not coded / annotated / case-assigned) and underlined (coded, annotated, case-assigned). Positions of the underlying codes / annotations / case-assigned may not correctly adjust if selected text is typed over or deleted.
 Do not code this text until you reload Coding - Code Text from the menu bar.</source>
-        <translation type="unfinished"></translation>
+        <translation>下線なし(コードなし/注釈あり/ケース指定あり)と下線あり(コードあり/注釈あり/ケース指定あり)の組み合わせでテキストのセクションを選択しないでください。選択したテキストを打ち直したり、削除したりすると、コード/注釈/ケースアサイ ントの位置が正しく調整されないことがあります。
+メニューバーから「コーディング - コードテキスト」を再読み込みするまで、このテキストをコーディングしないでください。</translation>
     </message>
 </context>
 <context>
