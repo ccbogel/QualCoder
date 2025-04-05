@@ -72,8 +72,10 @@ class DialogSettings(QtWidgets.QDialog):
                 if row[0] != "":
                     coders.append(row[0])
         self.ui.comboBox_coders.addItems(coders)
+        '''Future to add Swedish languages = ["Deutsch de", "English en", "Español es", "Français fr",
+                     "Italiano it", "日本語 ja", "Português pt", "svenska sv", "中国人 zh"]'''
         languages = ["Deutsch de", "English en", "Español es", "Français fr",
-                     "Italiano it", "日本語 ja", "Português pt", "svenska sv", "中国人 zh"]
+                     "Italiano it", "日本語 ja", "Português pt", "中国人 zh"]
         self.ui.comboBox_language.addItems(languages)
         for index, lang in enumerate(languages):
             if lang[-2:] == self.settings['language']:
