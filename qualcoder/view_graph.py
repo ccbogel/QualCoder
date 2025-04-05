@@ -812,19 +812,19 @@ class ViewGraph(QDialog):
         """
 
         # Line color selection
-        names = [_("gray"), _("blue"), _("cyan"), _("magenta"), _("green"), _("red"), _("yellow"), _("orange")]
+        colours = [{"name": _("gray"), "english": "gray"}, {"name": _("blue"), "english": "blue"},
+                   {"name": _("cyan"), "english": "cyan"}, {"name": _("magenta"), "english": "magenta"},
+                   {"name": _("green"), "english": "green"}, {"name": _("red"), "english": "red"},
+                   {"name": _("yellow"), "english": "yellow"}, {"name": _("orange"), "english": "orange"}]
         if obj_type != "line":
-            names = [_("gray"), _("blue"), _("cyan"), _("magenta"), _("green"), _("red"), _("yellow"), _("orange"),
-                     _("white"), _("black")]
-        names_dict_list = []
-        for n in names:
-            names_dict_list.append({'name': n})
-        ui = DialogSelectItems(self.app, names_dict_list, _("Colour"), "single")
+            colours.append({"name": _("white"), "english": "white"})
+            colours.append({"name": _("black"), "english": "black"})
+        ui = DialogSelectItems(self.app, colours, _("Colour"), "single")
         ok = ui.exec()
         if not ok:
             return ""
         selected_color = ui.get_selected()
-        return selected_color['name']
+        return selected_color['english']
 
     def add_text_item_to_graph(self, x=20, y=20):
         """ Add text item to graph.
