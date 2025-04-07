@@ -215,93 +215,96 @@ Codings from the entire text file are used for the calculations.</source>
     <message>
         <location filename="ui_dialog_graph.py" line="118"/>
         <source>Graph Visualisation</source>
-        <translation type="unfinished"></translation>
+        <translation>グラフの視覚化</translation>
     </message>
     <message>
         <location filename="ui_dialog_graph.py" line="119"/>
         <source>Export image</source>
-        <translation type="unfinished"></translation>
+        <translation>画像のエクスポート</translation>
     </message>
     <message>
         <location filename="ui_dialog_graph.py" line="120"/>
         <source>Click on the graph area and press + or W to zoom in. Press - or Q to zoom in or zoom out.</source>
-        <translation type="unfinished"></translation>
+        <translation>グラフ領域をクリックし、＋またはWを押してズームインする。またはQを押して拡大または縮小します。</translation>
     </message>
     <message>
         <location filename="ui_dialog_graph.py" line="121"/>
         <source>Reveal hidden items</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>隠されたアイテムを明らかにする</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_graph.py" line="122"/>
         <source>Save graph</source>
-        <translation type="unfinished"></translation>
+        <translation>保存グラフ</translation>
     </message>
     <message>
         <location filename="ui_dialog_graph.py" line="123"/>
         <source>Load graph
 Right-click for options</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>グラフを読み込む
+右クリックでオプション</translatorcomment>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_graph.py" line="125"/>
         <source>Delete graph</source>
-        <translation type="unfinished"></translation>
+        <translation>削除グラフ</translation>
     </message>
     <message>
         <location filename="ui_dialog_graph.py" line="126"/>
         <source>Add free text item</source>
-        <translation type="unfinished"></translation>
+        <translation>フリーテキスト項目の追加</translation>
     </message>
     <message>
         <location filename="ui_dialog_graph.py" line="127"/>
         <source>Add case items</source>
-        <translation type="unfinished"></translation>
+        <translation>ケース項目の追加</translation>
     </message>
     <message>
         <location filename="ui_dialog_graph.py" line="128"/>
         <source>Add file items</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイル項目の追加</translation>
     </message>
     <message>
         <location filename="ui_dialog_graph.py" line="129"/>
         <source>Add connecting line</source>
-        <translation type="unfinished"></translation>
+        <translation>接続線の追加</translation>
     </message>
     <message>
         <location filename="ui_dialog_graph.py" line="130"/>
         <source>Select code branch</source>
-        <translation type="unfinished"></translation>
+        <translation>コードブランチを選択</translation>
     </message>
     <message>
         <location filename="ui_dialog_graph.py" line="131"/>
         <source>Clear</source>
-        <translation type="unfinished"></translation>
+        <translation>クリア</translation>
     </message>
     <message>
         <location filename="ui_dialog_graph.py" line="132"/>
         <source>Changing to another report will lose unsaved graph.</source>
-        <translation type="unfinished"></translation>
+        <translation>他のレポートに変更すると、保存されていないグラフが失われます。</translation>
     </message>
     <message>
         <location filename="ui_dialog_graph.py" line="133"/>
         <source>Show coded segments of text files</source>
-        <translation type="unfinished"></translation>
+        <translation>テキストファイルのコード化されたセグメントを表示する</translation>
     </message>
     <message>
         <location filename="ui_dialog_graph.py" line="134"/>
         <source>Show coding memos of coded segments</source>
-        <translation type="unfinished"></translation>
+        <translation>コーディングされたセグメントのコーディングメモを表示する</translation>
     </message>
     <message>
         <location filename="ui_dialog_graph.py" line="135"/>
         <source>Show coded areas of image files</source>
-        <translation type="unfinished"></translation>
+        <translation>画像ファイルのコード化された領域を表示する</translation>
     </message>
     <message>
         <location filename="ui_dialog_graph.py" line="136"/>
         <source>Show coded av segments</source>
-        <translation type="unfinished"></translation>
+        <translation>コード化されたオーディオ/ビデオ・セグメントを表示</translation>
     </message>
 </context>
 <context>
@@ -309,73 +312,74 @@ Right-click for options</source>
     <message>
         <location filename="ui_report_matching_segments.py" line="105"/>
         <source>Report matching text segments</source>
-        <translation type="unfinished"></translation>
+        <translation>一致するテキストセグメントを報告する</translation>
     </message>
     <message>
         <location filename="ui_report_matching_segments.py" line="106"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select coder. Blank for all.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>コーダーを選択。すべて空欄。</translation>
     </message>
     <message>
         <location filename="ui_report_matching_segments.py" line="107"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_report_matching_segments.py" line="108"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Exact match text segments report&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>完全一致テキストセグメントレポート</translation>
     </message>
     <message>
         <location filename="ui_report_matching_segments.py" line="109"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select coder. Blank for all&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>コーダーを選択します。すべて空欄</translation>
     </message>
     <message>
         <location filename="ui_report_matching_segments.py" line="110"/>
         <source>Coder</source>
-        <translation type="unfinished"></translation>
+        <translation>コーダー</translation>
     </message>
     <message>
         <location filename="ui_report_matching_segments.py" line="111"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export Excel file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>エクセルファイルのエクスポート</translation>
     </message>
     <message>
         <location filename="ui_report_matching_segments.py" line="112"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Run&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>実行する</translation>
     </message>
     <message>
         <location filename="ui_report_matching_segments.py" line="113"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Coded text must include the text here.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>コード化されたテキストには、以下のテキストを含めなければならない。</translation>
     </message>
     <message>
         <location filename="ui_report_matching_segments.py" line="114"/>
         <source>Include text</source>
-        <translation type="unfinished"></translation>
+        <translation>テキストを含む</translation>
     </message>
     <message>
         <location filename="ui_report_matching_segments.py" line="115"/>
         <source>Select file(s), coder, 2 or more codes. Can exclude results by excluding a code (right click on code).</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイル、コーダー、2つ以上のコードを選択。コードを除外して結果を除外することができます（コードを右クリック）。</translation>
     </message>
     <message>
         <location filename="ui_report_matching_segments.py" line="116"/>
         <source>Unchecked - all selected codes must match exactly.
 Checked - any selected codes must match exactly.</source>
-        <translation type="unfinished"></translation>
+        <translation>チェックなし - 選択されたコードはすべて正確に一致しなければならない。
+チェックあり - 選択されたコードはすべて正確に一致する必要があります。</translation>
     </message>
     <message>
         <location filename="ui_report_matching_segments.py" line="118"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Matching exact coded text for multiple codes are collated into one line.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>複数のコードに完全に一致するコード化されたテキストは、1行に集約される。</translation>
     </message>
     <message>
         <location filename="ui_report_matching_segments.py" line="119"/>
         <source>One line results</source>
-        <translation type="unfinished"></translation>
+        <translation>1行の結果</translation>
     </message>
 </context>
 <context>
@@ -457,87 +461,87 @@ Checked - any selected codes must match exactly.</source>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="195"/>
         <source>AI Prompts Library</source>
-        <translation type="unfinished"></translation>
+        <translation>プロンプト・ライブラリー</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="196"/>
         <source>Analytic Prompts:</source>
-        <translation type="unfinished"></translation>
+        <translation>分析的なプロンプト：</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="197"/>
         <source>New</source>
-        <translation type="unfinished"></translation>
+        <translation>新しい</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="198"/>
         <source>Duplicate</source>
-        <translation type="unfinished"></translation>
+        <translation>重複</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="199"/>
         <source>Copy prompt to clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>プロンプトをクリップボードにコピー</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="204"/>
         <source>...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="201"/>
         <source>Paste prompt from clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>クリップボードからプロンプトを貼り付ける</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="203"/>
         <source>Delete prompt</source>
-        <translation type="unfinished"></translation>
+        <translation>プロンプトの削除</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="205"/>
         <source>Prompt Name:</source>
-        <translation type="unfinished"></translation>
+        <translation>プロンプト名：</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="206"/>
         <source>(Uneditable system prompt)</source>
-        <translation type="unfinished"></translation>
+        <translation>(編集不可システムプロンプト）</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="207"/>
         <source>Scope:</source>
-        <translation type="unfinished"></translation>
+        <translation>スコープ：</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="208"/>
         <source>system</source>
-        <translation type="unfinished"></translation>
+        <translation>システム</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="209"/>
         <source>user</source>
-        <translation type="unfinished"></translation>
+        <translation>ユーザー</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="210"/>
         <source>project</source>
-        <translation type="unfinished"></translation>
+        <translation>プロジェクト</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="211"/>
         <source>Type:</source>
-        <translation type="unfinished"></translation>
+        <translation>タイプ：</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="212"/>
         <source>Prompt description:</source>
-        <translation type="unfinished"></translation>
+        <translation>プロンプトの説明：</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="213"/>
         <source>Prompt text (this will be send to the AI):</source>
-        <translation type="unfinished"></translation>
+        <translation>プロンプトテキスト（これは人工知能に送信されます）：</translation>
     </message>
 </context>
 <context>
@@ -545,102 +549,102 @@ Checked - any selected codes must match exactly.</source>
     <message>
         <location filename="ui_ai_search.py" line="194"/>
         <source>AI search</source>
-        <translation type="unfinished"></translation>
+        <translation>人工知能検索</translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="195"/>
         <source>1) What do you want to search for?</source>
-        <translation type="unfinished"></translation>
+        <translation>1) 何を検索したいのか？</translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="196"/>
         <source>Please select a code or category</source>
-        <translation type="unfinished"></translation>
+        <translation>コードまたはカテゴリーを選択してください</translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="197"/>
         <source>Send not only the name but also the memo associated with a code to the AI?</source>
-        <translation type="unfinished"></translation>
+        <translation>名前だけでなく、コードに関連するメモも人工知能に送るのか？</translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="198"/>
         <source>Send memo to AI</source>
-        <translation type="unfinished"></translation>
+        <translation>人工知能にメモを送る</translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="199"/>
         <source>If deselected (default), the AI searches for new material only. Segments already coded with this code are excluded from the results.</source>
-        <translation type="unfinished"></translation>
+        <translation>非選択（デフォルト）の場合、AIは新しい素材のみを検索する。すでにこのコードでコード化されているセグメントは結果から除外される。</translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="200"/>
         <source>Include coded segments</source>
-        <translation type="unfinished"></translation>
+        <translation>コード化されたセグメントを含む</translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="201"/>
         <source>Code search</source>
-        <translation type="unfinished"></translation>
+        <translation>コード検索</translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="202"/>
         <source>Topic or phenomenon to search for:</source>
-        <translation type="unfinished"></translation>
+        <translation>検索するトピックまたは現象：</translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="203"/>
         <source>Enter a good descriptive name for what you are looking for.</source>
-        <translation type="unfinished"></translation>
+        <translation>探しているものを説明するのに適した名前を入力してください。</translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="204"/>
         <source>Description:</source>
-        <translation type="unfinished"></translation>
+        <translation>説明する：</translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="205"/>
         <source>Give a short description so that the AI can better understand what you are looking for</source>
-        <translation type="unfinished"></translation>
+        <translation>人工知能があなたが探しているものをよりよく理解できるように、簡単な説明をしてください。</translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="206"/>
         <source>Free search</source>
-        <translation type="unfinished"></translation>
+        <translation>無料検索</translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="207"/>
         <source>2) How to analyze the data?</source>
-        <translation type="unfinished"></translation>
+        <translation>2) データをどのように分析するか？</translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="208"/>
         <source>Analytic Prompt:</source>
-        <translation type="unfinished"></translation>
+        <translation>分析的なプロンプト：</translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="209"/>
         <source>Edit prompt or create your own (advanced option)</source>
-        <translation type="unfinished"></translation>
+        <translation>プロンプトの編集または独自のプロンプトの作成（詳細オプション）</translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="210"/>
         <source> Edit </source>
-        <translation type="unfinished"></translation>
+        <translation> 編集 </translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="211"/>
         <source>3) Filter the data?</source>
-        <translation type="unfinished"></translation>
+        <translation>3) データにフィルタをかける？</translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="212"/>
         <source>Filter with the help of attributes</source>
-        <translation type="unfinished"></translation>
+        <translation>属性の助けを借りてフィルタリングする</translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="213"/>
         <source>Select Attributes</source>
-        <translation type="unfinished"></translation>
+        <translation>属性を選択</translation>
     </message>
 </context>
 <context>
@@ -648,122 +652,122 @@ Checked - any selected codes must match exactly.</source>
     <message>
         <location filename="ui_dialog_code_relations.py" line="149"/>
         <source>Code relations</source>
-        <translation type="unfinished"></translation>
+        <translation>コード関係</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="150"/>
         <source>Relations between codes in text files.</source>
-        <translation type="unfinished"></translation>
+        <translation>テキストファイルのコード間の関係。</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="151"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export csv file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>csvファイルのエクスポート</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="152"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Calculate&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>計算する</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="153"/>
         <source>This coder</source>
-        <translation type="unfinished"></translation>
+        <translation>このコーダー</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="154"/>
         <source>All coders</source>
-        <translation type="unfinished"></translation>
+        <translation>すべてのコーダー</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="155"/>
         <source>Select text files.</source>
-        <translation type="unfinished"></translation>
+        <translation>テキストファイルを選択する。</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="156"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Relationship types&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>関係タイプ</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="157"/>
         <source>All</source>
-        <translation type="unfinished"></translation>
+        <translation>すべて</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="158"/>
         <source>Overlap</source>
-        <translation type="unfinished"></translation>
+        <translation>オーバーラップ</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="159"/>
         <source>Inclusion</source>
-        <translation type="unfinished"></translation>
+        <translation>包含</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="160"/>
         <source>Exact</source>
-        <translation type="unfinished"></translation>
+        <translation>正確</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="161"/>
         <source>Proximity</source>
-        <translation type="unfinished"></translation>
+        <translation>近さ</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="162"/>
         <source>Overlap Inclusion</source>
-        <translation type="unfinished"></translation>
+        <translation>オーバーラップ・インクルージョン</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="163"/>
         <source>Overlap Inclusion Exact</source>
-        <translation type="unfinished"></translation>
+        <translation>オーバーラップ インクルージョン イグザクト</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="164"/>
         <source>Relationship</source>
-        <translation type="unfinished"></translation>
+        <translation>人間関係</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="165"/>
         <source>Boxplots of distance between code pairs.</source>
-        <translation type="unfinished"></translation>
+        <translation>コードペア間の距離の箱ひげ図。</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="166"/>
         <source>Search Results for:</source>
-        <translation type="unfinished"></translation>
+        <translation>検索結果</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="167"/>
         <source>Search results for text</source>
-        <translation type="unfinished"></translation>
+        <translation>テキストの検索結果</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="168"/>
         <source>Search for next occurence in results</source>
-        <translation type="unfinished"></translation>
+        <translation>結果内の次の語句を検索</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="169"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export Excel report of exact text coding matches for all  files.&lt;/p&gt;&lt;p&gt;Ordered by file name and code name.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>全ファイルのテキストコーディングの完全一致のExcelレポートをエクスポート。ファイル名とコード名の順</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="170"/>
         <source>E</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="171"/>
         <source>Codes:</source>
-        <translation type="unfinished"></translation>
+        <translation>コード：</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="172"/>
         <source>Summary statistics</source>
-        <translation type="unfinished"></translation>
+        <translation>サマリー統計</translation>
     </message>
 </context>
 <context>
@@ -849,22 +853,22 @@ Checked - any selected codes must match exactly.</source>
     <message>
         <location filename="ui_dialog_import.py" line="97"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;NONE 123, abc&lt;/p&gt;&lt;p&gt;MINIMAL 123, &amp;quot;abc&amp;quot;&lt;/p&gt;&lt;p&gt;ALL &amp;quot;123&amp;quot;, &amp;quot;abc&amp;quot;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_import.py" line="98"/>
         <source>NONE</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_import.py" line="99"/>
         <source>MINIMAL</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_import.py" line="100"/>
         <source>ALL</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_import.py" line="101"/>
@@ -892,22 +896,22 @@ Checked - any selected codes must match exactly.</source>
     <message>
         <location filename="ui_import_twitter.py" line="53"/>
         <source>Twitter data import</source>
-        <translation type="unfinished"></translation>
+        <translation>Twitterのデータインポート</translation>
     </message>
     <message>
         <location filename="ui_import_twitter.py" line="54"/>
         <source>Import twitter data file</source>
-        <translation type="unfinished"></translation>
+        <translation>twitterデータファイルのインポート</translation>
     </message>
     <message>
         <location filename="ui_import_twitter.py" line="55"/>
         <source>Use the R statistics package to get the twitter data and create a csv file. Then import the csv file.</source>
-        <translation type="unfinished"></translation>
+        <translation>R統計パッケージを使ってtwitterのデータを取得し、csvファイルを作成する。そしてcsvファイルをインポートする。</translation>
     </message>
     <message>
         <location filename="ui_import_twitter.py" line="56"/>
         <source>Select file</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイルを選択</translation>
     </message>
 </context>
 <context>
@@ -979,37 +983,37 @@ Checked - any selected codes must match exactly.</source>
     <message>
         <location filename="ui_ai_chat.py" line="146"/>
         <source>AI Chat</source>
-        <translation type="unfinished"></translation>
+        <translation>人工知能チャット</translation>
     </message>
     <message>
         <location filename="ui_ai_chat.py" line="147"/>
         <source>Create a new chat</source>
-        <translation type="unfinished"></translation>
+        <translation>新しいチャットを作成する</translation>
     </message>
     <message>
         <location filename="ui_ai_chat.py" line="148"/>
         <source>New</source>
-        <translation type="unfinished"></translation>
+        <translation>新しい</translation>
     </message>
     <message>
         <location filename="ui_ai_chat.py" line="149"/>
         <source>Delete the selected chat</source>
-        <translation type="unfinished"></translation>
+        <translation>選択したチャットを削除する</translation>
     </message>
     <message>
         <location filename="ui_ai_chat.py" line="150"/>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>削除</translation>
     </message>
     <message>
         <location filename="ui_ai_chat.py" line="151"/>
         <source>Help</source>
-        <translation type="unfinished"></translation>
+        <translation>ヘルプ</translation>
     </message>
     <message>
         <location filename="ui_ai_chat.py" line="152"/>
         <source>Enter your question here and press Enter to continue the chat</source>
-        <translation type="unfinished"></translation>
+        <translation>ここに質問を入力し、Enterキーを押してチャットを続けます。</translation>
     </message>
 </context>
 <context>
