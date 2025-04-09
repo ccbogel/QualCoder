@@ -934,7 +934,6 @@ class DialogManageFiles(QtWidgets.QDialog):
                     s['attributes'].append(tmp)
         # Get reference for file, Vancouver and APA style
         # TODO
-
         self.fill_table()
 
     def get_icon_and_metadata(self, id_):
@@ -1401,16 +1400,27 @@ class DialogManageFiles(QtWidgets.QDialog):
             if import_path.split('.')[-1].lower() in ('docx', 'odt', 'txt', 'htm', 'html', 'epub', 'md'):
                 destination += f"/documents/{filename}"
                 if link_path == "":
-                    copyfile(import_path, destination)
-                    self.load_file_text(import_path)
+                    try:
+                        copyfile(import_path, destination)
+                        self.load_file_text(import_path)
+                    except PermissionError as e_:
+                        msg = _("Cannot copy file: ") + filename + _("Is the file open?\nIs there a permission restriction?")+ f"\n{e_}"
+                        Message(self.app, _("Copy file permission error"), msg).exec()
+                        continue
                 else:
                     self.load_file_text(import_path, f"docs:{link_path}")
                 known_file_type = True
             if import_path.split('.')[-1].lower() == 'pdf':
                 destination += f"/documents/{filename}"
                 if link_path == "":
-                    copyfile(import_path, destination)
-                    self.load_file_text(import_path)
+                    try:
+                        copyfile(import_path, destination)
+                        self.load_file_text(import_path)
+                    except PermissionError as e_:
+                        msg = _("Cannot copy file: ") + filename + _(
+                            "Is the file open?\nIs there a permission restriction?") + f"\n{e_}"
+                        Message(self.app, _("Copy file permission error"), msg).exec()
+                        continue
                 else:
                     self.load_file_text(import_path, f"docs:{link_path}")
                 known_file_type = True
@@ -1418,24 +1428,42 @@ class DialogManageFiles(QtWidgets.QDialog):
             if import_path.split('.')[-1].lower() in ('jpg', 'jpeg', 'png'):
                 if link_path == "":
                     destination += f"/images/{filename}"
-                    copyfile(import_path, destination)
-                    self.load_media_reference(f"/images/{filename}")
+                    try:
+                        copyfile(import_path, destination)
+                        self.load_media_reference(f"/images/{filename}")
+                    except PermissionError as e_:
+                        msg = _("Cannot copy file: ") + filename + _(
+                            "Is the file open?\nIs there a permission restriction?") + f"\n{e_}"
+                        Message(self.app, _("Copy file permission error"), msg).exec()
+                        continue
                 else:
                     self.load_media_reference(f"images:{link_path}")
                 known_file_type = True
             if import_path.split('.')[-1].lower() in ('wav', 'mp3', 'm4a'):
                 if link_path == "":
                     destination += f"/audio/{filename}"
-                    copyfile(import_path, destination)
-                    self.load_media_reference(f"/audio/{filename}")
+                    try:
+                        copyfile(import_path, destination)
+                        self.load_media_reference(f"/audio/{filename}")
+                    except PermissionError as e_:
+                        msg = _("Cannot copy file: ") + filename + _(
+                            "Is the file open?\nIs there a permission restriction?") + f"\n{e_}"
+                        Message(self.app, _("Copy file permission error"), msg).exec()
+                        continue
                 else:
                     self.load_media_reference(f"audio:{link_path}")
                 known_file_type = True
             if import_path.split('.')[-1].lower() in ('mkv', 'mov', 'mp4', 'ogg', 'wmv'):
                 if link_path == "":
                     destination += f"/video/{filename}"
-                    copyfile(import_path, destination)
-                    self.load_media_reference(f"/video/{filename}")
+                    try:
+                        copyfile(import_path, destination)
+                        self.load_media_reference(f"/video/{filename}")
+                    except PermissionError as e_:
+                        msg = _("Cannot copy file: ") + filename + _(
+                            "Is the file open?\nIs there a permission restriction?") + f"\n{e_}"
+                        Message(self.app, _("Copy file permission error"), msg).exec()
+                        continue
                 else:
                     self.load_media_reference(f"video:{link_path}")
                 known_file_type = True
