@@ -2250,6 +2250,8 @@ class DialogCodeText(QtWidgets.QWidget):
             code_: code Dictionary
         """
 
+        if not code_:
+            return
         if code_['pos0'] < 1:
             return
         code_['pos0'] -= 1
@@ -2269,6 +2271,8 @@ class DialogCodeText(QtWidgets.QWidget):
             code_: code Dictionary
         """
 
+        if not code_:
+            return
         if code_['pos1'] + 1 >= len(self.ui.textEdit.toPlainText()):
             return
         code_['pos1'] += 1
@@ -2289,6 +2293,8 @@ class DialogCodeText(QtWidgets.QWidget):
             code_: code Dictionary
         """
 
+        if not code_:
+            return
         if code_['pos1'] <= code_['pos0'] + 1:
             return
         code_['pos1'] -= 1
@@ -2308,6 +2314,8 @@ class DialogCodeText(QtWidgets.QWidget):
             code_: code Dictionary
         """
 
+        if not code_:
+            return
         if code_['pos0'] >= code_['pos1'] - 1:
             return
         code_['pos0'] += 1
