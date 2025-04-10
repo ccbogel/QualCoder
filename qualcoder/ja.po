@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-27 07:52+1100\n"
-"PO-Revision-Date: 2025-04-10 08:25+1000\n"
+"PO-Revision-Date: 2025-04-10 22:23+1000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: ja\n"
@@ -1970,7 +1970,7 @@ msgstr "空白またはカテゴリーを選択"
 #: view_graph.py:1295 view_graph.py:1321 view_graph.py:1340 view_graph.py:1361
 #: view_image.py:1804
 msgid "Code: "
-msgstr "コード"
+msgstr "コード: "
 
 #: code_text.py:1692 code_text.py:1715 view_graph.py:373
 msgid "Text: "
@@ -3911,37 +3911,37 @@ msgstr "ファイル別トップカテゴリー"
 
 #: report_codes.py:124
 msgid "Categories by case"
-msgstr ""
+msgstr "ケース別カテゴリー"
 
 #: report_codes.py:125
 msgid "Categories by file"
-msgstr ""
+msgstr "ファイル別カテゴリー"
 
 #: report_codes.py:125
 msgid "Codes by case"
-msgstr ""
+msgstr "ケース別コード"
 
 #: report_codes.py:125
 msgid "Codes by file"
-msgstr ""
+msgstr "ファイル別コード"
 
 #: report_codes.py:128
 msgid "None"
-msgstr ""
+msgstr "なし"
 
 #: report_codes.py:128 report_codes.py:2158 report_codes.py:2459
 msgid "Also code memos"
-msgstr ""
+msgstr "コードメモも"
 
 #: report_codes.py:128 report_codes.py:2709
 msgid "Also coded memos"
-msgstr ""
+msgstr "コードメモも"
 
 #: report_codes.py:128 report_codes.py:2158 report_codes.py:2161
 #: report_codes.py:2165 report_codes.py:2459 report_codes.py:2466
 #: report_codes.py:2709 report_codes.py:2733
 msgid "Also all memos"
-msgstr ""
+msgstr "また、すべてのメモ"
 
 #: report_codes.py:128 report_codes.py:1266 report_codes.py:2158
 #: report_codes.py:2161 report_codes.py:2165 report_codes.py:2459
@@ -3950,46 +3950,46 @@ msgstr ""
 #: report_codes.py:2716 report_codes.py:2728 report_codes.py:2730
 #: report_codes.py:2741 report_codes.py:2743 report_codes.py:2745
 msgid "Only memos"
-msgstr ""
+msgstr "メモのみ"
 
 #: report_codes.py:129 report_codes.py:1268 report_codes.py:2705
 #: report_codes.py:2707 report_codes.py:2712 report_codes.py:2714
 #: report_codes.py:2716 report_codes.py:2728 report_codes.py:2730
 #: report_codes.py:2741 report_codes.py:2743 report_codes.py:2745
 msgid "Only coded memos"
-msgstr ""
+msgstr "コード化されたメモのみ"
 
 #: report_codes.py:129 report_codes.py:1226
 msgid "Annotations"
-msgstr ""
+msgstr "注釈"
 
 #: report_codes.py:129 report_codes.py:1229
 msgid "Codebook memos"
-msgstr ""
+msgstr "コードブック・メモ"
 
 #: report_codes.py:201 report_codes_by_segments.py:117
 msgid "No file selection"
-msgstr ""
+msgstr "ファイル選択なし"
 
 #: report_codes.py:210 report_compare_coder_file.py:146
 #: report_exact_matches.py:134 report_file_summary.py:112
 msgid "Text file\n"
-msgstr ""
+msgstr "テキストファイル\n"
 
 #: report_codes.py:213 report_compare_coder_file.py:150
 #: report_exact_matches.py:138 report_file_summary.py:115
 msgid "Image"
-msgstr ""
+msgstr "画像"
 
 #: report_codes.py:215 report_compare_coder_file.py:153
 #: report_exact_matches.py:141 report_file_summary.py:117
 msgid "Audio"
-msgstr ""
+msgstr "音響"
 
 #: report_codes.py:217 report_compare_coder_file.py:156
 #: report_exact_matches.py:144 report_file_summary.py:119
 msgid "Video"
-msgstr ""
+msgstr "動画"
 
 #: report_codes.py:224 report_compare_coder_file.py:164
 #: report_exact_matches.py:148 report_file_summary.py:126
@@ -3997,321 +3997,332 @@ msgid ""
 "\n"
 "Codings: "
 msgstr ""
+"\n"
+"コーディング： "
 
 #: report_codes.py:240 report_codes_by_segments.py:130
 msgid "No case selection"
-msgstr ""
+msgstr "ケース選択なし"
 
 #: report_codes.py:290 report_codes_by_segments.py:181
 msgid "Select all files"
-msgstr ""
+msgstr "すべてのファイルを選択"
 
 #: report_codes.py:291 report_codes_by_segments.py:182
 msgid "Select files like"
-msgstr ""
+msgstr "などのファイルを選択する。"
 
 #: report_codes.py:292 report_codes.py:327 report_codes_by_segments.py:183
 #: report_codes_by_segments.py:218
 msgid "Select none"
-msgstr ""
+msgstr "なしを選択"
 
 #: report_codes.py:304 report_codes_by_segments.py:195
 msgid "Select some files"
-msgstr ""
+msgstr "いくつかのファイルを選択する"
 
 #: report_codes.py:307 report_codes_by_segments.py:198
 msgid "Show files containing text"
-msgstr ""
+msgstr "テキストを含むファイルを表示する"
 
 #: report_codes.py:325 report_codes_by_segments.py:216
 msgid "Select all cases"
-msgstr ""
+msgstr "すべてのケースを選択"
 
 #: report_codes.py:326 report_codes_by_segments.py:217
 msgid "Select cases like"
-msgstr ""
+msgstr "のようなケースを選択する。"
 
 #: report_codes.py:339 report_codes_by_segments.py:230
 msgid "Select some cases"
-msgstr ""
+msgstr "いくつかのケースを選ぶ"
 
 #: report_codes.py:342 report_codes_by_segments.py:233
 msgid "Select cases containing text"
-msgstr ""
+msgstr "テキストを含むケースを選択"
 
 #: report_codes.py:499 report_codes_by_segments.py:390
 msgid "Select all codes"
-msgstr ""
+msgstr "すべてのコードを選択"
 
 #: report_codes.py:500 report_codes_by_segments.py:391
 msgid "Remove selections"
-msgstr ""
+msgstr "選択項目の削除"
 
 #: report_codes.py:501 report_codes_by_segments.py:392
 msgid "Select codes like"
-msgstr ""
+msgstr "などのコードを選択する。"
 
 #: report_codes.py:516 report_codes_by_segments.py:407
 msgid "Select some codes"
-msgstr ""
+msgstr "いくつかのコードを選択"
 
 #: report_codes.py:519 report_codes_by_segments.py:410
 msgid "Select codes containing text"
-msgstr ""
+msgstr "テキストを含むコードを選択する"
 
 #: report_codes.py:556
 msgid "No matrix"
-msgstr ""
+msgstr "行列なし"
 
 #: report_codes.py:556
 msgid "No matrix results to export"
-msgstr ""
+msgstr "エクスポートする行列の結果がない"
 
 #: report_codes.py:590
 msgid "Matrix exported: "
-msgstr ""
+msgstr "マトリックスがエクスポートされた： "
 
 #: report_codes.py:591
 msgid "Matrix exported"
-msgstr ""
+msgstr "マトリックスがエクスポートされた"
 
 #: report_codes.py:603
 msgid "Save Text File"
-msgstr ""
+msgstr "テキストファイルの保存"
 
 #: report_codes.py:617 report_codes.py:643 report_codes.py:757
 #: report_codes.py:870 report_codes_by_segments.py:445
 #: report_compare_coder_file.py:250
 msgid "Report exported: "
-msgstr ""
+msgstr "レポートがエクスポートされました： "
 
 #: report_codes.py:618 report_codes.py:645 report_codes.py:758
 #: report_codes.py:871 report_codes.py:1015 report_codes_by_segments.py:446
 #: report_compare_coder_file.py:252 report_exact_matches.py:489
 #: report_relations.py:782 reports.py:552
 msgid "Report exported"
-msgstr ""
+msgstr "レポートがエクスポートされました"
 
 #: report_codes.py:629
 msgid "Save Open Document Text File"
-msgstr ""
+msgstr "ODTファイルの保存"
 
 #: report_codes.py:741
 msgid "Save CSV File"
-msgstr ""
+msgstr "CSVファイル保存"
 
 #: report_codes.py:754 report_codes.py:869
 msgid "Each row contains filename, coder, coded, codename and categories."
 msgstr ""
+"各行には、ファイル名、コーダー、コード、コードネーム、カテゴリーが含まれる。"
 
 #: report_codes.py:756
 msgid "And file and case variables"
-msgstr ""
+msgstr "ファイル変数とケース変数"
 
 #: report_codes.py:863 report_codes_by_segments.py:439
 #: report_exact_matches.py:479 report_relations.py:771
 msgid "Save Excel File"
-msgstr ""
+msgstr "エクセルファイルの保存"
 
 #: report_codes.py:912
 msgid "Save HTML File"
-msgstr ""
+msgstr "HTMLファイルの保存"
 
 #: report_codes.py:941
 msgid "html folder creation error "
-msgstr ""
+msgstr "htmlフォルダ作成エラー "
 
 #: report_codes.py:942
 msgid "Folder creation"
-msgstr ""
+msgstr "フォルダ作成"
 
 #: report_codes.py:942
 msgid "error "
-msgstr ""
+msgstr "エラー"
 
 #: report_codes.py:948
 msgid "html file reading error:"
-msgstr ""
+msgstr "htmlファイル読み込みエラー："
 
 #: report_codes.py:1011 report_exact_matches.py:488 report_relations.py:781
 msgid "Report exported to: "
-msgstr ""
+msgstr "レポートのエクスポート先 "
 
 #: report_codes.py:1013
 msgid "Media folder:"
-msgstr ""
+msgstr "メディアフォルダー："
 
 #: report_codes.py:1063
 msgid ""
 "Codebook with memos\n"
 "=================\n"
 msgstr ""
+"メモ付きコードブック\n"
+"=================\n"
 
 #: report_codes.py:1115
 msgid "No files selected for annotations"
-msgstr ""
+msgstr "注釈用に選択されたファイルがない"
 
 #: report_codes.py:1146
 msgid "Annotation search parameters"
-msgstr ""
+msgstr "注釈検索パラメータ"
 
 #: report_codes.py:1148
 msgid "Coder: All coders"
-msgstr ""
+msgstr "コーダー すべてのコーダー"
 
 #: report_codes.py:1150 report_codes.py:2171 view_av.py:207 view_charts.py:346
 #: view_image.py:120
 msgid "Coder: "
-msgstr ""
+msgstr "コーダー"
 
 #: report_codes.py:1152 report_codes.py:1321
 msgid "Search text: "
-msgstr ""
+msgstr "検索テキスト："
 
 #: report_codes.py:1153
 msgid "Files:"
-msgstr ""
+msgstr "ファイル："
 
 #: report_codes.py:1164
 msgid "DATE:"
-msgstr ""
+msgstr "日付："
 
 #: report_codes.py:1165
 msgid "Position"
-msgstr ""
+msgstr "位置"
 
 #: report_codes.py:1166
 msgid "TEXT"
-msgstr ""
+msgstr "テキスト"
 
 #: report_codes.py:1167
 msgid "ANNOTATION"
-msgstr ""
+msgstr "注釈"
 
 #: report_codes.py:1240 report_exact_matches.py:190
 msgid "No codes have been selected."
-msgstr ""
+msgstr "コードが選択されていない。"
 
 #: report_codes.py:1244
 msgid "No files, cases found."
-msgstr ""
+msgstr "ファイル、ケースが見つかりません。"
 
 #: report_codes.py:1245
 msgid "Nothing selected"
-msgstr ""
+msgstr "なし"
 
 #: report_codes.py:1249
 msgid "Searching"
-msgstr ""
+msgstr "検索"
 
 #: report_codes.py:1267
 msgid "Only memos shown. Coded data not shown."
-msgstr ""
+msgstr "メモのみ表示。コード化されたデータは表示されない。"
 
 #: report_codes.py:1269
 msgid "Coded memos shown if available. Coded data not shown."
-msgstr ""
+msgstr "コード化されたメモがあれば表示。コード化されたデータは表示されない。"
 
 #: report_codes.py:1270
 msgid "Search parameters"
-msgstr ""
+msgstr "検索パラメータ"
 
 #: report_codes.py:1273
 msgid "Coding by: All coders"
-msgstr ""
+msgstr "コーディング すべてのコーダー"
 
 #: report_codes.py:1275
 msgid "Coding by: "
-msgstr ""
+msgstr "コーディング "
 
 #: report_codes.py:1288
 msgid "Attributes:"
-msgstr ""
+msgstr "属性："
 
 #: report_codes.py:1307
 msgid ""
 "\n"
 "Files:\n"
 msgstr ""
+"\n"
+"ファイル：\n"
 
 #: report_codes.py:1312
 msgid " Files: "
-msgstr ""
+msgstr "ファイル "
 
 #: report_codes.py:1314
 msgid ""
 "\n"
 "Cases:\n"
 msgstr ""
+"\n"
+"ケース : \n"
 
 #: report_codes.py:1734
 msgid "Text code statistics:"
-msgstr ""
+msgstr "テキストコードの統計："
 
 #: report_codes.py:1736 report_codes.py:1798 report_codes.py:1873
 msgid "Count:"
-msgstr ""
+msgstr "カウント:"
 
 #: report_codes.py:1737 report_codes.py:1799 report_codes.py:1875
 msgid "Percent of file:"
-msgstr ""
+msgstr "ファイルの割合："
 
 #: report_codes.py:1796
 msgid "Image code statistics:"
-msgstr ""
+msgstr "画像コードの統計："
 
 #: report_codes.py:1871
 msgid "A/V code statistics:"
-msgstr ""
+msgstr "オーディオ/ビデオコードの統計："
 
 #: report_codes.py:1877
 msgid "Percent of file: Unknown. Either VLC not installer or file not found."
 msgstr ""
+"ファイルの割合 不明です。VLC がインストールされていないか、ファイルが見つかり"
+"ません。"
 
 #: report_codes.py:1915
 msgid "Code count totals"
-msgstr ""
+msgstr "コード・カウントの合計"
 
 #: report_codes.py:2035
 msgid "No case matrix"
-msgstr ""
+msgstr "ケースマトリックスなし"
 
 #: report_codes.py:2035
 msgid "Cases not selected"
-msgstr ""
+msgstr "選ばれなかったケース"
 
 #: report_codes.py:2159
 msgid "CODE MEMO: "
-msgstr ""
+msgstr "コードメモ: "
 
 #: report_codes.py:2162
 msgid " FILE MEMO: "
-msgstr ""
+msgstr "ファイル・メモ："
 
 #: report_codes.py:2170
 msgid "CASE MEMO: "
-msgstr ""
+msgstr "ケースメモ："
 
 #: report_codes.py:2237 report_codes.py:2780 report_exact_matches.py:328
 #: report_relations.py:515 view_graph.py:2860 view_graph.py:2991
 msgid "View in context"
-msgstr ""
+msgstr "文脈で見る"
 
 #: report_codes.py:2239 view_av.py:3485 view_image.py:1259
 msgid "Add important mark"
-msgstr ""
+msgstr "重要マークの追加"
 
 #: report_codes.py:2240
 msgid "Change code to"
-msgstr ""
+msgstr "コードを次のように変更する。"
 
 #: report_codes.py:2244 report_codes.py:2784
 msgid "Copy all to clipboard"
-msgstr ""
+msgstr "すべてをクリップボードにコピーする"
 
 #: report_codes.py:2247
 msgid "Rotate image 90 degrees"
-msgstr ""
+msgstr "画像を90度回転"
 
 #: report_codes.py:2251 view_image.py:1224
 msgid "Show control panel"
@@ -4339,15 +4350,15 @@ msgstr ""
 
 #: report_codes.py:2463
 msgid "FILE MEMO:"
-msgstr ""
+msgstr "ファイル・メモ："
 
 #: report_codes.py:2471
 msgid "CASE MEMO:"
-msgstr ""
+msgstr "ケースメモ："
 
 #: report_code_summary.py:241 report_compare_coder_file.py:271
 msgid "CODE: "
-msgstr ""
+msgstr "コード:"
 
 #: report_code_summary.py:242
 msgid "COLOUR: "
@@ -4363,7 +4374,7 @@ msgstr ""
 
 #: report_code_summary.py:276
 msgid "FILES: "
-msgstr ""
+msgstr "ファイル："
 
 #: report_code_summary.py:282
 msgid ""
@@ -4414,7 +4425,7 @@ msgstr ""
 #: report_file_summary.py:281 report_file_summary.py:334
 #: report_file_summary.py:399 report_file_summary.py:455
 msgid "Count: "
-msgstr ""
+msgstr "カウント:"
 
 #: report_code_summary.py:382
 msgid "Average coded area: "
@@ -4456,6 +4467,8 @@ msgid ""
 "\n"
 "Memo: "
 msgstr ""
+"\n"
+"メモ："
 
 #: report_compare_coder_file.py:234 reports.py:519
 msgid "No coders selected"
@@ -4475,7 +4488,7 @@ msgstr ""
 
 #: report_compare_coder_file.py:270
 msgid "FILE: "
-msgstr ""
+msgstr " ファイル: "
 
 #: report_compare_coder_file.py:323
 msgid "A/V Duration: "
@@ -4798,7 +4811,7 @@ msgstr ""
 
 #: report_file_summary.py:201
 msgid "CASE:"
-msgstr ""
+msgstr "ケース："
 
 #: report_file_summary.py:214
 msgid "No case assignment"
