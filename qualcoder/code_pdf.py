@@ -155,7 +155,10 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.textEdit.setAutoFillBackground(True)
         self.ui.textEdit.setToolTip("")
         self.ui.textEdit.setMouseTracking(True)
-        self.ui.textEdit.setReadOnly(True)
+        #self.ui.textEdit.setReadOnly(True)
+        self.ui.textEdit.setTextInteractionFlags(
+            Qt.TextInteractionFlag.TextSelectableByMouse |
+            Qt.TextInteractionFlag.TextSelectableByKeyboard)
         self.ui.textEdit.installEventFilter(self)
         self.eventFilterTT = ToolTipEventFilter()
         self.ui.textEdit.installEventFilter(self.eventFilterTT)
