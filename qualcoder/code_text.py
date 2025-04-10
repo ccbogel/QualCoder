@@ -193,7 +193,10 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.textEdit.setAutoFillBackground(True)
         self.ui.textEdit.setToolTip("")
         self.ui.textEdit.setMouseTracking(True)
-        self.ui.textEdit.setReadOnly(True)
+        self.ui.textEdit.setTextInteractionFlags(
+            Qt.TextInteractionFlag.TextSelectableByMouse | 
+            Qt.TextInteractionFlag.TextSelectableByKeyboard  
+        )        
         self.ui.textEdit.installEventFilter(self)
         self.eventFilterTT = ToolTipEventFilter()
         self.ui.textEdit.installEventFilter(self.eventFilterTT)
@@ -2194,14 +2197,18 @@ class DialogCodeText(QtWidgets.QWidget):
         # Change start and end code positions using alt arrow left and alt arrow right
         # and shift arrow left, shift arrow right
 
-        if type(event) == QtGui.QKeyEvent and self.ui.textEdit.hasFocus():
+        if type(event) == QtGui.QKeyEvent and object_ is self.ui.textEdit:
             key = event.key()
             mod = event.modifiers()
             # using timer for a lot of things
             now = datetime.datetime.now()
             diff = now - self.code_resize_timer
             if diff.microseconds < 100000:
-                return False
+                if mod in (QtCore.Qt.KeyboardModifier.AltModifier, QtCore.Qt.KeyboardModifier.ShiftModifier) \
+                      and key in (QtCore.Qt.Key.Key_Left, QtCore.Qt.Key.Key_Right):
+                    return True # consume rapid shift + left clicks, etc. without changing selection
+                else:
+                    return False
             # Ctrl + E Edit mode - must be detected here as Ctrl E is overridden in editable textEdit
             if key == QtCore.Qt.Key.Key_E and mod == QtCore.Qt.KeyboardModifier.ControlModifier:
                 self.edit_mode_toggle()
@@ -2216,6 +2223,8 @@ class DialogCodeText(QtWidgets.QWidget):
                         item['owner'] == self.app.settings['codername']:
                     codes_here.append(item)
             code_ = None
+            if len(codes_here) == 0:
+                return False
             if len(codes_here) > 1 and mod in (
                     QtCore.Qt.KeyboardModifier.AltModifier, QtCore.Qt.KeyboardModifier.ShiftModifier) \
                     and key in (QtCore.Qt.Key.Key_Left, QtCore.Qt.Key.Key_Right):
@@ -4178,7 +4187,10 @@ class DialogCodeText(QtWidgets.QWidget):
         self.prev_text = copy(self.text)
         self.ui.textEdit.removeEventFilter(self.eventFilterTT)
         self.get_cases_codings_annotations()
-        self.ui.textEdit.setReadOnly(False)
+        self.ui.textEdit.setTextInteractionFlags(
+            Qt.TextInteractionFlag.TextEditorInteraction |
+            Qt.TextInteractionFlag.TextEditable
+        )        
         self.ed_highlight()
         self.edit_mode_has_changed = False
         self.ui.textEdit.textChanged.connect(self.update_positions)
@@ -4224,7 +4236,10 @@ class DialogCodeText(QtWidgets.QWidget):
                 # AI is disabled. Delete the file from the vectorstore. It will be reimported later when the AI is enabled again. 
                 self.app.ai.sources_vectorstore.delete_document(self.file_['id'])
 
-        self.ui.textEdit.setReadOnly(True)
+        self.ui.textEdit.setTextInteractionFlags(  # make the textEdit read only by removing the 'TextEditable' flag
+            Qt.TextInteractionFlag.TextSelectableByMouse |
+            Qt.TextInteractionFlag.TextSelectableByKeyboard
+        ) 
         self.ui.textEdit.installEventFilter(self.eventFilterTT)
         self.annotations = self.app.get_annotations()
         self.load_file(self.file_)
