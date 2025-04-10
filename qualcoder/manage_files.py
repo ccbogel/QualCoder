@@ -1404,7 +1404,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                         copyfile(import_path, destination)
                         self.load_file_text(import_path)
                     except PermissionError as e_:
-                        msg = _("Cannot copy file: ") + filename + _("Is the file open?\nIs there a permission restriction?")+ f"\n{e_}"
+                        msg = _("Cannot copy file: ") + f"{filename}\n" + _("Is the file open?\nIs there a permission restriction?")+ f"\n{e_}"
                         Message(self.app, _("Copy file permission error"), msg).exec()
                         continue
                 else:
@@ -1417,7 +1417,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                         copyfile(import_path, destination)
                         self.load_file_text(import_path)
                     except PermissionError as e_:
-                        msg = _("Cannot copy file: ") + filename + _(
+                        msg = _("Cannot copy file: ") + f"{filename}\n" + _(
                             "Is the file open?\nIs there a permission restriction?") + f"\n{e_}"
                         Message(self.app, _("Copy file permission error"), msg).exec()
                         continue
@@ -1432,7 +1432,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                         copyfile(import_path, destination)
                         self.load_media_reference(f"/images/{filename}")
                     except PermissionError as e_:
-                        msg = _("Cannot copy file: ") + filename + _(
+                        msg = _("Cannot copy file: ") + f"{filename}\n" + _(
                             "Is the file open?\nIs there a permission restriction?") + f"\n{e_}"
                         Message(self.app, _("Copy file permission error"), msg).exec()
                         continue
@@ -1446,7 +1446,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                         copyfile(import_path, destination)
                         self.load_media_reference(f"/audio/{filename}")
                     except PermissionError as e_:
-                        msg = _("Cannot copy file: ") + filename + _(
+                        msg = _("Cannot copy file: ") + f"{filename}\n" + _(
                             "Is the file open?\nIs there a permission restriction?") + f"\n{e_}"
                         Message(self.app, _("Copy file permission error"), msg).exec()
                         continue
@@ -1460,7 +1460,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                         copyfile(import_path, destination)
                         self.load_media_reference(f"/video/{filename}")
                     except PermissionError as e_:
-                        msg = _("Cannot copy file: ") + filename + _(
+                        msg = _("Cannot copy file: ") + f"{filename}\n" + _(
                             "Is the file open?\nIs there a permission restriction?") + f"\n{e_}"
                         Message(self.app, _("Copy file permission error"), msg).exec()
                         continue
@@ -1479,10 +1479,11 @@ class DialogManageFiles(QtWidgets.QDialog):
                         logger.warning(str(err))
                     try:
                         copyfile(import_path, destination)
-                    except OSError as err:
+                    except (OSError, PermissionError) as err:
                         logger.warning(str(err))
                         Message(self.app, _('Unknown file type'), _("Cannot import file") + f":\n{import_path}",
                                 "warning")
+                        continue
                 else:
                     try:
                         self.load_file_text(import_path, f"docs:{link_path}")
