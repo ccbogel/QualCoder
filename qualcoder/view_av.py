@@ -1554,6 +1554,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         O Shortcut to cycle through overlapping codes - at clicked position
         S search text - may include current selection
         R opens a context menu for recently used codes for marking text
+        ! Shows cursor position in textEdit
 
         Ctrl 0 to 9 Button presses
         Ctrl + Z restore last unmarked code(s) - text code(s) or segment code.
@@ -1648,6 +1649,10 @@ class DialogCodeAV(QtWidgets.QDialog):
         # Annotate selected
         if key == QtCore.Qt.Key.Key_A and selected_text != "":
             self.annotate(cursor_pos)
+            return
+        # Exclamation mark - show cursor position in textEdit
+        if key == QtCore.Qt.Key.Key_Exclam:
+            Message(self.app, _("Text position") + " " * 20, _("Character position: ") + str(cursor_pos)).exec()
             return
         # Important  for coded text
         if key == QtCore.Qt.Key.Key_I:
