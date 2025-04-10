@@ -191,7 +191,10 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.textEdit.setAutoFillBackground(True)
         self.ui.textEdit.setToolTip("")
         self.ui.textEdit.setMouseTracking(True)
-        self.ui.textEdit.setReadOnly(True)
+        #self.ui.textEdit.setReadOnly(True)
+        self.ui.textEdit.setTextInteractionFlags(
+            Qt.TextInteractionFlag.TextSelectableByMouse |
+            Qt.TextInteractionFlag.TextSelectableByKeyboard)
         self.eventFilterTT = ToolTipEventFilter()
         self.ui.textEdit.installEventFilter(self.eventFilterTT)
         self.ui.textEdit.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
