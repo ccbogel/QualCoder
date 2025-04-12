@@ -29,183 +29,185 @@
     <message>
         <location filename="ui_dialog_charts.py" line="280"/>
         <source>Charts</source>
-        <translation type="unfinished"></translation>
+        <translation>图表</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="281"/>
         <source>Charts displayed in the default web browser</source>
-        <translation type="unfinished"></translation>
+        <translation>在默认网络浏览器中显示图表</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="282"/>
         <source>Pie charts</source>
-        <translation type="unfinished"></translation>
+        <translation>饼图</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="283"/>
         <source>Bar charts</source>
-        <translation type="unfinished"></translation>
+        <translation>条形图</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="284"/>
         <source>Sunburst and treemap charts</source>
-        <translation type="unfinished"></translation>
+        <translation>旭日图和树状地图</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="285"/>
         <source>Select coder</source>
-        <translation type="unfinished"></translation>
+        <translation>选择编码器</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="286"/>
         <source>Select file</source>
-        <translation type="unfinished"></translation>
+        <translation>选择文件</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="289"/>
         <source>If portions of a text file are assigned to a case, the code frequency and total text characters may be incorrect.
 Codings from the entire text file are used for the calculations.</source>
-        <translation type="unfinished"></translation>
+        <translation>如果将文本文件的部分内容分配给案件，则代码频率和文本字符总数可能不正确。
+计算时会使用整个文本文件中的编码。</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="291"/>
         <source>Select case</source>
-        <translation type="unfinished"></translation>
+        <translation>选择案例</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="292"/>
         <source>Select attributes</source>
-        <translation type="unfinished"></translation>
+        <translation>选择属性</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="293"/>
         <source>Filter out values below:</source>
-        <translation type="unfinished"></translation>
+        <translation>筛选出以下值：</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="294"/>
         <source>Enter number for filter cut off</source>
-        <translation type="unfinished"></translation>
+        <translation>输入过滤器截流的数字</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="295"/>
         <source>&lt;b&gt;Data filters&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>数据过滤器</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="296"/>
         <source>&lt;b&gt;Coding charts&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>编码图表</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="297"/>
         <source>Select category</source>
-        <translation type="unfinished"></translation>
+        <translation>选择类别</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="298"/>
         <source>&lt;b&gt;Attribute charts&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>属性图表</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="299"/>
         <source>Numeric attributes</source>
-        <translation type="unfinished"></translation>
+        <translation>数字属性</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="300"/>
         <source>Character attributes</source>
-        <translation type="unfinished"></translation>
+        <translation>角色属性</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="301"/>
         <source>File</source>
-        <translation type="unfinished"></translation>
+        <translation>文件</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="302"/>
         <source>Case</source>
-        <translation type="unfinished"></translation>
+        <translation>案例</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="303"/>
         <source>Export HTML file</source>
-        <translation type="unfinished"></translation>
+        <translation>导出 HTML 文件</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="304"/>
         <source>&lt;b&gt;Heatmap charts&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>热图图表</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="305"/>
         <source>Word cloud</source>
-        <translation type="unfinished"></translation>
+        <translation>词汇云</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="306"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Background&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>背景介绍</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="307"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Foreground&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>前景</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="308"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Make Word Cloud&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>制作词云</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="309"/>
         <source>Width</source>
-        <translation type="unfinished"></translation>
+        <translation>宽度</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="310"/>
         <source>Height</source>
-        <translation type="unfinished"></translation>
+        <translation>高度</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="311"/>
         <source>Max words</source>
-        <translation type="unfinished"></translation>
+        <translation>最多字数</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="313"/>
         <source>Reverse colour range</source>
-        <translation type="unfinished"></translation>
+        <translation>反色范围</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="314"/>
         <source>Reverse range</source>
-        <translation type="unfinished"></translation>
+        <translation>反向范围</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="315"/>
         <source>Number of conjoined words in phrase. Stopwords applies to selection of 1 word only.</source>
-        <translation type="unfinished"></translation>
+        <translation>短语中连词的数量。Stopwords 仅适用于选择 1 个单词。</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="316"/>
         <source>n-grams</source>
-        <translation type="unfinished"></translation>
+        <translation>n-grams</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="317"/>
         <source>1=One word, 3=3 word phrase, 4=4 word phrase</source>
-        <translation type="unfinished"></translation>
+        <translation>1=一个词，3=3 个词组，4=4 个词组</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="318"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This is to allow a wider spread of heatmap colours when there are extreme count differences.&lt;/p&gt;&lt;p&gt;0 represents no limit.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>这样做是为了在出现极端计数差异时，热图颜色的分布范围更广。
+0 表示无限制。</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="319"/>
         <source>Upper count limiter</source>
-        <translation type="unfinished"></translation>
+        <translation>上限计数限制器</translation>
     </message>
 </context>
 <context>
@@ -213,93 +215,94 @@ Codings from the entire text file are used for the calculations.</source>
     <message>
         <location filename="ui_dialog_graph.py" line="118"/>
         <source>Graph Visualisation</source>
-        <translation type="unfinished"></translation>
+        <translation>图表可视化</translation>
     </message>
     <message>
         <location filename="ui_dialog_graph.py" line="119"/>
         <source>Export image</source>
-        <translation type="unfinished"></translation>
+        <translation>导出图像</translation>
     </message>
     <message>
         <location filename="ui_dialog_graph.py" line="120"/>
         <source>Click on the graph area and press + or W to zoom in. Press - or Q to zoom in or zoom out.</source>
-        <translation type="unfinished"></translation>
+        <translation>点击图表区域，按 + 或 W 放大。按 - 或 Q 键放大或缩小。</translation>
     </message>
     <message>
         <location filename="ui_dialog_graph.py" line="121"/>
         <source>Reveal hidden items</source>
-        <translation type="unfinished"></translation>
+        <translation>揭示隐藏物品</translation>
     </message>
     <message>
         <location filename="ui_dialog_graph.py" line="122"/>
         <source>Save graph</source>
-        <translation type="unfinished"></translation>
+        <translation>保存图表</translation>
     </message>
     <message>
         <location filename="ui_dialog_graph.py" line="123"/>
         <source>Load graph
 Right-click for options</source>
-        <translation type="unfinished"></translation>
+        <translation>加载图表
+右键单击获取选项</translation>
     </message>
     <message>
         <location filename="ui_dialog_graph.py" line="125"/>
         <source>Delete graph</source>
-        <translation type="unfinished"></translation>
+        <translation>删除图表</translation>
     </message>
     <message>
         <location filename="ui_dialog_graph.py" line="126"/>
         <source>Add free text item</source>
-        <translation type="unfinished"></translation>
+        <translation>添加自由文本项目</translation>
     </message>
     <message>
         <location filename="ui_dialog_graph.py" line="127"/>
         <source>Add case items</source>
-        <translation type="unfinished"></translation>
+        <translation>添加案例项目</translation>
     </message>
     <message>
         <location filename="ui_dialog_graph.py" line="128"/>
         <source>Add file items</source>
-        <translation type="unfinished"></translation>
+        <translation>添加文件项目</translation>
     </message>
     <message>
         <location filename="ui_dialog_graph.py" line="129"/>
         <source>Add connecting line</source>
-        <translation type="unfinished"></translation>
+        <translation>添加连接线</translation>
     </message>
     <message>
         <location filename="ui_dialog_graph.py" line="130"/>
         <source>Select code branch</source>
-        <translation type="unfinished"></translation>
+        <translation>选择代码分支</translation>
     </message>
     <message>
         <location filename="ui_dialog_graph.py" line="131"/>
         <source>Clear</source>
-        <translation type="unfinished"></translation>
+        <translation>清晰</translation>
     </message>
     <message>
         <location filename="ui_dialog_graph.py" line="132"/>
         <source>Changing to another report will lose unsaved graph.</source>
-        <translation type="unfinished"></translation>
+        <translation>切换到其他报告将丢失未保存的图表。</translation>
     </message>
     <message>
         <location filename="ui_dialog_graph.py" line="133"/>
         <source>Show coded segments of text files</source>
-        <translation type="unfinished"></translation>
+        <translation>显示文本文件的编码段</translation>
     </message>
     <message>
         <location filename="ui_dialog_graph.py" line="134"/>
         <source>Show coding memos of coded segments</source>
-        <translation type="unfinished"></translation>
+        <translation>显示已编码片段的编码备忘录</translation>
     </message>
     <message>
         <location filename="ui_dialog_graph.py" line="135"/>
         <source>Show coded areas of image files</source>
-        <translation type="unfinished"></translation>
+        <translation>显示图像文件的编码区域</translation>
     </message>
     <message>
         <location filename="ui_dialog_graph.py" line="136"/>
         <source>Show coded av segments</source>
-        <translation type="unfinished"></translation>
+        <translation>显示编码的音频/视频片段</translation>
     </message>
 </context>
 <context>
@@ -307,73 +310,74 @@ Right-click for options</source>
     <message>
         <location filename="ui_report_matching_segments.py" line="105"/>
         <source>Report matching text segments</source>
-        <translation type="unfinished"></translation>
+        <translation>报告匹配的文本片段</translation>
     </message>
     <message>
         <location filename="ui_report_matching_segments.py" line="106"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select coder. Blank for all.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>选择编码器。全部为空。</translation>
     </message>
     <message>
         <location filename="ui_report_matching_segments.py" line="107"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_report_matching_segments.py" line="108"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Exact match text segments report&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>精确匹配文本段报告</translation>
     </message>
     <message>
         <location filename="ui_report_matching_segments.py" line="109"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select coder. Blank for all&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>选择编码器。全部为空</translation>
     </message>
     <message>
         <location filename="ui_report_matching_segments.py" line="110"/>
         <source>Coder</source>
-        <translation type="unfinished"></translation>
+        <translation>编码器</translation>
     </message>
     <message>
         <location filename="ui_report_matching_segments.py" line="111"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export Excel file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>导出 Excel 文件</translation>
     </message>
     <message>
         <location filename="ui_report_matching_segments.py" line="112"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Run&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>启动</translation>
     </message>
     <message>
         <location filename="ui_report_matching_segments.py" line="113"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Coded text must include the text here.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>编码文本必须包括此处的文本。</translation>
     </message>
     <message>
         <location filename="ui_report_matching_segments.py" line="114"/>
         <source>Include text</source>
-        <translation type="unfinished"></translation>
+        <translation>包括文本</translation>
     </message>
     <message>
         <location filename="ui_report_matching_segments.py" line="115"/>
         <source>Select file(s), coder, 2 or more codes. Can exclude results by excluding a code (right click on code).</source>
-        <translation type="unfinished"></translation>
+        <translation>选择文件、编码器、2 个或多个代码。可通过排除代码来排除结果（右键单击代码）。</translation>
     </message>
     <message>
         <location filename="ui_report_matching_segments.py" line="116"/>
         <source>Unchecked - all selected codes must match exactly.
 Checked - any selected codes must match exactly.</source>
-        <translation type="unfinished"></translation>
+        <translation>未选中 - 所有选中的代码必须完全匹配。
+选中 - 所有选中的代码必须完全匹配。</translation>
     </message>
     <message>
         <location filename="ui_report_matching_segments.py" line="118"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Matching exact coded text for multiple codes are collated into one line.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>多个编码的精确匹配编码文本被整理成一行。</translation>
     </message>
     <message>
         <location filename="ui_report_matching_segments.py" line="119"/>
         <source>One line results</source>
-        <translation type="unfinished"></translation>
+        <translation>单行结果</translation>
     </message>
 </context>
 <context>
@@ -381,42 +385,43 @@ Checked - any selected codes must match exactly.</source>
     <message>
         <location filename="ui_dialog_organiser.py" line="62"/>
         <source>Graph Visualisation</source>
-        <translation type="unfinished"></translation>
+        <translation>图表可视化</translation>
     </message>
     <message>
         <location filename="ui_dialog_organiser.py" line="63"/>
         <source>Export image</source>
-        <translation type="unfinished"></translation>
+        <translation>导出图像</translation>
     </message>
     <message>
         <location filename="ui_dialog_organiser.py" line="64"/>
         <source>Click on the graph area and press + or W to zoom in. Press - or Q to zoom in or zoom out.</source>
-        <translation type="unfinished"></translation>
+        <translation>点击图表区域，按 + 或 W 放大。按 - 或 Q 键放大或缩小。</translation>
     </message>
     <message>
         <location filename="ui_dialog_organiser.py" line="65"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Create category&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>创建类别</translation>
     </message>
     <message>
         <location filename="ui_dialog_organiser.py" line="66"/>
         <source>Select code branch</source>
-        <translation type="unfinished"></translation>
+        <translation>选择代码分支</translation>
     </message>
     <message>
         <location filename="ui_dialog_organiser.py" line="67"/>
         <source>Code organiser. Right click on codes and categories to link and merge. Add new categories. Re-structure codes tree.</source>
-        <translation type="unfinished"></translation>
+        <translation>代码组织器。右键点击代码和类别，进行链接和合并。添加新类别 重新构建代码树。</translation>
     </message>
     <message>
         <location filename="ui_dialog_organiser.py" line="68"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Apply changed structure.&lt;/p&gt;&lt;p&gt;Warning. No Undo option.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>应用更改后的结构。
+警告。无撤消选项。</translation>
     </message>
     <message>
         <location filename="ui_dialog_organiser.py" line="69"/>
         <source>Apply</source>
-        <translation type="unfinished"></translation>
+        <translation>申请</translation>
     </message>
 </context>
 <context>
@@ -424,7 +429,7 @@ Checked - any selected codes must match exactly.</source>
     <message>
         <location filename="ui_reference_editor.py" line="36"/>
         <source>Reference Editor</source>
-        <translation type="unfinished"></translation>
+        <translation>参考资料编辑</translation>
     </message>
 </context>
 <context>
@@ -432,22 +437,22 @@ Checked - any selected codes must match exactly.</source>
     <message>
         <location filename="ui_save_query.py" line="52"/>
         <source>Save Query</source>
-        <translation type="unfinished"></translation>
+        <translation>保存查询</translation>
     </message>
     <message>
         <location filename="ui_save_query.py" line="53"/>
         <source>Query name:</source>
-        <translation type="unfinished"></translation>
+        <translation>查询名称：</translation>
     </message>
     <message>
         <location filename="ui_save_query.py" line="54"/>
         <source>Query Group</source>
-        <translation type="unfinished"></translation>
+        <translation>查询组</translation>
     </message>
     <message>
         <location filename="ui_save_query.py" line="55"/>
         <source>Description</source>
-        <translation type="unfinished"></translation>
+        <translation>说明</translation>
     </message>
 </context>
 <context>
@@ -455,87 +460,87 @@ Checked - any selected codes must match exactly.</source>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="195"/>
         <source>AI Prompts Library</source>
-        <translation type="unfinished"></translation>
+        <translation>人工智能提示库</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="196"/>
         <source>Analytic Prompts:</source>
-        <translation type="unfinished"></translation>
+        <translation>分析提示：</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="197"/>
         <source>New</source>
-        <translation type="unfinished"></translation>
+        <translation>新</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="198"/>
         <source>Duplicate</source>
-        <translation type="unfinished"></translation>
+        <translation>重复</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="199"/>
         <source>Copy prompt to clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>将提示复制到剪贴板</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="204"/>
         <source>...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="201"/>
         <source>Paste prompt from clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>从剪贴板粘贴提示</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="203"/>
         <source>Delete prompt</source>
-        <translation type="unfinished"></translation>
+        <translation>删除提示</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="205"/>
         <source>Prompt Name:</source>
-        <translation type="unfinished"></translation>
+        <translation>提示名称：</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="206"/>
         <source>(Uneditable system prompt)</source>
-        <translation type="unfinished"></translation>
+        <translation>(不可编辑的系统提示）</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="207"/>
         <source>Scope:</source>
-        <translation type="unfinished"></translation>
+        <translation>范围：</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="208"/>
         <source>system</source>
-        <translation type="unfinished"></translation>
+        <translation>系统</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="209"/>
         <source>user</source>
-        <translation type="unfinished"></translation>
+        <translation>用户</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="210"/>
         <source>project</source>
-        <translation type="unfinished"></translation>
+        <translation>项目</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="211"/>
         <source>Type:</source>
-        <translation type="unfinished"></translation>
+        <translation>类型：</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="212"/>
         <source>Prompt description:</source>
-        <translation type="unfinished"></translation>
+        <translation>提示说明：</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="213"/>
         <source>Prompt text (this will be send to the AI):</source>
-        <translation type="unfinished"></translation>
+        <translation>提示文本（将发送给人工智能）：</translation>
     </message>
 </context>
 <context>
@@ -543,102 +548,102 @@ Checked - any selected codes must match exactly.</source>
     <message>
         <location filename="ui_ai_search.py" line="194"/>
         <source>AI search</source>
-        <translation type="unfinished"></translation>
+        <translation>人工智能搜索</translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="195"/>
         <source>1) What do you want to search for?</source>
-        <translation type="unfinished"></translation>
+        <translation>1) 您想搜索什么？</translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="196"/>
         <source>Please select a code or category</source>
-        <translation type="unfinished"></translation>
+        <translation>请选择代码或类别</translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="197"/>
         <source>Send not only the name but also the memo associated with a code to the AI?</source>
-        <translation type="unfinished"></translation>
+        <translation>不仅要向人工智能发送名称，还要发送与代码相关的备忘录？</translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="198"/>
         <source>Send memo to AI</source>
-        <translation type="unfinished"></translation>
+        <translation>向人工智能发送备忘录</translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="199"/>
         <source>If deselected (default), the AI searches for new material only. Segments already coded with this code are excluded from the results.</source>
-        <translation type="unfinished"></translation>
+        <translation>如果取消选择（默认值），人工智能将只搜索新材料。结果中将不包括已用此代码编码的区段。</translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="200"/>
         <source>Include coded segments</source>
-        <translation type="unfinished"></translation>
+        <translation>包括编码段</translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="201"/>
         <source>Code search</source>
-        <translation type="unfinished"></translation>
+        <translation>代码搜索</translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="202"/>
         <source>Topic or phenomenon to search for:</source>
-        <translation type="unfinished"></translation>
+        <translation>要搜索的主题或现象：</translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="203"/>
         <source>Enter a good descriptive name for what you are looking for.</source>
-        <translation type="unfinished"></translation>
+        <translation>为您要查找的内容输入一个好的描述性名称。</translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="204"/>
         <source>Description:</source>
-        <translation type="unfinished"></translation>
+        <translation>说明：</translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="205"/>
         <source>Give a short description so that the AI can better understand what you are looking for</source>
-        <translation type="unfinished"></translation>
+        <translation>请提供简短的描述，以便人工智能更好地理解您的需求</translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="206"/>
         <source>Free search</source>
-        <translation type="unfinished"></translation>
+        <translation>免费搜索</translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="207"/>
         <source>2) How to analyze the data?</source>
-        <translation type="unfinished"></translation>
+        <translation>2) 如何分析数据？</translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="208"/>
         <source>Analytic Prompt:</source>
-        <translation type="unfinished"></translation>
+        <translation>分析提示：</translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="209"/>
         <source>Edit prompt or create your own (advanced option)</source>
-        <translation type="unfinished"></translation>
+        <translation>编辑提示或创建自己的提示（高级选项）</translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="210"/>
         <source> Edit </source>
-        <translation type="unfinished"></translation>
+        <translation>编辑 </translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="211"/>
         <source>3) Filter the data?</source>
-        <translation type="unfinished"></translation>
+        <translation>3) 筛选数据？</translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="212"/>
         <source>Filter with the help of attributes</source>
-        <translation type="unfinished"></translation>
+        <translation>借助属性进行筛选</translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="213"/>
         <source>Select Attributes</source>
-        <translation type="unfinished"></translation>
+        <translation>选择属性</translation>
     </message>
 </context>
 <context>
@@ -646,122 +651,123 @@ Checked - any selected codes must match exactly.</source>
     <message>
         <location filename="ui_dialog_code_relations.py" line="149"/>
         <source>Code relations</source>
-        <translation type="unfinished"></translation>
+        <translation>代码关系</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="150"/>
         <source>Relations between codes in text files.</source>
-        <translation type="unfinished"></translation>
+        <translation>文本文件中代码之间的关系</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="151"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export csv file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>导出 csv 文件</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="152"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Calculate&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>计算</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="153"/>
         <source>This coder</source>
-        <translation type="unfinished"></translation>
+        <translation>该编码器</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="154"/>
         <source>All coders</source>
-        <translation type="unfinished"></translation>
+        <translation>所有编码员</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="155"/>
         <source>Select text files.</source>
-        <translation type="unfinished"></translation>
+        <translation>选择文本文件。</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="156"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Relationship types&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>关系类型</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="157"/>
         <source>All</source>
-        <translation type="unfinished"></translation>
+        <translation>全部</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="158"/>
         <source>Overlap</source>
-        <translation type="unfinished"></translation>
+        <translation>重叠</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="159"/>
         <source>Inclusion</source>
-        <translation type="unfinished"></translation>
+        <translation>融入</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="160"/>
         <source>Exact</source>
-        <translation type="unfinished"></translation>
+        <translation>精确</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="161"/>
         <source>Proximity</source>
-        <translation type="unfinished"></translation>
+        <translation>邻近性</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="162"/>
         <source>Overlap Inclusion</source>
-        <translation type="unfinished"></translation>
+        <translation>重叠包容</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="163"/>
         <source>Overlap Inclusion Exact</source>
-        <translation type="unfinished"></translation>
+        <translation>重叠包容精确</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="164"/>
         <source>Relationship</source>
-        <translation type="unfinished"></translation>
+        <translation>关系</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="165"/>
         <source>Boxplots of distance between code pairs.</source>
-        <translation type="unfinished"></translation>
+        <translation>代码对之间距离的方框图。</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="166"/>
         <source>Search Results for:</source>
-        <translation type="unfinished"></translation>
+        <translation>下列关键词的搜索结果</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="167"/>
         <source>Search results for text</source>
-        <translation type="unfinished"></translation>
+        <translation>文本搜索结果</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="168"/>
         <source>Search for next occurence in results</source>
-        <translation type="unfinished"></translation>
+        <translation>搜索结果中的下一次出现</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="169"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export Excel report of exact text coding matches for all  files.&lt;/p&gt;&lt;p&gt;Ordered by file name and code name.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>导出所有文件的精确文本编码匹配的 Excel 报告。
+按文件名和代码名排序。</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="170"/>
         <source>E</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="171"/>
         <source>Codes:</source>
-        <translation type="unfinished"></translation>
+        <translation>代码：</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="172"/>
         <source>Summary statistics</source>
-        <translation type="unfinished"></translation>
+        <translation>统计摘要</translation>
     </message>
 </context>
 <context>
@@ -769,42 +775,42 @@ Checked - any selected codes must match exactly.</source>
     <message>
         <location filename="ui_dialog_cooccurrence.py" line="81"/>
         <source>Code Co-occurence</source>
-        <translation type="unfinished"></translation>
+        <translation>代码协同</translation>
     </message>
     <message>
         <location filename="ui_dialog_cooccurrence.py" line="82"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show the overlapping codes.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>显示重叠代码</translation>
     </message>
     <message>
         <location filename="ui_dialog_cooccurrence.py" line="83"/>
         <source>Code co-occurence</source>
-        <translation type="unfinished"></translation>
+        <translation>共同编码</translation>
     </message>
     <message>
         <location filename="ui_dialog_cooccurrence.py" line="84"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export to file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>导出到文件</translation>
     </message>
     <message>
         <location filename="ui_dialog_cooccurrence.py" line="85"/>
         <source>Hide blank lines</source>
-        <translation type="unfinished"></translation>
+        <translation>隐藏空行</translation>
     </message>
     <message>
         <location filename="ui_dialog_cooccurrence.py" line="86"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select files&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>选择文件</translation>
     </message>
     <message>
         <location filename="ui_dialog_cooccurrence.py" line="87"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select categories&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>选择类别</translation>
     </message>
     <message>
         <location filename="ui_dialog_cooccurrence.py" line="88"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select codes&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>选择代码</translation>
     </message>
 </context>
 <context>
@@ -812,77 +818,81 @@ Checked - any selected codes must match exactly.</source>
     <message>
         <location filename="ui_dialog_import.py" line="90"/>
         <source>Import</source>
-        <translation type="unfinished"></translation>
+        <translation>进口</translation>
     </message>
     <message>
         <location filename="ui_dialog_import.py" line="91"/>
         <source>Survey Import Options</source>
-        <translation type="unfinished"></translation>
+        <translation>调查导入选项</translation>
     </message>
     <message>
         <location filename="ui_dialog_import.py" line="92"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_import.py" line="93"/>
         <source>,</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_import.py" line="94"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delimiter must be a single character.&lt;/p&gt;&lt;p&gt;Enter &apos;ta&apos; for &apos;tab&apos;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>分隔符必须是单字符。
+输入 “ta ”表示 &quot;制表符</translation>
     </message>
     <message>
         <location filename="ui_dialog_import.py" line="95"/>
         <source>Delimiter:</source>
-        <translation type="unfinished"></translation>
+        <translation>分隔符：</translation>
     </message>
     <message>
         <location filename="ui_dialog_import.py" line="96"/>
         <source>Quote format:</source>
-        <translation type="unfinished"></translation>
+        <translation>报价格式：</translation>
     </message>
     <message>
         <location filename="ui_dialog_import.py" line="97"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;NONE 123, abc&lt;/p&gt;&lt;p&gt;MINIMAL 123, &amp;quot;abc&amp;quot;&lt;/p&gt;&lt;p&gt;ALL &amp;quot;123&amp;quot;, &amp;quot;abc&amp;quot;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>NONE 123, abc
+MINIMAL 123,&apos;abc&apos;;
+ALL &apos;123&apos;, &apos;abc&apos;</translation>
     </message>
     <message>
         <location filename="ui_dialog_import.py" line="98"/>
         <source>NONE</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_import.py" line="99"/>
         <source>MINIMAL</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_import.py" line="100"/>
         <source>ALL</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_import.py" line="101"/>
         <source>Changes made on the top row will override any user changes to field names and field types below. Right-click on a column heading below to change the column name or to change from Character (attribute) to Qualitative (creates a text file from the text).</source>
-        <translation type="unfinished"></translation>
+        <translation>对顶行所做的更改将覆盖用户对下面字段名称和字段类型所做的任何更改。右键单击下面的列标题可更改列名或将字符（属性）改为定性（根据文本创建文本文件）。</translation>
     </message>
     <message>
         <location filename="ui_dialog_import.py" line="102"/>
         <source>Press OK to import.</source>
-        <translation type="unfinished"></translation>
+        <translation>按确定键导入。</translation>
     </message>
     <message>
         <location filename="ui_dialog_import.py" line="103"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If checked: All the rows of a qualitative column will be collated into one text file.&lt;/p&gt;&lt;p&gt;If unchecked: Each qualitative answer will be an individual text file within the database.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>如果选中： 定性列的所有行将整理成一个文本文件。
+如果未选中： 每个定性答案都将是数据库中的一个单独文本文件。</translation>
     </message>
     <message>
         <location filename="ui_dialog_import.py" line="104"/>
         <source>One file per qualitative column</source>
-        <translation type="unfinished"></translation>
+        <translation>每个定性列一个文件</translation>
     </message>
 </context>
 <context>
@@ -890,22 +900,22 @@ Checked - any selected codes must match exactly.</source>
     <message>
         <location filename="ui_import_twitter.py" line="53"/>
         <source>Twitter data import</source>
-        <translation type="unfinished"></translation>
+        <translation>Twitter 数据导入</translation>
     </message>
     <message>
         <location filename="ui_import_twitter.py" line="54"/>
         <source>Import twitter data file</source>
-        <translation type="unfinished"></translation>
+        <translation>导入 twitter 数据文件</translation>
     </message>
     <message>
         <location filename="ui_import_twitter.py" line="55"/>
         <source>Use the R statistics package to get the twitter data and create a csv file. Then import the csv file.</source>
-        <translation type="unfinished"></translation>
+        <translation>使用 R 统计软件包获取 twitter 数据并创建 csv 文件。然后导入 csv 文件。</translation>
     </message>
     <message>
         <location filename="ui_import_twitter.py" line="56"/>
         <source>Select file</source>
-        <translation type="unfinished"></translation>
+        <translation>选择文件</translation>
     </message>
 </context>
 <context>
@@ -913,17 +923,17 @@ Checked - any selected codes must match exactly.</source>
     <message>
         <location filename="ui_queryDetails.py" line="41"/>
         <source>Query Details</source>
-        <translation type="unfinished"></translation>
+        <translation>查询详情</translation>
     </message>
     <message>
         <location filename="ui_queryDetails.py" line="42"/>
         <source>Query Name</source>
-        <translation type="unfinished"></translation>
+        <translation>查询名称</translation>
     </message>
     <message>
         <location filename="ui_queryDetails.py" line="43"/>
         <source>Query Description</source>
-        <translation type="unfinished"></translation>
+        <translation>查询说明</translation>
     </message>
 </context>
 <context>
@@ -931,32 +941,32 @@ Checked - any selected codes must match exactly.</source>
     <message>
         <location filename="ui_dialog_start_and_end_marks.py" line="61"/>
         <source>Define start and end marks for auto assigning</source>
-        <translation type="unfinished"></translation>
+        <translation>定义自动分配的开始和结束标记</translation>
     </message>
     <message>
         <location filename="ui_dialog_start_and_end_marks.py" line="62"/>
         <source>Define the start and end text marks.</source>
-        <translation type="unfinished"></translation>
+        <translation>定义开始和结束文本标记。</translation>
     </message>
     <message>
         <location filename="ui_dialog_start_and_end_marks.py" line="63"/>
         <source>.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_start_and_end_marks.py" line="64"/>
         <source>Start mark</source>
-        <translation type="unfinished"></translation>
+        <translation>起始标记</translation>
     </message>
     <message>
         <location filename="ui_dialog_start_and_end_marks.py" line="65"/>
         <source>End mark</source>
-        <translation type="unfinished"></translation>
+        <translation>结束标记</translation>
     </message>
     <message>
         <location filename="ui_dialog_start_and_end_marks.py" line="66"/>
         <source>File(s):</source>
-        <translation type="unfinished"></translation>
+        <translation>文件 :</translation>
     </message>
 </context>
 <context>
@@ -964,12 +974,12 @@ Checked - any selected codes must match exactly.</source>
     <message>
         <location filename="ui_dialog_add_item.py" line="40"/>
         <source>Add Code</source>
-        <translation type="unfinished"></translation>
+        <translation>添加代码</translation>
     </message>
     <message>
         <location filename="ui_dialog_add_item.py" line="41"/>
         <source>Enter text below:</source>
-        <translation type="unfinished"></translation>
+        <translation>请在下面输入文字：</translation>
     </message>
 </context>
 <context>
@@ -1101,57 +1111,59 @@ Checked - any selected codes must match exactly.</source>
     <message>
         <location filename="ui_dialog_cases.py" line="104"/>
         <source>Cases</source>
-        <translation type="unfinished"></translation>
+        <translation>案例</translation>
     </message>
     <message>
         <location filename="ui_dialog_cases.py" line="105"/>
         <source>Double click case name to change the name. Click on Memo to edit a memo for the case. Click on Files to link files and file text to the case.</source>
-        <translation type="unfinished"></translation>
+        <translation>双击案件名称可更改名称。单击备忘录可编辑案件备忘录。单击文件可将文件和文件文本链接到案件。</translation>
     </message>
     <message>
         <location filename="ui_dialog_cases.py" line="106"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add case&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>加案例</translation>
     </message>
     <message>
         <location filename="ui_dialog_cases.py" line="107"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete case&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>删除案件</translation>
     </message>
     <message>
         <location filename="ui_dialog_cases.py" line="108"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Import cases&lt;/p&gt;&lt;p&gt;Import from a csv or xlsx file.&lt;/p&gt;&lt;p&gt;The file must have a header row and the first column must have the unique case names or identifiers. Subsequent columns are attributes for each case.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>导入案例
+从 csv 或 xlsx 文件导入。
+文件必须有标题行，第一列必须有唯一的案例名称或标识符。随后的列是每个案例的属性。</translation>
     </message>
     <message>
         <location filename="ui_dialog_cases.py" line="109"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add attribute&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>添加属性</translation>
     </message>
     <message>
         <location filename="ui_dialog_cases.py" line="110"/>
         <source>.</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_cases.py" line="111"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Case file manager&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>案件文件管理器</translation>
     </message>
     <message>
         <location filename="ui_dialog_cases.py" line="112"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export attributes to file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>将属性导出到文件</translation>
     </message>
     <message>
         <location filename="ui_dialog_cases.py" line="113"/>
         <source>Help</source>
-        <translation type="unfinished"></translation>
+        <translation>帮助</translation>
     </message>
     <message>
         <location filename="ui_dialog_cases.py" line="114"/>
         <source>Cases: </source>
-        <translation type="unfinished"></translation>
+        <translation>案例:</translation>
     </message>
 </context>
 <context>
@@ -2163,17 +2175,17 @@ As all assigned positions may be incorrect. </source>
     <message>
         <location filename="ui_dialog_manage_attributes.py" line="47"/>
         <source>Attributes</source>
-        <translation type="unfinished"></translation>
+        <translation>属性</translation>
     </message>
     <message>
         <location filename="ui_dialog_manage_attributes.py" line="48"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>添加属性</translation>
     </message>
     <message>
         <location filename="ui_dialog_manage_attributes.py" line="49"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>删去</translation>
     </message>
 </context>
 <context>
@@ -2356,12 +2368,12 @@ Cannot export text transcription file associated with an audio or video as a lin
     <message>
         <location filename="ui_dialog_memo.py" line="43"/>
         <source>Memo</source>
-        <translation type="unfinished"></translation>
+        <translation>备忘录</translation>
     </message>
     <message>
         <location filename="ui_dialog_memo.py" line="44"/>
         <source>Clear</source>
-        <translation type="unfinished"></translation>
+        <translation>清晰</translation>
     </message>
 </context>
 <context>
