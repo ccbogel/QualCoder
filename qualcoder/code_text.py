@@ -309,7 +309,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.treeWidget.viewport().installEventFilter(self)
         self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
-        self.ui.treeWidget.itemClicked.connect(self.fill_code_label_undo_show_selected_code)
+        self.ui.treeWidget.itemSelectionChanged.connect(self.fill_code_label_with_selected_code)
         self.ui.comboBox_export.currentIndexChanged.connect(self.export_option_selected)
         self.ui.splitter.setSizes([150, 400])
         try:
@@ -524,16 +524,18 @@ class DialogCodeText(QtWidgets.QWidget):
         self.app.settings['dialogcodetext_splitter_v0'] = v_sizes[0]
         self.app.settings['dialogcodetext_splitter_v1'] = v_sizes[1]
 
-    def fill_code_label_undo_show_selected_code(self):
+    def fill_code_label_with_selected_code(self):
         """ Fill code label with currently selected item's code name and colour.
          Also, if text is highlighted, assign the text to this code.
 
          Called by: treewidgetitem_clicked """
 
         current = self.ui.treeWidget.currentItem()
+        if current is None:
+            return
+        print(current.text(0), current.text(1))
         # Extra to fill right-hand side splitter details
         self.show_code_rule()
-
         if current.text(1)[0:3] == 'cat':
             self.ui.label_code.hide()
             self.ui.label_code.setToolTip("")
@@ -541,9 +543,9 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.label_code.show()
         # Set background colour of label to code color, and store current code for underlining
         for c in self.codes:
-            if current.text(0) == c['name']:
+            if int(current.text(1)[4:]) == c['cid']:
                 fg_color = TextColor(c['color']).recommendation
-                style = "QLabel {background-color :" + c['color'] + "; color : " + fg_color + ";}"
+                style = f"QLabel {{background-color:{c['color']}; color: {fg_color};}}"
                 self.ui.label_code.setStyleSheet(style)
                 self.ui.label_code.setAutoFillBackground(True)
                 tt = f"{c['name']}\n"
@@ -1840,7 +1842,7 @@ class DialogCodeText(QtWidgets.QWidget):
         U Unmark at selected location
         V assign 'in vivo' code to selected text
         Ctrl 0 to Ctrl 9 - button presses
-        # Display Clicked character position
+        ! Display Clicked character position
         ^ Alt key. Shift code positions. May be needed after the text is edited
             (added or deleted) to shift subsequent codings.
         """
