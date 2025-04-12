@@ -228,7 +228,8 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.treeWidget.viewport().installEventFilter(self)
         self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
-        self.ui.treeWidget.itemClicked.connect(self.fill_code_label)
+        self.ui.treeWidget.itemSelectionChanged.connect(self.fill_code_label)
+
         self.ui.textEdit_2.setReadOnly(True)  # Code examples
         self.ui.splitter.setSizes([150, 400, 150])
         self.ui.splitter_2.setSizes([100, 0])
@@ -434,6 +435,8 @@ class DialogCodePdf(QtWidgets.QWidget):
          Called by: treewidgetitem_clicked """
 
         current = self.ui.treeWidget.currentItem()
+        if current is None:
+            return
         if current.text(1)[0:3] == 'cat':
             self.ui.label_code.hide()
             self.ui.label_code.setToolTip("")
@@ -442,7 +445,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.label_code.show()
         # Set background colour of label to code color, and store current code for underlining
         for c in self.codes:
-            if current.text(0) == c['name']:
+            if int(current.text(1)[4:]) == c['cid']:
                 fg_color = TextColor(c['color']).recommendation
                 style = f"QLabel {{background-color :{c['color']}; color:{fg_color};}}"
                 self.ui.label_code.setStyleSheet(style)
