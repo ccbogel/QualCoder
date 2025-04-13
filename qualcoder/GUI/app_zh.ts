@@ -3195,77 +3195,78 @@ Not recommended unless you have many large files slowing the backup.</source>
     <message>
         <location filename="ui_special_functions.py" line="110"/>
         <source>Special Functions</source>
-        <translation type="unfinished"></translation>
+        <translation>特殊功能</translation>
     </message>
     <message>
         <location filename="ui_special_functions.py" line="111"/>
         <source>Backup project before running these functions.</source>
-        <translation type="unfinished"></translation>
+        <translation>运行这些功能前备份项目。</translation>
     </message>
     <message>
         <location filename="ui_special_functions.py" line="112"/>
         <source>Dynamic update text content</source>
-        <translation type="unfinished"></translation>
+        <translation>动态更新文本内容</translation>
     </message>
     <message>
         <location filename="ui_special_functions.py" line="113"/>
         <source>Run update text content</source>
-        <translation type="unfinished"></translation>
+        <translation>运行更新文本内容</translation>
     </message>
     <message>
         <location filename="ui_special_functions.py" line="115"/>
         <source>Select text file to update</source>
-        <translation type="unfinished"></translation>
+        <translation>选择要更新的文本文件</translation>
     </message>
     <message>
         <location filename="ui_special_functions.py" line="117"/>
         <source>Select replacement text file</source>
-        <translation type="unfinished"></translation>
+        <translation>选择替换文本文件</translation>
     </message>
     <message>
         <location filename="ui_special_functions.py" line="118"/>
         <source>Merge project into this project</source>
-        <translation type="unfinished"></translation>
+        <translation>将项目并入本项目</translation>
     </message>
     <message>
         <location filename="ui_special_functions.py" line="119"/>
         <source>Run merge projects</source>
-        <translation type="unfinished"></translation>
+        <translation>运行合并项目</translation>
     </message>
     <message>
         <location filename="ui_special_functions.py" line="120"/>
         <source>Select project to merge</source>
-        <translation type="unfinished"></translation>
+        <translation>选择要合并的项目</translation>
     </message>
     <message>
         <location filename="ui_special_functions.py" line="121"/>
         <source>Select project to merge into this project</source>
-        <translation type="unfinished"></translation>
+        <translation>选择要并入本项目的项目</translation>
     </message>
     <message>
         <location filename="ui_special_functions.py" line="122"/>
         <source>Change text positions</source>
-        <translation type="unfinished"></translation>
+        <translation>更改文本位置</translation>
     </message>
     <message>
         <location filename="ui_special_functions.py" line="123"/>
         <source>Change text code end positions ALL codes ALL files for current owner.</source>
-        <translation type="unfinished"></translation>
+        <translation>更改当前所有者的所有文件的文本代码结束位置。</translation>
     </message>
     <message>
         <location filename="ui_special_functions.py" line="124"/>
         <source>Change text code start positions ALL codes ALL files for current owner.</source>
-        <translation type="unfinished"></translation>
+        <translation>更改当前所有者的所有文件的文本代码起始位置。</translation>
     </message>
     <message>
         <location filename="ui_special_functions.py" line="126"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Number of characters to extend (positive numbers)&lt;/p&gt;&lt;p&gt;or reduce (negative numbers)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>要扩展（正数）或缩小（负数）的字符数
+或缩小（负数）</translation>
     </message>
     <message>
         <location filename="ui_special_functions.py" line="128"/>
         <source>Run</source>
-        <translation type="unfinished"></translation>
+        <translation>运行</translation>
     </message>
 </context>
 <context>
@@ -3336,7 +3337,7 @@ Not recommended unless you have many large files slowing the backup.</source>
     <message>
         <location filename="ui_dialog_text_mining.py" line="91"/>
         <source>Text Mining</source>
-        <translation type="unfinished"></translation>
+        <translation>文本挖掘</translation>
     </message>
     <message>
         <location filename="ui_dialog_text_mining.py" line="92"/>
@@ -3389,123 +3390,126 @@ Not recommended unless you have many large files slowing the backup.</source>
     <message>
         <location filename="ui_dialog_view_av.py" line="169"/>
         <source>View Audio Video</source>
-        <translation type="unfinished"></translation>
+        <translation>观看音频视频</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="170"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Left click on the slider button and drag left or right to change audio/video position.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>左键单击滑块按钮，向左或向右拖动即可更改音频/视频位置。</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="171"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Play / Pause&lt;/p&gt;&lt;p&gt;Ctrl + S start/pause&lt;/p&gt;&lt;p&gt;Ctrl + P start/pause&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>播放/暂停 Ctrl S 启动/暂停 Ctrl P 启动/暂停</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="172"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Volume&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>卷数</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="173"/>
         <source>Audio:</source>
-        <translation type="unfinished"></translation>
+        <translation>音频：</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="174"/>
         <source>Scroll transcript while playing. (Transcript is read only)</source>
-        <translation type="unfinished"></translation>
+        <translation>播放时滚动文本。(文字记录仅供阅读）</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="175"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ctrl + Shift + &amp;gt; increase play rate, maximum 2.0&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt; decrease play rate, minimum 0.1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Ctrl Shift &gt; 增加播放速率，最大 2.0
+Ctrl Shift &lt; 降低播放速率，最小 0.1</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="176"/>
         <source>1.0x</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="177"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Time&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>时间</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="178"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Decrease play rate&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt; &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>降低播放速度 Ctrl Shift &lt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="179"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Increase play rate&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;gt; &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>提高播放速度 Ctrl Shift &gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="180"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rewind 5 seconds&lt;/p&gt;&lt;p&gt;Ctrl + R&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>倒退 5 秒 Ctrl R</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="181"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rewind 30 seconds&lt;/p&gt;&lt;p&gt;Alt + Minus&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>倒退 30 秒 Alt -</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="182"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Forward 30 seconds&lt;/p&gt;&lt;p&gt;Alt + Plus&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>前进 30 秒 Alt +</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="183"/>
         <source>Help</source>
-        <translation type="unfinished"></translation>
+        <translation>帮助</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="184"/>
         <source>green underline = Assigned to case.
 red underline = Assigned to code or annotation</source>
-        <translation type="unfinished"></translation>
+        <translation>绿色下划线 = 分配给案件。
+红色下划线 = 分配给代码或注释</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="186"/>
         <source>Transcription:</source>
-        <translation type="unfinished"></translation>
+        <translation>转录：</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="187"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add a speaker name to shortcuts. In the text entry box press ctrl + n&lt;/p&gt;&lt;p&gt;Insert a speaker into transcription. In the text entry box press ctrl + 1 up to ctrl + 8 for the speakers name.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>在快捷方式中添加发言人姓名。在文本输入框中按下 ctrl n
+在转录中插入发言人。在文本输入框中按 ctrl 1 至 ctrl 8 键输入发言者姓名</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="188"/>
         <source>Speakers:</source>
-        <translation type="unfinished"></translation>
+        <translation>发言人：</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="189"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search for text.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>搜索文本。</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="190"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>下一页</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="191"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. &lt;/p&gt;&lt;p&gt;A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A ‘*’ after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;‘&lt;/span&gt;\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>搜索使用 Regex 函数。</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="192"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Previous&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>上一页</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="193"/>
         <source>0 / 0</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
