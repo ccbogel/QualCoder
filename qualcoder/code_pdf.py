@@ -20,6 +20,7 @@ https://github.com/ccbogel/QualCoder
 from binascii import b2a_hex
 from copy import deepcopy
 import datetime
+# import io
 import logging
 import os
 from pdfminer.converter import PDFPageAggregator
@@ -32,6 +33,7 @@ from pdfminer.pdfparser import PDFParser
 from pdfminer.pdfdocument import PDFDocument  # for PDF meta information
 # Using this for determining colourspace, e.g. colorspace': [<PDFObjRef:852>]
 from pdfminer.pdftypes import PDFObjRef, resolve1
+from PIL import Image, ImageOps, ImageQt
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 from random import randint
 import re
@@ -1946,7 +1948,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             cur.execute("delete from code_name where cid=?", [old_cid, ])
             self.app.conn.commit()
         except:
-            self.app.conn.rollback() # revert all changes 
+            self.app.conn.rollback()  # Revert all changes
             raise                
         self.app.delete_backup = False
         msg = msg.replace("\n", " ")
@@ -2646,6 +2648,13 @@ class DialogCodePdf(QtWidgets.QWidget):
                         "w": round(lobj.width,3), "h": round(lobj.height,3),
                         'imagemask': lobj.imagemask, 'colorspace': lobj.colorspace,
                         'depth': depth}
+
+            ''' colorspace: [/'DeviceCMYK']
+            # Summary of components below:
+            {'BitsPerComponent': 8, 'ColorSpace': /'DeviceCMYK', 
+            'DecodeParms': {'Quality': 65}, 'Filter': /'DCTDecode', 'Intent': /'RelativeColorimetric',}>
+            '''
+
             #'voverlap':lobj.voverlap(), 'vdistance':lobj.vdistance(),
             if isinstance(lobj.colorspace[0], PDFObjRef):
                 values = resolve1(lobj.colorspace[0])
@@ -2657,6 +2666,7 @@ class DialogCodePdf(QtWidgets.QWidget):
                     else:
                         cspace.append(v)
                 img_dict['colorspace'] = cspace
+
             img_dict['stream'] = lobj.stream
             img_dict['pixmap'] = None
             if lobj.stream:
@@ -2665,7 +2675,22 @@ class DialogCodePdf(QtWidgets.QWidget):
                 img_dict['filetype'] = file_ext
                 qp = QtGui.QPixmap()
                 qp.loadFromData(file_stream)
-                img_dict['pixmap'] = qp.scaled(int(img_dict['w']), int(img_dict['h']))
+                #print("Testing: CS0:", img_dict['colorspace'][0], file_ext)  # pdfminer.psparser.PSLiteral
+                if str(img_dict['colorspace'][0]) == "/'DeviceCMYK'" and file_ext.lower() in (".jpg", ".jpeg"):
+                    '''buffering did not work.
+                    buffer = QtCore.QBuffer()
+                    buffer.open(QtCore.QBuffer.ReadWrite)
+                    img.save(buffer, "jpg")
+                    pil_im = Image.open(io.BytesIO(buffer.data()))
+                    '''
+                    qimg = qp.toImage()
+                    qimg.save(os.path.join(os.path.expanduser('~'), ".qualcoder", "tmp.jpg"))
+                    pil_img = Image.open(os.path.join(os.path.expanduser('~'), ".qualcoder", "tmp.jpg"))
+                    pil_img = ImageOps.invert(pil_img)
+                    qp = ImageQt.toqpixmap(pil_img)
+                    img_dict['pixmap'] = qp.scaled(int(img_dict['w']), int(img_dict['h']))
+                else:
+                    img_dict['pixmap'] = qp.scaled(int(img_dict['w']), int(img_dict['h']))
                 if qp.isNull():
                     img_dict['pixmap'] = None
                 '''else:  # Potential to extract some images.
