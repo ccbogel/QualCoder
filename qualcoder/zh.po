@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-27 07:53+1100\n"
-"PO-Revision-Date: 2025-03-29 15:28+1100\n"
+"PO-Revision-Date: 2025-04-15 08:11+1000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: zh\n"
@@ -86,183 +86,187 @@ msgstr "扬声器名称格式"
 
 #: __main__.py:1592
 msgid "Report text context characters: "
-msgstr ""
+msgstr "报告文本上下文字符： "
 
 #: __main__.py:1593
 msgid "Report text context style: "
-msgstr ""
+msgstr "报告文本上下文样式： "
 
 #: __main__.py:1594
 msgid "Backup on open"
-msgstr ""
+msgstr "打开时备份"
 
 #: __main__.py:1595
 msgid "Backup AV files"
-msgstr ""
+msgstr "备份音频/视频文件"
 
 #: __main__.py:1597
 msgid "AI integration is enabled"
-msgstr ""
+msgstr "启用人工智能集成"
 
 #: __main__.py:1599
 msgid "AI integration is disabled"
-msgstr ""
+msgstr "人工智能集成已禁用"
 
 #: __main__.py:1600
 msgid "Style"
-msgstr ""
+msgstr "样式"
 
 #: __main__.py:1602 __main__.py:2780
 msgid "Directory (folder) paths / represents \\"
-msgstr ""
+msgstr "目录（文件夹）路径/表示"
 
 #: __main__.py:1851
 msgid "This project contains no text files."
-msgstr ""
+msgstr "本项目不包含文本文件。"
 
 #: __main__.py:1852
 msgid "No text files"
-msgstr ""
+msgstr "无文本文件"
 
 #: __main__.py:1865
 msgid "This project contains no pdf files."
-msgstr ""
+msgstr "本项目不包含 pdf 文件。"
 
 #: __main__.py:1866
 msgid "No pdf files"
-msgstr ""
+msgstr "无 pdf 文件"
 
 #: __main__.py:1879
 msgid "This project contains no image files."
-msgstr ""
+msgstr "本项目不包含图像文件。"
 
 #: __main__.py:1880
 msgid "No image files"
-msgstr ""
+msgstr "无图像文件"
 
 #: __main__.py:1888
 msgid "This project contains no audio/video files."
-msgstr ""
+msgstr "本项目不包含音频/视频文件。"
 
 #: __main__.py:1889
 msgid "No a/v files"
-msgstr ""
+msgstr "无音频/视频文件"
 
 #: __main__.py:1892
 msgid "VLC is not installed. Cannot code audio/video files."
-msgstr ""
+msgstr "未安装 VLC。无法编码音频/视频文件。"
 
 #: __main__.py:1893
 msgid "Install VLC"
-msgstr ""
+msgstr "安装 VLC"
 
 #: __main__.py:1902
 msgid "A/V Coding"
-msgstr ""
+msgstr "音频/视频编码"
 
 #: __main__.py:1989
 msgid "IMPORTING REFI-QDA PROJECT"
-msgstr ""
+msgstr "导入 refi-qda 项目"
 
 #: __main__.py:1991
 msgid ""
 "Step 1: You will be asked for a new QualCoder project name.\n"
 "Step 2: You will be asked for the QDPX file."
 msgstr ""
+"第 1 步：系统会要求您输入新的 QualCoder 项目名称。\n"
+"第 2 步：要求您提供 QDPX 文件。"
 
 #: __main__.py:1992
 msgid "REFI-QDA import steps"
-msgstr ""
+msgstr "REFI-QDA 导入步骤"
 
 #: __main__.py:1996 __main__.py:2014
 msgid "Project creation"
-msgstr ""
+msgstr "项目创建"
 
 #: __main__.py:1996
 msgid "REFI-QDA Project not successfully created"
-msgstr ""
+msgstr "未成功创建 REFI-QDA 项目"
 
 #: __main__.py:2007
 msgid "IMPORTING RQDA PROJECT"
-msgstr ""
+msgstr "导入 RQDA 项目"
 
 #: __main__.py:2009
 msgid ""
 "Step 1: You will be asked for a new QualCoder project name.\n"
 "Step 2: You will be asked for the RQDA file."
 msgstr ""
+"第 1 步：系统会要求您输入新的 QualCoder 项目名称。\n"
+"第 2 步：要求您提供 RQDA 文件。"
 
 #: __main__.py:2010
 msgid "RQDA import steps"
-msgstr ""
+msgstr "RQDA 导入步骤"
 
 #: __main__.py:2014
 msgid "Project not successfully created"
-msgstr ""
+msgstr "项目未成功创建"
 
 #: __main__.py:2028
 msgid "Are you sure you want to quit?"
-msgstr ""
+msgstr "你确定要辞职吗？"
 
 #: __main__.py:2077
 msgid "Enter project name"
-msgstr ""
+msgstr "输入项目名称"
 
 #: __main__.py:2081 __main__.py:2101 refi.py:1937 refi.py:1943
 msgid "Project"
-msgstr ""
+msgstr "项目"
 
 #: __main__.py:2081
 msgid "No project created."
-msgstr ""
+msgstr "未创建项目。"
 
 #: __main__.py:2100
 msgid "Project creation error "
-msgstr ""
+msgstr "项目创建错误 "
 
 #: __main__.py:2101
 msgid " not successfully created"
-msgstr ""
+msgstr " 未成功创建"
 
 #: __main__.py:2184
 msgid "New project: "
-msgstr ""
+msgstr "新项目： "
 
 #: __main__.py:2184 manage_files.py:1564
 msgid " created."
-msgstr ""
+msgstr "创建"
 
 #: __main__.py:2185
 msgid "Opening: "
-msgstr ""
+msgstr "开幕： "
 
 #: __main__.py:2195
 msgid "New Project Created"
-msgstr ""
+msgstr "创建新项目"
 
 #: __main__.py:2196
 msgid "DB Version:"
-msgstr ""
+msgstr "数据库版本："
 
 #: __main__.py:2197 report_file_summary.py:158 reports.py:247 reports.py:565
 msgid "Date: "
-msgstr ""
+msgstr "日期："
 
 #: __main__.py:2198
 msgid "About: "
-msgstr ""
+msgstr "关于："
 
 #: __main__.py:2199 report_codes.py:1164
 msgid "Coder:"
-msgstr ""
+msgstr "编码器"
 
 #: __main__.py:2202
 msgid "Problem creating database "
-msgstr ""
+msgstr "创建数据库问题 "
 
 #: __main__.py:2256
 msgid "Coder name changed to: "
-msgstr ""
+msgstr "编码员姓名改为："
 
 #: __main__.py:2279
 msgid ""
@@ -276,245 +280,257 @@ msgid ""
 "(Everything below this mark is a personal note and will never be sent to the "
 "AI.)"
 msgstr ""
+"**研究课题、问题和目标：*** \n"
+"\n"
+"**方法：** \n"
+"\n"
+"**参与者和收集的数据：** \n"
+"\n"
+"#####\n"
+"(此标记以下的内容均为个人说明，绝不会发送给人工智能）。"
 
 #: __main__.py:2284
 msgid "Memo for project "
-msgstr ""
+msgstr "项目备忘录 "
 
 #: __main__.py:2291
 msgid "Project memo entered."
-msgstr ""
+msgstr "输入项目备忘录。"
 
 #: __main__.py:2321
 msgid ""
 "An error occured while writing to the project folder. Please close the "
 "project and try to open it again."
-msgstr ""
+msgstr "在写入项目文件夹时发生错误。请关闭项目并尝试再次打开。"
 
 #: __main__.py:2323
 msgid "I/O Error"
-msgstr ""
+msgstr "输入/输出错误"
 
 #: __main__.py:2324
 msgid "Close"
-msgstr ""
+msgstr "关闭"
 
 #: __main__.py:2380 special_functions.py:96
 msgid "Open project directory"
-msgstr ""
+msgstr "打开项目目录"
 
 #: __main__.py:2418
 msgid ""
 "QualCoder detected that the project was not properly closed the last time it "
 "was used by \""
-msgstr ""
+msgstr "QualCoder 检测到该项目上次被“ ”使用时未正确关闭。"
 
 #: __main__.py:2420
 msgid ""
 "In most cases, you can still continue your work as usual. If you encounter "
 "any problems, search for a recent backup in the project folder."
 msgstr ""
+"在大多数情况下，您仍然可以照常工作。如果遇到任何问题，请在项目文件夹中查找最"
+"近的备份。"
 
 #: __main__.py:2422 code_text.py:4897 manage_files.py:1378
 msgid "Open file"
-msgstr ""
+msgstr "打开文件"
 
 #: __main__.py:2434
 msgid "Project cannot be opened since it's already in use by \""
-msgstr ""
+msgstr "项目已被“ ”使用，因此无法打开。"
 
 #: __main__.py:2435
 msgid "\". Please retry later."
-msgstr ""
+msgstr " 请稍后重试。"
 
 #: __main__.py:2437 __main__.py:2450
 msgid "Cannot open file"
-msgstr ""
+msgstr "无法打开文件"
 
 #: __main__.py:2478
 msgid "Default coder name changed to: "
-msgstr ""
+msgstr "默认编码器名称更改为 "
 
 #: __main__.py:2502 __main__.py:2531 __main__.py:2551 __main__.py:2576
 #: __main__.py:2616 __main__.py:2640 __main__.py:2648
 msgid "Updating database to version"
-msgstr ""
+msgstr "将数据库更新到版本"
 
 #: __main__.py:2658
 msgid "Project Opened: "
-msgstr ""
+msgstr "项目已开放： "
 
 #: __main__.py:2668
 msgid "Deleting code_text coding to deleted files: "
-msgstr ""
+msgstr "删除已删除文件的编码_文本编码： "
 
 #: __main__.py:2675
 msgid "Deleting code_image coding to deleted files: "
-msgstr ""
+msgstr "删除已删除文件的编码图像： "
 
 #: __main__.py:2682
 msgid "Deleting code_av coding to deleted files: "
-msgstr ""
+msgstr "删除已删除文件的代码_av 编码： "
 
 #: __main__.py:2721 code_text.py:3159 code_text.py:4957 code_pdf.py:261
 msgid "Information"
-msgstr ""
+msgstr "信息"
 
 #: __main__.py:2721
 msgid "QualCoder project missing folders. Created empty folders"
-msgstr ""
+msgstr "QualCoder 项目缺少文件夹。创建了空文件夹"
 
 #: __main__.py:2737
 msgid "Project summary"
-msgstr ""
+msgstr "项目总结"
 
 #: __main__.py:2738
 msgid "Date time now: "
-msgstr ""
+msgstr "现在的日期时间："
 
 #: __main__.py:2740
 msgid "Project path: "
-msgstr ""
+msgstr "项目路径："
 
 #: __main__.py:2741
 msgid "Project date: "
-msgstr ""
+msgstr "项目日期："
 
 #: __main__.py:2746
 msgid "Project memo: "
-msgstr ""
+msgstr "项目备忘录："
 
 #: __main__.py:2753 manage_files.py:2156
 msgid "Files: "
-msgstr ""
+msgstr "没有文件"
 
 #: __main__.py:2757 cases.py:357 import_twitter_data.py:104
 msgid "Cases: "
-msgstr ""
+msgstr "病例： "
 
 #: __main__.py:2761
 msgid "Code categories: "
-msgstr ""
+msgstr "代码类别："
 
 #: __main__.py:2765 report_codes.py:1276 report_codes.py:1282
 #: report_relations.py:167 report_relations.py:168
 msgid "Codes: "
-msgstr ""
+msgstr "代码"
 
 #: __main__.py:2769 attributes.py:92 attributes.py:257 view_charts.py:259
 msgid "Attributes: "
-msgstr ""
+msgstr "属性："
 
 #: __main__.py:2773 journals.py:359
 msgid "Journals: "
-msgstr ""
+msgstr "期刊："
 
 #: __main__.py:2785
 msgid "Bad links to files"
-msgstr ""
+msgstr "文件链接错误"
 
 #: __main__.py:2819
 msgid "Closing project: "
-msgstr ""
+msgstr "结束项目： "
 
 #: __main__.py:2886
 msgid "Deleting: "
-msgstr ""
+msgstr "删除： "
 
 #: __main__.py:2895
 msgid ""
 "The AI is setup and enabled, so there is nothing to do here. Go to AI > "
 "settings to change the current model or other settings."
 msgstr ""
+"人工智能已设置并启用，因此这里没有什么可做的。请转到人工智能 > 设置，更改当前"
+"模型或其他设置。"
 
 #: __main__.py:2897
 msgid "AI Setup Wizard"
-msgstr ""
+msgstr "人工智能设置向导"
 
 #: __main__.py:2899
 msgid "AI: Setup Wizard"
-msgstr ""
+msgstr "人工智能设置向导"
 
 #: __main__.py:2902
 msgid "AI: Setup Wizard finished"
-msgstr ""
+msgstr "人工智能：设置向导已完成"
 
 #: __main__.py:2911
 msgid "Please enable the AI first and set it in Settings."
-msgstr ""
+msgstr "请先启用人工智能，并在设置中进行设置。"
 
 #: __main__.py:2912 __main__.py:2916 __main__.py:2921 __main__.py:2946
 msgid "Rebuild AI Memory"
-msgstr ""
+msgstr "重建人工智能记忆"
 
 #: __main__.py:2915
 msgid "The AI is busy or not set up correctly."
-msgstr ""
+msgstr "人工智能忙或设置不正确。"
 
 #: __main__.py:2919
 msgid ""
 "This will re-read all of your empirical documents, which may take some time. "
 "Do you want to continue?"
-msgstr ""
+msgstr "这将重新读取您的所有经验文件，可能需要一些时间。您想继续吗？"
 
 #: __main__.py:2937 __main__.py:2945
 msgid "Please enable the AI first and set it up in Settings."
-msgstr ""
+msgstr "请先启用人工智能，并在设置中进行设置。"
 
 #: __main__.py:2938
 msgid "Ai Chat"
-msgstr ""
+msgstr "人工智能聊天"
 
 #: __main__.py:2958
 msgid "This version: "
-msgstr ""
+msgstr "此版本： "
 
 #: __main__.py:2965
 msgid "Newer release available: "
-msgstr ""
+msgstr "可提供更新版本： "
 
 #: __main__.py:2970
 msgid "Latest Release: "
-msgstr ""
+msgstr "最新发布： "
 
 #: add_attribute.py:74
 msgid "This attribute name already exists in cases, files or journals."
-msgstr ""
+msgstr "该属性名称已存在于案例、文件或期刊中。"
 
 #: add_attribute.py:75
 msgid "Or is reserved for bibliography attributes:"
-msgstr ""
+msgstr "或保留给书目属性："
 
 #: add_attribute.py:77
 msgid "Duplicate"
-msgstr ""
+msgstr "重复"
 
 #: add_item_name.py:78
 msgid "Duplicated"
-msgstr ""
+msgstr "重复"
 
 #: add_item_name.py:78
 msgid "This already exists"
-msgstr ""
+msgstr "这已经存在"
 
 #: ai_chat.py:88
 msgid "<your question>"
-msgstr ""
+msgstr "<您的问题>"
 
 #: ai_chat.py:271 ai_chat.py:286 ai_chat.py:308 ai_chat.py:416 ai_chat.py:537
 msgid "No project open."
-msgstr ""
+msgstr "未打开项目。"
 
 #: ai_chat.py:272 ai_chat.py:276 ai_chat.py:287 ai_chat.py:291 ai_chat.py:309
 #: ai_chat.py:313 ai_chat.py:417 ai_chat.py:421 ai_chat.py:538 ai_chat.py:542
 #: ai_chat.py:944
 msgid "AI not enabled"
-msgstr ""
+msgstr "未启用人工智能"
 
 #: ai_chat.py:275 ai_chat.py:290 ai_chat.py:312 ai_chat.py:420 ai_chat.py:541
 #: ai_chat.py:943 code_text.py:4650
 msgid "The AI is disabled. Go to \"AI > Setup Wizard\" first."
-msgstr ""
+msgstr "人工智能已禁用。请先进入 “人工智能 > 设置向导”。"
 
 #: ai_chat.py:294
 msgid ""
@@ -522,24 +538,27 @@ msgid ""
 " There you can open a document, select a piece of text, right click on it "
 "and choose \"AI Text Analysis\" from the context menu."
 msgstr ""
+"现在我们将切换到文本编码工作区。\n"
+" 在那里，您可以打开一个文档，选择一段文本，右击该文本并从右键菜单中选择 “AI "
+"文本分析”。"
 
 #: ai_chat.py:297 code_text.py:1066
 msgid "AI Text Analysis"
-msgstr ""
+msgstr "人工智能文本分析"
 
 #: ai_chat.py:379
 msgid ""
 "No coded text found. Please select another code or category, or refine you "
 "filters."
-msgstr ""
+msgstr "未找到编码文本。请选择其他编码或类别，或改进您的筛选条件。"
 
 #: ai_chat.py:380
 msgid "AI code analysis"
-msgstr ""
+msgstr "人工智能代码分析"
 
 #: ai_chat.py:396
 msgid "Analyzing the data coded as \"{}\" ({} pieces of data sent to the AI.)"
-msgstr ""
+msgstr "分析编码为“{}”的数据（发送给人工智能的 {} 条数据）。"
 
 #: ai_chat.py:398
 msgid ""
@@ -547,11 +566,14 @@ msgid ""
 "ATTENTION: There was more coded data found, but it had to be truncated "
 "because of the limited context window of the AI."
 msgstr ""
+"\n"
+"注意：虽然发现了更多的编码数据，但由于人工智能的上下文窗口有限，这些数据不得"
+"不被截断。"
 
 #: ai_chat.py:400 report_relations.py:617 report_relations.py:922
 #: view_graph.py:1654 view_graph.py:3080 view_graph.py:3082
 msgid "Code"
-msgstr ""
+msgstr "代码"
 
 #: ai_chat.py:404 ai_chat.py:443
 msgid ""
@@ -561,336 +583,350 @@ msgid ""
 "information will accompany every prompt sent to the AI, resulting in much "
 "more targeted results."
 msgstr ""
+"请注意，强烈建议使用项目备忘录（菜单 “项目 > 项目备忘录”）简短描述项目的研究"
+"课题、问题、目标和收集的经验数据。这些信息将伴随发送到人工智能的每个提示，从"
+"而使结果更有针对性"
 
 #: ai_chat.py:435
 msgid "Analyzing the free topic \"{}\" in the data."
-msgstr ""
+msgstr "分析数据中的自由主题“{}”。"
 
 #: ai_chat.py:437
 msgid ""
 "\n"
 "Description:"
 msgstr ""
+"\n"
+"说明"
 
 #: ai_chat.py:439
 msgid "Topic"
-msgstr ""
+msgstr "主题"
 
 #: ai_chat.py:449
 msgid "Searching for related data..."
-msgstr ""
+msgstr "搜索相关数据..."
 
 #: ai_chat.py:476
 msgid "Chat has been canceled by the user."
-msgstr ""
+msgstr "用户已取消聊天。"
 
 #: ai_chat.py:480
 msgid "Sorry, the AI could could not find any data related to \""
-msgstr ""
+msgstr "抱歉，人工智能无法找到任何与以下内容相关的数据 "
 
 #: ai_chat.py:487
 msgid "Found related data. Analyzing the most relevant segments closer."
-msgstr ""
+msgstr "找到相关数据。分析最相关的细分市场。"
 
 #: ai_chat.py:550
 msgid ""
 "The text is too long to be analyzed in one go. Please select a shorter "
 "passage."
-msgstr ""
+msgstr "文章太长，无法一次性分析。请选择较短的段落。"
 
 #: ai_chat.py:551
 msgid "AI text analysis"
-msgstr ""
+msgstr "人工智能文本分析"
 
 #: ai_chat.py:576
 msgid "Analyzing text from "
-msgstr ""
+msgstr "分析来自 "
 
 #: ai_chat.py:578
 msgid " characters)."
-msgstr ""
+msgstr " 字符）。"
 
 #: ai_chat.py:580
 msgid "Text analysis"
-msgstr ""
+msgstr "文本分析"
 
 #: ai_chat.py:593 ai_prompts.py:825
 msgid "Do you really want to delete "
-msgstr ""
+msgstr "您真的想删除 "
 
 #: ai_chat.py:594
 msgid "Delete Chat"
-msgstr ""
+msgstr "删除聊天"
 
 #: ai_chat.py:623
 msgid "Send your question to the AI"
-msgstr ""
+msgstr "将您的问题发送给人工智能"
 
 #: ai_chat.py:629
 msgid "Cancel AI generation"
-msgstr ""
+msgstr "取消人工智能生成"
 
 #: ai_chat.py:634 ai_chat.py:636
 msgid "AI: "
-msgstr ""
+msgstr "人工智能："
 
 #: ai_chat.py:634
 msgid "reading data"
-msgstr ""
+msgstr "读取数据"
 
 #: ai_chat.py:655 ai_chat.py:657
 msgid "Type:"
-msgstr ""
+msgstr "类型："
 
 #: ai_chat.py:655 ai_chat.py:657
 msgid "Summary:"
-msgstr ""
+msgstr "摘要："
 
 #: ai_chat.py:655 ai_chat.py:657
 msgid "Date:"
-msgstr ""
+msgstr "日期："
 
 #: ai_chat.py:655
 msgid "Prompt:"
-msgstr ""
+msgstr "提示："
 
 #: ai_chat.py:665
 msgid "User"
-msgstr ""
+msgstr "用户"
 
 #: ai_chat.py:673
 msgid "AI"
-msgstr ""
+msgstr "人工智能"
 
 #: ai_chat.py:677
 msgid "Info:"
-msgstr ""
+msgstr "信息："
 
 #: ai_chat.py:728
 msgid "(unknown reference)"
-msgstr ""
+msgstr "(参考文献不详）"
 
 #: ai_chat.py:798 ai_chat.py:812 ai_chat.py:813
 msgid "Export Chat"
-msgstr ""
+msgstr "出口聊天"
 
 #: ai_chat.py:811
 msgid "The file already exists. Do you want to override it?"
-msgstr ""
+msgstr "文件已经存在。您想覆盖它吗？"
 
 #: ai_chat.py:851
 msgid "New topic analysis chat"
-msgstr ""
+msgstr "新话题分析聊天"
 
 #: ai_chat.py:853
 msgid "Analyzing a free-search topic together with the AI."
-msgstr ""
+msgstr "与人工智能一起分析自由搜索主题。"
 
 #: ai_chat.py:854
 msgid "New text analysis chat"
-msgstr ""
+msgstr "新的文本分析聊天"
 
 #: ai_chat.py:856
 msgid "Analyse a piece of text from your empirical data together with the AI."
-msgstr ""
+msgstr "与人工智能一起分析经验数据中的一段文字。"
 
 #: ai_chat.py:857
 msgid "New code analysis chat"
-msgstr ""
+msgstr "新代码分析聊天"
 
 #: ai_chat.py:859
 msgid "Analyze the data collected under a certain code together with the AI."
-msgstr ""
+msgstr "与人工智能一起分析在特定代码下收集到的数据。"
 
 #: ai_chat.py:860
 msgid "New general chat"
-msgstr ""
+msgstr "新的一般聊天"
 
 #: ai_chat.py:862
 msgid "Ask the AI anything, not related to your data."
-msgstr ""
+msgstr "向人工智能提出任何与您的数据无关的问题。"
 
 #: ai_chat.py:947
 msgid ""
 "The AI is busy generating a response. Click on the button on the right to "
 "stop."
-msgstr ""
+msgstr "人工智能正忙着生成回复。点击右侧按钮即可停止。"
 
 #: ai_chat.py:948
 msgid "AI busy"
-msgstr ""
+msgstr "人工智能忙"
 
 #: ai_chat.py:951
 msgid "The AI not yet fully loaded. Please wait and retry."
-msgstr ""
+msgstr "人工智能尚未完全加载。请稍后重试。"
 
 #: ai_chat.py:952 ai_search_dialog.py:447
 msgid "AI not ready"
-msgstr ""
+msgstr "人工智能尚未准备就绪"
 
 #: ai_chat.py:970
 msgid "Please select a chat or create a new one."
-msgstr ""
+msgstr "请选择聊天或创建新聊天。"
 
 #: ai_chat.py:971
 msgid "Chat selection"
-msgstr ""
+msgstr "聊天选择"
 
 #: ai_chat.py:1076
 msgid ""
 "Error: The AI returned an empty result. This may indicate that the AI model "
 "is not available at the moment. Try again later or choose a different model."
 msgstr ""
+"错误： 人工智能返回的结果为空。这可能表明该人工智能模型暂时不可用。请稍后再试"
+"或选择其他模型。"
 
 #: ai_chat.py:1082
 msgid "Error communicating with "
-msgstr ""
+msgstr "通信错误"
 
 #: ai_chat.py:1089 ai_llm.py:327 ai_vectorstore.py:63
 msgid "Uncaught exception: "
-msgstr ""
+msgstr "未捕获异常："
 
 #: ai_chat.py:1125 ai_chat.py:1146 ai_chat.py:1186 ai_chat.py:1206
 msgid "Invalid source reference."
-msgstr ""
+msgstr "引用源无效。"
 
 #: ai_chat.py:1159
 msgid "Error retrieving source text"
-msgstr ""
+msgstr "检索源文本时出错"
 
 #: ai_chat.py:1187 ai_chat.py:1207
 msgid "AI Chat"
-msgstr ""
+msgstr "人工智能聊天"
 
 #: ai_llm.py:133
 msgid "AI: Starting up..."
-msgstr ""
+msgstr "人工智能：启动..."
 
 #: ai_llm.py:142
 msgid "AI: Please set up the AI model"
-msgstr ""
+msgstr "人工智能：请设置人工智能模型"
 
 #: ai_llm.py:143
 msgid "AI Setup"
-msgstr ""
+msgstr "人工智能设置"
 
 #: ai_llm.py:149
 msgid "AI: No model selected, AI is disabled."
-msgstr ""
+msgstr "人工智能：未选择模型，人工智能被禁用。"
 
 #: ai_llm.py:165
 msgid ""
 "Please enter an API-key for the AI in the following dialog (or \"None\" if "
 "not API-key is needed)."
 msgstr ""
+"请在以下对话框中输入人工智能的 API 密钥（如果不需要 API 密钥，则输入 “无”）。"
 
 #: ai_llm.py:166
 msgid "AI API-key"
-msgstr ""
+msgstr "人工智能 API 密钥"
 
 #: ai_llm.py:172
 msgid "AI: No API key set, AI is disabled."
-msgstr ""
+msgstr "人工智能：未设置 API 密钥，人工智能已禁用。"
 
 #: ai_llm.py:235
 msgid "AI: Ready"
-msgstr ""
+msgstr "人工智能：准备就绪"
 
 #: ai_llm.py:246
 msgid ""
 "An error occured during AI initialization. The AI features will be disabled. "
 "Click on Project > Settings to reenable them."
 msgstr ""
+"人工智能初始化过程中发生错误。人工智能功能将被禁用。单击 “项目”>“设置 ”重新启"
+"用这些功能。"
 
 #: ai_llm.py:247
 msgid "AI Initialization"
-msgstr ""
+msgstr "人工智能初始化"
 
 #: ai_llm.py:261
 msgid "Do you really want to cancel the AI operation?"
-msgstr ""
+msgstr "您真的想取消人工智能操作吗？"
 
 #: ai_llm.py:324
 msgid "AI Error:\n"
-msgstr ""
+msgstr "人工智能错误：\n"
 
 #: ai_llm.py:456
 msgid "AI generate_code_descriptions\n"
-msgstr ""
+msgstr "人工智能生成代码描述\n"
 
 #: ai_llm.py:457
 msgid "Prompt:\n"
-msgstr ""
+msgstr "提示:\n"
 
 #: ai_llm.py:487
 msgid ""
 "Stage 1:\n"
 "Searching data related to \""
 msgstr ""
+"第 1 阶段：\n"
+"搜索与”"
 
 #: ai_llm.py:564
 msgid ""
 "Stage 2:\n"
 "Inspecting the data more closely..."
 msgstr ""
+"第 2 阶段：\n"
+"更仔细地检查数据..."
 
 #: ai_prompts.py:826
 msgid "Delete Prompt"
-msgstr ""
+msgstr "删除提示"
 
 #: ai_prompts.py:863 ai_prompts.py:868 ai_prompts.py:874 ai_prompts.py:903
 #: ai_prompts.py:911
 msgid "Edit prompts"
-msgstr ""
+msgstr "编辑提示"
 
 #: ai_prompts.py:863
 msgid "The name cannot be empty"
-msgstr ""
+msgstr "名称不能为空"
 
 #: ai_prompts.py:868
 msgid "The name must be no longer than 60 characters."
-msgstr ""
+msgstr "名称长度不得超过 60 个字符。"
 
 #: ai_prompts.py:874
 msgid "The name of the prompt must be unique within its type and scope."
-msgstr ""
+msgstr "提示符的名称在其类型和范围内必须是唯一的。"
 
 #: ai_prompts.py:901
 msgid "Names of prompts must be unique within its type and scope. "
-msgstr ""
+msgstr "提示名称在其类型和范围内必须是唯一的。"
 
 #: ai_search_dialog.py:79
 msgid "1) What do you want to search for?"
-msgstr ""
+msgstr "1) 您想搜索什么？"
 
 #: ai_search_dialog.py:85
 msgid "1) Which code do you want to analyze?"
-msgstr ""
+msgstr "1) 您想分析哪些代码？"
 
 #: ai_search_dialog.py:92
 msgid "1) Which topic do you want to analyze?"
-msgstr ""
+msgstr "1) 您想分析哪个主题？"
 
 #: ai_search_dialog.py:121
 msgid "The last used prompt"
-msgstr ""
+msgstr "最后使用的提示"
 
 #: ai_search_dialog.py:123
 msgid "could not be found. The prompt will be reset to the default."
-msgstr ""
+msgstr "无法找到。提示符将重置为默认值。"
 
 #: ai_search_dialog.py:124 ai_search_dialog.py:453 ai_search_dialog.py:473
 #: report_codes.py:1241 report_exact_matches.py:191 view_graph.py:500
 #: view_graph.py:562 view_graph.py:613
 msgid "No codes"
-msgstr ""
+msgstr "无代码"
 
 #: ai_search_dialog.py:172 attributes.py:262 code_organiser.py:987
 #: code_text.py:563 code_pdf.py:468 journals.py:186 manage_files.py:912
 #: report_codes.py:362 report_code_summary.py:104
 #: report_codes_by_segments.py:253 view_av.py:452 view_image.py:321
 msgid "Name"
-msgstr ""
+msgstr "名称"
 
 #: ai_search_dialog.py:172 ai_search_dialog.py:186 ai_search_dialog.py:264
 #: attributes.py:200 attributes.py:262 cases.py:737 cases.py:895
@@ -909,76 +945,78 @@ msgstr ""
 #: view_av.py:2292 view_image.py:321 view_image.py:1254 view_image.py:1863
 #: view_image.py:1887
 msgid "Memo"
-msgstr ""
+msgstr "备忘录"
 
 #: ai_search_dialog.py:172 code_text.py:563 code_pdf.py:468 report_codes.py:362
 #: report_code_summary.py:104 report_codes_by_segments.py:253
 #: report_relations.py:922 view_av.py:452 view_image.py:321
 msgid "Count"
-msgstr ""
+msgstr "计数"
 
 #: ai_search_dialog.py:173 report_codes.py:363 report_codes_by_segments.py:254
 msgid "Codes and categories"
-msgstr ""
+msgstr "代码和类别"
 
 #: ai_search_dialog.py:375 report_attributes.py:324
 msgid "Show files:"
-msgstr ""
+msgstr "显示文件："
 
 #: ai_search_dialog.py:392
 msgid "<no file filter>"
-msgstr ""
+msgstr "<无文件过滤器>"
 
 #: ai_search_dialog.py:393
 msgid "Search in all textfiles"
-msgstr ""
+msgstr "在所有文本文件中搜索"
 
 #: ai_search_dialog.py:405
 msgid "Codings: "
-msgstr ""
+msgstr "编码： "
 
 #: ai_search_dialog.py:409 report_codes.py:233 report_codes_by_segments.py:123
 msgid ""
 "\n"
 "MEMO: "
 msgstr ""
+"\n"
+"备忘录: "
 
 #: ai_search_dialog.py:417
 msgid "Search in all cases"
-msgstr ""
+msgstr "在所有情况下进行搜索"
 
 #: ai_search_dialog.py:425 code_text.py:5124 code_pdf.py:3550
 #: report_codes.py:246 report_codes.py:2137 report_codes.py:2734
 #: report_code_summary.py:243 report_codes_by_segments.py:136
 #: report_file_summary.py:153 view_av.py:3285 view_av.py:3738
 msgid "MEMO: "
-msgstr ""
+msgstr "备忘录: "
 
 #: ai_search_dialog.py:446
 msgid "The AI ist not ready to fulfill your request (status: "
-msgstr ""
+msgstr "人工智能尚未准备好满足您的请求（状态： "
 
 #: ai_search_dialog.py:446
 msgid ")."
-msgstr ""
+msgstr ")."
 
 #: ai_search_dialog.py:452
 msgid "Please select a code or category (or use \"free search\" instead)."
-msgstr ""
+msgstr "请选择代码或类别（或使用 “自由搜索”）。"
 
 #: ai_search_dialog.py:472
 msgid "Please enter text in the \"topic\" field."
-msgstr ""
+msgstr "请在 “主题 ”栏输入文字。"
 
 #: ai_search_dialog.py:521
 msgid ""
 "After combining all filters, there are not files left for the search. Please "
 "check your settings."
-msgstr ""
+msgstr "合并所有筛选器后，没有文件可供搜索。请检查您的设置。"
 
 #: ai_search_dialog.py:522
 msgid "No files"
-msgstr ""
+msgstr "无文件"
 
 #: ai_vectorstore.py:154
 msgid ""
@@ -988,24 +1026,28 @@ msgid ""
 "This will download about 2.5 GB of data. Do you \n"
 "want to continue?"
 msgstr ""
+"由于您是第一次使用人工智能集成，QualCoder 需要下载并安装一些附加组件。\n"
+"\n"
+"这将下载约 2.5 GB 的数据。您是否 \n"
+"要继续吗？"
 
 #: ai_vectorstore.py:163 ai_vectorstore.py:174
 msgid "Download AI components"
-msgstr ""
+msgstr "下载人工智能组件"
 
 #: ai_vectorstore.py:193
 msgid "Downloading "
-msgstr ""
+msgstr "下载 "
 
 #: ai_vectorstore.py:264
 msgid ""
 "AI: Could not download all the necessary components, the AI integration will "
 "be disabled."
-msgstr ""
+msgstr "人工智能：无法下载所有必要组件，人工智能集成将被禁用。"
 
 #: ai_vectorstore.py:266
 msgid "AI: Success, components downloaded and installed."
-msgstr ""
+msgstr "人工智能： 成功，已下载并安装组件。"
 
 #: ai_vectorstore.py:304 ai_vectorstore.py:382
 msgid ""
@@ -1015,145 +1057,148 @@ msgid ""
 "all your empirical documents again to rebuild the local memory. This may "
 "take a while. Sorry for the inconvenience."
 msgstr ""
+"看来您之前已经在这个项目中使用过人工智能功能。同时，我们不得不更改本地人工智"
+"能内存的内部实现，使其更加稳健。因此，人工智能必须重新读取您的所有经验文档，"
+"以重建本地内存。这可能需要一段时间。不便之处，敬请原谅。"
 
 #: ai_vectorstore.py:369
 msgid "AI: Finished loading (no project open)."
-msgstr ""
+msgstr "人工智能：加载完毕（未打开项目）。"
 
 #: ai_vectorstore.py:387 ai_vectorstore.py:399
 msgid "AI memory"
-msgstr ""
+msgstr "人工智能存储器"
 
 #: ai_vectorstore.py:408
 msgid "AI: Checked all documents, memory is up to date."
-msgstr ""
+msgstr "大赦国际：检查了所有文件，内存是最新的。"
 
 #: ai_vectorstore.py:431
 msgid "Vectorstore: Document import failed, faiss_db not present."
-msgstr ""
+msgstr "向量存储： 文档导入失败，faiss_db 不存在。"
 
 #: ai_vectorstore.py:463
 msgid "AI: Adding document to internal memory: "
-msgstr ""
+msgstr "人工智能： 将文档添加到内部存储器 "
 
 #: ai_vectorstore.py:533
 msgid "AI: No documents, AI is ready."
-msgstr ""
+msgstr "人工智能：没有文件，人工智能已经准备好了。"
 
 #: ai_vectorstore.py:537
 msgid "AI: Checking for new documents"
-msgstr ""
+msgstr "人工智能：检查新文件"
 
 #: ai_vectorstore.py:550
 msgid ""
 "AI: Rebuilding memory. The local AI will read through all your documents, "
 "please be patient."
-msgstr ""
+msgstr "人工智能：重建内存。本地人工智能将读取您的所有文件，请耐心等待。"
 
 #: attributes.py:146
 msgid "Attribute added: "
-msgstr ""
+msgstr "已添加属性： "
 
 #: attributes.py:167
 msgid "Attribute deleted: "
-msgstr ""
+msgstr "属性已删除： "
 
 #: attributes.py:178
 msgid "Attributes deleted: "
-msgstr ""
+msgstr "属性已删除： "
 
 #: attributes.py:188
 msgid "Memo for Attribute "
-msgstr ""
+msgstr "属性备忘录 "
 
 #: attributes.py:214
 msgid "numeric"
-msgstr ""
+msgstr "数字"
 
 #: attributes.py:215
 msgid "Change to character"
-msgstr ""
+msgstr "改为字符"
 
 #: attributes.py:249
 msgid "Attribute renamed from: "
-msgstr ""
+msgstr "属性重命名自 "
 
 #: attributes.py:249 code_text.py:3050 code_text.py:3106
 msgid " to "
-msgstr ""
+msgstr "至 "
 
 #: attributes.py:262
 msgid "Assigned to"
-msgstr ""
+msgstr " 分配给"
 
 #: attributes.py:262 manage_links.py:188 manage_references.py:384
 msgid "Type"
-msgstr ""
+msgstr "类型"
 
 #: attributes.py:274 case_file_manager.py:231 case_file_manager.py:304
 msgid "Yes"
-msgstr ""
+msgstr "是"
 
 #: case_file_manager.py:94 code_in_all_files.py:135 code_in_all_files.py:212
 #: helpers.py:217 report_attributes.py:339 report_codes.py:2164
 #: view_charts.py:283 view_graph.py:1543
 msgid "Case: "
-msgstr ""
+msgstr "案例："
 
 #: case_file_manager.py:154
 msgid "Files linked: "
-msgstr ""
+msgstr "链接的文件："
 
 #: case_file_manager.py:162
 msgid "Add files to case"
-msgstr ""
+msgstr "为案件添加文件"
 
 #: case_file_manager.py:163
 msgid "Remove files from case"
-msgstr ""
+msgstr "从案件中删除文件"
 
 #: case_file_manager.py:191 case_file_manager.py:669
 msgid "File added to case"
-msgstr ""
+msgstr "文件已添加到案件中"
 
 #: case_file_manager.py:217
 msgid "This file has already been linked to this case "
-msgstr ""
+msgstr "该文件已与此案相关联 "
 
 #: case_file_manager.py:224
 msgid "added to case."
-msgstr ""
+msgstr "添加到案件中。"
 
 #: case_file_manager.py:351
 msgid "Displayed file: "
-msgstr ""
+msgstr "显示文件： "
 
 #: case_file_manager.py:446 cases.py:1103 edit_textfile.py:582
 #: report_exact_matches.py:583 report_relations.py:454 report_sql.py:414
 msgid "Select all"
-msgstr ""
+msgstr "选择所有"
 
 #: case_file_manager.py:448
 msgid "Mark"
-msgstr ""
+msgstr "马克"
 
 #: case_file_manager.py:450 cases.py:1104 edit_textfile.py:583
 #: report_sql.py:415
 msgid "Copy"
-msgstr ""
+msgstr "复制"
 
 #: case_file_manager.py:453 code_pdf.py:2891 report_codes.py:2238
 #: view_av.py:2504 view_image.py:1255
 msgid "Unmark"
-msgstr ""
+msgstr "无标记"
 
 #: case_file_manager.py:549
 msgid "Already Linked"
-msgstr ""
+msgstr "已链接"
 
 #: case_file_manager.py:550
 msgid "This segment has already been linked to this case"
-msgstr ""
+msgstr "该部分已与此案相关联"
 
 #: case_file_manager.py:618 cases.py:671 code_text.py:1145 code_text.py:3396
 #: code_text.py:3401 code_text.py:3554 code_text.py:3660 code_text.py:3673
@@ -1165,193 +1210,199 @@ msgstr ""
 #: report_attributes.py:543 report_codes.py:1115 view_av.py:2855
 #: view_av.py:2859 view_av.py:3005 view_graph.py:812
 msgid "Warning"
-msgstr ""
+msgstr "警告"
 
 #: case_file_manager.py:618 code_text.py:3673
 msgid "Cannot have blank text marks"
-msgstr ""
+msgstr "不能有空白文本标记"
 
 #: case_file_manager.py:620
 msgid "Auto assign text to case: "
-msgstr ""
+msgstr "自动将文本分配到大小写： "
 
 #: case_file_manager.py:621 code_text.py:3685
 msgid ""
 "\n"
 "Using "
 msgstr ""
+"\n"
+"使用 "
 
 #: case_file_manager.py:621 code_text.py:3685
 msgid " and "
-msgstr ""
+msgstr " 和 "
 
 #: case_file_manager.py:621
 msgid ""
 "\n"
 "In files:\n"
 msgstr ""
+"\n"
+"在文件中：\n"
 
 #: case_file_manager.py:643
 msgid "Auto assign. Could not find an end mark: "
-msgstr ""
+msgstr "自动分配。找不到结束标记： "
 
 #: case_file_manager.py:661
 msgid ""
 "\n"
 "Already assigned."
 msgstr ""
+"\n"
+"已分配。"
 
 #: case_file_manager.py:668
 msgid " sections found."
-msgstr ""
+msgstr " 发现的部分。"
 
 #: cases.py:264
 msgid "Case attributes file exported to: "
-msgstr ""
+msgstr "导出的案件属性文件： "
 
 #: cases.py:265 reports.py:320
 msgid "File export"
-msgstr ""
+msgstr "文件导出"
 
 #: cases.py:388
 msgid "Attribute added to cases: "
-msgstr ""
+msgstr "为案例添加属性： "
 
 #: cases.py:388
 msgid "type:"
-msgstr ""
+msgstr "类型："
 
 #: cases.py:395
 msgid "Cases have already been created."
-msgstr ""
+msgstr "案例已经创建。"
 
 #: cases.py:397
 msgid "Select cases file"
-msgstr ""
+msgstr "选择案件文件"
 
 #: cases.py:468 cases.py:544
 msgid "attribute:"
-msgstr ""
+msgstr "属性："
 
 #: cases.py:483 cases.py:559
 msgid "Cases and attributes imported from: "
-msgstr ""
+msgstr "输入的案例和属性： "
 
 #: cases.py:504
 msgid "Cannot import from csv, only one row in file"
-msgstr ""
+msgstr "无法从 csv 文件导入，文件中只有一行"
 
 #: cases.py:570 manage_files.py:912 view_graph.py:938 view_graph.py:1859
 #: view_graph.py:1887
 msgid "Case"
-msgstr ""
+msgstr "案例"
 
 #: cases.py:570
 msgid "Enter case name"
-msgstr ""
+msgstr "输入案件名称"
 
 #: cases.py:596
 msgid "Case added: "
-msgstr ""
+msgstr "案例补充： "
 
 #: cases.py:670 journals.py:745 manage_files.py:1180
 msgid "This attribute is numeric"
-msgstr ""
+msgstr "该属性为数字"
 
 #: cases.py:727
 msgid "Memo for case "
-msgstr ""
+msgstr "案件备忘录 "
 
 #: cases.py:766 manage_files.py:225
 msgid "Show all columns"
-msgstr ""
+msgstr "显示所有栏目"
 
 #: cases.py:769 manage_files.py:228
 msgid "Hide column"
-msgstr ""
+msgstr "隐藏栏"
 
 #: cases.py:770 manage_files.py:229
 msgid "Hide columns starting with"
-msgstr ""
+msgstr "隐藏以"
 
 #: cases.py:771 manage_files.py:230
 msgid "Show columns starting with"
-msgstr ""
+msgstr "显示以"
 
 #: cases.py:783 manage_files.py:242
 msgid "Hide columns starting with:"
-msgstr ""
+msgstr "隐藏以.开头的列"
 
 #: cases.py:784 manage_files.py:243
 msgid "Hide Columns"
-msgstr ""
+msgstr "隐藏列"
 
 #: cases.py:792 manage_files.py:250
 msgid "Show columns starting with:"
-msgstr ""
+msgstr "显示以......开头的列："
 
 #: cases.py:793 manage_files.py:251
 msgid "Show Columns"
-msgstr ""
+msgstr "显示列"
 
 #: cases.py:820
 msgid "View case"
-msgstr ""
+msgstr "查看案例"
 
 #: cases.py:821 cases.py:828 manage_files.py:290 manage_files.py:295
 #: manage_files.py:299 manage_files.py:313
 msgid "Order ascending"
-msgstr ""
+msgstr "升序排列"
 
 #: cases.py:822 cases.py:829 manage_files.py:291 manage_files.py:314
 msgid "Order descending"
-msgstr ""
+msgstr "降序排列"
 
 #: cases.py:823 journals.py:443 manage_files.py:304
 msgid "Show values like"
-msgstr ""
+msgstr "显示以下值"
 
 #: cases.py:824 manage_files.py:306 manage_references.py:606
 msgid "Show this value"
-msgstr ""
+msgstr "显示此值"
 
 #: cases.py:830 journals.py:450 manage_files.py:341
 msgid "Show all rows Ctrl A"
-msgstr ""
+msgstr "显示所有行 Ctrl A"
 
 #: cases.py:834 manage_files.py:345
 msgid "Open URL"
-msgstr ""
+msgstr "打开 URL"
 
 #: cases.py:865 journals.py:481 journals.py:496 manage_files.py:402
 #: manage_files.py:416 manage_references.py:246 manage_references.py:627
 #: report_sql.py:526 report_sql.py:540 report_sql.py:621 report_sql.py:631
 msgid "Text filter"
-msgstr ""
+msgstr "文本过滤器"
 
 #: cases.py:865 journals.py:496 manage_files.py:402
 msgid "Show values like:"
-msgstr ""
+msgstr "显示数值，如"
 
 #: cases.py:896
 msgid "Click to edit memo"
-msgstr ""
+msgstr "点击编辑备忘录"
 
 #: cases.py:904
 msgid "Click to manage files for this case"
-msgstr ""
+msgstr "点击管理此案件的文件"
 
 #: cases.py:918 manage_files.py:144 manage_files.py:2154
 msgid "Right click header row to hide columns"
-msgstr ""
+msgstr "右键单击标题行隐藏列"
 
 #: cases.py:938 report_attributes.py:556
 msgid "Minimum:"
-msgstr ""
+msgstr "最低："
 
 #: cases.py:938 report_attributes.py:556
 msgid "Maximum:"
-msgstr ""
+msgstr "最大："
 
 #: cases.py:961
 msgid "Viewing text of case: "
