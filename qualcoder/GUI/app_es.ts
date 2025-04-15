@@ -1441,7 +1441,7 @@ Key shortcut: Ctrl S</source>
     <message>
         <location filename="ui_dialog_code_av.py" line="194"/>
         <source>Coder:</source>
-        <translation>Descifrador:</translation>
+        <translation>Codificador:</translation>
     </message>
     <message>
         <location filename="." line="7274595"/>
@@ -1853,7 +1853,7 @@ Right-click to change automatic searching options</translation>
     <message>
         <location filename="ui_dialog_code_image.py" line="147"/>
         <source>Coder:</source>
-        <translation>Descifrador:</translation>
+        <translation>Codificador:</translation>
     </message>
     <message>
         <location filename="." line="7274595"/>
@@ -2699,7 +2699,7 @@ Ya que todas las posiciones asignadas pueden ser incorrectas. </translation>
     <message>
         <location filename="ui_dialog_journals.py" line="146"/>
         <source>Coder</source>
-        <translation>Descifrador</translation>
+        <translation>Codificador</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="130"/>
@@ -3258,7 +3258,7 @@ Revise después de aplicar la función.</translation>
     <message>
         <location filename="ui_dialog_report_codings.py" line="174"/>
         <source>Coder:</source>
-        <translation>Descifrador:</translation>
+        <translation>Codificador:</translation>
     </message>
     <message>
         <location filename="." line="7274595"/>
@@ -4231,7 +4231,7 @@ No se recomienda a menos que tenga muchos archivos grandes que ralenticen la cop
     <message>
         <location filename="ui_dialog_text_mining.py" line="94"/>
         <source>Coder:</source>
-        <translation>Descifrador:</translation>
+        <translation>Codificador:</translation>
     </message>
     <message>
         <location filename="ui_dialog_text_mining.py" line="95"/>
