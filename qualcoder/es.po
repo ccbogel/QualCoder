@@ -43,7 +43,7 @@ msgstr ""
 "Las nuevas funciones mejoradas de IA en QualCoder necesitan una "
 "configuración adicional. ¿Quieres habilitar la IA e iniciar la "
 "configuración? También puede hacerlo más tarde iniciando el Asistente de "
-"Configuración AI desde el menú AI en la ventana principal. Haga clic en «Sí» "
+"Configuración IA desde el menú IA en la ventana principal. Haga clic en «Sí» "
 "para empezar ahora."
 
 #: __main__.py:1167 __main__.py:1210 __main__.py:1213 __main__.py:1268
@@ -252,7 +252,7 @@ msgstr " creado."
 
 #: __main__.py:2031 __main__.py:2092 __main__.py:2116 __main__.py:2185
 msgid "Opening: "
-msgstr "Abrirse: "
+msgstr "Abriendo: "
 
 #: __main__.py:2041 __main__.py:2102 __main__.py:2126 __main__.py:2195
 msgid "New Project Created"
@@ -455,20 +455,20 @@ msgid ""
 "settings."
 msgstr ""
 "Parece que la IA ya está configurada y activada, por lo que no hay nada que "
-"hacer aquí. Ve a AI > ajustes si quieres cambiar el modelo actual u otros "
+"hacer aquí. Ve a IA > ajustes si quieres cambiar el modelo actual u otros "
 "ajustes."
 
 #: __main__.py:2759 __main__.py:2821 __main__.py:2846 __main__.py:2897
 msgid "AI Setup Wizard"
-msgstr "Asistente de configuración AI"
+msgstr "Asistente de configuración de IA"
 
 #: __main__.py:2761 __main__.py:2823 __main__.py:2848 __main__.py:2899
 msgid "AI: Setup Wizard"
-msgstr "Asistente de configuración AI"
+msgstr "Asistente de configuración de IA"
 
 #: __main__.py:2764 __main__.py:2826 __main__.py:2851 __main__.py:2902
 msgid "AI: Setup Wizard finished"
-msgstr "AI: Asistente de configuración finalizado"
+msgstr "IA: Asistente de configuración finalizado"
 
 #: __main__.py:2773 __main__.py:2799 __main__.py:2807
 msgid "Please enable the AI first and set it up properly."
@@ -1422,7 +1422,7 @@ msgstr "Agregar una nueva categoría"
 #: code_text.py:1525 code_organiser.py:937 code_pdf.py:1179 view_av.py:1339
 #: view_image.py:888
 msgid "Rename"
-msgstr "Rebautizar"
+msgstr "Renombrar"
 
 #: code_pdf.py:1224 code_text.py:1502 view_av.py:1399 view_image.py:885
 #: code_text.py:1473 code_pdf.py:1149 view_av.py:1336 view_image.py:850
@@ -2158,7 +2158,7 @@ msgid ""
 "AI search prompt: "
 msgstr ""
 "\n"
-"Aviso de búsqueda AI:"
+"Instrucciones de búsqueda para IA:"
 
 #: code_text.py:3390 code_text.py:3350 code_text.py:3402 code_text.py:3441
 msgid ""
@@ -2327,7 +2327,7 @@ msgstr "Codificación de texto: "
 #: code_text.py:4464 code_text.py:4512 code_text.py:4586 code_text.py:4646
 msgid "Please finish editing the text before starting an AI search."
 msgstr ""
-"Por favor, termine de editar el texto antes de iniciar una búsqueda AI."
+"Por favor, termine de editar el texto antes de iniciar una búsqueda con IA."
 
 #: code_text.py:4465 code_text.py:4469 code_text.py:4473 code_text.py:4477
 #: code_text.py:4536 code_text.py:4575 code_text.py:4615 code_text.py:4622
@@ -2342,7 +2342,7 @@ msgstr ""
 #, fuzzy
 #| msgid "Searching"
 msgid "AI Search"
-msgstr "Búsqueda"
+msgstr "Buscando"
 
 #: code_text.py:4468 ai_chat.py:272 ai_chat.py:287 ai_chat.py:309
 #: ai_chat.py:417 ai_chat.py:538 ai_chat.py:850 code_text.py:4516
@@ -2390,7 +2390,7 @@ msgstr ""
 "\n"
 "\n"
 "Translation results\n"
-"La IA está desactivada. Vaya primero a «AI > Asistente de configuración».\n"
+"La IA está desactivada. Vaya primero a «IA > Asistente de configuración».\n"
 "\n"
 "\n"
 "\n"
@@ -2535,11 +2535,11 @@ msgstr "Buscando datos relacionados, por favor espere..."
 
 #: code_text.py:4535 code_text.py:4583 code_text.py:4657 code_text.py:4717
 msgid "AI: No related data found for \""
-msgstr "AI: No se han encontrado datos relacionados para »"
+msgstr "IA: No se han encontrado datos relacionados para »"
 
 #: code_text.py:4574 code_text.py:4623 code_text.py:4697 code_text.py:4757
 msgid "AI: No new data found for \""
-msgstr "AI: No se han encontrado nuevos datos para »"
+msgstr "IA: No se han encontrado nuevos datos para »"
 
 #: code_text.py:4574 code_text.py:4624 code_text.py:4698 code_text.py:4758
 #, fuzzy
@@ -2590,7 +2590,7 @@ msgstr "Haga clic aquí para detener la búsqueda"
 
 #: code_text.py:4682 code_text.py:4736 code_text.py:4810 code_text.py:4870
 msgid ">> Find more..."
-msgstr ">> Más información..."
+msgstr ">> Encuentra más..."
 
 #: code_text.py:4683 code_text.py:4737 code_text.py:4811 code_text.py:4871
 #, fuzzy
@@ -2700,8 +2700,8 @@ msgid ""
 "+ - zoom in and out\n"
 "E Export Image"
 msgstr ""
-"L girar en el sentido de las agujas del reloj\n"
-"R girar en sentido antihorario\n"
+"Girar 90° grados a la derecha\n"
+"Girar 90° grados a la izquierda\n"
 "+ - acercar y alejar\n"
 "E Exportar imagen"
 
@@ -3179,7 +3179,7 @@ msgstr ""
 #: manage_files.py:1779 manage_files.py:675 manage_files.py:1782
 #: manage_files.py:696 manage_files.py:1804
 msgid "Cannot export"
-msgstr "No puede exportar"
+msgstr "No se puede exportar"
 
 #: manage_files.py:708 manage_files.py:674 manage_files.py:675
 #: manage_files.py:696
@@ -5589,7 +5589,7 @@ msgstr "Seleccione un modelo de IA o desactívela por completo."
 
 #: settings.py:275 settings.py:279 settings.py:341 settings.py:345
 msgid "AI model"
-msgstr "Modelo AIClick to apply"
+msgstr "Modelo IA Click to apply"
 
 #: settings.py:278 settings.py:344
 msgid ""
@@ -6012,7 +6012,7 @@ msgstr "Eliminar segmento"
 #: view_av.py:3111 view_av.py:3358 view_av.py:3056 view_av.py:3430
 #: view_av.py:3060 view_av.py:3434 view_av.py:3095 view_av.py:3469
 msgid "Play segment"
-msgstr "Segmeno actuar"
+msgstr "Reproducir segmento"
 
 #: view_av.py:3359 view_av.py:3431 view_av.py:3435 view_av.py:3470
 msgid "Edit segment start position"
@@ -6024,7 +6024,7 @@ msgstr "Editar la posición final del segmento"
 
 #: view_av.py:3365 view_av.py:3437 view_av.py:3441 view_av.py:3476
 msgid "Export segment to file"
-msgstr "Export segment to file"
+msgstr "Exportar segmento a archivo"
 
 #: view_av.py:3372 view_av.py:3444 view_av.py:3448 view_av.py:3483
 msgid "Link segment to selected text"
@@ -6718,11 +6718,11 @@ msgstr "Rotación"
 
 #: view_image.py:1119 view_image.py:1136 view_image.py:1140 view_image.py:1216
 msgid "Rotate clockwise"
-msgstr "Girar en sentido horario"
+msgstr "Girar 90° grados a la derecha"
 
 #: view_image.py:1120 view_image.py:1137 view_image.py:1141 view_image.py:1217
 msgid "Rotate counter-clockwise"
-msgstr "Girar en sentido antihorario"
+msgstr "Girar 90° grados a la izquierda"
 
 #: view_image.py:1156 view_image.py:1182 view_image.py:1186 view_image.py:1256
 msgid "Move or resize"
@@ -6738,8 +6738,8 @@ msgid ""
 "R rotate anti-clockwise\n"
 "+ - zoom in and out"
 msgstr ""
-"L girar en el sentido de las agujas del reloj\n"
-"R girar en sentido antihorario\n"
+"Girar 90° grados a la derecha\n"
+"Girar 90° grados a la izquierda\n"
 "+ - acercar y alejar"
 
 #: view_image.py:1938 view_image.py:1987 view_image.py:1993 view_image.py:2075
@@ -6810,8 +6810,8 @@ msgid "Please enable the AI first and set it up in Settings."
 msgstr "Primero activa la IA y configúrala en Ajustes."
 
 #: __main__.py:2862 __main__.py:2887 __main__.py:2938
-msgid "Ai Chat"
-msgstr "IA Chat"
+msgid "AI Chat"
+msgstr "Chat con IA"
 
 #: ai_chat.py:87 ai_chat.py:88
 msgid "<your question>"
@@ -6838,13 +6838,13 @@ msgid ""
 msgstr ""
 "Ahora pasaremos al espacio de trabajo de codificación de texto.\n"
 " Allí puedes abrir un documento, seleccionar un fragmento de texto, hacer "
-"clic con el botón derecho y elegir «Análisis de texto AI» en el menú "
+"clic con el botón derecho y elegir «Análisis de texto IA» en el menú "
 "contextual."
 
 #: ai_chat.py:294 code_text.py:1013 ai_chat.py:297 code_text.py:1059
 #: code_text.py:1066
 msgid "AI Text Analysis"
-msgstr "IA Análisis de textos"
+msgstr "Análisis de texto con IA"
 
 #: ai_chat.py:376 ai_chat.py:379
 msgid ""
@@ -6870,7 +6870,7 @@ msgstr ""
 "proyecto (Menú «Proyecto > Nota del proyecto») para incluir una breve "
 "descripción de los temas de investigación de su proyecto, las preguntas, los "
 "objetivos y los datos empíricos recopilados. Esta información acompañará a "
-"cada pregunta enviada a la IA, lo que dará lugar a resultados mucho más "
+"cada instrucción enviada a la IA, lo que dará lugar a resultados mucho más "
 "específicos."
 
 #: ai_chat.py:446 ai_chat.py:449
@@ -6879,7 +6879,7 @@ msgstr "Búsqueda de datos relacionados..."
 
 #: ai_chat.py:473 ai_chat.py:476
 msgid "Chat has been canceled by the user."
-msgstr "El chat ha sido cancelado por el usuario."
+msgstr "El Chat ha sido cancelado por el usuario."
 
 #: ai_chat.py:477 ai_chat.py:480
 msgid "Sorry, the AI could could not find any data related to \""
@@ -6926,7 +6926,7 @@ msgstr "¿De verdad quieres borrar "
 
 #: ai_chat.py:591 ai_chat.py:594
 msgid "Delete Chat"
-msgstr "Borrar chat"
+msgstr "Borrar Chat"
 
 #: ai_chat.py:620 ai_chat.py:623
 msgid "Send your question to the AI"
@@ -6938,7 +6938,7 @@ msgstr "Cancelar la generación de IA"
 
 #: ai_chat.py:630 ai_chat.py:634 ai_chat.py:636
 msgid "AI: "
-msgstr "AI: "
+msgstr "IA: "
 
 #: ai_chat.py:649 ai_chat.py:651 ai_chat.py:655 ai_chat.py:657
 msgid "Type:"
@@ -6954,7 +6954,7 @@ msgstr "Date:"
 
 #: ai_chat.py:649 ai_chat.py:655
 msgid "Prompt:"
-msgstr "Prompt:"
+msgstr "Instrucción:"
 
 #: ai_chat.py:659 ai_chat.py:665
 msgid "User"
@@ -7001,7 +7001,7 @@ msgstr ""
 
 #: ai_chat.py:767 ai_chat.py:860
 msgid "New general chat"
-msgstr "Nuevo chat general"
+msgstr "Nuevo Chat general"
 
 #: ai_chat.py:769 ai_chat.py:862
 msgid "Ask the AI anything, not related to your data."
@@ -7032,11 +7032,11 @@ msgstr "La IA no está preparada"
 
 #: ai_chat.py:877 ai_chat.py:970
 msgid "Please select a chat or create a new one."
-msgstr "Seleccione un chat o cree uno nuevo."
+msgstr "Seleccione un Chat o cree uno nuevo."
 
 #: ai_chat.py:878 ai_chat.py:971
 msgid "Chat selection"
-msgstr "Selección de chat"
+msgstr "Selección de Chat"
 
 #: ai_chat.py:983 ai_chat.py:1076
 msgid ""
@@ -7069,15 +7069,15 @@ msgstr "Error al recuperar el texto fuente"
 #: ai_chat.py:1092 ai_chat.py:1112 ai_chat.py:1185 ai_chat.py:1205
 #: ai_chat.py:1187 ai_chat.py:1207
 msgid "AI Chat"
-msgstr "IA Chat"
+msgstr "Chat con IA"
 
 #: ai_llm.py:132 ai_llm.py:133
 msgid "AI: Starting up..."
-msgstr "AI: Arrancando..."
+msgstr "IA: Arrancando..."
 
 #: ai_llm.py:139 ai_llm.py:142
 msgid "AI: Please set up the AI model"
-msgstr "AI: Por favor, configure el modelo AI"
+msgstr "IA: Por favor, configure el modelo de IA"
 
 #: ai_llm.py:145 ai_llm.py:149
 msgid "AI: No model selected, AI is disabled."
@@ -7093,7 +7093,7 @@ msgstr ""
 
 #: ai_llm.py:162 ai_llm.py:166
 msgid "AI API-key"
-msgstr "Clave API IA"
+msgstr "Clave-API de IA"
 
 #: ai_llm.py:168 ai_llm.py:172
 msgid "AI: No API key set, AI is disabled."
@@ -7101,7 +7101,7 @@ msgstr "IA: No hay clave API, la IA está desactivada."
 
 #: ai_llm.py:225 ai_llm.py:231 ai_llm.py:235
 msgid "AI: Ready"
-msgstr "AI: Listo"
+msgstr "IA: Lista"
 
 #: ai_llm.py:241 ai_llm.py:247 ai_llm.py:261
 msgid "Do you really want to cancel the AI operation?"
@@ -7109,15 +7109,15 @@ msgstr "¿De verdad quieres cancelar la operación de la IA?"
 
 #: ai_llm.py:304 ai_llm.py:310 ai_llm.py:324
 msgid "AI Error:\n"
-msgstr "Error IA:\n"
+msgstr "Error de IA:\n"
 
 #: ai_llm.py:432 ai_llm.py:442 ai_llm.py:456
 msgid "AI generate_code_descriptions\n"
-msgstr "AI generar_descripciones_de_código\n"
+msgstr "IA generar_descripciones_de_código\n"
 
 #: ai_llm.py:433 ai_llm.py:443 ai_llm.py:457
 msgid "Prompt:\n"
-msgstr "Prompt:\n"
+msgstr "Instrucción:\n"
 
 #: ai_llm.py:463 ai_llm.py:473 ai_llm.py:487
 msgid ""
@@ -7133,7 +7133,7 @@ msgid ""
 "Inspecting the data more closely..."
 msgstr ""
 "Fase 2:\n"
-"Examinar los datos más de cerca..."
+"Inspeccionando los datos más de cerca..."
 
 #: ai_prompts.py:341
 msgid ""
@@ -7142,7 +7142,7 @@ msgid ""
 "whether a chunk of empirical data is related to a given code/search string "
 "or not."
 msgstr ""
-"Estas indicaciones se utilizan en la búsqueda de la IA. Indican a la IA cómo "
+"Estas instrucciones se utilizan en la búsqueda de la IA. Indican a la IA cómo "
 "decidir \n"
 "si un fragmento de datos empíricos está relacionado o no con un código/una "
 "cadena de búsqueda determinados."
@@ -7152,7 +7152,7 @@ msgid ""
 "These prompts are used in the chat to analyze the data that has been coded "
 "with a selected code."
 msgstr ""
-"Estas indicaciones se utilizan en el chat para analizar los datos que se han "
+"Estas instrucciones se utilizan en el Chat para analizar los datos que se han "
 "codificado con un código seleccionado."
 
 #: ai_prompts.py:344
@@ -7160,7 +7160,7 @@ msgid ""
 "These prompts are used in the chat to analyse the results of a free search "
 "exploring a certain topic."
 msgstr ""
-"Estas indicaciones se utilizan en el chat para analizar los resultados de "
+"Estas instrucciones se utilizan en el Chat para analizar los resultados de "
 "una búsqueda libre sobre un tema determinado."
 
 #: ai_prompts.py:345
@@ -7168,7 +7168,7 @@ msgid ""
 "These prompts are used in the chat to analyze a section of text from a "
 "single empirical document."
 msgstr ""
-"Estas indicaciones se utilizan en el chat para analizar una sección de texto "
+"Estas instrucciones se utilizan en el Chat para analizar una sección de texto "
 "de un único documento empírico."
 
 #: ai_prompts.py:355
@@ -7176,15 +7176,15 @@ msgid ""
 "System prompts are the defaults defined in the source code of QualCoder. "
 "They cannot be changed by the user."
 msgstr ""
-"Los avisos del sistema son los valores por defecto definidos en el código "
-"fuente de QualCoder. No pueden ser modificados por el usuario."
+"Las instrucciones predeterminadas del Sistema están definidas en el código "
+"fuente de QualCoder. No pueden ser modificadas por el usuario."
 
 #: ai_prompts.py:356
 msgid ""
 "User prompts are defined by you on the level of your particular instance of "
 "QualCoder. They are available in every project that you open on your machine."
 msgstr ""
-"Los avisos al usuario son definidos por usted a nivel de su instancia "
+"Las instrucciones del Usuario son definidas por usted a nivel de su instancia "
 "particular de QualCoder. Están disponibles en todos los proyectos que abra "
 "en su máquina."
 
@@ -7194,20 +7194,20 @@ msgid ""
 "go with the project files. If you or somebody else opens the same project on "
 "another machine, these prompts will be available there too."
 msgstr ""
-"Las indicaciones del proyecto las define usted, pero sólo para el proyecto "
+"Las instrucciones del Proyecto las define usted, pero sólo para el proyecto "
 "actual. Van con los archivos del proyecto. Si usted u otra persona abre el "
-"mismo proyecto en otra máquina, estas indicaciones también estarán "
+"mismo proyecto en otra máquina, estas instrucciones también estarán "
 "disponibles allí."
 
 #: ai_prompts.py:782 ai_prompts.py:826
 msgid "Delete Prompt"
-msgstr "Borrar indicaciones"
+msgstr "Borrar instrucción"
 
 #: ai_prompts.py:819 ai_prompts.py:824 ai_prompts.py:830 ai_prompts.py:859
 #: ai_prompts.py:867 ai_prompts.py:863 ai_prompts.py:868 ai_prompts.py:874
 #: ai_prompts.py:903 ai_prompts.py:911
 msgid "Edit prompts"
-msgstr "Editar indicaciones"
+msgstr "Editar instrucciones"
 
 #: ai_prompts.py:819 ai_prompts.py:863
 msgid "The name cannot be empty"
@@ -7219,12 +7219,12 @@ msgstr "El nombre no debe tener más de 60 caracteres."
 
 #: ai_prompts.py:830 ai_prompts.py:874
 msgid "The name of the prompt must be unique within its type and scope."
-msgstr "El nombre de la consulta debe ser único dentro de su tipo y ámbito."
+msgstr "El nombre de la instrucción debe ser único dentro de su tipo y ámbito."
 
 #: ai_prompts.py:857 ai_prompts.py:901
 msgid "Names of prompts must be unique within its type and scope. "
 msgstr ""
-"Los nombres de los avisos deben ser únicos dentro de su tipo y ámbito. "
+"Los nombres de las instrucciones deben ser únicas dentro de su tipo y ámbito. "
 
 #: ai_search_dialog.py:79
 msgid "1) What do you want to search for?"
@@ -7240,12 +7240,12 @@ msgstr "1) ¿Qué tema desea analizar?"
 
 #: ai_search_dialog.py:121
 msgid "The last used prompt"
-msgstr "La última consulta utilizada"
+msgstr "La última instrucción utilizada"
 
 #: ai_search_dialog.py:123
 msgid "could not be found. The prompt will be reset to the default."
 msgstr ""
-"no se ha encontrado. El indicador se restablecerá al valor predeterminado."
+"no se ha encontrado. La instrucción se restablecerá al valor predeterminado."
 
 #: ai_search_dialog.py:392
 msgid "<no file filter>"
@@ -7312,7 +7312,7 @@ msgstr "Descargar componentes de IA"
 
 #: ai_vectorstore.py:190 ai_vectorstore.py:193
 msgid "Downloading "
-msgstr "Descargar"
+msgstr "Descargando"
 
 #: ai_vectorstore.py:261 ai_vectorstore.py:264
 msgid ""
@@ -7347,7 +7347,7 @@ msgstr ""
 
 #: ai_vectorstore.py:366 ai_vectorstore.py:387 ai_vectorstore.py:399
 msgid "AI memory"
-msgstr "Memoria AI"
+msgstr "Memoria de IA"
 
 #: ai_vectorstore.py:383 ai_vectorstore.py:408
 msgid "AI: Checked all documents, memory is up to date."
@@ -7434,7 +7434,7 @@ msgstr "De:"
 
 #: code_text.py:1024 code_text.py:1070 code_text.py:1077
 msgid "Edit text analysis prompts"
-msgstr "Editar indicaciones de análisis de texto"
+msgstr "Editar instrucciones para el análisis de texto"
 
 #: code_text.py:2102 code_text.py:2152 code_text.py:2188
 msgid "Select a code"
@@ -7442,7 +7442,7 @@ msgstr "Seleccione un código"
 
 #: code_text.py:3919 code_text.py:3987 code_text.py:4025
 msgid "Text reverted to prior to edit"
-msgstr "Texto anterior a la edició"
+msgstr "Texto anterior a la edición"
 
 #: code_text.py:3920 code_text.py:3988 code_text.py:4026
 msgid "Undo last edited text"
@@ -7580,11 +7580,11 @@ msgstr "Escala:"
 
 #: helpers.py:665
 msgid "Rotate clockwise R"
-msgstr "Rotate clockwise R"
+msgstr "Girar 90° grados a la derecha"
 
 #: helpers.py:666
 msgid "Rotate counter-clockwise L"
-msgstr "Girar en sentido antihorario L"
+msgstr "Girar 90° grados a la izquierda"
 
 #: helpers.py:667 view_image.py:1138 view_image.py:1142 view_image.py:1218
 msgid "Highlight area - gray"
@@ -7604,7 +7604,7 @@ msgstr "Exportar imagen E"
 
 #: import_survey.py:282 import_survey.py:287 import_survey.py:288
 msgid "Survey file:"
-msgstr "Ficha de encuesta:"
+msgstr "Archivo de encuesta:"
 
 #: import_survey.py:283 import_survey.py:288 import_survey.py:289
 msgid "Fields:"
@@ -7901,15 +7901,15 @@ msgstr "Análisis de textos"
 
 #: ai_chat.py:634
 msgid "reading data"
-msgstr "datos de lectura"
+msgstr "Lectura de datos"
 
 #: ai_chat.py:798 ai_chat.py:812 ai_chat.py:813
 msgid "Export Chat"
-msgstr "Chat de exportación"
+msgstr "Exportar Chat"
 
 #: ai_chat.py:811
 msgid "The file already exists. Do you want to override it?"
-msgstr "El archivo ya existe. ¿Desea anularlo?"
+msgstr "El archivo ya existe. ¿Deseas sobrescribirlo?"
 
 #: cases.py:251 cases.py:264
 msgid "Case attributes file exported to: "
@@ -7983,7 +7983,7 @@ msgstr "Coocurrencia exportada"
 
 #: ai_llm.py:143
 msgid "AI Setup"
-msgstr ""
+msgstr "Configuración de IA"
 
 #: ai_llm.py:246
 msgid ""
@@ -7993,7 +7993,7 @@ msgstr ""
 
 #: ai_llm.py:247
 msgid "AI Initialization"
-msgstr ""
+msgstr "Inicialización de IA"
 
 #: code_text.py:1536 code_pdf.py:1190 view_av.py:1347 view_image.py:899
 msgid "Show codes of colour"
@@ -8009,7 +8009,7 @@ msgstr ""
 
 #: reports.py:452
 msgid "Export Excel"
-msgstr ""
+msgstr "Exportar a Excel"
 
 #: reports.py:551
 msgid "Coder comparisons report exported: "
