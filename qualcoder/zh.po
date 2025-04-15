@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-27 07:53+1100\n"
-"PO-Revision-Date: 2025-04-15 08:11+1000\n"
+"PO-Revision-Date: 2025-04-16 08:07+1000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: zh\n"
@@ -1406,55 +1406,55 @@ msgstr "最大："
 
 #: cases.py:961
 msgid "Viewing text of case: "
-msgstr ""
+msgstr "查看案件文本："
 
 #: cases.py:1008 report_codes.py:2461
 msgid "File:"
-msgstr ""
+msgstr "文件："
 
 #: cases.py:1008
 msgid "Characters:"
-msgstr ""
+msgstr "角色:"
 
 #: cases.py:1023
 msgid "Image:"
-msgstr ""
+msgstr "图片："
 
 #: cases.py:1035
 msgid "AV media:"
-msgstr ""
+msgstr "音频/视频媒体："
 
 #: cases.py:1059
 msgid "Open"
-msgstr ""
+msgstr "开"
 
 #: cases.py:1140 report_codes.py:2837
 msgid "Right click to view"
-msgstr ""
+msgstr "右击查看"
 
 #: code_color_scheme.py:60
 msgid "Normal vision"
-msgstr ""
+msgstr "正常视力"
 
 #: code_color_scheme.py:60
 msgid "Red weak"
-msgstr ""
+msgstr "红弱"
 
 #: code_color_scheme.py:60
 msgid "Red blind"
-msgstr ""
+msgstr "红色盲人"
 
 #: code_color_scheme.py:60
 msgid "Green weak"
-msgstr ""
+msgstr "绿色弱"
 
 #: code_color_scheme.py:60
 msgid "Green blind"
-msgstr ""
+msgstr "绿色盲板"
 
 #: code_color_scheme.py:148
 msgid "Codes tree"
-msgstr ""
+msgstr "代码树"
 
 #: code_color_scheme.py:148 code_text.py:563 code_pdf.py:468
 #: manage_files.py:912 report_code_summary.py:104 report_exact_matches.py:501
@@ -1464,39 +1464,39 @@ msgstr ""
 
 #: code_color_scheme.py:284
 msgid "Perspective: "
-msgstr ""
+msgstr "透视："
 
 #: code_in_all_files.py:76
 msgid "Coded files: "
-msgstr ""
+msgstr "编码文件："
 
 #: code_in_all_files.py:78
 msgid "Coded cases: "
-msgstr ""
+msgstr "已编码病例："
 
 #: code_in_all_files.py:85 code_in_all_files.py:99
 msgid "Left click on heading for coding in context"
-msgstr ""
+msgstr "左键单击标题，在上下文中进行编码"
 
 #: code_in_all_files.py:86 code_in_all_files.py:100
 msgid "Right click on heading to unmark or to add codes"
-msgstr ""
+msgstr "右击标题以取消标记或添加代码"
 
 #: code_in_all_files.py:133 code_in_all_files.py:135 code_in_all_files.py:172
 #: code_in_all_files.py:174 code_in_all_files.py:212
 msgid " File: "
-msgstr ""
+msgstr " 文件: "
 
 #: code_in_all_files.py:172
 msgid " Case: "
-msgstr ""
+msgstr "案例："
 
 #: code_in_all_files.py:182 code_text.py:525 code_text.py:1693 code_pdf.py:426
 #: code_pdf.py:2429 code_pdf.py:2835 view_av.py:3177 view_av.py:3683
 #: view_graph.py:514 view_graph.py:574 view_graph.py:633 view_graph.py:1247
 #: view_graph.py:1273 view_graph.py:1298
 msgid "Memo: "
-msgstr ""
+msgstr " 备忘："
 
 #: code_in_all_files.py:214 code_text.py:3866 helpers.py:215
 #: report_attributes.py:334 report_codes.py:2160 view_charts.py:268
@@ -1504,34 +1504,34 @@ msgstr ""
 #: view_graph.py:1243 view_graph.py:1268 view_graph.py:1294 view_graph.py:1320
 #: view_graph.py:1339 view_graph.py:1360 view_graph.py:1563
 msgid "File: "
-msgstr ""
+msgstr " 文件: "
 
 #: code_in_all_files.py:322
 msgid "Appy more codes to this segment"
-msgstr ""
+msgstr "为该部分添加更多代码"
 
 #: code_in_all_files.py:323
 msgid "Remove code"
-msgstr ""
+msgstr "删除代码"
 
 #: code_in_all_files.py:324
 msgid "Export to ODT file"
-msgstr ""
+msgstr "导出为 ODT 文件"
 
 #: code_in_all_files.py:359 code_text.py:2005
 msgid "Coded text file exported: "
-msgstr ""
+msgstr "导出编码文本文件："
 
 #: code_in_all_files.py:360 code_text.py:2007 code_text.py:2134
 msgid "Coded text file exported"
-msgstr ""
+msgstr "导出编码文本文件"
 
 #: code_in_all_files.py:366 code_text.py:1180 code_text.py:1261
 #: code_text.py:1347 code_pdf.py:977 code_pdf.py:1071
 #: report_cooccurrence.py:118 view_av.py:2616 view_av.py:2685 view_graph.py:469
 #: view_graph.py:530 view_graph.py:590 view_graph.py:647
 msgid "Select codes"
-msgstr ""
+msgstr "选择代码"
 
 #: code_organiser.py:95
 msgid ""
@@ -1545,103 +1545,110 @@ msgid ""
 "Potential for unexpected errors could occur.\n"
 "THERE IS NO UNDO OPTION AFTER APPLYING CHANGES WITH THE APPLY BUTTON."
 msgstr ""
+"在对代码树进行修改之前，请先备份项目。\n"
+"代码组织器主要用于基础理论，帮助您发展和组织编码概念及其层次结构。\n"
+"选择一个代码分支或全部，然后点击右键：\n"
+"添加类别、重命名代码和类别、更新备忘录、合并代码、合并类别、删除类别。\n"
+"\n"
+"可能会出现意外错误。\n"
+"使用 “应用 ”按钮应用更改后没有撤消选项。"
 
 #: code_organiser.py:115 code_organiser.py:425 code_text.py:2647
 #: code_pdf.py:1998 view_av.py:2168 view_graph.py:1652 view_graph.py:3088
 #: view_graph.py:3090 view_image.py:1761
 msgid "Category"
-msgstr ""
+msgstr "类别"
 
 #: code_organiser.py:115 code_organiser.py:425 code_text.py:2647
 #: code_pdf.py:1998 view_av.py:2168 view_image.py:1761
 msgid "Category name"
-msgstr ""
+msgstr "类别名称"
 
 #: code_organiser.py:146 view_graph.py:153
 msgid "Select code tree branch"
-msgstr ""
+msgstr "选择代码树分支"
 
 #: code_organiser.py:159
 msgid "Branch has been selected"
-msgstr ""
+msgstr "已选择分支机构"
 
 #: code_organiser.py:408
 msgid "Add category"
-msgstr ""
+msgstr "添加类别"
 
 #: code_organiser.py:464 helpers.py:744 view_graph.py:976 view_image.py:870
 msgid "Image exported"
-msgstr ""
+msgstr "导出图像"
 
 #: code_organiser.py:579
 msgid "Code tree re-organised."
-msgstr ""
+msgstr "重新组织代码树。"
 
 #: code_organiser.py:925
 msgid "Link code to category"
-msgstr ""
+msgstr "类别链接代码"
 
 #: code_organiser.py:926
 msgid "Merge code into code"
-msgstr ""
+msgstr "将代码合并到代码中"
 
 #: code_organiser.py:928
 msgid "Remove code from category"
-msgstr ""
+msgstr "从类别中删除代码"
 
 #: code_organiser.py:929
 msgid "Coded text and media"
-msgstr ""
+msgstr "编码文本和媒体"
 
 #: code_organiser.py:930
 msgid "Case text and media"
-msgstr ""
+msgstr "案例文本和媒体"
 
 #: code_organiser.py:932
 msgid "Link category under category"
-msgstr ""
+msgstr "在类别下链接类别"
 
 #: code_organiser.py:933 code_text.py:1522 code_pdf.py:1176 view_av.py:1336
 #: view_image.py:885
 msgid "Merge category into category"
-msgstr ""
+msgstr "将类别合并为类别"
 
 #: code_organiser.py:935
 msgid "Remove category from category"
-msgstr ""
+msgstr "从类别中删除类别"
 
 #: code_organiser.py:937 code_text.py:1525 code_pdf.py:1179 view_av.py:1339
 #: view_image.py:888
 msgid "Rename"
-msgstr ""
+msgstr "重命名"
 
 #: code_organiser.py:939 view_graph.py:3119
 msgid "Display memo"
-msgstr ""
+msgstr "显示备忘"
 
 #: code_organiser.py:987
 msgid "Update name"
-msgstr ""
+msgstr "更新名称"
 
 #: code_organiser.py:1027
 msgid "Link code: Select category"
-msgstr ""
+msgstr "链接代码： 选择类别"
 
 #: code_organiser.py:1053
 msgid "Merge into: Select code"
-msgstr ""
+msgstr "并入： 选择代码"
 
 #: code_organiser.py:1111
 msgid "Link under: Select category"
-msgstr ""
+msgstr "下的链接： 选择类别"
 
 #: code_organiser.py:1135
 msgid "Merge into: Select category"
-msgstr ""
+msgstr "合并到 选择类别"
 
 #: code_text.py:167
 msgid "EDITING TEXT MODE (Ctrl+E)"
-msgstr ""
+msgstr "编辑文本模式 (Ctrl+E)"
 
 #: code_text.py:169 edit_textfile.py:83 view_av.py:3840
 msgid ""
@@ -1649,12 +1656,14 @@ msgid ""
 "coded / annotated / case-assigned) and underlined (coded, annotated, case-"
 "assigned)."
 msgstr ""
+"避免选择未加下划线（未编码/已注释/已指定案例）和加下划线（已编码、已注释、已"
+"指定案例）的文本部分。"
 
 #: code_text.py:172 edit_textfile.py:85 view_av.py:3842
 msgid ""
 "Positions of the underlying codes / annotations / case-assigned may not "
 "correctly adjust if text is typed over or deleted."
-msgstr ""
+msgstr "如果文本被打翻或删除，基础代码/注释/案例分配的位置可能无法正确调整。"
 
 #: code_text.py:409 code_text.py:440 code_pdf.py:322 code_pdf.py:353
 #: manage_files.py:958 manage_files.py:961 manage_files.py:967
@@ -1662,15 +1671,15 @@ msgstr ""
 #: report_exact_matches.py:135 report_file_summary.py:113
 #: report_file_summary.py:415
 msgid "Characters: "
-msgstr ""
+msgstr " 字符）: "
 
 #: code_text.py:416 code_text.py:445 code_pdf.py:329 code_pdf.py:358
 msgid "Codings:"
-msgstr ""
+msgstr "编码："
 
 #: code_text.py:417 code_text.py:446 code_pdf.py:330 code_pdf.py:359
 msgid "From:"
-msgstr ""
+msgstr "来自:"
 
 #: code_text.py:463 code_text.py:472 code_text.py:479 code_text.py:485
 #: code_pdf.py:376 code_pdf.py:385 code_pdf.py:392 code_pdf.py:398
@@ -1679,158 +1688,158 @@ msgstr ""
 #: view_av.py:386 view_image.py:269 view_image.py:278 view_image.py:285
 #: view_image.py:291
 msgid "Attributes"
-msgstr ""
+msgstr "属性"
 
 #: code_text.py:483 code_pdf.py:396 view_av.py:384 view_image.py:289
 msgid "Nothing found"
-msgstr ""
+msgstr "未找到"
 
 #: code_text.py:483 code_pdf.py:396 view_av.py:384 view_image.py:289
 msgid "No matching files found"
-msgstr ""
+msgstr "未找到匹配文件"
 
 #: code_text.py:759
 msgid "Examples:"
-msgstr ""
+msgstr "例如"
 
 #: code_text.py:778
 msgid "Project memo"
-msgstr ""
+msgstr "项目备忘录"
 
 #: code_text.py:787
 msgid "Delete all codings in this file made by "
-msgstr ""
+msgstr "删除该文件中所有由"
 
 #: code_text.py:798
 msgid "All codes by "
-msgstr ""
+msgstr "所有代码由"
 
 #: code_text.py:798
 msgid " deleted from "
-msgstr ""
+msgstr " 删去"
 
 #: code_text.py:918 code_pdf.py:760
 msgid "Automatic search 3 or more characters"
-msgstr ""
+msgstr "自动搜索 3 个或更多字符"
 
 #: code_text.py:919 code_pdf.py:761
 msgid "Automatic search 5 or more characters"
-msgstr ""
+msgstr "自动搜索 5 个或更多字符"
 
 #: code_text.py:948
 msgid "all matches in file"
-msgstr ""
+msgstr "文件中的所有匹配"
 
 #: code_text.py:953
 msgid "first match in file"
-msgstr ""
+msgstr "文件中的第一个匹配"
 
 #: code_text.py:958
 msgid "last match in file"
-msgstr ""
+msgstr "文件中的最后一个匹配"
 
 #: code_text.py:1024 code_pdf.py:844
 msgid "Unmark (U)"
-msgstr ""
+msgstr "无标记 (U)"
 
 #: code_text.py:1025 code_pdf.py:845
 msgid "Memo coded text (M)"
-msgstr ""
+msgstr "备忘编码文本 (M)"
 
 #: code_text.py:1026 view_av.py:2506
 msgid "Change start position (SHIFT LEFT/ALT RIGHT)"
-msgstr ""
+msgstr "更改起始位置（左移/右移）"
 
 #: code_text.py:1027 view_av.py:2507
 msgid "Change end position (SHIFT RIGHT/ALT LEFT)"
-msgstr ""
+msgstr "更改末端位置（右移/左移）"
 
 #: code_text.py:1030 code_pdf.py:848 view_av.py:2511
 msgid "Add important mark (I)"
-msgstr ""
+msgstr "添加重要标记 (I)"
 
 #: code_text.py:1032 code_pdf.py:850 view_av.py:2513 view_av.py:3487
 #: view_image.py:1262
 msgid "Remove important mark"
-msgstr ""
+msgstr "删除重要标记"
 
 #: code_text.py:1033 code_pdf.py:851 view_av.py:2508
 msgid "Change code"
-msgstr ""
+msgstr "更改代码"
 
 #: code_text.py:1052 code_pdf.py:866 view_av.py:2532
 msgid "Mark (Q)"
-msgstr ""
+msgstr "马克 (Q)"
 
 #: code_text.py:1055 code_pdf.py:869 view_av.py:2535
 msgid "Mark with recent code (R)"
-msgstr ""
+msgstr "用最近的代码标记 (R)"
 
 #: code_text.py:1058 code_pdf.py:872 view_av.py:2538
 msgid "Annotate (A)"
-msgstr ""
+msgstr "注释 (A)"
 
 #: code_text.py:1059 code_pdf.py:873 manage_references.py:611
 #: report_codes.py:2243 report_codes.py:2783 view_av.py:2539
 msgid "Copy to clipboard"
-msgstr ""
+msgstr "复制到剪贴板"
 
 #: code_text.py:1060 code_pdf.py:874
 msgid "Mark with new code"
-msgstr ""
+msgstr "用新代码标记"
 
 #: code_text.py:1061 code_pdf.py:875
 msgid "in vivo code (V)"
-msgstr ""
+msgstr "活体代码 (V)"
 
 #: code_text.py:1063 code_pdf.py:877 view_av.py:2541
 msgid "Edit annotation"
-msgstr ""
+msgstr "编辑注释"
 
 #: code_text.py:1064
 msgid "Set bookmark (B)"
-msgstr ""
+msgstr "设置书签 (B)"
 
 #: code_text.py:1077
 msgid "Edit text analysis prompts"
-msgstr ""
+msgstr "编辑文本分析提示"
 
 #: code_text.py:1084 code_pdf.py:881
 msgid "Show control panel (H)"
-msgstr ""
+msgstr "显示控制面板 (H)"
 
 #: code_text.py:1086 code_pdf.py:883
 msgid "Hide control panel (H)"
-msgstr ""
+msgstr "隐藏控制面板 (H)"
 
 #: code_text.py:1145 code_text.py:3396 code_text.py:3554 code_pdf.py:3153
 #: code_pdf.py:3316
 msgid "No file was selected"
-msgstr ""
+msgstr "未选择文件"
 
 #: code_text.py:1276 code_pdf.py:992 report_codes.py:2315 view_av.py:2631
 msgid "Select replacement code"
-msgstr ""
+msgstr "选择替换代码"
 
 #: code_text.py:1381 code_pdf.py:2416 view_av.py:730 view_image.py:481
 msgid "Memo for file: "
-msgstr ""
+msgstr "备忘存档："
 
 #: code_text.py:1393 code_text.py:1394 code_pdf.py:2428
 msgid "Memo:"
-msgstr ""
+msgstr " 备忘："
 
 #: code_text.py:1418 code_pdf.py:1119 code_pdf.py:2910 view_av.py:2724
 msgid "Select code to memo"
-msgstr ""
+msgstr "选择要备忘的代码"
 
 #: code_text.py:1427 code_pdf.py:1128 view_av.py:2733
 msgid "Memo for Coded text: "
-msgstr ""
+msgstr "编码文本备忘："
 
 #: code_text.py:1465
 msgid "Shift codings after clicked position"
-msgstr ""
+msgstr "点击位置后移动编码"
 
 #: code_text.py:1468
 msgid ""
@@ -1843,72 +1852,77 @@ msgid ""
 "500)\n"
 "Clicked character position: "
 msgstr ""
+"单击文本中的某个位置后，移动所有代码的位置。\n"
+"运行此操作前请先备份项目。\n"
+"如果您编辑了编码文本，而编码位置不对，此功能将有所帮助。\n"
+"正数（向右移动）或负数（向左移动）（-500 至 500）\n"
+"点击的字符位置："
 
 #: code_text.py:1520 code_pdf.py:1174 view_av.py:1334 view_image.py:883
 msgid "Add new code to category"
-msgstr ""
+msgstr "为类别添加新代码"
 
 #: code_text.py:1521 code_pdf.py:1175 view_av.py:1335 view_image.py:884
 msgid "Add a new category to category"
-msgstr ""
+msgstr "在类别中添加新类别"
 
 #: code_text.py:1523 code_pdf.py:1177 view_av.py:1337 view_image.py:886
 msgid "Add a new code"
-msgstr ""
+msgstr "添加新代码"
 
 #: code_text.py:1524 code_pdf.py:1178 view_av.py:1338 view_image.py:887
 msgid "Add a new category"
-msgstr ""
+msgstr "添加新类别"
 
 #: code_text.py:1526 code_pdf.py:1180 view_av.py:1340 view_image.py:889
 msgid "View or edit memo"
-msgstr ""
+msgstr "查看或编辑备忘录"
 
 #: code_text.py:1527 code_pdf.py:1181 manage_files.py:334 report_sql.py:417
 #: view_av.py:1341 view_image.py:890
 msgid "Delete"
-msgstr ""
+msgstr "删除"
 
 #: code_text.py:1532 code_pdf.py:1186 view_av.py:1343 view_image.py:895
 msgid "Change code color"
-msgstr ""
+msgstr "更改代码颜色"
 
 #: code_text.py:1533 code_pdf.py:1187
 msgid "Show coded files"
-msgstr ""
+msgstr "显示编码文件"
 
 #: code_text.py:1534 code_pdf.py:1188 view_av.py:1344 view_image.py:896
 msgid "Move code to"
-msgstr ""
+msgstr "将代码移至"
 
 #: code_text.py:1535 code_pdf.py:1189 view_av.py:1346 view_image.py:898
 msgid "Show codes like"
-msgstr ""
+msgstr "显示代码，如"
 
 #: code_text.py:1536 code_pdf.py:1190 view_av.py:1347 view_image.py:899
 msgid "Show codes of colour"
-msgstr ""
+msgstr "显示颜色代码"
 
 #: code_text.py:1537 code_pdf.py:1191 report_exact_matches.py:329
 #: report_relations.py:516 report_relations.py:985 report_sql.py:505
 #: report_sql.py:602 view_av.py:1348 view_image.py:900
 msgid "Sort ascending"
-msgstr ""
+msgstr "升序排序"
 
 #: code_text.py:1538 code_pdf.py:1192 report_exact_matches.py:330
 #: report_relations.py:517 report_relations.py:986 report_sql.py:507
 #: report_sql.py:604 view_av.py:1349 view_image.py:901
 msgid "Sort descending"
-msgstr ""
+msgstr "降序排序"
 
 #: code_text.py:1539 code_pdf.py:1193 view_av.py:1350 view_image.py:902
 msgid "Sort category then code ascending"
-msgstr ""
+msgstr "按类别和代码升序排列"
 
 #: code_text.py:1624 code_text.py:1667 code_pdf.py:1279 code_pdf.py:1321
 #: view_av.py:1434 view_av.py:2052 view_image.py:985 view_image.py:1642
 msgid "Select blank or category"
-msgstr ""
+msgstr "选择空白或类别"
 
 #: code_text.py:1691 code_text.py:2684 code_pdf.py:2035 report_codes.py:1079
 #: reports.py:263 view_av.py:2208 view_graph.py:511 view_graph.py:573
@@ -1916,68 +1930,68 @@ msgstr ""
 #: view_graph.py:1295 view_graph.py:1321 view_graph.py:1340 view_graph.py:1361
 #: view_image.py:1804
 msgid "Code: "
-msgstr ""
+msgstr "代码:"
 
 #: code_text.py:1692 code_text.py:1715 view_graph.py:373
 msgid "Text: "
-msgstr ""
+msgstr "正文："
 
 #: code_text.py:1694
 msgid "Memos for file: "
-msgstr ""
+msgstr "备忘录存档："
 
 #: code_text.py:1716 code_text.py:3593 code_text.py:3614 code_pdf.py:3354
 #: code_pdf.py:3374 view_av.py:3029 view_av.py:3050
 msgid "Annotation: "
-msgstr ""
+msgstr "注释："
 
 #: code_text.py:1717
 msgid "Annotations for file: "
-msgstr ""
+msgstr "文件注释："
 
 #: code_text.py:1727 code_pdf.py:1336 view_av.py:400 view_image.py:200
 msgid "Showing important codings"
-msgstr ""
+msgstr "显示重要编码"
 
 #: code_text.py:1730 code_pdf.py:1340 view_av.py:403 view_image.py:203
 msgid "Show codings flagged important"
-msgstr ""
+msgstr "显示标记为重要的编码"
 
 #: code_text.py:1741 code_pdf.py:1352
 msgid "Show some codes"
-msgstr ""
+msgstr "显示一些代码"
 
 #: code_text.py:1744 code_pdf.py:1355
 msgid "Show codes containing the text. (Blank for all)"
-msgstr ""
+msgstr "显示包含文本的代码。(全部为空）"
 
 #: code_text.py:1758 code_pdf.py:1369 view_av.py:1466 view_image.py:1017
 msgid "Select code colors"
-msgstr ""
+msgstr "选择代码颜色"
 
 #: code_text.py:1867 code_pdf.py:1523
 msgid "Text position"
-msgstr ""
+msgstr "文本位置"
 
 #: code_text.py:1867 code_pdf.py:1523
 msgid "Character position: "
-msgstr ""
+msgstr "角色定位："
 
 #: code_text.py:2075 code_text.py:2132
 msgid "Coded text file exported to: "
-msgstr ""
+msgstr "导出为编码文本文件："
 
 #: code_text.py:2077
 msgid "Coded html file exported"
-msgstr ""
+msgstr "导出已编码的 html 文件"
 
 #: code_text.py:2188
 msgid "Select a code"
-msgstr ""
+msgstr "选择代码"
 
 #: code_text.py:2327 code_text.py:2397 codebook.py:224
 msgid "Code:"
-msgstr ""
+msgstr "代码:"
 
 #: code_text.py:2350 code_text.py:2421 code_text.py:2436
 msgid "Show previous coding of selected code"
