@@ -578,12 +578,12 @@ es-AU</translation>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="195"/>
         <source>AI Prompts Library</source>
-        <translation>Biblioteca AI Alviso</translation>
+        <translation>Biblioteca de Instrucciones para IA</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="196"/>
         <source>Analytic Prompts:</source>
-        <translation>Alviso analíticas:</translation>
+        <translation>Instrucciones analíticas:</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="197"/>
@@ -598,7 +598,7 @@ es-AU</translation>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="199"/>
         <source>Copy prompt to clipboard</source>
-        <translation>Copiar aviso al portapapeles</translation>
+        <translation>Copiar instrucción al portapapeles</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="204"/>
@@ -608,22 +608,22 @@ es-AU</translation>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="201"/>
         <source>Paste prompt from clipboard</source>
-        <translation>Pegar aviso desde el portapapeles</translation>
+        <translation>Pegar instrucción desde el portapapeles</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="203"/>
         <source>Delete prompt</source>
-        <translation>Borrar aviso</translation>
+        <translation>Borrar instrucción</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="205"/>
         <source>Prompt Name:</source>
-        <translation>Alviso Name:</translation>
+        <translation>Nombre de la instrucción:</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="206"/>
         <source>(Uneditable system prompt)</source>
-        <translation>( Aviso del sistema no editable)</translation>
+        <translation>(Instrucción del sistema no editable)</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="207"/>
@@ -653,12 +653,12 @@ es-AU</translation>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="212"/>
         <source>Prompt description:</source>
-        <translation>Descripción alviso:</translation>
+        <translation>Descripción de la instrucción:</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="213"/>
         <source>Prompt text (this will be send to the AI):</source>
-        <translation>Texto de aviso (se enviará a la IA):</translation>
+        <translation>Texto de la instrucción (se enviará a la IA):</translation>
     </message>
 </context>
 <context>
@@ -736,12 +736,12 @@ es-AU</translation>
     <message>
         <location filename="ui_ai_search.py" line="208"/>
         <source>Analytic Prompt:</source>
-        <translation>Alviso analítica:</translation>
+        <translation>Instrucción analítica:</translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="209"/>
         <source>Edit prompt or create your own (advanced option)</source>
-        <translation>Editar aviso o crear uno propio (opción avanzada)</translation>
+        <translation>Editar instrucción o crear una propia (opción avanzada)</translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="210"/>
