@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-27 07:53+1100\n"
-"PO-Revision-Date: 2025-04-16 08:07+1000\n"
+"PO-Revision-Date: 2025-04-17 08:12+1000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: zh\n"
@@ -1995,186 +1995,186 @@ msgstr "代码:"
 
 #: code_text.py:2350 code_text.py:2421 code_text.py:2436
 msgid "Show previous coding of selected code"
-msgstr ""
+msgstr "显示所选代码以前的编码"
 
 #: code_text.py:2353 code_text.py:2425 code_text.py:2439
 msgid "Show next coding of selected code"
-msgstr ""
+msgstr "显示所选代码的下一个编码"
 
 #: code_text.py:2526 code_pdf.py:1880 view_av.py:2091 view_image.py:1683
 msgid "Merge code: "
-msgstr ""
+msgstr "合并代码："
 
 #: code_text.py:2526 code_pdf.py:1880
 msgid " into code: "
-msgstr ""
+msgstr " 变成代码："
 
 #: code_text.py:2527 code_pdf.py:1881 view_av.py:2092 view_image.py:1684
 msgid "Merge codes"
-msgstr ""
+msgstr "合并代码"
 
 #: code_text.py:2585 code_pdf.py:1941 view_av.py:2145 view_image.py:1738
 msgid "Add new code"
-msgstr ""
+msgstr "添加新代码"
 
 #: code_text.py:2585 code_pdf.py:1941 view_image.py:1738
 msgid "Code name"
-msgstr ""
+msgstr "代码名称"
 
 #: code_text.py:2605 code_pdf.py:1959 view_image.py:1752
 msgid "New code: "
-msgstr ""
+msgstr "新代码："
 
 #: code_text.py:2661 code_pdf.py:2012 view_image.py:1775
 msgid "New category: "
-msgstr ""
+msgstr "新类别："
 
 #: code_text.py:2696 code_pdf.py:2047 view_av.py:2218 view_image.py:1808
 msgid "Code deleted: "
-msgstr ""
+msgstr "代码已删除："
 
 #: code_text.py:2715 code_pdf.py:2067 report_codes.py:1074 reports.py:260
 #: view_av.py:2235 view_charts.py:348 view_image.py:1831
 msgid "Category: "
-msgstr ""
+msgstr "类别："
 
 #: code_text.py:2726 code_pdf.py:2078 view_av.py:2244 view_image.py:1835
 msgid "Category deleted: "
-msgstr ""
+msgstr "类别已删除："
 
 #: code_text.py:2739 code_pdf.py:2091
 msgid "Memo for Code: "
-msgstr ""
+msgstr "代码备忘录："
 
 #: code_text.py:2752 code_pdf.py:2104 view_image.py:1426
 msgid "Memo for code: "
-msgstr ""
+msgstr "代码备忘录："
 
 #: code_text.py:2762 code_pdf.py:2114 view_image.py:1880
 msgid "Memo for Category: "
-msgstr ""
+msgstr "类别备忘录："
 
 #: code_text.py:2776 code_pdf.py:2128
 msgid "Memo for category: "
-msgstr ""
+msgstr "类别备忘录："
 
 #: code_text.py:2790 code_pdf.py:2142 view_av.py:2309 view_image.py:1904
 msgid "Rename code"
-msgstr ""
+msgstr "重命名代码"
 
 #: code_text.py:2791 code_pdf.py:2143 view_av.py:2309 view_image.py:1904
 msgid "New code name:"
-msgstr ""
+msgstr "新代号："
 
 #: code_text.py:2799 code_pdf.py:2150 view_av.py:2316 view_image.py:1911
 msgid "Name in use"
-msgstr ""
+msgstr "使用中的名称"
 
 #: code_text.py:2800 code_pdf.py:2151
 msgid " is already in use, choose another name."
-msgstr ""
+msgstr "已被使用，请选择其他名称。"
 
 #: code_text.py:2820
 msgid "Code renamed from: "
-msgstr ""
+msgstr "代码重命名自"
 
 #: code_text.py:2820 code_text.py:2855
 msgid " to: "
-msgstr ""
+msgstr " 到："
 
 #: code_text.py:2829 code_pdf.py:2181 view_av.py:2336 view_image.py:1932
 msgid "Rename category"
-msgstr ""
+msgstr "重新命名类别"
 
 #: code_text.py:2830 code_pdf.py:2181 view_av.py:2336 view_image.py:1932
 msgid "New category name:"
-msgstr ""
+msgstr "新类别名称："
 
 #: code_text.py:2837 code_pdf.py:2188
 msgid "This code name is already in use."
-msgstr ""
+msgstr "该代号已在使用中。"
 
 #: code_text.py:2838 code_pdf.py:2189
 msgid "Duplicate code name"
-msgstr ""
+msgstr "代码名称重复"
 
 #: code_text.py:2855 view_image.py:1957
 msgid "Category renamed from: "
-msgstr ""
+msgstr "类别更名自："
 
 #: code_text.py:2912 code_pdf.py:2263 view_av.py:619 view_image.py:545
 msgid "Open memo"
-msgstr ""
+msgstr "打开备忘录"
 
 #: code_text.py:2916 manage_files.py:285
 msgid "view original text file"
-msgstr ""
+msgstr "查看原始文本文件"
 
 #: code_text.py:2918 code_pdf.py:2270 view_av.py:620 view_image.py:546
 msgid "Next file"
-msgstr ""
+msgstr "下一个文件"
 
 #: code_text.py:2919 code_pdf.py:2271 view_av.py:621 view_image.py:547
 msgid "File with latest coding"
-msgstr ""
+msgstr "带有最新编码的文件"
 
 #: code_text.py:2920 code_text.py:3000 code_pdf.py:2272 code_pdf.py:2338
 #: view_av.py:622 view_av.py:696 view_image.py:548 view_image.py:597
 msgid "Show files like"
-msgstr ""
+msgstr "显示以下文件"
 
 #: code_text.py:2921 code_pdf.py:2273 view_av.py:624 view_image.py:550
 msgid "Show files by attributes"
-msgstr ""
+msgstr "按属性显示文件"
 
 #: code_text.py:2922 code_pdf.py:2274 view_av.py:623 view_image.py:549
 msgid "Show case files"
-msgstr ""
+msgstr "显示案件档案"
 
 #: code_text.py:2924
 msgid " next  characters"
-msgstr ""
+msgstr " 下一个字符"
 
 #: code_text.py:2927
 msgid " previous  characters"
-msgstr ""
+msgstr " 以前的人物"
 
 #: code_text.py:2928
 msgid "Go to bookmark"
-msgstr ""
+msgstr "转到书签"
 
 #: code_text.py:2975 code_pdf.py:2315 view_av.py:671 view_image.py:572
 msgid "Show all files"
-msgstr ""
+msgstr "显示所有文件"
 
 #: code_text.py:2976 code_pdf.py:2316 view_av.py:672 view_image.py:573
 msgid "Select case"
-msgstr ""
+msgstr "选择案例"
 
 #: code_text.py:3003 code_pdf.py:2341 view_av.py:699 view_image.py:600
 msgid "Show files containing the text. (Blank for all)"
-msgstr ""
+msgstr "显示包含文本的文件。(全部为空）"
 
 #: code_text.py:3050 code_text.py:3106
 msgid "From: "
-msgstr ""
+msgstr "来自:"
 
 #: code_text.py:3158 code_text.py:4956
 msgid "Entire text file will be loaded"
-msgstr ""
+msgstr "将加载整个文本文件"
 
 #: code_text.py:3245 code_pdf.py:2475
 msgid "Code text: "
-msgstr ""
+msgstr "代码文本："
 
 #: code_text.py:3401 code_text.py:3660 code_text.py:3795 code_text.py:3897
 #: code_pdf.py:3157 view_av.py:2859
 msgid "No code was selected"
-msgstr ""
+msgstr "未选择代码"
 
 #: code_text.py:3439 code_text.py:4827
 msgid "AI interpretation: "
-msgstr ""
+msgstr "人工智能解释："
 
 #: code_text.py:3440
 msgid ""
@@ -2182,377 +2182,399 @@ msgid ""
 "\n"
 "AI search prompt: "
 msgstr ""
+"\n"
+"\n"
+"人工智能搜索提示："
 
 #: code_text.py:3441
 msgid ""
 "\n"
 "AI model: "
 msgstr ""
+"\n"
+"人工智能模型："
 
 #: code_text.py:3444
 msgid ""
 "Do you want to store the AI interpretation in a memo together with the "
 "coding?<br/><br/>"
-msgstr ""
+msgstr "您想将人工智能解释与编码一起存储在备忘录中吗？"
 
 #: code_text.py:3526 code_pdf.py:2896 code_pdf.py:3287 view_av.py:2770
 #: view_av.py:2975
 msgid "Select code to unmark"
-msgstr ""
+msgstr "选择代码以取消标记"
 
 #: code_text.py:3607 code_pdf.py:3368 view_av.py:3043
 msgid "Annotation added at position: "
-msgstr ""
+msgstr "在位置处添加注释："
 
 #: code_text.py:3608 code_text.py:3637 view_av.py:3044 view_av.py:3071
 msgid " for: "
-msgstr ""
+msgstr " 为："
 
 #: code_text.py:3636 code_pdf.py:3396 view_av.py:3070
 msgid "Annotation removed from position "
-msgstr ""
+msgstr "从位置上删除注释"
 
 #: code_text.py:3676 code_text.py:3923
 msgid "Select files to code"
-msgstr ""
+msgstr "选择要编码的文件"
 
 #: code_text.py:3684
 msgid "Code text using start and end marks: "
-msgstr ""
+msgstr "使用开始和结束标记对文本进行编码："
 
 #: code_text.py:3736
 msgid "Coding using start and end marks"
-msgstr ""
+msgstr "使用开始和结束标记编码"
 
 #: code_text.py:3736 code_text.py:3874 code_text.py:3879 code_text.py:3982
 msgid ""
 "\n"
 "Code: "
 msgstr ""
+"\n"
+"代码:"
 
 #: code_text.py:3737
 msgid ""
 "\n"
 "With start mark: "
 msgstr ""
+"\n"
+"带起始标记："
 
 #: code_text.py:3737
 msgid ""
 "\n"
 "End mark: "
 msgstr ""
+"\n"
+"结束标记："
 
 #: code_text.py:3744
 msgid " new coded sections found."
-msgstr ""
+msgstr " 发现新的编码章节。"
 
 #: code_text.py:3746
 msgid "previously coded."
-msgstr ""
+msgstr "之前的编码。"
 
 #: code_text.py:3758
 msgid "Select auto-codings to undo"
-msgstr ""
+msgstr "选择要撤销的自动编码"
 
 #: code_text.py:3775
 msgid "Undo autocoding: "
-msgstr ""
+msgstr "撤销自动编码："
 
 #: code_text.py:3801 code_text.py:3814
 msgid "Code sentence"
-msgstr ""
+msgstr "代码句"
 
 #: code_text.py:3804
 msgid "Auto code sentence using this text fragment:"
-msgstr ""
+msgstr "使用该文本片段自动生成代码句："
 
 #: code_text.py:3818
 msgid ""
 "Define sentence ending. Default is period space.\n"
 "Use \\n for line ending:"
 msgstr ""
+"定义句子结尾。默认为句号空格。\n"
+"行尾用 \\n 表示："
 
 #: code_text.py:3863 code_text.py:3971
 msgid "Autocode insert error "
-msgstr ""
+msgstr "自动代码插入错误"
 
 #: code_text.py:3866
 msgid " added codes"
-msgstr ""
+msgstr " 添加代码"
 
 #: code_text.py:3874
 msgid "Sentence coding: "
-msgstr ""
+msgstr "句子编码："
 
 #: code_text.py:3875 code_text.py:3983
 msgid ""
 "\n"
 "With: "
 msgstr ""
+"\n"
+"有了："
 
 #: code_text.py:3875 code_text.py:3882
 msgid ""
 "\n"
 "Using line ending: "
 msgstr ""
+"\n"
+"使用行尾："
 
 #: code_text.py:3878
 msgid "Automatic code sentence in files:"
-msgstr ""
+msgstr "文件中的自动代码句："
 
 #: code_text.py:3880
 msgid ""
 "\n"
 "With text fragment: "
 msgstr ""
+"\n"
+"附文字片段："
 
 #: code_text.py:3903
 msgid "Automatic coding"
-msgstr ""
+msgstr "自动编码"
 
 #: code_text.py:3906
 msgid "Use | to code multiple texts"
-msgstr ""
+msgstr "使用 | 对多个文本进行编码"
 
 #: code_text.py:3907
 msgid "Auto code files with the current code for this text:"
-msgstr ""
+msgstr "使用该文本的当前代码自动生成代码文件："
 
 #: code_text.py:3974
 msgid "Automatic coding in files: "
-msgstr ""
+msgstr "文件自动编码："
 
 #: code_text.py:3975
 msgid ". with text: "
-msgstr ""
+msgstr ".有文字："
 
 #: code_text.py:3982
 msgid "Text coding: "
-msgstr ""
+msgstr "文本编码："
 
 #: code_text.py:4025
 msgid "Text reverted to prior to edit"
-msgstr ""
+msgstr "文本恢复到编辑前"
 
 #: code_text.py:4026
 msgid "Undo last edited text"
-msgstr ""
+msgstr "撤销上次编辑的文本"
 
 #: code_text.py:4646
 msgid "Please finish editing the text before starting an AI search."
-msgstr ""
+msgstr "请完成文本编辑后再开始人工智能搜索。"
 
 #: code_text.py:4647 code_text.py:4651 code_text.py:4655 code_text.py:4659
 #: code_text.py:4718 code_text.py:4759 code_text.py:4800 code_text.py:4809
 #: code_text.py:4909 code_text.py:4912
 msgid "AI Search"
-msgstr ""
+msgstr "人工智能搜索"
 
 #: code_text.py:4654
 msgid ""
 "The AI is already performing a search. Please stop it before starting a new "
 "one."
-msgstr ""
+msgstr "人工智能已经在执行搜索。请先停止搜索，然后再开始新的搜索。"
 
 #: code_text.py:4658
 msgid "The AI is busy, please wait a moment and retry."
-msgstr ""
+msgstr "人工智能正忙，请稍等片刻后重试。"
 
 #: code_text.py:4695
 msgid "Searching for related data, please wait..."
-msgstr ""
+msgstr "正在搜索相关数据，请稍候..."
 
 #: code_text.py:4717
 msgid "AI: No related data found for \""
-msgstr ""
+msgstr "人工智能 未找到相关数据"
 
 #: code_text.py:4757
 msgid "AI: No new data found for \""
-msgstr ""
+msgstr "人工智能： 未找到以下方面的新数据"
 
 #: code_text.py:4758
 msgid "\" beside what has already been coded with this code."
-msgstr ""
+msgstr " 旁边是已用此代码编码的内容。"
 
 #: code_text.py:4763
 msgid ""
 "Potentially related data found, inspecting it closer. Please be patient..."
-msgstr ""
+msgstr "发现潜在相关数据，正在仔细检查。请耐心等待..."
 
 #: code_text.py:4797
 msgid "The closer inspection of the first "
-msgstr ""
+msgstr "仔细观察第一个"
 
 #: code_text.py:4798
 msgid ""
 "pieces of data yielded no results. You can continue to inspect more by "
 "clicking on \"find more\" in the list on the left."
-msgstr ""
+msgstr "条数据没有结果。您可以点击左侧列表中的 “查找更多”，继续查看更多信息。"
 
 #: code_text.py:4807
 msgid ""
 "Upon closer inspection, no pieces of data relevant to your search query "
 "could be identified. Please start a new search."
-msgstr ""
+msgstr "经仔细检查，未找到与您的搜索查询相关的数据。请重新搜索。"
 
 #: code_text.py:4826
 msgid "Quote: "
-msgstr ""
+msgstr "引用："
 
 #: code_text.py:4863
 msgid ">> Searching (click here to cancel)"
-msgstr ""
+msgstr ">> 搜索（点击此处取消）"
 
 #: code_text.py:4865
 msgid "Click here to stop the search"
-msgstr ""
+msgstr "单击此处停止搜索"
 
 #: code_text.py:4870
 msgid ">> Find more..."
-msgstr ""
+msgstr ">> 了解更多..."
 
 #: code_text.py:4871
 msgid "Click here to analyze more data"
-msgstr ""
+msgstr "点击此处分析更多数据"
 
 #: code_text.py:4896
 msgid "Do you want to stop the search?"
-msgstr ""
+msgstr "你想停止搜索吗？"
 
 #: code_text.py:4908
 msgid ""
 "There are no more pieces of data to analyze for this search. Please start a "
 "new search."
-msgstr ""
+msgstr "此搜索已无数据可供分析。请重新搜索。"
 
 #: code_text.py:4911
 msgid "The AI is busy. Please wait a moment and retry."
-msgstr ""
+msgstr "人工智能正忙。请稍等片刻后重试。"
 
 #: code_text.py:5088 code_pdf.py:3517 view_av.py:3268
 msgid "Press O to cycle overlapping codes"
-msgstr ""
+msgstr "按 O 循环重叠代码"
 
 #: code_text.py:5138 code_pdf.py:3563 view_av.py:3300
 msgid "ANNOTATED:"
-msgstr ""
+msgstr "附注："
 
 #: code_pdf.py:180
 msgid "View original file"
-msgstr ""
+msgstr "查看原始文件"
 
 #: code_pdf.py:252
 msgid "QualCoder roughly displays PDFs."
-msgstr ""
+msgstr "QualCoder 可大致显示 PDF。"
 
 #: code_pdf.py:253
 msgid ""
 "Some images will not display and image masks and rotations will not work."
-msgstr ""
+msgstr "某些图像将无法显示，图像遮罩和旋转也无法使用。"
 
 #: code_pdf.py:254
 msgid "Original fonts or bold or italic are not applied."
-msgstr ""
+msgstr "不使用原始字体、粗体或斜体。"
 
 #: code_pdf.py:255
 msgid ""
 "There is not enough information in pdfminer to accurately display polygon "
 "curves."
-msgstr ""
+msgstr "pdfminer 中没有足够的信息来准确显示多边形曲线。"
 
 #: code_pdf.py:256
 msgid "Plain text must match exactly for Code PDF to work correctly."
-msgstr ""
+msgstr "纯文本必须完全匹配，代码 PDF 才能正常工作。"
 
 #: code_pdf.py:257
 msgid ""
 "A warning will display if the parsed PDF text does not match the database "
 "stored plain text."
-msgstr ""
+msgstr "如果解析的 PDF 文本与数据库存储的纯文本不匹配，则会显示警告。"
 
 #: code_pdf.py:258
 msgid ""
 "Plain text of PDFs loaded in to QualCoder before version 3.4 will not have "
 "the plain text positions correct for PDF display."
 msgstr ""
+"在 3.4 版之前载入 QualCoder 的 PDF 纯文本，其纯文本位置将无法正确显示为 PDF。"
 
 #: code_pdf.py:259
 msgid "This means coding stripes will show in incorrect positions."
-msgstr ""
+msgstr "这意味着编码条纹会显示在不正确的位置。"
 
 #: code_pdf.py:260
 msgid ""
 "Similarly, if the PDF plain text has beeen edited in any way, this will "
 "affect coding stripes display."
-msgstr ""
+msgstr "同样，如果对 PDF 纯文本进行了任何编辑，也会影响编码条纹的显示。"
 
 #: code_pdf.py:762
 msgid "Press Enter to search"
-msgstr ""
+msgstr "按 Enter 键搜索"
 
 #: code_pdf.py:794
 msgid "PDF objects"
-msgstr ""
+msgstr "PDF 对象"
 
 #: code_pdf.py:846
 msgid "Change code position key presses"
-msgstr ""
+msgstr "更改代码位置按键"
 
 #: code_pdf.py:1151
 msgid ""
 "Change start position (extend SHIFT LEFT/ shrink ALT RIGHT)\n"
 "Change end position (extend SHIFT RIGHT/ shrink ALT LEFT)"
 msgstr ""
+"更改起始位置（向左延伸 SHIFT/向右收缩 ALT）\n"
+"更改结束位置（向右延伸 SHIFT/向左收缩 ALT）"
 
 #: code_pdf.py:1152
 msgid "Use key presses"
-msgstr ""
+msgstr "使用按键"
 
 #: code_pdf.py:1409
 msgid "CODE:"
-msgstr ""
+msgstr "代码:"
 
 #: code_pdf.py:1409 report_codes.py:2017 report_codes.py:2710
 msgid "MEMO:"
-msgstr ""
+msgstr " 备忘："
 
 #: code_pdf.py:1412
 msgid "EXAMPLES:"
-msgstr ""
+msgstr "举例说明："
 
 #: code_pdf.py:1503 view_image.py:1247
 msgid "Select code"
-msgstr ""
+msgstr "选择代码"
 
 #: code_pdf.py:1657
 msgid "PDF Image exported"
-msgstr ""
+msgstr "导出 PDF 图像"
 
 #: code_pdf.py:2171
 msgid "Code renamed:"
-msgstr ""
+msgstr "代码重命名："
 
 #: code_pdf.py:2206
 msgid "Category renamed:"
-msgstr ""
+msgstr "类别更名："
 
 #: code_pdf.py:2268
 msgid "View original text file"
-msgstr ""
+msgstr "查看原始文本文件"
 
 #: code_pdf.py:2481
 msgid "Pages: "
-msgstr ""
+msgstr "页数:"
 
 #: code_pdf.py:2529
 msgid "Parsing the PDF text."
-msgstr ""
+msgstr "解析 PDF 文本"
 
 #: code_pdf.py:2530
 msgid ""
 "Texts do not match. PDF imported before 3.4 QualCodr version or the PDF text "
 "has been edited."
-msgstr ""
+msgstr "文本不匹配。PDF 在 3.4 QualCodr 版本之前导入或 PDF 文本已被编辑。"
 
 #: code_pdf.py:2531
 msgid ""
@@ -2560,105 +2582,108 @@ msgid ""
 "View PDF but cannot code. Code positions will appear wrongly.\n"
 "Character difference: "
 msgstr ""
+"\n"
+"查看 PDF 但无法编码。代码位置会显示错误。\n"
+"字符差异："
 
 #: code_pdf.py:2738
 msgid "TEXT START CHARACTER POSITION: "
-msgstr ""
+msgstr "文本起始字符位置："
 
 #: code_pdf.py:2739
 msgid "TEXT END CHARACTER POSITION: "
-msgstr ""
+msgstr "文本结束符位置："
 
 #: code_pdf.py:2740
 msgid "NUMBER OF CHARACTERS: "
-msgstr ""
+msgstr "字符数："
 
 #: code_pdf.py:2837
 msgid "Important"
-msgstr ""
+msgstr "重要"
 
 #: code_pdf.py:2883
 msgid "Code memo"
-msgstr ""
+msgstr "代码备忘录"
 
 #: code_pdf.py:2888
 msgid "Flag important"
-msgstr ""
+msgstr "重要标志"
 
 #: code_pdf.py:2890
 msgid "Remove important flag"
-msgstr ""
+msgstr "移除重要标志"
 
 #: code_pdf.py:2923
 msgid "Select code for important flag"
-msgstr ""
+msgstr "选择重要标志的代码"
 
 #: code_pdf.py:2937
 msgid "Select code to remove important flag"
-msgstr ""
+msgstr "选择删除重要标志的代码"
 
 #: code_pdf.py:3148
 msgid "PDF loaded text does not match Imported PDF text length."
-msgstr ""
+msgstr "PDF 加载的文本与导入的 PDF 文本长度不匹配。"
 
 #: code_pdf.py:3149
 msgid "Mark using the right hand side text pane."
-msgstr ""
+msgstr "使用右侧文本窗格进行标记。"
 
 #: code_pdf.py:3150
 msgid "Cannot mark"
-msgstr ""
+msgstr "无法标记"
 
 #: code_pdf.py:3369 code_pdf.py:3397
 msgid "for:"
-msgstr ""
+msgstr "为:"
 
 #: codebook.py:189 codebook.py:235 refi.py:2039 refi.py:2040
 msgid "Codebook exported"
-msgstr ""
+msgstr "导出的代码集"
 
 #: codebook.py:190 codebook.py:236
 msgid "Codebook exported to "
-msgstr ""
+msgstr "输出到"
 
 #: codebook.py:198 helpers.py:140 manage_files.py:670 refi.py:1992 refi.py:2029
 msgid "Select directory to save file"
-msgstr ""
+msgstr "选择保存文件的目录"
 
 #: codebook.py:203
 msgid "Codebook for"
-msgstr ""
+msgstr "编码手册"
 
 #: codebook.py:218
 msgid "Category:"
-msgstr ""
+msgstr "类别"
 
 #: color_selector.py:219
 msgid "Current colour"
-msgstr ""
+msgstr "当前颜色"
 
 #: color_selector.py:221
 msgid "New colour"
-msgstr ""
+msgstr "新颜色"
 
 #: color_selector.py:250
 msgid "New colour: "
-msgstr ""
+msgstr "新颜色:"
 
 #: edit_textfile.py:76
 msgid ""
 "Avoid selecting text combinations of unmarked text sections and coded/"
 "annotated/case-assigned sections."
-msgstr ""
+msgstr "避免选择无标记文本部分和编码/注释/案例指定部分的文本组合。"
 
 #: edit_textfile.py:77
 msgid "Positions may not correctly adjust."
-msgstr ""
+msgstr "位置可能无法正确调整。"
 
 #: edit_textfile.py:78
 msgid ""
 "Do not code this text until you reload Coding - Code Text from the menu bar."
-msgstr ""
+msgstr "在从菜单栏重新加载 “编码--编码文本 ”之前，请勿对该文本进行编码。"
 
 #: helpers.py:235
 msgid ""
@@ -2666,20 +2691,23 @@ msgid ""
 "Alt+Left Arrow, Alt+Right Arrow\n"
 "Shift+LeftArrow, Shift+Right Arrow"
 msgstr ""
+"调整编码大小\n"
+"Alt+ 左箭头，Alt+ 右箭头\n"
+"Shift+ 左箭头，Shift+ 右箭头"
 
 #: helpers.py:427 view_av.py:865 view_av.py:3549 view_av.py:3975
 msgid "Media not found"
-msgstr ""
+msgstr "未找到媒体"
 
 #: helpers.py:515 report_compare_coder_file.py:838 view_image.py:2028
 msgid "Image error"
-msgstr ""
+msgstr "图像错误"
 
 #: helpers.py:515 report_compare_coder_file.py:325
 #: report_compare_coder_file.py:450 report_compare_coder_file.py:838
 #: view_image.py:656 view_image.py:2028
 msgid "Cannot open: "
-msgstr ""
+msgstr "无法打开："
 
 #: helpers.py:522
 msgid ""
@@ -2688,22 +2716,26 @@ msgid ""
 "+ - zoom in and out\n"
 "E Export Image"
 msgstr ""
+"L 顺时针旋转\n"
+"R 逆时针旋转\n"
+"+ - 放大和缩小\n"
+"E 导出图像"
 
 #: helpers.py:528 helpers.py:605 view_image.py:123 view_image.py:2044
 msgid "Key + or W zoom in. Key - or Q zoom out"
-msgstr ""
+msgstr "键 + 或 W 放大。按键 - 或 Q 缩小"
 
 #: helpers.py:606
 msgid "Scale:"
-msgstr ""
+msgstr "规模："
 
 #: helpers.py:665
 msgid "Rotate clockwise R"
-msgstr ""
+msgstr "顺时针旋转 R"
 
 #: helpers.py:666
 msgid "Rotate counter-clockwise L"
-msgstr ""
+msgstr "逆时针旋转 L"
 
 #: helpers.py:667 view_image.py:1218
 msgid "Highlight area - gray"
