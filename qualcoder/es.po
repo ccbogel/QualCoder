@@ -1262,7 +1262,7 @@ msgstr "Proyecto"
 #, fuzzy
 #| msgid "Unmark"
 msgid "Unmark (U)"
-msgstr "Desmarcar"
+msgstr "Desmarcar código (U)"
 
 #: code_pdf.py:889 code_text.py:1034 code_text.py:972 code_pdf.py:814
 #: code_text.py:1018 code_pdf.py:835 code_text.py:1025 code_pdf.py:845
@@ -1299,13 +1299,13 @@ msgstr "Cambiar el código"
 #: code_pdf.py:835 view_av.py:2493 code_text.py:1045 code_pdf.py:856
 #: view_av.py:2497 code_text.py:1052 code_pdf.py:866 view_av.py:2532
 msgid "Mark (Q)"
-msgstr "Marca (Q)"
+msgstr "Marcar con código seleccionado (Q)"
 
 #: code_pdf.py:913 code_text.py:1064 view_av.py:2549 code_text.py:1002
 #: code_pdf.py:838 view_av.py:2496 code_text.py:1048 code_pdf.py:859
 #: view_av.py:2500 code_text.py:1055 code_pdf.py:869 view_av.py:2535
 msgid "Mark with recent code (R)"
-msgstr "Marca con código reciente (R)"
+msgstr "Marcar con código reciente (R)"
 
 #: code_pdf.py:916 code_text.py:1067 view_av.py:2552 code_text.py:1005
 #: code_pdf.py:841 view_av.py:2499 code_text.py:1051 code_pdf.py:862
@@ -1330,7 +1330,7 @@ msgstr "Marcar con el nuevo código"
 #: code_pdf.py:919 code_text.py:1070 code_text.py:1008 code_pdf.py:844
 #: code_text.py:1054 code_pdf.py:865 code_text.py:1061 code_pdf.py:875
 msgid "in vivo code (V)"
-msgstr "código in vivo (V)"
+msgstr "Código in-vivo (V)"
 
 #: code_pdf.py:921 code_text.py:1072 view_av.py:2555 code_text.py:1010
 #: code_pdf.py:846 view_av.py:2502 code_text.py:1056 code_pdf.py:867
@@ -1444,7 +1444,7 @@ msgstr "Eliminar"
 #: code_text.py:1525 code_pdf.py:1176 code_text.py:1532 code_pdf.py:1186
 #: view_av.py:1343 view_image.py:895
 msgid "Change code color"
-msgstr "Cambiar código de color"
+msgstr "Cambiar color del código"
 
 #: code_pdf.py:1231 code_text.py:1509 code_text.py:1480 code_pdf.py:1156
 #: code_text.py:1526 code_pdf.py:1177 code_text.py:1533 code_pdf.py:1187
@@ -1664,7 +1664,7 @@ msgstr "Renombrar código"
 #: code_text.py:2755 code_pdf.py:2103 view_av.py:2274 view_image.py:1822
 #: code_text.py:2791 code_pdf.py:2143 view_av.py:2309 view_image.py:1904
 msgid "New code name:"
-msgstr "Nuevo nombre en código:"
+msgstr "Nuevo nombre del código:"
 
 #: code_pdf.py:2163 code_text.py:2764 view_av.py:2330 view_image.py:1774
 #: code_text.py:2711 code_pdf.py:2085 view_av.py:2277 view_image.py:1823
@@ -1695,7 +1695,7 @@ msgstr "Nuevo nombre de categoría: "
 #: code_pdf.py:2201 code_text.py:2802 code_text.py:2749 code_pdf.py:2123
 #: code_text.py:2801 code_pdf.py:2148 code_text.py:2837 code_pdf.py:2188
 msgid "This code name is already in use."
-msgstr "Este nombre en código ya está en uso."
+msgstr "Este nombre de código ya está en uso."
 
 #: code_pdf.py:2202 code_text.py:2803 code_text.py:2750 code_pdf.py:2124
 #: code_text.py:2802 code_pdf.py:2149 code_text.py:2838 code_pdf.py:2189
@@ -3073,7 +3073,7 @@ msgstr "El nombre del diario cambió de: "
 #: manage_files.py:310 manage_files.py:276 manage_files.py:277
 #: manage_files.py:282
 msgid "View"
-msgstr "Vea"
+msgstr "Visualizar"
 
 #: manage_files.py:320 manage_files.py:286 manage_files.py:287
 #: manage_files.py:292
@@ -3132,7 +3132,7 @@ msgstr "Importar archivo enlazado"
 #, fuzzy
 #| msgid "Show values like:"
 msgid "Hide values like:"
-msgstr "Mostrar valores como: "
+msgstr "Mostrar valores como:"
 
 #: manage_files.py:499 manage_files.py:1904 special_functions.py:137
 #: manage_files.py:465 manage_files.py:1850 special_functions.py:126
@@ -4677,7 +4677,7 @@ msgstr "(CODIFICADOR AMARILLO 0)"
 
 #: report_compare_coder_file.py:283 report_compare_coder_file.py:268
 msgid "(BLUE CODER 1)"
-msgstr "(CODER AZUL 1)"
+msgstr "(CODIFICADOR AZUL 1)"
 
 #: report_compare_coder_file.py:285 report_compare_coder_file.py:270
 msgid "FILE: "
@@ -6555,7 +6555,7 @@ msgstr "Texto azul"
 #: view_graph.py:1962 view_graph.py:2134 view_graph.py:1922 view_graph.py:2094
 #: view_graph.py:1923 view_graph.py:2095
 msgid "Orange text"
-msgstr " Texto naranja"
+msgstr "Texto naranja"
 
 #: view_graph.py:1963 view_graph.py:2133 view_graph.py:1923 view_graph.py:2093
 #: view_graph.py:1924 view_graph.py:2094
@@ -6700,8 +6700,8 @@ msgstr "Punteado"
 
 #: view_graph.py:2719 view_graph.py:2677 view_graph.py:2881
 msgid "Cannot find audio/video coding in database"
-msgstr ""
-"No se puede encontrar la codificación de audio/vídeo en la base de datos"
+msgstr "No se puede encontrar la codificación de audio/vídeo en la base de datos"
+
 
 #: view_graph.py:3079 view_graph.py:3037 view_graph.py:3043 view_graph.py:3247
 msgid "Hide"
@@ -6922,7 +6922,7 @@ msgstr " caracteres)."
 
 #: ai_chat.py:590 ai_prompts.py:781 ai_chat.py:593 ai_prompts.py:825
 msgid "Do you really want to delete "
-msgstr "¿De verdad quieres borrar "
+msgstr "¿De verdad quieres borrar?"
 
 #: ai_chat.py:591 ai_chat.py:594
 msgid "Delete Chat"
@@ -7975,11 +7975,11 @@ msgstr "Todos los códigos seleccionados"
 
 #: report_cooccurrence.py:247 report_cooccurrence.py:253
 msgid "Co-occurrence exported: "
-msgstr "Coocurrencia exportada: "
+msgstr "Archivo de Co-ocurrencias exportado: "
 
 #: report_cooccurrence.py:248 report_cooccurrence.py:254
 msgid "Co-occurrence exported"
-msgstr "Coocurrencia exportada"
+msgstr "Co-ocurrencias exportadas"
 
 #: ai_llm.py:143
 msgid "AI Setup"
