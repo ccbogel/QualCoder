@@ -54,12 +54,12 @@
     <message>
         <location filename="ui_dialog_charts.py" line="285"/>
         <source>Select coder</source>
-        <translation>Seleccione el codificador</translation>
+        <translation>Seleccionar codificador</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="286"/>
         <source>Select file</source>
-        <translation>Seleccione el archivo</translation>
+        <translation>Seleccionar archivo</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="289"/>
@@ -106,7 +106,7 @@ Para los cálculos se utilizan las codificaciones de todo el archivo de texto.</
     <message>
         <location filename="ui_dialog_charts.py" line="298"/>
         <source>&lt;b&gt;Attribute charts&lt;/b&gt;</source>
-        <translation>Cuadros de atributos</translation>
+        <translation>Gráficas de atributos</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="299"/>
@@ -902,7 +902,7 @@ es-AU</translation>
     <message>
         <location filename="ui_dialog_cooccurrence.py" line="81"/>
         <source>Code Co-occurence</source>
-        <translation>Código Co-ocurrencia</translation>
+        <translation>Co-ocurrencias de Códigos</translation>
     </message>
     <message>
         <location filename="ui_dialog_cooccurrence.py" line="82"/>
@@ -912,17 +912,17 @@ es-AU</translation>
     <message>
         <location filename="ui_dialog_cooccurrence.py" line="83"/>
         <source>Code co-occurence</source>
-        <translation>Código Co-ocurrencia</translation>
+        <translation>Co-ocurrencias de Códigos</translation>
     </message>
     <message>
         <location filename="ui_dialog_cooccurrence.py" line="84"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export to file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Exportar a archivo</translation>
+        <translation>Exportar a Excel</translation>
     </message>
     <message>
         <location filename="ui_dialog_cooccurrence.py" line="85"/>
         <source>Hide blank lines</source>
-        <translation>Ocultar líneas en blanco</translation>
+        <translation>Ocultar líneas vacías</translation>
     </message>
     <message>
         <location filename="ui_dialog_cooccurrence.py" line="86"/>
@@ -1918,12 +1918,12 @@ Right-click to change automatic searching options</translation>
     <message>
         <location filename="ui_dialog_code_image.py" line="153"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show captions&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Mostrar subtítulos</translation>
+        <translation>Mostrar nombre de código</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_image.py" line="154"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Zoom in. W or +&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Ampliar W o +</translation>
+        <translation>Acercar W o +</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_image.py" line="155"/>
@@ -1933,12 +1933,12 @@ Right-click to change automatic searching options</translation>
     <message>
         <location filename="ui_dialog_code_image.py" line="156"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rotate counter-clockwise&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Girar en sentido antihorario</translation>
+        <translation>Girar 90° grados a la izquierda</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_image.py" line="157"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rotate clockwise&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Girar en el sentido de las agujas del reloj</translation>
+        <translation>Girar 90° grados a la derecha</translation>
     </message>
 </context>
 <context>
@@ -1946,7 +1946,7 @@ Right-click to change automatic searching options</translation>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="248"/>
         <source>Code Text</source>
-        <translation>Texto del código</translation>
+        <translation>Codificar Texto</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="249"/>
@@ -3388,7 +3388,7 @@ Revise después de aplicar la función.</translation>
     <message>
         <location filename="ui_dialog_report_codings.py" line="192"/>
         <source>Text context</source>
-        <translation>Contexto texto</translation>
+        <translation>Añadir Contexto</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_codings.py" line="193"/>
@@ -3408,7 +3408,7 @@ Revise después de aplicar la función.</translation>
     <message>
         <location filename="ui_dialog_report_codings.py" line="191"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Surround coded text with pre-text and post-text.&lt;/p&gt;&lt;p&gt;Change Settings for number of characters and display style.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Rodea el texto codificado con pre-texto y post-texto. Cambiar la configuración del número de caracteres y el estilo de visualización</translation>
+        <translation>Contextualiza el segmento codificado añadiendo texto previo y posterior. Cambiar la configuración del número de caracteres y el estilo de visualización</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_codings.py" line="194"/>
@@ -3469,7 +3469,7 @@ La selección de atributos anulará los expedientes o casos seleccionados en las
     <message>
         <location filename="ui_dialog_report_codings.py" line="204"/>
         <source>Export matrix</source>
-        <translation>Matriz de exportación</translation>
+        <translation>Exportar Matriz</translation>
     </message>
 </context>
 <context>
@@ -4748,7 +4748,7 @@ No codifique este texto hasta que vuelva a cargar Codificación - Texto codifica
     <message>
         <location filename="ui_main.py" line="348"/>
         <source>Code image</source>
-        <translation>Imagen de código</translation>
+        <translation>Codificar imágenes</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="349"/>
@@ -4763,7 +4763,7 @@ No codifique este texto hasta que vuelva a cargar Codificación - Texto codifica
     <message>
         <location filename="ui_main.py" line="351"/>
         <source>Code audio/video</source>
-        <translation>Código de audio / video</translation>
+        <translation>Codificar Audio / Video</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="353"/>
@@ -4978,7 +4978,7 @@ No codifique este texto hasta que vuelva a cargar Codificación - Texto codifica
     <message>
         <location filename="ui_main.py" line="377"/>
         <source>Code pdf</source>
-        <translation>Código pdf</translation>
+        <translation>Codificar PDF</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="378"/>
@@ -5008,7 +5008,7 @@ No codifique este texto hasta que vuelva a cargar Codificación - Texto codifica
     <message>
         <location filename="ui_main.py" line="386"/>
         <source>Prompt library</source>
-        <translation>Biblioteca Prompt</translation>
+        <translation>Biblioteca de instrucciones (Prompts)</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="387"/>
@@ -5028,7 +5028,7 @@ No codifique este texto hasta que vuelva a cargar Codificación - Texto codifica
     <message>
         <location filename="ui_main.py" line="390"/>
         <source>Code co-occurrence</source>
-        <translation>Código Co-ocurrencia</translation>
+        <translation>Co-ocurrencia de Códigos</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="391"/>
