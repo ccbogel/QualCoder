@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-27 07:53+1100\n"
-"PO-Revision-Date: 2025-04-17 08:12+1000\n"
+"PO-Revision-Date: 2025-04-18 09:00+1000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: zh\n"
@@ -2739,190 +2739,194 @@ msgstr "逆时针旋转 L"
 
 #: helpers.py:667 view_image.py:1218
 msgid "Highlight area - gray"
-msgstr ""
+msgstr "高亮区域 - 灰色"
 
 #: helpers.py:668 view_image.py:1219
 msgid "Highlight area - solarize"
-msgstr ""
+msgstr "突出显示区域 - 日晒"
 
 #: helpers.py:669 view_image.py:1220
 msgid "Highlight area - blur"
-msgstr ""
+msgstr "突出显示区域 - 模糊"
 
 #: helpers.py:670
 msgid "Export image E"
-msgstr ""
+msgstr "导出图像 E"
 
 #: helpers.py:760
 msgid "Select plain text codes file"
-msgstr ""
+msgstr "选择纯文本代码文件"
 
 #: helpers.py:766
 msgid "Codes list text file not imported"
-msgstr ""
+msgstr "未导入代码表文本文件"
 
 #: helpers.py:769
 msgid "Importing codes from: "
-msgstr ""
+msgstr "从以下设备导入代码"
 
 #: helpers.py:770
 msgid "Refresh codes trees via menu options for coding, reports"
-msgstr ""
+msgstr "通过编码、报告菜单选项刷新代码树"
 
 #: helpers.py:801
 msgid "Imported category: "
-msgstr ""
+msgstr "进口类别："
 
 #: helpers.py:828
 msgid "Imported code: "
-msgstr ""
+msgstr "进口代码："
 
 #: helpers.py:830
 msgid "Duplicate code not imported: "
-msgstr ""
+msgstr "未导入重复代码："
 
 #: import_survey.py:111
 msgid "No survey selected."
-msgstr ""
+msgstr "未选择调查。"
 
 #: import_survey.py:118
 msgid "Select survey file"
-msgstr ""
+msgstr "选择调查文件"
 
 #: import_survey.py:124
 msgid "Survey not imported. Survey not a csv or xlsx file: "
-msgstr ""
+msgstr "调查表未导入。调查表不是 csv 或 xlsx 文件："
 
 #: import_survey.py:181
 msgid "A column delimiter has not been set."
-msgstr ""
+msgstr "未设置列分隔符。"
 
 #: import_survey.py:223 import_survey.py:228
 msgid "Survey not imported."
-msgstr ""
+msgstr "未导入调查。"
 
 #: import_survey.py:230
 msgid "Importing from: "
-msgstr ""
+msgstr "进口自"
 
 #: import_survey.py:285
 msgid ""
 "There are duplicated identifiers in the first column.\n"
 "File not imported"
 msgstr ""
+"第一列中有重复的标识符。\n"
+"文件未导入"
 
 #: import_survey.py:288
 msgid "Survey file:"
-msgstr ""
+msgstr "调查文件："
 
 #: import_survey.py:289
 msgid "Fields:"
-msgstr ""
+msgstr "领域："
 
 #: import_survey.py:289
 msgid "Rows:"
-msgstr ""
+msgstr "行："
 
 #: import_survey.py:304
 msgid "Attribute name error"
-msgstr ""
+msgstr "属性名称错误"
 
 #: import_survey.py:305
 msgid "Survey Not Imported. Attribute duplicate name error: "
-msgstr ""
+msgstr "调查未导入。属性名称重复错误："
 
 #: import_survey.py:316
 msgid ""
 "Number of fields does not match header\n"
 "Possible wrong quote format"
 msgstr ""
+"字段数量与标题不符\n"
+"可能引号格式错误"
 
 #: import_survey.py:318
 msgid "Survey not loaded: "
-msgstr ""
+msgstr "调查未加载："
 
 #: import_survey.py:319
 msgid "Survey not loaded"
-msgstr ""
+msgstr "调查未加载"
 
 #: import_survey.py:333
 msgid "Inserting cases: "
-msgstr ""
+msgstr "插入箱子："
 
 #: import_survey.py:346
 msgid ""
 " Duplicate case names, either in the file, or with existing project cases"
-msgstr ""
+msgstr " 文件中或现有项目案例中的案例名称重复"
 
 #: import_survey.py:347
 msgid "Duplicate case names warning"
-msgstr ""
+msgstr "案件名称重复警告"
 
 #: import_survey.py:348
 msgid "Survey import warning: "
-msgstr ""
+msgstr "调查导入警告："
 
 #: import_survey.py:382
 msgid "Inserting attributes to cases: "
-msgstr ""
+msgstr "为案例插入属性："
 
 #: import_survey.py:410
 msgid "Creating qualitative text file(s)"
-msgstr ""
+msgstr "创建定性文本文件"
 
 #: import_survey.py:507 import_survey.py:509
 msgid "Survey imported"
-msgstr ""
+msgstr "导入的调查"
 
 #: import_survey.py:508
 msgid "Survey imported."
-msgstr ""
+msgstr "导入的调查"
 
 #: import_survey.py:556
 msgid "Number of fields in row error."
-msgstr ""
+msgstr "错误行中的字段数。"
 
 #: import_survey.py:557
 msgid "Use another quote format OR another delimiter"
-msgstr ""
+msgstr "使用其他引号格式或其他分隔符"
 
 #: import_survey.py:571
 msgid "Change fieldname"
-msgstr ""
+msgstr "更改字段名"
 
 #: import_survey.py:574
 msgid "Change to Qualitative"
-msgstr ""
+msgstr "改为定性"
 
 #: import_survey.py:577
 msgid "Change to Character"
-msgstr ""
+msgstr "改变性格"
 
 #: import_survey.py:603
 msgid "Change field name"
-msgstr ""
+msgstr "更改字段名称"
 
 #: import_survey.py:603
 msgid "New name:"
-msgstr ""
+msgstr "新名称："
 
 #: import_survey.py:610
 msgid ""
 "Name must contain only letters and numbers or '_' and must not start with a "
 "number"
-msgstr ""
+msgstr "名称必须只包含字母和数字或“_”，且不得以数字开头"
 
 #: import_survey.py:611
 msgid "Field name invalid"
-msgstr ""
+msgstr "字段名无效"
 
 #: import_survey.py:614
 msgid " Already in use"
-msgstr ""
+msgstr " 已在使用"
 
 #: import_survey.py:615
 msgid "Field name invalid."
-msgstr ""
+msgstr "字段名无效。"
 
 #: import_twitter_data.py:86
 msgid "Select Twitter csv file"
@@ -2938,57 +2942,57 @@ msgstr ""
 
 #: import_twitter_data.py:107
 msgid "Could not import file"
-msgstr ""
+msgstr "无法导入文件"
 
 #: import_twitter_data.py:134 import_twitter_data.py:140
 #: import_twitter_data.py:153
 msgid "Cannot use file"
-msgstr ""
+msgstr "无法使用文件"
 
 #: import_twitter_data.py:136
 msgid "Row error: "
-msgstr ""
+msgstr "行错误："
 
 #: import_twitter_data.py:139
 msgid "Number of columns is inconsistent. May not be all quoted"
-msgstr ""
+msgstr "列数不一致。可能没有全部引用"
 
 #: import_twitter_data.py:143
 msgid "Missing header columns: "
-msgstr ""
+msgstr "缺少标题栏："
 
 #: import_twitter_data.py:146
 msgid "Tweet field: "
-msgstr ""
+msgstr "Tweet 字段："
 
 #: import_twitter_data.py:150
 msgid "User field: "
-msgstr ""
+msgstr "用户字段："
 
 #: import_twitter_data.py:222 import_twitter_data.py:223
 msgid "Importing twitter data"
-msgstr ""
+msgstr "导入 twitter 数据"
 
 #: journals.py:186
 msgid "Modified"
-msgstr ""
+msgstr "改装"
 
 #: journals.py:186
 msgid "jid"
-msgstr ""
+msgstr "jid"
 
 #: journals.py:209 journals.py:490 journals.py:505 journals.py:528
 #: journals.py:539 journals.py:685 journals.py:723
 msgid "Journal: "
-msgstr ""
+msgstr "期刊："
 
 #: journals.py:252
 msgid "Attribute added to journals:"
-msgstr ""
+msgstr "为期刊添加属性："
 
 #: journals.py:252 manage_files.py:1114
 msgid "type"
-msgstr ""
+msgstr "类型"
 
 #: journals.py:371 journals.py:376 journals.py:381 journals.py:423
 #: journals.py:429 journals.py:446 manage_references.py:213
@@ -2996,7 +3000,7 @@ msgstr ""
 #: manage_references.py:482 manage_references.py:487 manage_references.py:492
 #: manage_references.py:497 manage_references.py:502 manage_references.py:507
 msgid "Ascending"
-msgstr ""
+msgstr "上升"
 
 #: journals.py:372 journals.py:377 journals.py:382 journals.py:424
 #: journals.py:430 journals.py:447 manage_references.py:214
@@ -3004,579 +3008,585 @@ msgstr ""
 #: manage_references.py:483 manage_references.py:488 manage_references.py:493
 #: manage_references.py:498 manage_references.py:503 manage_references.py:508
 msgid "Descending"
-msgstr ""
+msgstr "下降"
 
 #: journals.py:425
 msgid "Show name like"
-msgstr ""
+msgstr "显示名称如"
 
 #: journals.py:437
 msgid "Show this coder"
-msgstr ""
+msgstr "显示该编码器"
 
 #: journals.py:445 manage_files.py:322
 msgid "Enter date"
-msgstr ""
+msgstr "输入日期"
 
 #: journals.py:481
 msgid "Show names like:"
-msgstr ""
+msgstr "节目名称如:"
 
 #: journals.py:551
 msgid "Collated journals exported as text file to: "
-msgstr ""
+msgstr "整理后的期刊以文本文件形式导出到:"
 
 #: journals.py:553
 msgid "Journals exported"
-msgstr ""
+msgstr "导出的期刊"
 
 #: journals.py:609
 msgid "New Journal"
-msgstr ""
+msgstr "新期刊"
 
 #: journals.py:609
 msgid "Journal name"
-msgstr ""
+msgstr "期刊名称"
 
 #: journals.py:630
 msgid "Journal created: "
-msgstr ""
+msgstr "创建期刊："
 
 #: journals.py:656
 msgid "Journal exported to:"
-msgstr ""
+msgstr "导出至："
 
 #: journals.py:657
 msgid "Journal export"
-msgstr ""
+msgstr "期刊出口"
 
 #: journals.py:677
 msgid "Journal deleted: "
-msgstr ""
+msgstr "期刊已删除："
 
 #: journals.py:702
 msgid "No name was entered"
-msgstr ""
+msgstr "未输入姓名"
 
 #: journals.py:706
 msgid "Journal name in use"
-msgstr ""
+msgstr "使用中的期刊名称"
 
 #: journals.py:711
 msgid "Warning - invalid characters"
-msgstr ""
+msgstr "警告 - 字符无效"
 
 #: journals.py:712
 msgid "In the journal name use only: a-z, A-z 0-9 - space"
-msgstr ""
+msgstr "期刊名称中只能使用：a-z，A-z 0-9 - 空格"
 
 #: journals.py:721
 msgid "Journal name changed from: "
-msgstr ""
+msgstr "期刊名称由："
 
 #: manage_files.py:282
 msgid "View"
-msgstr ""
+msgstr "查看"
 
 #: manage_files.py:292
 msgid "File type order"
-msgstr ""
+msgstr "文件类型顺序"
 
 #: manage_files.py:300
 msgid "Assign case to file"
-msgstr ""
+msgstr "指定案件归档"
 
 #: manage_files.py:305
 msgid "Hide values like"
-msgstr ""
+msgstr "隐藏以下值"
 
 #: manage_files.py:324
 msgid "Copy reference to clipboard. APA"
-msgstr ""
+msgstr "将参考文献复制到剪贴板。APA"
 
 #: manage_files.py:325
 msgid "Copy reference to clipboard. Vancouver"
-msgstr ""
+msgstr "将参考文献复制到剪贴板。温哥华"
 
 #: manage_files.py:332 manage_files.py:524
 msgid "Rename database entry"
-msgstr ""
+msgstr "重命名数据库条目"
 
 #: manage_files.py:333
 msgid "Export"
-msgstr ""
+msgstr "出口"
 
 #: manage_files.py:336
 msgid "Move file to externally linked file"
-msgstr ""
+msgstr "将文件移至外部链接文件"
 
 #: manage_files.py:338
 msgid "Import linked file"
-msgstr ""
+msgstr "导入链接文件"
 
 #: manage_files.py:416
 msgid "Hide values like:"
-msgstr ""
+msgstr "隐藏值，如"
 
 #: manage_files.py:487 manage_files.py:1875 special_functions.py:126
 msgid "Delete files"
-msgstr ""
+msgstr "删除文件"
 
 #: manage_files.py:533
 msgid "Renamed database file entry: "
-msgstr ""
+msgstr "重命名数据库文件条目："
 
 #: manage_files.py:554
 msgid "Undo file rename"
-msgstr ""
+msgstr "撤销文件重命名"
 
 #: manage_files.py:564
 msgid "Cannot undo"
-msgstr ""
+msgstr "无法撤销"
 
 #: manage_files.py:564
 msgid "Another file has this name"
-msgstr ""
+msgstr "另一个文件的名称是"
 
 #: manage_files.py:572
 msgid "Reversed renamed database file entry: "
-msgstr ""
+msgstr "逆转重命名的数据库文件条目："
 
 #: manage_files.py:595
 msgid "Bulk Rename of database file name entries"
-msgstr ""
+msgstr "批量重命名数据库文件名条目"
 
 #: manage_files.py:618
 msgid "Renamed database file entry:"
-msgstr ""
+msgstr "重命名数据库文件条目："
 
 #: manage_files.py:691
 msgid "Export to"
-msgstr ""
+msgstr "出口"
 
 #: manage_files.py:696 manage_files.py:1804
 msgid "Cannot export"
-msgstr ""
+msgstr "无法出口"
 
 #: manage_files.py:696
 msgid "Cannot export as linked file\n"
-msgstr ""
+msgstr "无法导出为链接文件\n"
 
 #: manage_files.py:827
 msgid "File attributes exported to: "
-msgstr ""
+msgstr "导出到的文件属性："
 
 #: manage_files.py:828
 msgid "File Export"
-msgstr ""
+msgstr "文件出口"
 
 #: manage_files.py:912
 msgid "Date"
-msgstr ""
+msgstr "日期"
 
 #: manage_files.py:957
 msgid "Transcript for: "
-msgstr ""
+msgstr "转载请注明出处："
 
 #: manage_files.py:990 manage_files.py:999 manage_files.py:1012
 #: manage_files.py:1030
 msgid "Cannot locate media. "
-msgstr ""
+msgstr "无法定位媒体。"
 
 #: manage_files.py:1026 report_file_summary.py:264 report_file_summary.py:317
 msgid "Duration: "
-msgstr ""
+msgstr "持续时间："
 
 #: manage_files.py:1033
 msgid ""
 "Cannot get media duration.\n"
 "VLC not installed."
 msgstr ""
+"无法获取媒体持续时间。\n"
+"未安装 VLC。"
 
 #: manage_files.py:1048
 msgid "Case linked:"
-msgstr ""
+msgstr "案例链接："
 
 #: manage_files.py:1114
 msgid "Attribute added to files:"
-msgstr ""
+msgstr "为文件添加属性："
 
 #: manage_files.py:1130 report_codes.py:1163 view_graph.py:900
 #: view_graph.py:2029 view_graph.py:2056
 msgid "File"
-msgstr ""
+msgstr " 文件"
 
 #: manage_files.py:1138 manage_files.py:1145
 msgid "Memo for file "
-msgstr ""
+msgstr "备忘存档"
 
 #: manage_files.py:1243 manage_references.py:299
 msgid "VLC not installed cannot play audio or video."
-msgstr ""
+msgstr "未安装 VLC 无法播放音频或视频。"
 
 #: manage_files.py:1244 manage_references.py:300
 msgid "View AV error"
-msgstr ""
+msgstr "查看音频/视频错误"
 
 #: manage_files.py:1253 manage_files.py:1285 manage_references.py:309
 #: manage_references.py:338
 msgid "Bad link or non-existent file "
-msgstr ""
+msgstr "链接错误或文件不存在"
 
 #: manage_files.py:1267 manage_references.py:320
 msgid "view AV error"
-msgstr ""
+msgstr "查看音频/视频错误"
 
 #: manage_files.py:1308
 msgid "New File"
-msgstr ""
+msgstr "新文件"
 
 #: manage_files.py:1308
 msgid "Enter file name"
-msgstr ""
+msgstr "输入文件名"
 
 #: manage_files.py:1347
 msgid "File created: "
-msgstr ""
+msgstr "创建的文件："
 
 #: manage_files.py:1444 manage_files.py:1457 manage_files.py:1464
 msgid "Unknown file type"
-msgstr ""
+msgstr "未知文件类型"
 
 #: manage_files.py:1445
 msgid "Trying to import as text"
-msgstr ""
+msgstr "尝试以文本形式导入"
 
 #: manage_files.py:1457 manage_files.py:1464
 msgid "Cannot import file"
-msgstr ""
+msgstr "无法导入文件"
 
 #: manage_files.py:1509 manage_files.py:1671
 msgid "Duplicate file"
-msgstr ""
+msgstr "重复文件"
 
 #: manage_files.py:1509 manage_files.py:1672
 msgid ""
 "Duplicate filename.\n"
 "File not imported"
 msgstr ""
+"文件名重复。\n"
+"文件未导入"
 
 #: manage_files.py:1525 manage_files.py:1710
 msgid " linked"
-msgstr ""
+msgstr " 链接"
 
 #: manage_files.py:1527
 msgid " imported."
-msgstr ""
+msgstr " 进口的"
 
 #: manage_files.py:1632 manage_files.py:1660
 msgid " lines not imported"
-msgstr ""
+msgstr " 未导入的行"
 
 #: manage_files.py:1656 refi.py:1151
 msgid "Cannot import"
-msgstr ""
+msgstr "无法导入"
 
 #: manage_files.py:1661
 msgid "lines not imported"
-msgstr ""
+msgstr "未导入的行"
 
 #: manage_files.py:1665
 msgid "Cannot import "
-msgstr ""
+msgstr "无法导入"
 
 #: manage_files.py:1708
 msgid " imported"
-msgstr ""
+msgstr " 进口的"
 
 #: manage_files.py:1802
 msgid "This is an external linked file"
-msgstr ""
+msgstr "这是一个外部链接文件"
 
 #: manage_files.py:1812
 msgid "This is a linked file. Will export text representation."
-msgstr ""
+msgstr "这是一个链接文件。将导出文本表示法。"
 
 #: manage_files.py:1814
 msgid "Can export text"
-msgstr ""
+msgstr "可导出文本"
 
 #: manage_files.py:1824
 msgid "Export to "
-msgstr ""
+msgstr "出口到"
 
 #: manage_files.py:1833 manage_files.py:1849 manage_files.py:1862
 msgid "Files exported"
-msgstr ""
+msgstr "导出的文件"
 
 #: manage_files.py:1834 manage_files.py:1850 manage_files.py:1863
 msgid " exported to "
-msgstr ""
+msgstr " 导出至"
 
 #: manage_files.py:1836 report_sql.py:313 special_functions.py:99
 #: special_functions.py:102 special_functions.py:105 view_graph.py:2352
 #: view_graph.py:2367 view_graph.py:2385 view_graph.py:2881 view_graph.py:3006
 msgid "Error"
-msgstr ""
+msgstr "错误"
 
 #: manage_files.py:1836
 msgid "File not found"
-msgstr ""
+msgstr "未找到文件"
 
 #: manage_files.py:1893 manage_files.py:2055
 msgid "Deleted file: "
-msgstr ""
+msgstr "删除文件："
 
 #: manage_files.py:1904 manage_files.py:1935 manage_files.py:1998
 #: manage_files.py:2031
 msgid "Deleting file error: "
-msgstr ""
+msgstr "删除文件："
 
 #: manage_files.py:2076
 msgid "Minimum: "
-msgstr ""
+msgstr "最低："
 
 #: manage_files.py:2077
 msgid "Maximum: "
-msgstr ""
+msgstr "最大："
 
 #: manage_files.py:2108
 msgid ""
 "\n"
 "Externally linked file:\n"
 msgstr ""
+"\n"
+"外部链接文件：\n"
 
 #: manage_links.py:80
 msgid "Search folders"
-msgstr ""
+msgstr "搜索文件夹"
 
 #: manage_links.py:109 manage_links.py:124
 msgid "Select file"
-msgstr ""
+msgstr "选择文件"
 
 #: manage_links.py:132
 msgid "Filename does not match."
-msgstr ""
+msgstr "文件名不匹配。"
 
 #: manage_links.py:133
 msgid "Wrong file"
-msgstr ""
+msgstr "错误文件"
 
 #: manage_links.py:160
 msgid "Bad link fixed for file: "
-msgstr ""
+msgstr "修复了文件的错误链接："
 
 #: manage_links.py:160
 msgid " Path: "
-msgstr ""
+msgstr " 路径:"
 
 #: manage_links.py:188 report_relations.py:800
 msgid "Filename"
-msgstr ""
+msgstr "文件名"
 
 #: manage_links.py:188
 msgid "Current path"
-msgstr ""
+msgstr "当前路径"
 
 #: manage_links.py:188
 msgid "Suggestion 1"
-msgstr ""
+msgstr "建议 1"
 
 #: manage_links.py:188
 msgid "Suggestion 2"
-msgstr ""
+msgstr "建议 2"
 
 #: manage_references.py:232 manage_references.py:607
 msgid "Show value like"
-msgstr ""
+msgstr "显示值如"
 
 #: manage_references.py:233
 msgid "View file"
-msgstr ""
+msgstr "查看文件"
 
 #: manage_references.py:238 manage_references.py:610
 msgid "Show all rows"
-msgstr ""
+msgstr "显示所有行"
 
 #: manage_references.py:246 manage_references.py:627
 msgid "Show value like:"
-msgstr ""
+msgstr "显示价值："
 
 #: manage_references.py:375
 msgid "Matches: "
-msgstr ""
+msgstr "匹配："
 
 #: manage_references.py:376
 msgid "Files linked to references"
-msgstr ""
+msgstr "与参考文献链接的文件"
 
 #: manage_references.py:384
 msgid "Reference"
-msgstr ""
+msgstr "参考资料"
 
 #: manage_references.py:384
 msgid "Year"
-msgstr ""
+msgstr "年份"
 
 #: manage_references.py:384
 msgid "Authors"
-msgstr ""
+msgstr "作者"
 
 #: manage_references.py:384
 msgid "Journal or Publication Title"
-msgstr ""
+msgstr "期刊或出版物名称"
 
 #: manage_references.py:385
 msgid "Volume"
-msgstr ""
+msgstr "卷数"
 
 #: manage_references.py:385
 msgid "Issue"
-msgstr ""
+msgstr "议题"
 
 #: manage_references.py:385
 msgid "Keywords"
-msgstr ""
+msgstr "关键词"
 
 #: manage_references.py:612
 msgid "Copy to clipboard.  APA style"
-msgstr ""
+msgstr "复制到剪贴板。 APA 风格"
 
 #: manage_references.py:613
 msgid "Edit reference"
-msgstr ""
+msgstr "编辑参考"
 
 #: manage_references.py:857
 msgid "Reference edited."
-msgstr ""
+msgstr "已编辑参考资料。"
 
 #: manage_references.py:871
 msgid "Delete this reference."
-msgstr ""
+msgstr "删除此引用。"
 
 #: manage_references.py:895
 msgid "Reference deleted."
-msgstr ""
+msgstr "参考资料已删除。"
 
 #: merge_projects.py:74
 msgid "Merging: "
-msgstr ""
+msgstr "参考资料已删除。"
 
 #: merge_projects.py:74
 msgid "Into: "
-msgstr ""
+msgstr "进入："
 
 #: merge_projects.py:91
 msgid "Finished merging "
-msgstr ""
+msgstr "完成合并"
 
 #: merge_projects.py:93
 msgid ""
 "Existing values in destination project are not over-written, apart from "
 "blank attribute values."
-msgstr ""
+msgstr "除空白属性值外，目标项目中的现有值不会被覆盖。"
 
 #: merge_projects.py:94
 msgid "Project merged"
-msgstr ""
+msgstr "项目合并"
 
 #: merge_projects.py:94
 msgid "Review the action log for details."
-msgstr ""
+msgstr "查看行动日志了解详情。"
 
 #: merge_projects.py:98 merge_projects.py:484
 msgid "Project not merged"
-msgstr ""
+msgstr "未合并的项目"
 
 #: merge_projects.py:111
 msgid "Adding top level category: "
-msgstr ""
+msgstr "添加顶级类别："
 
 #: merge_projects.py:133
 msgid "Adding sub-category: "
-msgstr ""
+msgstr "添加子类别："
 
 #: merge_projects.py:139
 msgid " categories not added"
-msgstr ""
+msgstr " 未添加的类别"
 
 #: merge_projects.py:174
 msgid "Adding code name: "
-msgstr ""
+msgstr "添加代号："
 
 #: merge_projects.py:205
 msgid "Adding journal: "
-msgstr ""
+msgstr "添加日志："
 
 #: merge_projects.py:219
 msgid "Merging coded text"
-msgstr ""
+msgstr "合并编码文本"
 
 #: merge_projects.py:225
 msgid "Merging annotations"
-msgstr ""
+msgstr "合并注释"
 
 #: merge_projects.py:233
 msgid "Merging coded image areas"
-msgstr ""
+msgstr "合并编码图像区域"
 
 #: merge_projects.py:240
 msgid "Merging coded audio/video segments"
-msgstr ""
+msgstr "合并编码音频/视频片段"
 
 #: merge_projects.py:277
 msgid "Adding case: "
-msgstr ""
+msgstr "添加案例："
 
 #: merge_projects.py:320
 msgid ""
 "Warning! Inaccurate coding positions. Text lengths different for same text "
 "file: "
-msgstr ""
+msgstr "警告！编码位置不准确。同一文本文件的文本长度不同："
 
 #: merge_projects.py:322
 msgid "Import project file text length: "
-msgstr ""
+msgstr "导入项目文件文本长度："
 
 #: merge_projects.py:323
 msgid "Destination project file text length: "
-msgstr ""
+msgstr "目标项目文件文本长度："
 
 #: merge_projects.py:384
 msgid "File copied: "
-msgstr ""
+msgstr "文件已复制："
 
 #: merge_projects.py:388
 msgid "NOT copied. Permission error"
-msgstr ""
+msgstr "未复制。权限错误"
 
 #: merge_projects.py:406
 msgid "Adding attribute ("
-msgstr ""
+msgstr "添加属性 ("
 
 #: merge_projects.py:455
 msgid "Added attribute values for cases and files: n="
-msgstr ""
+msgstr "为个案和文件添加了属性值：n="
 
 #: merge_projects.py:481
 msgid "Need to update the source project database."
-msgstr ""
+msgstr "需要更新源项目数据库。"
 
 #: merge_projects.py:482
 msgid "Please open the source project using QualCoder. Then close the project."
-msgstr ""
+msgstr "请使用 QualCoder 打开源代码项目。然后关闭项目。"
 
 #: merge_projects.py:483
 msgid "This will update the database schema. Then try merging again."
-msgstr ""
+msgstr "这将更新数据库模式。然后再尝试合并。"
 
 #: refi.py:109
 msgid "Select REFI-QDA file"
-msgstr ""
+msgstr "选择 REFI-QDA 文件"
 
 #: refi.py:119
 msgid "Select REFI-QDA qdpx file"
-msgstr ""
+msgstr "选择 REFI-QDA qdpx 文件"
 
 #: refi.py:144
 msgid " categories and codes imported from "
@@ -3584,129 +3594,131 @@ msgstr ""
 
 #: refi.py:145
 msgid "Codebook imported"
-msgstr ""
+msgstr "导入代码集"
 
 #: refi.py:148
 msgid "Codebook importation"
-msgstr ""
+msgstr "输入代码集"
 
 #: refi.py:148
 msgid " NOT imported"
-msgstr ""
+msgstr " 非进口"
 
 #: refi.py:311
 msgid "Reading from: "
-msgstr ""
+msgstr "读自:"
 
 #: refi.py:312
 msgid "Creating temporary directory: "
-msgstr ""
+msgstr "创建临时目录："
 
 #: refi.py:327
 msgid "Project Import"
-msgstr ""
+msgstr "项目进口"
 
 #: refi.py:346
 msgid "Parse users. Loaded: "
-msgstr ""
+msgstr "解析用户。已加载："
 
 #: refi.py:353
 msgid "Parse codes and categories. Loaded: "
-msgstr ""
+msgstr "解析代码和类别。已加载："
 
 #: refi.py:356
 msgid "Parse variables. Loaded: "
-msgstr ""
+msgstr "解析变量。已加载："
 
 #: refi.py:358
 msgid "Parsing and loading project memo"
-msgstr ""
+msgstr "解析和加载项目备忘录"
 
 #: refi.py:372
 msgid "Parsed cases for file variables. Loaded: "
-msgstr ""
+msgstr "解析了文件变量的情况。已加载："
 
 #: refi.py:380
 msgid "Parsing sources. Loaded: "
-msgstr ""
+msgstr "解析信号源。已加载："
 
 #: refi.py:387
 msgid "Parsing Notes. Journals loaded: "
-msgstr ""
+msgstr "解析说明。已加载期刊："
 
 #: refi.py:399
 msgid "Parsing cases. Loaded: "
-msgstr ""
+msgstr "解析案例。已加载："
 
 #: refi.py:408
 msgid "Parsing sets."
-msgstr ""
+msgstr "解析集。"
 
 #: refi.py:410
 msgid " loaded."
-msgstr ""
+msgstr " 装好了"
 
 #: refi.py:425
 msgid "REFI-QDA PROJECT IMPORT EXPERIMENTAL FUNCTION - NOT FULLY TESTED\n"
-msgstr ""
+msgstr "refi-qda 项目导入实验功能 - 未完全测试\n"
 
 #: refi.py:426
 msgid ""
 "Audio/video transcripts: transcript codings and synchpoints not tested.\n"
-msgstr ""
+msgstr "音频/视频誊本：未测试誊本编码和同步点。\n"
 
 #: refi.py:427
 msgid "Set components may be imported as file attributes.\n"
-msgstr ""
+msgstr "集合组件可作为文件属性导入。\n"
 
 #: refi.py:428
 msgid "Graphs not imported as QualCoder does not have this functionality.\n"
-msgstr ""
+msgstr "集合组件可作为文件属性导入。\n"
 
 #: refi.py:429
 msgid ""
 "Boolean variables treated as character (text). Integer variables treated as "
 "floating point. \n"
-msgstr ""
+msgstr "将布尔变量视为字符（文本）。整数变量按浮点处理。\n"
 
 #: refi.py:430
 msgid ""
 "All variables are stored as text. Cast as text or float for SQL operations.\n"
 msgstr ""
+"所有变量都以文本形式存储。在进行 SQL 操作时，可转换为文本或浮点运算。\n"
 
 #: refi.py:431
 msgid "Relative paths to external files are untested.\n"
-msgstr ""
+msgstr "外部文件的相对路径未经测试。\n"
 
 #: refi.py:432
 msgid ""
 "Select a coder name in Settings dropbox, otherwise coded text and media may "
 "appear uncoded."
 msgstr ""
+"在 “设置 ”下拉框中选择编码器名称，否则已编码的文本和媒体可能会显示为未编码。"
 
 #: refi.py:433
 msgid "REFI-QDA Project import"
-msgstr ""
+msgstr "REFI-QDA项目进口"
 
 #: refi.py:472
 msgid "Cannot read text source from Note: "
-msgstr ""
+msgstr "无法从注释中读取文本源："
 
 #: refi.py:605 refi.py:1784
 msgid "Variable import error"
-msgstr ""
+msgstr "变量导入错误"
 
 #: refi.py:605 refi.py:1784
 msgid "Variable name already exists: "
-msgstr ""
+msgstr "变量名已存在："
 
 #: refi.py:669
 msgid "Error entering Case into database"
-msgstr ""
+msgstr "将案例输入数据库时出错"
 
 #: refi.py:864
 msgid "Cannot copy Image file from: "
-msgstr ""
+msgstr "无法复制图像文件："
 
 #: refi.py:960
 msgid "Cannot copy Audio file from: "
@@ -3764,15 +3776,15 @@ msgstr ""
 
 #: refi.py:2020 refi.py:2021
 msgid "Project exported"
-msgstr ""
+msgstr "导出的项目"
 
 #: refi.py:2037
 msgid "Codebook has been exported to "
-msgstr ""
+msgstr "代码集已导出至"
 
 #: refi.py:2043 refi.py:2044
 msgid "Codebook NOT exported"
-msgstr ""
+msgstr "未导出代码集"
 
 #: refi.py:2917
 msgid "A/V Media not found"
@@ -3784,7 +3796,7 @@ msgstr ""
 
 #: refi.py:2921
 msgid "VLC not found"
-msgstr ""
+msgstr "未找到 VLC"
 
 #: report_attributes.py:528
 msgid "No operator was selected"
@@ -3792,7 +3804,7 @@ msgstr ""
 
 #: report_attributes.py:532
 msgid "Too many values given for this operator"
-msgstr ""
+msgstr "该运算符给出的值过多"
 
 #: report_attributes.py:535
 msgid "Need 2 values for between"
@@ -3800,31 +3812,31 @@ msgstr ""
 
 #: report_attributes.py:543
 msgid " is not a number"
-msgstr ""
+msgstr " 不是数字"
 
 #: report_codes.py:124
 msgid "Top categories by case"
-msgstr ""
+msgstr "按案例分列的热门类别"
 
 #: report_codes.py:124
 msgid "Top categories by file"
-msgstr ""
+msgstr "按文件分列的热门类别"
 
 #: report_codes.py:124
 msgid "Categories by case"
-msgstr ""
+msgstr "按案例分类"
 
 #: report_codes.py:125
 msgid "Categories by file"
-msgstr ""
+msgstr "按文件分类"
 
 #: report_codes.py:125
 msgid "Codes by case"
-msgstr ""
+msgstr "个案代码"
 
 #: report_codes.py:125
 msgid "Codes by file"
-msgstr ""
+msgstr "文件代码"
 
 #: report_codes.py:128
 msgid "None"
@@ -3832,17 +3844,17 @@ msgstr ""
 
 #: report_codes.py:128 report_codes.py:2158 report_codes.py:2459
 msgid "Also code memos"
-msgstr ""
+msgstr "也是代码备忘录"
 
 #: report_codes.py:128 report_codes.py:2709
 msgid "Also coded memos"
-msgstr ""
+msgstr "还有编码备忘录"
 
 #: report_codes.py:128 report_codes.py:2158 report_codes.py:2161
 #: report_codes.py:2165 report_codes.py:2459 report_codes.py:2466
 #: report_codes.py:2709 report_codes.py:2733
 msgid "Also all memos"
-msgstr ""
+msgstr "还包括所有备忘录"
 
 #: report_codes.py:128 report_codes.py:1266 report_codes.py:2158
 #: report_codes.py:2161 report_codes.py:2165 report_codes.py:2459
@@ -3851,31 +3863,31 @@ msgstr ""
 #: report_codes.py:2716 report_codes.py:2728 report_codes.py:2730
 #: report_codes.py:2741 report_codes.py:2743 report_codes.py:2745
 msgid "Only memos"
-msgstr ""
+msgstr "只有备忘录"
 
 #: report_codes.py:129 report_codes.py:1268 report_codes.py:2705
 #: report_codes.py:2707 report_codes.py:2712 report_codes.py:2714
 #: report_codes.py:2716 report_codes.py:2728 report_codes.py:2730
 #: report_codes.py:2741 report_codes.py:2743 report_codes.py:2745
 msgid "Only coded memos"
-msgstr ""
+msgstr "只有编码备忘录"
 
 #: report_codes.py:129 report_codes.py:1226
 msgid "Annotations"
-msgstr ""
+msgstr "注释"
 
 #: report_codes.py:129 report_codes.py:1229
 msgid "Codebook memos"
-msgstr ""
+msgstr "密码本备忘录"
 
 #: report_codes.py:201 report_codes_by_segments.py:117
 msgid "No file selection"
-msgstr ""
+msgstr "无文件选择"
 
 #: report_codes.py:210 report_compare_coder_file.py:146
 #: report_exact_matches.py:134 report_file_summary.py:112
 msgid "Text file\n"
-msgstr ""
+msgstr "文本文件\n"
 
 #: report_codes.py:213 report_compare_coder_file.py:150
 #: report_exact_matches.py:138 report_file_summary.py:115
@@ -3905,11 +3917,11 @@ msgstr ""
 
 #: report_codes.py:290 report_codes_by_segments.py:181
 msgid "Select all files"
-msgstr ""
+msgstr "选择所有文件"
 
 #: report_codes.py:291 report_codes_by_segments.py:182
 msgid "Select files like"
-msgstr ""
+msgstr "选择以下文件"
 
 #: report_codes.py:292 report_codes.py:327 report_codes_by_segments.py:183
 #: report_codes_by_segments.py:218
@@ -3918,7 +3930,7 @@ msgstr ""
 
 #: report_codes.py:304 report_codes_by_segments.py:195
 msgid "Select some files"
-msgstr ""
+msgstr "选择部分文件"
 
 #: report_codes.py:307 report_codes_by_segments.py:198
 msgid "Show files containing text"
@@ -3926,15 +3938,15 @@ msgstr ""
 
 #: report_codes.py:325 report_codes_by_segments.py:216
 msgid "Select all cases"
-msgstr ""
+msgstr "选择所有案例"
 
 #: report_codes.py:326 report_codes_by_segments.py:217
 msgid "Select cases like"
-msgstr ""
+msgstr "选择案例，如"
 
 #: report_codes.py:339 report_codes_by_segments.py:230
 msgid "Select some cases"
-msgstr ""
+msgstr "选择一些案例"
 
 #: report_codes.py:342 report_codes_by_segments.py:233
 msgid "Select cases containing text"
@@ -3942,7 +3954,7 @@ msgstr ""
 
 #: report_codes.py:499 report_codes_by_segments.py:390
 msgid "Select all codes"
-msgstr ""
+msgstr "选择所有代码"
 
 #: report_codes.py:500 report_codes_by_segments.py:391
 msgid "Remove selections"
@@ -3950,7 +3962,7 @@ msgstr ""
 
 #: report_codes.py:501 report_codes_by_segments.py:392
 msgid "Select codes like"
-msgstr ""
+msgstr "选择以下代码"
 
 #: report_codes.py:516 report_codes_by_segments.py:407
 msgid "Select some codes"
@@ -3970,11 +3982,11 @@ msgstr ""
 
 #: report_codes.py:590
 msgid "Matrix exported: "
-msgstr ""
+msgstr "矩阵已导出："
 
 #: report_codes.py:591
 msgid "Matrix exported"
-msgstr ""
+msgstr "矩阵已导出"
 
 #: report_codes.py:603
 msgid "Save Text File"
@@ -3984,14 +3996,14 @@ msgstr ""
 #: report_codes.py:870 report_codes_by_segments.py:445
 #: report_compare_coder_file.py:250
 msgid "Report exported: "
-msgstr ""
+msgstr "已导出报告："
 
 #: report_codes.py:618 report_codes.py:645 report_codes.py:758
 #: report_codes.py:871 report_codes.py:1015 report_codes_by_segments.py:446
 #: report_compare_coder_file.py:252 report_exact_matches.py:489
 #: report_relations.py:782 reports.py:552
 msgid "Report exported"
-msgstr ""
+msgstr "已导出报告"
 
 #: report_codes.py:629
 msgid "Save Open Document Text File"
