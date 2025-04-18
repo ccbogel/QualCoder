@@ -3104,7 +3104,7 @@ def install_language(lang):
     """
 
     qm = os.path.join(home, '.qualcoder')
-    qm = os.path.join(qm, 'app_' + lang + '.qm')
+    qm = os.path.join(qm, f'app_{lang}.qm')
     qm_data = None
     mo_data = None
     if lang == "de":
