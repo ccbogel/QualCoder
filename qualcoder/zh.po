@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-27 07:53+1100\n"
-"PO-Revision-Date: 2025-04-18 09:00+1000\n"
+"PO-Revision-Date: 2025-04-19 09:05+1000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: zh\n"
@@ -339,7 +339,7 @@ msgstr "项目已被“ ”使用，因此无法打开。"
 
 #: __main__.py:2435
 msgid "\". Please retry later."
-msgstr " 请稍后重试。"
+msgstr "请稍后重试。"
 
 #: __main__.py:2437 __main__.py:2450
 msgid "Cannot open file"
@@ -400,7 +400,7 @@ msgstr "项目备忘录："
 
 #: __main__.py:2753 manage_files.py:2156
 msgid "Files: "
-msgstr "没有文件"
+msgstr "没有文件:"
 
 #: __main__.py:2757 cases.py:357 import_twitter_data.py:104
 msgid "Cases: "
@@ -597,7 +597,7 @@ msgid ""
 "Description:"
 msgstr ""
 "\n"
-"说明"
+"说明:"
 
 #: ai_chat.py:439
 msgid "Topic"
@@ -1129,7 +1129,7 @@ msgstr "至 "
 
 #: attributes.py:262
 msgid "Assigned to"
-msgstr " 分配给"
+msgstr "分配给"
 
 #: attributes.py:262 manage_links.py:188 manage_references.py:384
 msgid "Type"
@@ -1460,7 +1460,7 @@ msgstr "代码树"
 #: manage_files.py:912 report_code_summary.py:104 report_exact_matches.py:501
 #: report_relations.py:1012 view_av.py:452 view_image.py:321
 msgid "Id"
-msgstr ""
+msgstr "Id"
 
 #: code_color_scheme.py:284
 msgid "Perspective: "
@@ -1496,7 +1496,7 @@ msgstr "案例："
 #: view_graph.py:514 view_graph.py:574 view_graph.py:633 view_graph.py:1247
 #: view_graph.py:1273 view_graph.py:1298
 msgid "Memo: "
-msgstr " 备忘："
+msgstr "备忘："
 
 #: code_in_all_files.py:214 code_text.py:3866 helpers.py:215
 #: report_attributes.py:334 report_codes.py:2160 view_charts.py:268
@@ -1504,7 +1504,7 @@ msgstr " 备忘："
 #: view_graph.py:1243 view_graph.py:1268 view_graph.py:1294 view_graph.py:1320
 #: view_graph.py:1339 view_graph.py:1360 view_graph.py:1563
 msgid "File: "
-msgstr " 文件: "
+msgstr "文件: "
 
 #: code_in_all_files.py:322
 msgid "Appy more codes to this segment"
@@ -1671,7 +1671,7 @@ msgstr "如果文本被打翻或删除，基础代码/注释/案例分配的位�
 #: report_exact_matches.py:135 report_file_summary.py:113
 #: report_file_summary.py:415
 msgid "Characters: "
-msgstr " 字符）: "
+msgstr "字符）: "
 
 #: code_text.py:416 code_text.py:445 code_pdf.py:329 code_pdf.py:358
 msgid "Codings:"
@@ -1700,7 +1700,7 @@ msgstr "未找到匹配文件"
 
 #: code_text.py:759
 msgid "Examples:"
-msgstr "例如"
+msgstr "例如:"
 
 #: code_text.py:778
 msgid "Project memo"
@@ -1827,7 +1827,7 @@ msgstr "备忘存档："
 
 #: code_text.py:1393 code_text.py:1394 code_pdf.py:2428
 msgid "Memo:"
-msgstr " 备忘："
+msgstr "备忘："
 
 #: code_text.py:1418 code_pdf.py:1119 code_pdf.py:2910 view_av.py:2724
 msgid "Select code to memo"
@@ -2076,7 +2076,7 @@ msgstr "已被使用，请选择其他名称。"
 
 #: code_text.py:2820
 msgid "Code renamed from: "
-msgstr "代码重命名自"
+msgstr "代码重命名自:"
 
 #: code_text.py:2820 code_text.py:2855
 msgid " to: "
@@ -2391,7 +2391,7 @@ msgstr "人工智能： 未找到以下方面的新数据"
 
 #: code_text.py:4758
 msgid "\" beside what has already been coded with this code."
-msgstr " 旁边是已用此代码编码的内容。"
+msgstr "旁边是已用此代码编码的内容。"
 
 #: code_text.py:4763
 msgid ""
@@ -2536,7 +2536,7 @@ msgstr "代码:"
 
 #: code_pdf.py:1409 report_codes.py:2017 report_codes.py:2710
 msgid "MEMO:"
-msgstr " 备忘："
+msgstr "备忘："
 
 #: code_pdf.py:1412
 msgid "EXAMPLES:"
@@ -2656,7 +2656,7 @@ msgstr "编码手册"
 
 #: codebook.py:218
 msgid "Category:"
-msgstr "类别"
+msgstr "类别:"
 
 #: color_selector.py:219
 msgid "Current colour"
@@ -2803,7 +2803,7 @@ msgstr "未导入调查。"
 
 #: import_survey.py:230
 msgid "Importing from: "
-msgstr "进口自"
+msgstr "进口自:"
 
 #: import_survey.py:285
 msgid ""
@@ -2930,15 +2930,15 @@ msgstr "字段名无效。"
 
 #: import_twitter_data.py:86
 msgid "Select Twitter csv file"
-msgstr ""
+msgstr "选择 Twitter csv 文件"
 
 #: import_twitter_data.py:103
 msgid "Tweet file loaded. Please check via Manage files and Manage cases"
-msgstr ""
+msgstr "Tweet 文件已加载。请通过 “管理文件 ”和 “管理案例 ”进行检查"
 
 #: import_twitter_data.py:104
 msgid "Tweets: "
-msgstr ""
+msgstr "Tweets: "
 
 #: import_twitter_data.py:107
 msgid "Could not import file"
@@ -3210,7 +3210,7 @@ msgstr "为文件添加属性："
 #: manage_files.py:1130 report_codes.py:1163 view_graph.py:900
 #: view_graph.py:2029 view_graph.py:2056
 msgid "File"
-msgstr " 文件"
+msgstr "文件"
 
 #: manage_files.py:1138 manage_files.py:1145
 msgid "Memo for file "
@@ -3590,7 +3590,7 @@ msgstr "选择 REFI-QDA qdpx 文件"
 
 #: refi.py:144
 msgid " categories and codes imported from "
-msgstr ""
+msgstr " 的类别和代码"
 
 #: refi.py:145
 msgid "Codebook imported"
@@ -3654,7 +3654,7 @@ msgstr "解析集。"
 
 #: refi.py:410
 msgid " loaded."
-msgstr " 装好了"
+msgstr " 装好了."
 
 #: refi.py:425
 msgid "REFI-QDA PROJECT IMPORT EXPERIMENTAL FUNCTION - NOT FULLY TESTED\n"
@@ -3722,57 +3722,57 @@ msgstr "无法复制图像文件："
 
 #: refi.py:960
 msgid "Cannot copy Audio file from: "
-msgstr ""
+msgstr "无法复制音频文件："
 
 #: refi.py:1022
 msgid "Cannot copy Video file from: "
-msgstr ""
+msgstr "无法复制视频文件："
 
 #: refi.py:1130
 msgid "Cannot copy transcript file from: "
-msgstr ""
+msgstr "无法从以下地址复制成绩单文件："
 
 #: refi.py:1307
 msgid "Cannot copy PDF file from: "
-msgstr ""
+msgstr "无法复制 PDF 文件："
 
 #: refi.py:1422
 msgid "Cannot read from TextSource: "
-msgstr ""
+msgstr "无法从文本源读取数据："
 
 #: refi.py:1434 refi.py:1448
 msgid "Cannot copy TextSource file from: "
-msgstr ""
+msgstr "无法复制文本源文件："
 
 #: refi.py:1570
 msgid "Duplicated text coding for code and coder. Only one loaded."
-msgstr ""
+msgstr "代码和编码器的文本编码重复。只加载一个。"
 
 #: refi.py:1571
 msgid " Positions:"
-msgstr ""
+msgstr "职位"
 
 #: refi.py:1660
 msgid "Trying to read Note element: "
-msgstr ""
+msgstr "尝试阅读注释要素："
 
 #: refi.py:1936
 msgid "Project export error "
-msgstr ""
+msgstr "项目导出错误"
 
 #: refi.py:1937 refi.py:1943
 msgid "Project not exported. Exiting. "
-msgstr ""
+msgstr "项目未导出。退出。"
 
 #: refi.py:2015
 msgid "REFI-QDA PROJECT EXPORT EXPERIMENTAL FUNCTION.\n"
-msgstr ""
+msgstr "refi-qda 项目导出实验功能。\n"
 
 #: refi.py:2016
 msgid ""
 "This project exchange is not guaranteed compliant with the exchange "
 "standard.\n"
-msgstr ""
+msgstr "该项目交换不保证符合交换标准。\n"
 
 #: refi.py:2020 refi.py:2021
 msgid "Project exported"
@@ -3788,11 +3788,11 @@ msgstr "未导出代码集"
 
 #: refi.py:2917
 msgid "A/V Media not found"
-msgstr ""
+msgstr "未找到音频/视频媒体"
 
 #: refi.py:2920
 msgid "VLC not installed, final end character timepoint will be inaccurate"
-msgstr ""
+msgstr "未安装 VLC，最终结束符时间点将不准确"
 
 #: refi.py:2921
 msgid "VLC not found"
@@ -3800,7 +3800,7 @@ msgstr "未找到 VLC"
 
 #: report_attributes.py:528
 msgid "No operator was selected"
-msgstr ""
+msgstr "未选择操作员"
 
 #: report_attributes.py:532
 msgid "Too many values given for this operator"
@@ -3808,7 +3808,7 @@ msgstr "该运算符给出的值过多"
 
 #: report_attributes.py:535
 msgid "Need 2 values for between"
-msgstr ""
+msgstr "之间需要 2 个值"
 
 #: report_attributes.py:543
 msgid " is not a number"
@@ -3840,7 +3840,7 @@ msgstr "文件代码"
 
 #: report_codes.py:128
 msgid "None"
-msgstr ""
+msgstr "无"
 
 #: report_codes.py:128 report_codes.py:2158 report_codes.py:2459
 msgid "Also code memos"
@@ -3892,17 +3892,17 @@ msgstr "文本文件\n"
 #: report_codes.py:213 report_compare_coder_file.py:150
 #: report_exact_matches.py:138 report_file_summary.py:115
 msgid "Image"
-msgstr ""
+msgstr "图片"
 
 #: report_codes.py:215 report_compare_coder_file.py:153
 #: report_exact_matches.py:141 report_file_summary.py:117
 msgid "Audio"
-msgstr ""
+msgstr "音频"
 
 #: report_codes.py:217 report_compare_coder_file.py:156
 #: report_exact_matches.py:144 report_file_summary.py:119
 msgid "Video"
-msgstr ""
+msgstr "视频"
 
 #: report_codes.py:224 report_compare_coder_file.py:164
 #: report_exact_matches.py:148 report_file_summary.py:126
@@ -3910,10 +3910,12 @@ msgid ""
 "\n"
 "Codings: "
 msgstr ""
+"\n"
+"编码："
 
 #: report_codes.py:240 report_codes_by_segments.py:130
 msgid "No case selection"
-msgstr ""
+msgstr "无案例选择"
 
 #: report_codes.py:290 report_codes_by_segments.py:181
 msgid "Select all files"
@@ -3926,7 +3928,7 @@ msgstr "选择以下文件"
 #: report_codes.py:292 report_codes.py:327 report_codes_by_segments.py:183
 #: report_codes_by_segments.py:218
 msgid "Select none"
-msgstr ""
+msgstr "选择无"
 
 #: report_codes.py:304 report_codes_by_segments.py:195
 msgid "Select some files"
@@ -3934,7 +3936,7 @@ msgstr "选择部分文件"
 
 #: report_codes.py:307 report_codes_by_segments.py:198
 msgid "Show files containing text"
-msgstr ""
+msgstr "显示包含文本的文件"
 
 #: report_codes.py:325 report_codes_by_segments.py:216
 msgid "Select all cases"
@@ -3950,7 +3952,7 @@ msgstr "选择一些案例"
 
 #: report_codes.py:342 report_codes_by_segments.py:233
 msgid "Select cases containing text"
-msgstr ""
+msgstr "选择包含文本的案例"
 
 #: report_codes.py:499 report_codes_by_segments.py:390
 msgid "Select all codes"
@@ -3958,7 +3960,7 @@ msgstr "选择所有代码"
 
 #: report_codes.py:500 report_codes_by_segments.py:391
 msgid "Remove selections"
-msgstr ""
+msgstr "删除选择"
 
 #: report_codes.py:501 report_codes_by_segments.py:392
 msgid "Select codes like"
@@ -3966,19 +3968,19 @@ msgstr "选择以下代码"
 
 #: report_codes.py:516 report_codes_by_segments.py:407
 msgid "Select some codes"
-msgstr ""
+msgstr "选择一些代码"
 
 #: report_codes.py:519 report_codes_by_segments.py:410
 msgid "Select codes containing text"
-msgstr ""
+msgstr "选择包含文本的代码"
 
 #: report_codes.py:556
 msgid "No matrix"
-msgstr ""
+msgstr "无矩阵"
 
 #: report_codes.py:556
 msgid "No matrix results to export"
-msgstr ""
+msgstr "没有输出矩阵结果"
 
 #: report_codes.py:590
 msgid "Matrix exported: "
@@ -3990,7 +3992,7 @@ msgstr "矩阵已导出"
 
 #: report_codes.py:603
 msgid "Save Text File"
-msgstr ""
+msgstr "保存文本文件"
 
 #: report_codes.py:617 report_codes.py:643 report_codes.py:757
 #: report_codes.py:870 report_codes_by_segments.py:445
@@ -4007,361 +4009,367 @@ msgstr "已导出报告"
 
 #: report_codes.py:629
 msgid "Save Open Document Text File"
-msgstr ""
+msgstr "保存打开的文档文本文件"
 
 #: report_codes.py:741
 msgid "Save CSV File"
-msgstr ""
+msgstr "保存 CSV 文件"
 
 #: report_codes.py:754 report_codes.py:869
 msgid "Each row contains filename, coder, coded, codename and categories."
-msgstr ""
+msgstr "每行包含文件名、编码者、编码、代码名和类别。"
 
 #: report_codes.py:756
 msgid "And file and case variables"
-msgstr ""
+msgstr "文件和案例变量"
 
 #: report_codes.py:863 report_codes_by_segments.py:439
 #: report_exact_matches.py:479 report_relations.py:771
 msgid "Save Excel File"
-msgstr ""
+msgstr "保存 Excel 文件"
 
 #: report_codes.py:912
 msgid "Save HTML File"
-msgstr ""
+msgstr "保存 HTML 文件"
 
 #: report_codes.py:941
 msgid "html folder creation error "
-msgstr ""
+msgstr "html 文件夹创建错误"
 
 #: report_codes.py:942
 msgid "Folder creation"
-msgstr ""
+msgstr "创建文件夹"
 
 #: report_codes.py:942
 msgid "error "
-msgstr ""
+msgstr "错误"
 
 #: report_codes.py:948
 msgid "html file reading error:"
-msgstr ""
+msgstr "html 文件读取错误："
 
 #: report_codes.py:1011 report_exact_matches.py:488 report_relations.py:781
 msgid "Report exported to: "
-msgstr ""
+msgstr "报告输出到:"
 
 #: report_codes.py:1013
 msgid "Media folder:"
-msgstr ""
+msgstr "媒体文件夹："
 
 #: report_codes.py:1063
 msgid ""
 "Codebook with memos\n"
 "=================\n"
 msgstr ""
+"带备忘录的密码本\n"
+"=================\n"
 
 #: report_codes.py:1115
 msgid "No files selected for annotations"
-msgstr ""
+msgstr "未选择用于注释的文件"
 
 #: report_codes.py:1146
 msgid "Annotation search parameters"
-msgstr ""
+msgstr "注释搜索参数"
 
 #: report_codes.py:1148
 msgid "Coder: All coders"
-msgstr ""
+msgstr "编码员 所有编码员"
 
 #: report_codes.py:1150 report_codes.py:2171 view_av.py:207 view_charts.py:346
 #: view_image.py:120
 msgid "Coder: "
-msgstr ""
+msgstr "编码器："
 
 #: report_codes.py:1152 report_codes.py:1321
 msgid "Search text: "
-msgstr ""
+msgstr "搜索文本："
 
 #: report_codes.py:1153
 msgid "Files:"
-msgstr ""
+msgstr "文件："
 
 #: report_codes.py:1164
 msgid "DATE:"
-msgstr ""
+msgstr "日期："
 
 #: report_codes.py:1165
 msgid "Position"
-msgstr ""
+msgstr "职位"
 
 #: report_codes.py:1166
 msgid "TEXT"
-msgstr ""
+msgstr "文本"
 
 #: report_codes.py:1167
 msgid "ANNOTATION"
-msgstr ""
+msgstr "附注"
 
 #: report_codes.py:1240 report_exact_matches.py:190
 msgid "No codes have been selected."
-msgstr ""
+msgstr "未选择任何代码。"
 
 #: report_codes.py:1244
 msgid "No files, cases found."
-msgstr ""
+msgstr "未找到文件和案件。"
 
 #: report_codes.py:1245
 msgid "Nothing selected"
-msgstr ""
+msgstr "没有选择"
 
 #: report_codes.py:1249
 msgid "Searching"
-msgstr ""
+msgstr "搜索"
 
 #: report_codes.py:1267
 msgid "Only memos shown. Coded data not shown."
-msgstr ""
+msgstr "仅显示备忘录。未显示编码数据。"
 
 #: report_codes.py:1269
 msgid "Coded memos shown if available. Coded data not shown."
-msgstr ""
+msgstr "如有编码备忘录，则予以显示。未显示编码数据。"
 
 #: report_codes.py:1270
 msgid "Search parameters"
-msgstr ""
+msgstr "搜索参数"
 
 #: report_codes.py:1273
 msgid "Coding by: All coders"
-msgstr ""
+msgstr "编码员 所有编码员"
 
 #: report_codes.py:1275
 msgid "Coding by: "
-msgstr ""
+msgstr "编码："
 
 #: report_codes.py:1288
 msgid "Attributes:"
-msgstr ""
+msgstr "属性："
 
 #: report_codes.py:1307
 msgid ""
 "\n"
 "Files:\n"
 msgstr ""
+"\n"
+"文件\n"
 
 #: report_codes.py:1312
 msgid " Files: "
-msgstr ""
+msgstr " 文件: "
 
 #: report_codes.py:1314
 msgid ""
 "\n"
 "Cases:\n"
 msgstr ""
+"\n"
+"案例:\n"
 
 #: report_codes.py:1734
 msgid "Text code statistics:"
-msgstr ""
+msgstr "文本代码统计："
 
 #: report_codes.py:1736 report_codes.py:1798 report_codes.py:1873
 msgid "Count:"
-msgstr ""
+msgstr "计数："
 
 #: report_codes.py:1737 report_codes.py:1799 report_codes.py:1875
 msgid "Percent of file:"
-msgstr ""
+msgstr "文件百分比："
 
 #: report_codes.py:1796
 msgid "Image code statistics:"
-msgstr ""
+msgstr "图像代码统计："
 
 #: report_codes.py:1871
 msgid "A/V code statistics:"
-msgstr ""
+msgstr "音频/视频代码统计："
 
 #: report_codes.py:1877
 msgid "Percent of file: Unknown. Either VLC not installer or file not found."
-msgstr ""
+msgstr "文件百分比： 未知。要么 VLC 不是安装程序，要么找不到文件。"
 
 #: report_codes.py:1915
 msgid "Code count totals"
-msgstr ""
+msgstr "代码总数"
 
 #: report_codes.py:2035
 msgid "No case matrix"
-msgstr ""
+msgstr "无案例矩阵"
 
 #: report_codes.py:2035
 msgid "Cases not selected"
-msgstr ""
+msgstr "未被选中的案例"
 
 #: report_codes.py:2159
 msgid "CODE MEMO: "
-msgstr ""
+msgstr "代码备忘录："
 
 #: report_codes.py:2162
 msgid " FILE MEMO: "
-msgstr ""
+msgstr " 文件备忘录："
 
 #: report_codes.py:2170
 msgid "CASE MEMO: "
-msgstr ""
+msgstr "案例备忘录："
 
 #: report_codes.py:2237 report_codes.py:2780 report_exact_matches.py:328
 #: report_relations.py:515 view_graph.py:2860 view_graph.py:2991
 msgid "View in context"
-msgstr ""
+msgstr "按上下文查看"
 
 #: report_codes.py:2239 view_av.py:3485 view_image.py:1259
 msgid "Add important mark"
-msgstr ""
+msgstr "添加重要标记"
 
 #: report_codes.py:2240
 msgid "Change code to"
-msgstr ""
+msgstr "将代码更改为"
 
 #: report_codes.py:2244 report_codes.py:2784
 msgid "Copy all to clipboard"
-msgstr ""
+msgstr "全部复制到剪贴板"
 
 #: report_codes.py:2247
 msgid "Rotate image 90 degrees"
-msgstr ""
+msgstr "将图像旋转 90 度"
 
 #: report_codes.py:2251 view_image.py:1224
 msgid "Show control panel"
-msgstr ""
+msgstr "显示控制面板"
 
 #: report_codes.py:2253 view_image.py:1226
 msgid "Hide control panel"
-msgstr ""
+msgstr "隐藏控制面板"
 
 #: report_codes.py:2348
 msgid "Delete coded section."
-msgstr ""
+msgstr "删除编码部分。"
 
 #: report_codes.py:2349
 msgid "Delete coded section"
-msgstr ""
+msgstr "删除编码部分"
 
 #: report_codes.py:2460
 msgid "CODE MEMO: All memo"
-msgstr ""
+msgstr "代码备忘录： 所有备忘"
 
 #: report_codes.py:2462
 msgid "Also alll memos"
-msgstr ""
+msgstr "还包括所有备忘录"
 
 #: report_codes.py:2463
 msgid "FILE MEMO:"
-msgstr ""
+msgstr "文件备忘录："
 
 #: report_codes.py:2471
 msgid "CASE MEMO:"
-msgstr ""
+msgstr "案例备忘录："
 
 #: report_code_summary.py:241 report_compare_coder_file.py:271
 msgid "CODE: "
-msgstr ""
+msgstr "代码:"
 
 #: report_code_summary.py:242
 msgid "COLOUR: "
-msgstr ""
+msgstr "颜色:"
 
 #: report_code_summary.py:242
 msgid "CREATED BY: "
-msgstr ""
+msgstr "创作者："
 
 #: report_code_summary.py:269 report_compare_coder_file.py:264
 msgid "CODERS: "
-msgstr ""
+msgstr "编码器："
 
 #: report_code_summary.py:276
 msgid "FILES: "
-msgstr ""
+msgstr "文件: "
 
 #: report_code_summary.py:282
 msgid ""
 "Report code summary. Code_text, code_image or code_av had a coding to a "
 "deleted file"
-msgstr ""
+msgstr "报告代码摘要。代码_文本、代码_图像或代码_av 的编码指向已删除的文件"
 
 #: report_code_summary.py:297
 msgid "TEXT CODINGS: "
-msgstr ""
+msgstr "文字编码："
 
 #: report_code_summary.py:316
 msgid ""
 "Word calculations: Words use alphabet characters and include the apostrophe."
 "All other characters are word separators"
-msgstr ""
+msgstr "单词计算： 单词使用字母字符，包括撇号，所有其他字符均为单词分隔符"
 
 #: report_code_summary.py:319 report_file_summary.py:427
 msgid "Words: "
-msgstr ""
+msgstr "字数:"
 
 #: report_code_summary.py:329 report_file_summary.py:437
 msgid "Unique words: "
-msgstr ""
+msgstr "独特的词语："
 
 #: report_code_summary.py:334 report_file_summary.py:442
 msgid "Top 100 words"
-msgstr ""
+msgstr "前 100 个单词"
 
 #: report_code_summary.py:337 report_compare_coder_file.py:666
 #: report_file_summary.py:455
 msgid "Total characters: "
-msgstr ""
+msgstr "总字符数："
 
 #: report_code_summary.py:338 report_file_summary.py:457
 msgid "Average characters: "
-msgstr ""
+msgstr "平均字符数："
 
 #: report_code_summary.py:347
 msgid "IMAGE CODINGS: "
-msgstr ""
+msgstr "图像编码："
 
 #: report_code_summary.py:381 view_image.py:662
 msgid "Image: "
-msgstr ""
+msgstr "图片:"
 
 #: report_code_summary.py:382 report_code_summary.py:433
 #: report_file_summary.py:281 report_file_summary.py:334
 #: report_file_summary.py:399 report_file_summary.py:455
 msgid "Count: "
-msgstr ""
+msgstr "计数："
 
 #: report_code_summary.py:382
 msgid "Average coded area: "
-msgstr ""
+msgstr "平均编码面积："
 
 #: report_code_summary.py:382 report_compare_coder_file.py:880
 #: report_compare_coder_file.py:883 report_file_summary.py:365
 #: report_file_summary.py:401
 msgid " pixels"
-msgstr ""
+msgstr " 像素"
 
 #: report_code_summary.py:383
 msgid "Average area of image: "
-msgstr ""
+msgstr "图像的平均面积："
 
 #: report_code_summary.py:392
 msgid "A/V CODINGS: "
-msgstr ""
+msgstr "奥迪/视频编码："
 
 #: report_code_summary.py:432
 msgid "Media: "
-msgstr ""
+msgstr "媒体："
 
 #: report_code_summary.py:434
 msgid "Average coded duration: "
-msgstr ""
+msgstr "平均编码持续时间："
 
 #: report_code_summary.py:434
 msgid " secs"
-msgstr ""
+msgstr "秒"
 
 #: report_code_summary.py:436
 msgid "Average percent of media: "
-msgstr ""
+msgstr "媒体的平均百分比："
 
 #: report_compare_coder_file.py:173 report_exact_matches.py:153
 #: report_file_summary.py:135
@@ -4369,177 +4377,179 @@ msgid ""
 "\n"
 "Memo: "
 msgstr ""
+"\n"
+"备忘录:"
 
 #: report_compare_coder_file.py:234 reports.py:519
 msgid "No coders selected"
-msgstr ""
+msgstr "未选择编码员"
 
 #: report_compare_coder_file.py:264
 msgid "CODER COMPARISON FOR FILE"
-msgstr ""
+msgstr "文件编码器比较"
 
 #: report_compare_coder_file.py:266
 msgid "(YELLOW CODER 0)"
-msgstr ""
+msgstr "(黄色编码器 0）"
 
 #: report_compare_coder_file.py:268
 msgid "(BLUE CODER 1)"
-msgstr ""
+msgstr "(蓝色编码器 1）"
 
 #: report_compare_coder_file.py:270
 msgid "FILE: "
-msgstr ""
+msgstr "文件: "
 
 #: report_compare_coder_file.py:323
 msgid "A/V Duration: "
-msgstr ""
+msgstr "音频/视频时长："
 
 #: report_compare_coder_file.py:323
 msgid "msecs: "
-msgstr ""
+msgstr "毫秒："
 
 #: report_compare_coder_file.py:327
 msgid "A/V Error"
-msgstr ""
+msgstr "音频/视频错误"
 
 #: report_compare_coder_file.py:332
 msgid "A/V Duration: Unknown, Set at 1 millisecond"
-msgstr ""
+msgstr "音频/视频持续时间： 未知，设置为 1 毫秒"
 
 #: report_compare_coder_file.py:333
 msgid "Statistical comparisons will be incorrect. VLC not installed."
-msgstr ""
+msgstr "统计比较将不正确。未安装 VLC。"
 
 #: report_compare_coder_file.py:387 report_compare_coder_file.py:534
 #: report_compare_coder_file.py:663
 msgid "ZeroDivisionError. unique_codings:"
-msgstr ""
+msgstr "零除法错误："
 
 #: report_compare_coder_file.py:390
 msgid "Total msecs: "
-msgstr ""
+msgstr "总毫秒数："
 
 #: report_compare_coder_file.py:391 report_compare_coder_file.py:539
 #: report_compare_coder_file.py:667
 msgid "Dual coded: "
-msgstr ""
+msgstr "双重编码："
 
 #: report_compare_coder_file.py:392 report_compare_coder_file.py:540
 #: report_compare_coder_file.py:668
 msgid "Single coded: "
-msgstr ""
+msgstr "单一编码："
 
 #: report_compare_coder_file.py:393 report_compare_coder_file.py:541
 #: report_compare_coder_file.py:669
 msgid "Uncoded: "
-msgstr ""
+msgstr "未编码："
 
 #: report_compare_coder_file.py:394 report_compare_coder_file.py:542
 #: report_compare_coder_file.py:670
 msgid "Coder 0: "
-msgstr ""
+msgstr "代码 0:"
 
 #: report_compare_coder_file.py:395 report_compare_coder_file.py:543
 #: report_compare_coder_file.py:671
 msgid "Coder 1: "
-msgstr ""
+msgstr "代码 1:"
 
 #: report_compare_coder_file.py:396 report_compare_coder_file.py:544
 #: report_compare_coder_file.py:672
 msgid "Agreement between coders: "
-msgstr ""
+msgstr "编码员之间意见一致："
 
 #: report_compare_coder_file.py:397
 msgid "Total msecs dual coded: "
-msgstr ""
+msgstr "双编码总毫秒数："
 
 #: report_compare_coder_file.py:398
 msgid "Total msecs uncoded: "
-msgstr ""
+msgstr "未编码的总毫秒数："
 
 #: report_compare_coder_file.py:399
 msgid "Total msecs disagreement (single coded): "
-msgstr ""
+msgstr "不一致总毫秒数（单一编码）："
 
 #: report_compare_coder_file.py:400 report_compare_coder_file.py:548
 #: report_compare_coder_file.py:676
 msgid "Kappa: "
-msgstr ""
+msgstr "Kappa: "
 
 #: report_compare_coder_file.py:402 report_compare_coder_file.py:412
 msgid "Overlaps Coder: "
-msgstr ""
+msgstr "重叠编码器："
 
 #: report_compare_coder_file.py:406 report_compare_coder_file.py:416
 msgid "No overlap"
-msgstr ""
+msgstr "无重叠"
 
 #: report_compare_coder_file.py:408 report_compare_coder_file.py:418
 msgid "Count of overlaps: "
-msgstr ""
+msgstr "重叠次数："
 
 #: report_compare_coder_file.py:409 report_compare_coder_file.py:419
 #: report_compare_coder_file.py:557 report_compare_coder_file.py:567
 msgid "Total: "
-msgstr ""
+msgstr "共计:"
 
 #: report_compare_coder_file.py:409 report_compare_coder_file.py:419
 #: view_graph.py:512 view_graph.py:697 view_graph.py:1364
 msgid "msecs"
-msgstr ""
+msgstr "毫秒"
 
 #: report_compare_coder_file.py:450 view_image.py:656
 msgid "Image Error"
-msgstr ""
+msgstr "图像错误"
 
 #: report_compare_coder_file.py:538
 msgid "Total pixels: "
-msgstr ""
+msgstr "总像素:"
 
 #: report_compare_coder_file.py:545
 msgid "Total pixels dual coded: "
-msgstr ""
+msgstr "双编码总像素："
 
 #: report_compare_coder_file.py:546
 msgid "Total pixels uncoded: "
-msgstr ""
+msgstr "未编码像素总数："
 
 #: report_compare_coder_file.py:547
 msgid "Total pixels disagreement (single coded): "
-msgstr ""
+msgstr "不同意的像素总数（单一编码）："
 
 #: report_compare_coder_file.py:550 report_compare_coder_file.py:560
 msgid "Intersections Coder: "
-msgstr ""
+msgstr "交叉点编码器："
 
 #: report_compare_coder_file.py:554 report_compare_coder_file.py:564
 msgid "No intersections"
-msgstr ""
+msgstr "无交叉路口"
 
 #: report_compare_coder_file.py:556 report_compare_coder_file.py:566
 msgid "Count of intersections: "
-msgstr ""
+msgstr "交叉路口计数："
 
 #: report_compare_coder_file.py:557 report_compare_coder_file.py:567
 msgid "pixels"
-msgstr ""
+msgstr "像素"
 
 #: report_compare_coder_file.py:673
 msgid "Total text dual coded: "
-msgstr ""
+msgstr "全文采用双编码："
 
 #: report_compare_coder_file.py:674
 msgid "Total text uncoded: "
-msgstr ""
+msgstr "未编码文本总数："
 
 #: report_compare_coder_file.py:675
 msgid "Total text disagreement (single coded): "
-msgstr ""
+msgstr "文本分歧总数（单一编码）："
 
 #: report_compare_coder_file.py:723 report_exact_matches.py:501
 #: report_relations.py:1012 reports.py:276 reports.py:330 reports.py:746
 msgid "Code Tree"
-msgstr ""
+msgstr "代码树"
 
 #: report_compare_coder_file.py:880 report_file_summary.py:364
 msgid "Area: "
@@ -4547,7 +4557,7 @@ msgstr ""
 
 #: report_compare_coder_file.py:882
 msgid "Intersections: "
-msgstr ""
+msgstr "交叉路口："
 
 #: report_compare_coder_file.py:883
 msgid "Intersecting: "
@@ -4555,49 +4565,49 @@ msgstr ""
 
 #: report_compare_coder_file.py:884
 msgid "Proportion: "
-msgstr ""
+msgstr "比例："
 
 #: report_compare_coder_file.py:910 view_image.py:724
 msgid "Scale: "
-msgstr ""
+msgstr "规模："
 
 #: report_cooccurrence.py:96 report_relations.py:125 view_graph.py:641
 #: view_graph.py:893
 msgid "Select files"
-msgstr ""
+msgstr "选择文件"
 
 #: report_cooccurrence.py:103 report_cooccurrence.py:109
 msgid "Files selected"
-msgstr ""
+msgstr "所选文件"
 
 #: report_cooccurrence.py:103 report_relations.py:134
 msgid "All files selected"
-msgstr ""
+msgstr "选择所有文件"
 
 #: report_cooccurrence.py:125 report_cooccurrence.py:130
 msgid "Codes selected"
-msgstr ""
+msgstr "所选代码"
 
 #: report_cooccurrence.py:125
 msgid "All codes selected"
-msgstr ""
+msgstr "选择所有代码"
 
 #: report_cooccurrence.py:253
 msgid "Co-occurrence exported: "
-msgstr ""
+msgstr "已导出共现："
 
 #: report_cooccurrence.py:254
 msgid "Co-occurrence exported"
-msgstr ""
+msgstr "已导出共现"
 
 #: report_exact_matches.py:82
 msgid ""
 "Only matches where ALL codes are applied to the same text will be shown."
-msgstr ""
+msgstr "只显示所有代码都应用于同一文本的匹配结果。"
 
 #: report_exact_matches.py:172
 msgid "No file has been selected."
-msgstr ""
+msgstr "未选择任何文件。"
 
 #: report_exact_matches.py:173
 msgid "No file"
@@ -4605,7 +4615,7 @@ msgstr ""
 
 #: report_exact_matches.py:194
 msgid "Only one code has been selected."
-msgstr ""
+msgstr "只选择了一个代码。"
 
 #: report_exact_matches.py:195
 msgid "One code selected"
@@ -4613,11 +4623,11 @@ msgstr ""
 
 #: report_exact_matches.py:263 report_relations.py:753
 msgid "No exact matches found."
-msgstr ""
+msgstr "未找到精确匹配。"
 
 #: report_exact_matches.py:265
 msgid "ALL selected codes need to be exactly overlapping."
-msgstr ""
+msgstr "所有选定的代码必须完全重叠。"
 
 #: report_exact_matches.py:266 report_relations.py:754
 msgid "No results"
@@ -4626,24 +4636,24 @@ msgstr ""
 #: report_exact_matches.py:331 report_relations.py:518 report_relations.py:987
 #: report_sql.py:499 report_sql.py:596
 msgid "Filter equals: "
-msgstr ""
+msgstr "过滤器等效："
 
 #: report_exact_matches.py:332 report_relations.py:519
 msgid "Filter greater or equals: "
-msgstr ""
+msgstr "筛选大于或等于："
 
 #: report_exact_matches.py:333 report_relations.py:520
 msgid "Filter lower or equals: "
-msgstr ""
+msgstr "过滤精度较低或相等："
 
 #: report_exact_matches.py:334 report_relations.py:521 report_relations.py:988
 #: report_sql.py:497 report_sql.py:594
 msgid "Clear filter"
-msgstr ""
+msgstr "清除过滤器"
 
 #: report_exact_matches.py:407
 msgid "code name"
-msgstr ""
+msgstr "代号"
 
 #: report_exact_matches.py:407
 msgid "text"
@@ -4651,439 +4661,441 @@ msgstr ""
 
 #: report_exact_matches.py:407
 msgid "Coded memo"
-msgstr ""
+msgstr "编码备忘录"
 
 #: report_exact_matches.py:407
 msgid "File name"
-msgstr ""
+msgstr "文件名"
 
 #: report_exact_matches.py:487
 msgid "Report of exact matches for text codings for file"
-msgstr ""
+msgstr "文件文本编码完全匹配的报告"
 
 #: report_exact_matches.py:582 report_relations.py:453
 msgid "Clear all"
-msgstr ""
+msgstr "全部清除"
 
 #: report_exact_matches.py:586
 msgid "Exclude code"
-msgstr ""
+msgstr "排除代码"
 
 #: report_file_summary.py:158
 msgid "Owner: "
-msgstr ""
+msgstr "业主:"
 
 #: report_file_summary.py:162
 msgid "Internal text document"
-msgstr ""
+msgstr "内部文本文件"
 
 #: report_file_summary.py:165
 msgid "External text document: "
-msgstr ""
+msgstr "外部文本文件："
 
 #: report_file_summary.py:168
 msgid "External audio file: "
-msgstr ""
+msgstr "外部音频文件："
 
 #: report_file_summary.py:171
 msgid "Internal audio file"
-msgstr ""
+msgstr "内部音频文件"
 
 #: report_file_summary.py:174
 msgid "External video file: "
-msgstr ""
+msgstr "外部视频文件："
 
 #: report_file_summary.py:177
 msgid "Internal video file"
-msgstr ""
+msgstr "内部视频文件"
 
 #: report_file_summary.py:180
 msgid "External image file: "
-msgstr ""
+msgstr "外部图像文件："
 
 #: report_file_summary.py:183
 msgid "Internal image file"
-msgstr ""
+msgstr "内部图像文件"
 
 #: report_file_summary.py:185
 msgid "Media path: "
-msgstr ""
+msgstr "媒体路径："
 
 #: report_file_summary.py:201
 msgid "CASE:"
-msgstr ""
+msgstr "案例："
 
 #: report_file_summary.py:214
 msgid "No case assignment"
-msgstr ""
+msgstr "无案件分配"
 
 #: report_file_summary.py:222
 msgid "ATTRIBUTES:"
-msgstr ""
+msgstr "属性："
 
 #: report_file_summary.py:240 report_file_summary.py:301
 #: report_file_summary.py:352
 msgid "METADATA:"
-msgstr ""
+msgstr "元数据："
 
 #: report_file_summary.py:270 report_file_summary.py:323
 msgid "Duration: Cannot obtain. VLC not installed."
-msgstr ""
+msgstr "持续时间： 无法获取。未安装 VLC。"
 
 #: report_file_summary.py:279 report_file_summary.py:332
 #: report_file_summary.py:395 report_file_summary.py:452
 msgid "CODE COUNTS:"
-msgstr ""
+msgstr "代码数量："
 
 #: report_file_summary.py:283 report_file_summary.py:335
 #: report_file_summary.py:400 report_file_summary.py:456
 msgid "Percent: "
-msgstr ""
+msgstr "百分比："
 
 #: report_file_summary.py:284 report_file_summary.py:336
 msgid "Average segment: "
-msgstr ""
+msgstr "平均分段："
 
 #: report_file_summary.py:284 report_file_summary.py:336 view_graph.py:494
 msgid " msecs"
-msgstr ""
+msgstr " 毫秒"
 
 #: report_file_summary.py:292
 msgid "TRANSCRIPT:"
-msgstr ""
+msgstr "转录："
 
 #: report_file_summary.py:294 report_file_summary.py:345
 msgid "END OF TRANSCRIPT"
-msgstr ""
+msgstr "成绩单结束"
 
 #: report_file_summary.py:343
 msgid "TRANSCRIPT: "
-msgstr ""
+msgstr "转录："
 
 #: report_file_summary.py:364 view_image.py:2075
 msgid "Width: "
-msgstr ""
+msgstr "宽度："
 
 #: report_file_summary.py:364
 msgid "Height: "
-msgstr ""
+msgstr "高度:"
 
 #: report_file_summary.py:401
 msgid "Average area: "
-msgstr ""
+msgstr "平均面积："
 
 #: report_file_summary.py:409
 msgid "STATISTICS:"
-msgstr ""
+msgstr "统计："
 
 #: report_file_summary.py:425
 msgid ""
 "Word calculations: Words use alphabet characters and include the apostrophe. "
 "All other characters are word separators"
-msgstr ""
+msgstr "单词计算： 单词使用字母字符，包括撇号。所有其他字符均为单词分隔符"
 
 #: report_relations.py:136 reports.py:89
 msgid "Files selected: "
-msgstr ""
+msgstr "所选文件："
 
 #: report_relations.py:163
 msgid ""
 "Select 2 or more codes\n"
 "Use Ctrl or Shift and mouse click"
 msgstr ""
+"选择 2 个或更多代码\n"
+"使用 Ctrl 或 Shift 键并单击鼠标"
 
 #: report_relations.py:164
 msgid "Selection warning"
-msgstr ""
+msgstr "选择警告"
 
 #: report_relations.py:617 report_relations.py:618 report_relations.py:619
 #: report_relations.py:647 report_relations.py:803
 msgid "Overlap"
-msgstr ""
+msgstr "重叠"
 
 #: report_relations.py:618 report_relations.py:803 report_relations.py:804
 msgid "Union"
-msgstr ""
+msgstr "工会"
 
 #: report_relations.py:619 report_relations.py:804
 msgid "Distance"
-msgstr ""
+msgstr "距离"
 
 #: report_relations.py:619 report_relations.py:804
 msgid "Text before"
-msgstr ""
+msgstr "之前的文本"
 
 #: report_relations.py:619 report_relations.py:804
 msgid "Text after"
-msgstr ""
+msgstr "之后的文本"
 
 #: report_relations.py:619 report_relations.py:804
 msgid "Owner"
-msgstr ""
+msgstr "业主"
 
 #: report_relations.py:645
 msgid "Proximity"
-msgstr ""
+msgstr "邻近性"
 
 #: report_relations.py:649
 msgid "Exact"
-msgstr ""
+msgstr "精确"
 
 #: report_relations.py:651
 msgid "Inclusion"
-msgstr ""
+msgstr "包容"
 
 #: report_relations.py:779
 msgid "Report of exact matches for text codings by file and code"
-msgstr ""
+msgstr "按文件和代码报告完全匹配的文本编码"
 
 #: report_relations.py:780
 msgid "Each row contains filename, codename, pos0, pos1, text, owner."
-msgstr ""
+msgstr "每行包含文件名、代码名、pos0、pos1、文本、所有者。"
 
 #: report_relations.py:800 report_relations.py:801 report_relations.py:844
 msgid "name"
-msgstr ""
+msgstr "名字"
 
 #: report_relations.py:802
 msgid "Relation"
-msgstr ""
+msgstr "关系"
 
 #: report_relations.py:802 report_relations.py:844
 msgid "Minimum"
-msgstr ""
+msgstr "最低"
 
 #: report_relations.py:802 report_relations.py:845
 msgid "Maximum"
-msgstr ""
+msgstr "最大"
 
 #: report_relations.py:804
 msgid "Text overlap"
-msgstr ""
+msgstr "文本重叠"
 
 #: report_relations.py:837
 msgid "Code relations csv file exported to: "
-msgstr ""
+msgstr "导出为代码关系 csv 文件："
 
 #: report_relations.py:838
 msgid "Csv file Export"
-msgstr ""
+msgstr "Csv 文件导出"
 
 #: report_relations.py:854
 msgid "Code relations stats csv file exported to: "
-msgstr ""
+msgstr "代码关系统计 csv 文件已导出："
 
 #: report_relations.py:855
 msgid "Csv summary file Export"
-msgstr ""
+msgstr "导出 Csv 摘要文件"
 
 #: report_relations.py:905
 msgid "Code pair"
-msgstr ""
+msgstr "代码对"
 
 #: report_relations.py:905
 msgid "Distance (characters)"
-msgstr ""
+msgstr "距离（字符）"
 
 #: report_relations.py:914
 msgid "Code relations"
-msgstr ""
+msgstr "代码关系"
 
 #: reports.py:87
 msgid "Select files to view"
-msgstr ""
+msgstr "选择要查看的文件"
 
 #: reports.py:245
 msgid "Code frequencies"
-msgstr ""
+msgstr "代码频率"
 
 #: reports.py:264
 msgid ", Frequency: "
-msgstr ""
+msgstr "频率:"
 
 #: reports.py:269
 msgid "Coding frequencies text file exported to: "
-msgstr ""
+msgstr "编码频率文本文件导出为"
 
 #: reports.py:270
 msgid "Text file Export"
-msgstr ""
+msgstr "文本文件导出"
 
 #: reports.py:319
 msgid "Coding frequencies exported to: "
-msgstr ""
+msgstr "编码频率输出到"
 
 #: reports.py:452
 msgid "Export Excel"
-msgstr ""
+msgstr "导出 Excel"
 
 #: reports.py:551
 msgid "Coder comparisons report exported: "
-msgstr ""
+msgstr "导出编码器比较报告："
 
 #: reports.py:567
 msgid "Coder comparison text file exported to: "
-msgstr ""
+msgstr "编码器比较文本文件导出为:"
 
 #: reports.py:568
 msgid "Text file export"
-msgstr ""
+msgstr "导出文本文件"
 
 #: reports.py:575
 msgid "CODER COMPARISON"
-msgstr ""
+msgstr "编码器比较"
 
 #: reports.py:575
 msgid "Selected coders: "
-msgstr ""
+msgstr "选定的编码员："
 
 #: reports.py:593
 msgid "agreement: "
-msgstr ""
+msgstr "协议："
 
 #: reports.py:595
 msgid ", dual coded: "
-msgstr ""
+msgstr "双编码："
 
 #: reports.py:597
 msgid ", uncoded: "
-msgstr ""
+msgstr "无编码："
 
 #: reports.py:599
 msgid ", disagreement: "
-msgstr ""
+msgstr "不同意："
 
 #: reports.py:601
 msgid ", agree coded only: "
-msgstr ""
+msgstr "仅同意编码："
 
 #: report_sql.py:138 report_sql.py:190
 msgid "No select query"
-msgstr ""
+msgstr "无选择查询"
 
 #: report_sql.py:138 report_sql.py:190
 msgid "No data to export"
-msgstr ""
+msgstr "无数据可导出"
 
 #: report_sql.py:143 report_sql.py:195
 msgid "SQL error"
-msgstr ""
+msgstr "SQL 错误"
 
 #: report_sql.py:179
 msgid "Results exported: "
-msgstr ""
+msgstr "导出结果："
 
 #: report_sql.py:180
 msgid "Results exported"
-msgstr ""
+msgstr "导出结果"
 
 #: report_sql.py:217
 msgid "SQL Results exported to: "
-msgstr ""
+msgstr "SQL 输出结果："
 
 #: report_sql.py:219
 msgid "Query:"
-msgstr ""
+msgstr "查询："
 
 #: report_sql.py:220
 msgid "CSV file export"
-msgstr ""
+msgstr "CSV 文件导出"
 
 #: report_sql.py:257
 msgid "Running query. Please wait."
-msgstr ""
+msgstr "正在运行查询。请稍候。"
 
 #: report_sql.py:272 report_sql.py:568
 msgid " rows"
-msgstr ""
+msgstr " 行数"
 
 #: report_sql.py:275
 msgid "Table created"
-msgstr ""
+msgstr "创建的表格"
 
 #: report_sql.py:278
 msgid "Index created"
-msgstr ""
+msgstr "创建索引"
 
 #: report_sql.py:282
 msgid " rows deleted"
-msgstr ""
+msgstr " 删除的行"
 
 #: report_sql.py:286
 msgid " rows updated"
-msgstr ""
+msgstr " 更新行数"
 
 #: report_sql.py:314
 msgid "SQL Error"
-msgstr ""
+msgstr "SQL 错误"
 
 #: report_sql.py:361
 msgid "Default Queries"
-msgstr ""
+msgstr "默认查询"
 
 #: report_sql.py:377
 msgid "Saved Queries"
-msgstr ""
+msgstr "保存的查询"
 
 #: report_sql.py:395
 msgid "Delete stored sql"
-msgstr ""
+msgstr "删除存储的 sql"
 
 #: report_sql.py:416
 msgid "Paste"
-msgstr ""
+msgstr "粘贴"
 
 #: report_sql.py:421
 msgid "Save query"
-msgstr ""
+msgstr "保存查询"
 
 #: report_sql.py:469
 msgid "The query must have a name"
-msgstr ""
+msgstr "查询必须有一个名称"
 
 #: report_sql.py:470 report_sql.py:480 view_graph.py:990
 msgid "Cannot save"
-msgstr ""
+msgstr "无法保存"
 
 #: report_sql.py:501 report_sql.py:598
 msgid "Filter on text like"
-msgstr ""
+msgstr "筛选文本，如"
 
 #: report_sql.py:503 report_sql.py:600
 msgid "Filter on text starts with"
-msgstr ""
+msgstr "筛选以"
 
 #: report_sql.py:515 report_sql.py:521
 msgid " rows ["
-msgstr ""
+msgstr " 行 ["
 
 #: report_sql.py:515
 msgid " asc]"
-msgstr ""
+msgstr " 升序]"
 
 #: report_sql.py:521
 msgid " desc]"
-msgstr ""
+msgstr " 降序]"
 
 #: report_sql.py:526 report_sql.py:540 report_sql.py:621 report_sql.py:631
 msgid "Text contains:"
-msgstr ""
+msgstr "文本包含："
 
 #: report_sql.py:532 report_sql.py:546 report_sql.py:558
 msgid " rows [filtered]"
-msgstr ""
+msgstr " 行 [已筛选]"
 
 #: report_sql.py:549
 msgid " starts with: "
-msgstr ""
+msgstr " 以......开头:"
 
 #: rqda.py:48
 msgid "Select RQDA file"
-msgstr ""
+msgstr "选择 RQDA 文件"
 
 #: rqda.py:55
 msgid "Beginning import from RQDA"
-msgstr ""
+msgstr "开始从 RQDA 导入"
 
 #: rqda.py:58
 msgid "Data imported from "
@@ -5099,11 +5111,11 @@ msgstr ""
 
 #: rqda.py:117
 msgid "Project memo imported"
-msgstr ""
+msgstr "导入项目备忘录"
 
 #: rqda.py:132
 msgid "Duplicate filename: "
-msgstr ""
+msgstr "文件名重复："
 
 #: rqda.py:132
 msgid " --> Replaced with: "
@@ -5111,31 +5123,31 @@ msgstr ""
 
 #: rqda.py:135
 msgid " files imported"
-msgstr ""
+msgstr " 导入的文件"
 
 #: rqda.py:144
 msgid " annotations imported"
-msgstr ""
+msgstr " 导入的注释"
 
 #: rqda.py:153
 msgid " journals imported"
-msgstr ""
+msgstr " 引进的期刊"
 
 #: rqda.py:164
 msgid " cases imported"
-msgstr ""
+msgstr " 进口案件"
 
 #: rqda.py:176
 msgid " code categories imported"
-msgstr ""
+msgstr " 导入的代码类别"
 
 #: rqda.py:209
 msgid " codings imported"
-msgstr ""
+msgstr " 导入的编码"
 
 #: rqda.py:211
 msgid " duplicated codings found and ignored"
-msgstr ""
+msgstr " 发现并忽略重复编码"
 
 #: rqda.py:225
 msgid " codings imported from coding2 table"
@@ -5143,11 +5155,11 @@ msgstr ""
 
 #: rqda.py:227
 msgid " duplicated codings found and ignored from coding2 table"
-msgstr ""
+msgstr " 从编码 2 表中发现并忽略的重复编码"
 
 #: rqda.py:247
 msgid " attribute types imported"
-msgstr ""
+msgstr " 导入的属性类型"
 
 #: rqda.py:258
 msgid " case attribute values imported"
@@ -5155,23 +5167,23 @@ msgstr ""
 
 #: rqda.py:269
 msgid " file attribute values imported"
-msgstr ""
+msgstr " 导入的文件属性值"
 
 #: rqda.py:280
 msgid " case linked texts imported"
-msgstr ""
+msgstr " 输入的案件链接文本"
 
 #: select_items.py:78
 msgid "Dictionary is empty"
-msgstr ""
+msgstr "词典为空"
 
 #: select_items.py:78
 msgid "No data to select from"
-msgstr ""
+msgstr "无数据可选"
 
 #: select_items.py:92
 msgid "This data does not contain names to select from"
-msgstr ""
+msgstr "该数据不包含可供选择的名称"
 
 #: select_items.py:93
 msgid "Dictionary has no \"name\" key"
@@ -5179,71 +5191,71 @@ msgstr ""
 
 #: select_items.py:97
 msgid "All"
-msgstr ""
+msgstr "全部"
 
 #: settings.py:57 settings.py:269 settings.py:278
 msgid "Current coder: "
-msgstr ""
+msgstr "现任编码员："
 
 #: settings.py:123
 msgid "original"
-msgstr ""
+msgstr "原创"
 
 #: settings.py:123
 msgid "dark"
-msgstr ""
+msgstr "暗处"
 
 #: settings.py:123 view_graph.py:784 view_graph.py:786
 msgid "blue"
-msgstr ""
+msgstr "蓝"
 
 #: settings.py:123 view_graph.py:784 view_graph.py:786
 msgid "green"
-msgstr ""
+msgstr "绿化"
 
 #: settings.py:123 view_graph.py:784 view_graph.py:786
 msgid "orange"
-msgstr ""
+msgstr "橘色"
 
 #: settings.py:123
 msgid "purple"
-msgstr ""
+msgstr "紫色"
 
 #: settings.py:123 view_graph.py:784 view_graph.py:786
 msgid "yellow"
-msgstr ""
+msgstr "黄的"
 
 #: settings.py:123
 msgid "rainbow"
-msgstr ""
+msgstr "彩虹"
 
 #: settings.py:123
 msgid "native"
-msgstr ""
+msgstr "本地人"
 
 #: settings.py:146
 msgid "Bold"
-msgstr ""
+msgstr "粗体"
 
 #: settings.py:146
 msgid "Italic"
-msgstr ""
+msgstr "斜体"
 
 #: settings.py:146
 msgid "Bigger"
-msgstr ""
+msgstr "更大"
 
 #: settings.py:284
 msgid "Choose project directory"
-msgstr ""
+msgstr "选择项目目录"
 
 #: settings.py:340
 msgid "Please select an AI model or disable the AI altogether."
-msgstr ""
+msgstr "请选择人工智能模式或完全禁用人工智能。"
 
 #: settings.py:341 settings.py:345
 msgid "AI model"
-msgstr ""
+msgstr "人工智能模型"
 
 #: settings.py:344
 msgid ""
@@ -5251,66 +5263,68 @@ msgid ""
 "(If you are sure that your particular model does not need an API-key, enter "
 "\"None\" instead.)"
 msgstr ""
+"请输入人工智能模型的有效 API 密钥。\n"
+"(如果您确定您的特定模型不需要 API 密钥，请输入 “无”）。"
 
 #: settings.py:357
 msgid "Restart QualCoder"
-msgstr ""
+msgstr "重新启动 QualCoder"
 
 #: settings.py:357
 msgid "Restart QualCoder to enact some changes"
-msgstr ""
+msgstr "重启 QualCoder 以进行一些更改"
 
 #: special_functions.py:99
 msgid "No project selected"
-msgstr ""
+msgstr "未选定项目"
 
 #: special_functions.py:102
 msgid "Not a QualCoder project"
-msgstr ""
+msgstr "不是 QualCoder 项目"
 
 #: special_functions.py:105
 msgid "The same project"
-msgstr ""
+msgstr "同一项目"
 
 #: special_functions.py:107
 msgid "Merge"
-msgstr ""
+msgstr "合并"
 
 #: special_functions.py:107
 msgid "into"
-msgstr ""
+msgstr "成"
 
 #: special_functions.py:108
 msgid "Press Run Button to merge projects"
-msgstr ""
+msgstr "按运行按钮合并项目"
 
 #: special_functions.py:109
 msgid "Merge projects"
-msgstr ""
+msgstr "合并项目"
 
 #: special_functions.py:132 special_functions.py:164
 msgid "Select text file to replace"
-msgstr ""
+msgstr "选择要替换的文本文件"
 
 #: special_functions.py:134
 msgid "Replacing: "
-msgstr ""
+msgstr "更换:"
 
 #: special_functions.py:142
 msgid "Replacement file"
-msgstr ""
+msgstr "替换文件"
 
 #: special_functions.py:146 special_functions.py:166
 msgid "Select replacement text file"
-msgstr ""
+msgstr "选择替换文本文件"
 
 #: special_functions.py:149
 msgid "Replacement file: "
-msgstr ""
+msgstr "替换文件:"
 
 #: special_functions.py:152
 msgid "Press to replace the text file"
-msgstr ""
+msgstr "按下 以替换文本文件"
 
 #: special_functions.py:160
 msgid "No files selected"
@@ -5318,35 +5332,35 @@ msgstr ""
 
 #: special_functions.py:160
 msgid "No existing or replacement file selected"
-msgstr ""
+msgstr "未选择现有文件或替换文件"
 
 #: special_functions.py:182
 msgid "Change ALL text code start positions in ALL text files by "
-msgstr ""
+msgstr "通过以下方式更改所有文本文件中所有文本代码的起始位置"
 
 #: special_functions.py:183 special_functions.py:228
 msgid " characters.\n"
-msgstr ""
+msgstr " 人物\n"
 
 #: special_functions.py:184 special_functions.py:229
 msgid "Made by coder: "
-msgstr ""
+msgstr "由编码员制作："
 
 #: special_functions.py:185 special_functions.py:230
 msgid " to change."
-msgstr ""
+msgstr " 要改变。"
 
 #: special_functions.py:186 special_functions.py:231
 msgid "Backup project before performing this function.\n"
-msgstr ""
+msgstr "执行此功能前备份项目。\n"
 
 #: special_functions.py:187 special_functions.py:232
 msgid "Press OK to continue."
-msgstr ""
+msgstr "按 “确定 ”继续。"
 
 #: special_functions.py:188
 msgid "Change code start positions"
-msgstr ""
+msgstr "更改代码起始位置"
 
 #: special_functions.py:209 special_functions.py:254
 msgid "All text codings by "
@@ -5354,11 +5368,11 @@ msgstr ""
 
 #: special_functions.py:209 special_functions.py:254
 msgid " resized by "
-msgstr ""
+msgstr "按"
 
 #: special_functions.py:210 special_functions.py:255
 msgid " characters."
-msgstr ""
+msgstr " 人物."
 
 #: special_functions.py:227
 msgid "Change ALL text code end positions in ALL text files by "
@@ -5370,7 +5384,7 @@ msgstr ""
 
 #: view_av.py:208 view_av.py:846
 msgid "Media coding"
-msgstr ""
+msgstr "媒体编码"
 
 #: view_av.py:259 view_av.py:3959
 msgid "QualCoder will crash"
@@ -5378,27 +5392,27 @@ msgstr ""
 
 #: view_av.py:294 view_av.py:4137
 msgid "Screenshot"
-msgstr ""
+msgstr "截图"
 
 #: view_av.py:295 view_av.py:4138
 msgid "Resize"
-msgstr ""
+msgstr "调整大小"
 
 #: view_av.py:307 view_av.py:4150 view_image.py:726
 msgid "Width"
-msgstr ""
+msgstr "宽度"
 
 #: view_av.py:307 view_av.py:4150
 msgid "Width:"
-msgstr ""
+msgstr "宽度:"
 
 #: view_av.py:310 view_av.py:4153 view_image.py:726
 msgid "Height"
-msgstr ""
+msgstr "高度"
 
 #: view_av.py:310 view_av.py:4153
 msgid "Height:"
-msgstr ""
+msgstr "高度:"
 
 #: view_av.py:872
 msgid "Media coding: "
@@ -5406,41 +5420,43 @@ msgstr ""
 
 #: view_av.py:1285 view_av.py:1304
 msgid "Clear segment"
-msgstr ""
+msgstr "清除分段"
 
 #: view_av.py:1298
 msgid "End segment"
-msgstr ""
+msgstr "结束部分"
 
 #: view_av.py:1299 view_av.py:1313 view_av.py:3177 view_av.py:3683
 msgid "Segment: "
-msgstr ""
+msgstr "分段："
 
 #: view_av.py:1345 view_image.py:897
 msgid "Show coded text and media"
-msgstr ""
+msgstr "显示编码文本和媒体"
 
 #: view_av.py:1449 view_image.py:1000
 msgid "Show codes containing"
-msgstr ""
+msgstr "显示包含以下内容的代码"
 
 #: view_av.py:1452 view_image.py:1003
 msgid ""
 "Show codes containing text.\n"
 "(Blank for all)"
 msgstr ""
+"显示包含文本的代码。\n"
+"(全部为空）"
 
 #: view_av.py:1955
 msgid "Segment:"
-msgstr ""
+msgstr "分段："
 
 #: view_av.py:1956
 msgid "Start segment"
-msgstr ""
+msgstr "起始分段"
 
 #: view_av.py:2145
 msgid "New code name"
-msgstr ""
+msgstr "新代号"
 
 #: view_av.py:2158
 msgid "Code added: "
@@ -5448,15 +5464,15 @@ msgstr ""
 
 #: view_av.py:2261 view_image.py:1856
 msgid "Memo for Code "
-msgstr ""
+msgstr "代码备忘录"
 
 #: view_av.py:2285
 msgid "Memo for Category "
-msgstr ""
+msgstr "类别备忘录"
 
 #: view_av.py:2316
 msgid " Name already in use, choose another."
-msgstr ""
+msgstr " 名称已被使用，请另选。"
 
 #: view_av.py:2330 view_image.py:1926
 msgid "Code renamed: "
@@ -5468,11 +5484,11 @@ msgstr ""
 
 #: view_av.py:2344 view_image.py:1940
 msgid "Duplicate category name"
-msgstr ""
+msgstr "类别名称重复"
 
 #: view_av.py:2358
 msgid "Category renamed: "
-msgstr ""
+msgstr "类别更名："
 
 #: view_av.py:2501
 msgid "Play text"
@@ -5508,7 +5524,7 @@ msgstr ""
 
 #: view_av.py:2855
 msgid "No transcription"
-msgstr ""
+msgstr "无转录"
 
 #: view_av.py:2880 view_av.py:3608
 msgid "Already Coded"
@@ -5516,27 +5532,27 @@ msgstr ""
 
 #: view_av.py:2881
 msgid "This segment has already been coded with this code by "
-msgstr ""
+msgstr "该分段的编码已由"
 
 #: view_av.py:3005
 msgid "No media transcription selected"
-msgstr ""
+msgstr "未选择媒体转录"
 
 #: view_av.py:3093 view_av.py:3145 view_av.py:3467 view_av.py:3713
 msgid "Memo for segment"
-msgstr ""
+msgstr "会议段备忘录"
 
 #: view_av.py:3094 view_av.py:3468
 msgid "Delete segment"
-msgstr ""
+msgstr "删除分段"
 
 #: view_av.py:3095 view_av.py:3469
 msgid "Play segment"
-msgstr ""
+msgstr "播放片段"
 
 #: view_av.py:3096
 msgid "Important mark"
-msgstr ""
+msgstr "重要标记"
 
 #: view_av.py:3097
 msgid "Edit start position"
@@ -5606,43 +5622,43 @@ msgstr ""
 
 #: view_charts.py:115 view_charts.py:133
 msgid "Code frequency"
-msgstr ""
+msgstr "代码频率"
 
 #: view_charts.py:116 view_charts.py:134
 msgid "Code by characters"
-msgstr ""
+msgstr "按字符编码"
 
 #: view_charts.py:117 view_charts.py:135
 msgid "Code by image area"
-msgstr ""
+msgstr "按图像区域编码"
 
 #: view_charts.py:118 view_charts.py:136
 msgid "Code by audio/video segments"
-msgstr ""
+msgstr "按音频/视频片段编码"
 
 #: view_charts.py:122
 msgid "Code frequency sunburst"
-msgstr ""
+msgstr "代码频率太阳纹"
 
 #: view_charts.py:123
 msgid "Code frequency treemap"
-msgstr ""
+msgstr "代码频率树状图"
 
 #: view_charts.py:124
 msgid "Code by characters sunburst"
-msgstr ""
+msgstr "按字符编码 旭日"
 
 #: view_charts.py:125
 msgid "Code by characters treemap"
-msgstr ""
+msgstr "字符代码树状图"
 
 #: view_charts.py:126
 msgid "Code by image area sunburst"
-msgstr ""
+msgstr "按图像区域旭日代码"
 
 #: view_charts.py:127
 msgid "Code by image area treemap"
-msgstr ""
+msgstr "按图像区域树形图编码"
 
 #: view_charts.py:128
 msgid "Code by A/V sunburst"
@@ -5654,11 +5670,11 @@ msgstr ""
 
 #: view_charts.py:147
 msgid "Word cloud made from coded text segments"
-msgstr ""
+msgstr "根据编码文本片段制作的词云"
 
 #: view_charts.py:365
 msgid "Word cloud"
-msgstr ""
+msgstr "词汇云"
 
 #: view_charts.py:479 view_charts.py:634
 msgid "Code count - text, images and Audio/Video"
@@ -5669,7 +5685,7 @@ msgstr ""
 #: view_charts.py:890 view_charts.py:972 view_charts.py:1054
 #: view_charts.py:1136
 msgid "Values"
-msgstr ""
+msgstr "价值观"
 
 #: view_charts.py:521 view_charts.py:675
 msgid "Code text by character count"
@@ -5701,7 +5717,7 @@ msgstr ""
 
 #: view_charts.py:1184
 msgid "Attribute bar chart"
-msgstr ""
+msgstr "属性条形图"
 
 #: view_charts.py:1185 view_charts.py:1215
 msgid " attribute: "
@@ -5721,7 +5737,7 @@ msgstr ""
 
 #: view_charts.py:1280
 msgid "Heatmap"
-msgstr ""
+msgstr "热图"
 
 #: view_charts.py:1308
 msgid "Too many files"
@@ -5753,15 +5769,15 @@ msgstr ""
 
 #: view_graph.py:431
 msgid "Insert Text"
-msgstr ""
+msgstr "插入文本"
 
 #: view_graph.py:432
 msgid "Insert Line"
-msgstr ""
+msgstr "插入线"
 
 #: view_graph.py:433
 msgid "Insert coded text items"
-msgstr ""
+msgstr "插入编码文本项目"
 
 #: view_graph.py:434
 msgid "Insert coded image items"
@@ -5773,7 +5789,7 @@ msgstr ""
 
 #: view_graph.py:436
 msgid "Show files"
-msgstr ""
+msgstr "显示文件"
 
 #: view_graph.py:437
 msgid "Show cases"
@@ -5781,7 +5797,7 @@ msgstr ""
 
 #: view_graph.py:438
 msgid "Show memos of coded segments"
-msgstr ""
+msgstr "显示编码段的备忘录"
 
 #: view_graph.py:462
 msgid "Select audio/video files"
@@ -5789,11 +5805,11 @@ msgstr ""
 
 #: view_graph.py:500 view_graph.py:562 view_graph.py:613
 msgid "No coded segments for selection"
-msgstr ""
+msgstr "没有供选择的编码段"
 
 #: view_graph.py:502
 msgid "Select coded segment"
-msgstr ""
+msgstr "选择编码段"
 
 #: view_graph.py:523
 msgid "Select image files"
