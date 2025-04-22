@@ -21,6 +21,7 @@ https://qualcoder.wordpress.com/
 import sqlite3
 from copy import deepcopy
 import csv
+import fitz
 import logging
 import openpyxl
 from openpyxl.styles import Font, Alignment
@@ -1409,7 +1410,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         parameters = []
         sql = "select code_name.name, color, source.name, x1, y1, width, height,"
         sql += "code_image.owner, source.mediapath, source.id, ifnull(code_image.memo,''), "
-        sql += "code_name.memo, ifnull(source.memo,''), imid, code_name.cid "
+        sql += "code_name.memo, ifnull(source.memo,''), imid, code_name.cid, pdf_page "
         sql += " from code_image join code_name "
         sql += "on code_name.cid = code_image.cid join source on code_image.id = source.id "
         sql += f"where code_name.cid in ({code_ids}) "
@@ -1429,7 +1430,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             cur.execute(sql, parameters)
         result = cur.fetchall()
         keys = 'codename', 'color', 'file_or_casename', 'x1', 'y1', 'width', 'height', 'coder', 'mediapath', \
-            'fid', 'coded_memo', 'codename_memo', 'source_memo', 'imid', 'cid'
+            'fid', 'coded_memo', 'codename_memo', 'source_memo', 'imid', 'cid', 'pdf_page'
         for row in result:
             tmp = dict(zip(keys, row))
             tmp['result_type'] = 'image'
@@ -1539,7 +1540,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         sql = "select code_name.name, color, cases.name, cases.caseid, "
         sql += "x1, y1, width, height, code_image.owner,source.mediapath, source.id, "
         sql += "ifnull(code_image.memo,''), ifnull(cases.memo,''), ifnull(code_name.memo,''), "
-        sql += "ifnull(source.memo,''), imid, code_name.cid, source.name "
+        sql += "ifnull(source.memo,''), imid, code_name.cid, source.name, pdf_page "
         sql += "from code_image join code_name on code_name.cid = code_image.cid "
         sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
         sql += "code_image.id = case_text.fid "
@@ -1564,7 +1565,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         image_results = cur.fetchall()
         keys = ('codename', 'color', 'file_or_casename', 'caseid', 'x1', 'y1', 'width', 'height', 'coder',
                 'mediapath', 'fid', 'coded_memo', 'case_memo', 'codename_memo', 'source_memo', 'imid', 'cid',
-                'filename')
+                'filename', 'pdf_page')
         for row in image_results:
             tmp = dict(zip(keys, row))
             tmp['result_type'] = 'image'
@@ -2094,12 +2095,26 @@ class DialogReportCodes(QtWidgets.QDialog):
 
     def put_image_into_textedit(self, img, counter, text_edit):
         """ Scale image, add resource to document, insert image.
+        Extra work for pdf images.
         """
 
         text_edit.append("\n")
         path_ = self.app.project_path + img['mediapath']
         if img['mediapath'][0:7] == "images:":
             path_ = img['mediapath'][7:]
+        if img['pdf_page'] is not None:
+            if img['mediapath'][:6] == "/docs/":
+                pdf_path = f"{self.app.project_path}/documents/{img['mediapath'][6:]}"
+            if img['mediapath'][:5] == "docs:":
+                pdf_path = img['mediapath'][5:]
+            fitz_pdf = fitz.open(pdf_path)  # Use pymupdf to get page images
+            for page in fitz_pdf:
+                if page.number == img['pdf_page']:
+                    # Only need the current page image of interest
+                    path_ = os.path.join(self.app.confighome, f"tmp_pdf_page.png")
+                    pixmap = page.get_pixmap()
+                    pixmap.save(path_)
+        print("image path:", path_)
         document = text_edit.document()
         image = QtGui.QImageReader(path_).read()
         image = image.copy(int(img['x1']), int(img['y1']), int(img['width']), int(img['height']))
