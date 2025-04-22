@@ -201,8 +201,7 @@ Kodningar från hela textfilen används för beräkningarna.</translation>
     <message>
         <location filename="ui_dialog_charts.py" line="318"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This is to allow a wider spread of heatmap colours when there are extreme count differences.&lt;/p&gt;&lt;p&gt;0 represents no limit.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Om delar av en textfil är tilldelade ett fall kan kodfrekvensen och det totala antalet tecken bli fel.
-Kodningar från hela textfilen används för beräkningarna.</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Dett är för att möjliggöra en bredare palett av heatmap färger när det finns extrema skillnader i antal.&lt;/p&gt;&lt;p&gt;0 representerar obegränsat.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="319"/>
@@ -1047,7 +1046,7 @@ Kontrollerad - Alla valda koder måste matcha exakt.</translation>
     <message>
         <location filename="ui_case_file_manager.py" line="82"/>
         <source>Case file manager</source>
-        <translation>Fallfilchef</translation>
+        <translation>Case fil hanterare</translation>
     </message>
     <message>
         <location filename="ui_case_file_manager.py" line="83"/>
@@ -1789,8 +1788,8 @@ Avoid selecting text to delete or paste over if the selected text is underlined:
 As all assigned positions may be incorrect. </source>
         <translation>Redigera text
 Klicka på en position, utan att välja text, för att skriva, ta bort eller klistra in text.
-Välj text som inte är understruken och radera eller klistra in.
-Undvik att välja text för att ta bort eller klistra in om den valda texten är understruken:
+Välj text som inte är understrukna och radera eller klistra in.
+Undvik att välja text för att ta bort eller klistra in om den valda texten understryks:
 (kodad - röd, kommenterad - gul, fall -tilldelad - grön)
 Eftersom alla tilldelade positioner kan vara felaktiga. </translation>
     </message>
@@ -1872,7 +1871,7 @@ Eftersom alla tilldelade positioner kan vara felaktiga. </translation>
     <message>
         <location filename="ui_dialog_code_text.py" line="448"/>
         <source>Exit Edit text </source>
-        <translation>EXIT Redigera text </translation>
+        <translation>Lämna redigeringsläget </translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="449"/>
@@ -2615,7 +2614,7 @@ Det går inte att exportera texttranskriptionsfil associerad med ett ljud eller 
     <message>
         <location filename="ui_dialog_report_codings.py" line="198"/>
         <source>Z - a</source>
-        <translation>Ö - A</translation>
+        <translation>Z - A</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_codings.py" line="199"/>
@@ -3936,7 +3935,7 @@ Kod inte den här texten förrän du laddar om kodning - kodtext från menyfält
     <message>
         <location filename="ui_main.py" line="383"/>
         <source>AI Assisted Coding</source>
-        <translation>AI Assisterad Kodning</translation>
+        <translation>AI Assisterad kodning</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="385"/>
