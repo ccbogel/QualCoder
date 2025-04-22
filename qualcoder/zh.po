@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-27 07:53+1100\n"
-"PO-Revision-Date: 2025-04-19 09:05+1000\n"
+"PO-Revision-Date: 2025-04-22 11:09+1000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: zh\n"
@@ -4553,7 +4553,7 @@ msgstr "代码树"
 
 #: report_compare_coder_file.py:880 report_file_summary.py:364
 msgid "Area: "
-msgstr ""
+msgstr "区域："
 
 #: report_compare_coder_file.py:882
 msgid "Intersections: "
@@ -4561,7 +4561,7 @@ msgstr "交叉路口："
 
 #: report_compare_coder_file.py:883
 msgid "Intersecting: "
-msgstr ""
+msgstr "相交："
 
 #: report_compare_coder_file.py:884
 msgid "Proportion: "
@@ -4611,7 +4611,7 @@ msgstr "未选择任何文件。"
 
 #: report_exact_matches.py:173
 msgid "No file"
-msgstr ""
+msgstr "无文件"
 
 #: report_exact_matches.py:194
 msgid "Only one code has been selected."
@@ -4619,7 +4619,7 @@ msgstr "只选择了一个代码。"
 
 #: report_exact_matches.py:195
 msgid "One code selected"
-msgstr ""
+msgstr "选择一个代码"
 
 #: report_exact_matches.py:263 report_relations.py:753
 msgid "No exact matches found."
@@ -4631,7 +4631,7 @@ msgstr "所有选定的代码必须完全重叠。"
 
 #: report_exact_matches.py:266 report_relations.py:754
 msgid "No results"
-msgstr ""
+msgstr "无结果"
 
 #: report_exact_matches.py:331 report_relations.py:518 report_relations.py:987
 #: report_sql.py:499 report_sql.py:596
@@ -4657,7 +4657,7 @@ msgstr "代号"
 
 #: report_exact_matches.py:407
 msgid "text"
-msgstr ""
+msgstr "文本"
 
 #: report_exact_matches.py:407
 msgid "Coded memo"
@@ -5099,15 +5099,15 @@ msgstr "开始从 RQDA 导入"
 
 #: rqda.py:58
 msgid "Data imported from "
-msgstr ""
+msgstr "数据已从"
 
 #: rqda.py:59
 msgid "File categories are not imported from RQDA"
-msgstr ""
+msgstr "未从 RQDA 导入文件类别"
 
 #: rqda.py:64
 msgid "Data import unsuccessful from "
-msgstr ""
+msgstr "数据导入不成功"
 
 #: rqda.py:117
 msgid "Project memo imported"
@@ -5119,7 +5119,7 @@ msgstr "文件名重复："
 
 #: rqda.py:132
 msgid " --> Replaced with: "
-msgstr ""
+msgstr " --> 替换为："
 
 #: rqda.py:135
 msgid " files imported"
@@ -5151,7 +5151,7 @@ msgstr " 发现并忽略重复编码"
 
 #: rqda.py:225
 msgid " codings imported from coding2 table"
-msgstr ""
+msgstr " 从编码 2 表中导入的编码"
 
 #: rqda.py:227
 msgid " duplicated codings found and ignored from coding2 table"
@@ -5163,7 +5163,7 @@ msgstr " 导入的属性类型"
 
 #: rqda.py:258
 msgid " case attribute values imported"
-msgstr ""
+msgstr " 导入的案例属性值"
 
 #: rqda.py:269
 msgid " file attribute values imported"
@@ -5187,7 +5187,7 @@ msgstr "该数据不包含可供选择的名称"
 
 #: select_items.py:93
 msgid "Dictionary has no \"name\" key"
-msgstr ""
+msgstr "字典没有 “名称 ”键"
 
 #: select_items.py:97
 msgid "All"
@@ -5328,7 +5328,7 @@ msgstr "按下 以替换文本文件"
 
 #: special_functions.py:160
 msgid "No files selected"
-msgstr ""
+msgstr "未选择文件"
 
 #: special_functions.py:160
 msgid "No existing or replacement file selected"
@@ -5364,7 +5364,7 @@ msgstr "更改代码起始位置"
 
 #: special_functions.py:209 special_functions.py:254
 msgid "All text codings by "
-msgstr ""
+msgstr "所有文本编码由"
 
 #: special_functions.py:209 special_functions.py:254
 msgid " resized by "
@@ -5376,11 +5376,11 @@ msgstr " 人物."
 
 #: special_functions.py:227
 msgid "Change ALL text code end positions in ALL text files by "
-msgstr ""
+msgstr "通过以下方式更改所有文本文件中所有文本代码的结束位置"
 
 #: special_functions.py:233
 msgid "Change code end positions"
-msgstr ""
+msgstr "更改代码结束位置"
 
 #: view_av.py:208 view_av.py:846
 msgid "Media coding"
@@ -5388,7 +5388,7 @@ msgstr "媒体编码"
 
 #: view_av.py:259 view_av.py:3959
 msgid "QualCoder will crash"
-msgstr ""
+msgstr "QualCoder 将崩溃"
 
 #: view_av.py:294 view_av.py:4137
 msgid "Screenshot"
@@ -5416,7 +5416,7 @@ msgstr "高度:"
 
 #: view_av.py:872
 msgid "Media coding: "
-msgstr ""
+msgstr "媒体编码："
 
 #: view_av.py:1285 view_av.py:1304
 msgid "Clear segment"
@@ -5460,7 +5460,7 @@ msgstr "新代号"
 
 #: view_av.py:2158
 msgid "Code added: "
-msgstr ""
+msgstr "代码已添加："
 
 #: view_av.py:2261 view_image.py:1856
 msgid "Memo for Code "
@@ -5476,11 +5476,11 @@ msgstr " 名称已被使用，请另选。"
 
 #: view_av.py:2330 view_image.py:1926
 msgid "Code renamed: "
-msgstr ""
+msgstr "代码重命名："
 
 #: view_av.py:2343 view_image.py:1939
 msgid "This category name is already in use"
-msgstr ""
+msgstr "该类别名称已被使用"
 
 #: view_av.py:2344 view_image.py:1940
 msgid "Duplicate category name"
@@ -5492,35 +5492,39 @@ msgstr "类别更名："
 
 #: view_av.py:2501
 msgid "Play text"
-msgstr ""
+msgstr "播放文本"
 
 #: view_av.py:2505
 msgid "Memo coded text M"
-msgstr ""
+msgstr "备忘编码文本 M"
 
 #: view_av.py:2545
 msgid "Video position to timestamp"
-msgstr ""
+msgstr "视频位置到时间戳"
 
 #: view_av.py:2783
 msgid "Change start position"
-msgstr ""
+msgstr "更改启动位置"
 
 #: view_av.py:2784
 msgid ""
 "Change start character position.\n"
 "Positive or negative number:"
 msgstr ""
+"更改起始字符位置。\n"
+"正数或负数："
 
 #: view_av.py:2790
 msgid "Change end position"
-msgstr ""
+msgstr "更改末端位置"
 
 #: view_av.py:2791
 msgid ""
 "Change end character position.\n"
 "Positive or negative number:"
 msgstr ""
+"更改结束符位置。\n"
+"正数或负数："
 
 #: view_av.py:2855
 msgid "No transcription"
@@ -5528,7 +5532,7 @@ msgstr "无转录"
 
 #: view_av.py:2880 view_av.py:3608
 msgid "Already Coded"
-msgstr ""
+msgstr "已编码"
 
 #: view_av.py:2881
 msgid "This segment has already been coded with this code by "
@@ -5556,69 +5560,70 @@ msgstr "重要标记"
 
 #: view_av.py:3097
 msgid "Edit start position"
-msgstr ""
+msgstr "编辑起始位置"
 
 #: view_av.py:3098
 msgid "Edit end position"
-msgstr ""
+msgstr "编辑结束位置"
 
 #: view_av.py:3422
 msgid "Segment menu"
-msgstr ""
+msgstr "分段菜单"
 
 #: view_av.py:3470
 msgid "Edit segment start position"
-msgstr ""
+msgstr "编辑片段起始位置"
 
 #: view_av.py:3471
 msgid "Edit segment end position"
-msgstr ""
+msgstr "编辑区段终点位置"
 
 #: view_av.py:3476
 msgid "Export segment to file"
-msgstr ""
+msgstr "将片段导出到文件"
 
 #: view_av.py:3483
 msgid "Link segment to selected text"
-msgstr ""
+msgstr "将段落链接到所选文本"
 
 #: view_av.py:3561
 msgid "A/V segment exported: "
-msgstr ""
+msgstr "导出音频/视频段："
 
 #: view_av.py:3562
 msgid "Segment exported"
-msgstr ""
+msgstr "导出的分段"
 
 #: view_av.py:3608
 msgid "This segment has already been coded with this code."
-msgstr ""
+msgstr "本段已用此代码编码。"
 
 #: view_av.py:3740
 msgid "LINKED TEXT: "
-msgstr ""
+msgstr "链接文本："
 
 #: view_av.py:3742 view_image.py:751
 msgid "IMPORTANT"
-msgstr ""
+msgstr "重要"
 
 #: view_av.py:3838
 msgid ""
 "Transcription area: Ctrl+R Alt+Minus Alt+Plus Ctrl+P/S Ctrl+T Ctrl+N "
 "Ctrl+1-8 Ctrl+D"
 msgstr ""
+"转录区 Ctrl+R Alt+Minus Alt+Plus Ctrl+P/S Ctrl+T Ctrl+N Ctrl+1-8 Ctrl+D"
 
 #: view_av.py:4305
 msgid "Select name to delete"
-msgstr ""
+msgstr "选择要删除的名称"
 
 #: view_av.py:4324
 msgid "Speaker name"
-msgstr ""
+msgstr "发言人姓名"
 
 #: view_av.py:4325
 msgid "Name:"
-msgstr ""
+msgstr "名称："
 
 #: view_charts.py:115 view_charts.py:133
 msgid "Code frequency"
@@ -5662,11 +5667,11 @@ msgstr "按图像区域树形图编码"
 
 #: view_charts.py:128
 msgid "Code by A/V sunburst"
-msgstr ""
+msgstr "音频/视频旭日代码"
 
 #: view_charts.py:129
 msgid "Code by A/V treemap"
-msgstr ""
+msgstr "按音频/视频树形图编码"
 
 #: view_charts.py:147
 msgid "Word cloud made from coded text segments"
@@ -5678,7 +5683,7 @@ msgstr "词汇云"
 
 #: view_charts.py:479 view_charts.py:634
 msgid "Code count - text, images and Audio/Video"
-msgstr ""
+msgstr "代码计数 - 文本、图像和音频/视频"
 
 #: view_charts.py:513 view_charts.py:544 view_charts.py:575 view_charts.py:606
 #: view_charts.py:667 view_charts.py:698 view_charts.py:729 view_charts.py:760
@@ -5689,31 +5694,31 @@ msgstr "价值观"
 
 #: view_charts.py:521 view_charts.py:675
 msgid "Code text by character count"
-msgstr ""
+msgstr "按字符数编码文本"
 
 #: view_charts.py:552 view_charts.py:706
 msgid "Code volume by image area (pixels)"
-msgstr ""
+msgstr "按图像面积（像素）计算的代码量"
 
 #: view_charts.py:583 view_charts.py:737
 msgid "Code volume by audio/video segments (milliseconds)"
-msgstr ""
+msgstr "按音频/视频段划分的代码量（毫秒）"
 
 #: view_charts.py:811
 msgid " chart of counts of codes and categories"
-msgstr ""
+msgstr " 代码和类别计数表"
 
 #: view_charts.py:907
 msgid " chart of counts of coded text - total characters"
-msgstr ""
+msgstr " 编码文本计数表 - 字符总数"
 
 #: view_charts.py:989
 msgid " chart of coded image areas - pixels"
-msgstr ""
+msgstr " 编码图像区域图 - 像素"
 
 #: view_charts.py:1071
 msgid " chart of coded audio/video segments - milliseconds"
-msgstr ""
+msgstr " 音频/视频编码段图表 - 毫秒"
 
 #: view_charts.py:1184
 msgid "Attribute bar chart"
@@ -5721,19 +5726,19 @@ msgstr "属性条形图"
 
 #: view_charts.py:1185 view_charts.py:1215
 msgid " attribute: "
-msgstr ""
+msgstr "属性："
 
 #: view_charts.py:1214
 msgid "Attribute histogram"
-msgstr ""
+msgstr "属性直方图"
 
 #: view_charts.py:1275
 msgid "Too many codes"
-msgstr ""
+msgstr "代码太多"
 
 #: view_charts.py:1275
 msgid "Too many codes for display. Restricted to 40"
-msgstr ""
+msgstr "显示代码过多。限制为 40"
 
 #: view_charts.py:1280
 msgid "Heatmap"
@@ -5741,31 +5746,31 @@ msgstr "热图"
 
 #: view_charts.py:1308
 msgid "Too many files"
-msgstr ""
+msgstr "文件过多"
 
 #: view_charts.py:1308
 msgid "Too many files for display. Restricted to 40"
-msgstr ""
+msgstr "文件太多，无法显示。限制为 40"
 
 #: view_charts.py:1325
 msgid "Too many cases"
-msgstr ""
+msgstr "太多案例"
 
 #: view_charts.py:1325
 msgid "Too many cases for display. Restricted to 40"
-msgstr ""
+msgstr "陈列柜太多。限制在 40 个"
 
 #: view_graph.py:134
 msgid "Are you sure you want to clear the graph?"
-msgstr ""
+msgstr "您确定要清除图表吗？"
 
 #: view_graph.py:375
 msgid "Link: "
-msgstr ""
+msgstr "链接："
 
 #: view_graph.py:378
 msgid "Reveal hidden items"
-msgstr ""
+msgstr "揭示隐藏物品"
 
 #: view_graph.py:431
 msgid "Insert Text"
@@ -5781,11 +5786,11 @@ msgstr "插入编码文本项目"
 
 #: view_graph.py:434
 msgid "Insert coded image items"
-msgstr ""
+msgstr "插入编码图像项目"
 
 #: view_graph.py:435
 msgid "Insert coded A/V items"
-msgstr ""
+msgstr "插入编码音频/视频项目"
 
 #: view_graph.py:436
 msgid "Show files"
@@ -5793,7 +5798,7 @@ msgstr "显示文件"
 
 #: view_graph.py:437
 msgid "Show cases"
-msgstr ""
+msgstr "展示案例"
 
 #: view_graph.py:438
 msgid "Show memos of coded segments"
@@ -5801,7 +5806,7 @@ msgstr "显示编码段的备忘录"
 
 #: view_graph.py:462
 msgid "Select audio/video files"
-msgstr ""
+msgstr "选择音频/视频文件"
 
 #: view_graph.py:500 view_graph.py:562 view_graph.py:613
 msgid "No coded segments for selection"
@@ -5813,389 +5818,389 @@ msgstr "选择编码段"
 
 #: view_graph.py:523
 msgid "Select image files"
-msgstr ""
+msgstr "选择图像文件"
 
 #: view_graph.py:556
 msgid " width"
-msgstr ""
+msgstr "宽度"
 
 #: view_graph.py:556
 msgid " height:"
-msgstr ""
+msgstr "高度:"
 
 #: view_graph.py:564
 msgid "Select coded area"
-msgstr ""
+msgstr "选择编码区域"
 
 #: view_graph.py:583
 msgid "Select text files"
-msgstr ""
+msgstr "选择文本文件"
 
 #: view_graph.py:615
 msgid "Select coded text"
-msgstr ""
+msgstr "选择编码文本"
 
 #: view_graph.py:680 view_graph.py:1343
 msgid "Memo for area: "
-msgstr ""
+msgstr "地区备忘录："
 
 #: view_graph.py:680 view_graph.py:1343
 msgid "width:"
-msgstr ""
+msgstr "宽度:"
 
 #: view_graph.py:681 view_graph.py:1344
 msgid "height:"
-msgstr ""
+msgstr "高度:"
 
 #: view_graph.py:697 view_graph.py:1364
 msgid "Memo for duration: "
-msgstr ""
+msgstr "期限备忘录："
 
 #: view_graph.py:702
 msgid "No memos"
-msgstr ""
+msgstr "无备忘录"
 
 #: view_graph.py:702
 msgid "No memos for selection"
-msgstr ""
+msgstr "没有供遴选的备忘录"
 
 #: view_graph.py:704
 msgid "Select coding memo"
-msgstr ""
+msgstr "选择编码备忘录"
 
 #: view_graph.py:722 view_graph.py:1324
 msgid "Memo for: "
-msgstr ""
+msgstr "备忘："
 
 #: view_graph.py:731
 msgid "Line start item"
-msgstr ""
+msgstr "线路起始项目"
 
 #: view_graph.py:751
 msgid "Line end item(s)"
-msgstr ""
+msgstr "项目结束项目"
 
 #: view_graph.py:784 view_graph.py:786
 msgid "gray"
-msgstr ""
+msgstr "浅黑"
 
 #: view_graph.py:784 view_graph.py:786
 msgid "cyan"
-msgstr ""
+msgstr "青色"
 
 #: view_graph.py:784 view_graph.py:786
 msgid "magenta"
-msgstr ""
+msgstr "洋红"
 
 #: view_graph.py:784 view_graph.py:786
 msgid "red"
-msgstr ""
+msgstr "红"
 
 #: view_graph.py:787
 msgid "white"
-msgstr ""
+msgstr "白色"
 
 #: view_graph.py:787
 msgid "black"
-msgstr ""
+msgstr "黑色"
 
 #: view_graph.py:791
 msgid "Colour"
-msgstr ""
+msgstr "颜色"
 
 #: view_graph.py:806
 msgid "Text object"
-msgstr ""
+msgstr "文本对象"
 
 #: view_graph.py:806
 msgid "Enter text:"
-msgstr ""
+msgstr "输入文本："
 
 #: view_graph.py:812
 msgid "Another item has this exact text"
-msgstr ""
+msgstr "另一个项目有这样一段文字"
 
 #: view_graph.py:871
 msgid "Free text item"
-msgstr ""
+msgstr "自由文本项目"
 
 #: view_graph.py:873
 msgid "Case item"
-msgstr ""
+msgstr "案例项目"
 
 #: view_graph.py:875
 msgid "File item"
-msgstr ""
+msgstr "文件项目"
 
 #: view_graph.py:931
 msgid "Select cases"
-msgstr ""
+msgstr "选择案例"
 
 #: view_graph.py:982
 msgid "Save graph"
-msgstr ""
+msgstr "保存图表"
 
 #: view_graph.py:983
 msgid "Graph name"
-msgstr ""
+msgstr "图表名称"
 
 #: view_graph.py:989
 msgid "Must have a name"
-msgstr ""
+msgstr "必须有名字"
 
 #: view_graph.py:1004
 msgid "Name error"
-msgstr ""
+msgstr "名称错误"
 
 #: view_graph.py:1004
 msgid "This name already used. Choose another name."
-msgstr ""
+msgstr "此名称已被使用。请选择其他名称。"
 
 #: view_graph.py:1146 view_graph.py:1154
 msgid "Alphabet ascending"
-msgstr ""
+msgstr "字母升序"
 
 #: view_graph.py:1147 view_graph.py:1156
 msgid "Alphabet descending"
-msgstr ""
+msgstr "字母降序"
 
 #: view_graph.py:1148 view_graph.py:1158
 msgid "Oldest to newest"
-msgstr ""
+msgstr "从旧到新"
 
 #: view_graph.py:1149 view_graph.py:1160
 msgid "Newest to oldest"
-msgstr ""
+msgstr "从最新到最旧"
 
 #: view_graph.py:1161 view_graph.py:1394
 msgid "Load graph"
-msgstr ""
+msgstr "载荷图"
 
 #: view_graph.py:1416
 msgid "Load graph errors"
-msgstr ""
+msgstr "加载图形错误"
 
 #: view_graph.py:1417
 msgid "Changing to another report will lose unsaved graph."
-msgstr ""
+msgstr "切换到其他报告将丢失未保存的图表。"
 
 #: view_graph.py:1655
 msgid " does not exist: "
-msgstr ""
+msgstr " 不存在："
 
 #: view_graph.py:1671
 msgid "Delete stored graphs"
-msgstr ""
+msgstr "删除存储的图表"
 
 #: view_graph.py:1915 view_graph.py:1983 view_graph.py:2085 view_graph.py:2159
 #: view_graph.py:2301 view_graph.py:2436
 msgid "Edit text"
-msgstr ""
+msgstr "编辑文本"
 
 #: view_graph.py:1916 view_graph.py:2087 view_graph.py:2312 view_graph.py:3120
 msgid "Larger font"
-msgstr ""
+msgstr "字体更大"
 
 #: view_graph.py:1917 view_graph.py:2088 view_graph.py:2313 view_graph.py:3121
 msgid "Smaller font"
-msgstr ""
+msgstr "字体更小"
 
 #: view_graph.py:1918 view_graph.py:2086 view_graph.py:2311 view_graph.py:3122
 msgid "Bold toggle"
-msgstr ""
+msgstr "粗体切换"
 
 #: view_graph.py:1919 view_graph.py:2089
 msgid "Red text"
-msgstr ""
+msgstr "红色文本"
 
 #: view_graph.py:1920 view_graph.py:2090
 msgid "Green text"
-msgstr ""
+msgstr "绿色文本"
 
 #: view_graph.py:1921 view_graph.py:2091
 msgid "Yellow text"
-msgstr ""
+msgstr "黄色文本"
 
 #: view_graph.py:1922 view_graph.py:2092
 msgid "Blue text"
-msgstr ""
+msgstr "蓝色文本"
 
 #: view_graph.py:1923 view_graph.py:2095
 msgid "Orange text"
-msgstr ""
+msgstr "橙色文本"
 
 #: view_graph.py:1924 view_graph.py:2094
 msgid "Cyan text"
-msgstr ""
+msgstr "青色文本"
 
 #: view_graph.py:1925 view_graph.py:2093
 msgid "Magenta text"
-msgstr ""
+msgstr "洋红色文本"
 
 #: view_graph.py:1926 view_graph.py:2096
 msgid "Gray text"
-msgstr ""
+msgstr "灰色文本"
 
 #: view_graph.py:1927 view_graph.py:2097
 msgid "Black text"
-msgstr ""
+msgstr "黑色文本"
 
 #: view_graph.py:1928 view_graph.py:2098
 msgid "White text"
-msgstr ""
+msgstr "白色文本"
 
 #: view_graph.py:1930 view_graph.py:2100
 msgid "Hide attributes"
-msgstr ""
+msgstr "隐藏属性"
 
 #: view_graph.py:1932 view_graph.py:2102
 msgid "Show attributes"
-msgstr ""
+msgstr "显示属性"
 
 #: view_graph.py:1933 view_graph.py:2103 view_graph.py:2314 view_graph.py:2509
 #: view_graph.py:2712 view_graph.py:2861 view_graph.py:2992
 msgid "Remove"
-msgstr ""
+msgstr "移除"
 
 #: view_graph.py:2300
 msgid "Update text"
-msgstr ""
+msgstr "更新文本"
 
 #: view_graph.py:2304 view_graph.py:2307 view_graph.py:2310
 msgid "Code in context"
-msgstr ""
+msgstr "上下文中的代码"
 
 #: view_graph.py:2315 view_graph.py:2501 view_graph.py:2704 view_graph.py:2862
 #: view_graph.py:3239
 msgid "Red"
-msgstr ""
+msgstr "红"
 
 #: view_graph.py:2316 view_graph.py:2503 view_graph.py:2706 view_graph.py:2863
 #: view_graph.py:3241
 msgid "Green"
-msgstr ""
+msgstr "绿色"
 
 #: view_graph.py:2317 view_graph.py:2502 view_graph.py:2705 view_graph.py:2864
 #: view_graph.py:3240
 msgid "Yellow"
-msgstr ""
+msgstr "黄色"
 
 #: view_graph.py:2318 view_graph.py:2504 view_graph.py:2707 view_graph.py:2865
 #: view_graph.py:3242
 msgid "Blue"
-msgstr ""
+msgstr "蓝色"
 
 #: view_graph.py:2319 view_graph.py:2505 view_graph.py:2708 view_graph.py:2867
 #: view_graph.py:3243
 msgid "Cyan"
-msgstr ""
+msgstr "青色"
 
 #: view_graph.py:2320 view_graph.py:2506 view_graph.py:2709 view_graph.py:2866
 #: view_graph.py:3244
 msgid "Magenta"
-msgstr ""
+msgstr "品红色"
 
 #: view_graph.py:2321 view_graph.py:2507 view_graph.py:2710 view_graph.py:2868
 #: view_graph.py:3245
 msgid "Orange"
-msgstr ""
+msgstr "橙色"
 
 #: view_graph.py:2322 view_graph.py:2508 view_graph.py:2711 view_graph.py:2869
 #: view_graph.py:3246
 msgid "Gray"
-msgstr ""
+msgstr "灰色"
 
 #: view_graph.py:2323
 msgid "Black"
-msgstr ""
+msgstr "黑色"
 
 #: view_graph.py:2324 view_graph.py:2870
 msgid "White"
-msgstr ""
+msgstr "白色"
 
 #: view_graph.py:2329
 msgid "Update text to"
-msgstr ""
+msgstr "更新文本为"
 
 #: view_graph.py:2352 view_graph.py:3006
 msgid "Cannot find image coding in database"
-msgstr ""
+msgstr "无法在数据库中找到图像编码"
 
 #: view_graph.py:2367
 msgid "Cannot find A/V coding in database"
-msgstr ""
+msgstr "无法在数据库中找到音频/视频编码"
 
 #: view_graph.py:2385
 msgid "Cannot find text coding in database"
-msgstr ""
+msgstr "无法在数据库中找到文本编码"
 
 #: view_graph.py:2498 view_graph.py:2701 view_graph.py:3236
 msgid "Thicker"
-msgstr ""
+msgstr "更厚"
 
 #: view_graph.py:2499 view_graph.py:2702 view_graph.py:3237
 msgid "Thinner"
-msgstr ""
+msgstr "稀释剂"
 
 #: view_graph.py:2500 view_graph.py:2703 view_graph.py:3238
 msgid "Dotted"
-msgstr ""
+msgstr "点状"
 
 #: view_graph.py:2881
 msgid "Cannot find audio/video coding in database"
-msgstr ""
+msgstr "无法在数据库中找到音频/视频编码"
 
 #: view_graph.py:3247
 msgid "Hide"
-msgstr ""
+msgstr "隐藏"
 
 #: view_image.py:121 view_image.py:639
 msgid "Image coding"
-msgstr ""
+msgstr "图像编码"
 
 #: view_image.py:727
 msgid "Rotation"
-msgstr ""
+msgstr "旋转"
 
 #: view_image.py:1216
 msgid "Rotate clockwise"
-msgstr ""
+msgstr "顺时针旋转"
 
 #: view_image.py:1217
 msgid "Rotate counter-clockwise"
-msgstr ""
+msgstr "逆时针旋转"
 
 #: view_image.py:1256
 msgid "Move or resize"
-msgstr ""
+msgstr "移动或调整大小"
 
 #: view_image.py:1263
 msgid "Highlight this area - gray"
-msgstr ""
+msgstr "突出显示该区域 - 灰色"
 
 #: view_image.py:1264
 msgid "Highlight this area - solarize"
-msgstr ""
+msgstr "突出这一区域--日晒"
 
 #: view_image.py:1265
 msgid "Highlight this area - blur"
-msgstr ""
+msgstr "突出显示该区域 - 模糊"
 
 #: view_image.py:1266
 msgid "Highlight this code - gray"
-msgstr ""
+msgstr "突出显示此代码 - 灰色"
 
 #: view_image.py:1267
 msgid "Highlight this code - solarize"
-msgstr ""
+msgstr "突出显示这段代码 - 日晒"
 
 #: view_image.py:1268
 msgid "Highlight this code - blur"
-msgstr ""
+msgstr "突出显示这段代码 - 模糊"
 
 #: view_image.py:1911
 msgid " Choose another name"
-msgstr ""
+msgstr " 选择其他名称"
 
 #: view_image.py:2046
 msgid ""
@@ -6203,11 +6208,14 @@ msgid ""
 "R rotate anti-clockwise\n"
 "+ - zoom in and out"
 msgstr ""
+"L 顺时针旋转\n"
+"R 逆时针旋转\n"
+"+ - 放大和缩小"
 
 #: view_image.py:2075
 msgid " Height: "
-msgstr ""
+msgstr "高度:"
 
 #: view_image.py:2076
 msgid " Scale: "
-msgstr ""
+msgstr " 规模："
