@@ -20,20 +20,20 @@ https://github.com/ccbogel/QualCoder
 from binascii import b2a_hex
 from copy import deepcopy
 import datetime
-# import io
+import fitz
 import logging
 import os
 from pdfminer.converter import PDFPageAggregator
-# Unused LTFigure, LTTextBox, LTTextBoxHorizontal
-from pdfminer.layout import LAParams, LTTextLine, LTImage, LTCurve, LTLine, LTRect
+# Unused LTFigure, LTTextBox, LTTextBoxHorizontal, LTImage, LTCurve, LTLine, LTRect
+from pdfminer.layout import LAParams, LTTextLine
 from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
 from pdfminer.pdfpage import PDFPage
 from pdfminer.psparser import PSLiteral  # Partly using for color conversion
 from pdfminer.pdfparser import PDFParser
 from pdfminer.pdfdocument import PDFDocument  # for PDF meta information
 # Using this for determining colourspace, e.g. colorspace': [<PDFObjRef:852>]
-from pdfminer.pdftypes import PDFObjRef, resolve1
-from PIL import Image, ImageOps, ImageQt
+# from pdfminer.pdftypes import PDFObjRef, resolve1
+# from PIL import Image, ImageOps, ImageQt
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 from random import randint
 import re
@@ -135,13 +135,18 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.scene = None
         self.page_num = 0
         self.total_pages = 0
+        self.page_end_index = 0  # Text position end of page
+        self.text_pos0 = 0  # Character position
         self.full_text = ""
         self.page_full_text = ""
         self.metadata = ""
         self.selected_graphic_textboxes = []
         self.pdf_object_info_text = ""  # Contains details of PDF page objects
-        self.page_dict = {}  # Temporary variable used when loading PDF pages
 
+        # Used by load_pdf_pages and get_pdf_items_and_hierarchy to fill document_text for length comparison
+        # and for each page ['plain_text'], ['plaintext_start], ['plain_txt_end']
+        self.page_text_extract = ""
+        self.page_dict = {}  # Temporary variable used when loading PDF pages
         # Set up ui
         self.ui = Ui_Dialog_code_pdf()
         self.ui.setupUi(self)
@@ -157,7 +162,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.textEdit.setAutoFillBackground(True)
         self.ui.textEdit.setToolTip("")
         self.ui.textEdit.setMouseTracking(True)
-        #self.ui.textEdit.setReadOnly(True)
+        # self.ui.textEdit.setReadOnly(True)
         self.ui.textEdit.setTextInteractionFlags(
             Qt.TextInteractionFlag.TextSelectableByMouse |
             Qt.TextInteractionFlag.TextSelectableByKeyboard)
@@ -244,26 +249,32 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.graphicsView.customContextMenuRequested.connect(self.graphicsview_menu)
         self.ui.graphicsView.viewport().installEventFilter(self)
 
-        self.ui.checkBox_curve.stateChanged.connect(self.update_page)
-        self.ui.checkBox_image.stateChanged.connect(self.update_page)
-        self.ui.checkBox_rect.stateChanged.connect(self.update_page)
-        self.ui.checkBox_text.stateChanged.connect(self.update_page)
-        self.ui.checkBox_line.stateChanged.connect(self.update_page)
-        self.ui.checkBox_black_text.stateChanged.connect(self.update_page)
         self.ui.comboBox_fontsize.setCurrentIndex(2)
         self.ui.comboBox_fontsize.currentIndexChanged.connect(self.update_page)
+
+        self.ui.checkBox_image.stateChanged.connect(self.update_page)
+        self.ui.checkBox_black_text.stateChanged.connect(self.update_page)
+        # self.ui.checkBox_curve.stateChanged.connect(self.update_page)
+        self.ui.checkBox_curve.hide()
+        # self.ui.checkBox_rect.stateChanged.connect(self.update_page)
+        self.ui.checkBox_rect.hide()
+        self.ui.checkBox_text.stateChanged.connect(self.update_page)
+        # self.ui.checkBox_line.stateChanged.connect(self.update_page)
+        self.ui.checkBox_line.hide()
 
         self.get_files()
         self.fill_tree()
         msg = _("QualCoder roughly displays PDFs.")
-        msg += "\n" + _("Some images will not display and image masks and rotations will not work.")
+        # msg += "\n" + _("Some images will not display and image masks and rotations will not work.")
         msg += "\n" + _("Original fonts or bold or italic are not applied.")
-        msg += "\n" + _("There is not enough information in pdfminer to accurately display polygon curves.")
+        # msg += "\n" + _("There is not enough information in pdfminer to accurately display polygon curves.")
         msg += "\n" + _("Plain text must match exactly for Code PDF to work correctly.")
         msg += "\n" + _("A warning will display if the parsed PDF text does not match the database stored plain text.")
-        msg += "\n" + _("Plain text of PDFs loaded in to QualCoder before version 3.4 will not have the plain text positions correct for PDF display.")
+        msg += "\n" + _(
+            "Plain text of PDFs loaded in to QualCoder before version 3.4 will not have the plain text positions correct for PDF display.")
         msg += "\n" + _("This means coding stripes will show in incorrect positions.")
-        msg += "\n" + _("Similarly, if the PDF plain text has beeen edited in any way, this will affect coding stripes display.")
+        msg += "\n" + _(
+            "Similarly, if the PDF plain text has been edited in any way, this will affect coding stripes display.")
         Message(self.app, _("Information") + " " * 20, msg).exec()
 
     def goto_page(self):
@@ -675,7 +686,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.label_search_totals.setText("0 / 0")
         if len(self.search_term) < int(self.search_type):
             return
-        #TODO some errors to fix
+        # TODO some errors to fix
         pattern = None
         flags = 0
         if not self.ui.checkBox_search_case.isChecked():
@@ -739,11 +750,11 @@ class DialogCodePdf(QtWidgets.QWidget):
             if tb['pos0'] <= next_result[0] < tb['pos1']:
                 x = tb['graphic_item_ref'].pos().x()
                 y = tb['graphic_item_ref'].pos().y()
-                #print("pos", tb['graphic_item_ref'].boundingRect())
-                path = QtGui.QPainterPath()
-                self.scene.setSelectionArea(path)
-                path.addRect(x + 2, y + 6, 1, 1)
-                self.scene.setSelectionArea(path)
+                # print("pos", tb['graphic_item_ref'].boundingRect())
+                painter_path = QtGui.QPainterPath()
+                self.scene.setSelectionArea(painter_path)
+                painter_path.addRect(x + 2, y + 6, 1, 1)
+                self.scene.setSelectionArea(painter_path)
                 break
 
     def move_to_previous_search_text(self):
@@ -776,11 +787,11 @@ class DialogCodePdf(QtWidgets.QWidget):
             if tb['pos0'] <= previous_result[0] < tb['pos1']:
                 x = tb['graphic_item_ref'].pos().x()
                 y = tb['graphic_item_ref'].pos().y()
-                #print("pos", tb['graphic_item_ref'].boundingRect())
-                path = QtGui.QPainterPath()
-                self.scene.setSelectionArea(path)
-                path.addRect(x + 2, y + 6, 1, 1)
-                self.scene.setSelectionArea(path)
+                # print("pos", tb['graphic_item_ref'].boundingRect())
+                painter_path = QtGui.QPainterPath()
+                self.scene.setSelectionArea(painter_path)
+                painter_path.addRect(x + 2, y + 6, 1, 1)
+                self.scene.setSelectionArea(painter_path)
                 break
 
     def lineedit_search_menu(self, position):
@@ -1052,7 +1063,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         child_count = item.childCount()
         for i in range(child_count):
             if item.child(i).text(1)[0:3] == "cid" and (item.child(i).text(0) == text_
-            or item.child(i).toolTip(0) == text_):
+                                                        or item.child(i).toolTip(0) == text_):
                 self.ui.treeWidget.setCurrentItem(item.child(i))
             self.recursive_set_current_item(item.child(i), text_)
 
@@ -1179,7 +1190,8 @@ class DialogCodePdf(QtWidgets.QWidget):
     def change_code_pos_message(self):
         """  Called via textedit_menu. """
 
-        msg = _("Change start position (extend SHIFT LEFT/ shrink ALT RIGHT)\nChange end position (extend SHIFT RIGHT/ shrink ALT LEFT)")
+        msg = _(
+            "Change start position (extend SHIFT LEFT/ shrink ALT RIGHT)\nChange end position (extend SHIFT RIGHT/ shrink ALT LEFT)")
         Message(self.app, _("Use key presses") + " " * 20, msg).exec()
 
     def copy_selected_text_to_clipboard(self):
@@ -1312,7 +1324,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         if not ok:
             return
         category = ui.get_selected()
-        try: 
+        try:
             for code in self.codes:
                 if code['catid'] == catid:
                     cur.execute("update code_name set catid=? where catid=?", [category['catid'], catid])
@@ -1329,10 +1341,11 @@ class DialogCodePdf(QtWidgets.QWidget):
             for orphan in orphans:
                 cur.execute(sql, [orphan[0]])
             self.app.conn.commit()
-        except:
-            self.app.conn.rollback() # Revert all changes
+        except Exception as e_:
+            print(e_)
+            self.app.conn.rollback()  # Revert all changes
             self.update_dialog_codes_and_categories()
-            raise                
+            raise
         self.update_dialog_codes_and_categories()
 
     def move_code(self, selected):
@@ -1435,6 +1448,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         if selected.text(1)[0:3] == 'cat':
             return
         else:  # Code is selected
+            txt = ""
             for c in self.codes:
                 if c['cid'] == int(selected.text(1)[4:]):
                     txt = f"{_('CODE:')} {c['name']}\n{_('MEMO:')}\n{c['memo']}\n"
@@ -1818,13 +1832,6 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.get_coded_text_update_eventfilter_tooltips()
         self.display_page_text_objects()
 
-    '''def show_all_codes_in_text(self):
-        """ Opposes show selected code methods.
-        Highlights all the codes in the text. """
-
-        self.ui.pushButton_show_all_codings.setIcon(qta.icon('mdi6.grid-large'))
-        self.get_coded_text_update_eventfilter_tooltips()'''
-
     def coded_media_dialog(self, code_dict):
         """ Display all coded media for this code, in a separate modal dialog.
         Coded media comes from ALL files for this coder.
@@ -1947,9 +1954,11 @@ class DialogCodePdf(QtWidgets.QWidget):
 
             cur.execute("delete from code_name where cid=?", [old_cid, ])
             self.app.conn.commit()
-        except:
+        except Exception as e_:
+            print(e_)
+            logger.debug(e_)
             self.app.conn.rollback()  # Revert all changes
-            raise                
+            raise
         self.app.delete_backup = False
         msg = msg.replace("\n", " ")
         self.parent_textEdit.append(msg)
@@ -2171,7 +2180,8 @@ class DialogCodePdf(QtWidgets.QWidget):
                 if c['cid'] == int(selected.text(1)[4:]):
                     code_ = c
             new_name, ok = QtWidgets.QInputDialog.getText(self, _("Rename code"),
-                                                          _("New code name:") + " " * 40, QtWidgets.QLineEdit.EchoMode.Normal,
+                                                          _("New code name:") + " " * 40,
+                                                          QtWidgets.QLineEdit.EchoMode.Normal,
                                                           code_['name'])
             if not ok or new_name == '':
                 return
@@ -2209,7 +2219,8 @@ class DialogCodePdf(QtWidgets.QWidget):
             for c in self.categories:
                 if c['catid'] == int(selected.text(1)[6:]):
                     cat = c
-            new_name, ok = QtWidgets.QInputDialog.getText(self, _("Rename category"), _("New category name:") + " " * 40,
+            new_name, ok = QtWidgets.QInputDialog.getText(self, _("Rename category"),
+                                                          _("New category name:") + " " * 40,
                                                           QtWidgets.QLineEdit.EchoMode.Normal, cat['name'])
             if not ok or new_name == '':
                 return
@@ -2343,7 +2354,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         Or show all files. """
 
         cases = self.app.get_casenames()
-        cases.insert(0, {"name": _("Show all files"),  "id": -1})
+        cases.insert(0, {"name": _("Show all files"), "id": -1})
         ui = DialogSelectItems(self.app, cases, _("Select case"), "single")
         ok = ui.exec()
         if not ok:
@@ -2499,10 +2510,8 @@ class DialogCodePdf(QtWidgets.QWidget):
         if "end" not in self.file_:
             self.file_['end'] = len(file_result['fulltext'])
         sql_values.append(int(file_result['id']))
-        # self.text = file_result['fulltext'][self.file_['start']:self.file_['end']]  # tod remove
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
-        #self.show_all_codes_in_text()  # Deactivates the show_selected_code if this is active. Show selected Not used
         self.setWindowTitle(_("Code text: ") + self.file_['name'])
         self.ui.lineEdit_search.setEnabled(True)
         self.ui.checkBox_search_case.setEnabled(True)
@@ -2539,22 +2548,51 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.pages = []
         self.page_num = 0
         document_text = ""
-        self.page_end_index = 0  # text end of page
-        self.text_pos0 = 0  # character pos
+        self.page_end_index = 0  # Text end of page
+        self.text_pos0 = 0  # Character pos
+        fitz_pdf = fitz.open(filepath)  # Use pymupdf to get page image
+
         for i, page in enumerate(pages_generator):
-            self.page_text = ""
+            self.page_text_extract = ""
             self.page_dict = {'pagenum': i, 'mediabox': page.mediabox, 'text_boxes': [], 'lines': [], 'curves': [],
                               'images': [], 'rect': [], 'plain_text': [], 'plain_text_start': 0, 'plain_text_end': 0}
             interpreter.process_page(page)
             layout = device.get_result()
             for lobj in layout:
                 self.get_pdf_items_and_hierarchy(page, lobj)
-            self.page_dict['plain_text'] = self.page_text
+            self.page_dict['plain_text'] = self.page_text_extract
             self.page_dict['plain_text_start'] = self.page_end_index
-            self.page_end_index += len(self.page_text)
+            self.page_end_index += len(self.page_text_extract)
             self.page_dict['plain_text_end'] = self.page_end_index
             self.pages.append(self.page_dict)
-            document_text += self.page_text
+            document_text += self.page_text_extract
+
+            # pymupdf fitz to get page image and clear all text objects.
+            fitz_page = fitz_pdf.load_page(i)
+            # print(f"Page {i}  #text_boxes {len(self.page_dict['text_boxes'])}")
+            for text_box in self.page_dict['text_boxes']:
+                # look at text boxes containing text
+                if not text_box['text'].isspace():
+                    # List of text rectangles to replace text
+                    matches = fitz_page.search_for(text_box["text"])
+                    # print(len(matches), text_box['text'], len(text_box['text']))
+                    for rect in matches:
+                        fitz_page.add_redact_annot(rect, "")
+            fitz_page.apply_redactions(images=fitz.PDF_REDACT_IMAGE_NONE)  # Do not touch images
+            # Not needed, keep for future reference. doc.save("replaced.pdf", garbage=3, deflate=True)
+            # Get the height and width of the  page
+            width, height = fitz_page.rect.width, fitz_page.rect.height
+            pymypdf_pixmap = fitz_page.get_pixmap()
+            # Variable holding a transparent image
+            pymypdf_pixmap = fitz.Pixmap(pymypdf_pixmap, 0) if pymypdf_pixmap.alpha else pymypdf_pixmap
+            qt_image = QtGui.QImage(pymypdf_pixmap.samples, pymypdf_pixmap.width, pymypdf_pixmap.height,
+                                    pymypdf_pixmap.stride,  # length of one image line in bytes
+                                    QtGui.QImage.Format.Format_RGB888)
+            qt_pixmap = QtGui.QPixmap.fromImage(qt_image)
+            img_dict = {"name": "pymupdf_page", "x": 0, "y": 0, "w": width, "h": height,
+                        'imagemask': "", 'colorspace': "rgb", 'depth': 0, 'pixmap': qt_pixmap}
+            self.page_dict['images'].append(img_dict)
+
         self.different_text_lengths = False
         if len(document_text) != len(self.file_['fulltext']):
             msg = _("Parsing the PDF text.") + "\n"
@@ -2566,96 +2604,94 @@ class DialogCodePdf(QtWidgets.QWidget):
 
     def get_pdf_items_and_hierarchy(self, page, lobj: Any, depth=0):
         """ Get item details add to page_dict, with depth and all its descendants.
+        The purpose of this method is to get all the text elements, and to add to:
+         self.full_text, self.page_text_extract, self.text_pos0
+
+        OLD, use the other objects to create the page image elements. NEW: Use pymupdf fitz
         Objects added to self.page_dict, with depth counter.
         LTFigure objects are not listed in the if statements, as they are containers for other objects,
-         and are iterated, via the isinstance(Iteratable).
+        and are iterated, via the isinstance(Iteratable).
         """
 
-        if isinstance(lobj, LTLine):
-            #print("LTLINE", lobj.__dir__())
+        '''if isinstance(lobj, LTLine):
+            # print("LTLINE", lobj.__dir__())
             # left, btm, right, top = lobj.x0, lobj.y0, lobj.x1, lobj.y1
-            line_dict = {'x0': round(lobj.x0,3), 'y0': round(page.mediabox[3] - lobj.y0,3), 'y1': round(page.mediabox[3] - lobj.y1,3),
-                         'x1': round(lobj.x1,3), 'linewidth': lobj.linewidth, 'stroke': lobj.stroke, 'fill': lobj.fill,
+            line_dict = {'x0': round(lobj.x0, 3), 'y0': round(page.mediabox[3] - lobj.y0, 3),
+                         'y1': round(page.mediabox[3] - lobj.y1, 3),
+                         'x1': round(lobj.x1, 3), 'linewidth': lobj.linewidth, 'stroke': lobj.stroke, 'fill': lobj.fill,
                          'stroking_color': lobj.stroking_color, 'non_stroking_color': lobj.non_stroking_color,
                          'pts': lobj.pts, 'depth': depth}
-            self.page_dict['lines'].append(line_dict)
+            self.page_dict['lines'].append(line_dict)'''
 
-        if isinstance(lobj, LTRect):
-            #print("LTRECT", lobj, type(lobj))
-            rect_dict = {"x": round(lobj.bbox[0],3), "y": round(page.mediabox[3] - lobj.bbox[1] - lobj.height,3),
-                         "w": round(lobj.width,3), "h": round(lobj.height,3),
+        '''if isinstance(lobj, LTRect):
+            # print("LTRECT", lobj, type(lobj))
+            rect_dict = {"x": round(lobj.bbox[0], 3), "y": round(page.mediabox[3] - lobj.bbox[1] - lobj.height, 3),
+                         "w": round(lobj.width, 3), "h": round(lobj.height, 3),
                          "linewidth": lobj.linewidth, "stroke": lobj.stroke, "fill": lobj.fill,
                          "stroking_color": lobj.stroking_color,
                          "non_stroking_color": lobj.non_stroking_color, 'is_empty': lobj.is_empty(),
                          'depth': depth}
-            self.page_dict['rect'].append(rect_dict)
+            self.page_dict['rect'].append(rect_dict)'''
 
-        if isinstance(lobj, LTCurve):
+        '''if isinstance(lobj, LTCurve):
             """ LTCurve can be a LTRect, LTImage or LTLine. The LTRect can contain a LTImage. """
             # print(lobj.__dir__())
             # left, btm, right, top = lobj.x0, lobj.y0, lobj.x1, lobj.y1
-            curve_dict = {'x0': round(lobj.x0,3), 'y0': round(page.mediabox[3] - lobj.y0,3),
-                          'y1': round(page.mediabox[3] - lobj.y1,3),
-                          'x1': round(lobj.x1,3), 'linewidth': lobj.linewidth, 'stroke': lobj.stroke, 'fill': lobj.fill,
+            curve_dict = {'x0': round(lobj.x0, 3), 'y0': round(page.mediabox[3] - lobj.y0, 3),
+                          'y1': round(page.mediabox[3] - lobj.y1, 3),
+                          'x1': round(lobj.x1, 3), 'linewidth': lobj.linewidth, 'stroke': lobj.stroke,
+                          'fill': lobj.fill,
                           'stroking_color': lobj.stroking_color, 'non_stroking_color': lobj.non_stroking_color,
                           'is_empty': lobj.is_empty(),  # 'analyze': lobj.analyze(laparams),
                           'evenodd': lobj.evenodd,
                           'pts': [QtCore.QPointF(p[0], page.mediabox[3] - p[1]) for p in lobj.pts],
                           'depth': depth}
-            self.page_dict['curves'].append(curve_dict)
+            self.page_dict['curves'].append(curve_dict)'''
 
         if isinstance(lobj, LTTextLine):  # or isinstance(lobj, LTTextBox):
             # y-coordinates are the distance from the bottom of the page
             #  left, bottom, right, and top
-            #print("LTTEXTLINE", obj.__dir__())
+            # print("LTTEXTLINE", obj.__dir__())
             left, btm, right, top, text_ = lobj.x0, lobj.y0, lobj.x1, lobj.y1, lobj.get_text()
             text_dict = {'left': round(left, 3), 'btm': round(page.mediabox[3] - btm, 3),
-                             'top': round(page.mediabox[3] - top, 3),
-                             'right': round(right, 3), 'text': text_, 'pos0': self.text_pos0,
+                         'top': round(page.mediabox[3] - top, 3),
+                         'right': round(right, 3), 'text': text_, 'pos0': self.text_pos0,
                          'pos1': self.text_pos0 + len(text_) + 1, 'graphic_item_ref': None,
                          'bold': False, 'depth': depth}
             # Fix Pdfminer recognising invalid unicode characters.
             text_dict['text'] = text_dict['text'].replace(u"\uE002", "Th")
             text_dict['text'] = text_dict['text'].replace(u"\uFB01", "fi")
-            self.full_text += text_dict['text'] #+ "\n"  # add line to paragraph spacing for visual format
-            self.page_text += text_dict['text'] #+ "\n"
+            self.full_text += text_dict['text']
+            self.page_text_extract += text_dict['text']
             self.text_pos0 += len(text_dict['text'])
             text_dict['pos1'] = self.text_pos0
             char_font_sizes = []
-            #fontnames = []
-            colors = []
-            #bold = False
+            # fontnames = []
+            text_colors = []
+            # bold = False
             for ltchar in lobj:
                 fontname, fontsize, color = self.get_char_info(ltchar)
                 char_font_sizes.append(fontsize)
-                #if "bold" in fontname.lower():
+                # if "bold" in fontname.lower():
                 #    bold = True
-                #fontnames.append(fontname)  # TODO get most common
-                colors.append(color)
-            '''fontname = fontnames[0]
-            if fontname.find("+") > 0:
-                fontname = fontname.split("+")[1]
-            text_dict['fontname'] = fontname'''
+                # fontnames.append(fontname)
+                text_colors.append(color)
+            # fontname = fontnames[0]
+            # if fontname.find("+") > 0:
+            #     fontname = fontname.split("+")[1]
+            # text_dict['fontname'] = fontname
             text_dict['fontsize'] = int(median(char_font_sizes))
-            text_dict['color'] = colors[0]
+            text_dict['color'] = text_colors[0]
             self.page_dict['text_boxes'].append(text_dict)
 
-        if isinstance(lobj, LTImage):
-            #print("IMG", lobj.__dir__())
-            #print("BBOX - x,y,w,h", lobj.bbox)
+        '''if isinstance(lobj, LTImage):
+            # print("IMG", lobj.__dir__())
+            # print("BBOX - x,y,w,h", lobj.bbox)
             img_dict = {"name": lobj.name, "x": round(lobj.bbox[0],3),
                         "y": round(page.mediabox[3] - lobj.bbox[1] - lobj.height,3),
                         "w": round(lobj.width,3), "h": round(lobj.height,3),
                         'imagemask': lobj.imagemask, 'colorspace': lobj.colorspace,
                         'depth': depth}
-
-            ''' colorspace: [/'DeviceCMYK']
-            # Summary of components below:
-            {'BitsPerComponent': 8, 'ColorSpace': /'DeviceCMYK', 
-            'DecodeParms': {'Quality': 65}, 'Filter': /'DCTDecode', 'Intent': /'RelativeColorimetric',}>
-            '''
-
-            #'voverlap':lobj.voverlap(), 'vdistance':lobj.vdistance(),
             if isinstance(lobj.colorspace[0], PDFObjRef):
                 values = resolve1(lobj.colorspace[0])
                 cspace = []
@@ -2666,7 +2702,6 @@ class DialogCodePdf(QtWidgets.QWidget):
                     else:
                         cspace.append(v)
                 img_dict['colorspace'] = cspace
-
             img_dict['stream'] = lobj.stream
             img_dict['pixmap'] = None
             if lobj.stream:
@@ -2677,12 +2712,6 @@ class DialogCodePdf(QtWidgets.QWidget):
                 qp.loadFromData(file_stream)
                 #print("Testing: CS0:", img_dict['colorspace'][0], file_ext)  # pdfminer.psparser.PSLiteral
                 if str(img_dict['colorspace'][0]) == "/'DeviceCMYK'" and file_ext.lower() in (".jpg", ".jpeg"):
-                    '''buffering did not work.
-                    buffer = QtCore.QBuffer()
-                    buffer.open(QtCore.QBuffer.ReadWrite)
-                    img.save(buffer, "jpg")
-                    pil_im = Image.open(io.BytesIO(buffer.data()))
-                    '''
                     qimg = qp.toImage()
                     qimg.save(os.path.join(os.path.expanduser('~'), ".qualcoder", "tmp.jpg"))
                     pil_img = Image.open(os.path.join(os.path.expanduser('~'), ".qualcoder", "tmp.jpg"))
@@ -2693,10 +2722,10 @@ class DialogCodePdf(QtWidgets.QWidget):
                     img_dict['pixmap'] = qp.scaled(int(img_dict['w']), int(img_dict['h']))
                 if qp.isNull():
                     img_dict['pixmap'] = None
-                '''else:  # Potential to extract some images.
-                    file_name = QtWidgets.QFileDialog.getSaveFileName(self, 'Save File', '', '*.jpg')
-                    qp.save(file_name[0])  # tuple of path and type'''
-            self.page_dict['images'].append(img_dict)
+                # else:  # Potential to extract some images.
+                #     file_name = QtWidgets.QFileDialog.getSaveFileName(self, 'Save File', '', '*.jpg')
+                #     qp.save(file_name[0])  # tuple of path and type
+            self.page_dict['images'].append(img_dict)'''
 
         if isinstance(lobj, Iterable):
             # Includes LTFigure objects
@@ -2718,7 +2747,8 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.pdf_object_info_text = ""
         #    text_edit_text = "PAGE RECT: " + str(page_rect) + "\n"
         self.scene = QtWidgets.QGraphicsScene()
-        self.ui.graphicsView.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)  #RenderHint.SmoothPixmapTransform)  # Antialiasing
+        self.ui.graphicsView.setRenderHint(
+            QtGui.QPainter.RenderHint.Antialiasing)  # RenderHint.SmoothPixmapTransform)  # Antialiasing
         self.scene.setSceneRect(QtCore.QRectF(0, 0, page_rect[2], page_rect[3]))
         self.ui.graphicsView.setScene(self.scene)
         self.scene.setBackgroundBrush(QtCore.Qt.GlobalColor.white)
@@ -2726,7 +2756,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         gray_pen = QtGui.QPen(QtCore.Qt.GlobalColor.gray, 1, QtCore.Qt.PenStyle.SolidLine)
         self.scene.addRect(0, 0, page_rect[2], page_rect[3], gray_pen)
         counter = 0
-        if self.ui.checkBox_rect.isChecked():
+        '''if self.ui.checkBox_rect.isChecked():
             for r in page['rect']:
                 counter += 1
                 self.pdf_object_info_text += f"RECT: {r}\n"
@@ -2737,8 +2767,8 @@ class DialogCodePdf(QtWidgets.QWidget):
                     item.setBrush(color)
                 if r['stroke']:
                     color = self.get_qcolor(r['stroking_color'])
-                    item.setPen(QtGui.QPen(color, r['linewidth']))  # Border
-        if self.ui.checkBox_curve.isChecked():
+                    item.setPen(QtGui.QPen(color, r['linewidth']))  # Border'''
+        '''if self.ui.checkBox_curve.isChecked():
             # https://stackoverflow.com/questions/63016214/drawing-multi-point-curve-with-pyqt5
             # addPath QPainterPath - maybe?
             for c in page['curves']:
@@ -2754,10 +2784,9 @@ class DialogCodePdf(QtWidgets.QWidget):
                     brush = QtGui.QColor(self.get_qcolor(c['non_stroking_color']))  # Fill
                     pen = QtGui.QPen(QtGui.QBrush(QtCore.Qt.BrushStyle.NoBrush), 0)  # Border
                     item = QtGui.QPolygonF(c['pts'])
-                    self.scene.addPolygon(item,pen , brush)
-        # Images before or after curves?
-        # Seems better here, but sometimes overlaps
+                    self.scene.addPolygon(item, pen, brush)'''
         if self.ui.checkBox_image.isChecked():
+            # Now only pymupdf page rendering without text is displayed
             for img in page['images']:
                 counter += 1
                 self.pdf_object_info_text += "IMAGE:\n"
@@ -2768,14 +2797,9 @@ class DialogCodePdf(QtWidgets.QWidget):
                     qpixmap_item = self.scene.addPixmap(img['pixmap'])
                     qpixmap_item.setPos(img['x'], img['y'])
                 else:
-                    # Do not use placeholder question mark icon
-                    '''pixmap = QtGui.QPixmap()
-                    pixmap.loadFromData(QtCore.QByteArray.fromBase64(question_icon), "png")
-                    pixmap = pixmap.scaled(int(img['w']), int(img['h']))
-                    qpixmap_item = self.scene.addPixmap(pixmap)
-                    qpixmap_item.setPos(img['x'], img['y'])'''
+                    print("else", img['name'])
                     pass
-        if self.ui.checkBox_line.isChecked():
+        '''if self.ui.checkBox_line.isChecked():
             for line in page['lines']:
                 counter += 1
                 self.pdf_object_info_text += f"LINE: {line}\n"
@@ -2785,13 +2809,14 @@ class DialogCodePdf(QtWidgets.QWidget):
                 if line['fill']:
                     color = self.get_qcolor(line['non_stroking_color'])
                 line_pen = QtGui.QPen(color, line['linewidth'], QtCore.Qt.PenStyle.SolidLine)
-                self.scene.addLine(line['x0'], line['y0'], line['x1'], line['y1'], line_pen)
+                self.scene.addLine(line['x0'], line['y0'], line['x1'], line['y1'], line_pen)'''
         self.display_page_text_objects()
         counter += len(page['text_boxes'])
         text_edit_text += f"\n\nOBJECTS: {counter}"
         self.pdf_object_info_text += "\n" + _("TEXT START CHARACTER POSITION: ") + str(page['plain_text_start']) + "\n"
         self.pdf_object_info_text += _("TEXT END CHARACTER POSITION: ") + str(page['plain_text_end']) + "\n"
-        self.pdf_object_info_text += _("NUMBER OF CHARACTERS: ") + str(page['plain_text_end'] - page['plain_text_start'])
+        self.pdf_object_info_text += _("NUMBER OF CHARACTERS: ") + str(
+            page['plain_text_end'] - page['plain_text_start'])
         self.ui.textEdit.setText(page['plain_text'])
         self.get_coded_text_update_eventfilter_tooltips()
 
@@ -2857,7 +2882,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             # Code starts within text_item text and continues beyond it
             if code_['pos0'] < text_item['pos1'] < code_['pos1']:
                 codes_for_item.append(code_)
-            #print(f"Code {code_['seltext']} {code_['pos0']} - {code_['pos1']}")
+            # print(f"Code {code_['seltext']} {code_['pos0']} - {code_['pos1']}")
         if not codes_for_item:
             return
         tooltip_list = []
@@ -2871,7 +2896,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             pos1 = int(graphics_item_code['pos1'] - text_item['pos0'])
             if pos1 > len(text_item['text']):
                 pos1 = len(text_item['text']) - 1
-            cursor.setPosition(pos0, QtGui.QTextCursor.MoveMode.MoveAnchor) # Or zero
+            cursor.setPosition(pos0, QtGui.QTextCursor.MoveMode.MoveAnchor)  # Or zero
             cursor.setPosition(pos1, QtGui.QTextCursor.MoveMode.KeepAnchor)
             color = graphics_item_code['color']
             brush = QBrush(QColor(color))
@@ -2883,7 +2908,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             '''if text_item['bold']:
                 fmt.setFontWeight(QtGui.QFont.Weight.Bold)'''
             cursor.mergeCharFormat(fmt)
-            #cursor.setCharFormat(fmt)
+            # cursor.setCharFormat(fmt)
             tooltip_item_text = graphics_item_code['name']
             if graphics_item_code['memo'] is not None and graphics_item_code['memo'] != "":
                 tooltip_item_text += "\n" + _("Memo: ") + graphics_item_code['memo']
@@ -2984,7 +3009,7 @@ class DialogCodePdf(QtWidgets.QWidget):
                 self.set_important(position=None, ctid=to_make_important['ctid'], important=True)
             else:
                 self.set_important(position=None, ctid=codes_in_text_box[0]['ctid'], important=True)
-            #self.set_important(position=cursor.position(), ctid=None, important=True)
+            # self.set_important(position=cursor.position(), ctid=None, important=True)
             return
         if action == action_remove_important:
             if len(codes_in_text_box) > 1:
@@ -3005,6 +3030,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         Return a QColor object.
         A float or integer
         A list with one numeric element --> (0=black -> gray -> 1=white)
+        Except - 1 is not always white ...?
         A list with one String element (PSLiteral)
         A 3-value color is RGB
         A 4-value color is CMYK
@@ -3017,29 +3043,32 @@ class DialogCodePdf(QtWidgets.QWidget):
         color = QtCore.Qt.GlobalColor.green  # Wild Green default color
         if isinstance(pdf_color, float) or isinstance(pdf_color, int):  # gray scale 0 to 1
             int_col = int(pdf_color * 255)
+            if int_col == 255:
+                int_col = 200  # Rarely white 255 is meant to be black, so using light gray
             color = QtGui.QColor(int_col, int_col, int_col)
         if isinstance(pdf_color, (tuple, list)) and len(pdf_color) == 1:  # gray scale 0 to 1
             if isinstance(pdf_color[0], (float, int)):
                 int_col = int(pdf_color[0] * 255)
+                if int_col == 255:
+                    int_col = 200  # Rarely white 255 is meant to be black, so using light gray
                 color = QtGui.QColor(int_col, int_col, int_col)
             if isinstance(pdf_color[0], PSLiteral):
-                #print(pdf_color[0], pdf_color[0].name)  # /'P0'  P0
+                # print(pdf_color[0], pdf_color[0].name)  # /'P0'  P0
                 pass
-                # Will have a Green object, use default color
 
         if isinstance(pdf_color, (tuple, list)) and len(pdf_color) == 3:  # rgb
             try:
                 color = QtGui.QColor()
                 color.setRgbF(pdf_color[0], pdf_color[1], pdf_color[2])
-            except Exception as e:
-                #print("RGB", e)
+            except Exception as e_:
+                # print("RGB", e_)
                 pass
         if isinstance(pdf_color, (tuple, list)) and len(pdf_color) == 4:  # cmyk
             try:
                 color = QtGui.QColor()
                 color.setCmykF(pdf_color[0], pdf_color[1], pdf_color[2], pdf_color[3])
-            except Exception as e:
-                #print(e)
+            except Exception as e_:
+                # print(e_)
                 pass
         return color
 
@@ -3050,7 +3079,8 @@ class DialogCodePdf(QtWidgets.QWidget):
 
         if self.file_ is None:
             return
-        sql_values = [int(self.file_['id']), self.app.settings['codername']]  # , self.file_['start'], self.file_['end']]
+        sql_values = [int(self.file_['id']),
+                      self.app.settings['codername']]  # , self.file_['start'], self.file_['end']]
         # Get code text for this file and for this coder
         self.code_text = []
         # seltext length, longest first, so overlapping shorter text is superimposed.
@@ -3109,7 +3139,8 @@ class DialogCodePdf(QtWidgets.QWidget):
             '''print(f"len text {len(self.ui.textEdit.toPlainText())} TEXTEDIT page {self.page_num} pos0 {item['pos0'] - self.file_['start']}"
                   f" pos1 {item['pos1'] - self.file_['start']}"
                   f" page plain text end {self.pages[self.page_num]['plain_text_end']}")  # tmp'''
-            if item['pos0'] > self.pages[self.page_num]['plain_text_end'] or item['pos1'] < self.pages[self.page_num]['plain_text_start']:
+            if item['pos0'] > self.pages[self.page_num]['plain_text_end'] or item['pos1'] < self.pages[self.page_num][
+                'plain_text_start']:
                 continue
             cursor.setPosition(int(item['pos0'] - self.file_['start']), QtGui.QTextCursor.MoveMode.MoveAnchor)
             cursor.setPosition(int(item['pos1'] - self.file_['start']), QtGui.QTextCursor.MoveMode.KeepAnchor)
@@ -3228,7 +3259,6 @@ class DialogCodePdf(QtWidgets.QWidget):
             # Link up boxes so that one string of coded text is applied.
             # for tb in selected_boxes:
             #    print("CHAR POS:", tb['pos0'], tb['pos1'])
-            linked_positions = []
 
             pos0 = selected_boxes[0]['pos0']
             pos1 = selected_boxes[0]['pos1']
@@ -3474,6 +3504,7 @@ class DialogCodePdf(QtWidgets.QWidget):
                 except AttributeError as e:
                     self.metadata += str(e)
                 self.metadata += "\n"
+
     @staticmethod
     def get_image_type(stream_first_4_bytes) -> str:
         """Find out the image file type based on the magic number comparison of the first 4 (or 2) bytes.
@@ -3498,7 +3529,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         """Font, fontsize and color info of LTChar if available, otherwise defaults
         """
 
-        #print(ob, ob.__dir__())
+        # print(ob, ob.__dir__())
         color = 0  # Default Black
         fontname = "ITC Officina Sans Book Regular"
         fontsize = 10
@@ -3649,8 +3680,8 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
         super(GraphicsScene, self).mousePressEvent(mouseEvent)
         position = QtCore.QPointF(mouseEvent.scenePos())
         print(position.x(), position.y())
-        #logger.debug("pressed here: " + str(position.x()) + ", " + str(position.y()))
-        for item in self.items(): # item is QGraphicsProxyWidget
+        # logger.debug("pressed here: " + str(position.x()) + ", " + str(position.y()))
+        for item in self.items():  # item is QGraphicsProxyWidget
             print(item)
 
     def mouseReleaseEvent(self, mouseEvent):
