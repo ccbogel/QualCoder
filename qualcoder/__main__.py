@@ -191,7 +191,8 @@ class App(object):
         self.last_export_directory = ""
         self.delete_backup = True
         self.delete_backup_path_name = ""
-        self.confighome = os.path.expanduser('~/.qualcoder')
+        self.userhome = os.path.expanduser('~')
+        self.confighome = os.path.join(self.userhome, '.qualcoder')
         self.configpath = os.path.join(self.confighome, 'config.ini')
         self.persist_path = os.path.join(self.confighome, 'recent_projects.txt')
         self.settings, self.ai_models = self.load_settings()
@@ -1887,8 +1888,10 @@ Click "Yes" to start now.')
         """ Create edit and delete codes. Apply and remove codes to the image (or regions)
         """
 
-        files = self.app.get_image_filenames()
-        if len(files) > 0:
+        image_files = self.app.get_image_filenames()
+        pdf_files = self.app.get_pdf_filenames()
+
+        if len(image_files) + len(pdf_files) > 0:
             self.ui.label_coding.hide()
             ui = DialogCodeImage(self.app, self.ui.textEdit, self.ui.tab_reports)
             ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
@@ -2083,6 +2086,8 @@ Click "Yes" to start now.')
         v6 has tables for storage of graph items.
         v7 has memo links from graph items (text/image/av to coding memos).
         v8 has table for ris bibliography data.
+        v9 has project.recently_used_codes text')  # code ids list split by a space
+        v10 has cpde_image.pdf_page integer added
         """
 
         self.journal_display = None
@@ -2132,7 +2137,7 @@ Click "Yes" to start now.')
             "owner text, date text, av_text_id integer, risid integer, unique(name))")
         cur.execute(
             "CREATE TABLE code_image (imid integer primary key,id integer,x1 integer, y1 integer, width integer, "
-            "height integer, cid integer, memo text, date text, owner text, important integer)")
+            "height integer, cid integer, memo text, date text, owner text, important integer, pdf_page integer)")
         cur.execute(
             "CREATE TABLE code_av (avid integer primary key,id integer,pos0 integer, pos1 integer, cid integer, "
             "memo text, date text, owner text, important integer)")
@@ -2331,7 +2336,7 @@ Click "Yes" to start now.')
         try:
             if self.lock_file_path != '':
                 os.remove(self.lock_file_path)
-        except Exception as e_:  # TODO determine specific exception type to add in here, so printing e_
+        except Exception as e_:
             print("delete_lock_file", e_)
             logger.debug(e_)
 
@@ -2368,7 +2373,7 @@ Click "Yes" to start now.')
                 self.heartbeat_worker.stop()
                 if wait:
                     self.heartbeat_thread.wait()  # Wait for the thread to properly finish
-            except Exception as e_:  # TODO determine actual exceptions
+            except Exception as e_:
                 print(e_)
                 logger.debug(e_)
         self.delete_lock_file()
@@ -2672,10 +2677,18 @@ Click "Yes" to start now.')
         try:
             cur.execute("select recently_used_codes from project")
         except sqlite3.OperationalError:
-            cur.execute('ALTER TABLE project ADD recently_used_codes text')  # codes ids split by space
+            cur.execute('ALTER TABLE project ADD recently_used_codes text')  # code ids list split by a space
             cur.execute('update project set databaseversion="v9", about=?', [qualcoder_version])
             self.app.conn.commit()
             self.ui.textEdit.append(_("Updating database to version") + " v9")
+        # Database version v10
+        try:
+            cur.execute("select pdf_page from code_image")
+        except sqlite3.OperationalError:
+            cur.execute('ALTER TABLE code_image ADD pdf_page integer')  #
+            cur.execute('update project set databaseversion="v9", about=?', [qualcoder_version])
+            self.app.conn.commit()
+            self.ui.textEdit.append(_("Updating database to version") + " v10")
 
         # Save a date and 24 hour stamped backup
         if self.app.settings['backup_on_open'] == 'True' and newproject == "no":
