@@ -21,6 +21,7 @@ https://qualcoder.wordpress.com/
 
 from copy import deepcopy
 import datetime
+import fitz
 import html
 from io import BytesIO
 import logging
@@ -75,6 +76,8 @@ class DialogCodeImage(QtWidgets.QDialog):
     undo_deleted_code = None  # Undo last deleted code
     degrees = 0  # For image rotation
     show_code_captions = 0  # 0 = no, 1 = code name, 2 = codename + memo
+    pdf_page = None   # display at 1
+    pdf_total_pages = None  # Total pages in pdf
 
     def __init__(self, app, parent_textedit, tab_reports):
         """ Show list of image files.
@@ -101,6 +104,8 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.get_codes_and_categories()
         self.tree_sort_option = "all asc"
         self.show_code_captions = 0
+        self.pdf_page = None
+        self.pdf_total_pages = None
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_code_image()
         self.ui.setupUi(self)
@@ -161,6 +166,16 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.ui.pushButton_rotate_counter.pressed.connect(self.rotate_counter)
         self.ui.pushButton_rotate_clock.setIcon(qta.icon('mdi6.file-rotate-right-outline', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_rotate_clock.pressed.connect(self.rotate_clockwise)
+        # Pdf widgets
+        self.pdf_controls_toggle()
+        self.ui.pushButton_next_page.setIcon(qta.icon('mdi6.arrow-right', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_next_page.pressed.connect(self.next_page)
+        self.ui.pushButton_previous_page.setIcon(qta.icon('mdi6.arrow-left', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_previous_page.pressed.connect(self.previous_page)
+        self.ui.pushButton_last_page.setIcon(qta.icon('mdi6.arrow-collapse-right', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_last_page.pressed.connect(self.last_page)
+        self.ui.pushButton_goto_page.setIcon(qta.icon('mdi6.book-search-outline', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_goto_page.pressed.connect(self.goto_page)
 
         try:
             s0 = int(self.app.settings['dialogcodeimage_splitter0'])
@@ -211,20 +226,30 @@ class DialogCodeImage(QtWidgets.QDialog):
         """
 
         self.code_areas = []
-        sql = "select imid,id,x1, y1, width, height, code_image.memo, code_image.date, code_image.owner, " \
-              "code_image.cid, important, code_name.name, code_name.color from code_image " \
-              "join code_name on code_name.cid=code_image.cid " \
-              " where code_image.id=? and code_image.owner=? and width > 0 and height > 0" \
-              " order by width*height desc"
         cur = self.app.conn.cursor()
-        cur.execute(sql, [self.file_['id'], self.app.settings['codername']])
+        if self.pdf_page is not None:
+            sql = "select imid,id,x1, y1, width, height, code_image.memo, code_image.date, code_image.owner, " \
+                  "code_image.cid, important, code_name.name, code_name.color, pdf_page from code_image " \
+                  "join code_name on code_name.cid=code_image.cid " \
+                  " where code_image.id=? and code_image.owner=? and width > 0 and height > 0 and pdf_page=?" \
+                  " order by width*height desc"
+            cur.execute(sql, [self.file_['id'], self.app.settings['codername'], self.pdf_page])
+        else:  # Images, jpg, png
+            sql = "select imid,id,x1, y1, width, height, code_image.memo, code_image.date, code_image.owner, " \
+                  "code_image.cid, important, code_name.name, code_name.color, pdf_page from code_image " \
+                  "join code_name on code_name.cid=code_image.cid " \
+                  " where code_image.id=? and code_image.owner=? and width > 0 and height > 0" \
+                  " order by width*height desc"
+            cur.execute(sql, [self.file_['id'], self.app.settings['codername']])
         results = cur.fetchall()
-        keys = 'imid', 'id', 'x1', 'y1', 'width', 'height', 'memo', 'date', 'owner', 'cid', 'important', 'name', 'color'
+        keys = 'imid', 'id', 'x1', 'y1', 'width', 'height', 'memo', 'date', 'owner', 'cid', 'important', 'name', \
+            'color', 'pdf_page'
         for row in results:
             self.code_areas.append(dict(zip(keys, row)))
 
     def get_files(self, ids=None):
-        """ Load the image file data. Exclude those image file data where there are bad links.
+        """ Load the image and pdf file data.
+        Exclude those image and pdf file data where there are bad links.
         Fill List widget with the files.
         param:
             ids : list of Integer ids to restrict files """
@@ -241,7 +266,9 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.ui.listWidget.clear()
         cur = self.app.conn.cursor()
         sql = "select name, id, memo, owner, date, mediapath from source where "
-        sql += "substr(mediapath,1,7) in ('/images', 'images:') " + bad_link_sql + " "
+        sql += "(substr(mediapath,1,7) in ('/images', 'images:')) or "
+        sql += "(lower(substr(mediapath, -4)) = '.pdf') "
+        sql += bad_link_sql + " "
         if ids:
             str_ids = list(map(str, ids))
             sql += " and id in (" + ",".join(str_ids) + ")"
@@ -639,23 +666,100 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.setWindowTitle(_("Image coding"))
         self.ui.pushButton_memo.setEnabled(False)
 
+    def pdf_controls_toggle(self, active=False):
+        """ Toggle pdf controls on or off depending on file selection. """
+
+        self.ui.pushButton_goto_page.setEnabled(active)
+        self.ui.pushButton_last_page.setEnabled(active)
+        self.ui.label_pages.setEnabled(active)
+        self.ui.pushButton_next_page.setEnabled(active)
+        self.ui.pushButton_previous_page.setEnabled(active)
+
+    def goto_page(self):
+        text, ok = QtWidgets.QInputDialog.getInt(None, 'Go to page', f'1 - {self.pdf_total_pages}')
+        if not ok or not text:
+            return
+        self.pdf_page = int(text) - 1
+        if self.pdf_page < 1:
+            self.pdf_page = 0
+        if self.pdf_page > self.pdf_total_pages - 1:
+            self.pdf_page = self.pdf_total_pages - 1
+        self.ui.label_pages.setText(f"{self.pdf_page + 1}/{self.pdf_total_pages}")
+        self.load_file()
+
+    def last_page(self):
+        self.pdf_page = self.pdf_total_pages - 1
+        self.ui.label_pages.setText(f"{self.pdf_page + 1}/{self.pdf_total_pages}")
+        self.load_file()
+
+    def next_page(self):
+        self.pdf_page += 1
+        if self.pdf_page > self.pdf_total_pages - 1:
+            self.pdf_page = self.pdf_total_pages - 1
+        self.ui.label_pages.setText(f"{self.pdf_page + 1}/{self.pdf_total_pages}")
+        self.load_file()
+
+    def previous_page(self):
+        self.pdf_page -= 1
+        if self.pdf_page < 0:
+            self.pdf_page = 0
+        self.ui.label_pages.setText(f"{self.pdf_page + 1}/{self.pdf_total_pages}")
+        self.load_file()
+
     def load_file(self):
         """ Add image to scene if it exists. If not exists clear the GUI and variables.
-        Called by: select_image_menu, file_selection_changed
+        Called by: select_image_menu, file_selection_changed, pdf page changed
         """
 
         self.degrees = 0
         self.ui.label_coded_area.setText("Coded area")
         self.ui.label_coded_area.setToolTip("")
-        source = self.app.project_path + self.file_['mediapath']
+        image = None
+        source_path = ""
+        # Images source
+        if self.file_['mediapath'][0:7] == "/images":
+            source_path = self.app.project_path + self.file_['mediapath']  # Internal
+            image = QtGui.QImage(source_path)
+            self.pdf_controls_toggle()
+            self.pdf_page = None
+            self.pdf_total_pages = None
+            self.ui.label_pages.setText("")
         if self.file_['mediapath'][0:7] == "images:":
-            source = self.file_['mediapath'][7:]
-        image = QtGui.QImage(source)
+            source_path = self.file_['mediapath'][7:]  # Linked
+            image = QtGui.QImage(source_path)
+            self.pdf_controls_toggle()
+            self.pdf_page = None
+            self.pdf_total_pages = None
+            self.ui.label_pages.setText("")
+
+        # PDF source
+        if self.file_['mediapath'][-4:].lower() == ".pdf":
+            if self.file_['mediapath'][:6] == "/docs/":
+                source_path = f"{self.app.project_path}/documents/{self.file_['mediapath'][6:]}"
+            if self.file_['mediapath'][:5] == "docs:":
+                source_path = self.file_['mediapath'][5:]
+            fitz_pdf = fitz.open(source_path)  # Use pymupdf to get page images
+            if not self.pdf_page:
+                self.pdf_page = 0
+            self.pdf_total_pages = 0
+            for page in fitz_pdf:
+                self.pdf_total_pages += 1
+                if page.number == self.pdf_page:
+                    # Only need the current page image of interest
+                    pixmap = page.get_pixmap()
+                    pixmap.save(os.path.join(self.app.confighome, f"tmp_pdf_page.png"))
+
+            source_path = os.path.join(self.app.confighome, f"tmp_pdf_page.png")
+            image = QtGui.QImage(source_path)
+            self.pdf_controls_toggle(True)
+            self.ui.label_pages.setText(f"{self.pdf_page + 1}/{self.pdf_total_pages}")
+
         if image.isNull():
             self.clear_file()
-            Message(self.app, _("Image Error"), _("Cannot open: ", "warning") + source).exec()
-            logger.warning("Cannot open image: " + source)
+            Message(self.app, _("Image Error"), _("Cannot open: ", "warning") + source_path).exec()
+            logger.warning("Cannot open image: " + source_path)
             return
+
         items = list(self.scene.items())
         for i in range(items.__len__()):
             self.scene.removeItem(items[i])
@@ -734,6 +838,14 @@ class DialogCodeImage(QtWidgets.QDialog):
 
         if self.file_ is None:
             return
+        # Error catch re pdf coded areas. some coded areas still present even if page changed by 1
+        if self.pdf_page is not None:
+            tmp_coded_areas = []
+            for area in self.code_areas:
+                if area['pdf_page'] == self.pdf_page:
+                    tmp_coded_areas.append(area)
+            self.code_areas = tmp_coded_areas
+
         for coded in self.code_areas:
             if coded['id'] == self.file_['id']:
                 color = None
@@ -1339,6 +1451,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         if self.degrees < 0:
             self.degrees = 270
         self.redraw_scene()
+
     def move_or_resize_coding(self, item):
         """ Move or resize a coding rectangle, in pixels.
 
@@ -1477,10 +1590,10 @@ class DialogCodeImage(QtWidgets.QDialog):
         item = self.undo_deleted_code
         cur = self.app.conn.cursor()
         cur.execute(
-            "insert into code_image (id,x1,y1,width,height,cid,memo,date,owner, important) "
-            "values(?,?,?,?,?,?,?,?,?,?)",
+            "insert into code_image (id,x1,y1,width,height,cid,memo,date,owner, important, pdf_page) "
+            "values(?,?,?,?,?,?,?,?,?,?,?)",
             (item['id'], item['x1'], item['y1'], item['width'], item['height'], item['cid'], item['memo'],
-             item['date'], item['owner'], item['important']))
+             item['date'], item['owner'], item['important'], item['pdf_page']))
         self.app.conn.commit()
         self.undo_deleted_code = []
         self.get_coded_areas()
@@ -1559,16 +1672,17 @@ class DialogCodeImage(QtWidgets.QDialog):
         item = {'imid': None, 'id': self.file_['id'], 'x1': x_unscaled, 'y1': y_unscaled,
                 'width': width_unscaled, 'height': height_unscaled, 'owner': self.app.settings['codername'],
                 'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),
-                'cid': cid, 'memo': '', 'important': None, 'name': code_name, 'color': '#777777'}
+                'cid': cid, 'memo': '', 'important': None, 'name': code_name, 'color': '#777777',
+                'pdf_page': self.pdf_page}
         for c in self.codes:
             if c['cid'] == cid:
                 item['color'] = c['color']
         cur = self.app.conn.cursor()
         cur.execute(
-            "insert into code_image (id,x1,y1,width,height,cid,memo,date,owner, important) values(?,?,?,?,?,?,?,?,?,"
-            "null)",
+            "insert into code_image (id,x1,y1,width,height,cid,memo,date,owner, important, pdf_page) values(?,?,?,?,?,?"
+            ",?,?,?,null,?)",
             (item['id'], item['x1'], item['y1'], item['width'], item['height'], cid, item['memo'],
-             item['date'], item['owner']))
+             item['date'], item['owner'], self.pdf_page))
         self.app.conn.commit()
         cur.execute("select last_insert_rowid()")
         imid = cur.fetchone()[0]
@@ -1753,7 +1867,8 @@ class DialogCodeImage(QtWidgets.QDialog):
 
             cur.execute("delete from code_name where cid=?", [old_cid, ])
             self.app.conn.commit()
-        except:
+        except Exception as e_:
+            print(e_)
             self.app.conn.rollback() # revert all changes 
             raise            
         self.parent_textEdit.append(msg)
