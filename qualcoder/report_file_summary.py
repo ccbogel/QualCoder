@@ -18,6 +18,7 @@ Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 """
 
+import fitz
 import logging
 import os
 from PIL import Image
@@ -28,7 +29,7 @@ import re
 from PyQt6 import QtCore, QtWidgets, QtGui
 
 from .GUI.ui_dialog_report_file_summary import Ui_Dialog_file_summary
-from .helpers import msecs_to_hours_mins_secs
+from .helpers import file_typer, msecs_to_hours_mins_secs
 
 # If VLC not installed, it will not crash
 vlc = None
@@ -107,16 +108,10 @@ class DialogReportFileSummary(QtWidgets.QDialog):
             res = cur.fetchone()
             if res is None:  # safety catch
                 res = [0]
-            tt = ""
-            if res[1] is None or res[1][0:5] == "docs:":
-                tt += _("Text file\n")
-                tt += _("Characters: ") + str(res[0])
-            if res[1] is not None and (res[1][0:7] == "images:" or res[1][0:7] == "/images"):
-                tt += _("Image")
-            if res[1] is not None and (res[1][0:6] == "audio:" or res[1][0:6] == "/audio"):
-                tt += _("Audio")
-            if res[1] is not None and (res[1][0:6] == "video:" or res[1][0:6] == "/video"):
-                tt += _("Video")
+            file_type = file_typer(res[1])
+            tt = file_type
+            if file_type == "text":
+                tt += "\n" + _("Characters: ") + str(res[0])
             cur.execute(sql_text_codings, [f['id']])
             txt_res = cur.fetchone()
             cur.execute(sql_av_codings, [f['id']])
@@ -124,12 +119,14 @@ class DialogReportFileSummary(QtWidgets.QDialog):
             cur.execute(sql_image_codings, [f['id']])
             img_res = cur.fetchone()
             tt += _("\nCodings: ")
-            if txt_res[0] > 0:
+            if file_type == "text":
                 tt += str(txt_res[0])
-            if av_res[0] > 0:
+            if file_type in ("audio", "video"):
                 tt += str(av_res[0])
-            if img_res[0] > 0:
+            if img_res[0] > 0 and file_type == "image":
                 tt += str(img_res[0])
+            if img_res[0] > 0 and file_type == "text":
+                tt += f"\nImage codings: {img_res[0]}"
             item = QtWidgets.QListWidgetItem(f['name'])
             if f['memo'] != "":
                 tt += _("\nMemo: ") + f['memo']
@@ -157,34 +154,29 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         res = cur.fetchone()
         text_ += f"ID: {file_['id']}  " + _("Date: ") + f"{res[0]}  " + _("Owner: ") + f"{res[1]}\n"
         media_path = ""
-        file_type = ""
-        if res[3] is None or res[3] == "":
+        if res[3] is None or res[3] == "" or res[3][:6] == "/docs/":
             media_path = _("Internal text document")
-            file_type = "text"
         elif res[3][0:5] == "docs:":
             media_path = _("External text document: ") + res[3][5:]
-            file_type = "text"
         elif res[3][0:6] == "audio:":
             media_path = _("External audio file: ") + res[3][6:]
-            file_type = "audio"
         elif res[3][0:7] == "/audio/":
             media_path = _("Internal audio file")
-            file_type = "audio"
         elif res[3][0:6] == "video:":
             media_path = _("External video file: ") + res[3][6:]
-            file_type = "video"
         elif res[3][0:7] == "/video/":
             media_path = _("Internal video file")
-            file_type = "video"
         elif res[3][0:7] == "images:":
             media_path = _("External image file: ") + res[3][7:]
-            file_type = "image"
         elif res[3][0:8] == "/images/":
             media_path = _("Internal image file")
-            file_type = "image"
         text_ += _("Media path: ") + f"{media_path}\n"
+
+        file_type = file_typer(res[3])
         if file_type == "text":
             text_ += self.text_statistics(file_['id'])
+        if file_type == "text" and res[3] is not None and res[3][-4:].lower() == ".pdf":
+            text_ += self.image_statistics(file_['id'])
         if file_type == "image":
             text_ += self.image_statistics(file_['id'])
         if file_type == "audio":
@@ -346,10 +338,10 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         return text_
 
     def image_statistics(self, id_):
-        """ Get image statistics for image file
+        """ Get image statistics for image file, or from image of pdf page.
         param: id: Integer """
 
-        text_ = _("METADATA:") + "\n"
+        text_ = "\n" + _("METADATA:") + "\n"
         cur = self.app.conn.cursor()
         cur.execute("select mediapath from source where id=?", [id_])
         mediapath = cur.fetchone()[0]
@@ -358,6 +350,20 @@ class DialogReportFileSummary(QtWidgets.QDialog):
             abs_path = mediapath[7:]
         else:
             abs_path = self.app.project_path + mediapath
+        # Pdf image codings
+        pdf_path = ""
+        if mediapath[:6] == "/docs/":
+            pdf_path = f"{self.app.project_path}/documents/{mediapath[6:]}"
+        if mediapath[:5] == "docs:":
+            pdf_path = mediapath[5:]
+        if mediapath[-4:].lower() == ".pdf":
+            text_ = "\n\n" + _("PDF IMAGE DETAILS") + ":" + text_
+            fitz_pdf = fitz.open(pdf_path)
+            text_ += _("Pages") + f": {len(fitz_pdf)}\n"
+            pixmap = fitz_pdf[0].get_pixmap()  # Use first page and assume the remainder are the same size
+            abs_path = os.path.join(self.app.confighome, f"tmp_pdf_page.png")
+            pixmap.save(abs_path)
+
         # Image size and metadata
         image = Image.open(abs_path)
         w, h = image.size
@@ -392,7 +398,10 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         sql += "group by code_name.name, code_image.cid order by count(code_image.cid) desc"
         cur.execute(sql, [id_])
         res = cur.fetchall()
-        text_ += "\n\n" + _("CODE COUNTS:") + "\n"
+        if len(res) == 0:
+            text_ += "\n" + _("CODE COUNT:") + " 0"
+            return text_
+        text_ += "\n" + _("CODE COUNTS:") + "\n"
         # Calculate statistics
         for r in res:
             area = int(r[3] * r[4])
@@ -449,6 +458,9 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         sql += "group by code_name.name, code_text.cid order by count(code_text.cid) desc"
         cur.execute(sql, [id_])
         res = cur.fetchall()
+        if len(res) == 0:
+            text_ += "\n\n" + _("CODE COUNT:") + " 0"
+            return text_
         text_ += "\n\n" + _("CODE COUNTS:") + "\n"
         # Calculate code statistics
         for r in res:
