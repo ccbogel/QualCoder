@@ -95,9 +95,9 @@ class Ui_Dialog_Comparisons(object):
 
     def retranslateUi(self, Dialog_Comparisons):
         _translate = QtCore.QCoreApplication.translate
-        Dialog_Comparisons.setWindowTitle(_translate("Dialog_Comparisons", "Code Co-occurence"))
+        Dialog_Comparisons.setWindowTitle(_translate("Dialog_Comparisons", "Code Counts by file or case"))
         self.label_selections.setToolTip(_translate("Dialog_Comparisons", "<html><head/><body><p>Show the overlapping codes.</p></body></html>"))
-        self.label_selections.setText(_translate("Dialog_Comparisons", "Code comparison table"))
+        self.label_selections.setText(_translate("Dialog_Comparisons", "Code counts table"))
         self.pushButton_export.setToolTip(_translate("Dialog_Comparisons", "<html><head/><body><p>Export to file</p></body></html>"))
         self.checkBox_hide_blanks.setText(_translate("Dialog_Comparisons", "Hide blank lines"))
         self.pushButton_select_files.setToolTip(_translate("Dialog_Comparisons", "<html><head/><body><p>Select files</p></body></html>"))

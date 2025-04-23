@@ -388,7 +388,7 @@ class Ui_MainWindow(object):
         self.actionText_segments_by_codes.setText(_translate("MainWindow", "Codes by text segments"))
         self.actionAI_assisted_coding.setText(_translate("MainWindow", "AI assisted coding"))
         self.actionCode_co_occurrence.setText(_translate("MainWindow", "Code co-occurrence"))
-        self.actionCode_comparison_table.setText(_translate("MainWindow", "Code comparison table"))
+        self.actionCode_comparison_table.setText(_translate("MainWindow", "Code counts by file/case"))
 
 
 if __name__ == "__main__":
