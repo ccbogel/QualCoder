@@ -2114,7 +2114,6 @@ class DialogReportCodes(QtWidgets.QDialog):
                     path_ = os.path.join(self.app.confighome, f"tmp_pdf_page.png")
                     pixmap = page.get_pixmap()
                     pixmap.save(path_)
-        print("image path:", path_)
         document = text_edit.document()
         image = QtGui.QImageReader(path_).read()
         image = image.copy(int(img['x1']), int(img['y1']), int(img['width']), int(img['height']))
