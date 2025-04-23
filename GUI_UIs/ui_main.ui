@@ -596,7 +596,7 @@
   </action>
   <action name="actionCode_comparison_table">
    <property name="text">
-    <string>Code comparison table</string>
+    <string>Code counts by file/case</string>
    </property>
   </action>
  </widget>
