@@ -38,7 +38,9 @@ logger = logging.getLogger(__name__)
 
 
 class DialogReportCooccurrence(QtWidgets.QDialog):
-    """ Provide a co-occurrence report. """
+    """ Provide a co-occurrence report.
+     This shows overlapping and edge-connected codes against codes.
+    """
 
     app = None
     parent_tetEdit = None

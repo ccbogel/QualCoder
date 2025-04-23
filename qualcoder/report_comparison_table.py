@@ -38,7 +38,8 @@ logger = logging.getLogger(__name__)
 
 
 class DialogReportComparisonTable(QtWidgets.QDialog):
-    """ Provide a co-occurrence table with codes rows and files columns. """
+    """ Provides a table with codes as rows and files/cases as columns.
+    Code counts are displayed for each column, with a heat map colour applied. """
 
     def __init__(self, app, parent_text_edit):
         self.app = app
