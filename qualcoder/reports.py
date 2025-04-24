@@ -73,7 +73,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         self.ui.pushButton_exporttext.setIcon(qta.icon('mdi6.export-variant', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_export_excel.pressed.connect(self.export_excel_file)
         self.ui.pushButton_export_excel.setIcon(qta.icon('mdi6.export', options=[{'scale_factor': 1.3}]))
-        self.ui.pushButton_select_files.pressed.connect(self.select_files)
+        self.ui.pushButton_select_files.pressed.connect(self.select_files_button)
         font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
         font = f'font: {self.app.settings["treefontsize"]}pt "{self.app.settings["font"]}";'
@@ -83,7 +83,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         self.ui.radioButton.clicked.connect(self.sort_by_alphabet)
         self.ui.radioButton_2.clicked.connect(self.sort_by_totals)
 
-    def select_files(self):
+    def select_files_button(self):
         """ Report code frequencies for all files or selected files.
         Set:
             self.file_ids
@@ -95,6 +95,8 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         ui = DialogSelectItems(self.app, filenames, _("Select files to view"), "many")
         ok = ui.exec()
         tooltip = _("Files selected: ")
+        self.attributes = []
+        self.ui.pushButton_file_attributes.setToolTip(_("File Attributes"))
         self.file_ids = []
         if ok:
             selected_files = ui.get_selected()  # List of dictionaries
