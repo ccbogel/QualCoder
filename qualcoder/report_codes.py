@@ -119,7 +119,7 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.pushButton_run_report.clicked.connect(self.search)
         self.ui.pushButton_run_report.setIcon(qta.icon('mdi6.play', options=[{'scale_factor': 2}]))
         self.ui.label_exports.setPixmap(qta.icon('mdi6.export').pixmap(22, 22))
-        self.ui.pushButton_attributeselect.setIcon(qta.icon('mdi6.line-scan'))
+        self.ui.pushButton_attributeselect.setIcon(qta.icon('mdi6.variable'))
         self.ui.pushButton_search_next.setIcon(qta.icon('mdi6.arrow-right'))
         self.ui.pushButton_search_next.pressed.connect(self.search_results_next)
         options = ["", _("Top categories by case"), _("Top categories by file"), _("Categories by case"),
@@ -1196,18 +1196,18 @@ class DialogReportCodes(QtWidgets.QDialog):
         ok = attr_ui.exec()
         if not ok:
             self.attributes = temp_attributes
-            self.ui.pushButton_attributeselect.setIcon(qta.icon('mdi6.line-scan'))
+            self.ui.pushButton_attributeselect.setIcon(qta.icon('mdi6.variable'))
             self.ui.pushButton_attributeselect.setToolTip(_("Attributes"))
             if self.attributes:
-                self.ui.pushButton_attributeselect.setIcon(qta.icon('mdi6.variable'))
+                self.ui.pushButton_attributeselect.setIcon(qta.icon('mdi6.variable-box'))
             return
         # As List containing (1) list of attributes, within (2) [List of attributes, boolean type]
         self.attributes = attr_ui.parameters
         if len(self.attributes) == 1:  # The and /or boolean operator only
-            self.ui.pushButton_attributeselect.setIcon(qta.icon('mdi6.line-scan'))
+            self.ui.pushButton_attributeselect.setIcon(qta.icon('mdi6.variable'))
             self.ui.pushButton_attributeselect.setToolTip(_("Attributes"))
             return
-        self.ui.pushButton_attributeselect.setIcon(qta.icon('mdi6.variable'))
+        self.ui.pushButton_attributeselect.setIcon(qta.icon('mdi6.variable-box'))
         self.ui.pushButton_attributeselect.setToolTip(attr_ui.tooltip_msg)
         self.attributes_msg = attr_ui.tooltip_msg
         # Used ..?
