@@ -111,7 +111,7 @@ class Ui_Dialog_reportCodings(object):
         self.label_export.setWordWrap(True)
         self.label_export.setObjectName("label_export")
         self.checkBox_variables = QtWidgets.QCheckBox(parent=self.groupBox)
-        self.checkBox_variables.setGeometry(QtCore.QRect(860, 90, 191, 20))
+        self.checkBox_variables.setGeometry(QtCore.QRect(860, 90, 201, 20))
         self.checkBox_variables.setObjectName("checkBox_variables")
         self.pushButton_export_matrix = QtWidgets.QPushButton(parent=self.groupBox)
         self.pushButton_export_matrix.setGeometry(QtCore.QRect(892, 23, 151, 32))
