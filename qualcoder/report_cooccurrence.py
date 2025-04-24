@@ -57,15 +57,15 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         self.setStyleSheet(font)
         self.ui.pushButton_export.setIcon(qta.icon('mdi6.export', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_export.pressed.connect(self.export_to_excel)
-        self.ui.pushButton_select_files.setIcon(qta.icon('mdi6.file-multiple', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_select_files.setIcon(qta.icon('mdi6.file-multiple', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_select_files.pressed.connect(self.select_files)
         self.ui.pushButton_select_codes.setIcon(qta.icon('mdi6.text', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_select_codes.pressed.connect(self.select_codes)
         self.ui.pushButton_select_categories.setIcon(qta.icon('mdi6.file-tree', options=[{'scale_factor': 1.4}]))
-        self.ui.pushButton_select_categories.hide()
+        self.ui.pushButton_select_categories.pressed.connect(self.select_categories)
         self.ui.checkBox_hide_blanks.stateChanged.connect(self.show_or_hide_empty_rows_and_cols)
         tablefont = f'font: 10pt "{self.app.settings["font"]}";'
-        self.ui.tableWidget.setStyleSheet(tablefont)  # should be smaller
+        self.ui.tableWidget.setStyleSheet(tablefont)  # Should be smaller
         self.ui.tableWidget.cellClicked.connect(self.cell_selected)
         #self.ui.tableWidget.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         #self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
@@ -80,7 +80,7 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
             self.code_names_str += f"{c['name']}|"
             self.code_ids_str += f",{c['cid']}"
         self.code_ids_str = self.code_ids_str[1:]
-
+        self.selected_codes = deepcopy(self.codes)
         self.result_relations = []
         self.max_count = 0
         self.data_counts = []
@@ -121,26 +121,100 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         ok = ui.exec()
         if not ok:
             return
-        selected = ui.get_selected()
-        if not selected or selected[0]['name'] == '':
-            selected = deepcopy(self.codes)
+        self.selected_codes = ui.get_selected()
+        if not self.selected_codes or self.selected_codes[0]['name'] == '':
+            self.selected_codes = deepcopy(self.codes)
             Message(self.app, _("Codes selected"), _("All codes selected")).exec()
         else:
             msg = ""
-            for s in selected:
+            for s in self.selected_codes:
                 msg += f"{s['name']}\n"
             Message(self.app, _("Codes selected"), msg).exec()
 
         self.code_ids_str = ""
         self.code_names_str = ""
         self.code_names_list = []
-        for code_ in selected:
+        for code_ in self.selected_codes:
             self.code_names_list.append(code_['name'])
             self.code_names_str += f"{code_['name']}|"
             self.code_ids_str += f",{code_['cid']}"
         self.code_ids_str = self.code_ids_str[1:]
-
         self.process_data()
+
+    def select_categories(self):
+        """ Select categories and their codes for table. """
+
+        selection_list = [{'id': -1, 'name': ''}]
+        for category in self.categories:
+            selection_list.append(category)
+        ui = DialogSelectItems(self.app, selection_list, _("Select categories"), "multi")
+        ok = ui.exec()
+        if not ok:
+            return
+        selected_categories = ui.get_selected()
+        if not selected_categories or selected_categories[0]['name'] == '':
+            selected_categories = deepcopy(self.categories)
+            msg = _("All categories selected")
+        else:
+            msg = ""
+            for category in selected_categories:
+                msg += f"{category['name']}\n"
+
+        self.selected_codes = []
+        for category in selected_categories:
+            codes = self.codes_of_category(category)
+            for code_ in codes:
+                if code_ not in self.selected_codes:
+                    self.selected_codes.append(code_)
+        Message(self.app, _("Categories selected"), msg).exec()
+
+        self.code_names_list = []
+        self.code_names_str = ""
+        self.code_ids_str = ""
+        for code_ in self.selected_codes:
+            self.code_names_list.append(code_['name'])
+            self.code_names_str += f"{code_['name']}|"
+            self.code_ids_str += f",{code_['cid']}"
+        self.code_ids_str = self.code_ids_str[1:]
+        self.process_data()
+
+    def codes_of_category(self, node):
+        """ Get child codes of this category node.
+        Only keep the category or code name.
+
+        param: node : Dictionary of category
+
+        return: selected_codes : List of Code Dictionaries
+        """
+
+        child_cat_names = []
+        codes, categories = self.app.get_codes_categories()
+        """ Create a list of this category (node) and all its category children.
+        Maximum depth of 200. """
+        selected_categories = [node]
+        i = 0  # Ensure an exit from loop
+        new_model_changed = True
+        while categories != [] and new_model_changed and i < 200:
+            new_model_changed = False
+            append_list = []
+            for sel_cat in selected_categories:
+                for cat in categories:
+                    if cat['supercatid'] == sel_cat['catid']:
+                        append_list.append(cat)
+                        child_cat_names.append({'name': cat['name'], 'catid': cat['catid']})
+            for n in append_list:
+                selected_categories.append(n)
+                categories.remove(n)
+                new_model_changed = True
+            i += 1
+        categories = selected_categories
+        # Ignore codes that are not associated with these selected categories and sub-categories
+        selected_codes = []
+        for category in categories:
+            for code in codes:
+                if code['catid'] == category['catid']:
+                    selected_codes.append(code)
+        return selected_codes
 
     def process_data(self):
         """ Calculate the relations for selected codes for ALL coders (TODO only THIS coder).
@@ -156,14 +230,10 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         self.data_counts = []
         self.data_colors = []
         self.data_details = []
-        for row in self.codes:
-            self.data_counts.append([0] * len(self.codes))
-            self.data_colors.append([""] * len(self.codes))
-            self.data_details.append(["."] * len(self.codes))
-
-        '''print("Data details")
-        for r in self.data_details:
-            print(r)'''
+        for row in self.selected_codes:
+            self.data_counts.append([0] * len(self.selected_codes))
+            self.data_colors.append([""] * len(self.selected_codes))
+            self.data_details.append(["."] * len(self.selected_codes))
 
         self.max_count = 0
         for r in self.result_relations:
@@ -183,7 +253,7 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
                 self.data_details[row_pos][col_pos].append(res_list)
 
         # Color heat map for spread across 5 colours
-        colors = ["#F8E0E0", "#F6CECE", "#F5A9A9", "#F78181", "#FA5858"]  # light to dark red
+        colors = ["#F8E0E0", "#F6CECE", "#F5A9A9", "#F78181", "#FA5858"]  # Light to dark red
         for row, row_data in enumerate(self.data_counts):
             for col, item_data in enumerate(row_data):
                 if self.data_counts[row][col] > 0:
@@ -191,7 +261,6 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
                     if color_range_index < 0:
                         color_range_index = 0
                     self.data_colors[row][col] = colors[color_range_index]
-
         self.fill_table()
 
     def export_to_excel(self):
@@ -205,7 +274,7 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
 
         # Excel vertical and horizontal headers
         header = []
-        for code_ in self.codes:
+        for code_ in self.selected_codes:  # self.codes:
             name_split_50 = [code_['name'][y - 50:y] for y in range(50, len(code_['name']) + 50, 50)]
             # header_labels.append(code_['name'])  # OLD, need line separators
             header.append("\n".join(name_split_50))
@@ -368,9 +437,13 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         rows = self.ui.tableWidget.rowCount()
         for r in range(0, rows):
             self.ui.tableWidget.removeRow(0)
+        cols = self.ui.tableWidget.columnCount()
+        for c in range(0, cols):
+            self.ui.tableWidget.removeColumn(0)
 
         header_labels = []
-        for code_ in self.codes:
+        # Wrong for selected codes
+        for code_ in self.selected_codes:  # self.codes:
             name_split_50 = [code_['name'][y - 50:y] for y in range(50, len(code_['name']) + 50, 50)]
             # header_labels.append(code_['name'])  # OLD, needed line separators
             header_labels.append("\n".join(name_split_50))
