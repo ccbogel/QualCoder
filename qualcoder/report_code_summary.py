@@ -19,6 +19,7 @@ https://github.com/ccbogel/QualCoder
 """
 
 from copy import deepcopy
+import fitz
 import logging
 import os
 from PIL import Image
@@ -251,7 +252,7 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         for r in text_res:
             coders.append(r[4])
             sources.append(r[0])
-        img_sql = "select id, x1, y1, width, height, owner, ifnull(memo,'') from code_image where cid=?"
+        img_sql = "select id, x1, y1, width, height, owner, ifnull(memo,''), pdf_page from code_image where cid=?"
         cur.execute(img_sql, [code_['cid']])
         img_res = cur.fetchall()
         for r in img_res:
@@ -339,16 +340,17 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         return text
 
     def image_statistics(self, img_res):
-        """ Get image statistics (code count, image size ,average coded area) for code results.
+        """ Get image statistics (code count, image size, average coded area) for code results.
         param:
-            img_res: list of id, x1, y1, width, height, owner, memo
+            img_res: list of id, x1, y1, width, height, owner, memo, pdf_page
         """
 
         text = "\n" + _("IMAGE CODINGS: ") + f"{len(img_res)}\n"
         if not img_res:
             return text
         cur = self.app.conn.cursor()
-        sql = "select id, mediapath from source where (mediapath like '/images%' or mediapath like 'images:%') "
+        sql = "select id, mediapath from source where "\
+              "(mediapath like '/images%' or mediapath like 'images:%' or lower(mediapath) like '%.pdf') "
         cur.execute(sql)
         res = cur.fetchall()
         images = []
@@ -359,11 +361,29 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
                 abs_path = r[1][7:]
             else:
                 abs_path = self.app.project_path + r[1]
-            image['abspath'] = abs_path
-            # Image size
-            img = Image.open(abs_path)
-            w, h = img.size
-            image['area'] = w * h
+
+            # Pdf images
+            pdf_path = ""
+            if r[1][:6] == "/docs/":
+                pdf_path = f"{self.app.project_path}/documents/{r[1][6:]}"
+            if r[1][:5] == "docs:":
+                pdf_path = r[1][5:]
+            if pdf_path != "":
+                fitz_pdf = fitz.open(pdf_path)
+                page = fitz_pdf[0]  # Use first page and assume the remainder are the same size
+                pixmap = page.get_pixmap()
+                pdf_width = pixmap.width
+                pdf_height = pixmap.height
+
+            # Image size and area
+            if pdf_path == "":
+                image['abspath'] = abs_path
+                img = Image.open(abs_path)
+                w, h = img.size
+                image['area'] = w * h
+            else:
+                image['abspath'] = pdf_path
+                image['area'] = pdf_height * pdf_width
             images.append(image)
             total_area = 0
             count = 0
