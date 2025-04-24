@@ -292,7 +292,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_right_side_pane.pressed.connect(self.show_right_side_pane)
         self.ui.pushButton_delete_all_codes.setIcon(qta.icon('mdi6.delete-outline', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_delete_all_codes.pressed.connect(self.delete_all_codes_from_file)
-        self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.tag-outline', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_file_attributes.pressed.connect(self.get_files_from_attributes)
         self.ui.pushButton_important.setIcon(qta.icon('mdi6.star-outline', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_important.pressed.connect(self.show_important_coded)
@@ -494,23 +494,23 @@ class DialogCodeText(QtWidgets.QWidget):
         ok = ui.exec()
         if not ok:
             self.attributes = temp_attributes
-            self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.tag-outline', options=[{'scale_factor': 1.3}]))
+            self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
             self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
             if self.attributes:
-                self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.tag', options=[{'scale_factor': 1.3}]))
+                self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable-box', options=[{'scale_factor': 1.3}]))
             return
         self.attributes = ui.parameters
         if len(self.attributes) == 1:  # Boolean parameter, no attributes
-            self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.tag-outline', options=[{'scale_factor': 1.3}]))
+            self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
             self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
             self.get_files()
             return
         if not ui.result_file_ids:
             Message(self.app, _("Nothing found") + " " * 20, _("No matching files found")).exec()
-            self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.tag-outline', options=[{'scale_factor': 1.3}]))
+            self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
             self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
             return
-        self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.tag', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable-box', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_file_attributes.setToolTip(ui.tooltip_msg)
         self.get_files(ui.result_file_ids)
 

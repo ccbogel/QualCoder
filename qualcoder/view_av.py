@@ -177,7 +177,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.pushButton_document_memo.pressed.connect(self.active_file_memo)
         self.ui.pushButton_important.setIcon(qta.icon('mdi6.star-outline', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_important.pressed.connect(self.show_important_coded)
-        self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.tag-outline', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_file_attributes.pressed.connect(self.get_files_from_attributes)
 
         # Until any media is selected disable some widgets
@@ -395,23 +395,23 @@ class DialogCodeAV(QtWidgets.QDialog):
         ok = ui.exec()
         if not ok:
             self.attributes = temp_attributes
-            self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.tag-outline'))
+            self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable'))
             self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
             if self.attributes:
-                self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.tag'))
+                self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable-box'))
             return
         self.attributes = ui.parameters
         if len(self.attributes) == 1:
-            self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.tag-outline'))
+            self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable'))
             self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
             self.get_files()
             return
         if not ui.result_file_ids:
             Message(self.app, _("Nothing found") + " " * 20, _("No matching files found")).exec()
-            self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.tag-outline'))
+            self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable'))
             self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
             return
-        self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.tag'))
+        self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable-box'))
         self.ui.pushButton_file_attributes.setToolTip(ui.tooltip_msg)
         self.get_files(ui.result_file_ids)
 
