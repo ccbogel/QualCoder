@@ -19,7 +19,7 @@ https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 """
 
-from copy import copy
+from copy import copy, deepcopy
 import datetime
 import logging
 import openpyxl
@@ -36,6 +36,7 @@ from .GUI.ui_dialog_report_comparisons import Ui_Dialog_reportComparisons
 from .GUI.ui_dialog_report_code_frequencies import Ui_Dialog_reportCodeFrequencies
 from .helpers import Message, ExportDirectoryPathDialog
 from .information import DialogInformation
+from .report_attributes import DialogSelectAttributeParameters
 from .select_items import DialogSelectItems
 
 path = os.path.abspath(os.path.dirname(__file__))
@@ -43,7 +44,7 @@ logger = logging.getLogger(__name__)
 
 
 class DialogReportCodeFrequencies(QtWidgets.QDialog):
-    """ Show code and category frequencies, overall and for each coder.
+    """ Show code and category frequencies, overall and for each coder in tree widget.
     This is for text, image and av coding. """
 
     app = None
@@ -53,17 +54,21 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
     codes = []
     coded = []  # to refactor name
     file_ids = []
+    attributes = []
 
     def __init__(self, app, parent_textedit):
 
         self.app = app
         self.parent_textEdit = parent_textedit
+        self.attributes = []
         self.get_data()
         self.calculate_code_frequencies()
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_reportCodeFrequencies()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
+        self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_file_attributes.pressed.connect(self.get_files_from_attributes)
         self.ui.pushButton_exporttext.pressed.connect(self.export_text_file)
         self.ui.pushButton_exporttext.setIcon(qta.icon('mdi6.export-variant', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_export_excel.pressed.connect(self.export_excel_file)
@@ -79,7 +84,10 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         self.ui.radioButton_2.clicked.connect(self.sort_by_totals)
 
     def select_files(self):
-        """ Report code frequencies for all files or selected files. """
+        """ Report code frequencies for all files or selected files.
+        Set:
+            self.file_ids
+        """
 
         filenames = self.app.get_filenames()
         if len(filenames) == 0:
@@ -94,10 +102,66 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
             for row in selected_files:
                 self.file_ids.append(row['id'])
                 files_text += f"\n{row['name']}"
-            files_text = files_text[2:]
             tooltip += files_text
             if len(self.file_ids) > 0:
                 self.ui.pushButton_select_files.setToolTip(tooltip)
+        self.get_data()
+        self.calculate_code_frequencies()
+        self.fill_tree()
+
+    def get_files_from_attributes(self):
+        """ Select files based on attribute selections.
+        Attribute results are a dictionary of:
+        first item is a Boolean AND or OR list item
+        Followed by each attribute list item
+        Set:
+            self.file_ids
+        """
+
+        # Clear ui
+        self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
+        ui = DialogSelectAttributeParameters(self.app)
+
+        ui.fill_parameters(self.attributes)
+        temp_attributes = deepcopy(self.attributes)
+        self.attributes = []
+
+        ok = ui.exec()
+        if not ok:
+            self.attributes = temp_attributes
+            self.ui.pushButton_file_attributes.setIcon(
+                qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
+            self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
+            if self.attributes:
+                self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable-box', options=[{'scale_factor': 1.3}]))
+            return
+        self.attributes = ui.parameters
+        if len(self.attributes) == 1:  # Boolean parameter, no attributes selected
+            self.ui.pushButton_file_attributes.setIcon(
+                qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
+            self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
+            self.attributes = []
+            return
+        if not ui.result_file_ids:
+            Message(self.app, _("Nothing found") + " " * 20, _("No matching files found")).exec()
+            self.ui.pushButton_file_attributes.setIcon(
+                qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
+            self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
+            return
+        self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable-box', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_file_attributes.setToolTip(ui.tooltip_msg)
+        self.file_ids = ui.result_file_ids
+
+        msg = ""
+        filenames = self.app.get_filenames()
+        for i, f in enumerate(filenames):
+            if f['id'] in ui.result_file_ids:
+                if i < 20:
+                    msg += f"\n{f['name']}"
+        if len(ui.result_file_ids) > 20:
+            msg += f"\nand more. Total files: {len(ui.result_file_ids)}"
+        Message(self.app, _("Files selected by attributes"), msg).exec()
+
         self.get_data()
         self.calculate_code_frequencies()
         self.fill_tree()
