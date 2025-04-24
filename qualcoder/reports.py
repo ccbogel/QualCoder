@@ -152,6 +152,8 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         self.ui.pushButton_file_attributes.setToolTip(ui.tooltip_msg)
         self.file_ids = ui.result_file_ids
 
+        self.ui.pushButton_select_files.setToolTip(_("Select files"))
+
         msg = ""
         filenames = self.app.get_filenames()
         for i, f in enumerate(filenames):
