@@ -31,6 +31,7 @@ from PyQt6.QtCore import Qt
 
 from .GUI.ui_dialog_report_code_summary import Ui_Dialog_code_summary
 from .color_selector import TextColor
+from .simple_wordcloud import stopwords
 
 # If VLC not installed, it will not crash
 vlc = None
@@ -304,6 +305,9 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
             total_chars += len(t[1])
             fulltext += f"{t[1]} "
         avg_chars = total_chars / len(text_res)
+        text += _("Total characters: ") + f"{total_chars:,d}"
+        text += "  " + _("Average characters: ") + f"{int(avg_chars)}\n"
+
         # Remove punctuation. Convert to lower case
         chars = ""
         for c in range(0, len(fulltext)):
@@ -312,21 +316,26 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
             else:
                 chars += " "
         chars = chars.lower()
-        word_list = chars.split()
+        word_list_with_stopwords = chars.split()
+        word_list = []
+        for word in word_list_with_stopwords:
+            if word not in stopwords:
+                word_list.append(word)
         msg = _(
-            "Word calculations: Words use alphabet characters and include the apostrophe."
-            "All other characters are word separators")
+            "Word calculations: Words use alphabet characters and include the apostrophe. "
+            "All other characters are word separators. Excludes English stopwords")
         text += f"{msg}\n"
         text += _("Words: ") + f"{len(word_list):,d}\n"
+
         # Word frequency
         d = {}
         for word in word_list:
             d[word] = d.get(word, 0) + 1  # get(key, value if not present)
-        # https://codeburst.io/python-basics-11-word-count-filter-out-punctuation-dictionary-manipulation-and-sorting-lists-3f6c55420855
         word_freq = []
         for key, value in d.items():
             word_freq.append((value, key))
         word_freq.sort(reverse=True)
+
         text += _("Unique words: ") + f"{len(word_freq)}\n"
         # Top 100 or maximum of less than 100
         max_count = len(word_freq)
@@ -335,8 +344,7 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         text += _("Top 100 words") + "\n"
         for i in range(0, max_count):
             text += f"{word_freq[i][1]}   {word_freq[i][0]} | "
-        text += "\n" + _("Total characters: ") + f"{total_chars:,d}"
-        text += "  " + _("Average characters: ") + f"{int(avg_chars)}\n"
+        text += "\n"
         return text
 
     def image_statistics(self, img_res):
@@ -363,6 +371,8 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
                 abs_path = self.app.project_path + r[1]
 
             # Pdf images
+            pdf_width = 0
+            pdf_height = 0
             pdf_path = ""
             if r[1][:6] == "/docs/":
                 pdf_path = f"{self.app.project_path}/documents/{r[1][6:]}"
