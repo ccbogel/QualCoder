@@ -497,6 +497,33 @@ class App(object):
             res.append({'id': row[0], 'name': row[1], 'memo': row[2]})
         return res
 
+    def get_image_and_pdf_filenames(self, ids=None):
+        """ Get filenames of image and pdf files.
+        Args:
+            ids: list of Integer ids for a restricted list of files, or Nonew.
+        Returns:
+            List of dictionaries of id, name, memo
+        """
+
+        if ids is None:
+            ids = []
+
+        sql = "select id, name, ifnull(memo,'') from source where "
+        sql += "(substr(mediapath,1,7) in ('/images', 'images:')) or "
+        sql += "(lower(substr(mediapath, -4)) = '.pdf') "
+
+        if ids:
+            ids_str = ",".join(map(str, ids))
+            sql += f" and id in ({ids_str})"
+        sql += " order by lower(name)"
+        cur = self.conn.cursor()
+        cur.execute(sql)
+        result = cur.fetchall()
+        res = []
+        for row in result:
+            res.append({'id': row[0], 'name': row[1], 'memo': row[2]})
+        return res
+
     def get_av_filenames(self, ids=None):
         """ Get filenames of audio video files only.
         Args:
@@ -2087,7 +2114,8 @@ Click "Yes" to start now.')
         v7 has memo links from graph items (text/image/av to coding memos).
         v8 has table for ris bibliography data.
         v9 has project.recently_used_codes text')  # code ids list split by a space
-        v10 has cpde_image.pdf_page integer added
+        v10 has code_image.pdf_page integer added
+        v11 has gr_pix_item.pdf_page integer added
         """
 
         self.journal_display = None
@@ -2194,12 +2222,12 @@ Click "Yes" to start now.')
                     "linewidth real, linetype text);")
         cur.execute("CREATE TABLE gr_pix_item (grpixid integer primary key, grid integer, imid integer,"
                     "x integer, y integer, px integer, py integer, w integer, h integer, filepath text,"
-                    "tooltip text);")
+                    "tooltip text, pdf_page integer);")
         cur.execute("CREATE TABLE gr_av_item (gr_avid integer primary key, grid integer, avid integer,"
                     "x integer, y integer, pos0 integer, pos1 integer, filepath text, tooltip text, color text);")
         cur.execute("CREATE TABLE ris (risid integer, tag text, longtag text, value text);")
         cur.execute("INSERT INTO project VALUES(?,?,?,?,?,?,?,?)",
-                    ('v9', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', qualcoder_version, 0,
+                    ('v11', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', qualcoder_version, 0,
                      0, self.app.settings['codername'], ""))
         self.app.conn.commit()
         try:
@@ -2689,6 +2717,14 @@ Click "Yes" to start now.')
             cur.execute('update project set databaseversion="v9", about=?', [qualcoder_version])
             self.app.conn.commit()
             self.ui.textEdit.append(_("Updating database to version") + " v10")
+        # Database version v11
+        try:
+            cur.execute("select pdf_page from gr_pix_item")
+        except sqlite3.OperationalError:
+            cur.execute('ALTER TABLE gr_pix_item ADD pdf_page integer')  #
+            cur.execute('update project set databaseversion="v11", about=?', [qualcoder_version])
+            self.app.conn.commit()
+            self.ui.textEdit.append(_("Updating database to version") + " v11")
 
         # Save a date and 24 hour stamped backup
         if self.app.settings['backup_on_open'] == 'True' and newproject == "no":
