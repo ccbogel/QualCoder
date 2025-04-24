@@ -19,7 +19,7 @@ https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 """
 
-from copy import copy
+from copy import copy, deepcopy
 import logging
 import openpyxl
 import os
@@ -53,6 +53,7 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
     results_display = []
     excluded_codes = []
     excluded_icon = None
+    attributes = []  # File selection by attributes
 
     def __init__(self, app, parent_textedit):
 
@@ -64,6 +65,7 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         self.ui = Ui_DialogMatchingTextSegments()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
+        self.ui.checkBox_any_matches.setChecked(True)
         self.ui.pushButton_run.setIcon(qta.icon('mdi6.play', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_export.setIcon(qta.icon('mdi6.export', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_export.pressed.connect(self.export_excel_file)
@@ -93,7 +95,7 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
         self.get_files_fill_list_widget()
         self.ui.listWidget_files.setSelectionMode(QtWidgets.QListWidget.SelectionMode.ExtendedSelection)
-        self.ui.pushButton_file_filter.pressed.connect(self.select_files_by_parameters)
+        self.ui.pushButton_file_filter.pressed.connect(self.select_files_from_attributes)
         self.ui.pushButton_run.pressed.connect(self.get_exact_text_matches)
         self.ui.tableWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
@@ -119,7 +121,7 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         """
 
         self.ui.listWidget_files.clear()
-        self.files = self.app.get_filenames()
+        self.files = self.app.get_text_filenames()
         # Fill additional details about each file in the memo
         cur = self.app.conn.cursor()
         sql = "select length(fulltext), mediapath from source where id=?"
@@ -157,10 +159,49 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
             item.setToolTip(tt)
             self.ui.listWidget_files.addItem(item)
 
-    def select_files_by_parameters(self):
-        """ Select files for report, by using file attributes. """
+    def select_files_from_attributes(self):
+        """ Select files based on attribute selections.
+        Attribute results are a dictionary of:
+        first item is a Boolean AND or OR list item
+        Followed by each attribute list item
+        """
 
-        Message(self.app, _('Work to do'), "Work in progress", "warning").exec()
+        # Clear ui
+        self.ui.pushButton_file_filter.setToolTip(_("Attributes"))
+        ui = DialogSelectAttributeParameters(self.app)
+        ui.fill_parameters(self.attributes)
+        temp_attributes = deepcopy(self.attributes)
+        self.attributes = []
+        ok = ui.exec()
+        if not ok:
+            self.attributes = temp_attributes
+            self.ui.pushButton_file_filter.setIcon(
+                qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
+            self.ui.pushButton_file_filter.setToolTip(_("Attributes"))
+            if self.attributes:
+                self.ui.pushButton_file_filter.setIcon(qta.icon('mdi6.variable-box', options=[{'scale_factor': 1.3}]))
+            return
+        self.attributes = ui.parameters
+        if len(self.attributes) == 1:  # Boolean parameter, no attributes
+            self.ui.pushButton_file_filter.setIcon(
+                qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
+            self.ui.pushButton_file_filter.setToolTip(_("Attributes"))
+            self.get_files_fill_list_widget()
+            return
+        if not ui.result_file_ids:
+            Message(self.app, _("Nothing found") + " " * 20, _("No matching files found")).exec()
+            self.ui.pushButton_file_filter.setIcon(
+                qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
+            self.ui.pushButton_file_filter.setToolTip(_("Attributes"))
+            return
+        self.ui.pushButton_file_filter.setIcon(qta.icon('mdi6.variable-box', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_file_filter.setToolTip(ui.tooltip_msg)
+
+        for i in range(self.ui.listWidget_files.count()):
+            item = self.ui.listWidget_files.item(i)
+            for f in self.files:
+                if f['name'] == item.text() and f['id'] in ui.result_file_ids:
+                    item.setSelected(True)
 
     def get_exact_text_matches(self):
         """ Use selected, coder, selected files and two or more codes.
@@ -173,7 +214,7 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         file_ids = []
         for file_item in self.ui.listWidget_files.selectedItems():
             for f in self.files:
-                print(file_item.text(), f['name'])
+                # print(file_item.text(), f['name'])
                 if f['name'] == file_item.text():
                     file_ids.append(f['id'])
         if not file_ids:
