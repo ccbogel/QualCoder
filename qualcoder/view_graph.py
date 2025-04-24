@@ -21,11 +21,12 @@ https://qualcoder.wordpress.com/
 
 from copy import deepcopy
 import datetime
+import fitz
 import logging
 from math import atan2, pi
 import os
-from PIL import Image, ImageFont, ImageDraw
-from PIL.ImageQt import ImageQt
+# from PIL import Image, ImageFont, ImageDraw
+# from PIL.ImageQt import ImageQt
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 import sqlite3
 
@@ -107,7 +108,7 @@ class ViewGraph(QDialog):
         self.ui.pushButton_deletegraph.pressed.connect(self.delete_saved_graph)
         self.ui.pushButton_codes_of_text.setIcon(qta.icon('mdi6.text', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_codes_of_text.pressed.connect(self.add_coded_text_of_text_files)
-        if not self.app.get_image_filenames():
+        if not self.app.get_image_and_pdf_filenames():
             self.ui.pushButton_codes_of_images.setEnabled(False)
         self.ui.pushButton_codes_of_images.setIcon(qta.icon('mdi6.image-outline', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_codes_of_images.pressed.connect(self.add_codes_of_image_files)
@@ -536,7 +537,7 @@ class ViewGraph(QDialog):
         """
 
         # Select image file
-        files_wth_names = self.app.get_image_filenames()
+        files_wth_names = self.app.get_image_and_pdf_filenames()
         ui = DialogSelectItems(self.app, files_wth_names, _("Select image files"), "single")
         ok = ui.exec()
         if not ok:
@@ -563,7 +564,7 @@ class ViewGraph(QDialog):
         codings = []
 
         for code in selected_codes:
-            sql = "select cid,id,x1,y1,width,height,ifnull(memo,''), imid from code_image where cid=? and id=?"
+            sql = "select cid,id,x1,y1,width,height,ifnull(memo,''), imid, pdf_page from code_image where cid=? and id=?"
             cur.execute(sql, [code['cid'], selected_file['id']])
             res = cur.fetchall()
             for r in res:
@@ -578,7 +579,7 @@ class ViewGraph(QDialog):
                     codings.append({'cid': r[0], 'fid': r[1], 'x': int(r[2]), 'y': int(r[3]), 'width': int(r[4]),
                                     'height': int(r[5]), 'memo': r[6], 'filename': selected_file['name'],
                                     'codename': code['name'], 'name': name,
-                                    'path': selected_file['path'], 'imid': r[7]})
+                                    'path': selected_file['path'], 'imid': r[7], 'pdf_page': r[8]})
         if not codings:
             Message(self.app, _("No codes"), _("No coded segments for selection")).exec()
             return
@@ -590,7 +591,8 @@ class ViewGraph(QDialog):
         for s in selected_codings:
             x += 10
             y += 10
-            item = PixmapGraphicsItem(self.app, s['imid'], x, y, s['x'], s['y'], s['width'], s['height'], s['path'])
+            item = PixmapGraphicsItem(self.app, s['imid'], x, y, s['x'], s['y'], s['width'], s['height'], s['path'],
+                                      None, s['pdf_page'])
             msg = f"IMID:{s['imid']} " + _("File: ") + f"{s['filename']}\n" + _("Code: ") + f"{s['codename']}\n"
             msg += _("Memo: ") + s['memo']
             item.setToolTip(msg)
@@ -1064,10 +1066,10 @@ class ViewGraph(QDialog):
                     cur.execute(sql,
                                 [grid, i.pos().x(), i.pos().y(), i.file_id, i.font_size, i.bold, i.color, i.toPlainText()])
                 if isinstance(i, PixmapGraphicsItem):
-                    sql = "insert into gr_pix_item (grid,imid,x,y,px,py,w,h,filepath,tooltip) values " \
-                        "(?,?,?,?,?,?,?,?,?,?)"
+                    sql = "insert into gr_pix_item (grid,imid,x,y,px,py,w,h,filepath,tooltip,pdf_page) values " \
+                        "(?,?,?,?,?,?,?,?,?,?,?)"
                     cur.execute(sql, [grid, i.imid, i.pos().x(), i.pos().y(), i.px, i.py, i.pwidth, i.pheight, i.path_,
-                                    i.toolTip()])
+                                    i.toolTip(), i.pdf_page])
                 if isinstance(i, AVGraphicsItem):
                     sql = "insert into gr_av_item (grid,avid,x,y,pos0,pos1,filepath,tooltip, color) values " \
                         "(?,?,?,?,?,?,?,?,?)"
@@ -1623,12 +1625,13 @@ class ViewGraph(QDialog):
         """
 
         err_msg = ""
-        sql_pix = "select imid, x, y, px,py,w,h,filepath, tooltip from gr_pix_item where grid=?"
+        sql_pix = "select imid, x,y, px,py ,w,h, filepath, tooltip, pdf_page from gr_pix_item where grid=?"
         cur = self.app.conn.cursor()
         cur.execute(sql_pix, [grid])
         res = cur.fetchall()
         for i in res:
-            item = PixmapGraphicsItem(self.app, i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7])
+            # app, imid=-1, x=10, y=10, px=0, py=0, pwidth=0, pheight=0, path_="", grpixid=None, pdf_page=None
+            item = PixmapGraphicsItem(self.app, i[0], i[1], i[2], i[3], i[4], i[5], i[6], i[7], grid, i[9])
             if i[8] != "":
                 item.setToolTip(i[8])
             self.scene.addItem(item)
@@ -2692,7 +2695,7 @@ class FreeLineGraphicsItem(QtWidgets.QGraphicsPolygonItem):
 
 class XFreeLineGraphicsItem(QtWidgets.QGraphicsLineItem):
     """ Takes the coordinate from two TextGraphicsItems.
-    OLD. Replaced with arrowhead line: FreeLineGraphicsItem. """
+    OLD  -DONT USE. Replaced with arrowhead line: FreeLineGraphicsItem. """
 
     from_widget = None
     from_pos = None
@@ -2949,7 +2952,7 @@ class AVGraphicsItem(QtWidgets.QGraphicsPixmapItem):
 
 
 class PixmapGraphicsItem(QtWidgets.QGraphicsPixmapItem):
-    """ Coded pixmap.
+    """ Coded pixmap. Uses Images and PDF image files.
     Maximum size of 200 pixels high and wide. """
 
     app = None
@@ -2964,12 +2967,12 @@ class PixmapGraphicsItem(QtWidgets.QGraphicsPixmapItem):
     pwidth = 0
     pheight = 0
     path_ = ""
+    pdf_page = None
     MAX_WIDTH = 300
     MAX_HEIGHT = 300
-    # For db stored free pixmap graph items
-    grpixid = None
+    grpixid = None  # id for database stored free pixmap graph items
 
-    def __init__(self, app, imid=-1, x=10, y=10, px=0, py=0, pwidth=0, pheight=0, path_="", grpixid=None):
+    def __init__(self, app, imid=-1, x=10, y=10, px=0, py=0, pwidth=0, pheight=0, path_="", grpixid=None, pdf_page=None):
         """ pixmap object.
          param:
             app  : the main App class
@@ -2981,7 +2984,8 @@ class PixmapGraphicsItem(QtWidgets.QGraphicsPixmapItem):
             pwidth : Integer
             pheight : Integer
             imid : Integer code_image primary key
-            grpixid
+            grpixid : None or Integer from gr_pix_item table
+            pdf_page : For Pdf images
          """
 
         super(PixmapGraphicsItem, self).__init__(None)
@@ -2992,14 +2996,32 @@ class PixmapGraphicsItem(QtWidgets.QGraphicsPixmapItem):
         self.py = py
         self.pwidth = pwidth
         self.pheight = pheight
-        self.grpixid = grpixid
         self.path_ = path_
+        self.grpixid = grpixid  # gr_pix_item table id
+        self.pdf_page = pdf_page
+
+        # Image jpg, png
         abs_path_ = self.app.project_path + path_
         if path_[0:7] == "images:":
             abs_path_ = path_[7:]
+
+        # Pdf image
+        if self.pdf_page is not None:
+            source_path = ""
+            if path_[:6] == "/docs/":
+                source_path = f"{self.app.project_path}/documents/{path_[6:]}"
+            if path_[:5] == "docs:":
+                source_path = path_[5:]
+            fitz_pdf = fitz.open(source_path)
+            page = fitz_pdf[self.pdf_page]
+            pixmap = page.get_pixmap()
+            abs_path_ = os.path.join(self.app.confighome, f"tmp_pdf_page.png")
+            pixmap.save(abs_path_)
+
         image = QtGui.QImageReader(abs_path_).read()
         image = image.copy(int(px), int(py), int(pwidth), int(pheight))
-        # Scale to max 200 wide or high. perhaps add option to change maximum limit?
+
+        # Scale to max 200 wide or high. (TODO Perhaps add option to change maximum limits)
         scaler_w = 1.0
         scaler_h = 1.0
         if image.width() > 200:
