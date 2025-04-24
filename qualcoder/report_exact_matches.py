@@ -23,7 +23,7 @@ from copy import copy
 import logging
 import openpyxl
 import os
-import qtawesome as qta
+import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 
 from PyQt6 import QtGui, QtWidgets, QtCore
 from PyQt6.QtCore import Qt
@@ -32,6 +32,7 @@ from PyQt6.QtGui import QBrush
 from .color_selector import TextColor
 from .GUI.ui_report_matching_segments import Ui_DialogMatchingTextSegments
 from .helpers import DialogCodeInText, Message
+from .report_attributes import DialogSelectAttributeParameters
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -66,6 +67,7 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         self.ui.pushButton_run.setIcon(qta.icon('mdi6.play', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_export.setIcon(qta.icon('mdi6.export', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_export.pressed.connect(self.export_excel_file)
+        self.ui.pushButton_file_filter.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
         self.excluded_icon = qta.icon('mdi6.window-close')
         self.get_data()
 
@@ -91,6 +93,7 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
         self.get_files_fill_list_widget()
         self.ui.listWidget_files.setSelectionMode(QtWidgets.QListWidget.SelectionMode.ExtendedSelection)
+        self.ui.pushButton_file_filter.pressed.connect(self.select_files_by_parameters)
         self.ui.pushButton_run.pressed.connect(self.get_exact_text_matches)
         self.ui.tableWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
@@ -153,6 +156,11 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
                 tt += _("\nMemo: ") + f['memo']
             item.setToolTip(tt)
             self.ui.listWidget_files.addItem(item)
+
+    def select_files_by_parameters(self):
+        """ Select files for report, by using file attributes. """
+
+        Message(self.app, _('Work to do'), "Work in progress", "warning").exec()
 
     def get_exact_text_matches(self):
         """ Use selected, coder, selected files and two or more codes.
