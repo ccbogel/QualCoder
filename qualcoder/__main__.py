@@ -2714,7 +2714,7 @@ Click "Yes" to start now.')
             cur.execute("select pdf_page from code_image")
         except sqlite3.OperationalError:
             cur.execute('ALTER TABLE code_image ADD pdf_page integer')  #
-            cur.execute('update project set databaseversion="v9", about=?', [qualcoder_version])
+            cur.execute('update project set databaseversion="v10", about=?', [qualcoder_version])
             self.app.conn.commit()
             self.ui.textEdit.append(_("Updating database to version") + " v10")
         # Database version v11
