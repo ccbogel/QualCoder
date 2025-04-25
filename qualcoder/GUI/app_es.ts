@@ -39,7 +39,7 @@
     <message>
         <location filename="ui_dialog_charts.py" line="282"/>
         <source>Pie charts</source>
-        <translation>Gráficos circulares</translation>
+        <translation>Gráficos de pastel</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="283"/>
@@ -81,7 +81,7 @@ Para los cálculos se utilizan las codificaciones de todo el archivo de texto.</
     <message>
         <location filename="ui_dialog_charts.py" line="293"/>
         <source>Filter out values below:</source>
-        <translation>Filtra los valores de abajo:</translation>
+        <translation>Filtrar valores menores a:</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="294"/>
@@ -96,7 +96,7 @@ Para los cálculos se utilizan las codificaciones de todo el archivo de texto.</
     <message>
         <location filename="ui_dialog_charts.py" line="296"/>
         <source>&lt;b&gt;Coding charts&lt;/b&gt;</source>
-        <translation>Codificación de gráficos</translation>
+        <translation>Gráficos de codificación</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="297"/>
@@ -184,7 +184,7 @@ nube de palabras</translation>
     <message>
         <location filename="ui_dialog_charts.py" line="314"/>
         <source>Reverse range</source>
-        <translation>Margen inverso</translation>
+        <translation>Rango inverso</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="315"/>
@@ -210,7 +210,7 @@ nube de palabras</translation>
     <message>
         <location filename="ui_dialog_charts.py" line="319"/>
         <source>Upper count limiter</source>
-        <translation>Limitador de recuento superior</translation>
+        <translation>Limitador de conteo superior</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="308"/>
@@ -1327,12 +1327,12 @@ Si no está marcada: Cada respuesta cualitativa será un fichero de texto indivi
     <message>
         <location filename="ui_dialog_cases.py" line="106"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add case&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Añade el caso</translation>
+        <translation>Añadir caso</translation>
     </message>
     <message>
         <location filename="ui_dialog_cases.py" line="107"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete case&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Borre el caso</translation>
+        <translation>Borrar caso</translation>
     </message>
     <message>
         <location filename="." line="7274595"/>
@@ -1807,7 +1807,7 @@ Right-click to change automatic searching options</translation>
     <message>
         <location filename="ui_dialog_code_colours.py" line="102"/>
         <source>Clear selection</source>
-        <translation>Selección clara</translation>
+        <translation>Limpiar Selección</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_colours.py" line="100"/>
@@ -2153,12 +2153,12 @@ Reduce las superposiciones de texto.</translation>
     <message>
         <location filename="ui_dialog_report_code_summary.py" line="64"/>
         <source>Code summary</source>
-        <translation>Sumario de códigos</translation>
+        <translation>Resumen de códigos</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_code_summary.py" line="68"/>
         <source>Code summary report</source>
-        <translation>Reporte de sumario de códigos</translation>
+        <translation>Reporte de resumen de códigos</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_code_summary.py" line="65"/>
@@ -2623,12 +2623,12 @@ Ya que todas las posiciones asignadas pueden ser incorrectas. </translation>
     <message>
         <location filename="ui_dialog_report_file_summary.py" line="64"/>
         <source>File summary</source>
-        <translation>Sumario de archivos</translation>
+        <translation>Resumen de archivos</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_file_summary.py" line="68"/>
         <source>File summary report</source>
-        <translation>Reporte del sumario del archivo</translation>
+        <translation>Reporte del resumen del archivo</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_file_summary.py" line="64"/>
@@ -3053,7 +3053,7 @@ Revise después de aplicar la función.</translation>
     <message>
         <location filename="ui_dialog_memo.py" line="44"/>
         <source>Clear</source>
-        <translation>Vacío</translation>
+        <translation>Limpiar</translation>
     </message>
 </context>
 <context>
@@ -3499,7 +3499,7 @@ Seleccione dos codificadores, un archivo, un código.</translation>
     <message>
         <location filename="ui_dialog_report_compare_coder_file.py" line="103"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Clear selection&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Selección clara</translation>
+        <translation>Limpiar Selección</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_compare_coder_file.py" line="104"/>
@@ -3557,7 +3557,7 @@ Seleccione dos codificadores, un archivo, un código.</translation>
     <message>
         <location filename="." line="7274595"/>
         <source>Clear selection</source>
-        <translation type="obsolete">Selección clara</translation>
+        <translation type="obsolete">Limpiar Selección</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_comparisons.py" line="86"/>
@@ -3577,7 +3577,7 @@ Seleccione dos codificadores, un archivo, un código.</translation>
     <message>
         <location filename="ui_dialog_report_comparisons.py" line="84"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Clear selection&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Selección clara</translation>
+        <translation>Limpiar Selección</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_comparisons.py" line="85"/>
@@ -3655,7 +3655,7 @@ Los comodines para &apos;like&apos; son % y _</translation>
     <message>
         <location filename="ui_report_attribute_parameters.py" line="69"/>
         <source>Clear</source>
-        <translation>Vacío</translation>
+        <translation>Vaciar</translation>
     </message>
     <message>
         <location filename="ui_report_attribute_parameters.py" line="70"/>
@@ -4623,7 +4623,7 @@ No codifique este texto hasta que vuelva a cargar Codificación - Texto codifica
     <message>
         <location filename="ui_main.py" line="321"/>
         <source>Open Project</source>
-        <translation>Proyecto abierto</translation>
+        <translation>Abrir Proyecto</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="322"/>
@@ -4643,7 +4643,7 @@ No codifique este texto hasta que vuelva a cargar Codificación - Texto codifica
     <message>
         <location filename="ui_main.py" line="325"/>
         <source>Exit</source>
-        <translation>Salida</translation>
+        <translation>Salir</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="326"/>
@@ -4718,7 +4718,7 @@ No codifique este texto hasta que vuelva a cargar Codificación - Texto codifica
     <message>
         <location filename="ui_main.py" line="374"/>
         <source>Import survey</source>
-        <translation>Encuesta de importación</translation>
+        <translation>Importar Encuesta</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="342"/>
@@ -4808,7 +4808,7 @@ No codifique este texto hasta que vuelva a cargar Codificación - Texto codifica
     <message>
         <location filename="ui_main.py" line="312"/>
         <source>Open Recent Project</source>
-        <translation>Abrir el proyecto reciente</translation>
+        <translation>Abrir proyecto reciente</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="313"/>
@@ -4823,7 +4823,7 @@ No codifique este texto hasta que vuelva a cargar Codificación - Texto codifica
     <message>
         <location filename="ui_main.py" line="358"/>
         <source>Project summary</source>
-        <translation>Sumario del proyecto</translation>
+        <translation>Resumen del proyecto</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="359"/>
@@ -4863,7 +4863,7 @@ No codifique este texto hasta que vuelva a cargar Codificación - Texto codifica
     <message>
         <location filename="ui_main.py" line="315"/>
         <source>Manage</source>
-        <translation>Gestionar</translation>
+        <translation>Administrar</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="303"/>
@@ -4883,12 +4883,12 @@ No codifique este texto hasta que vuelva a cargar Codificación - Texto codifica
     <message>
         <location filename="ui_main.py" line="364"/>
         <source>File summary</source>
-        <translation>Sumario de archivos</translation>
+        <translation>Resumen de archivos</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="365"/>
         <source>Code summary</source>
-        <translation>Sumario de códigos</translation>
+        <translation>Resumen de códigos</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="366"/>
@@ -4938,7 +4938,7 @@ No codifique este texto hasta que vuelva a cargar Codificación - Texto codifica
     <message>
         <location filename="ui_main.py" line="371"/>
         <source>Manage references</source>
-        <translation>Gestionar referencias</translation>
+        <translation>Administrar referencias</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="338"/>
