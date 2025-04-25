@@ -57,7 +57,7 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         self.setStyleSheet(font)
         self.ui.pushButton_export.setIcon(qta.icon('mdi6.export', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_export.pressed.connect(self.export_to_excel)
-        self.ui.pushButton_select_files.setIcon(qta.icon('mdi6.file-multiple', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_select_files.setIcon(qta.icon('mdi6.file-multiple', options=[{'scale_factor': 1.2}]))
         self.ui.pushButton_select_files.pressed.connect(self.select_files)
         self.ui.pushButton_select_codes.setIcon(qta.icon('mdi6.text', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_select_codes.pressed.connect(self.select_codes)
