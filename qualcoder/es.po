@@ -148,7 +148,7 @@ msgstr "Este proyecto no contiene archivos de imagen."
 
 #: __main__.py:1727 __main__.py:1788 __main__.py:1810 __main__.py:1880
 msgid "No image files"
-msgstr "no hay archivos de imagen. "
+msgstr "No hay archivos de imagen. "
 
 #: __main__.py:1735 __main__.py:1796 __main__.py:1818 __main__.py:1888
 msgid "This project contains no audio/video files."
@@ -172,7 +172,7 @@ msgstr "Codificación A/V"
 
 #: __main__.py:1837 __main__.py:1898 __main__.py:1920 __main__.py:1989
 msgid "IMPORTING REFI-QDA PROJECT"
-msgstr "PROYECTO DE IMPORTACIÓN DEL REF-QDA"
+msgstr "IMPORTACIÓN DE PROYECTO REFI-QDA"
 
 #: __main__.py:1839 __main__.py:1900 __main__.py:1922 __main__.py:1991
 msgid ""
@@ -193,11 +193,11 @@ msgstr "Creación del proyecto"
 
 #: __main__.py:1844 __main__.py:1905 __main__.py:1927 __main__.py:1996
 msgid "REFI-QDA Project not successfully created"
-msgstr "Proyecto REFI-QDA no creado con éxito"
+msgstr "El proyecto REFI-QDA no se creó correctamente"
 
 #: __main__.py:1855 __main__.py:1916 __main__.py:1938 __main__.py:2007
 msgid "IMPORTING RQDA PROJECT"
-msgstr "PROYECTO RQDA DE IMPORTACIÓN"
+msgstr "IMPORTACIÓN DE PROYECTO RQDA"
 
 #: __main__.py:1857 __main__.py:1918 __main__.py:1940 __main__.py:2009
 msgid ""
@@ -213,7 +213,7 @@ msgstr "Pasos de importación de la RQDA"
 
 #: __main__.py:1862 __main__.py:1923 __main__.py:1945 __main__.py:2014
 msgid "Project not successfully created"
-msgstr "El proyecto no se ha creado con éxito"
+msgstr "El proyecto no se creó correctamente"
 
 #: __main__.py:1876 __main__.py:1937 __main__.py:1959 __main__.py:2028
 msgid "Are you sure you want to quit?"
@@ -266,7 +266,7 @@ msgstr "Versión DB:"
 #: __main__.py:2104 report_file_summary.py:158 reports.py:247 reports.py:526
 #: __main__.py:2128 __main__.py:2197 reports.py:565
 msgid "Date: "
-msgstr "Fecha "
+msgstr "Fecha: "
 
 #: __main__.py:2044 __main__.py:2105 __main__.py:2129 __main__.py:2198
 msgid "About: "
@@ -297,7 +297,7 @@ msgid ""
 "(Everything below this mark is considered to be a personal note and will "
 "never be send to the AI.)"
 msgstr ""
-"Tema, preguntas y objetivos de la investigación: \n"
+"Tema de investigación, preguntas y objetivos: \n"
 "\n"
 "Metodología: \n"
 "\n"
@@ -1707,13 +1707,13 @@ msgstr "Nombre de código duplicado"
 #: code_text.py:2876 code_pdf.py:2223 code_text.py:2912 code_pdf.py:2263
 #: view_av.py:619 view_image.py:545
 msgid "Open memo"
-msgstr "Memo abierto"
+msgstr "Abrir Memo"
 
 #: code_pdf.py:2281 code_pdf.py:2203 code_pdf.py:2228 code_pdf.py:2268
 #, fuzzy
 #| msgid "view original text file"
 msgid "View original text file"
-msgstr "ver el archivo de texto original"
+msgstr "Ver el archivo de texto original"
 
 #: code_pdf.py:2283 code_text.py:2881 view_av.py:671 view_image.py:563
 #: code_text.py:2830 code_pdf.py:2205 view_av.py:616 view_image.py:527
@@ -3758,7 +3758,7 @@ msgstr " cargada."
 #: refi.py:432 refi.py:425
 msgid "REFI-QDA PROJECT IMPORT EXPERIMENTAL FUNCTION - NOT FULLY TESTED\n"
 msgstr ""
-"PROYECTO REFI-QDA IMPORTACIÓN DE LA FUNCIÓN EXPERIMENTAL - NO SE HA PROBADO "
+"FUNCIÓN EXPERIMENTAL DE IMPORTACIÓN DE PROYECTO REFI-QDA - NO SE HA PROBADO "
 "COMPLETAMENTE\\N\n"
 
 #: refi.py:433 refi.py:426
@@ -5995,14 +5995,14 @@ msgstr "Este segmento ya ha sido codificado con este código por "
 
 #: view_av.py:3021 view_av.py:2966 view_av.py:2970 view_av.py:3005
 msgid "No media transcription selected"
-msgstr "No se ha seleccionado la transcripción de los medios de comunicación"
+msgstr "No se seleccionó transcripción de medios"
 
 #: view_av.py:3109 view_av.py:3130 view_av.py:3356 view_av.py:3606
 #: view_av.py:3054 view_av.py:3106 view_av.py:3428 view_av.py:3674
 #: view_av.py:3058 view_av.py:3110 view_av.py:3432 view_av.py:3678
 #: view_av.py:3093 view_av.py:3145 view_av.py:3467 view_av.py:3713
 msgid "Memo for segment"
-msgstr "Memo por segmento"
+msgstr "Memo para segmento"
 
 #: view_av.py:3110 view_av.py:3357 view_av.py:3055 view_av.py:3429
 #: view_av.py:3059 view_av.py:3433 view_av.py:3094 view_av.py:3468
@@ -6101,7 +6101,7 @@ msgstr "Código por segmentos de audio/vídeo"
 
 #: view_charts.py:131 view_charts.py:124 view_charts.py:122
 msgid "Code frequency sunburst"
-msgstr "Código de frecuencia de la ráfaga de sol"
+msgstr "Diagrama Sunburst de frecuencia de códigos"
 
 #: view_charts.py:132 view_charts.py:125 view_charts.py:123
 msgid "Code frequency treemap"
@@ -7997,15 +7997,15 @@ msgstr "Inicialización de IA"
 
 #: code_text.py:1536 code_pdf.py:1190 view_av.py:1347 view_image.py:899
 msgid "Show codes of colour"
-msgstr ""
+msgstr "Mostrar códigos con color asignado"
 
 #: code_text.py:1539 code_pdf.py:1193 view_av.py:1350 view_image.py:902
 msgid "Sort category then code ascending"
-msgstr ""
+msgstr "Ordenar por categoría y código (ascendente)"
 
 #: code_text.py:1758 code_pdf.py:1369 view_av.py:1466 view_image.py:1017
 msgid "Select code colors"
-msgstr ""
+msgstr "Seleccionar el color del código"
 
 #: reports.py:452
 msgid "Export Excel"
@@ -8013,4 +8013,4 @@ msgstr "Exportar a Excel"
 
 #: reports.py:551
 msgid "Coder comparisons report exported: "
-msgstr ""
+msgstr "Informe de comparaciones de codificadores exportado:"
