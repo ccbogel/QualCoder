@@ -72,7 +72,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export csv file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Export csv file</string>
       </property>
       <property name="text">
        <string/>
@@ -81,14 +81,14 @@
      <widget class="QPushButton" name="pushButton_calculate">
       <property name="geometry">
        <rect>
-        <x>390</x>
-        <y>30</y>
+        <x>410</x>
+        <y>28</y>
         <width>28</width>
         <height>28</height>
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Calculate&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Calculate</string>
       </property>
       <property name="text">
        <string/>
@@ -126,8 +126,8 @@
      <widget class="QPushButton" name="pushButton_select_files">
       <property name="geometry">
        <rect>
-        <x>360</x>
-        <y>30</y>
+        <x>350</x>
+        <y>28</y>
         <width>28</width>
         <height>28</height>
        </rect>
@@ -264,30 +264,34 @@
      <widget class="QPushButton" name="pushButton_export_exact">
       <property name="geometry">
        <rect>
-        <x>750</x>
+        <x>730</x>
         <y>30</y>
-        <width>28</width>
+        <width>36</width>
         <height>28</height>
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export Excel report of exact text coding matches for all  files.&lt;/p&gt;&lt;p&gt;Ordered by file name and code name.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Export Excel report of exact text coding matches for all  files.
+Ordered by file name and code name.</string>
       </property>
       <property name="text">
        <string>E</string>
       </property>
      </widget>
-     <widget class="Line" name="line">
+     <widget class="QPushButton" name="pushButton_file_attributes">
       <property name="geometry">
        <rect>
-        <x>735</x>
-        <y>10</y>
-        <width>10</width>
-        <height>71</height>
+        <x>380</x>
+        <y>28</y>
+        <width>28</width>
+        <height>28</height>
        </rect>
       </property>
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
+      <property name="toolTip">
+       <string>Select text files by attributes</string>
+      </property>
+      <property name="text">
+       <string/>
       </property>
      </widget>
     </widget>
