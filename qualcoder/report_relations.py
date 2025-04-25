@@ -36,6 +36,7 @@ from PyQt6.QtGui import QBrush
 from .color_selector import TextColor
 from .GUI.ui_dialog_code_relations import Ui_Dialog_CodeRelations
 from .helpers import DialogCodeInText, ExportDirectoryPathDialog, Message
+from .report_attributes import DialogSelectAttributeParameters
 from .select_items import DialogSelectItems
 
 path = os.path.abspath(os.path.dirname(__file__))
@@ -55,6 +56,7 @@ class DialogReportRelations(QtWidgets.QDialog):
     result_relations = []
     result_summary = []
     dataframe = None
+    attributes = []
 
     def __init__(self, app, parent_textedit):
 
@@ -63,6 +65,7 @@ class DialogReportRelations(QtWidgets.QDialog):
         self.get_code_data()
         self.result_relations = []
         self.result_summary = []
+        self.attributes = []
         self.dataframe = None
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_CodeRelations()
@@ -94,6 +97,8 @@ class DialogReportRelations(QtWidgets.QDialog):
         self.ui.pushButton_boxplots.pressed.connect(self.create_boxplots)
         self.ui.pushButton_search_next.setIcon(qta.icon('mdi6.play'))
         self.ui.pushButton_search_next.clicked.connect(self.search_text)
+        self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_file_attributes.pressed.connect(self.get_files_from_attributes)
         self.ui.tableWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
         self.ui.tableWidget.setTabKeyNavigation(False)
@@ -132,12 +137,80 @@ class DialogReportRelations(QtWidgets.QDialog):
             if s['fid'] == -1:
                 self.files = all_files[1:]
                 self.ui.pushButton_select_files.setToolTip(_("All files selected"))
+                self.ui.pushButton_file_attributes.setToolTip(_("Select files by attributes"))
+                self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
+                self.ui.pushButton_select_files.setIcon(qta.icon('mdi6.file', options=[{'scale_factor': 1.4}]))
+                self.attributes = []
                 return
         tt = _("Files selected: ")
         for s in selected:
             self.files.append(s)
             tt += "\n" + s['name']
         self.ui.pushButton_select_files.setToolTip(tt)
+        self.ui.pushButton_file_attributes.setToolTip(_("Select files by attributes"))
+        self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_select_files.setIcon(qta.icon('mdi6.file', options=[{'scale_factor': 1.4}]))
+        self.attributes = []
+
+    def get_files_from_attributes(self):
+        """ Select text files based on attribute selections.
+        Attribute results are a dictionary of:
+        first item is a Boolean AND or OR list item
+        Followed by each attribute list item
+        Set:
+            self.file_ids
+        """
+
+        # Clear ui
+        self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
+        ui = DialogSelectAttributeParameters(self.app)
+
+        ui.fill_parameters(self.attributes)
+        temp_attributes = deepcopy(self.attributes)
+        self.attributes = []
+
+        ok = ui.exec()
+        if not ok:
+            self.attributes = temp_attributes
+            self.ui.pushButton_file_attributes.setIcon(
+                qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
+            self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
+            if self.attributes:
+                self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable-box', options=[{'scale_factor': 1.3}]))
+                self.ui.pushButton_select_files.setIcon(qta.icon('mdi6.file-outline', options=[{'scale_factor': 1.4}]))
+            return
+        self.attributes = ui.parameters
+        if len(self.attributes) == 1:  # Boolean parameter, no attributes selected
+            self.ui.pushButton_file_attributes.setIcon(
+                qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
+            self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
+            self.attributes = []
+            return
+        if not ui.result_file_ids:
+            Message(self.app, _("Nothing found") + " " * 20, _("No matching files found")).exec()
+            self.ui.pushButton_file_attributes.setIcon(
+                qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
+            self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
+            return
+
+        # Limit to text files
+        text_files = self.app.get_text_filenames()
+        self.files = []
+        msg = ui.tooltip_msg
+        for i, file_ in enumerate(text_files):
+            if file_['id'] in ui.result_file_ids:
+                file_['fid'] = file_['id']  # Need fid key for calucte_code_relations
+                self.files.append(file_)
+                if i < 20:
+                    msg += f"\n{file_['name']}"
+        if len(ui.result_file_ids) > 20:
+            msg += f"\nand more. Total files: {len(ui.result_file_ids)}"
+        Message(self.app, _("Files selected by attributes"), msg).exec()
+
+        self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable-box', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_file_attributes.setToolTip(msg)
+        self.ui.pushButton_select_files.setToolTip(_("Select files"))
+        self.ui.pushButton_select_files.setIcon(qta.icon('mdi6.file-outline', options=[{'scale_factor': 1.4}]))
 
     def get_code_data(self):
         """ Called from init. gets code_names, categories and owner names.
@@ -181,6 +254,8 @@ class DialogReportRelations(QtWidgets.QDialog):
 
         id1, id2, overlapindex, unionindex, distance, whichmin, whichmax, fid
         relation is 1 character: Inclusion, Overlap, Exact, Proximity
+        Requires:
+            self.files List of Dict
         """
 
         index = self.ui.comboBox_relation_type.currentIndex()
