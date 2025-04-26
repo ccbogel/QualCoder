@@ -22,7 +22,7 @@ from copy import deepcopy
 import logging
 import openpyxl
 from openpyxl.utils import get_column_letter
-from openpyxl.styles import Alignment, PatternFill
+from openpyxl.styles import PatternFill
 import os
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 
@@ -30,6 +30,7 @@ from PyQt6 import QtCore, QtWidgets, QtGui
 
 from .GUI.ui_dialog_cooccurrence import Ui_Dialog_Coocurrence
 from .helpers import ExportDirectoryPathDialog, Message
+from .report_attributes import DialogSelectAttributeParameters
 from .select_items import DialogSelectItems
 
 
@@ -45,10 +46,12 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
     app = None
     parent_tetEdit = None
     files = []
+    attributes = []
 
     def __init__(self, app, parent_text_edit):
         self.app = app
         self.parent_textEdit = parent_text_edit
+        self.attributes = []
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_Coocurrence()
         self.ui.setupUi(self)
@@ -59,7 +62,8 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         self.ui.pushButton_export.pressed.connect(self.export_to_excel)
         self.ui.pushButton_select_files.setIcon(qta.icon('mdi6.file-outline', options=[{'scale_factor': 1.2}]))
         self.ui.pushButton_select_files.pressed.connect(self.select_files)
-        # TODO add Select Files by Attributes
+        self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_file_attributes.pressed.connect(self.get_files_from_attributes)
 
         self.ui.pushButton_select_codes.setIcon(qta.icon('mdi6.text', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_select_codes.pressed.connect(self.select_codes)
@@ -105,12 +109,82 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         if not selected or selected[0]['name'] == '':
             self.file_ids_names = self.app.get_text_filenames()
             Message(self.app, _("Files selected"), _("All files selected")).exec()
+            self.ui.pushButton_select_files.setToolTip(_("All files selected"))
+            self.ui.pushButton_file_attributes.setToolTip(_("Select files by attributes"))
+            self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
+            self.ui.pushButton_select_files.setIcon(qta.icon('mdi6.file', options=[{'scale_factor': 1.4}]))
+            self.attributes = []
         else:
             self.file_ids_names = selected
             msg = ""
             for item in self.file_ids_names:
                 msg += f"{item['name']}\n"
             Message(self.app, _("Files selected"), msg).exec()
+            self.ui.pushButton_select_files.setToolTip(msg)
+            self.ui.pushButton_file_attributes.setToolTip(_("Select files by attributes"))
+            self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
+            self.ui.pushButton_select_files.setIcon(qta.icon('mdi6.file', options=[{'scale_factor': 1.4}]))
+            self.attributes = []
+
+        self.process_data()
+
+    def get_files_from_attributes(self):
+        """ Select text files based on attribute selections.
+        Attribute results are a dictionary of:
+        first item is a Boolean AND or OR list item
+        Followed by each attribute list item
+        Set:
+            self.file_ids_names
+        """
+
+        # Clear ui
+        self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
+        ui = DialogSelectAttributeParameters(self.app)
+        ui.fill_parameters(self.attributes)
+        temp_attributes = deepcopy(self.attributes)
+        self.attributes = []
+
+        ok = ui.exec()
+        if not ok:
+            self.attributes = temp_attributes
+            self.ui.pushButton_file_attributes.setIcon(
+                qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
+            self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
+            if self.attributes:
+                self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable-box', options=[{'scale_factor': 1.3}]))
+                self.ui.pushButton_select_files.setIcon(qta.icon('mdi6.file-outline', options=[{'scale_factor': 1.4}]))
+            return
+        self.attributes = ui.parameters
+        if len(self.attributes) == 1:  # Boolean parameter, no attributes selected
+            self.ui.pushButton_file_attributes.setIcon(
+                qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
+            self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
+            self.attributes = []
+            return
+        if not ui.result_file_ids:
+            Message(self.app, _("Nothing found") + " " * 20, _("No matching files found")).exec()
+            self.ui.pushButton_file_attributes.setIcon(
+                qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
+            self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
+            return
+
+        # Limit to text files
+        text_files = self.app.get_text_filenames()
+        self.file_ids_names = []
+        msg = ui.tooltip_msg
+        for i, file_ in enumerate(text_files):
+            if file_['id'] in ui.result_file_ids:
+                self.file_ids_names.append(file_)
+                if i < 20:
+                    msg += f"\n{file_['name']}"
+        if len(ui.result_file_ids) > 20:
+            msg += f"\nand more. Total files: {len(ui.result_file_ids)}"
+        Message(self.app, _("Files selected by attributes"), msg).exec()
+        self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable-box', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_file_attributes.setToolTip(msg)
+        self.ui.pushButton_select_files.setToolTip(_("Select files"))
+        self.ui.pushButton_select_files.setIcon(qta.icon('mdi6.file-outline', options=[{'scale_factor': 1.4}]))
+
         self.process_data()
 
     def select_codes(self):
