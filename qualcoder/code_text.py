@@ -341,7 +341,6 @@ class DialogCodeText(QtWidgets.QWidget):
         layout.setContentsMargins(0, 0, 0, 0)  # Remove margins if needed
         layout.addWidget(self.number_bar)
         self.ui.lineNumbers.setLayout(layout)
-
         self.fill_tree()
 
         # AI search
@@ -379,7 +378,7 @@ class DialogCodeText(QtWidgets.QWidget):
 
     def set_default_new_code_color(self):
         """ New code colours are usually generated randomly.
-         This overides the random approach, by setting a colout. """
+         This overrides the random approach, by setting a colout. """
 
         tmp_code = {'name': 'new', 'color': None}
         ui = DialogColorSelect(self.app, tmp_code)
@@ -398,9 +397,45 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.textEdit.setStyleSheet(font)
 
     def find_code_in_tree(self):
-        """ Find a code by name in the tre and select it. """
+        """ Find a code by name in the codes tree and select it.
+        """
 
-        Message(self.app, "TODO", "TODO").exec()
+        dialog = QtWidgets.QInputDialog(None)
+        dialog.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        dialog.setWindowTitle(_("Search for code"))
+        dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
+        dialog.setInputMode(QtWidgets.QInputDialog.InputMode.TextInput)
+        msg = _("Find and select first code that matches text.") + "\n"
+        msg += _("Enter text to match all or partial code:")
+        dialog.setLabelText(msg)
+        dialog.resize(200, 20)
+        ok = dialog.exec()
+        if not ok:
+            return
+        search_text = dialog.textValue()
+
+        # Remove selections and search for matching item text
+        self.ui.treeWidget.setCurrentItem(None)
+        self.ui.treeWidget.clearSelection()
+        item = None
+        iterator = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
+        while iterator.value():
+            item = iterator.value()
+            if "cid" in item.text(1):
+                cid = int(item.text(1)[4:])
+                code_ = next((code_ for code_ in self.codes if code_['cid'] == cid), None)
+                if search_text in code_['name']:
+                    self.ui.treeWidget.setCurrentItem(item)
+                    break
+            iterator += 1
+        if item is None:
+            Message(self.app, _("Match not found"), _("No code with matching text found.")).exec()
+            return
+        # Expand parents
+        parent = item.parent()
+        while parent is not None:
+            parent.setExpanded(True)
+            parent = parent.parent()
 
     def get_recent_codes(self):
         """ Get recently used codes. Must have loaded all codes first.
@@ -546,7 +581,6 @@ class DialogCodeText(QtWidgets.QWidget):
         current = self.ui.treeWidget.currentItem()
         if current is None:
             return
-        print(current.text(0), current.text(1))
         # Extra to fill right-hand side splitter details
         self.show_code_rule()
         if current.text(1)[0:3] == 'cat':
