@@ -231,6 +231,8 @@ class DialogCodePdf(QtWidgets.QWidget):
         # Widgets under codes tree
         self.ui.pushButton_important.setIcon(qta.icon('mdi6.star-outline', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_important.pressed.connect(self.show_important_coded)
+        self.ui.pushButton_find_code.setIcon(qta.icon('mdi6.card-search-outline', options=[{'scale-factor': 1.2}]))
+        self.ui.pushButton_find_code.pressed.connect(self.find_code_in_tree)
 
         self.ui.treeWidget.setDragEnabled(True)
         self.ui.treeWidget.setAcceptDrops(True)
@@ -1472,6 +1474,47 @@ class DialogCodePdf(QtWidgets.QWidget):
             for i, r in enumerate(res):
                 txt += f"{i + 1}: {r[0]}\n"
         self.ui.textEdit_2.setText(txt)
+
+    def find_code_in_tree(self):
+        """ Find a code by name in the codes tree and select it.
+        """
+
+        dialog = QtWidgets.QInputDialog(None)
+        dialog.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        dialog.setWindowTitle(_("Search for code"))
+        dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
+        dialog.setInputMode(QtWidgets.QInputDialog.InputMode.TextInput)
+        msg = _("Find and select first code that matches text.") + "\n"
+        msg += _("Enter text to match all or partial code:")
+        dialog.setLabelText(msg)
+        dialog.resize(200, 20)
+        ok = dialog.exec()
+        if not ok:
+            return
+        search_text = dialog.textValue()
+
+        # Remove selections and search for matching item text
+        self.ui.treeWidget.setCurrentItem(None)
+        self.ui.treeWidget.clearSelection()
+        item = None
+        iterator = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
+        while iterator.value():
+            item = iterator.value()
+            if "cid" in item.text(1):
+                cid = int(item.text(1)[4:])
+                code_ = next((code_ for code_ in self.codes if code_['cid'] == cid), None)
+                if search_text in code_['name']:
+                    self.ui.treeWidget.setCurrentItem(item)
+                    break
+            iterator += 1
+        if item is None:
+            Message(self.app, _("Match not found"), _("No code with matching text found.")).exec()
+            return
+        # Expand parents
+        parent = item.parent()
+        while parent is not None:
+            parent.setExpanded(True)
+            parent = parent.parent()
 
     def keyPressEvent(self, event):
         """
