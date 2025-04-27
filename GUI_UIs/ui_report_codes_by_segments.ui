@@ -69,14 +69,14 @@
      <widget class="QPushButton" name="pushButton_run_report">
       <property name="geometry">
        <rect>
-        <x>390</x>
+        <x>450</x>
         <y>24</y>
         <width>51</width>
         <height>51</height>
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Run report&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Run report</string>
       </property>
       <property name="text">
        <string/>
@@ -121,14 +121,30 @@
      <widget class="QPushButton" name="pushButton_export_xlsx">
       <property name="geometry">
        <rect>
-        <x>460</x>
+        <x>510</x>
         <y>42</y>
         <width>32</width>
         <height>32</height>
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export to Excel&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Export to Excel</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_file_attributes">
+      <property name="geometry">
+       <rect>
+        <x>390</x>
+        <y>44</y>
+        <width>32</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select files by attributes&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
