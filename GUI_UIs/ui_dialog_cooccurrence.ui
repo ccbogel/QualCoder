@@ -28,7 +28,7 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>44</height>
+       <height>48</height>
       </size>
      </property>
      <property name="maximumSize">
@@ -74,7 +74,7 @@
      <widget class="QPushButton" name="pushButton_export">
       <property name="geometry">
        <rect>
-        <x>550</x>
+        <x>410</x>
         <y>1</y>
         <width>32</width>
         <height>32</height>
@@ -102,9 +102,9 @@
      <widget class="QCheckBox" name="checkBox_hide_blanks">
       <property name="geometry">
        <rect>
-        <x>230</x>
-        <y>4</y>
-        <width>151</width>
+        <x>10</x>
+        <y>30</y>
+        <width>211</width>
         <height>20</height>
        </rect>
       </property>
@@ -115,7 +115,7 @@
      <widget class="QPushButton" name="pushButton_select_files">
       <property name="geometry">
        <rect>
-        <x>390</x>
+        <x>250</x>
         <y>1</y>
         <width>32</width>
         <height>32</height>
@@ -143,7 +143,7 @@
      <widget class="QPushButton" name="pushButton_select_categories">
       <property name="geometry">
        <rect>
-        <x>510</x>
+        <x>370</x>
         <y>1</y>
         <width>32</width>
         <height>32</height>
@@ -171,7 +171,7 @@
      <widget class="QPushButton" name="pushButton_select_codes">
       <property name="geometry">
        <rect>
-        <x>470</x>
+        <x>330</x>
         <y>1</y>
         <width>32</width>
         <height>32</height>
@@ -199,7 +199,7 @@
      <widget class="QPushButton" name="pushButton_file_attributes">
       <property name="geometry">
        <rect>
-        <x>430</x>
+        <x>290</x>
         <y>1</y>
         <width>32</width>
         <height>32</height>
