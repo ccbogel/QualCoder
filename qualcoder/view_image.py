@@ -106,6 +106,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.show_code_captions = 0
         self.pdf_page = None
         self.pdf_total_pages = None
+        self.default_new_code_color = None
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_code_image()
         self.ui.setupUi(self)
@@ -126,9 +127,9 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.setWindowTitle(_("Image coding"))
         self.ui.horizontalSlider.valueChanged[int].connect(self.redraw_scene)
         self.ui.horizontalSlider.setToolTip(_("Key + or W zoom in. Key - or Q zoom out"))
-        self.ui.pushButton_memo.setIcon(qta.icon('mdi6.text-box-edit-outline', options=[{'scale_factor': 1.4}]))
-        self.ui.pushButton_memo.pressed.connect(self.active_file_memo)
-        self.ui.pushButton_memo.setEnabled(False)
+
+        self.ui.pushButton_default_new_code_color.setIcon(qta.icon('mdi6.palette', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_default_new_code_color.pressed.connect(self.set_default_new_code_color)
         self.ui.pushButton_export.setIcon(qta.icon('mdi6.export', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_export.pressed.connect(self.export_html_file)
         self.ui.pushButton_export.setEnabled(False)
@@ -144,20 +145,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.ui.listWidget.installEventFilter(self)
         self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
-        self.ui.pushButton_latest.setIcon(qta.icon('mdi6.arrow-collapse-right', options=[{'scale_factor': 1.3}]))
-        self.ui.pushButton_latest.pressed.connect(self.go_to_latest_coded_file)
-        self.ui.pushButton_next_file.setIcon(qta.icon('mdi6.arrow-right', options=[{'scale_factor': 1.3}]))
-        self.ui.pushButton_next_file.pressed.connect(self.go_to_next_file)
-        self.ui.pushButton_document_memo.setIcon(qta.icon('mdi6.text-box-outline', options=[{'scale_factor': 1.3}]))
-        self.ui.pushButton_document_memo.pressed.connect(self.active_file_memo)
-        self.ui.label_coded_area_icon.setPixmap(qta.icon('mdi6.grid').pixmap(22, 22))
-        self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
-        self.ui.pushButton_file_attributes.pressed.connect(self.get_files_from_attributes)
-        self.ui.pushButton_important.setIcon(qta.icon('mdi6.star-outline', options=[{'scale_factor': 1.4}]))
-        self.ui.pushButton_important.pressed.connect(self.show_important_coded)
-
-        self.ui.pushButton_captions.setIcon(qta.icon('mdi6.closed-caption-outline', options=[{'scale_factor': 1.4}]))
-        self.ui.pushButton_captions.pressed.connect(self.captions_options)
+        # Header widgets
         self.ui.pushButton_zoom_in.setIcon(qta.icon('mdi6.magnify-plus-outline', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_zoom_in.pressed.connect(self.zoom_in)
         self.ui.pushButton_zoom_out.setIcon(qta.icon('mdi6.magnify-minus-outline', options=[{'scale_factor': 1.4}]))
@@ -166,7 +154,21 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.ui.pushButton_rotate_counter.pressed.connect(self.rotate_counter)
         self.ui.pushButton_rotate_clock.setIcon(qta.icon('mdi6.file-rotate-right-outline', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_rotate_clock.pressed.connect(self.rotate_clockwise)
-        # Pdf widgets
+        self.ui.label_coded_area_icon.setPixmap(qta.icon('mdi6.grid').pixmap(22, 22))
+        self.ui.pushButton_captions.setIcon(qta.icon('mdi6.closed-caption-outline', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_captions.pressed.connect(self.captions_options)
+        self.ui.pushButton_important.setIcon(qta.icon('mdi6.star-outline', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_important.pressed.connect(self.show_important_coded)
+        # Widgets under File list
+        self.ui.pushButton_latest.setIcon(qta.icon('mdi6.arrow-collapse-right', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_latest.pressed.connect(self.go_to_latest_coded_file)
+        self.ui.pushButton_next_file.setIcon(qta.icon('mdi6.arrow-right', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_next_file.pressed.connect(self.go_to_next_file)
+        self.ui.pushButton_document_memo.setIcon(qta.icon('mdi6.text-box-outline', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_document_memo.pressed.connect(self.active_file_memo)
+        self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_file_attributes.pressed.connect(self.get_files_from_attributes)
+        # Header - Pdf widgets
         self.pdf_controls_toggle()
         self.ui.pushButton_next_page.setIcon(qta.icon('mdi6.arrow-right', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_next_page.pressed.connect(self.next_page)
@@ -176,6 +178,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.ui.pushButton_last_page.pressed.connect(self.last_page)
         self.ui.pushButton_goto_page.setIcon(qta.icon('mdi6.book-search-outline', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_goto_page.pressed.connect(self.goto_page)
+        self.ui.label_pdf.setPixmap(qta.icon('mdi6.file-pdf-box').pixmap(26, 26))
 
         try:
             s0 = int(self.app.settings['dialogcodeimage_splitter0'])
@@ -207,6 +210,20 @@ class DialogCodeImage(QtWidgets.QDialog):
 
         self.codes, self.categories = self.app.get_codes_categories()
 
+    def set_default_new_code_color(self):
+        """ New code colours are usually generated randomly.
+         This overrides the random approach, by setting a colout. """
+
+        tmp_code = {'name': 'new', 'color': None}
+        ui = DialogColorSelect(self.app, tmp_code)
+        ok = ui.exec()
+        if not ok:
+            return
+        color = ui.get_color()
+        if color is not None:
+            self.ui.pushButton_default_new_code_color.setStyleSheet(f'background-color: {color}')
+        self.default_new_code_color = color
+
     def show_important_coded(self):
         """ Show codes flagged as important. """
 
@@ -225,8 +242,10 @@ class DialogCodeImage(QtWidgets.QDialog):
         Called by load file, update_dialog_codes_and_categories,coded_media_dialog, undo_last_unmarked_code.
         """
 
-        self.code_areas = []
+        if self.file_ is None:
+            return
         cur = self.app.conn.cursor()
+        self.code_areas = []
         if self.pdf_page is not None:
             sql = "select imid,id,x1, y1, width, height, code_image.memo, code_image.date, code_image.owner, " \
                   "code_image.cid, important, code_name.name, code_name.color, pdf_page from code_image " \
@@ -664,7 +683,6 @@ class DialogCodeImage(QtWidgets.QDialog):
         for i in range(items.__len__()):
             self.scene.removeItem(items[i])
         self.setWindowTitle(_("Image coding"))
-        self.ui.pushButton_memo.setEnabled(False)
 
     def pdf_controls_toggle(self, active=False):
         """ Toggle pdf controls on or off depending on file selection. """
@@ -764,7 +782,6 @@ class DialogCodeImage(QtWidgets.QDialog):
         for i in range(items.__len__()):
             self.scene.removeItem(items[i])
         self.setWindowTitle(_("Image: ") + self.file_['name'])
-        self.ui.pushButton_memo.setEnabled(True)
         self.ui.pushButton_export.setEnabled(True)
         self.pixmap = QtGui.QPixmap.fromImage(image)
         pixmap_item = QtWidgets.QGraphicsPixmapItem(QtGui.QPixmap.fromImage(image))
@@ -1888,6 +1905,8 @@ class DialogCodeImage(QtWidgets.QDialog):
         if new_code_name is None:
             return
         code_color = colors[randint(0, len(colors) - 1)]
+        if self.default_new_code_color:
+            code_color = self.default_new_code_color
         item = {'name': new_code_name, 'memo': "", 'owner': self.app.settings['codername'],
                 'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'catid': catid,
                 'color': code_color}
