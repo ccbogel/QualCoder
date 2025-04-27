@@ -76,7 +76,7 @@ class DialogCodeImage(QtWidgets.QDialog):
     undo_deleted_code = None  # Undo last deleted code
     degrees = 0  # For image rotation
     show_code_captions = 0  # 0 = no, 1 = code name, 2 = codename + memo
-    pdf_page = None   # display at 1
+    pdf_page = None  # display at 1
     pdf_total_pages = None  # Total pages in pdf
 
     def __init__(self, app, parent_textedit, tab_reports):
@@ -150,9 +150,11 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.ui.pushButton_zoom_in.pressed.connect(self.zoom_in)
         self.ui.pushButton_zoom_out.setIcon(qta.icon('mdi6.magnify-minus-outline', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_zoom_out.pressed.connect(self.zoom_out)
-        self.ui.pushButton_rotate_counter.setIcon(qta.icon('mdi6.file-rotate-left-outline', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_rotate_counter.setIcon(
+            qta.icon('mdi6.file-rotate-left-outline', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_rotate_counter.pressed.connect(self.rotate_counter)
-        self.ui.pushButton_rotate_clock.setIcon(qta.icon('mdi6.file-rotate-right-outline', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_rotate_clock.setIcon(
+            qta.icon('mdi6.file-rotate-right-outline', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_rotate_clock.pressed.connect(self.rotate_clockwise)
         self.ui.label_coded_area_icon.setPixmap(qta.icon('mdi6.grid').pixmap(22, 22))
         self.ui.pushButton_captions.setIcon(qta.icon('mdi6.closed-caption-outline', options=[{'scale_factor': 1.4}]))
@@ -658,7 +660,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         Or show all files. """
 
         cases = self.app.get_casenames()
-        cases.insert(0, {"name": _("Show all files"),  "id": -1})
+        cases.insert(0, {"name": _("Show all files"), "id": -1})
         ui = DialogSelectItems(self.app, cases, _("Select case"), "single")
         ok = ui.exec()
         if not ok:
@@ -925,6 +927,21 @@ class DialogCodeImage(QtWidgets.QDialog):
                         if coded['important'] == 1:
                             tooltip += "\n" + _("IMPORTANT")
                         color = QtGui.QColor(c['color'])
+                # Warn of exact overlapping code(s)
+                overlaps = ""
+                for coded2 in self.code_areas:
+                    if coded2['x1'] == coded['x1'] and coded2['y1'] == coded['y1'] and \
+                            coded2['width'] == coded['width'] and coded2['height'] == coded['height'] and \
+                            coded2['owner'] == coded['owner'] and coded2['cid'] != coded['cid']:
+                        code_name2 = ""
+                        for c2 in self.codes:
+                            if c2['cid'] == coded2['cid']:
+                                code_name2 = c2['name']
+                                break
+                        overlaps += "\n" + _("Overlaps exactly with") + f": {code_name2}\n"
+                if overlaps:
+                    tooltip += overlaps
+
                 # Degrees 0
                 x = coded['x1'] * self.scale
                 y = coded['y1'] * self.scale
@@ -1253,7 +1270,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         # Ctrl 0 to 9, G
         if mods & QtCore.Qt.KeyboardModifier.ControlModifier:
             if key == QtCore.Qt.Key.Key_G:
-                self.gray_image_highlight("gray")
+                self.image_highlight("gray")
                 return
             if key == QtCore.Qt.Key.Key_1:
                 self.go_to_next_file()
@@ -1288,7 +1305,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             return
         self.ui.horizontalSlider.setValue(v)
 
-    def image_highlight(self, image_operation = "gray", coded_area=None, code_id=None):
+    def image_highlight(self, image_operation="gray", coded_area=None, code_id=None):
         """ Gray, blurred or solarised image with coloured coded highlight(s).
         Highlight all coded area, or selected coded area, or all areas coded by one specific code.
         Takes a few seconds to build and show image.
@@ -1318,7 +1335,8 @@ class DialogCodeImage(QtWidgets.QDialog):
                 img_with_border = ImageOps.expand(coded_img, border=3, fill=coded_area['color'])
                 # highlights.paste(coded_img, (int(ca['x1']), int(ca['y1']))) # No border
                 highlights.paste(img_with_border, (int(coded_area['x1']), int(coded_area['y1'])))
-                self.text_box(draw, background.width, (coded_area['x1'], coded_area['y1']), coded_area['name'], coded_area['memo'])
+                self.text_box(draw, background.width, (coded_area['x1'], coded_area['y1']), coded_area['name'],
+                              coded_area['memo'])
             except SystemError as e_:
                 logger.debug(e_)
         else:
@@ -1326,7 +1344,8 @@ class DialogCodeImage(QtWidgets.QDialog):
             for coded in self.code_areas:
                 try:
                     # Needs tuple of left, top, right, bottom
-                    coded_img = pil_img.crop((coded['x1'], coded['y1'], coded['x1'] + coded['width'], coded['y1'] + coded['height']))
+                    coded_img = pil_img.crop(
+                        (coded['x1'], coded['y1'], coded['x1'] + coded['width'], coded['y1'] + coded['height']))
                     img_with_border = ImageOps.expand(coded_img, border=3, fill=coded['color'])
                     if code_id == coded['cid']:
                         # Specific code id selected to highlight all of this code
@@ -1339,12 +1358,13 @@ class DialogCodeImage(QtWidgets.QDialog):
                 except SystemError as e_:
                     logger.debug(e_)
                     print(e_)
-                    print("Crop img: x1", coded['x1'], "y1", coded['y1'], "x2", coded['x1'] + coded['width'], "y2", coded['y1'] + coded['height'])
+                    print("Crop img: x1", coded['x1'], "y1", coded['y1'], "x2", coded['x1'] + coded['width'], "y2",
+                          coded['y1'] + coded['height'])
                     print("Main img: w", background.width, "h", background.height)
         highlights.show()
 
     def text_box(self, draw, background_width, position, text, memo):
-        """ Draw codename cation if show_code_captions=1, or codename plus memo if show_code_captions=2. """
+        """ Draw codename caption if show_code_captions=1, or codename plus memo if show_code_captions=2. """
 
         if self.show_code_captions == 0:
             return
@@ -1869,9 +1889,9 @@ class DialogCodeImage(QtWidgets.QDialog):
             self.app.conn.commit()
         except Exception as e_:
             print(e_)
-            self.app.conn.rollback() # revert all changes 
+            self.app.conn.rollback()  # revert all changes
             self.update_dialog_codes_and_categories()
-            raise            
+            raise
         self.update_dialog_codes_and_categories()
 
     def merge_codes(self, item, parent):
@@ -1929,8 +1949,8 @@ class DialogCodeImage(QtWidgets.QDialog):
             self.app.conn.commit()
         except Exception as e_:
             print(e_)
-            self.app.conn.rollback() # revert all changes 
-            raise            
+            self.app.conn.rollback()  # revert all changes
+            raise
         self.parent_textEdit.append(msg)
         self.update_dialog_codes_and_categories()
         self.app.delete_backup = False
