@@ -80,6 +80,9 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         self.ui.treeWidget.setStyleSheet(font)
         self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.SelectionMode.ExtendedSelection)
         self.fill_tree()
+        # These signals after the tree is filled the first time
+        self.ui.treeWidget.itemCollapsed.connect(self.get_collapsed)
+        self.ui.treeWidget.itemExpanded.connect(self.get_collapsed)
         self.ui.radioButton.clicked.connect(self.sort_by_alphabet)
         self.ui.radioButton_2.clicked.connect(self.sort_by_totals)
 
@@ -388,6 +391,18 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         Message(self.app, _('File export'), msg).exec()
         self.parent_textEdit.append(msg)
 
+    def get_collapsed(self, item):
+        """ On category collapse or expansion signal, find the collapsed parent category items.
+        This will fill the self.app.collapsed_categories and is the expanded/collapsed tree is then replicated across
+        other areas of the app. """
+
+        if item.text(1)[:3] == "cid":
+            return
+        if not item.isExpanded() and item.text(1) not in self.app.collapsed_categories:
+            self.app.collapsed_categories.append(item.text(1))
+        if item.isExpanded() and item.text(1) in self.app.collapsed_categories:
+            self.app.collapsed_categories.remove(item.text(1))
+
     def fill_tree(self):
         """ Fill tree widget, top level items are main categories and unlinked codes. """
 
@@ -407,7 +422,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
             self.ui.treeWidget.setColumnHidden(1, False)
         self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.ui.treeWidget.header().setStretchLastSection(False)
-        # add top level categories
+        # Add top level categories
         remove_list = []
         for c in cats:
             if c['supercatid'] is None:
@@ -419,6 +434,10 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
                 top_item = QtWidgets.QTreeWidgetItem(display_list)
                 top_item.setToolTip(0, c['name'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
+                if f"catid:{c['catid']}" in self.app.collapsed_categories:
+                    top_item.setExpanded(False)
+                else:
+                    top_item.setExpanded(True)
                 remove_list.append(c)
         for item in remove_list:
             cats.remove(item)
@@ -440,6 +459,10 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
                         child = QtWidgets.QTreeWidgetItem(display_list)
                         child.setToolTip(0, c['name'])
                         item.addChild(child)
+                        if f"catid:{c['catid']}" in self.app.collapsed_categories:
+                            child.setExpanded(False)
+                        else:
+                            child.setExpanded(True)
                         remove_list.append(c)
                     it += 1
                     item = it.value()
@@ -489,7 +512,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
                 it += 1
                 item = it.value()
         self.ui.treeWidget.sortByColumn(0, QtCore.Qt.SortOrder.AscendingOrder)
-        self.ui.treeWidget.expandAll()
+        # self.ui.treeWidget.expandAll()
 
 
 class DialogReportCoderComparisons(QtWidgets.QDialog):
@@ -532,6 +555,9 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
             self.ui.comboBox_coders.setCurrentIndex(1)
             self.ui.comboBox_coders.setCurrentIndex(2)
         self.fill_tree()
+        # These signals after the tree is filled the first time
+        self.ui.treeWidget.itemCollapsed.connect(self.get_collapsed)
+        self.ui.treeWidget.itemExpanded.connect(self.get_collapsed)
 
     def get_data(self):
         """ Called from init. gets coders, codes, categories, file_summaries.
@@ -803,6 +829,19 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
             pass
         return total
 
+    def get_collapsed(self, item):
+        """ On category collapse or expansion signal, find the collapsed parent category items.
+        This will fill the self.app.collapsed_categories and is the expanded/collapsed tree is then replicated across
+        other areas of the app. """
+
+        #print(item.text(0), item.text(1), "Expanded:", item.isExpanded())
+        if item.text(1)[:3] == "cid":
+            return
+        if not item.isExpanded() and item.text(1) not in self.app.collapsed_categories:
+            self.app.collapsed_categories.append(item.text(1))
+        if item.isExpanded() and item.text(1) in self.app.collapsed_categories:
+            self.app.collapsed_categories.remove(item.text(1))
+
     def fill_tree(self):
         """ Fill tree widget, top level items are main categories and unlinked codes. """
 
@@ -826,6 +865,10 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
                     top_item.setText(0, f"{c['name'][:30]}..{c['name'][-30:]}")
                 top_item.setToolTip(0, c['name'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
+                if f"catid:{c['catid']}" in self.app.collapsed_categories:
+                    top_item.setExpanded(False)
+                else:
+                    top_item.setExpanded(True)
                 remove_list.append(c)
         for item in remove_list:
             cats.remove(item)
@@ -844,6 +887,10 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
                             child.setText(0, f"{c['name'][:30]}..{c['name'][-30:]}")
                         child.setToolTip(0, c['name'])
                         item.addChild(child)
+                        if f"catid:{c['catid']}" in self.app.collapsed_categories:
+                            child.setExpanded(False)
+                        else:
+                            child.setExpanded(True)
                         remove_list.append(c)
                     it += 1
                     item = it.value()
@@ -886,7 +933,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
                 it += 1
                 item = it.value()
         self.ui.treeWidget.sortByColumn(0, QtCore.Qt.SortOrder.AscendingOrder)
-        self.ui.treeWidget.expandAll()
+        # self.ui.treeWidget.expandAll()
 
     def information(self):
         """ Provide statistical help information. """
