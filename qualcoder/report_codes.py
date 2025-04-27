@@ -21,6 +21,7 @@ https://qualcoder.wordpress.com/
 import sqlite3
 from copy import deepcopy
 import csv
+import datetime
 import fitz
 import logging
 import openpyxl
@@ -2252,6 +2253,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             action_unmark = menu.addAction(_("Unmark"))
             action_important = menu.addAction(_("Add important mark"))
             action_change_code_to = menu.addAction(_("Change code to"))
+            action_apply_additional_code = menu.addAction(_("Apply additional code"))
         action_copy = None
         if selected_text != "":
             action_copy = menu.addAction(_("Copy to clipboard"))
@@ -2276,6 +2278,8 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.mark_important(code_here)
         if action == action_change_code_to:
                 self.change_code_to_another_code(code_here)
+        if action == action_apply_additional_code:
+            self.apply_additional_code(code_here)
         if action == action_copy:
             cb = QtWidgets.QApplication.clipboard()
             cb.setText(selected_text)
@@ -2341,6 +2345,63 @@ class DialogReportCodes(QtWidgets.QDialog):
                 cur.execute("update code_image set cid=? where imid=?", [replacement_code['cid'], existing_code['imid']])
             if existing_code['result_type'] == 'av':
                 cur.execute("update code_av set cid=? where avid=?", [replacement_code['cid'], existing_code['avid']])
+            self.app.conn.commit()
+        except sqlite3.IntegrityError:
+            Message(self.app, "Cannot change code", "This is already marked with the selected code").exec()
+            return
+        Message(self.app, "Changed code", "Run report again to update display").exec()
+        self.app.delete_backup = False
+        # Remove widgets from coding layout
+        contents = self.tab_coding.layout()
+        if contents:
+            for i in reversed(range(contents.count())):
+                contents.itemAt(i).widget().close()
+                contents.itemAt(i).widget().setParent(None)
+
+    def apply_additional_code(self, existing_code):
+        """ Apply another code to this exact segment. """
+
+        # Get additional code
+        codes_list = deepcopy(self.code_names)
+        to_hide = None
+        for code_ in codes_list:
+            if code_['cid'] == existing_code['cid']:
+                to_hide = code_
+        if to_hide:
+            codes_list.remove(to_hide)
+        ui = DialogSelectItems(self.app, codes_list, _("Select replacement code"), "single")
+        ok = ui.exec()
+        if not ok:
+            return
+        new_code = ui.get_selected()
+        if not new_code:
+            return
+        cur = self.app.conn.cursor()
+        now_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
+        owner = self.app.settings['codername']
+        try:
+            if existing_code['result_type'] == 'text':
+                cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
+                            memo,date, important) values(?,?,?,?,?,?,'',?,null)", (new_code['cid'],
+                                                                               existing_code['fid'],
+                                                                               existing_code['text'],
+                                                                               existing_code['pos0'],
+                                                                               existing_code['pos1'],
+                                                                               owner,
+                                                                               now_date))
+            if existing_code['result_type'] == 'image':
+                cur.execute(
+                    "insert into code_image (id,x1,y1,width,height,cid,memo,date,owner, important, pdf_page) "
+                    "values(?,?,?,?,?,?,'',?,?,null,?)",
+                                                    (existing_code['fid'], existing_code['x1'], existing_code['y1'],
+                                                     existing_code['width'], existing_code['height'],
+                                                     new_code['cid'], now_date, owner, existing_code['pdf_page']))
+            if existing_code['result_type'] == 'av':
+                cur.execute("insert into code_av (id, pos0, pos1, cid, memo, date, owner, important) "
+                            "values(?,?,?,?,'',?,?, null)",
+                            (existing_code['fid'], existing_code['pos0'], existing_code['pos1'], new_code['cid'],
+                             now_date, owner))
+
             self.app.conn.commit()
         except sqlite3.IntegrityError:
             Message(self.app, "Cannot change code", "This is already marked with the selected code").exec()
