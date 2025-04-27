@@ -22,7 +22,7 @@ https://qualcoder.wordpress.com/
 from copy import copy
 import logging
 import os
-import qtawesome as qta
+import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 
 from PyQt6 import QtGui, QtWidgets, QtCore
 from PyQt6.QtCore import Qt
@@ -97,6 +97,10 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
             self.ui.comboBox_coders.setCurrentIndex(1)
             self.ui.comboBox_coders.setCurrentIndex(2)
         self.fill_tree()
+        # These signals after the tree is filled the first time
+        self.ui.treeWidget.itemCollapsed.connect(self.get_collapsed)
+        self.ui.treeWidget.itemExpanded.connect(self.get_collapsed)
+
         self.ui.treeWidget.itemSelectionChanged.connect(self.code_selected)
         self.ui.listWidget_files.itemClicked.connect(self.file_selected)
         self.ui.textEdit.setReadOnly(True)
@@ -713,6 +717,18 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
                 fmt.setForeground(text_brush)
                 cursor.setCharFormat(fmt)
 
+    def get_collapsed(self, item):
+        """ On category collapse or expansion signal, find the collapsed parent category items.
+        This will fill the self.app.collapsed_categories and is the expanded/collapsed tree is then replicated across
+        other areas of the app. """
+
+        if item.text(1)[:3] == "cid":
+            return
+        if not item.isExpanded() and item.text(1) not in self.app.collapsed_categories:
+            self.app.collapsed_categories.append(item.text(1))
+        if item.isExpanded() and item.text(1) in self.app.collapsed_categories:
+            self.app.collapsed_categories.remove(item.text(1))
+
     def fill_tree(self):
         """ Fill tree widget, top level items are main categories and unlinked codes. """
 
@@ -733,6 +749,10 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid'])])
                 top_item.setToolTip(0, c['name'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
+                if f"catid:{c['catid']}" in self.app.collapsed_categories:
+                    top_item.setExpanded(False)
+                else:
+                    top_item.setExpanded(True)
                 remove_list.append(c)
         for item in remove_list:
             cats.remove(item)
@@ -744,11 +764,15 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
             for c in cats:
                 it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
                 item = it.value()
-                while item:  # while there is an item in the list
+                while item:  # While there is an item in the list
                     if item.text(1) == 'catid:' + str(c['supercatid']):
                         child = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid'])])
                         child.setToolTip(0, c['name'])
                         item.addChild(child)
+                        if f"catid:{c['catid']}" in self.app.collapsed_categories:
+                            child.setExpanded(False)
+                        else:
+                            child.setExpanded(True)
                         remove_list.append(c)
                     it += 1
                     item = it.value()
@@ -788,7 +812,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
                 it += 1
                 item = it.value()
         self.ui.treeWidget.sortByColumn(0, QtCore.Qt.SortOrder.AscendingOrder)
-        self.ui.treeWidget.expandAll()
+        # self.ui.treeWidget.expandAll()
 
 
 class DialogDualCodedImage(QtWidgets.QDialog):
