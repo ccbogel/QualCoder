@@ -947,14 +947,14 @@ class DialogManageFiles(QtWidgets.QDialog):
         cur.execute("select name, fulltext, mediapath from source where id=?", [id_])
         res = cur.fetchone()
         metadata = res[0] + "\n"
-        icon = QtGui.QIcon(qta.icon('mdi6.text-box-outline'))
+        icon = QtGui.QIcon(qta.icon('mdi6.text-box-outline', options=[{'scale_factor': 1.2}]))
         # Check if text file is a transcription and add details
         cur.execute("select name from source where av_text_id=?", [id_])
         transcript_res = cur.fetchone()
         if transcript_res is not None:
             metadata += _("Transcript for: ") + f"{transcript_res[0]}\n"
             metadata += _("Characters: ") + str(len(res[1]))
-            icon = QtGui.QIcon(qta.icon('mdi6.text'))
+            icon = QtGui.QIcon(qta.icon('mdi6.text', options=[{'scale_factor': 1.2}]))
         if res[1] is not None and len(res[1]) > 0 and res[2] is None:
             metadata += _("Characters: ") + str(len(res[1]))
             return icon, metadata
@@ -966,7 +966,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             return icon, metadata
         if res[1] is not None and len(res[1]) > 5 and res[2][:5] == "docs:":
             metadata += _("Characters: ") + str(len(res[1]))
-            icon = QtGui.QIcon(qta.icon('mdi6.text-box-check-outline'))
+            icon = QtGui.QIcon(qta.icon('mdi6.text-box-check-outline', options=[{'scale_factor': 1.2}]))
             return icon, metadata
 
         abs_path = ""
@@ -980,7 +980,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             abs_path = self.app.project_path + res[2]
 
         if res[2][:8] == "/images/":
-            icon = QtGui.QIcon(qta.icon('mdi6.image-outline'))
+            icon = QtGui.QIcon(qta.icon('mdi6.image-outline', options=[{'scale_factor': 1.2}]))
             try:
                 image = Image.open(abs_path)
                 w, h = image.size
@@ -989,7 +989,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 return icon, metadata
             metadata += f"W: {w} x H: {h}"
         if res[2][:7] == "images:":
-            icon = QtGui.QIcon(qta.icon('mdi6.image-check-outline'))
+            icon = QtGui.QIcon(qta.icon('mdi6.image-check-outline', options=[{'scale_factor': 1.2}]))
             try:
                 image = Image.open(abs_path)
                 w, h = image.size
@@ -998,13 +998,13 @@ class DialogManageFiles(QtWidgets.QDialog):
                 return icon, metadata
             metadata += f"W: {w} x H: {h}"
         if res[2][:7] == "/video/":
-            icon = QtGui.QIcon(qta.icon('mdi6.video-outline'))
+            icon = QtGui.QIcon(qta.icon('mdi6.video-outline', options=[{'scale_factor': 1.2}]))
         if res[2][:6] == "video:":
-            icon = QtGui.QIcon(qta.icon('mdi6.video-check-outline'))
+            icon = QtGui.QIcon(qta.icon('mdi6.video-check-outline', options=[{'scale_factor': 1.2}]))
         if res[2][:7] == "/audio/":
-            icon = QtGui.QIcon(qta.icon('mdi6.play'))
+            icon = QtGui.QIcon(qta.icon('mdi6.play', options=[{'scale_factor': 1.2}]))
         if res[2][:6] == "audio:":
-            icon = QtGui.QIcon(qta.icon('mdi6.play-protected-content'))
+            icon = QtGui.QIcon(qta.icon('mdi6.play-protected-content', options=[{'scale_factor': 1.2}]))
         if res[2][:6] in ("/audio", "audio:", "/video", "video:"):
             if not os.path.exists(abs_path):
                 metadata += _("Cannot locate media. ") + abs_path
