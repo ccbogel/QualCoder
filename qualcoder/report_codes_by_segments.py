@@ -23,7 +23,7 @@ from copy import deepcopy
 import logging
 import openpyxl
 import os
-import qtawesome as qta
+import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 
 from PyQt6 import QtGui, QtWidgets, QtCore
 from PyQt6.QtCore import Qt
@@ -32,6 +32,7 @@ from PyQt6.QtGui import QBrush
 from .color_selector import TextColor
 from .GUI.ui_report_codes_by_segments import Ui_DialogSegmentCodings
 from .helpers import Message
+from .report_attributes import DialogSelectAttributeParameters
 
 
 path = os.path.abspath(os.path.dirname(__file__))
@@ -57,6 +58,7 @@ class DialogCodesBySegments(QtWidgets.QDialog):
     files = []
     cases = []
     results = []
+    attributes = []
     # Variables for search restrictions
     file_ids_string = ""
     case_ids_string = ""
@@ -87,7 +89,8 @@ class DialogCodesBySegments(QtWidgets.QDialog):
         self.ui.pushButton_run_report.setIcon(qta.icon('mdi6.play', options=[{'scale_factor': 2}]))
         self.ui.pushButton_export_xlsx.setIcon(qta.icon('mdi6.export', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_export_xlsx.clicked.connect(self.export_xlsx_file)
-
+        self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_file_attributes.pressed.connect(self.get_files_from_attributes)
         self.get_files_and_cases()
         self.ui.listWidget_files.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.listWidget_files.customContextMenuRequested.connect(self.listwidget_files_menu)
@@ -101,6 +104,7 @@ class DialogCodesBySegments(QtWidgets.QDialog):
         self.code_ids_string = ""
         self.code_columns = []
         self.results = []
+        self.attributes = []
         self.segment_rows = []
         self.horizontal_labels = []
         self.xlsx_results = []
@@ -172,6 +176,63 @@ class DialogCodesBySegments(QtWidgets.QDialog):
                     self.case_ids_string += f",{c['id']}"
         if len(self.case_ids_string) > 0:
             self.case_ids_string = self.case_ids_string[1:]
+
+    def get_files_from_attributes(self):
+        """ Select text files based on attribute selections.
+        Attribute results are a dictionary of:
+        first item is a Boolean AND or OR list item
+        Followed by each attribute list item
+        Set:
+            self.file_ids
+        """
+
+        self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
+        ui = DialogSelectAttributeParameters(self.app)
+        ui.fill_parameters(self.attributes)
+        temp_attributes = deepcopy(self.attributes)
+        self.attributes = []
+        ok = ui.exec()
+        if not ok:
+            self.attributes = temp_attributes
+            self.ui.pushButton_file_attributes.setIcon(
+                qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
+            self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
+            if self.attributes:
+                self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable-box', options=[{'scale_factor': 1.3}]))
+            return
+        self.attributes = ui.parameters
+        if len(self.attributes) == 1:  # Boolean parameter, no attributes selected
+            self.ui.pushButton_file_attributes.setIcon(
+                qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
+            self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
+            self.attributes = []
+            return
+        if not ui.result_file_ids:
+            Message(self.app, _("Nothing found") + " " * 20, _("No matching files found")).exec()
+            self.ui.pushButton_file_attributes.setIcon(
+                qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
+            self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
+            return
+
+        # Limit to text files
+        text_files = self.app.get_text_filenames()
+        msg = ui.tooltip_msg
+        selected_file_mames = []
+        for i, file_ in enumerate(text_files):
+            if file_['id'] in ui.result_file_ids:
+                selected_file_mames.append(file_['name'])
+                if i < 20:
+                    msg += f"\n{file_['name']}"
+        if len(ui.result_file_ids) > 20:
+            msg += f"\nand more. Total files: {len(ui.result_file_ids)}"
+        Message(self.app, _("Files selected by attributes"), msg).exec()
+
+        for i in range(self.ui.listWidget_files.count()):
+            item_name = self.ui.listWidget_files.item(i).text()
+            if item_name in selected_file_mames:
+                self.ui.listWidget_files.item(i).setSelected(True)
+            else:
+                self.ui.listWidget_files.item(i).setSelected(False)
 
     def listwidget_files_menu(self, position):
         """ Context menu for file selection. """
