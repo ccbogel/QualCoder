@@ -27,7 +27,7 @@ import html
 import logging
 from operator import itemgetter
 import os
-import qtawesome as qta
+import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 from random import randint
 import re
 import webbrowser
@@ -217,6 +217,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.tabWidget.setCurrentIndex(0)  # Defaults to list of documents
         self.get_files()
 
+        # Buttons under files list
         self.ui.pushButton_latest.setIcon(qta.icon('mdi6.arrow-collapse-right'))
         self.ui.pushButton_latest.pressed.connect(self.go_to_latest_coded_file)
         self.ui.pushButton_next_file.setIcon(qta.icon('mdi6.arrow-right'))
@@ -225,12 +226,29 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_bookmark_go.pressed.connect(self.go_to_bookmark)
         self.ui.pushButton_document_memo.setIcon(qta.icon('mdi6.text-long'))
         self.ui.pushButton_document_memo.pressed.connect(self.active_file_memo)
+        self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_file_attributes.pressed.connect(self.get_files_from_attributes)
+        # Buttons under codes tree
+        self.ui.pushButton_find_code.setIcon(qta.icon('mdi6.card-search-outline', options=[{'scale-factor': 1.2}]))
+        self.ui.pushButton_find_code.pressed.connect(self.find_code_in_tree)
         self.ui.pushButton_show_codings_next.setIcon(qta.icon('mdi6.arrow-right'))
         self.ui.pushButton_show_codings_next.pressed.connect(self.show_selected_code_in_text_next)
         self.ui.pushButton_show_codings_prev.setIcon(qta.icon('mdi6.arrow-left'))
         self.ui.pushButton_show_codings_prev.pressed.connect(self.show_selected_code_in_text_previous)
         self.ui.pushButton_show_all_codings.setIcon(qta.icon('mdi6.text-search'))
         self.ui.pushButton_show_all_codings.pressed.connect(self.show_all_codes_in_text)
+        self.ui.pushButton_show_all_codings.setIcon(qta.icon('mdi6.text-search', options=[{'scale-factor': 1.2}]))
+        self.ui.pushButton_show_all_codings.pressed.connect(self.show_all_codes_in_text)
+        self.ui.pushButton_important.setIcon(qta.icon('mdi6.star-outline', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_important.pressed.connect(self.show_important_coded)
+        # Right hand side splitter buttons
+        self.ui.pushButton_code_rule.setIcon(qta.icon('mdi6.text-shadow'))
+        self.ui.pushButton_code_rule.pressed.connect(self.show_code_rule)
+        self.ui.pushButton_journal.hide()
+        self.ui.pushButton_project_memo.setIcon(qta.icon('mdi6.file-document-outline'))
+        self.ui.pushButton_project_memo.pressed.connect(self.show_project_memo)
+        self.ui.textEdit_info.tabChangesFocus()
+        # Header buttons
         self.ui.pushButton_annotate.setIcon(qta.icon('mdi6.text-box-edit-outline', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_annotate.pressed.connect(self.annotate)
         self.ui.pushButton_show_annotations.setIcon(
@@ -255,13 +273,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_default_new_code_color.setIcon(qta.icon('mdi6.palette', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_default_new_code_color.pressed.connect(self.set_default_new_code_color)
         self.ui.label_exports.setPixmap(qta.icon('mdi6.export').pixmap(22, 22))
-        # Right hand side splitter buttons
-        self.ui.pushButton_code_rule.setIcon(qta.icon('mdi6.text-shadow'))
-        self.ui.pushButton_code_rule.pressed.connect(self.show_code_rule)
-        self.ui.pushButton_journal.hide()
-        self.ui.pushButton_project_memo.setIcon(qta.icon('mdi6.file-document-outline'))
-        self.ui.pushButton_project_memo.pressed.connect(self.show_project_memo)
-        self.ui.textEdit_info.tabChangesFocus()
+
         self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
         self.ui.lineEdit_search.setEnabled(False)
         self.ui.checkBox_search_all_files.stateChanged.connect(self.search_for_text)
@@ -292,10 +304,6 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_right_side_pane.pressed.connect(self.show_right_side_pane)
         self.ui.pushButton_delete_all_codes.setIcon(qta.icon('mdi6.delete-outline', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_delete_all_codes.pressed.connect(self.delete_all_codes_from_file)
-        self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
-        self.ui.pushButton_file_attributes.pressed.connect(self.get_files_from_attributes)
-        self.ui.pushButton_important.setIcon(qta.icon('mdi6.star-outline', options=[{'scale_factor': 1.3}]))
-        self.ui.pushButton_important.pressed.connect(self.show_important_coded)
         self.ui.pushButton_edit.setIcon(qta.icon('mdi6.text-box-edit-outline', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_edit.pressed.connect(self.edit_mode_toggle)
         self.ui.pushButton_exit_edit.setIcon(qta.icon('mdi6.text-box-check-outline', options=[{'scale_factor': 1.3}]))
@@ -388,6 +396,11 @@ class DialogCodeText(QtWidgets.QWidget):
 
         font = f'font: {self.ui.comboBox_fontsize.currentText()}pt "{self.app.settings["font"]}";'
         self.ui.textEdit.setStyleSheet(font)
+
+    def find_code_in_tree(self):
+        """ Find a code by name in the tre and select it. """
+
+        Message(self.app, "TODO", "TODO").exec()
 
     def get_recent_codes(self):
         """ Get recently used codes. Must have loaded all codes first.

@@ -87,6 +87,7 @@ class DialogCodePdf(QtWidgets.QWidget):
     undo_deleted_codes = []  # undo last deleted code(s), multiple may have been deleted at th same time, so a list
     different_text_lengths = False
     metadata = ""
+    default_new_code_color = None
 
     # Overlapping coded text details
     overlaps_at_pos = []
@@ -127,6 +128,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.code_rule = False
         self.important = False
         self.attributes = []
+        self.default_new_code_color = None
         self.code_resize_timer = datetime.datetime.now()
         self.overlap_timer = datetime.datetime.now()
 
@@ -162,7 +164,6 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.textEdit.setAutoFillBackground(True)
         self.ui.textEdit.setToolTip("")
         self.ui.textEdit.setMouseTracking(True)
-        # self.ui.textEdit.setReadOnly(True)
         self.ui.textEdit.setTextInteractionFlags(
             Qt.TextInteractionFlag.TextSelectableByMouse |
             Qt.TextInteractionFlag.TextSelectableByKeyboard)
@@ -179,23 +180,13 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.lineEdit_search.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.lineEdit_search.customContextMenuRequested.connect(self.lineedit_search_menu)
 
-        self.ui.pushButton_latest.setIcon(qta.icon('mdi6.arrow-collapse-right', options=[{'scale_factor': 1.4}]))
-        self.ui.pushButton_latest.pressed.connect(self.go_to_latest_coded_file)
-        self.ui.pushButton_next_file.setIcon(qta.icon('mdi6.arrow-right', options=[{'scale_factor': 1.4}]))
-        self.ui.pushButton_next_file.pressed.connect(self.go_to_next_file)
+        # Header widgets
         self.ui.pushButton_object_info.setIcon(qta.icon('mdi6.magnify', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_object_info.pressed.connect(self.show_pdf_object_info)
-        self.ui.pushButton_view_original.setIcon(qta.icon('mdi6.eye-outline', options=[{'scale_factor': 1.4}]))
-        self.ui.pushButton_view_original.pressed.connect(self.view_original_file)
-        self.ui.pushButton_view_original.setToolTip(_("View original file"))
-        self.ui.pushButton_document_memo.setIcon(qta.icon('mdi6.text-box-outline', options=[{'scale_factor': 1.4}]))
-        self.ui.pushButton_document_memo.pressed.connect(self.file_memo)
-
         self.ui.pushButton_zoom_in.setIcon(qta.icon('mdi6.magnify-plus-outline', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_zoom_in.pressed.connect(self.zoom_in)
         self.ui.pushButton_zoom_out.setIcon(qta.icon('mdi6.magnify-minus-outline', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_zoom_out.pressed.connect(self.zoom_out)
-
         self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
         self.ui.lineEdit_search.setEnabled(False)
         self.ui.checkBox_search_case.stateChanged.connect(self.search_for_text)
@@ -205,8 +196,17 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.pushButton_export.setIcon(qta.icon('mdi6.export', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_export.pressed.connect(self.export_pdf_image)
         self.ui.label_font_size.setPixmap(qta.icon('mdi6.format-size').pixmap(22, 22))
-
-        # Pages widgets
+        self.ui.pushButton_previous.setIcon(qta.icon('mdi6.arrow-left', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_previous.setEnabled(False)
+        self.ui.pushButton_previous.pressed.connect(self.move_to_previous_search_text)
+        self.ui.pushButton_next.setIcon(qta.icon('mdi6.arrow-right', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_next.setEnabled(False)
+        self.ui.pushButton_next.pressed.connect(self.move_to_next_search_text)
+        self.ui.pushButton_help.setIcon(qta.icon('mdi6.help'))
+        self.ui.pushButton_help.pressed.connect(self.help)
+        self.ui.pushButton_default_new_code_color.setIcon(qta.icon('mdi6.palette'))
+        self.ui.pushButton_default_new_code_color.pressed.connect(self.set_default_new_code_color)
+        # Header - pdf pages widgets
         self.ui.label_pages.setText("")
         self.ui.pushButton_next_page.setIcon(qta.icon('mdi6.arrow-right', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_next_page.pressed.connect(self.next_page)
@@ -216,19 +216,22 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.pushButton_last_page.pressed.connect(self.last_page)
         self.ui.pushButton_goto_page.setIcon(qta.icon('mdi6.book-search-outline', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_goto_page.pressed.connect(self.goto_page)
-
-        self.ui.pushButton_previous.setIcon(qta.icon('mdi6.arrow-left', options=[{'scale_factor': 1.4}]))
-        self.ui.pushButton_previous.setEnabled(False)
-        self.ui.pushButton_previous.pressed.connect(self.move_to_previous_search_text)
-        self.ui.pushButton_next.setIcon(qta.icon('mdi6.arrow-right', options=[{'scale_factor': 1.4}]))
-        self.ui.pushButton_next.setEnabled(False)
-        self.ui.pushButton_next.pressed.connect(self.move_to_next_search_text)
-        self.ui.pushButton_help.setIcon(qta.icon('mdi6.help'))
-        self.ui.pushButton_help.pressed.connect(self.help)
+        # Widgets under Files list
+        self.ui.pushButton_latest.setIcon(qta.icon('mdi6.arrow-collapse-right', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_latest.pressed.connect(self.go_to_latest_coded_file)
+        self.ui.pushButton_next_file.setIcon(qta.icon('mdi6.arrow-right', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_next_file.pressed.connect(self.go_to_next_file)
+        self.ui.pushButton_view_original.setIcon(qta.icon('mdi6.eye-outline', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_view_original.pressed.connect(self.view_original_file)
+        self.ui.pushButton_view_original.setToolTip(_("View original file"))
+        self.ui.pushButton_document_memo.setIcon(qta.icon('mdi6.text-box-outline', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_document_memo.pressed.connect(self.file_memo)
         self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_file_attributes.pressed.connect(self.get_files_from_attributes)
+        # Widgets under codes tree
         self.ui.pushButton_important.setIcon(qta.icon('mdi6.star-outline', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_important.pressed.connect(self.show_important_coded)
+
         self.ui.treeWidget.setDragEnabled(True)
         self.ui.treeWidget.setAcceptDrops(True)
         self.ui.treeWidget.setDragDropMode(QtWidgets.QAbstractItemView.DragDropMode.InternalMove)
@@ -236,7 +239,6 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
         self.ui.treeWidget.itemSelectionChanged.connect(self.fill_code_label)
-
         self.ui.textEdit_2.setReadOnly(True)  # Code examples
         self.ui.splitter.setSizes([150, 400, 150])
         self.ui.splitter_2.setSizes([100, 0])
@@ -254,13 +256,7 @@ class DialogCodePdf(QtWidgets.QWidget):
 
         self.ui.checkBox_image.stateChanged.connect(self.update_page)
         self.ui.checkBox_black_text.stateChanged.connect(self.update_page)
-        # self.ui.checkBox_curve.stateChanged.connect(self.update_page)
-        self.ui.checkBox_curve.hide()
-        # self.ui.checkBox_rect.stateChanged.connect(self.update_page)
-        self.ui.checkBox_rect.hide()
         self.ui.checkBox_text.stateChanged.connect(self.update_page)
-        # self.ui.checkBox_line.stateChanged.connect(self.update_page)
-        self.ui.checkBox_line.hide()
 
         self.get_files()
         self.fill_tree()
@@ -276,6 +272,20 @@ class DialogCodePdf(QtWidgets.QWidget):
         msg += "\n" + _(
             "Similarly, if the PDF plain text has been edited in any way, this will affect coding stripes display.")
         Message(self.app, _("Information") + " " * 20, msg).exec()
+
+    def set_default_new_code_color(self):
+        """ New code colours are usually generated randomly.
+         This overides the random approach, by setting a colout. """
+
+        tmp_code = {'name': 'new', 'color': None}
+        ui = DialogColorSelect(self.app, tmp_code)
+        ok = ui.exec()
+        if not ok:
+            return
+        color = ui.get_color()
+        if color is not None:
+            self.ui.pushButton_default_new_code_color.setStyleSheet(f'background-color: {color}')
+        self.default_new_code_color = color
 
     def goto_page(self):
         if self.pages:
@@ -1984,6 +1994,8 @@ class DialogCodePdf(QtWidgets.QWidget):
             if code_name is None:
                 return False
         code_color = colors[randint(0, len(colors) - 1)]
+        if self.default_new_code_color:
+            code_color = self.default_new_code_color
         item = {'name': code_name, 'memo': "", 'owner': self.app.settings['codername'],
                 'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), 'catid': catid,
                 'color': code_color}
