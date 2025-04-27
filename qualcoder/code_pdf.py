@@ -262,6 +262,10 @@ class DialogCodePdf(QtWidgets.QWidget):
 
         self.get_files()
         self.fill_tree()
+        # These signals after the tree is filled the first time
+        self.ui.treeWidget.itemCollapsed.connect(self.get_collapsed)
+        self.ui.treeWidget.itemExpanded.connect(self.get_collapsed)
+
         msg = _("QualCoder roughly displays PDFs.")
         # msg += "\n" + _("Some images will not display and image masks and rotations will not work.")
         msg += "\n" + _("Original fonts or bold or italic are not applied.")
@@ -513,8 +517,6 @@ class DialogCodePdf(QtWidgets.QWidget):
         The Count column counts the number of times that code has been used by selected coder in selected file.
         Keep record of non-expanded items, then re-enact these items when treee fill is called again. """
 
-        non_expanded = []
-        self.tree_traverse_for_non_expanded(self.ui.treeWidget.invisibleRootItem(), non_expanded)
         cats = deepcopy(self.categories)
         codes = deepcopy(self.codes)
         self.ui.treeWidget.clear()
@@ -540,7 +542,7 @@ class DialogCodePdf(QtWidgets.QWidget):
                     top_item.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
                     top_item.setToolTip(0, c['name'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
-                if f"catid:{c['catid']}" in non_expanded:
+                if f"catid:{c['catid']}" in self.app.collapsed_categories:
                     top_item.setExpanded(False)
                 else:
                     top_item.setExpanded(True)
@@ -568,7 +570,7 @@ class DialogCodePdf(QtWidgets.QWidget):
                             child.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
                             child.setToolTip(0, c['name'])
                         item.addChild(child)
-                        if f"catid:{c['catid']}" in non_expanded:
+                        if f"catid:{c['catid']}" in self.app.collapsed_categories:
                             child.setExpanded(False)
                         else:
                             child.setExpanded(True)
@@ -668,6 +670,20 @@ class DialogCodePdf(QtWidgets.QWidget):
             it += 1
             item = it.value()
             count += 1
+
+    def get_collapsed(self, item):
+        """ On category collapse or expansion signal, find the collapsed parent category items.
+        This will fill the self.app.collapsed_categories and is the expanded/collapsed tree is then replicated across
+        other areas of the app. """
+
+        #print(item.text(0), item.text(1), "Expanded:", item.isExpanded())
+        if item.text(1)[:3] == "cid":
+            return
+        if not item.isExpanded() and item.text(1) not in self.app.collapsed_categories:
+            self.app.collapsed_categories.append(item.text(1))
+        if item.isExpanded() and item.text(1) in self.app.collapsed_categories:
+            self.app.collapsed_categories.remove(item.text(1))
+        print("pdf", self.app.collapsed_categories)
 
     def get_codes_and_categories(self):
         """ Called from init, delete category/code.

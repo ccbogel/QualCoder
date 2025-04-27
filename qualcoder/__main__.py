@@ -179,6 +179,9 @@ class App(object):
     delete_backup = True
     # Used as a default export location, which may be different from the working directory
     last_export_directory = ""
+    # Used across app to have a consistent look of expanded and contracted categories in the codes tree. Visual appeal.
+    collapsed_categories = []
+
     ai = None
     ai_models = []
     # This is the sentence transformer embedding function. It is stored here so it must not be reloaded every time a project is opened.
@@ -188,6 +191,7 @@ class App(object):
         self.conn = None
         self.project_path = ""
         self.project_name = ""
+        self.collapsed_categories = []
         self.last_export_directory = ""
         self.delete_backup = True
         self.delete_backup_path_name = ""

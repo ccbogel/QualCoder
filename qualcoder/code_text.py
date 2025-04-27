@@ -284,14 +284,6 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.label_search_case_sensitive.setPixmap(qta.icon('mdi6.format-letter-case').pixmap(22, 22))
         self.ui.label_search_all_files.setPixmap(qta.icon('mdi6.text-box-multiple-outline').pixmap(22, 22))
         self.ui.label_font_size.setPixmap(qta.icon('mdi6.format-size').pixmap(22, 22))
-
-        index = self.ui.comboBox_fontsize.findText(str(self.app.settings['docfontsize']),
-                                                   QtCore.Qt.MatchFlag.MatchFixedString)
-        if index == -1:
-            index = 0
-        self.ui.comboBox_fontsize.setCurrentIndex(index)
-        self.ui.comboBox_fontsize.currentTextChanged.connect(self.change_text_font_size)
-
         self.ui.pushButton_previous.setIcon(qta.icon('mdi6.arrow-left', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_previous.setEnabled(False)
         self.ui.pushButton_next.setIcon(qta.icon('mdi6.arrow-right', options=[{'scale_factor': 1.3}]))
@@ -319,6 +311,12 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
         self.ui.treeWidget.itemSelectionChanged.connect(self.fill_code_label_with_selected_code)
         self.ui.comboBox_export.currentIndexChanged.connect(self.export_option_selected)
+        index = self.ui.comboBox_fontsize.findText(str(self.app.settings['docfontsize']),
+                                                   QtCore.Qt.MatchFlag.MatchFixedString)
+        if index == -1:
+            index = 0
+        self.ui.comboBox_fontsize.setCurrentIndex(index)
+        self.ui.comboBox_fontsize.currentTextChanged.connect(self.change_text_font_size)
         self.ui.splitter.setSizes([150, 400])
         try:
             s0 = int(self.app.settings['dialogcodetext_splitter0'])
@@ -342,6 +340,9 @@ class DialogCodeText(QtWidgets.QWidget):
         layout.addWidget(self.number_bar)
         self.ui.lineNumbers.setLayout(layout)
         self.fill_tree()
+        # These signals after the tree is filled the first time
+        self.ui.treeWidget.itemCollapsed.connect(self.get_collapsed)
+        self.ui.treeWidget.itemExpanded.connect(self.get_collapsed)
 
         # AI search
         self.ui.pushButton_ai_search.pressed.connect(self.ai_search_clicked)
@@ -459,6 +460,19 @@ class DialogCodeText(QtWidgets.QWidget):
                         self.recent_codes.append(code_)
             except ValueError:
                 pass
+
+    def get_collapsed(self, item):
+        """ On category collapse or expansion signal, find the collapsed parent category items.
+        This will fill the self.app.collapsed_categories and is the expanded/collapsed tree is then replicated across
+        other areas of the app. """
+
+        #print(item.text(0), item.text(1), "Expanded:", item.isExpanded())
+        if item.text(1)[:3] == "cid":
+            return
+        if not item.isExpanded() and item.text(1) not in self.app.collapsed_categories:
+            self.app.collapsed_categories.append(item.text(1))
+        if item.isExpanded() and item.text(1) in self.app.collapsed_categories:
+            self.app.collapsed_categories.remove(item.text(1))
 
     def get_files(self, ids=None):
         """ Get files with additional details and fill list widget.
@@ -609,28 +623,11 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_show_codings_prev.setIcon(qta.icon('mdi6.arrow-left', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_show_codings_next.setIcon(qta.icon('mdi6.arrow-right', options=[{'scale_factor': 1.3}]))
 
-    def tree_traverse_for_non_expanded(self, item, non_expanded):
-        """ Find all categories and codes
-        Recurse through all child categories.
-        Called by: fill_tree
-        param:
-            item: a QTreeWidgetItem
-            list of non-expanded categories as String if catid:#
-        """
-
-        child_count = item.childCount()
-        for i in range(child_count):
-            if "catid:" in item.child(i).text(1) and not item.child(i).isExpanded():
-                non_expanded.append(item.child(i).text(1))
-            self.tree_traverse_for_non_expanded(item.child(i), non_expanded)
-
     def fill_tree(self):
         """ Fill tree widget, top level items are main categories and unlinked codes.
         The Count column counts the number of times that code has been used by selected coder in selected file.
         Keep record of non-expanded items, then re-enact these items when treee fill is called again. """
 
-        non_expanded = []
-        self.tree_traverse_for_non_expanded(self.ui.treeWidget.invisibleRootItem(), non_expanded)
         cats = deepcopy(self.categories)
         codes = deepcopy(self.codes)
         self.ui.treeWidget.clear()
@@ -658,7 +655,7 @@ class DialogCodeText(QtWidgets.QWidget):
                     top_item.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
                     top_item.setToolTip(0, c['name'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
-                if f"catid:{c['catid']}" in non_expanded:
+                if f"catid:{c['catid']}" in self.app.collapsed_categories:
                     top_item.setExpanded(False)
                 else:
                     top_item.setExpanded(True)
@@ -686,7 +683,7 @@ class DialogCodeText(QtWidgets.QWidget):
                             child.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
                             child.setToolTip(0, c['name'])
                         item.addChild(child)
-                        if f"catid:{c['catid']}" in non_expanded:
+                        if f"catid:{c['catid']}" in self.app.collapsed_categories:
                             child.setExpanded(False)
                         else:
                             child.setExpanded(True)

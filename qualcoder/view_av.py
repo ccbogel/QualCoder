@@ -223,8 +223,11 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
         self.ui.treeWidget.itemClicked.connect(self.assign_selected_text_to_code)
-        self.fill_tree()
         self.get_files()
+        self.fill_tree()
+        # These signals after the tree is filled the first time
+        self.ui.treeWidget.itemCollapsed.connect(self.get_collapsed)
+        self.ui.treeWidget.itemExpanded.connect(self.get_collapsed)
 
         # My solution to getting gui mouse events by putting vlc video in another dialog
         # A display-dialog named ddialog
@@ -237,8 +240,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ddialog.gridLayout = QtWidgets.QGridLayout(self.ddialog)
         self.ddialog.dframe = QtWidgets.QFrame(self.ddialog)
         self.ddialog.dframe.setObjectName("frame")
-        '''if platform.system() == "Darwin":  # For MacOS
-            self.ddialog.dframe = QtWidgets.QMacCocoaViewContainer(0)'''
         self.palette = self.ddialog.dframe.palette()
         self.palette.setColor(QtGui.QPalette.ColorRole.Window, QColor(30, 30, 30))
         self.ddialog.dframe.setPalette(self.palette)
@@ -494,26 +495,9 @@ class DialogCodeAV(QtWidgets.QDialog):
         if len(selected_text) > 0:
             self.mark()
 
-    def tree_traverse_for_non_expanded(self, item, non_expanded):
-        """ Find all categories and codes
-        Recurse through all child categories.
-        Called by: fill_tree
-        param:
-            item: a QTreeWidgetItem
-            list of non-expanded categories as String if catid:#
-        """
-
-        child_count = item.childCount()
-        for i in range(child_count):
-            if "catid:" in item.child(i).text(1) and not item.child(i).isExpanded():
-                non_expanded.append(item.child(i).text(1))
-            self.tree_traverse_for_non_expanded(item.child(i), non_expanded)
-
     def fill_tree(self):
         """ Fill tree widget, tope level items are main categories and unlinked codes. """
 
-        non_expanded = []
-        self.tree_traverse_for_non_expanded(self.ui.treeWidget.invisibleRootItem(), non_expanded)
         cats = deepcopy(self.categories)
         codes = deepcopy(self.codes)
         self.ui.treeWidget.clear()
@@ -525,7 +509,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.ui.treeWidget.setColumnHidden(1, False)
         self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.ui.treeWidget.header().setStretchLastSection(False)
-        # add top level categories
+        # Add top level categories
         remove_list = []
         for c in cats:
             if c['supercatid'] is None:
@@ -539,7 +523,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                     top_item.setToolTip(0, c['name'])
                 top_item.setToolTip(2, c['memo'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
-                if f"catid:{c['catid']}" in non_expanded:
+                if f"catid:{c['catid']}" in self.app.collapsed_categories:
                     top_item.setExpanded(False)
                 else:
                     top_item.setExpanded(True)
@@ -569,7 +553,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                             child.setToolTip(0, c['name'])
                         child.setToolTip(2, c['memo'])
                         item.addChild(child)
-                        if f"catid:{c['catid']}" in non_expanded:
+                        if f"catid:{c['catid']}" in self.app.collapsed_categories:
                             child.setExpanded(False)
                         else:
                             child.setExpanded(True)
@@ -671,6 +655,19 @@ class DialogCodeAV(QtWidgets.QDialog):
             it += 1
             item = it.value()
             count += 1
+
+    def get_collapsed(self, item):
+        """ On category collapse or expansion signal, find the collapsed parent category items.
+        This will fill the self.app.collapsed_categories and is the expanded/collapsed tree is then replicated across
+        other areas of the app. """
+
+        #print(item.text(0), item.text(1), "Expanded:", item.isExpanded())
+        if item.text(1)[:3] == "cid":
+            return
+        if not item.isExpanded() and item.text(1) not in self.app.collapsed_categories:
+            self.app.collapsed_categories.append(item.text(1))
+        if item.isExpanded() and item.text(1) in self.app.collapsed_categories:
+            self.app.collapsed_categories.remove(item.text(1))
 
     def file_menu(self, position):
         """ Context menu to select the next image alphabetically, or
