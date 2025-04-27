@@ -65,7 +65,7 @@
      <widget class="QPushButton" name="pushButton_exportcsv">
       <property name="geometry">
        <rect>
-        <x>700</x>
+        <x>730</x>
         <y>30</y>
         <width>28</width>
         <height>28</height>
@@ -81,10 +81,10 @@
      <widget class="QPushButton" name="pushButton_calculate">
       <property name="geometry">
        <rect>
-        <x>410</x>
-        <y>28</y>
-        <width>28</width>
-        <height>28</height>
+        <x>437</x>
+        <y>29</y>
+        <width>58</width>
+        <height>58</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -144,7 +144,7 @@
        <rect>
         <x>190</x>
         <y>60</y>
-        <width>251</width>
+        <width>241</width>
         <height>26</height>
        </rect>
       </property>
@@ -203,7 +203,7 @@
      <widget class="QPushButton" name="pushButton_boxplots">
       <property name="geometry">
        <rect>
-        <x>670</x>
+        <x>700</x>
         <y>30</y>
         <width>28</width>
         <height>28</height>
@@ -219,9 +219,9 @@
      <widget class="QLabel" name="label_search_results">
       <property name="geometry">
        <rect>
-        <x>450</x>
+        <x>510</x>
         <y>30</y>
-        <width>211</width>
+        <width>181</width>
         <height>20</height>
        </rect>
       </property>
@@ -235,7 +235,7 @@
      <widget class="QLineEdit" name="lineEdit_search_results">
       <property name="geometry">
        <rect>
-        <x>450</x>
+        <x>500</x>
         <y>57</y>
         <width>161</width>
         <height>28</height>
@@ -248,7 +248,7 @@
      <widget class="QPushButton" name="pushButton_search_next">
       <property name="geometry">
        <rect>
-        <x>614</x>
+        <x>670</x>
         <y>57</y>
         <width>30</width>
         <height>28</height>
@@ -264,7 +264,7 @@
      <widget class="QPushButton" name="pushButton_export_exact">
       <property name="geometry">
        <rect>
-        <x>730</x>
+        <x>760</x>
         <y>30</y>
         <width>36</width>
         <height>28</height>
