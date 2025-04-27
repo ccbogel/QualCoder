@@ -23,7 +23,7 @@ import fitz
 import logging
 import os
 from PIL import Image
-import qtawesome as qta
+import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 import re
 
 from PyQt6 import QtCore, QtGui, QtWidgets
@@ -78,6 +78,10 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         self.ui.treeWidget.setStyleSheet(treefont)
         self.ui.treeWidget.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.fill_tree()
+        # These signals after the tree is filled the first time
+        self.ui.treeWidget.itemCollapsed.connect(self.get_collapsed)
+        self.ui.treeWidget.itemExpanded.connect(self.get_collapsed)
+
         self.ui.treeWidget.itemClicked.connect(self.fill_text_edit)
         self.ui.textEdit.setTabChangesFocus(True)
 
@@ -93,6 +97,18 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         Also called on other coding dialogs in the dialog_list. """
 
         self.codes, self.categories = self.app.get_codes_categories()
+
+    def get_collapsed(self, item):
+        """ On category collapse or expansion signal, find the collapsed parent category items.
+        This will fill the self.app.collapsed_categories and is the expanded/collapsed tree is then replicated across
+        other areas of the app. """
+
+        if item.text(1)[:3] == "cid":
+            return
+        if not item.isExpanded() and item.text(1) not in self.app.collapsed_categories:
+            self.app.collapsed_categories.append(item.text(1))
+        if item.isExpanded() and item.text(1) in self.app.collapsed_categories:
+            self.app.collapsed_categories.remove(item.text(1))
 
     def fill_tree(self):
         """ Fill tree widget, top level items are main categories and unlinked codes.
@@ -110,7 +126,7 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
             self.ui.treeWidget.setColumnHidden(1, False)
         self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.ui.treeWidget.header().setStretchLastSection(False)
-        # add top level categories
+        # Add top level categories
         remove_list = []
         for c in cats:
             if c['supercatid'] is None:
@@ -121,10 +137,13 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
                 top_item.setToolTip(0, c['name'])
                 top_item.setToolTip(2, c['memo'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
+                if f"catid:{c['catid']}" in self.app.collapsed_categories:
+                    top_item.setExpanded(False)
+                else:
+                    top_item.setExpanded(True)
                 remove_list.append(c)
         for item in remove_list:
             cats.remove(item)
-
         ''' Add child categories. look at each unmatched category, iterate through tree
          to add as child, then remove matched categories from the list '''
         count = 0
@@ -143,6 +162,10 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
                         child.setToolTip(0, c['name'])
                         child.setToolTip(2, c['memo'])
                         item.addChild(child)
+                        if f"catid:{c['catid']}" in self.app.collapsed_categories:
+                            child.setExpanded(False)
+                        else:
+                            child.setExpanded(True)
                         remove_list.append(c)
                     it += 1
                     item = it.value()
@@ -195,7 +218,7 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
                 item = it.value()
                 count += 1
         self.ui.treeWidget.sortByColumn(0, QtCore.Qt.SortOrder.AscendingOrder)
-        self.ui.treeWidget.expandAll()
+        # self.ui.treeWidget.expandAll()
         self.fill_code_counts_in_tree()
 
     def fill_code_counts_in_tree(self):
