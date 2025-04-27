@@ -167,6 +167,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.pushButton_rate_up.pressed.connect(self.increase_play_rate)
         self.ui.pushButton_help.setIcon(qta.icon('mdi6.help'))
         self.ui.pushButton_help.pressed.connect(self.help)
+        self.ui.pushButton_find_code.setIcon(qta.icon('mdi6.card-search-outline', options=[{'scale-factor': 1.2}]))
+        self.ui.pushButton_find_code.pressed.connect(self.find_code_in_tree)
 
         # The buttons in the splitter are smaller 24x24 pixels
         self.ui.pushButton_latest.setIcon(qta.icon('mdi6.arrow-collapse-right', options=[{'scale_factor': 1.3}]))
@@ -288,6 +290,47 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         url = "https://github.com/ccbogel/QualCoder/wiki/4.5.-Coding-Audio-and-Video"
         webbrowser.open(url)
+
+    def find_code_in_tree(self):
+        """ Find a code by name in the codes tree and select it.
+        """
+
+        dialog = QtWidgets.QInputDialog(None)
+        dialog.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        dialog.setWindowTitle(_("Search for code"))
+        dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
+        dialog.setInputMode(QtWidgets.QInputDialog.InputMode.TextInput)
+        msg = _("Find and select first code that matches text.") + "\n"
+        msg += _("Enter text to match all or partial code:")
+        dialog.setLabelText(msg)
+        dialog.resize(200, 20)
+        ok = dialog.exec()
+        if not ok:
+            return
+        search_text = dialog.textValue()
+
+        # Remove selections and search for matching item text
+        self.ui.treeWidget.setCurrentItem(None)
+        self.ui.treeWidget.clearSelection()
+        item = None
+        iterator = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
+        while iterator.value():
+            item = iterator.value()
+            if "cid" in item.text(1):
+                cid = int(item.text(1)[4:])
+                code_ = next((code_ for code_ in self.codes if code_['cid'] == cid), None)
+                if search_text in code_['name']:
+                    self.ui.treeWidget.setCurrentItem(item)
+                    break
+            iterator += 1
+        if item is None:
+            Message(self.app, _("Match not found"), _("No code with matching text found.")).exec()
+            return
+        # Expand parents
+        parent = item.parent()
+        while parent is not None:
+            parent.setExpanded(True)
+            parent = parent.parent()
 
     def ddialog_menu(self, position):
         """ Context menu to export a screenshot, to resize dialog. """
