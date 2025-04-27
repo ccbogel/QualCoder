@@ -529,7 +529,7 @@ As all assigned positions may be incorrect. </string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set default colour for new codes&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Set default colour for new codes</string>
       </property>
       <property name="text">
        <string/>
@@ -991,14 +991,14 @@ As all assigned positions may be incorrect. </string>
              <widget class="QPushButton" name="pushButton_show_all_codings">
               <property name="geometry">
                <rect>
-                <x>90</x>
+                <x>120</x>
                 <y>0</y>
                 <width>28</width>
                 <height>28</height>
                </rect>
               </property>
               <property name="toolTip">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show all codings&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               <string>Show all codings</string>
               </property>
               <property name="text">
                <string/>
@@ -1007,14 +1007,14 @@ As all assigned positions may be incorrect. </string>
              <widget class="QPushButton" name="pushButton_show_codings_prev">
               <property name="geometry">
                <rect>
-                <x>10</x>
+                <x>43</x>
                 <y>0</y>
                 <width>28</width>
                 <height>28</height>
                </rect>
               </property>
               <property name="toolTip">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show previous coding of selected code&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               <string>Show previous coding of selected code</string>
               </property>
               <property name="text">
                <string/>
@@ -1023,14 +1023,14 @@ As all assigned positions may be incorrect. </string>
              <widget class="QPushButton" name="pushButton_show_codings_next">
               <property name="geometry">
                <rect>
-                <x>50</x>
+                <x>80</x>
                 <y>0</y>
                 <width>28</width>
                 <height>28</height>
                </rect>
               </property>
               <property name="toolTip">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show next coding of selected code.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               <string>Show next coding of selected code.</string>
               </property>
               <property name="text">
                <string/>
@@ -1039,7 +1039,7 @@ As all assigned positions may be incorrect. </string>
              <widget class="QPushButton" name="pushButton_important">
               <property name="geometry">
                <rect>
-                <x>130</x>
+                <x>160</x>
                 <y>0</y>
                 <width>28</width>
                 <height>28</height>
@@ -1055,7 +1055,7 @@ As all assigned positions may be incorrect. </string>
              <widget class="QLabel" name="label_code">
               <property name="geometry">
                <rect>
-                <x>180</x>
+                <x>200</x>
                 <y>0</y>
                 <width>28</width>
                 <height>28</height>
@@ -1069,6 +1069,22 @@ As all assigned positions may be incorrect. </string>
               </property>
               <property name="wordWrap">
                <bool>true</bool>
+              </property>
+             </widget>
+             <widget class="QPushButton" name="pushButton_find_code">
+              <property name="geometry">
+               <rect>
+                <x>10</x>
+                <y>0</y>
+                <width>28</width>
+                <height>28</height>
+               </rect>
+              </property>
+              <property name="toolTip">
+               <string>Find code</string>
+              </property>
+              <property name="text">
+               <string/>
               </property>
              </widget>
             </widget>

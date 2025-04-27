@@ -210,38 +210,6 @@
        <string/>
       </property>
      </widget>
-     <widget class="QCheckBox" name="checkBox_curve">
-      <property name="geometry">
-       <rect>
-        <x>660</x>
-        <y>6</y>
-        <width>81</width>
-        <height>26</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Curves</string>
-      </property>
-      <property name="checked">
-       <bool>true</bool>
-      </property>
-     </widget>
-     <widget class="QCheckBox" name="checkBox_line">
-      <property name="geometry">
-       <rect>
-        <x>750</x>
-        <y>6</y>
-        <width>61</width>
-        <height>26</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Lines</string>
-      </property>
-      <property name="checked">
-       <bool>true</bool>
-      </property>
-     </widget>
      <widget class="QCheckBox" name="checkBox_image">
       <property name="geometry">
        <rect>
@@ -261,7 +229,7 @@
      <widget class="QCheckBox" name="checkBox_black_text">
       <property name="geometry">
        <rect>
-        <x>820</x>
+        <x>580</x>
         <y>6</y>
         <width>111</width>
         <height>26</height>
@@ -290,32 +258,13 @@
        <bool>true</bool>
       </property>
      </widget>
-     <widget class="QCheckBox" name="checkBox_rect">
-      <property name="geometry">
-       <rect>
-        <x>590</x>
-        <y>6</y>
-        <width>61</width>
-        <height>26</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rectangle objects&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-      <property name="text">
-       <string>Rects</string>
-      </property>
-      <property name="checked">
-       <bool>true</bool>
-      </property>
-     </widget>
      <widget class="QLabel" name="label_font_size">
       <property name="geometry">
        <rect>
         <x>440</x>
         <y>41</y>
         <width>24</width>
-        <height>24</height>
+        <height>26</height>
        </rect>
       </property>
       <property name="toolTip">
@@ -403,7 +352,7 @@
         <x>472</x>
         <y>40</y>
         <width>61</width>
-        <height>26</height>
+        <height>28</height>
        </rect>
       </property>
       <item>
@@ -523,6 +472,22 @@
       </property>
       <property name="toolTip">
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Zoom Out (Ctrl Minus)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_default_new_code_color">
+      <property name="geometry">
+       <rect>
+        <x>620</x>
+        <y>40</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Set default colour for new codes</string>
       </property>
       <property name="text">
        <string/>
