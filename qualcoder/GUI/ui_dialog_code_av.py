@@ -139,6 +139,10 @@ class Ui_Dialog_code_av(object):
         self.pushButton_segment_menu = QtWidgets.QPushButton(parent=self.groupBox_2)
         self.pushButton_segment_menu.setGeometry(QtCore.QRect(250, 50, 28, 28))
         self.pushButton_segment_menu.setObjectName("pushButton_segment_menu")
+        self.pushButton_find_code = QtWidgets.QPushButton(parent=self.groupBox_2)
+        self.pushButton_find_code.setGeometry(QtCore.QRect(900, 50, 28, 28))
+        self.pushButton_find_code.setText("")
+        self.pushButton_find_code.setObjectName("pushButton_find_code")
         self.gridLayout.addWidget(self.groupBox_2, 1, 0, 1, 1)
         self.horizontalSlider = QtWidgets.QSlider(parent=Dialog_code_av)
         self.horizontalSlider.setMinimumSize(QtCore.QSize(990, 24))
@@ -206,6 +210,7 @@ class Ui_Dialog_code_av(object):
         self.pushButton_important.setToolTip(_translate("Dialog_code_av", "Show codings flagged important"))
         self.pushButton_segment_menu.setToolTip(_translate("Dialog_code_av", "<html><head/><body><p>Button to select a segment. </p><p>Then a menu of options will open.</p><p>(This button is a work around if the right-click to open menus on the segment bars below does not work)</p></body></html>"))
         self.pushButton_segment_menu.setText(_translate("Dialog_code_av", "S"))
+        self.pushButton_find_code.setToolTip(_translate("Dialog_code_av", "Find code"))
         self.horizontalSlider.setToolTip(_translate("Dialog_code_av", "<html><head/><body><p>Left click on the slider button and drag left or right to change video position.</p></body></html>"))
 
 
