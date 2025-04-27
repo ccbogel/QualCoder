@@ -83,8 +83,6 @@ class DialogReportRelations(QtWidgets.QDialog):
         font = f'font: {self.app.settings["treefontsize"]}pt "{self.app.settings["font"]}";'
         self.ui.treeWidget.setStyleSheet(font)
         self.ui.label_codes.setStyleSheet(font)
-        self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.SelectionMode.ExtendedSelection)
-        self.fill_tree()
         self.ui.pushButton_exportcsv.setIcon(qta.icon('mdi6.export'))
         self.ui.pushButton_exportcsv.pressed.connect(self.export_csv_file)
         self.ui.pushButton_export_exact.setIcon(qta.icon('mdi6.export'))
@@ -105,8 +103,13 @@ class DialogReportRelations(QtWidgets.QDialog):
         self.ui.tableWidget_statistics.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget_statistics.customContextMenuRequested.connect(self.table_statistics_menu)
         self.ui.tableWidget_statistics.setTabKeyNavigation(False)
+        self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.SelectionMode.ExtendedSelection)
         self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
+        self.fill_tree()
+        # These signals after the tree is filled the first time
+        self.ui.treeWidget.itemCollapsed.connect(self.get_collapsed)
+        self.ui.treeWidget.itemExpanded.connect(self.get_collapsed)
 
         # Default to select all files
         cur = self.app.conn.cursor()
@@ -1075,6 +1078,18 @@ class DialogReportRelations(QtWidgets.QDialog):
                 if self.ui.tableWidget_statistics.item(r, col).text() != cell_value:
                     self.ui.tableWidget_statistics.setRowHidden(r, True)
 
+    def get_collapsed(self, item):
+        """ On category collapse or expansion signal, find the collapsed parent category items.
+        This will fill the self.app.collapsed_categories and is the expanded/collapsed tree is then replicated across
+        other areas of the app. """
+
+        if item.text(1)[:3] == "cid":
+            return
+        if not item.isExpanded() and item.text(1) not in self.app.collapsed_categories:
+            self.app.collapsed_categories.append(item.text(1))
+        if item.isExpanded() and item.text(1) in self.app.collapsed_categories:
+            self.app.collapsed_categories.remove(item.text(1))
+
     def fill_tree(self):
         """ Fill tree widget, top level items are main categories and unlinked codes.
         """
@@ -1089,13 +1104,17 @@ class DialogReportRelations(QtWidgets.QDialog):
         self.ui.treeWidget.setHeaderLabels(header)
         self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.ui.treeWidget.header().setStretchLastSection(False)
-        # add top level categories
+        # Add top level categories
         remove_list = []
         for c in cats:
             if c['supercatid'] is None:
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid'])])
                 top_item.setToolTip(0, c['name'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
+                if f"catid:{c['catid']}" in self.app.collapsed_categories:
+                    top_item.setExpanded(False)
+                else:
+                    top_item.setExpanded(True)
                 remove_list.append(c)
         for item in remove_list:
             cats.remove(item)
@@ -1114,7 +1133,10 @@ class DialogReportRelations(QtWidgets.QDialog):
                         child = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid'])])
                         child.setToolTip(0, c['name'])
                         item.addChild(child)
-                        # logger.debug("Adding: " + c['name'])
+                        if f"catid:{c['catid']}" in self.app.collapsed_categories:
+                            child.setExpanded(False)
+                        else:
+                            child.setExpanded(True)
                         remove_list.append(c)
                     it += 1
                     item = it.value()
@@ -1155,4 +1177,4 @@ class DialogReportRelations(QtWidgets.QDialog):
                     c['catid'] = -1  # make unmatchable
                 it += 1
                 item = it.value()
-        self.ui.treeWidget.expandAll()
+        # self.ui.treeWidget.expandAll()
