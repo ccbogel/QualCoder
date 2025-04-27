@@ -190,6 +190,10 @@ class Ui_Dialog_code_pdf(object):
         self.label_code.setText("")
         self.label_code.setWordWrap(True)
         self.label_code.setObjectName("label_code")
+        self.pushButton_find_code = QtWidgets.QPushButton(parent=self.groupBox_coding_buttons)
+        self.pushButton_find_code.setGeometry(QtCore.QRect(10, 0, 28, 28))
+        self.pushButton_find_code.setText("")
+        self.pushButton_find_code.setObjectName("pushButton_find_code")
         self.scrollArea = QtWidgets.QScrollArea(parent=self.splitter)
         self.scrollArea.setWidgetResizable(True)
         self.scrollArea.setObjectName("scrollArea")
@@ -275,6 +279,7 @@ class Ui_Dialog_code_pdf(object):
         self.pushButton_file_attributes.setToolTip(_translate("Dialog_code_pdf", "Show files with file attributes"))
         self.pushButton_important.setToolTip(_translate("Dialog_code_pdf", "Show codings flagged important"))
         self.label_code.setToolTip(_translate("Dialog_code_pdf", "Right click below to create new codes and categories"))
+        self.pushButton_find_code.setToolTip(_translate("Dialog_code_pdf", "Find code"))
 
 
 if __name__ == "__main__":
