@@ -36,7 +36,7 @@
        <rect>
         <x>6</x>
         <y>0</y>
-        <width>241</width>
+        <width>221</width>
         <height>28</height>
        </rect>
       </property>
@@ -342,6 +342,22 @@
       </property>
       <property name="toolTip">
        <string>PDF controls</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_find_code">
+      <property name="geometry">
+       <rect>
+        <x>230</x>
+        <y>0</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Find code</string>
       </property>
       <property name="text">
        <string/>
