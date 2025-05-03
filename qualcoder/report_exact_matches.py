@@ -90,9 +90,12 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         font = f'font: {self.app.settings["treefontsize"]}pt "{self.app.settings["font"]}";'
         self.ui.treeWidget.setStyleSheet(font)
         self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.SelectionMode.ExtendedSelection)
-        self.fill_tree()
         self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
+        self.fill_tree()
+        # These signals after the tree is filled the first time
+        self.ui.treeWidget.itemCollapsed.connect(self.get_collapsed)
+        self.ui.treeWidget.itemExpanded.connect(self.get_collapsed)
         self.get_files_fill_list_widget()
         self.ui.listWidget_files.setSelectionMode(QtWidgets.QListWidget.SelectionMode.ExtendedSelection)
         self.ui.pushButton_file_filter.pressed.connect(self.select_files_from_attributes)
@@ -538,12 +541,23 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         Message(self.app, _('Report exported'), msg, "information").exec()
         self.parent_textEdit.append(msg)
 
+    def get_collapsed(self, item):
+        """ On category collapse or expansion signal, find the collapsed parent category items.
+        This will fill the self.app.collapsed_categories and is the expanded/collapsed tree is then replicated across
+        other areas of the app. """
+
+        if item.text(1)[:3] == "cid":
+            return
+        if not item.isExpanded() and item.text(1) not in self.app.collapsed_categories:
+            self.app.collapsed_categories.append(item.text(1))
+        if item.isExpanded() and item.text(1) in self.app.collapsed_categories:
+            self.app.collapsed_categories.remove(item.text(1))
+
     def fill_tree(self):
         """ Fill tree widget, top level items are main categories and unlinked codes.
         """
 
         self.ui.treeWidget.clear()
-
         cats = copy(self.categories)
         codes = copy(self.codes)
         self.ui.treeWidget.clear()
@@ -552,13 +566,17 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         self.ui.treeWidget.setHeaderLabels(header)
         self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         self.ui.treeWidget.header().setStretchLastSection(False)
-        # add top level categories
+        # Add top level categories
         remove_list = []
         for c in cats:
             if c['supercatid'] is None:
-                top_item = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid'])])
+                top_item = QtWidgets.QTreeWidgetItem([c['name'], f"catid:{c['catid']}"])
                 top_item.setToolTip(0, c['name'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
+                if f"catid:{c['catid']}" in self.app.collapsed_categories:
+                    top_item.setExpanded(False)
+                else:
+                    top_item.setExpanded(True)
                 remove_list.append(c)
         for item in remove_list:
             cats.remove(item)
@@ -571,13 +589,15 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
             for c in cats:
                 it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
                 item = it.value()
-                while item:  # while there is an item in the list
-                    # logger.debug("While: ", item.text(0), item.text(1), c['catid'], c['supercatid'])
-                    if item.text(1) == 'catid:' + str(c['supercatid']):
-                        child = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid'])])
+                while item:  # While there is an item in the list
+                    if item.text(1) == f"catid:{c['supercatid']}":
+                        child = QtWidgets.QTreeWidgetItem([c['name'], f"catid:{c['catid']}"])
                         child.setToolTip(0, c['name'])
                         item.addChild(child)
-                        # logger.debug("Adding: " + c['name'])
+                        if f"catid:{c['catid']}" in self.app.collapsed_categories:
+                            child.setExpanded(False)
+                        else:
+                            child.setExpanded(True)
                         remove_list.append(c)
                     it += 1
                     item = it.value()
@@ -618,7 +638,7 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
                     c['catid'] = -1  # Make unmatchable
                 it += 1
                 item = it.value()
-        self.ui.treeWidget.expandAll()
+        # self.ui.treeWidget.expandAll()
 
     def tree_menu(self, position):
         """ Context menu for treewidget code/category items.

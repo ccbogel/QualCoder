@@ -84,7 +84,6 @@ class DialogCodesBySegments(QtWidgets.QDialog):
         self.ui.listWidget_cases.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
         self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.SelectionMode.ExtendedSelection)
         self.ui.comboBox_coders.insertItems(0, self.coders)
-        self.fill_tree()
         self.ui.pushButton_run_report.clicked.connect(self.search)
         self.ui.pushButton_run_report.setIcon(qta.icon('mdi6.play', options=[{'scale_factor': 2}]))
         self.ui.pushButton_export_xlsx.setIcon(qta.icon('mdi6.export', options=[{'scale_factor': 1.4}]))
@@ -98,6 +97,10 @@ class DialogCodesBySegments(QtWidgets.QDialog):
         self.ui.listWidget_cases.customContextMenuRequested.connect(self.listwidget_cases_menu)
         self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.treeWidget.customContextMenuRequested.connect(self.treewidget_menu)
+        self.fill_tree()
+        # These signals after the tree is filled the first time
+        self.ui.treeWidget.itemCollapsed.connect(self.get_collapsed)
+        self.ui.treeWidget.itemExpanded.connect(self.get_collapsed)
         self.ui.splitter.setSizes([200, 500])
         self.file_ids_string = ""
         self.case_ids_string = ""
@@ -304,6 +307,18 @@ class DialogCodesBySegments(QtWidgets.QDialog):
                 else:
                     self.ui.listWidget_cases.item(i).setSelected(False)
 
+    def get_collapsed(self, item):
+        """ On category collapse or expansion signal, find the collapsed parent category items.
+        This will fill the self.app.collapsed_categories and is the expanded/collapsed tree is then replicated across
+        other areas of the app. """
+
+        if item.text(1)[:3] == "cid":
+            return
+        if not item.isExpanded() and item.text(1) not in self.app.collapsed_categories:
+            self.app.collapsed_categories.append(item.text(1))
+        if item.isExpanded() and item.text(1) in self.app.collapsed_categories:
+            self.app.collapsed_categories.remove(item.text(1))
+
     def fill_tree(self):
         """ Fill tree widget, top level items are main categories and unlinked codes. """
 
@@ -326,13 +341,17 @@ class DialogCodesBySegments(QtWidgets.QDialog):
                 memo = ""
                 if c['memo'] != "":
                     memo = _("Memo")
-                top_item = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
+                top_item = QtWidgets.QTreeWidgetItem([c['name'], f"catid:{c['catid']}", memo])
                 top_item.setToolTip(0, '')
                 if len(c['name']) > 52:
                     top_item.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
                     top_item.setToolTip(0, c['name'])
                 top_item.setToolTip(2, c['memo'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
+                if f"catid:{c['catid']}" in self.app.collapsed_categories:
+                    top_item.setExpanded(False)
+                else:
+                    top_item.setExpanded(True)
                 remove_list.append(c)
         for item in remove_list:
             cats.remove(item)
@@ -346,8 +365,8 @@ class DialogCodesBySegments(QtWidgets.QDialog):
                 it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
                 item = it.value()
                 count2 = 0
-                while item and count2 < 10000:  # while there is an item in the list
-                    if item.text(1) == 'catid:' + str(c['supercatid']):
+                while item and count2 < 10000:  # While there is an item in the list
+                    if item.text(1) == f"catid:{c['supercatid']}":
                         memo = ""
                         if c['memo'] != "":
                             memo = "Memo"
@@ -358,6 +377,10 @@ class DialogCodesBySegments(QtWidgets.QDialog):
                             child.setToolTip(0, c['name'])
                         child.setToolTip(2, c['memo'])
                         item.addChild(child)
+                        if f"catid:{c['catid']}" in self.app.collapsed_categories:
+                            child.setExpanded(False)
+                        else:
+                            child.setExpanded(True)
                         remove_list.append(c)
                     it += 1
                     item = it.value()
@@ -415,7 +438,7 @@ class DialogCodesBySegments(QtWidgets.QDialog):
                 count += 1
         self.ui.treeWidget.sortByColumn(0, QtCore.Qt.SortOrder.AscendingOrder)
         self.fill_code_counts_in_tree()
-        self.ui.treeWidget.expandAll()
+        # self.ui.treeWidget.expandAll()
 
     def fill_code_counts_in_tree(self):
         """ Count instances of each code from all coders and all files. """
