@@ -30,6 +30,30 @@ from PyQt6 import QtWidgets
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
+country_names = [
+    "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua & Deps", "Argentina", "Armenia", "Australia",
+    "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin",
+    "Bhutan", "Bolivia", "Bosnia Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina", "Burundi",
+    "Cambodia", "Cameroon", "Canada", "Cape Verde", "Central African Republic", "Chad", "Chile", "China", "Colombia",
+    "Comoros","Congo", "Costa Rica", "Croatia", "Cuba", "Cyprus", "Czech Republic", "Denmark", "Djibouti", "Dominica",
+    "Dominican Republic", "East Timor", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia",
+    "Ethiopia", "Fiji", "Finland", "France", "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Greece", "Grenada",
+    "Guatemala", "Guinea", "Guinea-Bissau", "Guyana", "Haiti", "Honduras", "Hungary", "Iceland", "India", "Indonesia",
+    "Iran", "Iraq", "Ireland", "Israel", "Italy", "Ivory Coast", "Jamaica", "Japan", "Jordan", "Kazakhstan", "Kenya",
+    "Kiribati", "North Korea", "South Korea", "Kosovo", "Kuwait", "Kyrgyzstan", "Laos", "Latvia", "Lebanon", "Lesotho",
+    "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Macedonia", "Madagascar", "Malawi", "Malaysia",
+    "Maldives", "Mali", "Malta", "Marshall Islands", "Mauritania", "Mauritius", "Mexico", "Micronesia", "Moldova",
+    "Monaco", "Mongolia", "Montenegro", "Morocco", "Mozambique", "Myanmar", "Namibia", "Nauru", "Nepal",
+    "Netherlands", "New Zealand", "Nicaragua", "Niger", "Nigeria", "Norway", "Oman", "Pakistan", "Palau", "Panama",
+    "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland", "Portugal", "Qatar", "Romania",
+    "Russian Federation", "Rwanda", "St Kitts & Nevis", "St Lucia", "Saint Vincent & the Grenadines",
+    "Samoa", "San Marino", "Sao Tome & Principe", "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone",
+    "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Sudan", "Spain",
+    "Sri Lanka", "Sudan", "Suriname", "Swaziland", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan",
+    "Tanzania", "Thailand", "Togo", "Tonga", "Trinidad & Tobago", "Tunisia", "Turkey", "Turkmenistan", "Tuvalu",
+    "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Uzbekistan",
+    "Vanuatu", "Vatican City", "Venezuela", "Vietnam", "Yemen", "Zambia", "Zimbabwe"]
+
 
 class Ris:
     """ Load ris list of dictionaries.
@@ -128,7 +152,7 @@ class Ris:
         url = None
         doi = None
         vancouver = ""  # Vancouver reference style, approximately
-        apa = "" # American Psychological Association reference style
+        apa = ""  # American Psychological Association reference style v 7
 
         # Get the first title based on this order
         for tag in ("TI", "T1", "ST", "TT"):
@@ -237,7 +261,7 @@ class Ris:
         if published_year != "":
             apa += f"({published_year}). "
         if title != "":
-            apa += f"{title}"
+            apa += f"{self.apa_title(title)}"
         if periodical_name != "":
             apa += f"{periodical_name}, "
         if volume_and_or_issue != "":
@@ -253,8 +277,33 @@ class Ris:
         apa = apa.replace(" .", ".")
         apa = apa.replace("  ", " ")
         apa = apa.strip()
-
         return vancouver, apa
+
+    def apa_title(self, title):
+        """ APA 7 Sentence case. And after . : -
+         Keep names Titled - not easy to do, but have added country names. """
+
+        if title == "":
+            return ""
+        if not title.istitle():
+            return
+
+        text_list = title.split()
+        # Ignore the first word, should be sentence case already.
+        for i in range(1, len(text_list)):
+            # Keep uppercase acronyms as is, and keep Sentence case after . : -
+            if len(text_list[i]) > 1 and text_list[i].isupper():
+                continue
+            if text_list[i - 1][-1] in ('.', ':', '-'):
+                text_list[i] = text_list[i].capitalize()
+                continue
+            text_list[i] = text_list[i].lower()
+        apa_title = " ".join(text_list)
+        # Find and capitalise country names
+        for country_name in country_names:
+            if country_name.lower() in apa_title:
+                apa_title = apa_title.replace(country_name.lower(), country_name)
+        return apa_title
 
 
 class RisImport:
