@@ -24,6 +24,7 @@ jobs:
         python-version: "3.10"
     - name: Install dependencies
       run: |
+        sudo apt-get install -y qt6-base-dev libxcb-cursor0
         python -m pip install --upgrade pip
         pip install flake8 coverage
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
