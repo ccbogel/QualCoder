@@ -8,7 +8,7 @@ import os
 import subprocess
 import polib
 
-script_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.dirname(os.path.abspath(__file__))
 lrelease_path = "C:\\Users\\kai\\anaconda3\\envs\\QualCOder\\Lib\\site-packages\\qt6_applications\\Qt\\bin\\lrelease.exe"
 
 language_list = ['de', 'en', 'es', 'fr', 'it', 'pt']
@@ -16,13 +16,13 @@ language_list = ['de', 'en', 'es', 'fr', 'it', 'pt']
 # GETTEXT TRANSLATION
 
 # .po-files
-po_dir = os.path.join(script_dir, "qualcoder")
+po_dir = os.path.join(project_root, "src", "qualcoder")
 po_files = []
 for lang in language_list:
     po_files.append(os.path.join(po_dir, f'{lang}.po'))
 
 # .mo-files
-mo_basedir = os.path.join(script_dir, "qualcoder", "locale")
+mo_basedir = os.path.join(project_root, "src", "qualcoder", "locale")
 mo_files = []
 for lang in language_list:
     mo_files.append(os.path.join(mo_basedir, lang, 'LC_MESSAGES', f'{lang}.mo'))
@@ -44,13 +44,13 @@ for i in range(len(po_files)):
 # Qt TRANSLATIONS
 
 # .ts-files
-ts_dir = os.path.join(script_dir, "qualcoder", 'GUI')
+ts_dir = os.path.join(project_root, "src", "qualcoder", 'GUI')
 ts_files = []
 for lang in language_list:
     ts_files.append(os.path.join(ts_dir, f'app_{lang}.ts'))
 
 # .qm-files
-qm_basedir = os.path.join(script_dir, "qualcoder", "locale")
+qm_basedir = os.path.join(project_root, "src", "qualcoder", "locale")
 qm_files = []
 for lang in language_list:
     qm_files.append(os.path.join(qm_basedir, lang, f'app_{lang}.qm'))
@@ -72,8 +72,8 @@ for i in range(len(ts_files)):
 
 answer = input(f'Do you want to update "base_64_lang_helper.py"? (y/n)')
 if answer == 'y':
-    os.chdir(os.path.join(script_dir, 'qualcoder', 'locale'))
-    cmd = os.path.join(script_dir, 'qualcoder', 'locale', 'create_lang_script_base64.py')
+    os.chdir(os.path.join(project_root, "src", 'qualcoder', 'locale'))
+    cmd = os.path.join(project_root, "src", 'qualcoder', 'locale', 'create_lang_script_base64.py')
     subprocess.call(cmd, shell=True)
     print('Updated base_64_lang_helper.py')
     

@@ -45,7 +45,7 @@ def update_po_files(directory, pot_filename):
                     print(f"Error updating PO file {po_file}: {exc}")
 
 def main():
-    directory = 'qualcoder'
+    directory = os.path.join('src', 'qualcoder')
     pot_filename = os.path.join(directory, 'qualcoder.pot')
 
     extract_pot_file(directory, pot_filename)
