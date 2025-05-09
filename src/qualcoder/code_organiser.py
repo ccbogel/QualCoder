@@ -88,9 +88,9 @@ class CodeOrganiser(QDialog):
         self.ui.graphicsView.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.graphicsView.customContextMenuRequested.connect(self.graphicsview_menu)
         self.ui.graphicsView.viewport().installEventFilter(self)
-        global update_graphics_item_models
+        global update_graphics_item_models  # noqa: F824
         update_graphics_item_models = False
-        global model
+        global model  # noqa: F824
         model = []
         text_ = _("BACK UP PROJECT before applying changes to the codes tree.\n"
                   "The Code organiser is used mainly with grounded theory to help you develop and organise"
@@ -196,7 +196,7 @@ class CodeOrganiser(QDialog):
             category['cid'] = None
             category['color'] = '#FFFFFF'
             category['delete'] = False  # True if merged
-        global model
+        global model  # noqa: F824
         model = categories + codes
 
     def get_refined_model(self, top_node_text):
@@ -208,7 +208,7 @@ class CodeOrganiser(QDialog):
         """
 
         categories = []
-        global model
+        global model  # noqa: F824
         for item in model:
             if item['cid'] is None:
                 categories.append(item)
@@ -298,7 +298,7 @@ class CodeOrganiser(QDialog):
         param: global model : List of Dictionaries of categories and codes
         """
 
-        global model
+        global model  # noqa: F824
         # Order the model by supercatid, subcats, codes
         ordered_model = []
         # Top level categories
@@ -362,7 +362,7 @@ class CodeOrganiser(QDialog):
                 print(i.__class__, i.pos())
         if key == QtCore.Qt.Key.Key_M:  # and mod == QtCore.Qt.KeyboardModifier.ControlModifier:
             # Display model
-            global model
+            global model  # noqa: F824
             print("^^^^ MODEL ^^^^")
             for m in model:
                 print(m)
@@ -416,7 +416,7 @@ class CodeOrganiser(QDialog):
                           f" catid:{i.code_or_cat['catid']} ocatid:{i.code_or_cat['original_catid']} "
                           f"supercatid:{i.code_or_cat['supercatid']} child names{i.code_or_cat['child_names']}")'''
         if action == action_add_category:
-            global model
+            global model  # noqa: F824
             cat_ids_list = []
             categories_ = []
             for item in model:
@@ -467,7 +467,7 @@ class CodeOrganiser(QDialog):
         """ Apply changes to database from model. """
 
         test = False
-        global model
+        global model  # noqa: F824
         if test:
             print("MODEL")
             for item in model:
@@ -666,7 +666,7 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
         child_names = []
         codes_ = []
         categories_ = []
-        global model
+        global model  # noqa: F824
         model_copy = deepcopy(model)
         for item in model_copy:
             if item['cid'] is None:
@@ -719,8 +719,8 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
             if isinstance(item, TextGraphicsItem) and item.code_or_cat['name'] == "":
                 self.removeItem(item)
         # Update code.catid or category.supercatid if a category has been merged into another category
-        global model
-        global update_graphics_item_models
+        global model  # noqa: F824
+        global update_graphics_item_models  # noqa: F824
         if update_graphics_item_models:
             for m_item in model:
                 if m_item['original_cid'] is None:
@@ -980,7 +980,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
          sub_categories, sub_codes of a node. """
 
         existing_names = []
-        global model
+        global model  # noqa: F824
         for item in model:
             existing_names.append({'name': item['name']})
 
@@ -997,7 +997,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
             if item['cid'] == self.code_or_cat['cid'] and item['catid'] == self.code_or_cat['catid']:
                 item['name'] = name
                 break
-        global update_graphics_item_models
+        global update_graphics_item_models  # noqa: F824
         update_graphics_item_models = True
 
     def update_memo(self):
@@ -1013,14 +1013,14 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
             if item['cid'] == self.code_or_cat['cid'] and item['catid'] == self.code_or_cat['catid']:
                 item['memo'] = ui.memo
                 break
-        global update_graphics_item_models
+        global update_graphics_item_models  # noqa: F824
         update_graphics_item_models = True
 
     def link_code_to_category(self):
         """ Link selected code to selected category. """
 
         categories_ = []
-        global model
+        global model  # noqa: F824
         for item in model:
             if item['cid'] is None and item['name'] != "":
                 categories_.append(item)
@@ -1035,7 +1035,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
             if item['cid'] == self.code_or_cat['cid']:
                 item['catid'] = category['catid']
                 break
-        global update_graphics_item_models
+        global update_graphics_item_models  # noqa: F824
         update_graphics_item_models = True
         self.code_or_cat['catid'] = category['catid']
 
@@ -1044,7 +1044,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
          Keep nameless code in model. """
 
         unsorted_codes = []
-        global model
+        global model  # noqa: F824
         for item in model:
             if item['cid'] is not None and item['cid'] != self.code_or_cat['cid'] and item['name'] != "":
                 unsorted_codes.append(item)
@@ -1068,19 +1068,19 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.code_or_cat['cid'] = merge_code['cid']
         self.code_or_cat['name'] = ""
         self.hide()
-        global update_graphics_item_models
+        global update_graphics_item_models  # noqa: F824
         update_graphics_item_models = True
 
     def remove_code_from_category(self):
         """ Remove code from category as top level item. """
 
         self.code_or_cat['catid'] = None
-        global model
+        global model  # noqa: F824
         for item in model:
             if item['cid'] == self.code_or_cat['cid']:
                 item['catid'] = None
                 break
-        global update_graphics_item_models
+        global update_graphics_item_models  # noqa: F824
         update_graphics_item_models = True
 
     def case_media(self, ):
@@ -1102,7 +1102,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
          Use child_names list to prevent circular linkages. """
 
         categories_ = []
-        global model
+        global model  # noqa: F824
         for item in model:
             if item['catid'] != self.code_or_cat['catid'] and item['name'] != "" and item['cid'] is None and \
                     item['name'] not in self.code_or_cat['child_names']:
@@ -1119,7 +1119,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         for item in model:
             if item['catid'] == self.code_or_cat['catid']:
                 item['supercatid'] = category['catid']
-        global update_graphics_item_models
+        global update_graphics_item_models  # noqa: F824
         update_graphics_item_models = True
 
     def merge_category_into_category(self):
@@ -1127,7 +1127,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
          Use child_names list to prevent circular linkages. """
 
         categories = []
-        global model
+        global model  # noqa: F824
         for item in model:
             if item['catid'] != self.code_or_cat['catid'] and item['name'] != "" and item['cid'] is None and \
                     item['name'] not in self.code_or_cat['child_names']:
@@ -1154,7 +1154,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
                 break
         self.code_or_cat['name'] = ""
         self.hide()
-        global update_graphics_item_models
+        global update_graphics_item_models  # noqa: F824
         update_graphics_item_models = True
 
     def remove_category_from_category(self):
@@ -1164,7 +1164,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         for item in model:
             if item['catid'] == self.code_or_cat['catid']:
                 item['supercatid'] = None
-        global update_graphics_item_models
+        global update_graphics_item_models  # noqa: F824
         update_graphics_item_models = True
 
 
