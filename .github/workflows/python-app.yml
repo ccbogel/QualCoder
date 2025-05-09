@@ -35,4 +35,4 @@ jobs:
     - name: Test with unittest and coverage.py
       run: |
         coverage run -m unittest discover tests/
-        coverage report
+        coverage report -i
