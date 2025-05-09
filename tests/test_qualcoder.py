@@ -1,5 +1,6 @@
 from unittest import TestCase
-from qualcoder import *
+from qualcoder.__main__ import App
+import datetime
 import os
 import sqlite3
 import tempfile
