@@ -18,3 +18,4 @@ build
 ai_readme.md
 roadmap.md
 tmp*.*
+.coverage
