@@ -34,5 +34,5 @@ jobs:
         # consider adding more linting
     - name: Test with unittest and coverage.py
       run: |
-        coverage run -m unittest discover tests/
-        coverage report -i
+        coverage run --source=qualcoder -m unittest discover tests/
+        coverage report -m
