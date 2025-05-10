@@ -50,7 +50,7 @@ IMPORTANT: in the first window of the installation mark the option "Add Python t
 cd Downloads\QualCoder-master
 ```
 
-6. Install the virtual environment and required pyhon modules. 
+6. Install the virtual environment and required python modules. 
 
 The `py` command uses the most recent installed version of Python the `py` command does not work on all Windows OS, you may instead replace `py` with `python3` You can use a specific version on your Windows if you have many Python versions installed, e.g. `py -3.10`  See discussion here: [Difference between py and python](https://stackoverflow.com/questions/50896496/what-is-the-difference-between-py-and-python-in-the-terminal)
 
