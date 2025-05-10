@@ -3,6 +3,7 @@
 import sys
 from setuptools import setup, find_namespace_packages
 from os import path
+
 here = path.abspath(path.dirname(__file__))
 # Get the long description from the README file
 with open(path.join(here, 'README.md'), encoding='utf-8') as f:
@@ -11,10 +12,10 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 with open('requirements.txt') as f:
     required_modules = f.read().splitlines()
 
-mainscript = 'qualcoder/__main__.py'
+mainscript = 'src/qualcoder/__main__.py'
 OPTIONS = {
     'argv_emulation': True,
-    'iconfile': 'qualcoder/GUI/qualcoder.icns'
+    'iconfile': 'src/qualcoder/GUI/qualcoder.icns'
 }
 
 if sys.platform == 'darwin':
@@ -57,7 +58,8 @@ setup(
         'Development Status :: 3 - Alpha'
     ],
     keywords='qualitative data analysis',
-    packages=find_namespace_packages(include=['qualcoder','qualcoder.*']),
+    package_dir={'': 'src'},
+    packages=find_namespace_packages(where='src', include=['qualcoder', 'qualcoder.*']),
     python_requires='>=3.10',
     install_requires=required_modules,
     package_data={
