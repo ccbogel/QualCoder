@@ -320,7 +320,7 @@ Also, if you like Qualcoder a lot and want to advertise interest in its use, ple
 
 ## Warnings about other sources of information about QualCoder 
 
-There is a book avaiable for purchase called _Qualitative Data Analysis With Chatgpt And Qualcoder_ Pease be aware this book is not endorsed by the developers of QualCoder. The book contains some incorrect information about QualCoder.
+There is a book published called _Qualitative Data Analysis With Chatgpt And Qualcoder_ Pease be aware this book is not endorsed by the developers of QualCoder. The book contains some incorrect information about QualCoder.
 
 Downloads of executables from other web sites. We do not endorse downloading of executables from anywhere other than the GitHub QualCoder releases page.
 
