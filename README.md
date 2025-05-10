@@ -216,13 +216,11 @@ To install from source code below, inside a virtual environment. If you are usin
 
 4. Set up virtual environment and install python modules. The virtual environment will be in its own folder called env_qc. Installing required modules takes a while.
 
-`python3.12 -m venv env_qc`
-
-`source env_qc/bin/activate`
-
-`pip3 install -–upgrade pip`
-
-`pip install -r requirements.txt`
+```python3.12 -m venv env_qc
+source env_qc/bin/activate
+pip3 install -–upgrade pip
+pip install -r requirements.txt
+```
 
 5. Now, the command to start QualCoder:
 
@@ -236,9 +234,8 @@ To install from source code below, inside a virtual environment. If you are usin
 
 `cd QualCoder`
 
-`source env_qc/bin/activate`
-
-`python3 -m qualcoder`
+```source env_qc/bin/activate
+python3 -m qualcoder```
 
 `deactivate`
 
