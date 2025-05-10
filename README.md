@@ -63,8 +63,6 @@ py -m pip install --upgrade pip
 py -m pip install -r requirements.txt
 ```
 
- Note: on some Windows computers, you may have to type `python3` instead of `py` as the `py` command may not be recognised.
-
 7. Run QualCoder from the command prompt
 
 ```bash
