@@ -54,37 +54,24 @@ cd Downloads\QualCoder-master
 
 The `py` command uses the most recent installed version of Python the `py` command does not work on all Windows OS, you may instead replace `py` with `python3` You can use a specific version on your Windows if you have many Python versions installed, e.g. `py -3.10`  See discussion here: [Difference between py and python](https://stackoverflow.com/questions/50896496/what-is-the-difference-between-py-and-python-in-the-terminal)
 
-We recommend using a virtual environment to install packages. This will ensure that the dependencies for QualCoder are isolated from the rest of your system. On some Windows OS you may need to replace the _py_ command with _python3_ below: 
+Create a virtual environment, upgrade pip and install  python packages. The install may take up to 10 minutes. On some Windows OS you may need to replace the _py_ command with _python3_ below: 
 
 ```bash
 py -m venv env
 env\Scripts\activate
-```
-
-
-7. Install python modules. Type the following to upgrade all python modules before importing:
-
-```bash
 py -m pip install --upgrade pip
-```
-
-Type the following to install the required modules (it will take 10 minutes):
-
-```bash
 py -m pip install -r requirements.txt
 ```
 
- Wait, until all modules are installed.
+ Note: on some Windows computers, you may have to type `python3` instead of `py` as the `py` command may not be recognised.
 
- Note: on some Windows computers, you may have to type `python3` instead of `py` as `py` may not be recognised.
-
-8. Run QualCoder from the command prompt
+7. Run QualCoder from the command prompt
 
 ```bash
 py -m qualcoder
 ```
 
-9. If running QualCoder in a virtual environment, to exit the virtual environment type:
+8. If running QualCoder in a virtual environment, to exit the virtual environment type:
 
 `deactivate`
 
