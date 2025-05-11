@@ -310,6 +310,7 @@ https://scholar.google.com/citations?user=KTMRMWoAAAAJ&hl=en
 **Artificial intelligence features and more:** Dr. Kai Dröge, Institut für Sozialforschung, Frankfurt, Deutschland. https://www.ifs.uni-frankfurt.de/personendetails/kai-droege.html
 
 ## Leave a review
+
 If you like QualCoder and find it useful for your work. Please leave a review on these sites:
 
 https://www.saashub.com/qualcoder-alternatives
