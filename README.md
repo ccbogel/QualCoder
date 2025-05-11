@@ -244,8 +244,6 @@ To exit the environment:
 `deactivate`
 
 
-```
-
 ### Fedora 41
 
 The instructions below are to run from source code inside a virtual environment. These instructions download the current source code directly from GitHub. Note: Fedora uses Wayland which may not work well with the Qt graphical interface. It is suggested you also install Xwayland.
