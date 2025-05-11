@@ -269,11 +269,14 @@ To deactivate the virtual environment:
 
 **Usage:**
 
-At any time `cd` to the Qualcoder folder and enter the following commands. On finishing type `deactivate` to exit the virtual environment.
+At any time `cd` to the Qualcoder folder and enter the following commands: 
 
-`source env/bin/activate`
+```
+source env/bin/activate
+python3.12 -m qualcoder
+```
 
-`python3.12 -m qualcoder`
+On finishing type `deactivate` to exit the virtual environment.
 
 ### Arch/Manjaro Linux
 
