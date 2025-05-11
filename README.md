@@ -216,7 +216,8 @@ To install from source code below, inside a virtual environment. If you are usin
 
 4. Set up virtual environment and install python modules. The virtual environment will be in its own folder called env_qc. Installing required modules takes a while.
 
-```python3.12 -m venv env
+```
+python3.12 -m venv env
 source env/bin/activate
 pip3 install -–upgrade pip
 pip install -r requirements.txt
@@ -230,12 +231,15 @@ pip install -r requirements.txt
 
 `deactivate`
 
-**Usage:**
+**Usage nytime after the install, move to the folder, then:**
 
-`cd QualCoder`
+```
+cd QualCoder
+source env/bin/activate
+python3 -m qualcoder
+```
 
-```source env/bin/activate
-python3 -m qualcoder```
+To exit the environment:
 
 `deactivate`
 
@@ -244,9 +248,10 @@ python3 -m qualcoder```
 
 At any time `cd` to the Qualcoder folder and enter the following commands. On finishing type `deactivate` to exit the virtual environment.
 
-`source env_qc/bin/activate`
-
-`qualcoder`
+```
+source env_qc/bin/activate
+qualcoder
+```
 
 ### Fedora 41
 
@@ -254,19 +259,16 @@ The instructions below are to run from source code inside a virtual environment.
 
 `sudo dnf install python3.12`
 
-`virtualenv env_qc`
+```
+virtualenv env
+source env/bin/activate 
+pip3 install -–upgrade pip
+git clone https://github.com/ccbogel/QualCoder.git
+cd QualCoder
+python3.12 -m pip install -r requirements.txt
 
-`source env_qc/bin/activate `
-
-`pip3 install -–upgrade pip`
-
-`git clone https://github.com/ccbogel/QualCoder.git`
-
-`cd QualCoder`
-
-`python3.12 -m pip install -r requirements.txt`
-
-`python3.12 -m qualcoder`
+python3.12 -m qualcoder
+```
 
 `deactivate` 
 
@@ -274,7 +276,7 @@ The instructions below are to run from source code inside a virtual environment.
 
 At any time `cd` to the Qualcoder folder and enter the following commands. On finishing type `deactivate` to exit the virtual environment.
 
-`source env_qc/bin/activate`
+`source env/bin/activate`
 
 `python3.12 -m qualcoder`
 
