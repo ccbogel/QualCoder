@@ -257,9 +257,13 @@ pip3 install -–upgrade pip
 git clone https://github.com/ccbogel/QualCoder.git
 cd QualCoder
 python3.12 -m pip install -r requirements.txt
-
+```
+To run QualCoder:
+```
 python3.12 -m qualcoder
 ```
+
+To deactivate the virtual environment:
 
 `deactivate` 
 
