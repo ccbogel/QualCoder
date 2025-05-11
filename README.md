@@ -214,7 +214,7 @@ To install from source code below, inside a virtual environment. If you are usin
 
 3. Download and unzip the Qualcoder folder. Then `cd` to the QualCoder folder.
 
-4. Set up virtual environment and install python modules. The virtual environment will be in its own folder called env_qc. Installing required modules takes a while.
+4. Set up virtual environment and install python modules. The virtual environment will be in its own folder called env. Installing required modules takes a while.
 
 ```
 python3.12 -m venv env
