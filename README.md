@@ -231,7 +231,7 @@ pip install -r requirements.txt
 
 `deactivate`
 
-**Usage nytime after the install, move to the folder, then:**
+**Usage any time after the install, move to the folder, then:**
 
 ```
 cd QualCoder
@@ -244,13 +244,6 @@ To exit the environment:
 `deactivate`
 
 
-**Usage:**
-
-At any time `cd` to the Qualcoder folder and enter the following commands. On finishing type `deactivate` to exit the virtual environment.
-
-```
-source env_qc/bin/activate
-qualcoder
 ```
 
 ### Fedora 41
