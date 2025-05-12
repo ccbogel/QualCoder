@@ -2,6 +2,7 @@ from unittest import TestCase
 from qualcoder.__main__ import App
 import datetime
 import os
+import shutil
 import sqlite3
 import tempfile
 
@@ -18,48 +19,15 @@ class TestApp(TestCase):
 
     def setUp(self):
         # Need to mock these later when I learn how to do it
-        self.confighome = os.path.expanduser('~/.qualcoder')
+        self.confighome = tempfile.mkdtemp()
         self.configpath = os.path.join(self.confighome, 'config.ini')
         self.persist_path = os.path.join(self.confighome, 'recent_projects.txt')
-        settings = {'backup_num': 5, 'codername': 'default', 'font': 'Noto Sans', 'fontsize': 10,
-                    'docfontsize': 10, 'treefontsize': 10, 'directory': self.confighome,
-                    'showids': True, 'language': 'en', 'backup_on_open': 'False', 'backup_av_files': 'False',
-                    'timestampformat': '[hh.mm.ss]', 'speakernameformat': '[]',
-                    'mainwindow_geometry': '01d9d0cb00030000000000a10000003c0000052c000002ef000000a10000005a0000052c000002ef00000000000000000600000000a10000005a0000052c000002ef',
-                    'dialogcodetext_splitter0': '380', 'dialogcodetext_splitter1': '708',
-                    'dialogcodetext_splitter_v0': '255',
-                    'dialogcodetext_splitter_v1': '169', 'dialogcodeimage_splitter0': '137',
-                    'dialogcodeimage_splitter1': '247',
-                    'dialogcodeimage_splitter_h0': '326', 'dialogcodeimage_splitter_h1': '740',
-                    'dialogreportcodes_splitter0': '360', 'dialogreportcodes_splitter1': '720',
-                    'dialogreportcodes_splitter_v0': '147', 'dialogreportcodes_splitter_v1': '10',
-                    'dialogreportcodes_splitter_v2': '260', 'dialogjournals_splitter0': '437',
-                    'dialogjournals_splitter1': '437',
-                    'dialogsql_splitter_h0': '235', 'dialogsql_splitter_h1': '208', 'dialogsql_splitter_v0': '324',
-                    'dialogsql_splitter_v1': '635', 'dialogcasefilemanager_w': '899', 'dialogcasefilemanager_h': '570',
-                    'dialogcasefilemanager_splitter0': '437', 'dialogcasefilemanager_splitter1': '436',
-                    'video_w': '337',
-                    'video_h': '266', 'viewav_video_pos_x': '0', 'viewav_video_pos_y': '0', 'codeav_video_pos_x': '0',
-                    'codeav_video_pos_y': '0', 'codeav_abs_pos_x': '0', 'codeav_abs_pos_y': '0',
-                    'dialogcodeav_splitter_0': '0',
-                    'dialogcodeav_splitter_1': '0', 'dialogcodeav_splitter_h0': '521',
-                    'dialogcodeav_splitter_h1': '520',
-                    'viewav_abs_pos_x': '0', 'viewav_abs_pos_y': '0', 'dialogcodecrossovers_w': '0',
-                    'dialogcodecrossovers_h': '0',
-                    'dialogcodecrossovers_splitter0': '426', 'dialogcodecrossovers_splitter1': '425',
-                    'dialogmanagelinks_w': '0',
-                    'dialogmanagelinks_h': '0', 'bookmark_file_id': '0', 'bookmark_pos': '0',
-                    'dialogreport_file_summary_splitter0': '353', 'dialogreport_file_summary_splitter1': '496',
-                    'dialogreport_code_summary_splitter0': '266', 'dialogreport_code_summary_splitter1': '362',
-                    'stylesheet': 'native', 'report_text_context_chars': '150', 'report_text_context-style': 'Bold',
-                    'codetext_chunksize': 50000, 'ai_enable': 'False', 'ai_first_startup': 'False',
-                    'ai_model_index': '-1',
-                    'report_text_context_characters': 100, 'report_text_context_style': 'Bold',
-                    'ai_send_project_memo': 'True',
-                    'ai_language_ui': 'True', 'ai_language': '', 'ai_temperature': '1.0', 'ai_top_p': '1.0',
-                    'dialogcodeav_splitter0': '73', 'dialogcodeav_splitter1': '156', 'mainwindow_w': '1106',
-                    'mainwindow_h': '600'}
-        App.settings = settings
+
+        shutil.copy(
+            os.path.join(os.path.dirname(__file__), "fixtures", "config-ai-ec4c0559.ini"),
+            self.configpath,
+        )
+        self.settings, _ = App._load_config_ini(self)
 
         # Create temporary database
         try:
@@ -141,7 +109,7 @@ class TestApp(TestCase):
                     (
                         'v11', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', 'QualCoder 3.7',
                         0,
-                        0, App.settings['codername'], ""))
+                        0, self.settings['codername'], ""))
         cur.execute("insert into cases (name,memo,owner,date) VALUES(?,?,?,?)",
                     ('case one', 'memo 1', 'default', dt))
         cur.execute("insert into cases (name,memo,owner,date) VALUES(?,?,?,?)",
@@ -173,9 +141,13 @@ class TestApp(TestCase):
     def test_load_config_ini(self):
         """ Tests that all config.ini fields are present """
 
-        result = App._load_config_ini(self)
+        result, ai_models = App._load_config_ini(self)
         keys = result.keys()
-        self.assertEqual(keys, CONFIG_INI_TEST.keys())
+        self.assertEqual(keys, CONFIG_INI_AI_EX4C0559.keys())
+
+        for ai_model in ai_models:
+            self.assertEqual(tuple(ai_model.keys()), CONFIG_INI_AI_MODEL_KEYS)
+
 
     def test_get_casenames(self):
         result = App.get_casenames(self)
@@ -240,52 +212,16 @@ class TestMainWindow(TestCase):
     """
 
     def setUp(self):
-        # Need to mock these later when I learn howto do it
-        self.test_dir = tempfile.TemporaryFile()
-
-        self.confighome = os.path.expanduser('~/.qualcoder')
+        # Need to mock these later when I learn how to do it
+        self.confighome = tempfile.mkdtemp()
         self.configpath = os.path.join(self.confighome, 'config.ini')
         self.persist_path = os.path.join(self.confighome, 'recent_projects.txt')
 
-        settings = {'backup_num': 5, 'codername': 'default', 'font': 'Noto Sans', 'fontsize': 10,
-                    'docfontsize': 10, 'treefontsize': 10, 'directory': self.confighome,
-                    'showids': True, 'language': 'en', 'backup_on_open': 'False', 'backup_av_files': 'False',
-                    'timestampformat': '[hh.mm.ss]', 'speakernameformat': '[]',
-                    'mainwindow_geometry': '01d9d0cb00030000000000a10000003c0000052c000002ef000000a10000005a0000052c000002ef00000000000000000600000000a10000005a0000052c000002ef',
-                    'dialogcodetext_splitter0': '380', 'dialogcodetext_splitter1': '708',
-                    'dialogcodetext_splitter_v0': '255',
-                    'dialogcodetext_splitter_v1': '169', 'dialogcodeimage_splitter0': '137',
-                    'dialogcodeimage_splitter1': '247',
-                    'dialogcodeimage_splitter_h0': '326', 'dialogcodeimage_splitter_h1': '740',
-                    'dialogreportcodes_splitter0': '360', 'dialogreportcodes_splitter1': '720',
-                    'dialogreportcodes_splitter_v0': '147', 'dialogreportcodes_splitter_v1': '10',
-                    'dialogreportcodes_splitter_v2': '260', 'dialogjournals_splitter0': '437',
-                    'dialogjournals_splitter1': '437',
-                    'dialogsql_splitter_h0': '235', 'dialogsql_splitter_h1': '208', 'dialogsql_splitter_v0': '324',
-                    'dialogsql_splitter_v1': '635', 'dialogcasefilemanager_w': '899', 'dialogcasefilemanager_h': '570',
-                    'dialogcasefilemanager_splitter0': '437', 'dialogcasefilemanager_splitter1': '436',
-                    'video_w': '337',
-                    'video_h': '266', 'viewav_video_pos_x': '0', 'viewav_video_pos_y': '0', 'codeav_video_pos_x': '0',
-                    'codeav_video_pos_y': '0', 'codeav_abs_pos_x': '0', 'codeav_abs_pos_y': '0',
-                    'dialogcodeav_splitter_0': '0',
-                    'dialogcodeav_splitter_1': '0', 'dialogcodeav_splitter_h0': '521',
-                    'dialogcodeav_splitter_h1': '520',
-                    'viewav_abs_pos_x': '0', 'viewav_abs_pos_y': '0', 'dialogcodecrossovers_w': '0',
-                    'dialogcodecrossovers_h': '0',
-                    'dialogcodecrossovers_splitter0': '426', 'dialogcodecrossovers_splitter1': '425',
-                    'dialogmanagelinks_w': '0',
-                    'dialogmanagelinks_h': '0', 'bookmark_file_id': '0', 'bookmark_pos': '0',
-                    'dialogreport_file_summary_splitter0': '353', 'dialogreport_file_summary_splitter1': '496',
-                    'dialogreport_code_summary_splitter0': '266', 'dialogreport_code_summary_splitter1': '362',
-                    'stylesheet': 'native', 'report_text_context_chars': '150', 'report_text_context-style': 'Bold',
-                    'codetext_chunksize': 50000, 'ai_enable': 'False', 'ai_first_startup': 'False',
-                    'ai_model_index': '-1',
-                    'report_text_context_characters': 100, 'report_text_context_style': 'Bold',
-                    'ai_send_project_memo': 'True',
-                    'ai_language_ui': 'True', 'ai_language': '', 'ai_temperature': '1.0', 'ai_top_p': '1.0',
-                    'dialogcodeav_splitter0': '73', 'dialogcodeav_splitter1': '156', 'mainwindow_w': '1106',
-                    'mainwindow_h': '600'}
-        App.settings = settings
+        shutil.copy(
+            os.path.join(os.path.dirname(__file__), "fixtures", "config-ai-ec4c0559.ini"),
+            self.configpath,
+        )
+        self.settings, _ = App._load_config_ini(self)
 
         # Create temporary database
         try:
@@ -367,7 +303,7 @@ class TestMainWindow(TestCase):
                     (
                         'v11', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', 'QualCoder 3.7',
                         0,
-                        0, App.settings['codername'], ""))
+                        0, self.settings['codername'], ""))
         cur.execute("insert into cases (name,memo,owner,date) VALUES(?,?,?,?)",
                     ('case one', 'memo 1', 'default', dt))
         cur.execute("insert into cases (name,memo,owner,date) VALUES(?,?,?,?)",
@@ -387,48 +323,98 @@ class TestMainWindow(TestCase):
     def tearDown(self):
         self.conn = None
         os.remove(os.path.join(self.confighome, "test_qualcoder_test.qda"))
-        self.test_dir.close()
 
     def test_settings_report(self):
         pass
 
 
 # TEST_PERSIST_PATH = '/fake/path/'
-CONFIG_INI_TEST = {'backup_num': 5, 'codername': 'default', 'font': 'Noto Sans', 'fontsize': 10,
-                    'docfontsize': 10, 'treefontsize': 10, 'directory': '',
-                    'showids': True, 'language': 'en', 'backup_on_open': 'False', 'backup_av_files': 'False',
-                    'timestampformat': '[hh.mm.ss]', 'speakernameformat': '[]',
-                    'mainwindow_geometry': '01d9d0cb00030000000000a10000003c0000052c000002ef000000a10000005a0000052c000002ef00000000000000000600000000a10000005a0000052c000002ef',
-                    'dialogcodetext_splitter0': '380', 'dialogcodetext_splitter1': '708',
-                    'dialogcodetext_splitter_v0': '255',
-                    'dialogcodetext_splitter_v1': '169', 'dialogcodeimage_splitter0': '137',
-                    'dialogcodeimage_splitter1': '247',
-                    'dialogcodeimage_splitter_h0': '326', 'dialogcodeimage_splitter_h1': '740',
-                    'dialogreportcodes_splitter0': '360', 'dialogreportcodes_splitter1': '720',
-                    'dialogreportcodes_splitter_v0': '147', 'dialogreportcodes_splitter_v1': '10',
-                    'dialogreportcodes_splitter_v2': '260', 'dialogjournals_splitter0': '437',
-                    'dialogjournals_splitter1': '437',
-                    'dialogsql_splitter_h0': '235', 'dialogsql_splitter_h1': '208', 'dialogsql_splitter_v0': '324',
-                    'dialogsql_splitter_v1': '635', 'dialogcasefilemanager_w': '899', 'dialogcasefilemanager_h': '570',
-                    'dialogcasefilemanager_splitter0': '437', 'dialogcasefilemanager_splitter1': '436',
-                    'video_w': '337',
-                    'video_h': '266', 'viewav_video_pos_x': '0', 'viewav_video_pos_y': '0', 'codeav_video_pos_x': '0',
-                    'codeav_video_pos_y': '0', 'codeav_abs_pos_x': '0', 'codeav_abs_pos_y': '0',
-                    'dialogcodeav_splitter_0': '0',
-                    'dialogcodeav_splitter_1': '0', 'dialogcodeav_splitter_h0': '521',
-                    'dialogcodeav_splitter_h1': '520',
-                    'viewav_abs_pos_x': '0', 'viewav_abs_pos_y': '0', 'dialogcodecrossovers_w': '0',
-                    'dialogcodecrossovers_h': '0',
-                    'dialogcodecrossovers_splitter0': '426', 'dialogcodecrossovers_splitter1': '425',
-                    'dialogmanagelinks_w': '0',
-                    'dialogmanagelinks_h': '0', 'bookmark_file_id': '0', 'bookmark_pos': '0',
-                    'dialogreport_file_summary_splitter0': '353', 'dialogreport_file_summary_splitter1': '496',
-                    'dialogreport_code_summary_splitter0': '266', 'dialogreport_code_summary_splitter1': '362',
-                    'stylesheet': 'native', 'report_text_context_chars': '150', 'report_text_context-style': 'Bold',
-                    'codetext_chunksize': 50000, 'ai_enable': 'False', 'ai_first_startup': 'False',
-                    'ai_model_index': '-1',
-                    'report_text_context_characters': 100, 'report_text_context_style': 'Bold',
-                    'ai_send_project_memo': 'True',
-                    'ai_language_ui': 'True', 'ai_language': '', 'ai_temperature': '1.0', 'ai_top_p': '1.0',
-                    'dialogcodeav_splitter0': '73', 'dialogcodeav_splitter1': '156', 'mainwindow_w': '1106',
-                    'mainwindow_h': '600'}
+CONFIG_INI_AI_EX4C0559 = {
+    "backup_num": "5",
+    "codername": "default",
+    "font": "DejaVu Sans",
+    "fontsize": "12",
+    "docfontsize": "12",
+    "treefontsize": "12",
+    "directory": "/cephyr/users/vikren/Alvis",
+    "showids": "False",
+    "language": "en",
+    "backup_on_open": "True",
+    "backup_av_files": "True",
+    "timestampformat": "[hh.mm.ss]",
+    "speakernameformat": "[]",
+    "mainwindow_geometry": "",
+    "dialogcodetext_splitter0": "1",
+    "dialogcodetext_splitter1": "1",
+    "dialogcodetext_splitter_v0": "1",
+    "dialogcodetext_splitter_v1": "1",
+    "dialogcodeimage_splitter0": "1",
+    "dialogcodeimage_splitter1": "1",
+    "dialogcodeimage_splitter_h0": "1",
+    "dialogcodeimage_splitter_h1": "1",
+    "dialogreportcodes_splitter0": "1",
+    "dialogreportcodes_splitter1": "1",
+    "dialogreportcodes_splitter_v0": "30",
+    "dialogreportcodes_splitter_v1": "30",
+    "dialogreportcodes_splitter_v2": "30",
+    "dialogjournals_splitter0": "1",
+    "dialogjournals_splitter1": "1",
+    "dialogsql_splitter_h0": "1",
+    "dialogsql_splitter_h1": "1",
+    "dialogsql_splitter_v0": "1",
+    "dialogsql_splitter_v1": "1",
+    "dialogcasefilemanager_w": "0",
+    "dialogcasefilemanager_h": "0",
+    "dialogcasefilemanager_splitter0": "1",
+    "dialogcasefilemanager_splitter1": "1",
+    "video_w": "0",
+    "video_h": "0",
+    "viewav_video_pos_x": "0",
+    "viewav_video_pos_y": "0",
+    "codeav_video_pos_x": "0",
+    "codeav_video_pos_y": "0",
+    "codeav_abs_pos_x": "0",
+    "codeav_abs_pos_y": "0",
+    "dialogcodeav_splitter_0": "0",
+    "dialogcodeav_splitter_1": "0",
+    "dialogcodeav_splitter_h0": "0",
+    "dialogcodeav_splitter_h1": "0",
+    "viewav_abs_pos_x": "0",
+    "viewav_abs_pos_y": "0",
+    "dialogcodecrossovers_w": "0",
+    "dialogcodecrossovers_h": "0",
+    "dialogcodecrossovers_splitter0": "0",
+    "dialogcodecrossovers_splitter1": "0",
+    "dialogmanagelinks_w": "0",
+    "dialogmanagelinks_h": "0",
+    "bookmark_file_id": "0",
+    "bookmark_pos": "0",
+    "dialogreport_file_summary_splitter0": "100",
+    "dialogreport_file_summary_splitter1": "100",
+    "dialogreport_code_summary_splitter0": "100",
+    "dialogreport_code_summary_splitter1": "100",
+    "stylesheet": "native",
+    "report_text_context_chars": "150",
+    "report_text_context-style": "Bold",
+    "codetext_chunksize": "50000",
+    "ai_enable": "False",
+    "ai_first_startup": "False",
+    "ai_model_index": "2",
+    "report_text_context_characters": "100",
+    "report_text_context_style": "Bold",
+    "ai_send_project_memo": "True",
+    "ai_language_ui": "True",
+    "ai_language": "",
+    "ai_temperature": "1.0",
+    "ai_top_p": "1.0",
+    "ai_timeout": "30.0",
+}
+
+
+CONFIG_INI_AI_MODEL_KEYS = (
+    'name', 'desc',
+    'access_info_url',
+    'large_model', 'large_model_context_window',
+    'fast_model', 'fast_model_context_window',
+    'api_base', 'api_key',
+)
