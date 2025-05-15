@@ -242,22 +242,24 @@ To exit the environment:
 `deactivate`
 
 
-### Fedora 41
+### Fedora 42
 
-The instructions below are to run from source code inside a virtual environment. These instructions download the current source code directly from GitHub. Note: Fedora uses Wayland which may not work well with the Qt graphical interface. It is suggested you also install Xwayland.
+These instructions download the current source code directly from GitHub. Note: Fedora uses Wayland which may not work well with the Qt graphical interface. It is suggested you also install Xwayland.
 
 `sudo dnf install python3.12`
 
 ```
 virtualenv env
-source env/bin/activate 
-pip3 install -–upgrade pip
+source env/bin/activate
+python3.12 -m ensurepip
+python3.12 -m pip install -–upgrade pip
 git clone https://github.com/ccbogel/QualCoder.git
 cd QualCoder
 python3.12 -m pip install -r requirements.txt
 ```
 To run QualCoder:
 ```
+cd src
 python3.12 -m qualcoder
 ```
 
@@ -270,6 +272,8 @@ To deactivate the virtual environment:
 At any time `cd` to the Qualcoder folder and enter the following commands: 
 
 ```
+cd QualCoder
+cd src
 source env/bin/activate
 python3.12 -m qualcoder
 ```
