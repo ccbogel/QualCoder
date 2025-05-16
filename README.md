@@ -164,19 +164,26 @@ pip install "numpy<2" # Don't forget the quotation marks
 python3 /applications/QualCoder-master/qualcoder/__main__.py
 ```
 
+Or if using latest code (versions 3.7 and up):
+```
+python3 /applications/QualCoder-master/qualcoder/src/__main__.py
+```
+
+
 Alternative suggested commands to run QualCoder:
 
 From any directory:
 
 `qualcoder`
 
-From the QualCoder-Master directory:
+From the QualCoder-Master folder:
 
 `python3 -m qualcoder`
 
-or
-
-`python3 qualcoder/__main__.py`
+Or if using latest code (versions 3.7 and up), cdt oth src folder:
+```
+python3 -m \_\_main\_\_.py
+```
 
 Another option to run Qualcoder is shown here: [https://www.maketecheasier.com/run-python-script-in-mac/](https://www.maketecheasier.com/run-python-script-in-mac/). This means you can right-click on the qualcoder.py file and open with --> python launcher. 
 You can make an alias to the file and place it on your desktop.
