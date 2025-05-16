@@ -182,7 +182,7 @@ From the QualCoder-Master folder:
 
 Or if using latest code (versions 3.7 and up), cdt oth src folder:
 ```
-python3 -m \_\_main\_\_.py
+python3 -m __main__.py
 ```
 
 Another option to run Qualcoder is shown here: [https://www.maketecheasier.com/run-python-script-in-mac/](https://www.maketecheasier.com/run-python-script-in-mac/). This means you can right-click on the qualcoder.py file and open with --> python launcher. 
