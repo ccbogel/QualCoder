@@ -63,9 +63,16 @@ py -m pip install --upgrade pip
 py -m pip install -r requirements.txt
 ```
 
-7. Run QualCoder from the command prompt
+7. Run QualCoder from the command prompt, versions up to 3.6
 
 ```bash
+py -m qualcoder
+```
+
+Latest code, version 3.7 and up, cd to the inner src folder first:
+
+```bash
+cd src
 py -m qualcoder
 ```
 
@@ -83,7 +90,9 @@ If you are not using a virtual environment, as long as you are in the same drive
 
 If you are using a virtual environment:
 
-`cd` to the Qualcoder-master (or Qualcoder release folder), then type:
+`cd` to the Qualcoder-master (or Qualcoder release folder). Note: If using verion 3.7 (least code or newer), also mov eto a n inner folder: `cd src`
+
+Then type:
 
 `env\Scripts\activate `
 
