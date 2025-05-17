@@ -170,24 +170,6 @@ python3 /applications/QualCoder-master/qualcoder/src/__main__.py
 ```
 
 
-Alternative suggested commands to run QualCoder:
-
-From any directory:
-
-`qualcoder`
-
-From the QualCoder-Master folder:
-
-`python3 -m qualcoder`
-
-Or if using latest code (versions 3.7 and up), cdt oth src folder:
-```
-python3 -m __main__.py
-```
-
-Another option to run Qualcoder is shown here: [https://www.maketecheasier.com/run-python-script-in-mac/](https://www.maketecheasier.com/run-python-script-in-mac/). This means you can right-click on the qualcoder.py file and open with --> python launcher. 
-You can make an alias to the file and place it on your desktop.
-
 **Second option to install on macOS:**
 
 Open the Terminal App and move to the unzipped Qualcoder-Master directory, then run the following commands:
@@ -237,15 +219,22 @@ pip3 install -–upgrade pip
 pip install -r requirements.txt
 ```
 
-5. Now, the command to start QualCoder:
+5. Now, the command to start QualCoder, for versions up to 3.6:
 
 `python3.12 -m qualcoder`
+
+Latest code, version 3.7 and up, cd to the inner src folder first:
+
+```
+cd src
+python3.12 -m qualcoder
+```
 
 6. After using QualCoder deactiatve the virtual environment.
 
 `deactivate`
 
-**Usage any time after the install, move to the folder, then:**
+**Usage any time after the install, move to the folder (the to inner src folder if using 3.7 and up), then:**
 
 ```
 cd QualCoder
@@ -273,7 +262,13 @@ git clone https://github.com/ccbogel/QualCoder.git
 cd QualCoder
 python3.12 -m pip install -r requirements.txt
 ```
-To run QualCoder:
+To run QualCoder 3.6:
+```
+python3.12 -m qualcoder
+```
+
+Latest code, version 3.7 and up, cd to the inner src folder first:
+
 ```
 cd src
 python3.12 -m qualcoder
@@ -285,11 +280,10 @@ To deactivate the virtual environment:
 
 **Usage:**
 
-At any time `cd` to the Qualcoder folder and enter the following commands: 
+At any time `cd` to the Qualcoder folder (if running QualCoder 3.7+ then cd to the inner src folder cd src`) and enter the following commands: 
 
 ```
 cd QualCoder
-cd src
 source env/bin/activate
 python3.12 -m qualcoder
 ```
