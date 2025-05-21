@@ -223,7 +223,7 @@ nube de palabras</translation>
     <message>
         <location filename="ui_dialog_graph.py" line="118"/>
         <source>Graph Visualisation</source>
-        <translation>Visualización de grafos</translation>
+        <translation>Visualización de Grafos</translation>
     </message>
     <message>
         <location filename="ui_dialog_graph.py" line="64"/>
@@ -263,24 +263,24 @@ nube de palabras</translation>
     <message>
         <location filename="ui_dialog_graph.py" line="120"/>
         <source>Click on the graph area and press + or W to zoom in. Press - or Q to zoom in or zoom out.</source>
-        <translation>Haga clic en el área del gráfico y pulse + o W para ampliarlo. Pulsa - o Q para acercar o alejar el zoom.</translation>
+        <translation>Haga clic en el área del Grafo y pulse + o W para ampliarlo. Pulsa - o Q para acercar o alejar el zoom.</translation>
     </message>
     <message>
         <location filename="ui_dialog_graph.py" line="122"/>
         <source>Save graph</source>
-        <translation>Guardar gráfico</translation>
+        <translation>Guardar Grafo</translation>
     </message>
     <message>
         <location filename="ui_dialog_graph.py" line="123"/>
         <source>Load graph
 Right-click for options</source>
-        <translation>Cargar gráfico
+        <translation>Cargar Grafo
 Clic con el botón derecho del ratón para ver las opciones</translation>
     </message>
     <message>
         <location filename="ui_dialog_graph.py" line="125"/>
         <source>Delete graph</source>
-        <translation>Borrar gráfico</translation>
+        <translation>Borrar Grafo</translation>
     </message>
     <message>
         <location filename="ui_dialog_graph.py" line="126"/>
@@ -305,12 +305,12 @@ Clic con el botón derecho del ratón para ver las opciones</translation>
     <message>
         <location filename="ui_dialog_graph.py" line="130"/>
         <source>Select code branch</source>
-        <translation>Seleccione la rama de código</translation>
+        <translation>Seleccionar rama de código</translation>
     </message>
     <message>
         <location filename="ui_dialog_graph.py" line="131"/>
         <source>Clear</source>
-        <translation>Vacío</translation>
+        <translation>Limpiar vista de Grafo</translation>
     </message>
     <message>
         <location filename="ui_dialog_graph.py" line="132"/>
@@ -393,7 +393,7 @@ Clic con el botón derecho del ratón para ver las opciones</translation>
     <message>
         <location filename="ui_report_matching_segments.py" line="115"/>
         <source>Select file(s), coder, 2 or more codes. Can exclude results by excluding a code (right click on code).</source>
-        <translation>Seleccione fichero(s), codificador, 2 o más códigos. Puede excluir resultados excluyendo un código (haga clic con el botón derecho en el código).</translation>
+        <translation>Seleccione archivo(s), codificador, 2 o más códigos. Puede excluir resultados excluyendo un código (haga clic con el botón derecho en el código).</translation>
     </message>
     <message>
         <location filename="ui_report_matching_segments.py" line="116"/>
@@ -681,12 +681,12 @@ es-AU</translation>
     <message>
         <location filename="ui_ai_search.py" line="197"/>
         <source>Send not only the name but also the memo associated with a code to the AI?</source>
-        <translation>¿Enviar a la IA no sólo el nombre, sino también la nota asociada a un código?</translation>
+        <translation>¿Enviar a la IA no sólo el nombre, sino también el Memo asociado a un código?</translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="198"/>
         <source>Send memo to AI</source>
-        <translation>Enviar nota a AI</translation>
+        <translation>Enviar Memo a AI</translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="199"/>
@@ -1133,7 +1133,7 @@ Si no está marcada: Cada respuesta cualitativa será un fichero de texto indivi
     <message>
         <location filename="ui_ai_chat.py" line="146"/>
         <source>AI Chat</source>
-        <translation>Chat AI</translation>
+        <translation>Chat IA</translation>
     </message>
     <message>
         <location filename="ui_ai_chat.py" line="147"/>
@@ -1191,7 +1191,7 @@ Si no está marcada: Cada respuesta cualitativa será un fichero de texto indivi
     <message>
         <location filename="ui_dialog_assign_attribute.py" line="49"/>
         <source>Journals</source>
-        <translation>Diario</translation>
+        <translation>Diarios</translation>
     </message>
 </context>
 <context>
@@ -1262,7 +1262,7 @@ Si no está marcada: Cada respuesta cualitativa será un fichero de texto indivi
     <message>
         <location filename="ui_dialog_cases.py" line="104"/>
         <source>Cases</source>
-        <translation>Caso</translation>
+        <translation>Casos</translation>
     </message>
     <message>
         <location filename="." line="7274595"/>
@@ -1357,12 +1357,12 @@ Si no está marcada: Cada respuesta cualitativa será un fichero de texto indivi
     <message>
         <location filename="ui_dialog_cases.py" line="111"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Case file manager&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Gestor de expedientes de casos</translation>
+        <translation>Administrador de archivos de casos</translation>
     </message>
     <message>
         <location filename="ui_dialog_cases.py" line="112"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export attributes to file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Exportar atributos como archivo csv</translation>
+        <translation>Exportar atributos como archivo CSV</translation>
     </message>
     <message>
         <location filename="ui_dialog_cases.py" line="113"/>
@@ -1461,8 +1461,8 @@ Key shortcut: Ctrl S</source>
     <message>
         <location filename="ui_dialog_code_av.py" line="198"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ctrl + Shift + &amp;gt;     Increase play rate to maximum 2x &lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt;    Decrease play rate to minimum 0.1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Ctrl + Shift + &amp;gt;     Aumentar la velocidad de juego al máximo 2x 
-Ctrl + Shift + &amp;lt;    Disminuir la tasa de juego al mínimo 0.1</translation>
+        <translation>Ctrl + Shift + &amp;gt;     Aumentar velocidad de reproducción al máximo 2x 
+Ctrl + Shift + &amp;lt;    Disminuir velocidad de reproducción al mínimo 0.1</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_av.py" line="165"/>
@@ -1477,12 +1477,12 @@ Ctrl + Shift + &amp;lt;    Disminuir la tasa de juego al mínimo 0.1</translatio
     <message>
         <location filename="ui_dialog_code_av.py" line="177"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Time&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&amp;lt;html&amp;gt;&amp;lt;head/&amp;gt;&amp;lt;body&amp;gt;&amp;lt;p&amp;gt;Rebobina 30 segundos&amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Mayúsculas + R&amp;lt;/p&amp;gt;&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;</translation>
+        <translation type="obsolete">&amp;lt;html&amp;gt;&amp;lt;head/&amp;gt;&amp;lt;body&amp;gt;&amp;lt;p&amp;gt;Retroceder 30 segundos&amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Mayúsculas + R&amp;lt;/p&amp;gt;&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;</translation>
     </message>
     <message>
         <location filename="." line="7274595"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rewind 30 seconds&lt;/p&gt;&lt;p&gt;Alt + R&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&amp;lt;html&amp;gt;&amp;lt;head/&amp;gt;&amp;lt;body&amp;gt;&amp;lt;p&amp;gt;Rebobina 30 segundos&amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Alt + R&amp;lt;/p&amp;gt;&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;</translation>
+        <translation type="obsolete">&amp;lt;html&amp;gt;&amp;lt;head/&amp;gt;&amp;lt;body&amp;gt;&amp;lt;p&amp;gt;Retroceder 30 segundos&amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Alt + R&amp;lt;/p&amp;gt;&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;</translation>
     </message>
     <message>
         <location filename="." line="7274595"/>
@@ -1492,17 +1492,17 @@ Ctrl + Shift + &amp;lt;    Disminuir la tasa de juego al mínimo 0.1</translatio
     <message>
         <location filename="ui_dialog_code_av.py" line="202"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Decrease play rate&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt; &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Disminuir la velocidad de juego Ctrl + Shift + </translation>
+        <translation>Disminuir velocidad de reproducción Ctrl + Shift + </translation>
     </message>
     <message>
         <location filename="ui_dialog_code_av.py" line="203"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Increase play rate&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;gt; &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Rebobina 5 segundos Alt + R</translation>
+        <translation>Retroceder 5 segundos Alt + R</translation>
     </message>
     <message>
         <location filename="." line="7274595"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rewind 5 seconds&lt;/p&gt;&lt;p&gt;Ctrl + R&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&amp;lt;html&amp;gt;&amp;lt;head/&amp;gt;&amp;lt;body&amp;gt;&amp;lt;p&amp;gt;Rebobina 5 segundos&amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Ctrl + R&amp;lt;/p&amp;gt;&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;</translation>
+        <translation type="obsolete">&amp;lt;html&amp;gt;&amp;lt;head/&amp;gt;&amp;lt;body&amp;gt;&amp;lt;p&amp;gt;Retroceder 5 segundos&amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Ctrl + R&amp;lt;/p&amp;gt;&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_av.py" line="199"/>
@@ -1527,7 +1527,7 @@ Ctrl + Shift + &amp;lt;    Disminuir la tasa de juego al mínimo 0.1</translatio
     <message>
         <location filename="ui_dialog_code_av.py" line="184"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File memo&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Memorándum de archivo</translation>
+        <translation>Memo de archivo</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_av.py" line="197"/>
@@ -1562,7 +1562,7 @@ Ctrl + Shift + &amp;lt;    Disminuir la tasa de juego al mínimo 0.1</translatio
     <message>
         <location filename="ui_dialog_code_av.py" line="177"/>
         <source>Rewind 30 seconds. Alt + R</source>
-        <translation type="obsolete">Rebobinar 30 segundos. Alt + R</translation>
+        <translation type="obsolete">Retroceder 30 segundos. Alt + R</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_av.py" line="178"/>
@@ -1572,7 +1572,7 @@ Ctrl + Shift + &amp;lt;    Disminuir la tasa de juego al mínimo 0.1</translatio
     <message>
         <location filename="ui_dialog_code_av.py" line="204"/>
         <source>Rewind 5 seconds. Ctrl + R</source>
-        <translation>Rebobinar 5 segundos. Ctrl + R</translation>
+        <translation>Retroceder 5 segundos. Ctrl + R</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_av.py" line="195"/>
@@ -1582,7 +1582,7 @@ Ctrl + Shift + &amp;lt;    Disminuir la tasa de juego al mínimo 0.1</translatio
     <message>
         <location filename="ui_dialog_code_av.py" line="200"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rewind 30 seconds. Alt + Minus&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Rebobinar 30 segundos. Alt + Menos</translation>
+        <translation>Retroceder 30 segundos. Alt + Menos</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_av.py" line="201"/>
@@ -1657,7 +1657,7 @@ Entonces se abrirá un menú de opciones.
     <message>
         <location filename="ui_dialog_code_by_case.py" line="272"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rewind 30 seconds&lt;/p&gt;&lt;p&gt;Shift + R&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&amp;lt;html&amp;gt;&amp;lt;head/&amp;gt;&amp;lt;body&amp;gt;&amp;lt;p&amp;gt;Rebobina 30 segundos&amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Mayúsculas + R&amp;lt;/p&amp;gt;&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;</translation>
+        <translation type="obsolete">&amp;lt;html&amp;gt;&amp;lt;head/&amp;gt;&amp;lt;body&amp;gt;&amp;lt;p&amp;gt;Retroceder 30 segundos&amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Mayúsculas + R&amp;lt;/p&amp;gt;&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_by_case.py" line="273"/>
@@ -1667,7 +1667,7 @@ Entonces se abrirá un menú de opciones.
     <message>
         <location filename="ui_dialog_code_by_case.py" line="274"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rewind 5 seconds&lt;/p&gt;&lt;p&gt;Alt + R&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&amp;lt;html&amp;gt;&amp;lt;head/&amp;gt;&amp;lt;body&amp;gt;&amp;lt;p&amp;gt;Rebobina 5 segundos&amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Alt + R&amp;lt;/p&amp;gt;&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;</translation>
+        <translation type="obsolete">&amp;lt;html&amp;gt;&amp;lt;head/&amp;gt;&amp;lt;body&amp;gt;&amp;lt;p&amp;gt;Retroceder 5 segundos&amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Alt + R&amp;lt;/p&amp;gt;&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_by_case.py" line="275"/>
@@ -1682,17 +1682,17 @@ Entonces se abrirá un menú de opciones.
     <message>
         <location filename="ui_dialog_code_by_case.py" line="277"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Increase play rate&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;gt; &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&amp;lt;html&amp;gt;&amp;lt;head/&amp;gt;&amp;lt;body&amp;gt;&amp;lt;p&amp;gt;Aumentar la tasa de juego&amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Ctrl + Shift + &amp;gt; &amp;lt;/p&amp;gt;&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;</translation>
+        <translation type="obsolete">&amp;lt;html&amp;gt;&amp;lt;head/&amp;gt;&amp;lt;body&amp;gt;&amp;lt;p&amp;gt;Aumentar velocidad de reproducción&amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Ctrl + Shift + &amp;gt; &amp;lt;/p&amp;gt;&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_by_case.py" line="278"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Decrease play rate&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt; &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&amp;lt;html&amp;gt;&amp;lt;head/&amp;gt;&amp;lt;body&amp;gt;&amp;lt;p&amp;gt;Disminuir la velocidad de juego&amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Ctrl + Shift + &amp;lt; &amp;lt;/p&amp;gt;&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;</translation>
+        <translation type="obsolete">&amp;lt;html&amp;gt;&amp;lt;head/&amp;gt;&amp;lt;body&amp;gt;&amp;lt;p&amp;gt;Disminuir velocidad de reproducción&amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Ctrl + Shift + &amp;lt; &amp;lt;/p&amp;gt;&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_by_case.py" line="279"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ctrl + Shift + &amp;gt;     Increase play rate to maximum 2x &lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt;    Decrease play rate to minimum 0.1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&amp;lt;html&amp;gt;&amp;lt;head/&amp;gt;&amp;lt;body&amp;gt;&amp;lt;p&amp;gt;Ctrl + Shift + &amp;gt;     Aumentar la velocidad de juego al máximo 2x &amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Ctrl + Shift + &amp;lt;    Disminuir la tasa de juego al mínimo 0.1&amp;lt;/p&amp;gt;&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;</translation>
+        <translation type="obsolete">&amp;lt;html&amp;gt;&amp;lt;head/&amp;gt;&amp;lt;body&amp;gt;&amp;lt;p&amp;gt;Ctrl + Shift + &amp;gt;     Aumentar la velocidad de reproducción al máximo 2x &amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Ctrl + Shift + &amp;lt;    Disminuir velocidad de reproducción al mínimo 0.1&amp;lt;/p&amp;gt;&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_by_case.py" line="281"/>
@@ -1843,7 +1843,7 @@ Right-click to change automatic searching options</translation>
     <message>
         <location filename="." line="7274595"/>
         <source>Memo</source>
-        <translation type="obsolete">Memorándum</translation>
+        <translation type="obsolete">Memo</translation>
     </message>
     <message>
         <location filename="." line="7274595"/>
@@ -1873,7 +1873,7 @@ Right-click to change automatic searching options</translation>
     <message>
         <location filename="ui_dialog_code_image.py" line="160"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File memo&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Memorándum de archivo</translation>
+        <translation>Memo de archivo</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_image.py" line="149"/>
@@ -2084,7 +2084,7 @@ Reduce las superposiciones de texto.</translation>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="285"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File memo&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Memorándum de archivo</translation>
+        <translation>Memo de archivo</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="286"/>
@@ -2173,7 +2173,7 @@ Reduce las superposiciones de texto.</translation>
     <message>
         <location filename="ui_dialog_report_code_summary.py" line="67"/>
         <source>Search:</source>
-        <translation>Busca:</translation>
+        <translation>Buscar:</translation>
     </message>
 </context>
 <context>
@@ -2181,7 +2181,7 @@ Reduce las superposiciones de texto.</translation>
     <message>
         <location filename="ui_dialog_code_text.py" line="402"/>
         <source>Code Text</source>
-        <translation>Texto del código</translation>
+        <translation>Codificar Texto</translation>
     </message>
     <message>
         <location filename="." line="7274595"/>
@@ -2302,12 +2302,12 @@ Reduce las superposiciones de texto.</translation>
     <message>
         <location filename="ui_dialog_code_text.py" line="417"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete all codes by this coder from this file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Borrar todos los códigos de este codificador de este archivo</translation>
+        <translation>Eliminar todos los códigos de este codificador en este archivo</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="462"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show next coding of selected code.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Muestra la siguiente codificación del código seleccionado.</translation>
+        <translation>Mostrar la siguiente codificación del código seleccionado.</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="461"/>
@@ -2322,7 +2322,7 @@ Reduce las superposiciones de texto.</translation>
     <message>
         <location filename="ui_dialog_code_text.py" line="452"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File memo&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Memorándum de archivo</translation>
+        <translation>Memo de archivo</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="418"/>
@@ -2389,7 +2389,7 @@ Haga clic con el botón derecho para cambiar las opciones de búsqueda automáti
     <message>
         <location filename="ui_dialog_code_text.py" line="424"/>
         <source>Show memos</source>
-        <translation>Mostrar memos</translation>
+        <translation>Mostrar Memos</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="425"/>
@@ -2404,12 +2404,12 @@ Haga clic con el botón derecho para cambiar las opciones de búsqueda automáti
     <message>
         <location filename="ui_dialog_code_text.py" line="466"/>
         <source>Current journal</source>
-        <translation>Revista actual</translation>
+        <translation>Diario actual</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="467"/>
         <source>Project memo</source>
-        <translation>Nota del proyecto</translation>
+        <translation>Memo del proyecto</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="448"/>
@@ -3048,7 +3048,7 @@ Revise después de aplicar la función.</translation>
     <message>
         <location filename="ui_dialog_memo.py" line="43"/>
         <source>Memo</source>
-        <translation>Memorándum</translation>
+        <translation>Memo</translation>
     </message>
     <message>
         <location filename="ui_dialog_memo.py" line="44"/>
@@ -3170,7 +3170,7 @@ Revise después de aplicar la función.</translation>
     <message>
         <location filename="ui_dialog_report_code_frequencies.py" line="76"/>
         <source>Code frequencies</source>
-        <translation>Código de frecuencias</translation>
+        <translation>Frecuencias de Códigos</translation>
     </message>
     <message>
         <location filename="." line="7274595"/>
@@ -3180,12 +3180,12 @@ Revise después de aplicar la función.</translation>
     <message>
         <location filename="ui_dialog_report_code_frequencies.py" line="77"/>
         <source>Code and category frequencies: overall and by coder</source>
-        <translation>Código y frecuencias de categoría: general y por codificador</translation>
+        <translation>Frecuencias de códigos y categorías: generales y por codificador</translation>
     </message>
     <message>
         <location filename="." line="7274595"/>
         <source>Export csv file</source>
-        <translation type="obsolete">Exportar archivo csv</translation>
+        <translation type="obsolete">Exportar archivo CSV</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_code_frequencies.py" line="81"/>
@@ -3200,7 +3200,7 @@ Revise después de aplicar la función.</translation>
     <message>
         <location filename="ui_dialog_report_code_frequencies.py" line="79"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export Excel&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Exportar archivo csv</translation>
+        <translation>Exportar archivo CSV</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_code_frequencies.py" line="82"/>
@@ -3358,7 +3358,7 @@ Revise después de aplicar la función.</translation>
     <message>
         <location filename="ui_dialog_report_codings.py" line="187"/>
         <source>Memo reporting options</source>
-        <translation>Opciones de notificación de notas</translation>
+        <translation>Opciones de informe de Memos</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_codings.py" line="183"/>
@@ -3504,7 +3504,7 @@ Seleccione dos codificadores, un archivo, un código.</translation>
     <message>
         <location filename="ui_dialog_report_compare_coder_file.py" line="104"/>
         <source>Memo reporting options</source>
-        <translation type="obsolete">Opciones de notificación de notas</translation>
+        <translation type="obsolete">Opciones de informe de Memos</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_compare_coder_file.py" line="102"/>
@@ -3519,12 +3519,12 @@ Seleccione dos codificadores, un archivo, un código.</translation>
     <message>
         <location filename="ui_dialog_report_compare_coder_file.py" line="98"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select two coders&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Comparación de la carrera</translation>
+        <translation>Seleccione a dos codificadores</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_compare_coder_file.py" line="106"/>
         <source>Statistics explanation</source>
-        <translation>Explicación de las estadísticas</translation>
+        <translation>Explicación de estadísticas</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_compare_coder_file.py" line="105"/>
@@ -3587,7 +3587,7 @@ Seleccione dos codificadores, un archivo, un código.</translation>
     <message>
         <location filename="ui_dialog_report_comparisons.py" line="87"/>
         <source>Statistics help</source>
-        <translation>Ayuda a las estadísticas</translation>
+        <translation>Ayuda con estadísticas</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_comparisons.py" line="83"/>
@@ -3655,7 +3655,7 @@ Los comodines para &apos;like&apos; son % y _</translation>
     <message>
         <location filename="ui_report_attribute_parameters.py" line="69"/>
         <source>Clear</source>
-        <translation>Vaciar</translation>
+        <translation>Limpiar</translation>
     </message>
     <message>
         <location filename="ui_report_attribute_parameters.py" line="70"/>
@@ -3815,7 +3815,7 @@ No se recomienda a menos que tenga muchos archivos grandes que ralenticen la cop
         <location filename="ui_dialog_settings.py" line="436"/>
         <source>Set this name as the current coder.
 </source>
-        <translation>Establece este nombre como el codificador actual.</translation>
+        <translation>Establecer este nombre como el codificador actual.</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="438"/>
@@ -3830,7 +3830,7 @@ No se recomienda a menos que tenga muchos archivos grandes que ralenticen la cop
     <message>
         <location filename="ui_dialog_settings.py" line="481"/>
         <source>Code text chunk size</source>
-        <translation>Tamaño del trozo de texto del código</translation>
+        <translation>Tamaño del segmento de texto codificado</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="475"/>
@@ -3855,7 +3855,7 @@ No se recomienda a menos que tenga muchos archivos grandes que ralenticen la cop
     <message>
         <location filename="ui_dialog_settings.py" line="444"/>
         <source>Font size for codes tree</source>
-        <translation>Tamaño de letra del árbol de códigos</translation>
+        <translation>Tamaño de fuente para el árbol de códigos</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="424"/>
@@ -3867,7 +3867,7 @@ No se recomienda a menos que tenga muchos archivos grandes que ralenticen la cop
     <message>
         <location filename="ui_dialog_settings.py" line="426"/>
         <source>Backups</source>
-        <translation>Backups</translation>
+        <translation>Respaldos</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="479"/>
@@ -3922,12 +3922,12 @@ No se recomienda a menos que tenga muchos archivos grandes que ralenticen la cop
     <message>
         <location filename="ui_dialog_settings.py" line="492"/>
         <source>You can use the Project Memo (found in the menu: Project &gt; Project Memo) to convey background information about your research, including objectives, methodology, and data, to the AI. This will help the AI generate more accurate and relevant responses. Deselect this option if you use the Project Memo for other purposes.</source>
-        <translation>Puede utilizar la Memoria del proyecto (que encontrará en el menú: Proyecto &gt; Memoria del proyecto) para transmitir a la IA información general sobre su investigación, incluidos los objetivos, la metodología y los datos. Esto ayudará a la IA a generar respuestas más precisas y relevantes. Anule la selección de esta opción si utiliza la Memoria del proyecto para otros fines.</translation>
+        <translation>Puede utilizar el Memo del proyecto (que encontrará en el menú: Proyecto &gt; Memo del proyecto) para proporcionar información de contexto sobre su investigación a la IA, incluyendo sus objetivos, metodología y datos. Esto ayudará a que la IA genere respuestas más precisas y relevantes. Deseleccione esta opción si utiliza el Memo del Proyecto para otros fines.</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="493"/>
         <source>Send project memo to AI</source>
-        <translation>Enviar la nota del proyecto a AI</translation>
+        <translation>Enviar Memo del Proyecto a la IA</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="498"/>
@@ -4027,12 +4027,12 @@ No se recomienda a menos que tenga muchos archivos grandes que ralenticen la cop
     <message>
         <location filename="ui_dialog_settings.py" line="494"/>
         <source>Language for AI conversations: </source>
-        <translation>Lenguaje para conversaciones sobre IA: </translation>
+        <translation>Idioma para las conversaciones con IA: </translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="495"/>
         <source>If selected, the conversations will be in the same language as the rest of the user interface. You can select this language at the top of this window.</source>
-        <translation>Si se selecciona, las conversaciones estarán en el mismo idioma que el resto de la interfaz de usuario. Puede seleccionar este idioma en la parte superior de esta ventana.</translation>
+        <translation>Si está seleccionado, las conversaciones serán en el mismo idioma que el resto de la interfaz de usuario. Puedes seleccionar este idioma en la parte superior de esta ventana.</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="496"/>
@@ -4284,17 +4284,17 @@ No se recomienda a menos que tenga muchos archivos grandes que ralenticen la cop
     <message>
         <location filename="ui_dialog_view_av.py" line="127"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Memo&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&amp;lt;html&amp;gt;&amp;lt;head/&amp;gt;&amp;lt;body&amp;gt;&amp;lt;p&amp;gt;Memorándum&amp;lt;/p&amp;gt;&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;</translation>
+        <translation type="obsolete">&amp;lt;html&amp;gt;&amp;lt;head/&amp;gt;&amp;lt;body&amp;gt;&amp;lt;p&amp;gt;Memo&amp;lt;/p&amp;gt;&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="128"/>
         <source>Memo:</source>
-        <translation type="obsolete">Memorándum:</translation>
+        <translation type="obsolete">Memo:</translation>
     </message>
     <message>
         <location filename="." line="7274595"/>
         <source>Play</source>
-        <translation type="obsolete">Actuar</translation>
+        <translation type="obsolete">Reproducir</translation>
     </message>
     <message>
         <location filename="." line="7274595"/>
@@ -4334,7 +4334,7 @@ No se recomienda a menos que tenga muchos archivos grandes que ralenticen la cop
     <message>
         <location filename="." line="7274595"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To rewind 3 seconds. In the text entry box, press ctrl + r&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&amp;lt;html&amp;gt;&amp;lt;cabeza/&amp;gt;&amp;gt;cuerpo&amp;gt;&amp;lt;p&amp;gt;Rebobinar 5 segundos. En el cuadro de entrada de texto, presione ctrl + r&amp;lt;/p&amp;gt;&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;</translation>
+        <translation type="obsolete">&amp;lt;html&amp;gt;&amp;lt;cabeza/&amp;gt;&amp;gt;cuerpo&amp;gt;&amp;lt;p&amp;gt;Retroceder 5 segundos. En el cuadro de entrada de texto, presione ctrl + r&amp;lt;/p&amp;gt;&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="187"/>
@@ -4350,12 +4350,12 @@ Inserte un orador en la transcripción. En el cuadro de entrada de texto presion
     <message>
         <location filename="ui_dialog_view_av.py" line="175"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ctrl + Shift + &amp;gt; increase play rate, maximum 2.0&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt; decrease play rate, minimum 0.1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Ctrl + Shift + &amp;gt; ,aumentar la tasa de juego máximo 2.0 Ctrl + Shift + &amp;lt; ,Disminuir la velocidad de juego minimo 0.1</translation>
+        <translation>Ctrl + Shift + &amp;gt; ,aumentar velocidad de reproducción máxima 2.0 Ctrl + Shift + &amp;lt; ,Disminuir velocidad de reproducción mínima 0.1</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="171"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Play / Pause&lt;/p&gt;&lt;p&gt;Ctrl + S start/pause&lt;/p&gt;&lt;p&gt;Ctrl + P start/pause&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Rebobina 30 segundos Alt + R</translation>
+        <translation>Retroceder 30 segundos Alt + R</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="172"/>
@@ -4370,17 +4370,17 @@ Inserte un orador en la transcripción. En el cuadro de entrada de texto presion
     <message>
         <location filename="ui_dialog_view_av.py" line="178"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Decrease play rate&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt; &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&amp;lt;html&amp;gt;&amp;lt;head/&amp;gt;&amp;lt;body&amp;gt;&amp;lt;p&amp;gt;Disminuir la velocidad de juego&amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Ctrl + Shift + &amp;lt; &amp;lt;/p&amp;gt;&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;</translation>
+        <translation>&amp;lt;html&amp;gt;&amp;lt;head/&amp;gt;&amp;lt;body&amp;gt;&amp;lt;p&amp;gt;Disminuir velocidad de reproducción&amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Ctrl + Shift + &amp;lt; &amp;lt;/p&amp;gt;&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="179"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Increase play rate&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;gt; &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&amp;lt;html&amp;gt;&amp;lt;head/&amp;gt;&amp;lt;body&amp;gt;&amp;lt;p&amp;gt;Aumentar la tasa de juego&amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Ctrl + Shift + &amp;gt; &amp;lt;/p&amp;gt;&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;</translation>
+        <translation>&amp;lt;html&amp;gt;&amp;lt;head/&amp;gt;&amp;lt;body&amp;gt;&amp;lt;p&amp;gt;Aumentar velocidad de reproducción&amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Ctrl + Shift + &amp;gt; &amp;lt;/p&amp;gt;&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="180"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rewind 5 seconds&lt;/p&gt;&lt;p&gt;Ctrl + R&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&amp;lt;html&amp;gt;&amp;lt;head/&amp;gt;&amp;lt;body&amp;gt;&amp;lt;p&amp;gt;Rebobina 5 segundos&amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Ctrl + R&amp;lt;/p&amp;gt;&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;</translation>
+        <translation>&amp;lt;html&amp;gt;&amp;lt;head/&amp;gt;&amp;lt;body&amp;gt;&amp;lt;p&amp;gt;Retroceder 5 segundos&amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Ctrl + R&amp;lt;/p&amp;gt;&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="186"/>
@@ -4395,12 +4395,12 @@ Inserte un orador en la transcripción. En el cuadro de entrada de texto presion
     <message>
         <location filename="ui_dialog_view_av.py" line="142"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rewind 5 seconds&lt;/p&gt;&lt;p&gt;Alt + R&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&amp;lt;html&amp;gt;&amp;lt;head/&amp;gt;&amp;lt;body&amp;gt;&amp;lt;p&amp;gt;Rebobina 5 segundos&amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Alt + R&amp;lt;/p&amp;gt;&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;</translation>
+        <translation type="obsolete">&amp;lt;html&amp;gt;&amp;lt;head/&amp;gt;&amp;lt;body&amp;gt;&amp;lt;p&amp;gt;Retroceder 5 segundos&amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Alt + R&amp;lt;/p&amp;gt;&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="143"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rewind 30 seconds&lt;/p&gt;&lt;p&gt;Shift + R&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&amp;lt;html&amp;gt;&amp;lt;head/&amp;gt;&amp;lt;body&amp;gt;&amp;lt;p&amp;gt;Rebobina 30 segundos&amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Mayúsculas + R&amp;lt;/p&amp;gt;&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;</translation>
+        <translation type="obsolete">&amp;lt;html&amp;gt;&amp;lt;head/&amp;gt;&amp;lt;body&amp;gt;&amp;lt;p&amp;gt;Retroceder 30 segundos&amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Mayúsculas + R&amp;lt;/p&amp;gt;&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="144"/>
@@ -4457,7 +4457,7 @@ subrayado rojo = Asignado al código o a la anotación</translation>
     <message>
         <location filename="ui_dialog_view_av.py" line="181"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rewind 30 seconds&lt;/p&gt;&lt;p&gt;Alt + Minus&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Rebobinar 30 segundos. Alt + Menos</translation>
+        <translation>Retroceder 30 segundos. Alt + Menos</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="182"/>
@@ -4480,7 +4480,7 @@ subrayado rojo = Asignado al código o a la anotación</translation>
     <message>
         <location filename="ui_dialog_view_image.py" line="51"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Memo&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Memorándum</translation>
+        <translation>Memo</translation>
     </message>
 </context>
 <context>
@@ -4498,7 +4498,7 @@ subrayado rojo = Asignado al código o a la anotación</translation>
     <message>
         <location filename="ui_dialog_view_text.py" line="75"/>
         <source>Clear</source>
-        <translation>Vacío</translation>
+        <translation>Limpiar</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_text.py" line="76"/>
@@ -4552,7 +4552,7 @@ No codifique este texto hasta que vuelva a cargar Codificación - Texto codifica
     <message>
         <location filename="." line="7274595"/>
         <source>View graph</source>
-        <translation type="obsolete">Ver gráfico</translation>
+        <translation type="obsolete">Ver Grafo</translation>
     </message>
     <message>
         <location filename="." line="7274595"/>
@@ -4562,7 +4562,7 @@ No codifique este texto hasta que vuelva a cargar Codificación - Texto codifica
     <message>
         <location filename="." line="7274595"/>
         <source>Categories larger font</source>
-        <translation type="obsolete">Categorías fuente más grande</translation>
+        <translation type="obsolete">Categorías en fuente más grande</translation>
     </message>
 </context>
 <context>
@@ -4570,7 +4570,7 @@ No codifique este texto hasta que vuelva a cargar Codificación - Texto codifica
     <message>
         <location filename="ui_visualise_graph_original.py" line="56"/>
         <source>Graph Visualisation</source>
-        <translation type="obsolete">Visualización de grafos</translation>
+        <translation type="obsolete">Visualización de Grafos</translation>
     </message>
     <message>
         <location filename="ui_visualise_graph_original.py" line="57"/>
@@ -4663,22 +4663,22 @@ No codifique este texto hasta que vuelva a cargar Codificación - Texto codifica
     <message>
         <location filename="ui_main.py" line="329"/>
         <source>Manage journals</source>
-        <translation>Administrar revistas</translation>
+        <translation>Administrar Diarios</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="330"/>
         <source>Code text</source>
-        <translation>Texto del código</translation>
+        <translation>Codificar Texto</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="331"/>
         <source>Categories</source>
-        <translation>Categorias</translation>
+        <translation>Categorías</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="332"/>
         <source>Codebook</source>
-        <translation>Libro de códigos</translation>
+        <translation>Libro de Códigos</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="333"/>
@@ -4688,7 +4688,7 @@ No codifique este texto hasta que vuelva a cargar Codificación - Texto codifica
     <message>
         <location filename="ui_main.py" line="334"/>
         <source>Manage Attributes</source>
-        <translation>Administrar atributos</translation>
+        <translation>Administrar Atributos</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="335"/>
@@ -4968,12 +4968,12 @@ No codifique este texto hasta que vuelva a cargar Codificación - Texto codifica
     <message>
         <location filename="ui_main.py" line="382"/>
         <source>AI Chat</source>
-        <translation>Chat AI</translation>
+        <translation>Chat IA</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="319"/>
         <source>AI</source>
-        <translation></translation>
+        <translation>IA</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="377"/>
@@ -4983,7 +4983,7 @@ No codifique este texto hasta que vuelva a cargar Codificación - Texto codifica
     <message>
         <location filename="ui_main.py" line="378"/>
         <source>Code text exact matches</source>
-        <translation>Coincidencias exactas de texto en clave</translation>
+        <translation>Coincidencias exactas de texto codificado</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="379"/>
