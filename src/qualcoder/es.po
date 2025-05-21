@@ -107,11 +107,11 @@ msgstr "Copia de seguridad de los archivos AV"
 
 #: __main__.py:1463 __main__.py:1517 __main__.py:1532 __main__.py:1597
 msgid "AI integration is enabled"
-msgstr "La integración de la IA está activada"
+msgstr "La integración de la IA está habilitada"
 
 #: __main__.py:1465 __main__.py:1519 __main__.py:1534 __main__.py:1599
 msgid "AI integration is disabled"
-msgstr "La integración de la IA está desactivada"
+msgstr "La integración de la IA está deshabilitada"
 
 #: __main__.py:1466 __main__.py:1520 __main__.py:1535 __main__.py:1600
 msgid "Style"
@@ -454,7 +454,7 @@ msgid ""
 "here. Go to AI > settings if you want to change the current model or other "
 "settings."
 msgstr ""
-"Parece que la IA ya está configurada y activada, por lo que no hay nada que "
+"Parece que la IA ya está configurada y habilitada, por lo que no hay nada que "
 "hacer aquí. Ve a IA > ajustes si quieres cambiar el modelo actual u otros "
 "ajustes."
 
@@ -472,7 +472,7 @@ msgstr "IA: Asistente de configuración finalizado"
 
 #: __main__.py:2773 __main__.py:2799 __main__.py:2807
 msgid "Please enable the AI first and set it up properly."
-msgstr "Por favor, activa primero la IA y configúrala correctamente."
+msgstr "Por favor, habilite primero la IA y configúrela correctamente."
 
 #: __main__.py:2774 __main__.py:2778 __main__.py:2783 __main__.py:2800
 #: __main__.py:2808 __main__.py:2836 __main__.py:2840 __main__.py:2845
@@ -592,7 +592,7 @@ msgstr "Memo para el atributo "
 #: view_av.py:452 view_av.py:548 view_av.py:2268 view_av.py:2292
 #: view_image.py:321 view_image.py:1254 view_image.py:1863 view_image.py:1887
 msgid "Memo"
-msgstr "Memorándum"
+msgstr "Memo"
 
 #: attributes.py:228 attributes.py:215 attributes.py:214
 msgid "numeric"
@@ -794,12 +794,12 @@ msgstr " secciones encontradas."
 
 #: cases.py:259 cases.py:241
 msgid "Case attributes csv file exported to: "
-msgstr "Archivo csv de atributos de casos exportado a: "
+msgstr "Archivo CSV de atributos de casos exportado a: "
 
 #: cases.py:260 manage_files.py:838 report_relations.py:840 cases.py:242
 #: manage_files.py:804 report_relations.py:817 report_relations.py:838
 msgid "Csv file Export"
-msgstr "Exportación del archivo Csv"
+msgstr "Exportación del archivo CSV"
 
 #: cases.py:383 cases.py:365 cases.py:375 cases.py:388
 msgid "Attribute added to cases: "
@@ -825,7 +825,7 @@ msgstr "Casos y atributos importados de: "
 
 #: cases.py:499 cases.py:481 cases.py:491 cases.py:504
 msgid "Cannot import from csv, only one row in file"
-msgstr "No se puede importar desde csv, solo una fila en el archivo"
+msgstr "No se puede importar desde archivo CSV, solo una fila en el archivo"
 
 #: cases.py:565 manage_files.py:922 view_graph.py:978 view_graph.py:1898
 #: view_graph.py:1926 cases.py:547 manage_files.py:888 view_graph.py:937
@@ -955,11 +955,11 @@ msgstr "Mostrar valores como: "
 
 #: cases.py:888 cases.py:870 cases.py:880 cases.py:896
 msgid "Click to edit memo"
-msgstr "Haga clic para editar el memorándum"
+msgstr "Haga clic para editar el Memo"
 
 #: cases.py:896 cases.py:878 cases.py:888 cases.py:904
 msgid "Click to manage files for this case"
-msgstr "Haga clic para gestionar los archivos de este caso"
+msgstr "Haga clic para administrar los archivos de este caso"
 
 #: cases.py:910 manage_files.py:182 manage_files.py:2184 cases.py:892
 #: manage_files.py:148 manage_files.py:2130 cases.py:902 manage_files.py:149
@@ -1041,7 +1041,7 @@ msgstr ""
 #: code_in_all_files.py:100
 msgid "Right click on heading to unmark or to add codes"
 msgstr ""
-"Haga clic con el botón derecho en el título para desmarcarlo o añadir códigos"
+"Haz clic derecho en el encabezado para desmarcar o agregar códigos"
 
 #: code_in_all_files.py:143 code_in_all_files.py:145 code_in_all_files.py:182
 #: code_in_all_files.py:184 code_in_all_files.py:222 code_in_all_files.py:133
@@ -1067,7 +1067,7 @@ msgstr " Caso: "
 #: view_av.py:3177 view_av.py:3683 view_graph.py:514 view_graph.py:574
 #: view_graph.py:633 view_graph.py:1247 view_graph.py:1273 view_graph.py:1298
 msgid "Memo: "
-msgstr "Memorándum: "
+msgstr "Memo: "
 
 #: code_in_all_files.py:224 code_text.py:3793 helpers.py:220
 #: report_attributes.py:306 report_codes.py:2094 view_charts.py:265
@@ -1429,7 +1429,7 @@ msgstr "Renombrar"
 #: code_text.py:1519 code_pdf.py:1170 code_text.py:1526 code_pdf.py:1180
 #: view_av.py:1340 view_image.py:889
 msgid "View or edit memo"
-msgstr "Ver o editar memorándum"
+msgstr "Ver o editar Memo"
 
 #: code_pdf.py:1225 code_text.py:1503 manage_files.py:362 report_sql.py:370
 #: view_av.py:1400 view_image.py:886 code_text.py:1474 code_pdf.py:1150
@@ -1837,7 +1837,7 @@ msgstr "Importante"
 #, fuzzy
 #| msgid "Code memo: "
 msgid "Code memo"
-msgstr "Nota de código: "
+msgstr "Memo de código: "
 
 #: code_pdf.py:2903 code_pdf.py:2825 code_pdf.py:2848 code_pdf.py:2888
 #, fuzzy
@@ -1983,7 +1983,7 @@ msgstr "Ejemplos:"
 
 #: code_text.py:791 code_text.py:727 code_text.py:773 code_text.py:778
 msgid "Project memo"
-msgstr "Nota del proyecto"
+msgstr "Memo del proyecto"
 
 #: code_text.py:800 code_text.py:736 code_text.py:782 code_text.py:787
 msgid "Delete all codings in this file made by "
@@ -2173,7 +2173,7 @@ msgid ""
 "Do you want to store the AI interpretation in a memo together with the "
 "coding?<br/><br/>"
 msgstr ""
-"¿Desea almacenar la interpretación de la IA en una nota junto con la "
+"¿Desea almacenar la interpretación de la IA en un Memo junto con la "
 "codificación?<br/><br/>"
 
 #: code_text.py:3553 code_text.py:3582 view_av.py:3060 view_av.py:3087
@@ -2390,7 +2390,7 @@ msgstr ""
 "\n"
 "\n"
 "Translation results\n"
-"La IA está desactivada. Vaya primero a «IA > Asistente de configuración».\n"
+"La IA está deshabilitada. Vaya primero a «IA > Asistente de configuración».\n"
 "\n"
 "\n"
 "\n"
@@ -2578,7 +2578,7 @@ msgstr ""
 #, fuzzy
 #| msgid "Date: "
 msgid "Quote: "
-msgstr "Fecha "
+msgstr "Fecha: "
 
 #: code_text.py:4675 code_text.py:4729 code_text.py:4803 code_text.py:4863
 msgid ">> Searching (click here to cancel)"
@@ -2596,13 +2596,13 @@ msgstr ">> Encuentra más..."
 #, fuzzy
 #| msgid "Click to manage files for this case"
 msgid "Click here to analyze more data"
-msgstr "Haga clic para gestionar los archivos de este caso"
+msgstr "Haga clic para administrar los archivos de este caso"
 
 #: code_text.py:4708 code_text.py:4762 code_text.py:4836 code_text.py:4896
 #, fuzzy
 #| msgid "Are you sure you want to clear the graph?"
 msgid "Do you want to stop the search?"
-msgstr "¿Estás seguro de que quieres borrar el gráfico?"
+msgstr "¿Estás seguro de que quieres borrar el Grafo?"
 
 #: code_text.py:4720 code_text.py:4774 code_text.py:4848 code_text.py:4908
 msgid ""
@@ -2648,8 +2648,8 @@ msgid ""
 "Avoid selecting text combinations of unmarked text sections and coded/"
 "annotated/case-assigned sections."
 msgstr ""
-"Evite seleccionar combinaciones de secciones de texto no marcadas y "
-"secciones codificadas/anotadas/casi asignadas."
+"Evite seleccionar combinaciones de texto que incluyan secciones no marcadas junto con secciones "
+"codificadas, anotadas o asignadas a casos."
 
 #: edit_textfile.py:87 edit_textfile.py:77
 msgid "Positions may not correctly adjust."
@@ -2759,7 +2759,7 @@ msgstr "Seleccionar archivo de encuesta"
 
 #: import_survey.py:128 import_survey.py:123 import_survey.py:124
 msgid "Survey not imported. Survey not a csv or xlsx file: "
-msgstr "Encuesta no importada. La encuesta no es un archivo csv o xlsx: "
+msgstr "Encuesta no importada. La encuesta no es un archivo CSV o XLSX: "
 
 #: import_survey.py:181 import_survey.py:180
 msgid "A column delimiter has not been set."
@@ -2862,12 +2862,12 @@ msgstr "Cambiar a cualitativo"
 #: import_survey.py:483 import_survey.py:501 import_survey.py:579
 #: import_survey.py:577
 msgid "Change to Character"
-msgstr "Cambiar a nota"
+msgstr "Cambiar a carácter"
 
 #: import_survey.py:509 import_survey.py:527 import_survey.py:605
 #: import_survey.py:603
 msgid "Change field name"
-msgstr "Cambiar nombre de esfera"
+msgstr "Cambiar nombre del campo"
 
 #: import_survey.py:509 import_survey.py:527 import_survey.py:605
 #: import_survey.py:603
@@ -2896,17 +2896,17 @@ msgstr " Ya en uso"
 #: import_survey.py:521 import_survey.py:539 import_survey.py:617
 #: import_survey.py:615
 msgid "Field name invalid."
-msgstr "Nombre de esfera no válido."
+msgstr "Nombre de campo no válido."
 
 #: import_twitter_data.py:93 import_twitter_data.py:86
 msgid "Select Twitter csv file"
-msgstr "Seleccione el archivo csv de Twitter"
+msgstr "Seleccione el archivo CSV de Twitter"
 
 #: import_twitter_data.py:110 import_twitter_data.py:103
 msgid "Tweet file loaded. Please check via Manage files and Manage cases"
 msgstr ""
-"Archivo Tweet cargado. Compruébelo a través de Gestionar archivos y "
-"Gestionar casos."
+"Archivo de Twitter cargado. Compruébelo a través de Administrar archivos y "
+"Administrar casos."
 
 #: import_twitter_data.py:111 import_twitter_data.py:104
 msgid "Tweets: "
@@ -3060,7 +3060,7 @@ msgstr "Nombre de la revista en uso"
 
 #: journals.py:746 journals.py:711
 msgid "Warning - invalid characters"
-msgstr "Advertencia: nota no válidos"
+msgstr "Advertencia: caracteres no válidos"
 
 #: journals.py:747 journals.py:712
 msgid "In the journal name use only: a-z, A-z 0-9 - space"
@@ -3188,7 +3188,7 @@ msgstr "No se puede exportar como un archivo enlazado.\n"
 
 #: manage_files.py:837 manage_files.py:803
 msgid "File attributes csv file exported to: "
-msgstr "Atributos del archivo csv exportado: "
+msgstr "Archivo CSV de atributos de archivo exportado a: "
 
 #: manage_files.py:922 manage_files.py:888 manage_files.py:891
 #: manage_files.py:912
@@ -3441,7 +3441,7 @@ msgstr "El nombre del archivo no coincide."
 
 #: manage_links.py:140 manage_links.py:133
 msgid "Wrong file"
-msgstr "Fichero erróneo"
+msgstr "Archivo incorrecto"
 
 #: manage_links.py:167 manage_links.py:160
 msgid "Bad link fixed for file: "
@@ -3741,19 +3741,19 @@ msgstr "Analizando las fuentes. Cargadas: "
 #: refi.py:394 refi.py:387
 msgid "Parsing Notes. Journals loaded: "
 msgstr ""
-"Notas de análisis. Revistas cargadas: Notas de análisis. Revistas cargadas: "
+"Analizando Notas. Revistas cargadas: "
 
 #: refi.py:406 refi.py:399
 msgid "Parsing cases. Loaded: "
-msgstr "Casos de análisis. Cargadas: "
+msgstr "Analizando Casos. Cargados: "
 
 #: refi.py:415 refi.py:408
 msgid "Parsing sets."
-msgstr "Parsing sets."
+msgstr "Analizando Conjuntos."
 
 #: refi.py:417 refi.py:410
 msgid " loaded."
-msgstr " cargada."
+msgstr " cargado."
 
 #: refi.py:432 refi.py:425
 msgid "REFI-QDA PROJECT IMPORT EXPERIMENTAL FUNCTION - NOT FULLY TESTED\n"
@@ -3777,7 +3777,7 @@ msgstr ""
 #: refi.py:435 refi.py:428
 msgid "Graphs not imported as QualCoder does not have this functionality.\n"
 msgstr ""
-"Los gráficos no se importan ya que QualCoder no tiene esta funcionalidad.\n"
+"Los gráficos no se importaron, ya que QualCoder no tiene esta funcionalidad.\n"
 
 #: refi.py:436 refi.py:429
 msgid ""
@@ -4249,7 +4249,7 @@ msgstr "No hay selección de casos"
 #: report_codes.py:310 report_codes.py:287 report_codes_by_segments.py:181
 #: report_codes.py:288 report_codes.py:290
 msgid "Select all files"
-msgstr "Seleccione todos los ficheros"
+msgstr "Seleccione todos los archivos"
 
 #: report_codes.py:311 report_codes.py:288 report_codes_by_segments.py:182
 #: report_codes.py:289 report_codes.py:291
@@ -4440,7 +4440,7 @@ msgid ""
 "Codebook with memos\n"
 "=================\n"
 msgstr ""
-"Libro de códigos con notas\n"
+"Libro de códigos con Memos\n"
 "=================\n"
 
 #: report_codes.py:1046 report_codes.py:1105 report_codes.py:1103
@@ -4507,13 +4507,13 @@ msgstr "Búsqueda"
 #: report_codes.py:1205 report_codes.py:1257 report_codes.py:1255
 #: report_codes.py:1267
 msgid "Only memos shown. Coded data not shown."
-msgstr "Sólo se muestran las notas. No se muestran los datos codificados."
+msgstr "Sólo se muestran los Memos. No se muestran los datos codificados."
 
 #: report_codes.py:1207 report_codes.py:1259 report_codes.py:1257
 #: report_codes.py:1269
 msgid "Coded memos shown if available. Coded data not shown."
 msgstr ""
-"Se muestran las notas codificadas si están disponibles. No se muestran los "
+"Se muestran los Memos codificados si están disponibles. No se muestran los "
 "datos codificados."
 
 #: report_codes.py:1208 report_codes.py:1260 report_codes.py:1258
@@ -5084,7 +5084,7 @@ msgstr "Filtro inferior o igual: "
 #: report_relations.py:966 report_sql.py:497 report_sql.py:594
 #: report_relations.py:967 report_relations.py:521 report_relations.py:988
 msgid "Clear filter"
-msgstr "Filtro claro"
+msgstr "Limpiar Filtro"
 
 #: report_relations.py:619 report_relations.py:923 view_graph.py:1694
 #: view_graph.py:2918 view_graph.py:2920 report_relations.py:596
@@ -5189,15 +5189,15 @@ msgstr "Superposición de textos"
 
 #: report_relations.py:839 report_relations.py:816 report_relations.py:837
 msgid "Code relations csv file exported to: "
-msgstr "Archivo csv de relaciones de código exportado a: "
+msgstr "Archivo CSV de relaciones de código exportado a: "
 
 #: report_relations.py:856 report_relations.py:833 report_relations.py:854
 msgid "Code relations stats csv file exported to: "
-msgstr "Archivo csv de estadísticas de relaciones de código exportado a: "
+msgstr "Archivo CSV de estadísticas de relaciones de código exportado a: "
 
 #: report_relations.py:857 report_relations.py:834 report_relations.py:855
 msgid "Csv summary file Export"
-msgstr "Archivo de resumen Csv Exportación"
+msgstr "Archivo de resumen CSV Exportado"
 
 #: report_relations.py:907 report_relations.py:884 report_relations.py:905
 msgid "Code pair"
@@ -5225,7 +5225,7 @@ msgstr "Consulta:"
 
 #: report_sql.py:173 report_sql.py:220
 msgid "CSV file export"
-msgstr "Exportación de archivos CSV"
+msgstr "Exportación de archivo CSV"
 
 #: report_sql.py:210 report_sql.py:257
 msgid "Running query. Please wait."
@@ -5348,7 +5348,7 @@ msgstr "Exportar archivo de texto"
 #, fuzzy
 #| msgid "Coding frequencies csv file exported to: "
 msgid "Coding frequencies exported to: "
-msgstr "Frecuencias de codificación a las que se exporta el archivo csv: "
+msgstr "Archivo CSV de frecuencias de codificación exportado a: "
 
 #: reports.py:321 reports.py:310 cases.py:252 cases.py:265 reports.py:320
 #, fuzzy
@@ -5657,7 +5657,7 @@ msgstr "Seleccione el archivo de texto de sustitución"
 
 #: special_functions.py:160 special_functions.py:149
 msgid "Replacement file: "
-msgstr "Fichero de sustitución: "
+msgstr "Archivo de reemplazo: "
 
 #: special_functions.py:163 special_functions.py:152
 msgid "Press to replace the text file"
@@ -5742,7 +5742,7 @@ msgstr "No se puede procesar el archivo"
 
 #: speech_to_text.py:191
 msgid "Converting chunk "
-msgstr "Convertir un trozo "
+msgstr "Convirtiendo fragmento "
 
 #: speech_to_text.py:198 speech_to_text.py:208 speech_to_text.py:217
 #: speech_to_text.py:227 speech_to_text.py:236
@@ -5772,12 +5772,12 @@ msgid ""
 "Function works by identifying the first matching text segment for each "
 "coding and annotation."
 msgstr ""
-"La función funciona identificando el primer segmento de texto coincidente "
+"La función trabaja identificando el primer segmento de texto coincidente "
 "para cada codificación y anotación."
 
 #: text_file_replacement.py:92
 msgid "File replaced"
-msgstr "Archivo sustituido"
+msgstr "Archivo reemplazado"
 
 #: text_file_replacement.py:115 text_file_replacement.py:140
 #: text_file_replacement.py:167
@@ -5859,12 +5859,12 @@ msgstr "Altura:"
 
 #: view_av.py:923 view_av.py:868 view_av.py:872
 msgid "Media coding: "
-msgstr "Codificación de los medios de comunicación: "
+msgstr "Codificación de medios: "
 
 #: view_av.py:1344 view_av.py:1363 view_av.py:1281 view_av.py:1300
 #: view_av.py:1285 view_av.py:1304
 msgid "Clear segment"
-msgstr "Segmento claro"
+msgstr "Borrar Segmento"
 
 #: view_av.py:1357 view_av.py:1294 view_av.py:1298
 msgid "End segment"
@@ -5946,11 +5946,11 @@ msgstr "Categoría renombrada: "
 
 #: view_av.py:2515 view_av.py:2462 view_av.py:2466 view_av.py:2501
 msgid "Play text"
-msgstr "Juega con el texto"
+msgstr "Reproducir texto"
 
 #: view_av.py:2519 view_av.py:2466 view_av.py:2470 view_av.py:2505
 msgid "Memo coded text M"
-msgstr "Texto codificado en memo M"
+msgstr "Añadir Memo a texto codificado M"
 
 #: view_av.py:2559 view_av.py:2506 view_av.py:2510 view_av.py:2545
 msgid "Video position to timestamp"
@@ -6186,11 +6186,11 @@ msgstr "Volumen de código por segmentos de audio/vídeo (milisegundos)"
 
 #: view_charts.py:797 view_charts.py:790 view_charts.py:811
 msgid " chart of counts of codes and categories"
-msgstr " gráfico de recuentos de códigos y categorías"
+msgstr " gráfico de recuento de códigos y categorías"
 
 #: view_charts.py:893 view_charts.py:886 view_charts.py:907
 msgid " chart of counts of coded text - total characters"
-msgstr " gráfico de recuentos de texto codificado - total de caracteres"
+msgstr " gráfico de recuento de texto codificado - total de caracteres"
 
 #: view_charts.py:975 view_charts.py:968 view_charts.py:989
 msgid " chart of coded image areas - pixels"
@@ -6243,7 +6243,7 @@ msgstr "Demasiados casos para la exhibición. Restringido a 40"
 
 #: view_graph.py:174 view_graph.py:133 view_graph.py:134
 msgid "Are you sure you want to clear the graph?"
-msgstr "¿Estás seguro de que quieres borrar el gráfico?"
+msgstr "¿Estás seguro de que quieres borrar el Grafo?"
 
 #: view_graph.py:193 code_organiser.py:153 view_graph.py:152
 #: code_organiser.py:146 view_graph.py:153
@@ -6444,11 +6444,11 @@ msgstr "Seleccione los casos"
 
 #: view_graph.py:1022 view_graph.py:981 view_graph.py:982
 msgid "Save graph"
-msgstr "Guardar gráfico"
+msgstr "Guardar Grafo"
 
 #: view_graph.py:1023 view_graph.py:982 view_graph.py:983
 msgid "Graph name"
-msgstr "Nombre del gráfico"
+msgstr "Nombre del Grafo"
 
 #: view_graph.py:1029 view_graph.py:988 view_graph.py:989
 msgid "Must have a name"
@@ -6485,15 +6485,15 @@ msgstr "De más reciente a más antiguo"
 #: view_graph.py:1201 view_graph.py:1434 view_graph.py:1160 view_graph.py:1393
 #: view_graph.py:1161 view_graph.py:1394
 msgid "Load graph"
-msgstr "Gráfico de carga"
+msgstr "Cargar Grafo"
 
 #: view_graph.py:1456 view_graph.py:1415 view_graph.py:1416
 msgid "Load graph errors"
-msgstr "Errores en el gráfico de carga"
+msgstr "Errores de carga de Grafo"
 
 #: view_graph.py:1457 view_graph.py:1416 view_graph.py:1417
 msgid "Changing to another report will lose unsaved graph."
-msgstr "Al cambiar a otro informe se perderá el gráfico no guardado."
+msgstr "Al cambiar a otro informe se perderá el Grafo no guardado."
 
 #: view_graph.py:1695 view_graph.py:1654 view_graph.py:1655
 msgid " does not exist: "
@@ -6501,7 +6501,7 @@ msgstr " no existe: "
 
 #: view_graph.py:1711 view_graph.py:1670 view_graph.py:1671
 msgid "Delete stored graphs"
-msgstr "Borrar los gráficos almacenados"
+msgstr "Borrar los Grafos almacenados"
 
 #: view_graph.py:1954 view_graph.py:2022 view_graph.py:2124 view_graph.py:2198
 #: view_graph.py:2340 view_graph.py:2475 view_graph.py:1914 view_graph.py:1982
@@ -6530,7 +6530,7 @@ msgstr "Fuente más pequeña"
 #: view_graph.py:2918 view_graph.py:1918 view_graph.py:2086 view_graph.py:2311
 #: view_graph.py:3122
 msgid "Bold toggle"
-msgstr "Negrita de la palanca"
+msgstr "Texto en Negrita"
 
 #: view_graph.py:1958 view_graph.py:2128 view_graph.py:1918 view_graph.py:2088
 #: view_graph.py:1919 view_graph.py:2089
@@ -6793,12 +6793,12 @@ msgid ""
 "The AI is setup and enabled, so there is nothing to do here. Go to AI > "
 "settings to change the current model or other settings."
 msgstr ""
-"La IA está configurada y activada, por lo que no hay nada que hacer aquí. Ve "
+"La IA está configurada y habilitada, por lo que no hay nada que hacer aquí. Ve "
 "a IA > ajustes para cambiar el modelo actual u otros ajustes."
 
 #: __main__.py:2835 __main__.py:2860 __main__.py:2911
 msgid "Please enable the AI first and set it in Settings."
-msgstr "Por favor, activa primero la IA y configúrala en Ajustes."
+msgstr "Por favor, habilite primero la IA y configúrela en Ajustes."
 
 #: __main__.py:2839 __main__.py:2864 __main__.py:2915
 msgid "The AI is busy or not set up correctly."
@@ -6807,7 +6807,7 @@ msgstr "La IA está ocupada o no está configurada correctamente."
 #: __main__.py:2861 __main__.py:2869 __main__.py:2886 __main__.py:2894
 #: __main__.py:2937 __main__.py:2945
 msgid "Please enable the AI first and set it up in Settings."
-msgstr "Primero activa la IA y configúrala en Ajustes."
+msgstr "Primero habilite la IA y configúrela en Ajustes."
 
 #: __main__.py:2862 __main__.py:2887 __main__.py:2938
 msgid "AI Chat"
@@ -6828,7 +6828,7 @@ msgstr "No hay ningún proyecto abierto."
 #: ai_chat.py:309 ai_chat.py:313 ai_chat.py:417 ai_chat.py:421 ai_chat.py:538
 #: ai_chat.py:542 ai_chat.py:944
 msgid "AI not enabled"
-msgstr "IA no activada"
+msgstr "IA no habilitada"
 
 #: ai_chat.py:291 ai_chat.py:294
 msgid ""
@@ -6838,7 +6838,7 @@ msgid ""
 msgstr ""
 "Ahora pasaremos al espacio de trabajo de codificación de texto.\n"
 " Allí puedes abrir un documento, seleccionar un fragmento de texto, hacer "
-"clic con el botón derecho y elegir «Análisis de texto IA» en el menú "
+"clic con el botón derecho y elegir «Análisis de texto con IA» en el menú "
 "contextual."
 
 #: ai_chat.py:294 code_text.py:1013 ai_chat.py:297 code_text.py:1059
@@ -6866,8 +6866,8 @@ msgid ""
 "information will accompany every prompt sent to the AI, resulting in much "
 "more targeted results."
 msgstr ""
-"Tenga en cuenta que se recomienda encarecidamente utilizar la nota del "
-"proyecto (Menú «Proyecto > Nota del proyecto») para incluir una breve "
+"Tenga en cuenta que se recomienda encarecidamente utilizar el Memo del "
+"proyecto (Menú «Proyecto > Memo del proyecto») para incluir una breve "
 "descripción de los temas de investigación de su proyecto, las preguntas, los "
 "objetivos y los datos empíricos recopilados. Esta información acompañará a "
 "cada instrucción enviada a la IA, lo que dará lugar a resultados mucho más "
@@ -6883,7 +6883,7 @@ msgstr "El Chat ha sido cancelado por el usuario."
 
 #: ai_chat.py:477 ai_chat.py:480
 msgid "Sorry, the AI could could not find any data related to \""
-msgstr " La AI no pudo encontrar ningún dato relacionado con »"
+msgstr " La IA no pudo encontrar ningún dato relacionado con »"
 
 #: ai_chat.py:484
 msgid "Found "
@@ -6893,20 +6893,20 @@ msgstr "Encontrado"
 msgid ""
 " chunks of data which might be related to the topic. Analyzing the first "
 msgstr ""
-" trozos de datos que puedan estar relacionados con el tema. Analizar el "
-"primer "
+" segmentos de datos que podrían estar relacionados con el tema. Analizando el "
+"primero "
 
 #: ai_chat.py:484
 msgid " chunks closer."
-msgstr " trozos más cerca."
+msgstr " segmentos más cercanos."
 
 #: ai_chat.py:547 ai_chat.py:550
 msgid ""
 "The text is too long to be analyzed in one go. Please select a shorter "
 "passage."
 msgstr ""
-"El texto es demasiado largo para analizarlo de una sola vez. Por favor, "
-"seleccione un pasaje más corto."
+"El texto es demasiado largo para ser analizado de una vez. Por favor, "
+"seleccione un segmento más corto."
 
 #: ai_chat.py:548 ai_chat.py:551
 msgid "AI text analysis"
@@ -7081,7 +7081,7 @@ msgstr "IA: Por favor, configure el modelo de IA"
 
 #: ai_llm.py:145 ai_llm.py:149
 msgid "AI: No model selected, AI is disabled."
-msgstr "IA: No hay modelo seleccionado, la IA está desactivada."
+msgstr "IA: No hay modelo seleccionado, la IA está deshabilitada."
 
 #: ai_llm.py:161 ai_llm.py:165
 msgid ""
@@ -7097,7 +7097,7 @@ msgstr "Clave-API de IA"
 
 #: ai_llm.py:168 ai_llm.py:172
 msgid "AI: No API key set, AI is disabled."
-msgstr "IA: No hay clave API, la IA está desactivada."
+msgstr "IA: No hay clave API, la IA está deshabilitada."
 
 #: ai_llm.py:225 ai_llm.py:231 ai_llm.py:235
 msgid "AI: Ready"
@@ -7320,7 +7320,7 @@ msgid ""
 "be disabled."
 msgstr ""
 "IA: No se han podido descargar todos los componentes necesarios, la "
-"integración IA se desactivará."
+"integración de IA se deshabilitará."
 
 #: ai_vectorstore.py:263 ai_vectorstore.py:266
 msgid "AI: Success, components downloaded and installed."
@@ -7645,7 +7645,7 @@ msgstr "Caso vinculado:"
 
 #: manage_files.py:1089 manage_files.py:1092 manage_files.py:1114
 msgid "Attribute added to files:"
-msgstr "Atributo añadido a los ficheros:"
+msgstr "Atributo añadido a los archivos:"
 
 #: report_codes.py:750 report_codes.py:748 report_codes.py:756
 msgid "And file and case variables"
@@ -7759,11 +7759,11 @@ msgstr "texto"
 
 #: report_exact_matches.py:407
 msgid "Coded memo"
-msgstr "Nota codificada"
+msgstr "Memo codificado"
 
 #: report_exact_matches.py:407
 msgid "File name"
-msgstr "Nombre del fichero"
+msgstr "Nombre del archivo"
 
 #: report_exact_matches.py:487
 msgid "Report of exact matches for text codings for file"
@@ -7922,7 +7922,7 @@ msgstr "Exportar a archivo ODT"
 #: code_organiser.py:946 view_graph.py:2915 code_organiser.py:939
 #: view_graph.py:3119
 msgid "Display memo"
-msgstr "Mostrar nota"
+msgstr "Mostrar Memo"
 
 #: code_pdf.py:2441 code_pdf.py:2481
 msgid "Pages: "
