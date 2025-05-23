@@ -294,10 +294,12 @@ On finishing type `deactivate` to exit the virtual environment.
 
 If you are using audio or video, install VLC (download from site) or: sudo pacman -S vlc
 Install pip and venv:
+
 `sudo pacman -S python python-pip python-virtualenv`
 
 Download and unzip the Qualcoder folder. Then `cd` to the QualCoder folder.
 Set up virtual environment and install python modules. The virtual environment will be in its own folder called env. Installing required modules takes a while.
+
 ```
 python3 -m venv env
 source env/bin/activate
@@ -306,18 +308,22 @@ pip install -r requirements.txt
 ```
 
 Now, the command to start QualCoder, for versions up to 3.6:
+
 `python3 -m qualcoder`
 
 Latest code, version 3.7 and up, cd to the inner src folder first:
+
 ```
 cd src
 python -m qualcoder
 ```
 
 After using QualCoder deactiatve the virtual environment.
+
 `deactivate`
 
 Usage any time after the install, move to the folder (then to inner src folder if using 3.7 and up), then:
+
 ``
 cd QualCoder
 source env/bin/activate
