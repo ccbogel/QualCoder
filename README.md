@@ -325,7 +325,7 @@ After using QualCoder deactiatve the virtual environment.
 
 Usage any time after the install, move to the folder (then to inner src folder if using 3.7 and up), then:
 
-``
+```
 cd QualCoder
 source env/bin/activate
 python3 -m qualcoder
