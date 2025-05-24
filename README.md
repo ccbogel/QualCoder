@@ -215,7 +215,7 @@ To install from source code below, inside a virtual environment. If you are usin
 ```
 python3.12 -m venv env
 source env/bin/activate
-pip3 install -–upgrade pip
+pip install -–upgrade pip
 pip install -r requirements.txt
 ```
 
@@ -304,7 +304,7 @@ Set up virtual environment and install python modules. The virtual environment w
 ```
 python3 -m venv env
 source env/bin/activate
-pip3 install -–upgrade pip
+pip install -–upgrade pip
 pip install -r requirements.txt
 ```
 
