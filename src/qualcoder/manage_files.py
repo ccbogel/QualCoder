@@ -213,8 +213,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         selection = ui.get_selected()
         column_name_width_list = selection['tblcolumns'].split("\t\t")  # Will contain a '' at the end
         column_name_width_list.pop()
-
-        msg = _("Load table display settings") + f"\n{selection['name']}\n"
+        msg = _("Load table display settings") + f"\nProfile: {selection['name']}\n"
 
         # Reset columns and rows
         for col in range(0, self.ui.tableWidget.columnCount()):
@@ -230,11 +229,9 @@ class DialogManageFiles(QtWidgets.QDialog):
                     self.ui.tableWidget.setColumnHidden(col, True)  # Sets different Qt flags
                     msg += _("Hidden column: ") + colname + "\n"
                     break
-
         if selection['tblrows'] == "":
             return
         row_parameters_list = selection['tblrows'].split("\t\t")
-        print("RPARAM", row_parameters_list)
         # Need to re-create self.rows_hidden variable , for menu options and for any further display saving.
         self.rows_hidden = []
         for rpl in row_parameters_list:
@@ -242,13 +239,22 @@ class DialogManageFiles(QtWidgets.QDialog):
         # Convert the column name to its header index
         col_index_parameters_list = []
         if row_parameters_list:
-            msg += "\n" + _("Rows shown / hidden:") + "\n"
+            msg += _("Row settings:") + "\n"
+        warning = ""
         for rpl in row_parameters_list:
             colname, operator, value = rpl.split("\t")
             msg += f"{colname} {operator} {value}\n"
+            found = False
             for c in range(0, self.ui.tableWidget.columnCount()):
                 if self.ui.tableWidget.horizontalHeaderItem(c).text() == colname:
                     col_index_parameters_list.append({'col_idx': c, 'operator': operator, 'value': value})
+                    found = True
+                    break
+            if not found:
+                warning += f"Column name not found: {colname}\n"
+        if warning:
+            Message(self.app, _("Table column not present"), warning).exec()
+
         # Now hide the rows
         for row in range(0, self.ui.tableWidget.rowCount()):
             self.ui.tableWidget.setRowHidden(row, False)
@@ -260,10 +266,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                     self.ui.tableWidget.setRowHidden(r, True)
                 if param['operator'] == 'hide' and self.ui.tableWidget.item(r, param['col_idx']).text().find(param['value']) != -1:
                     self.ui.tableWidget.setRowHidden(r, True)
-
-        print("rows_hidden\n", self.rows_hidden)  # tmp
         self.ui.pushButton_display_load.setToolTip(msg)
-
 
     def table_display_delete(self):  # TODO
         pass
@@ -274,14 +277,6 @@ class DialogManageFiles(QtWidgets.QDialog):
         """
         key = event.key()
         mods = QtWidgets.QApplication.keyboardModifiers()
-
-        # TODO TEST
-        if mods & QtCore.Qt.KeyboardModifier.ControlModifier and key == QtCore.Qt.Key.Key_U:  # tmp
-            self.table_display_save()
-            return
-        if mods & QtCore.Qt.KeyboardModifier.ControlModifier and key == QtCore.Qt.Key.Key_K:  # tmp
-            self.table_display_load()
-            return
 
         # Ctrl 0 to 4
         if mods & QtCore.Qt.KeyboardModifier.ControlModifier:
@@ -557,6 +552,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 self.ui.tableWidget.setRowHidden(r, False)
             self.rows_hidden = []
             self.ui.label_fcount.setText(f"Files: {self.ui.tableWidget.rowCount()}")
+            self.ui.pushButton_display_load.setToolTip(_("Load table display settings"))
             return
         if action == action_url:
             webbrowser.open(item_text)
