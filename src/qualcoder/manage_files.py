@@ -87,7 +87,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.parent_text_edit = parent_text_edit
         self.tab_coding = tab_coding  # Tab widget coding for updates
         self.tab_reports = tab_reports  # Tab widget reports for updates
-        self.rows_hidden = False
+        self.rows_hidden = []  # For save display profile, as column_name \t operator \t value
         self.source = []  # Dictionaries of source files
         self.header_labels = []
         self.default_import_directory = os.path.expanduser("~")
@@ -127,6 +127,12 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.ui.pushButton_export_attributes.clicked.connect(self.export_attributes)
         self.ui.pushButton_undo.setIcon(qta.icon('mdi6.undo', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_undo.clicked.connect(self.undo_file_rename)
+
+        self.ui.pushButton_display_save.setIcon(qta.icon('mdi6.table-plus', options=[{'scale_factor': 1.2}]))
+        self.ui.pushButton_display_save.clicked.connect(self.table_display_save)
+        self.ui.pushButton_display_load.setIcon(qta.icon('mdi6.text-account', options=[{'scale_factor': 1.2}]))
+        self.ui.pushButton_display_load.clicked.connect(self.table_display_load)
+
         self.ui.pushButton_bulk_rename.setIcon(qta.icon('mdi6.file-multiple-outline', options=[{'scale_factor': 1.2}]))
         self.ui.pushButton_bulk_rename.clicked.connect(self.bulk_rename_database_entry)
         self.ui.pushButton_help.setIcon(qta.icon('mdi6.help'))
@@ -151,12 +157,132 @@ class DialogManageFiles(QtWidgets.QDialog):
         url = "https://github.com/ccbogel/QualCoder/wiki/3.2.-Files"
         webbrowser.open(url)
 
+    def table_display_save(self):
+        """ Save rows and column settings for replicating table display.
+        Table columns as name, width.
+        Table rows as colname tab operator tab value
+        operator is either: =, like, hide
+        """
+
+        row_txt = "\t\t".join(self.rows_hidden)
+        row_msg = " AND ".join(self.rows_hidden)
+        if len(row_msg) > 0:
+            row_msg = _("Rows: ") + row_msg.replace("\t", " ")
+        col_txt = ""
+        col_msg = ""
+        for c in range(0, self.ui.tableWidget.columnCount()):
+            header_text = self.ui.tableWidget.horizontalHeaderItem(c).text()
+            col_txt += f'{header_text}\t{self.ui.tableWidget.columnWidth(c)}\t\t'
+            if self.ui.tableWidget.isColumnHidden(c):
+                col_msg += f"{header_text}; "
+        if len(col_msg) > 0:
+            col_msg = _("Hidden columns: ") + col_msg
+        if col_msg == "" and row_msg == "":
+            Message(self.app, _("No special settings"), _("No table display settings or rows or columns selected")).exec()
+            return
+        msg = f"{col_msg}\n{row_msg}\n" + _("Save as:")
+        display_name, ok = QtWidgets.QInputDialog.getText(self, _("Save Table Display"), msg,
+                                                         QtWidgets.QLineEdit.EchoMode.Normal)
+        cur = self.app.conn.cursor()
+        cur.execute("select name from manage_files_display where tblrows=? and tblcolumns=?", [row_txt, col_txt])
+        res = cur.fetchone()
+        if res:
+            Message(self.app, _("Table display exists"), _("This table display setting already exists: ") + res[0]).exec()
+            return
+        sql = "insert into manage_files_display (name, tblrows, tblcolumns, owner) values (?,?,?,?)"
+        cur.execute(sql, [display_name, row_txt, col_txt, self.app.settings['codername']])
+        self.app.conn.commit()
+
+    def table_display_load(self):
+        """ Load rows and column settings for replicating a table display.  """
+
+        cur = self.app.conn.cursor()
+        cur.execute("select name, tblrows,tblcolumns, owner from manage_files_display order by upper(name)")
+        res = cur.fetchall()
+        if not res:
+            Message(self.app, _("Nothing saved"), _("No saved table dislpays")).exec()
+            return
+        keys = 'name', 'tblrows', 'tblcolumns', 'owner'
+        displays = []
+        for row in res:
+            displays.append(dict(zip(keys, row)))
+        ui = DialogSelectItems(self.app, displays, _("Select table display"), "single")
+        ok = ui.exec()
+        if not ok:
+            return
+        selection = ui.get_selected()
+        column_name_width_list = selection['tblcolumns'].split("\t\t")  # Will contain a '' at the end
+        column_name_width_list.pop()
+
+        msg = _("Load table display settings") + f"\n{selection['name']}\n"
+
+        # Reset columns and rows
+        for col in range(0, self.ui.tableWidget.columnCount()):
+            self.ui.tableWidget.setColumnHidden(col, False)
+            # Must check for each column name, as some columns might be renamed. Renamed columns will be ignored
+            for col_name_width in column_name_width_list:
+                colname, width = col_name_width.split("\t")
+                # print(colname, width)
+                if self.ui.tableWidget.horizontalHeaderItem(col).text() == colname and int(width) > 0:
+                    self.ui.tableWidget.setColumnWidth(col, int(width))
+                    break
+                if self.ui.tableWidget.horizontalHeaderItem(col).text() == colname and int(width) == 0:
+                    self.ui.tableWidget.setColumnHidden(col, True)  # Sets different Qt flags
+                    msg += _("Hidden column: ") + colname + "\n"
+                    break
+
+        if selection['tblrows'] == "":
+            return
+        row_parameters_list = selection['tblrows'].split("\t\t")
+        print("RPARAM", row_parameters_list)
+        # Need to re-create self.rows_hidden variable , for menu options and for any further display saving.
+        self.rows_hidden = []
+        for rpl in row_parameters_list:
+            self.rows_hidden.append(rpl)
+        # Convert the column name to its header index
+        col_index_parameters_list = []
+        if row_parameters_list:
+            msg += "\n" + _("Rows shown / hidden:") + "\n"
+        for rpl in row_parameters_list:
+            colname, operator, value = rpl.split("\t")
+            msg += f"{colname} {operator} {value}\n"
+            for c in range(0, self.ui.tableWidget.columnCount()):
+                if self.ui.tableWidget.horizontalHeaderItem(c).text() == colname:
+                    col_index_parameters_list.append({'col_idx': c, 'operator': operator, 'value': value})
+        # Now hide the rows
+        for row in range(0, self.ui.tableWidget.rowCount()):
+            self.ui.tableWidget.setRowHidden(row, False)
+        for param in col_index_parameters_list:
+            for r in range(0, self.ui.tableWidget.rowCount()):
+                if param['operator'] == 'like' and self.ui.tableWidget.item(r, param['col_idx']).text().find(param['value']) == -1:
+                    self.ui.tableWidget.setRowHidden(r, True)
+                if param['operator'] == '=' and self.ui.tableWidget.item(r, param['col_idx']).text() != param['value']:
+                    self.ui.tableWidget.setRowHidden(r, True)
+                if param['operator'] == 'hide' and self.ui.tableWidget.item(r, param['col_idx']).text().find(param['value']) != -1:
+                    self.ui.tableWidget.setRowHidden(r, True)
+
+        print("rows_hidden\n", self.rows_hidden)  # tmp
+        self.ui.pushButton_display_load.setToolTip(msg)
+
+
+    def table_display_delete(self):  # TODO
+        pass
+
     def keyPressEvent(self, event):
         """ Used to activate buttons.
         Ctrl 0 to 9
         """
         key = event.key()
         mods = QtWidgets.QApplication.keyboardModifiers()
+
+        # TODO TEST
+        if mods & QtCore.Qt.KeyboardModifier.ControlModifier and key == QtCore.Qt.Key.Key_U:  # tmp
+            self.table_display_save()
+            return
+        if mods & QtCore.Qt.KeyboardModifier.ControlModifier and key == QtCore.Qt.Key.Key_K:  # tmp
+            self.table_display_load()
+            return
+
         # Ctrl 0 to 4
         if mods & QtCore.Qt.KeyboardModifier.ControlModifier:
             if key == QtCore.Qt.Key.Key_1:
@@ -212,7 +338,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             if key == QtCore.Qt.Key.Key_A and mod == QtCore.Qt.KeyboardModifier.ControlModifier:
                 for r in range(0, self.ui.tableWidget.rowCount()):
                     self.ui.tableWidget.setRowHidden(r, False)
-                self.rows_hidden = False
+                self.rows_hidden = []
                 return True
         return False
 
@@ -391,7 +517,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 text_ = item.text()
                 if compare_text != text_:
                     self.ui.tableWidget.setRowHidden(r, True)
-            self.rows_hidden = True
+            self.rows_hidden.append(f'{self.ui.tableWidget.horizontalHeaderItem(col).text()}\t=\t{compare_text}')
             rows_showing = 0
             for r in range(self.ui.tableWidget.rowCount()):
                 if not self.ui.tableWidget.isRowHidden(r):
@@ -401,7 +527,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         if action == action_show_values_like:
             text_value, ok = QtWidgets.QInputDialog.getText(self, _("Text filter"), _("Show values like:"),
                                                             QtWidgets.QLineEdit.EchoMode.Normal)
-            self.rows_hidden = True
+            self.rows_hidden.append(f'{self.ui.tableWidget.horizontalHeaderItem(col).text()}\tlike\t{text_value}')
             if ok and text_value != '':
                 for r in range(0, self.ui.tableWidget.rowCount()):
                     if self.ui.tableWidget.item(r, col).text().find(text_value) == -1:
@@ -415,7 +541,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         if action == action_hide_values_like:
             text_value, ok = QtWidgets.QInputDialog.getText(self, _("Text filter"), _("Hide values like:"),
                                                             QtWidgets.QLineEdit.EchoMode.Normal)
-            self.rows_hidden = True
+            self.rows_hidden.append(f'{self.ui.tableWidget.horizontalHeaderItem(col).text()}\thide\t{text_value}')
             if ok and text_value != '':
                 for r in range(0, self.ui.tableWidget.rowCount()):
                     if self.ui.tableWidget.item(r, col).text().find(text_value) != -1:
@@ -429,7 +555,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         if action == action_show_all:
             for r in range(0, self.ui.tableWidget.rowCount()):
                 self.ui.tableWidget.setRowHidden(r, False)
-            self.rows_hidden = False
+            self.rows_hidden = []
             self.ui.label_fcount.setText(f"Files: {self.ui.tableWidget.rowCount()}")
             return
         if action == action_url:
