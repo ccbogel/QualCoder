@@ -2120,6 +2120,7 @@ Click "Yes" to start now.')
         v9 has project.recently_used_codes text')  # code ids list split by a space
         v10 has code_image.pdf_page integer added
         v11 has gr_pix_item.pdf_page integer added
+        v12 has manage_files_display table added. For Table display profile.
         """
 
         self.journal_display = None
@@ -2230,8 +2231,9 @@ Click "Yes" to start now.')
         cur.execute("CREATE TABLE gr_av_item (gr_avid integer primary key, grid integer, avid integer,"
                     "x integer, y integer, pos0 integer, pos1 integer, filepath text, tooltip text, color text);")
         cur.execute("CREATE TABLE ris (risid integer, tag text, longtag text, value text);")
+        cur.execute("CREATE TABLE manage_files_display (mfid integer primary key, name text, tblrows text, tblcolumns text, owner text);")
         cur.execute("INSERT INTO project VALUES(?,?,?,?,?,?,?,?)",
-                    ('v11', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', qualcoder_version, 0,
+                    ('v12', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', qualcoder_version, 0,
                      0, self.app.settings['codername'], ""))
         self.app.conn.commit()
         try:
@@ -2738,6 +2740,15 @@ Click "Yes" to start now.')
         self.ui.textEdit.append(msg)
         self.project_summary_report()
         self.show_menu_options()
+
+        # Database version v12
+        try:
+            cur.execute("select name from manage_files_display")
+        except sqlite3.OperationalError:
+            cur.execute("CREATE TABLE manage_files_display (mfid integer primary key, name text, tblrows text, tblcolumns text, owner text);")
+            cur.execute('update project set databaseversion="v12", about=?', [qualcoder_version])
+            self.app.conn.commit()
+            self.ui.textEdit.append(_("Updating database to version") + " v12")
 
         # Delete codings (fid, id) that do not have a matching source id
         sql = "select fid from code_text where fid not in (select source.id from source)"
