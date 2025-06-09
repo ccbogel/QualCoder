@@ -22,8 +22,10 @@ https://qualcoder.wordpress.com/
 from PyQt6 import QtCore, QtWidgets
 import logging
 import os
+import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 
 from .GUI.ui_report_attribute_parameters import Ui_Dialog_report_attribute_parameters
+from .select_items import DialogSelectItems
 from .helpers import Message
 
 path = os.path.abspath(os.path.dirname(__file__))
@@ -104,8 +106,100 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
         font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
         self.fill_table_widget()
+        self.ui.pushButton_save_filter.setIcon(qta.icon('mdi6.table-plus', options=[{'scale_factor': 1.2}]))
+        self.ui.pushButton_save_filter.clicked.connect(self.filter_settings_save)
+        self.ui.pushButton_load_filter.setIcon(qta.icon('mdi6.text-account', options=[{'scale_factor': 1.2}]))
+        self.ui.pushButton_load_filter.clicked.connect(self.filter_settings_load)
         self.ui.tableWidget.cellChanged.connect(self.cell_modified)
         self.ui.pushButton_clear.pressed.connect(self.clear_parameters)
+
+    def filter_settings_save(self):
+        """ Save filter settings, lists as string. """
+
+        self.make_parameter_list()
+        parameters_str = self.parameters.__str__()
+        if parameters_str in("[['BOOLEAN_OR']]", "[['BOOLEAN_OR']]"):
+            Message(self.app, _("Save Filter"), _("No attribute filers selected")).exec()
+            return
+
+        filter_name, ok = QtWidgets.QInputDialog.getText(self, _("Save filter"), _("Save filter settings"),
+                                                         QtWidgets.QLineEdit.EchoMode.Normal)
+        if not ok or filter_name == "":
+            return
+        cur = self.app.conn.cursor()
+        cur.execute("select name from files_filter where name =?", [filter_name])
+        res = cur.fetchone()
+        if res:
+            Message(self.app, _("Filter name exists"),
+                    _("This filter name is already in use: ") + res[0]).exec()
+            return
+        cur.execute("insert into files_filter (name, filter, owner) values(?,?,?)", [filter_name, parameters_str, self.app.settings['codername']])
+        self.app.conn.commit()
+
+    def filter_settings_load(self):
+        """ Load filter settings String.
+         Parse to crease self.parameters variable.
+         Fill Gui with values. """
+
+        cur = self.app.conn.cursor()
+        cur.execute("select name, filter from files_filter order by upper(name)")
+        res = cur.fetchall()
+        if not res:
+            Message(self.app, _("Nothing saved"), _("No saved filters")).exec()
+            return
+        keys = 'name', 'filter'
+        filters = []
+        for row in res:
+            filters.append(dict(zip(keys, row)))
+        ui = DialogSelectItems(self.app, filters, _("Select filter"), "single")
+        ok = ui.exec()
+        if not ok:
+            return
+        self.clear_parameters()
+        selection = ui.get_selected()
+        # {'name': 'age over 30', 'filter': "[['BOOLEAN_OR'], ['Age', 'case', 'numeric', '>', ['30']]]"}
+        filter_str = selection['filter'][1:-1]  # Remove outer braces
+        # print(1, filter_str)
+
+        # Unpack string and fill GUI
+        if filter_str[:16] == "['BOOLEAN_OR'], ":
+            self.ui.radioButton_or.setChecked(True)
+            filter_str = filter_str[16:]
+        else:  # AND
+            self.ui.radioButton_and.setChecked(True)
+            filter_str = filter_str[17:]
+
+        # Unpack string into a list of attributes with operator and value
+        # print(2, filter_str)
+        filter_str = filter_str.replace("'", "")
+        # print(3, filter_str)
+        filter_str_list = filter_str.split("], [")
+        # print(4, filter_str_list)
+        # Remove containing '[' on first item, and remove ']' from last item
+        filter_str_list[0] = filter_str_list[0][1:]
+        filter_str_list[-1] = filter_str_list[-1][:-1]
+        # print(5, filter_str_list)
+        warnings = ""
+        for attributes in filter_str_list:
+            # attribute name, case/file, character/numeric, operator, [value(s)]
+            attribute = attributes.split(", ", 4)
+            attribute[4] = attribute[4][1:-1]  # Remove the [ and ]
+            attribute[4] = attribute[4].replace(", ", ";")  # For in and between operators
+            if attribute[2] == 'character':
+                attribute[4] = attribute[4].replace('"', '')
+            # print(attribute)
+            for row in range(0, self.ui.tableWidget.rowCount()):
+                found = False
+                if self.ui.tableWidget.item(row, self.NAME_COLUMN).text() == attribute[0]:
+                    self.ui.tableWidget.cellWidget(row, self.OPERATOR_COLUMN).setCurrentText(attribute[3])
+                    value = attribute[4]
+                    self.ui.tableWidget.item(row, self.VALUE_LIST_COLUMN).setText(value)
+                    found = True
+                    break
+            if not found:
+                warnings += _("Not found") + f": {attribute[0]}\n"
+        if warnings:
+            Message(self.app, _("Attribute not found"), warnings).exec()
 
     def clear_parameters(self):
         """ Clear attribute_list and empty table cells. """
@@ -140,7 +234,7 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
                     self.ui.tableWidget.item(x, self.VALUE_LIST_COLUMN).setText(val_text)
                     self.ui.tableWidget.cellWidget(x, self.OPERATOR_COLUMN).setCurrentText(a[3])
 
-    def accept(self):
+    def make_parameter_list(self):
         """ Make a parameter list where operator and value are entered.
         Check that values are acceptable for operator and for numeric type. """
 
@@ -184,6 +278,11 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
                                         self.ui.tableWidget.item(x, self.CASE_OR_FILE_COLUMN).text(),
                                         self.ui.tableWidget.item(x, self.TYPE_COLUMN).text(),
                                         operator, values])
+
+    def accept(self):
+        """ Make a parameter list and get fiel and case ids. """
+
+        self.make_parameter_list()
         self.get_results_case_ids()
         self.get_results_file_ids()
         self.get_results_message()
