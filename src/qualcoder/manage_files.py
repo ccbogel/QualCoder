@@ -183,6 +183,8 @@ class DialogManageFiles(QtWidgets.QDialog):
         msg = f"{col_msg}\n{row_msg}\n" + _("Save as:")
         display_name, ok = QtWidgets.QInputDialog.getText(self, _("Save Table Display"), msg,
                                                          QtWidgets.QLineEdit.EchoMode.Normal)
+        if not ok or display_name == "":
+            return
         cur = self.app.conn.cursor()
         cur.execute("select name from manage_files_display where tblrows=? and tblcolumns=?", [row_txt, col_txt])
         res = cur.fetchone()
