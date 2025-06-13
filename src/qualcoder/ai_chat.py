@@ -435,7 +435,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             
             summary = _('Analyzing the free topic "{}" in the data.').format(self.ai_search_code_name)
             if self.ai_search_code_memo != '':
-                summary += _('\nDescription:') + ' ' + {self.ai_search_code_memo}
+                summary += _('\nDescription:') + f' {self.ai_search_code_memo}'
             logger.debug(f'New topic chat.')
             self.new_chat(_('Topic') + f' "{self.ai_search_code_name}"', 'topic chat', summary, self.ai_prompt.name_and_scope())
             # warn if project memo empty 
