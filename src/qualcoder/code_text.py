@@ -1103,22 +1103,6 @@ class DialogCodeText(QtWidgets.QWidget):
                 if item['important'] == 1:
                     action_not_important = QtGui.QAction(_("Remove important mark"))
                 action_change_code = QtGui.QAction(_("Change code"))
-        if action_unmark:
-            menu.addAction(action_unmark)
-        if action_code_memo:
-            menu.addAction(action_code_memo)
-        if action_change_pos:
-            menu.addAction(action_change_pos)
-        if action_start_pos:
-            menu.addAction(action_start_pos)
-        if action_end_pos:
-            menu.addAction(action_end_pos)
-        if action_important:
-            menu.addAction(action_important)
-        if action_not_important:
-            menu.addAction(action_not_important)
-        if action_change_code:
-            menu.addAction(action_change_code)
         if selected_text != "":
             if self.ui.treeWidget.currentItem() is not None:
                 action_mark = menu.addAction(_("Mark (Q)"))
@@ -1127,10 +1111,27 @@ class DialogCodeText(QtWidgets.QWidget):
                 submenu = menu.addMenu(_("Mark with recent code (R)"))
                 for item in self.recent_codes:
                     submenu.addAction(item['name'])
-            action_annotate = menu.addAction(_("Annotate (A)"))
-            action_copy = menu.addAction(_("Copy to clipboard"))
             action_new_code = menu.addAction(_("Mark with new code"))
             action_new_invivo_code = menu.addAction(_("in vivo code (V)"))
+
+        if action_unmark:
+            menu.addAction(action_unmark)
+        if action_code_memo:
+            menu.addAction(action_code_memo)
+        if action_important:
+            menu.addAction(action_important)
+        if action_not_important:
+            menu.addAction(action_not_important)
+        if action_change_pos:
+            menu.addAction(action_change_pos)
+        if action_start_pos:
+            menu.addAction(action_start_pos)
+        if action_end_pos:
+            menu.addAction(action_end_pos)
+        if action_change_code:
+            menu.addAction(action_change_code)
+        action_annotate = menu.addAction(_("Annotate (A)"))
+        action_copy = menu.addAction(_("Copy to clipboard"))
         if selected_text == "" and self.is_annotated(cursor.position()):
             action_edit_annotate = menu.addAction(_("Edit annotation"))
         action_set_bookmark = menu.addAction(_("Set bookmark (B)"))
