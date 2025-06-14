@@ -2232,8 +2232,9 @@ Click "Yes" to start now.')
                     "x integer, y integer, pos0 integer, pos1 integer, filepath text, tooltip text, color text);")
         cur.execute("CREATE TABLE ris (risid integer, tag text, longtag text, value text);")
         cur.execute("CREATE TABLE manage_files_display (mfid integer primary key, name text, tblrows text, tblcolumns text, owner text);")
+        cur.execute("CREATE TABLE files_filter (filterid integer primary key, name text, filter text, owner text);")
         cur.execute("INSERT INTO project VALUES(?,?,?,?,?,?,?,?)",
-                    ('v12', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', qualcoder_version, 0,
+                    ('v13', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', qualcoder_version, 0,
                      0, self.app.settings['codername'], ""))
         self.app.conn.commit()
         try:
@@ -2749,6 +2750,14 @@ Click "Yes" to start now.')
             cur.execute('update project set databaseversion="v12", about=?', [qualcoder_version])
             self.app.conn.commit()
             self.ui.textEdit.append(_("Updating database to version") + " v12")
+        # Database version v13
+        try:
+            cur.execute("select name from files_filter")
+        except sqlite3.OperationalError:
+            cur.execute("CREATE TABLE files_filter (filterid integer primary key, name text, filter text, owner text);")
+            cur.execute('update project set databaseversion="v13", about=?', [qualcoder_version])
+            self.app.conn.commit()
+            self.ui.textEdit.append(_("Updating database to version") + " v13")
 
         # Delete codings (fid, id) that do not have a matching source id
         sql = "select fid from code_text where fid not in (select source.id from source)"
