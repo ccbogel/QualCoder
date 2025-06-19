@@ -655,7 +655,10 @@ class App(object):
         except UnicodeDecodeError as err:
             logger.warning(f"_load_config_init, character decoding error: {err}")
             print(f"Could not load config.ini\n{err}")
-            return {}
+            msg = _("Cannot load config.ini.\nCharacter decoding error.\nUsing QualCoder default settings.")
+            print(msg)
+            Message(self, _("Cannot load config.ini file"), msg).exec()
+            return self.default_settings, self.ai_models_create_defaults()
 
         if 'fontsize' in default:
             result['fontsize'] = default.getint('fontsize')
