@@ -1176,29 +1176,21 @@ class DialogCodeAV(QtWidgets.QDialog):
         more precise are the results (1000 should suffice).
         """
 
-        if self.mediaplayer.is_playing():
-            self.mediaplayer.pause()
-            pos = self.ui.horizontalSlider.value()
-            self.mediaplayer.set_position(pos / 1000.0)
-            self.mediaplayer.play()
-            self.timer.start()
-        else:
-            pos = self.ui.horizontalSlider.value()
-            self.mediaplayer.set_position(pos / 1000.0)
-
-        # msecs is -1 if the video has not been played yet ?
+        self.ui.horizontalSlider.blockSignals(True)
+        pos = self.ui.horizontalSlider.value()
         msecs = self.mediaplayer.get_time()
+        self.mediaplayer.set_position(pos / 1000.0)
+
+        '''  # This code may not be needed - blockSignals seems to fix a problem where msecs returns -1
+        counter = 0
+        while pos > 0 and msecs == -1 and counter < 10000:
+            self.mediaplayer.set_position(pos / 1000.0)
+            msecs = self.mediaplayer.get_time()
+            counter += 1
+            #print("slider pos", pos, pos/1000.0 , "msecs", msecs, "counter", counter)'''
+
         self.ui.label_time.setText(msecs_to_hours_mins_secs(msecs) + self.media_duration_text)
-
-    def audio_track_changed(self):
-        """ Audio track changed.
-        The video needs to be playing/paused before the combobox is filled with track options.
-        The combobox only has positive integers."""
-
-        txt = self.ui.comboBox_tracks.currentText()
-        if txt == "":
-            txt = 1
-        success = self.mediaplayer.audio_set_track(int(txt))
+        self.ui.horizontalSlider.blockSignals(False)
 
     def play_pause(self):
         """ Toggle play or pause status. """
@@ -1252,6 +1244,16 @@ class DialogCodeAV(QtWidgets.QDialog):
         """ Set the volume. """
 
         self.mediaplayer.audio_set_volume(volume)
+
+    def audio_track_changed(self):
+        """ Audio track changed.
+        The video needs to be playing/paused before the combobox is filled with track options.
+        The combobox only has positive integers."""
+
+        txt = self.ui.comboBox_tracks.currentText()
+        if txt == "":
+            txt = 1
+        success = self.mediaplayer.audio_set_track(int(txt))
 
     def update_ui(self):
         """ Updates the user interface. Update the slider position to match media.
@@ -4239,18 +4241,12 @@ class DialogViewAV(QtWidgets.QDialog):
         more precise are the results (1000 should suffice).
         """
 
-        if self.mediaplayer.is_playing():
-            self.mediaplayer.pause()
-            pos = self.ui.horizontalSlider.value()
-            self.mediaplayer.set_position(pos / 1000.0)
-            self.mediaplayer.play()
-            self.timer.start()
-            msecs = self.mediaplayer.get_time()
-            self.ui.label_time.setText(msecs_to_hours_mins_secs(msecs) + self.media_duration_text)
-        else:
-            pos = self.ui.horizontalSlider.value()
-            self.mediaplayer.set_position(pos / 1000.0)
-            # msecs is -1 if the video has not been played yet  - unsure why
+        self.ui.horizontalSlider.blockSignals(True)
+        pos = self.ui.horizontalSlider.value()
+        msecs = self.mediaplayer.get_time()
+        self.mediaplayer.set_position(pos / 1000.0)
+        self.ui.label_time.setText(msecs_to_hours_mins_secs(msecs) + self.media_duration_text)
+        self.ui.horizontalSlider.blockSignals(False)
 
     def eventFilter(self, object_, event):
         """ Add key options to improve manual transcribing.
