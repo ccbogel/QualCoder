@@ -31,6 +31,7 @@ import os
 from PIL import Image
 import qtawesome as qta  # See https://pictogrammers.com/library/mdi/
 import re
+from ris import Ris
 from shutil import copyfile
 
 from PyQt6 import QtGui, QtWidgets, QtCore
@@ -1683,7 +1684,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             return
 
     def get_prettext_and_posttext(self):
-        """ Get surrounding text 200 characters.
+        """ Get surrounding text 100 - 300 characters. See Settings for options.
         When context checkbox is checked """
 
         cur = self.app.conn.cursor()
@@ -2183,14 +2184,23 @@ class DialogReportCodes(QtWidgets.QDialog):
         """
 
         cur = self.app.conn.cursor()
-        cur.execute("select name from source where id=?", [item['fid']])
+        cur.execute("select name, risid from source where id=?", [item['fid']])
         filename = ""
+        risid = None
+        reference = None
         res = cur.fetchone()
         if res is not None:
             filename = res[0]
+            risid = res[1]
+        if risid:
+            ris = Ris(self.app)
+            ris.get_references(risid)
+            if ris.refs:
+                reference = ris.refs[0]['apa']
+                reference = reference.replace("\n", " ") + "\n"
         head = "\n"
         if item['result_type'] == 'text':
-            head += "[" + str(item['pos0']) + "-" + str(item['pos1']) + "] "
+            head += f"[{item['pos0']}-{item['pos1']}] "
         head += item['codename'] + ", "
         memo_choice = self.ui.comboBox_memos.currentText()
         if memo_choice in (_("Also code memos"), _("Also all memos"), _("Only memos")) and item['codename_memo'] != "":
@@ -2209,15 +2219,15 @@ class DialogReportCodes(QtWidgets.QDialog):
         head += " " + _("Coder: ") + item['coder']
         if self.app.settings['showids']:
             try:
-                head += ", ctid: " + str(item['ctid'])
+                head += f", ctid: {item['ctid']}"
             except KeyError:
                 pass
             try:
-                head += ", imid: " + str(item['imid'])
+                head += f", imid: {item['imid']}"
             except KeyError:
                 pass
             try:
-                head += ", avid: " + str(item['avid'])
+                head += f", avid: {item['avid']}"
             except KeyError:
                 pass
 
@@ -2234,6 +2244,8 @@ class DialogReportCodes(QtWidgets.QDialog):
         text_brush = QBrush(QtGui.QColor(TextColor(item['color']).recommendation))
         fmt.setForeground(text_brush)
         cursor.setCharFormat(fmt)
+        if self.ui.checkBox_show_refs.isChecked() and reference:
+            self.ui.textEdit.append(reference)
         item['textedit_end'] = len(self.ui.textEdit.toPlainText())
 
     def text_edit_menu(self, position):
