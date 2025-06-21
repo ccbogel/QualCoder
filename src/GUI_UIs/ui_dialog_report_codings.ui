@@ -207,7 +207,7 @@
       <property name="geometry">
        <rect>
         <x>390</x>
-        <y>13</y>
+        <y>-1</y>
         <width>141</width>
         <height>26</height>
        </rect>
@@ -252,7 +252,7 @@
       <property name="geometry">
        <rect>
         <x>390</x>
-        <y>46</y>
+        <y>29</y>
         <width>131</width>
         <height>26</height>
        </rect>
@@ -281,7 +281,7 @@
       <property name="geometry">
        <rect>
         <x>390</x>
-        <y>80</y>
+        <y>60</y>
         <width>131</width>
         <height>26</height>
        </rect>
@@ -420,6 +420,22 @@
       </property>
       <property name="text">
        <string>Export matrix</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBox_show_refs">
+      <property name="geometry">
+       <rect>
+        <x>390</x>
+        <y>90</y>
+        <width>131</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show references&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string>References</string>
       </property>
      </widget>
     </widget>
