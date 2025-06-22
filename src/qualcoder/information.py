@@ -278,14 +278,16 @@ Ctrl 4 Filter files by attributes<br />\
 Ctrl 9 Show codes marked important<br />\
 Ctrl 0 Help - opens in browser<br />\
 A Annotate - for current selection<br />\
-Q Quick Mark with code - for current selection<br />\
+G Assign segment to currently selected code, and open memo for segment.<br />\
 I Tag important<br />\
 L Show codes like (when text coding area is in focus)<br />\
 M Memo code - at clicked position<br />\
 O Cycle through overlapping codes at clicked position<br />\
+Q Quick Mark with code - for current selection<br />\
 S Search text - may include current selection<br />\
 R Opens a context menu for recently used codes for marking text<br />\
 ! Shows cursor position in text area<br />\
+5 Go forward 5 seconds.<br />\
 Ctrl Z Restore last unmarked code(s) - text code(s) or segment code<br />\
 Alt minus Rewind 30 seconds<br />\
 Ctrl R Rewind 5 seconds<br />\
@@ -294,6 +296,6 @@ Ctrl P Play/pause. On start rewind 1 second<br />\
 Ctrl D Play/pause. On start rewind 1 second<br />\
 Ctrl S Start and stop av segment creation<br />\
 Ctrl Shift > Increase play rate<br />\
-Ctrl Shift < Decrease play rate<br />'
+Ctrl Shift &lt; Decrease play rate<br />'
 
 coding_shortcuts_display = coding_text_shortcuts + coding_image_shortcuts + coding_av_shortcuts
