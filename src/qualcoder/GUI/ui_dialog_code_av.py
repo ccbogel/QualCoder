@@ -201,7 +201,7 @@ class Ui_Dialog_code_av(object):
         self.label_rate.setToolTip(_translate("Dialog_code_av", "<html><head/><body><p>Ctrl + Shift + &gt;     Increase play rate to maximum 2x </p><p>Ctrl + Shift + &lt;    Decrease play rate to minimum 0.1</p></body></html>"))
         self.label_rate.setText(_translate("Dialog_code_av", "1.0x"))
         self.pushButton_rewind_30.setToolTip(_translate("Dialog_code_av", "<html><head/><body><p>Rewind 30 seconds. Alt + Minus</p></body></html>"))
-        self.pushButton_forward_30.setToolTip(_translate("Dialog_code_av", "<html><head/><body><p>Forward 30 seconds. Alt + Plus</p></body></html>"))
+        self.pushButton_forward_30.setToolTip(_translate("Dialog_code_av", "<html><head/><body><p>Forward 30 seconds. Alt + Plus</p><p>Keypress 5 - Forward 5 seconds</p></body></html>"))
         self.pushButton_rate_down.setToolTip(_translate("Dialog_code_av", "<html><head/><body><p>Decrease play rate</p><p>Ctrl + Shift + &lt; </p></body></html>"))
         self.pushButton_rate_up.setToolTip(_translate("Dialog_code_av", "<html><head/><body><p>Increase play rate</p><p>Ctrl + Shift + &gt; </p></body></html>"))
         self.pushButton_rewind_5.setToolTip(_translate("Dialog_code_av", "Rewind 5 seconds. Ctrl + R"))
