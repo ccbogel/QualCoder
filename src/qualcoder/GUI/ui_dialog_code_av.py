@@ -190,8 +190,7 @@ class Ui_Dialog_code_av(object):
         self.textEdit.setToolTip(_translate("Dialog_code_av", "<html><head/><body><p>Transcript</p></body></html>"))
         self.pushButton_play.setToolTip(_translate("Dialog_code_av", "Ctrl P or Ctrl D Play/Pause"))
         self.label_volume.setToolTip(_translate("Dialog_code_av", "<html><head/><body><p>Volume</p></body></html>"))
-        self.pushButton_coding.setToolTip(_translate("Dialog_code_av", "Press the Start segment button to begin coding the audio/video segment. Press the End segment button to end the coded segment.\n"
-"Key shortcut: Ctrl S"))
+        self.pushButton_coding.setToolTip(_translate("Dialog_code_av", "<html><head/><body><p>Press the Start segment button to begin coding the audio/video segment. Press the End segment button to end the coded segment.</p><p>Key shortcut: Ctrl S</p><p>Key shortcut: G - Open memo and apply segment to currently selected code.</p></body></html>"))
         self.pushButton_coding.setText(_translate("Dialog_code_av", "Start segment"))
         self.label_segment.setToolTip(_translate("Dialog_code_av", "<html><head/><body><p>When a segment of audio or video is made, choose a code from the codes tree, right click on the code and assign the segment to the code.</p></body></html>"))
         self.label_segment.setText(_translate("Dialog_code_av", "Segment:"))
@@ -208,7 +207,7 @@ class Ui_Dialog_code_av(object):
         self.pushButton_rewind_5.setToolTip(_translate("Dialog_code_av", "Rewind 5 seconds. Ctrl + R"))
         self.pushButton_help.setToolTip(_translate("Dialog_code_av", "Help"))
         self.pushButton_important.setToolTip(_translate("Dialog_code_av", "Show codings flagged important"))
-        self.pushButton_segment_menu.setToolTip(_translate("Dialog_code_av", "<html><head/><body><p>Button to select a segment. </p><p>Then a menu of options will open.</p><p>(This button is a work around if the right-click to open menus on the segment bars below does not work)</p></body></html>"))
+        self.pushButton_segment_menu.setToolTip(_translate("Dialog_code_av", "<html><head/><body><p>Button to select a segment. </p><p>Then a menu of options will open.</p></body></html>"))
         self.pushButton_segment_menu.setText(_translate("Dialog_code_av", "S"))
         self.pushButton_find_code.setToolTip(_translate("Dialog_code_av", "Find code"))
         self.horizontalSlider.setToolTip(_translate("Dialog_code_av", "<html><head/><body><p>Left click on the slider button and drag left or right to change video position.</p></body></html>"))
