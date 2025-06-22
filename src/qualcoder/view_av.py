@@ -81,7 +81,7 @@ class DialogCodeAV(QtWidgets.QDialog):
     media = None
     metadata = None
     is_paused = False
-    segment = {}
+    segment = {}  # start, end, start_msecs, end_msecs, memo, important, seltext
     segments = []
     text_for_segment = {}  # when linking text to segment
     segment_for_text = None  # when linking segment to text
@@ -1206,8 +1206,8 @@ class DialogCodeAV(QtWidgets.QDialog):
             if self.mediaplayer.play() == -1:
                 return
 
-            # On play rewind one second
-            time_msecs = self.mediaplayer.get_time() - 1000
+            # On play rewind 100msecs
+            time_msecs = self.mediaplayer.get_time() - 100
             if time_msecs < 0:
                 time_msecs = 0
             pos = time_msecs / self.mediaplayer.get_media().get_duration()
@@ -1589,6 +1589,7 @@ class DialogCodeAV(QtWidgets.QDialog):
          These key presses are not used in edi mode.
 
         A annotate - for current selection
+        G Glue selected segment to selected code, and open segment memo
         Q Quick Mark with code - for current selection
         I Tag important
         L Show codes like
@@ -1612,6 +1613,14 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         key = event.key()
         mods = QtGui.QGuiApplication.keyboardModifiers()
+        # Glue segment to currently selected code and open segment memo
+        if key == QtCore.Qt.Key.Key_G and self.segment['start_msecs'] is not None and \
+            self.segment['end_msecs'] is not None and self.ui.treeWidget.currentItem() is not None \
+                and self.ui.treeWidget.currentItem().text(1)[0:3] == 'cid':
+            ui = DialogMemo(self.app, _("Memo for Segment"), "")
+            ui.exec()
+            self.segment['memo'] = ui.memo
+            self.assign_segment_to_code(self.ui.treeWidget.currentItem())
         # Increase play rate  Ctrl + Shift + >
         if key == QtCore.Qt.Key.Key_Greater and (mods and QtCore.Qt.KeyboardModifier.ShiftModifier) and \
                 (mods and QtCore.Qt.KeyboardModifier.ControlModifier):
@@ -3831,7 +3840,7 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
 
         self.scene_from_x = self.segment['pos0'] * self.scaler
         self.scene_to_x = self.segment['pos1'] * self.scaler
-        self.scene_from_y_ = self.segment['y']
+        self.scene_from_y = self.segment['y']
         self.scene_to_y = self.segment['y'] + 8
         line_width = 8
         color = QColor(self.segment['color'])
@@ -4107,14 +4116,6 @@ class DialogViewAV(QtWidgets.QDialog):
             self.ui.comboBox_tracks.setEnabled(False)
         self.mediaplayer.stop()
         self.mediaplayer.audio_set_volume(100)
-        # self.play_pause()
-
-        ''' Problem with pydub pyaudioop module. Nov 2024.  
-        # Only try speech to text if there is no text present
-        if self.text == "":
-            self.ui.pushButton_speechtotext.setEnabled(True)
-        else:
-            self.ui.pushButton_speechtotext.setToolTip(_("Speech to text disabled.\nTranscript contains text."))'''
 
     def get_waveform(self):
         """ Create waveform image in the audio folder. Apply image to label_waveform.
@@ -4585,8 +4586,8 @@ class DialogViewAV(QtWidgets.QDialog):
             if self.mediaplayer.play() == -1:
                 return
 
-            # On play rewind one second
-            time_msecs = self.mediaplayer.get_time() - 1000
+            # On play rewind slightly
+            time_msecs = self.mediaplayer.get_time() - 100
             if time_msecs < 0:
                 time_msecs = 0
             pos = time_msecs / self.mediaplayer.get_media().get_duration()
