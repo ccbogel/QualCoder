@@ -3512,7 +3512,7 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         self.draw_segment()
 
     def alternative_context_menu(self):
-        """ Using alterniatve menu to the standard context menu.
+        """ Using alternative menu to the standard context menu.
         As the standard context menu does not work with pyinstaller. """
 
         seltext = self.code_av_dialog.ui.textEdit.textCursor().selectedText()
@@ -3520,7 +3520,8 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
                  {'name': 'Delete segment'},
                  {'name': 'Play segment'},
                  {'name': 'Edit start position'},
-                 {'name': 'Edit end position'}]
+                 {'name': 'Edit end position'},
+                 {'name': 'Export segment'}]
         if self.code_av_dialog.ui.textEdit.toPlainText() != "" and seltext != "":
             items.append({'name': 'Link segment to selected text'})
         if self.segment['important'] is None or self.segment['important'] > 1:
@@ -3534,6 +3535,9 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         action = menu_ui.get_selected()
         if action['name'] == 'Memo for segment':
             self.edit_memo()
+            return
+        if action['name'] == 'Export segment':
+            self.export_segment()
             return
         if action['name'] == 'Delete segment':
             self.delete()
@@ -3556,8 +3560,6 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         if action['name'] == 'Remove important mark':
             self.set_coded_importance(False)
             return
-        '''if action == action_export:
-            self.export_segment()'''
 
     def contextMenuEvent(self, event):
         """
@@ -3641,12 +3643,14 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         filename = self.code_av_dialog.file_['name'][:-4] + "_"
         filename += msecs_from + "_to_" + msecs_to + "_"
         filename += self.code_av_dialog.file_['name'][-4:]
-        export_dir = ExportDirectoryPathDialog(self.app, filename)
-        filepath = export_dir.filepath
-        if filepath is None:
+        filename = os.path.join(self.app.settings['directory'], filename)
+        file_suffix = self.code_av_dialog.file_['mediapath'][-4:]
+        filepath, ok = QtWidgets.QFileDialog.getSaveFileName(None,
+                                                            _("Export segment"), filename, file_suffix)
+        if filepath == "" or not ok:
             return
-        if os.path.exists(filepath):
-            os.remove(filepath)
+        if filepath[-4:].lower() != file_suffix.lower():
+            filepath += file_suffix
         mediapath = ""
         try:
             if self.code_av_dialog.file_['mediapath'][0:6] in ('/audio', '/video'):
@@ -3663,7 +3667,7 @@ class SegmentGraphicsItem(QtWidgets.QGraphicsLineItem):
         ffmpeg_command += ' -to '
         ffmpeg_command += str(self.segment['pos1'] / 1000)
         ffmpeg_command += ' -c copy "' + filepath + '"'
-        # print(f"FFMPEG COMMAND\n {ffmpeg_command}")
+        print(f"FFMPEG COMMAND\n {ffmpeg_command}")
         try:
             subprocess.run(ffmpeg_command, timeout=15, shell=True)
             self.code_av_dialog.parent_textEdit.append(_("A/V segment exported: ") + filepath)
