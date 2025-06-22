@@ -4300,6 +4300,9 @@ class DialogViewAV(QtWidgets.QDialog):
         # Rewind 5 seconds   Ctrl + R
         if key == QtCore.Qt.Key.Key_R and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
             self.rewind_5_seconds()
+        # Forward 5 seconds   5
+        if key == QtCore.Qt.Key.Key_5 and not self.ui.textEdit.hasFocus():
+            self.forward_5_seconds()
         # Rewind 30 seconds Alt minus
         if key == QtCore.Qt.Key.Key_Minus and mods == QtCore.Qt.KeyboardModifier.AltModifier:
             self.rewind_30_seconds()
@@ -4360,6 +4363,19 @@ class DialogViewAV(QtWidgets.QDialog):
         """ Forward 30 seconds. Alt + F """
 
         time_msecs = self.mediaplayer.get_time() + 30000
+        if time_msecs > self.media.get_duration():
+            time_msecs = self.media.get_duration() - 1
+        pos = time_msecs / self.mediaplayer.get_media().get_duration()
+        self.mediaplayer.set_position(pos)
+        # Update timer display
+        msecs = self.mediaplayer.get_time()
+        self.ui.label_time.setText(msecs_to_hours_mins_secs(msecs))
+        self.update_ui()
+
+    def forward_5_seconds(self):
+        """ Forward 5 seconds. 5 """
+
+        time_msecs = self.mediaplayer.get_time() + 5000
         if time_msecs > self.media.get_duration():
             time_msecs = self.media.get_duration() - 1
         pos = time_msecs / self.mediaplayer.get_media().get_duration()
