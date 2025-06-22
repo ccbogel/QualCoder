@@ -1598,6 +1598,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         S search text - may include current selection
         R opens a context menu for recently used codes for marking text
         ! Shows cursor position in textEdit
+        5 Jump forward 5 seconds
 
         Ctrl 0 to 9 Button presses
         Ctrl + Z restore last unmarked code(s) - text code(s) or segment code.
@@ -1621,6 +1622,10 @@ class DialogCodeAV(QtWidgets.QDialog):
             ui.exec()
             self.segment['memo'] = ui.memo
             self.assign_segment_to_code(self.ui.treeWidget.currentItem())
+            return
+        if key == QtCore.Qt.Key.Key_5:
+            self.forward_5_seconds()
+            return
         # Increase play rate  Ctrl + Shift + >
         if key == QtCore.Qt.Key.Key_Greater and (mods and QtCore.Qt.KeyboardModifier.ShiftModifier) and \
                 (mods and QtCore.Qt.KeyboardModifier.ControlModifier):
@@ -1902,6 +1907,21 @@ class DialogCodeAV(QtWidgets.QDialog):
         if self.mediaplayer.get_media() is None:
             return
         time_msecs = self.mediaplayer.get_time() + 30000
+        if time_msecs > self.media.get_duration():
+            time_msecs = self.media.get_duration() - 1
+        pos = time_msecs / self.mediaplayer.get_media().get_duration()
+        self.mediaplayer.set_position(pos)
+        # Update timer display
+        msecs = self.mediaplayer.get_time()
+        self.ui.label_time.setText(msecs_to_hours_mins_secs(msecs) + self.media_duration_text)
+        self.update_ui()
+
+    def forward_5_seconds(self):
+        """ Forward AV 5 seconds. Key 5. """
+
+        if self.mediaplayer.get_media() is None:
+            return
+        time_msecs = self.mediaplayer.get_time() + 5000
         if time_msecs > self.media.get_duration():
             time_msecs = self.media.get_duration() - 1
         pos = time_msecs / self.mediaplayer.get_media().get_duration()
