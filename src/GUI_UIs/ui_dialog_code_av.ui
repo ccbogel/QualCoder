@@ -262,9 +262,9 @@
      <widget class="QLabel" name="label_segment">
       <property name="geometry">
        <rect>
-        <x>280</x>
+        <x>270</x>
         <y>50</y>
-        <width>241</width>
+        <width>221</width>
         <height>28</height>
        </rect>
       </property>
@@ -280,7 +280,7 @@
        <rect>
         <x>0</x>
         <y>50</y>
-        <width>241</width>
+        <width>231</width>
         <height>28</height>
        </rect>
       </property>
@@ -304,9 +304,9 @@
      <widget class="QCheckBox" name="checkBox_scroll_transcript">
       <property name="geometry">
        <rect>
-        <x>570</x>
+        <x>600</x>
         <y>51</y>
-        <width>301</width>
+        <width>299</width>
         <height>28</height>
        </rect>
       </property>
@@ -359,7 +359,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Forward 30 seconds. Alt + Plus&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Forward 30 seconds. Alt + Plus&lt;/p&gt;&lt;p&gt;Keypress 5 - Forward 5 seconds&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -448,7 +448,7 @@
      <widget class="QPushButton" name="pushButton_segment_menu">
       <property name="geometry">
        <rect>
-        <x>250</x>
+        <x>238</x>
         <y>50</y>
         <width>28</width>
         <height>28</height>
@@ -472,6 +472,38 @@
       </property>
       <property name="toolTip">
        <string>Find code</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_screensshot">
+      <property name="geometry">
+       <rect>
+        <x>500</x>
+        <y>50</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Screenshot&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_add_image_to_project">
+      <property name="geometry">
+       <rect>
+        <x>530</x>
+        <y>50</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Project image from screenshot&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
