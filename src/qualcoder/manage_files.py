@@ -865,17 +865,17 @@ class DialogManageFiles(QtWidgets.QDialog):
         name_split1 = mediapath.split(":")[1]
         filename = name_split1.split('/')[-1]
         if mediapath[0:6] == "audio:":
-            copyfile(mediapath[6:], self.app.project_path + "/audio/" + filename)
+            copyfile(mediapath[6:], os.path.join(self.app.project_path, "audio", filename))
             mediapath = '/audio/' + filename
         if mediapath[0:6] == "video:":
-            copyfile(mediapath[6:], self.app.project_path + "/video/" + filename)
+            copyfile(mediapath[6:], os.path.join(self.app.project_path, "video", filename))
             mediapath = '/video/' + filename
         if mediapath[0:7] == "images:":
-            copyfile(mediapath[7:], self.app.project_path + "/images/" + filename)
+            copyfile(mediapath[7:], os.path.join(self.app.project_path, "images", filename))
             mediapath = '/images/' + filename
         # This must be the last if statement as mediapath can be None
         if mediapath[0:5] == "docs:":
-            copyfile(mediapath[5:], f"{self.app.project_path}/documents/{filename}")
+            copyfile(mediapath[5:], os.path.join(self.app.project_path, "documents", filename))
             mediapath = None
         cur = self.app.conn.cursor()
         cur.execute("update source set mediapath=? where id=?", [mediapath, id_])
