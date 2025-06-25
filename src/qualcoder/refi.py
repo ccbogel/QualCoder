@@ -1991,8 +1991,19 @@ class RefiExport(QtWidgets.QDialog):
         directory = QtWidgets.QFileDialog.getExistingDirectory(None,
                                                                _("Select directory to save file"),
                                                                self.app.settings['directory'], options)
-
         export_path = f"{directory}/{self.app.project_name[:-4]}"
+
+        # Clear any existing, identically named .zip and .qdpx files. Avoids File Exists error
+        try:
+            os.remove(f"{prep_path}.zip")
+        except FileNotFoundError as err:
+            pass
+        try:
+            os.remove(f"{prep_path}.qdpx")
+        except FileNotFoundError as err:
+            pass
+
+        # Create the zip, and rename suffix to .qdpx
         shutil.make_archive(prep_path, 'zip', prep_path)
         os.rename(prep_path + ".zip", prep_path + ".qdpx")
 
