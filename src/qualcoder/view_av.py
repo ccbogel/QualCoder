@@ -182,6 +182,13 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_file_attributes.pressed.connect(self.get_files_from_attributes)
 
+        self.ui.pushButton_add_image_to_project.setIcon(qta.icon('mdi6.image-plus-outline', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_add_image_to_project.pressed.connect(self.import_screenshot_into_project)
+        self.ui.pushButton_add_image_to_project.setEnabled(False)
+        self.ui.pushButton_screensshot.setIcon(qta.icon('mdi6.image-outline', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_screensshot.pressed.connect(self.save_screenshot)
+        self.ui.pushButton_screensshot.setEnabled(False)
+
         # Until any media is selected disable some widgets
         self.ui.pushButton_play.setEnabled(False)
         self.ui.pushButton_coding.setEnabled(False)
@@ -245,12 +252,12 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ddialog.dframe.setPalette(self.palette)
         self.ddialog.dframe.setAutoFillBackground(True)
         self.ddialog.gridLayout.addWidget(self.ddialog.dframe, 0, 0, 0, 0)
-        # enable custom window hint - must be set to enable customizing window controls
+        # Enable custom window hint - must be set to enable customizing window controls
         self.ddialog.setWindowFlags(self.ddialog.windowFlags() | QtCore.Qt.WindowType.CustomizeWindowHint)
-        # disable close button, only close through closing the Ui_Dialog_view_av
+        # Disable close button, only close through closing the Ui_Dialog_view_av
         self.ddialog.setWindowFlags(self.ddialog.windowFlags() & ~QtCore.Qt.WindowType.WindowCloseButtonHint)
         self.ddialog.setWindowFlags(self.ddialog.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        # add context menu for ddialog
+        # Add context menu for ddialog
         self.ddialog.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ddialog.customContextMenuRequested.connect(self.ddialog_menu)
 
@@ -917,6 +924,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.transcription = None
         # None on init
         if self.ddialog is not None:
+            self.ui.pushButton_add_image_to_project.setEnabled(False)
+            self.ui.pushButton_screensshot.setEnabled(False)
             self.ddialog.hide()
 
     def load_media(self):
@@ -941,6 +950,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.pushButton_coding.setEnabled(True)
         if self.file_['mediapath'][0:6] not in ("/audio", "audio:"):
             self.ddialog.show()
+            self.ui.pushButton_add_image_to_project.setEnabled(True)
+            self.ui.pushButton_screensshot.setEnabled(True)
             try:
                 w = int(self.app.settings['video_w'])
                 h = int(self.app.settings['video_h'])
@@ -952,6 +963,8 @@ class DialogCodeAV(QtWidgets.QDialog):
                 self.ddialog.resize(500, 400)
         else:
             self.ddialog.hide()
+            self.ui.pushButton_add_image_to_project.setEnabled(False)
+            self.ui.pushButton_screensshot.setEnabled(False)
 
         # Clear comboBox tracks options and reload when playing/pausing
         self.ui.comboBox_tracks.clear()
@@ -1206,7 +1219,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             if self.mediaplayer.play() == -1:
                 return
 
-            # On play rewind 100msecs
+            # On play rewind 100 msecs
             time_msecs = self.mediaplayer.get_time() - 100
             if time_msecs < 0:
                 time_msecs = 0
@@ -1589,6 +1602,8 @@ class DialogCodeAV(QtWidgets.QDialog):
          These key presses are not used in edi mode.
 
         A annotate - for current selection
+        ON HOLD C - Save screenshot as png
+        ON HOLD D - Save screenshot in project for image coding
         G Glue selected segment to selected code, and open segment memo
         Q Quick Mark with code - for current selection
         I Tag important
@@ -1614,6 +1629,14 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         key = event.key()
         mods = QtGui.QGuiApplication.keyboardModifiers()
+        '''# Get screenshot and load in project for coding - D
+        if key == QtCore.Qt.Key.Key_D and not self.ddialog.isHidden():
+            self.import_screenshot_into_project()
+            return
+        # Save screenshot png - C
+        if key == QtCore.Qt.Key.Key_C and not (self.ddialog.isHidden() or self.mediaplayer.get_media() is None):
+            self.save_screenshot()
+            return'''
         # Glue segment to currently selected code and open segment memo
         if key == QtCore.Qt.Key.Key_G and self.segment['start_msecs'] is not None and \
             self.segment['end_msecs'] is not None and self.ui.treeWidget.currentItem() is not None \
@@ -1623,6 +1646,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.segment['memo'] = ui.memo
             self.assign_segment_to_code(self.ui.treeWidget.currentItem())
             return
+        # Forward 5 seconds
         if key == QtCore.Qt.Key.Key_5:
             self.forward_5_seconds()
             return
@@ -1688,13 +1712,11 @@ class DialogCodeAV(QtWidgets.QDialog):
                         self.restore_unmarked_segment()
                 except KeyError:
                     self.restore_unmarked_text_codes()
-
         if not self.ui.textEdit.hasFocus():
             return
         '''# Ignore all other key events if edit mode is active  # Edit mode not used here yet
         if self.edit_mode:
             return'''
-
         cursor_pos = self.ui.textEdit.textCursor().position()
         selected_text = self.ui.textEdit.textCursor().selectedText()
         codes_here = []
@@ -1736,6 +1758,32 @@ class DialogCodeAV(QtWidgets.QDialog):
         if key == QtCore.Qt.Key.Key_R and self.file_ is not None and self.ui.textEdit.textCursor().selectedText() != "":
             self.textedit_recent_codes_menu(self.ui.textEdit.cursorRect().topLeft())
             return
+
+    def save_screenshot(self):
+        hms = msecs_to_hours_mins_secs(self.mediaplayer.get_time())
+        image_name = f"{self.file_['name']}_{hms}.png"
+        filename = os.path.join(self.app.settings['directory'], image_name)
+        self.mediaplayer.video_take_snapshot(0, filename, 1280, 720)
+        Message(self.app, _("Screenshot saved"), filename).exec()
+
+    def import_screenshot_into_project(self):
+
+        hms = msecs_to_hours_mins_secs(self.mediaplayer.get_time())
+        image_name = f"{self.file_['name']}_{hms}.png"
+        file_path = os.path.join(self.app.project_path, "images", image_name)
+        self.mediaplayer.video_take_snapshot(0, file_path, 1280, 720)
+        entry = {'name': image_name, 'id': -1, 'fulltext': None,
+                 'memo': self.file_['memo'], 'mediapath': f"/images/{image_name}",
+                 'owner': self.app.settings['codername'],
+                 'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                 'av_text_id': None}
+        cur = self.app.conn.cursor()
+        cur.execute("insert into source(name,memo,owner,date, mediapath, fulltext) values(?,?,?,?,?,?)",
+                    (
+                        entry['name'], entry['memo'], entry['owner'], entry['date'], entry['mediapath'],
+                        entry['fulltext']))
+        self.app.conn.commit()
+        Message(self.app, _("Screenshot imported"), file_path).exec()
 
     def eventFilter(self, object_, event):
         """ Using this event filter to identify treeWidgetItem drop events.
