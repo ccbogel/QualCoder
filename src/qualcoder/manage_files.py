@@ -19,8 +19,10 @@ https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 """
 
-import csv
 import datetime
+import os.path
+
+import fitz
 import sqlite3
 import ebooklib
 from ebooklib import epub
@@ -55,7 +57,7 @@ from .ris import Ris
 from .select_items import DialogSelectItems
 from .view_av import DialogViewAV, DialogCodeAV  # for isinstance update files
 from .view_image import DialogViewImage, DialogCodeImage  # for isinstance update files
-from .code_pdf import DialogCodePdf  # for isinstance update files
+from .code_pdf import DialogCodePdf  # For isinstance update files
 
 # If VLC not installed, it will not crash
 vlc = None
@@ -404,8 +406,12 @@ class DialogManageFiles(QtWidgets.QDialog):
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         action_view = menu.addAction(_("View"))
         action_view_original_text = None
+        action_pdf_to_images = None
         if mediapath is not None and len(mediapath) > 6 and (mediapath[:6] == '/docs/' or mediapath[:5] == 'docs:'):
             action_view_original_text = menu.addAction(_("view original text file"))
+        if mediapath is not None and len(mediapath) > 6 and (mediapath[:6] == '/docs/' or mediapath[:5] == 'docs:') \
+                and mediapath[-4:].lower() == ".pdf":
+            action_pdf_to_images = menu.addAction(_("Pdf pages to images"))
         action_filename_asc = None
         action_filename_desc = None
         action_type = None
@@ -474,6 +480,9 @@ class DialogManageFiles(QtWidgets.QDialog):
             return
         if action == action_view_original_text:
             self.view_original_text_file(mediapath)
+            return
+        if action == action_pdf_to_images:
+            self.pdf_to_images(mediapath)
             return
         if self.av_dialog_open is not None:
             self.av_dialog_open.mediaplayer.stop()
@@ -585,6 +594,37 @@ class DialogManageFiles(QtWidgets.QDialog):
                 return
             cb = QtWidgets.QApplication.clipboard()
             cb.setText(vancouver[0]['vancouver'].replace("\n", " "))
+
+    def pdf_to_images(self, mediapath):
+        """ Turn pdf to an image for each page. """
+
+        filepath = ""
+        filename = ""
+        if mediapath[:6] == '/docs/':
+            filepath = os.path.join(self.app.project_path, "documents", mediapath[6:])
+            filename = mediapath[6:]
+        if mediapath[:5] == 'docs:':
+            filepath = mediapath[5:]
+            filename = os.path.split(filepath)[1]
+        if filepath == "" or filename == "":
+            return
+
+        fitz_pdf = fitz.open(filepath)  # Use pymupdf to get page image
+        for i in range(len(fitz_pdf)):
+            fitz_page = fitz_pdf.load_page(i)
+            #fitz_page.apply_redactions(images=fitz.PDF_REDACT_IMAGE_NONE)  # Do not touch images
+            pymypdf_pixmap = fitz_page.get_pixmap()
+            image_filename = filename + f"_p{i + 1}.jpg"
+            # Not using os.path.join. Other methods 'might' look for the forward slash.
+            destination = f"{self.app.project_path}/images/{image_filename}"
+            print(destination)
+            pymypdf_pixmap.save(destination)
+            self.load_media_reference(f"/images/{image_filename}")
+            self.parent_text_edit.append(_("Image loaded from pdf: ") + image_filename)
+        self.load_file_data()
+        self.fill_table()
+        self.app.delete_backup = False
+        self.update_files_in_dialogs()
 
     def view_original_text_file(self, mediapath):
         """ View original text file.
@@ -1654,9 +1694,8 @@ class DialogManageFiles(QtWidgets.QDialog):
                        External link path contains prefix 'docs:', 'images:, 'audio:', 'video:'
         """
 
-        # check for duplicated filename and update model, widget and database
-        name_split = mediapath.split("/")
-        filename = name_split[-1]
+        # Check for duplicated filename and update model, widget and database
+        head_path, filename = os.path.split(mediapath)
         if any(d['name'] == filename for d in self.source):
             QtWidgets.QMessageBox.warning(self, _('Duplicate file'), _("Duplicate filename.\nFile not imported"))
             return
@@ -1747,7 +1786,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 try:
                     bytes_ = d.get_body_content()
                     string = bytes_.decode('utf-8')
-                    text_ += html_to_text(string) + "\n\n"  # add line to paragraph spacing for visual format
+                    text_ += html_to_text(string) + "\n\n"  # Add line to paragraph spacing for visual format
                 except TypeError as err:
                     logger.debug("ebooklib get_body_content error " + str(err))
         # Import PDF
@@ -1755,8 +1794,6 @@ class DialogManageFiles(QtWidgets.QDialog):
             pdf_file = open(import_file, 'rb')
             resource_manager = PDFResourceManager()
             laparams = LAParams()
-            # laparams.char_margin = 1.0
-            # laparams.word_margin = 1.0
             device = PDFPageAggregator(resource_manager, laparams=laparams)
             interpreter = PDFPageInterpreter(resource_manager, device)
             pages_generator = PDFPage.get_pages(pdf_file)  # Generator PDFpage objects
