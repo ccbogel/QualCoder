@@ -6,17 +6,38 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-27 08:08+1000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"POT-Creation-Date: 2025-06-28 11:15+1000\n"
+"PO-Revision-Date: 2025-06-29 08:29+1000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: sv\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.5\n"
 
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
@@ -47,9 +68,9 @@ msgstr "Det finns redan en säkerhetskopia med det namnet"
 #: __main__.py:1192 __main__.py:1242 __main__.py:1245
 msgid "WARNING: audio and video files NOT backed up. See settings."
 msgstr ""
-"VARNING: ljud‑ och videofiler säkerhetskopieras INTE. Se "
-"inställningarna.VARNING: ljud och videofilerna är INTE säkerhetskopierade, "
-"gå till inställningarna."
+"VARNING: ljud‑ och videofiler säkerhetskopieras INTE. Se inställningarna."
+"VARNING: ljud och videofilerna är INTE säkerhetskopierade, gå till "
+"inställningarna."
 
 #: __main__.py:1194 __main__.py:1244 __main__.py:1247
 msgid "Project backup created: "
@@ -263,7 +284,7 @@ msgid "New project: "
 msgstr "Nytt projekt: "
 
 #: __main__.py:2184 manage_files.py:1564 __main__.py:2242 manage_files.py:1716
-#: __main__.py:2245
+#: __main__.py:2245 manage_files.py:1755
 msgid " created."
 msgstr " skapad."
 
@@ -370,7 +391,7 @@ msgstr ""
 "i."
 
 #: __main__.py:2422 code_text.py:4897 manage_files.py:1378 __main__.py:2480
-#: code_text.py:5034 manage_files.py:1500 __main__.py:2483
+#: code_text.py:5034 manage_files.py:1500 __main__.py:2483 manage_files.py:1540
 msgid "Open file"
 msgstr "Öppna fil"
 
@@ -449,7 +470,7 @@ msgid "Project memo: "
 msgstr "Projektmemo: "
 
 #: __main__.py:2753 manage_files.py:2156 __main__.py:2852 manage_files.py:2308
-#: __main__.py:2855
+#: __main__.py:2855 manage_files.py:2345
 msgid "Files: "
 msgstr "Filer: "
 
@@ -691,9 +712,8 @@ msgstr "Tyvärr kunde AI:n inte hitta någon data relaterad till \""
 #: ai_chat.py:487 ai_chat.py:488
 msgid "Found related data. Analyzing the most relevant segments closer."
 msgstr ""
-"Relaterad data hittad. Analyserar de mest relevanta segmenten "
-"närmare.Relaterad data hittades. Analyserar de mest relevanta segmenten "
-"närmare."
+"Relaterad data hittad. Analyserar de mest relevanta segmenten närmare."
+"Relaterad data hittades. Analyserar de mest relevanta segmenten närmare."
 
 #: ai_chat.py:550 ai_chat.py:551
 msgid ""
@@ -1013,7 +1033,7 @@ msgstr "Inga koder"
 #: report_codes_by_segments.py:253 view_av.py:452 view_image.py:321
 #: code_text.py:635 code_pdf.py:524 manage_files.py:1036 report_codes.py:381
 #: report_code_summary.py:122 report_codes_by_segments.py:329 view_av.py:505
-#: view_image.py:398 report_codes.py:382 view_av.py:512
+#: view_image.py:398 report_codes.py:382 view_av.py:512 manage_files.py:1076
 msgid "Name"
 msgstr "Namn"
 
@@ -1046,7 +1066,8 @@ msgstr "Namn"
 #: view_av.py:601 view_av.py:2339 view_av.py:2363 view_image.py:398
 #: view_image.py:1477 view_image.py:2091 view_image.py:2115 report_codes.py:382
 #: report_codes.py:396 report_codes.py:475 view_av.py:512 view_av.py:608
-#: view_av.py:2418 view_av.py:2442
+#: view_av.py:2418 view_av.py:2442 manage_files.py:1076 manage_files.py:1426
+#: manage_files.py:1461 manage_files.py:2306 view_av.py:2420 view_av.py:2444
 msgid "Memo"
 msgstr "Anteckning"
 
@@ -1101,7 +1122,8 @@ msgstr "Sök i alla fall"
 #: report_codes.py:2832 report_code_summary.py:268
 #: report_codes_by_segments.py:143 report_file_summary.py:150 view_av.py:3362
 #: view_av.py:3815 report_codes.py:253 report_codes.py:2176
-#: report_codes.py:2844 view_av.py:3441 view_av.py:3898
+#: report_codes.py:2844 view_av.py:3441 view_av.py:3898 view_av.py:3443
+#: view_av.py:3900
 msgid "MEMO: "
 msgstr "ANTECKNING: "
 
@@ -1315,6 +1337,7 @@ msgstr "Kopiera"
 #: case_file_manager.py:453 code_pdf.py:2891 report_codes.py:2238
 #: view_av.py:2504 view_image.py:1255 code_pdf.py:3041 report_codes.py:2276
 #: view_av.py:2575 view_image.py:1478 report_codes.py:2288 view_av.py:2654
+#: view_av.py:2656
 msgid "Unmark"
 msgstr "Avmarkera"
 
@@ -1342,7 +1365,9 @@ msgstr "Det här segmentet är redan länkad till fallet"
 #: manage_files.py:1816 report_attributes.py:627 report_attributes.py:631
 #: report_attributes.py:634 report_attributes.py:642 report_codes.py:1140
 #: view_av.py:2926 view_av.py:2930 view_av.py:3082 view_graph.py:849
-#: report_codes.py:1141 view_av.py:3009 view_av.py:3161
+#: report_codes.py:1141 view_av.py:3009 view_av.py:3161 manage_files.py:1343
+#: manage_files.py:1821 manage_files.py:1845 manage_files.py:1849
+#: manage_files.py:1853 view_av.py:3007 view_av.py:3011 view_av.py:3163
 msgid "Warning"
 msgstr "Varning"
 
@@ -1428,7 +1453,7 @@ msgstr "Kan inte importera från csv, endast en rad i filen"
 
 #: cases.py:570 manage_files.py:912 view_graph.py:938 view_graph.py:1859
 #: view_graph.py:1887 manage_files.py:1036 view_graph.py:975 view_graph.py:1897
-#: view_graph.py:1925
+#: view_graph.py:1925 manage_files.py:1076
 msgid "Case"
 msgstr "Fall"
 
@@ -1441,6 +1466,7 @@ msgid "Case added: "
 msgstr "Fall tillagt: "
 
 #: cases.py:670 journals.py:745 manage_files.py:1180 manage_files.py:1302
+#: manage_files.py:1342
 msgid "This attribute is numeric"
 msgstr "Detta attribut är numeriskt"
 
@@ -1448,35 +1474,35 @@ msgstr "Detta attribut är numeriskt"
 msgid "Memo for case "
 msgstr "Anteckning för fall "
 
-#: cases.py:766 manage_files.py:225 manage_files.py:348
+#: cases.py:766 manage_files.py:225 manage_files.py:348 manage_files.py:350
 msgid "Show all columns"
 msgstr "Visa alla kolumner"
 
-#: cases.py:769 manage_files.py:228 manage_files.py:351
+#: cases.py:769 manage_files.py:228 manage_files.py:351 manage_files.py:353
 msgid "Hide column"
 msgstr "Dölj kolumn"
 
-#: cases.py:770 manage_files.py:229 manage_files.py:352
+#: cases.py:770 manage_files.py:229 manage_files.py:352 manage_files.py:354
 msgid "Hide columns starting with"
 msgstr "Dölj kolumner som börjar med"
 
-#: cases.py:771 manage_files.py:230 manage_files.py:353
+#: cases.py:771 manage_files.py:230 manage_files.py:353 manage_files.py:355
 msgid "Show columns starting with"
 msgstr "Visa kolumner som börjar med"
 
-#: cases.py:783 manage_files.py:242 manage_files.py:365
+#: cases.py:783 manage_files.py:242 manage_files.py:365 manage_files.py:367
 msgid "Hide columns starting with:"
 msgstr "Dölj kolumner som börjar med:"
 
-#: cases.py:784 manage_files.py:243 manage_files.py:366
+#: cases.py:784 manage_files.py:243 manage_files.py:366 manage_files.py:368
 msgid "Hide Columns"
 msgstr "Dölj kolumner"
 
-#: cases.py:792 manage_files.py:250 manage_files.py:373
+#: cases.py:792 manage_files.py:250 manage_files.py:373 manage_files.py:375
 msgid "Show columns starting with:"
 msgstr "Visa kolumner som börjar med:"
 
-#: cases.py:793 manage_files.py:251 manage_files.py:374
+#: cases.py:793 manage_files.py:251 manage_files.py:374 manage_files.py:376
 msgid "Show Columns"
 msgstr "Visa kolumner"
 
@@ -1487,39 +1513,46 @@ msgstr "Visa fall"
 #: cases.py:821 cases.py:828 manage_files.py:290 manage_files.py:295
 #: manage_files.py:299 manage_files.py:313 manage_files.py:413
 #: manage_files.py:418 manage_files.py:422 manage_files.py:436
+#: manage_files.py:419 manage_files.py:424 manage_files.py:428
+#: manage_files.py:442
 msgid "Order ascending"
 msgstr "Sortera stigande"
 
 #: cases.py:822 cases.py:829 manage_files.py:291 manage_files.py:314
-#: manage_files.py:414 manage_files.py:437
+#: manage_files.py:414 manage_files.py:437 manage_files.py:420
+#: manage_files.py:443
 msgid "Order descending"
 msgstr "Sortera fallande"
 
 #: cases.py:823 journals.py:443 manage_files.py:304 manage_files.py:427
+#: manage_files.py:433
 msgid "Show values like"
 msgstr "Visa värden som liknar"
 
 #: cases.py:824 manage_files.py:306 manage_references.py:606
-#: manage_files.py:429
+#: manage_files.py:429 manage_files.py:435
 msgid "Show this value"
 msgstr "Visa detta värde"
 
 #: cases.py:830 journals.py:450 manage_files.py:341 manage_files.py:464
+#: manage_files.py:470
 msgid "Show all rows Ctrl A"
 msgstr "Visa alla rader Ctrl A"
 
-#: cases.py:834 manage_files.py:345 manage_files.py:468
+#: cases.py:834 manage_files.py:345 manage_files.py:468 manage_files.py:474
 msgid "Open URL"
 msgstr "Ãppna URL"
 
 #: cases.py:865 journals.py:481 journals.py:496 manage_files.py:402
 #: manage_files.py:416 manage_references.py:246 manage_references.py:627
 #: report_sql.py:526 report_sql.py:540 report_sql.py:621 report_sql.py:631
-#: manage_files.py:525 manage_files.py:539
+#: manage_files.py:525 manage_files.py:539 manage_files.py:534
+#: manage_files.py:548
 msgid "Text filter"
 msgstr "Textfilter"
 
 #: cases.py:865 journals.py:496 manage_files.py:402 manage_files.py:525
+#: manage_files.py:534
 msgid "Show values like:"
 msgstr "Visa värden som liknar:"
 
@@ -1532,7 +1565,7 @@ msgid "Click to manage files for this case"
 msgstr "Klicka för att hantera filer för detta fall"
 
 #: cases.py:918 manage_files.py:144 manage_files.py:2154 manage_files.py:150
-#: manage_files.py:2306
+#: manage_files.py:2306 manage_files.py:152 manage_files.py:2343
 msgid "Right click header row to hide columns"
 msgstr "Högerklicka på rubrikraden för att dölja kolumner"
 
@@ -1601,7 +1634,7 @@ msgstr "Kodträd"
 #: report_relations.py:1012 view_av.py:452 view_image.py:321 code_text.py:635
 #: code_pdf.py:524 manage_files.py:1036 report_code_summary.py:122
 #: report_exact_matches.py:564 report_relations.py:1102 view_av.py:505
-#: view_image.py:398 view_av.py:512
+#: view_image.py:398 view_av.py:512 manage_files.py:1076
 msgid "Id"
 msgstr "ID"
 
@@ -1641,7 +1674,7 @@ msgstr " Fall: "
 #: code_pdf.py:484 code_pdf.py:2542 code_pdf.py:2985 view_av.py:3254
 #: view_av.py:3760 view_graph.py:528 view_graph.py:597 view_graph.py:660
 #: view_graph.py:1284 view_graph.py:1310 view_graph.py:1335 view_av.py:3333
-#: view_av.py:3843
+#: view_av.py:3843 view_av.py:3335 view_av.py:3845
 msgid "Memo: "
 msgstr "Anteckning: "
 
@@ -1685,7 +1718,7 @@ msgstr "Kodad textfil exporterad"
 #: code_text.py:1341 code_text.py:1431 code_pdf.py:1047 code_pdf.py:1141
 #: report_cooccurrence.py:196 view_av.py:2687 view_av.py:2756 view_graph.py:490
 #: view_graph.py:558 view_graph.py:617 view_graph.py:678 view_av.py:2766
-#: view_av.py:2835
+#: view_av.py:2835 view_av.py:2768 view_av.py:2837
 msgid "Select codes"
 msgstr "Välj koder"
 
@@ -1715,13 +1748,14 @@ msgstr ""
 #: code_pdf.py:1998 view_av.py:2168 view_graph.py:1652 view_graph.py:3088
 #: view_graph.py:3090 view_image.py:1761 code_text.py:2758 code_pdf.py:2109
 #: view_av.py:2239 view_graph.py:1690 view_graph.py:3145 view_graph.py:3147
-#: view_image.py:1989 view_av.py:2318
+#: view_image.py:1989 view_av.py:2318 view_av.py:2320
 msgid "Category"
 msgstr "Kategori"
 
 #: code_organiser.py:115 code_organiser.py:425 code_text.py:2647
 #: code_pdf.py:1998 view_av.py:2168 view_image.py:1761 code_text.py:2758
 #: code_pdf.py:2109 view_av.py:2239 view_image.py:1989 view_av.py:2318
+#: view_av.py:2320
 msgid "Category name"
 msgstr "Kategorinamn"
 
@@ -1815,7 +1849,7 @@ msgid "EDITING TEXT MODE (Ctrl+E)"
 msgstr "REDIGERINGSLÃGE FÃR TEXT (Ctrl+E)"
 
 #: code_text.py:169 edit_textfile.py:83 view_av.py:3840 view_av.py:3917
-#: view_av.py:4000
+#: view_av.py:4000 view_av.py:4002
 msgid ""
 "Avoid selecting sections of text with a combination of not underlined (not "
 "coded / annotated / case-assigned) and underlined (coded, annotated, case-"
@@ -1826,7 +1860,7 @@ msgstr ""
 "annoterade, case tilldelade)."
 
 #: code_text.py:172 edit_textfile.py:85 view_av.py:3842 view_av.py:3919
-#: view_av.py:4002
+#: view_av.py:4002 view_av.py:4004
 msgid ""
 "Positions of the underlying codes / annotations / case-assigned may not "
 "correctly adjust if text is typed over or deleted."
@@ -1843,6 +1877,8 @@ msgstr ""
 #: manage_files.py:1089 manage_files.py:1092 report_codes.py:217
 #: report_compare_coder_file.py:151 report_exact_matches.py:143
 #: report_file_summary.py:114 report_file_summary.py:424 report_codes.py:218
+#: manage_files.py:1120 manage_files.py:1123 manage_files.py:1129
+#: manage_files.py:1132
 msgid "Characters: "
 msgstr "Tecken: "
 
@@ -1945,50 +1981,51 @@ msgid "Memo coded text (M)"
 msgstr "Anteckna kodad text (M)"
 
 #: code_text.py:1026 view_av.py:2506 code_text.py:1098 view_av.py:2577
-#: view_av.py:2656
+#: view_av.py:2656 view_av.py:2658
 msgid "Change start position (SHIFT LEFT/ALT RIGHT)"
 msgstr "Ãndra startposition (SKIFT VÃNSTER/ALT HÃGER)"
 
 #: code_text.py:1027 view_av.py:2507 code_text.py:1099 view_av.py:2578
-#: view_av.py:2657
+#: view_av.py:2657 view_av.py:2659
 msgid "Change end position (SHIFT RIGHT/ALT LEFT)"
 msgstr "Ãndra slutposition (SKIFT HÃGER/ALT VÃNSTER)"
 
 #: code_text.py:1030 code_pdf.py:848 view_av.py:2511 code_text.py:1102
-#: code_pdf.py:918 view_av.py:2582 view_av.py:2661
+#: code_pdf.py:918 view_av.py:2582 view_av.py:2661 view_av.py:2663
 msgid "Add important mark (I)"
 msgstr "Lägg till viktig markering (I)"
 
 #: code_text.py:1032 code_pdf.py:850 view_av.py:2513 view_av.py:3487
 #: view_image.py:1262 code_text.py:1104 code_pdf.py:920 view_av.py:2584
 #: view_av.py:3564 view_image.py:1485 view_av.py:2663 view_av.py:3645
+#: view_av.py:2665 view_av.py:3647
 msgid "Remove important mark"
 msgstr "Ta bort viktig markering"
 
 #: code_text.py:1033 code_pdf.py:851 view_av.py:2508 code_text.py:1105
-#: code_pdf.py:921 view_av.py:2579 view_av.py:2658
+#: code_pdf.py:921 view_av.py:2579 view_av.py:2658 view_av.py:2660
 msgid "Change code"
 msgstr "Ãndra kod"
 
 #: code_text.py:1052 code_pdf.py:866 view_av.py:2532 code_text.py:1108
-#: code_pdf.py:936 view_av.py:2603 view_av.py:2682
+#: code_pdf.py:936 view_av.py:2603 view_av.py:2682 view_av.py:2684
 msgid "Mark (Q)"
 msgstr "Markera (Q)"
 
 #: code_text.py:1055 code_pdf.py:869 view_av.py:2535 code_text.py:1111
-#: code_pdf.py:939 view_av.py:2606 view_av.py:2685
+#: code_pdf.py:939 view_av.py:2606 view_av.py:2685 view_av.py:2687
 msgid "Mark with recent code (R)"
 msgstr "Markera med senaste kod (R)"
 
 #: code_text.py:1058 code_pdf.py:872 view_av.py:2538 code_text.py:1133
-#: code_pdf.py:942 view_av.py:2609 view_av.py:2688
+#: code_pdf.py:942 view_av.py:2609 view_av.py:2688 view_av.py:2690
 msgid "Annotate (A)"
 msgstr "Anteckna (A)"
 
 #: code_text.py:1059 code_pdf.py:873 manage_references.py:611
 #: report_codes.py:2243 report_codes.py:2783 view_av.py:2539 code_text.py:1134
 #: code_pdf.py:943 report_codes.py:2282 report_codes.py:2881 view_av.py:2610
-#: report_codes.py:2294 report_codes.py:2893 view_av.py:2689
+#: report_codes.py:2294 report_codes.py:2893 view_av.py:2689 view_av.py:2691
 msgid "Copy to clipboard"
 msgstr "Kopiera till urklipp"
 
@@ -2001,7 +2038,7 @@ msgid "in vivo code (V)"
 msgstr "in vivo-kod (V)"
 
 #: code_text.py:1063 code_pdf.py:877 view_av.py:2541 code_text.py:1136
-#: code_pdf.py:947 view_av.py:2612 view_av.py:2691
+#: code_pdf.py:947 view_av.py:2612 view_av.py:2691 view_av.py:2693
 msgid "Edit annotation"
 msgstr "Redigera anteckning"
 
@@ -2030,6 +2067,7 @@ msgstr "Ingen fil valdes"
 #: code_text.py:1276 code_pdf.py:992 report_codes.py:2315 view_av.py:2631
 #: code_text.py:1356 code_pdf.py:1062 report_codes.py:2356 report_codes.py:2395
 #: view_av.py:2702 report_codes.py:2368 report_codes.py:2407 view_av.py:2781
+#: view_av.py:2783
 msgid "Select replacement code"
 msgstr "Välj ersättningskod"
 
@@ -2046,12 +2084,12 @@ msgstr "Anteckning:"
 
 #: code_text.py:1418 code_pdf.py:1119 code_pdf.py:2910 view_av.py:2724
 #: code_text.py:1503 code_pdf.py:1189 code_pdf.py:3060 view_av.py:2795
-#: view_av.py:2874
+#: view_av.py:2874 view_av.py:2876
 msgid "Select code to memo"
 msgstr "Välj kod för anteckning"
 
 #: code_text.py:1427 code_pdf.py:1128 view_av.py:2733 code_text.py:1512
-#: code_pdf.py:1198 view_av.py:2804 view_av.py:2883
+#: code_pdf.py:1198 view_av.py:2804 view_av.py:2883 view_av.py:2885
 msgid "Memo for Coded text: "
 msgstr "Anteckning för kodad text: "
 
@@ -2111,6 +2149,7 @@ msgstr "Visa eller redigera anteckning"
 #: code_text.py:1527 code_pdf.py:1181 manage_files.py:334 report_sql.py:417
 #: view_av.py:1341 view_image.py:890 code_text.py:1615 code_pdf.py:1252
 #: manage_files.py:457 view_av.py:1407 view_image.py:1086 view_av.py:1422
+#: manage_files.py:463
 msgid "Delete"
 msgstr "Ta bort"
 
@@ -2168,7 +2207,7 @@ msgstr "Sortera kategori och sedan kod stigande"
 #: view_av.py:1434 view_av.py:2052 view_image.py:985 view_image.py:1642
 #: code_text.py:1712 code_text.py:1755 code_pdf.py:1350 code_pdf.py:1393
 #: view_av.py:1500 view_av.py:2123 view_image.py:1181 view_image.py:1867
-#: view_av.py:1515 view_av.py:2202
+#: view_av.py:1515 view_av.py:2202 view_av.py:2204
 msgid "Select blank or category"
 msgstr "Välj tom eller kategori"
 
@@ -2181,6 +2220,7 @@ msgstr "Välj tom eller kategori"
 #: view_graph.py:596 view_graph.py:658 view_graph.py:751 view_graph.py:1281
 #: view_graph.py:1306 view_graph.py:1332 view_graph.py:1358 view_graph.py:1377
 #: view_graph.py:1398 view_image.py:2032 report_codes.py:1105 view_av.py:2358
+#: view_av.py:2360
 msgid "Code: "
 msgstr "Kod: "
 
@@ -2197,6 +2237,7 @@ msgstr "Anteckningar för fil: "
 #: code_pdf.py:3374 view_av.py:3029 view_av.py:3050 code_text.py:1804
 #: code_text.py:3724 code_text.py:3745 code_pdf.py:3515 code_pdf.py:3535
 #: view_av.py:3106 view_av.py:3127 view_av.py:3185 view_av.py:3206
+#: view_av.py:3187 view_av.py:3208
 msgid "Annotation: "
 msgstr "Anteckning: "
 
@@ -2269,7 +2310,7 @@ msgstr "Visa nästa kodning av vald kod"
 
 #: code_text.py:2526 code_pdf.py:1880 view_av.py:2091 view_image.py:1683
 #: code_text.py:2637 code_pdf.py:1987 view_av.py:2162 view_image.py:1908
-#: view_av.py:2241
+#: view_av.py:2241 view_av.py:2243
 msgid "Merge code: "
 msgstr "Slå ihop kod: "
 
@@ -2279,13 +2320,13 @@ msgstr " till kod: "
 
 #: code_text.py:2527 code_pdf.py:1881 view_av.py:2092 view_image.py:1684
 #: code_text.py:2638 code_pdf.py:1988 view_av.py:2163 view_image.py:1909
-#: view_av.py:2242
+#: view_av.py:2242 view_av.py:2244
 msgid "Merge codes"
 msgstr "Slå ihop koder"
 
 #: code_text.py:2585 code_pdf.py:1941 view_av.py:2145 view_image.py:1738
 #: code_text.py:2696 code_pdf.py:2050 view_av.py:2216 view_image.py:1964
-#: view_av.py:2295
+#: view_av.py:2295 view_av.py:2297
 msgid "Add new code"
 msgstr "Lägg till ny kod"
 
@@ -2306,20 +2347,20 @@ msgstr "Ny kategori: "
 
 #: code_text.py:2696 code_pdf.py:2047 view_av.py:2218 view_image.py:1808
 #: code_text.py:2812 code_pdf.py:2158 view_av.py:2289 view_image.py:2036
-#: view_av.py:2368
+#: view_av.py:2368 view_av.py:2370
 msgid "Code deleted: "
 msgstr "Kod raderad: "
 
 #: code_text.py:2715 code_pdf.py:2067 report_codes.py:1074 reports.py:260
 #: view_av.py:2235 view_charts.py:348 view_image.py:1831 code_text.py:2835
 #: code_pdf.py:2178 report_codes.py:1099 reports.py:331 view_av.py:2306
-#: view_image.py:2059 report_codes.py:1100 view_av.py:2385
+#: view_image.py:2059 report_codes.py:1100 view_av.py:2385 view_av.py:2387
 msgid "Category: "
 msgstr "Kategori: "
 
 #: code_text.py:2726 code_pdf.py:2078 view_av.py:2244 view_image.py:1835
 #: code_text.py:2846 code_pdf.py:2189 view_av.py:2315 view_image.py:2063
-#: view_av.py:2394
+#: view_av.py:2394 view_av.py:2396
 msgid "Category deleted: "
 msgstr "Kategori raderad: "
 
@@ -2343,19 +2384,19 @@ msgstr "Anteckning för kategori: "
 
 #: code_text.py:2790 code_pdf.py:2142 view_av.py:2309 view_image.py:1904
 #: code_text.py:2913 code_pdf.py:2253 view_av.py:2380 view_image.py:2132
-#: view_av.py:2459
+#: view_av.py:2459 view_av.py:2461
 msgid "Rename code"
 msgstr "Byt namn på kod"
 
 #: code_text.py:2791 code_pdf.py:2143 view_av.py:2309 view_image.py:1904
 #: code_text.py:2914 code_pdf.py:2254 view_av.py:2380 view_image.py:2132
-#: view_av.py:2459
+#: view_av.py:2459 view_av.py:2461
 msgid "New code name:"
 msgstr "Nytt kodnamn:"
 
 #: code_text.py:2799 code_pdf.py:2150 view_av.py:2316 view_image.py:1911
 #: code_text.py:2922 code_pdf.py:2262 view_av.py:2387 view_image.py:2139
-#: view_av.py:2466
+#: view_av.py:2466 view_av.py:2468
 msgid "Name in use"
 msgstr "Namnet används"
 
@@ -2373,13 +2414,13 @@ msgstr " till: "
 
 #: code_text.py:2829 code_pdf.py:2181 view_av.py:2336 view_image.py:1932
 #: code_text.py:2952 code_pdf.py:2293 view_av.py:2407 view_image.py:2160
-#: view_av.py:2486
+#: view_av.py:2486 view_av.py:2488
 msgid "Rename category"
 msgstr "Byt namn på kategori"
 
 #: code_text.py:2830 code_pdf.py:2181 view_av.py:2336 view_image.py:1932
 #: code_text.py:2953 code_pdf.py:2294 view_av.py:2407 view_image.py:2160
-#: view_av.py:2486
+#: view_av.py:2486 view_av.py:2488
 msgid "New category name:"
 msgstr "Nytt kategorinamn:"
 
@@ -2402,6 +2443,7 @@ msgid "Open memo"
 msgstr "Ãppna anteckning"
 
 #: code_text.py:2916 manage_files.py:285 code_text.py:3039 manage_files.py:408
+#: manage_files.py:411
 msgid "view original text file"
 msgstr "visa originaltextfil"
 
@@ -2482,7 +2524,7 @@ msgstr "Kodtext: "
 #: code_text.py:3401 code_text.py:3660 code_text.py:3795 code_text.py:3897
 #: code_pdf.py:3157 view_av.py:2859 code_text.py:3525 code_text.py:3791
 #: code_text.py:3926 code_text.py:4028 code_pdf.py:3313 view_av.py:2930
-#: view_av.py:3009
+#: view_av.py:3009 view_av.py:3011
 msgid "No code was selected"
 msgstr "Ingen kod valdes"
 
@@ -2518,22 +2560,23 @@ msgstr ""
 #: code_text.py:3526 code_pdf.py:2896 code_pdf.py:3287 view_av.py:2770
 #: view_av.py:2975 code_text.py:3657 code_pdf.py:3046 code_pdf.py:3448
 #: view_av.py:2841 view_av.py:3052 view_av.py:2920 view_av.py:3131
+#: view_av.py:2922 view_av.py:3133
 msgid "Select code to unmark"
 msgstr "Välj kod att avmarkera"
 
 #: code_text.py:3607 code_pdf.py:3368 view_av.py:3043 code_text.py:3738
-#: code_pdf.py:3529 view_av.py:3120 view_av.py:3199
+#: code_pdf.py:3529 view_av.py:3120 view_av.py:3199 view_av.py:3201
 msgid "Annotation added at position: "
 msgstr "Anteckning tillagd på position: "
 
 #: code_text.py:3608 code_text.py:3637 view_av.py:3044 view_av.py:3071
 #: code_text.py:3739 code_text.py:3768 view_av.py:3121 view_av.py:3148
-#: view_av.py:3200 view_av.py:3227
+#: view_av.py:3200 view_av.py:3227 view_av.py:3202 view_av.py:3229
 msgid " for: "
 msgstr " för: "
 
 #: code_text.py:3636 code_pdf.py:3396 view_av.py:3070 code_text.py:3767
-#: code_pdf.py:3557 view_av.py:3147 view_av.py:3226
+#: code_pdf.py:3557 view_av.py:3147 view_av.py:3226 view_av.py:3228
 msgid "Annotation removed from position "
 msgstr "Anteckning borttagen från position "
 
@@ -2779,12 +2822,12 @@ msgid "The AI is busy. Please wait a moment and retry."
 msgstr "AI:n är upptagen. Vänta en stund och försök igen."
 
 #: code_text.py:5088 code_pdf.py:3517 view_av.py:3268 code_text.py:5225
-#: code_pdf.py:3679 view_av.py:3345 view_av.py:3424
+#: code_pdf.py:3679 view_av.py:3345 view_av.py:3424 view_av.py:3426
 msgid "Press O to cycle overlapping codes"
 msgstr "Tryck på O för att bläddra bland överlappande koder"
 
 #: code_text.py:5138 code_pdf.py:3563 view_av.py:3300 code_text.py:5275
-#: code_pdf.py:3725 view_av.py:3377 view_av.py:3456
+#: code_pdf.py:3725 view_av.py:3377 view_av.py:3456 view_av.py:3458
 msgid "ANNOTATED:"
 msgstr "ANTECKNAD:"
 
@@ -2994,7 +3037,7 @@ msgid "Codebook exported to "
 msgstr "Kodbok exporterad till "
 
 #: codebook.py:198 helpers.py:140 manage_files.py:670 refi.py:1992 refi.py:2029
-#: manage_files.py:794 refi.py:2040
+#: manage_files.py:794 refi.py:2040 manage_files.py:834
 msgid "Select directory to save file"
 msgstr "Välj katalog för att spara filen"
 
@@ -3048,7 +3091,7 @@ msgstr ""
 
 #: helpers.py:427 view_av.py:865 view_av.py:3549 view_av.py:3975 view_av.py:931
 #: view_av.py:3626 view_av.py:4052 view_av.py:940 view_av.py:3709
-#: view_av.py:4135
+#: view_av.py:4135 view_av.py:3711 view_av.py:4137
 msgid "Media not found"
 msgstr "Media hittades inte"
 
@@ -3351,6 +3394,7 @@ msgid "Attribute added to journals:"
 msgstr "Attribut tillagt till journaler:"
 
 #: journals.py:252 manage_files.py:1114 manage_files.py:1236
+#: manage_files.py:1276
 msgid "type"
 msgstr "typ"
 
@@ -3378,7 +3422,7 @@ msgstr "Visa namn som liknar"
 msgid "Show this coder"
 msgstr "Visa denna kodare"
 
-#: journals.py:445 manage_files.py:322 manage_files.py:445
+#: journals.py:445 manage_files.py:322 manage_files.py:445 manage_files.py:451
 msgid "Enter date"
 msgstr "Ange datum"
 
@@ -3438,258 +3482,268 @@ msgstr "Använd endast: a-z, A-Z, 0-9, mellanslag, bindestreck i journalnamnet"
 msgid "Journal name changed from: "
 msgstr "Journalnamnet ändrades från: "
 
-#: manage_files.py:282 manage_files.py:405
+#: manage_files.py:282 manage_files.py:405 manage_files.py:407
 msgid "View"
 msgstr "Visa"
 
-#: manage_files.py:292 manage_files.py:415
+#: manage_files.py:292 manage_files.py:415 manage_files.py:421
 msgid "File type order"
 msgstr "Filtypordning"
 
-#: manage_files.py:300 manage_files.py:423
+#: manage_files.py:300 manage_files.py:423 manage_files.py:429
 msgid "Assign case to file"
 msgstr "Tilldela fall till fil"
 
-#: manage_files.py:305 manage_files.py:428
+#: manage_files.py:305 manage_files.py:428 manage_files.py:434
 msgid "Hide values like"
 msgstr "Dölj värden som liknar"
 
-#: manage_files.py:324 manage_files.py:447
+#: manage_files.py:324 manage_files.py:447 manage_files.py:453
 msgid "Copy reference to clipboard. APA"
 msgstr "Kopiera referens till urklipp. APA"
 
-#: manage_files.py:325 manage_files.py:448
+#: manage_files.py:325 manage_files.py:448 manage_files.py:454
 msgid "Copy reference to clipboard. Vancouver"
 msgstr "Kopiera referens till urklipp. Vancouver"
 
 #: manage_files.py:332 manage_files.py:524 manage_files.py:455
-#: manage_files.py:648
+#: manage_files.py:648 manage_files.py:461 manage_files.py:688
 msgid "Rename database entry"
 msgstr "Byt namn på databaspost"
 
-#: manage_files.py:333 manage_files.py:456
+#: manage_files.py:333 manage_files.py:456 manage_files.py:462
 msgid "Export"
 msgstr "Exportera"
 
-#: manage_files.py:336 manage_files.py:459
+#: manage_files.py:336 manage_files.py:459 manage_files.py:465
 msgid "Move file to externally linked file"
 msgstr "Flytta fil till externt länkad fil"
 
-#: manage_files.py:338 manage_files.py:461
+#: manage_files.py:338 manage_files.py:461 manage_files.py:467
 msgid "Import linked file"
 msgstr "Importera länkad fil"
 
-#: manage_files.py:416 manage_files.py:539
+#: manage_files.py:416 manage_files.py:539 manage_files.py:548
 msgid "Hide values like:"
 msgstr "Dölj värden som liknar:"
 
 #: manage_files.py:487 manage_files.py:1875 special_functions.py:126
-#: manage_files.py:611 manage_files.py:2027
+#: manage_files.py:611 manage_files.py:2027 manage_files.py:651
+#: manage_files.py:2064
 msgid "Delete files"
 msgstr "Ta bort filer"
 
-#: manage_files.py:533 manage_files.py:657
+#: manage_files.py:533 manage_files.py:657 manage_files.py:697
 msgid "Renamed database file entry: "
 msgstr "Omdöpt databasfilpost: "
 
-#: manage_files.py:554 manage_files.py:678
+#: manage_files.py:554 manage_files.py:678 manage_files.py:718
 msgid "Undo file rename"
 msgstr "Ãngra namnbyte av fil"
 
-#: manage_files.py:564 manage_files.py:688
+#: manage_files.py:564 manage_files.py:688 manage_files.py:728
 msgid "Cannot undo"
 msgstr "Kan inte ångra"
 
-#: manage_files.py:564 manage_files.py:688
+#: manage_files.py:564 manage_files.py:688 manage_files.py:728
 msgid "Another file has this name"
 msgstr "En annan fil har det här namnet"
 
-#: manage_files.py:572 manage_files.py:696
+#: manage_files.py:572 manage_files.py:696 manage_files.py:736
 msgid "Reversed renamed database file entry: "
 msgstr "Ãterställd namnändring av databasfilpost: "
 
-#: manage_files.py:595 manage_files.py:719
+#: manage_files.py:595 manage_files.py:719 manage_files.py:759
 msgid "Bulk Rename of database file name entries"
 msgstr "Massändring av databasfilnamn"
 
-#: manage_files.py:618 manage_files.py:742
+#: manage_files.py:618 manage_files.py:742 manage_files.py:782
 msgid "Renamed database file entry:"
 msgstr "Omdöpt databasfilpost:"
 
-#: manage_files.py:691 manage_files.py:815
+#: manage_files.py:691 manage_files.py:815 manage_files.py:855
 msgid "Export to"
 msgstr "Exportera till"
 
 #: manage_files.py:696 manage_files.py:1804 manage_files.py:820
-#: manage_files.py:1956
+#: manage_files.py:1956 manage_files.py:860 manage_files.py:1993
 msgid "Cannot export"
 msgstr "Kan inte exportera"
 
-#: manage_files.py:696 manage_files.py:820
+#: manage_files.py:696 manage_files.py:820 manage_files.py:860
 msgid "Cannot export as linked file\n"
 msgstr "Kan inte exportera som länkad fil\n"
 
-#: manage_files.py:827 manage_files.py:951
+#: manage_files.py:827 manage_files.py:951 manage_files.py:991
 msgid "File attributes exported to: "
 msgstr "Filattribut exporterade till: "
 
-#: manage_files.py:828 manage_files.py:952
+#: manage_files.py:828 manage_files.py:952 manage_files.py:992
 msgid "File Export"
 msgstr "Filexport"
 
-#: manage_files.py:912 manage_files.py:1036
+#: manage_files.py:912 manage_files.py:1036 manage_files.py:1076
 msgid "Date"
 msgstr "Datum"
 
-#: manage_files.py:957 manage_files.py:1079
+#: manage_files.py:957 manage_files.py:1079 manage_files.py:1119
 msgid "Transcript for: "
 msgstr "Transkription för: "
 
 #: manage_files.py:990 manage_files.py:999 manage_files.py:1012
 #: manage_files.py:1030 manage_files.py:1112 manage_files.py:1121
-#: manage_files.py:1134 manage_files.py:1152
+#: manage_files.py:1134 manage_files.py:1152 manage_files.py:1161
+#: manage_files.py:1174 manage_files.py:1192
 msgid "Cannot locate media. "
 msgstr "Kan inte hitta media. "
 
 #: manage_files.py:1026 report_file_summary.py:264 report_file_summary.py:317
 #: manage_files.py:1148 report_file_summary.py:256 report_file_summary.py:309
+#: manage_files.py:1188
 msgid "Duration: "
 msgstr "Varaktighet: "
 
-#: manage_files.py:1033 manage_files.py:1155
+#: manage_files.py:1033 manage_files.py:1155 manage_files.py:1195
 msgid ""
 "Cannot get media duration.\n"
 "VLC not installed."
 msgstr "Kan inte avgöra längd på media. VLC är inte installerad."
 
-#: manage_files.py:1048 manage_files.py:1170
+#: manage_files.py:1048 manage_files.py:1170 manage_files.py:1210
 msgid "Case linked:"
 msgstr "Fall länkat:"
 
-#: manage_files.py:1114 manage_files.py:1236
+#: manage_files.py:1114 manage_files.py:1236 manage_files.py:1276
 msgid "Attribute added to files:"
 msgstr "Attribut tillagt till filer:"
 
 #: manage_files.py:1130 report_codes.py:1163 view_graph.py:900
 #: view_graph.py:2029 view_graph.py:2056 manage_files.py:1252
 #: report_codes.py:1188 view_graph.py:937 view_graph.py:2067 view_graph.py:2094
-#: report_codes.py:1189
+#: report_codes.py:1189 manage_files.py:1292
 msgid "File"
 msgstr "Fil"
 
 #: manage_files.py:1138 manage_files.py:1145 manage_files.py:1260
-#: manage_files.py:1267
+#: manage_files.py:1267 manage_files.py:1300 manage_files.py:1307
 msgid "Memo for file "
 msgstr "Anteckning för fil "
 
 #: manage_files.py:1243 manage_references.py:299 manage_files.py:1365
+#: manage_files.py:1405
 msgid "VLC not installed cannot play audio or video."
 msgstr "VLC är inte installerat, kan inte spela upp ljud eller video."
 
 #: manage_files.py:1244 manage_references.py:300 manage_files.py:1366
+#: manage_files.py:1406
 msgid "View AV error"
 msgstr "Visa AV-fel"
 
 #: manage_files.py:1253 manage_files.py:1285 manage_references.py:309
 #: manage_references.py:338 manage_files.py:1375 manage_files.py:1407
+#: manage_files.py:1415 manage_files.py:1447
 msgid "Bad link or non-existent file "
 msgstr "Felaktig eller obefintlig fil "
 
 #: manage_files.py:1267 manage_references.py:320 manage_files.py:1389
+#: manage_files.py:1429
 msgid "view AV error"
 msgstr "visa AV-fel"
 
-#: manage_files.py:1308 manage_files.py:1430
+#: manage_files.py:1308 manage_files.py:1430 manage_files.py:1470
 msgid "New File"
 msgstr "Ny fil"
 
-#: manage_files.py:1308 manage_files.py:1430
+#: manage_files.py:1308 manage_files.py:1430 manage_files.py:1470
 msgid "Enter file name"
 msgstr "Ange filnamn"
 
-#: manage_files.py:1347 manage_files.py:1469
+#: manage_files.py:1347 manage_files.py:1469 manage_files.py:1509
 msgid "File created: "
 msgstr "Fil skapad: "
 
 #: manage_files.py:1444 manage_files.py:1457 manage_files.py:1464
 #: manage_files.py:1595 manage_files.py:1608 manage_files.py:1616
+#: manage_files.py:1635 manage_files.py:1648 manage_files.py:1656
 msgid "Unknown file type"
 msgstr "Okänd filtyp"
 
-#: manage_files.py:1445 manage_files.py:1596
+#: manage_files.py:1445 manage_files.py:1596 manage_files.py:1636
 msgid "Trying to import as text"
 msgstr "Försöker importera som text"
 
 #: manage_files.py:1457 manage_files.py:1464 manage_files.py:1608
-#: manage_files.py:1616
+#: manage_files.py:1616 manage_files.py:1648 manage_files.py:1656
 msgid "Cannot import file"
 msgstr "Kan inte importera fil"
 
 #: manage_files.py:1509 manage_files.py:1671 manage_files.py:1661
-#: manage_files.py:1823
+#: manage_files.py:1823 manage_files.py:1700 manage_files.py:1860
 msgid "Duplicate file"
 msgstr "Dubblettfil"
 
 #: manage_files.py:1509 manage_files.py:1672 manage_files.py:1661
-#: manage_files.py:1824
+#: manage_files.py:1824 manage_files.py:1700 manage_files.py:1861
 msgid ""
 "Duplicate filename.\n"
 "File not imported"
 msgstr "Filnamnet finns redan. Filen kan inte importeras"
 
 #: manage_files.py:1525 manage_files.py:1710 manage_files.py:1677
-#: manage_files.py:1862
+#: manage_files.py:1862 manage_files.py:1716 manage_files.py:1899
 msgid " linked"
 msgstr " länkad"
 
-#: manage_files.py:1527 manage_files.py:1679
+#: manage_files.py:1527 manage_files.py:1679 manage_files.py:1718
 msgid " imported."
 msgstr " importerad."
 
 #: manage_files.py:1632 manage_files.py:1660 manage_files.py:1784
-#: manage_files.py:1812
+#: manage_files.py:1812 manage_files.py:1821 manage_files.py:1849
 msgid " lines not imported"
 msgstr " rader importerades inte"
 
-#: manage_files.py:1656 refi.py:1151 manage_files.py:1808
+#: manage_files.py:1656 refi.py:1151 manage_files.py:1808 manage_files.py:1845
 msgid "Cannot import"
 msgstr "Kan inte importera"
 
-#: manage_files.py:1661 manage_files.py:1813
+#: manage_files.py:1661 manage_files.py:1813 manage_files.py:1850
 msgid "lines not imported"
 msgstr "rader importerades inte"
 
-#: manage_files.py:1665 manage_files.py:1817
+#: manage_files.py:1665 manage_files.py:1817 manage_files.py:1854
 msgid "Cannot import "
 msgstr "Kan inte importera "
 
-#: manage_files.py:1708 manage_files.py:1860
+#: manage_files.py:1708 manage_files.py:1860 manage_files.py:1897
 msgid " imported"
 msgstr " importerad"
 
-#: manage_files.py:1802 manage_files.py:1954
+#: manage_files.py:1802 manage_files.py:1954 manage_files.py:1991
 msgid "This is an external linked file"
 msgstr "Det här är en externt länkad fil"
 
-#: manage_files.py:1812 manage_files.py:1964
+#: manage_files.py:1812 manage_files.py:1964 manage_files.py:2001
 msgid "This is a linked file. Will export text representation."
 msgstr "Det här är en länkad fil. Textrepresentation kommer att exporteras."
 
-#: manage_files.py:1814 manage_files.py:1966
+#: manage_files.py:1814 manage_files.py:1966 manage_files.py:2003
 msgid "Can export text"
 msgstr "Kan exportera text"
 
-#: manage_files.py:1824 manage_files.py:1976
+#: manage_files.py:1824 manage_files.py:1976 manage_files.py:2013
 msgid "Export to "
 msgstr "Exportera till "
 
 #: manage_files.py:1833 manage_files.py:1849 manage_files.py:1862
 #: manage_files.py:1985 manage_files.py:2001 manage_files.py:2014
+#: manage_files.py:2022 manage_files.py:2038 manage_files.py:2051
 msgid "Files exported"
 msgstr "Filer exporterade"
 
 #: manage_files.py:1834 manage_files.py:1850 manage_files.py:1863
 #: manage_files.py:1986 manage_files.py:2002 manage_files.py:2015
+#: manage_files.py:2023 manage_files.py:2039 manage_files.py:2052
 msgid " exported to "
 msgstr " exporterad till "
 
@@ -3698,33 +3752,35 @@ msgstr " exporterad till "
 #: view_graph.py:2367 view_graph.py:2385 view_graph.py:2881 view_graph.py:3006
 #: manage_files.py:1988 view_graph.py:2390 view_graph.py:2405
 #: view_graph.py:2423 view_graph.py:2919 view_graph.py:3063
+#: manage_files.py:2025
 msgid "Error"
 msgstr "Fel"
 
-#: manage_files.py:1836 manage_files.py:1988
+#: manage_files.py:1836 manage_files.py:1988 manage_files.py:2025
 msgid "File not found"
 msgstr "Filen hittades inte"
 
 #: manage_files.py:1893 manage_files.py:2055 manage_files.py:2045
-#: manage_files.py:2207
+#: manage_files.py:2207 manage_files.py:2082 manage_files.py:2244
 msgid "Deleted file: "
 msgstr "Raderad fil: "
 
 #: manage_files.py:1904 manage_files.py:1935 manage_files.py:1998
 #: manage_files.py:2031 manage_files.py:2056 manage_files.py:2087
-#: manage_files.py:2150 manage_files.py:2183
+#: manage_files.py:2150 manage_files.py:2183 manage_files.py:2093
+#: manage_files.py:2124 manage_files.py:2187 manage_files.py:2220
 msgid "Deleting file error: "
 msgstr "Fel vid borttagning av fil: "
 
-#: manage_files.py:2076 manage_files.py:2228
+#: manage_files.py:2076 manage_files.py:2228 manage_files.py:2265
 msgid "Minimum: "
 msgstr "Min: "
 
-#: manage_files.py:2077 manage_files.py:2229
+#: manage_files.py:2077 manage_files.py:2229 manage_files.py:2266
 msgid "Maximum: "
 msgstr "Max: "
 
-#: manage_files.py:2108 manage_files.py:2260
+#: manage_files.py:2108 manage_files.py:2260 manage_files.py:2297
 msgid ""
 "\n"
 "Externally linked file:\n"
@@ -4692,6 +4748,7 @@ msgstr "Visa i kontext"
 
 #: report_codes.py:2239 view_av.py:3485 view_image.py:1259 report_codes.py:2277
 #: view_av.py:3562 view_image.py:1482 report_codes.py:2289 view_av.py:3643
+#: view_av.py:3645
 msgid "Add important mark"
 msgstr "Lägg till viktig markering"
 
@@ -4778,8 +4835,8 @@ msgstr "TEXTKODNINGAR: "
 
 #: report_code_summary.py:316
 msgid ""
-"Word calculations: Words use alphabet characters and include the "
-"apostrophe.All other characters are word separators"
+"Word calculations: Words use alphabet characters and include the apostrophe."
+"All other characters are word separators"
 msgstr ""
 "Ordberäkningar: Ord använder alfabetiska tecken och inkluderar apostrofer. "
 "Alla andra tecken ses som ord avskiljare"
@@ -5949,37 +6006,39 @@ msgid "Media coding"
 msgstr "Mediakodning"
 
 #: view_av.py:259 view_av.py:3959 view_av.py:265 view_av.py:4036 view_av.py:272
-#: view_av.py:4119
+#: view_av.py:4119 view_av.py:4121
 msgid "QualCoder will crash"
 msgstr "QualCoder kommer att krascha"
 
 #: view_av.py:294 view_av.py:4137 view_av.py:341 view_av.py:4214 view_av.py:348
-#: view_av.py:4289
+#: view_av.py:4289 view_av.py:4291
 msgid "Screenshot"
 msgstr "Skärmdump"
 
 #: view_av.py:295 view_av.py:4138 view_av.py:342 view_av.py:4215 view_av.py:349
-#: view_av.py:4290
+#: view_av.py:4290 view_av.py:4292
 msgid "Resize"
 msgstr "Ändra storlek"
 
 #: view_av.py:307 view_av.py:4150 view_image.py:726 view_av.py:354
 #: view_av.py:4227 view_image.py:891 view_av.py:361 view_av.py:4302
+#: view_av.py:4304
 msgid "Width"
 msgstr "Bredd"
 
 #: view_av.py:307 view_av.py:4150 view_av.py:354 view_av.py:4227 view_av.py:361
-#: view_av.py:4302
+#: view_av.py:4302 view_av.py:4304
 msgid "Width:"
 msgstr "Bredd:"
 
 #: view_av.py:310 view_av.py:4153 view_image.py:726 view_av.py:357
 #: view_av.py:4230 view_image.py:891 view_av.py:364 view_av.py:4305
+#: view_av.py:4307
 msgid "Height"
 msgstr "Höjd"
 
 #: view_av.py:310 view_av.py:4153 view_av.py:357 view_av.py:4230 view_av.py:364
-#: view_av.py:4305
+#: view_av.py:4305 view_av.py:4307
 msgid "Height:"
 msgstr "Höjd:"
 
@@ -5999,6 +6058,7 @@ msgstr "Avsluta segment"
 #: view_av.py:1299 view_av.py:1313 view_av.py:3177 view_av.py:3683
 #: view_av.py:1365 view_av.py:1379 view_av.py:3254 view_av.py:3760
 #: view_av.py:1380 view_av.py:1394 view_av.py:3333 view_av.py:3843
+#: view_av.py:3335 view_av.py:3845
 msgid "Segment: "
 msgstr "Segment: "
 
@@ -6019,81 +6079,81 @@ msgid ""
 "(Blank for all)"
 msgstr "Visa koder som innehåller text. (Lämna blankt för alla)"
 
-#: view_av.py:1955 view_av.py:2026 view_av.py:2105
+#: view_av.py:1955 view_av.py:2026 view_av.py:2105 view_av.py:2107
 msgid "Segment:"
 msgstr "Segment:"
 
-#: view_av.py:1956 view_av.py:2027 view_av.py:2106
+#: view_av.py:1956 view_av.py:2027 view_av.py:2106 view_av.py:2108
 msgid "Start segment"
 msgstr "Start av segment"
 
-#: view_av.py:2145 view_av.py:2216 view_av.py:2295
+#: view_av.py:2145 view_av.py:2216 view_av.py:2295 view_av.py:2297
 msgid "New code name"
 msgstr "Nytt kodnamn"
 
-#: view_av.py:2158 view_av.py:2229 view_av.py:2308
+#: view_av.py:2158 view_av.py:2229 view_av.py:2308 view_av.py:2310
 msgid "Code added: "
 msgstr "Kod tillagd: "
 
 #: view_av.py:2261 view_image.py:1856 view_av.py:2332 view_image.py:2084
-#: view_av.py:2411
+#: view_av.py:2411 view_av.py:2413
 msgid "Memo for Code "
 msgstr "Anteckning för kod "
 
-#: view_av.py:2285 view_av.py:2356 view_av.py:2435
+#: view_av.py:2285 view_av.py:2356 view_av.py:2435 view_av.py:2437
 msgid "Memo for Category "
 msgstr "Anteckning för kategori "
 
-#: view_av.py:2316 view_av.py:2387 view_av.py:2466
+#: view_av.py:2316 view_av.py:2387 view_av.py:2466 view_av.py:2468
 msgid " Name already in use, choose another."
 msgstr " Namn redan i bruk, välj ett annat."
 
 #: view_av.py:2330 view_image.py:1926 view_av.py:2401 view_image.py:2154
-#: view_av.py:2480
+#: view_av.py:2480 view_av.py:2482
 msgid "Code renamed: "
 msgstr "Kod bytt namn: "
 
 #: view_av.py:2343 view_image.py:1939 view_av.py:2414 view_image.py:2167
-#: view_av.py:2493
+#: view_av.py:2493 view_av.py:2495
 msgid "This category name is already in use"
 msgstr "Detta kategorinamn är redan i bruk"
 
 #: view_av.py:2344 view_image.py:1940 view_av.py:2415 view_image.py:2168
-#: view_av.py:2494
+#: view_av.py:2494 view_av.py:2496
 msgid "Duplicate category name"
 msgstr "Dubblett av kategorinamn"
 
-#: view_av.py:2358 view_av.py:2429 view_av.py:2508
+#: view_av.py:2358 view_av.py:2429 view_av.py:2508 view_av.py:2510
 msgid "Category renamed: "
 msgstr "Kategori bytt namn: "
 
-#: view_av.py:2501 view_av.py:2572 view_av.py:2651
+#: view_av.py:2501 view_av.py:2572 view_av.py:2651 view_av.py:2653
 msgid "Play text"
 msgstr "Spela text"
 
-#: view_av.py:2505 view_av.py:2576 view_av.py:2655
+#: view_av.py:2505 view_av.py:2576 view_av.py:2655 view_av.py:2657
 msgid "Memo coded text M"
 msgstr "Anteckning kodad text M"
 
-#: view_av.py:2545 view_av.py:2616 view_av.py:2695
+#: view_av.py:2545 view_av.py:2616 view_av.py:2695 view_av.py:2697
 msgid "Video position to timestamp"
 msgstr "Videoposition till tidsstämpel"
 
-#: view_av.py:2783 view_av.py:2854 view_av.py:2933
+#: view_av.py:2783 view_av.py:2854 view_av.py:2933 view_av.py:2935
 msgid "Change start position"
 msgstr "Ändra startposition"
 
-#: view_av.py:2784 view_av.py:2855 view_av.py:2934
+#: view_av.py:2784 view_av.py:2855 view_av.py:2934 view_av.py:2936
 msgid ""
 "Change start character position.\n"
 "Positive or negative number:"
 msgstr "Ändra starttecknets position. Positivt eller negativt tal:"
 
-#: view_av.py:2790 view_av.py:2861 view_av.py:2940
+#: view_av.py:2790 view_av.py:2861 view_av.py:2940 view_av.py:2942
 msgid "Change end position"
 msgstr "Ändra slutposition"
 
-#: view_av.py:2791 view_av.py:2862 view_av.py:2941
+#: view_av.py:2791 view_av.py:2862 view_av.py:2941 view_av.py:2943
 msgid ""
 "Change end character position.\n"
 "Positive or negative number:"
@@ -6101,93 +6161,94 @@ msgstr ""
 "Ändra sluttecknets position.\n"
 "Positivt eller negativt tal:"
 
-#: view_av.py:2855 view_av.py:2926 view_av.py:3005
+#: view_av.py:2855 view_av.py:2926 view_av.py:3005 view_av.py:3007
 msgid "No transcription"
 msgstr "Ingen transkription"
 
 #: view_av.py:2880 view_av.py:3608 view_av.py:2951 view_av.py:3685
-#: view_av.py:3030 view_av.py:3768
+#: view_av.py:3030 view_av.py:3768 view_av.py:3032 view_av.py:3770
 msgid "Already Coded"
 msgstr "Redan kodad"
 
-#: view_av.py:2881 view_av.py:2952 view_av.py:3031
+#: view_av.py:2881 view_av.py:2952 view_av.py:3031 view_av.py:3033
 msgid "This segment has already been coded with this code by "
 msgstr "Detta segment har redan kodats med denna kod av "
 
-#: view_av.py:3005 view_av.py:3082 view_av.py:3161
+#: view_av.py:3005 view_av.py:3082 view_av.py:3161 view_av.py:3163
 msgid "No media transcription selected"
 msgstr "Ingen medietranskription vald"
 
 #: view_av.py:3093 view_av.py:3145 view_av.py:3467 view_av.py:3713
 #: view_av.py:3170 view_av.py:3222 view_av.py:3544 view_av.py:3790
 #: view_av.py:3249 view_av.py:3301 view_av.py:3625 view_av.py:3873
+#: view_av.py:3251 view_av.py:3303 view_av.py:3627 view_av.py:3875
 msgid "Memo for segment"
 msgstr "Anteckning för segment"
 
 #: view_av.py:3094 view_av.py:3468 view_av.py:3171 view_av.py:3545
-#: view_av.py:3250 view_av.py:3626
+#: view_av.py:3250 view_av.py:3626 view_av.py:3252 view_av.py:3628
 msgid "Delete segment"
 msgstr "Ta bort segment"
 
 #: view_av.py:3095 view_av.py:3469 view_av.py:3172 view_av.py:3546
-#: view_av.py:3251 view_av.py:3627
+#: view_av.py:3251 view_av.py:3627 view_av.py:3253 view_av.py:3629
 msgid "Play segment"
 msgstr "Spela segment"
 
-#: view_av.py:3096 view_av.py:3173 view_av.py:3252
+#: view_av.py:3096 view_av.py:3173 view_av.py:3252 view_av.py:3254
 msgid "Important mark"
 msgstr "Viktig markering"
 
-#: view_av.py:3097 view_av.py:3174 view_av.py:3253
+#: view_av.py:3097 view_av.py:3174 view_av.py:3253 view_av.py:3255
 msgid "Edit start position"
 msgstr "Redigera startposition"
 
-#: view_av.py:3098 view_av.py:3175 view_av.py:3254
+#: view_av.py:3098 view_av.py:3175 view_av.py:3254 view_av.py:3256
 msgid "Edit end position"
 msgstr "Redigera slutposition"
 
-#: view_av.py:3422 view_av.py:3499 view_av.py:3579
+#: view_av.py:3422 view_av.py:3499 view_av.py:3579 view_av.py:3581
 msgid "Segment menu"
 msgstr "Segmentmeny"
 
-#: view_av.py:3470 view_av.py:3547 view_av.py:3628
+#: view_av.py:3470 view_av.py:3547 view_av.py:3628 view_av.py:3630
 msgid "Edit segment start position"
 msgstr "Redigera segments startposition"
 
-#: view_av.py:3471 view_av.py:3548 view_av.py:3629
+#: view_av.py:3471 view_av.py:3548 view_av.py:3629 view_av.py:3631
 msgid "Edit segment end position"
 msgstr "Redigera segments slutposition"
 
-#: view_av.py:3476 view_av.py:3553 view_av.py:3634
+#: view_av.py:3476 view_av.py:3553 view_av.py:3634 view_av.py:3636
 msgid "Export segment to file"
 msgstr "Exportera segment till fil"
 
-#: view_av.py:3483 view_av.py:3560 view_av.py:3641
+#: view_av.py:3483 view_av.py:3560 view_av.py:3641 view_av.py:3643
 msgid "Link segment to selected text"
 msgstr "Länka segment till markerad text"
 
-#: view_av.py:3561 view_av.py:3638 view_av.py:3721
+#: view_av.py:3561 view_av.py:3638 view_av.py:3721 view_av.py:3723
 msgid "A/V segment exported: "
 msgstr "A/V-segment exporterades: "
 
-#: view_av.py:3562 view_av.py:3639 view_av.py:3722
+#: view_av.py:3562 view_av.py:3639 view_av.py:3722 view_av.py:3724
 msgid "Segment exported"
 msgstr "Segment exporterades"
 
-#: view_av.py:3608 view_av.py:3685 view_av.py:3768
+#: view_av.py:3608 view_av.py:3685 view_av.py:3768 view_av.py:3770
 msgid "This segment has already been coded with this code."
 msgstr "Detta segment har redan kodats med denna kod."
 
-#: view_av.py:3740 view_av.py:3817 view_av.py:3900
+#: view_av.py:3740 view_av.py:3817 view_av.py:3900 view_av.py:3902
 msgid "LINKED TEXT: "
 msgstr "LÄNKAD TEXT: "
 
 #: view_av.py:3742 view_image.py:751 view_av.py:3819 view_image.py:927
-#: view_av.py:3902
+#: view_av.py:3902 view_av.py:3904
 msgid "IMPORTANT"
 msgstr "VIKTIGT"
 
-#: view_av.py:3838 view_av.py:3915 view_av.py:3998
+#: view_av.py:3838 view_av.py:3915 view_av.py:3998 view_av.py:4000
 msgid ""
 "Transcription area: Ctrl+R Alt+Minus Alt+Plus Ctrl+P/S Ctrl+T Ctrl+N "
 "Ctrl+1-8 Ctrl+D"
@@ -6195,15 +6256,15 @@ msgstr ""
 "Översättningsområde: Ctrl+R Alt+Minus Alt+Plus Ctrl+P/S Ctrl+T Ctrl+N "
 "Ctrl+1-8 Ctrl+D"
 
-#: view_av.py:4305 view_av.py:4382 view_av.py:4467
+#: view_av.py:4305 view_av.py:4382 view_av.py:4467 view_av.py:4469
 msgid "Select name to delete"
 msgstr "Välj namn att ta bort"
 
-#: view_av.py:4324 view_av.py:4401 view_av.py:4486
+#: view_av.py:4324 view_av.py:4401 view_av.py:4486 view_av.py:4488
 msgid "Speaker name"
 msgstr "Talarnamn"
 
-#: view_av.py:4325 view_av.py:4402 view_av.py:4487
+#: view_av.py:4325 view_av.py:4402 view_av.py:4487 view_av.py:4489
 msgid "Name:"
 msgstr "Namn:"
 
@@ -6823,239 +6884,256 @@ msgstr " Skala: "
 
 #: __main__.py:1653 __main__.py:1656
 msgid "Directory (folder) paths / represents backslash"
-msgstr ""
+msgstr "Sökvägar till kataloger (mappar) / representerar backslash"
 
 #: ai_llm.py:193
 msgid ""
 "In the following dialog, go to \"Advanced AI Options\" and select a large "
 "and a fast AI model (both can be the same)."
 msgstr ""
+"I följande dialogruta går du till ”Advanced AI Options” och väljer en stor "
+"och en snabb AI-modell (båda kan vara desamma)."
 
 #: ai_llm.py:194
 msgid "AI Model Selection"
-msgstr ""
+msgstr "Val av AI-modell"
 
 #: ai_llm.py:200
 msgid "AI: No large/fast model selected, AI is disabled."
-msgstr ""
+msgstr "AI: Ingen stor/snabb modell vald, AI är avaktiverad."
 
 #: ai_llm.py:302
 msgid ""
 "The AI operation could not be aborted immediately. It may take a moment for "
 "the AI to be ready again."
 msgstr ""
+"AI-operationen kunde inte avbrytas omedelbart. Det kan ta en stund innan AI:"
+"n är redo igen."
 
 #: code_text.py:406 code_pdf.py:1500 view_av.py:301 view_image.py:240
 #: view_av.py:308
 msgid "Search for code"
-msgstr ""
+msgstr "Sök efter kod"
 
 #: code_text.py:409 code_pdf.py:1503 view_av.py:304 view_image.py:243
 #: view_av.py:311
 msgid "Find and select first code that matches text."
-msgstr ""
+msgstr "Hitta och välj den första koden som matchar texten."
 
 #: code_text.py:410 code_pdf.py:1504 view_av.py:305 view_image.py:244
 #: view_av.py:312
 msgid "Enter text to match all or partial code:"
-msgstr ""
+msgstr "Ange text för att matcha hela eller delar av koden:"
 
 #: code_text.py:433 code_pdf.py:1527 view_av.py:328 view_image.py:267
 #: view_av.py:335
 msgid "Match not found"
-msgstr ""
+msgstr "Matchningen hittades inte"
 
 #: code_text.py:433 code_pdf.py:1527 view_av.py:328 view_image.py:267
 #: view_av.py:335
 msgid "No code with matching text found."
-msgstr ""
+msgstr "Ingen kod med matchande text hittades."
 
 #: code_pdf.py:279
 msgid ""
 "Similarly, if the PDF plain text has been edited in any way, this will "
 "affect coding stripes display."
 msgstr ""
+"Om PDF-texten i klartext har redigerats på något sätt kommer detta också att "
+"påverka visningen av kodningsremsor."
 
-#: manage_files.py:170
+#: manage_files.py:170 manage_files.py:172
 msgid "Rows: "
-msgstr ""
+msgstr "Rader:"
 
-#: manage_files.py:179
+#: manage_files.py:179 manage_files.py:181
 msgid "Hidden columns: "
-msgstr ""
+msgstr "Dolda kolumner:"
 
-#: manage_files.py:181
+#: manage_files.py:181 manage_files.py:183
 msgid "No special settings"
-msgstr ""
+msgstr "Inga speciella inställningar"
 
-#: manage_files.py:181
+#: manage_files.py:181 manage_files.py:183
 msgid "No table display settings or rows or columns selected"
-msgstr ""
+msgstr "Inga inställningar för tabellvisning eller rader eller kolumner valda"
 
-#: manage_files.py:183
+#: manage_files.py:183 manage_files.py:185
 msgid "Save as:"
-msgstr ""
+msgstr "Spara som:"
 
-#: manage_files.py:184
+#: manage_files.py:184 manage_files.py:186
 msgid "Save Table Display"
-msgstr ""
+msgstr "Spara bord Display"
 
-#: manage_files.py:192
+#: manage_files.py:192 manage_files.py:194
 msgid "Table display exists"
-msgstr ""
+msgstr "Tabellvisning finns"
 
-#: manage_files.py:192
+#: manage_files.py:192 manage_files.py:194
 msgid "This table display setting already exists: "
-msgstr ""
+msgstr "Den här inställningen för bordsvisning finns redan:"
 
-#: manage_files.py:205 report_attributes.py:148
+#: manage_files.py:205 report_attributes.py:148 manage_files.py:207
 msgid "Nothing saved"
-msgstr ""
+msgstr "Inget sparat"
 
-#: manage_files.py:205
+#: manage_files.py:205 manage_files.py:207
 msgid "No saved table dislpays"
-msgstr ""
+msgstr "Inget sparat bord dislpays"
 
-#: manage_files.py:211
+#: manage_files.py:211 manage_files.py:213
 msgid "Select table display"
-msgstr ""
+msgstr "Välj tabellvisning"
 
-#: manage_files.py:218 manage_files.py:557
+#: manage_files.py:218 manage_files.py:557 manage_files.py:220
+#: manage_files.py:566
 msgid "Load table display settings"
-msgstr ""
+msgstr "Inställningar för visning av lastbord"
 
-#: manage_files.py:232
+#: manage_files.py:232 manage_files.py:234
 msgid "Hidden column: "
-msgstr ""
+msgstr "Dold kolumn:"
 
-#: manage_files.py:244
+#: manage_files.py:244 manage_files.py:246
 msgid "Row settings:"
-msgstr ""
+msgstr "Radinställningar:"
 
-#: manage_files.py:258
+#: manage_files.py:258 manage_files.py:260
 msgid "Table column not present"
-msgstr ""
+msgstr "Tabellkolumn inte närvarande"
 
 #: manage_files.py:1531 manage_files.py:1544 manage_files.py:1559
-#: manage_files.py:1573 manage_files.py:1587
+#: manage_files.py:1573 manage_files.py:1587 manage_files.py:1571
+#: manage_files.py:1584 manage_files.py:1599 manage_files.py:1613
+#: manage_files.py:1627
 msgid "Cannot copy file: "
-msgstr ""
+msgstr "Det går inte att kopiera filen:"
 
 #: manage_files.py:1531 manage_files.py:1545 manage_files.py:1560
-#: manage_files.py:1574 manage_files.py:1588
+#: manage_files.py:1574 manage_files.py:1588 manage_files.py:1571
+#: manage_files.py:1585 manage_files.py:1600 manage_files.py:1614
+#: manage_files.py:1628
 msgid ""
 "Is the file open?\n"
 "Is there a permission restriction?"
 msgstr ""
+"Är filen öppen?\n"
+"Finns det en behörighetsbegränsning?"
 
 #: manage_files.py:1532 manage_files.py:1546 manage_files.py:1561
-#: manage_files.py:1575 manage_files.py:1589
+#: manage_files.py:1575 manage_files.py:1589 manage_files.py:1572
+#: manage_files.py:1586 manage_files.py:1601 manage_files.py:1615
+#: manage_files.py:1629
 msgid "Copy file permission error"
-msgstr ""
+msgstr "Fel i behörigheten för kopieringsfil"
 
 #: report_attributes.py:122
 msgid "Save Filter"
-msgstr ""
+msgstr "Spara filter"
 
 #: report_attributes.py:122
 msgid "No attribute filers selected"
-msgstr ""
+msgstr "Inga attributfilter valda"
 
 #: report_attributes.py:125
 msgid "Save filter"
-msgstr ""
+msgstr "Spara filter"
 
 #: report_attributes.py:125
 msgid "Save filter settings"
-msgstr ""
+msgstr "Spara filterinställningar"
 
 #: report_attributes.py:133
 msgid "Filter name exists"
-msgstr ""
+msgstr "Filtrets namn finns"
 
 #: report_attributes.py:134
 msgid "This filter name is already in use: "
-msgstr ""
+msgstr "Detta filternamn används redan:"
 
 #: report_attributes.py:148
 msgid "No saved filters"
-msgstr ""
+msgstr "Inga sparade filter"
 
 #: report_attributes.py:154
 msgid "Select filter"
-msgstr ""
+msgstr "Välj filter"
 
 #: report_attributes.py:200
 msgid "Not found"
-msgstr ""
+msgstr "Hittades inte"
 
 #: report_attributes.py:202
 msgid "Attribute not found"
-msgstr ""
+msgstr "Attribut hittades inte"
 
 #: report_codes.py:2279 report_codes.py:2291
 msgid "Apply additional code"
-msgstr ""
+msgstr "Tillämpa tilläggskod"
 
 #: report_code_summary.py:348
 msgid ""
 "Word calculations: Words use alphabet characters and include the apostrophe. "
 "All other characters are word separators. Excludes English stopwords"
 msgstr ""
+"Beräkningar av ord: Ord består av alfabetets tecken och apostrofen ingår. "
+"Alla andra tecken är ordseparatorer. Exkluderar engelska stoppord"
 
 #: report_codes_by_segments.py:231 report_cooccurrence.py:182
 #: report_relations.py:211 reports.py:170
 msgid "Files selected by attributes"
-msgstr ""
+msgstr "Filer valda efter attribut"
 
 #: report_cooccurrence.py:113 report_cooccurrence.py:124
 #: report_relations.py:143 report_relations.py:153
 msgid "Select files by attributes"
-msgstr ""
+msgstr "Välj filer efter attribut"
 
 #: report_cooccurrence.py:226
 msgid "Select categories"
-msgstr ""
+msgstr "Välj kategorier"
 
 #: report_cooccurrence.py:233
 msgid "All categories selected"
-msgstr ""
+msgstr "Alla kategorier valda"
 
 #: report_cooccurrence.py:245
 msgid "Categories selected"
-msgstr ""
+msgstr "Valda kategorier"
 
 #: report_file_summary.py:360
 msgid "PDF IMAGE DETAILS"
-msgstr ""
+msgstr "PDF-BILDDETALJER"
 
 #: report_file_summary.py:362
 msgid "Pages"
-msgstr ""
+msgstr "Sidor"
 
 #: report_file_summary.py:402 report_file_summary.py:462
 msgid "CODE COUNT:"
-msgstr ""
+msgstr "KOD COUNT:"
 
 #: reports.py:102
 msgid "File Attributes"
-msgstr ""
+msgstr "Filens attribut"
 
 #: settings.py:421
 msgid "Please select an AI provider or disable the AI altogether."
-msgstr ""
+msgstr "Välj en AI-leverantör eller avaktivera AI helt och hållet."
 
 #: settings.py:422
 msgid "AI provider"
-msgstr ""
+msgstr "AI leverantör"
 
 #: settings.py:431
 msgid "Please select a \"large\" and a \"fast\" AI model."
-msgstr ""
+msgstr "Vänligen välj en \"stor\" och en \"snabb\" AI-modell."
 
 #: view_image.py:940
 msgid "Overlaps exactly with"
-msgstr ""
+msgstr "Överlappar exakt med"
 
 #: __main__.py:658
 msgid ""
@@ -7063,23 +7141,42 @@ msgid ""
 "Character decoding error.\n"
 "Using QualCoder default settings."
 msgstr ""
+"Det går inte att ladda config.ini.\n"
+"Fel i teckenavkodningen.\n"
+"Använder QualCoders standardinställningar."
 
 #: __main__.py:660
 msgid "Cannot load config.ini file"
-msgstr ""
+msgstr "Det går inte att ladda filen config.ini"
 
 #: view_av.py:1644
 msgid "Memo for Segment"
-msgstr ""
+msgstr "Memo för segment"
 
 #: view_av.py:1767
 msgid "Screenshot saved"
-msgstr ""
+msgstr "Skärmdump sparad"
 
-#: view_av.py:1786
+#: view_av.py:1786 view_av.py:1787
 msgid "Screenshot imported"
-msgstr ""
+msgstr "Skärmdump importerad"
 
-#: view_av.py:3697
+#: view_av.py:3697 view_av.py:3699
 msgid "Export segment"
-msgstr ""
+msgstr "Export segment"
+
+#: manage_files.py:414
+msgid "Pdf pages to images"
+msgstr "Pdf-sidor till bilder"
+
+#: manage_files.py:623
+msgid "Image loaded from pdf: "
+msgstr "Bild inläst från pdf:"
+
+#: view_av.py:1768
+msgid "Screenshot saved: "
+msgstr "Skärmdump sparad:"
+
+#: view_av.py:1788
+msgid "Screenshot imports: "
+msgstr "Import av skärmdumpar:"
