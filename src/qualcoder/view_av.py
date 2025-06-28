@@ -1765,6 +1765,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         filename = os.path.join(self.app.settings['directory'], image_name)
         self.mediaplayer.video_take_snapshot(0, filename, 1280, 720)
         Message(self.app, _("Screenshot saved"), filename).exec()
+        self.parent_textEdit.append(_("Screenshot saved: ") + filename)
 
     def import_screenshot_into_project(self):
 
@@ -1784,6 +1785,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                         entry['fulltext']))
         self.app.conn.commit()
         Message(self.app, _("Screenshot imported"), file_path).exec()
+        self.parent_textEdit.append(_("Screenshot imports: ") + image_name)
 
     def eventFilter(self, object_, event):
         """ Using this event filter to identify treeWidgetItem drop events.
