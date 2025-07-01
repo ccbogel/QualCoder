@@ -31,7 +31,6 @@ import os
 from PIL import Image
 import qtawesome as qta  # See https://pictogrammers.com/library/mdi/
 import re
-from ris import Ris
 from shutil import copyfile
 
 from PyQt6 import QtGui, QtWidgets, QtCore
@@ -44,6 +43,7 @@ from .GUI.ui_dialog_report_codings import Ui_Dialog_reportCodings
 from .helpers import Message, msecs_to_hours_mins_secs, DialogCodeInImage, DialogCodeInAV, DialogCodeInText, \
     ExportDirectoryPathDialog
 from .report_attributes import DialogSelectAttributeParameters
+from .ris import Ris
 from .select_items import DialogSelectItems
 
 # If VLC not installed, it will not crash
