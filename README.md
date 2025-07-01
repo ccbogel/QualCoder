@@ -22,6 +22,8 @@ Optional: ffmpeg installed for waveform image see here to install ffmpeg on Wind
 
 On the first start of QualCoder, you may want to [setup the AI enhanced features](#setup-of-the-ai-features) as described below.
 
+&#x1F534; **Please note that there is currently an issue for first-time users of the AI features in QualCoder. A workaround is described here: https://github.com/ccbogel/QualCoder/issues/1072#issuecomment-3022819222**
+
 ### Windows
 
 You have two options, see Releases link on the right-hand side of this page:
