@@ -92,13 +92,20 @@ If you are not using a virtual environment, as long as you are in the same drive
 
 If you are using a virtual environment:
 
-`cd` to the Qualcoder-master (or Qualcoder release folder). Note: If using verion 3.7 (least code or newer), also mov eto a n inner folder: `cd src`
+`cd` to the Qualcoder-master (or Qualcoder release folder) for versions up to 3.6:
 
-Then type:
+```
+env\Scripts\activate 
+py -m qualcoder
+```
 
-`env\Scripts\activate `
+`cd` to the Qualcoder-master (or Qualcoder release folder) for versions 3.7and up:. 
 
-`py -m qualcoder`
+```
+env\Scripts\activate
+cd src
+py -m qualcoder
+```
 
 ## MacOS
 
