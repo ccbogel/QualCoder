@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-03-27 07:52+1100\n"
-"PO-Revision-Date: 2025-04-05 16:08+1100\n"
+"PO-Revision-Date: 2025-04-10 22:23+1000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: ja\n"
@@ -883,12 +883,16 @@ msgid ""
 "Stage 1:\n"
 "Searching data related to \""
 msgstr ""
+"第1段階\n"
+"\"に関連するデータの検索"
 
 #: ai_llm.py:564
 msgid ""
 "Stage 2:\n"
 "Inspecting the data more closely..."
 msgstr ""
+"第2段階\n"
+"データをより詳細に検査する..."
 
 #: ai_prompts.py:826
 msgid "Delete Prompt"
@@ -918,15 +922,15 @@ msgstr ""
 
 #: ai_search_dialog.py:79
 msgid "1) What do you want to search for?"
-msgstr ""
+msgstr "1) 何を検索したいのか？"
 
 #: ai_search_dialog.py:85
 msgid "1) Which code do you want to analyze?"
-msgstr ""
+msgstr "1) どのコードを分析したいのか？"
 
 #: ai_search_dialog.py:92
 msgid "1) Which topic do you want to analyze?"
-msgstr ""
+msgstr "1) どのトピックを分析したいですか？"
 
 #: ai_search_dialog.py:121
 msgid "The last used prompt"
@@ -1051,10 +1055,15 @@ msgid ""
 "This will download about 2.5 GB of data. Do you \n"
 "want to continue?"
 msgstr ""
+"人工知能統合を初めて使用するため、QualCoderはいくつかの追加コンポーネントをダ"
+"ウンロードしてインストールする必要があります。\n"
+"\n"
+"これにより、約2.5GBのデータがダウンロードされます。続行しますか？\n"
+"続けますか？"
 
 #: ai_vectorstore.py:163 ai_vectorstore.py:174
 msgid "Download AI components"
-msgstr ""
+msgstr "人工知能コンポーネントのダウンロード"
 
 #: ai_vectorstore.py:193
 msgid "Downloading "
@@ -1064,11 +1073,11 @@ msgstr "ダウンロード"
 msgid ""
 "AI: Could not download all the necessary components, the AI integration will "
 "be disabled."
-msgstr ""
+msgstr "人工知能： 必要なコンポーネントをすべてダウンロードできませんでした。"
 
 #: ai_vectorstore.py:266
 msgid "AI: Success, components downloaded and installed."
-msgstr ""
+msgstr "人工知能： 成功、コンポーネントのダウンロードとインストール。"
 
 #: ai_vectorstore.py:304 ai_vectorstore.py:382
 msgid ""
@@ -1078,40 +1087,47 @@ msgid ""
 "all your empirical documents again to rebuild the local memory. This may "
 "take a while. Sorry for the inconvenience."
 msgstr ""
+"すでにこのプロジェクトで人工知能の機能を使ったことがあるようですね。その一方"
+"で、より堅牢にするために、ローカルの人工知能メモリの内部実装を変更する必要が"
+"ありました。その結果、人工知能はローカル・メモリーを再構築するために、あなた"
+"の経験的な文書をすべて再度読み込まなければならなくなりました。これには時間が"
+"かかるかもしれません。ご迷惑をおかけして申し訳ありません。"
 
 #: ai_vectorstore.py:369
 msgid "AI: Finished loading (no project open)."
-msgstr ""
+msgstr "人工知能： 読み込みを終了しました。"
 
 #: ai_vectorstore.py:387 ai_vectorstore.py:399
 msgid "AI memory"
-msgstr ""
+msgstr "人工知能メモリー"
 
 #: ai_vectorstore.py:408
 msgid "AI: Checked all documents, memory is up to date."
-msgstr ""
+msgstr "人工知能： すべての書類をチェックし、メモリは最新。"
 
 #: ai_vectorstore.py:431
 msgid "Vectorstore: Document import failed, faiss_db not present."
-msgstr ""
+msgstr "ベクターストア：ドキュメントのインポートに失敗しました。"
 
 #: ai_vectorstore.py:463
 msgid "AI: Adding document to internal memory: "
-msgstr ""
+msgstr "人工知能： 内部メモリに文書を追加する "
 
 #: ai_vectorstore.py:533
 msgid "AI: No documents, AI is ready."
-msgstr ""
+msgstr "人工知能： 人工知能の準備はできている"
 
 #: ai_vectorstore.py:537
 msgid "AI: Checking for new documents"
-msgstr ""
+msgstr "人工知能：新しい文書のチェック"
 
 #: ai_vectorstore.py:550
 msgid ""
 "AI: Rebuilding memory. The local AI will read through all your documents, "
 "please be patient."
 msgstr ""
+"人工知能I：メモリの再構築。すべての文書に目を通しますので、しばらくお待ちくだ"
+"さい。"
 
 #: attributes.py:146
 msgid "Attribute added: "
@@ -1198,25 +1214,25 @@ msgstr "すべて選択"
 
 #: case_file_manager.py:448
 msgid "Mark"
-msgstr ""
+msgstr "マーク"
 
 #: case_file_manager.py:450 cases.py:1104 edit_textfile.py:583
 #: report_sql.py:415
 msgid "Copy"
-msgstr ""
+msgstr "コピー"
 
 #: case_file_manager.py:453 code_pdf.py:2891 report_codes.py:2238
 #: view_av.py:2504 view_image.py:1255
 msgid "Unmark"
-msgstr ""
+msgstr "マークを解除する"
 
 #: case_file_manager.py:549
 msgid "Already Linked"
-msgstr ""
+msgstr "すでにリンク済み"
 
 #: case_file_manager.py:550
 msgid "This segment has already been linked to this case"
-msgstr ""
+msgstr "このセグメントはすでに本件とリンクしている"
 
 #: case_file_manager.py:618 cases.py:671 code_text.py:1145 code_text.py:3396
 #: code_text.py:3401 code_text.py:3554 code_text.py:3660 code_text.py:3673
@@ -1228,7 +1244,7 @@ msgstr ""
 #: report_attributes.py:543 report_codes.py:1115 view_av.py:2855
 #: view_av.py:2859 view_av.py:3005 view_graph.py:812
 msgid "Warning"
-msgstr ""
+msgstr "警告"
 
 #: case_file_manager.py:618 code_text.py:3673
 msgid "Cannot have blank text marks"
@@ -1260,7 +1276,7 @@ msgstr ""
 
 #: case_file_manager.py:643
 msgid "Auto assign. Could not find an end mark: "
-msgstr ""
+msgstr "自動割り当て エンドマークが見つからない： "
 
 #: case_file_manager.py:661
 msgid ""
@@ -1735,7 +1751,7 @@ msgstr "によって作成されたこのファイル内のすべてのコーデ
 
 #: code_text.py:798
 msgid "All codes by "
-msgstr ""
+msgstr "すべてのコード "
 
 #: code_text.py:798
 msgid " deleted from "
@@ -1771,11 +1787,11 @@ msgstr "メモコード付きテキスト（M）"
 
 #: code_text.py:1026 view_av.py:2506
 msgid "Change start position (SHIFT LEFT/ALT RIGHT)"
-msgstr ""
+msgstr "スタート位置の変更（SHIFT LEFT/ALT RIGHT）"
 
 #: code_text.py:1027 view_av.py:2507
 msgid "Change end position (SHIFT RIGHT/ALT LEFT)"
-msgstr ""
+msgstr "エンドポジションの変更（SHIFT RIGHT/ALT LEFT）"
 
 #: code_text.py:1030 code_pdf.py:848 view_av.py:2511
 msgid "Add important mark (I)"
@@ -1850,7 +1866,7 @@ msgstr "ファイル用メモ： "
 
 #: code_text.py:1393 code_text.py:1394 code_pdf.py:2428
 msgid "Memo:"
-msgstr ""
+msgstr "メモ："
 
 #: code_text.py:1418 code_pdf.py:1119 code_pdf.py:2910 view_av.py:2724
 msgid "Select code to memo"
@@ -1858,7 +1874,7 @@ msgstr "メモするコードを選択"
 
 #: code_text.py:1427 code_pdf.py:1128 view_av.py:2733
 msgid "Memo for Coded text: "
-msgstr ""
+msgstr "コード付きテキストのメモ： "
 
 #: code_text.py:1465
 msgid "Shift codings after clicked position"
@@ -1875,6 +1891,12 @@ msgid ""
 "500)\n"
 "Clicked character position: "
 msgstr ""
+"テキスト内の位置をクリックした後、すべてのコードのコード位置をシフトする。\n"
+"このアクションを実行する前に、プロジェクトをバックアップしてください。\n"
+"この機能は、コード化されたテキストを編集していて、コードの位置がずれている場"
+"合に役立ちます。\n"
+"正の数（右に移動）または負の数（左に移動）（-500～500）\n"
+"クリックした文字の位置 "
 
 #: code_text.py:1520 code_pdf.py:1174 view_av.py:1334 view_image.py:883
 msgid "Add new code to category"
@@ -1948,7 +1970,7 @@ msgstr "空白またはカテゴリーを選択"
 #: view_graph.py:1295 view_graph.py:1321 view_graph.py:1340 view_graph.py:1361
 #: view_image.py:1804
 msgid "Code: "
-msgstr "コード"
+msgstr "コード: "
 
 #: code_text.py:1692 code_text.py:1715 view_graph.py:373
 msgid "Text: "
@@ -1981,7 +2003,7 @@ msgstr "コードを表示する"
 
 #: code_text.py:1744 code_pdf.py:1355
 msgid "Show codes containing the text. (Blank for all)"
-msgstr ""
+msgstr "テキストを含むコードを表示する。(すべて空白)"
 
 #: code_text.py:1758 code_pdf.py:1369 view_av.py:1466 view_image.py:1017
 msgid "Select code colors"
@@ -1993,7 +2015,7 @@ msgstr "テキスト位置"
 
 #: code_text.py:1867 code_pdf.py:1523
 msgid "Character position: "
-msgstr ""
+msgstr "キャラクターのポジション "
 
 #: code_text.py:2075 code_text.py:2132
 msgid "Coded text file exported to: "
@@ -2147,23 +2169,23 @@ msgstr "属性でファイルを表示する"
 
 #: code_text.py:2922 code_pdf.py:2274 view_av.py:623 view_image.py:549
 msgid "Show case files"
-msgstr ""
+msgstr "ケースファイルの表示"
 
 #: code_text.py:2924
 msgid " next  characters"
-msgstr ""
+msgstr " 次の文字"
 
 #: code_text.py:2927
 msgid " previous  characters"
-msgstr ""
+msgstr " 前の登場人物"
 
 #: code_text.py:2928
 msgid "Go to bookmark"
-msgstr ""
+msgstr "ブックマークへ"
 
 #: code_text.py:2975 code_pdf.py:2315 view_av.py:671 view_image.py:572
 msgid "Show all files"
-msgstr ""
+msgstr "すべてのファイルを表示する"
 
 #: code_text.py:2976 code_pdf.py:2316 view_av.py:672 view_image.py:573
 msgid "Select case"
@@ -2171,11 +2193,11 @@ msgstr "ケースを選択"
 
 #: code_text.py:3003 code_pdf.py:2341 view_av.py:699 view_image.py:600
 msgid "Show files containing the text. (Blank for all)"
-msgstr ""
+msgstr "テキストを含むファイルを表示します。(すべて空白)"
 
 #: code_text.py:3050 code_text.py:3106
 msgid "From: "
-msgstr ""
+msgstr "からだ： "
 
 #: code_text.py:3158 code_text.py:4956
 msgid "Entire text file will be loaded"
@@ -2183,16 +2205,16 @@ msgstr "テキストファイル全体が読み込まれる"
 
 #: code_text.py:3245 code_pdf.py:2475
 msgid "Code text: "
-msgstr ""
+msgstr "コード・テキスト "
 
 #: code_text.py:3401 code_text.py:3660 code_text.py:3795 code_text.py:3897
 #: code_pdf.py:3157 view_av.py:2859
 msgid "No code was selected"
-msgstr ""
+msgstr "コードが選択されていない"
 
 #: code_text.py:3439 code_text.py:4827
 msgid "AI interpretation: "
-msgstr ""
+msgstr "人工知能の解釈： "
 
 #: code_text.py:3440
 msgid ""
@@ -2200,18 +2222,22 @@ msgid ""
 "\n"
 "AI search prompt: "
 msgstr ""
+"\n"
+"人工知能の検索プロンプト： "
 
 #: code_text.py:3441
 msgid ""
 "\n"
 "AI model: "
 msgstr ""
+"\n"
+"人工知能モデル： "
 
 #: code_text.py:3444
 msgid ""
 "Do you want to store the AI interpretation in a memo together with the "
 "coding?<br/><br/>"
-msgstr ""
+msgstr "人工知能の解釈をコーディングと一緒にメモに保存しますか？"
 
 #: code_text.py:3526 code_pdf.py:2896 code_pdf.py:3287 view_av.py:2770
 #: view_av.py:2975
@@ -2220,19 +2246,19 @@ msgstr "マークを解除するコードを選択"
 
 #: code_text.py:3607 code_pdf.py:3368 view_av.py:3043
 msgid "Annotation added at position: "
-msgstr ""
+msgstr "位置に注釈が追加された： "
 
 #: code_text.py:3608 code_text.py:3637 view_av.py:3044 view_av.py:3071
 msgid " for: "
-msgstr ""
+msgstr " のためだ： "
 
 #: code_text.py:3636 code_pdf.py:3396 view_av.py:3070
 msgid "Annotation removed from position "
-msgstr ""
+msgstr "ポジションから削除された注釈 "
 
 #: code_text.py:3676 code_text.py:3923
 msgid "Select files to code"
-msgstr ""
+msgstr "コーディングするファイルを選択する"
 
 #: code_text.py:3684
 msgid "Code text using start and end marks: "
@@ -2247,155 +2273,171 @@ msgid ""
 "\n"
 "Code: "
 msgstr ""
+"\n"
+"コード:"
 
 #: code_text.py:3737
 msgid ""
 "\n"
 "With start mark: "
 msgstr ""
+"\n"
+"スタートマーク付き： "
 
 #: code_text.py:3737
 msgid ""
 "\n"
 "End mark: "
 msgstr ""
+"\n"
+"エンドマーク： "
 
 #: code_text.py:3744
 msgid " new coded sections found."
-msgstr ""
+msgstr " 新しいコード化されたセクションが見つかった。"
 
 #: code_text.py:3746
 msgid "previously coded."
-msgstr ""
+msgstr "事前にコード化されている。"
 
 #: code_text.py:3758
 msgid "Select auto-codings to undo"
-msgstr ""
+msgstr "元に戻す自動コーディングを選択する"
 
 #: code_text.py:3775
 msgid "Undo autocoding: "
-msgstr ""
+msgstr "オートコーディングを取り消す："
 
 #: code_text.py:3801 code_text.py:3814
 msgid "Code sentence"
-msgstr ""
+msgstr "コード文"
 
 #: code_text.py:3804
 msgid "Auto code sentence using this text fragment:"
-msgstr ""
+msgstr "このテキスト・フラグメントを使用した自動コード文："
 
 #: code_text.py:3818
 msgid ""
 "Define sentence ending. Default is period space.\n"
 "Use \\n for line ending:"
 msgstr ""
+"文末を定義する。デフォルトはピリオド・スペース。\n"
+"行末には \"n \"を使用します："
 
 #: code_text.py:3863 code_text.py:3971
 msgid "Autocode insert error "
-msgstr ""
+msgstr "オートコード挿入エラー"
 
 #: code_text.py:3866
 msgid " added codes"
-msgstr ""
+msgstr "追加コード"
 
 #: code_text.py:3874
 msgid "Sentence coding: "
-msgstr ""
+msgstr "文のコーディング："
 
 #: code_text.py:3875 code_text.py:3983
 msgid ""
 "\n"
 "With: "
 msgstr ""
+"\n"
+"と："
 
 #: code_text.py:3875 code_text.py:3882
 msgid ""
 "\n"
 "Using line ending: "
 msgstr ""
+"\n"
+"行末を使う： "
 
 #: code_text.py:3878
 msgid "Automatic code sentence in files:"
-msgstr ""
+msgstr "ファイル内の自動コードセンテンス："
 
 #: code_text.py:3880
 msgid ""
 "\n"
 "With text fragment: "
 msgstr ""
+"\n"
+"テキスト断片付き： "
 
 #: code_text.py:3903
 msgid "Automatic coding"
-msgstr ""
+msgstr "自動コーディング"
 
 #: code_text.py:3906
 msgid "Use | to code multiple texts"
-msgstr ""
+msgstr "複数のテキストをコーディングする"
 
 #: code_text.py:3907
 msgid "Auto code files with the current code for this text:"
-msgstr ""
+msgstr "このテキストの現在のコードで自動コードファイル："
 
 #: code_text.py:3974
 msgid "Automatic coding in files: "
-msgstr ""
+msgstr "ファイルの自動コーディング： "
 
 #: code_text.py:3975
 msgid ". with text: "
-msgstr ""
+msgstr "テキスト付き： "
 
 #: code_text.py:3982
 msgid "Text coding: "
-msgstr ""
+msgstr "テキストコーディング： "
 
 #: code_text.py:4025
 msgid "Text reverted to prior to edit"
-msgstr ""
+msgstr "テキストを編集前に戻す"
 
 #: code_text.py:4026
 msgid "Undo last edited text"
-msgstr ""
+msgstr "最後に編集したテキストを元に戻す"
 
 #: code_text.py:4646
 msgid "Please finish editing the text before starting an AI search."
-msgstr ""
+msgstr "人工知能の検索を開始する前に、テキストの編集を終了してください。"
 
 #: code_text.py:4647 code_text.py:4651 code_text.py:4655 code_text.py:4659
 #: code_text.py:4718 code_text.py:4759 code_text.py:4800 code_text.py:4809
 #: code_text.py:4909 code_text.py:4912
 msgid "AI Search"
-msgstr ""
+msgstr "人工知能検索"
 
 #: code_text.py:4654
 msgid ""
 "The AI is already performing a search. Please stop it before starting a new "
 "one."
 msgstr ""
+"人工知能はすでに検索を実行しています。新しい検索を開始する前に停止してくださ"
+"い。"
 
 #: code_text.py:4658
 msgid "The AI is busy, please wait a moment and retry."
-msgstr ""
+msgstr "人工知能がビジー状態です。しばらく待ってから再試行してください。"
 
 #: code_text.py:4695
 msgid "Searching for related data, please wait..."
-msgstr ""
+msgstr "関連データを検索中です、しばらくお待ちください..."
 
 #: code_text.py:4717
 msgid "AI: No related data found for \""
-msgstr ""
+msgstr "人工知能 「に関連するデータは見つかりませんでした。"
 
 #: code_text.py:4757
 msgid "AI: No new data found for \""
-msgstr ""
+msgstr "人工知能 「」に関する新しいデータは見つからなかった。"
 
 #: code_text.py:4758
 msgid "\" beside what has already been coded with this code."
-msgstr ""
+msgstr " このコードですでにコード化されたものを横に置く。"
 
 #: code_text.py:4763
 msgid ""
 "Potentially related data found, inspecting it closer. Please be patient..."
-msgstr ""
+msgstr "関連する可能性のあるデータが見つかりました。しばらくお待ちください。"
 
 #: code_text.py:4797
 msgid "The closer inspection of the first "
@@ -2423,19 +2465,19 @@ msgstr "引用 "
 
 #: code_text.py:4863
 msgid ">> Searching (click here to cancel)"
-msgstr ""
+msgstr ">> 検索 (キャンセルするにはここをクリック)"
 
 #: code_text.py:4865
 msgid "Click here to stop the search"
-msgstr ""
+msgstr "検索を停止するにはここをクリック"
 
 #: code_text.py:4870
 msgid ">> Find more..."
-msgstr ""
+msgstr ">> もっと見る"
 
 #: code_text.py:4871
 msgid "Click here to analyze more data"
-msgstr ""
+msgstr "より詳細なデータ分析はこちら"
 
 #: code_text.py:4896
 msgid "Do you want to stop the search?"
@@ -2446,10 +2488,11 @@ msgid ""
 "There are no more pieces of data to analyze for this search. Please start a "
 "new search."
 msgstr ""
+"この検索で分析できるデータはもうありません。新しい検索を開始してください。"
 
 #: code_text.py:4911
 msgid "The AI is busy. Please wait a moment and retry."
-msgstr ""
+msgstr "人工知能がビジー状態です。しばらく待ってから再試行してください。"
 
 #: code_text.py:5088 code_pdf.py:3517 view_av.py:3268
 msgid "Press O to cycle overlapping codes"
@@ -2457,7 +2500,7 @@ msgstr "Oを押して重複コードを循環させる"
 
 #: code_text.py:5138 code_pdf.py:3563 view_av.py:3300
 msgid "ANNOTATED:"
-msgstr ""
+msgstr "注釈あり："
 
 #: code_pdf.py:180
 msgid "View original file"
@@ -2465,7 +2508,7 @@ msgstr "元のファイルを見る"
 
 #: code_pdf.py:252
 msgid "QualCoder roughly displays PDFs."
-msgstr ""
+msgstr "QualCoderは大まかにPDFを表示します。"
 
 #: code_pdf.py:253
 msgid ""
@@ -2474,43 +2517,52 @@ msgstr "一部の画像は表示されず、画像マスクや回転は機能し
 
 #: code_pdf.py:254
 msgid "Original fonts or bold or italic are not applied."
-msgstr ""
+msgstr "オリジナルのフォントや太字、斜体は適用されません。"
 
 #: code_pdf.py:255
 msgid ""
 "There is not enough information in pdfminer to accurately display polygon "
 "curves."
-msgstr ""
+msgstr "ポリゴン曲線を正確に表示するには、pdfminerには十分な情報がありません。"
 
 #: code_pdf.py:256
 msgid "Plain text must match exactly for Code PDF to work correctly."
 msgstr ""
+"Code PDF が正しく動作するためには、プレーンテキストが正確に一致しなければなり"
+"ません。"
 
 #: code_pdf.py:257
 msgid ""
 "A warning will display if the parsed PDF text does not match the database "
 "stored plain text."
 msgstr ""
+"解析 さ れた PDF テ キ ス ト がデー タ ベース に格納 さ れてい る プ レーン "
+"テ キ ス ト と 一致 し ない と き は警告が表示 さ れます。"
 
 #: code_pdf.py:258
 msgid ""
 "Plain text of PDFs loaded in to QualCoder before version 3.4 will not have "
 "the plain text positions correct for PDF display."
 msgstr ""
+"バージョン3.4以前のQualCoderに読み込まれたPDFのプレーンテキストは、PDF表示の"
+"ためにプレーンテキストの位置が正しくありません。"
 
 #: code_pdf.py:259
 msgid "This means coding stripes will show in incorrect positions."
 msgstr ""
+"これは、コーディングストライプが正しくない位置に表示されることを意味する。"
 
 #: code_pdf.py:260
 msgid ""
 "Similarly, if the PDF plain text has beeen edited in any way, this will "
 "affect coding stripes display."
 msgstr ""
+"同様に、PDFプレーンテキストが何らかの方法で編集されている場合、これはコーディ"
+"ングストライプ表示に影響を与えます。"
 
 #: code_pdf.py:762
 msgid "Press Enter to search"
-msgstr ""
+msgstr "Enterキーを押して検索"
 
 #: code_pdf.py:794
 msgid "PDF objects"
@@ -2518,37 +2570,39 @@ msgstr "PDFオブジェクト"
 
 #: code_pdf.py:846
 msgid "Change code position key presses"
-msgstr ""
+msgstr "コードポジション変更キー押下"
 
 #: code_pdf.py:1151
 msgid ""
 "Change start position (extend SHIFT LEFT/ shrink ALT RIGHT)\n"
 "Change end position (extend SHIFT RIGHT/ shrink ALT LEFT)"
 msgstr ""
+"開始位置の変更（SHIFT LEFTを伸ばす/ALT RIGHTを縮める）\n"
+"終了位置の変更（SHIFT RIGHTを伸ばす／ALT LEFTを縮める）"
 
 #: code_pdf.py:1152
 msgid "Use key presses"
-msgstr ""
+msgstr "キーを押す"
 
 #: code_pdf.py:1409
 msgid "CODE:"
-msgstr ""
+msgstr "コード:"
 
 #: code_pdf.py:1409 report_codes.py:2017 report_codes.py:2710
 msgid "MEMO:"
-msgstr ""
+msgstr "メモ："
 
 #: code_pdf.py:1412
 msgid "EXAMPLES:"
-msgstr ""
+msgstr "例："
 
 #: code_pdf.py:1503 view_image.py:1247
 msgid "Select code"
-msgstr ""
+msgstr "コードを選択"
 
 #: code_pdf.py:1657
 msgid "PDF Image exported"
-msgstr ""
+msgstr "書き出されたPDF画像"
 
 #: code_pdf.py:2171
 msgid "Code renamed:"
@@ -2560,7 +2614,7 @@ msgstr "カテゴリー名を変更："
 
 #: code_pdf.py:2268
 msgid "View original text file"
-msgstr ""
+msgstr "元のテキストファイルを見る"
 
 #: code_pdf.py:2481
 msgid "Pages: "
@@ -2568,13 +2622,15 @@ msgstr "ページ： "
 
 #: code_pdf.py:2529
 msgid "Parsing the PDF text."
-msgstr ""
+msgstr "PDFテキストを解析する。"
 
 #: code_pdf.py:2530
 msgid ""
 "Texts do not match. PDF imported before 3.4 QualCodr version or the PDF text "
 "has been edited."
 msgstr ""
+"テキストが一致しません。QualCodrバージョン3.4より前に取り込まれたPDF、または"
+"PDFテキストが編集されています。"
 
 #: code_pdf.py:2531
 msgid ""
@@ -2582,18 +2638,21 @@ msgid ""
 "View PDF but cannot code. Code positions will appear wrongly.\n"
 "Character difference: "
 msgstr ""
+"\n"
+"PDFを表示してもコードが書けない。コード位置が正しく表示されません。\n"
+"文字の違い： "
 
 #: code_pdf.py:2738
 msgid "TEXT START CHARACTER POSITION: "
-msgstr ""
+msgstr "テキスト開始文字の位置： "
 
 #: code_pdf.py:2739
 msgid "TEXT END CHARACTER POSITION: "
-msgstr ""
+msgstr "テキスト終了文字の位置： "
 
 #: code_pdf.py:2740
 msgid "NUMBER OF CHARACTERS: "
-msgstr ""
+msgstr "文字数： "
 
 #: code_pdf.py:2837
 msgid "Important"
@@ -2601,7 +2660,7 @@ msgstr "重要"
 
 #: code_pdf.py:2883
 msgid "Code memo"
-msgstr ""
+msgstr "コードメモ"
 
 #: code_pdf.py:2888
 msgid "Flag important"
@@ -2622,18 +2681,20 @@ msgstr "重要なフラグを削除するコードを選択"
 #: code_pdf.py:3148
 msgid "PDF loaded text does not match Imported PDF text length."
 msgstr ""
+"PDF に読み込まれたテキストが、取り込まれた PDF のテキストの長さと一致しませ"
+"ん。"
 
 #: code_pdf.py:3149
 msgid "Mark using the right hand side text pane."
-msgstr ""
+msgstr "右側のテキストペインを使ってマークする。"
 
 #: code_pdf.py:3150
 msgid "Cannot mark"
-msgstr ""
+msgstr "マークできない"
 
 #: code_pdf.py:3369 code_pdf.py:3397
 msgid "for:"
-msgstr ""
+msgstr "のためだ："
 
 #: codebook.py:189 codebook.py:235 refi.py:2039 refi.py:2040
 msgid "Codebook exported"
@@ -2649,11 +2710,11 @@ msgstr "ファイルを保存するディレクトリを選択"
 
 #: codebook.py:203
 msgid "Codebook for"
-msgstr ""
+msgstr "コードブック"
 
 #: codebook.py:218
 msgid "Category:"
-msgstr ""
+msgstr "カテゴリー："
 
 #: color_selector.py:219
 msgid "Current colour"
@@ -2672,15 +2733,19 @@ msgid ""
 "Avoid selecting text combinations of unmarked text sections and coded/"
 "annotated/case-assigned sections."
 msgstr ""
+"マークされていないテキスト部分と、コード化/注釈/ケース指定された部分のテキス"
+"トの組み合わせを選択することは避けてください。"
 
 #: edit_textfile.py:77
 msgid "Positions may not correctly adjust."
-msgstr ""
+msgstr "ポジションが正しく調整されないことがある。"
 
 #: edit_textfile.py:78
 msgid ""
 "Do not code this text until you reload Coding - Code Text from the menu bar."
 msgstr ""
+"メニューバーから「コーディング - コードテキスト」を再読み込みするまで、このテ"
+"キストをコーディングしないでください。"
 
 #: helpers.py:235
 msgid ""
@@ -2688,6 +2753,9 @@ msgid ""
 "Alt+Left Arrow, Alt+Right Arrow\n"
 "Shift+LeftArrow, Shift+Right Arrow"
 msgstr ""
+"リサイズコーディング\n"
+"Alt+左矢印、Alt+右矢印\n"
+"Shift+左矢印、Shift+右矢印"
 
 #: helpers.py:427 view_av.py:865 view_av.py:3549 view_av.py:3975
 msgid "Media not found"
@@ -2710,10 +2778,14 @@ msgid ""
 "+ - zoom in and out\n"
 "E Export Image"
 msgstr ""
+"L 時計回りに回転\n"
+"R 反時計回りに回転\n"
+"+ 拡大・縮小\n"
+"E 画像のエクスポート"
 
 #: helpers.py:528 helpers.py:605 view_image.py:123 view_image.py:2044
 msgid "Key + or W zoom in. Key - or Q zoom out"
-msgstr ""
+msgstr "キー + または W 拡大。キーまたはQズームアウト"
 
 #: helpers.py:606
 msgid "Scale:"
@@ -2721,23 +2793,23 @@ msgstr "規模が大きい："
 
 #: helpers.py:665
 msgid "Rotate clockwise R"
-msgstr ""
+msgstr "時計回りに回転 R"
 
 #: helpers.py:666
 msgid "Rotate counter-clockwise L"
-msgstr ""
+msgstr "反時計回りに回す L"
 
 #: helpers.py:667 view_image.py:1218
 msgid "Highlight area - gray"
-msgstr ""
+msgstr "ハイライトエリア - グレー"
 
 #: helpers.py:668 view_image.py:1219
 msgid "Highlight area - solarize"
-msgstr ""
+msgstr "ハイライトエリア - ソラライズ"
 
 #: helpers.py:669 view_image.py:1220
 msgid "Highlight area - blur"
-msgstr ""
+msgstr "ハイライトエリア - ぼかし"
 
 #: helpers.py:670
 msgid "Export image E"
@@ -2749,7 +2821,7 @@ msgstr "プレーンテキストコードファイルを選択"
 
 #: helpers.py:766
 msgid "Codes list text file not imported"
-msgstr ""
+msgstr "コードリストのテキストファイルがインポートされない"
 
 #: helpers.py:769
 msgid "Importing codes from: "
@@ -2757,7 +2829,7 @@ msgstr "コードをインポートする： "
 
 #: helpers.py:770
 msgid "Refresh codes trees via menu options for coding, reports"
-msgstr ""
+msgstr "コーディング、レポートのメニューオプションでコードツリーをリフレッシュ"
 
 #: helpers.py:801
 msgid "Imported category: "
@@ -2773,7 +2845,7 @@ msgstr "重複したコードがインポートされない： "
 
 #: import_survey.py:111
 msgid "No survey selected."
-msgstr ""
+msgstr "アンケートは選択されていない。"
 
 #: import_survey.py:118
 msgid "Select survey file"
@@ -2782,6 +2854,8 @@ msgstr "調査ファイルの選択"
 #: import_survey.py:124
 msgid "Survey not imported. Survey not a csv or xlsx file: "
 msgstr ""
+"アンケートがインポートされません。アンケートが csv または xlsx ファイルでな"
+"い： "
 
 #: import_survey.py:181
 msgid "A column delimiter has not been set."
@@ -2828,6 +2902,8 @@ msgid ""
 "Number of fields does not match header\n"
 "Possible wrong quote format"
 msgstr ""
+"フィールド数がヘッダと一致しない\n"
+"引用符の形式が間違っている可能性がある"
 
 #: import_survey.py:318
 msgid "Survey not loaded: "
@@ -2839,16 +2915,16 @@ msgstr "アンケートが読み込まれません"
 
 #: import_survey.py:333
 msgid "Inserting cases: "
-msgstr ""
+msgstr "ケースを挿入する： "
 
 #: import_survey.py:346
 msgid ""
 " Duplicate case names, either in the file, or with existing project cases"
-msgstr ""
+msgstr " ファイル内または既存のプロジェクトケースとのケース名の重複"
 
 #: import_survey.py:347
 msgid "Duplicate case names warning"
-msgstr ""
+msgstr "ケース名の重複警告"
 
 #: import_survey.py:348
 msgid "Survey import warning: "
@@ -2856,11 +2932,11 @@ msgstr "調査の輸入に関する警告： "
 
 #: import_survey.py:382
 msgid "Inserting attributes to cases: "
-msgstr ""
+msgstr "ケースに属性を挿入する： "
 
 #: import_survey.py:410
 msgid "Creating qualitative text file(s)"
-msgstr ""
+msgstr "定性的テキストファイルの作成"
 
 #: import_survey.py:507 import_survey.py:509
 msgid "Survey imported"
@@ -2872,15 +2948,15 @@ msgstr "輸入調査"
 
 #: import_survey.py:556
 msgid "Number of fields in row error."
-msgstr ""
+msgstr "行エラーのフィールド数。"
 
 #: import_survey.py:557
 msgid "Use another quote format OR another delimiter"
-msgstr ""
+msgstr "別の引用書式を使うか、別の区切り文字を使う"
 
 #: import_survey.py:571
 msgid "Change fieldname"
-msgstr ""
+msgstr "フィールド名の変更"
 
 #: import_survey.py:574
 msgid "Change to Qualitative"
@@ -2896,74 +2972,78 @@ msgstr "フィールド名の変更"
 
 #: import_survey.py:603
 msgid "New name:"
-msgstr ""
+msgstr "新しい名前だ："
 
 #: import_survey.py:610
 msgid ""
 "Name must contain only letters and numbers or '_' and must not start with a "
 "number"
 msgstr ""
+"名前はアルファベットと数字、または'_'のみで構成され、数字で始まってはならな"
+"い。"
 
 #: import_survey.py:611
 msgid "Field name invalid"
-msgstr ""
+msgstr "フィールド名が無効"
 
 #: import_survey.py:614
 msgid " Already in use"
-msgstr ""
+msgstr " すでに使用中"
 
 #: import_survey.py:615
 msgid "Field name invalid."
-msgstr ""
+msgstr "フィールド名が無効です。"
 
 #: import_twitter_data.py:86
 msgid "Select Twitter csv file"
-msgstr ""
+msgstr "Twitterのcsvファイルを選択"
 
 #: import_twitter_data.py:103
 msgid "Tweet file loaded. Please check via Manage files and Manage cases"
 msgstr ""
+"ツイートファイルが読み込まれました。ファイルの管理とケースの管理で確認してく"
+"ださい。"
 
 #: import_twitter_data.py:104
 msgid "Tweets: "
-msgstr ""
+msgstr "ツイート "
 
 #: import_twitter_data.py:107
 msgid "Could not import file"
-msgstr ""
+msgstr "ファイルをインポートできませんでした"
 
 #: import_twitter_data.py:134 import_twitter_data.py:140
 #: import_twitter_data.py:153
 msgid "Cannot use file"
-msgstr ""
+msgstr "ファイル使用不可"
 
 #: import_twitter_data.py:136
 msgid "Row error: "
-msgstr ""
+msgstr "行エラー： "
 
 #: import_twitter_data.py:139
 msgid "Number of columns is inconsistent. May not be all quoted"
-msgstr ""
+msgstr "カラム数に一貫性がない。すべて引用されていない可能性がある"
 
 #: import_twitter_data.py:143
 msgid "Missing header columns: "
-msgstr ""
+msgstr "ヘッダーカラムがない： "
 
 #: import_twitter_data.py:146
 msgid "Tweet field: "
-msgstr ""
+msgstr "ツイート欄： "
 
 #: import_twitter_data.py:150
 msgid "User field: "
-msgstr ""
+msgstr "ユーザーフィールド： "
 
 #: import_twitter_data.py:222 import_twitter_data.py:223
 msgid "Importing twitter data"
-msgstr ""
+msgstr "ツイッターデータのインポート"
 
 #: journals.py:186
 msgid "Modified"
-msgstr ""
+msgstr "変形"
 
 #: journals.py:186
 msgid "jid"
@@ -2976,11 +3056,11 @@ msgstr "ジャーナル "
 
 #: journals.py:252
 msgid "Attribute added to journals:"
-msgstr ""
+msgstr "ジャーナルに属性が追加された："
 
 #: journals.py:252 manage_files.py:1114
 msgid "type"
-msgstr ""
+msgstr "タイプ"
 
 #: journals.py:371 journals.py:376 journals.py:381 journals.py:423
 #: journals.py:429 journals.py:446 manage_references.py:213
@@ -3012,11 +3092,11 @@ msgstr "日付を入力"
 
 #: journals.py:481
 msgid "Show names like:"
-msgstr ""
+msgstr "などの名前が表示される："
 
 #: journals.py:551
 msgid "Collated journals exported as text file to: "
-msgstr ""
+msgstr "照合されたジャーナルをテキストファイルとしてエクスポート： "
 
 #: journals.py:553
 msgid "Journals exported"
@@ -3032,7 +3112,7 @@ msgstr "雑誌名"
 
 #: journals.py:630
 msgid "Journal created: "
-msgstr ""
+msgstr "ジャーナルを作成した： "
 
 #: journals.py:656
 msgid "Journal exported to:"
@@ -3060,7 +3140,7 @@ msgstr "警告 - 無効な文字"
 
 #: journals.py:712
 msgid "In the journal name use only: a-z, A-z 0-9 - space"
-msgstr ""
+msgstr "ジャーナル名には、a-z, A-z 0-9 - スペースのみを使用する。"
 
 #: journals.py:721
 msgid "Journal name changed from: "
@@ -3068,7 +3148,7 @@ msgstr "誌名変更 "
 
 #: manage_files.py:282
 msgid "View"
-msgstr ""
+msgstr "表示"
 
 #: manage_files.py:292
 msgid "File type order"
@@ -3076,11 +3156,11 @@ msgstr "ファイルタイプ順"
 
 #: manage_files.py:300
 msgid "Assign case to file"
-msgstr ""
+msgstr "ケースをファイルに割り当てる"
 
 #: manage_files.py:305
 msgid "Hide values like"
-msgstr ""
+msgstr "のような値を隠す。"
 
 #: manage_files.py:324
 msgid "Copy reference to clipboard. APA"
@@ -3128,15 +3208,15 @@ msgstr "元に戻せない"
 
 #: manage_files.py:564
 msgid "Another file has this name"
-msgstr ""
+msgstr "別のファイルは次のような名前である。"
 
 #: manage_files.py:572
 msgid "Reversed renamed database file entry: "
-msgstr ""
+msgstr "リネームされたデータベースファイルのエントリを取り消した： "
 
 #: manage_files.py:595
 msgid "Bulk Rename of database file name entries"
-msgstr ""
+msgstr "データベースファイル名の一括変更"
 
 #: manage_files.py:618
 msgid "Renamed database file entry:"
@@ -3152,7 +3232,7 @@ msgstr "輸出できない"
 
 #: manage_files.py:696
 msgid "Cannot export as linked file\n"
-msgstr ""
+msgstr "リンクファイルとしてエクスポートできない\n"
 
 #: manage_files.py:827
 msgid "File attributes exported to: "
@@ -3173,668 +3253,695 @@ msgstr "の謄本： "
 #: manage_files.py:990 manage_files.py:999 manage_files.py:1012
 #: manage_files.py:1030
 msgid "Cannot locate media. "
-msgstr ""
+msgstr "メディアが見つかりません。"
 
 #: manage_files.py:1026 report_file_summary.py:264 report_file_summary.py:317
 msgid "Duration: "
-msgstr ""
+msgstr "期間："
 
 #: manage_files.py:1033
 msgid ""
 "Cannot get media duration.\n"
 "VLC not installed."
 msgstr ""
+"メディアのデュレーションを取得できません。\n"
+"VLCがインストールされていません。"
 
 #: manage_files.py:1048
 msgid "Case linked:"
-msgstr ""
+msgstr "ケースはリンクしている："
 
 #: manage_files.py:1114
 msgid "Attribute added to files:"
-msgstr ""
+msgstr "ファイルに属性が追加された："
 
 #: manage_files.py:1130 report_codes.py:1163 view_graph.py:900
 #: view_graph.py:2029 view_graph.py:2056
 msgid "File"
-msgstr ""
+msgstr "ファイル"
 
 #: manage_files.py:1138 manage_files.py:1145
 msgid "Memo for file "
-msgstr ""
+msgstr "ファイル用メモ： "
 
 #: manage_files.py:1243 manage_references.py:299
 msgid "VLC not installed cannot play audio or video."
-msgstr ""
+msgstr "VLCがインストールされていないと、オーディオもビデオも再生できません。"
 
 #: manage_files.py:1244 manage_references.py:300
 msgid "View AV error"
-msgstr ""
+msgstr "AVエラーの表示"
 
 #: manage_files.py:1253 manage_files.py:1285 manage_references.py:309
 #: manage_references.py:338
 msgid "Bad link or non-existent file "
-msgstr ""
+msgstr "不正なリンクまたは存在しないファイル "
 
 #: manage_files.py:1267 manage_references.py:320
 msgid "view AV error"
-msgstr ""
+msgstr "AVエラーの表示"
 
 #: manage_files.py:1308
 msgid "New File"
-msgstr ""
+msgstr "新規ファイル"
 
 #: manage_files.py:1308
 msgid "Enter file name"
-msgstr ""
+msgstr "ファイル名を入力"
 
 #: manage_files.py:1347
 msgid "File created: "
-msgstr ""
+msgstr "作成されたファイル "
 
 #: manage_files.py:1444 manage_files.py:1457 manage_files.py:1464
 msgid "Unknown file type"
-msgstr ""
+msgstr "不明なファイルタイプ"
 
 #: manage_files.py:1445
 msgid "Trying to import as text"
-msgstr ""
+msgstr "テキストとしてインポートしようとする"
 
 #: manage_files.py:1457 manage_files.py:1464
 msgid "Cannot import file"
-msgstr ""
+msgstr "ファイルをインポートできない"
 
 #: manage_files.py:1509 manage_files.py:1671
 msgid "Duplicate file"
-msgstr ""
+msgstr "重複ファイル"
 
 #: manage_files.py:1509 manage_files.py:1672
 msgid ""
 "Duplicate filename.\n"
 "File not imported"
 msgstr ""
+"ファイル名が重複しています。\n"
+"ファイルがインポートされない"
 
 #: manage_files.py:1525 manage_files.py:1710
 msgid " linked"
-msgstr ""
+msgstr " 連動"
 
 #: manage_files.py:1527
 msgid " imported."
-msgstr ""
+msgstr " 輸入された。"
 
 #: manage_files.py:1632 manage_files.py:1660
 msgid " lines not imported"
-msgstr ""
+msgstr " インポートされない行"
 
 #: manage_files.py:1656 refi.py:1151
 msgid "Cannot import"
-msgstr ""
+msgstr "インポートできない"
 
 #: manage_files.py:1661
 msgid "lines not imported"
-msgstr ""
+msgstr "インポートされない行"
 
 #: manage_files.py:1665
 msgid "Cannot import "
-msgstr ""
+msgstr "インポートできない "
 
 #: manage_files.py:1708
 msgid " imported"
-msgstr ""
+msgstr " 輸入された。"
 
 #: manage_files.py:1802
 msgid "This is an external linked file"
-msgstr ""
+msgstr "インポートできない "
 
 #: manage_files.py:1812
 msgid "This is a linked file. Will export text representation."
-msgstr ""
+msgstr "これはリンクされたファイルです。テキスト表現でエクスポートされます。"
 
 #: manage_files.py:1814
 msgid "Can export text"
-msgstr ""
+msgstr "テキストのエクスポートが可能"
 
 #: manage_files.py:1824
 msgid "Export to "
-msgstr ""
+msgstr "輸出先 "
 
 #: manage_files.py:1833 manage_files.py:1849 manage_files.py:1862
 msgid "Files exported"
-msgstr ""
+msgstr "エクスポートされたファイル"
 
 #: manage_files.py:1834 manage_files.py:1850 manage_files.py:1863
 msgid " exported to "
-msgstr ""
+msgstr " に輸出された。"
 
 #: manage_files.py:1836 report_sql.py:313 special_functions.py:99
 #: special_functions.py:102 special_functions.py:105 view_graph.py:2352
 #: view_graph.py:2367 view_graph.py:2385 view_graph.py:2881 view_graph.py:3006
 msgid "Error"
-msgstr ""
+msgstr "エラー"
 
 #: manage_files.py:1836
 msgid "File not found"
-msgstr ""
+msgstr "ファイルが見つかりません"
 
 #: manage_files.py:1893 manage_files.py:2055
 msgid "Deleted file: "
-msgstr ""
+msgstr "削除されたファイル： "
 
 #: manage_files.py:1904 manage_files.py:1935 manage_files.py:1998
 #: manage_files.py:2031
 msgid "Deleting file error: "
-msgstr ""
+msgstr "ファイル削除エラー： "
 
 #: manage_files.py:2076
 msgid "Minimum: "
-msgstr ""
+msgstr "最低限だ： "
 
 #: manage_files.py:2077
 msgid "Maximum: "
-msgstr ""
+msgstr "最大だ： "
 
 #: manage_files.py:2108
 msgid ""
 "\n"
 "Externally linked file:\n"
 msgstr ""
+"\n"
+"外部リンクファイル：\n"
 
 #: manage_links.py:80
 msgid "Search folders"
-msgstr ""
+msgstr "検索フォルダ"
 
 #: manage_links.py:109 manage_links.py:124
 msgid "Select file"
-msgstr ""
+msgstr "ファイルを選択"
 
 #: manage_links.py:132
 msgid "Filename does not match."
-msgstr ""
+msgstr "ファイル名が一致しません。"
 
 #: manage_links.py:133
 msgid "Wrong file"
-msgstr ""
+msgstr "間違ったファイル"
 
 #: manage_links.py:160
 msgid "Bad link fixed for file: "
-msgstr ""
+msgstr "ファイルのリンク不良を修正しました： "
 
 #: manage_links.py:160
 msgid " Path: "
-msgstr ""
+msgstr "パス "
 
 #: manage_links.py:188 report_relations.py:800
 msgid "Filename"
-msgstr ""
+msgstr "ファイル名"
 
 #: manage_links.py:188
 msgid "Current path"
-msgstr ""
+msgstr "現在のパス"
 
 #: manage_links.py:188
 msgid "Suggestion 1"
-msgstr ""
+msgstr "提案1"
 
 #: manage_links.py:188
 msgid "Suggestion 2"
-msgstr ""
+msgstr "提案2"
 
 #: manage_references.py:232 manage_references.py:607
 msgid "Show value like"
-msgstr ""
+msgstr "のような値を表示する。"
 
 #: manage_references.py:233
 msgid "View file"
-msgstr ""
+msgstr "ファイルを見る"
 
 #: manage_references.py:238 manage_references.py:610
 msgid "Show all rows"
-msgstr ""
+msgstr "すべての行を表示"
 
 #: manage_references.py:246 manage_references.py:627
 msgid "Show value like:"
-msgstr ""
+msgstr "のような価値を示す："
 
 #: manage_references.py:375
 msgid "Matches: "
-msgstr ""
+msgstr "試合： "
 
 #: manage_references.py:376
 msgid "Files linked to references"
-msgstr ""
+msgstr "リファレンスにリンクされたファイル"
 
 #: manage_references.py:384
 msgid "Reference"
-msgstr ""
+msgstr "参考"
 
 #: manage_references.py:384
 msgid "Year"
-msgstr ""
+msgstr "年"
 
 #: manage_references.py:384
 msgid "Authors"
-msgstr ""
+msgstr "著者紹介"
 
 #: manage_references.py:384
 msgid "Journal or Publication Title"
-msgstr ""
+msgstr "雑誌名または出版物名"
 
 #: manage_references.py:385
 msgid "Volume"
-msgstr ""
+msgstr "ボリューム"
 
 #: manage_references.py:385
 msgid "Issue"
-msgstr ""
+msgstr "問題"
 
 #: manage_references.py:385
 msgid "Keywords"
-msgstr ""
+msgstr "キーワード"
 
 #: manage_references.py:612
 msgid "Copy to clipboard.  APA style"
-msgstr ""
+msgstr "クリップボードにコピーする  APAスタイル"
 
 #: manage_references.py:613
 msgid "Edit reference"
-msgstr ""
+msgstr "参考文献を編集する"
 
 #: manage_references.py:857
 msgid "Reference edited."
-msgstr ""
+msgstr "参考編集"
 
 #: manage_references.py:871
 msgid "Delete this reference."
-msgstr ""
+msgstr "このリファレンスを削除する。"
 
 #: manage_references.py:895
 msgid "Reference deleted."
-msgstr ""
+msgstr "参考文献は削除された。"
 
 #: merge_projects.py:74
 msgid "Merging: "
-msgstr ""
+msgstr "合併する： "
 
 #: merge_projects.py:74
 msgid "Into: "
-msgstr ""
+msgstr "中へ： "
 
 #: merge_projects.py:91
 msgid "Finished merging "
-msgstr ""
+msgstr "マージ完了 "
 
 #: merge_projects.py:93
 msgid ""
 "Existing values in destination project are not over-written, apart from "
 "blank attribute values."
 msgstr ""
+"デスティネーション・プロジェクトの既存の値は、空白の属性値を除いて上書きされ"
+"ません。"
 
 #: merge_projects.py:94
 msgid "Project merged"
-msgstr ""
+msgstr "プロジェクト統合"
 
 #: merge_projects.py:94
 msgid "Review the action log for details."
-msgstr ""
+msgstr "詳しくはアクションログをご覧ください。"
 
 #: merge_projects.py:98 merge_projects.py:484
 msgid "Project not merged"
-msgstr ""
+msgstr "プロジェクトがマージされない"
 
 #: merge_projects.py:111
 msgid "Adding top level category: "
-msgstr ""
+msgstr "トップレベルカテゴリーの追加："
 
 #: merge_projects.py:133
 msgid "Adding sub-category: "
-msgstr ""
+msgstr "サブカテゴリーの追加："
 
 #: merge_projects.py:139
 msgid " categories not added"
-msgstr ""
+msgstr " 追加されていないカテゴリー"
 
 #: merge_projects.py:174
 msgid "Adding code name: "
-msgstr ""
+msgstr "コードネームの追加："
 
 #: merge_projects.py:205
 msgid "Adding journal: "
-msgstr ""
+msgstr "日記の追加"
 
 #: merge_projects.py:219
 msgid "Merging coded text"
-msgstr ""
+msgstr "コード化されたテキストのマージ"
 
 #: merge_projects.py:225
 msgid "Merging annotations"
-msgstr ""
+msgstr "注釈のマージ"
 
 #: merge_projects.py:233
 msgid "Merging coded image areas"
-msgstr ""
+msgstr "コード化された画像領域のマージ"
 
 #: merge_projects.py:240
 msgid "Merging coded audio/video segments"
-msgstr ""
+msgstr "コード化されたオーディオ/ビデオセグメントのマージ"
 
 #: merge_projects.py:277
 msgid "Adding case: "
-msgstr ""
+msgstr "ケースを追加する： "
 
 #: merge_projects.py:320
 msgid ""
 "Warning! Inaccurate coding positions. Text lengths different for same text "
 "file: "
 msgstr ""
+"警告 不正確なコーディング位置。同じテキストファイルでもテキストの長さが異な"
+"る： "
 
 #: merge_projects.py:322
 msgid "Import project file text length: "
-msgstr ""
+msgstr "プロジェクトファイルのテキスト長をインポートする： "
 
 #: merge_projects.py:323
 msgid "Destination project file text length: "
-msgstr ""
+msgstr "宛先プロジェクトファイルのテキスト長： "
 
 #: merge_projects.py:384
 msgid "File copied: "
-msgstr ""
+msgstr "ファイルをコピーした： "
 
 #: merge_projects.py:388
 msgid "NOT copied. Permission error"
-msgstr ""
+msgstr "コピーされません。パーミッションエラー"
 
 #: merge_projects.py:406
 msgid "Adding attribute ("
-msgstr ""
+msgstr "属性の追加 ("
 
 #: merge_projects.py:455
 msgid "Added attribute values for cases and files: n="
-msgstr ""
+msgstr "ケースとファイルの属性値を追加： n="
 
 #: merge_projects.py:481
 msgid "Need to update the source project database."
-msgstr ""
+msgstr "ソースプロジェクトのデータベースを更新する必要がある。"
 
 #: merge_projects.py:482
 msgid "Please open the source project using QualCoder. Then close the project."
 msgstr ""
+"QualCoderを使ってソースプロジェクトを開いてください。その後、プロジェクトを閉"
+"じてください。"
 
 #: merge_projects.py:483
 msgid "This will update the database schema. Then try merging again."
 msgstr ""
+"これでデータベーススキーマが更新される。その後、もう一度マージしてください。"
 
 #: refi.py:109
 msgid "Select REFI-QDA file"
-msgstr ""
+msgstr "REFI-QDAファイルを選択"
 
 #: refi.py:119
 msgid "Select REFI-QDA qdpx file"
-msgstr ""
+msgstr "REFI-QDA qdpxファイルを選択する。"
 
 #: refi.py:144
 msgid " categories and codes imported from "
-msgstr ""
+msgstr " からインポートしたカテゴリーとコード "
 
 #: refi.py:145
 msgid "Codebook imported"
-msgstr ""
+msgstr "輸入されたコードブック"
 
 #: refi.py:148
 msgid "Codebook importation"
-msgstr ""
+msgstr "コードブックのインポート"
 
 #: refi.py:148
 msgid " NOT imported"
-msgstr ""
+msgstr " 輸入されていない"
 
 #: refi.py:311
 msgid "Reading from: "
-msgstr ""
+msgstr "から読む： "
 
 #: refi.py:312
 msgid "Creating temporary directory: "
-msgstr ""
+msgstr "一時ディレクトリの作成： "
 
 #: refi.py:327
 msgid "Project Import"
-msgstr ""
+msgstr "プロジェクトインポート"
 
 #: refi.py:346
 msgid "Parse users. Loaded: "
-msgstr ""
+msgstr "ユーザーを解析する ロード "
 
 #: refi.py:353
 msgid "Parse codes and categories. Loaded: "
-msgstr ""
+msgstr "コードとカテゴリーを解析する。ロード "
 
 #: refi.py:356
 msgid "Parse variables. Loaded: "
-msgstr ""
+msgstr "変数を解析する。ロード "
 
 #: refi.py:358
 msgid "Parsing and loading project memo"
-msgstr ""
+msgstr "プロジェクトメモの解析と読み込み"
 
 #: refi.py:372
 msgid "Parsed cases for file variables. Loaded: "
-msgstr ""
+msgstr "ファイル変数のケースを解析。ロード： "
 
 #: refi.py:380
 msgid "Parsing sources. Loaded: "
-msgstr ""
+msgstr "ソースの解析。ロード： "
 
 #: refi.py:387
 msgid "Parsing Notes. Journals loaded: "
-msgstr ""
+msgstr "解析メモ ジャーナルが読み込まれました： "
 
 #: refi.py:399
 msgid "Parsing cases. Loaded: "
-msgstr ""
+msgstr "ケースの解析 ロードした： "
 
 #: refi.py:408
 msgid "Parsing sets."
-msgstr ""
+msgstr "解析セット。"
 
 #: refi.py:410
 msgid " loaded."
-msgstr ""
+msgstr " を積んだ。"
 
 #: refi.py:425
 msgid "REFI-QDA PROJECT IMPORT EXPERIMENTAL FUNCTION - NOT FULLY TESTED\n"
 msgstr ""
+"refi-qdaプロジェクトのインポート実験的機能 - 完全にはテストされていない\n"
 
 #: refi.py:426
 msgid ""
 "Audio/video transcripts: transcript codings and synchpoints not tested.\n"
 msgstr ""
+"音声/ビデオトランスクリプト：トランスクリプトのコーディングとシンクポイントは"
+"テストされていない。\n"
 
 #: refi.py:427
 msgid "Set components may be imported as file attributes.\n"
 msgstr ""
+"セット・コンポーネントは、ファイル属性としてインポートすることができる。\n"
 
 #: refi.py:428
 msgid "Graphs not imported as QualCoder does not have this functionality.\n"
-msgstr ""
+msgstr "QualCoderにはこの機能がないため、グラフはインポートされない。\n"
 
 #: refi.py:429
 msgid ""
 "Boolean variables treated as character (text). Integer variables treated as "
 "floating point. \n"
 msgstr ""
+"文字（テキスト）として扱われるブール変数。整数変数は浮動小数点として扱う。\n"
 
 #: refi.py:430
 msgid ""
 "All variables are stored as text. Cast as text or float for SQL operations.\n"
 msgstr ""
+"変数はすべてテキストとして格納される。SQL操作のためにテキストまたは浮動小数点"
+"数としてキャストされます。\n"
 
 #: refi.py:431
 msgid "Relative paths to external files are untested.\n"
-msgstr ""
+msgstr "外部ファイルへの相対パスは未検証。\n"
 
 #: refi.py:432
 msgid ""
 "Select a coder name in Settings dropbox, otherwise coded text and media may "
 "appear uncoded."
 msgstr ""
+"そうしないと、コード化されたテキストやメディアがコード化されずに表示されるこ"
+"とがあります。"
 
 #: refi.py:433
 msgid "REFI-QDA Project import"
-msgstr ""
+msgstr "REFI-QDAプロジェクトのインポート"
 
 #: refi.py:472
 msgid "Cannot read text source from Note: "
-msgstr ""
+msgstr "ノートからテキストソースを読み取れません： "
 
 #: refi.py:605 refi.py:1784
 msgid "Variable import error"
-msgstr ""
+msgstr "変数のインポートエラー"
 
 #: refi.py:605 refi.py:1784
 msgid "Variable name already exists: "
-msgstr ""
+msgstr "変数名はすでに存在します： "
 
 #: refi.py:669
 msgid "Error entering Case into database"
-msgstr ""
+msgstr "ケースをデータベースに入力する際のエラー"
 
 #: refi.py:864
 msgid "Cannot copy Image file from: "
-msgstr ""
+msgstr "画像ファイルをコピーできません： "
 
 #: refi.py:960
 msgid "Cannot copy Audio file from: "
-msgstr ""
+msgstr "オーディオファイルをコピーできません： "
 
 #: refi.py:1022
 msgid "Cannot copy Video file from: "
-msgstr ""
+msgstr "動画ファイルをコピーできません： "
 
 #: refi.py:1130
 msgid "Cannot copy transcript file from: "
-msgstr ""
+msgstr "トランスクリプトファイルがコピーできない： "
 
 #: refi.py:1307
 msgid "Cannot copy PDF file from: "
-msgstr ""
+msgstr "PDFファイルをコピーできません： "
 
 #: refi.py:1422
 msgid "Cannot read from TextSource: "
-msgstr ""
+msgstr "テキスト・ソースから読み取れません： "
 
 #: refi.py:1434 refi.py:1448
 msgid "Cannot copy TextSource file from: "
-msgstr ""
+msgstr "テキストソースファイルをコピーできません： "
 
 #: refi.py:1570
 msgid "Duplicated text coding for code and coder. Only one loaded."
 msgstr ""
+"コードとコーダーのテキストコーディングが重複している。1つだけ読み込まれる。"
 
 #: refi.py:1571
 msgid " Positions:"
-msgstr ""
+msgstr " ポジション"
 
 #: refi.py:1660
 msgid "Trying to read Note element: "
-msgstr ""
+msgstr "ノート・エレメントを読もうとしている： "
 
 #: refi.py:1936
 msgid "Project export error "
-msgstr ""
+msgstr "プロジェクトのエクスポートエラー "
 
 #: refi.py:1937 refi.py:1943
 msgid "Project not exported. Exiting. "
-msgstr ""
+msgstr "プロジェクトがエクスポートされません。終了します。"
 
 #: refi.py:2015
 msgid "REFI-QDA PROJECT EXPORT EXPERIMENTAL FUNCTION.\n"
-msgstr ""
+msgstr "refi-qdaプロジェクト・エクスポート実験機能。\n"
 
 #: refi.py:2016
 msgid ""
 "This project exchange is not guaranteed compliant with the exchange "
 "standard.\n"
 msgstr ""
+"このプロジェクトの交換は、交換標準に準拠していることを保証するものではな"
+"い。\n"
 
 #: refi.py:2020 refi.py:2021
 msgid "Project exported"
-msgstr ""
+msgstr "プロジェクトのエクスポート"
 
 #: refi.py:2037
 msgid "Codebook has been exported to "
-msgstr ""
+msgstr "コードブックは "
 
 #: refi.py:2043 refi.py:2044
 msgid "Codebook NOT exported"
-msgstr ""
+msgstr "コードブックはエクスポートされない"
 
 #: refi.py:2917
 msgid "A/V Media not found"
-msgstr ""
+msgstr "オーディオ/ビデオメディアが見つかりません"
 
 #: refi.py:2920
 msgid "VLC not installed, final end character timepoint will be inaccurate"
 msgstr ""
+"VLCがインストールされていない場合、最終的な終了文字のタイムポイントが不正確に"
+"なります。"
 
 #: refi.py:2921
 msgid "VLC not found"
-msgstr ""
+msgstr "VLCが見つかりません"
 
 #: report_attributes.py:528
 msgid "No operator was selected"
-msgstr ""
+msgstr "オペレータが選択されていない"
 
 #: report_attributes.py:532
 msgid "Too many values given for this operator"
-msgstr ""
+msgstr "この演算子の値が多すぎる"
 
 #: report_attributes.py:535
 msgid "Need 2 values for between"
-msgstr ""
+msgstr "間に2つの値が必要"
 
 #: report_attributes.py:543
 msgid " is not a number"
-msgstr ""
+msgstr " は数字ではない"
 
 #: report_codes.py:124
 msgid "Top categories by case"
-msgstr ""
+msgstr "ケース別トップカテゴリー"
 
 #: report_codes.py:124
 msgid "Top categories by file"
-msgstr ""
+msgstr "ファイル別トップカテゴリー"
 
 #: report_codes.py:124
 msgid "Categories by case"
-msgstr ""
+msgstr "ケース別カテゴリー"
 
 #: report_codes.py:125
 msgid "Categories by file"
-msgstr ""
+msgstr "ファイル別カテゴリー"
 
 #: report_codes.py:125
 msgid "Codes by case"
-msgstr ""
+msgstr "ケース別コード"
 
 #: report_codes.py:125
 msgid "Codes by file"
-msgstr ""
+msgstr "ファイル別コード"
 
 #: report_codes.py:128
 msgid "None"
-msgstr ""
+msgstr "なし"
 
 #: report_codes.py:128 report_codes.py:2158 report_codes.py:2459
 msgid "Also code memos"
-msgstr ""
+msgstr "コードメモも"
 
 #: report_codes.py:128 report_codes.py:2709
 msgid "Also coded memos"
-msgstr ""
+msgstr "コードメモも"
 
 #: report_codes.py:128 report_codes.py:2158 report_codes.py:2161
 #: report_codes.py:2165 report_codes.py:2459 report_codes.py:2466
 #: report_codes.py:2709 report_codes.py:2733
 msgid "Also all memos"
-msgstr ""
+msgstr "また、すべてのメモ"
 
 #: report_codes.py:128 report_codes.py:1266 report_codes.py:2158
 #: report_codes.py:2161 report_codes.py:2165 report_codes.py:2459
@@ -3843,46 +3950,46 @@ msgstr ""
 #: report_codes.py:2716 report_codes.py:2728 report_codes.py:2730
 #: report_codes.py:2741 report_codes.py:2743 report_codes.py:2745
 msgid "Only memos"
-msgstr ""
+msgstr "メモのみ"
 
 #: report_codes.py:129 report_codes.py:1268 report_codes.py:2705
 #: report_codes.py:2707 report_codes.py:2712 report_codes.py:2714
 #: report_codes.py:2716 report_codes.py:2728 report_codes.py:2730
 #: report_codes.py:2741 report_codes.py:2743 report_codes.py:2745
 msgid "Only coded memos"
-msgstr ""
+msgstr "コード化されたメモのみ"
 
 #: report_codes.py:129 report_codes.py:1226
 msgid "Annotations"
-msgstr ""
+msgstr "注釈"
 
 #: report_codes.py:129 report_codes.py:1229
 msgid "Codebook memos"
-msgstr ""
+msgstr "コードブック・メモ"
 
 #: report_codes.py:201 report_codes_by_segments.py:117
 msgid "No file selection"
-msgstr ""
+msgstr "ファイル選択なし"
 
 #: report_codes.py:210 report_compare_coder_file.py:146
 #: report_exact_matches.py:134 report_file_summary.py:112
 msgid "Text file\n"
-msgstr ""
+msgstr "テキストファイル\n"
 
 #: report_codes.py:213 report_compare_coder_file.py:150
 #: report_exact_matches.py:138 report_file_summary.py:115
 msgid "Image"
-msgstr ""
+msgstr "画像"
 
 #: report_codes.py:215 report_compare_coder_file.py:153
 #: report_exact_matches.py:141 report_file_summary.py:117
 msgid "Audio"
-msgstr ""
+msgstr "音響"
 
 #: report_codes.py:217 report_compare_coder_file.py:156
 #: report_exact_matches.py:144 report_file_summary.py:119
 msgid "Video"
-msgstr ""
+msgstr "動画"
 
 #: report_codes.py:224 report_compare_coder_file.py:164
 #: report_exact_matches.py:148 report_file_summary.py:126
@@ -3890,321 +3997,332 @@ msgid ""
 "\n"
 "Codings: "
 msgstr ""
+"\n"
+"コーディング： "
 
 #: report_codes.py:240 report_codes_by_segments.py:130
 msgid "No case selection"
-msgstr ""
+msgstr "ケース選択なし"
 
 #: report_codes.py:290 report_codes_by_segments.py:181
 msgid "Select all files"
-msgstr ""
+msgstr "すべてのファイルを選択"
 
 #: report_codes.py:291 report_codes_by_segments.py:182
 msgid "Select files like"
-msgstr ""
+msgstr "などのファイルを選択する。"
 
 #: report_codes.py:292 report_codes.py:327 report_codes_by_segments.py:183
 #: report_codes_by_segments.py:218
 msgid "Select none"
-msgstr ""
+msgstr "なしを選択"
 
 #: report_codes.py:304 report_codes_by_segments.py:195
 msgid "Select some files"
-msgstr ""
+msgstr "いくつかのファイルを選択する"
 
 #: report_codes.py:307 report_codes_by_segments.py:198
 msgid "Show files containing text"
-msgstr ""
+msgstr "テキストを含むファイルを表示する"
 
 #: report_codes.py:325 report_codes_by_segments.py:216
 msgid "Select all cases"
-msgstr ""
+msgstr "すべてのケースを選択"
 
 #: report_codes.py:326 report_codes_by_segments.py:217
 msgid "Select cases like"
-msgstr ""
+msgstr "のようなケースを選択する。"
 
 #: report_codes.py:339 report_codes_by_segments.py:230
 msgid "Select some cases"
-msgstr ""
+msgstr "いくつかのケースを選ぶ"
 
 #: report_codes.py:342 report_codes_by_segments.py:233
 msgid "Select cases containing text"
-msgstr ""
+msgstr "テキストを含むケースを選択"
 
 #: report_codes.py:499 report_codes_by_segments.py:390
 msgid "Select all codes"
-msgstr ""
+msgstr "すべてのコードを選択"
 
 #: report_codes.py:500 report_codes_by_segments.py:391
 msgid "Remove selections"
-msgstr ""
+msgstr "選択項目の削除"
 
 #: report_codes.py:501 report_codes_by_segments.py:392
 msgid "Select codes like"
-msgstr ""
+msgstr "などのコードを選択する。"
 
 #: report_codes.py:516 report_codes_by_segments.py:407
 msgid "Select some codes"
-msgstr ""
+msgstr "いくつかのコードを選択"
 
 #: report_codes.py:519 report_codes_by_segments.py:410
 msgid "Select codes containing text"
-msgstr ""
+msgstr "テキストを含むコードを選択する"
 
 #: report_codes.py:556
 msgid "No matrix"
-msgstr ""
+msgstr "行列なし"
 
 #: report_codes.py:556
 msgid "No matrix results to export"
-msgstr ""
+msgstr "エクスポートする行列の結果がない"
 
 #: report_codes.py:590
 msgid "Matrix exported: "
-msgstr ""
+msgstr "マトリックスがエクスポートされた： "
 
 #: report_codes.py:591
 msgid "Matrix exported"
-msgstr ""
+msgstr "マトリックスがエクスポートされた"
 
 #: report_codes.py:603
 msgid "Save Text File"
-msgstr ""
+msgstr "テキストファイルの保存"
 
 #: report_codes.py:617 report_codes.py:643 report_codes.py:757
 #: report_codes.py:870 report_codes_by_segments.py:445
 #: report_compare_coder_file.py:250
 msgid "Report exported: "
-msgstr ""
+msgstr "レポートがエクスポートされました： "
 
 #: report_codes.py:618 report_codes.py:645 report_codes.py:758
 #: report_codes.py:871 report_codes.py:1015 report_codes_by_segments.py:446
 #: report_compare_coder_file.py:252 report_exact_matches.py:489
 #: report_relations.py:782 reports.py:552
 msgid "Report exported"
-msgstr ""
+msgstr "レポートがエクスポートされました"
 
 #: report_codes.py:629
 msgid "Save Open Document Text File"
-msgstr ""
+msgstr "ODTファイルの保存"
 
 #: report_codes.py:741
 msgid "Save CSV File"
-msgstr ""
+msgstr "CSVファイル保存"
 
 #: report_codes.py:754 report_codes.py:869
 msgid "Each row contains filename, coder, coded, codename and categories."
 msgstr ""
+"各行には、ファイル名、コーダー、コード、コードネーム、カテゴリーが含まれる。"
 
 #: report_codes.py:756
 msgid "And file and case variables"
-msgstr ""
+msgstr "ファイル変数とケース変数"
 
 #: report_codes.py:863 report_codes_by_segments.py:439
 #: report_exact_matches.py:479 report_relations.py:771
 msgid "Save Excel File"
-msgstr ""
+msgstr "エクセルファイルの保存"
 
 #: report_codes.py:912
 msgid "Save HTML File"
-msgstr ""
+msgstr "HTMLファイルの保存"
 
 #: report_codes.py:941
 msgid "html folder creation error "
-msgstr ""
+msgstr "htmlフォルダ作成エラー "
 
 #: report_codes.py:942
 msgid "Folder creation"
-msgstr ""
+msgstr "フォルダ作成"
 
 #: report_codes.py:942
 msgid "error "
-msgstr ""
+msgstr "エラー"
 
 #: report_codes.py:948
 msgid "html file reading error:"
-msgstr ""
+msgstr "htmlファイル読み込みエラー："
 
 #: report_codes.py:1011 report_exact_matches.py:488 report_relations.py:781
 msgid "Report exported to: "
-msgstr ""
+msgstr "レポートのエクスポート先 "
 
 #: report_codes.py:1013
 msgid "Media folder:"
-msgstr ""
+msgstr "メディアフォルダー："
 
 #: report_codes.py:1063
 msgid ""
 "Codebook with memos\n"
 "=================\n"
 msgstr ""
+"メモ付きコードブック\n"
+"=================\n"
 
 #: report_codes.py:1115
 msgid "No files selected for annotations"
-msgstr ""
+msgstr "注釈用に選択されたファイルがない"
 
 #: report_codes.py:1146
 msgid "Annotation search parameters"
-msgstr ""
+msgstr "注釈検索パラメータ"
 
 #: report_codes.py:1148
 msgid "Coder: All coders"
-msgstr ""
+msgstr "コーダー すべてのコーダー"
 
 #: report_codes.py:1150 report_codes.py:2171 view_av.py:207 view_charts.py:346
 #: view_image.py:120
 msgid "Coder: "
-msgstr ""
+msgstr "コーダー"
 
 #: report_codes.py:1152 report_codes.py:1321
 msgid "Search text: "
-msgstr ""
+msgstr "検索テキスト："
 
 #: report_codes.py:1153
 msgid "Files:"
-msgstr ""
+msgstr "ファイル："
 
 #: report_codes.py:1164
 msgid "DATE:"
-msgstr ""
+msgstr "日付："
 
 #: report_codes.py:1165
 msgid "Position"
-msgstr ""
+msgstr "位置"
 
 #: report_codes.py:1166
 msgid "TEXT"
-msgstr ""
+msgstr "テキスト"
 
 #: report_codes.py:1167
 msgid "ANNOTATION"
-msgstr ""
+msgstr "注釈"
 
 #: report_codes.py:1240 report_exact_matches.py:190
 msgid "No codes have been selected."
-msgstr ""
+msgstr "コードが選択されていない。"
 
 #: report_codes.py:1244
 msgid "No files, cases found."
-msgstr ""
+msgstr "ファイル、ケースが見つかりません。"
 
 #: report_codes.py:1245
 msgid "Nothing selected"
-msgstr ""
+msgstr "なし"
 
 #: report_codes.py:1249
 msgid "Searching"
-msgstr ""
+msgstr "検索"
 
 #: report_codes.py:1267
 msgid "Only memos shown. Coded data not shown."
-msgstr ""
+msgstr "メモのみ表示。コード化されたデータは表示されない。"
 
 #: report_codes.py:1269
 msgid "Coded memos shown if available. Coded data not shown."
-msgstr ""
+msgstr "コード化されたメモがあれば表示。コード化されたデータは表示されない。"
 
 #: report_codes.py:1270
 msgid "Search parameters"
-msgstr ""
+msgstr "検索パラメータ"
 
 #: report_codes.py:1273
 msgid "Coding by: All coders"
-msgstr ""
+msgstr "コーディング すべてのコーダー"
 
 #: report_codes.py:1275
 msgid "Coding by: "
-msgstr ""
+msgstr "コーディング "
 
 #: report_codes.py:1288
 msgid "Attributes:"
-msgstr ""
+msgstr "属性："
 
 #: report_codes.py:1307
 msgid ""
 "\n"
 "Files:\n"
 msgstr ""
+"\n"
+"ファイル：\n"
 
 #: report_codes.py:1312
 msgid " Files: "
-msgstr ""
+msgstr "ファイル "
 
 #: report_codes.py:1314
 msgid ""
 "\n"
 "Cases:\n"
 msgstr ""
+"\n"
+"ケース : \n"
 
 #: report_codes.py:1734
 msgid "Text code statistics:"
-msgstr ""
+msgstr "テキストコードの統計："
 
 #: report_codes.py:1736 report_codes.py:1798 report_codes.py:1873
 msgid "Count:"
-msgstr ""
+msgstr "カウント:"
 
 #: report_codes.py:1737 report_codes.py:1799 report_codes.py:1875
 msgid "Percent of file:"
-msgstr ""
+msgstr "ファイルの割合："
 
 #: report_codes.py:1796
 msgid "Image code statistics:"
-msgstr ""
+msgstr "画像コードの統計："
 
 #: report_codes.py:1871
 msgid "A/V code statistics:"
-msgstr ""
+msgstr "オーディオ/ビデオコードの統計："
 
 #: report_codes.py:1877
 msgid "Percent of file: Unknown. Either VLC not installer or file not found."
 msgstr ""
+"ファイルの割合 不明です。VLC がインストールされていないか、ファイルが見つかり"
+"ません。"
 
 #: report_codes.py:1915
 msgid "Code count totals"
-msgstr ""
+msgstr "コード・カウントの合計"
 
 #: report_codes.py:2035
 msgid "No case matrix"
-msgstr ""
+msgstr "ケースマトリックスなし"
 
 #: report_codes.py:2035
 msgid "Cases not selected"
-msgstr ""
+msgstr "選ばれなかったケース"
 
 #: report_codes.py:2159
 msgid "CODE MEMO: "
-msgstr ""
+msgstr "コードメモ: "
 
 #: report_codes.py:2162
 msgid " FILE MEMO: "
-msgstr ""
+msgstr "ファイル・メモ："
 
 #: report_codes.py:2170
 msgid "CASE MEMO: "
-msgstr ""
+msgstr "ケースメモ："
 
 #: report_codes.py:2237 report_codes.py:2780 report_exact_matches.py:328
 #: report_relations.py:515 view_graph.py:2860 view_graph.py:2991
 msgid "View in context"
-msgstr ""
+msgstr "文脈で見る"
 
 #: report_codes.py:2239 view_av.py:3485 view_image.py:1259
 msgid "Add important mark"
-msgstr ""
+msgstr "重要マークの追加"
 
 #: report_codes.py:2240
 msgid "Change code to"
-msgstr ""
+msgstr "コードを次のように変更する。"
 
 #: report_codes.py:2244 report_codes.py:2784
 msgid "Copy all to clipboard"
-msgstr ""
+msgstr "すべてをクリップボードにコピーする"
 
 #: report_codes.py:2247
 msgid "Rotate image 90 degrees"
-msgstr ""
+msgstr "画像を90度回転"
 
 #: report_codes.py:2251 view_image.py:1224
 msgid "Show control panel"
@@ -4232,15 +4350,15 @@ msgstr ""
 
 #: report_codes.py:2463
 msgid "FILE MEMO:"
-msgstr ""
+msgstr "ファイル・メモ："
 
 #: report_codes.py:2471
 msgid "CASE MEMO:"
-msgstr ""
+msgstr "ケースメモ："
 
 #: report_code_summary.py:241 report_compare_coder_file.py:271
 msgid "CODE: "
-msgstr ""
+msgstr "コード:"
 
 #: report_code_summary.py:242
 msgid "COLOUR: "
@@ -4256,7 +4374,7 @@ msgstr ""
 
 #: report_code_summary.py:276
 msgid "FILES: "
-msgstr ""
+msgstr "ファイル："
 
 #: report_code_summary.py:282
 msgid ""
@@ -4307,7 +4425,7 @@ msgstr ""
 #: report_file_summary.py:281 report_file_summary.py:334
 #: report_file_summary.py:399 report_file_summary.py:455
 msgid "Count: "
-msgstr ""
+msgstr "カウント:"
 
 #: report_code_summary.py:382
 msgid "Average coded area: "
@@ -4349,6 +4467,8 @@ msgid ""
 "\n"
 "Memo: "
 msgstr ""
+"\n"
+"メモ："
 
 #: report_compare_coder_file.py:234 reports.py:519
 msgid "No coders selected"
@@ -4368,7 +4488,7 @@ msgstr ""
 
 #: report_compare_coder_file.py:270
 msgid "FILE: "
-msgstr ""
+msgstr " ファイル: "
 
 #: report_compare_coder_file.py:323
 msgid "A/V Duration: "
@@ -4691,7 +4811,7 @@ msgstr ""
 
 #: report_file_summary.py:201
 msgid "CASE:"
-msgstr ""
+msgstr "ケース："
 
 #: report_file_summary.py:214
 msgid "No case assignment"

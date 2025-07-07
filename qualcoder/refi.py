@@ -38,7 +38,7 @@ import zipfile
 from PyQt6 import QtWidgets, QtCore
 
 from .color_selector import colors, color_matcher
-from .xsd import xsd_codebook, xsd_project
+# from .xsd import xsd_codebook, xsd_project  # Not used
 from .GUI.ui_dialog_refi_export_endings import Ui_Dialog_refi_export_line_endings
 from .helpers import Message
 
@@ -1836,7 +1836,7 @@ class RefiImport:
 
     def xml_validation(self, xsd_type="codebook"):
         """ Verify that the XML complies with XSD
-        NOT USED. Problems geting the original validator to work.
+        NOT USED. Problems getting the original validator to work.
         Arguments:
             1. file_xml: Input xml file
             2. file_xsd: xsd file which needs to be validated against xml
@@ -1846,9 +1846,9 @@ class RefiImport:
         return: true or false passing validation
         """
 
-        file_xsd = xsd_codebook
+        '''file_xsd = xsd_codebook
         if xsd_type != "codebook":
-            file_xsd = xsd_project
+            file_xsd = xsd_project'''
         return True
 
 
@@ -3160,7 +3160,7 @@ class RefiExport(QtWidgets.QDialog):
             No return value
         """
 
-        file_xsd = xsd_codebook
+        '''file_xsd = xsd_codebook
         if xsd_type != "codebook":
-            file_xsd = xsd_project
+            file_xsd = xsd_project'''
         return True

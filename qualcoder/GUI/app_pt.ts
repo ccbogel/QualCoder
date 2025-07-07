@@ -949,7 +949,8 @@ pt-AU</translation>
     <message>
         <location filename="ui_dialog_import.py" line="94"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delimiter must be a single character.&lt;/p&gt;&lt;p&gt;Enter &apos;ta&apos; for &apos;tab&apos;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&amp;lt;html&amp;gt;&amp;lt;head/&amp;gt;&amp;lt;body&amp;gt;&amp;lt;p&amp;gt;Delimiter deve ser um único caractere.&amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Enter 'ta' para 'tab'&amp;lt;/p&amp;gt;&amp;lt;/body&amp;gt;&amp;gt;&amp;lt;/html&amp;gt;</translation>
+        <translation>Delimiter deve ser um único caractere.
+Enter &apos;ta&apos; para &apos;tab&apos;</translation>
     </message>
     <message>
         <location filename="ui_dialog_import.py" line="95"/>
@@ -964,7 +965,7 @@ pt-AU</translation>
     <message>
         <location filename="ui_dialog_import.py" line="97"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;NONE 123, abc&lt;/p&gt;&lt;p&gt;MINIMAL 123, &amp;quot;abc&amp;quot;&lt;/p&gt;&lt;p&gt;ALL &amp;quot;123&amp;quot;, &amp;quot;abc&amp;quot;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&amp;lt;html&amp;gt;&amp;lt;head/&amp;gt;&amp;lt;body&amp;gt;&amp;lt;p&amp;gt;NONE 123, abc&amp;lt;/p&amp;gt;&amp;gt;p&amp;gt;MINIMAL 123, &amp;quot;abc&amp;quot;&amp;lt;/p&amp;gt;&amp;gt;p&amp;gt;ALL &amp;quot;123&amp;quot;, &amp;quot;abc&amp;quot;&amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;&amp;gt;br/&amp;gt;&amp;gt;/p&amp;gt;&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;</translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_import.py" line="98"/>
@@ -1259,7 +1260,9 @@ Se não estiver marcado: Cada resposta qualitativa será um arquivo de texto ind
     <message>
         <location filename="ui_dialog_cases.py" line="108"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Import cases&lt;/p&gt;&lt;p&gt;Import from a csv or xlsx file.&lt;/p&gt;&lt;p&gt;The file must have a header row and the first column must have the unique case names or identifiers. Subsequent columns are attributes for each case.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&amp;lt;html&amp;gt;&amp;lt;head/&amp;gt;&amp;lt;body&amp;gt;&amp;lt;p&amp;gt;Import cases&amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Import from a csv or xlsx file.&amp;lt;/p&amp;gt;&amp;lt;p&amp;gt; O arquivo deve ter uma linha de cabeçalho e a primeira coluna deve ter os nomes ou identificadores únicos dos casos. As colunas subsequentes são atributos para cada caso.&amp;lt;/p&amp;gt;&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;</translation>
+        <translation>Import cases
+Import from a csv or xlsx file.
+ O arquivo deve ter uma linha de cabeçalho e a primeira coluna deve ter os nomes ou identificadores únicos dos casos. As colunas subsequentes são atributos para cada caso.</translation>
     </message>
     <message>
         <location filename="ui_dialog_cases.py" line="109"/>
@@ -1353,7 +1356,8 @@ Key shortcut: Ctrl S</source>
     <message>
         <location filename="ui_dialog_code_av.py" line="198"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ctrl + Shift + &amp;gt;     Increase play rate to maximum 2x &lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt;    Decrease play rate to minimum 0.1&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&amp;lt;html&amp;gt;&amp;lt;head/&amp;gt;&amp;lt;body&amp;gt;&amp;lt;p&amp;gt;Ctrl + Shift + &amp;gt; Aumentar a taxa de jogo para o máximo 2x &amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Ctrl + Shift + &amp;lt; Diminuir a taxa de jogo para o mínimo 0,1&amp;lt;/p&amp;gt;&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;</translation>
+        <translation>Ctrl Shift &gt; Aumentar a taxa de jogo para o máximo 2x
+Ctrl Shift &lt;  Diminuir a taxa de jogo para o mínimo 0,1</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_av.py" line="199"/>
@@ -1373,12 +1377,12 @@ Key shortcut: Ctrl S</source>
     <message>
         <location filename="ui_dialog_code_av.py" line="202"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Decrease play rate&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt; &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&amp;lt;html&amp;gt;&amp;lt;head/&amp;gt;&amp;lt;body&amp;gt;&amp;lt;p&amp;gt;Diminuir a taxa de jogo&amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Ctrl + Shift + &amp;lt; &amp;lt;/p&amp;gt;&amp;gt;&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;</translation>
+        <translation>Diminuir a taxa de jogo  Ctrl Shift &lt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_av.py" line="203"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Increase play rate&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;gt; &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&amp;lt;html&amp;gt;&amp;lt;head/&amp;gt;&amp;lt;body&amp;gt;&amp;lt;p&amp;gt; Rebobinar 5 segundos&amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Alt + R&amp;lt;/p&amp;gt;&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;</translation>
+        <translation>Rebobinar 5 segundos  Alt + R</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_av.py" line="182"/>
@@ -1773,27 +1777,27 @@ Em seguida, um menu de opções será aberto.
     <message>
         <location filename="ui_dialog_code_image.py" line="153"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show captions&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Mostrar legendas</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_image.py" line="154"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Zoom in. W or +&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Ampliar W ou +</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_image.py" line="155"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Zoom out. Q or -&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Diminuir Q ou -</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_image.py" line="156"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rotate counter-clockwise&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>girar no sentido anti-horário</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_image.py" line="157"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rotate clockwise&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>girar no sentido horário</translation>
     </message>
 </context>
 <context>
@@ -1992,12 +1996,12 @@ Em seguida, um menu de opções será aberto.
     <message>
         <location filename="ui_dialog_code_pdf.py" line="280"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Zoom in (Shift Plus)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Aumentar o zoom (Shift +)</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="281"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Zoom Out (Ctrl Minus)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Diminuir zoom (Ctrl-)</translation>
     </message>
 </context>
 <context>
@@ -2173,7 +2177,8 @@ Em seguida, um menu de opções será aberto.
     <message>
         <location filename="ui_dialog_code_text.py" line="420"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Text font size.&lt;/p&gt;&lt;p&gt;A default size can be set in Settings.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&amp;lt;html&amp;gt;&amp;lt;head/&amp;gt;&amp;lt;body&amp;gt;&amp;lt;p&amp;gt;Tamanho de letra de texto.&amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Um tamanho por defeito pode ser definido em Settings.&amp;lt;/p&amp;gt;&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;</translation>
+        <translation>Tamanho de letra de texto.
+Um tamanho por defeito pode ser definido em Settings.</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="422"/>
@@ -2919,7 +2924,7 @@ Frequências de código e categoria: global e por codificador</translation>
     <message>
         <location filename="ui_dialog_report_code_frequencies.py" line="79"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export Excel&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">Exportar ficheiro csv</translation>
+        <translation>Exportar ficheiro csv</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_code_frequencies.py" line="81"/>
@@ -3205,7 +3210,7 @@ Seleccionar dois codificadores, um ficheiro, um código.</translation>
     <message>
         <location filename="ui_dialog_report_comparisons.py" line="80"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export Excel&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">Exportar arquivo de texto</translation>
+        <translation>Exportar arquivo de texto</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_comparisons.py" line="81"/>
@@ -3281,8 +3286,8 @@ Seleccionar dois codificadores, um ficheiro, um código.</translation>
 The value list can be a single value  or a list where each list item is separated by a semi-colon &apos;;&apos;.
 Wildcards for &apos;like&apos; are % and _</source>
         <translation type="obsolete">Selecione parâmetros para restringir os relatórios para os atributos abaixo. 
-A lista de valores pode ser um único valor ou uma lista onde cada item da lista é separado por um ponto-e-vírgula';'.
-Os wildcards para 'semelhantes' são % e _</translation>
+A lista de valores pode ser um único valor ou uma lista onde cada item da lista é separado por um ponto-e-vírgula&apos;;&apos;.
+Os wildcards para &apos;semelhantes&apos; são % e _</translation>
     </message>
     <message>
         <location filename="ui_report_attribute_parameters.py" line="64"/>
@@ -3925,7 +3930,7 @@ Não recomendado, a menos que você tenha muitos arquivos grandes tornando o bac
     <message>
         <location filename="ui_dialog_view_av.py" line="179"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Increase play rate&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;gt; &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Aumentar a taxa de jogo Ctrl + Shift + &amp;gt; </translation>
+        <translation>Aumentar a taxa de jogo Ctrl Shift &gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="186"/>
@@ -3935,7 +3940,8 @@ Não recomendado, a menos que você tenha muitos arquivos grandes tornando o bac
     <message>
         <location filename="ui_dialog_view_av.py" line="187"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add a speaker name to shortcuts. In the text entry box press ctrl + n&lt;/p&gt;&lt;p&gt;Insert a speaker into transcription. In the text entry box press ctrl + 1 up to ctrl + 8 for the speakers name.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&amp;lt;html&amp;gt;&amp;lt;head/&amp;gt;&amp;lt;body&amp;gt;&amp;lt;p&amp;gt;Adicionar um nome de alto-falante a atalhos. Na caixa de entrada de texto pressione ctrl + n&amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Inserir um alto-falante na transcrição. Na caixa de entrada de texto, pressione ctrl + 1 até ctrl + 8 para o nome dos alto-falantes.&amp;lt;/p&amp;gt;&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;</translation>
+        <translation>Adicionar um nome de alto-falante a atalhos. Na caixa de entrada de texto pressione ctrl + n
+Inserir um alto-falante na transcrição. Na caixa de entrada de texto, pressione ctrl + 1 até ctrl + 8 para o nome dos alto-falantes.</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="188"/>
@@ -4006,7 +4012,7 @@ Não recomendado, a menos que você tenha muitos arquivos grandes tornando o bac
     <message>
         <location filename="ui_dialog_view_av.py" line="170"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Left click on the slider button and drag left or right to change audio/video position.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&amp;lt;html&amp;gt;&amp;lt;head/&amp;gt;&amp;lt;body&amp;gt;&amp;lt;p&amp;gt;clique esquerdo no botão deslizante e arraste para a esquerda ou direita para mudar a posição do áudio/vídeo.&amp;lt;/p&amp;gt;&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;</translation>
+        <translation>clique esquerdo no botão deslizante e arraste para a esquerda ou direita para mudar a posição do áudio/vídeo.</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="180"/>
@@ -4031,7 +4037,7 @@ Não recomendado, a menos que você tenha muitos arquivos grandes tornando o bac
     <message>
         <location filename="ui_dialog_view_av.py" line="187"/>
         <source>&amp;lt;html&amp;gt;&amp;lt;head/&amp;gt;&amp;lt;body&amp;gt;&amp;lt;p&amp;gt;Search uses Regex functions. &amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;A dot â.â is used as a wild card, e.g. â.earsâ will match âbearsâ and âyearsâ. &amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;A â?â after a character will match one or none times that character, e.g. âbears?â will match âbearâ and âbearsâ &amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;&amp;lt;span style=&amp;quot; background-color:transparent;&amp;quot;&amp;gt;A â*â after a character will match zero or more times. &amp;lt;/span&amp;gt;&amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;&amp;lt;span style=&amp;quot; background-color:transparent;&amp;quot;&amp;gt;â&amp;lt;/span&amp;gt;\. will match the dot symbol, â\?â will match the question mark. â\nâ will match the line ending symbol. &amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Regex cheatsheet: &amp;lt;a href=&amp;quot;http://www.rexegg.com/regex-quickstart.html&amp;quot;&amp;gt;&amp;lt;span style=&amp;quot; text-decoration: underline; color:#000080;&amp;quot;&amp;gt;www.rexegg.com/regex-quickstart.html&amp;lt;/span&amp;gt;&amp;lt;/a&amp;gt;&amp;lt;/p&amp;gt;&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;</source>
-        <translation type="obsolete">&amp;lt;html&amp;gt;&amp;lt;head/&amp;gt;&amp;lt;body&amp;gt;&amp;lt;p&amp;gt;Search usa funções Regex. &amp;lt;/p&amp;gt;&amp;gt;&amp;lt;p&amp;gt;Um ponto '.' é usado como um wild card, por exemplo '.ears' corresponderá a 'ursos' e 'anos'. &amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;A '?' depois de um carácter coincidirá uma ou nenhuma vez com esse carácter, por exemplo 'ursos?' coincidirá com 'urso' e 'ursos' &amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;&amp;lt;span style=&amp;quot; background-color:transparent;&amp;quot;&amp;gt;A '*' depois de um carácter coincidirá zero ou mais vezes. &amp;lt;/span&amp;gt;&amp;lt;&amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;&amp;lt;span style=&amp;quot; background-color:transparent;&amp;quot;&amp;gt;'&amp;gt;'&amp;lt;/span&amp;gt;\. coincidirá com o símbolo do ponto, '\?' coincidirá com o ponto de interrogação. '\n' coincidirá com o símbolo de fim de linha. &amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Regex cheatsheet: &amp;lt;a href=&amp;quot;http://www.rexegg.com/regex-quickstart.html&amp;quot;&amp;gt;&amp;lt;estilo de varredura=&amp;quot; decoração de texto: sublinhado; cor:#000080;&amp;quot;&amp;gt;www.rexegg.com/regex-quickstart.html&amp;lt;/span&amp;gt;&amp;lt;/a&amp;gt;&amp;lt;/p&amp;gt;&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;</translation>
+        <translation type="obsolete">&amp;lt;html&amp;gt;&amp;lt;head/&amp;gt;&amp;lt;body&amp;gt;&amp;lt;p&amp;gt;Search usa funções Regex. &amp;lt;/p&amp;gt;&amp;gt;&amp;lt;p&amp;gt;Um ponto &apos;.&apos; é usado como um wild card, por exemplo &apos;.ears&apos; corresponderá a &apos;ursos&apos; e &apos;anos&apos;. &amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;A &apos;?&apos; depois de um carácter coincidirá uma ou nenhuma vez com esse carácter, por exemplo &apos;ursos?&apos; coincidirá com &apos;urso&apos; e &apos;ursos&apos; &amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;&amp;lt;span style=&amp;quot; background-color:transparent;&amp;quot;&amp;gt;A &apos;*&apos; depois de um carácter coincidirá zero ou mais vezes. &amp;lt;/span&amp;gt;&amp;lt;&amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;&amp;lt;span style=&amp;quot; background-color:transparent;&amp;quot;&amp;gt;&apos;&amp;gt;&apos;&amp;lt;/span&amp;gt;\. coincidirá com o símbolo do ponto, &apos;\?&apos; coincidirá com o ponto de interrogação. &apos;\n&apos; coincidirá com o símbolo de fim de linha. &amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Regex cheatsheet: &amp;lt;a href=&amp;quot;http://www.rexegg.com/regex-quickstart.html&amp;quot;&amp;gt;&amp;lt;estilo de varredura=&amp;quot; decoração de texto: sublinhado; cor:#000080;&amp;quot;&amp;gt;www.rexegg.com/regex-quickstart.html&amp;lt;/span&amp;gt;&amp;lt;/a&amp;gt;&amp;lt;/p&amp;gt;&amp;lt;/body&amp;gt;&amp;lt;/html&amp;gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="192"/>
@@ -4081,7 +4087,7 @@ Sublinhado vermelho = Atribuído a código ou anotação</translation>
     <message>
         <location filename="ui_dialog_view_image.py" line="51"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Memo&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation></translation>
+        <translation type="unfinished">Memo</translation>
     </message>
 </context>
 <context>
@@ -4143,7 +4149,7 @@ Traduzido com a versão gratuita do tradutor - www.DeepL.com/Translator</transla
     </message>
     <message>
         <location filename="ui_dialog_view_text.py" line="79"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot &#xe2;&#x80;&#x98;.&#xe2;&#x80;&#x99; is used as a wild card, e.g. &#xe2;&#x80;&#x98;.ears&#xe2;&#x80;&#x99; will match &#xe2;&#x80;&#x98;bears&#xe2;&#x80;&#x99; and &#xe2;&#x80;&#x98;years&#xe2;&#x80;&#x99;. &lt;/p&gt;&lt;p&gt;A &#xe2;&#x80;&#x98;?&#xe2;&#x80;&#x99; after a character will match one or none times that character, e.g. &#xe2;&#x80;&#x98;bears?&#xe2;&#x80;&#x99; will match &#xe2;&#x80;&#x98;bear&#xe2;&#x80;&#x99; and &#xe2;&#x80;&#x98;bears&#xe2;&#x80;&#x99; &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A &#xe2;&#x80;&#x98;*&#xe2;&#x80;&#x99; after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;&#xe2;&#x80;&#x98;&lt;/span&gt;\. will match the dot symbol, &#xe2;&#x80;&#x98;\?&#xe2;&#x80;&#x99; will match the question mark. &#xe2;&#x80;&#x98;\n&#xe2;&#x80;&#x99; will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot â.â is used as a wild card, e.g. â.earsâ will match âbearsâ and âyearsâ. &lt;/p&gt;&lt;p&gt;A â?â after a character will match one or none times that character, e.g. âbears?â will match âbearâ and âbearsâ &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A â*â after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;â&lt;/span&gt;\. will match the dot symbol, â\?â will match the question mark. â\nâ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished">A pesquisa usa funções regex.</translation>
     </message>
 </context>
@@ -4600,7 +4606,7 @@ Traduzido com a versão gratuita do tradutor - www.DeepL.com/Translator</transla
     <message>
         <location filename="ui_main.py" line="391"/>
         <source>Code comparison table</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tabela de comparação de código</translation>
     </message>
 </context>
 </TS>
