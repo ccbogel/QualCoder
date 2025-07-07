@@ -568,7 +568,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             f'Always answer in the following language: "{self.app.ai.get_curr_language()}".\n'
             f'Be sure to include references to the original data, using this format '
             'definition: `[REF: "{The exact text from the original data that you want to reference, '
-            'word for word. Do not translate!}"]`.\n'             
+            'word for word. Do not translate, do not leave words out!}"]`.\n'             
             f'This is the text from the empirical document:\n'
             f'-- BEGIN EMPIRICAL DATA --'
             f'"{text}"'
@@ -704,10 +704,20 @@ data collected. This information will accompany every prompt sent to the AI, res
             # we are not in text analysis chat
             return text
                 
-        pattern = r'\[REF: "(.*?)"\]'  # Pattern for [REF: "QUOTE"]        
+        # pattern = r'\[REF: "(.*?)"\]'  # Pattern for [REF: "QUOTE"]
+        # Pattern for [REF: "QUOTE"] (accepting also different quotation marks)                 
+        """
+        pattern = (
+            r'\[REF: ([\"\'«»‘’])(.+?)\1\]'           # Same open and close
+            r'|\[REF: (“)(.+?)”\]'                    # Curly English quotes
+            r'|\[REF: („)(.+?)“\]'                    # German low-high quotes
+        )  
+        """
+        pattern = r'\[REF: ([\"\'“”„‘’«»])(.+?)([\"\'“”„‘’«»])\]'      
         
         # Replacement function
         def replace_match(match):
+            print(match)
             if streaming:
                 return f'({self.ai_text_doc_name})'
             quote = match.group(1)
