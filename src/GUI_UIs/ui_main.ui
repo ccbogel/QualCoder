@@ -1,0 +1,605 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1024</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>QualCoder</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QGridLayout" name="gridLayout">
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <item row="0" column="0">
+     <widget class="QTabWidget" name="tabWidget">
+      <property name="currentIndex">
+       <number>0</number>
+      </property>
+      <widget class="QWidget" name="tab_action_log">
+       <attribute name="title">
+        <string>Action Log</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_2">
+        <item row="0" column="0">
+         <widget class="QTextEdit" name="textEdit"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="tab_manage">
+       <attribute name="title">
+        <string>Manage</string>
+       </attribute>
+       <widget class="QLabel" name="label_manage">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>20</y>
+          <width>861</width>
+          <height>71</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Select an option in the Files and Cases menu. </string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="tab_coding">
+       <attribute name="title">
+        <string>Coding</string>
+       </attribute>
+       <widget class="QLabel" name="label_coding">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>20</y>
+          <width>811</width>
+          <height>71</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Select an option in the Coding menu. </string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="tab_reports">
+       <attribute name="title">
+        <string>Reports</string>
+       </attribute>
+       <widget class="QLabel" name="label_reports">
+        <property name="geometry">
+         <rect>
+          <x>20</x>
+          <y>20</y>
+          <width>831</width>
+          <height>71</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Select an option in the Reports menu. </string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="tab_ai_chat">
+       <attribute name="title">
+        <string>AI Chat</string>
+       </attribute>
+      </widget>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1024</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuProject">
+    <property name="title">
+     <string>Project</string>
+    </property>
+    <widget class="QMenu" name="menuOpen_Recent_Project">
+     <property name="title">
+      <string>Open Recent Project</string>
+     </property>
+     <addaction name="actionNone"/>
+    </widget>
+    <widget class="QMenu" name="menuExport">
+     <property name="title">
+      <string>Export</string>
+     </property>
+     <addaction name="actionProject_Exchange_Export"/>
+     <addaction name="actionREFI_Codebook_export"/>
+     <addaction name="actionExport_codebook"/>
+     <addaction name="actionExport_codebook_with_memos"/>
+    </widget>
+    <widget class="QMenu" name="menuImport">
+     <property name="title">
+      <string>Import</string>
+     </property>
+     <addaction name="actionREFI_Codebook_import"/>
+     <addaction name="actionREFI_QDA_Project_import"/>
+     <addaction name="actionRQDA_Project_import"/>
+     <addaction name="actionImport_plain_text_codes_list"/>
+    </widget>
+    <addaction name="actionCreate_New_Project"/>
+    <addaction name="actionOpen_Project"/>
+    <addaction name="menuOpen_Recent_Project"/>
+    <addaction name="actionClose_Project"/>
+    <addaction name="actionProject_Memo"/>
+    <addaction name="actionSettings"/>
+    <addaction name="actionProject_summary"/>
+    <addaction name="separator"/>
+    <addaction name="menuImport"/>
+    <addaction name="menuExport"/>
+    <addaction name="separator"/>
+    <addaction name="actionExit"/>
+   </widget>
+   <widget class="QMenu" name="menuFiles_and_Cases">
+    <property name="title">
+     <string>Manage</string>
+    </property>
+    <addaction name="actionManage_files"/>
+    <addaction name="actionManage_cases"/>
+    <addaction name="actionManage_journals"/>
+    <addaction name="actionManage_attributes"/>
+    <addaction name="actionManage_references"/>
+    <addaction name="actionImport_survey_2"/>
+    <addaction name="actionManage_bad_links_to_files"/>
+    <addaction name="actionImport_twitter_data"/>
+   </widget>
+   <widget class="QMenu" name="menuCoding">
+    <property name="title">
+     <string>Coding</string>
+    </property>
+    <addaction name="actionCodes"/>
+    <addaction name="actionCode_image"/>
+    <addaction name="actionCode_audio_video"/>
+    <addaction name="actionCode_pdf"/>
+    <addaction name="actionAI_assisted_coding"/>
+    <addaction name="actionColour_scheme"/>
+    <addaction name="actionCode_organiser"/>
+   </widget>
+   <widget class="QMenu" name="menuReports">
+    <property name="title">
+     <string>Reports</string>
+    </property>
+    <addaction name="actionCoding_reports"/>
+    <addaction name="actionCoding_comparison"/>
+    <addaction name="actionCoding_comparison_by_file"/>
+    <addaction name="actionCode_comparison_table"/>
+    <addaction name="actionCode_frequencies"/>
+    <addaction name="actionFile_summary"/>
+    <addaction name="actionCode_summary"/>
+    <addaction name="actionCode_relations"/>
+    <addaction name="actionCode_co_occurrence"/>
+    <addaction name="actionCode_text_exact_matches"/>
+    <addaction name="actionText_segments_by_codes"/>
+    <addaction name="actionView_Graph"/>
+    <addaction name="actionCharts"/>
+    <addaction name="actionText_mining"/>
+    <addaction name="actionSQL_statements"/>
+    <addaction name="separator"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actionContents"/>
+    <addaction name="actionAbout"/>
+    <addaction name="actionSpecial_functions"/>
+    <addaction name="actionMenu_Key_Shortcuts"/>
+   </widget>
+   <widget class="QMenu" name="menuAI">
+    <property name="title">
+     <string>AI</string>
+    </property>
+    <addaction name="actionAI_Setup_wizard"/>
+    <addaction name="actionAI_Configuration"/>
+    <addaction name="actionAI_Rebuild_internal_memory"/>
+    <addaction name="actionAI_Edit_Project_Memo"/>
+    <addaction name="actionAI_Prompts"/>
+    <addaction name="separator"/>
+    <addaction name="actionAI_Chat"/>
+    <addaction name="actionAI_Search_and_Coding"/>
+   </widget>
+   <addaction name="menuProject"/>
+   <addaction name="menuFiles_and_Cases"/>
+   <addaction name="menuCoding"/>
+   <addaction name="menuReports"/>
+   <addaction name="menuAI"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionCreate_New_Project">
+   <property name="text">
+    <string>Create New Project</string>
+   </property>
+  </action>
+  <action name="actionOpen_Project">
+   <property name="text">
+    <string>Open Project</string>
+   </property>
+  </action>
+  <action name="actionClose_Project">
+   <property name="text">
+    <string>Close Project</string>
+   </property>
+  </action>
+  <action name="actionProject_Memo">
+   <property name="text">
+    <string>Project Memo</string>
+   </property>
+  </action>
+  <action name="actionSettings">
+   <property name="text">
+    <string>Settings</string>
+   </property>
+  </action>
+  <action name="actionExit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+  </action>
+  <action name="actionManage_files">
+   <property name="text">
+    <string>Manage files</string>
+   </property>
+  </action>
+  <action name="actionManage_cases">
+   <property name="text">
+    <string>Manage cases</string>
+   </property>
+  </action>
+  <action name="actionFile_categories">
+   <property name="text">
+    <string>File categories</string>
+   </property>
+  </action>
+  <action name="actionManage_journals">
+   <property name="text">
+    <string>Manage journals</string>
+   </property>
+  </action>
+  <action name="actionCodes">
+   <property name="text">
+    <string>Code text</string>
+   </property>
+  </action>
+  <action name="actionCategories">
+   <property name="text">
+    <string>Categories</string>
+   </property>
+  </action>
+  <action name="actionCodebook">
+   <property name="text">
+    <string>Codebook</string>
+   </property>
+  </action>
+  <action name="actionAssign_Attributes">
+   <property name="text">
+    <string>Assign Attributes</string>
+   </property>
+  </action>
+  <action name="actionManage_Attributes">
+   <property name="text">
+    <string>Manage Attributes</string>
+   </property>
+  </action>
+  <action name="actionImport_Attributes">
+   <property name="text">
+    <string>Import Attributes</string>
+   </property>
+  </action>
+  <action name="actionCoding_reports">
+   <property name="text">
+    <string>Coding reports</string>
+   </property>
+  </action>
+  <action name="actionCoding_summary">
+   <property name="text">
+    <string>Coding summary</string>
+   </property>
+  </action>
+  <action name="actionSQL_statements">
+   <property name="text">
+    <string>Database queries</string>
+   </property>
+  </action>
+  <action name="actionContents">
+   <property name="text">
+    <string>Contents</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About</string>
+   </property>
+  </action>
+  <action name="actionImport_survey">
+   <property name="text">
+    <string>Import survey</string>
+   </property>
+  </action>
+  <action name="actionManage_attributes">
+   <property name="text">
+    <string>Manage attributes</string>
+   </property>
+  </action>
+  <action name="actionFrequency_table">
+   <property name="text">
+    <string>Frequency table</string>
+   </property>
+  </action>
+  <action name="actionCoding_comparison">
+   <property name="text">
+    <string>Coding comparison</string>
+   </property>
+  </action>
+  <action name="actionText_mining">
+   <property name="text">
+    <string>Text mining</string>
+   </property>
+  </action>
+  <action name="actionView_Graph">
+   <property name="text">
+    <string>View Graph</string>
+   </property>
+  </action>
+  <action name="actionExport_codebook">
+   <property name="text">
+    <string>Export codebook as ODT file</string>
+   </property>
+  </action>
+  <action name="actionCode_image">
+   <property name="text">
+    <string>Code image</string>
+   </property>
+  </action>
+  <action name="actionCode_frequencies">
+   <property name="text">
+    <string>Code frequencies</string>
+   </property>
+  </action>
+  <action name="actionCoding_Matrix">
+   <property name="text">
+    <string>Coding Matrix</string>
+   </property>
+  </action>
+  <action name="actionCode_audio_video">
+   <property name="text">
+    <string>Code audio/video</string>
+   </property>
+  </action>
+  <action name="actionProject_Exchange_Export">
+   <property name="text">
+    <string>REFI-QDA Project export</string>
+   </property>
+   <property name="toolTip">
+    <string>REFI-QDA Project export</string>
+   </property>
+  </action>
+  <action name="actionREFI_Codebook_export">
+   <property name="text">
+    <string>REFI-QDA Codebook export</string>
+   </property>
+  </action>
+  <action name="actionREFI_Codebook_import">
+   <property name="text">
+    <string>REFI-QDA Codebook import</string>
+   </property>
+  </action>
+  <action name="actionREFI_QDA_Project_import">
+   <property name="text">
+    <string>REFI-QDA Project import</string>
+   </property>
+  </action>
+  <action name="actionRQDA_Project_import">
+   <property name="text">
+    <string>RQDA Project import</string>
+   </property>
+  </action>
+  <action name="actionProject_summary">
+   <property name="text">
+    <string>Project summary</string>
+   </property>
+  </action>
+  <action name="actionNone">
+   <property name="text">
+    <string>None</string>
+   </property>
+  </action>
+  <action name="actionCode_relations">
+   <property name="text">
+    <string>Code relations</string>
+   </property>
+  </action>
+  <action name="actionExport_coded_text_as_html">
+   <property name="text">
+    <string>Export coded text as html</string>
+   </property>
+  </action>
+  <action name="actionManage_bad_links_to_files">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Manage bad links to files</string>
+   </property>
+  </action>
+  <action name="actionSpecial_functions">
+   <property name="text">
+    <string>Special functions</string>
+   </property>
+  </action>
+  <action name="actionFile_summary">
+   <property name="text">
+    <string>File summary</string>
+   </property>
+  </action>
+  <action name="actionCode_summary">
+   <property name="text">
+    <string>Code summary</string>
+   </property>
+  </action>
+  <action name="actionCoding_comparison_by_file">
+   <property name="text">
+    <string>Coding comparison by file</string>
+   </property>
+  </action>
+  <action name="actionCode_by_case">
+   <property name="text">
+    <string>Code by case</string>
+   </property>
+  </action>
+  <action name="actionCharts">
+   <property name="text">
+    <string>Charts</string>
+   </property>
+  </action>
+  <action name="actionExport_codebook_with_memos">
+   <property name="text">
+    <string>Export codebook with memos as ODT file</string>
+   </property>
+  </action>
+  <action name="actionImport_references_RIS_format">
+   <property name="text">
+    <string>Import references RIS format</string>
+   </property>
+  </action>
+  <action name="actionManage_references">
+   <property name="text">
+    <string>Manage references</string>
+   </property>
+  </action>
+  <action name="actionColour_scheme">
+   <property name="text">
+    <string>Colour scheme</string>
+   </property>
+  </action>
+  <action name="actionImport_plain_text_codes_list">
+   <property name="text">
+    <string>Import plain text codes list</string>
+   </property>
+  </action>
+  <action name="actionImport_survey_2">
+   <property name="text">
+    <string>Import survey</string>
+   </property>
+  </action>
+  <action name="actionMenu_Key_Shortcuts">
+   <property name="text">
+    <string>Menu Key Shortcuts</string>
+   </property>
+  </action>
+  <action name="actionImport_twitter_data">
+   <property name="text">
+    <string>Import twitter data</string>
+   </property>
+  </action>
+  <action name="actionCode_pdf">
+   <property name="text">
+    <string>Code pdf</string>
+   </property>
+  </action>
+  <action name="actionCode_text_exact_matches">
+   <property name="text">
+    <string>Code text exact matches</string>
+   </property>
+  </action>
+  <action name="actionAI_Setup_wizard">
+   <property name="text">
+    <string>Setup Wizard</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionAI_Rebuild_internal_memory">
+   <property name="text">
+    <string>Rebuild Internal Memory</string>
+   </property>
+  </action>
+  <action name="actionAI_Edit_Project_Memo">
+   <property name="text">
+    <string>Project Memo</string>
+   </property>
+  </action>
+  <action name="actionAI_Chat">
+   <property name="text">
+    <string>AI Chat</string>
+   </property>
+  </action>
+  <action name="actionAI_Search_and_Coding">
+   <property name="text">
+    <string>AI Assisted Coding</string>
+   </property>
+  </action>
+  <action name="actionAI_Configuration">
+   <property name="text">
+    <string>Settings</string>
+   </property>
+   <property name="toolTip">
+    <string>AI related Settings</string>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::NoRole</enum>
+   </property>
+  </action>
+  <action name="actionAI_Prompts">
+   <property name="text">
+    <string>Prompt library</string>
+   </property>
+  </action>
+  <action name="actionCode_organiser">
+   <property name="text">
+    <string>Code organiser</string>
+   </property>
+  </action>
+  <action name="actionText_segments_by_codes">
+   <property name="text">
+    <string>Codes by text segments</string>
+   </property>
+  </action>
+  <action name="actionAI_assisted_coding">
+   <property name="text">
+    <string>AI assisted coding</string>
+   </property>
+  </action>
+  <action name="actionCode_co_occurrence">
+   <property name="text">
+    <string>Code co-occurrence</string>
+   </property>
+  </action>
+  <action name="actionCode_comparison_table">
+   <property name="text">
+    <string>Code counts by file/case</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

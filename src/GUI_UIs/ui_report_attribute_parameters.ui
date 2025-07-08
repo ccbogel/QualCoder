@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Dialog_report_attribute_parameters</class>
+ <widget class="QDialog" name="Dialog_report_attribute_parameters">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>758</width>
+    <height>509</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Attribute selection parameters</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>100</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>100</height>
+      </size>
+     </property>
+     <property name="title">
+      <string/>
+     </property>
+     <widget class="QPushButton" name="pushButton_load_filter">
+      <property name="geometry">
+       <rect>
+        <x>510</x>
+        <y>10</y>
+        <width>30</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Load filter settings&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>0</y>
+        <width>361</width>
+        <height>85</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>85</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>80</height>
+       </size>
+      </property>
+      <property name="text">
+       <string>Select parameters for the attributes. 
+between requires 2 values separated by ; e.g. 1;100
+ in and not in require 1 or more values separated by ;
+Wildcards for 'like' are % and _</string>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_save_filter">
+      <property name="geometry">
+       <rect>
+        <x>550</x>
+        <y>10</y>
+        <width>30</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Save filter settings.&lt;/p&gt;&lt;p&gt;Do not use apostrophe or comma in any values.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_clear">
+      <property name="geometry">
+       <rect>
+        <x>510</x>
+        <y>43</y>
+        <width>131</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Clear attribute selections</string>
+      </property>
+      <property name="text">
+       <string>Clear</string>
+      </property>
+     </widget>
+     <widget class="QRadioButton" name="radioButton_and">
+      <property name="geometry">
+       <rect>
+        <x>380</x>
+        <y>10</y>
+        <width>90</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>90</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Boolean And&lt;/p&gt;&lt;p&gt;For all parameter selections&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string>and</string>
+      </property>
+     </widget>
+     <widget class="QRadioButton" name="radioButton_or">
+      <property name="geometry">
+       <rect>
+        <x>380</x>
+        <y>50</y>
+        <width>80</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>80</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Boolean Or&lt;/p&gt;&lt;p&gt;For all parameter selections&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string>or</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QTableWidget" name="tableWidget">
+     <column>
+      <property name="text">
+       <string>Attribute</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Source</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Type</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Operator</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Value list</string>
+      </property>
+     </column>
+    </widget>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>Dialog_report_attribute_parameters</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>375</x>
+     <y>504</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>378</x>
+     <y>263</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>Dialog_report_attribute_parameters</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>375</x>
+     <y>504</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>378</x>
+     <y>263</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

@@ -9,6 +9,7 @@ plotly
 ply
 PyQt6>=6.5
 qtawesome
+pymupdf
 python-vlc
 requests
 rispy

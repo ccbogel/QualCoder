@@ -32,13 +32,13 @@ https://qualcoder.wordpress.com/
 import os
 import subprocess
 
-script_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.dirname(os.path.abspath(__file__))
 
 # path to .ui-files
-ui_dir = os.path.join(script_dir, "GUI_UIs")
+ui_dir = os.path.join(project_root, "src", "GUI_UIs")
 
 # path to .py-files
-py_dir = os.path.join(script_dir, "qualcoder", "GUI")
+py_dir = os.path.join(project_root, "src", "qualcoder", "GUI")
 
 for file in os.listdir(ui_dir):
     if file.endswith(".ui"):

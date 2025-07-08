@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Dialog_Coocurrence</class>
+ <widget class="QDialog" name="Dialog_Coocurrence">
+  <property name="windowModality">
+   <enum>Qt::NonModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>839</width>
+    <height>540</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Code Co-occurence</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="leftMargin">
+    <number>6</number>
+   </property>
+   <property name="rightMargin">
+    <number>6</number>
+   </property>
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>48</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>44</height>
+      </size>
+     </property>
+     <property name="title">
+      <string/>
+     </property>
+     <widget class="QLabel" name="label_selections">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>3</y>
+        <width>211</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>22</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777213</width>
+        <height>22</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show the overlapping codes.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string>Code co-occurence</string>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_export">
+      <property name="geometry">
+       <rect>
+        <x>410</x>
+        <y>1</y>
+        <width>32</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>32</width>
+        <height>32</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>32</width>
+        <height>32</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>Export to file</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBox_hide_blanks">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>30</y>
+        <width>211</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Hide blank lines</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_select_files">
+      <property name="geometry">
+       <rect>
+        <x>250</x>
+        <y>1</y>
+        <width>32</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>32</width>
+        <height>32</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>32</width>
+        <height>32</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>Select files</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_select_categories">
+      <property name="geometry">
+       <rect>
+        <x>370</x>
+        <y>1</y>
+        <width>32</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>32</width>
+        <height>32</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>32</width>
+        <height>32</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>Select categories</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_select_codes">
+      <property name="geometry">
+       <rect>
+        <x>330</x>
+        <y>1</y>
+        <width>32</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>32</width>
+        <height>32</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>32</width>
+        <height>32</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>Select codes</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_file_attributes">
+      <property name="geometry">
+       <rect>
+        <x>290</x>
+        <y>1</y>
+        <width>32</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>32</width>
+        <height>32</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>32</width>
+        <height>32</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>Select files by attributes</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string/>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0">
+       <widget class="QSplitter" name="splitter">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <widget class="QTableWidget" name="tableWidget"/>
+        <widget class="QTextEdit" name="textEdit"/>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>pushButton_export</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>

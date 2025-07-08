@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>DialogSegmentCodings</class>
+ <widget class="QDialog" name="DialogSegmentCodings">
+  <property name="windowModality">
+   <enum>Qt::NonModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1085</width>
+    <height>571</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Report Segment Codings</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>80</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>80</height>
+      </size>
+     </property>
+     <property name="title">
+      <string/>
+     </property>
+     <widget class="QLineEdit" name="lineEdit">
+      <property name="geometry">
+       <rect>
+        <x>200</x>
+        <y>45</y>
+        <width>183</width>
+        <height>30</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_text_limiter">
+      <property name="geometry">
+       <rect>
+        <x>200</x>
+        <y>22</y>
+        <width>183</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Text limiter:</string>
+      </property>
+      <property name="wordWrap">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_run_report">
+      <property name="geometry">
+       <rect>
+        <x>450</x>
+        <y>24</y>
+        <width>51</width>
+        <height>51</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Run report</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_coder">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>22</y>
+        <width>130</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Coder:</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="comboBox_coders">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>45</y>
+        <width>181</width>
+        <height>30</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_title">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>-3</y>
+        <width>531</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Codes by text segments table. 1 = code present, 0 = not coded.</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_export_xlsx">
+      <property name="geometry">
+       <rect>
+        <x>510</x>
+        <y>42</y>
+        <width>32</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Export to Excel</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_file_attributes">
+      <property name="geometry">
+       <rect>
+        <x>390</x>
+        <y>44</y>
+        <width>32</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select files by attributes&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string/>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <property name="topMargin">
+       <number>5</number>
+      </property>
+      <property name="bottomMargin">
+       <number>2</number>
+      </property>
+      <item row="0" column="0">
+       <widget class="QSplitter" name="splitter">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <widget class="QSplitter" name="splitter_vert">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <widget class="QListWidget" name="listWidget_files">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Files. Right click for selection options.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+         </widget>
+         <widget class="QListWidget" name="listWidget_cases">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Cases. Right click for selection options.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+         </widget>
+         <widget class="QTreeWidget" name="treeWidget">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Codes. Right click for options&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <column>
+           <property name="text">
+            <string notr="true">Code Tree</string>
+           </property>
+          </column>
+         </widget>
+        </widget>
+        <widget class="QTableWidget" name="tableWidget"/>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <tabstops>
+  <tabstop>comboBox_coders</tabstop>
+  <tabstop>lineEdit</tabstop>
+  <tabstop>pushButton_run_report</tabstop>
+  <tabstop>listWidget_files</tabstop>
+  <tabstop>listWidget_cases</tabstop>
+  <tabstop>treeWidget</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>
