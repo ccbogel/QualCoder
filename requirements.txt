@@ -4,6 +4,7 @@ EbookLib
 openpyxl
 pandas
 pdfminer.six
+fitz
 Pillow
 plotly
 ply
