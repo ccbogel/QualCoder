@@ -233,8 +233,12 @@ want to continue?\
                 r = requests.get(url, stream=True, timeout=20)
                 r.raise_for_status()  # raise error on 404 etc.
                 with open(tmp_filename, "wb") as f:
-                    total_length = int(r.headers.get('content-length'))
-                    expected_size = (total_length/1024) + 1
+                    total_length = r.headers.get('content-length')
+                    if total_length is not None:
+                        total_length = int(total_length)
+                        expected_size = (total_length / 1024) + 1
+                    else:
+                        expected_size = 0
                     i = 0
                     for chunk in r.iter_content(chunk_size=1024):
                         if self.download_model_cancel:
@@ -242,7 +246,10 @@ want to continue?\
                         if chunk:
                             f.write(chunk)
                             i += 1
-                            msg = f'{os.path.basename(local_path)}: {round(i/expected_size * 100)}%'
+                            if expected_size > 0:
+                                msg = f'{os.path.basename(local_path)}: {round(i/expected_size * 100)}%'
+                            else:
+                                msg = f'{os.path.basename(local_path)}: 50%'
                             if signals is not None and signals.progress is not None:
                                 signals.progress.emit(msg)
                             print(msg, '                           ', end='\r', flush=True)
