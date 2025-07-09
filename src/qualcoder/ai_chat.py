@@ -567,8 +567,12 @@ data collected. This information will accompany every prompt sent to the AI, res
             f'"{prompt.text}"\n\n'
             f'Always answer in the following language: "{self.app.ai.get_curr_language()}".\n'
             f'Be sure to include references to the original data, using this format '
-            'definition: `[REF: "{The exact text from the original data that you want to reference, '
-            'word for word. Do not translate!}"]`.\n'             
+            'definition: `[REF: "{The text from the original data that you want to reference. '
+            'I have to match this against the original, so it is very important that you don\'t '
+            'change the quoted text in any way. Do not translate or correct errors, do not '
+            'leave parts of the text out. Create a new reference for every single quote.}"]`. \n'
+            'My app will later replace these references with a short form (document name + line '
+            'number), so don\'t expect the quoted text in the reference to be visible to the user.\n'
             f'This is the text from the empirical document:\n'
             f'-- BEGIN EMPIRICAL DATA --'
             f'"{text}"'
@@ -648,6 +652,32 @@ data collected. This information will accompany every prompt sent to the AI, res
                 self.ui.pushButton_question.setEnabled(True)
                 chat = self.chat_list[self.current_chat_idx]
                 id_, name, analysis_type, summary, date, analysis_prompt = chat
+                if analysis_type == 'text chat':
+                    # Extract doc info from the summary field:
+                    doc_info_pattern = r'<a href="quote:(\d+)_(\d+)_(\d+)">(.+?)</a>'
+                    m = re.search(doc_info_pattern, summary)
+                    if m:
+                        try:
+                            self.ai_text_doc_id = int(m.group(1))
+                            self.ai_text_start_pos = int(m.group(2))
+                            len_text = int(m.group(3))
+                            cursor = self.app.conn.cursor()
+                            sql = f'SELECT name, fulltext FROM source WHERE id = {self.ai_text_doc_id}'
+                            cursor.execute(sql)
+                            source = cursor.fetchone()
+                            self.ai_text_doc_name = source[0]
+                            self.ai_text_text = source[1][self.ai_text_start_pos:self.ai_text_start_pos + len_text] 
+                        except:
+                            self.ai_text_doc_id = None
+                            self.ai_text_start_pos = None
+                            self.ai_text_doc_name = None
+                            self.ai_text_text = ''
+                    else:
+                        self.ai_text_doc_id = None
+                        self.ai_text_start_pos = None
+                        self.ai_text_doc_name = None   
+                        self.ai_text_text = ''                   
+                            
                 self.ui.ai_output.setText('')  # Clear chat window
                 # Show title
                 html += f'<h1 style={self.ai_info_style}>{name}</h1>'
@@ -704,13 +734,13 @@ data collected. This information will accompany every prompt sent to the AI, res
             # we are not in text analysis chat
             return text
                 
-        pattern = r'\[REF: "(.*?)"\]'  # Pattern for [REF: "QUOTE"]        
+        pattern = r'\[REF: ([\"\'“”„‘’«»])(.+?)([\"\'“”„‘’«»])\]'      
         
         # Replacement function
         def replace_match(match):
             if streaming:
                 return f'({self.ai_text_doc_name})'
-            quote = match.group(1)
+            quote = match.group(2)
             # search quote with not more than 10% mismatch (Levenshtein Distance). This is done because the AI sometimes alters the text a little bit.
             quote_found = fuzzysearch.find_near_matches(quote, self.ai_text_text, 
                              max_l_dist=round(len(quote) * 0.1))  # result: list [Match(start=x, end=x, dist=x, matched='txt')]
