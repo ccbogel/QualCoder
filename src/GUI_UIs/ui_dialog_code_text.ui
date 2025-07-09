@@ -34,7 +34,7 @@
      <widget class="QPushButton" name="pushButton_auto_code">
       <property name="geometry">
        <rect>
-        <x>510</x>
+        <x>530</x>
         <y>0</y>
         <width>28</width>
         <height>28</height>
@@ -223,7 +223,7 @@
      <widget class="QPushButton" name="pushButton_auto_code_frag_this_file">
       <property name="geometry">
        <rect>
-        <x>540</x>
+        <x>560</x>
         <y>0</y>
         <width>28</width>
         <height>28</height>
@@ -239,7 +239,7 @@
      <widget class="QPushButton" name="pushButton_auto_code_frag_all_files">
       <property name="geometry">
        <rect>
-        <x>570</x>
+        <x>590</x>
         <y>0</y>
         <width>28</width>
         <height>28</height>
@@ -255,7 +255,7 @@
      <widget class="QPushButton" name="pushButton_auto_code_undo">
       <property name="geometry">
        <rect>
-        <x>630</x>
+        <x>650</x>
         <y>0</y>
         <width>28</width>
         <height>28</height>
@@ -271,7 +271,7 @@
      <widget class="QPushButton" name="pushButton_delete_all_codes">
       <property name="geometry">
        <rect>
-        <x>860</x>
+        <x>880</x>
         <y>0</y>
         <width>28</width>
         <height>28</height>
@@ -369,7 +369,7 @@
      <widget class="QPushButton" name="pushButton_auto_code_surround">
       <property name="geometry">
        <rect>
-        <x>600</x>
+        <x>620</x>
         <y>0</y>
         <width>28</width>
         <height>28</height>
@@ -385,7 +385,7 @@
      <widget class="QPushButton" name="pushButton_help">
       <property name="geometry">
        <rect>
-        <x>710</x>
+        <x>840</x>
         <y>0</y>
         <width>28</width>
         <height>28</height>
@@ -588,7 +588,7 @@ As all assigned positions may be incorrect. </string>
      <widget class="QPushButton" name="pushButton_right_side_pane">
       <property name="geometry">
        <rect>
-        <x>680</x>
+        <x>810</x>
         <y>0</y>
         <width>28</width>
         <height>28</height>
@@ -599,6 +599,23 @@ As all assigned positions may be incorrect. </string>
       </property>
       <property name="text">
        <string/>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBox_auto_regex">
+      <property name="geometry">
+       <rect>
+        <x>680</x>
+        <y>5</y>
+        <width>81</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Apply REGEX to autocoding for exact text and sentences buttons.
+https://www.datacamp.com/cheat-sheet/regular-expresso</string>
+      </property>
+      <property name="text">
+       <string>REGEX</string>
       </property>
      </widget>
     </widget>
