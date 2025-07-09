@@ -3771,18 +3771,19 @@ class DialogCodeText(QtWidgets.QWidget):
     def button_autocode_sentences_this_file(self):
         """ Flag to autocode sentences in one file """
 
-        self.code_sentences("")
+        self.auto_code_sentences("")
 
     def button_autocode_sentences_all_files(self):
         """ Flag to autocode sentences across all text files. """
 
-        self.code_sentences("all")
+        self.auto_code_sentences("all")
 
     def button_autocode_surround(self):
         """ Autocode with selected code using start and end marks.
          Uses selected files.
          Line ending text representation \\n is replaced with the actual line ending character.
          Activated by: self.ui.pushButton_auto_code_surround
+         Regex is not used for this function
          """
 
         self.clear_edit_variables()
@@ -3909,12 +3910,12 @@ class DialogCodeText(QtWidgets.QWidget):
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
 
-    def code_sentences(self, all_=""):
+    def auto_code_sentences(self, all_=""):
         """ Code full sentence based on text fragment.
         Activated via self.ui.pushButton_auto_code_frag_this_file -> button_autocode_sentences_this_file()
         Activated via self.ui.pushButton_auto_code_frag_this_file -> button_autocode_sentences_all_files()
 
-        param:
+        Args:
             all = "" :  for this text file only.
             all = "all" :  for all text files.
         """
@@ -3937,8 +3938,8 @@ class DialogCodeText(QtWidgets.QWidget):
         ok = dialog.exec()
         if not ok:
             return
-        text_ = dialog.textValue()
-        if text_ == "":
+        find_text = dialog.textValue()
+        if find_text == "":
             return
         dialog2 = QtWidgets.QInputDialog(None)
         dialog2.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
@@ -3964,13 +3965,25 @@ class DialogCodeText(QtWidgets.QWidget):
         cur = self.app.conn.cursor()
         msg = ""
         undo_list = []
+
+        # Regex
+        regex_pattern = None
+        if self.ui.checkBox_auto_regex.isChecked():
+            try:
+                regex_pattern = re.compile(find_text)
+            except re.error as e_:
+                logger.warning('re error Bad escape ' + str(e_))
+                Message(self.app, _("Regex compliation error"), str(e_))
+            if regex_pattern is None:
+                return
+
         try:
             for f in files:
                 sentences = f['fulltext'].split(ending)
                 pos0 = 0
                 codes_added = 0
                 for sentence in sentences:
-                    if text_ in sentence:
+                    if (find_text in sentence and not regex_pattern) or (regex_pattern and regex_pattern.search(sentence)):
                         i = {'cid': cid, 'fid': int(f['id']), 'seltext': str(sentence),
                              'pos0': pos0, 'pos1': pos0 + len(sentence),
                              'owner': self.app.settings['codername'], 'memo': "",
@@ -3994,7 +4007,7 @@ class DialogCodeText(QtWidgets.QWidget):
                             logger.debug(_("Autocode insert error ") + str(e))
                     pos0 += len(sentence) + len(ending)
                 if codes_added > 0:
-                    msg += _("File: ") + f['name'] + " " + str(codes_added) + _(" added codes") + "\n"
+                    msg += _("File: ") + f"{f['name']} {codes_added}" + _(" added codes") + "\n"
             self.app.conn.commit()
         except Exception as e_:
             print(e_)
@@ -4003,13 +4016,13 @@ class DialogCodeText(QtWidgets.QWidget):
             raise
         if len(undo_list) > 0:
             name = _("Sentence coding: ") + _("\nCode: ") + item.text(0)
-            name += _("\nWith: ") + text_ + _("\nUsing line ending: ") + ending
+            name += _("\nWith: ") + find_text + _("\nUsing line ending: ") + ending
             undo_dict = {"name": name, "sql_list": undo_list}
             self.autocode_history.insert(0, undo_dict)
         self.parent_textEdit.append(_("Automatic code sentence in files:")
                                     + _("\nCode: ") + item.text(0)
                                     + _("\nWith text fragment: ")
-                                    + text_
+                                    + find_text
                                     + _("\nUsing line ending: ")
                                     + ending + "\n" + msg)
         self.app.delete_backup = False
@@ -4020,6 +4033,7 @@ class DialogCodeText(QtWidgets.QWidget):
     def auto_code(self):
         """ Autocode text in one file or all files with currently selected code.
         Button menu option to auto-code all, first or last instances in files.
+        Split multiple find textx with pipe |
         Activated using self.ui.pushButton_auto_code
         """
 
@@ -4043,12 +4057,15 @@ class DialogCodeText(QtWidgets.QWidget):
         find_text = str(dialog.textValue())
         if find_text == "" or find_text is None:
             return
-        texts = find_text.split('|')
-        tmp = list(set(texts))
-        texts = []
+        texts_ = find_text.split('|')
+        tmp = list(set(texts_))
+        find_texts = []
         for t in tmp:
             if t != "":
-                texts.append(t)
+                find_texts.append(t)
+        # Regex, pipe | has different meaning, so do not split into separate texts
+        if self.ui.checkBox_auto_regex.isChecked():
+            find_texts = [find_text]
         if len(self.filenames) == 0:
             return
         ui = DialogSelectItems(self.app, self.filenames, _("Select files to code"), "many")
@@ -4060,10 +4077,21 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         self.clear_edit_variables()
 
+        # Regex
+        regex_pattern = None
+        if self.ui.checkBox_auto_regex.isChecked():
+            try:
+                regex_pattern = re.compile(find_texts[0])
+            except re.error as e_:
+                logger.warning('re error Bad escape ' + str(e_))
+                Message(self.app, _("Regex compliation error"), str(e_))
+            if regex_pattern is None:
+                return
+
         undo_list = []
         cur = self.app.conn.cursor()
         try:
-            for txt in texts:
+            for find_txt in find_texts:
                 filenames = ""
                 for f in files:
                     filenames += f['name'] + " "
@@ -4071,39 +4099,52 @@ class DialogCodeText(QtWidgets.QWidget):
                                 "(mediapath is null or mediapath like '/docs/%' or mediapath like 'docs:%')",
                                 [f['id']])
                     current_file = cur.fetchone()
-                    # Rare but possible no result is returned, hence if statement
-                    if current_file is not None:
-                        text_ = current_file[2]
-                        text_starts = [match.start() for match in re.finditer(re.escape(txt), text_)]
-                        # Trim to first or last instance if option selected
-                        if self.all_first_last == "first" and len(text_starts) > 1:
-                            text_starts = [text_starts[0]]
-                        if self.all_first_last == "last" and len(text_starts) > 1:
-                            text_starts = [text_starts[-1]]
+                    # Rare but possible no result is returned.
+                    if current_file is None:
+                        continue
 
-                        # Add new items to database
-                        for startPos in text_starts:
-                            item = {'cid': cid, 'fid': int(f['id']), 'seltext': str(txt),
-                                    'pos0': startPos, 'pos1': startPos + len(txt),
-                                    'owner': self.app.settings['codername'], 'memo': "",
-                                    'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")}
-                            try:
-                                cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,\
-                                    owner,memo,date) values(?,?,?,?,?,?,?,?)",
-                                            [item['cid'], item['fid'], item['seltext'], item['pos0'],
-                                             item['pos1'], item['owner'], item['memo'], item['date']])
-                                # Record a list of undo sql
-                                undo = {
-                                    "sql": "delete from code_text where cid=? and fid=? and pos0=? and pos1=? and owner=?",
-                                    "cid": item['cid'], "fid": item['fid'], "pos0": item['pos0'], "pos1": item['pos1'],
-                                    "owner": item['owner']}
-                                undo_list.append(undo)
-                            except sqlite3.IntegrityError as e:
-                                logger.debug(_("Autocode insert error ") + str(e))
-                            self.app.delete_backup = False
+                    file_text = current_file[2]
+                    text_starts = []
+                    text_ends = []
+                    if regex_pattern:
+                        for match in regex_pattern.finditer(file_text):
+                            text_starts.append(match.start())
+                            text_ends.append(match.end())
+                    else:
+                        text_starts = [match.start() for match in re.finditer(re.escape(find_txt), file_text)]
+                        text_ends = [match.end() for match in re.finditer(re.escape(find_txt), file_text)]
+
+                    # Trim to first or last instance if option selected
+                    if self.all_first_last == "first" and len(text_starts) > 1:
+                        text_starts = [text_starts[0]]
+                    if self.all_first_last == "last" and len(text_starts) > 1:
+                        text_starts = [text_starts[-1]]
+
+                    # Add new items to database
+                    for index in range(len(text_starts)):
+                        item = {'cid': cid, 'fid': int(f['id']), 'seltext': str(find_txt),
+                                'pos0': text_starts[index], 'pos1': text_ends[index],
+                                'owner': self.app.settings['codername'], 'memo': "",
+                                'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")}
+                        try:
+                            cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,\
+                                owner,memo,date) values(?,?,?,?,?,?,?,?)",
+                                        [item['cid'], item['fid'], item['seltext'], item['pos0'],
+                                         item['pos1'], item['owner'], item['memo'], item['date']])
+                            # Record a list of undo sql
+                            undo = {
+                                "sql": "delete from code_text where cid=? and fid=? and pos0=? and pos1=? and owner=?",
+                                "cid": item['cid'], "fid": item['fid'], "pos0": item['pos0'], "pos1": item['pos1'],
+                                "owner": item['owner']}
+                            undo_list.append(undo)
+                        except sqlite3.IntegrityError as e:
+                            logger.debug(_("Autocode insert error ") + str(e))
+                        self.app.delete_backup = False
                 self.app.conn.commit()
                 self.parent_textEdit.append(_("Automatic coding in files: ") + filenames
-                                            + _(". with text: ") + txt)
+                                            + _(". with text: ") + find_txt)
+                if regex_pattern:
+                    self.parent_textEdit.append(_("Using Regex."))
         except Exception as e_:
             print(e_)
             self.app.conn.rollback()  # Revert all changes
