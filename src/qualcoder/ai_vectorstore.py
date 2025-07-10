@@ -430,6 +430,21 @@ want to continue?\
                 if doc.metadata['id'] == file_id:
                     res.append(str(doc_id))
         return res
+
+    def faiss_db_retrieve_documents(self, docstore_ids: List[str], faiss_db=None):
+        """Returns a list of langchain_core.Documents corresponding to the list of 
+        faiss docstore_ids. """
+        if faiss_db is None:
+            faiss_db = self.faiss_db
+        if faiss_db is None:
+            return []
+        res = []
+        for doc_id in faiss_db.index_to_docstore_id.values():
+            if doc_id in docstore_ids:
+                doc = faiss_db.docstore.search(doc_id)
+                if isinstance(doc, Document):
+                    res.append(doc)
+        return res
     
     def _import_document(self, id_, name, text, update=False, signals=None):
         if self._is_closing:

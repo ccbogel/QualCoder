@@ -21,7 +21,7 @@ https://qualcoder.wordpress.com/
 
 from PyQt6 import QtWidgets, QtCore
 from PyQt6.QtCore import Qt, QEvent, QObject, pyqtSignal
-from PyQt6.QtGui import QCursor, QGuiApplication, QAction
+from PyQt6.QtGui import QCursor, QGuiApplication, QAction, QPalette
 from PyQt6.QtWidgets import QTextEdit
 import qtawesome as qta
 
@@ -29,7 +29,9 @@ from langchain_core.messages.human import HumanMessage
 from langchain_core.messages.ai import AIMessage
 from langchain_core.messages.system import SystemMessage
 from langchain_core.callbacks.base import BaseCallbackHandler
+from langchain_core.documents.base import Document
 
+from typing import List
 from datetime import datetime
 import json
 import logging
@@ -51,6 +53,8 @@ from .html_parser import html_to_text
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
+
+topic_analysis_max_chunks = 30
 
 class AIChatSignalEmitter(QObject):
     newTextChatSignal = pyqtSignal(int, str, str, int, object)  # will start a new text analysis chat
@@ -137,6 +141,7 @@ class DialogAIChat(QtWidgets.QDialog):
         self.ai_response_style = f'"{doc_font} color: #356399;"'
         self.ai_user_style = f'"{doc_font} color: #287368;"'
         self.ai_info_style = f'"{doc_font}"'
+        self.ai_actions_style = f'"{doc_font}"'
         if self.app.settings['stylesheet'] in ['dark', 'rainbow']:
             self.ai_response_style = f'"{doc_font} color: #8FB1D8;"'
             self.ai_user_style = f'"{doc_font} color: #35998A;"'
@@ -195,6 +200,14 @@ class DialogAIChat(QtWidgets.QDialog):
                                 msg_type TEXT,
                                 msg_author TEXT,
                                 msg_content TEXT,
+                                FOREIGN KEY (chat_id) REFERENCES chats(id))''')
+        
+        cursor.execute('''CREATE TABLE IF NOT EXISTS topic_chat_embeddings (
+                                id INTEGER PRIMARY KEY,
+                                chat_id INTEGER,
+                                docstore_id TEXT,
+                                position INTEGER,
+                                used_flag INTEGER,
                                 FOREIGN KEY (chat_id) REFERENCES chats(id))''')
         self.chat_history_conn.commit()
         self.current_chat_idx = -1
@@ -471,7 +484,7 @@ data collected. This information will accompany every prompt sent to the AI, res
         else:
             return ''
 
-    def new_topic_chat_callback(self, chunks):
+    def new_topic_chat_callback(self, chunks: List[Document]):
         # Analyze the data found
         if self.app.ai.ai_async_is_canceled:
             self.process_message('info', _('Chat has been canceled by the user.'))
@@ -484,10 +497,19 @@ data collected. This information will accompany every prompt sent to the AI, res
             return
         
         self.ai_semantic_search_chunks = chunks                
-        topic_analysis_max_chunks = 30
         msg = _('Found related data. Analyzing the most relevant segments closer.')
         self.process_message('info', msg)
         self.update_chat_window()
+        
+        # store the found chunks in the table "topic_chat_embeddings" for later
+        cursor = self.chat_history_conn.cursor()
+        chat_id = int(self.chat_list[self.current_chat_idx][0])
+        for i in range(len(chunks)):
+            cursor.execute('''
+                INSERT INTO topic_chat_embeddings (chat_id, docstore_id, position, used_flag)
+                VALUES (?, ?, ?, ?)
+            ''', (chat_id, chunks[i].id, i, (1 if i < topic_analysis_max_chunks else 0)))
+        self.chat_history_conn.commit()                                
 
         ai_data = []
         max_ai_data_length = round(0.5 * (self.app.ai.large_llm_context_window * 4)) 
@@ -524,12 +546,108 @@ data collected. This information will accompany every prompt sent to the AI, res
             f'The whole discussion should be based updon the the empirical data provided and its proper interpretation. '
             f'Do not make any assumptions which are not supported by the data. '
             f'Please mention the sources that your refer to from the given empirical data, using an html anchor tag of the following form: '
-            '<a href="chunk:{source_id}">{source_name}: {line_start} - {line_end}</a>\n' 
+            '(<a href="chunk:{source_id}">{source_name}: {line_start} - {line_end}</a>)\n' 
             f'Always answer in the following language: "{self.app.ai.get_curr_language()}".'
         )    
         logger.debug(f'Topic chat prompt:\n{ai_instruction}')
         self.process_message('instruct', ai_instruction)
         self.update_chat_window()   
+                
+    def topic_chat_get_actions(self) -> List[str]:
+        # Analyze more data found in the semantic search
+        cursor = self.chat_history_conn.cursor()
+        chat_id = int(self.chat_list[self.current_chat_idx][0])
+        cursor.execute(f'''
+            SELECT id, docstore_id
+            FROM topic_chat_embeddings
+            WHERE chat_id = {chat_id} AND used_flag = 0
+            ORDER BY position
+            LIMIT 1
+        ''')
+        if cursor.fetchone() is None: # no data left
+            return []
+        
+        msg = '<a href="action:topic_chat_analyze_more">' + _('Analyze more data...') + '</a>'
+        return [msg]
+            
+    def topic_chat_analyze_more(self): 
+        # Analyze more data found in the semantic search
+        cursor = self.chat_history_conn.cursor()
+        chat_id = int(self.chat_list[self.current_chat_idx][0])
+        cursor.execute(f'''
+            SELECT id, docstore_id
+            FROM topic_chat_embeddings
+            WHERE chat_id = {chat_id} AND used_flag = 0
+            ORDER BY position
+            LIMIT 30
+        ''')
+        res = cursor.fetchall()
+        
+        if res and len(res) > 0:
+            topic_chat_embeddings_ids = [row[0] for row in res]
+            docstore_ids = [row[1] for row in res]
+            chunks = self.app.ai.sources_vectorstore.faiss_db_retrieve_documents(docstore_ids)  
+        else:
+            chunks = None   
+        
+        if chunks is None or len(chunks) == 0:
+            msg = _('Error: There is no more data to analyze.')
+            self.process_message('info', msg)
+            self.update_chat_window()  
+            return
+        
+        msg = _('Expanding the analysis with more data.')
+        self.process_message('info', msg)
+        self.update_chat_window()  
+                        
+        # self.ai_semantic_search_chunks = chunks
+        ai_data = []
+        max_ai_data_length = round(0.5 * (self.app.ai.large_llm_context_window * 4)) 
+        max_ai_data_length_reached = False  # TODO varaible not used
+        ai_data_length = 0
+        for i in range(0, len(chunks)):
+            if ai_data_length >= max_ai_data_length:
+                max_ai_data_length_reached = True  # TODO variable not used
+                break
+            chunk = chunks[i]
+            fulltext = self.app.get_text_fulltext(chunk.metadata["id"])
+            line_start, line_end = self.app.get_line_numbers(fulltext, 
+                                                             chunk.metadata["start_index"], 
+                                                             chunk.metadata["start_index"] + len(chunk.page_content))
+            ai_data.append({
+                'source_id': f'{chunk.metadata["id"]}_{chunk.metadata["start_index"]}_{len(chunk.page_content)}_{line_start}_{line_end}',
+                'source_name': self.get_filename(int(chunk.metadata['id'])),
+                'quote': chunk.page_content,
+                'line_start': line_start,
+                'line_end': line_end
+            })
+            ai_data_length += len(chunk.page_content)
+        
+        ai_data_json = json.dumps(ai_data)
+            
+        ai_instruction = (
+            f'Here are more chunks of empirical data from the semantic search described at the beginning '
+            'of this conversation: \n'
+            f'{ai_data_json}\n\n'
+            f'Considering this data, are there any important aspects we must add to the analysis above '
+            f'or do we need to revise our conclusions? Make sure to not digress. Ignore any data that is '
+            f'not related to the topic of this analysis. Keep your answer short. '
+            f'(Do not refer to these instructions in your answer, as they are not visible to the user.)'
+        )    
+        
+        logger.debug(f'Topic chat analyze more prompt:\n{ai_instruction}')
+        self.process_message('instruct', ai_instruction)
+        self.update_chat_window()
+        
+        # mark all newly analyzed chunks of data as 'used':
+        placeholders = ','.join(['?'] * len(topic_chat_embeddings_ids))
+        query = f'''
+            UPDATE topic_chat_embeddings
+            SET used_flag = 1
+            WHERE id IN ({placeholders})
+        '''
+        cursor.execute(query, topic_chat_embeddings_ids)
+        self.chat_history_conn.commit()           
         
     def new_text_chat(self, doc_id, doc_name, text, start_pos, prompt: PromptItem):
         """Analyze a text passage from an empirical document
@@ -717,6 +835,18 @@ data collected. This information will accompany every prompt sent to the AI, res
                         author = 'unkown'
                     txt = f'<b>AI ({author}):</b><br />{txt}'                        
                     html += f'<p style={self.ai_response_style}>{txt}</p>'
+                elif not self.app.ai.is_busy(): # streaming finished, add actions
+                    actions_list = []
+                    if analysis_type == 'topic chat':
+                        actions_list.extend(self.topic_chat_get_actions())                        
+                    if len(actions_list):
+                        # html += f'<p style={self.ai_actions_style}>&nbsp;</p>'
+                        button_color = self.ui.pushButton_question.palette().color(QPalette.ColorRole.Button).name()
+                        actions_html = '<table border="0" cellspacing="3" cellpadding="10"><tr>'
+                        for action in actions_list:
+                            actions_html += f'<td style="background-color: {button_color}">{action}</td>'
+                        actions_html += '</tr></table>' 
+                        html += f'<p style={self.ai_actions_style}>{actions_html}</p>'
                 self.ui.ai_output.setText(html)
             finally:
                 if scroll_to_bottom:
@@ -1196,6 +1326,11 @@ data collected. This information will accompany every prompt sent to the AI, res
                 if tooltip_txt == '':
                     tooltip_txt = _('Error retrieving source text')
                 QtWidgets.QToolTip.showText(QCursor.pos(), tooltip_txt, self.ui.ai_output)
+            elif link.startswith('action:topic_chat_analyze_more'):
+                tooltip_txt = _('This expands the data basis for the analysis. However, '
+                                'be careful not to overdo it, as this can also dilute '
+                                'the focus of the analysis.')
+                QtWidgets.QToolTip.showText(QCursor.pos(), tooltip_txt, self.ui.ai_output)
         else:
             QtWidgets.QToolTip.hideText()
             
@@ -1251,6 +1386,8 @@ data collected. This information will accompany every prompt sent to the AI, res
                                                  doc_id=int(source_id), 
                                                  doc_sel_start=int(start), 
                                                  doc_sel_end=end)
+            elif link.startswith('action:topic_chat_analyze_more'):
+                self.topic_chat_analyze_more()
 
 # Helper:
 class LlmCallbackHandler(BaseCallbackHandler):
