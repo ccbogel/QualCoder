@@ -471,6 +471,7 @@ class AiLLM():
             ]
         }
 
+        """
         code_descriptions_prompt = [
             SystemMessage(
                 content=self.get_default_system_prompt()
@@ -482,6 +483,25 @@ class AiLLM():
                     'Try to give a variety of diverse code-descriptions. Use simple language. '
                     f'Always answer in the following language: "{self.get_curr_language()}". Do not use numbers or bullet points. '
                     'Do not explain anything or repeat the code name, just give back the descriptive text. '
+                    'Return the list as a valid JSON object in the following form:\n'
+                    f'{json_result}')
+            )
+        ]
+        """
+
+        # revised version 7/25:
+        code_descriptions_prompt = [
+            SystemMessage(
+                content=self.get_default_system_prompt()
+            ),
+            HumanMessage(
+                content=(f'We are searching for empirical data that fits a code named "{code_name}" '
+                    f'with the following code memo: "{extract_ai_memo(code_memo)}". \n'
+                    'Your task: Give back a list of 10 reformulated variants of the code name, using '
+                    'synonyms or directly related concepts. Try to give a variety of diverse reformulations. '
+                    'Use simple language.'
+                    f'Always answer in the following language: "{self.get_curr_language()}". Do not use numbers or bullet points. '
+                    'Do not explain anything or repeat the code name, just give back the list of variants. '
                     'Return the list as a valid JSON object in the following form:\n'
                     f'{json_result}')
             )
