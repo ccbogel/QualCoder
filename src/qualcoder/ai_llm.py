@@ -497,9 +497,9 @@ class AiLLM():
             HumanMessage(
                 content=(f'We are searching for empirical data that fits a code named "{code_name}" '
                     f'with the following code memo: "{extract_ai_memo(code_memo)}". \n'
-                    'Your task: Give back a list of 10 reformulated variants of the code name, using '
-                    'synonyms or directly related concepts. Try to give a variety of diverse reformulations. '
-                    'Use simple language.'
+                    'Your task: Give back a list of up to 10 reformulated variants of the code, using '
+                    'synonyms or directly related concepts. Also consider the memo, if available. '
+                    'Try to give a variety of diverse reformulations. Use simple language.'
                     f'Always answer in the following language: "{self.get_curr_language()}". Do not use numbers or bullet points. '
                     'Do not explain anything or repeat the code name, just give back the list of variants. '
                     'Return the list as a valid JSON object in the following form:\n'
@@ -517,7 +517,8 @@ class AiLLM():
 
         res = self.large_llm.invoke(code_descriptions_prompt, response_format={"type": "json_object"}, config=config)
         logger.debug(str(res.content))
-        code_descriptions = json_repair.loads(str(res.content))['descriptions']
+        code_descriptions = list(json_repair.loads(str(res.content))['descriptions'])
+        code_descriptions.insert(0, code_name) # insert the original as well
         return code_descriptions
 
     def retrieve_similar_data(self, result_callback, code_name, code_memo='', doc_ids=None):
@@ -637,13 +638,13 @@ class AiLLM():
                     'Summarize your reasoning briefly in the field "interpretation" of the result. '
                     f'In this particular field, always answer in the language "{self.get_curr_language()}".\n'
                     'If you came to the conclusion that the chunk of data '
-                    'is not related to the code, give back \'false\' in the field "related", otherwise \'true\'.\n'
-                    'If the previous step resulted in \'true\', identify a quote from the chunk of empirical data that contains the part which is '
+                    'is not related to the code, give back \'False\' in the field "related", otherwise \'True\'.\n'
+                    'If the previous step resulted in \'True\', identify a quote from the chunk of empirical data that contains the part which is '
                     'relevant for the analysis of the given code. Include enough context so that the quote is comprehensable. '
                     'Give back this quote in the field "quote" exactly like in the original, '
                     'including errors. Do not leave anything out, do not translate the text or change it in any other way. '
                     'If you cannot identify a particular quote, return the whole chunk of empirical data in the field "quote".\n'
-                    'If the previous step resulted in \'false\', return an empty quote ("") in the field "quote".\n'
+                    'If the previous step resulted in \'False\', return an empty quote ("") in the field "quote".\n'
                     f'Make sure to return nothing else but a valid JSON object in the following form: \n{json_result}.'
                     f'\n\nThe chunk of empirical data for you to analyze: \n"{chunk.page_content}"')
                 )
@@ -659,10 +660,9 @@ class AiLLM():
         res_json = json_repair.loads(str(res.content))
         
         # analyse and format the answer
-        if 'related' in res_json and res_json['related'] is True and \
+        if 'related' in res_json and res_json['related'] in [True, 'True', 'true'] and \
            'quote' in res_json and res_json['quote'] != '':  # found something
             # Adjust quote_start
-            i = 0  # TODO i not used
             doc = {}
             doc['metadata'] = chunk.metadata
                        
