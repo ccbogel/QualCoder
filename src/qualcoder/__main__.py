@@ -102,15 +102,16 @@ if not os.path.exists(home + '/.qualcoder'):
         print("Cannot add .qualcoder folder to home directory\n" + str(e))
         raise
 logfile = home + '/.qualcoder/QualCoder.log'
+log_maxBytes = 500000 # 500 KB: max length of the logfile before old entries are discarded
 # Hack for Windows 10 PermissionError that stops the rotating file handler, will produce massive files.
 try:
     log_file = open(logfile, "r")
     data = log_file.read()
     log_file.close()
-    if len(data) > 12000:
+    if len(data) > log_maxBytes:
         os.remove(logfile)
         log_file = open(logfile, "w")
-        log_file.write(data[10000:])
+        log_file.write(data[len(data) - (log_maxBytes // 2):]) # frees up half of log_maxBytes
         log_file.close()
 except Exception as e:
     print(e)
@@ -119,7 +120,7 @@ logging.basicConfig(format='%(asctime)s %(levelname)s %(name)s.%(funcName)s %(me
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 # The rotating file handler does not work on Windows
-handler = RotatingFileHandler(logfile, maxBytes=4000, backupCount=2)
+handler = RotatingFileHandler(logfile, maxBytes=log_maxBytes, backupCount=2)
 logger.addHandler(handler)
 
 lock_timeout = 30.0  # in seconds. If a project lockfile is older (= has received no heartbeat for 30 seconds),
