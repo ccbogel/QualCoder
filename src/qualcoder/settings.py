@@ -245,12 +245,16 @@ class DialogSettings(QtWidgets.QDialog):
             self.ui.label_ai_access_info_url.setText(f'<a href="{curr_ai_model["access_info_url"]}">{curr_ai_model["access_info_url"]}</a>')
             with QtCore.QSignalBlocker(self.ui.lineEdit_ai_api_key): # prevents ai_update_avaliable_models() to trigger
                 self.ui.lineEdit_ai_api_key.setText(curr_ai_model['api_key']) 
-            self.ui.comboBox_AI_model_large.setCurrentText(curr_ai_model['large_model'])
-            self.ui.comboBox_AI_model_large.lineEdit().setCursorPosition(0)
-            self.ui.comboBox_AI_model_fast.setCurrentText(curr_ai_model['fast_model'])
-            self.ui.comboBox_AI_model_fast.lineEdit().setCursorPosition(0)
-            self.ui.lineEdit_ai_large_context_window.setText(curr_ai_model['large_model_context_window'])
-            self.ui.lineEdit_ai_fast_context_window.setText(curr_ai_model['fast_model_context_window'])            
+            with QtCore.QSignalBlocker(self.ui.comboBox_AI_model_large):
+                self.ui.comboBox_AI_model_large.setCurrentText(curr_ai_model['large_model'])
+                self.ui.comboBox_AI_model_large.lineEdit().setCursorPosition(0)
+            with QtCore.QSignalBlocker(self.ui.comboBox_AI_model_fast):
+                self.ui.comboBox_AI_model_fast.setCurrentText(curr_ai_model['fast_model'])
+                self.ui.comboBox_AI_model_fast.lineEdit().setCursorPosition(0)
+            with QtCore.QSignalBlocker(self.ui.lineEdit_ai_large_context_window):
+                self.ui.lineEdit_ai_large_context_window.setText(curr_ai_model['large_model_context_window'])
+            with QtCore.QSignalBlocker(self.ui.lineEdit_ai_fast_context_window):
+                self.ui.lineEdit_ai_fast_context_window.setText(curr_ai_model['fast_model_context_window'])            
         else:
             self.ui.label_ai_model_desc.setText('')
             self.ui.label_ai_access_info_url.setText('')
