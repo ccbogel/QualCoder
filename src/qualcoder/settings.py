@@ -24,6 +24,7 @@ import os
 import sys
 from PyQt6 import QtGui, QtWidgets, QtCore
 import copy
+import re
 
 from .GUI.ui_dialog_settings import Ui_Dialog_settings
 from .helpers import Message
@@ -282,6 +283,23 @@ class DialogSettings(QtWidgets.QDialog):
             curr_name                                 # text
         )
         if ok and new_name != '':
+            # clean up new name for use in ini file
+            new_name = new_name.replace('[', '').replace(']', '') # Remove square brackets
+            new_name = re.sub(r'[\r\n]+', ' ', new_name) # Replace line breaks with a space
+            new_name = re.sub(r'\s+', ' ', new_name) # Remove repeated spaces
+            new_name = new_name.strip() # Remove leading/trailing whitespace
+            # if name not altered, return
+            if new_name == curr_name:
+                return
+            # make the new name unique
+            existing_names = {model['name'] for model in self.ai_models}
+            i = 1
+            candidate = new_name
+            while candidate in existing_names: # Find next available unique name: new_name_1, new_name_2, etc.
+                candidate = f"{new_name}_{i}"
+                i += 1
+            new_name = candidate            
+            
             self.ai_models[int(self.settings['ai_model_index'])]['name'] = new_name
             with QtCore.QSignalBlocker(self.ui.comboBox_ai_profile): 
                 self.ui.comboBox_ai_profile.setItemText(int(self.settings['ai_model_index']), new_name)
