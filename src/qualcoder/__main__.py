@@ -84,6 +84,7 @@ from qualcoder.view_charts import ViewCharts
 from qualcoder.view_graph import ViewGraph
 from qualcoder.view_image import DialogCodeImage
 from qualcoder.ai_prompts import DialogAiEditPrompts
+from qualcoder.ai_llm import get_default_ai_models, update_ai_models
 
 # Check if VLC installed, for warning message for code_av
 vlc = None
@@ -629,7 +630,7 @@ class App(object):
         config['DEFAULT'] = settings
         # add AI models
         if len(ai_models) == 0:
-            ai_models = self.ai_models_create_defaults()
+            ai_models = get_default_ai_models()
         for model in ai_models:
             model_section = 'ai_model_' + model['name']
             config[model_section] = {}
@@ -659,7 +660,7 @@ class App(object):
             msg = _("Cannot load config.ini.\nCharacter decoding error.\nUsing QualCoder default settings.")
             print(msg)
             Message(self, _("Cannot load config.ini file"), msg).exec()
-            return self.default_settings, self.ai_models_create_defaults()
+            return self.default_settings, get_default_ai_models()
 
         if 'fontsize' in default:
             result['fontsize'] = default.getint('fontsize')
@@ -696,57 +697,11 @@ class App(object):
                 }
                 ai_models.append(model)
         if len(ai_models) == 0:  # no models loaded, create default
-            ai_models = self.ai_models_create_defaults()
+            ai_models = get_default_ai_models()
+        else:
+            current_ai_model_index = int(result.get('ai_model_index', -1)) 
+            ai_models, result['ai_model_index'] = update_ai_models(ai_models, current_ai_model_index)
         return result, ai_models
-
-    def ai_models_create_defaults(self):
-        """Returns a list of the default AI model parameters
-        """       
-        models = [
-            {
-                'name': 'OpenAI_GPT4o',
-                'desc': """Current default model from OpenAI, faster and cheaper than GPT4-turbo.  
-                You need an API-key from OpenAI and have paid for credits in your account. 
-                OpenAI will charge a small amount for every use.""",
-                'access_info_url': 'https://platform.openai.com/api-keys',
-                'large_model': 'gpt-4o',
-                'large_model_context_window': '128000',
-                'fast_model': 'gpt-4o-mini',
-                'fast_model_context_window': '128000',
-                'api_base': '',
-                'api_key': ''
-            },
-            {
-                'name': 'GPT-4-turbo',
-                'desc': """Classic model from OpenAI, still very capable. 
-                You need an API-key from OpenAI and have paid for credits in your account. 
-                OpenAI will charge a small amount for every use.""",
-                'access_info_url': 'https://platform.openai.com/api-keys',
-                'large_model': 'gpt-4-turbo',
-                'large_model_context_window': '128000',
-                'fast_model': 'gpt-4o-mini',
-                'fast_model_context_window': '128000',
-                'api_base': '',
-                'api_key': ''
-            },
-            {
-                'name': 'Blablador',
-                'desc': """A free and open source model, excellent privacy, 
-but not as powerful as GPT-4. 
-Blablador is free to use and runs on a server of the Helmholtz Society, 
-a large non-profit research organization in Germany. To gain 
-access and get an API-key, you have to identify yourself once with your 
-university, ORCID, GitHub, or Google account.""",
-                'access_info_url': 'https://sdlaml.pages.jsc.fz-juelich.de/ai/guides/blablador_api_access/',
-                'large_model': 'alias-large',
-                'large_model_context_window': '32768',
-                'fast_model': 'alias-fast',
-                'fast_model_context_window': '32768',
-                'api_base': 'https://helmholtz-blablador.fz-juelich.de:8000/v1',
-                'api_key': ''
-            }
-        ]
-        return models
 
     def check_and_add_additional_settings(self, settings_data, ai_models):
         """ Newer features include width and height settings for many dialogs and main window.
@@ -817,7 +772,7 @@ university, ORCID, GitHub, or Google account.""",
                     
         # Check AI models
         if len(ai_models) == 0:  # No models loaded, create default
-            ai_models = self.ai_models_create_defaults()
+            ai_models = get_default_ai_models()
 
         # Write out new ini file, if needed
         if len(settings_data) > dict_len:
@@ -1011,7 +966,7 @@ university, ORCID, GitHub, or Google account.""",
         if (not len(result) or 'codername' not in result.keys() or 'stylesheet' not in result.keys() or
                 'speakernameformat' not in result.keys()):
             # create default:
-            ai_models = self.ai_models_create_defaults()
+            ai_models = get_default_ai_models()
             self.write_config_ini(self.default_settings, ai_models)
             logger.info('Initialized config.ini')
             result, ai_models = self._load_config_ini()
