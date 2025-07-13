@@ -44,9 +44,9 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>-229</y>
+        <y>-237</y>
         <width>795</width>
-        <height>838</height>
+        <height>841</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -797,13 +797,70 @@ Not recommended unless you have many large files slowing the backup.</string>
              <property name="horizontalSpacing">
               <number>6</number>
              </property>
-             <item row="0" column="0">
-              <widget class="QLabel" name="label_10">
+             <item row="3" column="0">
+              <widget class="QLabel" name="label_11">
                <property name="text">
-                <string>AI Provider:</string>
+                <string>Description:</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="0">
+              <widget class="QLabel" name="label_12">
+               <property name="text">
+                <string>Get Access:</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QComboBox" name="comboBox_ai_profile">
+               <property name="editable">
+                <bool>false</bool>
+               </property>
+               <property name="insertPolicy">
+                <enum>QComboBox::NoInsert</enum>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="0">
+              <widget class="QLabel" name="label_ai_api_key">
+               <property name="text">
+                <string>API key</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QLabel" name="label_10">
+               <property name="text">
+                <string>AI Profile:</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="2">
+              <widget class="QPushButton" name="pushButton_ai_profile_edit">
+               <property name="text">
+                <string>Edit Name</string>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="1">
+              <widget class="QLineEdit" name="lineEdit_ai_api_key"/>
+             </item>
+             <item row="3" column="1">
+              <widget class="QLabel" name="label_ai_model_desc">
+               <property name="text">
+                <string/>
                </property>
               </widget>
              </item>
@@ -819,49 +876,6 @@ Not recommended unless you have many large files slowing the backup.</string>
                 <set>Qt::TextBrowserInteraction</set>
                </property>
               </widget>
-             </item>
-             <item row="3" column="0">
-              <widget class="QLabel" name="label_11">
-               <property name="text">
-                <string>Description:</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
-               </property>
-              </widget>
-             </item>
-             <item row="5" column="1">
-              <widget class="QLineEdit" name="lineEdit_ai_api_key"/>
-             </item>
-             <item row="5" column="0">
-              <widget class="QLabel" name="label_ai_api_key">
-               <property name="text">
-                <string>API key</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="4" column="0">
-              <widget class="QLabel" name="label_12">
-               <property name="text">
-                <string>Get Access:</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-               </property>
-              </widget>
-             </item>
-             <item row="3" column="1">
-              <widget class="QLabel" name="label_ai_model_desc">
-               <property name="text">
-                <string/>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="1">
-              <widget class="QComboBox" name="comboBox_ai_provider"/>
              </item>
             </layout>
            </widget>

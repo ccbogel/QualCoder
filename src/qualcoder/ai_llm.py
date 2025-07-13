@@ -45,6 +45,7 @@ from .html_parser import html_to_text
 import fuzzysearch
 import json_repair
 import asyncio
+import configparser
 
 max_memo_length = 1500  # Maximum length of the memo send to the AI
 
@@ -82,10 +83,158 @@ def get_available_models(api_base: str, api_key: str) -> list:
     if api_base == '':
         api_base = None
     client = OpenAI(api_key=api_key, base_url=api_base)
-    response = client.models.list(timeout=6.0)
+    response = client.models.list(timeout=4.0)
     model_dict = response.model_dump().get('data', [])
     model_list = sorted([model['id'] for model in model_dict])
     return model_list
+
+def get_default_ai_models():
+    ini_string = """
+[ai_model_OpenAI GPT4.1]
+desc = Powerful and large model from OpenAI, for complex tasks.
+	You need an API-key from OpenAI and have paid for credits in your account.
+	OpenAI will charge a small amount for every use.
+access_info_url = https://platform.openai.com/api-keys
+large_model = gpt-4.1
+large_model_context_window = 1000000
+fast_model = gpt-4.1-mini
+fast_model_context_window = 128000
+api_base = 
+api_key = 
+
+[ai_model_OpenAI_GPT4o]
+desc = General use model from OpenAI, faster and cheaper than other options.
+	You need an API-key from OpenAI and have paid for credits in your account.
+	OpenAI will charge a small amount for every use.
+access_info_url = https://platform.openai.com/api-keys
+large_model = gpt-4o
+large_model_context_window = 1000000
+fast_model = gpt-4o-mini
+fast_model_context_window = 128000
+api_base = 
+api_key = 
+
+[ai_model_Blablador]
+desc = Free and open source models, excellent privacy, but not as powerful 
+	as the commercial offerings. Blablador runs on a server of the Helmholtz 
+	Society, a large non-profit research organization in Germany. To gain 
+	access and get an API-key, you have to identify yourself once with your
+	university, ORCID, GitHub, or Google account.
+access_info_url = https://sdlaml.pages.jsc.fz-juelich.de/ai/guides/blablador_api_access/
+large_model = alias-large
+large_model_context_window = 128000
+fast_model = alias-fast
+fast_model_context_window = 32000
+api_base = https://helmholtz-blablador.fz-juelich.de:8000/v1
+api_key = 
+
+[ai_model_Blablador Huge]
+desc = Llama 3.1 405b, very large and powerful. Availability might change.
+	Blablador is free to use and runs on a server of the Helmholtz Society,
+	a large non-profit research organization in Germany. To gain
+	access and get an API-key, you have to identify yourself once with your
+	university, ORCID, GitHub, or Google account.
+access_info_url = https://sdlaml.pages.jsc.fz-juelich.de/ai/guides/blablador_api_access/
+large_model = alias-llama3-huge
+large_model_context_window = 128000
+fast_model = alias-fast
+fast_model_context_window = 128000
+api_base = https://helmholtz-blablador.fz-juelich.de:8000/v1
+api_key = 
+
+[ai_model_Anthropic Claude]
+desc = Claude is a family of high quality models from Anthropic.
+	You need an API-key from Anthropic and credits in your account.
+	Anthropic will charge a small amount for every use.
+access_info_url = https://console.anthropic.com/settings/keys
+large_model = claude-opus-4-20250514
+large_model_context_window = 200000
+fast_model = claude-sonnet-4-20250514
+fast_model_context_window = 200000
+api_base = https://api.anthropic.com/v1/
+api_key = 
+
+[ai_model_Google Gemini]
+desc = Google offers several free and paid models on their servers.
+	Select one in the Advanced AI options below.
+	You need an API-key from Google.
+access_info_url = https://ai.google.dev/gemini-api/docs
+large_model = gemini-2.5-flash
+large_model_context_window = 1000000
+fast_model = gemini-2.5-flash
+fast_model_context_window = 1000000
+api_base = https://generativelanguage.googleapis.com/v1beta/openai/
+api_key = 
+
+[ai_model_Deepseek Chat V3]
+desc = Deepseek is a high quality Chinese chat model.
+	You will need an an API-key from Deepseek and have payed credits in your account.
+	Deepseek will charge a small amount for every use.
+access_info_url = https://platform.deepseek.com/api_keys
+large_model = deepseek-chat
+large_model_context_window = 64000
+fast_model = deepseek-chat
+fast_model_context_window = 64000
+api_base = https://api.deepseek.com
+api_key = 
+
+[ai_model_OpenRouter]
+desc = OpenRouter is a unified interface to access many different AI language
+	models, both free and paid. You need an API-key from OpenRouter.
+	Select a model in the Advanced AI Options below.
+access_info_url = https://openrouter.ai/
+large_model = deepseek/deepseek-chat:free
+large_model_context_window = 64000
+fast_model = deepseek/deepseek-chat:free
+fast_model_context_window = 64000
+api_base = https://openrouter.ai/api/v1
+api_key = 
+
+[ai_model_Ollama local AI]
+desc = Ollama is an open source server that lets you run LLMs locally on
+	your computer. To use it in QualCoder, you must have Ollama set up and
+	running first. Use the Advanced AI Options below to select between your
+	locally installed models.
+access_info_url = https://ollama.com
+large_model = test
+large_model_context_window = 1
+fast_model = test
+fast_model_context_window = 1
+api_base = http://localhost:11434/v1/
+api_key = <no API key needed>
+    """
+    
+    config = configparser.ConfigParser()
+    config.read_string(ini_string)
+    ai_models = []
+    for section in config.sections():
+        if section.startswith('ai_model_'):
+            model = {
+                'name': section[9:],
+                'desc': config[section].get('desc', ''),
+                'access_info_url': config[section].get('access_info_url', ''),
+                'large_model': config[section].get('large_model', ''),
+                'large_model_context_window': config[section].get('large_model_context_window', '32768'),
+                'fast_model': config[section].get('fast_model', ''),
+                'fast_model_context_window': config[section].get('fast_model_context_window', '32768'),
+                'api_base': config[section].get('api_base', ''),
+                'api_key': config[section].get('api_key', '')
+            }
+            ai_models.append(model)
+    return ai_models
+
+def update_ai_models(current_models: list, current_model_index: int) -> tuple[list, int]:
+    default_models = get_default_ai_models()
+    current_models_names = {model['name'] for model in current_models}
+    for model in default_models:
+        if not model['name'] in current_models_names:
+            if model['name'] == 'OpenAI GPT4.1': # insert this at the top, because it is the current default model
+                current_models.insert(0, model)
+                if current_model_index >= 0:
+                    current_model_index += 1
+            else:
+                current_models.append(model)
+    return current_models, current_model_index
 
 class AiLLM():
     """ This manages the communication between qualcoder, the vectorstore 
@@ -150,7 +299,7 @@ class AiLLM():
                 if int(self.app.settings['ai_model_index']) >= len(self.app.ai_models): # model index out of range
                     self.app.settings['ai_model_index'] = -1
                 if int(self.app.settings['ai_model_index']) < 0:
-                    msg = _('AI: Please set up the AI model')
+                    msg = _('AI: In the follwoing window, please set up the AI model.')
                     Message(self.app, _('AI Setup'), msg).exec()
 
                     main_window.change_settings(section='AI', enable_ai=True)
@@ -167,13 +316,15 @@ class AiLLM():
                 curr_model = self.app.ai_models[int(self.app.settings['ai_model_index'])]
                 
                 large_model = curr_model['large_model']
+                if large_model.find('gpt-4-turbo') > -1:
+                    self.parent_text_edit.append(_('AI: You are still using the outdated GPT-4 turbo. Consider switching to a newer model, such as GPT 4.1. Go to Project > Settings to change the AI profile and model.'))
                 self.large_llm_context_window = int(curr_model['large_model_context_window'])
                 fast_model = curr_model['fast_model']
                 self.fast_llm_context_window = int(curr_model['fast_model_context_window'])
                 api_base = curr_model['api_base']
                 api_key = curr_model['api_key']
                 if api_key == '':
-                    msg = _('Please enter an API-key for the AI in the following dialog (or "None" if not API-key is needed).')
+                    msg = _('Please enter an API-key for the AI in the following dialog.')
                     Message(self.app, _('AI API-key'), msg).exec()
                     main_window.change_settings(section='AI', enable_ai=True)
                     curr_model = self.app.ai_models[int(self.app.settings['ai_model_index'])]
@@ -187,8 +338,6 @@ class AiLLM():
                         # Success, API-key was set. But since the "change_settings" function will start 
                         # a new "init_llm" anyways, we are going to quit here
                         return    
-                #elif api_key == 'None':
-                #    api_key = ''
                 if large_model == '' or fast_model == '':
                     msg = _('In the following dialog, go to "Advanced AI Options" and select a large and a fast AI model (both can be the same).')
                     Message(self.app, _('AI Model Selection'), msg).exec()
@@ -471,6 +620,7 @@ class AiLLM():
             ]
         }
 
+        """
         code_descriptions_prompt = [
             SystemMessage(
                 content=self.get_default_system_prompt()
@@ -486,6 +636,25 @@ class AiLLM():
                     f'{json_result}')
             )
         ]
+        """
+
+        # revised version 7/25:
+        code_descriptions_prompt = [
+            SystemMessage(
+                content=self.get_default_system_prompt()
+            ),
+            HumanMessage(
+                content=(f'We are searching for empirical data that fits a code named "{code_name}" '
+                    f'with the following code memo: "{extract_ai_memo(code_memo)}". \n'
+                    'Your task: Give back a list of up to 10 reformulated variants of the code, using '
+                    'synonyms or directly related concepts. Also consider the memo, if available. '
+                    'Try to give a variety of diverse reformulations. Use simple language.'
+                    f'Always answer in the following language: "{self.get_curr_language()}". Do not use numbers or bullet points. '
+                    'Do not explain anything or repeat the code name, just give back the list of variants. '
+                    'Return the list as a valid JSON object in the following form:\n'
+                    f'{json_result}')
+            )
+        ]
 
         logger.debug(_('AI generate_code_descriptions\n'))
         logger.debug(_('Prompt:\n') + str(code_descriptions_prompt))
@@ -497,7 +666,8 @@ class AiLLM():
 
         res = self.large_llm.invoke(code_descriptions_prompt, response_format={"type": "json_object"}, config=config)
         logger.debug(str(res.content))
-        code_descriptions = json_repair.loads(str(res.content))['descriptions']
+        code_descriptions = list(json_repair.loads(str(res.content))['descriptions'])
+        code_descriptions.insert(0, code_name) # insert the original as well
         return code_descriptions
 
     def retrieve_similar_data(self, result_callback, code_name, code_memo='', doc_ids=None):
@@ -617,13 +787,13 @@ class AiLLM():
                     'Summarize your reasoning briefly in the field "interpretation" of the result. '
                     f'In this particular field, always answer in the language "{self.get_curr_language()}".\n'
                     'If you came to the conclusion that the chunk of data '
-                    'is not related to the code, give back \'false\' in the field "related", otherwise \'true\'.\n'
-                    'If the previous step resulted in \'true\', identify a quote from the chunk of empirical data that contains the part which is '
+                    'is not related to the code, give back \'False\' in the field "related", otherwise \'True\'.\n'
+                    'If the previous step resulted in \'True\', identify a quote from the chunk of empirical data that contains the part which is '
                     'relevant for the analysis of the given code. Include enough context so that the quote is comprehensable. '
                     'Give back this quote in the field "quote" exactly like in the original, '
                     'including errors. Do not leave anything out, do not translate the text or change it in any other way. '
                     'If you cannot identify a particular quote, return the whole chunk of empirical data in the field "quote".\n'
-                    'If the previous step resulted in \'false\', return an empty quote ("") in the field "quote".\n'
+                    'If the previous step resulted in \'False\', return an empty quote ("") in the field "quote".\n'
                     f'Make sure to return nothing else but a valid JSON object in the following form: \n{json_result}.'
                     f'\n\nThe chunk of empirical data for you to analyze: \n"{chunk.page_content}"')
                 )
@@ -639,10 +809,9 @@ class AiLLM():
         res_json = json_repair.loads(str(res.content))
         
         # analyse and format the answer
-        if 'related' in res_json and res_json['related'] is True and \
+        if 'related' in res_json and res_json['related'] in [True, 'True', 'true'] and \
            'quote' in res_json and res_json['quote'] != '':  # found something
             # Adjust quote_start
-            i = 0  # TODO i not used
             doc = {}
             doc['metadata'] = chunk.metadata
                        

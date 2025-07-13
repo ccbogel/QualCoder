@@ -24,6 +24,7 @@ import os
 import sys
 from PyQt6 import QtGui, QtWidgets, QtCore
 import copy
+import re
 
 from .GUI.ui_dialog_settings import Ui_Dialog_settings
 from .helpers import Message
@@ -44,8 +45,6 @@ class DialogSettings(QtWidgets.QDialog):
 
         self.app = app
         self.settings = app.settings
-        if enable_ai:
-            self.settings['ai_enable'] = 'True'
         self.ai_models = copy.deepcopy(self.app.ai_models)
         self.current_coder = self.app.settings['codername']
         super(QtWidgets.QDialog, self).__init__(parent)  # overrride accept method
@@ -160,17 +159,28 @@ class DialogSettings(QtWidgets.QDialog):
         self.ui.pushButton_choose_directory.clicked.connect(self.choose_directory)
         self.ui.pushButton_set_coder.pressed.connect(self.new_coder_entered)
         # AI options
-        self.ui.checkBox_AI_enable.setChecked(self.settings['ai_enable'] == 'True')
+        if enable_ai or self.settings['ai_enable'] == 'True':
+            self.ui.checkBox_AI_enable.setChecked(True)
+        else:
+            self.ui.checkBox_AI_enable.setChecked(False)
         self.ui.checkBox_AI_enable.stateChanged.connect(self.ai_enable_state_changed)
-        self.ui.comboBox_ai_provider.clear()
-        for i in range(len(self.ai_models)):
-            model = self.ai_models[i]
-            self.ui.comboBox_ai_provider.addItem(model['name'])
-            self.ui.comboBox_ai_provider.setItemData(i, model['desc'], QtCore.Qt.ItemDataRole.ToolTipRole)
-        self.ui.comboBox_ai_provider.setCurrentIndex(int(self.settings['ai_model_index']))
-        self.ui.comboBox_ai_provider.currentTextChanged.connect(self.ai_provider_changed)
-        self.ai_provider_changed()
+        self.ui.comboBox_ai_profile.clear()
+        if len(self.ai_models) > 0:
+            for i in range(len(self.ai_models)):
+                model = self.ai_models[i]
+                self.ui.comboBox_ai_profile.addItem(model['name'])
+                self.ui.comboBox_ai_profile.setItemData(i, model['desc'], QtCore.Qt.ItemDataRole.ToolTipRole)
+            if 0 <= int(self.settings['ai_model_index']) <= (len(self.ai_models) - 1): 
+                self.ui.comboBox_ai_profile.setCurrentIndex(int(self.settings['ai_model_index']))
+            else: # ai_model_index out of range
+                self.settings['ai_model_index'] = 0
+                self.ui.comboBox_ai_profile.setCurrentIndex(0)
+        else: # no ai profiles defined
+            self.settings['ai_model_index'] = -1
+        self.ui.comboBox_ai_profile.currentIndexChanged.connect(self.ai_profile_changed)
+        self.ai_profile_changed()
         self.ai_enable_state_changed()
+        self.ui.pushButton_ai_profile_edit.clicked.connect(self.ai_profile_name_edit)
         self.ui.lineEdit_ai_api_key.textChanged.connect(self.ai_api_key_changed)
         # advanced AI options:
         self.ui.pushButton_advanced_AI_options.clicked.connect(self.toggle_ai_advanced_options)
@@ -219,7 +229,7 @@ class DialogSettings(QtWidgets.QDialog):
             self.ui.checkBox_backup_AV_files.setEnabled(False)
     
     def ai_enable_state_changed(self):
-        self.ui.comboBox_ai_provider.setEnabled(self.ui.checkBox_AI_enable.isChecked())
+        self.ui.comboBox_ai_profile.setEnabled(self.ui.checkBox_AI_enable.isChecked())
         self.ui.label_ai_model_desc.setEnabled(self.ui.checkBox_AI_enable.isChecked())
         self.ui.label_ai_access_info_url.setEnabled(self.ui.checkBox_AI_enable.isChecked())
         self.ui.lineEdit_ai_api_key.setEnabled(self.ui.checkBox_AI_enable.isChecked())
@@ -229,51 +239,102 @@ class DialogSettings(QtWidgets.QDialog):
         self.ui.checkBox_AI_language_ui.setEnabled(self.ui.checkBox_AI_enable.isChecked())
         self.ui.lineEdit_AI_language.setEnabled(self.ui.checkBox_AI_enable.isChecked() and (not self.ui.checkBox_AI_language_ui.isChecked()))
     
-    def ai_provider_changed(self):
-        ai_model_index = self.ui.comboBox_ai_provider.currentIndex()
-        if ai_model_index >= 0:
-            self.curr_ai_model = self.ai_models[ai_model_index]
-            self.ui.label_ai_model_desc.setText(self.curr_ai_model['desc'])
-            self.ui.label_ai_access_info_url.setText(f'<a href="{self.curr_ai_model["access_info_url"]}">{self.curr_ai_model["access_info_url"]}</a>')
-            self.ui.lineEdit_ai_api_key.setText(self.curr_ai_model['api_key'])
-            self.ui.comboBox_AI_model_large.setCurrentText(self.curr_ai_model['large_model'])
-            self.ui.comboBox_AI_model_large.lineEdit().setCursorPosition(0)
-            self.ui.comboBox_AI_model_fast.setCurrentText(self.curr_ai_model['fast_model'])
-            self.ui.comboBox_AI_model_fast.lineEdit().setCursorPosition(0)
-            self.ui.lineEdit_ai_large_context_window.setText(self.curr_ai_model['large_model_context_window'])
-            self.ui.lineEdit_ai_fast_context_window.setText(self.curr_ai_model['fast_model_context_window'])            
+    def ai_profile_changed(self):
+        self.settings['ai_model_index'] = self.ui.comboBox_ai_profile.currentIndex()
+        if int(self.settings['ai_model_index']) >= 0:
+            curr_ai_model = self.ai_models[int(self.settings['ai_model_index'])]
+            self.ui.label_ai_model_desc.setText(curr_ai_model['desc'])
+            self.ui.label_ai_access_info_url.setText(f'<a href="{curr_ai_model["access_info_url"]}">{curr_ai_model["access_info_url"]}</a>')
+            with QtCore.QSignalBlocker(self.ui.lineEdit_ai_api_key): # prevents ai_update_avaliable_models() to trigger
+                self.ui.lineEdit_ai_api_key.setText(curr_ai_model['api_key']) 
+            with QtCore.QSignalBlocker(self.ui.comboBox_AI_model_large):
+                self.ui.comboBox_AI_model_large.setCurrentText(curr_ai_model['large_model'])
+                self.ui.comboBox_AI_model_large.lineEdit().setCursorPosition(0)
+            with QtCore.QSignalBlocker(self.ui.comboBox_AI_model_fast):
+                self.ui.comboBox_AI_model_fast.setCurrentText(curr_ai_model['fast_model'])
+                self.ui.comboBox_AI_model_fast.lineEdit().setCursorPosition(0)
+            with QtCore.QSignalBlocker(self.ui.lineEdit_ai_large_context_window):
+                self.ui.lineEdit_ai_large_context_window.setText(curr_ai_model['large_model_context_window'])
+            with QtCore.QSignalBlocker(self.ui.lineEdit_ai_fast_context_window):
+                self.ui.lineEdit_ai_fast_context_window.setText(curr_ai_model['fast_model_context_window'])            
         else:
-            self.curr_ai_model = None
             self.ui.label_ai_model_desc.setText('')
             self.ui.label_ai_access_info_url.setText('')
-            self.ui.lineEdit_ai_api_key.setText('')
+            with QtCore.QSignalBlocker(self.ui.lineEdit_ai_api_key): # prevents ai_update_avaliable_models() to trigger
+                self.ui.lineEdit_ai_api_key.setText('')
             self.ui.comboBox_AI_model_large.setCurrentText('')
             self.ui.comboBox_AI_model_fast.setCurrentText('')
             self.ui.lineEdit_ai_large_context_window.setText('')
             self.ui.lineEdit_ai_fast_context_window.setText('')            
         self.ai_update_avaliable_models()     
         
+    def ai_profile_name_edit(self):
+        if int(self.settings['ai_model_index']) < 0:
+            Message.warning(self, _('Edit AI profile name'), _('Select a profile first. \n'
+                'You can only edit the name of an existing profile. ' 
+                'To create a new profile from scratch, follow the instructions in the QualCoder '
+                'wiki on GitHub.'))
+            return
+        curr_name = self.ai_models[int(self.settings['ai_model_index'])]['name']
+        new_name, ok = QtWidgets.QInputDialog.getText(
+            self,                                     # parent
+            _('Edit AI profile name'),                # title
+            _('Enter new profile name:'),             # label
+            QtWidgets.QLineEdit.EchoMode.Normal,      # echo
+            curr_name                                 # text
+        )
+        if ok and new_name != '':
+            # clean up new name for use in ini file
+            new_name = new_name.replace('[', '').replace(']', '') # Remove square brackets
+            new_name = re.sub(r'[\r\n]+', ' ', new_name) # Replace line breaks with a space
+            new_name = re.sub(r'\s+', ' ', new_name) # Remove repeated spaces
+            new_name = new_name.strip() # Remove leading/trailing whitespace
+            # if name not altered, return
+            if new_name == curr_name:
+                return
+            # make the new name unique
+            existing_names = {model['name'] for model in self.ai_models}
+            i = 1
+            candidate = new_name
+            while candidate in existing_names: # Find next available unique name: new_name_1, new_name_2, etc.
+                candidate = f"{new_name}_{i}"
+                i += 1
+            new_name = candidate            
+            
+            self.ai_models[int(self.settings['ai_model_index'])]['name'] = new_name
+            with QtCore.QSignalBlocker(self.ui.comboBox_ai_profile): 
+                self.ui.comboBox_ai_profile.setItemText(int(self.settings['ai_model_index']), new_name)
+                self.ui.comboBox_ai_profile.setCurrentText = new_name
+        
     def ai_model_parameters_changed(self):
         """Called if the selected large or fast model has changed or if one of the 
         context window numbers has been altered."""
-        return
-        if self.curr_ai_model is not None:
-            self.curr_ai_model['large_model'] = self.ui.comboBox_AI_model_large.currentText()
-            self.curr_ai_model['fast_model'] = self.ui.comboBox_AI_model_fast.currentText()
-            self.curr_ai_model['large_model_context_window'] = self.ui.lineEdit_ai_large_context_window.text()
-            self.curr_ai_model['fast_model_context_window'] = self.ui.lineEdit_ai_fast_context_window.text()            
+        ai_model_index = int(self.settings['ai_model_index'])
+        if 0 <= ai_model_index < len(self.ai_models):
+            self.ai_models[ai_model_index]['large_model'] = self.ui.comboBox_AI_model_large.currentText()
+            self.ai_models[ai_model_index]['fast_model'] = self.ui.comboBox_AI_model_fast.currentText()
+            if self.ui.lineEdit_ai_large_context_window.text() != '':
+                self.ai_models[ai_model_index]['large_model_context_window'] = self.ui.lineEdit_ai_large_context_window.text()
+            else:
+                self.ai_models[ai_model_index]['large_model_context_window'] = '32768' # default
+            if self.ui.lineEdit_ai_fast_context_window.text() != '':
+                self.ai_models[ai_model_index]['fast_model_context_window'] = self.ui.lineEdit_ai_fast_context_window.text()
+            else:
+                self.ai_models[ai_model_index]['fast_model_context_window'] = '32768' # default        
 
     def ai_api_key_changed(self):
-        if self.curr_ai_model is not None:
-            self.curr_ai_model['api_key'] = self.ui.lineEdit_ai_api_key.text()   
+        if int(self.settings['ai_model_index']) >= 0:
+            self.ai_models[int(self.settings['ai_model_index'])]['api_key'] = self.ui.lineEdit_ai_api_key.text()   
         self.ai_update_avaliable_models()     
 
     def ai_update_avaliable_models(self):
+        if not self.ui.widget_AI_advanced_options.isVisible():
+            return
         model_list = []
-        if self.curr_ai_model is not None:
+        if int(self.settings['ai_model_index']) >= 0:
             try:
-                model_list = get_available_models(self.curr_ai_model['api_base'], 
-                                                  self.curr_ai_model['api_key'])
+                model_list = get_available_models(self.ai_models[int(self.settings['ai_model_index'])]['api_base'], 
+                                                  self.ai_models[int(self.settings['ai_model_index'])]['api_key'])
             except Exception as e:
                 msg = type(e).__name__ + ': ' + str(e)
                 logger.error("Error getting AI model list: " + msg)
@@ -363,6 +424,7 @@ class DialogSettings(QtWidgets.QDialog):
     def toggle_ai_advanced_options(self):
         if self.ui.pushButton_advanced_AI_options.isChecked():
             self.ui.widget_AI_advanced_options.show()
+            self.ai_update_avaliable_models()
             QtCore.QTimer.singleShot(100, lambda: self.ui.scrollArea.verticalScrollBar().setValue(self.ui.scrollArea.verticalScrollBar().maximum()))
         else:
             self.ui.widget_AI_advanced_options.hide()
@@ -415,14 +477,14 @@ class DialogSettings(QtWidgets.QDialog):
             self.settings['ai_enable'] = 'True'
         else:
             self.settings['ai_enable'] = 'False'
-        ai_model_index = self.ui.comboBox_ai_provider.currentIndex() 
+        ai_model_index = self.ui.comboBox_ai_profile.currentIndex() 
         self.settings['ai_model_index'] = ai_model_index
         if self.settings['ai_enable'] == 'True' and ai_model_index < 0:
-            msg = _('Please select an AI provider or disable the AI altogether.')
-            Message(self.app, _('AI provider'), msg).exec()
+            msg = _('Please select an AI profile or disable the AI altogether.')
+            Message(self.app, _('AI profile'), msg).exec()
             return
         if self.settings['ai_enable'] == 'True' and self.ai_models[ai_model_index]['api_key'] == '':
-            msg = _('Please enter a valid API-key for the AI model. \n(If you are sure that your particular model does not need an API-key, enter "None" instead.)')
+            msg = _('Please enter a valid API-key for the AI model.')
             Message(self.app, _('AI model'), msg).exec()
             return
         if self.settings['ai_enable'] == 'True' and (self.ui.comboBox_AI_model_large.currentText() == '' or self.ui.comboBox_AI_model_fast.currentText() == ''):
@@ -431,17 +493,6 @@ class DialogSettings(QtWidgets.QDialog):
             msg = _('Please select a "large" and a "fast" AI model.')
             Message(self.app, _('AI model'), msg).exec()
             return
-        if ai_model_index >= 0 and ai_model_index < len(self.ai_models):
-            self.ai_models[ai_model_index]['large_model'] = self.ui.comboBox_AI_model_large.currentText()
-            self.ai_models[ai_model_index]['fast_model'] = self.ui.comboBox_AI_model_fast.currentText()
-            if self.ui.lineEdit_ai_large_context_window.text() != '':
-                self.ai_models[ai_model_index]['large_model_context_window'] = self.ui.lineEdit_ai_large_context_window.text()
-            else:
-                self.ai_models[ai_model_index]['large_model_context_window'] = '32768' # default
-            if self.ui.lineEdit_ai_fast_context_window.text() != '':
-                self.ai_models[ai_model_index]['fast_model_context_window'] = self.ui.lineEdit_ai_fast_context_window.text()
-            else:
-                self.ai_models[ai_model_index]['fast_model_context_window'] = '32768' # default        
         if self.ui.checkBox_ai_project_memo.isChecked():
             self.settings['ai_send_project_memo'] = 'True'
         else: 
