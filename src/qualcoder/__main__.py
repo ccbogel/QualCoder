@@ -281,7 +281,7 @@ class App(object):
                 result.append(dated_path)
                 result.sort()
                 if len(result) > 8:
-                    result = result[0:8]
+                    result = result[(len(result) - 8):]
         with open(self.persist_path, 'w', encoding='utf-8') as f:
             for i, line in enumerate(result):
                 f.write(line)
