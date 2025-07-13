@@ -308,9 +308,13 @@ class DialogAIChat(QtWidgets.QDialog):
         msg = _('We will now switch to the text coding workspace.\n There you can open a document, select a piece of text, right click on it and choose "AI Text Analysis" from the context menu.')
         msg_box = QtWidgets.QMessageBox(self)
         msg_box.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-        reply = msg_box.question(self, _('AI Text Analysis'),
-                                        msg, QtWidgets.QMessageBox.StandardButton.Ok,
-                                        QtWidgets.QMessageBox.StandardButton.Cancel)
+        reply = msg_box.question(
+            self,
+            _('AI Text Analysis'),
+            msg,
+            QtWidgets.QMessageBox.StandardButton.Ok | QtWidgets.QMessageBox.StandardButton.Cancel,
+            QtWidgets.QMessageBox.StandardButton.Ok  # <--- Default button
+        )
         if reply == QtWidgets.QMessageBox.StandardButton.Ok:
             self.main_window.text_coding(task='documents')
         else:
