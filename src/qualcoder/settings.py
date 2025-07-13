@@ -45,8 +45,6 @@ class DialogSettings(QtWidgets.QDialog):
 
         self.app = app
         self.settings = app.settings
-        if enable_ai:
-            self.settings['ai_enable'] = 'True'
         self.ai_models = copy.deepcopy(self.app.ai_models)
         self.current_coder = self.app.settings['codername']
         super(QtWidgets.QDialog, self).__init__(parent)  # overrride accept method
@@ -161,7 +159,10 @@ class DialogSettings(QtWidgets.QDialog):
         self.ui.pushButton_choose_directory.clicked.connect(self.choose_directory)
         self.ui.pushButton_set_coder.pressed.connect(self.new_coder_entered)
         # AI options
-        self.ui.checkBox_AI_enable.setChecked(self.settings['ai_enable'] == 'True')
+        if enable_ai or self.settings['ai_enable'] == 'True':
+            self.ui.checkBox_AI_enable.setChecked(True)
+        else:
+            self.ui.checkBox_AI_enable.setChecked(False)
         self.ui.checkBox_AI_enable.stateChanged.connect(self.ai_enable_state_changed)
         self.ui.comboBox_ai_profile.clear()
         if len(self.ai_models) > 0:
@@ -483,7 +484,7 @@ class DialogSettings(QtWidgets.QDialog):
             Message(self.app, _('AI profile'), msg).exec()
             return
         if self.settings['ai_enable'] == 'True' and self.ai_models[ai_model_index]['api_key'] == '':
-            msg = _('Please enter a valid API-key for the AI model. \n(If you are sure that your particular model does not need an API-key, enter "None" instead.)')
+            msg = _('Please enter a valid API-key for the AI model.')
             Message(self.app, _('AI model'), msg).exec()
             return
         if self.settings['ai_enable'] == 'True' and (self.ui.comboBox_AI_model_large.currentText() == '' or self.ui.comboBox_AI_model_fast.currentText() == ''):
