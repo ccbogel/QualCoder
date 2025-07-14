@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-06-28 11:15+1000\n"
-"PO-Revision-Date: 2025-06-29 08:46+1000\n"
+"POT-Creation-Date: 2025-07-14 20:01+1000\n"
+"PO-Revision-Date: 2025-07-14 20:36+1000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: zh\n"
@@ -18,19 +18,19 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.5\n"
 
-#: __main__.py:1183 __main__.py:1233 __main__.py:1236
+#: __main__.py:1183 __main__.py:1233 __main__.py:1236 __main__.py:1192
 msgid "There is already a backup with this name"
 msgstr "已经有一个使用此名称的备份"
 
-#: __main__.py:1192 __main__.py:1242 __main__.py:1245
+#: __main__.py:1192 __main__.py:1242 __main__.py:1245 __main__.py:1201
 msgid "WARNING: audio and video files NOT backed up. See settings."
 msgstr "警告：不备份音频和视频文件。请参见设置。"
 
-#: __main__.py:1194 __main__.py:1244 __main__.py:1247
+#: __main__.py:1194 __main__.py:1244 __main__.py:1247 __main__.py:1203
 msgid "Project backup created: "
 msgstr "创建项目备份： "
 
-#: __main__.py:1262 __main__.py:1312 __main__.py:1315
+#: __main__.py:1262 __main__.py:1312 __main__.py:1315 __main__.py:1271
 msgid ""
 "Welcome\n"
 "\n"
@@ -44,128 +44,130 @@ msgstr ""
 "QualCoder 中的新人工智能增强功能需要一些额外设置。您想启用 AI 并开始设置吗？"
 "您也可以稍后从主窗口的 AI 菜单启动 AI 设置向导。点击 “是 ”立即开始。"
 
-#: __main__.py:1268 __main__.py:1318 __main__.py:1321
+#: __main__.py:1268 __main__.py:1318 __main__.py:1321 __main__.py:1277
 msgid "AI Integration"
 msgstr "人工智能集成"
 
-#: __main__.py:1583 __main__.py:1633 __main__.py:1636
+#: __main__.py:1583 __main__.py:1633 __main__.py:1636 __main__.py:1592
 msgid "Settings"
 msgstr "设置"
 
 #: __main__.py:1584 journals.py:186 report_exact_matches.py:407
 #: __main__.py:1634 report_exact_matches.py:459 __main__.py:1637
+#: __main__.py:1593
 msgid "Coder"
 msgstr "编码器"
 
-#: __main__.py:1585 __main__.py:1635 __main__.py:1638
+#: __main__.py:1585 __main__.py:1635 __main__.py:1638 __main__.py:1594
 msgid "Font"
 msgstr "字体"
 
-#: __main__.py:1586 __main__.py:1636 __main__.py:1639
+#: __main__.py:1586 __main__.py:1636 __main__.py:1639 __main__.py:1595
 msgid "Tree font size"
 msgstr "树木字体大小"
 
-#: __main__.py:1587 __main__.py:1637 __main__.py:1640
+#: __main__.py:1587 __main__.py:1637 __main__.py:1640 __main__.py:1596
 msgid "Working directory"
 msgstr "工作目录"
 
-#: __main__.py:1588 __main__.py:1638 __main__.py:1641
+#: __main__.py:1588 __main__.py:1638 __main__.py:1641 __main__.py:1597
 msgid "Show IDs"
 msgstr "显示 ID"
 
-#: __main__.py:1589 __main__.py:1639 __main__.py:1642
+#: __main__.py:1589 __main__.py:1639 __main__.py:1642 __main__.py:1598
 msgid "Language"
 msgstr "语言"
 
-#: __main__.py:1590 __main__.py:1640 __main__.py:1643
+#: __main__.py:1590 __main__.py:1640 __main__.py:1643 __main__.py:1599
 msgid "Timestamp format"
 msgstr "时间戳格式"
 
-#: __main__.py:1591 __main__.py:1641 __main__.py:1644
+#: __main__.py:1591 __main__.py:1641 __main__.py:1644 __main__.py:1600
 msgid "Speaker name format"
 msgstr "扬声器名称格式"
 
-#: __main__.py:1592 __main__.py:1642 __main__.py:1645
+#: __main__.py:1592 __main__.py:1642 __main__.py:1645 __main__.py:1601
 msgid "Report text context characters: "
 msgstr "报告文本上下文字符： "
 
-#: __main__.py:1593 __main__.py:1643 __main__.py:1646
+#: __main__.py:1593 __main__.py:1643 __main__.py:1646 __main__.py:1602
 msgid "Report text context style: "
 msgstr "报告文本上下文样式： "
 
-#: __main__.py:1594 __main__.py:1644 __main__.py:1647
+#: __main__.py:1594 __main__.py:1644 __main__.py:1647 __main__.py:1603
 msgid "Backup on open"
 msgstr "打开时备份"
 
-#: __main__.py:1595 __main__.py:1645 __main__.py:1648
+#: __main__.py:1595 __main__.py:1645 __main__.py:1648 __main__.py:1604
 msgid "Backup AV files"
 msgstr "备份音频/视频文件"
 
-#: __main__.py:1597 __main__.py:1647 __main__.py:1650
+#: __main__.py:1597 __main__.py:1647 __main__.py:1650 __main__.py:1606
 msgid "AI integration is enabled"
 msgstr "启用人工智能集成"
 
-#: __main__.py:1599 __main__.py:1649 __main__.py:1652
+#: __main__.py:1599 __main__.py:1649 __main__.py:1652 __main__.py:1608
 msgid "AI integration is disabled"
 msgstr "人工智能集成已禁用"
 
-#: __main__.py:1600 __main__.py:1650 __main__.py:1653
+#: __main__.py:1600 __main__.py:1650 __main__.py:1653 __main__.py:1609
 msgid "Style"
 msgstr "样式"
 
 #: __main__.py:1602 __main__.py:2780 __main__.py:2879 __main__.py:2882
+#: __main__.py:2838
 msgid "Directory (folder) paths / represents \\"
 msgstr "目录（文件夹）路径/表示"
 
-#: __main__.py:1851 __main__.py:1901 __main__.py:1904
+#: __main__.py:1851 __main__.py:1901 __main__.py:1904 __main__.py:1860
 msgid "This project contains no text files."
 msgstr "本项目不包含文本文件。"
 
-#: __main__.py:1852 __main__.py:1902 __main__.py:1905
+#: __main__.py:1852 __main__.py:1902 __main__.py:1905 __main__.py:1861
 msgid "No text files"
 msgstr "无文本文件"
 
-#: __main__.py:1865 __main__.py:1915 __main__.py:1918
+#: __main__.py:1865 __main__.py:1915 __main__.py:1918 __main__.py:1874
 msgid "This project contains no pdf files."
 msgstr "本项目不包含 pdf 文件。"
 
-#: __main__.py:1866 __main__.py:1916 __main__.py:1919
+#: __main__.py:1866 __main__.py:1916 __main__.py:1919 __main__.py:1875
 msgid "No pdf files"
 msgstr "无 pdf 文件"
 
-#: __main__.py:1879 __main__.py:1931 __main__.py:1934
+#: __main__.py:1879 __main__.py:1931 __main__.py:1934 __main__.py:1890
 msgid "This project contains no image files."
 msgstr "本项目不包含图像文件。"
 
-#: __main__.py:1880 __main__.py:1932 __main__.py:1935
+#: __main__.py:1880 __main__.py:1932 __main__.py:1935 __main__.py:1891
 msgid "No image files"
 msgstr "无图像文件"
 
-#: __main__.py:1888 __main__.py:1940 __main__.py:1943
+#: __main__.py:1888 __main__.py:1940 __main__.py:1943 __main__.py:1899
 msgid "This project contains no audio/video files."
 msgstr "本项目不包含音频/视频文件。"
 
-#: __main__.py:1889 __main__.py:1941 __main__.py:1944
+#: __main__.py:1889 __main__.py:1941 __main__.py:1944 __main__.py:1900
 msgid "No a/v files"
 msgstr "无音频/视频文件"
 
-#: __main__.py:1892 __main__.py:1944 __main__.py:1947
+#: __main__.py:1892 __main__.py:1944 __main__.py:1947 __main__.py:1903
 msgid "VLC is not installed. Cannot code audio/video files."
 msgstr "未安装 VLC。无法编码音频/视频文件。"
 
-#: __main__.py:1893 __main__.py:1945 __main__.py:1948
+#: __main__.py:1893 __main__.py:1945 __main__.py:1948 __main__.py:1904
 msgid "Install VLC"
 msgstr "安装 VLC"
 
-#: __main__.py:1902 __main__.py:1954 __main__.py:1957
+#: __main__.py:1902 __main__.py:1954 __main__.py:1957 __main__.py:1913
 msgid "A/V Coding"
 msgstr "音频/视频编码"
 
-#: __main__.py:1989 __main__.py:2041 __main__.py:2044
+#: __main__.py:1989 __main__.py:2041 __main__.py:2044 __main__.py:2000
 msgid "IMPORTING REFI-QDA PROJECT"
 msgstr "导入 refi-qda 项目"
 
-#: __main__.py:1991 __main__.py:2043 __main__.py:2046
+#: __main__.py:1991 __main__.py:2043 __main__.py:2046 __main__.py:2002
 msgid ""
 "Step 1: You will be asked for a new QualCoder project name.\n"
 "Step 2: You will be asked for the QDPX file."
@@ -173,24 +175,24 @@ msgstr ""
 "第 1 步：系统会要求您输入新的 QualCoder 项目名称。\n"
 "第 2 步：要求您提供 QDPX 文件。"
 
-#: __main__.py:1992 __main__.py:2044 __main__.py:2047
+#: __main__.py:1992 __main__.py:2044 __main__.py:2047 __main__.py:2003
 msgid "REFI-QDA import steps"
 msgstr "REFI-QDA 导入步骤"
 
 #: __main__.py:1996 __main__.py:2014 __main__.py:2048 __main__.py:2066
-#: __main__.py:2051 __main__.py:2069
+#: __main__.py:2051 __main__.py:2069 __main__.py:2007 __main__.py:2025
 msgid "Project creation"
 msgstr "项目创建"
 
-#: __main__.py:1996 __main__.py:2048 __main__.py:2051
+#: __main__.py:1996 __main__.py:2048 __main__.py:2051 __main__.py:2007
 msgid "REFI-QDA Project not successfully created"
 msgstr "未成功创建 REFI-QDA 项目"
 
-#: __main__.py:2007 __main__.py:2059 __main__.py:2062
+#: __main__.py:2007 __main__.py:2059 __main__.py:2062 __main__.py:2018
 msgid "IMPORTING RQDA PROJECT"
 msgstr "导入 RQDA 项目"
 
-#: __main__.py:2009 __main__.py:2061 __main__.py:2064
+#: __main__.py:2009 __main__.py:2061 __main__.py:2064 __main__.py:2020
 msgid ""
 "Step 1: You will be asked for a new QualCoder project name.\n"
 "Step 2: You will be asked for the RQDA file."
@@ -198,84 +200,85 @@ msgstr ""
 "第 1 步：系统会要求您输入新的 QualCoder 项目名称。\n"
 "第 2 步：要求您提供 RQDA 文件。"
 
-#: __main__.py:2010 __main__.py:2062 __main__.py:2065
+#: __main__.py:2010 __main__.py:2062 __main__.py:2065 __main__.py:2021
 msgid "RQDA import steps"
 msgstr "RQDA 导入步骤"
 
-#: __main__.py:2014 __main__.py:2066 __main__.py:2069
+#: __main__.py:2014 __main__.py:2066 __main__.py:2069 __main__.py:2025
 msgid "Project not successfully created"
 msgstr "项目未成功创建"
 
-#: __main__.py:2028 __main__.py:2080 __main__.py:2083
+#: __main__.py:2028 __main__.py:2080 __main__.py:2083 __main__.py:2039
 msgid "Are you sure you want to quit?"
 msgstr "你确定要辞职吗？"
 
-#: __main__.py:2077 __main__.py:2133 __main__.py:2136
+#: __main__.py:2077 __main__.py:2133 __main__.py:2136 __main__.py:2092
 msgid "Enter project name"
 msgstr "输入项目名称"
 
 #: __main__.py:2081 __main__.py:2101 refi.py:1937 refi.py:1943 __main__.py:2137
-#: __main__.py:2157 __main__.py:2140 __main__.py:2160
+#: __main__.py:2157 __main__.py:2140 __main__.py:2160 __main__.py:2096
+#: __main__.py:2116
 msgid "Project"
 msgstr "项目"
 
-#: __main__.py:2081 __main__.py:2137 __main__.py:2140
+#: __main__.py:2081 __main__.py:2137 __main__.py:2140 __main__.py:2096
 msgid "No project created."
 msgstr "未创建项目。"
 
-#: __main__.py:2100 __main__.py:2156 __main__.py:2159
+#: __main__.py:2100 __main__.py:2156 __main__.py:2159 __main__.py:2115
 msgid "Project creation error "
 msgstr "项目创建错误 "
 
-#: __main__.py:2101 __main__.py:2157 __main__.py:2160
+#: __main__.py:2101 __main__.py:2157 __main__.py:2160 __main__.py:2116
 msgid " not successfully created"
 msgstr " 未成功创建"
 
-#: __main__.py:2184 __main__.py:2242 __main__.py:2245
+#: __main__.py:2184 __main__.py:2242 __main__.py:2245 __main__.py:2201
 msgid "New project: "
 msgstr "新项目： "
 
 #: __main__.py:2184 manage_files.py:1564 __main__.py:2242 manage_files.py:1716
-#: __main__.py:2245 manage_files.py:1755
+#: __main__.py:2245 manage_files.py:1755 __main__.py:2201
 msgid " created."
 msgstr "创建"
 
-#: __main__.py:2185 __main__.py:2243 __main__.py:2246
+#: __main__.py:2185 __main__.py:2243 __main__.py:2246 __main__.py:2202
 msgid "Opening: "
 msgstr "开幕： "
 
-#: __main__.py:2195 __main__.py:2253 __main__.py:2256
+#: __main__.py:2195 __main__.py:2253 __main__.py:2256 __main__.py:2212
 msgid "New Project Created"
 msgstr "创建新项目"
 
-#: __main__.py:2196 __main__.py:2254 __main__.py:2257
+#: __main__.py:2196 __main__.py:2254 __main__.py:2257 __main__.py:2213
 msgid "DB Version:"
 msgstr "数据库版本："
 
 #: __main__.py:2197 report_file_summary.py:158 reports.py:247 reports.py:565
 #: __main__.py:2255 report_file_summary.py:155 reports.py:318 reports.py:659
-#: __main__.py:2258
+#: __main__.py:2258 __main__.py:2214
 msgid "Date: "
 msgstr "日期："
 
-#: __main__.py:2198 __main__.py:2256 __main__.py:2259
+#: __main__.py:2198 __main__.py:2256 __main__.py:2259 __main__.py:2215
 msgid "About: "
 msgstr "关于："
 
 #: __main__.py:2199 report_codes.py:1164 __main__.py:2257 report_codes.py:1189
-#: __main__.py:2260 report_codes.py:1190
+#: __main__.py:2260 report_codes.py:1190 __main__.py:2216
 msgid "Coder:"
 msgstr "编码器"
 
-#: __main__.py:2202 __main__.py:2260 __main__.py:2263
+#: __main__.py:2202 __main__.py:2260 __main__.py:2263 __main__.py:2219
 msgid "Problem creating database "
 msgstr "创建数据库问题 "
 
-#: __main__.py:2256 __main__.py:2314 __main__.py:2317
+#: __main__.py:2256 __main__.py:2314 __main__.py:2317 __main__.py:2273
 msgid "Coder name changed to: "
 msgstr "编码员姓名改为："
 
-#: __main__.py:2279 __main__.py:2337 __main__.py:2340
+#: __main__.py:2279 __main__.py:2337 __main__.py:2340 __main__.py:2296
 msgid ""
 "**Research topic, questions and objectives:** \n"
 "\n"
@@ -296,39 +299,40 @@ msgstr ""
 "#####\n"
 "(此标记以下的内容均为个人说明，绝不会发送给人工智能）。"
 
-#: __main__.py:2284 __main__.py:2342 __main__.py:2345
+#: __main__.py:2284 __main__.py:2342 __main__.py:2345 __main__.py:2301
 msgid "Memo for project "
 msgstr "项目备忘录 "
 
-#: __main__.py:2291 __main__.py:2349 __main__.py:2352
+#: __main__.py:2291 __main__.py:2349 __main__.py:2352 __main__.py:2308
 msgid "Project memo entered."
 msgstr "输入项目备忘录。"
 
-#: __main__.py:2321 __main__.py:2379 __main__.py:2382
+#: __main__.py:2321 __main__.py:2379 __main__.py:2382 __main__.py:2338
 msgid ""
 "An error occured while writing to the project folder. Please close the "
 "project and try to open it again."
 msgstr "在写入项目文件夹时发生错误。请关闭项目并尝试再次打开。"
 
-#: __main__.py:2323 __main__.py:2381 __main__.py:2384
+#: __main__.py:2323 __main__.py:2381 __main__.py:2384 __main__.py:2340
 msgid "I/O Error"
 msgstr "输入/输出错误"
 
-#: __main__.py:2324 __main__.py:2382 __main__.py:2385
+#: __main__.py:2324 __main__.py:2382 __main__.py:2385 __main__.py:2341
 msgid "Close"
 msgstr "关闭"
 
 #: __main__.py:2380 special_functions.py:96 __main__.py:2438 __main__.py:2441
+#: __main__.py:2397
 msgid "Open project directory"
 msgstr "打开项目目录"
 
-#: __main__.py:2418 __main__.py:2476 __main__.py:2479
+#: __main__.py:2418 __main__.py:2476 __main__.py:2479 __main__.py:2435
 msgid ""
 "QualCoder detected that the project was not properly closed the last time it "
 "was used by \""
 msgstr "QualCoder 检测到该项目上次被“ ”使用时未正确关闭。"
 
-#: __main__.py:2420 __main__.py:2478 __main__.py:2481
+#: __main__.py:2420 __main__.py:2478 __main__.py:2481 __main__.py:2437
 msgid ""
 "In most cases, you can still continue your work as usual. If you encounter "
 "any problems, search for a recent backup in the project folder."
@@ -338,23 +342,24 @@ msgstr ""
 
 #: __main__.py:2422 code_text.py:4897 manage_files.py:1378 __main__.py:2480
 #: code_text.py:5034 manage_files.py:1500 __main__.py:2483 manage_files.py:1540
+#: __main__.py:2439 code_text.py:5070
 msgid "Open file"
 msgstr "打开文件"
 
-#: __main__.py:2434 __main__.py:2492 __main__.py:2495
+#: __main__.py:2434 __main__.py:2492 __main__.py:2495 __main__.py:2451
 msgid "Project cannot be opened since it's already in use by \""
 msgstr "项目已被“ ”使用，因此无法打开。"
 
-#: __main__.py:2435 __main__.py:2493 __main__.py:2496
+#: __main__.py:2435 __main__.py:2493 __main__.py:2496 __main__.py:2452
 msgid "\". Please retry later."
 msgstr "请稍后重试。"
 
 #: __main__.py:2437 __main__.py:2450 __main__.py:2495 __main__.py:2508
-#: __main__.py:2498 __main__.py:2511
+#: __main__.py:2498 __main__.py:2511 __main__.py:2454 __main__.py:2467
 msgid "Cannot open file"
 msgstr "无法打开文件"
 
-#: __main__.py:2478 __main__.py:2536 __main__.py:2539
+#: __main__.py:2478 __main__.py:2536 __main__.py:2539 __main__.py:2495
 msgid "Default coder name changed to: "
 msgstr "默认编码器名称更改为 "
 
@@ -365,67 +370,70 @@ msgstr "默认编码器名称更改为 "
 #: __main__.py:2734 __main__.py:2752 __main__.py:2760 __main__.py:2563
 #: __main__.py:2592 __main__.py:2612 __main__.py:2637 __main__.py:2677
 #: __main__.py:2701 __main__.py:2709 __main__.py:2721 __main__.py:2729
-#: __main__.py:2737 __main__.py:2755 __main__.py:2763
+#: __main__.py:2737 __main__.py:2755 __main__.py:2763 __main__.py:2519
+#: __main__.py:2548 __main__.py:2568 __main__.py:2593 __main__.py:2633
+#: __main__.py:2657 __main__.py:2665 __main__.py:2685 __main__.py:2693
+#: __main__.py:2711 __main__.py:2719
 msgid "Updating database to version"
 msgstr "将数据库更新到版本"
 
-#: __main__.py:2658 __main__.py:2740 __main__.py:2743
+#: __main__.py:2658 __main__.py:2740 __main__.py:2743 __main__.py:2699
 msgid "Project Opened: "
 msgstr "项目已开放： "
 
-#: __main__.py:2668 __main__.py:2767 __main__.py:2770
+#: __main__.py:2668 __main__.py:2767 __main__.py:2770 __main__.py:2726
 msgid "Deleting code_text coding to deleted files: "
 msgstr "删除已删除文件的编码_文本编码： "
 
-#: __main__.py:2675 __main__.py:2774 __main__.py:2777
+#: __main__.py:2675 __main__.py:2774 __main__.py:2777 __main__.py:2733
 msgid "Deleting code_image coding to deleted files: "
 msgstr "删除已删除文件的编码图像： "
 
-#: __main__.py:2682 __main__.py:2781 __main__.py:2784
+#: __main__.py:2682 __main__.py:2781 __main__.py:2784 __main__.py:2740
 msgid "Deleting code_av coding to deleted files: "
 msgstr "删除已删除文件的代码_av 编码： "
 
 #: __main__.py:2721 code_text.py:3159 code_text.py:4957 code_pdf.py:261
 #: __main__.py:2820 code_text.py:3283 code_text.py:5094 code_pdf.py:280
-#: __main__.py:2823
+#: __main__.py:2823 __main__.py:2779 code_text.py:3281 code_text.py:5130
 msgid "Information"
 msgstr "信息"
 
-#: __main__.py:2721 __main__.py:2820 __main__.py:2823
+#: __main__.py:2721 __main__.py:2820 __main__.py:2823 __main__.py:2779
 msgid "QualCoder project missing folders. Created empty folders"
 msgstr "QualCoder 项目缺少文件夹。创建了空文件夹"
 
-#: __main__.py:2737 __main__.py:2836 __main__.py:2839
+#: __main__.py:2737 __main__.py:2836 __main__.py:2839 __main__.py:2795
 msgid "Project summary"
 msgstr "项目总结"
 
-#: __main__.py:2738 __main__.py:2837 __main__.py:2840
+#: __main__.py:2738 __main__.py:2837 __main__.py:2840 __main__.py:2796
 msgid "Date time now: "
 msgstr "现在的日期时间："
 
-#: __main__.py:2740 __main__.py:2839 __main__.py:2842
+#: __main__.py:2740 __main__.py:2839 __main__.py:2842 __main__.py:2798
 msgid "Project path: "
 msgstr "项目路径："
 
-#: __main__.py:2741 __main__.py:2840 __main__.py:2843
+#: __main__.py:2741 __main__.py:2840 __main__.py:2843 __main__.py:2799
 msgid "Project date: "
 msgstr "项目日期："
 
-#: __main__.py:2746 __main__.py:2845 __main__.py:2848
+#: __main__.py:2746 __main__.py:2845 __main__.py:2848 __main__.py:2804
 msgid "Project memo: "
 msgstr "项目备忘录："
 
 #: __main__.py:2753 manage_files.py:2156 __main__.py:2852 manage_files.py:2308
-#: __main__.py:2855 manage_files.py:2345
+#: __main__.py:2855 manage_files.py:2345 __main__.py:2811
 msgid "Files: "
 msgstr "没有文件:"
 
 #: __main__.py:2757 cases.py:357 import_twitter_data.py:104 __main__.py:2856
-#: __main__.py:2859
+#: __main__.py:2859 __main__.py:2815
 msgid "Cases: "
 msgstr "病例： "
 
-#: __main__.py:2761 __main__.py:2860 __main__.py:2863
+#: __main__.py:2761 __main__.py:2860 __main__.py:2863 __main__.py:2819
 msgid "Code categories: "
 msgstr "代码类别："
 
@@ -433,32 +441,33 @@ msgstr "代码类别："
 #: report_relations.py:167 report_relations.py:168 __main__.py:2864
 #: report_codes.py:1301 report_codes.py:1307 report_relations.py:243
 #: report_relations.py:244 __main__.py:2867 report_codes.py:1302
-#: report_codes.py:1308
+#: report_codes.py:1308 __main__.py:2823
 msgid "Codes: "
 msgstr "代码"
 
 #: __main__.py:2769 attributes.py:92 attributes.py:257 view_charts.py:259
-#: __main__.py:2868 __main__.py:2871
+#: __main__.py:2868 __main__.py:2871 __main__.py:2827
 msgid "Attributes: "
 msgstr "属性："
 
 #: __main__.py:2773 journals.py:359 __main__.py:2872 __main__.py:2875
+#: __main__.py:2831
 msgid "Journals: "
 msgstr "期刊："
 
-#: __main__.py:2785 __main__.py:2884 __main__.py:2887
+#: __main__.py:2785 __main__.py:2884 __main__.py:2887 __main__.py:2843
 msgid "Bad links to files"
 msgstr "文件链接错误"
 
-#: __main__.py:2819 __main__.py:2918 __main__.py:2921
+#: __main__.py:2819 __main__.py:2918 __main__.py:2921 __main__.py:2877
 msgid "Closing project: "
 msgstr "结束项目： "
 
-#: __main__.py:2886 __main__.py:2985 __main__.py:2988
+#: __main__.py:2886 __main__.py:2985 __main__.py:2988 __main__.py:2944
 msgid "Deleting: "
 msgstr "删除： "
 
-#: __main__.py:2895 __main__.py:2994 __main__.py:2997
+#: __main__.py:2895 __main__.py:2994 __main__.py:2997 __main__.py:2953
 msgid ""
 "The AI is setup and enabled, so there is nothing to do here. Go to AI > "
 "settings to change the current model or other settings."
@@ -466,56 +475,57 @@ msgstr ""
 "人工智能已设置并启用，因此这里没有什么可做的。请转到人工智能 > 设置，更改当前"
 "模型或其他设置。"
 
-#: __main__.py:2897 __main__.py:2996 __main__.py:2999
+#: __main__.py:2897 __main__.py:2996 __main__.py:2999 __main__.py:2955
 msgid "AI Setup Wizard"
 msgstr "人工智能设置向导"
 
-#: __main__.py:2899 __main__.py:2998 __main__.py:3001
+#: __main__.py:2899 __main__.py:2998 __main__.py:3001 __main__.py:2957
 msgid "AI: Setup Wizard"
 msgstr "人工智能设置向导"
 
-#: __main__.py:2902 __main__.py:3001 __main__.py:3004
+#: __main__.py:2902 __main__.py:3001 __main__.py:3004 __main__.py:2960
 msgid "AI: Setup Wizard finished"
 msgstr "人工智能：设置向导已完成"
 
-#: __main__.py:2911 __main__.py:3010 __main__.py:3013
+#: __main__.py:2911 __main__.py:3010 __main__.py:3013 __main__.py:2969
 msgid "Please enable the AI first and set it in Settings."
 msgstr "请先启用人工智能，并在设置中进行设置。"
 
 #: __main__.py:2912 __main__.py:2916 __main__.py:2921 __main__.py:2946
 #: __main__.py:3011 __main__.py:3015 __main__.py:3020 __main__.py:3045
 #: __main__.py:3014 __main__.py:3018 __main__.py:3023 __main__.py:3048
+#: __main__.py:2970 __main__.py:2974 __main__.py:2979 __main__.py:3004
 msgid "Rebuild AI Memory"
 msgstr "重建人工智能记忆"
 
-#: __main__.py:2915 __main__.py:3014 __main__.py:3017
+#: __main__.py:2915 __main__.py:3014 __main__.py:3017 __main__.py:2973
 msgid "The AI is busy or not set up correctly."
 msgstr "人工智能忙或设置不正确。"
 
-#: __main__.py:2919 __main__.py:3018 __main__.py:3021
+#: __main__.py:2919 __main__.py:3018 __main__.py:3021 __main__.py:2977
 msgid ""
 "This will re-read all of your empirical documents, which may take some time. "
 "Do you want to continue?"
 msgstr "这将重新读取您的所有经验文件，可能需要一些时间。您想继续吗？"
 
 #: __main__.py:2937 __main__.py:2945 __main__.py:3036 __main__.py:3044
-#: __main__.py:3039 __main__.py:3047
+#: __main__.py:3039 __main__.py:3047 __main__.py:2995 __main__.py:3003
 msgid "Please enable the AI first and set it up in Settings."
 msgstr "请先启用人工智能，并在设置中进行设置。"
 
-#: __main__.py:2938 __main__.py:3037 __main__.py:3040
+#: __main__.py:2938 __main__.py:3037 __main__.py:3040 __main__.py:2996
 msgid "Ai Chat"
 msgstr "人工智能聊天"
 
-#: __main__.py:2958 __main__.py:3057 __main__.py:3060
+#: __main__.py:2958 __main__.py:3057 __main__.py:3060 __main__.py:3016
 msgid "This version: "
 msgstr "此版本： "
 
-#: __main__.py:2965 __main__.py:3064 __main__.py:3067
+#: __main__.py:2965 __main__.py:3064 __main__.py:3067 __main__.py:3023
 msgid "Newer release available: "
 msgstr "可提供更新版本： "
 
-#: __main__.py:2970 __main__.py:3069 __main__.py:3072
+#: __main__.py:2970 __main__.py:3069 __main__.py:3072 __main__.py:3028
 msgid "Latest Release: "
 msgstr "最新发布： "
 
@@ -539,12 +549,13 @@ msgstr "重复"
 msgid "This already exists"
 msgstr "这已经存在"
 
-#: ai_chat.py:88 ai_chat.py:89
+#: ai_chat.py:88 ai_chat.py:89 ai_chat.py:93
 msgid "<your question>"
 msgstr "<您的问题>"
 
 #: ai_chat.py:271 ai_chat.py:286 ai_chat.py:308 ai_chat.py:416 ai_chat.py:537
 #: ai_chat.py:272 ai_chat.py:287 ai_chat.py:309 ai_chat.py:417 ai_chat.py:538
+#: ai_chat.py:285 ai_chat.py:300 ai_chat.py:326 ai_chat.py:434 ai_chat.py:660
 msgid "No project open."
 msgstr "未打开项目。"
 
@@ -552,18 +563,21 @@ msgstr "未打开项目。"
 #: ai_chat.py:313 ai_chat.py:417 ai_chat.py:421 ai_chat.py:538 ai_chat.py:542
 #: ai_chat.py:944 ai_chat.py:273 ai_chat.py:277 ai_chat.py:288 ai_chat.py:292
 #: ai_chat.py:310 ai_chat.py:314 ai_chat.py:418 ai_chat.py:422 ai_chat.py:539
-#: ai_chat.py:543 ai_chat.py:949
+#: ai_chat.py:543 ai_chat.py:949 ai_chat.py:286 ai_chat.py:290 ai_chat.py:301
+#: ai_chat.py:305 ai_chat.py:327 ai_chat.py:331 ai_chat.py:435 ai_chat.py:439
+#: ai_chat.py:661 ai_chat.py:665 ai_chat.py:1114
 msgid "AI not enabled"
 msgstr "未启用人工智能"
 
 #: ai_chat.py:275 ai_chat.py:290 ai_chat.py:312 ai_chat.py:420 ai_chat.py:541
 #: ai_chat.py:943 code_text.py:4650 ai_chat.py:276 ai_chat.py:291
 #: ai_chat.py:313 ai_chat.py:421 ai_chat.py:542 ai_chat.py:948
-#: code_text.py:4787
+#: code_text.py:4787 ai_chat.py:289 ai_chat.py:304 ai_chat.py:330
+#: ai_chat.py:438 ai_chat.py:664 ai_chat.py:1113 code_text.py:4823
 msgid "The AI is disabled. Go to \"AI > Setup Wizard\" first."
 msgstr "人工智能已禁用。请先进入 “人工智能 > 设置向导”。"
 
-#: ai_chat.py:294 ai_chat.py:295
+#: ai_chat.py:294 ai_chat.py:295 ai_chat.py:308
 msgid ""
 "We will now switch to the text coding workspace.\n"
 " There you can open a document, select a piece of text, right click on it "
@@ -574,24 +588,25 @@ msgstr ""
 "文本分析”。"
 
 #: ai_chat.py:297 code_text.py:1066 ai_chat.py:298 code_text.py:1139
+#: ai_chat.py:313 code_text.py:1137
 msgid "AI Text Analysis"
 msgstr "人工智能文本分析"
 
-#: ai_chat.py:379 ai_chat.py:380
+#: ai_chat.py:379 ai_chat.py:380 ai_chat.py:397
 msgid ""
 "No coded text found. Please select another code or category, or refine you "
 "filters."
 msgstr "未找到编码文本。请选择其他编码或类别，或改进您的筛选条件。"
 
-#: ai_chat.py:380 ai_chat.py:381
+#: ai_chat.py:380 ai_chat.py:381 ai_chat.py:398
 msgid "AI code analysis"
 msgstr "人工智能代码分析"
 
-#: ai_chat.py:396 ai_chat.py:397
+#: ai_chat.py:396 ai_chat.py:397 ai_chat.py:414
 msgid "Analyzing the data coded as \"{}\" ({} pieces of data sent to the AI.)"
 msgstr "分析编码为“{}”的数据（发送给人工智能的 {} 条数据）。"
 
-#: ai_chat.py:398 ai_chat.py:399
+#: ai_chat.py:398 ai_chat.py:399 ai_chat.py:416
 msgid ""
 "\n"
 "ATTENTION: There was more coded data found, but it had to be truncated "
@@ -604,11 +619,12 @@ msgstr ""
 #: ai_chat.py:400 report_relations.py:617 report_relations.py:922
 #: view_graph.py:1654 view_graph.py:3080 view_graph.py:3082 ai_chat.py:401
 #: report_relations.py:695 report_relations.py:1000 view_graph.py:1692
-#: view_graph.py:3137 view_graph.py:3139
+#: view_graph.py:3137 view_graph.py:3139 ai_chat.py:418
 msgid "Code"
 msgstr "代码"
 
-#: ai_chat.py:404 ai_chat.py:443 ai_chat.py:405 ai_chat.py:444
+#: ai_chat.py:404 ai_chat.py:443 ai_chat.py:405 ai_chat.py:444 ai_chat.py:422
+#: ai_chat.py:461
 msgid ""
 "Note that it is highly recommended to use the project memo (Menu \"Project > "
 "Project Memo\") to include a short description of your project's research "
@@ -620,11 +636,11 @@ msgstr ""
 "课题、问题、目标和收集的经验数据。这些信息将伴随发送到人工智能的每个提示，从"
 "而使结果更有针对性"
 
-#: ai_chat.py:435 ai_chat.py:436
+#: ai_chat.py:435 ai_chat.py:436 ai_chat.py:453
 msgid "Analyzing the free topic \"{}\" in the data."
 msgstr "分析数据中的自由主题“{}”。"
 
-#: ai_chat.py:437 ai_chat.py:438
+#: ai_chat.py:437 ai_chat.py:438 ai_chat.py:455
 msgid ""
 "\n"
 "Description:"
@@ -632,172 +648,177 @@ msgstr ""
 "\n"
 "说明:"
 
-#: ai_chat.py:439 ai_chat.py:440
+#: ai_chat.py:439 ai_chat.py:440 ai_chat.py:457
 msgid "Topic"
 msgstr "主题"
 
-#: ai_chat.py:449 ai_chat.py:450
+#: ai_chat.py:449 ai_chat.py:450 ai_chat.py:467
 msgid "Searching for related data..."
 msgstr "搜索相关数据..."
 
-#: ai_chat.py:476 ai_chat.py:477 ai_chat.py:1082
+#: ai_chat.py:476 ai_chat.py:477 ai_chat.py:1082 ai_chat.py:494 ai_chat.py:1247
 msgid "Chat has been canceled by the user."
 msgstr "用户已取消聊天。"
 
-#: ai_chat.py:480 ai_chat.py:481
+#: ai_chat.py:480 ai_chat.py:481 ai_chat.py:498
 msgid "Sorry, the AI could could not find any data related to \""
 msgstr "抱歉，人工智能无法找到任何与以下内容相关的数据 "
 
-#: ai_chat.py:487 ai_chat.py:488
+#: ai_chat.py:487 ai_chat.py:488 ai_chat.py:504
 msgid "Found related data. Analyzing the most relevant segments closer."
 msgstr "找到相关数据。分析最相关的细分市场。"
 
-#: ai_chat.py:550 ai_chat.py:551
+#: ai_chat.py:550 ai_chat.py:551 ai_chat.py:673
 msgid ""
 "The text is too long to be analyzed in one go. Please select a shorter "
 "passage."
 msgstr "文章太长，无法一次性分析。请选择较短的段落。"
 
-#: ai_chat.py:551 ai_chat.py:552
+#: ai_chat.py:551 ai_chat.py:552 ai_chat.py:674
 msgid "AI text analysis"
 msgstr "人工智能文本分析"
 
-#: ai_chat.py:576 ai_chat.py:577
+#: ai_chat.py:576 ai_chat.py:577 ai_chat.py:704
 msgid "Analyzing text from "
 msgstr "分析来自 "
 
-#: ai_chat.py:578 ai_chat.py:579
+#: ai_chat.py:578 ai_chat.py:579 ai_chat.py:706
 msgid " characters)."
 msgstr " 字符）。"
 
-#: ai_chat.py:580 ai_chat.py:581
+#: ai_chat.py:580 ai_chat.py:581 ai_chat.py:708
 msgid "Text analysis"
 msgstr "文本分析"
 
-#: ai_chat.py:593 ai_prompts.py:825 ai_chat.py:594
+#: ai_chat.py:593 ai_prompts.py:825 ai_chat.py:594 ai_chat.py:721
+#: ai_prompts.py:850
 msgid "Do you really want to delete "
 msgstr "您真的想删除 "
 
-#: ai_chat.py:594 ai_chat.py:595
+#: ai_chat.py:594 ai_chat.py:595 ai_chat.py:722
 msgid "Delete Chat"
 msgstr "删除聊天"
 
-#: ai_chat.py:623 ai_chat.py:624
+#: ai_chat.py:623 ai_chat.py:624 ai_chat.py:751
 msgid "Send your question to the AI"
 msgstr "将您的问题发送给人工智能"
 
-#: ai_chat.py:629 ai_chat.py:630
+#: ai_chat.py:629 ai_chat.py:630 ai_chat.py:757
 msgid "Cancel AI generation"
 msgstr "取消人工智能生成"
 
-#: ai_chat.py:634 ai_chat.py:636 ai_chat.py:635 ai_chat.py:637
+#: ai_chat.py:634 ai_chat.py:636 ai_chat.py:635 ai_chat.py:637 ai_chat.py:762
+#: ai_chat.py:764
 msgid "AI: "
 msgstr "人工智能："
 
-#: ai_chat.py:634 ai_chat.py:635
+#: ai_chat.py:634 ai_chat.py:635 ai_chat.py:762
 msgid "reading data"
 msgstr "读取数据"
 
-#: ai_chat.py:655 ai_chat.py:657 ai_chat.py:656 ai_chat.py:658
+#: ai_chat.py:655 ai_chat.py:657 ai_chat.py:656 ai_chat.py:658 ai_chat.py:809
+#: ai_chat.py:811
 msgid "Type:"
 msgstr "类型："
 
-#: ai_chat.py:655 ai_chat.py:657 ai_chat.py:656 ai_chat.py:658
+#: ai_chat.py:655 ai_chat.py:657 ai_chat.py:656 ai_chat.py:658 ai_chat.py:809
+#: ai_chat.py:811
 msgid "Summary:"
 msgstr "摘要："
 
-#: ai_chat.py:655 ai_chat.py:657 ai_chat.py:656 ai_chat.py:658
+#: ai_chat.py:655 ai_chat.py:657 ai_chat.py:656 ai_chat.py:658 ai_chat.py:809
+#: ai_chat.py:811
 msgid "Date:"
 msgstr "日期："
 
-#: ai_chat.py:655 ai_chat.py:656
+#: ai_chat.py:655 ai_chat.py:656 ai_chat.py:809
 msgid "Prompt:"
 msgstr "提示："
 
-#: ai_chat.py:665 ai_chat.py:666
+#: ai_chat.py:665 ai_chat.py:666 ai_chat.py:819
 msgid "User"
 msgstr "用户"
 
-#: ai_chat.py:673 ai_chat.py:674
+#: ai_chat.py:673 ai_chat.py:674 ai_chat.py:827
 msgid "AI"
 msgstr "人工智能"
 
-#: ai_chat.py:677 ai_chat.py:678
+#: ai_chat.py:677 ai_chat.py:678 ai_chat.py:831
 msgid "Info:"
 msgstr "信息："
 
-#: ai_chat.py:728 ai_chat.py:731
+#: ai_chat.py:728 ai_chat.py:731 ai_chat.py:896
 msgid "(unknown reference)"
 msgstr "(参考文献不详）"
 
 #: ai_chat.py:798 ai_chat.py:812 ai_chat.py:813 ai_chat.py:801 ai_chat.py:815
-#: ai_chat.py:816
+#: ai_chat.py:816 ai_chat.py:966 ai_chat.py:980 ai_chat.py:981
 msgid "Export Chat"
 msgstr "出口聊天"
 
-#: ai_chat.py:811 ai_chat.py:814
+#: ai_chat.py:811 ai_chat.py:814 ai_chat.py:979
 msgid "The file already exists. Do you want to override it?"
 msgstr "文件已经存在。您想覆盖它吗？"
 
-#: ai_chat.py:851 ai_chat.py:854
+#: ai_chat.py:851 ai_chat.py:854 ai_chat.py:1019
 msgid "New topic analysis chat"
 msgstr "新话题分析聊天"
 
-#: ai_chat.py:853 ai_chat.py:856
+#: ai_chat.py:853 ai_chat.py:856 ai_chat.py:1021
 msgid "Analyzing a free-search topic together with the AI."
 msgstr "与人工智能一起分析自由搜索主题。"
 
-#: ai_chat.py:854 ai_chat.py:857
+#: ai_chat.py:854 ai_chat.py:857 ai_chat.py:1022
 msgid "New text analysis chat"
 msgstr "新的文本分析聊天"
 
-#: ai_chat.py:856 ai_chat.py:859
+#: ai_chat.py:856 ai_chat.py:859 ai_chat.py:1024
 msgid "Analyse a piece of text from your empirical data together with the AI."
 msgstr "与人工智能一起分析经验数据中的一段文字。"
 
-#: ai_chat.py:857 ai_chat.py:860
+#: ai_chat.py:857 ai_chat.py:860 ai_chat.py:1025
 msgid "New code analysis chat"
 msgstr "新代码分析聊天"
 
-#: ai_chat.py:859 ai_chat.py:862
+#: ai_chat.py:859 ai_chat.py:862 ai_chat.py:1027
 msgid "Analyze the data collected under a certain code together with the AI."
 msgstr "与人工智能一起分析在特定代码下收集到的数据。"
 
-#: ai_chat.py:860 ai_chat.py:863
+#: ai_chat.py:860 ai_chat.py:863 ai_chat.py:1028
 msgid "New general chat"
 msgstr "新的一般聊天"
 
-#: ai_chat.py:862 ai_chat.py:865
+#: ai_chat.py:862 ai_chat.py:865 ai_chat.py:1030
 msgid "Ask the AI anything, not related to your data."
 msgstr "向人工智能提出任何与您的数据无关的问题。"
 
-#: ai_chat.py:947 ai_chat.py:952
+#: ai_chat.py:947 ai_chat.py:952 ai_chat.py:1117
 msgid ""
 "The AI is busy generating a response. Click on the button on the right to "
 "stop."
 msgstr "人工智能正忙着生成回复。点击右侧按钮即可停止。"
 
-#: ai_chat.py:948 ai_chat.py:953
+#: ai_chat.py:948 ai_chat.py:953 ai_chat.py:1118
 msgid "AI busy"
 msgstr "人工智能忙"
 
-#: ai_chat.py:951 ai_chat.py:956
+#: ai_chat.py:951 ai_chat.py:956 ai_chat.py:1121
 msgid "The AI not yet fully loaded. Please wait and retry."
 msgstr "人工智能尚未完全加载。请稍后重试。"
 
-#: ai_chat.py:952 ai_search_dialog.py:447 ai_chat.py:957
+#: ai_chat.py:952 ai_search_dialog.py:447 ai_chat.py:957 ai_chat.py:1122
 msgid "AI not ready"
 msgstr "人工智能尚未准备就绪"
 
-#: ai_chat.py:970 ai_chat.py:975
+#: ai_chat.py:970 ai_chat.py:975 ai_chat.py:1140
 msgid "Please select a chat or create a new one."
 msgstr "请选择聊天或创建新聊天。"
 
-#: ai_chat.py:971 ai_chat.py:976
+#: ai_chat.py:971 ai_chat.py:976 ai_chat.py:1141
 msgid "Chat selection"
 msgstr "聊天选择"
 
-#: ai_chat.py:1076 ai_chat.py:1084
+#: ai_chat.py:1076 ai_chat.py:1084 ai_chat.py:1249
 msgid ""
 "Error: The AI returned an empty result. This may indicate that the AI model "
 "is not available at the moment. Try again later or choose a different model."
@@ -805,29 +826,31 @@ msgstr ""
 "错误： 人工智能返回的结果为空。这可能表明该人工智能模型暂时不可用。请稍后再试"
 "或选择其他模型。"
 
-#: ai_chat.py:1082 ai_chat.py:1090
+#: ai_chat.py:1082 ai_chat.py:1090 ai_chat.py:1255
 msgid "Error communicating with "
 msgstr "通信错误"
 
 #: ai_chat.py:1089 ai_llm.py:327 ai_vectorstore.py:63 ai_chat.py:1097
-#: ai_llm.py:361
+#: ai_llm.py:361 ai_chat.py:1262 ai_llm.py:510
 msgid "Uncaught exception: "
 msgstr "未捕获异常："
 
 #: ai_chat.py:1125 ai_chat.py:1146 ai_chat.py:1186 ai_chat.py:1206
 #: ai_chat.py:1133 ai_chat.py:1154 ai_chat.py:1194 ai_chat.py:1214
+#: ai_chat.py:1298 ai_chat.py:1319 ai_chat.py:1364 ai_chat.py:1384
 msgid "Invalid source reference."
 msgstr "引用源无效。"
 
-#: ai_chat.py:1159 ai_chat.py:1167
+#: ai_chat.py:1159 ai_chat.py:1167 ai_chat.py:1332
 msgid "Error retrieving source text"
 msgstr "检索源文本时出错"
 
 #: ai_chat.py:1187 ai_chat.py:1207 ai_chat.py:1195 ai_chat.py:1215
+#: ai_chat.py:1365 ai_chat.py:1385
 msgid "AI Chat"
 msgstr "人工智能聊天"
 
-#: ai_llm.py:133 ai_llm.py:144
+#: ai_llm.py:133 ai_llm.py:144 ai_llm.py:293
 msgid "AI: Starting up..."
 msgstr "人工智能：启动..."
 
@@ -835,11 +858,11 @@ msgstr "人工智能：启动..."
 msgid "AI: Please set up the AI model"
 msgstr "人工智能：请设置人工智能模型"
 
-#: ai_llm.py:143 ai_llm.py:154
+#: ai_llm.py:143 ai_llm.py:154 ai_llm.py:303
 msgid "AI Setup"
 msgstr "人工智能设置"
 
-#: ai_llm.py:149 ai_llm.py:160
+#: ai_llm.py:149 ai_llm.py:160 ai_llm.py:309
 msgid "AI: No model selected, AI is disabled."
 msgstr "人工智能：未选择模型，人工智能被禁用。"
 
@@ -850,19 +873,19 @@ msgid ""
 msgstr ""
 "请在以下对话框中输入人工智能的 API 密钥（如果不需要 API 密钥，则输入 “无”）。"
 
-#: ai_llm.py:166 ai_llm.py:177
+#: ai_llm.py:166 ai_llm.py:177 ai_llm.py:328
 msgid "AI API-key"
 msgstr "人工智能 API 密钥"
 
-#: ai_llm.py:172 ai_llm.py:183
+#: ai_llm.py:172 ai_llm.py:183 ai_llm.py:334
 msgid "AI: No API key set, AI is disabled."
 msgstr "人工智能：未设置 API 密钥，人工智能已禁用。"
 
-#: ai_llm.py:235 ai_llm.py:265
+#: ai_llm.py:235 ai_llm.py:265 ai_llm.py:414
 msgid "AI: Ready"
 msgstr "人工智能：准备就绪"
 
-#: ai_llm.py:246 ai_llm.py:276
+#: ai_llm.py:246 ai_llm.py:276 ai_llm.py:425
 msgid ""
 "An error occured during AI initialization. The AI features will be disabled. "
 "Click on Project > Settings to reenable them."
@@ -870,27 +893,27 @@ msgstr ""
 "人工智能初始化过程中发生错误。人工智能功能将被禁用。单击 “项目”>“设置 ”重新启"
 "用这些功能。"
 
-#: ai_llm.py:247 ai_llm.py:277
+#: ai_llm.py:247 ai_llm.py:277 ai_llm.py:426
 msgid "AI Initialization"
 msgstr "人工智能初始化"
 
-#: ai_llm.py:261 ai_llm.py:291
+#: ai_llm.py:261 ai_llm.py:291 ai_llm.py:440
 msgid "Do you really want to cancel the AI operation?"
 msgstr "您真的想取消人工智能操作吗？"
 
-#: ai_llm.py:324 ai_llm.py:358
+#: ai_llm.py:324 ai_llm.py:358 ai_llm.py:507
 msgid "AI Error:\n"
 msgstr "人工智能错误：\n"
 
-#: ai_llm.py:456 ai_llm.py:490
+#: ai_llm.py:456 ai_llm.py:490 ai_llm.py:659
 msgid "AI generate_code_descriptions\n"
 msgstr "人工智能生成代码描述\n"
 
-#: ai_llm.py:457 ai_llm.py:491
+#: ai_llm.py:457 ai_llm.py:491 ai_llm.py:660
 msgid "Prompt:\n"
 msgstr "提示:\n"
 
-#: ai_llm.py:487 ai_llm.py:521
+#: ai_llm.py:487 ai_llm.py:521 ai_llm.py:691
 msgid ""
 "Stage 1:\n"
 "Searching data related to \""
@@ -898,7 +921,7 @@ msgstr ""
 "第 1 阶段：\n"
 "搜索与”"
 
-#: ai_llm.py:564 ai_llm.py:598
+#: ai_llm.py:564 ai_llm.py:598 ai_llm.py:768
 msgid ""
 "Stage 2:\n"
 "Inspecting the data more closely..."
@@ -906,28 +929,29 @@ msgstr ""
 "第 2 阶段：\n"
 "更仔细地检查数据..."
 
-#: ai_prompts.py:826
+#: ai_prompts.py:826 ai_prompts.py:851
 msgid "Delete Prompt"
 msgstr "删除提示"
 
 #: ai_prompts.py:863 ai_prompts.py:868 ai_prompts.py:874 ai_prompts.py:903
-#: ai_prompts.py:911
+#: ai_prompts.py:911 ai_prompts.py:888 ai_prompts.py:893 ai_prompts.py:899
+#: ai_prompts.py:928 ai_prompts.py:936
 msgid "Edit prompts"
 msgstr "编辑提示"
 
-#: ai_prompts.py:863
+#: ai_prompts.py:863 ai_prompts.py:888
 msgid "The name cannot be empty"
 msgstr "名称不能为空"
 
-#: ai_prompts.py:868
+#: ai_prompts.py:868 ai_prompts.py:893
 msgid "The name must be no longer than 60 characters."
 msgstr "名称长度不得超过 60 个字符。"
 
-#: ai_prompts.py:874
+#: ai_prompts.py:874 ai_prompts.py:899
 msgid "The name of the prompt must be unique within its type and scope."
 msgstr "提示符的名称在其类型和范围内必须是唯一的。"
 
-#: ai_prompts.py:901
+#: ai_prompts.py:901 ai_prompts.py:926
 msgid "Names of prompts must be unique within its type and scope. "
 msgstr "提示名称在其类型和范围内必须是唯一的。"
 
@@ -966,6 +990,7 @@ msgstr "无代码"
 #: code_text.py:635 code_pdf.py:524 manage_files.py:1036 report_codes.py:381
 #: report_code_summary.py:122 report_codes_by_segments.py:329 view_av.py:505
 #: view_image.py:398 report_codes.py:382 view_av.py:512 manage_files.py:1076
+#: code_text.py:633
 msgid "Name"
 msgstr "名称"
 
@@ -1000,6 +1025,8 @@ msgstr "名称"
 #: report_codes.py:396 report_codes.py:475 view_av.py:512 view_av.py:608
 #: view_av.py:2418 view_av.py:2442 manage_files.py:1076 manage_files.py:1426
 #: manage_files.py:1461 manage_files.py:2306 view_av.py:2420 view_av.py:2444
+#: code_text.py:633 code_text.py:648 code_text.py:676 code_text.py:701
+#: code_text.py:727 code_text.py:2877 code_text.py:2901
 msgid "Memo"
 msgstr "备忘录"
 
@@ -1008,7 +1035,7 @@ msgstr "备忘录"
 #: report_relations.py:922 view_av.py:452 view_image.py:321 code_text.py:635
 #: code_pdf.py:524 report_codes.py:381 report_code_summary.py:122
 #: report_codes_by_segments.py:329 report_relations.py:1000 view_av.py:505
-#: view_image.py:398 report_codes.py:382 view_av.py:512
+#: view_image.py:398 report_codes.py:382 view_av.py:512 code_text.py:633
 msgid "Count"
 msgstr "计数"
 
@@ -1055,7 +1082,7 @@ msgstr "在所有情况下进行搜索"
 #: report_codes_by_segments.py:143 report_file_summary.py:150 view_av.py:3362
 #: view_av.py:3815 report_codes.py:253 report_codes.py:2176
 #: report_codes.py:2844 view_av.py:3441 view_av.py:3898 view_av.py:3443
-#: view_av.py:3900
+#: view_av.py:3900 code_text.py:5297
 msgid "MEMO: "
 msgstr "备忘录: "
 
@@ -1106,17 +1133,18 @@ msgstr "下载人工智能组件"
 msgid "Downloading "
 msgstr "下载 "
 
-#: ai_vectorstore.py:264
+#: ai_vectorstore.py:264 ai_vectorstore.py:271
 msgid ""
 "AI: Could not download all the necessary components, the AI integration will "
 "be disabled."
 msgstr "人工智能：无法下载所有必要组件，人工智能集成将被禁用。"
 
-#: ai_vectorstore.py:266
+#: ai_vectorstore.py:266 ai_vectorstore.py:273
 msgid "AI: Success, components downloaded and installed."
 msgstr "人工智能： 成功，已下载并安装组件。"
 
-#: ai_vectorstore.py:304 ai_vectorstore.py:382
+#: ai_vectorstore.py:304 ai_vectorstore.py:382 ai_vectorstore.py:311
+#: ai_vectorstore.py:389
 msgid ""
 "It appears that you have already used the AI features with this project "
 "before. Meanwhile, we had to change the internal implementation of the local "
@@ -1128,35 +1156,36 @@ msgstr ""
 "能内存的内部实现，使其更加稳健。因此，人工智能必须重新读取您的所有经验文档，"
 "以重建本地内存。这可能需要一段时间。不便之处，敬请原谅。"
 
-#: ai_vectorstore.py:369
+#: ai_vectorstore.py:369 ai_vectorstore.py:376
 msgid "AI: Finished loading (no project open)."
 msgstr "人工智能：加载完毕（未打开项目）。"
 
-#: ai_vectorstore.py:387 ai_vectorstore.py:399
+#: ai_vectorstore.py:387 ai_vectorstore.py:399 ai_vectorstore.py:394
+#: ai_vectorstore.py:406
 msgid "AI memory"
 msgstr "人工智能存储器"
 
-#: ai_vectorstore.py:408
+#: ai_vectorstore.py:408 ai_vectorstore.py:415
 msgid "AI: Checked all documents, memory is up to date."
 msgstr "大赦国际：检查了所有文件，内存是最新的。"
 
-#: ai_vectorstore.py:431
+#: ai_vectorstore.py:431 ai_vectorstore.py:453
 msgid "Vectorstore: Document import failed, faiss_db not present."
 msgstr "向量存储： 文档导入失败，faiss_db 不存在。"
 
-#: ai_vectorstore.py:463
+#: ai_vectorstore.py:463 ai_vectorstore.py:485
 msgid "AI: Adding document to internal memory: "
 msgstr "人工智能： 将文档添加到内部存储器 "
 
-#: ai_vectorstore.py:533
+#: ai_vectorstore.py:533 ai_vectorstore.py:555
 msgid "AI: No documents, AI is ready."
 msgstr "人工智能：没有文件，人工智能已经准备好了。"
 
-#: ai_vectorstore.py:537
+#: ai_vectorstore.py:537 ai_vectorstore.py:559
 msgid "AI: Checking for new documents"
 msgstr "人工智能：检查新文件"
 
-#: ai_vectorstore.py:550
+#: ai_vectorstore.py:550 ai_vectorstore.py:572
 msgid ""
 "AI: Rebuilding memory. The local AI will read through all your documents, "
 "please be patient."
@@ -1191,7 +1220,7 @@ msgid "Attribute renamed from: "
 msgstr "属性重命名自 "
 
 #: attributes.py:249 code_text.py:3050 code_text.py:3106 code_text.py:3174
-#: code_text.py:3230
+#: code_text.py:3230 code_text.py:3172 code_text.py:3228
 msgid " to "
 msgstr "至 "
 
@@ -1291,10 +1320,13 @@ msgstr "该部分已与此案相关联"
 #: report_codes.py:1141 view_av.py:3009 view_av.py:3161 manage_files.py:1343
 #: manage_files.py:1821 manage_files.py:1845 manage_files.py:1849
 #: manage_files.py:1853 view_av.py:3007 view_av.py:3011 view_av.py:3163
+#: code_text.py:1216 code_text.py:3518 code_text.py:3523 code_text.py:3683
+#: code_text.py:3790 code_text.py:3803 code_text.py:4037
 msgid "Warning"
 msgstr "警告"
 
 #: case_file_manager.py:618 code_text.py:3673 code_text.py:3804
+#: code_text.py:3803
 msgid "Cannot have blank text marks"
 msgstr "不能有空白文本标记"
 
@@ -1303,6 +1335,7 @@ msgid "Auto assign text to case: "
 msgstr "自动将文本分配到大小写： "
 
 #: case_file_manager.py:621 code_text.py:3685 code_text.py:3816
+#: code_text.py:3815
 msgid ""
 "\n"
 "Using "
@@ -1311,6 +1344,7 @@ msgstr ""
 "使用 "
 
 #: case_file_manager.py:621 code_text.py:3685 code_text.py:3816
+#: code_text.py:3815
 msgid " and "
 msgstr " 和 "
 
@@ -1557,7 +1591,7 @@ msgstr "代码树"
 #: report_relations.py:1012 view_av.py:452 view_image.py:321 code_text.py:635
 #: code_pdf.py:524 manage_files.py:1036 report_code_summary.py:122
 #: report_exact_matches.py:564 report_relations.py:1102 view_av.py:505
-#: view_image.py:398 view_av.py:512 manage_files.py:1076
+#: view_image.py:398 view_av.py:512 manage_files.py:1076 code_text.py:633
 msgid "Id"
 msgstr "Id"
 
@@ -1597,7 +1631,8 @@ msgstr "案例："
 #: code_pdf.py:484 code_pdf.py:2542 code_pdf.py:2985 view_av.py:3254
 #: view_av.py:3760 view_graph.py:528 view_graph.py:597 view_graph.py:660
 #: view_graph.py:1284 view_graph.py:1310 view_graph.py:1335 view_av.py:3333
-#: view_av.py:3843 view_av.py:3335 view_av.py:3845
+#: view_av.py:3843 view_av.py:3335 view_av.py:3845 code_text.py:612
+#: code_text.py:1784
 msgid "Memo: "
 msgstr "备忘："
 
@@ -1609,7 +1644,7 @@ msgstr "备忘："
 #: report_attributes.py:433 report_codes.py:2198 view_graph.py:525
 #: view_graph.py:596 view_graph.py:658 view_graph.py:751 view_graph.py:1280
 #: view_graph.py:1305 view_graph.py:1331 view_graph.py:1357 view_graph.py:1376
-#: view_graph.py:1397 view_graph.py:1600 report_codes.py:2208
+#: view_graph.py:1397 view_graph.py:1600 report_codes.py:2208 code_text.py:4005
 msgid "File: "
 msgstr "文件: "
 
@@ -1626,11 +1661,12 @@ msgid "Export to ODT file"
 msgstr "导出为 ODT 文件"
 
 #: code_in_all_files.py:359 code_text.py:2005 code_text.py:2089
+#: code_text.py:2092
 msgid "Coded text file exported: "
 msgstr "导出编码文本文件："
 
 #: code_in_all_files.py:360 code_text.py:2007 code_text.py:2134
-#: code_text.py:2091 code_text.py:2218
+#: code_text.py:2091 code_text.py:2218 code_text.py:2094 code_text.py:2221
 msgid "Coded text file exported"
 msgstr "导出编码文本文件"
 
@@ -1641,7 +1677,8 @@ msgstr "导出编码文本文件"
 #: code_text.py:1341 code_text.py:1431 code_pdf.py:1047 code_pdf.py:1141
 #: report_cooccurrence.py:196 view_av.py:2687 view_av.py:2756 view_graph.py:490
 #: view_graph.py:558 view_graph.py:617 view_graph.py:678 view_av.py:2766
-#: view_av.py:2835 view_av.py:2768 view_av.py:2837
+#: view_av.py:2835 view_av.py:2768 view_av.py:2837 code_text.py:1255
+#: code_text.py:1339 code_text.py:1429
 msgid "Select codes"
 msgstr "选择代码"
 
@@ -1669,14 +1706,14 @@ msgstr ""
 #: code_pdf.py:1998 view_av.py:2168 view_graph.py:1652 view_graph.py:3088
 #: view_graph.py:3090 view_image.py:1761 code_text.py:2758 code_pdf.py:2109
 #: view_av.py:2239 view_graph.py:1690 view_graph.py:3145 view_graph.py:3147
-#: view_image.py:1989 view_av.py:2318 view_av.py:2320
+#: view_image.py:1989 view_av.py:2318 view_av.py:2320 code_text.py:2761
 msgid "Category"
 msgstr "类别"
 
 #: code_organiser.py:115 code_organiser.py:425 code_text.py:2647
 #: code_pdf.py:1998 view_av.py:2168 view_image.py:1761 code_text.py:2758
 #: code_pdf.py:2109 view_av.py:2239 view_image.py:1989 view_av.py:2318
-#: view_av.py:2320
+#: view_av.py:2320 code_text.py:2761
 msgid "Category name"
 msgstr "类别名称"
 
@@ -1796,17 +1833,19 @@ msgstr "如果文本被打翻或删除，基础代码/注释/案例分配的位�
 #: report_compare_coder_file.py:151 report_exact_matches.py:143
 #: report_file_summary.py:114 report_file_summary.py:424 report_codes.py:218
 #: manage_files.py:1120 manage_files.py:1123 manage_files.py:1129
-#: manage_files.py:1132
+#: manage_files.py:1132 code_text.py:495 code_text.py:526
 msgid "Characters: "
 msgstr "字符）: "
 
 #: code_text.py:416 code_text.py:445 code_pdf.py:329 code_pdf.py:358
 #: code_text.py:504 code_text.py:533 code_pdf.py:385 code_pdf.py:414
+#: code_text.py:502 code_text.py:531
 msgid "Codings:"
 msgstr "编码："
 
 #: code_text.py:417 code_text.py:446 code_pdf.py:330 code_pdf.py:359
 #: code_text.py:505 code_text.py:534 code_pdf.py:386 code_pdf.py:415
+#: code_text.py:503 code_text.py:532
 msgid "From:"
 msgstr "来自:"
 
@@ -1830,7 +1869,8 @@ msgstr "来自:"
 #: view_av.py:450 view_av.py:456 view_image.py:363 view_image.py:372
 #: view_image.py:379 view_image.py:385 report_codes.py:1225
 #: report_codes.py:1233 report_codes.py:1384 view_av.py:441 view_av.py:457
-#: view_av.py:463
+#: view_av.py:463 code_text.py:549 code_text.py:558 code_text.py:565
+#: code_text.py:571
 msgid "Attributes"
 msgstr "属性"
 
@@ -1838,7 +1878,7 @@ msgstr "属性"
 #: code_text.py:571 code_pdf.py:452 report_codes_by_segments.py:214
 #: report_cooccurrence.py:165 report_exact_matches.py:195
 #: report_relations.py:193 reports.py:151 view_av.py:454 view_image.py:383
-#: view_av.py:461
+#: view_av.py:461 code_text.py:569
 msgid "Nothing found"
 msgstr "未找到"
 
@@ -1846,97 +1886,106 @@ msgstr "未找到"
 #: code_text.py:571 code_pdf.py:452 report_codes_by_segments.py:214
 #: report_cooccurrence.py:165 report_exact_matches.py:195
 #: report_relations.py:193 reports.py:151 view_av.py:454 view_image.py:383
-#: view_av.py:461
+#: view_av.py:461 code_text.py:569
 msgid "No matching files found"
 msgstr "未找到匹配文件"
 
-#: code_text.py:759 code_text.py:831
+#: code_text.py:759 code_text.py:831 code_text.py:829
 msgid "Examples:"
 msgstr "例如:"
 
-#: code_text.py:778 code_text.py:850
+#: code_text.py:778 code_text.py:850 code_text.py:848
 msgid "Project memo"
 msgstr "项目备忘录"
 
-#: code_text.py:787 code_text.py:859
+#: code_text.py:787 code_text.py:859 code_text.py:857
 msgid "Delete all codings in this file made by "
 msgstr "删除该文件中所有由"
 
-#: code_text.py:798 code_text.py:870
+#: code_text.py:798 code_text.py:870 code_text.py:868
 msgid "All codes by "
 msgstr "所有代码由"
 
-#: code_text.py:798 code_text.py:870
+#: code_text.py:798 code_text.py:870 code_text.py:868
 msgid " deleted from "
 msgstr " 删去"
 
 #: code_text.py:918 code_pdf.py:760 code_text.py:990 code_pdf.py:830
+#: code_text.py:988
 msgid "Automatic search 3 or more characters"
 msgstr "自动搜索 3 个或更多字符"
 
 #: code_text.py:919 code_pdf.py:761 code_text.py:991 code_pdf.py:831
+#: code_text.py:989
 msgid "Automatic search 5 or more characters"
 msgstr "自动搜索 5 个或更多字符"
 
-#: code_text.py:948 code_text.py:1020
+#: code_text.py:948 code_text.py:1020 code_text.py:1018
 msgid "all matches in file"
 msgstr "文件中的所有匹配"
 
-#: code_text.py:953 code_text.py:1025
+#: code_text.py:953 code_text.py:1025 code_text.py:1023
 msgid "first match in file"
 msgstr "文件中的第一个匹配"
 
-#: code_text.py:958 code_text.py:1030
+#: code_text.py:958 code_text.py:1030 code_text.py:1028
 msgid "last match in file"
 msgstr "文件中的最后一个匹配"
 
 #: code_text.py:1024 code_pdf.py:844 code_text.py:1096 code_pdf.py:914
+#: code_text.py:1094
 msgid "Unmark (U)"
 msgstr "无标记 (U)"
 
 #: code_text.py:1025 code_pdf.py:845 code_text.py:1097 code_pdf.py:915
+#: code_text.py:1095
 msgid "Memo coded text (M)"
 msgstr "备忘编码文本 (M)"
 
 #: code_text.py:1026 view_av.py:2506 code_text.py:1098 view_av.py:2577
-#: view_av.py:2656 view_av.py:2658
+#: view_av.py:2656 view_av.py:2658 code_text.py:1096
 msgid "Change start position (SHIFT LEFT/ALT RIGHT)"
 msgstr "更改起始位置（左移/右移）"
 
 #: code_text.py:1027 view_av.py:2507 code_text.py:1099 view_av.py:2578
-#: view_av.py:2657 view_av.py:2659
+#: view_av.py:2657 view_av.py:2659 code_text.py:1097
 msgid "Change end position (SHIFT RIGHT/ALT LEFT)"
 msgstr "更改末端位置（右移/左移）"
 
 #: code_text.py:1030 code_pdf.py:848 view_av.py:2511 code_text.py:1102
 #: code_pdf.py:918 view_av.py:2582 view_av.py:2661 view_av.py:2663
+#: code_text.py:1100
 msgid "Add important mark (I)"
 msgstr "添加重要标记 (I)"
 
 #: code_text.py:1032 code_pdf.py:850 view_av.py:2513 view_av.py:3487
 #: view_image.py:1262 code_text.py:1104 code_pdf.py:920 view_av.py:2584
 #: view_av.py:3564 view_image.py:1485 view_av.py:2663 view_av.py:3645
-#: view_av.py:2665 view_av.py:3647
+#: view_av.py:2665 view_av.py:3647 code_text.py:1102
 msgid "Remove important mark"
 msgstr "删除重要标记"
 
 #: code_text.py:1033 code_pdf.py:851 view_av.py:2508 code_text.py:1105
 #: code_pdf.py:921 view_av.py:2579 view_av.py:2658 view_av.py:2660
+#: code_text.py:1103
 msgid "Change code"
 msgstr "更改代码"
 
 #: code_text.py:1052 code_pdf.py:866 view_av.py:2532 code_text.py:1108
 #: code_pdf.py:936 view_av.py:2603 view_av.py:2682 view_av.py:2684
+#: code_text.py:1106
 msgid "Mark (Q)"
 msgstr "马克 (Q)"
 
 #: code_text.py:1055 code_pdf.py:869 view_av.py:2535 code_text.py:1111
 #: code_pdf.py:939 view_av.py:2606 view_av.py:2685 view_av.py:2687
+#: code_text.py:1109
 msgid "Mark with recent code (R)"
 msgstr "用最近的代码标记 (R)"
 
 #: code_text.py:1058 code_pdf.py:872 view_av.py:2538 code_text.py:1133
 #: code_pdf.py:942 view_av.py:2609 view_av.py:2688 view_av.py:2690
+#: code_text.py:1131
 msgid "Annotate (A)"
 msgstr "注释 (A)"
 
@@ -1944,70 +1993,78 @@ msgstr "注释 (A)"
 #: report_codes.py:2243 report_codes.py:2783 view_av.py:2539 code_text.py:1134
 #: code_pdf.py:943 report_codes.py:2282 report_codes.py:2881 view_av.py:2610
 #: report_codes.py:2294 report_codes.py:2893 view_av.py:2689 view_av.py:2691
+#: code_text.py:1132
 msgid "Copy to clipboard"
 msgstr "复制到剪贴板"
 
 #: code_text.py:1060 code_pdf.py:874 code_text.py:1114 code_pdf.py:944
+#: code_text.py:1112
 msgid "Mark with new code"
 msgstr "用新代码标记"
 
 #: code_text.py:1061 code_pdf.py:875 code_text.py:1115 code_pdf.py:945
+#: code_text.py:1113
 msgid "in vivo code (V)"
 msgstr "活体代码 (V)"
 
 #: code_text.py:1063 code_pdf.py:877 view_av.py:2541 code_text.py:1136
 #: code_pdf.py:947 view_av.py:2612 view_av.py:2691 view_av.py:2693
+#: code_text.py:1134
 msgid "Edit annotation"
 msgstr "编辑注释"
 
-#: code_text.py:1064 code_text.py:1137
+#: code_text.py:1064 code_text.py:1137 code_text.py:1135
 msgid "Set bookmark (B)"
 msgstr "设置书签 (B)"
 
-#: code_text.py:1077 code_text.py:1150
+#: code_text.py:1077 code_text.py:1150 code_text.py:1148
 msgid "Edit text analysis prompts"
 msgstr "编辑文本分析提示"
 
 #: code_text.py:1084 code_pdf.py:881 code_text.py:1157 code_pdf.py:951
+#: code_text.py:1155
 msgid "Show control panel (H)"
 msgstr "显示控制面板 (H)"
 
 #: code_text.py:1086 code_pdf.py:883 code_text.py:1159 code_pdf.py:953
+#: code_text.py:1157
 msgid "Hide control panel (H)"
 msgstr "隐藏控制面板 (H)"
 
 #: code_text.py:1145 code_text.py:3396 code_text.py:3554 code_pdf.py:3153
 #: code_pdf.py:3316 code_text.py:1218 code_text.py:3520 code_text.py:3685
-#: code_pdf.py:3309 code_pdf.py:3477
+#: code_pdf.py:3309 code_pdf.py:3477 code_text.py:1216 code_text.py:3518
+#: code_text.py:3683
 msgid "No file was selected"
 msgstr "未选择文件"
 
 #: code_text.py:1276 code_pdf.py:992 report_codes.py:2315 view_av.py:2631
 #: code_text.py:1356 code_pdf.py:1062 report_codes.py:2356 report_codes.py:2395
 #: view_av.py:2702 report_codes.py:2368 report_codes.py:2407 view_av.py:2781
-#: view_av.py:2783
+#: view_av.py:2783 code_text.py:1354
 msgid "Select replacement code"
 msgstr "选择替换代码"
 
 #: code_text.py:1381 code_pdf.py:2416 view_av.py:730 view_image.py:481
 #: code_text.py:1466 code_pdf.py:2529 view_av.py:796 view_image.py:571
-#: view_av.py:803
+#: view_av.py:803 code_text.py:1464
 msgid "Memo for file: "
 msgstr "备忘存档："
 
 #: code_text.py:1393 code_text.py:1394 code_pdf.py:2428 code_text.py:1478
-#: code_text.py:1479 code_pdf.py:2541
+#: code_text.py:1479 code_pdf.py:2541 code_text.py:1476 code_text.py:1477
 msgid "Memo:"
 msgstr "备忘："
 
 #: code_text.py:1418 code_pdf.py:1119 code_pdf.py:2910 view_av.py:2724
 #: code_text.py:1503 code_pdf.py:1189 code_pdf.py:3060 view_av.py:2795
-#: view_av.py:2874 view_av.py:2876
+#: view_av.py:2874 view_av.py:2876 code_text.py:1504
 msgid "Select code to memo"
 msgstr "选择要备忘的代码"
 
 #: code_text.py:1427 code_pdf.py:1128 view_av.py:2733 code_text.py:1512
 #: code_pdf.py:1198 view_av.py:2804 view_av.py:2883 view_av.py:2885
+#: code_text.py:1513
 msgid "Memo for Coded text: "
 msgstr "编码文本备忘："
 
@@ -2123,7 +2180,8 @@ msgstr "按类别和代码升序排列"
 #: view_av.py:1434 view_av.py:2052 view_image.py:985 view_image.py:1642
 #: code_text.py:1712 code_text.py:1755 code_pdf.py:1350 code_pdf.py:1393
 #: view_av.py:1500 view_av.py:2123 view_image.py:1181 view_image.py:1867
-#: view_av.py:1515 view_av.py:2202 view_av.py:2204
+#: view_av.py:1515 view_av.py:2202 view_av.py:2204 code_text.py:1715
+#: code_text.py:1758
 msgid "Select blank or category"
 msgstr "选择空白或类别"
 
@@ -2136,16 +2194,16 @@ msgstr "选择空白或类别"
 #: view_graph.py:596 view_graph.py:658 view_graph.py:751 view_graph.py:1281
 #: view_graph.py:1306 view_graph.py:1332 view_graph.py:1358 view_graph.py:1377
 #: view_graph.py:1398 view_image.py:2032 report_codes.py:1105 view_av.py:2358
-#: view_av.py:2360
+#: view_av.py:2360 code_text.py:1782 code_text.py:2803
 msgid "Code: "
 msgstr "代码:"
 
 #: code_text.py:1692 code_text.py:1715 view_graph.py:373 code_text.py:1780
-#: code_text.py:1803 view_graph.py:380
+#: code_text.py:1803 view_graph.py:380 code_text.py:1783 code_text.py:1806
 msgid "Text: "
 msgstr "正文："
 
-#: code_text.py:1694 code_text.py:1782
+#: code_text.py:1694 code_text.py:1782 code_text.py:1785
 msgid "Memos for file: "
 msgstr "备忘录存档："
 
@@ -2153,117 +2211,124 @@ msgstr "备忘录存档："
 #: code_pdf.py:3374 view_av.py:3029 view_av.py:3050 code_text.py:1804
 #: code_text.py:3724 code_text.py:3745 code_pdf.py:3515 code_pdf.py:3535
 #: view_av.py:3106 view_av.py:3127 view_av.py:3185 view_av.py:3206
-#: view_av.py:3187 view_av.py:3208
+#: view_av.py:3187 view_av.py:3208 code_text.py:1807 code_text.py:3722
+#: code_text.py:3743
 msgid "Annotation: "
 msgstr "注释："
 
-#: code_text.py:1717 code_text.py:1805
+#: code_text.py:1717 code_text.py:1805 code_text.py:1808
 msgid "Annotations for file: "
 msgstr "文件注释："
 
 #: code_text.py:1727 code_pdf.py:1336 view_av.py:400 view_image.py:200
 #: code_text.py:1815 code_pdf.py:1408 view_av.py:470 view_image.py:280
-#: view_av.py:477
+#: view_av.py:477 code_text.py:1818
 msgid "Showing important codings"
 msgstr "显示重要编码"
 
 #: code_text.py:1730 code_pdf.py:1340 view_av.py:403 view_image.py:203
 #: code_text.py:1818 code_pdf.py:1412 view_av.py:473 view_image.py:283
-#: view_av.py:480
+#: view_av.py:480 code_text.py:1821
 msgid "Show codings flagged important"
 msgstr "显示标记为重要的编码"
 
 #: code_text.py:1741 code_pdf.py:1352 code_text.py:1829 code_pdf.py:1424
+#: code_text.py:1832
 msgid "Show some codes"
 msgstr "显示一些代码"
 
 #: code_text.py:1744 code_pdf.py:1355 code_text.py:1832 code_pdf.py:1427
+#: code_text.py:1835
 msgid "Show codes containing the text. (Blank for all)"
 msgstr "显示包含文本的代码。(全部为空）"
 
 #: code_text.py:1758 code_pdf.py:1369 view_av.py:1466 view_image.py:1017
 #: code_text.py:1846 code_pdf.py:1441 view_av.py:1532 view_image.py:1213
-#: view_av.py:1547
+#: view_av.py:1547 code_text.py:1849
 msgid "Select code colors"
 msgstr "选择代码颜色"
 
 #: code_text.py:1867 code_pdf.py:1523 code_text.py:1955 code_pdf.py:1637
-#: view_av.py:1695 view_av.py:1733
+#: view_av.py:1695 view_av.py:1733 code_text.py:1958
 msgid "Text position"
 msgstr "文本位置"
 
 #: code_text.py:1867 code_pdf.py:1523 code_text.py:1955 code_pdf.py:1637
-#: view_av.py:1695 view_av.py:1733
+#: view_av.py:1695 view_av.py:1733 code_text.py:1958
 msgid "Character position: "
 msgstr "角色定位："
 
 #: code_text.py:2075 code_text.py:2132 code_text.py:2159 code_text.py:2216
+#: code_text.py:2162 code_text.py:2219
 msgid "Coded text file exported to: "
 msgstr "导出为编码文本文件："
 
-#: code_text.py:2077 code_text.py:2161
+#: code_text.py:2077 code_text.py:2161 code_text.py:2164
 msgid "Coded html file exported"
 msgstr "导出已编码的 html 文件"
 
-#: code_text.py:2188 code_text.py:2278
+#: code_text.py:2188 code_text.py:2278 code_text.py:2281
 msgid "Select a code"
 msgstr "选择代码"
 
 #: code_text.py:2327 code_text.py:2397 codebook.py:224 code_text.py:2434
-#: code_text.py:2504
+#: code_text.py:2504 code_text.py:2437 code_text.py:2507
 msgid "Code:"
 msgstr "代码:"
 
 #: code_text.py:2350 code_text.py:2421 code_text.py:2436 code_text.py:2457
-#: code_text.py:2528 code_text.py:2543
+#: code_text.py:2528 code_text.py:2543 code_text.py:2460 code_text.py:2531
+#: code_text.py:2546
 msgid "Show previous coding of selected code"
 msgstr "显示所选代码以前的编码"
 
 #: code_text.py:2353 code_text.py:2425 code_text.py:2439 code_text.py:2460
-#: code_text.py:2532 code_text.py:2546
+#: code_text.py:2532 code_text.py:2546 code_text.py:2463 code_text.py:2535
+#: code_text.py:2549
 msgid "Show next coding of selected code"
 msgstr "显示所选代码的下一个编码"
 
 #: code_text.py:2526 code_pdf.py:1880 view_av.py:2091 view_image.py:1683
 #: code_text.py:2637 code_pdf.py:1987 view_av.py:2162 view_image.py:1908
-#: view_av.py:2241 view_av.py:2243
+#: view_av.py:2241 view_av.py:2243 code_text.py:2640
 msgid "Merge code: "
 msgstr "合并代码："
 
 #: code_text.py:2526 code_pdf.py:1880 code_text.py:2637 code_pdf.py:1987
+#: code_text.py:2640
 msgid " into code: "
 msgstr " 变成代码："
 
 #: code_text.py:2527 code_pdf.py:1881 view_av.py:2092 view_image.py:1684
 #: code_text.py:2638 code_pdf.py:1988 view_av.py:2163 view_image.py:1909
-#: view_av.py:2242 view_av.py:2244
+#: view_av.py:2242 view_av.py:2244 code_text.py:2641
 msgid "Merge codes"
 msgstr "合并代码"
 
 #: code_text.py:2585 code_pdf.py:1941 view_av.py:2145 view_image.py:1738
 #: code_text.py:2696 code_pdf.py:2050 view_av.py:2216 view_image.py:1964
-#: view_av.py:2295 view_av.py:2297
+#: view_av.py:2295 view_av.py:2297 code_text.py:2699
 msgid "Add new code"
 msgstr "添加新代码"
 
 #: code_text.py:2585 code_pdf.py:1941 view_image.py:1738 code_text.py:2696
-#: code_pdf.py:2050 view_image.py:1964
+#: code_pdf.py:2050 view_image.py:1964 code_text.py:2699
 msgid "Code name"
 msgstr "代码名称"
 
 #: code_text.py:2605 code_pdf.py:1959 view_image.py:1752 code_text.py:2716
-#: code_pdf.py:2070 view_image.py:1980
+#: code_pdf.py:2070 view_image.py:1980 code_text.py:2719
 msgid "New code: "
 msgstr "新代码："
 
 #: code_text.py:2661 code_pdf.py:2012 view_image.py:1775 code_text.py:2772
-#: code_pdf.py:2123 view_image.py:2003
+#: code_pdf.py:2123 view_image.py:2003 code_text.py:2775
 msgid "New category: "
 msgstr "新类别："
 
 #: code_text.py:2696 code_pdf.py:2047 view_av.py:2218 view_image.py:1808
 #: code_text.py:2812 code_pdf.py:2158 view_av.py:2289 view_image.py:2036
-#: view_av.py:2368 view_av.py:2370
+#: view_av.py:2368 view_av.py:2370 code_text.py:2815
 msgid "Code deleted: "
 msgstr "代码已删除："
 
@@ -2271,107 +2336,115 @@ msgstr "代码已删除："
 #: view_av.py:2235 view_charts.py:348 view_image.py:1831 code_text.py:2835
 #: code_pdf.py:2178 report_codes.py:1099 reports.py:331 view_av.py:2306
 #: view_image.py:2059 report_codes.py:1100 view_av.py:2385 view_av.py:2387
+#: code_text.py:2838
 msgid "Category: "
 msgstr "类别："
 
 #: code_text.py:2726 code_pdf.py:2078 view_av.py:2244 view_image.py:1835
 #: code_text.py:2846 code_pdf.py:2189 view_av.py:2315 view_image.py:2063
-#: view_av.py:2394 view_av.py:2396
+#: view_av.py:2394 view_av.py:2396 code_text.py:2849
 msgid "Category deleted: "
 msgstr "类别已删除："
 
 #: code_text.py:2739 code_pdf.py:2091 code_text.py:2862 code_pdf.py:2202
+#: code_text.py:2865
 msgid "Memo for Code: "
 msgstr "代码备忘录："
 
 #: code_text.py:2752 code_pdf.py:2104 view_image.py:1426 code_text.py:2875
-#: code_pdf.py:2215 view_image.py:1650
+#: code_pdf.py:2215 view_image.py:1650 code_text.py:2878
 msgid "Memo for code: "
 msgstr "代码备忘录："
 
 #: code_text.py:2762 code_pdf.py:2114 view_image.py:1880 code_text.py:2885
-#: code_pdf.py:2225 view_image.py:2108
+#: code_pdf.py:2225 view_image.py:2108 code_text.py:2888
 msgid "Memo for Category: "
 msgstr "类别备忘录："
 
 #: code_text.py:2776 code_pdf.py:2128 code_text.py:2899 code_pdf.py:2239
+#: code_text.py:2902
 msgid "Memo for category: "
 msgstr "类别备忘录："
 
 #: code_text.py:2790 code_pdf.py:2142 view_av.py:2309 view_image.py:1904
 #: code_text.py:2913 code_pdf.py:2253 view_av.py:2380 view_image.py:2132
-#: view_av.py:2459 view_av.py:2461
+#: view_av.py:2459 view_av.py:2461 code_text.py:2916
 msgid "Rename code"
 msgstr "重命名代码"
 
 #: code_text.py:2791 code_pdf.py:2143 view_av.py:2309 view_image.py:1904
 #: code_text.py:2914 code_pdf.py:2254 view_av.py:2380 view_image.py:2132
-#: view_av.py:2459 view_av.py:2461
+#: view_av.py:2459 view_av.py:2461 code_text.py:2917
 msgid "New code name:"
 msgstr "新代号："
 
 #: code_text.py:2799 code_pdf.py:2150 view_av.py:2316 view_image.py:1911
 #: code_text.py:2922 code_pdf.py:2262 view_av.py:2387 view_image.py:2139
-#: view_av.py:2466 view_av.py:2468
+#: view_av.py:2466 view_av.py:2468 code_text.py:2925
 msgid "Name in use"
 msgstr "使用中的名称"
 
 #: code_text.py:2800 code_pdf.py:2151 code_text.py:2923 code_pdf.py:2263
+#: code_text.py:2926
 msgid " is already in use, choose another name."
 msgstr "已被使用，请选择其他名称。"
 
-#: code_text.py:2820 code_text.py:2943
+#: code_text.py:2820 code_text.py:2943 code_text.py:2946
 msgid "Code renamed from: "
 msgstr "代码重命名自:"
 
 #: code_text.py:2820 code_text.py:2855 code_text.py:2943 code_text.py:2978
+#: code_text.py:2946 code_text.py:2981
 msgid " to: "
 msgstr " 到："
 
 #: code_text.py:2829 code_pdf.py:2181 view_av.py:2336 view_image.py:1932
 #: code_text.py:2952 code_pdf.py:2293 view_av.py:2407 view_image.py:2160
-#: view_av.py:2486 view_av.py:2488
+#: view_av.py:2486 view_av.py:2488 code_text.py:2955
 msgid "Rename category"
 msgstr "重新命名类别"
 
 #: code_text.py:2830 code_pdf.py:2181 view_av.py:2336 view_image.py:1932
 #: code_text.py:2953 code_pdf.py:2294 view_av.py:2407 view_image.py:2160
-#: view_av.py:2486 view_av.py:2488
+#: view_av.py:2486 view_av.py:2488 code_text.py:2956
 msgid "New category name:"
 msgstr "新类别名称："
 
 #: code_text.py:2837 code_pdf.py:2188 code_text.py:2960 code_pdf.py:2301
+#: code_text.py:2963
 msgid "This code name is already in use."
 msgstr "该代号已在使用中。"
 
 #: code_text.py:2838 code_pdf.py:2189 code_text.py:2961 code_pdf.py:2302
+#: code_text.py:2964
 msgid "Duplicate code name"
 msgstr "代码名称重复"
 
 #: code_text.py:2855 view_image.py:1957 code_text.py:2978 view_image.py:2185
+#: code_text.py:2981
 msgid "Category renamed from: "
 msgstr "类别更名自："
 
 #: code_text.py:2912 code_pdf.py:2263 view_av.py:619 view_image.py:545
 #: code_text.py:3035 code_pdf.py:2376 view_av.py:685 view_image.py:635
-#: view_av.py:692
+#: view_av.py:692 code_text.py:3038
 msgid "Open memo"
 msgstr "打开备忘录"
 
 #: code_text.py:2916 manage_files.py:285 code_text.py:3039 manage_files.py:408
-#: manage_files.py:411
+#: manage_files.py:411 code_text.py:3042
 msgid "view original text file"
 msgstr "查看原始文本文件"
 
 #: code_text.py:2918 code_pdf.py:2270 view_av.py:620 view_image.py:546
 #: code_text.py:3042 code_pdf.py:2383 view_av.py:686 view_image.py:636
-#: view_av.py:693
+#: view_av.py:693 code_text.py:3045
 msgid "Next file"
 msgstr "下一个文件"
 
 #: code_text.py:2919 code_pdf.py:2271 view_av.py:621 view_image.py:547
 #: code_text.py:3043 code_pdf.py:2384 view_av.py:687 view_image.py:637
-#: view_av.py:694
+#: view_av.py:694 code_text.py:3046
 msgid "File with latest coding"
 msgstr "带有最新编码的文件"
 
@@ -2379,43 +2452,43 @@ msgstr "带有最新编码的文件"
 #: view_av.py:622 view_av.py:696 view_image.py:548 view_image.py:597
 #: code_text.py:3044 code_text.py:3124 code_pdf.py:2385 code_pdf.py:2451
 #: view_av.py:688 view_av.py:762 view_image.py:638 view_image.py:687
-#: view_av.py:695 view_av.py:769
+#: view_av.py:695 view_av.py:769 code_text.py:3047
 msgid "Show files like"
 msgstr "显示以下文件"
 
 #: code_text.py:2921 code_pdf.py:2273 view_av.py:624 view_image.py:550
 #: code_text.py:3045 code_pdf.py:2386 view_av.py:690 view_image.py:640
-#: view_av.py:697
+#: view_av.py:697 code_text.py:3048
 msgid "Show files by attributes"
 msgstr "按属性显示文件"
 
 #: code_text.py:2922 code_pdf.py:2274 view_av.py:623 view_image.py:549
 #: code_text.py:3046 code_pdf.py:2387 view_av.py:689 view_image.py:639
-#: view_av.py:696
+#: view_av.py:696 code_text.py:3049
 msgid "Show case files"
 msgstr "显示案件档案"
 
-#: code_text.py:2924 code_text.py:3048
+#: code_text.py:2924 code_text.py:3048 code_text.py:3051
 msgid " next  characters"
 msgstr " 下一个字符"
 
-#: code_text.py:2927 code_text.py:3051
+#: code_text.py:2927 code_text.py:3051 code_text.py:3054
 msgid " previous  characters"
 msgstr " 以前的人物"
 
-#: code_text.py:2928 code_text.py:3052
+#: code_text.py:2928 code_text.py:3052 code_text.py:3055
 msgid "Go to bookmark"
 msgstr "转到书签"
 
 #: code_text.py:2975 code_pdf.py:2315 view_av.py:671 view_image.py:572
 #: code_text.py:3099 code_pdf.py:2428 view_av.py:737 view_image.py:662
-#: view_av.py:744
+#: view_av.py:744 code_text.py:3101
 msgid "Show all files"
 msgstr "显示所有文件"
 
 #: code_text.py:2976 code_pdf.py:2316 view_av.py:672 view_image.py:573
 #: code_text.py:3100 code_pdf.py:2429 view_av.py:738 view_image.py:663
-#: view_av.py:745
+#: view_av.py:745 code_text.py:3102
 msgid "Select case"
 msgstr "选择案例"
 
@@ -2426,29 +2499,34 @@ msgid "Show files containing the text. (Blank for all)"
 msgstr "显示包含文本的文件。(全部为空）"
 
 #: code_text.py:3050 code_text.py:3106 code_text.py:3174 code_text.py:3230
+#: code_text.py:3172 code_text.py:3228
 msgid "From: "
 msgstr "来自:"
 
 #: code_text.py:3158 code_text.py:4956 code_text.py:3282 code_text.py:5093
+#: code_text.py:3280 code_text.py:5129
 msgid "Entire text file will be loaded"
 msgstr "将加载整个文本文件"
 
 #: code_text.py:3245 code_pdf.py:2475 code_text.py:3369 code_pdf.py:2586
+#: code_text.py:3367
 msgid "Code text: "
 msgstr "代码文本："
 
 #: code_text.py:3401 code_text.py:3660 code_text.py:3795 code_text.py:3897
 #: code_pdf.py:3157 view_av.py:2859 code_text.py:3525 code_text.py:3791
 #: code_text.py:3926 code_text.py:4028 code_pdf.py:3313 view_av.py:2930
-#: view_av.py:3009 view_av.py:3011
+#: view_av.py:3009 view_av.py:3011 code_text.py:3523 code_text.py:3790
+#: code_text.py:4037
 msgid "No code was selected"
 msgstr "未选择代码"
 
 #: code_text.py:3439 code_text.py:4827 code_text.py:3563 code_text.py:4964
+#: code_text.py:3561 code_text.py:5000
 msgid "AI interpretation: "
 msgstr "人工智能解释："
 
-#: code_text.py:3440 code_text.py:3564
+#: code_text.py:3440 code_text.py:3564 code_text.py:3562
 msgid ""
 "\n"
 "\n"
@@ -2458,7 +2536,7 @@ msgstr ""
 "\n"
 "人工智能搜索提示："
 
-#: code_text.py:3441 code_text.py:3565
+#: code_text.py:3441 code_text.py:3565 code_text.py:3563
 msgid ""
 "\n"
 "AI model: "
@@ -2466,7 +2544,7 @@ msgstr ""
 "\n"
 "人工智能模型："
 
-#: code_text.py:3444 code_text.py:3568
+#: code_text.py:3444 code_text.py:3568 code_text.py:3566
 msgid ""
 "Do you want to store the AI interpretation in a memo together with the "
 "coding?<br/><br/>"
@@ -2475,40 +2553,45 @@ msgstr "您想将人工智能解释与编码一起存储在备忘录中吗？"
 #: code_text.py:3526 code_pdf.py:2896 code_pdf.py:3287 view_av.py:2770
 #: view_av.py:2975 code_text.py:3657 code_pdf.py:3046 code_pdf.py:3448
 #: view_av.py:2841 view_av.py:3052 view_av.py:2920 view_av.py:3131
-#: view_av.py:2922 view_av.py:3133
+#: view_av.py:2922 view_av.py:3133 code_text.py:3655
 msgid "Select code to unmark"
 msgstr "选择代码以取消标记"
 
 #: code_text.py:3607 code_pdf.py:3368 view_av.py:3043 code_text.py:3738
 #: code_pdf.py:3529 view_av.py:3120 view_av.py:3199 view_av.py:3201
+#: code_text.py:3736
 msgid "Annotation added at position: "
 msgstr "在位置处添加注释："
 
 #: code_text.py:3608 code_text.py:3637 view_av.py:3044 view_av.py:3071
 #: code_text.py:3739 code_text.py:3768 view_av.py:3121 view_av.py:3148
 #: view_av.py:3200 view_av.py:3227 view_av.py:3202 view_av.py:3229
+#: code_text.py:3737 code_text.py:3766
 msgid " for: "
 msgstr " 为："
 
 #: code_text.py:3636 code_pdf.py:3396 view_av.py:3070 code_text.py:3767
 #: code_pdf.py:3557 view_av.py:3147 view_av.py:3226 view_av.py:3228
+#: code_text.py:3765
 msgid "Annotation removed from position "
 msgstr "从位置上删除注释"
 
 #: code_text.py:3676 code_text.py:3923 code_text.py:3807 code_text.py:4054
+#: code_text.py:3806 code_text.py:3917 code_text.py:4066
 msgid "Select files to code"
 msgstr "选择要编码的文件"
 
-#: code_text.py:3684 code_text.py:3815
+#: code_text.py:3684 code_text.py:3815 code_text.py:3814
 msgid "Code text using start and end marks: "
 msgstr "使用开始和结束标记对文本进行编码："
 
-#: code_text.py:3736 code_text.py:3867
+#: code_text.py:3736 code_text.py:3867 code_text.py:3866
 msgid "Coding using start and end marks"
 msgstr "使用开始和结束标记编码"
 
 #: code_text.py:3736 code_text.py:3874 code_text.py:3879 code_text.py:3982
 #: code_text.py:3867 code_text.py:4005 code_text.py:4010 code_text.py:4113
+#: code_text.py:3866 code_text.py:4013 code_text.py:4018 code_text.py:4149
 msgid ""
 "\n"
 "Code: "
@@ -2516,7 +2599,7 @@ msgstr ""
 "\n"
 "代码:"
 
-#: code_text.py:3737 code_text.py:3868
+#: code_text.py:3737 code_text.py:3868 code_text.py:3867
 msgid ""
 "\n"
 "With start mark: "
@@ -2524,7 +2607,7 @@ msgstr ""
 "\n"
 "带起始标记："
 
-#: code_text.py:3737 code_text.py:3868
+#: code_text.py:3737 code_text.py:3868 code_text.py:3867
 msgid ""
 "\n"
 "End mark: "
@@ -2532,19 +2615,19 @@ msgstr ""
 "\n"
 "结束标记："
 
-#: code_text.py:3744 code_text.py:3875
+#: code_text.py:3744 code_text.py:3875 code_text.py:3874
 msgid " new coded sections found."
 msgstr " 发现新的编码章节。"
 
-#: code_text.py:3746 code_text.py:3877
+#: code_text.py:3746 code_text.py:3877 code_text.py:3876
 msgid "previously coded."
 msgstr "之前的编码。"
 
-#: code_text.py:3758 code_text.py:3889
+#: code_text.py:3758 code_text.py:3889 code_text.py:3888
 msgid "Select auto-codings to undo"
 msgstr "选择要撤销的自动编码"
 
-#: code_text.py:3775 code_text.py:3906
+#: code_text.py:3775 code_text.py:3906 code_text.py:3905
 msgid "Undo autocoding: "
 msgstr "撤销自动编码："
 
@@ -2565,18 +2648,20 @@ msgstr ""
 "行尾用 \\n 表示："
 
 #: code_text.py:3863 code_text.py:3971 code_text.py:3994 code_text.py:4102
+#: code_text.py:4002 code_text.py:4136
 msgid "Autocode insert error "
 msgstr "自动代码插入错误"
 
-#: code_text.py:3866 code_text.py:3997
+#: code_text.py:3866 code_text.py:3997 code_text.py:4005
 msgid " added codes"
 msgstr " 添加代码"
 
-#: code_text.py:3874 code_text.py:4005
+#: code_text.py:3874 code_text.py:4005 code_text.py:4013
 msgid "Sentence coding: "
 msgstr "句子编码："
 
 #: code_text.py:3875 code_text.py:3983 code_text.py:4006 code_text.py:4114
+#: code_text.py:4014 code_text.py:4150
 msgid ""
 "\n"
 "With: "
@@ -2585,6 +2670,7 @@ msgstr ""
 "有了："
 
 #: code_text.py:3875 code_text.py:3882 code_text.py:4006 code_text.py:4013
+#: code_text.py:4014 code_text.py:4021
 msgid ""
 "\n"
 "Using line ending: "
@@ -2592,11 +2678,11 @@ msgstr ""
 "\n"
 "使用行尾："
 
-#: code_text.py:3878 code_text.py:4009
+#: code_text.py:3878 code_text.py:4009 code_text.py:4017
 msgid "Automatic code sentence in files:"
 msgstr "文件中的自动代码句："
 
-#: code_text.py:3880 code_text.py:4011
+#: code_text.py:3880 code_text.py:4011 code_text.py:4019
 msgid ""
 "\n"
 "With text fragment: "
@@ -2604,39 +2690,39 @@ msgstr ""
 "\n"
 "附文字片段："
 
-#: code_text.py:3903 code_text.py:4034
+#: code_text.py:3903 code_text.py:4034 code_text.py:4043
 msgid "Automatic coding"
 msgstr "自动编码"
 
-#: code_text.py:3906 code_text.py:4037
+#: code_text.py:3906 code_text.py:4037 code_text.py:4046
 msgid "Use | to code multiple texts"
 msgstr "使用 | 对多个文本进行编码"
 
-#: code_text.py:3907 code_text.py:4038
+#: code_text.py:3907 code_text.py:4038 code_text.py:4047
 msgid "Auto code files with the current code for this text:"
 msgstr "使用该文本的当前代码自动生成代码文件："
 
-#: code_text.py:3974 code_text.py:4105
+#: code_text.py:3974 code_text.py:4105 code_text.py:4139
 msgid "Automatic coding in files: "
 msgstr "文件自动编码："
 
-#: code_text.py:3975 code_text.py:4106
+#: code_text.py:3975 code_text.py:4106 code_text.py:4140
 msgid ". with text: "
 msgstr ".有文字："
 
-#: code_text.py:3982 code_text.py:4113
+#: code_text.py:3982 code_text.py:4113 code_text.py:4149
 msgid "Text coding: "
 msgstr "文本编码："
 
-#: code_text.py:4025 code_text.py:4156
+#: code_text.py:4025 code_text.py:4156 code_text.py:4192
 msgid "Text reverted to prior to edit"
 msgstr "文本恢复到编辑前"
 
-#: code_text.py:4026 code_text.py:4157
+#: code_text.py:4026 code_text.py:4157 code_text.py:4193
 msgid "Undo last edited text"
 msgstr "撤销上次编辑的文本"
 
-#: code_text.py:4646 code_text.py:4783
+#: code_text.py:4646 code_text.py:4783 code_text.py:4819
 msgid "Please finish editing the text before starting an AI search."
 msgstr "请完成文本编辑后再开始人工智能搜索。"
 
@@ -2645,97 +2731,102 @@ msgstr "请完成文本编辑后再开始人工智能搜索。"
 #: code_text.py:4909 code_text.py:4912 code_text.py:4784 code_text.py:4788
 #: code_text.py:4792 code_text.py:4796 code_text.py:4855 code_text.py:4896
 #: code_text.py:4937 code_text.py:4946 code_text.py:5046 code_text.py:5049
+#: code_text.py:4820 code_text.py:4824 code_text.py:4828 code_text.py:4832
+#: code_text.py:4891 code_text.py:4932 code_text.py:4973 code_text.py:4982
+#: code_text.py:5082 code_text.py:5085
 msgid "AI Search"
 msgstr "人工智能搜索"
 
-#: code_text.py:4654 code_text.py:4791
+#: code_text.py:4654 code_text.py:4791 code_text.py:4827
 msgid ""
 "The AI is already performing a search. Please stop it before starting a new "
 "one."
 msgstr "人工智能已经在执行搜索。请先停止搜索，然后再开始新的搜索。"
 
-#: code_text.py:4658 code_text.py:4795
+#: code_text.py:4658 code_text.py:4795 code_text.py:4831
 msgid "The AI is busy, please wait a moment and retry."
 msgstr "人工智能正忙，请稍等片刻后重试。"
 
-#: code_text.py:4695 code_text.py:4832
+#: code_text.py:4695 code_text.py:4832 code_text.py:4868
 msgid "Searching for related data, please wait..."
 msgstr "正在搜索相关数据，请稍候..."
 
-#: code_text.py:4717 code_text.py:4854
+#: code_text.py:4717 code_text.py:4854 code_text.py:4890
 msgid "AI: No related data found for \""
 msgstr "人工智能 未找到相关数据"
 
-#: code_text.py:4757 code_text.py:4894
+#: code_text.py:4757 code_text.py:4894 code_text.py:4930
 msgid "AI: No new data found for \""
 msgstr "人工智能： 未找到以下方面的新数据"
 
-#: code_text.py:4758 code_text.py:4895
+#: code_text.py:4758 code_text.py:4895 code_text.py:4931
 msgid "\" beside what has already been coded with this code."
 msgstr "旁边是已用此代码编码的内容。"
 
-#: code_text.py:4763 code_text.py:4900
+#: code_text.py:4763 code_text.py:4900 code_text.py:4936
 msgid ""
 "Potentially related data found, inspecting it closer. Please be patient..."
 msgstr "发现潜在相关数据，正在仔细检查。请耐心等待..."
 
-#: code_text.py:4797 code_text.py:4934
+#: code_text.py:4797 code_text.py:4934 code_text.py:4970
 msgid "The closer inspection of the first "
 msgstr "仔细观察第一个"
 
-#: code_text.py:4798 code_text.py:4935
+#: code_text.py:4798 code_text.py:4935 code_text.py:4971
 msgid ""
 "pieces of data yielded no results. You can continue to inspect more by "
 "clicking on \"find more\" in the list on the left."
 msgstr "条数据没有结果。您可以点击左侧列表中的 “查找更多”，继续查看更多信息。"
 
-#: code_text.py:4807 code_text.py:4944
+#: code_text.py:4807 code_text.py:4944 code_text.py:4980
 msgid ""
 "Upon closer inspection, no pieces of data relevant to your search query "
 "could be identified. Please start a new search."
 msgstr "经仔细检查，未找到与您的搜索查询相关的数据。请重新搜索。"
 
-#: code_text.py:4826 code_text.py:4963
+#: code_text.py:4826 code_text.py:4963 code_text.py:4999
 msgid "Quote: "
 msgstr "引用："
 
-#: code_text.py:4863 code_text.py:5000
+#: code_text.py:4863 code_text.py:5000 code_text.py:5036
 msgid ">> Searching (click here to cancel)"
 msgstr ">> 搜索（点击此处取消）"
 
-#: code_text.py:4865 code_text.py:5002
+#: code_text.py:4865 code_text.py:5002 code_text.py:5038
 msgid "Click here to stop the search"
 msgstr "单击此处停止搜索"
 
-#: code_text.py:4870 code_text.py:5007
+#: code_text.py:4870 code_text.py:5007 code_text.py:5043
 msgid ">> Find more..."
 msgstr ">> 了解更多..."
 
-#: code_text.py:4871 code_text.py:5008
+#: code_text.py:4871 code_text.py:5008 code_text.py:5044
 msgid "Click here to analyze more data"
 msgstr "点击此处分析更多数据"
 
-#: code_text.py:4896 code_text.py:5033
+#: code_text.py:4896 code_text.py:5033 code_text.py:5069
 msgid "Do you want to stop the search?"
 msgstr "你想停止搜索吗？"
 
-#: code_text.py:4908 code_text.py:5045
+#: code_text.py:4908 code_text.py:5045 code_text.py:5081
 msgid ""
 "There are no more pieces of data to analyze for this search. Please start a "
 "new search."
 msgstr "此搜索已无数据可供分析。请重新搜索。"
 
-#: code_text.py:4911 code_text.py:5048
+#: code_text.py:4911 code_text.py:5048 code_text.py:5084
 msgid "The AI is busy. Please wait a moment and retry."
 msgstr "人工智能正忙。请稍等片刻后重试。"
 
 #: code_text.py:5088 code_pdf.py:3517 view_av.py:3268 code_text.py:5225
 #: code_pdf.py:3679 view_av.py:3345 view_av.py:3424 view_av.py:3426
+#: code_text.py:5261
 msgid "Press O to cycle overlapping codes"
 msgstr "按 O 循环重叠代码"
 
 #: code_text.py:5138 code_pdf.py:3563 view_av.py:3300 code_text.py:5275
 #: code_pdf.py:3725 view_av.py:3377 view_av.py:3456 view_av.py:3458
+#: code_text.py:5311
 msgid "ANNOTATED:"
 msgstr "附注："
 
@@ -5678,63 +5769,64 @@ msgid "All"
 msgstr "全部"
 
 #: settings.py:57 settings.py:269 settings.py:278 settings.py:59
-#: settings.py:343 settings.py:352
+#: settings.py:343 settings.py:352 settings.py:58 settings.py:404
+#: settings.py:413
 msgid "Current coder: "
 msgstr "现任编码员："
 
-#: settings.py:123 settings.py:125
+#: settings.py:123 settings.py:125 settings.py:124
 msgid "original"
 msgstr "原创"
 
-#: settings.py:123 settings.py:125
+#: settings.py:123 settings.py:125 settings.py:124
 msgid "dark"
 msgstr "暗处"
 
 #: settings.py:123 view_graph.py:784 view_graph.py:786 settings.py:125
-#: view_graph.py:817
+#: view_graph.py:817 settings.py:124
 msgid "blue"
 msgstr "蓝"
 
 #: settings.py:123 view_graph.py:784 view_graph.py:786 settings.py:125
-#: view_graph.py:819
+#: view_graph.py:819 settings.py:124
 msgid "green"
 msgstr "绿化"
 
 #: settings.py:123 view_graph.py:784 view_graph.py:786 settings.py:125
-#: view_graph.py:820
+#: view_graph.py:820 settings.py:124
 msgid "orange"
 msgstr "橘色"
 
-#: settings.py:123 settings.py:125
+#: settings.py:123 settings.py:125 settings.py:124
 msgid "purple"
 msgstr "紫色"
 
 #: settings.py:123 view_graph.py:784 view_graph.py:786 settings.py:125
-#: view_graph.py:820
+#: view_graph.py:820 settings.py:124
 msgid "yellow"
 msgstr "黄的"
 
-#: settings.py:123 settings.py:125
+#: settings.py:123 settings.py:125 settings.py:124
 msgid "rainbow"
 msgstr "彩虹"
 
-#: settings.py:123 settings.py:125
+#: settings.py:123 settings.py:125 settings.py:124
 msgid "native"
 msgstr "本地人"
 
-#: settings.py:146 settings.py:148
+#: settings.py:146 settings.py:148 settings.py:147
 msgid "Bold"
 msgstr "粗体"
 
-#: settings.py:146 settings.py:148
+#: settings.py:146 settings.py:148 settings.py:147
 msgid "Italic"
 msgstr "斜体"
 
-#: settings.py:146 settings.py:148
+#: settings.py:146 settings.py:148 settings.py:147
 msgid "Bigger"
 msgstr "更大"
 
-#: settings.py:284 settings.py:358
+#: settings.py:284 settings.py:358 settings.py:419
 msgid "Choose project directory"
 msgstr "选择项目目录"
 
@@ -5743,6 +5835,7 @@ msgid "Please select an AI model or disable the AI altogether."
 msgstr "请选择人工智能模式或完全禁用人工智能。"
 
 #: settings.py:341 settings.py:345 settings.py:426 settings.py:432
+#: settings.py:488 settings.py:494
 msgid "AI model"
 msgstr "人工智能模型"
 
@@ -5755,11 +5848,11 @@ msgstr ""
 "请输入人工智能模型的有效 API 密钥。\n"
 "(如果您确定您的特定模型不需要 API 密钥，请输入 “无”）。"
 
-#: settings.py:357 settings.py:455
+#: settings.py:357 settings.py:455 settings.py:506
 msgid "Restart QualCoder"
 msgstr "重新启动 QualCoder"
 
-#: settings.py:357 settings.py:455
+#: settings.py:357 settings.py:455 settings.py:506
 msgid "Restart QualCoder to enact some changes"
 msgstr "重启 QualCoder 以进行一些更改"
 
@@ -6756,11 +6849,11 @@ msgstr "高度:"
 msgid " Scale: "
 msgstr " 规模："
 
-#: __main__.py:1653 __main__.py:1656
+#: __main__.py:1653 __main__.py:1656 __main__.py:1612
 msgid "Directory (folder) paths / represents backslash"
 msgstr "目录（文件夹）路径 / 表示反斜线"
 
-#: ai_llm.py:193
+#: ai_llm.py:193 ai_llm.py:342
 msgid ""
 "In the following dialog, go to \"Advanced AI Options\" and select a large "
 "and a fast AI model (both can be the same)."
@@ -6768,42 +6861,42 @@ msgstr ""
 "在下面的对话框中，转到 “高级人工智能选项”，选择一个大型人工智能模型和一个快速"
 "人工智能模型（两者可以相同）。"
 
-#: ai_llm.py:194
+#: ai_llm.py:194 ai_llm.py:343
 msgid "AI Model Selection"
 msgstr "人工智能模型选择"
 
-#: ai_llm.py:200
+#: ai_llm.py:200 ai_llm.py:349
 msgid "AI: No large/fast model selected, AI is disabled."
 msgstr "人工智能：未选择大型/快速模型，人工智能被禁用。"
 
-#: ai_llm.py:302
+#: ai_llm.py:302 ai_llm.py:451
 msgid ""
 "The AI operation could not be aborted immediately. It may take a moment for "
 "the AI to be ready again."
 msgstr "人工智能操作无法立即中止。人工智能可能需要一些时间才能再次准备就绪。"
 
 #: code_text.py:406 code_pdf.py:1500 view_av.py:301 view_image.py:240
-#: view_av.py:308
+#: view_av.py:308 code_text.py:404
 msgid "Search for code"
 msgstr "搜索代码"
 
 #: code_text.py:409 code_pdf.py:1503 view_av.py:304 view_image.py:243
-#: view_av.py:311
+#: view_av.py:311 code_text.py:407
 msgid "Find and select first code that matches text."
 msgstr "查找并选择第一个与文本匹配的代码。"
 
 #: code_text.py:410 code_pdf.py:1504 view_av.py:305 view_image.py:244
-#: view_av.py:312
+#: view_av.py:312 code_text.py:408
 msgid "Enter text to match all or partial code:"
 msgstr "输入文本以匹配全部或部分代码："
 
 #: code_text.py:433 code_pdf.py:1527 view_av.py:328 view_image.py:267
-#: view_av.py:335
+#: view_av.py:335 code_text.py:431
 msgid "Match not found"
 msgstr "未找到匹配"
 
 #: code_text.py:433 code_pdf.py:1527 view_av.py:328 view_image.py:267
-#: view_av.py:335
+#: view_av.py:335 code_text.py:431
 msgid "No code with matching text found."
 msgstr "未找到与文本匹配的代码。"
 
@@ -6997,7 +7090,7 @@ msgstr "请选择人工智能提供商或完全禁用人工智能。"
 msgid "AI provider"
 msgstr "人工智能供应商"
 
-#: settings.py:431
+#: settings.py:431 settings.py:493
 msgid "Please select a \"large\" and a \"fast\" AI model."
 msgstr "请选择 “大型 ”和 “快速 ”人工智能模型。"
 
@@ -7005,7 +7098,7 @@ msgstr "请选择 “大型 ”和 “快速 ”人工智能模型。"
 msgid "Overlaps exactly with"
 msgstr "完全重合"
 
-#: __main__.py:658
+#: __main__.py:658 __main__.py:660
 msgid ""
 "Cannot load config.ini.\n"
 "Character decoding error.\n"
@@ -7015,7 +7108,7 @@ msgstr ""
 "字符解码错误。\n"
 "使用 QualCoder 默认设置。"
 
-#: __main__.py:660
+#: __main__.py:660 __main__.py:662
 msgid "Cannot load config.ini file"
 msgstr "无法加载 config.ini 文件"
 
@@ -7050,3 +7143,76 @@ msgstr "保存截图: "
 #: view_av.py:1788
 msgid "Screenshot imports: "
 msgstr "截图导入："
+
+#: ai_chat.py:574
+msgid "Analyze more data..."
+msgstr "分析更多数据..."
+
+#: ai_chat.py:598
+msgid "Error: There is no more data to analyze."
+msgstr "错误： 没有更多数据可供分析。"
+
+#: ai_chat.py:603
+msgid "Expanding the analysis with more data."
+msgstr "利用更多数据扩大分析范围。"
+
+#: ai_chat.py:1335
+msgid ""
+"This expands the data basis for the analysis. However, be careful not to "
+"overdo it, as this can also dilute the focus of the analysis."
+msgstr "这就扩大了分析的数据基础。但要注意不要过度，因为这也会冲淡分析的重点。"
+
+#: ai_llm.py:302
+msgid "AI: In the follwoing window, please set up the AI model."
+msgstr "人工智能：请在以下窗口中设置人工智能模型。"
+
+#: ai_llm.py:320
+msgid ""
+"AI: You are still using the outdated GPT-4 turbo. Consider switching to a "
+"newer model, such as GPT 4.1. Go to Project > Settings to change the AI "
+"profile and model."
+msgstr ""
+"AI: 您仍在使用过时的 GPT-4 涡轮增压。考虑改用较新的型号，如 GPT 4.1。进入 “项"
+"目”>“设置 ”更改 AI 配置文件和型号。"
+
+#: ai_llm.py:327
+msgid "Please enter an API-key for the AI in the following dialog."
+msgstr "请在以下对话框中输入人工智能的 API 密钥。"
+
+#: code_text.py:3971 code_text.py:4082
+msgid "Regex compliation error"
+msgstr "Regex 编译错误"
+
+#: code_text.py:4142
+msgid "Using Regex."
+msgstr "使用 Regex。"
+
+#: settings.py:273 settings.py:281
+msgid "Edit AI profile name"
+msgstr "编辑人工智能配置文件名称"
+
+#: settings.py:273
+msgid ""
+"Select a profile first. \n"
+"You can only edit the name of an existing profile. To create a new profile "
+"from scratch, follow the instructions in the QualCoder wiki on GitHub."
+msgstr ""
+"先选择一个配置文件。\n"
+"您只能编辑现有配置文件的名称。要从头开始创建一个新的配置文件，请遵循 GitHub "
+"上 QualCoder wiki 中的说明。"
+
+#: settings.py:282
+msgid "Enter new profile name:"
+msgstr "输入新的配置文件名称："
+
+#: settings.py:483
+msgid "Please select an AI profile or disable the AI altogether."
+msgstr "请选择人工智能配置文件或完全禁用人工智能。"
+
+#: settings.py:484
+msgid "AI profile"
+msgstr "人工智能概况"
+
+#: settings.py:487
+msgid "Please enter a valid API-key for the AI model."
+msgstr "请输入人工智能模型的有效 API 密钥。"
