@@ -851,7 +851,7 @@ class App(object):
         style_dark = style_dark.replace("QTreeWidget {font-size: 12",
                                         "QTreeWidget {font-size: " + str(settings.get('treefontsize')))
         style = "* {font-size: 12px; color: #000000;}\n\
-        QWidget {color: #000000; border: none;}\n\
+        QWidget {background-color: #efefef; color: #000000; border: none;}\n\
         QWidget:focus {border: 1px solid #f89407;}\n\
         QMainWindow {background-color: #efefef}\n\
         QDialog {border: 1px solid #808080; background-color: #efefef;}\n\
@@ -866,9 +866,9 @@ class App(object):
         QHeaderView::section {background-color: #f9f9f9}\n\
         QLineEdit {border: 1px solid #707070; background-color: #fafafa;}\n\
         QListWidget::item:selected {border-left: 2px solid red; color: #000000;}\n\
-        QMenu {border: 1px solid #808080;}\n\
+        QMenu {background-color: #efefef; border: 1px solid #808080;}\n\
         QMenu::item:selected {background-color: #fafafa;}\n\
-        QMenu::item:disabled {color: #707070;}\n\
+        QMenu::item:disabled {background-color: #efefef; color: #707070;}\n\
         QSpinBox {border: 1px solid #808080;}\n\
         QSplitter::handle {background-color: #808080;}\n\
         QSplitter::handle:horizontal {width: 2px;}\n\
@@ -882,7 +882,7 @@ class App(object):
         QTabBar {border: 2px solid #808080;}\n\
         QTabBar::tab {background-color: #f9f9f9; border-top: #f9f9f9 4px solid; padding-left: 6px; padding-right: 6px;}\n\
         QTabBar::tab:selected {background-color: #f9f9f9; border-top: 3px solid #f89407; border-bottom: 3px solid #f89407;}\n\
-        QTabWidget {border: none}\n\
+        QTabWidget {background-color: #ffffff; border: none}\n\
         QTextEdit {background-color: #fcfcfc; selection-color: #ffffff; selection-background-color:#000000;}\n\
         QTextEdit:focus {border: 2px solid #f89407;}\n\
         QPlainTextEdit {background-color: #fcfcfc; selection-color: #ffffff; selection-background-color:#000000;}\n\
@@ -894,6 +894,11 @@ class App(object):
         style = style.replace("QFileDialog {font-size: 12", "QFileDialog {font-size:" + str(settings.get('fontsize')))
         style = style.replace("QTreeWidget {font-size: 12",
                               "QTreeWidget {font-size: " + str(settings.get('treefontsize')))
+        # Set the color for links (used in AI chat window and Settings dialog). The system default might be hard to read, especially in light themes. 
+        palette = QtGui.QPalette()
+        palette.setColor(QtGui.QPalette.ColorRole.Link, QtGui.QColor(self.highlight_color()))
+        palette.setColor(QtGui.QPalette.ColorRole.LinkVisited, QtGui.QColor(self.highlight_color()))
+        QtWidgets.QApplication.instance().setPalette(palette)
         if self.settings['stylesheet'] == 'dark':
             return style_dark
         style_rainbow = style_dark

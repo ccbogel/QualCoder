@@ -3122,7 +3122,7 @@ class DialogCodeText(QtWidgets.QWidget):
         dialog = QtWidgets.QInputDialog(self)
         dialog.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         dialog.setWindowTitle(_("Show files like"))
-        dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
+        dialog.setWindowFlags(dialog.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         dialog.setInputMode(QtWidgets.QInputDialog.InputMode.TextInput)
         dialog.setLabelText(_("Show files containing the text. (Blank for all)"))
         dialog.resize(200, 20)
