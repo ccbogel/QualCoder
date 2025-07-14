@@ -230,23 +230,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Text fragment to auto code sentences. This file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="pushButton_auto_code_frag_all_files">
-      <property name="geometry">
-       <rect>
-        <x>590</x>
-        <y>0</y>
-        <width>28</width>
-        <height>28</height>
-       </rect>
-      </property>
-      <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Text fragment to auto code sentences. All files.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Text fragment to auto code sentences.</string>
       </property>
       <property name="text">
        <string/>
@@ -255,7 +239,7 @@
      <widget class="QPushButton" name="pushButton_auto_code_undo">
       <property name="geometry">
        <rect>
-        <x>650</x>
+        <x>620</x>
         <y>0</y>
         <width>28</width>
         <height>28</height>
@@ -369,7 +353,7 @@
      <widget class="QPushButton" name="pushButton_auto_code_surround">
       <property name="geometry">
        <rect>
-        <x>620</x>
+        <x>590</x>
         <y>0</y>
         <width>28</width>
         <height>28</height>
@@ -604,7 +588,7 @@ As all assigned positions may be incorrect. </string>
      <widget class="QCheckBox" name="checkBox_auto_regex">
       <property name="geometry">
        <rect>
-        <x>680</x>
+        <x>651</x>
         <y>5</y>
         <width>81</width>
         <height>20</height>
@@ -1251,7 +1235,6 @@ https://www.datacamp.com/cheat-sheet/regular-expresso</string>
   <tabstop>pushButton_show_memos</tabstop>
   <tabstop>pushButton_auto_code</tabstop>
   <tabstop>pushButton_auto_code_frag_this_file</tabstop>
-  <tabstop>pushButton_auto_code_frag_all_files</tabstop>
   <tabstop>pushButton_auto_code_surround</tabstop>
   <tabstop>pushButton_auto_code_undo</tabstop>
   <tabstop>pushButton_help</tabstop>
