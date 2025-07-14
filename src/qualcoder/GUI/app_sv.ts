@@ -1793,124 +1793,114 @@ Därefter öppnas en meny med alternativ</translation>
 <context>
     <name>Dialog_code_text</name>
     <message>
-        <location filename="ui_dialog_code_text.py" line="406"/>
+        <location filename="ui_dialog_code_text.py" line="404"/>
         <source>Code Text</source>
         <translation>Kodtext</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="407"/>
+        <location filename="ui_dialog_code_text.py" line="405"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Auto code with exact text.&lt;/p&gt;&lt;p&gt;Right click for options: all, first, last.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt; &lt;Head /&gt; &lt;body&gt; &lt;p&gt; autokod med exakt text. &lt;/p&gt; &lt;p&gt; Högerklicka för alternativ: Alla, först, sist. &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="408"/>
+        <location filename="ui_dialog_code_text.py" line="406"/>
         <source>Coder:</source>
         <translation>Kodare:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="409"/>
+        <location filename="ui_dialog_code_text.py" line="407"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search for text.&lt;/p&gt;&lt;p&gt;check &lt;span style=&quot; font-weight:600;&quot;&gt;Case sensitive&lt;/span&gt; for case sensitive search&lt;/p&gt;&lt;p&gt;check &lt;span style=&quot; font-weight:600;&quot;&gt;All files&lt;/span&gt; for searching all files search&lt;/p&gt;
 &lt;p&gt;Right-click to change automatic searching options&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search for text.&lt;/p&gt;&lt;p&gt;check &lt;span style=&quot; font-weight:600;&quot;&gt;Case sensitive&lt;/span&gt; for case sensitive search&lt;/p&gt;&lt;p&gt;check &lt;span style=&quot; font-weight:600;&quot;&gt;All files&lt;/span&gt; for searching all files search&lt;/p&gt;
 &lt;p&gt; Högerklicka för att ändra automatiska sökalternativ &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="411"/>
+        <location filename="ui_dialog_code_text.py" line="409"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;search case sensitive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; sökfodral känslig &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="412"/>
+        <location filename="ui_dialog_code_text.py" line="410"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;search all files&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; Sök alla filer &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="413"/>
+        <location filename="ui_dialog_code_text.py" line="411"/>
         <source>0 / 0</source>
         <translation>0/0</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="414"/>
+        <location filename="ui_dialog_code_text.py" line="412"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Previous&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; Föregående &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="415"/>
+        <location filename="ui_dialog_code_text.py" line="413"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; nästa &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="416"/>
+        <location filename="ui_dialog_code_text.py" line="414"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search text. All text files.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; Söktext.Alla textfiler. &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="417"/>
+        <location filename="ui_dialog_code_text.py" line="415"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search text. Case sensitive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; Söktext.Skiftkänslig &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="418"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Text fragment to auto code sentences. This file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; Textfragment till bilkodens meningar.Den här filen. &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
-    </message>
-    <message>
-        <location filename="ui_dialog_code_text.py" line="419"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Text fragment to auto code sentences. All files.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; Textfragment till bilkodens meningar.Alla filer. &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
-    </message>
-    <message>
-        <location filename="ui_dialog_code_text.py" line="420"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Undo auto coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; ångra autokodning &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
-    </message>
-    <message>
-        <location filename="ui_dialog_code_text.py" line="421"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete all codes by this coder from this file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; Radera alla koder med denna kodare från den här filen &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="422"/>
+        <location filename="ui_dialog_code_text.py" line="419"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Annotate selection&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; annotera val &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="423"/>
+        <location filename="ui_dialog_code_text.py" line="417"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Undo auto coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; ångra autokodning &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_code_text.py" line="420"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Memo for this coded section&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; memo för detta kodade avsnitt &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="424"/>
+        <location filename="ui_dialog_code_text.py" line="421"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Text font size.&lt;/p&gt;&lt;p&gt;A default size can be set in Settings.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt; &lt;Head /&gt; &lt;body&gt; &lt;p&gt; Textstorlek. &lt;/p&gt; &lt;p&gt; En standardstorlek kan ställas in i inställningar. &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="425"/>
+        <location filename="ui_dialog_code_text.py" line="422"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. &lt;/p&gt;&lt;p&gt;A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A ‘*’ after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;‘&lt;/span&gt;\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: www.rexegg.com/regex-quickstart.html&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; Sök använder regex -funktioner.&lt;/p&gt; &lt;p&gt; a prick &apos;.&apos; används som ett vildkort, t.ex.&quot;.Ears&quot; kommer att matcha &quot;björnar&quot; och &quot;år&quot;.&lt;/p&gt; &lt;p&gt; a &apos;?&apos; Efter att en karaktär kommer att matcha en eller ingen gånger den karaktären, t.ex.‘Bears?’ Kommer att matcha ‘Bear’ och ‘Bears’ &lt;/p&gt; &lt;p&gt; &lt;span style = &quot;bakgrundsfärg: transparent;&quot;&gt; en &quot;*&quot; efter att en karaktär matchar noll eller fler gånger.&lt;/span&gt; &lt;/p&gt; &lt;p&gt; &lt;span style = &quot;bakgrundsfärg: transparent;&quot;&gt; ‘&lt;/span&gt; \.Kommer att matcha pricksymbolen, &apos;\?&apos; Kommer att matcha frågetecknet.‘\ N’ kommer att matcha linjens slutsymbol.&lt;/p&gt; &lt;p&gt; regex cheatsheet: www.rexegg.com/regex-quickstart.html&lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="426"/>
+        <location filename="ui_dialog_code_text.py" line="423"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Auto code using start and end marks.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt; &lt;Head /&gt; &lt;body&gt; &lt;p&gt; autokod med start- och slutmärken. &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="427"/>
+        <location filename="ui_dialog_code_text.py" line="424"/>
         <source>Help</source>
         <translation>Hjälp</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="428"/>
+        <location filename="ui_dialog_code_text.py" line="425"/>
         <source>Show memos</source>
         <translation>Visa memos</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="429"/>
+        <location filename="ui_dialog_code_text.py" line="426"/>
         <source>Show annotations</source>
         <translation>Visa kommentarer</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="430"/>
+        <location filename="ui_dialog_code_text.py" line="427"/>
         <source>Edit text 
 Click on a position, without selecting text, to type, delete, or paste text. 
 Select text that is not underlined and delete or paste over. 
@@ -1925,27 +1915,27 @@ Undvik att välja text för att ta bort eller klistra in om den valda texten und
 Eftersom alla tilldelade positioner kan vara felaktiga. </translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="437"/>
+        <location filename="ui_dialog_code_text.py" line="434"/>
         <source>Export</source>
         <translation>Exportera</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="438"/>
+        <location filename="ui_dialog_code_text.py" line="435"/>
         <source>html</source>
         <translation>html</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="439"/>
+        <location filename="ui_dialog_code_text.py" line="436"/>
         <source>odt</source>
         <translation>odt</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="440"/>
+        <location filename="ui_dialog_code_text.py" line="437"/>
         <source>txt</source>
         <translation>txt</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="441"/>
+        <location filename="ui_dialog_code_text.py" line="438"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;After editing the text:&lt;/p&gt;&lt;p&gt;Review edited text to confirm code positions are correct. Press button to Undo edited text, if code postions are incorrect. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; Efter redigering av texten: &lt;/p&gt; &lt;p&gt; granskning Redigerad text för att bekräfta kodpositioner är korrekta.Tryck på knappen för att ångra redigerad text, om kodpositioner är felaktiga.&lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
@@ -1955,47 +1945,47 @@ Eftersom alla tilldelade positioner kan vara felaktiga. </translation>
         <translation type="obsolete">&lt;html&gt; &lt;Head /&gt; &lt;body&gt; &lt;p&gt; Ställ in standardfärg för nya koder &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="443"/>
+        <location filename="ui_dialog_code_text.py" line="440"/>
         <source>8</source>
         <translation>8</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="444"/>
+        <location filename="ui_dialog_code_text.py" line="441"/>
         <source>10</source>
         <translation>10</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="445"/>
+        <location filename="ui_dialog_code_text.py" line="442"/>
         <source>12</source>
         <translation>12</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="446"/>
+        <location filename="ui_dialog_code_text.py" line="443"/>
         <source>14</source>
         <translation>14</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="447"/>
+        <location filename="ui_dialog_code_text.py" line="444"/>
         <source>16</source>
         <translation>16</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="448"/>
+        <location filename="ui_dialog_code_text.py" line="445"/>
         <source>18</source>
         <translation>18</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="449"/>
+        <location filename="ui_dialog_code_text.py" line="446"/>
         <source>20</source>
         <translation>20</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="450"/>
+        <location filename="ui_dialog_code_text.py" line="447"/>
         <source>22</source>
         <translation>22</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="451"/>
+        <location filename="ui_dialog_code_text.py" line="448"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show side pane&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; visa sidofönstret &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
@@ -2100,7 +2090,7 @@ Eftersom alla tilldelade positioner kan vara felaktiga. </translation>
         <translation>.</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="442"/>
+        <location filename="ui_dialog_code_text.py" line="439"/>
         <source>Set default colour for new codes</source>
         <translation>Ange standardfärg för nya koder</translation>
     </message>
@@ -2123,6 +2113,23 @@ Eftersom alla tilldelade positioner kan vara felaktiga. </translation>
         <location filename="ui_dialog_code_text.py" line="469"/>
         <source>Find code</source>
         <translation>Sök kod</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_code_text.py" line="416"/>
+        <source>Text fragment to auto code sentences.</source>
+        <translation>Textfragment till meningar med autokodning.</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_code_text.py" line="449"/>
+        <source>Apply REGEX to autocoding for exact text and sentences buttons.
+https://www.datacamp.com/cheat-sheet/regular-expresso</source>
+        <translation>Använd REGEX för autokodning för exakta text- och meningsknappar.
+https://www.datacamp.com/cheat-sheet/regular-expresso</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_code_text.py" line="451"/>
+        <source>REGEX</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -3034,276 +3041,276 @@ Använd inte apostrof eller kommatecken i några värden</translation>
 <context>
     <name>Dialog_settings</name>
     <message>
-        <location filename="ui_dialog_settings.py" line="526"/>
+        <location filename="ui_dialog_settings.py" line="531"/>
         <source>Settings</source>
         <translation>Inställningar</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="527"/>
+        <location filename="ui_dialog_settings.py" line="532"/>
         <source>Backup project folder every time project is opened</source>
         <translation>Backup Project -mappen varje gång projekt öppnas</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="528"/>
+        <location filename="ui_dialog_settings.py" line="533"/>
         <source>Default project directory</source>
         <translation>Standardprojektkatalog</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="529"/>
+        <location filename="ui_dialog_settings.py" line="534"/>
         <source>Backup video and audio files. Uncheck to speed up backups.
 Not recommended unless you have many large files slowing the backup.</source>
         <translation>Säkerhetskopieringsvideo- och ljudfiler.Avmarkera för att påskynda säkerhetskopior.
 Rekommenderas inte om du inte har många stora filer som bromsar säkerhetskopian.</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="531"/>
+        <location filename="ui_dialog_settings.py" line="536"/>
         <source>Backups</source>
         <translation>Säkerhetskopiering</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="532"/>
+        <location filename="ui_dialog_settings.py" line="537"/>
         <source>0</source>
         <translation>0</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="533"/>
+        <location filename="ui_dialog_settings.py" line="538"/>
         <source>1</source>
         <translation>1</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="534"/>
+        <location filename="ui_dialog_settings.py" line="539"/>
         <source>2</source>
         <translation>2</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="535"/>
+        <location filename="ui_dialog_settings.py" line="540"/>
         <source>3</source>
         <translation>3</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="536"/>
+        <location filename="ui_dialog_settings.py" line="541"/>
         <source>4</source>
         <translation>4</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="537"/>
+        <location filename="ui_dialog_settings.py" line="542"/>
         <source>5</source>
         <translation>5</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="538"/>
+        <location filename="ui_dialog_settings.py" line="543"/>
         <source>Select another coder in this project</source>
         <translation>Välj en annan kodare i detta projekt</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="539"/>
+        <location filename="ui_dialog_settings.py" line="544"/>
         <source>Other coders</source>
         <translation>Andra kodare</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="540"/>
+        <location filename="ui_dialog_settings.py" line="545"/>
         <source>New coder</source>
         <translation>Ny kodare</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="541"/>
+        <location filename="ui_dialog_settings.py" line="546"/>
         <source>Set this name as the current coder.
 </source>
         <translation>Ställ in detta namn som den nuvarande kodaren.
 </translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="543"/>
+        <location filename="ui_dialog_settings.py" line="548"/>
         <source>Apply</source>
         <translation>Tillämpas</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="544"/>
+        <location filename="ui_dialog_settings.py" line="549"/>
         <source>Current coder: </source>
         <translation>Aktuell kodare: </translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="545"/>
+        <location filename="ui_dialog_settings.py" line="550"/>
         <source>/</source>
         <translation>/</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="546"/>
+        <location filename="ui_dialog_settings.py" line="551"/>
         <source>Language</source>
         <translation>Språk</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="547"/>
+        <location filename="ui_dialog_settings.py" line="552"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Close and open the software for the change in language to occur.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; Stäng och öppna programvaran för att språkförändringen ska inträffa. &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="548"/>
+        <location filename="ui_dialog_settings.py" line="553"/>
         <source>General font and size</source>
         <translation>Allmänt teckensnitt och storlek</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="549"/>
+        <location filename="ui_dialog_settings.py" line="554"/>
         <source>Font size for codes tree</source>
         <translation>Teckensnittsstorlek för koder Träd</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="550"/>
+        <location filename="ui_dialog_settings.py" line="555"/>
         <source>Font size for documents</source>
         <translation>Teckensnittsstorlek för dokument</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="551"/>
+        <location filename="ui_dialog_settings.py" line="556"/>
         <source>Reports with text context</source>
         <translation>Rapporter med textsammanhang</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="552"/>
+        <location filename="ui_dialog_settings.py" line="557"/>
         <source>Characters before and after</source>
         <translation>Tecken före och efter</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="553"/>
+        <location filename="ui_dialog_settings.py" line="558"/>
         <source>Text context, coded text style</source>
         <translation>Textsammanhang, kodad textstil</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="568"/>
+        <location filename="ui_dialog_settings.py" line="573"/>
         <source>8</source>
         <translation>8</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="569"/>
+        <location filename="ui_dialog_settings.py" line="574"/>
         <source>10</source>
         <translation>10</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="570"/>
+        <location filename="ui_dialog_settings.py" line="575"/>
         <source>12</source>
         <translation>12</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="571"/>
+        <location filename="ui_dialog_settings.py" line="576"/>
         <source>14</source>
         <translation>14</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="572"/>
+        <location filename="ui_dialog_settings.py" line="577"/>
         <source>16</source>
         <translation>16</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="573"/>
+        <location filename="ui_dialog_settings.py" line="578"/>
         <source>18</source>
         <translation>18</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="574"/>
+        <location filename="ui_dialog_settings.py" line="579"/>
         <source>20</source>
         <translation>20</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="575"/>
+        <location filename="ui_dialog_settings.py" line="580"/>
         <source>100</source>
         <translation>100</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="576"/>
+        <location filename="ui_dialog_settings.py" line="581"/>
         <source>200</source>
         <translation>200</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="577"/>
+        <location filename="ui_dialog_settings.py" line="582"/>
         <source>300</source>
         <translation>300</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="578"/>
+        <location filename="ui_dialog_settings.py" line="583"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show the identifying numbers for files, cases, codes, et cetera.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; Visa identifierande nummer för filer, fall, koder, et cetera. &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="579"/>
+        <location filename="ui_dialog_settings.py" line="584"/>
         <source>Show IDs</source>
         <translation>Visa ID</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="580"/>
+        <location filename="ui_dialog_settings.py" line="585"/>
         <source>50000</source>
         <translation>50000</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="581"/>
+        <location filename="ui_dialog_settings.py" line="586"/>
         <source>40000</source>
         <translation>40000</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="582"/>
+        <location filename="ui_dialog_settings.py" line="587"/>
         <source>30000</source>
         <translation>30000</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="583"/>
+        <location filename="ui_dialog_settings.py" line="588"/>
         <source>20000</source>
         <translation>20000</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="584"/>
+        <location filename="ui_dialog_settings.py" line="589"/>
         <source>Style</source>
         <translation>Stil</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="585"/>
+        <location filename="ui_dialog_settings.py" line="590"/>
         <source>Very large text documents. Load text chunks by number of characters.</source>
         <translation>Mycket stora textdokument.Ladda textbitar efter antal tecken.</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="586"/>
+        <location filename="ui_dialog_settings.py" line="591"/>
         <source>Code text chunk size</source>
         <translation>Kodtextbitstorlek</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="587"/>
+        <location filename="ui_dialog_settings.py" line="592"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Used when entering time position in transcription&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt; &lt;Head /&gt; &lt;body&gt; &lt;p&gt; Används vid tidsposition i transkription &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="588"/>
+        <location filename="ui_dialog_settings.py" line="593"/>
         <source>Time format</source>
         <translation>Tidsformat</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="589"/>
+        <location filename="ui_dialog_settings.py" line="594"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Used when entering speaker name in transcription&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt; &lt;huvud/&gt; &lt;body&gt; &lt;p&gt; Används vid inmatning av högtalarnamn i transkription &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="590"/>
+        <location filename="ui_dialog_settings.py" line="595"/>
         <source>Speaker format</source>
         <translation>Högtalarformat</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="591"/>
+        <location filename="ui_dialog_settings.py" line="596"/>
         <source>AI Integration</source>
         <translation>AI -integration</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="592"/>
+        <location filename="ui_dialog_settings.py" line="597"/>
         <source>enable AI integration</source>
         <translation>Aktivera AI -integration</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="594"/>
+        <location filename="ui_dialog_settings.py" line="598"/>
         <source>Description:</source>
         <translation>Beskrivning:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="596"/>
+        <location filename="ui_dialog_settings.py" line="599"/>
         <source>Get Access:</source>
         <translation>Få åtkomst:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="595"/>
+        <location filename="ui_dialog_settings.py" line="600"/>
         <source>API key</source>
         <translation>API -nyckel</translation>
     </message>
@@ -3313,99 +3320,109 @@ Rekommenderas inte om du inte har många stora filer som bromsar säkerhetskopia
         <translation type="obsolete">AI -modell</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="598"/>
+        <location filename="ui_dialog_settings.py" line="604"/>
         <source>You can use the Project Memo (found in the menu: Project &gt; Project Memo) to convey background information about your research, including objectives, methodology, and data, to the AI. This will help the AI generate more accurate and relevant responses. Deselect this option if you use the Project Memo for other purposes.</source>
         <translation>Du kan använda projektmemo (finns i menyn: Projekt&gt; Projektmemo) för att förmedla bakgrundsinformation om din forskning, inklusive mål, metodik och data, till AI.Detta hjälper AI att generera mer exakta och relevanta svar.Avmarkera det här alternativet om du använder projektmemo för andra ändamål.</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="599"/>
+        <location filename="ui_dialog_settings.py" line="605"/>
         <source>Send project memo to AI</source>
         <translation>Skicka projektmemo till AI</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="600"/>
+        <location filename="ui_dialog_settings.py" line="606"/>
         <source>Language for AI conversations: </source>
         <translation>Språk för AI -konversationer: </translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="601"/>
+        <location filename="ui_dialog_settings.py" line="607"/>
         <source>If selected, the conversations will be in the same language as the rest of the user interface. You can select this language at the top of this window.</source>
         <translation>Om det väljs kommer konversationerna att vara på samma språk som resten av användargränssnittet.Du kan välja det här språket högst upp i detta fönster.</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="602"/>
+        <location filename="ui_dialog_settings.py" line="608"/>
         <source>same as UI</source>
         <translation>Samma som UI</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="603"/>
+        <location filename="ui_dialog_settings.py" line="609"/>
         <source>Enter the name of your language here</source>
         <translation>Ange namnet på ditt språk här</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="612"/>
+        <location filename="ui_dialog_settings.py" line="618"/>
         <source>Temperature:</source>
         <translation>Temperatur:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="613"/>
+        <location filename="ui_dialog_settings.py" line="619"/>
         <source>Advanced option. Only change when you know whatr you are doing.</source>
         <translation>Avancerat alternativ.Byt bara när du vet vad du gör.</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="617"/>
+        <location filename="ui_dialog_settings.py" line="623"/>
         <source>D.9</source>
         <translation>D.9</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="618"/>
+        <location filename="ui_dialog_settings.py" line="624"/>
         <source>1.0</source>
         <translation>1.0</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="616"/>
+        <location filename="ui_dialog_settings.py" line="622"/>
         <source>   Top_p:</source>
         <translation>   Top_p:</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="593"/>
         <source>AI Provider:</source>
-        <translation>AI leverantör:</translation>
+        <translation type="obsolete">AI leverantör:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="597"/>
+        <location filename="ui_dialog_settings.py" line="603"/>
         <source>Advanced AI Options...</source>
         <translation>Avancerade AI-alternativ </translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="604"/>
+        <location filename="ui_dialog_settings.py" line="610"/>
         <source>Large Model:</source>
         <translation>Stor modell:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="605"/>
+        <location filename="ui_dialog_settings.py" line="611"/>
         <source>Select an available AI model (can be the same as the large model). The fast model is used for simple tasks only.</source>
         <translation>Välj en tillgänglig AI-modell (kan vara samma som den stora modellen). Den snabba modellen används endast för enkla uppgifter.</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="610"/>
+        <location filename="ui_dialog_settings.py" line="616"/>
         <source>&lt;select available model&gt;</source>
         <translation>välj tillgänglig modell</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="607"/>
+        <location filename="ui_dialog_settings.py" line="613"/>
         <source>   Fast Model:</source>
         <translation>   Snabb modell:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="611"/>
+        <location filename="ui_dialog_settings.py" line="617"/>
         <source>context window:</source>
         <translation>kontextfönster:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="609"/>
+        <location filename="ui_dialog_settings.py" line="615"/>
         <source>Select an available AI model. The large model is used for most of the AI features in QualCoder.</source>
         <translation>Välj en tillgänglig AI-modell. Den stora modellen används för de flesta av AI-funktionerna i QualCoder.</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_settings.py" line="601"/>
+        <source>AI Profile:</source>
+        <translation>AI profil:</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_settings.py" line="602"/>
+        <source>Edit Name</source>
+        <translation>Redigera namn</translation>
     </message>
 </context>
 <context>

@@ -1793,123 +1793,113 @@ Ctrl Shift &lt; 再生レートを最小0.1に下げる</translation>
 <context>
     <name>Dialog_code_text</name>
     <message>
-        <location filename="ui_dialog_code_text.py" line="406"/>
+        <location filename="ui_dialog_code_text.py" line="404"/>
         <source>Code Text</source>
         <translation>コード・テキスト</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="407"/>
+        <location filename="ui_dialog_code_text.py" line="405"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Auto code with exact text.&lt;/p&gt;&lt;p&gt;Right click for options: all, first, last.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>正確なテキストで自動コード。右クリックでオプション：すべて、最初、最後</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="408"/>
+        <location filename="ui_dialog_code_text.py" line="406"/>
         <source>Coder:</source>
         <translation>コーダー</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="409"/>
+        <location filename="ui_dialog_code_text.py" line="407"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search for text.&lt;/p&gt;&lt;p&gt;check &lt;span style=&quot; font-weight:600;&quot;&gt;Case sensitive&lt;/span&gt; for case sensitive search&lt;/p&gt;&lt;p&gt;check &lt;span style=&quot; font-weight:600;&quot;&gt;All files&lt;/span&gt; for searching all files search&lt;/p&gt;
 &lt;p&gt;Right-click to change automatic searching options&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>テキストを検索します。</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="411"/>
+        <location filename="ui_dialog_code_text.py" line="409"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;search case sensitive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>大文字と小文字を区別する</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="412"/>
+        <location filename="ui_dialog_code_text.py" line="410"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;search all files&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>すべてのファイルを検索</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="413"/>
+        <location filename="ui_dialog_code_text.py" line="411"/>
         <source>0 / 0</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="414"/>
+        <location filename="ui_dialog_code_text.py" line="412"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Previous&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>前へ</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="415"/>
+        <location filename="ui_dialog_code_text.py" line="413"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>次へ</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="416"/>
+        <location filename="ui_dialog_code_text.py" line="414"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search text. All text files.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>検索テキスト すべてのテキストファイル</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="417"/>
+        <location filename="ui_dialog_code_text.py" line="415"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search text. Case sensitive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>検索テキスト 大文字と小文字を区別する</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="418"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Text fragment to auto code sentences. This file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>文章をオートコード化するためのテキストフラグメント。このファイル</translation>
-    </message>
-    <message>
-        <location filename="ui_dialog_code_text.py" line="419"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Text fragment to auto code sentences. All files.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>テキストの断片を自動コード文に。</translation>
-    </message>
-    <message>
-        <location filename="ui_dialog_code_text.py" line="420"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Undo auto coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>自動コーディングの取り消し</translation>
-    </message>
-    <message>
-        <location filename="ui_dialog_code_text.py" line="421"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete all codes by this coder from this file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>このコーダーによるすべてのコードをこのファイルから削除する。</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="422"/>
+        <location filename="ui_dialog_code_text.py" line="419"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Annotate selection&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>選択範囲に注釈を付ける</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="423"/>
+        <location filename="ui_dialog_code_text.py" line="417"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Undo auto coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>自動コーディングの取り消し</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_code_text.py" line="420"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Memo for this coded section&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>このコード化されたセクションのメモ</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="424"/>
+        <location filename="ui_dialog_code_text.py" line="421"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Text font size.&lt;/p&gt;&lt;p&gt;A default size can be set in Settings.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>デフォルトのサイズは「設定」で設定できます。</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="425"/>
+        <location filename="ui_dialog_code_text.py" line="422"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. &lt;/p&gt;&lt;p&gt;A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A ‘*’ after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;‘&lt;/span&gt;\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: www.rexegg.com/regex-quickstart.html&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>検索には Regex 関数を使用します。</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="426"/>
+        <location filename="ui_dialog_code_text.py" line="423"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Auto code using start and end marks.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>開始記号と終了記号を使ったオートコード。</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="427"/>
+        <location filename="ui_dialog_code_text.py" line="424"/>
         <source>Help</source>
         <translation>ヘルプ</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="428"/>
+        <location filename="ui_dialog_code_text.py" line="425"/>
         <source>Show memos</source>
         <translation>メモを表示する</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="429"/>
+        <location filename="ui_dialog_code_text.py" line="426"/>
         <source>Show annotations</source>
         <translation>注釈の表示</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="430"/>
+        <location filename="ui_dialog_code_text.py" line="427"/>
         <source>Edit text 
 Click on a position, without selecting text, to type, delete, or paste text. 
 Select text that is not underlined and delete or paste over. 
@@ -1924,27 +1914,27 @@ As all assigned positions may be incorrect. </source>
 割り当てられた位置がすべて正しくない可能性があるためです。</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="437"/>
+        <location filename="ui_dialog_code_text.py" line="434"/>
         <source>Export</source>
         <translation>輸出</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="438"/>
+        <location filename="ui_dialog_code_text.py" line="435"/>
         <source>html</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="439"/>
+        <location filename="ui_dialog_code_text.py" line="436"/>
         <source>odt</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="440"/>
+        <location filename="ui_dialog_code_text.py" line="437"/>
         <source>txt</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="441"/>
+        <location filename="ui_dialog_code_text.py" line="438"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;After editing the text:&lt;/p&gt;&lt;p&gt;Review edited text to confirm code positions are correct. Press button to Undo edited text, if code postions are incorrect. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>テキストを編集した後 &gt;編集したテキストを見直して、コードの位置が正しいことを確認する。コード位置が正しくない場合は、ボタンを押して編集したテキストを元に戻す。</translation>
     </message>
@@ -1954,47 +1944,47 @@ As all assigned positions may be incorrect. </source>
         <translation type="obsolete">新しいコードのデフォルトカラーを設定する</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="443"/>
+        <location filename="ui_dialog_code_text.py" line="440"/>
         <source>8</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="444"/>
+        <location filename="ui_dialog_code_text.py" line="441"/>
         <source>10</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="445"/>
+        <location filename="ui_dialog_code_text.py" line="442"/>
         <source>12</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="446"/>
+        <location filename="ui_dialog_code_text.py" line="443"/>
         <source>14</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="447"/>
+        <location filename="ui_dialog_code_text.py" line="444"/>
         <source>16</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="448"/>
+        <location filename="ui_dialog_code_text.py" line="445"/>
         <source>18</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="449"/>
+        <location filename="ui_dialog_code_text.py" line="446"/>
         <source>20</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="450"/>
+        <location filename="ui_dialog_code_text.py" line="447"/>
         <source>22</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="451"/>
+        <location filename="ui_dialog_code_text.py" line="448"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show side pane&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>サイドペインの表示</translation>
     </message>
@@ -2099,7 +2089,7 @@ As all assigned positions may be incorrect. </source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="442"/>
+        <location filename="ui_dialog_code_text.py" line="439"/>
         <source>Set default colour for new codes</source>
         <translation>新しいコードのデフォルトの色を設定する</translation>
     </message>
@@ -2122,6 +2112,23 @@ As all assigned positions may be incorrect. </source>
         <location filename="ui_dialog_code_text.py" line="469"/>
         <source>Find code</source>
         <translation>コードを検索</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_code_text.py" line="416"/>
+        <source>Text fragment to auto code sentences.</source>
+        <translation>文章を自動コード化するテキストフラグメント。</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_code_text.py" line="449"/>
+        <source>Apply REGEX to autocoding for exact text and sentences buttons.
+https://www.datacamp.com/cheat-sheet/regular-expresso</source>
+        <translation>REGEX をオートコーディングに適用して、正確なテキストとセンテンス・ボタンを作成する。
+https://www.datacamp.com/cheat-sheet/regular-expresso</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_code_text.py" line="451"/>
+        <source>REGEX</source>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -3036,275 +3043,275 @@ like&apos; のワイルドカードは % と _ です。</translation>
 <context>
     <name>Dialog_settings</name>
     <message>
-        <location filename="ui_dialog_settings.py" line="526"/>
+        <location filename="ui_dialog_settings.py" line="531"/>
         <source>Settings</source>
         <translation>設定</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="527"/>
+        <location filename="ui_dialog_settings.py" line="532"/>
         <source>Backup project folder every time project is opened</source>
         <translation>プロジェクトを開くたびにプロジェクトフォルダをバックアップ</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="528"/>
+        <location filename="ui_dialog_settings.py" line="533"/>
         <source>Default project directory</source>
         <translation>デフォルトのプロジェクトディレクトリ</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="529"/>
+        <location filename="ui_dialog_settings.py" line="534"/>
         <source>Backup video and audio files. Uncheck to speed up backups.
 Not recommended unless you have many large files slowing the backup.</source>
         <translation>ビデオファイルとオーディオファイルをバックアップします。チェックを外すとバックアップが高速化されます。
 バックアップに時間がかかる大きなファイルが多数ある場合を除き、お勧めしません。</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="531"/>
+        <location filename="ui_dialog_settings.py" line="536"/>
         <source>Backups</source>
         <translation>バックアップ</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="532"/>
+        <location filename="ui_dialog_settings.py" line="537"/>
         <source>0</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="533"/>
+        <location filename="ui_dialog_settings.py" line="538"/>
         <source>1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="534"/>
+        <location filename="ui_dialog_settings.py" line="539"/>
         <source>2</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="535"/>
+        <location filename="ui_dialog_settings.py" line="540"/>
         <source>3</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="536"/>
+        <location filename="ui_dialog_settings.py" line="541"/>
         <source>4</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="537"/>
+        <location filename="ui_dialog_settings.py" line="542"/>
         <source>5</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="538"/>
+        <location filename="ui_dialog_settings.py" line="543"/>
         <source>Select another coder in this project</source>
         <translation>このプロジェクトの別のコーダーを選択する</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="539"/>
+        <location filename="ui_dialog_settings.py" line="544"/>
         <source>Other coders</source>
         <translation>その他のコーダー</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="540"/>
+        <location filename="ui_dialog_settings.py" line="545"/>
         <source>New coder</source>
         <translation>新人コーダー</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="541"/>
+        <location filename="ui_dialog_settings.py" line="546"/>
         <source>Set this name as the current coder.
 </source>
         <translation>この名前を現在のコーダーとして設定する。</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="543"/>
+        <location filename="ui_dialog_settings.py" line="548"/>
         <source>Apply</source>
         <translation>応募する</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="544"/>
+        <location filename="ui_dialog_settings.py" line="549"/>
         <source>Current coder: </source>
         <translation>現在のコーダー </translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="545"/>
+        <location filename="ui_dialog_settings.py" line="550"/>
         <source>/</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="546"/>
+        <location filename="ui_dialog_settings.py" line="551"/>
         <source>Language</source>
         <translation>言語</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="547"/>
+        <location filename="ui_dialog_settings.py" line="552"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Close and open the software for the change in language to occur.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>言語を変更するために、ソフトウェアを一旦終了し、開いてください。</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="548"/>
+        <location filename="ui_dialog_settings.py" line="553"/>
         <source>General font and size</source>
         <translation>一般的なフォントとサイズ</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="549"/>
+        <location filename="ui_dialog_settings.py" line="554"/>
         <source>Font size for codes tree</source>
         <translation>コードツリーのフォントサイズ</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="550"/>
+        <location filename="ui_dialog_settings.py" line="555"/>
         <source>Font size for documents</source>
         <translation>文書のフォントサイズ</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="551"/>
+        <location filename="ui_dialog_settings.py" line="556"/>
         <source>Reports with text context</source>
         <translation>テキスト・コンテキスト付きレポート</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="552"/>
+        <location filename="ui_dialog_settings.py" line="557"/>
         <source>Characters before and after</source>
         <translation>前後の文字</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="553"/>
+        <location filename="ui_dialog_settings.py" line="558"/>
         <source>Text context, coded text style</source>
         <translation>テキストコンテキスト、コード化されたテキストスタイル</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="568"/>
+        <location filename="ui_dialog_settings.py" line="573"/>
         <source>8</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="569"/>
+        <location filename="ui_dialog_settings.py" line="574"/>
         <source>10</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="570"/>
+        <location filename="ui_dialog_settings.py" line="575"/>
         <source>12</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="571"/>
+        <location filename="ui_dialog_settings.py" line="576"/>
         <source>14</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="572"/>
+        <location filename="ui_dialog_settings.py" line="577"/>
         <source>16</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="573"/>
+        <location filename="ui_dialog_settings.py" line="578"/>
         <source>18</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="574"/>
+        <location filename="ui_dialog_settings.py" line="579"/>
         <source>20</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="575"/>
+        <location filename="ui_dialog_settings.py" line="580"/>
         <source>100</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="576"/>
+        <location filename="ui_dialog_settings.py" line="581"/>
         <source>200</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="577"/>
+        <location filename="ui_dialog_settings.py" line="582"/>
         <source>300</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="578"/>
+        <location filename="ui_dialog_settings.py" line="583"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show the identifying numbers for files, cases, codes, et cetera.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>ファイル、ケース、コードなどの識別番号を示す。</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="579"/>
+        <location filename="ui_dialog_settings.py" line="584"/>
         <source>Show IDs</source>
         <translation>識別子を表示</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="580"/>
+        <location filename="ui_dialog_settings.py" line="585"/>
         <source>50000</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="581"/>
+        <location filename="ui_dialog_settings.py" line="586"/>
         <source>40000</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="582"/>
+        <location filename="ui_dialog_settings.py" line="587"/>
         <source>30000</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="583"/>
+        <location filename="ui_dialog_settings.py" line="588"/>
         <source>20000</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="584"/>
+        <location filename="ui_dialog_settings.py" line="589"/>
         <source>Style</source>
         <translation>スタイル</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="585"/>
+        <location filename="ui_dialog_settings.py" line="590"/>
         <source>Very large text documents. Load text chunks by number of characters.</source>
         <translation>非常に大きなテキスト文書。文字数でテキストチャンクを読み込む。</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="586"/>
+        <location filename="ui_dialog_settings.py" line="591"/>
         <source>Code text chunk size</source>
         <translation>コードテキストのチャンクサイズ</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="587"/>
+        <location filename="ui_dialog_settings.py" line="592"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Used when entering time position in transcription&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>トランスクリプションで時間位置を入力する際に使用</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="588"/>
+        <location filename="ui_dialog_settings.py" line="593"/>
         <source>Time format</source>
         <translation>時間形式</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="589"/>
+        <location filename="ui_dialog_settings.py" line="594"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Used when entering speaker name in transcription&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>トランスクリプションでスピーカー名を入力する際に使用</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="590"/>
+        <location filename="ui_dialog_settings.py" line="595"/>
         <source>Speaker format</source>
         <translation>スピーカー形式</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="591"/>
+        <location filename="ui_dialog_settings.py" line="596"/>
         <source>AI Integration</source>
         <translation>人工知能の統合</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="592"/>
+        <location filename="ui_dialog_settings.py" line="597"/>
         <source>enable AI integration</source>
         <translation>人工知能の統合を可能にする</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="594"/>
+        <location filename="ui_dialog_settings.py" line="598"/>
         <source>Description:</source>
         <translation>説明 :</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="596"/>
+        <location filename="ui_dialog_settings.py" line="599"/>
         <source>Get Access:</source>
         <translation>アクセス :</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="595"/>
+        <location filename="ui_dialog_settings.py" line="600"/>
         <source>API key</source>
         <translation>APIキー</translation>
     </message>
@@ -3314,100 +3321,110 @@ Not recommended unless you have many large files slowing the backup.</source>
         <translation type="obsolete">人工知能モデル</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="598"/>
+        <location filename="ui_dialog_settings.py" line="604"/>
         <source>You can use the Project Memo (found in the menu: Project &gt; Project Memo) to convey background information about your research, including objectives, methodology, and data, to the AI. This will help the AI generate more accurate and relevant responses. Deselect this option if you use the Project Memo for other purposes.</source>
         <translation>プロジェクトメモ（メニュー：プロジェクト＞プロジェクトメモ）を使って、研究の目的、方法論、データなど、研究の背景情報をAIに伝えることができます。これは、AI がより正確で適切な回答を生成するのに役立ちます。プロジェクトメモを他の目的で使用する場合は、このオプションの選択を解除してください。</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="599"/>
+        <location filename="ui_dialog_settings.py" line="605"/>
         <source>Send project memo to AI</source>
         <translation>プロジェクト・メモを人工知能に送る</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="600"/>
+        <location filename="ui_dialog_settings.py" line="606"/>
         <source>Language for AI conversations: </source>
         <translation>人工知能の会話のための言語： </translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="601"/>
+        <location filename="ui_dialog_settings.py" line="607"/>
         <source>If selected, the conversations will be in the same language as the rest of the user interface. You can select this language at the top of this window.</source>
         <translation>選択した場合、会話は他のユーザーインターフェイスと同じ言語で表示されます。この言語は、このウィンドウの上部で選択できます。</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="602"/>
+        <location filename="ui_dialog_settings.py" line="608"/>
         <source>same as UI</source>
         <translation>ユーザーインターフェースと同じ</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="603"/>
+        <location filename="ui_dialog_settings.py" line="609"/>
         <source>Enter the name of your language here</source>
         <translation>ここに言語名を入力してください</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="612"/>
+        <location filename="ui_dialog_settings.py" line="618"/>
         <source>Temperature:</source>
         <translation>温度だ：</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="613"/>
+        <location filename="ui_dialog_settings.py" line="619"/>
         <source>Advanced option. Only change when you know whatr you are doing.</source>
         <translation>高度なオプション。自分が何をしているかわかっているときだけ変更してください。</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="617"/>
+        <location filename="ui_dialog_settings.py" line="623"/>
         <source>D.9</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="618"/>
+        <location filename="ui_dialog_settings.py" line="624"/>
         <source>1.0</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="616"/>
+        <location filename="ui_dialog_settings.py" line="622"/>
         <source>   Top_p:</source>
         <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="593"/>
         <source>AI Provider:</source>
-        <translation>人工知能プロバイダー:</translation>
+        <translation type="obsolete">人工知能プロバイダー:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="597"/>
+        <location filename="ui_dialog_settings.py" line="603"/>
         <source>Advanced AI Options...</source>
         <translation>高度な人工知能オプション</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="604"/>
+        <location filename="ui_dialog_settings.py" line="610"/>
         <source>Large Model:</source>
         <translation>大型モデル:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="605"/>
+        <location filename="ui_dialog_settings.py" line="611"/>
         <source>Select an available AI model (can be the same as the large model). The fast model is used for simple tasks only.</source>
         <translation>利用可能な人工知能モデルを選択します (大規模モデルと同じにすることもできます)。高速モデルは単純なタスクにのみ使用されます。</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="610"/>
+        <location filename="ui_dialog_settings.py" line="616"/>
         <source>&lt;select available model&gt;</source>
         <translation>利用可能なモデルを選択してください</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="607"/>
+        <location filename="ui_dialog_settings.py" line="613"/>
         <source>   Fast Model:</source>
         <translation>高速モデル:
 </translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="611"/>
+        <location filename="ui_dialog_settings.py" line="617"/>
         <source>context window:</source>
         <translation>コンテキストウィンドウ:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="609"/>
+        <location filename="ui_dialog_settings.py" line="615"/>
         <source>Select an available AI model. The large model is used for most of the AI features in QualCoder.</source>
         <translation>利用可能な人工知能モデルを選択します。大きなモデルは、QualCoder のほとんどの人工知能機能に使用されます。</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_settings.py" line="601"/>
+        <source>AI Profile:</source>
+        <translation>人工知能のプロフィール：</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_settings.py" line="602"/>
+        <source>Edit Name</source>
+        <translation>編集名</translation>
     </message>
 </context>
 <context>
