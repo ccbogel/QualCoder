@@ -263,9 +263,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_auto_code.customContextMenuRequested.connect(self.button_auto_code_menu)
         self.ui.pushButton_auto_code.clicked.connect(self.auto_code)
         self.ui.pushButton_auto_code_frag_this_file.setIcon(qta.icon('mdi6.magic-staff'))
-        self.ui.pushButton_auto_code_frag_this_file.pressed.connect(self.button_autocode_sentences_this_file)
-        self.ui.pushButton_auto_code_frag_all_files.setIcon(qta.icon('mdi6.mace'))
-        self.ui.pushButton_auto_code_frag_all_files.pressed.connect(self.button_autocode_sentences_all_files)
+        self.ui.pushButton_auto_code_frag_this_file.pressed.connect(self.auto_code_sentences)
         self.ui.pushButton_auto_code_surround.setIcon(qta.icon('mdi6.spear'))
         self.ui.pushButton_auto_code_surround.pressed.connect(self.button_autocode_surround)
         self.ui.pushButton_auto_code_undo.setIcon(qta.icon('mdi6.undo'))
@@ -477,8 +475,8 @@ class DialogCodeText(QtWidgets.QWidget):
     def get_files(self, ids=None):
         """ Get files with additional details and fill list widget.
          Called by: init, get_files_from_attributes, show_files_like
-         param:
-         ids: list, fill with ids to limit file selection.
+         Args:
+            ids : list, fill with ids to limit file selection.
          """
 
         if ids is None:
@@ -804,7 +802,7 @@ class DialogCodeText(QtWidgets.QWidget):
 
         self.codes, self.categories = self.app.get_codes_categories()
 
-    # RHS splitter details for code rule, project memo
+    # Right Hand Side splitter details for code rule, project memo
     def show_code_rule(self):
         """ Show text in right-hand side splitter pane. """
 
@@ -1481,7 +1479,10 @@ class DialogCodeText(QtWidgets.QWidget):
         self.app.delete_backup = False
 
     def coded_text_memo(self, position=None):
-        """ Add or edit a memo for this coded text. """
+        """ Add or edit a memo for this coded text.
+        Args:
+            position : Current text cursor position
+        """
 
         if position is None:
             # Called via button
@@ -1543,7 +1544,6 @@ class DialogCodeText(QtWidgets.QWidget):
         for item in self.code_text:
             if item['pos0'] > position + self.file_['start']:
                 code_list.append(item)
-                # print(item['pos0'], ">", position + self.file_['start'])
         if not code_list:
             return
         int_dialog = QtWidgets.QInputDialog()
@@ -1682,6 +1682,9 @@ class DialogCodeText(QtWidgets.QWidget):
         Tried to use QTreeWidget.finditems - but this did not find matching item text
         Called by: textEdit recent codes menu option
         Required for: merge_category()
+        Args:
+            item : QTreeWidgetItem
+            no_merge_list : List of child Category ids (as Strings)
         """
 
         child_count = item.childCount()
@@ -1694,7 +1697,7 @@ class DialogCodeText(QtWidgets.QWidget):
     def merge_category(self, catid):
         """ Select another category to merge this category into.
         Args:
-            catid : Integer cateogry identifier
+            catid : Integer category identifier
         """
 
         do_not_merge_list = []
@@ -1800,7 +1803,7 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         for r in res:
             text_ += f"[{r[1]}-{r[2]}] \n"
-            text_ += _("Text: ") + r[0] + "\n"
+            text_ += _("Text: ") + f"{r[0]}\n"
             text_ += _("Annotation: ") + r[3] + "\n\n"
         ui = DialogMemo(self.app, _("Annotations for file: ") + self.file_['name'], text_)
         ui.ui.pushButton_clear.hide()
@@ -1858,7 +1861,7 @@ class DialogCodeText(QtWidgets.QWidget):
         Called by: show_codes_like
         Args:
             item: a QTreeWidgetItem
-            text:  Text string for matching with code names
+            text_:  Text string for matching with code names
         """
 
         child_count = item.childCount()
@@ -3085,7 +3088,6 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         if self.file_['mediapath'][:5] == "docs:":
             doc_path = self.file_['mediapath'][5:]
-            #print("TO open external ", doc_path)
             webbrowser.open(doc_path)
             return
         logger.error("Cannot open text file in browser " + self.file_['mediapath'])
@@ -3111,8 +3113,6 @@ class DialogCodeText(QtWidgets.QWidget):
         cur.execute('select fid from case_text where caseid=?', [selection['id']])
         res = cur.fetchall()
         file_ids = [r[0] for r in res]
-        '''for r in res:
-            file_ids.append(r[0])'''
         self.get_files(file_ids)
 
     def show_files_like(self):
@@ -3137,8 +3137,6 @@ class DialogCodeText(QtWidgets.QWidget):
         cur.execute('select id from source where name like ?', ['%' + text_ + '%'])
         res = cur.fetchall()
         file_ids = [r[0] for r in res]
-        '''for r in res:
-            file_ids.append(r[0])'''
         self.get_files(file_ids)
 
     def prev_chars(self, file_, selected):
@@ -3768,7 +3766,7 @@ class DialogCodeText(QtWidgets.QWidget):
                                         + str(item['pos0']) + _(" for: ") + self.file_['name'])
         self.get_coded_text_update_eventfilter_tooltips()
 
-    def button_autocode_sentences_this_file(self):
+    '''def button_autocode_sentences_this_file(self):
         """ Flag to autocode sentences in one file """
 
         self.auto_code_sentences("")
@@ -3776,7 +3774,7 @@ class DialogCodeText(QtWidgets.QWidget):
     def button_autocode_sentences_all_files(self):
         """ Flag to autocode sentences across all text files. """
 
-        self.auto_code_sentences("all")
+        self.auto_code_sentences("all")'''
 
     def button_autocode_surround(self):
         """ Autocode with selected code using start and end marks.
@@ -3910,17 +3908,18 @@ class DialogCodeText(QtWidgets.QWidget):
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
 
-    def auto_code_sentences(self, all_=""):
+    def auto_code_sentences(self):
         """ Code full sentence based on text fragment.
-        Activated via self.ui.pushButton_auto_code_frag_this_file -> button_autocode_sentences_this_file()
-        Activated via self.ui.pushButton_auto_code_frag_this_file -> button_autocode_sentences_all_files()
-
-        Args:
-            all = "" :  for this text file only.
-            all = "all" :  for all text files.
+        Activated via self.ui.pushButton_auto_code_frag_this_file
+        Opens a dialog to select text files for autocoding.
         """
 
-        if all_ == "" and not self.file_:
+        ui = DialogSelectItems(self.app, self.filenames, _("Select files to code"), "many")
+        ok = ui.exec()
+        if not ok:
+            return
+        files = ui.get_selected()
+        if len(files) == 0:
             return
         item = self.ui.treeWidget.currentItem()
         if item is None or item.text(1)[0:3] == 'cat':
@@ -3941,27 +3940,23 @@ class DialogCodeText(QtWidgets.QWidget):
         find_text = dialog.textValue()
         if find_text == "":
             return
-        dialog2 = QtWidgets.QInputDialog(None)
-        dialog2.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-        dialog2.setWindowTitle(_("Code sentence"))
-        dialog2.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        dialog2.setInputMode(QtWidgets.QInputDialog.InputMode.TextInput)
-        dialog2.setToolTip("Use \\n for line ending")
-        dialog2.setLabelText(_("Define sentence ending. Default is period space.\nUse \\n for line ending:"))
-        dialog2.setTextValue(". ")
-        dialog2.resize(200, 40)
-        ok2 = dialog2.exec()
+        dialog_sentence_end = QtWidgets.QInputDialog(None)
+        dialog_sentence_end.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        dialog_sentence_end.setWindowTitle(_("Code sentence"))
+        dialog_sentence_end.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
+        dialog_sentence_end.setInputMode(QtWidgets.QInputDialog.InputMode.TextInput)
+        dialog_sentence_end.setToolTip("Use \\n for line ending")
+        dialog_sentence_end.setLabelText(_("Define sentence ending. Default is period space.\nUse \\n for line ending:"))
+        dialog_sentence_end.setTextValue(". ")
+        dialog_sentence_end.resize(200, 40)
+        ok2 = dialog_sentence_end.exec()
         if not ok2:
             return
-        ending = dialog2.textValue()
+        ending = dialog_sentence_end.textValue()
         if ending == "":
             return
         ending = ending.replace("\\n", "\n")
-        files = []
-        if all_ == "all":
-            files = self.app.get_file_texts()
-        else:
-            files = self.app.get_file_texts([self.file_['id'], ])
+
         cur = self.app.conn.cursor()
         msg = ""
         undo_list = []
