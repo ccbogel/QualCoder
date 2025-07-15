@@ -240,7 +240,8 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.treeWidget.viewport().installEventFilter(self)
         self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
-        self.ui.treeWidget.itemSelectionChanged.connect(self.fill_code_label)
+        #self.ui.treeWidget.itemSelectionChanged.connect(self.fill_code_label)
+        self.ui.treeWidget.itemPressed.connect(self.fill_code_label)
         self.ui.textEdit_2.setReadOnly(True)  # Code examples
         self.ui.splitter.setSizes([150, 400, 150])
         self.ui.splitter_2.setSizes([100, 0])

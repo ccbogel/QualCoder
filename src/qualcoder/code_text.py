@@ -9,7 +9,8 @@ Foundation, either version 3 of the License, or (at your option) any later versi
 
 QualCoder is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
 without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU General Public License for more details.
+See the GNU General Pu
+blic License for more details.
 
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
@@ -307,7 +308,8 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.treeWidget.viewport().installEventFilter(self)
         self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
-        self.ui.treeWidget.itemSelectionChanged.connect(self.fill_code_label_with_selected_code)
+        #self.ui.treeWidget.itemSelectionChanged.connect(self.fill_code_label_with_selected_code)
+        self.ui.treeWidget.itemPressed.connect(self.fill_code_label_with_selected_code)
         self.ui.comboBox_export.currentIndexChanged.connect(self.export_option_selected)
         index = self.ui.comboBox_fontsize.findText(str(self.app.settings['docfontsize']),
                                                    QtCore.Qt.MatchFlag.MatchFixedString)
