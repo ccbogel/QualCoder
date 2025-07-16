@@ -42,10 +42,10 @@ from .ai_vectorstore import AiVectorstore
 from .helpers import Message
 from .error_dlg import qt_exception_hook
 from .html_parser import html_to_text
-import fuzzysearch
 import json_repair
 import asyncio
 import configparser
+from Bio.Align import PairwiseAligner
 
 max_memo_length = 1500  # Maximum length of the memo send to the AI
 
@@ -235,6 +235,42 @@ def update_ai_models(current_models: list, current_model_index: int) -> tuple[li
             else:
                 current_models.append(model)
     return current_models, current_model_index
+
+def ai_quote_search(quote: str, original: str) -> tuple[int, int]:
+    """Searches the quote in the original text using the Smith-Waterman algorithm.
+    This also tolerates gaps up to complete sentences in the cited text or other 
+    minor differences in the exact wording.
+    The "PairwiseAligner" is normally used to find partial overlaps in DNA-strings.
+    Returns -1, -1 if no match is found.
+    """
+    
+    aligner = PairwiseAligner()
+    aligner.mode = 'local'
+    aligner.match_score = 2         # score for each matched char
+    aligner.mismatch_score = -1     # penalty for mismatched chars (errors)
+    aligner.open_gap_score = -0.5   # penalty for opening a gap (left out chars)
+    aligner.extend_gap_score = -0.1 # penalty for gap continuation
+
+    alignments = aligner.align(original.lower(), quote.lower())
+    if not len(alignments): # nothing found
+        return -1, -1
+
+    best = alignments[0]
+    orig_spans = best.aligned[0]
+    if not len(orig_spans):
+        return -1, -1
+
+    # combine all matched blocks from the first start to the last end:
+    start_idx = orig_spans[0][0]
+    end_idx = orig_spans[-1][1]
+        
+    # only accept a match if it reaches 80% of the max score -> prevents false positives
+    max_score = len(quote) * aligner.match_score
+    score_fraction = best.score / max_score
+    if score_fraction > 0.8:
+        return start_idx, end_idx
+    else:
+        return -1, -1
 
 class AiLLM():
     """ This manages the communication between qualcoder, the vectorstore 
@@ -813,19 +849,14 @@ class AiLLM():
            'quote' in res_json and res_json['quote'] != '':  # found something
             # Adjust quote_start
             doc = {}
-            doc['metadata'] = chunk.metadata
-                       
-            # search quote with not more than 30% mismatch (Levenshtein Distance).
-            # This is done because the AI sometimes alters the text a little bit.
-            quote_found = fuzzysearch.find_near_matches(res_json['quote'], chunk.page_content, 
-                             max_l_dist=round(len(res_json['quote']) * 0.3))  # result: list [Match(start=x, end=x, dist=x, matched='txt')]
-            if len(quote_found) > 0:
-                doc['quote_start'] = quote_found[0].start + doc['metadata']['start_index']
-                doc['quote'] = quote_found[0].matched
+            doc['metadata'] = chunk.metadata          
+            quote_start, quote_end = ai_quote_search(res_json['quote'], chunk.page_content)
+            if quote_start > -1 < quote_end:
+                doc['quote_start'] = quote_start + doc['metadata']['start_index']
+                doc['quote'] = chunk.page_content[quote_start:quote_end]
             else:  # quote not found, make the whole chunk the quote
                 doc['quote_start'] = doc['metadata']['start_index']
-                doc['quote'] = chunk.page_content
-        
+                doc['quote'] = chunk.page_content        
             doc['interpretation'] = res_json['interpretation']
         else:  # No quote means the AI discarded this chunk as not relevant
             doc = None

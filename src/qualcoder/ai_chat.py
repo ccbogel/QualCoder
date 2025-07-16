@@ -40,14 +40,13 @@ import os
 import sqlite3
 import webbrowser
 import re
-import fuzzysearch
 
 from .ai_search_dialog import DialogAiSearch
 from .GUI.ui_ai_chat import Ui_Dialog_ai_chat
 from .helpers import Message
 from .confirm_delete import DialogConfirmDelete
 from .ai_prompts import PromptItem
-from .ai_llm import extract_ai_memo
+from .ai_llm import extract_ai_memo, ai_quote_search
 from .error_dlg import qt_exception_hook
 from .html_parser import html_to_text
 
@@ -691,8 +690,8 @@ data collected. This information will accompany every prompt sent to the AI, res
             f'Be sure to include references to the original data, using this format '
             'definition: `[REF: "{The text from the original data that you want to reference. '
             'I have to match this against the original, so it is very important that you don\'t '
-            'change the quoted text in any way. Do not translate or correct errors, do not '
-            'leave parts of the text out. Create a new reference for every single quote.}"]`. \n'
+            'change the quoted text in any way. Do not translate or correct errors. Create a '
+            'new reference for every single quote.}"]`. \n'
             'These references are invisible text. If you want a direct quote to be '
             'visible to the user, include it in the normal text and add an additional reference '
             'in the above format.\n'
@@ -856,6 +855,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             finally:
                 if scroll_to_bottom:
                     self.ai_output_scroll_to_bottom()
+                    self.ui.plainTextEdit_question.setFocus()
                 else:
                     self.ui.scrollArea_ai_output.verticalScrollBar().setValue(0)
                 self.is_updating_chat_window = False
@@ -869,21 +869,21 @@ data collected. This information will accompany every prompt sent to the AI, res
             # we are not in text analysis chat
             return text
                 
-        pattern = r'\[REF: ([\"\'“”„‘’«»])(.+?)([\"\'“”„‘’«»])\]'      
+        pattern = r'\[REF: ([\"\'“”„‘’«»])(.+?)([\"\'“”„‘’«»])\]'  
+        fulltext = self.app.get_text_fulltext(self.ai_text_doc_id)    
         
         # Replacement function
         def replace_match(match):
             if streaming:
                 return f'({self.ai_text_doc_name})'
             quote = match.group(2)
-            # search quote with not more than 10% mismatch (Levenshtein Distance). This is done because the AI sometimes alters the text a little bit.
-            quote_found = fuzzysearch.find_near_matches(quote, self.ai_text_text, 
-                             max_l_dist=round(len(quote) * 0.1))  # result: list [Match(start=x, end=x, dist=x, matched='txt')]
-            if len(quote_found) > 0:
-                quote_start = quote_found[0].start + self.ai_text_start_pos
-                quote = quote_found[0].matched
-                fulltext = self.app.get_text_fulltext(self.ai_text_doc_id)
-                line_start, line_end = self.app.get_line_numbers(fulltext, quote_start, quote_start + len(quote))
+            
+            quote_start, quote_end = ai_quote_search(quote, self.ai_text_text)
+            if quote_start > -1 < quote_end:
+                quote = self.ai_text_text[quote_start:quote_end]
+                quote_start += self.ai_text_start_pos
+                quote_end += self.ai_text_start_pos
+                line_start, line_end = self.app.get_line_numbers(fulltext, quote_start, quote_end)
                 if line_start + line_end > 0:
                     if line_start == line_end:  # one line
                         a = f'(<a href="quote:{self.ai_text_doc_id}_{quote_start}_{len(quote)}">{self.ai_text_doc_name}: {line_start}</a>)'

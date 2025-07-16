@@ -21,7 +21,7 @@ langchain-openai>=0.1.16
 langchain-text-splitters>=0.2.2 
 faiss-cpu
 sentence-transformers 
-fuzzysearch 
+Bio
 PyYAML 
 json_repair
 pyinstaller<=6.4.0 
