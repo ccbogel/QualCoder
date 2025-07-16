@@ -29,8 +29,6 @@ from random import randint
 import re
 import shutil
 import sqlite3
-import sys
-import traceback
 import uuid
 import xml.etree.ElementTree as etree
 import zipfile
@@ -134,7 +132,7 @@ class RefiImport:
         root = tree.getroot()
         # Look for the Codes tag, which contains each Code element
         for child in root:
-            #print("CB:", child, "tag:", child.tag)  # 1 only , Codes
+            # print("CB:", child, "tag:", child.tag)  # 1 only , Codes
             if child.tag in ("{urn:QDA-XML:codebook:1.0}Codes", "{urn:QDA-XML:project:1.0}Codes"):
                 counter = 0
                 code_elements = list(child)  # list of children of child element
@@ -323,7 +321,12 @@ class RefiImport:
         for i in contents:
             if i == "sources":
                 self.sources_name = "/sources"
-        num_sources = len(os.listdir(self.folder_name + self.sources_name))
+        # Not all sources are in a sub-folder of the qpdx.
+        try:
+            num_sources = len(os.listdir(self.folder_name + self.sources_name))
+        except FileNotFoundError:
+            # Some sources may be relative - in another folder alongside the qpdx folder.
+            num_sources = 1
         self.pd = QtWidgets.QProgressDialog(_("Project Import"), "", 0, num_sources, None)
         self.pd.setWindowModality(QtCore.Qt.WindowModality.WindowModal)
         self.pd_value = 0
@@ -438,7 +441,7 @@ class RefiImport:
         """
 
         for el in list(element):
-            #print("LINK TAG", el.tag, "GUID", el.get("guid"), "origin", el.get("originGUID"), "target", el.get("targetGUID"))
+            # print("LINK TAG", el.tag, "GUID", el.get("guid"), "origin", el.get("originGUID"), "target", el.get("targetGUID"))
             link = {"GUID": el.get("guid"), "originGUID": el.get("originGUID"), "targetGUID": el.get("targetGUID")}
             self.links.append(link)
 
@@ -463,7 +466,7 @@ class RefiImport:
                     with open(source_path, encoding='utf-8', errors='replace') as f:
                         fulltext = f.read()
                         for lnk in self.links:
-                            #print(lnk['originGUID'], " link --- note", note_guid)
+                            # print(lnk['originGUID'], " link --- note", note_guid)
                             if note_guid == lnk['originGUID']:
                                 lnk['text'] = fulltext
                 except Exception as err:
@@ -788,8 +791,9 @@ class RefiImport:
     def name_creating_user_create_date_source_path_helper(self, element):
         """ Helper method to obtain name, guid, creating user, create date, path type from each source.
          The sources folder can be named: sources or Sources
-         MAXQDA uses sources, NVIVO uses Sources
-         param:
+         MAXQDA uses sources, NVIVO uses Sources.
+
+         Args:
             element: xml element
         """
 
@@ -833,7 +837,10 @@ class RefiImport:
                 rich_text_path = self.folder_name + self.sources_name + element.get("richTextPath").split('internal:/')[1]
             path_type = "internal"
         if path_ is not None and path_.find("relative://") == 0:
+            # print("RELATIVE PATH: ", path_)
+            # print("BASE PATH: ", self.base_path)
             source_path = self.base_path + path_.split('relative://')[1]
+            # print("SOURCE PATH: ", source_path)
             path_type = "relative"
         if path_ is not None and path_.find("absolute://") == 0:
             source_path = path_.split('absolute://')[1]
@@ -844,9 +851,9 @@ class RefiImport:
         """ Load this picture source.
          Load the description and codings into sqlite.
          Can manage internal and absolute source paths.
-         TODO relative import path
+        Relative path sources are imported into the project folder
 
-        Params:
+        Args:
             element: PictureSource element object
          """
 
@@ -865,9 +872,15 @@ class RefiImport:
         if path_type == "absolute":
             media_path = "images:" + source_path
         if path_type == "relative":
-            # TODO check this works
-            media_path = "images:" + self.base_path + source_path
-            print("relative path", source_path, media_path)
+            media_path = f"/images/{name}"
+            # Copy file into .qda audio folder and rename into original name
+            destination = os.path.join(self.app.project_path, "images", name)
+            try:
+                shutil.copyfile(source_path, destination)
+            except (FileNotFoundError, PermissionError, shutil.SameFileError) as err:
+                self.parent_textedit.append(
+                    _('Cannot copy image file from: ') + f"{source_path}\nto: {destination}\n{err}")
+
         memo = ""
         for el in list(element):
             if el.tag == "{urn:QDA-XML:project:1.0}Description":
@@ -940,9 +953,9 @@ class RefiImport:
         """ Load audio source into .
         Load the description and codings into sqlite.
         Can manage internal and absolute source paths.
-        TODO test relative path
+        Relative path sources are imported into the project folder
 
-        Params:
+        Args:
             element: AudioSource element object
         """
 
@@ -961,10 +974,14 @@ class RefiImport:
         if path_type == "absolute":
             media_path = "audio:" + source_path
         if path_type == "relative":
-            # TODO check relative import works
-            media_path = f"audio:{self.base_path}{source_path}"
-            # print(source_path, media_path)
-
+            media_path = f"/audio/{name}"
+            # Copy file into .qda audio folder and rename into original name
+            destination = os.path.join(self.app.project_path, "audio", name)
+            try:
+                shutil.copyfile(source_path, destination)
+            except (FileNotFoundError, PermissionError, shutil.SameFileError) as err:
+                self.parent_textedit.append(
+                    _('Cannot copy Audio file from: ') + f"{source_path}\nto: {destination}\n{err}")
         memo = ""
         for el in list(element):
             if el.tag == "{urn:QDA-XML:project:1.0}Description":
@@ -988,7 +1005,7 @@ class RefiImport:
             # Create an empty transcription file
             now_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             txt_name = name + ".txt"
-            cur.execute('insert into source(name,fulltext,mediapath,memo,owner,date) values(?,"","","",?,?)',
+            cur.execute('insert into source(name,fulltext,mediapath,memo,owner,date) values(?,"",null,"",?,?)',
                         (txt_name, creating_user, now_date))
             self.app.conn.commit()
         # Parse AudioSelection and VariableValue elements to load codings and variables
@@ -1002,9 +1019,9 @@ class RefiImport:
         """ Load this video source into .
         Load the description and codings into sqlite.
         Can manage internal and absolute source paths.
-        TODO relative paths to be tested
+        Relative path sources are imported into the project folder
 
-        Params:
+        Args:
             element: VideoSource element object
         """
 
@@ -1023,9 +1040,15 @@ class RefiImport:
         if path_type == "absolute":
             media_path = f"video:{source_path}"
         if path_type == "relative":
-            # TODO check relative import works
-            media_path = "video:" + self.base_path + source_path
-            # print(source_path, media_path)
+            media_path = f"/video/{name}"
+            # Copy file into .qda video folder and rename into original name
+            destination = os.path.join(self.app.project_path, "video", name)
+            try:
+                shutil.copyfile(source_path, destination)
+            except (FileNotFoundError, PermissionError, shutil.SameFileError) as err:
+                self.parent_textedit.append(
+                    _('Cannot copy Video file from: ') + f"{source_path}\nto: {destination}\n{err}")
+
         memo = ""
         for el in list(element):
             if el.tag == "{urn:QDA-XML:project:1.0}Description":
@@ -1049,7 +1072,7 @@ class RefiImport:
             # Create an empty transcription file
             now_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             txt_name = f"{name}.transcribed"
-            cur.execute('insert into source(name,fulltext,mediapath,memo,owner,date) values(?,"","","",?,?)',
+            cur.execute('insert into source(name,fulltext,mediapath,memo,owner,date) values(?,"",null,"",?,?)',
                         (txt_name, creating_user, now_date))
             self.app.conn.commit()
 
@@ -1281,9 +1304,9 @@ class RefiImport:
     def load_pdf_source(self, element):
         """ Load the pdf and text representation into sqlite.
         Can manage internal and absolute source paths.
-        TODO test relative path
+        Relative path sources are imported into the project folder
 
-        Params:
+        Args:
             element: PDFSource element object
         """
 
@@ -1292,13 +1315,12 @@ class RefiImport:
         # pdf suffix may need to be added on
         if name.lower()[-4:] != ".pdf":
             name += ".pdf"
-        #print("source path: ", source_path)
-        #print("name: ", name)
+        # print("source path: ", source_path, "name: ", name)
         media_path = f"/docs/{name}"  # Default
         if path_type == "internal":
             # Copy file into .qda documents folder and rename into original name
             destination = os.path.join(self.app.project_path, "documents", name)
-            #print("destination: ", destination)
+            # print("destination: ", destination)
             try:
                 shutil.copyfile(source_path, destination)
                 # print("PDF IMPORT", source_path, destination)
@@ -1308,8 +1330,15 @@ class RefiImport:
         if path_type == "absolute":
             media_path = f"docs:{source_path}"
         if path_type == "relative":
-            media_path = f"docs:{self.base_path}{source_path}"
-            # print(source_path, media_path)
+            media_path = f"/docs/{name}"
+            # Copy file into .qda documents folder and rename into original name
+            destination = os.path.join(self.app.project_path, "documents", name)
+            try:
+                shutil.copyfile(source_path, destination)
+            except (FileNotFoundError, PermissionError, shutil.SameFileError) as err:
+                self.parent_textedit.append(
+                    _('Cannot copy PDF file from: ') + f"{source_path}\nto: {destination}\n{err}")
+
         """ The PDF source contains a text representation:
         <Representation plainTextPath="internal://142EB46D‐612E‐4593‐A385‐D0E5D04D1288.txt"
         modifyingUser="AD68FBE7‐E1EE‐4A82‐A279‐23CC698C89EB" modifiedDateTime="2018‐03‐27T18:01:07Z"
@@ -1334,12 +1363,13 @@ class RefiImport:
 
     def load_text_source(self, element, pdf_rep_name="", pdf_rep_date="", mediapath=None):
         """ Load this text source into sqlite.
-         Add the description and the text codings.
-         When testing with Windows Nvivo export: import from docx or txt
-         The text may need an additional line-ending character for Windows: \r\n
-        Can manage internal and absolute source paths.
+        Add the description and the text codings.
+        When testing with Windows Nvivo export: import from docx or txt
+        The text may need an additional line-ending character for Windows: \r\n
+        Can import internal and absolute source paths.
+        Relative path sources are imported into the project folder
 
-        Params:
+        Args:
         :name element: TextSource element object
         :type element: etree element
         :name pdf_rep_name: Name of the PDF file
@@ -1350,7 +1380,6 @@ class RefiImport:
         :type mediapath: String
          """
 
-        # TODO absolute and relative - not tested relative
         name, creating_user, create_date, source_path, path_type, rich_text_path = \
             self.name_creating_user_create_date_source_path_helper(element)
         for s in self.sources:
@@ -1421,11 +1450,21 @@ class RefiImport:
             logger.warning(str(err))
             self.parent_textedit.append(_("Cannot read from TextSource: ") + f"{source_path}\n{err}")
 
+        if path_type == "relative":
+            media_path = f"/docs/{name}"
+            # Copy file into .qda documents folder and rename into original name
+            destination = os.path.join(self.app.project_path, "documents", name)
+            try:
+                shutil.copyfile(source_path, destination)
+            except (FileNotFoundError, PermissionError, shutil.SameFileError) as err:
+                self.parent_textedit.append(
+                    _('Cannot copy text file from: ') + f"{source_path}\nto: {destination}\n{err}")
+
         if path_type == "internal":
             # Copy file into .qda documents folder and rename into original name
             destination = f"{self.app.project_path}/documents/{name}.{source_path.split('.')[-1]}"
-            #print("source", source_path)
-            #print("dest", destination)
+            # print("source", source_path)
+            # print("dest", destination)
             try:
                 shutil.copyfile(source_path, destination)
             except Exception as err:
@@ -1435,8 +1474,8 @@ class RefiImport:
             # If present, copy rich text file into .qda documents folder and rename into original name
             if rich_text_path != "":
                 rtf_destination = f"{self.app.project_path}/documents/{name}.{rich_text_path.split('.')[-1]}"
-                #print("rtf source", rich_text_path)
-                #print("dest", rtf_destination)
+                # print("rtf source", rich_text_path)
+                # print("dest", rtf_destination)
                 cur.execute("update source set mediapath=? where id=?", [f"/docs/{name}.{rich_text_path.split('.')[-1]}",
                                                                          source['id']])
                 self.app.conn.commit()
@@ -1618,7 +1657,7 @@ class RefiImport:
         cur = self.app.conn.cursor()
         journal_count = 0
         for el in list(notes_element):
-            #print("Notes xml\n", el.tag, el.get("name"), el.get("plainTextPath"), el.get("guid"))
+            # print("Notes xml\n", el.tag, el.get("name"), el.get("plainTextPath"), el.get("guid"))
             name = el.get("name")
             create_date = el.get("creationDateTime")
             if create_date is None:
@@ -1809,12 +1848,16 @@ class RefiImport:
 
     def parse_project_tag(self, element):
         """ Parse the Project tag.
-        Interested in basePath for relative linked sources.
-         software name for ATLAS.ti for line endings issue where txt source is \r\n but within ATLAS it is just \n """
+        basePath used for relative linked sources.
+        Ifthe is not basePath element - create  on relative to the QPDX folder - at least - for ATLAS.ti
+        Software name for ATLAS.ti for line endings issue where txt source is \r\n but within ATLAS it is just \n """
         self.base_path = element.get("basePath")
-        # print("BASEPATH ", self.base_path, type(self.base_path))  # tmp
+        # print("BASEPATH ", self.base_path)
         self.software_name = element.get("origin")
-        # print("SOFTWARE NAME: ", self.software_name)
+        self.parent_textedit.append(f"QDPX created with: {self.software_name}")
+        if self.base_path is None and "ATLAS" in self.software_name.upper():  # Create relative path to the QDPX folder
+            # self.folder name is: qpdx_project_name._temporary
+            self.base_path = self.folder_name[: -11] + " Media"  # Remove ._temporary, and add Media
 
     def parse_users(self, element):
         """ Parse Users element children, fill list with guid and name.
@@ -1951,11 +1994,11 @@ class RefiExport(QtWidgets.QDialog):
             add_line_ending_for_maxqda = True
         txt_errors = ""
         for s in self.sources:
-            #print(s['id'], s['name'], s['mediapath'], s['filename'], s['plaintext_filename'], s['external'])
+            # print(s['id'], s['name'], s['mediapath'], s['filename'], s['plaintext_filename'], s['external'])
             destination = f"/Sources/{s['filename']}"
             if s['mediapath'] is not None and s['mediapath'] != "" and s['external'] is None:
-                #print("Source\n", self.app.project_path + s['mediapath'].replace("/docs/", "/documents/"))
-                #print("dest\n", prep_path + destination)
+                # print("Source\n", self.app.project_path + s['mediapath'].replace("/docs/", "/documents/"))
+                # print("dest\n", prep_path + destination)
                 try:
                     shutil.copyfile(self.app.project_path + s['mediapath'].replace("/docs/", "/documents/"),
                                 prep_path + destination)
@@ -1996,11 +2039,11 @@ class RefiExport(QtWidgets.QDialog):
         # Clear any existing, identically named .zip and .qdpx files. Avoids File Exists error
         try:
             os.remove(f"{prep_path}.zip")
-        except FileNotFoundError as err:
+        except FileNotFoundError:
             pass
         try:
             os.remove(f"{prep_path}.qdpx")
-        except FileNotFoundError as err:
+        except FileNotFoundError:
             pass
 
         # Create the zip, and rename suffix to .qdpx
