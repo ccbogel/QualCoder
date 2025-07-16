@@ -30,6 +30,7 @@ from PyQt6 import QtCore, QtWidgets, QtGui
 
 from .GUI.ui_dialog_report_file_summary import Ui_Dialog_file_summary
 from .helpers import file_typer, msecs_to_hours_mins_secs
+from .simple_wordcloud import stopwords as cloud_stopwords
 
 # If VLC not installed, it will not crash
 vlc = None
@@ -422,6 +423,24 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         if fulltext is None:
             fulltext = ""
         text_ += _("Characters: ") + f"{len(fulltext):,d}\n"
+
+        # Get stopwords from user created list or default to simple_wordcloud stopwords
+        stopwords_file_path = os.path.join(os.path.expanduser('~'), ".qualcoder", "stopwords.txt")
+        user_created_stopwords = []
+        try:
+            # Can get UnicodeDecode Error on Windows so using error handler
+            with open(stopwords_file_path, "r", encoding="utf-8", errors="backslashreplace") as stopwords_file:
+                while 1:
+                    stopword = stopwords_file.readline()
+                    if stopword[0:6] == "\ufeff":  # Associated with notepad files
+                        stopword = stopword[6:]
+                    if not stopword:
+                        break
+                    user_created_stopwords.append(stopword.strip())  # Remove line ending
+            stopwords = user_created_stopwords
+        except FileNotFoundError as err:
+            stopwords = cloud_stopwords
+
         # Remove punctuation. Convert to lower case
         chars = ""
         for c in range(0, len(fulltext)):
@@ -430,8 +449,18 @@ class DialogReportFileSummary(QtWidgets.QDialog):
             else:
                 chars += " "
         chars = chars.lower()
-        word_list = chars.split()
+        word_list_with_stopwords = chars.split()
+        word_list = []
+        for word in word_list_with_stopwords:
+            if word not in stopwords:
+                word_list.append(word)
+
+
+
+
+
         msg = _("Word calculations: Words use alphabet characters and include the apostrophe. All other characters are word separators")
+        msg += _( " Excludes English Stopwords")
         text_ += f"\n{msg}\n"
         text_ += "\n" + _("Words: ") + f"{len(word_list):,d}\n"
         # Word frequency

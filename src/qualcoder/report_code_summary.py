@@ -31,7 +31,7 @@ from PyQt6.QtCore import Qt
 
 from .GUI.ui_dialog_report_code_summary import Ui_Dialog_code_summary
 from .color_selector import TextColor
-from .simple_wordcloud import stopwords
+from .simple_wordcloud import stopwords as cloud_stopwords
 
 # If VLC not installed, it will not crash
 vlc = None
@@ -330,6 +330,23 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         avg_chars = total_chars / len(text_res)
         text += _("Total characters: ") + f"{total_chars:,d}"
         text += "  " + _("Average characters: ") + f"{int(avg_chars)}\n"
+
+        # Get stopwords from user created list or default to simple_wordcloud stopwords
+        stopwords_file_path = os.path.join(os.path.expanduser('~'), ".qualcoder", "stopwords.txt")
+        user_created_stopwords = []
+        try:
+            # Can get UnicodeDecode Error on Windows so using error handler
+            with open(stopwords_file_path, "r", encoding="utf-8", errors="backslashreplace") as stopwords_file:
+                while 1:
+                    stopword = stopwords_file.readline()
+                    if stopword[0:6] == "\ufeff":  # Associated with notepad files
+                        stopword = stopword[6:]
+                    if not stopword:
+                        break
+                    user_created_stopwords.append(stopword.strip())  # Remove line ending
+            stopwords = user_created_stopwords
+        except FileNotFoundError as err:
+            stopwords = cloud_stopwords
 
         # Remove punctuation. Convert to lower case
         chars = ""
