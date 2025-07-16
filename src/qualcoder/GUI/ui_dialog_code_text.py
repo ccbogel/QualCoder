@@ -160,7 +160,7 @@ class Ui_Dialog_code_text(object):
         self.pushButton_right_side_pane.setText("")
         self.pushButton_right_side_pane.setObjectName("pushButton_right_side_pane")
         self.checkBox_auto_regex = QtWidgets.QCheckBox(parent=self.groupBox)
-        self.checkBox_auto_regex.setGeometry(QtCore.QRect(651, 5, 81, 20))
+        self.checkBox_auto_regex.setGeometry(QtCore.QRect(651, 5, 111, 20))
         self.checkBox_auto_regex.setObjectName("checkBox_auto_regex")
         self.verticalLayout.addWidget(self.groupBox)
         self.groupBox_edit_mode = QtWidgets.QGroupBox(parent=Dialog_code_text)
