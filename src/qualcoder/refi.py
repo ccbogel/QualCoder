@@ -1019,7 +1019,6 @@ class RefiImport:
                 self.parse_transcript_with_codings_and_syncpoints(name, id_, el)
                 break  # Get one transcript only
         if no_transcript:
-            print("NO TRANScript!!!!")
             # Create an empty transcription file
             now_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             txt_name = name + ".txt"
@@ -1200,8 +1199,8 @@ class RefiImport:
                     memo += el.text
         transcript_filename = f"{av_name}.txt"
         cur = self.app.conn.cursor()
-        sql = "insert into source (name, fulltext, mediapath, memo, owner, date, av_text_id) values (?,?,?,?,?,?,?)"
-        cur.execute(sql, [transcript_filename, text, None, memo, creating_user, create_date, av_id])
+        sql = "insert into source (name, fulltext, mediapath, memo, owner, date) values (?,?,?,?,?,?)"
+        cur.execute(sql, [transcript_filename, text, None, memo, creating_user, create_date])
         self.app.conn.commit()
         cur.execute("select last_insert_rowid()")
         fid = cur.fetchone()[0]
