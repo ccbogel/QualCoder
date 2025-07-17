@@ -1066,6 +1066,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             cur.execute(sql)
         result = cur.fetchall()
         for row in result:
+            print("ROW:\n", row)
             icon, metadata = self.get_icon_and_metadata(row[1])
             self.source.append({'name': row[0], 'id': row[1], 'fulltext': row[2],
                                 'mediapath': row[3], 'memo': row[4], 'owner': row[5], 'date': row[6],
@@ -1096,8 +1097,6 @@ class DialogManageFiles(QtWidgets.QDialog):
                     if att_name == "Ref_authors":
                         tmp = tmp.replace(";", "\n")
                     s['attributes'].append(tmp)
-        # Get reference for file, Vancouver and APA style
-        # TODO
         self.fill_table()
 
     def get_icon_and_metadata(self, id_):
@@ -1112,12 +1111,13 @@ class DialogManageFiles(QtWidgets.QDialog):
         res = cur.fetchone()
         metadata = res[0] + "\n"
         icon = QtGui.QIcon(qta.icon('mdi6.text-box-outline', options=[{'scale_factor': 1.2}]))
+
         # Check if text file is a transcription and add details
-        cur.execute("select name from source where av_text_id=?", [id_])
+        cur.execute("select name, fulltext from source where av_text_id=?", [id_])
         transcript_res = cur.fetchone()
         if transcript_res is not None:
             metadata += _("Transcript for: ") + f"{transcript_res[0]}\n"
-            metadata += _("Characters: ") + str(len(res[1]))
+            metadata += _("Characters: ") + str(len(transcript_res[1]))
             icon = QtGui.QIcon(qta.icon('mdi6.text', options=[{'scale_factor': 1.2}]))
         if res[1] is not None and len(res[1]) > 0 and res[2] is None:
             metadata += _("Characters: ") + str(len(res[1]))
@@ -1185,11 +1185,11 @@ class DialogManageFiles(QtWidgets.QDialog):
                     media.parse()
                     msecs = media.get_duration()
                     duration_txt = msecs_to_hours_mins_secs(msecs)
-                    metadata += _("Duration: ") + duration_txt
+                    metadata += " " + _("Duration: ") + duration_txt
                     return icon, metadata
                 except AttributeError as err:
                     logger.warning(str(err))
-                    metadata += _("Cannot locate media. ") + abs_path + "\n" + str(err)
+                    metadata += _("Cannot locate media. ") + f"{abs_path}\n{err}"
                     return icon, metadata
             else:
                 metadata += _("Cannot get media duration.\nVLC not installed.")
