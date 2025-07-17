@@ -134,6 +134,8 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.ui.pushButton_display_save.clicked.connect(self.table_display_save)
         self.ui.pushButton_display_load.setIcon(qta.icon('mdi6.text-account', options=[{'scale_factor': 1.2}]))
         self.ui.pushButton_display_load.clicked.connect(self.table_display_load)
+        self.ui.pushButton_display_delete.setIcon(qta.icon('mdi6.table-minus', options=[{'scale_factor': 1.2}]))
+        self.ui.pushButton_display_delete.clicked.connect(self.table_display_delete)
 
         self.ui.pushButton_bulk_rename.setIcon(qta.icon('mdi6.file-multiple-outline', options=[{'scale_factor': 1.2}]))
         self.ui.pushButton_bulk_rename.clicked.connect(self.bulk_rename_database_entry)
@@ -204,7 +206,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         cur.execute("select name, tblrows,tblcolumns, owner from manage_files_display order by upper(name)")
         res = cur.fetchall()
         if not res:
-            Message(self.app, _("Nothing saved"), _("No saved table dislpays")).exec()
+            Message(self.app, _("Nothing saved"), _("No saved table displays")).exec()
             return
         keys = 'name', 'tblrows', 'tblcolumns', 'owner'
         displays = []
@@ -272,8 +274,27 @@ class DialogManageFiles(QtWidgets.QDialog):
                     self.ui.tableWidget.setRowHidden(r, True)
         self.ui.pushButton_display_load.setToolTip(msg)
 
-    def table_display_delete(self):  # TODO
-        pass
+    def table_display_delete(self):
+        """ Delete stored table displays """
+
+        cur = self.app.conn.cursor()
+        cur.execute("select name, tblrows,tblcolumns, owner from manage_files_display order by upper(name)")
+        res = cur.fetchall()
+        if not res:
+            Message(self.app, _("Nothing saved"), _("No saved table displays")).exec()
+            return
+        keys = 'name', 'tblrows', 'tblcolumns', 'owner'
+        displays = []
+        for row in res:
+            displays.append(dict(zip(keys, row)))
+        ui = DialogSelectItems(self.app, displays, _("Delete table display"), "single")
+        ok = ui.exec()
+        if not ok:
+            return
+        selection = ui.get_selected()
+        cur.execute("delete from manage_files_display where name=?", [selection['name']])
+        self.app.conn.commit()
+        Message(self.app, _("Deleted display"), selection['name']).exec()
 
     def keyPressEvent(self, event):
         """ Used to activate buttons.
@@ -1066,7 +1087,6 @@ class DialogManageFiles(QtWidgets.QDialog):
             cur.execute(sql)
         result = cur.fetchall()
         for row in result:
-            print("ROW:\n", row)
             icon, metadata = self.get_icon_and_metadata(row[1])
             self.source.append({'name': row[0], 'id': row[1], 'fulltext': row[2],
                                 'mediapath': row[3], 'memo': row[4], 'owner': row[5], 'date': row[6],
@@ -1113,11 +1133,10 @@ class DialogManageFiles(QtWidgets.QDialog):
         icon = QtGui.QIcon(qta.icon('mdi6.text-box-outline', options=[{'scale_factor': 1.2}]))
 
         # Check if text file is a transcription and add details
-        cur.execute("select name, fulltext from source where av_text_id=?", [id_])
+        cur.execute("select name from source where av_text_id=?", [id_])
         transcript_res = cur.fetchone()
         if transcript_res is not None:
             metadata += _("Transcript for: ") + f"{transcript_res[0]}\n"
-            metadata += _("Characters: ") + str(len(transcript_res[1]))
             icon = QtGui.QIcon(qta.icon('mdi6.text', options=[{'scale_factor': 1.2}]))
         if res[1] is not None and len(res[1]) > 0 and res[2] is None:
             metadata += _("Characters: ") + str(len(res[1]))
