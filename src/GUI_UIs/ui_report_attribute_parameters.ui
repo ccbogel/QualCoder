@@ -157,6 +157,22 @@ Wildcards for 'like' are % and _</string>
        <bool>true</bool>
       </property>
      </widget>
+     <widget class="QPushButton" name="pushButton_delete_filter">
+      <property name="geometry">
+       <rect>
+        <x>590</x>
+        <y>10</y>
+        <width>30</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Delete saved filter settings</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
     </widget>
    </item>
    <item>
