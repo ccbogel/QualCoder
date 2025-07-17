@@ -50,7 +50,7 @@
      <widget class="QPushButton" name="pushButton_create">
       <property name="geometry">
        <rect>
-        <x>130</x>
+        <x>100</x>
         <y>3</y>
         <width>30</width>
         <height>30</height>
@@ -66,7 +66,7 @@
      <widget class="QPushButton" name="pushButton_export">
       <property name="geometry">
        <rect>
-        <x>330</x>
+        <x>390</x>
         <y>3</y>
         <width>30</width>
         <height>30</height>
@@ -84,7 +84,7 @@ Text files (from any source) are exported from the text stored in the database a
      <widget class="QPushButton" name="pushButton_delete">
       <property name="geometry">
        <rect>
-        <x>670</x>
+        <x>640</x>
         <y>3</y>
         <width>30</width>
         <height>30</height>
@@ -100,7 +100,7 @@ Text files (from any source) are exported from the text stored in the database a
      <widget class="QPushButton" name="pushButton_import">
       <property name="geometry">
        <rect>
-        <x>50</x>
+        <x>40</x>
         <y>3</y>
         <width>30</width>
         <height>30</height>
@@ -116,7 +116,7 @@ Text files (from any source) are exported from the text stored in the database a
      <widget class="QPushButton" name="pushButton_add_attribute">
       <property name="geometry">
        <rect>
-        <x>250</x>
+        <x>190</x>
         <y>3</y>
         <width>30</width>
         <height>30</height>
@@ -132,7 +132,7 @@ Text files (from any source) are exported from the text stored in the database a
      <widget class="QPushButton" name="pushButton_link">
       <property name="geometry">
        <rect>
-        <x>90</x>
+        <x>70</x>
         <y>3</y>
         <width>30</width>
         <height>30</height>
@@ -148,7 +148,7 @@ Text files (from any source) are exported from the text stored in the database a
      <widget class="QPushButton" name="pushButton_import_from_linked">
       <property name="geometry">
        <rect>
-        <x>170</x>
+        <x>130</x>
         <y>3</y>
         <width>30</width>
         <height>30</height>
@@ -164,7 +164,7 @@ Text files (from any source) are exported from the text stored in the database a
      <widget class="QPushButton" name="pushButton_export_to_linked">
       <property name="geometry">
        <rect>
-        <x>210</x>
+        <x>160</x>
         <y>3</y>
         <width>30</width>
         <height>30</height>
@@ -181,7 +181,7 @@ Cannot export text transcription file associated with an audio or video as a lin
      <widget class="QPushButton" name="pushButton_export_attributes">
       <property name="geometry">
        <rect>
-        <x>290</x>
+        <x>360</x>
         <y>3</y>
         <width>30</width>
         <height>30</height>
@@ -197,7 +197,7 @@ Cannot export text transcription file associated with an audio or video as a lin
      <widget class="QPushButton" name="pushButton_help">
       <property name="geometry">
        <rect>
-        <x>370</x>
+        <x>710</x>
         <y>3</y>
         <width>30</width>
         <height>30</height>
@@ -213,8 +213,8 @@ Cannot export text transcription file associated with an audio or video as a lin
      <widget class="QLabel" name="label_fcount">
       <property name="geometry">
        <rect>
-        <x>450</x>
-        <y>7</y>
+        <x>230</x>
+        <y>6</y>
         <width>121</width>
         <height>26</height>
        </rect>
@@ -229,7 +229,7 @@ Cannot export text transcription file associated with an audio or video as a lin
       </property>
       <property name="geometry">
        <rect>
-        <x>410</x>
+        <x>610</x>
         <y>3</y>
         <width>30</width>
         <height>30</height>
@@ -245,7 +245,7 @@ Cannot export text transcription file associated with an audio or video as a lin
      <widget class="QPushButton" name="pushButton_bulk_rename">
       <property name="geometry">
        <rect>
-        <x>700</x>
+        <x>580</x>
         <y>3</y>
         <width>30</width>
         <height>30</height>
@@ -261,7 +261,7 @@ Cannot export text transcription file associated with an audio or video as a lin
      <widget class="QPushButton" name="pushButton_display_save">
       <property name="geometry">
        <rect>
-        <x>610</x>
+        <x>480</x>
         <y>3</y>
         <width>30</width>
         <height>30</height>
@@ -277,7 +277,7 @@ Cannot export text transcription file associated with an audio or video as a lin
      <widget class="QPushButton" name="pushButton_display_load">
       <property name="geometry">
        <rect>
-        <x>580</x>
+        <x>450</x>
         <y>3</y>
         <width>30</width>
         <height>30</height>
@@ -285,6 +285,22 @@ Cannot export text transcription file associated with an audio or video as a lin
       </property>
       <property name="toolTip">
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Load saved table display setting.&lt;/p&gt;&lt;p&gt;(Hidden rows and columns and column sizing)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_display_delete">
+      <property name="geometry">
+       <rect>
+        <x>510</x>
+        <y>3</y>
+        <width>30</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Delete saved table display settings. </string>
       </property>
       <property name="text">
        <string/>
