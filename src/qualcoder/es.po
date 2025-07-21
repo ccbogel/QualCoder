@@ -73,12 +73,12 @@ msgstr "Codificador"
 #: __main__.py:1451 __main__.py:1505 __main__.py:1520 __main__.py:1585
 #: __main__.py:1635 __main__.py:1638 __main__.py:1594
 msgid "Font"
-msgstr "Font"
+msgstr "Fuente"
 
 #: __main__.py:1452 __main__.py:1506 __main__.py:1521 __main__.py:1586
 #: __main__.py:1636 __main__.py:1639 __main__.py:1595
 msgid "Tree font size"
-msgstr "El tamaño de la fuente del árbol"
+msgstr "Tamaño de fuente del árbol"
 
 #: __main__.py:1453 __main__.py:1507 __main__.py:1522 __main__.py:1587
 #: __main__.py:1637 __main__.py:1640 __main__.py:1596
@@ -98,12 +98,12 @@ msgstr "Idioma"
 #: __main__.py:1456 __main__.py:1510 __main__.py:1525 __main__.py:1590
 #: __main__.py:1640 __main__.py:1643 __main__.py:1599
 msgid "Timestamp format"
-msgstr "Formato de la marca de tiempo"
+msgstr "Formato de marca de tiempo"
 
 #: __main__.py:1457 __main__.py:1511 __main__.py:1526 __main__.py:1591
 #: __main__.py:1641 __main__.py:1644 __main__.py:1600
 msgid "Speaker name format"
-msgstr "Formato del nombre del orador"
+msgstr "Formato del nombre del interlocutor"
 
 #: __main__.py:1458 __main__.py:1512 __main__.py:1527 __main__.py:1592
 #: __main__.py:1642 __main__.py:1645 __main__.py:1601
@@ -619,7 +619,7 @@ msgstr "Última edición: "
 
 #: add_attribute.py:82 add_attribute.py:74
 msgid "This attribute name already exists in cases, files or journals."
-msgstr "Este nombre de atributo ya existe en casos, expedientes o diarios."
+msgstr "Este nombre de atributo ya existe en casos, archivos o diarios."
 
 #: add_attribute.py:83 add_attribute.py:75
 msgid "Or is reserved for bibliography attributes:"
@@ -1302,12 +1302,12 @@ msgstr "Seleccione los códigos"
 #, fuzzy
 #| msgid "view original text file"
 msgid "View original file"
-msgstr "ver el archivo de texto original"
+msgstr "Ver el archivo de texto original"
 
 #: code_pdf.py:306 code_pdf.py:251 code_pdf.py:245 code_pdf.py:252
 #: code_pdf.py:269
 msgid "QualCoder roughly displays PDFs."
-msgstr "QualCoder muestra los PDF de forma aproximada."
+msgstr "QualCoder muestra los PDFs de forma aproximada."
 
 #: code_pdf.py:307 code_pdf.py:252 code_pdf.py:246 code_pdf.py:253
 msgid ""
@@ -1462,7 +1462,7 @@ msgstr "No se han encontrado archivos coincidentes"
 #: report_codes_by_segments.py:329 report_relations.py:1000 view_av.py:505
 #: view_image.py:398 view_av.py:512 code_text.py:633
 msgid "Count"
-msgstr "Cuenta"
+msgstr "Conteo"
 
 #: code_pdf.py:804 code_text.py:929 code_text.py:865 code_pdf.py:729
 #: code_text.py:911 code_pdf.py:750 code_text.py:918 code_pdf.py:760
@@ -2093,7 +2093,7 @@ msgstr "Mostrar archivos por atributos"
 #: view_av.py:623 view_image.py:549 code_text.py:3046 code_pdf.py:2387
 #: view_av.py:689 view_image.py:639 view_av.py:696 code_text.py:3049
 msgid "Show case files"
-msgstr "Mostrar expedientes"
+msgstr "Mostrar archivos del caso"
 
 #: code_pdf.py:2328 code_text.py:2938 view_av.py:722 view_image.py:589
 #: code_text.py:2887 code_pdf.py:2250 view_av.py:667 view_image.py:553
@@ -2541,7 +2541,7 @@ msgstr "Categoría renombrada de: "
 #: code_text.py:2880 manage_files.py:280 code_text.py:2916 manage_files.py:285
 #: code_text.py:3039 manage_files.py:408 manage_files.py:411 code_text.py:3042
 msgid "view original text file"
-msgstr "ver el archivo de texto original"
+msgstr "Ver el archivo de texto original"
 
 #: code_text.py:2887 code_text.py:2836 code_text.py:2888 code_text.py:2924
 #: code_text.py:3048 code_text.py:3051
@@ -3578,7 +3578,7 @@ msgstr "Orden de tipo de archivo"
 #: manage_files.py:328 manage_files.py:294 manage_files.py:295
 #: manage_files.py:300 manage_files.py:423 manage_files.py:429
 msgid "Assign case to file"
-msgstr "Asignar caso a expediente"
+msgstr "Asignar caso a archivo"
 
 #: manage_files.py:333 manage_files.py:299 manage_files.py:300
 #: manage_files.py:305 manage_files.py:428 manage_files.py:434
@@ -4303,7 +4303,7 @@ msgstr ""
 #: refi.py:435 refi.py:428
 msgid "Graphs not imported as QualCoder does not have this functionality.\n"
 msgstr ""
-"Los gráficos no se importaron, ya que QualCoder no tiene esta "
+"Los Mapas ó Redes no se importaron, ya que QualCoder no tiene esta "
 "funcionalidad.\n"
 
 #: refi.py:436 refi.py:429
@@ -4335,7 +4335,7 @@ msgstr ""
 
 #: refi.py:440 refi.py:433
 msgid "REFI-QDA Project import"
-msgstr "Importación del proyecto REFI-QDA"
+msgstr "Importar proyecto REFI-QDA"
 
 #: refi.py:479 refi.py:472
 msgid "Cannot read text source from Note: "
@@ -4389,7 +4389,7 @@ msgstr ""
 
 #: refi.py:1576 refi.py:1571
 msgid " Positions:"
-msgstr " Puestos:"
+msgstr " Posiciones:"
 
 #: refi.py:1665 refi.py:1660
 msgid "Trying to read Note element: "
@@ -4405,7 +4405,7 @@ msgstr "Proyecto no exportado. Saliendo. "
 
 #: refi.py:2020 refi.py:2015 refi.py:2026
 msgid "REFI-QDA PROJECT EXPORT EXPERIMENTAL FUNCTION.\n"
-msgstr "REFI-QDA PROYECTO EXPORTACIÓN FUNCIÓN EXPERIMENTAL.\n"
+msgstr "FUNCIÓN EXPERIMENTAL DE EXPORTACIÓN DE PROYECTO REFI-QDA.\n"
 
 #: refi.py:2021 refi.py:2016 refi.py:2027
 msgid ""
@@ -4435,7 +4435,7 @@ msgstr "Medios A/V no encontrados"
 
 #: refi.py:2925 refi.py:2920 refi.py:2931
 msgid "VLC not installed, final end character timepoint will be inaccurate"
-msgstr "Si VLC no está instalado, la hora del carácter final será inexacta."
+msgstr "VLC no está instalado, el punto de tiempo final del carácter será inexacto."
 
 #: refi.py:2926 refi.py:2921 refi.py:2932
 msgid "VLC not found"
@@ -4573,7 +4573,7 @@ msgstr "Imagen: "
 #: report_file_summary.py:273 report_file_summary.py:326
 #: report_file_summary.py:467
 msgid "Count: "
-msgstr "Cuenta: "
+msgstr "Conteo: "
 
 #: report_code_summary.py:391 report_code_summary.py:389
 #: report_code_summary.py:382 report_code_summary.py:435
@@ -5434,19 +5434,19 @@ msgstr "Kappa: "
 #: report_compare_coder_file.py:402 report_compare_coder_file.py:412
 #: report_compare_coder_file.py:406 report_compare_coder_file.py:416
 msgid "Overlaps Coder: "
-msgstr "Codificador de solapamientos: "
+msgstr "Se superpone con codificador: "
 
 #: report_compare_coder_file.py:421 report_compare_coder_file.py:431
 #: report_compare_coder_file.py:406 report_compare_coder_file.py:416
 #: report_compare_coder_file.py:410 report_compare_coder_file.py:420
 msgid "No overlap"
-msgstr "No hay solapamiento"
+msgstr "Sin superposición"
 
 #: report_compare_coder_file.py:423 report_compare_coder_file.py:433
 #: report_compare_coder_file.py:408 report_compare_coder_file.py:418
 #: report_compare_coder_file.py:412 report_compare_coder_file.py:422
 msgid "Count of overlaps: "
-msgstr "Recuento de solapamientos: "
+msgstr "Conteo de superposiciones: "
 
 #: report_compare_coder_file.py:424 report_compare_coder_file.py:434
 #: report_compare_coder_file.py:572 report_compare_coder_file.py:582
@@ -5655,7 +5655,7 @@ msgstr "Duración: No se puede obtener. VLC no instalado."
 #: report_file_summary.py:271 report_file_summary.py:324
 #: report_file_summary.py:464
 msgid "CODE COUNTS:"
-msgstr "CÓDIGO CUENTA:"
+msgstr "CONTEO DE CÓDIGOS:"
 
 #: report_file_summary.py:292 report_file_summary.py:344
 #: report_file_summary.py:409 report_file_summary.py:465
@@ -6338,7 +6338,7 @@ msgstr "Cursiva"
 
 #: settings.py:129 settings.py:146 settings.py:148 settings.py:147
 msgid "Bigger"
-msgstr "Mayor"
+msgstr "Más grande"
 
 #: settings.py:219 settings.py:284 settings.py:358 settings.py:419
 msgid "Choose project directory"
@@ -6891,7 +6891,7 @@ msgstr "Seleccione el nombre que desea borrar"
 #: view_av.py:4246 view_av.py:4288 view_av.py:4292 view_av.py:4324
 #: view_av.py:4401 view_av.py:4486 view_av.py:4488
 msgid "Speaker name"
-msgstr "Nombre del orador"
+msgstr "Nombre del interlocutor"
 
 #: view_av.py:4247 view_av.py:4289 view_av.py:4293 view_av.py:4325
 #: view_av.py:4402 view_av.py:4487 view_av.py:4489
@@ -6901,7 +6901,7 @@ msgstr "Nombre:"
 #: view_charts.py:124 view_charts.py:142 view_charts.py:117 view_charts.py:135
 #: view_charts.py:115 view_charts.py:133
 msgid "Code frequency"
-msgstr "Frecuencia del código"
+msgstr "Frecuencia de códigos"
 
 #: view_charts.py:125 view_charts.py:143 view_charts.py:118 view_charts.py:136
 #: view_charts.py:116 view_charts.py:134
@@ -6920,35 +6920,35 @@ msgstr "Código por segmentos de audio/vídeo"
 
 #: view_charts.py:131 view_charts.py:124 view_charts.py:122
 msgid "Code frequency sunburst"
-msgstr "Diagrama Sunburst de frecuencia de códigos"
+msgstr "Sunburst: frecuencia de códigos"
 
 #: view_charts.py:132 view_charts.py:125 view_charts.py:123
 msgid "Code frequency treemap"
-msgstr "Mapa de frecuencias de códigos"
+msgstr "Treemap: frecuencias de códigos"
 
 #: view_charts.py:133 view_charts.py:126 view_charts.py:124
 msgid "Code by characters sunburst"
-msgstr "Código por caracteres sunburst"
+msgstr "Sunburst: Código por caracteres"
 
 #: view_charts.py:134 view_charts.py:127 view_charts.py:125
 msgid "Code by characters treemap"
-msgstr "Código por caracteres treemap"
+msgstr "Treemap: Código por caracteres"
 
 #: view_charts.py:135 view_charts.py:128 view_charts.py:126
 msgid "Code by image area sunburst"
-msgstr "Código por área de imagen sunburst"
+msgstr "Sunburst: Código por área de imagen"
 
 #: view_charts.py:136 view_charts.py:129 view_charts.py:127
 msgid "Code by image area treemap"
-msgstr "Código por área de imagen treemap"
+msgstr "Treemap: Código por área de imagen"
 
 #: view_charts.py:137 view_charts.py:130 view_charts.py:128
 msgid "Code by A/V sunburst"
-msgstr "Código de A/V sunburst"
+msgstr "Sunburst: Código de A/V"
 
 #: view_charts.py:138 view_charts.py:131 view_charts.py:129
 msgid "Code by A/V treemap"
-msgstr "Código por A/V treemap"
+msgstr "Treemap: Código por A/V"
 
 #: view_charts.py:153 view_charts.py:146 view_charts.py:147
 #, fuzzy
@@ -8547,7 +8547,7 @@ msgstr "Atributo añadido a los archivos:"
 #: report_codes.py:750 report_codes.py:748 report_codes.py:756
 #: report_codes.py:781 report_codes.py:782
 msgid "And file and case variables"
-msgstr "Y las variables file y case"
+msgstr "Y variables de archivo y de caso"
 
 #: report_codes.py:932 report_codes.py:930 report_codes.py:942
 #: report_codes.py:967 report_codes.py:968
@@ -8610,7 +8610,7 @@ msgstr " Archivos: "
 #: report_codes.py:1761 report_codes.py:1823 report_codes.py:1898
 #: report_codes.py:1762 report_codes.py:1824 report_codes.py:1899
 msgid "Count:"
-msgstr "Cuenta:"
+msgstr "Conteo:"
 
 #: report_codes.py:1727 report_codes.py:1789 report_codes.py:1865
 #: report_codes.py:1725 report_codes.py:1787 report_codes.py:1863
@@ -8633,7 +8633,7 @@ msgstr "Eliminar sección codificada."
 #: report_codes.py:2454 report_codes.py:2452 report_codes.py:2463
 #: report_codes.py:2561 report_codes.py:2573
 msgid "FILE MEMO:"
-msgstr "MEMORIA DE ARCHIVO:"
+msgstr "MEMO DE ARCHIVO:"
 
 #: report_codes.py:2462 report_codes.py:2460 report_codes.py:2471
 #: report_codes.py:2569 report_codes.py:2581
@@ -8668,7 +8668,7 @@ msgstr "TODOS los códigos seleccionados deben coincidir exactamente."
 
 #: report_exact_matches.py:407 report_exact_matches.py:459
 msgid "code name"
-msgstr "nombre en clave"
+msgstr "nombre del código"
 
 #: report_exact_matches.py:407 report_exact_matches.py:459
 msgid "text"
@@ -8695,11 +8695,11 @@ msgstr "Borrar todo"
 #: report_exact_matches.py:585 report_exact_matches.py:586
 #: report_exact_matches.py:655
 msgid "Exclude code"
-msgstr "Código de exclusión"
+msgstr "Excluir código"
 
 #: report_sql.py:138 report_sql.py:190
 msgid "No select query"
-msgstr "Ninguna consulta select"
+msgstr "Sin consulta seleccionada"
 
 #: report_sql.py:138 report_sql.py:190
 msgid "No data to export"
@@ -8798,7 +8798,7 @@ msgstr ""
 
 #: ai_chat.py:435 ai_chat.py:436 ai_chat.py:453
 msgid "Analyzing the free topic \"{}\" in the data."
-msgstr "Análisis del tema libre «{}» en los datos."
+msgstr "Analizando el tema libre «{}» en los datos."
 
 #: ai_chat.py:437 ai_chat.py:438 ai_chat.py:455
 msgid ""
@@ -9058,7 +9058,7 @@ msgstr "Esta configuración de visualización de tabla ya existe:"
 
 #: manage_files.py:205 report_attributes.py:148 manage_files.py:207
 msgid "Nothing saved"
-msgstr "Nada salvado"
+msgstr "Nada guardado"
 
 #: manage_files.py:205 manage_files.py:207
 msgid "No saved table dislpays"
@@ -9079,7 +9079,7 @@ msgstr "Columna oculta:"
 
 #: manage_files.py:244 manage_files.py:246
 msgid "Row settings:"
-msgstr "Configuración de filas::"
+msgstr "Configuración de filas:"
 
 #: manage_files.py:258 manage_files.py:260
 msgid "Table column not present"
@@ -9116,7 +9116,7 @@ msgstr "Guardar filtro"
 
 #: report_attributes.py:122
 msgid "No attribute filers selected"
-msgstr "No se han seleccionado declarantes de atributos"
+msgstr "No se seleccionaron filtros de atributos"
 
 #: report_attributes.py:125
 msgid "Save filter"
@@ -9195,7 +9195,7 @@ msgstr "Páginas"
 
 #: report_file_summary.py:402 report_file_summary.py:462
 msgid "CODE COUNT:"
-msgstr "CÓDIGO CUENTA:"
+msgstr "CONTEO DE CÓDIGOS:"
 
 #: reports.py:102
 msgid "File Attributes"
@@ -9215,7 +9215,7 @@ msgstr "Seleccione un modelo de IA «grande» y otro «rápido»."
 
 #: view_image.py:940
 msgid "Overlaps exactly with"
-msgstr "Se solapa exactamente con"
+msgstr "Se superpone exactamente con"
 
 #: __main__.py:658 __main__.py:660
 msgid ""
@@ -9233,7 +9233,7 @@ msgstr "No se puede cargar el archivo config.ini"
 
 #: view_av.py:1644
 msgid "Memo for Segment"
-msgstr "Nota para el segmento"
+msgstr "Memo para segmento"
 
 #: view_av.py:1767
 msgid "Screenshot saved"
@@ -9245,15 +9245,15 @@ msgstr "Captura de pantalla importada"
 
 #: view_av.py:3697 view_av.py:3699
 msgid "Export segment"
-msgstr "Segmento de exportación"
+msgstr "Exportar segmento"
 
 #: manage_files.py:414
 msgid "Pdf pages to images"
-msgstr "Páginas Pdf a imágenes"
+msgstr "Páginas PDF a imágenes"
 
 #: manage_files.py:623
 msgid "Image loaded from pdf: "
-msgstr "Imagen cargada desde pdf:"
+msgstr "Imagen cargada desde PDF:"
 
 #: view_av.py:1768
 msgid "Screenshot saved: "
