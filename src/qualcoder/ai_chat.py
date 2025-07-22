@@ -834,7 +834,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                     txt = self.app.ai.ai_streaming_output
                     txt = self.replace_references(txt, streaming=True)
                     txt = txt.replace('\n', '<br />')
-                    author = self.app.ai_models[int(self.app.settings['ai_model_index'])]['name'] + ' - ' + self.app.ai_models[int(self.app.settings['ai_model_index'])]['large_model']
+                    author = self.app.ai_models[int(self.app.settings['ai_model_index'])]['name']
                     if author is None or author == '':
                         author = 'unkown'
                     txt = f'<b>AI ({author}):</b><br />{txt}'                        
@@ -897,6 +897,13 @@ data collected. This information will accompany every prompt sent to the AI, res
             
         # Use re.sub with replacement function
         res = re.sub(pattern, replace_match, text)
+        
+        # If streaming, delete incomplete references at the end
+        if streaming:
+            incomplete = re.search(r'\[REF:[^\]]*$', res)
+            if incomplete:
+                res = res[:incomplete.start()].rstrip()
+        
         return res
             
     def chat_list_selection_changed(self, force_update=False):
@@ -1181,7 +1188,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             # create temporary db connection to make it thread safe
             db_conn = sqlite3.connect(self.chat_history_path)
             try: 
-                ai_model_name = self.app.ai_models[int(self.app.settings['ai_model_index'])]['name'] + ' - ' + self.app.ai_models[int(self.app.settings['ai_model_index'])]['large_model']
+                ai_model_name = self.app.ai_models[int(self.app.settings['ai_model_index'])]['name']
                 self.history_add_message(msg_type, ai_model_name, msg_content, chat_idx, db_conn)
                 self.ai_streaming_output = ''
                 self.update_chat_window()
@@ -1251,7 +1258,7 @@ data collected. This information will accompany every prompt sent to the AI, res
     def ai_error_callback(self, exception_type, value, tb_obj):
         """Called if the AI returns an error"""
         self.ai_streaming_output = ''
-        ai_model_name = self.app.ai_models[int(self.app.settings['ai_model_index'])]['name'] + ' - ' + self.app.ai_models[int(self.app.settings['ai_model_index'])]['large_model']
+        ai_model_name = self.app.ai_models[int(self.app.settings['ai_model_index'])]['name']
         msg = _('Error communicating with ' + ai_model_name + '\n')
         msg += exception_type.__name__ + ': ' + str(html_to_text(value))
         if hasattr(value, 'message'):
