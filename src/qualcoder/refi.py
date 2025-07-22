@@ -25,6 +25,7 @@ import html
 import logging
 from operator import itemgetter
 import os
+import pathlib
 from random import randint
 import re
 import shutil
@@ -798,6 +799,21 @@ class RefiImport:
         """
 
         name = element.get("name")
+        # For audio, video in Atlas.ti, the Source name may be "". The associated transcript name is there.
+        if name == "":
+            try:
+                for el in element:
+                    print(el.tag, el.get("name"))
+                    if el.tag == "{urn:QDA-XML:project:1.0}Transcript":
+                        name = el.get("name")
+                        # Get, and if needed, add suffix
+                        suffix = pathlib.Path(element.get("path")).suffix
+                        if not name.endswith(suffix):
+                            name = name + suffix
+                        break
+            except Exception as err:
+                print(err)
+
         creating_user_guid = element.get("creatingUser")
         if creating_user_guid is None:
             creating_user_guid = element.get("modifyingUser")
@@ -987,7 +1003,7 @@ class RefiImport:
             if el.tag == "{urn:QDA-XML:project:1.0}Description":
                 memo = el.text
         cur = self.app.conn.cursor()
-        cur.execute("insert into source(name,memo,owner,date, mediapath, fulltext) values(?,?,?,?,?,?)",
+        cur.execute("insert into source(name,memo,owner,date, mediapath, fulltext,av_text_id) values(?,?,?,?,?,?, null)",
                     (name, memo, creating_user, create_date, media_path, None))
         self.app.conn.commit()
         cur.execute("select last_insert_rowid()")
@@ -1001,6 +1017,7 @@ class RefiImport:
             if el.tag == "{urn:QDA-XML:project:1.0}Transcript":
                 no_transcript = False
                 self.parse_transcript_with_codings_and_syncpoints(name, id_, el)
+                break  # Get one transcript only
         if no_transcript:
             # Create an empty transcription file
             now_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -1182,8 +1199,8 @@ class RefiImport:
                     memo += el.text
         transcript_filename = f"{av_name}.txt"
         cur = self.app.conn.cursor()
-        sql = "insert into source (name, fulltext, mediapath, memo, owner, date, av_text_id) values (?,?,?,?,?,?,?)"
-        cur.execute(sql, [transcript_filename, text, None, memo, creating_user, create_date, av_id])
+        sql = "insert into source (name, fulltext, mediapath, memo, owner, date) values (?,?,?,?,?,?)"
+        cur.execute(sql, [transcript_filename, text, None, memo, creating_user, create_date])
         self.app.conn.commit()
         cur.execute("select last_insert_rowid()")
         fid = cur.fetchone()[0]

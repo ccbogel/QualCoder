@@ -253,7 +253,7 @@ nube de palabras</translation>
     <message>
         <location filename="ui_dialog_graph.py" line="60"/>
         <source>Click on the graph area and press + or - to zoom in or zoom out.</source>
-        <translation type="obsolete">Haz clic en el área del gráfico y pulsa + o - para acercar o alejar el zoom.</translation>
+        <translation type="obsolete">Haz clic en el área del Grafo y pulsa + o - para acercar o alejar el zoom.</translation>
     </message>
     <message>
         <location filename="ui_dialog_graph.py" line="121"/>
@@ -315,7 +315,7 @@ Clic con el botón derecho del ratón para ver las opciones</translation>
     <message>
         <location filename="ui_dialog_graph.py" line="132"/>
         <source>Changing to another report will lose unsaved graph.</source>
-        <translation>Al cambiar a otro informe se perderá el gráfico no guardado.</translation>
+        <translation>Al cambiar a otro informe se perderá el Grafo no guardado.</translation>
     </message>
     <message>
         <location filename="ui_dialog_graph.py" line="133"/>
@@ -434,7 +434,7 @@ Seleccionado: todos los códigos seleccionados deben coincidir exactamente.</tra
     <message>
         <location filename="ui_dialog_organiser.py" line="64"/>
         <source>Click on the graph area and press + or W to zoom in. Press - or Q to zoom in or zoom out.</source>
-        <translation>Haga clic en el área del gráfico y pulse + o W para ampliarlo. Pulsa - o Q para acercar o alejar el zoom.</translation>
+        <translation>Haga clic en el área del Grafo y pulse + o W para ampliarlo. Pulsa - o Q para acercar o alejar el zoom.</translation>
     </message>
     <message>
         <location filename="ui_dialog_organiser.py" line="65"/>
@@ -959,7 +959,7 @@ Ordenado por nombre de archivo y nombre de código.</translation>
     <message>
         <location filename="ui_dialog_cooccurrence.py" line="92"/>
         <source>Select files</source>
-        <translation>Seleccionar los archivos</translation>
+        <translation>Seleccionar archivos</translation>
     </message>
     <message>
         <location filename="ui_dialog_cooccurrence.py" line="93"/>
@@ -1003,7 +1003,7 @@ Ordenado por nombre de archivo y nombre de código.</translation>
     <message>
         <location filename="ui_dialog_import.py" line="96"/>
         <source>Quote format:</source>
-        <translation>Formato de cotización:</translation>
+        <translation>Formato de cita:</translation>
     </message>
     <message>
         <location filename="." line="7274595"/>
@@ -1073,7 +1073,7 @@ Si no está marcada: Cada respuesta cualitativa será un fichero de texto indivi
     <message>
         <location filename="ui_import_twitter.py" line="53"/>
         <source>Twitter data import</source>
-        <translation>Importación de datos de Twitter</translation>
+        <translation>Importar datos de X (Twitter)</translation>
     </message>
     <message>
         <location filename="ui_import_twitter.py" line="54"/>
@@ -1458,7 +1458,7 @@ Si no está marcada: Cada respuesta cualitativa será un fichero de texto indivi
         <location filename="ui_dialog_code_av.py" line="189"/>
         <source>Press the Start segment button to begin coding the audio/video segment. Press the End segment button to end the coded segment.
 Key shortcut: Ctrl S</source>
-        <translation type="obsolete"> Presione el botón Iniciar segmento para comenzar a codificar el segmento de audio / video. Presione el botón Finalizar segmento para finalizar el segmento codificado. </translation>
+        <translation type="obsolete"> Presione el botón Iniciar Segmento para comenzar a codificar el segmento de audio / video. Presione el botón Finalizar Segmento para finalizar el segmento codificado. </translation>
     </message>
     <message>
         <location filename="ui_dialog_code_av.py" line="202"/>
@@ -1569,7 +1569,7 @@ Ctrl + Shift + &amp;lt;    Disminuir velocidad de reproducción al mínimo 0.1</
     <message>
         <location filename="ui_dialog_code_av.py" line="208"/>
         <source>Scroll transcript while playing.</source>
-        <translation>Desplazamiento de la transcripción mientras se juega.</translation>
+        <translation>Desplazar la transcripción durante la reproducción.</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_av.py" line="216"/>
@@ -1863,12 +1863,12 @@ Right-click to change automatic searching options</translation>
     <message>
         <location filename="ui_dialog_code_colours.py" line="96"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This coded area&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Esta zona codificada</translation>
+        <translation>Esta área codificada</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_colours.py" line="97"/>
         <source>Codes colour scheme. Select colours in order. Select codes. Apply.</source>
-        <translation>Códigos de colores. Seleccionar colores en orden. Seleccione los códigos. Aplicar.</translation>
+        <translation>Esquema de colores de los códigos. Seleccionar colores en orden. Seleccione los códigos. Aplicar.</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_colours.py" line="98"/>
@@ -1954,7 +1954,7 @@ Right-click to change automatic searching options</translation>
     <message>
         <location filename="ui_dialog_code_image.py" line="181"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This coded area&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Esta zona codificada</translation>
+        <translation>Esta área codificada</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_image.py" line="197"/>
@@ -3118,7 +3118,7 @@ Renombrado como: Prefijo elegido por el usuario y sufijo numerado _nnn.&lt;/p&gt
     <message>
         <location filename="ui_dialog_manage_links.py" line="45"/>
         <source>Manage bad links to files</source>
-        <translation>Administrar los enlaces malos a los archivos</translation>
+        <translation>Administrar enlaces defectuosos a archivos</translation>
     </message>
     <message>
         <location filename="ui_dialog_manage_links.py" line="47"/>
@@ -3171,7 +3171,7 @@ Renombrado como: Prefijo elegido por el usuario y sufijo numerado _nnn.&lt;/p&gt
     <message>
         <location filename="ui_manage_references.py" line="97"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete all references that are not assigned to files&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Borrar todas las referencias no asignadas a expedientes</translation>
+        <translation>Borrar todas las referencias no asignadas a archivos</translation>
     </message>
     <message>
         <location filename="ui_manage_references.py" line="98"/>
@@ -3284,7 +3284,7 @@ Revise después de aplicar la función.</translation>
     <message>
         <location filename="ui_reference_manager.py" line="80"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete all references that are not assigned to files&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">Borrar todas las referencias no asignadas a expedientes</translation>
+        <translation type="obsolete">Borrar todas las referencias no asignadas a archivos</translation>
     </message>
     <message>
         <location filename="ui_reference_manager.py" line="81"/>
@@ -3340,7 +3340,7 @@ Revise después de aplicar la función.</translation>
     <message>
         <location filename="ui_dialog_report_code_frequencies.py" line="87"/>
         <source>Select files</source>
-        <translation>Seleccionar los archivos</translation>
+        <translation>Seleccionar archivos</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_code_frequencies.py" line="78"/>
@@ -3614,7 +3614,7 @@ Revise después de aplicar la función.</translation>
         <location filename="ui_dialog_report_codings.py" line="178"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Attributes. &lt;/p&gt;&lt;p&gt;Attribute selection will override files or cases selected in the left-hand-side lists.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Atributos.
-La selección de atributos anulará los expedientes o casos seleccionados en las listas de la izquierda.</translation>
+La selección de atributos anulará los archivos o casos seleccionados en las listas de la izquierda.</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_codings.py" line="205"/>
@@ -3742,7 +3742,7 @@ Seleccione dos codificadores, un archivo, un código.</translation>
     <message>
         <location filename="ui_dialog_report_comparisons.py" line="81"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Run comparison&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Comparación de la carrera</translation>
+        <translation>Ejecutar comparación</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_comparisons.py" line="84"/>
@@ -3790,7 +3790,7 @@ Seleccione dos codificadores, un archivo, un código.</translation>
     <message>
         <location filename="ui_report_attribute_parameters.py" line="97"/>
         <source>Operator</source>
-        <translation>Símbolo</translation>
+        <translation>Operador</translation>
     </message>
     <message>
         <location filename="ui_report_attribute_parameters.py" line="99"/>
@@ -3840,7 +3840,7 @@ Los comodines para &apos;like&apos; son % y _</translation>
     <message>
         <location filename="ui_report_attribute_parameters.py" line="86"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Boolean And&lt;/p&gt;&lt;p&gt;For all parameter selections&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Booleano y. Para todas las selecciones de parámetros</translation>
+        <translation>Booleano Y. Para todas las selecciones de parámetros</translation>
     </message>
     <message>
         <location filename="ui_report_attribute_parameters.py" line="87"/>
@@ -3850,7 +3850,7 @@ Los comodines para &apos;like&apos; son % y _</translation>
     <message>
         <location filename="ui_report_attribute_parameters.py" line="78"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Load filter settings&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Ajustes del filtro de carga</translation>
+        <translation>Cargar configuración de filtro</translation>
     </message>
     <message>
         <location filename="ui_report_attribute_parameters.py" line="83"/>
@@ -3935,7 +3935,7 @@ No se recomienda a menos que tenga muchos archivos grandes que ralenticen la cop
     <message>
         <location filename="ui_dialog_settings.py" line="595"/>
         <source>Speaker format</source>
-        <translation>Formato del orador</translation>
+        <translation>Formato del interlocutor</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="583"/>
@@ -3945,12 +3945,12 @@ No se recomienda a menos que tenga muchos archivos grandes que ralenticen la cop
     <message>
         <location filename="ui_dialog_settings.py" line="592"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Used when entering time position in transcription&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Se utiliza cuando se introduce la posición de tiempo en la transcripción</translation>
+        <translation>Se utiliza al ingresar la posición de tiempo en la transcripción</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="594"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Used when entering speaker name in transcription&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Se utiliza cuando se introduce el nombre del orador en la transcripción</translation>
+        <translation>Se utiliza cuando se introduce el nombre del interlocutor en la transcripción</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="550"/>
@@ -4560,7 +4560,7 @@ No se recomienda a menos que tenga muchos archivos grandes que ralenticen la cop
     <message>
         <location filename="ui_dialog_view_av.py" line="174"/>
         <source>Scroll transcript while playing. (Transcript is read only)</source>
-        <translation>Desplaza la transcripción mientras juegas. (La transcripción no se puede codificar).</translation>
+        <translation>Desplazar la transcripción mientras se reproduce. (La transcripción no se puede codificar).</translation>
     </message>
     <message>
         <location filename="." line="7274595"/>
@@ -4570,13 +4570,13 @@ No se recomienda a menos que tenga muchos archivos grandes que ralenticen la cop
     <message>
         <location filename="ui_dialog_view_av.py" line="187"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add a speaker name to shortcuts. In the text entry box press ctrl + n&lt;/p&gt;&lt;p&gt;Insert a speaker into transcription. In the text entry box press ctrl + 1 up to ctrl + 8 for the speakers name.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Añade un nombre de orador a los atajos. En el cuadro de entrada de texto presione ctrl + n 
-Inserte un orador en la transcripción. En el cuadro de entrada de texto presione ctrl + 1 hasta ctrl + 8 para el nombre del orador.</translation>
+        <translation>Añade un nombre de interlocutor a los atajos. En el cuadro de entrada de texto presione ctrl + n 
+Inserte un interlocutor en la transcripción. En el cuadro de entrada de texto presione ctrl + 1 hasta ctrl + 8 para el nombre del interlocutor.</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="188"/>
         <source>Speakers:</source>
-        <translation>Oradores: </translation>
+        <translation>Interlocutores: </translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="175"/>
@@ -4879,12 +4879,12 @@ No codifique este texto hasta que vuelva a cargar Codificación - Texto codifica
     <message>
         <location filename="ui_main.py" line="326"/>
         <source>Manage files</source>
-        <translation>Administrar archivos</translation>
+        <translation>Administrar Archivos</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="327"/>
         <source>Manage cases</source>
-        <translation>Administrar casos</translation>
+        <translation>Administrar Casos</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="328"/>
@@ -4914,7 +4914,7 @@ No codifique este texto hasta que vuelva a cargar Codificación - Texto codifica
     <message>
         <location filename="ui_main.py" line="333"/>
         <source>Assign Attributes</source>
-        <translation>Asignar atributos</translation>
+        <translation>Asignar Atributos</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="334"/>
@@ -4924,7 +4924,7 @@ No codifique este texto hasta que vuelva a cargar Codificación - Texto codifica
     <message>
         <location filename="ui_main.py" line="335"/>
         <source>Import Attributes</source>
-        <translation>Importar atributos</translation>
+        <translation>Importar Atributos</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="336"/>
@@ -4954,7 +4954,7 @@ No codifique este texto hasta que vuelva a cargar Codificación - Texto codifica
     <message>
         <location filename="ui_main.py" line="342"/>
         <source>Manage attributes</source>
-        <translation>Administrar atributos</translation>
+        <translation>Administrar Atributos</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="343"/>
@@ -4964,7 +4964,7 @@ No codifique este texto hasta que vuelva a cargar Codificación - Texto codifica
     <message>
         <location filename="ui_main.py" line="344"/>
         <source>Coding comparison</source>
-        <translation>Comparación de codificación</translation>
+        <translation>Acuerdo entre codificadores</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="345"/>
@@ -4974,17 +4974,17 @@ No codifique este texto hasta que vuelva a cargar Codificación - Texto codifica
     <message>
         <location filename="ui_main.py" line="346"/>
         <source>View Graph</source>
-        <translation>Ver gráfico</translation>
+        <translation>Ver Grafo</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="348"/>
         <source>Code image</source>
-        <translation>Codificar imágenes</translation>
+        <translation>Codificar Imágenes</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="349"/>
         <source>Code frequencies</source>
-        <translation>Código de frecuencias</translation>
+        <translation>Frecuencias de códigos</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="350"/>
@@ -4994,27 +4994,27 @@ No codifique este texto hasta que vuelva a cargar Codificación - Texto codifica
     <message>
         <location filename="ui_main.py" line="351"/>
         <source>Code audio/video</source>
-        <translation>Codificar Audio / Video</translation>
+        <translation>Codificar Audio/Video</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="353"/>
         <source>REFI-QDA Project export</source>
-        <translation>Exportación del proyecto REFI-QDA</translation>
+        <translation>Exportar proyecto REFI-QDA</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="354"/>
         <source>REFI-QDA Codebook export</source>
-        <translation>REFI-QDA Exportación de libro de códigos </translation>
+        <translation>Exportar libro de códigos REFI-QDA</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="355"/>
         <source>REFI-QDA Codebook import</source>
-        <translation>REFI-QDA Importación de libro de códigos </translation>
+        <translation>Importar libro de códigos REFI-QDA</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="356"/>
         <source>REFI-QDA Project import</source>
-        <translation>Importación del proyecto REFI-QDA</translation>
+        <translation>Importar proyecto REFI-QDA</translation>
     </message>
     <message>
         <location filename="." line="7274595"/>
@@ -5024,12 +5024,12 @@ No codifique este texto hasta que vuelva a cargar Codificación - Texto codifica
     <message>
         <location filename="ui_main.py" line="357"/>
         <source>RQDA Project import</source>
-        <translation>RQDA Proyecto de importación </translation>
+        <translation>Importar proyecto RQDA</translation>
     </message>
     <message>
         <location filename="." line="7274595"/>
         <source>Action log</source>
-        <translation type="obsolete">Bitácora de acción</translation>
+        <translation type="obsolete">Registro de acciones</translation>
     </message>
     <message>
         <location filename="." line="7274595"/>
@@ -5069,7 +5069,7 @@ No codifique este texto hasta que vuelva a cargar Codificación - Texto codifica
     <message>
         <location filename="ui_main.py" line="362"/>
         <source>Manage bad links to files</source>
-        <translation>Administrar los enlaces malos a los archivos</translation>
+        <translation>Administrar enlaces defectuosos a archivos</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="302"/>
@@ -5124,7 +5124,7 @@ No codifique este texto hasta que vuelva a cargar Codificación - Texto codifica
     <message>
         <location filename="ui_main.py" line="366"/>
         <source>Coding comparison by file</source>
-        <translation>Comparación de la codificación por archivos</translation>
+        <translation>Comparación de codificadores por archivos</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="367"/>
@@ -5169,7 +5169,7 @@ No codifique este texto hasta que vuelva a cargar Codificación - Texto codifica
     <message>
         <location filename="ui_main.py" line="371"/>
         <source>Manage references</source>
-        <translation>Administrar referencias</translation>
+        <translation>Administrar Referencias</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="338"/>
@@ -5184,7 +5184,7 @@ No codifique este texto hasta que vuelva a cargar Codificación - Texto codifica
     <message>
         <location filename="ui_main.py" line="373"/>
         <source>Import plain text codes list</source>
-        <translation>Importar lista de códigos de texto sin formato</translation>
+        <translation>Importar lista de códigos (texto sin formato)</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="375"/>
@@ -5194,7 +5194,7 @@ No codifique este texto hasta que vuelva a cargar Codificación - Texto codifica
     <message>
         <location filename="ui_main.py" line="376"/>
         <source>Import twitter data</source>
-        <translation>Importar datos de Twitter</translation>
+        <translation>Importar datos de X (Twitter)</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="382"/>
@@ -5264,7 +5264,7 @@ No codifique este texto hasta que vuelva a cargar Codificación - Texto codifica
     <message>
         <location filename="ui_main.py" line="391"/>
         <source>Code counts by file/case</source>
-        <translation>Recuento de códigos por archivo/caso</translation>
+        <translation>Distribución de códigos por Archivo/Caso</translation>
     </message>
 </context>
 </TS>

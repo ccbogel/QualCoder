@@ -110,8 +110,34 @@ class DialogSelectAttributeParameters(QtWidgets.QDialog):
         self.ui.pushButton_save_filter.clicked.connect(self.filter_settings_save)
         self.ui.pushButton_load_filter.setIcon(qta.icon('mdi6.text-account', options=[{'scale_factor': 1.2}]))
         self.ui.pushButton_load_filter.clicked.connect(self.filter_settings_load)
+        self.ui.pushButton_delete_filter.setIcon(qta.icon('mdi6.table-minus', options=[{'scale_factor': 1.2}]))
+        self.ui.pushButton_delete_filter.clicked.connect(self.filter_settings_delete)
         self.ui.tableWidget.cellChanged.connect(self.cell_modified)
         self.ui.pushButton_clear.pressed.connect(self.clear_parameters)
+
+    def filter_settings_delete(self):
+        """ Delete saved filter settings.
+        """
+
+        cur = self.app.conn.cursor()
+        cur.execute("select name, filter from files_filter order by upper(name)")
+        res = cur.fetchall()
+        if not res:
+            Message(self.app, _("Nothing saved"), _("No saved filters")).exec()
+            return
+        keys = 'name', 'filter'
+        filters = []
+        for row in res:
+            filters.append(dict(zip(keys, row)))
+        ui = DialogSelectItems(self.app, filters, _("Delete filter"), "single")
+        ok = ui.exec()
+        if not ok:
+            return
+        self.clear_parameters()
+        selection = ui.get_selected()
+        cur.execute("delete from files_filter where name=?", [selection['name']])
+        self.app.conn.commit()
+        Message(self.app, _("Filter deleted"), selection['name']).exec()
 
     def filter_settings_save(self):
         """ Save filter settings, lists as string. """
