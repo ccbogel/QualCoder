@@ -299,6 +299,8 @@ python3.12 -m qualcoder
 
 On finishing type `deactivate` to exit the virtual environment.
 
+Note re Fedora. This is an issue with coding audio / video. The software crashes, and unable to find a solution to this for now.
+
 ### Arch/Manjaro Linux
 
 If you are using audio or video, install VLC (download from site) or: `sudo pacman -S vlc`
