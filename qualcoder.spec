@@ -19,7 +19,7 @@ datas += copy_metadata('packaging')
 datas += copy_metadata('filelock')
 datas += copy_metadata('numpy')
 datas += copy_metadata('huggingface-hub')
-datas += copy_metadata('safetensors')
+# datas += copy_metadata('safetensors')
 datas += copy_metadata('pyyaml')
 datas += copy_metadata('torch')
 datas += copy_metadata('tokenizers')
@@ -30,7 +30,7 @@ hiddenimports += collect_submodules('pydantic')
 hiddenimports += ['scipy._lib.array_api_compat.numpy.fft']
 
 a = Analysis(
-    ['qualcoder/__main__.py'],
+    ['src/qualcoder/__main__.py'],
     pathex=[],
     binaries=[],
     datas=datas,
@@ -82,7 +82,7 @@ coll = COLLECT(
     strip=False,
     upx=True,
     upx_exclude=[],
-    name='__main__',
+    name='QualCoder',
 )
 
 app = BUNDLE(coll,
