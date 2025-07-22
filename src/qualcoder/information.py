@@ -87,7 +87,7 @@ ebooklib: Aleksandar Erkalović https://github.com/aerkalov.<br /> \
 The VideoLAN team for the bindings to VLC. https://github.com/oaubert/python-vlc.<br /> \
 The ffmpeg team. https://ffmpeg.org/ used with waveform and spectrograph images.<br /> \
 Julius Reich for creating the QualCoder logo.<br /> \
-Dr Droege for developing and testing the code to incorporate artificial intelligence models for AI coding.<br /> \
+Kai Droege for developing and testing the code to incorporate artificial intelligence models for AI coding.<br /> \
  To various members on github for supporting this project.</p>\
 <h2 class="western">Other details</h2\
 <p>The qda data folder contains folders for imported documents, \
@@ -100,8 +100,8 @@ default working directory, selected font and other parameters.</p>\
 <p>The REFI-QDA Project import and export seem to work ok, but are not guaranteed to work.</p>\
 <p>Created by Colin Curtain BPharm GradDipComp PhD, python programmer, Lecturer University of Tasmania.</p>\
 <h2>Citation</h2>\
-Curtain, C. (2024) QualCoder 3.6 [Computer software]. \
-Retrieved from https://github.com/ccbogel/QualCoder/releases/tag/3.6\
+Curtain, C. Droege, K. (2025) QualCoder 3.7 [Computer software]. \
+Retrieved from https://github.com/ccbogel/QualCoder/releases/tag/3.7\
 <h2 class="western">Licenses</h2>\
 <h3>LGPL-3.0 License</h3>\
 <p>This file is part of QualCoder.</p>\
