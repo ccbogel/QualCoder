@@ -87,5 +87,5 @@ coll = COLLECT(
 
 app = BUNDLE(coll,
              name='Qualcoder.app',
-             icon='qualcoder/GUI/qualcoder.icns',
+             icon='src/qualcoder/GUI/qualcoder.icns',
              bundle_identifier='org.ccbogel.qualcoder')
