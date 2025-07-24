@@ -191,17 +191,7 @@ Open the Terminal App and move to the unzipped Qualcoder-Master directory, then 
 
 `python3 setup.py py2app`
 
-**Third option to run on macOS:**
-
-Install Wine for macOS and run a QualCoder exe, e.g. QualCoder-3.6.exe - see the [releases page](https://github.com/ccbogel/QualCoder/releases).
-
-Wine is available through: https://www.winehq.org/
-
 ## Linux
-
-Hopefully an easy way to run QualCoder on the following Linux distributions is to use Wine, https://www.winehq.org/.
-There are binary Wine packages for Ubuntu, Debian, Fedora, SUSE, Slackware FreeBSD.
-Once installed, run a Windows QualCoder exe file, e.g. QualCoder-3.6.exe - see the [releases page](https://github.com/ccbogel/QualCoder/releases).
 
 ### Ubuntu Linux
 
@@ -263,6 +253,7 @@ bash -c 'cd ~/.local/share/qualcoder/src/ && ~/.local/share/qualcoder/env/bin/py
 ### Fedora 42
 
 These instructions download the current source code directly from GitHub. Note: Fedora uses Wayland which may not work well with the Qt graphical interface. It is suggested you also install Xwayland.
+Audio and video coding - the software crashes and for now a solution has not been found.
 
 `sudo dnf install python3.12`
 
