@@ -46,6 +46,7 @@ import json_repair
 import asyncio
 import configparser
 from Bio.Align import PairwiseAligner
+from pydantic import ValidationError
 
 max_memo_length = 1500  # Maximum length of the memo send to the AI
 
@@ -677,7 +678,7 @@ class AiLLM():
         # revised version 7/25:
         code_descriptions_prompt = [
             SystemMessage(
-                content=self.get_default_system_prompt()
+                content=self.get_default_system_prompt() + '\n /no_think'
             ),
             HumanMessage(
                 content=(f'We are searching for empirical data that fits a code named "{code_name}" '
@@ -700,7 +701,12 @@ class AiLLM():
         config['callbacks'] = [MyCustomSyncHandler(self)]
         self.ai_async_progress_max = round(1000 / 4)  # estimated token count of the result (1000 chars)
 
-        res = self.large_llm.invoke(code_descriptions_prompt, response_format={"type": "json_object"}, config=config)
+        try:
+            res = self.large_llm.invoke(code_descriptions_prompt, response_format={"type": "json_object"}, config=config)
+        except ValidationError as e:
+            # The returned JSON was malformed. Try it without validation and hope that "json_repair" will fix it below 
+            logger.debug(e)
+            res = self.large_llm.invoke(code_descriptions_prompt, config=config)            
         logger.debug(str(res.content))
         code_descriptions = list(json_repair.loads(str(res.content))['descriptions'])
         code_descriptions.insert(0, code_name) # insert the original as well
@@ -841,7 +847,12 @@ class AiLLM():
         self.ai_async_progress_max = 130  # estimated average token count of the result
         
         # send the query to the llm 
-        res = self.large_llm.invoke(f'{prompt}', response_format={"type": "json_object"}, config=config)
+        try:
+            res = self.large_llm.invoke(f'{prompt}', response_format={"type": "json_object"}, config=config)
+        except ValidationError as e:
+            # The returned JSON was malformed. Try it without validation and hope that "json_repair" will fix it below 
+            logger.debug(e)
+            res = self.large_llm.invoke(f'{prompt}', config=config)                  
         res_json = json_repair.loads(str(res.content))
         
         # analyse and format the answer
