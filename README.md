@@ -253,6 +253,12 @@ To exit the environment:
 
 `deactivate`
 
+You can also make a .desktop file for launching QualCoder:
+
+Create a .Desktop file for launch, enter this command (adapt it according to the location of the source code folder):
+
+bash -c 'cd ~/.local/share/qualcoder/src/ && ~/.local/share/qualcoder/env/bin/python3.12 -m qualcoder'
+
 
 ### Fedora 42
 
