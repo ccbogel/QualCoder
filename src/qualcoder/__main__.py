@@ -2602,35 +2602,66 @@ Click "Yes" to start now.')
             cur.execute(
                 "CREATE TABLE stored_sql (title text, description text, grouper text, ssql text, unique(title));")
             self.app.conn.commit()
-        # Database version 6
+        # Database version 6  - add Graph tables
         try:
             cur.execute("select name, description, date from graph")
         except sqlite3.OperationalError:
-            # Tables to store graph. sqlite 0 is False 1 is True
             cur.execute("CREATE TABLE graph (grid integer primary key, name text, description text, "
                         "date text, scene_width integer, scene_height integer, unique(name));")
+            self.app.conn.commit()
+        try:
+            cur.execute("select gtextid from gr_cdct_text_item")
+        except sqlite3.OperationalError:
             cur.execute(
                 "CREATE TABLE gr_cdct_text_item (gtextid integer primary key, grid integer, x integer, y integer, "
                 "supercatid integer, catid integer, cid integer, font_size integer, bold integer, "
                 "isvisible integer, displaytext text);")
+            self.app.conn.commit()
+        try:
+            cur.execute("select gcaseid from gr_case_text_item")
+        except sqlite3.OperationalError:
             cur.execute("CREATE TABLE gr_case_text_item (gcaseid integer primary key, grid integer, x integer, "
                         "y integer, caseid integer, font_size integer, bold integer, color text, displaytext text);")
+            self.app.conn.commit()
+        try:
+            cur.execute("select gfileid from gr_file_text_item")
+        except sqlite3.OperationalError:
             cur.execute("CREATE TABLE gr_file_text_item (gfileid integer primary key, grid integer, x integer, "
                         "y integer, fid integer, font_size integer, bold integer, color text, displaytext text);")
+            self.app.conn.commit()
+        try:
+            cur.execute("select gfreeid from gr_free_text_item")
+        except sqlite3.OperationalError:
             cur.execute("CREATE TABLE gr_free_text_item (gfreeid integer primary key, grid integer, freetextid integer,"
                         "x integer, y integer, free_text text, font_size integer, bold integer, color text,"
                         "tooltip text, ctid integer);")
+            self.app.conn.commit()
+        try:
+            cur.execute("select glineid from gr_cdct_line_item")
+        except sqlite3.OperationalError:
             cur.execute("CREATE TABLE gr_cdct_line_item (glineid integer primary key, grid integer, "
                         "fromcatid integer, fromcid integer, tocatid integer, tocid integer, color text, "
                         "linewidth real, linetype text, isvisible integer);")
+            self.app.conn.commit()
+        try:
+            cur.execute("select gflineid from gr_free_line_item")
+        except sqlite3.OperationalError:
             cur.execute("CREATE TABLE gr_free_line_item (gflineid integer primary key, grid integer, "
                         "fromfreetextid integer, fromcatid integer, fromcid integer, fromcaseid integer,"
                         "fromfileid integer, fromimid integer, fromavid integer, tofreetextid integer, tocatid integer,"
                         "tocid integer, tocaseid integer, tofileid integer, toimid integer, toavid integer, color text,"
                         " linewidth real, linetype text);")
+            self.app.conn.commit()
+        try:
+            cur.execute("select grpixid from gr_pix_item")
+        except sqlite3.OperationalError:
             cur.execute("CREATE TABLE gr_pix_item (grpixid integer primary key, grid integer, imid integer,"
                         "x integer, y integer, px integer, py integer, w integer, h integer, filepath text,"
                         "tooltip text);")
+            self.app.conn.commit()
+        try:
+            cur.execute("select gr_avid from gr_av_item")
+        except sqlite3.OperationalError:
             cur.execute("CREATE TABLE gr_av_item (gr_avid integer primary key, grid integer, avid integer,"
                         "x integer, y integer, pos0 integer, pos1 integer, filepath text, tooltip text, color text);")
             self.app.conn.commit()
