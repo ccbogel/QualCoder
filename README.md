@@ -22,8 +22,6 @@ Optional: ffmpeg installed for waveform image see here to install ffmpeg on Wind
 
 On the first start of QualCoder, you may want to [setup the AI enhanced features](#setup-of-the-ai-features) as described below.
 
-&#x1F534; **Please note that there is currently an issue for first-time users of the AI features in QualCoder. A workaround is described here: https://github.com/ccbogel/QualCoder/issues/1072#issuecomment-3022819222**
-
 ### Windows
 
 You have two options, see Releases link on the right-hand side of this page:
@@ -255,6 +253,12 @@ To exit the environment:
 
 `deactivate`
 
+You can also make a .desktop file for launching QualCoder:
+
+Create a .Desktop file for launch, enter this command (adapt it according to the location of the source code folder):
+
+bash -c 'cd ~/.local/share/qualcoder/src/ && ~/.local/share/qualcoder/env/bin/python3.12 -m qualcoder'
+
 
 ### Fedora 42
 
@@ -360,18 +364,20 @@ QualCoder is distributed under the LGPLv3 LICENSE.
 
 ##  Citation APA style
 
-Curtain, C. Dröge, K. (2025) QualCoder 3.6 [Computer software]. Retrieved from
-https://github.com/ccbogel/QualCoder/releases/tag/3.6
+Curtain, C. Dröge, K. (2025) QualCoder 3.7 [Computer software]. Retrieved from
+https://github.com/ccbogel/QualCoder/releases/tag/3.7
 
 ## Creator
 
-Dr. Colin Curtain BPharm GradDipComp PhD Pharmacy lecturer at the University of Tasmania. I obtained a Graduate Diploma in Computing in 2011. I have developed my Python programming skills from this time onwards. The QualCoder project originated from my use of RQDA during my PhD - *Evaluation of clinical decision support provided by medication review software*. My original and now completely deprecated PyQDA software on PyPI was my first attempt at creating qualitative software. The reason for creating the software was that during my PhD RQDA did not always install or work well for me, but I did realise that I could use the same SQLite database and access it with Python. The current database is different from the older RQDA version. This is an ongoing hobby project, perhaps a labour of love, which I utilise with some Masters's and Ph.D. students whom I supervise.
+**Dr. Colin Curtain** BPharm GradDipComp PhD Pharmacy lecturer at the University of Tasmania. I obtained a Graduate Diploma in Computing in 2011. I have developed my Python programming skills from this time onwards. The QualCoder project originated from my use of RQDA during my PhD - *Evaluation of clinical decision support provided by medication review software*. My original and now completely deprecated PyQDA software on PyPI was my first attempt at creating qualitative software. The reason for creating the software was that during my PhD RQDA did not always install or work well for me, but I did realise that I could use the same SQLite database and access it with Python. The current database is different from the older RQDA version. This is an ongoing hobby project, perhaps a labour of love, which I utilise with some Masters's and Ph.D. students whom I supervise.
 
 https://www.utas.edu.au/profiles/staff/umore/colin-curtain
 
 https://scholar.google.com/citations?user=KTMRMWoAAAAJ&hl=en
 
-**Artificial intelligence features and more:** Dr. Kai Dröge, Institut für Sozialforschung, Frankfurt, Deutschland. https://www.ifs.uni-frankfurt.de/personendetails/kai-droege.html
+**Artificial intelligence features and more:** 
+
+**Dr. rer. soc. Kai Dröge,** [University for Applied Science](https://www.hslu.ch/de-ch/hochschule-luzern/ueber-uns/personensuche/profile/?pid=823), Lucerne, Switzerland and [Institute for Social Research](https://www.ifs.uni-frankfurt.de/personendetails/kai-droege.html) Frankfurt, Germany. Kai is an experienced researcher and teacher of qualitative methods. His research interests are wide-ranging and include the sociology of emotions and intimate relationships, digital life and new media, and questions of economic and labor sociology. Recently, he has focused on the methodological challenges and opportunities of integrating AI into qualitative research. He is also the creator of [noScribe](https://github.com/kaixxx/noScribe#readme), a popular open-source transcription tool aimed especially at qualitative interviews.
 
 ## Leave a review
 
