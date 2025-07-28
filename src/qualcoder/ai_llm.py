@@ -197,10 +197,10 @@ desc = Ollama is an open source server that lets you run LLMs locally on
 	running first. Use the Advanced AI Options below to select between your
 	locally installed models.
 access_info_url = https://ollama.com
-large_model = test
-large_model_context_window = 1
-fast_model = test
-fast_model_context_window = 1
+large_model = 
+large_model_context_window = 32000
+fast_model = 
+fast_model_context_window = 32000
 api_base = http://localhost:11434/v1/
 api_key = <no API key needed>
     """
