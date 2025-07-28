@@ -4,7 +4,7 @@ debian/debhelper-build-stamp
 debian/files
 debian/qualcoder.substvars
 debian/qualcoder
-dist
+**dist*/
 .eggs
 .pybuild/
 *.egg-info
