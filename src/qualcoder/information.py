@@ -247,7 +247,7 @@ M Memo code - at clicked position<br />\
 O Shortcut to cycle through overlapping codes - at clicked position<br />\
 S Search text - may include current selection<br />\
 R Opens a context menu for recently used codes for marking text<br />\
-U Umark at clicked position in the text<br />\
+U Unmark at clicked position in the text<br />\
 V assign in vivo code to selected text<br />\
 Alt + Left arrow  Shrink coding to the left <br />\
 Alt + Right arrow Shrink coding to the right<br />\
