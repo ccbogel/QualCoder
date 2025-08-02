@@ -2252,6 +2252,7 @@ class DialogCodeText(QtWidgets.QWidget):
         if type(event) == QtGui.QKeyEvent and object_ is self.ui.textEdit:
             key = event.key()
             mod = event.modifiers()
+            first_key_press = event.type() == QtCore.QEvent.Type.KeyPress and not event.isAutoRepeat()
             # using timer for a lot of things
             now = datetime.datetime.now()
             diff = now - self.code_resize_timer
@@ -2262,7 +2263,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 else:
                     return False
             # Ctrl + E Edit mode - must be detected here as Ctrl E is overridden in editable textEdit
-            if key == QtCore.Qt.Key.Key_E and mod == QtCore.Qt.KeyboardModifier.ControlModifier:
+            if key == QtCore.Qt.Key.Key_E and mod == QtCore.Qt.KeyboardModifier.ControlModifier and first_key_press:
                 self.edit_mode_toggle()
                 return True
             # Ignore all other key events if edit mode is active
