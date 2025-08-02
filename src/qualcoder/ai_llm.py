@@ -245,6 +245,12 @@ def ai_quote_search(quote: str, original: str) -> tuple[int, int]:
     Returns -1, -1 if no match is found.
     """
     
+    # try finding an exact match first
+    start_idx = original.find(quote)
+    if start_idx > -1:
+        return start_idx, start_idx + len(quote)
+    
+    # no exact match found, use the PairwiseAligner to find also partial matches
     aligner = PairwiseAligner()
     aligner.mode = 'local'
     aligner.match_score = 2         # score for each matched char
@@ -253,10 +259,16 @@ def ai_quote_search(quote: str, original: str) -> tuple[int, int]:
     aligner.extend_gap_score = -0.1 # penalty for gap continuation
 
     alignments = aligner.align(original.lower(), quote.lower())
-    if not len(alignments): # nothing found
+    try:
+        best = next(alignments)
+    except StopIteration: 
+        # No alignments were found
+        return -1, -1
+    except Exception as e:
+        # any other error (could be a memory issue)
+        logger.error(e)
         return -1, -1
 
-    best = alignments[0]
     orig_spans = best.aligned[0]
     if not len(orig_spans):
         return -1, -1
