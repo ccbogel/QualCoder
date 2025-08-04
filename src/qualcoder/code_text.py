@@ -1111,7 +1111,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 submenu = menu.addMenu(_("Mark with recent code (R)"))
                 for item in self.recent_codes:
                     submenu.addAction(item['name'])
-            action_new_code = menu.addAction(_("Mark with new code"))
+            action_new_code = menu.addAction(_("Mark with new code (N)"))
             action_new_invivo_code = menu.addAction(_("in vivo code (V)"))
 
         if action_unmark:
@@ -1293,20 +1293,26 @@ class DialogCodeText(QtWidgets.QWidget):
 
     def mark_with_new_code(self, in_vivo=False):
         """ Create new code and mark selected text.
+        Called through text_edit_menu or N key press - with selected text.
         Args:
-            in_vivo : Boolean if True use in vivio text selection as code name """
+            in_vivo : Boolean if True use in vivo text selection as code name """
 
+        # Get selected category, if any
+        tree_item = self.ui.treeWidget.currentItem()
+        catid = None
+        if tree_item is not None and tree_item.text(1)[0:3] == 'cat':
+            catid = int(tree_item.text(1)[6:])
         codes_copy = deepcopy(self.codes)
         if not in_vivo:
-            self.add_code()
+            self.add_code(catid)
         else:
-            self.add_code(catid=None, code_name=self.ui.textEdit.textCursor().selectedText())
+            self.add_code(catid, code_name=self.ui.textEdit.textCursor().selectedText())
         new_code = None
         for c in self.codes:
             if c not in codes_copy:
                 new_code = c
         if new_code is None and not in_vivo:
-            # not a new code and not an in vivo coding
+            # Not a new code and not an in vivo coding
             return
         if new_code is None and in_vivo:
             # Find existing code name that matches in vivo selection
@@ -1886,6 +1892,7 @@ class DialogCodeText(QtWidgets.QWidget):
         I Tag important
         L Show codes like
         M memo code - at clicked position
+        N new code
         O Shortcut to cycle through overlapping codes - at clicked position
         S search text - may include current selection
         R opens a context menu for recently used codes for marking text
@@ -1987,6 +1994,9 @@ class DialogCodeText(QtWidgets.QWidget):
         # Memo for current code
         if key == QtCore.Qt.Key.Key_M:
             self.coded_text_memo(cursor_pos)
+            return
+        if key == QtCore.Qt.Key.Key_N and self.ui.textEdit.textCursor().selectedText() != '':
+            self.mark_with_new_code(False)
             return
         # Overlapping codes cycle
         now = datetime.datetime.now()
@@ -2692,7 +2702,7 @@ class DialogCodeText(QtWidgets.QWidget):
         duplicate code name. A random color is selected for the code, or a color has been pre-set by the user.
         New code is added to data and database.
         Args:
-            catid : None to add to without category, catid to add to category.
+            catid : None to add code without category, catid Integer to add to category.
             code_name : String : Used for 'in vivo' coding where name is preset by in vivo text selection.
         Returns:
             True  - new code added, False - code exists or could not be added

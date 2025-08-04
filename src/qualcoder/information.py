@@ -244,6 +244,7 @@ H Hide / Unhide top groupbox<br />\
 I Tag code at clicked position as important<br />\
 L Show codes like (when text coding area is in focus)<br />\
 M Memo code - at clicked position<br />\
+N New code - for selected text<br />\
 O Shortcut to cycle through overlapping codes - at clicked position<br />\
 S Search text - may include current selection<br />\
 R Opens a context menu for recently used codes for marking text<br />\
