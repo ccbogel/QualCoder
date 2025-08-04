@@ -205,7 +205,6 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.textEdit.customContextMenuRequested.connect(self.text_edit_menu)
         self.ui.textEdit.cursorPositionChanged.connect(self.overlapping_codes_in_text)
         self.ui.textEdit_info.setReadOnly(True)
-        highlighter = MarkdownHighlighter(self.ui.textEdit_info, self.app)
         self.ui.listWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.listWidget.customContextMenuRequested.connect(self.file_menu)
         self.ui.listWidget.setStyleSheet(tree_font)
@@ -3361,7 +3360,7 @@ class DialogCodeText(QtWidgets.QWidget):
         if "end" not in self.file_:
             self.file_['end'] = len(file_result['fulltext'])
         sql_values.append(int(file_result['id']))
-        # determine start line
+        # Determine start line
         if self.file_['start'] == 0:
             self.file_['start_line'] = 1
         else:
@@ -3373,6 +3372,13 @@ class DialogCodeText(QtWidgets.QWidget):
         if self.text.endswith('\n'):
             self.text = self.text[
                         :-1]  # having '\n' at the end of the text sometimes creates an empty line in QTextEdit, so we omit it
+
+        if self.file_['name'][-3:].lower() == ".md":
+            highlighter = MarkdownHighlighter(self.ui.textEdit, self.app)
+        else:
+            highlighter = MarkdownHighlighter(self.ui.textEdit, self.app)
+            highlighter.highlighting_rules = []
+
         self.ui.textEdit.setPlainText(self.text)
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()

@@ -28,6 +28,7 @@ import logging
 import os
 
 from .GUI.ui_dialog_memo import Ui_Dialog_memo
+from .helpers import MarkdownHighlighter
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -89,6 +90,8 @@ class DialogEditTextFile(QtWidgets.QDialog):
             self.ui.pushButton_clear.hide()
         self.ui.pushButton_clear.pressed.connect(self.clear_contents)
         self.get_cases_codings_annotations()
+        if self.name[-3:].lower() == ".md":
+            highlighter = MarkdownHighlighter(self.ui.textEdit, self.app)
         self.ui.textEdit.setPlainText(self.text)
         self.ui.textEdit.setFocus()
         self.prev_text = copy(self.text)
