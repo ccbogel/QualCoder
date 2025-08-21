@@ -135,6 +135,16 @@ class Ui_Dialog_view_av(object):
         self.label_search_totals.setGeometry(QtCore.QRect(310, 7, 111, 22))
         self.label_search_totals.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.label_search_totals.setObjectName("label_search_totals")
+        self.pushButton_new_speaker = QtWidgets.QPushButton(parent=self.groupBox_search_text)
+        self.pushButton_new_speaker.setGeometry(QtCore.QRect(480, 3, 161, 30))
+        self.pushButton_new_speaker.setObjectName("pushButton_new_speaker")
+        self.pushButton_insert_timestamp = QtWidgets.QPushButton(parent=self.groupBox_search_text)
+        self.pushButton_insert_timestamp.setGeometry(QtCore.QRect(440, 3, 30, 30))
+        self.pushButton_insert_timestamp.setText("")
+        self.pushButton_insert_timestamp.setObjectName("pushButton_insert_timestamp")
+        self.pushButton_remove_speaker = QtWidgets.QPushButton(parent=self.groupBox_search_text)
+        self.pushButton_remove_speaker.setGeometry(QtCore.QRect(650, 3, 161, 30))
+        self.pushButton_remove_speaker.setObjectName("pushButton_remove_speaker")
         self.gridLayout.addWidget(self.groupBox_search_text, 6, 0, 1, 1)
         self.label_note = QtWidgets.QLabel(parent=Dialog_view_av)
         self.label_note.setText("")
@@ -179,7 +189,7 @@ class Ui_Dialog_view_av(object):
         self.pushButton_rate_up.setToolTip(_translate("Dialog_view_av", "<html><head/><body><p>Increase play rate</p><p>Ctrl + Shift + &gt; </p></body></html>"))
         self.pushButton_rewind_5.setToolTip(_translate("Dialog_view_av", "<html><head/><body><p>Rewind 5 seconds</p><p>Ctrl + R</p></body></html>"))
         self.pushButton_rewind_30.setToolTip(_translate("Dialog_view_av", "<html><head/><body><p>Rewind 30 seconds</p><p>Alt + Minus</p></body></html>"))
-        self.pushButton_forward_30.setToolTip(_translate("Dialog_view_av", "<html><head/><body><p>Forward 30 seconds</p><p>Alt + Plus</p></body></html>"))
+        self.pushButton_forward_30.setToolTip(_translate("Dialog_view_av", "<html><head/><body><p>Forward 30 seconds. Alt + Plus</p><p>Forward 5 seconds. Press 5</p></body></html>"))
         self.pushButton_help.setToolTip(_translate("Dialog_view_av", "Help"))
         self.label_transcription.setToolTip(_translate("Dialog_view_av", "green underline = Assigned to case.\n"
 "red underline = Assigned to code or annotation"))
@@ -191,6 +201,9 @@ class Ui_Dialog_view_av(object):
         self.label_search_regex.setToolTip(_translate("Dialog_view_av", "<html><head/><body><p>Search uses Regex functions. </p><p>A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. </p><p>A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ </p><p><span style=\" background-color:transparent;\">A ‘*’ after a character will match zero or more times. </span></p><p><span style=\" background-color:transparent;\">‘</span>\\. will match the dot symbol, ‘\\?’ will match the question mark. ‘\\n’ will match the line ending symbol. </p><p>Regex cheatsheet: <a href=\"http://www.rexegg.com/regex-quickstart.html\"><span style=\" text-decoration: underline; color:#000080;\">www.rexegg.com/regex-quickstart.html</span></a></p></body></html>"))
         self.pushButton_previous.setToolTip(_translate("Dialog_view_av", "<html><head/><body><p>Previous</p></body></html>"))
         self.label_search_totals.setText(_translate("Dialog_view_av", "0 / 0"))
+        self.pushButton_new_speaker.setText(_translate("Dialog_view_av", "New speaker"))
+        self.pushButton_insert_timestamp.setToolTip(_translate("Dialog_view_av", "Insert timestamp"))
+        self.pushButton_remove_speaker.setText(_translate("Dialog_view_av", "Remove Speaker"))
 
 
 if __name__ == "__main__":
