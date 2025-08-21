@@ -3997,7 +3997,7 @@ class DialogViewAV(QtWidgets.QDialog):
         doc_font = f'font: {self.app.settings["docfontsize"]}pt "{self.app.settings["font"]}";'
         self.ui.textEdit.setStyleSheet(doc_font)
         self.ui.label_note.setText(
-            _("Transcription area: Ctrl+R Alt+Minus Alt+Plus Ctrl+P/S Ctrl+T Ctrl+N Ctrl+1-8 Ctrl+D"))
+            _("Transcription area: Ctrl+T (insert timestamp) Ctrl+N (new speaker) Ctrl+1-8 (select speaker) Ctrl+D (delete speaker)"))
         tt = _(
             "Avoid selecting sections of text with a combination of not underlined (not coded / annotated / case-assigned) and underlined (coded, annotated, case-assigned).")
         tt += _(
@@ -4078,6 +4078,17 @@ class DialogViewAV(QtWidgets.QDialog):
         self.ui.pushButton_next.pressed.connect(self.move_to_next_search_text)
         self.ui.pushButton_next.setEnabled(False)
         self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
+        # Transcription buttons
+        self.ui.pushButton_new_speaker.setIcon(qta.icon('mdi6.account-plus-outline'))
+        self.ui.pushButton_new_speaker.setToolTip("Ctrl+N")
+        self.ui.pushButton_new_speaker.pressed.connect(self.add_speakername)
+        self.ui.pushButton_remove_speaker.setIcon(qta.icon('mdi6.account-minus-outline'))
+        self.ui.pushButton_remove_speaker.setToolTip("Ctrl+D")
+        self.ui.pushButton_remove_speaker.pressed.connect(self.delete_speakernames)
+        self.ui.pushButton_insert_timestamp.setIcon(qta.icon('mdi6.clock-outline'))
+        self.ui.pushButton_insert_timestamp.setToolTip("Ctrl+T")
+        self.ui.pushButton_insert_timestamp.pressed.connect(self.insert_timestamp)
+
         # My solution to getting gui mouse events by putting vlc video in another dialog
         self.ddialog = QtWidgets.QDialog()
         # Enable custom window hint - must be set to enable customizing window controls
