@@ -462,6 +462,48 @@ red underline = Assigned to code or annotation</string>
        <set>Qt::AlignCenter</set>
       </property>
      </widget>
+     <widget class="QPushButton" name="pushButton_new_speaker">
+      <property name="geometry">
+       <rect>
+        <x>480</x>
+        <y>3</y>
+        <width>161</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>New speaker</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_insert_timestamp">
+      <property name="geometry">
+       <rect>
+        <x>440</x>
+        <y>3</y>
+        <width>30</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Insert timestamp</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_remove_speaker">
+      <property name="geometry">
+       <rect>
+        <x>650</x>
+        <y>3</y>
+        <width>161</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Remove Speaker</string>
+      </property>
+     </widget>
     </widget>
    </item>
    <item row="8" column="0">
