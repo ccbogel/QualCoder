@@ -209,6 +209,10 @@ To install from source code below, inside a virtual environment. If you are usin
 
 4. Set up virtual environment and install python modules. The virtual environment will be in its own folder called env. Installing required modules takes a while.
 
+For example you might be in this folder, where you unzipped Qualcoder: 
+
+yourcomputer:~Downloads/QualCoder-3.7
+
 ```
 python3.12 -m venv env
 source env/bin/activate
@@ -216,28 +220,23 @@ pip install -–upgrade pip
 pip install -r requirements.txt
 ```
 
-5. Now, the command to start QualCoder, for versions up to 3.6:
-
-`python3.12 -m qualcoder`
-
-Latest code, version 3.7 and up, cd to the inner src folder first:
+5. Latest code, version 3.7 and up, cd to the inner src folder first:
 
 ```
 cd src
-python3.12 -m qualcoder
+python3 -m qualcoder
 ```
 
-6. After using QualCoder deactiatve the virtual environment.
+6. After using QualCoder deactivate the virtual environment.
 
 `deactivate`
 
-**Usage any time after the install, move to the folder (the to inner src folder if using 3.7 and up), then:**
+**Usage any time after the install, move to the QualCoder folder then:**
 
 ```
-cd QualCoder
 source env/bin/activate
-python3 -m qualcoder
-```
+cd src
+python3 -m qualcoder```
 
 To exit the environment:
 
