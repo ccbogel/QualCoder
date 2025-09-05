@@ -236,7 +236,8 @@ python3 -m qualcoder
 ```
 source env/bin/activate
 cd src
-python3 -m qualcoder```
+python3 -m qualcoder
+```
 
 To exit the environment:
 
