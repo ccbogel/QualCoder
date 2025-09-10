@@ -1,0 +1,163 @@
+Menu key shortcuts
+Menu shortcuts
+Project menu shortcuts
+Files and Cases menu shortcuts
+Alt 1 Open Project menu
+Ctrl N New project
+// Cmd + N
+Alt F Manage files
+// Option + F
+Alt 2 Open Files and Cases menu
+Ctrl O Open project
+Alt C Manage cases
+Alt 3 Open Coding menu
+Alt X Close project
+Alt J Manage journals
+Alt 4 Open Reports menu
+Ctrl M Project memo
+Alt A Manage attributes
+Alt 5 Open Help menu
+Alt S Settings
+Alt R Manage references
+Ctrl Q Exit
+// Cmd + Q
+Ctrl I Import survey
+
+
+Coding menu shortcuts
+Reports menu shortcuts
+Help menu shortcuts
+Alt T Code text
+Alt K Coding reports
+Alt H Contents - in web browser
+Alt I Code image
+Alt L Coding comparison
+Alt Y About
+Alt V Code audio/video
+Alt M Coding comparison by file
+Alt Z Special functions
+Alt E Colour scheme
+Alt N Code frequencies
+Alt O File summary
+Alt P Code summary
+Alt Q Code relations
+Alt G Open Graph
+Alt U Charts
+Alt D Database queries
+
+Manage menu section key shortcuts
+Key   
+Manage files		Cases		Journals	References
+Ctrl 0	Help		Help		Help
+Ctrl 1 View file	Create case	Create journal
+Ctrl 2 Import file	Import cases	Export		Unlink file
+Ctrl 3 Link to file	Case file manager Export all	Edit reference
+Ctrl 4 Create text file	Add attribute	Delete journal	Import references
+Ctrl 5 Import linked file Export attributes		Delete reference
+Ctrl 6 Export to linked file Delete case
+Ctrl 7 Add attribute
+Ctrl 8 Export attributes
+Ctrl 9 Export file
+
+Ctrl A Show all rows Ctrl A Show all rows		L Link selected
+							U Unlink file
+
+
+Manage files - view A/V shortcuts
+// Commands after clicking/another command might not work promptly
+// Must drag the progress bar and not clicking
+// Must drag the volume button for the sound to come out
+Alt minus Rewind 30 seconds.
+Ctrl R Rewind 5 seconds
+// Cmd + R
+Alt plus Forward 30 seconds
+Ctrl S OR Ctrl P Start/pause. On start rewind 1 second
+// Cmd + S OR Cmd + P
+Ctrl T Insert timestamp in format [hh.mm.ss]
+// Cmd + T
+Ctrl N Enter a new speakers name into shortcuts
+// Currently does not work as Cmd + N is reserved for create new project, and no other combinations work
+Ctrl D Delete speaker names from shortcuts
+// Unable to try
+Ctrl 1 .. 8 Insert speaker in format [speaker name]
+// Unable to try
+Ctrl Shift > Increase play rate
+// Cmd + Shift + >
+Ctrl Shift < Decrease play rate
+// Cmd + Shift + <
+
+
+Code text key shortcuts
+Ctrl 1 Next file
+Ctrl 2 File with latest coding
+Ctrl 3 Go to bookmark
+Ctrl 4 Open file memo
+Ctrl 5 Filter files by attributes
+Ctrl 6 Show selected code previous
+Ctrl 7 Show selected code next
+Ctrl 8 Show all codes in text (if selected code previous or next has been used)
+Ctrl 9 Show codes marked important
+Ctrl 0 Help - opens in browser
+Ctrl F Jump to search box
+Ctrl Z The last code that was unmarked, restore that coding
+Ctrl E Enter and Exit Edit mode
+A Annotate - Current text selection
+Q Quick Mark with code - for current selection
+B Create bookmark - at clicked position
+H Hide / Unhide top groupbox
+I Tag code at clicked position as important
+L Show codes like (when text coding area is in focus)
+M Memo code - at clicked position
+O Shortcut to cycle through overlapping codes - at clicked position
+S Search text - may include current selection
+R Opens a context menu for recently used codes for marking text
+U Umark at clicked position in the text
+V assign in vivo code to selected text
+Alt + Left arrow Shrink coding to the left 
+Alt + Right arrow Shrink coding to the right
+Shift + Left arrow Extend coding to the left
+Shift + Right arrow Extend coding to the right
+! Exclamation mark key - describes clicked text character position
+$ Dollar key - Shift all coding positions after a clicked position by X characters (negative numbers shift left)
+
+Code image key shortcuts
+Ctrl 1 Next file
+Ctrl 2 File with latest coding
+Ctrl 3 Open file memo
+Ctrl 4 Filter files by attributes
+Ctrl 5 Show codes marked important
+Ctrl 0 Help - opens in browser
+L Show codes like (when coding area is in focus)
+Ctrl Z The last code is unmarked, undo and restore that coding
+Ctrl G Create a grayed-out image with coloured coded highlights (Wait a few seconds)
+Minus or Q Zoom out
+Plus or W Zoom in
+Right-click on image for menu to rotate image
+
+Code audio/video key shortcuts
+Ctrl 1 Next file
+Ctrl 2 File with latest coding
+Ctrl 3 Open file memo
+Ctrl 4 Filter files by attributes
+Ctrl 9 Show codes marked important
+Ctrl 0 Help - opens in browser
+A Annotate - for current selection
+G Assign segment to currently selected code, and open memo for segment.
+I Tag important
+L Show codes like (when text coding area is in focus)
+M Memo code - at clicked position
+O Cycle through overlapping codes at clicked position
+Q Quick Mark with code - for current selection
+S Search text - may include current selection
+R Opens a context menu for recently used codes for marking text
+! Shows cursor position in text area
+5 Go forward 5 seconds.
+Ctrl Z Restore last unmarked code(s) - text code(s) or segment code
+Alt minus Rewind 30 seconds
+Ctrl R Rewind 5 seconds
+Alt + plus Forward 30 seconds
+Ctrl P Play/pause. On start rewind 1 second
+Ctrl D Play/pause. On start rewind 1 second
+Ctrl S Start and stop av segment creation
+Ctrl Shift > Increase play rate
+Ctrl Shift < Decrease play rate
