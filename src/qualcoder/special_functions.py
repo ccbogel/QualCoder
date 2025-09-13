@@ -20,6 +20,8 @@ https://github.com/ccbogel/QualCoder
 
 import logging
 import os
+import sqlite3
+
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 
 from PyQt6 import QtGui, QtWidgets, QtCore
@@ -50,7 +52,7 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
 
     # For merging projects
     merge_project_path = ""
-    projects_merged = False
+    projects_merged = False  # Used in main to clear gui tabs
 
     def __init__(self, app, parent_text_edit, tab_coding, parent=None):
 
@@ -65,16 +67,17 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
         font = f'font: {app.settings["fontsize"]}pt "{app.settings["font"]}";'
         self.setStyleSheet(font)
         self.merge_project_path = ""
+        self.coder_names = []
         self.ui.pushButton_select_text_file.setIcon(qta.icon('mdi6.file-search', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_select_text_file.setFocus()
-        self.ui.pushButton_select_replacement_text_file.setIcon(qta.icon('mdi6.file-search', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_select_replacement_text_file.setIcon(
+            qta.icon('mdi6.file-search', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_select_project.setIcon(qta.icon('mdi6.file-search', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_text_starts.setIcon(qta.icon('mdi6.play', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_text_starts.clicked.connect(self.change_text_code_start_positions)
         self.ui.pushButton_text_ends.setIcon(qta.icon('mdi6.play', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_text_ends.clicked.connect(self.change_text_code_end_positions)
         self.ui.pushButton_text_update.setIcon(qta.icon('mdi6.play', options=[{'scale_factor': 1.4}]))
-        self.ui.groupBox_text_positions.hide()
         self.ui.pushButton_select_text_file.pressed.connect(self.select_original_text_file)
         self.ui.pushButton_select_replacement_text_file.pressed.connect(self.select_replacement_text_file)
         self.ui.pushButton_text_update.setEnabled(False)
@@ -83,6 +86,10 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
         self.ui.pushButton_select_project.pressed.connect(self.select_project_folder)
         self.ui.pushButton_merge.setEnabled(False)
         self.ui.pushButton_merge.pressed.connect(self.merge_projects)
+        self.fill_combobox_codernames()
+        self.ui.pushButton_rename.pressed.connect(self.rename_coder)
+        # Text positions, is here in case it is needed, but hidden for users
+        self.ui.groupBox_text_positions.hide()
 
     # Functions to merge external project into this project
     def select_project_folder(self):
@@ -116,6 +123,98 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
         mp = MergeProjects(self.app, self.merge_project_path)
         self.parent_text_edit.append(mp.summary_msg)
         self.projects_merged = mp.projects_merged
+
+    # Functions for coder names deletion and editing
+    def fill_combobox_codernames(self):
+        """ Get coder names from all tables """
+
+        sql = "select owner from code_image union select owner from code_text union select owner from code_av "
+        sql += "union select owner from code_name union select owner from code_cat "
+        sql += "union select owner from cases union select owner from case_text "
+        sql += "union select owner from attribute union select owner from attribute_type "
+        sql += "union select owner from source union select owner from annotation union select owner from journal "
+        sql += "union select owner from manage_files_display union select owner from files_filter"
+        self.coder_names = []
+        if self.app.conn is not None:
+            cur = self.app.conn.cursor()
+            cur.execute(sql)
+            results = cur.fetchall()
+            for row in results:
+                if row[0] != "":
+                    self.coder_names.append(row[0])
+        self.ui.comboBox_codername.clear()
+        self.ui.comboBox_codername.addItems(self.coder_names)
+        index = self.ui.comboBox_codername.findText(self.app.settings['codername'], QtCore.Qt.MatchFlag.MatchFixedString)
+        if index >= 0:
+            self.ui.comboBox_codername.setCurrentIndex(index)
+
+    def rename_coder(self):
+        """ Rename a coder name. Rename can also be merged into an existing name. """
+
+        selected_name = self.ui.comboBox_codername.currentText()
+        new_name, ok = QtWidgets.QInputDialog.getText(None, _('New coder name'), _('New name:'))
+        if not ok or new_name == "":
+            Message(self.app, _("Rename coder"), _("No change"), "Information").exec()
+            return
+        msg = f"{selected_name} --> {new_name}\n" + _("Are you sure?")
+        ui = DialogConfirmDelete(self.app, msg, _("Rename coder"))
+        ok = ui.exec()
+        if not ok:
+            return
+        sqls = ["update code_image set owner=? where owner=?",
+                "update code_av set owner=? where owner=?",
+                "update code_name set owner=? where owner=?",
+                "update code_cat set owner=? where owner=?",
+                "update cases set owner=? where owner=?",
+                "update case_text set owner=? where owner=?",
+                "update attribute set owner=? where owner=?",
+                "update attribute_type set owner=? where owner=?",
+                "update source set owner=? where owner=?",
+                "update journal set owner=? where owner=?",
+                "update manage_files_display set owner=? where owner=?",
+                "update files_filter set owner=? where owner=?"]
+        rename_success = True
+        cur = self.app.conn.cursor()
+        for sql in sqls:
+            try:
+                cur.execute(sql, [new_name, selected_name])
+                self.app.conn.commit()
+            except sqlite3.IntegrityError as e:
+                self.parent_text_edit.append(f"<p>Renamed coder error: {selected_name} --> {new_name}</p><p>{e}</p>")
+                rename_success = False
+
+        # Code text has an extensive unique constraint across: cid, fid, pos0, pos1, owner
+        cur.execute("select ctid from code_text where owner=?", [selected_name])
+        ctid_res = cur.fetchall()
+        for row in ctid_res:
+            try:
+                cur.execute("update code_text set owner=? where ctid=?", [new_name, row[0]])
+                self.app.conn.commit()
+            except sqlite3.IntegrityError:
+                cur.execute("delete from code_text where ctid=?", [row[0]])
+                self.app.conn.commit()
+        # Annotation has an extensive unique constraint across: fid, pos0, pos1, owner
+        cur.execute("select anid from annotation where owner=?", [selected_name])
+        anid_res = cur.fetchall()
+        for row in anid_res:
+            try:
+                cur.execute("update annotation set owner=? where anid=?", [new_name, row[0]])
+                self.app.conn.commit()
+            except sqlite3.IntegrityError:
+                cur.execute("delete from annotation where anid=?", [row[0]])
+                self.app.conn.commit()
+
+        self.fill_combobox_codernames()
+        if self.app.settings['codername'] == selected_name:
+            self.app.settings['codername'] = new_name
+            cur.execute("update project set codername=?", [new_name])
+            self.app.conn.commit()
+        # This is checked in main.special_functions and clears other tabs: coding etc
+        self.projects_merged = True
+        if rename_success:
+            self.parent_text_edit.append(f"<p>Renamed coder: {selected_name} --> {new_name}</p>")
+        else:
+            self.parent_text_edit.append(f"<p>Renamed coder across most tables: {selected_name} --> {new_name}</p>")
 
     # Functions to update a text file but attempt to keep original codings
     def select_original_text_file(self):

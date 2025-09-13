@@ -58,10 +58,12 @@ class DialogSettings(QtWidgets.QDialog):
         self.ui.label_current_coder.setText(_("Current coder: ") + self.app.settings['codername'])
         self.ui.fontComboBox.setCurrentFont(new_font)
         # Get coder names from all tables
-        sql = "select owner from  code_image union select owner from code_text union select owner from code_av "
-        sql += " union select owner from cases union select owner from journal union select owner from attribute "
-        sql += "union select owner from source union select owner from annotation union select owner from code_name "
-        sql += "union select owner from code_cat"
+        sql = "select owner from code_image union select owner from code_text union select owner from code_av "
+        sql += "union select owner from code_name union select owner from code_cat "
+        sql += "union select owner from cases union select owner from case_text "
+        sql += "union select owner from attribute union select owner from attribute_type "
+        sql += "union select owner from source union select owner from annotation union select owner from journal "
+        sql += "union select owner from manage_files_display union select owner from files_filter"
         coders = [""]
         if self.app.conn is not None:
             cur = self.app.conn.cursor()
