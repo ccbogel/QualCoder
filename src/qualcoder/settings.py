@@ -21,7 +21,6 @@ https://qualcoder.wordpress.com/
 
 import logging
 import os
-import sys
 from PyQt6 import QtGui, QtWidgets, QtCore
 import copy
 import re
@@ -90,15 +89,11 @@ class DialogSettings(QtWidgets.QDialog):
         for index, snf in enumerate(speakernameformats):
             if snf == self.settings['speakernameformat']:
                 self.ui.comboBox_speaker.setCurrentIndex(index)
-
-        #self.ui.spinBox.setValue(self.settings['fontsize'])
         index = self.ui.comboBox_fontsize.findText(str(self.settings['fontsize']),
                                                           QtCore.Qt.MatchFlag.MatchFixedString)
         if index == -1:
             index = 0
         self.ui.comboBox_fontsize.setCurrentIndex(index)
-
-        #self.ui.spinBox_treefontsize.setValue(self.settings['treefontsize'])
         index = self.ui.comboBox_codetreefontsize.findText(str(self.settings['treefontsize']),
                                                           QtCore.Qt.MatchFlag.MatchFixedString)
         if index == -1:
@@ -157,9 +152,11 @@ class DialogSettings(QtWidgets.QDialog):
         if index == -1:
             index = 0
         self.ui.comboBox_surrounding_chars.setCurrentIndex(index)
-
+        msg = _("Default folder for storing automatic backups and for file outputs.")
+        self.ui.pushButton_choose_directory.setToolTip(msg)
         self.ui.pushButton_choose_directory.clicked.connect(self.choose_directory)
         self.ui.pushButton_set_coder.pressed.connect(self.new_coder_entered)
+
         # AI options
         if enable_ai or self.settings['ai_enable'] == 'True':
             self.ui.checkBox_AI_enable.setChecked(True)
@@ -445,7 +442,6 @@ class DialogSettings(QtWidgets.QDialog):
         self.settings['fontsize'] = int(self.ui.comboBox_fontsize.currentText())
         self.settings['treefontsize'] = int(self.ui.comboBox_codetreefontsize.currentText())
         self.settings['docfontsize'] = int(self.ui.comboBox_docfontsize.currentText())
-
         self.settings['directory'] = self.ui.label_directory.text()
         if self.ui.checkBox.isChecked():
             self.settings['showids'] = 'True'

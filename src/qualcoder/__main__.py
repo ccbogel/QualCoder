@@ -1184,7 +1184,8 @@ class App(object):
         """
 
         nowdate = datetime.datetime.now().astimezone().strftime("%Y%m%d_%H")  # -%S")
-        backup = f"{self.project_path[0:-4]}_BKUP_{nowdate}{suffix}.qda"
+        # backup = f"{self.project_path[0:-4]}_BKUP_{nowdate}{suffix}.qda"
+        backup = os.path.join(self.settings['directory'], f"{self.project_name[:-4]}_BKUP_{nowdate}{suffix}.qda")
         # Do not try and create another backup with same date and hour, unless suffix present
         result = os.path.exists(backup)
         if result and suffix == "":
