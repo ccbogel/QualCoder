@@ -166,14 +166,13 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
                 "update code_name set owner=? where owner=?",
                 "update code_cat set owner=? where owner=?",
                 "update cases set owner=? where owner=?",
-                " update case_text set owner=? where owner=?",
+                "update case_text set owner=? where owner=?",
                 "update attribute set owner=? where owner=?",
                 "update attribute_type set owner=? where owner=?",
                 "update source set owner=? where owner=?",
-                " update annotation set owner=? where owner=?",
-                " update journal set owner=? where owner=?",
+                "update journal set owner=? where owner=?",
                 "update manage_files_display set owner=? where owner=?",
-                " update files_filter set owner=? where owner=?"]
+                "update files_filter set owner=? where owner=?"]
         rename_success = True
         cur = self.app.conn.cursor()
         for sql in sqls:
