@@ -32,6 +32,7 @@ import sqlite3
 
 from PyQt6 import QtCore, QtWidgets, QtGui
 from PyQt6.QtWidgets import QDialog
+from PyQt6.QtGui import QPdfWriter
 
 from .code_in_all_files import DialogCodeInAllFiles
 from .color_selector import TextColor
@@ -81,8 +82,10 @@ class ViewGraph(QDialog):
         font += f'"{self.app.settings["font"]}";'
         self.setStyleSheet(font)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        self.ui.pushButton_export.setIcon(qta.icon('mdi6.image-move', options=[{'scale_factor': 1.4}]))
-        self.ui.pushButton_export.pressed.connect(self.export_pdf_graph)
+        self.ui.pushButton_export_pdf.setIcon(qta.icon('mdi6.image-move', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_export_pdf.pressed.connect(self.export_pdf_graph)
+        self.ui.pushButton_export.setIcon(qta.icon('mdi6.image-move', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_export.pressed.connect(self.export_image)
         self.ui.label_zoom.setPixmap(qta.icon('mdi6.magnify').pixmap(22, 22))
         self.ui.pushButton_reveal.setIcon(qta.icon('mdi6.eye', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_reveal.pressed.connect(self.reveal_hidden_items)
@@ -1019,7 +1022,6 @@ class ViewGraph(QDialog):
         if filepath is None:
             return
 
-        from PyQt6.QtGui import QPdfWriter
         max_x, max_y = self.scene.suggested_scene_size()
         # Set up PDF writer (DPI and page size)
         pdf_writer = QPdfWriter(filepath)
