@@ -82,7 +82,7 @@ class ViewGraph(QDialog):
         self.setStyleSheet(font)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         self.ui.pushButton_export.setIcon(qta.icon('mdi6.image-move', options=[{'scale_factor': 1.4}]))
-        self.ui.pushButton_export.pressed.connect(self.export_image)
+        self.ui.pushButton_export.pressed.connect(self.export_pdf_graph)
         self.ui.label_zoom.setPixmap(qta.icon('mdi6.magnify').pixmap(22, 22))
         self.ui.pushButton_reveal.setIcon(qta.icon('mdi6.eye', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_reveal.pressed.connect(self.reveal_hidden_items)
@@ -1011,6 +1011,28 @@ class ViewGraph(QDialog):
         painter.end()
         image.save(filepath)
         Message(self.app, _("Image exported"), filepath).exec()
+
+    def export_pdf_graph(self):
+        filename = "Graph.pdf"
+        e_dir = ExportDirectoryPathDialog(self.app, filename)
+        filepath = e_dir.filepath
+        if filepath is None:
+            return
+
+        from PyQt6.QtGui import QPdfWriter
+        max_x, max_y = self.scene.suggested_scene_size()
+        # Set up PDF writer (DPI and page size)
+        pdf_writer = QPdfWriter(filepath)
+        pdf_writer.setResolution(300)  # Dots per inch
+
+        painter = QtGui.QPainter(pdf_writer)
+        painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
+        # Render the scene
+        rect_area = QtCore.QRectF(0.0, 0.0, max_x + 10, max_y + 10)
+        self.scene.render(painter, QtCore.QRectF(0, 0, max_x + 10, max_y + 10), rect_area)
+        painter.end()
+
+        Message(self.app, _("PDF exported"), filepath).exec()
 
     def save_graph(self):
         """ Save graph items. """
