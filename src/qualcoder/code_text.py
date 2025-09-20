@@ -4131,8 +4131,10 @@ class DialogCodeText(QtWidgets.QWidget):
                     # Trim to first or last instance if option selected
                     if self.all_first_last == "first" and len(text_starts) > 1:
                         text_starts = [text_starts[0]]
+                        text_ends = [text_ends[0]]
                     if self.all_first_last == "last" and len(text_starts) > 1:
                         text_starts = [text_starts[-1]]
+                        text_ends = [text_ends[-1]]
 
                     # Add new items to database
                     for index in range(len(text_starts)):
