@@ -82,7 +82,7 @@ class ViewGraph(QDialog):
         font += f'"{self.app.settings["font"]}";'
         self.setStyleSheet(font)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        self.ui.pushButton_export_pdf.setIcon(qta.icon('mdi6.image-move', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_export_pdf.setIcon(qta.icon('mdi6.file-pdf-box', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_export_pdf.pressed.connect(self.export_pdf_graph)
         self.ui.pushButton_export.setIcon(qta.icon('mdi6.image-move', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_export.pressed.connect(self.export_image)
@@ -1022,19 +1022,29 @@ class ViewGraph(QDialog):
         if filepath is None:
             return
 
-        max_x, max_y = self.scene.suggested_scene_size()
-        # Set up PDF writer (DPI and page size)
-        pdf_writer = QPdfWriter(filepath)
-        pdf_writer.setResolution(300)  # Dots per inch
+        bounding_rect = self.scene.itemsBoundingRect()
+        margin = 2
+        bounding_rect = bounding_rect.adjusted(-margin, -margin, margin, margin)
+
+        pdf_writer = QtGui.QPdfWriter(filepath)
+        pdf_writer.setResolution(300)
+
+        # Create the custom page size in mm
+        width_mm = bounding_rect.width() / pdf_writer.resolution() * 30
+        height_mm = bounding_rect.height() / pdf_writer.resolution() * 30
+        page_size = QtGui.QPageSize(QtCore.QSizeF(width_mm, height_mm), QtGui.QPageSize.Millimeter)
+        pdf_writer.setPageSize(page_size)
 
         painter = QtGui.QPainter(pdf_writer)
         painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
-        # Render the scene
-        rect_area = QtCore.QRectF(0.0, 0.0, max_x + 10, max_y + 10)
-        self.scene.render(painter, QtCore.QRectF(0, 0, max_x + 10, max_y + 10), rect_area)
+        self.scene.render(
+            painter,
+            QtCore.QRectF(0, 0, bounding_rect.width(), bounding_rect.height()),
+            bounding_rect
+        )
         painter.end()
 
-        Message(self.app, _("PDF exported"), filepath).exec()
+        Message(self.app, ("PDF exported (cropped)"), filepath).exec()
 
     def save_graph(self):
         """ Save graph items. """
