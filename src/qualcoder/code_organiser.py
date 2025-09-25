@@ -993,6 +993,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         if name is None:
             return False
         self.code_or_cat['name'] = name
+        self.text = name
         self.set_text()
         for item in model:
             if item['cid'] == self.code_or_cat['cid'] and item['catid'] == self.code_or_cat['catid']:
