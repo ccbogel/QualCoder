@@ -985,6 +985,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
             existing_names.append({'name': item['name']})
 
         ui = DialogAddItemName(self.app, existing_names, _("Update name"), _("Name"))
+        ui.ui.lineEdit.setText(self.code_or_cat['name'])
         ok = ui.exec()
         if not ok:
             return
