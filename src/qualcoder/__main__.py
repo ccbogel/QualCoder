@@ -51,6 +51,7 @@ from qualcoder.code_organiser import CodeOrganiser
 from qualcoder.code_text import DialogCodeText
 from qualcoder.code_pdf import DialogCodePdf
 from qualcoder.GUI.base64_droidsansmono_helper import DroidSansMono
+from qualcoder.GUI.base64_notosans_helper import NotoSans
 from qualcoder.GUI.ui_main import Ui_MainWindow
 from qualcoder.helpers import Message, ImportPlainTextCodes
 from qualcoder.import_survey import DialogImportSurvey
@@ -3077,8 +3078,10 @@ def gui():
     qual_app = App()
     settings, ai_models = qual_app.load_settings()
     project_path = qual_app.get_most_recent_projectpath()
-    #QtGui.QFontDatabase.addApplicationFont("GUI/NotoSans-hinted/NotoSans-Regular.ttf")  # OLD
-    #QtGui.QFontDatabase.addApplicationFont("GUI/NotoSans-hinted/NotoSans-Bold.ttf")  # OLD
+    # Check Noto Sans installed  - for general application
+    install_noto_sans()
+    QtGui.QFontDatabase.addApplicationFont(os.path.join(home, ".qualcoder", "NotoSans-Regular.ttf"))
+    # QtGui.QFontDatabase.addApplicationFont(os.path.join(home, ".qualcoder", "NotoSans-Bold.ttf"))
     stylesheet = qual_app.merge_settings_with_default_stylesheet(settings)
     app.setStyleSheet(stylesheet)
     if sys.platform != 'darwin':
@@ -3219,11 +3222,19 @@ def install_language(lang):
 
 
 def install_droid_sans_mono():
-    """ Install DroidSandMono ttf font for wordclouds into .qualcoder folder """
+    """ Install DroidSansMono ttf font for wordclouds into .qualcoder folder """
 
     qc_folder = os.path.join(home, '.qualcoder', 'DroidSansMono.ttf')
     with open(qc_folder, 'wb') as file_:
         decoded_data = base64.decodebytes(DroidSansMono)
+        file_.write(decoded_data)
+
+def install_noto_sans():
+    """ Install NotoSans ttf font for general application into .qualcoder folder """
+
+    qc_folder = os.path.join(home, '.qualcoder', 'NotoSans.ttf')
+    with open(qc_folder, 'wb') as file_:
+        decoded_data = base64.decodebytes(NotoSans)
         file_.write(decoded_data)
 
 
