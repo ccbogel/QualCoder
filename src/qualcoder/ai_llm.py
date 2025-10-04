@@ -552,7 +552,7 @@ class AiLLM():
         
     def _ai_async_error(self, exception_type, value, tb_obj):
         self.ai_async_is_errored = True
-        value = html_to_text(value)
+        value = html_to_text(str(value))
         msg = _('AI Error:\n')
         msg += exception_type.__name__ + ': ' + str(value)
         tb = '\n'.join(traceback.format_tb(tb_obj))
