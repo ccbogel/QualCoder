@@ -1328,7 +1328,7 @@ Click "Yes" to start now.')
         self.ui.actionRQDA_Project_import.triggered.connect(self.rqda_project_import)
         self.ui.actionExport_codebook.triggered.connect(self.codebook)
         self.ui.actionExport_codebook_with_memos.triggered.connect(self.codebook_with_memos)
-        self.ui.actionExit.triggered.connect(self.closeEvent)
+        self.ui.actionExit.triggered.connect(self.close)
         self.ui.actionExit.setShortcut('Ctrl+Q')
         self.ui.actionImport_plain_text_codes_list.triggered.connect(self.import_plain_text_codes)
         # Manage menu
@@ -2037,37 +2037,39 @@ Click "Yes" to start now.')
     def closeEvent(self, event):
         """ Override the QWindow close event.
         Close all dialogs and database connection.
-        If selected via menu option exit: event == False
-        If selected via window x close: event == QtGui.QCloseEvent
         Close project will also delete a backup if a backup was made and no changes occurred.
         """
 
         if not self.force_quit:
-            quit_msg = _("Are you sure you want to quit?")
-            reply = QtWidgets.QMessageBox.question(self, 'Message', quit_msg,
-                                                   QtWidgets.QMessageBox.StandardButton.Yes,
-                                                   QtWidgets.QMessageBox.StandardButton.No)
-            if reply == QtWidgets.QMessageBox.StandardButton.Yes:
-                # close project before the dialog list, as close project clean the dialogs
-                self.close_project()
-                # self.dialog_list = None
-                # save main window geometry to config.ini
-                self.app.settings['mainwindow_geometry'] = self.saveGeometry().toHex().data().decode('utf-8') 
-                self.app.write_config_ini(self.app.settings, self.app.ai_models)
-                if self.app.conn is not None:
-                    try:
-                        self.app.conn.commit()
-                        self.app.conn.close()
-                    except Exception as err:
-                        print("closeEvent", err)
-                        logger.warning("close event " + str(err))
-                # TODO calls twice, do not know how to fix
-                QtWidgets.QApplication.instance().quit()
-                return
-            if event is False:
-                return
-            else:
+            reply = QtWidgets.QMessageBox.question(
+                self, 'Message', _("Are you sure you want to quit?"),
+                QtWidgets.QMessageBox.StandardButton.Yes,
+                QtWidgets.QMessageBox.StandardButton.No
+            )
+            if reply != QtWidgets.QMessageBox.StandardButton.Yes:
                 event.ignore()
+                return
+
+        self.close_project()
+
+        self.app.settings['mainwindow_geometry'] = (
+            self.saveGeometry().toHex().data().decode('utf-8')
+        )
+        self.app.write_config_ini(self.app.settings, self.app.ai_models)
+
+        if self.app.conn is not None:
+            try:
+                self.app.conn.commit()
+                self.app.conn.close()
+            except Exception as err:
+                print("closeEvent", err)
+                logger.warning("close event " + str(err))
+
+        # Accept the event and let Qt handle quitting
+        event.accept()
+
+        # Let pending deleteLaters run before loop exits
+        QtCore.QTimer.singleShot(0, QtCore.QCoreApplication.processEvents)
 
     def new_project(self):
         """ Create a new project folder with data.qda (sqlite) and folders for documents,
