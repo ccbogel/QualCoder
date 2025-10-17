@@ -212,7 +212,7 @@ yourcomputer:~Downloads/QualCoder-3.7
 ```
 python3.12 -m venv env
 source env/bin/activate
-pip install -–upgrade pip
+pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
@@ -257,7 +257,7 @@ Audio and video coding - the software crashes and for now a solution has not bee
 virtualenv env
 source env/bin/activate
 python3.12 -m ensurepip
-python3.12 -m pip install -–upgrade pip
+python3.12 -m pip install --upgrade pip
 git clone https://github.com/ccbogel/QualCoder.git
 cd QualCoder
 python3.12 -m pip install -r requirements.txt
@@ -306,7 +306,7 @@ Set up virtual environment and install python modules. The virtual environment w
 ```
 python3 -m venv env
 source env/bin/activate
-pip install -–upgrade pip
+pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
