@@ -857,17 +857,17 @@ class MarkdownHighlighter(QtGui.QSyntaxHighlighter):
         h1_format = QtGui.QTextCharFormat()
         h1_format.setFontPointSize(self.app.settings['docfontsize'] + 6)
         h1_format.setFontWeight(QtGui.QFont.Weight.Bold)
-        self.highlighting_rules += [(QtCore.QRegularExpression("# [^\n]*"), h1_format)]
+        self.highlighting_rules += [(QtCore.QRegularExpression("^# [^\n]*"), h1_format)]
         # Heading 2
         h2_format = QtGui.QTextCharFormat()
         h2_format.setFontPointSize(self.app.settings['docfontsize'] + 4)
         h2_format.setFontWeight(QtGui.QFont.Weight.Bold)
-        self.highlighting_rules += [(QtCore.QRegularExpression("## [^\n]*"), h2_format)]
+        self.highlighting_rules += [(QtCore.QRegularExpression("^## [^\n]*"), h2_format)]
         # Heading 3
         h3_format = QtGui.QTextCharFormat()
         h3_format.setFontPointSize(self.app.settings['docfontsize'] + 2)
         h3_format.setFontWeight(QtGui.QFont.Weight.Bold)
-        self.highlighting_rules += [(QtCore.QRegularExpression("### [^\n]*"), h3_format)]
+        self.highlighting_rules += [(QtCore.QRegularExpression("^### [^\n]*"), h3_format)]
         # Italic
         italic_format = QtGui.QTextCharFormat()
         italic_format.setFontItalic(True)
