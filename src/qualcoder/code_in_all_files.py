@@ -29,6 +29,7 @@ from PyQt6 import QtCore, QtGui, QtWidgets
 from .color_selector import TextColor
 from .helpers import msecs_to_mins_and_secs, DialogCodeInAV, DialogCodeInImage, DialogCodeInText, \
     ExportDirectoryPathDialog, Message
+from .memo import DialogMemo
 from .select_items import DialogSelectItems
 
 path = os.path.abspath(os.path.dirname(__file__))
@@ -100,14 +101,16 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         msg += _("Right click on heading to unmark or to add codes") + "\n\n"
         self.te.append(msg)
         cur = self.app.conn.cursor()
-        sql = "select code_name.name, color, source.name, pos0, pos1, seltext, source.name, source.id,ctid from "
+        sql = "select code_name.name, color, source.name, pos0, pos1, seltext, source.name, source.id,ctid," \
+              "important, code_text.memo from "
         sql += "code_text "
         sql += " join code_name on code_name.cid = code_text.cid join source on fid = source.id "
         sql += " where code_name.cid=? and code_text.owner=?"
         sql += " order by source.name, pos0"
         if self.case_or_file == "Case":
             sql = "select code_name.name, color, cases.name, "
-            sql += "code_text.pos0, code_text.pos1, seltext, source.name, source.id, ctid from code_text "
+            sql += "code_text.pos0, code_text.pos1, seltext, source.name, source.id, ctid, important," \
+                   "code_text.memo from code_text "
             sql += " join code_name on code_name.cid = code_text.cid "
             sql += " join (case_text join cases on cases.caseid = case_text.caseid) on "
             sql += " code_text.fid = case_text.fid "
@@ -119,7 +122,8 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         cur.execute(sql, [self.code_dict['cid'], self.app.settings['codername']])
         results = cur.fetchall()
         self.text_results = []
-        keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'text', 'source_name', 'fid', 'ctid'
+        keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'text', 'source_name', 'fid', 'ctid', \
+            'important', 'memo'
         for row in results:
             self.text_results.append(dict(zip(keys, row)))
 
@@ -141,14 +145,14 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
 
         # Get coded image by file for this coder data
         sql = "select code_name.name, color, source.name, x1, y1, width, height,"
-        sql += " source.mediapath, source.id, code_image.memo, imid "
+        sql += " source.mediapath, source.id, code_image.memo, imid, important "
         sql += " from code_image join code_name "
         sql += "on code_name.cid = code_image.cid join source on code_image.id = source.id "
         sql += "where code_name.cid =? and code_image.owner=? "
         sql += " order by source.name"
         if self.case_or_file == "Case":
             sql = "select code_name.name, color, cases.name, "
-            sql += "x1, y1, width, height, source.mediapath, source.id, code_image.memo,imid  "
+            sql += "x1, y1, width, height, source.mediapath, source.id, code_image.memo,imid, important "
             sql += "from code_image join code_name on code_name.cid = code_image.cid "
             sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
             sql += "code_image.id = case_text.fid "
@@ -159,7 +163,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         results = cur.fetchall()
         self.image_results = []
         keys = 'codename', 'color', 'file_or_casename', 'x1', 'y1', 'width', 'height', 'mediapath', 'fid', 'memo', \
-               'imid'
+               'imid', 'important'
         for row in results:
             self.image_results.append(dict(zip(keys, row)))
         # Image - textEdit insertion
@@ -183,13 +187,13 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
 
         # Get coded A/V by file for this coder data
         sql = "select code_name.name, color, source.name, pos0, pos1, code_av.memo, "
-        sql += "source.mediapath, source.id, avid from code_av join code_name "
+        sql += "source.mediapath, source.id, avid, important from code_av join code_name "
         sql += "on code_name.cid = code_av.cid join source on code_av.id = source.id "
         sql += "where code_name.cid =? and code_av.owner=? "
         sql += " order by source.name"
         if self.case_or_file == "Case":
             sql = "select code_name.name, color, cases.name, code_av.pos0, code_av.pos1, code_av.memo, "
-            sql += "source.mediapath, source.id, avid from "
+            sql += "source.mediapath, source.id, avid, important from "
             sql += "code_av join code_name on code_name.cid = code_av.cid "
             sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
             sql += "code_av.id = case_text.fid "
@@ -199,7 +203,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         cur.execute(sql, [self.code_dict['cid'], self.app.settings['codername']])
         results = cur.fetchall()
         self.av_results = []
-        keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'memo', 'mediapath', 'fid', 'avid'
+        keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'memo', 'mediapath', 'fid', 'avid', 'important'
         for row in results:
             self.av_results.append(dict(zip(keys, row)))
         # A/V - textEdit insertion
@@ -294,7 +298,9 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
 
     def text_edit_menu(self, position):
         """ Context menu for textEdit.
-        Mark, unmark, annotate. """
+        Mark, unmark, annotate.
+        TODO important mark, memo
+        """
 
         cursor = self.te.cursorForPosition(position)
         pos = cursor.position()
@@ -318,9 +324,17 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         action_mark = None
         action_unmark = None
+        action_memo = None
+        action_add_important = None
+        action_remove_important = None
         if item:
             action_mark = menu.addAction(_("Appy more codes to this segment"))
             action_unmark = menu.addAction(_("Remove code"))
+            action_memo = menu.addAction(_("Memo"))
+            if item['res']['important']:
+                action_remove_important = menu.addAction(_("Remove important flag"))
+            else:
+                action_add_important = menu.addAction(_("Add important flag"))
         action_export_odt = menu.addAction((_("Export to ODT file")))
         action = menu.exec(self.te.mapToGlobal(position))
         if action is None:
@@ -342,7 +356,61 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
                 cur.execute("delete from code_av where avid=?", [item['res']['avid']])
                 self.app.conn.commit()
             self.get_coded_segments_all_files()
+            self.app.delete_backup = False
             return
+        if action == action_memo:
+            print("MEMO")
+            self.edit_memo(item)
+        if action == action_add_important:
+            self.add_important_flag(item)
+        if action == action_remove_important:
+            self.remove_important_flag(item)
+
+    def add_important_flag(self, item):
+
+        cur = self.app.conn.cursor()
+        print(item)
+        if item['type'] == 'text':
+            cur.execute("update code_text set important=1 where ctid=?", (item['res']['ctid'],))
+        if item['type'] == 'image':
+            cur.execute("update code_image set important=1 where imid=?", (item['res']['imid'],))
+        if item['type'] == 'av':
+            cur.execute("update code_av set important=1 where avid=?", (item['res']['avid'],))
+        self.app.conn.commit()
+        self.get_coded_segments_all_files()
+        self.app.delete_backup = False
+
+    def remove_important_flag(self, item):
+
+        cur = self.app.conn.cursor()
+        if item['type'] == 'text':
+            cur.execute("update code_text set important=null where ctid=?", (item['res']['ctid'],))
+        if item['type'] == 'image':
+            cur.execute("update code_image set important=null where imid=?", (item['res']['imid'],))
+        if item['type'] == 'av':
+            cur.execute("update code_av set important=null where avid=?", (item['res']['avid'],))
+        self.app.conn.commit()
+        self.get_coded_segments_all_files()
+        self.app.delete_backup = False
+
+    def edit_memo(self, item):
+        """ Edit item memo. """
+
+        ui = DialogMemo(self.app, _("Memo for Coded: ") + item['type'], item['res']['memo'], "show")
+        ui.exec()
+        memo = ui.memo
+        if memo == item['res']['memo']:
+            return
+        cur = self.app.conn.cursor()
+        if item['type'] == 'text':
+            cur.execute("update code_text set memo=? where ctid=?", (memo, item['res']['ctid']))
+        if item['type'] == 'image':
+            cur.execute("update code_image set memo=? where imid=?", (memo, item['res']['imid']))
+        if item['type'] == 'av':
+            cur.execute("update code_av set memo=? where avid=?", (memo, item['res']['avid']))
+        self.app.conn.commit()
+        self.get_coded_segments_all_files()
+        self.app.delete_backup = False
 
     def export_odt(self):
         """ Export all contents to ODT file. """
