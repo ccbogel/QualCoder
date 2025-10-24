@@ -162,6 +162,7 @@ class DialogSettings(QtWidgets.QDialog):
             self.ui.checkBox_AI_enable.setChecked(True)
         else:
             self.ui.checkBox_AI_enable.setChecked(False)
+        self.ui.lineEdit_ai_api_key.setEchoMode(QtWidgets.QLineEdit.EchoMode.Password)
         self.ui.checkBox_AI_enable.stateChanged.connect(self.ai_enable_state_changed)
         self.ui.comboBox_ai_profile.clear()
         if len(self.ai_models) > 0:
@@ -171,10 +172,10 @@ class DialogSettings(QtWidgets.QDialog):
                 self.ui.comboBox_ai_profile.setItemData(i, model['desc'], QtCore.Qt.ItemDataRole.ToolTipRole)
             if 0 <= int(self.settings['ai_model_index']) <= (len(self.ai_models) - 1): 
                 self.ui.comboBox_ai_profile.setCurrentIndex(int(self.settings['ai_model_index']))
-            else: # ai_model_index out of range
+            else:  # ai_model_index out of range
                 self.settings['ai_model_index'] = 0
                 self.ui.comboBox_ai_profile.setCurrentIndex(0)
-        else: # no ai profiles defined
+        else:  # no ai profiles defined
             self.settings['ai_model_index'] = -1
         self.ui.comboBox_ai_profile.currentIndexChanged.connect(self.ai_profile_changed)
         self.ai_profile_changed()
