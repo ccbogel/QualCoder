@@ -22,6 +22,7 @@ https://qualcoder.wordpress.com/
 import logging
 import os
 from PyQt6 import QtGui, QtWidgets, QtCore
+import qtawesome as qta
 import copy
 import re
 
@@ -162,7 +163,6 @@ class DialogSettings(QtWidgets.QDialog):
             self.ui.checkBox_AI_enable.setChecked(True)
         else:
             self.ui.checkBox_AI_enable.setChecked(False)
-        self.ui.lineEdit_ai_api_key.setEchoMode(QtWidgets.QLineEdit.EchoMode.Password)
         self.ui.checkBox_AI_enable.stateChanged.connect(self.ai_enable_state_changed)
         self.ui.comboBox_ai_profile.clear()
         if len(self.ai_models) > 0:
@@ -182,6 +182,8 @@ class DialogSettings(QtWidgets.QDialog):
         self.ai_enable_state_changed()
         self.ui.pushButton_ai_profile_edit.clicked.connect(self.ai_profile_name_edit)
         self.ui.lineEdit_ai_api_key.textChanged.connect(self.ai_api_key_changed)
+        self.ui.toolButtonShowApiKey.setIcon(qta.icon('mdi6.eye-outline'))
+        self.ui.toolButtonShowApiKey.toggled.connect(self.ai_api_key_show)
         # advanced AI options:
         self.ui.pushButton_advanced_AI_options.clicked.connect(self.toggle_ai_advanced_options)
         self.toggle_ai_advanced_options() # hide the advanced AI options panel
@@ -325,7 +327,10 @@ class DialogSettings(QtWidgets.QDialog):
     def ai_api_key_changed(self):
         if int(self.settings['ai_model_index']) >= 0:
             self.ai_models[int(self.settings['ai_model_index'])]['api_key'] = self.ui.lineEdit_ai_api_key.text()   
-        self.ai_update_avaliable_models()     
+        self.ai_update_avaliable_models()    
+        
+    def ai_api_key_show(self, checked):
+        self.ui.lineEdit_ai_api_key.setEchoMode(QtWidgets.QLineEdit.EchoMode.Normal if checked else QtWidgets.QLineEdit.EchoMode.PasswordEchoOnEdit) 
 
     def ai_update_avaliable_models(self):
         if not self.ui.widget_AI_advanced_options.isVisible():

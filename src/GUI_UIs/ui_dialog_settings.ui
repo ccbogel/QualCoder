@@ -44,9 +44,9 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>-237</y>
+        <y>-188</y>
         <width>795</width>
-        <height>841</height>
+        <height>842</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -855,7 +855,11 @@ Not recommended unless you have many large files slowing the backup.</string>
               </widget>
              </item>
              <item row="5" column="1">
-              <widget class="QLineEdit" name="lineEdit_ai_api_key"/>
+              <widget class="QLineEdit" name="lineEdit_ai_api_key">
+               <property name="echoMode">
+                <enum>QLineEdit::PasswordEchoOnEdit</enum>
+               </property>
+              </widget>
              </item>
              <item row="3" column="1">
               <widget class="QLabel" name="label_ai_model_desc">
@@ -874,6 +878,16 @@ Not recommended unless you have many large files slowing the backup.</string>
                </property>
                <property name="textInteractionFlags">
                 <set>Qt::TextBrowserInteraction</set>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="2">
+              <widget class="QToolButton" name="toolButtonShowApiKey">
+               <property name="text">
+                <string>...</string>
+               </property>
+               <property name="checkable">
+                <bool>true</bool>
                </property>
               </widget>
              </item>
