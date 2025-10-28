@@ -126,21 +126,22 @@ large_model = alias-large
 large_model_context_window = 128000
 fast_model = alias-fast
 fast_model_context_window = 32000
-api_base = https://helmholtz-blablador.fz-juelich.de:8000/v1
+api_base = https://api.helmholtz-blablador.fz-juelich.de/v1/
 api_key = 
 
 [ai_model_Blablador Huge]
-desc = Llama 3.1 405b, very large and powerful. Availability might change.
+desc = The largest and most powerful model currently running on Blablador. 
+    Availability might change.
 	Blablador is free to use and runs on a server of the Helmholtz Society,
 	a large non-profit research organization in Germany. To gain
 	access and get an API-key, you have to identify yourself once with your
 	university, ORCID, GitHub, or Google account.
 access_info_url = https://sdlaml.pages.jsc.fz-juelich.de/ai/guides/blablador_api_access/
-large_model = alias-llama3-huge
+large_model = alias-huge
 large_model_context_window = 128000
 fast_model = alias-fast
 fast_model_context_window = 128000
-api_base = https://helmholtz-blablador.fz-juelich.de:8000/v1
+api_base = https://api.helmholtz-blablador.fz-juelich.de/v1/
 api_key = 
 
 [ai_model_Anthropic Claude]
@@ -362,11 +363,39 @@ class AiLLM():
                         # Success, model was selected. But since the "change_settings" function will start 
                         # a new "init_llm" anyway, we are going to quit here
                         return    
+                
                 curr_model = self.app.ai_models[int(self.app.settings['ai_model_index'])]
                 
-                large_model = curr_model['large_model']
-                if large_model.find('gpt-4-turbo') > -1:
+                # Update model definitions if needed
+                
+                # Blablador: update config (api base, model alias)
+                if curr_model['api_base'] == 'https://helmholtz-blablador.fz-juelich.de:8000/v1' and curr_model['large_model'] != 'alias-large':
+                    msg = _('You are using the "Blablador" service on an old server that will soon be disabled. '
+                            'Your configuration will be updated automatically. Please test if the AI access still works as expected. '
+                            'You might need to change to a different AI model in the settings dialog under "Advanced AI Settings".')
+                    Message(self.app, _('AI Setup'), msg).exec()
+                blablador_updated = False
+                for model_def in self.app.ai_models:
+                    if model_def['api_base'] == 'https://helmholtz-blablador.fz-juelich.de:8000/v1':
+                        model_def['api_base'] = 'https://api.helmholtz-blablador.fz-juelich.de/v1/'
+                        blablador_updated = True
+                    if model_def['large_model'] == 'alias-llama3-huge': # this alias is no longer available
+                        model_def['large_model'] = 'alias-huge'
+                        blablador_updated = True
+                    if model_def['fast_model'] == 'alias-llama3-huge':
+                        model_def['fast_model'] = 'alias-huge'
+                        blablador_updated = True                    
+                if blablador_updated:
+                    self.app.write_config_ini(self.app.settings, self.app.ai_models)
+                    msg = _('AI: Updated Blablador config.')
+                    self.parent_text_edit.append(msg)
+                    logger.debug(msg)
+                    
+                # OpenAI: Check for outdated models:            
+                if curr_model['large_model'].find('gpt-4-turbo') > -1:
                     self.parent_text_edit.append(_('AI: You are still using the outdated GPT-4 turbo. Consider switching to a newer model, such as GPT 4.1. Go to Project > Settings to change the AI profile and model.'))
+                
+                large_model = curr_model['large_model']
                 self.large_llm_context_window = int(curr_model['large_model_context_window'])
                 fast_model = curr_model['fast_model']
                 self.fast_llm_context_window = int(curr_model['fast_model_context_window'])
