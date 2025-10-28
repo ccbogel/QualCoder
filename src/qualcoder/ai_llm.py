@@ -144,14 +144,14 @@ fast_model_context_window = 128000
 api_base = https://api.helmholtz-blablador.fz-juelich.de/v1/
 api_key = 
 
-[ai_model_Anthropic Claude]
+[ai_model_Anthropic Claude Opus 4.1]
 desc = Claude is a family of high quality models from Anthropic.
 	You need an API-key from Anthropic and credits in your account.
 	Anthropic will charge a small amount for every use.
 access_info_url = https://console.anthropic.com/settings/keys
-large_model = claude-opus-4-20250514
+large_model = claude-opus-4-1
 large_model_context_window = 200000
-fast_model = claude-sonnet-4-20250514
+fast_model = claude-sonnet-4
 fast_model_context_window = 200000
 api_base = https://api.anthropic.com/v1/
 api_key = 
@@ -395,6 +395,10 @@ class AiLLM():
                 if curr_model['large_model'].find('gpt-4-turbo') > -1:
                     self.parent_text_edit.append(_('AI: You are still using the outdated GPT-4 turbo. Consider switching to a newer model, such as GPT 4.1. Go to Project > Settings to change the AI profile and model.'))
                 
+                # Anthropic: Check for outdated models
+                if curr_model['large_model'] == 'claude-opus-4-20250514':
+                    self.parent_text_edit.append(_('AI: You are using the outdated Claude Opus 4 model from Anthropic. Consider switching to a newer model, such as Opus 4.1. Go to Project > Settings to change the AI profile and model.'))
+                
                 large_model = curr_model['large_model']
                 self.large_llm_context_window = int(curr_model['large_model_context_window'])
                 fast_model = curr_model['fast_model']
@@ -462,6 +466,24 @@ class AiLLM():
                                         cache=False,
                                         streaming=True
                     )
+                elif api_base.find('anthropic.com') != -1:  # Anthropic
+                    # omitting top_p, since Antrhopic does not accept temerature and top_p at the same time
+                    self.large_llm = ChatOpenAI(model=large_model, 
+                                        openai_api_key=api_key, 
+                                        openai_api_base=api_base, 
+                                        cache=False,
+                                        temperature=temp,
+                                        streaming=True,
+                                        timeout=timeout,
+                                        )
+                    self.fast_llm = ChatOpenAI(model=fast_model, 
+                                        openai_api_key=api_key, 
+                                        openai_api_base=api_base, 
+                                        cache=False,
+                                        temperature=temp,
+                                        streaming=True,
+                                        timeout=timeout,
+                                        )
                 else:  # OpenAI or 100% compatible api
                     self.large_llm = ChatOpenAI(model=large_model, 
                                         openai_api_key=api_key, 
