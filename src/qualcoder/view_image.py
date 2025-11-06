@@ -1705,8 +1705,10 @@ class DialogCodeImage(QtWidgets.QDialog):
             return
         code_ = self.ui.treeWidget.currentItem()
         if code_ is None:
+            Message(self.app, _("Coded area"), _("Select a code in the list first."), "warning").exec()
             return
         if code_.text(1)[0:3] == 'cat':
+            Message(self.app, _("Coded area"), _("Select a code in the list first."), "warning").exec()
             return
         cid = int(code_.text(1)[4:])  # must be integer
         code_name = code_.text(0)
