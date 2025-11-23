@@ -245,6 +245,37 @@ Create a .Desktop file for launch, enter this command (adapt it according to the
 
 bash -c 'cd ~/.local/share/qualcoder/src/ && ~/.local/share/qualcoder/env/bin/python3.12 -m qualcoder'
 
+### Fedora 43
+
+These instructions are adapted from the Fedora 42 instructions below, tested with QualCoder 3.7 on Fedora 43 with Python 3.12.12.
+
+1. Install dependencies:
+
+    ```bash
+    sudo dnf install python3.12
+    ```
+
+2. Set up QualCoder:
+
+    ```bash
+    cd ~/qualcoder  # replace with appropriate location on your machine
+    python3.12 -m venv env
+    source env/bin/activate
+    python3.12 -m ensurepip
+    python3.12 -m pip install --upgrade pip
+    mkdir tmp
+    TMPDIR=./tmp python3.12 -m pip install -r requirements.txt
+    deactivate
+    ```
+
+3. Usage:
+
+    ```bash
+    cd ~/qualcoder  # replace with appropriate location on your machine
+    source env/bin/activate
+    cd src
+    python3.12 -m qualcoder
+    ```
 
 ### Fedora 42
 
