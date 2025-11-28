@@ -1,0 +1,44 @@
+#!/usr/bin/env -S flatpak-builder --user --force-clean --install-deps-from flathub .flatpak-build-dir
+#      - flatpak build-export .flatpak-repo .flatpak-build-dir
+#      - flatpak build-bundle .flatpak-repo qualcoder.flatpak io.github.ccbogel.QualCoder
+# when in a container add FLATPAK_SYSTEM_HELPER_ON_SESSION=none for the first install
+# or dbus-send --system /org/freedesktop/DBus org.freedesktop.DBus || dbus-daemon --system --fork # see https://github.com/flatpak/flatpak/issues/5076
+id: io.github.ccbogel.QualCoder
+runtime: org.kde.Platform
+runtime-version: '6.9'
+sdk: org.kde.Sdk
+base: com.riverbankcomputing.PyQt.BaseApp
+base-version: '6.9' # python312
+cleanup-commands:
+  - /app/cleanup-BaseApp.sh
+command: qualcoder
+finish-args:
+  - --share=ipc
+  - --socket=fallback-x11
+  - --socket=wayland
+  - --filesystem=xdg-documents
+  - --device=dri
+
+modules:
+  # generate with flatpak_pip_generator --runtime='com.riverbankcomputing.PyQt.BaseApp//6.9' --requirements-file='requirements.txt' --ignore-pkg 'PyQt6>=6.5' pymupdf --output flatpak-pypi-dependencies --checker-data
+  # -- was trying to build everything from source which broke for Pillow, pymupdf and possibly more...
+
+  # req2flatpak --requirements-file requirements-flatpak.txt --outfile flatpak-pypi-dependencies.json --target-platforms 312-x86_64
+  - flatpak-pypi-dependencies.json
+
+  - name: qualcoder
+    sources:
+      - type: archive
+        url: https://github.com/ccbogel/QualCoder/archive/refs/tags/3.7.tar.gz
+        sha256: "028cf4af96ce4bbe67666e8b6d71db78b957112ca6e3cad33e1cbe0727988109"
+    buildsystem: simple
+    build-commands:
+      # from https://develop.kde.org/docs/getting-started/python/python-flatpak/
+      #- pip3 install --requirement requirements.txt --verbose --no-build-isolation --prefix=${FLATPAK_DEST}
+      # from https://github.com/flathub/org.thonny.Thonny/blob/master/org.thonny.Thonny.yaml
+      - python3 setup.py install --prefix=${FLATPAK_DEST} --root=/
+      #- install -Dm644 packaging/linux/org.thonny.Thonny.desktop -t ${FLATPAK_DEST}/share/applications
+      - install -Dm644 -T qualcoder.png ${FLATPAK_DEST}/share/icons/hicolor/512x512/apps/${FLATPAK_ID}.png
+      - install -Dm644 -T icons/qualcoder32.png ${FLATPAK_DEST}/share/icons/hicolor/32x32/apps/${FLATPAK_ID}.png
+
+# see also https://github.com/flatpak/flatpak-builder-tools/tree/master/pip
