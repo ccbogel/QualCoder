@@ -4699,7 +4699,7 @@ msgstr "Notes d'analyse. Journaux chargés : "
 
 #: qualcoder\refi.py:406 refi.py:406 refi.py:399 refi.py:403
 msgid "Parsing cases. Loaded: "
-msgstr "L'analyse des affaires. Chargé : "
+msgstr "L'analyse des cas. Chargé : "
 
 #: qualcoder\refi.py:415 refi.py:415 refi.py:408 refi.py:412
 msgid "Parsing sets."
@@ -5207,7 +5207,7 @@ msgstr ""
 #: report_codes.py:238 report_codes_by_segments.py:130 report_codes.py:240
 #: report_codes.py:246 report_codes_by_segments.py:137 report_codes.py:247
 msgid "No case selection"
-msgstr "Pas de sélection des affaires"
+msgstr "Pas de sélection des cas"
 
 #: qualcoder\report_codes.py:288 qualcoder\report_codes_by_segments.py:181
 #: report_codes.py:288 report_codes_by_segments.py:181 report_codes.py:290
