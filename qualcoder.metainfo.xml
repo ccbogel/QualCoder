@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+    <id>io.github.ccbogel.QualCoder</id>
+
+    <name>QualCoder</name>
+    <summary>Qualitative data analysis for text, images, audio, video</summary>
+
+    <metadata_license>CC-BY-SA-4.0</metadata_license>
+    <project_license>LGPL-3.0-only</project_license>
+
+    <recommends>
+        <display_length compare="ge">950</display_length>
+        <internet>always</internet>
+    </recommends>
+
+    <description>
+        <p>QualCoder is a qualitative data analysis application written in Python.</p>
+        <p>Text files can be typed in manually or loaded from txt, odt, docx, html, htm, md, epub, and PDF files. 
+           Images, video, and audio can also be imported for coding. 
+           Codes can be assigned to text, images, and a/v selections and grouped into categories in a hierarchical fashion.
+           Various types of reports can be produced including visual coding graphs, coder comparisons, and coding frequencies. 
+           AI models like GPT-4 from OpenAI can be used to explore your data and analyze the results.
+        </p>
+    </description>
+
+    <launchable type="desktop-id">io.github.ccbogel.QualCoder.desktop</launchable>
+
+    <categories>
+        <category>Science</category>
+    </categories>
+
+    <provides>
+        <binary>qualcoder</binary>
+    </provides>
+</component>

@@ -37,8 +37,19 @@ modules:
       #- pip3 install --requirement requirements.txt --verbose --no-build-isolation --prefix=${FLATPAK_DEST}
       # from https://github.com/flathub/org.thonny.Thonny/blob/master/org.thonny.Thonny.yaml
       - python3 setup.py install --prefix=${FLATPAK_DEST} --root=/
-      #- install -Dm644 packaging/linux/org.thonny.Thonny.desktop -t ${FLATPAK_DEST}/share/applications
+#      - install -D qualcoder.desktop ${FLATPAK_DEST}/share/applications/${FLATPAK_ID}.desktop
+#      - install -D qualcoder.metainfo.xml ${FLATPAK_DEST}/share/metainfo/${FLATPAK_ID}.metainfo.xml
       - install -Dm644 -T qualcoder.png ${FLATPAK_DEST}/share/icons/hicolor/512x512/apps/${FLATPAK_ID}.png
       - install -Dm644 -T icons/qualcoder32.png ${FLATPAK_DEST}/share/icons/hicolor/32x32/apps/${FLATPAK_ID}.png
+
+   # to be removed when those are included in the release archive
+  - name: local files
+    sources:
+      - type: dir
+        path: .
+    buildsystem: simple
+    build-commands:
+     - install -D qualcoder.desktop ${FLATPAK_DEST}/share/applications/${FLATPAK_ID}.desktop
+     - install -D qualcoder.metainfo.xml ${FLATPAK_DEST}/share/metainfo/${FLATPAK_ID}.metainfo.xml
 
 # see also https://github.com/flatpak/flatpak-builder-tools/tree/master/pip
