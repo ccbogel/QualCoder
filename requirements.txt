@@ -20,7 +20,7 @@ langchain-core>=0.2.19
 langchain-openai>=0.1.16
 langchain-text-splitters>=0.2.2 
 faiss-cpu
-transformers<=4.48.3 # see https://github.com/huggingface/transformers/issues/38402
+transformers<=4.53.0 # see https://github.com/huggingface/transformers/issues/38402
 sentence-transformers 
 Bio
 PyYAML 
