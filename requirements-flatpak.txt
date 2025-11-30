@@ -398,7 +398,7 @@ tqdm==4.67.1
     #   openai
     #   sentence-transformers
     #   transformers
-transformers==4.48.3
+transformers==4.53.0
     # via
     #   qualcoder
     #   sentence-transformers
