@@ -91,12 +91,12 @@ Les codages de l&apos;ensemble du fichier texte sont utilisés pour les calculs.
     <message>
         <location filename="ui_dialog_charts.py" line="295"/>
         <source>&lt;b&gt;Data filters&lt;/b&gt;</source>
-        <translation>&amp;lt;b&amp;gt;Filtres de données&amp;lt;/b&amp;gt;</translation>
+        <translation>&lt;b&gt;Filtres de données&lt;/b&gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="296"/>
         <source>&lt;b&gt;Coding charts&lt;/b&gt;</source>
-        <translation>&amp;lt;b&amp;gt;Graphiques de codage&amp;lt;/b&amp;gt;</translation>
+        <translation>&lt;b&gt;Graphiques de codage&lt;/b&gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="297"/>
@@ -106,7 +106,7 @@ Les codages de l&apos;ensemble du fichier texte sont utilisés pour les calculs.
     <message>
         <location filename="ui_dialog_charts.py" line="298"/>
         <source>&lt;b&gt;Attribute charts&lt;/b&gt;</source>
-        <translation>&amp;lt;b&amp;gt;Graphes d&apos;attributs&amp;lt;/b&amp;gt;</translation>
+        <translation>&lt;b&gt;Graphes d&apos;attributs&lt;/b&gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="299"/>
@@ -136,7 +136,7 @@ Les codages de l&apos;ensemble du fichier texte sont utilisés pour les calculs.
     <message>
         <location filename="ui_dialog_charts.py" line="304"/>
         <source>&lt;b&gt;Heatmap charts&lt;/b&gt;</source>
-        <translation>&amp;lt;b&amp;gt;Cartes thermiques&amp;lt;/b&amp;gt;</translation>
+        <translation>&lt;b&gt;Cartes thermiques&lt;/b&gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="305"/>
