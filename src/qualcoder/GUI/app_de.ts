@@ -3991,7 +3991,7 @@ Sie müssen diese Dateien an einem anderen Ort speichern.</translation>
     <message>
         <location filename="ui_dialog_settings.py" line="591"/>
         <source>Code text chunk size</source>
-        <translation>Größe des Textstücks im Code</translation>
+        <translation>Größe der Textstücke</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="585"/>

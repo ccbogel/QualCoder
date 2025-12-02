@@ -164,6 +164,7 @@ class DialogSettings(QtWidgets.QDialog):
         else:
             self.ui.checkBox_AI_enable.setChecked(False)
         self.ui.checkBox_AI_enable.stateChanged.connect(self.ai_enable_state_changed)
+        self.ui.comboBox_reasoning.addItems(['default', 'low', 'medium', 'high'])
         self.ui.comboBox_ai_profile.clear()
         if len(self.ai_models) > 0:
             for i in range(len(self.ai_models)):
@@ -206,6 +207,7 @@ class DialogSettings(QtWidgets.QDialog):
         self.ui.lineEdit_ai_temperature.editingFinished.connect(self.validate_ai_temperature)
         self.ui.lineEdit_top_p.setText(self.settings.get('ai_top_p', '1.0'))
         self.ui.lineEdit_top_p.editingFinished.connect(self.validate_ai_top_p)
+        self.ui.comboBox_reasoning.currentIndexChanged.connect(self.ai_model_parameters_changed)
         
         # Move to AI settings if requested
         if section is not None and (section == 'AI' or section == 'advanced AI'):
@@ -258,7 +260,12 @@ class DialogSettings(QtWidgets.QDialog):
             with QtCore.QSignalBlocker(self.ui.lineEdit_ai_large_context_window):
                 self.ui.lineEdit_ai_large_context_window.setText(curr_ai_model['large_model_context_window'])
             with QtCore.QSignalBlocker(self.ui.lineEdit_ai_fast_context_window):
-                self.ui.lineEdit_ai_fast_context_window.setText(curr_ai_model['fast_model_context_window'])            
+                self.ui.lineEdit_ai_fast_context_window.setText(curr_ai_model['fast_model_context_window'])
+            try:
+                reasoning_effort = curr_ai_model['reasoning_effort']
+                self.ui.comboBox_reasoning.setCurrentText(reasoning_effort)
+            except:
+                self.ui.comboBox_reasoning.setCurrentText('default')    
         else:
             self.ui.label_ai_model_desc.setText('')
             self.ui.label_ai_access_info_url.setText('')
@@ -267,7 +274,8 @@ class DialogSettings(QtWidgets.QDialog):
             self.ui.comboBox_AI_model_large.setCurrentText('')
             self.ui.comboBox_AI_model_fast.setCurrentText('')
             self.ui.lineEdit_ai_large_context_window.setText('')
-            self.ui.lineEdit_ai_fast_context_window.setText('')            
+            self.ui.lineEdit_ai_fast_context_window.setText('') 
+            self.ui.comboBox_reasoning.setCurrentText('default')           
         self.ai_update_avaliable_models()     
         
     def ai_profile_name_edit(self):
@@ -322,7 +330,8 @@ class DialogSettings(QtWidgets.QDialog):
             if self.ui.lineEdit_ai_fast_context_window.text() != '':
                 self.ai_models[ai_model_index]['fast_model_context_window'] = self.ui.lineEdit_ai_fast_context_window.text()
             else:
-                self.ai_models[ai_model_index]['fast_model_context_window'] = '32768' # default        
+                self.ai_models[ai_model_index]['fast_model_context_window'] = '32768' # default
+            self.ai_models[ai_model_index]['reasoning_effort'] = self.ui.comboBox_reasoning.currentText()        
 
     def ai_api_key_changed(self):
         if int(self.settings['ai_model_index']) >= 0:
@@ -505,6 +514,7 @@ class DialogSettings(QtWidgets.QDialog):
         self.settings['ai_language'] =  self.ui.lineEdit_AI_language.text()
         self.settings['ai_temperature'] = self.ui.lineEdit_ai_temperature.text()
         self.settings['ai_top_p'] = self.ui.lineEdit_top_p.text()
+        self.settings['reasoning_effort'] = self.ui.comboBox_reasoning.currentText()
         self.save_settings()
         if restart_qualcoder:
             Message(self.app, _("Restart QualCoder"), _("Restart QualCoder to enact some changes")).exec()

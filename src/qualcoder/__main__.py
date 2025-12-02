@@ -641,6 +641,7 @@ class App(object):
             config[model_section]['large_model_context_window'] = model['large_model_context_window']
             config[model_section]['fast_model'] = model['fast_model']
             config[model_section]['fast_model_context_window'] = model['fast_model_context_window']
+            config[model_section]['reasoning_effort'] = model['reasoning_effort']
             config[model_section]['api_base'] = model['api_base']
             config[model_section]['api_key'] = model['api_key']
         
@@ -693,6 +694,7 @@ class App(object):
                     'large_model_context_window': config[section].get('large_model_context_window', '32768'),
                     'fast_model': config[section].get('fast_model', ''),
                     'fast_model_context_window': config[section].get('fast_model_context_window', '32768'),
+                    'reasoning_effort': config[section].get('reasoning_effort', ''),
                     'api_base': config[section].get('api_base', ''),
                     'api_key': config[section].get('api_key', '')
                 }

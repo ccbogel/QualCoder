@@ -414,7 +414,8 @@ class RefiImport:
         self.parent_textedit.append(self.file_path + _(" loaded."))
         # Remove temporary extract folder
         try:
-            shutil.rmtree(self.folder_name)
+            if self.folder_name != '':
+                shutil.rmtree(self.folder_name)
         except OSError as err:
             logger.debug(f"{err} {self.folder_name}")
         # Change the username to an owner name from the import
@@ -2078,7 +2079,8 @@ class RefiExport(QtWidgets.QDialog):
 
         shutil.copyfile(f"{prep_path}.qdpx", f"{export_path}.qdpx")
         try:
-            shutil.rmtree(prep_path)
+            if prep_path != '':
+                shutil.rmtree(prep_path)
             os.remove(f"{prep_path}.qdpx")
         except FileNotFoundError as err:
             logger.warning(str(err))
