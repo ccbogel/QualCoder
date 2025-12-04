@@ -474,34 +474,25 @@ class AiLLM():
                 top_p = float(self.app.settings.get('ai_top_p', '1.0'))
                 timeout = float(self.app.settings.get('ai_timeout', '30.0'))
                 self.app.settings['ai_timeout'] = str(timeout)
-                if api_base.find('openai.azure.com') != -1:  # using Microsoft Azure
-                    self.large_llm = AzureChatOpenAI(
-                                        azure_endpoint=api_base,
-                                        azure_deployment=large_model,    
-                                        api_version="2024-02-15-preview",
-                                        api_key=api_key,
-                                        temperature=temp,
-                                        top_p=top_p,
-                                        max_tokens=None,
-                                        timeout=timeout,
-                                        max_retries=2,
-                                        cache=False,
-                                        streaming=True
-                    )
-                    self.fast_llm = AzureChatOpenAI(
-                                        azure_endpoint=api_base,
-                                        azure_deployment=large_model,    
-                                        api_version="2024-02-15-preview",
-                                        api_key=api_key,
-                                        temperature=temp,
-                                        top_p=top_p,
-                                        max_tokens=None,
-                                        timeout=timeout,
-                                        max_retries=2,
-                                        cache=False,
-                                        streaming=True
-                    )
+                if api_base.find('azure.com') != -1:  # using Microsoft Azure
+                    is_azure = True
+                    large_llm_params = {
+                        'azure_endpoint': api_base,
+                        'azure_deployment': large_model,    
+                        'api_version': '2024-12-01-preview',
+                        'api_key': api_key,
+                        'temperature': temp,
+                        'top_p': top_p,
+                        'max_tokens': None,
+                        'timeout': timeout,
+                        'max_retries': 2,
+                        'cache': False,
+                        'streaming': True
+                    }        
+                    fast_llm_params = large_llm_params.copy()
+                    fast_llm_params['model'] = fast_model
                 else: # OpenAI or compatible API
+                    is_azure = False
                     large_llm_params = {
                         'model': large_model, 
                         'openai_api_key': api_key, 
@@ -511,24 +502,27 @@ class AiLLM():
                         'top_p': top_p,
                         'streaming': True,
                         'timeout': timeout,
-                    }
-                    
+                    }   
                     fast_llm_params = large_llm_params.copy()
                     fast_llm_params['model'] = fast_model
                     
-                    if 'reasoning_effort' in curr_model and curr_model['reasoning_effort'] in ['low', 'medium', 'high']:
-                        large_llm_params['reasoning_effort'] = curr_model['reasoning_effort']
-                        # raise the timeout for reasoning models
-                        large_llm_params['timeout'] = (['low', 'medium', 'high'].index(curr_model['reasoning_effort']) + 1) * timeout
-                    
-                    if api_base.find('anthropic.com') != -1:  # Anthropic
-                        # omitting top_p, since Antrhopic does not accept temerature and top_p at the same time
-                        try:
-                            large_llm_params.pop('top_p')
-                            fast_llm_params.pop('top_p')
-                        except:
-                            pass
-
+                if 'reasoning_effort' in curr_model and curr_model['reasoning_effort'] in ['low', 'medium', 'high']:
+                    large_llm_params['reasoning_effort'] = curr_model['reasoning_effort']
+                    # raise the timeout for reasoning models
+                    large_llm_params['timeout'] = (['low', 'medium', 'high'].index(curr_model['reasoning_effort']) + 1) * timeout
+                
+                if large_model.lower().find('claude') != -1:  # Anthropic
+                    # omitting top_p, since Antrhopic does not accept temperature and top_p at the same time
+                    try:
+                        large_llm_params.pop('top_p')
+                        fast_llm_params.pop('top_p')
+                    except:
+                        pass
+                
+                if is_azure:
+                    self.large_llm = AzureChatOpenAI(**large_llm_params)
+                    self.fast_llm = AzureChatOpenAI(**fast_llm_params)
+                else:    
                     self.large_llm = ChatOpenAI(**large_llm_params)
                     self.fast_llm = ChatOpenAI(**fast_llm_params)
 
