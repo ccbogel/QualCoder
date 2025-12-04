@@ -46,7 +46,7 @@ from .GUI.ui_ai_chat import Ui_Dialog_ai_chat
 from .helpers import Message
 from .confirm_delete import DialogConfirmDelete
 from .ai_prompts import PromptItem
-from .ai_llm import extract_ai_memo, ai_quote_search
+from .ai_llm import extract_ai_memo, ai_quote_search, strip_think_blocks
 from .error_dlg import qt_exception_hook
 from .html_parser import html_to_text
 
@@ -832,6 +832,9 @@ data collected. This information will accompany every prompt sent to the AI, res
                 # add partially streamed ai response if needed
                 if len(self.app.ai.ai_streaming_output) > 0:
                     txt = self.app.ai.ai_streaming_output
+                    txt = strip_think_blocks(txt)
+                    if len(self.app.ai.ai_streaming_output) != len(txt) and len(txt) == 0:
+                        txt = _('Thinking...')
                     txt = self.replace_references(txt, streaming=True)
                     txt = txt.replace('\n', '<br />')
                     author = self.app.ai_models[int(self.app.settings['ai_model_index'])]['name']
@@ -1189,6 +1192,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             db_conn = sqlite3.connect(self.chat_history_path)
             try: 
                 ai_model_name = self.app.ai_models[int(self.app.settings['ai_model_index'])]['name']
+                msg_content = strip_think_blocks(msg_content)
                 self.history_add_message(msg_type, ai_model_name, msg_content, chat_idx, db_conn)
                 self.ai_streaming_output = ''
                 self.update_chat_window()

@@ -47,6 +47,7 @@ import asyncio
 import configparser
 from Bio.Align import PairwiseAligner
 from pydantic import ValidationError
+import re
 
 max_memo_length = 1500  # Maximum length of the memo send to the AI
 
@@ -297,6 +298,20 @@ def update_ai_models(current_models: list, current_model_index: int) -> tuple[li
                 model['reasoning_effort'] = 'default'
     
     return current_models, current_model_index
+
+def strip_think_blocks(text: str) -> str:
+    """
+    Removes <think>...</think> blocks from an LLM response.
+    If the closing </think> is missing (e.g., during streaming),
+    removes everything from <think> to the end of the text.
+    """
+    # Case 1: Remove complete <think>...</think> blocks
+    text = re.sub(r"<think>.*?</think>", "", text, flags=re.DOTALL)
+
+    # Case 2: Remove unfinished <think> blocks (no closing tag yet)
+    text = re.sub(r"<think>.*$", "", text, flags=re.DOTALL)
+
+    return text.strip()
 
 def ai_quote_search(quote: str, original: str) -> tuple[int, int]:
     """Searches the quote in the original text using the Smith-Waterman algorithm.
@@ -794,6 +809,7 @@ class AiLLM():
             logger.debug(e)
             res = self.large_llm.invoke(code_descriptions_prompt, config=config)            
         logger.debug(str(res.content))
+        res.content = strip_think_blocks(res.content)
         code_descriptions = list(json_repair.loads(str(res.content))['descriptions'])
         code_descriptions.insert(0, code_name) # insert the original as well
         return code_descriptions
@@ -939,6 +955,7 @@ class AiLLM():
             # The returned JSON was malformed. Try it without validation and hope that "json_repair" will fix it below 
             logger.debug(e)
             res = self.large_llm.invoke(f'{prompt}', config=config)                  
+        res.content = strip_think_blocks(res.content)
         res_json = json_repair.loads(str(res.content))
         
         # analyse and format the answer
