@@ -750,18 +750,66 @@ code_cat.owner as "Coder name", code_cat.date as "Date" from  code_cat \n\n\
 --- code_cat.name = "abilities"  -- TO SELECT SPECIFIC CATEGORY\n\
 -- AND code_cat.memo  like "%filter words for memo text%" -- TO SELECT MEMOS CONTAINING SPECIFIED TEXT',
 
-               '-- FILES THAT ARE NOT CODED with code id 1\n\
+'-- FILES THAT ARE NOT CODED with code id 1\n\
 select source.name from source where source.id not in\n\
 (select code_text.fid from code_text where code_text.cid=1\n\
 union select code_av.id from code_av where code_av.cid=1\n\
 union select code_image.id from code_image where code_image.cid=1)',
 
-               '-- CODES NOT USED IN A FILE. Example using file id 1 presuming a text file.\n\
+'-- CODES NOT USED IN A FILE. Example using file id 1 presuming a text file.\n\
 select code_name.name from code_name where code_name.cid not in\n\
 -- Uncomment the appropriate line below for another file type if needed\n\
 (select code_text.cid from code_text where code_text.fid=1)  -- comment out for another file type\n\
 -- (select code_av.cid from code_av where code_av.id=1) -- uncomment for av files\n\
 -- (select code_image.cid from code_image where code_image.id=1) -- uncomment for image files',
+
+'-- FILTERED CONTAINER CODES\n\
+-- This is useful when asking questions like:\n\
+-- What does speaker 1 say? What do male respondents say?\n\
+-- The containing codes can be quite long (speakerID, sex) but the content of interest can be quite short.\n\
+-- All the codes applied are in a single column and appends to the bottom a list of all the codes used in the output.\n\
+-- That list of codes then needs to be turned into column headers.\n\
+-- Then in Excel you can do conditional values like this:\n\
+-- =IF(ISNUMBER(SEARCH("," & E$1 & ",", "," & $D2 & ",")), 1, 0)\n\
+-- Where E1 has the code of interest and column D has the comma delimited list of codes applied to that segment.\n\n\
+WITH container_codes AS (\n\
+-- EDIT THIS LIST ONLY: names of codes you want as CONTAINERS (AND logic)\n\
+SELECT "CONTAINER_CODE_A" AS name -- change CONTAINER_CODE_A to your container code name\n\
+UNION ALL\n\
+SELECT "CONTAINER_CODE_B" -- add or remove lines as needed\n\
+),\n\n\
+segments AS (SELECT ct.ctid,ct.cid,ct.fid,ct.owner,ct.pos0,ct.pos1,ct.seltext FROM code_text ct),\n\
+segments_with_names AS (SELECT s.*,cn.name AS code_name FROM segments s JOIN code_name cn ON cn.cid = s.cid),\n\n\
+-- All coded segments that have a container code\n\
+container_segments AS (SELECT swn.*FROM segments_with_names swn JOIN container_codes cc ON swn.code_name = cc.name),\n\
+-- All containment relationships: inner segments inside container segments\n\
+contained_raw AS (\n\
+SELECT inner.ctid AS segment_ctid,inner.fid,inner.owner,inner.pos0,inner.pos1,inner.seltext AS segment_text,\n\
+inner.code_name AS segment_code,outer.code_name AS container_code FROM segments_with_names AS inner\n\
+JOIN container_segments AS outer\n\
+ON inner.fid = outer.fid AND inner.owner = outer.owner AND inner.pos0 >= outer.pos0 AND inner.pos1 <= outer.pos1),\n\
+\n\
+-- Keep only segments that are inside ALL container codes (AND)\n\
+segments_in_all_containers AS (\n\
+SELECT segment_ctid, fid,owner,pos0,pos1,segment_text FROM contained_raw\n\
+GROUP BY segment_ctid, fid, owner, pos0, pos1, segment_text\n\
+HAVING COUNT(DISTINCT container_code) = (SELECT COUNT(*) FROM container_codes)\n\
+),\n\n\
+-- For those focal segments, attach ALL codes that occur within them\n\
+segments_all_codes AS (\n\
+SELECT s.segment_ctid,s.segment_text,sc.code_name FROM segments_in_all_containers s\n\
+JOIN segments_with_names sc ON sc.fid = s.fid AND sc.owner = s.owner AND sc.pos0 >= s.pos0 AND sc.pos1 <= s.pos1\n\
+)\n\n\
+-- FINAL OUTPUT:\n\
+-- (1) one row per segment_ctid, with comma-joined code list\n\
+-- (2) one extra row ALL_SEGMENTS listing all codes seen\n\
+SELECT segment_ctid,segment_text, GROUP_CONCAT(DISTINCT code_name) AS codes_applied FROM segments_all_codes\n\
+GROUP BY segment_ctid, segment_text\n\n\
+UNION ALL\n\n\
+SELECT "ALL_SEGMENTS" AS segment_ctid, "(all segments)" AS segment_text,\n\
+GROUP_CONCAT(DISTINCT code_name) AS codes_applied\n\
+FROM segments_all_codes\n\
+ORDER BY segment_ctid;',
 
 '-- THREE OR MORE EXACTLY OVERLAPPING CODINGS IN A SELECTED FILE\n\
 -- Everywhere use the same file id, otherwise results will be incorrect\n\
