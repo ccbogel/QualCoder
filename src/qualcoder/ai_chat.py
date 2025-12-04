@@ -121,6 +121,8 @@ class DialogAIChat(QtWidgets.QDialog):
         self.ai_text_doc_name = ''
         self.ai_text_text = ''
         self.ai_text_start_pos = -1
+        self.ai_output_autoscroll = True
+        self.ui.scrollArea_ai_output.verticalScrollBar().valueChanged.connect(self.on_ai_output_scroll)
 
     def init_styles(self):
         """Set up the stylesheets for the ui and the chat entries
@@ -277,6 +279,7 @@ class DialogAIChat(QtWidgets.QDialog):
         # select new chat
         self.current_chat_idx = self.find_chat_idx(cursor.lastrowid)
         self.ui.listWidget_chat_list.setCurrentRow(self.current_chat_idx)
+        self.ai_output_autoscroll = True
         self.chat_list_selection_changed()
 
     def new_general_chat(self, name, summary):
@@ -575,6 +578,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             
     def topic_chat_analyze_more(self): 
         # Analyze more data found in the semantic search
+        self.ai_output_autoscroll = True
         cursor = self.chat_history_conn.cursor()
         chat_id = int(self.chat_list[self.current_chat_idx][0])
         cursor.execute(f'''
@@ -763,6 +767,22 @@ data collected. This information will accompany every prompt sent to the AI, res
                 self.main_window.statusBar().showMessage(_('AI: ') + _(self.app.ai.get_status()))
         else: 
             self.main_window.statusBar().showMessage('')
+
+    def on_ai_output_scroll(self, value):
+        """Normally, if the AI is generating text, the scrollArea_ai_output scrolls to the bottom
+        automatically so that the new text becomes visible. 
+        This function ensures the if the user scroll up during the text generation, the auto
+        scrolling stops. 
+        If the user scroll back down the the end, the auto scrolling is re-enabled. 
+
+        Args:
+            value (int): current scroll position
+        """
+        max_value = self.ui.scrollArea_ai_output.verticalScrollBar().maximum()
+        if value >= max_value:
+            self.ai_output_autoscroll = True
+        else:
+            self.ai_output_autoscroll = False
 
     def update_chat_window(self, scroll_to_bottom=True):
         """load current chat into self.ai_output"""
@@ -1063,8 +1083,9 @@ data collected. This information will accompany every prompt sent to the AI, res
         QtCore.QTimer.singleShot(200, self._ai_output_scroll_to_bottom)
         
     def _ai_output_scroll_to_bottom(self):
-        self.ui.scrollArea_ai_output.verticalScrollBar().setValue(self.ui.scrollArea_ai_output.verticalScrollBar().maximum())
-        #self.ui.scrollArea_ai_output.ensureVisible(0, self.ui.scrollArea_ai_output.widget().height())
+        if self.ai_output_autoscroll:
+            self.ui.scrollArea_ai_output.verticalScrollBar().setValue(self.ui.scrollArea_ai_output.verticalScrollBar().maximum())
+            self.ai_output_autoscroll = True
                                 
     def history_update_message_list(self, db_conn=None):
         """Update sel.chat_msg_list from the database
@@ -1131,6 +1152,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             msg = _('The AI not yet fully loaded. Please wait and retry.')
             Message(self.app, _('AI not ready'), msg, "warning").exec()
             return
+        self.ai_output_autoscroll = True
         q = self.ui.plainTextEdit_question.toPlainText()
         if q != '':
             if self.process_message('user', q):
