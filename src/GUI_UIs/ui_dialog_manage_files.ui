@@ -34,7 +34,7 @@
      <widget class="QPushButton" name="pushButton_view">
       <property name="geometry">
        <rect>
-        <x>10</x>
+        <x>30</x>
         <y>3</y>
         <width>30</width>
         <height>30</height>
@@ -50,7 +50,7 @@
      <widget class="QPushButton" name="pushButton_create">
       <property name="geometry">
        <rect>
-        <x>100</x>
+        <x>120</x>
         <y>3</y>
         <width>30</width>
         <height>30</height>
@@ -66,7 +66,7 @@
      <widget class="QPushButton" name="pushButton_export">
       <property name="geometry">
        <rect>
-        <x>390</x>
+        <x>430</x>
         <y>3</y>
         <width>30</width>
         <height>30</height>
@@ -100,7 +100,7 @@ Text files (from any source) are exported from the text stored in the database a
      <widget class="QPushButton" name="pushButton_import">
       <property name="geometry">
        <rect>
-        <x>40</x>
+        <x>60</x>
         <y>3</y>
         <width>30</width>
         <height>30</height>
@@ -116,7 +116,7 @@ Text files (from any source) are exported from the text stored in the database a
      <widget class="QPushButton" name="pushButton_add_attribute">
       <property name="geometry">
        <rect>
-        <x>190</x>
+        <x>210</x>
         <y>3</y>
         <width>30</width>
         <height>30</height>
@@ -132,7 +132,7 @@ Text files (from any source) are exported from the text stored in the database a
      <widget class="QPushButton" name="pushButton_link">
       <property name="geometry">
        <rect>
-        <x>70</x>
+        <x>90</x>
         <y>3</y>
         <width>30</width>
         <height>30</height>
@@ -148,7 +148,7 @@ Text files (from any source) are exported from the text stored in the database a
      <widget class="QPushButton" name="pushButton_import_from_linked">
       <property name="geometry">
        <rect>
-        <x>130</x>
+        <x>150</x>
         <y>3</y>
         <width>30</width>
         <height>30</height>
@@ -164,7 +164,7 @@ Text files (from any source) are exported from the text stored in the database a
      <widget class="QPushButton" name="pushButton_export_to_linked">
       <property name="geometry">
        <rect>
-        <x>160</x>
+        <x>180</x>
         <y>3</y>
         <width>30</width>
         <height>30</height>
@@ -181,7 +181,7 @@ Cannot export text transcription file associated with an audio or video as a lin
      <widget class="QPushButton" name="pushButton_export_attributes">
       <property name="geometry">
        <rect>
-        <x>360</x>
+        <x>390</x>
         <y>3</y>
         <width>30</width>
         <height>30</height>
@@ -213,7 +213,7 @@ Cannot export text transcription file associated with an audio or video as a lin
      <widget class="QLabel" name="label_fcount">
       <property name="geometry">
        <rect>
-        <x>230</x>
+        <x>260</x>
         <y>6</y>
         <width>121</width>
         <height>26</height>
@@ -261,7 +261,7 @@ Cannot export text transcription file associated with an audio or video as a lin
      <widget class="QPushButton" name="pushButton_display_save">
       <property name="geometry">
        <rect>
-        <x>480</x>
+        <x>500</x>
         <y>3</y>
         <width>30</width>
         <height>30</height>
@@ -277,7 +277,7 @@ Cannot export text transcription file associated with an audio or video as a lin
      <widget class="QPushButton" name="pushButton_display_load">
       <property name="geometry">
        <rect>
-        <x>450</x>
+        <x>470</x>
         <y>3</y>
         <width>30</width>
         <height>30</height>
@@ -293,7 +293,7 @@ Cannot export text transcription file associated with an audio or video as a lin
      <widget class="QPushButton" name="pushButton_display_delete">
       <property name="geometry">
        <rect>
-        <x>510</x>
+        <x>530</x>
         <y>3</y>
         <width>30</width>
         <height>30</height>
@@ -301,6 +301,32 @@ Cannot export text transcription file associated with an audio or video as a lin
       </property>
       <property name="toolTip">
        <string>Delete saved table display settings. </string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_pseudonyms">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>3</y>
+        <width>30</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Pseudonymisation (data de-identfication)
+Before importing text files, create a list of names or phrases to be replaced.
+Applies to these files: docx, epub, htm, html, md, rtf, odt, txt, survey imports of qualitative columns.
+Pseudonym replacements are case sensitive. 
+So separate entries would be needed for Tom and TOM.
+
+Does not work with PDF files. Instead extract the plain text and only import the plain text of the PDF.
+
+The pseudonyms are stored in the qda data folder as pseudonyms.json
+After all text files are imported, remove this file from the project folder and store it securely.
+</string>
       </property>
       <property name="text">
        <string/>
