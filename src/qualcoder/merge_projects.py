@@ -68,8 +68,8 @@ class MergeProjects:
     def __init__(self, app, path_s):
         self.app = app
         self.path_s = path_s
-        self.conn_s = sqlite3.connect(os.path.join(self.path_s, 'data.qda'))
-        self.conn_d = self.app.conn
+        self.conn_s = sqlite3.connect(os.path.join(self.path_s, 'data.qda'))  # Source project that is to be merged in
+        self.conn_d = self.app.conn  # Destination project - the currently opened project
         self.path_d = self.app.project_path
         self.summary_msg = _("Merging: ") + self.path_s + "\n" + _("Into: ") + self.app.project_path + "\n"
         self.copy_source_files_into_destination()
@@ -88,7 +88,7 @@ class MergeProjects:
             # Update vectorstore
             if self.app.settings['ai_enable'] == 'True':
                 self.app.ai.sources_vectorstore.update_vectorstore()
-            self.summary_msg += _("Finished merging " + self.path_s + " into " + self.path_d) + "\n"
+            self.summary_msg += "\n" + _("Finished merging " + self.path_s + " into " + self.path_d) + "\n"
             self.summary_msg += _(
                 "Existing values in destination project are not over-written, apart from blank attribute values.") + "\n"
             Message(self.app, _('Project merged'), _("Review the action log for details.")).exec()
@@ -332,14 +332,16 @@ class MergeProjects:
                 id_ = cur_d.fetchone()[0]
                 src['newid'] = id_
                 new_source_file_ids.append(id_)
+
         # Need to find matching av_text_filename to get its id to link as the av_text_id
         for src in self.source_s:
             if src['av_text_filename'] != "":
                 cur_d.execute("select id from source where name=?", [src['av_text_filename']])
                 res = cur_d.fetchone()
                 if res is not None:
-                    cur_d.execute("update source set av_text_id=? where id=?", [res[0], src['id']])
+                    cur_d.execute("update source set av_text_id=? where id=?", [res[0], src['newid']])
                     self.conn_d.commit()
+
         # Create attribute placeholders for the destination file attributes
         now_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
         sql_attribute_types = 'select name from attribute_type where caseOrFile ="file"'
