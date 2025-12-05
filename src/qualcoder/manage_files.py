@@ -108,8 +108,8 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.av_dialog_open = None  # Used for opened AV dialog
         font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
-        #self.ui.pushButton_pseudonyms.setIcon(qta.icon('mdi6.account-cancel-outline', options=[{'scale_factor': 1.4}]))
-        #self.ui.pushButton_pseudonyms.clicked.connect(self.pseudonyms)
+        self.ui.pushButton_pseudonyms.setIcon(qta.icon('mdi6.account-cancel-outline', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_pseudonyms.clicked.connect(self.pseudonyms)
         self.ui.pushButton_create.setIcon(qta.icon('mdi6.pencil-outline', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_create.clicked.connect(self.create_text_file)
         self.ui.pushButton_view.setIcon(qta.icon('mdi6.magnify', options=[{'scale_factor': 1.4}]))
@@ -163,6 +163,17 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         url = "https://github.com/ccbogel/QualCoder/wiki/3.2.-Files"
         webbrowser.open(url)
+
+    def pseudonyms(self):
+        """ Pseudonymisation, data de-identification.
+        User created list of pseudonyms to replace senstitive wording, e.g. participant names.
+        The list must be crated before any text files or survey qualitative columns are imported.
+        The pseudonyms are case-sensistive.
+        The original to pseudonym list is stored in the qda folder as pseudonyms.json
+        This file can be removed and stored securely afte rthe data is imported.
+        Pseudonyms does not apply to PDF imports. Instead import plain text of the PDF. """
+
+        Message(self.app, "Pseudonymisation", "UNDER CONSTRUCTION\nDOES NOT WORK YET").exec()
 
     def table_display_save(self):
         """ Save rows and column settings for replicating table display.
