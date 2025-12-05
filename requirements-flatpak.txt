@@ -377,6 +377,8 @@ sqlalchemy==2.0.44
     # via
     #   langchain-classic
     #   langchain-community
+striprtf==0.0.29
+    # via qualcoder
 sympy==1.14.0
     # via torch
 tenacity==9.1.2
