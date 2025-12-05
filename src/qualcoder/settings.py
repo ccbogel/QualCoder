@@ -28,7 +28,7 @@ import re
 
 from .GUI.ui_dialog_settings import Ui_Dialog_settings
 from .helpers import Message
-from .ai_llm import get_available_models
+from .ai_llm import get_available_models, add_new_ai_model
 
 home = os.path.expanduser('~')
 path = os.path.abspath(os.path.dirname(__file__))
@@ -166,23 +166,11 @@ class DialogSettings(QtWidgets.QDialog):
         self.ui.checkBox_AI_enable.stateChanged.connect(self.ai_enable_state_changed)
         self.ui.comboBox_reasoning.addItems(['default', 'low', 'medium', 'high'])
         self.ui.comboBox_ai_profile.clear()
-        if len(self.ai_models) > 0:
-            for i in range(len(self.ai_models)):
-                model = self.ai_models[i]
-                self.ui.comboBox_ai_profile.addItem(model['name'])
-                self.ui.comboBox_ai_profile.setItemData(i, model['desc'], QtCore.Qt.ItemDataRole.ToolTipRole)
-            if 0 <= int(self.settings['ai_model_index']) <= (len(self.ai_models) - 1): 
-                self.ui.comboBox_ai_profile.setCurrentIndex(int(self.settings['ai_model_index']))
-            else:  # ai_model_index out of range
-                self.settings['ai_model_index'] = 0
-                self.ui.comboBox_ai_profile.setCurrentIndex(0)
-        else:  # no ai profiles defined
-            self.settings['ai_model_index'] = -1
+        self.load_ai_profiles()
         self.ui.comboBox_ai_profile.currentIndexChanged.connect(self.ai_profile_changed)
-        self.ai_profile_changed()
         self.ai_enable_state_changed()
         self.ui.pushButton_ai_profile_edit.clicked.connect(self.ai_profile_name_edit)
-        self.ui.lineEdit_ai_api_key.textChanged.connect(self.ai_api_key_changed)
+        self.ui.lineEdit_ai_api_key.editingFinished.connect(self.ai_api_key_changed)
         self.ui.toolButtonShowApiKey.setIcon(qta.icon('mdi6.eye-outline'))
         self.ui.toolButtonShowApiKey.toggled.connect(self.ai_api_key_show)
         # advanced AI options:
@@ -192,8 +180,8 @@ class DialogSettings(QtWidgets.QDialog):
         int_validator.setBottom(0)
         self.ui.lineEdit_ai_large_context_window.setValidator(int_validator)
         self.ui.lineEdit_ai_fast_context_window.setValidator(int_validator)
-        self.ui.lineEdit_ai_large_context_window.textChanged.connect(self.ai_model_parameters_changed)
-        self.ui.lineEdit_ai_fast_context_window.textChanged.connect(self.ai_model_parameters_changed)
+        self.ui.lineEdit_ai_large_context_window.editingFinished.connect(self.ai_model_parameters_changed)
+        self.ui.lineEdit_ai_fast_context_window.editingFinished.connect(self.ai_model_parameters_changed)
         self.ui.comboBox_AI_model_large.currentTextChanged.connect(self.ai_model_parameters_changed)
         self.ui.comboBox_AI_model_fast.currentTextChanged.connect(self.ai_model_parameters_changed)
         self.ui.comboBox_AI_model_large.view().setMinimumWidth(500)  # Set a minimum width for the dropdown list
@@ -209,6 +197,7 @@ class DialogSettings(QtWidgets.QDialog):
         self.ui.lineEdit_top_p.editingFinished.connect(self.validate_ai_top_p)
         self.ui.comboBox_reasoning.currentIndexChanged.connect(self.ai_model_parameters_changed)
         self.ui.lineEdit_ai_api_base.editingFinished.connect(self.ai_api_base_changed)
+        self.ui.pushButton_ai_new_profile.clicked.connect(self.new_ai_profile)
         
         # Move to AI settings if requested
         if section is not None and (section == 'AI' or section == 'advanced AI'):
@@ -243,6 +232,23 @@ class DialogSettings(QtWidgets.QDialog):
         self.ui.lineEdit_top_p.setEnabled(self.ui.checkBox_AI_enable.isChecked())
         self.ui.checkBox_AI_language_ui.setEnabled(self.ui.checkBox_AI_enable.isChecked())
         self.ui.lineEdit_AI_language.setEnabled(self.ui.checkBox_AI_enable.isChecked() and (not self.ui.checkBox_AI_language_ui.isChecked()))
+    
+    def load_ai_profiles(self):
+        with QtCore.QSignalBlocker(self.ui.comboBox_ai_profile):
+            self.ui.comboBox_ai_profile.clear()
+            if len(self.ai_models) > 0:
+                for i in range(len(self.ai_models)):
+                    model = self.ai_models[i]
+                    self.ui.comboBox_ai_profile.addItem(model['name'])
+                    self.ui.comboBox_ai_profile.setItemData(i, model['desc'], QtCore.Qt.ItemDataRole.ToolTipRole)
+                if 0 <= int(self.settings['ai_model_index']) <= (len(self.ai_models) - 1): 
+                    self.ui.comboBox_ai_profile.setCurrentIndex(int(self.settings['ai_model_index']))
+                else:  # ai_model_index out of range
+                    self.settings['ai_model_index'] = 0
+                    self.ui.comboBox_ai_profile.setCurrentIndex(0)
+            else:  # no ai profiles defined
+                self.settings['ai_model_index'] = -1
+        self.ai_profile_changed()
     
     def ai_profile_changed(self):
         self.settings['ai_model_index'] = self.ui.comboBox_ai_profile.currentIndex()
@@ -454,6 +460,30 @@ class DialogSettings(QtWidgets.QDialog):
             QtCore.QTimer.singleShot(100, lambda: self.ui.scrollArea.verticalScrollBar().setValue(self.ui.scrollArea.verticalScrollBar().maximum()))
         else:
             self.ui.widget_AI_advanced_options.hide()
+            
+    def new_ai_profile(self):
+        """Adds a new, empty AI profile and selects it.
+        """
+        new_name, ok = QtWidgets.QInputDialog.getText(
+            self,                                     # parent
+            _('New AI profile'),                      # title
+            _('Enter new profile name:'),             # label
+            QtWidgets.QLineEdit.EchoMode.Normal,      # echo
+        )
+        if ok and new_name != '':
+            # clean up new name for use in ini file
+            new_name = new_name.replace('[', '').replace(']', '') # Remove square brackets
+            new_name = re.sub(r'[\r\n]+', ' ', new_name) # Replace line breaks with a space
+            new_name = re.sub(r'\s+', ' ', new_name) # Remove repeated spaces
+            new_name = new_name.strip() # Remove leading/trailing whitespace
+            # ensure the new name is unique
+            existing_names = {model['name'] for model in self.ai_models}
+            if new_name in existing_names:
+                Message(_('New AI profile'), _('An AI profile with this name already exists: ') + new_name, 'critical')
+                return
+            
+            self.ai_models, self.settings['ai_model_index'] = add_new_ai_model(self.ai_models, new_name)
+            self.load_ai_profiles()
 
     def accept(self):
         restart_qualcoder = False
@@ -526,7 +556,6 @@ class DialogSettings(QtWidgets.QDialog):
         self.settings['ai_language'] =  self.ui.lineEdit_AI_language.text()
         self.settings['ai_temperature'] = self.ui.lineEdit_ai_temperature.text()
         self.settings['ai_top_p'] = self.ui.lineEdit_top_p.text()
-        self.settings['reasoning_effort'] = self.ui.comboBox_reasoning.currentText()
         self.save_settings()
         if restart_qualcoder:
             Message(self.app, _("Restart QualCoder"), _("Restart QualCoder to enact some changes")).exec()

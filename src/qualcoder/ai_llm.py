@@ -246,6 +246,32 @@ api_key = <no API key needed>
             ai_models.append(model)
     return ai_models
 
+def add_new_ai_model(current_models: list, new_name: str) -> tuple[list, int]:
+    """Adds a new AI profile to the list, sets some default values,
+    and returns the extended list as well as the index of the new model 
+
+    Args:
+        current_models (list): AI profiles
+        new_name (str): the name for the new profile
+
+    Returns:
+        tuple[list, int]: extended list, index of new profile
+    """
+    new_model = {
+        'name': new_name,
+        'desc': '',
+        'access_info_url': '',
+        'large_model': '',
+        'large_model_context_window': '32768',
+        'fast_model': '',
+        'fast_model_context_window': '32768',
+        'reasoning_effort': 'default',
+        'api_base': '',
+        'api_key': ''
+    }
+    current_models.append(new_model)
+    return current_models, len(current_models) - 1
+
 def update_ai_models(current_models: list, current_model_index: int) -> tuple[list, int]:
     """Update the AI model definitions, and add new models from the default set
 
