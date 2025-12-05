@@ -208,6 +208,7 @@ class DialogSettings(QtWidgets.QDialog):
         self.ui.lineEdit_top_p.setText(self.settings.get('ai_top_p', '1.0'))
         self.ui.lineEdit_top_p.editingFinished.connect(self.validate_ai_top_p)
         self.ui.comboBox_reasoning.currentIndexChanged.connect(self.ai_model_parameters_changed)
+        self.ui.lineEdit_ai_api_base.editingFinished.connect(self.ai_api_base_changed)
         
         # Move to AI settings if requested
         if section is not None and (section == 'AI' or section == 'advanced AI'):
@@ -263,9 +264,12 @@ class DialogSettings(QtWidgets.QDialog):
                 self.ui.lineEdit_ai_fast_context_window.setText(curr_ai_model['fast_model_context_window'])
             try:
                 reasoning_effort = curr_ai_model['reasoning_effort']
-                self.ui.comboBox_reasoning.setCurrentText(reasoning_effort)
+                with QtCore.QSignalBlocker(self.ui.comboBox_reasoning):
+                    self.ui.comboBox_reasoning.setCurrentText(reasoning_effort)
             except:
-                self.ui.comboBox_reasoning.setCurrentText('default')    
+                self.ui.comboBox_reasoning.setCurrentText('default')
+            with QtCore.QSignalBlocker(self.ui.lineEdit_ai_api_base):
+                self.ui.lineEdit_ai_api_base.setText(curr_ai_model['api_base'])    
         else:
             self.ui.label_ai_model_desc.setText('')
             self.ui.label_ai_access_info_url.setText('')
@@ -275,7 +279,9 @@ class DialogSettings(QtWidgets.QDialog):
             self.ui.comboBox_AI_model_fast.setCurrentText('')
             self.ui.lineEdit_ai_large_context_window.setText('')
             self.ui.lineEdit_ai_fast_context_window.setText('') 
-            self.ui.comboBox_reasoning.setCurrentText('default')           
+            self.ui.comboBox_reasoning.setCurrentText('default')
+            with QtCore.QSignalBlocker(self.ui.lineEdit_ai_api_base):
+                self.ui.lineEdit_ai_api_base.setText('')    
         self.ai_update_avaliable_models()     
         
     def ai_profile_name_edit(self):
@@ -347,7 +353,8 @@ class DialogSettings(QtWidgets.QDialog):
         model_list = []
         if int(self.settings['ai_model_index']) >= 0:
             try:
-                model_list = get_available_models(self.ai_models[int(self.settings['ai_model_index'])]['api_base'], 
+                model_list = get_available_models(self.app,
+                                                  self.ai_models[int(self.settings['ai_model_index'])]['api_base'], 
                                                   self.ai_models[int(self.settings['ai_model_index'])]['api_key'])
             except Exception as e:
                 msg = type(e).__name__ + ': ' + str(e)
@@ -404,6 +411,11 @@ class DialogSettings(QtWidgets.QDialog):
             Message.warning(self, "Invalid input", "AI top_p parameter must be between 0.0 and 1.0.")
             self.ui.lineEdit_top_p.setFocus()
             self.ui.lineEdit_top_p.selectAll()
+            
+    def ai_api_base_changed(self):
+        if int(self.settings['ai_model_index']) >= 0:
+            self.ai_models[int(self.settings['ai_model_index'])]['api_base'] = self.ui.lineEdit_ai_api_base.text()   
+        self.ai_update_avaliable_models()    
             
     def new_coder_entered(self):
         """ New coder name entered.

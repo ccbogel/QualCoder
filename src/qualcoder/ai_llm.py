@@ -80,14 +80,24 @@ def extract_ai_memo(memo: str) -> str:
     else:
         return memo
     
-def get_available_models(api_base: str, api_key: str) -> list:
+def get_available_models(app, api_base: str, api_key: str) -> list:
     """Queries the API and returns a list of all AI models available from this provider."""
-    if api_base == '':
-        api_base = None
-    client = OpenAI(api_key=api_key, base_url=api_base)
-    response = client.models.list(timeout=4.0)
-    model_dict = response.model_dump().get('data', [])
-    model_list = sorted([model['id'] for model in model_dict])
+    msg = None
+    if app is not None:
+        msg = Message(app, _('AI Models'), _('Loading list of available AI models...'))
+        msg.setStandardButtons(QtWidgets.QMessageBox.StandardButton.NoButton)
+        msg.show()
+        QtWidgets.QApplication.processEvents()
+    try:        
+        if api_base == '':
+            api_base = None
+        client = OpenAI(api_key=api_key, base_url=api_base)
+        response = client.models.list(timeout=4.0)
+        model_dict = response.model_dump().get('data', [])
+        model_list = sorted([model['id'] for model in model_dict])
+    finally:
+        if msg is not None:
+            msg.deleteLater()
     return model_list
 
 def get_default_ai_models():
