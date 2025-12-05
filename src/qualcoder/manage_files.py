@@ -51,6 +51,7 @@ from .docx import opendocx, getdocumenttext
 from .edit_textfile import DialogEditTextFile
 from .helpers import ExportDirectoryPathDialog, Message, msecs_to_hours_mins_secs
 from .html_parser import *
+from striprtf.striprtf import rtf_to_text
 from .memo import DialogMemo
 from .report_codes import DialogReportCodes  # for isInstance()
 from .ris import Ris
@@ -1542,9 +1543,9 @@ class DialogManageFiles(QtWidgets.QDialog):
     def import_files(self, link=False):
         """ Import files and store into relevant directories (documents, images, audio, video).
         Convert documents to plain text and store this in data.qda
-        Can import from plain text files, also import from html, odt, docx and md.
+        Can import from plain text files, also import from html, odt, docx, rtf, and md.
         md is text Markdown format.
-        Note importing from html, odt, docx all formatting is lost.
+        Note importing from html, odt, docx, rtf all formatting is lost.
         Imports images as jpg, jpeg, png which are stored in an images directory.
         Imports audio as mp3, wav, m4a which are stored in an audio directory.
         Imports video as mp4, mov, ogg, wmv which are stored in a video directory.
@@ -1581,7 +1582,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             QtWidgets.QApplication.processEvents()
             filename = import_path.split("/")[-1]
             destination = self.app.project_path
-            if import_path.split('.')[-1].lower() in ('docx', 'odt', 'txt', 'htm', 'html', 'epub', 'md'):
+            if import_path.split('.')[-1].lower() in ('docx', 'odt', 'rtf', 'txt', 'htm', 'html', 'epub', 'md'):
                 destination += f"/documents/{filename}"
                 if link_path == "":
                     try:
@@ -1776,7 +1777,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.source.append(entry)
 
     def load_file_text(self, import_file, link_path=""):
-        """ Import from file types of odt, docx pdf, epub, txt, html, htm.
+        """ Import from file types of odt, docx, rtf, pdf, epub, txt, html, htm.
         Implement character detection for txt imports.
         Loading pdf text. I have removed additional line breaks. See commented sections below.
         Removing these allows the pdf to be coded in Code_text and Code_pdf without positional shifting problems.
@@ -1799,6 +1800,11 @@ class DialogManageFiles(QtWidgets.QDialog):
             document = opendocx(import_file)
             list_ = getdocumenttext(document)
             text_ = "\n\n".join(list_)  # add line to paragraph spacing for visual format
+        # Import from rtf
+        if import_file[-4:].lower() == ".rtf":
+            with open(import_file, "r", encoding="latin-1") as sourcefile:
+                rtf = sourcefile.read()
+                text_ = rtf_to_text(rtf)      
         # Import from epub
         if import_file[-5:].lower() == ".epub":
             book = epub.read_epub(import_file)
