@@ -108,6 +108,8 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.av_dialog_open = None  # Used for opened AV dialog
         font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
+        #self.ui.pushButton_pseudonyms.setIcon(qta.icon('mdi6.account-cancel-outline', options=[{'scale_factor': 1.4}]))
+        #self.ui.pushButton_pseudonyms.clicked.connect(self.pseudonyms)
         self.ui.pushButton_create.setIcon(qta.icon('mdi6.pencil-outline', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_create.clicked.connect(self.create_text_file)
         self.ui.pushButton_view.setIcon(qta.icon('mdi6.magnify', options=[{'scale_factor': 1.4}]))
@@ -1802,9 +1804,19 @@ class DialogManageFiles(QtWidgets.QDialog):
             text_ = "\n\n".join(list_)  # add line to paragraph spacing for visual format
         # Import from rtf
         if import_file[-4:].lower() == ".rtf":
+            # TODO Kai, can  you test. I dont have any rtf files?
+            # I was looking here https://github.com/joshy/striprtf/issues/46
+            # text_ = rtf_to_text(import_file, encoding="utf-8", errors="replace")
+            # text_ = rtf_to_text(import_file, encoding="latin-1", errors="replace")
             with open(import_file, "r", encoding="latin-1") as sourcefile:
-                rtf = sourcefile.read()
-                text_ = rtf_to_text(rtf)      
+                text_ = ""
+                try:
+                    rtf = sourcefile.read()
+                    text_ = rtf_to_text(rtf)
+                except Exception as err:
+                    msg = "Importing rtf. Expecting characters encoded as latin-1. Import failed."
+                    logger.debug(f"rtf_to_text error Not Latin-1: {err}")
+                    Message(self.app, "rtf to text error", msg).exec()
         # Import from epub
         if import_file[-5:].lower() == ".epub":
             book = epub.read_epub(import_file)
@@ -1814,7 +1826,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                     string = bytes_.decode('utf-8')
                     text_ += html_to_text(string) + "\n\n"  # Add line to paragraph spacing for visual format
                 except TypeError as err:
-                    logger.debug("ebooklib get_body_content error " + str(err))
+                    logger.debug(f"ebooklib get_body_content error: {err}")
         # Import PDF
         if import_file[-4:].lower() == '.pdf':
             pdf_file = open(import_file, 'rb')
