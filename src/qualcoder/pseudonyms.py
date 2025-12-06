@@ -22,9 +22,12 @@ https://qualcoder.wordpress.com/
 import logging
 import json
 import os
-from PyQt6 import QtCore, QtGui, QtWidgets
-import qtawesome as qta   # see: https://pictogrammers.com/library/mdi/
+import random
+import string
+from PyQt6 import QtCore, QtWidgets
+import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 
+from .confirm_delete import DialogConfirmDelete
 from .GUI.ui_dialog_pseudonyms import Ui_Dialog_pseudonyms
 from .helpers import Message
 
@@ -40,7 +43,6 @@ class Pseudonyms(QtWidgets.QDialog):
     Case sensitive, so TOM != Tom != tom
     Must have unique original text, and unique pseudonym text.
     Minimum original length = 2 characters.
-    Minimum pseudonym length = 2 characters. TODO
     """
 
     def __init__(self, app):
@@ -71,10 +73,20 @@ class Pseudonyms(QtWidgets.QDialog):
             Message(self.app, _("Original"), _("Too short") + "        ").exec()
             return
         pseudonym = self.ui.lineEdit_pseudonym.text()
+        if 0 < len(pseudonym) < 3:
+            Message(self.app, _("Original"), _("Too short, need 3 or more characters.\nLeave blank for random generated.")).exec()
+            return
         if pseudonym == "":
-            # TODO Create random pseudonym
-            pseudonym = "RANDOM"
-        # TODO do checks if original used already, or pseudonym used already
+            # Create random pseudonym
+            characters = string.ascii_uppercase + string.digits
+            pseudonym = ''.join(random.choices(characters, k=6))
+        # Check if original used already, or pseudonym used already
+        if any(d['original'] == original for d in self.data):
+            Message(self.app, _("Original"), _("Original entry already exists.")).exec()
+            return
+        if any(d['pseudonym'] == pseudonym for d in self.data):
+            Message(self.app, _("Pseudonym"), _("Pseudonym entry already exists.")).exec()
+            return
         self.data.append({'original': original, 'pseudonym': pseudonym})
         # Save json
         with open(self.pseudonyms_filepath, 'w') as output_file:
@@ -82,9 +94,23 @@ class Pseudonyms(QtWidgets.QDialog):
         self.fill_table()
 
     def delete_pseudonym(self):
-        """  """
-        print("delete pseudonym from json")
+        """ Delete pseudonym from json data.
+        It will be a single row with 2 items original, pseudonym, as single row selection is on.
+        """
 
+        row_items = self.ui.tableWidget.selectedItems()
+        if not row_items:
+            return
+        item_to_remove = {"original": row_items[0].text(), "pseudonym": row_items[1].text()}
+        ui = DialogConfirmDelete(self.app, f"{row_items[0].text()} --> {row_items[1].text()}")
+        ok = ui.exec()
+        if not ok:
+            return
+        self.data.remove(item_to_remove)
+        # Save json
+        with open(self.pseudonyms_filepath, 'w') as output_file:
+            json.dump(self.data, output_file, indent=2)
+        self.fill_table()
 
     def load_json(self):
         """ Pseudonyms stored in pseudonyms.json in qda data folder.
@@ -113,7 +139,3 @@ class Pseudonyms(QtWidgets.QDialog):
             pseudonym_item = QtWidgets.QTableWidgetItem(data['pseudonym'])
             pseudonym_item.setFlags(pseudonym_item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
             self.ui.tableWidget.setItem(row, 1, pseudonym_item)
-
-
-
-
