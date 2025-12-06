@@ -316,7 +316,7 @@ Cannot export text transcription file associated with an audio or video as a lin
        </rect>
       </property>
       <property name="toolTip">
-       <string>Pseudonymisation (data de-identfication)
+       <string>Pseudonymisation (data de-identification)
 Before importing text files, create a list of names or phrases to be replaced.
 Applies to these files: docx, epub, htm, html, md, rtf, odt, txt, survey imports of qualitative columns.
 Pseudonym replacements are case sensitive. 
