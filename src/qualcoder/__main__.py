@@ -55,7 +55,7 @@ from qualcoder.GUI.base64_notosans_helper import NotoSans
 from qualcoder.GUI.ui_main import Ui_MainWindow
 from qualcoder.helpers import Message, ImportPlainTextCodes
 from qualcoder.import_survey import DialogImportSurvey
-from qualcoder.import_twitter_data import DialogImportTwitterData
+#from qualcoder.import_twitter_data import DialogImportTwitterData
 from qualcoder.information import DialogInformation, menu_shortcuts_display, coding_shortcuts_display
 from qualcoder.locale.base64_lang_helper import *
 from qualcoder.journals import DialogJournals
@@ -1347,7 +1347,10 @@ Click "Yes" to start now.')
         self.ui.actionManage_bad_links_to_files.triggered.connect(self.manage_bad_file_links)
         self.ui.actionManage_references.setShortcut('Alt+R')
         self.ui.actionManage_references.triggered.connect(self.manage_references)
-        self.ui.actionImport_twitter_data.triggered.connect(self.import_twitter)
+        # Expect twitter / X is not used now
+        # self.ui.actionImport_twitter_data.triggered.connect(self.import_twitter)
+        self.ui.actionImport_twitter_data.setVisible(False)
+        self.ui.menuImport.removeAction(self.ui.actionImport_twitter_data)  # Line does not work
         # Coding menu
         self.ui.actionCodes.triggered.connect(self.text_coding)
         self.ui.actionCodes.setShortcut('Alt+T')
@@ -1499,7 +1502,7 @@ Click "Yes" to start now.')
         self.ui.actionImport_survey_2.setEnabled(False)
         self.ui.actionManage_bad_links_to_files.setEnabled(False)
         self.ui.actionManage_references.setEnabled(False)
-        self.ui.actionImport_twitter_data.setEnabled(False)
+        #self.ui.actionImport_twitter_data.setEnabled(False)
         # Coding menu
         self.ui.actionCodes.setEnabled(False)
         self.ui.actionCode_image.setEnabled(False)
@@ -1548,7 +1551,7 @@ Click "Yes" to start now.')
         self.ui.actionManage_attributes.setEnabled(True)
         self.ui.actionImport_survey_2.setEnabled(True)
         self.ui.actionManage_references.setEnabled(True)
-        self.ui.actionImport_twitter_data.setEnabled(True)
+        #self.ui.actionImport_twitter_data.setEnabled(True)
         # Coding menu
         self.ui.actionCodes.setEnabled(True)
         self.ui.actionCode_image.setEnabled(True)
@@ -1794,7 +1797,7 @@ Click "Yes" to start now.')
         ui = DialogImportSurvey(self.app, self.ui.textEdit)
         self.tab_layout_helper(self.ui.tab_manage, ui)
 
-    def import_twitter(self):
+    '''def import_twitter(self):
         """ Import twitter flat sheet: csv file.
         Create cases by User name.
         Create qualitative text files for each tweet.
@@ -1802,7 +1805,7 @@ Click "Yes" to start now.')
 
         self.ui.label_manage.hide()
         ui = DialogImportTwitterData(self.app, self.ui.textEdit)
-        self.tab_layout_helper(self.ui.tab_manage, ui)
+        self.tab_layout_helper(self.ui.tab_manage, ui)'''
 
     def manage_cases(self):
         """ Create, edit, delete, rename cases, add cases to files or parts of
