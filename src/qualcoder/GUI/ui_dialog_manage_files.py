@@ -140,7 +140,7 @@ class Ui_Dialog_manage_files(object):
         self.pushButton_display_save.setToolTip(_translate("Dialog_manage_files", "<html><head/><body><p>Save table display settings. </p><p>(Hidden rows and columns and column sizing)</p></body></html>"))
         self.pushButton_display_load.setToolTip(_translate("Dialog_manage_files", "<html><head/><body><p>Load saved table display setting.</p><p>(Hidden rows and columns and column sizing)</p></body></html>"))
         self.pushButton_display_delete.setToolTip(_translate("Dialog_manage_files", "Delete saved table display settings. "))
-        self.pushButton_pseudonyms.setToolTip(_translate("Dialog_manage_files", "Pseudonymisation (data de-identfication)\n"
+        self.pushButton_pseudonyms.setToolTip(_translate("Dialog_manage_files", "Pseudonymisation (data de-identification)\n"
 "Before importing text files, create a list of names or phrases to be replaced.\n"
 "Applies to these files: docx, epub, htm, html, md, rtf, odt, txt, survey imports of qualitative columns.\n"
 "Pseudonym replacements are case sensitive. \n"
