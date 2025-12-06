@@ -20,45 +20,45 @@ https://qualcoder.wordpress.com/
 """
 
 import datetime
-import os.path
-
 import fitz
-import sqlite3
 import ebooklib
 from ebooklib import epub
+import json
 import openpyxl
-import PIL
-from PIL import Image
-import qtawesome as qta
-from typing import Iterable, Any
-from shutil import copyfile, move
-from urllib.parse import urlparse
-import webbrowser
-import zipfile
-
-from PyQt6 import QtCore, QtGui, QtWidgets
+import os.path
 from pdfminer.converter import PDFPageAggregator
 from pdfminer.layout import LAParams, LTTextLine
 from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
 from pdfminer.pdfpage import PDFPage
+import PIL
+from PIL import Image
+from PyQt6 import QtCore, QtGui, QtWidgets
+import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
+import sqlite3
+from typing import Iterable, Any
+from shutil import copyfile, move
+from striprtf.striprtf import rtf_to_text
+from urllib.parse import urlparse
+import webbrowser
+import zipfile
 
-from .GUI.ui_dialog_manage_files import Ui_Dialog_manage_files
 from .add_attribute import DialogAddAttribute
 from .add_item_name import DialogAddItemName
+from .code_pdf import DialogCodePdf  # For isinstance update files
 from .code_text import DialogCodeText  # for isinstance()
 from .confirm_delete import DialogConfirmDelete
 from .docx import opendocx, getdocumenttext
 from .edit_textfile import DialogEditTextFile
+from .GUI.ui_dialog_manage_files import Ui_Dialog_manage_files
 from .helpers import ExportDirectoryPathDialog, Message, msecs_to_hours_mins_secs
 from .html_parser import *
-from striprtf.striprtf import rtf_to_text
 from .memo import DialogMemo
+from .pseudonyms import Pseudonyms
 from .report_codes import DialogReportCodes  # for isInstance()
 from .ris import Ris
 from .select_items import DialogSelectItems
 from .view_av import DialogViewAV, DialogCodeAV  # for isinstance update files
 from .view_image import DialogViewImage, DialogCodeImage  # for isinstance update files
-from .code_pdf import DialogCodePdf  # For isinstance update files
 
 # If VLC not installed, it will not crash
 vlc = None
@@ -174,6 +174,9 @@ class DialogManageFiles(QtWidgets.QDialog):
         Pseudonyms does not apply to PDF imports. Instead import plain text of the PDF. """
 
         Message(self.app, "Pseudonymisation", "UNDER CONSTRUCTION\nDOES NOT WORK YET").exec()
+        return  # TODO work in progress
+        ui_pseudomyms = Pseudonyms(self.app)
+        ui_pseudomyms.exec()
 
     def table_display_save(self):
         """ Save rows and column settings for replicating table display.
@@ -1815,9 +1818,6 @@ class DialogManageFiles(QtWidgets.QDialog):
             text_ = "\n\n".join(list_)  # add line to paragraph spacing for visual format
         # Import from rtf
         if import_file[-4:].lower() == ".rtf":
-            # TODO Kai, can  you test. I dont have any rtf files?
-            # I was looking here https://github.com/joshy/striprtf/issues/46
-            # text_ = rtf_to_text(import_file, encoding="utf-8", errors="replace")
             # text_ = rtf_to_text(import_file, encoding="latin-1", errors="replace")
             with open(import_file, "r", encoding="latin-1") as sourcefile:
                 text_ = ""
