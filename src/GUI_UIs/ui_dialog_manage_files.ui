@@ -34,7 +34,7 @@
      <widget class="QPushButton" name="pushButton_view">
       <property name="geometry">
        <rect>
-        <x>30</x>
+        <x>120</x>
         <y>3</y>
         <width>30</width>
         <height>30</height>
@@ -50,7 +50,7 @@
      <widget class="QPushButton" name="pushButton_create">
       <property name="geometry">
        <rect>
-        <x>120</x>
+        <x>30</x>
         <y>3</y>
         <width>30</width>
         <height>30</height>
@@ -100,7 +100,7 @@ Text files (from any source) are exported from the text stored in the database a
      <widget class="QPushButton" name="pushButton_import">
       <property name="geometry">
        <rect>
-        <x>60</x>
+        <x>0</x>
         <y>3</y>
         <width>30</width>
         <height>30</height>
@@ -132,7 +132,7 @@ Text files (from any source) are exported from the text stored in the database a
      <widget class="QPushButton" name="pushButton_link">
       <property name="geometry">
        <rect>
-        <x>90</x>
+        <x>60</x>
         <y>3</y>
         <width>30</width>
         <height>30</height>
@@ -309,7 +309,7 @@ Cannot export text transcription file associated with an audio or video as a lin
      <widget class="QPushButton" name="pushButton_pseudonyms">
       <property name="geometry">
        <rect>
-        <x>0</x>
+        <x>90</x>
         <y>3</y>
         <width>30</width>
         <height>30</height>
@@ -347,18 +347,23 @@ After all text files are imported, remove this file from the project folder and 
   </layout>
  </widget>
  <tabstops>
-  <tabstop>pushButton_view</tabstop>
   <tabstop>pushButton_import</tabstop>
-  <tabstop>pushButton_link</tabstop>
   <tabstop>pushButton_create</tabstop>
+  <tabstop>pushButton_link</tabstop>
+  <tabstop>pushButton_pseudonyms</tabstop>
+  <tabstop>pushButton_view</tabstop>
   <tabstop>pushButton_import_from_linked</tabstop>
   <tabstop>pushButton_export_to_linked</tabstop>
   <tabstop>pushButton_add_attribute</tabstop>
   <tabstop>pushButton_export_attributes</tabstop>
   <tabstop>pushButton_export</tabstop>
-  <tabstop>pushButton_help</tabstop>
+  <tabstop>pushButton_display_load</tabstop>
+  <tabstop>pushButton_display_save</tabstop>
+  <tabstop>pushButton_display_delete</tabstop>
+  <tabstop>pushButton_bulk_rename</tabstop>
   <tabstop>pushButton_undo</tabstop>
   <tabstop>pushButton_delete</tabstop>
+  <tabstop>pushButton_help</tabstop>
   <tabstop>tableWidget</tabstop>
  </tabstops>
  <resources/>
