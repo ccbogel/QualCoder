@@ -16,7 +16,8 @@ class Ui_Dialog_pseudonyms(object):
         self.verticalLayout = QtWidgets.QVBoxLayout(Dialog_pseudonyms)
         self.verticalLayout.setObjectName("verticalLayout")
         self.label = QtWidgets.QLabel(parent=Dialog_pseudonyms)
-        self.label.setMaximumSize(QtCore.QSize(16777215, 40))
+        self.label.setMinimumSize(QtCore.QSize(0, 50))
+        self.label.setMaximumSize(QtCore.QSize(16777215, 50))
         self.label.setWordWrap(True)
         self.label.setObjectName("label")
         self.verticalLayout.addWidget(self.label)
@@ -60,10 +61,12 @@ class Ui_Dialog_pseudonyms(object):
     def retranslateUi(self, Dialog_pseudonyms):
         _translate = QtCore.QCoreApplication.translate
         Dialog_pseudonyms.setWindowTitle(_translate("Dialog_pseudonyms", "Pseudonyms"))
-        self.label.setText(_translate("Dialog_pseudonyms", "Pseudonyms. Data de-identification applied on file import"))
+        self.label.setText(_translate("Dialog_pseudonyms", "Pseudonyms. Data de-identification applied on file import. Does not apply for PDF imports.\n"
+"Case sensitive, add multiple entries for each: e.g. Tom Jones  and TOM JONES"))
         self.lineEdit_original.setToolTip(_translate("Dialog_pseudonyms", "Original"))
         self.lineEdit_pseudonym.setToolTip(_translate("Dialog_pseudonyms", "Pseudonym"))
         self.pushButton_add.setToolTip(_translate("Dialog_pseudonyms", "Add to pseudonyms"))
+        self.tableWidget.setToolTip(_translate("Dialog_pseudonyms", "Click on a row to delete entry."))
 
 
 if __name__ == "__main__":
