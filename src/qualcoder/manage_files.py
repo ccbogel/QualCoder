@@ -20,6 +20,8 @@ https://qualcoder.wordpress.com/
 """
 
 import datetime
+import re
+
 import fitz
 import ebooklib
 from ebooklib import epub
@@ -173,8 +175,8 @@ class DialogManageFiles(QtWidgets.QDialog):
         This file can be removed and stored securely afte rthe data is imported.
         Pseudonyms does not apply to PDF imports. Instead import plain text of the PDF. """
 
-        Message(self.app, "Pseudonymisation", "UNDER CONSTRUCTION\nDOES NOT WORK YET").exec()
-        return  # TODO work in progress
+        #Message(self.app, "Pseudonymisation", "UNDER CONSTRUCTION\nDOES NOT WORK YET").exec()
+        #return  # TODO work in progress
         ui_pseudomyms = Pseudonyms(self.app)
         ui_pseudomyms.exec()
 
@@ -655,7 +657,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             image_filename = filename + f"_p{i + 1}.jpg"
             # Not using os.path.join. Other methods 'might' look for the forward slash.
             destination = f"{self.app.project_path}/images/{image_filename}"
-            print(destination)
+            #print(destination)
             pymypdf_pixmap.save(destination)
             self.load_media_reference(f"/images/{image_filename}")
             self.parent_text_edit.append(_("Image loaded from pdf: ") + image_filename)
@@ -1792,11 +1794,27 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.parent_text_edit.append(entry['name'] + _(" created."))
             self.source.append(entry)
 
+    def load_pseudonyms(self):
+        """ Pseudonyms stored in pseudonyms.json in qda data folder.
+        Loads into list of dictionaries of 'original', ;pseudonym' keys.
+        """
+
+        pseudonyms = []
+        pseudonyms_filepath = os.path.join(self.app.project_path, "pseudonyms.json")
+        try:
+            with open(pseudonyms_filepath, "r") as f:
+                pseudonyms = json.load(f)
+        except FileNotFoundError as err:
+            print(err)
+        return pseudonyms
+
     def load_file_text(self, import_file, link_path=""):
         """ Import from file types of odt, docx, rtf, pdf, epub, txt, html, htm.
         Implement character detection for txt imports.
         Loading pdf text. I have removed additional line breaks. See commented sections below.
         Removing these allows the pdf to be coded in Code_text and Code_pdf without positional shifting problems.
+
+        If pseudonyms.json is present in the qda folder, apply the pseudonyms to the words / phrases on import.
 
         param:
             import_file: filepath of file to be imported, String
@@ -1838,6 +1856,19 @@ class DialogManageFiles(QtWidgets.QDialog):
                     text_ += html_to_text(string) + "\n\n"  # Add line to paragraph spacing for visual format
                 except TypeError as err:
                     logger.debug(f"ebooklib get_body_content error: {err}")
+        # Import from html
+        if import_file[-5:].lower() == ".html" or import_file[-4:].lower() == ".htm":
+            import_errors = 0
+            with open(import_file, "r", encoding="utf-8", errors="surrogateescape") as sourcefile:
+                html_text = ""
+                while 1:
+                    line = sourcefile.readline()
+                    if not line:
+                        break
+                    html_text += line
+                text_ = html_to_text(html_text)
+                if import_errors > 0:
+                    Message(self.app, _("Warning"), str(import_errors) + _(" lines not imported"), "warning").exec()
         # Import PDF
         if import_file[-4:].lower() == '.pdf':
             pdf_file = open(import_file, 'rb')
@@ -1854,20 +1885,6 @@ class DialogManageFiles(QtWidgets.QDialog):
                 for lobj in layout:
                     self.get_item_and_hierarchy(page, lobj)
                 text_ += self.pdf_page_text
-
-        # Import from html
-        if import_file[-5:].lower() == ".html" or import_file[-4:].lower() == ".htm":
-            import_errors = 0
-            with open(import_file, "r", encoding="utf-8", errors="surrogateescape") as sourcefile:
-                html_text = ""
-                while 1:
-                    line = sourcefile.readline()
-                    if not line:
-                        break
-                    html_text += line
-                text_ = html_to_text(html_text)
-                if import_errors > 0:
-                    Message(self.app, _("Warning"), str(import_errors) + _(" lines not imported"), "warning").exec()
         # Try importing as a plain text file.
         # TODO https://stackoverflow.com/questions/436220/how-to-determine-the-encoding-of-text
         # ==> suggestion: use the new lib "charset_normalizer"  
@@ -1909,6 +1926,13 @@ class DialogManageFiles(QtWidgets.QDialog):
             QtWidgets.QMessageBox.warning(self, _('Duplicate file'),
                                           _("Duplicate filename.\nFile not imported"))
             return
+
+        # Apply pseudonym text replacement
+        pseudonyms = self.load_pseudonyms()
+        if import_file[-4:].lower() != '.pdf':
+            for pseudonym in pseudonyms:
+                pseudonymised = re.sub(rf"\b{pseudonym['original']}\b", pseudonym['pseudonym'], text_)
+                text_ = pseudonymised
 
         # Internal storage
         mediapath = "/docs/" + filename

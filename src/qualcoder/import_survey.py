@@ -24,6 +24,7 @@ from PyQt6.QtCore import Qt
 
 import csv
 import datetime
+import json
 import logging
 from openpyxl import load_workbook
 import os
@@ -63,6 +64,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
     preexisting_fields = []  # attribute names already in database
     parent_textEdit = None
     success = False  # Ability to load file and has individual ids in first column
+    pseudonyms = []  # Pseudonymisation - data de-identfication. Set these in Manage Files
 
     def __init__(self, app, parent_text_edit):
         """ Need to comment out the connection accept signal line in ui_Dialog_Import.py.
@@ -74,6 +76,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
         self.fields = []
         self.filepath = ""
         self.success = True
+        self.pseudonyms = self.load_pseudonyms()
 
         # Set up the user interface from Designer.
         QtWidgets.QDialog.__init__(self)
@@ -111,6 +114,28 @@ class DialogImportSurvey(QtWidgets.QDialog):
             self.ui.label_msg.setText(_("No survey selected."))
             self.ui.label_msg.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
             self.close()
+
+    def load_pseudonyms(self):
+        """ Pseudonyms stored in pseudonyms.json in qda data folder.
+        Loads into list of dictionaries of 'original', ;pseudonym' keys.
+        """
+
+        pseudonyms = []
+        pseudonyms_filepath = os.path.join(self.app.project_path, "pseudonyms.json")
+        try:
+            with open(pseudonyms_filepath, "r") as f:
+                pseudonyms = json.load(f)
+        except FileNotFoundError as err:
+            print(err)
+        return pseudonyms
+
+    def pseudonymise(self, text_):
+        """ Apply pseudonym text replacement to only qualitative file data. """
+
+        for pseudonym in self.pseudonyms:
+            pseudonymised = re.sub(rf"\b{pseudonym['original']}\b", pseudonym['pseudonym'], text_)
+            text_ = pseudonymised
+        return text_
 
     def select_file(self):
         """ Select csv or Excel file """
@@ -330,7 +355,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
         duplicate_names_counter = 0
         for i, c in enumerate(self.data):
             try:
-                self.ui.label_msg.setText(_("Inserting cases: " + str(i)))
+                self.ui.label_msg.setText(_("Inserting cases: ") + str(i))
                 cur.execute("insert into cases (name,memo,owner,date) values(?,?,?,?)",
                             (c[0], "", self.app.settings['codername'], now_date))
                 self.app.conn.commit()
@@ -404,7 +429,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
                     self.app.conn.commit()
                 except Exception as e_:  # Codename might exist - sqlite.Integrityerror
                     print(e_)
-                    logger.warning("Survey Insert code name from qual column " + str(e_))
+                    logger.warning("Survey Insert code name from qualtative column " + str(e_))
 
         # Insert qualitative data into source table
         self.ui.label_msg.setText(_("Creating qualitative text file(s)"))
@@ -470,7 +495,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
                     fulltext = f"{self.data[row][field]}"
                     try:
                         cur.execute(source_sql,
-                                    (qual_file_name, fulltext, "", self.app.settings['codername'], now_date))
+                                    (qual_file_name, self.pseudonymise(fulltext), "", self.app.settings['codername'], now_date))
                         self.app.conn.commit()
                     except sqlite3.IntegrityError as integrity_error:
                         logger.warning(integrity_error)
