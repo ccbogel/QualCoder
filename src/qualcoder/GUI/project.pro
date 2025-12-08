@@ -26,6 +26,7 @@ ui_dialog_manage_files.py \
 ui_dialog_manage_links.py \
 ui_dialog_memo.py \
 ui_dialog_organiser.py \
+ui_dialog_pseudonyms.py \
 ui_dialog_refi_export_endings.py \
 ui_dialog_report_code_frequencies.py \
 ui_dialog_report_code_summary.py \
