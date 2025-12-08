@@ -1299,7 +1299,7 @@ msgstr "Le nom de la variable existe déjà."
 
 #: src/qualcoder/pseudonyms.py:88
 msgid "Pseudonym entry already exists."
-msgstr "Cela existe déjà."
+msgstr "Le pseudonyme existe déjà."
 
 #: src/qualcoder/ai_llm.py:87
 msgid "AI Models"
