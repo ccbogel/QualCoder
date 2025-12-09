@@ -3,15 +3,15 @@ Notes for creating language files
 List_of_ISO_639-1_codes
 2 letter codes for different languages
 
+For Qt translations files: .ts to .qm
+=====================================
 Installs:
 sudo apt install python-setuptools
-sudo apt install qttools5-dev-tools  # Old not used
+sudo apt install qttools5-dev-tools  # for project.pro to convert multiple files at once
 sudo apt install qtcreator
 sudo apt -y install linguist-qt6
 sudo apt install pyqt6-dev-tools
 
-For Qt translations files: .ts to .tm
-=====================================
 In directory qualcoder/GUI 
 Need a .pro file  in the qualcoder/GUI directory
 run:
