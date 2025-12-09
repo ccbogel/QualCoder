@@ -15,7 +15,9 @@ sudo apt install pyqt6-dev-tools
 In directory qualcoder/GUI 
 Need a .pro file  in the qualcoder/GUI directory
 run:
-pylupdate5 project.pro -noobsolete
+pylupdate5 project.pro -no-obsolete
+
+I have added a helper file for this: update_qt_ts_helper.py
 
 For individual files:
 pylupdate6 -ts app_fr.ts -noobsolete
