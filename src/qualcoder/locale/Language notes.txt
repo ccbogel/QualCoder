@@ -1,7 +1,7 @@
 Notes for creating language files
 =================================
 List_of_ISO_639-1_codes
-2 letter codes for differnt languages
+2 letter codes for different languages
 
 Installs:
 sudo apt install python-setuptools
@@ -10,16 +10,19 @@ sudo apt install qtcreator
 sudo apt -y install linguist-qt6
 sudo apt install pyqt6-dev-tools
 
-
+For Qt translations files: .ts to .tm
+=====================================
 In directory qualcoder/GUI 
 Need a .pro file  in the qualcoder/GUI directory
 run:
 pylupdate5 project.pro
-OR
-pylupdate6 project.pro
+
+# Note this line does not work well with project .pro: pylupdate6 project.pro
 
 Double-click to open the .pro file in Qt Creator
 Go to Tools > External > Linguist > update Translations
+
+Remove obsolete entries with lupdate -noobsolete option
 
 Release as app_name.qm 
 Release is placed in qualcoder/locale/name/name.qm
