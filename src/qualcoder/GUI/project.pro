@@ -51,7 +51,9 @@ ui_reference_editor.py \
 ui_report_attribute_parameters.py \
 ui_report_matching_segments.py \
 ui_save_query.py \
-ui_special_functions.py
+ui_special_functions.py \
+ui_dialog_manage_files.py \
+ui_dialog_pseudonyms.py
 TRANSLATIONS    = app_de.ts \
                   app_es.ts \
                   app_fr.ts \
@@ -61,6 +63,5 @@ TRANSLATIONS    = app_de.ts \
 		  app_sv.ts \
 		  app_zh.ts
 CODECFORTR      = ISO-8859-5
-
 
 
