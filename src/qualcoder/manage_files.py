@@ -1107,6 +1107,8 @@ class DialogManageFiles(QtWidgets.QDialog):
         result = cur.fetchall()
         for row in result:
             icon, metadata, err_ = self.get_icon_and_metadata(row[1])
+            if err_:
+                self.parent_text_edit.append(err_ + " : " + row[3])
             self.source.append({'name': row[0], 'id': row[1], 'fulltext': row[2],
                                 'mediapath': row[3], 'memo': row[4], 'owner': row[5], 'date': row[6],
                                 'av_text_id': row[7], 'risid': row[8], 'metadata': metadata, 'icon': icon,
