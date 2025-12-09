@@ -1106,7 +1106,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             cur.execute(sql)
         result = cur.fetchall()
         for row in result:
-            icon, metadata = self.get_icon_and_metadata(row[1])
+            icon, metadata, err_ = self.get_icon_and_metadata(row[1])
             self.source.append({'name': row[0], 'id': row[1], 'fulltext': row[2],
                                 'mediapath': row[3], 'memo': row[4], 'owner': row[5], 'date': row[6],
                                 'av_text_id': row[7], 'risid': row[8], 'metadata': metadata, 'icon': icon,
@@ -1159,17 +1159,17 @@ class DialogManageFiles(QtWidgets.QDialog):
             icon = QtGui.QIcon(qta.icon('mdi6.text', options=[{'scale_factor': 1.2}]))
         if res[1] is not None and len(res[1]) > 0 and res[2] is None:
             metadata += _("Characters: ") + str(len(res[1]))
-            return icon, metadata
+            return icon, metadata, ""
         if res[2] is None:
             logger.debug("empty media path error")
-            return icon, metadata
+            return icon, metadata, ""
         if res[1] is not None and len(res[1]) > 5 and res[2][:6] == "/docs/":
             metadata += _("Characters: ") + str(len(res[1]))
-            return icon, metadata
+            return icon, metadata, ""
         if res[1] is not None and len(res[1]) > 5 and res[2][:5] == "docs:":
             metadata += _("Characters: ") + str(len(res[1]))
             icon = QtGui.QIcon(qta.icon('mdi6.text-box-check-outline', options=[{'scale_factor': 1.2}]))
-            return icon, metadata
+            return icon, metadata, ""
 
         abs_path = ""
         if 'audio:' == res[2][0:6]:
@@ -1188,7 +1188,10 @@ class DialogManageFiles(QtWidgets.QDialog):
                 w, h = image.size
             except (FileNotFoundError, PIL.UnidentifiedImageError):
                 metadata += _("Cannot locate media. ") + abs_path
-                return icon, metadata
+                return icon, metadata, "Not found error"
+            except PIL.Image.DecompressionBombError:
+                metadata += _("Image too large for PIL module. (DecompressionBombError): ") + abs_path
+                return icon, metadata, "DecompressionError"
             metadata += f"W: {w} x H: {h}"
         if res[2][:7] == "images:":
             icon = QtGui.QIcon(qta.icon('mdi6.image-check-outline', options=[{'scale_factor': 1.2}]))
@@ -1197,7 +1200,10 @@ class DialogManageFiles(QtWidgets.QDialog):
                 w, h = image.size
             except (FileNotFoundError, PIL.UnidentifiedImageError, AttributeError):
                 metadata += _("Cannot locate media. ") + abs_path
-                return icon, metadata
+                return icon, metadata, "Other error"
+            except PIL.Image.DecompressionBombError:
+                metadata += _("Image too large for PIL module. (DecompressionBombError): ") + abs_path
+                return icon, metadata, "DecompressionBombError"
             metadata += f"W: {w} x H: {h}"
         if res[2][:7] == "/video/":
             icon = QtGui.QIcon(qta.icon('mdi6.video-outline', options=[{'scale_factor': 1.2}]))
@@ -1210,7 +1216,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         if res[2][:6] in ("/audio", "audio:", "/video", "video:"):
             if not os.path.exists(abs_path):
                 metadata += _("Cannot locate media. ") + abs_path
-                return icon, metadata
+                return icon, metadata, "Not found Error"
             if vlc:
                 try:
                     try:
@@ -1224,14 +1230,14 @@ class DialogManageFiles(QtWidgets.QDialog):
                     msecs = media.get_duration()
                     duration_txt = msecs_to_hours_mins_secs(msecs)
                     metadata += " " + _("Duration: ") + duration_txt
-                    return icon, metadata
+                    return icon, metadata, ""
                 except AttributeError as err:
                     logger.warning(str(err))
                     metadata += _("Cannot locate media. ") + f"{abs_path}\n{err}"
-                    return icon, metadata
+                    return icon, metadata, "Not found error"
             else:
                 metadata += _("Cannot get media duration.\nVLC not installed.")
-                return icon, metadata
+                return icon, metadata, "Other error"
         bytes_ = 0
         try:
             bytes_ = os.path.getsize(abs_path)
@@ -1246,7 +1252,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         txt = self.get_cases_by_filename(res[0])
         if txt != "":
             metadata += f'\n{_("Case linked:")}\n{txt}'
-        return icon, metadata
+        return icon, metadata, ""
 
     def get_cases_by_filename(self, name):
         """ Called by get_icon_and_metadata, get_file_data
@@ -1528,7 +1534,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         ui = DialogEditTextFile(self.app, id_)
         ui.ui.textEdit.setAcceptRichText(False)
         ui.exec()
-        icon, metadata = self.get_icon_and_metadata(id_)
+        icon, metadata, err_ = self.get_icon_and_metadata(id_)
         item['icon'] = icon
         item['metadata'] = metadata
         item['attributes'] = []

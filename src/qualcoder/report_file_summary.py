@@ -29,7 +29,7 @@ import re
 from PyQt6 import QtCore, QtWidgets, QtGui
 
 from .GUI.ui_dialog_report_file_summary import Ui_Dialog_file_summary
-from .helpers import file_typer, msecs_to_hours_mins_secs
+from .helpers import file_typer, msecs_to_hours_mins_secs, Message
 from .simple_wordcloud import stopwords as cloud_stopwords
 
 # If VLC not installed, it will not crash
@@ -366,31 +366,37 @@ class DialogReportFileSummary(QtWidgets.QDialog):
             pixmap.save(abs_path)
 
         # Image size and metadata
-        image = Image.open(abs_path)
-        w, h = image.size
-        text_ += _("Width: ") + f"{w:,d}" + "  " + _("Height: ") + f"{h:,d}  " + _("Area: ") + f"{w * h:,d}" + \
-                _(" pixels") + "\n"
-        image_type = abs_path[-3:].lower()
-        # From: www.thepythoncode.com/article/extracting-image-metadata-in-python
-        if image_type in ("jpg", "peg"):
-            exifdata = image.getexif()
-            # iterating over the EXIF data fields
-            for tag_id in exifdata:
-                # get the tag name, instead of human unreadable tag id
-                tag = TAGS.get(tag_id, tag_id)
-                data = exifdata.get(tag_id)
-                # Decode bytes
-                if isinstance(data, bytes):
-                    try:
-                        data = data.decode()
-                        text_ += f"{tag:25}: {data}\n"
-                    except UnicodeDecodeError as e_:
-                        logger.debug(e_)
-        # From: www.vice.com/en/article/aekn58/hack-this-extra-image-metadata-using-python
-        if image_type == "png":
-            for tag, value in image.info.items():
-                key = TAGS.get(tag, tag)
-                text_ += f"{key} {value}\n"
+        try:
+            image = Image.open(abs_path)
+            w, h = image.size
+            text_ += _("Width: ") + f"{w:,d}" + "  " + _("Height: ") + f"{h:,d}  " + _("Area: ") + f"{w * h:,d}" + \
+                    _(" pixels") + "\n"
+            image_type = abs_path[-3:].lower()
+            # From: www.thepythoncode.com/article/extracting-image-metadata-in-python
+            if image_type in ("jpg", "peg"):
+                exifdata = image.getexif()
+                # iterating over the EXIF data fields
+                for tag_id in exifdata:
+                    # get the tag name, instead of human unreadable tag id
+                    tag = TAGS.get(tag_id, tag_id)
+                    data = exifdata.get(tag_id)
+                    # Decode bytes
+                    if isinstance(data, bytes):
+                        try:
+                            data = data.decode()
+                            text_ += f"{tag:25}: {data}\n"
+                        except UnicodeDecodeError as e_:
+                            logger.debug(e_)
+            # From: www.vice.com/en/article/aekn58/hack-this-extra-image-metadata-using-python
+            if image_type == "png":
+                for tag, value in image.info.items():
+                    key = TAGS.get(tag, tag)
+                    text_ += f"{key} {value}\n"
+        except Image.DecompressionBombError:
+            w = 1
+            h = 1
+            Message(self.app, _("Image too large"), _("Cannot open image with PIL module to ge t size and details.\n(DecompressionBombError)")).exec()
+
         # Codes
         sql = "select code_name.name, code_image.cid, count(code_image.cid), round(avg(width)), round(avg(height)), "
         sql += "sum(width*height) "

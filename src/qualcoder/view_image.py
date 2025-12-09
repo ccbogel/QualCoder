@@ -21,6 +21,8 @@ https://qualcoder.wordpress.com/
 
 from copy import deepcopy
 import datetime
+
+import PIL.Image
 import fitz
 import html
 from io import BytesIO
@@ -1316,7 +1318,12 @@ class DialogCodeImage(QtWidgets.QDialog):
         buffer = QBuffer()
         buffer.open(QBuffer.ReadWrite)
         img.save(buffer, "PNG")
-        pil_img = Image.open(BytesIO(buffer.data()))
+        try:
+            pil_img = Image.open(BytesIO(buffer.data()))
+        except PIL.Image.DecompressionBombError:
+            msg = _("Cannot open image with PIL. The image it too large.")
+            Message(self.app, _("Image highlight error"), msg).exec()
+            return
         background = ImageOps.grayscale(pil_img)  # Default gray
         if image_operation == "solarize":
             background = ImageOps.solarize(pil_img)  # Invert all pixel values above a threshold.

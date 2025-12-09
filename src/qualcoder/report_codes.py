@@ -1795,8 +1795,8 @@ class DialogReportCodes(QtWidgets.QDialog):
             try:
                 image = Image.open(abs_path)
                 w, h = image.size
-            except FileNotFoundError:
-                pass
+            except (FileNotFoundError, Image.DecompressionBombError) as err:
+                logger.warning(str(err))
             res_dict = {"fid": res[0], "area": w * h, "filename": res[1]}
             file_areas.append(res_dict)
 
