@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-12-08 14:26+0100\n"
-"PO-Revision-Date: 2025-12-08 14:29+0100\n"
+"PO-Revision-Date: 2025-12-10 13:02+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -3100,19 +3100,19 @@ msgstr "Vision normale"
 
 #: src/qualcoder/code_color_scheme.py:60
 msgid "Red weak"
-msgstr "Rouge faible"
+msgstr "Protanomalie"
 
 #: src/qualcoder/code_color_scheme.py:60
 msgid "Red blind"
-msgstr "Cécité rouge"
+msgstr "Protanopie"
 
 #: src/qualcoder/code_color_scheme.py:60
 msgid "Green weak"
-msgstr "Vert faible"
+msgstr "Deutéranomalie"
 
 #: src/qualcoder/code_color_scheme.py:60
 msgid "Green blind"
-msgstr "Cécité verte"
+msgstr "Deutéranopie"
 
 #: src/qualcoder/code_color_scheme.py:148
 msgid "Codes tree"
@@ -3888,15 +3888,15 @@ msgstr "Cas non sélectionnés"
 
 #: src/qualcoder/report_codes.py:2207
 msgid "CODE MEMO: "
-msgstr "CODE MÉMO: "
+msgstr "MÉMO DE CODE : "
 
 #: src/qualcoder/report_codes.py:2210
 msgid " FILE MEMO: "
-msgstr " MEMO DE FICHIER : "
+msgstr " MÉMO DE FICHIER : "
 
 #: src/qualcoder/report_codes.py:2218
 msgid "CASE MEMO: "
-msgstr "CASE MEMO: "
+msgstr "MÉMO DE CAS :"
 
 #: src/qualcoder/report_codes.py:2287 src/qualcoder/report_codes.py:2890
 #: src/qualcoder/view_graph.py:2932 src/qualcoder/view_graph.py:3082
