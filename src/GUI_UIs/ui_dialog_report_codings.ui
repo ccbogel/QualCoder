@@ -176,6 +176,11 @@
         <string>csv</string>
        </property>
       </item>
+      <item>
+       <property name="text">
+        <string>iramuteq</string>
+       </property>
+      </item>
      </widget>
      <widget class="QLabel" name="label_title">
       <property name="geometry">
