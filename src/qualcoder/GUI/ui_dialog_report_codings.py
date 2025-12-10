@@ -182,6 +182,7 @@ class Ui_Dialog_reportCodings(object):
         self.comboBox_export.setItemText(3, _translate("Dialog_reportCodings", "odt"))
         self.comboBox_export.setItemText(4, _translate("Dialog_reportCodings", "xlsx"))
         self.comboBox_export.setItemText(5, _translate("Dialog_reportCodings", "csv"))
+        self.comboBox_export.setItemText(5, _translate("Dialog_reportCodings", "iramuteq"))
         self.label_title.setText(_translate("Dialog_reportCodings", "Coding report"))
         self.comboBox_matrix.setToolTip(_translate("Dialog_reportCodings", "File and case matrix options"))
         self.checkBox_important.setToolTip(_translate("Dialog_reportCodings", "Filter results for those marked Important"))
@@ -217,3 +218,4 @@ if __name__ == "__main__":
     ui.setupUi(Dialog_reportCodings)
     Dialog_reportCodings.show()
     sys.exit(app.exec())
+
