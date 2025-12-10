@@ -571,6 +571,8 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.export_csv_file()
         if text_ == "xlsx":
             self.export_xlsx_file()
+        if text_ == "iramuteq":
+            self.export_iramuteq_file()
         self.ui.comboBox_export.setCurrentIndex(0)
 
     def export_matrix(self):
@@ -643,7 +645,66 @@ class DialogReportCodes(QtWidgets.QDialog):
         msg = _('Report exported: ') + filepath
         Message(self.app, _('Report exported'), msg, "information").exec()
         self.parent_textEdit.append(msg)
+        
+    def export_iramuteq_file(self):
+        """Export report to IRaMuTeQ text format,."""
+        if not self.results:
+            return
 
+        # Demander à l'utilisateur où sauvegarder le fichier
+        filepath, ok = QtWidgets.QFileDialog.getSaveFileName(
+            self,
+            _("Save IRaMuTeQ File"),
+            self.app.settings['directory'],
+            "Text Files (*.txt)"
+        )
+        if not filepath or not ok:
+            return
+
+        with open(filepath, 'w', encoding='utf-8') as f:
+            for data in self.results:
+                # Construire la ligne de métadonnées
+                metadata_parts = [
+                    f"*{data['file_or_case']}_{data['file_or_casename']}",
+                    f"*coder_{data['coder']}",
+                    f"*codename_{data['codename']}"
+                ]
+
+                # Ajouter les catégories
+                categories = self.categories_of_code(data['cid'])
+                for category in categories:
+                    metadata_parts.append(f"*category_{category}")
+
+                # Ajouter les variables de fichier et de cas si la case est cochée
+                if self.ui.checkBox_variables.isChecked():
+                    cur = self.app.conn.cursor()
+                    # Variables de fichier
+                    cur.execute("select name, value from attribute where attr_type='file' and id=?", [data['fid']])
+                    file_vars = cur.fetchall()
+                    for name, value in file_vars:
+                        metadata_parts.append(f"*filevar_{name}_{value}")
+                    # Variables de cas (si c'est un cas)
+                    if data['file_or_case'] == "Case":
+                        cur.execute("select name, value from attribute where attr_type='case' and id=?", [data['caseid']])
+                        case_vars = cur.fetchall()
+                        for name, value in case_vars:
+                            metadata_parts.append(f"*casevar_{name}_{value}")
+
+                # Écrire la ligne de métadonnées
+                f.write("**** " + " ".join(metadata_parts) + "\n")
+
+                # Écrire le texte ou la description du média
+                if data['result_type'] == 'text':
+                    f.write(f"{data['text']}\n\n")
+                elif data['result_type'] == 'image':
+                    f.write(f"image (id: imid:{data['imid']})\n\n")
+                elif data['result_type'] == 'av':
+                    f.write(f"audio/video (id: avid:{data['avid']})\n\n")
+
+        msg = _("Report exported in IRaMuTeQ format: ") + filepath
+        Message(self.app, _('Report exported'), msg, "information").exec()
+        self.parent_textEdit.append(msg)
+        
     def export_odt_file(self):
         """ Export report to open document format with .odt ending.
         QTextWriter supports plaintext, ODF and HTML .
