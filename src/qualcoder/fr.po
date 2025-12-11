@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-08 14:26+0100\n"
-"PO-Revision-Date: 2025-12-10 13:02+0100\n"
+"POT-Creation-Date: 2025-12-11 09:50+0100\n"
+"PO-Revision-Date: 2025-12-11 09:52+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -39,9 +39,9 @@ msgid "Uncaught exception: "
 msgstr "Exception non prise : "
 
 #: src/qualcoder/report_file_summary.py:115
-#: src/qualcoder/report_file_summary.py:425 src/qualcoder/code_pdf.py:379
-#: src/qualcoder/code_pdf.py:410 src/qualcoder/manage_files.py:1161
-#: src/qualcoder/manage_files.py:1167 src/qualcoder/manage_files.py:1170
+#: src/qualcoder/report_file_summary.py:431 src/qualcoder/code_pdf.py:379
+#: src/qualcoder/code_pdf.py:410 src/qualcoder/manage_files.py:1163
+#: src/qualcoder/manage_files.py:1169 src/qualcoder/manage_files.py:1172
 #: src/qualcoder/report_compare_coder_file.py:151
 #: src/qualcoder/report_codes.py:218 src/qualcoder/report_exact_matches.py:143
 #: src/qualcoder/code_text.py:496 src/qualcoder/code_text.py:527
@@ -72,8 +72,8 @@ msgstr ""
 #: src/qualcoder/report_code_summary.py:268
 #: src/qualcoder/ai_search_dialog.py:425
 #: src/qualcoder/report_codes_by_segments.py:143
-#: src/qualcoder/report_codes.py:253 src/qualcoder/report_codes.py:2176
-#: src/qualcoder/report_codes.py:2844 src/qualcoder/view_av.py:3443
+#: src/qualcoder/report_codes.py:253 src/qualcoder/report_codes.py:2237
+#: src/qualcoder/report_codes.py:2905 src/qualcoder/view_av.py:3443
 #: src/qualcoder/view_av.py:3900 src/qualcoder/code_text.py:5318
 msgid "MEMO: "
 msgstr "MÉMO : "
@@ -125,7 +125,7 @@ msgstr "Chemin des médias : "
 
 #: src/qualcoder/report_file_summary.py:194
 msgid "CASE:"
-msgstr "CASE :"
+msgstr "CAS :"
 
 #: src/qualcoder/report_file_summary.py:207
 msgid "No case assignment"
@@ -142,7 +142,7 @@ msgid "METADATA:"
 msgstr "MÉTADONNÉES :"
 
 #: src/qualcoder/report_file_summary.py:257
-#: src/qualcoder/report_file_summary.py:310 src/qualcoder/manage_files.py:1226
+#: src/qualcoder/report_file_summary.py:310 src/qualcoder/manage_files.py:1234
 msgid "Duration: "
 msgstr "Durée : "
 
@@ -153,15 +153,15 @@ msgstr "Durée : Impossible à obtenir. VLC n'est pas installé."
 
 #: src/qualcoder/report_file_summary.py:272
 #: src/qualcoder/report_file_summary.py:325
-#: src/qualcoder/report_file_summary.py:405
-#: src/qualcoder/report_file_summary.py:493
+#: src/qualcoder/report_file_summary.py:411
+#: src/qualcoder/report_file_summary.py:499
 msgid "CODE COUNTS:"
 msgstr "COMPTE DES CODES :"
 
 #: src/qualcoder/report_file_summary.py:274
 #: src/qualcoder/report_file_summary.py:327
-#: src/qualcoder/report_file_summary.py:409
-#: src/qualcoder/report_file_summary.py:496
+#: src/qualcoder/report_file_summary.py:415
+#: src/qualcoder/report_file_summary.py:502
 #: src/qualcoder/report_code_summary.py:452
 #: src/qualcoder/report_code_summary.py:503
 msgid "Count: "
@@ -169,8 +169,8 @@ msgstr "Compte : "
 
 #: src/qualcoder/report_file_summary.py:276
 #: src/qualcoder/report_file_summary.py:328
-#: src/qualcoder/report_file_summary.py:410
-#: src/qualcoder/report_file_summary.py:497
+#: src/qualcoder/report_file_summary.py:416
+#: src/qualcoder/report_file_summary.py:503
 msgid "Percent: "
 msgstr "Pourcentage : "
 
@@ -205,41 +205,54 @@ msgstr "DÉTAILS DE L'IMAGE PDF"
 msgid "Pages"
 msgstr "Pages"
 
-#: src/qualcoder/report_file_summary.py:371 src/qualcoder/view_image.py:2305
+#: src/qualcoder/report_file_summary.py:372 src/qualcoder/view_image.py:2312
 msgid "Width: "
 msgstr "Largeur : "
 
-#: src/qualcoder/report_file_summary.py:371
+#: src/qualcoder/report_file_summary.py:372
 msgid "Height: "
 msgstr "Hauteur : "
 
-#: src/qualcoder/report_file_summary.py:371
+#: src/qualcoder/report_file_summary.py:372
 #: src/qualcoder/report_compare_coder_file.py:904
 msgid "Area: "
 msgstr "Zone : "
 
-#: src/qualcoder/report_file_summary.py:372
-#: src/qualcoder/report_file_summary.py:411
+#: src/qualcoder/report_file_summary.py:373
+#: src/qualcoder/report_file_summary.py:417
 #: src/qualcoder/report_code_summary.py:452
 #: src/qualcoder/report_compare_coder_file.py:904
 #: src/qualcoder/report_compare_coder_file.py:907
 msgid " pixels"
 msgstr " pixels"
 
-#: src/qualcoder/report_file_summary.py:403
-#: src/qualcoder/report_file_summary.py:491
+#: src/qualcoder/report_file_summary.py:398
+msgid "Image too large"
+msgstr "Image trop grande"
+
+#: src/qualcoder/report_file_summary.py:398
+msgid ""
+"Cannot open image with PIL module to ge t size and details.\n"
+"(DecompressionBombError)"
+msgstr ""
+"Impossible d'ouvrir l'image avec le module PIL pour obtenir la taille et les "
+"détails.\n"
+"(DecompressionBombError)"
+
+#: src/qualcoder/report_file_summary.py:409
+#: src/qualcoder/report_file_summary.py:497
 msgid "CODE COUNT:"
 msgstr "NOMBRE DE CODES :"
 
-#: src/qualcoder/report_file_summary.py:411
+#: src/qualcoder/report_file_summary.py:417
 msgid "Average area: "
 msgstr "Zone moyenne : "
 
-#: src/qualcoder/report_file_summary.py:419
+#: src/qualcoder/report_file_summary.py:425
 msgid "STATISTICS:"
 msgstr "STATISTIQUES :"
 
-#: src/qualcoder/report_file_summary.py:462
+#: src/qualcoder/report_file_summary.py:468
 msgid ""
 "Word calculations: Words use alphabet characters and include the apostrophe. "
 "All other characters are word separators"
@@ -248,32 +261,32 @@ msgstr ""
 "incluent l'apostrophe. Tous les autres caractères sont des séparateurs de "
 "mots"
 
-#: src/qualcoder/report_file_summary.py:463
+#: src/qualcoder/report_file_summary.py:469
 msgid " Excludes English Stopwords"
 msgstr " Exclut les mots vides en anglais"
 
-#: src/qualcoder/report_file_summary.py:465
+#: src/qualcoder/report_file_summary.py:471
 #: src/qualcoder/report_code_summary.py:368
 msgid "Words: "
 msgstr "Mots : "
 
-#: src/qualcoder/report_file_summary.py:475
+#: src/qualcoder/report_file_summary.py:481
 #: src/qualcoder/report_code_summary.py:379
 msgid "Unique words: "
 msgstr "Des mots uniques : "
 
-#: src/qualcoder/report_file_summary.py:480
+#: src/qualcoder/report_file_summary.py:486
 #: src/qualcoder/report_code_summary.py:384
 msgid "Top 100 words"
 msgstr "Les 100 premiers mots"
 
-#: src/qualcoder/report_file_summary.py:496
+#: src/qualcoder/report_file_summary.py:502
 #: src/qualcoder/report_code_summary.py:331
 #: src/qualcoder/report_compare_coder_file.py:670
 msgid "Total characters: "
 msgstr "Total des caractères : "
 
-#: src/qualcoder/report_file_summary.py:498
+#: src/qualcoder/report_file_summary.py:504
 #: src/qualcoder/report_code_summary.py:332
 msgid "Average characters: "
 msgstr "Caractères moyens : "
@@ -335,14 +348,14 @@ msgstr "Information"
 
 #: src/qualcoder/code_pdf.py:433 src/qualcoder/code_pdf.py:442
 #: src/qualcoder/code_pdf.py:449 src/qualcoder/code_pdf.py:455
-#: src/qualcoder/view_image.py:363 src/qualcoder/view_image.py:372
-#: src/qualcoder/view_image.py:379 src/qualcoder/view_image.py:385
+#: src/qualcoder/view_image.py:365 src/qualcoder/view_image.py:374
+#: src/qualcoder/view_image.py:381 src/qualcoder/view_image.py:387
 #: src/qualcoder/report_codes_by_segments.py:192
 #: src/qualcoder/report_codes_by_segments.py:202
 #: src/qualcoder/report_codes_by_segments.py:210
 #: src/qualcoder/report_codes_by_segments.py:217
-#: src/qualcoder/report_codes.py:1207 src/qualcoder/report_codes.py:1225
-#: src/qualcoder/report_codes.py:1233 src/qualcoder/report_codes.py:1384
+#: src/qualcoder/report_codes.py:1268 src/qualcoder/report_codes.py:1286
+#: src/qualcoder/report_codes.py:1294 src/qualcoder/report_codes.py:1445
 #: src/qualcoder/view_av.py:441 src/qualcoder/view_av.py:450
 #: src/qualcoder/view_av.py:457 src/qualcoder/view_av.py:463
 #: src/qualcoder/report_cooccurrence.py:141
@@ -362,7 +375,7 @@ msgstr "Information"
 msgid "Attributes"
 msgstr "Attributs"
 
-#: src/qualcoder/code_pdf.py:453 src/qualcoder/view_image.py:383
+#: src/qualcoder/code_pdf.py:453 src/qualcoder/view_image.py:385
 #: src/qualcoder/report_codes_by_segments.py:214 src/qualcoder/view_av.py:461
 #: src/qualcoder/report_cooccurrence.py:165
 #: src/qualcoder/report_exact_matches.py:195 src/qualcoder/code_text.py:570
@@ -370,7 +383,7 @@ msgstr "Attributs"
 msgid "Nothing found"
 msgstr "Rien n'a été trouvé"
 
-#: src/qualcoder/code_pdf.py:453 src/qualcoder/view_image.py:383
+#: src/qualcoder/code_pdf.py:453 src/qualcoder/view_image.py:385
 #: src/qualcoder/report_codes_by_segments.py:214 src/qualcoder/view_av.py:461
 #: src/qualcoder/report_cooccurrence.py:165
 #: src/qualcoder/report_exact_matches.py:195 src/qualcoder/code_text.py:570
@@ -389,9 +402,9 @@ msgid "Memo: "
 msgstr "Mémo : "
 
 #: src/qualcoder/code_pdf.py:525 src/qualcoder/journals.py:186
-#: src/qualcoder/report_code_summary.py:122 src/qualcoder/view_image.py:398
+#: src/qualcoder/report_code_summary.py:122 src/qualcoder/view_image.py:400
 #: src/qualcoder/ai_search_dialog.py:172 src/qualcoder/attributes.py:262
-#: src/qualcoder/manage_files.py:1116 src/qualcoder/code_organiser.py:987
+#: src/qualcoder/manage_files.py:1118 src/qualcoder/code_organiser.py:987
 #: src/qualcoder/report_codes_by_segments.py:329
 #: src/qualcoder/report_codes.py:382 src/qualcoder/view_av.py:512
 #: src/qualcoder/code_text.py:634
@@ -399,7 +412,7 @@ msgid "Name"
 msgstr "Nom"
 
 #: src/qualcoder/code_pdf.py:525 src/qualcoder/report_code_summary.py:122
-#: src/qualcoder/view_image.py:398 src/qualcoder/manage_files.py:1116
+#: src/qualcoder/view_image.py:400 src/qualcoder/manage_files.py:1118
 #: src/qualcoder/code_color_scheme.py:148 src/qualcoder/view_av.py:512
 #: src/qualcoder/report_exact_matches.py:564 src/qualcoder/code_text.py:634
 #: src/qualcoder/report_relations.py:1102
@@ -413,13 +426,13 @@ msgstr "Id"
 #: src/qualcoder/report_code_summary.py:135
 #: src/qualcoder/report_code_summary.py:160
 #: src/qualcoder/report_code_summary.py:183
-#: src/qualcoder/report_code_summary.py:206 src/qualcoder/view_image.py:398
-#: src/qualcoder/view_image.py:1477 src/qualcoder/view_image.py:2093
-#: src/qualcoder/view_image.py:2117 src/qualcoder/ai_search_dialog.py:172
+#: src/qualcoder/report_code_summary.py:206 src/qualcoder/view_image.py:400
+#: src/qualcoder/view_image.py:1484 src/qualcoder/view_image.py:2100
+#: src/qualcoder/view_image.py:2124 src/qualcoder/ai_search_dialog.py:172
 #: src/qualcoder/ai_search_dialog.py:186 src/qualcoder/ai_search_dialog.py:264
 #: src/qualcoder/attributes.py:200 src/qualcoder/attributes.py:262
-#: src/qualcoder/manage_files.py:1116 src/qualcoder/manage_files.py:1464
-#: src/qualcoder/manage_files.py:1499 src/qualcoder/manage_files.py:2379
+#: src/qualcoder/manage_files.py:1118 src/qualcoder/manage_files.py:1472
+#: src/qualcoder/manage_files.py:1507 src/qualcoder/manage_files.py:2387
 #: src/qualcoder/code_organiser.py:936
 #: src/qualcoder/report_codes_by_segments.py:329
 #: src/qualcoder/report_codes_by_segments.py:343
@@ -438,7 +451,7 @@ msgid "Memo"
 msgstr "Mémo"
 
 #: src/qualcoder/code_pdf.py:525 src/qualcoder/report_code_summary.py:122
-#: src/qualcoder/view_image.py:398 src/qualcoder/ai_search_dialog.py:172
+#: src/qualcoder/view_image.py:400 src/qualcoder/ai_search_dialog.py:172
 #: src/qualcoder/report_codes_by_segments.py:329
 #: src/qualcoder/report_codes.py:382 src/qualcoder/view_av.py:512
 #: src/qualcoder/code_text.py:634 src/qualcoder/report_relations.py:1000
@@ -478,7 +491,7 @@ msgstr "Modifier"
 msgid "Add important mark (I)"
 msgstr "Ajouter une marque importante (I)"
 
-#: src/qualcoder/code_pdf.py:921 src/qualcoder/view_image.py:1485
+#: src/qualcoder/code_pdf.py:921 src/qualcoder/view_image.py:1492
 #: src/qualcoder/view_av.py:2665 src/qualcoder/view_av.py:3647
 #: src/qualcoder/code_text.py:1103
 msgid "Remove important mark"
@@ -504,8 +517,8 @@ msgstr "Marquer avec un code récent (R)"
 msgid "Annotate (A)"
 msgstr "Annoter (A)"
 
-#: src/qualcoder/code_pdf.py:944 src/qualcoder/report_codes.py:2294
-#: src/qualcoder/report_codes.py:2893 src/qualcoder/manage_references.py:611
+#: src/qualcoder/code_pdf.py:944 src/qualcoder/report_codes.py:2355
+#: src/qualcoder/report_codes.py:2954 src/qualcoder/manage_references.py:611
 #: src/qualcoder/view_av.py:2691 src/qualcoder/code_text.py:1133
 msgid "Copy to clipboard"
 msgstr "Copier dans le presse-papier"
@@ -541,8 +554,8 @@ msgstr "Masquer le panneau de contrôle (H)"
 msgid "Select codes"
 msgstr "Sélectionnez les codes"
 
-#: src/qualcoder/code_pdf.py:1063 src/qualcoder/report_codes.py:2368
-#: src/qualcoder/report_codes.py:2407 src/qualcoder/view_av.py:2783
+#: src/qualcoder/code_pdf.py:1063 src/qualcoder/report_codes.py:2429
+#: src/qualcoder/report_codes.py:2468 src/qualcoder/view_av.py:2783
 #: src/qualcoder/code_text.py:1361
 msgid "Select replacement code"
 msgstr "Sélectionnez le code de remplacement"
@@ -569,50 +582,50 @@ msgstr ""
 msgid "Use key presses"
 msgstr "Utiliser les touches"
 
-#: src/qualcoder/code_pdf.py:1246 src/qualcoder/view_image.py:1079
+#: src/qualcoder/code_pdf.py:1246 src/qualcoder/view_image.py:1081
 #: src/qualcoder/view_av.py:1415 src/qualcoder/code_text.py:1615
 msgid "Add new code to category"
 msgstr "Ajouter un nouveau code à la catégorie"
 
-#: src/qualcoder/code_pdf.py:1247 src/qualcoder/view_image.py:1080
+#: src/qualcoder/code_pdf.py:1247 src/qualcoder/view_image.py:1082
 #: src/qualcoder/view_av.py:1416 src/qualcoder/code_text.py:1616
 msgid "Add a new category to category"
 msgstr "Ajouter une nouvelle catégorie à la catégorie"
 
-#: src/qualcoder/code_pdf.py:1248 src/qualcoder/view_image.py:1081
+#: src/qualcoder/code_pdf.py:1248 src/qualcoder/view_image.py:1083
 #: src/qualcoder/code_organiser.py:933 src/qualcoder/view_av.py:1417
 #: src/qualcoder/code_text.py:1617
 msgid "Merge category into category"
 msgstr "Fusionner la catégorie dans la catégorie"
 
-#: src/qualcoder/code_pdf.py:1249 src/qualcoder/view_image.py:1082
+#: src/qualcoder/code_pdf.py:1249 src/qualcoder/view_image.py:1084
 #: src/qualcoder/view_av.py:1418 src/qualcoder/code_text.py:1618
 msgid "Add a new code"
 msgstr "Ajouter un nouveau code"
 
-#: src/qualcoder/code_pdf.py:1250 src/qualcoder/view_image.py:1083
+#: src/qualcoder/code_pdf.py:1250 src/qualcoder/view_image.py:1085
 #: src/qualcoder/view_av.py:1419 src/qualcoder/code_text.py:1619
 msgid "Add a new category"
 msgstr "Ajouter une nouvelle catégorie"
 
-#: src/qualcoder/code_pdf.py:1251 src/qualcoder/view_image.py:1084
+#: src/qualcoder/code_pdf.py:1251 src/qualcoder/view_image.py:1086
 #: src/qualcoder/code_organiser.py:937 src/qualcoder/view_av.py:1420
 #: src/qualcoder/code_text.py:1620
 msgid "Rename"
 msgstr "Renommer"
 
-#: src/qualcoder/code_pdf.py:1252 src/qualcoder/view_image.py:1085
+#: src/qualcoder/code_pdf.py:1252 src/qualcoder/view_image.py:1087
 #: src/qualcoder/view_av.py:1421 src/qualcoder/code_text.py:1621
 msgid "View or edit memo"
 msgstr "Afficher ou modifier un mémo"
 
-#: src/qualcoder/code_pdf.py:1253 src/qualcoder/view_image.py:1086
+#: src/qualcoder/code_pdf.py:1253 src/qualcoder/view_image.py:1088
 #: src/qualcoder/manage_files.py:503 src/qualcoder/view_av.py:1422
 #: src/qualcoder/code_text.py:1622 src/qualcoder/report_sql.py:418
 msgid "Delete"
 msgstr "Effacer"
 
-#: src/qualcoder/code_pdf.py:1258 src/qualcoder/view_image.py:1091
+#: src/qualcoder/code_pdf.py:1258 src/qualcoder/view_image.py:1093
 #: src/qualcoder/view_av.py:1424 src/qualcoder/code_text.py:1627
 msgid "Change code color"
 msgstr "Changer la couleur du code"
@@ -621,22 +634,22 @@ msgstr "Changer la couleur du code"
 msgid "Show coded files"
 msgstr "Afficher les fichiers codés"
 
-#: src/qualcoder/code_pdf.py:1260 src/qualcoder/view_image.py:1092
+#: src/qualcoder/code_pdf.py:1260 src/qualcoder/view_image.py:1094
 #: src/qualcoder/view_av.py:1425 src/qualcoder/code_text.py:1629
 msgid "Move code to"
 msgstr "Déplacer le code vers"
 
-#: src/qualcoder/code_pdf.py:1261 src/qualcoder/view_image.py:1094
+#: src/qualcoder/code_pdf.py:1261 src/qualcoder/view_image.py:1096
 #: src/qualcoder/view_av.py:1427 src/qualcoder/code_text.py:1630
 msgid "Show codes like"
 msgstr "Afficher des codes comme"
 
-#: src/qualcoder/code_pdf.py:1262 src/qualcoder/view_image.py:1095
+#: src/qualcoder/code_pdf.py:1262 src/qualcoder/view_image.py:1097
 #: src/qualcoder/view_av.py:1428 src/qualcoder/code_text.py:1631
 msgid "Show codes of colour"
 msgstr "Afficher les codes de couleur"
 
-#: src/qualcoder/code_pdf.py:1263 src/qualcoder/view_image.py:1096
+#: src/qualcoder/code_pdf.py:1263 src/qualcoder/view_image.py:1098
 #: src/qualcoder/view_av.py:1429 src/qualcoder/report_exact_matches.py:381
 #: src/qualcoder/code_text.py:1632 src/qualcoder/report_relations.py:594
 #: src/qualcoder/report_relations.py:1063 src/qualcoder/report_sql.py:506
@@ -644,7 +657,7 @@ msgstr "Afficher les codes de couleur"
 msgid "Sort ascending"
 msgstr "Trier par ordre croissant"
 
-#: src/qualcoder/code_pdf.py:1264 src/qualcoder/view_image.py:1097
+#: src/qualcoder/code_pdf.py:1264 src/qualcoder/view_image.py:1099
 #: src/qualcoder/view_av.py:1430 src/qualcoder/report_exact_matches.py:382
 #: src/qualcoder/code_text.py:1633 src/qualcoder/report_relations.py:595
 #: src/qualcoder/report_relations.py:1064 src/qualcoder/report_sql.py:508
@@ -652,24 +665,24 @@ msgstr "Trier par ordre croissant"
 msgid "Sort descending"
 msgstr "Trier par ordre décroissant"
 
-#: src/qualcoder/code_pdf.py:1265 src/qualcoder/view_image.py:1098
+#: src/qualcoder/code_pdf.py:1265 src/qualcoder/view_image.py:1100
 #: src/qualcoder/view_av.py:1431 src/qualcoder/code_text.py:1634
 msgid "Sort category then code ascending"
 msgstr "Trier la catégorie puis le code par ordre croissant"
 
 #: src/qualcoder/code_pdf.py:1351 src/qualcoder/code_pdf.py:1394
-#: src/qualcoder/view_image.py:1181 src/qualcoder/view_image.py:1869
+#: src/qualcoder/view_image.py:1183 src/qualcoder/view_image.py:1876
 #: src/qualcoder/view_av.py:1515 src/qualcoder/view_av.py:2204
 #: src/qualcoder/code_text.py:1722 src/qualcoder/code_text.py:1765
 msgid "Select blank or category"
 msgstr "Sélectionnez un blanc ou une catégorie"
 
-#: src/qualcoder/code_pdf.py:1409 src/qualcoder/view_image.py:280
+#: src/qualcoder/code_pdf.py:1409 src/qualcoder/view_image.py:282
 #: src/qualcoder/view_av.py:477 src/qualcoder/code_text.py:1825
 msgid "Showing important codings"
 msgstr "Affichage des codages importants"
 
-#: src/qualcoder/code_pdf.py:1413 src/qualcoder/view_image.py:283
+#: src/qualcoder/code_pdf.py:1413 src/qualcoder/view_image.py:285
 #: src/qualcoder/view_av.py:480 src/qualcoder/code_text.py:1828
 msgid "Show codings flagged important"
 msgstr "Afficher les codages marqués comme importants"
@@ -682,37 +695,37 @@ msgstr "Afficher quelques codes"
 msgid "Show codes containing the text. (Blank for all)"
 msgstr "Afficher les codes contenant le texte. (vide pour tous)"
 
-#: src/qualcoder/code_pdf.py:1442 src/qualcoder/view_image.py:1213
+#: src/qualcoder/code_pdf.py:1442 src/qualcoder/view_image.py:1215
 #: src/qualcoder/view_av.py:1547 src/qualcoder/code_text.py:1856
 msgid "Select code colors"
 msgstr "Sélectionner les couleurs du code"
 
-#: src/qualcoder/code_pdf.py:1501 src/qualcoder/view_image.py:240
+#: src/qualcoder/code_pdf.py:1501 src/qualcoder/view_image.py:242
 #: src/qualcoder/view_av.py:308 src/qualcoder/code_text.py:405
 msgid "Search for code"
 msgstr "Recherche de code"
 
-#: src/qualcoder/code_pdf.py:1504 src/qualcoder/view_image.py:243
+#: src/qualcoder/code_pdf.py:1504 src/qualcoder/view_image.py:245
 #: src/qualcoder/view_av.py:311 src/qualcoder/code_text.py:408
 msgid "Find and select first code that matches text."
 msgstr "Rechercher et sélectionner le premier code qui correspond au texte."
 
-#: src/qualcoder/code_pdf.py:1505 src/qualcoder/view_image.py:244
+#: src/qualcoder/code_pdf.py:1505 src/qualcoder/view_image.py:246
 #: src/qualcoder/view_av.py:312 src/qualcoder/code_text.py:409
 msgid "Enter text to match all or partial code:"
 msgstr "Saisir le texte pour faire correspondre tout ou partie du code :"
 
-#: src/qualcoder/code_pdf.py:1528 src/qualcoder/view_image.py:267
+#: src/qualcoder/code_pdf.py:1528 src/qualcoder/view_image.py:269
 #: src/qualcoder/view_av.py:335 src/qualcoder/code_text.py:432
 msgid "Match not found"
 msgstr "Correspondance non trouvée"
 
-#: src/qualcoder/code_pdf.py:1528 src/qualcoder/view_image.py:267
+#: src/qualcoder/code_pdf.py:1528 src/qualcoder/view_image.py:269
 #: src/qualcoder/view_av.py:335 src/qualcoder/code_text.py:432
 msgid "No code with matching text found."
 msgstr "Aucun code avec le texte correspondant n'a été trouvé."
 
-#: src/qualcoder/code_pdf.py:1618 src/qualcoder/view_image.py:1470
+#: src/qualcoder/code_pdf.py:1618 src/qualcoder/view_image.py:1477
 msgid "Select code"
 msgstr "Sélectionnez le code"
 
@@ -730,7 +743,7 @@ msgstr "Position du caractère : "
 msgid "PDF Image exported"
 msgstr "Image PDF exporté"
 
-#: src/qualcoder/code_pdf.py:1988 src/qualcoder/view_image.py:1910
+#: src/qualcoder/code_pdf.py:1988 src/qualcoder/view_image.py:1917
 #: src/qualcoder/view_av.py:2243 src/qualcoder/code_text.py:2652
 msgid "Merge code: "
 msgstr "Fusionner le code : "
@@ -739,27 +752,27 @@ msgstr "Fusionner le code : "
 msgid " into code: "
 msgstr " dans le code : "
 
-#: src/qualcoder/code_pdf.py:1989 src/qualcoder/view_image.py:1911
+#: src/qualcoder/code_pdf.py:1989 src/qualcoder/view_image.py:1918
 #: src/qualcoder/view_av.py:2244 src/qualcoder/code_text.py:2653
 msgid "Merge codes"
 msgstr "Fusionner les codes"
 
-#: src/qualcoder/code_pdf.py:2051 src/qualcoder/view_image.py:1966
+#: src/qualcoder/code_pdf.py:2051 src/qualcoder/view_image.py:1973
 #: src/qualcoder/view_av.py:2297 src/qualcoder/code_text.py:2711
 msgid "Add new code"
 msgstr "Ajouter un nouveau code"
 
-#: src/qualcoder/code_pdf.py:2051 src/qualcoder/view_image.py:1966
+#: src/qualcoder/code_pdf.py:2051 src/qualcoder/view_image.py:1973
 #: src/qualcoder/code_text.py:2711
 msgid "Code name"
 msgstr "Nom du code"
 
-#: src/qualcoder/code_pdf.py:2071 src/qualcoder/view_image.py:1982
+#: src/qualcoder/code_pdf.py:2071 src/qualcoder/view_image.py:1989
 #: src/qualcoder/code_text.py:2731
 msgid "New code: "
 msgstr "Nouveau code : "
 
-#: src/qualcoder/code_pdf.py:2110 src/qualcoder/view_image.py:1991
+#: src/qualcoder/code_pdf.py:2110 src/qualcoder/view_image.py:1998
 #: src/qualcoder/code_organiser.py:115 src/qualcoder/code_organiser.py:425
 #: src/qualcoder/view_graph.py:1724 src/qualcoder/view_graph.py:3179
 #: src/qualcoder/view_graph.py:3181 src/qualcoder/view_av.py:2320
@@ -767,19 +780,19 @@ msgstr "Nouveau code : "
 msgid "Category"
 msgstr "Catégorie"
 
-#: src/qualcoder/code_pdf.py:2110 src/qualcoder/view_image.py:1991
+#: src/qualcoder/code_pdf.py:2110 src/qualcoder/view_image.py:1998
 #: src/qualcoder/code_organiser.py:115 src/qualcoder/code_organiser.py:425
 #: src/qualcoder/view_av.py:2320 src/qualcoder/code_text.py:2773
 msgid "Category name"
 msgstr "Nom de la catégorie"
 
-#: src/qualcoder/code_pdf.py:2124 src/qualcoder/view_image.py:2005
+#: src/qualcoder/code_pdf.py:2124 src/qualcoder/view_image.py:2012
 #: src/qualcoder/code_text.py:2787
 msgid "New category: "
 msgstr "Nouvelle catégorie : "
 
-#: src/qualcoder/code_pdf.py:2147 src/qualcoder/view_image.py:2034
-#: src/qualcoder/report_codes.py:1105 src/qualcoder/view_graph.py:528
+#: src/qualcoder/code_pdf.py:2147 src/qualcoder/view_image.py:2041
+#: src/qualcoder/report_codes.py:1166 src/qualcoder/view_graph.py:528
 #: src/qualcoder/view_graph.py:599 src/qualcoder/view_graph.py:661
 #: src/qualcoder/view_graph.py:754 src/qualcoder/view_graph.py:1315
 #: src/qualcoder/view_graph.py:1340 src/qualcoder/view_graph.py:1366
@@ -790,19 +803,19 @@ msgstr "Nouvelle catégorie : "
 msgid "Code: "
 msgstr "Code : "
 
-#: src/qualcoder/code_pdf.py:2159 src/qualcoder/view_image.py:2038
+#: src/qualcoder/code_pdf.py:2159 src/qualcoder/view_image.py:2045
 #: src/qualcoder/view_av.py:2370 src/qualcoder/code_text.py:2827
 msgid "Code deleted: "
 msgstr "Code supprimé : "
 
-#: src/qualcoder/code_pdf.py:2179 src/qualcoder/view_image.py:2061
-#: src/qualcoder/report_codes.py:1100 src/qualcoder/view_av.py:2387
+#: src/qualcoder/code_pdf.py:2179 src/qualcoder/view_image.py:2068
+#: src/qualcoder/report_codes.py:1161 src/qualcoder/view_av.py:2387
 #: src/qualcoder/view_charts.py:348 src/qualcoder/code_text.py:2850
 #: src/qualcoder/reports.py:331
 msgid "Category: "
 msgstr "Catégorie : "
 
-#: src/qualcoder/code_pdf.py:2190 src/qualcoder/view_image.py:2065
+#: src/qualcoder/code_pdf.py:2190 src/qualcoder/view_image.py:2072
 #: src/qualcoder/view_av.py:2396 src/qualcoder/code_text.py:2861
 msgid "Category deleted: "
 msgstr "Catégorie supprimée : "
@@ -811,12 +824,12 @@ msgstr "Catégorie supprimée : "
 msgid "Memo for Code: "
 msgstr "Mémo de Code : "
 
-#: src/qualcoder/code_pdf.py:2216 src/qualcoder/view_image.py:1650
+#: src/qualcoder/code_pdf.py:2216 src/qualcoder/view_image.py:1657
 #: src/qualcoder/code_text.py:2890
 msgid "Memo for code: "
 msgstr "Mémo de code : "
 
-#: src/qualcoder/code_pdf.py:2226 src/qualcoder/view_image.py:2110
+#: src/qualcoder/code_pdf.py:2226 src/qualcoder/view_image.py:2117
 #: src/qualcoder/code_text.py:2900
 msgid "Memo for Category: "
 msgstr "Mémo de Catégorie : "
@@ -825,17 +838,17 @@ msgstr "Mémo de Catégorie : "
 msgid "Memo for category: "
 msgstr "Mémo de catégorie : "
 
-#: src/qualcoder/code_pdf.py:2254 src/qualcoder/view_image.py:2134
+#: src/qualcoder/code_pdf.py:2254 src/qualcoder/view_image.py:2141
 #: src/qualcoder/view_av.py:2461 src/qualcoder/code_text.py:2928
 msgid "Rename code"
 msgstr "Renommer le code"
 
-#: src/qualcoder/code_pdf.py:2255 src/qualcoder/view_image.py:2134
+#: src/qualcoder/code_pdf.py:2255 src/qualcoder/view_image.py:2141
 #: src/qualcoder/view_av.py:2461 src/qualcoder/code_text.py:2929
 msgid "New code name:"
 msgstr "Nouveau nom de code :"
 
-#: src/qualcoder/code_pdf.py:2263 src/qualcoder/view_image.py:2141
+#: src/qualcoder/code_pdf.py:2263 src/qualcoder/view_image.py:2148
 #: src/qualcoder/view_av.py:2468 src/qualcoder/code_text.py:2937
 msgid "Name in use"
 msgstr "Nom utilisé"
@@ -844,12 +857,12 @@ msgstr "Nom utilisé"
 msgid " is already in use, choose another name."
 msgstr " est déjà utilisé, choisissez un autre nom."
 
-#: src/qualcoder/code_pdf.py:2294 src/qualcoder/view_image.py:2162
+#: src/qualcoder/code_pdf.py:2294 src/qualcoder/view_image.py:2169
 #: src/qualcoder/view_av.py:2488 src/qualcoder/code_text.py:2967
 msgid "Rename category"
 msgstr "Renommer la catégorie"
 
-#: src/qualcoder/code_pdf.py:2295 src/qualcoder/view_image.py:2162
+#: src/qualcoder/code_pdf.py:2295 src/qualcoder/view_image.py:2169
 #: src/qualcoder/view_av.py:2488 src/qualcoder/code_text.py:2968
 msgid "New category name:"
 msgstr "Nouveau nom de la catégorie :"
@@ -862,7 +875,7 @@ msgstr "Ce nom de code est déjà utilisé."
 msgid "Duplicate code name"
 msgstr "Nom de code dupliqué"
 
-#: src/qualcoder/code_pdf.py:2377 src/qualcoder/view_image.py:635
+#: src/qualcoder/code_pdf.py:2377 src/qualcoder/view_image.py:637
 #: src/qualcoder/view_av.py:692 src/qualcoder/code_text.py:3050
 msgid "Open memo"
 msgstr "Mémo ouvert"
@@ -871,49 +884,49 @@ msgstr "Mémo ouvert"
 msgid "View original text file"
 msgstr "Voir le fichier texte original"
 
-#: src/qualcoder/code_pdf.py:2384 src/qualcoder/view_image.py:636
+#: src/qualcoder/code_pdf.py:2384 src/qualcoder/view_image.py:638
 #: src/qualcoder/view_av.py:693 src/qualcoder/code_text.py:3057
 msgid "Next file"
 msgstr "Fichier suivant"
 
-#: src/qualcoder/code_pdf.py:2385 src/qualcoder/view_image.py:637
+#: src/qualcoder/code_pdf.py:2385 src/qualcoder/view_image.py:639
 #: src/qualcoder/view_av.py:694 src/qualcoder/code_text.py:3058
 msgid "File with latest coding"
 msgstr "Fichier avec le dernier codage"
 
 #: src/qualcoder/code_pdf.py:2386 src/qualcoder/code_pdf.py:2452
-#: src/qualcoder/view_image.py:638 src/qualcoder/view_image.py:687
+#: src/qualcoder/view_image.py:640 src/qualcoder/view_image.py:689
 #: src/qualcoder/view_av.py:695 src/qualcoder/view_av.py:769
 #: src/qualcoder/code_text.py:3059 src/qualcoder/code_text.py:3136
 msgid "Show files like"
 msgstr "Afficher les fichiers tels que"
 
-#: src/qualcoder/code_pdf.py:2387 src/qualcoder/view_image.py:640
+#: src/qualcoder/code_pdf.py:2387 src/qualcoder/view_image.py:642
 #: src/qualcoder/view_av.py:697 src/qualcoder/code_text.py:3060
 msgid "Show files by attributes"
 msgstr "Afficher les fichiers par attributs"
 
-#: src/qualcoder/code_pdf.py:2388 src/qualcoder/view_image.py:639
+#: src/qualcoder/code_pdf.py:2388 src/qualcoder/view_image.py:641
 #: src/qualcoder/view_av.py:696 src/qualcoder/code_text.py:3061
 msgid "Show case files"
 msgstr "Montrer les dossiers"
 
-#: src/qualcoder/code_pdf.py:2429 src/qualcoder/view_image.py:662
+#: src/qualcoder/code_pdf.py:2429 src/qualcoder/view_image.py:664
 #: src/qualcoder/view_av.py:744 src/qualcoder/code_text.py:3113
 msgid "Show all files"
 msgstr "Afficher tous les fichiers"
 
-#: src/qualcoder/code_pdf.py:2430 src/qualcoder/view_image.py:663
+#: src/qualcoder/code_pdf.py:2430 src/qualcoder/view_image.py:665
 #: src/qualcoder/view_av.py:745 src/qualcoder/code_text.py:3114
 msgid "Select case"
 msgstr "Sélectionner un cas"
 
-#: src/qualcoder/code_pdf.py:2455 src/qualcoder/view_image.py:690
+#: src/qualcoder/code_pdf.py:2455 src/qualcoder/view_image.py:692
 #: src/qualcoder/view_av.py:772 src/qualcoder/code_text.py:3139
 msgid "Show files containing the text. (Blank for all)"
 msgstr "Afficher les fichiers contenant le texte. (vide pour tous)"
 
-#: src/qualcoder/code_pdf.py:2530 src/qualcoder/view_image.py:571
+#: src/qualcoder/code_pdf.py:2530 src/qualcoder/view_image.py:573
 #: src/qualcoder/view_av.py:803 src/qualcoder/code_text.py:1471
 msgid "Memo for file: "
 msgstr "Mémo pour dossier : "
@@ -959,11 +972,11 @@ msgstr ""
 #: src/qualcoder/journals.py:746 src/qualcoder/report_attributes.py:653
 #: src/qualcoder/report_attributes.py:657
 #: src/qualcoder/report_attributes.py:660
-#: src/qualcoder/report_attributes.py:668 src/qualcoder/manage_files.py:1381
-#: src/qualcoder/manage_files.py:1871 src/qualcoder/manage_files.py:1911
-#: src/qualcoder/manage_files.py:1915 src/qualcoder/manage_files.py:1919
+#: src/qualcoder/report_attributes.py:668 src/qualcoder/manage_files.py:1389
+#: src/qualcoder/manage_files.py:1879 src/qualcoder/manage_files.py:1919
+#: src/qualcoder/manage_files.py:1923 src/qualcoder/manage_files.py:1927
 #: src/qualcoder/refi.py:1192 src/qualcoder/case_file_manager.py:618
-#: src/qualcoder/report_codes.py:1141 src/qualcoder/view_graph.py:852
+#: src/qualcoder/report_codes.py:1202 src/qualcoder/view_graph.py:852
 #: src/qualcoder/text_file_replacement.py:75
 #: src/qualcoder/text_file_replacement.py:304
 #: src/qualcoder/text_file_replacement.py:307
@@ -1005,8 +1018,8 @@ msgstr "Marquer comme important"
 msgid "Remove important flag"
 msgstr "Enlever la marque importante"
 
-#: src/qualcoder/code_pdf.py:3042 src/qualcoder/view_image.py:1478
-#: src/qualcoder/case_file_manager.py:453 src/qualcoder/report_codes.py:2288
+#: src/qualcoder/code_pdf.py:3042 src/qualcoder/view_image.py:1485
+#: src/qualcoder/case_file_manager.py:453 src/qualcoder/report_codes.py:2349
 #: src/qualcoder/view_av.py:2656
 msgid "Unmark"
 msgstr "Dé-surligner"
@@ -1267,7 +1280,7 @@ msgstr "Dans le nom du journal, utilisez uniquement: a-z, A-z 0-9 - espace"
 msgid "Journal name changed from: "
 msgstr "Le nom du journal a été modifié : "
 
-#: src/qualcoder/journals.py:745 src/qualcoder/manage_files.py:1380
+#: src/qualcoder/journals.py:745 src/qualcoder/manage_files.py:1388
 #: src/qualcoder/cases.py:670
 msgid "This attribute is numeric"
 msgstr "Cet attribut est numérique"
@@ -1611,7 +1624,7 @@ msgstr ""
 msgid "IMAGE CODINGS: "
 msgstr "CODAGES D'IMAGES : "
 
-#: src/qualcoder/report_code_summary.py:451 src/qualcoder/view_image.py:828
+#: src/qualcoder/report_code_summary.py:451 src/qualcoder/view_image.py:830
 msgid "Image: "
 msgstr "Image : "
 
@@ -1643,74 +1656,74 @@ msgstr " secs"
 msgid "Average percent of media: "
 msgstr "Pourcentage moyen des médias : "
 
-#: src/qualcoder/view_image.py:126 src/qualcoder/report_codes.py:1176
-#: src/qualcoder/report_codes.py:2219 src/qualcoder/view_av.py:219
+#: src/qualcoder/view_image.py:128 src/qualcoder/report_codes.py:1237
+#: src/qualcoder/report_codes.py:2280 src/qualcoder/view_av.py:219
 #: src/qualcoder/view_charts.py:346
 msgid "Coder: "
 msgstr "Codeur : "
 
-#: src/qualcoder/view_image.py:127 src/qualcoder/view_image.py:729
+#: src/qualcoder/view_image.py:129 src/qualcoder/view_image.py:731
 msgid "Image coding"
 msgstr "Codage des images"
 
-#: src/qualcoder/view_image.py:129 src/qualcoder/view_image.py:2274
+#: src/qualcoder/view_image.py:131 src/qualcoder/view_image.py:2281
 #: src/qualcoder/helpers.py:528 src/qualcoder/helpers.py:605
 msgid "Key + or W zoom in. Key - or Q zoom out"
 msgstr "Touche + ou W : zoom avant. Touche - ou Q : zoom arrière"
 
-#: src/qualcoder/view_image.py:821
+#: src/qualcoder/view_image.py:823
 #: src/qualcoder/report_compare_coder_file.py:454
 msgid "Image Error"
 msgstr "Erreur sur l'image"
 
-#: src/qualcoder/view_image.py:821 src/qualcoder/view_image.py:2258
+#: src/qualcoder/view_image.py:823 src/qualcoder/view_image.py:2265
 #: src/qualcoder/report_compare_coder_file.py:329
 #: src/qualcoder/report_compare_coder_file.py:454
 #: src/qualcoder/report_compare_coder_file.py:862 src/qualcoder/helpers.py:515
 msgid "Cannot open: "
 msgstr "Impossible d'ouvrir : "
 
-#: src/qualcoder/view_image.py:889
+#: src/qualcoder/view_image.py:891
 #: src/qualcoder/report_compare_coder_file.py:934
 msgid "Scale: "
 msgstr "Échelle : "
 
-#: src/qualcoder/view_image.py:891 src/qualcoder/view_av.py:361
+#: src/qualcoder/view_image.py:893 src/qualcoder/view_av.py:361
 #: src/qualcoder/view_av.py:4315
 msgid "Width"
 msgstr "Largeur"
 
-#: src/qualcoder/view_image.py:891 src/qualcoder/view_av.py:364
+#: src/qualcoder/view_image.py:893 src/qualcoder/view_av.py:364
 #: src/qualcoder/view_av.py:4318
 msgid "Height"
 msgstr "Hauteur"
 
-#: src/qualcoder/view_image.py:892
+#: src/qualcoder/view_image.py:894
 msgid "Rotation"
 msgstr "Rotation"
 
-#: src/qualcoder/view_image.py:927 src/qualcoder/view_av.py:3904
+#: src/qualcoder/view_image.py:929 src/qualcoder/view_av.py:3904
 msgid "IMPORTANT"
 msgstr "IMPORTANT"
 
-#: src/qualcoder/view_image.py:940
+#: src/qualcoder/view_image.py:942
 msgid "Overlaps exactly with"
 msgstr "Se superpose exactement à"
 
-#: src/qualcoder/view_image.py:1066 src/qualcoder/code_organiser.py:464
+#: src/qualcoder/view_image.py:1068 src/qualcoder/code_organiser.py:464
 #: src/qualcoder/helpers.py:744 src/qualcoder/view_graph.py:1016
 msgid "Image exported"
 msgstr "Image exportée"
 
-#: src/qualcoder/view_image.py:1093 src/qualcoder/view_av.py:1426
+#: src/qualcoder/view_image.py:1095 src/qualcoder/view_av.py:1426
 msgid "Show coded text and media"
 msgstr "Afficher le texte et les médias codés"
 
-#: src/qualcoder/view_image.py:1196 src/qualcoder/view_av.py:1530
+#: src/qualcoder/view_image.py:1198 src/qualcoder/view_av.py:1530
 msgid "Show codes containing"
 msgstr "Afficher les codes contenant"
 
-#: src/qualcoder/view_image.py:1199 src/qualcoder/view_av.py:1533
+#: src/qualcoder/view_image.py:1201 src/qualcoder/view_av.py:1533
 msgid ""
 "Show codes containing text.\n"
 "(Blank for all)"
@@ -1718,105 +1731,113 @@ msgstr ""
 "Afficher les codes contenant du texte.\n"
 "(Vide pour tous)"
 
-#: src/qualcoder/view_image.py:1439
+#: src/qualcoder/view_image.py:1324
+msgid "Cannot open image with PIL. The image it too large."
+msgstr "Impossible d'ouvrir l'image avec PIL. L'image est trop grande."
+
+#: src/qualcoder/view_image.py:1325
+msgid "Image highlight error"
+msgstr "Erreur d'affichage de l'image"
+
+#: src/qualcoder/view_image.py:1446
 msgid "Rotate clockwise"
 msgstr "Rotation dans le sens horaire"
 
-#: src/qualcoder/view_image.py:1440
+#: src/qualcoder/view_image.py:1447
 msgid "Rotate counter-clockwise"
 msgstr "Rotation dans  le sens horaire inverse"
 
-#: src/qualcoder/view_image.py:1441 src/qualcoder/helpers.py:667
+#: src/qualcoder/view_image.py:1448 src/qualcoder/helpers.py:667
 msgid "Highlight area - gray"
 msgstr "Zone de surbrillance - grise"
 
-#: src/qualcoder/view_image.py:1442 src/qualcoder/helpers.py:668
+#: src/qualcoder/view_image.py:1449 src/qualcoder/helpers.py:668
 msgid "Highlight area - solarize"
 msgstr "Zone de surbrillance - solariser"
 
-#: src/qualcoder/view_image.py:1443 src/qualcoder/helpers.py:669
+#: src/qualcoder/view_image.py:1450 src/qualcoder/helpers.py:669
 msgid "Highlight area - blur"
 msgstr "Zone de surbrillance - flou"
 
-#: src/qualcoder/view_image.py:1447 src/qualcoder/report_codes.py:2302
+#: src/qualcoder/view_image.py:1454 src/qualcoder/report_codes.py:2363
 msgid "Show control panel"
 msgstr "Afficher le panneau de contrôle"
 
-#: src/qualcoder/view_image.py:1449 src/qualcoder/report_codes.py:2304
+#: src/qualcoder/view_image.py:1456 src/qualcoder/report_codes.py:2365
 msgid "Hide control panel"
 msgstr "Masquer le panneau de contrôle"
 
-#: src/qualcoder/view_image.py:1479
+#: src/qualcoder/view_image.py:1486
 msgid "Move or resize"
 msgstr "Déplacer ou redimensionner"
 
-#: src/qualcoder/view_image.py:1482 src/qualcoder/report_codes.py:2289
+#: src/qualcoder/view_image.py:1489 src/qualcoder/report_codes.py:2350
 #: src/qualcoder/view_av.py:3645
 msgid "Add important mark"
 msgstr "Ajouter une marque importante"
 
-#: src/qualcoder/view_image.py:1486
+#: src/qualcoder/view_image.py:1493
 msgid "Highlight this area - gray"
 msgstr "Mettre en évidence cette zone - grise"
 
-#: src/qualcoder/view_image.py:1487
+#: src/qualcoder/view_image.py:1494
 msgid "Highlight this area - solarize"
 msgstr "Mettre en évidence cette zone - solariser"
 
-#: src/qualcoder/view_image.py:1488
+#: src/qualcoder/view_image.py:1495
 msgid "Highlight this area - blur"
 msgstr "Mettre en évidence cette zone - estomper"
 
-#: src/qualcoder/view_image.py:1489
+#: src/qualcoder/view_image.py:1496
 msgid "Highlight this code - gray"
 msgstr "Surligner ce code - gris"
 
-#: src/qualcoder/view_image.py:1490
+#: src/qualcoder/view_image.py:1497
 msgid "Highlight this code - solarize"
 msgstr "Surligner ce code - solariser"
 
-#: src/qualcoder/view_image.py:1491
+#: src/qualcoder/view_image.py:1498
 msgid "Highlight this code - blur"
 msgstr "Surligner ce code - flou"
 
-#: src/qualcoder/view_image.py:1708 src/qualcoder/view_image.py:1711
+#: src/qualcoder/view_image.py:1715 src/qualcoder/view_image.py:1718
 msgid "Coded area"
 msgstr "Zone codé"
 
-#: src/qualcoder/view_image.py:1708 src/qualcoder/view_image.py:1711
+#: src/qualcoder/view_image.py:1715 src/qualcoder/view_image.py:1718
 msgid "Select a code in the list first."
 msgstr "Sélectionner d'abord un code dans la liste."
 
-#: src/qualcoder/view_image.py:2086 src/qualcoder/view_av.py:2413
+#: src/qualcoder/view_image.py:2093 src/qualcoder/view_av.py:2413
 msgid "Memo for Code "
 msgstr "Mémo de code : "
 
-#: src/qualcoder/view_image.py:2141
+#: src/qualcoder/view_image.py:2148
 msgid " Choose another name"
 msgstr " Choisissez un autre nom"
 
-#: src/qualcoder/view_image.py:2156 src/qualcoder/view_av.py:2482
+#: src/qualcoder/view_image.py:2163 src/qualcoder/view_av.py:2482
 msgid "Code renamed: "
 msgstr "Code renommé : "
 
-#: src/qualcoder/view_image.py:2169 src/qualcoder/view_av.py:2495
+#: src/qualcoder/view_image.py:2176 src/qualcoder/view_av.py:2495
 msgid "This category name is already in use"
 msgstr "La catégorie a un nom déjà utilisé"
 
-#: src/qualcoder/view_image.py:2170 src/qualcoder/view_av.py:2496
+#: src/qualcoder/view_image.py:2177 src/qualcoder/view_av.py:2496
 msgid "Duplicate category name"
 msgstr "Nom dupliqué"
 
-#: src/qualcoder/view_image.py:2187 src/qualcoder/code_text.py:2993
+#: src/qualcoder/view_image.py:2194 src/qualcoder/code_text.py:2993
 msgid "Category renamed from: "
 msgstr "Catégorie renommée en : "
 
-#: src/qualcoder/view_image.py:2258
+#: src/qualcoder/view_image.py:2265
 #: src/qualcoder/report_compare_coder_file.py:862 src/qualcoder/helpers.py:515
 msgid "Image error"
 msgstr "Erreur sur l'image"
 
-#: src/qualcoder/view_image.py:2276
+#: src/qualcoder/view_image.py:2283
 msgid ""
 "L rotate clockwise\n"
 "R rotate anti-clockwise\n"
@@ -1826,11 +1847,11 @@ msgstr ""
 "R rotation dans le sens inverse des aiguilles d'une montre\n"
 "+ - zoom avant et arrière"
 
-#: src/qualcoder/view_image.py:2305
+#: src/qualcoder/view_image.py:2312
 msgid " Height: "
 msgstr " La hauteur : "
 
-#: src/qualcoder/view_image.py:2306
+#: src/qualcoder/view_image.py:2313
 msgid " Scale: "
 msgstr " Échelle : "
 
@@ -1856,7 +1877,7 @@ msgstr ""
 "n'a pas été trouvé. La commande sera réinitialisée à la valeur par défaut."
 
 #: src/qualcoder/ai_search_dialog.py:124 src/qualcoder/ai_search_dialog.py:453
-#: src/qualcoder/ai_search_dialog.py:473 src/qualcoder/report_codes.py:1267
+#: src/qualcoder/ai_search_dialog.py:473 src/qualcoder/report_codes.py:1328
 #: src/qualcoder/view_graph.py:517 src/qualcoder/view_graph.py:587
 #: src/qualcoder/view_graph.py:643 src/qualcoder/report_exact_matches.py:243
 msgid "No codes"
@@ -1988,7 +2009,7 @@ msgid "Attribute not found"
 msgstr "Attribut non trouvé"
 
 #: src/qualcoder/report_attributes.py:459 src/qualcoder/helpers.py:215
-#: src/qualcoder/report_codes.py:2208 src/qualcoder/view_graph.py:528
+#: src/qualcoder/report_codes.py:2269 src/qualcoder/view_graph.py:528
 #: src/qualcoder/view_graph.py:599 src/qualcoder/view_graph.py:661
 #: src/qualcoder/view_graph.py:754 src/qualcoder/view_graph.py:1314
 #: src/qualcoder/view_graph.py:1339 src/qualcoder/view_graph.py:1365
@@ -2000,7 +2021,7 @@ msgid "File: "
 msgstr "Fichier : "
 
 #: src/qualcoder/report_attributes.py:464 src/qualcoder/helpers.py:217
-#: src/qualcoder/case_file_manager.py:94 src/qualcoder/report_codes.py:2212
+#: src/qualcoder/case_file_manager.py:94 src/qualcoder/report_codes.py:2273
 #: src/qualcoder/view_graph.py:1614 src/qualcoder/code_in_all_files.py:139
 #: src/qualcoder/code_in_all_files.py:216 src/qualcoder/view_charts.py:283
 msgid "Case: "
@@ -2184,7 +2205,7 @@ msgstr "Ou est réservé aux attributs de la bibliographie :"
 msgid "Duplicate"
 msgstr "Dupliquer"
 
-#: src/qualcoder/manage_files.py:159 src/qualcoder/manage_files.py:2416
+#: src/qualcoder/manage_files.py:159 src/qualcoder/manage_files.py:2424
 #: src/qualcoder/cases.py:918
 msgid "Right click header row to hide columns"
 msgstr ""
@@ -2365,7 +2386,7 @@ msgstr "Cacher des valeurs comme :"
 msgid "Image loaded from pdf: "
 msgstr "Image chargée à partir d'un PDF : "
 
-#: src/qualcoder/manage_files.py:691 src/qualcoder/manage_files.py:2137
+#: src/qualcoder/manage_files.py:691 src/qualcoder/manage_files.py:2145
 #: src/qualcoder/special_functions.py:225
 msgid "Delete files"
 msgstr "Supprimer des fichiers"
@@ -2400,7 +2421,7 @@ msgstr "Renommer l'entrée du fichier de la base de données"
 msgid "Select directory to save file"
 msgstr "Sélectionner le répertoire pour sauvegarder le fichier"
 
-#: src/qualcoder/manage_files.py:900 src/qualcoder/manage_files.py:2066
+#: src/qualcoder/manage_files.py:900 src/qualcoder/manage_files.py:2074
 msgid "Cannot export"
 msgstr "Impossible d'exporter"
 
@@ -2416,26 +2437,30 @@ msgstr "Attributs du fichier exporté vers : "
 msgid "File Export"
 msgstr "Exportation de fichiers"
 
-#: src/qualcoder/manage_files.py:1116
+#: src/qualcoder/manage_files.py:1118
 msgid "Date"
 msgstr "Date"
 
-#: src/qualcoder/manage_files.py:1116 src/qualcoder/view_graph.py:978
+#: src/qualcoder/manage_files.py:1118 src/qualcoder/view_graph.py:978
 #: src/qualcoder/view_graph.py:1931 src/qualcoder/view_graph.py:1959
 #: src/qualcoder/cases.py:570
 msgid "Case"
 msgstr "Cas"
 
-#: src/qualcoder/manage_files.py:1158
+#: src/qualcoder/manage_files.py:1160
 msgid "Transcript for: "
 msgstr "Transcription pour : "
 
-#: src/qualcoder/manage_files.py:1190 src/qualcoder/manage_files.py:1199
-#: src/qualcoder/manage_files.py:1212 src/qualcoder/manage_files.py:1230
+#: src/qualcoder/manage_files.py:1192 src/qualcoder/manage_files.py:1204
+#: src/qualcoder/manage_files.py:1220 src/qualcoder/manage_files.py:1238
 msgid "Cannot locate media. "
 msgstr "Impossible de localiser les médias. "
 
-#: src/qualcoder/manage_files.py:1233
+#: src/qualcoder/manage_files.py:1195 src/qualcoder/manage_files.py:1207
+msgid "Image too large for PIL module. (DecompressionBombError): "
+msgstr "Image trop grande pour le module PIL. (DecompressionBombError) : "
+
+#: src/qualcoder/manage_files.py:1241
 msgid ""
 "Cannot get media duration.\n"
 "VLC not installed."
@@ -2443,54 +2468,54 @@ msgstr ""
 "Impossible d'obtenir la durée du média.\n"
 "VLC n'est pas installé."
 
-#: src/qualcoder/manage_files.py:1338 src/qualcoder/manage_files.py:1345
+#: src/qualcoder/manage_files.py:1346 src/qualcoder/manage_files.py:1353
 msgid "Memo for file "
 msgstr "Mémo pour fichier "
 
-#: src/qualcoder/manage_files.py:1443 src/qualcoder/manage_references.py:299
+#: src/qualcoder/manage_files.py:1451 src/qualcoder/manage_references.py:299
 msgid "VLC not installed cannot play audio or video."
 msgstr "VLC non installé ne peut pas lire l'audio ou la vidéo."
 
-#: src/qualcoder/manage_files.py:1444 src/qualcoder/manage_references.py:300
+#: src/qualcoder/manage_files.py:1452 src/qualcoder/manage_references.py:300
 msgid "View AV error"
 msgstr "Voir l'erreur AV"
 
-#: src/qualcoder/manage_files.py:1453 src/qualcoder/manage_files.py:1485
+#: src/qualcoder/manage_files.py:1461 src/qualcoder/manage_files.py:1493
 #: src/qualcoder/manage_references.py:309
 #: src/qualcoder/manage_references.py:338
 msgid "Bad link or non-existent file "
 msgstr "Mauvais lien ou fichier inexistant "
 
-#: src/qualcoder/manage_files.py:1467 src/qualcoder/manage_references.py:320
+#: src/qualcoder/manage_files.py:1475 src/qualcoder/manage_references.py:320
 msgid "view AV error"
 msgstr "voir erreur AV"
 
-#: src/qualcoder/manage_files.py:1508
+#: src/qualcoder/manage_files.py:1516
 msgid "New File"
 msgstr "Nouveau fichier"
 
-#: src/qualcoder/manage_files.py:1508
+#: src/qualcoder/manage_files.py:1516
 msgid "Enter file name"
 msgstr "Entrez le nom du fichier"
 
-#: src/qualcoder/manage_files.py:1548
+#: src/qualcoder/manage_files.py:1556
 msgid "File created: "
 msgstr "Fichier créé : "
 
-#: src/qualcoder/manage_files.py:1579 src/qualcoder/__main__.py:2453
+#: src/qualcoder/manage_files.py:1587 src/qualcoder/__main__.py:2453
 #: src/qualcoder/code_text.py:5091
 msgid "Open file"
 msgstr "Fichier ouvert"
 
-#: src/qualcoder/manage_files.py:1610 src/qualcoder/manage_files.py:1623
-#: src/qualcoder/manage_files.py:1638 src/qualcoder/manage_files.py:1652
-#: src/qualcoder/manage_files.py:1666
+#: src/qualcoder/manage_files.py:1618 src/qualcoder/manage_files.py:1631
+#: src/qualcoder/manage_files.py:1646 src/qualcoder/manage_files.py:1660
+#: src/qualcoder/manage_files.py:1674
 msgid "Cannot copy file: "
 msgstr "Impossible de copier le fichier : "
 
-#: src/qualcoder/manage_files.py:1610 src/qualcoder/manage_files.py:1624
-#: src/qualcoder/manage_files.py:1639 src/qualcoder/manage_files.py:1653
-#: src/qualcoder/manage_files.py:1667
+#: src/qualcoder/manage_files.py:1618 src/qualcoder/manage_files.py:1632
+#: src/qualcoder/manage_files.py:1647 src/qualcoder/manage_files.py:1661
+#: src/qualcoder/manage_files.py:1675
 msgid ""
 "Is the file open?\n"
 "Is there a permission restriction?"
@@ -2498,30 +2523,30 @@ msgstr ""
 "Le fichier est-il ouvert ?\n"
 "Y a-t-il une restriction d'autorisation ?"
 
-#: src/qualcoder/manage_files.py:1611 src/qualcoder/manage_files.py:1625
-#: src/qualcoder/manage_files.py:1640 src/qualcoder/manage_files.py:1654
-#: src/qualcoder/manage_files.py:1668
+#: src/qualcoder/manage_files.py:1619 src/qualcoder/manage_files.py:1633
+#: src/qualcoder/manage_files.py:1648 src/qualcoder/manage_files.py:1662
+#: src/qualcoder/manage_files.py:1676
 msgid "Copy file permission error"
 msgstr "Erreur d'autorisation de copie de fichier"
 
-#: src/qualcoder/manage_files.py:1674 src/qualcoder/manage_files.py:1687
-#: src/qualcoder/manage_files.py:1695
+#: src/qualcoder/manage_files.py:1682 src/qualcoder/manage_files.py:1695
+#: src/qualcoder/manage_files.py:1703
 msgid "Unknown file type"
 msgstr "Type de fichier inconnu"
 
-#: src/qualcoder/manage_files.py:1675
+#: src/qualcoder/manage_files.py:1683
 msgid "Trying to import as text"
 msgstr "Tentative d'importation sous forme de texte"
 
-#: src/qualcoder/manage_files.py:1687 src/qualcoder/manage_files.py:1695
+#: src/qualcoder/manage_files.py:1695 src/qualcoder/manage_files.py:1703
 msgid "Cannot import file"
 msgstr "Impossible d'importer le fichier"
 
-#: src/qualcoder/manage_files.py:1739 src/qualcoder/manage_files.py:1926
+#: src/qualcoder/manage_files.py:1747 src/qualcoder/manage_files.py:1934
 msgid "Duplicate file"
 msgstr "Fichié dupliqué"
 
-#: src/qualcoder/manage_files.py:1739 src/qualcoder/manage_files.py:1927
+#: src/qualcoder/manage_files.py:1747 src/qualcoder/manage_files.py:1935
 msgid ""
 "Duplicate filename.\n"
 "File not imported"
@@ -2529,69 +2554,69 @@ msgstr ""
 "Nom de fichier en double. \n"
 "Fichier non importé"
 
-#: src/qualcoder/manage_files.py:1755 src/qualcoder/manage_files.py:1972
+#: src/qualcoder/manage_files.py:1763 src/qualcoder/manage_files.py:1980
 msgid " linked"
 msgstr " relié"
 
-#: src/qualcoder/manage_files.py:1757
+#: src/qualcoder/manage_files.py:1765
 msgid " imported."
 msgstr " importé."
 
-#: src/qualcoder/manage_files.py:1794 src/qualcoder/__main__.py:2215
+#: src/qualcoder/manage_files.py:1802 src/qualcoder/__main__.py:2215
 msgid " created."
 msgstr " Créé."
 
-#: src/qualcoder/manage_files.py:1871 src/qualcoder/manage_files.py:1915
+#: src/qualcoder/manage_files.py:1879 src/qualcoder/manage_files.py:1923
 #: src/qualcoder/text_file_replacement.py:307
 #: src/qualcoder/text_file_replacement.py:308
 msgid " lines not imported"
 msgstr " lignes non importées"
 
-#: src/qualcoder/manage_files.py:1911 src/qualcoder/refi.py:1192
+#: src/qualcoder/manage_files.py:1919 src/qualcoder/refi.py:1192
 #: src/qualcoder/text_file_replacement.py:303
 msgid "Cannot import"
 msgstr "Impossible d'importer"
 
-#: src/qualcoder/manage_files.py:1916
+#: src/qualcoder/manage_files.py:1924
 msgid "lines not imported"
 msgstr "lignes non importées"
 
-#: src/qualcoder/manage_files.py:1920
+#: src/qualcoder/manage_files.py:1928
 #: src/qualcoder/text_file_replacement.py:312
 msgid "Cannot import "
 msgstr "Impossible d'importer "
 
-#: src/qualcoder/manage_files.py:1970
+#: src/qualcoder/manage_files.py:1978
 msgid " imported"
 msgstr " importé"
 
-#: src/qualcoder/manage_files.py:2064
+#: src/qualcoder/manage_files.py:2072
 msgid "This is an external linked file"
 msgstr "Ceci est un fichier externe relié"
 
-#: src/qualcoder/manage_files.py:2074
+#: src/qualcoder/manage_files.py:2082
 msgid "This is a linked file. Will export text representation."
 msgstr "Il s'agit d'un fichier relié. Exportera la représentation du texte."
 
-#: src/qualcoder/manage_files.py:2076
+#: src/qualcoder/manage_files.py:2084
 msgid "Can export text"
 msgstr "Exporter en texte"
 
-#: src/qualcoder/manage_files.py:2086
+#: src/qualcoder/manage_files.py:2094
 msgid "Export to "
 msgstr "Exporter vers "
 
-#: src/qualcoder/manage_files.py:2095 src/qualcoder/manage_files.py:2111
-#: src/qualcoder/manage_files.py:2124
+#: src/qualcoder/manage_files.py:2103 src/qualcoder/manage_files.py:2119
+#: src/qualcoder/manage_files.py:2132
 msgid "Files exported"
 msgstr "Fichiers exportés"
 
-#: src/qualcoder/manage_files.py:2096 src/qualcoder/manage_files.py:2112
-#: src/qualcoder/manage_files.py:2125
+#: src/qualcoder/manage_files.py:2104 src/qualcoder/manage_files.py:2120
+#: src/qualcoder/manage_files.py:2133
 msgid " exported to "
 msgstr " exporté vers "
 
-#: src/qualcoder/manage_files.py:2098 src/qualcoder/view_graph.py:2424
+#: src/qualcoder/manage_files.py:2106 src/qualcoder/view_graph.py:2424
 #: src/qualcoder/view_graph.py:2439 src/qualcoder/view_graph.py:2457
 #: src/qualcoder/view_graph.py:2953 src/qualcoder/view_graph.py:3097
 #: src/qualcoder/special_functions.py:106
@@ -2600,29 +2625,29 @@ msgstr " exporté vers "
 msgid "Error"
 msgstr "Erreur"
 
-#: src/qualcoder/manage_files.py:2098
+#: src/qualcoder/manage_files.py:2106
 msgid "File not found"
 msgstr "Fichier non trouvé"
 
-#: src/qualcoder/manage_files.py:2155 src/qualcoder/manage_files.py:2317
+#: src/qualcoder/manage_files.py:2163 src/qualcoder/manage_files.py:2325
 msgid "Deleted file: "
 msgstr "Fichier supprimé : "
 
-#: src/qualcoder/manage_files.py:2166 src/qualcoder/manage_files.py:2197
-#: src/qualcoder/manage_files.py:2260 src/qualcoder/manage_files.py:2293
+#: src/qualcoder/manage_files.py:2174 src/qualcoder/manage_files.py:2205
+#: src/qualcoder/manage_files.py:2268 src/qualcoder/manage_files.py:2301
 #: src/qualcoder/text_file_replacement.py:326
 msgid "Deleting file error: "
 msgstr "Suppression d'une erreur de fichier : "
 
-#: src/qualcoder/manage_files.py:2338
+#: src/qualcoder/manage_files.py:2346
 msgid "Minimum: "
 msgstr "Minimum : "
 
-#: src/qualcoder/manage_files.py:2339
+#: src/qualcoder/manage_files.py:2347
 msgid "Maximum: "
 msgstr "Maximum : "
 
-#: src/qualcoder/manage_files.py:2370
+#: src/qualcoder/manage_files.py:2378
 msgid ""
 "\n"
 "Externally linked file:\n"
@@ -2630,7 +2655,7 @@ msgstr ""
 "\n"
 "Fichier lié en externe :\n"
 
-#: src/qualcoder/manage_files.py:2418 src/qualcoder/__main__.py:2856
+#: src/qualcoder/manage_files.py:2426 src/qualcoder/__main__.py:2856
 msgid "Files: "
 msgstr "Fichiers : "
 
@@ -3073,23 +3098,24 @@ msgid "Select codes containing text"
 msgstr "Sélectionnez les codes contenant du texte"
 
 #: src/qualcoder/report_codes_by_segments.py:523
-#: src/qualcoder/report_codes.py:889 src/qualcoder/report_exact_matches.py:531
+#: src/qualcoder/report_codes.py:950 src/qualcoder/report_exact_matches.py:531
 #: src/qualcoder/report_relations.py:849
 msgid "Save Excel File"
 msgstr "Enregistrer le fichier Excel"
 
 #: src/qualcoder/report_codes_by_segments.py:529
 #: src/qualcoder/report_compare_coder_file.py:254
-#: src/qualcoder/report_codes.py:643 src/qualcoder/report_codes.py:669
-#: src/qualcoder/report_codes.py:783 src/qualcoder/report_codes.py:896
+#: src/qualcoder/report_codes.py:645 src/qualcoder/report_codes.py:730
+#: src/qualcoder/report_codes.py:844 src/qualcoder/report_codes.py:957
 msgid "Report exported: "
 msgstr "Rapport exporté : "
 
 #: src/qualcoder/report_codes_by_segments.py:530
 #: src/qualcoder/report_compare_coder_file.py:256
-#: src/qualcoder/report_codes.py:644 src/qualcoder/report_codes.py:671
-#: src/qualcoder/report_codes.py:784 src/qualcoder/report_codes.py:897
-#: src/qualcoder/report_codes.py:1041 src/qualcoder/report_exact_matches.py:541
+#: src/qualcoder/report_codes.py:646 src/qualcoder/report_codes.py:705
+#: src/qualcoder/report_codes.py:732 src/qualcoder/report_codes.py:845
+#: src/qualcoder/report_codes.py:958 src/qualcoder/report_codes.py:1102
+#: src/qualcoder/report_exact_matches.py:541
 #: src/qualcoder/report_relations.py:860 src/qualcoder/reports.py:646
 msgid "Report exported"
 msgstr "Rapport exporté"
@@ -3681,111 +3707,119 @@ msgstr "Codes par fichier"
 msgid "None"
 msgstr "Aucun"
 
-#: src/qualcoder/report_codes.py:135 src/qualcoder/report_codes.py:2206
-#: src/qualcoder/report_codes.py:2569
+#: src/qualcoder/report_codes.py:135 src/qualcoder/report_codes.py:2267
+#: src/qualcoder/report_codes.py:2630
 msgid "Also code memos"
 msgstr "Également des mémos de code"
 
-#: src/qualcoder/report_codes.py:135 src/qualcoder/report_codes.py:2819
+#: src/qualcoder/report_codes.py:135 src/qualcoder/report_codes.py:2880
 msgid "Also coded memos"
 msgstr "Egalement des mémos codés"
 
-#: src/qualcoder/report_codes.py:135 src/qualcoder/report_codes.py:2206
-#: src/qualcoder/report_codes.py:2209 src/qualcoder/report_codes.py:2213
-#: src/qualcoder/report_codes.py:2569 src/qualcoder/report_codes.py:2576
-#: src/qualcoder/report_codes.py:2819 src/qualcoder/report_codes.py:2843
+#: src/qualcoder/report_codes.py:135 src/qualcoder/report_codes.py:2267
+#: src/qualcoder/report_codes.py:2270 src/qualcoder/report_codes.py:2274
+#: src/qualcoder/report_codes.py:2630 src/qualcoder/report_codes.py:2637
+#: src/qualcoder/report_codes.py:2880 src/qualcoder/report_codes.py:2904
 msgid "Also all memos"
 msgstr "Aussi tous les mémos"
 
-#: src/qualcoder/report_codes.py:135 src/qualcoder/report_codes.py:1292
-#: src/qualcoder/report_codes.py:2206 src/qualcoder/report_codes.py:2209
-#: src/qualcoder/report_codes.py:2213 src/qualcoder/report_codes.py:2569
-#: src/qualcoder/report_codes.py:2572 src/qualcoder/report_codes.py:2576
-#: src/qualcoder/report_codes.py:2815 src/qualcoder/report_codes.py:2817
-#: src/qualcoder/report_codes.py:2822 src/qualcoder/report_codes.py:2824
-#: src/qualcoder/report_codes.py:2826 src/qualcoder/report_codes.py:2838
-#: src/qualcoder/report_codes.py:2840 src/qualcoder/report_codes.py:2851
-#: src/qualcoder/report_codes.py:2853 src/qualcoder/report_codes.py:2855
+#: src/qualcoder/report_codes.py:135 src/qualcoder/report_codes.py:1353
+#: src/qualcoder/report_codes.py:2267 src/qualcoder/report_codes.py:2270
+#: src/qualcoder/report_codes.py:2274 src/qualcoder/report_codes.py:2630
+#: src/qualcoder/report_codes.py:2633 src/qualcoder/report_codes.py:2637
+#: src/qualcoder/report_codes.py:2876 src/qualcoder/report_codes.py:2878
+#: src/qualcoder/report_codes.py:2883 src/qualcoder/report_codes.py:2885
+#: src/qualcoder/report_codes.py:2887 src/qualcoder/report_codes.py:2899
+#: src/qualcoder/report_codes.py:2901 src/qualcoder/report_codes.py:2912
+#: src/qualcoder/report_codes.py:2914 src/qualcoder/report_codes.py:2916
 msgid "Only memos"
 msgstr "Seulement des mémos"
 
-#: src/qualcoder/report_codes.py:136 src/qualcoder/report_codes.py:1294
-#: src/qualcoder/report_codes.py:2815 src/qualcoder/report_codes.py:2817
-#: src/qualcoder/report_codes.py:2822 src/qualcoder/report_codes.py:2824
-#: src/qualcoder/report_codes.py:2826 src/qualcoder/report_codes.py:2838
-#: src/qualcoder/report_codes.py:2840 src/qualcoder/report_codes.py:2851
-#: src/qualcoder/report_codes.py:2853 src/qualcoder/report_codes.py:2855
+#: src/qualcoder/report_codes.py:136 src/qualcoder/report_codes.py:1355
+#: src/qualcoder/report_codes.py:2876 src/qualcoder/report_codes.py:2878
+#: src/qualcoder/report_codes.py:2883 src/qualcoder/report_codes.py:2885
+#: src/qualcoder/report_codes.py:2887 src/qualcoder/report_codes.py:2899
+#: src/qualcoder/report_codes.py:2901 src/qualcoder/report_codes.py:2912
+#: src/qualcoder/report_codes.py:2914 src/qualcoder/report_codes.py:2916
 msgid "Only coded memos"
 msgstr "Seulement des mémos codés"
 
-#: src/qualcoder/report_codes.py:136 src/qualcoder/report_codes.py:1252
+#: src/qualcoder/report_codes.py:136 src/qualcoder/report_codes.py:1313
 msgid "Annotations"
 msgstr "Annotations"
 
-#: src/qualcoder/report_codes.py:136 src/qualcoder/report_codes.py:1255
+#: src/qualcoder/report_codes.py:136 src/qualcoder/report_codes.py:1316
 msgid "Codebook memos"
 msgstr "Mémos du livre de codes"
 
-#: src/qualcoder/report_codes.py:582
+#: src/qualcoder/report_codes.py:584
 msgid "No matrix"
 msgstr "Aucune matrice"
 
-#: src/qualcoder/report_codes.py:582
+#: src/qualcoder/report_codes.py:584
 msgid "No matrix results to export"
 msgstr "Pas de matrices de résultats à exporter"
 
-#: src/qualcoder/report_codes.py:616
+#: src/qualcoder/report_codes.py:618
 msgid "Matrix exported: "
 msgstr "Matrice exportée : "
 
-#: src/qualcoder/report_codes.py:617
+#: src/qualcoder/report_codes.py:619
 msgid "Matrix exported"
 msgstr "Matrice exportée"
 
-#: src/qualcoder/report_codes.py:629
+#: src/qualcoder/report_codes.py:631
 msgid "Save Text File"
 msgstr "Enregistrer le fichier texte"
 
-#: src/qualcoder/report_codes.py:655
+#: src/qualcoder/report_codes.py:657
+msgid "Save IRaMuTeQ File"
+msgstr "Enregistrer un fichier IRaMuTeQ"
+
+#: src/qualcoder/report_codes.py:704
+msgid "Report exported in IRaMuTeQ format: "
+msgstr "Rapport exporté au format IRaMuTeQ : "
+
+#: src/qualcoder/report_codes.py:716
 msgid "Save Open Document Text File"
 msgstr "Enregistrer le fichier texte ODT"
 
-#: src/qualcoder/report_codes.py:767
+#: src/qualcoder/report_codes.py:828
 msgid "Save CSV File"
 msgstr "Enregistrer le fichier CSV"
 
-#: src/qualcoder/report_codes.py:780 src/qualcoder/report_codes.py:895
+#: src/qualcoder/report_codes.py:841 src/qualcoder/report_codes.py:956
 msgid "Each row contains filename, coder, coded, codename and categories."
 msgstr ""
 "Chaque ligne contient le nom du fichier, le codeur, le codé, le nom du codé "
 "et les catégories."
 
-#: src/qualcoder/report_codes.py:782
+#: src/qualcoder/report_codes.py:843
 msgid "And file and case variables"
 msgstr "Et les variables de fichier et de cas"
 
-#: src/qualcoder/report_codes.py:938
+#: src/qualcoder/report_codes.py:999
 msgid "Save HTML File"
 msgstr "Enregistrer le fichier HTML"
 
-#: src/qualcoder/report_codes.py:967
+#: src/qualcoder/report_codes.py:1028
 msgid "html folder creation error "
 msgstr "erreur de création de dossier HTML "
 
-#: src/qualcoder/report_codes.py:968
+#: src/qualcoder/report_codes.py:1029
 msgid "Folder creation"
 msgstr "Création du dossier"
 
-#: src/qualcoder/report_codes.py:974
+#: src/qualcoder/report_codes.py:1035
 msgid "html file reading error:"
 msgstr "erreur de lecture du fichier html :"
 
-#: src/qualcoder/report_codes.py:1037 src/qualcoder/report_exact_matches.py:540
+#: src/qualcoder/report_codes.py:1098 src/qualcoder/report_exact_matches.py:540
 #: src/qualcoder/report_relations.py:859
 msgid "Report exported to: "
 msgstr "Rapport exporté vers : "
 
-#: src/qualcoder/report_codes.py:1089
+#: src/qualcoder/report_codes.py:1150
 msgid ""
 "Codebook with memos\n"
 "=================\n"
@@ -3793,58 +3827,58 @@ msgstr ""
 "Codebook avec mémos\n"
 "=================\n"
 
-#: src/qualcoder/report_codes.py:1141
+#: src/qualcoder/report_codes.py:1202
 msgid "No files selected for annotations"
 msgstr "Aucun fichier sélectionné pour les annotations"
 
-#: src/qualcoder/report_codes.py:1172
+#: src/qualcoder/report_codes.py:1233
 msgid "Annotation search parameters"
 msgstr "Paramètres de recherche des annotations"
 
-#: src/qualcoder/report_codes.py:1174
+#: src/qualcoder/report_codes.py:1235
 msgid "Coder: All coders"
 msgstr "Codeur : Tous les codeurs"
 
-#: src/qualcoder/report_codes.py:1178
+#: src/qualcoder/report_codes.py:1239
 msgid "Search text: "
 msgstr "Texte de recherche : "
 
-#: src/qualcoder/report_codes.py:1179
+#: src/qualcoder/report_codes.py:1240
 msgid "Files:"
 msgstr "Fichiers :"
 
-#: src/qualcoder/report_codes.py:1266 src/qualcoder/report_exact_matches.py:242
+#: src/qualcoder/report_codes.py:1327 src/qualcoder/report_exact_matches.py:242
 msgid "No codes have been selected."
 msgstr "Aucun code n'a été sélectionné."
 
-#: src/qualcoder/report_codes.py:1270
+#: src/qualcoder/report_codes.py:1331
 msgid "No files, cases found."
 msgstr "Aucun dossier, aucune affaire n'a été trouvée."
 
-#: src/qualcoder/report_codes.py:1271
+#: src/qualcoder/report_codes.py:1332
 msgid "Nothing selected"
 msgstr "Rien de sélectionné"
 
-#: src/qualcoder/report_codes.py:1275
+#: src/qualcoder/report_codes.py:1336
 msgid "Searching"
 msgstr "Recherche"
 
-#: src/qualcoder/report_codes.py:1293
+#: src/qualcoder/report_codes.py:1354
 msgid "Only memos shown. Coded data not shown."
 msgstr ""
 "Seuls les mémos sont montrés. Les données codées ne sont pas affichées."
 
-#: src/qualcoder/report_codes.py:1295
+#: src/qualcoder/report_codes.py:1356
 msgid "Coded memos shown if available. Coded data not shown."
 msgstr ""
 "Les mémos codés sont affichés s'ils sont disponibles. Les données codées ne "
 "sont pas affichées."
 
-#: src/qualcoder/report_codes.py:1296
+#: src/qualcoder/report_codes.py:1357
 msgid "Search parameters"
 msgstr "Paramètres de recherche"
 
-#: src/qualcoder/report_codes.py:1333
+#: src/qualcoder/report_codes.py:1394
 msgid ""
 "\n"
 "Files:\n"
@@ -3852,7 +3886,7 @@ msgstr ""
 "\n"
 "Fichiers:\n"
 
-#: src/qualcoder/report_codes.py:1340
+#: src/qualcoder/report_codes.py:1401
 msgid ""
 "\n"
 "Cases:\n"
@@ -3860,80 +3894,80 @@ msgstr ""
 "\n"
 "Cas:\n"
 
-#: src/qualcoder/report_codes.py:1760
+#: src/qualcoder/report_codes.py:1821
 msgid "Text code statistics:"
 msgstr "Statistiques de codes texte :"
 
-#: src/qualcoder/report_codes.py:1822
+#: src/qualcoder/report_codes.py:1883
 msgid "Image code statistics:"
 msgstr "Statistiques sur les codes d'image :"
 
-#: src/qualcoder/report_codes.py:1897
+#: src/qualcoder/report_codes.py:1958
 msgid "A/V code statistics:"
 msgstr "Statistiques sur les codes A/V :"
 
-#: src/qualcoder/report_codes.py:1903
+#: src/qualcoder/report_codes.py:1964
 msgid "Percent of file: Unknown. Either VLC not installer or file not found."
 msgstr ""
 "Pourcentage du fichier : Inconnu. Soit VLC n'est pas installé, soit le "
 "fichier n'a pas été trouvé."
 
-#: src/qualcoder/report_codes.py:2061
+#: src/qualcoder/report_codes.py:2122
 msgid "No case matrix"
 msgstr "Pas de matrice de cas"
 
-#: src/qualcoder/report_codes.py:2061
+#: src/qualcoder/report_codes.py:2122
 msgid "Cases not selected"
 msgstr "Cas non sélectionnés"
 
-#: src/qualcoder/report_codes.py:2207
+#: src/qualcoder/report_codes.py:2268
 msgid "CODE MEMO: "
 msgstr "MÉMO DE CODE : "
 
-#: src/qualcoder/report_codes.py:2210
+#: src/qualcoder/report_codes.py:2271
 msgid " FILE MEMO: "
 msgstr " MÉMO DE FICHIER : "
 
-#: src/qualcoder/report_codes.py:2218
+#: src/qualcoder/report_codes.py:2279
 msgid "CASE MEMO: "
-msgstr "MÉMO DE CAS :"
+msgstr "MÉMO DE CAS : "
 
-#: src/qualcoder/report_codes.py:2287 src/qualcoder/report_codes.py:2890
+#: src/qualcoder/report_codes.py:2348 src/qualcoder/report_codes.py:2951
 #: src/qualcoder/view_graph.py:2932 src/qualcoder/view_graph.py:3082
 #: src/qualcoder/report_exact_matches.py:380
 #: src/qualcoder/report_relations.py:593
 msgid "View in context"
 msgstr "Voir dans le contexte"
 
-#: src/qualcoder/report_codes.py:2290
+#: src/qualcoder/report_codes.py:2351
 msgid "Change code to"
 msgstr "Changer le code en"
 
-#: src/qualcoder/report_codes.py:2291
+#: src/qualcoder/report_codes.py:2352
 msgid "Apply additional code"
 msgstr "Appliquer un code supplémentaire"
 
-#: src/qualcoder/report_codes.py:2295 src/qualcoder/report_codes.py:2894
+#: src/qualcoder/report_codes.py:2356 src/qualcoder/report_codes.py:2955
 msgid "Copy all to clipboard"
 msgstr "Copier tout dans le presse-papiers"
 
-#: src/qualcoder/report_codes.py:2298
+#: src/qualcoder/report_codes.py:2359
 msgid "Rotate image 90 degrees"
 msgstr "Rotation de l'image de 90 degrés"
 
-#: src/qualcoder/report_codes.py:2459
+#: src/qualcoder/report_codes.py:2520
 msgid "Delete coded section"
 msgstr "Supprimer le texte codé"
 
-#: src/qualcoder/report_codes.py:2570
+#: src/qualcoder/report_codes.py:2631
 msgid "CODE MEMO: All memo"
 msgstr "CODE MEMO : Tous les mémos"
 
-#: src/qualcoder/report_codes.py:2572
+#: src/qualcoder/report_codes.py:2633
 msgid "Also alll memos"
 msgstr "Aussi tous les mémos"
 
-#: src/qualcoder/report_codes.py:2947 src/qualcoder/cases.py:1140
+#: src/qualcoder/report_codes.py:3008 src/qualcoder/cases.py:1140
 msgid "Right click to view"
 msgstr "Cliquez à droite pour afficher"
 
