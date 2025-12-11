@@ -224,6 +224,18 @@ fast_model_context_window = 32000
 reasoning_effort = default
 api_base = http://localhost:11434/v1/
 api_key = <no API key needed>
+
+[ai_model_Mistral]
+desc = Mistral AI offers high-performance, open-source and proprietary language models, prioritizing transparency, privacy, and ethical AI for researchers and developers.
+access_info_url = https://mistral.ai
+large_model = mistral-large-latest
+large_model_context_window = 128000
+fast_model = mistral-small-latest
+fast_model_context_window = 128000
+api_base = https://api.mistral.ai/v1
+api_key =
+
+
     """
     
     config = configparser.ConfigParser()
