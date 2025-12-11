@@ -464,6 +464,59 @@ Kontrollerad - Alla valda koder måste matcha exakt.</translation>
     </message>
 </context>
 <context>
+    <name>DialogSegmentCodings</name>
+    <message>
+        <location filename="ui_report_codes_by_segments.py" line="94"/>
+        <source>Report Segment Codings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_report_codes_by_segments.py" line="95"/>
+        <source>Text limiter:</source>
+        <translation type="unfinished">Textbegränsare:</translation>
+    </message>
+    <message>
+        <location filename="ui_report_codes_by_segments.py" line="96"/>
+        <source>Run report</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_report_codes_by_segments.py" line="97"/>
+        <source>Coder:</source>
+        <translation type="unfinished">Kodare:</translation>
+    </message>
+    <message>
+        <location filename="ui_report_codes_by_segments.py" line="98"/>
+        <source>Codes by text segments table. 1 = code present, 0 = not coded.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_report_codes_by_segments.py" line="99"/>
+        <source>Export to Excel</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_report_codes_by_segments.py" line="100"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select files by attributes&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_report_codes_by_segments.py" line="101"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Files. Right click for selection options.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_report_codes_by_segments.py" line="102"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Cases. Right click for selection options.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_report_codes_by_segments.py" line="103"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Codes. Right click for options&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>Dialog_AiPrompts</name>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="195"/>
@@ -667,16 +720,6 @@ Kontrollerad - Alla valda koder måste matcha exakt.</translation>
         <translation>Relationer mellan koder i textfiler.</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_relations.py" line="151"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export csv file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; export csv -fil &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
-    </message>
-    <message>
-        <location filename="ui_dialog_code_relations.py" line="152"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Calculate&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&lt;html&gt; &lt;Head /&gt; &lt;body&gt; &lt;p&gt; beräkna &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
-    </message>
-    <message>
         <location filename="ui_dialog_code_relations.py" line="152"/>
         <source>This coder</source>
         <translation>Den här kodaren</translation>
@@ -757,11 +800,6 @@ Kontrollerad - Alla valda koder måste matcha exakt.</translation>
         <translation>Sök efter nästa händelse i resultat</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_relations.py" line="169"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export Excel report of exact text coding matches for all  files.&lt;/p&gt;&lt;p&gt;Ordered by file name and code name.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; export excel rapport om exakta textkodningsmatchningar för alla filer. &lt;/p&gt; &lt;p&gt; beställt med filnamn och kodnamn. &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
-    </message>
-    <message>
         <location filename="ui_dialog_code_relations.py" line="170"/>
         <source>E</source>
         <translation>E</translation>
@@ -800,6 +838,59 @@ Sorterad efter filnamn och kodnamn.</translation>
     </message>
 </context>
 <context>
+    <name>Dialog_Comparisons</name>
+    <message>
+        <location filename="ui_comparison_table.py" line="98"/>
+        <source>Code Counts by file or case</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_comparison_table.py" line="99"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show the overlapping codes.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished">&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; Välj koder &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="ui_comparison_table.py" line="100"/>
+        <source>Code counts table</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_comparison_table.py" line="101"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export to file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished">&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; export till fil &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="ui_comparison_table.py" line="102"/>
+        <source>Hide blank lines</source>
+        <translation type="unfinished">Dölj tomma linjer</translation>
+    </message>
+    <message>
+        <location filename="ui_comparison_table.py" line="103"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select files&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished">&lt;html&gt; &lt;Head /&gt; &lt;body&gt; &lt;p&gt; Välj filer &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="ui_comparison_table.py" line="104"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select categories&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished">&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; utvalda kategorier &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
+    </message>
+    <message>
+        <location filename="ui_comparison_table.py" line="105"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select codes&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_comparison_table.py" line="106"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select attribute&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_comparison_table.py" line="107"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select cases&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>Dialog_Coocurrence</name>
     <message>
         <location filename="ui_dialog_cooccurrence.py" line="87"/>
@@ -817,24 +908,9 @@ Sorterad efter filnamn och kodnamn.</translation>
         <translation>Kodens förekomst</translation>
     </message>
     <message>
-        <location filename="ui_dialog_cooccurrence.py" line="84"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export to file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; export till fil &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
-    </message>
-    <message>
         <location filename="ui_dialog_cooccurrence.py" line="91"/>
         <source>Hide blank lines</source>
         <translation>Dölj tomma linjer</translation>
-    </message>
-    <message>
-        <location filename="ui_dialog_cooccurrence.py" line="86"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select files&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&lt;html&gt; &lt;Head /&gt; &lt;body&gt; &lt;p&gt; Välj filer &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
-    </message>
-    <message>
-        <location filename="ui_dialog_cooccurrence.py" line="87"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select categories&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; utvalda kategorier &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_cooccurrence.py" line="90"/>
@@ -1252,13 +1328,6 @@ Sorterad efter filnamn och kodnamn.</translation>
         <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; volym &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_av.py" line="189"/>
-        <source>Press the Start segment button to begin coding the audio/video segment. Press the End segment button to end the coded segment.
-Key shortcut: Ctrl S</source>
-        <translation type="obsolete">Tryck på startsegmentknappen för att börja koda ljud-/videosegmentet.Tryck på knappen End Segment för att avsluta det kodade segmentet.
-Nyckelgenväg: Ctrl S</translation>
-    </message>
-    <message>
         <location filename="ui_dialog_code_av.py" line="202"/>
         <source>Start segment</source>
         <translation>Starta segmentet</translation>
@@ -1309,11 +1378,6 @@ Nyckelgenväg: Ctrl S</translation>
         <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; spolar in 30 sekunder.Alt + minus &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_av.py" line="201"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Forward 30 seconds. Alt + Plus&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; framåt 30 sekunder.Alt + plus &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
-    </message>
-    <message>
         <location filename="ui_dialog_code_av.py" line="213"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Decrease play rate&lt;/p&gt;&lt;p&gt;Ctrl + Shift + &amp;lt; &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; minska spelfrekvensen &lt;/p&gt; &lt;p&gt; ctrl + skift + &amp; lt;&lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
@@ -1337,11 +1401,6 @@ Nyckelgenväg: Ctrl S</translation>
         <location filename="ui_dialog_code_av.py" line="217"/>
         <source>Show codings flagged important</source>
         <translation>Visa kodningar flaggade viktiga</translation>
-    </message>
-    <message>
-        <location filename="ui_dialog_code_av.py" line="207"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Button to select a segment. &lt;/p&gt;&lt;p&gt;Then a menu of options will open.&lt;/p&gt;&lt;p&gt;(This button is a work around if the right-click to open menus on the segment bars below does not work)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; -knappen för att välja ett segment.&lt;/p&gt; &lt;p&gt; då öppnas en meny med alternativ. &lt;/p&gt; &lt;p&gt; (den här knappen är ett arbete om högerklicka för att öppna menyer på segmentstängerna nedan inte fungerar) &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_av.py" line="219"/>
@@ -1617,16 +1676,6 @@ Därefter öppnas en meny med alternativ</translation>
         <translation>Hjälp</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_pdf.py" line="259"/>
-        <source>Curves</source>
-        <translation type="obsolete">Kurvor</translation>
-    </message>
-    <message>
-        <location filename="ui_dialog_code_pdf.py" line="260"/>
-        <source>Lines</source>
-        <translation type="obsolete">Rader</translation>
-    </message>
-    <message>
         <location filename="ui_dialog_code_pdf.py" line="255"/>
         <source>Images</source>
         <translation>Bilder</translation>
@@ -1645,16 +1694,6 @@ Därefter öppnas en meny med alternativ</translation>
         <location filename="ui_dialog_code_pdf.py" line="258"/>
         <source>Text</source>
         <translation>Text</translation>
-    </message>
-    <message>
-        <location filename="ui_dialog_code_pdf.py" line="265"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rectangle objects&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; rektangelobjekt &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
-    </message>
-    <message>
-        <location filename="ui_dialog_code_pdf.py" line="266"/>
-        <source>Rects</source>
-        <translation type="obsolete">Minskat</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="259"/>
@@ -1945,11 +1984,6 @@ Eftersom alla tilldelade positioner kan vara felaktiga. </translation>
         <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; Efter redigering av texten: &lt;/p&gt; &lt;p&gt; granskning Redigerad text för att bekräfta kodpositioner är korrekta.Tryck på knappen för att ångra redigerad text, om kodpositioner är felaktiga.&lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="438"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Set default colour for new codes&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&lt;html&gt; &lt;Head /&gt; &lt;body&gt; &lt;p&gt; Ställ in standardfärg för nya koder &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
-    </message>
-    <message>
         <location filename="ui_dialog_code_text.py" line="440"/>
         <source>8</source>
         <translation>8</translation>
@@ -2053,16 +2087,6 @@ Eftersom alla tilldelade positioner kan vara felaktiga. </translation>
         <location filename="ui_dialog_code_text.py" line="463"/>
         <source>Use the AI to find data</source>
         <translation>Använd AI för att hitta data</translation>
-    </message>
-    <message>
-        <location filename="ui_dialog_code_text.py" line="461"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show previous coding of selected code&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&lt;html&gt; &lt;Head /&gt; &lt;body&gt; &lt;p&gt; Visa tidigare kodning av vald kod &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
-    </message>
-    <message>
-        <location filename="ui_dialog_code_text.py" line="462"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show next coding of selected code.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&lt;html&gt; &lt;huvud/&gt; &lt;body&gt; &lt;p&gt; Visa nästa kodning av vald kod. &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="467"/>
@@ -2678,16 +2702,6 @@ Case sensitive, add multiple entries for each: e.g. Tom Jones  and TOM JONES</so
         <translation>Kod- och kategorfrekvenser: Sammantaget och av kodare</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_code_frequencies.py" line="78"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export text file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; export textfil &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
-    </message>
-    <message>
-        <location filename="ui_dialog_report_code_frequencies.py" line="79"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export Excel&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; export excel &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
-    </message>
-    <message>
         <location filename="ui_dialog_report_code_frequencies.py" line="86"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select files&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt; &lt;Head /&gt; &lt;body&gt; &lt;p&gt; Välj filer &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
@@ -2726,179 +2740,184 @@ Case sensitive, add multiple entries for each: e.g. Tom Jones  and TOM JONES</so
 <context>
     <name>Dialog_reportCodings</name>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="174"/>
+        <location filename="ui_dialog_report_codings.py" line="175"/>
         <source>Reports</source>
         <translation>Rapporter</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="175"/>
+        <location filename="ui_dialog_report_codings.py" line="176"/>
         <source>Text limiter:</source>
         <translation>Textbegränsare:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="176"/>
+        <location filename="ui_dialog_report_codings.py" line="177"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Run report&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt; &lt;Head /&gt; &lt;body&gt; &lt;p&gt; Run Report &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="177"/>
+        <location filename="ui_dialog_report_codings.py" line="178"/>
         <source>Coder:</source>
         <translation>Kodare:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="178"/>
+        <location filename="ui_dialog_report_codings.py" line="179"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Attributes. &lt;/p&gt;&lt;p&gt;Attribute selection will override files or cases selected in the left-hand-side lists.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; attribut.&lt;/p&gt; &lt;p&gt; attributval kommer att åsidosätta filer eller fall som valts i listorna om vänster sida. &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="179"/>
+        <location filename="ui_dialog_report_codings.py" line="180"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; export &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="180"/>
+        <location filename="ui_dialog_report_codings.py" line="181"/>
         <source>html</source>
         <translation>html</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="181"/>
+        <location filename="ui_dialog_report_codings.py" line="182"/>
         <source>txt</source>
         <translation>txt</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="182"/>
+        <location filename="ui_dialog_report_codings.py" line="183"/>
         <source>odt</source>
         <translation>odt</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="183"/>
+        <location filename="ui_dialog_report_codings.py" line="184"/>
         <source>xlsx</source>
         <translation>xlsx</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="184"/>
+        <location filename="ui_dialog_report_codings.py" line="185"/>
         <source>csv</source>
         <translation>csv</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="185"/>
+        <location filename="ui_dialog_report_codings.py" line="187"/>
         <source>Coding report</source>
         <translation>Kodningsrapport</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="186"/>
+        <location filename="ui_dialog_report_codings.py" line="188"/>
         <source>File and case matrix options</source>
         <translation>Alternativ för fil och fallmatris</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="187"/>
+        <location filename="ui_dialog_report_codings.py" line="189"/>
         <source>Filter results for those marked Important</source>
         <translation>Filterresultat för de markerade viktiga</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="188"/>
+        <location filename="ui_dialog_report_codings.py" line="190"/>
         <source>Important</source>
         <translation>Viktig</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="190"/>
+        <location filename="ui_dialog_report_codings.py" line="192"/>
         <source>Memo reporting options</source>
         <translation>Memorapporteringsalternativ</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="191"/>
+        <location filename="ui_dialog_report_codings.py" line="193"/>
         <source>Display summary statistics</source>
         <translation>Visa sammanfattningsstatistik</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="192"/>
+        <location filename="ui_dialog_report_codings.py" line="194"/>
         <source>Statistics</source>
         <translation>Statistik</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="193"/>
+        <location filename="ui_dialog_report_codings.py" line="195"/>
         <source>Transpose matrix</source>
         <translation>Transponera matris</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="194"/>
+        <location filename="ui_dialog_report_codings.py" line="196"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Surround coded text with pre-text and post-text.&lt;/p&gt;&lt;p&gt;Change Settings for number of characters and display style.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; surround kodad text med pre-text och posttext. &lt;/p&gt; &lt;p&gt; Ändra inställningar för antal tecken och visningsstil. &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="195"/>
+        <location filename="ui_dialog_report_codings.py" line="197"/>
         <source>Text context</source>
         <translation>Sms</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="196"/>
+        <location filename="ui_dialog_report_codings.py" line="198"/>
         <source>Search results for text</source>
         <translation>Sökresultat för text</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="197"/>
+        <location filename="ui_dialog_report_codings.py" line="199"/>
         <source>Search:</source>
         <translation>Söka:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="198"/>
+        <location filename="ui_dialog_report_codings.py" line="200"/>
         <source>Search for next occurence in results</source>
         <translation>Sök efter nästa händelse i resultat</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="199"/>
+        <location filename="ui_dialog_report_codings.py" line="201"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Code names sort order.&lt;/p&gt;&lt;p&gt;Set this before running results.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; kodnamn sorteringsordning. &lt;/p&gt; &lt;p&gt; ställ in detta innan du kör resultat. &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="200"/>
+        <location filename="ui_dialog_report_codings.py" line="202"/>
         <source>A - z</source>
         <translation>A - ö</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="201"/>
+        <location filename="ui_dialog_report_codings.py" line="203"/>
         <source>Z - a</source>
         <translation>Z - A</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="202"/>
+        <location filename="ui_dialog_report_codings.py" line="204"/>
         <source>10 - 1</source>
         <translation>10 - 1</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="203"/>
+        <location filename="ui_dialog_report_codings.py" line="205"/>
         <source>1 - 10</source>
         <translation>1 - 10</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="204"/>
+        <location filename="ui_dialog_report_codings.py" line="206"/>
         <source>Export:</source>
         <translation>Exportera:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="205"/>
+        <location filename="ui_dialog_report_codings.py" line="207"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export file  or case variables in columns for CSV or XLSX export&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; exportfil eller fallvariabler i kolumner för CSV eller XLSX Export &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="206"/>
+        <location filename="ui_dialog_report_codings.py" line="208"/>
         <source>Variables CSV / XLSX</source>
         <translation>Variabler CSV / XLSX</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="207"/>
+        <location filename="ui_dialog_report_codings.py" line="209"/>
         <source>Export matrix</source>
         <translation>Exportmatris</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="208"/>
+        <location filename="ui_dialog_report_codings.py" line="210"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show references&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Visa referenser</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="209"/>
+        <location filename="ui_dialog_report_codings.py" line="211"/>
         <source>References</source>
         <translation>Referenser</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_report_codings.py" line="186"/>
+        <source>iramuteq</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3379,11 +3398,6 @@ Rekommenderas inte om du inte har många stora filer som bromsar säkerhetskopia
         <translation>API -nyckel</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="491"/>
-        <source>AI Model</source>
-        <translation type="obsolete">AI -modell</translation>
-    </message>
-    <message>
         <location filename="ui_dialog_settings.py" line="635"/>
         <source>You can use the Project Memo (found in the menu: Project &gt; Project Memo) to convey background information about your research, including objectives, methodology, and data, to the AI. This will help the AI generate more accurate and relevant responses. Deselect this option if you use the Project Memo for other purposes.</source>
         <translation>Du kan använda projektmemo (finns i menyn: Projekt&gt; Projektmemo) för att förmedla bakgrundsinformation om din forskning, inklusive mål, metodik och data, till AI.Detta hjälper AI att generera mer exakta och relevanta svar.Avmarkera det här alternativet om du använder projektmemo för andra ändamål.</translation>
@@ -3437,11 +3451,6 @@ Rekommenderas inte om du inte har många stora filer som bromsar säkerhetskopia
         <location filename="ui_dialog_settings.py" line="634"/>
         <source>   Top_p:</source>
         <translation>   Top_p:</translation>
-    </message>
-    <message>
-        <location filename="ui_dialog_settings.py" line="593"/>
-        <source>AI Provider:</source>
-        <translation type="obsolete">AI leverantör:</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="617"/>
@@ -3867,6 +3876,11 @@ Röd understrykning = tilldelad kod eller kommentar</translation>
         <source>Remove Speaker</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="ui_dialog_view_av.py" line="192"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Forward 30 seconds. Alt + Plus&lt;/p&gt;&lt;p&gt;Forward 5 seconds. Press 5&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Dialog_view_image</name>
@@ -3938,6 +3952,29 @@ Kod inte den här texten förrän du laddar om kodning - kodtext från menyfält
 Do not code this text until you reload Coding - Code Text from the menu bar.</source>
         <translation>Välj inte textavsnitt med en kombination av inte understrukna (inte kodade / kommenterade / fall-tilldelade) och understrukna (kodade, kommenterade, ärende-tilldelade).Positioner för de underliggande koderna / kommentarerna / fallet tilldelade kanske inte korrekt justeras om vald text skrivs över eller raderas.
 Kod inte den här texten förrän du laddar om kodning - kodtext från menyfältet.</translation>
+    </message>
+</context>
+<context>
+    <name>ErrorDlg</name>
+    <message>
+        <location filename="ui_error_dlg.py" line="99"/>
+        <source>Uncaught exception</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_error_dlg.py" line="100"/>
+        <source>&lt;Error Message&gt; </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_error_dlg.py" line="101"/>
+        <source>Error traceback (most recent call last):</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_error_dlg.py" line="102"/>
+        <source>&lt;traceback&gt;</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
