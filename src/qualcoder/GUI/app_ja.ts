@@ -305,7 +305,7 @@ Right-click for options</source>
     <message>
         <location filename="ui_dialog_graph.py" line="141"/>
         <source>Export Pdf image</source>
-        <translation type="unfinished"></translation>
+        <translation>PDF画像をエクスポート</translation>
     </message>
 </context>
 <context>
@@ -467,52 +467,52 @@ Checked - any selected codes must match exactly.</source>
     <message>
         <location filename="ui_report_codes_by_segments.py" line="94"/>
         <source>Report Segment Codings</source>
-        <translation type="unfinished"></translation>
+        <translation>レポートセグメントの符号化</translation>
     </message>
     <message>
         <location filename="ui_report_codes_by_segments.py" line="95"/>
         <source>Text limiter:</source>
-        <translation type="unfinished">テキスト・リミッター：</translation>
+        <translation>テキスト・リミッター：</translation>
     </message>
     <message>
         <location filename="ui_report_codes_by_segments.py" line="96"/>
         <source>Run report</source>
-        <translation type="unfinished"></translation>
+        <translation>レポートを実行する</translation>
     </message>
     <message>
         <location filename="ui_report_codes_by_segments.py" line="97"/>
         <source>Coder:</source>
-        <translation type="unfinished"></translation>
+        <translation>コーダー:</translation>
     </message>
     <message>
         <location filename="ui_report_codes_by_segments.py" line="98"/>
         <source>Codes by text segments table. 1 = code present, 0 = not coded.</source>
-        <translation type="unfinished"></translation>
+        <translation>テキストセグメントごとのコード表。1 = コードあり、0 = コードなし。</translation>
     </message>
     <message>
         <location filename="ui_report_codes_by_segments.py" line="99"/>
         <source>Export to Excel</source>
-        <translation type="unfinished"></translation>
+        <translation>エクセルファイルのエクスポート</translation>
     </message>
     <message>
         <location filename="ui_report_codes_by_segments.py" line="100"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select files by attributes&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>属性でファイルを選択する</translation>
     </message>
     <message>
         <location filename="ui_report_codes_by_segments.py" line="101"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Files. Right click for selection options.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイル。選択オプションを表示するには右クリックしてください。</translation>
     </message>
     <message>
         <location filename="ui_report_codes_by_segments.py" line="102"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Cases. Right click for selection options.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>ケース。選択オプションを表示するには右クリックしてください。</translation>
     </message>
     <message>
         <location filename="ui_report_codes_by_segments.py" line="103"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Codes. Right click for options&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>コード。オプションを表示するには右クリック</translation>
     </message>
 </context>
 <context>
@@ -841,52 +841,52 @@ Ordered by file name and code name.</source>
     <message>
         <location filename="ui_comparison_table.py" line="98"/>
         <source>Code Counts by file or case</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイルまたはケースごとのコード数</translation>
     </message>
     <message>
         <location filename="ui_comparison_table.py" line="99"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show the overlapping codes.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">重複コードを表示する</translation>
+        <translation>重複コードを表示する</translation>
     </message>
     <message>
         <location filename="ui_comparison_table.py" line="100"/>
         <source>Code counts table</source>
-        <translation type="unfinished"></translation>
+        <translation>コードカウント表</translation>
     </message>
     <message>
         <location filename="ui_comparison_table.py" line="101"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export to file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">ファイルへのエクスポート</translation>
+        <translation>ファイルへのエクスポート</translation>
     </message>
     <message>
         <location filename="ui_comparison_table.py" line="102"/>
         <source>Hide blank lines</source>
-        <translation type="unfinished">空白行を隠す</translation>
+        <translation>空白行を隠す</translation>
     </message>
     <message>
         <location filename="ui_comparison_table.py" line="103"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select files&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">ファイルを選択</translation>
+        <translation>ファイルを選択</translation>
     </message>
     <message>
         <location filename="ui_comparison_table.py" line="104"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select categories&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">カテゴリーを選択</translation>
+        <translation>カテゴリーを選択</translation>
     </message>
     <message>
         <location filename="ui_comparison_table.py" line="105"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select codes&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>コードを選択</translation>
     </message>
     <message>
         <location filename="ui_comparison_table.py" line="106"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select attribute&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>属性を選択</translation>
     </message>
     <message>
         <location filename="ui_comparison_table.py" line="107"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select cases&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>選定事例</translation>
     </message>
 </context>
 <context>
@@ -2476,7 +2476,7 @@ Cannot export text transcription file associated with an audio or video as a lin
     <message>
         <location filename="ui_dialog_manage_files.py" line="147"/>
         <source>Delete saved table display settings. </source>
-        <translation type="unfinished"></translation>
+        <translation>保存されたテーブル表示設定を削除します。</translation>
     </message>
     <message>
         <location filename="ui_dialog_manage_files.py" line="148"/>
@@ -2491,7 +2491,16 @@ Does not work with PDF files. Instead extract the plain text and only import the
 The pseudonyms are stored in the qda data folder as pseudonyms.json
 After all text files are imported, remove this file from the project folder and store it securely.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>仮名化（データの匿名化）
+テキストファイルをインポートする前に、置換対象となる名前やフレーズのリストを作成してください。
+以下のファイル形式に適用されます：docx、epub、htm、html、md、rtf、odt、txt、定性列の調査インポート。
+仮名置換は大文字小文字を区別します。
+したがって「Tom」と「TOM」には別々の項目が必要です。
+
+PDFファイルでは機能しません。代わりにPDFからプレーンテキストを抽出し、プレーンテキストのみをインポートしてください。
+
+仮名はqdaデータフォルダ内のpseudonyms.jsonに保存されます。
+全テキストファイルのインポート完了後、このファイルをプロジェクトフォルダから削除し、安全に保管してください。</translation>
     </message>
 </context>
 <context>
@@ -2636,33 +2645,34 @@ After all text files are imported, remove this file from the project folder and 
     <message>
         <location filename="ui_dialog_pseudonyms.py" line="63"/>
         <source>Pseudonyms</source>
-        <translation type="unfinished"></translation>
+        <translation>ペンネーム</translation>
     </message>
     <message>
         <location filename="ui_dialog_pseudonyms.py" line="64"/>
         <source>Pseudonyms. Data de-identification applied on file import. Does not apply for PDF imports.
 Case sensitive, add multiple entries for each: e.g. Tom Jones  and TOM JONES</source>
-        <translation type="unfinished"></translation>
+        <translation>仮名。ファイルインポート時に適用されるデータ匿名化処理。PDFインポートには適用されません。
+大文字小文字を区別します。それぞれについて複数のエントリを追加してください：例：Tom Jones と TOM JONES</translation>
     </message>
     <message>
         <location filename="ui_dialog_pseudonyms.py" line="66"/>
         <source>Original</source>
-        <translation type="unfinished"></translation>
+        <translation>オリジナル</translation>
     </message>
     <message>
         <location filename="ui_dialog_pseudonyms.py" line="67"/>
         <source>Pseudonym</source>
-        <translation type="unfinished"></translation>
+        <translation>ペンネーム</translation>
     </message>
     <message>
         <location filename="ui_dialog_pseudonyms.py" line="68"/>
         <source>Add to pseudonyms</source>
-        <translation type="unfinished"></translation>
+        <translation>別名に追加</translation>
     </message>
     <message>
         <location filename="ui_dialog_pseudonyms.py" line="69"/>
         <source>Click on a row to delete entry.</source>
-        <translation type="unfinished"></translation>
+        <translation>行をクリックすると項目が削除されます。</translation>
     </message>
 </context>
 <context>
@@ -2917,7 +2927,7 @@ Case sensitive, add multiple entries for each: e.g. Tom Jones  and TOM JONES</so
     <message>
         <location filename="ui_dialog_report_codings.py" line="186"/>
         <source>iramuteq</source>
-        <translation type="unfinished"></translation>
+        <translation>iramuteq</translation>
     </message>
 </context>
 <context>
@@ -3040,7 +3050,7 @@ Wildcards for &apos;like&apos; are % and _</source>
         <translation>属性のパラメータを選択します。
 betweenには、;で区切られた2つの値が必要です。
  in と not in は、.で区切られた1つ以上の値を必要とします；
-like' のワイルドカードは % と _ です。</translation>
+like&apos; のワイルドカードは % と _ です。</translation>
     </message>
     <message>
         <location filename="ui_report_attribute_parameters.py" line="88"/>
@@ -3112,7 +3122,7 @@ like' のワイルドカードは % と _ です。</translation>
     <message>
         <location filename="ui_report_attribute_parameters.py" line="94"/>
         <source>Delete saved filter settings</source>
-        <translation type="unfinished"></translation>
+        <translation>保存されたフィルター設定を削除する</translation>
     </message>
 </context>
 <context>
@@ -3502,32 +3512,33 @@ Not recommended unless you have many large files slowing the backup.</source>
     <message>
         <location filename="ui_dialog_settings.py" line="615"/>
         <source>...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="623"/>
         <source>New AI Profile...</source>
-        <translation type="unfinished"></translation>
+        <translation>新しいAIプロフィール...</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="624"/>
         <source>General Parameters:</source>
-        <translation type="unfinished"></translation>
+        <translation>一般パラメータ：</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="633"/>
         <source>API Base URL:</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="638"/>
         <source>AI Models:</source>
-        <translation type="unfinished"></translation>
+        <translation>AIモデル：</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="643"/>
         <source>Reasoning:</source>
-        <translation type="unfinished"></translation>
+        <translatorcomment>理由：</translatorcomment>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -3610,22 +3621,22 @@ Not recommended unless you have many large files slowing the backup.</source>
     <message>
         <location filename="ui_special_functions.py" line="139"/>
         <source>Edit coder names</source>
-        <translation type="unfinished"></translation>
+        <translation>コーダー名の編集</translation>
     </message>
     <message>
         <location filename="ui_special_functions.py" line="140"/>
         <source>Select coder name</source>
-        <translation type="unfinished"></translation>
+        <translation>コーダー名を選択</translation>
     </message>
     <message>
         <location filename="ui_special_functions.py" line="141"/>
         <source>Rename</source>
-        <translation type="unfinished"></translation>
+        <translation>名前を変更する</translation>
     </message>
     <message>
         <location filename="ui_special_functions.py" line="142"/>
         <source>Rename or merge into an existing name</source>
-        <translation type="unfinished"></translation>
+        <translation>名前を変更するか、既存の名前と統合する</translation>
     </message>
 </context>
 <context>
@@ -3764,7 +3775,7 @@ Not recommended unless you have many large files slowing the backup.</source>
     <message>
         <location filename="ui_dialog_view_av.py" line="182"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Volume&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">30秒進む&lt;/p&gt;&lt;p&gt;Alt+を押す。</translation>
+        <translation>巻</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="183"/>
@@ -3867,22 +3878,22 @@ red underline = Assigned to code or annotation</source>
     <message>
         <location filename="ui_dialog_view_av.py" line="204"/>
         <source>New speaker</source>
-        <translation type="unfinished"></translation>
+        <translation>新しいスピーカー</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="205"/>
         <source>Insert timestamp</source>
-        <translation type="unfinished"></translation>
+        <translation>タイムスタンプを挿入</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="206"/>
         <source>Remove Speaker</source>
-        <translation type="unfinished"></translation>
+        <translation>スピーカーを取り外す</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="192"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Forward 30 seconds. Alt + Plus&lt;/p&gt;&lt;p&gt;Forward 5 seconds. Press 5&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>30秒早送り。Alt + プラス\n5秒早送り。5を押す</translation>
     </message>
 </context>
 <context>
@@ -3962,22 +3973,22 @@ Do not code this text until you reload Coding - Code Text from the menu bar.</so
     <message>
         <location filename="ui_error_dlg.py" line="99"/>
         <source>Uncaught exception</source>
-        <translation type="unfinished"></translation>
+        <translation>未捕捉の例外</translation>
     </message>
     <message>
         <location filename="ui_error_dlg.py" line="100"/>
         <source>&lt;Error Message&gt; </source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_error_dlg.py" line="101"/>
         <source>Error traceback (most recent call last):</source>
-        <translation type="unfinished"></translation>
+        <translation>エラーのトレースバック（最新の呼び出しが最後）：</translation>
     </message>
     <message>
         <location filename="ui_error_dlg.py" line="102"/>
         <source>&lt;traceback&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
