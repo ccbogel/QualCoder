@@ -307,7 +307,7 @@ Right-click for options</source>
     <message>
         <location filename="ui_dialog_graph.py" line="141"/>
         <source>Export Pdf image</source>
-        <translation type="unfinished"></translation>
+        <translation>导出PDF图像</translation>
     </message>
 </context>
 <context>
@@ -470,52 +470,52 @@ Checked - any selected codes must match exactly.</source>
     <message>
         <location filename="ui_report_codes_by_segments.py" line="94"/>
         <source>Report Segment Codings</source>
-        <translation type="unfinished"></translation>
+        <translation>报告分段编码</translation>
     </message>
     <message>
         <location filename="ui_report_codes_by_segments.py" line="95"/>
         <source>Text limiter:</source>
-        <translation type="unfinished">文本限制器：</translation>
+        <translation>文本限制器：</translation>
     </message>
     <message>
         <location filename="ui_report_codes_by_segments.py" line="96"/>
         <source>Run report</source>
-        <translation type="unfinished"></translation>
+        <translation>运行报告</translation>
     </message>
     <message>
         <location filename="ui_report_codes_by_segments.py" line="97"/>
         <source>Coder:</source>
-        <translation type="unfinished">编码器:</translation>
+        <translation>编码器.</translation>
     </message>
     <message>
         <location filename="ui_report_codes_by_segments.py" line="98"/>
         <source>Codes by text segments table. 1 = code present, 0 = not coded.</source>
-        <translation type="unfinished"></translation>
+        <translation>文本段落编码表。1 = 存在编码，0 = 未编码。</translation>
     </message>
     <message>
         <location filename="ui_report_codes_by_segments.py" line="99"/>
         <source>Export to Excel</source>
-        <translation type="unfinished"></translation>
+        <translation>导出 Excel</translation>
     </message>
     <message>
         <location filename="ui_report_codes_by_segments.py" line="100"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select files by attributes&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>按属性选择文件</translation>
     </message>
     <message>
         <location filename="ui_report_codes_by_segments.py" line="101"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Files. Right click for selection options.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>文件。右键点击可查看选项。</translation>
     </message>
     <message>
         <location filename="ui_report_codes_by_segments.py" line="102"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Cases. Right click for selection options.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>案例。右键点击可查看选项。</translation>
     </message>
     <message>
         <location filename="ui_report_codes_by_segments.py" line="103"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Codes. Right click for options&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>代码。右键点击查看选项</translation>
     </message>
 </context>
 <context>
@@ -844,52 +844,52 @@ Ordered by file name and code name.</source>
     <message>
         <location filename="ui_comparison_table.py" line="98"/>
         <source>Code Counts by file or case</source>
-        <translation type="unfinished"></translation>
+        <translation>按文件或案例统计代码行数</translation>
     </message>
     <message>
         <location filename="ui_comparison_table.py" line="99"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show the overlapping codes.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">显示重叠的代码。</translation>
+        <translation>显示重叠的代码。</translation>
     </message>
     <message>
         <location filename="ui_comparison_table.py" line="100"/>
         <source>Code counts table</source>
-        <translation type="unfinished"></translation>
+        <translation>代码计数表</translation>
     </message>
     <message>
         <location filename="ui_comparison_table.py" line="101"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export to file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">导出到文件</translation>
+        <translation>导出到文件</translation>
     </message>
     <message>
         <location filename="ui_comparison_table.py" line="102"/>
         <source>Hide blank lines</source>
-        <translation type="unfinished">隐藏空行</translation>
+        <translation>隐藏空行</translation>
     </message>
     <message>
         <location filename="ui_comparison_table.py" line="103"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select files&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">选择文件</translation>
+        <translation>选择文件</translation>
     </message>
     <message>
         <location filename="ui_comparison_table.py" line="104"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select categories&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">选择类别</translation>
+        <translation>选择类别</translation>
     </message>
     <message>
         <location filename="ui_comparison_table.py" line="105"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select codes&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>选择代码</translation>
     </message>
     <message>
         <location filename="ui_comparison_table.py" line="106"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select attribute&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>选择属性</translation>
     </message>
     <message>
         <location filename="ui_comparison_table.py" line="107"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select cases&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>选定案例</translation>
     </message>
 </context>
 <context>
@@ -982,8 +982,8 @@ Ordered by file name and code name.</source>
         <location filename="ui_dialog_import.py" line="97"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;NONE 123, abc&lt;/p&gt;&lt;p&gt;MINIMAL 123, &amp;quot;abc&amp;quot;&lt;/p&gt;&lt;p&gt;ALL &amp;quot;123&amp;quot;, &amp;quot;abc&amp;quot;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>NONE 123, abc
-MINIMAL 123,'abc';
-ALL '123', 'abc'</translation>
+MINIMAL 123,&apos;abc&apos;;
+ALL &apos;123&apos;, &apos;abc&apos;</translation>
     </message>
     <message>
         <location filename="ui_dialog_import.py" line="98"/>
@@ -2486,7 +2486,7 @@ Cannot export text transcription file associated with an audio or video as a lin
     <message>
         <location filename="ui_dialog_manage_files.py" line="147"/>
         <source>Delete saved table display settings. </source>
-        <translation type="unfinished"></translation>
+        <translation>删除已保存的表格显示设置。</translation>
     </message>
     <message>
         <location filename="ui_dialog_manage_files.py" line="148"/>
@@ -2501,7 +2501,16 @@ Does not work with PDF files. Instead extract the plain text and only import the
 The pseudonyms are stored in the qda data folder as pseudonyms.json
 After all text files are imported, remove this file from the project folder and store it securely.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>假名化（数据去标识化）
+导入文本文件前，请创建待替换的名称或短语列表。
+适用文件类型：docx、epub、htm、html、md、rtf、odt、txt，以及定性列的调查导入数据。
+别名替换区分大小写。
+因此需分别创建Tom和TOM的替换条目。
+
+不适用于PDF文件。请先提取纯文本内容，仅导入PDF的纯文本部分。
+
+别名存储于qda数据文件夹中的pseudonyms.json文件。
+所有文本文件导入完成后，请从项目文件夹移除此文件并妥善保管。</translation>
     </message>
 </context>
 <context>
@@ -2650,33 +2659,34 @@ After all text files are imported, remove this file from the project folder and 
     <message>
         <location filename="ui_dialog_pseudonyms.py" line="63"/>
         <source>Pseudonyms</source>
-        <translation type="unfinished"></translation>
+        <translation>笔名</translation>
     </message>
     <message>
         <location filename="ui_dialog_pseudonyms.py" line="64"/>
         <source>Pseudonyms. Data de-identification applied on file import. Does not apply for PDF imports.
 Case sensitive, add multiple entries for each: e.g. Tom Jones  and TOM JONES</source>
-        <translation type="unfinished"></translation>
+        <translation>化名。文件导入时应用数据去标识化处理。PDF导入不适用此功能。
+区分大小写，每个名称需添加多个条目：例如 Tom Jones 和 TOM JONES</translation>
     </message>
     <message>
         <location filename="ui_dialog_pseudonyms.py" line="66"/>
         <source>Original</source>
-        <translation type="unfinished"></translation>
+        <translation>原版</translation>
     </message>
     <message>
         <location filename="ui_dialog_pseudonyms.py" line="67"/>
         <source>Pseudonym</source>
-        <translation type="unfinished"></translation>
+        <translation>笔名</translation>
     </message>
     <message>
         <location filename="ui_dialog_pseudonyms.py" line="68"/>
         <source>Add to pseudonyms</source>
-        <translation type="unfinished"></translation>
+        <translation>添加到别名</translation>
     </message>
     <message>
         <location filename="ui_dialog_pseudonyms.py" line="69"/>
         <source>Click on a row to delete entry.</source>
-        <translation type="unfinished"></translation>
+        <translation>点击某行以删除该条目。</translation>
     </message>
 </context>
 <context>
@@ -2932,7 +2942,7 @@ Case sensitive, add multiple entries for each: e.g. Tom Jones  and TOM JONES</so
     <message>
         <location filename="ui_dialog_report_codings.py" line="186"/>
         <source>iramuteq</source>
-        <translation type="unfinished"></translation>
+        <translation>iramuteq</translation>
     </message>
 </context>
 <context>
@@ -3128,7 +3138,7 @@ like &quot;的通配符是 % 和 _。</translation>
     <message>
         <location filename="ui_report_attribute_parameters.py" line="94"/>
         <source>Delete saved filter settings</source>
-        <translation type="unfinished"></translation>
+        <translation>删除已保存的筛选器设置</translation>
     </message>
 </context>
 <context>
@@ -3517,32 +3527,32 @@ Not recommended unless you have many large files slowing the backup.</source>
     <message>
         <location filename="ui_dialog_settings.py" line="615"/>
         <source>...</source>
-        <translation type="unfinished"></translation>
+        <translation>...</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="623"/>
         <source>New AI Profile...</source>
-        <translation type="unfinished"></translation>
+        <translation>新的人工智能档案...</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="624"/>
         <source>General Parameters:</source>
-        <translation type="unfinished"></translation>
+        <translation>通用参数：</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="633"/>
         <source>API Base URL:</source>
-        <translation type="unfinished"></translation>
+        <translation>API 基础 URL：</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="638"/>
         <source>AI Models:</source>
-        <translation type="unfinished"></translation>
+        <translation>人工智能模型：</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="643"/>
         <source>Reasoning:</source>
-        <translation type="unfinished"></translation>
+        <translation>推理：</translation>
     </message>
 </context>
 <context>
@@ -3626,22 +3636,22 @@ Not recommended unless you have many large files slowing the backup.</source>
     <message>
         <location filename="ui_special_functions.py" line="139"/>
         <source>Edit coder names</source>
-        <translation type="unfinished"></translation>
+        <translation>编辑编码器名称</translation>
     </message>
     <message>
         <location filename="ui_special_functions.py" line="140"/>
         <source>Select coder name</source>
-        <translation type="unfinished"></translation>
+        <translation>选择编码器名称</translation>
     </message>
     <message>
         <location filename="ui_special_functions.py" line="141"/>
         <source>Rename</source>
-        <translation type="unfinished"></translation>
+        <translation>重命名</translation>
     </message>
     <message>
         <location filename="ui_special_functions.py" line="142"/>
         <source>Rename or merge into an existing name</source>
-        <translation type="unfinished"></translation>
+        <translation>重命名或合并到现有名称中</translation>
     </message>
 </context>
 <context>
@@ -3780,7 +3790,7 @@ Not recommended unless you have many large files slowing the backup.</source>
     <message>
         <location filename="ui_dialog_view_av.py" line="182"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Volume&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">前进 30 秒 Alt +</translation>
+        <translation>卷</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="183"/>
@@ -3884,22 +3894,22 @@ red underline = Assigned to code or annotation</source>
     <message>
         <location filename="ui_dialog_view_av.py" line="204"/>
         <source>New speaker</source>
-        <translation type="unfinished"></translation>
+        <translation>新扬声器</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="205"/>
         <source>Insert timestamp</source>
-        <translation type="unfinished"></translation>
+        <translation>插入时间戳</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="206"/>
         <source>Remove Speaker</source>
-        <translation type="unfinished"></translation>
+        <translation>移除扬声器</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="192"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Forward 30 seconds. Alt + Plus&lt;/p&gt;&lt;p&gt;Forward 5 seconds. Press 5&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>前进 30 秒 Alt +</translation>
     </message>
 </context>
 <context>
@@ -3979,22 +3989,22 @@ Do not code this text until you reload Coding - Code Text from the menu bar.</so
     <message>
         <location filename="ui_error_dlg.py" line="99"/>
         <source>Uncaught exception</source>
-        <translation type="unfinished"></translation>
+        <translation>未捕获的异常</translation>
     </message>
     <message>
         <location filename="ui_error_dlg.py" line="100"/>
         <source>&lt;Error Message&gt; </source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_error_dlg.py" line="101"/>
         <source>Error traceback (most recent call last):</source>
-        <translation type="unfinished"></translation>
+        <translation>错误回溯（最近一次调用在最后）：</translation>
     </message>
     <message>
         <location filename="ui_error_dlg.py" line="102"/>
         <source>&lt;traceback&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
