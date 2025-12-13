@@ -4334,11 +4334,7 @@ class DialogCodeText(QtWidgets.QWidget):
             self.ed_update_casetext()
             # Update vectorstore
             if self.app.settings['ai_enable'] == 'True':
-                self.app.ai.sources_vectorstore.import_document(self.file_['id'], self.file_['name'], self.text,
-                                                                update=True)
-            else:
-                # AI is disabled. Delete the file from the vectorstore. It will be reimported later when the AI is enabled again. 
-                self.app.ai.sources_vectorstore.delete_document(self.file_['id'])
+                self.app.ai.sources_vectorstore.import_document(self.file_['id'], self.file_['name'], self.text)
 
         self.ui.textEdit.setTextInteractionFlags(  # make the textEdit read only by removing the 'TextEditable' flag
             Qt.TextInteractionFlag.TextSelectableByMouse |

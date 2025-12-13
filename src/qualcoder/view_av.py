@@ -4791,7 +4791,7 @@ class DialogViewAV(QtWidgets.QDialog):
                 # update transcript in vectorstore
                 if self.app.settings['ai_enable'] == 'True': 
                     name = self.transcription[2]
-                    self.app.ai.sources_vectorstore.import_document(self.transcription[0], name, txt, update=True)
+                    self.app.ai.sources_vectorstore.import_document(self.transcription[0], name, txt)
         self.app.delete_backup = False
 
     def update_sizes(self):

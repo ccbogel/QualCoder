@@ -417,7 +417,8 @@ want to continue?\
             logger.debug(msg)
             
     def faiss_db_search_file_id(self, file_id, faiss_db=None):
-        """Returns a list of embedded chunk ids (doc_id) for a certain file id 
+        """Returns a list of embedded chunks for a certain file id
+        as langchain Documents with metadata,  
         or an empty list if nothing is found."""
         if faiss_db is None:
             faiss_db = self.faiss_db
@@ -428,7 +429,7 @@ want to continue?\
             doc = faiss_db.docstore.search(doc_id)
             if isinstance(doc, Document):
                 if doc.metadata['id'] == file_id:
-                    res.append(str(doc_id))
+                    res.append(doc)
         return res
 
     def faiss_db_retrieve_documents(self, docstore_ids: List[str], faiss_db=None):
@@ -446,31 +447,16 @@ want to continue?\
                     res.append(doc)
         return res
     
-    def _import_document(self, id_, name, text, update=False, signals=None):
+    def _import_document(self, id_, name, text, signals=None):        
         if self._is_closing:
             return  # abort when closing db
         if self.faiss_db is None:
             raise AIException(_('Vectorstore: Document import failed, faiss_db not present.'))
-        # Check if the document is already in the store and delete if needed:        
+
+        # Check if the document is already in the faiss index        
         embeddings_list = self.faiss_db_search_file_id(id_)
-        if len(embeddings_list) > 0:
-            # check name of first embedded chunk 
-            doc = self.faiss_db.docstore.search(embeddings_list[0])
-            if update or doc.metadata['name'] != name:
-                # delete old embeddings
-                try:
-                    self.faiss_db.delete(embeddings_list)
-                except ValueError as e:
-                    logger.debug(f'Error deleting document from faiss vector store: {e}')
-                self.faiss_save()
-            else:
-                # skip the doc
-                return 
-        # add to faiss_db
-        if self._is_closing:
-            return  # abort when closing db
-        
-        # split fulltext into smaller chunks 
+                
+        # add to faiss_db or update content        
         if text != '':  # Can only add embeddings if text is not empty
             metadata = {'id': id_, 'name': name}
             document = Document(page_content=text, metadata=metadata)
@@ -480,31 +466,44 @@ want to continue?\
             chunks = text_splitter.split_documents([document])
             
             if len(chunks) > 0:  # doc not empty 
-                if signals is not None and signals.progress is not None:
-                    self.reading_doc = name
-                    signals.progress.emit(_('AI: Adding document to internal memory: ') + f'"{name}"')
-
                 # create embeddings for these chunks and store them in the faiss_db (with metadata)
                 for chunk in chunks:
                     if not self._is_closing:
-                        uid = str(uuid4())
-                        self.faiss_db.add_documents([chunk], ids=[uid])
-                    else:  # Canceled, delete the unfinished document from the vectorstore:
-                        embeddings_list = self.faiss_db_search_file_id(id_)
-                        if len(embeddings_list) > 0:
-                            try:
-                                self.faiss_db.delete(embeddings_list)
-                            except ValueError as e:
-                                logger.debug(f'Error deleting document from faiss vector store: {e}')
+                        # If the chunk is already in the embeddings list, just update metadata, else add it
+                        found_chunk = False
+                        for doc in embeddings_list:
+                            if doc.page_content == chunk.page_content:
+                                doc.metadata = chunk.metadata
+                                found_chunk = True
+                                embeddings_list.remove(doc)
+                                break
+                        if not found_chunk:
+                            if signals is not None and signals.progress is not None and self.reading_doc != name:
+                                self.reading_doc = name
+                                signals.progress.emit(_('AI: Adding document to internal memory: ') + f'"{name}"')
+                            uid = str(uuid4())
+                            self.faiss_db.add_documents([chunk], ids=[uid])
+                    else: # closing
+                        embeddings_list = []
                         break
-                self.faiss_save()
+        # Delete all remaining elements in embeddings_list. 
+        # These are old chunks of text that have been changed and replaced with new embeddings, 
+        # or chunks of text from a deleted document. 
+        if len(embeddings_list) > 0:
+            embeddings_ids = [doc.id for doc in embeddings_list]
+            try:
+                self.faiss_db.delete(embeddings_ids)
+            except ValueError as e:
+                logger.debug(f'Error deleting changed chunks from faiss vector store: {e}')
+                                
+        self.faiss_save()
         self.reading_doc = ''
 
-    def import_document(self, id_, name, text, update=False):
+    def import_document(self, id_, name, text):
         """Imports a document into the faiss_db. 
         If a document with the same id is already in 
-        the faiss_db, it can be updated (update=True) 
-        or skipped (update=False).
+        the faiss_db, the contents are compared and 
+        updated if needed.
         This is an async process running in a background
         thread. AiVectorstore.is_ready() will return False
         until the import is finished.
@@ -513,10 +512,9 @@ want to continue?\
             id_ (integer): the database id
             name (String): document name
             text (String): document text
-            update (bool, optional): defaults to False.
         """   
         
-        worker = Worker(self._import_document, id_, name, text, update)  # Any other args, kwargs are passed to the run function
+        worker = Worker(self._import_document, id_, name, text)  # Any other args, kwargs are passed to the run function
         # worker.signals.result.connect()
         worker.signals.finished.connect(self.finished_import)
         worker.signals.progress.connect(self.progress_import)
@@ -560,7 +558,7 @@ want to continue?\
             self.parent_text_edit.append(msg)
             logger.debug(msg)
             for doc in docs:
-                self.import_document(doc['id'], doc['name'], doc['fulltext'], False)
+                self.import_document(doc['id'], doc['name'], doc['fulltext'])
             
     def rebuild_vectorstore(self):
         """Deletes all contents from faiss_db and rebuilds the vectorstore from the ground up.  
@@ -602,8 +600,9 @@ want to continue?\
         if faiss_db is not None:
             embeddings_list = self.faiss_db_search_file_id(id_, faiss_db=faiss_db)
             if len(embeddings_list) > 0:
+                embeddings_ids = [doc.id for doc in embeddings_list]
                 try:
-                    faiss_db.delete(embeddings_list)
+                    faiss_db.delete(embeddings_ids)
                 except ValueError as e:
                     logger.debug(f'Error deleting document from faiss vector store: {e}')
                 self.faiss_save(faiss_db=faiss_db, faiss_db_path=faiss_db_path)

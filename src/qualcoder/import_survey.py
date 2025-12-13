@@ -486,7 +486,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
 
                 # Add doc to vectorstore
                 if self.app.settings['ai_enable'] == 'True':
-                    self.app.ai.sources_vectorstore.import_document(fid, qual_file_name, fulltext, update=True)'''
+                    self.app.ai.sources_vectorstore.import_document(fid, qual_file_name, fulltext)'''
 
             # Create one text file per row, prefix [case identifier] to each row.
             if self.fields_type[field] == "qualitative" and not self.ui.checkBox_collate.isChecked():
@@ -527,7 +527,7 @@ class DialogImportSurvey(QtWidgets.QDialog):
 
                     # Add doc to vectorstore
                     if self.app.settings['ai_enable'] == 'True':
-                        self.app.ai.sources_vectorstore.import_document(fid, qual_file_name, fulltext, update=True)
+                        self.app.ai.sources_vectorstore.import_document(fid, qual_file_name, fulltext)
 
         logger.info(_("Survey imported"))
         self.parent_textEdit.append(_("Survey imported."))

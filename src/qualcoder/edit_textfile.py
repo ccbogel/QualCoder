@@ -535,10 +535,7 @@ class DialogEditTextFile(QtWidgets.QDialog):
         # update doc in vectorstore
         if self.has_changed:
             if self.app.settings['ai_enable'] == 'True':
-                self.app.ai.sources_vectorstore.import_document(self.fid, self.name, self.text, update=True)
-            else:
-                # AI is disabled. Delete the file from the vectorstore. It will be reimported later when the AI is enabled again. 
-                self.app.ai.sources_vectorstore.delete_document(self.fid)
+                self.app.ai.sources_vectorstore.import_document(self.fid, self.name, self.text)
         super(DialogEditTextFile, self).accept()
 
     def update_casetext(self):
