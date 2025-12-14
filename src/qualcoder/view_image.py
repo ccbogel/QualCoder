@@ -19,7 +19,7 @@ https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 """
 
-from copy import deepcopy
+from copy import deepcopy, copy
 import datetime
 
 import PIL.Image
@@ -518,6 +518,74 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.fill_code_counts_in_tree()
 
     def fill_code_counts_in_tree(self):
+        """ Calculate the frequency of each code and category for this coder and the selected file.
+        Add a list item to each code that can be used to display in treeWidget.
+        If the tab 'AI assisted coding' is active, the codings will be counted
+        across all files, not only the currently selected one, because the AI assisted
+        coding is not working on a per-file basis.
+        """
+
+        if self.file_ is None:
+            return
+        cur = self.app.conn.cursor()
+        code_counts = []
+        for c in self.codes:
+            parameters = [c['cid'], self.app.settings['codername'], self.file_['id']]
+            sql = "select code_name.catid, count(code_image.cid) from code_image join code_name " \
+                "on code_name.cid=code_image.cid where code_image.cid=? and code_image.owner=? " \
+                "and code_image.id=?"
+            cur.execute(sql, parameters)
+            result = cur.fetchone()
+            code_counts.append([c['cid'], result[0], result[1]])
+        categories = deepcopy(self.categories)
+        # Set up category counts
+        for category in categories:
+            category['count'] = 0
+        # Add the number of codes directly under each category to the category
+        for category in categories:
+            for code in code_counts:
+                if code[1] == category['catid']:
+                    category['count'] += code[2]
+        # Find leaf categories, add to above categories, and gradually remove leaves
+        # until only top categories are left
+        sub_categories = copy(categories)
+        counter = 0
+        while len(sub_categories) > 0 or counter < 10000:
+            leaf_list = []
+            branch_list = []
+            for cat in sub_categories:
+                for cat2 in sub_categories:
+                    if cat['catid'] == cat2['supercatid']:
+                        branch_list.append(cat)
+            for category in sub_categories:
+                if category not in branch_list:
+                    leaf_list.append(category)
+            # Add totals higher category
+            for leaf_category in leaf_list:
+                for category in categories:
+                    if category['catid'] == leaf_category['supercatid']:
+                        category['count'] += leaf_category['count']
+                sub_categories.remove(leaf_category)
+            counter += 1
+
+        # Fill tree item counts
+        iterator = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
+        while iterator.value():
+            item = iterator.value()
+            if item.text(1).startswith("catid"):
+                catid = int(item.text(1)[6:])
+                for category in categories:
+                    if catid == category['catid']:
+                        item.setText(3, str(category['count']))
+            else:
+                cid = int(item.text(1)[4:])
+                for code in code_counts:
+                    if cid == code[0]:
+                        item.setText(3, str(code[2]))
+                        break
+            iterator += 1  # Move to the next item
+
+    '''def fill_code_counts_in_tree(self):
         """ Count instances of each code for current coder and in the selected file.
         Called by: fill_tree """
 
@@ -539,7 +607,7 @@ class DialogCodeImage(QtWidgets.QDialog):
                     item.setText(3, "")
             it += 1
             item = it.value()
-            count += 1
+            count += 1'''
 
     def get_collapsed(self, item):
         """ On category collapse or expansion signal, find the collapsed parent category items.

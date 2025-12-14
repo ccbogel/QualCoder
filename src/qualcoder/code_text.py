@@ -764,45 +764,47 @@ class DialogCodeText(QtWidgets.QWidget):
         cur = self.app.conn.cursor()
         code_counts = []
         for c in self.codes:
+            parameters = [c['cid'], self.app.settings['codername']]
             if ai_assisted_coding:
-                sql = (f"select code_name.catid, count(code_text.cid) from code_text join code_name "
-                       f"on code_name.cid=code_text.cid where code_text.cid={c['cid']} and code_text.owner='{self.app.settings['codername']}'")
+                sql = "select code_name.catid, count(code_text.cid) from code_text join code_name " \
+                      "on code_name.cid=code_text.cid where code_text.cid=? and code_text.owner=?"
             else:  # documents
-                sql = (f"select code_name.catid, count(code_text.cid) from code_text join code_name "
-                       f"on code_name.cid=code_text.cid where code_text.cid={c['cid']} and code_text.owner='{self.app.settings['codername']}' "
-                       f"and code_text.fid={self.file_['id']}")
-            cur.execute(sql)
+                sql = "select code_name.catid, count(code_text.cid) from code_text join code_name " \
+                      "on code_name.cid=code_text.cid where code_text.cid=? and code_text.owner=? " \
+                       "and code_text.fid=?"
+                parameters.append(self.file_['id'])
+            cur.execute(sql, parameters)
             result = cur.fetchone()
             code_counts.append([c['cid'], result[0], result[1]])
-        cats = deepcopy(self.categories)
+        categories = deepcopy(self.categories)
         # Set up category counts
-        for cat in cats:
-            cat['count'] = 0
+        for category in categories:
+            category['count'] = 0
         # Add the number of codes directly under each category to the category
-        for cat in cats:
+        for category in categories:
             for code in code_counts:
-                if code[1] == cat['catid']:
-                    cat['count'] += code[2]
+                if code[1] == category['catid']:
+                    category['count'] += code[2]
         # Find leaf categories, add to above categories, and gradually remove leaves
         # until only top categories are left
-        sub_cats = copy(cats)
+        sub_categories = copy(categories)
         counter = 0
-        while len(sub_cats) > 0 or counter < 10000:
+        while len(sub_categories) > 0 or counter < 10000:
             leaf_list = []
             branch_list = []
-            for c in sub_cats:
-                for c2 in sub_cats:
-                    if c['catid'] == c2['supercatid']:
-                        branch_list.append(c)
-            for cat in sub_cats:
-                if cat not in branch_list:
-                    leaf_list.append(cat)
+            for cat in sub_categories:
+                for cat2 in sub_categories:
+                    if cat['catid'] == cat2['supercatid']:
+                        branch_list.append(cat)
+            for category in sub_categories:
+                if category not in branch_list:
+                    leaf_list.append(category)
             # Add totals higher category
-            for leaf_cat in leaf_list:
-                for cat in cats:
-                    if cat['catid'] == leaf_cat['supercatid']:
-                        cat['count'] += leaf_cat['count']
-                sub_cats.remove(leaf_cat)
+            for leaf_category in leaf_list:
+                for category in categories:
+                    if category['catid'] == leaf_category['supercatid']:
+                        category['count'] += leaf_category['count']
+                sub_categories.remove(leaf_category)
             counter += 1
 
         # Fill tree item counts
@@ -811,9 +813,9 @@ class DialogCodeText(QtWidgets.QWidget):
             item = iterator.value()
             if item.text(1).startswith("catid"):
                 catid = int(item.text(1)[6:])
-                for cat in cats:
-                    if catid == cat['catid']:
-                        item.setText(3, str(cat['count']))
+                for category in categories:
+                    if catid == category['catid']:
+                        item.setText(3, str(category['count']))
             else:
                 cid = int(item.text(1)[4:])
                 for code in code_counts:

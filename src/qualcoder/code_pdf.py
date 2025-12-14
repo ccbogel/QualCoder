@@ -18,7 +18,7 @@ Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 """
 from binascii import b2a_hex
-from copy import deepcopy
+from copy import copy, deepcopy
 import datetime
 import fitz
 import logging
@@ -640,51 +640,84 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.fill_code_counts_in_tree()
 
     def fill_code_counts_in_tree(self):
-        """ Count instances of each code for current coder and in the selected file.
-        Called by: fill_tree
+        """ Calculate the frequency of each code and category for this coder and the selected file.
+        Add a list item to each code that can be used to display in treeWidget.
+        If the tab 'AI assisted coding' is active, the codings will be counted
+        across all files, not only the currently selected one, because the AI assisted
+        coding is not working on a per-file basis.
         """
 
         if self.file_ is None:
             return
         cur = self.app.conn.cursor()
-        sql = "select count(cid) from code_text where cid=? and fid=? and owner=?"
-        it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
-        item = it.value()
-        count = 0
-        while item and count < 10000:
-            if item.text(1)[0:4] == "cid:":
-                cid = str(item.text(1)[4:])
-                try:
-                    cur.execute(sql, [cid, self.file_['id'], self.app.settings['codername']])
-                    result = cur.fetchone()
-                    if result[0] > 0:
-                        item.setText(3, str(result[0]))
-                        item.setToolTip(3, self.app.settings['codername'])
-                    else:
-                        item.setText(3, "")
-                except Exception as e:
-                    msg = f"Fill code counts error\n{e}\n{sql}\n"
-                    msg += f"cid: {cid}\n"
-                    msg += "self.file_['id'] " + f"{self.file_['id']}\n"
-                    logger.debug(msg)
-                    item.setText(3, "")
-            it += 1
-            item = it.value()
-            count += 1
+        code_counts = []
+        for c in self.codes:
+            parameters = [c['cid'], self.app.settings['codername'], self.file_['id']]
+            sql = "select code_name.catid, count(code_text.cid) from code_text join code_name " \
+                  "on code_name.cid=code_text.cid where code_text.cid=? and code_text.owner=? " \
+                  "and code_text.fid=?"
+            cur.execute(sql, parameters)
+            result = cur.fetchone()
+            code_counts.append([c['cid'], result[0], result[1]])
+        categories = deepcopy(self.categories)
+        # Set up category counts
+        for category in categories:
+            category['count'] = 0
+        # Add the number of codes directly under each category to the category
+        for category in categories:
+            for code in code_counts:
+                if code[1] == category['catid']:
+                    category['count'] += code[2]
+        # Find leaf categories, add to above categories, and gradually remove leaves
+        # until only top categories are left
+        sub_categories = copy(categories)
+        counter = 0
+        while len(sub_categories) > 0 or counter < 10000:
+            leaf_list = []
+            branch_list = []
+            for cat in sub_categories:
+                for cat2 in sub_categories:
+                    if cat['catid'] == cat2['supercatid']:
+                        branch_list.append(cat)
+            for category in sub_categories:
+                if category not in branch_list:
+                    leaf_list.append(category)
+            # Add totals higher category
+            for leaf_category in leaf_list:
+                for category in categories:
+                    if category['catid'] == leaf_category['supercatid']:
+                        category['count'] += leaf_category['count']
+                sub_categories.remove(leaf_category)
+            counter += 1
+
+        # Fill tree item counts
+        iterator = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
+        while iterator.value():
+            item = iterator.value()
+            if item.text(1).startswith("catid"):
+                catid = int(item.text(1)[6:])
+                for category in categories:
+                    if catid == category['catid']:
+                        item.setText(3, str(category['count']))
+            else:
+                cid = int(item.text(1)[4:])
+                for code in code_counts:
+                    if cid == code[0]:
+                        item.setText(3, str(code[2]))
+                        break
+            iterator += 1  # Move to the next item
 
     def get_collapsed(self, item):
         """ On category collapse or expansion signal, find the collapsed parent category items.
         This will fill the self.app.collapsed_categories and is the expanded/collapsed tree is then replicated across
         other areas of the app. """
 
-        #print(item.text(0), item.text(1), "Expanded:", item.isExpanded())
         if item.text(1)[:3] == "cid":
             return
         if not item.isExpanded() and item.text(1) not in self.app.collapsed_categories:
             self.app.collapsed_categories.append(item.text(1))
         if item.isExpanded() and item.text(1) in self.app.collapsed_categories:
             self.app.collapsed_categories.remove(item.text(1))
-        print("pdf", self.app.collapsed_categories)
 
     def get_codes_and_categories(self):
         """ Called from init, delete category/code.
