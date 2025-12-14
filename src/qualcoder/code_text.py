@@ -798,19 +798,27 @@ class DialogCodeText(QtWidgets.QWidget):
             count += 1
 
     def fill_code_counts_in_tree(self):
-        """ Calculate the frequency of each code and category for this coder.
+        """ Calculate the frequency of each code and category for this coder and the selected file.
         Add a list item to each code that can be used to display in treeWidget.
+        If the tab 'AI assisted coding' is active, the codings will be counted
+        across all files, not only the currently selected one, because the AI assisted 
+        coding is not working on a per-file basis.
         """
-
+        
+        ai_assisted_coding = self.ui.tabWidget.currentIndex() == 1
         if self.file_ is None:
             return
         cur = self.app.conn.cursor()
         code_counts = []
         for c in self.codes:
-            cur.execute("select code_name.catid, count(code_text.cid) from code_text join code_name "
-                        "on code_name.cid=code_text.cid where code_text.cid=? and code_text.owner=? "
-                        "and code_text.fid=?",
-                    [c['cid'], self.app.settings['codername'], self.file_['id']])
+            if ai_assisted_coding:
+                sql = (f"select code_name.catid, count(code_text.cid) from code_text join code_name "
+                       f"on code_name.cid=code_text.cid where code_text.cid={c['cid']} and code_text.owner='{self.app.settings['codername']}'")
+            else:  # documents
+                sql = (f"select code_name.catid, count(code_text.cid) from code_text join code_name "
+                       f"on code_name.cid=code_text.cid where code_text.cid={c['cid']} and code_text.owner='{self.app.settings['codername']}' "
+                       f"and code_text.fid={self.file_['id']}")
+            cur.execute(sql)
             result = cur.fetchone()
             code_counts.append([c['cid'], result[0], result[1]])
         cats = deepcopy(self.categories)
