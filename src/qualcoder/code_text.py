@@ -750,7 +750,7 @@ class DialogCodeText(QtWidgets.QWidget):
             self.ui.treeWidget.sortByColumn(0, QtCore.Qt.SortOrder.DescendingOrder)
         self.fill_code_counts_in_tree()
 
-    def fill_code_counts_in_tree(self):
+    def fill_code_counts_in_tree_OLD_DELETE(self):
         """ Count instances of each code for current coder and in the selected file.
         If the tab 'AI assisted coding' is active, the codings will be counted
         across all files, not only the currently selected one, because the AI assisted 
@@ -796,6 +796,70 @@ class DialogCodeText(QtWidgets.QWidget):
             it += 1
             item = it.value()
             count += 1
+
+    def fill_code_counts_in_tree(self):
+        """ Calculate the frequency of each code and category for this coder.
+        Add a list item to each code that can be used to display in treeWidget.
+        """
+
+        if self.file_ is None:
+            return
+        cur = self.app.conn.cursor()
+        code_counts = []
+        for c in self.codes:
+            cur.execute("select code_name.catid, count(code_text.cid) from code_text join code_name "
+                        "on code_name.cid=code_text.cid where code_text.cid=? and code_text.owner=? "
+                        "and code_text.fid=?",
+                    [c['cid'], self.app.settings['codername'], self.file_['id']])
+            result = cur.fetchone()
+            code_counts.append([c['cid'], result[0], result[1]])
+        cats = deepcopy(self.categories)
+        # Set up category counts
+        for cat in cats:
+            cat['count'] = 0
+        # Add the number of codes directly under each category to the category
+        for cat in cats:
+            for code in code_counts:
+                if code[1] == cat['catid']:
+                    cat['count'] += code[2]
+        # Find leaf categories, add to above categories, and gradually remove leaves
+        # until only top categories are left
+        sub_cats = copy(cats)
+        counter = 0
+        while len(sub_cats) > 0 or counter < 10000:
+            leaf_list = []
+            branch_list = []
+            for c in sub_cats:
+                for c2 in sub_cats:
+                    if c['catid'] == c2['supercatid']:
+                        branch_list.append(c)
+            for cat in sub_cats:
+                if cat not in branch_list:
+                    leaf_list.append(cat)
+            # Add totals higher category
+            for leaf_cat in leaf_list:
+                for cat in cats:
+                    if cat['catid'] == leaf_cat['supercatid']:
+                        cat['count'] += leaf_cat['count']
+                sub_cats.remove(leaf_cat)
+            counter += 1
+
+        # Fill tree item counts
+        iterator = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
+        while iterator.value():
+            item = iterator.value()
+            if item.text(1).startswith("catid"):
+                catid = int(item.text(1)[6:])
+                for cat in cats:
+                    if catid == cat['catid']:
+                        item.setText(3, str(cat['count']))
+            else:
+                cid = int(item.text(1)[4:])
+                for code in code_counts:
+                    if cid == code[0]:
+                        item.setText(3, str(code[2]))
+                        break
+            iterator += 1  # Move to the next item
 
     def get_codes_and_categories(self):
         """ Called from init, delete category/code.
