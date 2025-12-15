@@ -90,8 +90,9 @@ def update_translation():
 
 def recompile_translation():
     project_root = os.path.dirname(os.path.abspath(__file__))
-    lrelease_path = "C:\\Users\\kai\\anaconda3\\envs\\QualCOder\\Lib\\site-packages\\qt6_applications\\Qt\\bin\\lrelease.exe"
-
+    #lrelease_path = "C:\\Users\\kai\\anaconda3\\envs\\QualCOder\\Lib\\site-packages\\qt6_applications\\Qt\\bin\\lrelease.exe"
+    #lrelease_path = "/usr/bin/lrelease"
+    lrelease_path = 'lrelease'
     language_list = ['de', 'en', 'es', 'fr', 'it', 'pt']
 
     # GETTEXT TRANSLATION
