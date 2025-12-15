@@ -32,6 +32,7 @@ import sys
 from PyQt5.QtCore import QLibraryInfo
 import polib
 
+
 def extract_pot_file(directory, pot_filename):
     # List all .py files within the specified directory
     py_files = []
@@ -54,6 +55,7 @@ def extract_pot_file(directory, pot_filename):
     else:
         print("No Python files found to extract translatable strings from.")
 
+
 def update_po_files(directory, pot_filename):
     # List all .po files within the specified directory
     for root, dirs, files in os.walk(directory):
@@ -70,6 +72,7 @@ def update_po_files(directory, pot_filename):
                 except subprocess.CalledProcessError as exc:
                     print(f"Error updating PO file {po_file}: {exc}")
 
+
 def update_qt_ts_files(directory):
     pylupdate_path = os.path.join(QLibraryInfo.location(QLibraryInfo.BinariesPath), "pylupdate5")
     translation_files = ["app_de.ts", "app_es.ts", "app_fr.ts", "app_it.ts", "app_ja.ts",
@@ -81,6 +84,7 @@ def update_qt_ts_files(directory):
         print(f">>> {' '.join(cmd)}")
         subprocess.call(cmd)
 
+
 def update_translation():
     directory = os.path.join('src', 'qualcoder')
     pot_filename = os.path.join(directory, 'qualcoder.pot')
@@ -88,12 +92,13 @@ def update_translation():
     update_po_files(directory, pot_filename)
     update_qt_ts_files(os.path.join('src', 'qualcoder', 'GUI'))
 
+
 def recompile_translation():
     project_root = os.path.dirname(os.path.abspath(__file__))
     #lrelease_path = "C:\\Users\\kai\\anaconda3\\envs\\QualCOder\\Lib\\site-packages\\qt6_applications\\Qt\\bin\\lrelease.exe"
     #lrelease_path = "/usr/bin/lrelease"
     lrelease_path = 'lrelease'
-    language_list = ['de', 'en', 'es', 'fr', 'it', 'pt']
+    language_list = ['de', 'en', 'es', 'fr', 'it', 'ja', 'pt', 'sv', 'zh']
 
     # GETTEXT TRANSLATION
 
@@ -114,7 +119,7 @@ def recompile_translation():
         mo_file = mo_files[i]
         if os.path.exists(po_file):
             # Check if po-file has been updated and is newer than the corresponding mo-file
-            if (os.path.exists(mo_file) == False) or (os.path.getmtime(po_file) > os.path.getmtime(mo_file)):
+            if (os.path.exists(mo_file) is False) or (os.path.getmtime(po_file) > os.path.getmtime(mo_file)):
                 answer = input(f'Do you want to create/update "{mo_file}"? (y/n)')
                 if answer == 'y':
                     po = polib.pofile(po_file)
@@ -142,7 +147,7 @@ def recompile_translation():
         qm_file = qm_files[i]
         if os.path.exists(ts_file):
             # Check if ts-file has been updated and is newer than the corresponding qm-file
-            if (os.path.exists(qm_file) == False) or (os.path.getmtime(ts_file) > os.path.getmtime(qm_file)):
+            if (os.path.exists(qm_file) is False) or (os.path.getmtime(ts_file) > os.path.getmtime(qm_file)):
                 answer = input(f'Do you want to create/update "{qm_file}"? (y/n)')
                 if answer == 'y':
                     subprocess.run([lrelease_path, ts_file, "-qm", qm_file], check=True)
@@ -158,18 +163,19 @@ def recompile_translation():
         cmd = os.path.join(project_root, "src", 'qualcoder', 'locale', 'create_lang_script_base64.py')
         subprocess.call(cmd, shell=True)
         print('Updated base_64_lang_helper.py')
-        
     print("Finished")
- 
+
+
 def main():
     print("Please choose option")
+
     
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         mode = sys.argv[1]
-        if mode == "--update-translation":
-           update_translation()
-         elif mode == "--compilation-translation":
+        if mode == "--update":
+            update_translation()
+        elif mode == "--compile":
             recompile_translation()
         else:
             main()
