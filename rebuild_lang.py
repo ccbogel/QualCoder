@@ -82,12 +82,17 @@ def update_qt_ts_files(directory):
     pylupdate_path = os.path.join(QLibraryInfo.location(QLibraryInfo.BinariesPath), "pylupdate5")
     translation_files = ["app_de.ts", "app_es.ts", "app_fr.ts", "app_it.ts", "app_ja.ts",
                          "app_pt.ts", "app_sv.ts", "app_zh.ts"]
+    script_path = os.path.dirname(os.path.realpath(__file__))
+    directory = os.path.join(script_path, directory)
     os.chdir(directory)
     for translation in translation_files:
         ui_files = [f for f in os.listdir(directory) if f.startswith("ui_")]
         cmd = [pylupdate_path, "-noobsolete", "-ts", translation] + ui_files
         print(f">>> {' '.join(cmd)}")
         subprocess.call(cmd)
+
+        """ TODO Not working for me yet. I might have to add the path to each ui_file
+        """
 
 
 def update_translation_placeholders():
