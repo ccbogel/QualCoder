@@ -1,8 +1,8 @@
 """
-This simple helper script checks if any of the .ui-files has been updated and needs recompiling.
-If so, pyuic6 is used to compile it, the result is placed in "qualcoder/GUI"
-
-Kai Dröge 2023
+Using --update option
+This script updates translation placeholders in .po and Qt .ts files.
+Using --compile option
+This script compiles .po to .mo files, and .ts to .qm files.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -57,7 +57,7 @@ def extract_pot_file(directory, pot_filename):
 
 
 def update_po_files(directory, pot_filename):
-    # List all .po files within the specified directory
+    """ List all .po files within the specified directory. """
     for root, dirs, files in os.walk(directory):
         for file in files:
             if file.endswith('.po'):
@@ -74,9 +74,14 @@ def update_po_files(directory, pot_filename):
 
 
 def update_qt_ts_files(directory):
+    """ Requires pyludate5
+    pip install pyqt5-tools
+     Warning: pylupdate6 overrides ,but does not update, existing ts files.
+     """
+
     pylupdate_path = os.path.join(QLibraryInfo.location(QLibraryInfo.BinariesPath), "pylupdate5")
     translation_files = ["app_de.ts", "app_es.ts", "app_fr.ts", "app_it.ts", "app_ja.ts",
-                     "app_pt.ts", "app_sv.ts", "app_zh.ts"]
+                         "app_pt.ts", "app_sv.ts", "app_zh.ts"]
     os.chdir(directory)
     for translation in translation_files:
         ui_files = [f for f in os.listdir(directory) if f.startswith("ui_")]
@@ -85,7 +90,9 @@ def update_qt_ts_files(directory):
         subprocess.call(cmd)
 
 
-def update_translation():
+def update_translation_placeholders():
+    """ Update po files, update GUI ts files """
+
     directory = os.path.join('src', 'qualcoder')
     pot_filename = os.path.join(directory, 'qualcoder.pot')
     extract_pot_file(directory, pot_filename)
@@ -95,8 +102,8 @@ def update_translation():
 
 def recompile_translation():
     project_root = os.path.dirname(os.path.abspath(__file__))
-    #lrelease_path = "C:\\Users\\kai\\anaconda3\\envs\\QualCOder\\Lib\\site-packages\\qt6_applications\\Qt\\bin\\lrelease.exe"
-    #lrelease_path = "/usr/bin/lrelease"
+    # lrelease_path = "C:\\Users\\kai\\anaconda3\\envs\\QualCOder\\Lib\\site-packages\\qt6_applications\\Qt\\bin\\lrelease.exe"
+    # lrelease_path = "/usr/bin/lrelease"
     lrelease_path = 'lrelease'
     language_list = ['de', 'en', 'es', 'fr', 'it', 'ja', 'pt', 'sv', 'zh']
 
@@ -167,14 +174,14 @@ def recompile_translation():
 
 
 def main():
-    print("Please choose option")
+    print("Choose language option: --update --compile")
 
-    
+
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         mode = sys.argv[1]
         if mode == "--update":
-            update_translation()
+            update_translation_placeholders()
         elif mode == "--compile":
             recompile_translation()
         else:
