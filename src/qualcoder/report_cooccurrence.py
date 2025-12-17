@@ -19,6 +19,7 @@ https://github.com/ccbogel/QualCoder
 """
 
 from copy import deepcopy
+from datetime import datetime
 import logging
 import openpyxl
 from openpyxl.utils import get_column_letter
@@ -32,7 +33,6 @@ from .GUI.ui_dialog_cooccurrence import Ui_Dialog_Coocurrence
 from .helpers import ExportDirectoryPathDialog, Message
 from .report_attributes import DialogSelectAttributeParameters
 from .select_items import DialogSelectItems
-
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -73,8 +73,8 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         tablefont = f'font: 10pt "{self.app.settings["font"]}";'
         self.ui.tableWidget.setStyleSheet(tablefont)  # Should be smaller
         self.ui.tableWidget.cellClicked.connect(self.cell_selected)
-        #self.ui.tableWidget.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
-        #self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
+        self.ui.tableWidget.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
         self.ui.splitter.setSizes([500, 0])
 
         self.codes, self.categories = self.app.get_codes_categories()
@@ -151,7 +151,8 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
                 qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
             self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
             if self.attributes:
-                self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable-box', options=[{'scale_factor': 1.3}]))
+                self.ui.pushButton_file_attributes.setIcon(
+                    qta.icon('mdi6.variable-box', options=[{'scale_factor': 1.3}]))
                 self.ui.pushButton_select_files.setIcon(qta.icon('mdi6.file-outline', options=[{'scale_factor': 1.4}]))
             return
         self.attributes = ui.parameters
@@ -377,7 +378,8 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
                 cell = ws.cell(row=row + 2, column=col + 2)
                 cell.value = col_data
                 if self.data_colors[row][col] != "":
-                    cell.fill = PatternFill(start_color=self.data_colors[row][col][1:], end_color=self.data_colors[row][col][1:], fill_type="solid")
+                    cell.fill = PatternFill(start_color=self.data_colors[row][col][1:],
+                                            end_color=self.data_colors[row][col][1:], fill_type="solid")
                 # Details list
                 if self.data_details[row][col] == ".":
                     continue
@@ -493,19 +495,71 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
 
         self.ui.splitter.setSizes([300, 200])
 
-    ''' TODO for future expansion maybe.
     def table_menu(self, position):
-        """ Context menu for displaying table cell coding details.
+        """ Context menu for creating a new code by merging existing codes.
         """
 
         row = self.ui.tableWidget.currentRow()
         col = self.ui.tableWidget.currentColumn()
         text = self.ui.tableWidget.item(row, col).text()
-        print(row, col, text)
-
+        if text == "":
+            return
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-        action_view = menu.addAction(_("View"))'''
+        action_merge = menu.addAction(_("Merge into new code"))
+        action = menu.exec(self.ui.tableWidget.mapToGlobal(position))
+        if action is not action_merge:
+            return
+        new_code_name = self.ui.tableWidget.horizontalHeaderItem(col).text() + " | "
+        new_code_name += self.ui.tableWidget.verticalHeaderItem(row).text()
+        new_code_name = new_code_name.replace("\n", "")
+        new_code_name, ok = QtWidgets.QInputDialog.getText(self, _("New code"), " " * 30 + _("Edit name:") + " " * 30,
+                                                           QtWidgets.QLineEdit.EchoMode.Normal, new_code_name)
+        memo = _("Merged: ") + new_code_name
+        if not ok or new_code_name == '':
+            return
+        # Insert new code name
+        codes = self.app.get_code_names()
+        if any(code['name'] == new_code_name for code in codes):
+            Message(self.app, _("Code name exists"), _("Choose another code name")).exec()
+            return
+        cur = self.app.conn.cursor()
+        now_date = datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
+        cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,?,?,?,?)",
+                    (new_code_name, memo, self.app.settings['codername'], now_date,
+                     None, "#DDE600"))  # Vibrant yellow colour
+        self.app.conn.commit()
+        self.app.delete_backup = False
+        cur.execute("select last_insert_rowid()")
+        new_code_cid = cur.fetchone()[0]
+        self.parent_textEdit.append(_("New code: ") + new_code_name)
+
+        # Create new coded segments
+        data_list = self.data_details[row][col]
+        ''' data item list object:
+        0 - 5 cid0, name, ctid0, cid1, c1_name, ctid1, 
+        6 - 8 fid, file_name, owners, 
+        9 - 12 c0_pos0, c0_pos1, c1_pos0, c1_pos1,
+        13 - 16 text_before, text_overlap, text_after, relation
+        '''
+        for item in data_list:
+            pos0 = min(item[9], item[11])
+            pos1 = max(item[10], item[12])
+            # Note substr() function started at 1, not 0, so + 1
+            cur.execute("select substr(fulltext,?,?) from source where id=?", [pos0 + 1, pos1 - pos0, item[6]])
+            seltext = cur.fetchone()[0]
+
+            # Create item details to put into code_text
+            try:
+                cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
+                            memo,date, important) values(?,?,?,?,?,?,?,?,?)", (new_code_cid, item[6],
+                                                                               seltext, pos0, pos1,
+                                                                               self.app.settings['codername'],
+                                                                               memo, now_date, None))
+                self.app.conn.commit()
+            except Exception as e_:
+                print(e_)
+                logger.debug(e_)
 
     def fill_table(self):
         """ Fill table using code names alphabetically (case insensitive), using self.data """
@@ -521,7 +575,6 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         # Wrong for selected codes
         for code_ in self.selected_codes:  # self.codes:
             name_split_50 = [code_['name'][y - 50:y] for y in range(50, len(code_['name']) + 50, 50)]
-            # header_labels.append(code_['name'])  # OLD, needed line separators
             header_labels.append("\n".join(name_split_50))
         self.ui.tableWidget.setColumnCount(len(header_labels))
         self.ui.tableWidget.setHorizontalHeaderLabels(header_labels)
@@ -535,6 +588,8 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
                     item.setForeground(QtGui.QBrush(QtGui.QColor("#000000")))
                 if cell_data > 0:
                     item.setData(QtCore.Qt.ItemDataRole.DisplayRole, cell_data)
+                    msg = _("Left click: Show coded text.\nRight click: Create new combined code from these codes.")
+                    item.setToolTip(msg)
                 item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
                 self.ui.tableWidget.setItem(row, col, item)
         # self.ui.tableWidget.resizeColumnsToContents()  # Doesnt look great
