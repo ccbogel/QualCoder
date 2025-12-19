@@ -198,8 +198,8 @@
     <addaction name="actionCode_co_occurrence"/>
     <addaction name="actionCode_text_exact_matches"/>
     <addaction name="actionText_segments_by_codes"/>
-    <addaction name="actionView_Graph"/>
     <addaction name="actionCharts"/>
+    <addaction name="actionView_Graph"/>
     <addaction name="actionText_mining"/>
     <addaction name="actionSQL_statements"/>
     <addaction name="separator"/>
@@ -366,7 +366,7 @@
   </action>
   <action name="actionView_Graph">
    <property name="text">
-    <string>View Graph</string>
+    <string>Graph</string>
    </property>
   </action>
   <action name="actionExport_codebook">
