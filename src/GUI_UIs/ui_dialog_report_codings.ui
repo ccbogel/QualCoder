@@ -198,7 +198,7 @@
      <widget class="QComboBox" name="comboBox_matrix">
       <property name="geometry">
        <rect>
-        <x>610</x>
+        <x>598</x>
         <y>25</y>
         <width>281</width>
         <height>29</height>
@@ -272,7 +272,7 @@
      <widget class="QCheckBox" name="checkBox_matrix_transpose">
       <property name="geometry">
        <rect>
-        <x>620</x>
+        <x>608</x>
         <y>-1</y>
         <width>231</width>
         <height>24</height>
@@ -417,9 +417,9 @@
      <widget class="QPushButton" name="pushButton_export_matrix">
       <property name="geometry">
        <rect>
-        <x>892</x>
+        <x>880</x>
         <y>23</y>
-        <width>151</width>
+        <width>171</width>
         <height>32</height>
        </rect>
       </property>
