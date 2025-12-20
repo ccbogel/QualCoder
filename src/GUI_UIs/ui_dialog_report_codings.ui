@@ -69,8 +69,8 @@
      <widget class="QPushButton" name="pushButton_run_report">
       <property name="geometry">
        <rect>
-        <x>543</x>
-        <y>2</y>
+        <x>539</x>
+        <y>3</y>
         <width>51</width>
         <height>51</height>
        </rect>
@@ -219,7 +219,7 @@
        <rect>
         <x>390</x>
         <y>-1</y>
-        <width>141</width>
+        <width>131</width>
         <height>26</height>
        </rect>
       </property>
@@ -278,7 +278,7 @@
      <widget class="QCheckBox" name="checkBox_matrix_transpose">
       <property name="geometry">
        <rect>
-        <x>608</x>
+        <x>602</x>
         <y>-1</y>
         <width>231</width>
         <height>24</height>
