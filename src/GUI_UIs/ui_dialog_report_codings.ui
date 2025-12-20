@@ -70,7 +70,7 @@
       <property name="geometry">
        <rect>
         <x>543</x>
-        <y>0</y>
+        <y>2</y>
         <width>51</width>
         <height>51</height>
        </rect>
@@ -141,7 +141,7 @@
       <property name="geometry">
        <rect>
         <x>760</x>
-        <y>86</y>
+        <y>85</y>
         <width>91</width>
         <height>30</height>
        </rect>
@@ -203,6 +203,12 @@
         <width>281</width>
         <height>29</height>
        </rect>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>16777215</width>
+        <height>31</height>
+       </size>
       </property>
       <property name="toolTip">
        <string>File and case matrix options</string>
@@ -418,9 +424,9 @@
       <property name="geometry">
        <rect>
         <x>880</x>
-        <y>23</y>
-        <width>171</width>
-        <height>32</height>
+        <y>24</y>
+        <width>181</width>
+        <height>31</height>
        </rect>
       </property>
       <property name="text">
