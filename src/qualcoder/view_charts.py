@@ -365,12 +365,11 @@ class ViewCharts(QDialog):
         return owner, subtitle
 
     def helper_export_html(self, fig):
-        """ Export chart. """
-        # TODO used by ?
+        """ Export chart. Used for all created charts to save an image to the default directory. """
 
         if self.ui.checkBox_export_html.isChecked():
-            e = ExportDirectoryPathDialog(self.app, "Chart.html")
-            filepath = e.filepath
+            export_path = ExportDirectoryPathDialog(self.app, "Chart.html")
+            filepath = export_path.filepath
             if filepath is None:
                 return
             fig.write_html(filepath)
@@ -568,6 +567,7 @@ class ViewCharts(QDialog):
                      title=title
                      )
         fig.show()
+        self.helper_export_html(fig)
 
     def stacked_barchart_cases_by_codes(self):
         """ Frequency of codes in each case (file collection), cumulative across codes, for each code row.
@@ -649,6 +649,7 @@ class ViewCharts(QDialog):
                      title=title
                      )
         fig.show()
+        self.helper_export_html(fig)
 
     def stacked_barchart_files_by_codes(self):
         """ Frequency of codes in each file, cumulative across codes, for each code row.
@@ -722,6 +723,7 @@ class ViewCharts(QDialog):
                      title=title
                      )
         fig.show()
+        self.helper_export_html(fig)
 
     def stacked_barchart_codes_by_files(self):
         """ Frequency of codes in each file, cumulative across files, for each code row.
@@ -795,6 +797,7 @@ class ViewCharts(QDialog):
                      title=title
                      )
         fig.show()
+        self.helper_export_html(fig)
 
     def show_bar_chart(self):
         """ https://www.tutorialspoint.com/plotly/plotly_bar_and_pie_chart.htm
