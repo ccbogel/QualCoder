@@ -137,10 +137,11 @@ class ViewCharts(QDialog):
                              _('Code by audio/video segments')
                              ]
         self.ui.comboBox_bar_charts.addItems(bar_combobox_list)
-        cumul_bar_combobox_list = ['', _('Files by codes'),
-                             _('Codes by files')
+        stacked_bar_combobox_list = ['', _('Files by codes'),
+                             _('Codes by files'),
+                            _('Cases by codes')
                              ]
-        self.ui.comboBox_cumulative_bar.addItems(cumul_bar_combobox_list)
+        self.ui.comboBox_cumulative_bar.addItems(stacked_bar_combobox_list)
         self.ui.comboBox_cumulative_bar.currentIndexChanged.connect(self.show_cumulative_bar_chart)
 
         categories_combobox_list = [""]
@@ -241,6 +242,7 @@ class ViewCharts(QDialog):
         self.attribute_file_ids = []
         self.attributes_msg = ""
         self.ui.pushButton_attributes.setToolTip("")
+        self.ui.pushButton_attributes.setIcon(QtGui.QIcon())
 
     def clear_combobox_cases(self):
         """ Clear case selection if a file is selected.
@@ -253,6 +255,7 @@ class ViewCharts(QDialog):
         self.attribute_file_ids = []
         self.attributes_msg = ""
         self.ui.pushButton_attributes.setToolTip("")
+        self.ui.pushButton_attributes.setIcon(QtGui.QIcon())
 
     def get_file_ids(self):
         """ Get file ids based on file selection or case selection.
@@ -481,14 +484,95 @@ class ViewCharts(QDialog):
             self.stacked_barchart_files_by_codes()
         if chart_type_index == 2:  # Codes by files
             self.stacked_barchart_codes_by_files()
-        '''if chart_type_index == 3:  # Codes by files
-            self.barchart_codes_by_files()
-        if chart_type_index == 4:  # Codes by cases
+        if chart_type_index == 3:  # Cases by codes
+            self.stacked_barchart_cases_by_codes()
+        '''if chart_type_index == 4:  # Codes by cases
             self.barchart_codes_by_cases()'''
         self.ui.comboBox_cumulative_bar.setCurrentIndex(0)
 
+    def stacked_barchart_cases_by_codes(self):
+        """ Frequency of codes in each case (file collection), cumulative across codes, for each code row.
+        Index numbering matches order of options, set up in init. Need this to avoid translation issues.
+
+        Sample data frame for cumulative bar chart display
+        data = {
+            'Codes': ['A', 'A', 'A', 'B', 'B', 'B', 'C', 'C', 'C'],
+            'Cases': ['X', 'Y', 'Z', 'X', 'Y', 'Z', 'X', 'Y', 'Z'],
+            'Counts': [10, 15, 7, 12, 10, 8, 15, 12, 10]
+        }
+        """
+
+        title = _('Cumulative code count in cases by code')
+        owner, subtitle = self.owner_and_subtitle_helper()
+        title += subtitle
+        # if a case or file selection is made: file_ids is comma separated string of file ids
+        case_file_name, file_ids = self.get_file_ids()
+
+        # Calculate
+        cur = self.app.conn.cursor()
+        codes = []
+        cases = []
+        counts = []
+        for c in self.codes:
+            sql = "select cases.name from cases join case_text on cases.caseid = case_text.caseid " \
+                  "join code_text on code_text.fid=case_text.fid" \
+                  " where cid=? and code_text.owner like ? order by cases.name asc"
+            if file_ids != "":
+                sql = "select cases.name from cases join case_text on cases.caseid = case_text.caseid " \
+                      "join code_text on code_text.fid=case_text.fid where" \
+                      " cid=? and code_text.owner like ? and code_text.fid" + file_ids + " order by cases.name asc"
+            cur.execute(sql, [c['cid'], owner])
+            res_text = cur.fetchall()
+            sql = "select cases.name from cases join case_text on cases.caseid = case_text.caseid " \
+                  " join code_image on code_image.id=case_text.fid where \
+             cid=? and code_image.owner like ? order by cases.name asc"
+            if file_ids != "":
+                sql = "select cases.name from cases join case_text on cases.caseid = case_text.caseid " \
+                      "join code_image on code_image.id=case_text.fid where " \
+                      "cid=? and code_image.owner like ? and code_image.id" + file_ids + " order by cases.name asc"
+            cur.execute(sql, [c['cid'], owner])
+            res_image = cur.fetchall()
+            sql = "select cases.name from cases join case_text on cases.caseid = case_text.caseid " \
+            " join code_av on case_text.fid=code_av.id where \
+            cid=? and code_av.owner like ? order by cases.name asc"
+            if file_ids != "":
+                sql = "select cases.name from cases join case_text on cases.caseid = case_text.caseid " \
+                "join code_av code_av.id=case_text.fid where " \
+                "cid=? and code_av.owner like ? and code_av.id" + file_ids + " order by cases.name asc"
+            cur.execute(sql, [c['cid'], owner])
+            res_av = cur.fetchall()
+            file_names_long = []
+            for r in res_text:
+                file_names_long.append(r[0])
+            for r in res_image:
+                file_names_long.append(r[0])
+            for r in res_av:
+                file_names_long.append(r[0])
+            file_code_counts = Counter(file_names_long)
+
+            for item in file_code_counts.items():
+                codes.append(c['name'])
+                cases.append(item[0])
+                counts.append(item[1])
+
+        # Create stacked bar chart
+        data = {
+            _('Codes'): codes,
+            _('Cases'): cases,
+            _('Counts'): counts
+        }
+        df = pd.DataFrame(data)
+        fig = px.bar(df,
+                     x=_("Counts"),
+                     y=_("Codes"),
+                     color=_("Cases"),
+                     orientation='h',
+                     title=title
+                     )
+        fig.show()
+
     def stacked_barchart_files_by_codes(self):
-        """ Frequency of codes in each file, cumulative across files, for each code row.
+        """ Frequency of codes in each file, cumulative across codes, for each code row.
         Index numbering matches order of options, set up in init. Need this to avoid translation issues.
 
         Sample data frame for cumulative bar chart display
@@ -518,17 +602,17 @@ class ViewCharts(QDialog):
                       " cid=? and code_text.owner like ? and fid" + file_ids + " order by source.name asc"
             cur.execute(sql, [c['cid'], owner])
             res_text = cur.fetchall()
-            sql = "select source.name, count(cid) from code_image join source on source.id=code_image.id where \
+            sql = "select source.name from code_image join source on source.id=code_image.id where \
              cid=? and code_image.owner like ? order by source.name asc"
             if file_ids != "":
-                sql = "select source.name, count(cid) from code_image join source on source.id=code_image.id where \
+                sql = "select source.name from code_image join source on source.id=code_image.id where \
                  cid=? and code_image.owner like ? and source.id" + file_ids + " order by source.name asc"
             cur.execute(sql, [c['cid'], owner])
             res_image = cur.fetchall()
-            sql = "select source.name, count(cid) from code_av join source on source.id=code_av.id where \
+            sql = "select source.name from code_av join source on source.id=code_av.id where \
             cid=? and code_av.owner like ? order by source.name asc"
             if file_ids != "":
-                sql = "select source.name, count(cid) from code_av join source on source.id=code_av.id where \
+                sql = "select source.name from code_av join source on source.id=code_av.id where \
                 cid=? and code_av.owner like ? and source.id" + file_ids + " order by source.name asc"
             cur.execute(sql, [c['cid'], owner])
             res_av = cur.fetchall()
@@ -591,17 +675,17 @@ class ViewCharts(QDialog):
                       " cid=? and code_text.owner like ? and fid" + file_ids + " order by source.name asc"
             cur.execute(sql, [c['cid'], owner])
             res_text = cur.fetchall()
-            sql = "select source.name, count(cid) from code_image join source on source.id=code_image.id where \
+            sql = "select source.name from code_image join source on source.id=code_image.id where \
              cid=? and code_image.owner like ? order by source.name asc"
             if file_ids != "":
-                sql = "select source.name, count(cid) from code_image join source on source.id=code_image.id where \
+                sql = "select source.name from code_image join source on source.id=code_image.id where \
                  cid=? and code_image.owner like ? and source.id" + file_ids + " order by source.name asc"
             cur.execute(sql, [c['cid'], owner])
             res_image = cur.fetchall()
-            sql = "select source.name, count(cid) from code_av join source on source.id=code_av.id where \
+            sql = "select source.name from code_av join source on source.id=code_av.id where \
             cid=? and code_av.owner like ? order by source.name asc"
             if file_ids != "":
-                sql = "select source.name, count(cid) from code_av join source on source.id=code_av.id where \
+                sql = "select source.name from code_av join source on source.id=code_av.id where \
                 cid=? and code_av.owner like ? and source.id" + file_ids + " order by source.name asc"
             cur.execute(sql, [c['cid'], owner])
             res_av = cur.fetchall()
