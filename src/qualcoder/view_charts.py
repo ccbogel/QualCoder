@@ -138,12 +138,12 @@ class ViewCharts(QDialog):
                              ]
         self.ui.comboBox_bar_charts.addItems(bar_combobox_list)
         stacked_bar_combobox_list = ['', _('Files by codes'),
-                             _('Codes by files'),
-                            _('Cases by codes')
+                            _('Codes by files'),
+                            _('Cases by codes'),
+                            _("Codes by cases")
                              ]
         self.ui.comboBox_cumulative_bar.addItems(stacked_bar_combobox_list)
         self.ui.comboBox_cumulative_bar.currentIndexChanged.connect(self.show_cumulative_bar_chart)
-
         categories_combobox_list = [""]
         for c in self.categories:
             categories_combobox_list.append(c['name'])
@@ -175,11 +175,9 @@ class ViewCharts(QDialog):
         self.ui.lineEdit_height.setText("600")
         self.ui.pushButton_wordcloud.setIcon(qta.icon('mdi6.play', options=[{'scale_factor': 2}]))
         self.ui.pushButton_wordcloud.pressed.connect(self.show_word_cloud)
-
         # Attributes comboboxes. Initial radio button checked is Files
         self.ui.comboBox_char_attributes.currentIndexChanged.connect(self.character_attribute_charts)
         self.ui.comboBox_num_attributes.currentIndexChanged.connect(self.numeric_attribute_charts)
-
         # Heatmaps
         heatmap_combobox_list = ["", "File", "Case"]
         self.ui.comboBox_heatmap.addItems(heatmap_combobox_list)
@@ -187,7 +185,7 @@ class ViewCharts(QDialog):
 
     # DATA FILTERS SECTION
     def select_attributes(self):
-        """ Select files based on attribute selections using DialogSecectAttributeParameters.
+        """ Select files based on attribute selections using DialogSelectAttributeParameters.
         Attribute selection results are a list of:
 
         DialogSelectAttributeParameters returns lists for each parameter selected of:
@@ -211,7 +209,6 @@ class ViewCharts(QDialog):
         Results stored in attribute_file_ids as list of file_id integers
         """
 
-        #self.attribute_case_ids = []  # TODO unsure here, Not used yet
         self.attribute_file_ids = []
         self.attributes_msg = ""
         ui = DialogSelectAttributeParameters(self.app)
@@ -369,6 +366,7 @@ class ViewCharts(QDialog):
 
     def helper_export_html(self, fig):
         """ Export chart. """
+        # TODO used by ?
 
         if self.ui.checkBox_export_html.isChecked():
             e = ExportDirectoryPathDialog(self.app, "Chart.html")
@@ -480,15 +478,96 @@ class ViewCharts(QDialog):
         if chart_type_index < 1:
             return
         self.get_selected_categories_and_codes()
-        if chart_type_index == 1:  # Files by codes
+        if chart_type_index == 1:
             self.stacked_barchart_files_by_codes()
-        if chart_type_index == 2:  # Codes by files
+        if chart_type_index == 2:
             self.stacked_barchart_codes_by_files()
-        if chart_type_index == 3:  # Cases by codes
+        if chart_type_index == 3:
             self.stacked_barchart_cases_by_codes()
-        '''if chart_type_index == 4:  # Codes by cases
-            self.barchart_codes_by_cases()'''
+        if chart_type_index == 4:
+            self.stacked_barchart_codes_by_cases()
         self.ui.comboBox_cumulative_bar.setCurrentIndex(0)
+
+    def stacked_barchart_codes_by_cases(self):
+        """ Frequency of codes in each case (file collection), cumulative, for each case row.
+        Index numbering matches order of options, set up in init. Need this to avoid translation issues.
+
+        Sample data frame for cumulative bar chart display
+        data = {
+            'Cases': ['A', 'A', 'A', 'B', 'B', 'B', 'C', 'C', 'C'],
+            'Codes': ['X', 'Y', 'Z', 'X', 'Y', 'Z', 'X', 'Y', 'Z'],
+            'Counts': [10, 15, 7, 12, 10, 8, 15, 12, 10]
+        }
+        """
+
+        title = _('Cumulative code count in cases by case')
+        owner, subtitle = self.owner_and_subtitle_helper()
+        title += subtitle
+        # if a case or file selection is made: file_ids is comma separated string of file ids
+        case_file_name, file_ids = self.get_file_ids()
+
+        # Calculate
+        cur = self.app.conn.cursor()
+        codes = []
+        cases = []
+        counts = []
+        for c in self.codes:
+            sql = "select cases.name from cases join case_text on cases.caseid = case_text.caseid " \
+                  "join code_text on code_text.fid=case_text.fid" \
+                  " where cid=? and code_text.owner like ? order by cases.name asc"
+            if file_ids != "":
+                sql = "select cases.name from cases join case_text on cases.caseid = case_text.caseid " \
+                      "join code_text on code_text.fid=case_text.fid where" \
+                      " cid=? and code_text.owner like ? and code_text.fid" + file_ids + " order by cases.name asc"
+            cur.execute(sql, [c['cid'], owner])
+            res_text = cur.fetchall()
+            sql = "select cases.name from cases join case_text on cases.caseid = case_text.caseid " \
+                  " join code_image on code_image.id=case_text.fid where \
+             cid=? and code_image.owner like ? order by cases.name asc"
+            if file_ids != "":
+                sql = "select cases.name from cases join case_text on cases.caseid = case_text.caseid " \
+                      "join code_image on code_image.id=case_text.fid where " \
+                      "cid=? and code_image.owner like ? and code_image.id" + file_ids + " order by cases.name asc"
+            cur.execute(sql, [c['cid'], owner])
+            res_image = cur.fetchall()
+            sql = "select cases.name from cases join case_text on cases.caseid = case_text.caseid " \
+            " join code_av on case_text.fid=code_av.id where \
+            cid=? and code_av.owner like ? order by cases.name asc"
+            if file_ids != "":
+                sql = "select cases.name from cases join case_text on cases.caseid = case_text.caseid " \
+                "join code_av code_av.id=case_text.fid where " \
+                "cid=? and code_av.owner like ? and code_av.id" + file_ids + " order by cases.name asc"
+            cur.execute(sql, [c['cid'], owner])
+            res_av = cur.fetchall()
+            file_names_long = []
+            for r in res_text:
+                file_names_long.append(r[0])
+            for r in res_image:
+                file_names_long.append(r[0])
+            for r in res_av:
+                file_names_long.append(r[0])
+            file_code_counts = Counter(file_names_long)
+
+            for item in file_code_counts.items():
+                codes.append(c['name'])
+                cases.append(item[0])
+                counts.append(item[1])
+
+        # Create stacked bar chart
+        data = {
+            _('Cases'): cases,
+            _('Codes'): codes,
+            _('Counts'): counts
+        }
+        df = pd.DataFrame(data)
+        fig = px.bar(df,
+                     x=_("Counts"),
+                     y=_("Cases"),
+                     color=_("Codes"),
+                     orientation='h',
+                     title=title
+                     )
+        fig.show()
 
     def stacked_barchart_cases_by_codes(self):
         """ Frequency of codes in each case (file collection), cumulative across codes, for each code row.
