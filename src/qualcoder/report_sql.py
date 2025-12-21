@@ -691,10 +691,12 @@ and attribute.name='District' -- change to case attribute name of interest \n\
 and attribute.value='north'  -- change to case attribute value of interest \n\
 and case_text.pos0 <= code_text.pos0 \n\
 and case_text.pos1 >= code_text.pos1 ",
-               '-- CODES, FILEID, CODED TEXT\nselect  code_name.name as "codename", \
-code_text.fid, code_text.pos0, code_text.pos1, code_text.seltext from code_name \
-join  code_text on code_name.cid = code_text.cid\n\
+    '-- CATEGORY, CODES, FILE NAME, CODED TEXT\n\
+select  code_cat.name as "category", code_name.name as "codename", source.name as "filename", code_text.seltext \n\
+from code_name join  code_text on code_name.cid = code_text.cid\n\
 join source on source.id=code_text.fid\n\
+left join code_cat on code_name.catid=code_cat.catid\n\
+order by code_cat.name, code_name.name asc\n\
 -- UNCOMMENT "--" LINES BELOW TO GET DETAILS FOR A CODE AND OR A FILE\n\
 -- AND codename="CODENAME" -- FILL CODENAME WITH CODE NAME\n\
 -- AND source.name="FILENAME" -- FILL FILENAME WITH FILE NAME',
