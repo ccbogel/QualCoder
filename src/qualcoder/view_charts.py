@@ -29,6 +29,7 @@ import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtWidgets import QDialog
+from PyQt6.QtGui import QIcon
 from .simple_wordcloud import Wordcloud
 
 from .GUI.ui_dialog_charts import Ui_DialogCharts
@@ -55,6 +56,7 @@ class ViewCharts(QDialog):
     attribute_file_ids = []  # For filtering based on attribute selection
     attributes_msg = ""  # Tooltip msg for filtering based on attribute selection
     attribute_case_ids_and_names = []  # Used for Case heatmaps based on attribute selection
+    stopwords_filepath = None
 
     def __init__(self, app):
         """ Set up the dialog. """
@@ -65,6 +67,7 @@ class ViewCharts(QDialog):
         self.conn = app.conn
         self.attribute_file_ids = []
         self.attributes_msg = ""
+        self.stopwords_filepath = None
         # Set up the user interface from Designer.
         self.ui = Ui_DialogCharts()
         self.ui.setupUi(self)
@@ -165,6 +168,7 @@ class ViewCharts(QDialog):
         self.ui.comboBox_wordcloud_foreground.addItems(wordcloud_foregrounds)
         wordcloud_ngram_options = ["1", "2", "3", "4"]
         self.ui.comboBox_ngrams.addItems(wordcloud_ngram_options)
+        self.ui.pushButton_stopwords.clicked.connect(self.set_stopwords_filepath)
         # QIntValidator does not use upper limits, it is based on number of digits entered. eg 999 possible
         self.ui.lineEdit_max_words.setValidator(QtGui.QIntValidator(50, 500))
         self.ui.lineEdit_max_words.setText("200")
@@ -253,6 +257,26 @@ class ViewCharts(QDialog):
         self.attributes_msg = ""
         self.ui.pushButton_attributes.setToolTip("")
         self.ui.pushButton_attributes.setIcon(QtGui.QIcon())
+
+    def set_stopwords_filepath(self):
+        """ Set stopwords from a user selected file for the word cloud.
+         This overrides exisitng stops words in simple_wordcloud,
+         and overrides stops words file in .qualcoder configuration folder."""
+
+        default_import_directory = os.path.expanduser("~")
+        response = QtWidgets.QFileDialog.getOpenFileName(None, _('Select stopwords file'),
+                                                         default_import_directory,
+                                                         "Text Files (*.txt)",
+                                                         options=QtWidgets.QFileDialog.Option.DontUseNativeDialog
+                                                         )
+        print(response)
+        if response[0] == "":
+            self.stopwords_filepath = None
+            self.ui.pushButton_stopwords.setIcon(QIcon())
+            return
+        self.stopwords_filepath = response[0]
+        self.ui.pushButton_stopwords.setToolTip(response[0])
+        self.ui.pushButton_stopwords.setIcon(qta.icon('mdi6.file-check-outline', options=[{'scale_factor': 1.3}]))
 
     def get_file_ids(self):
         """ Get file ids based on file selection or case selection.
@@ -416,7 +440,8 @@ class ViewCharts(QDialog):
         reverse_colors = self.ui.checkBox_reverse_range.isChecked()
         ngrams = int( self.ui.comboBox_ngrams.currentText())
         Wordcloud(self.app, text, width=width, height=height, max_words=max_words, background_color=background,
-                  text_color=foreground, reverse_colors=reverse_colors, ngrams=ngrams)
+                  text_color=foreground, reverse_colors=reverse_colors, ngrams=ngrams,
+                  stopwords_filepath2=self.stopwords_filepath)
 
     def codes_of_category_helper(self, category_name):
         """ Get child categories and codes of this category node.
