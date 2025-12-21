@@ -164,7 +164,7 @@ class Ui_DialogCharts(object):
         self.pushButton_wordcloud.setText("")
         self.pushButton_wordcloud.setObjectName("pushButton_wordcloud")
         self.label_width = QtWidgets.QLabel(parent=DialogCharts)
-        self.label_width.setGeometry(QtCore.QRect(380, 442, 71, 18))
+        self.label_width.setGeometry(QtCore.QRect(380, 440, 71, 18))
         self.label_width.setObjectName("label_width")
         self.label_height = QtWidgets.QLabel(parent=DialogCharts)
         self.label_height.setGeometry(QtCore.QRect(470, 440, 61, 18))
@@ -173,17 +173,17 @@ class Ui_DialogCharts(object):
         self.label_max_words.setGeometry(QtCore.QRect(560, 440, 91, 18))
         self.label_max_words.setObjectName("label_max_words")
         self.checkBox_reverse_range = QtWidgets.QCheckBox(parent=DialogCharts)
-        self.checkBox_reverse_range.setGeometry(QtCore.QRect(380, 490, 21, 20))
+        self.checkBox_reverse_range.setGeometry(QtCore.QRect(381, 490, 20, 20))
         self.checkBox_reverse_range.setText("")
         self.checkBox_reverse_range.setObjectName("checkBox_reverse_range")
         self.label_reverse_range = QtWidgets.QLabel(parent=DialogCharts)
         self.label_reverse_range.setGeometry(QtCore.QRect(410, 490, 151, 22))
         self.label_reverse_range.setObjectName("label_reverse_range")
         self.label_ngrams = QtWidgets.QLabel(parent=DialogCharts)
-        self.label_ngrams.setGeometry(QtCore.QRect(425, 523, 131, 22))
+        self.label_ngrams.setGeometry(QtCore.QRect(425, 521, 131, 22))
         self.label_ngrams.setObjectName("label_ngrams")
         self.comboBox_ngrams = QtWidgets.QComboBox(parent=DialogCharts)
-        self.comboBox_ngrams.setGeometry(QtCore.QRect(380, 520, 40, 30))
+        self.comboBox_ngrams.setGeometry(QtCore.QRect(380, 519, 40, 28))
         self.comboBox_ngrams.setObjectName("comboBox_ngrams")
         self.label_upper_count = QtWidgets.QLabel(parent=DialogCharts)
         self.label_upper_count.setGeometry(QtCore.QRect(10, 256, 241, 24))
@@ -212,6 +212,9 @@ class Ui_DialogCharts(object):
         self.comboBox_cumulative_bar = QtWidgets.QComboBox(parent=DialogCharts)
         self.comboBox_cumulative_bar.setGeometry(QtCore.QRect(10, 350, 321, 25))
         self.comboBox_cumulative_bar.setObjectName("comboBox_cumulative_bar")
+        self.pushButton_stopwords = QtWidgets.QPushButton(parent=DialogCharts)
+        self.pushButton_stopwords.setGeometry(QtCore.QRect(380, 550, 181, 28))
+        self.pushButton_stopwords.setObjectName("pushButton_stopwords")
         self.groupBox.raise_()
         self.label_info.raise_()
         self.label_pie.raise_()
@@ -263,6 +266,7 @@ class Ui_DialogCharts(object):
         self.lineEdit_count_limiter.raise_()
         self.label_cumulative_bar.raise_()
         self.comboBox_cumulative_bar.raise_()
+        self.pushButton_stopwords.raise_()
 
         self.retranslateUi(DialogCharts)
         QtCore.QMetaObject.connectSlotsByName(DialogCharts)
@@ -324,6 +328,12 @@ class Ui_DialogCharts(object):
         self.label_upper_count.setToolTip(_translate("DialogCharts", "<html><head/><body><p>This is to allow a wider spread of heatmap colours when there are extreme count differences.</p><p>0 represents no limit.</p></body></html>"))
         self.label_upper_count.setText(_translate("DialogCharts", "Upper count limiter"))
         self.label_cumulative_bar.setText(_translate("DialogCharts", "<b>Cumulative barchart</b>"))
+        self.pushButton_stopwords.setToolTip(_translate("DialogCharts", "Selecting a text file here will override exisitng stopwords in the software, and also override stopwords stored in the .qualcoder configuration folder. \n"
+"This is temporary and must be selected each time the Charts screen is opened.\n"
+"\n"
+"The file must be plain text with one word per line.\n"
+"Each word is excluded in the n-grams=1 Word cloud."))
+        self.pushButton_stopwords.setText(_translate("DialogCharts", "Stop words"))
 
 
 if __name__ == "__main__":
