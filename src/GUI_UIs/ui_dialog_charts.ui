@@ -547,7 +547,7 @@ Codings from the entire text file are used for the calculations.</string>
    <property name="geometry">
     <rect>
      <x>380</x>
-     <y>442</y>
+     <y>440</y>
      <width>71</width>
      <height>18</height>
     </rect>
@@ -585,9 +585,9 @@ Codings from the entire text file are used for the calculations.</string>
   <widget class="QCheckBox" name="checkBox_reverse_range">
    <property name="geometry">
     <rect>
-     <x>380</x>
+     <x>381</x>
      <y>490</y>
-     <width>21</width>
+     <width>20</width>
      <height>20</height>
     </rect>
    </property>
@@ -618,7 +618,7 @@ Codings from the entire text file are used for the calculations.</string>
    <property name="geometry">
     <rect>
      <x>425</x>
-     <y>523</y>
+     <y>521</y>
      <width>131</width>
      <height>22</height>
     </rect>
@@ -634,9 +634,9 @@ Codings from the entire text file are used for the calculations.</string>
    <property name="geometry">
     <rect>
      <x>380</x>
-     <y>520</y>
+     <y>519</y>
      <width>40</width>
-     <height>30</height>
+     <height>28</height>
     </rect>
    </property>
    <property name="toolTip">
@@ -734,6 +734,26 @@ Codings from the entire text file are used for the calculations.</string>
     </rect>
    </property>
   </widget>
+  <widget class="QPushButton" name="pushButton_stopwords">
+   <property name="geometry">
+    <rect>
+     <x>380</x>
+     <y>550</y>
+     <width>181</width>
+     <height>28</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>Selecting a text file here will override exisitng stopwords in the software, and also override stopwords stored in the .qualcoder configuration folder. 
+This is temporary and must be selected each time the Charts screen is opened.
+
+The file must be plain text with one word per line.
+Each word is excluded in the n-grams=1 Word cloud.</string>
+   </property>
+   <property name="text">
+    <string>Stop words</string>
+   </property>
+  </widget>
   <zorder>groupBox</zorder>
   <zorder>label_info</zorder>
   <zorder>label_pie</zorder>
@@ -785,6 +805,7 @@ Codings from the entire text file are used for the calculations.</string>
   <zorder>lineEdit_count_limiter</zorder>
   <zorder>label_cumulative_bar</zorder>
   <zorder>comboBox_cumulative_bar</zorder>
+  <zorder>pushButton_stopwords</zorder>
  </widget>
  <tabstops>
   <tabstop>checkBox_export_html</tabstop>
