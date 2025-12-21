@@ -105,10 +105,11 @@ class Wordcloud:
         text color(s): a single named colour in Pil, or a named in the named colour ranges above.
         reverse_colors: if true, reverses the order of the colour range
         trigrams: if true, use 3 word phrases in the word cloud
+        stopwords_filepath2 alternative source of stopwords
     """
 
     def __init__(self, app, fulltext, width=800, height=600, max_words=200, background_color="black",
-                 text_color="random", reverse_colors=False, ngrams=1):
+                 text_color="random", reverse_colors=False, ngrams=1, stopwords_filepath2=None):
 
         self.app = app  # Used for project path
         self.width = width
@@ -128,8 +129,10 @@ class Wordcloud:
         self.max_font_size = int(self.height / 6)  # This factor seems oK
         self.min_font_size = 10
         self.font_path = os.path.join(os.path.expanduser('~'), ".qualcoder", "DroidSansMono.ttf")
-        # Get a different stopwords file from the .qualcoder folder
+        # Get a different stopwords file from the .qualcoder folderor another source
         stopwords_file_path = os.path.join(os.path.expanduser('~'), ".qualcoder", "stopwords.txt")
+        if stopwords_filepath2 is not None:
+            stopwords_file_path = stopwords_filepath2  # provided as argument
         self.stopwords = []
         try:
             # Can get UnicodeDecode Error on Windows so using error handler
@@ -142,6 +145,7 @@ class Wordcloud:
                         break
                     self.stopwords.append(stopword.strip())  # Remove line ending
         except FileNotFoundError as err:
+            print(err)
             self.stopwords = stopwords
 
         # Remove most punctuation except apostrophe. Convert to lower case
