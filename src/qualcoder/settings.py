@@ -85,11 +85,14 @@ class DialogSettings(QtWidgets.QDialog):
         for index, ts in enumerate(timestampformats):
             if ts == self.settings['timestampformat']:
                 self.ui.comboBox_timestamp.setCurrentIndex(index)
-        speakernameformats = ["[]", "{}"]
+        # TODO Temporary hide speaker name format - later remove - in GUI ui and py files and here
+        '''speakernameformats = ["[]", "{}"]
         self.ui.comboBox_speaker.addItems(speakernameformats)
         for index, snf in enumerate(speakernameformats):
             if snf == self.settings['speakernameformat']:
-                self.ui.comboBox_speaker.setCurrentIndex(index)
+                self.ui.comboBox_speaker.setCurrentIndex(index)'''
+        self.ui.comboBox_speaker.hide()
+        self.ui.label_6.hide()
         index = self.ui.comboBox_fontsize.findText(str(self.settings['fontsize']),
                                                           QtCore.Qt.MatchFlag.MatchFixedString)
         if index == -1:
@@ -514,7 +517,8 @@ class DialogSettings(QtWidgets.QDialog):
         self.settings['language'] = self.ui.comboBox_language.currentText()[-2:]
         self.settings['codetext_chunksize'] = int(self.ui.comboBox_text_chunk_size.currentText())
         self.settings['timestampformat'] = self.ui.comboBox_timestamp.currentText()
-        self.settings['speakernameformat'] = self.ui.comboBox_speaker.currentText()
+        # TODO speakername format now not used
+        self.settings['speakernameformat'] = "[]"  # self.ui.comboBox_speaker.currentText()
         if self.ui.checkBox_auto_backup.isChecked():
             self.settings['backup_on_open'] = 'True'
         else:
