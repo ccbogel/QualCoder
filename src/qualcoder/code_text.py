@@ -96,7 +96,8 @@ class DialogCodeText(QtWidgets.QWidget):
     attributes = []  # Show selected files using these attributes in list widget
 
     # Autocode variables
-    all_first_last = "all"  # Autocode all instances or first or last in a file
+    autocode_all_first_last_within = "all"  # Autocode all instances or first or last, or within another code in a file
+    autocode_frag_all_first_within = "all"  # Autocode all instances or within another code in a file
     # A list of dictionaries of autocode history {title, list of dictionary of sql commands}
     autocode_history = []
 
@@ -155,6 +156,8 @@ class DialogCodeText(QtWidgets.QWidget):
         self.annotations = self.app.get_annotations()
         self.autocode_history = []
         self.undo_deleted_codes = []
+        self.autocode_all_first_last_within = "all"
+        self.autocode_frag_all_first_within = "all"
         self.default_new_code_color = None
         self.project_memo = False
         self.code_rule = False
@@ -264,6 +267,8 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_auto_code.customContextMenuRequested.connect(self.button_auto_code_menu)
         self.ui.pushButton_auto_code.clicked.connect(self.auto_code)
         self.ui.pushButton_auto_code_frag_this_file.setIcon(qta.icon('mdi6.magic-staff'))
+        self.ui.pushButton_auto_code_frag_this_file.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.ui.pushButton_auto_code_frag_this_file.customContextMenuRequested.connect(self.button_auto_code_frag_menu)
         self.ui.pushButton_auto_code_frag_this_file.pressed.connect(self.auto_code_sentences)
         self.ui.pushButton_auto_code_surround.setIcon(qta.icon('mdi6.spear'))
         self.ui.pushButton_auto_code_surround.pressed.connect(self.button_autocode_surround)
@@ -1035,38 +1040,100 @@ class DialogCodeText(QtWidgets.QWidget):
             return
 
     def button_auto_code_menu(self, position):
-        """ Options to auto-code all instances, first instance or last instance in a file. """
+        """ Options to auto-code all instances, first instance or last instance in a file.
+        For Exact text matches. """
 
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         msg = ""
-        if self.all_first_last == "all":
+        if self.autocode_all_first_last_within == "all":
             msg = " *"
         else:
             msg = ""
         action_all = QtGui.QAction(_("all matches in file") + msg)
-        if self.all_first_last == "first":
+        if self.autocode_all_first_last_within == "first":
             msg = " *"
         else:
             msg = ""
         action_first = QtGui.QAction(_("first match in file") + msg)
-        if self.all_first_last == "last":
+        if self.autocode_all_first_last_within == "last":
             msg = " *"
         else:
             msg = ""
         action_last = QtGui.QAction(_("last match in file") + msg)
+        if self.autocode_all_first_last_within.startswith("code_within_code "):
+            msg = f" * cid:{self.autocode_all_first_last_within.split(' ')[1]}"
+        else:
+            msg = ""
+        action_code_within_code = QtGui.QAction(_("code within code") + msg)
         menu.addAction(action_all)
         menu.addAction(action_first)
         menu.addAction(action_last)
+        menu.addAction(action_code_within_code)
         action = menu.exec(self.ui.pushButton_auto_code.mapToGlobal(position))
         if action is None:
             return
         if action == action_all:
-            self.all_first_last = "all"
+            self.autocode_all_first_last_within = "all"
         if action == action_first:
-            self.all_first_last = "first"
+            self.autocode_all_first_last_within = "first"
         if action == action_last:
-            self.all_first_last = "last"
+            self.autocode_all_first_last_within = "last"
+        if action == action_code_within_code:
+            ui = DialogSelectItems(self.app, self.codes, _("Select code"), "single")
+            ok = ui.exec()
+            if not ok:
+                return
+            code_ = ui.get_selected()
+            if not code_:
+                return
+            self.autocode_all_first_last_within = f"code_within_code {code_['cid']}"
+
+    def button_auto_code_frag_menu(self, position):
+        """ Options to auto-code all instances, first instance or last instance in a file.
+        For fragments of a sentence to code the full sentence. """
+
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        msg = ""
+        if self.autocode_frag_all_first_within == "all":
+            msg = " *"
+        else:
+            msg = ""
+        action_all = QtGui.QAction(_("all matches in file") + msg)
+        if self.autocode_frag_all_first_within == "first":
+            msg = " *"
+        else:
+            msg = ""
+        action_first = QtGui.QAction(_("first match in file") + msg)
+        if self.autocode_frag_all_first_within == "last":
+            msg = " *"
+        else:
+            msg = ""
+        if self.autocode_frag_all_first_within.startswith("code_within_code "):
+            msg = f" * cid:{self.autocode_frag_all_first_within.split(' ')[1]}"
+        else:
+            msg = ""
+        action_code_within_code = QtGui.QAction(_("code within code") + msg)
+        menu.addAction(action_all)
+        menu.addAction(action_first)
+        menu.addAction(action_code_within_code)
+        action = menu.exec(self.ui.pushButton_auto_code.mapToGlobal(position))
+        if action is None:
+            return
+        if action == action_all:
+            self.autocode_frag_all_first_within = "all"
+        if action == action_first:
+            self.autocode_frag_all_first_within = "first"
+        if action == action_code_within_code:
+            ui = DialogSelectItems(self.app, self.codes, _("Select code"), "single")
+            ok = ui.exec()
+            if not ok:
+                return
+            code_ = ui.get_selected()
+            if not code_:
+                return
+            self.autocode_frag_all_first_within = f"code_within_code {code_['cid']}"
 
     def text_edit_recent_codes_menu(self, position):
         """ Alternative context menu.
@@ -3967,6 +4034,7 @@ class DialogCodeText(QtWidgets.QWidget):
         """ Code full sentence based on text fragment.
         Activated via self.ui.pushButton_auto_code_frag_this_file
         Opens a dialog to select text files for autocoding.
+        Button Right-click options are: all (default), first, last, code within code.
         """
 
         ui = DialogSelectItems(self.app, self.filenames, _("Select files to code"), "many")
@@ -4032,33 +4100,54 @@ class DialogCodeText(QtWidgets.QWidget):
                 sentences = f['fulltext'].split(ending)
                 pos0 = 0
                 codes_added = 0
+                surround_codes = []
+                if self.autocode_frag_all_first_within.startswith("code_within_code"):
+                    cur.execute("select pos0,pos1 from code_text where cid=? and fid=? and owner=?",
+                                [int(self.autocode_frag_all_first_within.split()[1]), f['id'], self.app.settings['codername']])
+                    surround_codes = cur.fetchall()
+                    #print("Outer cid", int(self.autocode_frag_all_within.split()[1]))
+                    #for s in surround_codes:
+                    #    print(s)
+                    if not surround_codes:
+                        return
+
                 for sentence in sentences:
                     if (find_text in sentence and not regex_pattern) or (regex_pattern and regex_pattern.search(sentence)):
                         i = {'cid': cid, 'fid': int(f['id']), 'seltext': str(sentence),
                              'pos0': pos0, 'pos1': pos0 + len(sentence),
                              'owner': self.app.settings['codername'], 'memo': "",
                              'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")}
-                        # Possible IntegrityError: UNIQUE constraint failed
-                        try:
-                            codes_added += 1
-                            cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,\
-                                owner,memo,date) values(?,?,?,?,?,?,?,?)",
-                                        (i['cid'], i['fid'], i['seltext'], i['pos0'],
-                                         i['pos1'], i['owner'], i['memo'], i['date']))
-                            # Record a list of undo sql
-                            undo = {
-                                "sql": "delete from code_text where cid=? and fid=? and pos0=? and pos1=? and owner=?",
-                                "cid": i['cid'], "fid": i['fid'], "pos0": i['pos0'], "pos1": i['pos1'],
-                                "owner": i['owner']
-                            }
-                            undo_list.append(undo)
-                        except Exception as e:
-                            print("Autocode insert error ", str(e))
-                            logger.debug(_("Autocode insert error ") + str(e))
-                    pos0 += len(sentence) + len(ending)
+                        # For code within a code, if selected
+                        found_code_in_code = False
+                        if self.autocode_frag_all_first_within.startswith("code_within_code"):
+                            for surround_code in surround_codes:
+                                if i['pos0'] >= surround_code[0] and i['pos1'] <= surround_code[1]:
+                                    found_code_in_code = True
+                                    #print("Found", surround_code[0], "[", i['pos0'], i['pos1'], "]", surround_code[1], sentence)
+
+                        if self.autocode_frag_all_first_within in ("all", "first") or found_code_in_code:
+                            try:
+                                codes_added += 1
+                                cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,\
+                                    owner,memo,date) values(?,?,?,?,?,?,?,?)",
+                                            (i['cid'], i['fid'], i['seltext'], i['pos0'],
+                                             i['pos1'], i['owner'], i['memo'], i['date']))
+                                # Store a list of undo sql
+                                undo = {
+                                    "sql": "delete from code_text where cid=? and fid=? and pos0=? and pos1=? and owner=?",
+                                    "cid": i['cid'], "fid": i['fid'], "pos0": i['pos0'], "pos1": i['pos1'],
+                                    "owner": i['owner']
+                                }
+                                undo_list.append(undo)
+                                self.app.conn.commit()
+                            except Exception as e:  # Possible Unique constraint fail
+                                print("Autocode insert error ", str(e))
+                                logger.debug(_("Autocode insert error ") + str(e))
+                    pos0 += len(sentence) + len(ending)  # move forward
+                    if codes_added == 1 and self.autocode_frag_all_first_within == "first":
+                        break
                 if codes_added > 0:
                     msg += _("File: ") + f"{f['name']} {codes_added}" + _(" added codes") + "\n"
-            self.app.conn.commit()
         except Exception as e_:
             print(e_)
             self.app.conn.rollback()  # revert all changes
@@ -4082,8 +4171,8 @@ class DialogCodeText(QtWidgets.QWidget):
 
     def auto_code(self):
         """ Autocode text in one file or all files with currently selected code.
-        Button menu option to auto-code all, first or last instances in files.
-        Split multiple find textx with pipe |
+        Button menu option to auto-code all, first or last instances in files, or to code within an existing code.
+        Split multiple find texts with pipe |
         Activated using self.ui.pushButton_auto_code
         """
 
@@ -4164,13 +4253,30 @@ class DialogCodeText(QtWidgets.QWidget):
                         text_starts = [match.start() for match in re.finditer(re.escape(find_txt), file_text)]
                         text_ends = [match.end() for match in re.finditer(re.escape(find_txt), file_text)]
 
-                    # Trim to first or last instance if option selected
-                    if self.all_first_last == "first" and len(text_starts) > 1:
+                    # Trim to first instance if option selected
+                    if self.autocode_all_first_last_within == "first" and len(text_starts) > 1:
                         text_starts = [text_starts[0]]
                         text_ends = [text_ends[0]]
-                    if self.all_first_last == "last" and len(text_starts) > 1:
+                    # Trim to last instance if option selected
+                    if self.autocode_all_first_last_within == "last" and len(text_starts) > 1:
                         text_starts = [text_starts[-1]]
                         text_ends = [text_ends[-1]]
+                    # Trim to within_existing_code instances if this option is selected
+                    if self.autocode_all_first_last_within.startswith("code_within_code"):
+                        cur.execute("select pos0,pos1 from code_text where cid=? and fid=? and owner=?",
+                                    [int(self.autocode_all_first_last_within.split()[1]), f['id'], self.app.settings['codername']])
+                        res = cur.fetchall()
+                        within_starts = []
+                        within_ends = []
+                        for r in res:
+                            for i in range(0, len(text_starts)):
+                                if text_starts[i] >= r[0] and text_ends[i] <= r[1]:
+                                    within_starts.append(text_starts[i])
+                                    within_ends.append(text_ends[i])
+                        text_starts = within_starts
+                        text_ends = within_ends
+                    if not text_starts:
+                        return
 
                     # Add new items to database
                     for index in range(len(text_starts)):
@@ -4190,6 +4296,7 @@ class DialogCodeText(QtWidgets.QWidget):
                                 "owner": item['owner']}
                             undo_list.append(undo)
                         except sqlite3.IntegrityError as e:
+                            #print(_("Autocode insert error ") + str(e))  # Possible a duplicate entry
                             logger.debug(_("Autocode insert error ") + str(e))
                         self.app.delete_backup = False
                 self.app.conn.commit()
