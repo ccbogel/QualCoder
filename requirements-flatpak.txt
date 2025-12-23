@@ -119,7 +119,7 @@ langchain-classic==1.0.0
     # via langchain-community
 langchain-community==0.4.1
     # via qualcoder
-langchain-core==1.1.0
+langchain-core==1.2.5
     # via
     #   langchain
     #   langchain-classic
