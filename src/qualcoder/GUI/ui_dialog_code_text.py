@@ -414,7 +414,8 @@ class Ui_Dialog_code_text(object):
         self.pushButton_next.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>Next</p></body></html>"))
         self.label_search_all_files.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>Search text. All text files.</p></body></html>"))
         self.label_search_case_sensitive.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>Search text. Case sensitive</p></body></html>"))
-        self.pushButton_auto_code_frag_this_file.setToolTip(_translate("Dialog_code_text", "Text fragment to auto code sentences."))
+        self.pushButton_auto_code_frag_this_file.setToolTip(_translate("Dialog_code_text", "Text fragment to auto code sentences.\n"
+"Right click for options: all (default), first, code within code."))
         self.pushButton_auto_code_undo.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>Undo auto coding</p></body></html>"))
         self.pushButton_delete_all_codes.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>Delete all codes by this coder from this file</p></body></html>"))
         self.pushButton_annotate.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>Annotate selection</p></body></html>"))
