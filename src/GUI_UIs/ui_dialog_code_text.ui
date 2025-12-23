@@ -614,7 +614,11 @@ https://www.datacamp.com/cheat-sheet/regular-expresso</string>
        </rect>
       </property>
       <property name="toolTip">
-       <string>Mark speakers</string>
+       <string>Mark speakers.
+Limited to names up to 63 characters long. 
+The name must be at the start of a new line.
+Formatted like below for name detection.
+Name:</string>
       </property>
       <property name="text">
        <string/>
