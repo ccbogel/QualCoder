@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'c:\Users\kai\Documents\Programmierung\QualCoderOrig\QualCoder\src\GUI_UIs\ui_dialog_code_text.ui'
+# Form implementation generated from reading ui file 'ui_dialog_code_text.ui'
 #
 # Created by: PyQt6 UI code generator 6.9.1
 #
@@ -455,7 +455,11 @@ class Ui_Dialog_code_text(object):
         self.checkBox_auto_regex.setToolTip(_translate("Dialog_code_text", "Apply REGEX to autocoding for exact text and sentences buttons.\n"
 "https://www.datacamp.com/cheat-sheet/regular-expresso"))
         self.checkBox_auto_regex.setText(_translate("Dialog_code_text", "REGEX"))
-        self.pushButton_mark_speakers.setToolTip(_translate("Dialog_code_text", "Mark speakers"))
+        self.pushButton_mark_speakers.setToolTip(_translate("Dialog_code_text", "Mark speakers.\n"
+"Limited to names up to 63 characters long. \n"
+"The name must be at the start of a new line.\n"
+"Formatted like below for name detection.\n"
+"Name:"))
         self.pushButton_exit_edit.setToolTip(_translate("Dialog_code_text", "Exit Edit text "))
         self.pushButton_latest.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>File with latest coding</p></body></html>"))
         self.pushButton_bookmark_go.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>Go to bookmark</p></body></html>"))
@@ -478,3 +482,13 @@ class Ui_Dialog_code_text(object):
         self.pushButton_journal.setToolTip(_translate("Dialog_code_text", "Current journal"))
         self.pushButton_project_memo.setToolTip(_translate("Dialog_code_text", "Project memo"))
         self.label_info.setText(_translate("Dialog_code_text", "."))
+
+
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    Dialog_code_text = QtWidgets.QDialog()
+    ui = Ui_Dialog_code_text()
+    ui.setupUi(Dialog_code_text)
+    Dialog_code_text.show()
+    sys.exit(app.exec())
