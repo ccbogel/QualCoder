@@ -1821,7 +1821,7 @@ Click "Yes" to start now.')
         """
 
         self.ui.label_manage.hide()
-        ui = DialogManageFiles(self.app, self.ui.textEdit, self.ui.tab_coding, self.ui.tab_reports)
+        ui = DialogManageFiles(self.app, self.ui.textEdit, self.ui.tab_coding, self.ui.tab_reports, self)
         self.tab_layout_helper(self.ui.tab_manage, ui)
 
     def manage_bad_file_links(self):
@@ -1867,7 +1867,12 @@ Click "Yes" to start now.')
                 if doc_id is not None:
                     ui.open_doc_selection(doc_id, doc_sel_start, doc_sel_end)
             elif task == 'ai_search':
-                ui.ui.tabWidget.setCurrentWidget(ui.ui.tab_ai)               
+                ui.ui.tabWidget.setCurrentWidget(ui.ui.tab_ai)
+            elif task == 'mark_speakers':
+                ui.ui.tabWidget.setCurrentWidget(ui.ui.tab_docs)
+                if doc_id is not None:
+                    ui.open_doc_selection(doc_id, doc_sel_start, doc_sel_end)
+                    ui.mark_speakers()                               
         else:
             msg = _("This project contains no text files.")
             Message(self.app, _('No text files'), msg).exec()

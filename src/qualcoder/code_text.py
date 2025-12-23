@@ -262,6 +262,8 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_coding_memo.pressed.connect(self.coded_text_memo)
         self.ui.pushButton_show_memos.setIcon(qta.icon('mdi6.text-search', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_show_memos.pressed.connect(self.show_memos)
+        self.ui.pushButton_mark_speakers.setIcon(qta.icon('mdi6.pin-outline', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_mark_speakers.pressed.connect(self.mark_speakers)
         self.ui.pushButton_auto_code.setIcon(qta.icon('mdi6.mace'))
         self.ui.pushButton_auto_code.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.pushButton_auto_code.customContextMenuRequested.connect(self.button_auto_code_menu)
@@ -3407,9 +3409,12 @@ class DialogCodeText(QtWidgets.QWidget):
                 break
             
     def mark_speakers(self):
-        ui_speaker = DialogSpeakers(self.app, self.file_['id'], self.file_['name'])
-        if ui_speaker.exec() == QtWidgets.QDialog.DialogCode.Accepted:
-            self.update_dialog_codes_and_categories()
+        if self.file_ is not None: 
+            ui_speaker = DialogSpeakers(self.app, self.file_['id'], self.file_['name'])
+            if ui_speaker.exec() == QtWidgets.QDialog.DialogCode.Accepted:
+                self.update_dialog_codes_and_categories()
+        else:
+            Message(self.app, _('Mark speakers'), _('No text file selected.'), 'critical').exec()
 
     def listwidgetitem_view_file(self):
         """ When listwidget item is pressed load the file.

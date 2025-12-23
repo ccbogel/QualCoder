@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'ui_dialog_code_text.ui'
+# Form implementation generated from reading ui file 'c:\Users\kai\Documents\Programmierung\QualCoderOrig\QualCoder\src\GUI_UIs\ui_dialog_code_text.ui'
 #
 # Created by: PyQt6 UI code generator 6.9.1
 #
@@ -21,7 +21,7 @@ class Ui_Dialog_code_text(object):
         self.groupBox.setTitle("")
         self.groupBox.setObjectName("groupBox")
         self.pushButton_auto_code = QtWidgets.QPushButton(parent=self.groupBox)
-        self.pushButton_auto_code.setGeometry(QtCore.QRect(530, 0, 28, 28))
+        self.pushButton_auto_code.setGeometry(QtCore.QRect(570, 0, 28, 28))
         self.pushButton_auto_code.setText("")
         self.pushButton_auto_code.setObjectName("pushButton_auto_code")
         self.label_coder = QtWidgets.QLabel(parent=self.groupBox)
@@ -70,11 +70,11 @@ class Ui_Dialog_code_text(object):
         self.label_search_case_sensitive.setWordWrap(True)
         self.label_search_case_sensitive.setObjectName("label_search_case_sensitive")
         self.pushButton_auto_code_frag_this_file = QtWidgets.QPushButton(parent=self.groupBox)
-        self.pushButton_auto_code_frag_this_file.setGeometry(QtCore.QRect(560, 0, 28, 28))
+        self.pushButton_auto_code_frag_this_file.setGeometry(QtCore.QRect(600, 0, 28, 28))
         self.pushButton_auto_code_frag_this_file.setText("")
         self.pushButton_auto_code_frag_this_file.setObjectName("pushButton_auto_code_frag_this_file")
         self.pushButton_auto_code_undo = QtWidgets.QPushButton(parent=self.groupBox)
-        self.pushButton_auto_code_undo.setGeometry(QtCore.QRect(620, 0, 28, 28))
+        self.pushButton_auto_code_undo.setGeometry(QtCore.QRect(660, 0, 28, 28))
         self.pushButton_auto_code_undo.setText("")
         self.pushButton_auto_code_undo.setObjectName("pushButton_auto_code_undo")
         self.pushButton_delete_all_codes = QtWidgets.QPushButton(parent=self.groupBox)
@@ -90,7 +90,7 @@ class Ui_Dialog_code_text(object):
         self.pushButton_coding_memo.setText("")
         self.pushButton_coding_memo.setObjectName("pushButton_coding_memo")
         self.label_font_size = QtWidgets.QLabel(parent=self.groupBox)
-        self.label_font_size.setGeometry(QtCore.QRect(410, 2, 24, 24))
+        self.label_font_size.setGeometry(QtCore.QRect(450, 2, 24, 24))
         self.label_font_size.setAutoFillBackground(False)
         self.label_font_size.setText("")
         self.label_font_size.setAlignment(QtCore.Qt.AlignmentFlag.AlignRight|QtCore.Qt.AlignmentFlag.AlignTrailing|QtCore.Qt.AlignmentFlag.AlignVCenter)
@@ -104,7 +104,7 @@ class Ui_Dialog_code_text(object):
         self.label_search_regex.setWordWrap(True)
         self.label_search_regex.setObjectName("label_search_regex")
         self.pushButton_auto_code_surround = QtWidgets.QPushButton(parent=self.groupBox)
-        self.pushButton_auto_code_surround.setGeometry(QtCore.QRect(590, 0, 28, 28))
+        self.pushButton_auto_code_surround.setGeometry(QtCore.QRect(630, 0, 28, 28))
         self.pushButton_auto_code_surround.setText("")
         self.pushButton_auto_code_surround.setObjectName("pushButton_auto_code_surround")
         self.pushButton_help = QtWidgets.QPushButton(parent=self.groupBox)
@@ -145,7 +145,7 @@ class Ui_Dialog_code_text(object):
         self.pushButton_default_new_code_color.setText("")
         self.pushButton_default_new_code_color.setObjectName("pushButton_default_new_code_color")
         self.comboBox_fontsize = QtWidgets.QComboBox(parent=self.groupBox)
-        self.comboBox_fontsize.setGeometry(QtCore.QRect(440, 0, 61, 26))
+        self.comboBox_fontsize.setGeometry(QtCore.QRect(480, 0, 61, 26))
         self.comboBox_fontsize.setObjectName("comboBox_fontsize")
         self.comboBox_fontsize.addItem("")
         self.comboBox_fontsize.addItem("")
@@ -160,8 +160,12 @@ class Ui_Dialog_code_text(object):
         self.pushButton_right_side_pane.setText("")
         self.pushButton_right_side_pane.setObjectName("pushButton_right_side_pane")
         self.checkBox_auto_regex = QtWidgets.QCheckBox(parent=self.groupBox)
-        self.checkBox_auto_regex.setGeometry(QtCore.QRect(651, 5, 111, 20))
+        self.checkBox_auto_regex.setGeometry(QtCore.QRect(691, 5, 111, 20))
         self.checkBox_auto_regex.setObjectName("checkBox_auto_regex")
+        self.pushButton_mark_speakers = QtWidgets.QPushButton(parent=self.groupBox)
+        self.pushButton_mark_speakers.setGeometry(QtCore.QRect(400, 0, 28, 28))
+        self.pushButton_mark_speakers.setText("")
+        self.pushButton_mark_speakers.setObjectName("pushButton_mark_speakers")
         self.verticalLayout.addWidget(self.groupBox)
         self.groupBox_edit_mode = QtWidgets.QGroupBox(parent=Dialog_code_text)
         self.groupBox_edit_mode.setMinimumSize(QtCore.QSize(0, 80))
@@ -451,6 +455,7 @@ class Ui_Dialog_code_text(object):
         self.checkBox_auto_regex.setToolTip(_translate("Dialog_code_text", "Apply REGEX to autocoding for exact text and sentences buttons.\n"
 "https://www.datacamp.com/cheat-sheet/regular-expresso"))
         self.checkBox_auto_regex.setText(_translate("Dialog_code_text", "REGEX"))
+        self.pushButton_mark_speakers.setToolTip(_translate("Dialog_code_text", "Mark speakers"))
         self.pushButton_exit_edit.setToolTip(_translate("Dialog_code_text", "Exit Edit text "))
         self.pushButton_latest.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>File with latest coding</p></body></html>"))
         self.pushButton_bookmark_go.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>Go to bookmark</p></body></html>"))
@@ -473,13 +478,3 @@ class Ui_Dialog_code_text(object):
         self.pushButton_journal.setToolTip(_translate("Dialog_code_text", "Current journal"))
         self.pushButton_project_memo.setToolTip(_translate("Dialog_code_text", "Project memo"))
         self.label_info.setText(_translate("Dialog_code_text", "."))
-
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    Dialog_code_text = QtWidgets.QDialog()
-    ui = Ui_Dialog_code_text()
-    ui.setupUi(Dialog_code_text)
-    Dialog_code_text.show()
-    sys.exit(app.exec())

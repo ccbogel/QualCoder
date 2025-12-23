@@ -86,12 +86,13 @@ class DialogManageFiles(QtWidgets.QDialog):
     CASE_COLUMN = 4
     ATTRIBUTE_START_COLUMN = 5
 
-    def __init__(self, app, parent_text_edit, tab_coding, tab_reports):
+    def __init__(self, app, parent_text_edit, tab_coding, tab_reports, main_window: QtWidgets.QMainWindow):
 
         self.app = app
         self.parent_text_edit = parent_text_edit
         self.tab_coding = tab_coding  # Tab widget coding for updates
         self.tab_reports = tab_reports  # Tab widget reports for updates
+        self.main_window = main_window
         self.rows_hidden = []  # For save display profile, as column_name \t operator \t value
         self.source = []  # Dictionaries of source files
         self.header_labels = []
@@ -497,6 +498,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         action_delete = None
         action_export_to_linked = None
         action_import_linked = None
+        action_mark_speakers = None
         if col == self.NAME_COLUMN:
             action_rename = menu.addAction(_("Rename database entry"))
             action_export = menu.addAction(_("Export"))
@@ -505,6 +507,8 @@ class DialogManageFiles(QtWidgets.QDialog):
                 action_export_to_linked = menu.addAction(_("Move file to externally linked file"))
             if mediapath is not None and mediapath != "" and mediapath[0] != "/":
                 action_import_linked = menu.addAction(_("Import linked file"))
+            if mediapath is not None and len(mediapath) > 6 and (mediapath[:6] == '/docs/' or mediapath[:5] == 'docs:'):
+                action_mark_speakers = menu.addAction(_('Mark speakers'))
         action_show_all = None
         if self.rows_hidden:
             action_show_all = menu.addAction(_("Show all rows Ctrl A"))
@@ -634,6 +638,9 @@ class DialogManageFiles(QtWidgets.QDialog):
                 return
             cb = QtWidgets.QApplication.clipboard()
             cb.setText(vancouver[0]['vancouver'].replace("\n", " "))
+        if action == action_mark_speakers:
+            self.main_window.text_coding(task='mark_speakers', 
+                                         doc_id=int(id_))
 
     def pdf_to_images(self, mediapath):
         """ Turn pdf to an image for each page. """

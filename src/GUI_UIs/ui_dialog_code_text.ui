@@ -34,7 +34,7 @@
      <widget class="QPushButton" name="pushButton_auto_code">
       <property name="geometry">
        <rect>
-        <x>530</x>
+        <x>570</x>
         <y>0</y>
         <width>28</width>
         <height>28</height>
@@ -224,7 +224,7 @@ Right click for options: all, first, last, within another code.</string>
      <widget class="QPushButton" name="pushButton_auto_code_frag_this_file">
       <property name="geometry">
        <rect>
-        <x>560</x>
+        <x>600</x>
         <y>0</y>
         <width>28</width>
         <height>28</height>
@@ -241,7 +241,7 @@ Right click for options: all (default), first, code within code.</string>
      <widget class="QPushButton" name="pushButton_auto_code_undo">
       <property name="geometry">
        <rect>
-        <x>620</x>
+        <x>660</x>
         <y>0</y>
         <width>28</width>
         <height>28</height>
@@ -305,7 +305,7 @@ Right click for options: all (default), first, code within code.</string>
      <widget class="QLabel" name="label_font_size">
       <property name="geometry">
        <rect>
-        <x>410</x>
+        <x>450</x>
         <y>2</y>
         <width>24</width>
         <height>24</height>
@@ -355,7 +355,7 @@ Right click for options: all (default), first, code within code.</string>
      <widget class="QPushButton" name="pushButton_auto_code_surround">
       <property name="geometry">
        <rect>
-        <x>590</x>
+        <x>630</x>
         <y>0</y>
         <width>28</width>
         <height>28</height>
@@ -524,7 +524,7 @@ As all assigned positions may be incorrect. </string>
      <widget class="QComboBox" name="comboBox_fontsize">
       <property name="geometry">
        <rect>
-        <x>440</x>
+        <x>480</x>
         <y>0</y>
         <width>61</width>
         <height>26</height>
@@ -590,7 +590,7 @@ As all assigned positions may be incorrect. </string>
      <widget class="QCheckBox" name="checkBox_auto_regex">
       <property name="geometry">
        <rect>
-        <x>651</x>
+        <x>691</x>
         <y>5</y>
         <width>111</width>
         <height>20</height>
@@ -602,6 +602,22 @@ https://www.datacamp.com/cheat-sheet/regular-expresso</string>
       </property>
       <property name="text">
        <string>REGEX</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_mark_speakers">
+      <property name="geometry">
+       <rect>
+        <x>400</x>
+        <y>0</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Mark speakers</string>
+      </property>
+      <property name="text">
+       <string/>
       </property>
      </widget>
     </widget>
