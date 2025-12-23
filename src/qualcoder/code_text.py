@@ -49,6 +49,7 @@ from .reports import DialogReportCoderComparisons, DialogReportCodeFrequencies  
 from .report_codes import DialogReportCodes
 from .report_code_summary import DialogReportCodeSummary  # For isinstance()
 from .select_items import DialogSelectItems  # For isinstance()
+from .speakers import DialogSpeakers
 from .ai_search_dialog import DialogAiSearch
 from .ai_prompts import PromptsList, DialogAiEditPrompts
 from .ai_chat import ai_chat_signal_emitter
@@ -3092,6 +3093,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 action_prev_chars = menu.addAction(
                     str(self.app.settings['codetext_chunksize']) + _(" previous  characters"))
         action_go_to_bookmark = menu.addAction(_("Go to bookmark"))
+        action_mark_speakers = menu.addAction(_("Mark speakers"))
         action = menu.exec(self.ui.listWidget.mapToGlobal(position))
         if action is None:
             return
@@ -3115,6 +3117,8 @@ class DialogCodeText(QtWidgets.QWidget):
             self.show_case_files()
         if action == action_show_by_attribute:
             self.get_files_from_attributes()
+        if action == action_mark_speakers:
+            self.mark_speakers()
 
     def view_original_text_file(self):
         """ View original text file.
@@ -3334,6 +3338,11 @@ class DialogCodeText(QtWidgets.QWidget):
                 except Exception as e:
                     logger.debug(str(e))
                 break
+            
+    def mark_speakers(self):
+        ui_speaker = DialogSpeakers(self.app, self.file_['id'], self.file_['name'])
+        if ui_speaker.exec() == QtWidgets.QDialog.DialogCode.Accepted:
+            self.update_dialog_codes_and_categories()
 
     def listwidgetitem_view_file(self):
         """ When listwidget item is pressed load the file.
@@ -4888,7 +4897,7 @@ class DialogCodeText(QtWidgets.QWidget):
             selected_id = int(code_item.text(1).split(':')[1])
             selected_is_code = True
 
-        ui = DialogAiSearch(self.app, 'search', selected_id, selected_is_code)
+        ui = DialogAiSearch(self.app, 'search', selected_id, selected_is_code, self.tree_sort_option)
         ret = ui.exec()
         if ret == QtWidgets.QDialog.DialogCode.Accepted:
             self.ai_search_code_name = ui.selected_code_name

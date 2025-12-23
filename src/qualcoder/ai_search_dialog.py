@@ -51,7 +51,7 @@ class DialogAiSearch(QtWidgets.QDialog):
     selected_file_ids = []
     current_prompt = None
 
-    def __init__(self, app_, context, selected_id=-1, selected_is_code=True):
+    def __init__(self, app_, context, selected_id=-1, selected_is_code=True, tree_sort_option="all asc"):
         """Initializes the dialog
 
         Args:
@@ -70,6 +70,7 @@ class DialogAiSearch(QtWidgets.QDialog):
         self.case_ids = ""
         self.files = []
         self.cases = []
+        self.tree_sort_option = tree_sort_option
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_AiSearch()
         self.ui.setupUi(self)
@@ -279,6 +280,10 @@ class DialogAiSearch(QtWidgets.QDialog):
                 it += 1
                 item = it.value()
                 count += 1
+        if self.tree_sort_option == "all asc":
+            self.ui.treeWidget.sortByColumn(0, QtCore.Qt.SortOrder.AscendingOrder)
+        if self.tree_sort_option == "all desc":
+            self.ui.treeWidget.sortByColumn(0, QtCore.Qt.SortOrder.DescendingOrder)
         self.fill_code_counts_in_tree()
         self.ui.treeWidget.expandAll()    
 
