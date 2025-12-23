@@ -4580,24 +4580,20 @@ class DialogViewAV(QtWidgets.QDialog):
             self.add_speaker_names_to_label()
 
     def insert_speakername(self, key):
-        """ Insert speaker name using settings format of {} or []
-        param:
+        """ Insert speaker name using format 'name: '
+        Up to 8 speakers can be selected from, 1 - 8.
+        args:
             key: """
 
         list_pos = key - 49
-        speaker = ""
         try:
             speaker = self.speaker_list[list_pos]
         except IndexError:
             return False
-        if self.app.settings['speakernameformat'] == "[]":
-            speaker = '[' + speaker + ']'
-        else:
-            speaker = '{' + speaker + '}'
-        self.ui.textEdit.insertPlainText(speaker)
+        self.ui.textEdit.insertPlainText(f"\n{speaker}: ")
 
     def insert_timestamp(self):
-        """ Insert timestamp using current format.
+        """ Insert timestamp using settings format.
         Format options:
         [mm.ss], [mm:ss], [hh.mm.ss], [hh:mm:ss],
         {hh.mm.ss}, #hh:mm:ss.sss#
@@ -4625,7 +4621,7 @@ class DialogViewAV(QtWidgets.QDialog):
             if len(tms_str) > 2:
                 msecs = tms_str[-3:]
             ts += f'#{hours}:{mins}:{secs}.{msecs}#'
-        self.ui.textEdit.insertPlainText(f"\n{ts} ")
+        self.ui.textEdit.insertPlainText(f"{ts}\n")
         # Code here makes the current text location visible on the textEdit pane
         text_cursor = self.ui.textEdit.textCursor()
         pos = text_cursor.position()
@@ -4636,7 +4632,7 @@ class DialogViewAV(QtWidgets.QDialog):
         """ Add speaker names to label, four on each line.
         Called by init, delete_speakernames, add_speakernames """
 
-        txt = ""
+        txt = "Ctrl "
         for i, n in enumerate(self.speaker_list):
             if i == 4:
                 txt += "\n"
