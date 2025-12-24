@@ -1074,7 +1074,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                   "order by mediapath"
         if order_by == "casename":
             sql = "select distinct source.name, source.id, source.fulltext, source.mediapath, ifnull(source.memo,''), "
-            sql += "source.owner, source.date, av_text_id "
+            sql += "source.owner, source.date, av_text_id, risid "
             sql += "from source left join case_text on source.id=case_text.fid "
             sql += "left join cases on cases.caseid=case_text.caseid "
             sql += "order by cases.name, source.name "
