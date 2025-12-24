@@ -4586,7 +4586,7 @@ class DialogViewAV(QtWidgets.QDialog):
             self.add_speaker_names_to_label()
 
     def insert_speakername(self, key):
-        """ Insert speaker name using format 'name: '
+        """ Insert speaker name using a settings format [name] {name} name:
         Up to 8 speakers can be selected from, 1 - 8.
         args:
             key: """
@@ -4596,7 +4596,12 @@ class DialogViewAV(QtWidgets.QDialog):
             speaker = self.speaker_list[list_pos]
         except IndexError:
             return False
-        self.ui.textEdit.insertPlainText(f"\n{speaker}: ")
+        if self.app.settings['speakernameformat'] == ":":
+            self.ui.textEdit.insertPlainText(f"\n{speaker}: ")
+        if self.app.settings['speakernameformat'] == "[]":
+            self.ui.textEdit.insertPlainText(f"\n[{speaker}] ")
+        if self.app.settings['speakernameformat'] == "{}":
+            self.ui.textEdit.insertPlainText(f"\n{{{speaker}}} ")
 
     def insert_timestamp(self):
         """ Insert timestamp using settings format.
