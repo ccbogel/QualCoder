@@ -494,21 +494,27 @@ class DialogCodeText(QtWidgets.QWidget):
         self.filenames = self.app.get_text_filenames(ids)
         # Fill additional details about each file in the memo
         cur = self.app.conn.cursor()
-        sql = "select length(fulltext), fulltext from source where id=?"
+        sql_length = "select length(fulltext), fulltext from source where id=?"
         sql_codings = "select count(cid) from code_text where fid=? and owner=?"
+        sql_case = "SELECT group_concat(cases.name) from cases join case_text on case_text.caseid=cases.caseid where case_text.fid=?"
         for file_ in self.filenames:
-            cur.execute(sql, [file_['id'], ])
-            res = cur.fetchone()
-            if res is None:  # Safety catch
-                res = [0, ""]
-            tt = _("Characters: ") + str(res[0])
-            file_['characters'] = res[0]
+            cur.execute(sql_length, [file_['id'], ])
+            res_length = cur.fetchone()
+            if res_length is None:  # Safety catch
+                res_length = [0, ""]
+            tt = _("Date: ") + file_['date'].split()[0] + "\n"  # Date without timestamp
+            cur.execute(sql_case, [file_['id']])
+            res_cases = cur.fetchone()
+            if res_cases and res_cases[0] is not None:
+                tt += _("Case: ") + str(res_cases[0]) + "\n"
+            tt += _("Characters: ") + str(res_length[0])
+            file_['characters'] = res_length[0]
             file_['start'] = 0
-            file_['end'] = res[0]
-            file_['fulltext'] = res[1]
+            file_['end'] = res_length[0]
+            file_['fulltext'] = res_length[1]
             cur.execute(sql_codings, [file_['id'], self.app.settings['codername']])
-            res = cur.fetchone()
-            tt += f'\n{_("Codings:")} {res[0]}'
+            res_codings = cur.fetchone()
+            tt += f'\n{_("Codings:")} {res_codings[0]}'
             tt += f"\n{_('From:')} {file_['start']} - {file_['end']}"
             item = QtWidgets.QListWidgetItem(file_['name'])
             if file_['memo'] != "":

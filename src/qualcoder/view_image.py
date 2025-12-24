@@ -348,9 +348,16 @@ class DialogCodeImage(QtWidgets.QDialog):
         keys = 'name', 'id', 'memo', 'owner', 'date', 'mediapath'
         for row in result:
             self.files.append(dict(zip(keys, row)))
-        for f in self.files:
-            item = QtWidgets.QListWidgetItem(f['name'])
-            item.setToolTip(f['memo'])
+        sql_case = "SELECT group_concat(cases.name) from cases join case_text on case_text.caseid=cases.caseid where case_text.fid=?"
+        for file_ in self.files:
+            item = QtWidgets.QListWidgetItem(file_['name'])
+            tt = _("Date: ") + file_['date'].split()[0]
+            cur.execute(sql_case, [file_['id']])
+            res_cases = cur.fetchone()
+            if res_cases and res_cases[0] is not None:
+                tt += "\n" + _("Case: ") + f"{res_cases[0]}"
+            tt += f"\n{file_['memo']}"
+            item.setToolTip(tt)
             self.ui.listWidget.addItem(item)
         self.clear_file()
 
