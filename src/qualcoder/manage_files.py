@@ -461,6 +461,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             action_filename_desc = menu.addAction(_("Order descending"))
             action_type = menu.addAction(_("File type order"))
         action_date_asc = None
+        action_date_desc = None
         if col == self.DATE_COLUMN:
             action_date_asc = menu.addAction(_("Order ascending"))
             action_date_desc = menu.addAction(_("Order descending"))
