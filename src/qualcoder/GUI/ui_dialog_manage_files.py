@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'c:\Users\kai\Documents\Programmierung\QualCoderOrig\QualCoder\src\GUI_UIs\ui_dialog_manage_files.ui'
+# Form implementation generated from reading ui file 'ui_dialog_manage_files.ui'
 #
 # Created by: PyQt6 UI code generator 6.9.1
 #
@@ -160,9 +160,18 @@ class Ui_Dialog_manage_files(object):
 "The pseudonyms are stored in the qda data folder as pseudonyms.json\n"
 "After all text files are imported, remove this file from the project folder and store it securely.\n"
 ""))
-        self.pushButton_mark_speakers.setToolTip(_translate("Dialog_manage_files", "Mark speakers.\n"
-"Limited to names up to 63 characters long. \n"
-"The name must be at the start of a new line.\n"
+        self.pushButton_mark_speakers.setToolTip(_translate("Dialog_manage_files", "Select a text transcription to mark the speakers.\n"
+"The speaker name must be at the start of a new line and less than 64 characters long.\n"
 "Formatted like below for name detection.\n"
-"\"Name:\", \"{Name}, or \"[Name]\""))
+"\"Name:\", \"{Name} or \"[Name]\""))
         self.label_file.setText(_translate("Dialog_manage_files", "File:"))
+
+
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    Dialog_manage_files = QtWidgets.QDialog()
+    ui = Ui_Dialog_manage_files()
+    ui.setupUi(Dialog_manage_files)
+    Dialog_manage_files.show()
+    sys.exit(app.exec())
