@@ -135,6 +135,8 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.ui.pushButton_export_attributes.clicked.connect(self.export_attributes)
         self.ui.pushButton_undo.setIcon(qta.icon('mdi6.undo', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_undo.clicked.connect(self.undo_file_rename)
+        self.ui.pushButton_mark_speakers.setIcon(qta.icon('mdi6.pin-outline', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_mark_speakers.pressed.connect(self.mark_speakers)
 
         self.ui.pushButton_display_save.setIcon(qta.icon('mdi6.table-plus', options=[{'scale_factor': 1.2}]))
         self.ui.pushButton_display_save.clicked.connect(self.table_display_save)
@@ -647,9 +649,8 @@ class DialogManageFiles(QtWidgets.QDialog):
             cb = QtWidgets.QApplication.clipboard()
             cb.setText(vancouver[0]['vancouver'].replace("\n", " "))
         if action == action_mark_speakers:
-            self.main_window.text_coding(task='mark_speakers', 
-                                         doc_id=int(id_))
-
+            self.mark_speakers()
+            
     def pdf_to_images(self, mediapath):
         """ Turn pdf to an image for each page. """
 
@@ -978,6 +979,26 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.update_files_in_dialogs()
         self.load_file_data()
         self.app.delete_backup = False
+        
+    def mark_speakers(self):
+        try:
+            row = self.ui.tableWidget.currentRow()
+            if row == -1:
+                raise ValueError()
+            mediapath = None
+            id_ = int(self.ui.tableWidget.item(row, self.ID_COLUMN).text())
+            for s in self.source:
+                if s['id'] == id_:
+                    mediapath = s['mediapath']
+            if id_ is None or mediapath is None:
+                raise ValueError()
+            if len(mediapath) > 6 and (mediapath[:6] == '/docs/' or mediapath[:5] == 'docs:'):
+                self.main_window.text_coding(task='mark_speakers', 
+                                             doc_id=int(id_))
+            else:
+                raise ValueError()        
+        except (AttributeError, ValueError):
+            Message(self.app, _('Mark speakers'), _('No text file selected.'), 'critical').exec()
 
     def check_attribute_placeholders(self):
         """ Files can be added after attributes are in the project.

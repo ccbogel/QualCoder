@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'ui_dialog_manage_files.ui'
+# Form implementation generated from reading ui file 'c:\Users\kai\Documents\Programmierung\QualCoderOrig\QualCoder\src\GUI_UIs\ui_dialog_manage_files.ui'
 #
 # Created by: PyQt6 UI code generator 6.9.1
 #
@@ -29,11 +29,11 @@ class Ui_Dialog_manage_files(object):
         self.pushButton_create.setText("")
         self.pushButton_create.setObjectName("pushButton_create")
         self.pushButton_export = QtWidgets.QPushButton(parent=self.groupBox)
-        self.pushButton_export.setGeometry(QtCore.QRect(430, 3, 30, 30))
+        self.pushButton_export.setGeometry(QtCore.QRect(450, 3, 30, 30))
         self.pushButton_export.setText("")
         self.pushButton_export.setObjectName("pushButton_export")
         self.pushButton_delete = QtWidgets.QPushButton(parent=self.groupBox)
-        self.pushButton_delete.setGeometry(QtCore.QRect(640, 3, 30, 30))
+        self.pushButton_delete.setGeometry(QtCore.QRect(660, 3, 30, 30))
         self.pushButton_delete.setText("")
         self.pushButton_delete.setObjectName("pushButton_delete")
         self.pushButton_import = QtWidgets.QPushButton(parent=self.groupBox)
@@ -57,7 +57,7 @@ class Ui_Dialog_manage_files(object):
         self.pushButton_export_to_linked.setText("")
         self.pushButton_export_to_linked.setObjectName("pushButton_export_to_linked")
         self.pushButton_export_attributes = QtWidgets.QPushButton(parent=self.groupBox)
-        self.pushButton_export_attributes.setGeometry(QtCore.QRect(390, 3, 30, 30))
+        self.pushButton_export_attributes.setGeometry(QtCore.QRect(410, 3, 30, 30))
         self.pushButton_export_attributes.setText("")
         self.pushButton_export_attributes.setObjectName("pushButton_export_attributes")
         self.pushButton_help = QtWidgets.QPushButton(parent=self.groupBox)
@@ -65,33 +65,37 @@ class Ui_Dialog_manage_files(object):
         self.pushButton_help.setText("")
         self.pushButton_help.setObjectName("pushButton_help")
         self.label_fcount = QtWidgets.QLabel(parent=self.groupBox)
-        self.label_fcount.setGeometry(QtCore.QRect(260, 6, 121, 26))
+        self.label_fcount.setGeometry(QtCore.QRect(280, 6, 121, 26))
         self.label_fcount.setObjectName("label_fcount")
         self.pushButton_undo = QtWidgets.QPushButton(parent=self.groupBox)
         self.pushButton_undo.setEnabled(False)
-        self.pushButton_undo.setGeometry(QtCore.QRect(610, 3, 30, 30))
+        self.pushButton_undo.setGeometry(QtCore.QRect(630, 3, 30, 30))
         self.pushButton_undo.setText("")
         self.pushButton_undo.setObjectName("pushButton_undo")
         self.pushButton_bulk_rename = QtWidgets.QPushButton(parent=self.groupBox)
-        self.pushButton_bulk_rename.setGeometry(QtCore.QRect(580, 3, 30, 30))
+        self.pushButton_bulk_rename.setGeometry(QtCore.QRect(600, 3, 30, 30))
         self.pushButton_bulk_rename.setText("")
         self.pushButton_bulk_rename.setObjectName("pushButton_bulk_rename")
         self.pushButton_display_save = QtWidgets.QPushButton(parent=self.groupBox)
-        self.pushButton_display_save.setGeometry(QtCore.QRect(500, 3, 30, 30))
+        self.pushButton_display_save.setGeometry(QtCore.QRect(520, 3, 30, 30))
         self.pushButton_display_save.setText("")
         self.pushButton_display_save.setObjectName("pushButton_display_save")
         self.pushButton_display_load = QtWidgets.QPushButton(parent=self.groupBox)
-        self.pushButton_display_load.setGeometry(QtCore.QRect(470, 3, 30, 30))
+        self.pushButton_display_load.setGeometry(QtCore.QRect(490, 3, 30, 30))
         self.pushButton_display_load.setText("")
         self.pushButton_display_load.setObjectName("pushButton_display_load")
         self.pushButton_display_delete = QtWidgets.QPushButton(parent=self.groupBox)
-        self.pushButton_display_delete.setGeometry(QtCore.QRect(530, 3, 30, 30))
+        self.pushButton_display_delete.setGeometry(QtCore.QRect(550, 3, 30, 30))
         self.pushButton_display_delete.setText("")
         self.pushButton_display_delete.setObjectName("pushButton_display_delete")
         self.pushButton_pseudonyms = QtWidgets.QPushButton(parent=self.groupBox)
         self.pushButton_pseudonyms.setGeometry(QtCore.QRect(90, 3, 30, 30))
         self.pushButton_pseudonyms.setText("")
         self.pushButton_pseudonyms.setObjectName("pushButton_pseudonyms")
+        self.pushButton_mark_speakers = QtWidgets.QPushButton(parent=self.groupBox)
+        self.pushButton_mark_speakers.setGeometry(QtCore.QRect(240, 3, 30, 30))
+        self.pushButton_mark_speakers.setText("")
+        self.pushButton_mark_speakers.setObjectName("pushButton_mark_speakers")
         self.gridLayout.addWidget(self.groupBox, 1, 0, 1, 1)
         self.tableWidget = QtWidgets.QTableWidget(parent=Dialog_manage_files)
         self.tableWidget.setObjectName("tableWidget")
@@ -156,14 +160,9 @@ class Ui_Dialog_manage_files(object):
 "The pseudonyms are stored in the qda data folder as pseudonyms.json\n"
 "After all text files are imported, remove this file from the project folder and store it securely.\n"
 ""))
+        self.pushButton_mark_speakers.setToolTip(_translate("Dialog_manage_files", "Mark speakers.\n"
+"Limited to names up to 63 characters long. \n"
+"The name must be at the start of a new line.\n"
+"Formatted like below for name detection.\n"
+"\"Name:\", \"{Name}, or \"[Name]\""))
         self.label_file.setText(_translate("Dialog_manage_files", "File:"))
-
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    Dialog_manage_files = QtWidgets.QDialog()
-    ui = Ui_Dialog_manage_files()
-    ui.setupUi(Dialog_manage_files)
-    Dialog_manage_files.show()
-    sys.exit(app.exec())

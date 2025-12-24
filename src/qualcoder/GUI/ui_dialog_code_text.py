@@ -459,7 +459,7 @@ class Ui_Dialog_code_text(object):
 "Limited to names up to 63 characters long. \n"
 "The name must be at the start of a new line.\n"
 "Formatted like below for name detection.\n"
-"\"Name:\", \"{Name}, or \"{Name]\""))
+"\"Name:\", \"{Name}, or \"[Name]\""))
         self.pushButton_exit_edit.setToolTip(_translate("Dialog_code_text", "Exit Edit text "))
         self.pushButton_latest.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>File with latest coding</p></body></html>"))
         self.pushButton_bookmark_go.setToolTip(_translate("Dialog_code_text", "<html><head/><body><p>Go to bookmark</p></body></html>"))

@@ -66,7 +66,7 @@
      <widget class="QPushButton" name="pushButton_export">
       <property name="geometry">
        <rect>
-        <x>430</x>
+        <x>450</x>
         <y>3</y>
         <width>30</width>
         <height>30</height>
@@ -84,7 +84,7 @@ Text files (from any source) are exported from the text stored in the database a
      <widget class="QPushButton" name="pushButton_delete">
       <property name="geometry">
        <rect>
-        <x>640</x>
+        <x>660</x>
         <y>3</y>
         <width>30</width>
         <height>30</height>
@@ -181,7 +181,7 @@ Cannot export text transcription file associated with an audio or video as a lin
      <widget class="QPushButton" name="pushButton_export_attributes">
       <property name="geometry">
        <rect>
-        <x>390</x>
+        <x>410</x>
         <y>3</y>
         <width>30</width>
         <height>30</height>
@@ -213,7 +213,7 @@ Cannot export text transcription file associated with an audio or video as a lin
      <widget class="QLabel" name="label_fcount">
       <property name="geometry">
        <rect>
-        <x>260</x>
+        <x>280</x>
         <y>6</y>
         <width>121</width>
         <height>26</height>
@@ -229,7 +229,7 @@ Cannot export text transcription file associated with an audio or video as a lin
       </property>
       <property name="geometry">
        <rect>
-        <x>610</x>
+        <x>630</x>
         <y>3</y>
         <width>30</width>
         <height>30</height>
@@ -245,7 +245,7 @@ Cannot export text transcription file associated with an audio or video as a lin
      <widget class="QPushButton" name="pushButton_bulk_rename">
       <property name="geometry">
        <rect>
-        <x>580</x>
+        <x>600</x>
         <y>3</y>
         <width>30</width>
         <height>30</height>
@@ -261,7 +261,7 @@ Cannot export text transcription file associated with an audio or video as a lin
      <widget class="QPushButton" name="pushButton_display_save">
       <property name="geometry">
        <rect>
-        <x>500</x>
+        <x>520</x>
         <y>3</y>
         <width>30</width>
         <height>30</height>
@@ -277,7 +277,7 @@ Cannot export text transcription file associated with an audio or video as a lin
      <widget class="QPushButton" name="pushButton_display_load">
       <property name="geometry">
        <rect>
-        <x>470</x>
+        <x>490</x>
         <y>3</y>
         <width>30</width>
         <height>30</height>
@@ -293,7 +293,7 @@ Cannot export text transcription file associated with an audio or video as a lin
      <widget class="QPushButton" name="pushButton_display_delete">
       <property name="geometry">
        <rect>
-        <x>530</x>
+        <x>550</x>
         <y>3</y>
         <width>30</width>
         <height>30</height>
@@ -327,6 +327,26 @@ Does not work with PDF files. Instead extract the plain text and only import the
 The pseudonyms are stored in the qda data folder as pseudonyms.json
 After all text files are imported, remove this file from the project folder and store it securely.
 </string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_mark_speakers">
+      <property name="geometry">
+       <rect>
+        <x>240</x>
+        <y>3</y>
+        <width>30</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Mark speakers.
+Limited to names up to 63 characters long. 
+The name must be at the start of a new line.
+Formatted like below for name detection.
+&quot;Name:&quot;, &quot;{Name}, or &quot;[Name]&quot;</string>
       </property>
       <property name="text">
        <string/>

@@ -618,7 +618,7 @@ https://www.datacamp.com/cheat-sheet/regular-expresso</string>
 Limited to names up to 63 characters long. 
 The name must be at the start of a new line.
 Formatted like below for name detection.
-&quot;Name:&quot;, &quot;{Name}, or &quot;{Name]&quot;</string>
+&quot;Name:&quot;, &quot;{Name}, or &quot;[Name]&quot;</string>
       </property>
       <property name="text">
        <string/>
