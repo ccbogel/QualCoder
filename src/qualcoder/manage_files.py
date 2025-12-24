@@ -463,10 +463,13 @@ class DialogManageFiles(QtWidgets.QDialog):
         action_date_asc = None
         if col == self.DATE_COLUMN:
             action_date_asc = menu.addAction(_("Order ascending"))
+            action_date_desc = menu.addAction(_("Order descending"))
         action_casename_asc = None
+        action_casename_desc = None
         action_assign_case = None
         if col == self.CASE_COLUMN:
             action_casename_asc = menu.addAction(_("Order ascending"))
+            action_casename_desc = menu.addAction(_("Order descending"))
             action_assign_case = menu.addAction(_("Assign case to file"))
         action_show_values_like = None
         action_hide_values_like = None
@@ -549,11 +552,15 @@ class DialogManageFiles(QtWidgets.QDialog):
         if action == action_filename_desc:
             self.load_file_data("filename desc")
         if action == action_date_asc:
-            self.load_file_data("date")
+            self.load_file_data("date asc")
+        if action == action_date_desc:
+            self.load_file_data("date desc")
         if action == action_type:
             self.load_file_data("filetype")
         if action == action_casename_asc:
-            self.load_file_data("casename")
+            self.load_file_data("casename asc")
+        if action == action_casename_desc:
+            self.load_file_data("casename desc")
         if action == action_order_by_value_asc:
             self.load_file_data("attribute asc:" + self.header_labels[col])
         if action == action_order_by_value_desc:
@@ -1050,13 +1057,14 @@ class DialogManageFiles(QtWidgets.QDialog):
         Fills table after data is loaded.
         param:
             order_by: string ""= name asc, "filename desc" = name desc,
-            "date" = date, "filetype" = mediapath,
-                "casename" = by alphabetic casename
+            "date asc" = date ascending, "date desc" = date descending, "filetype" = mediapath,
+                "casename asc" = by alphabetic casename ascending
+                "casename desc" = by alphabetic descending
                 "attribute:attribute name" selected attribute - ascending
                 "attribute desc: attribute name ttribute - descending
         """
 
-        # check a placeholder attribute is present for the file, add if missing
+        # Check a placeholder attribute is present for the file, add if missing
         self.check_attribute_placeholders()
         self.source = []
         cur = self.app.conn.cursor()
@@ -1066,18 +1074,28 @@ class DialogManageFiles(QtWidgets.QDialog):
               "order by upper(name)"
         if order_by == "filename desc":
             sql += " desc"
-        if order_by == "date":
+        if order_by == "date asc":
             sql = "select name, id, fulltext, mediapath, ifnull(memo,''), owner, date, av_text_id, risid from source " \
                   "order by date, upper(name)"
+        if order_by == "date desc":
+            sql = "select name, id, fulltext, mediapath, ifnull(memo,''), owner, date, av_text_id, risid from source " \
+                  "order by date desc, upper(name) desc"
         if order_by == "filetype":
             sql = "select name, id, fulltext, mediapath, ifnull(memo,''), owner, date, av_text_id, risid from source " \
                   "order by mediapath"
-        if order_by == "casename":
+        if order_by == "casename asc":
             sql = "select distinct source.name, source.id, source.fulltext, source.mediapath, ifnull(source.memo,''), "
             sql += "source.owner, source.date, av_text_id, risid "
             sql += "from source left join case_text on source.id=case_text.fid "
             sql += "left join cases on cases.caseid=case_text.caseid "
             sql += "order by cases.name, source.name "
+
+        if order_by == "casename desc":
+            sql = "select distinct source.name, source.id, source.fulltext, source.mediapath, ifnull(source.memo,''), "
+            sql += "source.owner, source.date, av_text_id, risid "
+            sql += "from source left join case_text on source.id=case_text.fid "
+            sql += "left join cases on cases.caseid=case_text.caseid "
+            sql += "order by cases.name desc, source.name desc"
 
         if order_by[:14] == "attribute asc:":
             attribute_name = order_by[14:]
