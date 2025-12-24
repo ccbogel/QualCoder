@@ -342,11 +342,10 @@ After all text files are imported, remove this file from the project folder and 
        </rect>
       </property>
       <property name="toolTip">
-       <string>Mark speakers.
-Limited to names up to 63 characters long. 
-The name must be at the start of a new line.
+       <string>Select a text transcription to mark the speakers.
+The speaker name must be at the start of a new line and less than 64 characters long.
 Formatted like below for name detection.
-&quot;Name:&quot;, &quot;{Name}, or &quot;[Name]&quot;</string>
+&quot;Name:&quot;, &quot;{Name} or &quot;[Name]&quot;</string>
       </property>
       <property name="text">
        <string/>
