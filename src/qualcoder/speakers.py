@@ -90,13 +90,51 @@ class DialogSpeakers(QtWidgets.QDialog):
         name_counts: Dict[str, int] = {}
         name_example: Dict[str, str] = {}
 
-        # Regex: capture up to max_name_len characters (after optional leading spaces), then ":".
-        speaker_re = re.compile(r"^\s*(.{1," + str(max_name_len) + r"}?)\s*:\s*", flags=re.UNICODE)
+        # Regexes for supported speaker markers ("name:", "[name]", "{name}").
+        speaker_res = [
+            re.compile(r"^\s*(.{1," + str(max_name_len) + r"}?)\s*:\s*", flags=re.UNICODE),
+            re.compile(r"^\s*\[([^\]\r\n]{1," + str(max_name_len) + r"})\]\s*", flags=re.UNICODE),
+            re.compile(r"^\s*\{([^}\r\n]{1," + str(max_name_len) + r"})\}\s*", flags=re.UNICODE),
+        ]
 
         # State for the currently open speaker turn
         current_name: Optional[str] = None
         current_start: Optional[int] = None  # pos0
         current_end: Optional[int] = None    # pos1 (exclusive), updated as we consume lines
+        current_content_start: Optional[int] = None  # start of actual utterance (after marker)
+
+        def finalize_current_turn():
+            """Store the active turn and reset the state."""
+
+            nonlocal current_name, current_start, current_end, current_content_start
+            if current_name is None or current_start is None or current_end is None:
+                return
+
+            seltext = transcript[current_start:current_end]
+            self.codings.append(
+                {
+                    "name": current_name,
+                    "fid": self.fid,
+                    "seltext": seltext,
+                    "pos0": current_start,
+                    "pos1": current_end,
+                    "owner": codername,
+                    "memo": "",
+                    "date": datetime.datetime.now()
+                    .astimezone()
+                    .strftime("%Y-%m-%d %H:%M:%S"),
+                }
+            )
+            name_counts[current_name] = name_counts.get(current_name, 0) + 1
+            if name_example.get(current_name, "") == "":
+                content_start = current_content_start or current_start
+                example_text = transcript[content_start:current_end].strip()
+                name_example[current_name] = example_text
+
+            current_name = None
+            current_start = None
+            current_end = None
+            current_content_start = None
 
         # Iterate over the transcript while keeping absolute positions.
         offset = 0
@@ -117,62 +155,26 @@ class DialogSpeakers(QtWidgets.QDialog):
 
             # If we hit a blank line, close any open turn and reset (blank lines are separators, not coded).
             if line_is_blank:
-                if current_name is not None and current_start is not None and current_end is not None:
-                    seltext = transcript[current_start:current_end]
-                    self.codings.append(
-                        {
-                            "name": current_name,
-                            "fid": self.fid,
-                            "seltext": seltext,
-                            "pos0": current_start,
-                            "pos1": current_end,
-                            "owner": codername,
-                            "memo": "",
-                            "date": datetime.datetime.now()
-                            .astimezone()
-                            .strftime("%Y-%m-%d %H:%M:%S"),
-                        }
-                    )
-                    name_counts[current_name] = name_counts.get(current_name, 0) + 1
-                    if name_example.get(current_name, '') == '':
-                        name_example[current_name] = seltext[len(current_name) + 1:].strip()  
-
-
-                current_name = None
-                current_start = None
-                current_end = None
+                finalize_current_turn()
                 continue
 
             # Check whether this non-empty line starts a new speaker turn
-            m = speaker_re.match(line_wo_eol)
+            m = None
+            for regex in speaker_res:
+                m = regex.match(line_wo_eol)
+                if m:
+                    break
             if m:
                 code_as = m.group(1).strip()
                 if code_as:
                     # Close the previous turn (if any) before starting a new one
-                    if current_name is not None and current_start is not None and current_end is not None:
-                        seltext = transcript[current_start:current_end]
-                        self.codings.append(
-                            {
-                                "name": current_name,
-                                "fid": self.fid,
-                                "seltext": seltext,
-                                "pos0": current_start,
-                                "pos1": current_end,
-                                "owner": codername,
-                                "memo": "",
-                                "date": datetime.datetime.now()
-                                .astimezone()
-                                .strftime("%Y-%m-%d %H:%M:%S"),
-                            }
-                        )
-                        name_counts[current_name] = name_counts.get(current_name, 0) + 1
-                        if name_example.get(current_name, '') == '':
-                            name_example[current_name] = seltext[len(current_name) + 1:].strip()
+                    finalize_current_turn()
 
                     # Start new turn at the beginning of this line
                     current_name = code_as
                     current_start = line_start
                     current_end = line_start + len(line_wo_eol)  # exclude EOL
+                    current_content_start = line_start + m.end()
                     continue
 
             # Continuation line: only attach it if we're currently inside a speaker turn
@@ -184,25 +186,7 @@ class DialogSpeakers(QtWidgets.QDialog):
             # If no speaker has started yet, we ignore these lines as "header" / uncoded intro.
 
         # Close a trailing open turn at EOF (if any)
-        if current_name is not None and current_start is not None and current_end is not None:
-            seltext = transcript[current_start:current_end]
-            self.codings.append(
-                {
-                    "name": current_name,
-                    "fid": self.fid,
-                    "seltext": seltext,
-                    "pos0": current_start,
-                    "pos1": current_end,
-                    "owner": codername,
-                    "memo": "",
-                    "date": datetime.datetime.now()
-                    .astimezone()
-                    .strftime("%Y-%m-%d %H:%M:%S"),
-                }
-            )
-            name_counts[current_name] = name_counts.get(current_name, 0) + 1
-            if name_example.get(current_name, '') == '':
-                name_example[current_name] = seltext[len(current_name) + 1:].strip()
+        finalize_current_turn()
 
         # Build summary for table
         self.speaker_summary = []
