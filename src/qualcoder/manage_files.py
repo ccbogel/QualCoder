@@ -513,7 +513,9 @@ class DialogManageFiles(QtWidgets.QDialog):
                 action_export_to_linked = menu.addAction(_("Move file to externally linked file"))
             if mediapath is not None and mediapath != "" and mediapath[0] != "/":
                 action_import_linked = menu.addAction(_("Import linked file"))
-            if mediapath is not None and len(mediapath) > 6 and (mediapath[:6] == '/docs/' or mediapath[:5] == 'docs:'):
+            if mediapath is None or \
+                    (mediapath is not None and len(mediapath) > 6 and (mediapath[:6] == '/docs/' or
+                                                                       mediapath[:5] == 'docs:')):
                 action_mark_speakers = menu.addAction(_('Mark speakers'))
         action_show_all = None
         if self.rows_hidden:
@@ -981,22 +983,19 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.app.delete_backup = False
         
     def mark_speakers(self):
+        """ Mark the speakers in text files.
+         Note: User generated files (not loaded files) have medipath None.
+         When text file found open the text coding pane. """
+
         try:
             row = self.ui.tableWidget.currentRow()
             if row == -1:
                 raise ValueError()
-            mediapath = None
             id_ = int(self.ui.tableWidget.item(row, self.ID_COLUMN).text())
-            for s in self.source:
-                if s['id'] == id_:
-                    mediapath = s['mediapath']
-            if id_ is None or mediapath is None:
+            text_item = next((item for item in self.source if item['id'] == id_ and item['fulltext']), None)
+            if not text_item:
                 raise ValueError()
-            if len(mediapath) > 6 and (mediapath[:6] == '/docs/' or mediapath[:5] == 'docs:'):
-                self.main_window.text_coding(task='mark_speakers', 
-                                             doc_id=int(id_))
-            else:
-                raise ValueError()        
+            self.main_window.text_coding(task='mark_speakers', doc_id=int(id_))
         except (AttributeError, ValueError):
             Message(self.app, _('Mark speakers'), _('No text file selected.'), 'critical').exec()
 
@@ -1181,7 +1180,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 res = cur.fetchone()
                 if res:
                     tmp = res[0]
-                    # For nicer display
+                    # Nicer display
                     if att_name == "Ref_authors":
                         tmp = tmp.replace(";", "\n")
                     s['attributes'].append(tmp)
