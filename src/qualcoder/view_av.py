@@ -200,7 +200,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.textEdit.setAutoFillBackground(True)
         self.ui.textEdit.setToolTip("")
         self.ui.textEdit.setMouseTracking(True)
-        #self.ui.textEdit.setReadOnly(True)
         self.ui.textEdit.setTextInteractionFlags(
             Qt.TextInteractionFlag.TextSelectableByMouse |
             Qt.TextInteractionFlag.TextSelectableByKeyboard)
@@ -304,7 +303,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         """
 
         dialog = QtWidgets.QInputDialog(None)
-        dialog.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        dialog.setStyleSheet(f"* {{font-size:{self.app.settings['fontsize']}pt}} ")
         dialog.setWindowTitle(_("Search for code"))
         dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         dialog.setInputMode(QtWidgets.QInputDialog.InputMode.TextInput)
@@ -549,7 +548,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         count = 0
         while len(cats) > 0 and count < 10000:
             remove_list = []
-            # logger.debug("cats:" + str(cats))
             for c in cats:
                 it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
                 item = it.value()
@@ -708,45 +706,11 @@ class DialogCodeAV(QtWidgets.QDialog):
                         break
             iterator += 1  # Move to the next item
 
-    '''def fill_code_counts_in_tree(self):
-        """ Count instances of each code for current coder and in the selected file.
-        Called by fill_tree """
-
-        if self.file_ is None:
-            return
-        cur = self.app.conn.cursor()
-        sql = "select count(cid) from code_av where cid=? and id=? and owner=?"
-        sql_txt = "select count(cid) from code_text where cid=? and fid=? and owner=?"
-        it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
-        item = it.value()
-        count = 0
-        while item and count < 10000:
-            if item.text(1)[0:4] == "cid:":
-                cid = str(item.text(1)[4:])
-                cur.execute(sql, [cid, self.file_['id'], self.app.settings['codername']])
-                result_av = cur.fetchone()
-                result_txt = [0]
-                try:  # May not have a text file
-                    cur.execute(sql_txt, [cid, self.transcription[0], self.app.settings['codername']])
-                    result_txt = cur.fetchone()
-                except Exception as e_:
-                    print(e_)
-                    logger.warning(str(e_))
-                result = result_av[0] + result_txt[0]
-                if result > 0:
-                    item.setText(3, str(result))
-                else:
-                    item.setText(3, "")
-            it += 1
-            item = it.value()
-            count += 1'''
-
     def get_collapsed(self, item):
         """ On category collapse or expansion signal, find the collapsed parent category items.
         This will fill the self.app.collapsed_categories and is the expanded/collapsed tree is then replicated across
         other areas of the app. """
 
-        #print(item.text(0), item.text(1), "Expanded:", item.isExpanded())
         if item.text(1)[:3] == "cid":
             return
         if not item.isExpanded() and item.text(1) not in self.app.collapsed_categories:
@@ -761,12 +725,9 @@ class DialogCodeAV(QtWidgets.QDialog):
         if len(self.files) == 0:
             return
         selected = self.ui.listWidget.currentItem()
-        file_ = None
-        for f in self.files:
-            if selected.text() == f['name']:
-                file_ = f
+        file_ = next((f for f in self.files if f['name'] == selected.text()), None)
         menu = QtWidgets.QMenu()
-        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
         memo_action = menu.addAction(_("Open memo"))
         action_next = menu.addAction(_("Next file"))
         action_latest = menu.addAction(_("File with latest coding"))
@@ -834,8 +795,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         cur.execute('select fid from case_text where caseid=?', [selection['id']])
         res = cur.fetchall()
         file_ids = [r[0] for r in res]
-        '''for r in res:
-            file_ids.append(r[0])'''
         self.get_files(file_ids)
 
     def show_files_like(self):
@@ -843,7 +802,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         If blank, show all files. """
 
         dialog = QtWidgets.QInputDialog(self)
-        dialog.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        dialog.setStyleSheet(f"* {{font-size:{self.app.settings['fontsize']}pt}}")
         dialog.setWindowTitle(_("Show files like"))
         dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         dialog.setInputMode(QtWidgets.QInputDialog.InputMode.TextInput)
@@ -1075,7 +1034,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.mediaplayer.play()
         self.mediaplayer.audio_set_volume(0)
         time.sleep(0.2)
-        # print( self.mediaplayer.audio_get_track_count()) # > 0
         tracks = self.mediaplayer.audio_get_track_description()
         good_tracks = []  # note where track [0] == -1 is a disabled track
         for track in tracks:
@@ -1239,7 +1197,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             text_hms = stamp.split(':')
             text_secs = text_hms[2].split('.')[0]
             text_msecs = text_hms[2].split('.')[1]
-            # adjust msecs to 1000's for 1 or 2 digit strings
+            # Adjust msecs to 1000's for 1 or 2 digit strings
             if len(text_msecs) == 1:
                 text_msecs += "00"
             if len(text_msecs) == 2:
@@ -1478,7 +1436,7 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         # selected_text = self.ui.textEdit.textCursor().selectedText()
         menu = QtWidgets.QMenu()
-        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
         selected = self.ui.treeWidget.currentItem()
         action_color = None
         action_assign_segment = None
@@ -1554,12 +1512,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         if action == action_assign_segment:
             self.assign_segment_to_code(selected)
         if selected is not None and action == action_show_coded_media:
-            found = None
             to_find = int(selected.text(1)[4:])
-            for code in self.codes:
-                if code['cid'] == to_find:
-                    found = code
-                    break
+            found = next((code for code in self.codes if code['cid'] == to_find), None)
             if found:
                 self.coded_media_dialog(found)
 
@@ -1975,9 +1929,6 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         pos = self.ui.textEdit.textCursor().position()
         codes_here = [c for c in self.code_text if c['pos0'] <= pos <= c['pos1']]
-        '''for i in self.code_text:
-            if i['pos0'] <= pos <= i['pos1']:
-                codes_here.append(i)'''
         self.overlap_code_index += 1
         if self.overlap_code_index >= len(codes_here):
             self.overlap_code_index = 0
@@ -2195,11 +2146,11 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         # Find the category in the list
         if item.text(1)[0:3] == 'cat':
-            found = -1
+            found = None
             for i in range(0, len(self.categories)):
                 if self.categories[i]['catid'] == int(item.text(1)[6:]):
                     found = i
-            if found == -1:
+            if not found:
                 return
             if parent is None:
                 self.categories[found]['supercatid'] = None
@@ -2302,7 +2253,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                 cur.execute(sql, [orphan[0]])
             self.app.conn.commit()
         except:
-            self.app.conn.rollback() # revert all changes 
+            self.app.conn.rollback()  # revert all changes
             self.update_dialog_codes_and_categories()
             raise            
         self.update_dialog_codes_and_categories()
@@ -2496,7 +2447,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                 selected.setData(2, QtCore.Qt.ItemDataRole.DisplayRole, "")
             else:
                 selected.setData(2, QtCore.Qt.ItemDataRole.DisplayRole, _("Memo"))
-            # update codes list and database
+            # Update codes list and database
             if memo != self.codes[found]['memo']:
                 self.codes[found]['memo'] = memo
                 cur = self.app.conn.cursor()
@@ -2505,12 +2456,12 @@ class DialogCodeAV(QtWidgets.QDialog):
                 self.app.delete_backup = False
 
         if selected.text(1)[0:3] == 'cat':
-            # find the category in the list
-            found = -1
+            # Find the category in the list
+            found = None
             for i in range(0, len(self.categories)):
                 if self.categories[i]['catid'] == int(selected.text(1)[6:]):
                     found = i
-            if found == -1:
+            if not found:
                 return
             ui = DialogMemo(self.app, _("Memo for Category ") + self.categories[found]['name'],
                             self.categories[found]['memo'])
@@ -2520,7 +2471,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                 selected.setData(2, QtCore.Qt.ItemDataRole.DisplayRole, "")
             else:
                 selected.setData(2, QtCore.Qt.ItemDataRole.DisplayRole, _("Memo"))
-            # update codes list and database
+            # Update codes list and database
             if memo != self.categories[found]['memo']:
                 self.categories[found]['memo'] = memo
                 cur = self.app.conn.cursor()
@@ -2540,18 +2491,18 @@ class DialogCodeAV(QtWidgets.QDialog):
                                                           QtWidgets.QLineEdit.EchoMode.Normal, selected.text(0))
             if not ok or new_name == '':
                 return
-            # check that no other code has this text
+            # Check that no other code has this text
             for c in self.codes:
                 if c['name'] == new_name:
                     Message(self.app, _('Name in use'), new_name + _(" Name already in use, choose another."),
                             "warning").exec()
                     return
-            # find the code in the list
-            found = -1
+            # Find the code in the list
+            found = None
             for i in range(0, len(self.codes)):
                 if self.codes[i]['cid'] == int(selected.text(1)[4:]):
                     found = i
-            if found == -1:
+            if not found:
                 return
             # update codes list and database
             cur = self.app.conn.cursor()
@@ -2574,11 +2525,11 @@ class DialogCodeAV(QtWidgets.QDialog):
                     Message(self.app, _('Duplicate category name'), msg_, "warning").exec()
                     return
             # Find the category in the list
-            found = -1
+            found = None
             for i in range(0, len(self.categories)):
                 if self.categories[i]['catid'] == int(selected.text(1)[6:]):
                     found = i
-            if found == -1:
+            if not found:
                 return
             # update category list and database
             cur = self.app.conn.cursor()
@@ -2595,11 +2546,11 @@ class DialogCodeAV(QtWidgets.QDialog):
             selected: QTreeWidgetItem """
 
         cid = int(selected.text(1)[4:])
-        found = -1
+        found = None
         for i in range(0, len(self.codes)):
             if self.codes[i]['cid'] == cid:
                 found = i
-        if found == -1:
+        if not found:
             return
         ui = DialogColorSelect(self.app, self.codes[found])
         ok = ui.exec()
@@ -2692,15 +2643,15 @@ class DialogCodeAV(QtWidgets.QDialog):
                         else:  # j['pos0'] < i['pos0']:
                             overlaps.append([j['pos1'], i['pos0']])
         cursor = self.ui.textEdit.textCursor()
-        for o in overlaps:
+        for overlap in overlaps:
             fmt = QtGui.QTextCharFormat()
             fmt.setFontUnderline(True)
             if self.app.settings['stylesheet'] == 'dark':
                 fmt.setUnderlineColor(QColor("#000000"))
             else:
                 fmt.setUnderlineColor(QColor("#FFFFFF"))
-            cursor.setPosition(o[0], QtGui.QTextCursor.MoveMode.MoveAnchor)
-            cursor.setPosition(o[1], QtGui.QTextCursor.MoveMode.KeepAnchor)
+            cursor.setPosition(overlap[0], QtGui.QTextCursor.MoveMode.MoveAnchor)
+            cursor.setPosition(overlap[1], QtGui.QTextCursor.MoveMode.KeepAnchor)
             cursor.mergeCharFormat(fmt)
 
     def textedit_menu(self, position):
@@ -2852,10 +2803,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             return
         # Get replacement code
         codes_list = deepcopy(self.codes)
-        to_remove = None
-        for code_ in codes_list:
-            if code_['cid'] == text_item['cid']:
-                to_remove = code_
+        to_remove = next((code_ for code_ in codes_list if code_['cid'] == text_item['cid']), None)
         if to_remove:
             codes_list.remove(to_remove)
         ui = DialogSelectItems(self.app, codes_list, _("Select replacement code"), "single")
@@ -2959,7 +2907,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         if text_item is None:
             return
         # Dictionary with cid fid seltext owner date name color memo
-        msg_ = text_item['name'] + " [" + str(text_item['pos0']) + "-" + str(text_item['pos1']) + "]"
+        msg_ = f"{text_item['name']} [{text_item['pos0']}-{text_item['pos1']}]"
         ui = DialogMemo(self.app, _("Memo for Coded text: ") + msg_, text_item['memo'], "show", text_item['seltext'])
         ui.exec()
         memo = ui.memo
@@ -3038,12 +2986,8 @@ class DialogCodeAV(QtWidgets.QDialog):
     def play_text(self, avid):
         """ Play the audio/video for this coded text selection that is mapped to an a/v segment. """
 
-        segment = None
-        for s in self.segments:
-            if s['avid'] == avid:
-                segment = s
-                break
-        if segment is None:
+        segment = next((item for item in self.segments if item['avid'] == avid), None)
+        if not segment:
             return
         pos = segment['pos0'] / self.mediaplayer.get_media().get_duration()
         self.mediaplayer.play()
@@ -3058,11 +3002,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         The horizontal slider will move to match the position of the video (in update_ui).
         """
 
-        timestamp = None
-        for ts in self.time_positions:
-            if ts[0] <= position <= ts[1]:
-                timestamp = ts
-        if timestamp is None:
+        timestamp = next((ts for ts in self.time_positions if ts[0] <= position <= ts[1]), None)
+        if not timestamp:
             return
         self.timer.stop()
         self.mediaplayer.set_position(timestamp[2] / self.media.get_duration())
@@ -3131,11 +3072,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.fill_code_counts_in_tree()
 
         # Update recent_codes
-        tmp_code = None
-        for c in self.codes:
-            if c['cid'] == cid:
-                tmp_code = c
-        if tmp_code is None:
+        tmp_code = next((item for item in self.codes if item['cid'] == cid), None)
+        if not tmp_code:
             return
         for item in self.recent_codes:
             if item == tmp_code:
