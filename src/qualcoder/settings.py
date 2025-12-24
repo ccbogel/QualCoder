@@ -90,8 +90,6 @@ class DialogSettings(QtWidgets.QDialog):
         for index, snf in enumerate(speakernameformats):
             if snf == self.settings['speakernameformat']:
                 self.ui.comboBox_speaker.setCurrentIndex(index)
-        self.ui.comboBox_speaker.hide()
-        self.ui.label_6.hide()
         index = self.ui.comboBox_fontsize.findText(str(self.settings['fontsize']),
                                                           QtCore.Qt.MatchFlag.MatchFixedString)
         if index == -1:
