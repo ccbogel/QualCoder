@@ -348,32 +348,34 @@ class App(object):
         return res
 
     def get_filenames(self):
-        """ Get all filenames. As id, name, memo
+        """ Get all filenames.
 
         Returns:
-            List of dictionaries of id, name memo, mediapath
+            List of dictionaries of id, name memo, mediapath, date
         """
 
         cur = self.conn.cursor()
-        cur.execute("select id, name, ifnull(memo,'') from source order by lower(name)")
+        cur.execute("select id, name, ifnull(memo,''), date from source order by lower(name)")
         result = cur.fetchall()
         res = []
+        keys = 'id', 'name', 'memo', 'date'
         for row in result:
-            res.append({'id': row[0], 'name': row[1], 'memo': row[2]})
+            res.append(dict(zip(keys, row)))
         return res
 
     def get_casenames(self):
         """ Get all case names. As id, name, memo.
         Returns:
-            List of dictionaries of name memo, id
+            List of dictionaries of name memo, id, date
         """
 
         cur = self.conn.cursor()
-        cur.execute("select caseid, name, ifnull(memo,'') from cases order by lower(name)")
+        cur.execute("select caseid, name, ifnull(memo,''), date from cases order by lower(name)")
         result = cur.fetchall()
         res = []
+        keys = 'id', 'name', 'memo', 'date'
         for row in result:
-            res.append({'id': row[0], 'name': row[1], 'memo': row[2]})
+            res.append(dict(zip(keys, row)))
         return res
 
     def get_text_filenames(self, ids=None):
@@ -383,12 +385,12 @@ class App(object):
             ids: list of Integer ids for a restricted list of files.
 
         Returns:
-            List of dictionaries of id, name memo, mediapath
+            List of dictionaries of id, name memo, mediapath, date
         """
 
         if ids is None:
             ids = []
-        sql = "select id, name, ifnull(memo,''), mediapath from source where (mediapath is Null or mediapath " \
+        sql = "select id, name, ifnull(memo,''), mediapath, date from source where (mediapath is Null or mediapath " \
               "like '/docs/%' or mediapath like 'docs:%') "
         if ids:
             ids_str = ",".join(map(str, ids))
@@ -398,7 +400,7 @@ class App(object):
         cur.execute(sql)
         result = cur.fetchall()
         res = []
-        keys = 'id', 'name', 'memo', 'mediapath'
+        keys = 'id', 'name', 'memo', 'mediapath', 'date'
         for row in result:
             res.append(dict(zip(keys, row)))
         return res
@@ -461,12 +463,12 @@ class App(object):
         Args:
             ids: list of Integer ids for a restricted list of files, or None.
         Returns:
-            List of dictionaries of id, name memo, mediapath
+            List of dictionaries of id, name memo, mediapath, date
         """
 
         if ids is None:
             ids = []
-        sql = "select id, name, ifnull(memo,''), mediapath from source where mediapath is not Null and(mediapath " \
+        sql = "select id, name, ifnull(memo,''), mediapath, date from source where mediapath is not Null and(mediapath " \
               "like '/docs/%' or mediapath like 'docs:%') and (mediapath like '%.pdf' or mediapath like '%.PDF')"
         if ids:
             ids_str = ",".join(map(str, ids))
@@ -476,7 +478,7 @@ class App(object):
         cur.execute(sql)
         result = cur.fetchall()
         res = []
-        keys = 'id', 'name', 'memo', 'mediapath'
+        keys = 'id', 'name', 'memo', 'mediapath', 'date'
         for row in result:
             res.append(dict(zip(keys, row)))
         return res
@@ -484,14 +486,14 @@ class App(object):
     def get_image_filenames(self, ids=None):
         """ Get filenames of image files only.
         Args:
-            ids: list of Integer ids for a restricted list of files, or Nonew.
+            ids: list of Integer ids for a restricted list of files, or None.
         Returns:
-            List of dictionaries of id, name, memo
+            List of dictionaries of id, name, memo, mediapath, date
         """
 
         if ids is None:
             ids = []
-        sql = "select id, name, ifnull(memo,'') from source where mediapath like '/images/%' or mediapath like 'images:%'"
+        sql = "select id, name, ifnull(memo,''), mediapath, date from source where mediapath like '/images/%' or mediapath like 'images:%'"
         if ids:
             ids_str = ",".join(map(str, ids))
             sql += f" and id in ({ids_str})"
@@ -500,8 +502,9 @@ class App(object):
         cur.execute(sql)
         result = cur.fetchall()
         res = []
+        keys = 'id', 'name', 'memo', 'mediapath', 'date'
         for row in result:
-            res.append({'id': row[0], 'name': row[1], 'memo': row[2]})
+            res.append(dict(zip(keys, row)))
         return res
 
     def get_image_and_pdf_filenames(self, ids=None):
@@ -509,13 +512,13 @@ class App(object):
         Args:
             ids: list of Integer ids for a restricted list of files, or Nonew.
         Returns:
-            List of dictionaries of id, name, memo
+            List of dictionaries of id, name, memo, mediapath, date
         """
 
         if ids is None:
             ids = []
 
-        sql = "select id, name, ifnull(memo,'') from source where "
+        sql = "select id, name, ifnull(memo,''),mediapath, date from source where "
         sql += "(substr(mediapath,1,7) in ('/images', 'images:')) or "
         sql += "(lower(substr(mediapath, -4)) = '.pdf') "
 
@@ -527,8 +530,9 @@ class App(object):
         cur.execute(sql)
         result = cur.fetchall()
         res = []
+        keys = 'id', 'name', 'memo', 'mediapath', 'date'
         for row in result:
-            res.append({'id': row[0], 'name': row[1], 'memo': row[2]})
+            res.append(dict(zip(keys, row)))
         return res
 
     def get_av_filenames(self, ids=None):
@@ -536,12 +540,12 @@ class App(object):
         Args:
             ids: list of Integer ids for a restricted list of files.
         Returns:
-            List of dictionaries of id, name, memo
+            List of dictionaries of id, name, memo, mediapath, date
         """
 
         if ids is None:
             ids = []
-        sql = "select id, name, ifnull(memo,'') from source where "
+        sql = "select id, name, ifnull(memo,''), mediapath, date from source where "
         sql += "(mediapath like '/audio/%' or mediapath like 'audio:%' or mediapath like '/video/%' or mediapath like 'video:%') "
         if ids:
             ids_str = ",".join(map(str, ids))
@@ -551,8 +555,9 @@ class App(object):
         cur.execute(sql)
         result = cur.fetchall()
         res = []
+        keys = 'id', 'name', 'memo', 'mediapath', 'date'
         for row in result:
-            res.append({'id': row[0], 'name': row[1], 'memo': row[2]})
+            res.append(dict(zip(keys, row)))
         return res
 
     def get_annotations(self):
