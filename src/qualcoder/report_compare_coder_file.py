@@ -33,6 +33,8 @@ from .GUI.ui_dialog_code_context_image import Ui_Dialog_code_context_image
 from .GUI.ui_dialog_report_compare_coder_file import Ui_Dialog_reportCompareCoderFile
 from .helpers import Message, msecs_to_hours_mins_secs, ExportDirectoryPathDialog
 from .information import DialogInformation
+from .report_attributes import DialogSelectAttributeParameters
+from .select_items import DialogSelectItems
 
 # If VLC not installed, it will not crash
 vlc = None
@@ -91,6 +93,8 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         self.ui.treeWidget.setStyleSheet(font)
         self.ui.listWidget_files.setStyleSheet(font)
         self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.SelectionMode.SingleSelection)
+        self.ui.listWidget_files.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        self.ui.listWidget_files.customContextMenuRequested.connect(self.file_menu)
         self.ui.comboBox_coders.insertItems(0, self.coders)
         self.ui.comboBox_coders.currentTextChanged.connect(self.coder_selected)
         if len(self.coders) == 3:  # Includes empty slot
@@ -114,7 +118,8 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
 
     def get_data(self):
         """ Called from init. gets coders, code_names, categories, files.
-        Images are not loaded. """
+        Images are not loaded.
+        """
 
         self.codes, self.categories = self.app.get_codes_categories()
         cur = self.app.conn.cursor()
@@ -126,44 +131,170 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
             self.coders.append(row[0])
         self.get_files()
 
-    def get_files(self):
+    def file_menu(self, position):
+        """ Context menu for listWidget files for Sorting files.
+        Each file dictionary item in self.filenames contains:
+        {'id', 'name', 'memo', 'characters'= number of characters in the file,
+        'start' = showing characters from this position, 'end' = showing characters to this position}
+
+        Args:
+            position :
+        """
+
+        selected = self.ui.listWidget_files.currentItem()
+        if not selected:
+            return
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
+        action_show_files_like = menu.addAction(_("Show files like"))
+        action_show_by_attribute = menu.addAction(_("Show files by attributes"))
+        action_show_case_files = menu.addAction(_("Show case files"))
+        action_sort_name_asc = menu.addAction(_("Sort by name ascending"))
+        action_sort_name_desc = menu.addAction(_("Sort by name descending"))
+        action_sort_case_asc = menu.addAction(_("Sort by case ascending"))
+        action_sort_case_desc = menu.addAction(_("Sort by case descending"))
+        action_sort_date_asc = menu.addAction(_("Sort by date ascending"))
+        action_sort_date_desc = menu.addAction(_("Sort by date descending"))
+        action = menu.exec(self.ui.listWidget_files.mapToGlobal(position))
+        if action is None:
+            return
+        if action == action_show_files_like:
+            self.show_files_like()
+        if action == action_show_case_files:
+            self.show_case_files()
+        if action == action_show_by_attribute:
+            self.get_files_from_attributes()
+        if action == action_sort_name_asc:
+            self.get_files(None, "name asc")
+        if action == action_sort_name_desc:
+            self.get_files(None, "name desc")
+        if action == action_sort_case_asc:
+            self.get_files(None, "case asc")
+        if action == action_sort_case_desc:
+            self.get_files(None, "case desc")
+        if action == action_sort_date_asc:
+            self.get_files(None, "date asc")
+        if action == action_sort_date_desc:
+            self.get_files(None, "date desc")
+
+    def show_case_files(self):
+        """ Show files of specified case.
+        Or show all files. """
+
+        cases = self.app.get_casenames()
+        cases.insert(0, {"name": _("Show all files"), "id": -1})
+        ui = DialogSelectItems(self.app, cases, _("Select case"), "single")
+        ok = ui.exec()
+        if not ok:
+            return
+        selection = ui.get_selected()
+        if not selection:
+            return
+        if selection['id'] == -1:
+            self.get_files()
+            return
+        cur = self.app.conn.cursor()
+        cur.execute('select fid from case_text where caseid=?', [selection['id']])
+        res = cur.fetchall()
+        file_ids = [r[0] for r in res]
+        self.get_files(file_ids)
+
+    def show_files_like(self):
+        """ Show files that contain specified filename text.
+        If blank, show all files. """
+
+        dialog = QtWidgets.QInputDialog(self)
+        dialog.setStyleSheet(f"* {{font-size:{self.app.settings['fontsize']}pt}} ")
+        dialog.setWindowTitle(_("Show files like"))
+        dialog.setWindowFlags(dialog.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
+        dialog.setInputMode(QtWidgets.QInputDialog.InputMode.TextInput)
+        dialog.setLabelText(_("Show files containing the text. (Blank for all)"))
+        dialog.resize(200, 20)
+        ok = dialog.exec()
+        if not ok:
+            return
+        text_ = str(dialog.textValue())
+        if text_ == "":
+            self.get_files()
+            return
+        cur = self.app.conn.cursor()
+        cur.execute('select id from source where name like ?', ['%' + text_ + '%'])
+        res = cur.fetchall()
+        file_ids = [r[0] for r in res]
+        self.get_files(file_ids)
+
+    def get_files_from_attributes(self):
+        """ Select files based on attribute selections.
+        Attribute results are a dictionary of:
+        first item is a Boolean AND or OR list item
+        Followed by each attribute list item
+        """
+
+        ui = DialogSelectAttributeParameters(self.app)
+        attributes = []
+        ok = ui.exec()
+        if not ok:
+            return
+        attributes = ui.parameters
+        if len(attributes) == 1:  # Boolean parameter, no attributes
+            self.get_files()
+            return
+        if not ui.result_file_ids:
+            Message(self.app, _("Nothing found") + " " * 20, _("No matching files found")).exec()
+            return
+        self.get_files(ui.result_file_ids)
+
+    def get_files(self, ids=None, sort="name asc"):
         """ Get source files with additional details and fill list widget.
         Add file type to dictionary for each file.
+        Args:
+            ids : list, fill with ids to limit file selection list.
+            sort : String Sort options, name asc, name, desc, case asc, case desc
         """
 
         self.ui.listWidget_files.clear()
-        self.files = self.app.get_filenames()
+        if ids is None:
+            ids = []
+        self.files = self.app.get_filenames(ids)
         # Fill additional details about each file in the memo
         cur = self.app.conn.cursor()
         sql = "select length(fulltext), mediapath from source where id=?"
         sql_text_codings = "select count(cid) from code_text where fid=?"
         sql_av_codings = "select count(cid) from code_av where id=?"
         sql_image_codings = "select count(cid) from code_image where id=?"
-        for f in self.files:
-            cur.execute(sql, [f['id'], ])
+        for file_ in self.files:
+            cur.execute(sql, [file_['id'], ])
             res = cur.fetchone()
             if res is None:  # safety catch
                 res = [0]
-            tt = ""
-            f['mediapath'] = res[1]
+            tt = f"{file_['date'].split()[0]}\n"
+            file_['mediapath'] = res[1]
             if res[1] is None or res[1][0:5] == "docs:" or res[1][0:5] == "/docs":
                 tt += _("Text file\n")
                 tt += _("Characters: ") + str(res[0])
-                f['type'] = 'text'
+                file_['type'] = 'text'
             if res[1] is not None and (res[1][0:7] == "images:" or res[1][0:7] == "/images"):
                 tt += _("Image")
-                f['type'] = 'image'
+                file_['type'] = 'image'
             if res[1] is not None and (res[1][0:6] == "audio:" or res[1][0:6] == "/audio"):
                 tt += _("Audio")
-                f['type'] = 'audio'
+                file_['type'] = 'audio'
             if res[1] is not None and (res[1][0:6] == "video:" or res[1][0:6] == "/video"):
                 tt += _("Video")
-                f['type'] = 'video'
-            cur.execute(sql_text_codings, [f['id']])
+                file_['type'] = 'video'
+            file_['case'] = ""
+            sql_case = "SELECT group_concat(cases.name) from cases join case_text on case_text.caseid=cases.caseid " \
+                       "where case_text.fid=?"
+            cur.execute(sql_case, [file_['id']])
+            res_cases = cur.fetchone()
+            if res_cases and res_cases[0] is not None:
+                tt += "\n" + _("Case: ") + f"{res_cases[0]}\n"
+                file_['case'] = str(res_cases[0])
+            cur.execute(sql_text_codings, [file_['id']])
             txt_res = cur.fetchone()
-            cur.execute(sql_av_codings, [f['id']])
+            cur.execute(sql_av_codings, [file_['id']])
             av_res = cur.fetchone()
-            cur.execute(sql_image_codings, [f['id']])
+            cur.execute(sql_image_codings, [file_['id']])
             img_res = cur.fetchone()
             tt += _("\nCodings: ")
             if txt_res[0] > 0:
@@ -172,10 +303,25 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
                 tt += str(av_res[0])
             if img_res[0] > 0:
                 tt += str(img_res[0])
-            item = QtWidgets.QListWidgetItem(f['name'])
-            if f['memo'] != "":
-                tt += _("\nMemo: ") + f['memo']
-            item.setToolTip(tt)
+            if file_['memo'] != "":
+                tt += _("\nMemo: ") + file_['memo']
+            file_['tooltip'] = tt
+        # Sorting the file list
+        if sort == "name asc":
+            self.files = sorted(self.files, key=lambda x: x['name'])
+        if sort == "name desc":
+            self.files = sorted(self.files, key=lambda x: x['name'], reverse=True)
+        if sort == "case asc":
+            self.files = sorted(self.files, key=lambda x: x['case'])
+        if sort == "case desc":
+            self.files = sorted(self.files, key=lambda x: x['case'], reverse=True)
+        if sort == "date asc":
+            self.files = sorted(self.files, key=lambda x: x['date'])
+        if sort == "date desc":
+            self.files = sorted(self.files, key=lambda x: x['date'], reverse=True)
+        for file_ in self.files:
+            item = QtWidgets.QListWidgetItem(file_['name'])
+            item.setToolTip(file_['tooltip'])
             self.ui.listWidget_files.addItem(item)
 
     def coder_selected(self):
