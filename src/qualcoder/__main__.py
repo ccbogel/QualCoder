@@ -347,15 +347,24 @@ class App(object):
             res.append(dict(zip(keys, row)))
         return res
 
-    def get_filenames(self):
+    def get_filenames(self, ids=None):
         """ Get all filenames.
+        Args:
+            ids: List of ids or none
 
         Returns:
             List of dictionaries of id, name memo, mediapath, date
         """
 
+        if ids is None:
+            ids = []
+        sql = "select id, name, ifnull(memo,''), date from source "
+        if ids:
+            ids_str = ",".join(map(str, ids))
+            sql += f" where id in ({ids_str}) "
+        sql += "order by lower(name)"
         cur = self.conn.cursor()
-        cur.execute("select id, name, ifnull(memo,''), date from source order by lower(name)")
+        cur.execute(sql)
         result = cur.fetchall()
         res = []
         keys = 'id', 'name', 'memo', 'date'
