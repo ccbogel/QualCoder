@@ -367,14 +367,14 @@ class DialogCodePdf(QtWidgets.QWidget):
         if ids is None:
             ids = []
         self.ui.listWidget.clear()
-        self.filenames = self.app.get_pdf_filenames(ids)
+        self.files = self.app.get_pdf_filenames(ids)
         # Fill additional details about each file in the memo
         cur = self.app.conn.cursor()
         sql_length = "select length(fulltext), fulltext from source where id=?"
         sql_codings = "select count(cid) from code_text where fid=? and owner=?"
         sql_case = "SELECT group_concat(cases.name) from cases join case_text on case_text.caseid=cases.caseid where case_text.fid=?"
-        for file_ in self.filenames:
-            tt = _("Date: ") + file_['date'].split()[0] + "\n"  # Date without timestamp
+        for file_ in self.files:
+            tt = _("Date: ") + f"{file_['date'].split()[0]}\n"  # Date without timestamp
             cur.execute(sql_case, [file_['id']])
             res_cases = cur.fetchone()
             if res_cases and res_cases[0] is not None:
@@ -397,19 +397,19 @@ class DialogCodePdf(QtWidgets.QWidget):
             file_['tooltip'] = tt
         # Sorting the file list
         if sort == "name asc":
-            self.filenames = sorted(self.filenames, key=lambda x: x['name'])
+            self.files = sorted(self.files, key=lambda x: x['name'])
         if sort == "name desc":
-            self.filenames = sorted(self.filenames, key=lambda x: x['name'], reverse=True)
+            self.files = sorted(self.files, key=lambda x: x['name'], reverse=True)
         if sort == "case asc":
-            self.filenames = sorted(self.filenames, key=lambda x: x['case'])
+            self.files = sorted(self.files, key=lambda x: x['case'])
         if sort == "case desc":
-            self.filenames = sorted(self.filenames, key=lambda x: x['case'], reverse=True)
+            self.files = sorted(self.files, key=lambda x: x['case'], reverse=True)
         if sort == "date asc":
-            self.filenames = sorted(self.filenames, key=lambda x: x['date'])
+            self.files = sorted(self.files, key=lambda x: x['date'])
         if sort == "date desc":
-            self.filenames = sorted(self.filenames, key=lambda x: x['date'], reverse=True)
+            self.files = sorted(self.files, key=lambda x: x['date'], reverse=True)
         # Fill list widget
-        for file_ in self.filenames:
+        for file_ in self.files:
             item = QtWidgets.QListWidgetItem(file_['name'])
             item.setToolTip(file_['tooltip'])
             self.ui.listWidget.addItem(item)
@@ -2408,7 +2408,7 @@ class DialogCodePdf(QtWidgets.QWidget):
     def file_menu(self, position):
         """ Context menu for listWidget files to get to the next file and
         to go to the file with the latest codings by this coder.
-        Each file dictionary item in self.filenames contains:
+        Each file dictionary item in self.files contains:
         {'id', 'name', 'memo', 'characters'= number of characters in the file,
         'start' = showing characters from this position, 'end' = showing characters to this position}
 
@@ -2419,7 +2419,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         selected = self.ui.listWidget.currentItem()
         if not selected:
             return
-        file_ = next((f for f in self.filenames if f['name'] == selected.text()), None)
+        file_ = next((f for f in self.files if f['name'] == selected.text()), None)
         menu = QtWidgets.QMenu()
         menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
         action_next = None
@@ -2435,7 +2435,7 @@ class DialogCodePdf(QtWidgets.QWidget):
                 len(file_['mediapath']) > 6 and \
                 (file_['mediapath'][:6] == '/docs/' or file_['mediapath'][:5] == 'docs:'):
             action_view_original_file = menu.addAction(_("View original text file"))
-        if len(self.filenames) > 1:
+        if len(self.files) > 1:
             action_next = menu.addAction(_("Next file"))
             action_latest = menu.addAction(_("File with latest coding"))
             action_show_files_like = menu.addAction(_("Show files like"))
@@ -2547,12 +2547,12 @@ class DialogCodePdf(QtWidgets.QWidget):
         """ Go to next file in list. Button. """
 
         if self.file_ is None:
-            self.load_file(self.filenames[0])
+            self.load_file(self.files[0])
             self.ui.listWidget.setCurrentRow(0)
             return
-        for i in range(0, len(self.filenames) - 1):
-            if self.file_ == self.filenames[i]:
-                found = self.filenames[i + 1]
+        for i in range(0, len(self.files) - 1):
+            if self.file_ == self.files[i]:
+                found = self.files[i + 1]
                 self.ui.listWidget.setCurrentRow(i + 1)
                 self.load_file(found)
                 self.search_term = ""
@@ -2570,7 +2570,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         result = cur.fetchone()
         if result is None:
             return
-        for i, filedata in enumerate(self.filenames):
+        for i, filedata in enumerate(self.files):
             if filedata['id'] == result[0]:
                 self.ui.listWidget.setCurrentRow(i)
                 self.load_file(filedata)
@@ -2582,10 +2582,10 @@ class DialogCodePdf(QtWidgets.QWidget):
         The selected file is then displayed for coding.
         Note: file segment is also loaded from listWidget context menu """
 
-        if len(self.filenames) == 0:
+        if len(self.files) == 0:
             return
         item_name = self.ui.listWidget.currentItem().text()
-        for f in self.filenames:
+        for f in self.files:
             if f['name'] == item_name:
                 self.file_ = f
                 self.load_file(self.file_)
@@ -2624,7 +2624,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         """ File selection changed. """
 
         row = self.ui.listWidget.currentRow()
-        self.load_file(self.filenames[row])
+        self.load_file(self.files[row])
 
     def load_file(self, file_):
         """ Load and display file pdf object in qgraphicsscene and text for this file.
