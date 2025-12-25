@@ -316,12 +316,14 @@ class DialogCodeImage(QtWidgets.QDialog):
         for row in results:
             self.code_areas.append(dict(zip(keys, row)))
 
-    def get_files(self, ids=None):
+    def get_files(self, ids=None, sort="name asc"):
         """ Load the image and pdf file data.
         Exclude those image and pdf file data where there are bad links.
         Fill List widget with the files.
-        param:
-            ids : list of Integer ids to restrict files """
+        args:
+            ids : list of Integer ids to restrict files
+            sort : String Sort options, name asc, name, desc, case asc, case desc
+        """
 
         if ids is None:
             ids = []
@@ -348,16 +350,35 @@ class DialogCodeImage(QtWidgets.QDialog):
         keys = 'name', 'id', 'memo', 'owner', 'date', 'mediapath'
         for row in result:
             self.files.append(dict(zip(keys, row)))
-        sql_case = "SELECT group_concat(cases.name) from cases join case_text on case_text.caseid=cases.caseid where case_text.fid=?"
+        sql_case = "SELECT group_concat(cases.name) from cases join case_text on case_text.caseid=cases.caseid " \
+                   "where case_text.fid=?"
         for file_ in self.files:
-            item = QtWidgets.QListWidgetItem(file_['name'])
             tt = _("Date: ") + file_['date'].split()[0]
+            file_['case'] = ""
             cur.execute(sql_case, [file_['id']])
             res_cases = cur.fetchone()
             if res_cases and res_cases[0] is not None:
                 tt += "\n" + _("Case: ") + f"{res_cases[0]}"
+                file_['case'] = f"{res_cases[0]}"
             tt += f"\n{file_['memo']}"
-            item.setToolTip(tt)
+            file_['tooltip'] = tt
+        # Sorting the file list
+        if sort == "name asc":
+            self.files = sorted(self.files, key=lambda x: x['name'])
+        if sort == "name desc":
+            self.files = sorted(self.files, key=lambda x: x['name'], reverse=True)
+        if sort == "case asc":
+            self.files = sorted(self.files, key=lambda x: x['case'])
+        if sort == "case desc":
+            self.files = sorted(self.files, key=lambda x: x['case'], reverse=True)
+        if sort == "date asc":
+            self.files = sorted(self.files, key=lambda x: x['date'])
+        if sort == "date desc":
+            self.files = sorted(self.files, key=lambda x: x['date'], reverse=True)
+        # Fill list widget
+        for file_ in self.files:
+            item = QtWidgets.QListWidgetItem(file_['name'])
+            item.setToolTip(file_['tooltip'])
             self.ui.listWidget.addItem(item)
         self.clear_file()
 
@@ -700,21 +721,27 @@ class DialogCodeImage(QtWidgets.QDialog):
         """ Context menu to select the next image alphabetically, or
          to select the image that was most recently coded """
 
-        if len(self.files) == 0:
-            return
         selected = self.ui.listWidget.currentItem()
-        file_ = None
-        for f in self.files:
-            if selected.text() == f['name']:
-                file_ = f
+        if not selected:
+            return
+        file_ = next((f for f in self.files if f['name'] == selected.text()), None)
         menu = QtWidgets.QMenu()
-        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
         action_memo = menu.addAction(_("Open memo"))
         action_next = menu.addAction(_("Next file"))
         action_latest = menu.addAction(_("File with latest coding"))
         action_show_files_like = menu.addAction(_("Show files like"))
         action_show_case_files = menu.addAction(_("Show case files"))
         action_show_by_attribute = menu.addAction(_("Show files by attributes"))
+        sort_menu = QtWidgets.QMenu(_("Sort"))
+        sort_menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
+        action_sort_name_asc = sort_menu.addAction(_("Sort by name ascending"))
+        action_sort_name_desc = sort_menu.addAction(_("Sort by name descending"))
+        action_sort_case_asc = sort_menu.addAction(_("Sort by case ascending"))
+        action_sort_case_desc = sort_menu.addAction(_("Sort by case descending"))
+        action_sort_date_asc = sort_menu.addAction(_("Sort by date ascending"))
+        action_sort_date_desc = sort_menu.addAction(_("Sort by date descending"))
+        menu.addMenu(sort_menu)
         action = menu.exec(self.ui.listWidget.mapToGlobal(position))
         if action == action_memo:
             self.file_memo(file_)
@@ -730,6 +757,18 @@ class DialogCodeImage(QtWidgets.QDialog):
             self.show_case_files()
         if action == action_show_by_attribute:
             self.get_files_from_attributes()
+        if action == action_sort_name_asc:
+            self.get_files(None, "name asc")
+        if action == action_sort_name_desc:
+            self.get_files(None, "name desc")
+        if action == action_sort_case_asc:
+            self.get_files(None, "case asc")
+        if action == action_sort_case_desc:
+            self.get_files(None, "case desc")
+        if action == action_sort_date_asc:
+            self.get_files(None, "date asc")
+        if action == action_sort_date_desc:
+            self.get_files(None, "date desc")
 
     def show_case_files(self):
         """ Show files of specified case.
@@ -777,8 +816,6 @@ class DialogCodeImage(QtWidgets.QDialog):
         cur.execute('select id from source where name like ?', ['%' + text_ + '%'])
         res = cur.fetchall()
         file_ids = [r[0] for r in res]
-        '''for r in res:
-            file_ids.append(r[0])'''
         self.get_files(file_ids)
 
     def file_selection_changed(self):

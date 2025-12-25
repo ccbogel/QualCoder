@@ -9,8 +9,7 @@ Foundation, either version 3 of the License, or (at your option) any later versi
 
 QualCoder is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
 without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU General Pu
-blic License for more details.
+See the GNU General Public License for more details.
 
 You should have received a copy of the GNU Lesser General Public License along with QualCoder.
 If not, see <https://www.gnu.org/licenses/>.
@@ -481,11 +480,12 @@ class DialogCodeText(QtWidgets.QWidget):
         if item.isExpanded() and item.text(1) in self.app.collapsed_categories:
             self.app.collapsed_categories.remove(item.text(1))
 
-    def get_files(self, ids=None):
+    def get_files(self, ids=None, sort="name asc"):
         """ Get files with additional details and fill list widget.
          Called by: init, get_files_from_attributes, show_files_like
          Args:
             ids : list, fill with ids to limit file selection.
+            sort : String Sort options, name asc, name, desc, case asc, case desc
          """
 
         if ids is None:
@@ -505,8 +505,10 @@ class DialogCodeText(QtWidgets.QWidget):
             tt = _("Date: ") + file_['date'].split()[0] + "\n"  # Date without timestamp
             cur.execute(sql_case, [file_['id']])
             res_cases = cur.fetchone()
+            file_['case'] = ""
             if res_cases and res_cases[0] is not None:
                 tt += _("Case: ") + str(res_cases[0]) + "\n"
+                file_['case'] = str(res_cases[0])
             tt += _("Characters: ") + str(res_length[0])
             file_['characters'] = res_length[0]
             file_['start'] = 0
@@ -516,10 +518,26 @@ class DialogCodeText(QtWidgets.QWidget):
             res_codings = cur.fetchone()
             tt += f'\n{_("Codings:")} {res_codings[0]}'
             tt += f"\n{_('From:')} {file_['start']} - {file_['end']}"
-            item = QtWidgets.QListWidgetItem(file_['name'])
             if file_['memo'] != "":
                 tt += f"\nMemo: {file_['memo']}"
-            item.setToolTip(tt)
+            file_['tooltip'] = tt
+        # Sorting the file list
+        if sort == "name asc":
+            self.filenames = sorted(self.filenames, key=lambda x: x['name'])
+        if sort == "name desc":
+            self.filenames = sorted(self.filenames, key=lambda x: x['name'], reverse=True)
+        if sort == "case asc":
+            self.filenames = sorted(self.filenames, key=lambda x: x['case'])
+        if sort == "case desc":
+            self.filenames = sorted(self.filenames, key=lambda x: x['case'], reverse=True)
+        if sort == "date asc":
+            self.filenames = sorted(self.filenames, key=lambda x: x['date'])
+        if sort == "date desc":
+            self.filenames = sorted(self.filenames, key=lambda x: x['date'], reverse=True)
+        # Fill list widget
+        for file_ in self.filenames:
+            item = QtWidgets.QListWidgetItem(file_['name'])
+            item.setToolTip(file_['tooltip'])
             self.ui.listWidget.addItem(item)
         self.file_ = None
         self.code_text = []  # Must be before clearing textEdit, as next calls cursorChanged
@@ -3127,22 +3145,21 @@ class DialogCodeText(QtWidgets.QWidget):
     def file_menu(self, position):
         """ Context menu for listWidget files to get to the next file and
         to go to the file with the latest codings by this coder.
+        Sorting files.
         Each file dictionary item in self.filenames contains:
         {'id', 'name', 'memo', 'characters'= number of characters in the file,
         'start' = showing characters from this position, 'end' = showing characters to this position}
 
         Args:
-            position : """
+            position :
+        """
 
         selected = self.ui.listWidget.currentItem()
-        if selected is None:
+        if not selected:
             return
-        file_ = None
-        for f in self.filenames:
-            if selected.text() == f['name']:
-                file_ = f
+        file_ = next((f for f in self.filenames if f['name'] == selected.text()), None)
         menu = QtWidgets.QMenu()
-        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
         action_next = None
         action_latest = None
         action_next_chars = None
@@ -3162,13 +3179,22 @@ class DialogCodeText(QtWidgets.QWidget):
             action_show_files_like = menu.addAction(_("Show files like"))
             action_show_by_attribute = menu.addAction(_("Show files by attributes"))
             action_show_case_files = menu.addAction(_("Show case files"))
-        if file_['characters'] > self.app.settings['codetext_chunksize']:
+        if file_ is not None and file_['characters'] > self.app.settings['codetext_chunksize']:
             action_next_chars = menu.addAction(str(self.app.settings['codetext_chunksize']) + _(" next  characters"))
             if file_['start'] > 0:
                 action_prev_chars = menu.addAction(
                     str(self.app.settings['codetext_chunksize']) + _(" previous  characters"))
         action_go_to_bookmark = menu.addAction(_("Go to bookmark"))
         action_mark_speakers = menu.addAction(_("Mark speakers"))
+        sort_menu = QtWidgets.QMenu(_("Sort"))
+        sort_menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
+        action_sort_name_asc = sort_menu.addAction(_("Sort by name ascending"))
+        action_sort_name_desc = sort_menu.addAction(_("Sort by name descending"))
+        action_sort_case_asc = sort_menu.addAction(_("Sort by case ascending"))
+        action_sort_case_desc = sort_menu.addAction(_("Sort by case descending"))
+        action_sort_date_asc = sort_menu.addAction(_("Sort by date ascending"))
+        action_sort_date_desc = sort_menu.addAction(_("Sort by date descending"))
+        menu.addMenu(sort_menu)
         action = menu.exec(self.ui.listWidget.mapToGlobal(position))
         if action is None:
             return
@@ -3194,6 +3220,18 @@ class DialogCodeText(QtWidgets.QWidget):
             self.get_files_from_attributes()
         if action == action_mark_speakers:
             self.mark_speakers()
+        if action == action_sort_name_asc:
+            self.get_files(None, "name asc")
+        if action == action_sort_name_desc:
+            self.get_files(None, "name desc")
+        if action == action_sort_case_asc:
+            self.get_files(None, "case asc")
+        if action == action_sort_case_desc:
+            self.get_files(None, "case desc")
+        if action == action_sort_date_asc:
+            self.get_files(None, "date asc")
+        if action == action_sort_date_desc:
+            self.get_files(None, "date desc")
 
     def view_original_text_file(self):
         """ View original text file.

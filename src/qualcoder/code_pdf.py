@@ -356,11 +356,12 @@ class DialogCodePdf(QtWidgets.QWidget):
             except ValueError:
                 pass
 
-    def get_files(self, ids=None):
+    def get_files(self, ids=None, sort="name asc"):
         """ Get pdf files with additional details and fill list widget.
          Called by: init, get_files_from_attributes, show_files_like
-         param:
+         args:
          ids: list, fill with ids to limit file selection.
+         sort : String Sort options, name asc, name, desc, case asc, case desc
          """
 
         if ids is None:
@@ -372,29 +373,45 @@ class DialogCodePdf(QtWidgets.QWidget):
         sql_length = "select length(fulltext), fulltext from source where id=?"
         sql_codings = "select count(cid) from code_text where fid=? and owner=?"
         sql_case = "SELECT group_concat(cases.name) from cases join case_text on case_text.caseid=cases.caseid where case_text.fid=?"
-        for f in self.filenames:
-            tt = _("Date: ") + f['date'].split()[0] + "\n"  # Date without timestamp
-            cur.execute(sql_case, [f['id']])
+        for file_ in self.filenames:
+            tt = _("Date: ") + file_['date'].split()[0] + "\n"  # Date without timestamp
+            cur.execute(sql_case, [file_['id']])
             res_cases = cur.fetchone()
             if res_cases and res_cases[0] is not None:
-                tt += _("Case: ") + str(res_cases[0]) + "\n"
-            cur.execute(sql_length, [f['id'], ])
+                tt += _("Case: ") + f"{res_cases[0]}\n"
+            cur.execute(sql_length, [file_['id'], ])
             res_length = cur.fetchone()
             if res_length is None:  # Safety catch
                 res_length = [0, ""]
             tt += _("Characters: ") + str(res_length[0])
-            f['characters'] = res_length[0]
-            f['start'] = 0
-            f['end'] = res_length[0]
-            f['fulltext'] = res_length[1]
-            cur.execute(sql_codings, [f['id'], self.app.settings['codername']])
+            file_['characters'] = res_length[0]
+            file_['start'] = 0
+            file_['end'] = res_length[0]
+            file_['fulltext'] = res_length[1]
+            cur.execute(sql_codings, [file_['id'], self.app.settings['codername']])
             res_codings = cur.fetchone()
             tt += f"\n{_('Codings:')} {res_codings[0]}"
-            tt += f"\n{_('From:')} {f['start']} - {f['end']}"
-            item = QtWidgets.QListWidgetItem(f['name'])
-            if f['memo'] != "":
-                tt += f"\nMemo: {f['memo']}"
-            item.setToolTip(tt)
+            tt += f"\n{_('From:')} {file_['start']} - {file_['end']}"
+            if file_['memo'] != "":
+                tt += f"\nMemo: {file_['memo']}"
+            file_['tooltip'] = tt
+        # Sorting the file list
+        if sort == "name asc":
+            self.filenames = sorted(self.filenames, key=lambda x: x['name'])
+        if sort == "name desc":
+            self.filenames = sorted(self.filenames, key=lambda x: x['name'], reverse=True)
+        if sort == "case asc":
+            self.filenames = sorted(self.filenames, key=lambda x: x['case'])
+        if sort == "case desc":
+            self.filenames = sorted(self.filenames, key=lambda x: x['case'], reverse=True)
+        if sort == "date asc":
+            self.filenames = sorted(self.filenames, key=lambda x: x['date'])
+        if sort == "date desc":
+            self.filenames = sorted(self.filenames, key=lambda x: x['date'], reverse=True)
+        # Fill list widget
+        for file_ in self.filenames:
+            item = QtWidgets.QListWidgetItem(file_['name'])
+            item.setToolTip(file_['tooltip'])
             self.ui.listWidget.addItem(item)
         self.file_ = None
         self.code_text = []  # Must be before clearing textEdit, as next calls cursorChanged
@@ -2395,17 +2412,16 @@ class DialogCodePdf(QtWidgets.QWidget):
         {'id', 'name', 'memo', 'characters'= number of characters in the file,
         'start' = showing characters from this position, 'end' = showing characters to this position}
 
-        param:
-            position : """
+        args:
+            position :
+        """
 
         selected = self.ui.listWidget.currentItem()
-        file_ = None
-        if selected is not None:
-            for f in self.filenames:
-                if selected.text() == f['name']:
-                    file_ = f
+        if not selected:
+            return
+        file_ = next((f for f in self.filenames if f['name'] == selected.text()), None)
         menu = QtWidgets.QMenu()
-        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
         action_next = None
         action_latest = None
         action_show_files_like = None
@@ -2425,6 +2441,15 @@ class DialogCodePdf(QtWidgets.QWidget):
             action_show_files_like = menu.addAction(_("Show files like"))
             action_show_by_attribute = menu.addAction(_("Show files by attributes"))
             action_show_case_files = menu.addAction(_("Show case files"))
+        sort_menu = QtWidgets.QMenu(_("Sort"))
+        sort_menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
+        action_sort_name_asc = sort_menu.addAction(_("Sort by name ascending"))
+        action_sort_name_desc = sort_menu.addAction(_("Sort by name descending"))
+        action_sort_case_asc = sort_menu.addAction(_("Sort by case ascending"))
+        action_sort_case_desc = sort_menu.addAction(_("Sort by case descending"))
+        action_sort_date_asc = sort_menu.addAction(_("Sort by date ascending"))
+        action_sort_date_desc = sort_menu.addAction(_("Sort by date descending"))
+        menu.addMenu(sort_menu)
         action = menu.exec(self.ui.listWidget.mapToGlobal(position))
         if action is None:
             return
@@ -2442,6 +2467,18 @@ class DialogCodePdf(QtWidgets.QWidget):
             self.show_case_files()
         if action == action_show_by_attribute:
             self.get_files_from_attributes()
+        if action == action_sort_name_asc:
+            self.get_files(None, "name asc")
+        if action == action_sort_name_desc:
+            self.get_files(None, "name desc")
+        if action == action_sort_case_asc:
+            self.get_files(None, "case asc")
+        if action == action_sort_case_desc:
+            self.get_files(None, "case desc")
+        if action == action_sort_date_asc:
+            self.get_files(None, "date asc")
+        if action == action_sort_date_desc:
+            self.get_files(None, "date desc")
 
     def view_original_file(self):
         """ View original pdf file. Opens in browser or other OS default software.
