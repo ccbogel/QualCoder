@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-12-26 15:02+1100\n"
-"PO-Revision-Date: 2025-07-14 20:28+1000\n"
+"PO-Revision-Date: 2025-12-27 08:50+1100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: sv\n"
@@ -155,9 +155,8 @@ msgstr "Tyvärr kunde AI:n inte hitta någon data relaterad till \""
 #: src\qualcoder\ai_chat.py:506
 msgid "Found related data. Analyzing the most relevant segments closer."
 msgstr ""
-"Relaterad data hittad. Analyserar de mest relevanta segmenten "
-"närmare.Relaterad data hittades. Analyserar de mest relevanta segmenten "
-"närmare."
+"Relaterad data hittad. Analyserar de mest relevanta segmenten närmare."
+"Relaterad data hittades. Analyserar de mest relevanta segmenten närmare."
 
 #: src\qualcoder\ai_chat.py:576
 msgid "Analyze more data..."
@@ -249,7 +248,7 @@ msgstr "Info:"
 
 #: src\qualcoder\ai_chat.py:857
 msgid "Thinking..."
-msgstr ""
+msgstr "Tänkande..."
 
 #: src\qualcoder\ai_chat.py:919
 msgid "(unknown reference)"
@@ -370,7 +369,7 @@ msgstr "AI-modell"
 
 #: src\qualcoder\ai_llm.py:87
 msgid "Loading list of available AI models..."
-msgstr ""
+msgstr "Laddar lista över tillgängliga AI-modeller..."
 
 #: src\qualcoder\ai_llm.py:320
 msgid ""
@@ -379,6 +378,11 @@ msgid ""
 "the AI access still works as expected. You might need to change to a "
 "different AI model in the settings dialog under \"Advanced AI Settings\"."
 msgstr ""
+"Du använder tjänsten \"Blablador\" på en gammal server som snart kommer att "
+"inaktiveras. Din konfiguration kommer att uppdateras automatiskt. Testa om "
+"AI-åtkomsten fortfarande fungerar som förväntat. Du kan behöva byta till en "
+"annan AI-modell i inställningsdialogrutan under \"Avancerade AI-"
+"inställningar\"."
 
 #: src\qualcoder\ai_llm.py:323 src\qualcoder\ai_llm.py:477
 msgid "AI Setup"
@@ -470,8 +474,8 @@ msgid ""
 "The AI operation could not be aborted immediately. It may take a moment for "
 "the AI to be ready again."
 msgstr ""
-"AI-operationen kunde inte avbrytas omedelbart. Det kan ta en stund innan "
-"AI:n är redo igen."
+"AI-operationen kunde inte avbrytas omedelbart. Det kan ta en stund innan AI:"
+"n är redo igen."
 
 #: src\qualcoder\ai_llm.py:694
 msgid "AI Error:\n"
@@ -2008,7 +2012,7 @@ msgstr "Visa fallfiler"
 #: src\qualcoder\code_pdf.py:2444 src\qualcoder\code_text.py:3190
 #: src\qualcoder\view_av.py:758 src\qualcoder\view_image.py:736
 msgid "Sort"
-msgstr ""
+msgstr "Sortera"
 
 #: src\qualcoder\code_pdf.py:2446 src\qualcoder\code_text.py:3192
 #: src\qualcoder\report_codes.py:319 src\qualcoder\report_codes.py:366
@@ -2392,7 +2396,7 @@ msgstr "Gå till bokmärke"
 #: src\qualcoder\code_text.py:3189 src\qualcoder\code_text.py:3462
 #: src\qualcoder\manage_files.py:519 src\qualcoder\manage_files.py:1000
 msgid "Mark speakers"
-msgstr ""
+msgstr "Markera högtalare"
 
 #: src\qualcoder\code_text.py:3329 src\qualcoder\code_text.py:3385
 msgid "From: "
@@ -2733,7 +2737,7 @@ msgstr "Kopiera referens till urklipp. APA"
 
 #: src\qualcoder\error_dlg.py:64
 msgid "Exception handler"
-msgstr ""
+msgstr "Undantagshanterare"
 
 #: src\qualcoder\helpers.py:235
 msgid ""
@@ -3357,7 +3361,7 @@ msgstr "Kan inte hitta media. "
 
 #: src\qualcoder\manage_files.py:1241 src\qualcoder\manage_files.py:1253
 msgid "Image too large for PIL module. (DecompressionBombError): "
-msgstr ""
+msgstr "Bilden är för stor för PIL-modulen. (DecompressionBombError):"
 
 #: src\qualcoder\manage_files.py:1280 src\qualcoder\report_file_summary.py:404
 #: src\qualcoder\report_file_summary.py:457
@@ -3807,17 +3811,19 @@ msgstr "original"
 
 #: src\qualcoder\pseudonyms.py:57 src\qualcoder\pseudonyms.py:88
 msgid "Pseudonym"
-msgstr ""
+msgstr "Pseudonym"
 
 #: src\qualcoder\pseudonyms.py:73
 msgid "Too short"
-msgstr ""
+msgstr "För kort"
 
 #: src\qualcoder\pseudonyms.py:77
 msgid ""
 "Too short, need 3 or more characters.\n"
 "Leave blank for random generated."
 msgstr ""
+"För kort, behöver 3 eller fler tecken.\\nLämna tomt för slumpmässigt "
+"genererat."
 
 #: src\qualcoder\pseudonyms.py:85
 #, fuzzy
@@ -5203,6 +5209,8 @@ msgid ""
 "Left click: Show coded text.\n"
 "Right click: Create new combined code from these codes."
 msgstr ""
+"Vänsterklick: Visa kodad text.\\nHögerklick: Skapa ny kombinerad kod från "
+"dessa koder."
 
 #: src\qualcoder\report_exact_matches.py:86
 msgid ""
@@ -5417,6 +5425,8 @@ msgid ""
 "Cannot open image with PIL module to ge t size and details.\n"
 "(DecompressionBombError)"
 msgstr ""
+"Det går inte att öppna bilden med PIL-modulen för att få storlek och "
+"detaljer.\\in(DecompressionBombError)"
 
 #: src\qualcoder\report_file_summary.py:556
 #: src\qualcoder\report_file_summary.py:644
@@ -5441,7 +5451,7 @@ msgstr ""
 
 #: src\qualcoder\report_file_summary.py:616
 msgid " Excludes English Stopwords"
-msgstr ""
+msgstr "Utesluter engelska stoppord"
 
 #: src\qualcoder\report_relations.py:239
 msgid ""
@@ -5864,6 +5874,7 @@ msgstr "Större"
 #: src\qualcoder\settings.py:156
 msgid "Default folder for storing automatic backups and for file outputs."
 msgstr ""
+"Standardmapp för lagring av automatiska säkerhetskopior och för filutdata."
 
 #: src\qualcoder\settings.py:295 src\qualcoder\settings.py:303
 msgid "Edit AI profile name"
@@ -5945,18 +5956,20 @@ msgid ""
 "The speaker name cannot be empty. If you want to exclude a speaker from "
 "being marked, deselect the check box on the left."
 msgstr ""
+"Högtalarnamnet får inte vara tomt. Om du vill utesluta en högtalare från att "
+"markeras, avmarkera kryssrutan till vänster."
 
 #: src\qualcoder\speakers.py:272
 msgid "This contains all the speakers that have been marked in documents."
-msgstr ""
+msgstr "Detta innehåller alla talare som har markerats i dokument."
 
 #: src\qualcoder\speakers.py:283
 msgid "Speakers category could not be found found or created."
-msgstr ""
+msgstr "Det gick inte att hitta eller skapa högtalarkategori."
 
 #: src\qualcoder\speakers.py:310
 msgid "Speaker code could not be found found or created."
-msgstr ""
+msgstr "Högtalarkoden kunde inte hittas eller skapas."
 
 #: src\qualcoder\special_functions.py:103 src\qualcoder\__main__.py:2430
 msgid "Open project directory"
@@ -6123,19 +6136,23 @@ msgstr "Ändra slutposition för kod"
 
 #: src\qualcoder\text_file_replacement.py:74
 msgid " New file name matches another existing file name"
-msgstr ""
+msgstr "Nytt filnamn matchar ett annat befintligt filnamn"
 
 #: src\qualcoder\text_file_replacement.py:82
 msgid ""
 "Reload the other tabs.\n"
 "Check accuracy of codings and annotations.\n"
 msgstr ""
+"Ladda om de andra flikarna.\\nKontrollera noggrannheten hos kodningar och "
+"anteckningar.\\n\n"
 
 #: src\qualcoder\text_file_replacement.py:83
 msgid ""
 "Function works by identifying the first matching text segment for each "
 "coding and annotation."
 msgstr ""
+"Funktionen fungerar genom att identifiera det första matchande textsegmentet "
+"för varje kodning och anteckning."
 
 #: src\qualcoder\text_file_replacement.py:85
 #, fuzzy
@@ -6149,12 +6166,14 @@ msgid ""
 "\n"
 "Found "
 msgstr ""
+"\n"
+"Hittade"
 
 #: src\qualcoder\text_file_replacement.py:108
 #: src\qualcoder\text_file_replacement.py:133
 #: src\qualcoder\text_file_replacement.py:160
 msgid " of "
-msgstr ""
+msgstr " av "
 
 #: src\qualcoder\text_file_replacement.py:143
 #: src\qualcoder\text_file_replacement.py:170
@@ -6175,6 +6194,8 @@ msgid ""
 "\n"
 "Please check if the file is empty."
 msgstr ""
+"\n"
+"Kontrollera om filen är tom."
 
 #: src\qualcoder\view_av.py:219 src\qualcoder\view_av.py:998
 msgid "Media coding"
@@ -6429,6 +6450,8 @@ msgid ""
 "Transcription area: Ctrl+T (insert timestamp) Ctrl+N (new speaker) Ctrl+1-8 "
 "(select speaker) Ctrl+D (delete speaker)"
 msgstr ""
+"Transkriptionsområde: Ctrl+T (infoga tidsstämpel) Ctrl+N (ny högtalare) "
+"Ctrl+1-8 (välj högtalare) Ctrl+D (ta bort högtalare)"
 
 #: src\qualcoder\view_av.py:4538
 msgid "Select name to delete"
@@ -6530,7 +6553,7 @@ msgstr "Ordmoln"
 
 #: src\qualcoder\view_charts.py:527
 msgid "Cumulative code count in cases by case"
-msgstr ""
+msgstr "Kumulativt antal kod från fall till fall"
 
 #: src\qualcoder\view_charts.py:582 src\qualcoder\view_charts.py:589
 #: src\qualcoder\view_charts.py:665 src\qualcoder\view_charts.py:672
@@ -6556,7 +6579,7 @@ msgstr "Antal"
 
 #: src\qualcoder\view_charts.py:609
 msgid "Cumulative code count in cases by code"
-msgstr ""
+msgstr "Kumulativt kodantal i fall efter kod"
 
 #: src\qualcoder\view_charts.py:691
 #, fuzzy
@@ -7078,7 +7101,7 @@ msgstr "Överlappar exakt med"
 
 #: src\qualcoder\view_image.py:1436
 msgid "Cannot open image with PIL. The image it too large."
-msgstr ""
+msgstr "Kan inte öppna bilden med PIL. Bilden är för stor."
 
 #: src\qualcoder\view_image.py:1437
 #, fuzzy
@@ -7174,9 +7197,9 @@ msgstr "Det finns redan en säkerhetskopia med det namnet"
 #: src\qualcoder\__main__.py:1224
 msgid "WARNING: audio and video files NOT backed up. See settings."
 msgstr ""
-"VARNING: ljud‑ och videofiler säkerhetskopieras INTE. Se "
-"inställningarna.VARNING: ljud och videofilerna är INTE säkerhetskopierade, "
-"gå till inställningarna."
+"VARNING: ljud‑ och videofiler säkerhetskopieras INTE. Se inställningarna."
+"VARNING: ljud och videofilerna är INTE säkerhetskopierade, gå till "
+"inställningarna."
 
 #: src\qualcoder\__main__.py:1226
 msgid "Project backup created: "
