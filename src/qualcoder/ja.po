@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-12-26 15:02+1100\n"
-"PO-Revision-Date: 2025-07-14 20:17+1000\n"
+"PO-Revision-Date: 2025-12-27 08:38+1100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: ja\n"
@@ -248,7 +248,7 @@ msgstr "インフォメーション:"
 
 #: src\qualcoder\ai_chat.py:857
 msgid "Thinking..."
-msgstr ""
+msgstr "考え..."
 
 #: src\qualcoder\ai_chat.py:919
 msgid "(unknown reference)"
@@ -371,7 +371,7 @@ msgstr "人工知能モデル"
 
 #: src\qualcoder\ai_llm.py:87
 msgid "Loading list of available AI models..."
-msgstr ""
+msgstr "利用可能な AI モデルのリストを読み込んでいます"
 
 #: src\qualcoder\ai_llm.py:320
 msgid ""
@@ -380,6 +380,10 @@ msgid ""
 "the AI access still works as expected. You might need to change to a "
 "different AI model in the settings dialog under \"Advanced AI Settings\"."
 msgstr ""
+"あなたは、まもなく無効になる古いサーバー上で「Blablador」サービスを使用してい"
+"ます。設定は自動的に更新されます。 AI アクセスが期待どおりに動作するかどうか"
+"をテストしてください。 「高度な AI 設定」の設定ダイアログで別の AI モデルに変"
+"更する必要がある場合があります。"
 
 #: src\qualcoder\ai_llm.py:323 src\qualcoder\ai_llm.py:477
 msgid "AI Setup"
@@ -2013,7 +2017,7 @@ msgstr "ケースファイルの表示"
 #: src\qualcoder\code_pdf.py:2444 src\qualcoder\code_text.py:3190
 #: src\qualcoder\view_av.py:758 src\qualcoder\view_image.py:736
 msgid "Sort"
-msgstr ""
+msgstr "選別"
 
 #: src\qualcoder\code_pdf.py:2446 src\qualcoder\code_text.py:3192
 #: src\qualcoder\report_codes.py:319 src\qualcoder\report_codes.py:366
@@ -2397,7 +2401,7 @@ msgstr "ブックマークへ"
 #: src\qualcoder\code_text.py:3189 src\qualcoder\code_text.py:3462
 #: src\qualcoder\manage_files.py:519 src\qualcoder\manage_files.py:1000
 msgid "Mark speakers"
-msgstr ""
+msgstr "発言者にマークを付ける"
 
 #: src\qualcoder\code_text.py:3329 src\qualcoder\code_text.py:3385
 msgid "From: "
@@ -2737,7 +2741,7 @@ msgstr "参照をクリップボードにコピー APA"
 
 #: src\qualcoder\error_dlg.py:64
 msgid "Exception handler"
-msgstr ""
+msgstr "例外ハンドラ"
 
 #: src\qualcoder\helpers.py:235
 msgid ""
@@ -3364,7 +3368,7 @@ msgstr "メディアが見つかりません。"
 
 #: src\qualcoder\manage_files.py:1241 src\qualcoder\manage_files.py:1253
 msgid "Image too large for PIL module. (DecompressionBombError): "
-msgstr ""
+msgstr "画像が PIL モジュールに対して大きすぎます。 (解凍爆弾エラー):"
 
 #: src\qualcoder\manage_files.py:1280 src\qualcoder\report_file_summary.py:404
 #: src\qualcoder\report_file_summary.py:457
@@ -3821,17 +3825,19 @@ msgstr "独自"
 
 #: src\qualcoder\pseudonyms.py:57 src\qualcoder\pseudonyms.py:88
 msgid "Pseudonym"
-msgstr ""
+msgstr "仮名"
 
 #: src\qualcoder\pseudonyms.py:73
 msgid "Too short"
-msgstr ""
+msgstr "短すぎる"
 
 #: src\qualcoder\pseudonyms.py:77
 msgid ""
 "Too short, need 3 or more characters.\n"
 "Leave blank for random generated."
 msgstr ""
+"短すぎます。3 文字以上必要です。\\nランダムに生成されるため空白のままにしてく"
+"ださい。"
 
 #: src\qualcoder\pseudonyms.py:85
 #, fuzzy
@@ -5221,6 +5227,8 @@ msgid ""
 "Left click: Show coded text.\n"
 "Right click: Create new combined code from these codes."
 msgstr ""
+"左クリック: コード化されたテキストを表示します。\\n右クリック: これらのコード"
+"から新しい結合コードを作成します。"
 
 #: src\qualcoder\report_exact_matches.py:86
 msgid ""
@@ -5434,6 +5442,8 @@ msgid ""
 "Cannot open image with PIL module to ge t size and details.\n"
 "(DecompressionBombError)"
 msgstr ""
+"PIL モジュールで画像を開いてサイズと詳細を取得できません。\n"
+"(DecompressionBombError)"
 
 #: src\qualcoder\report_file_summary.py:556
 #: src\qualcoder\report_file_summary.py:644
@@ -5458,7 +5468,7 @@ msgstr ""
 
 #: src\qualcoder\report_file_summary.py:616
 msgid " Excludes English Stopwords"
-msgstr ""
+msgstr "英語のストップワードを除く"
 
 #: src\qualcoder\report_relations.py:239
 msgid ""
@@ -5882,7 +5892,7 @@ msgstr "大きい"
 
 #: src\qualcoder\settings.py:156
 msgid "Default folder for storing automatic backups and for file outputs."
-msgstr ""
+msgstr "自動バックアップの保存およびファイル出力用のデフォルトのフォルダー。"
 
 #: src\qualcoder\settings.py:295 src\qualcoder\settings.py:303
 msgid "Edit AI profile name"
@@ -5964,18 +5974,20 @@ msgid ""
 "The speaker name cannot be empty. If you want to exclude a speaker from "
 "being marked, deselect the check box on the left."
 msgstr ""
+"発言者名を空にすることはできません。発言者をマークから除外したい場合は、左側"
+"のチェックボックスの選択を解除します。"
 
 #: src\qualcoder\speakers.py:272
 msgid "This contains all the speakers that have been marked in documents."
-msgstr ""
+msgstr "これには、ドキュメント内でマークされているすべての発言者が含まれます。"
 
 #: src\qualcoder\speakers.py:283
 msgid "Speakers category could not be found found or created."
-msgstr ""
+msgstr "スピーカー カテゴリが見つからないか、作成できませんでした。"
 
 #: src\qualcoder\speakers.py:310
 msgid "Speaker code could not be found found or created."
-msgstr ""
+msgstr "スピーカー カテゴリが見つからないか、作成できませんでした。"
 
 #: src\qualcoder\special_functions.py:103 src\qualcoder\__main__.py:2430
 msgid "Open project directory"
@@ -6146,19 +6158,23 @@ msgstr "コードエンド位置の変更"
 
 #: src\qualcoder\text_file_replacement.py:74
 msgid " New file name matches another existing file name"
-msgstr ""
+msgstr "新しいファイル名が別の既存のファイル名と一致する"
 
 #: src\qualcoder\text_file_replacement.py:82
 msgid ""
 "Reload the other tabs.\n"
 "Check accuracy of codings and annotations.\n"
 msgstr ""
+"他のタブを再ロードします。\\nコーディングと注釈の正確さを確認してくださ"
+"い。\\n\n"
 
 #: src\qualcoder\text_file_replacement.py:83
 msgid ""
 "Function works by identifying the first matching text segment for each "
 "coding and annotation."
 msgstr ""
+"関数は、各コーディングと注釈に対して最初に一致するテキスト セグメントを識別す"
+"ることによって機能します。"
 
 #: src\qualcoder\text_file_replacement.py:85
 #, fuzzy
@@ -6172,12 +6188,14 @@ msgid ""
 "\n"
 "Found "
 msgstr ""
+"\n"
+"見つかりました"
 
 #: src\qualcoder\text_file_replacement.py:108
 #: src\qualcoder\text_file_replacement.py:133
 #: src\qualcoder\text_file_replacement.py:160
 msgid " of "
-msgstr ""
+msgstr "の"
 
 #: src\qualcoder\text_file_replacement.py:143
 #: src\qualcoder\text_file_replacement.py:170
@@ -6198,6 +6216,8 @@ msgid ""
 "\n"
 "Please check if the file is empty."
 msgstr ""
+"\n"
+"ファイルが空かどうかを確認してください。"
 
 #: src\qualcoder\view_av.py:219 src\qualcoder\view_av.py:998
 msgid "Media coding"
@@ -6456,6 +6476,8 @@ msgid ""
 "Transcription area: Ctrl+T (insert timestamp) Ctrl+N (new speaker) Ctrl+1-8 "
 "(select speaker) Ctrl+D (delete speaker)"
 msgstr ""
+"文字起こしエリア: Ctrl+T (タイムスタンプの挿入) Ctrl+N (新しい話者) Ctrl+1-8 "
+"(話者の選択) Ctrl+D (話者の削除)"
 
 #: src\qualcoder\view_av.py:4538
 msgid "Select name to delete"
@@ -6557,7 +6579,7 @@ msgstr "単語雲"
 
 #: src\qualcoder\view_charts.py:527
 msgid "Cumulative code count in cases by case"
-msgstr ""
+msgstr "ケースごとの累積コード数"
 
 #: src\qualcoder\view_charts.py:582 src\qualcoder\view_charts.py:589
 #: src\qualcoder\view_charts.py:665 src\qualcoder\view_charts.py:672
@@ -6583,7 +6605,7 @@ msgstr "カウント"
 
 #: src\qualcoder\view_charts.py:609
 msgid "Cumulative code count in cases by code"
-msgstr ""
+msgstr "コードごとのケースの累積コード数"
 
 #: src\qualcoder\view_charts.py:691
 #, fuzzy
@@ -7105,7 +7127,7 @@ msgstr "とぴったり重なる。"
 
 #: src\qualcoder\view_image.py:1436
 msgid "Cannot open image with PIL. The image it too large."
-msgstr ""
+msgstr "PIL で画像を開けません。画像が大きすぎます。"
 
 #: src\qualcoder\view_image.py:1437
 #, fuzzy
