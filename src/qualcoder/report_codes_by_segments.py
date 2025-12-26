@@ -153,6 +153,8 @@ class DialogCodesBySegments(QtWidgets.QDialog):
                 tt = _("MEMO: ") + c['memo']
             item.setToolTip(tt)
             self.ui.listWidget_cases.addItem(item)
+        if not self.cases:
+            self.ui.listWidget_cases.setHidden(True)
 
     def get_codes_categories_coders(self):
         """ Called from init, delete category. Load codes, categories, and coders. """
