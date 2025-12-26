@@ -187,75 +187,9 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.app.settings['dialogreportcodes_splitter0'] = sizes[0]
         self.app.settings['dialogreportcodes_splitter1'] = sizes[1]
         sizes_vert = self.ui.splitter_vert.sizes()
-        if not self.cases:
-            self.ui.splitter_vert.setSizes([sizes_vert[0], 0, sizes_vert[2]])
         self.app.settings['dialogreportcodes_splitter_v0'] = max(sizes_vert[0], 10)
         self.app.settings['dialogreportcodes_splitter_v1'] = max(sizes_vert[1], 10)
         self.app.settings['dialogreportcodes_splitter_v2'] = max(sizes_vert[2], 10)
-
-    def get_files_and_cases(self):
-        """ Get source files with additional details and fill files list widget.
-        Get cases and fill case list widget
-        Called from : init, manage_files.delete manage_files.delete_button_multiple_files
-        """
-
-        self.ui.listWidget_files.clear()
-        self.files = self.app.get_filenames()
-        # Fill additional details about each file in the memo
-        cur = self.app.conn.cursor()
-        sql = "select length(fulltext), mediapath from source where id=?"
-        sql_text_codings = "select count(cid) from code_text where fid=?"
-        sql_av_codings = "select count(cid) from code_av where id=?"
-        sql_image_codings = "select count(cid) from code_image where id=?"
-        item = QtWidgets.QListWidgetItem("")
-        item.setToolTip(_("No file selection"))
-        self.ui.listWidget_files.addItem(item)
-        for f in self.files:
-            cur.execute(sql, [f['id'], ])
-            res = cur.fetchone()
-            if res is None:  # safety catch
-                res = [0]
-            tt = ""
-            if res[1] is None or res[1][0:5] == "docs:":
-                tt += _("Text file\n")
-                tt += _("Characters: ") + str(res[0])
-            if res[1] is not None and (res[1][0:7] == "images:" or res[1][0:7] == "/images"):
-                tt += _("Image")
-            if res[1] is not None and (res[1][0:6] == "audio:" or res[1][0:6] == "/audio"):
-                tt += _("Audio")
-            if res[1] is not None and (res[1][0:6] == "video:" or res[1][0:6] == "/video"):
-                tt += _("Video")
-            cur.execute(sql_text_codings, [f['id']])
-            txt_res = cur.fetchone()
-            cur.execute(sql_av_codings, [f['id']])
-            av_res = cur.fetchone()
-            cur.execute(sql_image_codings, [f['id']])
-            img_res = cur.fetchone()
-            tt += _("\nCodings: ")
-            if txt_res[0] > 0:
-                tt += str(txt_res[0])
-            if av_res[0] > 0:
-                tt += str(av_res[0])
-            if img_res[0] > 0:
-                tt += str(img_res[0])
-            item = QtWidgets.QListWidgetItem(f['name'])
-            if f['memo'] != "":
-                tt += _("\nMEMO: ") + f['memo']
-            item.setToolTip(tt)
-            self.ui.listWidget_files.addItem(item)
-
-        self.ui.listWidget_cases.clear()
-        self.cases = self.app.get_casenames()
-        item = QtWidgets.QListWidgetItem("")
-        item.setToolTip(_("No case selection"))
-        self.ui.listWidget_cases.addItem(item)
-        for c in self.cases:
-            tt = ""
-            item = QtWidgets.QListWidgetItem(c['name'])
-            if c['memo'] != "":
-                tt = _("MEMO: ") + c['memo']
-            item.setToolTip(tt)
-            self.ui.listWidget_cases.addItem(item)
 
     def get_files_and_cases(self, file_sort="name asc"):
         """ Get source files with additional details and fill files list widget.
@@ -331,6 +265,13 @@ class DialogReportCodes(QtWidgets.QDialog):
                 tt = _("MEMO: ") + c['memo']
             item.setToolTip(tt)
             self.ui.listWidget_cases.addItem(item)
+        if not self.cases:
+            self.ui.listWidget_cases.setHidden(True)
+            view = self.ui.comboBox_matrix.view()
+            print("hiding")
+            view.setRowHidden(1, True)
+            view.setRowHidden(3, True)
+            view.setRowHidden(5, True)
 
     def get_codes_categories_coders(self):
         """ Called from init, delete category. Load codes, categories, and coders. """
