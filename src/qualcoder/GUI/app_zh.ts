@@ -27,187 +27,206 @@
 <context>
     <name>DialogCharts</name>
     <message>
-        <location filename="ui_dialog_charts.py" line="280"/>
+        <location filename="ui_dialog_charts.py" line="290"/>
         <source>Charts</source>
         <translation>图表</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="281"/>
+        <location filename="ui_dialog_charts.py" line="291"/>
         <source>Charts displayed in the default web browser</source>
         <translation>在默认网络浏览器中显示图表</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="282"/>
+        <location filename="ui_dialog_charts.py" line="292"/>
         <source>Pie charts</source>
         <translation>饼图</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="283"/>
+        <location filename="ui_dialog_charts.py" line="293"/>
         <source>Bar charts</source>
         <translation>条形图</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="284"/>
+        <location filename="ui_dialog_charts.py" line="294"/>
         <source>Sunburst and treemap charts</source>
         <translation>旭日图和树状地图</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="285"/>
+        <location filename="ui_dialog_charts.py" line="295"/>
         <source>Select coder</source>
         <translation>选择编码器</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="286"/>
+        <location filename="ui_dialog_charts.py" line="296"/>
         <source>Select file</source>
         <translation>选择文件</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="289"/>
+        <location filename="ui_dialog_charts.py" line="299"/>
         <source>If portions of a text file are assigned to a case, the code frequency and total text characters may be incorrect.
 Codings from the entire text file are used for the calculations.</source>
         <translation>如果将文本文件的部分内容分配给案件，则代码频率和文本字符总数可能不正确。
 计算时会使用整个文本文件中的编码。</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="291"/>
+        <location filename="ui_dialog_charts.py" line="301"/>
         <source>Select case</source>
         <translation>选择案例</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="292"/>
+        <location filename="ui_dialog_charts.py" line="302"/>
         <source>Select attributes</source>
         <translation>选择属性</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="293"/>
+        <location filename="ui_dialog_charts.py" line="303"/>
         <source>Filter out values below:</source>
         <translation>筛选出以下值：</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="294"/>
+        <location filename="ui_dialog_charts.py" line="304"/>
         <source>Enter number for filter cut off</source>
         <translation>输入过滤器截流的数字</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="295"/>
+        <location filename="ui_dialog_charts.py" line="305"/>
         <source>&lt;b&gt;Data filters&lt;/b&gt;</source>
         <translation>数据过滤器</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="296"/>
+        <location filename="ui_dialog_charts.py" line="306"/>
         <source>&lt;b&gt;Coding charts&lt;/b&gt;</source>
         <translation>编码图表</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="297"/>
+        <location filename="ui_dialog_charts.py" line="307"/>
         <source>Select category</source>
         <translation>选择类别</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="298"/>
+        <location filename="ui_dialog_charts.py" line="308"/>
         <source>&lt;b&gt;Attribute charts&lt;/b&gt;</source>
         <translation>属性图表</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="299"/>
+        <location filename="ui_dialog_charts.py" line="309"/>
         <source>Numeric attributes</source>
         <translation>数字属性</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="300"/>
+        <location filename="ui_dialog_charts.py" line="310"/>
         <source>Character attributes</source>
         <translation>角色属性</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="301"/>
+        <location filename="ui_dialog_charts.py" line="311"/>
         <source>File</source>
         <translation>文件</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="302"/>
+        <location filename="ui_dialog_charts.py" line="312"/>
         <source>Case</source>
         <translation>案例</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="303"/>
+        <location filename="ui_dialog_charts.py" line="313"/>
         <source>Export HTML file</source>
         <translation>导出 HTML 文件</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="304"/>
+        <location filename="ui_dialog_charts.py" line="314"/>
         <source>&lt;b&gt;Heatmap charts&lt;/b&gt;</source>
         <translation>热图图表</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="305"/>
+        <location filename="ui_dialog_charts.py" line="315"/>
         <source>Word cloud</source>
         <translation>词汇云</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="306"/>
+        <location filename="ui_dialog_charts.py" line="316"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Background&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>背景介绍</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="307"/>
+        <location filename="ui_dialog_charts.py" line="317"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Foreground&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>前景</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="308"/>
+        <location filename="ui_dialog_charts.py" line="318"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Make Word Cloud&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>制作词云</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="309"/>
+        <location filename="ui_dialog_charts.py" line="319"/>
         <source>Width</source>
         <translation>宽度</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="310"/>
+        <location filename="ui_dialog_charts.py" line="320"/>
         <source>Height</source>
         <translation>高度</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="311"/>
+        <location filename="ui_dialog_charts.py" line="321"/>
         <source>Max words</source>
         <translation>最多字数</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="313"/>
+        <location filename="ui_dialog_charts.py" line="323"/>
         <source>Reverse colour range</source>
         <translation>反色范围</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="314"/>
+        <location filename="ui_dialog_charts.py" line="324"/>
         <source>Reverse range</source>
         <translation>反向范围</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="315"/>
+        <location filename="ui_dialog_charts.py" line="325"/>
         <source>Number of conjoined words in phrase. Stopwords applies to selection of 1 word only.</source>
         <translation>短语中连词的数量。Stopwords 仅适用于选择 1 个单词。</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="316"/>
+        <location filename="ui_dialog_charts.py" line="326"/>
         <source>n-grams</source>
         <translation>n-grams</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="317"/>
+        <location filename="ui_dialog_charts.py" line="327"/>
         <source>1=One word, 3=3 word phrase, 4=4 word phrase</source>
         <translation>1=一个词，3=3 个词组，4=4 个词组</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="318"/>
+        <location filename="ui_dialog_charts.py" line="328"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This is to allow a wider spread of heatmap colours when there are extreme count differences.&lt;/p&gt;&lt;p&gt;0 represents no limit.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>这样做是为了在出现极端计数差异时，热图颜色的分布范围更广。
 0 表示无限制。</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="319"/>
+        <location filename="ui_dialog_charts.py" line="329"/>
         <source>Upper count limiter</source>
         <translation>上限计数限制器</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_charts.py" line="330"/>
+        <source>&lt;b&gt;Cumulative barchart&lt;/b&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_charts.py" line="331"/>
+        <source>Selecting a text file here will override exisitng stopwords in the software, and also override stopwords stored in the .qualcoder configuration folder. 
+This is temporary and must be selected each time the Charts screen is opened.
+
+The file must be plain text with one word per line.
+Each word is excluded in the n-grams=1 Word cloud.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_charts.py" line="336"/>
+        <source>Stop words</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -982,8 +1001,8 @@ Ordered by file name and code name.</source>
         <location filename="ui_dialog_import.py" line="97"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;NONE 123, abc&lt;/p&gt;&lt;p&gt;MINIMAL 123, &amp;quot;abc&amp;quot;&lt;/p&gt;&lt;p&gt;ALL &amp;quot;123&amp;quot;, &amp;quot;abc&amp;quot;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>NONE 123, abc
-MINIMAL 123,&apos;abc&apos;;
-ALL &apos;123&apos;, &apos;abc&apos;</translation>
+MINIMAL 123,'abc';
+ALL '123', 'abc'</translation>
     </message>
     <message>
         <location filename="ui_dialog_import.py" line="98"/>
@@ -1845,114 +1864,108 @@ Ctrl + Shift + &lt; 将播放速率降至最低 0.1</translation>
 <context>
     <name>Dialog_code_text</name>
     <message>
-        <location filename="ui_dialog_code_text.py" line="404"/>
+        <location filename="ui_dialog_code_text.py" line="408"/>
         <source>Code Text</source>
         <translation>代码文本</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="405"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Auto code with exact text.&lt;/p&gt;&lt;p&gt;Right click for options: all, first, last.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>使用精确文本自动编码。
-右键点击选项：全部、第一个、最后一个</translation>
-    </message>
-    <message>
-        <location filename="ui_dialog_code_text.py" line="406"/>
+        <location filename="ui_dialog_code_text.py" line="411"/>
         <source>Coder:</source>
         <translation>编码器:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="407"/>
+        <location filename="ui_dialog_code_text.py" line="412"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search for text.&lt;/p&gt;&lt;p&gt;check &lt;span style=&quot; font-weight:600;&quot;&gt;Case sensitive&lt;/span&gt; for case sensitive search&lt;/p&gt;&lt;p&gt;check &lt;span style=&quot; font-weight:600;&quot;&gt;All files&lt;/span&gt; for searching all files search&lt;/p&gt;
 &lt;p&gt;Right-click to change automatic searching options&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>搜索文本</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="409"/>
+        <location filename="ui_dialog_code_text.py" line="414"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;search case sensitive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>搜索区分大小写</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="410"/>
+        <location filename="ui_dialog_code_text.py" line="415"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;search all files&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>搜索所有文件</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="411"/>
+        <location filename="ui_dialog_code_text.py" line="416"/>
         <source>0 / 0</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="412"/>
+        <location filename="ui_dialog_code_text.py" line="417"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Previous&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>上一页</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="413"/>
+        <location filename="ui_dialog_code_text.py" line="418"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>下一页</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="414"/>
+        <location filename="ui_dialog_code_text.py" line="419"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search text. All text files.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>搜索文本。所有文本文件。</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="415"/>
+        <location filename="ui_dialog_code_text.py" line="420"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search text. Case sensitive&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>搜索文本。区分大小写</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="418"/>
+        <location filename="ui_dialog_code_text.py" line="424"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete all codes by this coder from this file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>从文件中删除该编码员的所有编码</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="419"/>
+        <location filename="ui_dialog_code_text.py" line="425"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Annotate selection&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>注释选择</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="417"/>
+        <location filename="ui_dialog_code_text.py" line="423"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Undo auto coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>撤销自动编码</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="420"/>
+        <location filename="ui_dialog_code_text.py" line="426"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Memo for this coded section&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>该编码部分的备忘录</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="421"/>
+        <location filename="ui_dialog_code_text.py" line="427"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Text font size.&lt;/p&gt;&lt;p&gt;A default size can be set in Settings.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>文本字体大小</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="422"/>
+        <location filename="ui_dialog_code_text.py" line="428"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. &lt;/p&gt;&lt;p&gt;A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A ‘*’ after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;‘&lt;/span&gt;\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: www.rexegg.com/regex-quickstart.html&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>搜索使用 Regex 函数</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="423"/>
+        <location filename="ui_dialog_code_text.py" line="429"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Auto code using start and end marks.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>使用开始和结束标记自动编码。</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="424"/>
+        <location filename="ui_dialog_code_text.py" line="430"/>
         <source>Help</source>
         <translation>帮助</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="425"/>
+        <location filename="ui_dialog_code_text.py" line="431"/>
         <source>Show memos</source>
         <translation>显示备忘录</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="426"/>
+        <location filename="ui_dialog_code_text.py" line="432"/>
         <source>Show annotations</source>
         <translation>显示注释</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="427"/>
+        <location filename="ui_dialog_code_text.py" line="433"/>
         <source>Edit text 
 Click on a position, without selecting text, to type, delete, or paste text. 
 Select text that is not underlined and delete or paste over. 
@@ -1967,207 +1980,211 @@ As all assigned positions may be incorrect. </source>
 因为所有指定的位置都可能不正确。</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="434"/>
+        <location filename="ui_dialog_code_text.py" line="440"/>
         <source>Export</source>
         <translation>出口</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="435"/>
+        <location filename="ui_dialog_code_text.py" line="441"/>
         <source>html</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="436"/>
+        <location filename="ui_dialog_code_text.py" line="442"/>
         <source>odt</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="437"/>
+        <location filename="ui_dialog_code_text.py" line="443"/>
         <source>txt</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="438"/>
+        <location filename="ui_dialog_code_text.py" line="444"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;After editing the text:&lt;/p&gt;&lt;p&gt;Review edited text to confirm code positions are correct. Press button to Undo edited text, if code postions are incorrect. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>编辑文本后：
 查看已编辑的文本，确认代码位置是否正确。如果代码位置不正确，按下按钮撤销编辑的文本。</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="440"/>
+        <location filename="ui_dialog_code_text.py" line="446"/>
         <source>8</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="441"/>
+        <location filename="ui_dialog_code_text.py" line="447"/>
         <source>10</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="442"/>
+        <location filename="ui_dialog_code_text.py" line="448"/>
         <source>12</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="443"/>
+        <location filename="ui_dialog_code_text.py" line="449"/>
         <source>14</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="444"/>
+        <location filename="ui_dialog_code_text.py" line="450"/>
         <source>16</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="445"/>
+        <location filename="ui_dialog_code_text.py" line="451"/>
         <source>18</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="446"/>
+        <location filename="ui_dialog_code_text.py" line="452"/>
         <source>20</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="447"/>
+        <location filename="ui_dialog_code_text.py" line="453"/>
         <source>22</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="448"/>
+        <location filename="ui_dialog_code_text.py" line="454"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show side pane&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>显示侧窗格</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="452"/>
+        <location filename="ui_dialog_code_text.py" line="463"/>
         <source>Exit Edit text </source>
         <translation>退出编辑文本 </translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="453"/>
+        <location filename="ui_dialog_code_text.py" line="464"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File with latest coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>带有最新编码的文件</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="454"/>
+        <location filename="ui_dialog_code_text.py" line="465"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Go to bookmark&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>转到书签</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="455"/>
+        <location filename="ui_dialog_code_text.py" line="466"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>下一个文件</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="456"/>
+        <location filename="ui_dialog_code_text.py" line="467"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File memo&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>文件备忘录</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="457"/>
+        <location filename="ui_dialog_code_text.py" line="468"/>
         <source>Show files with file attributes</source>
         <translation>显示带有文件属性的文件</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="458"/>
+        <location filename="ui_dialog_code_text.py" line="469"/>
         <source>Documents</source>
         <translation>文件</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="459"/>
+        <location filename="ui_dialog_code_text.py" line="470"/>
         <source>Select a document</source>
         <translation>选择文件</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="460"/>
+        <location filename="ui_dialog_code_text.py" line="471"/>
         <source>Click here to define the options for the AI based search</source>
         <translation>显示所有编码</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="461"/>
+        <location filename="ui_dialog_code_text.py" line="472"/>
         <source>&lt;Start AI Search&gt;</source>
         <translation>&lt;开始人工智能搜索&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="462"/>
+        <location filename="ui_dialog_code_text.py" line="473"/>
         <source>AI Assistance</source>
         <translation>人工智能援助</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="463"/>
+        <location filename="ui_dialog_code_text.py" line="474"/>
         <source>Use the AI to find data</source>
         <translation>利用人工智能查找数据</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="467"/>
+        <location filename="ui_dialog_code_text.py" line="478"/>
         <source>Show codings flagged important</source>
         <translation>显示标记为重要的编码</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="468"/>
+        <location filename="ui_dialog_code_text.py" line="479"/>
         <source>Right click below to create new codes and categories</source>
         <translation>右键单击下方创建新代码和类别</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="470"/>
+        <location filename="ui_dialog_code_text.py" line="481"/>
         <source>Code rule with examples</source>
         <translation>带示例的代码规则</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="471"/>
+        <location filename="ui_dialog_code_text.py" line="482"/>
         <source>Current journal</source>
         <translation>当前期刊</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="472"/>
+        <location filename="ui_dialog_code_text.py" line="483"/>
         <source>Project memo</source>
         <translation>项目备忘录</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="473"/>
+        <location filename="ui_dialog_code_text.py" line="484"/>
         <source>.</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="439"/>
+        <location filename="ui_dialog_code_text.py" line="445"/>
         <source>Set default colour for new codes</source>
         <translation>为新代码设置默认颜色</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="464"/>
+        <location filename="ui_dialog_code_text.py" line="475"/>
         <source>Show all codings</source>
         <translation>显示所有编码</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="465"/>
+        <location filename="ui_dialog_code_text.py" line="476"/>
         <source>Show previous coding of selected code</source>
         <translation>显示所选代码以前的编码</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="466"/>
+        <location filename="ui_dialog_code_text.py" line="477"/>
         <source>Show next coding of selected code.</source>
         <translation>显示所选代码的下一个编码。</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="469"/>
+        <location filename="ui_dialog_code_text.py" line="480"/>
         <source>Find code</source>
         <translation>查找代码</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="416"/>
-        <source>Text fragment to auto code sentences.</source>
-        <translation>文本片段自动编码句子。</translation>
-    </message>
-    <message>
-        <location filename="ui_dialog_code_text.py" line="449"/>
+        <location filename="ui_dialog_code_text.py" line="455"/>
         <source>Apply REGEX to autocoding for exact text and sentences buttons.
 https://www.datacamp.com/cheat-sheet/regular-expresso</source>
         <translation>将 REGEX 应用于自动编码，以获得准确的文本和句子按钮。
 https://www.datacamp.com/cheat-sheet/regular-expresso</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="451"/>
+        <location filename="ui_dialog_code_text.py" line="457"/>
         <source>REGEX</source>
         <translation></translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_code_text.py" line="458"/>
+        <source>Mark speakers.
+Limited to names up to 63 characters long. 
+The name must be at the start of a new line.
+Formatted like below for name detection.
+&quot;Name:&quot;, &quot;{Name}, or &quot;[Name]&quot;</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2386,22 +2403,22 @@ https://www.datacamp.com/cheat-sheet/regular-expresso</translation>
 <context>
     <name>Dialog_manage_files</name>
     <message>
-        <location filename="ui_dialog_manage_files.py" line="127"/>
+        <location filename="ui_dialog_manage_files.py" line="131"/>
         <source>Files</source>
         <translation>文件</translation>
     </message>
     <message>
-        <location filename="ui_dialog_manage_files.py" line="128"/>
+        <location filename="ui_dialog_manage_files.py" line="132"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;View file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>查看文件</translation>
     </message>
     <message>
-        <location filename="ui_dialog_manage_files.py" line="129"/>
+        <location filename="ui_dialog_manage_files.py" line="133"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Create a text file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>创建文本文件</translation>
     </message>
     <message>
-        <location filename="ui_dialog_manage_files.py" line="130"/>
+        <location filename="ui_dialog_manage_files.py" line="134"/>
         <source>Export selected file.
 Text files (from any source) are exported from the text stored in the database as .txt files.
 (You can open the project folder and copy/paste the orignal text file if preferred.)</source>
@@ -2410,86 +2427,86 @@ Text files (from any source) are exported from the text stored in the database a
 (如果愿意，可以打开项目文件夹并复制/粘贴原始文本文件）。</translation>
     </message>
     <message>
-        <location filename="ui_dialog_manage_files.py" line="133"/>
+        <location filename="ui_dialog_manage_files.py" line="137"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select files for deletion&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>选择要删除的文件</translation>
     </message>
     <message>
-        <location filename="ui_dialog_manage_files.py" line="134"/>
+        <location filename="ui_dialog_manage_files.py" line="138"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Import file into project folder&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>将文件导入项目文件夹</translation>
     </message>
     <message>
-        <location filename="ui_dialog_manage_files.py" line="135"/>
+        <location filename="ui_dialog_manage_files.py" line="139"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add attribute&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>添加属性</translation>
     </message>
     <message>
-        <location filename="ui_dialog_manage_files.py" line="136"/>
+        <location filename="ui_dialog_manage_files.py" line="140"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Link to a file that is outside the project folder&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>链接到项目文件夹之外的文件</translation>
     </message>
     <message>
-        <location filename="ui_dialog_manage_files.py" line="137"/>
+        <location filename="ui_dialog_manage_files.py" line="141"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Import linked file into project folder&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>将链接文件导入项目文件夹</translation>
     </message>
     <message>
-        <location filename="ui_dialog_manage_files.py" line="138"/>
+        <location filename="ui_dialog_manage_files.py" line="142"/>
         <source>Export file from project folder as a linked file.
 Cannot export text transcription file associated with an audio or video as a linked file.</source>
         <translation>将项目文件夹中的文件导出为链接文件。
 无法将与音频或视频相关联的文本转录文件作为链接文件导出。</translation>
     </message>
     <message>
-        <location filename="ui_dialog_manage_files.py" line="140"/>
+        <location filename="ui_dialog_manage_files.py" line="144"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export attributes to file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>将属性导出到文件</translation>
     </message>
     <message>
-        <location filename="ui_dialog_manage_files.py" line="141"/>
+        <location filename="ui_dialog_manage_files.py" line="145"/>
         <source>Help</source>
         <translation>帮助</translation>
     </message>
     <message>
-        <location filename="ui_dialog_manage_files.py" line="142"/>
+        <location filename="ui_dialog_manage_files.py" line="146"/>
         <source>Files:</source>
         <translation>文件 :</translation>
     </message>
     <message>
-        <location filename="ui_dialog_manage_files.py" line="143"/>
+        <location filename="ui_dialog_manage_files.py" line="147"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Undo file rename&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>撤销文件重命名</translation>
     </message>
     <message>
-        <location filename="ui_dialog_manage_files.py" line="144"/>
+        <location filename="ui_dialog_manage_files.py" line="148"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Bulk rename of database name file entries.&lt;/p&gt;&lt;p&gt;Only rename visible file rows. Can show only some rows by using attribute selection, or show/hide value like...&lt;/p&gt;&lt;p&gt;Renamed as: User chosen prefix and numbered suffix _nnn.&lt;/p&gt;&lt;p&gt;e.g. interview_001&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;批量重命名数据库名称文件条目。&lt;/p&gt;&lt;p&gt;只重命名可见的文件行。&lt;/p&gt;&lt;p&gt; 仅重命名可见的文件行。可通过使用属性选择或显示/隐藏值（如......）只显示某些行： 用户选择的前缀和编号后缀 _nnn.&lt;/p&gt;&lt;p&gt; 例如：interview_001&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;。</translation>
     </message>
     <message>
-        <location filename="ui_dialog_manage_files.py" line="159"/>
+        <location filename="ui_dialog_manage_files.py" line="167"/>
         <source>File:</source>
         <translation>文件 :</translation>
     </message>
     <message>
-        <location filename="ui_dialog_manage_files.py" line="145"/>
+        <location filename="ui_dialog_manage_files.py" line="149"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Save table display settings. &lt;/p&gt;&lt;p&gt;(Hidden rows and columns and column sizing)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>保存表格显示设置。
 （隐藏行、列和列大小)</translation>
     </message>
     <message>
-        <location filename="ui_dialog_manage_files.py" line="146"/>
+        <location filename="ui_dialog_manage_files.py" line="150"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Load saved table display setting.&lt;/p&gt;&lt;p&gt;(Hidden rows and columns and column sizing)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>加载已保存的表格显示设置。
 (隐藏行、列和列大小）。</translation>
     </message>
     <message>
-        <location filename="ui_dialog_manage_files.py" line="147"/>
+        <location filename="ui_dialog_manage_files.py" line="151"/>
         <source>Delete saved table display settings. </source>
         <translation>删除已保存的表格显示设置。</translation>
     </message>
     <message>
-        <location filename="ui_dialog_manage_files.py" line="148"/>
+        <location filename="ui_dialog_manage_files.py" line="152"/>
         <source>Pseudonymisation (data de-identification)
 Before importing text files, create a list of names or phrases to be replaced.
 Applies to these files: docx, epub, htm, html, md, rtf, odt, txt, survey imports of qualitative columns.
@@ -2511,6 +2528,14 @@ After all text files are imported, remove this file from the project folder and 
 
 别名存储于qda数据文件夹中的pseudonyms.json文件。
 所有文本文件导入完成后，请从项目文件夹移除此文件并妥善保管。</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_manage_files.py" line="163"/>
+        <source>Select a text transcription to mark the speakers.
+The speaker name must be at the start of a new line and less than 64 characters long.
+Formatted like below for name detection.
+&quot;Name:&quot;, &quot;{Name} or &quot;[Name]&quot;</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2763,184 +2788,184 @@ Case sensitive, add multiple entries for each: e.g. Tom Jones  and TOM JONES</so
 <context>
     <name>Dialog_reportCodings</name>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="175"/>
+        <location filename="ui_dialog_report_codings.py" line="176"/>
         <source>Reports</source>
         <translation>报告</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="176"/>
+        <location filename="ui_dialog_report_codings.py" line="177"/>
         <source>Text limiter:</source>
         <translation>文本限制器：</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="177"/>
+        <location filename="ui_dialog_report_codings.py" line="178"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Run report&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>运行报告</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="178"/>
+        <location filename="ui_dialog_report_codings.py" line="179"/>
         <source>Coder:</source>
         <translation>编码器:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="179"/>
+        <location filename="ui_dialog_report_codings.py" line="180"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Attributes. &lt;/p&gt;&lt;p&gt;Attribute selection will override files or cases selected in the left-hand-side lists.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>属性。属性选择将覆盖左侧列表中选择的文件或案例。</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="180"/>
+        <location filename="ui_dialog_report_codings.py" line="181"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>出口</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="181"/>
+        <location filename="ui_dialog_report_codings.py" line="182"/>
         <source>html</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="182"/>
+        <location filename="ui_dialog_report_codings.py" line="183"/>
         <source>txt</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="183"/>
+        <location filename="ui_dialog_report_codings.py" line="184"/>
         <source>odt</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="184"/>
+        <location filename="ui_dialog_report_codings.py" line="185"/>
         <source>xlsx</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="185"/>
+        <location filename="ui_dialog_report_codings.py" line="186"/>
         <source>csv</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="187"/>
+        <location filename="ui_dialog_report_codings.py" line="188"/>
         <source>Coding report</source>
         <translation>编码报告</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="188"/>
+        <location filename="ui_dialog_report_codings.py" line="189"/>
         <source>File and case matrix options</source>
         <translation>文件和案例矩阵选项</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="189"/>
+        <location filename="ui_dialog_report_codings.py" line="190"/>
         <source>Filter results for those marked Important</source>
         <translation>筛选标记为 “重要 ”的结果</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="190"/>
+        <location filename="ui_dialog_report_codings.py" line="191"/>
         <source>Important</source>
         <translation>重要</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="192"/>
+        <location filename="ui_dialog_report_codings.py" line="193"/>
         <source>Memo reporting options</source>
         <translation>备忘录报告选项</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="193"/>
+        <location filename="ui_dialog_report_codings.py" line="194"/>
         <source>Display summary statistics</source>
         <translation>显示汇总统计数据</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="194"/>
+        <location filename="ui_dialog_report_codings.py" line="195"/>
         <source>Statistics</source>
         <translation>统计资料</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="195"/>
+        <location filename="ui_dialog_report_codings.py" line="196"/>
         <source>Transpose matrix</source>
         <translation>矩阵转置</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="196"/>
+        <location filename="ui_dialog_report_codings.py" line="197"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Surround coded text with pre-text and post-text.&lt;/p&gt;&lt;p&gt;Change Settings for number of characters and display style.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>用前文本和后文本包围编码文本。
 更改字符数和显示样式的设置。</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="197"/>
+        <location filename="ui_dialog_report_codings.py" line="198"/>
         <source>Text context</source>
         <translation>文本背景</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="198"/>
+        <location filename="ui_dialog_report_codings.py" line="199"/>
         <source>Search results for text</source>
         <translation>文本搜索结果</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="199"/>
+        <location filename="ui_dialog_report_codings.py" line="200"/>
         <source>Search:</source>
         <translation>搜索：</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="200"/>
+        <location filename="ui_dialog_report_codings.py" line="201"/>
         <source>Search for next occurence in results</source>
         <translation>搜索结果中的下一次出现</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="201"/>
+        <location filename="ui_dialog_report_codings.py" line="202"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Code names sort order.&lt;/p&gt;&lt;p&gt;Set this before running results.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>代码名排序顺序。
 请在运行结果前设置。</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="202"/>
+        <location filename="ui_dialog_report_codings.py" line="203"/>
         <source>A - z</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="203"/>
+        <location filename="ui_dialog_report_codings.py" line="204"/>
         <source>Z - a</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="204"/>
+        <location filename="ui_dialog_report_codings.py" line="205"/>
         <source>10 - 1</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="205"/>
+        <location filename="ui_dialog_report_codings.py" line="206"/>
         <source>1 - 10</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="206"/>
+        <location filename="ui_dialog_report_codings.py" line="207"/>
         <source>Export:</source>
         <translation>出口:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="207"/>
+        <location filename="ui_dialog_report_codings.py" line="208"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export file  or case variables in columns for CSV or XLSX export&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>以 CSV 或 XLSX 导出文件或列中的案例变量</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="208"/>
+        <location filename="ui_dialog_report_codings.py" line="209"/>
         <source>Variables CSV / XLSX</source>
         <translation>变量 CSV / XLSX</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="209"/>
+        <location filename="ui_dialog_report_codings.py" line="210"/>
         <source>Export matrix</source>
         <translation>出口矩阵</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="210"/>
+        <location filename="ui_dialog_report_codings.py" line="211"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show references&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>显示参考资料</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="211"/>
+        <location filename="ui_dialog_report_codings.py" line="212"/>
         <source>References</source>
         <translation>参考资料</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_codings.py" line="186"/>
+        <location filename="ui_dialog_report_codings.py" line="187"/>
         <source>iramuteq</source>
         <translation>iramuteq</translation>
     </message>
@@ -3553,6 +3578,25 @@ Not recommended unless you have many large files slowing the backup.</source>
         <location filename="ui_dialog_settings.py" line="643"/>
         <source>Reasoning:</source>
         <translation>推理：</translation>
+    </message>
+</context>
+<context>
+    <name>Dialog_speakers</name>
+    <message>
+        <location filename="ui_dialog_speakers.py" line="53"/>
+        <source>Mark Speakers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_speakers.py" line="54"/>
+        <source>The following speaker names were detected in the document. 
+Select (✓) the ones you want to mark. Clicking OK creates a code for each selected speaker in the “📌 Speakers” category and assigns all corresponding text segments. Doubleclick to edit the &quot;code as&quot; name in the table. To merge two speakers (e.g. to correct a typo), rename the &quot;code as&quot; in one entry so that it exactly matches the other.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_speakers.py" line="56"/>
+        <source>Doubleclick a &quot;coded as&quot; name to edit</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -4216,8 +4260,8 @@ Do not code this text until you reload Coding - Code Text from the menu bar.</so
     </message>
     <message>
         <location filename="ui_main.py" line="346"/>
-        <source>View Graph</source>
-        <translation>查看图表</translation>
+        <source>Graph</source>
+        <translation type="unfinished">查看图表</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="347"/>
