@@ -106,7 +106,7 @@ Codings from the entire text file are used for the calculations.</source>
     <message>
         <location filename="ui_dialog_charts.py" line="308"/>
         <source>&lt;b&gt;Attribute charts&lt;/b&gt;</source>
-        <translation>属性图表</translation>
+        <translation>&lt;b&gt;属性图表&lt;/b&gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="309"/>
@@ -136,7 +136,7 @@ Codings from the entire text file are used for the calculations.</source>
     <message>
         <location filename="ui_dialog_charts.py" line="314"/>
         <source>&lt;b&gt;Heatmap charts&lt;/b&gt;</source>
-        <translation>热图图表</translation>
+        <translation>&lt;b&gt;热图图表&lt;/b&gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="315"/>
@@ -212,7 +212,7 @@ Codings from the entire text file are used for the calculations.</source>
     <message>
         <location filename="ui_dialog_charts.py" line="330"/>
         <source>&lt;b&gt;Cumulative barchart&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;累积条形图&lt;/b&gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="331"/>
@@ -221,12 +221,16 @@ This is temporary and must be selected each time the Charts screen is opened.
 
 The file must be plain text with one word per line.
 Each word is excluded in the n-grams=1 Word cloud.</source>
-        <translation type="unfinished"></translation>
+        <translation>在此处选择文本文件将覆盖软件中现有的停用词，同时也会覆盖存储在.qualcoder配置文件夹中的停用词。
+此设置为临时性，每次打开图表界面时均需重新选择。
+
+文件必须为纯文本格式，每行仅包含一个单词。
+每个单词将在n-grams=1的词云中被排除。</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="336"/>
         <source>Stop words</source>
-        <translation type="unfinished"></translation>
+        <translation>停用词</translation>
     </message>
 </context>
 <context>
@@ -1001,8 +1005,8 @@ Ordered by file name and code name.</source>
         <location filename="ui_dialog_import.py" line="97"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;NONE 123, abc&lt;/p&gt;&lt;p&gt;MINIMAL 123, &amp;quot;abc&amp;quot;&lt;/p&gt;&lt;p&gt;ALL &amp;quot;123&amp;quot;, &amp;quot;abc&amp;quot;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>NONE 123, abc
-MINIMAL 123,'abc';
-ALL '123', 'abc'</translation>
+MINIMAL 123,&apos;abc&apos;;
+ALL &apos;123&apos;, &apos;abc&apos;</translation>
     </message>
     <message>
         <location filename="ui_dialog_import.py" line="98"/>
@@ -2184,7 +2188,11 @@ Limited to names up to 63 characters long.
 The name must be at the start of a new line.
 Formatted like below for name detection.
 &quot;Name:&quot;, &quot;{Name}, or &quot;[Name]&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>标记发言者。
+名称长度限制为63个字符。
+名称必须位于新行开头。
+名称检测格式如下：
+“名称：”、“{名称}” 或 “[名称]”</translation>
     </message>
 </context>
 <context>
@@ -2535,7 +2543,10 @@ After all text files are imported, remove this file from the project folder and 
 The speaker name must be at the start of a new line and less than 64 characters long.
 Formatted like below for name detection.
 &quot;Name:&quot;, &quot;{Name} or &quot;[Name]&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>选择文本转录内容以标记发言者。
+发言者姓名必须位于新行开头，且长度不超过64个字符。
+姓名检测格式如下：
+“姓名：”, “{姓名} 或 ”[姓名]&quot;</translation>
     </message>
 </context>
 <context>
@@ -3585,18 +3596,19 @@ Not recommended unless you have many large files slowing the backup.</source>
     <message>
         <location filename="ui_dialog_speakers.py" line="53"/>
         <source>Mark Speakers</source>
-        <translation type="unfinished"></translation>
+        <translation>马克扬声器</translation>
     </message>
     <message>
         <location filename="ui_dialog_speakers.py" line="54"/>
         <source>The following speaker names were detected in the document. 
 Select (✓) the ones you want to mark. Clicking OK creates a code for each selected speaker in the “📌 Speakers” category and assigns all corresponding text segments. Doubleclick to edit the &quot;code as&quot; name in the table. To merge two speakers (e.g. to correct a typo), rename the &quot;code as&quot; in one entry so that it exactly matches the other.</source>
-        <translation type="unfinished"></translation>
+        <translation>在文档中检测到以下发言者姓名。
+勾选(✓)您需要标记的发言人。点击确定后，系统将在“📌 发言人”类别中为每位选中发言人创建代码，并分配所有对应的文本片段。双击表格中的“代码名称”可进行编辑。若需合并两位发言人（例如修正拼写错误），请将其中一条记录的“代码名称”重命名为与另一条完全一致的名称。</translation>
     </message>
     <message>
         <location filename="ui_dialog_speakers.py" line="56"/>
         <source>Doubleclick a &quot;coded as&quot; name to edit</source>
-        <translation type="unfinished"></translation>
+        <translation>双击“编码为”名称进行编辑</translation>
     </message>
 </context>
 <context>
@@ -4261,7 +4273,7 @@ Do not code this text until you reload Coding - Code Text from the menu bar.</so
     <message>
         <location filename="ui_main.py" line="346"/>
         <source>Graph</source>
-        <translation type="unfinished">查看图表</translation>
+        <translation>图</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="347"/>
