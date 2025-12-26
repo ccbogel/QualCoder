@@ -213,7 +213,7 @@ As codificações de todo o arquivo de texto são utilizadas para os cálculos.<
     <message>
         <location filename="ui_dialog_charts.py" line="330"/>
         <source>&lt;b&gt;Cumulative barchart&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Gráfico de barras acumuladas&lt;/b&gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="331"/>
@@ -222,12 +222,16 @@ This is temporary and must be selected each time the Charts screen is opened.
 
 The file must be plain text with one word per line.
 Each word is excluded in the n-grams=1 Word cloud.</source>
-        <translation type="unfinished"></translation>
+        <translation>Selecionar um ficheiro de texto aqui substituirá as palavras irrelevantes existentes no software e também substituirá as palavras irrelevantes armazenadas na pasta de configuração .qualcoder. 
+Isso é temporário e deve ser selecionado sempre que a tela Gráficos for aberta.
+
+O ficheiro deve ser de texto simples, com uma palavra por linha.
+Cada palavra é excluída na nuvem de palavras n-grams=1.</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="336"/>
         <source>Stop words</source>
-        <translation type="unfinished"></translation>
+        <translation>Palavras irrelevantes</translation>
     </message>
 </context>
 <context>
@@ -986,7 +990,7 @@ Ordenado por nome de arquivo e nome de código.</translation>
         <location filename="ui_dialog_import.py" line="94"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delimiter must be a single character.&lt;/p&gt;&lt;p&gt;Enter &apos;ta&apos; for &apos;tab&apos;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Delimiter deve ser um único caractere.
-Enter 'ta' para 'tab'</translation>
+Enter &apos;ta&apos; para &apos;tab&apos;</translation>
     </message>
     <message>
         <location filename="ui_dialog_import.py" line="95"/>
@@ -2183,7 +2187,11 @@ Limited to names up to 63 characters long.
 The name must be at the start of a new line.
 Formatted like below for name detection.
 &quot;Name:&quot;, &quot;{Name}, or &quot;[Name]&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>Marque os alto-falantes.
+Limitado a nomes com até 63 caracteres. 
+O nome deve estar no início de uma nova linha.
+Formate como abaixo para detecção de nome.
+“Nome:”, “{Nome} ou ”[Nome]&quot;</translation>
     </message>
 </context>
 <context>
@@ -2536,7 +2544,10 @@ Depois de todos os ficheiros de texto serem importados, remova este ficheiro da 
 The speaker name must be at the start of a new line and less than 64 characters long.
 Formatted like below for name detection.
 &quot;Name:&quot;, &quot;{Name} or &quot;[Name]&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>Selecione uma transcrição de texto para marcar os locutores.
+O nome do locutor deve estar no início de uma nova linha e ter menos de 64 caracteres.
+Formate como abaixo para deteção de nome.
+“Nome:”, “{Nome} ou ”[Nome]&quot;</translation>
     </message>
 </context>
 <context>
@@ -3111,7 +3122,7 @@ Wildcards for &apos;like&apos; are % and _</source>
         <translation>Selecione parâmetros para os atributos. 
 between requer 2 valores separados por ;, por exemplo, 1;100
  in e not in requerem 1 ou mais valores separados por ;
-Os curingas para 'like' são % e _</translation>
+Os curingas para &apos;like&apos; são % e _</translation>
     </message>
     <message>
         <location filename="ui_report_attribute_parameters.py" line="88"/>
@@ -3579,18 +3590,19 @@ Não recomendado, a menos que você tenha muitos arquivos grandes tornando o bac
     <message>
         <location filename="ui_dialog_speakers.py" line="53"/>
         <source>Mark Speakers</source>
-        <translation type="unfinished"></translation>
+        <translation>Marcar oradores</translation>
     </message>
     <message>
         <location filename="ui_dialog_speakers.py" line="54"/>
         <source>The following speaker names were detected in the document. 
 Select (✓) the ones you want to mark. Clicking OK creates a code for each selected speaker in the “📌 Speakers” category and assigns all corresponding text segments. Doubleclick to edit the &quot;code as&quot; name in the table. To merge two speakers (e.g. to correct a typo), rename the &quot;code as&quot; in one entry so that it exactly matches the other.</source>
-        <translation type="unfinished"></translation>
+        <translation>Os seguintes nomes de oradores foram detetados no documento. 
+Selecione (✓) aqueles que deseja marcar. Clicar em OK cria um código para cada locutor selecionado na categoria «📌 Locutores» e atribui todos os segmentos de texto correspondentes. Clique duas vezes para editar o nome «codificar como» na tabela. Para mesclar dois locutores (por exemplo, para corrigir um erro ortográfico), renomeie o «codificar como» em uma entrada para que corresponda exatamente à outra.</translation>
     </message>
     <message>
         <location filename="ui_dialog_speakers.py" line="56"/>
         <source>Doubleclick a &quot;coded as&quot; name to edit</source>
-        <translation type="unfinished"></translation>
+        <translation>Clique duas vezes num nome «codificado como» para editar</translation>
     </message>
 </context>
 <context>
@@ -4019,7 +4031,7 @@ Não codifique este texto até que você recarregue Codificação - Texto do có
     </message>
     <message>
         <location filename="ui_dialog_view_text.py" line="79"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot &#xe2;&#x80;&#x98;.&#xe2;&#x80;&#x99; is used as a wild card, e.g. &#xe2;&#x80;&#x98;.ears&#xe2;&#x80;&#x99; will match &#xe2;&#x80;&#x98;bears&#xe2;&#x80;&#x99; and &#xe2;&#x80;&#x98;years&#xe2;&#x80;&#x99;. &lt;/p&gt;&lt;p&gt;A &#xe2;&#x80;&#x98;?&#xe2;&#x80;&#x99; after a character will match one or none times that character, e.g. &#xe2;&#x80;&#x98;bears?&#xe2;&#x80;&#x99; will match &#xe2;&#x80;&#x98;bear&#xe2;&#x80;&#x99; and &#xe2;&#x80;&#x98;bears&#xe2;&#x80;&#x99; &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A &#xe2;&#x80;&#x98;*&#xe2;&#x80;&#x99; after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;&#xe2;&#x80;&#x98;&lt;/span&gt;\. will match the dot symbol, &#xe2;&#x80;&#x98;\?&#xe2;&#x80;&#x99; will match the question mark. &#xe2;&#x80;&#x98;\n&#xe2;&#x80;&#x99; will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot â.â is used as a wild card, e.g. â.earsâ will match âbearsâ and âyearsâ. &lt;/p&gt;&lt;p&gt;A â?â after a character will match one or none times that character, e.g. âbears?â will match âbearâ and âbearsâ &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A â*â after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;â&lt;/span&gt;\. will match the dot symbol, â\?â will match the question mark. â\nâ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished">A pesquisa usa funções regex.</translation>
     </message>
 </context>
@@ -4226,7 +4238,7 @@ Não codifique este texto até que você recarregue Codificação - Texto do có
     <message>
         <location filename="ui_main.py" line="346"/>
         <source>Graph</source>
-        <translation type="unfinished">Ver Gráfico</translation>
+        <translation>Gráfico</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="348"/>
