@@ -211,7 +211,7 @@ Kodningar från hela textfilen används för beräkningarna.</translation>
     <message>
         <location filename="ui_dialog_charts.py" line="330"/>
         <source>&lt;b&gt;Cumulative barchart&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Kumulativ stapeldiagram&lt;/b&gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="331"/>
@@ -220,12 +220,16 @@ This is temporary and must be selected each time the Charts screen is opened.
 
 The file must be plain text with one word per line.
 Each word is excluded in the n-grams=1 Word cloud.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om du väljer en textfil här kommer befintliga stoppord i programvaran att åsidosättas, liksom stoppord som lagrats i konfigurationsmappen .qualcoder. 
+Detta är tillfälligt och måste väljas varje gång skärmen Diagram öppnas.
+
+Filen måste vara ren text med ett ord per rad.
+Varje ord exkluderas i n-grams=1 Word cloud.</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="336"/>
         <source>Stop words</source>
-        <translation type="unfinished"></translation>
+        <translation>Stop ord</translation>
     </message>
 </context>
 <context>
@@ -982,7 +986,7 @@ Sorterad efter filnamn och kodnamn.</translation>
     <message>
         <location filename="ui_dialog_import.py" line="94"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delimiter must be a single character.&lt;/p&gt;&lt;p&gt;Enter &apos;ta&apos; for &apos;tab&apos;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; delimiter måste vara en enda karaktär. &lt;/p&gt; &lt;p&gt; enter 'ta' för 'flik' &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
+        <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; delimiter måste vara en enda karaktär. &lt;/p&gt; &lt;p&gt; enter &apos;ta&apos; för &apos;flik&apos; &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_import.py" line="95"/>
@@ -1687,7 +1691,7 @@ Därefter öppnas en meny med alternativ</translation>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="253"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. &lt;/p&gt;&lt;p&gt;A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A ‘*’ after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;‘&lt;/span&gt;\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: www.rexegg.com/regex-quickstart.html&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; Sök använder regex -funktioner.&lt;/p&gt; &lt;p&gt; a prick '.' används som ett vildkort, t.ex.&quot;.Ears&quot; kommer att matcha &quot;björnar&quot; och &quot;år&quot;.&lt;/p&gt; &lt;p&gt; a '?' Efter att en karaktär kommer att matcha en eller ingen gånger den karaktären, t.ex.‘Bears?’ Kommer att matcha ‘Bear’ och ‘Bears’ &lt;/p&gt; &lt;p&gt; &lt;span style = &quot;bakgrundsfärg: transparent;&quot;&gt; en &quot;*&quot; efter att en karaktär matchar noll eller fler gånger.&lt;/span&gt; &lt;/p&gt; &lt;p&gt; &lt;span style = &quot;bakgrundsfärg: transparent;&quot;&gt; ‘&lt;/span&gt; \.Kommer att matcha pricksymbolen, '\?' Kommer att matcha frågetecknet.‘\ N’ kommer att matcha linjens slutsymbol.&lt;/p&gt; &lt;p&gt; regex cheatsheet: www.rexegg.com/regex-quickstart.html&lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
+        <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; Sök använder regex -funktioner.&lt;/p&gt; &lt;p&gt; a prick &apos;.&apos; används som ett vildkort, t.ex.&quot;.Ears&quot; kommer att matcha &quot;björnar&quot; och &quot;år&quot;.&lt;/p&gt; &lt;p&gt; a &apos;?&apos; Efter att en karaktär kommer att matcha en eller ingen gånger den karaktären, t.ex.‘Bears?’ Kommer att matcha ‘Bear’ och ‘Bears’ &lt;/p&gt; &lt;p&gt; &lt;span style = &quot;bakgrundsfärg: transparent;&quot;&gt; en &quot;*&quot; efter att en karaktär matchar noll eller fler gånger.&lt;/span&gt; &lt;/p&gt; &lt;p&gt; &lt;span style = &quot;bakgrundsfärg: transparent;&quot;&gt; ‘&lt;/span&gt; \.Kommer att matcha pricksymbolen, &apos;\?&apos; Kommer att matcha frågetecknet.‘\ N’ kommer att matcha linjens slutsymbol.&lt;/p&gt; &lt;p&gt; regex cheatsheet: www.rexegg.com/regex-quickstart.html&lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="254"/>
@@ -1935,7 +1939,7 @@ Därefter öppnas en meny med alternativ</translation>
     <message>
         <location filename="ui_dialog_code_text.py" line="428"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. &lt;/p&gt;&lt;p&gt;A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A ‘*’ after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;‘&lt;/span&gt;\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: www.rexegg.com/regex-quickstart.html&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; Sök använder regex -funktioner.&lt;/p&gt; &lt;p&gt; a prick '.' används som ett vildkort, t.ex.&quot;.Ears&quot; kommer att matcha &quot;björnar&quot; och &quot;år&quot;.&lt;/p&gt; &lt;p&gt; a '?' Efter att en karaktär kommer att matcha en eller ingen gånger den karaktären, t.ex.‘Bears?’ Kommer att matcha ‘Bear’ och ‘Bears’ &lt;/p&gt; &lt;p&gt; &lt;span style = &quot;bakgrundsfärg: transparent;&quot;&gt; en &quot;*&quot; efter att en karaktär matchar noll eller fler gånger.&lt;/span&gt; &lt;/p&gt; &lt;p&gt; &lt;span style = &quot;bakgrundsfärg: transparent;&quot;&gt; ‘&lt;/span&gt; \.Kommer att matcha pricksymbolen, '\?' Kommer att matcha frågetecknet.‘\ N’ kommer att matcha linjens slutsymbol.&lt;/p&gt; &lt;p&gt; regex cheatsheet: www.rexegg.com/regex-quickstart.html&lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
+        <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; Sök använder regex -funktioner.&lt;/p&gt; &lt;p&gt; a prick &apos;.&apos; används som ett vildkort, t.ex.&quot;.Ears&quot; kommer att matcha &quot;björnar&quot; och &quot;år&quot;.&lt;/p&gt; &lt;p&gt; a &apos;?&apos; Efter att en karaktär kommer att matcha en eller ingen gånger den karaktären, t.ex.‘Bears?’ Kommer att matcha ‘Bear’ och ‘Bears’ &lt;/p&gt; &lt;p&gt; &lt;span style = &quot;bakgrundsfärg: transparent;&quot;&gt; en &quot;*&quot; efter att en karaktär matchar noll eller fler gånger.&lt;/span&gt; &lt;/p&gt; &lt;p&gt; &lt;span style = &quot;bakgrundsfärg: transparent;&quot;&gt; ‘&lt;/span&gt; \.Kommer att matcha pricksymbolen, &apos;\?&apos; Kommer att matcha frågetecknet.‘\ N’ kommer att matcha linjens slutsymbol.&lt;/p&gt; &lt;p&gt; regex cheatsheet: www.rexegg.com/regex-quickstart.html&lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="429"/>
@@ -2176,7 +2180,11 @@ Limited to names up to 63 characters long.
 The name must be at the start of a new line.
 Formatted like below for name detection.
 &quot;Name:&quot;, &quot;{Name}, or &quot;[Name]&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>Markera högtalare.
+Begränsat till namn på upp till 63 tecken. 
+Namnet måste stå i början av en ny rad.
+Formaterat enligt nedan för namnigenkänning.
+”Namn:”, ”{Namn} eller ”[Namn]&quot;</translation>
     </message>
 </context>
 <context>
@@ -2311,7 +2319,7 @@ Formatted like below for name detection.
     <message>
         <location filename="ui_dialog_journals.py" line="132"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. &lt;/p&gt;&lt;p&gt;A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A ‘*’ after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;‘&lt;/span&gt;\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; Sök använder regex -funktioner.&lt;/p&gt; &lt;p&gt; a prick '.' används som ett vildkort, t.ex.&quot;.Ears&quot; kommer att matcha &quot;björnar&quot; och &quot;år&quot;.&lt;/p&gt; &lt;p&gt; a '?' Efter att en karaktär kommer att matcha en eller ingen gånger den karaktären, t.ex.‘Bears?’ Kommer att matcha ‘Bear’ och ‘Bears’ &lt;/p&gt; &lt;p&gt; &lt;span style = &quot;bakgrundsfärg: transparent;&quot;&gt; en &quot;*&quot; efter att en karaktär matchar noll eller fler gånger.&lt;/span&gt; &lt;/p&gt; &lt;p&gt; &lt;span style = &quot;bakgrundsfärg: transparent;&quot;&gt; ‘&lt;/span&gt; \.Kommer att matcha pricksymbolen, '\?' Kommer att matcha frågetecknet.‘\ N’ kommer att matcha linjens slutsymbol.&lt;/p&gt; &lt;p&gt; regex cheatsheet: &lt;a href = &quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt; &lt;span style = &quot;Text-Decoration: understyrning;Färg:#000080; &quot;&gt; www.rexegg.com/regex-quickstart.html &lt;/span&gt; &lt;/a&gt; &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
+        <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; Sök använder regex -funktioner.&lt;/p&gt; &lt;p&gt; a prick &apos;.&apos; används som ett vildkort, t.ex.&quot;.Ears&quot; kommer att matcha &quot;björnar&quot; och &quot;år&quot;.&lt;/p&gt; &lt;p&gt; a &apos;?&apos; Efter att en karaktär kommer att matcha en eller ingen gånger den karaktären, t.ex.‘Bears?’ Kommer att matcha ‘Bear’ och ‘Bears’ &lt;/p&gt; &lt;p&gt; &lt;span style = &quot;bakgrundsfärg: transparent;&quot;&gt; en &quot;*&quot; efter att en karaktär matchar noll eller fler gånger.&lt;/span&gt; &lt;/p&gt; &lt;p&gt; &lt;span style = &quot;bakgrundsfärg: transparent;&quot;&gt; ‘&lt;/span&gt; \.Kommer att matcha pricksymbolen, &apos;\?&apos; Kommer att matcha frågetecknet.‘\ N’ kommer att matcha linjens slutsymbol.&lt;/p&gt; &lt;p&gt; regex cheatsheet: &lt;a href = &quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt; &lt;span style = &quot;Text-Decoration: understyrning;Färg:#000080; &quot;&gt; www.rexegg.com/regex-quickstart.html &lt;/span&gt; &lt;/a&gt; &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="133"/>
@@ -2527,7 +2535,10 @@ När alla textfiler har importerats tar du bort den här filen från projektmapp
 The speaker name must be at the start of a new line and less than 64 characters long.
 Formatted like below for name detection.
 &quot;Name:&quot;, &quot;{Name} or &quot;[Name]&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj en textutskrift för att markera talarna.
+Talarnas namn måste stå i början av en ny rad och vara kortare än 64 tecken.
+Formateras enligt nedan för namnigenkänning.
+”Namn:”, ”{Namn} eller ”[Namn]&quot;</translation>
     </message>
 </context>
 <context>
@@ -3075,7 +3086,7 @@ Wildcards for &apos;like&apos; are % and _</source>
         <translation>Välj parametrar för attributen.
 mellan kräver 2 värden separerade av;till exempel1; 100
 i och inte i kräver 1 eller fler värden separerade av;
-Jokertecken för 'som' är % och _</translation>
+Jokertecken för &apos;som&apos; är % och _</translation>
     </message>
     <message>
         <location filename="ui_report_attribute_parameters.py" line="88"/>
@@ -3569,18 +3580,19 @@ Rekommenderas inte om du inte har många stora filer som bromsar säkerhetskopia
     <message>
         <location filename="ui_dialog_speakers.py" line="53"/>
         <source>Mark Speakers</source>
-        <translation type="unfinished"></translation>
+        <translation>Markera högtalare</translation>
     </message>
     <message>
         <location filename="ui_dialog_speakers.py" line="54"/>
         <source>The following speaker names were detected in the document. 
 Select (✓) the ones you want to mark. Clicking OK creates a code for each selected speaker in the “📌 Speakers” category and assigns all corresponding text segments. Doubleclick to edit the &quot;code as&quot; name in the table. To merge two speakers (e.g. to correct a typo), rename the &quot;code as&quot; in one entry so that it exactly matches the other.</source>
-        <translation type="unfinished"></translation>
+        <translation>Följande talarnamn har identifierats i dokumentet. 
+Markera (✓) de du vill markera. När du klickar på OK skapas en kod för varje vald talare i kategorin ”📌 Talare” och alla motsvarande textsegment tilldelas. Dubbelklicka för att redigera namnet ”kod som” i tabellen. För att slå samman två talare (t.ex. för att korrigera ett stavfel) byter du namn på ”kod som” i en post så att det stämmer exakt med den andra.</translation>
     </message>
     <message>
         <location filename="ui_dialog_speakers.py" line="56"/>
         <source>Doubleclick a &quot;coded as&quot; name to edit</source>
-        <translation type="unfinished"></translation>
+        <translation>Dubbelklicka på ett ”kodat som”-namn för att redigera det.</translation>
     </message>
 </context>
 <context>
@@ -3904,7 +3916,7 @@ Röd understrykning = tilldelad kod eller kommentar</translation>
     <message>
         <location filename="ui_dialog_view_av.py" line="201"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. &lt;/p&gt;&lt;p&gt;A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A ‘*’ after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;‘&lt;/span&gt;\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; Sök använder regex -funktioner.&lt;/p&gt; &lt;p&gt; a prick '.' används som ett vildkort, t.ex.&quot;.Ears&quot; kommer att matcha &quot;björnar&quot; och &quot;år&quot;.&lt;/p&gt; &lt;p&gt; a '?' Efter att en karaktär kommer att matcha en eller ingen gånger den karaktären, t.ex.‘Bears?’ Kommer att matcha ‘Bear’ och ‘Bears’ &lt;/p&gt; &lt;p&gt; &lt;span style = &quot;bakgrundsfärg: transparent;&quot;&gt; en &quot;*&quot; efter att en karaktär matchar noll eller fler gånger.&lt;/span&gt; &lt;/p&gt; &lt;p&gt; &lt;span style = &quot;bakgrundsfärg: transparent;&quot;&gt; ‘&lt;/span&gt; \.Kommer att matcha pricksymbolen, '\?' Kommer att matcha frågetecknet.‘\ N’ kommer att matcha linjens slutsymbol.&lt;/p&gt; &lt;p&gt; regex cheatsheet: &lt;a href = &quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt; &lt;span style = &quot;Text-Decoration: understyrning;Färg:#000080; &quot;&gt; www.rexegg.com/regex-quickstart.html &lt;/span&gt; &lt;/a&gt; &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
+        <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; Sök använder regex -funktioner.&lt;/p&gt; &lt;p&gt; a prick &apos;.&apos; används som ett vildkort, t.ex.&quot;.Ears&quot; kommer att matcha &quot;björnar&quot; och &quot;år&quot;.&lt;/p&gt; &lt;p&gt; a &apos;?&apos; Efter att en karaktär kommer att matcha en eller ingen gånger den karaktären, t.ex.‘Bears?’ Kommer att matcha ‘Bear’ och ‘Bears’ &lt;/p&gt; &lt;p&gt; &lt;span style = &quot;bakgrundsfärg: transparent;&quot;&gt; en &quot;*&quot; efter att en karaktär matchar noll eller fler gånger.&lt;/span&gt; &lt;/p&gt; &lt;p&gt; &lt;span style = &quot;bakgrundsfärg: transparent;&quot;&gt; ‘&lt;/span&gt; \.Kommer att matcha pricksymbolen, &apos;\?&apos; Kommer att matcha frågetecknet.‘\ N’ kommer att matcha linjens slutsymbol.&lt;/p&gt; &lt;p&gt; regex cheatsheet: &lt;a href = &quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt; &lt;span style = &quot;Text-Decoration: understyrning;Färg:#000080; &quot;&gt; www.rexegg.com/regex-quickstart.html &lt;/span&gt; &lt;/a&gt; &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="202"/>
@@ -3985,7 +3997,7 @@ Röd understrykning = tilldelad kod eller kommentar</translation>
     <message>
         <location filename="ui_dialog_view_text.py" line="79"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. &lt;/p&gt;&lt;p&gt;A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A ‘*’ after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;‘&lt;/span&gt;\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; Sök använder regex -funktioner.&lt;/p&gt; &lt;p&gt; a prick '.' används som ett vildkort, t.ex.&quot;.Ears&quot; kommer att matcha &quot;björnar&quot; och &quot;år&quot;.&lt;/p&gt; &lt;p&gt; a '?' Efter att en karaktär kommer att matcha en eller ingen gånger den karaktären, t.ex.‘Bears?’ Kommer att matcha ‘Bear’ och ‘Bears’ &lt;/p&gt; &lt;p&gt; &lt;span style = &quot;bakgrundsfärg: transparent;&quot;&gt; en &quot;*&quot; efter att en karaktär matchar noll eller fler gånger.&lt;/span&gt; &lt;/p&gt; &lt;p&gt; &lt;span style = &quot;bakgrundsfärg: transparent;&quot;&gt; ‘&lt;/span&gt; \.Kommer att matcha pricksymbolen, '\?' Kommer att matcha frågetecknet.‘\ N’ kommer att matcha linjens slutsymbol.&lt;/p&gt; &lt;p&gt; regex cheatsheet: &lt;a href = &quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt; &lt;span style = &quot;Text-Decoration: understyrning;Färg:#000080; &quot;&gt; www.rexegg.com/regex-quickstart.html &lt;/span&gt; &lt;/a&gt; &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
+        <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; Sök använder regex -funktioner.&lt;/p&gt; &lt;p&gt; a prick &apos;.&apos; används som ett vildkort, t.ex.&quot;.Ears&quot; kommer att matcha &quot;björnar&quot; och &quot;år&quot;.&lt;/p&gt; &lt;p&gt; a &apos;?&apos; Efter att en karaktär kommer att matcha en eller ingen gånger den karaktären, t.ex.‘Bears?’ Kommer att matcha ‘Bear’ och ‘Bears’ &lt;/p&gt; &lt;p&gt; &lt;span style = &quot;bakgrundsfärg: transparent;&quot;&gt; en &quot;*&quot; efter att en karaktär matchar noll eller fler gånger.&lt;/span&gt; &lt;/p&gt; &lt;p&gt; &lt;span style = &quot;bakgrundsfärg: transparent;&quot;&gt; ‘&lt;/span&gt; \.Kommer att matcha pricksymbolen, &apos;\?&apos; Kommer att matcha frågetecknet.‘\ N’ kommer att matcha linjens slutsymbol.&lt;/p&gt; &lt;p&gt; regex cheatsheet: &lt;a href = &quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt; &lt;span style = &quot;Text-Decoration: understyrning;Färg:#000080; &quot;&gt; www.rexegg.com/regex-quickstart.html &lt;/span&gt; &lt;/a&gt; &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_text.py" line="80"/>
@@ -4242,7 +4254,7 @@ Kod inte den här texten förrän du laddar om kodning - kodtext från menyfält
     <message>
         <location filename="ui_main.py" line="346"/>
         <source>Graph</source>
-        <translation type="unfinished">Visa graf</translation>
+        <translation>Graf</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="347"/>
