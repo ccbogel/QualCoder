@@ -3,6 +3,7 @@ Using --update option
 This script updates translation placeholders in .po and Qt .ts files.
 Using --compile option
 This script compiles .po to .mo files, and .ts to .qm files.
+Requires polib and PyQt5
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -29,11 +30,11 @@ https://qualcoder.wordpress.com/
 import os
 import subprocess
 import sys
-from PyQt5.QtCore import QLibraryInfo
 import polib
 
 
 def extract_pot_file(directory, pot_filename):
+    """ Called by: update_translation_placeholders """
     # List all .py files within the specified directory
     py_files = []
     for root, dirs, files in os.walk(directory):
@@ -57,7 +58,8 @@ def extract_pot_file(directory, pot_filename):
 
 
 def update_po_files(directory, pot_filename):
-    """ List all .po files within the specified directory. """
+    """ List all .po files within the specified directory.
+    called by: update_translation_placeholders """
     for root, dirs, files in os.walk(directory):
         for file in files:
             if file.endswith('.po'):
@@ -73,26 +75,28 @@ def update_po_files(directory, pot_filename):
                     print(f"Error updating PO file {po_file}: {exc}")
 
 
-def update_qt_ts_files(directory):
+def update_qt_ts_files():
     """ Requires pyludate5
     pip install pyqt5-tools
-     Warning: pylupdate6 overrides ,but does not update, existing ts files.
-     """
+    Run from QualCoder-master folder
+    Warning: pylupdate6 overrides ,but does not update, existing ts files.
+    CAlled by: update_translation_placeholders
+    """
 
-    pylupdate_path = os.path.join(QLibraryInfo.location(QLibraryInfo.BinariesPath), "pylupdate5")
     translation_files = ["app_de.ts", "app_es.ts", "app_fr.ts", "app_it.ts", "app_ja.ts",
                          "app_pt.ts", "app_sv.ts", "app_zh.ts"]
     script_path = os.path.dirname(os.path.realpath(__file__))
-    directory = os.path.join(script_path, directory)
-    os.chdir(directory)
+    gui_directory = os.path.join(script_path, "src", "qualcoder", "GUI")
+    print("GUI directory:", gui_directory)
+    os.chdir(gui_directory)
     for translation in translation_files:
-        ui_files = [f for f in os.listdir(directory) if f.startswith("ui_")]
-        cmd = [pylupdate_path, "-noobsolete", "-ts", translation] + ui_files
-        print(f">>> {' '.join(cmd)}")
-        subprocess.call(cmd)
-
-        """ TODO Not working for me yet. I might have to add the path to each ui_file
-        """
+        cmd = "pylupdate5 "
+        for file in os.listdir():
+            if file.startswith("ui_"):
+                cmd += f"{file} "
+        cmd += f"-noobsolete -ts {translation}"
+        print(f">>> {cmd}")
+        subprocess.call(cmd, shell=True, cwd=gui_directory)
 
 
 def update_translation_placeholders():
@@ -102,7 +106,7 @@ def update_translation_placeholders():
     pot_filename = os.path.join(directory, 'qualcoder.pot')
     extract_pot_file(directory, pot_filename)
     update_po_files(directory, pot_filename)
-    update_qt_ts_files(os.path.join('src', 'qualcoder', 'GUI'))
+    update_qt_ts_files()
 
 
 def recompile_translation():
@@ -167,8 +171,7 @@ def recompile_translation():
                 else:
                     print(f'Skipping "{qm_file}".')
 
-    # update base_64_lang_helper.py
-
+    # Update base_64_lang_helper.py
     answer = input(f'Do you want to update "base_64_lang_helper.py"? (y/n)')
     if answer == 'y':
         os.chdir(os.path.join(project_root, "src", 'qualcoder', 'locale'))
@@ -179,7 +182,10 @@ def recompile_translation():
 
 
 def main():
-    print("Choose language option: --update --compile")
+    print("Run from the QualCoder-master folder")
+    print("Choose option: --update --compile")
+    print("--update updates language placeholders for ts and po files.")
+    print("--compile compiles language files ts to qm files and po to mo files NOT TESTED YET")
 
 
 if __name__ == "__main__":
