@@ -15,12 +15,12 @@ sudo apt install pyqt6-dev-tools
 In directory qualcoder/GUI 
 Need a .pro file  in the qualcoder/GUI directory
 run:
-pylupdate5 project.pro -no-obsolete
+pylupdate5 project.pro -noobsolete
 
 I have added a helper file for this: update_qt_ts_helper.py
 
 For individual files:
-pylupdate6 -ts app_fr.ts -noobsolete
+pylupdate5 -ts app_fr.ts -noobsolete
 
 Double-click to open the .pro file in Qt Creator
 Go to Tools > External > Linguist > update Translations
