@@ -7343,7 +7343,7 @@ msgid ""
 "Step 1: You will be asked for a new QualCoder project name.\n"
 "Step 2: You will be asked for the RQDA file."
 msgstr ""
-"Steg 1: Du kommer att behöva ange ett nytt QualCoder projektnamn.\r\n"
+"Steg 1: Du kommer att behöva ange ett nytt QualCoder projektnamn.\n"
 "Steg 2: Du kommer att behöva ange RQDA filen."
 
 #: src\qualcoder\__main__.py:2052
