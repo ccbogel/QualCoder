@@ -359,10 +359,12 @@ class DialogReportCodes(QtWidgets.QDialog):
         """ Context menu for case selection. """
 
         menu = QtWidgets.QMenu()
-        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
         action_all_cases = menu.addAction(_("Select all cases"))
         action_cases_like = menu.addAction(_("Select cases like"))
         action_cases_none = menu.addAction(_("Select none"))
+        action_cases_name_ascending = menu.addAction(_("Sort by name ascending"))
+        action_cases_name_descending = menu.addAction(_("Sort by name descending"))
         action = menu.exec(self.ui.listWidget_cases.mapToGlobal(position))
         if action == action_all_cases:
             self.ui.listWidget_cases.selectAll()
@@ -370,10 +372,14 @@ class DialogReportCodes(QtWidgets.QDialog):
         if action == action_cases_none:
             for i in range(self.ui.listWidget_cases.count()):
                 self.ui.listWidget_cases.item(i).setSelected(False)
+        if action == action_cases_name_ascending:
+            self.ui.listWidget_cases.sortItems(Qt.SortOrder.AscendingOrder)
+        if action == action_cases_name_descending:
+            self.ui.listWidget_cases.sortItems(Qt.SortOrder.DescendingOrder)
         if action == action_cases_like:
             # Input dialog narrow, so code below
             dialog = QtWidgets.QInputDialog(None)
-            dialog.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            dialog.setStyleSheet(f"* {{font-size:{self.app.settings['fontsize']}pt}} ")
             dialog.setWindowTitle(_("Select some cases"))
             dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
             dialog.setInputMode(QtWidgets.QInputDialog.InputMode.TextInput)
