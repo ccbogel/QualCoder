@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-12-26 15:02+1100\n"
-"PO-Revision-Date: 2025-07-14 20:36+1000\n"
+"PO-Revision-Date: 2025-12-27 09:01+1100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: zh\n"
@@ -240,7 +240,7 @@ msgstr "信息："
 
 #: src\qualcoder\ai_chat.py:857
 msgid "Thinking..."
-msgstr ""
+msgstr "思维..."
 
 #: src\qualcoder\ai_chat.py:919
 msgid "(unknown reference)"
@@ -357,7 +357,7 @@ msgstr "人工智能模型"
 
 #: src\qualcoder\ai_llm.py:87
 msgid "Loading list of available AI models..."
-msgstr ""
+msgstr "正在加载可用 AI 模型列表..."
 
 #: src\qualcoder\ai_llm.py:320
 msgid ""
@@ -366,6 +366,9 @@ msgid ""
 "the AI access still works as expected. You might need to change to a "
 "different AI model in the settings dialog under \"Advanced AI Settings\"."
 msgstr ""
+"您正在旧服务器上使用“Blablador”服务，该服务器很快将被禁用。您的配置将自动更"
+"新。请测试AI访问是否仍能正常工作。您可能需要在“高级 AI 设置”下的设置对话框中"
+"更改为不同的 AI 模型。"
 
 #: src\qualcoder\ai_llm.py:323 src\qualcoder\ai_llm.py:477
 msgid "AI Setup"
@@ -896,7 +899,7 @@ msgstr "显示以"
 
 #: src\qualcoder\cases.py:783 src\qualcoder\manage_files.py:410
 msgid "Hide columns starting with:"
-msgstr "隐藏以.开头的列"
+msgstr "隐藏以.开头的列:"
 
 #: src\qualcoder\cases.py:784 src\qualcoder\manage_files.py:411
 msgid "Hide Columns"
@@ -1975,7 +1978,7 @@ msgstr "显示案件档案"
 #: src\qualcoder\code_pdf.py:2444 src\qualcoder\code_text.py:3190
 #: src\qualcoder\view_av.py:758 src\qualcoder\view_image.py:736
 msgid "Sort"
-msgstr ""
+msgstr "种类"
 
 #: src\qualcoder\code_pdf.py:2446 src\qualcoder\code_text.py:3192
 #: src\qualcoder\report_codes.py:319 src\qualcoder\report_codes.py:366
@@ -2351,7 +2354,7 @@ msgstr "转到书签"
 #: src\qualcoder\code_text.py:3189 src\qualcoder\code_text.py:3462
 #: src\qualcoder\manage_files.py:519 src\qualcoder\manage_files.py:1000
 msgid "Mark speakers"
-msgstr ""
+msgstr "标记扬声器"
 
 #: src\qualcoder\code_text.py:3329 src\qualcoder\code_text.py:3385
 msgid "From: "
@@ -2681,7 +2684,7 @@ msgstr "将参考文献复制到剪贴板。APA"
 
 #: src\qualcoder\error_dlg.py:64
 msgid "Exception handler"
-msgstr ""
+msgstr "异常处理程序"
 
 #: src\qualcoder\helpers.py:235
 msgid ""
@@ -3228,7 +3231,7 @@ msgstr "导入链接文件"
 
 #: src\qualcoder\manage_files.py:604
 msgid "Hide values like:"
-msgstr "隐藏值，如"
+msgstr "隐藏值，如:"
 
 #: src\qualcoder\manage_files.py:681
 msgid "Image loaded from pdf: "
@@ -3302,7 +3305,7 @@ msgstr "无法定位媒体。"
 
 #: src\qualcoder\manage_files.py:1241 src\qualcoder\manage_files.py:1253
 msgid "Image too large for PIL module. (DecompressionBombError): "
-msgstr ""
+msgstr "图像对于 PIL 模块来说太大。 （减压炸弹错误）："
 
 #: src\qualcoder\manage_files.py:1280 src\qualcoder\report_file_summary.py:404
 #: src\qualcoder\report_file_summary.py:457
@@ -3752,17 +3755,17 @@ msgstr "原创"
 
 #: src\qualcoder\pseudonyms.py:57 src\qualcoder\pseudonyms.py:88
 msgid "Pseudonym"
-msgstr ""
+msgstr "笔名"
 
 #: src\qualcoder\pseudonyms.py:73
 msgid "Too short"
-msgstr ""
+msgstr "太短，需要 3 个或更多字符。\\n留空以随机生成。"
 
 #: src\qualcoder\pseudonyms.py:77
 msgid ""
 "Too short, need 3 or more characters.\n"
 "Leave blank for random generated."
-msgstr ""
+msgstr "太短，需要 3 个或更多字符。\\n留空以随机生成。"
 
 #: src\qualcoder\pseudonyms.py:85
 #, fuzzy
@@ -3954,7 +3957,7 @@ msgstr "代码和编码器的文本编码重复。只加载一个。"
 
 #: src\qualcoder\refi.py:1628
 msgid " Positions:"
-msgstr "职位"
+msgstr "职位:"
 
 #: src\qualcoder\refi.py:1717
 msgid "Trying to read Note element: "
@@ -5134,7 +5137,7 @@ msgstr " 选择其他名称"
 msgid ""
 "Left click: Show coded text.\n"
 "Right click: Create new combined code from these codes."
-msgstr ""
+msgstr "左键单击：显示编码文本。\\n右键单击：从这些代码创建新的组合代码。"
 
 #: src\qualcoder\report_exact_matches.py:86
 msgid ""
@@ -5348,6 +5351,7 @@ msgid ""
 "Cannot open image with PIL module to ge t size and details.\n"
 "(DecompressionBombError)"
 msgstr ""
+"无法使用 PIL 模块打开图像以获取大小和详细信息。(DecompressionBombError)"
 
 #: src\qualcoder\report_file_summary.py:556
 #: src\qualcoder\report_file_summary.py:644
@@ -5370,7 +5374,7 @@ msgstr "单词计算： 单词使用字母字符，包括撇号。所有其他�
 
 #: src\qualcoder\report_file_summary.py:616
 msgid " Excludes English Stopwords"
-msgstr ""
+msgstr "排除英语停用词"
 
 #: src\qualcoder\report_relations.py:239
 msgid ""
@@ -5792,7 +5796,7 @@ msgstr "更大"
 
 #: src\qualcoder\settings.py:156
 msgid "Default folder for storing automatic backups and for file outputs."
-msgstr ""
+msgstr "用于存储自动备份和文件输出的默认文件夹。"
 
 #: src\qualcoder\settings.py:295 src\qualcoder\settings.py:303
 msgid "Edit AI profile name"
@@ -5874,18 +5878,20 @@ msgid ""
 "The speaker name cannot be empty. If you want to exclude a speaker from "
 "being marked, deselect the check box on the left."
 msgstr ""
+"发言者姓名不能为空。如果您想要从标记中排除某个发言者，请取消选中左侧的复选"
+"框。"
 
 #: src\qualcoder\speakers.py:272
 msgid "This contains all the speakers that have been marked in documents."
-msgstr ""
+msgstr "其中包含文档中标记的所有发言者。"
 
 #: src\qualcoder\speakers.py:283
 msgid "Speakers category could not be found found or created."
-msgstr ""
+msgstr "无法找到或创建演讲者类别。"
 
 #: src\qualcoder\speakers.py:310
 msgid "Speaker code could not be found found or created."
-msgstr ""
+msgstr "无法找到或创建扬声器代码。"
 
 #: src\qualcoder\special_functions.py:103 src\qualcoder\__main__.py:2430
 msgid "Open project directory"
@@ -6052,19 +6058,21 @@ msgstr "更改代码结束位置"
 
 #: src\qualcoder\text_file_replacement.py:74
 msgid " New file name matches another existing file name"
-msgstr ""
+msgstr "新文件名与另一个现有文件名匹配"
 
 #: src\qualcoder\text_file_replacement.py:82
 msgid ""
 "Reload the other tabs.\n"
 "Check accuracy of codings and annotations.\n"
 msgstr ""
+"重新加载其他选项卡。\n"
+"检查编码和注释的准确性。\n"
 
 #: src\qualcoder\text_file_replacement.py:83
 msgid ""
 "Function works by identifying the first matching text segment for each "
 "coding and annotation."
-msgstr ""
+msgstr "函数的工作原理是识别每个编码和注释的第一个匹配文本段。"
 
 #: src\qualcoder\text_file_replacement.py:85
 #, fuzzy
@@ -6078,12 +6086,14 @@ msgid ""
 "\n"
 "Found "
 msgstr ""
+"\n"
+"找到"
 
 #: src\qualcoder\text_file_replacement.py:108
 #: src\qualcoder\text_file_replacement.py:133
 #: src\qualcoder\text_file_replacement.py:160
 msgid " of "
-msgstr ""
+msgstr "的"
 
 #: src\qualcoder\text_file_replacement.py:143
 #: src\qualcoder\text_file_replacement.py:170
@@ -6104,6 +6114,8 @@ msgid ""
 "\n"
 "Please check if the file is empty."
 msgstr ""
+"\n"
+"请检查文件是否为空。"
 
 #: src\qualcoder\view_av.py:219 src\qualcoder\view_av.py:998
 msgid "Media coding"
@@ -6362,6 +6374,8 @@ msgid ""
 "Transcription area: Ctrl+T (insert timestamp) Ctrl+N (new speaker) Ctrl+1-8 "
 "(select speaker) Ctrl+D (delete speaker)"
 msgstr ""
+"转录区域： Ctrl+T（插入时间戳） Ctrl+N（新发言者） Ctrl+1-8（选择发言者） "
+"Ctrl+D（删除发言者）"
 
 #: src\qualcoder\view_av.py:4538
 msgid "Select name to delete"
@@ -6463,7 +6477,7 @@ msgstr "词汇云"
 
 #: src\qualcoder\view_charts.py:527
 msgid "Cumulative code count in cases by case"
-msgstr ""
+msgstr "逐个案例的累积代码计数"
 
 #: src\qualcoder\view_charts.py:582 src\qualcoder\view_charts.py:589
 #: src\qualcoder\view_charts.py:665 src\qualcoder\view_charts.py:672
@@ -6489,7 +6503,7 @@ msgstr "计数"
 
 #: src\qualcoder\view_charts.py:609
 msgid "Cumulative code count in cases by code"
-msgstr ""
+msgstr "按代码统计案例的累积代码计数"
 
 #: src\qualcoder\view_charts.py:691
 #, fuzzy
@@ -7011,7 +7025,7 @@ msgstr "完全重合"
 
 #: src\qualcoder\view_image.py:1436
 msgid "Cannot open image with PIL. The image it too large."
-msgstr ""
+msgstr "无法使用 PIL 打开图像。图片太大了。"
 
 #: src\qualcoder\view_image.py:1437
 #, fuzzy
