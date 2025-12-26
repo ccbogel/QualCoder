@@ -211,7 +211,7 @@ Codings from the entire text file are used for the calculations.</source>
     <message>
         <location filename="ui_dialog_charts.py" line="330"/>
         <source>&lt;b&gt;Cumulative barchart&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>累積棒グラフ</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="331"/>
@@ -220,12 +220,16 @@ This is temporary and must be selected each time the Charts screen is opened.
 
 The file must be plain text with one word per line.
 Each word is excluded in the n-grams=1 Word cloud.</source>
-        <translation type="unfinished"></translation>
+        <translation>ここでテキストファイルを選択すると、ソフトウェア内の既存のストップワードが上書きされ、.qualcoder設定フォルダに保存されているストップワードも上書きされます。
+これは一時的な設定であり、チャート画面を開くたびに選択する必要があります。
+
+ファイルはプレーンテキスト形式で、1行に1語のみ記載してください。
+各語はn-grams=1のワードクラウドから除外されます。</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="336"/>
         <source>Stop words</source>
-        <translation type="unfinished"></translation>
+        <translation>ストップワード</translation>
     </message>
 </context>
 <context>
@@ -2175,7 +2179,11 @@ Limited to names up to 63 characters long.
 The name must be at the start of a new line.
 Formatted like below for name detection.
 &quot;Name:&quot;, &quot;{Name}, or &quot;[Name]&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>スピーカーをマークする。
+名前は最大63文字まで。
+名前は必ず改行の先頭に配置すること。
+名前の検出用に以下のようにフォーマットする。
+「Name:」, 「{Name}」, または 「[Name]」</translation>
     </message>
 </context>
 <context>
@@ -2526,7 +2534,10 @@ PDFファイルでは機能しません。代わりにPDFからプレーンテ�
 The speaker name must be at the start of a new line and less than 64 characters long.
 Formatted like below for name detection.
 &quot;Name:&quot;, &quot;{Name} or &quot;[Name]&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>話者をマークするテキスト文字起こしを選択してください。
+話者名は必ず改行の先頭に配置し、64文字未満にしてください。
+名前検出のため、以下の形式で記述してください。
+「名前:」, 「{名前} または 」[名前]&quot;</translation>
     </message>
 </context>
 <context>
@@ -3076,7 +3087,7 @@ Wildcards for &apos;like&apos; are % and _</source>
         <translation>属性のパラメータを選択します。
 betweenには、;で区切られた2つの値が必要です。
  in と not in は、.で区切られた1つ以上の値を必要とします；
-like' のワイルドカードは % と _ です。</translation>
+like&apos; のワイルドカードは % と _ です。</translation>
     </message>
     <message>
         <location filename="ui_report_attribute_parameters.py" line="88"/>
@@ -3571,18 +3582,19 @@ Not recommended unless you have many large files slowing the backup.</source>
     <message>
         <location filename="ui_dialog_speakers.py" line="53"/>
         <source>Mark Speakers</source>
-        <translation type="unfinished"></translation>
+        <translation>マークスピーカー</translation>
     </message>
     <message>
         <location filename="ui_dialog_speakers.py" line="54"/>
         <source>The following speaker names were detected in the document. 
 Select (✓) the ones you want to mark. Clicking OK creates a code for each selected speaker in the “📌 Speakers” category and assigns all corresponding text segments. Doubleclick to edit the &quot;code as&quot; name in the table. To merge two speakers (e.g. to correct a typo), rename the &quot;code as&quot; in one entry so that it exactly matches the other.</source>
-        <translation type="unfinished"></translation>
+        <translation>以下の話者名が文書内で検出されました。
+マークしたい項目にチェック（✓）を入れてください。「OK」をクリックすると、選択した各話者に対して「📌 話者」カテゴリにコードが生成され、対応するテキストセグメントが割り当てられます。テーブル内の「コード名」を編集するにはダブルクリックしてください。2人の話者を統合する場合（例：誤字の修正）、一方のエントリの「コード名」をもう一方と完全に一致するように変更してください。</translation>
     </message>
     <message>
         <location filename="ui_dialog_speakers.py" line="56"/>
         <source>Doubleclick a &quot;coded as&quot; name to edit</source>
-        <translation type="unfinished"></translation>
+        <translation>「コード化名」をダブルクリックして編集する</translation>
     </message>
 </context>
 <context>
@@ -4245,7 +4257,7 @@ Do not code this text until you reload Coding - Code Text from the menu bar.</so
     <message>
         <location filename="ui_main.py" line="346"/>
         <source>Graph</source>
-        <translation type="unfinished">グラフを見る</translation>
+        <translation>グラフ</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="347"/>
