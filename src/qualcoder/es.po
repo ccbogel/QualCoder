@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-12-26 15:02+1100\n"
-"PO-Revision-Date: 2025-07-14 20:09+1000\n"
+"PO-Revision-Date: 2025-12-26 18:24+1100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: es\n"
@@ -417,7 +417,7 @@ msgstr "Info:"
 
 #: src\qualcoder\ai_chat.py:857
 msgid "Thinking..."
-msgstr ""
+msgstr "Pensamiento..."
 
 #: src\qualcoder\ai_chat.py:919
 msgid "(unknown reference)"
@@ -546,7 +546,7 @@ msgstr "Modelo IA Click to apply"
 
 #: src\qualcoder\ai_llm.py:87
 msgid "Loading list of available AI models..."
-msgstr ""
+msgstr "Cargando lista de modelos de IA disponibles..."
 
 #: src\qualcoder\ai_llm.py:320
 msgid ""
@@ -555,6 +555,11 @@ msgid ""
 "the AI access still works as expected. You might need to change to a "
 "different AI model in the settings dialog under \"Advanced AI Settings\"."
 msgstr ""
+"Estás utilizando el servicio \\\"Blablador\\\" en un servidor antiguo que "
+"pronto será discapacitado. Su configuración se actualizará automáticamente. "
+"Por favor prueba si El acceso a la IA sigue funcionando como se esperaba. Es "
+"posible que tengas que cambiar a modelo de IA diferente en el cuadro de "
+"diálogo de configuración en \"Configuración avanzada de IA\""
 
 #: src\qualcoder\ai_llm.py:323 src\qualcoder\ai_llm.py:477
 msgid "AI Setup"
@@ -2215,7 +2220,7 @@ msgstr "Mostrar archivos del caso"
 #: src\qualcoder\code_pdf.py:2444 src\qualcoder\code_text.py:3190
 #: src\qualcoder\view_av.py:758 src\qualcoder\view_image.py:736
 msgid "Sort"
-msgstr ""
+msgstr "Clasificar"
 
 #: src\qualcoder\code_pdf.py:2446 src\qualcoder\code_text.py:3192
 #: src\qualcoder\report_codes.py:319 src\qualcoder\report_codes.py:366
@@ -2611,7 +2616,7 @@ msgstr "Ir a los marcadores"
 #: src\qualcoder\code_text.py:3189 src\qualcoder\code_text.py:3462
 #: src\qualcoder\manage_files.py:519 src\qualcoder\manage_files.py:1000
 msgid "Mark speakers"
-msgstr ""
+msgstr "Marcar oradores"
 
 #: src\qualcoder\code_text.py:3329 src\qualcoder\code_text.py:3385
 msgid "From: "
@@ -2964,7 +2969,7 @@ msgstr "Copiar al portapapeles"
 
 #: src\qualcoder\error_dlg.py:64
 msgid "Exception handler"
-msgstr ""
+msgstr "Manejador de excepciones"
 
 #: src\qualcoder\helpers.py:235
 msgid ""
@@ -3609,6 +3614,8 @@ msgstr "No puedo localizar los medios de comunicación. "
 #: src\qualcoder\manage_files.py:1241 src\qualcoder\manage_files.py:1253
 msgid "Image too large for PIL module. (DecompressionBombError): "
 msgstr ""
+"Imagen demasiado grande para el módulo PIL. (Error de bomba de "
+"descompresión):"
 
 #: src\qualcoder\manage_files.py:1280 src\qualcoder\report_file_summary.py:404
 #: src\qualcoder\report_file_summary.py:457
@@ -4075,17 +4082,19 @@ msgstr "original"
 
 #: src\qualcoder\pseudonyms.py:57 src\qualcoder\pseudonyms.py:88
 msgid "Pseudonym"
-msgstr ""
+msgstr "Seudónimo"
 
 #: src\qualcoder\pseudonyms.py:73
 msgid "Too short"
-msgstr ""
+msgstr "demasiado corto"
 
 #: src\qualcoder\pseudonyms.py:77
 msgid ""
 "Too short, need 3 or more characters.\n"
 "Leave blank for random generated."
 msgstr ""
+"Demasiado corto, se necesitan 3 o más caracteres.\n"
+"Déjelo en blanco para generación aleatoria."
 
 #: src\qualcoder\pseudonyms.py:85
 #, fuzzy
@@ -5493,6 +5502,8 @@ msgid ""
 "Left click: Show coded text.\n"
 "Right click: Create new combined code from these codes."
 msgstr ""
+"Clic izquierdo: Mostrar texto codificado.\n"
+"Haga clic derecho: cree un nuevo código combinado a partir de estos códigos."
 
 #: src\qualcoder\report_exact_matches.py:86
 msgid ""
@@ -5708,6 +5719,9 @@ msgid ""
 "Cannot open image with PIL module to ge t size and details.\n"
 "(DecompressionBombError)"
 msgstr ""
+"No se puede abrir la imagen con el módulo PIL para obtener el tamaño y los "
+"detalles.\n"
+"(Error de bomba de descompresión)"
 
 #: src\qualcoder\report_file_summary.py:556
 #: src\qualcoder\report_file_summary.py:644
@@ -5732,7 +5746,7 @@ msgstr ""
 
 #: src\qualcoder\report_file_summary.py:616
 msgid " Excludes English Stopwords"
-msgstr ""
+msgstr "Excluye palabras vacías en inglés"
 
 #: src\qualcoder\report_relations.py:239
 msgid ""
@@ -6155,6 +6169,8 @@ msgstr "Más grande"
 #: src\qualcoder\settings.py:156
 msgid "Default folder for storing automatic backups and for file outputs."
 msgstr ""
+"Carpeta predeterminada para almacenar copias de seguridad automáticas y "
+"salidas de archivos."
 
 #: src\qualcoder\settings.py:295 src\qualcoder\settings.py:303
 msgid "Edit AI profile name"
@@ -6236,18 +6252,20 @@ msgid ""
 "The speaker name cannot be empty. If you want to exclude a speaker from "
 "being marked, deselect the check box on the left."
 msgstr ""
+"El nombre del orador no puede estar vacío. Si desea excluir a un hablante de "
+"siendo marcado, desmarque la casilla de verificación a la izquierda."
 
 #: src\qualcoder\speakers.py:272
 msgid "This contains all the speakers that have been marked in documents."
-msgstr ""
+msgstr "Contiene todos los oradores que han sido marcados en los documentos."
 
 #: src\qualcoder\speakers.py:283
 msgid "Speakers category could not be found found or created."
-msgstr ""
+msgstr "No se pudo encontrar ni crear la categoría de oradores."
 
 #: src\qualcoder\speakers.py:310
 msgid "Speaker code could not be found found or created."
-msgstr ""
+msgstr "No se pudo encontrar ni crear el código del altavoz."
 
 #: src\qualcoder\special_functions.py:103 src\qualcoder\__main__.py:2430
 msgid "Open project directory"
@@ -6738,6 +6756,8 @@ msgid ""
 "Transcription area: Ctrl+T (insert timestamp) Ctrl+N (new speaker) Ctrl+1-8 "
 "(select speaker) Ctrl+D (delete speaker)"
 msgstr ""
+"Área de transcripción: Ctrl+T (insertar marca de tiempo) Ctrl+N (nuevo "
+"orador) Ctrl+1-8  (seleccionar orador) Ctrl+D (eliminar orador)"
 
 #: src\qualcoder\view_av.py:4538
 msgid "Select name to delete"
@@ -6840,7 +6860,7 @@ msgstr "Nube de palabras"
 
 #: src\qualcoder\view_charts.py:527
 msgid "Cumulative code count in cases by case"
-msgstr ""
+msgstr "Recuento de códigos acumulados caso por caso"
 
 #: src\qualcoder\view_charts.py:582 src\qualcoder\view_charts.py:589
 #: src\qualcoder\view_charts.py:665 src\qualcoder\view_charts.py:672
@@ -6866,7 +6886,7 @@ msgstr "Conteo"
 
 #: src\qualcoder\view_charts.py:609
 msgid "Cumulative code count in cases by code"
-msgstr ""
+msgstr "Recuento de códigos acumulados en casos por código"
 
 #: src\qualcoder\view_charts.py:691
 #, fuzzy
@@ -7389,7 +7409,7 @@ msgstr "Se superpone exactamente con"
 
 #: src\qualcoder\view_image.py:1436
 msgid "Cannot open image with PIL. The image it too large."
-msgstr ""
+msgstr "No se puede abrir la imagen con PIL. La imagen es demasiado grande."
 
 #: src\qualcoder\view_image.py:1437
 #, fuzzy
