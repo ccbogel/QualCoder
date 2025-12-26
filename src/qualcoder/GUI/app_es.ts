@@ -212,7 +212,7 @@ Para los cálculos se utilizan las codificaciones de todo el archivo de texto.</
     <message>
         <location filename="ui_dialog_charts.py" line="330"/>
         <source>&lt;b&gt;Cumulative barchart&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Gráfico de barras acumulativo</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="331"/>
@@ -221,12 +221,16 @@ This is temporary and must be selected each time the Charts screen is opened.
 
 The file must be plain text with one word per line.
 Each word is excluded in the n-grams=1 Word cloud.</source>
-        <translation type="unfinished"></translation>
+        <translation>Al seleccionar un archivo de texto aquí, se anularán las palabras vacías existentes en el software, así como las palabras vacías almacenadas en la carpeta de configuración .qualcoder. 
+Esto es temporal y debe seleccionarse cada vez que se abra la pantalla Gráficos.
+
+El archivo debe ser de texto sin formato, con una palabra por línea.
+Cada palabra se excluye de la nube de palabras n-grams=1.</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="336"/>
         <source>Stop words</source>
-        <translation type="unfinished"></translation>
+        <translation>Palabras vacías</translation>
     </message>
 </context>
 <context>
@@ -326,7 +330,7 @@ Clic con el botón derecho del ratón para ver las opciones</translation>
     <message>
         <location filename="ui_dialog_graph.py" line="141"/>
         <source>Export Pdf image</source>
-        <translation type="unfinished"></translation>
+        <translation>Exportar imagen PDF</translation>
     </message>
 </context>
 <context>
@@ -490,52 +494,52 @@ Advertencia. No hay opción de deshacer.</translation>
     <message>
         <location filename="ui_report_codes_by_segments.py" line="94"/>
         <source>Report Segment Codings</source>
-        <translation type="unfinished"></translation>
+        <translation>Códigos de segmentos de informes</translation>
     </message>
     <message>
         <location filename="ui_report_codes_by_segments.py" line="95"/>
         <source>Text limiter:</source>
-        <translation type="unfinished">Limitador de texto: </translation>
+        <translation>Limitador de texto: </translation>
     </message>
     <message>
         <location filename="ui_report_codes_by_segments.py" line="96"/>
         <source>Run report</source>
-        <translation type="unfinished"></translation>
+        <translation>Ejecutar informe</translation>
     </message>
     <message>
         <location filename="ui_report_codes_by_segments.py" line="97"/>
         <source>Coder:</source>
-        <translation type="unfinished"></translation>
+        <translation>Codificador:</translation>
     </message>
     <message>
         <location filename="ui_report_codes_by_segments.py" line="98"/>
         <source>Codes by text segments table. 1 = code present, 0 = not coded.</source>
-        <translation type="unfinished"></translation>
+        <translation>Códigos por tabla de segmentos de texto. 1 = código presente, 0 = no codificado.</translation>
     </message>
     <message>
         <location filename="ui_report_codes_by_segments.py" line="99"/>
         <source>Export to Excel</source>
-        <translation type="unfinished"></translation>
+        <translation>Exportar archivo Excel</translation>
     </message>
     <message>
         <location filename="ui_report_codes_by_segments.py" line="100"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select files by attributes&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Seleccionar archivos por atributo</translation>
     </message>
     <message>
         <location filename="ui_report_codes_by_segments.py" line="101"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Files. Right click for selection options.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Archivos. Haga clic con el botón derecho para ver las opciones de selección.</translation>
     </message>
     <message>
         <location filename="ui_report_codes_by_segments.py" line="102"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Cases. Right click for selection options.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Casos. Haga clic con el botón derecho para ver las opciones de selección.</translation>
     </message>
     <message>
         <location filename="ui_report_codes_by_segments.py" line="103"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Codes. Right click for options&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Códigos. Haga clic con el botón derecho para ver las opciones de selección.</translation>
     </message>
 </context>
 <context>
@@ -864,52 +868,52 @@ Ordenado por nombre de archivo y nombre de código.</translation>
     <message>
         <location filename="ui_comparison_table.py" line="98"/>
         <source>Code Counts by file or case</source>
-        <translation type="unfinished"></translation>
+        <translation>Recuento de códigos por archivo o caso</translation>
     </message>
     <message>
         <location filename="ui_comparison_table.py" line="99"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show the overlapping codes.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">Muestra los códigos superpuestos.</translation>
+        <translation>Muestra los códigos superpuestos.</translation>
     </message>
     <message>
         <location filename="ui_comparison_table.py" line="100"/>
         <source>Code counts table</source>
-        <translation type="unfinished"></translation>
+        <translation>Tabla de recuento de códigos</translation>
     </message>
     <message>
         <location filename="ui_comparison_table.py" line="101"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export to file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Exportar a archivo</translation>
     </message>
     <message>
         <location filename="ui_comparison_table.py" line="102"/>
         <source>Hide blank lines</source>
-        <translation type="unfinished">Ocultar líneas vacías</translation>
+        <translation>Ocultar líneas vacías</translation>
     </message>
     <message>
         <location filename="ui_comparison_table.py" line="103"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select files&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">Seleccionar archivos</translation>
+        <translation>Seleccionar archivos</translation>
     </message>
     <message>
         <location filename="ui_comparison_table.py" line="104"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select categories&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">Seleccionar categorías</translation>
+        <translation>Seleccionar categorías</translation>
     </message>
     <message>
         <location filename="ui_comparison_table.py" line="105"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select codes&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Seleccionar códigos</translation>
     </message>
     <message>
         <location filename="ui_comparison_table.py" line="106"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select attribute&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Seleccionar atributo</translation>
     </message>
     <message>
         <location filename="ui_comparison_table.py" line="107"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select cases&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Seleccionar casos</translation>
     </message>
 </context>
 <context>
@@ -976,7 +980,7 @@ Ordenado por nombre de archivo y nombre de código.</translation>
         <location filename="ui_dialog_import.py" line="94"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delimiter must be a single character.&lt;/p&gt;&lt;p&gt;Enter &apos;ta&apos; for &apos;tab&apos;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>El delimitador debe ser un solo carácter. 
- Ingrese 'ta' para 'tab' </translation>
+ Ingrese &apos;ta&apos; para &apos;tab&apos; </translation>
     </message>
     <message>
         <location filename="ui_dialog_import.py" line="95"/>
@@ -2183,7 +2187,11 @@ Limited to names up to 63 characters long.
 The name must be at the start of a new line.
 Formatted like below for name detection.
 &quot;Name:&quot;, &quot;{Name}, or &quot;[Name]&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>Marcar altavoces.
+Limitado a nombres de hasta 63 caracteres. 
+El nombre debe estar al principio de una nueva línea.
+Formateado como se indica a continuación para la detección de nombres.
+«Nombre:», «{Nombre}» o «[Nombre]».</translation>
     </message>
 </context>
 <context>
@@ -2506,7 +2514,7 @@ Renombrado como: Prefijo elegido por el usuario y sufijo numerado _nnn.&lt;/p&gt
     <message>
         <location filename="ui_dialog_manage_files.py" line="151"/>
         <source>Delete saved table display settings. </source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminar la configuración guardada de visualización de la tabla. </translation>
     </message>
     <message>
         <location filename="ui_dialog_manage_files.py" line="152"/>
@@ -2521,7 +2529,17 @@ Does not work with PDF files. Instead extract the plain text and only import the
 The pseudonyms are stored in the qda data folder as pseudonyms.json
 After all text files are imported, remove this file from the project folder and store it securely.
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Seudonimización (desidentificación de datos)
+Antes de importar archivos de texto, cree una lista de nombres o frases que se van a sustituir.
+Se aplica a estos archivos: docx, epub, htm, html, md, rtf, odt, txt, importaciones de encuestas de columnas cualitativas.
+Las sustituciones de seudónimos distinguen entre mayúsculas y minúsculas. 
+Por lo tanto, se necesitarían entradas separadas para Tom y TOM.
+
+No funciona con archivos PDF. En su lugar, extraiga el texto sin formato e importe solo el texto sin formato del PDF.
+
+Los seudónimos se almacenan en la carpeta de datos qda como pseudonyms.json.
+Una vez importados todos los archivos de texto, elimine este archivo de la carpeta del proyecto y guárdelo en un lugar seguro.
+</translation>
     </message>
     <message>
         <location filename="ui_dialog_manage_files.py" line="163"/>
@@ -2529,7 +2547,10 @@ After all text files are imported, remove this file from the project folder and 
 The speaker name must be at the start of a new line and less than 64 characters long.
 Formatted like below for name detection.
 &quot;Name:&quot;, &quot;{Name} or &quot;[Name]&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>Seleccione una transcripción de texto para marcar a los hablantes.
+El nombre del hablante debe aparecer al principio de una nueva línea y tener menos de 64 caracteres.
+Formateado como se indica a continuación para la detección de nombres.
+«Nombre:», «{Nombre}» o «[Nombre]».</translation>
     </message>
 </context>
 <context>
@@ -2678,33 +2699,34 @@ Revise después de aplicar la función.</translation>
     <message>
         <location filename="ui_dialog_pseudonyms.py" line="63"/>
         <source>Pseudonyms</source>
-        <translation type="unfinished"></translation>
+        <translation>Seudónimos</translation>
     </message>
     <message>
         <location filename="ui_dialog_pseudonyms.py" line="64"/>
         <source>Pseudonyms. Data de-identification applied on file import. Does not apply for PDF imports.
 Case sensitive, add multiple entries for each: e.g. Tom Jones  and TOM JONES</source>
-        <translation type="unfinished"></translation>
+        <translation>Seudónimos. Se aplica la desidentificación de datos al importar archivos. No se aplica a las importaciones de PDF.
+Distingue entre mayúsculas y minúsculas, añada varias entradas para cada uno: por ejemplo, Tom Jones  y TOM JONES.</translation>
     </message>
     <message>
         <location filename="ui_dialog_pseudonyms.py" line="66"/>
         <source>Original</source>
-        <translation type="unfinished"></translation>
+        <translation>Original</translation>
     </message>
     <message>
         <location filename="ui_dialog_pseudonyms.py" line="67"/>
         <source>Pseudonym</source>
-        <translation type="unfinished"></translation>
+        <translation>Seudónimo</translation>
     </message>
     <message>
         <location filename="ui_dialog_pseudonyms.py" line="68"/>
         <source>Add to pseudonyms</source>
-        <translation type="unfinished"></translation>
+        <translation>Añadir a los seudónimos</translation>
     </message>
     <message>
         <location filename="ui_dialog_pseudonyms.py" line="69"/>
         <source>Click on a row to delete entry.</source>
-        <translation type="unfinished"></translation>
+        <translation>Haga clic en una fila para eliminar la entrada.</translation>
     </message>
 </context>
 <context>
@@ -2959,7 +2981,7 @@ La selección de atributos anulará los archivos o casos seleccionados en las li
     <message>
         <location filename="ui_dialog_report_codings.py" line="187"/>
         <source>iramuteq</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -3106,7 +3128,7 @@ Wildcards for &apos;like&apos; are % and _</source>
         <translation>Seleccione los parámetros para los atributos. 
 entre requiere 2 valores separados por ; por ejemplo, 1;100
  in y not in requieren 1 o más valores separados por ;
-Los comodines para 'like' son % y _</translation>
+Los comodines para &apos;like&apos; son % y _</translation>
     </message>
     <message>
         <location filename="ui_report_attribute_parameters.py" line="88"/>
@@ -3152,7 +3174,7 @@ No utilice apóstrofes ni comas en ningún valor.</translation>
     <message>
         <location filename="ui_report_attribute_parameters.py" line="94"/>
         <source>Delete saved filter settings</source>
-        <translation type="unfinished"></translation>
+        <translation>Eliminar la configuración de filtro guardada</translation>
     </message>
 </context>
 <context>
@@ -3541,32 +3563,32 @@ No se recomienda a menos que tenga muchos archivos grandes que ralenticen la cop
     <message>
         <location filename="ui_dialog_settings.py" line="615"/>
         <source>...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="623"/>
         <source>New AI Profile...</source>
-        <translation type="unfinished"></translation>
+        <translation>Nuevo perfil de IA...</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="624"/>
         <source>General Parameters:</source>
-        <translation type="unfinished"></translation>
+        <translation>Parámetros generales:</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="633"/>
         <source>API Base URL:</source>
-        <translation type="unfinished"></translation>
+        <translation>URL base de la API:</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="638"/>
         <source>AI Models:</source>
-        <translation type="unfinished"></translation>
+        <translation>Modelos de IA:</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="643"/>
         <source>Reasoning:</source>
-        <translation type="unfinished"></translation>
+        <translation>Razonamiento:</translation>
     </message>
 </context>
 <context>
@@ -3574,18 +3596,19 @@ No se recomienda a menos que tenga muchos archivos grandes que ralenticen la cop
     <message>
         <location filename="ui_dialog_speakers.py" line="53"/>
         <source>Mark Speakers</source>
-        <translation type="unfinished"></translation>
+        <translation>Marcar altavoces</translation>
     </message>
     <message>
         <location filename="ui_dialog_speakers.py" line="54"/>
         <source>The following speaker names were detected in the document. 
 Select (✓) the ones you want to mark. Clicking OK creates a code for each selected speaker in the “📌 Speakers” category and assigns all corresponding text segments. Doubleclick to edit the &quot;code as&quot; name in the table. To merge two speakers (e.g. to correct a typo), rename the &quot;code as&quot; in one entry so that it exactly matches the other.</source>
-        <translation type="unfinished"></translation>
+        <translation>Se han detectado los siguientes nombres de hablantes en el documento. 
+Seleccione (✓) los que desee marcar. Al hacer clic en Aceptar, se crea un código para cada hablante seleccionado en la categoría «📌 Hablantes» y se asignan todos los segmentos de texto correspondientes. Haga doble clic para editar el nombre «codificar como» en la tabla. Para fusionar dos hablantes (por ejemplo, para corregir un error tipográfico), cambie el nombre de «codificar como» en una entrada para que coincida exactamente con la otra.</translation>
     </message>
     <message>
         <location filename="ui_dialog_speakers.py" line="56"/>
         <source>Doubleclick a &quot;coded as&quot; name to edit</source>
-        <translation type="unfinished"></translation>
+        <translation>Haga doble clic en un nombre «codificado como» para editarlo.</translation>
     </message>
 </context>
 <context>
@@ -3668,22 +3691,22 @@ Select (✓) the ones you want to mark. Clicking OK creates a code for each sele
     <message>
         <location filename="ui_special_functions.py" line="139"/>
         <source>Edit coder names</source>
-        <translation type="unfinished"></translation>
+        <translation>Editar nombres de codificadores</translation>
     </message>
     <message>
         <location filename="ui_special_functions.py" line="140"/>
         <source>Select coder name</source>
-        <translation type="unfinished"></translation>
+        <translation>Seleccionar nombre del codificador</translation>
     </message>
     <message>
         <location filename="ui_special_functions.py" line="141"/>
         <source>Rename</source>
-        <translation type="unfinished"></translation>
+        <translation>Cambiar nombre</translation>
     </message>
     <message>
         <location filename="ui_special_functions.py" line="142"/>
         <source>Rename or merge into an existing name</source>
-        <translation type="unfinished"></translation>
+        <translation>Cambiar el nombre o fusionar con un nombre existente</translation>
     </message>
 </context>
 <context>
@@ -3843,7 +3866,7 @@ Inserte un interlocutor en la transcripción. En el cuadro de entrada de texto p
     <message>
         <location filename="ui_dialog_view_av.py" line="182"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Volume&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">Avanzar 30 segundos. Alt + Más</translation>
+        <translation>Volumen</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="187"/>
@@ -3925,22 +3948,23 @@ subrayado rojo = Asignado al código o a la anotación</translation>
     <message>
         <location filename="ui_dialog_view_av.py" line="204"/>
         <source>New speaker</source>
-        <translation type="unfinished"></translation>
+        <translation>Nuevo altavoz</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="205"/>
         <source>Insert timestamp</source>
-        <translation type="unfinished"></translation>
+        <translation>Insertar marca de tiempo</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="206"/>
         <source>Remove Speaker</source>
-        <translation type="unfinished"></translation>
+        <translation>Quitar altavoz</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="192"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Forward 30 seconds. Alt + Plus&lt;/p&gt;&lt;p&gt;Forward 5 seconds. Press 5&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>Adelantar 30 segundos. Alt + Más
+Adelantar 5 segundos. Pulsar 5</translation>
     </message>
 </context>
 <context>
@@ -3990,7 +4014,7 @@ subrayado rojo = Asignado al código o a la anotación</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_text.py" line="79"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot &#xe2;&#x80;&#x98;.&#xe2;&#x80;&#x99; is used as a wild card, e.g. &#xe2;&#x80;&#x98;.ears&#xe2;&#x80;&#x99; will match &#xe2;&#x80;&#x98;bears&#xe2;&#x80;&#x99; and &#xe2;&#x80;&#x98;years&#xe2;&#x80;&#x99;. &lt;/p&gt;&lt;p&gt;A &#xe2;&#x80;&#x98;?&#xe2;&#x80;&#x99; after a character will match one or none times that character, e.g. &#xe2;&#x80;&#x98;bears?&#xe2;&#x80;&#x99; will match &#xe2;&#x80;&#x98;bear&#xe2;&#x80;&#x99; and &#xe2;&#x80;&#x98;bears&#xe2;&#x80;&#x99; &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A &#xe2;&#x80;&#x98;*&#xe2;&#x80;&#x99; after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;&#xe2;&#x80;&#x98;&lt;/span&gt;\. will match the dot symbol, &#xe2;&#x80;&#x98;\?&#xe2;&#x80;&#x99; will match the question mark. &#xe2;&#x80;&#x98;\n&#xe2;&#x80;&#x99; will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot â.â is used as a wild card, e.g. â.earsâ will match âbearsâ and âyearsâ. &lt;/p&gt;&lt;p&gt;A â?â after a character will match one or none times that character, e.g. âbears?â will match âbearâ and âbearsâ &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A â*â after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;â&lt;/span&gt;\. will match the dot symbol, â\?â will match the question mark. â\nâ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished">La búsqueda utiliza funciones regex.</translation>
     </message>
     <message>
@@ -4020,22 +4044,22 @@ No codifique este texto hasta que vuelva a cargar Codificación - Texto codifica
     <message>
         <location filename="ui_error_dlg.py" line="99"/>
         <source>Uncaught exception</source>
-        <translation type="unfinished"></translation>
+        <translation>Excepción no detectada</translation>
     </message>
     <message>
         <location filename="ui_error_dlg.py" line="100"/>
         <source>&lt;Error Message&gt; </source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="ui_error_dlg.py" line="101"/>
         <source>Error traceback (most recent call last):</source>
-        <translation type="unfinished"></translation>
+        <translation>Rastreo de errores (última llamada más reciente):</translation>
     </message>
     <message>
         <location filename="ui_error_dlg.py" line="102"/>
         <source>&lt;traceback&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -4188,7 +4212,7 @@ No codifique este texto hasta que vuelva a cargar Codificación - Texto codifica
     <message>
         <location filename="ui_main.py" line="346"/>
         <source>Graph</source>
-        <translation type="unfinished">Ver Grafo</translation>
+        <translation>Grafo</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="348"/>
