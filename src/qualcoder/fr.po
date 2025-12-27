@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-12-26 15:02+1100\n"
-"PO-Revision-Date: 2025-12-11 09:52+0100\n"
+"PO-Revision-Date: 2025-12-27 16:30+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: fr\n"
@@ -678,8 +678,8 @@ msgstr ")."
 #: src\qualcoder\ai_search_dialog.py:457
 msgid "Please select a code or category (or use \"free search\" instead)."
 msgstr ""
-"Veuillez sélectionner un code ou une catégorie (ou utilisez plutôt la "
-"« recherche libre »)."
+"Veuillez sélectionner un code ou une catégorie (ou utilisez plutôt la « "
+"recherche libre »)."
 
 #: src\qualcoder\ai_search_dialog.py:477
 msgid "Please enter text in the \"topic\" field."
@@ -2043,7 +2043,7 @@ msgstr "Montrer les dossiers"
 #: src\qualcoder\code_pdf.py:2444 src\qualcoder\code_text.py:3190
 #: src\qualcoder\view_av.py:758 src\qualcoder\view_image.py:736
 msgid "Sort"
-msgstr ""
+msgstr "Trier"
 
 #: src\qualcoder\code_pdf.py:2446 src\qualcoder\code_text.py:3192
 #: src\qualcoder\report_codes.py:319 src\qualcoder\report_codes.py:366
@@ -2051,9 +2051,8 @@ msgstr ""
 #: src\qualcoder\report_compare_coder_file.py:152
 #: src\qualcoder\report_file_summary.py:117 src\qualcoder\view_av.py:760
 #: src\qualcoder\view_image.py:738
-#, fuzzy
 msgid "Sort by name ascending"
-msgstr "Trier par ordre croissant"
+msgstr "Trier par nom croissant"
 
 #: src\qualcoder\code_pdf.py:2447 src\qualcoder\code_text.py:3193
 #: src\qualcoder\report_codes.py:320 src\qualcoder\report_codes.py:367
@@ -2061,25 +2060,22 @@ msgstr "Trier par ordre croissant"
 #: src\qualcoder\report_compare_coder_file.py:153
 #: src\qualcoder\report_file_summary.py:118 src\qualcoder\view_av.py:761
 #: src\qualcoder\view_image.py:739
-#, fuzzy
 msgid "Sort by name descending"
-msgstr "Trier par ordre décroissant"
+msgstr "Trier par nom décroissant"
 
 #: src\qualcoder\code_pdf.py:2448 src\qualcoder\code_text.py:3194
 #: src\qualcoder\report_compare_coder_file.py:154
 #: src\qualcoder\report_file_summary.py:119 src\qualcoder\view_av.py:762
 #: src\qualcoder\view_image.py:740
-#, fuzzy
 msgid "Sort by case ascending"
-msgstr "Trier par ordre croissant"
+msgstr "Trier par cas croissant"
 
 #: src\qualcoder\code_pdf.py:2449 src\qualcoder\code_text.py:3195
 #: src\qualcoder\report_compare_coder_file.py:155
 #: src\qualcoder\report_file_summary.py:120 src\qualcoder\view_av.py:763
 #: src\qualcoder\view_image.py:741
-#, fuzzy
 msgid "Sort by case descending"
-msgstr "Trier par ordre décroissant"
+msgstr "Trier par cas décroissant"
 
 #: src\qualcoder\code_pdf.py:2450 src\qualcoder\code_text.py:3196
 #: src\qualcoder\report_codes.py:321
@@ -2087,9 +2083,8 @@ msgstr "Trier par ordre décroissant"
 #: src\qualcoder\report_compare_coder_file.py:156
 #: src\qualcoder\report_file_summary.py:121 src\qualcoder\view_av.py:764
 #: src\qualcoder\view_image.py:742
-#, fuzzy
 msgid "Sort by date ascending"
-msgstr "Trier par ordre décroissant"
+msgstr "Trier par date croissante"
 
 #: src\qualcoder\code_pdf.py:2451 src\qualcoder\code_text.py:3197
 #: src\qualcoder\report_codes.py:322
@@ -2097,9 +2092,8 @@ msgstr "Trier par ordre décroissant"
 #: src\qualcoder\report_compare_coder_file.py:157
 #: src\qualcoder\report_file_summary.py:122 src\qualcoder\view_av.py:765
 #: src\qualcoder\view_image.py:743
-#, fuzzy
 msgid "Sort by date descending"
-msgstr "Trier par ordre décroissant"
+msgstr "Trier par date décroissante"
 
 #: src\qualcoder\code_pdf.py:2505 src\qualcoder\code_text.py:3258
 #: src\qualcoder\report_compare_coder_file.py:185
@@ -2315,9 +2309,8 @@ msgid "last match in file"
 msgstr "dernière correspondance dans le fichier"
 
 #: src\qualcoder\code_text.py:1095 src\qualcoder\code_text.py:1144
-#, fuzzy
 msgid "code within code"
-msgstr "Fusionner le code dans le code"
+msgstr "code à l'intérieur d'un autre code"
 
 #: src\qualcoder\code_text.py:1219 src\qualcoder\view_av.py:2729
 msgid "Change start position (SHIFT LEFT/ALT RIGHT)"
@@ -2429,7 +2422,7 @@ msgstr "Aller au signet"
 #: src\qualcoder\code_text.py:3189 src\qualcoder\code_text.py:3462
 #: src\qualcoder\manage_files.py:519 src\qualcoder\manage_files.py:1000
 msgid "Mark speakers"
-msgstr ""
+msgstr "Marquer les interlocuteurs"
 
 #: src\qualcoder\code_text.py:3329 src\qualcoder\code_text.py:3385
 msgid "From: "
@@ -2440,9 +2433,8 @@ msgid "Entire text file will be loaded"
 msgstr "Le fichier texte entier sera chargé"
 
 #: src\qualcoder\code_text.py:3462 src\qualcoder\manage_files.py:1000
-#, fuzzy
 msgid "No text file selected."
-msgstr "Aucun fichier sélectionné"
+msgstr "Aucun fichier texte sélectionné."
 
 #: src\qualcoder\code_text.py:3733 src\qualcoder\code_text.py:5210
 msgid "AI interpretation: "
@@ -5228,40 +5220,36 @@ msgid "Categories selected"
 msgstr "Catégories sélectionnées"
 
 #: src\qualcoder\report_cooccurrence.py:509
-#, fuzzy
 msgid "Merge into new code"
-msgstr "Fusionner dans : Sélectionner le code"
+msgstr "Fusionner dans le nouveau code"
 
 #: src\qualcoder\report_cooccurrence.py:516
-#, fuzzy
 msgid "New code"
-msgstr "Nouveau code : "
+msgstr "Nouveau code"
 
 #: src\qualcoder\report_cooccurrence.py:516
-#, fuzzy
 msgid "Edit name:"
-msgstr "Mise à jour du nom"
+msgstr "Éditer le nom :"
 
 #: src\qualcoder\report_cooccurrence.py:518
-#, fuzzy
 msgid "Merged: "
-msgstr "Fusionner le code : "
+msgstr "Fusionné : "
 
 #: src\qualcoder\report_cooccurrence.py:524
-#, fuzzy
 msgid "Code name exists"
-msgstr "Le nom du filtre existe"
+msgstr "Nom de code existant"
 
 #: src\qualcoder\report_cooccurrence.py:524
-#, fuzzy
 msgid "Choose another code name"
-msgstr " Choisissez un autre nom"
+msgstr "Choisir un autre nom de code"
 
 #: src\qualcoder\report_cooccurrence.py:591
 msgid ""
 "Left click: Show coded text.\n"
 "Right click: Create new combined code from these codes."
 msgstr ""
+"Clic gauche : Afficher le texte codé.\n"
+"Clic droit : Créer un nouveau code combiné depuis ces codes."
 
 #: src\qualcoder\report_exact_matches.py:86
 msgid ""
@@ -5992,37 +5980,37 @@ msgid "Restart QualCoder to enact some changes"
 msgstr "Redémarrer QualCoder pour appliquer certains changements"
 
 #: src\qualcoder\speakers.py:61 src\qualcoder\speakers.py:255
-#, fuzzy
 msgid "Speakers"
-msgstr "Nom de l'intervenant"
+msgstr "Interlocuteurs"
 
 #: src\qualcoder\speakers.py:69
-#, fuzzy
 msgid "code as"
-msgstr "nom de code"
+msgstr "code comme"
 
 #: src\qualcoder\speakers.py:69
-#, fuzzy
 msgid "Example"
-msgstr "Exemples :"
+msgstr "Exemple"
 
 #: src\qualcoder\speakers.py:255
 msgid ""
 "The speaker name cannot be empty. If you want to exclude a speaker from "
 "being marked, deselect the check box on the left."
 msgstr ""
+"Le nom de l’interlocuteur ne peut pas être vide. Si vous cherchez à exclure "
+"un interlocuteur depuis du marquage, décochez la case à gauche."
 
 #: src\qualcoder\speakers.py:272
 msgid "This contains all the speakers that have been marked in documents."
 msgstr ""
+"Ceci contient tous les interlocuteurs qui ont été marqués dans les documents."
 
 #: src\qualcoder\speakers.py:283
 msgid "Speakers category could not be found found or created."
-msgstr ""
+msgstr "La catégorie « Interlocuteurs » n'a pas pu être trouvée ou créée."
 
 #: src\qualcoder\speakers.py:310
 msgid "Speaker code could not be found found or created."
-msgstr ""
+msgstr "Le code de l’interlocuteur n'a pas pu être trouvé ou créé."
 
 #: src\qualcoder\special_functions.py:103 src\qualcoder\__main__.py:2430
 msgid "Open project directory"
@@ -6572,22 +6560,18 @@ msgid "Code by A/V treemap"
 msgstr "Diagramme circulaire du code par  A/V"
 
 #: src\qualcoder\view_charts.py:143
-#, fuzzy
 msgid "Files by codes"
-msgstr "Ordre du type de fichier"
+msgstr "Fichiers par codes"
 
 #: src\qualcoder\view_charts.py:144
-#, fuzzy
 msgid "Codes by files"
 msgstr "Codes par fichier"
 
 #: src\qualcoder\view_charts.py:145
-#, fuzzy
 msgid "Cases by codes"
-msgstr "Fait par le codeur : "
+msgstr "Cas par codes"
 
 #: src\qualcoder\view_charts.py:146
-#, fuzzy
 msgid "Codes by cases"
 msgstr "Codes par cas"
 
@@ -6596,14 +6580,12 @@ msgid "Word cloud made from coded text segments"
 msgstr "Nuage de mots créé à partir de segments de texte codés"
 
 #: src\qualcoder\view_charts.py:267
-#, fuzzy
 msgid "Select stopwords file"
-msgstr "Sélectionnez quelques fichiers"
+msgstr "Sélectionner le fichier de mots vides"
 
 #: src\qualcoder\view_charts.py:380
-#, fuzzy
 msgid "Coders: all"
-msgstr "Codeur : "
+msgstr "Codeurs : tous"
 
 #: src\qualcoder\view_charts.py:405
 msgid "Word cloud"
@@ -6611,11 +6593,10 @@ msgstr "Nuage de mots"
 
 #: src\qualcoder\view_charts.py:527
 msgid "Cumulative code count in cases by case"
-msgstr ""
+msgstr "Nombre cumulé de codes par code"
 
 #: src\qualcoder\view_charts.py:582 src\qualcoder\view_charts.py:589
 #: src\qualcoder\view_charts.py:665 src\qualcoder\view_charts.py:672
-#, fuzzy
 msgid "Cases"
 msgstr "Cas"
 
@@ -6623,37 +6604,32 @@ msgstr "Cas"
 #: src\qualcoder\view_charts.py:664 src\qualcoder\view_charts.py:671
 #: src\qualcoder\view_charts.py:738 src\qualcoder\view_charts.py:745
 #: src\qualcoder\view_charts.py:813 src\qualcoder\view_charts.py:820
-#, fuzzy
 msgid "Codes"
-msgstr "Code"
+msgstr "Codes"
 
 #: src\qualcoder\view_charts.py:584 src\qualcoder\view_charts.py:588
 #: src\qualcoder\view_charts.py:666 src\qualcoder\view_charts.py:670
 #: src\qualcoder\view_charts.py:740 src\qualcoder\view_charts.py:744
 #: src\qualcoder\view_charts.py:814 src\qualcoder\view_charts.py:818
-#, fuzzy
 msgid "Counts"
-msgstr "Compter"
+msgstr "Compte"
 
 #: src\qualcoder\view_charts.py:609
 msgid "Cumulative code count in cases by code"
-msgstr ""
+msgstr "Nombre cumulé de codes dans les cas par code"
 
 #: src\qualcoder\view_charts.py:691
-#, fuzzy
 msgid "Cumulative code count in files by code"
-msgstr "Phrase de code automatique dans les fichiers :"
+msgstr "Nombre cumulé de codes dans les fichiers par code"
 
 #: src\qualcoder\view_charts.py:739 src\qualcoder\view_charts.py:746
 #: src\qualcoder\view_charts.py:812 src\qualcoder\view_charts.py:819
-#, fuzzy
 msgid "Files"
-msgstr "Fichiers :"
+msgstr "Fichiers"
 
 #: src\qualcoder\view_charts.py:765
-#, fuzzy
 msgid "Cumulative code count in codes by file"
-msgstr "Phrase de code automatique dans les fichiers :"
+msgstr "Nombre cumulé de codes dans les codes par fichier"
 
 #: src\qualcoder\view_charts.py:851 src\qualcoder\view_charts.py:998
 msgid "Code count - text, images and Audio/Video"
