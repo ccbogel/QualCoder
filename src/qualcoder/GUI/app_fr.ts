@@ -39,7 +39,7 @@
     <message>
         <location filename="ui_dialog_charts.py" line="292"/>
         <source>Pie charts</source>
-        <translation>Graphiques camembert</translation>
+        <translation>Diagrammes circulaires</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="293"/>
@@ -49,12 +49,12 @@
     <message>
         <location filename="ui_dialog_charts.py" line="294"/>
         <source>Sunburst and treemap charts</source>
-        <translation>Graphiques rayons de soleil et Treemap</translation>
+        <translation>Diagramme radial hiérarchique et Treemap</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="295"/>
         <source>Select coder</source>
-        <translation>Sélectionner un codeur</translation>
+        <translation>Sélectionner un codeur·euse</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="296"/>
@@ -211,7 +211,7 @@ Les codages de l&apos;ensemble du fichier texte sont utilisés pour les calculs.
     <message>
         <location filename="ui_dialog_charts.py" line="330"/>
         <source>&lt;b&gt;Cumulative barchart&lt;/b&gt;</source>
-        <translation>&lt;b&gt;Graphique à barres cumulées&lt;/b&gt;</translation>
+        <translation>&lt;b&gt; Graphique à barres cumulé&lt;/b&gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="331"/>
@@ -342,7 +342,7 @@ Clic droit pour les options</translation>
     <message>
         <location filename="ui_report_matching_segments.py" line="110"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select coder. Blank for all.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sélectionner le codeur. Vide pour tous.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sélectionner le codeur·euse. Vide pour tous.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="ui_report_matching_segments.py" line="111"/>
@@ -357,7 +357,7 @@ Clic droit pour les options</translation>
     <message>
         <location filename="ui_report_matching_segments.py" line="113"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select coder. Blank for all&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sélectionner le codeur. Vide pour tous&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Sélectionner le codeur·euse. Vide pour tous&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="ui_report_matching_segments.py" line="114"/>
@@ -367,7 +367,7 @@ Clic droit pour les options</translation>
     <message>
         <location filename="ui_report_matching_segments.py" line="117"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Coded text must include the text here.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Le texte codé doit inclure le texte ici.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Le texte codé doit contenir le texte saisi ci-dessus.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="ui_report_matching_segments.py" line="118"/>
@@ -377,7 +377,7 @@ Clic droit pour les options</translation>
     <message>
         <location filename="ui_report_matching_segments.py" line="119"/>
         <source>Select file(s), coder, 2 or more codes. Can exclude results by excluding a code (right click on code).</source>
-        <translation>Sélectionner le(s) fichier(s), le codeur, 2 codes ou plus. Possibilité d&apos;exclure des résultats en excluant un code (clic droit sur le code).</translation>
+        <translation>Sélectionner le(s) fichier(s), le codeur·euse, 2 codes ou plus. Possibilité d&apos;exclure des résultats en excluant un code (clic droit sur le code).</translation>
     </message>
     <message>
         <location filename="ui_report_matching_segments.py" line="120"/>
@@ -447,7 +447,7 @@ Coché - tous les codes sélectionnés doivent correspondre exactement.</transla
     <message>
         <location filename="ui_dialog_organiser.py" line="68"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Apply changed structure.&lt;/p&gt;&lt;p&gt;Warning. No Undo option.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Appliquer la structure modifiée.&lt;/p&gt;&lt;p&gt;Avertissement. Pas d&apos;option d&apos;annulation.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Appliquer la structure modifiée.&lt;/p&gt;&lt;p&gt;Attention : cette action est irréversible.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_organiser.py" line="69"/>
@@ -755,12 +755,12 @@ Coché - tous les codes sélectionnés doivent correspondre exactement.</transla
     <message>
         <location filename="ui_dialog_code_relations.py" line="152"/>
         <source>This coder</source>
-        <translation>Ce codeur</translation>
+        <translation>Ce codeur·euse</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="153"/>
         <source>All coders</source>
-        <translation>Tous les codeurs</translation>
+        <translation>Tous les codeur·euses</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="172"/>
@@ -875,7 +875,7 @@ Classement par nom de fichier et nom de code.</translation>
     <message>
         <location filename="ui_comparison_table.py" line="100"/>
         <source>Code counts table</source>
-        <translation>Tableau des codes</translation>
+        <translation>Tableau des occurrences des codes</translation>
     </message>
     <message>
         <location filename="ui_comparison_table.py" line="101"/>
@@ -1090,12 +1090,12 @@ Classement par nom de fichier et nom de code.</translation>
     <message>
         <location filename="ui_dialog_start_and_end_marks.py" line="64"/>
         <source>Start mark</source>
-        <translation>Marquage de début</translation>
+        <translation type="unfinished">Marque de départ</translation>
     </message>
     <message>
         <location filename="ui_dialog_start_and_end_marks.py" line="65"/>
         <source>End mark</source>
-        <translation>Marquage de fin</translation>
+        <translation type="unfinished">Marque de fin</translation>
     </message>
     <message>
         <location filename="ui_dialog_start_and_end_marks.py" line="66"/>
@@ -1222,7 +1222,7 @@ Classement par nom de fichier et nom de code.</translation>
     <message>
         <location filename="ui_case_file_manager.py" line="88"/>
         <source>Can assign text in a file to this case. Right click to mark selected text in a file to assign to this case.</source>
-        <translation>Attribuer du texte dans un fichier vers ce cas. Clic-droit pour marquer le texte sélectionné dans un fichier à affecter à ce cas.</translation>
+        <translation type="unfinished">Attribuer du texte dans un fichier vers ce cas. Clic-droit pour surligner le texte sélectionné dans un fichier à affecter à ce cas.</translation>
     </message>
     <message>
         <location filename="ui_case_file_manager.py" line="89"/>
@@ -1305,7 +1305,7 @@ Classement par nom de fichier et nom de code.</translation>
     <message>
         <location filename="ui_dialog_cases.py" line="105"/>
         <source>Double click case name to change the name. Click on Memo to edit a memo for the case. Click on Files to link files and file text to the case.</source>
-        <translation>Double-cliquez sur le nom du dossier pour le modifier. Cliquez sur Mémo pour éditer un mémo pour le cas. Cliquez sur Fichiers pour lier des fichiers et des textes de fichiers au cas.</translation>
+        <translation>Double-cliquez sur le nom du cas pour le modifier. Cliquez sur Mémo pour éditer un mémo pour le cas. Cliquez sur Fichiers pour lier des fichiers et des textes de fichiers au cas.</translation>
     </message>
 </context>
 <context>
@@ -1658,7 +1658,7 @@ Appui sur la touche 5 - Avance de 5 secondes</translation>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search for text.&lt;/p&gt;&lt;p&gt;check &lt;span style=&quot; font-weight:600;&quot;&gt;Case sensitive&lt;/span&gt; for case sensitive search&lt;/p&gt;&lt;p&gt;check &lt;span style=&quot; font-weight:600;&quot;&gt;All files&lt;/span&gt; for searching all files search&lt;/p&gt;
 &lt;p&gt;Right-click to change automatic searching options&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Recherche de texte.&lt;/p&gt;&lt;p&gt;cocher &lt;span style=&quot;font-weight:600;&quot;&gt;Sensible à la casse&lt;/span&gt; pour une recherche sensible à la casse&lt;/p&gt;&lt;p&gt;cocher &lt;span style=&quot;font-weight:600;&quot;&gt;Tous les fichiers&lt;/span&gt; pour une recherche sur tous les fichiers&lt;/p&gt;
-&lt;p&gt;Cliquez avec le bouton droit de la souris pour modifier les options de recherche automatique&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+&lt;p&gt;Clic droit pour modifier les options de recherche&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="248"/>
@@ -1688,7 +1688,7 @@ Appui sur la touche 5 - Avance de 5 secondes</translation>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="253"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. &lt;/p&gt;&lt;p&gt;A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A ‘*’ after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;‘&lt;/span&gt;\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: www.rexegg.com/regex-quickstart.html&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;La recherche utilise les fonctions Regex. &lt;/p&gt;&lt;p&gt;Le point « . » est utilisé comme caractère générique. Par exemple, « .ears » correspondra à « bears » et « years ». &lt;/p&gt;&lt;p&gt;Un « ? » après un caractère correspondra à une ou aucune occurrence de ce caractère, par exemple « bears? » correspondra à « bear » et « bears ». &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;Un « * » après un caractère correspondra à zéro ou plusieurs occurrences. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot;background-color:transparent;&quot;&gt;« &lt;/span&gt;\. correspondra au symbole point, « \? » correspondra au point d&apos;interrogation. « \n » correspondra au symbole de fin de ligne. &lt;/p&gt;&lt;p&gt;Aide-mémoire Regex : www.rexegg.com/regex-quickstart.html&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;La recherche utilise des expressions régulières (Regex). &lt;/p&gt;&lt;p&gt;Le point « . » est utilisé comme caractère générique. Par exemple, « .ears » correspondra à « bears » et « years ». &lt;/p&gt;&lt;p&gt;Un « ? » après un caractère correspondra à une ou aucune occurrence de ce caractère, par exemple « bears? » correspondra à « bear » et « bears ». &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;Un « * » après un caractère correspondra à zéro ou plusieurs occurrences. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot;background-color:transparent;&quot;&gt;« &lt;/span&gt;\. correspondra au symbole point, « \? » correspondra au point d&apos;interrogation. « \n » correspondra au symbole de fin de ligne. &lt;/p&gt;&lt;p&gt;Aide-mémoire Regex : www.rexegg.com/regex-quickstart.html&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="254"/>
@@ -1831,12 +1831,12 @@ Appui sur la touche 5 - Avance de 5 secondes</translation>
     <message>
         <location filename="ui_dialog_report_code_summary.py" line="64"/>
         <source>Code summary</source>
-        <translation>Rapport de sommaire des codes</translation>
+        <translation>Résumé des codes</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_code_summary.py" line="68"/>
         <source>Code summary report</source>
-        <translation>Rapport de sommaire des codes</translation>
+        <translation>Rapport des résumés des codes</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_code_summary.py" line="65"/>
@@ -1904,7 +1904,7 @@ Appui sur la touche 5 - Avance de 5 secondes</translation>
     <message>
         <location filename="ui_dialog_code_text.py" line="424"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete all codes by this coder from this file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Effacer tous les codes de ce codeur de ce fichier</translation>
+        <translation>Effacer tous les codes de ce codeur·euse de ce fichier</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="425"/>
@@ -1914,7 +1914,7 @@ Appui sur la touche 5 - Avance de 5 secondes</translation>
     <message>
         <location filename="ui_dialog_code_text.py" line="423"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Undo auto coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Annuler le codage automatique</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Annuler l’auto-codage&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="466"/>
@@ -1959,7 +1959,7 @@ Appui sur la touche 5 - Avance de 5 secondes</translation>
     <message>
         <location filename="ui_dialog_code_text.py" line="429"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Auto code using start and end marks.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Codage automatique à l&apos;aide de marques de début et de fin.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Autocodage à l&apos;aide de marques de début et de fin.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="430"/>
@@ -2050,7 +2050,7 @@ car toutes les positions assignées peuvent être incorrectes. </translation>
     <message>
         <location filename="ui_dialog_code_text.py" line="428"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. &lt;/p&gt;&lt;p&gt;A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A ‘*’ after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;‘&lt;/span&gt;\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: www.rexegg.com/regex-quickstart.html&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;La recherche utilise les fonctions Regex. &lt;/p&gt;&lt;p&gt;Le point « . » est utilisé comme caractère générique. Par exemple, « .ears » correspondra à « bears » et « years ». &lt;/p&gt;&lt;p&gt;Un « ? » après un caractère correspondra à une ou aucune occurrence de ce caractère, par exemple « bears? » correspondra à « bear » et « bears ». &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;Un « * » après un caractère correspondra à zéro ou plusieurs occurrences. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;« &lt;/span&gt;\. correspondra au symbole point, « \? » correspondra au point d&apos;interrogation. « \n » correspondra au symbole de fin de ligne. &lt;/p&gt;&lt;p&gt;Aide-mémoire Regex : www.rexegg.com/regex-quickstart.html&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;La recherche utilise des expressions régulières (Regex). &lt;/p&gt;&lt;p&gt;Le point « . » est utilisé comme caractère générique. Par exemple, « .ears » correspondra à « bears » et « years ». &lt;/p&gt;&lt;p&gt;Un « ? » après un caractère correspondra à une ou aucune occurrence de ce caractère, par exemple « bears? » correspondra à « bear » et « bears ». &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;Un « * » après un caractère correspondra à zéro ou plusieurs occurrences. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;« &lt;/span&gt;\. correspondra au symbole point, « \? » correspondra au point d&apos;interrogation. « \n » correspondra au symbole de fin de ligne. &lt;/p&gt;&lt;p&gt;Aide-mémoire Regex : www.rexegg.com/regex-quickstart.html&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="443"/>
@@ -2176,7 +2176,7 @@ Limited to names up to 63 characters long.
 The name must be at the start of a new line.
 Formatted like below for name detection.
 &quot;Name:&quot;, &quot;{Name}, or &quot;[Name]&quot;</source>
-        <translation>Marquer les interlocuteurs.
+        <translation type="unfinished">Surligner les intervenant⋅es.
 Limité à des noms de 63 caractères maximum. 
 Le nom doit être au début d&apos;une nouvelle ligne.
 Formaté comme ci-dessous pour la détection du nom.
@@ -2244,12 +2244,12 @@ Formaté comme ci-dessous pour la détection du nom.
     <message>
         <location filename="ui_dialog_report_file_summary.py" line="64"/>
         <source>File summary</source>
-        <translation>Sommaire des fichiers</translation>
+        <translation>Résumé des fichiers</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_file_summary.py" line="68"/>
         <source>File summary report</source>
-        <translation>Rapport de sommaire de fichier</translation>
+        <translation>Rapport du résumé du fichier</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_file_summary.py" line="66"/>
@@ -2365,7 +2365,7 @@ Formaté comme ci-dessous pour la détection du nom.
     <message>
         <location filename="ui_dialog_journals.py" line="132"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. &lt;/p&gt;&lt;p&gt;A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A ‘*’ after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;‘&lt;/span&gt;\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;La recherche utilise les fonctions Regex. &lt;/p&gt;&lt;p&gt;Le point « . » est utilisé comme caractère générique. Par exemple, « .ears » correspondra à « bears » et « years ». &lt;/p&gt;&lt;p&gt;Un « ? » après un caractère correspondra à une ou aucune occurrence de ce caractère, par exemple « bears? » correspondra à « bear » et « bears ». &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;Un « * » après un caractère correspondra à zéro ou plusieurs occurrences. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;« &lt;/span&gt;\. correspondra au symbole point, « \? » correspondra au point d&apos;interrogation. « \n » correspondra au symbole de fin de ligne. &lt;/p&gt;&lt;p&gt;Aide-mémoire Regex : &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;La recherche utilise des expressions régulières (Regex).&lt;/p&gt;&lt;p&gt;Le point « . » est utilisé comme caractère générique. Par exemple, « .ears » correspondra à « bears » et « years ». &lt;/p&gt;&lt;p&gt;Un « ? » après un caractère correspondra à une ou aucune occurrence de ce caractère, par exemple « bears? » correspondra à « bear » et « bears ». &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;Un « * » après un caractère correspondra à zéro ou plusieurs occurrences. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;« &lt;/span&gt;\. correspondra au symbole point, « \? » correspondra au point d&apos;interrogation. « \n » correspondra au symbole de fin de ligne. &lt;/p&gt;&lt;p&gt;Aide-mémoire Regex : &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="140"/>
@@ -2467,7 +2467,7 @@ Les fichiers texte (de n&apos;importe quelle source) sont exportés à partir du
         <source>Export file from project folder as a linked file.
 Cannot export text transcription file associated with an audio or video as a linked file.</source>
         <translation>Exportation d&apos;un fichier du dossier de projet en tant que fichier lié.
-Impossible d&apos;exporter le fichier de transcription de texte associé à un fichier audio ou vidéo en tant que fichier lié.</translation>
+Impossible d&apos;exporter le fichier de retranscription de texte associé à un fichier audio ou vidéo en tant que fichier lié.</translation>
     </message>
     <message>
         <location filename="ui_dialog_manage_files.py" line="167"/>
@@ -2532,7 +2532,7 @@ Une fois tous les fichiers texte importés, supprimez ce fichier du dossier du p
 The speaker name must be at the start of a new line and less than 64 characters long.
 Formatted like below for name detection.
 &quot;Name:&quot;, &quot;{Name} or &quot;[Name]&quot;</source>
-        <translation>Sélectionnez une transcription de texte pour identifier les interlocuteurs.
+        <translation type="unfinished">Sélectionnez une retranscription de texte pour surligner les intervenant⋅es.
 Le nom de l’interlocuteur doit figurer au début d&apos;une nouvelle ligne et comporter moins de 64 caractères.
 Formaté comme ci-dessous pour la détection du nom.
 « Nom : », « {Nom} » ou « [Nom] »</translation>
@@ -2748,7 +2748,7 @@ Sensible à la casse, ajoutez plusieurs entrées pour chaque nom : par exemple, 
     <message>
         <location filename="ui_dialog_report_code_frequencies.py" line="83"/>
         <source>Code and category frequencies: overall and by coder</source>
-        <translation>Effectifs des codes et des catégories: globale et par codeur</translation>
+        <translation>Effectifs des codes et des catégories: globale et par codeur·euse</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_code_frequencies.py" line="87"/>
@@ -2836,7 +2836,7 @@ Sensible à la casse, ajoutez plusieurs entrées pour chaque nom : par exemple, 
     <message>
         <location filename="ui_dialog_report_codings.py" line="190"/>
         <source>Filter results for those marked Important</source>
-        <translation>Filtrer les résultats pour ceux qui sont marqués Important</translation>
+        <translation type="unfinished">Filtrer les résultats pour ceux marqués comme importants</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_codings.py" line="191"/>
@@ -2856,7 +2856,7 @@ Sensible à la casse, ajoutez plusieurs entrées pour chaque nom : par exemple, 
     <message>
         <location filename="ui_dialog_report_codings.py" line="194"/>
         <source>Display summary statistics</source>
-        <translation>Afficher les statistiques récapitulatives</translation>
+        <translation>Afficher le résumé des statistiques</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_codings.py" line="195"/>
@@ -2974,19 +2974,19 @@ Sensible à la casse, ajoutez plusieurs entrées pour chaque nom : par exemple, 
     <message>
         <location filename="ui_dialog_report_compare_coder_file.py" line="97"/>
         <source>Coders:</source>
-        <translation>Codeurs:</translation>
+        <translation>codeur·euses:</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_compare_coder_file.py" line="99"/>
         <source>To compare coding.
 Select two coders, one file, one code.</source>
         <translation>Pour comparer les codages.
-Sélectionnez deux codeurs, un fichier, un code.</translation>
+Sélectionnez deux codeur·euses, un fichier, un code.</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_compare_coder_file.py" line="101"/>
         <source>Coder comparisons by file</source>
-        <translation>Comparaisons de codeurs par dossier</translation>
+        <translation>Comparaisons de codeur·euses par dossier</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_compare_coder_file.py" line="103"/>
@@ -3016,7 +3016,7 @@ Sélectionnez deux codeurs, un fichier, un code.</translation>
     <message>
         <location filename="ui_dialog_report_compare_coder_file.py" line="105"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Run comparison.&lt;/p&gt;&lt;p&gt;Select 2 coders, 1 file, 1 code.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Exécuter la comparaison.&lt;/p&gt;&lt;p&gt;Sélectionnez 2 codeurs, 1 fichier, 1 code.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Exécuter la comparaison.&lt;/p&gt;&lt;p&gt;Sélectionnez 2 codeur·euses, 1 fichier, 1 code.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -3024,7 +3024,7 @@ Sélectionnez deux codeurs, un fichier, un code.</translation>
     <message>
         <location filename="ui_dialog_report_comparisons.py" line="79"/>
         <source>Coder Comparisons</source>
-        <translation>Comparaison des codeurs</translation>
+        <translation>Comparaison des codeur·euses</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_comparisons.py" line="82"/>
@@ -3054,7 +3054,7 @@ Sélectionnez deux codeurs, un fichier, un code.</translation>
     <message>
         <location filename="ui_dialog_report_comparisons.py" line="85"/>
         <source>Coder comparisons - text files</source>
-        <translation>Comparaisons de codeurs - fichiers texte</translation>
+        <translation>Comparaisons de codeur·euses - fichiers texte</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_comparisons.py" line="87"/>
@@ -3064,7 +3064,7 @@ Sélectionnez deux codeurs, un fichier, un code.</translation>
     <message>
         <location filename="ui_dialog_report_comparisons.py" line="83"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select two coders&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Sélectionner deux codeurs</translation>
+        <translation>Sélectionner deux codeur·euses</translation>
     </message>
 </context>
 <context>
@@ -3224,7 +3224,7 @@ Les caractères génériques pour&apos;like&apos; are % and _</translation>
     <message>
         <location filename="ui_dialog_settings.py" line="607"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Used when entering speaker name in transcription&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Utilisé lors de la saisie du nom de l&apos;orateur dans la retranscription</translation>
+        <translation>Utilisé lors de la saisie du nom de l&apos;intervenant⋅e dans la retranscription</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="563"/>
@@ -3239,17 +3239,17 @@ Les caractères génériques pour&apos;like&apos; are % and _</translation>
     <message>
         <location filename="ui_dialog_settings.py" line="558"/>
         <source>New coder</source>
-        <translation>Nouveau codeur</translation>
+        <translation>Nouveau codeur·euse</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="556"/>
         <source>Select another coder in this project</source>
-        <translation>Sélectionner un autre codeur dans ce projet</translation>
+        <translation>Sélectionner un autre codeur·euse dans ce projet</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="557"/>
         <source>Other coders</source>
-        <translation>Autres codeurs</translation>
+        <translation>Autres codeur·euses</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="562"/>
@@ -3260,7 +3260,7 @@ Les caractères génériques pour&apos;like&apos; are % and _</translation>
         <location filename="ui_dialog_settings.py" line="559"/>
         <source>Set this name as the current coder.
 </source>
-        <translation>Définir ce nom comme le codeur actuel.
+        <translation>Définir ce nom comme le codeur·euse actuel.
 </translation>
     </message>
     <message>
@@ -3576,14 +3576,14 @@ Non recommandé, sauf si vous avez beaucoup de gros fichiers qui ralentissent la
     <message>
         <location filename="ui_dialog_speakers.py" line="53"/>
         <source>Mark Speakers</source>
-        <translation>Marquer l’interlocuteur</translation>
+        <translation type="unfinished">Surligner l’interlocuteur</translation>
     </message>
     <message>
         <location filename="ui_dialog_speakers.py" line="54"/>
         <source>The following speaker names were detected in the document. 
 Select (✓) the ones you want to mark. Clicking OK creates a code for each selected speaker in the “📌 Speakers” category and assigns all corresponding text segments. Doubleclick to edit the &quot;code as&quot; name in the table. To merge two speakers (e.g. to correct a typo), rename the &quot;code as&quot; in one entry so that it exactly matches the other.</source>
-        <translation>Les noms des interlocuteurs suivants ont été détectés dans le document. 
-Sélectionnez (✓) ceux que vous souhaitez marquer. En cliquant sur OK, vous créez un code pour chaque interlocuteur sélectionné dans la catégorie « 📌 Interlocuteur » et attribuez tous les segments de texte correspondants. Double-cliquez pour modifier le nom « coder comme » dans le tableau. Pour fusionner deux interlocuteurs (par exemple pour corriger une faute de frappe), renommez le « code comme » dans une entrée afin qu&apos;il corresponde exactement à l&apos;autre.</translation>
+        <translation type="unfinished">Les noms des intervenant⋅es suivants ont été détectés dans le document. 
+Sélectionnez (✓) ceux que vous souhaitez surligner. En cliquant sur OK, vous créez un code pour chaque intervenant⋅es sélectionné⋅e dans la catégorie « 📌 intervenant⋅e » et attribuez tous les segments de texte correspondants. Double-cliquez pour modifier le nom « coder comme » dans le tableau. Pour fusionner deux intervenant⋅es (par exemple pour corriger une faute de frappe), renommez le « code comme » dans une entrée afin qu&apos;il corresponde exactement à l&apos;autre.</translation>
     </message>
     <message>
         <location filename="ui_dialog_speakers.py" line="56"/>
@@ -3672,12 +3672,12 @@ ou à réduire (nombres négatifs)</translation>
     <message>
         <location filename="ui_special_functions.py" line="139"/>
         <source>Edit coder names</source>
-        <translation>Modifier les noms des codeurs</translation>
+        <translation>Modifier les noms des codeur·euses</translation>
     </message>
     <message>
         <location filename="ui_special_functions.py" line="140"/>
         <source>Select coder name</source>
-        <translation>Sélectionnez le nom du codeur</translation>
+        <translation>Sélectionnez le nom du codeur·euses</translation>
     </message>
     <message>
         <location filename="ui_special_functions.py" line="141"/>
@@ -3831,7 +3831,7 @@ ou à réduire (nombres négatifs)</translation>
     <message>
         <location filename="ui_dialog_view_av.py" line="197"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add a speaker name to shortcuts. In the text entry box press ctrl + n&lt;/p&gt;&lt;p&gt;Insert a speaker into transcription. In the text entry box press ctrl + 1 up to ctrl + 8 for the speakers name.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ajouter un raccourci clavier intervenant. Dans le champ texte appuyer sur CTRL + N&lt;/p&gt;&lt;p&gt;Insérer un intervenant à la retranscription. Dans le champ texte, appuyer sur CTRL + 1 à CTRL + 8 pour les noms des intervenants.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ajouter un nom d&apos;intervenant·e aux raccourcis. Dans la zone de saisie, appuyez sur Ctrl + N&lt;/p&gt;&lt;p&gt;Insérer un·e intervenant·e dans la transcription. Dans la zone de saisie, appuyez sur Ctrl + 1 à Ctrl + 8 pour insérer le nom de l&apos;intervenant·e correspondant·e.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="198"/>
@@ -3924,7 +3924,7 @@ souligné en rouge = Affecté au code ou à l&apos;annotation</translation>
     <message>
         <location filename="ui_dialog_view_av.py" line="201"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. &lt;/p&gt;&lt;p&gt;A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A ‘*’ after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;‘&lt;/span&gt;\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;La recherche utilise les fonctions Regex. &lt;/p&gt;&lt;p&gt;Le point « . » est utilisé comme caractère générique. Par exemple, « .ears » correspondra à « bears » et « years ». &lt;/p&gt;&lt;p&gt;Un « ? » après un caractère correspondra à une ou aucune occurrence de ce caractère, par exemple « bears? » correspondra à « bear » et « bears ». &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;Un « * » après un caractère correspondra à zéro ou plusieurs occurrences. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;« &lt;/span&gt;\. correspondra au point, « \? » correspondra au point d&apos;interrogation. « \n » correspondra au symbole de fin de ligne. &lt;/p&gt;&lt;p&gt;Aide-mémoire sur les expressions régulières : &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;La recherche utilise des expressions régulières (Regex). &lt;/p&gt;&lt;p&gt;Le point « . » est utilisé comme caractère générique. Par exemple, « .ears » correspondra à « bears » et « years ». &lt;/p&gt;&lt;p&gt;Un « ? » après un caractère correspondra à une ou aucune occurrence de ce caractère, par exemple « bears? » correspondra à « bear » et « bears ». &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;Un « * » après un caractère correspondra à zéro ou plusieurs occurrences. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;« &lt;/span&gt;\. correspondra au point, « \? » correspondra au point d&apos;interrogation. « \n » correspondra au symbole de fin de ligne. &lt;/p&gt;&lt;p&gt;Aide-mémoire sur les expressions régulières : &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="204"/>
@@ -4016,7 +4016,7 @@ Ne codez pas ce texte avant d&apos;avoir rechargé Codage - Coder le texte dans 
     <message>
         <location filename="ui_dialog_view_text.py" line="79"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot â.â is used as a wild card, e.g. â.earsâ will match âbearsâ and âyearsâ. &lt;/p&gt;&lt;p&gt;A â?â after a character will match one or none times that character, e.g. âbears?â will match âbearâ and âbearsâ &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A â*â after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;â&lt;/span&gt;\. will match the dot symbol, â\?â will match the question mark. â\nâ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;La recherche utilise les fonctions Regex. &lt;/p&gt;&lt;p&gt;Le point « . » est utilisé comme caractère générique. Par exemple, « .ears » correspondra à « bears » et « years ». &lt;/p&gt;&lt;p&gt;Un « ? » après un caractère correspondra à ce caractère une ou aucune fois, par exemple « bears? » correspondra à « bear » et « bears ». &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;Un « *â après un caractère correspondra à zéro ou plusieurs occurrences de ce caractère. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;â&lt;/span&gt;\. correspondra au symbole point, â\?â correspondra au point d&apos;interrogation. â\nâ correspondra au symbole de fin de ligne. &lt;/p&gt;&lt;p&gt;Aide-mémoire sur les expressions régulières : &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;La recherche utilise des expressions régulières (Regex). &lt;/p&gt;&lt;p&gt;Le point « . » est utilisé comme caractère générique. Par exemple, « .ears » correspondra à « bears » et « years ». &lt;/p&gt;&lt;p&gt;Un « ? » après un caractère correspondra à ce caractère une ou aucune fois, par exemple « bears? » correspondra à « bear » et « bears ». &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;Un « *â après un caractère correspondra à zéro ou plusieurs occurrences de ce caractère. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;â&lt;/span&gt;\. correspondra au symbole point, â\?â correspondra au point d&apos;interrogation. â\nâ correspondra au symbole de fin de ligne. &lt;/p&gt;&lt;p&gt;Aide-mémoire sur les expressions régulières : &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -4122,7 +4122,7 @@ Ne codez pas ce texte avant d&apos;avoir rechargé Codage - Coder le texte dans 
     <message>
         <location filename="ui_main.py" line="332"/>
         <source>Codebook</source>
-        <translation>Livre de code</translation>
+        <translation>Grille de codage</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="333"/>
@@ -4187,7 +4187,7 @@ Ne codez pas ce texte avant d&apos;avoir rechargé Codage - Coder le texte dans 
     <message>
         <location filename="ui_main.py" line="346"/>
         <source>Graph</source>
-        <translation>Graphique</translation>
+        <translation>Graphe</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="348"/>
@@ -4222,12 +4222,12 @@ Ne codez pas ce texte avant d&apos;avoir rechargé Codage - Coder le texte dans 
     <message>
         <location filename="ui_main.py" line="354"/>
         <source>REFI-QDA Codebook export</source>
-        <translation>Export de livre de codes REFI-QDA</translation>
+        <translation>Export de la grille de codage REFI-QDA</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="355"/>
         <source>REFI-QDA Codebook import</source>
-        <translation>Importation du livre de code REFI QDA</translation>
+        <translation>Importation une gille de codage REFI QDA</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="356"/>
@@ -4307,7 +4307,7 @@ Ne codez pas ce texte avant d&apos;avoir rechargé Codage - Coder le texte dans 
     <message>
         <location filename="ui_main.py" line="365"/>
         <source>Code summary</source>
-        <translation>Rapport de sommaire des codes</translation>
+        <translation>Résumé des codes</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="366"/>
@@ -4342,12 +4342,12 @@ Ne codez pas ce texte avant d&apos;avoir rechargé Codage - Coder le texte dans 
     <message>
         <location filename="ui_main.py" line="347"/>
         <source>Export codebook as ODT file</source>
-        <translation>Exporter le livre de codes comme fichier ODT</translation>
+        <translation>Exporter la grille de codage comme fichier ODT</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="369"/>
         <source>Export codebook with memos as ODT file</source>
-        <translation>Exporter le livre de codes avec les mémos comme fichier ODT</translation>
+        <translation>Exporter la grille de codage avec les mémos comme fichier ODT</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="370"/>
@@ -4407,7 +4407,7 @@ Ne codez pas ce texte avant d&apos;avoir rechargé Codage - Coder le texte dans 
     <message>
         <location filename="ui_main.py" line="379"/>
         <source>Setup Wizard</source>
-        <translation>Assistant d&apos;installation</translation>
+        <translation type="unfinished">Configuration</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="380"/>
@@ -4452,7 +4452,7 @@ Ne codez pas ce texte avant d&apos;avoir rechargé Codage - Coder le texte dans 
     <message>
         <location filename="ui_main.py" line="391"/>
         <source>Code counts by file/case</source>
-        <translation>Nombre de codes par fichier/cas</translation>
+        <translation>Occurrences des codes par fichier/cas</translation>
     </message>
 </context>
 </TS>
