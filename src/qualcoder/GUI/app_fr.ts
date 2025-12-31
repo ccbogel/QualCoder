@@ -544,12 +544,12 @@ Coché - tous les codes sélectionnés doivent correspondre exactement.</transla
     <message>
         <location filename="ui_ai_edit_prompts.py" line="195"/>
         <source>AI Prompts Library</source>
-        <translation>Bibliothèque d&apos;invites IA</translation>
+        <translation type="unfinished">Bibliothèque des instructions IA</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="196"/>
         <source>Analytic Prompts:</source>
-        <translation>Invitations à l&apos;analyse de l&apos;IA :</translation>
+        <translation type="unfinished">Instructions à l&apos;analyse de l&apos;IA :</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="197"/>
@@ -564,7 +564,7 @@ Coché - tous les codes sélectionnés doivent correspondre exactement.</transla
     <message>
         <location filename="ui_ai_edit_prompts.py" line="199"/>
         <source>Copy prompt to clipboard</source>
-        <translation>Copier l&apos;invite dans le presse-papiers</translation>
+        <translation type="unfinished">Copier l’instruction dans le presse-papiers</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="204"/>
@@ -574,22 +574,22 @@ Coché - tous les codes sélectionnés doivent correspondre exactement.</transla
     <message>
         <location filename="ui_ai_edit_prompts.py" line="201"/>
         <source>Paste prompt from clipboard</source>
-        <translation>Coller l&apos;invite à partir du presse-papiers</translation>
+        <translation type="unfinished">Coller l&apos;instruction à partir du presse-papiers</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="203"/>
         <source>Delete prompt</source>
-        <translation>Supprimer l&apos;invite</translation>
+        <translation type="unfinished">Supprimer l&apos;instruction</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="205"/>
         <source>Prompt Name:</source>
-        <translation>Nom de l&apos;invite :</translation>
+        <translation type="unfinished">Nom de l&apos;instruction :</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="206"/>
         <source>(Uneditable system prompt)</source>
-        <translation>(Invite non éditable)</translation>
+        <translation type="unfinished">(Instruction non éditable)</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="207"/>
@@ -619,12 +619,12 @@ Coché - tous les codes sélectionnés doivent correspondre exactement.</transla
     <message>
         <location filename="ui_ai_edit_prompts.py" line="212"/>
         <source>Prompt description:</source>
-        <translation>Description de commande IA :</translation>
+        <translation type="unfinished">Description de l’instruction IA :</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="213"/>
         <source>Prompt text (this will be send to the AI):</source>
-        <translation>Texte de commande (il sera envoyé à l&apos;IA) :</translation>
+        <translation type="unfinished">Texte de l’instruction (il sera envoyé à l&apos;IA) :</translation>
     </message>
 </context>
 <context>
@@ -702,12 +702,12 @@ Coché - tous les codes sélectionnés doivent correspondre exactement.</transla
     <message>
         <location filename="ui_ai_search.py" line="208"/>
         <source>Analytic Prompt:</source>
-        <translation>Message analytique :</translation>
+        <translation type="unfinished">Instruction analytique :</translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="209"/>
         <source>Edit prompt or create your own (advanced option)</source>
-        <translation>Modifier la commande ou créer la vôtre (option avancée)</translation>
+        <translation type="unfinished">Modifier l’instruction ou créer la vôtre (option avancée)</translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="210"/>
@@ -4427,7 +4427,7 @@ Ne codez pas ce texte avant d&apos;avoir rechargé Codage - Coder le texte dans 
     <message>
         <location filename="ui_main.py" line="386"/>
         <source>Prompt library</source>
-        <translation>Bibliothèque de commandes</translation>
+        <translation type="unfinished">Bibliothèque des instructions</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="387"/>

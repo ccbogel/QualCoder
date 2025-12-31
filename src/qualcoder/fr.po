@@ -2,21 +2,22 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Justin <>, 2025.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: \n"
+"Project-Id-Version: unnamed project\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-12-26 15:02+1100\n"
-"PO-Revision-Date: 2025-12-28 10:45+0100\n"
-"Last-Translator: \n"
-"Language-Team: \n"
+"PO-Revision-Date: 2025-12-31 18:41+0100\n"
+"Last-Translator: Justin <>\n"
+"Language-Team: French\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.4.2\n"
+"X-Generator: Gtranslator 49.0\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #: src\qualcoder\add_attribute.py:74
 msgid "This attribute name already exists in cases, files or journals."
@@ -124,8 +125,8 @@ msgstr ""
 "Mémo de projet ») pour inclure une brève description des sujets de "
 "recherche, des questions, des objectifs et des données empiriques collectées "
 "dans le cadre de votre projet. Ces informations accompagneront chaque "
-"demande envoyée à l'IA, ce qui permettra d'obtenir des résultats beaucoup "
-"plus ciblés."
+"instruction envoyée à l'IA, ce qui permettra d'obtenir des résultats "
+"beaucoup plus ciblés."
 
 #: src\qualcoder\ai_chat.py:455
 msgid "Analyzing the free topic \"{}\" in the data."
@@ -235,7 +236,7 @@ msgstr "Date :"
 
 #: src\qualcoder\ai_chat.py:828
 msgid "Prompt:"
-msgstr "Commande :"
+msgstr "Instruction :"
 
 #: src\qualcoder\ai_chat.py:838
 msgid "User"
@@ -495,7 +496,7 @@ msgstr "AI generate_code_descriptions\n"
 
 #: src\qualcoder\ai_llm.py:847
 msgid "Prompt:\n"
-msgstr "Commande :\n"
+msgstr "Instruction :\n"
 
 #: src\qualcoder\ai_llm.py:884
 msgid ""
@@ -515,13 +516,13 @@ msgstr ""
 
 #: src\qualcoder\ai_prompts.py:851
 msgid "Delete Prompt"
-msgstr "Supprimer la commande"
+msgstr "Supprimer l’instruction"
 
 #: src\qualcoder\ai_prompts.py:888 src\qualcoder\ai_prompts.py:893
 #: src\qualcoder\ai_prompts.py:899 src\qualcoder\ai_prompts.py:928
 #: src\qualcoder\ai_prompts.py:936
 msgid "Edit prompts"
-msgstr "Modifier les commandes"
+msgstr "Modifier les instructions"
 
 #: src\qualcoder\ai_prompts.py:888
 msgid "The name cannot be empty"
@@ -534,13 +535,14 @@ msgstr "Le nom ne doit pas comporter plus de 60 caractères."
 #: src\qualcoder\ai_prompts.py:899
 msgid "The name of the prompt must be unique within its type and scope."
 msgstr ""
-"Le nom de l'invite doit être unique dans son type et son champ d'application."
+"Le nom de l'instruction doit être unique dans son type et son champ "
+"d'application."
 
 #: src\qualcoder\ai_prompts.py:926
 msgid "Names of prompts must be unique within its type and scope. "
 msgstr ""
-"Les noms des invites doivent être uniques au sein de leur type et de leur "
-"champ d'application. "
+"Les noms des instructions doivent être uniques au sein de leur type et de "
+"leur champ d'application. "
 
 #: src\qualcoder\ai_search_dialog.py:80
 msgid "1) What do you want to search for?"
@@ -556,12 +558,12 @@ msgstr "1) Quel sujet voulez-vous analyser ?"
 
 #: src\qualcoder\ai_search_dialog.py:122
 msgid "The last used prompt"
-msgstr "La dernière commande utilisée"
+msgstr "La dernière instruction utilisée"
 
 #: src\qualcoder\ai_search_dialog.py:124
 msgid "could not be found. The prompt will be reset to the default."
 msgstr ""
-"n'a pas été trouvé. La commande sera réinitialisée à la valeur par défaut."
+"n'a pas été trouvé. L’instruction sera réinitialisée à la valeur par défaut."
 
 #: src\qualcoder\ai_search_dialog.py:125 src\qualcoder\ai_search_dialog.py:458
 #: src\qualcoder\ai_search_dialog.py:478 src\qualcoder\report_codes.py:1365
@@ -677,8 +679,8 @@ msgstr ")."
 #: src\qualcoder\ai_search_dialog.py:457
 msgid "Please select a code or category (or use \"free search\" instead)."
 msgstr ""
-"Veuillez sélectionner un code ou une catégorie (ou utilisez plutôt la « "
-"recherche libre »)."
+"Veuillez sélectionner un code ou une catégorie (ou utilisez plutôt la "
+"« recherche libre »)."
 
 #: src\qualcoder\ai_search_dialog.py:477
 msgid "Please enter text in the \"topic\" field."
@@ -2329,7 +2331,7 @@ msgstr "Mettre un signet (B)"
 
 #: src\qualcoder\code_text.py:1271
 msgid "Edit text analysis prompts"
-msgstr "Modifier les commandes d'analyse de texte"
+msgstr "Modifier les instructions d'analyse de texte"
 
 #: src\qualcoder\code_text.py:1682
 msgid "Shift codings after clicked position"
@@ -2447,7 +2449,7 @@ msgid ""
 msgstr ""
 "\n"
 "\n"
-"Commande de recherche d'IA : "
+"Instruction de recherche d'IA : "
 
 #: src\qualcoder\code_text.py:3735
 msgid ""
@@ -7673,7 +7675,7 @@ msgstr "Uncaught Exception"
 
 #, python-brace-format
 #~ msgid "You must select a {self.prompt_type} prompt."
-#~ msgstr "Vous devez sélectionnez une commande {self.prompt_type}."
+#~ msgstr "Vous devez sélectionnez une instruction {self.prompt_type}."
 
 #~ msgid "AI: Please set up the AI model"
 #~ msgstr "IA : Veuillez configurer le modèle d'IA"
