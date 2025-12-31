@@ -2185,6 +2185,18 @@ Formatted like below for name detection.
 名前の検出用に以下のようにフォーマットする。
 「Name:」, 「{Name}」, または 「[Name]」</translation>
     </message>
+    <message>
+        <location filename="ui_dialog_code_text.py" line="409"/>
+        <source>Auto code with exact text.
+Right click for options: all, first, last, within another code.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_code_text.py" line="421"/>
+        <source>Text fragment to auto code sentences.
+Right click for options: all (default), first, code within code.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Dialog_colour_selector</name>
@@ -3087,7 +3099,7 @@ Wildcards for &apos;like&apos; are % and _</source>
         <translation>属性のパラメータを選択します。
 betweenには、;で区切られた2つの値が必要です。
  in と not in は、.で区切られた1つ以上の値を必要とします；
-like&apos; のワイルドカードは % と _ です。</translation>
+like' のワイルドカードは % と _ です。</translation>
     </message>
     <message>
         <location filename="ui_report_attribute_parameters.py" line="88"/>

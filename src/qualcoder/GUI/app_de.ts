@@ -2178,6 +2178,18 @@ Formatted like below for name detection.
 &quot;Name:&quot;, &quot;{Name}, or &quot;[Name]&quot;</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <location filename="ui_dialog_code_text.py" line="409"/>
+        <source>Auto code with exact text.
+Right click for options: all, first, last, within another code.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_code_text.py" line="421"/>
+        <source>Text fragment to auto code sentences.
+Right click for options: all (default), first, code within code.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>Dialog_colour_selector</name>

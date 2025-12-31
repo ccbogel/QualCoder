@@ -11,7 +11,7 @@
     <message>
         <location filename="ui_attribute.py" line="42"/>
         <source>Attribute name:</source>
-        <translation>Nome dell&apos;attributo:</translation>
+        <translation>Nome dell'attributo:</translation>
     </message>
     <message>
         <location filename="ui_attribute.py" line="43"/>
@@ -66,7 +66,7 @@
         <source>If portions of a text file are assigned to a case, the code frequency and total text characters may be incorrect.
 Codings from the entire text file are used for the calculations.</source>
         <translation>Se a un caso vengono assegnate parti di un file di testo, la frequenza dei codici e il totale dei caratteri del testo potrebbero essere errati.
-Per i calcoli vengono utilizzati i codici dell&apos;intero file di testo.</translation>
+Per i calcoli vengono utilizzati i codici dell'intero file di testo.</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="301"/>
@@ -222,7 +222,7 @@ This is temporary and must be selected each time the Charts screen is opened.
 The file must be plain text with one word per line.
 Each word is excluded in the n-grams=1 Word cloud.</source>
         <translation>Selezionando un file di testo qui si sovrascriveranno le parole vuote esistenti nel software e anche quelle memorizzate nella cartella di configurazione .qualcoder. 
-Si tratta di un&apos;impostazione temporanea che deve essere selezionata ogni volta che si apre la schermata Grafici.
+Si tratta di un'impostazione temporanea che deve essere selezionata ogni volta che si apre la schermata Grafici.
 
 Il file deve essere in formato testo semplice con una parola per riga.
 Ogni parola viene esclusa dalla nuvola di parole n-grams=1.</translation>
@@ -243,7 +243,7 @@ Ogni parola viene esclusa dalla nuvola di parole n-grams=1.</translation>
     <message>
         <location filename="ui_dialog_graph.py" line="123"/>
         <source>Export image</source>
-        <translation>Esportare l&apos;immagine</translation>
+        <translation>Esportare l'immagine</translation>
     </message>
     <message>
         <location filename="ui_dialog_graph.py" line="125"/>
@@ -253,7 +253,7 @@ Ogni parola viene esclusa dalla nuvola di parole n-grams=1.</translation>
     <message>
         <location filename="ui_dialog_graph.py" line="124"/>
         <source>Click on the graph area and press + or W to zoom in. Press - or Q to zoom in or zoom out.</source>
-        <translation>Fare clic sull&apos;area del grafico e premere + o W per ingrandire. Premere - o Q per ingrandire o ridurre il grafico.</translation>
+        <translation>Fare clic sull'area del grafico e premere + o W per ingrandire. Premere - o Q per ingrandire o ridurre il grafico.</translation>
     </message>
     <message>
         <location filename="ui_dialog_graph.py" line="126"/>
@@ -391,7 +391,7 @@ Selezionato - tutti i codici selezionati devono corrispondere esattamente.</tran
     <message>
         <location filename="ui_report_matching_segments.py" line="122"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Matching exact coded text for multiple codes are collated into one line.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>I testi codificati esattamente corrispondenti per più codici sono raccolti in un&apos;unica riga.</translation>
+        <translation>I testi codificati esattamente corrispondenti per più codici sono raccolti in un'unica riga.</translation>
     </message>
     <message>
         <location filename="ui_report_matching_segments.py" line="123"/>
@@ -424,12 +424,12 @@ Selezionato - tutti i codici selezionati devono corrispondere esattamente.</tran
     <message>
         <location filename="ui_dialog_organiser.py" line="63"/>
         <source>Export image</source>
-        <translation>Esportare l&apos;immagine</translation>
+        <translation>Esportare l'immagine</translation>
     </message>
     <message>
         <location filename="ui_dialog_organiser.py" line="64"/>
         <source>Click on the graph area and press + or W to zoom in. Press - or Q to zoom in or zoom out.</source>
-        <translation>Fare clic sull&apos;area del grafico e premere + o W per ingrandire. Premere - o Q per ingrandire o ridurre il grafico.</translation>
+        <translation>Fare clic sull'area del grafico e premere + o W per ingrandire. Premere - o Q per ingrandire o ridurre il grafico.</translation>
     </message>
     <message>
         <location filename="ui_dialog_organiser.py" line="65"/>
@@ -444,7 +444,7 @@ Selezionato - tutti i codici selezionati devono corrispondere esattamente.</tran
     <message>
         <location filename="ui_dialog_organiser.py" line="67"/>
         <source>Code organiser. Right click on codes and categories to link and merge. Add new categories. Re-structure codes tree.</source>
-        <translation>Organizzatore di codici. Cliccate con il tasto destro del mouse sui codici e sulle categorie da collegare e unire. Aggiungere nuove categorie. Ristrutturare l&apos;albero dei codici.</translation>
+        <translation>Organizzatore di codici. Cliccate con il tasto destro del mouse sui codici e sulle categorie da collegare e unire. Aggiungere nuove categorie. Ristrutturare l'albero dei codici.</translation>
     </message>
     <message>
         <location filename="ui_dialog_organiser.py" line="68"/>
@@ -523,7 +523,7 @@ Selezionato - tutti i codici selezionati devono corrispondere esattamente.</tran
     <message>
         <location filename="ui_report_codes_by_segments.py" line="100"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select files by attributes&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Seleziona i file in base all&apos;attributo</translation>
+        <translation>Seleziona i file in base all'attributo</translation>
     </message>
     <message>
         <location filename="ui_report_codes_by_segments.py" line="101"/>
@@ -626,7 +626,7 @@ Selezionato - tutti i codici selezionati devono corrispondere esattamente.</tran
     <message>
         <location filename="ui_ai_edit_prompts.py" line="213"/>
         <source>Prompt text (this will be send to the AI):</source>
-        <translation>Testo del prompt (sarà inviato all&apos;IA):</translation>
+        <translation>Testo del prompt (sarà inviato all'IA):</translation>
     </message>
 </context>
 <context>
@@ -649,17 +649,17 @@ Selezionato - tutti i codici selezionati devono corrispondere esattamente.</tran
     <message>
         <location filename="ui_ai_search.py" line="197"/>
         <source>Send not only the name but also the memo associated with a code to the AI?</source>
-        <translation>Inviare all&apos;intelligenza artificiale non solo il nome ma anche il promemoria associato a un codice?</translation>
+        <translation>Inviare all'intelligenza artificiale non solo il nome ma anche il promemoria associato a un codice?</translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="198"/>
         <source>Send memo to AI</source>
-        <translation>Inviare un promemoria all&apos;AI</translation>
+        <translation>Inviare un promemoria all'AI</translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="199"/>
         <source>If deselected (default), the AI searches for new material only. Segments already coded with this code are excluded from the results.</source>
-        <translation>Se deselezionato (impostazione predefinita), l&apos;IA cerca solo materiale nuovo. I segmenti già codificati con questo codice sono esclusi dai risultati.</translation>
+        <translation>Se deselezionato (impostazione predefinita), l'IA cerca solo materiale nuovo. I segmenti già codificati con questo codice sono esclusi dai risultati.</translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="200"/>
@@ -689,7 +689,7 @@ Selezionato - tutti i codici selezionati devono corrispondere esattamente.</tran
     <message>
         <location filename="ui_ai_search.py" line="205"/>
         <source>Give a short description so that the AI can better understand what you are looking for</source>
-        <translation>Fornite una breve descrizione in modo che l&apos;IA possa capire meglio cosa state cercando.</translation>
+        <translation>Fornite una breve descrizione in modo che l'IA possa capire meglio cosa state cercando.</translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="206"/>
@@ -724,7 +724,7 @@ Selezionato - tutti i codici selezionati devono corrispondere esattamente.</tran
     <message>
         <location filename="ui_ai_search.py" line="212"/>
         <source>Filter with the help of attributes</source>
-        <translation>Filtrare con l&apos;aiuto degli attributi</translation>
+        <translation>Filtrare con l'aiuto degli attributi</translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="213"/>
@@ -973,7 +973,7 @@ Ordinati per nome file e nome in codice.</translation>
     <message>
         <location filename="ui_dialog_import.py" line="91"/>
         <source>Survey Import Options</source>
-        <translation>Opzioni per l&apos;importazione del sondaggio</translation>
+        <translation>Opzioni per l'importazione del sondaggio</translation>
     </message>
     <message>
         <location filename="ui_dialog_import.py" line="92"/>
@@ -984,7 +984,7 @@ Ordinati per nome file e nome in codice.</translation>
         <location filename="ui_dialog_import.py" line="94"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delimiter must be a single character.&lt;/p&gt;&lt;p&gt;Enter &apos;ta&apos; for &apos;tab&apos;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>La delimitazione deve essere un singolo carattere .
-Enter &apos;ta&apos; for &apos;tab&apos;</translation>
+Enter 'ta' for 'tab'</translation>
     </message>
     <message>
         <location filename="ui_dialog_import.py" line="95"/>
@@ -1036,7 +1036,7 @@ Enter &apos;ta&apos; for &apos;tab&apos;</translation>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If checked: All the rows of a qualitative column will be collated into one text file.&lt;/p&gt;&lt;p&gt;If unchecked: Each qualitative answer will be an individual text file within the database.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Se selezionato, tutte le righe di una colonna qualitativa verranno fascicolate in un unico file di testo: Tutte le righe di una colonna qualitativa saranno riunite in un unico file di testo.
 
-Se non è selezionata: Ogni risposta qualitativa sarà un file di testo individuale all&apos;interno del database.</translation>
+Se non è selezionata: Ogni risposta qualitativa sarà un file di testo individuale all'interno del database.</translation>
     </message>
     <message>
         <location filename="ui_dialog_import.py" line="104"/>
@@ -1090,7 +1090,7 @@ Se non è selezionata: Ogni risposta qualitativa sarà un file di testo individu
     <message>
         <location filename="ui_dialog_start_and_end_marks.py" line="61"/>
         <source>Define start and end marks for auto assigning</source>
-        <translation>Definisci i punti di inizio e di fine per l&apos;assegnazione automatica</translation>
+        <translation>Definisci i punti di inizio e di fine per l'assegnazione automatica</translation>
     </message>
     <message>
         <location filename="ui_dialog_start_and_end_marks.py" line="63"/>
@@ -1247,7 +1247,7 @@ Se non è selezionata: Ogni risposta qualitativa sarà un file di testo individu
     <message>
         <location filename="ui_case_file_manager.py" line="90"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Double click the file row to view image, audio, or video&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Fare doppio clic sulla riga del file per visualizzare l&apos;immagine, l&apos;audio o il video.</translation>
+        <translation>Fare doppio clic sulla riga del file per visualizzare l'immagine, l'audio o il video.</translation>
     </message>
     <message>
         <location filename="ui_case_file_manager.py" line="87"/>
@@ -1334,7 +1334,7 @@ Il file deve avere una riga di intestazione e la prima colonna deve avere i nomi
     <message>
         <location filename="ui_dialog_code_av.py" line="203"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;When a segment of audio or video is made, choose a code from the codes tree, right click on the code and assign the segment to the code.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Quando un segmento di un audio o video e&apos; realizzato, scegliere un codice dal catalogo codici, cliccare col destro sul codice per assegnarlo al segmento.</translation>
+        <translation>Quando un segmento di un audio o video e' realizzato, scegliere un codice dal catalogo codici, cliccare col destro sul codice per assegnarlo al segmento.</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_av.py" line="204"/>
@@ -1380,7 +1380,7 @@ Ctrl Shift &lt;    Decrease play rate to minimum 0.1</translation>
     <message>
         <location filename="ui_dialog_code_av.py" line="194"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File with latest coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>File con l&apos;ultima codifica</translation>
+        <translation>File con l'ultima codifica</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_av.py" line="195"/>
@@ -1474,7 +1474,7 @@ Quindi si aprirà un menu di opzioni.</translation>
     <message>
         <location filename="ui_dialog_code_av.py" line="222"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Project image from screenshot&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Proietta l&apos;immagine dallo screenshot</translation>
+        <translation>Proietta l'immagine dallo screenshot</translation>
     </message>
 </context>
 <context>
@@ -1558,7 +1558,7 @@ Quindi si aprirà un menu di opzioni.</translation>
     <message>
         <location filename="ui_dialog_code_image.py" line="197"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File with latest coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>File con l&apos;ultima codifica</translation>
+        <translation>File con l'ultima codifica</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_image.py" line="198"/>
@@ -1583,7 +1583,7 @@ Quindi si aprirà un menu di opzioni.</translation>
     <message>
         <location filename="ui_dialog_code_image.py" line="183"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export image as html file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Esportazione dell&apos;immagine come file html.</translation>
+        <translation>Esportazione dell'immagine come file html.</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_image.py" line="184"/>
@@ -1741,17 +1741,17 @@ Cheatsheet Regex: www.rexegg.com/regex-quickstart.html</translation>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="261"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;PDF object information&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Informazioni sull&apos;oggetto PDF</translation>
+        <translation>Informazioni sull'oggetto PDF</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="262"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export image&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Esportare l&apos;immagine</translation>
+        <translation>Esportare l'immagine</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="275"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File with latest coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>File con l&apos;ultima codifica</translation>
+        <translation>File con l'ultima codifica</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="276"/>
@@ -1942,7 +1942,7 @@ Cheatsheet Regex: www.rexegg.com/regex-quickstart.html</translation>
     <message>
         <location filename="ui_dialog_code_text.py" line="464"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File with latest coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>File con l&apos;ultima codifica</translation>
+        <translation>File con l'ultima codifica</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="465"/>
@@ -1952,7 +1952,7 @@ Cheatsheet Regex: www.rexegg.com/regex-quickstart.html</translation>
     <message>
         <location filename="ui_dialog_code_text.py" line="471"/>
         <source>Click here to define the options for the AI based search</source>
-        <translation>Fare clic qui per definire le opzioni per la ricerca basata sull&apos;intelligenza artificiale.</translation>
+        <translation>Fare clic qui per definire le opzioni per la ricerca basata sull'intelligenza artificiale.</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="467"/>
@@ -2103,7 +2103,7 @@ Cheatsheet Regex: www.rexegg.com/regex-quickstart.html</translation>
     <message>
         <location filename="ui_dialog_code_text.py" line="474"/>
         <source>Use the AI to find data</source>
-        <translation>Usare l&apos;IA per trovare i dati</translation>
+        <translation>Usare l'IA per trovare i dati</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="446"/>
@@ -2196,9 +2196,21 @@ Formatted like below for name detection.
 &quot;Name:&quot;, &quot;{Name}, or &quot;[Name]&quot;</source>
         <translation>Contrassegna gli altoparlanti.
 Limitato a nomi lunghi fino a 63 caratteri. 
-Il nome deve essere all&apos;inizio di una nuova riga.
+Il nome deve essere all'inizio di una nuova riga.
 Formattato come di seguito per il rilevamento del nome.
 “Nome:”, “{Nome}” o “[Nome]”</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_code_text.py" line="409"/>
+        <source>Auto code with exact text.
+Right click for options: all, first, last, within another code.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_code_text.py" line="421"/>
+        <source>Text fragment to auto code sentences.
+Right click for options: all (default), first, code within code.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2249,7 +2261,7 @@ Formattato come di seguito per il rilevamento del nome.
     <message>
         <location filename="ui_dialog_confirm_delete.py" line="34"/>
         <source>Confirm Delete</source>
-        <translation>Confermare l&apos;eliminazione</translation>
+        <translation>Confermare l'eliminazione</translation>
     </message>
     <message>
         <location filename="ui_dialog_confirm_delete.py" line="35"/>
@@ -2390,7 +2402,7 @@ www.rexegg.com/regex-quickstart.html</translation>
     <message>
         <location filename="ui_dialog_journals.py" line="140"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add Attribute&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Aggiungere l&apos;attributo</translation>
+        <translation>Aggiungere l'attributo</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="144"/>
@@ -2504,7 +2516,7 @@ Impossibile esportare il file di trascrizione del testo associato a un audio o a
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Bulk rename of database name file entries.&lt;/p&gt;&lt;p&gt;Only rename visible file rows. Can show only some rows by using attribute selection, or show/hide value like...&lt;/p&gt;&lt;p&gt;Renamed as: User chosen prefix and numbered suffix _nnn.&lt;/p&gt;&lt;p&gt;e.g. interview_001&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Rinomina in blocco le voci del file del nome del database. Rinomina solo le righe visibili del file. È possibile mostrare solo alcune righe utilizzando la selezione degli attributi o mostrando/nascondendo i valori come...
 
-Rinominato come: Prefisso scelto dall&apos;utente e suffisso numerato _nnn.
+Rinominato come: Prefisso scelto dall'utente e suffisso numerato _nnn.
 
 Ad esempio, intervista_001</translation>
     </message>
@@ -2517,7 +2529,7 @@ Ad esempio, intervista_001</translation>
     <message>
         <location filename="ui_dialog_manage_files.py" line="150"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Load saved table display setting.&lt;/p&gt;&lt;p&gt;(Hidden rows and columns and column sizing)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Carica l&apos;impostazione di visualizzazione della tabella salvata.
+        <translation>Carica l'impostazione di visualizzazione della tabella salvata.
 (Righe e colonne nascoste e dimensionamento delle colonne)</translation>
     </message>
     <message>
@@ -2557,7 +2569,7 @@ The speaker name must be at the start of a new line and less than 64 characters 
 Formatted like below for name detection.
 &quot;Name:&quot;, &quot;{Name} or &quot;[Name]&quot;</source>
         <translation>Seleziona una trascrizione del testo per contrassegnare gli oratori.
-Il nome dell&apos;oratore deve essere all&apos;inizio di una nuova riga e deve contenere meno di 64 caratteri.
+Il nome dell'oratore deve essere all'inizio di una nuova riga e deve contenere meno di 64 caratteri.
 Formattato come di seguito per il rilevamento del nome.
 “Nome:”, “{Nome} o ”[Nome]&quot;</translation>
     </message>
@@ -2714,7 +2726,7 @@ Rivedere dopo aver applicato la funzione.</translation>
         <location filename="ui_dialog_pseudonyms.py" line="64"/>
         <source>Pseudonyms. Data de-identification applied on file import. Does not apply for PDF imports.
 Case sensitive, add multiple entries for each: e.g. Tom Jones  and TOM JONES</source>
-        <translation>Pseudonimi. Anonimizzazione dei dati applicata all&apos;importazione dei file. Non applicabile alle importazioni in formato PDF.
+        <translation>Pseudonimi. Anonimizzazione dei dati applicata all'importazione dei file. Non applicabile alle importazioni in formato PDF.
 Distinzione tra maiuscole e minuscole, aggiungere più voci per ciascuna: ad esempio Tom Jones  e TOM JONES</translation>
     </message>
     <message>
@@ -2753,12 +2765,12 @@ Distinzione tra maiuscole e minuscole, aggiungere più voci per ciascuna: ad ese
     <message>
         <location filename="ui_dialog_refi_export_endings.py" line="43"/>
         <source>Add line ending character for MAXQDA importation</source>
-        <translation>Aggiungere il carattere di fine riga per l&apos;importazione in MAXQDA</translation>
+        <translation>Aggiungere il carattere di fine riga per l'importazione in MAXQDA</translation>
     </message>
     <message>
         <location filename="ui_dialog_refi_export_endings.py" line="44"/>
         <source>REFI-QDA project export. Plain text representation may need adjustment of line endings so that codes do not shift on import into other software.</source>
-        <translation>Esportazione del progetto REFI-QDA. La rappresentazione in testo semplice può aver bisogno di aggiustare le terminazioni di riga in modo che i codici non si spostino durante l&apos;importazione in altri software.</translation>
+        <translation>Esportazione del progetto REFI-QDA. La rappresentazione in testo semplice può aver bisogno di aggiustare le terminazioni di riga in modo che i codici non si spostino durante l'importazione in altri software.</translation>
     </message>
 </context>
 <context>
@@ -2959,12 +2971,12 @@ Distinzione tra maiuscole e minuscole, aggiungere più voci per ciascuna: ad ese
     <message>
         <location filename="ui_dialog_report_codings.py" line="180"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Attributes. &lt;/p&gt;&lt;p&gt;Attribute selection will override files or cases selected in the left-hand-side lists.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>La selezione dell&apos;attributo sostituisce i file o i casi selezionati negli elenchi di sinistra.</translation>
+        <translation>La selezione dell'attributo sostituisce i file o i casi selezionati negli elenchi di sinistra.</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_codings.py" line="208"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export file  or case variables in columns for CSV or XLSX export&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Esportazione di file o variabili di caso in colonne per l&apos;esportazione in CSV o XLSX</translation>
+        <translation>Esportazione di file o variabili di caso in colonne per l'esportazione in CSV o XLSX</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_codings.py" line="209"/>
@@ -3100,7 +3112,7 @@ Seleziona due codificatori, un file, un codice.</translation>
     <message>
         <location filename="ui_report_attribute_parameters.py" line="81"/>
         <source>Attribute selection parameters</source>
-        <translation>Parametri per la selezione dell&apos;attributo</translation>
+        <translation>Parametri per la selezione dell'attributo</translation>
     </message>
     <message>
         <location filename="ui_report_attribute_parameters.py" line="96"/>
@@ -3136,7 +3148,7 @@ Wildcards for &apos;like&apos; are % and _</source>
         <translation>Seleziona i parametri per gli attributi. 
 between richiede 2 valori separati da ; ad esempio 1;100
  in e not in richiedono 1 o più valori separati da ;
-I caratteri jolly per &apos;like&apos; sono % e _</translation>
+I caratteri jolly per 'like' sono % e _</translation>
     </message>
     <message>
         <location filename="ui_report_attribute_parameters.py" line="88"/>
@@ -3177,7 +3189,7 @@ I caratteri jolly per &apos;like&apos; sono % e _</translation>
         <location filename="ui_report_attribute_parameters.py" line="87"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Save filter settings.&lt;/p&gt;&lt;p&gt;Do not use apostrophe or comma in any values.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Salva le impostazioni del filtro.
-Non utilizzare l&apos;apostrofo o la virgola in nessun valore.</translation>
+Non utilizzare l'apostrofo o la virgola in nessun valore.</translation>
     </message>
     <message>
         <location filename="ui_report_attribute_parameters.py" line="94"/>
@@ -3258,7 +3270,7 @@ Non utilizzare l&apos;apostrofo o la virgola in nessun valore.</translation>
     <message>
         <location filename="ui_dialog_settings.py" line="607"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Used when entering speaker name in transcription&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Usato quando si inserisce il nome dell&apos;altoparlante nella trascrizione</translation>
+        <translation>Usato quando si inserisce il nome dell'altoparlante nella trascrizione</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="568"/>
@@ -3329,7 +3341,7 @@ Non utilizzare l&apos;apostrofo o la virgola in nessun valore.</translation>
     <message>
         <location filename="ui_dialog_settings.py" line="567"/>
         <source>Font size for codes tree</source>
-        <translation>Dimensione caratteri l&apos;albero dei codici</translation>
+        <translation>Dimensione caratteri l'albero dei codici</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="547"/>
@@ -3366,12 +3378,12 @@ Non è consigliato se non si hanno molti file di grandi dimensioni che rallentan
     <message>
         <location filename="ui_dialog_settings.py" line="609"/>
         <source>AI Integration</source>
-        <translation>Integrazione dell&apos;IA</translation>
+        <translation>Integrazione dell'IA</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="610"/>
         <source>enable AI integration</source>
-        <translation>consentire l&apos;integrazione dell&apos;IA</translation>
+        <translation>consentire l'integrazione dell'IA</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="613"/>
@@ -3391,12 +3403,12 @@ Non è consigliato se non si hanno molti file di grandi dimensioni che rallentan
     <message>
         <location filename="ui_dialog_settings.py" line="635"/>
         <source>You can use the Project Memo (found in the menu: Project &gt; Project Memo) to convey background information about your research, including objectives, methodology, and data, to the AI. This will help the AI generate more accurate and relevant responses. Deselect this option if you use the Project Memo for other purposes.</source>
-        <translation>È possibile utilizzare il Memo del progetto (nel menu: Progetto &gt; Memo del progetto) per fornire all&apos;IA informazioni di base sulla ricerca, compresi gli obiettivi, la metodologia e i dati. Questo aiuterà l&apos;IA a generare risposte più accurate e pertinenti. Deselezionare questa opzione se si utilizza il Memo di progetto per altri scopi.</translation>
+        <translation>È possibile utilizzare il Memo del progetto (nel menu: Progetto &gt; Memo del progetto) per fornire all'IA informazioni di base sulla ricerca, compresi gli obiettivi, la metodologia e i dati. Questo aiuterà l'IA a generare risposte più accurate e pertinenti. Deselezionare questa opzione se si utilizza il Memo di progetto per altri scopi.</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="636"/>
         <source>Send project memo to AI</source>
-        <translation>Inviare la nota del progetto all&apos;AI</translation>
+        <translation>Inviare la nota del progetto all'AI</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="622"/>
@@ -3501,7 +3513,7 @@ Non è consigliato se non si hanno molti file di grandi dimensioni che rallentan
     <message>
         <location filename="ui_dialog_settings.py" line="627"/>
         <source>If selected, the conversations will be in the same language as the rest of the user interface. You can select this language at the top of this window.</source>
-        <translation>Se è selezionato, le conversazioni saranno nella stessa lingua del resto dell&apos;interfaccia utente. È possibile selezionare questa lingua nella parte superiore di questa finestra.</translation>
+        <translation>Se è selezionato, le conversazioni saranno nella stessa lingua del resto dell'interfaccia utente. È possibile selezionare questa lingua nella parte superiore di questa finestra.</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="628"/>
@@ -3561,7 +3573,7 @@ Non è consigliato se non si hanno molti file di grandi dimensioni che rallentan
     <message>
         <location filename="ui_dialog_settings.py" line="616"/>
         <source>AI Profile:</source>
-        <translation>Profilo dell&apos;IA</translation>
+        <translation>Profilo dell'IA</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="614"/>
@@ -3611,7 +3623,7 @@ Non è consigliato se non si hanno molti file di grandi dimensioni che rallentan
         <source>The following speaker names were detected in the document. 
 Select (✓) the ones you want to mark. Clicking OK creates a code for each selected speaker in the “📌 Speakers” category and assigns all corresponding text segments. Doubleclick to edit the &quot;code as&quot; name in the table. To merge two speakers (e.g. to correct a typo), rename the &quot;code as&quot; in one entry so that it exactly matches the other.</source>
         <translation>Nel documento sono stati rilevati i seguenti nomi di oratori. 
-Seleziona (✓) quelli che desideri contrassegnare. Facendo clic su OK viene creato un codice per ciascun oratore selezionato nella categoria “📌 Oratori” e vengono assegnati tutti i segmenti di testo corrispondenti. Fai doppio clic per modificare il nome “codifica come” nella tabella. Per unire due oratori (ad esempio per correggere un errore di battitura), rinomina il “codifica come” in una voce in modo che corrisponda esattamente all&apos;altra.</translation>
+Seleziona (✓) quelli che desideri contrassegnare. Facendo clic su OK viene creato un codice per ciascun oratore selezionato nella categoria “📌 Oratori” e vengono assegnati tutti i segmenti di testo corrispondenti. Fai doppio clic per modificare il nome “codifica come” nella tabella. Per unire due oratori (ad esempio per correggere un errore di battitura), rinomina il “codifica come” in una voce in modo che corrisponda esattamente all'altra.</translation>
     </message>
     <message>
         <location filename="ui_dialog_speakers.py" line="56"/>
@@ -3684,7 +3696,7 @@ Seleziona (✓) quelli che desideri contrassegnare. Facendo clic su OK viene cre
     <message>
         <location filename="ui_special_functions.py" line="130"/>
         <source>Run update text content</source>
-        <translation>Esegui l&apos;aggiornamento del contenuto del testo</translation>
+        <translation>Esegui l'aggiornamento del contenuto del testo</translation>
     </message>
     <message>
         <location filename="ui_special_functions.py" line="136"/>
@@ -3757,7 +3769,7 @@ Seleziona (✓) quelli che desideri contrassegnare. Facendo clic su OK viene cre
     <message>
         <location filename="ui_dialog_SQL.py" line="86"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delimiter for export&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Delimitatore per l&apos;esportazione</translation>
+        <translation>Delimitatore per l'esportazione</translation>
     </message>
     <message>
         <location filename="ui_dialog_SQL.py" line="91"/>
@@ -3830,7 +3842,7 @@ Seleziona (✓) quelli che desideri contrassegnare. Facendo clic su OK viene cre
     <message>
         <location filename="ui_dialog_text_mining.py" line="100"/>
         <source>Analysis selections:</source>
-        <translation>Selezioni dell&apos;analisi</translation>
+        <translation>Selezioni dell'analisi</translation>
     </message>
 </context>
 <context>
@@ -3942,7 +3954,7 @@ Ctrl  Shift &lt; diminuire il tasso di gioco, minimo 0.1</translation>
         <source>green underline = Assigned to case.
 red underline = Assigned to code or annotation</source>
         <translation>sottolineatura verde = assegnato al caso.
-sottolineatura rossa = assegnato al codice o all&apos;annotazione</translation>
+sottolineatura rossa = assegnato al codice o all'annotazione</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="191"/>
@@ -4046,7 +4058,7 @@ Non codificate questo testo finché non ricaricate Codifica - Testo codificato d
     </message>
     <message>
         <location filename="ui_dialog_view_text.py" line="79"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot â.â is used as a wild card, e.g. â.earsâ will match âbearsâ and âyearsâ. &lt;/p&gt;&lt;p&gt;A â?â after a character will match one or none times that character, e.g. âbears?â will match âbearâ and âbearsâ &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A â*â after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;â&lt;/span&gt;\. will match the dot symbol, â\?â will match the question mark. â\nâ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot &#xe2;&#x80;&#x98;.&#xe2;&#x80;&#x99; is used as a wild card, e.g. &#xe2;&#x80;&#x98;.ears&#xe2;&#x80;&#x99; will match &#xe2;&#x80;&#x98;bears&#xe2;&#x80;&#x99; and &#xe2;&#x80;&#x98;years&#xe2;&#x80;&#x99;. &lt;/p&gt;&lt;p&gt;A &#xe2;&#x80;&#x98;?&#xe2;&#x80;&#x99; after a character will match one or none times that character, e.g. &#xe2;&#x80;&#x98;bears?&#xe2;&#x80;&#x99; will match &#xe2;&#x80;&#x98;bear&#xe2;&#x80;&#x99; and &#xe2;&#x80;&#x98;bears&#xe2;&#x80;&#x99; &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A &#xe2;&#x80;&#x98;*&#xe2;&#x80;&#x99; after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;&#xe2;&#x80;&#x98;&lt;/span&gt;\. will match the dot symbol, &#xe2;&#x80;&#x98;\?&#xe2;&#x80;&#x99; will match the question mark. &#xe2;&#x80;&#x98;\n&#xe2;&#x80;&#x99; will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished">La ricerca utilizza le funzioni regex</translation>
     </message>
 </context>
@@ -4065,7 +4077,7 @@ Non codificate questo testo finché non ricaricate Codifica - Testo codificato d
     <message>
         <location filename="ui_error_dlg.py" line="101"/>
         <source>Error traceback (most recent call last):</source>
-        <translation>Traccia dell&apos;errore (ultima chiamata più recente):</translation>
+        <translation>Traccia dell'errore (ultima chiamata più recente):</translation>
     </message>
     <message>
         <location filename="ui_error_dlg.py" line="102"/>
@@ -4358,17 +4370,17 @@ Non codificate questo testo finché non ricaricate Codifica - Testo codificato d
     <message>
         <location filename="ui_main.py" line="304"/>
         <source>Select an option in the Files and Cases menu. </source>
-        <translation>Selezionare un&apos;opzione nel menu File e casi. </translation>
+        <translation>Selezionare un'opzione nel menu File e casi. </translation>
     </message>
     <message>
         <location filename="ui_main.py" line="306"/>
         <source>Select an option in the Coding menu. </source>
-        <translation>Selezionare un&apos;opzione nel menu Codifica. </translation>
+        <translation>Selezionare un'opzione nel menu Codifica. </translation>
     </message>
     <message>
         <location filename="ui_main.py" line="308"/>
         <source>Select an option in the Reports menu. </source>
-        <translation>Selezionare un&apos;opzione nel menu Rapporti. </translation>
+        <translation>Selezionare un'opzione nel menu Rapporti. </translation>
     </message>
     <message>
         <location filename="ui_main.py" line="347"/>
@@ -4448,12 +4460,12 @@ Non codificate questo testo finché non ricaricate Codifica - Testo codificato d
     <message>
         <location filename="ui_main.py" line="383"/>
         <source>AI Assisted Coding</source>
-        <translation>Codifica assistita dall&apos;IA</translation>
+        <translation>Codifica assistita dall'IA</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="385"/>
         <source>AI related Settings</source>
-        <translation>Parametri relativi all&apos;IA</translation>
+        <translation>Parametri relativi all'IA</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="386"/>
@@ -4473,7 +4485,7 @@ Non codificate questo testo finché non ricaricate Codifica - Testo codificato d
     <message>
         <location filename="ui_main.py" line="389"/>
         <source>AI assisted coding</source>
-        <translation>Codifica assistita dall&apos;IA</translation>
+        <translation>Codifica assistita dall'IA</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="390"/>
