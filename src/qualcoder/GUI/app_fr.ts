@@ -544,12 +544,12 @@ Coché - tous les codes sélectionnés doivent correspondre exactement.</transla
     <message>
         <location filename="ui_ai_edit_prompts.py" line="195"/>
         <source>AI Prompts Library</source>
-        <translation>Bibliothèque d&apos;invites IA</translation>
+        <translation>Bibliothèque des instructions IA</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="196"/>
         <source>Analytic Prompts:</source>
-        <translation>Invitations à l&apos;analyse de l&apos;IA :</translation>
+        <translation>Instructions à l&apos;analyse de l&apos;IA :</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="197"/>
@@ -564,7 +564,7 @@ Coché - tous les codes sélectionnés doivent correspondre exactement.</transla
     <message>
         <location filename="ui_ai_edit_prompts.py" line="199"/>
         <source>Copy prompt to clipboard</source>
-        <translation>Copier l&apos;invite dans le presse-papiers</translation>
+        <translation>Copier l’instruction dans le presse-papiers</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="204"/>
@@ -574,22 +574,22 @@ Coché - tous les codes sélectionnés doivent correspondre exactement.</transla
     <message>
         <location filename="ui_ai_edit_prompts.py" line="201"/>
         <source>Paste prompt from clipboard</source>
-        <translation>Coller l&apos;invite à partir du presse-papiers</translation>
+        <translation>Coller l&apos;instruction à partir du presse-papiers</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="203"/>
         <source>Delete prompt</source>
-        <translation>Supprimer l&apos;invite</translation>
+        <translation>Supprimer l&apos;instruction</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="205"/>
         <source>Prompt Name:</source>
-        <translation>Nom de l&apos;invite :</translation>
+        <translation>Nom de l&apos;instruction :</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="206"/>
         <source>(Uneditable system prompt)</source>
-        <translation>(Invite non éditable)</translation>
+        <translation>(Instruction non éditable)</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="207"/>
@@ -619,12 +619,12 @@ Coché - tous les codes sélectionnés doivent correspondre exactement.</transla
     <message>
         <location filename="ui_ai_edit_prompts.py" line="212"/>
         <source>Prompt description:</source>
-        <translation>Description de commande IA :</translation>
+        <translation>Description de l’instruction IA :</translation>
     </message>
     <message>
         <location filename="ui_ai_edit_prompts.py" line="213"/>
         <source>Prompt text (this will be send to the AI):</source>
-        <translation>Texte de commande (il sera envoyé à l&apos;IA) :</translation>
+        <translation>Texte de l’instruction (il sera envoyé à l&apos;IA) :</translation>
     </message>
 </context>
 <context>
@@ -702,12 +702,12 @@ Coché - tous les codes sélectionnés doivent correspondre exactement.</transla
     <message>
         <location filename="ui_ai_search.py" line="208"/>
         <source>Analytic Prompt:</source>
-        <translation>Message analytique :</translation>
+        <translation>Instruction analytique :</translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="209"/>
         <source>Edit prompt or create your own (advanced option)</source>
-        <translation>Modifier la commande ou créer la vôtre (option avancée)</translation>
+        <translation>Modifier l’instruction ou créer la vôtre (option avancée)</translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="210"/>
@@ -1090,12 +1090,12 @@ Classement par nom de fichier et nom de code.</translation>
     <message>
         <location filename="ui_dialog_start_and_end_marks.py" line="64"/>
         <source>Start mark</source>
-        <translation type="unfinished">Marque de départ</translation>
+        <translation>Marque de départ</translation>
     </message>
     <message>
         <location filename="ui_dialog_start_and_end_marks.py" line="65"/>
         <source>End mark</source>
-        <translation type="unfinished">Marque de fin</translation>
+        <translation>Marque de fin</translation>
     </message>
     <message>
         <location filename="ui_dialog_start_and_end_marks.py" line="66"/>
@@ -1222,7 +1222,7 @@ Classement par nom de fichier et nom de code.</translation>
     <message>
         <location filename="ui_case_file_manager.py" line="88"/>
         <source>Can assign text in a file to this case. Right click to mark selected text in a file to assign to this case.</source>
-        <translation type="unfinished">Attribuer du texte dans un fichier vers ce cas. Clic-droit pour surligner le texte sélectionné dans un fichier à affecter à ce cas.</translation>
+        <translation>Attribuer du texte dans un fichier vers ce cas. Clic-droit pour surligner le texte sélectionné dans un fichier à affecter à ce cas.</translation>
     </message>
     <message>
         <location filename="ui_case_file_manager.py" line="89"/>
@@ -2176,11 +2176,25 @@ Limited to names up to 63 characters long.
 The name must be at the start of a new line.
 Formatted like below for name detection.
 &quot;Name:&quot;, &quot;{Name}, or &quot;[Name]&quot;</source>
-        <translation type="unfinished">Surligner les intervenant⋅es.
+        <translation>Surligner les intervenant⋅es.
 Limité à des noms de 63 caractères maximum. 
 Le nom doit être au début d&apos;une nouvelle ligne.
 Formaté comme ci-dessous pour la détection du nom.
 « Nom : », « {Nom} » ou « [Nom] »</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_code_text.py" line="409"/>
+        <source>Auto code with exact text.
+Right click for options: all, first, last, within another code.</source>
+        <translation>Code automatique avec texte exact.
+Clic-droit pour afficher les options : tout, premier, dernier, dans un autre code.</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_code_text.py" line="421"/>
+        <source>Text fragment to auto code sentences.
+Right click for options: all (default), first, code within code.</source>
+        <translation>Fragment de texte vers phrase d’autocodage.
+Clic-droit pour les options : tous (par défaut), premier, code dans le code.</translation>
     </message>
 </context>
 <context>
@@ -2532,7 +2546,7 @@ Une fois tous les fichiers texte importés, supprimez ce fichier du dossier du p
 The speaker name must be at the start of a new line and less than 64 characters long.
 Formatted like below for name detection.
 &quot;Name:&quot;, &quot;{Name} or &quot;[Name]&quot;</source>
-        <translation type="unfinished">Sélectionnez une retranscription de texte pour surligner les intervenant⋅es.
+        <translation>Sélectionnez une retranscription de texte pour surligner les intervenant⋅es.
 Le nom de l’interlocuteur doit figurer au début d&apos;une nouvelle ligne et comporter moins de 64 caractères.
 Formaté comme ci-dessous pour la détection du nom.
 « Nom : », « {Nom} » ou « [Nom] »</translation>
@@ -2836,7 +2850,7 @@ Sensible à la casse, ajoutez plusieurs entrées pour chaque nom : par exemple, 
     <message>
         <location filename="ui_dialog_report_codings.py" line="190"/>
         <source>Filter results for those marked Important</source>
-        <translation type="unfinished">Filtrer les résultats pour ceux marqués comme importants</translation>
+        <translation>Filtrer les résultats pour ceux marqués comme importants</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_codings.py" line="191"/>
@@ -3576,13 +3590,13 @@ Non recommandé, sauf si vous avez beaucoup de gros fichiers qui ralentissent la
     <message>
         <location filename="ui_dialog_speakers.py" line="53"/>
         <source>Mark Speakers</source>
-        <translation type="unfinished">Surligner l’interlocuteur</translation>
+        <translation>Surligner l’interlocuteur</translation>
     </message>
     <message>
         <location filename="ui_dialog_speakers.py" line="54"/>
         <source>The following speaker names were detected in the document. 
 Select (✓) the ones you want to mark. Clicking OK creates a code for each selected speaker in the “📌 Speakers” category and assigns all corresponding text segments. Doubleclick to edit the &quot;code as&quot; name in the table. To merge two speakers (e.g. to correct a typo), rename the &quot;code as&quot; in one entry so that it exactly matches the other.</source>
-        <translation type="unfinished">Les noms des intervenant⋅es suivants ont été détectés dans le document. 
+        <translation>Les noms des intervenant⋅es suivants ont été détectés dans le document. 
 Sélectionnez (✓) ceux que vous souhaitez surligner. En cliquant sur OK, vous créez un code pour chaque intervenant⋅es sélectionné⋅e dans la catégorie « 📌 intervenant⋅e » et attribuez tous les segments de texte correspondants. Double-cliquez pour modifier le nom « coder comme » dans le tableau. Pour fusionner deux intervenant⋅es (par exemple pour corriger une faute de frappe), renommez le « code comme » dans une entrée afin qu&apos;il corresponde exactement à l&apos;autre.</translation>
     </message>
     <message>
@@ -4407,7 +4421,7 @@ Ne codez pas ce texte avant d&apos;avoir rechargé Codage - Coder le texte dans 
     <message>
         <location filename="ui_main.py" line="379"/>
         <source>Setup Wizard</source>
-        <translation type="unfinished">Configuration</translation>
+        <translation>Configuration</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="380"/>
@@ -4427,7 +4441,7 @@ Ne codez pas ce texte avant d&apos;avoir rechargé Codage - Coder le texte dans 
     <message>
         <location filename="ui_main.py" line="386"/>
         <source>Prompt library</source>
-        <translation>Bibliothèque de commandes</translation>
+        <translation>Bibliothèque des instructions</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="387"/>

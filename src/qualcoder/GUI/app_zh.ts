@@ -1005,8 +1005,8 @@ Ordered by file name and code name.</source>
         <location filename="ui_dialog_import.py" line="97"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;NONE 123, abc&lt;/p&gt;&lt;p&gt;MINIMAL 123, &amp;quot;abc&amp;quot;&lt;/p&gt;&lt;p&gt;ALL &amp;quot;123&amp;quot;, &amp;quot;abc&amp;quot;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>NONE 123, abc
-MINIMAL 123,&apos;abc&apos;;
-ALL &apos;123&apos;, &apos;abc&apos;</translation>
+MINIMAL 123,'abc';
+ALL '123', 'abc'</translation>
     </message>
     <message>
         <location filename="ui_dialog_import.py" line="98"/>
@@ -2193,6 +2193,18 @@ Formatted like below for name detection.
 名称必须位于新行开头。
 名称检测格式如下：
 “名称：”、“{名称}” 或 “[名称]”</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_code_text.py" line="409"/>
+        <source>Auto code with exact text.
+Right click for options: all, first, last, within another code.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_code_text.py" line="421"/>
+        <source>Text fragment to auto code sentences.
+Right click for options: all (default), first, code within code.</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
