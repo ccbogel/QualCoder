@@ -17,16 +17,17 @@ If not, see <https://www.gnu.org/licenses/>.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 """
+
 import webbrowser
 from copy import deepcopy
 import datetime
 import logging
 import os
-from PIL import Image, ImageColor, ImageDraw, ImageFont
 from PyQt6 import QtWidgets
-from random import randint
 import sys
 import traceback
+from wordcloud import WordCloud
+from PIL import ImageColor
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -93,179 +94,140 @@ stopwords = ["a", "about", "above", "after", "again", "against", "all", "am", "a
 
 
 class Wordcloud:
-    """ Create a wordcloud using text separated with spaces. Punctuaiton aparat from apostrophe is removed from the text,
-    and the text is converted to lower case. The wordcloud uses the Droid-sans font which is located in the
-    /Users/yourname/home/.qualcoder folder.
-    A stopwords.txt file stored in the .qualcoder folder will override the stopwords listed below.
-    The maximum font siz is the height / 6. The minimum font size is 10. Font sizes are scaled by word frequency.
-    Options include:
-        maximum number of words to use
-        image width and height
-        black or white background
-        text color(s): a single named colour in Pil, or a named in the named colour ranges above.
-        reverse_colors: if true, reverses the order of the colour range
-        trigrams: if true, use 3 word phrases in the word cloud
-        stopwords_filepath2 alternative source of stopwords
+    """Create a wordcloud using the `wordcloud` package.
+
+    Args are mostly compatible with the original implementation:
+        app: kept for compatibility (not used here except for potential future use)
+        fulltext: source text
+        width, height: image dimensions
+        max_words: maximum number of words
+        background_color: passed directly to WordCloud
+        text_color:
+            - "random": use wordcloud's default random coloring
+            - a named color ("red", "#ff0000", etc.)
+            - a color range name from color_ranges above
+        reverse_colors: reverse order of the chosen color range
+        ngrams: 1 for single words, >1 for n-grams
+        stopwords_filepath2: alternative stopwords file path
     """
 
-    def __init__(self, app, fulltext, width=800, height=600, max_words=200, background_color="black",
-                 text_color="random", reverse_colors=False, ngrams=1, stopwords_filepath2=None):
-
-        self.app = app  # Used for project path
+    def __init__(
+        self,
+        app,
+        fulltext,
+        width=800,
+        height=600,
+        max_words=200,
+        background_color="black",
+        text_color="random",
+        reverse_colors=False,
+        ngrams=1,
+        stopwords_filepath2=None
+    ):
+        self.app = app
         self.width = width
         self.height = height
         self.max_words = max_words
         self.background_color = background_color
         self.text_color = text_color
-        self.color_range_chosen = []
-        reverse_colors = reverse_colors
-        for color_range in color_ranges:
-            if color_range["name"] == text_color:
-                # Need to deepcopy otherwise range may be reversed already from previous calls to class
-                self.color_range_chosen = deepcopy(color_range["range"])
-        if reverse_colors and self.color_range_chosen:
-            self.color_range_chosen.reverse()
         self.ngrams = ngrams
-        self.max_font_size = int(self.height / 6)  # This factor seems oK
-        self.min_font_size = 10
+        self.reverse_colors = reverse_colors
+
+        # Font in ~/.qualcoder
         self.font_path = os.path.join(os.path.expanduser('~'), ".qualcoder", "DroidSansMono.ttf")
-        # Get a different stopwords file from the .qualcoder folderor another source
+
+        # Stopwords: file in ~/.qualcoder or provided path, fallback to built-in list
         stopwords_file_path = os.path.join(os.path.expanduser('~'), ".qualcoder", "stopwords.txt")
         if stopwords_filepath2 is not None:
-            stopwords_file_path = stopwords_filepath2  # provided as argument
+            stopwords_file_path = stopwords_filepath2
+
         self.stopwords = []
         try:
-            # Can get UnicodeDecode Error on Windows so using error handler
             with open(stopwords_file_path, "r", encoding="utf-8", errors="backslashreplace") as stopwords_file:
-                while 1:
+                while True:
                     stopword = stopwords_file.readline()
-                    if stopword[0:6] == "\ufeff":  # Associated with notepad files
-                        stopword = stopword[6:]
                     if not stopword:
                         break
-                    self.stopwords.append(stopword.strip())  # Remove line ending
+                    if stopword[0:6] == "﻿":  # BOM from some editors
+                        stopword = stopword[6:]
+                    self.stopwords.append(stopword.strip())
         except FileNotFoundError as err:
             print(err)
             self.stopwords = stopwords
 
-        # Remove most punctuation except apostrophe. Convert to lower case
-        chars = ""
-        for c in range(0, len(fulltext)):
-            if fulltext[c].isalpha() or fulltext[c] == "'":
-                chars += fulltext[c]
-            else:
-                chars += " "
-        chars = chars.lower()
-        word_list = []
-        word_list_with_stopwords = chars.split()
-        for word in word_list_with_stopwords:
-            if word not in self.stopwords:
-                word_list.append(word)
-        # print("Words: " + f"{len(word_list):,d}")
-        #print(word_list)
+        # ---- TEXT PREPROCESSING + NGRAMS ----
+        # 1) Clean text (letters + apostrophes, lowercased)
+        cleaned = self._clean_text(fulltext)
+
+        # 2) Tokenize
+        tokens = cleaned.split()
+
+        # 3) Build n-grams before applying stopwords,
+        #    then drop n-grams that are entirely stopwords.
         if self.ngrams > 1:
-            word_list = self.make_ngrams(word_list_with_stopwords, self.ngrams)
-            #print(word_list)
-            self.max_font_size = int(self.height / 18)  # Needs this bigger divisor. Phrases can be long
-            if self.max_font_size < self.min_font_size:
-                self.max_font_size = self.min_font_size
-        # Word frequency
-        d = {}
-        for word in word_list:
-            d[word] = d.get(word, 0) + 1  # get(key, value if not present)
-        self.words = []
-        for key, value in d.items():
-            self.words.append({"text": key, "frequency": value, "x": 0, "y": -100})
-        self.words = sorted(self.words, key=lambda x: x["frequency"], reverse=True)
-        if len(self.words) == 0:
-            self.words.append({"text": "NO WORDS", "frequency": 1, "x": 0, "y": 0})
-        # print("Unique words: " + str(len(self.words)))
+            units = self.make_ngrams(tokens, self.ngrams)
+            # Optional: filter out n-grams where every word is a stopword
+            filtered_units = []
+            sw_set = set(self.stopwords)
+            for phrase in units:
+                words = phrase.split()
+                if not all(w in sw_set for w in words):
+                    filtered_units.append(phrase)
+            units = filtered_units
+        else:
+            units = tokens
 
-        # Limit number of words to display
-        max_count = len(self.words)
-        if len(self.words) > self.max_words:
-            self.words = self.words[:self.max_words]
-        # Add frequency count, relative font size and color to each word
-        total_frequency = 0
-        for word in self.words:
-            total_frequency += word["frequency"]
-        self.font_scale = self.max_font_size / self.words[0]['frequency']
-        for i, word in enumerate(self.words):
-            word["color"] = self.word_color(i)
-            word['font_size'] = int(self.font_scale * word['frequency'])
-            if word['font_size'] < self.min_font_size:
-                word['font_size'] = self.min_font_size
-            font = ImageFont.truetype(self.font_path, size=word['font_size'])
-            left, upper, right, lower = font.getbbox(word['text'])
-            word['width'] = right - left
-            word['height'] = lower - upper
-        # Set x and y with adjustment to minimse overlaps
-        for i, word in enumerate(self.words):
-            self.position_word_minimise_overlapping(word)
-        self.create_image()
+        # 4) Remove pure stopword tokens for ngrams=1
+        if self.ngrams == 1:
+            sw_set = set(self.stopwords)
+            units = [t for t in units if t not in sw_set]
 
-    def position_word_minimise_overlapping(self, word):
-        """ Try to reduce word overlap by identifying text font bounding boxes.
-         While there are overlaps keep creating new x, y coordinates until no overlaps.
-         Does not work perfectly, but does reduce overlaps. """
+        # 5) Build frequency dictionary
+        freq = {}
+        for u in units:
+            freq[u] = freq.get(u, 0) + 1
 
-        words2 = deepcopy(self.words)
-        words2.remove(word)
+        if not freq:
+            freq = {"NO WORDS": 1}
 
-        x_upper = self.width - 10 - word['width']
-        if x_upper < 0:
-            x_upper = 1
-        y_upper = self.height - 10 - word['height']
-        if y_upper < 0:
-            y_upper = 1
-        overlap = True
-        counter = 0
-        while overlap and counter < 1000:
-            word["x"] = randint(0, x_upper)
-            word["y"] = randint(0, y_upper)
-            overlap = False
-            counter += 1
-            for word2 in words2:
-                if word2['x'] <= word['x'] < word2['x'] + word2['width'] and \
-                        word2['y'] <= word['y'] < word2['y'] + word2['height'] and \
-                        word2['y'] != -100:
-                    overlap = True
-                    # print("Word ", word, "\nWord2", word2, "\n")
-                if word['x'] <= word2['x'] < word['x'] + word['width'] and \
-                        word['y'] <= word2['y'] < word['y'] + word['height'] and \
-                        word2['y'] != -100:
-                    overlap = True
-                    # print("Word ", word, "\nWord2", word2, "\n")
-                if word2['x'] <= word['x'] < word2['x'] + word2['width'] and \
-                        word['y'] <= word2['y'] < word['y'] + word['height'] and \
-                        word2['y'] != -100:
-                    overlap = True
-                if word['x'] <= word2['x'] < word['x'] + word['width'] and \
-                        word2['y'] <= word['y'] < word2['y'] + word2['height'] and \
-                        word2['y'] != -100:
-                    overlap = True
-        # If the word shape does not fit, do not use it.
-        if counter >= 1000:
-            word['y'] = - 100
-            word['text'] = ""
-        #print(word['text'], counter)
-        return
+        # ---- COLOR HANDLING ----
+        color_func, colormap = self._build_color_function()
 
-    def word_color(self, list_position):
-        """ Use list position and words count to determine colour in color range. """
+        # ---- WORDCLOUD CONSTRUCTION ----
+        wc = WordCloud(
+            width=self.width,
+            height=self.height,
+            max_words=self.max_words,
+            background_color=self.background_color,
+            stopwords=set(self.stopwords),
+            font_path=self.font_path,
+            color_func=color_func,
+            colormap=colormap,  # used only if color_func is None
+            scale=3  # higher-quality PNG
+        )
 
-        if self.color_range_chosen:
-            num_colors = len(self.color_range_chosen)
-            color_position = int(list_position / len(self.words) * num_colors)
-            color = self.color_range_chosen[color_position]
-            return color
-        if self.text_color == "random":
-            colors = []
-            for name, code in ImageColor.colormap.items():
-                colors.append(code)
-            color = colors[randint(0, len(colors) - 1)]
-            return color
-        return self.text_color
+        if self.reverse_colors:
+            if wc.colormap is not None and hasattr(wc.colormap, "reversed"):
+                wc.colormap = wc.colormap.reversed()
+
+        # Generate image from frequencies
+        wc.generate_from_frequencies(freq)
+
+        temp_filepath = os.path.join(os.path.expanduser("~"), ".qualcoder", "wordcloud_temp.png")
+        wc.to_file(temp_filepath)
+        webbrowser.open(temp_filepath)
+
+    # ---------------- helper methods ----------------
+
+    def _clean_text(self, fulltext: str) -> str:
+        """Remove most punctuation except apostrophe; convert to lowercase."""
+        chars = []
+        for ch in fulltext:
+            if ch.isalpha() or ch == "'":
+                chars.append(ch)
+            else:
+                chars.append(" ")
+        return "".join(chars).lower()
 
     def make_ngrams(self, tokens, number_of_words):
         """ Create trigrams from words list. """
@@ -276,30 +238,36 @@ class Wordcloud:
             ngrams_list.append(" ".join(tokens_list))
         return ngrams_list
 
-    def create_image(self):
-        """ Create image and save to Downloads. Draw lesser frequency words first.
-        Image saved to Downloads as png. """
+    def _build_color_function(self):
+        """Return (color_func, colormap) suitable for WordCloud based on text_color.
 
-        img = Image.new("RGB", (self.width, self.height), self.background_color)
-        draw = ImageDraw.Draw(img)
-        for word in reversed(self.words):
-            font = ImageFont.truetype(self.font_path, size=word['font_size'])
-            draw.text((word['x'], word['y']), word["text"], font=font, fill=word["color"])
-        time_now = datetime.datetime.now().astimezone().strftime("%H-%M-%S")
-        temp_filepath = os.path.join(os.path.expanduser("~"), ".qualcoder", f"wordcloud_temp.png")
-        img.save(temp_filepath)
-        webbrowser.open(temp_filepath)
-        ''' Should Open with default OS image program. No need to have a separate Save below.
-        filepath, ok = QtWidgets.QFileDialog.getSaveFileName(None, _("Save wordcloud"),
-                                                             self.app.settings['directory'],
-                                                             "PNG Files(*.png)")
-        # options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
-        if filepath is None or not ok:
-            return
-        if filepath[-3:] != ".png":
-            filepath += ".png"
-        img.save(filepath)'''
+        - If text_color is a named color range: build a color_func cycling through that list.
+        - If text_color is 'random': use default WordCloud random coloring (return (None, None)).
+        - Otherwise: treat text_color as a fixed color string (#rrggbb or named) and
+          build a color_func returning that color.
+        """
+        # Determine if text_color matches one of the defined color ranges
+        color_range_chosen = []
+        for color_range in color_ranges:
+            if color_range["name"] == self.text_color:
+                color_range_chosen = deepcopy(color_range["range"])
+                break
 
+        if color_range_chosen:
+            def color_func(word, font_size, position, orientation, random_state=None, **kwargs):
+                idx = abs(hash(word)) % len(color_range_chosen)
+                return color_range_chosen[idx]
+            return color_func, None
+
+        if self.text_color == "random":
+            return None, None
+
+        fixed_color = self.text_color
+
+        def single_color_func(word, font_size, position, orientation, random_state=None, **kwargs):
+            return fixed_color
+
+        return single_color_func, None
 
 if __name__ == "__main__":
     test_text = "qualcoder qualcoder qualcoder qualcoder dogs cats birds qualitative analysis  qualitative analysis qualitative analysis research research"
