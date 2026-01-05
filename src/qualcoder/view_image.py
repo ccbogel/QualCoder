@@ -1499,10 +1499,9 @@ class DialogCodeImage(QtWidgets.QDialog):
         draw.rectangle(bounding_box, fill="white")
         draw.text(position, text, font=font, fill="black")
 
-    @staticmethod
     def help(self):
         """ Open help for transcribe section in browser. """
-        webbrowser.open(self.app.help_wiki("4.4.-Coding-Images"))
+        self.app.help_wiki("4.4.-Coding-Images")
 
     def eventFilter(self, object_, event):
         """ Using this event filter to identify treeWidgetItem drop events.

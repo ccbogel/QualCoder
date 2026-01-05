@@ -338,4 +338,4 @@ class DialogSpeakers(QtWidgets.QDialog):
     @staticmethod
     def help(self):
         """ Open help in browser. """
-        webbrowser.open(self.app.help_wiki(""))
+        self.app.help_wiki("")

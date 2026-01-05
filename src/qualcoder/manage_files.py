@@ -163,10 +163,9 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.ui.tableWidget.horizontalHeader().setToolTip(_("Right click header row to hide columns"))
         self.load_file_data()
 
-    @staticmethod
     def help(self):
         """ Open help for transcribe section in browser. """
-        webbrowser.open(self.app.help_wiki("3.2.-Files"))
+        self.app.help_wiki("3.2.-Files")
 
     def pseudonyms(self):
         """ Pseudonymisation, data de-identification.

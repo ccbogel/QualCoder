@@ -292,10 +292,9 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.graphicsView.setScene(self.scene)
         self.ui.graphicsView.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.DefaultContextMenu)
 
-    @staticmethod
     def help(self):
         """ Open help for transcribe section in browser. """
-        webbrowser.open(self.app.help_wiki("4.5.-Coding-Audio-and-Video"))
+        self.app.help_wiki("4.5.-Coding-Audio-and-Video")
 
     def find_code_in_tree(self):
         """ Find a code by name in the codes tree and select it.
@@ -4344,11 +4343,10 @@ class DialogViewAV(QtWidgets.QDialog):
         txt = ui.text
         self.ui.textEdit.setText(txt)'''
 
-    @staticmethod
     def help(self):
         """ Open help for transcribe section in browser. """
 
-        webbrowser.open(self.app.help_wiki("3.2.-Files"))
+        self.app.help_wiki("3.2.-Files")
 
     def ddialog_menu(self, position):
         """ Context menu to export a screenshot, to resize dialog """

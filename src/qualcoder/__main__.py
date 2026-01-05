@@ -1232,7 +1232,7 @@ class App(object):
     def help_wiki(self, path):
         """ Send to the website """
         lang = "fr" if self.settings['language'] == 'fr' else "en"
-        return f"https://qualcoder-org.github.io/doc/{lang}/{path}"
+        return webbrowser.open(f"https://qualcoder-org.github.io/doc/{lang}/{path}")
        
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -1313,7 +1313,7 @@ Click "Yes" to start now.')
                 while reply is None or reply == QtWidgets.QMessageBox.StandardButton.Help:
                     reply = msg_box.exec()
                     if reply == QtWidgets.QMessageBox.StandardButton.Help:
-                        webbrowser.open(self.app.help_wiki("2.3.-AI-Setup"))                
+                        self.app.help_wiki("2.3.-AI-Setup")                
                 if reply == QtWidgets.QMessageBox.StandardButton.Yes:
                     self.ai_setup_wizard()  # (will also init the llm)
             else:
@@ -1752,11 +1752,10 @@ Click "Yes" to start now.')
         ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
         self.tab_layout_helper(self.ui.tab_reports, ui)
 
-    @staticmethod
     def help(self):
         """ Display manual in browser. """
 
-        webbrowser.open(self.app.help_wiki(""))
+        self.app.help_wiki("")
 
     def display_menu_key_shortcuts(self):
         self.ui.textEdit.append(menu_shortcuts_display)

@@ -3703,10 +3703,9 @@ class DialogCodePdf(QtWidgets.QWidget):
             color = 0
         return fontname, fontsize, color
 
-    @staticmethod
     def help(self):
         """ Open help for transcribe section in browser. """
-        webbrowser.open(self.app.help_wiki("4.3.-Coding-Text-on-PDFs"))
+        self.app.help_wiki("4.3.-Coding-Text-on-PDFs")
 
 
 class ToolTipEventFilter(QtCore.QObject):

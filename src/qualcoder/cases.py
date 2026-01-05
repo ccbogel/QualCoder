@@ -199,12 +199,9 @@ class DialogCases(QtWidgets.QDialog):
                     cur.execute("insert into attribute (value,id,name,attr_type, date,owner) values(?,?,?,'case',?,?)",
                                 ("", c['caseid'], att_name[0], now_date, self.app.settings['codername']))
                     self.app.conn.commit()
-
-    @staticmethod
     def help(self):
         """ Open help for transcribe section in browser. """
-
-        webbrowser.open(self.app.help_wiki("3.3.-Cases"))
+        self.app.help_wiki("3.3.-Cases")
 
     # Revise
     def count_selected_items(self):
