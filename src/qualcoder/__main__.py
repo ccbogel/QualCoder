@@ -1229,10 +1229,23 @@ class App(object):
         self.delete_backup_path_name = backup
         return msg, backup
         
-    def help_wiki(self, path):
-        """ Send to the website """
-        lang = "fr" if self.settings['language'] == 'fr' else "en"
-        return webbrowser.open(f"https://qualcoder-org.github.io/doc/{lang}/{path}")
+    def help_wiki(self, page_path):
+        """ Open website doc help page in https://qualcoder-org.github.io.
+        Assumes English pages are present as a default.
+        Args:
+            page_path : String : specific page
+        """
+
+        lang = self.settings['language']
+        if lang not in ("en", "fr"):
+            lang = "en"
+        try:
+            urllib.request.urlopen(f"https://qualcoder-org.github.io/doc/{lang}/{page_path}")
+        except urllib.error.HTTPError as err:
+            logger.warning(f"App.help_wiki:\nhttps://qualcoder-org.github.io/doc/{lang}/{page_path}\n{err}")
+            if err.code == 404:
+                lang = "en"
+        webbrowser.open(f"https://qualcoder-org.github.io/doc/{lang}/{page_path}")
        
 
 class MainWindow(QtWidgets.QMainWindow):
