@@ -578,7 +578,7 @@ class CodeOrganiser(QDialog):
         self.app.delete_backup = False
         self.parent_text_edit.append(_("Code tree re-organised."))
         self.hide()
-        Message(self.app, "Code organiser", "Changes applied to the codes tree").exec()
+        Message(self.app, _("Code organiser"), _("Changes applied to the codes tree")).exec()
 
     def update_merged_coded_segments(self, old_cid, new_cid):
         """ Update cid for each coded segment in text, A/V, image.
