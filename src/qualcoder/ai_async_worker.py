@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>.
 Author: Kai Droege (kaixxx)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io/
 
 Async worker for lengthy AI functions that would otherwise block the UI.
 Adopted from https://www.pythonguis.com/tutorials/multithreading-pyqt-applications-qthreadpool/ 
