@@ -606,10 +606,9 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         paste_shortcut.activated.connect(self.paste_prompt_from_clipboard)
         
     @staticmethod
-    def help():
+    def help(self):
         """ Open help in browser. """
-        url = "https://github.com/ccbogel/QualCoder/wiki/6.2.-AI-Prompt-Editing"
-        webbrowser.open(url)
+        webbrowser.open(self.app.help_wiki("6.2.-AI-Prompt-Editing"))
         
     def fill_tree(self):
         """ Fill tree with prompts, top level items are the prompt types. """

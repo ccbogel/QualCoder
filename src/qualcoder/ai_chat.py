@@ -219,10 +219,9 @@ class DialogAIChat(QtWidgets.QDialog):
             self.chat_history_conn.close()
             
     @staticmethod
-    def help():
+    def help(self):
         """ Open help in browser. """
-        url = "https://github.com/ccbogel/QualCoder/wiki/5.1.-AI-chat-based-analysis"
-        webbrowser.open(url)
+        webbrowser.open(self.app.help_wiki("5.1.-AI-chat-based-analysis"))
 
     def get_chat_list(self):
         """Load the current chat list from the database into self.chat_list

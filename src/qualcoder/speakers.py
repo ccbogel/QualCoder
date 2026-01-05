@@ -335,7 +335,6 @@ class DialogSpeakers(QtWidgets.QDialog):
             raise
 
     @staticmethod
-    def help():
+    def help(self):
         """ Open help in browser. """
-        url = "https://github.com/ccbogel/QualCoder/wiki/"
-        webbrowser.open(url)
+        webbrowser.open(self.app.help_wiki(""))

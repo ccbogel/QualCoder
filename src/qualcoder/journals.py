@@ -285,11 +285,9 @@ class DialogJournals(QtWidgets.QDialog):
             self.app.conn.commit()
 
     @staticmethod
-    def help():
+    def help(self):
         """ Open help for transcribe section in browser. """
-
-        url = "https://github.com/ccbogel/QualCoder/wiki/5.2.-Journals"
-        webbrowser.open(url)
+        webbrowser.open(self.app.help_wiki("5.2.-Journals"))
 
     def keyPressEvent(self, event):
         """ Used to activate buttons. """

@@ -199,11 +199,10 @@ class DialogCases(QtWidgets.QDialog):
                     self.app.conn.commit()
 
     @staticmethod
-    def help():
+    def help(self):
         """ Open help for transcribe section in browser. """
 
-        url = "https://github.com/ccbogel/QualCoder/wiki/3.3.-Cases"
-        webbrowser.open(url)
+        webbrowser.open(self.app.help_wiki("3.3.-Cases"))
 
     # Revise
     def count_selected_items(self):
