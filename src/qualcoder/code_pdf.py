@@ -16,6 +16,8 @@ If not, see <https://www.gnu.org/licenses/>.
 
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
+https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io/
 """
 from binascii import b2a_hex
 from copy import copy, deepcopy
@@ -3701,12 +3703,9 @@ class DialogCodePdf(QtWidgets.QWidget):
             color = 0
         return fontname, fontsize, color
 
-    @staticmethod
-    def help():
+    def help(self):
         """ Open help for transcribe section in browser. """
-
-        url = "https://github.com/ccbogel/QualCoder/wiki/4.3.-Coding-Text-on-PDFs"
-        webbrowser.open(url)
+        self.app.help_wiki("4.3.-Coding-Text-on-PDFs")
 
 
 class ToolTipEventFilter(QtCore.QObject):

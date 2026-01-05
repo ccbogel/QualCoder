@@ -16,6 +16,8 @@ If not, see <https://www.gnu.org/licenses/>.
 
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
+https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io/
 """
 
 import sqlite3
@@ -370,13 +372,9 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ai_search_found = False
         self.ai_include_coded_segments = None
         self.ai_search_analysis_counter = 0
-
-    @staticmethod
-    def help():
+    def help(self):
         """ Open help for transcribe section in browser. """
-
-        url = "https://github.com/ccbogel/QualCoder/wiki/4.1.-Coding-Text"
-        webbrowser.open(url)
+        self.app.help_wiki("4.1.-Coding-Text")
 
     def show_right_side_pane(self):
         """ Button press to show hidden right side pane. """

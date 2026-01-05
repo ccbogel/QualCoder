@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io/
 """
 
 from copy import deepcopy, copy
@@ -1498,12 +1499,9 @@ class DialogCodeImage(QtWidgets.QDialog):
         draw.rectangle(bounding_box, fill="white")
         draw.text(position, text, font=font, fill="black")
 
-    @staticmethod
-    def help():
+    def help(self):
         """ Open help for transcribe section in browser. """
-
-        url = "https://github.com/ccbogel/QualCoder/wiki/4.4.-Coding-Images"
-        webbrowser.open(url)
+        self.app.help_wiki("4.4.-Coding-Images")
 
     def eventFilter(self, object_, event):
         """ Using this event filter to identify treeWidgetItem drop events.

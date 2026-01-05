@@ -6,7 +6,7 @@ QualCoder is a qualitative data analysis application written in Python.
 Text files can be typed in manually or loaded from txt, odt, docx, html, htm, md, epub, rtf and  PDF files. Images, video, and audio can also be imported for coding. Codes can be assigned to text, images, and a/v selections and grouped into categories in a hierarchical fashion. Various types of reports can be produced including visual coding graphs, coder comparisons, and coding frequencies. AI models like GPT-4 from OpenAI can be used to explore your data and analyze the results.  
 
 This software has been used on MacOS and various Linux distros.
-Instructions and other information are available here: https://qualcoder.wordpress.com/ and on the [Github Wiki](https://github.com/ccbogel/QualCoder/wiki).
+Instructions and other information are available here: https://qualcoder.wordpress.com/ and on the [Documentation](https://qualcoder-org.github.io/doc/en/).
 
 It is best to download the Current Release from the Releases page: https://github.com/ccbogel/QualCoder/releases
 

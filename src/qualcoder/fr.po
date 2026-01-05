@@ -2,14 +2,14 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-# Justin <>, 2025.
+# Justin <>, 2025-2026.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: unnamed project\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-01-05 16:36+1100\n"
-"PO-Revision-Date: 2026-01-05 16:38+1100\n"
+"PO-Revision-Date: 2026-01-05 08:54+0100\n"
 "Last-Translator: Justin <>\n"
 "Language-Team: French\n"
 "Language: fr\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
-"X-Generator: Poedit 3.5\n"
+"X-Generator: Gtranslator 49.0\n"
 
 #: src\qualcoder\add_attribute.py:74
 msgid "This attribute name already exists in cases, files or journals."
@@ -1397,9 +1397,8 @@ msgid "Code tree re-organised."
 msgstr "Réorganisation de l'arborescence du code."
 
 #: src\qualcoder\code_organiser.py:581
-#, fuzzy
 msgid "Code organiser"
-msgstr "Réorganisation de l'arborescence du code."
+msgstr "Organisateur de code"
 
 #: src\qualcoder\code_organiser.py:581
 msgid "Changes applied to the codes tree"

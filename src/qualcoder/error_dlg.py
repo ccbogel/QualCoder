@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>.
 Author: Kai Dröge (kaixxx)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io/
 """
 
 import sys
