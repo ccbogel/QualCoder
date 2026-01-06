@@ -44,9 +44,9 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>-391</y>
-        <width>795</width>
-        <height>997</height>
+        <y>0</y>
+        <width>787</width>
+        <height>1074</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -494,11 +494,6 @@ Not recommended unless you have many large files slowing the backup.</string>
                  <string>18</string>
                 </property>
                </item>
-               <item>
-                <property name="text">
-                 <string>20</string>
-                </property>
-               </item>
               </widget>
              </item>
              <item row="3" column="2">
@@ -533,11 +528,6 @@ Not recommended unless you have many large files slowing the backup.</string>
                  <string>18</string>
                 </property>
                </item>
-               <item>
-                <property name="text">
-                 <string>20</string>
-                </property>
-               </item>
               </widget>
              </item>
              <item row="4" column="2">
@@ -570,11 +560,6 @@ Not recommended unless you have many large files slowing the backup.</string>
                <item>
                 <property name="text">
                  <string>18</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>20</string>
                 </property>
                </item>
               </widget>
@@ -758,6 +743,7 @@ Not recommended unless you have many large files slowing the backup.</string>
             </property>
             <property name="font">
              <font>
+              <weight>50</weight>
               <bold>false</bold>
              </font>
             </property>
@@ -1110,7 +1096,7 @@ Not recommended unless you have many large files slowing the backup.</string>
                <property name="insertPolicy">
                 <enum>QComboBox::NoInsert</enum>
                </property>
-               <property name="placeholderText">
+               <property name="placeholderText" stdset="0">
                 <string>&lt;select available model&gt;</string>
                </property>
               </widget>
@@ -1252,7 +1238,7 @@ Not recommended unless you have many large files slowing the backup.</string>
                <property name="sizeAdjustPolicy">
                 <enum>QComboBox::AdjustToContentsOnFirstShow</enum>
                </property>
-               <property name="placeholderText">
+               <property name="placeholderText" stdset="0">
                 <string>&lt;select available model&gt;</string>
                </property>
               </widget>
