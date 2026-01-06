@@ -16,6 +16,8 @@ If not, see <https://www.gnu.org/licenses/>.
 
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
+https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io/
 """
 
 import csv
@@ -197,13 +199,9 @@ class DialogCases(QtWidgets.QDialog):
                     cur.execute("insert into attribute (value,id,name,attr_type, date,owner) values(?,?,?,'case',?,?)",
                                 ("", c['caseid'], att_name[0], now_date, self.app.settings['codername']))
                     self.app.conn.commit()
-
-    @staticmethod
-    def help():
+    def help(self):
         """ Open help for transcribe section in browser. """
-
-        url = "https://github.com/ccbogel/QualCoder/wiki/3.3.-Cases"
-        webbrowser.open(url)
+        self.app.help_wiki("3.3.-Cases")
 
     # Revise
     def count_selected_items(self):

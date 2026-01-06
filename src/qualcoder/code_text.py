@@ -16,6 +16,8 @@ If not, see <https://www.gnu.org/licenses/>.
 
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
+https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io/
 """
 
 import sqlite3
@@ -76,7 +78,7 @@ class DialogCodeText(QtWidgets.QWidget):
     recent_codes = []  # List of recent codes (up to 5) for textedit context menu
     categories = []
     tree_sort_option = "all asc"  # all desc, cat then code asc
-    filenames = []
+    files = []
     file_ = None  # Contains filename and file id returned from SelectItems
     code_text = []
     annotations = []
@@ -220,6 +222,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.lineEdit_search.returnPressed.connect(self.search_for_text)
         self.ui.tabWidget.currentChanged.connect(self.tab_changed)
         self.ui.tabWidget.setCurrentIndex(0)  # Defaults to list of documents
+        self.files = []
         self.get_files()
 
         # Buttons under files list
@@ -316,7 +319,6 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.treeWidget.viewport().installEventFilter(self)
         self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
-        #self.ui.treeWidget.itemSelectionChanged.connect(self.fill_code_label_with_selected_code)
         self.ui.treeWidget.itemPressed.connect(self.fill_code_label_with_selected_code)
         self.ui.comboBox_export.currentIndexChanged.connect(self.export_option_selected)
         index = self.ui.comboBox_fontsize.findText(str(self.app.settings['docfontsize']),
@@ -373,16 +375,12 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ai_include_coded_segments = None
         self.ai_search_analysis_counter = 0
 
-    @staticmethod
-    def help():
+    def help(self):
         """ Open help for transcribe section in browser. """
-
-        url = "https://github.com/ccbogel/QualCoder/wiki/4.1.-Coding-Text"
-        webbrowser.open(url)
+        self.app.help_wiki("4.1.-Coding-Text")
 
     def show_right_side_pane(self):
         """ Button press to show hidden right side pane. """
-
         self.ui.splitter.setSizes([150, 300, 100])
 
     def set_default_new_code_color(self):
@@ -474,7 +472,7 @@ class DialogCodeText(QtWidgets.QWidget):
         This will fill the self.app.collapsed_categories and is the expanded/collapsed tree is then replicated across
         other areas of the app. """
 
-        #print(item.text(0), item.text(1), "Expanded:", item.isExpanded())
+        # print(item.text(0), item.text(1), "Expanded:", item.isExpanded())
         if item.text(1)[:3] == "cid":
             return
         if not item.isExpanded() and item.text(1) not in self.app.collapsed_categories:
@@ -1197,8 +1195,6 @@ class DialogCodeText(QtWidgets.QWidget):
         menu = QtWidgets.QMenu()
         menu.setStyleSheet('font-size:' + str(self.app.settings['fontsize']) + 'pt')
         menu.setToolTipsVisible(True)
-        action_annotate = None
-        action_copy = None
         action_code_memo = None
         action_edit_annotate = None
         action_important = None
@@ -2392,7 +2388,7 @@ class DialogCodeText(QtWidgets.QWidget):
             if diff.microseconds < 100000:
                 if mod in (QtCore.Qt.KeyboardModifier.AltModifier, QtCore.Qt.KeyboardModifier.ShiftModifier) \
                       and key in (QtCore.Qt.Key.Key_Left, QtCore.Qt.Key.Key_Right):
-                    return True # consume rapid shift + left clicks, etc. without changing selection
+                    return True  # consume rapid shift + left clicks, etc. without changing selection
                 else:
                     return False
             # Ctrl + E Edit mode - must be detected here as Ctrl E is overridden in editable textEdit
@@ -4162,9 +4158,6 @@ class DialogCodeText(QtWidgets.QWidget):
                     cur.execute("select pos0,pos1 from code_text where cid=? and fid=? and owner=?",
                                 [int(self.autocode_frag_all_first_within.split()[1]), f['id'], self.app.settings['codername']])
                     surround_codes = cur.fetchall()
-                    #print("Outer cid", int(self.autocode_frag_all_within.split()[1]))
-                    #for s in surround_codes:
-                    #    print(s)
                     if not surround_codes:
                         return
 
@@ -4353,7 +4346,7 @@ class DialogCodeText(QtWidgets.QWidget):
                                 "owner": item['owner']}
                             undo_list.append(undo)
                         except sqlite3.IntegrityError as e:
-                            #print(_("Autocode insert error ") + str(e))  # Possible a duplicate entry
+                            # print(_("Autocode insert error ") + str(e))  # Possible a duplicate entry
                             logger.debug(_("Autocode insert error ") + str(e))
                         self.app.delete_backup = False
                 self.app.conn.commit()

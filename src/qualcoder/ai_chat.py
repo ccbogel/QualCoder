@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>.
 Author: Kai Droege (kaixxx)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io/
 """
 
 from PyQt6 import QtWidgets, QtCore
@@ -218,11 +219,9 @@ class DialogAIChat(QtWidgets.QDialog):
         if self.chat_history_conn is not None:
             self.chat_history_conn.close()
             
-    @staticmethod
-    def help():
+    def help(self):
         """ Open help in browser. """
-        url = "https://github.com/ccbogel/QualCoder/wiki/5.1.-AI-chat-based-analysis"
-        webbrowser.open(url)
+        self.app.help_wiki("5.1.-AI-chat-based-analysis")
 
     def get_chat_list(self):
         """Load the current chat list from the database into self.chat_list

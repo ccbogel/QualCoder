@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io/
 """
 
 from copy import copy, deepcopy
@@ -620,16 +621,9 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         filepath = export_path.filepath
         if filepath is None:
             return
-
         wb = openpyxl.Workbook()
         ws = wb.active
-
-        #file_.write(f"{self.app.project_name}\n")
-        #file_.write(_("Date: ") + datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S") + "\n")
-        #file_.write(self.comparisons)
-
         ws.cell(column=1, row=1, value=f"Coder Comparison: {self.selected_coders[0]}, {self.selected_coders[1]}")
-
         headings = ["Code tree", "Agree %", "A and B %", "Not A Not B %", "Disagree %", "Agree coded only %", "Kappa"]
         for col, heading in enumerate(headings):
             ws.cell(column=col + 1, row=2, value=heading)
@@ -834,7 +828,6 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         This will fill the self.app.collapsed_categories and is the expanded/collapsed tree is then replicated across
         other areas of the app. """
 
-        #print(item.text(0), item.text(1), "Expanded:", item.isExpanded())
         if item.text(1)[:3] == "cid":
             return
         if not item.isExpanded() and item.text(1) not in self.app.collapsed_categories:

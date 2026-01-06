@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io/
 """
 
 import sqlite3
@@ -291,12 +292,9 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.graphicsView.setScene(self.scene)
         self.ui.graphicsView.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.DefaultContextMenu)
 
-    @staticmethod
-    def help():
+    def help(self):
         """ Open help for transcribe section in browser. """
-
-        url = "https://github.com/ccbogel/QualCoder/wiki/4.5.-Coding-Audio-and-Video"
-        webbrowser.open(url)
+        self.app.help_wiki("4.5.-Coding-Audio-and-Video")
 
     def find_code_in_tree(self):
         """ Find a code by name in the codes tree and select it.
@@ -4345,12 +4343,10 @@ class DialogViewAV(QtWidgets.QDialog):
         txt = ui.text
         self.ui.textEdit.setText(txt)'''
 
-    @staticmethod
-    def help():
+    def help(self):
         """ Open help for transcribe section in browser. """
 
-        url = "https://github.com/ccbogel/QualCoder/wiki/3.2.-Files"
-        webbrowser.open(url)
+        self.app.help_wiki("3.2.-Files")
 
     def ddialog_menu(self, position):
         """ Context menu to export a screenshot, to resize dialog """

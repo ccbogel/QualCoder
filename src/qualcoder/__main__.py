@@ -18,6 +18,7 @@ If not, see <https://www.gnu.org/licenses/>.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io/
 """
 
 import multiprocessing
@@ -1227,7 +1228,25 @@ class App(object):
         # Delete backup path - delete the backup if no changes occurred in the project during the session
         self.delete_backup_path_name = backup
         return msg, backup
+        
+    def help_wiki(self, page_path):
+        """ Open website doc help page in https://qualcoder-org.github.io.
+        Assumes English pages are present as a default.
+        Args:
+            page_path : String : specific page
+        """
 
+        lang = self.settings['language']
+        if lang not in ("en", "fr"):
+            lang = "en"
+        try:
+            urllib.request.urlopen(f"https://qualcoder-org.github.io/doc/{lang}/{page_path}")
+        except urllib.error.HTTPError as err:
+            logger.warning(f"App.help_wiki:\nhttps://qualcoder-org.github.io/doc/{lang}/{page_path}\n{err}")
+            if err.code == 404:
+                lang = "en"
+        webbrowser.open(f"https://qualcoder-org.github.io/doc/{lang}/{page_path}")
+       
 
 class MainWindow(QtWidgets.QMainWindow):
     """ Main GUI window.
@@ -1307,7 +1326,7 @@ Click "Yes" to start now.')
                 while reply is None or reply == QtWidgets.QMessageBox.StandardButton.Help:
                     reply = msg_box.exec()
                     if reply == QtWidgets.QMessageBox.StandardButton.Help:
-                        webbrowser.open('https://github.com/ccbogel/QualCoder/wiki/2.3.-AI-Setup')                
+                        self.app.help_wiki("2.3.-AI-Setup")                
                 if reply == QtWidgets.QMessageBox.StandardButton.Yes:
                     self.ai_setup_wizard()  # (will also init the llm)
             else:
@@ -1746,11 +1765,10 @@ Click "Yes" to start now.')
         ui.setAttribute(QtCore.Qt.WidgetAttribute.WA_DeleteOnClose)
         self.tab_layout_helper(self.ui.tab_reports, ui)
 
-    @staticmethod
-    def help():
+    def help(self):
         """ Display manual in browser. """
 
-        webbrowser.open("https://github.com/ccbogel/QualCoder/wiki")
+        self.app.help_wiki("")
 
     def display_menu_key_shortcuts(self):
         self.ui.textEdit.append(menu_shortcuts_display)

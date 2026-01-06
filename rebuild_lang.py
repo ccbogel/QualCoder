@@ -25,6 +25,7 @@ THE SOFTWARE.
 
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io/
 """
 
 import os

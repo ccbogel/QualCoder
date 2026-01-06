@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io/
 """
 
 import datetime
@@ -162,12 +163,9 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.ui.tableWidget.horizontalHeader().setToolTip(_("Right click header row to hide columns"))
         self.load_file_data()
 
-    @staticmethod
-    def help():
+    def help(self):
         """ Open help for transcribe section in browser. """
-
-        url = "https://github.com/ccbogel/QualCoder/wiki/3.2.-Files"
-        webbrowser.open(url)
+        self.app.help_wiki("3.2.-Files")
 
     def pseudonyms(self):
         """ Pseudonymisation, data de-identification.

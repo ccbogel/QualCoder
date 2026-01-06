@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io/
 """
 
 import logging
@@ -335,7 +336,6 @@ class DialogSpeakers(QtWidgets.QDialog):
             raise
 
     @staticmethod
-    def help():
+    def help(self):
         """ Open help in browser. """
-        url = "https://github.com/ccbogel/QualCoder/wiki/"
-        webbrowser.open(url)
+        self.app.help_wiki("")

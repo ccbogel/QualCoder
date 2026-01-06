@@ -18,6 +18,7 @@ If not, see <https://www.gnu.org/licenses/>.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io/
 """
 
 import base64
@@ -47,6 +48,7 @@ class CreateHelperFile:
         Author: Colin Curtain (ccbogel)\n\
         https://github.com/ccbogel/QualCoder\n\
         https://qualcoder.wordpress.com/\n\n\
+        https://qualcoder-org.github.io/\n\n\
         Generated base64 helper file\n"""\n\n'
 
         text = header

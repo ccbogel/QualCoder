@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io/
 """
 
 from PyQt6 import QtCore, QtWidgets, QtGui
@@ -284,12 +285,9 @@ class DialogJournals(QtWidgets.QDialog):
             cur.execute("delete from attribute where attr_type='journal' and id=?", [r[0], ])
             self.app.conn.commit()
 
-    @staticmethod
-    def help():
+    def help(self):
         """ Open help for transcribe section in browser. """
-
-        url = "https://github.com/ccbogel/QualCoder/wiki/5.2.-Journals"
-        webbrowser.open(url)
+        self.app.help_wiki("5.2.-Journals")
 
     def keyPressEvent(self, event):
         """ Used to activate buttons. """
