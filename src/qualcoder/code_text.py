@@ -49,6 +49,7 @@ from .report_codes import DialogReportCodes
 from .report_code_summary import DialogReportCodeSummary  # For isinstance()
 from .select_items import DialogSelectItems  # For isinstance()
 from .speakers import DialogSpeakers
+from .coder_names import DialogCoderNames
 from .ai_search_dialog import DialogAiSearch
 from .ai_prompts import PromptsList, DialogAiEditPrompts
 from .ai_chat import ai_chat_signal_emitter
@@ -192,7 +193,8 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.treeWidget.setStyleSheet(tree_font)
         doc_font = f'font: {self.app.settings["docfontsize"]}pt "{self.app.settings["font"]}";'
         self.ui.textEdit.setStyleSheet(doc_font)
-        self.ui.label_coder.setText(f"Coder: {self.app.settings['codername']}")
+        self.ui.lineEdit_coder.setText(self.app.settings['codername'])
+        self.ui.pushButton_coder.pressed.connect(self.edit_coder_names)
         self.ui.textEdit.setPlainText("")
         self.ui.textEdit.setAutoFillBackground(True)
         self.ui.textEdit.setToolTip("")
@@ -3452,6 +3454,11 @@ class DialogCodeText(QtWidgets.QWidget):
                 except Exception as e:
                     logger.debug(str(e))
                 break
+
+    def edit_coder_names(self):
+        ui_coder_names = DialogCoderNames(self.app)
+        if ui_coder_names.exec() == QtWidgets.QDialog.DialogCode.Accepted:
+            pass
             
     def mark_speakers(self):
         if self.file_ is not None: 
