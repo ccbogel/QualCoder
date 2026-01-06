@@ -1237,8 +1237,6 @@ class App(object):
         """
 
         lang = self.settings['language']
-        if lang not in ("en", "fr"):
-            lang = "en"
         try:
             urllib.request.urlopen(f"https://qualcoder-org.github.io/doc/{lang}/{page_path}")
         except urllib.error.HTTPError as err:
