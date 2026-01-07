@@ -609,7 +609,7 @@ class App(object):
         for row in result:
             codes.append(dict(zip(keys, row)))
         return codes, categories
-
+    
     def check_bad_file_links(self):
         """ Check all linked files are present.
          Called from MainWindow.open_project, view_av.
@@ -1155,7 +1155,126 @@ class App(object):
         for row in cur.fetchall():
             result.append(dict(zip(keys, row)))
         return result
+    
+    def get_last_project_coder(self) -> str:
+        """Returns the last coder name stored in the project table or 
+        an empty string if nothing is found there (old dab version 1-4)"""
+        if self.conn is None:
+            return ""
+        cur = self.conn.cursor()
+        try:
+            cur.execute("SELECT codername FROM project")
+            res = cur.fetchone()
+            if res[0] is not None:
+                return res[0]                   
+        except sqlite3.OperationalError: # db vers. 1-4 did not have codername in project table
+            return ""
+        
+    def update_coder_names(self):
+        """
+        Collects names from the 'owner' field in all tables, and updates the 
+        table 'coder_names' accordingly. The table will be created if not present.
+        
+        The function also creates views that filter out invisible coders for the 
+        following tables: 
+        code_image --> code_image_visible 
+        code_text  --> code_text_visible 
+        code_av    --> code_av_visible 
+        """
+        if self.conn is None:
+            return
+        system_coder_names = ['📌 ' + _('Speakers'), ] # in the future, we could add '🤖 AI' to the list, and more...
+        
+        cur = self.conn.cursor()
+        
+        try:
+            # create table 'coder_names' if not already present
+            sql = """
+                CREATE TABLE IF NOT EXISTS coder_names (
+                    name TEXT UNIQUE NOT NULL,
+                    visibility INTEGER NOT NULL DEFAULT 1 CHECK (visibility IN (0, 1))
+                );
+            """        
+            cur.execute(sql)
 
+            # Collect used coder names from all tables and add them to 'coder_names'.
+            # Visibility will default to 1 (True)
+            sql = """
+                INSERT OR IGNORE INTO coder_names (name)
+                    SELECT owner FROM code_image WHERE owner IS NOT NULL
+                    UNION SELECT owner FROM code_text WHERE owner IS NOT NULL
+                    UNION SELECT owner FROM code_av WHERE owner IS NOT NULL
+                    UNION SELECT owner FROM code_name WHERE owner IS NOT NULL
+                    UNION SELECT owner FROM code_cat WHERE owner IS NOT NULL
+                    UNION SELECT owner FROM cases WHERE owner IS NOT NULL
+                    UNION SELECT owner FROM case_text WHERE owner IS NOT NULL
+                    UNION SELECT owner FROM attribute WHERE owner IS NOT NULL
+                    UNION SELECT owner FROM attribute_type WHERE owner IS NOT NULL
+                    UNION SELECT owner FROM source WHERE owner IS NOT NULL
+                    UNION SELECT owner FROM annotation WHERE owner IS NOT NULL
+                    UNION SELECT owner FROM journal WHERE owner IS NOT NULL
+                    UNION SELECT owner FROM manage_files_display WHERE owner IS NOT NULL
+                    UNION SELECT owner FROM files_filter WHERE owner IS NOT NULL;
+            """
+            cur.execute(sql)
+
+            # Ensure current coder is added and visible
+            sql = """
+                INSERT INTO coder_names (name, visibility) 
+                VALUES (?, 1) 
+                ON CONFLICT(name) 
+                DO UPDATE SET visibility = 1
+            """
+            cur.execute(sql, (self.settings['codername'],))
+            
+            # Ensure last coder from project is added
+            last_project_coder = self.get_last_project_coder()
+            if last_project_coder != "":
+                cur.execute("INSERT OR IGNORE INTO coder_names (name) VALUES (?)", (last_project_coder, ))                    
+            
+            # Ensure system coder names are added
+            for name in system_coder_names:
+                cur.execute("INSERT OR IGNORE INTO coder_names (name) VALUES (?)", (name, ))
+            
+            # create views
+            cur.execute("""
+                CREATE VIEW IF NOT EXISTS code_image_visible AS
+                SELECT t.*
+                FROM code_image t
+                WHERE NOT EXISTS (
+                    SELECT 1
+                    FROM coder_names c
+                    WHERE c.name = t.owner
+                        AND c.visibility = 0
+                );
+            """)
+            cur.execute("""
+                CREATE VIEW IF NOT EXISTS code_text_visible AS
+                SELECT t.*
+                FROM code_text t
+                WHERE NOT EXISTS (
+                    SELECT 1
+                    FROM coder_names c
+                    WHERE c.name = t.owner
+                        AND c.visibility = 0
+                );
+            """)
+            cur.execute("""
+                CREATE VIEW IF NOT EXISTS code_av_visible AS
+                SELECT t.*
+                FROM code_av t
+                WHERE NOT EXISTS (
+                    SELECT 1
+                    FROM coder_names c
+                    WHERE c.name = t.owner
+                        AND c.visibility = 0
+                );
+            """)
+            self.conn.commit()
+        except:
+            self.conn.rollback()
+            raise
+    
     def get_coder_names_in_project(self):
         """ Get all coder names from all tables and from the config.ini file
         Design flaw is that current codername is not stored in a specific table in Database Versions 1 to 4.
@@ -1165,29 +1284,20 @@ class App(object):
         Returns:
             List of String coder names
         """
+        
+        if self.conn is None:
+            return [self.settings['codername']]
 
-        # Try except, as there may not be an open project, and might be an older <= v4 database
+        coder_names = []
         try:
+            self.update_coder_names()
             cur = self.conn.cursor()
-            cur.execute("select codername from project")
-            res = cur.fetchone()
-            if res[0] is not None:
-                self.settings['codername'] = res[0]
-        except sqlite3.OperationalError:
-            pass
-        # For versions 1 to 4, current coder name stored in the config.ini file, so is added here.
-        coder_names = [self.settings['codername']]
-        try:
-            cur = self.conn.cursor()
-            sql = "select owner from code_image union select owner from code_text union select owner from code_av "
-            sql += "union select owner from cases union select owner from source union select owner from code_name"
-            cur.execute(sql)
+            cur.execute("select name from coder_names")
             res = cur.fetchall()
             for r in res:
-                if r[0] not in coder_names:
-                    coder_names.append(r[0])
+                coder_names.append(r[0])
         except sqlite3.OperationalError:
-            pass
+            pass        
         return coder_names
          
     def save_backup(self, suffix=""):
@@ -2537,13 +2647,31 @@ Click "Yes" to start now.')
         # Potential design flaw to have the current coders name in the config.ini file (early versions of QC).
         # as it would change to this coder when opening different projects
         # Check that the coder name from setting ini file is in the project
-        # If not then replace with a name in the project
+        # If not then user is asked if they want to switch.
         # Database version 5 (QualCoder 2.8 and newer) stores the current coder in the project table
-        names = self.app.get_coder_names_in_project()
-        if self.app.settings['codername'] not in names and len(names) > 0:
-            self.app.settings['codername'] = names[0]
-            self.app.write_config_ini(self.app.settings, self.app.ai_models)
-            self.ui.textEdit.append(_("Default coder name changed to: ") + names[0])
+        last_project_coder = self.app.get_last_project_coder()
+        if last_project_coder != "" and last_project_coder != self.app.settings['codername']:
+            msg = _('Your current coder name ("{}") differs from the one last used in the project ("{}"). Do you want to keep your current name or switch to the one from the project?'.format(
+                self.app.settings['codername'], last_project_coder)
+            )
+            msg_box = Message(self.app, _('Coder name'), msg, 'warning')
+            msg_box.setStandardButtons(QtWidgets.QMessageBox.StandardButton.NoButton)  # Clear default buttons
+            keep_button = msg_box.addButton(_('Keep'), QtWidgets.QMessageBox.ButtonRole.YesRole)
+            switch_button = msg_box.addButton(_('Switch'), QtWidgets.QMessageBox.ButtonRole.NoRole)
+            cancel_button = msg_box.addButton(_('Cancel'), QtWidgets.QMessageBox.ButtonRole.RejectRole)
+            msg_box.setDefaultButton(keep_button) 
+            msg_box.exec()
+            res = msg_box.clickedButton()
+            if res == keep_button:
+                pass                
+            elif res == switch_button:
+                self.app.settings['codername'] = last_project_coder
+                self.app.write_config_ini(self.app.settings, self.app.ai_models)
+                self.ui.textEdit.append(_("Default coder name changed to: ") + last_project_coder)                
+            else:  # Cancel or closed
+                self.close_project()                
+                return
+
         # Display some project details
         self.app.append_recent_project(self.app.project_path)
         self.fill_recent_projects_menu_actions()
@@ -2831,6 +2959,11 @@ Click "Yes" to start now.')
         self.app.conn.commit()
         # Vacuum database
         cur.execute("vacuum")
+        self.app.conn.commit()
+        
+        # update coder_names table and current coder in project
+        self.app.update_coder_names()
+        cur.execute('update project set codername=?', [self.app.settings['codername']])
         self.app.conn.commit()
         
         # AI: init llm and update vectorstore

@@ -79,7 +79,7 @@ class Ui_Dialog_coders(object):
     def retranslateUi(self, Dialog_coders):
         _translate = QtCore.QCoreApplication.translate
         Dialog_coders.setWindowTitle(_translate("Dialog_coders", "Coders"))
-        self.label_2.setText(_translate("Dialog_coders", "Choose your own coder name and select which others should be visible:"))
+        self.label_2.setText(_translate("Dialog_coders", "Choose (✓) your own coder name and adjust the visibility of others:"))
         self.pushButton_add.setText(_translate("Dialog_coders", "Add"))
         self.pushButton_rename.setText(_translate("Dialog_coders", "Rename"))
         self.pushButton_merge.setText(_translate("Dialog_coders", "Merge"))
