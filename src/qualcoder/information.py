@@ -78,28 +78,25 @@ about = '<h1 class="western">About QualCoder</h1>\
 <p>QualCoderVersion</p>\
 <p>Optional: Install VLC for audio and video coding.<br /> \
 Optional: Install ffmpeg for waveform images.</p>\
-<p>Tested on: Ubuntu 24.04, Windows 11, used on macOS and on other Linux distros.</p>\
+<p>Tested on: Windows 11.</p>\
 <p></p>\
 <h2 class="western">Acknowledgements</h2>\
 <p>Ronggui Huang and Zhang Gehao for creating RQDA, which inspired this software.<br /> \
 Mike MacCana for the source code for the docx module.<br /> \
 User: bit4 on stackoverflow who presented the source code to convert html to text.<br /> \
 ebooklib: Aleksandar Erkalović https://github.com/aerkalov.<br /> \
-The VideoLAN team for the bindings to VLC. https://github.com/oaubert/python-vlc.<br /> \
-The ffmpeg team. https://ffmpeg.org/ used with waveform and spectrograph images.<br /> \
+The VideoLAN team for the bindings to VLC.<br /> \
 Julius Reich for creating the QualCoder logo.<br /> \
-Kai Dröge for developing and testing the code to incorporate artificial intelligence models for AI coding.<br /> \
- To various members on github for supporting this project.</p>\
+Kai Dröge for developing and testing the code to incorporate artificial intelligence models for AI, and more.<br /> \
+Justin Missaghieh--Poncet for French translations and setting up the new manual <a href="https://qualcoder-org.github.io" target="_blank">https://qualcoder-org.github.io</a><br /> \
+To various members on github for supporting this project.</p>\
 <h2 class="western">Other details</h2\
 <p>The qda data folder contains folders for imported documents, \
 images, audio and video. It also contains the sqlite database, named data.qda, which stores the coding data.</p>\
-<p>QualCoder creates a .qualcoder folder inside your home directory. \
-This contains QualCoder.log, config.ini (for settings) and \
-recent_project.txt. The config file contains the name of the current coder, \
-default working directory, selected font and other parameters.</p>\
+<p>QualCoder also creates a configuration folder inside your home directory.</p>\
 <p>QualCoder is written in python3 using Qt6 for the graphical interface.</p>\
 <p>The REFI-QDA Project import and export seem to work ok, but are not guaranteed to work.</p>\
-<p>Created by Colin Curtain BPharm GradDipComp PhD, python programmer, Lecturer University of Tasmania.</p>\
+<p>Created by Colin Curtain BPharm GradDipComp PhD, programmer, Lecturer University of Tasmania.</p>\
 <h2>Citation</h2>\
 Curtain, C. Dröge, K. (2025) QualCoder 3.7 [Computer software]. \
 Retrieved from https://github.com/ccbogel/QualCoder/releases/tag/3.7\
