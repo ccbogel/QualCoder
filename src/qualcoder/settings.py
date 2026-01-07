@@ -48,7 +48,7 @@ class DialogSettings(QtWidgets.QDialog):
         self.settings = app.settings
         self.ai_models = copy.deepcopy(self.app.ai_models)
         self.current_coder = self.app.settings['codername']
-        super(QtWidgets.QDialog, self).__init__(parent)  # overrride accept method
+        super(QtWidgets.QDialog, self).__init__(parent)
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_settings()
         self.ui.setupUi(self)
@@ -446,11 +446,17 @@ class DialogSettings(QtWidgets.QDialog):
         self.ui.label_current_coder.setText(_("Current coder: ") + self.current_coder)
 
     def choose_directory(self):
-        """ Choose default project directory. """
+        """ Choose default project output folder. """
 
         directory = QtWidgets.QFileDialog.getExistingDirectory(self,
-            _('Choose project directory'), self.settings['directory'])
+            _('Choose a default output folder'), self.settings['directory'])
         if directory == "":
+            return
+        if directory.endswith(".qualcoder"):
+            Message(self.app, _("Choose another folder"), _("Do not use the QualCoder configuration folder."),"warning").exec()
+            return
+        if directory.endswith(".qda"):
+            Message(self.app, _("Choose another folder"), _("Do not use the QualCoder data folder."),"warning").exec()
             return
         self.ui.label_directory.setText(directory)
         
