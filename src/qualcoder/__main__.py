@@ -1186,6 +1186,7 @@ class App(object):
         system_coder_names = ['📌 ' + _('Speakers'), ] # in the future, we could add '🤖 AI' to the list, and more...
         
         cur = self.conn.cursor()
+        initial_changes = self.conn.total_changes
         
         try:
             # create table 'coder_names' if not already present
@@ -1281,6 +1282,8 @@ class App(object):
                         AND c.visibility = 0
                 );
             """)
+            if self.conn.total_changes != initial_changes:
+                self.delete_backup = False
             self.conn.commit()
         except:
             self.conn.rollback()

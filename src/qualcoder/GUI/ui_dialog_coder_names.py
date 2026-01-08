@@ -45,6 +45,7 @@ class Ui_Dialog_coders(object):
         self.tableWidget.setColumnCount(2)
         self.tableWidget.setObjectName("tableWidget")
         self.tableWidget.horizontalHeader().setCascadingSectionResizes(False)
+        self.tableWidget.horizontalHeader().setDefaultSectionSize(160)
         self.tableWidget.horizontalHeader().setStretchLastSection(True)
         self.tableWidget.verticalHeader().setVisible(False)
         self.verticalLayout_2.addWidget(self.tableWidget)

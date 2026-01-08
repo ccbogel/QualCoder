@@ -51,8 +51,15 @@ class DialogCoderNames(QtWidgets.QDialog):
         headers = [_("Name"), _("Codings"), _("Visibility")]
         self.ui.tableWidget.setColumnCount(len(headers))
         self.ui.tableWidget.setHorizontalHeaderLabels(headers)
-        self.coder_names = []
         self.current_coder = self.app.settings['codername']
+        self.initial_current_coder = self.app.settings['codername']
+        self.coder_names = []
+        self.app.update_coder_names()
+        if self.app.conn is not None:
+            self.cursor = self.app.conn.cursor()
+            self.initial_changes = self.app.conn.total_changes # keep track of this value so we can determine later if any changes where made
+        else:
+            self.cursor = None
         self.fill_table()
         self.ui.tableWidget.itemChanged.connect(self.on_item_changed)
         self.ui.pushButton_add.clicked.connect(self.add_coder_name)
@@ -73,7 +80,6 @@ class DialogCoderNames(QtWidgets.QDialog):
             self.coder_names.append((self.current_coder, 1, 0))
             self.cursor = None
         else: 
-            self.cursor = self.app.conn.cursor()
             # collect coder names and codings count
             sql = """
                 SELECT
@@ -96,6 +102,8 @@ class DialogCoderNames(QtWidgets.QDialog):
         
                         
     def fill_table(self):
+        """Will fill the table widget with the contents of self.coder_names 
+        """
         self.ui.tableWidget.blockSignals(True)
         try:
             # clear
@@ -104,9 +112,7 @@ class DialogCoderNames(QtWidgets.QDialog):
                 self.ui.tableWidget.removeRow(0)
 
             # Add coder names from all tables including count for codings
-            self.app.update_coder_names()
-            self.read_coder_names()            
-
+            self.read_coder_names()
             for item in self.coder_names:
                 row = self.ui.tableWidget.rowCount()
                 self.ui.tableWidget.insertRow(row)
@@ -147,9 +153,6 @@ class DialogCoderNames(QtWidgets.QDialog):
                 self.ui.tableWidget.setCellWidget(row, 2, combo)   
         finally:
             self.ui.tableWidget.blockSignals(False)
-            self.ui.tableWidget.resizeColumnsToContents()
-            # self.ui.tableWidget.sortByColumn(0, QtCore.Qt.SortOrder.AscendingOrder)
-
 
     def on_item_changed(self, item):
         """Called if the selection status of a row changes. 
@@ -217,6 +220,7 @@ class DialogCoderNames(QtWidgets.QDialog):
         else:
             Message(self.app, _('Coder'), _('Open a project first.'), 'critical').exec()
 
+
     def _rename_coder(self, old_name, new_name) -> bool:
         """Renames the coder (owner) in all tables. 
         This function can also be used to merge two coder names if new_name is already existing.
@@ -232,7 +236,8 @@ class DialogCoderNames(QtWidgets.QDialog):
         """
         err_msg = _('An error occured while renaming.')
         if self.app.conn is not None:
-            self.cursor.execute("savepoint rename_coder") # allows to return to this point in case of an error
+            # Set savepoint. This allows us to return to this point in case of an error.
+            self.cursor.execute("savepoint rename_coder") 
             try: 
                 # update coder name in all tables
                 sqls = ["update code_image set owner=? where owner=?",
@@ -283,10 +288,9 @@ class DialogCoderNames(QtWidgets.QDialog):
                 except sqlite3.IntegrityError: # new_name already exists (=merging), delete old_name 
                     self.cursor.execute("delete from coder_names where name=?", [old_name])
 
-
             except Exception as e:
                 # In case of an error that could not be resolved (like deleting duplicates), 
-                # we restore the state before renaming started, and show an error message so
+                # we restore the state before renaming started, and show an error message, so
                 # users can address the issue manually.
                 self.cursor.execute("rollback to rename_coder")
                 self.cursor.execute("release rename_coder")
@@ -298,6 +302,10 @@ class DialogCoderNames(QtWidgets.QDialog):
 
         if self.current_coder == old_name:
             self.current_coder = new_name
+            # ensure current coder is "visible"
+            if self.app.conn is not None:
+                self.cursor.execute("UPDATE coder_names SET visibility = 1 WHERE name = ?", (self.current_coder, ))
+
         self.fill_table()
         return True
 
@@ -354,10 +362,18 @@ class DialogCoderNames(QtWidgets.QDialog):
 
 
     def ok(self):
+        if self.initial_current_coder != self.current_coder:
+            self.app.settings['codername'] = self.current_coder
+            self.app.write_config_ini(self.app.settings, self.app.ai_models)
+            if self.app.conn is not None:
+                self.cursor.execute('update project set codername=?', [self.current_coder])
+            self.app.delete_backup = False
+            
+        if self.app.conn is not None and self.app.conn.total_changes != self.initial_changes:
+            self.app.delete_backup = False
+        
         if self.app.conn is not None:
-            self.cursor.execute('update project set codername=?', [self.current_coder])
             self.app.conn.commit() # this writes all the changes finally to the database
-        self.app.settings['codername'] = self.current_coder
         
         
     def cancel(self):
