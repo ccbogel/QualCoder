@@ -88,7 +88,8 @@ class DialogCoderNames(QtWidgets.QDialog):
                     (
                         SELECT COUNT(*) FROM code_av ca WHERE ca.owner = cn.name
                     ) AS codings_count
-                FROM coder_names cn;
+                FROM coder_names cn
+                ORDER BY cn.name;
             """
             self.cursor.execute(sql)
             self.coder_names = self.cursor.fetchall()
@@ -146,9 +147,8 @@ class DialogCoderNames(QtWidgets.QDialog):
                 self.ui.tableWidget.setCellWidget(row, 2, combo)   
         finally:
             self.ui.tableWidget.blockSignals(False)
-            # self.ui.tableWidget.verticalHeader().setStretchLastSection(True)
             self.ui.tableWidget.resizeColumnsToContents()
-            self.ui.tableWidget.sortByColumn(0, QtCore.Qt.SortOrder.AscendingOrder)
+            # self.ui.tableWidget.sortByColumn(0, QtCore.Qt.SortOrder.AscendingOrder)
 
 
     def on_item_changed(self, item):
@@ -325,6 +325,9 @@ class DialogCoderNames(QtWidgets.QDialog):
         new_name = str(dialog.textValue())
         if new_name == old_name:
             Message(self.app, _('Coder'), _('Old and new name are identical.'), 'critical').exec()
+            return
+        if new_name == "":
+            Message(self.app, _('Coder'), _('Coder name cannot be empty.'), 'critical').exec()
             return
         # check if new_name already exists (required for merging, not allowed for renaming)
         new_name_exists = False
