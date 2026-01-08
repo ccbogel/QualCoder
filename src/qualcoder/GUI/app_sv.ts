@@ -27,194 +27,194 @@
 <context>
     <name>DialogCharts</name>
     <message>
-        <location filename="ui_dialog_charts.py" line="290"/>
+        <location filename="ui_dialog_charts.py" line="284"/>
         <source>Charts</source>
         <translation>Diagram</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="291"/>
+        <location filename="ui_dialog_charts.py" line="285"/>
         <source>Charts displayed in the default web browser</source>
         <translation>Diagram visas i standardwebbläsaren</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="292"/>
+        <location filename="ui_dialog_charts.py" line="286"/>
         <source>Pie charts</source>
         <translation>Cirkeldiagram</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="293"/>
+        <location filename="ui_dialog_charts.py" line="287"/>
         <source>Bar charts</source>
         <translation>Stapeldiagram</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="294"/>
+        <location filename="ui_dialog_charts.py" line="288"/>
         <source>Sunburst and treemap charts</source>
         <translation>Solros- och trädstrukturdiagram</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="295"/>
+        <location filename="ui_dialog_charts.py" line="289"/>
         <source>Select coder</source>
         <translation>Välj kodare</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="296"/>
+        <location filename="ui_dialog_charts.py" line="290"/>
         <source>Select file</source>
         <translation>Välj fil</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="299"/>
+        <location filename="ui_dialog_charts.py" line="293"/>
         <source>If portions of a text file are assigned to a case, the code frequency and total text characters may be incorrect.
 Codings from the entire text file are used for the calculations.</source>
         <translation>Om delar av en textfil är tilldelade ett fall kan kodfrekvensen och det totala antalet tecken bli fel.
 Kodningar från hela textfilen används för beräkningarna.</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="301"/>
+        <location filename="ui_dialog_charts.py" line="295"/>
         <source>Select case</source>
         <translation>Välj fall</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="302"/>
+        <location filename="ui_dialog_charts.py" line="296"/>
         <source>Select attributes</source>
         <translation>Välj attribut</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="303"/>
+        <location filename="ui_dialog_charts.py" line="297"/>
         <source>Filter out values below:</source>
         <translation>Filtrera bort värden under:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="304"/>
+        <location filename="ui_dialog_charts.py" line="298"/>
         <source>Enter number for filter cut off</source>
         <translation>Ange ett tal som gränsvärde för filtret</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="305"/>
+        <location filename="ui_dialog_charts.py" line="299"/>
         <source>&lt;b&gt;Data filters&lt;/b&gt;</source>
         <translation>&lt;b&gt;Datafilter&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="306"/>
+        <location filename="ui_dialog_charts.py" line="300"/>
         <source>&lt;b&gt;Coding charts&lt;/b&gt;</source>
         <translation>&lt;b&gt;Kodningsdiagram&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="307"/>
+        <location filename="ui_dialog_charts.py" line="301"/>
         <source>Select category</source>
         <translation>Välj kategori</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="308"/>
+        <location filename="ui_dialog_charts.py" line="302"/>
         <source>&lt;b&gt;Attribute charts&lt;/b&gt;</source>
         <translation>&lt;b&gt;Attributdiagram&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="309"/>
+        <location filename="ui_dialog_charts.py" line="303"/>
         <source>Numeric attributes</source>
         <translation>Numeriska attribut</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="310"/>
+        <location filename="ui_dialog_charts.py" line="304"/>
         <source>Character attributes</source>
         <translation>Textattribut</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="311"/>
+        <location filename="ui_dialog_charts.py" line="305"/>
         <source>File</source>
         <translation>Fil</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="312"/>
+        <location filename="ui_dialog_charts.py" line="306"/>
         <source>Case</source>
         <translation>Fall</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="313"/>
+        <location filename="ui_dialog_charts.py" line="307"/>
         <source>Export HTML file</source>
         <translation>Exportera HTML-fil</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="314"/>
+        <location filename="ui_dialog_charts.py" line="308"/>
         <source>&lt;b&gt;Heatmap charts&lt;/b&gt;</source>
         <translation>&lt;b&gt;Värmekartediagram&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="315"/>
+        <location filename="ui_dialog_charts.py" line="309"/>
         <source>Word cloud</source>
         <translation>Ordmoln</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="316"/>
+        <location filename="ui_dialog_charts.py" line="310"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Background&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Bakgrund&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="317"/>
+        <location filename="ui_dialog_charts.py" line="311"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Foreground&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Förgrund&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="318"/>
+        <location filename="ui_dialog_charts.py" line="312"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Make Word Cloud&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Skapa ordmoln&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="319"/>
+        <location filename="ui_dialog_charts.py" line="313"/>
         <source>Width</source>
         <translation>Bredd</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="320"/>
+        <location filename="ui_dialog_charts.py" line="314"/>
         <source>Height</source>
         <translation>Höjd</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="321"/>
+        <location filename="ui_dialog_charts.py" line="315"/>
         <source>Max words</source>
         <translation>Maximalt antal ord</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="323"/>
+        <location filename="ui_dialog_charts.py" line="317"/>
         <source>Reverse colour range</source>
         <translation>Omvänd färgskala</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="324"/>
+        <location filename="ui_dialog_charts.py" line="318"/>
         <source>Reverse range</source>
         <translation>Omvänd skala</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="325"/>
+        <location filename="ui_dialog_charts.py" line="319"/>
         <source>Number of conjoined words in phrase. Stopwords applies to selection of 1 word only.</source>
         <translation>Antal sammansatta ord i fras. Stoppord gäller endast vid val av ett ord.</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="326"/>
+        <location filename="ui_dialog_charts.py" line="320"/>
         <source>n-grams</source>
         <translation>n-gram</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="327"/>
+        <location filename="ui_dialog_charts.py" line="321"/>
         <source>1=One word, 3=3 word phrase, 4=4 word phrase</source>
         <translation>1=Ett ord, 3=3-ordsfras, 4=4-ordsfras</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="328"/>
+        <location filename="ui_dialog_charts.py" line="322"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This is to allow a wider spread of heatmap colours when there are extreme count differences.&lt;/p&gt;&lt;p&gt;0 represents no limit.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Dett är för att möjliggöra en bredare palett av heatmap färger när det finns extrema skillnader i antal.&lt;/p&gt;&lt;p&gt;0 representerar obegränsat.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="329"/>
+        <location filename="ui_dialog_charts.py" line="323"/>
         <source>Upper count limiter</source>
         <translation>Övre räknare</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="330"/>
+        <location filename="ui_dialog_charts.py" line="324"/>
         <source>&lt;b&gt;Cumulative barchart&lt;/b&gt;</source>
         <translation>&lt;b&gt;Kumulativ stapeldiagram&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="331"/>
+        <location filename="ui_dialog_charts.py" line="325"/>
         <source>Selecting a text file here will override exisitng stopwords in the software, and also override stopwords stored in the .qualcoder configuration folder. 
 This is temporary and must be selected each time the Charts screen is opened.
 
@@ -227,7 +227,7 @@ Filen måste vara ren text med ett ord per rad.
 Varje ord exkluderas i n-grams=1 Word cloud.</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="336"/>
+        <location filename="ui_dialog_charts.py" line="330"/>
         <source>Stop words</source>
         <translation>Stop ord</translation>
     </message>
@@ -3183,406 +3183,401 @@ Använd inte apostrof eller kommatecken i några värden</translation>
 <context>
     <name>Dialog_settings</name>
     <message>
-        <location filename="ui_dialog_settings.py" line="544"/>
+        <location filename="ui_dialog_settings.py" line="542"/>
         <source>Settings</source>
         <translation>Inställningar</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="545"/>
+        <location filename="ui_dialog_settings.py" line="543"/>
         <source>Backup project folder every time project is opened</source>
         <translation>Backup Project -mappen varje gång projekt öppnas</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="546"/>
+        <location filename="ui_dialog_settings.py" line="544"/>
         <source>Default project directory</source>
         <translation>Standardprojektkatalog</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="547"/>
+        <location filename="ui_dialog_settings.py" line="545"/>
         <source>Backup video and audio files. Uncheck to speed up backups.
 Not recommended unless you have many large files slowing the backup.</source>
         <translation>Säkerhetskopieringsvideo- och ljudfiler.Avmarkera för att påskynda säkerhetskopior.
 Rekommenderas inte om du inte har många stora filer som bromsar säkerhetskopian.</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="549"/>
+        <location filename="ui_dialog_settings.py" line="547"/>
         <source>Backups</source>
         <translation>Säkerhetskopiering</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="550"/>
+        <location filename="ui_dialog_settings.py" line="548"/>
         <source>0</source>
         <translation>0</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="551"/>
+        <location filename="ui_dialog_settings.py" line="549"/>
         <source>1</source>
         <translation>1</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="552"/>
+        <location filename="ui_dialog_settings.py" line="550"/>
         <source>2</source>
         <translation>2</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="553"/>
+        <location filename="ui_dialog_settings.py" line="551"/>
         <source>3</source>
         <translation>3</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="554"/>
+        <location filename="ui_dialog_settings.py" line="552"/>
         <source>4</source>
         <translation>4</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="555"/>
+        <location filename="ui_dialog_settings.py" line="553"/>
         <source>5</source>
         <translation>5</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="556"/>
+        <location filename="ui_dialog_settings.py" line="554"/>
         <source>Select another coder in this project</source>
         <translation>Välj en annan kodare i detta projekt</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="557"/>
+        <location filename="ui_dialog_settings.py" line="555"/>
         <source>Other coders</source>
         <translation>Andra kodare</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="558"/>
+        <location filename="ui_dialog_settings.py" line="556"/>
         <source>New coder</source>
         <translation>Ny kodare</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="559"/>
+        <location filename="ui_dialog_settings.py" line="557"/>
         <source>Set this name as the current coder.
 </source>
         <translation>Ställ in detta namn som den nuvarande kodaren.
 </translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="561"/>
+        <location filename="ui_dialog_settings.py" line="559"/>
         <source>Apply</source>
         <translation>Tillämpas</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="562"/>
+        <location filename="ui_dialog_settings.py" line="560"/>
         <source>Current coder: </source>
         <translation>Aktuell kodare: </translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="563"/>
+        <location filename="ui_dialog_settings.py" line="561"/>
         <source>/</source>
         <translation>/</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="564"/>
+        <location filename="ui_dialog_settings.py" line="562"/>
         <source>Language</source>
         <translation>Språk</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="565"/>
+        <location filename="ui_dialog_settings.py" line="563"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Close and open the software for the change in language to occur.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; Stäng och öppna programvaran för att språkförändringen ska inträffa. &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="566"/>
+        <location filename="ui_dialog_settings.py" line="564"/>
         <source>General font and size</source>
         <translation>Allmänt teckensnitt och storlek</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="567"/>
+        <location filename="ui_dialog_settings.py" line="565"/>
         <source>Font size for codes tree</source>
         <translation>Teckensnittsstorlek för koder Träd</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="568"/>
+        <location filename="ui_dialog_settings.py" line="566"/>
         <source>Font size for documents</source>
         <translation>Teckensnittsstorlek för dokument</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="569"/>
+        <location filename="ui_dialog_settings.py" line="567"/>
         <source>Reports with text context</source>
         <translation>Rapporter med textsammanhang</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="570"/>
+        <location filename="ui_dialog_settings.py" line="568"/>
         <source>Characters before and after</source>
         <translation>Tecken före och efter</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="571"/>
+        <location filename="ui_dialog_settings.py" line="569"/>
         <source>Text context, coded text style</source>
         <translation>Textsammanhang, kodad textstil</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="586"/>
+        <location filename="ui_dialog_settings.py" line="582"/>
         <source>8</source>
         <translation>8</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="587"/>
+        <location filename="ui_dialog_settings.py" line="583"/>
         <source>10</source>
         <translation>10</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="588"/>
+        <location filename="ui_dialog_settings.py" line="584"/>
         <source>12</source>
         <translation>12</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="589"/>
+        <location filename="ui_dialog_settings.py" line="585"/>
         <source>14</source>
         <translation>14</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="590"/>
+        <location filename="ui_dialog_settings.py" line="586"/>
         <source>16</source>
         <translation>16</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="591"/>
+        <location filename="ui_dialog_settings.py" line="587"/>
         <source>18</source>
         <translation>18</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="592"/>
-        <source>20</source>
-        <translation>20</translation>
-    </message>
-    <message>
-        <location filename="ui_dialog_settings.py" line="593"/>
+        <location filename="ui_dialog_settings.py" line="588"/>
         <source>100</source>
         <translation>100</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="594"/>
+        <location filename="ui_dialog_settings.py" line="589"/>
         <source>200</source>
         <translation>200</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="595"/>
+        <location filename="ui_dialog_settings.py" line="590"/>
         <source>300</source>
         <translation>300</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="602"/>
+        <location filename="ui_dialog_settings.py" line="597"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show the identifying numbers for files, cases, codes, et cetera.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; Visa identifierande nummer för filer, fall, koder, et cetera. &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="603"/>
+        <location filename="ui_dialog_settings.py" line="598"/>
         <source>Show IDs</source>
         <translation>Visa ID</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="596"/>
+        <location filename="ui_dialog_settings.py" line="591"/>
         <source>50000</source>
         <translation>50000</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="597"/>
+        <location filename="ui_dialog_settings.py" line="592"/>
         <source>40000</source>
         <translation>40000</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="598"/>
+        <location filename="ui_dialog_settings.py" line="593"/>
         <source>30000</source>
         <translation>30000</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="599"/>
+        <location filename="ui_dialog_settings.py" line="594"/>
         <source>20000</source>
         <translation>20000</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="604"/>
+        <location filename="ui_dialog_settings.py" line="599"/>
         <source>Style</source>
         <translation>Stil</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="600"/>
+        <location filename="ui_dialog_settings.py" line="595"/>
         <source>Very large text documents. Load text chunks by number of characters.</source>
         <translation>Mycket stora textdokument.Ladda textbitar efter antal tecken.</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="601"/>
+        <location filename="ui_dialog_settings.py" line="596"/>
         <source>Code text chunk size</source>
         <translation>Kodtextbitstorlek</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="605"/>
+        <location filename="ui_dialog_settings.py" line="600"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Used when entering time position in transcription&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt; &lt;Head /&gt; &lt;body&gt; &lt;p&gt; Används vid tidsposition i transkription &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="606"/>
+        <location filename="ui_dialog_settings.py" line="601"/>
         <source>Time format</source>
         <translation>Tidsformat</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="607"/>
+        <location filename="ui_dialog_settings.py" line="602"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Used when entering speaker name in transcription&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt; &lt;huvud/&gt; &lt;body&gt; &lt;p&gt; Används vid inmatning av högtalarnamn i transkription &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="608"/>
+        <location filename="ui_dialog_settings.py" line="603"/>
         <source>Speaker format</source>
         <translation>Högtalarformat</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="609"/>
+        <location filename="ui_dialog_settings.py" line="604"/>
         <source>AI Integration</source>
         <translation>AI -integration</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="610"/>
+        <location filename="ui_dialog_settings.py" line="605"/>
         <source>enable AI integration</source>
         <translation>Aktivera AI -integration</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="613"/>
+        <location filename="ui_dialog_settings.py" line="608"/>
         <source>Description:</source>
         <translation>Beskrivning:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="612"/>
+        <location filename="ui_dialog_settings.py" line="607"/>
         <source>Get Access:</source>
         <translation>Få åtkomst:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="611"/>
+        <location filename="ui_dialog_settings.py" line="606"/>
         <source>API key</source>
         <translation>API -nyckel</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="635"/>
+        <location filename="ui_dialog_settings.py" line="630"/>
         <source>You can use the Project Memo (found in the menu: Project &gt; Project Memo) to convey background information about your research, including objectives, methodology, and data, to the AI. This will help the AI generate more accurate and relevant responses. Deselect this option if you use the Project Memo for other purposes.</source>
         <translation>Du kan använda projektmemo (finns i menyn: Projekt&gt; Projektmemo) för att förmedla bakgrundsinformation om din forskning, inklusive mål, metodik och data, till AI.Detta hjälper AI att generera mer exakta och relevanta svar.Avmarkera det här alternativet om du använder projektmemo för andra ändamål.</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="636"/>
+        <location filename="ui_dialog_settings.py" line="631"/>
         <source>Send project memo to AI</source>
         <translation>Skicka projektmemo till AI</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="630"/>
+        <location filename="ui_dialog_settings.py" line="625"/>
         <source>Language for AI conversations: </source>
         <translation>Språk för AI -konversationer: </translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="627"/>
+        <location filename="ui_dialog_settings.py" line="622"/>
         <source>If selected, the conversations will be in the same language as the rest of the user interface. You can select this language at the top of this window.</source>
         <translation>Om det väljs kommer konversationerna att vara på samma språk som resten av användargränssnittet.Du kan välja det här språket högst upp i detta fönster.</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="628"/>
+        <location filename="ui_dialog_settings.py" line="623"/>
         <source>same as UI</source>
         <translation>Samma som UI</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="640"/>
+        <location filename="ui_dialog_settings.py" line="635"/>
         <source>Enter the name of your language here</source>
         <translation>Ange namnet på ditt språk här</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="622"/>
+        <location filename="ui_dialog_settings.py" line="617"/>
         <source>Temperature:</source>
         <translation>Temperatur:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="618"/>
+        <location filename="ui_dialog_settings.py" line="613"/>
         <source>Advanced option. Only change when you know whatr you are doing.</source>
         <translation>Avancerat alternativ.Byt bara när du vet vad du gör.</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="625"/>
+        <location filename="ui_dialog_settings.py" line="620"/>
         <source>D.9</source>
         <translation>D.9</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="626"/>
+        <location filename="ui_dialog_settings.py" line="621"/>
         <source>1.0</source>
         <translation>1.0</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="634"/>
+        <location filename="ui_dialog_settings.py" line="629"/>
         <source>   Top_p:</source>
         <translation>   Top_p:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="617"/>
+        <location filename="ui_dialog_settings.py" line="612"/>
         <source>Advanced AI Options...</source>
         <translation>Avancerade AI-alternativ </translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="639"/>
+        <location filename="ui_dialog_settings.py" line="634"/>
         <source>Large Model:</source>
         <translation>Stor modell:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="631"/>
+        <location filename="ui_dialog_settings.py" line="626"/>
         <source>Select an available AI model (can be the same as the large model). The fast model is used for simple tasks only.</source>
         <translation>Välj en tillgänglig AI-modell (kan vara samma som den stora modellen). Den snabba modellen används endast för enkla uppgifter.</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="642"/>
+        <location filename="ui_dialog_settings.py" line="637"/>
         <source>&lt;select available model&gt;</source>
         <translation>välj tillgänglig modell</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="637"/>
+        <location filename="ui_dialog_settings.py" line="632"/>
         <source>   Fast Model:</source>
         <translation>   Snabb modell:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="629"/>
+        <location filename="ui_dialog_settings.py" line="624"/>
         <source>context window:</source>
         <translation>kontextfönster:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="641"/>
+        <location filename="ui_dialog_settings.py" line="636"/>
         <source>Select an available AI model. The large model is used for most of the AI features in QualCoder.</source>
         <translation>Välj en tillgänglig AI-modell. Den stora modellen används för de flesta av AI-funktionerna i QualCoder.</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="616"/>
+        <location filename="ui_dialog_settings.py" line="611"/>
         <source>AI Profile:</source>
         <translation>AI profil:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="614"/>
+        <location filename="ui_dialog_settings.py" line="609"/>
         <source>Edit Name</source>
         <translation>Redigera namn</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="615"/>
+        <location filename="ui_dialog_settings.py" line="610"/>
         <source>...</source>
         <translation>...</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="623"/>
+        <location filename="ui_dialog_settings.py" line="618"/>
         <source>New AI Profile...</source>
         <translation>Ny AI-profil...</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="624"/>
+        <location filename="ui_dialog_settings.py" line="619"/>
         <source>General Parameters:</source>
         <translation>Allmänna parametrar:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="633"/>
+        <location filename="ui_dialog_settings.py" line="628"/>
         <source>API Base URL:</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="638"/>
+        <location filename="ui_dialog_settings.py" line="633"/>
         <source>AI Models:</source>
         <translation>AI-modeller:</translation>
     </message>
     <message>
-        <location filename="ui_dialog_settings.py" line="643"/>
+        <location filename="ui_dialog_settings.py" line="638"/>
         <source>Reasoning:</source>
         <translation>Motivering:</translation>
     </message>
