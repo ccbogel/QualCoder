@@ -571,14 +571,13 @@ class App(object):
         return res
 
     def get_annotations(self):
-        """ Get annotations for text files.
+        """ Get annotations for text files for all visible coders.
         Returns:
             List of dictionaries of anid, fid, memo, date, pos0, pos1, owner
         """
 
         cur = self.conn.cursor()
-        cur.execute("select anid, fid, pos0, pos1, memo, owner, date from annotation where owner=?",
-                    [self.settings['codername'], ])
+        cur.execute("select anid, fid, pos0, pos1, memo, owner, date from annotation_visible")
         result = cur.fetchall()
         res = []
         keys = 'anid', 'fid', 'pos0', 'pos1', 'memo', 'owner', 'date'
@@ -1180,6 +1179,7 @@ class App(object):
         code_image --> code_image_visible 
         code_text  --> code_text_visible 
         code_av    --> code_av_visible 
+        annotation --> annotation_visible
         """
         if self.conn is None:
             return
@@ -1263,6 +1263,17 @@ class App(object):
                 CREATE VIEW IF NOT EXISTS code_av_visible AS
                 SELECT t.*
                 FROM code_av t
+                WHERE NOT EXISTS (
+                    SELECT 1
+                    FROM coder_names c
+                    WHERE c.name = t.owner
+                        AND c.visibility = 0
+                );
+            """)
+            cur.execute("""
+                CREATE VIEW IF NOT EXISTS annotation_visible AS
+                SELECT t.*
+                FROM annotation t
                 WHERE NOT EXISTS (
                     SELECT 1
                     FROM coder_names c

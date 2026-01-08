@@ -1917,10 +1917,10 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         text_ = ""
         cur = self.app.conn.cursor()
-        sql = "select substr(source.fulltext,pos0+1 ,pos1-pos0), pos0, pos1, annotation.memo "
-        sql += "from annotation join source on annotation.fid = source.id "
-        sql += "where fid=? and annotation.owner=? order by pos0"
-        cur.execute(sql, [self.file_['id'], self.app.settings['codername']])
+        sql = "select substr(source.fulltext,pos0+1 ,pos1-pos0), pos0, pos1, annotation_visible.memo "
+        sql += "from annotation_visible join source on annotation_visible.fid = source.id "
+        sql += "where fid=? order by pos0"
+        cur.execute(sql, [self.file_['id']])
         res = cur.fetchall()
         if not res:
             return
@@ -3449,6 +3449,7 @@ class DialogCodeText(QtWidgets.QWidget):
         ui_coder_names = DialogCoderNames(self.app)
         if ui_coder_names.exec() == QtWidgets.QDialog.DialogCode.Accepted:
             # Update UI as coders visibility may have changed
+            self.annotations = self.app.get_annotations()
             self.get_coded_text_update_eventfilter_tooltips()
             self.fill_code_counts_in_tree()
             self.ui.lineEdit_coder.setText(self.app.settings['codername'])
