@@ -1894,7 +1894,7 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         text_ = ""
         cur = self.app.conn.cursor()
-        sql = "select code_name.name, pos0,pos1, seltext, code_text_visible.memo "
+        sql = "select code_name.name, pos0,pos1, seltext, code_text_visible.memo, code_text_visible.owner "
         sql += "from code_text_visible join code_name on code_text_visible.cid = code_name.cid "
         sql += "where length(code_text_visible.memo)>0 and fid=? order by pos0"
         cur.execute(sql, [self.file_['id']])
@@ -1902,7 +1902,8 @@ class DialogCodeText(QtWidgets.QWidget):
         if not res:
             return
         for r in res:
-            text_ += f'[{r[1]}-{r[2]}] ' + _("Code: ") + f'{r[0]}\n'
+            text_ += f'[{r[1]}-{r[2]}] ' + _("Code: ") + f'{r[0]}'
+            text_ += " (" + _('coder: ') + r[5] + ")\n"
             text_ += _("Text: ") + f"{r[3]}\n"
             text_ += _("Memo: ") + f"{r[4]}\n\n"
         ui = DialogMemo(self.app, _("Memos for file: ") + self.file_['name'], text_)
