@@ -1903,7 +1903,7 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         for r in res:
             text_ += f'[{r[1]}-{r[2]}] ' + _("Code: ") + f'{r[0]}'
-            text_ += " (" + _('coder: ') + r[5] + ")\n"
+            text_ += " (" + r[5] + ")\n" # coder/owner
             text_ += _("Text: ") + f"{r[3]}\n"
             text_ += _("Memo: ") + f"{r[4]}\n\n"
         ui = DialogMemo(self.app, _("Memos for file: ") + self.file_['name'], text_)
@@ -5498,7 +5498,7 @@ class ToolTipEventFilter(QtCore.QObject):
                         text_ += item['name'] + "</em>"
                         if self.app.settings['showids']:
                             text_ += " [ctid:" + str(item['ctid']) + "]"
-                        text_ += " (" + _('coder: ') + item['owner'] + ")"
+                        text_ += " (" + item['owner'] + ")"
                         text_ += "<br />" + seltext
                         if item['memo'] != "":
                             memo_text = item['memo']
@@ -5518,7 +5518,7 @@ class ToolTipEventFilter(QtCore.QObject):
             # Check annotations
             for ann in self.annotations:
                 if ann['pos0'] - self.offset <= pos <= ann['pos1'] - self.offset and self.file_id == ann['fid']:
-                    text_ += "<p>" + _("ANNOTATED:") + ann['memo'] + "</p>"
+                    text_ += "<p>" + _("ANNOTATED") + " (" + ann['owner'] + "): " + ann['memo'] + "</p>"
             if text_ != "":
                 receiver.setToolTip(text_)
         # Call Base Class Method to Continue Normal Event Processing

@@ -140,7 +140,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
                 title += _("Case: ") + row['file_or_casename'] + _(" File: ") + row['source_name']
             title += "</span>"
             title += f", {row['pos0']} - {row['pos1']}"
-            title += f" ({_('coder: ')}{row['owner']})"
+            title += f" ({row['owner']})"
             self.te.insertHtml(title)
             row['textedit_end'] = len(self.te.toPlainText())
             self.te.append(f"{row['text']}\n\n")
@@ -178,7 +178,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
                 title += _(" Case: ") + row['file_or_casename'] + _(" File: ") + row['mediapath']
             else:
                 title += _(" File: ") + row['mediapath']
-            title += f'</span> ({_('coder: ')}{row['owner']})</p>'
+            title += f'</span> ({row['owner']})</p>'
             self.te.insertHtml(title)
             row['textedit_end'] = len(self.te.toPlainText())
             self.te.append("\n")
@@ -218,7 +218,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
                 title += _("Case: ") + row['file_or_casename'] + _(" File: ") + row['mediapath']
             else:
                 title += _("File: ") + row['mediapath']
-            title += f'</span> ({_('coder: ')}{row['owner']})'
+            title += f'</span> ({row['owner']})'
             self.te.insertHtml(title)
             start = msecs_to_mins_and_secs(row['pos0'])
             end = msecs_to_mins_and_secs(row['pos1'])

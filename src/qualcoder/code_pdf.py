@@ -3068,7 +3068,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             cursor.mergeCharFormat(fmt)
             # cursor.setCharFormat(fmt)
             tooltip_item_text = graphics_item_code['name']
-            tooltip_item_text += " (" + _('coder: ') + graphics_item_code['owner'] + ")"
+            tooltip_item_text += " (" + graphics_item_code['owner'] + ")"
             if graphics_item_code['memo'] is not None and graphics_item_code['memo'] != "":
                 tooltip_item_text += "\n" + _("Memo: ") + graphics_item_code['memo']
             if graphics_item_code['important'] == 1:
@@ -3790,7 +3790,7 @@ class ToolTipEventFilter(QtCore.QObject):
                         text_ += item['name'] + "</em>"
                         if self.app.settings['showids']:
                             text_ += f" [ctid:{item['ctid']}]"
-                        text_ += " (" + _('coder: ') + item['owner'] + ")"
+                        text_ += " (" + item['owner'] + ")"
                         text_ += "<br />" + seltext
                         if item['memo'] != "":
                             text_ += "<br /><em>" + _("MEMO: ") + item['memo'] + "</em>"
@@ -3806,7 +3806,7 @@ class ToolTipEventFilter(QtCore.QObject):
             # Check annotations
             for ann in self.annotations:
                 if ann['pos0'] - self.offset <= pos <= ann['pos1'] - self.offset and self.file_id == ann['fid']:
-                    text_ += "<p>" + _("ANNOTATED:") + ann['memo'] + "</p>"
+                    text_ += "<p>" + _("ANNOTATED") + " (" + ann['owner'] + "): " + ann['memo'] + "</p>"
             if text_ != "":
                 receiver.setToolTip(text_)
         # Call Base Class Method to Continue Normal Event Processing
