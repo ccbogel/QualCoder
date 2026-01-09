@@ -196,7 +196,7 @@ class DialogCodeText(QtWidgets.QWidget):
         doc_font = f'font: {self.app.settings["docfontsize"]}pt "{self.app.settings["font"]}";'
         self.ui.textEdit.setStyleSheet(doc_font)
         self.ui.lineEdit_coder.setText(self.app.settings['codername'])
-        self.ui.pushButton_coder.pressed.connect(self.edit_coder_names)
+        self.ui.pushButton_coder.clicked.connect(self.edit_coder_names)
         self.ui.textEdit.setPlainText("")
         self.ui.textEdit.setAutoFillBackground(True)
         self.ui.textEdit.setToolTip("")
@@ -5497,13 +5497,13 @@ class ToolTipEventFilter(QtCore.QObject):
                         text_ += item['name'] + "</em>"
                         if self.app.settings['showids']:
                             text_ += " [ctid:" + str(item['ctid']) + "]"
+                        text_ += " (" + _('coder: ') + item['owner'] + ")"
                         text_ += "<br />" + seltext
                         if item['memo'] != "":
                             memo_text = item['memo']
                             if len(memo_text) > 150:
                                 memo_text = memo_text[:150] + "..."
                             text_ += "<br /><em>" + _("MEMO: ") + memo_text + "</em>"
-                        text_ += " (" + _('coder: ') + item['owner'] + ")"
                         if item['important'] == 1:
                             text_ += "<br /><em>IMPORTANT</em>"
                         text_ += "</p>"
