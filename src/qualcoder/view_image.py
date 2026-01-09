@@ -49,6 +49,7 @@ from .GUI.ui_dialog_view_image import Ui_Dialog_view_image
 from .move_resize_rectangle import DialogMoveResizeRectangle
 from .helpers import ExportDirectoryPathDialog, Message
 from .memo import DialogMemo
+from .coder_names import DialogCoderNames
 from .report_attributes import DialogSelectAttributeParameters
 from .reports import DialogReportCoderComparisons, DialogReportCodeFrequencies  # for isinstance()
 from .report_codes import DialogReportCodes
@@ -126,11 +127,12 @@ class DialogCodeImage(QtWidgets.QDialog):
         tree_font = f'font: {self.app.settings["treefontsize"]}pt "{self.app.settings["font"]}";'
         self.ui.treeWidget.setStyleSheet(tree_font)
         self.ui.label_image.setStyleSheet(tree_font)  # Usually smaller font
-        self.ui.label_coder.setText(_("Coder: ") + self.app.settings['codername'])
         self.setWindowTitle(_("Image coding"))
         self.ui.horizontalSlider.valueChanged[int].connect(self.redraw_scene)
         self.ui.horizontalSlider.setToolTip(_("Key + or W zoom in. Key - or Q zoom out"))
 
+        self.ui.lineEdit_coder.setText(self.app.settings['codername'])
+        self.ui.pushButton_coder.clicked.connect(self.edit_coder_names)
         self.ui.pushButton_default_new_code_color.setIcon(qta.icon('mdi6.palette', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_default_new_code_color.pressed.connect(self.set_default_new_code_color)
         self.ui.pushButton_export.setIcon(qta.icon('mdi6.export', options=[{'scale_factor': 1.4}]))
@@ -220,6 +222,15 @@ class DialogCodeImage(QtWidgets.QDialog):
 
         self.codes, self.categories = self.app.get_codes_categories()
 
+    def edit_coder_names(self):
+        ui_coder_names = DialogCoderNames(self.app)
+        if ui_coder_names.exec() == QtWidgets.QDialog.DialogCode.Accepted:
+            # Update UI as coders visibility may have changed
+            self.get_coded_areas()
+            self.redraw_scene()
+            self.fill_code_counts_in_tree()
+            self.ui.lineEdit_coder.setText(self.app.settings['codername'])
+
     def set_default_new_code_color(self):
         """ New code colours are usually generated randomly.
          This overrides the random approach, by setting a colout. """
@@ -288,7 +299,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.redraw_scene()
 
     def get_coded_areas(self):
-        """ Get the coded area details for the rectangles for the image file by current coder.
+        """ Get the coded area details for the rectangles for the image file by all visible coders.
         Order by area descending so when items are drawn to the scene. First largest to smallest on top.
         Called by load file, update_dialog_codes_and_categories,coded_media_dialog, undo_last_unmarked_code.
         """
@@ -298,19 +309,19 @@ class DialogCodeImage(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         self.code_areas = []
         if self.pdf_page is not None:
-            sql = "select imid,id,x1, y1, width, height, code_image.memo, code_image.date, code_image.owner, " \
-                  "code_image.cid, important, code_name.name, code_name.color, pdf_page from code_image " \
-                  "join code_name on code_name.cid=code_image.cid " \
-                  " where code_image.id=? and code_image.owner=? and width > 0 and height > 0 and pdf_page=?" \
+            sql = "select imid,id,x1, y1, width, height, code_image_visible.memo, code_image_visible.date, code_image_visible.owner, " \
+                  "code_image_visible.cid, important, code_name.name, code_name.color, pdf_page from code_image_visible " \
+                  "join code_name on code_name.cid=code_image_visible.cid " \
+                  " where code_image_visible.id=? and width > 0 and height > 0 and pdf_page=?" \
                   " order by width*height desc"
-            cur.execute(sql, [self.file_['id'], self.app.settings['codername'], self.pdf_page])
+            cur.execute(sql, [self.file_['id'], self.pdf_page])
         else:  # Images, jpg, png
-            sql = "select imid,id,x1, y1, width, height, code_image.memo, code_image.date, code_image.owner, " \
-                  "code_image.cid, important, code_name.name, code_name.color, pdf_page from code_image " \
-                  "join code_name on code_name.cid=code_image.cid " \
-                  " where code_image.id=? and code_image.owner=? and width > 0 and height > 0" \
+            sql = "select imid,id,x1, y1, width, height, code_image_visible.memo, code_image_visible.date, code_image_visible.owner, " \
+                  "code_image_visible.cid, important, code_name.name, code_name.color, pdf_page from code_image_visible " \
+                  "join code_name on code_name.cid=code_image_visible.cid " \
+                  " where code_image_visible.id=? and width > 0 and height > 0" \
                   " order by width*height desc"
-            cur.execute(sql, [self.file_['id'], self.app.settings['codername']])
+            cur.execute(sql, [self.file_['id']])
         results = cur.fetchall()
         keys = 'imid', 'id', 'x1', 'y1', 'width', 'height', 'memo', 'date', 'owner', 'cid', 'important', 'name', \
             'color', 'pdf_page'
@@ -547,7 +558,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.fill_code_counts_in_tree()
 
     def fill_code_counts_in_tree(self):
-        """ Calculate the frequency of each code and category for this coder and the selected file.
+        """ Calculate the frequency of each code and category for all visible coders and the selected file.
         Add a list item to each code that can be used to display in treeWidget.
         If the tab 'AI assisted coding' is active, the codings will be counted
         across all files, not only the currently selected one, because the AI assisted
@@ -559,10 +570,10 @@ class DialogCodeImage(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         code_counts = []
         for c in self.codes:
-            parameters = [c['cid'], self.app.settings['codername'], self.file_['id']]
-            sql = "select code_name.catid, count(code_image.cid) from code_image join code_name " \
-                "on code_name.cid=code_image.cid where code_image.cid=? and code_image.owner=? " \
-                "and code_image.id=?"
+            parameters = [c['cid'], self.file_['id']]
+            sql = "select code_name.catid, count(code_image_visible.cid) from code_image_visible join code_name " \
+                "on code_name.cid=code_image_visible.cid where code_image_visible.cid=? " \
+                "and code_image_visible.id=?"
             cur.execute(sql, parameters)
             result = cur.fetchone()
             code_counts.append([c['cid'], result[0], result[1]])
@@ -621,14 +632,14 @@ class DialogCodeImage(QtWidgets.QDialog):
         if self.file_ is None:
             return
         cur = self.app.conn.cursor()
-        sql = "select count(cid) from code_image where cid=? and id=? and owner=?"
+        sql = "select count(cid) from code_image_visible where cid=? and id=?"
         it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
         item = it.value()
         count = 0
         while item and count < 10000:
             if item.text(1)[0:4] == "cid:":
                 cid = str(item.text(1)[4:])
-                cur.execute(sql, [cid, self.file_['id'], self.app.settings['codername']])
+                cur.execute(sql, [cid, self.file_['id']])
                 result = cur.fetchone()
                 if result[0] > 0:
                     item.setText(3, str(result[0]))
@@ -687,9 +698,9 @@ class DialogCodeImage(QtWidgets.QDialog):
     def go_to_latest_coded_file(self):
         """ Vertical splitter button activates this """
 
-        sql = "SELECT id FROM code_image where owner=? order by date desc limit 1"
+        sql = "SELECT id FROM code_image_visible order by date desc limit 1"
         cur = self.app.conn.cursor()
-        cur.execute(sql, [self.app.settings['codername'], ])
+        cur.execute(sql)
         result = cur.fetchone()
         if result is None:
             return
@@ -1077,13 +1088,15 @@ class DialogCodeImage(QtWidgets.QDialog):
                     height = coded['width'] * self.scale
                     width = coded['height'] * self.scale
                 rect_item = QtWidgets.QGraphicsRectItem(x, y, width, height)
-                rect_item.setPen(QtGui.QPen(color, 2, QtCore.Qt.PenStyle.DashLine))
-                rect_item.setToolTip(tooltip)
                 if coded['owner'] == self.app.settings['codername']:
-                    if self.important and coded['important'] == 1:
-                        self.scene.addItem(rect_item)
-                    if not self.important:
-                        self.scene.addItem(rect_item)
+                    rect_item.setPen(QtGui.QPen(color, 2, QtCore.Qt.PenStyle.DashLine))
+                else:
+                    rect_item.setPen(QtGui.QPen(color, 2, QtCore.Qt.PenStyle.DotLine))
+                rect_item.setToolTip(tooltip)
+                if self.important and coded['important'] == 1:
+                    self.scene.addItem(rect_item)
+                if not self.important:
+                    self.scene.addItem(rect_item)
                 if self.show_code_captions == 1:
                     self.caption(x, y, code_name)
                 if self.show_code_captions == 2:
@@ -1584,11 +1597,24 @@ class DialogCodeImage(QtWidgets.QDialog):
             return
         item = items[0]
         if len(items) > 1:
-            ui = DialogSelectItems(self.app, items, _("Select code"), "single")
+            # Make item unambigious for selection by adding owner
+            items_for_select = []
+            for it in items:
+                it_view = it.copy()
+                it_view['name'] = f"{it['name']} ({it['owner']})"
+                items_for_select.append(it_view)
+            ui = DialogSelectItems(self.app, items_for_select, _("Select code"), "single")
             ok = ui.exec()
             if not ok:
                 return
-            item = ui.get_selected()
+            selected = ui.get_selected()
+            if selected is None:
+                return
+            # Map back to original item (so we keep full dict as stored)
+            for it in items:
+                if it['imid'] == selected['imid']:
+                    item = it
+                    break        
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
         action_memo = menu.addAction(_('Memo'))
@@ -1691,7 +1717,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.app.delete_backup = False
 
     def find_coded_areas_for_pos(self, pos):
-        """ Find any coded areas for this position AND for this coder.
+        """ Find any coded areas for this position AND for all visible coders.
 
         params:
         :name pos:
@@ -1712,7 +1738,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             pos = QtCore.QPointF(pix_w_scaled - pos.y(), pos.x())
         items = []
         for item in self.code_areas:
-            if item['id'] == self.file_['id'] and item['owner'] == self.app.settings['codername']:
+            if item['id'] == self.file_['id']:
                 if item['x1'] * self.scale <= pos.x() <= (item['x1'] + item['width']) * self.scale \
                         and item['y1'] * self.scale <= pos.y() <= (
                         item['y1'] + item['height']) * self.scale:
@@ -1732,6 +1758,7 @@ class DialogCodeImage(QtWidgets.QDialog):
                 if c['cid'] == i['cid']:
                     codename = c['name']
                     msg += codename
+                    msg += f" ({i['owner']})"
             msg += f"\nx:{int(i['x1'])} y:{int(i['y1'])}"
             msg += f" w:{int(i['width'])} h:{int(i['height'])}"
             area = i['width'] * i['height']
