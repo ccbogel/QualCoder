@@ -28,6 +28,7 @@ import copy
 import re
 
 from .GUI.ui_dialog_settings import Ui_Dialog_settings
+from .coder_names import DialogCoderNames
 from .helpers import Message
 from .ai_llm import get_available_models, add_new_ai_model
 
@@ -40,14 +41,15 @@ class DialogSettings(QtWidgets.QDialog):
     """ Settings for the coder name, coder table and to display ids. """
 
     settings = {}
-    current_coder = "default"
 
     def __init__(self, app, parent=None, section=None, enable_ai=False):
 
         self.app = app
-        self.settings = app.settings
+        if self.app.conn is not None:
+            self.initial_changes = self.app.conn.total_changes
+        self.settings = copy.deepcopy(self.app.settings)
         self.ai_models = copy.deepcopy(self.app.ai_models)
-        self.current_coder = self.app.settings['codername']
+        self.coder_names_changes = False 
         super(QtWidgets.QDialog, self).__init__(parent)  # overrride accept method
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_settings()
@@ -56,24 +58,9 @@ class DialogSettings(QtWidgets.QDialog):
         self.setStyleSheet(font)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         new_font = QtGui.QFont(self.settings['font'], self.settings['fontsize'], QtGui.QFont.Weight.Normal)
-        self.ui.label_current_coder.setText(_("Current coder: ") + self.app.settings['codername'])
+        self.ui.lineEdit_coderName.setText(self.settings['codername'])
+        self.ui.pushButton_set_coder.clicked.connect(self.set_coder)        
         self.ui.fontComboBox.setCurrentFont(new_font)
-        # Get coder names from all tables
-        sql = "select owner from code_image union select owner from code_text union select owner from code_av "
-        sql += "union select owner from code_name union select owner from code_cat "
-        sql += "union select owner from cases union select owner from case_text "
-        sql += "union select owner from attribute union select owner from attribute_type "
-        sql += "union select owner from source union select owner from annotation union select owner from journal "
-        sql += "union select owner from manage_files_display union select owner from files_filter"
-        coders = [""]
-        if self.app.conn is not None:
-            cur = self.app.conn.cursor()
-            cur.execute(sql)
-            results = cur.fetchall()
-            for row in results:
-                if row[0] != "":
-                    coders.append(row[0])
-        self.ui.comboBox_coders.addItems(coders)
         languages = ["Deutsch de", "English en", "Español es", "Français fr",
                      "Italiano it", "日本語 ja", "Português pt", "Svenska sv", "中国人 zh"]
         self.ui.comboBox_language.addItems(languages)
@@ -108,7 +95,6 @@ class DialogSettings(QtWidgets.QDialog):
             index = 0
         self.ui.comboBox_docfontsize.setCurrentIndex(index)
 
-        self.ui.comboBox_coders.currentIndexChanged.connect(self.combobox_coder_changed)
         index = self.ui.comboBox_text_chunk_size.findText(str(self.settings['codetext_chunksize']),
                                                           QtCore.Qt.MatchFlag.MatchFixedString)
         if index == -1:
@@ -157,7 +143,6 @@ class DialogSettings(QtWidgets.QDialog):
         msg = _("Default folder for storing automatic backups and for file outputs.")
         self.ui.pushButton_choose_directory.setToolTip(msg)
         self.ui.pushButton_choose_directory.clicked.connect(self.choose_directory)
-        self.ui.pushButton_set_coder.pressed.connect(self.new_coder_entered)
 
         # AI options
         if enable_ai or self.settings['ai_enable'] == 'True':
@@ -424,26 +409,14 @@ class DialogSettings(QtWidgets.QDialog):
             self.ai_models[int(self.settings['ai_model_index'])]['api_base'] = self.ui.lineEdit_ai_api_base.text()   
         self.ai_update_avaliable_models()    
             
-    def new_coder_entered(self):
-        """ New coder name entered.
-        Tried to disable Enter key or catch the event. Failed. So new coder name assigned
-        when the pushButton_set_coder is activated. """
-
-        new_coder = self.ui.lineEdit_coderName.text()
-        if new_coder == "":
-            return
-        self.ui.lineEdit_coderName.setEnabled(False)
-        self.current_coder = new_coder
-        self.ui.label_current_coder.setText(_("Current coder: ") + self.current_coder)
-
-    def combobox_coder_changed(self):
-        """ Set the coder name to the current selection. """
-
-        current_selection = self.ui.comboBox_coders.currentText()
-        if current_selection == "":
-            return
-        self.current_coder = current_selection
-        self.ui.label_current_coder.setText(_("Current coder: ") + self.current_coder)
+    def set_coder(self):
+        """ Edit the coder names and select the current one.
+        Changes made to the database (e.g. renamed coders) will NOT be committed until the settings dialog 
+        is closed with OK."""
+        
+        ui_coder_names = DialogCoderNames(self.app, self.settings, do_commit=False)
+        if ui_coder_names.exec() == QtWidgets.QDialog.DialogCode.Accepted:
+            self.ui.lineEdit_coderName.setText(self.settings['codername'])
 
     def choose_directory(self):
         """ Choose default project directory. """
@@ -488,14 +461,15 @@ class DialogSettings(QtWidgets.QDialog):
 
     def accept(self):
         restart_qualcoder = False
-        self.settings['codername'] = self.current_coder
         if self.settings['codername'] == "":
             self.settings['codername'] = "default"
-        if self.app.conn is not None:
-            # None if no project opened
-            cur = self.app.conn.cursor()
-            cur.execute('update project set codername=?', [self.settings['codername']])
-            self.app.conn.commit()
+            self.coder_names_changes = True
+        if self.settings['codername'] != self.app.settings['codername']:
+            self.coder_names_changes = True
+            if self.app.conn is not None:
+                # None if no project opened
+                cur = self.app.conn.cursor()
+                cur.execute('update project set codername=?', [self.settings['codername']])
         self.settings['font'] = self.ui.fontComboBox.currentText()
         self.settings['fontsize'] = int(self.ui.comboBox_fontsize.currentText())
         self.settings['treefontsize'] = int(self.ui.comboBox_codetreefontsize.currentText())
@@ -557,14 +531,38 @@ class DialogSettings(QtWidgets.QDialog):
         self.settings['ai_language'] =  self.ui.lineEdit_AI_language.text()
         self.settings['ai_temperature'] = self.ui.lineEdit_ai_temperature.text()
         self.settings['ai_top_p'] = self.ui.lineEdit_top_p.text()
+        
+        # if any changes to the coder names have been made, write them to the disk:
+        if self.app.conn is not None and self.app.conn.total_changes != self.initial_changes:
+            self.coder_names_changes = True
+        if self.app.conn is not None:
+            self.app.conn.commit()
         self.save_settings()
         if restart_qualcoder:
             Message(self.app, _("Restart QualCoder"), _("Restart QualCoder to enact some changes")).exec()
         super().accept()
+        
+    def reject(self):
+        if self.app.conn is not None and self.app.conn.total_changes != self.initial_changes:
+            msg = _('It seems that you have made changes to the coder names. These changes will be lost as well. Do you really want to cancel?')
+            msg_box = Message(self.app, _('Settings'), msg, "Information")
+            msg_box.setStandardButtons(
+                QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
+            msg_box.setDefaultButton(QtWidgets.QMessageBox.StandardButton.Yes)
+            reply = msg_box.exec()
+            if reply != QtWidgets.QMessageBox.StandardButton.Yes:
+                return
+            else: 
+                self.app.conn.rollback()
+        self.coder_names_changes = False
+        super().reject()
+
 
     def save_settings(self):
-        """ Save settings to text file in user's home directory.
+        """ Updates the apps setting with the contents of self.Settings and save 
+        it to a text file in user's home directory.
         Each setting has a variable identifier then a colon
         followed by the value. """
-
+        self.app.settings.clear()
+        self.app.settings.update(self.settings)
         self.app.write_config_ini(self.settings, self.ai_models)

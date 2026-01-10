@@ -45,8 +45,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>787</width>
-        <height>1074</height>
+        <width>795</width>
+        <height>948</height>
        </rect>
       </property>
       <property name="sizePolicy">
@@ -250,43 +250,37 @@ Not recommended unless you have many large files slowing the backup.</string>
           <property name="bottomMargin">
            <number>0</number>
           </property>
-          <item row="2" column="1">
-           <widget class="QComboBox" name="comboBox_coders"/>
-          </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_2">
-            <property name="toolTip">
-             <string>Select another coder in this project</string>
+          <item row="1" column="1">
+           <widget class="QLineEdit" name="lineEdit_coderName">
+            <property name="enabled">
+             <bool>true</bool>
             </property>
-            <property name="text">
-             <string>Other coders</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            <property name="readOnly">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
-          <item row="3" column="0">
-           <widget class="QLabel" name="label_new_coder">
-            <property name="text">
-             <string>New coder</string>
+          <item row="1" column="3">
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
             </property>
-            <property name="alignment">
-             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
             </property>
-           </widget>
+           </spacer>
           </item>
-          <item row="3" column="1">
-           <widget class="QLineEdit" name="lineEdit_coderName"/>
-          </item>
-          <item row="3" column="2">
+          <item row="1" column="2">
            <widget class="QPushButton" name="pushButton_set_coder">
             <property name="toolTip">
              <string>Set this name as the current coder.
 </string>
             </property>
             <property name="text">
-             <string>Apply</string>
+             <string>Change</string>
             </property>
            </widget>
           </item>
@@ -305,19 +299,6 @@ Not recommended unless you have many large files slowing the backup.</string>
              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
             </property>
            </widget>
-          </item>
-          <item row="3" column="3">
-           <spacer name="horizontalSpacer">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
           </item>
          </layout>
         </widget>
@@ -743,7 +724,6 @@ Not recommended unless you have many large files slowing the backup.</string>
             </property>
             <property name="font">
              <font>
-              <weight>50</weight>
               <bold>false</bold>
              </font>
             </property>
@@ -1096,7 +1076,7 @@ Not recommended unless you have many large files slowing the backup.</string>
                <property name="insertPolicy">
                 <enum>QComboBox::NoInsert</enum>
                </property>
-               <property name="placeholderText" stdset="0">
+               <property name="placeholderText">
                 <string>&lt;select available model&gt;</string>
                </property>
               </widget>
@@ -1238,7 +1218,7 @@ Not recommended unless you have many large files slowing the backup.</string>
                <property name="sizeAdjustPolicy">
                 <enum>QComboBox::AdjustToContentsOnFirstShow</enum>
                </property>
-               <property name="placeholderText" stdset="0">
+               <property name="placeholderText">
                 <string>&lt;select available model&gt;</string>
                </property>
               </widget>

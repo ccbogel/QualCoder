@@ -2443,9 +2443,10 @@ Click "Yes" to start now.')
         else:  
             self.app.ai.close()
             
-        # Name change: Close all opened dialogs as coder name needs to change everywhere
-        if current_coder != self.app.settings['codername']:
-            self.ui.textEdit.append(_("Coder name changed to: ") + self.app.settings['codername'])
+        # Change in coder names: Close all opened dialogs as coder names needs to change everywhere
+        if ui.coder_names_changes:
+            if current_coder != self.app.settings['codername']:
+                self.ui.textEdit.append(_("Coder name changed to: ") + self.app.settings['codername'])
             # Remove widgets from each tab
             contents = self.ui.tab_reports.layout()
             if contents:

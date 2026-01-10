@@ -36,12 +36,25 @@ logger = logging.getLogger(__name__)
 max_name_len: int = 63
 
 class DialogCoderNames(QtWidgets.QDialog):
-    """Extracts speaker names from a transcript of an interview or a focus group, lets the user select
-    which to keep, and creates codes for each speaker in the "Speakers" category.
+    """Shows coder names from all tables, lets the user choose their own name, and select which 
+    coders are visible or hidden. Users can also create new names or merge existing ones.
+    
+    Parameters:
+        app:       > QualCoder app instance
+        settings:  > The settings list to store the current coder. This is used when called from the settings dialog. 
+                   > If None (default), app.settings will be used.
+        do_commit: > If True, changes will be written to the database when the user clicks OK. 
+                   > If False, the database transaction stays open and the caller must comit the changes by
+                   calling app.conn.commit(). Used in the settings dialog, where the changes can be rolled back if
+                   the users cancels the settings dialog.
+                   > If the user clicks Cancel in the coder names dialog, changes will be rolled back in any case.
+                   > do_commit defaults to True.        
     """
 
-    def __init__(self, app):
+    def __init__(self, app, settings=None, do_commit=True):
         self.app = app
+        self.settings = settings if settings is not None else self.app.settings
+        self.do_commit = do_commit
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_coders()
         self.ui.setupUi(self)
@@ -51,12 +64,14 @@ class DialogCoderNames(QtWidgets.QDialog):
         headers = [_("Name"), _("Codings"), _("Visibility")]
         self.ui.tableWidget.setColumnCount(len(headers))
         self.ui.tableWidget.setHorizontalHeaderLabels(headers)
-        self.current_coder = self.app.settings['codername']
-        self.initial_current_coder = self.app.settings['codername']
+        self.current_coder = self.settings['codername']
+        self.initial_current_coder = self.settings['codername']
         self.coder_names = []
         self.app.update_coder_names()
         if self.app.conn is not None:
             self.cursor = self.app.conn.cursor()
+            if self.app.conn is not None and not self.app.conn.in_transaction:
+                self.app.conn.execute("BEGIN") # start a new transaction so we can rollback later if the user cancels the operation
             self.initial_changes = self.app.conn.total_changes # keep track of this value so we can determine later if any changes where made
         else:
             self.cursor = None
@@ -73,7 +88,7 @@ class DialogCoderNames(QtWidgets.QDialog):
     def read_coder_names(self):
         """
         Reads the content of the table 'coder_names' into self.coder_names.
-        If no project is open, only self.app.settings['codername'] will be added.
+        If no project is open, only self.settings['codername'] will be added.
         """
         self.coder_names = []
         if self.app.conn is None: # no project open
@@ -350,11 +365,8 @@ class DialogCoderNames(QtWidgets.QDialog):
             Message(self.app, _('Coder'), _('The new coder name already exists.'), 'critical').exec()
             return
         
-        if self._rename_coder(old_name, new_name):
-            if merge:
-                Message(self.app, _('Coder'), _('Merging was successful. If you click OK, "{}" will be changed to "{}" in all tables.').format(old_name, new_name) , 'Information').exec()
-            else:
-                Message(self.app, _('Coder'), _('Renaming was successful. If you click OK, "{}" will be changed to "{}" in all tables.').format(old_name, new_name) , 'Information').exec()
+        if not self._rename_coder(old_name, new_name):
+            Message(self.app, _('Coder'), _('An error occured during merging or renaming. All changes were reverted.'), 'Information').exec()
 
 
     def merge_coder(self):
@@ -363,8 +375,9 @@ class DialogCoderNames(QtWidgets.QDialog):
 
     def ok(self):
         if self.initial_current_coder != self.current_coder:
-            self.app.settings['codername'] = self.current_coder
-            self.app.write_config_ini(self.app.settings, self.app.ai_models)
+            self.settings['codername'] = self.current_coder
+            if self.settings is self.app.settings:
+                self.app.write_config_ini(self.app.settings, self.app.ai_models)
             if self.app.conn is not None:
                 self.cursor.execute('update project set codername=?', [self.current_coder])
             self.app.delete_backup = False
@@ -372,7 +385,7 @@ class DialogCoderNames(QtWidgets.QDialog):
         if self.app.conn is not None and self.app.conn.total_changes != self.initial_changes:
             self.app.delete_backup = False
         
-        if self.app.conn is not None:
+        if self.do_commit and self.app.conn is not None:
             self.app.conn.commit() # this writes all the changes finally to the database
         
         
