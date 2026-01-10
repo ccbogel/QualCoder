@@ -1289,7 +1289,7 @@ class App(object):
             self.conn.rollback()
             raise
     
-    def get_coder_names_in_project(self):
+    def get_coder_names_in_project(self, only_visible=False):
         """ Get all coder names from all tables and from the config.ini file
         Design flaw is that current codername is not stored in a specific table in Database Versions 1 to 4.
         Coder name is stored in Database version 5.
@@ -1306,7 +1306,11 @@ class App(object):
         try:
             self.update_coder_names()
             cur = self.conn.cursor()
-            cur.execute("select name from coder_names")
+            if only_visible:
+                sql = "select name from coder_names where visibility = 1"
+            else:
+                sql = "select name from coder_names"
+            cur.execute(sql)
             res = cur.fetchall()
             for r in res:
                 coder_names.append(r[0])
