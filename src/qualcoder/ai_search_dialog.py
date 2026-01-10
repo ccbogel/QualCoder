@@ -292,9 +292,9 @@ class DialogAiSearch(QtWidgets.QDialog):
         """ Count instances of each code from all coders and all files. """
 
         cur = self.app.conn.cursor()
-        sql = "select count(cid) from code_text where cid=? union "
-        sql += "select count(cid) from code_av where cid=? union "
-        sql += "select count(cid) from code_image where cid=?"
+        sql = "select count(cid) from code_text_visible where cid=? union "
+        sql += "select count(cid) from code_av_visible where cid=? union "
+        sql += "select count(cid) from code_image_visible where cid=?"
         it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
         item = it.value()
         count = 0
@@ -392,9 +392,9 @@ class DialogAiSearch(QtWidgets.QDialog):
         # Fill additional details about each file in the memo
         cur = self.app.conn.cursor()
         sql = "select length(fulltext), mediapath from source where id=?"
-        sql_text_codings = "select count(cid) from code_text where fid=?"
-        sql_av_codings = "select count(cid) from code_av where id=?"  # Not used
-        sql_image_codings = "select count(cid) from code_image where id=?"  # Not used
+        sql_text_codings = "select count(cid) from code_text_visible where fid=?"
+        sql_av_codings = "select count(cid) from code_av_visible where id=?"  # Not used
+        sql_image_codings = "select count(cid) from code_image_visible where id=?"  # Not used
         item = QtWidgets.QListWidgetItem(_("<no file filter>"))
         item.setToolTip(_("Search in all textfiles"))
         item.setData(Qt.ItemDataRole.UserRole, -1)
