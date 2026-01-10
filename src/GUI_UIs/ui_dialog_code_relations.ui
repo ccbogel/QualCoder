@@ -72,7 +72,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>Export csv file</string>
+       <string>Export file</string>
       </property>
       <property name="text">
        <string/>

@@ -86,7 +86,7 @@ class DialogReportRelations(QtWidgets.QDialog):
         self.ui.treeWidget.setStyleSheet(font)
         self.ui.label_codes.setStyleSheet(font)
         self.ui.pushButton_exportcsv.setIcon(qta.icon('mdi6.export'))
-        self.ui.pushButton_exportcsv.pressed.connect(self.export_csv_file)
+        self.ui.pushButton_exportcsv.pressed.connect(self.export_excel_file)  # changed from csv to excel export
         self.ui.pushButton_export_exact.setIcon(qta.icon('mdi6.export'))
         self.ui.pushButton_export_exact.pressed.connect(self.export_exact_excel_file)
         self.ui.pushButton_calculate.setIcon(qta.icon('mdi6.calculator', options=[{'scale_factor': 1.5}]))
@@ -862,19 +862,18 @@ class DialogReportRelations(QtWidgets.QDialog):
         Message(self.app, _('Report exported'), msg, "information").exec()
         self.parent_textEdit.append(msg)
 
-    def export_csv_file(self):
-        """ Export data as csv file(s),
-        The main file is called projectname_relations.csv.
+    def export_excel_file(self):
+        """ Export data as excel file plus csv stats file,
+        The main file is called projectname_relations.xlsx.
         The summary file (if generated) is called projectname_relations_stats.csv
-        The csv is comma delimited and all fields quoted. """
+        """
 
         if not self.result_relations:
             return
-
         shortname = self.app.project_name.split(".qda")[0]
-        filename = shortname + "_relations.csv"
-        e = ExportDirectoryPathDialog(self.app, filename)
-        filepath = e.filepath
+        filename = shortname + "_relations.xlsx"
+        export_dir = ExportDirectoryPathDialog(self.app, filename)
+        filepath = export_dir.filepath
         if filepath is None:
             return
         col_names = ["Fid", _("Filename"), "Code0", "Code0 " + _("name"), "Code0_pos0", "Code0_pos1",
@@ -883,56 +882,74 @@ class DialogReportRelations(QtWidgets.QDialog):
                      _("Overlap") + " 0", _("Overlap") + " 1", _("Union") + " 0",
                      _("Union") + " 1", _("Distance"), _("Text before"), _("Text overlap"), _("Text after"), _("Owner"),
                      "ctid0", "ctid1", "text0", "text1", _("Memo") + "0", _("Memo") + "1"]
-        with open(filepath, 'w', encoding='UTF8') as f:
-            writer = csv.writer(f, quoting=csv.QUOTE_ALL)
-            writer.writerow(col_names)
-            for r in self.result_relations:
-                row = [r['fid'], r['file_name'], r['cid0'], r['c0_name'], r['c0_pos0'], r['c0_pos1'], r['cid1'],
-                       r['c1_name'], r['c1_pos0'], r['c1_pos1'], r['relation'], str(r['whichmin']).replace('None', ''),
-                       str(r['whichmax']).replace('None', '')]
-                if r['overlapindex']:
-                    row.append(r['overlapindex'][0])
-                    row.append(r['overlapindex'][1])
-                else:
-                    row.append('')
-                    row.append('')
-                if r['unionindex']:
-                    row.append(r['unionindex'][0])
-                    row.append(r['unionindex'][1])
-                else:
-                    row.append('')
-                    row.append('')
-                row.append(str(r['distance']).replace('None', ''))
-                row.append(r['text_before'])
-                row.append(r['text_overlap'])
-                row.append(r['text_after'])
-                row.append(r['owner'])
-                row.append(r['ctid0'])
-                row.append(r['ctid1'])
-                row.append(r['ctid0_text'])
-                row.append(r['ctid1_text'])
-                row.append(r['coded_memo0'])
-                row.append(r['coded_memo1'])
-                writer.writerow(row)
-        msg = _("Code relations csv file exported to: ") + filepath
-        Message(self.app, _('Csv file Export'), msg, "information").exec()
-        self.parent_textEdit.append(msg)
-        # Write statistical summary file
-        if not self.result_summary:
-            return
-        stats_filepath = filepath[:-4] + "_stats.csv"
+        wb = openpyxl.Workbook()
+        ws = wb.active
+        ws.title = "Code Relations"
+        wb.create_sheet("Statistics")
+        ws2 = wb["Statistics"]
+        row = 1
+        for col, header in enumerate(col_names):
+            ws.cell(column=col + 1, row=row, value=header)
+        for row, data in enumerate(self.result_relations):
+            ws.cell(column=1, row=row + 2, value=data['fid'])
+            ws.cell(column=2, row=row + 2, value=data['file_name'])
+            ws.cell(column=3, row=row + 2, value=data['cid0'])
+            ws.cell(column=4, row=row + 2, value=data['c0_name'])
+            ws.cell(column=5, row=row + 2, value=data['c0_pos0'])
+            ws.cell(column=6, row=row + 2, value=data['c0_pos1'])
+            ws.cell(column=7, row=row + 2, value=data['cid1'])
+            ws.cell(column=8, row=row + 2, value=data['c1_name'])
+            ws.cell(column=9, row=row + 2, value=data['c1_pos0'])
+            ws.cell(column=10, row=row + 2, value=data['c1_pos1'])
+            ws.cell(column=11, row=row + 2, value=data['relation'])
+            ws.cell(column=12, row=row + 2, value=str(data['whichmin']).replace('None', ''))
+            ws.cell(column=13, row=row + 2, value=str(data['whichmax']).replace('None', ''))
+            if data['overlapindex']:
+                ws.cell(column=14, row=row + 2, value=data['overlapindex'][0])
+                ws.cell(column=15, row=row + 2, value=data['overlapindex'][1])
+            else:
+                ws.cell(column=14, row=row + 2, value='')
+                ws.cell(column=15, row=row + 2, value='')
+            if data['unionindex']:
+                ws.cell(column=16, row=row + 2, value=data['unionindex'][0])
+                ws.cell(column=17, row=row + 2, value=data['unionindex'][1])
+            else:
+                ws.cell(column=16, row=row + 2, value='')
+                ws.cell(column=17, row=row + 2, value='')
+            ws.cell(column=18, row=row + 2, value=str(data['distance']).replace('None', ''))
+            ws.cell(column=19, row=row + 2, value=data['text_before'])
+            ws.cell(column=20, row=row + 2, value=data['text_overlap'])
+            ws.cell(column=21, row=row + 2, value=data['text_after'])
+            ws.cell(column=22, row=row + 2, value=data['owner'])
+            ws.cell(column=23, row=row + 2, value=data['ctid0'])
+            ws.cell(column=24, row=row + 2, value=data['ctid1'])
+            ws.cell(column=25, row=row + 2, value=data['ctid0_text'])
+            ws.cell(column=26, row=row + 2, value=data['ctid1_text'])
+            ws.cell(column=27, row=row + 2, value=data['coded_memo0'])
+            ws.cell(column=28, row=row + 2, value=data['coded_memo1'])
+
+        # Write statistical summary to statistics sheet
         stats_col_names = ["Code0", "Code0 " + _("name"), "Code1", "Code1 " + _("name"), "Count", _("Minimum"), "Q1",
                            "Median", "Q3", _("Maximum"), "Mean", "std dev"]
-        with open(stats_filepath, 'w', encoding='UTF8') as f:
-            writer = csv.writer(f, quoting=csv.QUOTE_ALL)
-            writer.writerow(stats_col_names)
-            for r in self.result_summary:
-                row = [r['cid0'], r['c0_name'], r['cid1'], r['c1_name'], str(r['count']), str(r['min']),
-                       str(r['quantiles'][0]), str(r['quantiles'][1]), str(r['quantiles'][2]), str(r['max']),
-                       str(r['mean']), str(r['stdev'])]
-                writer.writerow(row)
-        msg = _("Code relations stats csv file exported to: ") + filepath
-        Message(self.app, _('Csv summary file Export'), msg, "information").exec()
+        row = 1
+        for col, header in enumerate(stats_col_names):
+            ws2.cell(column=col + 1, row=row, value=header)
+        for row, r in enumerate(self.result_summary):
+            ws2.cell(column=1, row=row + 2, value=r['cid0'])
+            ws2.cell(column=2, row=row + 2, value=r['c0_name'])
+            ws2.cell(column=3, row=row + 2, value=r['cid1'])
+            ws2.cell(column=4, row=row + 2, value=r['c1_name'])
+            ws2.cell(column=5, row=row + 2, value=str(r['count']))
+            ws2.cell(column=6, row=row + 2, value=str(r['min']))
+            ws2.cell(column=7, row=row + 2, value=str(r['quantiles'][0]))
+            ws2.cell(column=8, row=row + 2, value=str(r['quantiles'][1]))
+            ws2.cell(column=9, row=row + 2, value=str(r['quantiles'][2]))
+            ws2.cell(column=10, row=row + 2, value=str(r['max']))
+            ws2.cell(column=11, row=row + 2, value=str(r['mean']))
+            ws2.cell(column=12, row=row + 2, value=str(r['stdev']))
+        wb.save(filepath)
+        msg = _("Code relations file exported to: ") + filepath
+        Message(self.app, _('File export'), msg, "information").exec()
         self.parent_textEdit.append(msg)
 
     def closeEvent(self, event):
