@@ -792,8 +792,15 @@ class DialogCodeText(QtWidgets.QWidget):
         """
         
         ai_assisted_coding = self.ui.tabWidget.currentIndex() == 1
-        if self.file_ is None:
+        if self.file_ is None and not ai_assisted_coding:
+            # delete count if no file selected
+            iterator = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
+            while iterator.value():
+                item = iterator.value()
+                item.setText(3, '')
+                iterator += 1  # Move to the next item
             return
+            
         cur = self.app.conn.cursor()
         code_counts = []
         for c in self.codes:
