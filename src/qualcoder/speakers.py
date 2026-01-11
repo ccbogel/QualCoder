@@ -35,6 +35,7 @@ from .helpers import Message
 
 logger = logging.getLogger(__name__)
 max_name_len: int = 63
+speaker_coder_name = '📌 Speaker coding'
 
 class DialogSpeakers(QtWidgets.QDialog):
     """Extracts speaker names from a transcript of an interview or a focus group, lets the user select
@@ -86,7 +87,6 @@ class DialogSpeakers(QtWidgets.QDialog):
         """
 
         transcript = self.app.get_text_fulltext(self.fid)
-        codername = self.app.settings['codername']
         self.codings = []
         name_counts: Dict[str, int] = {}
         name_example: Dict[str, str] = {}
@@ -119,7 +119,7 @@ class DialogSpeakers(QtWidgets.QDialog):
                     "seltext": seltext,
                     "pos0": current_start,
                     "pos1": current_end,
-                    "owner": codername,
+                    "owner": speaker_coder_name,
                     "memo": "",
                     "date": datetime.datetime.now()
                     .astimezone()
@@ -203,6 +203,8 @@ class DialogSpeakers(QtWidgets.QDialog):
             )
 
     def fill_table(self):
+        """Fill the table widget in the dialog.
+        """
         self.ui.tableWidget.blockSignals(True)
         vertical_scroll = self.ui.tableWidget.verticalScrollBar().value()
         try:
@@ -272,7 +274,7 @@ class DialogSpeakers(QtWidgets.QDialog):
             if speakers_cat is None:
                 speakers_memo = _("This contains all the speakers that have been marked in documents.")
                 item = {'name': self.speakers_category_name, 'cid': None, 'memo': speakers_memo,
-                        'owner': self.app.settings['codername'],
+                        'owner': speaker_coder_name,
                         'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")}
                 cur.execute("insert into code_cat (name, memo, owner, date, supercatid) values(?,?,?,?,?)",
                             (item['name'], item['memo'], item['owner'], item['date'], None))   
@@ -295,7 +297,7 @@ class DialogSpeakers(QtWidgets.QDialog):
                 if speaker_code is None:
                     code_color = colors[randint(0, len(colors) - 1)]
                     item = {'cid': None, 'name': speaker['code_as'], 'memo': self.filename,
-                            'catid': speakers_catid, 'owner': self.app.settings['codername'],
+                            'catid': speakers_catid, 'owner': speaker_coder_name,
                             'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),
                             'color': code_color}
                     cur.execute("insert into code_name (name, memo, catid, owner, date, color) values(?,?,?,?,?,?)",

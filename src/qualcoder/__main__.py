@@ -1183,7 +1183,7 @@ class App(object):
         """
         if self.conn is None:
             return
-        system_coder_names = ['📌 ' + _('Speakers'), ] # in the future, we could add '🤖 AI' to the list, and more...
+        system_coder_names = ['📌 Speaker coding'] # in the future, we could add '🤖 AI' to the list, and more...
         
         cur = self.conn.cursor()
         initial_changes = self.conn.total_changes

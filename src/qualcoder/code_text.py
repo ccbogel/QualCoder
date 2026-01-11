@@ -50,7 +50,7 @@ from .reports import DialogReportCoderComparisons, DialogReportCodeFrequencies  
 from .report_codes import DialogReportCodes
 from .report_code_summary import DialogReportCodeSummary  # For isinstance()
 from .select_items import DialogSelectItems  # For isinstance()
-from .speakers import DialogSpeakers
+from .speakers import DialogSpeakers, speaker_coder_name
 from .coder_names import DialogCoderNames
 from .ai_search_dialog import DialogAiSearch
 from .ai_prompts import PromptsList, DialogAiEditPrompts
@@ -3457,24 +3457,42 @@ class DialogCodeText(QtWidgets.QWidget):
         ui_coder_names = DialogCoderNames(self.app)
         if (ui_coder_names.exec() == QtWidgets.QDialog.DialogCode.Accepted and 
            ui_coder_names.coder_names_changed):
-            # Update UI as coders visibility may have changed
-            self.annotations = self.app.get_annotations()
-            self.get_coded_text_update_eventfilter_tooltips()
-            self.fill_code_counts_in_tree()
-            self.ui.lineEdit_coder.setText(self.app.settings['codername'])
-            # close contents in tab_reports since they must update coder names as well 
-            contents = self.tab_reports.layout()
-            if contents:
-                for i in reversed(range(contents.count())):
-                    contents.itemAt(i).widget().close()
-                    contents.itemAt(i).widget().setParent(None)
-
+            self.update_coder_names()
+            
+    def update_coder_names(self):
+        """Update ui elements related to the coder names,
+        also close contents in tab_reports since they must 
+        update coder names as well."""
+        # Update UI as coders visibility may have changed
+        self.annotations = self.app.get_annotations()
+        self.get_coded_text_update_eventfilter_tooltips()
+        self.fill_code_counts_in_tree()
+        self.ui.lineEdit_coder.setText(self.app.settings['codername'])
+        # close contents in tab_reports since they must update coder names as well 
+        contents = self.tab_reports.layout()
+        if contents:
+            for i in reversed(range(contents.count())):
+                contents.itemAt(i).widget().close()
+                contents.itemAt(i).widget().setParent(None)
             
     def mark_speakers(self):
         if self.file_ is not None: 
             ui_speaker = DialogSpeakers(self.app, self.file_['id'], self.file_['name'])
             if ui_speaker.exec() == QtWidgets.QDialog.DialogCode.Accepted:
                 self.update_dialog_codes_and_categories()
+                if self.app.conn is not None and speaker_coder_name not in self.app.get_coder_names_in_project(only_visible=True):
+                    msg = _('The coder "{}" is currently hidden. Do you want to make it visible, so you can see the speaker codings?').format(speaker_coder_name)
+                    msg_box = Message(self.app, _('Speaker coding'), msg, 'Information')
+                    msg_box.setStandardButtons(
+                        QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
+                    msg_box.setDefaultButton(QtWidgets.QMessageBox.StandardButton.Yes)
+                    reply = msg_box.exec()
+                    if reply == QtWidgets.QMessageBox.StandardButton.Yes:
+                        cur = self.app.conn
+                        cur.execute('update coder_names set visibility=1 where name=?', (speaker_coder_name,))
+                        cur.commit()
+                        self.update_coder_names()
+                        
         else:
             Message(self.app, _('Mark speakers'), _('No text file selected.'), 'critical').exec()
 
