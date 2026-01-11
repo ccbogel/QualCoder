@@ -55,6 +55,7 @@ class DialogCoderNames(QtWidgets.QDialog):
         self.app = app
         self.settings = settings if settings is not None else self.app.settings
         self.do_commit = do_commit
+        self.coder_names_changed = False
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_coders()
         self.ui.setupUi(self)
@@ -375,6 +376,7 @@ class DialogCoderNames(QtWidgets.QDialog):
 
     def ok(self):
         if self.initial_current_coder != self.current_coder:
+            self.coder_names_changed = True
             self.settings['codername'] = self.current_coder
             if self.settings is self.app.settings:
                 self.app.write_config_ini(self.app.settings, self.app.ai_models)
@@ -383,6 +385,7 @@ class DialogCoderNames(QtWidgets.QDialog):
             self.app.delete_backup = False
             
         if self.app.conn is not None and self.app.conn.total_changes != self.initial_changes:
+            self.coder_names_changed = True
             self.app.delete_backup = False
         
         if self.do_commit and self.app.conn is not None:
@@ -391,7 +394,8 @@ class DialogCoderNames(QtWidgets.QDialog):
         
     def cancel(self):
         if self.app.conn is not None:
-            self.app.conn.rollback()        
+            self.app.conn.rollback()     
+        self.coder_names_changed = False   
 
 
     def help(self):

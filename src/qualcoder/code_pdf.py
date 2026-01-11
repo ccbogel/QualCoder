@@ -756,14 +756,21 @@ class DialogCodePdf(QtWidgets.QWidget):
 
     def edit_coder_names(self):
         ui_coder_names = DialogCoderNames(self.app)
-        if ui_coder_names.exec() == QtWidgets.QDialog.DialogCode.Accepted:
+        if (ui_coder_names.exec() == QtWidgets.QDialog.DialogCode.Accepted and 
+            ui_coder_names.coder_names_changed):
             # Update UI as coders visibility may have changed
             self.annotations = self.app.get_annotations()
             self.get_coded_text_update_eventfilter_tooltips()
             self.display_page_text_objects()
             self.fill_code_counts_in_tree()
-            self.ui.lineEdit_coder.setText(self.app.settings['codername'])
-    
+            self.ui.lineEdit_coder.setText(self.app.settings['codername'])   
+            # close contents in tab_reports since they must update coder names as well 
+            contents = self.tab_reports.layout()
+            if contents:
+                for i in reversed(range(contents.count())):
+                    contents.itemAt(i).widget().close()
+                    contents.itemAt(i).widget().setParent(None)
+
 
     # Search for text methods
     def search_for_text(self):
