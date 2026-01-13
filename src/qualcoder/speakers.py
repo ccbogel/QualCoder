@@ -30,12 +30,14 @@ from random import randint
 import sqlite3
 
 from .GUI.ui_dialog_speakers import Ui_Dialog_speakers
-from .color_selector import colors
+from .color_selector import colors, colour_ranges
 from .helpers import Message
 
 logger = logging.getLogger(__name__)
 max_name_len: int = 63
 speaker_coder_name = '📌 Speaker coding'
+gray_range = next(r for r in colour_ranges if r['name'] == 'gray')
+speaker_colors = colors[gray_range['min']:gray_range['max']+1]
 
 class DialogSpeakers(QtWidgets.QDialog):
     """Extracts speaker names from a transcript of an interview or a focus group, lets the user select
@@ -287,6 +289,7 @@ class DialogSpeakers(QtWidgets.QDialog):
             speakers_catid = speakers_cat[4]
             
             # for each speaker name, find a suitabe code or add a new
+            used_colors = []
             for speaker in self.speaker_summary:
                 if not speaker['selected']:
                     continue
@@ -295,7 +298,14 @@ class DialogSpeakers(QtWidgets.QDialog):
                             (speakers_catid, speaker['code_as']))
                 speaker_code = cur.fetchone()
                 if speaker_code is None:
-                    code_color = colors[randint(0, len(colors) - 1)]
+                    # search for unused color if possible
+                    code_color = None
+                    for color in speaker_colors:
+                        if color not in used_colors:
+                            code_color = color
+                            break
+                    if code_color is None:
+                        code_color = speaker_colors[randint(0, len(speaker_colors) - 1)]
                     item = {'cid': None, 'name': speaker['code_as'], 'memo': self.filename,
                             'catid': speakers_catid, 'owner': speaker_coder_name,
                             'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"),
@@ -306,9 +316,11 @@ class DialogSpeakers(QtWidgets.QDialog):
                     cur.execute("select cid, name, ifnull(memo,''), catid, owner, date, color from code_name where catid == ? and name == ?",
                                 (speakers_catid, speaker['code_as']))
                     speaker_code = cur.fetchone()
+                    used_colors.append(code_color)
                 else:
                     cur.execute("update code_name set memo = ? where cid = ?", 
-                                (f'{speaker_code[2]}\n{self.filename}', speaker_code[0]))    
+                                (f'{speaker_code[2]}\n{self.filename}', speaker_code[0]))
+                    used_colors.append(speaker_code[6])    
                 if speaker_code is None:
                     raise ValueError(_('Speaker code could not be found found or created.'))
                 speaker_code_cid = speaker_code[0]
