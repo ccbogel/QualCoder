@@ -21,11 +21,7 @@ https://qualcoder.wordpress.com/
 
 import logging
 import re
-import datetime
-from typing import Any, Dict, List, Tuple, Optional
 from PyQt6 import QtCore, QtWidgets
-import webbrowser
-from random import randint
 import sqlite3
 
 from .GUI.ui_dialog_coder_names import Ui_Dialog_coders
