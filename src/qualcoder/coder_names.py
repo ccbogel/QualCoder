@@ -65,6 +65,8 @@ class DialogCoderNames(QtWidgets.QDialog):
         headers = [_("Name"), _("Codings"), _("Visibility")]
         self.ui.tableWidget.setColumnCount(len(headers))
         self.ui.tableWidget.setHorizontalHeaderLabels(headers)
+        self.ui.tableWidget.setColumnWidth(0, 200)  # Name column
+        self.ui.tableWidget.setColumnWidth(1, 100)  # Status column
         self.current_coder = self.settings['codername']
         self.initial_current_coder = self.settings['codername']
         self.coder_names = []
