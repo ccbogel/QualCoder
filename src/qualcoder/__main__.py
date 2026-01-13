@@ -1226,6 +1226,7 @@ class App(object):
                 VALUES (?, 1) 
                 ON CONFLICT(name) 
                 DO UPDATE SET visibility = 1
+                WHERE coder_names.visibility <> 1
             """
             cur.execute(sql, (self.settings['codername'],))
             
