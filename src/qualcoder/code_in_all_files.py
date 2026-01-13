@@ -103,28 +103,28 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         self.te.append(msg)
         cur = self.app.conn.cursor()
         sql = "select code_name.name, color, source.name, pos0, pos1, seltext, source.name, source.id,ctid," \
-              "important, code_text.memo from "
-        sql += "code_text "
-        sql += " join code_name on code_name.cid = code_text.cid join source on fid = source.id "
-        sql += " where code_name.cid=? and code_text.owner=?"
+              "important, code_text_visible.memo, code_text_visible.owner from "
+        sql += "code_text_visible "
+        sql += " join code_name on code_name.cid = code_text_visible.cid join source on fid = source.id "
+        sql += " where code_name.cid=? "
         sql += " order by source.name, pos0"
         if self.case_or_file == "Case":
             sql = "select code_name.name, color, cases.name, "
-            sql += "code_text.pos0, code_text.pos1, seltext, source.name, source.id, ctid, important," \
-                   "code_text.memo from code_text "
-            sql += " join code_name on code_name.cid = code_text.cid "
+            sql += "code_text_visible.pos0, code_text_visible.pos1, seltext, source.name, source.id, ctid, important," \
+                   "code_text_visible.memo, code_text_visible.owner from code_text_visible "
+            sql += " join code_name on code_name.cid = code_text_visible.cid "
             sql += " join (case_text join cases on cases.caseid = case_text.caseid) on "
-            sql += " code_text.fid = case_text.fid "
-            sql += "and (code_text.pos0 between case_text.pos0 and case_text.pos1) "
-            sql += "and (code_text.pos1 between case_text.pos0 and case_text.pos1) "
-            sql += " join source on source.id = case_text.fid "
-            sql += " where code_name.cid=? and code_text.owner=? "
-            sql += " order by cases.name, code_text.pos0, code_text.owner"
-        cur.execute(sql, [self.code_dict['cid'], self.app.settings['codername']])
+            sql += " code_text_visible.fid = case_text.fid "
+            sql += "and (code_text_visible.pos0 between case_text.pos0 and case_text.pos1) "
+            sql += "and (code_text_visible.pos1 between case_text.pos0 and case_text.pos1) "
+            sql += " join source on source.id = case_text_visible.fid "
+            sql += " where code_name.cid=? "
+            sql += " order by cases.name, code_text_visible.pos0, code_text_visible.owner"
+        cur.execute(sql, [self.code_dict['cid']])
         results = cur.fetchall()
         self.text_results = []
         keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'text', 'source_name', 'fid', 'ctid', \
-            'important', 'memo'
+            'important', 'memo', 'owner'
         for row in results:
             self.text_results.append(dict(zip(keys, row)))
 
@@ -140,31 +140,32 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
                 title += _("Case: ") + row['file_or_casename'] + _(" File: ") + row['source_name']
             title += "</span>"
             title += f", {row['pos0']} - {row['pos1']}"
+            title += f" ({row['owner']})"
             self.te.insertHtml(title)
             row['textedit_end'] = len(self.te.toPlainText())
             self.te.append(f"{row['text']}\n\n")
 
         # Get coded image by file for this coder data
         sql = "select code_name.name, color, source.name, x1, y1, width, height,"
-        sql += " source.mediapath, source.id, code_image.memo, imid, important "
-        sql += " from code_image join code_name "
-        sql += "on code_name.cid = code_image.cid join source on code_image.id = source.id "
-        sql += "where code_name.cid =? and code_image.owner=? "
+        sql += " source.mediapath, source.id, code_image_visible.memo, imid, important, code_image_visible.owner "
+        sql += " from code_image_visible join code_name "
+        sql += "on code_name.cid = code_image_visible.cid join source on code_image_visible.id = source.id "
+        sql += "where code_name.cid =? "
         sql += " order by source.name"
         if self.case_or_file == "Case":
             sql = "select code_name.name, color, cases.name, "
-            sql += "x1, y1, width, height, source.mediapath, source.id, code_image.memo,imid, important "
-            sql += "from code_image join code_name on code_name.cid = code_image.cid "
+            sql += "x1, y1, width, height, source.mediapath, source.id, code_image_visible.memo,imid, important, code_image_visible.owner "
+            sql += "from code_image_visible join code_name on code_name.cid = code_image_visible.cid "
             sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
-            sql += "code_image.id = case_text.fid "
+            sql += "code_image_visible.id = case_text.fid "
             sql += " join source on case_text.fid = source.id "
-            sql += "where code_name.cid=? and code_image.owner=? "
-            sql += " order by cases.name, code_image.owner "
-        cur.execute(sql, [self.code_dict['cid'], self.app.settings['codername']])
+            sql += "where code_name.cid=? "
+            sql += " order by cases.name, code_image_visible.owner "
+        cur.execute(sql, [self.code_dict['cid']])
         results = cur.fetchall()
         self.image_results = []
         keys = 'codename', 'color', 'file_or_casename', 'x1', 'y1', 'width', 'height', 'mediapath', 'fid', 'memo', \
-               'imid', 'important'
+               'imid', 'important', 'owner'
         for row in results:
             self.image_results.append(dict(zip(keys, row)))
         # Image - textEdit insertion
@@ -177,7 +178,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
                 title += _(" Case: ") + row['file_or_casename'] + _(" File: ") + row['mediapath']
             else:
                 title += _(" File: ") + row['mediapath']
-            title += '</span></p>'
+            title += f'</span> ({row['owner']})</p>'
             self.te.insertHtml(title)
             row['textedit_end'] = len(self.te.toPlainText())
             self.te.append("\n")
@@ -187,24 +188,24 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
             self.te.append(_("Memo: ") + row['memo'] + "\n\n")
 
         # Get coded A/V by file for this coder data
-        sql = "select code_name.name, color, source.name, pos0, pos1, code_av.memo, "
-        sql += "source.mediapath, source.id, avid, important from code_av join code_name "
-        sql += "on code_name.cid = code_av.cid join source on code_av.id = source.id "
-        sql += "where code_name.cid =? and code_av.owner=? "
+        sql = "select code_name.name, color, source.name, pos0, pos1, code_av_visible.memo, "
+        sql += "source.mediapath, source.id, avid, important, code_av_visible.owner from code_av_visible join code_name "
+        sql += "on code_name.cid = code_av_visible.cid join source on code_av_visible.id = source.id "
+        sql += "where code_name.cid =? "
         sql += " order by source.name"
         if self.case_or_file == "Case":
-            sql = "select code_name.name, color, cases.name, code_av.pos0, code_av.pos1, code_av.memo, "
-            sql += "source.mediapath, source.id, avid, important from "
-            sql += "code_av join code_name on code_name.cid = code_av.cid "
+            sql = "select code_name.name, color, cases.name, code_av_visible.pos0, code_av_visible.pos1, code_av_visible.memo, "
+            sql += "source.mediapath, source.id, avid, important, code_av_visible.owner from "
+            sql += "code_av_visible join code_name on code_name.cid = code_av_visible.cid "
             sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
-            sql += "code_av.id = case_text.fid "
+            sql += "code_av_visible.id = case_text.fid "
             sql += " join source on case_text.fid = source.id "
-            sql += "where code_name.cid=? and code_av.owner=? "
-            sql += " order by source.name, code_av.owner "
-        cur.execute(sql, [self.code_dict['cid'], self.app.settings['codername']])
+            sql += "where code_name.cid=? "
+            sql += " order by source.name, code_av_visible.owner "
+        cur.execute(sql, [self.code_dict['cid']])
         results = cur.fetchall()
         self.av_results = []
-        keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'memo', 'mediapath', 'fid', 'avid', 'important'
+        keys = 'codename', 'color', 'file_or_casename', 'pos0', 'pos1', 'memo', 'mediapath', 'fid', 'avid', 'important', 'owner'
         for row in results:
             self.av_results.append(dict(zip(keys, row)))
         # A/V - textEdit insertion
@@ -217,7 +218,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
                 title += _("Case: ") + row['file_or_casename'] + _(" File: ") + row['mediapath']
             else:
                 title += _("File: ") + row['mediapath']
-            title += '</span>'
+            title += f'</span> ({row['owner']})'
             self.te.insertHtml(title)
             start = msecs_to_mins_and_secs(row['pos0'])
             end = msecs_to_mins_and_secs(row['pos1'])

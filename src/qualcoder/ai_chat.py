@@ -340,14 +340,9 @@ class DialogAIChat(QtWidgets.QDialog):
             self.ai_search_code_memo = ui.selected_code_memo
             self.ai_search_file_ids = ui.selected_file_ids
             self.ai_search_code_ids = ui.selected_code_ids
+            self.ai_search_coder_names = ui.coder_names
             self.ai_prompt = ui.current_prompt
-            
-            file_ids_str = str(self.ai_search_file_ids).replace('[', '(').replace(']', ')')
-            code_ids_str = str(self.ai_search_code_ids).replace('[', '(').replace(']', ')')
-                        
             # fetch data
-            #sql = f'SELECT * FROM code_text WHERE cid IN {code_ids_str} AND fid IN {file_ids_str}'
-            
             # This SQL sorts the results by file id, but not like 1, 1, 1, 2, 2, 3... 
             # Instead, the results are mixed up in this order: file id = 1, 2, 3, 1, 2, 1...
             # This tries to ensure that even if the data send to the AI must be cut off at some point 
@@ -355,20 +350,40 @@ class DialogAIChat(QtWidgets.QDialog):
             # possible included in the analysis.
             # The JOIN also adds the source.name so that the AI can refer to a certain document
             # by its name.     
+
+            code_ids = list(self.ai_search_code_ids or [])
+            file_ids = list(self.ai_search_file_ids or [])
+            coder_names = list(self.ai_search_coder_names or [])
+
+            code_ph  = ",".join(["?"] * len(code_ids))
+            file_ph  = ",".join(["?"] * len(file_ids))
+            owner_ph = ",".join(["?"] * len(coder_names))
+
             sql = f"""
                 SELECT ordered.*, source.name, code_name.name AS code_name
                 FROM (
-                SELECT *, ROW_NUMBER() OVER (PARTITION BY fid ORDER BY ctid) as rn
-                FROM code_text
-                WHERE cid IN {code_ids_str} AND fid IN {file_ids_str}
+                    SELECT *,
+                        ROW_NUMBER() OVER (PARTITION BY fid ORDER BY ctid) AS rn
+                    FROM code_text
+                    WHERE cid IN ({code_ph})
+                    AND fid IN ({file_ph})
+                    AND owner IN ({owner_ph})
                 ) AS ordered
                 JOIN source ON ordered.fid = source.id
                 JOIN code_name ON ordered.cid = code_name.cid
                 ORDER BY ordered.rn, ordered.fid;
-                """
+            """
+
+            params = [*code_ids, *file_ids, *coder_names]
+
             cursor = self.app.conn.cursor()
-            cursor.execute(sql)
+            cursor.execute(sql, params)
             self.curr_codings = cursor.fetchall()
+            
+            if len(self.curr_codings) == 0:
+                msg = _('No codings found for this particuar combination of coder, document filter, and code.')
+                Message(self.app, _('Code analysis'), msg, 'warning').exec()
+                return
             
             ai_data = []
             # Limit the amount of data (characters) send to the ai, so the maximum context window is not exceeded.

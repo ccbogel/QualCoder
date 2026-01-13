@@ -50,7 +50,8 @@ from .reports import DialogReportCoderComparisons, DialogReportCodeFrequencies  
 from .report_codes import DialogReportCodes
 from .report_code_summary import DialogReportCodeSummary  # For isinstance()
 from .select_items import DialogSelectItems  # For isinstance()
-from .speakers import DialogSpeakers
+from .speakers import DialogSpeakers, speaker_coder_name
+from .coder_names import DialogCoderNames
 from .ai_search_dialog import DialogAiSearch
 from .ai_prompts import PromptsList, DialogAiEditPrompts
 from .ai_chat import ai_chat_signal_emitter
@@ -194,7 +195,8 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.treeWidget.setStyleSheet(tree_font)
         doc_font = f'font: {self.app.settings["docfontsize"]}pt "{self.app.settings["font"]}";'
         self.ui.textEdit.setStyleSheet(doc_font)
-        self.ui.label_coder.setText(f"Coder: {self.app.settings['codername']}")
+        self.ui.lineEdit_coder.setText(self.app.settings['codername'])
+        self.ui.pushButton_coder.clicked.connect(self.edit_coder_names)
         self.ui.textEdit.setPlainText("")
         self.ui.textEdit.setAutoFillBackground(True)
         self.ui.textEdit.setToolTip("")
@@ -493,7 +495,7 @@ class DialogCodeText(QtWidgets.QWidget):
         # Fill additional details about each file in the memo
         cur = self.app.conn.cursor()
         sql_length = "select length(fulltext), fulltext from source where id=?"
-        sql_codings = "select count(cid) from code_text where fid=? and owner=?"
+        sql_codings = "select count(cid) from code_text_visible where fid=?"
         sql_case = "SELECT group_concat(cases.name) from cases join case_text on case_text.caseid=cases.caseid " \
                    "where case_text.fid=?"
         for file_ in self.files:
@@ -513,7 +515,7 @@ class DialogCodeText(QtWidgets.QWidget):
             file_['start'] = 0
             file_['end'] = res_length[0]
             file_['fulltext'] = res_length[1]
-            cur.execute(sql_codings, [file_['id'], self.app.settings['codername']])
+            cur.execute(sql_codings, [file_['id']])
             res_codings = cur.fetchone()
             tt += f'\n{_("Codings:")} {res_codings[0]}'
             tt += f"\n{_('From:')} {file_['start']} - {file_['end']}"
@@ -557,8 +559,8 @@ class DialogCodeText(QtWidgets.QWidget):
             res = [0, ""]
         tt = _("Characters: ") + str(res[0])
         file_size = {'characters': res[0], 'start': 0, 'end': res[0], 'fulltext': res[1]}
-        sql_codings = "select count(cid) from code_text where fid=? and owner=?"
-        cur.execute(sql_codings, [self.file_['id'], self.app.settings['codername']])
+        sql_codings = "select count(cid) from code_text_visible where fid=?"
+        cur.execute(sql_codings, [self.file_['id']])
         res = cur.fetchone()
         tt += f"\n{_('Codings:')} {res[0]}"
         tt += f"\n{_('From:')} {file_size['start']} - {file_size['end']}"
@@ -790,19 +792,26 @@ class DialogCodeText(QtWidgets.QWidget):
         """
         
         ai_assisted_coding = self.ui.tabWidget.currentIndex() == 1
-        if self.file_ is None:
+        if self.file_ is None and not ai_assisted_coding:
+            # delete count if no file selected
+            iterator = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
+            while iterator.value():
+                item = iterator.value()
+                item.setText(3, '')
+                iterator += 1  # Move to the next item
             return
+            
         cur = self.app.conn.cursor()
         code_counts = []
         for c in self.codes:
-            parameters = [c['cid'], self.app.settings['codername']]
+            parameters = [c['cid']]
             if ai_assisted_coding:
-                sql = "select code_name.catid, count(code_text.cid) from code_text join code_name " \
-                      "on code_name.cid=code_text.cid where code_text.cid=? and code_text.owner=?"
+                sql = "select code_name.catid, count(code_text_visible.cid) from code_text_visible join code_name " \
+                      "on code_name.cid=code_text_visible.cid where code_text_visible.cid=?"
             else:  # documents
-                sql = "select code_name.catid, count(code_text.cid) from code_text join code_name " \
-                      "on code_name.cid=code_text.cid where code_text.cid=? and code_text.owner=? " \
-                       "and code_text.fid=?"
+                sql = "select code_name.catid, count(code_text_visible.cid) from code_text_visible join code_name " \
+                      "on code_name.cid=code_text_visible.cid where code_text_visible.cid=?" \
+                       "and code_text_visible.fid=?"
                 parameters.append(self.file_['id'])
             cur.execute(sql, parameters)
             result = cur.fetchone()
@@ -887,7 +896,7 @@ class DialogCodeText(QtWidgets.QWidget):
             # Get coded examples
             txt += "\n\n" + _("Examples:") + "\n"
             cur = self.app.conn.cursor()
-            cur.execute("select seltext from code_text where length(seltext) > 0 and cid=? order by random() limit 3",
+            cur.execute("select seltext from code_text_visible where length(seltext) > 0 and cid=? order by random() limit 3",
                         [int(selected.text(1)[4:])])
             res = cur.fetchall()
             for i, r in enumerate(res):
@@ -1361,8 +1370,7 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         coded_list = []
         for item in self.code_text:
-            if item['pos0'] <= position + self.file_['start'] <= item['pos1'] and \
-                    item['owner'] == self.app.settings['codername']:
+            if item['pos0'] <= position + self.file_['start'] <= item['pos1']:
                 coded_list.append(item)
         if not coded_list:
             return
@@ -1451,8 +1459,7 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         coded_text_list = []
         for item in self.code_text:
-            if item['pos0'] <= position + self.file_['start'] <= item['pos1'] and \
-                    item['owner'] == self.app.settings['codername']:
+            if item['pos0'] <= position + self.file_['start'] <= item['pos1']:
                 coded_text_list.append(item)
         if not coded_text_list:
             return
@@ -1541,7 +1548,6 @@ class DialogCodeText(QtWidgets.QWidget):
         coded_text_list = []
         for item in self.code_text:
             if item['pos0'] <= position + self.file_['start'] <= item['pos1'] and \
-                    item['owner'] == self.app.settings['codername'] and \
                     ((not important and item['important'] == 1) or (important and item['important'] != 1)):
                 coded_text_list.append(item)
         if not coded_text_list:
@@ -1616,8 +1622,7 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         coded_text_list = []
         for item in self.code_text:
-            if item['pos0'] <= position + self.file_['start'] <= item['pos1'] and \
-                    item['owner'] == self.app.settings['codername']:
+            if item['pos0'] <= position + self.file_['start'] <= item['pos1']:
                 coded_text_list.append(item)
         if not coded_text_list:
             return
@@ -1649,7 +1654,7 @@ class DialogCodeText(QtWidgets.QWidget):
         for i in self.code_text:
             if text_item['cid'] == i['cid'] and text_item['seltext'] == i['seltext'] \
                     and text_item['pos0'] == i['pos0'] and text_item['pos1'] == i['pos1'] \
-                    and text_item['owner'] == self.app.settings['codername']:
+                    and text_item['owner'] == i['owner']:
                 i['memo'] = memo
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
@@ -1896,15 +1901,16 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         text_ = ""
         cur = self.app.conn.cursor()
-        sql = "select code_name.name, pos0,pos1, seltext, code_text.memo "
-        sql += "from code_text join code_name on code_text.cid = code_name.cid "
-        sql += "where length(code_text.memo)>0 and fid=? and code_text.owner=? order by pos0"
-        cur.execute(sql, [self.file_['id'], self.app.settings['codername']])
+        sql = "select code_name.name, pos0,pos1, seltext, code_text_visible.memo, code_text_visible.owner "
+        sql += "from code_text_visible join code_name on code_text_visible.cid = code_name.cid "
+        sql += "where length(code_text_visible.memo)>0 and fid=? order by pos0"
+        cur.execute(sql, [self.file_['id']])
         res = cur.fetchall()
         if not res:
             return
         for r in res:
-            text_ += f'[{r[1]}-{r[2]}] ' + _("Code: ") + f'{r[0]}\n'
+            text_ += f'[{r[1]}-{r[2]}] ' + _("Code: ") + f'{r[0]}'
+            text_ += " (" + r[5] + ")\n" # coder/owner
             text_ += _("Text: ") + f"{r[3]}\n"
             text_ += _("Memo: ") + f"{r[4]}\n\n"
         ui = DialogMemo(self.app, _("Memos for file: ") + self.file_['name'], text_)
@@ -1919,10 +1925,10 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         text_ = ""
         cur = self.app.conn.cursor()
-        sql = "select substr(source.fulltext,pos0+1 ,pos1-pos0), pos0, pos1, annotation.memo "
-        sql += "from annotation join source on annotation.fid = source.id "
-        sql += "where fid=? and annotation.owner=? order by pos0"
-        cur.execute(sql, [self.file_['id'], self.app.settings['codername']])
+        sql = "select substr(source.fulltext,pos0+1 ,pos1-pos0), pos0, pos1, annotation_visible.memo "
+        sql += "from annotation_visible join source on annotation_visible.fid = source.id "
+        sql += "where fid=? order by pos0"
+        cur.execute(sql, [self.file_['id']])
         res = cur.fetchall()
         if not res:
             return
@@ -2076,8 +2082,7 @@ class DialogCodeText(QtWidgets.QWidget):
         selected_text = self.ui.textEdit.textCursor().selectedText()
         codes_here = []
         for item in self.code_text:
-            if item['pos0'] <= cursor_pos + self.file_['start'] <= item['pos1'] and \
-                    item['owner'] == self.app.settings['codername']:
+            if item['pos0'] <= cursor_pos + self.file_['start'] <= item['pos1']:
                 codes_here.append(item)
         # Hash display character position
         if key == QtCore.Qt.Key.Key_Exclam:
@@ -2399,8 +2404,7 @@ class DialogCodeText(QtWidgets.QWidget):
             cursor_pos = self.ui.textEdit.textCursor().position()
             codes_here = []
             for item in self.code_text:
-                if item['pos0'] <= cursor_pos + self.file_['start'] <= item['pos1'] and \
-                        item['owner'] == self.app.settings['codername']:
+                if item['pos0'] <= cursor_pos + self.file_['start'] <= item['pos1']:
                     codes_here.append(item)
             code_ = None
             if len(codes_here) == 0:
@@ -3448,12 +3452,47 @@ class DialogCodeText(QtWidgets.QWidget):
                 except Exception as e:
                     logger.debug(str(e))
                 break
+
+    def edit_coder_names(self):
+        ui_coder_names = DialogCoderNames(self.app)
+        if (ui_coder_names.exec() == QtWidgets.QDialog.DialogCode.Accepted and 
+           ui_coder_names.coder_names_changed):
+            self.update_coder_names()
+            
+    def update_coder_names(self):
+        """Update ui elements related to the coder names,
+        also close contents in tab_reports since they must 
+        update coder names as well."""
+        # Update UI as coders visibility may have changed
+        self.annotations = self.app.get_annotations()
+        self.get_coded_text_update_eventfilter_tooltips()
+        self.fill_code_counts_in_tree()
+        self.ui.lineEdit_coder.setText(self.app.settings['codername'])
+        # close contents in tab_reports since they must update coder names as well 
+        contents = self.tab_reports.layout()
+        if contents:
+            for i in reversed(range(contents.count())):
+                contents.itemAt(i).widget().close()
+                contents.itemAt(i).widget().setParent(None)
             
     def mark_speakers(self):
         if self.file_ is not None: 
             ui_speaker = DialogSpeakers(self.app, self.file_['id'], self.file_['name'])
             if ui_speaker.exec() == QtWidgets.QDialog.DialogCode.Accepted:
                 self.update_dialog_codes_and_categories()
+                if self.app.conn is not None and speaker_coder_name not in self.app.get_coder_names_in_project(only_visible=True):
+                    msg = _('The coder "{}" is currently hidden. Do you want to make it visible, so you can see the speaker codings?').format(speaker_coder_name)
+                    msg_box = Message(self.app, _('Speaker coding'), msg, 'Information')
+                    msg_box.setStandardButtons(
+                        QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No)
+                    msg_box.setDefaultButton(QtWidgets.QMessageBox.StandardButton.Yes)
+                    reply = msg_box.exec()
+                    if reply == QtWidgets.QMessageBox.StandardButton.Yes:
+                        cur = self.app.conn
+                        cur.execute('update coder_names set visibility=1 where name=?', (speaker_coder_name,))
+                        cur.commit()
+                        self.update_coder_names()
+                        
         else:
             Message(self.app, _('Mark speakers'), _('No text file selected.'), 'critical').exec()
 
@@ -3545,14 +3584,14 @@ class DialogCodeText(QtWidgets.QWidget):
 
         if self.file_ is None:
             return
-        sql_values = [int(self.file_['id']), self.app.settings['codername'], self.file_['start'], self.file_['end']]
-        # Get code text for this file and for this coder
+        sql_values = [int(self.file_['id']), self.file_['start'], self.file_['end']]
+        # Get code text for this file and for visible coders
         self.code_text = []
         # seltext length, longest first, so overlapping shorter text is superimposed.
-        sql = "select code_text.ctid, code_text.cid, fid, seltext, pos0, pos1, code_text.owner, code_text.date, " \
-              "code_text.memo, important, name"
-        sql += " from code_text join code_name on code_text.cid = code_name.cid"
-        sql += " where fid=? and code_text.owner=? "
+        sql = "select code_text_visible.ctid, code_text_visible.cid, fid, seltext, pos0, pos1, code_text_visible.owner, code_text_visible.date, " \
+              "code_text_visible.memo, important, name"
+        sql += " from code_text_visible join code_name on code_text_visible.cid = code_name.cid"
+        sql += " where fid=?"
         # For file text which is currently loaded
         sql += " and pos0 >=? and pos1 <=? "
         sql += "order by length(seltext) desc, important asc"
@@ -3734,7 +3773,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 msg += _("Do you want to store the AI interpretation in a memo together with the coding?<br/><br/>")
                 msg += '<i>' + memo.replace('\n', '<br/>') + '</i></p>'
                 reply = QtWidgets.QMessageBox.question(
-                    self, 'AI Interpretation', msg,
+                    self, _('AI Interpretation'), msg,
                     QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No,
                     QtWidgets.QMessageBox.StandardButton.Yes
                 )
@@ -3797,7 +3836,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.fill_code_counts_in_tree()
 
     def unmark(self, location):
-        """ Remove code marking by this coder from selected text in current file.
+        """ Remove code marking by all visible coders from selected text in current file.
         Called by text_edit_context_menu
         Adjust for start of text file, as this may be a smaller portion of the full text file.
 
@@ -3810,8 +3849,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.clear_edit_variables()
         unmarked_list = []
         for item in self.code_text:
-            if item['pos0'] <= location + self.file_['start'] <= item['pos1'] and \
-                    item['owner'] == self.app.settings['codername']:
+            if item['pos0'] <= location + self.file_['start'] <= item['pos1']:
                 unmarked_list.append(item)
         if not unmarked_list:
             return
@@ -5106,7 +5144,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 chunk_start = chunk.metadata['start_index']
                 chunk_end = chunk_start + len(chunk.page_content)
                 code_ids_str = "(" + ", ".join(map(str, self.ai_search_code_ids)) + ")"
-                codings_sql = f'select pos0, pos1 from code_text where fid={chunk_source_id} AND cid in {code_ids_str}'
+                codings_sql = f'select pos0, pos1 from code_text_visible where fid={chunk_source_id} AND cid in {code_ids_str}'
                 cur = self.app.conn.cursor()
                 cur.execute(codings_sql)
                 codings = cur.fetchall()
@@ -5492,6 +5530,7 @@ class ToolTipEventFilter(QtCore.QObject):
                         text_ += item['name'] + "</em>"
                         if self.app.settings['showids']:
                             text_ += " [ctid:" + str(item['ctid']) + "]"
+                        text_ += " (" + item['owner'] + ")"
                         text_ += "<br />" + seltext
                         if item['memo'] != "":
                             memo_text = item['memo']
@@ -5511,7 +5550,7 @@ class ToolTipEventFilter(QtCore.QObject):
             # Check annotations
             for ann in self.annotations:
                 if ann['pos0'] - self.offset <= pos <= ann['pos1'] - self.offset and self.file_id == ann['fid']:
-                    text_ += "<p>" + _("ANNOTATED:") + ann['memo'] + "</p>"
+                    text_ += "<p>" + _("ANNOTATED") + " (" + ann['owner'] + "): " + ann['memo'] + "</p>"
             if text_ != "":
                 receiver.setToolTip(text_)
         # Call Base Class Method to Continue Normal Event Processing

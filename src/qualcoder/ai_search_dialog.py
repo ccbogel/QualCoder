@@ -32,6 +32,7 @@ from .color_selector import TextColor
 from .report_attributes import DialogSelectAttributeParameters
 from .GUI.ui_ai_search import Ui_Dialog_AiSearch
 from .helpers import Message
+from .select_items import DialogSelectItems
 
 
 path = os.path.abspath(os.path.dirname(__file__))
@@ -82,6 +83,7 @@ class DialogAiSearch(QtWidgets.QDialog):
             self.ui.tabWidget.setTabVisible(0, True)  # code search
             self.ui.tabWidget.setTabVisible(1, True)  # free search
             self.ui.checkBox_coded_segments.setVisible(True)
+            self.ui.widget_coder.setVisible(False)
         elif context == 'code_analysis':
             self.setWindowTitle('AI Code Analysis')
             self.ui.label_what.setText(_('1) Which code do you want to analyze?'))
@@ -89,6 +91,7 @@ class DialogAiSearch(QtWidgets.QDialog):
             self.ui.tabWidget.setTabVisible(0, True)  # code search
             self.ui.tabWidget.setTabVisible(1, False)  # free search
             self.ui.checkBox_coded_segments.setVisible(False) 
+            self.ui.widget_coder.setVisible(True)
         elif context == 'topic_analysis':
             self.setWindowTitle('AI Topic Analysis')
             self.ui.label_what.setText(_('1) Which topic do you want to analyze?'))
@@ -96,6 +99,7 @@ class DialogAiSearch(QtWidgets.QDialog):
             self.ui.tabWidget.setTabVisible(0, False)  # code search
             self.ui.tabWidget.setTabVisible(1, True)  # free search
             self.ui.checkBox_coded_segments.setVisible(False)
+            self.ui.widget_coder.setVisible(False)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         font = f'font: {app_.settings["fontsize"]}pt "{app_.settings["font"]}";'
         self.setStyleSheet(font)
@@ -103,6 +107,14 @@ class DialogAiSearch(QtWidgets.QDialog):
         self.ui.label_what.setStyleSheet(font_bold)
         self.ui.label_how.setStyleSheet(font_bold)
         self.ui.label_filter.setStyleSheet(font_bold)
+        # coder
+        self.coder_names = []
+        if context == 'code_analysis':
+            self.coder_names = self.app.get_coder_names_in_project(only_visible=True)
+            coder_names_str = ', '.join(self.coder_names)
+            self.ui.label_coder.setText(_('Coders: ') + coder_names_str)
+            self.ui.pushButton_coder.clicked.connect(self.select_coders)  
+        # code tree
         treefont = f'font: {self.app.settings["treefontsize"]}pt "{self.app.settings["font"]}";'
         self.ui.treeWidget.setStyleSheet(treefont)
         self.ui.listWidget_files.setStyleSheet(treefont)
@@ -111,7 +123,7 @@ class DialogAiSearch(QtWidgets.QDialog):
         self.ui.listWidget_cases.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
         self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.SelectionMode.SingleSelection)
         if self.ui.tabWidget.isTabVisible(0):  # code
-            self.fill_tree(selected_id, selected_is_code)   
+            self.fill_tree(selected_id, selected_is_code) 
         # prompts
         self.prompts_list = PromptsList(app_, context)
         # load last settings
@@ -289,19 +301,32 @@ class DialogAiSearch(QtWidgets.QDialog):
         self.ui.treeWidget.expandAll()    
 
     def fill_code_counts_in_tree(self):
-        """ Count instances of each code from all coders and all files. """
+        """ Count instances of each code from all visible or selected coders and all files. """
 
         cur = self.app.conn.cursor()
-        sql = "select count(cid) from code_text where cid=? union "
-        sql += "select count(cid) from code_av where cid=? union "
-        sql += "select count(cid) from code_image where cid=?"
         it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
         item = it.value()
         count = 0
         while item and count < 10000:
             if item.text(1)[0:4] == "cid:":
                 cid = str(item.text(1)[4:])
-                cur.execute(sql, [cid, cid, cid])  # , self.app.settings['codername']])
+                if self.context == 'code_analysis':
+                    # use selected coders
+                    placeholders = ", ".join(["?" for _ in self.coder_names])
+                    sql = f"select count(cid) from code_text_visible where cid=? and owner in ({placeholders}) union "
+                    sql += f"select count(cid) from code_av_visible where cid=? and owner in ({placeholders}) union "
+                    sql += f"select count(cid) from code_image_visible where cid=? and owner in ({placeholders})"        
+                    params = []
+                    for _ in range(3):
+                        params.append(cid)
+                        params.extend(self.coder_names)
+                else: 
+                    # use all visible coders
+                    sql = "select count(cid) from code_text_visible where cid=? union "
+                    sql += "select count(cid) from code_av_visible where cid=? union "
+                    sql += "select count(cid) from code_image_visible where cid=?"
+                    params = [cid, cid, cid]
+                cur.execute(sql, params)
                 result = cur.fetchall()
                 total = 0
                 for row in result:
@@ -313,6 +338,23 @@ class DialogAiSearch(QtWidgets.QDialog):
             it += 1
             item = it.value()
             count += 1
+            
+    def select_coders(self):
+        self.coder_names = self.app.get_coder_names_in_project(only_visible=False)
+        coder_names_dicts = [{"name": name} for name in self.coder_names]
+        ui = DialogSelectItems(self.app, coder_names_dicts, _('Coder selection'), 'multiple')
+        ok = ui.exec()
+        if not ok:
+            return
+        selection = ui.get_selected()
+        if not selection:
+            return
+        self.coder_names = []
+        for coder_name in selection:
+            self.coder_names.append(coder_name['name'])
+        coder_names_str = ', '.join(self.coder_names)
+        self.ui.label_coder.setText(_('Coders: ') + coder_names_str)
+        self.fill_code_counts_in_tree()
             
     def on_prompt_selected(self, index):
         """ This function will be called whenever the user selects a new item in the combobox. """
@@ -392,9 +434,9 @@ class DialogAiSearch(QtWidgets.QDialog):
         # Fill additional details about each file in the memo
         cur = self.app.conn.cursor()
         sql = "select length(fulltext), mediapath from source where id=?"
-        sql_text_codings = "select count(cid) from code_text where fid=?"
-        sql_av_codings = "select count(cid) from code_av where id=?"  # Not used
-        sql_image_codings = "select count(cid) from code_image where id=?"  # Not used
+        sql_text_codings = "select count(cid) from code_text_visible where fid=?"
+        sql_av_codings = "select count(cid) from code_av_visible where id=?"  # Not used
+        sql_image_codings = "select count(cid) from code_image_visible where id=?"  # Not used
         item = QtWidgets.QListWidgetItem(_("<no file filter>"))
         item.setToolTip(_("Search in all textfiles"))
         item.setData(Qt.ItemDataRole.UserRole, -1)
