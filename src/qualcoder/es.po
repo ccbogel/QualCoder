@@ -2,21 +2,22 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Justin <>, 2026.
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: \n"
+"Project-Id-Version: unnamed project\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-01-08 09:16+0100\n"
-"PO-Revision-Date: 2026-01-08 09:50+1100\n"
-"Last-Translator: \n"
-"Language-Team: \n"
+"PO-Revision-Date: 2026-01-12 13:49+0100\n"
+"Last-Translator: Alaia <>\n"
+"Language-Team: Spanish\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.5\n"
+"X-Generator: Gtranslator 49.0\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #: src/qualcoder/error_dlg.py:44 src/qualcoder/edit_textfile.py:584
 #: src/qualcoder/case_file_manager.py:452 src/qualcoder/cases.py:1102
@@ -24,8 +25,8 @@ msgstr ""
 msgid "Copy"
 msgstr "Copiar"
 
+# Copiar mensaje de error al portapapeles
 #: src/qualcoder/error_dlg.py:45
-#, fuzzy
 msgid "Copy error message and traceback to the clipboard."
 msgstr "Copiar al portapapeles"
 
@@ -64,61 +65,61 @@ msgstr "Mostrar archivos por atributos"
 msgid "Show case files"
 msgstr "Mostrar archivos del caso"
 
+# Ordenar por nombre (ascendente)
 #: src/qualcoder/report_file_summary.py:119 src/qualcoder/code_pdf.py:2448
 #: src/qualcoder/view_image.py:739
 #: src/qualcoder/report_codes_by_segments.py:261
 #: src/qualcoder/report_compare_coder_file.py:153
 #: src/qualcoder/report_codes.py:320 src/qualcoder/report_codes.py:367
 #: src/qualcoder/view_av.py:758 src/qualcoder/code_text.py:3188
-#, fuzzy
 msgid "Sort by name ascending"
 msgstr "Orden ascendente"
 
+# Ordenar por nombre (descendente)
 #: src/qualcoder/report_file_summary.py:120 src/qualcoder/code_pdf.py:2449
 #: src/qualcoder/view_image.py:740
 #: src/qualcoder/report_codes_by_segments.py:262
 #: src/qualcoder/report_compare_coder_file.py:154
 #: src/qualcoder/report_codes.py:321 src/qualcoder/report_codes.py:368
 #: src/qualcoder/view_av.py:759 src/qualcoder/code_text.py:3189
-#, fuzzy
 msgid "Sort by name descending"
-msgstr "Orden descendiente"
+msgstr "Orden descendente"
 
+# Ordenar por caso (ascendente)
 #: src/qualcoder/report_file_summary.py:121 src/qualcoder/code_pdf.py:2450
 #: src/qualcoder/view_image.py:741
 #: src/qualcoder/report_compare_coder_file.py:155 src/qualcoder/view_av.py:760
 #: src/qualcoder/code_text.py:3190
-#, fuzzy
 msgid "Sort by case ascending"
 msgstr "Orden ascendente"
 
+# Ordenar por caso (descendente)
 #: src/qualcoder/report_file_summary.py:122 src/qualcoder/code_pdf.py:2451
 #: src/qualcoder/view_image.py:742
 #: src/qualcoder/report_compare_coder_file.py:156 src/qualcoder/view_av.py:761
 #: src/qualcoder/code_text.py:3191
-#, fuzzy
 msgid "Sort by case descending"
-msgstr "Orden descendiente"
+msgstr "Orden descendente"
 
+# Ordenar por fecha (ascendente)
 #: src/qualcoder/report_file_summary.py:123 src/qualcoder/code_pdf.py:2452
 #: src/qualcoder/view_image.py:743
 #: src/qualcoder/report_codes_by_segments.py:263
 #: src/qualcoder/report_compare_coder_file.py:157
 #: src/qualcoder/report_codes.py:322 src/qualcoder/view_av.py:762
 #: src/qualcoder/code_text.py:3192
-#, fuzzy
 msgid "Sort by date ascending"
-msgstr "Orden descendiente"
+msgstr "Orden descendente"
 
+# Ordenar por fecha (descendente)
 #: src/qualcoder/report_file_summary.py:124 src/qualcoder/code_pdf.py:2453
 #: src/qualcoder/view_image.py:744
 #: src/qualcoder/report_codes_by_segments.py:264
 #: src/qualcoder/report_compare_coder_file.py:158
 #: src/qualcoder/report_codes.py:323 src/qualcoder/view_av.py:763
 #: src/qualcoder/code_text.py:3193
-#, fuzzy
 msgid "Sort by date descending"
-msgstr "Orden descendiente"
+msgstr "Orden descendente"
 
 #: src/qualcoder/report_file_summary.py:152 src/qualcoder/code_pdf.py:2507
 #: src/qualcoder/view_image.py:779
@@ -127,6 +128,7 @@ msgstr "Orden descendiente"
 msgid "Show all files"
 msgstr "Mostrar todos los archivos"
 
+# Seleccionar un caso
 #: src/qualcoder/report_file_summary.py:153 src/qualcoder/code_pdf.py:2508
 #: src/qualcoder/view_image.py:780
 #: src/qualcoder/report_compare_coder_file.py:187 src/qualcoder/view_av.py:824
@@ -161,6 +163,7 @@ msgstr "No se ha encontrado nada"
 msgid "No matching files found"
 msgstr "No se han encontrado archivos coincidentes"
 
+# Ou "caracteres" si on parle du symbole
 #: src/qualcoder/report_file_summary.py:240
 #: src/qualcoder/report_file_summary.py:580 src/qualcoder/code_pdf.py:388
 #: src/qualcoder/code_pdf.py:435 src/qualcoder/manage_files.py:1207
@@ -192,6 +195,7 @@ msgstr ""
 "\n"
 "Codificaciones: "
 
+# Nota
 #: src/qualcoder/report_file_summary.py:265
 #: src/qualcoder/report_compare_coder_file.py:308
 #: src/qualcoder/report_exact_matches.py:162
@@ -202,6 +206,7 @@ msgstr ""
 "\n"
 "Memo: "
 
+# NOTA
 #: src/qualcoder/report_file_summary.py:300 src/qualcoder/code_pdf.py:3788
 #: src/qualcoder/report_code_summary.py:270
 #: src/qualcoder/ai_search_dialog.py:431
@@ -362,8 +367,8 @@ msgstr "Zona: "
 msgid " pixels"
 msgstr " píxeles"
 
+# Imagen demasiado grande
 #: src/qualcoder/report_file_summary.py:547
-#, fuzzy
 msgid "Image too large"
 msgstr "Imagen exportada"
 
@@ -411,6 +416,7 @@ msgstr "Palabras: "
 msgid "Unique words: "
 msgstr "Palabras únicas: "
 
+# Top 100 de palabras/100 primeras palabras/100 palabras más usadas
 #: src/qualcoder/report_file_summary.py:635
 #: src/qualcoder/report_code_summary.py:386
 msgid "Top 100 words"
@@ -428,7 +434,6 @@ msgid "Average characters: "
 msgstr "Caracteres medios: "
 
 #: src/qualcoder/code_pdf.py:228
-#, fuzzy
 msgid "View original file"
 msgstr "Ver el archivo de texto original"
 
@@ -440,12 +445,14 @@ msgstr "QualCoder muestra los PDFs de forma aproximada."
 msgid "Original fonts or bold or italic are not applied."
 msgstr "No se aplican fuentes originales ni negrita o cursiva."
 
+# El texto simple debe coincidir exactamente para que Code PDF funcione correctamente.
 #: src/qualcoder/code_pdf.py:276
 msgid "Plain text must match exactly for Code PDF to work correctly."
 msgstr ""
 "El texto sin formato debe coincidir exactamente para que Code PDF funcione "
 "correctamente."
 
+# Aparecerá una advertencia si el texto del PDF analizado no coincide con el texto simple almacenado en la base de datos
 #: src/qualcoder/code_pdf.py:277
 msgid ""
 "A warning will display if the parsed PDF text does not match the database "
@@ -454,6 +461,7 @@ msgstr ""
 "Aparecerá una advertencia si el texto del PDF analizado no coincide con el "
 "texto sin formato almacenado en la base de datos."
 
+# El texto simple de los PDFs cargados en QualCoder antes de la versión 3.4 no tendrá las posiciones de texto simple correctas para la visualización de PDF.
 #: src/qualcoder/code_pdf.py:279
 msgid ""
 "Plain text of PDFs loaded in to QualCoder before version 3.4 will not have "
@@ -469,6 +477,7 @@ msgstr ""
 "Esto significa que las rayas de codificación se mostrarán en posiciones "
 "incorrectas."
 
+# Texto simple
 #: src/qualcoder/code_pdf.py:282
 msgid ""
 "Similarly, if the PDF plain text has been edited in any way, this will "
@@ -511,6 +520,7 @@ msgstr "Información"
 msgid "Attributes"
 msgstr "Atributos"
 
+# Nota:
 #: src/qualcoder/code_pdf.py:510 src/qualcoder/code_pdf.py:2621
 #: src/qualcoder/code_pdf.py:3064 src/qualcoder/view_graph.py:532
 #: src/qualcoder/view_graph.py:601 src/qualcoder/view_graph.py:664
@@ -539,6 +549,7 @@ msgstr "Nombre"
 msgid "Id"
 msgstr "Id"
 
+# Nota
 #: src/qualcoder/code_pdf.py:550 src/qualcoder/code_pdf.py:563
 #: src/qualcoder/code_pdf.py:591 src/qualcoder/code_pdf.py:616
 #: src/qualcoder/code_pdf.py:642 src/qualcoder/code_pdf.py:2273
@@ -587,26 +598,26 @@ msgstr "Búsqueda automática de 3 o más caracteres"
 msgid "Automatic search 5 or more characters"
 msgstr "Búsqueda automática de 5 o más caracteres"
 
+# Tecla Enter para buscar
 #: src/qualcoder/code_pdf.py:891
 msgid "Press Enter to search"
 msgstr "Pulse Enter para buscar"
 
+# Objetos PDF
 #: src/qualcoder/code_pdf.py:923
-#, fuzzy
 msgid "PDF objects"
 msgstr "Proyecto"
 
 #: src/qualcoder/code_pdf.py:973 src/qualcoder/code_text.py:1213
-#, fuzzy
 msgid "Unmark (U)"
 msgstr "Desmarcar código (U)"
 
+# Texto codificado en nota (M)
 #: src/qualcoder/code_pdf.py:974 src/qualcoder/code_text.py:1214
 msgid "Memo coded text (M)"
 msgstr "Texto codificado en memo (M)"
 
 #: src/qualcoder/code_pdf.py:975
-#, fuzzy
 msgid "Change code position key presses"
 msgstr "Cambiar las posiciones finales del código"
 
@@ -668,6 +679,7 @@ msgstr "Mostrar panel de control (H)"
 msgid "Hide control panel (H)"
 msgstr "Ocultar panel de control (H)"
 
+# Seleccionar
 #: src/qualcoder/code_pdf.py:1106 src/qualcoder/code_pdf.py:1200
 #: src/qualcoder/report_comparison_table.py:354 src/qualcoder/view_graph.py:494
 #: src/qualcoder/view_graph.py:562 src/qualcoder/view_graph.py:621
@@ -678,29 +690,34 @@ msgstr "Ocultar panel de control (H)"
 msgid "Select codes"
 msgstr "Seleccione los códigos"
 
+# Seleccionar
 #: src/qualcoder/code_pdf.py:1121 src/qualcoder/report_codes.py:2476
 #: src/qualcoder/report_codes.py:2516 src/qualcoder/view_av.py:2849
 #: src/qualcoder/code_text.py:1479
 msgid "Select replacement code"
 msgstr "Seleccione el código de sustitución"
 
+# Seleccionar 
+# memo > nota
 #: src/qualcoder/code_pdf.py:1248 src/qualcoder/code_pdf.py:3139
 #: src/qualcoder/view_av.py:2942 src/qualcoder/code_text.py:1629
 msgid "Select code to memo"
 msgstr "Seleccione el código para el memo"
 
+# Nota para el texto codificado:
 #: src/qualcoder/code_pdf.py:1257 src/qualcoder/view_av.py:2951
 #: src/qualcoder/code_text.py:1638
 msgid "Memo for Coded text: "
 msgstr "Memo para el texto codificado:"
 
+# encoger > contraer ou reducir (pour les deux)
 #: src/qualcoder/code_pdf.py:1281
 msgid ""
 "Change start position (extend SHIFT LEFT/ shrink ALT RIGHT)\n"
 "Change end position (extend SHIFT RIGHT/ shrink ALT LEFT)"
 msgstr ""
-"Cambiar posición inicial (extender MAYUS IZQUIERDA/ encoger ALT DERECHA)\n"
-"Cambiar posición final (extender MAYUS DERECHA/ contraer ALT IZQUIERDA)"
+"Cambiar posición inicial (extender MAYUS IZQUIERDA/encoger ALT DERECHA)\n"
+"Cambiar posición final (extender MAYUS DERECHA/contraer ALT IZQUIERDA)"
 
 #: src/qualcoder/code_pdf.py:1282
 msgid "Use key presses"
@@ -738,6 +755,7 @@ msgstr "Agregar una nueva categoría"
 msgid "Rename"
 msgstr "Renombrar"
 
+# Memo > nota
 #: src/qualcoder/code_pdf.py:1310 src/qualcoder/view_image.py:1200
 #: src/qualcoder/view_av.py:1497 src/qualcoder/code_text.py:1739
 msgid "View or edit memo"
@@ -787,7 +805,7 @@ msgstr "Orden ascendente"
 #: src/qualcoder/report_relations.py:1066 src/qualcoder/report_sql.py:510
 #: src/qualcoder/report_sql.py:607
 msgid "Sort descending"
-msgstr "Orden descendiente"
+msgstr "Orden descendente"
 
 #: src/qualcoder/code_pdf.py:1323 src/qualcoder/view_image.py:1213
 #: src/qualcoder/view_av.py:1507 src/qualcoder/code_text.py:1752
@@ -834,6 +852,7 @@ msgstr "Buscar código"
 msgid "Find and select first code that matches text."
 msgstr "Buscar y seleccionar el primer código que coincida con el texto."
 
+# Introduce
 #: src/qualcoder/code_pdf.py:1563 src/qualcoder/view_image.py:247
 #: src/qualcoder/view_av.py:309 src/qualcoder/code_text.py:414
 msgid "Enter text to match all or partial code:"
@@ -849,28 +868,29 @@ msgstr "Coincidencia no encontrada"
 msgid "No code with matching text found."
 msgstr "No se ha encontrado ningún código con texto coincidente."
 
+# Selecciona/seleccionar
 #: src/qualcoder/code_pdf.py:1676 src/qualcoder/view_image.py:1587
 #: src/qualcoder/code_text.py:1108 src/qualcoder/code_text.py:1154
 msgid "Select code"
 msgstr "Seleccione el código"
 
+# Posición del texto
 #: src/qualcoder/code_pdf.py:1696 src/qualcoder/view_av.py:1805
 #: src/qualcoder/code_text.py:2084
-#, fuzzy
 msgid "Text position"
 msgstr "Posición"
 
+# Posición de los caracteres
 #: src/qualcoder/code_pdf.py:1696 src/qualcoder/view_av.py:1805
 #: src/qualcoder/code_text.py:2084
-#, fuzzy
 msgid "Character position: "
 msgstr "Personajes: "
 
 #: src/qualcoder/code_pdf.py:1830
-#, fuzzy
 msgid "PDF Image exported"
 msgstr "Imagen exportada"
 
+# Fusionar código
 #: src/qualcoder/code_pdf.py:2046 src/qualcoder/view_image.py:2027
 #: src/qualcoder/view_av.py:2312 src/qualcoder/code_text.py:2770
 msgid "Merge code: "
@@ -890,6 +910,7 @@ msgstr "Fusionar códigos"
 msgid "Add new code"
 msgstr "Agregar nuevo código"
 
+# Nombre de código
 #: src/qualcoder/code_pdf.py:2109 src/qualcoder/view_image.py:2083
 #: src/qualcoder/code_text.py:2829
 msgid "Code name"
@@ -948,10 +969,12 @@ msgstr "Categoria: "
 msgid "Category deleted: "
 msgstr "Categoría eliminada: "
 
+# Nota
 #: src/qualcoder/code_pdf.py:2261 src/qualcoder/code_text.py:2995
 msgid "Memo for Code: "
 msgstr "Memo para el código: "
 
+# Nota
 #: src/qualcoder/code_pdf.py:2274 src/qualcoder/view_image.py:1767
 #: src/qualcoder/code_text.py:3008
 msgid "Memo for code: "
@@ -981,6 +1004,7 @@ msgstr "Nuevo nombre del código:"
 msgid "Name in use"
 msgstr "Nombre en uso"
 
+# elije
 #: src/qualcoder/code_pdf.py:2322 src/qualcoder/code_text.py:3056
 msgid " is already in use, choose another name."
 msgstr " ya está en uso, elija otro nombre."
@@ -999,6 +1023,7 @@ msgstr "Nuevo nombre de categoría: "
 msgid "This code name is already in use."
 msgstr "Este nombre de código ya está en uso."
 
+# Duplicar nombre de código
 #: src/qualcoder/code_pdf.py:2361 src/qualcoder/code_text.py:3094
 msgid "Duplicate code name"
 msgstr "Nombre de código duplicado"
@@ -1009,7 +1034,6 @@ msgid "Open memo"
 msgstr "Abrir Memo"
 
 #: src/qualcoder/code_pdf.py:2439
-#, fuzzy
 msgid "View original text file"
 msgstr "Ver el archivo de texto original"
 
@@ -1028,6 +1052,7 @@ msgstr "Archivo con la última codificación"
 msgid "Sort"
 msgstr "Clasificar"
 
+# Nota para el archivo
 #: src/qualcoder/code_pdf.py:2608 src/qualcoder/view_image.py:670
 #: src/qualcoder/view_av.py:880 src/qualcoder/code_text.py:1589
 msgid "Memo for file: "
@@ -1045,8 +1070,8 @@ msgstr "Texto del código: "
 msgid "Pages: "
 msgstr "Páginas: "
 
+# Analizando el documento PDF
 #: src/qualcoder/code_pdf.py:2748
-#, fuzzy
 msgid "Parsing the PDF text."
 msgstr "Parsing sets."
 
@@ -1058,6 +1083,7 @@ msgstr ""
 "Los textos no coinciden. PDF importado antes de la versión 3.4 de QualCoder "
 "o el texto del PDF ha sido editado."
 
+# El PDF se puede ver pero no se puede codificar. Las posiciones del código aparecerán incorrectamente
 #: src/qualcoder/code_pdf.py:2750
 msgid ""
 "\n"
@@ -1110,17 +1136,14 @@ msgid "Important"
 msgstr "Importante"
 
 #: src/qualcoder/code_pdf.py:3112
-#, fuzzy
 msgid "Code memo"
 msgstr "Memo de código: "
 
 #: src/qualcoder/code_pdf.py:3117
-#, fuzzy
 msgid "Flag important"
 msgstr "Añadir marca importante"
 
 #: src/qualcoder/code_pdf.py:3119 src/qualcoder/code_in_all_files.py:336
-#, fuzzy
 msgid "Remove important flag"
 msgstr "Eliminar la marca importante"
 
@@ -1136,13 +1159,13 @@ msgstr "Desmarcar"
 msgid "Select code to unmark"
 msgstr "Seleccione el código para desmarcar"
 
+# Seleccionar el código para marcar importante
 #: src/qualcoder/code_pdf.py:3152
-#, fuzzy
 msgid "Select code for important flag"
 msgstr "Seleccione el código para el cambio"
 
+# Seleccionar el código para eliminar la marca importante
 #: src/qualcoder/code_pdf.py:3166
-#, fuzzy
 msgid "Select code to remove important flag"
 msgstr "Seleccione el código para el memo"
 
@@ -1152,21 +1175,24 @@ msgstr ""
 "El texto cargado en el PDF no coincide con la longitud del texto del PDF "
 "importado."
 
+# Marca/marcar
 #: src/qualcoder/code_pdf.py:3384
 msgid "Mark using the right hand side text pane."
 msgstr "Marque utilizando el panel de texto de la derecha."
 
+# No se puede marcar
 #: src/qualcoder/code_pdf.py:3385
-#, fuzzy
 msgid "Cannot mark"
 msgstr "No se puede fusionar"
 
+# Ningún archivo seleccionado
 #: src/qualcoder/code_pdf.py:3388 src/qualcoder/code_pdf.py:3556
 #: src/qualcoder/code_text.py:1335 src/qualcoder/code_text.py:3686
 #: src/qualcoder/code_text.py:3851
 msgid "No file was selected"
 msgstr "No se seleccionó ningún archivo"
 
+# Ningún código seleccionado
 #: src/qualcoder/code_pdf.py:3392 src/qualcoder/view_av.py:3070
 #: src/qualcoder/code_text.py:3691 src/qualcoder/code_text.py:3958
 #: src/qualcoder/code_text.py:4095 src/qualcoder/code_text.py:4224
@@ -1201,10 +1227,10 @@ msgid "ANNOTATED:"
 msgstr "ANOTADO:"
 
 #: src/qualcoder/manage_links.py:81
-#, fuzzy
 msgid "Search folders"
 msgstr "Parámetros de búsqueda"
 
+# Seleccionar
 #: src/qualcoder/manage_links.py:110 src/qualcoder/manage_links.py:125
 msgid "Select file"
 msgstr "Seleccione el archivo"
@@ -1221,6 +1247,7 @@ msgstr "Archivo incorrecto"
 msgid "Bad link fixed for file: "
 msgstr "Enlace incorrecto corregido para el archivo: "
 
+# Ruta
 #: src/qualcoder/manage_links.py:161
 msgid " Path: "
 msgstr " Camino: "
@@ -1283,7 +1310,6 @@ msgstr "Diarios: "
 #: src/qualcoder/manage_references.py:499
 #: src/qualcoder/manage_references.py:504
 #: src/qualcoder/manage_references.py:509
-#, fuzzy
 msgid "Ascending"
 msgstr "Orden ascendente"
 
@@ -1300,17 +1326,15 @@ msgstr "Orden ascendente"
 #: src/qualcoder/manage_references.py:500
 #: src/qualcoder/manage_references.py:505
 #: src/qualcoder/manage_references.py:510
-#, fuzzy
 msgid "Descending"
-msgstr "Orden descendiente"
+msgstr "Orden descendente"
 
 #: src/qualcoder/journals.py:423
-#, fuzzy
 msgid "Show name like"
 msgstr "Mostrar casos como"
 
+# Mostrar
 #: src/qualcoder/journals.py:435
-#, fuzzy
 msgid "Show this coder"
 msgstr "Muestra este valor"
 
@@ -1319,8 +1343,8 @@ msgstr "Muestra este valor"
 msgid "Show values like"
 msgstr "Mostrar valores como"
 
+# Introduce
 #: src/qualcoder/journals.py:443 src/qualcoder/manage_files.py:496
-#, fuzzy
 msgid "Enter date"
 msgstr "Introduzca el texto:"
 
@@ -1339,7 +1363,6 @@ msgid "Text filter"
 msgstr "Filtro de texto"
 
 #: src/qualcoder/journals.py:479
-#, fuzzy
 msgid "Show names like:"
 msgstr "Mostrar valores como: "
 
@@ -1348,13 +1371,14 @@ msgstr "Mostrar valores como: "
 msgid "Show values like:"
 msgstr "Mostrar valores como: "
 
+# Diarios recopilados
 #: src/qualcoder/journals.py:549
 msgid "Collated journals exported as text file to: "
 msgstr "Diarios cotejados exportados como archivo de texto a: "
 
 #: src/qualcoder/journals.py:551
 msgid "Journals exported"
-msgstr "Revistas exportadas"
+msgstr "Diarios exportadas"
 
 #: src/qualcoder/journals.py:607
 msgid "New Journal"
@@ -1376,18 +1400,21 @@ msgstr "Exportación de diario"
 msgid "Journal deleted: "
 msgstr "Diario eliminado: "
 
+# No se añadió ningún nombre
 #: src/qualcoder/journals.py:700
 msgid "No name was entered"
 msgstr "No se ingresó ningún nombre"
 
+# revista > diario
 #: src/qualcoder/journals.py:704
 msgid "Journal name in use"
-msgstr "Nombre de la revista en uso"
+msgstr "Nombre de la diario en uso"
 
 #: src/qualcoder/journals.py:709
 msgid "Warning - invalid characters"
 msgstr "Advertencia: caracteres no válidos"
 
+# use > usa
 #: src/qualcoder/journals.py:710
 msgid "In the journal name use only: a-z, A-z 0-9 - space"
 msgstr "En el nombre del diario use solamente: a-z, A-z 0-9 - espacio"
@@ -1403,7 +1430,6 @@ msgstr "Este atributo es numérico"
 
 #: src/qualcoder/pseudonyms.py:58 src/qualcoder/pseudonyms.py:74
 #: src/qualcoder/pseudonyms.py:78 src/qualcoder/pseudonyms.py:86
-#, fuzzy
 msgid "Original"
 msgstr "original"
 
@@ -1415,6 +1441,7 @@ msgstr "Seudónimo"
 msgid "Too short"
 msgstr "demasiado corto"
 
+# Déjelo > déjalo
 #: src/qualcoder/pseudonyms.py:78
 msgid ""
 "Too short, need 3 or more characters.\n"
@@ -1424,17 +1451,16 @@ msgstr ""
 "Déjelo en blanco para generación aleatoria."
 
 #: src/qualcoder/pseudonyms.py:86
-#, fuzzy
 msgid "Original entry already exists."
 msgstr "El nombre de la variable ya existe: "
 
+# Este pseudónimo ya existe
 #: src/qualcoder/pseudonyms.py:89
-#, fuzzy
 msgid "Pseudonym entry already exists."
 msgstr "Esto ya existe"
 
+# Modelos IA
 #: src/qualcoder/ai_llm.py:88
-#, fuzzy
 msgid "AI Models"
 msgstr "Modelo IA Click to apply"
 
@@ -1442,6 +1468,7 @@ msgstr "Modelo IA Click to apply"
 msgid "Loading list of available AI models..."
 msgstr "Cargando lista de modelos de IA disponibles..."
 
+# discapacitado --> descartado/deshabilitado
 #: src/qualcoder/ai_llm.py:321
 msgid ""
 "You are using the \"Blablador\" service on an old server that will soon be "
@@ -1459,10 +1486,12 @@ msgstr ""
 msgid "AI Setup"
 msgstr "Configuración de IA"
 
+# IA: Iniciando
 #: src/qualcoder/ai_llm.py:468
 msgid "AI: Starting up..."
 msgstr "IA: Arrancando..."
 
+# configure > configura
 #: src/qualcoder/ai_llm.py:477
 msgid "AI: In the follwoing window, please set up the AI model."
 msgstr "IA: En la siguiente ventana, configure el modelo de IA."
@@ -1471,6 +1500,7 @@ msgstr "IA: En la siguiente ventana, configure el modelo de IA."
 msgid "AI: No model selected, AI is disabled."
 msgstr "IA: No hay modelo seleccionado, la IA está deshabilitada."
 
+# IA: Sigues utilizando el antiguo turbo GPT-4. Considera cambiar a un modelo más reciente, como GPT 4.1. Ve a Proyecto > Ajustes para cambiar el perfil y el modelo de IA.
 #: src/qualcoder/ai_llm.py:496
 msgid ""
 "AI: You are still using the outdated GPT-4 turbo. Consider switching to a "
@@ -1481,8 +1511,8 @@ msgstr ""
 "modelo más reciente, como GPT 4.1. Ve a Proyecto > Ajustes para cambiar el "
 "perfil y el modelo de IA."
 
+# IA: Sigues utilizando el antiguo turbo GPT-4. Considera cambiar a un modelo más reciente, como GPT 4.1. Ve a Proyecto > Ajustes para cambiar el perfil y el modelo de IA.
 #: src/qualcoder/ai_llm.py:500
-#, fuzzy
 msgid ""
 "AI: You are using the outdated Claude Opus 4 model from Anthropic. Consider "
 "switching to a newer model, such as Opus 4.1. Go to Project > Settings to "
@@ -1542,6 +1572,7 @@ msgstr "Inicialización de IA"
 msgid "Do you really want to cancel the AI operation?"
 msgstr "¿De verdad quieres cancelar la operación de la IA?"
 
+# abortar > interrumpir
 #: src/qualcoder/ai_llm.py:639
 msgid ""
 "The AI operation could not be aborted immediately. It may take a moment for "
@@ -1641,6 +1672,9 @@ msgstr ""
 msgid "Edit AI profile name"
 msgstr "Editar el nombre del perfil de la IA"
 
+# Selecciona
+# Puedes
+# Sigue
 #: src/qualcoder/settings.py:296
 msgid ""
 "Select a profile first. \n"
@@ -1651,37 +1685,43 @@ msgstr ""
 "Sólo puede editar el nombre de un perfil existente. Para crear un nuevo "
 "perfil desde cero, siga las instrucciones de la wiki de QualCoder en GitHub."
 
+# Introduce
 #: src/qualcoder/settings.py:305 src/qualcoder/settings.py:477
 msgid "Enter new profile name:"
 msgstr "Introduzca el nuevo nombre del perfil:"
 
+# Elija --> Elije
+# (parce que tout le reste du texte tutoie le lecteur)
 #: src/qualcoder/settings.py:452
 msgid "Choose a default output folder"
 msgstr "Elija una carpeta de salida predeterminada."
 
 #: src/qualcoder/settings.py:456 src/qualcoder/settings.py:459
-#, fuzzy
 msgid "Choose another folder"
 msgstr " Elige otro nombre"
 
+# Utilices
 #: src/qualcoder/settings.py:456
 msgid "Do not use the QualCoder configuration folder."
 msgstr "No utilice la carpeta de configuración QualCoder."
 
+# Utilices
 #: src/qualcoder/settings.py:459
 msgid "Do not use the QualCoder data folder."
 msgstr "No utilice la carpeta de datos QualCoder."
 
+# Nuevo perfil de IA
 #: src/qualcoder/settings.py:476 src/qualcoder/settings.py:489
-#, fuzzy
 msgid "New AI profile"
 msgstr "Perfil de IA"
 
+# Existe ya un perfil de IA con este nombre:
 #: src/qualcoder/settings.py:489
-#, fuzzy
 msgid "An AI profile with this name already exists: "
 msgstr "El nombre de la variable ya existe: "
 
+# Selecciona
+# Desactiva
 #: src/qualcoder/settings.py:545
 msgid "Please select an AI profile or disable the AI altogether."
 msgstr "Seleccione un perfil de IA o desactive la IA por completo."
@@ -1690,14 +1730,17 @@ msgstr "Seleccione un perfil de IA o desactive la IA por completo."
 msgid "AI profile"
 msgstr "Perfil de IA"
 
+# Introduce
 #: src/qualcoder/settings.py:549
 msgid "Please enter a valid API-key for the AI model."
 msgstr "Introduzca una clave API válida para el modelo de IA."
 
+# Modelo de IA
 #: src/qualcoder/settings.py:550 src/qualcoder/settings.py:556
 msgid "AI model"
 msgstr "Modelo IA Click to apply"
 
+# Selecciona
 #: src/qualcoder/settings.py:555
 msgid "Please select a \"large\" and a \"fast\" AI model."
 msgstr "Seleccione un modelo de IA «grande» y otro «rápido»."
@@ -1706,6 +1749,7 @@ msgstr "Seleccione un modelo de IA «grande» y otro «rápido»."
 msgid "Restart QualCoder"
 msgstr "Reiniciar QualCoder"
 
+# Reinicia
 #: src/qualcoder/settings.py:568
 msgid "Restart QualCoder to enact some changes"
 msgstr "Reinicie QualCoder para aplicar algunos cambios"
@@ -1785,6 +1829,7 @@ msgstr "Duración media codificada: "
 msgid " secs"
 msgstr " secs"
 
+# Porcentaje medio de archivos:
 #: src/qualcoder/report_code_summary.py:508
 msgid "Average percent of media: "
 msgstr "Porcentaje medio de medios de comunicación: "
@@ -1809,6 +1854,7 @@ msgstr "Tecla + o W acercar. Tecla - o Q alejar"
 msgid "Image Error"
 msgstr "Error de imagen"
 
+# No se puede abrir:
 #: src/qualcoder/view_image.py:936 src/qualcoder/view_image.py:2375
 #: src/qualcoder/report_compare_coder_file.py:476
 #: src/qualcoder/report_compare_coder_file.py:601
@@ -1821,6 +1867,7 @@ msgstr "No puedo abrir: "
 msgid "Scale: "
 msgstr "Escala: "
 
+# Anchura
 #: src/qualcoder/view_image.py:1006 src/qualcoder/view_av.py:358
 #: src/qualcoder/view_av.py:4369
 msgid "Width"
@@ -1848,6 +1895,7 @@ msgstr "Se superpone exactamente con"
 msgid "Image exported"
 msgstr "Imagen exportada"
 
+# Mostrar el texto codificado y el archivo
 #: src/qualcoder/view_image.py:1208 src/qualcoder/view_av.py:1502
 msgid "Show coded text and media"
 msgstr "Mostrar el texto codificado y los medios de comunicación"
@@ -1869,7 +1917,6 @@ msgid "Cannot open image with PIL. The image it too large."
 msgstr "No se puede abrir la imagen con PIL. La imagen es demasiado grande."
 
 #: src/qualcoder/view_image.py:1438
-#, fuzzy
 msgid "Image highlight error"
 msgstr "Error de imagen"
 
@@ -1881,6 +1928,7 @@ msgstr "Girar 90° grados a la derecha"
 msgid "Rotate counter-clockwise"
 msgstr "Girar 90° grados a la izquierda"
 
+# Resaltar zona - gris
 #: src/qualcoder/view_image.py:1558 src/qualcoder/helpers.py:668
 msgid "Highlight area - gray"
 msgstr "Zona resaltada - gris"
@@ -1889,6 +1937,7 @@ msgstr "Zona resaltada - gris"
 msgid "Highlight area - solarize"
 msgstr "Resaltar zona - solarizar"
 
+# Resaltar zona - difuminar
 #: src/qualcoder/view_image.py:1560 src/qualcoder/helpers.py:670
 msgid "Highlight area - blur"
 msgstr "Desenfoque de la zona resaltada"
@@ -1922,28 +1971,32 @@ msgstr "Resaltar esta zona - solarizar"
 msgid "Highlight this area - blur"
 msgstr "Resaltar esta zona - difuminar"
 
+# Resaltar
 #: src/qualcoder/view_image.py:1606
 msgid "Highlight this code - gray"
 msgstr "Resalte este código - gris"
 
+# Resaltar
 #: src/qualcoder/view_image.py:1607
 msgid "Highlight this code - solarize"
 msgstr "Resalte este código - solarizar"
 
+# Resaltar
 #: src/qualcoder/view_image.py:1608
 msgid "Highlight this code - blur"
 msgstr "Resalte este código - difuminar"
 
+# área codificada
 #: src/qualcoder/view_image.py:1825 src/qualcoder/view_image.py:1828
-#, fuzzy
 msgid "Coded area"
 msgstr "Nombre en código"
 
+# Selecciona un código en la lista.
 #: src/qualcoder/view_image.py:1825 src/qualcoder/view_image.py:1828
-#, fuzzy
 msgid "Select a code in the list first."
 msgstr "Seleccionar texto codificado"
 
+# Nota
 #: src/qualcoder/view_image.py:2203 src/qualcoder/view_av.py:2482
 msgid "Memo for Code "
 msgstr "Memo para el código: "
@@ -1960,6 +2013,7 @@ msgstr "Código renombrado: "
 msgid "This category name is already in use"
 msgstr "Este nombre de categoría ya está en uso"
 
+# Duplicar código de categoría
 #: src/qualcoder/view_image.py:2287 src/qualcoder/view_av.py:2565
 msgid "Duplicate category name"
 msgstr "Nombre de categoría duplicado"
@@ -1991,14 +2045,17 @@ msgstr "Altura:"
 msgid " Scale: "
 msgstr " Escala: "
 
+# quieres
 #: src/qualcoder/ai_search_dialog.py:81
 msgid "1) What do you want to search for?"
 msgstr "1) ¿Qué quiere buscar?"
 
+# deseas
 #: src/qualcoder/ai_search_dialog.py:87
 msgid "1) Which code do you want to analyze?"
 msgstr "1) ¿Qué código desea analizar?"
 
+# deseas
 #: src/qualcoder/ai_search_dialog.py:94
 msgid "1) Which topic do you want to analyze?"
 msgstr "1) ¿Qué tema desea analizar?"
@@ -2068,14 +2125,18 @@ msgstr ")."
 msgid "AI not ready"
 msgstr "La IA no está preparada"
 
+# Selecciona
+# Utiliza
 #: src/qualcoder/ai_search_dialog.py:458
 msgid "Please select a code or category (or use \"free search\" instead)."
 msgstr "Seleccione un código o una categoría (o utilice «búsqueda libre»)."
 
+# Introduce
 #: src/qualcoder/ai_search_dialog.py:478
 msgid "Please enter text in the \"topic\" field."
 msgstr "Introduzca un texto en el campo «tema»."
 
+# Comprueba tu configuración
 #: src/qualcoder/ai_search_dialog.py:527
 msgid ""
 "After combining all filters, there are not files left for the search. Please "
@@ -2099,13 +2160,13 @@ msgstr "Nada guardado"
 msgid "No saved filters"
 msgstr "No hay filtros guardados"
 
+# Borrar filtro
 #: src/qualcoder/report_attributes.py:133
-#, fuzzy
 msgid "Delete filter"
 msgstr "Borrar archivos"
 
+# Filtro eliminado
 #: src/qualcoder/report_attributes.py:141
-#, fuzzy
 msgid "Filter deleted"
 msgstr "Categoría eliminada: "
 
@@ -2173,6 +2234,7 @@ msgstr "Necesita 2 valores para entre"
 msgid " is not a number"
 msgstr " no es un numero"
 
+# Deseas
 #: src/qualcoder/ai_vectorstore.py:155
 msgid ""
 "Since you are using the AI integration for the first time, QualCoder needs "
@@ -2281,10 +2343,12 @@ msgstr "Memo para el atributo "
 msgid "numeric"
 msgstr "numérico"
 
+# Cambiar al carácter
 #: src/qualcoder/attributes.py:217
 msgid "Change to character"
 msgstr "Cambio de carácter"
 
+# Atributo renombrado de:
 #: src/qualcoder/attributes.py:251
 msgid "Attribute renamed from: "
 msgstr "Atributo al que se le ha cambiado el nombre: "
@@ -2331,11 +2395,12 @@ msgstr "Este nombre de atributo ya existe en casos, archivos o diarios."
 msgid "Or is reserved for bibliography attributes:"
 msgstr "O está reservado para los atributos de bibliografía:"
 
+# Duplicar
 #: src/qualcoder/add_attribute.py:79
-#, fuzzy
 msgid "Duplicate"
 msgstr "Duplicado"
 
+# Haga > Haz
 #: src/qualcoder/manage_files.py:163 src/qualcoder/manage_files.py:2473
 #: src/qualcoder/cases.py:916
 msgid "Right click header row to hide columns"
@@ -2377,7 +2442,6 @@ msgid "This table display setting already exists: "
 msgstr "Esta configuración de visualización de tabla ya existe:"
 
 #: src/qualcoder/manage_files.py:229 src/qualcoder/manage_files.py:304
-#, fuzzy
 msgid "No saved table displays"
 msgstr "No se muestra ninguna tabla guardada"
 
@@ -2401,13 +2465,13 @@ msgstr "Configuración de filas:"
 msgid "Table column not present"
 msgstr "Columna de tabla no presente"
 
+# Borrar visualización de tabla
 #: src/qualcoder/manage_files.py:310
-#, fuzzy
 msgid "Delete table display"
 msgstr "Seleccionar visualización de tabla"
 
+# Visualización borrada
 #: src/qualcoder/manage_files.py:317
-#, fuzzy
 msgid "Deleted display"
 msgstr "Seleccionar visualización de tabla"
 
@@ -2419,6 +2483,7 @@ msgstr "Mostrar todas las columnas"
 msgid "Hide column"
 msgstr "Ocultar columna"
 
+# empiecen
 #: src/qualcoder/manage_files.py:395 src/qualcoder/cases.py:768
 msgid "Hide columns starting with"
 msgstr "Ocultar las columnas que empiezan por"
@@ -2427,6 +2492,7 @@ msgstr "Ocultar las columnas que empiezan por"
 msgid "Show columns starting with"
 msgstr "Mostrar columnas que empiecen por"
 
+# empiecen
 #: src/qualcoder/manage_files.py:408 src/qualcoder/cases.py:781
 msgid "Hide columns starting with:"
 msgstr "Ocultar las columnas que empiezan por:"
@@ -2475,8 +2541,8 @@ msgstr "Orden de tipo de archivo"
 msgid "Assign case to file"
 msgstr "Asignar caso a archivo"
 
+# Ocultar valores como
 #: src/qualcoder/manage_files.py:479
-#, fuzzy
 msgid "Hide values like"
 msgstr "Mostrar valores como"
 
@@ -2485,13 +2551,13 @@ msgstr "Mostrar valores como"
 msgid "Show this value"
 msgstr "Muestra este valor"
 
+# Copiar al portapapeles - APA
 #: src/qualcoder/manage_files.py:498
-#, fuzzy
 msgid "Copy reference to clipboard. APA"
 msgstr "Copiar al portapapeles"
 
+# Copiar al portapapeles - Vancouver
 #: src/qualcoder/manage_files.py:499
-#, fuzzy
 msgid "Copy reference to clipboard. Vancouver"
 msgstr "Copiar al portapapeles"
 
@@ -2520,8 +2586,8 @@ msgstr "Marcar oradores"
 msgid "Open URL"
 msgstr "Abrir URL"
 
+# Ocultar valores como:
 #: src/qualcoder/manage_files.py:602
-#, fuzzy
 msgid "Hide values like:"
 msgstr "Mostrar valores como:"
 
@@ -2556,7 +2622,6 @@ msgid "Reversed renamed database file entry: "
 msgstr "Anulada la entrada de archivo de base de datos renombrada: "
 
 #: src/qualcoder/manage_files.py:815
-#, fuzzy
 msgid "Bulk Rename of database file name entries"
 msgstr ""
 "Se ha cambiado el nombre de la entrada del archivo de la base de datos: "
@@ -2576,7 +2641,6 @@ msgid "Cannot export as linked file\n"
 msgstr "No se puede exportar como un archivo enlazado.\n"
 
 #: src/qualcoder/manage_files.py:998 src/qualcoder/code_text.py:3458
-#, fuzzy
 msgid "No text file selected."
 msgstr "No hay archivos seleccionados"
 
@@ -2602,11 +2666,13 @@ msgstr "Caso"
 msgid "Transcript for: "
 msgstr "Transcripción para: "
 
+# No se puede localizar los medios de comunicación.
 #: src/qualcoder/manage_files.py:1236 src/qualcoder/manage_files.py:1248
 #: src/qualcoder/manage_files.py:1264 src/qualcoder/manage_files.py:1282
 msgid "Cannot locate media. "
 msgstr "No puedo localizar los medios de comunicación. "
 
+# Je sais pas si le mot entre parenthèses était vraiment à traduire, mais je pense que ça passe mieux en anglais pour le coup haha
 #: src/qualcoder/manage_files.py:1239 src/qualcoder/manage_files.py:1251
 msgid "Image too large for PIL module. (DecompressionBombError): "
 msgstr ""
@@ -2633,6 +2699,7 @@ msgstr "VLC no instalado no puede reproducir audio o video."
 msgid "View AV error"
 msgstr "Ver error AV"
 
+# Enlace equivocado o archivo inexistente
 #: src/qualcoder/manage_files.py:1505 src/qualcoder/manage_files.py:1537
 #: src/qualcoder/manage_references.py:311
 #: src/qualcoder/manage_references.py:340
@@ -2725,13 +2792,13 @@ msgstr " creado."
 msgid " lines not imported"
 msgstr " líneas no importadas"
 
+# No se puede importar
 #: src/qualcoder/manage_files.py:1963 src/qualcoder/refi.py:1193
 #: src/qualcoder/text_file_replacement.py:304
 msgid "Cannot import"
 msgstr "No puede importar"
 
 #: src/qualcoder/manage_files.py:1968
-#, fuzzy
 msgid "lines not imported"
 msgstr " líneas no importadas"
 
@@ -2752,6 +2819,7 @@ msgstr "Este es un archivo externo enlazado"
 msgid "This is a linked file. Will export text representation."
 msgstr "Este es un archivo enlazado. Exportará la representación de texto."
 
+# Se puede exportar el texto
 #: src/qualcoder/manage_files.py:2128
 msgid "Can export text"
 msgstr "Puede exportar el texto"
@@ -2834,10 +2902,10 @@ msgid ""
 "Potential for unexpected errors could occur.\n"
 "THERE IS NO UNDO OPTION AFTER APPLYING CHANGES WITH THE APPLY BUTTON."
 msgstr ""
-"HAGA UN BACK UP DEL PROYECTO antes de aplicar cambios al árbol de códigos.\n"
-"El Organizador de códigos se utiliza principalmente con la teoría "
-"fundamentada para ayudarle a desarrollar y organizar los conceptos de "
-"codificación y su jerarquía.\n"
+"HAZ UN BACK UP DEL PROYECTO antes de aplicar cambios al árbol de códigos.\n"
+"El Organizador de códigos se utiliza principalmente con teoría fundamentada "
+"para ayudarte a desarrollar y organizar los conceptos de codificación y su "
+"jerarquía.\n"
 "Selecciona una rama de código o Todas, luego haz clic con el botón derecho "
 "para:\n"
 "Añadir categorías, renombrar códigos y categorías, actualizar memos, "
@@ -2847,8 +2915,8 @@ msgstr ""
 "NO HAY OPCIÓN DE DESHACER DESPUÉS DE APLICAR LOS CAMBIOS CON EL BOTÓN "
 "APLICAR."
 
+# Seleccionar rama del árbol de código
 #: src/qualcoder/code_organiser.py:147 src/qualcoder/view_graph.py:164
-#, fuzzy
 msgid "Select code tree branch"
 msgstr "Seleccione el área codificada"
 
@@ -2865,7 +2933,6 @@ msgid "Code tree re-organised."
 msgstr "Árbol de código reorganizado."
 
 #: src/qualcoder/code_organiser.py:582
-#, fuzzy
 msgid "Code organiser"
 msgstr "Árbol de código reorganizado."
 
@@ -2909,6 +2976,7 @@ msgstr "Mostrar Memo"
 msgid "Update name"
 msgstr "Actualizar nombre"
 
+# Seleccionar
 #: src/qualcoder/code_organiser.py:1030
 msgid "Link code: Select category"
 msgstr "Código de enlace: Seleccione categoría"
@@ -2925,10 +2993,12 @@ msgstr "Enlace en: Seleccionar categoría"
 msgid "Merge into: Select category"
 msgstr "Fusionar en: Seleccionar categoría"
 
+# Selecciona
 #: src/qualcoder/refi.py:109
 msgid "Select REFI-QDA file"
 msgstr "Seleccione el archivo REFI-QDA"
 
+# Selecciona
 #: src/qualcoder/refi.py:119
 msgid "Select REFI-QDA qdpx file"
 msgstr "Seleccione el archivo REFI-QDA qdpx"
@@ -2939,11 +3009,11 @@ msgstr " categorías y códigos importados de "
 
 #: src/qualcoder/refi.py:145
 msgid "Codebook imported"
-msgstr "El libro de códigos importado"
+msgstr "Libro de códigos importado"
 
 #: src/qualcoder/refi.py:148
 msgid "Codebook importation"
-msgstr "Importación de libros de códigos"
+msgstr "Importación de libro de códigos"
 
 #: src/qualcoder/refi.py:148
 msgid " NOT imported"
@@ -2963,7 +3033,7 @@ msgstr "Importación de proyectos"
 
 #: src/qualcoder/refi.py:351
 msgid "Parse users. Loaded: "
-msgstr "Usuarios de parseo. Cargado: "
+msgstr "Usuarios de análisis. Cargado: "
 
 #: src/qualcoder/refi.py:358
 msgid "Parse codes and categories. Loaded: "
@@ -2971,7 +3041,7 @@ msgstr "Códigos y categorías de análisis. Cargado: "
 
 #: src/qualcoder/refi.py:361
 msgid "Parse variables. Loaded: "
-msgstr "Parse variables. Cargado: "
+msgstr "Variables de análisis. Cargado: "
 
 #: src/qualcoder/refi.py:363
 msgid "Parsing and loading project memo"
@@ -2987,7 +3057,7 @@ msgstr "Analizando las fuentes. Cargadas: "
 
 #: src/qualcoder/refi.py:392
 msgid "Parsing Notes. Journals loaded: "
-msgstr "Analizando Notas. Revistas cargadas: "
+msgstr "Analizando Notas. Diarios cargadas: "
 
 #: src/qualcoder/refi.py:404
 msgid "Parsing cases. Loaded: "
@@ -3023,7 +3093,7 @@ msgstr ""
 #: src/qualcoder/refi.py:434
 msgid "Graphs not imported as QualCoder does not have this functionality.\n"
 msgstr ""
-"Los Mapas ó Redes no se importaron, ya que QualCoder no tiene esta "
+"Los Mapas o Redes no se importaron, ya que QualCoder no tiene esta "
 "funcionalidad.\n"
 
 #: src/qualcoder/refi.py:435
@@ -3061,6 +3131,7 @@ msgstr "Importar proyecto REFI-QDA"
 msgid "Cannot read text source from Note: "
 msgstr "No se puede leer la fuente de texto de la Nota: "
 
+# Error de importación de la variable
 #: src/qualcoder/refi.py:611 src/qualcoder/refi.py:1842
 msgid "Variable import error"
 msgstr "Error de importación variable"
@@ -3078,7 +3149,6 @@ msgid "Cannot copy Image file from: "
 msgstr "No se puede copiar el archivo de imagen de: "
 
 #: src/qualcoder/refi.py:900
-#, fuzzy
 msgid "Cannot copy image file from: "
 msgstr "No se puede copiar el archivo de imagen de: "
 
@@ -3092,18 +3162,17 @@ msgstr "No se puede copiar el archivo de vídeo de: "
 
 #: src/qualcoder/refi.py:1172
 msgid "Cannot copy transcript file from: "
-msgstr "No puedo copiar el archivo de la transcripción: "
+msgstr "No se puede copiar el archivo de la transcripción: "
 
 #: src/qualcoder/refi.py:1348 src/qualcoder/refi.py:1359
 msgid "Cannot copy PDF file from: "
-msgstr "No se puede copiar un archivo PDF: "
+msgstr "No se puede copiar el archivo PDF de: "
 
 #: src/qualcoder/refi.py:1470
 msgid "Cannot read from TextSource: "
 msgstr "No se puede leer desde la fuente de texto: "
 
 #: src/qualcoder/refi.py:1480
-#, fuzzy
 msgid "Cannot copy text file from: "
 msgstr "No se puede copiar el archivo de imagen de: "
 
@@ -3194,19 +3263,22 @@ msgstr "Archivos seleccionados por atributos"
 #: src/qualcoder/report_codes_by_segments.py:258
 #: src/qualcoder/report_codes.py:317
 msgid "Select all files"
-msgstr "Seleccione todos los archivos"
+msgstr "Selecciona todos los archivos"
 
+# Seleccionar*
 #: src/qualcoder/report_codes_by_segments.py:259
 #: src/qualcoder/report_codes.py:318
 msgid "Select files like"
 msgstr "Seleccione los archivos como..."
 
+# No seleccionar ninguno
 #: src/qualcoder/report_codes_by_segments.py:260
 #: src/qualcoder/report_codes_by_segments.py:307
 #: src/qualcoder/report_codes.py:319 src/qualcoder/report_codes.py:366
 msgid "Select none"
-msgstr "No seleccione ninguno."
+msgstr "No seleccionar ninguno"
 
+# Seleccionar algunos archivos
 #: src/qualcoder/report_codes_by_segments.py:276
 #: src/qualcoder/report_codes.py:335
 msgid "Select some files"
@@ -3220,52 +3292,48 @@ msgstr "Mostrar archivos que contienen texto"
 #: src/qualcoder/report_codes_by_segments.py:305
 #: src/qualcoder/report_codes.py:364
 msgid "Select all cases"
-msgstr "Seleccione todos los casos"
+msgstr "Seleccionar todos los casos"
 
 #: src/qualcoder/report_codes_by_segments.py:306
 #: src/qualcoder/report_codes.py:365
 msgid "Select cases like"
-msgstr "Seleccione casos como"
+msgstr "Seleccionar casos como"
 
 #: src/qualcoder/report_codes_by_segments.py:319
 #: src/qualcoder/report_codes.py:384
 msgid "Select some cases"
-msgstr "Seleccione algunos casos"
+msgstr "Seleccionar algunos casos"
 
 #: src/qualcoder/report_codes_by_segments.py:322
 #: src/qualcoder/report_codes.py:387
 msgid "Select cases containing text"
-msgstr "Seleccione los casos que contienen texto"
+msgstr "Seleccionar los casos que contienen texto"
 
 #: src/qualcoder/report_codes_by_segments.py:499
 #: src/qualcoder/report_codes.py:564
-#, fuzzy
 msgid "Select all codes"
-msgstr "Seleccione todos los casos"
+msgstr "Seleccionar todos los códigos"
 
+# Borrar selecciones
 #: src/qualcoder/report_codes_by_segments.py:500
 #: src/qualcoder/report_codes.py:565
-#, fuzzy
 msgid "Remove selections"
 msgstr "No hay selección de archivos"
 
 #: src/qualcoder/report_codes_by_segments.py:501
 #: src/qualcoder/report_codes.py:566
-#, fuzzy
 msgid "Select codes like"
-msgstr "Seleccione casos como"
+msgstr "Seleccionar códigos como"
 
 #: src/qualcoder/report_codes_by_segments.py:516
 #: src/qualcoder/report_codes.py:581
-#, fuzzy
 msgid "Select some codes"
-msgstr "Seleccione algunos casos"
+msgstr "Seleccionar algunos códigos"
 
 #: src/qualcoder/report_codes_by_segments.py:519
 #: src/qualcoder/report_codes.py:584
-#, fuzzy
 msgid "Select codes containing text"
-msgstr "Seleccione los casos que contienen texto"
+msgstr "Seleccione los códigos que contienen texto"
 
 #: src/qualcoder/report_codes_by_segments.py:548
 #: src/qualcoder/report_codes.py:991 src/qualcoder/report_exact_matches.py:532
@@ -3318,8 +3386,8 @@ msgstr "Árbol de códigos"
 msgid "Perspective: "
 msgstr "Perspectiva: "
 
+# Seleccionar atributo
 #: src/qualcoder/report_comparison_table.py:122
-#, fuzzy
 msgid "Select Attribute"
 msgstr "Atributos de los archivos"
 
@@ -3347,12 +3415,11 @@ msgstr "Todos los archivos seleccionados"
 
 #: src/qualcoder/report_comparison_table.py:322 src/qualcoder/view_graph.py:972
 msgid "Select cases"
-msgstr "Seleccione los casos"
+msgstr "Seleccionar los casos"
 
 #: src/qualcoder/report_comparison_table.py:341
-#, fuzzy
 msgid "Selection"
-msgstr "No seleccione ninguno."
+msgstr "Selección"
 
 #: src/qualcoder/report_comparison_table.py:362
 #: src/qualcoder/report_comparison_table.py:369
@@ -3367,9 +3434,8 @@ msgid "All codes selected"
 msgstr "Todos los códigos seleccionados"
 
 #: src/qualcoder/report_comparison_table.py:379
-#, fuzzy
 msgid "Select one category"
-msgstr "Seleccione el blanco o la categoría"
+msgstr "Seleccionar una categoría"
 
 #: src/qualcoder/report_comparison_table.py:492
 #: src/qualcoder/report_cooccurrence.py:404
@@ -3399,7 +3465,7 @@ msgstr "Audio"
 #: src/qualcoder/report_compare_coder_file.py:284
 #: src/qualcoder/report_codes.py:226 src/qualcoder/report_exact_matches.py:153
 msgid "Video"
-msgstr "Video"
+msgstr "Vídeo"
 
 #: src/qualcoder/report_compare_coder_file.py:385 src/qualcoder/reports.py:614
 msgid "No coders selected"
@@ -3607,7 +3673,7 @@ msgid ""
 "Avoid selecting text combinations of unmarked text sections and coded/"
 "annotated/case-assigned sections."
 msgstr ""
-"Evite seleccionar combinaciones de texto que incluyan secciones no marcadas "
+"Evita seleccionar combinaciones de texto que incluyan secciones no marcadas "
 "junto con secciones codificadas, anotadas o asignadas a casos."
 
 #: src/qualcoder/edit_textfile.py:79
@@ -3618,7 +3684,7 @@ msgstr "Las posiciones pueden no ajustarse correctamente."
 msgid ""
 "Do not code this text until you reload Coding - Code Text from the menu bar."
 msgstr ""
-"No codifique este texto hasta que vuelva a cargar Codificación - Codificar "
+"No codifiques este texto hasta que vuelvas a cargar Codificación - Codificar "
 "texto en la barra de menú."
 
 #: src/qualcoder/edit_textfile.py:85 src/qualcoder/view_av.py:4058
@@ -3628,7 +3694,7 @@ msgid ""
 "coded / annotated / case-assigned) and underlined (coded, annotated, case-"
 "assigned)."
 msgstr ""
-"Evite seleccionar secciones de texto con una combinación de no subrayado (no "
+"Evita seleccionar secciones de texto con una combinación de no subrayado (no "
 "codificado / anotado / asignado a un caso) y subrayado (codificado, anotado, "
 "asignado a un caso)."
 
@@ -3658,6 +3724,7 @@ msgstr ""
 "Alt+Flecha izquierda, Alt+Flecha derecha\n"
 "Mayús+flecha izquierda, Mayús+flecha derecha"
 
+# Archivo no encontrado
 #: src/qualcoder/helpers.py:428 src/qualcoder/view_av.py:1017
 #: src/qualcoder/view_av.py:3767 src/qualcoder/view_av.py:4204
 msgid "Media not found"
@@ -3687,6 +3754,7 @@ msgstr "Girar 90° grados a la izquierda"
 msgid "Export image E"
 msgstr "Exportar imagen E"
 
+# sin formato > simple
 #: src/qualcoder/helpers.py:761
 msgid "Select plain text codes file"
 msgstr "Seleccionar archivo de códigos de texto sin formato"
@@ -3706,7 +3774,6 @@ msgstr ""
 "codificación, informes"
 
 #: src/qualcoder/helpers.py:802
-#, fuzzy
 msgid "Imported category: "
 msgstr "Código de importación: "
 
@@ -3827,6 +3894,7 @@ msgstr "Códigos por archivo"
 msgid "None"
 msgstr "Ninguno"
 
+# Codificar también memos/notas
 #: src/qualcoder/report_codes.py:137 src/qualcoder/report_codes.py:2313
 #: src/qualcoder/report_codes.py:2678
 msgid "Also code memos"
@@ -3870,7 +3938,7 @@ msgstr "Anotaciones"
 
 #: src/qualcoder/report_codes.py:138 src/qualcoder/report_codes.py:1358
 msgid "Codebook memos"
-msgstr "Memos libro de códigos"
+msgstr "Memos del libro de códigos"
 
 #: src/qualcoder/report_codes.py:624
 msgid "No matrix"
@@ -3893,15 +3961,14 @@ msgid "Save Text File"
 msgstr "Guardar archivo de texto"
 
 #: src/qualcoder/report_codes.py:697
-#, fuzzy
 msgid "Save IRaMuTeQ File"
-msgstr "Guardar archivo de texto"
+msgstr "Guardar archivo IRaMuTeQ"
 
 #: src/qualcoder/report_codes.py:745
-#, fuzzy
 msgid "Report exported in IRaMuTeQ format: "
-msgstr "Informe exportado a: "
+msgstr "Informe exportado en formato IRaMuTeQ: "
 
+# Guardar archivo de texto Open Document
 #: src/qualcoder/report_codes.py:757
 msgid "Save Open Document Text File"
 msgstr "Guardar archivo de texto de documento abierto"
@@ -4061,9 +4128,8 @@ msgid "View in context"
 msgstr "Ver en contexto"
 
 #: src/qualcoder/report_codes.py:2398
-#, fuzzy
 msgid "Change code to"
-msgstr "Cambiar el código"
+msgstr "Cambiar el código a:"
 
 #: src/qualcoder/report_codes.py:2399
 msgid "Apply additional code"
@@ -4078,9 +4144,8 @@ msgid "Rotate image 90 degrees"
 msgstr "Girar la imagen 90 grados"
 
 #: src/qualcoder/report_codes.py:2568
-#, fuzzy
 msgid "Delete coded section"
-msgstr "Seleccionar texto codificado"
+msgstr "Borrar sección codificada"
 
 #: src/qualcoder/report_codes.py:2679
 msgid "CODE MEMO: All memo"
@@ -4096,7 +4161,7 @@ msgstr "Haga clic con el botón derecho para ver"
 
 #: src/qualcoder/view_graph.py:145
 msgid "Are you sure you want to clear the graph?"
-msgstr "¿Estás seguro de que quieres borrar el Grafo?"
+msgstr "¿Estás seguro de que quieres borrar el gráfico?"
 
 #: src/qualcoder/view_graph.py:384 src/qualcoder/code_text.py:1908
 #: src/qualcoder/code_text.py:1931
@@ -4254,7 +4319,7 @@ msgstr "Objeto de texto"
 
 #: src/qualcoder/view_graph.py:847
 msgid "Enter text:"
-msgstr "Introduzca el texto:"
+msgstr "Introduce el texto:"
 
 #: src/qualcoder/view_graph.py:853
 msgid "Another item has this exact text"
@@ -4279,11 +4344,11 @@ msgstr "Archivo"
 
 #: src/qualcoder/view_graph.py:1054
 msgid "Save graph"
-msgstr "Guardar Grafo"
+msgstr "Guardar gráfico"
 
 #: src/qualcoder/view_graph.py:1055
 msgid "Graph name"
-msgstr "Nombre del Grafo"
+msgstr "Nombre del gráfico"
 
 #: src/qualcoder/view_graph.py:1061
 msgid "Must have a name"
@@ -4300,7 +4365,7 @@ msgstr "Error de nombre"
 
 #: src/qualcoder/view_graph.py:1076
 msgid "This name already used. Choose another name."
-msgstr "Este nombre ya está usado. Elija otro nombre."
+msgstr "Este nombre ya está usado. Elige otro nombre."
 
 #: src/qualcoder/view_graph.py:1218 src/qualcoder/view_graph.py:1226
 msgid "Alphabet ascending"
@@ -4320,15 +4385,15 @@ msgstr "De más reciente a más antiguo"
 
 #: src/qualcoder/view_graph.py:1233 src/qualcoder/view_graph.py:1466
 msgid "Load graph"
-msgstr "Cargar Grafo"
+msgstr "Cargar gráfico"
 
 #: src/qualcoder/view_graph.py:1488
 msgid "Load graph errors"
-msgstr "Errores de carga de Grafo"
+msgstr "Errores de carga de gráfico"
 
 #: src/qualcoder/view_graph.py:1489
 msgid "Changing to another report will lose unsaved graph."
-msgstr "Al cambiar a otro informe se perderá el Grafo no guardado."
+msgstr "Al cambiar a otro informe se perderá el gráfico no guardado."
 
 #: src/qualcoder/view_graph.py:1727 src/qualcoder/view_graph.py:3172
 #: src/qualcoder/view_graph.py:3174 src/qualcoder/ai_chat.py:419
@@ -4342,7 +4407,7 @@ msgstr " no existe: "
 
 #: src/qualcoder/view_graph.py:1744
 msgid "Delete stored graphs"
-msgstr "Borrar los Grafos almacenados"
+msgstr "Borrar los gráficos almacenados"
 
 #: src/qualcoder/view_graph.py:1988 src/qualcoder/view_graph.py:2056
 #: src/qualcoder/view_graph.py:2158 src/qualcoder/view_graph.py:2232
@@ -4387,7 +4452,7 @@ msgstr "Texto naranja"
 
 #: src/qualcoder/view_graph.py:1997 src/qualcoder/view_graph.py:2167
 msgid "Cyan text"
-msgstr "Texto cian"
+msgstr "Texto cyan"
 
 #: src/qualcoder/view_graph.py:1998 src/qualcoder/view_graph.py:2166
 msgid "Magenta text"
@@ -4457,7 +4522,7 @@ msgstr "Azul"
 #: src/qualcoder/view_graph.py:2781 src/qualcoder/view_graph.py:2940
 #: src/qualcoder/view_graph.py:3335
 msgid "Cyan"
-msgstr "Cian"
+msgstr "Cyan"
 
 #: src/qualcoder/view_graph.py:2393 src/qualcoder/view_graph.py:2579
 #: src/qualcoder/view_graph.py:2782 src/qualcoder/view_graph.py:2939
@@ -4529,9 +4594,10 @@ msgstr "Ocultar"
 msgid "Merging: "
 msgstr "Fusión: "
 
+# ou A:
 #: src/qualcoder/merge_projects.py:76
 msgid "Into: "
-msgstr "Dentro: "
+msgstr "En: "
 
 #: src/qualcoder/merge_projects.py:93
 msgid "Finished merging "
@@ -4551,7 +4617,7 @@ msgstr "Proyecto fusionado"
 
 #: src/qualcoder/merge_projects.py:96
 msgid "Review the action log for details."
-msgstr "Revise el registro de acciones para conocer los detalles."
+msgstr "Revisa el registro de acciones para conocer los detalles."
 
 #: src/qualcoder/merge_projects.py:100 src/qualcoder/merge_projects.py:488
 msgid "Project not merged"
@@ -4559,11 +4625,11 @@ msgstr "Proyecto no fusionado"
 
 #: src/qualcoder/merge_projects.py:113
 msgid "Adding top level category: "
-msgstr "Añadir categoría de nivel superior: "
+msgstr "Añadiendo categoría de nivel superior: "
 
 #: src/qualcoder/merge_projects.py:135
 msgid "Adding sub-category: "
-msgstr "Añadir subcategoría: "
+msgstr "Añadiendo subcategoría: "
 
 #: src/qualcoder/merge_projects.py:141
 msgid " categories not added"
@@ -4623,7 +4689,7 @@ msgstr "NO se ha copiado. Error de permiso"
 
 #: src/qualcoder/merge_projects.py:410
 msgid "Adding attribute ("
-msgstr "Añadir el atributo ("
+msgstr "Añadiendo el atributo ("
 
 #: src/qualcoder/merge_projects.py:459
 msgid "Added attribute values for cases and files: n="
@@ -4636,13 +4702,13 @@ msgstr "Es necesario actualizar la base de datos del proyecto de origen."
 #: src/qualcoder/merge_projects.py:486
 msgid "Please open the source project using QualCoder. Then close the project."
 msgstr ""
-"Por favor, abra el proyecto fuente utilizando QualCoder. A continuación, "
-"cierre el proyecto."
+"Por favor, abre el proyecto fuente utilizando QualCoder. A continuación, "
+"cierra el proyecto."
 
 #: src/qualcoder/merge_projects.py:487
 msgid "This will update the database schema. Then try merging again."
 msgstr ""
-"Esto actualizará el esquema de la base de datos. A continuación, intente "
+"Esto actualizará el esquema de la base de datos. A continuación, intenta "
 "fusionar de nuevo."
 
 #: src/qualcoder/rqda.py:49
@@ -4655,19 +4721,20 @@ msgstr "Comienzo de la importación desde la RQDA"
 
 #: src/qualcoder/rqda.py:59
 msgid "Data imported from "
-msgstr "Los datos importados de "
+msgstr "Datos importados de "
 
 #: src/qualcoder/rqda.py:60
 msgid "File categories are not imported from RQDA"
 msgstr "Las categorías de archivos no se importan de la RQDA"
 
+# No se han podido importar los datos de
 #: src/qualcoder/rqda.py:65
 msgid "Data import unsuccessful from "
 msgstr "La importación de datos sin éxito de "
 
 #: src/qualcoder/rqda.py:118
 msgid "Project memo imported"
-msgstr "Memorando del proyecto importado"
+msgstr "Memo del proyecto importado"
 
 #: src/qualcoder/rqda.py:133
 msgid "Duplicate filename: "
@@ -4683,11 +4750,11 @@ msgstr " archivos importados"
 
 #: src/qualcoder/rqda.py:145
 msgid " annotations imported"
-msgstr " las anotaciones importadas"
+msgstr " anotaciones importadas"
 
 #: src/qualcoder/rqda.py:154
 msgid " journals imported"
-msgstr " revistas importadas"
+msgstr " diarios importados"
 
 #: src/qualcoder/rqda.py:165
 msgid " cases imported"
@@ -4733,7 +4800,7 @@ msgstr " textos vinculados al caso importados"
 
 #: src/qualcoder/ai_chat.py:93
 msgid "<your question>"
-msgstr "<su pregunta>"
+msgstr "<pregunta>"
 
 #: src/qualcoder/ai_chat.py:286 src/qualcoder/ai_chat.py:301
 #: src/qualcoder/ai_chat.py:327 src/qualcoder/ai_chat.py:435
@@ -4750,178 +4817,13 @@ msgstr "No hay ningún proyecto abierto."
 msgid "AI not enabled"
 msgstr "IA no habilitada"
 
+# erreur de DeepL ici je crois ! "La IA está deshabilitada. Ve a "AI > Setup Wizard" antes.
 #: src/qualcoder/ai_chat.py:290 src/qualcoder/ai_chat.py:305
 #: src/qualcoder/ai_chat.py:331 src/qualcoder/ai_chat.py:439
 #: src/qualcoder/ai_chat.py:666 src/qualcoder/ai_chat.py:1143
 #: src/qualcoder/code_text.py:5026
 msgid "The AI is disabled. Go to \"AI > Setup Wizard\" first."
-msgstr ""
-"DeepL uses cookies. For further details, please read our Privacy Policy.\n"
-"\n"
-"Close\n"
-"DeepL Logo\n"
-"DeepL\n"
-"\n"
-"Translator\n"
-"\n"
-"\n"
-"Start free trial\n"
-"\n"
-"Menu\n"
-"Millions translate with DeepL every day. Popular: Spanish to English, French "
-"to English, and Japanese to English.\n"
-"Translation modes\n"
-"Translate text\n"
-"33 languages\n"
-"Translate files\n"
-".pdf, .docx, .pptx\n"
-"DeepL Write\n"
-"AI-powered edits\n"
-"Translate text\n"
-"\n"
-"Select source language. Currently selected:\n"
-"English\n"
-"\n"
-"\n"
-"Select target language. Currently selected:\n"
-"Spanish\n"
-"\n"
-"Options\n"
-"Source text\n"
-"The AI is disabled. Go to \"AI > Setup Wizard\" first.\n"
-"\n"
-"\n"
-"\n"
-"\n"
-"\n"
-"\n"
-"Translation results\n"
-"La IA está deshabilitada. Vaya primero a «IA > Asistente de configuración».\n"
-"\n"
-"\n"
-"\n"
-"\n"
-"\n"
-"\n"
-"Dictionary\n"
-"Click on a word to look it up.\n"
-"DeepL Write Banner\n"
-"Now change the style and tone of your translation\n"
-"Ensure your writing fits your audience with preset writing styles and tones "
-"from DeepL Write.\n"
-"\n"
-"Get a rewrite\n"
-"Unlock DeepL’s full potential – Try DeepL Pro for free\n"
-"Try Pro for 30 days free\n"
-"You are using the free version of DeepL\n"
-"Translate up to 1,500 characters\n"
-"Translate 3 locked documents/month\n"
-"10 glossary entries\n"
-"Unlock DeepL Pro features\n"
-"Maximum data security\n"
-"Unlimited text translation\n"
-"Translate and edit more documents\n"
-"See more features\n"
-"Translate even faster with DeepL apps\n"
-"DeepL for Windows\n"
-"Download for free\n"
-"DeepL for\n"
-"iOS\n"
-"and\n"
-"Android\n"
-"Download for free\n"
-"DeepL for Edge\n"
-"Download for free\n"
-"career illustration\n"
-"DeepL is hiring! Join us in breaking down language barriers\n"
-"See open jobs\n"
-"Millions translate with DeepL every day.\n"
-"Popular\n"
-"English to Chinese\n"
-"English to French\n"
-"Chinese to English\n"
-"Other languages\n"
-"Bulgarian\n"
-"Czech\n"
-"Danish\n"
-"German\n"
-"Greek\n"
-"Spanish\n"
-"Estonian\n"
-"Finnish\n"
-"French\n"
-"Hungarian\n"
-"Indonesian\n"
-"Italian\n"
-"Japanese\n"
-"Korean\n"
-"Lithuanian\n"
-"Latvian\n"
-"Norwegian (bokmål)\n"
-"Dutch\n"
-"Polish\n"
-"Portuguese\n"
-"Portuguese (Brazilian)\n"
-"Romanian\n"
-"Russian\n"
-"Slovak\n"
-"Slovenian\n"
-"Swedish\n"
-"Turkish\n"
-"Ukrainian\n"
-"Chinese\n"
-"Arabic\n"
-"Speed up your workflow with DeepL for Windows.\n"
-"\n"
-"Download for free!\n"
-"Speed up your workflow with DeepL for Windows.shortcutPhrase\n"
-"Language\n"
-"English\n"
-"DeepL\n"
-"Resources\n"
-"Help Center\n"
-"Blog\n"
-"API documentation\n"
-"Status\n"
-"Accessibility\n"
-"Data security\n"
-"Privacy policy\n"
-"Terms & Conditions\n"
-"Product\n"
-"NEW: Arabic translator\n"
-"Free translator\n"
-"Features\n"
-"DeepL Pro\n"
-"Translation API\n"
-"DeepL Write\n"
-"Apps\n"
-"Integrations\n"
-"Document Translation\n"
-"Download\n"
-"DeepL for Android\n"
-"DeepL for ChromeOS\n"
-"DeepL for iPhone\n"
-"DeepL for iPad\n"
-"DeepL for Mac\n"
-"DeepL for Windows\n"
-"DeepL Chrome extension\n"
-"DeepL Edge extension\n"
-"DeepL Firefox extension\n"
-"DeepL in Microsoft Word\n"
-"DeepL for Microsoft Outlook\n"
-"DeepL for Microsoft Powerpoint\n"
-"DeepL for Google Workspace\n"
-"DeepL for Microsoft 365\n"
-"Company\n"
-"Contact Sales\n"
-"Press\n"
-"Careers\n"
-"Publisher\n"
-"twitter\n"
-"facebook\n"
-"linkedin\n"
-"github\n"
-"instagram"
+msgstr "La IA está deshabilitada. Ve a \"AI > Setup Wizard\" antes"
 
 #: src/qualcoder/ai_chat.py:309
 msgid ""
@@ -4943,8 +4845,8 @@ msgid ""
 "No coded text found. Please select another code or category, or refine you "
 "filters."
 msgstr ""
-"No se ha encontrado ningún texto codificado. Seleccione otro código o "
-"categoría, o afine los filtros."
+"No se ha encontrado ningún texto codificado. Selecciona otro código o "
+"categoría, o afina los filtros."
 
 #: src/qualcoder/ai_chat.py:399
 msgid "AI code analysis"
@@ -4972,7 +4874,7 @@ msgid ""
 "information will accompany every prompt sent to the AI, resulting in much "
 "more targeted results."
 msgstr ""
-"Tenga en cuenta que se recomienda encarecidamente utilizar el Memo del "
+"Ten en cuenta que se recomienda encarecidamente utilizar el Memo del "
 "proyecto (Menú «Proyecto > Memo del proyecto») para incluir una breve "
 "descripción de los temas de investigación de su proyecto, las preguntas, los "
 "objetivos y los datos empíricos recopilados. Esta información acompañará a "
@@ -5010,7 +4912,7 @@ msgstr " La IA no pudo encontrar ningún dato relacionado con »"
 #: src/qualcoder/ai_chat.py:505
 msgid "Found related data. Analyzing the most relevant segments closer."
 msgstr ""
-"Encontrar datos relacionados. Analizar más de cerca los segmentos más "
+"Datos relacionados encontrados. Analizando más de cerca los segmentos más "
 "relevantes."
 
 #: src/qualcoder/ai_chat.py:575
@@ -5059,7 +4961,7 @@ msgstr "Borrar Chat"
 
 #: src/qualcoder/ai_chat.py:753
 msgid "Send your question to the AI"
-msgstr "Envíe su pregunta a la IA"
+msgstr "Enviar pregunta a la IA"
 
 #: src/qualcoder/ai_chat.py:759
 msgid "Cancel AI generation"
@@ -5069,6 +4971,7 @@ msgstr "Cancelar la generación de IA"
 msgid "AI: "
 msgstr "IA: "
 
+# ou "datos de lectura" ? suivant le sens de la phrase en anglais
 #: src/qualcoder/ai_chat.py:764
 msgid "reading data"
 msgstr "Lectura de datos"
@@ -5079,7 +4982,7 @@ msgstr "Info:"
 
 #: src/qualcoder/ai_chat.py:856
 msgid "Thinking..."
-msgstr "Pensamiento..."
+msgstr "Pensando..."
 
 #: src/qualcoder/ai_chat.py:918
 msgid "(unknown reference)"
@@ -5109,7 +5012,7 @@ msgstr "Nuevo chat de análisis de texto"
 #: src/qualcoder/ai_chat.py:1053
 msgid "Analyse a piece of text from your empirical data together with the AI."
 msgstr ""
-"Analiza un fragmento de texto a partir de tus datos empíricos junto con la "
+"Analizar un fragmento de texto a partir de tus datos empíricos junto con la "
 "IA."
 
 #: src/qualcoder/ai_chat.py:1054
@@ -5150,7 +5053,7 @@ msgstr ""
 
 #: src/qualcoder/ai_chat.py:1171
 msgid "Please select a chat or create a new one."
-msgstr "Seleccione un Chat o cree uno nuevo."
+msgstr "Selecciona un Chat o crea uno nuevo."
 
 #: src/qualcoder/ai_chat.py:1172
 msgid "Chat selection"
@@ -5201,8 +5104,8 @@ msgid ""
 "Reload the other tabs.\n"
 "Check accuracy of codings and annotations.\n"
 msgstr ""
-"Recargar las otras pestañas.\n"
-"Comprobar la exactitud de las codificaciones y anotaciones.\n"
+"Recarga las otras pestañas.\n"
+"Comprueba la exactitud de las codificaciones y anotaciones.\n"
 
 #: src/qualcoder/text_file_replacement.py:84
 msgid ""
@@ -5252,16 +5155,14 @@ msgid ""
 "Please check if the file is empty."
 msgstr ""
 "\n"
-"Por favor, compruebe si el archivo está vacío."
+"Por favor, comprueba si el archivo está vacío."
 
 #: src/qualcoder/manage_references.py:234
 #: src/qualcoder/manage_references.py:609
-#, fuzzy
 msgid "Show value like"
 msgstr "Mostrar valores como"
 
 #: src/qualcoder/manage_references.py:235
-#, fuzzy
 msgid "View file"
 msgstr "Ver archivo: "
 
@@ -5272,19 +5173,16 @@ msgstr "Mostrar todas las filas"
 
 #: src/qualcoder/manage_references.py:248
 #: src/qualcoder/manage_references.py:629
-#, fuzzy
 msgid "Show value like:"
 msgstr "Mostrar valores como: "
 
 #: src/qualcoder/manage_references.py:377
-#, fuzzy
 msgid "Matches: "
 msgstr "Casos: "
 
 #: src/qualcoder/manage_references.py:378
-#, fuzzy
 msgid "Files linked to references"
-msgstr "Archivos vinculados: "
+msgstr "Archivos vinculados con las referencias: "
 
 #: src/qualcoder/manage_references.py:386
 msgid "Reference"
@@ -5300,7 +5198,7 @@ msgstr "Autores"
 
 #: src/qualcoder/manage_references.py:386
 msgid "Journal or Publication Title"
-msgstr "Título de la revista o publicación"
+msgstr "Título de la diario o publicación"
 
 #: src/qualcoder/manage_references.py:387
 msgid "Volume"
@@ -5315,14 +5213,12 @@ msgid "Keywords"
 msgstr "Palabras clave"
 
 #: src/qualcoder/manage_references.py:614
-#, fuzzy
 msgid "Copy to clipboard.  APA style"
-msgstr "Copiar al portapapeles"
+msgstr "Copiar al portapapeles. APA"
 
 #: src/qualcoder/manage_references.py:615
-#, fuzzy
 msgid "Edit reference"
-msgstr "Referencia"
+msgstr "Editar referencia"
 
 #: src/qualcoder/manage_references.py:859
 msgid "Reference edited."
@@ -5367,7 +5263,7 @@ msgstr ""
 #: src/qualcoder/ai_prompts.py:934
 #, python-brace-format
 msgid "You must select a {self.prompt_type} prompt."
-msgstr ""
+msgstr "Tienes que seleccionar un {self.prompt_type} prompt."
 
 #: src/qualcoder/code_in_all_files.py:78
 msgid "Coded files: "
@@ -5380,8 +5276,7 @@ msgstr "Casos codificados: "
 #: src/qualcoder/code_in_all_files.py:87 src/qualcoder/code_in_all_files.py:101
 msgid "Left click on heading for coding in context"
 msgstr ""
-"Haga clic con el botón izquierdo del ratón en el título para codificar en "
-"contexto"
+"Haga clic con el botón izquierdo en el título para codificar en contexto"
 
 #: src/qualcoder/code_in_all_files.py:88 src/qualcoder/code_in_all_files.py:102
 msgid "Right click on heading to unmark or to add codes"
@@ -5408,7 +5303,6 @@ msgid "Remove code"
 msgstr "Eliminar código"
 
 #: src/qualcoder/code_in_all_files.py:338
-#, fuzzy
 msgid "Add important flag"
 msgstr "Añadir marca importante"
 
@@ -5417,7 +5311,6 @@ msgid "Export to ODT file"
 msgstr "Exportar a archivo ODT"
 
 #: src/qualcoder/code_in_all_files.py:400
-#, fuzzy
 msgid "Memo for Coded: "
 msgstr "Memo para el código: "
 
@@ -5435,7 +5328,6 @@ msgid "Media coding"
 msgstr "Codificación de medios"
 
 #: src/qualcoder/view_av.py:272 src/qualcoder/view_av.py:4188
-#, fuzzy
 msgid "QualCoder will crash"
 msgstr "Codificador: Todos los codificadores"
 
@@ -5465,7 +5357,7 @@ msgstr "Borrar Segmento"
 
 #: src/qualcoder/view_av.py:1455
 msgid "End segment"
-msgstr "Segmento final"
+msgstr "Terminar Segmento"
 
 #: src/qualcoder/view_av.py:1456 src/qualcoder/view_av.py:1470
 #: src/qualcoder/view_av.py:3391 src/qualcoder/view_av.py:3901
@@ -5502,11 +5394,11 @@ msgstr "Comenzar segmento"
 
 #: src/qualcoder/view_av.py:2366
 msgid "New code name"
-msgstr "Nuevo nombre en código"
+msgstr "Nuevo nombre de código"
 
 #: src/qualcoder/view_av.py:2379
 msgid "Code added: "
-msgstr "Caso agregado: "
+msgstr "Código agregado: "
 
 #: src/qualcoder/view_av.py:2506
 msgid "Memo for Category "
@@ -5514,7 +5406,7 @@ msgstr "Memo para la categoría: "
 
 #: src/qualcoder/view_av.py:2537
 msgid " Name already in use, choose another."
-msgstr " Nombre ya en uso, elija otro."
+msgstr " Nombre ya en uso, elige otro."
 
 #: src/qualcoder/view_av.py:2579
 msgid "Category renamed: "
@@ -5549,7 +5441,7 @@ msgid ""
 "Change start character position.\n"
 "Positive or negative number:"
 msgstr ""
-"Cambiar la posición del personaje inicial.\n"
+"Cambiar la posición del carácter inicial.\n"
 "Número positivo o negativo:"
 
 #: src/qualcoder/view_av.py:3008
@@ -5561,7 +5453,7 @@ msgid ""
 "Change end character position.\n"
 "Positive or negative number:"
 msgstr ""
-"Cambiar la posición del personaje final.\n"
+"Cambiar la posición del carácter final.\n"
 "Número positivo o negativo:"
 
 #: src/qualcoder/view_av.py:3066
@@ -5660,7 +5552,7 @@ msgstr ""
 
 #: src/qualcoder/view_av.py:4534
 msgid "Select name to delete"
-msgstr "Seleccione el nombre que desea borrar"
+msgstr "Selecciona el nombre para borrar"
 
 #: src/qualcoder/view_av.py:4553
 msgid "Speaker name"
@@ -5692,7 +5584,7 @@ msgstr "Sunburst: frecuencia de códigos"
 
 #: src/qualcoder/view_charts.py:128
 msgid "Code frequency treemap"
-msgstr "Treemap: frecuencias de códigos"
+msgstr "Treemap: frecuencia de códigos"
 
 #: src/qualcoder/view_charts.py:129
 msgid "Code by characters sunburst"
@@ -5719,39 +5611,32 @@ msgid "Code by A/V treemap"
 msgstr "Treemap: Código por A/V"
 
 #: src/qualcoder/view_charts.py:144
-#, fuzzy
 msgid "Files by codes"
 msgstr "Orden de tipo de archivo"
 
 #: src/qualcoder/view_charts.py:145
-#, fuzzy
 msgid "Codes by files"
 msgstr "Códigos por archivo"
 
 #: src/qualcoder/view_charts.py:146
-#, fuzzy
 msgid "Cases by codes"
-msgstr "Hecho por el codificador: "
+msgstr "Casos por código"
 
 #: src/qualcoder/view_charts.py:147
-#, fuzzy
 msgid "Codes by cases"
 msgstr "Códigos por caso"
 
 #: src/qualcoder/view_charts.py:159
-#, fuzzy
 msgid "Word cloud made from coded text segments"
-msgstr "Mostrar memos de segmentos codificados"
+msgstr "Mostrar nube de palabras a partir de los segmentos codificados"
 
 #: src/qualcoder/view_charts.py:268
-#, fuzzy
 msgid "Select stopwords file"
-msgstr "Seleccione algunos archivos..."
+msgstr "Seleccionar archivo de stopwords"
 
 #: src/qualcoder/view_charts.py:381
-#, fuzzy
 msgid "Coders: all"
-msgstr "Codificador: "
+msgstr "Codificador: todos"
 
 #: src/qualcoder/view_charts.py:406
 msgid "Word cloud"
@@ -5763,43 +5648,37 @@ msgstr "Recuento de códigos acumulados caso por caso"
 
 #: src/qualcoder/view_charts.py:583 src/qualcoder/view_charts.py:590
 #: src/qualcoder/view_charts.py:666 src/qualcoder/view_charts.py:673
-#, fuzzy
 msgid "Cases"
-msgstr "Caso"
+msgstr "Casos"
 
 #: src/qualcoder/view_charts.py:584 src/qualcoder/view_charts.py:591
 #: src/qualcoder/view_charts.py:665 src/qualcoder/view_charts.py:672
 #: src/qualcoder/view_charts.py:739 src/qualcoder/view_charts.py:746
 #: src/qualcoder/view_charts.py:814 src/qualcoder/view_charts.py:821
-#, fuzzy
 msgid "Codes"
-msgstr "Código"
+msgstr "Códigos"
 
 #: src/qualcoder/view_charts.py:585 src/qualcoder/view_charts.py:589
 #: src/qualcoder/view_charts.py:667 src/qualcoder/view_charts.py:671
 #: src/qualcoder/view_charts.py:741 src/qualcoder/view_charts.py:745
 #: src/qualcoder/view_charts.py:815 src/qualcoder/view_charts.py:819
-#, fuzzy
 msgid "Counts"
-msgstr "Conteo"
+msgstr "Recuento"
 
 #: src/qualcoder/view_charts.py:610
 msgid "Cumulative code count in cases by code"
 msgstr "Recuento de códigos acumulados en casos por código"
 
 #: src/qualcoder/view_charts.py:692
-#, fuzzy
 msgid "Cumulative code count in files by code"
 msgstr "Sentencia de código automático en los archivos:"
 
 #: src/qualcoder/view_charts.py:740 src/qualcoder/view_charts.py:747
 #: src/qualcoder/view_charts.py:813 src/qualcoder/view_charts.py:820
-#, fuzzy
 msgid "Files"
 msgstr "Archivos: "
 
 #: src/qualcoder/view_charts.py:766
-#, fuzzy
 msgid "Cumulative code count in codes by file"
 msgstr "Sentencia de código automático en los archivos:"
 
@@ -5944,6 +5823,7 @@ msgstr "Encuesta no cargada"
 msgid "Inserting cases: "
 msgstr "Inserción de casos: "
 
+# Duplicar los nombres de casos, ya sea en el archivo o con casos de proyectos existentes
 #: src/qualcoder/import_survey.py:372
 msgid ""
 " Duplicate case names, either in the file, or with existing project cases"
@@ -5975,17 +5855,20 @@ msgstr "Encuesta importada"
 msgid "Survey imported."
 msgstr "Encuesta importada."
 
+# Ou "Error en el número de campos en la fila", encore suivant le sens de la phrase en anglais
 #: src/qualcoder/import_survey.py:582
 msgid "Number of fields in row error."
 msgstr " Número de campos en el error de la fila."
 
+# quote (citation) = cita
+# quote (guillemets) = comillas
 #: src/qualcoder/import_survey.py:583
 msgid "Use another quote format OR another delimiter"
 msgstr "Utilizar otro formato de comillas u otro delimitador"
 
 #: src/qualcoder/import_survey.py:597
 msgid "Change fieldname"
-msgstr "Cambiar nombre de esfera"
+msgstr "Cambiar nombre de campo"
 
 #: src/qualcoder/import_survey.py:600
 msgid "Change to Qualitative"
@@ -6013,7 +5896,7 @@ msgstr ""
 
 #: src/qualcoder/import_survey.py:637
 msgid "Field name invalid"
-msgstr "El nombre del campo no es válido"
+msgstr "Nombre de campo no válido."
 
 #: src/qualcoder/import_survey.py:640
 msgid " Already in use"
@@ -6062,14 +5945,13 @@ msgid ""
 msgstr ""
 "Las nuevas funciones mejoradas de IA en QualCoder necesitan una "
 "configuración adicional. ¿Quieres habilitar la IA e iniciar la "
-"configuración? También puede hacerlo más tarde iniciando el Asistente de "
+"configuración? También puedes hacerlo más tarde iniciando el Asistente de "
 "Configuración IA desde el menú IA en la ventana principal. Haga clic en «Sí» "
 "para empezar ahora."
 
 #: src/qualcoder/__main__.py:1317
-#, fuzzy
 msgid "AI Integration"
-msgstr "Información"
+msgstr "Integración IA"
 
 #: src/qualcoder/__main__.py:1635
 msgid "Settings"
@@ -6144,14 +6026,12 @@ msgid "No text files"
 msgstr "No hay archivos de texto"
 
 #: src/qualcoder/__main__.py:1921
-#, fuzzy
 msgid "This project contains no pdf files."
-msgstr "Este proyecto no contiene archivos."
+msgstr "Este proyecto no contiene archivos PDF."
 
 #: src/qualcoder/__main__.py:1922
-#, fuzzy
 msgid "No pdf files"
-msgstr "No hay archivos"
+msgstr "No hay archivos PDF"
 
 #: src/qualcoder/__main__.py:1937
 msgid "This project contains no image files."
@@ -6190,8 +6070,8 @@ msgid ""
 "Step 1: You will be asked for a new QualCoder project name.\n"
 "Step 2: You will be asked for the QDPX file."
 msgstr ""
-"Paso 1: Se le pedirá un nuevo nombre para el proyecto QualCoder.\n"
-"Paso 2: Se le pedirá el archivo QDPX."
+"Paso 1: Se pedirá un nuevo nombre para el proyecto QualCoder.\n"
+"Paso 2: Se pedirá el archivo QDPX."
 
 #: src/qualcoder/__main__.py:2050
 msgid "REFI-QDA import steps"
@@ -6214,8 +6094,8 @@ msgid ""
 "Step 1: You will be asked for a new QualCoder project name.\n"
 "Step 2: You will be asked for the RQDA file."
 msgstr ""
-"Paso 1: Se le pedirá un nuevo nombre para el proyecto QualCoder.\n"
-"Paso 2: Se le pedirá el archivo RQDA."
+"Paso 1: Se pedirá un nuevo nombre para el proyecto QualCoder.\n"
+"Paso 2: Se pedirá el archivo RQDA."
 
 #: src/qualcoder/__main__.py:2068
 msgid "RQDA import steps"
@@ -6231,7 +6111,7 @@ msgstr "¿Seguro que quieres salir?"
 
 #: src/qualcoder/__main__.py:2141
 msgid "Enter project name"
-msgstr "Ingrese el nombre del proyecto"
+msgstr "Añade el nombre del proyecto"
 
 #: src/qualcoder/__main__.py:2145
 msgid "No project created."
@@ -6305,18 +6185,17 @@ msgstr "Memo para proyecto "
 
 #: src/qualcoder/__main__.py:2357
 msgid "Project memo entered."
-msgstr "Memorando del proyecto ingresado."
+msgstr "Memo del proyecto ingresado."
 
 #: src/qualcoder/__main__.py:2387
 msgid ""
 "An error occured while writing to the project folder. Please close the "
 "project and try to open it again."
 msgstr ""
-"Se ha producido un error al escribir en la carpeta del proyecto. Cierre el "
-"proyecto e intente abrirlo de nuevo."
+"Se ha producido un error al escribir en la carpeta del proyecto. Cierra el "
+"proyecto e intenta abrirlo de nuevo."
 
 #: src/qualcoder/__main__.py:2389
-#, fuzzy
 msgid "I/O Error"
 msgstr "Error A/V"
 
@@ -6351,11 +6230,11 @@ msgstr "El proyecto no puede abrirse porque ya está siendo utilizado por »"
 
 #: src/qualcoder/__main__.py:2501
 msgid "\". Please retry later."
-msgstr "«. Vuelva a intentarlo más tarde."
+msgstr "«. Vuelve a intentarlo más tarde."
 
 #: src/qualcoder/__main__.py:2503 src/qualcoder/__main__.py:2516
 msgid "Cannot open file"
-msgstr "No puede abrir el archivo"
+msgstr "No se puede abrir el archivo"
 
 #: src/qualcoder/__main__.py:2544
 msgid "Default coder name changed to: "
@@ -6404,14 +6283,13 @@ msgstr "Casos: "
 
 #: src/qualcoder/__main__.py:2918
 msgid "Directory (folder) paths / represents \\"
-msgstr "Las rutas de los directorios (carpetas) / representan \\"
+msgstr "Las rutas de los directorios (carpetas) / representa \\"
 
 #: src/qualcoder/__main__.py:2923
 msgid "Bad links to files"
-msgstr "Malos enlaces a los archivos"
+msgstr "Enlaces a los archivos equivocados"
 
 #: src/qualcoder/__main__.py:2957
-#, fuzzy
 msgid "Closing project: "
 msgstr "Nuevo proyecto: "
 
@@ -6441,7 +6319,7 @@ msgstr "IA: Asistente de configuración finalizado"
 
 #: src/qualcoder/__main__.py:3049
 msgid "Please enable the AI first and set it in Settings."
-msgstr "Por favor, habilite primero la IA y configúrela en Ajustes."
+msgstr "Por favor, habilita primero la IA y configúrala en Ajustes."
 
 #: src/qualcoder/__main__.py:3050 src/qualcoder/__main__.py:3054
 #: src/qualcoder/__main__.py:3059 src/qualcoder/__main__.py:3084
@@ -6458,7 +6336,7 @@ msgid ""
 "Do you want to continue?"
 msgstr ""
 "Esto volverá a leer todos sus documentos empíricos, lo que puede llevar "
-"algún tiempo. ¿Desea continuar?"
+"algún tiempo. ¿Deseas continuar?"
 
 #: src/qualcoder/__main__.py:3075 src/qualcoder/__main__.py:3083
 msgid "Please enable the AI first and set it up in Settings."
@@ -6499,32 +6377,26 @@ msgid "Categories selected"
 msgstr "Categorías seleccionadas"
 
 #: src/qualcoder/report_cooccurrence.py:511
-#, fuzzy
 msgid "Merge into new code"
 msgstr "Fusionar en: Seleccionar código"
 
 #: src/qualcoder/report_cooccurrence.py:518
-#, fuzzy
 msgid "New code"
 msgstr "Nuevo código "
 
 #: src/qualcoder/report_cooccurrence.py:518
-#, fuzzy
 msgid "Edit name:"
 msgstr "Actualizar nombre"
 
 #: src/qualcoder/report_cooccurrence.py:520
-#, fuzzy
 msgid "Merged: "
 msgstr "Código de fusión: "
 
 #: src/qualcoder/report_cooccurrence.py:526
-#, fuzzy
 msgid "Code name exists"
 msgstr "El nombre del filtro existe"
 
 #: src/qualcoder/report_cooccurrence.py:526
-#, fuzzy
 msgid "Choose another code name"
 msgstr " Elige otro nombre"
 
@@ -6534,7 +6406,7 @@ msgid ""
 "Right click: Create new combined code from these codes."
 msgstr ""
 "Clic izquierdo: Mostrar texto codificado.\n"
-"Haga clic derecho: cree un nuevo código combinado a partir de estos códigos."
+"Clic derecho: crea un nuevo código combinado a partir de estos códigos."
 
 #: src/qualcoder/report_exact_matches.py:87
 msgid ""
@@ -6629,9 +6501,8 @@ msgid "Case attributes file exported to: "
 msgstr "Archivo de atributos de casos exportado a: "
 
 #: src/qualcoder/cases.py:263 src/qualcoder/reports.py:392
-#, fuzzy
 msgid "File export"
-msgstr "Archivos exportados"
+msgstr "Exportación de archivos"
 
 #: src/qualcoder/cases.py:386
 msgid "Attribute added to cases: "
@@ -6643,7 +6514,7 @@ msgstr "Los casos ya han sido creados."
 
 #: src/qualcoder/cases.py:395
 msgid "Select cases file"
-msgstr "Seleccione el archivo de casos"
+msgstr "Seleccionar el archivo de casos"
 
 #: src/qualcoder/cases.py:466 src/qualcoder/cases.py:542
 msgid "attribute:"
@@ -6659,7 +6530,7 @@ msgstr "No se puede importar desde archivo CSV, solo una fila en el archivo"
 
 #: src/qualcoder/cases.py:568
 msgid "Enter case name"
-msgstr "Introduzca el nombre del caso"
+msgstr "Introduce el nombre del caso"
 
 #: src/qualcoder/cases.py:594
 msgid "Case added: "
@@ -6675,11 +6546,11 @@ msgstr "Ver caso"
 
 #: src/qualcoder/cases.py:894
 msgid "Click to edit memo"
-msgstr "Haga clic para editar el Memo"
+msgstr "Haz clic para editar el Memo"
 
 #: src/qualcoder/cases.py:902
 msgid "Click to manage files for this case"
-msgstr "Haga clic para administrar los archivos de este caso"
+msgstr "Haz clic para administrar los archivos de este caso"
 
 #: src/qualcoder/cases.py:959
 msgid "Viewing text of case: "
@@ -6702,39 +6573,36 @@ msgid "New colour: "
 msgstr "Nuevo color: "
 
 #: src/qualcoder/speakers.py:62 src/qualcoder/speakers.py:256
-#, fuzzy
 msgid "Speakers"
-msgstr "Nombre del interlocutor"
+msgstr "Interlocutores"
 
 #: src/qualcoder/speakers.py:70
-#, fuzzy
 msgid "code as"
-msgstr "nombre del código"
+msgstr "Codificar como"
 
 #: src/qualcoder/speakers.py:70
-#, fuzzy
 msgid "Example"
-msgstr "Ejemplos:"
+msgstr "Ejemplo:"
 
 #: src/qualcoder/speakers.py:256
 msgid ""
 "The speaker name cannot be empty. If you want to exclude a speaker from "
 "being marked, deselect the check box on the left."
 msgstr ""
-"El nombre del orador no puede estar vacío. Si desea excluir a un hablante de "
-"siendo marcado, desmarque la casilla de verificación a la izquierda."
+"El nombre del interlocutor no puede estar vacío. Si deseas excluir a un "
+"hablante del marcado, desmarca la casilla de verificación a la izquierda."
 
 #: src/qualcoder/speakers.py:273
 msgid "This contains all the speakers that have been marked in documents."
-msgstr "Contiene todos los oradores que han sido marcados en los documentos."
+msgstr "Contiene todos los hablantes que han sido marcados en los documentos."
 
 #: src/qualcoder/speakers.py:284
 msgid "Speakers category could not be found found or created."
-msgstr "No se pudo encontrar ni crear la categoría de oradores."
+msgstr "No se pudo encontrar ni crear la categoría de hablantes."
 
 #: src/qualcoder/speakers.py:311
 msgid "Speaker code could not be found found or created."
-msgstr "No se pudo encontrar ni crear el código del altavoz."
+msgstr "No se pudo encontrar ni crear el código de hablante."
 
 #: src/qualcoder/special_functions.py:108
 msgid "No project selected"
@@ -6765,30 +6633,26 @@ msgid "Merge projects"
 msgstr "Fusionar proyectos"
 
 #: src/qualcoder/special_functions.py:157
-#, fuzzy
 msgid "New coder name"
-msgstr "Nuevo nombre en código"
+msgstr "Nuevo nombre de codificador "
 
 #: src/qualcoder/special_functions.py:159
 #: src/qualcoder/special_functions.py:162
-#, fuzzy
 msgid "Rename coder"
-msgstr "Renombrar código"
+msgstr "Renombrar odificador"
 
 #: src/qualcoder/special_functions.py:159
-#, fuzzy
 msgid "No change"
-msgstr " para cambiar."
+msgstr "Ningún cambio"
 
 #: src/qualcoder/special_functions.py:161
-#, fuzzy
 msgid "Are you sure?"
-msgstr "¿Seguro que quieres salir?"
+msgstr "¿Estás seguro?"
 
 #: src/qualcoder/special_functions.py:233
 #: src/qualcoder/special_functions.py:265
 msgid "Select text file to replace"
-msgstr "Seleccione el archivo de texto a reemplazar"
+msgstr "Selecciona el archivo de texto a reemplazar"
 
 #: src/qualcoder/special_functions.py:235
 msgid "Replacing: "
@@ -6809,7 +6673,7 @@ msgstr "Archivo de reemplazo: "
 
 #: src/qualcoder/special_functions.py:253
 msgid "Press to replace the text file"
-msgstr "Pulse para sustituir el archivo de texto"
+msgstr "Pulsa para sustituir el archivo de texto"
 
 #: src/qualcoder/special_functions.py:261
 msgid "No files selected"
@@ -6823,7 +6687,7 @@ msgstr "No se ha seleccionado ningún archivo existente o de sustitución"
 #: src/qualcoder/GUI/special_functions.py:105
 msgid "Change ALL text code start positions in ALL text files by "
 msgstr ""
-"Cambie TODAS las posiciones de inicio del código de texto en TODOS los "
+"Cambiar TODAS las posiciones de inicio del código de texto en TODOS los "
 "archivos de texto por "
 
 #: src/qualcoder/special_functions.py:284
@@ -6853,14 +6717,14 @@ msgstr " para cambiar."
 #: src/qualcoder/GUI/special_functions.py:152
 msgid "Backup project before performing this function.\n"
 msgstr ""
-"Haga una copia de seguridad del proyecto antes de realizar esta función.\n"
+"Haz una copia de seguridad del proyecto antes de realizar esta función.\n"
 
 #: src/qualcoder/special_functions.py:288
 #: src/qualcoder/special_functions.py:333
 #: src/qualcoder/GUI/special_functions.py:110
 #: src/qualcoder/GUI/special_functions.py:153
 msgid "Press OK to continue."
-msgstr "Pulse OK para continuar."
+msgstr "Pulsa OK para continuar."
 
 #: src/qualcoder/special_functions.py:289
 #: src/qualcoder/GUI/special_functions.py:111
@@ -6910,7 +6774,7 @@ msgstr "Memo del proyecto"
 
 #: src/qualcoder/code_text.py:916
 msgid "Delete all codings in this file made by "
-msgstr "Borre todas las codificaciones de este archivo hechas por "
+msgstr "Borrar todas las codificaciones de este archivo hechas por "
 
 #: src/qualcoder/code_text.py:927
 msgid "All codes by "
@@ -6933,14 +6797,12 @@ msgid "last match in file"
 msgstr "última coincidencia en el archivo"
 
 #: src/qualcoder/code_text.py:1093 src/qualcoder/code_text.py:1142
-#, fuzzy
 msgid "code within code"
 msgstr "Fusionar código en código"
 
 #: src/qualcoder/code_text.py:1231
-#, fuzzy
 msgid "Mark with new code (N)"
-msgstr "Marcar con el nuevo código"
+msgstr "Marcar con el nuevo código (N)"
 
 #: src/qualcoder/code_text.py:1254
 msgid "Set bookmark (B)"
@@ -6951,9 +6813,8 @@ msgid "Edit text analysis prompts"
 msgstr "Editar instrucciones para el análisis de texto"
 
 #: src/qualcoder/code_text.py:1678
-#, fuzzy
 msgid "Shift codings after clicked position"
-msgstr "Mostrar codificaciones marcadas como importantes"
+msgstr "Cambiar códigos a la posición pulsada:"
 
 #: src/qualcoder/code_text.py:1681
 msgid ""
@@ -6968,8 +6829,8 @@ msgid ""
 msgstr ""
 "Cambia la posición de todos los códigos después de hacer clic en una "
 "posición del texto.\n"
-"Haga una copia de seguridad del proyecto antes de ejecutar esta acción.\n"
-"Esta función le ayudará si ha editado el texto codificado y los códigos "
+"Haz una copia de seguridad del proyecto antes de ejecutar esta acción.\n"
+"Esta función te ayudará si haz editado el texto codificado y los códigos "
 "están fuera de posición.\n"
 "Números positivos (se mueve a la derecha) o números negativos (se mueve a la "
 "izquierda) (-500 a 500)\n"
@@ -6988,13 +6849,12 @@ msgid "Coded text file exported to: "
 msgstr "Archivo de texto codificado exportado a: "
 
 #: src/qualcoder/code_text.py:2293
-#, fuzzy
 msgid "Coded html file exported"
 msgstr "Archivo de texto codificado exportado"
 
 #: src/qualcoder/code_text.py:2411
 msgid "Select a code"
-msgstr "Seleccione un código"
+msgstr "Selecciona un código"
 
 #: src/qualcoder/code_text.py:2567 src/qualcoder/code_text.py:2637
 msgid "Code:"
@@ -7039,9 +6899,8 @@ msgid "Entire text file will be loaded"
 msgstr "Se cargará todo el archivo de texto"
 
 #: src/qualcoder/code_text.py:3729 src/qualcoder/code_text.py:5203
-#, fuzzy
 msgid "AI interpretation: "
-msgstr "Intersecciones: "
+msgstr "Interpretación de la IA:"
 
 #: src/qualcoder/code_text.py:3730
 msgid ""
@@ -7065,7 +6924,7 @@ msgid ""
 "Do you want to store the AI interpretation in a memo together with the "
 "coding?<br/><br/>"
 msgstr ""
-"¿Desea almacenar la interpretación de la IA en un Memo junto con la "
+"¿Deseas almacenar la interpretación de la IA en un Memo junto con la "
 "codificación?<br/><br/>"
 
 #: src/qualcoder/code_text.py:3974 src/qualcoder/code_text.py:4086
@@ -7118,6 +6977,7 @@ msgstr "previamente codificado."
 msgid "Select auto-codings to undo"
 msgstr "Seleccione los códigos automáticos para deshacer"
 
+# Deshacer autocodificación
 #: src/qualcoder/code_text.py:4073
 msgid "Undo autocoding: "
 msgstr "Deshacer la codificación del coche"
@@ -7128,14 +6988,14 @@ msgstr "Sentencia del código"
 
 #: src/qualcoder/code_text.py:4104
 msgid "Auto code sentence using this text fragment:"
-msgstr "Oración de código automático usando este texto:"
+msgstr "Oración de código automático usando este fragmento:"
 
 #: src/qualcoder/code_text.py:4118
 msgid ""
 "Define sentence ending. Default is period space.\n"
 "Use \\n for line ending:"
 msgstr ""
-"Define el final de la frase. Por defecto es el espacio de punto.\\N-\n"
+"Define el final de la frase. Por defecto es punto y espacio.\\N-\n"
 "Utiliza \n"
 " para el final de línea:"
 
@@ -7222,32 +7082,31 @@ msgstr "Deshacer el último texto editado"
 #: src/qualcoder/code_text.py:5022
 msgid "Please finish editing the text before starting an AI search."
 msgstr ""
-"Por favor, termine de editar el texto antes de iniciar una búsqueda con IA."
+"Por favor, termina de editar el texto antes de iniciar una búsqueda con IA."
 
 #: src/qualcoder/code_text.py:5023 src/qualcoder/code_text.py:5027
 #: src/qualcoder/code_text.py:5031 src/qualcoder/code_text.py:5035
 #: src/qualcoder/code_text.py:5094 src/qualcoder/code_text.py:5135
 #: src/qualcoder/code_text.py:5176 src/qualcoder/code_text.py:5185
 #: src/qualcoder/code_text.py:5285 src/qualcoder/code_text.py:5288
-#, fuzzy
 msgid "AI Search"
-msgstr "Buscando"
+msgstr "Buscar con IA"
 
 #: src/qualcoder/code_text.py:5030
 msgid ""
 "The AI is already performing a search. Please stop it before starting a new "
 "one."
 msgstr ""
-"La IA ya está realizando una búsqueda. Por favor, deténgala antes de iniciar "
+"La IA ya está realizando una búsqueda. Por favor, detenla antes de iniciar "
 "una nueva."
 
 #: src/qualcoder/code_text.py:5034
 msgid "The AI is busy, please wait a moment and retry."
-msgstr "La IA está ocupada, por favor espere un momento y vuelva a intentarlo."
+msgstr "La IA está ocupada, por favor espera un momento y vuelve a intentarlo."
 
 #: src/qualcoder/code_text.py:5071
 msgid "Searching for related data, please wait..."
-msgstr "Buscando datos relacionados, por favor espere..."
+msgstr "Buscando datos relacionados, por favor espera..."
 
 #: src/qualcoder/code_text.py:5093
 msgid "AI: No related data found for \""
@@ -7258,7 +7117,6 @@ msgid "AI: No new data found for \""
 msgstr "IA: No se han encontrado nuevos datos para »"
 
 #: src/qualcoder/code_text.py:5134
-#, fuzzy
 msgid "\" beside what has already been coded with this code."
 msgstr "Este segmento ya ha sido codificado con este código."
 
@@ -7267,7 +7125,7 @@ msgid ""
 "Potentially related data found, inspecting it closer. Please be patient..."
 msgstr ""
 "Datos potencialmente relacionados encontrados, inspeccionándolos más de "
-"cerca. Por favor, tenga paciencia..."
+"cerca. Por favor, ten paciencia..."
 
 #: src/qualcoder/code_text.py:5173
 msgid "The closer inspection of the first "
@@ -7278,8 +7136,8 @@ msgid ""
 "pieces of data yielded no results. You can continue to inspect more by "
 "clicking on \"find more\" in the list on the left."
 msgstr ""
-"de datos no dio ningún resultado. Puede seguir inspeccionando más haciendo "
-"clic en «buscar más» en la lista de la izquierda."
+"Los datos no dieron ningún resultado. Puedse seguir inspeccionando más "
+"haciendo clic en «buscar más» en la lista de la izquierda."
 
 #: src/qualcoder/code_text.py:5183
 msgid ""
@@ -7287,50 +7145,47 @@ msgid ""
 "could be identified. Please start a new search."
 msgstr ""
 "Tras una inspección más detallada, no se ha podido identificar ningún dato "
-"relevante para su consulta de búsqueda. Por favor, inicie una nueva búsqueda."
+"relevante para la consulta de búsqueda. Por favor, inicia una nueva búsqueda."
 
 #: src/qualcoder/code_text.py:5202
-#, fuzzy
 msgid "Quote: "
-msgstr "Fecha: "
+msgstr "Cita: "
 
 #: src/qualcoder/code_text.py:5239
 msgid ">> Searching (click here to cancel)"
-msgstr ">> Búsqueda (pulse aquí para cancelar)"
+msgstr ">> Búsqueda (pulsa aquí para cancelar)"
 
 #: src/qualcoder/code_text.py:5241
 msgid "Click here to stop the search"
-msgstr "Haga clic aquí para detener la búsqueda"
+msgstr "Haz clic aquí para detener la búsqueda"
 
 #: src/qualcoder/code_text.py:5246
 msgid ">> Find more..."
 msgstr ">> Encuentra más..."
 
 #: src/qualcoder/code_text.py:5247
-#, fuzzy
 msgid "Click here to analyze more data"
-msgstr "Haga clic para administrar los archivos de este caso"
+msgstr "Pulsa aquí para analizar más datos"
 
 #: src/qualcoder/code_text.py:5272
-#, fuzzy
 msgid "Do you want to stop the search?"
-msgstr "¿Estás seguro de que quieres borrar el Grafo?"
+msgstr "¿Quieres interrumpir la búsqueda?"
 
 #: src/qualcoder/code_text.py:5284
 msgid ""
 "There are no more pieces of data to analyze for this search. Please start a "
 "new search."
 msgstr ""
-"No hay más datos para analizar en esta búsqueda. Por favor, inicie una nueva "
+"No hay más datos para analizar en esta búsqueda. Por favor, inicia una nueva "
 "búsqueda."
 
 #: src/qualcoder/code_text.py:5287
 msgid "The AI is busy. Please wait a moment and retry."
-msgstr "La IA está ocupada. Espere un momento y vuelva a intentarlo."
+msgstr "La IA está ocupada. Espera un momento y vuelve a intentarlo."
 
 #: src/qualcoder/ris.py:329
 msgid "Select RIS references file"
-msgstr "Seleccione el archivo de referencias RIS"
+msgstr "Selecciona el archivo de referencias RIS"
 
 #: src/qualcoder/ris.py:428
 msgid "Bibliography loaded from: "
@@ -7350,7 +7205,7 @@ msgstr "No hay nuevas referencias cargadas de: "
 
 #: src/qualcoder/ris.py:436
 msgid "References already exist"
-msgstr "Ya existen referencias"
+msgstr "Las referencias ya existen"
 
 #: src/qualcoder/report_relations.py:150 src/qualcoder/reports.py:101
 msgid "Files selected: "
@@ -7361,8 +7216,8 @@ msgid ""
 "Select 2 or more codes\n"
 "Use Ctrl or Shift and mouse click"
 msgstr ""
-"Seleccione 2 o más códigos\n"
-"Use Ctrl o Shift y haga clic con el ratón"
+"Selecciona 2 o más códigos\n"
+"Usa Ctrl o Shift y haz clic con el ratón"
 
 #: src/qualcoder/report_relations.py:242
 msgid "Selection warning"
@@ -7389,7 +7244,7 @@ msgstr "Distancia"
 
 #: src/qualcoder/report_relations.py:699 src/qualcoder/report_relations.py:884
 msgid "Text before"
-msgstr "Texto anterior"
+msgstr "Texto antes"
 
 #: src/qualcoder/report_relations.py:699 src/qualcoder/report_relations.py:884
 msgid "Text after"
@@ -7405,7 +7260,7 @@ msgstr "Proximidad"
 
 #: src/qualcoder/report_relations.py:729
 msgid "Exact"
-msgstr "Exactamente"
+msgstr "Exacto"
 
 #: src/qualcoder/report_relations.py:731
 msgid "Inclusion"
@@ -7420,7 +7275,7 @@ msgstr ""
 #: src/qualcoder/report_relations.py:860
 msgid "Each row contains filename, codename, pos0, pos1, text, owner."
 msgstr ""
-"Cada fila contiene nombre de archivo, nombre en clave, pos0, pos1, texto, "
+"Cada fila contiene nombre de archivo, nombre en código, pos0, pos1, texto, "
 "propietario."
 
 #: src/qualcoder/report_relations.py:880 src/qualcoder/report_relations.py:881
@@ -7476,9 +7331,10 @@ msgstr "Relaciones con el código"
 msgid "Select files to view"
 msgstr "Seleccionar archivos para ver"
 
+# Ou "Archivo Atributos" selon le sens de la phrase en anglais
 #: src/qualcoder/reports.py:103
 msgid "File Attributes"
-msgstr "Atributos de los archivos"
+msgstr "Atributos del archivo"
 
 #: src/qualcoder/reports.py:317
 msgid "Code frequencies"
@@ -7497,13 +7353,12 @@ msgid "Text file Export"
 msgstr "Exportar archivo de texto"
 
 #: src/qualcoder/reports.py:391
-#, fuzzy
 msgid "Coding frequencies exported to: "
-msgstr "Archivo CSV de frecuencias de codificación exportado a: "
+msgstr "Frecuencias de código exportadas a:"
 
 #: src/qualcoder/reports.py:544
 msgid "Export Excel"
-msgstr "Exportar a Excel"
+msgstr "Exportar Excel"
 
 #: src/qualcoder/reports.py:639
 msgid "Coder comparisons report exported: "
@@ -7595,7 +7450,7 @@ msgstr " filas"
 
 #: src/qualcoder/report_sql.py:278
 msgid "Table created"
-msgstr "Mesa creada"
+msgstr "Tabla creada"
 
 #: src/qualcoder/report_sql.py:281
 msgid "Index created"
@@ -7672,7 +7527,6 @@ msgid " starts with: "
 msgstr " comienza con: "
 
 #: src/qualcoder/GUI/special_functions.py:54
-#, fuzzy
 msgid "Uncaught Exception"
 msgstr "Excepción no detectada: "
 
@@ -7958,7 +7812,6 @@ msgstr "Excepción no detectada: "
 #~ msgid "File attributes csv file exported to: "
 #~ msgstr "Archivo CSV de atributos de archivo exportado a: "
 
-#, fuzzy
 #~| msgid ""
 #~| "Word calculations: Words use alphabet characters and include the "
 #~| "apostrophe. All other characters are word separators"
@@ -7985,7 +7838,6 @@ msgstr "Excepción no detectada: "
 #~ msgid "[VIEW] "
 #~ msgstr "[VER] "
 
-#, fuzzy
 #~| msgid "Export files"
 #~ msgid "Export Excel file"
 #~ msgstr "Exportar archivos "
