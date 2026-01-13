@@ -417,6 +417,8 @@ class DialogSettings(QtWidgets.QDialog):
         ui_coder_names = DialogCoderNames(self.app, self.settings, do_commit=False)
         if ui_coder_names.exec() == QtWidgets.QDialog.DialogCode.Accepted:
             self.ui.lineEdit_coderName.setText(self.settings['codername'])
+            if ui_coder_names.coder_names_changed:
+                self.coder_names_changes = True
 
     def choose_directory(self):
         """ Choose default project output folder. """
