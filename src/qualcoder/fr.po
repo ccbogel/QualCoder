@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: unnamed project\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-01-14 11:56+1100\n"
-"PO-Revision-Date: 2026-01-08 09:15+0100\n"
+"PO-Revision-Date: 2026-01-14 13:18+0100\n"
 "Last-Translator: Justin <>\n"
 "Language-Team: French\n"
 "Language: fr\n"
@@ -86,11 +86,12 @@ msgid ""
 "No codings found for this particuar combination of coder, document filter, "
 "and code."
 msgstr ""
+"Aucun codage trouvé pour cette combinaison particulière de codeur⋅euse, de "
+"filtre de document et de code."
 
 #: src\qualcoder\ai_chat.py:385
-#, fuzzy
 msgid "Code analysis"
-msgstr "Analyse du code de l'IA"
+msgstr "Analyse du code"
 
 #: src\qualcoder\ai_chat.py:413
 msgid ""
@@ -568,9 +569,8 @@ msgid "1) Which topic do you want to analyze?"
 msgstr "1) Quel sujet voulez-vous analyser ?"
 
 #: src\qualcoder\ai_search_dialog.py:115 src\qualcoder\ai_search_dialog.py:356
-#, fuzzy
 msgid "Coders: "
-msgstr "Codeur·euse : "
+msgstr "Codeur·euse :"
 
 #: src\qualcoder\ai_search_dialog.py:135
 msgid "The last used prompt"
@@ -646,9 +646,8 @@ msgid "Codes and categories"
 msgstr "Codes et catégories"
 
 #: src\qualcoder\ai_search_dialog.py:345
-#, fuzzy
 msgid "Coder selection"
-msgstr "Sélection du chat"
+msgstr "Sélection du codeur⋅euse"
 
 #: src\qualcoder\ai_search_dialog.py:423 src\qualcoder\report_attributes.py:450
 #: src\qualcoder\view_charts.py:229
@@ -1223,21 +1222,20 @@ msgid "Code:"
 msgstr "Code :"
 
 #: src\qualcoder\coder_names.py:62
-#, fuzzy
 msgid "Codings"
-msgstr "Codifications :"
+msgstr "Codages"
 
 #: src\qualcoder\coder_names.py:62
 msgid "Visibility"
-msgstr ""
+msgstr "Visibilité"
 
 #: src\qualcoder\coder_names.py:156
 msgid "visible"
-msgstr ""
+msgstr "visible"
 
 #: src\qualcoder\coder_names.py:156
 msgid "hidden"
-msgstr ""
+msgstr "caché"
 
 #: src\qualcoder\coder_names.py:192 src\qualcoder\coder_names.py:203
 #: src\qualcoder\coder_names.py:216 src\qualcoder\coder_names.py:227
@@ -1253,70 +1251,67 @@ msgstr "Codeur·euse"
 #: src\qualcoder\coder_names.py:192
 msgid "One coder must be selected. Choose another one if you want to change."
 msgstr ""
+"Un⋅e codeur⋅euse doit être sélectionné. Choisissez-en un⋅e autre si vous "
+"souhaitez en changer."
 
 #: src\qualcoder\coder_names.py:203
 msgid "You cannot hide the current coder."
-msgstr ""
+msgstr "Vous ne pouvez pas cacher le codeur⋅euse actuel."
 
 #: src\qualcoder\coder_names.py:219
-#, fuzzy
 msgid "New coder name:"
-msgstr "Nouveau nom de codeur·euse"
+msgstr "Nouveau nom de codeur·euse :"
 
 #: src\qualcoder\coder_names.py:227
-#, fuzzy
 msgid "Name already exists."
-msgstr "Cela existe déjà"
+msgstr "Le nom existe déjà."
 
 #: src\qualcoder\coder_names.py:231
-#, fuzzy
 msgid "Open a project first."
-msgstr "Ouvrir le répertoire du projet"
+msgstr "Ouvrez d'abord un projet."
 
 #: src\qualcoder\coder_names.py:247
 msgid "An error occurred while renaming."
-msgstr ""
+msgstr "Une erreur s'est produite lors du renommage."
 
 #: src\qualcoder\coder_names.py:273
 msgid "An error occurred while changing the name in \"{}\"."
-msgstr ""
+msgstr "Une erreur s'est produite lors de la modification du nom en « {} »."
 
 #: src\qualcoder\coder_names.py:323
-#, fuzzy
 msgid "No name selected."
-msgstr "Aucune enquête sélectionnée."
+msgstr "Aucun nom sélectionné."
 
 #: src\qualcoder\coder_names.py:333
-#, fuzzy
 msgid "Merge \"{}\" into:"
-msgstr "Fusionner le code dans le code"
+msgstr "Fusionner \"{}\" dans :"
 
 #: src\qualcoder\coder_names.py:335
 msgid "Rename \"{}\" into:"
-msgstr ""
+msgstr "Renommer \"{}\" en :"
 
 #: src\qualcoder\coder_names.py:342
 msgid "Old and new name are identical."
-msgstr ""
+msgstr "L’ancien et le nouveau nom sont identiques."
 
 #: src\qualcoder\coder_names.py:345
-#, fuzzy
 msgid "Coder name cannot be empty."
-msgstr "Le nom ne peut pas être vide"
+msgstr "Le nom du codeur⋅euse ne peut pas être vide."
 
 #: src\qualcoder\coder_names.py:354
 msgid "The coder name you want to merge into does not exist."
-msgstr ""
+msgstr "Le nom du codeur⋅euse que vous souhaitez fusionner n’existe pas."
 
 #: src\qualcoder\coder_names.py:357
-#, fuzzy
 msgid "The new coder name already exists."
-msgstr "Ce nom de code est déjà utilisé."
+msgstr "Le nom de codeur⋅euse existe déjà."
 
 #: src\qualcoder\coder_names.py:361
 msgid ""
 "An error occurred during merging or renaming. All changes were reverted."
 msgstr ""
+"Une erreur s’est produite durant la fusion ou le renommage. Tous les "
+"changements ont été annulés."
 
 #: src\qualcoder\code_color_scheme.py:61
 msgid "Normal vision"
@@ -2375,9 +2370,8 @@ msgid "Press O to cycle overlapping codes"
 msgstr "Appuyez sur O pour faire défiler les codes se chevauchant"
 
 #: src\qualcoder\code_pdf.py:3817 src\qualcoder\code_text.py:5555
-#, fuzzy
 msgid "ANNOTATED"
-msgstr "ANNOTÉ :"
+msgstr "ANNOTÉ"
 
 #: src\qualcoder\code_text.py:174
 msgid "EDITING TEXT MODE (Ctrl+E)"
@@ -2564,11 +2558,12 @@ msgid ""
 "The coder \"{}\" is currently hidden. Do you want to make it visible, so you "
 "can see the speaker codings?"
 msgstr ""
+"Le codeur⋅euse « {} » est actuellement masqué. Souhaitez-vous le rendre "
+"visible afin de pouvoir voir les codes des intervenant⋅es ?"
 
 #: src\qualcoder\code_text.py:3487
-#, fuzzy
 msgid "Speaker coding"
-msgstr "Nom de l'intervenant"
+msgstr "Codage de l’intervenant⋅e"
 
 #: src\qualcoder\code_text.py:3499 src\qualcoder\manage_files.py:998
 msgid "No text file selected."
@@ -2605,9 +2600,8 @@ msgstr ""
 "<br/><br/>"
 
 #: src\qualcoder\code_text.py:3778
-#, fuzzy
 msgid "AI Interpretation"
-msgstr "Interprétation de l'IA: "
+msgstr "Interprétation par IA"
 
 #: src\qualcoder\code_text.py:3945 src\qualcoder\code_text.py:3974
 #: src\qualcoder\view_av.py:3258 src\qualcoder\view_av.py:3285
@@ -5667,9 +5661,8 @@ msgid "Text overlap"
 msgstr "Chevauchement"
 
 #: src\qualcoder\report_relations.py:951
-#, fuzzy
 msgid "Code relations file exported to: "
-msgstr "Fichier CSV des relations de code exporté vers : "
+msgstr "Fichier de relations de code exporté vers : "
 
 #: src\qualcoder\report_relations.py:1002
 msgid "Code pair"
@@ -6065,6 +6058,8 @@ msgid ""
 "It seems that you have made changes to the coder names. These changes will "
 "be lost as well. Do you really want to cancel?"
 msgstr ""
+"Il semble que vous ayez apporté des modifications aux noms des codeur⋅euses. "
+"Ces modifications seront également perdues. Voulez-vous vraiment annuler ?"
 
 #: src\qualcoder\settings.py:556 src\qualcoder\__main__.py:1765
 msgid "Settings"
@@ -7614,23 +7609,25 @@ msgid ""
 "project (\"{}\"). Do you want to keep your current name or switch to the one "
 "from the project?"
 msgstr ""
+"Votre nom de codeur⋅euse actuel (« {} ») diffère de celui utilisé en dernier "
+"dans le projet (« {} »). Souhaitez-vous conserver votre nom actuel ou "
+"changer à celui du projet ?"
 
 #: src\qualcoder\__main__.py:2676
-#, fuzzy
 msgid "Coder name"
-msgstr "Nom du code"
+msgstr "Nom du codeur⋅euse"
 
 #: src\qualcoder\__main__.py:2678
 msgid "Keep"
-msgstr ""
+msgstr "Conserver"
 
 #: src\qualcoder\__main__.py:2679
 msgid "Switch"
-msgstr ""
+msgstr "Changer"
 
 #: src\qualcoder\__main__.py:2680
 msgid "Cancel"
-msgstr ""
+msgstr "Annuler"
 
 #: src\qualcoder\__main__.py:2689
 msgid "Default coder name changed to: "
