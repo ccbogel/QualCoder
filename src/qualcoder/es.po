@@ -9,15 +9,15 @@ msgstr ""
 "Project-Id-Version: unnamed project\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-01-14 11:56+1100\n"
-"PO-Revision-Date: 2026-01-12 13:49+0100\n"
+"PO-Revision-Date: 2026-01-14 17:12+1100\n"
 "Last-Translator: Alaia <>\n"
 "Language-Team: Spanish\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Gtranslator 49.0\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Generator: Poedit 3.5\n"
 
 #: src\qualcoder\add_attribute.py:76
 msgid "This attribute name already exists in cases, files or journals."
@@ -87,6 +87,8 @@ msgid ""
 "No codings found for this particuar combination of coder, document filter, "
 "and code."
 msgstr ""
+"No se han encontrado codificaciones para esta combinación concreta de "
+"codificador, filtro de documentos y código."
 
 #: src\qualcoder\ai_chat.py:385
 #, fuzzy
@@ -1253,15 +1255,15 @@ msgstr "Codificaciones:"
 
 #: src\qualcoder\coder_names.py:62
 msgid "Visibility"
-msgstr ""
+msgstr "Visibilidad"
 
 #: src\qualcoder\coder_names.py:156
 msgid "visible"
-msgstr ""
+msgstr "visible"
 
 #: src\qualcoder\coder_names.py:156
 msgid "hidden"
-msgstr ""
+msgstr "oculto"
 
 #: src\qualcoder\coder_names.py:192 src\qualcoder\coder_names.py:203
 #: src\qualcoder\coder_names.py:216 src\qualcoder\coder_names.py:227
@@ -1276,11 +1278,11 @@ msgstr "Codificador"
 
 #: src\qualcoder\coder_names.py:192
 msgid "One coder must be selected. Choose another one if you want to change."
-msgstr ""
+msgstr "Se debe seleccionar un codificador. Elija otro si desea cambiarlo."
 
 #: src\qualcoder\coder_names.py:203
 msgid "You cannot hide the current coder."
-msgstr ""
+msgstr "No se puede ocultar el codificador actual."
 
 #: src\qualcoder\coder_names.py:219
 #, fuzzy
@@ -1299,11 +1301,11 @@ msgstr "Abrir directorio de proyectos"
 
 #: src\qualcoder\coder_names.py:247
 msgid "An error occurred while renaming."
-msgstr ""
+msgstr "Se ha producido un error al cambiar el nombre."
 
 #: src\qualcoder\coder_names.py:273
 msgid "An error occurred while changing the name in \"{}\"."
-msgstr ""
+msgstr "Se ha producido un error al cambiar el nombre en «{}»."
 
 #: src\qualcoder\coder_names.py:323
 #, fuzzy
@@ -1317,11 +1319,11 @@ msgstr "Fusionar código en código"
 
 #: src\qualcoder\coder_names.py:335
 msgid "Rename \"{}\" into:"
-msgstr ""
+msgstr "Cambia el nombre de «{}» por:"
 
 #: src\qualcoder\coder_names.py:342
 msgid "Old and new name are identical."
-msgstr ""
+msgstr "El nombre antiguo y el nuevo son idénticos."
 
 #: src\qualcoder\coder_names.py:345
 #, fuzzy
@@ -1330,7 +1332,7 @@ msgstr "El nombre no puede estar vacío"
 
 #: src\qualcoder\coder_names.py:354
 msgid "The coder name you want to merge into does not exist."
-msgstr ""
+msgstr "El nombre del codificador con el que desea fusionarse no existe."
 
 #: src\qualcoder\coder_names.py:357
 #, fuzzy
@@ -1341,6 +1343,8 @@ msgstr "Este nombre de código ya está en uso."
 msgid ""
 "An error occurred during merging or renaming. All changes were reverted."
 msgstr ""
+"Se produjo un error durante la fusión o el cambio de nombre. Se han "
+"revertido todos los cambios."
 
 #: src\qualcoder\code_color_scheme.py:61
 msgid "Normal vision"
@@ -1844,7 +1848,7 @@ msgstr "Ocultar panel de control (H)"
 msgid "Select replacement code"
 msgstr "Seleccione el código de sustitución"
 
-# Seleccionar 
+# Seleccionar
 # memo > nota
 #: src\qualcoder\code_pdf.py:1266 src\qualcoder\code_pdf.py:3156
 #: src\qualcoder\code_text.py:1634 src\qualcoder\view_av.py:2942
@@ -2628,6 +2632,8 @@ msgid ""
 "The coder \"{}\" is currently hidden. Do you want to make it visible, so you "
 "can see the speaker codings?"
 msgstr ""
+"El código «{}» está oculto actualmente. ¿Desea hacerlo visible para poder "
+"ver los códigos de los hablantes?"
 
 #: src\qualcoder\code_text.py:3487
 #, fuzzy
@@ -6197,6 +6203,8 @@ msgid ""
 "It seems that you have made changes to the coder names. These changes will "
 "be lost as well. Do you really want to cancel?"
 msgstr ""
+"Parece que ha realizado cambios en los nombres de los codificadores. Estos "
+"cambios también se perderán. ¿De verdad desea cancelar?"
 
 #: src\qualcoder\settings.py:556 src\qualcoder\__main__.py:1765
 msgid "Settings"
@@ -7750,6 +7758,9 @@ msgid ""
 "project (\"{}\"). Do you want to keep your current name or switch to the one "
 "from the project?"
 msgstr ""
+"Tu nombre de codificador actual («{}») difiere del último utilizado en el "
+"proyecto («{}»). ¿Deseas conservar tu nombre actual o cambiar al del "
+"proyecto?"
 
 # Nombre de código
 #: src\qualcoder\__main__.py:2676
@@ -7759,15 +7770,15 @@ msgstr "Nombre en código"
 
 #: src\qualcoder\__main__.py:2678
 msgid "Keep"
-msgstr ""
+msgstr "Conservar"
 
 #: src\qualcoder\__main__.py:2679
 msgid "Switch"
-msgstr ""
+msgstr "Interruptor"
 
 #: src\qualcoder\__main__.py:2680
 msgid "Cancel"
-msgstr ""
+msgstr "Cancelar"
 
 #: src\qualcoder\__main__.py:2689
 msgid "Default coder name changed to: "
