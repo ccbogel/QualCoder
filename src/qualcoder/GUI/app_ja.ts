@@ -731,12 +731,12 @@ Checked - any selected codes must match exactly.</source>
     <message>
         <location filename="ui_ai_search.py" line="215"/>
         <source>TextLabel</source>
-        <translation type="unfinished"></translation>
+        <translation>テキストラベル</translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="216"/>
         <source>Select coders</source>
-        <translation type="unfinished"></translation>
+        <translation>選りすぐりのコーダー</translation>
     </message>
 </context>
 <context>
@@ -849,7 +849,7 @@ Checked - any selected codes must match exactly.</source>
     <message>
         <location filename="ui_dialog_code_relations.py" line="150"/>
         <source>Export file</source>
-        <translation type="unfinished">csvファイルのエクスポート</translation>
+        <translation>ファイルのエクスポート</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="151"/>
@@ -1657,12 +1657,12 @@ Ctrl Shift &lt; 再生レートを最小0.1に下げる</translation>
     <message>
         <location filename="ui_dialog_code_image.py" line="222"/>
         <source>Coder visibility</source>
-        <translation type="unfinished"></translation>
+        <translation>コーダーの可視性</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_image.py" line="223"/>
         <source>...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1851,12 +1851,12 @@ Ctrl Shift &lt; 再生レートを最小0.1に下げる</translation>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="300"/>
         <source>Coder visibility</source>
-        <translation type="unfinished"></translation>
+        <translation>コーダーの可視性</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="301"/>
         <source>...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2219,23 +2219,25 @@ Formatted like below for name detection.
         <location filename="ui_dialog_code_text.py" line="434"/>
         <source>Auto code with exact text.
 Right click for options: all, first, last, within another code.</source>
-        <translation type="unfinished"></translation>
+        <translation>正確なテキストで自動コード化。
+オプションを表示するには右クリック：すべて、最初、最後、別のコード内。</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="445"/>
         <source>Text fragment to auto code sentences.
 Right click for options: all (default), first, code within code.</source>
-        <translation type="unfinished"></translation>
+        <translation>テキスト断片を自動コード化します。
+右クリックでオプション選択：すべて（デフォルト）、最初のみ、コード内コード。</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="488"/>
         <source>Coder visibility</source>
-        <translation type="unfinished"></translation>
+        <translation>コーダーの可視性</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="489"/>
         <source>...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2243,42 +2245,42 @@ Right click for options: all (default), first, code within code.</source>
     <message>
         <location filename="ui_dialog_coder_names.py" line="81"/>
         <source>Coders</source>
-        <translation type="unfinished"></translation>
+        <translation>コーダー</translation>
     </message>
     <message>
         <location filename="ui_dialog_coder_names.py" line="82"/>
         <source>Choose (✓) your coder name. Adjust visibility of others:</source>
-        <translation type="unfinished"></translation>
+        <translation>コーダー名を選択してください（✓）。他のユーザーの表示設定を調整：</translation>
     </message>
     <message>
         <location filename="ui_dialog_coder_names.py" line="83"/>
         <source>Add a new coder name</source>
-        <translation type="unfinished"></translation>
+        <translation>新しいコーダー名を追加する</translation>
     </message>
     <message>
         <location filename="ui_dialog_coder_names.py" line="84"/>
         <source>New</source>
-        <translation type="unfinished">新しい</translation>
+        <translation>新しい</translation>
     </message>
     <message>
         <location filename="ui_dialog_coder_names.py" line="85"/>
         <source>Warning: If you choose another name to merge into, there is no undo. Make a project backup first.</source>
-        <translation type="unfinished"></translation>
+        <translation>警告：別の名前を選択してマージする場合、元に戻すことはできません。まずプロジェクトのバックアップを作成してください。</translation>
     </message>
     <message>
         <location filename="ui_dialog_coder_names.py" line="86"/>
         <source>Rename</source>
-        <translation type="unfinished">名前を変更する</translation>
+        <translation>名前を変更する</translation>
     </message>
     <message>
         <location filename="ui_dialog_coder_names.py" line="87"/>
         <source>Warning: There is no undo. Make a project backup first.</source>
-        <translation type="unfinished"></translation>
+        <translation>警告：元に戻す操作はできません。まずプロジェクトのバックアップを作成してください。</translation>
     </message>
     <message>
         <location filename="ui_dialog_coder_names.py" line="88"/>
         <source>Merge</source>
-        <translation type="unfinished"></translation>
+        <translation>マージ</translation>
     </message>
 </context>
 <context>
@@ -3182,7 +3184,7 @@ Wildcards for &apos;like&apos; are % and _</source>
         <translation>属性のパラメータを選択します。
 betweenには、;で区切られた2つの値が必要です。
  in と not in は、.で区切られた1つ以上の値を必要とします；
-like' のワイルドカードは % と _ です。</translation>
+like&apos; のワイルドカードは % と _ です。</translation>
     </message>
     <message>
         <location filename="ui_report_attribute_parameters.py" line="88"/>
@@ -3649,7 +3651,7 @@ Not recommended unless you have many large files slowing the backup.</source>
     <message>
         <location filename="ui_dialog_settings.py" line="546"/>
         <source>Change</source>
-        <translation type="unfinished"></translation>
+        <translation>変更</translation>
     </message>
 </context>
 <context>
