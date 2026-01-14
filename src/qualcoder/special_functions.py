@@ -41,7 +41,9 @@ logger = logging.getLogger(__name__)
 
 
 class DialogSpecialFunctions(QtWidgets.QDialog):
-    """ Dialog for special QualCoder functions.
+    """ Dialog for special QualCoder functions:
+    Merge projects,
+    Updating a text file while trying to keep existing codings.
     """
 
     app = None
@@ -88,10 +90,21 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
         self.ui.pushButton_select_project.pressed.connect(self.select_project_folder)
         self.ui.pushButton_merge.setEnabled(False)
         self.ui.pushButton_merge.pressed.connect(self.merge_projects)
-        self.fill_combobox_codernames()
-        self.ui.pushButton_rename.pressed.connect(self.rename_coder)
-        # Text positions, is here in case it is needed, but hidden for users
+        # TODO delete next 3 lines in next release. keep in case need to revert to it now. Also delete in the gui files
+        '''self.fill_combobox_codernames()
+        self.ui.pushButton_rename.pressed.connect(self.rename_coder)'''
+        self.ui.groupBox_coder_names.hide()
+
+        # Text positions, is here in case it is needed, but hidden for users as dangerous, Key Tilde to activate
         self.ui.groupBox_text_positions.hide()
+
+    def keyPressEvent(self, event):
+        """ Tilde ~ to show the exitst start and end text positions in coded text. """
+
+        key = event.key()
+        if key == QtCore.Qt.Key.Key_AsciiTilde:
+            self.ui.groupBox_text_positions.show()
+            return
 
     # Functions to merge external project into this project
     def select_project_folder(self):
@@ -126,6 +139,7 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
         self.parent_text_edit.append(mp.summary_msg)
         self.projects_merged = mp.projects_merged
 
+    '''TODO keep for now, as may need to revert, delete in next release (3.9) if all is OK
     # Functions for coder names deletion and editing
     def fill_combobox_codernames(self):
         """ Get coder names from all tables """
@@ -216,7 +230,7 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
         if rename_success:
             self.parent_text_edit.append(f"<p>Renamed coder: {selected_name} --> {new_name}</p>")
         else:
-            self.parent_text_edit.append(f"<p>Renamed coder across most tables: {selected_name} --> {new_name}</p>")
+            self.parent_text_edit.append(f"<p>Renamed coder across most tables: {selected_name} --> {new_name}</p>")'''
 
     # Functions to update a text file but attempt to keep original codings
     def select_original_text_file(self):
@@ -318,7 +332,8 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
         if delta == 0:
             return
         cur = self.app.conn.cursor()
-        sql = "select cid,fid,pos0,pos1,code_text.owner, length(source.fulltext) from code_text join source on source.id=code_text.fid where code_text.owner=?"
+        sql = "select cid,fid,pos0,pos1,code_text.owner, length(source.fulltext) from code_text join source on " \
+              "source.id=code_text.fid where code_text.owner=?"
         text_sql = "select substr(source.fulltext, ?, ?) from source where source.id=?"
         update_sql = "update code_text set pos1=?, seltext=? where pos0=? and pos1=? and cid=? and fid=? and owner=?"
         cur.execute(sql, [self.app.settings['codername']])
@@ -369,6 +384,6 @@ class DialogSpecialFunctions(QtWidgets.QDialog):
                     break
 
     def accept(self):
-        """ Overrride accept button. """
+        """ Override accept button. """
 
         super(DialogSpecialFunctions, self).accept()
