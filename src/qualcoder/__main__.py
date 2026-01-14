@@ -2924,15 +2924,6 @@ Click "Yes" to start now.')
             self.app.conn.commit()
             self.ui.textEdit.append(_("Updating database to version") + " v11")
 
-        # Save a date and 24 hour stamped backup
-        if self.app.settings['backup_on_open'] == 'True' and newproject == "no":
-            msg, backup_name = self.app.save_backup()
-            self.ui.textEdit.append(msg)
-        msg = f"\n{_('Project Opened: ')}{self.app.project_name}"
-        self.ui.textEdit.append(msg)
-        self.project_summary_report()
-        self.show_menu_options()
-
         # Database version v12
         try:
             cur.execute("select name from manage_files_display")
@@ -2991,7 +2982,7 @@ Click "Yes" to start now.')
         cur.execute("vacuum")
         self.app.conn.commit()
         
-        # update coder_names table and current coder in project
+        # Update coder_names table and current coder in project
         self.app.update_coder_names()
         cur.execute('update project set codername=?', [self.app.settings['codername']])
         self.app.conn.commit()
@@ -3000,7 +2991,7 @@ Click "Yes" to start now.')
         self.app.ai.init_llm(self)
         self.ai_chat_window.init_ai_chat(self.app)
         
-        # Fix missing folders within QualCoder project. Will cause import errors.
+        # Fix missing folders within QualCoder project. Otherwise, will cause import errors.
         span = '<span style="color:red">'
         end_span = "</span>"
         missing_folders = False
@@ -3022,6 +3013,15 @@ Click "Yes" to start now.')
             missing_folders = True
         if missing_folders:
             Message(self.app, _("Information"), _("QualCoder project missing folders. Created empty folders")).exec()
+
+        # Save a date and 24 hour stamped backup
+        if self.app.settings['backup_on_open'] == 'True' and newproject == "no":
+            msg, backup_name = self.app.save_backup()
+            self.ui.textEdit.append(msg)
+        msg = f"\n{_('Project Opened: ')}{self.app.project_name}"
+        self.ui.textEdit.append(msg)
+        self.project_summary_report()
+        self.show_menu_options()
 
     def project_summary_report(self):
         """ Add a summary of the project to the text edit.
