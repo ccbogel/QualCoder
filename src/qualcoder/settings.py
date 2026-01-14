@@ -414,7 +414,7 @@ class DialogSettings(QtWidgets.QDialog):
         Changes made to the database (e.g. renamed coders) will NOT be committed until the settings dialog 
         is closed with OK."""
         
-        ui_coder_names = DialogCoderNames(self.app, self.settings, do_commit=False)
+        ui_coder_names = DialogCoderNames(self.app, self.settings, extended_options=True, do_commit=False)
         if ui_coder_names.exec() == QtWidgets.QDialog.DialogCode.Accepted:
             self.ui.lineEdit_coderName.setText(self.settings['codername'])
             if ui_coder_names.coder_names_changed:

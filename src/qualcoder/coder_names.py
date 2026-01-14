@@ -27,6 +27,7 @@ import sqlite3
 
 from .GUI.ui_dialog_coder_names import Ui_Dialog_coders
 from .helpers import Message
+from .select_items import DialogSelectItems
 
 logger = logging.getLogger(__name__)
 max_name_len: int = 63
@@ -40,6 +41,7 @@ class DialogCoderNames(QtWidgets.QDialog):
         app:       > QualCoder app instance
         settings:  > The settings list to store the current coder. This is used when called from the settings dialog. 
                    > If None (default), app.settings will be used.
+        extended_options: If True, options "Rename" and "Merge" will also be shown (defaults to False)
         do_commit: > If True, changes will be written to the database when the user clicks OK. 
                    > If False, the database transaction stays open and the caller must comit the changes by
                    calling app.conn.commit(). Used in the settings dialog, where the changes can be rolled back if
@@ -48,7 +50,7 @@ class DialogCoderNames(QtWidgets.QDialog):
                    > do_commit defaults to True.        
     """
 
-    def __init__(self, app, settings=None, do_commit=True):
+    def __init__(self, app, settings=None, extended_options=False, do_commit=True):
         self.app = app
         self.settings = settings if settings is not None else self.app.settings
         self.do_commit = do_commit
@@ -59,6 +61,14 @@ class DialogCoderNames(QtWidgets.QDialog):
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
+        if extended_options:
+            self.ui.pushButton_rename.setVisible(True)
+            self.ui.pushButton_merge.setVisible(True)
+            self.ui.label_more_options.setVisible(False)
+        else:
+            self.ui.pushButton_rename.setVisible(False)
+            self.ui.pushButton_merge.setVisible(False)
+            self.ui.label_more_options.setVisible(True)
         headers = [_("Name"), _("Codings"), _("Visibility")]
         self.ui.tableWidget.setColumnCount(len(headers))
         self.ui.tableWidget.setHorizontalHeaderLabels(headers)
@@ -324,20 +334,33 @@ class DialogCoderNames(QtWidgets.QDialog):
             return
 
         old_name = self.ui.tableWidget.item(row, 0).text()
-        dialog = QtWidgets.QInputDialog(self)
-        dialog.setStyleSheet(f"* {{font-size:{self.app.settings['fontsize']}pt}} ")
-        dialog.setWindowTitle(_("Coder"))
-        dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        dialog.setInputMode(QtWidgets.QInputDialog.InputMode.TextInput)
         if merge:
-            dialog.setLabelText(_('Merge "{}" into:').format(old_name))
-        else:
+            msg = _('Merge "{}" into:').format(old_name)
+            names = []
+            for item in self.coder_names:
+                if item[0] != old_name:                    
+                    names.append({'name': item[0]})
+            select_dialog = DialogSelectItems(self.app, names, msg, 'single')
+            ok = select_dialog.exec()
+            if not ok:
+                return
+            sel = select_dialog.get_selected()
+            if len(sel) == 0:
+                return
+            new_name = sel['name']
+        else: # rename
+            dialog = QtWidgets.QInputDialog(self)
+            dialog.setStyleSheet(f"* {{font-size:{self.app.settings['fontsize']}pt}} ")
+            dialog.setWindowTitle(_("Coder"))
+            dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
+            dialog.setInputMode(QtWidgets.QInputDialog.InputMode.TextInput)
             dialog.setLabelText(_('Rename "{}" into:').format(old_name))
             dialog.setTextValue(old_name)
-        ok = dialog.exec()
-        if not ok:
-            return
-        new_name = str(dialog.textValue())
+            ok = dialog.exec()
+            if not ok:
+                return
+            new_name = str(dialog.textValue())
+            
         if new_name == old_name:
             Message(self.app, _('Coder'), _('Old and new name are identical.'), 'critical').exec()
             return
@@ -359,6 +382,8 @@ class DialogCoderNames(QtWidgets.QDialog):
         
         if not self._rename_coder(old_name, new_name):
             Message(self.app, _('Coder'), _('An error occurred during merging or renaming. All changes were reverted.'), 'Information').exec()
+        else: 
+            Message(self.app, _('Coder'), _('The merge or rename was successful. If you made a mistake, you can undo all changes by canceling the Coders dialog.'), 'Information').exec()
 
     def merge_coder(self):
         self.rename_coder(merge=True)
@@ -387,4 +412,4 @@ class DialogCoderNames(QtWidgets.QDialog):
 
     def help(self):
         """ Open help in browser. """
-        self.app.help_wiki("")
+        self.app.help_wiki("2.4.-Working-in-a-Team/#important-considerations-regarding-coder-names")

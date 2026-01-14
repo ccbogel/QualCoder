@@ -114,7 +114,7 @@
          <item>
           <widget class="QPushButton" name="pushButton_rename">
            <property name="toolTip">
-            <string>Warning: If you choose another name to merge into, there is no undo. Make a project backup first.</string>
+            <string>Rename the selected coder. Note that this will affect the entire project.</string>
            </property>
            <property name="text">
             <string>Rename</string>
@@ -128,6 +128,13 @@
            </property>
            <property name="text">
             <string>Merge</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_more_options">
+           <property name="text">
+            <string>(Go to Project &gt; Settings for more options)</string>
            </property>
           </widget>
          </item>
