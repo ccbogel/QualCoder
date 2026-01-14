@@ -734,12 +734,12 @@ Advertencia. No hay opción de deshacer.</translation>
     <message>
         <location filename="ui_ai_search.py" line="215"/>
         <source>TextLabel</source>
-        <translation type="unfinished"></translation>
+        <translation>Etiqueta de texto</translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="216"/>
         <source>Select coders</source>
-        <translation type="unfinished"></translation>
+        <translation>Seleccionar codificadores</translation>
     </message>
 </context>
 <context>
@@ -757,7 +757,7 @@ Advertencia. No hay opción de deshacer.</translation>
     <message>
         <location filename="ui_dialog_code_relations.py" line="150"/>
         <source>Export file</source>
-        <translation type="unfinished">Exportar archivo csv</translation>
+        <translation>Exportar archivo</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="151"/>
@@ -989,7 +989,7 @@ Ordenado por nombre de archivo y nombre de código.</translation>
         <location filename="ui_dialog_import.py" line="94"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delimiter must be a single character.&lt;/p&gt;&lt;p&gt;Enter &apos;ta&apos; for &apos;tab&apos;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>El delimitador debe ser un solo carácter. 
-Pon 'ta' para 'tab' </translation>
+Pon &apos;ta&apos; para &apos;tab&apos; </translation>
     </message>
     <message>
         <location filename="ui_dialog_import.py" line="95"/>
@@ -1662,12 +1662,12 @@ A continuación se abrirá un menú de opciones.</translation>
     <message>
         <location filename="ui_dialog_code_image.py" line="222"/>
         <source>Coder visibility</source>
-        <translation type="unfinished"></translation>
+        <translation>Visibilidad del codificador</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_image.py" line="223"/>
         <source>...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -1856,12 +1856,12 @@ A continuación se abrirá un menú de opciones.</translation>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="300"/>
         <source>Coder visibility</source>
-        <translation type="unfinished"></translation>
+        <translation>Visibilidad del codificador</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="301"/>
         <source>...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2238,12 +2238,12 @@ Haz clic con el botón derecho para las opciones: todo (por defecto), primero, c
     <message>
         <location filename="ui_dialog_code_text.py" line="488"/>
         <source>Coder visibility</source>
-        <translation type="unfinished"></translation>
+        <translation>Visibilidad del codificador</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="489"/>
         <source>...</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 <context>
@@ -2251,42 +2251,42 @@ Haz clic con el botón derecho para las opciones: todo (por defecto), primero, c
     <message>
         <location filename="ui_dialog_coder_names.py" line="81"/>
         <source>Coders</source>
-        <translation type="unfinished"></translation>
+        <translation>Codificadores</translation>
     </message>
     <message>
         <location filename="ui_dialog_coder_names.py" line="82"/>
         <source>Choose (✓) your coder name. Adjust visibility of others:</source>
-        <translation type="unfinished"></translation>
+        <translation>Elige (✓) tu nombre de programador. Ajusta la visibilidad de los demás:</translation>
     </message>
     <message>
         <location filename="ui_dialog_coder_names.py" line="83"/>
         <source>Add a new coder name</source>
-        <translation type="unfinished"></translation>
+        <translation>Añadir un nuevo nombre de codificador</translation>
     </message>
     <message>
         <location filename="ui_dialog_coder_names.py" line="84"/>
         <source>New</source>
-        <translation type="unfinished">Nuevo</translation>
+        <translation>Nuevo</translation>
     </message>
     <message>
         <location filename="ui_dialog_coder_names.py" line="85"/>
         <source>Warning: If you choose another name to merge into, there is no undo. Make a project backup first.</source>
-        <translation type="unfinished"></translation>
+        <translation>Advertencia: Si eliges otro nombre para fusionar, no hay forma de deshacer la acción. Haz primero una copia de seguridad del proyecto.</translation>
     </message>
     <message>
         <location filename="ui_dialog_coder_names.py" line="86"/>
         <source>Rename</source>
-        <translation type="unfinished">Cambiar nombre</translation>
+        <translation>Cambiar nombre</translation>
     </message>
     <message>
         <location filename="ui_dialog_coder_names.py" line="87"/>
         <source>Warning: There is no undo. Make a project backup first.</source>
-        <translation type="unfinished"></translation>
+        <translation>Advertencia: No hay opción de deshacer. Realice primero una copia de seguridad del proyecto.</translation>
     </message>
     <message>
         <location filename="ui_dialog_coder_names.py" line="88"/>
         <source>Merge</source>
-        <translation type="unfinished"></translation>
+        <translation>Fusionar</translation>
     </message>
 </context>
 <context>
@@ -3223,7 +3223,7 @@ Wildcards for &apos;like&apos; are % and _</source>
         <translation>Selecciona los parámetros para los atributos. 
 entre requiere 2 valores separados por ; por ejemplo, 1;100
  in y not in requieren 1 o más valores separados por ;
-Los comodines para 'like' son % y _</translation>
+Los comodines para &apos;like&apos; son % y _</translation>
     </message>
     <message>
         <location filename="ui_report_attribute_parameters.py" line="88"/>
@@ -3663,7 +3663,7 @@ No se recomienda a menos que tengas muchos archivos grandes que ralenticen la co
     <message>
         <location filename="ui_dialog_settings.py" line="546"/>
         <source>Change</source>
-        <translation type="unfinished"></translation>
+        <translation>Cambiar</translation>
     </message>
 </context>
 <context>
@@ -4089,7 +4089,7 @@ Adelantar 5 segundos. Pulsar 5</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_text.py" line="79"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot &#xe2;&#x80;&#x98;.&#xe2;&#x80;&#x99; is used as a wild card, e.g. &#xe2;&#x80;&#x98;.ears&#xe2;&#x80;&#x99; will match &#xe2;&#x80;&#x98;bears&#xe2;&#x80;&#x99; and &#xe2;&#x80;&#x98;years&#xe2;&#x80;&#x99;. &lt;/p&gt;&lt;p&gt;A &#xe2;&#x80;&#x98;?&#xe2;&#x80;&#x99; after a character will match one or none times that character, e.g. &#xe2;&#x80;&#x98;bears?&#xe2;&#x80;&#x99; will match &#xe2;&#x80;&#x98;bear&#xe2;&#x80;&#x99; and &#xe2;&#x80;&#x98;bears&#xe2;&#x80;&#x99; &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A &#xe2;&#x80;&#x98;*&#xe2;&#x80;&#x99; after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;&#xe2;&#x80;&#x98;&lt;/span&gt;\. will match the dot symbol, &#xe2;&#x80;&#x98;\?&#xe2;&#x80;&#x99; will match the question mark. &#xe2;&#x80;&#x98;\n&#xe2;&#x80;&#x99; will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot â.â is used as a wild card, e.g. â.earsâ will match âbearsâ and âyearsâ. &lt;/p&gt;&lt;p&gt;A â?â after a character will match one or none times that character, e.g. âbears?â will match âbearâ and âbearsâ &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A â*â after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;â&lt;/span&gt;\. will match the dot symbol, â\?â will match the question mark. â\nâ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished">La búsqueda utiliza funciones regex.</translation>
     </message>
     <message>
