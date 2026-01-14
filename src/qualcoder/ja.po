@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-01-14 11:56+1100\n"
-"PO-Revision-Date: 2026-01-14 11:59+1100\n"
+"PO-Revision-Date: 2026-01-14 17:03+1100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: ja\n"
@@ -1237,10 +1237,12 @@ msgstr "コーダー"
 #: src\qualcoder\coder_names.py:192
 msgid "One coder must be selected. Choose another one if you want to change."
 msgstr ""
+"コーダーは1人選択する必要があります。変更したい場合は別のコーダーを選択してく"
+"ださい。"
 
 #: src\qualcoder\coder_names.py:203
 msgid "You cannot hide the current coder."
-msgstr ""
+msgstr "現在のコーダーを隠すことはできません。"
 
 #: src\qualcoder\coder_names.py:219
 #, fuzzy
@@ -1259,11 +1261,11 @@ msgstr "プロジェクトのディレクトリを開く"
 
 #: src\qualcoder\coder_names.py:247
 msgid "An error occurred while renaming."
-msgstr ""
+msgstr "名前変更中にエラーが発生しました。"
 
 #: src\qualcoder\coder_names.py:273
 msgid "An error occurred while changing the name in \"{}\"."
-msgstr ""
+msgstr "「{}」内の名前を変更中にエラーが発生しました。"
 
 #: src\qualcoder\coder_names.py:323
 #, fuzzy
@@ -1277,11 +1279,11 @@ msgstr "コードをコードにマージする"
 
 #: src\qualcoder\coder_names.py:335
 msgid "Rename \"{}\" into:"
-msgstr ""
+msgstr "「{}」を次の名前に変更してください："
 
 #: src\qualcoder\coder_names.py:342
 msgid "Old and new name are identical."
-msgstr ""
+msgstr "旧名と新名は同一である。"
 
 #: src\qualcoder\coder_names.py:345
 #, fuzzy
@@ -1290,7 +1292,7 @@ msgstr "名前を空にすることはできません。"
 
 #: src\qualcoder\coder_names.py:354
 msgid "The coder name you want to merge into does not exist."
-msgstr ""
+msgstr "マージ先のコーダー名が存在しません。"
 
 #: src\qualcoder\coder_names.py:357
 #, fuzzy
@@ -1301,6 +1303,8 @@ msgstr "このコードネームはすでに使用されている。"
 msgid ""
 "An error occurred during merging or renaming. All changes were reverted."
 msgstr ""
+"マージまたは名前変更中にエラーが発生しました。すべての変更は元に戻されまし"
+"た。"
 
 #: src\qualcoder\code_color_scheme.py:61
 msgid "Normal vision"
@@ -2545,6 +2549,7 @@ msgid ""
 "The coder \"{}\" is currently hidden. Do you want to make it visible, so you "
 "can see the speaker codings?"
 msgstr ""
+"コード「{}」は現在非表示です。話者コードを確認できるように表示しますか？"
 
 #: src\qualcoder\code_text.py:3487
 #, fuzzy
@@ -6046,6 +6051,8 @@ msgid ""
 "It seems that you have made changes to the coder names. These changes will "
 "be lost as well. Do you really want to cancel?"
 msgstr ""
+"コーダー名の変更を行ったようですが、これらの変更も失われます。本当にキャンセ"
+"ルしますか？"
 
 #: src\qualcoder\settings.py:556 src\qualcoder\__main__.py:1765
 msgid "Settings"
@@ -7606,6 +7613,9 @@ msgid ""
 "project (\"{}\"). Do you want to keep your current name or switch to the one "
 "from the project?"
 msgstr ""
+"現在のコーダー名（「{}」）は、プロジェクトで最後に使用されたもの（「{}」）と"
+"異なります。現在の名前を維持しますか、それともプロジェクトの名前を切り替えま"
+"すか？"
 
 #: src\qualcoder\__main__.py:2676
 #, fuzzy
@@ -7614,15 +7624,15 @@ msgstr "コードネーム"
 
 #: src\qualcoder\__main__.py:2678
 msgid "Keep"
-msgstr ""
+msgstr "キープ"
 
 #: src\qualcoder\__main__.py:2679
 msgid "Switch"
-msgstr ""
+msgstr "スイッチ"
 
 #: src\qualcoder\__main__.py:2680
 msgid "Cancel"
-msgstr ""
+msgstr "キャンセル"
 
 #: src\qualcoder\__main__.py:2689
 msgid "Default coder name changed to: "
