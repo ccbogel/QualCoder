@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-01-14 11:56+1100\n"
-"PO-Revision-Date: 2026-01-14 11:58+1100\n"
+"PO-Revision-Date: 2026-01-14 16:57+1100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: sv\n"
@@ -1288,7 +1288,7 @@ msgstr "Namnet får inte vara tomt"
 
 #: src\qualcoder\coder_names.py:354
 msgid "The coder name you want to merge into does not exist."
-msgstr ""
+msgstr "Det kodarnamn som du vill slå samman med finns inte."
 
 #: src\qualcoder\coder_names.py:357
 #, fuzzy
@@ -1299,6 +1299,8 @@ msgstr "Det här kodnamnet används redan."
 msgid ""
 "An error occurred during merging or renaming. All changes were reverted."
 msgstr ""
+"Ett fel uppstod under sammanslagningen eller omdöpningen. Alla ändringar har "
+"återställts."
 
 #: src\qualcoder\code_color_scheme.py:61
 msgid "Normal vision"
@@ -2540,6 +2542,8 @@ msgid ""
 "The coder \"{}\" is currently hidden. Do you want to make it visible, so you "
 "can see the speaker codings?"
 msgstr ""
+"Kodaren ”{}” är för närvarande dold. Vill du göra den synlig så att du kan "
+"se högtalarkodningarna?"
 
 #: src\qualcoder\code_text.py:3487
 #, fuzzy
@@ -6027,6 +6031,8 @@ msgid ""
 "It seems that you have made changes to the coder names. These changes will "
 "be lost as well. Do you really want to cancel?"
 msgstr ""
+"Det verkar som om du har gjort ändringar i kodarnamnen. Dessa ändringar "
+"kommer också att gå förlorade. Vill du verkligen avbryta?"
 
 #: src\qualcoder\settings.py:556 src\qualcoder\__main__.py:1765
 msgid "Settings"
@@ -7581,6 +7587,9 @@ msgid ""
 "project (\"{}\"). Do you want to keep your current name or switch to the one "
 "from the project?"
 msgstr ""
+"Ditt nuvarande kodarnamn (”{}”) skiljer sig från det som senast användes i "
+"projektet (”{}”). Vill du behålla ditt nuvarande namn eller byta till det "
+"från projektet?"
 
 #: src\qualcoder\__main__.py:2676
 #, fuzzy
@@ -7589,15 +7598,15 @@ msgstr "Kodnamn"
 
 #: src\qualcoder\__main__.py:2678
 msgid "Keep"
-msgstr ""
+msgstr "Behåll"
 
 #: src\qualcoder\__main__.py:2679
 msgid "Switch"
-msgstr ""
+msgstr "Växla"
 
 #: src\qualcoder\__main__.py:2680
 msgid "Cancel"
-msgstr ""
+msgstr "Avbryt"
 
 #: src\qualcoder\__main__.py:2689
 msgid "Default coder name changed to: "
