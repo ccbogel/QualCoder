@@ -1165,7 +1165,7 @@ class App(object):
         try:
             cur.execute("SELECT codername FROM project")
             res = cur.fetchone()
-            if res[0] is not None:
+            if res is not None and res[0] is not None:
                 return res[0]                   
         except sqlite3.OperationalError: # db vers. 1-4 did not have codername in project table
             return ""
@@ -2259,6 +2259,8 @@ Click "Yes" to start now.')
         v10 has code_image.pdf_page integer added
         v11 has gr_pix_item.pdf_page integer added
         v12 has manage_files_display table added. For Table display profile.
+        v13 creates table files_filter?
+        v14 has coder_names table added to store codernames and their visibility status
         """
 
         self.journal_display = None
@@ -2371,8 +2373,9 @@ Click "Yes" to start now.')
         cur.execute("CREATE TABLE ris (risid integer, tag text, longtag text, value text);")
         cur.execute("CREATE TABLE manage_files_display (mfid integer primary key, name text, tblrows text, tblcolumns text, owner text);")
         cur.execute("CREATE TABLE files_filter (filterid integer primary key, name text, filter text, owner text);")
+        self.app.update_coder_names() # will create table coder_names, add current coder, create views, etc.
         cur.execute("INSERT INTO project VALUES(?,?,?,?,?,?,?,?)",
-                    ('v13', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', qualcoder_version, 0,
+                    ('v14', datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S"), '', qualcoder_version, 0,
                      0, self.app.settings['codername'], ""))
         self.app.conn.commit()
         try:
@@ -2946,6 +2949,14 @@ Click "Yes" to start now.')
             cur.execute('update project set databaseversion="v13", about=?', [qualcoder_version])
             self.app.conn.commit()
             self.ui.textEdit.append(_("Updating database to version") + " v13")
+        # Database version v14
+        try:
+            cur.execute("select name from coder_names")
+        except sqlite3.OperationalError:
+            self.app.update_coder_names() # will create table coder_names, add current coder, create views, etc.
+            cur.execute('update project set databaseversion="v14", about=?', [qualcoder_version])
+            self.app.conn.commit()
+            self.ui.textEdit.append(_("Updating database to version") + " v14")
 
         # Delete codings (fid, id) that do not have a matching source id
         sql = "select fid from code_text where fid not in (select source.id from source)"
