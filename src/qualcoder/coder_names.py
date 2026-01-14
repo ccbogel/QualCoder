@@ -386,6 +386,7 @@ class DialogCoderNames(QtWidgets.QDialog):
             Message(self.app, _('Coder'), _('The merge or rename was successful. If you made a mistake, you can undo all changes by canceling the Coders dialog.'), 'Information').exec()
 
     def merge_coder(self):
+        self.app.save_backup("_pre_coder_merge")
         self.rename_coder(merge=True)
 
     def ok(self):
