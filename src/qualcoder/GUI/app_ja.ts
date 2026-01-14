@@ -2243,44 +2243,49 @@ Right click for options: all (default), first, code within code.</source>
 <context>
     <name>Dialog_coders</name>
     <message>
-        <location filename="ui_dialog_coder_names.py" line="81"/>
+        <location filename="ui_dialog_coder_names.py" line="84"/>
         <source>Coders</source>
         <translation>コーダー</translation>
     </message>
     <message>
-        <location filename="ui_dialog_coder_names.py" line="82"/>
-        <source>Choose (✓) your coder name. Adjust visibility of others:</source>
-        <translation>コーダー名を選択してください（✓）。他のユーザーの表示設定を調整：</translation>
+        <location filename="ui_dialog_coder_names.py" line="85"/>
+        <source>Choose (â) your coder name. Adjust visibility of others:</source>
+        <translation>コーダー名を選択してください。他のユーザーの表示設定を調整：</translation>
     </message>
     <message>
-        <location filename="ui_dialog_coder_names.py" line="83"/>
+        <location filename="ui_dialog_coder_names.py" line="86"/>
         <source>Add a new coder name</source>
         <translation>新しいコーダー名を追加する</translation>
     </message>
     <message>
-        <location filename="ui_dialog_coder_names.py" line="84"/>
+        <location filename="ui_dialog_coder_names.py" line="87"/>
         <source>New</source>
         <translation>新しい</translation>
     </message>
     <message>
-        <location filename="ui_dialog_coder_names.py" line="85"/>
-        <source>Warning: If you choose another name to merge into, there is no undo. Make a project backup first.</source>
-        <translation>警告：別の名前を選択してマージする場合、元に戻すことはできません。まずプロジェクトのバックアップを作成してください。</translation>
-    </message>
-    <message>
-        <location filename="ui_dialog_coder_names.py" line="86"/>
+        <location filename="ui_dialog_coder_names.py" line="89"/>
         <source>Rename</source>
         <translation>名前を変更する</translation>
     </message>
     <message>
-        <location filename="ui_dialog_coder_names.py" line="87"/>
+        <location filename="ui_dialog_coder_names.py" line="90"/>
         <source>Warning: There is no undo. Make a project backup first.</source>
         <translation>警告：元に戻す操作はできません。まずプロジェクトのバックアップを作成してください。</translation>
     </message>
     <message>
-        <location filename="ui_dialog_coder_names.py" line="88"/>
+        <location filename="ui_dialog_coder_names.py" line="91"/>
         <source>Merge</source>
         <translation>マージ</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_coder_names.py" line="88"/>
+        <source>Rename the selected coder. Note that this will affect the entire project.</source>
+        <translation>選択したコーダーの名前を変更します。この操作はプロジェクト全体に影響を与えることに注意してください。</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_coder_names.py" line="92"/>
+        <source>(Go to Project &gt; Settings for more options)</source>
+        <translation>(詳細なオプションについては、プロジェクト &gt; 設定に移動してください)</translation>
     </message>
 </context>
 <context>
@@ -3184,7 +3189,7 @@ Wildcards for &apos;like&apos; are % and _</source>
         <translation>属性のパラメータを選択します。
 betweenには、;で区切られた2つの値が必要です。
  in と not in は、.で区切られた1つ以上の値を必要とします；
-like' のワイルドカードは % と _ です。</translation>
+like&apos; のワイルドカードは % と _ です。</translation>
     </message>
     <message>
         <location filename="ui_report_attribute_parameters.py" line="88"/>
@@ -3677,99 +3682,79 @@ Select (✓) the ones you want to mark. Clicking OK creates a code for each sele
 <context>
     <name>Dialog_special_functions</name>
     <message>
-        <location filename="ui_special_functions.py" line="127"/>
+        <location filename="ui_special_functions.py" line="110"/>
         <source>Special Functions</source>
         <translation>特殊機能</translation>
     </message>
     <message>
-        <location filename="ui_special_functions.py" line="128"/>
+        <location filename="ui_special_functions.py" line="111"/>
         <source>Backup project before running these functions.</source>
         <translation>これらの関数を実行する前に、プロジェクトをバックアップしてください。</translation>
     </message>
     <message>
-        <location filename="ui_special_functions.py" line="129"/>
+        <location filename="ui_special_functions.py" line="112"/>
         <source>Dynamic update text content</source>
         <translation>テキストコンテンツの動的更新</translation>
     </message>
     <message>
-        <location filename="ui_special_functions.py" line="130"/>
+        <location filename="ui_special_functions.py" line="113"/>
         <source>Run update text content</source>
         <translation>テキスト内容の更新を実行する</translation>
     </message>
     <message>
-        <location filename="ui_special_functions.py" line="132"/>
+        <location filename="ui_special_functions.py" line="115"/>
         <source>Select text file to update</source>
         <translation>更新するテキストファイルを選択する</translation>
     </message>
     <message>
-        <location filename="ui_special_functions.py" line="134"/>
+        <location filename="ui_special_functions.py" line="117"/>
         <source>Select replacement text file</source>
         <translation>置換テキストファイルを選択する</translation>
     </message>
     <message>
-        <location filename="ui_special_functions.py" line="135"/>
+        <location filename="ui_special_functions.py" line="118"/>
         <source>Merge project into this project</source>
         <translation>プロジェクトをこのプロジェクトにマージする</translation>
     </message>
     <message>
-        <location filename="ui_special_functions.py" line="136"/>
+        <location filename="ui_special_functions.py" line="119"/>
         <source>Run merge projects</source>
         <translation>マージプロジェクトを実行する</translation>
     </message>
     <message>
-        <location filename="ui_special_functions.py" line="137"/>
+        <location filename="ui_special_functions.py" line="120"/>
         <source>Select project to merge</source>
         <translation>マージするプロジェクトを選択する</translation>
     </message>
     <message>
-        <location filename="ui_special_functions.py" line="138"/>
+        <location filename="ui_special_functions.py" line="121"/>
         <source>Select project to merge into this project</source>
         <translation>このプロジェクトにマージするプロジェクトを選択する</translation>
     </message>
     <message>
-        <location filename="ui_special_functions.py" line="143"/>
+        <location filename="ui_special_functions.py" line="122"/>
         <source>Change text positions</source>
         <translation>テキスト位置の変更</translation>
     </message>
     <message>
-        <location filename="ui_special_functions.py" line="144"/>
+        <location filename="ui_special_functions.py" line="123"/>
         <source>Change text code end positions ALL codes ALL files for current owner.</source>
         <translation>テキストコードの終了位置を変更する すべてのコード 現在の所有者のためのすべてのファイル。</translation>
     </message>
     <message>
-        <location filename="ui_special_functions.py" line="145"/>
+        <location filename="ui_special_functions.py" line="124"/>
         <source>Change text code start positions ALL codes ALL files for current owner.</source>
         <translation>テキストコードの開始位置を変更する すべてのコード 現在の所有者のためのすべてのファイル。</translation>
     </message>
     <message>
-        <location filename="ui_special_functions.py" line="147"/>
+        <location filename="ui_special_functions.py" line="126"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Number of characters to extend (positive numbers)&lt;/p&gt;&lt;p&gt;or reduce (negative numbers)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>拡張する文字数（正の数）または縮小する文字数（負の数</translation>
     </message>
     <message>
-        <location filename="ui_special_functions.py" line="149"/>
+        <location filename="ui_special_functions.py" line="128"/>
         <source>Run</source>
         <translation>実行する</translation>
-    </message>
-    <message>
-        <location filename="ui_special_functions.py" line="139"/>
-        <source>Edit coder names</source>
-        <translation>コーダー名の編集</translation>
-    </message>
-    <message>
-        <location filename="ui_special_functions.py" line="140"/>
-        <source>Select coder name</source>
-        <translation>コーダー名を選択</translation>
-    </message>
-    <message>
-        <location filename="ui_special_functions.py" line="141"/>
-        <source>Rename</source>
-        <translation>名前を変更する</translation>
-    </message>
-    <message>
-        <location filename="ui_special_functions.py" line="142"/>
-        <source>Rename or merge into an existing name</source>
-        <translation>名前を変更するか、既存の名前と統合する</translation>
     </message>
 </context>
 <context>
