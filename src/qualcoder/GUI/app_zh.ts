@@ -734,12 +734,12 @@ Checked - any selected codes must match exactly.</source>
     <message>
         <location filename="ui_ai_search.py" line="215"/>
         <source>TextLabel</source>
-        <translation type="unfinished"></translation>
+        <translation>文本标签</translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="216"/>
         <source>Select coders</source>
-        <translation type="unfinished"></translation>
+        <translation>选择编码器</translation>
     </message>
 </context>
 <context>
@@ -852,7 +852,7 @@ Checked - any selected codes must match exactly.</source>
     <message>
         <location filename="ui_dialog_code_relations.py" line="150"/>
         <source>Export file</source>
-        <translation type="unfinished">导出 csv 文件</translation>
+        <translation>导出 文件</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="151"/>
@@ -1015,8 +1015,8 @@ Ordered by file name and code name.</source>
         <location filename="ui_dialog_import.py" line="97"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;NONE 123, abc&lt;/p&gt;&lt;p&gt;MINIMAL 123, &amp;quot;abc&amp;quot;&lt;/p&gt;&lt;p&gt;ALL &amp;quot;123&amp;quot;, &amp;quot;abc&amp;quot;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>NONE 123, abc
-MINIMAL 123,'abc';
-ALL '123', 'abc'</translation>
+MINIMAL 123,&apos;abc&apos;;
+ALL &apos;123&apos;, &apos;abc&apos;</translation>
     </message>
     <message>
         <location filename="ui_dialog_import.py" line="98"/>
@@ -1665,12 +1665,12 @@ Ctrl + Shift + &lt; 将播放速率降至最低 0.1</translation>
     <message>
         <location filename="ui_dialog_code_image.py" line="222"/>
         <source>Coder visibility</source>
-        <translation type="unfinished"></translation>
+        <translation>程序员可见性</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_image.py" line="223"/>
         <source>...</source>
-        <translation type="unfinished">...</translation>
+        <translation>...</translation>
     </message>
 </context>
 <context>
@@ -1859,12 +1859,12 @@ Ctrl + Shift + &lt; 将播放速率降至最低 0.1</translation>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="300"/>
         <source>Coder visibility</source>
-        <translation type="unfinished"></translation>
+        <translation>程序员可见性</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="301"/>
         <source>...</source>
-        <translation type="unfinished">...</translation>
+        <translation>...</translation>
     </message>
 </context>
 <context>
@@ -2228,23 +2228,25 @@ Formatted like below for name detection.
         <location filename="ui_dialog_code_text.py" line="434"/>
         <source>Auto code with exact text.
 Right click for options: all, first, last, within another code.</source>
-        <translation type="unfinished"></translation>
+        <translation>自动代码匹配精确文本。
+右键点击可选操作：全部匹配、首行匹配、末行匹配、在其他代码内匹配。</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="445"/>
         <source>Text fragment to auto code sentences.
 Right click for options: all (default), first, code within code.</source>
-        <translation type="unfinished"></translation>
+        <translation>文本片段自动编码句子。
+右键点击可选模式：全部（默认）、首段、嵌套代码。</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="488"/>
         <source>Coder visibility</source>
-        <translation type="unfinished"></translation>
+        <translation>程序员可见性</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="489"/>
         <source>...</source>
-        <translation type="unfinished">...</translation>
+        <translation>...</translation>
     </message>
 </context>
 <context>
@@ -2252,42 +2254,42 @@ Right click for options: all (default), first, code within code.</source>
     <message>
         <location filename="ui_dialog_coder_names.py" line="81"/>
         <source>Coders</source>
-        <translation type="unfinished"></translation>
+        <translation>程序员</translation>
     </message>
     <message>
         <location filename="ui_dialog_coder_names.py" line="82"/>
         <source>Choose (✓) your coder name. Adjust visibility of others:</source>
-        <translation type="unfinished"></translation>
+        <translation>选择（✓）您的开发者名称。调整他人可见性：</translation>
     </message>
     <message>
         <location filename="ui_dialog_coder_names.py" line="83"/>
         <source>Add a new coder name</source>
-        <translation type="unfinished"></translation>
+        <translation>添加新的编码器名称</translation>
     </message>
     <message>
         <location filename="ui_dialog_coder_names.py" line="84"/>
         <source>New</source>
-        <translation type="unfinished">新</translation>
+        <translation>新</translation>
     </message>
     <message>
         <location filename="ui_dialog_coder_names.py" line="85"/>
         <source>Warning: If you choose another name to merge into, there is no undo. Make a project backup first.</source>
-        <translation type="unfinished"></translation>
+        <translation>警告：若选择合并至其他名称，操作不可撤销。请先备份项目。</translation>
     </message>
     <message>
         <location filename="ui_dialog_coder_names.py" line="86"/>
         <source>Rename</source>
-        <translation type="unfinished">重命名</translation>
+        <translation>重命名</translation>
     </message>
     <message>
         <location filename="ui_dialog_coder_names.py" line="87"/>
         <source>Warning: There is no undo. Make a project backup first.</source>
-        <translation type="unfinished"></translation>
+        <translation>警告：此操作无法撤销。请先备份项目。</translation>
     </message>
     <message>
         <location filename="ui_dialog_coder_names.py" line="88"/>
         <source>Merge</source>
-        <translation type="unfinished"></translation>
+        <translation>合并</translation>
     </message>
 </context>
 <context>
@@ -3663,7 +3665,7 @@ Not recommended unless you have many large files slowing the backup.</source>
     <message>
         <location filename="ui_dialog_settings.py" line="546"/>
         <source>Change</source>
-        <translation type="unfinished"></translation>
+        <translation>变更</translation>
     </message>
 </context>
 <context>
