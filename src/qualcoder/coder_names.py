@@ -17,6 +17,7 @@ If not, see <https://www.gnu.org/licenses/>.
 Author: Colin Curtain (ccbogel)
 https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
+https://qualcoder-org.github.io/
 """
 
 import logging
@@ -25,11 +26,11 @@ from PyQt6 import QtCore, QtWidgets
 import sqlite3
 
 from .GUI.ui_dialog_coder_names import Ui_Dialog_coders
-from .color_selector import colors
 from .helpers import Message
 
 logger = logging.getLogger(__name__)
 max_name_len: int = 63
+
 
 class DialogCoderNames(QtWidgets.QDialog):
     """Shows coder names from all tables, lets the user choose their own name, and select which 
@@ -70,8 +71,8 @@ class DialogCoderNames(QtWidgets.QDialog):
         if self.app.conn is not None:
             self.cursor = self.app.conn.cursor()
             if self.app.conn is not None and not self.app.conn.in_transaction:
-                self.app.conn.execute("BEGIN") # start a new transaction so we can rollback later if the user cancels the operation
-            self.initial_changes = self.app.conn.total_changes # keep track of this value so we can determine later if any changes where made
+                self.app.conn.execute("BEGIN")  # start a new transaction so we can rollback later if the user cancels the operation
+            self.initial_changes = self.app.conn.total_changes  # keep track of this value so we can determine later if any changes where made
         else:
             self.cursor = None
         self.fill_table()
@@ -83,14 +84,13 @@ class DialogCoderNames(QtWidgets.QDialog):
         self.ui.buttonBox.rejected.connect(self.cancel) 
         self.ui.buttonBox.helpRequested.connect(self.help)
 
-        
     def read_coder_names(self):
         """
         Reads the content of the table 'coder_names' into self.coder_names.
         If no project is open, only self.settings['codername'] will be added.
         """
         self.coder_names = []
-        if self.app.conn is None: # no project open
+        if self.app.conn is None:  # no project open
             self.coder_names.append((self.current_coder, 1, 0))
             self.cursor = None
         else: 
@@ -113,14 +113,12 @@ class DialogCoderNames(QtWidgets.QDialog):
             """
             self.cursor.execute(sql)
             self.coder_names = self.cursor.fetchall()
-        
-                        
+
     def fill_table(self):
-        """Will fill the table widget with the contents of self.coder_names 
+        """ Fill the table widget with the contents of self.coder_names
         """
         self.ui.tableWidget.blockSignals(True)
         try:
-            # clear
             rows = self.ui.tableWidget.rowCount()
             for r in range(0, rows):
                 self.ui.tableWidget.removeRow(0)
@@ -191,12 +189,11 @@ class DialogCoderNames(QtWidgets.QDialog):
                 self.ui.tableWidget.item(item.row(), 0).setCheckState(QtCore.Qt.CheckState.Checked)
             finally:
                 self.ui.tableWidget.blockSignals(False)
-            Message(self.app, _('Coder'), _('We always need one coder selected. Choose another one if you want to change.'), 'critical').exec()
+            Message(self.app, _('Coder'), _('One coder must be selected. Choose another one if you want to change.'), 'critical').exec()
         return
 
-        
     def on_coder_visibility_changed(self, row, index):
-        """Called if the "Visibility" combo box is changed. 
+        """ Called if the "Visibility" combo box is changed.
         Ensures that the current coder will always stay visible."""
         if index == 1 and self.ui.tableWidget.item(row, 0).checkState() == QtCore.Qt.CheckState.Checked:
             combo = self.ui.tableWidget.cellWidget(row, 2)
@@ -212,11 +209,10 @@ class DialogCoderNames(QtWidgets.QDialog):
                 visibility = 1 if index == 0 else 0
                 self.cursor.execute("UPDATE coder_names SET visibility = ? WHERE name = ?", (visibility, name))           
 
-
     def add_coder_name(self):
         if self.app.conn is not None:
             dialog = QtWidgets.QInputDialog(self)
-            dialog.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            dialog.setStyleSheet(f"* {{font-size:{self.app.settings['fontsize']}pt}} ")
             dialog.setWindowTitle(_("Coder"))
             dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
             dialog.setInputMode(QtWidgets.QInputDialog.InputMode.TextInput)
@@ -234,11 +230,10 @@ class DialogCoderNames(QtWidgets.QDialog):
         else:
             Message(self.app, _('Coder'), _('Open a project first.'), 'critical').exec()
 
-
     def _rename_coder(self, old_name, new_name) -> bool:
-        """Renames the coder (owner) in all tables. 
+        """ Renames the coder (owner) in all tables.
         This function can also be used to merge two coder names if new_name is already existing.
-        If any error occures, the operation roles back completely so that no partial renaming
+        If any error occurs, the operation roles back completely so that no partial renaming
         happens.
 
         Args:
@@ -248,7 +243,8 @@ class DialogCoderNames(QtWidgets.QDialog):
         Returns:
             bool: True on success, False on error
         """
-        err_msg = _('An error occured while renaming.')
+
+        err_msg = _('An error occurred while renaming.')
         if self.app.conn is not None:
             # Set savepoint. This allows us to return to this point in case of an error.
             self.cursor.execute("savepoint rename_coder") 
@@ -274,7 +270,7 @@ class DialogCoderNames(QtWidgets.QDialog):
                         match = re.search(r'^\s*update\s+([^\s]+)', sql, re.IGNORECASE)
                         if match:
                             table_name = match.group(1)
-                        err_msg = _('An error ocurred while changing the name in "{}".').format(table_name)
+                        err_msg = _('An error occurred while changing the name in "{}".').format(table_name)
                         raise
 
                 # Code text has an extensive unique constraint across: cid, fid, pos0, pos1, owner
@@ -301,7 +297,6 @@ class DialogCoderNames(QtWidgets.QDialog):
                     self.cursor.execute("update coder_names set name=? where name=?", [new_name, old_name])
                 except sqlite3.IntegrityError: # new_name already exists (=merging), delete old_name 
                     self.cursor.execute("delete from coder_names where name=?", [old_name])
-
             except Exception as e:
                 # In case of an error that could not be resolved (like deleting duplicates), 
                 # we restore the state before renaming started, and show an error message, so
@@ -311,8 +306,7 @@ class DialogCoderNames(QtWidgets.QDialog):
                 err_msg += f'\n{e}'
                 Message(self.app, _('Coder'), err_msg, "critical").exec()
                 return False
-            
-            self.cursor.execute("release rename_coder") # success, delete savepoint
+            self.cursor.execute("release rename_coder")  # success, delete savepoint
 
         if self.current_coder == old_name:
             self.current_coder = new_name
@@ -323,16 +317,15 @@ class DialogCoderNames(QtWidgets.QDialog):
         self.fill_table()
         return True
 
-
     def rename_coder(self, merge=False):
         row = self.ui.tableWidget.currentRow()
         if row == -1:
             Message(self.app, _('Coder'), _('No name selected.'), 'critical').exec()
             return
-        
+
         old_name = self.ui.tableWidget.item(row, 0).text()
         dialog = QtWidgets.QInputDialog(self)
-        dialog.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        dialog.setStyleSheet(f"* {{font-size:{self.app.settings['fontsize']}pt}} ")
         dialog.setWindowTitle(_("Coder"))
         dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         dialog.setInputMode(QtWidgets.QInputDialog.InputMode.TextInput)
@@ -365,12 +358,10 @@ class DialogCoderNames(QtWidgets.QDialog):
             return
         
         if not self._rename_coder(old_name, new_name):
-            Message(self.app, _('Coder'), _('An error occured during merging or renaming. All changes were reverted.'), 'Information').exec()
-
+            Message(self.app, _('Coder'), _('An error occurred during merging or renaming. All changes were reverted.'), 'Information').exec()
 
     def merge_coder(self):
         self.rename_coder(merge=True)
-
 
     def ok(self):
         if self.initial_current_coder != self.current_coder:
@@ -387,14 +378,12 @@ class DialogCoderNames(QtWidgets.QDialog):
             self.app.delete_backup = False
         
         if self.do_commit and self.app.conn is not None:
-            self.app.conn.commit() # this writes all the changes finally to the database
-        
-        
+            self.app.conn.commit()  # this writes all the changes finally to the database
+
     def cancel(self):
         if self.app.conn is not None:
             self.app.conn.rollback()     
-        self.coder_names_changed = False   
-
+        self.coder_names_changed = False
 
     def help(self):
         """ Open help in browser. """
