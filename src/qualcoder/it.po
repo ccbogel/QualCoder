@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-01-14 11:56+1100\n"
-"PO-Revision-Date: 2026-01-08 09:50+1100\n"
+"PO-Revision-Date: 2026-01-14 17:08+1100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: it\n"
@@ -86,6 +86,8 @@ msgid ""
 "No codings found for this particuar combination of coder, document filter, "
 "and code."
 msgstr ""
+"Non sono stati trovati codici per questa particolare combinazione di "
+"codificatore, filtro documento e codice."
 
 #: src\qualcoder\ai_chat.py:385
 #, fuzzy
@@ -1233,15 +1235,15 @@ msgstr "Codifiche:"
 
 #: src\qualcoder\coder_names.py:62
 msgid "Visibility"
-msgstr ""
+msgstr "Visibilità"
 
 #: src\qualcoder\coder_names.py:156
 msgid "visible"
-msgstr ""
+msgstr "visibile"
 
 #: src\qualcoder\coder_names.py:156
 msgid "hidden"
-msgstr ""
+msgstr "nascosto"
 
 #: src\qualcoder\coder_names.py:192 src\qualcoder\coder_names.py:203
 #: src\qualcoder\coder_names.py:216 src\qualcoder\coder_names.py:227
@@ -1257,10 +1259,12 @@ msgstr "Autore"
 #: src\qualcoder\coder_names.py:192
 msgid "One coder must be selected. Choose another one if you want to change."
 msgstr ""
+"È necessario selezionare un programmatore. Sceglierne un altro se si "
+"desidera cambiare."
 
 #: src\qualcoder\coder_names.py:203
 msgid "You cannot hide the current coder."
-msgstr ""
+msgstr "Non è possibile nascondere il codificatore corrente."
 
 #: src\qualcoder\coder_names.py:219
 #, fuzzy
@@ -1279,11 +1283,11 @@ msgstr "Aprire la directory del progetto"
 
 #: src\qualcoder\coder_names.py:247
 msgid "An error occurred while renaming."
-msgstr ""
+msgstr "Si è verificato un errore durante la ridenominazione."
 
 #: src\qualcoder\coder_names.py:273
 msgid "An error occurred while changing the name in \"{}\"."
-msgstr ""
+msgstr "Si è verificato un errore durante la modifica del nome in “{}”."
 
 #: src\qualcoder\coder_names.py:323
 #, fuzzy
@@ -1297,11 +1301,11 @@ msgstr "Unire il codice al codice"
 
 #: src\qualcoder\coder_names.py:335
 msgid "Rename \"{}\" into:"
-msgstr ""
+msgstr "Rinomina “{}” in:"
 
 #: src\qualcoder\coder_names.py:342
 msgid "Old and new name are identical."
-msgstr ""
+msgstr "Il nome vecchio e quello nuovo sono identici."
 
 #: src\qualcoder\coder_names.py:345
 #, fuzzy
@@ -1310,7 +1314,7 @@ msgstr "Il nome non può essere vuoto"
 
 #: src\qualcoder\coder_names.py:354
 msgid "The coder name you want to merge into does not exist."
-msgstr ""
+msgstr "Il nome del codificatore che desideri unire non esiste."
 
 #: src\qualcoder\coder_names.py:357
 #, fuzzy
@@ -1321,6 +1325,8 @@ msgstr "Questo nome per il codice è gia in uso."
 msgid ""
 "An error occurred during merging or renaming. All changes were reverted."
 msgstr ""
+"Si è verificato un errore durante l'unione o la ridenominazione. Tutte le "
+"modifiche sono state annullate."
 
 #: src\qualcoder\code_color_scheme.py:61
 msgid "Normal vision"
@@ -2599,6 +2605,8 @@ msgid ""
 "The coder \"{}\" is currently hidden. Do you want to make it visible, so you "
 "can see the speaker codings?"
 msgstr ""
+"Il codice “{}” è attualmente nascosto. Vuoi renderlo visibile, in modo da "
+"poter vedere i codici degli altoparlanti?"
 
 #: src\qualcoder\code_text.py:3487
 #, fuzzy
@@ -6157,6 +6165,8 @@ msgid ""
 "It seems that you have made changes to the coder names. These changes will "
 "be lost as well. Do you really want to cancel?"
 msgstr ""
+"Sembra che tu abbia apportato modifiche ai nomi dei codificatori. Anche "
+"queste modifiche andranno perse. Vuoi davvero annullare?"
 
 #: src\qualcoder\settings.py:556 src\qualcoder\__main__.py:1765
 msgid "Settings"
@@ -7726,6 +7736,9 @@ msgid ""
 "project (\"{}\"). Do you want to keep your current name or switch to the one "
 "from the project?"
 msgstr ""
+"Il tuo nome attuale di programmatore (“{}”) è diverso da quello utilizzato "
+"per ultimo nel progetto (“{}”). Desideri mantenere il tuo nome attuale o "
+"passare a quello del progetto?"
 
 #: src\qualcoder\__main__.py:2676
 #, fuzzy
@@ -7734,15 +7747,15 @@ msgstr "Nome del codice"
 
 #: src\qualcoder\__main__.py:2678
 msgid "Keep"
-msgstr ""
+msgstr "Conserva"
 
 #: src\qualcoder\__main__.py:2679
 msgid "Switch"
-msgstr ""
+msgstr "Interruttore"
 
 #: src\qualcoder\__main__.py:2680
 msgid "Cancel"
-msgstr ""
+msgstr "Annulla"
 
 #: src\qualcoder\__main__.py:2689
 msgid "Default coder name changed to: "
