@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>506</width>
-    <height>355</height>
+    <width>593</width>
+    <height>359</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <item>
     <widget class="QLabel" name="label_2">
      <property name="text">
-      <string>Choose (✓) your own coder name and adjust the visibility of others:</string>
+      <string>Choose (✓) your coder name. Adjust visibility of others:</string>
      </property>
      <property name="wordWrap">
       <bool>true</bool>
@@ -103,13 +103,19 @@
         <layout class="QHBoxLayout" name="horizontalLayout">
          <item>
           <widget class="QPushButton" name="pushButton_add">
+           <property name="toolTip">
+            <string>Add a new coder name</string>
+           </property>
            <property name="text">
-            <string>Add</string>
+            <string>New</string>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QPushButton" name="pushButton_rename">
+           <property name="toolTip">
+            <string>Warning: If you choose another name to merge into, there is no undo. Make a project backup first.</string>
+           </property>
            <property name="text">
             <string>Rename</string>
            </property>
@@ -117,6 +123,9 @@
          </item>
          <item>
           <widget class="QPushButton" name="pushButton_merge">
+           <property name="toolTip">
+            <string>Warning: There is no undo. Make a project backup first.</string>
+           </property>
            <property name="text">
             <string>Merge</string>
            </property>

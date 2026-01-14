@@ -577,7 +577,7 @@ As all assigned positions may be incorrect. </string>
      <widget class="QCheckBox" name="checkBox_auto_regex">
       <property name="geometry">
        <rect>
-        <x>691</x>
+        <x>692</x>
         <y>5</y>
         <width>111</width>
         <height>20</height>
@@ -694,6 +694,9 @@ Formatted like below for name detection.
            <width>28</width>
            <height>28</height>
           </size>
+         </property>
+         <property name="toolTip">
+          <string>Coder visibility</string>
          </property>
          <property name="text">
           <string>...</string>

@@ -564,6 +564,9 @@
            <height>28</height>
           </size>
          </property>
+         <property name="toolTip">
+          <string>Coder visibility</string>
+         </property>
          <property name="text">
           <string>...</string>
          </property>
@@ -773,7 +776,7 @@
          <x>0</x>
          <y>0</y>
          <width>264</width>
-         <height>593</height>
+         <height>588</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout_3">
