@@ -1000,7 +1000,7 @@ Ordenado por nome de arquivo e nome de código.</translation>
         <location filename="ui_dialog_import.py" line="94"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delimiter must be a single character.&lt;/p&gt;&lt;p&gt;Enter &apos;ta&apos; for &apos;tab&apos;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Delimiter deve ser um único caractere.
-Enter 'ta' para 'tab'</translation>
+Enter &apos;ta&apos; para &apos;tab&apos;</translation>
     </message>
     <message>
         <location filename="ui_dialog_import.py" line="95"/>
@@ -2251,44 +2251,52 @@ Clique com o botão direito para ver as opções: todas (padrão), primeira, có
 <context>
     <name>Dialog_coders</name>
     <message>
-        <location filename="ui_dialog_coder_names.py" line="81"/>
+        <location filename="ui_dialog_coder_names.py" line="84"/>
         <source>Coders</source>
         <translation>Codificadores</translation>
     </message>
     <message>
-        <location filename="ui_dialog_coder_names.py" line="82"/>
-        <source>Choose (✓) your coder name. Adjust visibility of others:</source>
-        <translation>Escolha (✓) o seu nome de programador. Ajuste a visibilidade dos outros:</translation>
+        <location filename="ui_dialog_coder_names.py" line="85"/>
+        <source>Choose (â) your coder name. Adjust visibility of others:</source>
+        <translation type="unfinished" variants="yes">
+            <lengthvariant>Escolha (â</lengthvariant>
+            <lengthvariant>) o seu nome de programador. Ajuste a visibilidade dos outros:</lengthvariant>
+        </translation>
     </message>
     <message>
-        <location filename="ui_dialog_coder_names.py" line="83"/>
+        <location filename="ui_dialog_coder_names.py" line="86"/>
         <source>Add a new coder name</source>
         <translation>Adicionar um novo nome de codificador</translation>
     </message>
     <message>
-        <location filename="ui_dialog_coder_names.py" line="84"/>
+        <location filename="ui_dialog_coder_names.py" line="87"/>
         <source>New</source>
         <translation>Novo</translation>
     </message>
     <message>
-        <location filename="ui_dialog_coder_names.py" line="85"/>
-        <source>Warning: If you choose another name to merge into, there is no undo. Make a project backup first.</source>
-        <translation>Aviso: se escolher outro nome para mesclar, não há como desfazer. Faça primeiro um backup do projeto.</translation>
-    </message>
-    <message>
-        <location filename="ui_dialog_coder_names.py" line="86"/>
+        <location filename="ui_dialog_coder_names.py" line="89"/>
         <source>Rename</source>
         <translation>Renomear</translation>
     </message>
     <message>
-        <location filename="ui_dialog_coder_names.py" line="87"/>
+        <location filename="ui_dialog_coder_names.py" line="90"/>
         <source>Warning: There is no undo. Make a project backup first.</source>
         <translation>Aviso: Não há como desfazer. Faça primeiro uma cópia de segurança do projeto.</translation>
     </message>
     <message>
-        <location filename="ui_dialog_coder_names.py" line="88"/>
+        <location filename="ui_dialog_coder_names.py" line="91"/>
         <source>Merge</source>
         <translation>Mesclar</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_coder_names.py" line="88"/>
+        <source>Rename the selected coder. Note that this will affect the entire project.</source>
+        <translation>Renomeie o codificador selecionado. Observe que isso afetará todo o projeto.</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_coder_names.py" line="92"/>
+        <source>(Go to Project &gt; Settings for more options)</source>
+        <translation>(Vá para Projeto &gt; Configurações para mais opções)</translation>
     </message>
 </context>
 <context>
@@ -3219,7 +3227,7 @@ Wildcards for &apos;like&apos; are % and _</source>
         <translation>Selecione parâmetros para os atributos. 
 between requer 2 valores separados por ;, por exemplo, 1;100
  in e not in requerem 1 ou mais valores separados por ;
-Os curingas para 'like' são % e _</translation>
+Os curingas para &apos;like&apos; são % e _</translation>
     </message>
     <message>
         <location filename="ui_report_attribute_parameters.py" line="88"/>
@@ -3685,99 +3693,79 @@ Selecione (✓) aqueles que deseja marcar. Clicar em OK cria um código para cad
 <context>
     <name>Dialog_special_functions</name>
     <message>
-        <location filename="ui_special_functions.py" line="127"/>
+        <location filename="ui_special_functions.py" line="110"/>
         <source>Special Functions</source>
         <translation>Funções especiais</translation>
     </message>
     <message>
-        <location filename="ui_special_functions.py" line="147"/>
+        <location filename="ui_special_functions.py" line="126"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Number of characters to extend (positive numbers)&lt;/p&gt;&lt;p&gt;or reduce (negative numbers)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Número de caracteres a estender (números positivos) ou reduzir (números negativos)</translation>
     </message>
     <message>
-        <location filename="ui_special_functions.py" line="145"/>
+        <location filename="ui_special_functions.py" line="124"/>
         <source>Change text code start positions ALL codes ALL files for current owner.</source>
         <translation>Alterar posições de início de código de texto TODOS os códigos TODOS os arquivos para o proprietário atual.</translation>
     </message>
     <message>
-        <location filename="ui_special_functions.py" line="144"/>
+        <location filename="ui_special_functions.py" line="123"/>
         <source>Change text code end positions ALL codes ALL files for current owner.</source>
         <translation>Alterar as posições finais do código de texto TODOS os códigos TODOS os arquivos para o proprietário atual.</translation>
     </message>
     <message>
-        <location filename="ui_special_functions.py" line="128"/>
+        <location filename="ui_special_functions.py" line="111"/>
         <source>Backup project before running these functions.</source>
         <translation>Faça um backup do projeto antes de executar estas funções.</translation>
     </message>
     <message>
-        <location filename="ui_special_functions.py" line="129"/>
+        <location filename="ui_special_functions.py" line="112"/>
         <source>Dynamic update text content</source>
         <translation>Atualização dinâmica do conteúdo de texto</translation>
     </message>
     <message>
-        <location filename="ui_special_functions.py" line="149"/>
+        <location filename="ui_special_functions.py" line="128"/>
         <source>Run</source>
         <translation>Executar</translation>
     </message>
     <message>
-        <location filename="ui_special_functions.py" line="132"/>
+        <location filename="ui_special_functions.py" line="115"/>
         <source>Select text file to update</source>
         <translation>Selecionar arquivo de texto para atualizar</translation>
     </message>
     <message>
-        <location filename="ui_special_functions.py" line="134"/>
+        <location filename="ui_special_functions.py" line="117"/>
         <source>Select replacement text file</source>
         <translation>Selecionar arquivo de texto de substituição</translation>
     </message>
     <message>
-        <location filename="ui_special_functions.py" line="135"/>
+        <location filename="ui_special_functions.py" line="118"/>
         <source>Merge project into this project</source>
         <translation>Fundir o projeto neste projeto</translation>
     </message>
     <message>
-        <location filename="ui_special_functions.py" line="137"/>
+        <location filename="ui_special_functions.py" line="120"/>
         <source>Select project to merge</source>
         <translation>Selecione o projeto a fundir</translation>
     </message>
     <message>
-        <location filename="ui_special_functions.py" line="143"/>
+        <location filename="ui_special_functions.py" line="122"/>
         <source>Change text positions</source>
         <translation>Alterar as posições do texto</translation>
     </message>
     <message>
-        <location filename="ui_special_functions.py" line="130"/>
+        <location filename="ui_special_functions.py" line="113"/>
         <source>Run update text content</source>
         <translation>Executar atualização do conteúdo do texto</translation>
     </message>
     <message>
-        <location filename="ui_special_functions.py" line="136"/>
+        <location filename="ui_special_functions.py" line="119"/>
         <source>Run merge projects</source>
         <translation>Executar fusão de projetos</translation>
     </message>
     <message>
-        <location filename="ui_special_functions.py" line="138"/>
+        <location filename="ui_special_functions.py" line="121"/>
         <source>Select project to merge into this project</source>
         <translation>Selecione o projeto para fundir-se a este projeto</translation>
-    </message>
-    <message>
-        <location filename="ui_special_functions.py" line="139"/>
-        <source>Edit coder names</source>
-        <translation>Editar nomes de codificadores</translation>
-    </message>
-    <message>
-        <location filename="ui_special_functions.py" line="140"/>
-        <source>Select coder name</source>
-        <translation>Selecione o nome do programador</translation>
-    </message>
-    <message>
-        <location filename="ui_special_functions.py" line="141"/>
-        <source>Rename</source>
-        <translation>Renomear</translation>
-    </message>
-    <message>
-        <location filename="ui_special_functions.py" line="142"/>
-        <source>Rename or merge into an existing name</source>
-        <translation>Renomear ou fundir com um nome existente</translation>
     </message>
 </context>
 <context>
@@ -4108,7 +4096,7 @@ Não codifique este texto até que você recarregue Codificação - Texto do có
     </message>
     <message>
         <location filename="ui_dialog_view_text.py" line="79"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot &#xe2;&#x80;&#x98;.&#xe2;&#x80;&#x99; is used as a wild card, e.g. &#xe2;&#x80;&#x98;.ears&#xe2;&#x80;&#x99; will match &#xe2;&#x80;&#x98;bears&#xe2;&#x80;&#x99; and &#xe2;&#x80;&#x98;years&#xe2;&#x80;&#x99;. &lt;/p&gt;&lt;p&gt;A &#xe2;&#x80;&#x98;?&#xe2;&#x80;&#x99; after a character will match one or none times that character, e.g. &#xe2;&#x80;&#x98;bears?&#xe2;&#x80;&#x99; will match &#xe2;&#x80;&#x98;bear&#xe2;&#x80;&#x99; and &#xe2;&#x80;&#x98;bears&#xe2;&#x80;&#x99; &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A &#xe2;&#x80;&#x98;*&#xe2;&#x80;&#x99; after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;&#xe2;&#x80;&#x98;&lt;/span&gt;\. will match the dot symbol, &#xe2;&#x80;&#x98;\?&#xe2;&#x80;&#x99; will match the question mark. &#xe2;&#x80;&#x98;\n&#xe2;&#x80;&#x99; will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot â.â is used as a wild card, e.g. â.earsâ will match âbearsâ and âyearsâ. &lt;/p&gt;&lt;p&gt;A â?â after a character will match one or none times that character, e.g. âbears?â will match âbearâ and âbearsâ &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A â*â after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;â&lt;/span&gt;\. will match the dot symbol, â\?â will match the question mark. â\nâ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished">A pesquisa usa funções regex.</translation>
     </message>
 </context>
