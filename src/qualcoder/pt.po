@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-01-14 13:20+0100\n"
-"PO-Revision-Date: 2026-01-14 16:59+1100\n"
+"PO-Revision-Date: 2026-01-15 09:23+1100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: pt\n"
@@ -5298,7 +5298,7 @@ msgstr "Os nomes dos prompts devem ser únicos dentro do seu tipo e âmbito. "
 #: src/qualcoder/ai_prompts.py:934
 #, python-brace-format
 msgid "You must select a {self.prompt_type} prompt."
-msgstr ""
+msgstr "Tem de selecionar um prompt {self.prompt_type}."
 
 #: src/qualcoder/code_in_all_files.py:78
 msgid "Coded files: "

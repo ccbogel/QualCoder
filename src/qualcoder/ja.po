@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-01-14 13:20+0100\n"
-"PO-Revision-Date: 2026-01-14 17:03+1100\n"
+"PO-Revision-Date: 2026-01-15 09:23+1100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: ja\n"
@@ -5232,7 +5232,7 @@ msgstr ""
 #: src/qualcoder/ai_prompts.py:934
 #, python-brace-format
 msgid "You must select a {self.prompt_type} prompt."
-msgstr ""
+msgstr "{self.prompt_type} プロンプトを選択する必要があります。"
 
 #: src/qualcoder/code_in_all_files.py:78
 msgid "Coded files: "
