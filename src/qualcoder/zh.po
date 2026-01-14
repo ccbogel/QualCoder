@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-01-14 11:56+1100\n"
-"PO-Revision-Date: 2026-01-14 11:58+1100\n"
+"PO-Revision-Date: 2026-01-14 16:54+1100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: zh\n"
@@ -1269,7 +1269,7 @@ msgstr "该代号已在使用中。"
 #: src\qualcoder\coder_names.py:361
 msgid ""
 "An error occurred during merging or renaming. All changes were reverted."
-msgstr ""
+msgstr "合并或重命名过程中发生错误。所有更改均已撤销。"
 
 #: src\qualcoder\code_color_scheme.py:61
 msgid "Normal vision"
@@ -2495,7 +2495,7 @@ msgstr "将加载整个文本文件"
 msgid ""
 "The coder \"{}\" is currently hidden. Do you want to make it visible, so you "
 "can see the speaker codings?"
-msgstr ""
+msgstr "当前隐藏了编码符“{}”。是否需要将其显示出来，以便查看发言者标记？"
 
 #: src\qualcoder\code_text.py:3487
 #, fuzzy
@@ -5949,7 +5949,7 @@ msgstr "重启 QualCoder 以进行一些更改"
 msgid ""
 "It seems that you have made changes to the coder names. These changes will "
 "be lost as well. Do you really want to cancel?"
-msgstr ""
+msgstr "您似乎已修改了编码器名称。这些更改也将丢失。您确定要取消吗？"
 
 #: src\qualcoder\settings.py:556 src\qualcoder\__main__.py:1765
 msgid "Settings"
@@ -7495,6 +7495,8 @@ msgid ""
 "project (\"{}\"). Do you want to keep your current name or switch to the one "
 "from the project?"
 msgstr ""
+"您当前的编码者名称（“{}”）与项目中上次使用的名称（“{}”）不一致。您要保留当前"
+"名称还是切换为项目中的名称？"
 
 #: src\qualcoder\__main__.py:2676
 #, fuzzy
@@ -7503,15 +7505,15 @@ msgstr "代码名称"
 
 #: src\qualcoder\__main__.py:2678
 msgid "Keep"
-msgstr ""
+msgstr "保持"
 
 #: src\qualcoder\__main__.py:2679
 msgid "Switch"
-msgstr ""
+msgstr "切换"
 
 #: src\qualcoder\__main__.py:2680
 msgid "Cancel"
-msgstr ""
+msgstr "取消"
 
 #: src\qualcoder\__main__.py:2689
 msgid "Default coder name changed to: "
