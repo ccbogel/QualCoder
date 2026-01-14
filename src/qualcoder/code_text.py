@@ -3455,6 +3455,8 @@ class DialogCodeText(QtWidgets.QWidget):
 
     def edit_coder_names(self):
         ui_coder_names = DialogCoderNames(self.app)
+        ui_coder_names.ui.pushButton_rename.setVisible(False)
+        ui_coder_names.ui.pushButton_merge.setVisible(False)
         if (ui_coder_names.exec() == QtWidgets.QDialog.DialogCode.Accepted and 
            ui_coder_names.coder_names_changed):
             self.update_coder_names()
