@@ -428,7 +428,7 @@ Seleccionado: todos los códigos seleccionados deben coincidir exactamente.</tra
     <message>
         <location filename="ui_dialog_organiser.py" line="64"/>
         <source>Click on the graph area and press + or W to zoom in. Press - or Q to zoom in or zoom out.</source>
-        <translation>Haz clic en el área del gráfico y pulsz + o W para ampliarlo. Pulsa - o Q para acercar o alejar el zoom.</translation>
+        <translation>Haz clic en el área del gráfico y pulsa + o W para ampliarlo. Pulsa - o Q para acercar o alejar el zoom.</translation>
     </message>
     <message>
         <location filename="ui_dialog_organiser.py" line="65"/>
@@ -1024,17 +1024,17 @@ Pon &apos;ta&apos; para &apos;tab&apos; </translation>
     <message>
         <location filename="ui_dialog_import.py" line="98"/>
         <source>NONE</source>
-        <translation></translation>
+        <translation>NINGUNO</translation>
     </message>
     <message>
         <location filename="ui_dialog_import.py" line="99"/>
         <source>MINIMAL</source>
-        <translation></translation>
+        <translation>MÍNIMO</translation>
     </message>
     <message>
         <location filename="ui_dialog_import.py" line="100"/>
         <source>ALL</source>
-        <translation></translation>
+        <translation>TODOS</translation>
     </message>
     <message>
         <location filename="ui_dialog_import.py" line="102"/>
@@ -2215,7 +2215,7 @@ Limited to names up to 63 characters long.
 The name must be at the start of a new line.
 Formatted like below for name detection.
 &quot;Name:&quot;, &quot;{Name}, or &quot;[Name]&quot;</source>
-        <translation>Marcar altavoces.
+        <translation>Marcar hablantes.
 Limitado a nombres de hasta 63 caracteres. 
 El nombre debe estar al principio de una nueva línea.
 Formateado como se indica a continuación para la detección de nombres.
@@ -2258,7 +2258,7 @@ Haz clic con el botón derecho para las opciones: todo (por defecto), primero, c
         <source>Choose (â) your coder name. Adjust visibility of others:</source>
         <translation variants="yes">
             <lengthvariant>Elige (â</lengthvariant>
-            <lengthvariant>) tu nombre de programador. Ajusta la visibilidad de los demás:</lengthvariant>
+            <lengthvariant>) tu nombre de codificador. Ajusta la visibilidad de los demás:</lengthvariant>
         </translation>
     </message>
     <message>
@@ -2550,7 +2550,7 @@ Haz clic con el botón derecho para las opciones: todo (por defecto), primero, c
     <message>
         <location filename="ui_dialog_manage_files.py" line="140"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Link to a file that is outside the project folder&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Exportar el archivo de la carpeta del proyecto como un archivo vinculado</translation>
+        <translation>Vincular a un archivo que se encuentra fuera de la carpeta del proyecto</translation>
     </message>
     <message>
         <location filename="ui_dialog_manage_files.py" line="141"/>
@@ -3084,7 +3084,7 @@ La selección de atributos anulará los archivos o casos seleccionados en las li
     <message>
         <location filename="ui_dialog_report_codings.py" line="187"/>
         <source>iramuteq</source>
-        <translation></translation>
+        <translation>IRaMuTeQ</translation>
     </message>
 </context>
 <context>
@@ -3333,7 +3333,7 @@ No utilices apóstrofes ni comas en ningún valor.</translation>
     <message>
         <location filename="ui_dialog_settings.py" line="590"/>
         <source>Speaker format</source>
-        <translation>Formato de interlocutor</translation>
+        <translation>Formato del hablante</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="584"/>
@@ -3348,7 +3348,7 @@ No utilices apóstrofes ni comas en ningún valor.</translation>
     <message>
         <location filename="ui_dialog_settings.py" line="589"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Used when entering speaker name in transcription&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Se utiliza cuando se introduce el nombre del interlocutor en la transcripción</translation>
+        <translation>Se utiliza cuando se introduce el nombre del hablante en la transcripción</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="548"/>
@@ -3679,7 +3679,7 @@ No se recomienda a menos que tengas muchos archivos grandes que ralenticen la co
     <message>
         <location filename="ui_dialog_speakers.py" line="53"/>
         <source>Mark Speakers</source>
-        <translation>Marcar altavoces</translation>
+        <translation>Marcar hablantes</translation>
     </message>
     <message>
         <location filename="ui_dialog_speakers.py" line="54"/>
@@ -3908,13 +3908,13 @@ Selecciona (✓) los que desees marcar. Al hacer clic en Aceptar, se crea un có
     <message>
         <location filename="ui_dialog_view_av.py" line="197"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add a speaker name to shortcuts. In the text entry box press ctrl + n&lt;/p&gt;&lt;p&gt;Insert a speaker into transcription. In the text entry box press ctrl + 1 up to ctrl + 8 for the speakers name.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Añadir un nombre de interlocutor a los atajos. En el cuadro de entrada de texto presione ctrl + n 
-Inserta un interlocutor en la transcripción. En el cuadro de entrada de texto presiona ctrl + 1 hasta ctrl + 8 para el nombre del interlocutor.</translation>
+        <translation>Añadir un nombre de hablante a los atajos. En el cuadro de entrada de texto presione ctrl + n 
+Inserta un hablante en la transcripción. En el cuadro de entrada de texto presiona ctrl + 1 hasta ctrl + 8 para el nombre del hablante.</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="198"/>
         <source>Speakers:</source>
-        <translation>Interlocutores: </translation>
+        <translation>Hablantes: </translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="185"/>
