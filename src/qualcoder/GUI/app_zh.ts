@@ -1015,8 +1015,8 @@ Ordered by file name and code name.</source>
         <location filename="ui_dialog_import.py" line="97"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;NONE 123, abc&lt;/p&gt;&lt;p&gt;MINIMAL 123, &amp;quot;abc&amp;quot;&lt;/p&gt;&lt;p&gt;ALL &amp;quot;123&amp;quot;, &amp;quot;abc&amp;quot;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>NONE 123, abc
-MINIMAL 123,&apos;abc&apos;;
-ALL &apos;123&apos;, &apos;abc&apos;</translation>
+MINIMAL 123,'abc';
+ALL '123', 'abc'</translation>
     </message>
     <message>
         <location filename="ui_dialog_import.py" line="98"/>
@@ -2258,7 +2258,7 @@ Right click for options: all (default), first, code within code.</source>
     </message>
     <message>
         <location filename="ui_dialog_coder_names.py" line="85"/>
-        <source>Choose (â) your coder name. Adjust visibility of others:</source>
+        <source>Choose (&#xe2;&#x9c;&#x93;) your coder name. Adjust visibility of others:</source>
         <translation type="unfinished">警告：若选择合并至其他名称，操作不可撤销。请先备份项目。</translation>
     </message>
     <message>

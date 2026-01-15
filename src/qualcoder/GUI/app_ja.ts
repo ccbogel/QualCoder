@@ -2249,8 +2249,8 @@ Right click for options: all (default), first, code within code.</source>
     </message>
     <message>
         <location filename="ui_dialog_coder_names.py" line="85"/>
-        <source>Choose (â) your coder name. Adjust visibility of others:</source>
-        <translation>コーダー名を選択してください。他のユーザーの表示設定を調整：</translation>
+        <source>Choose (&#xe2;&#x9c;&#x93;) your coder name. Adjust visibility of others:</source>
+        <translation type="unfinished">コーダー名を選択してください。他のユーザーの表示設定を調整：</translation>
     </message>
     <message>
         <location filename="ui_dialog_coder_names.py" line="86"/>
@@ -3189,7 +3189,7 @@ Wildcards for &apos;like&apos; are % and _</source>
         <translation>属性のパラメータを選択します。
 betweenには、;で区切られた2つの値が必要です。
  in と not in は、.で区切られた1つ以上の値を必要とします；
-like&apos; のワイルドカードは % と _ です。</translation>
+like' のワイルドカードは % と _ です。</translation>
     </message>
     <message>
         <location filename="ui_report_attribute_parameters.py" line="88"/>

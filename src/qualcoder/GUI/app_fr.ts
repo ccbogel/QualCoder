@@ -2240,44 +2240,49 @@ Clic-droit pour les options : tous (par défaut), premier, code dans le code.</t
 <context>
     <name>Dialog_coders</name>
     <message>
-        <location filename="ui_dialog_coder_names.py" line="81"/>
+        <location filename="ui_dialog_coder_names.py" line="84"/>
         <source>Coders</source>
         <translation>Codeur⋅euses</translation>
     </message>
     <message>
-        <location filename="ui_dialog_coder_names.py" line="82"/>
-        <source>Choose (✓) your coder name. Adjust visibility of others:</source>
-        <translation>Choisissez (✓) votre nom de codeur⋅euse. Réglez la visibilité des autres :</translation>
+        <location filename="ui_dialog_coder_names.py" line="85"/>
+        <source>Choose (â) your coder name. Adjust visibility of others:</source>
+        <translation type="unfinished">Attension : si vous choisissez un autre nom pour la fusion, vous ne pourrez pas annuler cette opération. Effectuez d&apos;abord une sauvegarde du projet.</translation>
     </message>
     <message>
-        <location filename="ui_dialog_coder_names.py" line="83"/>
+        <location filename="ui_dialog_coder_names.py" line="86"/>
         <source>Add a new coder name</source>
         <translation>Ajouter un nouveau nom de codeur⋅euse</translation>
     </message>
     <message>
-        <location filename="ui_dialog_coder_names.py" line="84"/>
+        <location filename="ui_dialog_coder_names.py" line="87"/>
         <source>New</source>
         <translation>Nouveau</translation>
     </message>
     <message>
-        <location filename="ui_dialog_coder_names.py" line="85"/>
-        <source>Warning: If you choose another name to merge into, there is no undo. Make a project backup first.</source>
-        <translation>Attension : si vous choisissez un autre nom pour la fusion, vous ne pourrez pas annuler cette opération. Effectuez d&apos;abord une sauvegarde du projet.</translation>
-    </message>
-    <message>
-        <location filename="ui_dialog_coder_names.py" line="86"/>
+        <location filename="ui_dialog_coder_names.py" line="89"/>
         <source>Rename</source>
         <translation>Renommer</translation>
     </message>
     <message>
-        <location filename="ui_dialog_coder_names.py" line="87"/>
+        <location filename="ui_dialog_coder_names.py" line="90"/>
         <source>Warning: There is no undo. Make a project backup first.</source>
         <translation>Attention: Ce n&apos;est pas réversible. Faites une sauvegarde avant.</translation>
     </message>
     <message>
-        <location filename="ui_dialog_coder_names.py" line="88"/>
+        <location filename="ui_dialog_coder_names.py" line="91"/>
         <source>Merge</source>
         <translation>Fusionner</translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_coder_names.py" line="88"/>
+        <source>Rename the selected coder. Note that this will affect the entire project.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="ui_dialog_coder_names.py" line="92"/>
+        <source>(Go to Project &gt; Settings for more options)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -3671,100 +3676,80 @@ Sélectionnez (✓) ceux que vous souhaitez surligner. En cliquant sur OK, vous 
 <context>
     <name>Dialog_special_functions</name>
     <message>
-        <location filename="ui_special_functions.py" line="127"/>
+        <location filename="ui_special_functions.py" line="110"/>
         <source>Special Functions</source>
         <translation>Fonctions spéciales</translation>
     </message>
     <message>
-        <location filename="ui_special_functions.py" line="147"/>
+        <location filename="ui_special_functions.py" line="126"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Number of characters to extend (positive numbers)&lt;/p&gt;&lt;p&gt;or reduce (negative numbers)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Nombre de caractères à étendre (nombres positifs)
 ou à réduire (nombres négatifs)</translation>
     </message>
     <message>
-        <location filename="ui_special_functions.py" line="145"/>
+        <location filename="ui_special_functions.py" line="124"/>
         <source>Change text code start positions ALL codes ALL files for current owner.</source>
         <translation>Modifier les positions de début des codes de texte TOUS les codes TOUS les fichiers pour le propriétaire actuel.</translation>
     </message>
     <message>
-        <location filename="ui_special_functions.py" line="144"/>
+        <location filename="ui_special_functions.py" line="123"/>
         <source>Change text code end positions ALL codes ALL files for current owner.</source>
         <translation>Modifier les positions de fin de code de texte TOUS les codes TOUS les fichiers pour le propriétaire actuel.</translation>
     </message>
     <message>
-        <location filename="ui_special_functions.py" line="128"/>
+        <location filename="ui_special_functions.py" line="111"/>
         <source>Backup project before running these functions.</source>
         <translation>Sauvegarder le projet avant d&apos;exécuter ces fonctions.</translation>
     </message>
     <message>
-        <location filename="ui_special_functions.py" line="129"/>
+        <location filename="ui_special_functions.py" line="112"/>
         <source>Dynamic update text content</source>
         <translation>Mise à jour dynamique du contenu du texte</translation>
     </message>
     <message>
-        <location filename="ui_special_functions.py" line="149"/>
+        <location filename="ui_special_functions.py" line="128"/>
         <source>Run</source>
         <translation>Exécuter</translation>
     </message>
     <message>
-        <location filename="ui_special_functions.py" line="132"/>
+        <location filename="ui_special_functions.py" line="115"/>
         <source>Select text file to update</source>
         <translation>Sélectionnez le fichier texte à mettre à jour</translation>
     </message>
     <message>
-        <location filename="ui_special_functions.py" line="134"/>
+        <location filename="ui_special_functions.py" line="117"/>
         <source>Select replacement text file</source>
         <translation>Sélectionnez le fichier texte de remplacement</translation>
     </message>
     <message>
-        <location filename="ui_special_functions.py" line="135"/>
+        <location filename="ui_special_functions.py" line="118"/>
         <source>Merge project into this project</source>
         <translation>Fusionner le projet dans ce projet</translation>
     </message>
     <message>
-        <location filename="ui_special_functions.py" line="137"/>
+        <location filename="ui_special_functions.py" line="120"/>
         <source>Select project to merge</source>
         <translation>Sélectionnez le projet à fusionner</translation>
     </message>
     <message>
-        <location filename="ui_special_functions.py" line="143"/>
+        <location filename="ui_special_functions.py" line="122"/>
         <source>Change text positions</source>
         <translation>Modifier la position du texte</translation>
     </message>
     <message>
-        <location filename="ui_special_functions.py" line="130"/>
+        <location filename="ui_special_functions.py" line="113"/>
         <source>Run update text content</source>
         <translation>Exécuter la mise à jour du contenu textuel</translation>
     </message>
     <message>
-        <location filename="ui_special_functions.py" line="136"/>
+        <location filename="ui_special_functions.py" line="119"/>
         <source>Run merge projects</source>
         <translation>Exécuter des projets de fusion</translation>
     </message>
     <message>
-        <location filename="ui_special_functions.py" line="138"/>
+        <location filename="ui_special_functions.py" line="121"/>
         <source>Select project to merge into this project</source>
         <translation>Sélectionnez le projet à fusionner dans ce projet</translation>
-    </message>
-    <message>
-        <location filename="ui_special_functions.py" line="139"/>
-        <source>Edit coder names</source>
-        <translation>Modifier les noms des codeur·euses</translation>
-    </message>
-    <message>
-        <location filename="ui_special_functions.py" line="140"/>
-        <source>Select coder name</source>
-        <translation>Sélectionnez le nom du codeur·euses</translation>
-    </message>
-    <message>
-        <location filename="ui_special_functions.py" line="141"/>
-        <source>Rename</source>
-        <translation>Renommer</translation>
-    </message>
-    <message>
-        <location filename="ui_special_functions.py" line="142"/>
-        <source>Rename or merge into an existing name</source>
-        <translation>Renommer ou fusionner avec un nom existant</translation>
     </message>
 </context>
 <context>
