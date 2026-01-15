@@ -508,11 +508,12 @@ class DialogCodesBySegments(QtWidgets.QDialog):
                 tree_item.setSelected(False)
         if action == action_like:
             # Need to unselect where mouse click occurred
-            clicked_selected = self.ui.treeWidget.selectedItems()[0]
-            clicked_selected.setSelected(False)
+            if self.ui.treeWidget.selectedItems():
+                clicked_selected = self.ui.treeWidget.selectedItems()[0]
+                clicked_selected.setSelected(False)
             # Input dialog narrow, so code below
             dialog = QtWidgets.QInputDialog(None)
-            dialog.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            dialog.setStyleSheet(f"* {{font-size:{self.app.settings['fontsize']}pt}} ")
             dialog.setWindowTitle(_("Select some codes"))
             dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
             dialog.setInputMode(QtWidgets.QInputDialog.InputMode.TextInput)

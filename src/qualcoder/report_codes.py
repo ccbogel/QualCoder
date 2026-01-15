@@ -573,8 +573,9 @@ class DialogReportCodes(QtWidgets.QDialog):
                 tree_item.setSelected(False)
         if action == action_like:
             # Need to unselect where mouse click occurred
-            clicked_selected = self.ui.treeWidget.selectedItems()[0]
-            clicked_selected.setSelected(False)
+            if self.ui.treeWidget.selectedItems():
+                clicked_selected = self.ui.treeWidget.selectedItems()[0]
+                clicked_selected.setSelected(False)
             # Input dialog narrow, so code below
             dialog = QtWidgets.QInputDialog(None)
             dialog.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
