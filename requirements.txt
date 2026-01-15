@@ -1,3 +1,5 @@
+--index-url https://download.pytorch.org/whl/cpu # make sure that torch CPU is installed instead of CUDA, this saves space
+--extra-index-url https://pypi.org/simple
 chardet
 diff-match-patch
 EbookLib
