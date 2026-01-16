@@ -119,7 +119,7 @@ def update_translation_placeholders(language=None):
 
 def recompile_translation(language=None):
     """ Make sure lrelease.exe is in path.
-     Colin - I put mine in C:\Users\cc\AppData\Local\Python\pythoncore-3.14-64\Scripts
+     Colin - I put mine in C:/Users/cc/AppData/Local/Python/pythoncore-3.14-64/Scripts
      This is a user path environment variable """
 
     project_root = os.path.dirname(os.path.abspath(__file__))
