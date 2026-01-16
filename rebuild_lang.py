@@ -118,10 +118,12 @@ def update_translation_placeholders(language=None):
 
 
 def recompile_translation(language=None):
-    """ lrelease_path = "/usr/bin/lrelease """
+    """ Make sure lrelease.exe is in path.
+     Colin - I put mine in C:\Users\cc\AppData\Local\Python\pythoncore-3.14-64\Scripts
+     This is a user path environment variable """
+
     project_root = os.path.dirname(os.path.abspath(__file__))
 
-    lrelease_path = 'lrelease'
     language_list = ['de', 'en', 'es', 'fr', 'it', 'ja', 'pt', 'sv', 'zh']
     if language in language_list:
         language_list = [language]
@@ -163,7 +165,7 @@ def recompile_translation(language=None):
             if not os.path.exists(qm_file) or (os.path.getmtime(ts_file) > os.path.getmtime(qm_file)):
                 answer = input(f'Do you want to create/update "{qm_file}"? (y/n)')
                 if answer == 'y':
-                    subprocess.run([lrelease_path, ts_file, "-qm", qm_file], check=True)
+                    subprocess.run(['lrelease', ts_file, "-qm", qm_file], check=True)
                     print(f"{qm_file} has been updated.")
                 else:
                     print(f'Skipping "{qm_file}".')
