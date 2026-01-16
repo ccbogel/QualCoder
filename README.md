@@ -1,6 +1,6 @@
 <img src="https://github.com/ccbogel/QualCoder/blob/master/qualcoder.png" width=200 height=200>
 
-README QualCoder in others language : [[Français](https://qualcoder-org.github.io/doc/fr/readme/)]
+README QualCoder in other languages : [[Français](https://qualcoder-org.github.io/doc/fr/readme/)]
 
 # QualCoder
 QualCoder is a qualitative data analysis application written in Python.
