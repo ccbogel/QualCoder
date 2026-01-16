@@ -11,6 +11,7 @@ datas += collect_data_files('langchain_core')
 datas += collect_data_files('langchain_openai')
 datas += collect_data_files('langchain_text_splitters')
 datas += collect_data_files('transformers', include_py_files=True)
+datas += collect_data_files('plotly')
 # datas += collect_data_files('sentence_transformers')
 datas += copy_metadata('tqdm')
 datas += copy_metadata('regex')
@@ -19,7 +20,7 @@ datas += copy_metadata('packaging')
 datas += copy_metadata('filelock')
 datas += copy_metadata('numpy')
 datas += copy_metadata('huggingface-hub')
-datas += copy_metadata('safetensors')
+# datas += copy_metadata('safetensors')
 datas += copy_metadata('pyyaml')
 datas += copy_metadata('torch')
 datas += copy_metadata('tokenizers')
@@ -30,7 +31,7 @@ hiddenimports += collect_submodules('pydantic')
 hiddenimports += ['scipy._lib.array_api_compat.numpy.fft']
 
 a = Analysis(
-    ['qualcoder/__main__.py'],
+    ['src/qualcoder/__main__.py'],
     pathex=[],
     binaries=[],
     datas=datas,
@@ -44,8 +45,14 @@ a = Analysis(
     cipher=block_cipher,
     noarchive=False,
 )
-
 pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
+
+#splash = Splash('qualcoder.png',
+#                binaries=a.binaries,
+#                datas=a.datas,
+#                text_pos=(10, 50),
+#                text_size=12,
+#                text_color='black')
 
 exe = EXE(
     pyz,
@@ -53,8 +60,6 @@ exe = EXE(
     a.binaries,
     a.zipfiles,
     a.datas,
-    [],
-    exclude_binaries=False,  # This sets onefile mode
     name='QualCoder',
     debug=False,
     bootloader_ignore_signals=False,
@@ -66,12 +71,11 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon='qualcoder.png'
+    icon='qualcoder.png',
 )
 
-app = BUNDLE(
-    exe,
-    name='Qualcoder.app',
-    icon='qualcoder/GUI/qualcoder.icns',
-    bundle_identifier='org.ccbogel.qualcoder'
-)
+
+# no COLLECT in one file mode!
+# Instead, binaries, zipfiles, datas, etc. are integrated into the exe
+
+# no MacOS bundle possible in one file mode. MacOS bundles are always folders. 
