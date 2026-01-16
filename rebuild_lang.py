@@ -61,12 +61,12 @@ def extract_pot_file(directory, pot_filename):
         print("No Python files found to extract translatable strings from.")
 
 
-def update_po_files(directory, pot_filename, lang=None):
+def update_po_files(directory, pot_filename, lang_=None):
     """ List all .po files within the specified directory.
     called by: update_translation_placeholders """
     for root, dirs, files in os.walk(directory):
         for file in files:
-            if lang is None or file.startswith(lang):
+            if lang_ is None or file.startswith(lang_):
                 if file.endswith('.po'):
                     po_file = os.path.join(root, file)
                     try:
@@ -80,7 +80,7 @@ def update_po_files(directory, pot_filename, lang=None):
                         print(f"Error updating PO file {po_file}: {exc}")
 
 
-def update_qt_ts_files(lang=None):
+def update_qt_ts_files(lang_=None):
     """ Requires pyludate5
     pip install pyqt5-tools
     Run from QualCoder-master folder
@@ -90,9 +90,9 @@ def update_qt_ts_files(lang=None):
 
     translation_files = ["app_de.ts", "app_es.ts", "app_fr.ts", "app_it.ts", "app_ja.ts",
                          "app_pt.ts", "app_sv.ts", "app_zh.ts"]
-    if lang is not None:
-        translation_files = [f for f in translation_files if f.startswith(f"app_{lang}")]
-        
+    if lang_ is not None:
+        translation_files = [f for f in translation_files if f.startswith(f"app_{lang_}")]
+
     script_path = os.path.dirname(os.path.realpath(__file__))
     gui_directory = os.path.join(script_path, "src", "qualcoder", "GUI")
     print("GUI directory:", gui_directory)
@@ -107,32 +107,33 @@ def update_qt_ts_files(lang=None):
         subprocess.call(cmd, shell=True, cwd=gui_directory)
 
 
-def update_translation_placeholders(lang=None):
+def update_translation_placeholders(language=None):
     """ Update po files, update GUI ts files """
 
     directory = os.path.join('src', 'qualcoder')
     pot_filename = os.path.join(directory, 'qualcoder.pot')
     extract_pot_file(directory, pot_filename)
-    update_po_files(directory, pot_filename, lang)
-    update_qt_ts_files(lang)
+    update_po_files(directory, pot_filename, language)
+    update_qt_ts_files(language)
 
 
-def recompile_translation(lang=None):
+def recompile_translation(language=None):
+    """ lrelease_path = "/usr/bin/lrelease """
     project_root = os.path.dirname(os.path.abspath(__file__))
-    # lrelease_path = "C:\\Users\\kai\\anaconda3\\envs\\QualCOder\\Lib\\site-packages\\qt6_applications\\Qt\\bin\\lrelease.exe"
-    # lrelease_path = "/usr/bin/lrelease"
+
     lrelease_path = 'lrelease'
     language_list = ['de', 'en', 'es', 'fr', 'it', 'ja', 'pt', 'sv', 'zh']
-    if lang is not None and lang in language_list:
-        language_list = [lang]
-  
+    if language in language_list:
+        language_list = [language]
+
     # GETTEXT TRANSLATION
     # .po-files
     po_dir = os.path.join(project_root, "src", "qualcoder")
-    po_files = [os.path.join(po_dir, f'{l}.po') for l in language_list]
-    
+    po_files = [os.path.join(po_dir, f'{lang_}.po') for lang_ in language_list]
+
     # .mo-files
-    mo_files = [os.path.join(mo_basedir, l, 'LC_MESSAGES', f'{l}.mo') for l in language_list]
+    mo_basedir = os.path.join(project_root, "src", "qualcoder", "locale")
+    mo_files = [os.path.join(mo_basedir, lang_, 'LC_MESSAGES', f'{lang_}.mo') for lang_ in language_list]
 
     for po_file, mo_file in zip(po_files, mo_files):
         if os.path.exists(po_file):
@@ -150,11 +151,11 @@ def recompile_translation(lang=None):
 
     # .ts-files
     ts_dir = os.path.join(project_root, "src", "qualcoder", 'GUI')
-    ts_files = [os.path.join(ts_dir, f'app_{l}.ts') for l in language_list]
+    ts_files = [os.path.join(ts_dir, f'app_{lang_}.ts') for lang_ in language_list]
 
     # .qm-files
     qm_basedir = os.path.join(project_root, "src", "qualcoder", "locale")
-    qm_files = [os.path.join(qm_basedir, l, f'app_{l}.qm') for l in language_list]
+    qm_files = [os.path.join(qm_basedir, lang_, f'app_{lang_}.qm') for lang_ in language_list]
 
     for ts_file, qm_file in zip(ts_files, qm_files):
         if os.path.exists(ts_file):
@@ -181,8 +182,9 @@ def main():
     print("Run from the QualCoder-master folder")
     print("Choose option: --update --compile")
     print("--update updates language placeholders for ts and po files.")
-    print("--compile compiles language files ts to qm files and po to mo files NOT TESTED YET")
+    print("--compile compiles language files ts to qm files and po to mo files")
     print("--lang LANG: specify a language code (e.g., 'fr', 'es') to update/compile only that language.")
+    print("e.g. --update --lang fr")
 
 
 if __name__ == "__main__":
@@ -193,7 +195,6 @@ if __name__ == "__main__":
             lang_index = sys.argv.index("--lang") + 1
             if lang_index < len(sys.argv):
                 lang = sys.argv[lang_index]
-                
         if mode == "--update":
             update_translation_placeholders(lang)
         elif mode == "--compile":
