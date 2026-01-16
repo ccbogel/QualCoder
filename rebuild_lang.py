@@ -3,6 +3,9 @@ Using --update option
 This script updates translation placeholders in .po and Qt .ts files.
 Using --compile option
 This script compiles .po to .mo files, and .ts to .qm files.
+Using --lang option
+Change only a specific language
+
 Requires polib and PyQt5
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -58,25 +61,26 @@ def extract_pot_file(directory, pot_filename):
         print("No Python files found to extract translatable strings from.")
 
 
-def update_po_files(directory, pot_filename):
+def update_po_files(directory, pot_filename, lang=None):
     """ List all .po files within the specified directory.
     called by: update_translation_placeholders """
     for root, dirs, files in os.walk(directory):
         for file in files:
-            if file.endswith('.po'):
-                po_file = os.path.join(root, file)
-                try:
-                    # Update each .po file using msgmerge
-                    subprocess.run(
-                        ['msgmerge', '--update', po_file, pot_filename],
-                        check=True
-                    )
-                    print(f"Updated PO file: {po_file}")
-                except subprocess.CalledProcessError as exc:
-                    print(f"Error updating PO file {po_file}: {exc}")
+            if lang is None or file.startswith(lang):
+                if file.endswith('.po'):
+                    po_file = os.path.join(root, file)
+                    try:
+                        # Update each .po file using msgmerge
+                        subprocess.run(
+                            ['msgmerge', '--update', po_file, pot_filename],
+                            check=True
+                        )
+                        print(f"Updated PO file: {po_file}")
+                    except subprocess.CalledProcessError as exc:
+                        print(f"Error updating PO file {po_file}: {exc}")
 
 
-def update_qt_ts_files():
+def update_qt_ts_files(lang=None):
     """ Requires pyludate5
     pip install pyqt5-tools
     Run from QualCoder-master folder
@@ -86,6 +90,9 @@ def update_qt_ts_files():
 
     translation_files = ["app_de.ts", "app_es.ts", "app_fr.ts", "app_it.ts", "app_ja.ts",
                          "app_pt.ts", "app_sv.ts", "app_zh.ts"]
+    if lang is not None:
+        translation_files = [f for f in translation_files if f.startswith(f"app_{lang}")]
+        
     script_path = os.path.dirname(os.path.realpath(__file__))
     gui_directory = os.path.join(script_path, "src", "qualcoder", "GUI")
     print("GUI directory:", gui_directory)
@@ -100,40 +107,34 @@ def update_qt_ts_files():
         subprocess.call(cmd, shell=True, cwd=gui_directory)
 
 
-def update_translation_placeholders():
+def update_translation_placeholders(lang=None):
     """ Update po files, update GUI ts files """
 
     directory = os.path.join('src', 'qualcoder')
     pot_filename = os.path.join(directory, 'qualcoder.pot')
     extract_pot_file(directory, pot_filename)
-    update_po_files(directory, pot_filename)
-    update_qt_ts_files()
+    update_po_files(directory, pot_filename, lang)
+    update_qt_ts_files(lang)
 
 
-def recompile_translation():
+def recompile_translation(lang=None):
     project_root = os.path.dirname(os.path.abspath(__file__))
     # lrelease_path = "C:\\Users\\kai\\anaconda3\\envs\\QualCOder\\Lib\\site-packages\\qt6_applications\\Qt\\bin\\lrelease.exe"
     # lrelease_path = "/usr/bin/lrelease"
     lrelease_path = 'lrelease'
     language_list = ['de', 'en', 'es', 'fr', 'it', 'ja', 'pt', 'sv', 'zh']
-
+    if lang is not None and lang in language_list:
+        language_list = [lang]
+  
     # GETTEXT TRANSLATION
-
     # .po-files
     po_dir = os.path.join(project_root, "src", "qualcoder")
-    po_files = []
-    for lang in language_list:
-        po_files.append(os.path.join(po_dir, f'{lang}.po'))
-
+    po_files = [os.path.join(po_dir, f'{l}.po') for l in language_list]
+    
     # .mo-files
-    mo_basedir = os.path.join(project_root, "src", "qualcoder", "locale")
-    mo_files = []
-    for lang in language_list:
-        mo_files.append(os.path.join(mo_basedir, lang, 'LC_MESSAGES', f'{lang}.mo'))
+    mo_files = [os.path.join(mo_basedir, l, 'LC_MESSAGES', f'{l}.mo') for l in language_list]
 
-    for i in range(len(po_files)):
-        po_file = po_files[i]
-        mo_file = mo_files[i]
+    for po_file, mo_file in zip(po_files, mo_files):
         if os.path.exists(po_file):
             # Check if po-file has been updated and is newer than the corresponding mo-file
             if (os.path.exists(mo_file) is False) or (os.path.getmtime(po_file) > os.path.getmtime(mo_file)):
@@ -149,22 +150,16 @@ def recompile_translation():
 
     # .ts-files
     ts_dir = os.path.join(project_root, "src", "qualcoder", 'GUI')
-    ts_files = []
-    for lang in language_list:
-        ts_files.append(os.path.join(ts_dir, f'app_{lang}.ts'))
+    ts_files = [os.path.join(ts_dir, f'app_{l}.ts') for l in language_list]
 
     # .qm-files
     qm_basedir = os.path.join(project_root, "src", "qualcoder", "locale")
-    qm_files = []
-    for lang in language_list:
-        qm_files.append(os.path.join(qm_basedir, lang, f'app_{lang}.qm'))
+    qm_files = [os.path.join(qm_basedir, l, f'app_{l}.qm') for l in language_list]
 
-    for i in range(len(ts_files)):
-        ts_file = ts_files[i]
-        qm_file = qm_files[i]
+    for ts_file, qm_file in zip(ts_files, qm_files):
         if os.path.exists(ts_file):
             # Check if ts-file has been updated and is newer than the corresponding qm-file
-            if (os.path.exists(qm_file) is False) or (os.path.getmtime(ts_file) > os.path.getmtime(qm_file)):
+            if not os.path.exists(qm_file) or (os.path.getmtime(ts_file) > os.path.getmtime(qm_file)):
                 answer = input(f'Do you want to create/update "{qm_file}"? (y/n)')
                 if answer == 'y':
                     subprocess.run([lrelease_path, ts_file, "-qm", qm_file], check=True)
@@ -187,15 +182,22 @@ def main():
     print("Choose option: --update --compile")
     print("--update updates language placeholders for ts and po files.")
     print("--compile compiles language files ts to qm files and po to mo files NOT TESTED YET")
+    print("--lang LANG: specify a language code (e.g., 'fr', 'es') to update/compile only that language.")
 
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
         mode = sys.argv[1]
+        lang = None
+        if "--lang" in sys.argv:
+            lang_index = sys.argv.index("--lang") + 1
+            if lang_index < len(sys.argv):
+                lang = sys.argv[lang_index]
+                
         if mode == "--update":
-            update_translation_placeholders()
+            update_translation_placeholders(lang)
         elif mode == "--compile":
-            recompile_translation()
+            recompile_translation(lang)
         else:
             main()
     else:
