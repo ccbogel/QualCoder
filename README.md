@@ -178,7 +178,7 @@ python3 -m qualcoder
 
 ## Linux
 
-### Ubuntu Linux
+### Ubuntu / Lubuntu / ZorinOS
 
 To install from source code below, inside a virtual environment. If you are using the alternative Ubuntu Desktop manager **Xfce** you may need to run this: `sudo apt install libxcb-cursor0`
 
