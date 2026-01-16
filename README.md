@@ -28,7 +28,7 @@ On the first start of QualCoder, you may want to [setup the AI enhanced features
 
 You have two options, see Releases link on the right-hand side of this page:
 - Newer releases contain an **exe file** created on Windows 11. Double-click to run, it takes 20 seconds to start.
-- Since version 3.6, there are **Windows installers** available on the release page. 
+- There are **Windows installers** available on the release page. 
 
 On first use of the exe, Windows may ask you to allow to run QualCoder. This is because it is from an unknown publisher. It costs a lot of money to get a trusted publisher certificate - so that will not be possible for the foreseeable future. If you are uncomfortable with these warnings install from the source as detailed next.
 
@@ -36,7 +36,7 @@ On first use of the exe, Windows may ask you to allow to run QualCoder. This is 
 
 Use a virtual environment (commands in point 6 below). Not using a virtual environment may affect other Python software you may have installed.
 
-1. Download and install the Python programming language. Please use Python 3.10, 3.11 or 3.12 on Windows, other versions may cause issues  [Python3](https://www.python.org/downloads/). Download the latest "Windows installer (64-bit)" (or the one matching your architecture) for one of the above mentioned Python versions.
+1. Download and install the Python programming language. Please use Python 3.11 to 3.14 on Windows.  [Python3](https://www.python.org/downloads/). Download the latest "Windows installer (64-bit)" (or the one matching your architecture) for one of the above mentioned Python versions.
 
 IMPORTANT: in the first window of the installation mark the option "Add Python to PATH"
 
@@ -54,7 +54,7 @@ cd Downloads\QualCoder-master
 
 6. Install the virtual environment and required python modules. 
 
-The `py` command uses the most recent installed version of Python. The `py` command does not work on all Windows OS, you may instead replace `py` with `python3`. You can use a specific version on your Windows if you have many Python versions installed, e.g. `py -3.10`. See discussion here: [Difference between py and python](https://stackoverflow.com/questions/50896496/what-is-the-difference-between-py-and-python-in-the-terminal)
+The `py` command uses the most recent installed version of Python. The `py` command does not work on all Windows OS, you may instead replace `py` with `python3`. You can use a specific version on your Windows if you have many Python versions installed, e.g. `py -3.12`. See discussion here: [Difference between py and python](https://stackoverflow.com/questions/50896496/what-is-the-difference-between-py-and-python-in-the-terminal)
 
 The install may take up to 10 minutes. On some Windows OS you may need to replace the _py_ command with _python3_ below: 
 
@@ -65,13 +65,7 @@ py -m pip install --upgrade pip
 py -m pip install -r requirements.txt
 ```
 
-7. Run QualCoder from the command prompt, versions up to 3.6
-
-```bash
-py -m qualcoder
-```
-
-Latest code, version 3.7 and up, cd to the inner src folder first:
+7. Run QualCoder from the command prompt. Latest code, version 3.7 and newer, cd to the inner src folder first:
 
 ```bash
 cd src
@@ -92,14 +86,7 @@ If you are not using a virtual environment, as long as you are in the same drive
 
 If you are using a virtual environment:
 
-`cd` to the Qualcoder-master (or Qualcoder release folder) for versions up to 3.6:
-
-```
-env\Scripts\activate 
-py -m qualcoder
-```
-
-`cd` to the Qualcoder-master (or Qualcoder release folder) for versions 3.7and up:. 
+`cd` to the src folder inside the Qualcoder-master (or Qualcoder release folder):
 
 ```
 env\Scripts\activate
@@ -136,7 +123,7 @@ Use a virtual environment (commands in point 6 below). Not using a virtual envir
 
 4. Use the Terminal app (`Applications -> Utilities -> Terminal`).
 
-5. In the terminal, move (using the `cd` command) into the QualCoder folder. You should be inside the QualCoder-master folder or if using a release (the Qualcoder-3.6 folder). e.g. 
+5. In the terminal, move (using the `cd` command) into the QualCoder folder. You should be inside the QualCoder-master folder or if using a release (e.g. Qualcoder-3.8 folder). e.g. 
 
 ```bash
 cd Downloads/QualCoder-master
@@ -158,11 +145,11 @@ pip3 install -r requirements.txt
 7. Run QualCoder from the command prompt
 
 ```bash
-cd src # only for version 3.7 and newer
+cd src
 python3 -m qualcoder # python and python3 are equivalent withing a virtual environment
 ```
 
-8. If running QualCoder in a virtual environment (which you should), to exit the virtual environment type:
+8. If running QualCoder in a virtual environment, to exit the virtual environment type:
 
 ```bash
 deactivate
@@ -176,7 +163,7 @@ If you are not using a virtual environment:
 
 ```bash
 cd Downloads/QualCoder-master
-cd src # only for version 3.7 and newer
+cd src 
 python3 -m qualcoder
 ```
 
@@ -185,15 +172,13 @@ If you are using a virtual environment:
 ```bash
 cd Downloads/QualCoder-master
 source env/bin/activate
-cd src # only for version 3.7 and newer
+cd src 
 python3 -m qualcoder
 ```
 
 ## Linux
 
 ### Ubuntu Linux
-
-There is a link to an executable file (double-click to run) for Ubuntu in the 3.6 release. 
 
 To install from source code below, inside a virtual environment. If you are using the alternative Ubuntu Desktop manager **Xfce** you may need to run this: `sudo apt install libxcb-cursor0`
 
@@ -207,9 +192,9 @@ To install from source code below, inside a virtual environment. If you are usin
 
 4. Set up virtual environment and install python modules. The virtual environment will be in its own folder called env. Installing required modules takes a while.
 
-For example you might be in this folder, where you unzipped Qualcoder: 
+For example you might be in this folder, where you unzipped QualCoder: 
 
-yourcomputer:~Downloads/QualCoder-3.7
+yourcomputer:~Downloads/QualCoder-3.8
 
 ```
 python3.12 -m venv env
@@ -218,8 +203,7 @@ pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-5. Latest code, version 3.7 and up, cd to the inner src folder first:
-
+5. Move to the inner src folder, then:
 ```
 cd src
 python3 -m qualcoder
@@ -279,48 +263,6 @@ These instructions are adapted from the Fedora 42 instructions below, tested wit
     python3.12 -m qualcoder
     ```
 
-### Fedora 42
-
-These instructions download the current source code directly from GitHub. Note: Fedora uses Wayland which may not work well with the Qt graphical interface. It is suggested you also install Xwayland.
-Audio and video coding - the software crashes and for now a solution has not been found.
-
-`sudo dnf install python3.12`
-
-```
-virtualenv env
-source env/bin/activate
-python3.12 -m ensurepip
-python3.12 -m pip install --upgrade pip
-git clone https://github.com/ccbogel/QualCoder.git
-cd QualCoder
-python3.12 -m pip install -r requirements.txt
-```
-To run QualCoder 3.6:
-```
-python3.12 -m qualcoder
-```
-
-Latest code, version 3.7 and up, cd to the inner src folder first:
-
-```
-cd src
-python3.12 -m qualcoder
-```
-
-To deactivate the virtual environment:
-
-`deactivate` 
-
-**Usage:**
-
-At any time `cd` to the Qualcoder folder (if running QualCoder 3.7+ then cd to the inner src folder cd src`) and enter the following commands: 
-
-```
-cd QualCoder
-source env/bin/activate
-python3.12 -m qualcoder
-```
-
 On finishing type `deactivate` to exit the virtual environment.
 
 Note re Fedora. This is an issue with coding audio / video. The software crashes, and unable to find a solution to this for now.
@@ -343,11 +285,9 @@ pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-Now, the command to start QualCoder, for versions up to 3.6:
+Now, the command to start QualCoder:
 
-`python3 -m qualcoder`
-
-Latest code, version 3.7 and up, cd to the inner src folder first:
+Move to the inner src folder first:
 
 ```
 cd src
@@ -358,7 +298,7 @@ After using QualCoder deactiatve the virtual environment.
 
 `deactivate`
 
-Usage any time after the install, move to the folder (then to inner src folder if using 3.7 and up), then:
+Usage any time after the install, move to the folder, then to inner src folder, then:
 
 ```
 cd QualCoder
@@ -384,8 +324,8 @@ QualCoder is distributed under the LGPLv3 LICENSE.
 
 ##  Citation APA style
 
-Curtain, C. Dröge, K. (2025) QualCoder 3.7 [Computer software]. Retrieved from
-https://github.com/ccbogel/QualCoder/releases/tag/3.7
+Curtain, C. Dröge, K. (2025) QualCoder 3.8 [Computer software]. Retrieved from
+https://github.com/ccbogel/QualCoder/releases/tag/3.8
 
 ## Creator
 
