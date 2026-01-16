@@ -197,7 +197,7 @@ For example you might be in this folder, where you unzipped QualCoder:
 yourcomputer:~Downloads/QualCoder-3.8
 
 ```
-python3.12 -m venv env
+python3 -m venv env
 source env/bin/activate
 pip install --upgrade pip
 pip install -r requirements.txt
