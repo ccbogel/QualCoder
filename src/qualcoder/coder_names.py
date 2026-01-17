@@ -413,4 +413,4 @@ class DialogCoderNames(QtWidgets.QDialog):
 
     def help(self):
         """ Open help in browser. """
-        self.app.help_wiki("2.4.-Working-in-a-Team/#important-considerations-regarding-coder-names")
+        self.app.help_wiki("2.4.-Working-in-a-Team")
