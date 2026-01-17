@@ -54,7 +54,7 @@
     <message>
         <location filename="ui_dialog_charts.py" line="289"/>
         <source>Select coder</source>
-        <translation>Codierer auswählen</translation>
+        <translation>Coder:in auswählen</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="290"/>
@@ -211,7 +211,7 @@ Für die Berechnungen werden Codierungen aus der gesamten Textdatei verwendet.</
     <message>
         <location filename="ui_dialog_charts.py" line="324"/>
         <source>&lt;b&gt;Cumulative barchart&lt;/b&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;b&gt;Kumulatives Balkendiagramm&lt;/b&gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="325"/>
@@ -220,12 +220,16 @@ This is temporary and must be selected each time the Charts screen is opened.
 
 The file must be plain text with one word per line.
 Each word is excluded in the n-grams=1 Word cloud.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wenn Sie hier eine Textdatei auswählen, werden sowohl die in der Software vorhandenen Stoppwörter als auch die im .qualcoder-Konfigurationsordner überschrieben. 
+Dies ist temporär und muss jedes Mal ausgewählt werden, wenn der Diagramm-Bildschirm geöffnet wird.
+
+Die Datei muss reiner Text mit einem Wort pro Zeile sein.
+Jedes Wort wird in der n-grams=1 Wortwolke ausgeschlossen.</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="330"/>
         <source>Stop words</source>
-        <translation type="unfinished"></translation>
+        <translation>Stoppwörter</translation>
     </message>
 </context>
 <context>
@@ -728,12 +732,12 @@ ausgewählt: Einer der gewählten Codes muss passen</translation>
     <message>
         <location filename="ui_ai_search.py" line="215"/>
         <source>TextLabel</source>
-        <translation type="unfinished"></translation>
+        <translation>Textbeschriftung</translation>
     </message>
     <message>
         <location filename="ui_ai_search.py" line="216"/>
         <source>Select coders</source>
-        <translation type="unfinished"></translation>
+        <translation>Coder:in auswählen</translation>
     </message>
 </context>
 <context>
@@ -751,7 +755,7 @@ ausgewählt: Einer der gewählten Codes muss passen</translation>
     <message>
         <location filename="ui_dialog_code_relations.py" line="150"/>
         <source>Export file</source>
-        <translation type="unfinished">csv datei exportieren</translation>
+        <translation>Datei exportieren</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="151"/>
@@ -761,12 +765,12 @@ ausgewählt: Einer der gewählten Codes muss passen</translation>
     <message>
         <location filename="ui_dialog_code_relations.py" line="152"/>
         <source>This coder</source>
-        <translation>Dieser Codierer</translation>
+        <translation>Diese Coder:in</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="153"/>
         <source>All coders</source>
-        <translation>Alle Codierer</translation>
+        <translation>Alle Coder:innen</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_relations.py" line="172"/>
@@ -977,7 +981,7 @@ Geordnet nach Dateiname und Codename.</translation>
     <message>
         <location filename="ui_dialog_import.py" line="94"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delimiter must be a single character.&lt;/p&gt;&lt;p&gt;Enter &apos;ta&apos; for &apos;tab&apos;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Trennzeichen muss ein einzelnes Zeichen sein.&amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Eingeben 'ta' zum 'tab'</translation>
+        <translation>Trennzeichen muss ein einzelnes Zeichen sein.&amp;lt;/p&amp;gt;&amp;lt;p&amp;gt;Eingeben &apos;ta&apos; zum &apos;tab&apos;</translation>
     </message>
     <message>
         <location filename="ui_dialog_import.py" line="95"/>
@@ -1652,12 +1656,12 @@ Dann wird ein Menü mit Optionen geöffnet.</translation>
     <message>
         <location filename="ui_dialog_code_image.py" line="222"/>
         <source>Coder visibility</source>
-        <translation type="unfinished"></translation>
+        <translation>Sichtbarkeit Coder:innen</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_image.py" line="223"/>
         <source>...</source>
-        <translation type="unfinished">...</translation>
+        <translation>...</translation>
     </message>
 </context>
 <context>
@@ -1847,12 +1851,12 @@ Markieren Sie Alle Dateien für die Suche nach allen Dateien. Klicken Sie mit de
     <message>
         <location filename="ui_dialog_code_pdf.py" line="300"/>
         <source>Coder visibility</source>
-        <translation type="unfinished"></translation>
+        <translation>Sichtbarkeit Coder:innen</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="301"/>
         <source>...</source>
-        <translation type="unfinished">...</translation>
+        <translation>...</translation>
     </message>
 </context>
 <context>
@@ -1938,7 +1942,7 @@ Markieren Sie Alle Dateien für die Suche nach allen Dateien. Klicken Sie mit de
     <message>
         <location filename="ui_dialog_code_text.py" line="448"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete all codes by this coder from this file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Löschen Sie alle Codes dieses Codierers aus dieser Datei</translation>
+        <translation>Löschen Sie alle Codes dieser Coder:in aus dieser Datei</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="449"/>
@@ -2090,7 +2094,7 @@ Dies kann zu Fehlern in den zugewiesenen Positionen führen. </translation>
     <message>
         <location filename="ui_dialog_code_text.py" line="468"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;After editing the text:&lt;/p&gt;&lt;p&gt;Review edited text to confirm code positions are correct. Press button to Undo edited text, if code postions are incorrect. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Nach der Textbearbeitung:&lt;/p&gt;&lt;p&gt;Überprüfen Sie, ob die Code-Positionen korrekt sind. Klicken Sie auf die Schaltfläche 'Rückgängig', wenn die Code-Positionen falsch sein sollten.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Nach der Textbearbeitung:&lt;/p&gt;&lt;p&gt;Überprüfen Sie, ob die Code-Positionen korrekt sind. Klicken Sie auf die Schaltfläche &apos;Rückgängig&apos;, wenn die Code-Positionen falsch sein sollten.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="496"/>
@@ -2206,29 +2210,35 @@ Limited to names up to 63 characters long.
 The name must be at the start of a new line.
 Formatted like below for name detection.
 &quot;Name:&quot;, &quot;{Name}, or &quot;[Name]&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>Sprecher:innen markieren.
+Namen dürfen max. 63 Zeichen lang sein.
+Sie müssen am Anfang einer neuen Zeile stehen.
+Folgende Formate werden unterstützt:
+&quot;Name:&quot;, &quot;{Name}&quot;, oder &quot;[Name]&quot;</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="434"/>
         <source>Auto code with exact text.
 Right click for options: all, first, last, within another code.</source>
-        <translation type="unfinished"></translation>
+        <translation>Automatisch mit exaktem Text kodieren.
+Rechtsklick für Optionen: alle, erstes, letztes, innerhalb eines anderen Codes.</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="445"/>
         <source>Text fragment to auto code sentences.
 Right click for options: all (default), first, code within code.</source>
-        <translation type="unfinished"></translation>
+        <translation>Textfragment zum automatischen Kodieren von Sätzen.
+Rechtsklick für Optionen: alle (Standard), erstes, Code innerhalb eines Codes.</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="488"/>
         <source>Coder visibility</source>
-        <translation type="unfinished"></translation>
+        <translation>Sichtbarkeit Coder:innen</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="489"/>
         <source>...</source>
-        <translation type="unfinished">...</translation>
+        <translation>...</translation>
     </message>
 </context>
 <context>
@@ -2236,42 +2246,42 @@ Right click for options: all (default), first, code within code.</source>
     <message>
         <location filename="ui_dialog_coder_names.py" line="81"/>
         <source>Coders</source>
-        <translation type="unfinished"></translation>
+        <translation>Coder:innen</translation>
     </message>
     <message>
         <location filename="ui_dialog_coder_names.py" line="82"/>
         <source>Choose (✓) your coder name. Adjust visibility of others:</source>
-        <translation type="unfinished"></translation>
+        <translation>Wählen (✓) Sie Ihren Coder:innen-Namen und passen Sie die Sichtbarkeit der anderen an:</translation>
     </message>
     <message>
         <location filename="ui_dialog_coder_names.py" line="83"/>
         <source>Add a new coder name</source>
-        <translation type="unfinished"></translation>
+        <translation>Neue Coder:in hinzufügen</translation>
     </message>
     <message>
         <location filename="ui_dialog_coder_names.py" line="84"/>
         <source>New</source>
-        <translation type="unfinished">Neu</translation>
+        <translation>Neu</translation>
     </message>
     <message>
         <location filename="ui_dialog_coder_names.py" line="85"/>
         <source>Warning: If you choose another name to merge into, there is no undo. Make a project backup first.</source>
-        <translation type="unfinished"></translation>
+        <translation>Warnung: Wenn Sie zwei Coder:innen zusammenführen, lässt sich dies nicht rückgängig machen. Erstellen Sie vorher ein Backup des Projekts.</translation>
     </message>
     <message>
         <location filename="ui_dialog_coder_names.py" line="86"/>
         <source>Rename</source>
-        <translation type="unfinished">Umbenennen</translation>
+        <translation>Umbenennen</translation>
     </message>
     <message>
         <location filename="ui_dialog_coder_names.py" line="87"/>
         <source>Warning: There is no undo. Make a project backup first.</source>
-        <translation type="unfinished"></translation>
+        <translation>Warnung: Rückgängig nicht möglich. Erstellen Sie vorher ein Backup des Projekts.</translation>
     </message>
     <message>
         <location filename="ui_dialog_coder_names.py" line="88"/>
         <source>Merge</source>
-        <translation type="unfinished"></translation>
+        <translation>Zusammenführen</translation>
     </message>
 </context>
 <context>
@@ -2622,7 +2632,10 @@ Nachdem alle Textdateien importiert wurden, entfernen Sie diese Datei aus dem Pr
 The speaker name must be at the start of a new line and less than 64 characters long.
 Formatted like below for name detection.
 &quot;Name:&quot;, &quot;{Name} or &quot;[Name]&quot;</source>
-        <translation type="unfinished"></translation>
+        <translation>Wählen Sie ein Transkript aus, um Sprecher:innen darin zu markieren.
+Der Name muss am Anfang einer neuen Zeile stehen und darf max. 63 Zeichen lang sein.
+Folgende Formate werden unterstützt:
+&quot;Name:&quot;, &quot;{Name}&quot; oder &quot;[Name]&quot;</translation>
     </message>
 </context>
 <context>
@@ -2835,7 +2848,7 @@ Groß-/Kleinschreibung beachten, mehrere Einträge für jeden Begriff hinzufüge
     <message>
         <location filename="ui_dialog_report_code_frequencies.py" line="83"/>
         <source>Code and category frequencies: overall and by coder</source>
-        <translation>Code- und Kategoriefrequenzen: insgesamt und nach Codierer</translation>
+        <translation>Code- und Kategoriefrequenzen: insgesamt und nach Coder:in</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_code_frequencies.py" line="87"/>
@@ -3068,7 +3081,7 @@ Groß-/Kleinschreibung beachten, mehrere Einträge für jeden Begriff hinzufüge
         <source>To compare coding.
 Select two coders, one file, one code.</source>
         <translation>So vergleichen Sie die Codierung.
-Wählen Sie zwei Codierer, eine Datei, einen Code.</translation>
+Wählen Sie zwei Coder:innen, eine Datei, einen Code</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_compare_coder_file.py" line="101"/>
@@ -3083,7 +3096,7 @@ Wählen Sie zwei Codierer, eine Datei, einen Code.</translation>
     <message>
         <location filename="ui_dialog_report_compare_coder_file.py" line="102"/>
         <source>Coders selected</source>
-        <translation>Ausgewählte Codierer</translation>
+        <translation>Ausgewählte Coder:in</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_compare_coder_file.py" line="104"/>
@@ -3103,7 +3116,7 @@ Wählen Sie zwei Codierer, eine Datei, einen Code.</translation>
     <message>
         <location filename="ui_dialog_report_compare_coder_file.py" line="105"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Run comparison.&lt;/p&gt;&lt;p&gt;Select 2 coders, 1 file, 1 code.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Vergleich durchführen. Wählen Sie 2 Codierer, 1 Datei, 1 Code.</translation>
+        <translation>Vergleich durchführen. Wählen Sie 2 Coder:innen, 1 Datei, 1 Code.</translation>
     </message>
 </context>
 <context>
@@ -3111,7 +3124,7 @@ Wählen Sie zwei Codierer, eine Datei, einen Code.</translation>
     <message>
         <location filename="ui_dialog_report_comparisons.py" line="79"/>
         <source>Coder Comparisons</source>
-        <translation>Codierer Vergleiche</translation>
+        <translation>Coder:innen Vergleiche</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_comparisons.py" line="82"/>
@@ -3121,7 +3134,7 @@ Wählen Sie zwei Codierer, eine Datei, einen Code.</translation>
     <message>
         <location filename="ui_dialog_report_comparisons.py" line="86"/>
         <source>Coders selected:</source>
-        <translation>Ausgewählte Codierer:</translation>
+        <translation>Ausgewählte Coder:innen:</translation>
     </message>
     <message>
         <location filename="ui_dialog_report_comparisons.py" line="80"/>
@@ -3151,7 +3164,7 @@ Wählen Sie zwei Codierer, eine Datei, einen Code.</translation>
     <message>
         <location filename="ui_dialog_report_comparisons.py" line="83"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select two coders&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>Zwei Codierer auswählen</translation>
+        <translation>Zwei Coder:innen auswählen</translation>
     </message>
 </context>
 <context>
@@ -3332,13 +3345,13 @@ Verwenden Sie keine Apostrophe oder Kommas in den Werten.</translation>
     <message>
         <location filename="ui_dialog_settings.py" line="547"/>
         <source>Current coder: </source>
-        <translation>Aktueller Codierer: </translation>
+        <translation>Aktuelle Coder:in: </translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="544"/>
         <source>Set this name as the current coder.
 </source>
-        <translation>Legen Sie diesen Namen als den aktuellen Codierer fest.</translation>
+        <translation>Legen Sie diesen Namen als aktuelle Coder:in fest.</translation>
     </message>
     <message>
         <location filename="ui_dialog_settings.py" line="582"/>
@@ -3635,7 +3648,7 @@ Nicht empfohlen, es sei denn, Sie haben viele große Dateien, die die Sicherung 
     <message>
         <location filename="ui_dialog_settings.py" line="546"/>
         <source>Change</source>
-        <translation type="unfinished"></translation>
+        <translation>Ändern</translation>
     </message>
 </context>
 <context>
@@ -3643,18 +3656,19 @@ Nicht empfohlen, es sei denn, Sie haben viele große Dateien, die die Sicherung 
     <message>
         <location filename="ui_dialog_speakers.py" line="53"/>
         <source>Mark Speakers</source>
-        <translation type="unfinished"></translation>
+        <translation>Sprecher:innen markieren</translation>
     </message>
     <message>
         <location filename="ui_dialog_speakers.py" line="54"/>
         <source>The following speaker names were detected in the document. 
 Select (✓) the ones you want to mark. Clicking OK creates a code for each selected speaker in the “📌 Speakers” category and assigns all corresponding text segments. Doubleclick to edit the &quot;code as&quot; name in the table. To merge two speakers (e.g. to correct a typo), rename the &quot;code as&quot; in one entry so that it exactly matches the other.</source>
-        <translation type="unfinished"></translation>
+        <translation>Die folgenden Sprecher:innen wurden im Dokument erkannt. 
+Wählen (✓) Sie aus, wen Sie markieren möchten. Wenn Sie OK klicken, wird für jeden ausgewählten Namen ein Code in der Kategorie „📌 Sprecher:innen“ erstellt und alle entsprechenden Textsegmente werden zugewiesen. Mit Doppelklick können sie den „codieren als“-Eintrag in der Tabelle bearbeiten. Um zwei Namen zusammenzuführen (z. B. bei einem Tippfehler), ändern Sie den „codieren als“-Eintrag so, dass er exakt dem anderen Namen entspricht.</translation>
     </message>
     <message>
         <location filename="ui_dialog_speakers.py" line="56"/>
         <source>Doubleclick a &quot;coded as&quot; name to edit</source>
-        <translation type="unfinished"></translation>
+        <translation>Zum Bearbeiten auf &quot;codieren als&quot;-Eintrag doppelklicken</translation>
     </message>
 </context>
 <context>
@@ -4079,8 +4093,8 @@ Codieren Sie diesen Text erst, wenn Sie Codieren - Text codieren aus der Menüle
     </message>
     <message>
         <location filename="ui_dialog_view_text.py" line="79"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot &#xe2;&#x80;&#x98;.&#xe2;&#x80;&#x99; is used as a wild card, e.g. &#xe2;&#x80;&#x98;.ears&#xe2;&#x80;&#x99; will match &#xe2;&#x80;&#x98;bears&#xe2;&#x80;&#x99; and &#xe2;&#x80;&#x98;years&#xe2;&#x80;&#x99;. &lt;/p&gt;&lt;p&gt;A &#xe2;&#x80;&#x98;?&#xe2;&#x80;&#x99; after a character will match one or none times that character, e.g. &#xe2;&#x80;&#x98;bears?&#xe2;&#x80;&#x99; will match &#xe2;&#x80;&#x98;bear&#xe2;&#x80;&#x99; and &#xe2;&#x80;&#x98;bears&#xe2;&#x80;&#x99; &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A &#xe2;&#x80;&#x98;*&#xe2;&#x80;&#x99; after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;&#xe2;&#x80;&#x98;&lt;/span&gt;\. will match the dot symbol, &#xe2;&#x80;&#x98;\?&#xe2;&#x80;&#x99; will match the question mark. &#xe2;&#x80;&#x98;\n&#xe2;&#x80;&#x99; will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished">Die Suche verwendet Regex-Funktionen. </translation>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot â.â is used as a wild card, e.g. â.earsâ will match âbearsâ and âyearsâ. &lt;/p&gt;&lt;p&gt;A â?â after a character will match one or none times that character, e.g. âbears?â will match âbearâ and âbearsâ &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A â*â after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;â&lt;/span&gt;\. will match the dot symbol, â\?â will match the question mark. â\nâ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Die Suche verwendet Regex-Funktionen.&lt;/p&gt;&lt;p&gt;Ein Punkt ‘.’ wird als Platzhalter verwendet, z.B. ‘.ears’ wird ‘bears’ und ‘years’ entsprechen.&lt;/p&gt;&lt;p&gt;Ein ‘?’ nach einem Zeichen erlaubt kein- oder genau einmaliges Vorkommen dieses Zeichens, z.B. ‘bears?’ findet ‘bear’ und ‘bears’.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;Ein ‘*’ nach einem Zeichen erlaubt kein- oder mehrmaliges Vorkommen. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;‘&lt;/span&gt;\. entspricht dem Punkt-Symbol, ‘\?’ dem Fragezeichen. ‘\n’ entspricht dem Zeilenende-Symbol.&lt;/p&gt;&lt;p&gt;Regex Cheatsheet: &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -4256,7 +4270,7 @@ Codieren Sie diesen Text erst, wenn Sie Codieren - Text codieren aus der Menüle
     <message>
         <location filename="ui_main.py" line="346"/>
         <source>Graph</source>
-        <translation type="unfinished">Diagramm anzeigen</translation>
+        <translation>Graph</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="348"/>

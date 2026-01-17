@@ -17,6 +17,9 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.5\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Language: de\n"
+"X-Source-Language: en\n"
 
 #: src\qualcoder\add_attribute.py:76
 msgid "This attribute name already exists in cases, files or journals."
@@ -86,9 +89,10 @@ msgid ""
 "No codings found for this particuar combination of coder, document filter, "
 "and code."
 msgstr ""
+"Keine Kodierungen gefunden für diese Kombination aus Koder, Dokument und "
+"Kode."
 
 #: src\qualcoder\ai_chat.py:385
-#, fuzzy
 msgid "Code analysis"
 msgstr "KI Code Analyse"
 
@@ -351,9 +355,9 @@ msgid ""
 "Error: The AI returned an empty result. This may indicate that the AI model "
 "is not available at the moment. Try again later or choose a different model."
 msgstr ""
-"Fehler: Die KI hat ein leeres Ergebnis geliefert. Möglicherweise ist das KI-"
-"Modell im Moment nicht verfügbar. Versuchen Sie es später erneut oder wählen "
-"Sie ein anderes Modell."
+"Fehler: Die KI hat ein leeres Ergebnis geliefert. Möglicherweise ist das "
+"KI-Modell im Moment nicht verfügbar. Versuchen Sie es später erneut oder "
+"wählen Sie ein anderes Modell."
 
 #: src\qualcoder\ai_chat.py:1302
 msgid "Error communicating with "
@@ -388,9 +392,8 @@ msgid "AI Chat"
 msgstr "KI Chat"
 
 #: src\qualcoder\ai_llm.py:88
-#, fuzzy
 msgid "AI Models"
-msgstr "KI Modell:"
+msgstr "KI Modelle"
 
 #: src\qualcoder\ai_llm.py:88
 msgid "Loading list of available AI models..."
@@ -406,8 +409,8 @@ msgstr ""
 "Sie nutzen den Dienst „Blablador” auf einem alten Server, der bald "
 "deaktiviert wird. Ihre Konfiguration wird automatisch aktualisiert. Bitte "
 "testen Sie, ob der KI-Zugriff weiterhin wie erwartet funktioniert. "
-"Möglicherweise müssen Sie im Einstellungsdialog unter „Erweiterte KI-"
-"Einstellungen” zu einem anderen KI-Modell wechseln."
+"Möglicherweise müssen Sie im Einstellungsdialog unter „Erweiterte "
+"KI-Einstellungen” zu einem anderen KI-Modell wechseln."
 
 #: src\qualcoder\ai_llm.py:324 src\qualcoder\ai_llm.py:478
 msgid "AI Setup"
@@ -431,20 +434,19 @@ msgid ""
 "newer model, such as GPT 4.1. Go to Project > Settings to change the AI "
 "profile and model."
 msgstr ""
-"AI: Sie verwenden immer noch den veralteten GPT-4-Turbo. Erwägen Sie den "
-"Wechsel zu einem neueren Modell, z. B. GPT 4.1. Gehen Sie zu Projekt > "
-"Einstellungen, um das AI-Profil und -Modell zu ändern."
+"KI: Sie verwenden immer noch das veraltete GPT-4-Turbo. Erwägen Sie den "
+"Wechsel zu einem neueren Modell, z. B. GPT 5.2. Gehen Sie zu Projekt > "
+"Einstellungen, um das KI-Profil und -Modell zu ändern."
 
 #: src\qualcoder\ai_llm.py:500
-#, fuzzy
 msgid ""
 "AI: You are using the outdated Claude Opus 4 model from Anthropic. Consider "
 "switching to a newer model, such as Opus 4.1. Go to Project > Settings to "
 "change the AI profile and model."
 msgstr ""
-"AI: Sie verwenden immer noch den veralteten GPT-4-Turbo. Erwägen Sie den "
-"Wechsel zu einem neueren Modell, z. B. GPT 4.1. Gehen Sie zu Projekt > "
-"Einstellungen, um das AI-Profil und -Modell zu ändern."
+"KI: Sie verwenden das veraltete Claude Opus 4 Modell von Anthropic. Erwägen "
+"Sie den Wechsel zu einem neueren Modell, z. B. Opus 4.1. Gehen Sie zu "
+"Projekt > Einstellungen, um das KI-Profil und -Modell zu ändern."
 
 #: src\qualcoder\ai_llm.py:509
 msgid "Please enter an API-key for the AI in the following dialog."
@@ -575,9 +577,8 @@ msgid "1) Which topic do you want to analyze?"
 msgstr "1) Welches Thema möchten Sie analysieren?"
 
 #: src\qualcoder\ai_search_dialog.py:115 src\qualcoder\ai_search_dialog.py:356
-#, fuzzy
 msgid "Coders: "
-msgstr "Coder: "
+msgstr "Coder:in: "
 
 #: src\qualcoder\ai_search_dialog.py:135
 msgid "The last used prompt"
@@ -654,12 +655,11 @@ msgid "Codes and categories"
 msgstr "Codes und Kategorien"
 
 #: src\qualcoder\ai_search_dialog.py:345
-#, fuzzy
 msgid "Coder selection"
-msgstr "Chat Auswahl"
+msgstr "Auswahl Coder:in"
 
-#: src\qualcoder\ai_search_dialog.py:423 src\qualcoder\report_attributes.py:450
-#: src\qualcoder\view_charts.py:229
+#: src\qualcoder\ai_search_dialog.py:423
+#: src\qualcoder\report_attributes.py:450 src\qualcoder\view_charts.py:229
 msgid "Show files:"
 msgstr "Dateien anzeigen:"
 
@@ -1081,7 +1081,8 @@ msgid "Open"
 msgstr "Öffnen"
 
 #: src\qualcoder\cases.py:1101 src\qualcoder\case_file_manager.py:448
-#: src\qualcoder\edit_textfile.py:583 src\qualcoder\report_exact_matches.py:653
+#: src\qualcoder\edit_textfile.py:583
+#: src\qualcoder\report_exact_matches.py:653
 #: src\qualcoder\report_relations.py:534 src\qualcoder\report_sql.py:417
 msgid "Select all"
 msgstr "Alles auswählen"
@@ -1096,7 +1097,8 @@ msgstr "Kopieren"
 msgid "Right click to view"
 msgstr "Rechtsklick zur Ansicht"
 
-#: src\qualcoder\case_file_manager.py:96 src\qualcoder\code_in_all_files.py:140
+#: src\qualcoder\case_file_manager.py:96
+#: src\qualcoder\code_in_all_files.py:140
 #: src\qualcoder\code_in_all_files.py:218 src\qualcoder\code_pdf.py:385
 #: src\qualcoder\code_text.py:511 src\qualcoder\helpers.py:218
 #: src\qualcoder\report_attributes.py:465 src\qualcoder\report_codes.py:2319
@@ -1227,21 +1229,20 @@ msgid "Code:"
 msgstr "Code:"
 
 #: src\qualcoder\coder_names.py:72
-#, fuzzy
 msgid "Codings"
-msgstr "Kodierungen:"
+msgstr "Codierungen:"
 
 #: src\qualcoder\coder_names.py:72
 msgid "Visibility"
-msgstr ""
+msgstr "Sichtbarkeit"
 
 #: src\qualcoder\coder_names.py:166
 msgid "visible"
-msgstr ""
+msgstr "Anzeigen"
 
 #: src\qualcoder\coder_names.py:166
 msgid "hidden"
-msgstr ""
+msgstr "Ausblenden"
 
 #: src\qualcoder\coder_names.py:202 src\qualcoder\coder_names.py:213
 #: src\qualcoder\coder_names.py:226 src\qualcoder\coder_names.py:237
@@ -1253,81 +1254,81 @@ msgstr ""
 #: src\qualcoder\journals.py:187 src\qualcoder\report_exact_matches.py:460
 #: src\qualcoder\__main__.py:1766
 msgid "Coder"
-msgstr "Coder"
+msgstr "Coder:in"
 
 #: src\qualcoder\coder_names.py:202
 msgid "One coder must be selected. Choose another one if you want to change."
 msgstr ""
+"Es muss immer ein:e Coder:in ausgewählt sein. Wechseln Sie ggf. zu einem "
+"anderen Namen."
 
 #: src\qualcoder\coder_names.py:213
 msgid "You cannot hide the current coder."
-msgstr ""
+msgstr "Sie können die aktuelle Coder:in nicht ausblenden."
 
 #: src\qualcoder\coder_names.py:229
-#, fuzzy
 msgid "New coder name:"
-msgstr "Neuer Codename"
+msgstr "Neuer Name:"
 
 #: src\qualcoder\coder_names.py:237
-#, fuzzy
 msgid "Name already exists."
-msgstr "Das gibt es schon"
+msgstr "Dieser Name existiert bereits."
 
 #: src\qualcoder\coder_names.py:241
-#, fuzzy
 msgid "Open a project first."
-msgstr "Projektverzeichnis öffnen"
+msgstr "Öffnen Sie zuerst ein Projekt."
 
 #: src\qualcoder\coder_names.py:257
 msgid "An error occurred while renaming."
-msgstr ""
+msgstr "Bei der Umbenennung ist ein Fehler aufgetreten."
 
 #: src\qualcoder\coder_names.py:283
 msgid "An error occurred while changing the name in \"{}\"."
-msgstr ""
+msgstr "Bei der Umbenennung in \"{}\" ist ein Fehler aufgetreten."
 
 #: src\qualcoder\coder_names.py:333
-#, fuzzy
 msgid "No name selected."
-msgstr "Keine Umfrage ausgewählt."
+msgstr "Keine Name ausgewählt."
 
 #: src\qualcoder\coder_names.py:338
-#, fuzzy
 msgid "Merge \"{}\" into:"
-msgstr "Code in Code einbinden"
+msgstr "Code \"{}\" zusammenführen mit:"
 
 #: src\qualcoder\coder_names.py:357
 msgid "Rename \"{}\" into:"
-msgstr ""
+msgstr "\"{}\" umbenennen in:"
 
 #: src\qualcoder\coder_names.py:365
 msgid "Old and new name are identical."
-msgstr ""
+msgstr "Der alte und der neue Name sind identisch."
 
 #: src\qualcoder\coder_names.py:368
-#, fuzzy
 msgid "Coder name cannot be empty."
-msgstr "Der Name darf nicht leer sein"
+msgstr "Der Name darf nicht leer sein."
 
 #: src\qualcoder\coder_names.py:377
 msgid "The coder name you want to merge into does not exist."
-msgstr ""
+msgstr "Der Ziel-Name für die Zusammenführung existiert nicht."
 
 #: src\qualcoder\coder_names.py:380
-#, fuzzy
 msgid "The new coder name already exists."
-msgstr "Dieser Codename wird bereits verwendet."
+msgstr "Dieser Name wird bereits verwendet."
 
 #: src\qualcoder\coder_names.py:384
 msgid ""
 "An error occurred during merging or renaming. All changes were reverted."
 msgstr ""
+"Während des Zusammenführens oder Umbenennens ist ein Feher aufgetreten. Alle "
+"Änderungen wurden zurückgesetzt."
 
 #: src\qualcoder\coder_names.py:386
 msgid ""
 "The merge or rename was successful. If you made a mistake, you can undo all "
 "changes by canceling the Coders dialog."
 msgstr ""
+"Das Zusammenführen oder Umbenennen war erfolgreich. Sollte Ihnen ein Fehler "
+"unterlaufen sein, können Sie durch Abbrechen des Coder:in-Dialoges alle "
+"Änderungen rückgängig machen."
 
 #: src\qualcoder\code_color_scheme.py:61
 msgid "Normal vision"
@@ -1431,18 +1432,16 @@ msgid "Remove important flag"
 msgstr "\"Wichtig\"-Markierung entfernen"
 
 #: src\qualcoder\code_in_all_files.py:339
-#, fuzzy
 msgid "Add important flag"
-msgstr "Wichtige Markierung hinzufügen"
+msgstr "\"Wichtig\"-Markierung hinzufügen"
 
 #: src\qualcoder\code_in_all_files.py:340
 msgid "Export to ODT file"
 msgstr "Exportieren in eine ODT-Datei"
 
 #: src\qualcoder\code_in_all_files.py:401
-#, fuzzy
 msgid "Memo for Coded: "
-msgstr "Memo für Code:  "
+msgstr "Memo für Codierung: "
 
 #: src\qualcoder\code_in_all_files.py:429 src\qualcoder\code_text.py:2226
 msgid "Coded text file exported: "
@@ -1525,9 +1524,8 @@ msgid "Code tree re-organised."
 msgstr "Der Codebaum wurde neu organisiert."
 
 #: src\qualcoder\code_organiser.py:582
-#, fuzzy
 msgid "Code organiser"
-msgstr "Der Codebaum wurde neu organisiert."
+msgstr "Code Organisator"
 
 #: src\qualcoder\code_organiser.py:582
 msgid "Changes applied to the codes tree"
@@ -1753,9 +1751,8 @@ msgid "Memo coded text (M)"
 msgstr "Memo-Codierter Text (M)"
 
 #: src\qualcoder\code_pdf.py:994
-#, fuzzy
 msgid "Change code position key presses"
-msgstr "Codierungsende ändern"
+msgstr "Code-Position ändern"
 
 #: src\qualcoder\code_pdf.py:996 src\qualcoder\code_text.py:1228
 #: src\qualcoder\view_av.py:2732
@@ -1900,17 +1897,19 @@ msgstr "Farbcodes anzeigen"
 
 #: src\qualcoder\code_pdf.py:1337 src\qualcoder\code_text.py:1755
 #: src\qualcoder\report_exact_matches.py:382
-#: src\qualcoder\report_relations.py:596 src\qualcoder\report_relations.py:1082
-#: src\qualcoder\report_sql.py:508 src\qualcoder\report_sql.py:605
-#: src\qualcoder\view_av.py:1505 src\qualcoder\view_image.py:1232
+#: src\qualcoder\report_relations.py:596
+#: src\qualcoder\report_relations.py:1082 src\qualcoder\report_sql.py:508
+#: src\qualcoder\report_sql.py:605 src\qualcoder\view_av.py:1505
+#: src\qualcoder\view_image.py:1232
 msgid "Sort ascending"
 msgstr "Aufsteigend sortieren"
 
 #: src\qualcoder\code_pdf.py:1338 src\qualcoder\code_text.py:1756
 #: src\qualcoder\report_exact_matches.py:383
-#: src\qualcoder\report_relations.py:597 src\qualcoder\report_relations.py:1083
-#: src\qualcoder\report_sql.py:510 src\qualcoder\report_sql.py:607
-#: src\qualcoder\view_av.py:1506 src\qualcoder\view_image.py:1233
+#: src\qualcoder\report_relations.py:597
+#: src\qualcoder\report_relations.py:1083 src\qualcoder\report_sql.py:510
+#: src\qualcoder\report_sql.py:607 src\qualcoder\view_av.py:1506
+#: src\qualcoder\view_image.py:1233
 msgid "Sort descending"
 msgstr "Absteigend sortieren"
 
@@ -2188,9 +2187,8 @@ msgstr "Sortieren"
 #: src\qualcoder\report_compare_coder_file.py:153
 #: src\qualcoder\report_file_summary.py:119 src\qualcoder\view_av.py:758
 #: src\qualcoder\view_image.py:758
-#, fuzzy
 msgid "Sort by name ascending"
-msgstr "Aufsteigend sortieren"
+msgstr "Name aufsteigend sortieren"
 
 #: src\qualcoder\code_pdf.py:2463 src\qualcoder\code_text.py:3193
 #: src\qualcoder\report_codes.py:321 src\qualcoder\report_codes.py:368
@@ -2198,25 +2196,22 @@ msgstr "Aufsteigend sortieren"
 #: src\qualcoder\report_compare_coder_file.py:154
 #: src\qualcoder\report_file_summary.py:120 src\qualcoder\view_av.py:759
 #: src\qualcoder\view_image.py:759
-#, fuzzy
 msgid "Sort by name descending"
-msgstr "Absteigend sortieren"
+msgstr "Name absteigend sortieren"
 
 #: src\qualcoder\code_pdf.py:2464 src\qualcoder\code_text.py:3194
 #: src\qualcoder\report_compare_coder_file.py:155
 #: src\qualcoder\report_file_summary.py:121 src\qualcoder\view_av.py:760
 #: src\qualcoder\view_image.py:760
-#, fuzzy
 msgid "Sort by case ascending"
-msgstr "Aufsteigend sortieren"
+msgstr "Fall aufsteigend sortieren"
 
 #: src\qualcoder\code_pdf.py:2465 src\qualcoder\code_text.py:3195
 #: src\qualcoder\report_compare_coder_file.py:156
 #: src\qualcoder\report_file_summary.py:122 src\qualcoder\view_av.py:761
 #: src\qualcoder\view_image.py:761
-#, fuzzy
 msgid "Sort by case descending"
-msgstr "Absteigend sortieren"
+msgstr "Fall absteigend sortieren"
 
 #: src\qualcoder\code_pdf.py:2466 src\qualcoder\code_text.py:3196
 #: src\qualcoder\report_codes.py:322
@@ -2224,9 +2219,8 @@ msgstr "Absteigend sortieren"
 #: src\qualcoder\report_compare_coder_file.py:157
 #: src\qualcoder\report_file_summary.py:123 src\qualcoder\view_av.py:762
 #: src\qualcoder\view_image.py:762
-#, fuzzy
 msgid "Sort by date ascending"
-msgstr "Absteigend sortieren"
+msgstr "Datum aufsteigend sortieren"
 
 #: src\qualcoder\code_pdf.py:2467 src\qualcoder\code_text.py:3197
 #: src\qualcoder\report_codes.py:323
@@ -2234,9 +2228,8 @@ msgstr "Absteigend sortieren"
 #: src\qualcoder\report_compare_coder_file.py:158
 #: src\qualcoder\report_file_summary.py:124 src\qualcoder\view_av.py:763
 #: src\qualcoder\view_image.py:763
-#, fuzzy
 msgid "Sort by date descending"
-msgstr "Absteigend sortieren"
+msgstr "Datum absteigend sortieren"
 
 #: src\qualcoder\code_pdf.py:2521 src\qualcoder\code_text.py:3258
 #: src\qualcoder\report_compare_coder_file.py:186
@@ -2391,9 +2384,8 @@ msgid "Press O to cycle overlapping codes"
 msgstr "Drücken Sie O, um überlappende Codes zu durchlaufen"
 
 #: src\qualcoder\code_pdf.py:3815 src\qualcoder\code_text.py:5553
-#, fuzzy
 msgid "ANNOTATED"
-msgstr "ANNOTIERT:"
+msgstr "ANNOTIERT"
 
 #: src\qualcoder\code_text.py:174
 msgid "EDITING TEXT MODE (Ctrl+E)"
@@ -2403,8 +2395,8 @@ msgstr "BEARBEITEN DES TEXTMODUS (Strg+E)"
 #: src\qualcoder\view_av.py:4058
 msgid ""
 "Avoid selecting sections of text with a combination of not underlined (not "
-"coded / annotated / case-assigned) and underlined (coded, annotated, case-"
-"assigned)."
+"coded / annotated / case-assigned) and underlined (coded, annotated, "
+"case-assigned)."
 msgstr ""
 "Vermeiden Sie die Auswahl von Textabschnitten mit einer Kombination aus "
 "nicht unterstrichen (nicht codiert / kommentiert / fallbezogen) und "
@@ -2453,9 +2445,8 @@ msgid "last match in file"
 msgstr "letzter Treffer in der Datei"
 
 #: src\qualcoder\code_text.py:1102 src\qualcoder\code_text.py:1151
-#, fuzzy
 msgid "code within code"
-msgstr "Code in Code einbinden"
+msgstr "Code in Code"
 
 #: src\qualcoder\code_text.py:1224 src\qualcoder\view_av.py:2727
 msgid "Change start position (SHIFT LEFT/ALT RIGHT)"
@@ -2466,9 +2457,8 @@ msgid "Change end position (SHIFT RIGHT/ALT LEFT)"
 msgstr "Endposition ändern (SHIFT RIGHT/ALT LEFT)"
 
 #: src\qualcoder\code_text.py:1240
-#, fuzzy
 msgid "Mark with new code (N)"
-msgstr "Markierung mit neuem Code"
+msgstr "Mmit neuem Code markieren (N)"
 
 #: src\qualcoder\code_text.py:1263
 msgid "Set bookmark (B)"
@@ -2568,7 +2558,7 @@ msgstr "Zum Lesezeichen gehen"
 #: src\qualcoder\code_text.py:3189 src\qualcoder\code_text.py:3497
 #: src\qualcoder\manage_files.py:517 src\qualcoder\manage_files.py:998
 msgid "Mark speakers"
-msgstr "Sprecher markieren"
+msgstr "Sprecher:innen markieren"
 
 #: src\qualcoder\code_text.py:3329 src\qualcoder\code_text.py:3385
 msgid "From: "
@@ -2583,16 +2573,16 @@ msgid ""
 "The coder \"{}\" is currently hidden. Do you want to make it visible, so you "
 "can see the speaker codings?"
 msgstr ""
+"Coder:in \"{}\" ist aktuell ausgeblendet. Wollen Sie diese einblenden, damit "
+"Sie die Sprecher:innen-Codierungen sehen können?"
 
 #: src\qualcoder\code_text.py:3485
-#, fuzzy
 msgid "Speaker coding"
-msgstr "Name des Sprechers"
+msgstr "Sprecher:innen codieren"
 
 #: src\qualcoder\code_text.py:3497 src\qualcoder\manage_files.py:998
-#, fuzzy
 msgid "No text file selected."
-msgstr "Keine Dateien ausgewählt"
+msgstr "Keine Textdatei ausgewählt."
 
 #: src\qualcoder\code_text.py:3768 src\qualcoder\code_text.py:5241
 msgid "AI interpretation: "
@@ -2625,7 +2615,6 @@ msgstr ""
 "speichern?<br/><br/>"
 
 #: src\qualcoder\code_text.py:3776
-#, fuzzy
 msgid "AI Interpretation"
 msgstr "KI-Interpretation: "
 
@@ -2914,8 +2903,8 @@ msgstr "Neue Farbe: "
 
 #: src\qualcoder\edit_textfile.py:78
 msgid ""
-"Avoid selecting text combinations of unmarked text sections and coded/"
-"annotated/case-assigned sections."
+"Avoid selecting text combinations of unmarked text sections and "
+"coded/annotated/case-assigned sections."
 msgstr ""
 "Vermeiden Sie die Auswahl von Textkombinationen aus nicht markierten "
 "Textabschnitten und codierten/annotierten/kassierten Abschnitten."
@@ -2954,7 +2943,8 @@ msgstr ""
 msgid "Media not found"
 msgstr "Medien nicht gefunden"
 
-#: src\qualcoder\helpers.py:516 src\qualcoder\report_compare_coder_file.py:1009
+#: src\qualcoder\helpers.py:516
+#: src\qualcoder\report_compare_coder_file.py:1009
 #: src\qualcoder\view_image.py:2410
 msgid "Image error"
 msgstr "Bildfehler"
@@ -3255,20 +3245,18 @@ msgid "Descending"
 msgstr "Absteigend sortieren"
 
 #: src\qualcoder\journals.py:423
-#, fuzzy
 msgid "Show name like"
-msgstr "Fälle zeigen wie"
+msgstr "Wert anzeigen wie"
 
 #: src\qualcoder\journals.py:435
 msgid "Show this coder"
-msgstr "Diesen Codierer anzeigen"
+msgstr "Diese Codierer:in anzeigen"
 
 #: src\qualcoder\journals.py:443 src\qualcoder\manage_files.py:496
 msgid "Enter date"
 msgstr "Darum eingeben"
 
 #: src\qualcoder\journals.py:479
-#, fuzzy
 msgid "Show names like:"
 msgstr "Werte anzeigen wie:"
 
@@ -3354,7 +3342,7 @@ msgstr "Tabellenanzeige existiert"
 
 #: src\qualcoder\manage_files.py:216
 msgid "This table display setting already exists: "
-msgstr "Diese Einstellung der Tabellenanzeige ist bereits vorhanden:"
+msgstr "Diese Tabellenanzeige ist bereits vorhanden:"
 
 #: src\qualcoder\manage_files.py:229 src\qualcoder\manage_files.py:304
 #: src\qualcoder\report_attributes.py:127
@@ -3363,9 +3351,8 @@ msgid "Nothing saved"
 msgstr "Nichts gespeichert"
 
 #: src\qualcoder\manage_files.py:229 src\qualcoder\manage_files.py:304
-#, fuzzy
 msgid "No saved table displays"
-msgstr "Keine gespeicherten Tabellenauszahlungen"
+msgstr "Keine gespeicherten Tabellenanzeigen"
 
 #: src\qualcoder\manage_files.py:235
 msgid "Select table display"
@@ -3388,14 +3375,12 @@ msgid "Table column not present"
 msgstr "Tabellenspalte nicht vorhanden"
 
 #: src\qualcoder\manage_files.py:310
-#, fuzzy
 msgid "Delete table display"
-msgstr "Tabellenanzeige auswählen"
+msgstr "Tabellenanzeige löschen"
 
 #: src\qualcoder\manage_files.py:317
-#, fuzzy
 msgid "Deleted display"
-msgstr "Tabellenanzeige auswählen"
+msgstr "Anzeige gelöscht"
 
 #: src\qualcoder\manage_files.py:448
 msgid "View"
@@ -3969,7 +3954,6 @@ msgstr ""
 
 #: src\qualcoder\pseudonyms.py:58 src\qualcoder\pseudonyms.py:74
 #: src\qualcoder\pseudonyms.py:78 src\qualcoder\pseudonyms.py:86
-#, fuzzy
 msgid "Original"
 msgstr "Original"
 
@@ -3990,14 +3974,12 @@ msgstr ""
 "lassen."
 
 #: src\qualcoder\pseudonyms.py:86
-#, fuzzy
 msgid "Original entry already exists."
-msgstr "Variablenname existiert bereits: "
+msgstr "Originaleintrag existiert bereits."
 
 #: src\qualcoder\pseudonyms.py:89
-#, fuzzy
 msgid "Pseudonym entry already exists."
-msgstr "Das gibt es schon"
+msgstr "Pseudonym existiert bereits."
 
 #: src\qualcoder\refi.py:109
 msgid "Select REFI-QDA file"
@@ -4109,8 +4091,8 @@ msgstr ""
 msgid ""
 "All variables are stored as text. Cast as text or float for SQL operations.\n"
 msgstr ""
-"Alle Variablen werden als Text gespeichert. Cast als Text oder Float für SQL-"
-"Operationen.\n"
+"Alle Variablen werden als Text gespeichert. Cast als Text oder Float für "
+"SQL-Operationen.\n"
 
 #: src\qualcoder\refi.py:437
 msgid "Relative paths to external files are untested.\n"
@@ -4121,7 +4103,7 @@ msgid ""
 "Select a coder name in Settings dropbox, otherwise coded text and media may "
 "appear uncoded."
 msgstr ""
-"Wählen Sie in der Dropbox \"Einstellungen\" einen Codierernamen aus, da "
+"Wählen Sie in den \"Einstellungen\" einen Namen für die Codierer:in aus, da "
 "sonst codierte Texte und Medien uncodiert erscheinen können."
 
 #: src\qualcoder\refi.py:439
@@ -4149,7 +4131,6 @@ msgid "Cannot copy Image file from: "
 msgstr "Kann Bilddatei nicht kopieren von: "
 
 #: src\qualcoder\refi.py:900
-#, fuzzy
 msgid "Cannot copy image file from: "
 msgstr "Kann Bilddatei nicht kopieren von: "
 
@@ -4174,9 +4155,8 @@ msgid "Cannot read from TextSource: "
 msgstr "Kann nicht aus Textquelle lesen: "
 
 #: src\qualcoder\refi.py:1480
-#, fuzzy
 msgid "Cannot copy text file from: "
-msgstr "Kann Bilddatei nicht kopieren von: "
+msgstr "Kann Textdatei nicht kopieren von: "
 
 #: src\qualcoder\refi.py:1492 src\qualcoder\refi.py:1506
 msgid "Cannot copy TextSource file from: "
@@ -4184,7 +4164,7 @@ msgstr "Kann die Datei Text Source nicht kopieren von: "
 
 #: src\qualcoder\refi.py:1628
 msgid "Duplicated text coding for code and coder. Only one loaded."
-msgstr "Doppelte Textcodierung für Code und Codierer. Nur einer geladen."
+msgstr "Doppelte Textcodierung für Code und Codierer:in. Nur einer geladen."
 
 #: src\qualcoder\refi.py:1629
 msgid " Positions:"
@@ -4302,11 +4282,11 @@ msgstr "Excel exportieren"
 
 #: src\qualcoder\reports.py:614 src\qualcoder\report_compare_coder_file.py:385
 msgid "No coders selected"
-msgstr "Keine Codierer ausgewählt"
+msgstr "Keine Codierer:innen ausgewählt"
 
 #: src\qualcoder\reports.py:639
 msgid "Coder comparisons report exported: "
-msgstr "Coder-Vergleichsbericht exportiert:"
+msgstr "Coder:innen-Vergleichsbericht exportiert: "
 
 #: src\qualcoder\reports.py:640 src\qualcoder\report_codes.py:686
 #: src\qualcoder\report_codes.py:746 src\qualcoder\report_codes.py:774
@@ -4321,7 +4301,7 @@ msgstr "Bericht exportiert"
 
 #: src\qualcoder\reports.py:655
 msgid "Coder comparison text file exported to: "
-msgstr "Coder-Vergleichstextdatei exportiert nach: "
+msgstr "Coder:innen-Vergleich-Textdatei exportiert nach: "
 
 #: src\qualcoder\reports.py:656
 msgid "Text file export"
@@ -4329,11 +4309,11 @@ msgstr "Export von Textdateien"
 
 #: src\qualcoder\reports.py:663
 msgid "CODER COMPARISON"
-msgstr "CODER VERGLEICH"
+msgstr "CODER:INNEN VERGLEICH"
 
 #: src\qualcoder\reports.py:663
 msgid "Selected coders: "
-msgstr "Ausgewählte Codierer: "
+msgstr "Ausgewählte Coder:innen: "
 
 #: src\qualcoder\reports.py:681
 msgid "agreement: "
@@ -4361,14 +4341,12 @@ msgid "No saved filters"
 msgstr "Keine gespeicherten Filter"
 
 #: src\qualcoder\report_attributes.py:133
-#, fuzzy
 msgid "Delete filter"
-msgstr "Dateien löschen"
+msgstr "Filter löschen"
 
 #: src\qualcoder\report_attributes.py:141
-#, fuzzy
 msgid "Filter deleted"
-msgstr "Kategorie gelöscht: "
+msgstr "Filter gelöscht"
 
 #: src\qualcoder\report_attributes.py:149
 msgid "Save Filter"
@@ -4612,14 +4590,12 @@ msgid "Select codes containing text"
 msgstr "Codes auswählen, die Text enthalten"
 
 #: src\qualcoder\report_codes.py:624
-#, fuzzy
 msgid "No matrix"
-msgstr "Keine Fallmatrix"
+msgstr "Keine Matrix"
 
 #: src\qualcoder\report_codes.py:624
-#, fuzzy
 msgid "No matrix results to export"
-msgstr "Keine Daten zu exportieren"
+msgstr "Keine Matrixergebnisse zum exportieren"
 
 #: src\qualcoder\report_codes.py:658
 msgid "Matrix exported: "
@@ -4641,14 +4617,12 @@ msgid "Report exported: "
 msgstr "Bericht exportiert: "
 
 #: src\qualcoder\report_codes.py:697
-#, fuzzy
 msgid "Save IRaMuTeQ File"
-msgstr "Textdatei speichern"
+msgstr "IRaMuTeQ-Datei speichern"
 
 #: src\qualcoder\report_codes.py:745
-#, fuzzy
 msgid "Report exported in IRaMuTeQ format: "
-msgstr "Bericht exportiert nach: "
+msgstr "Bericht exportiert im IRaMuTeQ-Format: "
 
 #: src\qualcoder\report_codes.py:757
 msgid "Save Open Document Text File"
@@ -4661,7 +4635,7 @@ msgstr "CSV-Datei speichern"
 #: src\qualcoder\report_codes.py:882 src\qualcoder\report_codes.py:997
 msgid "Each row contains filename, coder, coded, codename and categories."
 msgstr ""
-"Jede Zeile enthält Dateiname, Codierer, codiert, Codename und Kategorien."
+"Jede Zeile enthält Dateiname, Coder:in, codiert, Codename und Kategorien."
 
 #: src\qualcoder\report_codes.py:884
 msgid "And file and case variables"
@@ -4694,7 +4668,8 @@ msgstr "Fehler "
 msgid "html file reading error:"
 msgstr "html-Datei-Lesefehler:"
 
-#: src\qualcoder\report_codes.py:1139 src\qualcoder\report_exact_matches.py:541
+#: src\qualcoder\report_codes.py:1139
+#: src\qualcoder\report_exact_matches.py:541
 #: src\qualcoder\report_relations.py:861
 msgid "Report exported to: "
 msgstr "Bericht exportiert nach: "
@@ -4721,12 +4696,12 @@ msgstr "Parameter für die Annotationssuche"
 
 #: src\qualcoder\report_codes.py:1276
 msgid "Coder: All coders"
-msgstr "Codierer: Alle Codierer"
+msgstr "Coder:in: Alle Coder:innen"
 
 #: src\qualcoder\report_codes.py:1278 src\qualcoder\report_codes.py:2326
 #: src\qualcoder\view_av.py:219 src\qualcoder\view_charts.py:383
 msgid "Coder: "
-msgstr "Coder: "
+msgstr "Coder:in: "
 
 #: src\qualcoder\report_codes.py:1280 src\qualcoder\report_codes.py:1450
 msgid "Search text: "
@@ -4742,7 +4717,7 @@ msgstr "DATE:"
 
 #: src\qualcoder\report_codes.py:1292 src\qualcoder\__main__.py:2398
 msgid "Coder:"
-msgstr "Coder:"
+msgstr "Coder:in:"
 
 #: src\qualcoder\report_codes.py:1293
 msgid "Position"
@@ -4788,7 +4763,7 @@ msgstr "Suchparameter"
 
 #: src\qualcoder\report_codes.py:1402
 msgid "Coding by: All coders"
-msgstr "Codierung durch: Alle Codierer"
+msgstr "Codierung durch: Alle Coder:innen"
 
 #: src\qualcoder\report_codes.py:1404
 msgid "Coding by: "
@@ -4952,7 +4927,7 @@ msgstr "GESCHAFFEN VON: "
 #: src\qualcoder\report_code_summary.py:296
 #: src\qualcoder\report_compare_coder_file.py:415
 msgid "CODERS: "
-msgstr "CODERS: "
+msgstr "CODER:INNEN: "
 
 #: src\qualcoder\report_code_summary.py:303
 msgid "FILES: "
@@ -5070,15 +5045,15 @@ msgstr ""
 
 #: src\qualcoder\report_compare_coder_file.py:415
 msgid "CODER COMPARISON FOR FILE"
-msgstr "CODERVERGLEICH FÜR DATEI"
+msgstr "VERGLEICH CODER:INNEN FÜR DATEI"
 
 #: src\qualcoder\report_compare_coder_file.py:417
 msgid "(YELLOW CODER 0)"
-msgstr "(GELBER CODER 0)"
+msgstr "(GELBE CODER:IN 0)"
 
 #: src\qualcoder\report_compare_coder_file.py:419
 msgid "(BLUE CODER 1)"
-msgstr "(BLAUER CODER 1)"
+msgstr "(BLAUE CODER:IN 1)"
 
 #: src\qualcoder\report_compare_coder_file.py:421
 msgid "FILE: "
@@ -5137,19 +5112,19 @@ msgstr "Uncodiert: "
 #: src\qualcoder\report_compare_coder_file.py:693
 #: src\qualcoder\report_compare_coder_file.py:821
 msgid "Coder 0: "
-msgstr "Coder 0: "
+msgstr "Coder:in 0: "
 
 #: src\qualcoder\report_compare_coder_file.py:546
 #: src\qualcoder\report_compare_coder_file.py:694
 #: src\qualcoder\report_compare_coder_file.py:822
 msgid "Coder 1: "
-msgstr "Coder 1: "
+msgstr "Coder:in 1: "
 
 #: src\qualcoder\report_compare_coder_file.py:547
 #: src\qualcoder\report_compare_coder_file.py:695
 #: src\qualcoder\report_compare_coder_file.py:823
 msgid "Agreement between coders: "
-msgstr "Übereinstimmung zwischen den Codierern: "
+msgstr "Übereinstimmung zwischen den Coder:innen: "
 
 #: src\qualcoder\report_compare_coder_file.py:548
 msgid "Total msecs dual coded: "
@@ -5172,7 +5147,7 @@ msgstr "Kappa: "
 #: src\qualcoder\report_compare_coder_file.py:553
 #: src\qualcoder\report_compare_coder_file.py:563
 msgid "Overlaps Coder: "
-msgstr "Überschneidungen Coder: "
+msgstr "Überschneidungen Coder:innen: "
 
 #: src\qualcoder\report_compare_coder_file.py:557
 #: src\qualcoder\report_compare_coder_file.py:567
@@ -5222,7 +5197,7 @@ msgstr "Total Pixel abweichung (einfach kodiert): "
 #: src\qualcoder\report_compare_coder_file.py:701
 #: src\qualcoder\report_compare_coder_file.py:711
 msgid "Intersections Coder: "
-msgstr "Intersections Coder: "
+msgstr "Überschneidungen Coder:in: "
 
 #: src\qualcoder\report_compare_coder_file.py:705
 #: src\qualcoder\report_compare_coder_file.py:715
@@ -5274,9 +5249,8 @@ msgid "Scale: "
 msgstr "Maßstab: "
 
 #: src\qualcoder\report_comparison_table.py:122
-#, fuzzy
 msgid "Select Attribute"
-msgstr "Datei-Attribute"
+msgstr "Attribut auswählen"
 
 #: src\qualcoder\report_comparison_table.py:213
 #: src\qualcoder\report_comparison_table.py:219
@@ -5297,9 +5271,8 @@ msgid "Select cases"
 msgstr "Fälle auswählen"
 
 #: src\qualcoder\report_comparison_table.py:341
-#, fuzzy
 msgid "Selection"
-msgstr "Keine auswählen"
+msgstr "Auswahl"
 
 #: src\qualcoder\report_comparison_table.py:362
 #: src\qualcoder\report_comparison_table.py:369
@@ -5314,9 +5287,8 @@ msgid "All codes selected"
 msgstr "Alle Codes ausgewählt"
 
 #: src\qualcoder\report_comparison_table.py:379
-#, fuzzy
 msgid "Select one category"
-msgstr "Leerzeichen oder Kategorie auswählen"
+msgstr "Eine Kategorie auswählen"
 
 #: src\qualcoder\report_comparison_table.py:492
 #: src\qualcoder\report_cooccurrence.py:404
@@ -5347,34 +5319,28 @@ msgid "Categories selected"
 msgstr "Ausgewählte Kategorien"
 
 #: src\qualcoder\report_cooccurrence.py:511
-#, fuzzy
 msgid "Merge into new code"
-msgstr "Zusammenführen in: Code auswählen"
+msgstr "In neuen Code zusammenführen"
 
 #: src\qualcoder\report_cooccurrence.py:518
-#, fuzzy
 msgid "New code"
-msgstr "Neuen Code: "
+msgstr "Neuer Code"
 
 #: src\qualcoder\report_cooccurrence.py:518
-#, fuzzy
 msgid "Edit name:"
-msgstr "Name aktualisieren"
+msgstr "Namen ändern"
 
 #: src\qualcoder\report_cooccurrence.py:520
-#, fuzzy
 msgid "Merged: "
-msgstr "Code zusammenführen: "
+msgstr "Zusammengeführt: "
 
 #: src\qualcoder\report_cooccurrence.py:526
-#, fuzzy
 msgid "Code name exists"
-msgstr "Filtername existiert"
+msgstr "Codename existiert bereits"
 
 #: src\qualcoder\report_cooccurrence.py:526
-#, fuzzy
 msgid "Choose another code name"
-msgstr " bereits verwendet wird, wählen Sie einen anderen Namen"
+msgstr "Wählen Sie einen anderen Codenamen"
 
 #: src\qualcoder\report_cooccurrence.py:593
 msgid ""
@@ -5422,8 +5388,9 @@ msgid "No results"
 msgstr "Keine Ergebnisse"
 
 #: src\qualcoder\report_exact_matches.py:384
-#: src\qualcoder\report_relations.py:598 src\qualcoder\report_relations.py:1084
-#: src\qualcoder\report_sql.py:502 src\qualcoder\report_sql.py:599
+#: src\qualcoder\report_relations.py:598
+#: src\qualcoder\report_relations.py:1084 src\qualcoder\report_sql.py:502
+#: src\qualcoder\report_sql.py:599
 msgid "Filter equals: "
 msgstr "Filter gleich "
 
@@ -5438,8 +5405,9 @@ msgid "Filter lower or equals: "
 msgstr "Filter kleiner oder gleich: "
 
 #: src\qualcoder\report_exact_matches.py:387
-#: src\qualcoder\report_relations.py:601 src\qualcoder\report_relations.py:1085
-#: src\qualcoder\report_sql.py:500 src\qualcoder\report_sql.py:597
+#: src\qualcoder\report_relations.py:601
+#: src\qualcoder\report_relations.py:1085 src\qualcoder\report_sql.py:500
+#: src\qualcoder\report_sql.py:597
 msgid "Clear filter"
 msgstr "Filter löschen"
 
@@ -5589,9 +5557,8 @@ msgid "Height: "
 msgstr "Höhe: "
 
 #: src\qualcoder\report_file_summary.py:547
-#, fuzzy
 msgid "Image too large"
-msgstr "Bild exportiert"
+msgstr "Bild zu groß"
 
 #: src\qualcoder\report_file_summary.py:547
 msgid ""
@@ -5709,9 +5676,8 @@ msgid "Text overlap"
 msgstr "Textüberschneidung"
 
 #: src\qualcoder\report_relations.py:951
-#, fuzzy
 msgid "Code relations file exported to: "
-msgstr "Code-Relationen csv-Datei exportiert nach: "
+msgstr "Code-Relationen Datei exportiert nach: "
 
 #: src\qualcoder\report_relations.py:1002
 msgid "Code pair"
@@ -6039,10 +6005,10 @@ msgid ""
 "You can only edit the name of an existing profile. To create a new profile "
 "from scratch, follow the instructions in the QualCoder wiki on GitHub."
 msgstr ""
-"Wählen Sie zunächst ein Profil aus.\n"
-"Sie können nur den Namen eines bestehenden Profils bearbeiten. Um ein neues "
-"Profil von Grund auf zu erstellen, folgen Sie den Anweisungen im QualCoder-"
-"Wiki auf GitHub."
+"Wählen Sie ein Profil aus.\n"
+"Sie können nur den Namen eines bestehenden Profils bearbeiten. Um ein Profil "
+"von Grund auf neu zu erstellen, folgen Sie den Anweisungen in der "
+"QualCoder-Dokumentation."
 
 #: src\qualcoder\settings.py:290 src\qualcoder\settings.py:452
 msgid "Enter new profile name:"
@@ -6053,9 +6019,8 @@ msgid "Choose a default output folder"
 msgstr "Standard-Ausgabeordner auswählen"
 
 #: src\qualcoder\settings.py:431 src\qualcoder\settings.py:434
-#, fuzzy
 msgid "Choose another folder"
-msgstr " bereits verwendet wird, wählen Sie einen anderen Namen"
+msgstr "Einen anderen Ordner auswählen"
 
 #: src\qualcoder\settings.py:431
 msgid "Do not use the QualCoder configuration folder."
@@ -6066,14 +6031,12 @@ msgid "Do not use the QualCoder data folder."
 msgstr "Verwenden Sie nicht den QualCoder-Datenordner."
 
 #: src\qualcoder\settings.py:451 src\qualcoder\settings.py:464
-#, fuzzy
 msgid "New AI profile"
-msgstr "AI-Profil"
+msgstr "Neues KI-Profil"
 
 #: src\qualcoder\settings.py:464
-#, fuzzy
 msgid "An AI profile with this name already exists: "
-msgstr "Variablenname existiert bereits: "
+msgstr "Ein KI-Profil mit diesem Namen existiert bereits: "
 
 #: src\qualcoder\settings.py:521
 msgid "Please select an AI profile or disable the AI altogether."
@@ -6108,46 +6071,47 @@ msgid ""
 "It seems that you have made changes to the coder names. These changes will "
 "be lost as well. Do you really want to cancel?"
 msgstr ""
+"Wie es aussieht, haben Sie Änderungen an den Coder:innen vorgenommen. Diese "
+"würden auch zurückgesetzt. Wollen Sie wirklich Abbrechen?"
 
 #: src\qualcoder\settings.py:556 src\qualcoder\__main__.py:1765
 msgid "Settings"
 msgstr "Einstellungen"
 
 #: src\qualcoder\speakers.py:65 src\qualcoder\speakers.py:260
-#, fuzzy
 msgid "Speakers"
-msgstr "Name des Sprechers"
+msgstr "Sprecher:innen"
 
 #: src\qualcoder\speakers.py:73
-#, fuzzy
 msgid "code as"
-msgstr "codename"
+msgstr "codieren als"
 
 #: src\qualcoder\speakers.py:73
-#, fuzzy
 msgid "Example"
-msgstr "Beispiele:"
+msgstr "Beispiel"
 
 #: src\qualcoder\speakers.py:260
 msgid ""
 "The speaker name cannot be empty. If you want to exclude a speaker from "
 "being marked, deselect the check box on the left."
 msgstr ""
-"Der Name des Sprechers darf nicht leer sein. Wenn Sie einen Sprecher von der "
-"Markierung ausschließen möchten, deaktivieren Sie das Kontrollkästchen auf "
-"der linken Seite."
+"Der Name darf nicht leer sein. Wenn Sie eine Sprecher:in von der Codierung "
+"ausschließen möchten, deaktivieren Sie das Kontrollkästchen auf der linken "
+"Seite."
 
 #: src\qualcoder\speakers.py:277
 msgid "This contains all the speakers that have been marked in documents."
-msgstr "Dies enthält alle Sprecher, die in Dokumenten markiert wurden."
+msgstr "Dies enthält alle Sprecher:innen, die in Dokumenten markiert wurden."
 
 #: src\qualcoder\speakers.py:288
 msgid "Speakers category could not be found found or created."
-msgstr "Die Kategorie „Sprecher“ konnte nicht gefunden oder erstellt werden."
+msgstr ""
+"Die Kategorie „Sprecher:innen“ konnte nicht gefunden oder erstellt werden."
 
 #: src\qualcoder\speakers.py:325
 msgid "Speaker code could not be found found or created."
-msgstr "Der Sprechercode konnte nicht gefunden oder erstellt werden."
+msgstr ""
+"Der Code für die Sprecher:in konnte nicht gefunden oder erstellt werden."
 
 #: src\qualcoder\special_functions.py:113 src\qualcoder\__main__.py:2580
 msgid "Open project directory"
@@ -6616,8 +6580,8 @@ msgid ""
 "Transcription area: Ctrl+T (insert timestamp) Ctrl+N (new speaker) Ctrl+1-8 "
 "(select speaker) Ctrl+D (delete speaker)"
 msgstr ""
-"Transkriptionsbereich: Strg+T (Zeitstempel einfügen) Strg+N (neuer Sprecher) "
-"Strg+1-8 (Sprecher auswählen) Strg+D (Sprecher löschen)"
+"Transkriptionsbereich: Strg+T (Zeitstempel einfügen) Strg+N (neue "
+"Sprecher:in) Strg+1-8 (Sprecher:in auswählen) Strg+D (Sprecher:in löschen)"
 
 #: src\qualcoder\view_av.py:4534
 msgid "Select name to delete"
@@ -6625,7 +6589,7 @@ msgstr "Zu löschenden Namen auswählen"
 
 #: src\qualcoder\view_av.py:4553
 msgid "Speaker name"
-msgstr "Name des Sprechers"
+msgstr "Name der Sprecher:in"
 
 #: src\qualcoder\view_av.py:4554
 msgid "Name:"
@@ -6680,38 +6644,32 @@ msgid "Code by A/V treemap"
 msgstr "Code nach A/V-Treemap"
 
 #: src\qualcoder\view_charts.py:144
-#, fuzzy
 msgid "Files by codes"
-msgstr "Dateityp-Reihenfolge"
+msgstr "Dateien nach Codes"
 
 #: src\qualcoder\view_charts.py:145
-#, fuzzy
 msgid "Codes by files"
-msgstr "Codes nach Datei"
+msgstr "Codes nach Dateien"
 
 #: src\qualcoder\view_charts.py:146
-#, fuzzy
 msgid "Cases by codes"
-msgstr "Hergestellt von Coder: "
+msgstr "Fälle nach Codes"
 
 #: src\qualcoder\view_charts.py:147
-#, fuzzy
 msgid "Codes by cases"
-msgstr "Codes nach Fall"
+msgstr "Codes nach Fällen"
 
 #: src\qualcoder\view_charts.py:159
 msgid "Word cloud made from coded text segments"
 msgstr "Wortwolke aus kodierten Textsegmenten"
 
 #: src\qualcoder\view_charts.py:268
-#, fuzzy
 msgid "Select stopwords file"
-msgstr "Einige Dateien auswählen"
+msgstr "Stoppwortdatei auswählen"
 
 #: src\qualcoder\view_charts.py:381
-#, fuzzy
 msgid "Coders: all"
-msgstr "Coder: "
+msgstr "Coder:innen: "
 
 #: src\qualcoder\view_charts.py:406
 msgid "Word cloud"
@@ -6723,23 +6681,20 @@ msgstr "Kumulative Codeanzahl in Einzelfällen"
 
 #: src\qualcoder\view_charts.py:583 src\qualcoder\view_charts.py:590
 #: src\qualcoder\view_charts.py:666 src\qualcoder\view_charts.py:673
-#, fuzzy
 msgid "Cases"
-msgstr "Fall"
+msgstr "Fälle"
 
 #: src\qualcoder\view_charts.py:584 src\qualcoder\view_charts.py:591
 #: src\qualcoder\view_charts.py:665 src\qualcoder\view_charts.py:672
 #: src\qualcoder\view_charts.py:739 src\qualcoder\view_charts.py:746
 #: src\qualcoder\view_charts.py:814 src\qualcoder\view_charts.py:821
-#, fuzzy
 msgid "Codes"
-msgstr "Code"
+msgstr "Codes"
 
 #: src\qualcoder\view_charts.py:585 src\qualcoder\view_charts.py:589
 #: src\qualcoder\view_charts.py:667 src\qualcoder\view_charts.py:671
 #: src\qualcoder\view_charts.py:741 src\qualcoder\view_charts.py:745
 #: src\qualcoder\view_charts.py:815 src\qualcoder\view_charts.py:819
-#, fuzzy
 msgid "Counts"
 msgstr "Anzahl"
 
@@ -6748,20 +6703,17 @@ msgid "Cumulative code count in cases by code"
 msgstr "Kumulative Codeanzahl in Fällen nach Code"
 
 #: src\qualcoder\view_charts.py:692
-#, fuzzy
 msgid "Cumulative code count in files by code"
-msgstr "Automatischer code Satz in Dateien:"
+msgstr "Kumulative Codeanzahl in Dateien nach Code"
 
 #: src\qualcoder\view_charts.py:740 src\qualcoder\view_charts.py:747
 #: src\qualcoder\view_charts.py:813 src\qualcoder\view_charts.py:820
-#, fuzzy
 msgid "Files"
-msgstr "Dateien:"
+msgstr "Dateien"
 
 #: src\qualcoder\view_charts.py:766
-#, fuzzy
 msgid "Cumulative code count in codes by file"
-msgstr "Automatischer code Satz in Dateien:"
+msgstr "Kumulative Codeanzahl in Code nach Datei"
 
 #: src\qualcoder\view_charts.py:852 src\qualcoder\view_charts.py:999
 msgid "Code count - text, images and Audio/Video"
@@ -7272,9 +7224,8 @@ msgid "Cannot open image with PIL. The image it too large."
 msgstr "Das Bild kann mit PIL nicht geöffnet werden. Das Bild ist zu groß."
 
 #: src\qualcoder\view_image.py:1459
-#, fuzzy
 msgid "Image highlight error"
-msgstr "Bildfehler"
+msgstr "Fehler bei der Hervorhebung im Bild"
 
 #: src\qualcoder\view_image.py:1577
 msgid "Rotate clockwise"
@@ -7313,14 +7264,12 @@ msgid "Highlight this code - blur"
 msgstr "Diesen Code hervorheben - verwischen"
 
 #: src\qualcoder\view_image.py:1860 src\qualcoder\view_image.py:1863
-#, fuzzy
 msgid "Coded area"
-msgstr "Codename"
+msgstr "Codierter Bereich"
 
 #: src\qualcoder\view_image.py:1860 src\qualcoder\view_image.py:1863
-#, fuzzy
 msgid "Select a code in the list first."
-msgstr "Codierten Text auswählen"
+msgstr "Zuerst einen Code aus der Liste wählen."
 
 #: src\qualcoder\view_image.py:2293
 msgid " Choose another name"
@@ -7384,8 +7333,9 @@ msgstr ""
 "\n"
 "Die neuen KI-Funktionen in QualCoder erfordern zusätzliche Einstellungen. "
 "Möchten Sie die KI-Integration aktivieren und die Einrichtung starten? Sie "
-"können dies auch später tun, indem Sie den KI-Setup-Assistenten über das KI-"
-"Menü im Hauptfenster starten. Klicken Sie auf \"Ja\", um jetzt zu beginnen."
+"können dies auch später tun, indem Sie den KI-Setup-Assistenten über das "
+"KI-Menü im Hauptfenster starten. Klicken Sie auf \"Ja\", um jetzt zu "
+"beginnen."
 
 #: src\qualcoder\__main__.py:1447
 msgid "AI Integration"
@@ -7417,7 +7367,7 @@ msgstr "Zeitstempel-Format"
 
 #: src\qualcoder\__main__.py:1773
 msgid "Speaker name format"
-msgstr "Format des Sprechernamens"
+msgstr "Format des Sprecher:innennamens"
 
 #: src\qualcoder\__main__.py:1774
 msgid "Report text context characters: "
@@ -7586,7 +7536,7 @@ msgstr "Problem beim Erstellen der Datenbank "
 
 #: src\qualcoder\__main__.py:2456
 msgid "Coder name changed to: "
-msgstr "Codername geändert in: "
+msgstr "Coder:in geändert in: "
 
 #: src\qualcoder\__main__.py:2479
 msgid ""
@@ -7671,27 +7621,29 @@ msgid ""
 "project (\"{}\"). Do you want to keep your current name or switch to the one "
 "from the project?"
 msgstr ""
+"Ihr aktueller Coder:innenname (\"{}\") unterschiedet sich von dem zuletzt im "
+"Projekt verwendeten (\"{}\"). Wollen Sie Ihren aktuellen Namen beibehalten "
+"oder zu dem aus dem Projekt wechseln?"
 
 #: src\qualcoder\__main__.py:2679
-#, fuzzy
 msgid "Coder name"
-msgstr "Codename"
+msgstr "Name Coder:in"
 
 #: src\qualcoder\__main__.py:2681
 msgid "Keep"
-msgstr ""
+msgstr "Beibehalten"
 
 #: src\qualcoder\__main__.py:2682
 msgid "Switch"
-msgstr ""
+msgstr "Wechseln"
 
 #: src\qualcoder\__main__.py:2683
 msgid "Cancel"
-msgstr ""
+msgstr "Abbrechen"
 
 #: src\qualcoder\__main__.py:2692
 msgid "Default coder name changed to: "
-msgstr "Standardkodiername geändert in: "
+msgstr "Standardname Coder:in geändert in: "
 
 #: src\qualcoder\__main__.py:2720 src\qualcoder\__main__.py:2749
 #: src\qualcoder\__main__.py:2769 src\qualcoder\__main__.py:2794
@@ -7948,8 +7900,8 @@ msgstr "Unbehandelter Fehler"
 
 #~ msgid "Please select an AI model or disable the AI altogether."
 #~ msgstr ""
-#~ "Bitte wählen Sie ein KI-Modell aus oder deaktivieren Sie die KI-"
-#~ "Integration."
+#~ "Bitte wählen Sie ein KI-Modell aus oder deaktivieren Sie die "
+#~ "KI-Integration."
 
 #~ msgid ""
 #~ "Please enter a valid API-key for the AI model. \n"
