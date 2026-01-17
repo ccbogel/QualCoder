@@ -103,12 +103,12 @@ def get_available_models(app, api_base: str, api_key: str) -> list:
 
 def get_default_ai_models():
     ini_string = """
-[ai_model_OpenAI GPT5.1 reasoning]
+[ai_model_OpenAI GPT5.2 reasoning]
 desc = Powerful model from OpenAI, with internal reasoning, for complex tasks.
 	You need an API-key from OpenAI and have paid for credits in your account.
 	OpenAI will charge a small amount for every use.
 access_info_url = https://platform.openai.com/api-keys
-large_model = gpt-5.1
+large_model = gpt-5.2
 large_model_context_window = 1000000
 fast_model = gpt-5-mini
 fast_model_context_window = 128000
@@ -116,12 +116,12 @@ reasoning_effort = medium
 api_base = 
 api_key = 
 
-[ai_model_OpenAI GPT5.1 no reasoning]
+[ai_model_OpenAI GPT5.2 no reasoning]
 desc = Powerful model from OpenAI, no reasoning, faster and cheaper.
 	You need an API-key from OpenAI and have paid for credits in your account.
 	OpenAI will charge a small amount for every use.
 access_info_url = https://platform.openai.com/api-keys
-large_model = gpt-5.1
+large_model = gpt-5.2
 large_model_context_window = 1000000
 fast_model = gpt-5-mini
 fast_model_context_window = 128000
