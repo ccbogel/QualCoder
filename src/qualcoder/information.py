@@ -89,17 +89,18 @@ The VideoLAN team for the bindings to VLC.<br /> \
 Julius Reich for creating the QualCoder logo.<br /> \
 Kai Dröge for developing and testing the code to incorporate artificial intelligence models for AI, and more.<br /> \
 Justin Missaghieh--Poncet for French translations and setting up the new manual <a href="https://qualcoder-org.github.io" target="_blank">https://qualcoder-org.github.io</a><br /> \
+Lorenzo Salomón for Spanish translations.<br /> \
+Jofen Kihlstrom for Swedish translations.<br /> \
 To various members on github for supporting this project.</p>\
-<h2 class="western">Other details</h2\
+<h2 class="western">Other details</h2> \
 <p>The qda data folder contains folders for imported documents, \
 images, audio and video. It also contains the sqlite database, named data.qda, which stores the coding data.</p>\
-<p>QualCoder also creates a configuration folder inside your home directory.</p>\
 <p>QualCoder is written in python3 using Qt6 for the graphical interface.</p>\
 <p>The REFI-QDA Project import and export seem to work ok, but are not guaranteed to work.</p>\
 <p>Created by Colin Curtain BPharm GradDipComp PhD, programmer, Lecturer University of Tasmania.</p>\
 <h2>Citation</h2>\
-Curtain, C. Dröge, K. (2025) QualCoder 3.7 [Computer software]. \
-Retrieved from https://github.com/ccbogel/QualCoder/releases/tag/3.7\
+Curtain, C. Dröge, K. (2026) QualCoderVersion [Computer software]. \
+Retrieved from https://github.com/ccbogel/QualCoder/releases/tag/3.8\
 <h2 class="western">Licenses</h2>\
 <h3>LGPL-3.0 License</h3>\
 <p>This file is part of QualCoder.</p>\
@@ -110,7 +111,7 @@ Foundation, either version 3 of the License, or (at your option) any later versi
 without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. \
 See the GNU General Public License for more details.</p>\
 <p>You should have received a copy of the GNU Lesser General Public License along with QualCoder. \
-If not, see &lt;https://www.gnu.org/licenses/&gt;. </p>\
+If not, see <a href="https://www.gnu.org/licenses">https://www.gnu.org/licenses</a>  </p>\
 <h3>License for highlighter.py code</h3>\
 <p>## Copyright (C) 2013 Riverbank Computing Limited.<br />\
 ## Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).<br />\
