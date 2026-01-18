@@ -294,8 +294,8 @@ class DialogSpeakers(QtWidgets.QDialog):
                 if not speaker['selected']:
                     continue
                 speaker_code = None
-                cur.execute("select cid, name, ifnull(memo,''), catid, owner, date, color from code_name where catid == ? and name == ?",
-                            (speakers_catid, speaker['code_as']))
+                cur.execute("select cid, name, ifnull(memo,''), catid, owner, date, color from code_name where name == ?",
+                            (speaker['code_as'], ))
                 speaker_code = cur.fetchone()
                 if speaker_code is None:
                     # search for unused color if possible
@@ -349,7 +349,6 @@ class DialogSpeakers(QtWidgets.QDialog):
             self.app.conn.rollback()  # Revert all changes
             raise
 
-    @staticmethod
     def help(self):
         """ Open help in browser. """
-        self.app.help_wiki("")
+        self.app.help_wiki("4.1.-Coding-Text")
