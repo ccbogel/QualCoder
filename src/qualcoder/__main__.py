@@ -3439,7 +3439,7 @@ def install_droid_sans_mono():
 def install_noto_sans():
     """ Install NotoSans ttf font for general application into .qualcoder folder """
 
-    qc_folder = os.path.join(home, '.qualcoder', 'NotoSans.ttf')
+    qc_folder = os.path.join(home, '.qualcoder', 'NotoSans-Regular.ttf')
     with open(qc_folder, 'wb') as file_:
         decoded_data = base64.decodebytes(NotoSans)
         file_.write(decoded_data)
