@@ -95,17 +95,34 @@ def update_qt_ts_files(lang_=None):
 
     script_path = os.path.dirname(os.path.realpath(__file__))
     gui_directory = os.path.join(script_path, "src", "qualcoder", "GUI")
-    print("GUI directory:", gui_directory)
-    os.chdir(gui_directory)
-    for translation in translation_files:
-        cmd = "pylupdate5 "
-        for file in os.listdir():
-            if file.startswith("ui_"):
-                cmd += f"{file} "
-        cmd += f"-noobsolete -ts {translation}"
-        print(f">>> {cmd}")
-        subprocess.call(cmd, shell=True, cwd=gui_directory)
+    
+    # Build a .pro file, which can then be used by pylupdate5 to create ts files
+    def rel_for_pro(path):
+        rel_path = os.path.relpath(path, gui_directory)
+        return rel_path.replace(os.path.sep, "/")
 
+    ui_files = []
+    for file in os.listdir(gui_directory):
+        if file.startswith("ui_") and file.endswith(".py"):
+            ui_files.append(rel_for_pro(os.path.join(gui_directory, file)))
+    ui_files.sort()
+
+    ts_files = [rel_for_pro(os.path.join(gui_directory, t)) for t in translation_files]
+
+    text = "SOURCES = \\\n"
+    text += " \\\n".join(ui_files)
+    text += "\n\nTRANSLATIONS = \\\n"
+    text += " \\\n".join(ts_files)
+    text += "\n\nCODECFORTR = ISO-8859-5\n"
+
+    pro_file_path = os.path.join(gui_directory, "project.pro")
+    with open(pro_file_path, 'w',) as pro_file:
+        pro_file.write(text)
+    print("Created project.pro file")
+    
+    # Compile ts files
+    subprocess.call(f'pylupdate5 "{pro_file_path}"', shell=True)
+    print("Updated ts translation files")
 
 def update_translation_placeholders(language=None):
     """ Update po files, update GUI ts files """
