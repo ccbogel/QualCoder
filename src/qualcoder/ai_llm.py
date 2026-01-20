@@ -334,7 +334,6 @@ def update_ai_models(current_models: list, current_model_index: int) -> tuple[li
     for model in current_models:
         if model['reasoning_effort'] == '':
             if model['large_model'].lower().find('gpt-5') > -1 or \
-                    model['large_model'].lower().find('gpt-4.1') > -1 or \
                     model['large_model'].lower().find('o4') > -1 or \
                     model['large_model'].lower().find('o3') > -1 or \
                     model['large_model'].lower().find('o1') > -1 or \
@@ -346,6 +345,10 @@ def update_ai_models(current_models: list, current_model_index: int) -> tuple[li
                 model['reasoning_effort'] = 'medium'
             else:
                 model['reasoning_effort'] = 'default'
+    
+        # Correct an error in the QualCoder 3.8 release, where reasoning effort was set to medium for GPT-4.1:            
+        if model['large_model'].lower().find('gpt-4.1') > -1: 
+            model['reasoning_effort'] = 'default'
     
     return current_models, current_model_index
 
