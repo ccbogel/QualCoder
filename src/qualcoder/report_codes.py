@@ -612,7 +612,7 @@ class DialogReportCodes(QtWidgets.QDialog):
             self.export_csv_file()
         if text_ == "xlsx":
             self.export_xlsx_file()
-        if text_ == "iramuteq":
+        if text_ in ("iramuteq", "IRaMuTeQ"):
             self.export_iramuteq_file()
         self.ui.comboBox_export.setCurrentIndex(0)
 
