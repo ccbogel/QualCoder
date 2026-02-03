@@ -1618,7 +1618,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         Note importing from html, odt, docx, rtf all formatting is lost.
         Imports images as jpg, jpeg, png which are stored in an images directory.
         Imports audio as mp3, wav, m4a which are stored in an audio directory.
-        Imports video as mp4, mov, ogg, wmv which are stored in a video directory.
+        Imports video as mp4, mov, ogg, wmv, webm which are stored in a video directory.
 
         param:
             link:   False - files are imported into project folder,
@@ -1708,7 +1708,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 else:
                     self.load_media_reference(f"audio:{link_path}")
                 known_file_type = True
-            if import_path.split('.')[-1].lower() in ('mkv', 'mov', 'mp4', 'ogg', 'wmv'):
+            if import_path.split('.')[-1].lower() in ('mkv', 'mov', 'mp4', 'ogg', 'wmv', 'webm'):
                 if link_path == "":
                     destination += f"/video/{filename}"
                     try:
