@@ -229,24 +229,33 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         """
 
         cur = self.app.conn.cursor()
-        sql = "select count(cid) from code_text where cid=?"
+        sql_text = "select count(cid) from code_text where cid=?"
+        sql_img = "select count(cid) from code_image where cid=?"
+        sql_av = "select count(cid) from code_av where cid=?"
         it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
         item = it.value()
         count = 0
         while item and count < 10000:
             if item.text(1)[0:4] == "cid:":
-                cid = str(item.text(1)[4:])
-                try:
-                    cur.execute(sql, [cid])
-                    result = cur.fetchone()
-                    if result[0] > 0:
-                        item.setText(3, str(result[0]))
-                    else:
-                        item.setText(3, "")
-                except Exception as err:
-                    msg = f"Fill code counts error\n{err}\n{sql}\ncid: {cid}\n"
-                    logger.debug(msg)
+                cid = int(item.text(1)[4:])
+                coding_count = 0
+                cur.execute(sql_text, [cid])
+                res_text = cur.fetchone()
+                if res_text:
+                    coding_count = res_text[0]
+                cur.execute(sql_img, [cid])
+                res_img = cur.fetchone()
+                if res_img:
+                    coding_count += res_img[0]
+                cur.execute(sql_av, [cid])
+                res_av = cur.fetchone()
+                if res_av:
+                    coding_count += res_av[0]
+                if coding_count > 0:
+                    item.setText(3, str(coding_count))
+                else:
                     item.setText(3, "")
+
             it += 1
             item = it.value()
             count += 1
