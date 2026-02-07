@@ -1018,7 +1018,6 @@ class DialogCodeText(QtWidgets.QWidget):
             self.ui.lineEdit_search.setText(self.search_term)
         cursor.setPosition(cursor.position() + next_result[2])
         self.ui.plainTextEdit.setTextCursor(cursor)
-
         # Highlight selected text
         cursor.setPosition(next_result[1])
         cursor.setPosition(cursor.position() + next_result[2], QtGui.QTextCursor.MoveMode.KeepAnchor)
@@ -1052,7 +1051,7 @@ class DialogCodeText(QtWidgets.QWidget):
          Enter is alway a search option. """
 
         menu = QtWidgets.QMenu()
-        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
         action_char3 = QtGui.QAction(_("Automatic search 3 or more characters"))
         action_char5 = QtGui.QAction(_("Automatic search 5 or more characters"))
         if self.search_type != 3:
@@ -1065,12 +1064,10 @@ class DialogCodeText(QtWidgets.QWidget):
         if action == action_char3:
             self.search_type = 3
             self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
-            # self.ui.lineEdit_search.returnPressed.disconnect(self.search_for_text)
             return
         if action == action_char5:
             self.search_type = 5
             self.ui.lineEdit_search.textEdited.connect(self.search_for_text)
-            # self.ui.lineEdit_search.returnPressed.disconnect(self.search_for_text)
             return
 
     def button_auto_code_menu(self, position):
@@ -1078,7 +1075,7 @@ class DialogCodeText(QtWidgets.QWidget):
         For Exact text matches. """
 
         menu = QtWidgets.QMenu()
-        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
         msg = ""
         if self.autocode_all_first_last_within == "all":
             msg = " *"
@@ -1128,7 +1125,7 @@ class DialogCodeText(QtWidgets.QWidget):
         For fragments of a sentence to code the full sentence. """
 
         menu = QtWidgets.QMenu()
-        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
         msg = ""
         if self.autocode_frag_all_first_within == "all":
             msg = " *"
@@ -1200,7 +1197,7 @@ class DialogCodeText(QtWidgets.QWidget):
         cursor = self.ui.plainTextEdit.cursorForPosition(position)
         selected_text = self.ui.plainTextEdit.textCursor().selectedText()
         menu = QtWidgets.QMenu()
-        menu.setStyleSheet('font-size:' + str(self.app.settings['fontsize']) + 'pt')
+        menu.setStyleSheet(f"font-size:{self.app.settings['fontsize']}pt")
         menu.setToolTipsVisible(True)
         action_code_memo = None
         action_edit_annotate = None
@@ -1729,7 +1726,7 @@ class DialogCodeText(QtWidgets.QWidget):
         Assign selected text to current hovered code. """
 
         menu = QtWidgets.QMenu()
-        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
         selected = self.ui.treeWidget.currentItem()
         action_add_code_to_category = None
         action_add_category_to_category = None
@@ -2185,7 +2182,6 @@ class DialogCodeText(QtWidgets.QWidget):
         pos = self.ui.plainTextEdit.textCursor().position()
         for item in self.code_text:
             if item['pos0'] <= pos + self.file_['start'] <= item['pos1']:
-                # logger.debug("Code name for selected pos0:" + str(item['pos0'])+" pos1:"+str(item['pos1'])
                 self.overlaps_at_pos.append(item)
         if len(self.overlaps_at_pos) < 2:
             self.overlaps_at_pos = []
@@ -3248,7 +3244,7 @@ class DialogCodeText(QtWidgets.QWidget):
             webbrowser.open(doc_path)
             return
         logger.error("Cannot open text file in browser " + self.file_['mediapath'])
-        print("code_text.view_original_text_file. Cannot open text file in browser " + self.file_['mediapath'])
+        print(f"code_text.view_original_text_file. Cannot open text file in browser {self.file_['mediapath']}")
 
     def show_case_files(self):
         """ Show files of specified case.
@@ -3277,7 +3273,7 @@ class DialogCodeText(QtWidgets.QWidget):
         If blank, show all files. """
 
         dialog = QtWidgets.QInputDialog(self)
-        dialog.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        dialog.setStyleSheet(f"* {{font-size:{self.app.settings['fontsize']}pt}} ")
         dialog.setWindowTitle(_("Show files like"))
         dialog.setWindowFlags(dialog.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         dialog.setInputMode(QtWidgets.QInputDialog.InputMode.TextInput)
@@ -3312,8 +3308,8 @@ class DialogCodeText(QtWidgets.QWidget):
         i = 0
         try:
             while file_['start'] + i < file_['end'] and not line_ending:
-                if file_['fulltext'][file_[
-                                         'start'] + i - 1] == "\n":  # ... + i - 1] because we want to include the line break in the chunk, and text[start:i] would otherwise exclude it
+                # ... + i - 1] Want to include the line break in the chunk, text[start:i] would otherwise exclude it
+                if file_['fulltext'][file_['start'] + i - 1] == "\n":
                     line_ending = True
                 else:
                     i += 1
@@ -3343,8 +3339,8 @@ class DialogCodeText(QtWidgets.QWidget):
             i = self.app.settings['codetext_chunksize']
             line_ending = False
             while i > 0 and not line_ending:
-                if file_['fulltext'][
-                    i - 1] == "\n":  # [i - 1] because we want to include the line break in the chunk, and text[start:i] would otherwise exclude it
+                # [i - 1] Want to include the line break in the chunk, and text[start:i] would otherwise exclude it
+                if file_['fulltext'][i - 1] == "\n":
                     line_ending = True
                 else:
                     i -= 1
