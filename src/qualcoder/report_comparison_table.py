@@ -52,7 +52,6 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
-
         self.ui.pushButton_export.setIcon(qta.icon('mdi6.export', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_export.pressed.connect(self.export_to_excel)
         self.ui.pushButton_select_files.setIcon(qta.icon('mdi6.file-multiple', options=[{'scale_factor': 1.2}]))
@@ -525,6 +524,7 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
                     item.setForeground(QtGui.QBrush(QtGui.QColor("#000000")))
                 if cell_data > 0:
                     item.setData(QtCore.Qt.ItemDataRole.DisplayRole, cell_data)
+                    item.setToolTip(_("Click for details."))
                 item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
                 self.ui.tableWidget.setItem(row, col, item)
         self.ui.tableWidget.resizeColumnsToContents()  # Doesnt look great
@@ -585,6 +585,7 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
             list_item = QtWidgets.QListWidgetItem()
             list_item.setText(display)
             self.ui.listWidget.insertItem(row, display)
+            self.ui.listWidget.setToolTip(_("Click item for context"))
         self.ui.splitter.setSizes([300, 200])
 
     def show_list_item(self):
