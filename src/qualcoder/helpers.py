@@ -890,19 +890,20 @@ class MarkdownHighlighter(QtGui.QSyntaxHighlighter):
 class NumberBar(QtWidgets.QFrame):
     """
     NumberBar is a QWidget subclass providing a sidebar with line numbers
-    for a QTextEdit widget. It visually aligns with the text editor to
+    for a text editor widget. It visually aligns with the text editor to
     display line numbers alongside text content, offering a useful guide
     for text navigation.
     Loosely based on https://nachtimwald.com/2009/08/15/qtextedit-with-line-numbers/
 
     Attributes:
-        text_edit (QTextEdit): The text editor widget that this NumberBar
+        text_edit (QTextEdit or QPlainTextEdit): The text editor widget that this NumberBar
                                is associated with.
     """    
     
     def __init__(self, text_edit: QtWidgets.QTextEdit, *args):
         super().__init__(*args)
         self.text_edit = text_edit
+        self.is_plain_text = isinstance(self.text_edit, QtWidgets.QPlainTextEdit)
         background_color = text_edit.palette().color(QtGui.QPalette.ColorRole.Base)
         self.setStyleSheet(f"background-color: {background_color.name()};")
         # The highest line that is currently visible, used to update the width of the control
@@ -925,6 +926,17 @@ class NumberBar(QtWidgets.QFrame):
         self.event_filter = EventFilter(self)
         self.text_edit.installEventFilter(self.event_filter)
         self.text_edit.viewport().installEventFilter(self.event_filter)
+        if self.is_plain_text:
+            self.text_edit.blockCountChanged.connect(self.adjustWidth)
+            self.text_edit.updateRequest.connect(self._on_update_request)
+
+    def _on_update_request(self, rect, dy):
+        """Keep the number bar in sync with QPlainTextEdit repaint/scroll events."""
+        if dy:
+            self.scroll(0, dy)
+        else:
+            self.update(0, rect.y(), self.width(), rect.height())
+        self.adjustWidth()
 
     def adjustWidth(self):
         """ 
@@ -933,8 +945,11 @@ class NumberBar(QtWidgets.QFrame):
         Will try to adjust the scrolling position accordingly so that the visible text is 
         not jumping too much.
         """
+        if self.is_plain_text:
+            total_lines = max(1, self.text_edit.blockCount())
+            self.highest_line = max(self.highest_line, self.first_line + total_lines - 1)
         if self.first_line > self.highest_line:
-            self. highest_line = self.first_line
+            self.highest_line = self.first_line
         if self.highest_line < 1000:
             digits = 3  # minimum width 3 digits
         else:
@@ -971,11 +986,6 @@ class NumberBar(QtWidgets.QFrame):
     def paintEvent(self, event):
         """Custom painting logic for rendering the line numbers
         based on the currently visible text blocks in the QTextEdit."""
-        
-        contents_y = self.text_edit.verticalScrollBar().value()
-        page_bottom = contents_y + self.text_edit.viewport().height()
-        text_edit_font_metrics = self.text_edit.fontMetrics()
-
         painter = QtGui.QPainter(self)
         font = self.text_edit.font()
         font.setFamily('Monospace')
@@ -984,26 +994,51 @@ class NumberBar(QtWidgets.QFrame):
         painter.setPen(text_color)
         painter.setFont(font)
         font_metrics = painter.fontMetrics()
+        text_edit_font_metrics = self.text_edit.fontMetrics()
 
-        line_count = self.first_line - 1
-        block = self.text_edit.document().begin()
+        if self.is_plain_text:
+            block = self.text_edit.firstVisibleBlock()
+            block_number = block.blockNumber()
+            top = self.text_edit.blockBoundingGeometry(block).translated(self.text_edit.contentOffset()).top()
+            bottom = top + self.text_edit.blockBoundingRect(block).height()
+            line_count = self.first_line + block_number
 
-        while block.isValid():
-            line_count += 1
-            position = self.text_edit.document().documentLayout().blockBoundingRect(block).topLeft()
-            if position.y() > page_bottom:
-                break
+            while block.isValid() and top <= event.rect().bottom():
+                if block.isVisible() and bottom >= event.rect().top():
+                    line_number = str(line_count)
+                    painter.drawText(
+                        self.width() - font_metrics.boundingRect(line_number).width() - 8,
+                        round(top) + text_edit_font_metrics.ascent(),
+                        line_number
+                    )
+                    if line_count > self.highest_line:
+                        self.highest_line = line_count
+                block = block.next()
+                top = bottom
+                bottom = top + self.text_edit.blockBoundingRect(block).height()
+                line_count += 1
+        else:
+            contents_y = self.text_edit.verticalScrollBar().value()
+            page_bottom = contents_y + self.text_edit.viewport().height()
+            line_count = self.first_line - 1
+            block = self.text_edit.document().begin()
 
-            line_number = str(line_count)
-            painter.drawText(
-                self.width() - font_metrics.boundingRect(line_number).width() - 8, 
-                round(position.y()) - contents_y + text_edit_font_metrics.ascent(), 
-                line_number
-            )
-                            
-            block = block.next()
-            if line_count > self.highest_line:
-                self.highest_line = line_count
+            while block.isValid():
+                line_count += 1
+                position = self.text_edit.document().documentLayout().blockBoundingRect(block).topLeft()
+                if position.y() > page_bottom:
+                    break
+
+                line_number = str(line_count)
+                painter.drawText(
+                    self.width() - font_metrics.boundingRect(line_number).width() - 8,
+                    round(position.y()) - contents_y + text_edit_font_metrics.ascent(),
+                    line_number
+                )
+
+                block = block.next()
+                if line_count > self.highest_line:
+                    self.highest_line = line_count
 
         painter.end()
         QtWidgets.QWidget.paintEvent(self, event)
