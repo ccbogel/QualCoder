@@ -100,7 +100,7 @@ def file_typer(mediapath):
         return "image"
     if mediapath[-3:] in ('mp3', 'wav', 'm4a'):
         return "audio"
-    if mediapath[-3:] in ('mkv', 'mov', 'mp4', 'ogg', 'wmv'):
+    if mediapath[-3:] in ('mkv', 'mov', 'mp4', 'ogg', 'wmv') or mediapath[-4:] == 'webm':
         return "video"
     return "text"
 
