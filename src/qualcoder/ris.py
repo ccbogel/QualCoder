@@ -70,7 +70,7 @@ class Ris:
 
     def get_references(self, selected_ris=None):
         """ As list of dictionaries with risid and summary.
-
+        ris: Integer risid
         """
 
         self.refs = []
@@ -82,6 +82,7 @@ class Ris:
         ris_ids_res = cur.fetchall()
         if not ris_ids_res:  # May be empty if selected_ris is incorrect or no references present
             return
+        # TODO missing title
         for ris_id in ris_ids_res:
             ref = {'risid': ris_id[0]}
             details = str(ris_id[0]) + " "
@@ -271,7 +272,7 @@ class Ris:
         if pages:
             apa += f"({pages})"
         if url is not None:
-            apa += url
+            apa += f" {url}"
         if doi is not None:
             apa += f" {doi}"
         # Clean up
@@ -287,9 +288,6 @@ class Ris:
 
         if title == "":
             return ""
-        if not title.istitle():
-            return
-
         text_list = title.split()
         # Ignore the first word, should be sentence case already.
         for i in range(1, len(text_list)):
