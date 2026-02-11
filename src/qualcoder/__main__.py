@@ -56,7 +56,6 @@ from qualcoder.GUI.base64_notosans_helper import NotoSans
 from qualcoder.GUI.ui_main import Ui_MainWindow
 from qualcoder.helpers import Message, ImportPlainTextCodes
 from qualcoder.import_survey import DialogImportSurvey
-#from qualcoder.import_twitter_data import DialogImportTwitterData
 from qualcoder.information import DialogInformation, menu_shortcuts_display, coding_shortcuts_display
 from qualcoder.locale.base64_lang_helper import *
 from qualcoder.journals import DialogJournals
@@ -157,7 +156,7 @@ class ProjectLockHeartbeatWorker(QtCore.QObject):
                     with open(self.lock_file_path, 'w', encoding='utf-8') as lock_file:
                         lock_file.write(f"{getpass.getuser()}\n{str(time.time())}")
                     self.lost_connection = False
-                except Exception as e_:  # TODO Needs specific exception, printing to find out what is needed
+                except Exception as e_:
                     print(e_)
                     if not self.lost_connection:
                         self.io_error.emit()
@@ -813,6 +812,8 @@ class App(object):
         QWidget:focus {border: 2px solid #f89407;}\n\
         QDialog {border: 1px solid #707070;}\n\
         QFileDialog {font-size: 12px}\n\
+        QFileDialog QListView {font-size: 12px;}\n\
+        QFileDialog QAbstractItemView {font-size: 12px;}\n\
         QCheckBox {border: None}\n\
         QCheckBox::indicator {border: 2px solid #808080; background-color: #2a2a2a;}\n\
         QCheckBox::indicator::checked {border: 2px solid #808080; background-color: orange;}\n\
@@ -863,17 +864,23 @@ class App(object):
         QTreeWidget {font-size: 12px;}\n\
         QTreeView {background-color: #484848}\n\
         QTreeView::branch:selected {border-left: 2px solid red; color: #eeeeee;}"
-        style_dark = style_dark.replace("* {font-size: 12", "* {font-size:" + str(settings.get('fontsize')))
+        style_dark = style_dark.replace("* {font-size: 12", f"* {{font-size: {settings.get('fontsize')}")
         style_dark = style_dark.replace("QFileDialog {font-size: 12",
-                                        "QFileDialog {font-size:" + str(settings.get('fontsize')))
+                                        f"QFileDialog {{font-size: {settings.get('fontsize')}")
+        style_dark = style_dark.replace("QFileDialog QListView {font-size: 12",
+                              f"QFileDialog QListView {{font-size: {settings.get('fontsize')}")
+        style_dark = style_dark.replace("QFileDialog QAbstractItemView {font-size: 12",
+                              f"QFileDialog QAbstractItemView {{font-size: {settings.get('fontsize')}")
         style_dark = style_dark.replace("QTreeWidget {font-size: 12",
-                                        "QTreeWidget {font-size: " + str(settings.get('treefontsize')))
+                                        f"QTreeWidget {{font-size: {settings.get('treefontsize')}")
         style = "* {font-size: 12px; color: #000000;}\n\
         QWidget {background-color: #efefef; color: #000000; border: none;}\n\
         QWidget:focus {border: 1px solid #f89407;}\n\
         QMainWindow {background-color: #efefef}\n\
         QDialog {border: 1px solid #808080; background-color: #efefef;}\n\
-        QFileDialog {font-size: 12px}\n\
+        QFileDialog {font-size: 12px;}\n\
+        QFileDialog QListView {font-size: 12px;}\n\
+        QFileDialog QAbstractItemView {font-size: 12px;}\n\
         QComboBox {border: 1px solid #707070; background-color: #fafafa;}\n\
         QComboBox:hover,QPushButton:hover {border: 2px solid #f89407;}\n\
         QGroupBox {border-right: 1px solid #707070; border-bottom: 1px solid #707070; background-color: #efefef}\n\
@@ -908,10 +915,15 @@ class App(object):
         QToolTip {background-color: #fffacd; color:#000000; border: 1px solid #f89407; }\n\
         QTreeWidget {font-size: 12px;}\n\
         QTreeView::branch:selected {border-left: 2px solid red; color: #000000;}"
-        style = style.replace("* {font-size: 12", "* {font-size:" + str(settings.get('fontsize')))
-        style = style.replace("QFileDialog {font-size: 12", "QFileDialog {font-size:" + str(settings.get('fontsize')))
+        style = style.replace("* {font-size: 12", f"* {{font-size: {settings.get('fontsize')}")
+        style = style.replace("QFileDialog {font-size: 12",
+                              f"QFileDialog {{font-size: {settings.get('fontsize')}")
+        style = style.replace("QFileDialog QListView {font-size: 12",
+                              f"QFileDialog QListView {{font-size: {settings.get('fontsize')}")
+        style = style.replace("QFileDialog QAbstractItemView {font-size: 12",
+                              f"QFileDialog QAbstractItemView {{font-size: {settings.get('fontsize')}")
         style = style.replace("QTreeWidget {font-size: 12",
-                              "QTreeWidget {font-size: " + str(settings.get('treefontsize')))
+                              f"QTreeWidget {{font-size: {settings.get('treefontsize')}")
         # Set the color for links (used in AI chat window and Settings dialog). The system default might be hard to read, especially in light themes. 
         palette = QtGui.QPalette()
         palette.setColor(QtGui.QPalette.ColorRole.Link, QtGui.QColor(self.highlight_color()))
@@ -957,8 +969,8 @@ class App(object):
         for i, sl in enumerate(style_lines):
             print(i + 1, sl)
         style_lines = style_lines[0:15]  # Test bed for parsing
-        style = "\n".join(style_lines)
-        print("\nSTYLE\n", style)'''
+        style = "\n".join(style_lines)'''
+        # print("\nSTYLE\n", style)
         return style
     
     def highlight_color(self):
