@@ -1850,12 +1850,20 @@ class DialogCodeAV(QtWidgets.QDialog):
                  'owner': self.app.settings['codername'],
                  'date': datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                  'av_text_id': None}
-        cur = self.app.conn.cursor()
-        cur.execute("insert into source(name,memo,owner,date, mediapath, fulltext) values(?,?,?,?,?,?)",
-                    (
-                        entry['name'], entry['memo'], entry['owner'], entry['date'], entry['mediapath'],
-                        entry['fulltext']))
-        self.app.conn.commit()
+        try:
+            cur = self.app.conn.cursor()
+            cur.execute("insert into source(name,memo,owner,date, mediapath, fulltext) values(?,?,?,?,?,?)",
+                        (
+                            entry['name'], entry['memo'], entry['owner'], entry['date'], entry['mediapath'],
+                            entry['fulltext']))
+            self.app.conn.commit()
+        except sqlite3.IntegrityError as e_:
+            print(e_)
+            msg = f"{e_}\n"
+            msg += _("This source name already exists:")
+            msg += f"\n{entry['name']}"
+            Message(self.app, _("Name exists"), msg, "warning").exec()
+            return
         Message(self.app, _("Screenshot imported"), file_path).exec()
         self.parent_textEdit.append(_("Screenshot imports: ") + image_name)
 
