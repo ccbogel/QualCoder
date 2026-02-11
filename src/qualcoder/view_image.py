@@ -952,7 +952,7 @@ class DialogCodeImage(QtWidgets.QDialog):
 
         if image.isNull():
             self.clear_file()
-            Message(self.app, _("Image Error"), _("Cannot open: ", "warning") + source_path).exec()
+            Message(self.app, _("Image Error"), _("Cannot open: ") + source_path).exec()
             logger.warning("Cannot open image: " + source_path)
             return
 
@@ -1502,6 +1502,15 @@ class DialogCodeImage(QtWidgets.QDialog):
                           coded['y1'] + coded['height'])
                     print("Main img: w", background.width, "h", background.height)
         highlights.show()
+
+        exp_dlg = ExportDirectoryPathDialog(self.app, "Image_highlights.jpg")
+        filepath = exp_dlg.filepath
+        if filepath is None:
+            return
+        highlights.save(filepath)
+        msg = _('Image exported: ') + filepath
+        Message(self.app, _('Image saved'), msg, "information").exec()
+        self.parent_textEdit.append(msg)
 
     def text_box(self, draw, background_width, position, text, memo):
         """ Draw codename caption if show_code_captions=1, or codename plus memo if show_code_captions=2. """
