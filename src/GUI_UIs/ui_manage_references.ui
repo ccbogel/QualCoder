@@ -95,7 +95,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete selected reference&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Delete selected reference</string>
       </property>
       <property name="text">
        <string/>
@@ -111,7 +111,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Link selected files to selected reference&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Link selected files to selected reference</string>
       </property>
       <property name="text">
        <string/>
@@ -127,7 +127,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Unlink selected files from references&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Unlink selected files from references</string>
       </property>
       <property name="text">
        <string/>
@@ -143,7 +143,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete all references that are not assigned to files&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Delete all references that are not assigned to files</string>
       </property>
       <property name="text">
        <string/>
@@ -159,7 +159,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Edit reference&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Edit reference</string>
       </property>
       <property name="text">
        <string/>
@@ -175,7 +175,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Import references. RIS format.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Import references. RIS or NBIB (PubMed) format.</string>
       </property>
       <property name="text">
        <string/>
@@ -191,7 +191,11 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Automatically link references to unassigned file names.&lt;/p&gt;&lt;p&gt;Word matching uses words from reference title.&lt;/p&gt;&lt;p&gt;Strong matches with 70% or more matching words are linked.&lt;/p&gt;&lt;p&gt;Linking may be incorrect. &lt;/p&gt;&lt;p&gt;Review after applying the function.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Automatically link references to unassigned file names.
+Word matching uses words from reference title.
+Strong matches with 70% or more matching words are linked.
+Linking may be incorrect.
+Review after applying the function.</string>
       </property>
       <property name="text">
        <string/>
