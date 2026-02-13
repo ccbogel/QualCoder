@@ -72,7 +72,7 @@ cd src
 py -m qualcoder
 ```
 
-If you are using python version 3.13 and get a dll error regarding the torch module when trying to run QualCoder. Try a different torch version:
+If you are using python version 3.13 and get a dll error regarding the torch module when trying to run QualCoder. Install this torch version:
 
 ```
 pip install torch==2.8.0 torchvision==0.23.0 torchaudio==2.8.0
