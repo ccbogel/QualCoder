@@ -24,9 +24,8 @@ import collections
 import datetime
 import logging
 import os
+import re
 import rispy
-import sys
-import traceback
 from PyQt6 import QtWidgets
 
 path = os.path.abspath(os.path.dirname(__file__))
@@ -309,6 +308,7 @@ class Ris:
 class RisImport:
     """ Import an RIS format bibliography and store in database.
     References in RIS can be poorly created often due to how the researcher created them.
+    Also, get PubMed Nbib file and convert to RIS to import.
 
     Create these variables for the sources
     Ref_Type (Type of Reference) – character variable
@@ -324,15 +324,18 @@ class RisImport:
     def __init__(self, app, parent_text_edit):
         self.app = app
         self.parent_text_edit = parent_text_edit
-        response = QtWidgets.QFileDialog.getOpenFileNames(None, _('Select RIS references file'),
+        response = QtWidgets.QFileDialog.getOpenFileNames(None, _('Select RIS or NBIB references file'),
                                                           self.app.settings['directory'],
-                                                          "(*.txt *.ris *.RIS)")
-        # options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
+                                                          "(*.ris *.RIS *.nbib *.txt)",
+                                                          options=QtWidgets.QFileDialog.Option.DontUseNativeDialog)
         imports = response[0]
         if imports:
+            file_path = imports[0]
+            if file_path.endswith(".nbib"):
+                file_path = self.nbib_to_ris(file_path)
             self.create_file_attributes()
             self.create_file_placeholder_attributes()
-            self.import_ris_file(imports[0])
+            self.import_ris_file(file_path)
 
     def create_file_attributes(self):
         """ Creates the attributes for Ref_Authors, Ref_Title, Ref_Type, Ref_Year, Ref_Journal """
@@ -342,7 +345,7 @@ class RisImport:
         ref_vars = {'Ref_Authors': 'character', 'Ref_Title': 'character', 'Ref_Type': 'character',
                     'Ref_Year': 'numeric', 'Ref_Journal': 'character'}
         for key in ref_vars:
-            cur.execute("select name from attribute type where name=?", [key])
+            cur.execute("select name from attribute_type where name=?", [key])
             res = cur.fetchone()
             if not res:
                 cur.execute("insert into attribute_type (name,date,owner,memo,caseOrFile, valuetype) values(?,?,?,?,?,?)",
@@ -381,10 +384,10 @@ class RisImport:
         tag_keys is the dictionary of 2 char short tag keys (e.g. AU) and the longtag wording
         """
 
-        #list_tags = rispy.LIST_TYPE_TAGS
-        #print("List tags ", list_tags)
+        # list_tags = rispy.LIST_TYPE_TAGS
+        # print("List tags ", list_tags)
         tag_keys = rispy.TAG_KEY_MAPPING
-        #for tk in tag_keys:
+        # for tk in tag_keys:
         #    print(tk, tag_keys[tk])
         longtag_to_tag = dict((v, k) for k, v in tag_keys.items())
         cur = self.app.conn.cursor()
@@ -409,7 +412,7 @@ class RisImport:
             else:
                 new_entries += 1
                 max_risid += 1
-                #print(entry.keys())
+                # print(entry.keys())
                 for longtag in entry:
                     if isinstance(entry[longtag], list):
                         data = "; ".join(entry[longtag])
@@ -417,7 +420,7 @@ class RisImport:
                         data = entry[longtag]
                     if not isinstance(data, str):
                         continue
-                    #print("risid", max_risid, longtag_to_tag[longtag], longtag, data)
+                    # print("risid", max_risid, longtag_to_tag[longtag], longtag, data)
                     sql = "insert into ris (risid,tag,longtag,value) values (?,?,?,?)"
                     cur.execute(sql, [max_risid, longtag_to_tag[longtag], longtag, data])
             self.app.conn.commit()
@@ -467,7 +470,65 @@ class RisImport:
                 exists = True
         return exists
 
+    def nbib_to_ris(self, nbib_filepath):
+        """ Create a temporary ris file from the PubMed nbib file.
+         Stored in .qualcoder """
 
+        # To find abstract and add the subsequent lines, without adding unknown lines to another tag
+        abstract_tag = False
+
+        ris_data = ""
+        with open(nbib_filepath, "r", encoding="utf-8", errors="backslashreplace") as nbib_file:
+            for line in nbib_file:
+                line = line.rstrip()
+                # print(line)
+                if line.startswith("PMID"):  # new record
+                    ris_data += "TY  - JOUR"
+                if line.startswith("AB  - "):
+                    abstract_tag = True
+                if abstract_tag is True and tag != "":  # No more part of the abstract
+                    abstract_tag = False
+                if line == "":  # End of nbib record
+                    ris_data += "\nER  -\n\n"
+                else:
+                    tag = nbib_tags.get(line[:6])
+                    data = line[6:]
+                    if tag is not None and tag != "":
+                        ris_data += "\n" + tag + data
+                    elif tag is not None and abstract_tag and tag == "":  # Continued line for abstract
+                        ris_data += " " + data
+        # Add final record tag
+        ris_data += "\nER  -\n\n"
+
+        ris_file_path = os.path.join(self.app.confighome, "temp_nbib_to_ris.ris")
+        with open(ris_file_path, "w", encoding="utf-8") as ris_data_file:
+            ris_data_file.write(ris_data)
+        return ris_file_path
+
+
+# PubMed nbib to ris reference tags
+nbib_tags = {
+            "PMID- ": "ID  - ",  # PubMed ID
+            "TI  - ": "TI  - ",  # Title
+            "JT  - ": "T2  - ",  # Journal Title
+            "TA  - ": "JO  - ",  # Journal Abbreviation
+            "AU  - ": "AU  - ",  # Author
+            "DP  - ": "PY  - ",  # Publication Year
+            "VI  - ": "VL  - ",  # Volume
+            "IP  - ": "IS  - ",  # Issue
+            "PG  - ": "SP  - ",  # Start Page
+            "LID - ": "DO  - ",  # DOI
+            "AB  - ": "AB  - ",  # Abstract
+            "PL  - ": "CY  - ",  # Place of Publication
+            "PB  - ": "PB  - ",  # Publisher
+            "ED  - ": "ED  - ",  # Editor
+            "MH  - ": "KW  - ",  # Keywords
+            "      ": ""    # line continuation, e.g. abstract
+        }
+# "FAU - ": "AU  - ",  # Full Author Name - seems superfluous, but might have to review this
+
+
+# ris reference tags
 ref_types = {
 'ABST': 'Abstract',
 'ADVS': 'Audiovisual material',

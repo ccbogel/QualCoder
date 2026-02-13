@@ -107,7 +107,8 @@ class DialogReferenceManager(QtWidgets.QDialog):
         self.ui.pushButton_edit_ref.pressed.connect(self.edit_reference)
         self.ui.pushButton_delete_ref.setIcon(qta.icon('mdi6.delete-outline', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_delete_ref.pressed.connect(self.delete_reference)
-        self.ui.pushButton_delete_unused_refs.setIcon(qta.icon('mdi6.file-document-remove-outline', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_delete_unused_refs.setIcon(
+            qta.icon('mdi6.file-document-remove-outline', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_delete_unused_refs.setEnabled(False)
         self.ui.pushButton_delete_unused_refs.hide()
         self.ui.pushButton_auto_link.setIcon(qta.icon('mdi6.magic-staff', options=[{'scale_factor': 1.4}]))
@@ -128,7 +129,8 @@ class DialogReferenceManager(QtWidgets.QDialog):
         """ Get data for files and references. """
 
         cur = self.app.conn.cursor()
-        cur.execute("select id, name, risid, memo, date, mediapath, av_text_id, fulltext from source order by lower(name)")
+        cur.execute(
+            "select id, name, risid, memo, date, mediapath, av_text_id, fulltext from source order by lower(name)")
         result = cur.fetchall()
         self.files = []
         keys = 'id', 'name', 'risid', 'memo', 'date', 'mediapath', 'av_text_id', 'fulltext'
@@ -229,7 +231,6 @@ class DialogReferenceManager(QtWidgets.QDialog):
     def table_files_menu(self, position):
         """ Context menu for showing specific rows. """
 
-        # row = self.ui.tableWidget_files.currentRow()
         menu = QtWidgets.QMenu()
         action_show_value_like = menu.addAction(_("Show value like"))
         action_file_view = menu.addAction(_("View file"))
@@ -383,7 +384,8 @@ class DialogReferenceManager(QtWidgets.QDialog):
         rows = self.ui.tableWidget_refs.rowCount()
         for c in range(0, rows):
             self.ui.tableWidget_refs.removeRow(0)
-        header_labels = ["Ref id", _("Reference"), _("Type"), _("Year"), _("Authors"), _("Journal or Publication Title"),
+        header_labels = ["Ref id", _("Reference"), _("Type"), _("Year"), _("Authors"),
+                         _("Journal or Publication Title"),
                          _("Volume"), _("Issue"), _("Keywords")]
         self.ui.tableWidget_refs.setColumnCount(len(header_labels))
         self.ui.tableWidget_refs.setHorizontalHeaderLabels(header_labels)
@@ -604,7 +606,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
         if item is not None:
             item_text = item.text()
         menu = QtWidgets.QMenu()
-        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
         action_show_this_value = menu.addAction(_("Show this value"))
         action_show_value_like = menu.addAction(_("Show value like"))
         action_show_all_rows = None
@@ -613,6 +615,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
         action_copy_to_clipboard = menu.addAction(_("Copy to clipboard"))
         action_copy_apa_to_clipboard = menu.addAction(_("Copy to clipboard.  APA style"))
         action_edit_reference = menu.addAction(_("Edit reference"))
+        action_delete_reference = menu.addAction(_("Delete"))
         action = menu.exec(self.ui.tableWidget_refs.mapToGlobal(position))
         if action == action_show_all_rows:
             for r in range(0, self.ui.tableWidget_refs.rowCount()):
@@ -649,9 +652,11 @@ class DialogReferenceManager(QtWidgets.QDialog):
                     return
         if action == action_edit_reference:
             self.edit_reference()
+        if action == action_delete_reference:
+            self.delete_reference()
 
     def import_references(self):
-        """ Import RIS formatted references from .ris or .txt files """
+        """ Import RIS formatted references from .ris or .txt files or PubMed nbib files """
 
         RisImport(self.app, self.parent_text_edit)
         self.get_data()
@@ -686,10 +691,12 @@ class DialogReferenceManager(QtWidgets.QDialog):
         if type(event) == QtGui.QKeyEvent:
             key = event.key()
             # mod = event.modifiers()
-            if key == QtCore.Qt.Key.Key_L and (self.ui.tableWidget_refs.hasFocus() or self.ui.tableWidget_files.hasFocus()):
+            if key == QtCore.Qt.Key.Key_L and (
+                    self.ui.tableWidget_refs.hasFocus() or self.ui.tableWidget_files.hasFocus()):
                 self.link_reference_to_files()
                 return True
-            if key == QtCore.Qt.Key.Key_U and (self.ui.tableWidget_refs.hasFocus() or self.ui.tableWidget_files.hasFocus()):
+            if key == QtCore.Qt.Key.Key_U and (
+                    self.ui.tableWidget_refs.hasFocus() or self.ui.tableWidget_files.hasFocus()):
                 self.unlink_files()
                 return True
         return False
@@ -886,7 +893,7 @@ class DialogReferenceManager(QtWidgets.QDialog):
         cur.execute("update source set risid=null where risid=?", [ris_id])
         cur.execute("delete from ris where risid=?", [ris_id])
         self.app.conn.commit()
-        # Clear Refeence attributes
+        # Clear Reference attributes
         attributes = ["Ref_Authors", "Ref_Title", "Ref_Type", "Ref_Year", "Ref_Journal"]
         sql = "update attribute set value='' where id=? and name=?"
         for source in source_ids:
@@ -897,4 +904,3 @@ class DialogReferenceManager(QtWidgets.QDialog):
         self.fill_table_refs()
         self.fill_table_files()
         self.parent_text_edit.append(_("Reference deleted."))
-
