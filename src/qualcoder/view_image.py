@@ -22,18 +22,16 @@ https://qualcoder-org.github.io/
 
 from copy import deepcopy, copy
 import datetime
-
-import PIL.Image
 import fitz
 import html
 from io import BytesIO
 import logging
 import os
+import PIL.Image
 from PIL import Image, ImageDraw, ImageFilter, ImageFont, ImageOps
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 from random import randint
 import sqlite3
-import webbrowser
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import Qt, QBuffer
@@ -41,6 +39,7 @@ from PyQt6.QtGui import QBrush
 
 from .add_item_name import DialogAddItemName
 from .code_in_all_files import DialogCodeInAllFiles
+from .coder_names import DialogCoderNames
 from .color_selector import DialogColorSelect
 from .color_selector import colors, TextColor, colour_ranges, show_codes_of_colour_range
 from .confirm_delete import DialogConfirmDelete
@@ -49,10 +48,10 @@ from .GUI.ui_dialog_view_image import Ui_Dialog_view_image
 from .move_resize_rectangle import DialogMoveResizeRectangle
 from .helpers import ExportDirectoryPathDialog, Message
 from .memo import DialogMemo
-from .coder_names import DialogCoderNames
 from .report_attributes import DialogSelectAttributeParameters
 from .reports import DialogReportCoderComparisons, DialogReportCodeFrequencies  # for isinstance()
 from .report_codes import DialogReportCodes
+from .ris import Ris
 from .select_items import DialogSelectItems
 
 path = os.path.abspath(os.path.dirname(__file__))
@@ -237,7 +236,6 @@ class DialogCodeImage(QtWidgets.QDialog):
                 for i in reversed(range(contents.count())):
                     contents.itemAt(i).widget().close()
                     contents.itemAt(i).widget().setParent(None)
-                    
 
     def set_default_new_code_color(self):
         """ New code colours are usually generated randomly.
@@ -258,7 +256,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         """
 
         dialog = QtWidgets.QInputDialog(None)
-        dialog.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        dialog.setStyleSheet(f"* {{font-size:{self.app.settings['fontsize']}pt}} ")
         dialog.setWindowTitle(_("Search for code"))
         dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         dialog.setInputMode(QtWidgets.QInputDialog.InputMode.TextInput)
@@ -356,7 +354,7 @@ class DialogCodeImage(QtWidgets.QDialog):
 
         self.ui.listWidget.clear()
         cur = self.app.conn.cursor()
-        sql = "select name, id, memo, owner, date, mediapath from source where "
+        sql = "select name, id, memo, owner, date, mediapath, risid from source where "
         sql += "(substr(mediapath,1,7) in ('/images', 'images:')) or "
         sql += "(lower(substr(mediapath, -4)) = '.pdf') "
         sql += bad_link_sql + " "
@@ -367,7 +365,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         cur.execute(sql)
         result = cur.fetchall()
         self.files = []
-        keys = 'name', 'id', 'memo', 'owner', 'date', 'mediapath'
+        keys = 'name', 'id', 'memo', 'owner', 'date', 'mediapath', 'risid'
         for row in result:
             self.files.append(dict(zip(keys, row)))
         sql_case = "SELECT group_concat(cases.name) from cases join case_text on case_text.caseid=cases.caseid " \
@@ -381,6 +379,14 @@ class DialogCodeImage(QtWidgets.QDialog):
                 tt += "\n" + _("Case: ") + f"{res_cases[0]}"
                 file_['case'] = f"{res_cases[0]}"
             tt += f"\n{file_['memo']}"
+
+            if file_['risid']:
+                ris = Ris(self.app)
+                ris.get_references(file_['risid'])
+                if ris.refs:
+                    reference = ris.refs[0]['vancouver']
+                    tt += f"\nREF: {reference}"
+
             file_['tooltip'] = tt
         # Sorting the file list
         if sort == "name asc":
@@ -459,10 +465,10 @@ class DialogCodeImage(QtWidgets.QDialog):
                 memo = ""
                 if c['memo'] != "":
                     memo = "Memo"
-                top_item = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
+                top_item = QtWidgets.QTreeWidgetItem([c['name'], f"catid:{c['catid']}", memo])
                 top_item.setToolTip(0, c['name'])
                 if len(c['name']) > 52:
-                    top_item.setText(0, c['name'][:25] + '..' + c['name'][-25:])
+                    top_item.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
                     top_item.setToolTip(0, c['name'])
                 top_item.setToolTip(2, c['memo'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
@@ -491,7 +497,7 @@ class DialogCodeImage(QtWidgets.QDialog):
                         child = QtWidgets.QTreeWidgetItem([c['name'], f"catid:{c['catid']}", memo])
                         child.setToolTip(0, c['name'])
                         if len(c['name']) > 52:
-                            child.setText(0, c['name'][:25] + '..' + c['name'][-25:])
+                            child.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
                             child.setToolTip(0, c['name'])
                         child.setToolTip(2, c['memo'])
                         item.addChild(child)
@@ -517,7 +523,7 @@ class DialogCodeImage(QtWidgets.QDialog):
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], f"cid:{c['cid']}", memo])
                 top_item.setToolTip(0, c['name'])
                 if len(c['name']) > 52:
-                    top_item.setText(0, c['name'][:25] + '..' + c['name'][-25:])
+                    top_item.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
                     top_item.setToolTip(0, c['name'])
                 top_item.setToolTip(2, c['memo'])
                 top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
@@ -547,7 +553,7 @@ class DialogCodeImage(QtWidgets.QDialog):
                     child.setForeground(0, QBrush(QtGui.QColor(color)))
                     child.setToolTip(0, c['name'])
                     if len(c['name']) > 52:
-                        child.setText(0, c['name'][:25] + '..' + c['name'][-25:])
+                        child.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
                         child.setToolTip(0, c['name'])
                     child.setToolTip(2, c['memo'])
                     child.setFlags(
@@ -819,7 +825,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         If blank, show all files. """
 
         dialog = QtWidgets.QInputDialog(self)
-        dialog.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        dialog.setStyleSheet(f"* {{font-size:{self.app.settings['fontsize']}pt}} ")
         dialog.setWindowTitle(_("Show files like"))
         dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         dialog.setInputMode(QtWidgets.QInputDialog.InputMode.TextInput)
