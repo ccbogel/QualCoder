@@ -61,6 +61,7 @@ from .report_attributes import DialogSelectAttributeParameters
 from .reports import DialogReportCoderComparisons, DialogReportCodeFrequencies  # for isinstance()
 from .report_codes import DialogReportCodes
 from .report_code_summary import DialogReportCodeSummary  # for isinstance()
+from .ris import Ris
 from .select_items import DialogSelectItems  # for isinstance()
 
 path = os.path.abspath(os.path.dirname(__file__))
@@ -392,12 +393,21 @@ class DialogCodePdf(QtWidgets.QWidget):
             file_['start'] = 0
             file_['end'] = res_length[0]
             file_['fulltext'] = res_length[1]
+
             cur.execute(sql_codings, [file_['id']])
             res_codings = cur.fetchone()
             tt += f"\n{_('Codings:')} {res_codings[0]}"
             tt += f"\n{_('From:')} {file_['start']} - {file_['end']}"
             if file_['memo'] != "":
                 tt += f"\nMemo: {file_['memo']}"
+
+            if file_['risid']:
+                ris = Ris(self.app)
+                ris.get_references(file_['risid'])
+                if ris.refs:
+                    reference = ris.refs[0]['vancouver']
+                    tt += f"\nREF: {reference}"
+
             file_['tooltip'] = tt
         # Sorting the file list
         if sort == "name asc":
@@ -770,7 +780,6 @@ class DialogCodePdf(QtWidgets.QWidget):
                     contents.itemAt(i).widget().close()
                     contents.itemAt(i).widget().setParent(None)
 
-
     # Search for text methods
     def search_for_text(self):
         """ On text changed in lineEdit_search OR Enter pressed, find indices of matching text.
@@ -904,7 +913,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         """ Option to change from automatic search on 3 characters or more to press Enter to search """
 
         menu = QtWidgets.QMenu()
-        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
         action_char3 = QtGui.QAction(_("Automatic search 3 or more characters"))
         action_char5 = QtGui.QAction(_("Automatic search 5 or more characters"))
         action_enter = QtGui.QAction(_("Press Enter to search"))
@@ -972,7 +981,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         cursor = self.ui.textEdit.cursorForPosition(position)
         selected_text = self.ui.textEdit.textCursor().selectedText()
         menu = QtWidgets.QMenu()
-        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
         action_annotate = None
         action_copy = None
         action_code_memo = None
@@ -1311,7 +1320,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         Assign selected text to current hovered code. """
 
         menu = QtWidgets.QMenu()
-        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
         selected = self.ui.treeWidget.currentItem()
         action_add_code_to_category = None
         action_add_category_to_category = None
@@ -1495,7 +1504,7 @@ class DialogCodePdf(QtWidgets.QWidget):
          The input dialog is too narrow, so it is re-created. """
 
         dialog = QtWidgets.QInputDialog(None)
-        dialog.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        dialog.setStyleSheet(f"* {{font-size:{self.app.settings['fontsize']}pt}} ")
         dialog.setWindowTitle(_("Show some codes"))
         dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         dialog.setInputMode(QtWidgets.QInputDialog.InputMode.TextInput)
@@ -2540,7 +2549,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         If blank, show all files. """
 
         dialog = QtWidgets.QInputDialog(self)
-        dialog.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        dialog.setStyleSheet(f"* {{font-size:{self.app.settings['fontsize']}pt}} ")
         dialog.setWindowTitle(_("Show files like"))
         dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         dialog.setInputMode(QtWidgets.QInputDialog.InputMode.TextInput)

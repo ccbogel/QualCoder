@@ -395,13 +395,13 @@ class App(object):
             ids: list of Integer ids for a restricted list of files.
 
         Returns:
-            List of dictionaries of id, name memo, mediapath, date
+            List of dictionaries of id, name memo, mediapath, date, risid
         """
 
         if ids is None:
             ids = []
-        sql = "select id, name, ifnull(memo,''), mediapath, date from source where (mediapath is Null or mediapath " \
-              "like '/docs/%' or mediapath like 'docs:%') "
+        sql = "select id, name, ifnull(memo,''), mediapath, date, risid from source where \
+        (mediapath is Null or mediapath like '/docs/%' or mediapath like 'docs:%') "
         if ids:
             ids_str = ",".join(map(str, ids))
             sql += f" and id in ({ids_str}) "
@@ -410,7 +410,7 @@ class App(object):
         cur.execute(sql)
         result = cur.fetchall()
         res = []
-        keys = 'id', 'name', 'memo', 'mediapath', 'date'
+        keys = 'id', 'name', 'memo', 'mediapath', 'date', 'risid'
         for row in result:
             res.append(dict(zip(keys, row)))
         return res
@@ -473,12 +473,13 @@ class App(object):
         Args:
             ids: list of Integer ids for a restricted list of files, or None.
         Returns:
-            List of dictionaries of id, name memo, mediapath, date
+            List of dictionaries of id, name memo, mediapath, date, risid
         """
 
         if ids is None:
             ids = []
-        sql = "select id, name, ifnull(memo,''), mediapath, date from source where mediapath is not Null and(mediapath " \
+        sql = "select id, name, ifnull(memo,''), mediapath, date, risid from source " \
+              "where mediapath is not Null and(mediapath " \
               "like '/docs/%' or mediapath like 'docs:%') and (mediapath like '%.pdf' or mediapath like '%.PDF')"
         if ids:
             ids_str = ",".join(map(str, ids))
@@ -488,7 +489,7 @@ class App(object):
         cur.execute(sql)
         result = cur.fetchall()
         res = []
-        keys = 'id', 'name', 'memo', 'mediapath', 'date'
+        keys = 'id', 'name', 'memo', 'mediapath', 'date', 'risid'
         for row in result:
             res.append(dict(zip(keys, row)))
         return res
@@ -498,12 +499,13 @@ class App(object):
         Args:
             ids: list of Integer ids for a restricted list of files, or None.
         Returns:
-            List of dictionaries of id, name, memo, mediapath, date
+            List of dictionaries of id, name, memo, mediapath, date, risid
         """
 
         if ids is None:
             ids = []
-        sql = "select id, name, ifnull(memo,''), mediapath, date from source where mediapath like '/images/%' or mediapath like 'images:%'"
+        sql = "select id, name, ifnull(memo,''), mediapath, date, risid from source where " \
+              "mediapath like '/images/%' or mediapath like 'images:%'"
         if ids:
             ids_str = ",".join(map(str, ids))
             sql += f" and id in ({ids_str})"
@@ -512,7 +514,7 @@ class App(object):
         cur.execute(sql)
         result = cur.fetchall()
         res = []
-        keys = 'id', 'name', 'memo', 'mediapath', 'date'
+        keys = 'id', 'name', 'memo', 'mediapath', 'date', 'risid'
         for row in result:
             res.append(dict(zip(keys, row)))
         return res
@@ -520,15 +522,15 @@ class App(object):
     def get_image_and_pdf_filenames(self, ids=None):
         """ Get filenames of image and pdf files.
         Args:
-            ids: list of Integer ids for a restricted list of files, or Nonew.
+            ids: list of Integer ids for a restricted list of files, or None.
         Returns:
-            List of dictionaries of id, name, memo, mediapath, date
+            List of dictionaries of id, name, memo, mediapath, date, risid
         """
 
         if ids is None:
             ids = []
 
-        sql = "select id, name, ifnull(memo,''),mediapath, date from source where "
+        sql = "select id, name, ifnull(memo,''),mediapath, date, risid from source where "
         sql += "(substr(mediapath,1,7) in ('/images', 'images:')) or "
         sql += "(lower(substr(mediapath, -4)) = '.pdf') "
 
@@ -540,7 +542,7 @@ class App(object):
         cur.execute(sql)
         result = cur.fetchall()
         res = []
-        keys = 'id', 'name', 'memo', 'mediapath', 'date'
+        keys = 'id', 'name', 'memo', 'mediapath', 'date', 'risid'
         for row in result:
             res.append(dict(zip(keys, row)))
         return res
@@ -550,13 +552,14 @@ class App(object):
         Args:
             ids: list of Integer ids for a restricted list of files.
         Returns:
-            List of dictionaries of id, name, memo, mediapath, date
+            List of dictionaries of id, name, memo, mediapath, date, risid
         """
 
         if ids is None:
             ids = []
-        sql = "select id, name, ifnull(memo,''), mediapath, date from source where "
-        sql += "(mediapath like '/audio/%' or mediapath like 'audio:%' or mediapath like '/video/%' or mediapath like 'video:%') "
+        sql = "select id, name, ifnull(memo,''), mediapath, date, risid from source where "
+        sql += "(mediapath like '/audio/%' or mediapath like 'audio:%' or " \
+               "mediapath like '/video/%' or mediapath like 'video:%') "
         if ids:
             ids_str = ",".join(map(str, ids))
             sql += f" and id in ({ids_str})"
@@ -565,7 +568,7 @@ class App(object):
         cur.execute(sql)
         result = cur.fetchall()
         res = []
-        keys = 'id', 'name', 'memo', 'mediapath', 'date'
+        keys = 'id', 'name', 'memo', 'mediapath', 'date', 'risid'
         for row in result:
             res.append(dict(zip(keys, row)))
         return res
@@ -1151,7 +1154,7 @@ class App(object):
         Args:
             jids - a list of journal jids or None
         Returns:
-            List of Dictironaries of journal data
+            List of Dictionaries of journal data
         """
 
         cur = self.conn.cursor()
@@ -1675,7 +1678,6 @@ Click "Yes" to start now.')
         self.ui.actionImport_survey_2.setEnabled(False)
         self.ui.actionManage_bad_links_to_files.setEnabled(False)
         self.ui.actionManage_references.setEnabled(False)
-        #self.ui.actionImport_twitter_data.setEnabled(False)
         # Coding menu
         self.ui.actionCodes.setEnabled(False)
         self.ui.actionCode_image.setEnabled(False)
@@ -1724,7 +1726,6 @@ Click "Yes" to start now.')
         self.ui.actionManage_attributes.setEnabled(True)
         self.ui.actionImport_survey_2.setEnabled(True)
         self.ui.actionManage_references.setEnabled(True)
-        #self.ui.actionImport_twitter_data.setEnabled(True)
         # Coding menu
         self.ui.actionCodes.setEnabled(True)
         self.ui.actionCode_image.setEnabled(True)
