@@ -19,13 +19,13 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>70</height>
+       <height>74</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>70</height>
+       <height>74</height>
       </size>
      </property>
      <property name="title">
@@ -41,7 +41,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Create&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Create</string>
       </property>
       <property name="text">
        <string/>
@@ -57,7 +57,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Export</string>
       </property>
       <property name="text">
        <string/>
@@ -73,7 +73,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Delete</string>
       </property>
       <property name="text">
        <string/>
@@ -115,7 +115,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export all journals as single text file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Export all journals as single text file.</string>
       </property>
       <property name="text">
        <string/>
@@ -162,7 +162,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Next</string>
       </property>
       <property name="text">
        <string/>
@@ -207,7 +207,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;search all journals&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Search all journals</string>
       </property>
       <property name="text">
        <string/>
@@ -223,7 +223,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Previous&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Previous</string>
       </property>
       <property name="text">
        <string/>
@@ -239,7 +239,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search all journals&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Search all journals</string>
       </property>
       <property name="autoFillBackground">
        <bool>false</bool>
@@ -286,7 +286,7 @@
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add Attribute&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Add Attribute</string>
       </property>
       <property name="text">
        <string/>
