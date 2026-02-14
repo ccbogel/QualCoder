@@ -44,7 +44,7 @@ git rebase upstream/<branch-name>
 
 ##  Create a new branch
 
-- Always create a new branch and name it accordingly so as to identify the issue you are addressing.
+- Always create a new branch and name it accordingly to identify the issue you are addressing.
 
 ```bash
 # It will create a new branch with name branch_name and switch to that branch 
