@@ -321,7 +321,10 @@ def update_ai_models(current_models: list, current_model_index: int) -> tuple[li
         msg = _('You are using the "Blablador" service on an old server that will soon be disabled. '
                 'Your configuration will be updated automatically. Please test if the AI access still works as expected. '
                 'You might need to change to a different AI model in the settings dialog under "Advanced AI Settings".')
-        QtWidgets.QMessageBox(parent=None, title=_('AI Setup'), text=msg).exec()
+        msg_box = QtWidgets.QMessageBox()
+        msg_box.setWindowTitle(_('AI Setup'))
+        msg_box.setText(msg)
+        msg_box.exec()
     for model in current_models:
         if model['api_base'] == 'https://helmholtz-blablador.fz-juelich.de:8000/v1':
             model['api_base'] = 'https://api.helmholtz-blablador.fz-juelich.de/v1/'
