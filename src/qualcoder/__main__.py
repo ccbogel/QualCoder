@@ -612,23 +612,31 @@ class App(object):
             codes.append(dict(zip(keys, row)))
         return codes, categories
     
-    def check_bad_file_links(self):
+    def check_bad_file_links(self, id=None):
         """ Check all linked files are present.
-         Called from MainWindow.open_project, view_av.
+        Will not state a bad link to an internally created text file.
+        Called from MainWindow.open_project, Manage_files, view_av.
+        Args:
+            id : Integer or none for a specific file
          Returns:
              dictionary of id,name, mediapath for bad links
          """
-
         cur = self.conn.cursor()
         sql = "select id, name, mediapath from source where \
-            substr(mediapath,1,6) = 'audio:' \
-            or substr(mediapath,1,5) = 'docs:' \
-            or substr(mediapath,1,7) = 'images:' \
-            or substr(mediapath,1,6) = 'video:' order by name"
-        cur.execute(sql)
+                substr(mediapath,1,6) = 'audio:' \
+                or substr(mediapath,1,5) = 'docs:' \
+                or substr(mediapath,1,7) = 'images:' \
+                or substr(mediapath,1,6) = 'video:' order by name"
+        if id is not None:
+            sql = "select id, name, mediapath from source where id=?"
+            cur.execute(sql, [id])
+        else:
+            cur.execute(sql)
         result = cur.fetchall()
         bad_links = []
         for r in result:
+            if r[2] is None:  # Internally created text file
+                continue
             if r[2][0:5] == "docs:" and not os.path.exists(r[2][5:]):
                 bad_links.append({'name': r[1], 'mediapath': r[2], 'id': r[0]})
             if r[2][0:7] == "images:" and not os.path.exists(r[2][7:]):
