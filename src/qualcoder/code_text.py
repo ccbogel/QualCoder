@@ -20,6 +20,7 @@ https://qualcoder.wordpress.com/
 https://qualcoder-org.github.io/
 """
 
+
 import sqlite3
 from copy import copy, deepcopy
 import datetime
@@ -62,6 +63,9 @@ ai_search_analysis_max_count = 10  # How many chunks of data are analysed in the
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
+#TESTING = True
+TESTING = False
+
 
 class DialogCodeText(QtWidgets.QWidget):
     """ Code management. Add, delete codes. Mark and unmark text.
@@ -72,105 +76,67 @@ class DialogCodeText(QtWidgets.QWidget):
     NAME_COLUMN = 0
     ID_COLUMN = 1
     MEMO_COLUMN = 2
-    app = None
-    parent_textEdit = None
-    tab_reports = None  # Tab widget reports, used for updates to codes
-    codes = []
-    recent_codes = []  # List of recent codes (up to 5) for textedit context menu
-    categories = []
-    tree_sort_option = "all asc"  # all desc, cat then code asc
-    files = []
-    file_ = None  # Contains filename and file id returned from SelectItems
-    code_text = []
-    annotations = []
-    undo_deleted_codes = []
-
-    # Overlapping coded text details
-    overlaps_at_pos = []
-    overlaps_at_pos_idx = 0
-
-    # Search text variables
-    search_type = "3"  # Three characters entered before search can begin
-    search_indices = []
-    search_index = 0
-    search_term = ""
-    selected_code_index = 0
-    important = False  # Show/hide important codes
-    attributes = []  # Show selected files using these attributes in list widget
-
-    # Autocode variables
-    autocode_all_first_last_within = "all"  # Autocode all instances or first or last, or within another code in a file
-    autocode_frag_all_first_within = "all"  # Autocode all instances or within another code in a file
-    # A list of dictionaries of autocode history {title, list of dictionary of sql commands}
-    autocode_history = []
-
-    # Timers to reduce overly sensitive key events: overlap, re-size oversteps by multiple characters
-    code_resize_timer = 0
-    overlap_timer = 0
-    text = ""
-
-    # Variables for Edit mode, text above also
-    ed_codetext = []
-    ed_annotations = []
-    ed_casetext = []
-    prev_text = ""
-    code_deletions = []
-    edit_mode = False
-    edit_pos = 0
-    no_codes_annotes_cases = None
-    edit_mode_has_changed = False
-    # Revert to original if edit text caused problems
-    edit_original_source_id = None
-    edit_original_source = None
-    edit_original_codes = None
-    edit_original_annotations = None
-    edit_original_case_assignment = None
-    edit_original_cutoff_datetime = None
-
-    # Variables associated with right-hand side splitter, for project memo, code rule
-    project_memo = False
-    code_rule = False
-
-    # Variables for ai search
-    ai_search_results = []
-    ai_search_code_name = ''
-    ai_search_code_memo = ''
-    ai_search_file_ids = []
-    ai_search_code_ids = []
-    ai_search_similar_chunk_list = []
-    ai_search_chunks_pos = 0
-    ai_search_running = False
-    ai_search_current_result_index = None
-    ai_search_prompt = None
-    ai_search_ai_model = None
-    ai_include_coded_segments = None
 
     def __init__(self, app, parent_textedit, tab_reports):
 
         super(DialogCodeText, self).__init__()
         self.app = app
-        self.tab_reports = tab_reports
+        self.tab_reports = tab_reports  # Tab widget reports, used for updates to codes in other tabs
         self.parent_textEdit = parent_textedit
-        self.search_indices = []
-        self.search_index = 0
-        self.codes, self.categories = self.app.get_codes_categories()
-        self.get_recent_codes()  # After codes obtained!
-        self.tree_sort_option = "all asc"
-        self.annotations = self.app.get_annotations()
-        self.autocode_history = []
-        self.undo_deleted_codes = []
-        self.autocode_all_first_last_within = "all"
-        self.autocode_frag_all_first_within = "all"
-        self.default_new_code_color = None
-        self.project_memo = False
-        self.code_rule = False
-        self.important = False
-        self.attributes = []
-        self.code_resize_timer = datetime.datetime.now()
-        self.overlap_timer = datetime.datetime.now()
         self.ui = Ui_Dialog_code_text()
         self.ui.setupUi(self)
 
+        self.default_new_code_color = None  # Alternatively have a hex defined colour
+        self.important = False  # Show/hide important codes
+        self.recent_codes = []  # List of recent codes (up to 5) for textedit context menu
+        self.file_ = None  # Contains current filename and file id
+        self.code_text = []  # List of coded segments for the curent file
+        self.undo_deleted_codes = []  # To restore recently deleted codes
+        self.attributes = []  # Show selected files using these attributes in list widget
+        self.tree_sort_option = "all asc"  # all asc, all desc, cat then code asc
+
+        # Get data
+        self.annotations = self.app.get_annotations()
+        self.codes, self.categories = self.app.get_codes_categories()
+        self.get_recent_codes()  # After codes obtained!
+
+        # Search text variables
+        self.search_type = "3"  # Three characters entered before search can begin
+        self.search_indices = []
+        self.search_index = 0
+        self.search_term = ""
+        self.selected_code_index = 0
+
+        # Overlapping coded text details
+        self.overlaps_at_pos = []
+        self.overlaps_at_pos_idx = 0
+
+        # Autocode variables
+        self.autocode_history = []  # List of dictionaries of autocode history {title, list of dictionary of sql commands}
+        self.autocode_all_first_last_within = "all"  # Autocode all or first or last or within another code in a file
+        self.autocode_frag_all_first_within = "all"  # Autocode all instances or within another code in a file
+
+        # Timers to reduce overly sensitive key events: overlap, re-size oversteps by multiple characters
+        self.code_resize_timer = 0
+        self.code_resize_timer = datetime.datetime.now()
+        self.overlap_timer = 0
+        self.overlap_timer = datetime.datetime.now()
+
+        # Variables associated with right-hand side splitter, for project memo, code rule
+        self.project_memo = False
+        self.code_rule = False
+
+        # Variables for Edit mode
+        self.text = ""
+        self.ed_codetext = []
+        self.ed_annotations = []
+        self.ed_casetext = []
+        self.prev_text = ""
+        self.code_deletions = []
+        self.edit_mode = False
+        self.edit_pos = 0
+        self.no_codes_annotes_cases = None
+        self.edit_mode_has_changed = False
         self.ui.groupBox_edit_mode.hide()
         ee = f'{_("EDITING TEXT MODE (Ctrl+E)")} '
         ee += _(
@@ -182,6 +148,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.label_editing.setText(ee)
         self.edit_pos = 0
         self.edit_mode = False
+        # Revert to original if edit text caused problems
         self.edit_original_source = None
         self.edit_original_source_id = None
         self.edit_original_codes = None
@@ -189,6 +156,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.edit_original_case_assignment = None
         self.edit_original_cutoff_datetime = None
 
+        # Setp up widgets
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
@@ -223,6 +191,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.lineEdit_search.returnPressed.connect(self.search_for_text)
         self.ui.tabWidget.currentChanged.connect(self.tab_changed)
         self.ui.tabWidget.setCurrentIndex(0)  # Defaults to list of documents
+
         self.files = []
         self.get_files()
 
@@ -355,7 +324,21 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.treeWidget.itemCollapsed.connect(self.get_collapsed)
         self.ui.treeWidget.itemExpanded.connect(self.get_collapsed)
 
-        # AI search
+        # Variables and widgets for AI search
+        self.ai_search_results = []
+        self.ai_search_code_name = ''
+        self.ai_search_code_memo = ''
+        self.ai_search_file_ids = []
+        self.ai_search_code_ids = []
+        self.ai_search_similar_chunk_list = []
+        self.ai_search_chunks_pos = 0
+        self.ai_search_running = False
+        self.ai_search_current_result_index = None
+        self.ai_search_prompt = None
+        self.ai_search_ai_model = None
+        self.ai_include_coded_segments = None
+        self.ai_search_found = False
+        self.ai_search_analysis_counter = 0
         self.ui.pushButton_ai_search.pressed.connect(self.ai_search_clicked)
         self.ui.listWidget_ai.selectionModel().selectionChanged.connect(self.ai_search_selection_changed)
         self.ai_search_listview_action_label = None
@@ -370,11 +353,6 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ai_search_spinner_index = 0
         self.ai_search_spinner_timer = QtCore.QTimer(self)
         self.ai_search_spinner_timer.timeout.connect(self.ai_search_update_spinner)
-        self.ai_search_prompt = None
-        self.ai_search_ai_model = None
-        self.ai_search_found = False
-        self.ai_include_coded_segments = None
-        self.ai_search_analysis_counter = 0
 
     def help(self):
         """ Open help for transcribe section in browser. """
@@ -1740,8 +1718,6 @@ class DialogCodeText(QtWidgets.QWidget):
         if metadata:
             '''cur = self.app.conn.cursor()
             cur.execute("select risid from source where source.id=?", [])'''
-            print(self.file_)
-            exit(0)
             start_pos = self.ui.plainTextEdit.textCursor().selectionStart() + self.file_['start']
             end_pos = self.ui.plainTextEdit.textCursor().selectionEnd() + self.file_['start']
             text += f"\nFile: {self.file_['name']} [{start_pos} - {end_pos}] "
@@ -3853,7 +3829,8 @@ class DialogCodeText(QtWidgets.QWidget):
     def undo_last_unmarked_code(self):
         """ Restore the last deleted code(s).
         One code or multiple, depends on what was selected when the unmark method was used.
-        Requires self.undo_deleted_codes """
+        Requires self.undo_deleted_codes
+        Called by : ? """
 
         if not self.undo_deleted_codes:
             return
@@ -4295,6 +4272,9 @@ class DialogCodeText(QtWidgets.QWidget):
         Activated using self.ui.pushButton_auto_code
         """
 
+        if TESTING:
+            print("autocode_all_first_last_within", self.autocode_all_first_last_within)
+            logger.debug("autocode_all_first_last_within" + self.autocode_all_first_last_within)
         code_item = self.ui.treeWidget.currentItem()
         if code_item is None or code_item.text(1)[0:3] == 'cat':
             Message(self.app, _('Warning'), _("No code was selected"), "warning").exec()
@@ -4302,7 +4282,7 @@ class DialogCodeText(QtWidgets.QWidget):
         cid = int(code_item.text(1).split(':')[1])
         # Input dialog too narrow, so code below to widen dialog
         dialog = QtWidgets.QInputDialog(None)
-        dialog.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        dialog.setStyleSheet(f"* {{font-size:{self.app.settings['fontsize']}pt}} ")
         dialog.setWindowTitle(_("Automatic coding"))
         dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         dialog.setInputMode(QtWidgets.QInputDialog.InputMode.TextInput)
@@ -4346,6 +4326,7 @@ class DialogCodeText(QtWidgets.QWidget):
             if regex_pattern is None:
                 return
 
+        found_instances = 0
         undo_list = []
         cur = self.app.conn.cursor()
         try:
@@ -4405,6 +4386,7 @@ class DialogCodeText(QtWidgets.QWidget):
                                 'owner': self.app.settings['codername'], 'memo': "",
                                 'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")}
                         try:
+                            found_instances += 1
                             cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,\
                                 owner,memo,date) values(?,?,?,?,?,?,?,?)",
                                         [item['cid'], item['fid'], item['seltext'], item['pos0'],
@@ -4415,18 +4397,20 @@ class DialogCodeText(QtWidgets.QWidget):
                                 "cid": item['cid'], "fid": item['fid'], "pos0": item['pos0'], "pos1": item['pos1'],
                                 "owner": item['owner']}
                             undo_list.append(undo)
-                        except sqlite3.IntegrityError as e:
-                            # print(_("Autocode insert error ") + str(e))  # Possible a duplicate entry
-                            logger.debug(_("Autocode insert error ") + str(e))
+                        except sqlite3.IntegrityError as err:
+                            # print(_("Autocode insert error ") + str(err))  # Possible a duplicate entry
+                            logger.debug(_("Autocode insert error ") + str(err))
                         self.app.delete_backup = False
                 self.app.conn.commit()
                 self.parent_textEdit.append(_("Automatic coding in files: ") + filenames
-                                            + _(". with text: ") + find_txt)
+                                            + _(". with text: ") + f"{find_txt}  Instances: {found_instances}")
                 if regex_pattern:
                     self.parent_textEdit.append(_("Using Regex."))
         except Exception as e_:
             print(e_)
             self.app.conn.rollback()  # Revert all changes
+            logger.error(f"auto_code rollback. {e_}")
+            self.parent_textEdit.append(_("Autocoding error: ") + str(e_))
             # undo_list = []
             raise
         if len(undo_list) > 0:
