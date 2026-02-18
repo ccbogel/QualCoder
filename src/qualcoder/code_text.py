@@ -73,10 +73,6 @@ class DialogCodeText(QtWidgets.QWidget):
     Trialled using setHtml for documents, but on marking text Html formatting was replaced, also
     on unmarking text, the unmark was not immediately cleared (needed to reload the file). """
 
-    NAME_COLUMN = 0
-    ID_COLUMN = 1
-    MEMO_COLUMN = 2
-
     def __init__(self, app, parent_textedit, tab_reports):
 
         super(DialogCodeText, self).__init__()
@@ -102,7 +98,7 @@ class DialogCodeText(QtWidgets.QWidget):
 
         # Search text variables
         self.search_type = "3"  # Three characters entered before search can begin
-        self.search_indices = []
+        self.search_indices = []  # List of file data, start, end, start_line, start char, String len
         self.search_index = 0
         self.search_term = ""
         self.selected_code_index = 0
@@ -112,7 +108,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.overlaps_at_pos_idx = 0
 
         # Autocode variables
-        self.autocode_history = []  # List of dictionaries of autocode history {title, list of dictionary of sql commands}
+        self.autocode_history = []  # List dictionaries of autocode history {title, list of dictionary of sql commands}
         self.autocode_all_first_last_within = "all"  # Autocode all or first or last or within another code in a file
         self.autocode_frag_all_first_within = "all"  # Autocode all instances or within another code in a file
 
@@ -156,7 +152,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.edit_original_case_assignment = None
         self.edit_original_cutoff_datetime = None
 
-        # Setp up widgets
+        # Setup up widgets
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
@@ -966,6 +962,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.search_indices = []
         if self.ui.checkBox_search_all_files.isChecked():
             """ Search for this text across all files. """
+            # print("searching all files")
             for filedata in self.app.get_file_texts():
                 try:
                     text_ = filedata['fulltext']
@@ -974,6 +971,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 except re.error:
                     logger.exception('Failed searching text %s for %s', filedata['name'], self.search_term)
         else:
+            # print("searching 1 file", self.file_['name'])
             try:
                 if self.text:
                     for match in pattern.finditer(self.text):
@@ -3526,6 +3524,15 @@ class DialogCodeText(QtWidgets.QWidget):
         """ File selection changed. """
 
         row = self.ui.listWidget.currentRow()
+        if not self.ui.checkBox_search_all_files.isChecked():
+            self.ui.lineEdit_search.setText("")
+            self.ui.pushButton_next.setEnabled(False)
+            self.ui.pushButton_previous.setEnabled(False)
+            self.search_indices = []
+            self.search_index = 0
+            self.search_term = ""
+            self.selected_code_index = 0
+
         self.load_file(self.files[row])
 
     def load_file(self, file_):
@@ -4272,9 +4279,6 @@ class DialogCodeText(QtWidgets.QWidget):
         Activated using self.ui.pushButton_auto_code
         """
 
-        if TESTING:
-            print("autocode_all_first_last_within", self.autocode_all_first_last_within)
-            logger.debug("autocode_all_first_last_within" + self.autocode_all_first_last_within)
         code_item = self.ui.treeWidget.currentItem()
         if code_item is None or code_item.text(1)[0:3] == 'cat':
             Message(self.app, _('Warning'), _("No code was selected"), "warning").exec()
@@ -4321,27 +4325,29 @@ class DialogCodeText(QtWidgets.QWidget):
             try:
                 regex_pattern = re.compile(find_texts[0])
             except re.error as e_:
-                logger.warning('re error Bad escape ' + str(e_))
-                Message(self.app, _("Regex compliation error"), str(e_))
+                logger.warning('Regex error Bad escape ' + str(e_))
+                Message(self.app, _("Regex compilation error"), str(e_))
             if regex_pattern is None:
                 return
 
         found_instances = 0
         undo_list = []
+        msg = _("Autocode Text") + f": {self.autocode_all_first_last_within} : {find_texts}"
+        if self.ui.checkBox_auto_regex.isChecked():
+            msg += " : Using REGEX"
+        msg += "\n"
         cur = self.app.conn.cursor()
         try:
             for find_txt in find_texts:
-                filenames = ""
                 for f in files:
-                    filenames += f['name'] + " "
                     cur.execute("select name, id, fulltext, memo, owner, date from source where id=? and "
                                 "(mediapath is null or mediapath like '/docs/%' or mediapath like 'docs:%')",
                                 [f['id']])
                     current_file = cur.fetchone()
                     # Rare but possible no result is returned.
                     if current_file is None:
+                        logger.error(f"File not found,  file id: {f['id']}")
                         continue
-
                     file_text = current_file[2]
                     text_starts = []
                     text_ends = []
@@ -4352,6 +4358,9 @@ class DialogCodeText(QtWidgets.QWidget):
                     else:
                         text_starts = [match.start() for match in re.finditer(re.escape(find_txt), file_text)]
                         text_ends = [match.end() for match in re.finditer(re.escape(find_txt), file_text)]
+                    if TESTING:
+                        print("TEXT STARTS FOUND", len(text_starts), f['name'])
+                    msg += f"{f['name']}: {len(text_starts)}. "
 
                     # Trim to first instance if option selected
                     if self.autocode_all_first_last_within == "first" and len(text_starts) > 1:
@@ -4376,8 +4385,6 @@ class DialogCodeText(QtWidgets.QWidget):
                                     within_ends.append(text_ends[i])
                         text_starts = within_starts
                         text_ends = within_ends
-                    if not text_starts:
-                        return
 
                     # Add new items to database
                     for index in range(len(text_starts)):
@@ -4402,10 +4409,6 @@ class DialogCodeText(QtWidgets.QWidget):
                             logger.debug(_("Autocode insert error ") + str(err))
                         self.app.delete_backup = False
                 self.app.conn.commit()
-                self.parent_textEdit.append(_("Automatic coding in files: ") + filenames
-                                            + _(". with text: ") + f"{find_txt}  Instances: {found_instances}")
-                if regex_pattern:
-                    self.parent_textEdit.append(_("Using Regex."))
         except Exception as e_:
             print(e_)
             self.app.conn.rollback()  # Revert all changes
@@ -4418,7 +4421,8 @@ class DialogCodeText(QtWidgets.QWidget):
             name += _("\nWith: ") + find_text
             undo_dict = {"name": name, "sql_list": undo_list}
             self.autocode_history.insert(0, undo_dict)
-        # Update tooltip filter and code tree code counts
+        # Update action log, tooltip filter and code tree code counts
+        self.parent_textEdit.append(msg)
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
 
