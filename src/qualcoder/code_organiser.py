@@ -511,11 +511,6 @@ class CodeOrganiser(QDialog):
                     model_item['catid'] = category['insert_id']
                 if model_item['supercatid'] == category['catid']:
                     model_item['supercatid'] = category['insert_id']
-        '''Test print("1 after insert new categories")
-        cur.execute("select * from code_cat")
-        res = cur.fetchall()
-        for r in res:
-            print(r)'''
 
         # Delete pre-existing categories from database, if they have been merged into other categories
         categories_to_delete = []
@@ -541,11 +536,6 @@ class CodeOrganiser(QDialog):
                     cur.execute("update code_cat set supercatid=? where catid=?", [new_category['insert_id'],
                                                                                    category_to_update[0]])
                     self.app.conn.commit()
-        '''Test print("2 after  new category supercatid updates")
-        cur.execute("select * from code_cat")
-        res = cur.fetchall()
-        for r in res:
-            print(r)'''
 
         # Update codes and categories in model - catid, supercatid, name, memo
         for item in model:
@@ -563,11 +553,6 @@ class CodeOrganiser(QDialog):
                 cur.execute("update code_name set name=?, memo=?, catid=? where cid=?",
                             [code_name, item['memo'], item['catid'], item['cid']])
                 self.app.conn.commit()
-        '''Test print("3 after existing category and code updates")
-        cur.execute("select * from code_cat")
-        res = cur.fetchall()
-        for r in res:
-            print(r)'''
 
         # Update merged codes: coded text, images and A/V. Using new cid and original_cid
         for item in model:
@@ -575,6 +560,13 @@ class CodeOrganiser(QDialog):
                 if test:
                     print(f"Merging code: {item['original_name']} into {item['cid']}")
                 self.update_merged_coded_segments(item['original_cid'], item['cid'])
+
+        # An extra check. Fix 'lost' categories if present.
+        sql = "update code_cat set supercatid=null where supercatid is not null and supercatid not in " \
+              "(select catid from code_cat)"
+        cur.execute(sql)
+        self.app.conn.commit()
+
         # Wrap up
         self.app.delete_backup = False
         self.parent_text_edit.append(_("Code tree re-organised."))

@@ -2266,6 +2266,11 @@ class DialogCodePdf(QtWidgets.QWidget):
         cur.execute("update code_cat set supercatid=null where catid = ?", [category['catid'], ])
         cur.execute("delete from code_cat where catid = ?", [category['catid'], ])
         self.app.conn.commit()
+        # An extra check. Fix 'lost' categories if present.
+        sql = "update code_cat set supercatid=null where supercatid is not null and supercatid not in " \
+              "(select catid from code_cat)"
+        cur.execute(sql)
+        self.app.conn.commit()
         self.update_dialog_codes_and_categories()
         self.app.delete_backup = False
         self.parent_textEdit.append(_("Category deleted: ") + category['name'])
