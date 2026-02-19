@@ -689,9 +689,9 @@ class DialogReportCodes(QtWidgets.QDialog):
 
     def export_iramuteq_file(self):
         """Export report to IRaMuTeQ text format,."""
+
         if not self.results:
             return
-
         # Demander à l'utilisateur où sauvegarder le fichier
         filepath, ok = QtWidgets.QFileDialog.getSaveFileName(
             self,
@@ -708,13 +708,13 @@ class DialogReportCodes(QtWidgets.QDialog):
                 metadata_parts = [
                     f"*{data['file_or_case']}_{data['file_or_casename']}",
                     f"*coder_{data['coder']}",
-                    f"*codename_{data['codename']}"
+                    f"*codename_{data['codename'].replace(' ', '_')}"
                 ]
 
-                # Ajouter les catégories
+                # Ajouter les catégories. Add categories.
                 categories = self.categories_of_code(data['cid'])
                 for category in categories:
-                    metadata_parts.append(f"*category_{category}")
+                    metadata_parts.append(f"*category_{category.replace(' ', '_')}")
 
                 # Ajouter les variables de fichier et de cas si la case est cochée
                 if self.ui.checkBox_variables.isChecked():
