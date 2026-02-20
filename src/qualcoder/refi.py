@@ -57,54 +57,38 @@ class RefiImport:
     """ Import Rotterdam Exchange Format Initiative (refi) xml documents for codebook.xml
     and project.xml
     Validate using REFI-QDA Codebook.xsd or Project-mrt2019.xsd
-
     TODO load_audio_source - check it works: transcript synchpoints, transcript codings
     TODO load_video_source - check it works: transcript synchpoints, transcript codings
-    TODO check imports from different vendors, tried Quirkos, Maxqda, Nvivo for text only so far
-    TODO reference external sources - relative or absolute paths
-
-    Trying: https://docs.python.org/3/library/xml.etree.elementtree.html
+    Using: https://docs.python.org/3/library/xml.etree.elementtree.html
     """
-
-    file_path = None
-    folder_name = ""  # Temporary extract folder name
-    codes = []
-    users = []
-    cases = []
-    sources = []  # List of Dictionary of mediapath, guid, memo, owner, date, id, fulltext
-    sources_name = "/Sources"  # Sources folder can be named Sources or sources
-    # List of Dictionaries of Variable guid, name, variable application (cases or files), last_insert_id, text or other
-    variables = []
-    file_vars = []  # Values for each variable for each file Found within Cases Case tag
-    annotations = []  # Text source annotation references
-    links = []  # Links - using now for Nvivo to link Note with .txt or .docx to PlainTextSelection annotation
-    parent_textedit = None
-    app = None
-    tree = None
-    import_type = None
-    xml = None
-    base_path = ""
-    software_name = ""
-    # Progress dialog
-    pd = None
-    pd_value = 0
 
     def __init__(self, app, parent_textedit, import_type):
 
         self.app = app
         self.parent_textedit = parent_textedit
-        self.import_type = import_type
+        self.import_type = import_type  # qdc codebook, qde project
+        self.file_path = None
+        self.folder_name = ""  # Temporary extract folder name
+        self.sources_name = "/Sources"  # Sources folder can be named Sources or sources
+        self.file_vars = []  # Values for each variable for each file Found within Cases Case tag
+        self.annotations = []  # Text source annotation references
+        self.links = []  # Links - using now for Nvivo to link Note with .txt or .docx to PlainTextSelection annotation
         self.tree = None
         self.codes = []
         self.users = []
         self.cases = []
         # Sources: name id fulltext mediapath memo owner date
-        self.sources = []
+        self.sources = []  # List of Dictionary of mediapath, guid, memo, owner, date, id, fulltext
         self.source_name_prefix = 0  # Used to add text prefix to source name. MaxQDA has multile same named text files.
-        self.variables = []
+        self.variables = []  # List of Variable guid, name, application (cases or files), last_insert_id, text or other
+        self.xml = None  # The qdc qdpx xml
         self.base_path = ""
         self.software_name = ""
-        if import_type == "qdc":
+        self.xmlns_version = "1.0"
+        # Progress dialog
+        self.pd = None
+        self.pd_value = 0
+        if self.import_type == "qdc":
             self.file_path, ok = QtWidgets.QFileDialog.getOpenFileName(None,
                                                                        _('Select REFI-QDA file'),
                                                                        self.app.settings['directory'],
@@ -129,13 +113,36 @@ class RefiImport:
         """ Import REFI-QDA standard codebook into opened project.
         """
 
+        '''if self.import_type == "qdc":
+            with open(self.file_path, encoding="utf8") as xml_file:
+                self.xml = xml_file.read()
+                result = self.xml_validation("codebook")
+                self.parent_textedit.append(f"Codebook XML parsing successful: {result}")'''
         # Get element tree object
         tree = etree.parse(self.file_path)
+        # Look for xmlns version. Have found 1.0, 0:4
         root = tree.getroot()
+        if self.import_type == "qdc":
+            self.parent_textedit.append(_("Starting codebook import from: ") + self.file_path)
+            for child in root:
+                try:
+                    c_tag = child.tag
+                    temp = c_tag.split("{urn:QDA-XML:codebook:")[1]
+                    self.xmlns_version = temp.split("}")[0]
+                    logger.info(f"Codebook import: {child.tag}")
+                    if 'Codes' in c_tag:
+                        self.parent_textedit.append(f"{c_tag}")
+                except Exception as e_:
+                    print(e_)
+                    self.parent_textedit.append(f"{e_}")
+                    logger.error(f"{child.tag}")
+                    logger.error(f"{e_}")
         # Look for the Codes tag, which contains each Code element
+        root = tree.getroot()
         for child in root:
             # print("CB:", child, "tag:", child.tag)  # 1 only , Codes
-            if child.tag in ("{urn:QDA-XML:codebook:1.0}Codes", "{urn:QDA-XML:project:1.0}Codes"):
+            if child.tag in (f"{{urn:QDA-XML:codebook:{self.xmlns_version}}}Codes",
+                             f"{{urn:QDA-XML:project:{self.xmlns_version}}}Codes"):
                 counter = 0
                 code_elements = list(child)  # list of children of child element
                 for el_ in code_elements:
@@ -145,9 +152,10 @@ class RefiImport:
                 Message(self.app, _("Codebook imported"), msg).exec()
                 self.parent_textedit.append(msg)
                 return
+        self.parent_textedit.append(_("Codebook not imported. "))
         Message(self.app, _("Codebook importation"), self.file_path + _(" NOT imported"), "warning").exec()
 
-    def sub_codes(self, parent, cat_id):
+    def sub_codes(self, parent, cat_id) -> int:
         """ Get subcode elements, if any.
         Determines whether the Code is a Category item or a Code item.
         Uses the parent entered cat_id ot give a Code a category alignment,
@@ -161,9 +169,10 @@ class RefiImport:
         Enters this category or code into database and obtains a cat_id (last_insert_id) for next call of method.
         Note: urn difference between codebook.qdc and project.qdpx
 
-        param parent element, cat_id
-
-        returns counter of inserted codes and categories
+        Args:
+            parent element, cat_id
+        Return:
+            counter of inserted codes and categories
         """
 
         counter = 0
@@ -171,14 +180,16 @@ class RefiImport:
         now_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
         description = ""
         for el in elements:
-            if el.tag in ("{urn:QDA-XML:codebook:1.0}Description", "{urn:QDA-XML:project:1.0}Description"):
+            if el.tag in (f"{{urn:QDA-XML:codebook:{self.xmlns_version}}}Description",
+                          f"{{urn:QDA-XML:project:{self.xmlns_version}}}Description"):
                 description = el.text
 
         # Determine if the parent is a code or a category
         # if parent has Code element children, so must be a category, insert into code_cat table
         is_category = False
         for el in elements:
-            if el.tag in ("{urn:QDA-XML:codebook:1.0}Code", "{urn:QDA-XML:project:1.0}Code"):
+            if el.tag in (f"{{urn:QDA-XML:codebook:{self.xmlns_version}}}Code",
+                          f"{{urn:QDA-XML:project:{self.xmlns_version}}}Code"):
                 is_category = True
         # if parent does not have Code element children and isCodable is false, it must be a category
         if parent.get("isCodable") == "false":
@@ -188,7 +199,7 @@ class RefiImport:
             name = parent.get("name")
             if name is not None:
                 cur = self.app.conn.cursor()
-                # insert this category into code_cat table
+                # Insert this category into code_cat table
                 try:
                     cur.execute("insert into code_cat (name, memo, owner, date, supercatid) values(?,?,'',?,?)",
                                 [name, description, now_date, cat_id])
@@ -221,7 +232,8 @@ class RefiImport:
                     except sqlite3.IntegrityError:
                         pass
             for el in elements:
-                if el.tag not in ("{urn:QDA-XML:codebook:1.0}Description", "{urn:QDA-XML:project:1.0}Description"):
+                if el.tag not in (f"{{urn:QDA-XML:codebook:{self.xmlns_version}}}Description",
+                                  f"{{urn:QDA-XML:project:{self.xmlns_version}}}Description"):
                     counter += self.sub_codes(el, last_insert_id)
                     # print("tag:", el.tag, el.text, el.get("name"), el.get("color"), el.get("isCodable"))
             return counter
@@ -251,7 +263,8 @@ class RefiImport:
 
         # One child, a description so, insert this code into code_name table
         if is_category is False and len(elements) == 1 and elements[0].tag in (
-                "{urn:QDA-XML:codebook:1.0}Description", "{urn:QDA-XML:project:1.0}Description"):
+                f"{{urn:QDA-XML:codebook:{self.xmlns_version}}}Description",
+                f"{{urn:QDA-XML:project:{self.xmlns_version}}}Description"):
             name = parent.get("name")
             # print("Only a description child: ", name)
             color = parent.get("color")
@@ -336,9 +349,22 @@ class RefiImport:
         # Parse xml for users, codebook, sources, journals, project description, variable names
         with open(self.folder_name + "/project.qde", "r", encoding="utf8") as xml_file:
             self.xml = xml_file.read()
-        result = self.xml_validation("project")
-        self.parent_textedit.append("Project XML parsing successful: " + str(result))
+        '''result = self.xml_validation("project")
+        self.parent_textedit.append(f"Project XML parsing successful: {result}")'''
         tree = etree.parse(self.folder_name + "/project.qde")  # get element tree object
+        # Look for xmlns version. Have found 1.0, 0:4
+        root = tree.getroot()
+        for child in root:
+            try:
+                c_tag = child.tag
+                temp = c_tag.split("{urn:QDA-XML:project:")[1]
+                self.xmlns_version = temp.split("}")[0]
+                logger.info(f"Project import: {child.tag}")
+            except Exception as e_:
+                print(e_)
+                logger.error(f"Project import: {child.tag}")
+                logger.error(f"{e_}")
+
         root = tree.getroot()
         # Must parse Project tag first to get software_name
         # This is used when importing - especially from ATLAS.ti
@@ -346,29 +372,29 @@ class RefiImport:
         children = list(root)
         for c in children:
             # print(c.tag)
-            if c.tag == "{urn:QDA-XML:project:1.0}Users":
+            if c.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}Users":
                 count = self.parse_users(c)
                 self.parent_textedit.append(_("Parse users. Loaded: " + str(count)))
-            if c.tag == "{urn:QDA-XML:project:1.0}CodeBook":
+            if c.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}CodeBook":
                 codes = list(c)[0]  # <Codes> tag is only element
                 count = 0
                 for code in codes:
                     # Recursive search through each Code in Codes
                     count += self.sub_codes(code, None)
                 self.parent_textedit.append(_("Parse codes and categories. Loaded: ") + str(count))
-            if c.tag == "{urn:QDA-XML:project:1.0}Variables":
+            if c.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}Variables":
                 count = self.parse_variables(c)
                 self.parent_textedit.append(_("Parse variables. Loaded: ") + str(count))
-            if c.tag == "{urn:QDA-XML:project:1.0}Description":
+            if c.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}Description":
                 self.parent_textedit.append(_("Parsing and loading project memo"))
                 self.parse_project_description(c)
-            if c.tag == "{urn:QDA-XML:project:1.0}Links":
+            if c.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}Links":
                 self.parse_links(c)
 
         # Parse Notes to add plaintext to link for links between PlainTextSelection and Note .txt/.docx
         children = list(root)
         for c in children:
-            if c.tag == "{urn:QDA-XML:project:1.0}Notes":
+            if c.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}Notes":
                 self.parse_notes_for_plaintextselection_link(c)
 
         # Parse Cases element for any file variable values (No case name and only one sourceref)
@@ -380,13 +406,13 @@ class RefiImport:
         # Variables caseOrFile will be 'file' for ALL variables, to change later if needed
         children = list(root)  # root.getchildren()
         for c in children:
-            if c.tag == "{urn:QDA-XML:project:1.0}Sources":
+            if c.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}Sources":
                 count = self.parse_sources(c)
                 self.parent_textedit.append(_("Parsing sources. Loaded: " + str(count)))
 
         # Parse Notes after sources. Notes contain journals and also text annotations
         for c in children:
-            if c.tag == "{urn:QDA-XML:project:1.0}Notes":
+            if c.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}Notes":
                 # Parse for journals AND annotations. Multiple ways annotations ca nbe stored
                 journal_count = self.parse_notes(c)
                 self.parent_textedit.append(_("Parsing Notes. Journals loaded: ") + str(journal_count))
@@ -399,7 +425,7 @@ class RefiImport:
         children = list(root)
         for c in children:
             # print(c.tag)
-            if c.tag == "{urn:QDA-XML:project:1.0}Cases":
+            if c.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}Cases":
                 count = self.parse_cases(c)
                 self.parent_textedit.append(_("Parsing cases. Loaded: ") + str(count))
         self.clean_up_case_codes_and_case_text()
@@ -408,7 +434,7 @@ class RefiImport:
         children = list(root)
         for c in children:
             # print(c.tag)
-            if c.tag == "{urn:QDA-XML:project:1.0}Sets":
+            if c.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}Sets":
                 self.parse_sets(c)
                 self.parent_textedit.append(_("Parsing sets."))
         # Wrap up
@@ -484,7 +510,7 @@ class RefiImport:
         self.file_vars = []
         children = list(root)
         for el in children:
-            if el.tag == "{urn:QDA-XML:project:1.0}Cases":
+            if el.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}Cases":
                 # print(el.tag)
                 for c in list(el):
                     self.parse_case_for_file_variables(c)
@@ -514,7 +540,7 @@ class RefiImport:
         file_guid = None
         for el in ec:
             # A variable assigned to a source
-            if el.tag == "{urn:QDA-XML:project:1.0}SourceRef":
+            if el.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}SourceRef":
                 # print("el source ref tag ", el.tag, el.get(("targetGUID")))
                 count += 1
                 file_guid = el.get("targetGUID")
@@ -525,15 +551,18 @@ class RefiImport:
         for el in ec:
             var_guid = None
             value = None
-            if el.tag == "{urn:QDA-XML:project:1.0}VariableValue":
+            if el.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}VariableValue":
                 for v_element in list(el):
                     value = None
-                    if v_element.tag == "{urn:QDA-XML:project:1.0}VariableRef":
+                    if v_element.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}VariableRef":
                         var_guid = v_element.get("targetGUID")
                     if v_element.tag in (
-                            "{urn:QDA-XML:project:1.0}TextValue", "{urn:QDA-XML:project:1.0}BooleanValue",
-                            "{urn:QDA-XML:project:1.0}IntegerValue", "{urn:QDA-XML:project:1.0}FloatValue",
-                            "{urn:QDA-XML:project:1.0}DateValue", "{urn:QDA-XML:project:1.0}DateTimeValue"):
+                            f"{{urn:QDA-XML:project:{self.xmlns_version}}}TextValue",
+                            f"{{urn:QDA-XML:project:{self.xmlns_version}}}BooleanValue",
+                            f"{{urn:QDA-XML:project:{self.xmlns_version}}}IntegerValue",
+                            f"{{urn:QDA-XML:project:{self.xmlns_version}}}FloatValue",
+                            f"{{urn:QDA-XML:project:{self.xmlns_version}}}DateValue",
+                            f"{{urn:QDA-XML:project:{self.xmlns_version}}}DateTimeValue"):
                         value = v_element.text
                 attr_val = {'file_guid': file_guid, 'var_guid': var_guid, 'value': value}
                 # Get attribute name by linking guids
@@ -593,7 +622,7 @@ class RefiImport:
             for d in d_elements:
                 memo = ""
                 # print("Memo ", d.tag)
-                if el.tag != "{urn:QDA-XML:project:1.0}Description":
+                if el.tag != f"{{urn:QDA-XML:project:{self.xmlns_version}}}Description":
                     memo = d.text
                 variable["memo"] = memo
 
@@ -658,7 +687,7 @@ class RefiImport:
                 item['memo'] = ""
                 for d in d_elements:
                     # print("Memo ", d.tag)
-                    if d.tag == "{urn:QDA-XML:project:1.0}Description":
+                    if d.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}Description":
                         # print("case memo")
                         item['memo'] = d.text
 
@@ -681,16 +710,19 @@ class RefiImport:
                 for vv in d_elements:
                     guid = None
                     value = None
-                    if vv.tag == "{urn:QDA-XML:project:1.0}VariableValue":
+                    if vv.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}VariableValue":
                         for v_element in list(vv):
                             value = None
-                            if v_element.tag == "{urn:QDA-XML:project:1.0}VariableRef":
+                            if v_element.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}VariableRef":
                                 guid = v_element.get("targetGUID")
                                 case_vars.append(guid)
                             if v_element.tag in (
-                                    "{urn:QDA-XML:project:1.0}TextValue", "{urn:QDA-XML:project:1.0}BooleanValue",
-                                    "{urn:QDA-XML:project:1.0}IntegerValue", "{urn:QDA-XML:project:1.0}FloatValue",
-                                    "{urn:QDA-XML:project:1.0}DateValue", "{urn:QDA-XML:project:1.0}DateTimeValue"):
+                                    f"{{urn:QDA-XML:project:{self.xmlns_version}}}TextValue",
+                                    f"{{urn:QDA-XML:project:{self.xmlns_version}}}BooleanValue",
+                                    f"{{urn:QDA-XML:project:{self.xmlns_version}}}IntegerValue",
+                                    f"{{urn:QDA-XML:project:{self.xmlns_version}}}FloatValue",
+                                    f"{{urn:QDA-XML:project:{self.xmlns_version}}}DateValue",
+                                    f"{{urn:QDA-XML:project:{self.xmlns_version}}}DateTimeValue"):
                                 value = v_element.text
                         # print(item, guid, value)
                         # Get attribute name by linking guids
@@ -768,23 +800,23 @@ class RefiImport:
         count = 0
         for el in list(element):
             # print(e.tag, e.get("name"))
-            if el.tag == "{urn:QDA-XML:project:1.0}TextSource":
+            if el.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}TextSource":
                 self.pd_value += 1
                 self.pd.setValue(self.pd_value)
                 self.load_text_source(el)
-            if el.tag == "{urn:QDA-XML:project:1.0}PictureSource":
+            if el.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}PictureSource":
                 self.pd_value += 1
                 self.pd.setValue(self.pd_value)
                 self.load_picture_source(el)
-            if el.tag == "{urn:QDA-XML:project:1.0}AudioSource":
+            if el.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}AudioSource":
                 self.pd_value += 1
                 self.pd.setValue(self.pd_value)
                 self.load_audio_source(el)
-            if el.tag == "{urn:QDA-XML:project:1.0}VideoSource":
+            if el.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}VideoSource":
                 self.pd_value += 1
                 self.pd.setValue(self.pd_value)
                 self.load_video_source(el)
-            if el.tag == "{urn:QDA-XML:project:1.0}PDFSource":
+            if el.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}PDFSource":
                 self.pd_value += 1
                 self.pd.setValue(self.pd_value)
                 self.load_pdf_source(el)
@@ -806,7 +838,7 @@ class RefiImport:
             try:
                 for el in element:
                     print(el.tag, el.get("name"))
-                    if el.tag == "{urn:QDA-XML:project:1.0}Transcript":
+                    if el.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}Transcript":
                         name = el.get("name")
                         # Get, and if needed, add suffix
                         suffix = pathlib.Path(element.get("path")).suffix
@@ -815,6 +847,7 @@ class RefiImport:
                         break
             except Exception as err:
                 print(err)
+                logger.error(err)
 
         creating_user_guid = element.get("creatingUser")
         if creating_user_guid is None:
@@ -901,7 +934,7 @@ class RefiImport:
 
         memo = ""
         for el in list(element):
-            if el.tag == "{urn:QDA-XML:project:1.0}Description":
+            if el.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}Description":
                 memo = el.text
         cur = self.app.conn.cursor()
         cur.execute("insert into source(name,memo,owner,date, mediapath, fulltext) values(?,?,?,?,?,?)",
@@ -914,9 +947,9 @@ class RefiImport:
         self.sources.append(source)
         # Parse PictureSelection and VariableValue elements to load codings and variables
         for el in list(element):
-            if el.tag == "{urn:QDA-XML:project:1.0}PictureSelection":
+            if el.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}PictureSelection":
                 self.load_codings_for_picture(id_, el)
-            if el.tag == "{urn:QDA-XML:project:1.0}VariableValue":
+            if el.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}VariableValue":
                 self.parse_variable_value(el, id_, creating_user)
 
     def load_codings_for_picture(self, id_, element):
@@ -952,7 +985,7 @@ class RefiImport:
                 creating_user = u['name']
         cur = self.app.conn.cursor()
         for el in element:
-            if el.tag == "{urn:QDA-XML:project:1.0}Coding":
+            if el.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}Coding":
                 # Get the code id from the CodeRef guid
                 cid = None
                 code_ref = list(el)[0]
@@ -1002,7 +1035,7 @@ class RefiImport:
                     _('Cannot copy Audio file from: ') + f"{source_path}\nto: {destination}\n{err}")
         memo = ""
         for el in list(element):
-            if el.tag == "{urn:QDA-XML:project:1.0}Description":
+            if el.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}Description":
                 memo = el.text
         cur = self.app.conn.cursor()
         cur.execute("insert into source(name,memo,owner,date, mediapath, fulltext,av_text_id) values(?,?,?,?,?,?, null)",
@@ -1016,7 +1049,7 @@ class RefiImport:
 
         no_transcript = True
         for el in list(element):
-            if el.tag == "{urn:QDA-XML:project:1.0}Transcript":
+            if el.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}Transcript":
                 no_transcript = False
                 self.parse_transcript_with_codings_and_syncpoints(name, id_, el)
                 break  # Get one transcript only
@@ -1029,9 +1062,9 @@ class RefiImport:
             self.app.conn.commit()
         # Parse AudioSelection and VariableValue elements to load codings and variables
         for el in list(element):
-            if el.tag == "{urn:QDA-XML:project:1.0}AudioSelection":
+            if el.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}AudioSelection":
                 self.load_codings_for_audio_video(id_, el)
-            if el.tag == "{urn:QDA-XML:project:1.0}VariableValue":
+            if el.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}VariableValue":
                 self.parse_variable_value(el, id_, creating_user)
 
     def load_video_source(self, element):
@@ -1070,7 +1103,7 @@ class RefiImport:
 
         memo = ""
         for el in list(element):
-            if el.tag == "{urn:QDA-XML:project:1.0}Description":
+            if el.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}Description":
                 memo = el.text
         cur = self.app.conn.cursor()
         cur.execute("insert into source(name,memo,owner,date, mediapath, fulltext) values(?,?,?,?,?,?)",
@@ -1084,7 +1117,7 @@ class RefiImport:
 
         no_transcript = True
         for el in list(element):
-            if el.tag == "{urn:QDA-XML:project:1.0}Transcript":
+            if el.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}Transcript":
                 no_transcript = False
                 self.parse_transcript_with_codings_and_syncpoints(name, av_id, el)
         if no_transcript:
@@ -1097,9 +1130,9 @@ class RefiImport:
 
         # Parse VideoSelection and VariableValue elements to load codings and variables
         for el in list(element):
-            if el.tag == "{urn:QDA-XML:project:1.0}VideoSelection":
+            if el.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}VideoSelection":
                 self.load_codings_for_audio_video(av_id, el)
-            if el.tag == "{urn:QDA-XML:project:1.0}VariableValue":
+            if el.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}VariableValue":
                 self.parse_variable_value(el, av_id, creating_user)
 
     def parse_transcript_with_codings_and_syncpoints(self, av_name, av_id, element):
@@ -1196,7 +1229,7 @@ class RefiImport:
         if name is not None:
             memo = f"Name: {name}\n"
         for el in list(element):
-            if el.tag == "{urn:QDA-XML:project:1.0}Description":
+            if el.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}Description":
                 if el.text is not None:
                     memo += el.text
         transcript_filename = f"{av_name}.txt"
@@ -1215,7 +1248,7 @@ class RefiImport:
         <SyncPoint guid="58716919-f62e-4f2a-b386-6ceb1ebbd859" position="3044" timeStamp="155000" />
         """
         for el in list(element):
-            if el.tag == "{urn:QDA-XML:project:1.0}SyncPoint":
+            if el.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}SyncPoint":
                 syncpoints.append({"guid": el.get("guid"), "pos": el.get("position"), "timestamp": el.get("timeStamp")})
 
         """
@@ -1234,7 +1267,7 @@ class RefiImport:
 
         value_list = []
         for el in list(element):
-            if el.tag == "{urn:QDA-XML:project:1.0}TranscriptSelection":
+            if el.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}TranscriptSelection":
                 pos0 = 0
                 pos1 = 0
                 guid_pos0 = el.get("fromSyncPoint")
@@ -1247,10 +1280,10 @@ class RefiImport:
                         pos1 = int(s['pos']) + 1
                 memo = ""
                 for el_child in list(el):
-                    if el_child.tag == "{urn:QDA-XML:project:1.0}Description":
+                    if el_child.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}Description":
                         memo = str(el_child.text)
                 for el_child in list(el):
-                    if el_child.tag == "{urn:QDA-XML:project:1.0}Coding":
+                    if el_child.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}Coding":
                         code_ref = list(el_child)[0]
                         for c in self.codes:
                             if c['guid'] == code_ref.get("targetGUID"):
@@ -1300,12 +1333,12 @@ class RefiImport:
         cur = self.app.conn.cursor()
         memo = ""
         for el in element:
-            if el.tag == "{urn:QDA-XML:project:1.0}Description":
+            if el.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}Description":
                 memo = el.text
                 if memo is None:
                     memo = ""
         for el in element:
-            if el.tag == "{urn:QDA-XML:project:1.0}Coding":
+            if el.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}Coding":
                 # Get the code id from the CodeRef guid
                 cid = None
                 code_ref = list(el)[0]
@@ -1375,7 +1408,7 @@ class RefiImport:
         </Representation>
         """
         for el in element:
-            if el.tag == "{urn:QDA-XML:project:1.0}Representation":
+            if el.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}Representation":
                 # print("PDF Representation element found")
                 self.load_text_source(el, name, create_date, media_path)
                 break
@@ -1417,7 +1450,7 @@ class RefiImport:
         # Find Description to complete memo
         memo = ""
         for el in list(element):  # element.getchildren():
-            if el.tag == "{urn:QDA-XML:project:1.0}Description":
+            if el.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}Description":
                 memo = el.text
         source = {'name': name, 'id': -1, 'fulltext': "", 'mediapath': mediapath, 'memo': memo,
                   'owner': self.app.settings['codername'], 'date': create_date, 'guid': element.get('guid')}
@@ -1470,7 +1503,7 @@ class RefiImport:
             self.parent_textedit.append(_("Cannot read from TextSource: ") + f"{source_path}\n{err}")
 
         if path_type == "relative":
-            media_path = f"/docs/{name}"
+            media_path = f"/docs/{name}"  # Note not used
             # Copy file into .qda documents folder and rename into original name
             destination = os.path.join(self.app.project_path, "documents", name)
             try:
@@ -1507,16 +1540,16 @@ class RefiImport:
 
         # Parse PlainTextSelection elements for Coding elements
         for el in list(element):
-            if el.tag == "{urn:QDA-XML:project:1.0}PlainTextSelection":
+            if el.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}PlainTextSelection":
                 self.load_codings_for_text(source, el)
         # Parse PlainTextSelection elements for NoteRef (annotation) elements
         for el in list(element):
-            if el.tag == "{urn:QDA-XML:project:1.0}NoteRef":
+            if el.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}NoteRef":
                 self.annotations.append({"NoteRef": el.get("targetGUID"), "TextSource": source["guid"]})
         # Parse elements for VariableValues
         # This approach used by MAXQDA but not by QUIRKOS
         for el in list(element):
-            if el.tag == "{urn:QDA-XML:project:1.0}VariableValue":
+            if el.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}VariableValue":
                 self.parse_variable_value(el, id_, creating_user)
 
     def parse_variable_value(self, element, id_, creating_user):
@@ -1540,7 +1573,7 @@ class RefiImport:
         var_name = ""
         value = ""
         for var_el in list(element):
-            if var_el.tag == "{urn:QDA-XML:project:1.0}VariableRef":
+            if var_el.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}VariableRef":
                 guid = var_el.get("targetGUID")
                 for v in self.variables:
                     if v['guid'] == guid:
@@ -1572,7 +1605,8 @@ class RefiImport:
 
         Example format:
         < PlainTextSelection guid = "08cbced0-d736-44c8-8fd6-eb4d29fe46c5" name = "" startPosition = "1967"
-        endPosition = "2207" creatingUser = "5c94bc9e-db8c-4f1d-9cd6-e900c7440860" creationDateTime = "2019-06-07T03:36:36Z"
+        endPosition = "2207" creatingUser = "5c94bc9e-db8c-4f1d-9cd6-e900c7440860"
+        creationDateTime = "2019-06-07T03:36:36Z"
         modifyingUser = "5c94bc9e-db8c-4f1d-9cd6-e900c7440860" modifiedDateTime = "2019-06-07T03:36:36Z" >
         < Description / > or <Description>some text</Description>
         < Coding guid = "76414714-63c4-4a25-a47e-66fef80bd52e" creatingUser = "5c94bc9e-db8c-4f1d-9cd6-e900c7440860"
@@ -1607,11 +1641,11 @@ class RefiImport:
         # The Description element text inside a PlainTextSelection is a coding memo
         memo = ""
         for el in element:
-            if el.tag == "{urn:QDA-XML:project:1.0}Description" and el.text is not None:
+            if el.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}Description" and el.text is not None:
                 memo = el.text
         annotation = True
         for el in element:
-            if el.tag == "{urn:QDA-XML:project:1.0}Coding":
+            if el.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}Coding":
                 annotation = False
                 # Get the code id from the CodeRef guid
                 cid = None
@@ -1716,9 +1750,11 @@ class RefiImport:
                         jentry = f.read()
                 except Exception as err:
                     self.parent_textedit.append(_('Trying to read Note element: ') + f"{path_}\n{err}")
-                # Check journal name does not exist. If it exists, add 3 random numbers, fix for Integrity Error
+                # Check journal name does not exist. If it exists, add random numbers, fix for Integrity Error
                 cur.execute("select name from journal where name=?", [name])
                 name_exists = cur.fetchone()
+                if name_exists:
+                    name += f"_{randint(100-999)}"
                 cur.execute("insert into journal(name,jentry,owner,date) values(?,?,?,?)",
                                 (name, jentry, creating_user, create_date))
                 self.app.conn.commit()
@@ -1760,9 +1796,9 @@ class RefiImport:
         pos0 = None
         pos1 = None
         for el in element:
-            if el.tag == "{urn:QDA-XML:project:1.0}PlainTextContent":
+            if el.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}PlainTextContent":
                 memo = el.text
-            if el.tag == "{urn:QDA-XML:project:1.0}PlainTextSelection":
+            if el.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}PlainTextSelection":
                 pos0 = el.get("startPosition")
                 pos1 = el.get("endPosition")
         if pos0 is None or pos1 is None or memo is None:
@@ -1792,7 +1828,7 @@ class RefiImport:
         """
 
         for el in list(element):
-            if el.tag == "{urn:QDA-XML:project:1.0}Set":
+            if el.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}Set":
                 self.parse_set(el)
 
     def parse_set(self, element):
@@ -1808,14 +1844,14 @@ class RefiImport:
         name = element.get("name")
         memo = ""
         for el in list(element):
-            if el.tag == "{urn:QDA-XML:project:1.0}Description":
+            if el.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}Description":
                 memo = el.text
                 if memo is None:
                     memo = ""
                 break
         set_sources = []  # List of sources associated with this Set
         for el in list(element):
-            if el.tag == "{urn:QDA-XML:project:1.0}MemberSource":
+            if el.tag == f"{{urn:QDA-XML:project:{self.xmlns_version}}}MemberSource":
                 target_guid = el.get("targetGUID")
                 for s in self.sources:
                     if target_guid == s['guid']:
@@ -1896,21 +1932,17 @@ class RefiImport:
             count += 1
         return count
 
-    def xml_validation(self, xsd_type="codebook"):
+    def xml_validation(self, xsd_type="codebook") -> bool:
         """ Verify that the XML complies with XSD
         NOT USED. Problems getting the original validator to work.
-        Arguments:
-            1. file_xml: Input xml file
-            2. file_xsd: xsd file which needs to be validated against xml
-
-        param: xsd_type codebook or project
-
-        return: true or false passing validation
+        Requires:
+            file_xml, file_xsd
+        Args:
+             xsd_type codebook or project
+        Return:
+            true or false passing validation
         """
 
-        '''file_xsd = xsd_codebook
-        if xsd_type != "codebook":
-            file_xsd = xsd_project'''
         return True
 
 
@@ -2042,7 +2074,6 @@ class RefiExport(QtWidgets.QDialog):
                         else:
                             f.write(s['fulltext'])
                     except Exception as err:
-                        #txt_errors += '\nIn plaintext file export: ' + s['plaintext_filename'] + "\n" + str(err)
                         logger.error(f"{err}\nIn plaintext file export: {s['plaintext_filename']}")
                         print(err)
 
@@ -2117,7 +2148,7 @@ class RefiExport(QtWidgets.QDialog):
             Message(self.app, _("Codebook NOT exported"), str(err)).exec()
             self.parent_textedit.append(_("Codebook NOT exported") + f"\n{err}")
 
-    def user_guid(self, username):
+    def user_guid(self, username:str) -> str:
         """ Requires a username. returns matching guid """
 
         for u in self.users:
@@ -2125,7 +2156,7 @@ class RefiExport(QtWidgets.QDialog):
                 return u['guid']
         return ""
 
-    def code_guid(self, code_id):
+    def code_guid(self, code_id:int) -> str:
         """ Requires a code id. returns matching guid """
 
         for c in self.codes:
@@ -2169,17 +2200,18 @@ class RefiExport(QtWidgets.QDialog):
         self.xml += self.project_description_xml()
         self.xml += '</Project>'
 
-    def variables_xml(self):
+    def variables_xml(self) -> str:
         """ Variables are associated with Sources and Cases.
         Stores a list of the variables with guids for later use.
         Called by project_xml.
         TODO not sure how to handle empty (N/A) numeric variables.
         TODO xs:decimal schema does not allow for null values
-        TODO I do not inssert the floatvalue tag!
+        TODO I do not insert the floatvalue tag
         <VariableRef targetGUID="7d936548-f82a-4819-9315-a7aa81b61bc3" />
         <FloatValue></FloatValue></VariableValue>
 
-        :returns xml string
+        Return:
+            xml string
         """
 
         self.variables = []
@@ -2211,9 +2243,10 @@ class RefiExport(QtWidgets.QDialog):
         xml += '</Variables>\n'
         return xml
 
-    def project_description_xml(self):
+    def project_description_xml(self) -> str:
         """ Create overall project description memo xml.
-        :returns xml string of project description
+        Return:
+             xml string of project description
         """
 
         cur = self.app.conn.cursor()
@@ -2225,7 +2258,7 @@ class RefiExport(QtWidgets.QDialog):
         xml = f"<Description>{html.escape(memo)}</Description>\n"
         return xml
 
-    def create_journal_note_xml(self, journal):
+    def create_journal_note_xml(self, journal) -> str:
         """ Create a Note xml for journal entries
         To be appended to the in notes list. To add to the Notes element
         Appends file name and journal text in notes_files list. This is exported to Sources folder.
@@ -2241,13 +2274,15 @@ class RefiExport(QtWidgets.QDialog):
        <Description></Description>
        </Note>
 
-        :param journal: [0] name is the name of the journal entry
+        Args:
+         journal: [0] name is the name of the journal entry
         [1] the text of the journal entry
         [2] the creation datetime of the entry
         [3] user is the user who created the entry
         :type journal: List
 
-        :returns a guid for a NoteRef
+        Return:
+            guid for a NoteRef
         """
 
         guid = self.create_guid()
@@ -2260,14 +2295,14 @@ class RefiExport(QtWidgets.QDialog):
         # Add blank Description tag for the journal entry, as these are not memoed
         xml += '<Description />'
         xml += '</Note>\n'
-        self.note_files.append([guid + '.txt', journal[1]])
+        self.note_files.append([f"{guid}.txt", journal[1]])
         return xml
 
-    def create_annotation_note_xml(self, ann):
+    def create_annotation_note_xml(self, ann) -> str:
         """ Create a Note xml for text source annotations
         Appends xml in notes list.
         Appends to the annotations list
-        Called by: ??? notes_xml
+        Called by: notes_xml
 
         Format:
         Annotation Note:
@@ -2280,8 +2315,10 @@ class RefiExport(QtWidgets.QDialog):
         Inside <TextSource> is <NoteRef targetGUID="0f758eeb-d61d-4e91-b250-79861c3869a6"/>
         Links to the annotation detail.
 
-        :param ann: Dictionaries of anid, fid, pos0, pos1, memo, owner, date,  NoteRef_guid
-        :returns a guid for a NoteRef
+        Args:
+             ann: Dictionaries of anid, fid, pos0, pos1, memo, owner, date,  NoteRef_guid
+        Return:
+             a guid for a NoteRef
         """
 
         # Temporary hack fix for NoteRef_guid, unsure of the cuase so far, might be ajournal entry
@@ -2305,14 +2342,14 @@ class RefiExport(QtWidgets.QDialog):
         xml += '</Note>\n'
         return xml
 
-    def notes_xml(self):
+    def notes_xml(self) -> str:
         """ Get journal entries and store them as Notes.
         Collate note_xml list into final xml
         <Notes><Note></Note></Notes>
         Note xml requires a NoteRef in the source or case.
         Called by: project_xml
 
-        :returns xml
+        Return: xml
         """
 
         # Get journal entries
@@ -2330,11 +2367,11 @@ class RefiExport(QtWidgets.QDialog):
         xml += '</Notes>\n'
         return xml
 
-    def cases_xml(self):
+    def cases_xml(self) -> str:
         """ Create xml for cases.
         Put case memo into description tag.
         Called by: project_xml
-        returns xml """
+        Return: xml """
 
         xml = ''
         cur = self.app.conn.cursor()
@@ -2357,7 +2394,7 @@ class RefiExport(QtWidgets.QDialog):
         xml += '</Cases>\n'
         return xml
 
-    def case_variables_xml(self, caseid):
+    def case_variables_xml(self, caseid) -> str:
         """ Get the variables, name, type and value for this case and create xml.
         Case variables are stored like this:
         <VariableValue>
@@ -2365,9 +2402,10 @@ class RefiExport(QtWidgets.QDialog):
         <TextValue>20-29</TextValue>
         </VariableValue>
 
-        :param caseid integer
-
-        :returns xml string for case variables
+        Args:
+            caseid integer
+        Return:
+             xml string for case variables
         """
 
         xml = ""
@@ -2391,13 +2429,13 @@ class RefiExport(QtWidgets.QDialog):
             xml += '</VariableValue>\n'
         return xml
 
-    def case_source_ref_xml(self, caseid):
+    def case_source_ref_xml(self, caseid:int) -> str:
         """ Find sources linked to this case, pos0 and pos1 must equal zero.
         Called by: cases_xml
-
-        :param caseid Integer
-
-        :returns xml String
+        Args:
+            caseid Integer
+        Return:
+             xml String
         """
 
         xml = ''
@@ -2413,7 +2451,7 @@ class RefiExport(QtWidgets.QDialog):
                     xml += f'<SourceRef targetGUID="{s["guid"]}"/>\n'
         return xml
 
-    def source_variables_xml(self, sourceid):
+    def source_variables_xml(self, sourceid:int) -> str:
         """ Get the variables, name, type and value for this source and create xml.
         Source variables are stored like this:
         <VariableValue>
@@ -2421,10 +2459,10 @@ class RefiExport(QtWidgets.QDialog):
         <TextValue>20-29</TextValue>
         </VariableValue>
 
-        :param sourceid:
-        :type sourceid: Integer
-
-        :returns xml String for case variables
+        Args:
+        sourceid: Integer
+        Return:
+            xml String for case variables
         """
 
         xml = ""
@@ -2448,7 +2486,7 @@ class RefiExport(QtWidgets.QDialog):
             xml += '</VariableValue>\n'
         return xml
 
-    def sources_xml(self):
+    def sources_xml(self) -> str:
         """ Create xml for sources: text, pictures, pdf, audio, video.
          Also add selections to each source.
 
@@ -2491,7 +2529,8 @@ class RefiExport(QtWidgets.QDialog):
 
         Called by: project_xml
 
-        :returns xml String
+        Returns:
+             xml String
         """
 
         # TODO after Coding: NoteRef and VariableValue for each Source element
@@ -2599,7 +2638,7 @@ class RefiExport(QtWidgets.QDialog):
                 xml += f'creationDateTime="{self.convert_timestamp(s["date"])}" '
                 if s['external'] is None:
                     # Internal - may not need to convert xml entities
-                    #print("sources_xml method: plaintext internal", s['plaintext_filename'])
+                    # print("sources_xml method: plaintext internal", s['plaintext_filename'])
                     xml += f'path="internal://{html.escape(s["filename"])}" '
                 else:
                     xml += f'path="absolute://{html.escape(s["external"])}" '
@@ -2615,15 +2654,15 @@ class RefiExport(QtWidgets.QDialog):
         xml += "</Sources>\n"
         return xml
 
-    def text_selection_xml(self, id_):
+    def text_selection_xml(self, id_:int) -> str:
         """ Get and complete text selection xml.
         xml is in form:
         <PlainTextSelection><Description></Description><Coding><CodeRef/></Coding></PlainTextSelection>
         Called by: sources_xml
-
-        :param id_ file id integer
-
-        :returns xml string
+        Args:
+            id_ file id integer
+        Return:
+            xml string
         """
 
         xml = ""
@@ -3234,7 +3273,4 @@ class RefiExport(QtWidgets.QDialog):
             No return value
         """
 
-        '''file_xsd = xsd_codebook
-        if xsd_type != "codebook":
-            file_xsd = xsd_project'''
         return True
