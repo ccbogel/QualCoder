@@ -37,7 +37,7 @@ logger = logging.getLogger(__name__)
 
 class TaguetteImport:
     """ Import from a Taguette.sqlite3 database into a new QualCoder database.
-    Thanks to Salomon for creating the intial code for this. """
+    Thanks to Lornzo Salomón for creating the intial code for this. """
 
     def __init__(self, app, parent_textedit):
         super(TaguetteImport, self).__init__()
