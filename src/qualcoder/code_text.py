@@ -4393,7 +4393,16 @@ class DialogCodeText(QtWidgets.QWidget):
 
                     # Add new items to database
                     for index in range(len(text_starts)):
-                        item = {'cid': cid, 'fid': int(f['id']), 'seltext': str(find_txt),
+                        seltext = str(find_txt)
+                        # Using Regex, need to get each matching text
+                        if self.ui.checkBox_auto_regex.isChecked():
+                            pos0 = text_starts[index] + 1  # need +1 for substr()
+                            length = text_ends[index] - pos0 + 1
+                            cur.execute("select substr(fulltext,?,?) from source where id=?", [pos0, length, int(f['id'])])
+                            res = cur.fetchone()
+                            if res:
+                                seltext = res[0]
+                        item = {'cid': cid, 'fid': int(f['id']), 'seltext': seltext,
                                 'pos0': text_starts[index], 'pos1': text_ends[index],
                                 'owner': self.app.settings['codername'], 'memo': "",
                                 'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")}
