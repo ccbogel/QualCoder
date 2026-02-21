@@ -142,6 +142,7 @@
      </property>
      <addaction name="actionREFI_Codebook_import"/>
      <addaction name="actionREFI_QDA_Project_import"/>
+     <addaction name="actionTaguette_import"/>
      <addaction name="actionRQDA_Project_import"/>
      <addaction name="actionImport_plain_text_codes_list"/>
     </widget>
@@ -597,6 +598,11 @@
   <action name="actionCode_comparison_table">
    <property name="text">
     <string>Code counts by file/case</string>
+   </property>
+  </action>
+  <action name="actionTaguette_import">
+   <property name="text">
+    <string>Taguette import</string>
    </property>
   </action>
  </widget>
