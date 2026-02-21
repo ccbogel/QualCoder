@@ -79,6 +79,7 @@ from qualcoder.ai_chat import DialogAIChat
 from qualcoder.rqda import RqdaImport
 from qualcoder.settings import DialogSettings
 from qualcoder.special_functions import DialogSpecialFunctions
+from qualcoder.taguette_import import TaguetteImport
 # from qualcoder.text_mining import DialogTextMining
 from qualcoder.view_av import DialogCodeAV
 from qualcoder.view_charts import ViewCharts
@@ -1512,6 +1513,7 @@ Click "Yes" to start now.')
         self.ui.actionREFI_Codebook_import.triggered.connect(self.refi_codebook_import)
         self.ui.actionREFI_QDA_Project_import.triggered.connect(self.refi_project_import)
         self.ui.actionRQDA_Project_import.triggered.connect(self.rqda_project_import)
+        self.ui.actionTaguette_import.triggered.connect(self.taguette_project_import)
         self.ui.actionExport_codebook.triggered.connect(self.codebook)
         self.ui.actionExport_codebook_with_memos.triggered.connect(self.codebook_with_memos)
         self.ui.actionExit.triggered.connect(self.close)
@@ -1676,6 +1678,7 @@ Click "Yes" to start now.')
         self.ui.actionREFI_Codebook_import.setEnabled(False)
         self.ui.actionREFI_QDA_Project_import.setEnabled(True)
         self.ui.actionRQDA_Project_import.setEnabled(True)
+        self.ui.actionTaguette_import.setEnabled(True)
         self.ui.actionExport_codebook.setEnabled(False)
         self.ui.actionImport_plain_text_codes_list.setEnabled(False)
         # Manage menu
@@ -1803,7 +1806,7 @@ Click "Yes" to start now.')
         msg += _("Style") + f"; {self.app.settings['stylesheet']}"
         self.ui.textEdit.append(msg)
         if platform.system() == "Windows":
-            self.ui.textEdit.append("<p>" + _("Directory (folder) paths / represents backslash") + "</p>")
+            self.ui.textEdit.append("<p>" + _("Folder paths / represents backslash") + "</p>")
         self.ui.textEdit.append("<p>&nbsp;</p>")
         self.ui.textEdit.textCursor().movePosition(QtGui.QTextCursor.MoveOperation.End)
         self.ui.tabWidget.setCurrentWidget(self.ui.tab_action_log)
@@ -2207,6 +2210,21 @@ Click "Yes" to start now.')
         RefiImport(self.app, self.ui.textEdit, "qdpx")
         if self.app.settings['ai_enable'] == 'True':
             self.app.ai.init_llm(self, rebuild_vectorstore=True)
+        self.project_summary_report()
+
+    def taguette_project_import(self):
+        """ Import a Taguette project into a new project space. """
+
+        self.close_project()
+        msg = _(
+            "Step 1: You will be asked for a new QualCoder project name.\nStep 2: You will be asked for the Taguette.sqlite3 file.")
+        Message(self.app, _('RQDA import steps'), msg).exec()
+        self.new_project()
+        # Check project created successfully
+        if self.app.project_name == "":
+            Message(self.app, _('Project creation'), _("Project not successfully created"), "critical").exec()
+            return
+        TaguetteImport(self.app, self.ui.textEdit)
         self.project_summary_report()
 
     def rqda_project_import(self):
@@ -3101,7 +3119,7 @@ Click "Yes" to start now.')
             msg += f"\nText Bookmark: {bookmark_filename[0]}"
             msg += f", position: {result[5]}\n"
         if platform.system() == "Windows":
-            msg += "\n" + _("Directory (folder) paths / represents \\")
+            msg += "\n" + _("Folder paths / represents \\")
         self.ui.textEdit.append(msg)
         bad_links = self.app.check_bad_file_links()
         if bad_links:
