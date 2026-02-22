@@ -44,17 +44,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
     Called from code_text, code_av, code_image.
     """
 
-    app = None
-    code_dict = None
-    case_or_file = None
-    codes = []
-    categories = []
-    text_results = []
-    image_results = []
-    av_results = []
-    te = None
-
-    def __init__(self, app, code_dict, case_or_file="File", parent=None):
+    def __init__(self, app, code_dict, case_or_file="File"):
         """ Create dialog with textEdit widget to show all codings of this code.
         Called: code_text.coded_media_dialog , code_av.coded_media_dialog , code_image.coded_media_dialog
         param:
@@ -67,14 +57,12 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         self.code_dict = code_dict
         self.case_or_file = case_or_file
         QtWidgets.QDialog.__init__(self)
-
         font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
         self.resize(550, 580)
         # Enable custom window hint to enable customizing window controls
         self.setWindowFlags(self.windowFlags() | QtCore.Qt.WindowType.CustomizeWindowHint)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-
         title = _("Coded files: ") + self.code_dict['name']
         if case_or_file == "Case":
             title = _("Coded cases: ") + self.code_dict['name']
@@ -87,7 +75,11 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         msg = _("Left click on heading for coding in context") + "\n"
         msg += _("Right click on heading to unmark or to add codes") + "\n\n"
         self.te.append(msg)
-
+        self.text_results = []
+        self.image_results = []
+        self.av_results = []
+        self.codes = []
+        self.categories = []
         self.codes, self.categories = self.app.get_codes_categories()
         self.get_coded_segments_all_files()
         self.te.cursorPositionChanged.connect(self.show_context_of_clicked_heading)
@@ -153,8 +145,8 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         sql += "where code_name.cid =? "
         sql += " order by source.name"
         if self.case_or_file == "Case":
-            sql = "select code_name.name, color, cases.name, "
-            sql += "x1, y1, width, height, source.mediapath, source.id, code_image_visible.memo,imid, important, code_image_visible.owner "
+            sql = "select code_name.name, color, cases.name, x1, y1, width, height,  "
+            sql += "source.mediapath, source.id, code_image_visible.memo,imid, important, code_image_visible.owner "
             sql += "from code_image_visible join code_name on code_name.cid = code_image_visible.cid "
             sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
             sql += "code_image_visible.id = case_text.fid "
@@ -178,7 +170,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
                 title += _(" Case: ") + row['file_or_casename'] + _(" File: ") + row['mediapath']
             else:
                 title += _(" File: ") + row['mediapath']
-            title += f'</span> ({row['owner']})</p>'
+            title += f'</span> ({row["owner"]})</p>'
             self.te.insertHtml(title)
             row['textedit_end'] = len(self.te.toPlainText())
             self.te.append("\n")
@@ -194,8 +186,8 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         sql += "where code_name.cid =? "
         sql += " order by source.name"
         if self.case_or_file == "Case":
-            sql = "select code_name.name, color, cases.name, code_av_visible.pos0, code_av_visible.pos1, code_av_visible.memo, "
-            sql += "source.mediapath, source.id, avid, important, code_av_visible.owner from "
+            sql = "select code_name.name, color, cases.name, code_av_visible.pos0, code_av_visible.pos1, "
+            sql += "code_av_visible.memo, source.mediapath, source.id, avid, important, code_av_visible.owner from "
             sql += "code_av_visible join code_name on code_name.cid = code_av_visible.cid "
             sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
             sql += "code_av_visible.id = case_text.fid "
@@ -218,13 +210,13 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
                 title += _("Case: ") + row['file_or_casename'] + _(" File: ") + row['mediapath']
             else:
                 title += _("File: ") + row['mediapath']
-            title += f'</span> ({row['owner']})'
+            title += f'</span> ({row["owner"]})'
             self.te.insertHtml(title)
             start = msecs_to_mins_and_secs(row['pos0'])
             end = msecs_to_mins_and_secs(row['pos1'])
             self.te.insertHtml(f'<br />[{start} - {end}] ')
             row['textedit_end'] = len(self.te.toPlainText())
-            self.te.append("Memo: " + row['memo'] + "\n\n")
+            self.te.append(_("Memo: ") + f"{row['memo']}\n\n")
         self.te.blockSignals(False)
 
     def put_image_into_textedit(self, img, counter, text_edit):
@@ -258,7 +250,8 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         else:
             scaler = scaler_h
         # Need unique image names or the same image from the same path is reproduced
-        imagename = self.app.project_path + '/images/' + str(counter) + '-' + img['mediapath']
+        # Works, but should use os.path.join
+        imagename = self.app.project_path + '/images/' + f"{counter}-{img['mediapath']}"
         url = QtCore.QUrl(imagename)
         document.addResource(QtGui.QTextDocument.ResourceType.ImageResource.value, url, image)
         # https://doc.qt.io/qt-6/qtextdocument.html#addResource
@@ -300,8 +293,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
 
     def text_edit_menu(self, position):
         """ Context menu for textEdit.
-        Mark, unmark, annotate.
-        TODO important mark, memo
+        Mark, unmark, annotate, important mark, memo.
         """
 
         cursor = self.te.cursorForPosition(position)
@@ -323,7 +315,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
                 item = {'type': 'av', 'res': row}
                 break
         menu = QtWidgets.QMenu()
-        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
         action_mark = None
         action_unmark = None
         action_memo = None
@@ -371,7 +363,6 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
     def add_important_flag(self, item):
 
         cur = self.app.conn.cursor()
-        print(item)
         if item['type'] == 'text':
             cur.execute("update code_text set important=1 where ctid=?", (item['res']['ctid'],))
         if item['type'] == 'image':
@@ -467,7 +458,8 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
                     pass
             if item['type'] == "av":
                 try:
-                    sql = "insert into code_av (id, pos0, pos1, cid, memo, date, owner, important) values(?,?,?,?,?,?,?, null)"
+                    sql = "insert into code_av (id, pos0, pos1, cid, memo, date, owner, important) " \
+                          "values(?,?,?,?,?,?,?, null)"
                     values = [item['res']['fid'], item['res']['pos0'], item['res']['pos1'],
                               s['cid'], "", now_date, self.app.settings['codername']]
                     cur.execute(sql, values)
