@@ -96,14 +96,14 @@ try:
 except Exception as e:
     print(e)
 
-qualcoder_version = "QualCoder 3.9"
+qualcoder_version = "QualCoder 3.8.1"
 path = os.path.abspath(os.path.dirname(__file__))
 home = os.path.expanduser('~')
 if not os.path.exists(home + '/.qualcoder'):
     try:
         os.mkdir(home + '/.qualcoder')
     except Exception as e:
-        print("Cannot add .qualcoder folder to home directory\n" + str(e))
+        print(f"Cannot add .qualcoder folder to home folder\n{e}")
         raise
 logfile = home + '/.qualcoder/QualCoder.log'
 log_maxBytes = 500000 # 500 KB: max length of the logfile before old entries are discarded
@@ -138,7 +138,7 @@ class ProjectLockHeartbeatWorker(QtCore.QObject):
     to the lock file to signify that the project is still in use and the host process did not crash.    
     """
     finished = QtCore.pyqtSignal()  # Signal for indicating completion
-    io_error = QtCore.pyqtSignal()  # Singal indicating an error acessing the lock file to write the heartbeat  
+    io_error = QtCore.pyqtSignal()  # Signal indicating an error acessing the lock file to write the heartbeat
 
     def __init__(self, app, lock_file_path):
         super().__init__()
