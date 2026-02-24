@@ -75,7 +75,7 @@ py -m qualcoder
 If you are using python version 3.13 and get a dll error regarding the torch module when trying to run QualCoder. Install this torch version:
 
 ```
-pip install torch==2.8.0 torchvision==0.23.0 torchaudio==2.8.0
+pip install torch==2.8.0
 ```
 
 8. If running QualCoder in a virtual environment, to exit the virtual environment type:
@@ -129,7 +129,7 @@ Use a virtual environment (commands in point 6 below). Not using a virtual envir
 
 4. Use the Terminal app (`Applications -> Utilities -> Terminal`).
 
-5. In the terminal, move (using the `cd` command) into the QualCoder folder. You should be inside the QualCoder-master folder or if using a release (e.g. Qualcoder-3.8 folder). e.g. 
+5. In the terminal, move (using the `cd` command) into the QualCoder folder. You should be inside the QualCoder-master folder or if using a release (e.g. Qualcoder-3.8.1 folder). e.g. 
 
 ```bash
 cd Downloads/QualCoder-master
@@ -200,7 +200,7 @@ To install from source code below, inside a virtual environment. If you are usin
 
 For example you might be in this folder, where you unzipped QualCoder: 
 
-yourcomputer:~Downloads/QualCoder-3.8
+yourcomputer:~Downloads/QualCoder-3.8.1
 
 ```
 python3 -m venv env
@@ -330,8 +330,8 @@ QualCoder is distributed under the LGPLv3 LICENSE.
 
 ##  Citation APA style
 
-Curtain, C. Dröge, K. (2025) QualCoder 3.8 [Computer software]. Retrieved from
-https://github.com/ccbogel/QualCoder/releases/tag/3.8
+Curtain, C. Dröge, K. (2025) QualCoder 3.8.1 [Computer software]. Retrieved from
+https://github.com/ccbogel/QualCoder/releases/tag/3.8.1
 
 ## Creator
 
