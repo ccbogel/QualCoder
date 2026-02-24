@@ -354,9 +354,10 @@ class DialogSQL(QtWidgets.QDialog):
                 field_item = QtWidgets.QTreeWidgetItem()
                 if table_or_view == "view":
                     field_item.setBackground(0, QtGui.QBrush(Qt.GlobalColor.yellow, Qt.BrushStyle.Dense6Pattern))
-                if field[5] > 0:
+                if field[5] > 0:  # Primary key
                     field_item.setForeground(0, QtGui.QBrush(Qt.GlobalColor.red))
-                field_item.setText(0, field[1])
+                field_item.setText(0, field[1])  # Name
+                field_item.setToolTip(0, field[2])  # Type
                 top_item.addChild(field_item)
 
         # Add default sqls
