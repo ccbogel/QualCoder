@@ -349,11 +349,12 @@ class DialogSQL(QtWidgets.QDialog):
             table_or_view = result.fetchone()[0]
             if table_or_view == "view":
                 top_item.setBackground(0, QtGui.QBrush(Qt.GlobalColor.yellow, Qt.BrushStyle.Dense6Pattern))
+                top_item.setToolTip(0, _("Table view\nBased on coder_names visibility"))
             self.ui.treeWidget.addTopLevelItem(top_item)
             for field in self.schema[table_name]:
                 field_item = QtWidgets.QTreeWidgetItem()
                 if table_or_view == "view":
-                    field_item.setBackground(0, QtGui.QBrush(Qt.GlobalColor.yellow, Qt.BrushStyle.Dense6Pattern))
+                    field_item.setBackground(0, QtGui.QBrush(Qt.GlobalColor.yellow, Qt.BrushStyle.Dense7Pattern))
                 if field[5] > 0:  # Primary key
                     field_item.setForeground(0, QtGui.QBrush(Qt.GlobalColor.red))
                 field_item.setText(0, field[1])  # Name
