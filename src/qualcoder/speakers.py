@@ -78,6 +78,8 @@ class DialogSpeakers(QtWidgets.QDialog):
         self.collect_names()
         self.fill_table()
         self.ui.tableWidget.itemChanged.connect(self.on_item_changed)
+        self.ui.tableWidget.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
         self.ui.buttonBox.accepted.connect(self.ok)
         # self.ui.buttonBox.rejected.connect(self.cancel) 
         self.ui.buttonBox.helpRequested.connect(self.help)
@@ -278,6 +280,33 @@ class DialogSpeakers(QtWidgets.QDialog):
             sel_state = self.ui.tableWidget.item(item.row(), 0).checkState() == QtCore.Qt.CheckState.Checked
             self.speaker_summary[item.row()]['selected'] = (sel_state)
         QtCore.QTimer.singleShot(0, lambda: self.fill_table())
+
+    def table_menu(self, position):
+        """ Context menu for quick visibility toggles. """
+
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
+        action_select_all = menu.addAction(_("Select all"))
+        action_deselect_all = menu.addAction(_("Deselect all"))
+        action = menu.exec(self.ui.tableWidget.viewport().mapToGlobal(position))
+        if action == action_select_all:
+            self.select_all()
+        if action == action_deselect_all:
+            self.deselect_all()
+
+    def select_all(self):
+        """ Select all speakers. """
+
+        for speaker in self.speaker_summary:
+            speaker['selected'] = True
+        self.fill_table()
+
+    def deselect_all(self):
+        """ Deselect all speakers. """
+
+        for speaker in self.speaker_summary:
+            speaker['selected'] = False
+        self.fill_table()
 
     def ok(self):
         cur = self.app.conn.cursor()
