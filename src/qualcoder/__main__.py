@@ -97,7 +97,7 @@ try:
 except Exception as e:
     print(e)
 
-qualcoder_version = "QualCoder 3.8.2"
+qualcoder_version = "QualCoder 4.0 in development"
 path = os.path.abspath(os.path.dirname(__file__))
 home = os.path.expanduser('~')
 if not os.path.exists(home + '/.qualcoder'):
