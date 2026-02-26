@@ -2247,7 +2247,7 @@ Clic-droit pour les options : tous (par défaut), premier, code dans le code.</t
     <message>
         <location filename="ui_dialog_coder_names.py" line="85"/>
         <source>Choose (â) your coder name. Adjust visibility of others:</source>
-        <translation>Choisissez (✓) votre nom de codeur·se. Ajustez la visibilité des autres :</translation>
+        <translation type="unfinished">Choisissez (✓) votre nom de codeur·se. Ajustez la visibilité des autres :</translation>
     </message>
     <message>
         <location filename="ui_dialog_coder_names.py" line="86"/>
