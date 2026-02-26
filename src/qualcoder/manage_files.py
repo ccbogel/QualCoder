@@ -43,6 +43,7 @@ from striprtf.striprtf import rtf_to_text
 from urllib.parse import urlparse
 import webbrowser
 import zipfile
+from charset_normalizer import from_bytes
 
 from .add_attribute import DialogAddAttribute
 from .add_item_name import DialogAddItemName
@@ -1899,6 +1900,36 @@ class DialogManageFiles(QtWidgets.QDialog):
             pass
         return pseudonyms
 
+    def decode_text_with_best_encoding(self, import_file):
+        """Decode text file bytes using robust encoding detection and fallbacks."""
+
+        with open(import_file, "rb") as sourcefile:
+            raw_bytes = sourcefile.read()
+        if not raw_bytes:
+            return "", "empty"
+
+        # try Unicode first, with and without BOM
+        decode_order = ("utf-8-sig", "utf-8")
+        for encoding in decode_order:
+            try:
+                return raw_bytes.decode(encoding), encoding
+            except UnicodeDecodeError:
+                pass
+
+        # no Unicode, try to detect charset with charset-normalizer, then fall back to common encodings
+        best_match = from_bytes(raw_bytes).best()
+        if best_match is not None:
+            detected_encoding = best_match.encoding if best_match.encoding else "unknown"
+            return str(best_match), detected_encoding
+
+        for encoding in ("cp1252", "latin-1"):
+            try:
+                return raw_bytes.decode(encoding), encoding
+            except UnicodeDecodeError:
+                pass
+
+        return raw_bytes.decode("utf-8", errors="backslashreplace"), "utf-8(backslashreplace)"
+
     def load_file_text(self, import_file, link_path=""):
         """ Import from file types of odt, docx, rtf, pdf, epub, txt, html, htm.
         Implement character detection for txt imports.
@@ -1977,34 +2008,17 @@ class DialogManageFiles(QtWidgets.QDialog):
                     self.get_item_and_hierarchy(page, lobj)
                 text_ += self.pdf_page_text
         # Try importing as a plain text file.
-        # TODO https://stackoverflow.com/questions/436220/how-to-determine-the-encoding-of-text
-        # ==> suggestion: use the new lib "charset_normalizer"  
-        # coding = chardet.detect(file.content).get('encoding')
-        # text = file.content[:10000].decode(coding)
         if text_ == "":
-            import_errors = 0
             try:
-                # can get UnicodeDecode Error on Windows so using error handler
-                with open(import_file, "r", encoding="utf-8", errors="backslashreplace") as sourcefile:
-                    while 1:
-                        line = sourcefile.readline()
-                        if not line:
-                            break
-                        try:
-                            text_ += line
-                        except Exception as err:
-                            logger.warning("Importing plain text file, line ignored: " + str(err))
-                            import_errors += 1
-                    if text_[0:6] == "\ufeff":  # associated with notepad files
-                        text_ = text_[6:]
+                text_, detected_encoding = self.decode_text_with_best_encoding(import_file)
+                logger.debug(f"Importing plain text file: {import_file} decoded as {detected_encoding}")
+                if text_ and text_[0] == "\ufeff":  # associated with notepad files
+                    text_ = text_[1:]
             except Exception as err:
                 logger.warning(str(err))
                 Message(self.app, _("Warning"), _("Cannot import") + f"{import_file}\n{err}",
                         "warning").exec()
                 return
-            if import_errors > 0:
-                Message(self.app, _("Warning"), str(import_errors) + _(" lines not imported"), "warning").exec()
-                logger.warning(f"{import_file}: {import_errors} " + _("lines not imported"))
         # Import of text file did not work
         if text_ == "":
             Message(self.app, _("Warning"),
