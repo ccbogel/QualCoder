@@ -129,7 +129,7 @@ Use a virtual environment (commands in point 6 below). Not using a virtual envir
 
 4. Use the Terminal app (`Applications -> Utilities -> Terminal`).
 
-5. In the terminal, move (using the `cd` command) into the QualCoder folder. You should be inside the QualCoder-master folder or if using a release (e.g. Qualcoder-3.8.1 folder). e.g. 
+5. In the terminal, move (using the `cd` command) into the QualCoder folder. You should be inside the QualCoder-master folder or if using a release (e.g. Qualcoder-3.8.2 folder). e.g. 
 
 ```bash
 cd Downloads/QualCoder-master
@@ -200,7 +200,7 @@ To install from source code below, inside a virtual environment. If you are usin
 
 For example you might be in this folder, where you unzipped QualCoder: 
 
-yourcomputer:~Downloads/QualCoder-3.8.1
+yourcomputer:~Downloads/QualCoder-3.8.2
 
 ```
 python3 -m venv env
@@ -330,8 +330,8 @@ QualCoder is distributed under the LGPLv3 LICENSE.
 
 ##  Citation APA style
 
-Curtain, C. Dröge, K. (2025) QualCoder 3.8.1 [Computer software]. Retrieved from
-https://github.com/ccbogel/QualCoder/releases/tag/3.8.1
+Curtain, C. Dröge, K. (2025) QualCoder 3.82 [Computer software]. Retrieved from
+https://github.com/ccbogel/QualCoder/releases/tag/3.8.2
 
 ## Creator
 
