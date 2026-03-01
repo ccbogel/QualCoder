@@ -28,13 +28,13 @@
      <property name="minimumSize">
       <size>
        <width>0</width>
-       <height>48</height>
+       <height>52</height>
       </size>
      </property>
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>44</height>
+       <height>52</height>
       </size>
      </property>
      <property name="title">
@@ -44,7 +44,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>3</y>
+        <y>2</y>
         <width>211</width>
         <height>22</height>
        </rect>
@@ -102,9 +102,9 @@
      <widget class="QCheckBox" name="checkBox_hide_blanks">
       <property name="geometry">
        <rect>
-        <x>10</x>
+        <x>12</x>
         <y>30</y>
-        <width>211</width>
+        <width>231</width>
         <height>20</height>
        </rect>
       </property>
@@ -219,6 +219,90 @@
       </property>
       <property name="toolTip">
        <string>Select files by attributes</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_export_gephi">
+      <property name="geometry">
+       <rect>
+        <x>550</x>
+        <y>0</y>
+        <width>32</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>32</width>
+        <height>32</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>32</width>
+        <height>32</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>Export to Gephi. GraphML format</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_export_graph1">
+      <property name="geometry">
+       <rect>
+        <x>470</x>
+        <y>0</y>
+        <width>32</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>32</width>
+        <height>32</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>32</width>
+        <height>32</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>Export Co-occurence Graph Image</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="pushButton_export_graph2">
+      <property name="geometry">
+       <rect>
+        <x>510</x>
+        <y>0</y>
+        <width>32</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>32</width>
+        <height>32</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>32</width>
+        <height>32</height>
+       </size>
+      </property>
+      <property name="toolTip">
+       <string>Export Graph Clusters Image</string>
       </property>
       <property name="text">
        <string/>
