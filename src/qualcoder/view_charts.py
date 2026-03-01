@@ -24,6 +24,7 @@ from collections import Counter
 from copy import copy, deepcopy
 import logging
 import os
+import tempfile  # Create a temporary file
 import pandas as pd
 import plotly.express as px
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
@@ -31,12 +32,12 @@ import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtWidgets import QDialog
 from PyQt6.QtGui import QIcon
-from .simple_wordcloud import Wordcloud
 
 from .GUI.ui_dialog_charts import Ui_DialogCharts
-
 from .helpers import ExportDirectoryPathDialog, Message
 from .report_attributes import DialogSelectAttributeParameters
+from .simple_wordcloud import Wordcloud
+from . import stopwords
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -170,6 +171,10 @@ class ViewCharts(QDialog):
         wordcloud_ngram_options = ["1", "2", "3", "4"]
         self.ui.comboBox_ngrams.addItems(wordcloud_ngram_options)
         self.ui.pushButton_stopwords.clicked.connect(self.set_stopwords_filepath)
+        languages = ["  ", "Deutsch de", "English en", "Español es", "Français fr", "Italiano it", "Português pt"]
+        for lang in languages:
+            lang_code = lang[-2:]
+            self.ui.comboBox_stopwords.addItem(lang, lang_code)
         # QIntValidator does not use upper limits, it is based on number of digits entered. eg 999 possible
         self.ui.lineEdit_max_words.setValidator(QtGui.QIntValidator(50, 500))
         self.ui.lineEdit_max_words.setText("200")
@@ -180,6 +185,7 @@ class ViewCharts(QDialog):
         self.ui.lineEdit_height.setText("600")
         self.ui.pushButton_wordcloud.setIcon(qta.icon('mdi6.play', options=[{'scale_factor': 2}]))
         self.ui.pushButton_wordcloud.pressed.connect(self.show_word_cloud)
+
         # Attributes comboboxes. Initial radio button checked is Files
         self.ui.comboBox_char_attributes.currentIndexChanged.connect(self.character_attribute_charts)
         self.ui.comboBox_num_attributes.currentIndexChanged.connect(self.numeric_attribute_charts)
@@ -187,6 +193,45 @@ class ViewCharts(QDialog):
         heatmap_combobox_list = ["", "File", "Case"]
         self.ui.comboBox_heatmap.addItems(heatmap_combobox_list)
         self.ui.comboBox_heatmap.currentIndexChanged.connect(self.make_heatmap)
+
+    def get_selected_stopwords_path(self):
+        """ Determina de forma segura qué archivo de exclusión enviar a la Nube de Palabras.
+        Determine which stopwords file to send to the Word Cloud. """
+
+        # 1. Si el usuario subió uno manualmente (botón Stop Words), tiene prioridad
+        if self.stopwords_filepath:
+            return self.stopwords_filepath
+        
+        # 2. Get language code or "" from combobox. Obtener el código de idioma (ej. "es") del combo box
+        idx = self.ui.comboBox_stopwords.currentIndex()
+        lang_code = self.ui.comboBox_stopwords.itemData(idx)
+        if lang_code:
+            # OPCIÓN A: Use stopwords from stopwords.py Intentar usar el módulo interno stopwords.py
+            try:
+                words_string = getattr(stopwords, lang_code, None)
+                if words_string:
+                    temp_path = os.path.join(tempfile.gettempdir(), f"qc_stopwords_{lang_code}.txt")
+                    with open(temp_path, 'w', encoding='utf-8') as f:
+                        f.write("\n".join(words_string.split()))
+                    return temp_path
+            except (ImportError, AttributeError):
+                pass
+                
+            # OPCIÓN B: Buscar en la carpeta Examples como plan de respaldo
+            examples_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "Examples")
+            example_file = os.path.join(examples_dir, f"stopwords_{lang_code}.txt")
+            if os.path.exists(example_file):
+                return example_file
+
+        # 3. FALLBACK: Prevenir crashes creando un archivo temporal vacío si no hay nada seleccionado
+        fallback_file = os.path.join(tempfile.gettempdir(), "qc_vacio_seguridad.txt")
+        if not os.path.exists(fallback_file):
+            try:
+                with open(fallback_file, 'w', encoding='utf-8') as f:
+                    f.write("") 
+            except Exception as e:
+                logger.error("Unable to create backup file: " + str(e))
+        return fallback_file
 
     # DATA FILTERS SECTION
     def select_attributes(self):
@@ -261,7 +306,7 @@ class ViewCharts(QDialog):
 
     def set_stopwords_filepath(self):
         """ Set stopwords from a user selected file for the word cloud.
-         This overrides exisitng stops words in simple_wordcloud,
+         This overrides existing stops words in the simple stopwords,
          and overrides stops words file in .qualcoder configuration folder."""
 
         default_import_directory = os.path.expanduser("~")
@@ -270,10 +315,10 @@ class ViewCharts(QDialog):
                                                          "Text Files (*.txt)",
                                                          options=QtWidgets.QFileDialog.Option.DontUseNativeDialog
                                                          )
-        print(response)
         if response[0] == "":
             self.stopwords_filepath = None
             self.ui.pushButton_stopwords.setIcon(QIcon())
+            # Si se cancela, resetear al combo box por defecto
             return
         self.stopwords_filepath = response[0]
         self.ui.pushButton_stopwords.setToolTip(response[0])
@@ -419,6 +464,7 @@ class ViewCharts(QDialog):
             res_text = cur.fetchone()
             if res_text:
                 values.append(res_text[0])
+
         # Create image
         text = " ".join(values)
         background = self.ui.comboBox_wordcloud_background.currentText()
@@ -439,18 +485,24 @@ class ViewCharts(QDialog):
             max_words = 200
             self.ui.lineEdit_max_words.setText("200")
         reverse_colors = self.ui.checkBox_reverse_range.isChecked()
-        ngrams = int( self.ui.comboBox_ngrams.currentText())
-        Wordcloud(self.app, text, width=width, height=height, max_words=max_words, background_color=background,
-                  text_color=foreground, reverse_colors=reverse_colors, ngrams=ngrams,
-                  stopwords_filepath2=self.stopwords_filepath)
+        ngrams = int(self.ui.comboBox_ngrams.currentText())
+        stopwords_path = self.get_selected_stopwords_path()
+        try:
+            Wordcloud(self.app, text, width=width, height=height, max_words=max_words, background_color=background,
+                      text_color=foreground, reverse_colors=reverse_colors, ngrams=ngrams,
+                      stopwords_filepath2=stopwords_path)
+        except Exception as e:
+            logger.error(f"Error generating Wordcloud: {str(e)}")
+            Message(self.app, _("Error"), _("Error loading stopwords or generating wordcloud: ") + str(e)).exec()
 
     def codes_of_category_helper(self, category_name):
         """ Get child categories and codes of this category node.
         Only keep the category or code name. Used to reposition TextGraphicsItems on moving a category.
 
-        param: node : Dictionary of category
-
-        return: child_names : List
+        Args:
+             node : Dictionary of category
+        Return:
+            child_names : List
         """
 
         if category_name['cid'] is not None:
