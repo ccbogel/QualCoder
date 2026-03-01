@@ -22,6 +22,7 @@ https://qualcoder-org.github.io/
 
 from copy import deepcopy
 from datetime import datetime
+import html
 import logging
 import openpyxl
 from openpyxl.utils import get_column_letter
@@ -38,6 +39,20 @@ from .select_items import DialogSelectItems
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
+
+# --- Imports for static image export
+try:
+    import networkx as nx
+    from networkx.algorithms.community import louvain_communities, greedy_modularity_communities
+    import matplotlib
+    matplotlib.use('Agg')  # Static engine to generate PNGs without a graphical interface
+    import matplotlib.pyplot as plt
+    import matplotlib.cm as cm
+    
+    HAS_NETWORK_LIBS = True
+except Exception as e:
+    HAS_NETWORK_LIBS = False
+    print("Error loading graph libraries for PyInstaller:", e)
 
 
 class DialogReportCooccurrence(QtWidgets.QDialog):
@@ -60,8 +75,10 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
+        
         self.ui.pushButton_export.setIcon(qta.icon('mdi6.export', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_export.pressed.connect(self.export_to_excel)
+
         self.ui.pushButton_select_files.setIcon(qta.icon('mdi6.file-outline', options=[{'scale_factor': 1.2}]))
         self.ui.pushButton_select_files.pressed.connect(self.select_files)
         self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
@@ -75,6 +92,17 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         tablefont = f'font: 10pt "{self.app.settings["font"]}";'
         self.ui.tableWidget.setStyleSheet(tablefont)  # Should be smaller
         self.ui.tableWidget.cellClicked.connect(self.cell_selected)
+        
+        if hasattr(self.ui, 'pushButton_export_gephi'):
+            self.ui.pushButton_export_gephi.setIcon(qta.icon('mdi6.graph-outline', options=[{'scale_factor': 1.4}]))
+            self.ui.pushButton_export_gephi.pressed.connect(self.export_to_gephi)
+        if hasattr(self.ui, 'pushButton_export_graph1'):
+            self.ui.pushButton_export_graph1.setIcon(qta.icon('mdi6.image', options=[{'scale_factor': 1.4}]))
+            self.ui.pushButton_export_graph1.pressed.connect(self.view_graph)
+        if hasattr(self.ui, 'pushButton_export_graph2'):
+            self.ui.pushButton_export_graph2.setIcon(qta.icon('mdi6.image-multiple', options=[{'scale_factor': 1.4}]))
+            self.ui.pushButton_export_graph2.pressed.connect(self.view_cluster_graph)
+
         self.ui.tableWidget.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
         self.ui.splitter.setSizes([500, 0])
@@ -342,6 +370,254 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
                     self.data_colors[row][col] = colors[color_range_index]
         self.fill_table()
 
+    def export_to_graphml(self):
+        """ Export co-occurrence data to GraphML format for network analysis in Gephi. """
+
+        filename = "Code_cooccurrence.graphml"
+        export_dir = ExportDirectoryPathDialog(self.app, filename)
+        filepath = export_dir.filepath
+        if filepath is None:
+            return
+
+        # Verificar qué filas O columnas (códigos) están visibles actualmente en la tabla
+        # Check which rows OR columns (codes) are currently visible in the table
+        visible_indices = [i for i in range(len(self.selected_codes)) if not self.ui.tableWidget.isRowHidden(i) or
+                           not self.ui.tableWidget.isColumnHidden(i)]
+        if not visible_indices:
+            Message(self.app, _("No data"), _("No visible codes to export.")).exec()
+            return
+
+        # Start building the XML for GraphML to avoid dependency issues
+        xml_content = '<?xml version="1.0" encoding="UTF-8"?>\n'
+        xml_content += '<graphml xmlns="http://graphml.graphdrawing.org/xmlns">\n'
+        xml_content += '  <key id="label" for="node" attr.name="label" attr.type="string"/>\n'
+        xml_content += '  <key id="weight" for="edge" attr.name="weight" attr.type="int"/>\n'
+        xml_content += '  <graph id="G" edgedefault="undirected">\n'
+
+        # 1. Add Nodes (Solo los visibles en filas o columnas)
+        for i in visible_indices:
+            code = self.selected_codes[i]
+            # Escape invalid XML characters in labels
+            name = html.escape(code['name'])
+            xml_content += f'    <node id="n{code["cid"]}">\n'
+            xml_content += f'      <data key="label">{name}</data>\n'
+            xml_content += '    </node>\n'
+
+        # 2. Add Edges (Solo entre nodos visibles)
+        edge_id = 0
+        for row in visible_indices:
+            for col in visible_indices:
+                count = self.data_counts[row][col]
+                if count > 0:
+                    source_cid = self.selected_codes[row]['cid']
+                    target_cid = self.selected_codes[col]['cid']
+                    xml_content += f'    <edge id="e{edge_id}" source="n{source_cid}" target="n{target_cid}">\n'
+                    xml_content += f'      <data key="weight">{count}</data>\n'
+                    xml_content += '    </edge>\n'
+                    edge_id += 1
+
+        xml_content += '  </graph>\n'
+        xml_content += '</graphml>\n'
+
+        try:
+            with open(filepath, 'w', encoding='utf-8') as f:
+                f.write(xml_content)
+            msg = _('Exported GraphML for Gephi: ') + filepath
+            Message(self.app, _('Gephi Export'), msg, "information").exec()
+            self.parent_textEdit.append(msg)
+        except Exception as e:
+            logger.error(f"Error exporting GraphML: {e}")
+            Message(self.app, _("Error"), str(e), "warning").exec()
+
+    def view_graph(self):
+        """ Exports a high-resolution image of the co-occurrence graph. """
+
+        if not HAS_NETWORK_LIBS:
+            Message(self.app, _("Missing Libraries"),
+                    _("'networkx' and 'matplotlib' are required to export graphs.")).exec()
+            return
+        filename = "Cooccurrence_graph.png"
+        export_dir = ExportDirectoryPathDialog(self.app, filename)
+        filepath = export_dir.filepath
+        if filepath is None:
+            return
+        visible_indices = [i for i in range(len(self.selected_codes)) if not self.ui.tableWidget.isRowHidden(i) or
+                           not self.ui.tableWidget.isColumnHidden(i)]
+        if not visible_indices:
+            Message(self.app, _("No data"), _("There are no visible codes to plot.")).exec()
+            return
+
+        graph = nx.Graph()
+        for i in visible_indices:
+            graph.add_node(self.selected_codes[i]['name'])
+        for row in visible_indices:
+            for col in visible_indices:
+                count = self.data_counts[row][col]
+                if count > 0 and row != col: 
+                    graph.add_edge(self.selected_codes[row]['name'], self.selected_codes[col]['name'], weight=count)
+                    
+        if graph.number_of_nodes() == 0 or graph.number_of_edges() == 0:
+            Message(self.app, _("No data"), _("There are no co-occurrences to plot.")).exec()
+            return
+
+        fig, ax = plt.subplots(figsize=(12, 10))
+        ax.set_title("Code Co-occurrence Graph", fontsize=16, fontweight='bold')
+        
+        pos = nx.spring_layout(graph, k=0.8, iterations=50)
+        weights = [graph[u][v]['weight'] for u, v in graph.edges()]
+        max_weight = max(weights) if weights else 1
+        normalized_weights = [(w / max_weight) * 4 + 1 for w in weights]
+        edge_labels = {(u, v): d['weight'] for u, v, d in graph.edges(data=True)}
+
+        nx.draw_networkx_nodes(graph, pos, ax=ax, node_size=800, node_color='#81BEF7', alpha=0.9, edgecolors='gray')
+        nx.draw_networkx_edges(graph, pos, ax=ax, width=normalized_weights, edge_color='#A4A4A4', alpha=0.7)
+        nx.draw_networkx_labels(graph, pos, ax=ax, font_size=10, font_family="sans-serif", font_weight='bold')
+        nx.draw_networkx_edge_labels(graph, pos, ax=ax, edge_labels=edge_labels, font_size=9, font_color='darkred')
+
+        ax.margins(0.15)
+        ax.axis('off')
+        plt.tight_layout()
+        
+        try:
+            plt.savefig(filepath, dpi=300, bbox_inches='tight')
+            plt.close(fig)
+            msg = f"Image successfully exported to:\n{filepath}"
+            Message(self.app, "Export Successful", msg, "information").exec()
+            self.parent_textEdit.append(msg)
+        except Exception as e:
+            logger.error(f"Error exporting graph: {e}")
+            Message(self.app, _("Error"), str(e), "warning").exec()
+
+    def view_cluster_graph(self):
+        """ Exporta una imagen del mapa de códigos agrupados por comunidades.
+        Export an image of the code map grouped by communities.
+        """
+
+        if not HAS_NETWORK_LIBS:
+            Message(self.app, _("Missing Libraries"),
+                    _("'networkx' and 'matplotlib' are required for cluster analysis.")).exec()
+            return
+            
+        filename = "Community_clusters_graph.png"
+        export_dir = ExportDirectoryPathDialog(self.app, filename)
+        filepath = export_dir.filepath
+        if filepath is None:
+            return
+
+        visible_indices = [i for i in range(len(self.selected_codes)) if not self.ui.tableWidget.isRowHidden(i) or
+                           not self.ui.tableWidget.isColumnHidden(i)]
+        if not visible_indices: return
+
+        graph = nx.Graph()
+        for i in visible_indices: graph.add_node(self.selected_codes[i]['name'])
+        for row in visible_indices:
+            for col in visible_indices:
+                count = self.data_counts[row][col]
+                if count > 0 and row != col:
+                    source = self.selected_codes[row]['name']
+                    target = self.selected_codes[col]['name']
+                    graph.add_edge(source, target, weight=count)
+                    graph[source][target]['distance'] = 1.0 / count
+                    
+        if graph.number_of_nodes() == 0 or graph.number_of_edges() == 0: return
+
+        weights_list = [d['weight'] for u, v, d in graph.edges(data=True)]
+        mean_w = sum(weights_list) / len(weights_list) if weights_list else 0
+        
+        graph_strong = nx.Graph()
+        graph_strong.add_nodes_from(graph.nodes())
+        for u, v, d in graph.edges(data=True):
+            if d['weight'] >= mean_w: graph_strong.add_edge(u, v, weight=d['weight'])
+
+        try:
+            communities = list(louvain_communities(graph_strong, weight='weight'))
+        except Exception:
+            try:
+                communities = list(greedy_modularity_communities(graph_strong, weight='weight'))
+            except Exception:
+                communities = [list(graph.nodes())]
+            
+        node_community = {}
+        for comm_id, comm in enumerate(communities):
+            for node in comm: node_community[node] = comm_id
+        cmap = plt.get_cmap('tab20')
+        node_colors = [cmap(node_community.get(node, 0) % 20) for node in graph.nodes()]
+        fig, ax = plt.subplots(figsize=(12, 10))
+        ax.set_title("Code graph (Cluster / Family Analysis)", fontsize=16, fontweight='bold')
+        
+        try:
+            if nx.is_connected(graph): pos = nx.kamada_kawai_layout(graph, weight='distance')
+            else: pos = nx.spring_layout(graph, k=1.2, weight='weight', iterations=80)
+        except Exception:
+            pos = nx.spring_layout(graph, k=1.2, weight='weight', iterations=80)
+        
+        weights = [graph[u][v]['weight'] for u, v in graph.edges()]
+        max_weight = max(weights) if weights else 1
+        normalized_weights = [(w / max_weight) * 4 + 1 for w in weights]
+        edge_labels = {(u, v): d['weight'] for u, v, d in graph.edges(data=True)}
+
+        nx.draw_networkx_nodes(graph, pos, ax=ax, node_size=800, node_color=node_colors, alpha=0.9, edgecolors='gray')
+        nx.draw_networkx_edges(graph, pos, ax=ax, width=normalized_weights, edge_color='#A4A4A4', alpha=0.5)
+        nx.draw_networkx_labels(graph, pos, ax=ax, font_size=10, font_family="sans-serif", font_weight='bold')
+        nx.draw_networkx_edge_labels(graph, pos, ax=ax, edge_labels=edge_labels, font_size=9, font_color='darkred')
+
+        ax.margins(0.15)
+        ax.axis('off')
+        plt.tight_layout()
+        
+        try:
+            plt.savefig(filepath, dpi=300, bbox_inches='tight')
+            plt.close(fig)
+            msg = f"Cluster image successfully exported to:\n{filepath}"
+            Message(self.app, "Export Successful", msg, "information").exec()
+            self.parent_textEdit.append(msg)
+        except Exception as e:
+            logger.error(f"Error exporting clusters: {e}")
+            Message(self.app, _("Error"), str(e), "warning").exec()
+
+    # --- EXPORTAR A GEPHI (GraphML) ---
+    def export_to_gephi(self):
+        """ Exporta la red a formato GraphML para abrir nativamente en Gephi usando NetworkX.
+        Export the network to GraphML format to open natively in Gephi using NetworkX.
+        """
+
+        if not HAS_NETWORK_LIBS:
+            Message(self.app, _("Missing Library"), _("networkx is required to export to Gephi.")).exec()
+            return
+            
+        filename = "Network_Coocurrence.graphml"
+        export_dir = ExportDirectoryPathDialog(self.app, filename)
+        filepath = export_dir.filepath
+        if filepath is None:
+            return
+        visible_indices = [i for i in range(len(self.selected_codes)) if not self.ui.tableWidget.isRowHidden(i) or
+                           not self.ui.tableWidget.isColumnHidden(i)]
+        if not visible_indices:
+            Message(self.app, _("No data"), _("There are no visible codes to export.")).exec()
+            return
+
+        graph = nx.Graph()
+        for i in visible_indices:
+            graph.add_node(self.selected_codes[i]['name'])
+        for row in visible_indices:
+            for col in visible_indices:
+                count = self.data_counts[row][col]
+                if count > 0 and row != col: 
+                    graph.add_edge(self.selected_codes[row]['name'], self.selected_codes[col]['name'], weight=count)
+
+        if graph.number_of_nodes() == 0 or graph.number_of_edges() == 0:
+            Message(self.app, _("No data"), _("There are no co-occurrences to export.")).exec()
+            return
+
+        try:
+            nx.write_graphml(graph, filepath)
+            msg = f"File successfully exported as GrapgML format for Gephi:\n{filepath}"
+            Message(self.app, "Successful Export", msg, "information").exec()
+            self.parent_textEdit.append(msg)
+        except Exception as err:
+            logger.error(f"Error exportando a Gephi: {err}")
+            Message(self.app, _("Error"), str(err), "warning").exec()
+
     def export_to_excel(self):
         """ Export to Excel file. """
 
@@ -498,70 +774,79 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         self.ui.splitter.setSizes([300, 200])
 
     def table_menu(self, position):
-        """ Context menu for creating a new code by merging existing codes.
+        """ Context menu for creating a new code by merging existing codes,
+        exporting to Gephi, viewing graph, and cluster analysis.
         """
 
-        row = self.ui.tableWidget.currentRow()
-        col = self.ui.tableWidget.currentColumn()
-        text = self.ui.tableWidget.item(row, col).text()
-        if text == "":
-            return
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
-        action_merge = menu.addAction(_("Merge into new code"))
+        
+        row = self.ui.tableWidget.currentRow()
+        col = self.ui.tableWidget.currentColumn()
+        action_merge = None
+        
+        # Merge option is only available when a cell with data is clicked
+        if row >= 0 and col >= 0:
+            item = self.ui.tableWidget.item(row, col)
+            if item is not None and item.text() != "":
+                action_merge = menu.addAction(_("Merge into new code"))
+                
         action = menu.exec(self.ui.tableWidget.mapToGlobal(position))
-        if action is not action_merge:
+        
+        if action is None:
             return
-        new_code_name = self.ui.tableWidget.horizontalHeaderItem(col).text() + " | "
-        new_code_name += self.ui.tableWidget.verticalHeaderItem(row).text()
-        new_code_name = new_code_name.replace("\n", "")
-        new_code_name, ok = QtWidgets.QInputDialog.getText(self, _("New code"), " " * 30 + _("Edit name:") + " " * 30,
-                                                           QtWidgets.QLineEdit.EchoMode.Normal, new_code_name)
-        memo = _("Merged: ") + new_code_name
-        if not ok or new_code_name == '':
-            return
-        # Insert new code name
-        codes = self.app.get_code_names()
-        if any(code['name'] == new_code_name for code in codes):
-            Message(self.app, _("Code name exists"), _("Choose another code name")).exec()
-            return
-        cur = self.app.conn.cursor()
-        now_date = datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
-        cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,?,?,?,?)",
-                    (new_code_name, memo, self.app.settings['codername'], now_date,
-                     None, "#DDE600"))  # Vibrant yellow colour
-        self.app.conn.commit()
-        self.app.delete_backup = False
-        cur.execute("select last_insert_rowid()")
-        new_code_cid = cur.fetchone()[0]
-        self.parent_textEdit.append(_("New code: ") + new_code_name)
+            
+        if action_merge and action == action_merge:
+            new_code_name = self.ui.tableWidget.horizontalHeaderItem(col).text() + " | "
+            new_code_name += self.ui.tableWidget.verticalHeaderItem(row).text()
+            new_code_name = new_code_name.replace("\n", "")
+            new_code_name, ok = QtWidgets.QInputDialog.getText(self, _("New code"), " " * 30 + _("Edit name:") + " " * 30,
+                                                               QtWidgets.QLineEdit.EchoMode.Normal, new_code_name)
+            memo = _("Merged: ") + new_code_name
+            if not ok or new_code_name == '':
+                return
+            # Insert new code name
+            codes = self.app.get_code_names()
+            if any(code['name'] == new_code_name for code in codes):
+                Message(self.app, _("Code name exists"), _("Choose another code name")).exec()
+                return
+            cur = self.app.conn.cursor()
+            now_date = datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
+            cur.execute("insert into code_name (name,memo,owner,date,catid,color) values(?,?,?,?,?,?)",
+                        (new_code_name, memo, self.app.settings['codername'], now_date,
+                         None, "#DDE600"))  # Vibrant yellow colour
+            self.app.conn.commit()
+            self.app.delete_backup = False
+            cur.execute("select last_insert_rowid()")
+            new_code_cid = cur.fetchone()[0]
+            self.parent_textEdit.append(_("New code: ") + new_code_name)
 
-        # Create new coded segments
-        data_list = self.data_details[row][col]
-        ''' data item list object:
-        0 - 5 cid0, name, ctid0, cid1, c1_name, ctid1, 
-        6 - 8 fid, file_name, owners, 
-        9 - 12 c0_pos0, c0_pos1, c1_pos0, c1_pos1,
-        13 - 16 text_before, text_overlap, text_after, relation
-        '''
-        for item in data_list:
-            pos0 = min(item[9], item[11])
-            pos1 = max(item[10], item[12])
-            # Note substr() function started at 1, not 0, so + 1
-            cur.execute("select substr(fulltext,?,?) from source where id=?", [pos0 + 1, pos1 - pos0, item[6]])
-            seltext = cur.fetchone()[0]
+            # Create new coded segments
+            data_list = self.data_details[row][col]
+            ''' data item list object:
+            0 - 5 cid0, name, ctid0, cid1, c1_name, ctid1, 
+            6 - 8 fid, file_name, owners, 
+            9 - 12 c0_pos0, c0_pos1, c1_pos0, c1_pos1,
+            13 - 16 text_before, text_overlap, text_after, relation
+            '''
+            for item in data_list:
+                pos0 = min(item[9], item[11])
+                pos1 = max(item[10], item[12])
+                # Note substr() function started at 1, not 0, so + 1
+                cur.execute("select substr(fulltext,?,?) from source where id=?", [pos0 + 1, pos1 - pos0, item[6]])
+                seltext = cur.fetchone()[0]
 
-            # Create item details to put into code_text
-            try:
-                cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
-                            memo,date, important) values(?,?,?,?,?,?,?,?,?)", (new_code_cid, item[6],
-                                                                               seltext, pos0, pos1,
-                                                                               self.app.settings['codername'],
-                                                                               memo, now_date, None))
-                self.app.conn.commit()
-            except Exception as e_:
-                print(e_)
-                logger.debug(e_)
+                # Create item details to put into code_text
+                try:
+                    cur.execute("insert into code_text (cid,fid,seltext,pos0,pos1,owner,\
+                                memo,date, important) values(?,?,?,?,?,?,?,?,?)", (new_code_cid, item[6],
+                                                                                   seltext, pos0, pos1,
+                                                                                   self.app.settings['codername'],
+                                                                                   memo, now_date, None))
+                    self.app.conn.commit()
+                except Exception as e_:
+                    print(e_)
+                    logger.debug(e_)
 
     def fill_table(self):
         """ Fill table using code names alphabetically (case insensitive), using self.data """
@@ -590,7 +875,7 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
                     item.setForeground(QtGui.QBrush(QtGui.QColor("#000000")))
                 if cell_data > 0:
                     item.setData(QtCore.Qt.ItemDataRole.DisplayRole, cell_data)
-                    msg = _("Left click: Show coded text.\nRight click: Create new combined code from these codes.")
+                    msg = _("Left click: Show coded text.\nRight click: merge codes.")
                     item.setToolTip(msg)
                 item.setFlags(item.flags() ^ QtCore.Qt.ItemFlag.ItemIsEditable)
                 self.ui.tableWidget.setItem(row, col, item)
