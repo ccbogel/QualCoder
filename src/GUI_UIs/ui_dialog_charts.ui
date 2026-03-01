@@ -517,8 +517,8 @@ Codings from the entire text file are used for the calculations.</string>
   <widget class="QPushButton" name="pushButton_wordcloud">
    <property name="geometry">
     <rect>
-     <x>580</x>
-     <y>493</y>
+     <x>720</x>
+     <y>490</y>
      <width>50</width>
      <height>50</height>
     </rect>
@@ -590,7 +590,7 @@ Codings from the entire text file are used for the calculations.</string>
     <rect>
      <x>410</x>
      <y>490</y>
-     <width>161</width>
+     <width>151</width>
      <height>22</height>
     </rect>
    </property>
@@ -724,9 +724,9 @@ Codings from the entire text file are used for the calculations.</string>
   <widget class="QPushButton" name="pushButton_stopwords">
    <property name="geometry">
     <rect>
-     <x>380</x>
-     <y>550</y>
-     <width>181</width>
+     <x>560</x>
+     <y>520</y>
+     <width>151</width>
      <height>28</height>
     </rect>
    </property>
@@ -739,6 +739,19 @@ Each word is excluded in the n-grams=1 Word cloud.</string>
    </property>
    <property name="text">
     <string>Stop words</string>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="comboBox_stopwords">
+   <property name="geometry">
+    <rect>
+     <x>560</x>
+     <y>490</y>
+     <width>151</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string>Select stopwords list by language</string>
    </property>
   </widget>
   <zorder>groupBox</zorder>
@@ -792,6 +805,7 @@ Each word is excluded in the n-grams=1 Word cloud.</string>
   <zorder>label_cumulative_bar</zorder>
   <zorder>comboBox_cumulative_bar</zorder>
   <zorder>pushButton_stopwords</zorder>
+  <zorder>comboBox_stopwords</zorder>
  </widget>
  <tabstops>
   <tabstop>checkBox_export_html</tabstop>
