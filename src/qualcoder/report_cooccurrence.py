@@ -41,18 +41,18 @@ path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 # --- Imports for static image export
-try:
-    import networkx as nx
-    from networkx.algorithms.community import louvain_communities, greedy_modularity_communities
-    import matplotlib
-    matplotlib.use('Agg')  # Static engine to generate PNGs without a graphical interface
-    import matplotlib.pyplot as plt
-    import matplotlib.cm as cm
+# try:
+import networkx as nx
+from networkx.algorithms.community import louvain_communities, greedy_modularity_communities
+import matplotlib
+matplotlib.use('Agg')  # Static engine to generate PNGs without a graphical interface
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm  # Not used ?
     
-    HAS_NETWORK_LIBS = True
+'''    HAS_NETWORK_LIBS = True
 except Exception as e:
     HAS_NETWORK_LIBS = False
-    print("Error loading graph libraries for PyInstaller:", e)
+    print("Error loading graph libraries for PyInstaller:", e)'''
 
 
 class DialogReportCooccurrence(QtWidgets.QDialog):
@@ -117,6 +117,7 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
             self.code_ids_str += f",{c['cid']}"
         self.code_ids_str = self.code_ids_str[1:]
         self.selected_codes = deepcopy(self.codes)
+        self.selected_categories_string = ""
         self.result_relations = []
         self.max_count = 0
         self.data_counts = []
@@ -251,6 +252,7 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
     def select_categories(self):
         """ Select categories and their codes for table. """
 
+        self.selected_categories_string = ""
         selection_list = [{'id': -1, 'name': ''}]
         for category in self.categories:
             selection_list.append(category)
@@ -266,13 +268,14 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
             msg = ""
             for category in selected_categories:
                 msg += f"{category['name']}\n"
-
+                self.selected_categories_string += category['name'] + "; "
         self.selected_codes = []
         for category in selected_categories:
             codes = self.codes_of_category(category)
             for code_ in codes:
                 if code_ not in self.selected_codes:
                     self.selected_codes.append(code_)
+
         Message(self.app, _("Categories selected"), msg).exec()
 
         self.code_names_list = []
@@ -324,12 +327,12 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         return selected_codes
 
     def process_data(self):
-        """ Calculate the relations for selected codes for ALL coders (TODO only THIS coder).
+        """ Calculate the relations for selected codes for ALL coders.
+        TODO only THIS coder.
         For text codings only. """
 
         self.ui.checkBox_hide_blanks.setChecked(False)
         self.ui.splitter.setSizes([500, 0])
-
         self.result_relations = []
         self.calculate_relations(self.code_ids_str)
 
@@ -432,10 +435,10 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
     def view_graph(self):
         """ Exports a high-resolution image of the co-occurrence graph. """
 
-        if not HAS_NETWORK_LIBS:
+        '''if not HAS_NETWORK_LIBS:
             Message(self.app, _("Missing Libraries"),
                     _("'networkx' and 'matplotlib' are required to export graphs.")).exec()
-            return
+            return'''
         filename = "Cooccurrence_graph.png"
         export_dir = ExportDirectoryPathDialog(self.app, filename)
         filepath = export_dir.filepath
@@ -462,7 +465,6 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
 
         fig, ax = plt.subplots(figsize=(12, 10))
         ax.set_title("Code Co-occurrence Graph", fontsize=16, fontweight='bold')
-        
         pos = nx.spring_layout(graph, k=0.8, iterations=50)
         weights = [graph[u][v]['weight'] for u, v in graph.edges()]
         max_weight = max(weights) if weights else 1
@@ -471,7 +473,8 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
 
         nx.draw_networkx_nodes(graph, pos, ax=ax, node_size=800, node_color='#81BEF7', alpha=0.9, edgecolors='gray')
         nx.draw_networkx_edges(graph, pos, ax=ax, width=normalized_weights, edge_color='#A4A4A4', alpha=0.7)
-        nx.draw_networkx_labels(graph, pos, ax=ax, font_size=10, font_family="sans-serif", font_weight='bold')
+        # Changed to font size 9, normal from font 10. helps with label overlaps
+        nx.draw_networkx_labels(graph, pos, ax=ax, font_size=9, font_family="sans-serif", font_weight='bold')
         nx.draw_networkx_edge_labels(graph, pos, ax=ax, edge_labels=edge_labels, font_size=9, font_color='darkred')
 
         ax.margins(0.15)
@@ -493,10 +496,10 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         Export an image of the code map grouped by communities.
         """
 
-        if not HAS_NETWORK_LIBS:
+        '''if not HAS_NETWORK_LIBS:
             Message(self.app, _("Missing Libraries"),
                     _("'networkx' and 'matplotlib' are required for cluster analysis.")).exec()
-            return
+            return'''
             
         filename = "Community_clusters_graph.png"
         export_dir = ExportDirectoryPathDialog(self.app, filename)
@@ -531,10 +534,12 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
 
         try:
             communities = list(louvain_communities(graph_strong, weight='weight'))
-        except Exception:
+        except Exception as err:
+            print(err)
             try:
                 communities = list(greedy_modularity_communities(graph_strong, weight='weight'))
-            except Exception:
+            except Exception as err:
+                print(err)
                 communities = [list(graph.nodes())]
             
         node_community = {}
@@ -548,7 +553,8 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         try:
             if nx.is_connected(graph): pos = nx.kamada_kawai_layout(graph, weight='distance')
             else: pos = nx.spring_layout(graph, k=1.2, weight='weight', iterations=80)
-        except Exception:
+        except Exception as err:
+            print(err)
             pos = nx.spring_layout(graph, k=1.2, weight='weight', iterations=80)
         
         weights = [graph[u][v]['weight'] for u, v in graph.edges()]
@@ -558,7 +564,8 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
 
         nx.draw_networkx_nodes(graph, pos, ax=ax, node_size=800, node_color=node_colors, alpha=0.9, edgecolors='gray')
         nx.draw_networkx_edges(graph, pos, ax=ax, width=normalized_weights, edge_color='#A4A4A4', alpha=0.5)
-        nx.draw_networkx_labels(graph, pos, ax=ax, font_size=10, font_family="sans-serif", font_weight='bold')
+        # Changed to font size 9,  from font 10 . helps with label overlaps
+        nx.draw_networkx_labels(graph, pos, ax=ax, font_size=9, font_family="sans-serif", font_weight='bold')
         nx.draw_networkx_edge_labels(graph, pos, ax=ax, edge_labels=edge_labels, font_size=9, font_color='darkred')
 
         ax.margins(0.15)
@@ -575,15 +582,14 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
             logger.error(f"Error exporting clusters: {e}")
             Message(self.app, _("Error"), str(e), "warning").exec()
 
-    # --- EXPORTAR A GEPHI (GraphML) ---
     def export_to_gephi(self):
         """ Exporta la red a formato GraphML para abrir nativamente en Gephi usando NetworkX.
         Export the network to GraphML format to open natively in Gephi using NetworkX.
         """
 
-        if not HAS_NETWORK_LIBS:
+        '''if not HAS_NETWORK_LIBS:
             Message(self.app, _("Missing Library"), _("networkx is required to export to Gephi.")).exec()
-            return
+            return'''
             
         filename = "Network_Coocurrence.graphml"
         export_dir = ExportDirectoryPathDialog(self.app, filename)
