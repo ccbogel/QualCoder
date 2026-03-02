@@ -3,6 +3,8 @@
 charset-normalizer
 diff-match-patch
 EbookLib
+matplotlib
+networkx
 openpyxl
 pandas
 pdfminer.six
