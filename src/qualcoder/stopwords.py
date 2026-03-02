@@ -2,6 +2,7 @@
 """
 Stopwords  for WordClouds.
 Each variable uses the 2-letter ISO language code.
+stopwords from: https://github.com/stopwords-iso
 
 Módulo de listas de palabras vacías (stopwords) para la generación de WordClouds.
 Cada variable usa el código ISO de 2 letras del idioma.
