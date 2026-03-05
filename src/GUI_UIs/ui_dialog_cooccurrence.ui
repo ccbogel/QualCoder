@@ -252,7 +252,7 @@
        <string/>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_export_graph1">
+     <widget class="QPushButton" name="pushButton_export_coocurrence_graph">
       <property name="geometry">
        <rect>
         <x>470</x>
@@ -274,13 +274,14 @@
        </size>
       </property>
       <property name="toolTip">
-       <string>Export Co-occurence Graph Image</string>
+       <string>Export Co-occurence Graph Image
+Right-click for format options</string>
       </property>
       <property name="text">
        <string/>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_export_graph2">
+     <widget class="QPushButton" name="pushButton_export_cluster_graph">
       <property name="geometry">
        <rect>
         <x>510</x>
@@ -302,7 +303,9 @@
        </size>
       </property>
       <property name="toolTip">
-       <string>Export Graph Clusters Image</string>
+       <string>Export Cluster Graph Image
+Right-click for format options
+</string>
       </property>
       <property name="text">
        <string/>
