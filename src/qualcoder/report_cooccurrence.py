@@ -98,16 +98,16 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
             self.ui.pushButton_export_gephi.pressed.connect(self.export_to_gephi)
         self.cluster_graph_format = {"size": 10, "color": "nodes"}
         self.coocurence_graph_format = {'size': 10}
-        if hasattr(self.ui, 'pushButton_export_graph1'):
-            self.ui.pushButton_export_graph1.setIcon(qta.icon('mdi6.image', options=[{'scale_factor': 1.4}]))
-            self.ui.pushButton_export_graph1.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
-            self.ui.pushButton_export_graph1.customContextMenuRequested.connect(self.coocurrence_graph_menu)
-            self.ui.pushButton_export_graph1.pressed.connect(self.view_graph)
-        if hasattr(self.ui, 'pushButton_export_graph2'):
-            self.ui.pushButton_export_graph2.setIcon(qta.icon('mdi6.image-multiple', options=[{'scale_factor': 1.4}]))
-            self.ui.pushButton_export_graph2.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
-            self.ui.pushButton_export_graph2.customContextMenuRequested.connect(self.cluster_graph_menu)
-            self.ui.pushButton_export_graph2.pressed.connect(self.view_cluster_graph)
+        if hasattr(self.ui, 'pushButton_export_coocurrence_graph'):
+            self.ui.pushButton_export_coocurrence_graph.setIcon(qta.icon('mdi6.image', options=[{'scale_factor': 1.4}]))
+            self.ui.pushButton_export_coocurrence_graph.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+            self.ui.pushButton_export_coocurrence_graph.customContextMenuRequested.connect(self.coocurrence_graph_menu)
+            self.ui.pushButton_export_coocurrence_graph.pressed.connect(self.view_graph)
+        if hasattr(self.ui, 'pushButton_export_cluster_graph'):
+            self.ui.pushButton_export_cluster_graph.setIcon(qta.icon('mdi6.image-multiple', options=[{'scale_factor': 1.4}]))
+            self.ui.pushButton_export_cluster_graph.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+            self.ui.pushButton_export_cluster_graph.customContextMenuRequested.connect(self.cluster_graph_menu)
+            self.ui.pushButton_export_cluster_graph.pressed.connect(self.view_cluster_graph)
 
         self.ui.tableWidget.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
@@ -478,7 +478,7 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
             i_8 = "*"
         action_font_8 = QtGui.QAction(_("Label font size 8 ") + i_8)
         menu.addAction(action_font_8)
-        action = menu.exec(self.ui.pushButton_export_graph1.mapToGlobal(position))
+        action = menu.exec(self.ui.pushButton_export_coocurrence_graph.mapToGlobal(position))
         if action == action_font_8:
             self.coocurence_graph_format['size'] = 8
         if action == action_font_10:
@@ -573,7 +573,7 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         action_font_8 = QtGui.QAction(_("Label font size 8 ") + i_8)
         menu.addAction(action_font_8)
 
-        action = menu.exec(self.ui.pushButton_export_graph2.mapToGlobal(position))
+        action = menu.exec(self.ui.pushButton_export_cluster_graph.mapToGlobal(position))
         if action == action_nodes:
             self.cluster_graph_format['color'] = "nodes"
         if action == action_labels:
