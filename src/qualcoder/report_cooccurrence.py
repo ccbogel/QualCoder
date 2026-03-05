@@ -96,16 +96,27 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         if hasattr(self.ui, 'pushButton_export_gephi'):
             self.ui.pushButton_export_gephi.setIcon(qta.icon('mdi6.graph-outline', options=[{'scale_factor': 1.4}]))
             self.ui.pushButton_export_gephi.pressed.connect(self.export_to_gephi)
+        self.cluster_graph_format = {"size": 10, "color": "nodes"}
+        self.coocurence_graph_format = {'size': 10}
         if hasattr(self.ui, 'pushButton_export_graph1'):
             self.ui.pushButton_export_graph1.setIcon(qta.icon('mdi6.image', options=[{'scale_factor': 1.4}]))
+            self.ui.pushButton_export_graph1.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+            self.ui.pushButton_export_graph1.customContextMenuRequested.connect(self.coocurrence_graph_menu)
             self.ui.pushButton_export_graph1.pressed.connect(self.view_graph)
         if hasattr(self.ui, 'pushButton_export_graph2'):
             self.ui.pushButton_export_graph2.setIcon(qta.icon('mdi6.image-multiple', options=[{'scale_factor': 1.4}]))
+            self.ui.pushButton_export_graph2.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+            self.ui.pushButton_export_graph2.customContextMenuRequested.connect(self.cluster_graph_menu)
             self.ui.pushButton_export_graph2.pressed.connect(self.view_cluster_graph)
 
         self.ui.tableWidget.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
         self.ui.splitter.setSizes([500, 0])
+
+        self.subtitle_files_selected = ""
+        self.subtitle_codes_selected = ""
+        self.subitle_categories_selected = ""
+        self.subtitle_attributes_selected = ""
 
         self.codes, self.categories = self.app.get_codes_categories()
         self.code_names_list = []
@@ -138,6 +149,7 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
             return
         selected = ui.get_selected()
         if not selected or selected[0]['name'] == '':
+            self.subtitle_files_selected = ""
             self.file_ids_names = self.app.get_text_filenames()
             Message(self.app, _("Files selected"), _("All files selected")).exec()
             self.ui.pushButton_select_files.setToolTip(_("All files selected"))
@@ -156,7 +168,7 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
             self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
             self.ui.pushButton_select_files.setIcon(qta.icon('mdi6.file', options=[{'scale_factor': 1.4}]))
             self.attributes = []
-
+            self.subtitle_files_selected = _("Files selected")
         self.process_data()
 
     def get_files_from_attributes(self):
@@ -192,12 +204,14 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
                 qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
             self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
             self.attributes = []
+            self.subtitle_attributes_selected = ""
             return
         if not ui.result_file_ids:
             Message(self.app, _("Nothing found") + " " * 20, _("No matching files found")).exec()
             self.ui.pushButton_file_attributes.setIcon(
                 qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
             self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
+            self.subtitle_attributes_selected = ""
             return
 
         # Limit to text files
@@ -216,8 +230,8 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         self.ui.pushButton_file_attributes.setToolTip(msg)
         self.ui.pushButton_select_files.setToolTip(_("Select files"))
         self.ui.pushButton_select_files.setIcon(qta.icon('mdi6.file-outline', options=[{'scale_factor': 1.4}]))
-
         self.process_data()
+        self.subtitle_attributes_selected = _("Attributes selected")
 
     def select_codes(self):
         """ Select codes. """
@@ -233,11 +247,15 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         if not self.selected_codes or self.selected_codes[0]['name'] == '':
             self.selected_codes = deepcopy(self.codes)
             Message(self.app, _("Codes selected"), _("All codes selected")).exec()
+            self.subtitle_codes_selected = ""
+            self.subitle_categories_selected = ""
         else:
             msg = ""
             for s in self.selected_codes:
                 msg += f"{s['name']}\n"
             Message(self.app, _("Codes selected"), msg).exec()
+            self.subtitle_codes_selected = _("Codes selected")
+            self.subitle_categories_selected = ""
 
         self.code_ids_str = ""
         self.code_names_str = ""
@@ -264,11 +282,15 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         if not selected_categories or selected_categories[0]['name'] == '':
             selected_categories = deepcopy(self.categories)
             msg = _("All categories selected")
+            self.subitle_categories_selected = ""
+            self.subtitle_codes_selected = ""
         else:
             msg = ""
             for category in selected_categories:
                 msg += f"{category['name']}\n"
                 self.selected_categories_string += category['name'] + "; "
+            self.subitle_categories_selected = _("Categories selected")
+            self.subtitle_codes_selected = ""
         self.selected_codes = []
         for category in selected_categories:
             codes = self.codes_of_category(category)
@@ -373,6 +395,7 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
                     self.data_colors[row][col] = colors[color_range_index]
         self.fill_table()
 
+
     def export_to_graphml(self):
         """ Export co-occurrence data to GraphML format for network analysis in Gephi. """
 
@@ -432,6 +455,29 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
             logger.error(f"Error exporting GraphML: {e}")
             Message(self.app, _("Error"), str(e), "warning").exec()
 
+    def coocurrence_graph_menu(self, position):
+        """ Format options for cluster graph.
+            self.coocurrence_graph_format = {"size": 10}
+        """
+
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
+        i_10 = ""
+        if self.coocurence_graph_format['size'] == 10:
+            i_10 = "*"
+        action_font_10 = QtGui.QAction(_("Label font size 10") + i_10)
+        menu.addAction(action_font_10)
+        i_8 = ""
+        if self.coocurence_graph_format['size'] == 8:
+            i_8 = "*"
+        action_font_8 = QtGui.QAction(_("Label font size 8 ") + i_8)
+        menu.addAction(action_font_8)
+        action = menu.exec(self.ui.pushButton_export_graph1.mapToGlobal(position))
+        if action == action_font_8:
+            self.coocurence_graph_format['size'] = 8
+        if action == action_font_10:
+            self.coocurence_graph_format['size'] = 10
+
     def view_graph(self):
         """ Exports a high-resolution image of the co-occurrence graph. """
 
@@ -464,7 +510,10 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
             return
 
         fig, ax = plt.subplots(figsize=(12, 10))
-        ax.set_title("Code Co-occurrence Graph", fontsize=16, fontweight='bold')
+        title = _("Code Co-occurrence Graph") + "\n"
+        title += self.subtitle_attributes_selected + " " + self.subtitle_files_selected + " "
+        title += self.subtitle_codes_selected + " " + self.subitle_categories_selected
+        ax.set_title(title, fontsize=16, fontweight='bold')
         pos = nx.spring_layout(graph, k=0.8, iterations=50)
         weights = [graph[u][v]['weight'] for u, v in graph.edges()]
         max_weight = max(weights) if weights else 1
@@ -473,8 +522,7 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
 
         nx.draw_networkx_nodes(graph, pos, ax=ax, node_size=800, node_color='#81BEF7', alpha=0.9, edgecolors='gray')
         nx.draw_networkx_edges(graph, pos, ax=ax, width=normalized_weights, edge_color='#A4A4A4', alpha=0.7)
-        # Changed to font size 9, normal from font 10. helps with label overlaps
-        nx.draw_networkx_labels(graph, pos, ax=ax, font_size=9, font_family="sans-serif", font_weight='bold')
+        nx.draw_networkx_labels(graph, pos, ax=ax, font_size=self.coocurence_graph_format['size'], font_family="sans-serif", font_weight='bold')
         nx.draw_networkx_edge_labels(graph, pos, ax=ax, edge_labels=edge_labels, font_size=9, font_color='darkred')
 
         ax.margins(0.15)
@@ -491,9 +539,54 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
             logger.error(f"Error exporting graph: {e}")
             Message(self.app, _("Error"), str(e), "warning").exec()
 
+    def cluster_graph_menu(self, position):
+        """ Format options for cluster graph.
+            self.cluster_graph_format = {"size": 10, "color": "nodes"}
+        """
+
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
+        i_nodes = ""
+        if self.cluster_graph_format['color'] == "nodes":
+            i_nodes = "*"
+        action_nodes = QtGui.QAction(_("Coloured nodes") + i_nodes)
+        menu.addAction(action_nodes)
+        i_labels = ""
+        if self.cluster_graph_format['color'] == "labels":
+            i_labels = "*"
+        action_labels = QtGui.QAction(_("Coloured labels") + i_labels)
+        menu.addAction(action_labels)
+        i_10 = ""
+        if self.cluster_graph_format['size'] == 10:
+            i_10 = "*"
+        action_font_10 = QtGui.QAction(_("Label font size 10") + i_10)
+        menu.addAction(action_font_10)
+        i_8 = ""
+        if self.cluster_graph_format['size'] == 8:
+            i_8 = "*"
+        action_font_8 = QtGui.QAction(_("Label font size 8 ") + i_8)
+        menu.addAction(action_font_8)
+
+        action = menu.exec(self.ui.pushButton_export_graph2.mapToGlobal(position))
+        if action == action_nodes:
+            self.cluster_graph_format['color'] = "nodes"
+        if action == action_labels:
+            self.cluster_graph_format['color'] = "labels"
+        if action == action_font_8:
+            self.cluster_graph_format['size'] = 8
+        if action == action_font_10:
+            self.cluster_graph_format['size'] = 10
+
     def view_cluster_graph(self):
         """ Exporta una imagen del mapa de códigos agrupados por comunidades.
         Export an image of the code map grouped by communities.
+
+        self.cluster_grapth-format contains font size and colour type (nodes or labels)
+
+        The Louvain method for community detection is a greedy optimization method intended to extract
+        non-overlapping communities from large networks. It groups the codes (nodes) that are more densely connected
+        within a group than between other groups. These close connections are considered to be in the same group.
+        Each group is given a unique colour.
         """
 
         '''if not HAS_NETWORK_LIBS:
@@ -548,25 +641,39 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         cmap = plt.get_cmap('tab20')
         node_colors = [cmap(node_community.get(node, 0) % 20) for node in graph.nodes()]
         fig, ax = plt.subplots(figsize=(12, 10))
-        ax.set_title("Code graph (Cluster / Family Analysis)", fontsize=16, fontweight='bold')
-        
+        title = _("Community Clusters Graph") + "\n"
+        title += self.subtitle_attributes_selected + " " + self.subtitle_files_selected + " "
+        title += self.subtitle_codes_selected + " " + self.subitle_categories_selected
+        ax.set_title(title, fontsize=16, fontweight='bold')
         try:
             if nx.is_connected(graph): pos = nx.kamada_kawai_layout(graph, weight='distance')
             else: pos = nx.spring_layout(graph, k=1.2, weight='weight', iterations=80)
         except Exception as err:
             print(err)
             pos = nx.spring_layout(graph, k=1.2, weight='weight', iterations=80)
-        
         weights = [graph[u][v]['weight'] for u, v in graph.edges()]
         max_weight = max(weights) if weights else 1
         normalized_weights = [(w / max_weight) * 4 + 1 for w in weights]
         edge_labels = {(u, v): d['weight'] for u, v, d in graph.edges(data=True)}
-
-        nx.draw_networkx_nodes(graph, pos, ax=ax, node_size=800, node_color=node_colors, alpha=0.9, edgecolors='gray')
+        if self.cluster_graph_format['color'] == "nodes":
+            nx.draw_networkx_nodes(graph, pos, ax=ax, node_size=800, node_color=node_colors, alpha=0.9, edgecolors='gray')
+        if self.cluster_graph_format['color'] == "labels":
+            nx.draw_networkx_nodes(graph, pos, ax=ax, node_size=800, node_color='#FFFFFFFF', alpha=0.9,
+                               edgecolors=node_colors)
         nx.draw_networkx_edges(graph, pos, ax=ax, width=normalized_weights, edge_color='#A4A4A4', alpha=0.5)
-        # Changed to font size 9,  from font 10 . helps with label overlaps
-        nx.draw_networkx_labels(graph, pos, ax=ax, font_size=9, font_family="sans-serif", font_weight='bold')
-        nx.draw_networkx_edge_labels(graph, pos, ax=ax, edge_labels=edge_labels, font_size=9, font_color='darkred')
+        if self.cluster_graph_format['color'] == "nodes":
+            nx.draw_networkx_edge_labels(graph, pos, ax=ax, edge_labels=edge_labels, font_size=9, font_color='darkred')
+        # Labels same colour, nodes filled with colour
+        nx.draw_networkx_labels(graph, pos, ax=ax, font_size=self.cluster_graph_format['size'],
+                                font_family="sans-serif", font_weight='bold')
+        # Coloured labels matching their community
+        if self.cluster_graph_format['color'] == "labels":
+            for i, node in enumerate(graph.nodes()):
+                color = node_colors[i]
+                label = {node: node}
+                nx.draw_networkx_labels(graph, pos, labels=label, ax=ax, font_color=color,
+                                        font_size=self.cluster_graph_format['size'],
+                                        font_family="sans-serif", font_weight='bold')
 
         ax.margins(0.15)
         ax.axis('off')
