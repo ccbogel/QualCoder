@@ -115,7 +115,7 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
 
         self.subtitle_files_selected = ""
         self.subtitle_codes_selected = ""
-        self.subitle_categories_selected = ""
+        self.subtitle_categories_selected = ""
         self.subtitle_attributes_selected = ""
 
         self.codes, self.categories = self.app.get_codes_categories()
@@ -169,6 +169,8 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
             self.ui.pushButton_select_files.setIcon(qta.icon('mdi6.file', options=[{'scale_factor': 1.4}]))
             self.attributes = []
             self.subtitle_files_selected = _("Files selected")
+            if len(selected) == 1:
+                self.subtitle_files_selected = f"{selected[0]['name']} " + _("File selected")
         self.process_data()
 
     def get_files_from_attributes(self):
@@ -248,14 +250,14 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
             self.selected_codes = deepcopy(self.codes)
             Message(self.app, _("Codes selected"), _("All codes selected")).exec()
             self.subtitle_codes_selected = ""
-            self.subitle_categories_selected = ""
+            self.subtitle_categories_selected = ""
         else:
             msg = ""
             for s in self.selected_codes:
                 msg += f"{s['name']}\n"
             Message(self.app, _("Codes selected"), msg).exec()
-            self.subtitle_codes_selected = _("Codes selected")
-            self.subitle_categories_selected = ""
+            self.subtitle_codes_selected = f"{len(self.selected_codes)} " + _("Codes selected")
+            self.subtitle_categories_selected = ""
 
         self.code_ids_str = ""
         self.code_names_str = ""
@@ -282,14 +284,18 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         if not selected_categories or selected_categories[0]['name'] == '':
             selected_categories = deepcopy(self.categories)
             msg = _("All categories selected")
-            self.subitle_categories_selected = ""
+            self.subtitle_categories_selected = ""
             self.subtitle_codes_selected = ""
         else:
             msg = ""
             for category in selected_categories:
                 msg += f"{category['name']}\n"
                 self.selected_categories_string += category['name'] + "; "
-            self.subitle_categories_selected = _("Categories selected")
+            self.subtitle_categories_selected = _("Categories selected")
+            if len(selected_categories) == 1:
+                self.subtitle_categories_selected = _("Category: ") + selected_categories[0]['name']
+            else:
+                self.subtitle_categories_selected = f"{len(selected_categories)} " + _("Categories selected ")
             self.subtitle_codes_selected = ""
         self.selected_codes = []
         for category in selected_categories:
@@ -512,7 +518,7 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         fig, ax = plt.subplots(figsize=(12, 10))
         title = _("Code Co-occurrence Graph") + "\n"
         title += self.subtitle_attributes_selected + " " + self.subtitle_files_selected + " "
-        title += self.subtitle_codes_selected + " " + self.subitle_categories_selected
+        title += self.subtitle_codes_selected + " " + self.subtitle_categories_selected
         ax.set_title(title, fontsize=16, fontweight='bold')
         pos = nx.spring_layout(graph, k=0.8, iterations=50)
         weights = [graph[u][v]['weight'] for u, v in graph.edges()]
@@ -643,7 +649,7 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         fig, ax = plt.subplots(figsize=(12, 10))
         title = _("Community Clusters Graph") + "\n"
         title += self.subtitle_attributes_selected + " " + self.subtitle_files_selected + " "
-        title += self.subtitle_codes_selected + " " + self.subitle_categories_selected
+        title += self.subtitle_codes_selected + " " + self.subtitle_categories_selected
         ax.set_title(title, fontsize=16, fontweight='bold')
         try:
             if nx.is_connected(graph): pos = nx.kamada_kawai_layout(graph, weight='distance')
