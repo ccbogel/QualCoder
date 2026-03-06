@@ -109,7 +109,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
             sql += " code_text_visible.fid = case_text.fid "
             sql += "and (code_text_visible.pos0 between case_text.pos0 and case_text.pos1) "
             sql += "and (code_text_visible.pos1 between case_text.pos0 and case_text.pos1) "
-            sql += " join source on source.id = case_text_visible.fid "
+            sql += " join source on source.id = code_text_visible.fid "
             sql += " where code_name.cid=? "
             sql += " order by cases.name, code_text_visible.pos0, code_text_visible.owner"
         cur.execute(sql, [self.code_dict['cid']])
