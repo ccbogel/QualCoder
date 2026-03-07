@@ -24,16 +24,13 @@ from copy import deepcopy
 import datetime
 import fitz
 import logging
-from math import atan2, pi
+import math
 import os
-# from PIL import Image, ImageFont, ImageDraw
-# from PIL.ImageQt import ImageQt
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 import sqlite3
 
 from PyQt6 import QtCore, QtWidgets, QtGui
 from PyQt6.QtWidgets import QDialog
-from PyQt6.QtGui import QPdfWriter
 
 from .code_in_all_files import DialogCodeInAllFiles
 from .color_selector import TextColor
@@ -54,7 +51,7 @@ colors = {"red": QtCore.Qt.GlobalColor.red, "green": QtCore.Qt.GlobalColor.green
           "orange": QtGui.QColor("#FFA500"), "gray": QtGui.QColor("#808080"),
           "black": QtCore.Qt.GlobalColor.black, "white": QtCore.Qt.GlobalColor.white}
 
-# --- class DialogSelectCodedSegments (NEW)
+
 class DialogSelectCodedSegments(QDialog):
     """
     Unified window to select coded segments from text, image, and A/V.
@@ -115,7 +112,8 @@ class DialogSelectCodedSegments(QDialog):
         for ic in image_codings:
             display = f"[{ic['filename']}] x:{ic['x']} y:{ic['y']} w:{ic['width']} h:{ic['height']}"
             item = QtWidgets.QListWidgetItem(display)
-            item.setToolTip(f"File: {ic['filename']}\nArea: x:{ic['x']} y:{ic['y']} width:{ic['width']} height:{ic['height']}")
+            item.setToolTip(
+                f"File: {ic['filename']}\nArea: x:{ic['x']} y:{ic['y']} width:{ic['width']} height:{ic['height']}")
             self.list_image.addItem(item)
         v_img.addWidget(self.list_image)
         h_layout.addLayout(v_img)
@@ -178,7 +176,7 @@ class DialogSelectCodedSegments(QDialog):
         if not self.selected_text and not self.selected_image and not self.selected_av:
             return
         self.accept()
-# ---
+
 
 class ViewGraph(QDialog):
     """ Dialog to view code and categories in an acyclic graph. Provides options for
@@ -212,12 +210,9 @@ class ViewGraph(QDialog):
         self.ui.pushButton_export_pdf.pressed.connect(self.export_pdf_graph)
         self.ui.pushButton_export.setIcon(qta.icon('mdi6.image-move', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_export.pressed.connect(self.export_image)
-        
-        # NUEVO: Conectar botón de Draw.io
-        if hasattr(self.ui, 'pushButton_export_drawio'):
-            self.ui.pushButton_export_drawio.setIcon(qta.icon('mdi6.sitemap', options=[{'scale_factor': 1.3}]))
-            self.ui.pushButton_export_drawio.pressed.connect(self.export_drawio)
-        # ---    
+        #if hasattr(self.ui, 'pushButton_export_drawio'):
+        self.ui.pushButton_export_drawio.setIcon(qta.icon('mdi6.sitemap', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_export_drawio.pressed.connect(self.export_drawio)
         self.ui.label_zoom.setPixmap(qta.icon('mdi6.magnify').pixmap(22, 22))
         self.ui.pushButton_reveal.setIcon(qta.icon('mdi6.eye', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_reveal.pressed.connect(self.reveal_hidden_items)
@@ -260,9 +255,8 @@ class ViewGraph(QDialog):
         self.ui.graphicsView.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.graphicsView.customContextMenuRequested.connect(self.graphicsview_menu)
         self.ui.graphicsView.viewport().installEventFilter(self)
-        # Configurar selección múltiple por arrastre (clic izquierdo sostenido)
+        # Multi-selection drag and hold. Configurar selección múltiple por arrastre (clic izquierdo sostenido)
         self.ui.graphicsView.setDragMode(QtWidgets.QGraphicsView.DragMode.RubberBandDrag)
-        #---
         self.codes, self.categories = app.get_codes_categories()
         """ qdpx import quirk, but category names and code names can match. (MAXQDA, Nvivo)
         This causes hierarchy to not work correctly (eg when moving a category).
@@ -271,15 +265,12 @@ class ViewGraph(QDialog):
             for cat in self.categories:
                 if code['name'] == cat['name']:
                     code['name'] = code['name'] + " "
-        # Variables para controlar el arrastre del lienzo
+        # Variables para controlar el arrastre del lienzo. Varaibles to control canvas dragging
         self._space_pressed = False
         self._is_panning = False
         self._pan_start_x = 0
         self._pan_start_y = 0
-        # --- ADD Frequencies
-        self.show_frequencies = False
-        # ---        
-        
+        self.show_frequencies = False  # Coded segment frequencies
 
     def clear_items(self):
         """ Clear all items from scene.
@@ -308,7 +299,6 @@ class ViewGraph(QDialog):
         ok = ui.exec()
         if not ok:
             return
-        # --- mejorar seleccion multiple    
         selected = ui.get_selected()
         if not selected:
             cats, codes, model = self.create_initial_model()
@@ -321,7 +311,6 @@ class ViewGraph(QDialog):
             cats, codes, model = self.create_initial_model()
             model = self.get_refined_model_with_category_counts(cats, model, node_text)
             self.list_graph(model)
-        # ---
 
     def create_initial_model(self):
         """ Create initial model of codes and categories.
@@ -542,22 +531,21 @@ class ViewGraph(QDialog):
         selected = ui.get_selected()
         for s in selected:
             s['item'].show()
-            
+
         # Refrescar automáticamente para reconectar líneas de nodos ahora visibles
         self.refresh_lines_visibility()
 
     def keyPressEvent(self, event):
         """ Plus, W to zoom in and Minus, Q to zoom out. Space for panning. """
         key = event.key()
-        
-        # Paneo: Activar modo mano al presionar espacio
+
+        # Paneo: Activar modo mano al presionar espacio. Panning activated by space key press
         if key == QtCore.Qt.Key.Key_Space and not event.isAutoRepeat():
             self._space_pressed = True
-            # CAMBIO: Cambiar a modo de arrastre de mano
+            # CAMBIO: Cambiar a modo de arrastre de mano, Switch to hand drag mode
             self.ui.graphicsView.setDragMode(QtWidgets.QGraphicsView.DragMode.ScrollHandDrag)
             self.ui.graphicsView.viewport().setCursor(QtCore.Qt.CursorShape.OpenHandCursor)
             return
-
         if key == QtCore.Qt.Key.Key_Plus or key == QtCore.Qt.Key.Key_W:
             if self.ui.graphicsView.transform().isScaling() and self.ui.graphicsView.transform().determinant() > 10:
                 return
@@ -569,13 +557,15 @@ class ViewGraph(QDialog):
         if key == QtCore.Qt.Key.Key_H:
             # print item x y
             for i in self.scene.items():
-                print(i.__class__, i.pos())
+                print(i.__class__, i.pos(), i.__repr__())
 
     def keyReleaseEvent(self, event):
-        """ Soltar espacio para desactivar el paneo. """
+        """ Soltar espacio para desactivar el paneo. Drop space to disable panning.
+        """
+
         if event.key() == QtCore.Qt.Key.Key_Space and not event.isAutoRepeat():
             self._space_pressed = False
-            # CAMBIO: Volver al modo de selección por cuadro
+            # Volver al modo de selección por cuadro. Return to framce selection mode
             self.ui.graphicsView.setDragMode(QtWidgets.QGraphicsView.DragMode.RubberBandDrag)
             self.ui.graphicsView.viewport().setCursor(QtCore.Qt.CursorShape.ArrowCursor)
         super().keyReleaseEvent(event)
@@ -588,51 +578,57 @@ class ViewGraph(QDialog):
 
     def eventFilter(self, obj, event):
         if obj == self.ui.graphicsView.viewport():
-            # ZOOM: Rueda del ratón
+            # ZOOM: mouse wheel. Rueda del ratón
             if event.type() == QtCore.QEvent.Type.Wheel:
                 self.ui.graphicsView.setTransformationAnchor(QtWidgets.QGraphicsView.ViewportAnchor.AnchorViewCenter)
                 if event.angleDelta().y() > 0:
-                    if not (self.ui.graphicsView.transform().isScaling() and self.ui.graphicsView.transform().determinant() > 10):
+                    if not (
+                            self.ui.graphicsView.transform().isScaling() and self.ui.graphicsView.transform().determinant() > 10):
                         self.ui.graphicsView.scale(1.1, 1.1)
                 else:
-                    if not (self.ui.graphicsView.transform().isScaling() and self.ui.graphicsView.transform().determinant() < 0.1):
+                    if not (
+                            self.ui.graphicsView.transform().isScaling() and self.ui.graphicsView.transform().determinant() < 0.1):
                         self.ui.graphicsView.scale(0.9, 0.9)
                 return True
-                
+
             # PANEO: Solo se activa con Botón Central o (Espacio + Clic Izquierdo)
+            # PANNING: Only activated with the Center Button or (Space + Left Click)
             elif event.type() == QtCore.QEvent.Type.MouseButtonPress:
-                if event.button() == QtCore.Qt.MouseButton.MiddleButton or (event.button() == QtCore.Qt.MouseButton.LeftButton and getattr(self, '_space_pressed', False)):
+                if event.button() == QtCore.Qt.MouseButton.MiddleButton or (
+                        event.button() == QtCore.Qt.MouseButton.LeftButton and getattr(self, '_space_pressed', False)):
                     self._is_panning = True
                     self._pan_start_x = event.position().x()
                     self._pan_start_y = event.position().y()
                     return True
-                    
-            # PANEO: Arrastrar ratón
+
+            # PANEO: Arrastrar ratón. PAN: Drag mouse
             elif event.type() == QtCore.QEvent.Type.MouseMove and getattr(self, '_is_panning', False):
                 dx = event.position().x() - self._pan_start_x
                 dy = event.position().y() - self._pan_start_y
-                
-                # AJUSTE FINO INDEPENDIENTE: Suma (+) para X y Resta (-) para Y
-                self.ui.graphicsView.horizontalScrollBar().setValue(int(self.ui.graphicsView.horizontalScrollBar().value() + dx))
-                self.ui.graphicsView.verticalScrollBar().setValue(int(self.ui.graphicsView.verticalScrollBar().value() - dy))
-                
+
+                # Fine Adjustment. AJUSTE FINO INDEPENDIENTE: Suma (+) para X y Resta (-) para Y
+                self.ui.graphicsView.horizontalScrollBar().setValue(
+                    int(self.ui.graphicsView.horizontalScrollBar().value() + dx))
+                self.ui.graphicsView.verticalScrollBar().setValue(
+                    int(self.ui.graphicsView.verticalScrollBar().value() - dy))
+
                 self._pan_start_x = event.position().x()
                 self._pan_start_y = event.position().y()
                 return True
-                
-            # PANEO: Soltar ratón
+
+            # PAN: Release mouse. PANEO: Soltar ratón
             elif event.type() == QtCore.QEvent.Type.MouseButtonRelease:
-                if getattr(self, '_is_panning', False) and (event.button() == QtCore.Qt.MouseButton.MiddleButton or event.button() == QtCore.Qt.MouseButton.LeftButton):
+                if getattr(self, '_is_panning', False) and (
+                        event.button() == QtCore.Qt.MouseButton.MiddleButton or event.button() == QtCore.Qt.MouseButton.LeftButton):
                     self._is_panning = False
-                    cursor = QtCore.Qt.CursorShape.OpenHandCursor if getattr(self, '_space_pressed', False) else QtCore.Qt.CursorShape.ArrowCursor
+                    cursor = QtCore.Qt.CursorShape.OpenHandCursor if getattr(self, '_space_pressed',
+                                                                             False) else QtCore.Qt.CursorShape.ArrowCursor
                     self.ui.graphicsView.viewport().setCursor(cursor)
                     return True
-
-            # MENÚ CONTEXTUAL
+            # MENÚ
             elif event.type() == event.Type.ContextMenu:
                 self.ui.graphicsView.contextMenuEvent(event)
                 return event.isAccepted()
-                
         return super().eventFilter(obj, event)
 
     def graphicsview_menu(self, position):
@@ -648,35 +644,26 @@ class ViewGraph(QDialog):
         action_add_coded_text = menu.addAction(_("Insert coded text items"))
         action_add_coded_image = menu.addAction(_("Insert coded image items"))
         action_add_coded_av = menu.addAction(_("Insert coded A/V items"))
-        # -- DELETE: action_add_files = menu.addAction(_("Show files"))
-        # -- DELETE: action_add_cases = menu.addAction(_("Show cases"))
         action_memos = menu.addAction(_("Show memos of coded segments"))
-        
-        # --- NUEVAS VISTAS ANALÍTICAS ---
         menu.addSeparator()
         action_fit_and_center = menu.addAction("Fit and Center View")
         menu.addSeparator()
         action_import_cooc = menu.addAction("Import Code(s) with Co-occurrences")
-        
-        # NUEVO: Sub-menú para agrupar los modelos visuales
+        # Sub-menu - visual models. Sub-menú para agrupar los modelos visuales
         layout_menu = menu.addMenu("Organize graph")
-        action_radial_layout = layout_menu.addAction("Radial")
-        action_tree_layout = layout_menu.addAction("Top to Bottom")
-        action_lr_layout = layout_menu.addAction("Left to Right")
-        action_rl_layout = layout_menu.addAction("Right to Left")
-        
+        action_radial_layout = layout_menu.addAction(_("Radial"))
+        action_tree_layout = layout_menu.addAction(_("Top to Bottom"))
+        action_lr_layout = layout_menu.addAction(_("Left to Right"))
+        action_rl_layout = layout_menu.addAction(_("Right to Left"))
         menu.addSeparator()
-        action_refresh_lines = menu.addAction("Refresh view")
-        # --
+        action_refresh_lines = menu.addAction(_("Refresh view"))
         menu.addSeparator()
         if self.show_frequencies:
             action_toggle_freq = menu.addAction("Hide frequencies")
         else:
-            action_toggle_freq = menu.addAction("Display frequencies")        
-        # --
-        
+            action_toggle_freq = menu.addAction("Display frequencies")
         action = menu.exec(self.ui.graphicsView.mapToGlobal(position))
-        
+
         if action == action_add_text_item:
             self.add_text_item_to_graph(position.x(), position.y())
         if action == action_add_coded_text:
@@ -689,19 +676,15 @@ class ViewGraph(QDialog):
             self.add_memos_of_coded(position.x(), position.y())
         if action == action_add_line:
             self.add_lines_to_graph()
-        # --- DELETE: if action == action_add_files:
-        # --- DELETE:     self.add_files_to_graph()
-        # --- DELETE: if action == action_add_cases:
-        # --- DELETE:     self.add_cases_to_graph()
-            
-        # --- EJECUCIÓN DE VISTAS ANALÍTICAS Y AJUSTES ---
+
+        # Analyitical views and adjustments. EJECUCIÓN DE VISTAS ANALÍTICAS Y AJUSTES
         if action == action_fit_and_center:
             rect = self.scene.itemsBoundingRect()
             rect.adjust(-100, -100, 100, 100)
             self.scene.setSceneRect(rect)
             self.ui.graphicsView.fitInView(rect, QtCore.Qt.AspectRatioMode.KeepAspectRatio)
             self.ui.graphicsView.centerOn(rect.center())
-            
+
         if action == action_import_cooc:
             self.import_codes_and_cooccurrences(position.x(), position.y())
         if action == action_radial_layout:
@@ -714,13 +697,12 @@ class ViewGraph(QDialog):
             self.organize_horizontal("RL")
         if action == action_refresh_lines:
             self.refresh_lines_visibility()
-        # ---
         if action == action_toggle_freq:
             self.toggle_frequencies()
-        # ---
-    # --- add frequency    
+
     def toggle_frequencies(self):
         """ Toggle display of coding frequencies on code and category nodes. """
+
         self.show_frequencies = not self.show_frequencies
         cur = self.app.conn.cursor()
         for item in self.scene.items():
@@ -770,32 +752,35 @@ class ViewGraph(QDialog):
                     item.text = base_name
                 item.setPlainText(item.text)
         self.scene.update()
-    # --- 
-    # --- FUNCIONES DE ORGANIZACIÓN ESPACIAL 
+
+    # FUNCIONES DE ORGANIZACIÓN ESPACIAL. Spacial organisation functions
     def import_codes_and_cooccurrences(self, x, y):
         """ Importa un código y sus co-ocurrencias sin duplicados (Solución str estricta) """
         if not self.codes:
             Message(self.app, _("No codes"), _("There are no codes in this project.")).exec()
             return
-            
+
         ui = DialogSelectItems(self.app, self.codes, "Select Code(s) to import", "multi")
         if not ui.exec():
             return
-            
+
         selected_codes = ui.get_selected()
-        
+
         import math
         cur = self.app.conn.cursor()
 
         for idx, sc in enumerate(selected_codes):
             cx = x + (idx * 350)
             cy = y
-            
+
             # CORRECCIÓN: str() para evitar error de int vs string y prevenir duplicados del Nodo Principal
-            main_node = next((item for item in self.scene.items() if type(item).__name__ == "TextGraphicsItem" and str(item.code_or_cat.get('cid')) == str(sc['cid'])), None)
-            
+            main_node = next((item for item in self.scene.items() if
+                              type(item).__name__ == "TextGraphicsItem" and str(item.code_or_cat.get('cid')) == str(
+                                  sc['cid'])), None)
+
             if not main_node:
-                code_data = {'name': sc['name'], 'supercatid': sc.get('supercatid'), 'catid': sc.get('catid'), 'cid': sc['cid'], 
+                code_data = {'name': sc['name'], 'supercatid': sc.get('supercatid'), 'catid': sc.get('catid'),
+                             'cid': sc['cid'],
                              'x': cx, 'y': cy, 'color': sc['color'], 'memo': sc.get('memo', ''), 'child_names': []}
                 main_node = TextGraphicsItem(self.app, code_data)
                 self.scene.addItem(main_node)
@@ -814,40 +799,43 @@ class ViewGraph(QDialog):
             res = cur.fetchall()
 
             if res:
-                radius = max(120, len(res) * 20) 
+                radius = max(120, len(res) * 20)
                 angle_step = (2 * math.pi) / max(1, len(res))
 
                 for i, r in enumerate(res):
                     cooc_cid, cooc_name, cooc_color, overlap_count = r
-                    
+
                     # str() para evitar duplicados en los Nodos Destino
-                    target_node = next((item for item in self.scene.items() if type(item).__name__ == "TextGraphicsItem" and str(item.code_or_cat.get('cid')) == str(cooc_cid)), None)
-                    
+                    target_node = next((item for item in self.scene.items() if
+                                        type(item).__name__ == "TextGraphicsItem" and str(
+                                            item.code_or_cat.get('cid')) == str(cooc_cid)), None)
+
                     if not target_node:
                         nx = cx + radius * math.cos(i * angle_step)
                         ny = cy + radius * math.sin(i * angle_step)
-                        cooc_data = {'name': cooc_name, 'supercatid': None, 'catid': None, 'cid': cooc_cid, 
+                        cooc_data = {'name': cooc_name, 'supercatid': None, 'catid': None, 'cid': cooc_cid,
                                      'x': nx, 'y': ny, 'color': cooc_color, 'memo': "", 'child_names': []}
                         # Cambiamos 'code_data' por 'cooc_data'             
                         target_node = TextGraphicsItem(self.app, cooc_data)
                         self.scene.addItem(target_node)
 
                     # Verificar que la LÍNEA no exista ya en ninguna de las dos direcciones
-                    line_exists = any(type(link).__name__ == "LinkGraphicsItem" and 
-                                      ((link.from_widget == main_node and link.to_widget == target_node) or 
-                                       (link.from_widget == target_node and link.to_widget == main_node)) 
+                    line_exists = any(type(link).__name__ == "LinkGraphicsItem" and
+                                      ((link.from_widget == main_node and link.to_widget == target_node) or
+                                       (link.from_widget == target_node and link.to_widget == main_node))
                                       for link in self.scene.items())
-                                      
+
                     if not line_exists:
-                        line_item = LinkGraphicsItem(main_node, target_node, line_width=2, line_type="dotted", color="blue", isvisible=True)
+                        line_item = LinkGraphicsItem(main_node, target_node, line_width=2, line_type="dotted",
+                                                     color="blue", isvisible=True)
                         self.scene.addItem(line_item)
-                        
+
         self.scene.suggested_scene_size()
         self.scene.update()
 
-
     def refresh_lines_visibility(self):
-        """ Oculta líneas conectadas a nodos invisibles """
+        """ Oculta líneas conectadas a nodos invisibles. Hide lines connected to invisible nodes. """
+
         for item in self.scene.items():
             if isinstance(item, LinkGraphicsItem) or isinstance(item, FreeLineGraphicsItem):
                 if hasattr(item, 'from_widget') and hasattr(item, 'to_widget'):
@@ -858,18 +846,22 @@ class ViewGraph(QDialog):
         self.scene.update()
 
     def organize_hierarchically(self):
-        """
-        Top-Down Tree Layout (v2)
-        ─────────────────────────
-        Mejoras sobre la versión original:
+        """ Top-Down Tree Layout (v2)
           1. Raíz inteligente: prioriza categorías sin supercatid (raíz semántica real).
+             Smart root: prioritize categories without supercatid (real semantic root).
           2. Espaciado vertical adaptativo según la altura real de cada nivel.
+             Adaptive vertical spacing based on the actual height of each level.
           3. Gap explícito entre subárboles/componentes desconectados.
-          4. Segunda pasada de centrado para que los padres queden alineados
-             sobre el centro exacto de sus hijos (sin desvíos por colisión).
+             Explicit gap between disconnected subtrees/components.
+          4. Segunda pasada de centrado para que los padres queden alineados sobre el centro exacto de sus hijos
+             (sin desvíos por colisión).
+             Second centering pass so that the parents are aligned on the exact center of your children
+             (without deviations due to collision).
           5. Ancho de subárbol calculado recursivamente para evitar solapamientos.
+             Subtree width calculated recursively to avoid overlaps.
         """
-        # ── 0. Recolectar nodos y enlaces visibles ──────────────────────
+
+        # 0. Recolectar nodos y enlaces visibles
         nodes = []
         links = []
         for item in self.scene.items():
@@ -885,7 +877,7 @@ class ViewGraph(QDialog):
         if not nodes:
             return
 
-        # ── 1. Grafo no dirigido ────────────────────────────────────────
+        # 1. Grafo no dirigido
         adjacency = {n: set() for n in nodes}
         for link in links:
             if hasattr(link, 'from_widget') and hasattr(link, 'to_widget'):
@@ -894,7 +886,7 @@ class ViewGraph(QDialog):
                     adjacency[u].add(v)
                     adjacency[v].add(u)
 
-        # ── 2. Componentes conectados ───────────────────────────────────
+        # 2. Componentes conectados
         visited_global = set()
         components = []
         for n in nodes:
@@ -911,24 +903,25 @@ class ViewGraph(QDialog):
                             queue.append(nb)
                 components.append(comp)
 
-        # ── 3. Selección inteligente de raíz por componente ─────────────
+        # 3. Selección inteligente de raíz por componente
         #    Prioridad: categoría sin supercatid > más conexiones > primero en lista
+        #   Priority: category without supercatid > more connections > first in list
         def pick_root(comp_nodes):
             # Buscar categorías raíz reales (supercatid == None y cid == None)
             top_cats = [
                 n for n in comp_nodes
                 if isinstance(n, TextGraphicsItem)
-                and n.code_or_cat is not None
-                and n.code_or_cat.get('cid') is None
-                and n.code_or_cat.get('supercatid') is None
+                   and n.code_or_cat is not None
+                   and n.code_or_cat.get('cid') is None
+                   and n.code_or_cat.get('supercatid') is None
             ]
             if top_cats:
-                # Si hay varias, elegir la más conectada
+                # Si hay varias, elegir la más conectada. If several, choose the one with the best connection.
                 return max(top_cats, key=lambda x: len(adjacency[x]))
             # Fallback: nodo con más conexiones
             return max(comp_nodes, key=lambda x: len(adjacency[x]))
 
-        # ── 4. Árbol expansivo (BFS) por componente ────────────────────
+        # 4. Árbol expansivo (BFS) por componente. Spanning Tree (BFS) by component
         tree_children = {n: [] for n in nodes}
         roots = []
         for comp in components:
@@ -938,7 +931,7 @@ class ViewGraph(QDialog):
             queue = [root]
             while queue:
                 curr = queue.pop(0)
-                # Ordenar vecinos para obtener un layout determinista
+                # Ordenar vecinos para obtener un layout determinista. Order neighbors to obtain a deterministic layout
                 # (categorías primero, luego códigos, ambos alfabéticos)
                 sorted_neighbors = sorted(
                     adjacency[curr],
@@ -954,10 +947,10 @@ class ViewGraph(QDialog):
                         tree_children[curr].append(nb)
                         queue.append(nb)
 
-        # ── 5. Calcular dimensiones reales de cada nodo ─────────────────
-        H_PAD = 30    # Espacio horizontal mínimo entre nodos hermanos
-        V_PAD = 40    # Espacio vertical extra sobre la altura máxima del nivel
-        COMP_GAP = 80 # Espacio horizontal entre componentes desconectados
+        # 5. Calcular dimensiones reales de cada nodo
+        H_PAD = 30  # Espacio horizontal mínimo entre nodos hermanos. Minimum horizontal spacing between sibling nodes
+        V_PAD = 40  # Espacio vertical extra sobre la altura máxima del nivel. Extra space above the maximum level height
+        COMP_GAP = 80  # Espacio horizontal entre componentes desconectados. Horizontal space between disconnected components
 
         def node_width(n):
             if hasattr(n, 'boundingRect'):
@@ -969,7 +962,7 @@ class ViewGraph(QDialog):
                 return n.boundingRect().height()
             return 30
 
-        # ── 6. Calcular la altura máxima por nivel (profundidad) ────────
+        # 6. Calcular la altura máxima por nivel (profundidad). Calculate the maximum height per level (depth)
         level_max_height = {}
 
         def compute_level_heights(node, depth):
@@ -982,7 +975,7 @@ class ViewGraph(QDialog):
         for r in roots:
             compute_level_heights(r, 0)
 
-        # Convertir alturas máximas en posiciones Y acumuladas
+        # Convertir alturas máximas en posiciones Y acumuladas. Convert max heights into cumulative Y positions
         max_depth = max(level_max_height.keys()) if level_max_height else 0
         level_y = {}
         cumulative_y = 0
@@ -990,7 +983,7 @@ class ViewGraph(QDialog):
             level_y[d] = cumulative_y
             cumulative_y += level_max_height.get(d, 30) + V_PAD
 
-        # ── 7. Calcular ancho de subárbol (recursivo, bottom-up) ────────
+        # 7. Calcular ancho de subárbol (recursivo, bottom-up)
         subtree_width = {}
 
         def compute_subtree_width(node):
@@ -1000,9 +993,9 @@ class ViewGraph(QDialog):
                 subtree_width[node] = w
                 return w
             children_total = sum(compute_subtree_width(c) for c in children)
-            # Añadir gaps entre hijos
+            # Añadir gaps entre hijos. Add gaps between children
             children_total += H_PAD * (len(children) - 1)
-            # El subárbol es al menos tan ancho como el propio nodo
+            # El subárbol es al menos tan ancho como el propio nodo. The subtree is at least as wide as the node itself.
             w = max(node_width(node), children_total)
             subtree_width[node] = w
             return w
@@ -1010,7 +1003,7 @@ class ViewGraph(QDialog):
         for r in roots:
             compute_subtree_width(r)
 
-        # ── 8. Posicionar nodos ─────────────────────────────────────────
+        # 8. Posicionar nodos
         def set_pos(n, x, y):
             if hasattr(n, 'code_or_cat') and n.code_or_cat is not None:
                 n.code_or_cat['x'] = x
@@ -1022,6 +1015,9 @@ class ViewGraph(QDialog):
             Posiciona 'node' y todos sus descendientes.
             'left_x' es el borde izquierdo del espacio asignado a este subárbol.
             Retorna el centro X del nodo para que el padre se centre sobre sus hijos.
+            Positions 'node' and all its descendants.
+            'left_x' is the left edge of the space allocated to this subtree.
+            Returns the center X of the node so that the parent is centered over its children.
             """
             children = tree_children.get(node, [])
             my_width = subtree_width[node]
@@ -1033,12 +1029,12 @@ class ViewGraph(QDialog):
                 set_pos(node, node_x, y)
                 return left_x + my_width / 2  # Devolver el centro
 
-            # Distribuir hijos dentro del espacio del subárbol
+            # Distribuir hijos dentro del espacio del subárbol. Put children within subtree space
             children_total_width = (
-                sum(subtree_width[c] for c in children)
-                + H_PAD * (len(children) - 1)
+                    sum(subtree_width[c] for c in children)
+                    + H_PAD * (len(children) - 1)
             )
-            # Centrar el bloque de hijos dentro del espacio del padre
+            # Centrar el bloque de hijos dentro del espacio del padre. Center child block within parent's space
             child_left = left_x + (my_width - children_total_width) / 2
 
             child_centers = []
@@ -1047,13 +1043,13 @@ class ViewGraph(QDialog):
                 child_centers.append(cx)
                 child_left += subtree_width[child] + H_PAD
 
-            # Centrar el padre sobre el promedio de los centros de sus hijos
+            # Centrar el padre sobre el promedio de los centros de sus hijos. Center parent on the avg of children's centers
             parent_center = sum(child_centers) / len(child_centers)
             parent_x = parent_center - node_width(node) / 2
             set_pos(node, parent_x, y)
             return parent_center
 
-        # Recorrer cada componente con un gap entre ellos
+        # Recorrer cada componente con un gap entre ellos. Go through each im with gap between them
         rect = self.scene.itemsBoundingRect()
         current_left = rect.left() + 50
 
@@ -1061,7 +1057,7 @@ class ViewGraph(QDialog):
             layout_subtree(root, current_left, 0)
             current_left += subtree_width[root] + COMP_GAP
 
-        # --- 9. Redibujar conexiones 
+        # 9. Redibujar conexiones
         for link in links:
             if hasattr(link, 'redraw'):
                 link.redraw()
@@ -1076,8 +1072,8 @@ class ViewGraph(QDialog):
         for item in self.scene.items():
             if not item.isVisible(): continue
             if isinstance(item, TextGraphicsItem) or isinstance(item, FreeTextGraphicsItem) or \
-               isinstance(item, CaseTextGraphicsItem) or isinstance(item, FileTextGraphicsItem) or \
-               isinstance(item, PixmapGraphicsItem) or isinstance(item, AVGraphicsItem):
+                    isinstance(item, CaseTextGraphicsItem) or isinstance(item, FileTextGraphicsItem) or \
+                    isinstance(item, PixmapGraphicsItem) or isinstance(item, AVGraphicsItem):
                 nodes.append(item)
             elif isinstance(item, LinkGraphicsItem) or isinstance(item, FreeLineGraphicsItem):
                 links.append(item)
@@ -1093,7 +1089,7 @@ class ViewGraph(QDialog):
                     adjacency[u].add(v)
                     adjacency[v].add(u)
 
-        # 2. Encontrar familias conectadas y raíces
+        # 2. Encontrar familias conectadas y raíces. Finding connected families and roots
         visited_global = set()
         components = []
         for n in nodes:
@@ -1126,7 +1122,7 @@ class ViewGraph(QDialog):
                         tree_children[curr].append(neighbor)
                         queue.append(neighbor)
 
-        # 4. Asignar posiciones espaciales
+        # 4. Asignar posiciones espaciales. Assign spacial positions
         rect = self.scene.itemsBoundingRect()
         start_y = rect.center().y() - (len(nodes) * 20)
 
@@ -1137,13 +1133,12 @@ class ViewGraph(QDialog):
             if hasattr(n, 'code_or_cat') and n.code_or_cat is not None:
                 n.code_or_cat['x'], n.code_or_cat['y'] = x, y
             n.setPos(x, y)
-
         current_y = start_y
+
         def layout_node(node, depth):
             nonlocal current_y
             node_h = node.boundingRect().height() if hasattr(node, 'boundingRect') else 40
             node_x = start_x + (depth * 280 * x_multiplier)
-
             ch = tree_children.get(node, [])
             if not ch:
                 y = current_y
@@ -1154,17 +1149,14 @@ class ViewGraph(QDialog):
             c_ys = [layout_node(c, depth + 1) for c in ch]
             parent_y = sum(c_ys) / len(c_ys) if c_ys else current_y
             set_pos(node, node_x, parent_y)
-
             expected_bottom = parent_y + node_h + 20
             if current_y < expected_bottom: current_y = expected_bottom
             return parent_y
 
         for r in roots:
             layout_node(r, 0)
-
         for link in links:
             if hasattr(link, 'redraw'): link.redraw()
-
         self.scene.suggested_scene_size()
         self.scene.update()
 
@@ -1175,12 +1167,12 @@ class ViewGraph(QDialog):
         for item in self.scene.items():
             if not item.isVisible(): continue
             if isinstance(item, TextGraphicsItem) or isinstance(item, FreeTextGraphicsItem) or \
-               isinstance(item, CaseTextGraphicsItem) or isinstance(item, FileTextGraphicsItem) or \
-               isinstance(item, PixmapGraphicsItem) or isinstance(item, AVGraphicsItem):
+                    isinstance(item, CaseTextGraphicsItem) or isinstance(item, FileTextGraphicsItem) or \
+                    isinstance(item, PixmapGraphicsItem) or isinstance(item, AVGraphicsItem):
                 nodes.append(item)
             elif isinstance(item, LinkGraphicsItem) or isinstance(item, FreeLineGraphicsItem):
                 links.append(item)
-                
+
         if not nodes: return
 
         import math
@@ -1203,15 +1195,14 @@ class ViewGraph(QDialog):
                 if u in adjacency and v in adjacency:
                     adjacency[u].add(v)
                     adjacency[v].add(u)
-                    
-        # 2. Encontrar el nodo más conectado (El centro absoluto o "Rey")
+
+        # 2. Encontrar el nodo más conectado (El centro absoluto o "Rey"). Find the most connected node (The center)
         main_root = max(nodes, key=lambda n: len(adjacency[n]))
-        
-        # 3. Construir un árbol en abanico (BFS) desde el main_root
+
+        # 3. Construir un árbol en abanico (BFS) desde el main_root. Build a fan tree (BFS) from the main_root
         tree_children = {n: [] for n in nodes}
         visited_tree = set([main_root])
         queue = [main_root]
-        
         while queue:
             current = queue.pop(0)
             for neighbor in adjacency[current]:
@@ -1220,8 +1211,9 @@ class ViewGraph(QDialog):
                     tree_children[current].append(neighbor)
                     queue.append(neighbor)
 
-        # 4. Calcular "hojas" para distribuir el ángulo del círculo equitativamente
+        # 4. Calcular "hojas" para distribuir el ángulo del círculo equitativamente. Calculate "leaves" evenly
         leaves_count = {}
+
         def calc_leaves(node):
             ch = tree_children.get(node, [])
             if not ch:
@@ -1232,15 +1224,15 @@ class ViewGraph(QDialog):
             return count
 
         calc_leaves(main_root)
+        radius_step = 280  # Distancia entre anillos ampliada para que se vea limpio
 
-        radius_step = 280 # Distancia entre anillos ampliada para que se vea limpio
-
-        # 5. Dibujar la estrella principal
+        # 5. Dibujar la estrella principal. Draw the main star
         drawn_nodes = set()
+
         def layout_radial(node, depth, angle_start, angle_end):
             drawn_nodes.add(node)
             mid_angle = (angle_start + angle_end) / 2
-            
+
             if depth == 0:
                 set_pos(node, center_x, center_y)
             else:
@@ -1261,16 +1253,18 @@ class ViewGraph(QDialog):
 
         layout_radial(main_root, 0, 0, 2 * math.pi)
 
-        # 6. Acomodar nodos sueltos o sub-grafos desconectados en un anillo exterior
+        # 6. Acomodar nodos sueltos o sub-grafos desconectados en un anillo exterior. outer ring for disconnected items
         unvisited = [n for n in nodes if n not in drawn_nodes]
         if unvisited:
             max_depth = 0
+
             def get_depth(node, d):
                 nonlocal max_depth
                 max_depth = max(max_depth, d)
                 for c in tree_children.get(node, []): get_depth(c, d + 1)
+
             get_depth(main_root, 0)
-            
+
             outer_radius = (max_depth + 1) * radius_step + 150
             angle_step = (2 * math.pi) / len(unvisited)
             for i, node in enumerate(unvisited):
@@ -1282,10 +1276,9 @@ class ViewGraph(QDialog):
         # 7. Redibujar las líneas y refrescar vista
         for link in links:
             if hasattr(link, 'redraw'): link.redraw()
-            
         self.scene.suggested_scene_size()
         self.scene.update()
-    # ---
+
     def add_codes_of_av_files(self, x=10, y=10):
         """ Show selected codes of selected audio/video files as av graphics items.
         Args:
@@ -1829,22 +1822,21 @@ class ViewGraph(QDialog):
 
         # REPARACIÓN: Obtener el rectángulo real que envuelve a TODOS los elementos (incluso coordenadas negativas)
         rect = self.scene.itemsBoundingRect()
-        rect.adjust(-30, -30, 30, 30) # Añadir un margen seguro de 30px alrededor de la imagen
+        rect.adjust(-30, -30, 30, 30)  # Añadir un margen seguro de 30px alrededor de la imagen
 
         # Crear la imagen con el tamaño exacto del rectángulo detectado
         image = QtGui.QImage(int(rect.width()), int(rect.height()), QtGui.QImage.Format.Format_ARGB32_Premultiplied)
-        image.fill(QtCore.Qt.GlobalColor.transparent) # Asegurar fondo transparente
-
+        image.fill(QtCore.Qt.GlobalColor.transparent)  # Asegurar fondo transparente
         painter = QtGui.QPainter(image)
         painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
-        
+
         # Renderizar especificando el área objetivo (la imagen) y el área de origen (el rectángulo exacto de la escena)
         self.scene.render(painter, QtCore.QRectF(image.rect()), rect)
         painter.end()
-        
+
         image.save(filepath)
         Message(self.app, _("Image exported"), filepath).exec()
-    # --- Nueva función para exportar grafo a proyecto de Draw.io
+
     def export_drawio(self):
         """ Escanea el lienzo actual y exporta un archivo editable nativo para Draw.io (.drawio) """
         filename = "QualCoder_graph.drawio"
@@ -1865,31 +1857,34 @@ class ViewGraph(QDialog):
         # 2. Procesar Nodos (Categorías y Códigos)
         for item in self.scene.items():
             if not item.isVisible(): continue
-            
-            if type(item).__name__ in ("TextGraphicsItem", "FreeTextGraphicsItem", "CaseTextGraphicsItem", "FileTextGraphicsItem"):
+
+            if type(item).__name__ in (
+            "TextGraphicsItem", "FreeTextGraphicsItem", "CaseTextGraphicsItem", "FileTextGraphicsItem"):
                 item_ids[item] = str(current_id)
                 x = item.pos().x()
                 y = item.pos().y()
                 w = item.boundingRect().width()
                 h = item.boundingRect().height()
-                
+
                 label = ""
-                color = "#FFFFFF" 
+                color = "#FFFFFF"
                 is_ellipse = getattr(item, 'is_ellipse', False)
-                
+
                 if hasattr(item, 'code_or_cat') and item.code_or_cat is not None:
                     label = item.code_or_cat.get('name', '')
                     color = item.code_or_cat.get('color', '#FFFFFF')
                 elif hasattr(item, 'text'):
                     label = item.text
-                
+
                 # Limpiar caracteres conflictivos en XML
-                label = str(label).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&apos;')
-                
+                label = str(label).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"',
+                                                                                                           '&quot;').replace(
+                    "'", '&apos;')
+
                 # Definir forma y estilo
                 shape = "ellipse" if is_ellipse else "rounded=1"
                 style = f"{shape};whiteSpace=wrap;html=1;fillColor={color};strokeColor=#333333;fontColor=#000000;"
-                
+
                 xml += f'        <mxCell id="{current_id}" value="{label}" style="{style}" vertex="1" parent="1">\n'
                 xml += f'          <mxGeometry x="{x}" y="{y}" width="{w}" height="{h}" as="geometry" />\n'
                 xml += '        </mxCell>\n'
@@ -1898,25 +1893,28 @@ class ViewGraph(QDialog):
         # 3. Procesar Conexiones (Líneas) asegurando que queden vinculadas dinámicamente a los nodos
         for item in self.scene.items():
             if not item.isVisible(): continue
-            
+
             if type(item).__name__ in ("LinkGraphicsItem", "FreeLineGraphicsItem"):
                 if not hasattr(item, 'from_widget') or not hasattr(item, 'to_widget'): continue
-                    
+
                 source_id = item_ids.get(item.from_widget)
                 target_id = item_ids.get(item.to_widget)
-                
+
                 if source_id and target_id:
                     line_color = item.color if hasattr(item, 'color') else "gray"
-                    dashed = "1" if hasattr(item, 'line_type') and item.line_type != QtCore.Qt.PenStyle.SolidLine else "0"
+                    dashed = "1" if hasattr(item,
+                                            'line_type') and item.line_type != QtCore.Qt.PenStyle.SolidLine else "0"
                     width = item.line_width if hasattr(item, 'line_width') else 2
-                    
+
                     label = item.label if hasattr(item, 'label') else ""
-                    label = str(label).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&apos;')
-                    
+                    label = str(label).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"',
+                                                                                                               '&quot;').replace(
+                        "'", '&apos;')
+
                     # Definir flecha dependiendo del tipo de conexión original
                     arrow = "classic" if type(item).__name__ == "FreeLineGraphicsItem" else "none"
                     style = f"endArrow={arrow};html=1;strokeColor={line_color};strokeWidth={width};dashed={dashed};labelBackgroundColor=none;"
-                    
+
                     xml += f'        <mxCell id="{current_id}" value="{label}" style="{style}" edge="1" parent="1" source="{source_id}" target="{target_id}">\n'
                     xml += '          <mxGeometry relative="1" as="geometry" />\n'
                     xml += '        </mxCell>\n'
@@ -1928,10 +1926,11 @@ class ViewGraph(QDialog):
         try:
             with open(filepath, 'w', encoding='utf-8') as f:
                 f.write(xml)
-            Message(self.app, "Export Successful", f"Graph successfully exported natively for Draw.io to:\n{filepath}", "information").exec()
+            Message(self.app, "Export Successful", f"Graph successfully exported natively for Draw.io to:\n{filepath}",
+                    "information").exec()
         except Exception as e:
             logger.error(f"Error exporting to Draw.io: {e}")
-            Message(self.app, _("Error"), f"No se pudo guardar el archivo:\n{e}", "warning").exec()        
+            Message(self.app, _("Error"), f"No se pudo guardar el archivo:\n{e}", "warning").exec()
 
     def export_pdf_graph(self):
         filename = "Graph.pdf"
@@ -1998,42 +1997,52 @@ class ViewGraph(QDialog):
             for i in self.scene.items():
                 if isinstance(i, TextGraphicsItem):
                     sql = "insert into gr_cdct_text_item (grid,x,y,supercatid,catid,cid,font_size,bold,isvisible," \
-                        "displaytext) values (?,?,?,?,?,?,?,?,?,?)"
-                    cur.execute(sql, [grid, i.pos().x(), i.pos().y(), i.code_or_cat['supercatid'], i.code_or_cat['catid'],
-                                    i.code_or_cat['cid'], i.font_size, i.bold, i.isVisible(), i.toPlainText()])
+                          "displaytext) values (?,?,?,?,?,?,?,?,?,?)"
+                    cur.execute(sql,
+                                [grid, i.pos().x(), i.pos().y(), i.code_or_cat['supercatid'], i.code_or_cat['catid'],
+                                 i.code_or_cat['cid'], i.font_size, i.bold, i.isVisible(), i.toPlainText()])
                 if isinstance(i, FreeTextGraphicsItem):
                     sql = "insert into gr_free_text_item (grid,freetextid, x,y,free_text,font_size,bold,color,tooltip, " \
-                        "ctid, memo_ctid, memo_imid, memo_avid) values (?,?,?,?,?,?,?,?,?,?,?,?,?)"
+                          "ctid, memo_ctid, memo_imid, memo_avid) values (?,?,?,?,?,?,?,?,?,?,?,?,?)"
                     tt = i.toolTip()
-                    cur.execute(sql, [grid, i.freetextid, i.pos().x(), i.pos().y(), i.text, i.font_size, i.bold, i.color,
-                                    tt, i.ctid, i.memo_ctid, i.memo_imid, i.memo_avid])
+                    cur.execute(sql,
+                                [grid, i.freetextid, i.pos().x(), i.pos().y(), i.text, i.font_size, i.bold, i.color,
+                                 tt, i.ctid, i.memo_ctid, i.memo_imid, i.memo_avid])
                 if isinstance(i, CaseTextGraphicsItem):
                     sql = "insert into gr_case_text_item (grid,x,y,caseid,font_size,bold,color, displaytext) " \
-                        "values (?,?,?,?,?,?,?,?)"
+                          "values (?,?,?,?,?,?,?,?)"
                     cur.execute(sql,
-                                [grid, i.pos().x(), i.pos().y(), i.case_id, i.font_size, i.bold, i.color, i.toPlainText()])
+                                [grid, i.pos().x(), i.pos().y(), i.case_id, i.font_size, i.bold, i.color,
+                                 i.toPlainText()])
                 if isinstance(i, FileTextGraphicsItem):
                     sql = "insert into gr_file_text_item (grid,x,y,fid,font_size,bold,color, displaytext) " \
-                        "values (?,?,?,?,?,?,?,?)"
+                          "values (?,?,?,?,?,?,?,?)"
                     cur.execute(sql,
-                                [grid, i.pos().x(), i.pos().y(), i.file_id, i.font_size, i.bold, i.color, i.toPlainText()])
+                                [grid, i.pos().x(), i.pos().y(), i.file_id, i.font_size, i.bold, i.color,
+                                 i.toPlainText()])
                 if isinstance(i, PixmapGraphicsItem):
                     sql = "insert into gr_pix_item (grid,imid,x,y,px,py,w,h,filepath,tooltip,pdf_page) values " \
-                        "(?,?,?,?,?,?,?,?,?,?,?)"
+                          "(?,?,?,?,?,?,?,?,?,?,?)"
                     cur.execute(sql, [grid, i.imid, i.pos().x(), i.pos().y(), i.px, i.py, i.pwidth, i.pheight, i.path_,
-                                    i.toolTip(), i.pdf_page])
+                                      i.toolTip(), i.pdf_page])
                 if isinstance(i, AVGraphicsItem):
                     sql = "insert into gr_av_item (grid,avid,x,y,pos0,pos1,filepath,tooltip, color) values " \
-                        "(?,?,?,?,?,?,?,?,?)"
+                          "(?,?,?,?,?,?,?,?,?)"
                     cur.execute(sql,
                                 [grid, i.avid, i.pos().x(), i.pos().y(), i.pos0, i.pos1, i.path_, i.toolTip(), i.color])
                 if isinstance(i, LinkGraphicsItem):
                     sql = "insert into gr_cdct_line_item (grid,fromcatid,fromcid,tocatid,tocid,color,linewidth,linetype," \
-                        "isvisible) values (?,?,?,?,?,?,?,?,?)"
+                          "isvisible) values (?,?,?,?,?,?,?,?,?)"
+                    # TODO Sometimes Error FreeTextGraphicsItem no attribute code_or_cat
+                    print(i.__repr__())
+                    print("FROM:", i.from_widget.__repr__)
+                    print("TO:", i.to_widget.__repr__)
+
                     cur.execute(sql, [grid, i.from_widget.code_or_cat['catid'], i.from_widget.code_or_cat['cid'],
-                                    i.to_widget.code_or_cat['catid'], i.to_widget.code_or_cat['cid'],
-                                    i.color, i.line_width, self.line_type_to_text(i.line_type),
-                                    i.isVisible()])
+                                      i.to_widget.code_or_cat['catid'], i.to_widget.code_or_cat['cid'],
+                                      i.color, i.line_width, self.line_type_to_text(i.line_type),
+                                      i.isVisible()])
+
                 if isinstance(i, FreeLineGraphicsItem):
                     from_catid = None
                     try:
@@ -2107,14 +2116,16 @@ class ViewGraph(QDialog):
                         pass
                     """ Free line linking options use catid/cid or caseid or fileid and last match text e.g. freetextitem """
                     sql = "insert into gr_free_line_item (grid,fromfreetextid,fromcatid,fromcid,fromcaseid,fromfileid, " \
-                        "fromimid,fromavid,tofreetextid,tocatid,tocid,tocaseid,tofileid, toimid,toavid,color, " \
-                        "linewidth,linetype) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
-                    cur.execute(sql, [grid, from_freetextid, from_catid, from_cid, from_case_id, from_file_id, from_imid,
-                                    from_avid, to_freetextid, to_catid, to_cid, to_case_id, to_file_id, to_imid, to_avid,
-                                    i.color, i.line_width, self.line_type_to_text(i.line_type)])
+                          "fromimid,fromavid,tofreetextid,tocatid,tocid,tocaseid,tofileid, toimid,toavid,color, " \
+                          "linewidth,linetype) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+                    cur.execute(sql,
+                                [grid, from_freetextid, from_catid, from_cid, from_case_id, from_file_id, from_imid,
+                                 from_avid, to_freetextid, to_catid, to_cid, to_case_id, to_file_id, to_imid, to_avid,
+                                 i.color, i.line_width, self.line_type_to_text(i.line_type)])
             self.app.conn.commit()
-        except:
-            self.app.conn.rollback() # revert all changes 
+        except Exception as err:
+            print(err)
+            self.app.conn.rollback()  # revert all changes
             raise
         self.app.delete_backup = False
 
@@ -2433,8 +2444,11 @@ class ViewGraph(QDialog):
                             i.code_or_cat['cid'] == line['tocid']:
                         to_item = i
             if from_item is not None and to_item is not None:
+                print("line", line)
                 item = LinkGraphicsItem(from_item, to_item, line['linewidth'], line['linetype'],
                                         line['color'], line['isvisible'])
+                # self, from_widget, to_widget, line_width=2, line_type="solid",
+                #                  color="gray", isvisible=True, label=""
                 self.scene.addItem(item)
             else:
                 cur.execute("delete from gr_cdct_line_item where glineid=?", [line['glineid']])
@@ -2454,8 +2468,8 @@ class ViewGraph(QDialog):
         result = cur.fetchall()
         res = []
         keys = "fromfreetextid", "fromcatid", "fromcid", "fromcaseid", "fromfileid", "fromimid", "fromavid", \
-               "tofreetextid", "tocatid", "tocid", "tocaseid", "tofileid", "toimid", "toavid", "color", \
-               "linewidth", "linetype", "gflineid"
+            "tofreetextid", "tocatid", "tocid", "tocaseid", "tofileid", "toimid", "toavid", "color", \
+            "linewidth", "linetype", "gflineid"
         for row in result:
             res.append(dict(zip(keys, row)))
         for line in res:
@@ -2687,7 +2701,7 @@ class ViewGraph(QDialog):
             self.app.conn.commit()
         except Exception as e_:
             print(e_)
-            self.app.conn.rollback() # revert all changes 
+            self.app.conn.rollback()  # revert all changes
             raise
         self.app.delete_backup = False
 
@@ -2729,18 +2743,17 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
     def mouseMoveEvent(self, mouse_event):
         super(GraphicsScene, self).mouseMoveEvent(mouse_event)
 
-        # Actualizar datos de posición para TODOS los elementos que se movieron
+        # Actualizar datos de posición para TODOS los elementos que se movieron. Update positionsfor ALL moved items
         for item in self.items():
             # Solo procesamos la posición de los nodos reales (que son los que tienen 'code_or_cat')
-            if item.isSelected() and hasattr(item, 'code_or_cat'): # Solo procesamos lo que está seleccionado para ganar velocidad
+            if item.isSelected() and hasattr(item,
+                                             'code_or_cat'):  # Solo procesamos lo que está seleccionado para ganar velocidad
                 if item.code_or_cat is not None:
                     item.code_or_cat['x'] = item.pos().x()
                     item.code_or_cat['y'] = item.pos().y()
-            
             # Redibujar líneas conectadas
             if isinstance(item, (LinkGraphicsItem, FreeLineGraphicsItem)):
                 item.redraw()
-        
         self.update()
 
     '''def mousePressEvent(self, mouseEvent):
@@ -2778,7 +2791,9 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
                     i.setPos(i.pos().x() - min_adjust_x, i.pos().y() - min_adjust_y)
 
     def suggested_scene_size(self):
-        """ Calcula el tamaño real de la escena permitiendo márgenes para el paneo libre. """
+        """ Calcula el tamaño real de la escena permitiendo márgenes para el paneo libre.
+        Calculate the actual size of the scene, allowing margins for free panning
+        """
         rect = self.itemsBoundingRect()
         rect.adjust(-600, -600, 600, 600)  # Añade espacio libre en todas direcciones
         self.setSceneRect(rect)
@@ -2791,18 +2806,6 @@ class CaseTextGraphicsItem(QtWidgets.QGraphicsTextItem):
     """ The item shows the case name and optionally attributes.
     A custom context menu
     """
-
-    app = None
-    settings = None
-    text = ""
-    show_attributes = False
-    remove = False
-    case_name = ""
-    # For graph item storage
-    font_size = 9
-    case_id = -1
-    color = "black"
-    bold = False
 
     def __init__(self, app, case_name, case_id, x=0, y=0, font_size=9, color="black", bold=False, displaytext=""):
         """ Show name and optionally attributes.
@@ -2848,6 +2851,10 @@ class CaseTextGraphicsItem(QtWidgets.QGraphicsTextItem):
             self.setToolTip(_("Case") + ": " + res[0])
         self.setDefaultTextColor(colors[color])
 
+    def __repr__(self):
+        txt = f"CaseTextGraphicsItem case_id:{self.case_id} case_name:{self.case_name}"
+        return txt
+
     def paint(self, painter, option, widget):
         """ """
 
@@ -2867,7 +2874,7 @@ class CaseTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         # https://riverbankcomputing.com/pipermail/pyqt/2010-July/027094.html
         I was not able to mapToGlobal position so, the menu maps to scene position plus
         the Dialog screen position.
-        """        
+        """
         menu = QtWidgets.QMenu()
         menu.setStyleSheet("QMenu {font-size: 9pt} ")
         show_att_action = None
@@ -2875,13 +2882,13 @@ class CaseTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         edit_action = menu.addAction(_("Edit text"))
         bold_action = menu.addAction(_("Bold toggle"))
         menu.addSeparator()
-        # --- Sub-menú para el tamaño de fuente ---
+        # Sub-menú para el tamaño de fuente
         font_size_menu = menu.addMenu("Font size")
         font_size_actions = {}
         for size in [8, 10, 12, 14, 16, 18]:
             act = font_size_menu.addAction(str(size))
             font_size_actions[act] = size
-        # --- Sub-menú para el color de texto ---
+        # Sub-menú para el color de texto
         color_menu = menu.addMenu(_("Text color"))
         red_action = color_menu.addAction(_("Red"))
         green_action = color_menu.addAction(_("Green"))
@@ -2986,27 +2993,17 @@ class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
     A custom context menu
     """
 
-    app = None
-    settings = None
-    file_name = ""
-    remove = False
-    show_attributes = False
-    text = ""
-    # For graph item storage
-    file_id = -1
-    font_size = 9
-    color = "black"
-    bold = False
-
-    def __init__(self, app, file_name, file_id, x=0, y=0, font_size=9, color="black", bold=False, displaytext=""):
-        """ Show name and optionally attributes.
-        param: app  : the main App class
-        param: file_name : String
-        param: file_od : Integer
-        param: x : Integer
-        param: y : Integer
-        param: color : String
-        bold : boolean
+    def __init__(self, app, file_name, file_id=-1, x=0, y=0, font_size=9, color="black", bold=False, displaytext=""):
+        """ Show name and optionally attributes, in text graphic.
+        Args:
+            app  : the main App class
+            file_name : String
+            file_id : Integer
+            x : Integer
+            y : Integer
+            color : String
+            bold: boolean
+            displaytext : String
         """
 
         super(FileTextGraphicsItem, self).__init__(None)
@@ -3041,6 +3038,10 @@ class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.setPlainText(self.text)
         self.setDefaultTextColor(colors[color])
 
+    def __repr__(self):
+        txt = f"FileTextGraphicsItem file_id:{self.file_id} file_name:{self.file_name}"
+        return txt
+
     def paint(self, painter, option, widget):
         """ """
 
@@ -3069,13 +3070,13 @@ class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         edit_action = menu.addAction(_("Edit text"))
         bold_action = menu.addAction(_("Bold toggle"))
         menu.addSeparator()
-        # --- Sub-menú para el tamaño de fuente ---
+        # Sub-menú para el tamaño de fuente
         font_size_menu = menu.addMenu("Font size")
         font_size_actions = {}
         for size in [8, 10, 12, 14, 16, 18]:
             act = font_size_menu.addAction(str(size))
             font_size_actions[act] = size
-        # --- Sub-menú para el color de texto ---
+        # Sub-menú para el color de texto
         color_menu = menu.addMenu(_("Text color"))
         red_action = color_menu.addAction(_("Red"))
         green_action = color_menu.addAction(_("Green"))
@@ -3180,30 +3181,13 @@ class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
 class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
     """ Free text to add to the scene. """
 
-    app = None
-    font = None
-    settings = None
-    remove = False
-    # For graph item storage
-    freetextid = -1
-    text = "text"
-    ctid = -1  # Used for a coded text display to show code in context
-    memo_ctid = None
-    memo_imid = None
-    memo_avid = None
-    font_size = 9
-    color = "black"
-    bold = False
     MAX_WIDTH = 300
     MAX_HEIGHT = 300
-    # For db stored free text graph items
-    gfreeid = None
-    updated_text = ""
 
     def __init__(self, app, freetextid=-1, x=10, y=10, text_="text", font_size=9, color="black", bold=False, ctid=-1,
                  memo_ctid=None, memo_imid=None, memo_avid=None, gfreeid=None):
         """ Free text object.
-         param:
+         Args:
             app  : the main App class
             freetextid : Integer
             x : Integer x position
@@ -3220,19 +3204,21 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
 
         super(FreeTextGraphicsItem, self).__init__(None)
         self.app = app
-        self.freetextid = freetextid
+        self.freetextid = freetextid  # For graph item storage
         self.setPos(x, y)
         self.text = text_
+        self.updated_text = ""  # for
         self.font_size = font_size
         self.color = color
         self.bold = bold
         self.settings = app.settings
         self.project_path = app.project_path
         self.remove = False
-        self.ctid = ctid
-        self.memo_ctid = memo_ctid
-        self.memo_imid = memo_imid
-        self.memo_avid = memo_avid
+        self.ctid = ctid  # Used for a coded text display to show code in context
+        self.memo_ctid = memo_ctid  # For graph item storage
+        self.memo_imid = memo_imid  # For graph item storage
+        self.memo_avid = memo_avid  # For graph item storage
+        self.code_or_cat = {'cid': None, 'catid': None}  # Catch for LinkGraphicsItem in save_graph
         self.gfreeid = gfreeid
         self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsFocusable |
@@ -3245,6 +3231,13 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         if self.boundingRect().width() > self.MAX_WIDTH:
             self.setTextWidth(self.MAX_WIDTH)
         self.check_coding()
+
+    def __repr__(self):
+        txt = f"FreeTextGraphicsItem freetextid:{self.freetextid} gfreeid:{self.gfreeid} Font:{self.font_size} " \
+              f"Bold:{self.bold} ctid:{self.ctid} memo_ctid:{self.memo_ctid} memo_imid:{self.memo_imid} " \
+              f"memo_avid:{self.memo_avid}\n"
+        txt += f"Text:{self.text}"
+        return txt
 
     def check_coding(self):
         """ Check text coding segment is current.
@@ -3313,13 +3306,13 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
             av_context_action = menu.addAction(_("Segment in context"))
         menu.addSeparator()
         bold_action = menu.addAction(_("Bold toggle"))
-        # --- Sub-menú para el tamaño de fuente ---
+        # Sub-menú para el tamaño de fuente
         font_size_menu = menu.addMenu("Font size")
         font_size_actions = {}
-        for size in [8, 10, 12, 14, 16, 18]:
+        for size in [8, 10, 12, 14, 16, 18, 20]:
             act = font_size_menu.addAction(str(size))
             font_size_actions[act] = size
-        # --- Sub-menú para el color de texto ---
+        # Sub-menú para el color de texto
         color_menu = menu.addMenu(_("Text color"))
         red_action = color_menu.addAction(_("Red"))
         green_action = color_menu.addAction(_("Green"))
@@ -3474,21 +3467,11 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
 
 
 class FreeLineGraphicsItem(QtWidgets.QGraphicsPolygonItem):
-    """ Polygon with arrow head. """
-
-    from_widget = None
-    from_pos = None
-    to_widget = None
-    to_pos = None
-    line_width = 2
-    line_type = QtCore.Qt.PenStyle.SolidLine
-    color = "gray"
-    tooltip = ""
-    remove = False
+    """ Polygon line with arrow head. """
 
     def __init__(self, from_widget, to_widget, color="gray", line_width=2, line_type="solid"):
         """ User created connecting line, with arrow.
-         param:
+         Args:
             from_widget : FreeTextGraphicsItem, TextGraphicsItem, AVGraphicsItem, PixmapGraphicsItem,
                 FileTextGraphicsItem, CaseTextGraphicsItem
             to_widget : FreeTextGraphicsItem, TextGraphicsItem, AVGraphicsItem, PixmapGraphicsItem,
@@ -3504,21 +3487,26 @@ class FreeLineGraphicsItem(QtWidgets.QGraphicsPolygonItem):
         self.to_widget = to_widget
         self.line_width = line_width
         self.remove = False
-        # --- Bloquear selección y hacer que ignore el clic izquierdo (pero permita el derecho para el menú)
+        # Bloquear selección y hacer que ignore el clic izquierdo (pero permita el derecho para el menú)
+        # Lock selection and make it ignore left clicks (but allow right clicks for the menu)
         self.setFlag(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable, False)
         self.setAcceptedMouseButtons(QtCore.Qt.MouseButton.RightButton)
-        self.calculate_points_and_draw()
-        # ---
         self.color = color
         self.line_type = QtCore.Qt.PenStyle.SolidLine
         if line_type == "dotted":
             self.line_type = QtCore.Qt.PenStyle.DotLine
         color_obj = colors[color]
         self.setPen(QtGui.QPen(color_obj, self.line_width, self.line_type))
+        self.calculate_points_and_draw()
+
+    def __repr__(self):
+        txt = f"LinkGraphicsItem From:{self.from_widget} To:{self.to_widget} Line_type:{self.line_type}\n"
+        txt += f"Color:{self.color} Width:{self.line_width}"
+        return txt
 
     def contextMenuEvent(self, event):
         menu = QtWidgets.QMenu()
-        # --- Sub-menú de grosor y estilo de línea ---
+        # Sub-menú de grosor y estilo de línea
         line_menu = menu.addMenu(_('Line style'))
         width1_action = line_menu.addAction(_('Thin (1px)'))
         width2_action = line_menu.addAction(_('Normal (2px)'))
@@ -3527,7 +3515,7 @@ class FreeLineGraphicsItem(QtWidgets.QGraphicsPolygonItem):
         line_menu.addSeparator()
         dotted_action = line_menu.addAction(_('Dotted'))
         solid_action = line_menu.addAction(_('Solid'))
-        # --- Sub-menú de color ---
+        # Sub-menú de color
         color_menu = menu.addMenu(_('Line color'))
         red_action = color_menu.addAction(_('Red'))
         yellow_action = color_menu.addAction(_('Yellow'))
@@ -3606,90 +3594,71 @@ class FreeLineGraphicsItem(QtWidgets.QGraphicsPolygonItem):
 
     def calculate_points_and_draw(self):
         """ Cálculo fluido con punta de flecha giratoria. """
-        import math
-        
+
         c1 = self.from_widget.sceneBoundingRect().center()
         c2 = self.to_widget.sceneBoundingRect().center()
         self.setZValue(-1)
 
         is_ellipse_from = getattr(self.from_widget, 'is_ellipse', False)
         is_ellipse_to = getattr(self.to_widget, 'is_ellipse', False)
-        
+
         rect1 = self.from_widget.sceneBoundingRect()
         rect2 = self.to_widget.sceneBoundingRect()
-        
+
         def get_edge_point(center_source, center_target, rect, is_ellipse):
             dx = center_target.x() - center_source.x()
             dy = center_target.y() - center_source.y()
             if dx == 0 and dy == 0: return center_source
-            
+
             w = rect.width() / 2
             h = rect.height() / 2
-            
+
             if is_ellipse:
                 angle = math.atan2(dy, dx)
                 return QtCore.QPointF(center_source.x() + w * math.cos(angle), center_source.y() + h * math.sin(angle))
             else:
                 if dx == 0: return QtCore.QPointF(center_source.x(), center_source.y() + math.copysign(h, dy))
                 if dy == 0: return QtCore.QPointF(center_source.x() + math.copysign(w, dx), center_source.y())
-                
+
                 tx = w / abs(dx)
                 ty = h / abs(dy)
                 t = min(tx, ty)
                 return QtCore.QPointF(center_source.x() + dx * t, center_source.y() + dy * t)
-
         if rect1.intersects(rect2):
             p1, p2 = c1, c2
         else:
             p1 = get_edge_point(c1, c2, rect1, is_ellipse_from)
             p2 = get_edge_point(c2, c1, rect2, is_ellipse_to)
-
         color_obj = colors[self.color]
         self.setPen(QtGui.QPen(color_obj, self.line_width, self.line_type))
 
-        # --- DIBUJO DE FLECHA TRIGONOMETRICA FLUIDA ---
+        # DIBUJO DE FLECHA TRIGONOMETRICA FLUIDA. Trigonometric arrow drawing
         dx = p1.x() - p2.x()
         dy = p1.y() - p2.y()
         theta = math.atan2(dy, dx)
-        
         polygon = QtGui.QPolygonF()
         polygon.append(p1)
         polygon.append(p2)
-        
+
         # Puntas de flecha a 30 grados (pi/6) del eje de la línea
         arrow_size = 12
         p3 = QtCore.QPointF(p2.x() + arrow_size * math.cos(theta + math.pi / 6),
                             p2.y() + arrow_size * math.sin(theta + math.pi / 6))
         p4 = QtCore.QPointF(p2.x() + arrow_size * math.cos(theta - math.pi / 6),
                             p2.y() + arrow_size * math.sin(theta - math.pi / 6))
-        
         polygon.append(p3)
         polygon.append(p2)
         polygon.append(p4)
         polygon.append(p2)
-        
         self.setPolygon(polygon)
 
-class AVGraphicsItem(QtWidgets.QGraphicsPixmapItem):
-    """ Coded audio video item.
-    """
 
-    app = None
-    font = None
-    settings = None
-    remove = False
-    # For graph item storage
-    text = ""
-    avid = -1  # code_av
-    pos0 = 0
-    pos1 = 0
-    path_ = ""
-    abs_path = ""
-    color = "white"
+class AVGraphicsItem(QtWidgets.QGraphicsPixmapItem):
+    """ Coded audio video item. """
 
     def __init__(self, app, avid=-1, x=10, y=10, pos0=0, pos1=0, path_="", color="white"):
         """ A/V graphics object.
-         param:
+         Args:
             app  : the main App class
             avid : Integer  code_av primary key
             x : Integer x position of graphics item
@@ -3720,11 +3689,15 @@ class AVGraphicsItem(QtWidgets.QGraphicsPixmapItem):
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsFocusable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
 
+    def __repr__(self):
+        txt = f"AVGraphicsItem avid:{self.avid} Path:{self.abs_path_}"
+        return txt
+
     def contextMenuEvent(self, event):
         menu = QtWidgets.QMenu()
         context_action = menu.addAction(_("View in context"))
         menu.addSeparator()
-        # --- Sub-menú de color ---
+        # Sub-menú de color
         color_menu = menu.addMenu(_("Color"))
         red_action = color_menu.addAction(_("Red"))
         green_action = color_menu.addAction(_("Green"))
@@ -3752,7 +3725,7 @@ class AVGraphicsItem(QtWidgets.QGraphicsPixmapItem):
             data = {'pos0': self.pos0, 'pos1': self.pos1, 'file_or_casename': self.path_, 'mediapath': self.path_,
                     'coder': res[3], 'codename': res[1], 'cid': res[2], 'color': res[2], 'memo': res[4]}
             DialogCodeInAV(self.app, data).exec()
-        # ---    
+
         if action == remove_action:
             from .confirm_delete import DialogConfirmDelete
             ui = DialogConfirmDelete(self.app, _("Remove this item from the graph?"))
@@ -3768,7 +3741,7 @@ class AVGraphicsItem(QtWidgets.QGraphicsPixmapItem):
             scene.removeItem(self)
             scene.update()
             return
-        # ---    
+
         if action == red_action:
             self.color = "red"
         if action == green_action:
@@ -3801,24 +3774,11 @@ class PixmapGraphicsItem(QtWidgets.QGraphicsPixmapItem):
     """ Coded pixmap. Uses Images and PDF image files.
     Maximum size of 200 pixels high and wide. """
 
-    app = None
-    font = None
-    settings = None
-    remove = False
-    # For graph item storage
-    text = ""
-    imid = -1  # code_image table imid i=unique for the coded image area
-    px = 0
-    py = 0
-    pwidth = 0
-    pheight = 0
-    path_ = ""
-    pdf_page = None
     MAX_WIDTH = 300
     MAX_HEIGHT = 300
-    grpixid = None  # id for database stored free pixmap graph items
 
-    def __init__(self, app, imid=-1, x=10, y=10, px=0, py=0, pwidth=0, pheight=0, path_="", grpixid=None, pdf_page=None):
+    def __init__(self, app, imid=-1, x=10, y=10, px=0, py=0, pwidth=0, pheight=0, path_="", grpixid=None,
+                 pdf_page=None):
         """ pixmap object.
          param:
             app  : the main App class
@@ -3843,7 +3803,7 @@ class PixmapGraphicsItem(QtWidgets.QGraphicsPixmapItem):
         self.pwidth = pwidth
         self.pheight = pheight
         self.path_ = path_
-        self.grpixid = grpixid  # gr_pix_item table id
+        self.grpixid = grpixid  # gr_pix_item table id. id for database stored free pixmap graph ite
         self.pdf_page = pdf_page
 
         # Image jpg, png
@@ -3889,6 +3849,10 @@ class PixmapGraphicsItem(QtWidgets.QGraphicsPixmapItem):
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsFocusable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
 
+    def __repr__(self):
+        txt = f"PixmapGraphicsItem imid:{self.imid} grpxid:{self.grpixid} Path:{self.path_}"
+        return txt
+
     def contextMenuEvent(self, event):
         menu = QtWidgets.QMenu()
         context_action = menu.addAction(_("View in context"))
@@ -3913,7 +3877,7 @@ class PixmapGraphicsItem(QtWidgets.QGraphicsPixmapItem):
                     'file_or_casename': self.path_, 'mediapath': self.path_, 'coder': res[3],
                     'codename': res[1], 'cid': res[2], 'color': res[2], 'memo': res[4]}
             DialogCodeInImage(self.app, data).exec()
-        # ---    
+
         if action == remove_action:
             from .confirm_delete import DialogConfirmDelete
             ui = DialogConfirmDelete(self.app, _("Remove this item from the graph?"))
@@ -3929,7 +3893,6 @@ class PixmapGraphicsItem(QtWidgets.QGraphicsPixmapItem):
             scene.removeItem(self)
             scene.update()
             return
-        #---    
 
     def paint(self, painter, option, widget=None):
         painter.save()
@@ -3943,15 +3906,6 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
     Categories are shown white. A custom context menu
     allows selection of a code/category memo and displaying the information.
     """
-
-    code_or_cat = None
-    border_rect = None
-    app = None
-    settings = None
-    text = ""
-    # For graph item storage
-    font_size = 9
-    bold = False
 
     def __init__(self, app, code_or_cat, font_size=9, bold=False, isvisible=True, displayed_text=""):
         """ Show name and colour of text. Has context menu for various options.
@@ -3970,8 +3924,8 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.code_or_cat = code_or_cat
         self.font_size = font_size
         self.bold = bold
-        self.is_ellipse = False # NUEVO: Controla si es elipse o cuadrado
-        self.is_collapsed = False # NUEVO: Controla si sus hijos están ocultos
+        self.is_ellipse = False
+        self.is_collapsed = False
         self.setPos(self.code_or_cat['x'], self.code_or_cat['y'])
         self.text = displayed_text
         if self.text == "":
@@ -3979,7 +3933,6 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsFocusable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
-        # self.setTextInteractionFlags(QtCore.Qt.TextInteractionFlag.TextEditable)
         self.setDefaultTextColor(QtGui.QColor(TextColor(self.code_or_cat['color']).recommendation))
         fontweight = QtGui.QFont.Weight.Normal
         if self.bold:
@@ -3990,6 +3943,12 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
             self.hide()
         self.code_or_cat['memo'] = ""
         self.get_memo()
+
+    def __repr__(self):
+        txt = f"TextGraphicsItem CodeOrCat:{self.code_or_cat} Font:{self.font_size} Bold:{self.bold}\n"
+        txt += f"Ellipse:{self.is_ellipse} Collapse:{self.is_collapsed}\n"
+        txt += f"Text:{self.text}"
+        return txt
 
     def get_memo(self):
         cur = self.app.conn.cursor()
@@ -4016,51 +3975,45 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         painter.save()
         color = QtGui.QColor(self.code_or_cat['color'])
         painter.setBrush(QtGui.QBrush(color, style=QtCore.Qt.BrushStyle.SolidPattern))
-        
         # Propuesta: Renderizado condicional basado en la bandera de estado visual.
+        # # Proposal: Conditional rendering based on the visual status flag.
         if getattr(self, 'is_ellipse', False):
             painter.drawEllipse(self.boundingRect())
         else:
             painter.drawRect(self.boundingRect())
-            
         painter.restore()
         super().paint(painter, option, widget)
 
     def contextMenuEvent(self, event):
-        """
-        # https://riverbankcomputing.com/pipermail/pyqt/2010-July/027094.html
+        """ https://riverbankcomputing.com/pipermail/pyqt/2010-July/027094.html
         I was not able to mapToGlobal position so, the menu maps to scene position plus
         the Dialog screen position.
         """
 
         menu = QtWidgets.QMenu()
-        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
         memo_action = menu.addAction('View Memo')
         collapse_action = None
         if self.code_or_cat.get('child_names'):
             if getattr(self, 'is_collapsed', False):
-                collapse_action = menu.addAction('Expand category')
+                collapse_action = menu.addAction(_('Expand category'))
             else:
-                collapse_action = menu.addAction('Collapse category')
-        shape_action = menu.addAction('Toggle Shape (Ellipse/Rectangle)')
-        # ---
+                collapse_action = menu.addAction(_('Collapse category'))
+        shape_action = menu.addAction(_('Toggle: Ellipse/Rectangle'))
         coded_action = None
         case_action = None
         show_memo_action = None
         add_segments_action = None
         add_cooc_action = None
-        # ---
-        # --- (NEW)
         if self.code_or_cat['cid'] is not None:
-            add_segments_action = menu.addAction('Import segments and link them')
-        # ---    
-            add_cooc_action = menu.addAction('Import Co-occurrences')
-            coded_action = menu.addAction('View text and media')
-            case_action = menu.addAction('Case text and media')
+            add_segments_action = menu.addAction(_('Import and link segments'))
+            add_cooc_action = menu.addAction(_('Import Co-occurrences'))
+            coded_action = menu.addAction(_('View text and media'))
+            case_action = menu.addAction(_('Case text and media'))
         hide_memo_action = None
         if self.code_or_cat['memo'] != "":
             if "\nMEMO:" in self.text:
-                hide_memo_action = menu.addAction("Hide memo")
+                hide_memo_action = menu.addAction(_("Hide memo"))
             else:
                 show_memo_action = menu.addAction(_("Display memo"))
         menu.addSeparator()
@@ -4068,7 +4021,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         # --- Sub-menú para el tamaño de fuente ---
         font_size_menu = menu.addMenu("Font size")
         font_size_actions = {}
-        for size in [8, 10, 12, 14, 16, 18]:
+        for size in [8, 10, 12, 14, 16, 18, 20]:
             act = font_size_menu.addAction(str(size))
             font_size_actions[act] = size
         menu.addSeparator()
@@ -4081,10 +4034,8 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
             self.update()
         if collapse_action and action == collapse_action:
             self.toggle_collapse()
-        # --- (NEW)   
         if action == add_segments_action:
             self.add_coded_segments()
-        # ---    
         if action == add_cooc_action:
             self.add_cooccurring_codes()
         if action == show_memo_action:
@@ -4112,7 +4063,6 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
             self.coded_media()
         if action == case_action:
             self.case_media()
-        # ---    
         if action == hide_action:
             ui_confirm = DialogConfirmDelete(self.app, _("Hide this item?"))
             if not ui_confirm.exec():
@@ -4124,8 +4074,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
                         if not item.from_widget.isVisible() or not item.to_widget.isVisible():
                             item.hide()
             self.scene().update()
-        # ---   
-    # --- Modificado, antes: "add_coded_text_segments"
+
     def add_coded_segments(self):
         """
         Unified window to import coded segments from text, image, and A/V
@@ -4135,7 +4084,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         cid = self.code_or_cat['cid']
         code_name = self.code_or_cat['name']
 
-        # --- Collect TEXT segments
+        # Collect TEXT segments
         sql_text = ("select code_text.cid, code_text.fid, code_text.seltext, "
                     "ifnull(code_text.memo,''), code_text.ctid, source.name "
                     "from code_text join source on source.id = code_text.fid "
@@ -4144,15 +4093,19 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         res_text = cur.fetchall()
         text_codings = []
         for r in res_text:
-            already = any(isinstance(item, FreeTextGraphicsItem) and item.ctid == r[4]
+            already_present = any(isinstance(item, FreeTextGraphicsItem) and item.ctid == r[4]
                           for item in self.scene().items())
-            if not already:
+            if not already_present:
+                # To fix error in save graph: 2034, in save_graph
+                # i.to_widget.code_or_cat['catid'], i.to_widget.code_or_cat['cid'],
+                code_or_cat = {'cid':r[0], 'catid': None}
                 text_codings.append({
                     'cid': r[0], 'fid': r[1], 'name': r[2], 'memo': r[3],
-                    'ctid': r[4], 'filename': r[5], 'codename': code_name
+                    'ctid': r[4], 'filename': r[5], 'codename': code_name,
+                    'code_or_cat': code_or_cat
                 })
 
-        # --- Collect IMAGE segments
+        # Collect IMAGE segments
         sql_img = ("select code_image.cid, code_image.id, x1, y1, width, height, "
                    "ifnull(code_image.memo,''), code_image.imid, code_image.pdf_page, "
                    "source.name, source.mediapath "
@@ -4162,18 +4115,22 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         res_img = cur.fetchall()
         image_codings = []
         for r in res_img:
-            already = any(isinstance(item, PixmapGraphicsItem) and item.imid == r[7]
+            already_present = any(isinstance(item, PixmapGraphicsItem) and item.imid == r[7]
                           for item in self.scene().items())
-            if not already:
+            if not already_present:
+                # To fix error in save graph: 2034, in save_graph
+                # i.to_widget.code_or_cat['catid'], i.to_widget.code_or_cat['cid'],
+                code_or_cat = {'cid': r[0], 'catid': None}
                 image_codings.append({
                     'cid': r[0], 'fid': r[1], 'x': int(r[2]), 'y': int(r[3]),
                     'width': int(r[4]), 'height': int(r[5]), 'memo': r[6],
                     'imid': r[7], 'pdf_page': r[8], 'filename': r[9],
                     'path': r[10] if r[10] else '', 'codename': code_name,
-                    'name': f"{r[9]} x:{int(r[2])} y:{int(r[3])} w:{int(r[4])} h:{int(r[5])}"
+                    'name': f"{r[9]} x:{int(r[2])} y:{int(r[3])} w:{int(r[4])} h:{int(r[5])}",
+                    'code_or_cat': code_or_cat
                 })
 
-        # --- Collect A/V segments
+        # Collect A/V segments
         sql_av = ("select code_av.cid, code_av.id, code_av.pos0, code_av.pos1, "
                   "ifnull(code_av.memo,''), code_av.avid, source.name, source.mediapath "
                   "from code_av join source on source.id = code_av.id "
@@ -4182,23 +4139,26 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         res_av = cur.fetchall()
         av_codings = []
         for r in res_av:
-            already = any(isinstance(item, AVGraphicsItem) and item.avid == r[5]
+            already_present = any(isinstance(item, AVGraphicsItem) and item.avid == r[5]
                           for item in self.scene().items())
-            if not already:
+            if not already_present:
+                # To fix error in save graph: 2034, in save_graph
+                # i.to_widget.code_or_cat['catid'], i.to_widget.code_or_cat['cid'],
+                code_or_cat = {'cid': r[0], 'catid': None}
                 av_codings.append({
                     'cid': r[0], 'fid': r[1], 'pos0': int(r[2]), 'pos1': int(r[3]),
                     'memo': r[4], 'avid': r[5], 'filename': r[6],
                     'path': r[7] if r[7] else '', 'codename': code_name,
-                    'name': f"{r[6]}: {int(r[2])} to {int(r[3])} msecs"
+                    'name': f"{r[6]}: {int(r[2])} to {int(r[3])} msecs",
+                    'code_or_cat': code_or_cat
                 })
 
-        # --- Validate that there is something to import
         if not text_codings and not image_codings and not av_codings:
-            Message(self.app, "No segments",
-                    "There are no new coded segments for this code.").exec()
+            Message(self.app, _("No segments"),
+                    _("There are no new coded segments for this code.")).exec()
             return
 
-        # --- Show unified dialog
+        # Show unified dialog to select text, image, A/V segments
         ui = DialogSelectCodedSegments(
             self.app, code_name, text_codings, image_codings, av_codings, self.scene().views()[0]
         )
@@ -4208,7 +4168,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         x = self.pos().x() + 180
         y = self.pos().y()
 
-        # --- Import selected TEXT segments
+        # Import selected TEXT segments
         for s in ui.selected_text:
             y += 40
             freetextid = 1
@@ -4225,12 +4185,12 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
                                          color="gray", isvisible=True)
             self.scene().addItem(line_item)
 
-        # --- Import selected IMAGE segments
+        # Import selected IMAGE segments
         for s in ui.selected_image:
             y += 40
             item = PixmapGraphicsItem(self.app, s['imid'], x, y,
-                                       s['x'], s['y'], s['width'], s['height'],
-                                       s['path'], None, s['pdf_page'])
+                                      s['x'], s['y'], s['width'], s['height'],
+                                      s['path'], None, s['pdf_page'])
             msg = f"IMID:{s['imid']} File: {s['filename']}\nCode: {s['codename']}"
             if s['memo']:
                 msg += f"\nMemo: {s['memo']}"
@@ -4240,11 +4200,11 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
                                          color="gray", isvisible=True)
             self.scene().addItem(line_item)
 
-        # --- Import selected A/V segments
+        # Import selected A/V segments
         for s in ui.selected_av:
             y += 40
             item = AVGraphicsItem(self.app, s['avid'], x, y,
-                                   s['pos0'], s['pos1'], s['path'])
+                                  s['pos0'], s['pos1'], s['path'])
             msg = f"AVID:{s['avid']} File: {s['filename']}\nCode: {s['codename']}"
             msg += f"\n{s['pos0']} - {s['pos1']} msecs"
             if s['memo']:
@@ -4254,10 +4214,12 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
             line_item = LinkGraphicsItem(self, item, line_width=2, line_type="dotted",
                                          color="gray", isvisible=True)
             self.scene().addItem(line_item)
-    # ---        
 
     def add_cooccurring_codes(self):
-        """ Importa códigos co-ocurrentes desde un nodo específico sin duplicados """
+        """ Importa códigos co-ocurrentes desde un nodo específico sin duplicados.
+         Import co-occurring codes from a specific node without duplicates.
+         """
+
         cur = self.app.conn.cursor()
         sql = """
         SELECT c2.cid, n2.name, n2.color, COUNT(c2.cid) as overlap_count
@@ -4269,68 +4231,75 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         """
         cur.execute(sql, [self.code_or_cat['cid']])
         res = cur.fetchall()
-        
+
         if not res:
             Message(self.app, "Sin co-ocurrencias", "No hay códigos que se sobrepongan con este en los textos.").exec()
             return
-            
-        cooc_list = [{'cid': r[0], 'name': f"{r[1]} (Co-occ freq: {r[3]})", 'raw_name': r[1], 'color': r[2], 'count': r[3]} for r in res]
-            
+
+        cooc_list = [
+            {'cid': r[0], 'name': f"{r[1]} (Co-occ freq: {r[3]})", 'raw_name': r[1], 'color': r[2], 'count': r[3]} for r
+            in res]
+
         ui = DialogSelectItems(self.app, cooc_list, "Select codes", "multi")
         if not ui.exec():
             return
-            
+
         selected = ui.get_selected()
-        
+
         import math
-        radius = 250 
+        radius = 250
         angle_step = (2 * math.pi) / max(1, len(selected))
-        
+
         for i, s in enumerate(selected):
             # CORRECCIÓN: Uso estricto de str()
-            target_node = next((item for item in self.scene().items() if type(item).__name__ == "TextGraphicsItem" and str(item.code_or_cat.get('cid')) == str(s['cid'])), None)
-                    
+            target_node = next((item for item in self.scene().items() if
+                                type(item).__name__ == "TextGraphicsItem" and str(item.code_or_cat.get('cid')) == str(
+                                    s['cid'])), None)
+
             if not target_node:
                 angle = i * angle_step
                 cx = self.pos().x() + radius * math.cos(angle)
                 cy = self.pos().y() + radius * math.sin(angle)
-                
-                code_data = {'name': s['raw_name'], 'supercatid': None, 'catid': None, 'cid': s['cid'], 
+
+                code_data = {'name': s['raw_name'], 'supercatid': None, 'catid': None, 'cid': s['cid'],
                              'x': cx, 'y': cy, 'color': s['color'], 'memo': "", 'child_names': []}
                 target_node = TextGraphicsItem(self.app, code_data)
                 self.scene().addItem(target_node)
-                
-            line_exists = any(type(link).__name__ == "LinkGraphicsItem" and 
-                              ((link.from_widget == self and link.to_widget == target_node) or 
-                               (link.from_widget == target_node and link.to_widget == self)) 
+
+            line_exists = any(type(link).__name__ == "LinkGraphicsItem" and
+                              ((link.from_widget == self and link.to_widget == target_node) or
+                               (link.from_widget == target_node and link.to_widget == self))
                               for link in self.scene().items())
-                              
+
             if not line_exists:
-                line_item = LinkGraphicsItem(self, target_node, line_width=2, line_type="dotted", color="blue", isvisible=True)
+                line_item = LinkGraphicsItem(self, target_node, line_width=2, line_type="dotted", color="blue",
+                                             isvisible=True)
                 self.scene().addItem(line_item)
 
     def add_edit_memo(self):
         """ Add or edit memos for codes and categories. """
 
         if self.code_or_cat['cid'] is not None:
-            ui = DialogMemo(self.app, "Memo for Code " + self.code_or_cat['name'], self.code_or_cat['memo'])
+            ui = DialogMemo(self.app, _("Memo for Code ") + self.code_or_cat['name'], self.code_or_cat['memo'])
             ui.exec()
             self.code_or_cat['memo'] = ui.memo
             cur = self.conn.cursor()
             cur.execute("update code_name set memo=? where cid=?", (self.code_or_cat['memo'], self.code_or_cat['cid']))
             self.conn.commit()
         if self.code_or_cat['catid'] is not None and self.code_or_cat['cid'] is None:
-            ui = DialogMemo(self.app, "Memo for Category " + self.code_or_cat['name'], self.code_or_cat['memo'])
+            ui = DialogMemo(self.app, _("Memo for Category ") + self.code_or_cat['name'], self.code_or_cat['memo'])
             ui.exec()
             self.code_or_cat['memo'] = ui.memo
             cur = self.conn.cursor()
             cur.execute("update code_cat set memo=? where catid=?",
                         (self.code_or_cat['memo'], self.code_or_cat['catid']))
             self.conn.commit()
+
     def toggle_collapse(self):
-        """ Oculta o muestra todos los nodos descendientes y actualiza las líneas """
+        """ Oculta o muestra todos los nodos descendientes y actualiza las líneas.
+         Hides or shows all descendant nodes and updates the lines"""
         self.is_collapsed = not getattr(self, 'is_collapsed', False)
-        
+
         # 1. Ocultar/Mostrar nodos hijos en cascada
         for item in self.scene().items():
             if type(item).__name__ == "TextGraphicsItem" and item != self:
@@ -4339,9 +4308,9 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
                         item.hide()
                     else:
                         item.show()
-                        item.is_collapsed = False # Reinicia el estado de los hijos para evitar errores lógicos
-                        
-        # 2. Refrescar las líneas (Ocultar las que queden sueltas)
+                        item.is_collapsed = False  # Reinicia el estado de los hijos para evitar errores lógicos
+
+        # 2. Refrescar las líneas (Ocultar las que queden sueltas). Refresh lines (Hide any loose ones)
         for item in self.scene().items():
             if type(item).__name__ in ("LinkGraphicsItem", "FreeLineGraphicsItem"):
                 if hasattr(item, 'from_widget') and hasattr(item, 'to_widget'):
@@ -4349,8 +4318,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
                         item.hide()
                     else:
                         item.show()
-                        
-        self.scene().update()            
+        self.scene().update()
 
     def case_media(self, ):
         """ Display all coded text and media for this code.
@@ -4369,50 +4337,37 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
 class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
     """ Takes the coordinate from the two TextGraphicsItems. """
 
-    from_widget = None
-    from_pos = None
-    to_widget = None
-    to_pos = None
-    line_width = 2
-    line_type = QtCore.Qt.PenStyle.SolidLine
-    text = ""
-    color = "gray"
-
-    # Propuesta: Se amplía la firma del constructor con el parámetro opcional 'label=""' 
-    # para permitir que las conexiones (aristas) puedan renderizar información analítica (ej. frecuencias).
     def __init__(self, from_widget, to_widget, line_width=2, line_type="solid",
                  color="gray", isvisible=True, label=""):
         """ Links codes and categories. Called when codes or categories of categories are inserted.
-         param: from_widget  : TextGraphicsItem
-         param: to_widget : TextGraphicsItem
-         param: line_width : Real
-         param: line_type : String
-         param: color : String
-         param: isvisible : boolean
+        Args:
+            from_widget  : TextGraphicsItem
+            to_widget : TextGraphicsItem
+            line_width : Real
+            line_type : String
+            color : String
+            isvisible : boolean
+            label : String  allow connections (edges) to show analytical information (e.g., frequencies).
         """
-        # ---
-        super(LinkGraphicsItem, self).__init__(None)
 
+        super(LinkGraphicsItem, self).__init__(None)
         self.app = from_widget.app
-        self.from_widget = from_widget   
-        # ---
         self.from_widget = from_widget
         self.to_widget = to_widget
-        self.text = from_widget.text + " - " + to_widget.text
+        self.text = f"{from_widget.text} - {to_widget.text}"
         self.line_width = line_width
-        # --- La línea no se puede seleccionar y no responde al arrastre del mouse izquierdo
+        # La línea no se puede seleccionar y no responde al arrastre del mouse izquierdo. Cannot select or drag line.
         self.setFlag(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable, False)
         self.setAcceptedMouseButtons(QtCore.Qt.MouseButton.RightButton)
-        # ---
-        self.calculate_points_and_draw()
         self.color = color
-        if not isvisible:
-            self.hide()
         self.line_type = QtCore.Qt.PenStyle.SolidLine
         if line_type == "dotted":
             self.line_type = QtCore.Qt.PenStyle.DotLine
-            
+        self.calculate_points_and_draw()
+        if not isvisible:
+            self.hide()
         # garantiza que el texto nunca sufrirá desincronización física si los nodos conectados son arrastrados rápidamente.
+        # text will never suffer physical desynchronization if the connected nodes are rapidly pulled.
         self.label = str(label)
         self.text_item = None
         if self.label:
@@ -4421,13 +4376,17 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
             font.setPointSize(9)
             font.setBold(True)
             self.text_item.setFont(font)
-            self.text_item.setDefaultTextColor(QtGui.QColor("#0000CD")) # Azul para destacar atributos relacionales
-            
+            self.text_item.setDefaultTextColor(QtGui.QColor("#0000CD"))  # Azul para destacar atributos relacionales
         self.redraw()
+
+    def __repr__(self):
+        txt = f"LinkGraphicsItem From:{self.from_widget} To:{self.to_widget} Txt:{self.text}\n"
+        txt += f"Color:{self.color} Width:{self.line_width}"
+        return txt
 
     def contextMenuEvent(self, event):
         menu = QtWidgets.QMenu()
-        # --- Sub-menú de grosor y estilo de línea ---
+        # Sub-menú de grosor y estilo de línea
         line_menu = menu.addMenu(_('Line style'))
         width1_action = line_menu.addAction(_('Thin (1px)'))
         width2_action = line_menu.addAction(_('Normal (2px)'))
@@ -4436,7 +4395,7 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
         line_menu.addSeparator()
         dotted_action = line_menu.addAction(_('Dotted'))
         solid_action = line_menu.addAction(_('Solid'))
-        # --- Sub-menú de color ---
+        # Sub-menú de color
         color_menu = menu.addMenu(_('Line color'))
         red_action = color_menu.addAction(_('Red'))
         yellow_action = color_menu.addAction(_('Yellow'))
@@ -4482,13 +4441,11 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
             self.color = "magenta"
         if action == gray_action:
             self.color = "gray"
-        # ---    
         if action == hide_action:
             ui_confirm = DialogConfirmDelete(self.app, _("Hide this line?"))
             if not ui_confirm.exec():
                 return
             self.hide()
-        # ---    
         self.redraw()
 
     def redraw(self):
@@ -4499,34 +4456,34 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
     def calculate_points_and_draw(self):
         """ Cálculo fluido de intersección perimetral. """
         import math
-        
+
         c1 = self.from_widget.sceneBoundingRect().center()
         c2 = self.to_widget.sceneBoundingRect().center()
-        
+
         # Enviar la línea detrás de los nodos visualmente
         self.setZValue(-1)
 
         is_ellipse_from = getattr(self.from_widget, 'is_ellipse', False)
         is_ellipse_to = getattr(self.to_widget, 'is_ellipse', False)
-        
+
         rect1 = self.from_widget.sceneBoundingRect()
         rect2 = self.to_widget.sceneBoundingRect()
-        
+
         def get_edge_point(center_source, center_target, rect, is_ellipse):
             dx = center_target.x() - center_source.x()
             dy = center_target.y() - center_source.y()
             if dx == 0 and dy == 0: return center_source
-            
+
             w = rect.width() / 2
             h = rect.height() / 2
-            
+
             if is_ellipse:
                 angle = math.atan2(dy, dx)
                 return QtCore.QPointF(center_source.x() + w * math.cos(angle), center_source.y() + h * math.sin(angle))
             else:
                 if dx == 0: return QtCore.QPointF(center_source.x(), center_source.y() + math.copysign(h, dy))
                 if dy == 0: return QtCore.QPointF(center_source.x() + math.copysign(w, dx), center_source.y())
-                
+
                 tx = w / abs(dx)
                 ty = h / abs(dy)
                 t = min(tx, ty)
@@ -4542,10 +4499,9 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
         color_obj = colors[self.color]
         self.setPen(QtGui.QPen(color_obj, self.line_width, self.line_type))
         self.setLine(p1.x(), p1.y(), p2.x(), p2.y())
-        
+
         if hasattr(self, 'text_item') and self.text_item:
             mid_x = (p1.x() + p2.x()) / 2
             mid_y = (p1.y() + p2.y()) / 2
             br = self.text_item.boundingRect()
             self.text_item.setPos(mid_x - br.width() / 2, mid_y - br.height() / 2)
-  
