@@ -1984,6 +1984,7 @@ class ViewGraph(QDialog):
         width, height = self.scene.suggested_scene_size()
         self.scene.set_width(width)
         self.scene.set_height(height)
+        # Insert graphics items first, but not the lines, as need the insertids
         try:
             try:
                 cur.execute("insert into graph (name, description, date, scene_width, scene_height) values(?,?,?,?,?)",
@@ -2001,13 +2002,6 @@ class ViewGraph(QDialog):
                     cur.execute(sql,
                                 [grid, i.pos().x(), i.pos().y(), i.code_or_cat['supercatid'], i.code_or_cat['catid'],
                                  i.code_or_cat['cid'], i.font_size, i.bold, i.isVisible(), i.toPlainText()])
-                if isinstance(i, FreeTextGraphicsItem):
-                    sql = "insert into gr_free_text_item (grid,freetextid, x,y,free_text,font_size,bold,color,tooltip, " \
-                          "ctid, memo_ctid, memo_imid, memo_avid) values (?,?,?,?,?,?,?,?,?,?,?,?,?)"
-                    tt = i.toolTip()
-                    cur.execute(sql,
-                                [grid, i.freetextid, i.pos().x(), i.pos().y(), i.text, i.font_size, i.bold, i.color,
-                                 tt, i.ctid, i.memo_ctid, i.memo_imid, i.memo_avid])
                 if isinstance(i, CaseTextGraphicsItem):
                     sql = "insert into gr_case_text_item (grid,x,y,caseid,font_size,bold,color, displaytext) " \
                           "values (?,?,?,?,?,?,?,?)"
@@ -2030,6 +2024,25 @@ class ViewGraph(QDialog):
                           "(?,?,?,?,?,?,?,?,?)"
                     cur.execute(sql,
                                 [grid, i.avid, i.pos().x(), i.pos().y(), i.pos0, i.pos1, i.path_, i.toolTip(), i.color])
+                if isinstance(i, FreeTextGraphicsItem):
+                    sql = "insert into gr_free_text_item (grid,freetextid, x,y,free_text,font_size,bold,color,tooltip, " \
+                          "ctid, memo_ctid, memo_imid, memo_avid) values (?,?,?,?,?,?,?,?,?,?,?,?,?)"
+                    tt = i.toolTip()
+                    cur.execute(sql,
+                                [grid, i.freetextid, i.pos().x(), i.pos().y(), i.text, i.font_size, i.bold, i.color,
+                                 tt, i.ctid, i.memo_ctid, i.memo_imid, i.memo_avid])
+                    cur.execute("select last_insert_rowid()")  # the gfreeid
+                    i.freetextid = cur.fetchone()[0]
+                    cur.execute("update gr_free_text_item set freetextid=? where gfreeid=?", [i.freetextid, i.freetextid])
+            self.app.conn.commit()
+        except Exception as err:
+            print(err)
+            self.app.conn.rollback()  # revert all changes
+            raise
+
+        # Insert the lines - after the freetextids are obtained
+        for i in self.scene.items():
+            try:
                 if isinstance(i, LinkGraphicsItem):
                     sql = "insert into gr_cdct_line_item (grid,fromcatid,fromcid,tocatid,tocid,color,linewidth,linetype," \
                           "isvisible) values (?,?,?,?,?,?,?,?,?)"
@@ -2037,7 +2050,7 @@ class ViewGraph(QDialog):
                     print(i.__repr__())
                     print("FROM:", i.from_widget.__repr__)
                     print("TO:", i.to_widget.__repr__)
-
+                    # TODO check self.line_type_to_text
                     cur.execute(sql, [grid, i.from_widget.code_or_cat['catid'], i.from_widget.code_or_cat['cid'],
                                       i.to_widget.code_or_cat['catid'], i.to_widget.code_or_cat['cid'],
                                       i.color, i.line_width, self.line_type_to_text(i.line_type),
@@ -2122,11 +2135,13 @@ class ViewGraph(QDialog):
                                 [grid, from_freetextid, from_catid, from_cid, from_case_id, from_file_id, from_imid,
                                  from_avid, to_freetextid, to_catid, to_cid, to_case_id, to_file_id, to_imid, to_avid,
                                  i.color, i.line_width, self.line_type_to_text(i.line_type)])
-            self.app.conn.commit()
-        except Exception as err:
-            print(err)
-            self.app.conn.rollback()  # revert all changes
-            raise
+
+                self.app.conn.commit()
+            except Exception as err:
+                print(err)
+                self.app.conn.rollback()  # revert all changes
+                raise
+
         self.app.delete_backup = False
 
     @staticmethod
@@ -2474,6 +2489,7 @@ class ViewGraph(QDialog):
             res.append(dict(zip(keys, row)))
         for line in res:
             # Add link which includes the scene text items and associated data, add links before text_items
+            print("load free line:", line)
             from_item = None
             to_item = None
             # Check for each text item type and try to get a matching characteristic
@@ -2489,6 +2505,8 @@ class ViewGraph(QDialog):
                     if i.code_or_cat['catid'] == line['fromcatid'] and i.code_or_cat['cid'] == line['fromcid']:
                         from_item = i
                 if from_item is None and line['fromfreetextid'] is not None and isinstance(i, FreeTextGraphicsItem):
+                    print("details", i.__repr__())
+                    print("item ", i.freetextid, " = ", "fromfreetextid", line['fromfreetextid'])
                     if i.freetextid == line['fromfreetextid']:
                         from_item = i
                 if from_item is None and line['fromimid'] is not None and isinstance(i, PixmapGraphicsItem):
@@ -2497,6 +2515,9 @@ class ViewGraph(QDialog):
                 if from_item is None and line['fromavid'] is not None and isinstance(i, AVGraphicsItem):
                     if i.avid == line['fromavid']:
                         from_item = i
+            print("from_item:", from_item)
+
+            for i in self.scene.items():
                 if to_item is None and line['tocaseid'] is not None and isinstance(i, CaseTextGraphicsItem):
                     if i.case_id == line['tocaseid']:
                         to_item = i
@@ -2516,6 +2537,8 @@ class ViewGraph(QDialog):
                 if to_item is None and line['toavid'] is not None and isinstance(i, AVGraphicsItem):
                     if i.avid == line['toavid']:
                         to_item = i
+            print("load to_item", to_item)
+
             # Add line graphics item OR remove database entry
             if from_item is not None and to_item is not None:
                 line_item = FreeLineGraphicsItem(from_item, to_item, line['color'], line['linewidth'],
@@ -3672,6 +3695,8 @@ class AVGraphicsItem(QtWidgets.QGraphicsPixmapItem):
         super(AVGraphicsItem, self).__init__(None)
         self.app = app
         self.avid = avid
+        # TODO cid
+        self.code_or_cat = {'cid': None, 'catid': None}  # Catch for LinkGraphicsItem in save_graph
         self.text = f"AVID:{self.avid}"
         self.pos0 = pos0
         self.pos1 = pos1
@@ -3782,14 +3807,13 @@ class PixmapGraphicsItem(QtWidgets.QGraphicsPixmapItem):
         """ pixmap object.
          param:
             app  : the main App class
-            pixid : Integer
+            imid : Integer code_image primary key
             x : Integer x position of graphics item
             y : Integer y position of graphics item
             px : Integer
             py + Integer
             pwidth : Integer
             pheight : Integer
-            imid : Integer code_image primary key
             grpixid : None or Integer from gr_pix_item table
             pdf_page : For Pdf images
          """
@@ -3797,6 +3821,8 @@ class PixmapGraphicsItem(QtWidgets.QGraphicsPixmapItem):
         super(PixmapGraphicsItem, self).__init__(None)
         self.app = app
         self.imid = imid
+        # TODO update cid
+        self.code_or_cat = {'cid': None, 'catid': None}  # Catch for LinkGraphicsItem in save_graph
         self.text = "IMID:" + str(self.imid)
         self.px = px
         self.py = py
