@@ -555,9 +555,9 @@ class ViewGraph(QDialog):
                 return
             self.ui.graphicsView.scale(0.9, 0.9)
         if key == QtCore.Qt.Key.Key_H:
-            # print item x y
             for i in self.scene.items():
-                print(i.__class__, i.pos(), i.__repr__())
+                print(f"========\nITEM: {i.__class__}, POS: {int(i.scenePos().x())}, {int(i.scenePos().y())}")
+                print(f"DETAILS: {i.__repr__()}")
 
     def keyReleaseEvent(self, event):
         """ Soltar espacio para desactivar el paneo. Drop space to disable panning.
@@ -565,7 +565,7 @@ class ViewGraph(QDialog):
 
         if event.key() == QtCore.Qt.Key.Key_Space and not event.isAutoRepeat():
             self._space_pressed = False
-            # Volver al modo de selección por cuadro. Return to framce selection mode
+            # Volver al modo de selección por cuadro. Return to frame selection mode
             self.ui.graphicsView.setDragMode(QtWidgets.QGraphicsView.DragMode.RubberBandDrag)
             self.ui.graphicsView.viewport().setCursor(QtCore.Qt.CursorShape.ArrowCursor)
         super().keyReleaseEvent(event)
@@ -2046,16 +2046,10 @@ class ViewGraph(QDialog):
                 if isinstance(i, LinkGraphicsItem):
                     sql = "insert into gr_cdct_line_item (grid,fromcatid,fromcid,tocatid,tocid,color,linewidth,linetype," \
                           "isvisible) values (?,?,?,?,?,?,?,?,?)"
-                    # TODO Sometimes Error FreeTextGraphicsItem no attribute code_or_cat
-                    print(i.__repr__())
-                    print("FROM:", i.from_widget.__repr__)
-                    print("TO:", i.to_widget.__repr__)
-                    # TODO check self.line_type_to_text
                     cur.execute(sql, [grid, i.from_widget.code_or_cat['catid'], i.from_widget.code_or_cat['cid'],
                                       i.to_widget.code_or_cat['catid'], i.to_widget.code_or_cat['cid'],
                                       i.color, i.line_width, self.line_type_to_text(i.line_type),
                                       i.isVisible()])
-
                 if isinstance(i, FreeLineGraphicsItem):
                     from_catid = None
                     try:
@@ -2139,7 +2133,7 @@ class ViewGraph(QDialog):
                 self.app.conn.commit()
             except Exception as err:
                 print(err)
-                self.app.conn.rollback()  # revert all changes
+                self.app.conn.rollback()  # Revert all changes
                 raise
 
         self.app.delete_backup = False
@@ -2459,11 +2453,8 @@ class ViewGraph(QDialog):
                             i.code_or_cat['cid'] == line['tocid']:
                         to_item = i
             if from_item is not None and to_item is not None:
-                print("line", line)
                 item = LinkGraphicsItem(from_item, to_item, line['linewidth'], line['linetype'],
                                         line['color'], line['isvisible'])
-                # self, from_widget, to_widget, line_width=2, line_type="solid",
-                #                  color="gray", isvisible=True, label=""
                 self.scene.addItem(item)
             else:
                 cur.execute("delete from gr_cdct_line_item where glineid=?", [line['glineid']])
@@ -2489,7 +2480,6 @@ class ViewGraph(QDialog):
             res.append(dict(zip(keys, row)))
         for line in res:
             # Add link which includes the scene text items and associated data, add links before text_items
-            print("load free line:", line)
             from_item = None
             to_item = None
             # Check for each text item type and try to get a matching characteristic
@@ -2505,8 +2495,6 @@ class ViewGraph(QDialog):
                     if i.code_or_cat['catid'] == line['fromcatid'] and i.code_or_cat['cid'] == line['fromcid']:
                         from_item = i
                 if from_item is None and line['fromfreetextid'] is not None and isinstance(i, FreeTextGraphicsItem):
-                    print("details", i.__repr__())
-                    print("item ", i.freetextid, " = ", "fromfreetextid", line['fromfreetextid'])
                     if i.freetextid == line['fromfreetextid']:
                         from_item = i
                 if from_item is None and line['fromimid'] is not None and isinstance(i, PixmapGraphicsItem):
@@ -2515,7 +2503,6 @@ class ViewGraph(QDialog):
                 if from_item is None and line['fromavid'] is not None and isinstance(i, AVGraphicsItem):
                     if i.avid == line['fromavid']:
                         from_item = i
-            print("from_item:", from_item)
 
             for i in self.scene.items():
                 if to_item is None and line['tocaseid'] is not None and isinstance(i, CaseTextGraphicsItem):
@@ -2537,7 +2524,6 @@ class ViewGraph(QDialog):
                 if to_item is None and line['toavid'] is not None and isinstance(i, AVGraphicsItem):
                     if i.avid == line['toavid']:
                         to_item = i
-            print("load to_item", to_item)
 
             # Add line graphics item OR remove database entry
             if from_item is not None and to_item is not None:
@@ -2722,8 +2708,8 @@ class ViewGraph(QDialog):
                 cur.execute("delete from gr_pix_item where grid = ?", [s['grid']])
                 cur.execute("delete from gr_av_item where grid = ?", [s['grid']])
             self.app.conn.commit()
-        except Exception as e_:
-            print(e_)
+        except Exception as err:
+            print(err)
             self.app.conn.rollback()  # revert all changes
             raise
         self.app.delete_backup = False
@@ -3695,8 +3681,7 @@ class AVGraphicsItem(QtWidgets.QGraphicsPixmapItem):
         super(AVGraphicsItem, self).__init__(None)
         self.app = app
         self.avid = avid
-        # TODO cid
-        self.code_or_cat = {'cid': None, 'catid': None}  # Catch for LinkGraphicsItem in save_graph
+        self.code_or_cat = {'cid': None, 'catid': None}
         self.text = f"AVID:{self.avid}"
         self.pos0 = pos0
         self.pos1 = pos1
@@ -3715,7 +3700,8 @@ class AVGraphicsItem(QtWidgets.QGraphicsPixmapItem):
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsSelectable)
 
     def __repr__(self):
-        txt = f"AVGraphicsItem avid:{self.avid} Path:{self.abs_path_}"
+        txt = f"AVGraphicsItem avid:{self.avid} Path:{self.abs_path_} color:{self.color} code_cat:{self.code_or_cat}"
+        txt += f"\ntext: {self.text}"
         return txt
 
     def contextMenuEvent(self, event):
@@ -3821,9 +3807,8 @@ class PixmapGraphicsItem(QtWidgets.QGraphicsPixmapItem):
         super(PixmapGraphicsItem, self).__init__(None)
         self.app = app
         self.imid = imid
-        # TODO update cid
-        self.code_or_cat = {'cid': None, 'catid': None}  # Catch for LinkGraphicsItem in save_graph
-        self.text = "IMID:" + str(self.imid)
+        self.code_or_cat = {'cid': None, 'catid': None}
+        self.text = f"IMID: {self.imid}"
         self.px = px
         self.py = py
         self.pwidth = pwidth
@@ -3877,6 +3862,8 @@ class PixmapGraphicsItem(QtWidgets.QGraphicsPixmapItem):
 
     def __repr__(self):
         txt = f"PixmapGraphicsItem imid:{self.imid} grpxid:{self.grpixid} Path:{self.path_}"
+        txt += f"\npx:{self.px} py:{self.py} w:{self.pwidth} h:{self.pheight}"
+        txt += f"\nTexT:{self.text}"
         return txt
 
     def contextMenuEvent(self, event):
@@ -3996,8 +3983,6 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
                 self.setToolTip(_("Category"))
 
     def paint(self, painter, option, widget):
-        """  """
-
         painter.save()
         color = QtGui.QColor(self.code_or_cat['color'])
         painter.setBrush(QtGui.QBrush(color, style=QtCore.Qt.BrushStyle.SolidPattern))
@@ -4102,10 +4087,10 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
             self.scene().update()
 
     def add_coded_segments(self):
+        """ Window to import coded segments from text, image, and A/V associated with this code.
+        Generates automatic dotted links using the FreeLineGraphicsItem.
         """
-        Unified window to import coded segments from text, image, and A/V
-        associated with this code. Generates automatic dotted connections.
-        """
+
         cur = self.app.conn.cursor()
         cid = self.code_or_cat['cid']
         code_name = self.code_or_cat['name']
@@ -4206,39 +4191,37 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
             if s['memo']:
                 msg += f"\nMemo: {s['memo']}"
             item.setToolTip(msg)
+            item.code_or_cat['cid'] = cid
             self.scene().addItem(item)
-            line_item = LinkGraphicsItem(self, item, line_width=2, line_type="dotted",
-                                         color="gray", isvisible=True)
+            line_item = FreeLineGraphicsItem(self, item,line_width=2, line_type="dotted",color="gray")
             self.scene().addItem(line_item)
 
         # Import selected IMAGE segments
         for s in ui.selected_image:
             y += 40
-            item = PixmapGraphicsItem(self.app, s['imid'], x, y,
-                                      s['x'], s['y'], s['width'], s['height'],
+            item = PixmapGraphicsItem(self.app, s['imid'], x, y, s['x'], s['y'], s['width'], s['height'],
                                       s['path'], None, s['pdf_page'])
             msg = f"IMID:{s['imid']} File: {s['filename']}\nCode: {s['codename']}"
             if s['memo']:
                 msg += f"\nMemo: {s['memo']}"
             item.setToolTip(msg)
+            item.code_or_cat['cid'] = cid
             self.scene().addItem(item)
-            line_item = LinkGraphicsItem(self, item, line_width=2, line_type="dotted",
-                                         color="gray", isvisible=True)
+            line_item = FreeLineGraphicsItem(self, item,line_width=2, line_type="dotted",color="gray")
             self.scene().addItem(line_item)
 
         # Import selected A/V segments
         for s in ui.selected_av:
             y += 40
-            item = AVGraphicsItem(self.app, s['avid'], x, y,
-                                  s['pos0'], s['pos1'], s['path'])
+            item = AVGraphicsItem(self.app, s['avid'], x, y, s['pos0'], s['pos1'], s['path'])
             msg = f"AVID:{s['avid']} File: {s['filename']}\nCode: {s['codename']}"
             msg += f"\n{s['pos0']} - {s['pos1']} msecs"
             if s['memo']:
                 msg += f"\nMemo: {s['memo']}"
             item.setToolTip(msg)
+            item.code_or_cat['cid'] = cid
             self.scene().addItem(item)
-            line_item = LinkGraphicsItem(self, item, line_width=2, line_type="dotted",
-                                         color="gray", isvisible=True)
+            line_item = FreeLineGraphicsItem(self, item,line_width=2, line_type="dotted",color="gray")
             self.scene().addItem(line_item)
 
     def add_cooccurring_codes(self):
@@ -4257,36 +4240,29 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         """
         cur.execute(sql, [self.code_or_cat['cid']])
         res = cur.fetchall()
-
         if not res:
-            Message(self.app, "Sin co-ocurrencias", "No hay códigos que se sobrepongan con este en los textos.").exec()
+            Message(self.app, _("No co-ocurrences"), "No overlapping codes this code in the text.").exec()
             return
 
         cooc_list = [
             {'cid': r[0], 'name': f"{r[1]} (Co-occ freq: {r[3]})", 'raw_name': r[1], 'color': r[2], 'count': r[3]} for r
             in res]
-
         ui = DialogSelectItems(self.app, cooc_list, "Select codes", "multi")
         if not ui.exec():
             return
-
         selected = ui.get_selected()
-
         import math
         radius = 250
         angle_step = (2 * math.pi) / max(1, len(selected))
-
         for i, s in enumerate(selected):
             # CORRECCIÓN: Uso estricto de str()
             target_node = next((item for item in self.scene().items() if
                                 type(item).__name__ == "TextGraphicsItem" and str(item.code_or_cat.get('cid')) == str(
                                     s['cid'])), None)
-
             if not target_node:
                 angle = i * angle_step
                 cx = self.pos().x() + radius * math.cos(angle)
                 cy = self.pos().y() + radius * math.sin(angle)
-
                 code_data = {'name': s['raw_name'], 'supercatid': None, 'catid': None, 'cid': s['cid'],
                              'x': cx, 'y': cy, 'color': s['color'], 'memo': "", 'child_names': []}
                 target_node = TextGraphicsItem(self.app, code_data)
@@ -4296,7 +4272,6 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
                               ((link.from_widget == self and link.to_widget == target_node) or
                                (link.from_widget == target_node and link.to_widget == self))
                               for link in self.scene().items())
-
             if not line_exists:
                 line_item = LinkGraphicsItem(self, target_node, line_width=2, line_type="dotted", color="blue",
                                              isvisible=True)
