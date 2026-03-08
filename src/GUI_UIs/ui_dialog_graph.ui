@@ -82,7 +82,7 @@
      <widget class="QPushButton" name="pushButton_savegraph">
       <property name="geometry">
        <rect>
-        <x>440</x>
+        <x>490</x>
         <y>3</y>
         <width>28</width>
         <height>28</height>
@@ -98,7 +98,7 @@
      <widget class="QPushButton" name="pushButton_loadgraph">
       <property name="geometry">
        <rect>
-        <x>472</x>
+        <x>522</x>
         <y>3</y>
         <width>28</width>
         <height>28</height>
@@ -115,7 +115,7 @@ Right-click for options</string>
      <widget class="QPushButton" name="pushButton_deletegraph">
       <property name="geometry">
        <rect>
-        <x>502</x>
+        <x>552</x>
         <y>3</y>
         <width>28</width>
         <height>28</height>
@@ -211,7 +211,7 @@ Right-click for options</string>
      <widget class="QPushButton" name="pushButton_clear">
       <property name="geometry">
        <rect>
-        <x>410</x>
+        <x>460</x>
         <y>3</y>
         <width>28</width>
         <height>28</height>
@@ -227,7 +227,7 @@ Right-click for options</string>
      <widget class="QLabel" name="label_loaded_graph">
       <property name="geometry">
        <rect>
-        <x>540</x>
+        <x>590</x>
         <y>2</y>
         <width>461</width>
         <height>40</height>
@@ -317,18 +317,37 @@ Right-click for options</string>
        <string/>
       </property>
      </widget>
+     <widget class="QPushButton" name="pushButton_export_drawio">
+      <property name="geometry">
+       <rect>
+        <x>410</x>
+        <y>3</y>
+        <width>28</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Export to Draw.io</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="icon">
+       <iconset theme="QIcon::ThemeIcon::WeatherClear"/>
+      </property>
+     </widget>
     </widget>
    </item>
    <item row="1" column="0">
     <widget class="QGraphicsView" name="graphicsView">
      <property name="layoutDirection">
-      <enum>Qt::RightToLeft</enum>
+      <enum>Qt::LayoutDirection::RightToLeft</enum>
      </property>
      <property name="verticalScrollBarPolicy">
-      <enum>Qt::ScrollBarAlwaysOn</enum>
+      <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOn</enum>
      </property>
      <property name="horizontalScrollBarPolicy">
-      <enum>Qt::ScrollBarAlwaysOn</enum>
+      <enum>Qt::ScrollBarPolicy::ScrollBarAlwaysOn</enum>
      </property>
     </widget>
    </item>
