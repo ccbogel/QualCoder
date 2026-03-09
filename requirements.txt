@@ -3,6 +3,7 @@
 charset-normalizer
 diff-match-patch
 EbookLib
+emoji
 matplotlib
 networkx
 openpyxl
