@@ -26,6 +26,7 @@ from copy import copy, deepcopy
 import datetime
 # import difflib  # Slow, kept this in case need to revert to it. Now using diff_match_patch
 import diff_match_patch
+import emoji
 import html
 import logging
 from operator import itemgetter
@@ -4036,7 +4037,7 @@ class DialogCodeText(QtWidgets.QWidget):
         if len(files) == 0:
             return
 
-        msg = _("Code text using start and end marks: ")  # + self.file_['name']
+        msg = _("Code text using start and end marks: ")
         msg += _("\nUsing ") + start_mark + _(" and ") + end_mark + "\n"
         cur = self.app.conn.cursor()
         cid = int(item.text(1)[4:])
@@ -4049,6 +4050,7 @@ class DialogCodeText(QtWidgets.QWidget):
         for f in files:
             text_starts = [match.start() for match in re.finditer(re.escape(start_mark), f['fulltext'])]
             text_ends = [match.start() for match in re.finditer(re.escape(end_mark), f['fulltext'])]
+            emojis = emoji.emoji_list(f['fulltext'])
             try:
                 for start_pos in text_starts:
                     # pos1 = -1  # Default if not found. Not Used
@@ -4060,15 +4062,24 @@ class DialogCodeText(QtWidgets.QWidget):
                         text_end_iterator = -1
                     if text_end_iterator >= 0:
                         pos1 = text_ends[text_end_iterator]
+
                         # Check if already coded in this file for this coder
                         sql = "select cid from code_text where cid=? and fid=? and pos0=? and pos1=? and owner=?"
                         cur.execute(sql, [cid, f['id'], start_pos, pos1, self.app.settings['codername']])
                         res = cur.fetchone()
                         if res is None:
                             seltext = f['fulltext'][start_pos: pos1]
+
+                            # Check and add emoji character length, after seltext is selected
+                            for emo in emojis:
+                                if emo['match_end'] < start_pos:
+                                    # Emojis can be 2 or more characters in length
+                                    start_pos += emo['match_end'] - emo['match_start']
+                                    pos1 += emo['match_end'] - emo['match_start']
+                                if start_pos <= emo['match_end'] <= pos1:
+                                    pos1 += emo['match_end'] - emo['match_start']
+
                             sql = "insert into code_text (cid, fid, seltext, pos0, pos1, owner, date, memo) values(?,?,?,?,?,?,?,?)"
-                            '''cur.execute(sql, (cid, self.file_['id'], seltext, start_pos, pos1,
-                                              self.app.settings['codername'], now_date, ""))'''
                             cur.execute(sql, (cid, f['id'], seltext, start_pos, pos1,
                                               self.app.settings['codername'], now_date, ""))
                             # Add to undo auto-coding history
@@ -4195,7 +4206,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 regex_pattern = re.compile(find_text)
             except re.error as e_:
                 logger.warning('re error Bad escape ' + str(e_))
-                Message(self.app, _("Regex compliation error"), str(e_))
+                Message(self.app, _("Regex compilation error"), str(e_))
             if regex_pattern is None:
                 return
 
@@ -4213,6 +4224,8 @@ class DialogCodeText(QtWidgets.QWidget):
                     if not surround_codes:
                         return
 
+                emojis = emoji.emoji_list(f['fulltext'])
+
                 for sentence in sentences:
                     if (find_text in sentence and not regex_pattern) or (
                             regex_pattern and regex_pattern.search(sentence)):
@@ -4220,6 +4233,16 @@ class DialogCodeText(QtWidgets.QWidget):
                              'pos0': pos0, 'pos1': pos0 + len(sentence),
                              'owner': self.app.settings['codername'], 'memo': "",
                              'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")}
+
+                        # Check and add emoji character length
+                        for emo in emojis:
+                            if emo['match_end'] < i['pos0']:
+                                # Emojis can be 2 or more characters in length
+                                i['pos0'] += emo['match_end'] - emo['match_start']
+                                i['pos1'] += emo['match_end'] - emo['match_start']
+                            if i['pos0'] <= emo['match_end'] <= i['pos1']:
+                                i['pos1'] += emo['match_end'] - emo['match_start']
+
                         # For code within a code, if selected
                         found_code_in_code = False
                         if self.autocode_frag_all_first_within.startswith("code_within_code"):
@@ -4291,7 +4314,10 @@ class DialogCodeText(QtWidgets.QWidget):
         dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         dialog.setInputMode(QtWidgets.QInputDialog.InputMode.TextInput)
         dialog.setToolTip(_("Use | to code multiple texts"))
-        dialog.setLabelText(_("Auto code files with the current code for this text:") + "\n" + code_item.text(0))
+        if self.ui.checkBox_auto_regex.isChecked():
+            dialog.setLabelText(_("Auto code files with the current code using Regex:") + "\n" + code_item.text(0))
+        else:
+            dialog.setLabelText(_("Auto code files with the current code for this text:") + "\n" + code_item.text(0))
         dialog.resize(200, 20)
         ok = dialog.exec()
         if not ok:
@@ -4349,6 +4375,7 @@ class DialogCodeText(QtWidgets.QWidget):
                         logger.error(f"File not found,  file id: {f['id']}")
                         continue
                     file_text = current_file[2]
+                    emojis = emoji.emoji_list(file_text)
                     text_starts = []
                     text_ends = []
                     if regex_pattern:
@@ -4396,8 +4423,17 @@ class DialogCodeText(QtWidgets.QWidget):
                             res = cur.fetchone()
                             if res:
                                 seltext = res[0]
+
+                        pos0 = text_starts[index]
+                        pos1 = text_ends[index]
+                        # Have the seltext, now adjust pos0, pos1 for emoji length, by adding to the character positions
+                        for emo in emojis:
+                            if emo['match_end'] < pos0:
+                                # Emojis can be 2 or more characters in length
+                                pos0 += emo['match_end'] - emo['match_start']
+                                pos1 += emo['match_end'] - emo['match_start']
                         item = {'cid': cid, 'fid': int(f['id']), 'seltext': seltext,
-                                'pos0': text_starts[index], 'pos1': text_ends[index],
+                                'pos0': pos0, 'pos1': pos1,
                                 'owner': self.app.settings['codername'], 'memo': "",
                                 'date': datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")}
                         try:
@@ -4417,10 +4453,10 @@ class DialogCodeText(QtWidgets.QWidget):
                             logger.debug(_("Autocode insert error ") + str(err))
                         self.app.delete_backup = False
                 self.app.conn.commit()
-        except Exception as e_:
-            print(e_)
+        except Exception as err:
+            print(err)
             self.app.conn.rollback()  # Revert all changes
-            logger.error(f"auto_code rollback. {e_}")
+            logger.error(f"auto_code rollback. {err}")
             self.parent_textEdit.append(_("Autocoding error: ") + str(e_))
             # undo_list = []
             raise
