@@ -23,6 +23,7 @@ https://qualcoder-org.github.io/
 import datetime
 import ebooklib
 from ebooklib import epub
+import emoji
 import fitz
 import json
 import openpyxl
@@ -1230,7 +1231,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         cur = self.app.conn.cursor()
         cur.execute("select name, fulltext, mediapath from source where id=?", [id_])
         res = cur.fetchone()
-        metadata = res[0] + "\n"
+        metadata = f"{res[0]}\n"
         icon = QtGui.QIcon(qta.icon('mdi6.text-box-outline', options=[{'scale_factor': 1.2}]))
 
         # Check if text file is a transcription and add details
@@ -1240,16 +1241,22 @@ class DialogManageFiles(QtWidgets.QDialog):
             metadata += _("Transcript for: ") + f"{transcript_res[0]}\n"
             icon = QtGui.QIcon(qta.icon('mdi6.text', options=[{'scale_factor': 1.2}]))
         if res[1] is not None and len(res[1]) > 0 and res[2] is None:
-            metadata += _("Characters: ") + str(len(res[1]))
+            metadata += _("Characters: ") + f"{len(res[1]):,}"
+            emojis = emoji.emoji_list(res[1])
+            if emojis: metadata += "\n" + _("Emojis: ") + f"{len(emojis)}"
             return icon, metadata, ""
         if res[2] is None:
             logger.debug("empty media path error")
             return icon, metadata, ""
         if res[1] is not None and len(res[1]) > 5 and res[2][:6] == "/docs/":
-            metadata += _("Characters: ") + str(len(res[1]))
+            metadata += _("Characters: ") + f"{len(res[1]):,}"
+            emojis = emoji.emoji_list(res[1])
+            if emojis: metadata += "\n" + _("Emojis: ") + f"{len(emojis)}"
             return icon, metadata, ""
         if res[1] is not None and len(res[1]) > 5 and res[2][:5] == "docs:":
-            metadata += _("Characters: ") + str(len(res[1]))
+            metadata += _("Characters: ") + f"{len(res[1]):,}"
+            emojis = emoji.emoji_list(res[1])
+            if emojis: metadata += "\n" + _("Emojis: ") + f"{len(emojis)}"
             icon = QtGui.QIcon(qta.icon('mdi6.text-box-check-outline', options=[{'scale_factor': 1.2}]))
             return icon, metadata, ""
 
@@ -1274,7 +1281,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             except PIL.Image.DecompressionBombError:
                 metadata += _("Image too large for PIL module. (DecompressionBombError): ") + abs_path
                 return icon, metadata, "DecompressionError"
-            metadata += f"W: {w} x H: {h}"
+            metadata += f"W: {w:,} x H: {h:,}"
         if res[2][:7] == "images:":
             icon = QtGui.QIcon(qta.icon('mdi6.image-check-outline', options=[{'scale_factor': 1.2}]))
             try:
@@ -1286,7 +1293,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             except PIL.Image.DecompressionBombError:
                 metadata += _("Image too large for PIL module. (DecompressionBombError): ") + abs_path
                 return icon, metadata, "DecompressionBombError"
-            metadata += f"W: {w} x H: {h}"
+            metadata += f"W: {w:,} x H: {h:,}"
         if res[2][:7] == "/video/":
             icon = QtGui.QIcon(qta.icon('mdi6.video-outline', options=[{'scale_factor': 1.2}]))
         if res[2][:6] == "video:":
