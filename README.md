@@ -115,6 +115,8 @@ Note: We are currently not able to sign the app bundles, so you will get a warni
 - Go to Settings -> Privacy and Security -> Scroll down until you see a message stating QualCoder was prevented from starting. Click on "open anyway".
 - From now on, QualCoder should start without issues.
 
+- Sometimes VLC might not be detected. One solution to try is to install VLC via Homebrew.
+
 If these app bundles do not work for you and you want to **run QualCoder from source,** follow these steps: 
 
 **Alternatively, install from source:**
