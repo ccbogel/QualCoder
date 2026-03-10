@@ -70,7 +70,7 @@ class ViewCharts(QDialog):
         self.attribute_file_ids = []
         self.attributes_msg = ""
         self.stopwords_filepath = None
-        self.last_wordcloud_dir = os.path.expanduser("~") # Recordar la última ubicación de guardado. Remember the last save location for WordCloud
+        self.last_wordcloud_dir = self.app.settings['directory']  # Remember the last save location for WordCloud
         # Set up the user interface from Designer.
         self.ui = Ui_DialogCharts()
         self.ui.setupUi(self)
@@ -194,6 +194,12 @@ class ViewCharts(QDialog):
         heatmap_combobox_list = ["", "File", "Case"]
         self.ui.comboBox_heatmap.addItems(heatmap_combobox_list)
         self.ui.comboBox_heatmap.currentIndexChanged.connect(self.make_heatmap)
+        # Word cloud default stopwords based on default language
+        index = self.ui.comboBox_stopwords.findText(self.app.settings['language'],
+                                                   QtCore.Qt.MatchFlag.MatchEndsWith)
+        if index == -1:
+            index = 0
+        self.ui.comboBox_stopwords.setCurrentIndex(index)
 
     def get_selected_stopwords_path(self):
         """ Determina de forma segura qué archivo de exclusión enviar a la Nube de Palabras.
@@ -488,19 +494,14 @@ class ViewCharts(QDialog):
         reverse_colors = self.ui.checkBox_reverse_range.isChecked()
         ngrams = int(self.ui.comboBox_ngrams.currentText())
         stopwords_path = self.get_selected_stopwords_path()
-        # Seleccionar carpeta donde se guardara la Nube de palabras generada. Select the folder where the generated Word Cloud will be saved
         export_dir = QtWidgets.QFileDialog.getExistingDirectory(
-            None,
-            _('Select directory to save Wordcloud'),
+            None, _('Select folder to save Wordcloud'),
             self.last_wordcloud_dir,
             options=QtWidgets.QFileDialog.Option.ShowDirsOnly
         )
-
         if not export_dir:
             return
-            
         self.last_wordcloud_dir = export_dir
-
         base_name = "QualCoder_Wordcloud"
         extension = ".png"
         filepath = os.path.join(export_dir, base_name + extension)
