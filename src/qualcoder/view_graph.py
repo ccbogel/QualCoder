@@ -83,7 +83,7 @@ class DialogSelectCodedSegments(QDialog):
 
         layout = QtWidgets.QVBoxLayout(self)
 
-        # --- Sección TEXTO 
+        # --- Sección TEXTO. TEXT section
         label_text = QtWidgets.QLabel(f"Text segments ({len(text_codings)})")
         label_text.setStyleSheet("font-weight: bold; margin-top: 4px;")
         layout.addWidget(label_text)
@@ -99,10 +99,10 @@ class DialogSelectCodedSegments(QDialog):
             self.list_text.addItem(item)
         layout.addWidget(self.list_text, stretch=3)
 
-        # --- Sección horizontal inferior: IMAGEN y A/V lado a lado
+        # --- Sección horizontal inferior: IMAGEN y A/V lado a lado. Bottom horizontal section: IMAGE and A/V side by side
         h_layout = QtWidgets.QHBoxLayout()
 
-        # --- Sub-sección IMAGEN
+        # --- Sub-sección IMAGEN. IMAGE sub-section
         v_img = QtWidgets.QVBoxLayout()
         label_img = QtWidgets.QLabel(f"Image segments ({len(image_codings)})")
         label_img.setStyleSheet("font-weight: bold; margin-top: 4px;")
@@ -118,7 +118,7 @@ class DialogSelectCodedSegments(QDialog):
         v_img.addWidget(self.list_image)
         h_layout.addLayout(v_img)
 
-        # --- Sub-sección A/V
+        # --- Sub-sección A/V. A/V sub-section
         v_av = QtWidgets.QVBoxLayout()
         label_av = QtWidgets.QLabel(f"A/V segments ({len(av_codings)})")
         label_av.setStyleSheet("font-weight: bold; margin-top: 4px;")
@@ -135,7 +135,7 @@ class DialogSelectCodedSegments(QDialog):
 
         layout.addLayout(h_layout, stretch=2)
 
-        # --- Botones Select All / Import / Cancel ---
+        # --- Botones Select All / Import / Cancel ---. Select All / Import / Cancel buttons
         btn_layout = QtWidgets.QHBoxLayout()
 
         self.btn_select_all = QtWidgets.QPushButton("Select All")
@@ -210,7 +210,6 @@ class ViewGraph(QDialog):
         self.ui.pushButton_export_pdf.pressed.connect(self.export_pdf_graph)
         self.ui.pushButton_export.setIcon(qta.icon('mdi6.image-move', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_export.pressed.connect(self.export_image)
-        #if hasattr(self.ui, 'pushButton_export_drawio'):
         self.ui.pushButton_export_drawio.setIcon(qta.icon('mdi6.sitemap', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_export_drawio.pressed.connect(self.export_drawio)
         self.ui.label_zoom.setPixmap(qta.icon('mdi6.magnify').pixmap(22, 22))
@@ -532,7 +531,7 @@ class ViewGraph(QDialog):
         for s in selected:
             s['item'].show()
 
-        # Refrescar automáticamente para reconectar líneas de nodos ahora visibles
+        # Refrescar automáticamente para reconectar líneas de nodos ahora visibles. Automatically refresh to reconnect lines of now-visible nodes.
         self.refresh_lines_visibility()
 
     def keyPressEvent(self, event):
@@ -773,7 +772,7 @@ class ViewGraph(QDialog):
             cx = x + (idx * 350)
             cy = y
 
-            # CORRECCIÓN: str() para evitar error de int vs string y prevenir duplicados del Nodo Principal
+            # CORRECCIÓN: str() para evitar error de int vs string y prevenir duplicados del Nodo Principal. CORRECTION: Use str() to avoid int vs string errors and prevent duplicates of the Main Node.
             main_node = next((item for item in self.scene.items() if
                               type(item).__name__ == "TextGraphicsItem" and str(item.code_or_cat.get('cid')) == str(
                                   sc['cid'])), None)
@@ -805,7 +804,7 @@ class ViewGraph(QDialog):
                 for i, r in enumerate(res):
                     cooc_cid, cooc_name, cooc_color, overlap_count = r
 
-                    # str() para evitar duplicados en los Nodos Destino
+                    # str() para evitar duplicados en los Nodos Destino. Use str() to avoid duplicates in the Destination Nodes.
                     target_node = next((item for item in self.scene.items() if
                                         type(item).__name__ == "TextGraphicsItem" and str(
                                             item.code_or_cat.get('cid')) == str(cooc_cid)), None)
@@ -815,11 +814,11 @@ class ViewGraph(QDialog):
                         ny = cy + radius * math.sin(i * angle_step)
                         cooc_data = {'name': cooc_name, 'supercatid': None, 'catid': None, 'cid': cooc_cid,
                                      'x': nx, 'y': ny, 'color': cooc_color, 'memo': "", 'child_names': []}
-                        # Cambiamos 'code_data' por 'cooc_data'             
+                        # Cambiamos 'code_data' por 'cooc_data'. Replace 'code_data' with 'cooc_data'             
                         target_node = TextGraphicsItem(self.app, cooc_data)
                         self.scene.addItem(target_node)
 
-                    # Verificar que la LÍNEA no exista ya en ninguna de las dos direcciones
+                    # Verificar que la LÍNEA no exista ya en ninguna de las dos direcciones. Check that the LINE does not already exist in either direction
                     line_exists = any(type(link).__name__ == "LinkGraphicsItem" and
                                       ((link.from_widget == main_node and link.to_widget == target_node) or
                                        (link.from_widget == target_node and link.to_widget == main_node))
@@ -861,7 +860,7 @@ class ViewGraph(QDialog):
              Subtree width calculated recursively to avoid overlaps.
         """
 
-        # 0. Recolectar nodos y enlaces visibles
+        # 0. Recolectar nodos y enlaces visibles. Collect visible nodes and links.
         nodes = []
         links = []
         for item in self.scene.items():
@@ -877,7 +876,7 @@ class ViewGraph(QDialog):
         if not nodes:
             return
 
-        # 1. Grafo no dirigido
+        # 1. Grafo no dirigido. Undirected graph
         adjacency = {n: set() for n in nodes}
         for link in links:
             if hasattr(link, 'from_widget') and hasattr(link, 'to_widget'):
@@ -886,7 +885,7 @@ class ViewGraph(QDialog):
                     adjacency[u].add(v)
                     adjacency[v].add(u)
 
-        # 2. Componentes conectados
+        # 2. Componentes conectados. Connected components
         visited_global = set()
         components = []
         for n in nodes:
@@ -903,11 +902,11 @@ class ViewGraph(QDialog):
                             queue.append(nb)
                 components.append(comp)
 
-        # 3. Selección inteligente de raíz por componente
+        # 3. Selección inteligente de raíz por componente. Smart root selection by component
         #    Prioridad: categoría sin supercatid > más conexiones > primero en lista
         #   Priority: category without supercatid > more connections > first in list
         def pick_root(comp_nodes):
-            # Buscar categorías raíz reales (supercatid == None y cid == None)
+            # Buscar categorías raíz reales (supercatid == None y cid == None). Find the actual root categories (supercatid == None and cid == None).
             top_cats = [
                 n for n in comp_nodes
                 if isinstance(n, TextGraphicsItem)
@@ -947,7 +946,7 @@ class ViewGraph(QDialog):
                         tree_children[curr].append(nb)
                         queue.append(nb)
 
-        # 5. Calcular dimensiones reales de cada nodo
+        # 5. Calcular dimensiones reales de cada nodo. Calculate the actual dimensions of each node
         H_PAD = 30  # Espacio horizontal mínimo entre nodos hermanos. Minimum horizontal spacing between sibling nodes
         V_PAD = 40  # Espacio vertical extra sobre la altura máxima del nivel. Extra space above the maximum level height
         COMP_GAP = 80  # Espacio horizontal entre componentes desconectados. Horizontal space between disconnected components
@@ -983,7 +982,7 @@ class ViewGraph(QDialog):
             level_y[d] = cumulative_y
             cumulative_y += level_max_height.get(d, 30) + V_PAD
 
-        # 7. Calcular ancho de subárbol (recursivo, bottom-up)
+        # 7. Calcular ancho de subárbol (recursivo, bottom-up). Calculate subtree width (recursive, bottom-up).
         subtree_width = {}
 
         def compute_subtree_width(node):
@@ -1003,7 +1002,7 @@ class ViewGraph(QDialog):
         for r in roots:
             compute_subtree_width(r)
 
-        # 8. Posicionar nodos
+        # 8. Posicionar nodos. Position nodes
         def set_pos(n, x, y):
             if hasattr(n, 'code_or_cat') and n.code_or_cat is not None:
                 n.code_or_cat['x'] = x
@@ -1024,10 +1023,10 @@ class ViewGraph(QDialog):
             y = level_y[depth]
 
             if not children:
-                # Hoja: centrar el nodo dentro de su espacio asignado
+                # Hoja: centrar el nodo dentro de su espacio asignado. Leaf: center the node within its assigned space.
                 node_x = left_x + (my_width - node_width(node)) / 2
                 set_pos(node, node_x, y)
-                return left_x + my_width / 2  # Devolver el centro
+                return left_x + my_width / 2  # Devolver el centro. Return the center
 
             # Distribuir hijos dentro del espacio del subárbol. Put children within subtree space
             children_total_width = (
@@ -1057,7 +1056,7 @@ class ViewGraph(QDialog):
             layout_subtree(root, current_left, 0)
             current_left += subtree_width[root] + COMP_GAP
 
-        # 9. Redibujar conexiones
+        # 9. Redibujar conexiones. Redraw connections
         for link in links:
             if hasattr(link, 'redraw'):
                 link.redraw()
@@ -1080,7 +1079,7 @@ class ViewGraph(QDialog):
 
         if not nodes: return
 
-        # 1. Grafo no dirigido
+        # 1. Grafo no dirigido. Undirected graph
         adjacency = {n: set() for n in nodes}
         for link in links:
             if hasattr(link, 'from_widget') and hasattr(link, 'to_widget'):
@@ -1106,7 +1105,7 @@ class ViewGraph(QDialog):
                             queue.append(neighbor)
                 components.append(comp_nodes)
 
-        # 3. Construir árbol BFS
+        # 3. Construir árbol BFS. Build BFS tree
         tree_children = {n: [] for n in nodes}
         roots = []
         for comp in components:
@@ -1187,7 +1186,7 @@ class ViewGraph(QDialog):
                 n.code_or_cat['x'], n.code_or_cat['y'] = nx, ny
             n.setPos(nx, ny)
 
-        # 1. Construir grafo no dirigido para encontrar el centro real sin importar dirección de flechas
+        # 1. Construir grafo no dirigido para encontrar el centro real sin importar dirección de flechas. Build an undirected graph to find the true center regardless of arrow direction
         adjacency = {n: set() for n in nodes}
         for link in links:
             if hasattr(link, 'from_widget') and hasattr(link, 'to_widget'):
@@ -1224,7 +1223,7 @@ class ViewGraph(QDialog):
             return count
 
         calc_leaves(main_root)
-        radius_step = 280  # Distancia entre anillos ampliada para que se vea limpio
+        radius_step = 280  # Distancia entre anillos ampliada para que se vea limpio. Distance between rings increased for a cleaner appearance
 
         # 5. Dibujar la estrella principal. Draw the main star
         drawn_nodes = set()
@@ -1273,7 +1272,7 @@ class ViewGraph(QDialog):
                 y = center_y + outer_radius * math.sin(angle)
                 set_pos(node, x, y)
 
-        # 7. Redibujar las líneas y refrescar vista
+        # 7. Redibujar las líneas y refrescar vista. Redraw the lines and refresh the view
         for link in links:
             if hasattr(link, 'redraw'): link.redraw()
         self.scene.suggested_scene_size()
@@ -1423,13 +1422,12 @@ class ViewGraph(QDialog):
             y: Integer
         """
 
-        # --- Select files
+        # Select files
         files_wth_names = self.app.get_text_filenames()
         if not files_wth_names:
             Message(self.app, _("No files"), _("No text files in this project.")).exec()
             return
         ui = DialogSelectItems(self.app, files_wth_names, _("Step 1/3: Select text files"), "multi")
-        # ---
         ok = ui.exec()
         if not ok:
             return
@@ -1820,17 +1818,17 @@ class ViewGraph(QDialog):
         if filepath is None:
             return
 
-        # REPARACIÓN: Obtener el rectángulo real que envuelve a TODOS los elementos (incluso coordenadas negativas)
+        # REPARACIÓN: Obtener el rectángulo real que envuelve a TODOS los elementos (incluso coordenadas negativas). FIX: Get the actual rectangle that encloses ALL elements (including negative coordinates).
         rect = self.scene.itemsBoundingRect()
-        rect.adjust(-30, -30, 30, 30)  # Añadir un margen seguro de 30px alrededor de la imagen
+        rect.adjust(-30, -30, 30, 30)  # Añadir un margen seguro de 30px alrededor de la imagen. Add a safe margin of 30px around the image
 
-        # Crear la imagen con el tamaño exacto del rectángulo detectado
+        # Crear la imagen con el tamaño exacto del rectángulo detectado. Create the image with the exact size of the detected rectangle
         image = QtGui.QImage(int(rect.width()), int(rect.height()), QtGui.QImage.Format.Format_ARGB32_Premultiplied)
-        image.fill(QtCore.Qt.GlobalColor.transparent)  # Asegurar fondo transparente
+        image.fill(QtCore.Qt.GlobalColor.transparent)  # Asegurar fondo transparente. Ensure transparent background
         painter = QtGui.QPainter(image)
         painter.setRenderHint(QtGui.QPainter.RenderHint.Antialiasing)
 
-        # Renderizar especificando el área objetivo (la imagen) y el área de origen (el rectángulo exacto de la escena)
+        # Renderizar especificando el área objetivo (la imagen) y el área de origen (el rectángulo exacto de la escena). Render by specifying the target area (the image) and the source area (the exact rectangle of the scene).
         self.scene.render(painter, QtCore.QRectF(image.rect()), rect)
         painter.end()
 
@@ -1838,14 +1836,14 @@ class ViewGraph(QDialog):
         Message(self.app, _("Image exported"), filepath).exec()
 
     def export_drawio(self):
-        """ Escanea el lienzo actual y exporta un archivo editable nativo para Draw.io (.drawio) """
+        """ Scan the current canvas and export a native editable file for Draw.io (.drawio) """
         filename = "QualCoder_graph.drawio"
         e_dir = ExportDirectoryPathDialog(self.app, filename)
         filepath = e_dir.filepath
         if filepath is None:
             return
 
-        # 1. Cabecera estándar requerida por Draw.io
+        # 1. Standard header required by Draw.io
         xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
         xml += '<mxfile>\n  <diagram id="qualcoder_graph" name="QualCoder Graph">\n'
         xml += '    <mxGraphModel dx="1000" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">\n'
@@ -1854,43 +1852,60 @@ class ViewGraph(QDialog):
         item_ids = {}
         current_id = 2
 
-        # 2. Procesar Nodos (Categorías y Códigos)
+        # 2. Process Nodes (Categories, Codes, and Text/Image/AV Segments)
         for item in self.scene.items():
             if not item.isVisible(): continue
 
-            if type(item).__name__ in (
-            "TextGraphicsItem", "FreeTextGraphicsItem", "CaseTextGraphicsItem", "FileTextGraphicsItem"):
+            item_type = type(item).__name__
+            if item_type in ("TextGraphicsItem", "FreeTextGraphicsItem", "CaseTextGraphicsItem", "FileTextGraphicsItem", "PixmapGraphicsItem", "AVGraphicsItem"):
                 item_ids[item] = str(current_id)
-                x = item.pos().x()
-                y = item.pos().y()
-                w = item.boundingRect().width()
-                h = item.boundingRect().height()
+                x = round(item.pos().x(), 2)
+                y = round(item.pos().y(), 2)
+                w = round(item.boundingRect().width(), 2)
+                h = round(item.boundingRect().height(), 2)
 
                 label = ""
                 color = "#FFFFFF"
                 is_ellipse = getattr(item, 'is_ellipse', False)
 
+                # Extract color
                 if hasattr(item, 'code_or_cat') and item.code_or_cat is not None:
-                    label = item.code_or_cat.get('name', '')
                     color = item.code_or_cat.get('color', '#FFFFFF')
+
+                # Extract the exact visual text or descriptive information from the segment
+                if item_type in ("PixmapGraphicsItem", "AVGraphicsItem"):
+                    # Images and A/V store segment details (File, Code, Coordinates) in the ToolTip
+                    label = item.toolTip() if item.toolTip() else getattr(item, 'text', '')
+                elif hasattr(item, 'toPlainText'):
+                    label = item.toPlainText()
                 elif hasattr(item, 'text'):
                     label = item.text
 
-                # Limpiar caracteres conflictivos en XML
-                label = str(label).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"',
-                                                                                                           '&quot;').replace(
-                    "'", '&apos;')
+                # Clean conflicting characters in XML
+                label = str(label).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&apos;')
+                # Convert line breaks so Draw.io renders them correctly as blocks (html=1)
+                label = label.replace('\n', '&lt;br&gt;')
 
-                # Definir forma y estilo
-                shape = "ellipse" if is_ellipse else "rounded=1"
-                style = f"{shape};whiteSpace=wrap;html=1;fillColor={color};strokeColor=#333333;fontColor=#000000;"
+                # Define shape and style according to the element type
+                if item_type == "PixmapGraphicsItem":
+                    buffer = QtCore.QBuffer()
+                    buffer.open(QtCore.QIODevice.OpenModeFlag.WriteOnly)
+                    item.pixmap().toImage().save(buffer, "PNG")
+                    b64_data = buffer.data().toBase64().data().decode('ascii').replace('\n', '').replace('\r', '')
+                    
+                    style = f"shape=image;html=1;verticalLabelPosition=bottom;verticalAlign=top;imageAspect=0;aspect=fixed;image=data:image/png,{b64_data};"
+                elif item_type == "AVGraphicsItem":
+                    style = f"rounded=1;whiteSpace=wrap;html=1;fillColor=#E1BEE7;strokeColor=#333333;fontColor=#000000;"
+                else:
+                    shape = "ellipse" if is_ellipse else "rounded=1"
+                    style = f"{shape};whiteSpace=wrap;html=1;fillColor={color};strokeColor=#333333;fontColor=#000000;"
 
                 xml += f'        <mxCell id="{current_id}" value="{label}" style="{style}" vertex="1" parent="1">\n'
                 xml += f'          <mxGeometry x="{x}" y="{y}" width="{w}" height="{h}" as="geometry" />\n'
                 xml += '        </mxCell>\n'
                 current_id += 1
 
-        # 3. Procesar Conexiones (Líneas) asegurando que queden vinculadas dinámicamente a los nodos
+        # 3. Process Connections (Lines)
         for item in self.scene.items():
             if not item.isVisible(): continue
 
@@ -1902,16 +1917,13 @@ class ViewGraph(QDialog):
 
                 if source_id and target_id:
                     line_color = item.color if hasattr(item, 'color') else "gray"
-                    dashed = "1" if hasattr(item,
-                                            'line_type') and item.line_type != QtCore.Qt.PenStyle.SolidLine else "0"
+                    dashed = "1" if hasattr(item, 'line_type') and item.line_type != QtCore.Qt.PenStyle.SolidLine else "0"
                     width = item.line_width if hasattr(item, 'line_width') else 2
 
                     label = item.label if hasattr(item, 'label') else ""
-                    label = str(label).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"',
-                                                                                                               '&quot;').replace(
-                        "'", '&apos;')
+                    label = str(label).replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;').replace('"', '&quot;').replace("'", '&apos;')
 
-                    # Definir flecha dependiendo del tipo de conexión original
+                    # Define the arrow depending on the original connection type
                     arrow = "classic" if type(item).__name__ == "FreeLineGraphicsItem" else "none"
                     style = f"endArrow={arrow};html=1;strokeColor={line_color};strokeWidth={width};dashed={dashed};labelBackgroundColor=none;"
 
@@ -1920,17 +1932,18 @@ class ViewGraph(QDialog):
                     xml += '        </mxCell>\n'
                     current_id += 1
 
-        # 4. Cerrar XML y guardar
+        # 4. Close the XML and save
         xml += '      </root>\n    </mxGraphModel>\n  </diagram>\n</mxfile>'
 
         try:
             with open(filepath, 'w', encoding='utf-8') as f:
                 f.write(xml)
-            Message(self.app, "Export Successful", f"Graph successfully exported natively for Draw.io to:\n{filepath}",
-                    "information").exec()
+            Message(self.app, "Export successful", f"Graph exported natively for Draw.io at:\n{filepath}", "information").exec()
         except Exception as e:
+            import logging
+            logger = logging.getLogger(__name__)
             logger.error(f"Error exporting to Draw.io: {e}")
-            Message(self.app, _("Error"), f"No se pudo guardar el archivo:\n{e}", "warning").exec()
+            Message(self.app, _("Error"), f"The file could not be saved:\n{e}", "warning").exec()
 
     def export_pdf_graph(self):
         filename = "Graph.pdf"
@@ -2421,6 +2434,31 @@ class ViewGraph(QDialog):
         # Load lines
         self.load_cdct_line_graphics_items(grid)
         self.load_free_line_graphics_items(grid)
+        # Synchronize segment visibility and collapsed state after loading
+        for item in self.scene.items():
+            if type(item).__name__ == "TextGraphicsItem":
+                children_names = item.code_or_cat.get('child_names', [])
+                if children_names:
+                    children_items = [child for child in self.scene.items() 
+                                      if type(child).__name__ == "TextGraphicsItem" 
+                                      and child != item 
+                                      and child.code_or_cat['name'] in children_names]
+                    # If it has children in the scene and ALL are hidden, restore to the collapsed state
+                    if children_items and all(not child.isVisible() for child in children_items):
+                        item.is_collapsed = True
+
+            elif type(item).__name__ in ("FreeTextGraphicsItem", "PixmapGraphicsItem", "AVGraphicsItem"):
+                if hasattr(item, 'code_or_cat') and item.code_or_cat is not None:
+                    item_cid = item.code_or_cat.get('cid')
+                    if item_cid is not None:
+                        # Hide segment if its parent code node is hidden
+                        parent_node = next((node for node in self.scene.items() 
+                                            if type(node).__name__ == "TextGraphicsItem" 
+                                            and node.code_or_cat.get('cid') == item_cid), None)
+                        if parent_node and not parent_node.isVisible():
+                            item.hide()
+
+        self.refresh_lines_visibility()
         if err_msg != "":
             Message(self.app, _("Load graph errors"), err_msg).exec()
         label = _("Changing to another report will lose unsaved graph.") + "\n" + graph['name']
@@ -2754,13 +2792,13 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
 
         # Actualizar datos de posición para TODOS los elementos que se movieron. Update positionsfor ALL moved items
         for item in self.items():
-            # Solo procesamos la posición de los nodos reales (que son los que tienen 'code_or_cat')
+            # Solo procesamos la posición de los nodos reales (que son los que tienen 'code_or_cat'). We only process the position of the actual nodes (those with 'code_or_cat').
             if item.isSelected() and hasattr(item,
-                                             'code_or_cat'):  # Solo procesamos lo que está seleccionado para ganar velocidad
+                                             'code_or_cat'):  # Solo procesamos lo que está seleccionado para ganar velocidad. We only process what is selected to increase speed.
                 if item.code_or_cat is not None:
                     item.code_or_cat['x'] = item.pos().x()
                     item.code_or_cat['y'] = item.pos().y()
-            # Redibujar líneas conectadas
+            # Redibujar líneas conectadas. Redraw connected lines
             if isinstance(item, (LinkGraphicsItem, FreeLineGraphicsItem)):
                 item.redraw()
         self.update()
@@ -2891,13 +2929,13 @@ class CaseTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         edit_action = menu.addAction(_("Edit text"))
         bold_action = menu.addAction(_("Bold toggle"))
         menu.addSeparator()
-        # Sub-menú para el tamaño de fuente
+        # Sub-menú para el tamaño de fuente. Submenu for font size
         font_size_menu = menu.addMenu("Font size")
         font_size_actions = {}
         for size in [8, 10, 12, 14, 16, 18]:
             act = font_size_menu.addAction(str(size))
             font_size_actions[act] = size
-        # Sub-menú para el color de texto
+        # Sub-menú para el color de texto. Submenu for text color
         color_menu = menu.addMenu(_("Text color"))
         red_action = color_menu.addAction(_("Red"))
         green_action = color_menu.addAction(_("Green"))
@@ -3079,13 +3117,13 @@ class FileTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         edit_action = menu.addAction(_("Edit text"))
         bold_action = menu.addAction(_("Bold toggle"))
         menu.addSeparator()
-        # Sub-menú para el tamaño de fuente
+        # Sub-menú para el tamaño de fuente. Submenu for font size
         font_size_menu = menu.addMenu("Font size")
         font_size_actions = {}
         for size in [8, 10, 12, 14, 16, 18]:
             act = font_size_menu.addAction(str(size))
             font_size_actions[act] = size
-        # Sub-menú para el color de texto
+        # Sub-menú para el color de texto. Submenu for text color
         color_menu = menu.addMenu(_("Text color"))
         red_action = color_menu.addAction(_("Red"))
         green_action = color_menu.addAction(_("Green"))
@@ -3228,6 +3266,13 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
         self.memo_imid = memo_imid  # For graph item storage
         self.memo_avid = memo_avid  # For graph item storage
         self.code_or_cat = {'cid': None, 'catid': None}  # Catch for LinkGraphicsItem in save_graph
+        # Recuperar el cid si es un segmento guardado (necesario para el colapso de categorías). Retrieve the cid if it is a saved segment (required for category collapsing).
+        if self.ctid is not None and self.ctid != -1:
+            cur = self.app.conn.cursor()
+            cur.execute("select cid from code_text where ctid=?", [self.ctid])
+            res = cur.fetchone()
+            if res:
+                self.code_or_cat['cid'] = res[0]
         self.gfreeid = gfreeid
         self.setFlags(QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsMovable |
                       QtWidgets.QGraphicsItem.GraphicsItemFlag.ItemIsFocusable |
@@ -3315,13 +3360,13 @@ class FreeTextGraphicsItem(QtWidgets.QGraphicsTextItem):
             av_context_action = menu.addAction(_("Segment in context"))
         menu.addSeparator()
         bold_action = menu.addAction(_("Bold toggle"))
-        # Sub-menú para el tamaño de fuente
+        # Sub-menú para el tamaño de fuente. Submenu for font size
         font_size_menu = menu.addMenu("Font size")
         font_size_actions = {}
         for size in [8, 10, 12, 14, 16, 18, 20]:
             act = font_size_menu.addAction(str(size))
             font_size_actions[act] = size
-        # Sub-menú para el color de texto
+        # Sub-menú para el color de texto. Submenu for text color.
         color_menu = menu.addMenu(_("Text color"))
         red_action = color_menu.addAction(_("Red"))
         green_action = color_menu.addAction(_("Green"))
@@ -3515,7 +3560,7 @@ class FreeLineGraphicsItem(QtWidgets.QGraphicsPolygonItem):
 
     def contextMenuEvent(self, event):
         menu = QtWidgets.QMenu()
-        # Sub-menú de grosor y estilo de línea
+        # Sub-menú de grosor y estilo de línea. Submenu for line thickness and style
         line_menu = menu.addMenu(_('Line style'))
         width1_action = line_menu.addAction(_('Thin (1px)'))
         width2_action = line_menu.addAction(_('Normal (2px)'))
@@ -3524,7 +3569,7 @@ class FreeLineGraphicsItem(QtWidgets.QGraphicsPolygonItem):
         line_menu.addSeparator()
         dotted_action = line_menu.addAction(_('Dotted'))
         solid_action = line_menu.addAction(_('Solid'))
-        # Sub-menú de color
+        # Sub-menú de color. Color submenu
         color_menu = menu.addMenu(_('Line color'))
         red_action = color_menu.addAction(_('Red'))
         yellow_action = color_menu.addAction(_('Yellow'))
@@ -3539,7 +3584,7 @@ class FreeLineGraphicsItem(QtWidgets.QGraphicsPolygonItem):
         action = menu.exec(QtGui.QCursor.pos())
         if action is None:
             return
-        # Grosor
+        # Grosor. Thickness
         if action == width1_action:
             self.line_width = 1
             self.redraw()
@@ -3552,7 +3597,7 @@ class FreeLineGraphicsItem(QtWidgets.QGraphicsPolygonItem):
         if action == width6_action:
             self.line_width = 6
             self.redraw()
-        # Estilo
+        # Estilo. Style
         if action == dotted_action:
             self.line_type = QtCore.Qt.PenStyle.DotLine
             self.redraw()
@@ -3649,7 +3694,7 @@ class FreeLineGraphicsItem(QtWidgets.QGraphicsPolygonItem):
         polygon.append(p1)
         polygon.append(p2)
 
-        # Puntas de flecha a 30 grados (pi/6) del eje de la línea
+        # Puntas de flecha a 30 grados (pi/6) del eje de la línea. Arrowheads at 30 degrees (pi/6) from the line axis.
         arrow_size = 12
         p3 = QtCore.QPointF(p2.x() + arrow_size * math.cos(theta + math.pi / 6),
                             p2.y() + arrow_size * math.sin(theta + math.pi / 6))
@@ -3682,6 +3727,13 @@ class AVGraphicsItem(QtWidgets.QGraphicsPixmapItem):
         self.app = app
         self.avid = avid
         self.code_or_cat = {'cid': None, 'catid': None}
+        # Recuperar el cid si es un segmento guardado (necesario para el colapso de categorías). Retrieve the cid if it is a saved segment (required for category collapsing).
+        if self.avid is not None and self.avid != -1:
+            cur = self.app.conn.cursor()
+            cur.execute("select cid from code_av where avid=?", [self.avid])
+            res = cur.fetchone()
+            if res:
+                self.code_or_cat['cid'] = res[0]
         self.text = f"AVID:{self.avid}"
         self.pos0 = pos0
         self.pos1 = pos1
@@ -3708,7 +3760,7 @@ class AVGraphicsItem(QtWidgets.QGraphicsPixmapItem):
         menu = QtWidgets.QMenu()
         context_action = menu.addAction(_("View in context"))
         menu.addSeparator()
-        # Sub-menú de color
+        # Sub-menú de color. Color submenu
         color_menu = menu.addMenu(_("Color"))
         red_action = color_menu.addAction(_("Red"))
         green_action = color_menu.addAction(_("Green"))
@@ -3808,6 +3860,13 @@ class PixmapGraphicsItem(QtWidgets.QGraphicsPixmapItem):
         self.app = app
         self.imid = imid
         self.code_or_cat = {'cid': None, 'catid': None}
+        # Recuperar el cid si es un segmento guardado (necesario para el colapso de categorías). Retrieve the cid if it is a saved segment (required for category collapsing)
+        if self.imid is not None and self.imid != -1:
+            cur = self.app.conn.cursor()
+            cur.execute("select cid from code_image where imid=?", [self.imid])
+            res = cur.fetchone()
+            if res:
+                self.code_or_cat['cid'] = res[0]
         self.text = f"IMID: {self.imid}"
         self.px = px
         self.py = py
@@ -4029,7 +4088,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
                 show_memo_action = menu.addAction(_("Display memo"))
         menu.addSeparator()
         bold_action = menu.addAction(_("Bold toggle"))
-        # --- Sub-menú para el tamaño de fuente ---
+        # Sub-menú para el tamaño de fuente. Submenu for font size
         font_size_menu = menu.addMenu("Font size")
         font_size_actions = {}
         for size in [8, 10, 12, 14, 16, 18, 20]:
@@ -4255,7 +4314,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         radius = 250
         angle_step = (2 * math.pi) / max(1, len(selected))
         for i, s in enumerate(selected):
-            # CORRECCIÓN: Uso estricto de str()
+            # CORRECCIÓN: Uso estricto de str(). CORRECTION: Strict use of str().
             target_node = next((item for item in self.scene().items() if
                                 type(item).__name__ == "TextGraphicsItem" and str(item.code_or_cat.get('cid')) == str(
                                     s['cid'])), None)
@@ -4301,17 +4360,36 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
          Hides or shows all descendant nodes and updates the lines"""
         self.is_collapsed = not getattr(self, 'is_collapsed', False)
 
-        # 1. Ocultar/Mostrar nodos hijos en cascada
+        # 1. Recopilar CIDs del nodo actual (si aplica) para ocultar sus propios segmentos. Collect CIDs from the current node (if applicable) to hide its own segments
+        child_cids = []
+        if self.code_or_cat.get('cid') is not None:
+            child_cids.append(self.code_or_cat['cid'])
+
+        # 2. Ocultar/Mostrar nodos hijos en cascada y recolectar sus CIDs. Hide/Show child nodes in cascade and collect their CIDs
         for item in self.scene().items():
             if type(item).__name__ == "TextGraphicsItem" and item != self:
                 if item.code_or_cat['name'] in self.code_or_cat.get('child_names', []):
+                    # Guardar el CID de los códigos hijos para ocultar sus segmentos. Save the CID of child codes to hide their segments.
+                    if item.code_or_cat.get('cid') is not None:
+                        child_cids.append(item.code_or_cat['cid'])
+                        
                     if self.is_collapsed:
                         item.hide()
                     else:
                         item.show()
-                        item.is_collapsed = False  # Reinicia el estado de los hijos para evitar errores lógicos
+                        item.is_collapsed = False  # Reinicia el estado de los hijos para evitar errores lógicos. Reset the state of the children to prevent logical errors
 
-        # 2. Refrescar las líneas (Ocultar las que queden sueltas). Refresh lines (Hide any loose ones)
+        # 3. Ocultar/Mostrar los segmentos (texto, imagen, a/v) vinculados a los códigos colapsados. Hide/Show the segments (text, image, A/V) linked to the collapsed codes
+        for item in self.scene().items():
+            if type(item).__name__ in ("FreeTextGraphicsItem", "PixmapGraphicsItem", "AVGraphicsItem"):
+                if hasattr(item, 'code_or_cat') and item.code_or_cat is not None:
+                    if item.code_or_cat.get('cid') in child_cids:
+                        if self.is_collapsed:
+                            item.hide()
+                        else:
+                            item.show()
+
+        # 4. Refrescar las líneas (Ocultar las que queden sueltas). Refresh lines (Hide any loose ones)
         for item in self.scene().items():
             if type(item).__name__ in ("LinkGraphicsItem", "FreeLineGraphicsItem"):
                 if hasattr(item, 'from_widget') and hasattr(item, 'to_widget'):
@@ -4377,7 +4455,7 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
             font.setPointSize(9)
             font.setBold(True)
             self.text_item.setFont(font)
-            self.text_item.setDefaultTextColor(QtGui.QColor("#0000CD"))  # Azul para destacar atributos relacionales
+            self.text_item.setDefaultTextColor(QtGui.QColor("#0000CD"))  # Azul para destacar atributos relacionales. Blue to highlight relational attributes.
         self.redraw()
 
     def __repr__(self):
@@ -4387,7 +4465,7 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
 
     def contextMenuEvent(self, event):
         menu = QtWidgets.QMenu()
-        # Sub-menú de grosor y estilo de línea
+        # Sub-menú de grosor y estilo de línea. Submenu for line thickness and style
         line_menu = menu.addMenu(_('Line style'))
         width1_action = line_menu.addAction(_('Thin (1px)'))
         width2_action = line_menu.addAction(_('Normal (2px)'))
@@ -4396,7 +4474,7 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
         line_menu.addSeparator()
         dotted_action = line_menu.addAction(_('Dotted'))
         solid_action = line_menu.addAction(_('Solid'))
-        # Sub-menú de color
+        # Sub-menú de color. Color submenu
         color_menu = menu.addMenu(_('Line color'))
         red_action = color_menu.addAction(_('Red'))
         yellow_action = color_menu.addAction(_('Yellow'))
@@ -4411,7 +4489,7 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
         action = menu.exec(QtGui.QCursor.pos())
         if action is None:
             return
-        # Grosor
+        # Grosor. Thickness
         if action == width1_action:
             self.line_width = 1
         if action == width2_action:
@@ -4420,7 +4498,7 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
             self.line_width = 4
         if action == width6_action:
             self.line_width = 6
-        # Estilo
+        # Estilo. Style
         if action == dotted_action:
             self.line_type = QtCore.Qt.PenStyle.DotLine
         if action == solid_action:
@@ -4455,13 +4533,13 @@ class LinkGraphicsItem(QtWidgets.QGraphicsLineItem):
         self.calculate_points_and_draw()
 
     def calculate_points_and_draw(self):
-        """ Cálculo fluido de intersección perimetral. """
+        """ Cálculo fluido de intersección perimetral. Smooth calculation of the perimeter intersection """
         import math
 
         c1 = self.from_widget.sceneBoundingRect().center()
         c2 = self.to_widget.sceneBoundingRect().center()
 
-        # Enviar la línea detrás de los nodos visualmente
+        # Enviar la línea detrás de los nodos visualmente. Send the line behind the nodes visually
         self.setZValue(-1)
 
         is_ellipse_from = getattr(self.from_widget, 'is_ellipse', False)
