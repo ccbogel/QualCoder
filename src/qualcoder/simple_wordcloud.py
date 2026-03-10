@@ -66,30 +66,6 @@ color_ranges = [
      "range": ["#C61A09", "#DF2C14", "#ED3419", "#FB3B1E", "#FF4122", "#FF6242", "#FF8164", "#FFA590", "#FFC9BB"]}
 ]
 
-# TODO remove . note  -also used by report_file_summary.py
-stopwords = ["a", "about", "above", "after", "again", "against", "all", "am", "an", "and", "any", "are", "aren't", "as",
-             "at",
-             "b", "be", "because", "been", "before", "being", "below", "between", "both", "but", "by", "c", "can",
-             "can't", "could", "couldn't",
-             "d", "did", "didn't", "do", "does", "doesn't", "doing", "don't", "down", "during",
-             "e", "each", "f", "few", "for", "from", "further", "g", "get", "got",
-             "h", "had", "hadn't", "has", "hasn't", "have", "haven't", "having", "he", "he's", "her", "here",
-             "hers", "herself", "him", "himself", "his", "how",
-             "i", "i'll", "i'm", "i've", "if", "in", "into", "is", "is'nt", "isn't", "it", "it's", "its", "itself",
-             "j", "just", "k", "l", "m", "me", "more", "most", "my", "myself", "n", "no", "nor", "not", "now",
-             "o", "of", "off", "oh", "on", "once", "only", "or", "other", "our", "ours", "ourselves", "out", "over",
-             "own",
-             "p", "pre", "put", "q", "r", "re",
-             "s", "same", "she", "she'd", "she's", "should", "shouldn't", "so", "some", "such",
-             "t", "than", "that", "that's", "the", "their", "theirs", "them", "themselves", "then", "there", "there's",
-             "these",
-             "they", "they'd", "they'll", "they're", "they've", "this", "those", "through", "to", "too",
-             "u", "uh", "um", "under", "until", "up", "us", "v", "very",
-             "w", "was", "wasn't", "we", "we're", "we've", "were", "weren't", "what",
-             "what's", "when", "where", "which", "while",
-             "who", "who's", "whom", "why", "will", "with", "would", "wouldn't",
-             "x", "y", "you", "you'd", "you'ld", "you're", "you've", "your", "yours", "yourself", "yourselves", "z"]
-
 
 class Wordcloud:
     """Create a wordcloud using the `wordcloud` package.
@@ -134,7 +110,6 @@ class Wordcloud:
         # Font in ~/.qualcoder
         self.font_path = os.path.join(os.path.expanduser('~'), ".qualcoder", "DroidSansMono.ttf")
 
-        # TODO change as have stopwords.py
         # Stopwords: file in ~/.qualcoder or provided path, fallback to built-in list
         stopwords_file_path = os.path.join(os.path.expanduser('~'), ".qualcoder", "stopwords.txt")
         if stopwords_filepath2 is not None:
@@ -152,7 +127,7 @@ class Wordcloud:
                     self.stopwords.append(stopword.strip())
         except FileNotFoundError as err:
             print(err)
-            self.stopwords = stopwords
+            pass
 
         # ---- TEXT PREPROCESSING + NGRAMS ----
         # 1) Clean text (letters + apostrophes, lowercased)

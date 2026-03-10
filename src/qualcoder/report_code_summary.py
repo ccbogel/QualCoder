@@ -33,7 +33,7 @@ from PyQt6.QtCore import Qt
 
 from .GUI.ui_dialog_report_code_summary import Ui_Dialog_code_summary
 from .color_selector import TextColor
-from .simple_wordcloud import stopwords as cloud_stopwords
+# TODO replace using stopwords.py from .simple_wordcloud import stopwords as cloud_stopwords
 
 # If VLC not installed, it will not crash
 vlc = None
@@ -342,7 +342,8 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         text += _("Total characters: ") + f"{total_chars:,d}"
         text += "  " + _("Average characters: ") + f"{int(avg_chars)}\n"
 
-        # Get stopwords from user created list or default to simple_wordcloud stopwords
+        # Get stopwords from user created list or
+        # TODO default to user selection
         stopwords_file_path = os.path.join(os.path.expanduser('~'), ".qualcoder", "stopwords.txt")
         user_created_stopwords = []
         try:
@@ -357,7 +358,7 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
                     user_created_stopwords.append(stopword.strip())  # Remove line ending
             stopwords = user_created_stopwords
         except FileNotFoundError as err:
-            stopwords = cloud_stopwords
+            stopwords = []  # TODO select from stopwords.py
 
         # Remove punctuation. Convert to lower case
         chars = ""
@@ -374,7 +375,7 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
                 word_list.append(word)
         msg = _(
             "Word calculations: Words use alphabet characters and include the apostrophe. "
-            "All other characters are word separators. Excludes English stopwords")
+            "All other characters are word separators.")
         text += f"{msg}\n"
         text += _("Words: ") + f"{len(word_list):,d}\n"
 

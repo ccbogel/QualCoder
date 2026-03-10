@@ -33,7 +33,7 @@ from .GUI.ui_dialog_report_file_summary import Ui_Dialog_file_summary
 from .helpers import file_typer, msecs_to_hours_mins_secs, Message
 from .report_attributes import DialogSelectAttributeParameters
 from .select_items import DialogSelectItems
-from .simple_wordcloud import stopwords as cloud_stopwords
+#TODO replace with stopwords.py from .simple_wordcloud import stopwords as cloud_stopwords
 
 # If VLC not installed, it will not crash
 vlc = None
@@ -579,7 +579,8 @@ class DialogReportFileSummary(QtWidgets.QDialog):
             fulltext = ""
         text_ += _("Characters: ") + f"{len(fulltext):,d}\n"
 
-        # Get stopwords from user created list or default to simple_wordcloud stopwords
+        # Get stopwords from user created list or default to stopwords
+        stopwords = []
         stopwords_file_path = os.path.join(os.path.expanduser('~'), ".qualcoder", "stopwords.txt")
         user_created_stopwords = []
         try:
@@ -594,7 +595,8 @@ class DialogReportFileSummary(QtWidgets.QDialog):
                     user_created_stopwords.append(stopword.strip())  # Remove line ending
             stopwords = user_created_stopwords
         except FileNotFoundError as err:
-            stopwords = cloud_stopwords
+            #stopwords = cloud_stopwords
+            print("TODO STOPWORDS")
 
         # Remove punctuation. Convert to lower case
         chars = ""
@@ -615,7 +617,6 @@ class DialogReportFileSummary(QtWidgets.QDialog):
 
 
         msg = _("Word calculations: Words use alphabet characters and include the apostrophe. All other characters are word separators")
-        msg += _( " Excludes English Stopwords")
         text_ += f"\n{msg}\n"
         text_ += "\n" + _("Words: ") + f"{len(word_list):,d}\n"
         # Word frequency
