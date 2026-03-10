@@ -70,6 +70,7 @@ class ViewCharts(QDialog):
         self.attribute_file_ids = []
         self.attributes_msg = ""
         self.stopwords_filepath = None
+        self.last_wordcloud_dir = os.path.expanduser("~") # Recordar la última ubicación de guardado. Remember the last save location for WordCloud
         # Set up the user interface from Designer.
         self.ui = Ui_DialogCharts()
         self.ui.setupUi(self)
@@ -487,10 +488,33 @@ class ViewCharts(QDialog):
         reverse_colors = self.ui.checkBox_reverse_range.isChecked()
         ngrams = int(self.ui.comboBox_ngrams.currentText())
         stopwords_path = self.get_selected_stopwords_path()
+        # Seleccionar carpeta donde se guardara la Nube de palabras generada. Select the folder where the generated Word Cloud will be saved
+        export_dir = QtWidgets.QFileDialog.getExistingDirectory(
+            None,
+            _('Select directory to save Wordcloud'),
+            self.last_wordcloud_dir,
+            options=QtWidgets.QFileDialog.Option.ShowDirsOnly
+        )
+
+        if not export_dir:
+            return
+            
+        self.last_wordcloud_dir = export_dir
+
+        base_name = "QualCoder_Wordcloud"
+        extension = ".png"
+        filepath = os.path.join(export_dir, base_name + extension)
+        counter = 0
+        
+        while os.path.exists(filepath):
+            filepath = os.path.join(export_dir, f"{base_name}_{counter}{extension}")
+            counter += 1
+        # Ventana de confirmación de guardado. Save confirmation window
         try:
             Wordcloud(self.app, text, width=width, height=height, max_words=max_words, background_color=background,
                       text_color=foreground, reverse_colors=reverse_colors, ngrams=ngrams,
-                      stopwords_filepath2=stopwords_path)
+                      stopwords_filepath2=stopwords_path, save_filepath=filepath)
+            Message(self.app, _("Success"), _("Wordcloud saved successfully to:\n") + filepath).exec()
         except Exception as e:
             logger.error(f"Error generating Wordcloud: {str(e)}")
             Message(self.app, _("Error"), _("Error loading stopwords or generating wordcloud: ") + str(e)).exec()

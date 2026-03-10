@@ -22,14 +22,9 @@ https://qualcoder-org.github.io/
 
 import webbrowser
 from copy import deepcopy
-import datetime
 import logging
 import os
-from PyQt6 import QtWidgets
-import sys
-import traceback
 from wordcloud import WordCloud
-from PIL import ImageColor
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
@@ -71,6 +66,7 @@ color_ranges = [
      "range": ["#C61A09", "#DF2C14", "#ED3419", "#FB3B1E", "#FF4122", "#FF6242", "#FF8164", "#FFA590", "#FFC9BB"]}
 ]
 
+# TODO remove . note  -also used by report_file_summary.py
 stopwords = ["a", "about", "above", "after", "again", "against", "all", "am", "an", "and", "any", "are", "aren't", "as",
              "at",
              "b", "be", "because", "been", "before", "being", "below", "between", "both", "but", "by", "c", "can",
@@ -114,18 +110,18 @@ class Wordcloud:
     """
 
     def __init__(
-        self,
-        app,
-        fulltext,
-        width=800,
-        height=600,
-        max_words=200,
-        background_color="black",
-        text_color="random",
-        reverse_colors=False,
-        ngrams=1,
-        stopwords_filepath2=None
-    ):
+            self,
+            app,
+            fulltext,
+            width=800,
+            height=600,
+            max_words=200,
+            background_color="black",
+            text_color="random",
+            reverse_colors=False,
+            ngrams=1,
+            stopwords_filepath2=None,
+            save_filepath=None):
         self.app = app
         self.width = width
         self.height = height
@@ -138,6 +134,7 @@ class Wordcloud:
         # Font in ~/.qualcoder
         self.font_path = os.path.join(os.path.expanduser('~'), ".qualcoder", "DroidSansMono.ttf")
 
+        # TODO change as have stopwords.py
         # Stopwords: file in ~/.qualcoder or provided path, fallback to built-in list
         stopwords_file_path = os.path.join(os.path.expanduser('~'), ".qualcoder", "stopwords.txt")
         if stopwords_filepath2 is not None:
@@ -214,10 +211,14 @@ class Wordcloud:
 
         # Generate image from frequencies
         wc.generate_from_frequencies(freq)
-
-        temp_filepath = os.path.join(os.path.expanduser("~"), ".qualcoder", "wordcloud_temp.png")
-        wc.to_file(temp_filepath)
-        webbrowser.open(temp_filepath)
+        # Guardar la imagen en la ruta seleccionada. Save the image to the selected path
+        if save_filepath:
+            wc.to_file(save_filepath)
+            webbrowser.open(save_filepath)
+        else:
+            temp_filepath = os.path.join(os.path.expanduser("~"), ".qualcoder", "wordcloud_temp.png")
+            wc.to_file(temp_filepath)
+            webbrowser.open(temp_filepath)
 
     # ---------------- helper methods ----------------
 
@@ -270,6 +271,7 @@ class Wordcloud:
             return fixed_color
 
         return single_color_func, None
+
 
 if __name__ == "__main__":
     test_text = "qualcoder qualcoder qualcoder qualcoder dogs cats birds qualitative analysis  qualitative analysis qualitative analysis research research"
