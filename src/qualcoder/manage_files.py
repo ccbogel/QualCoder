@@ -23,7 +23,6 @@ https://qualcoder-org.github.io/
 import datetime
 import ebooklib
 from ebooklib import epub
-import emoji
 import fitz
 import json
 import openpyxl
@@ -1242,21 +1241,15 @@ class DialogManageFiles(QtWidgets.QDialog):
             icon = QtGui.QIcon(qta.icon('mdi6.text', options=[{'scale_factor': 1.2}]))
         if res[1] is not None and len(res[1]) > 0 and res[2] is None:
             metadata += _("Characters: ") + f"{len(res[1]):,}"
-            emojis = emoji.emoji_list(res[1])
-            if emojis: metadata += "\n" + _("Emojis: ") + f"{len(emojis)}"
             return icon, metadata, ""
         if res[2] is None:
             logger.debug("empty media path error")
             return icon, metadata, ""
         if res[1] is not None and len(res[1]) > 5 and res[2][:6] == "/docs/":
             metadata += _("Characters: ") + f"{len(res[1]):,}"
-            emojis = emoji.emoji_list(res[1])
-            if emojis: metadata += "\n" + _("Emojis: ") + f"{len(emojis)}"
             return icon, metadata, ""
         if res[1] is not None and len(res[1]) > 5 and res[2][:5] == "docs:":
             metadata += _("Characters: ") + f"{len(res[1]):,}"
-            emojis = emoji.emoji_list(res[1])
-            if emojis: metadata += "\n" + _("Emojis: ") + f"{len(emojis)}"
             icon = QtGui.QIcon(qta.icon('mdi6.text-box-check-outline', options=[{'scale_factor': 1.2}]))
             return icon, metadata, ""
 
