@@ -33,7 +33,7 @@ from .GUI.ui_dialog_report_file_summary import Ui_Dialog_file_summary
 from .helpers import file_typer, msecs_to_hours_mins_secs, Message
 from .report_attributes import DialogSelectAttributeParameters
 from .select_items import DialogSelectItems
-#TODO replace with stopwords.py from .simple_wordcloud import stopwords as cloud_stopwords
+from .stopwords import *
 
 # If VLC not installed, it will not crash
 vlc = None
@@ -54,12 +54,7 @@ logger = logging.getLogger(__name__)
 
 
 class DialogReportFileSummary(QtWidgets.QDialog):
-    """ Provide a summary report for selected file.
-    """
-
-    app = None
-    parent_tetEdit = None
-    files = []
+    """ Provide a summary report for selected file. """
 
     def __init__(self, app, parent_text_edit):
         self.app = app
@@ -79,6 +74,9 @@ class DialogReportFileSummary(QtWidgets.QDialog):
             self.ui.splitter.setSizes([s0, s1])
         except KeyError:
             pass
+        languages = ["  ", "Deutsch de", "English en", "Español es", "Français fr", "Italiano it", "Português pt"]
+        for lang in languages:
+            self.ui.comboBox_stopwords.addItem(lang)
         self.ui.splitter.splitterMoved.connect(self.splitter_sizes)
         self.ui.pushButton_search_next.setIcon(qta.icon('mdi6.play'))
         self.ui.pushButton_search_next.pressed.connect(self.search_results_next)
@@ -86,8 +84,10 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         self.ui.listWidget.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.ui.listWidget.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.listWidget.customContextMenuRequested.connect(self.file_menu)
+        self.files = []
         self.get_files()
         self.ui.listWidget.itemClicked.connect(self.fill_text_edit)
+        self.ui.comboBox_stopwords.currentTextChanged.connect(self.fill_text_edit)
         self.ui.textEdit.setTabChangesFocus(True)
 
     def splitter_sizes(self):
@@ -594,9 +594,21 @@ class DialogReportFileSummary(QtWidgets.QDialog):
                         break
                     user_created_stopwords.append(stopword.strip())  # Remove line ending
             stopwords = user_created_stopwords
-        except FileNotFoundError as err:
-            #stopwords = cloud_stopwords
-            print("TODO STOPWORDS")
+        except FileNotFoundError:
+            pass
+        if not user_created_stopwords:
+            stopwords = []
+            language = self.ui.comboBox_stopwords.currentText()
+            if language.endswith("de"):
+                stopwords = de.splitlines()
+            if language.endswith("en"):
+                stopwords = en.splitlines()
+            if language.endswith("es"):
+                stopwords = es.splitlines()
+            if language.endswith("fr"):
+                stopwords = fr.splitlines()
+            if language.endswith("pt"):
+                stopwords = pt.splitlines()
 
         # Remove punctuation. Convert to lower case
         chars = ""
@@ -611,10 +623,6 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         for word in word_list_with_stopwords:
             if word not in stopwords:
                 word_list.append(word)
-
-
-
-
 
         msg = _("Word calculations: Words use alphabet characters and include the apostrophe. All other characters are word separators")
         text_ += f"\n{msg}\n"
@@ -633,7 +641,12 @@ class DialogReportFileSummary(QtWidgets.QDialog):
         max_count = len(word_freq)
         if max_count > 100:
             max_count = 100
-        text_ += _("Top 100 words") + "\n"
+        text_ += _("Top 100 words") + ". "
+        if self.ui.comboBox_stopwords.currentText() != "  " and not user_created_stopwords:
+            text_ += _("Applying stopwords: ") + self.ui.comboBox_stopwords.currentText()
+        if user_created_stopwords:
+            text_ += _("Applying stopwords from: .qualcoder/stopwords.txt")
+        text_ += "\n"
         for i in range(0, max_count):
             text_ += f"{word_freq[i][1]}   {word_freq[i][0]} | "
         # Codes
