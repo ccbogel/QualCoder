@@ -64,7 +64,7 @@
         <widget class="QPushButton" name="pushButton_search_next">
          <property name="geometry">
           <rect>
-           <x>709</x>
+           <x>550</x>
            <y>0</y>
            <width>28</width>
            <height>28</height>
@@ -80,8 +80,8 @@
         <widget class="QLineEdit" name="lineEdit_search_results">
          <property name="geometry">
           <rect>
-           <x>521</x>
-           <y>0</y>
+           <x>370</x>
+           <y>1</y>
            <width>181</width>
            <height>28</height>
           </rect>
@@ -93,9 +93,9 @@
         <widget class="QLabel" name="label_search_results">
          <property name="geometry">
           <rect>
-           <x>379</x>
+           <x>260</x>
            <y>0</y>
-           <width>131</width>
+           <width>101</width>
            <height>28</height>
           </rect>
          </property>
@@ -114,7 +114,7 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>271</width>
+           <width>241</width>
            <height>28</height>
           </rect>
          </property>
@@ -132,6 +132,19 @@
          </property>
          <property name="text">
           <string>Code summary report</string>
+         </property>
+        </widget>
+        <widget class="QComboBox" name="comboBox_stopwords">
+         <property name="geometry">
+          <rect>
+           <x>608</x>
+           <y>1</y>
+           <width>181</width>
+           <height>28</height>
+          </rect>
+         </property>
+         <property name="toolTip">
+          <string>Select stopwords list by language</string>
          </property>
         </widget>
        </widget>
