@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-12 09:12+0100\n"
+"POT-Creation-Date: 2026-03-13 14:20+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -191,7 +191,7 @@ msgid ""
 msgstr ""
 
 #: src/qualcoder/report_file_summary.py:300 src/qualcoder/code_pdf.py:3816
-#: src/qualcoder/report_code_summary.py:279
+#: src/qualcoder/report_code_summary.py:281
 #: src/qualcoder/ai_search_dialog.py:473
 #: src/qualcoder/report_codes_by_segments.py:154
 #: src/qualcoder/report_codes.py:266 src/qualcoder/report_codes.py:2284
@@ -286,8 +286,8 @@ msgstr ""
 #: src/qualcoder/report_file_summary.py:476
 #: src/qualcoder/report_file_summary.py:564
 #: src/qualcoder/report_file_summary.py:665
-#: src/qualcoder/report_code_summary.py:464
-#: src/qualcoder/report_code_summary.py:515
+#: src/qualcoder/report_code_summary.py:485
+#: src/qualcoder/report_code_summary.py:536
 msgid "Count: "
 msgstr ""
 
@@ -344,7 +344,7 @@ msgstr ""
 
 #: src/qualcoder/report_file_summary.py:522
 #: src/qualcoder/report_file_summary.py:566
-#: src/qualcoder/report_code_summary.py:464
+#: src/qualcoder/report_code_summary.py:485
 #: src/qualcoder/report_compare_coder_file.py:1051
 #: src/qualcoder/report_compare_coder_file.py:1054
 msgid " pixels"
@@ -380,36 +380,38 @@ msgid ""
 msgstr ""
 
 #: src/qualcoder/report_file_summary.py:629
-#: src/qualcoder/report_code_summary.py:380
+#: src/qualcoder/report_code_summary.py:396
 msgid "Words: "
 msgstr ""
 
 #: src/qualcoder/report_file_summary.py:639
-#: src/qualcoder/report_code_summary.py:391
+#: src/qualcoder/report_code_summary.py:407
 msgid "Unique words: "
 msgstr ""
 
 #: src/qualcoder/report_file_summary.py:644
-#: src/qualcoder/report_code_summary.py:396
+#: src/qualcoder/report_code_summary.py:412
 msgid "Top 100 words"
 msgstr ""
 
 #: src/qualcoder/report_file_summary.py:646
+#: src/qualcoder/report_code_summary.py:414
 msgid "Applying stopwords: "
 msgstr ""
 
 #: src/qualcoder/report_file_summary.py:648
+#: src/qualcoder/report_code_summary.py:416
 msgid "Applying stopwords from: .qualcoder/stopwords.txt"
 msgstr ""
 
 #: src/qualcoder/report_file_summary.py:665
-#: src/qualcoder/report_code_summary.py:342
+#: src/qualcoder/report_code_summary.py:344
 #: src/qualcoder/report_compare_coder_file.py:817
 msgid "Total characters: "
 msgstr ""
 
 #: src/qualcoder/report_file_summary.py:667
-#: src/qualcoder/report_code_summary.py:343
+#: src/qualcoder/report_code_summary.py:345
 msgid "Average characters: "
 msgstr ""
 
@@ -1676,77 +1678,77 @@ msgstr ""
 msgid "Settings"
 msgstr ""
 
-#: src/qualcoder/report_code_summary.py:277
+#: src/qualcoder/report_code_summary.py:279
 #: src/qualcoder/report_compare_coder_file.py:422
 msgid "CODE: "
 msgstr ""
 
-#: src/qualcoder/report_code_summary.py:278
+#: src/qualcoder/report_code_summary.py:280
 msgid "COLOUR: "
 msgstr ""
 
-#: src/qualcoder/report_code_summary.py:278
+#: src/qualcoder/report_code_summary.py:280
 msgid "CREATED BY: "
 msgstr ""
 
-#: src/qualcoder/report_code_summary.py:305
+#: src/qualcoder/report_code_summary.py:307
 #: src/qualcoder/report_compare_coder_file.py:415
 msgid "CODERS: "
 msgstr ""
 
-#: src/qualcoder/report_code_summary.py:312
+#: src/qualcoder/report_code_summary.py:314
 msgid "FILES: "
 msgstr ""
 
-#: src/qualcoder/report_code_summary.py:318
+#: src/qualcoder/report_code_summary.py:320
 msgid ""
 "Report code summary. Code_text, code_image or code_av had a coding to a "
 "deleted file"
 msgstr ""
 
-#: src/qualcoder/report_code_summary.py:333
+#: src/qualcoder/report_code_summary.py:335
 msgid "TEXT CODINGS: "
 msgstr ""
 
-#: src/qualcoder/report_code_summary.py:377
+#: src/qualcoder/report_code_summary.py:393
 msgid ""
 "Word calculations: Words use alphabet characters and include the apostrophe. "
 "All other characters are word separators."
 msgstr ""
 
-#: src/qualcoder/report_code_summary.py:408
+#: src/qualcoder/report_code_summary.py:429
 msgid "IMAGE CODINGS: "
 msgstr ""
 
-#: src/qualcoder/report_code_summary.py:463 src/qualcoder/view_image.py:968
+#: src/qualcoder/report_code_summary.py:484 src/qualcoder/view_image.py:968
 msgid "Image: "
 msgstr ""
 
-#: src/qualcoder/report_code_summary.py:464
+#: src/qualcoder/report_code_summary.py:485
 msgid "Average coded area: "
 msgstr ""
 
-#: src/qualcoder/report_code_summary.py:465
+#: src/qualcoder/report_code_summary.py:486
 msgid "Average area of image: "
 msgstr ""
 
-#: src/qualcoder/report_code_summary.py:474
+#: src/qualcoder/report_code_summary.py:495
 msgid "A/V CODINGS: "
 msgstr ""
 
-#: src/qualcoder/report_code_summary.py:514
+#: src/qualcoder/report_code_summary.py:535
 msgid "Media: "
 msgstr ""
 
-#: src/qualcoder/report_code_summary.py:516
+#: src/qualcoder/report_code_summary.py:537
 msgid "Average coded duration: "
 msgstr ""
 
-#: src/qualcoder/report_code_summary.py:516
+#: src/qualcoder/report_code_summary.py:537
 msgid " secs"
 msgstr ""
 
-#: src/qualcoder/report_code_summary.py:518
+#: src/qualcoder/report_code_summary.py:539
 msgid "Average percent of media: "
 msgstr ""
 
