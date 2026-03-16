@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-22 09:50+1100\n"
+"POT-Creation-Date: 2026-03-17 08:05+1100\n"
 "PO-Revision-Date: 2026-02-22 10:02+1100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -60,7 +60,7 @@ msgstr "未启用人工智能"
 #: src\qualcoder\ai_chat.py:290 src\qualcoder\ai_chat.py:305
 #: src\qualcoder\ai_chat.py:331 src\qualcoder\ai_chat.py:454
 #: src\qualcoder\ai_chat.py:681 src\qualcoder\ai_chat.py:1158
-#: src\qualcoder\code_text.py:5106
+#: src\qualcoder\code_text.py:5136
 msgid "The AI is disabled. Go to \"AI > Setup Wizard\" first."
 msgstr "人工智能已禁用。请先进入 “人工智能 > 设置向导”。"
 
@@ -74,7 +74,7 @@ msgstr ""
 " 在那里，您可以打开一个文档，选择一段文本，右击该文本并从右键菜单中选择 “AI "
 "文本分析”。"
 
-#: src\qualcoder\ai_chat.py:314 src\qualcoder\code_text.py:1252
+#: src\qualcoder\ai_chat.py:314 src\qualcoder\code_text.py:1250
 msgid "AI Text Analysis"
 msgstr "人工智能文本分析"
 
@@ -114,8 +114,8 @@ msgstr ""
 "不被截断。"
 
 #: src\qualcoder\ai_chat.py:434 src\qualcoder\report_relations.py:697
-#: src\qualcoder\report_relations.py:1019 src\qualcoder\view_graph.py:1727
-#: src\qualcoder\view_graph.py:3172 src\qualcoder\view_graph.py:3174
+#: src\qualcoder\report_relations.py:1019 src\qualcoder\view_graph.py:2705
+#: src\qualcoder\view_graph.py:4032 src\qualcoder\view_graph.py:4034
 msgid "Code"
 msgstr "代码"
 
@@ -474,15 +474,15 @@ msgstr "人工智能操作无法立即中止。人工智能可能需要一些时
 msgid "AI Error:\n"
 msgstr "人工智能错误：\n"
 
-#: src\qualcoder\ai_llm.py:853
+#: src\qualcoder\ai_llm.py:880
 msgid "AI generate_code_descriptions\n"
 msgstr "人工智能生成代码描述\n"
 
-#: src\qualcoder\ai_llm.py:854
+#: src\qualcoder\ai_llm.py:881
 msgid "Prompt:\n"
 msgstr "提示:\n"
 
-#: src\qualcoder\ai_llm.py:891
+#: src\qualcoder\ai_llm.py:922
 msgid ""
 "Stage 1:\n"
 "Searching data related to \""
@@ -490,7 +490,7 @@ msgstr ""
 "第 1 阶段：\n"
 "搜索与”"
 
-#: src\qualcoder\ai_llm.py:968
+#: src\qualcoder\ai_llm.py:999
 msgid ""
 "Stage 2:\n"
 "Inspecting the data more closely..."
@@ -551,15 +551,16 @@ msgstr "无法找到。提示符将重置为默认值。"
 
 #: src\qualcoder\ai_search_dialog.py:138 src\qualcoder\ai_search_dialog.py:501
 #: src\qualcoder\ai_search_dialog.py:521 src\qualcoder\report_codes.py:1371
-#: src\qualcoder\report_exact_matches.py:244 src\qualcoder\view_graph.py:518
-#: src\qualcoder\view_graph.py:588 src\qualcoder\view_graph.py:644
+#: src\qualcoder\report_exact_matches.py:244 src\qualcoder\view_graph.py:759
+#: src\qualcoder\view_graph.py:1331 src\qualcoder\view_graph.py:1401
+#: src\qualcoder\view_graph.py:1460
 msgid "No codes"
 msgstr "无代码"
 
 #: src\qualcoder\ai_search_dialog.py:186 src\qualcoder\attributes.py:264
 #: src\qualcoder\coder_names.py:72 src\qualcoder\code_organiser.py:980
-#: src\qualcoder\code_pdf.py:562 src\qualcoder\code_text.py:653
-#: src\qualcoder\journals.py:188 src\qualcoder\manage_files.py:1201
+#: src\qualcoder\code_pdf.py:562 src\qualcoder\code_text.py:651
+#: src\qualcoder\journals.py:188 src\qualcoder\manage_files.py:1198
 #: src\qualcoder\report_codes.py:419
 #: src\qualcoder\report_codes_by_segments.py:354
 #: src\qualcoder\report_code_summary.py:124 src\qualcoder\speakers.py:73
@@ -571,16 +572,16 @@ msgstr "名称"
 #: src\qualcoder\ai_search_dialog.py:278 src\qualcoder\attributes.py:202
 #: src\qualcoder\attributes.py:264 src\qualcoder\cases.py:735
 #: src\qualcoder\cases.py:893 src\qualcoder\code_color_scheme.py:149
-#: src\qualcoder\code_in_all_files.py:335 src\qualcoder\code_organiser.py:929
+#: src\qualcoder\code_in_all_files.py:327 src\qualcoder\code_organiser.py:929
 #: src\qualcoder\code_pdf.py:562 src\qualcoder\code_pdf.py:575
 #: src\qualcoder\code_pdf.py:603 src\qualcoder\code_pdf.py:628
 #: src\qualcoder\code_pdf.py:654 src\qualcoder\code_pdf.py:2301
-#: src\qualcoder\code_pdf.py:2325 src\qualcoder\code_text.py:653
-#: src\qualcoder\code_text.py:668 src\qualcoder\code_text.py:696
-#: src\qualcoder\code_text.py:721 src\qualcoder\code_text.py:747
-#: src\qualcoder\code_text.py:3022 src\qualcoder\code_text.py:3046
-#: src\qualcoder\manage_files.py:1201 src\qualcoder\manage_files.py:1555
-#: src\qualcoder\manage_files.py:1590 src\qualcoder\manage_files.py:2482
+#: src\qualcoder\code_pdf.py:2325 src\qualcoder\code_text.py:651
+#: src\qualcoder\code_text.py:666 src\qualcoder\code_text.py:694
+#: src\qualcoder\code_text.py:719 src\qualcoder\code_text.py:745
+#: src\qualcoder\code_text.py:3028 src\qualcoder\code_text.py:3052
+#: src\qualcoder\manage_files.py:1198 src\qualcoder\manage_files.py:1552
+#: src\qualcoder\manage_files.py:1587 src\qualcoder\manage_files.py:2492
 #: src\qualcoder\report_codes.py:419 src\qualcoder\report_codes.py:433
 #: src\qualcoder\report_codes.py:513
 #: src\qualcoder\report_codes_by_segments.py:354
@@ -600,7 +601,7 @@ msgid "Memo"
 msgstr "备忘录"
 
 #: src\qualcoder\ai_search_dialog.py:186 src\qualcoder\code_pdf.py:562
-#: src\qualcoder\code_text.py:653 src\qualcoder\report_codes.py:419
+#: src\qualcoder\code_text.py:651 src\qualcoder\report_codes.py:419
 #: src\qualcoder\report_codes_by_segments.py:354
 #: src\qualcoder\report_code_summary.py:124
 #: src\qualcoder\report_relations.py:1019 src\qualcoder\speakers.py:73
@@ -619,7 +620,7 @@ msgid "Coder selection"
 msgstr "聊天选择"
 
 #: src\qualcoder\ai_search_dialog.py:423 src\qualcoder\report_attributes.py:450
-#: src\qualcoder\view_charts.py:229
+#: src\qualcoder\view_charts.py:281
 msgid "Show files:"
 msgstr "显示文件："
 
@@ -649,7 +650,7 @@ msgid "Search in all cases"
 msgstr "在所有情况下进行搜索"
 
 #: src\qualcoder\ai_search_dialog.py:473 src\qualcoder\code_pdf.py:3816
-#: src\qualcoder\code_text.py:5582 src\qualcoder\report_codes.py:266
+#: src\qualcoder\code_text.py:5624 src\qualcoder\report_codes.py:266
 #: src\qualcoder\report_codes.py:2284 src\qualcoder\report_codes.py:2959
 #: src\qualcoder\report_codes_by_segments.py:154
 #: src\qualcoder\report_code_summary.py:279
@@ -680,7 +681,7 @@ msgid ""
 "check your settings."
 msgstr "合并所有筛选器后，没有文件可供搜索。请检查您的设置。"
 
-#: src\qualcoder\ai_search_dialog.py:570
+#: src\qualcoder\ai_search_dialog.py:570 src\qualcoder\view_graph.py:1428
 msgid "No files"
 msgstr "无文件"
 
@@ -762,8 +763,8 @@ msgid ""
 msgstr "人工智能：重建内存。本地人工智能将读取您的所有文件，请耐心等待。"
 
 #: src\qualcoder\attributes.py:94 src\qualcoder\attributes.py:259
-#: src\qualcoder\view_charts.py:295 src\qualcoder\view_charts.py:389
-#: src\qualcoder\__main__.py:3111
+#: src\qualcoder\view_charts.py:347 src\qualcoder\view_charts.py:441
+#: src\qualcoder\__main__.py:3114
 msgid "Attributes: "
 msgstr "属性："
 
@@ -795,8 +796,8 @@ msgstr "改为字符"
 msgid "Attribute renamed from: "
 msgstr "属性重命名自 "
 
-#: src\qualcoder\attributes.py:251 src\qualcoder\code_text.py:3340
-#: src\qualcoder\code_text.py:3396
+#: src\qualcoder\attributes.py:251 src\qualcoder\code_text.py:3346
+#: src\qualcoder\code_text.py:3402
 msgid " to "
 msgstr "至 "
 
@@ -823,7 +824,7 @@ msgstr "导出的案件属性文件： "
 msgid "File export"
 msgstr "文件导出"
 
-#: src\qualcoder\cases.py:355 src\qualcoder\__main__.py:3099
+#: src\qualcoder\cases.py:355 src\qualcoder\__main__.py:3102
 msgid "Cases: "
 msgstr "病例： "
 
@@ -855,9 +856,9 @@ msgstr "输入的案例和属性： "
 msgid "Cannot import from csv, only one row in file"
 msgstr "无法从 csv 文件导入，文件中只有一行"
 
-#: src\qualcoder\cases.py:568 src\qualcoder\manage_files.py:1201
-#: src\qualcoder\view_graph.py:979 src\qualcoder\view_graph.py:1932
-#: src\qualcoder\view_graph.py:1960
+#: src\qualcoder\cases.py:568 src\qualcoder\manage_files.py:1198
+#: src\qualcoder\view_graph.py:1795 src\qualcoder\view_graph.py:2870
+#: src\qualcoder\view_graph.py:2898
 msgid "Case"
 msgstr "案例"
 
@@ -870,23 +871,22 @@ msgid "Case added: "
 msgstr "案例补充： "
 
 #: src\qualcoder\cases.py:668 src\qualcoder\journals.py:744
-#: src\qualcoder\manage_files.py:1471
+#: src\qualcoder\manage_files.py:1468
 msgid "This attribute is numeric"
 msgstr "该属性为数字"
 
 #: src\qualcoder\cases.py:669 src\qualcoder\case_file_manager.py:620
 #: src\qualcoder\code_pdf.py:2780 src\qualcoder\code_pdf.py:3416
 #: src\qualcoder\code_pdf.py:3420 src\qualcoder\code_pdf.py:3583
-#: src\qualcoder\code_text.py:1334 src\qualcoder\code_text.py:3748
-#: src\qualcoder\code_text.py:3753 src\qualcoder\code_text.py:3913
-#: src\qualcoder\code_text.py:4020 src\qualcoder\code_text.py:4033
-#: src\qualcoder\code_text.py:4157 src\qualcoder\code_text.py:4289
+#: src\qualcoder\code_text.py:1332 src\qualcoder\code_text.py:3754
+#: src\qualcoder\code_text.py:3759 src\qualcoder\code_text.py:3919
+#: src\qualcoder\code_text.py:4016 src\qualcoder\code_text.py:4029
+#: src\qualcoder\code_text.py:4163 src\qualcoder\code_text.py:4307
 #: src\qualcoder\import_survey.py:208 src\qualcoder\journals.py:701
 #: src\qualcoder\journals.py:705 src\qualcoder\journals.py:745
-#: src\qualcoder\manage_files.py:1472 src\qualcoder\manage_files.py:1966
-#: src\qualcoder\manage_files.py:2006 src\qualcoder\manage_files.py:2010
-#: src\qualcoder\manage_files.py:2014 src\qualcoder\refi.py:1226
-#: src\qualcoder\report_attributes.py:654
+#: src\qualcoder\manage_files.py:1469 src\qualcoder\manage_files.py:1993
+#: src\qualcoder\manage_files.py:2019 src\qualcoder\manage_files.py:2024
+#: src\qualcoder\refi.py:1226 src\qualcoder\report_attributes.py:654
 #: src\qualcoder\report_attributes.py:658
 #: src\qualcoder\report_attributes.py:661
 #: src\qualcoder\report_attributes.py:669 src\qualcoder\report_codes.py:1244
@@ -895,7 +895,7 @@ msgstr "该属性为数字"
 #: src\qualcoder\text_file_replacement.py:308
 #: src\qualcoder\text_file_replacement.py:313 src\qualcoder\view_av.py:3079
 #: src\qualcoder\view_av.py:3083 src\qualcoder\view_av.py:3232
-#: src\qualcoder\view_graph.py:853
+#: src\qualcoder\view_graph.py:1669
 msgid "Warning"
 msgstr "警告"
 
@@ -903,35 +903,35 @@ msgstr "警告"
 msgid "Memo for case "
 msgstr "案件备忘录 "
 
-#: src\qualcoder\cases.py:764 src\qualcoder\manage_files.py:398
+#: src\qualcoder\cases.py:764 src\qualcoder\manage_files.py:395
 msgid "Show all columns"
 msgstr "显示所有栏目"
 
-#: src\qualcoder\cases.py:767 src\qualcoder\manage_files.py:401
+#: src\qualcoder\cases.py:767 src\qualcoder\manage_files.py:398
 msgid "Hide column"
 msgstr "隐藏栏"
 
-#: src\qualcoder\cases.py:768 src\qualcoder\manage_files.py:402
+#: src\qualcoder\cases.py:768 src\qualcoder\manage_files.py:399
 msgid "Hide columns starting with"
 msgstr "隐藏以"
 
-#: src\qualcoder\cases.py:769 src\qualcoder\manage_files.py:403
+#: src\qualcoder\cases.py:769 src\qualcoder\manage_files.py:400
 msgid "Show columns starting with"
 msgstr "显示以"
 
-#: src\qualcoder\cases.py:781 src\qualcoder\manage_files.py:415
+#: src\qualcoder\cases.py:781 src\qualcoder\manage_files.py:412
 msgid "Hide columns starting with:"
 msgstr "隐藏以.开头的列:"
 
-#: src\qualcoder\cases.py:782 src\qualcoder\manage_files.py:416
+#: src\qualcoder\cases.py:782 src\qualcoder\manage_files.py:413
 msgid "Hide Columns"
 msgstr "隐藏列"
 
-#: src\qualcoder\cases.py:790 src\qualcoder\manage_files.py:423
+#: src\qualcoder\cases.py:790 src\qualcoder\manage_files.py:420
 msgid "Show columns starting with:"
 msgstr "显示以......开头的列："
 
-#: src\qualcoder\cases.py:791 src\qualcoder\manage_files.py:424
+#: src\qualcoder\cases.py:791 src\qualcoder\manage_files.py:421
 msgid "Show Columns"
 msgstr "显示列"
 
@@ -940,47 +940,47 @@ msgid "View case"
 msgstr "查看案例"
 
 #: src\qualcoder\cases.py:819 src\qualcoder\cases.py:826
-#: src\qualcoder\manage_files.py:467 src\qualcoder\manage_files.py:473
-#: src\qualcoder\manage_files.py:479 src\qualcoder\manage_files.py:494
+#: src\qualcoder\manage_files.py:464 src\qualcoder\manage_files.py:470
+#: src\qualcoder\manage_files.py:476 src\qualcoder\manage_files.py:491
 msgid "Order ascending"
 msgstr "升序排列"
 
 #: src\qualcoder\cases.py:820 src\qualcoder\cases.py:827
-#: src\qualcoder\manage_files.py:468 src\qualcoder\manage_files.py:474
-#: src\qualcoder\manage_files.py:480 src\qualcoder\manage_files.py:495
+#: src\qualcoder\manage_files.py:465 src\qualcoder\manage_files.py:471
+#: src\qualcoder\manage_files.py:477 src\qualcoder\manage_files.py:492
 msgid "Order descending"
 msgstr "降序排列"
 
 #: src\qualcoder\cases.py:821 src\qualcoder\journals.py:442
-#: src\qualcoder\manage_files.py:485
+#: src\qualcoder\manage_files.py:482
 msgid "Show values like"
 msgstr "显示以下值"
 
-#: src\qualcoder\cases.py:822 src\qualcoder\manage_files.py:487
+#: src\qualcoder\cases.py:822 src\qualcoder\manage_files.py:484
 #: src\qualcoder\manage_references.py:610
 msgid "Show this value"
 msgstr "显示此值"
 
 #: src\qualcoder\cases.py:828 src\qualcoder\journals.py:449
-#: src\qualcoder\manage_files.py:527
+#: src\qualcoder\manage_files.py:524
 msgid "Show all rows Ctrl A"
 msgstr "显示所有行 Ctrl A"
 
-#: src\qualcoder\cases.py:832 src\qualcoder\manage_files.py:531
+#: src\qualcoder\cases.py:832 src\qualcoder\manage_files.py:528
 msgid "Open URL"
 msgstr "打开 URL"
 
 #: src\qualcoder\cases.py:863 src\qualcoder\journals.py:480
-#: src\qualcoder\journals.py:495 src\qualcoder\manage_files.py:602
-#: src\qualcoder\manage_files.py:616 src\qualcoder\manage_references.py:249
-#: src\qualcoder\manage_references.py:632 src\qualcoder\report_sql.py:529
-#: src\qualcoder\report_sql.py:543 src\qualcoder\report_sql.py:624
-#: src\qualcoder\report_sql.py:634
+#: src\qualcoder\journals.py:495 src\qualcoder\manage_files.py:599
+#: src\qualcoder\manage_files.py:613 src\qualcoder\manage_references.py:249
+#: src\qualcoder\manage_references.py:632 src\qualcoder\report_sql.py:531
+#: src\qualcoder\report_sql.py:545 src\qualcoder\report_sql.py:626
+#: src\qualcoder\report_sql.py:636
 msgid "Text filter"
 msgstr "文本过滤器"
 
 #: src\qualcoder\cases.py:863 src\qualcoder\journals.py:495
-#: src\qualcoder\manage_files.py:602
+#: src\qualcoder\manage_files.py:599
 msgid "Show values like:"
 msgstr "显示数值，如"
 
@@ -992,8 +992,8 @@ msgstr "点击编辑备忘录"
 msgid "Click to manage files for this case"
 msgstr "点击管理此案件的文件"
 
-#: src\qualcoder\cases.py:916 src\qualcoder\manage_files.py:166
-#: src\qualcoder\manage_files.py:2519
+#: src\qualcoder\cases.py:916 src\qualcoder\manage_files.py:165
+#: src\qualcoder\manage_files.py:2529
 msgid "Right click header row to hide columns"
 msgstr "右键单击标题行隐藏列"
 
@@ -1031,13 +1031,14 @@ msgstr "开"
 
 #: src\qualcoder\cases.py:1101 src\qualcoder\case_file_manager.py:448
 #: src\qualcoder\edit_textfile.py:583 src\qualcoder\report_exact_matches.py:653
-#: src\qualcoder\report_relations.py:534 src\qualcoder\report_sql.py:417
+#: src\qualcoder\report_relations.py:534 src\qualcoder\report_sql.py:419
+#: src\qualcoder\speakers.py:289
 msgid "Select all"
 msgstr "选择所有"
 
 #: src\qualcoder\cases.py:1102 src\qualcoder\case_file_manager.py:452
 #: src\qualcoder\edit_textfile.py:584 src\qualcoder\error_dlg.py:44
-#: src\qualcoder\report_sql.py:418
+#: src\qualcoder\report_sql.py:420
 msgid "Copy"
 msgstr "复制"
 
@@ -1045,14 +1046,14 @@ msgstr "复制"
 msgid "Right click to view"
 msgstr "右击查看"
 
-#: src\qualcoder\case_file_manager.py:96 src\qualcoder\code_in_all_files.py:140
-#: src\qualcoder\code_in_all_files.py:218 src\qualcoder\code_pdf.py:386
-#: src\qualcoder\code_text.py:486 src\qualcoder\helpers.py:218
+#: src\qualcoder\case_file_manager.py:96 src\qualcoder\code_in_all_files.py:132
+#: src\qualcoder\code_in_all_files.py:210 src\qualcoder\code_pdf.py:386
+#: src\qualcoder\code_text.py:484 src\qualcoder\helpers.py:218
 #: src\qualcoder\report_attributes.py:465 src\qualcoder\report_codes.py:2320
 #: src\qualcoder\report_compare_coder_file.py:292
 #: src\qualcoder\report_file_summary.py:253 src\qualcoder\view_av.py:433
-#: src\qualcoder\view_charts.py:319 src\qualcoder\view_charts.py:387
-#: src\qualcoder\view_graph.py:1615 src\qualcoder\view_image.py:379
+#: src\qualcoder\view_charts.py:371 src\qualcoder\view_charts.py:439
+#: src\qualcoder\view_graph.py:2593 src\qualcoder\view_image.py:379
 msgid "Case: "
 msgstr "案例："
 
@@ -1103,7 +1104,7 @@ msgstr "已链接"
 msgid "This segment has already been linked to this case"
 msgstr "该部分已与此案相关联"
 
-#: src\qualcoder\case_file_manager.py:620 src\qualcoder\code_text.py:4033
+#: src\qualcoder\case_file_manager.py:620 src\qualcoder\code_text.py:4029
 msgid "Cannot have blank text marks"
 msgstr "不能有空白文本标记"
 
@@ -1111,7 +1112,7 @@ msgstr "不能有空白文本标记"
 msgid "Auto assign text to case: "
 msgstr "自动将文本分配到大小写： "
 
-#: src\qualcoder\case_file_manager.py:623 src\qualcoder\code_text.py:4045
+#: src\qualcoder\case_file_manager.py:623 src\qualcoder\code_text.py:4041
 msgid ""
 "\n"
 "Using "
@@ -1119,7 +1120,7 @@ msgstr ""
 "\n"
 "使用 "
 
-#: src\qualcoder\case_file_manager.py:623 src\qualcoder\code_text.py:4045
+#: src\qualcoder\case_file_manager.py:623 src\qualcoder\code_text.py:4041
 msgid " and "
 msgstr " 和 "
 
@@ -1157,7 +1158,7 @@ msgid "Codebook exported to "
 msgstr "输出到"
 
 #: src\qualcoder\codebook.py:200 src\qualcoder\helpers.py:141
-#: src\qualcoder\manage_files.py:929 src\qualcoder\refi.py:2085
+#: src\qualcoder\manage_files.py:926 src\qualcoder\refi.py:2085
 #: src\qualcoder\refi.py:2134
 msgid "Select directory to save file"
 msgstr "选择保存文件的目录"
@@ -1170,8 +1171,8 @@ msgstr "编码手册"
 msgid "Category:"
 msgstr "类别:"
 
-#: src\qualcoder\codebook.py:226 src\qualcoder\code_text.py:2577
-#: src\qualcoder\code_text.py:2647
+#: src\qualcoder\codebook.py:226 src\qualcoder\code_text.py:2583
+#: src\qualcoder\code_text.py:2653
 msgid "Code:"
 msgstr "代码:"
 
@@ -1200,7 +1201,7 @@ msgstr "隐藏"
 #: src\qualcoder\coder_names.py:377 src\qualcoder\coder_names.py:380
 #: src\qualcoder\coder_names.py:384 src\qualcoder\coder_names.py:386
 #: src\qualcoder\journals.py:188 src\qualcoder\report_exact_matches.py:460
-#: src\qualcoder\__main__.py:1790
+#: src\qualcoder\__main__.py:1793
 msgid "Coder"
 msgstr "编码器"
 
@@ -1304,7 +1305,7 @@ msgid "Codes tree"
 msgstr "代码树"
 
 #: src\qualcoder\code_color_scheme.py:149 src\qualcoder\code_pdf.py:562
-#: src\qualcoder\code_text.py:653 src\qualcoder\manage_files.py:1201
+#: src\qualcoder\code_text.py:651 src\qualcoder\manage_files.py:1198
 #: src\qualcoder\report_code_summary.py:124
 #: src\qualcoder\report_exact_matches.py:565
 #: src\qualcoder\report_relations.py:1121 src\qualcoder\view_av.py:536
@@ -1316,99 +1317,99 @@ msgstr "Id"
 msgid "Perspective: "
 msgstr "透视："
 
-#: src\qualcoder\code_in_all_files.py:78
+#: src\qualcoder\code_in_all_files.py:66
 msgid "Coded files: "
 msgstr "编码文件："
 
-#: src\qualcoder\code_in_all_files.py:80
+#: src\qualcoder\code_in_all_files.py:68
 msgid "Coded cases: "
 msgstr "已编码病例："
 
-#: src\qualcoder\code_in_all_files.py:87 src\qualcoder\code_in_all_files.py:101
+#: src\qualcoder\code_in_all_files.py:75 src\qualcoder\code_in_all_files.py:93
 msgid "Left click on heading for coding in context"
 msgstr "左键单击标题，在上下文中进行编码"
 
-#: src\qualcoder\code_in_all_files.py:88 src\qualcoder\code_in_all_files.py:102
+#: src\qualcoder\code_in_all_files.py:76 src\qualcoder\code_in_all_files.py:94
 msgid "Right click on heading to unmark or to add codes"
 msgstr "右击标题以取消标记或添加代码"
 
-#: src\qualcoder\code_in_all_files.py:138
-#: src\qualcoder\code_in_all_files.py:140
-#: src\qualcoder\code_in_all_files.py:178
-#: src\qualcoder\code_in_all_files.py:180
-#: src\qualcoder\code_in_all_files.py:218
+#: src\qualcoder\code_in_all_files.py:130
+#: src\qualcoder\code_in_all_files.py:132
+#: src\qualcoder\code_in_all_files.py:170
+#: src\qualcoder\code_in_all_files.py:172
+#: src\qualcoder\code_in_all_files.py:210
 msgid " File: "
 msgstr " 文件: "
 
-#: src\qualcoder\code_in_all_files.py:178
+#: src\qualcoder\code_in_all_files.py:170
 msgid " Case: "
 msgstr "案例："
 
-#: src\qualcoder\code_in_all_files.py:188 src\qualcoder\code_pdf.py:522
+#: src\qualcoder\code_in_all_files.py:180
+#: src\qualcoder\code_in_all_files.py:219 src\qualcoder\code_pdf.py:522
 #: src\qualcoder\code_pdf.py:2649 src\qualcoder\code_pdf.py:3093
-#: src\qualcoder\code_text.py:632 src\qualcoder\code_text.py:1922
+#: src\qualcoder\code_text.py:630 src\qualcoder\code_text.py:1928
 #: src\qualcoder\view_av.py:3404 src\qualcoder\view_av.py:3914
-#: src\qualcoder\view_graph.py:532 src\qualcoder\view_graph.py:601
-#: src\qualcoder\view_graph.py:664 src\qualcoder\view_graph.py:1319
-#: src\qualcoder\view_graph.py:1345 src\qualcoder\view_graph.py:1370
+#: src\qualcoder\view_graph.py:1345 src\qualcoder\view_graph.py:1414
+#: src\qualcoder\view_graph.py:1480 src\qualcoder\view_graph.py:2269
+#: src\qualcoder\view_graph.py:2295 src\qualcoder\view_graph.py:2320
 msgid "Memo: "
 msgstr "备忘："
 
-#: src\qualcoder\code_in_all_files.py:220 src\qualcoder\code_text.py:4258
+#: src\qualcoder\code_in_all_files.py:212 src\qualcoder\code_text.py:4276
 #: src\qualcoder\helpers.py:216 src\qualcoder\report_attributes.py:460
-#: src\qualcoder\report_codes.py:2316 src\qualcoder\view_charts.py:304
-#: src\qualcoder\view_graph.py:529 src\qualcoder\view_graph.py:600
-#: src\qualcoder\view_graph.py:662 src\qualcoder\view_graph.py:755
-#: src\qualcoder\view_graph.py:1315 src\qualcoder\view_graph.py:1340
-#: src\qualcoder\view_graph.py:1366 src\qualcoder\view_graph.py:1392
-#: src\qualcoder\view_graph.py:1411 src\qualcoder\view_graph.py:1432
-#: src\qualcoder\view_graph.py:1635
+#: src\qualcoder\report_codes.py:2316 src\qualcoder\view_charts.py:356
+#: src\qualcoder\view_graph.py:1342 src\qualcoder\view_graph.py:1413
+#: src\qualcoder\view_graph.py:1478 src\qualcoder\view_graph.py:1571
+#: src\qualcoder\view_graph.py:2265 src\qualcoder\view_graph.py:2290
+#: src\qualcoder\view_graph.py:2316 src\qualcoder\view_graph.py:2342
+#: src\qualcoder\view_graph.py:2361 src\qualcoder\view_graph.py:2382
+#: src\qualcoder\view_graph.py:2613
 msgid "File: "
 msgstr "文件: "
 
-#: src\qualcoder\code_in_all_files.py:333
+#: src\qualcoder\code_in_all_files.py:325
 msgid "Appy more codes to this segment"
 msgstr "为该部分添加更多代码"
 
-#: src\qualcoder\code_in_all_files.py:334
+#: src\qualcoder\code_in_all_files.py:326
 msgid "Remove code"
 msgstr "删除代码"
 
-#: src\qualcoder\code_in_all_files.py:337 src\qualcoder\code_pdf.py:3148
+#: src\qualcoder\code_in_all_files.py:329 src\qualcoder\code_pdf.py:3148
 msgid "Remove important flag"
 msgstr "移除重要标志"
 
-#: src\qualcoder\code_in_all_files.py:339
+#: src\qualcoder\code_in_all_files.py:331
 #, fuzzy
 msgid "Add important flag"
 msgstr "添加重要标记"
 
-#: src\qualcoder\code_in_all_files.py:340
+#: src\qualcoder\code_in_all_files.py:332
 msgid "Export to ODT file"
 msgstr "导出为 ODT 文件"
 
-#: src\qualcoder\code_in_all_files.py:401
+#: src\qualcoder\code_in_all_files.py:392
 #, fuzzy
 msgid "Memo for Coded: "
 msgstr "代码备忘录："
 
-#: src\qualcoder\code_in_all_files.py:429 src\qualcoder\code_text.py:2232
+#: src\qualcoder\code_in_all_files.py:420 src\qualcoder\code_text.py:2238
 msgid "Coded text file exported: "
 msgstr "导出编码文本文件："
 
-#: src\qualcoder\code_in_all_files.py:430 src\qualcoder\code_text.py:2234
-#: src\qualcoder\code_text.py:2361
+#: src\qualcoder\code_in_all_files.py:421 src\qualcoder\code_text.py:2240
+#: src\qualcoder\code_text.py:2367
 msgid "Coded text file exported"
 msgstr "导出编码文本文件"
 
-#: src\qualcoder\code_in_all_files.py:436 src\qualcoder\code_pdf.py:1133
-#: src\qualcoder\code_pdf.py:1226 src\qualcoder\code_text.py:1372
-#: src\qualcoder\code_text.py:1461 src\qualcoder\code_text.py:1550
+#: src\qualcoder\code_in_all_files.py:427 src\qualcoder\code_pdf.py:1133
+#: src\qualcoder\code_pdf.py:1226 src\qualcoder\code_text.py:1370
+#: src\qualcoder\code_text.py:1459 src\qualcoder\code_text.py:1548
 #: src\qualcoder\report_comparison_table.py:353
-#: src\qualcoder\report_cooccurrence.py:199 src\qualcoder\view_av.py:2850
-#: src\qualcoder\view_av.py:2916 src\qualcoder\view_graph.py:494
-#: src\qualcoder\view_graph.py:562 src\qualcoder\view_graph.py:621
-#: src\qualcoder\view_graph.py:682
+#: src\qualcoder\report_cooccurrence.py:244 src\qualcoder\view_av.py:2850
+#: src\qualcoder\view_av.py:2916 src\qualcoder\view_graph.py:1307
+#: src\qualcoder\view_graph.py:1375 src\qualcoder\view_graph.py:1498
 msgid "Select codes"
 msgstr "选择代码"
 
@@ -1433,20 +1434,20 @@ msgstr ""
 "使用 “应用 ”按钮应用更改后没有撤消选项。"
 
 #: src\qualcoder\code_organiser.py:116 src\qualcoder\code_organiser.py:426
-#: src\qualcoder\code_pdf.py:2191 src\qualcoder\code_text.py:2901
-#: src\qualcoder\view_av.py:2397 src\qualcoder\view_graph.py:1725
-#: src\qualcoder\view_graph.py:3180 src\qualcoder\view_graph.py:3182
+#: src\qualcoder\code_pdf.py:2191 src\qualcoder\code_text.py:2907
+#: src\qualcoder\view_av.py:2397 src\qualcoder\view_graph.py:2703
+#: src\qualcoder\view_graph.py:4040 src\qualcoder\view_graph.py:4042
 #: src\qualcoder\view_image.py:2158
 msgid "Category"
 msgstr "类别"
 
 #: src\qualcoder\code_organiser.py:116 src\qualcoder\code_organiser.py:426
-#: src\qualcoder\code_pdf.py:2191 src\qualcoder\code_text.py:2901
+#: src\qualcoder\code_pdf.py:2191 src\qualcoder\code_text.py:2907
 #: src\qualcoder\view_av.py:2397 src\qualcoder\view_image.py:2158
 msgid "Category name"
 msgstr "类别名称"
 
-#: src\qualcoder\code_organiser.py:147 src\qualcoder\view_graph.py:164
+#: src\qualcoder\code_organiser.py:147 src\qualcoder\view_graph.py:297
 msgid "Select code tree branch"
 msgstr "选择代码树分支"
 
@@ -1459,7 +1460,7 @@ msgid "Add category"
 msgstr "添加类别"
 
 #: src\qualcoder\code_organiser.py:465 src\qualcoder\helpers.py:745
-#: src\qualcoder\view_graph.py:1017 src\qualcoder\view_image.py:1208
+#: src\qualcoder\view_graph.py:1836 src\qualcoder\view_image.py:1208
 msgid "Image exported"
 msgstr "导出图像"
 
@@ -1492,7 +1493,7 @@ msgstr "从类别中删除代码"
 msgid "Coded text and media"
 msgstr "编码文本和媒体"
 
-#: src\qualcoder\code_organiser.py:923
+#: src\qualcoder\code_organiser.py:923 src\qualcoder\view_graph.py:4082
 msgid "Case text and media"
 msgstr "案例文本和媒体"
 
@@ -1501,7 +1502,7 @@ msgid "Link category under category"
 msgstr "在类别下链接类别"
 
 #: src\qualcoder\code_organiser.py:926 src\qualcoder\code_pdf.py:1331
-#: src\qualcoder\code_text.py:1747 src\qualcoder\view_av.py:1493
+#: src\qualcoder\code_text.py:1753 src\qualcoder\view_av.py:1493
 #: src\qualcoder\view_image.py:1223
 msgid "Merge category into category"
 msgstr "将类别合并为类别"
@@ -1511,12 +1512,12 @@ msgid "Remove category from category"
 msgstr "从类别中删除类别"
 
 #: src\qualcoder\code_organiser.py:930 src\qualcoder\code_pdf.py:1334
-#: src\qualcoder\code_text.py:1750 src\qualcoder\view_av.py:1496
+#: src\qualcoder\code_text.py:1756 src\qualcoder\view_av.py:1496
 #: src\qualcoder\view_image.py:1226
 msgid "Rename"
 msgstr "重命名"
 
-#: src\qualcoder\code_organiser.py:932 src\qualcoder\view_graph.py:3211
+#: src\qualcoder\code_organiser.py:932 src\qualcoder\view_graph.py:4088
 msgid "Display memo"
 msgstr "显示备忘"
 
@@ -1579,22 +1580,22 @@ msgid ""
 "affect coding stripes display."
 msgstr "同样，如果对 PDF 纯文本进行了任何编辑，也会影响编码条纹的显示。"
 
-#: src\qualcoder\code_pdf.py:286 src\qualcoder\code_text.py:3449
-#: src\qualcoder\code_text.py:5414 src\qualcoder\__main__.py:3054
+#: src\qualcoder\code_pdf.py:286 src\qualcoder\code_text.py:3455
+#: src\qualcoder\code_text.py:5444 src\qualcoder\__main__.py:3057
 msgid "Information"
 msgstr "信息"
 
-#: src\qualcoder\code_pdf.py:382 src\qualcoder\code_text.py:481
+#: src\qualcoder\code_pdf.py:382 src\qualcoder\code_text.py:479
 #: src\qualcoder\reports.py:319 src\qualcoder\reports.py:653
 #: src\qualcoder\report_file_summary.py:305 src\qualcoder\view_av.py:428
-#: src\qualcoder\view_image.py:374 src\qualcoder\__main__.py:2435
+#: src\qualcoder\view_image.py:374 src\qualcoder\__main__.py:2438
 msgid "Date: "
 msgstr "日期："
 
 #: src\qualcoder\code_pdf.py:391 src\qualcoder\code_pdf.py:447
-#: src\qualcoder\code_text.py:488 src\qualcoder\code_text.py:545
-#: src\qualcoder\manage_files.py:1246 src\qualcoder\manage_files.py:1252
-#: src\qualcoder\manage_files.py:1255 src\qualcoder\report_codes.py:220
+#: src\qualcoder\code_text.py:486 src\qualcoder\code_text.py:543
+#: src\qualcoder\manage_files.py:1243 src\qualcoder\manage_files.py:1249
+#: src\qualcoder\manage_files.py:1252 src\qualcoder\report_codes.py:220
 #: src\qualcoder\report_compare_coder_file.py:275
 #: src\qualcoder\report_exact_matches.py:144
 #: src\qualcoder\report_file_summary.py:240
@@ -1603,19 +1604,19 @@ msgid "Characters: "
 msgstr "字符）: "
 
 #: src\qualcoder\code_pdf.py:399 src\qualcoder\code_pdf.py:452
-#: src\qualcoder\code_text.py:496 src\qualcoder\code_text.py:550
+#: src\qualcoder\code_text.py:494 src\qualcoder\code_text.py:548
 msgid "Codings:"
 msgstr "编码："
 
 #: src\qualcoder\code_pdf.py:400 src\qualcoder\code_pdf.py:453
-#: src\qualcoder\code_text.py:497 src\qualcoder\code_text.py:551
+#: src\qualcoder\code_text.py:495 src\qualcoder\code_text.py:549
 msgid "From:"
 msgstr "来自:"
 
 #: src\qualcoder\code_pdf.py:470 src\qualcoder\code_pdf.py:479
 #: src\qualcoder\code_pdf.py:486 src\qualcoder\code_pdf.py:492
-#: src\qualcoder\code_text.py:568 src\qualcoder\code_text.py:577
-#: src\qualcoder\code_text.py:585 src\qualcoder\code_text.py:591
+#: src\qualcoder\code_text.py:566 src\qualcoder\code_text.py:575
+#: src\qualcoder\code_text.py:583 src\qualcoder\code_text.py:589
 #: src\qualcoder\reports.py:128 src\qualcoder\reports.py:140
 #: src\qualcoder\reports.py:148 src\qualcoder\reports.py:155
 #: src\qualcoder\report_codes.py:1310 src\qualcoder\report_codes.py:1328
@@ -1624,10 +1625,10 @@ msgstr "来自:"
 #: src\qualcoder\report_codes_by_segments.py:215
 #: src\qualcoder\report_codes_by_segments.py:223
 #: src\qualcoder\report_codes_by_segments.py:230
-#: src\qualcoder\report_cooccurrence.py:143
-#: src\qualcoder\report_cooccurrence.py:154
-#: src\qualcoder\report_cooccurrence.py:164
-#: src\qualcoder\report_cooccurrence.py:171
+#: src\qualcoder\report_cooccurrence.py:186
+#: src\qualcoder\report_cooccurrence.py:197
+#: src\qualcoder\report_cooccurrence.py:207
+#: src\qualcoder\report_cooccurrence.py:215
 #: src\qualcoder\report_exact_matches.py:174
 #: src\qualcoder\report_exact_matches.py:184
 #: src\qualcoder\report_exact_matches.py:192
@@ -1641,10 +1642,10 @@ msgstr "来自:"
 msgid "Attributes"
 msgstr "属性"
 
-#: src\qualcoder\code_pdf.py:490 src\qualcoder\code_text.py:589
+#: src\qualcoder\code_pdf.py:490 src\qualcoder\code_text.py:587
 #: src\qualcoder\reports.py:152 src\qualcoder\report_codes_by_segments.py:227
 #: src\qualcoder\report_compare_coder_file.py:244
-#: src\qualcoder\report_cooccurrence.py:168
+#: src\qualcoder\report_cooccurrence.py:212
 #: src\qualcoder\report_exact_matches.py:196
 #: src\qualcoder\report_file_summary.py:210
 #: src\qualcoder\report_relations.py:195 src\qualcoder\view_av.py:485
@@ -1652,10 +1653,10 @@ msgstr "属性"
 msgid "Nothing found"
 msgstr "未找到"
 
-#: src\qualcoder\code_pdf.py:490 src\qualcoder\code_text.py:589
+#: src\qualcoder\code_pdf.py:490 src\qualcoder\code_text.py:587
 #: src\qualcoder\reports.py:152 src\qualcoder\report_codes_by_segments.py:227
 #: src\qualcoder\report_compare_coder_file.py:244
-#: src\qualcoder\report_cooccurrence.py:168
+#: src\qualcoder\report_cooccurrence.py:212
 #: src\qualcoder\report_exact_matches.py:196
 #: src\qualcoder\report_file_summary.py:210
 #: src\qualcoder\report_relations.py:195 src\qualcoder\view_av.py:485
@@ -1663,11 +1664,11 @@ msgstr "未找到"
 msgid "No matching files found"
 msgstr "未找到匹配文件"
 
-#: src\qualcoder\code_pdf.py:917 src\qualcoder\code_text.py:1044
+#: src\qualcoder\code_pdf.py:917 src\qualcoder\code_text.py:1042
 msgid "Automatic search 3 or more characters"
 msgstr "自动搜索 3 个或更多字符"
 
-#: src\qualcoder\code_pdf.py:918 src\qualcoder\code_text.py:1045
+#: src\qualcoder\code_pdf.py:918 src\qualcoder\code_text.py:1043
 msgid "Automatic search 5 or more characters"
 msgstr "自动搜索 5 个或更多字符"
 
@@ -1679,11 +1680,11 @@ msgstr "按 Enter 键搜索"
 msgid "PDF objects"
 msgstr "PDF 对象"
 
-#: src\qualcoder\code_pdf.py:1001 src\qualcoder\code_text.py:1208
+#: src\qualcoder\code_pdf.py:1001 src\qualcoder\code_text.py:1206
 msgid "Unmark (U)"
 msgstr "无标记 (U)"
 
-#: src\qualcoder\code_pdf.py:1002 src\qualcoder\code_text.py:1209
+#: src\qualcoder\code_pdf.py:1002 src\qualcoder\code_text.py:1207
 msgid "Memo coded text (M)"
 msgstr "备忘编码文本 (M)"
 
@@ -1691,38 +1692,38 @@ msgstr "备忘编码文本 (M)"
 msgid "Change code position key presses"
 msgstr "更改代码位置按键"
 
-#: src\qualcoder\code_pdf.py:1005 src\qualcoder\code_text.py:1214
+#: src\qualcoder\code_pdf.py:1005 src\qualcoder\code_text.py:1212
 #: src\qualcoder\view_av.py:2745
 msgid "Add important mark (I)"
 msgstr "添加重要标记 (I)"
 
-#: src\qualcoder\code_pdf.py:1007 src\qualcoder\code_text.py:1216
+#: src\qualcoder\code_pdf.py:1007 src\qualcoder\code_text.py:1214
 #: src\qualcoder\view_av.py:2747 src\qualcoder\view_av.py:3716
 #: src\qualcoder\view_image.py:1651
 msgid "Remove important mark"
 msgstr "删除重要标记"
 
-#: src\qualcoder\code_pdf.py:1008 src\qualcoder\code_text.py:1217
+#: src\qualcoder\code_pdf.py:1008 src\qualcoder\code_text.py:1215
 #: src\qualcoder\view_av.py:2742
 msgid "Change code"
 msgstr "更改代码"
 
-#: src\qualcoder\code_pdf.py:1023 src\qualcoder\code_text.py:1220
+#: src\qualcoder\code_pdf.py:1023 src\qualcoder\code_text.py:1218
 #: src\qualcoder\view_av.py:2766
 msgid "Mark (Q)"
 msgstr "马克 (Q)"
 
-#: src\qualcoder\code_pdf.py:1026 src\qualcoder\code_text.py:1223
+#: src\qualcoder\code_pdf.py:1026 src\qualcoder\code_text.py:1221
 #: src\qualcoder\view_av.py:2769
 msgid "Mark with recent code (R)"
 msgstr "用最近的代码标记 (R)"
 
-#: src\qualcoder\code_pdf.py:1029 src\qualcoder\code_text.py:1245
+#: src\qualcoder\code_pdf.py:1029 src\qualcoder\code_text.py:1243
 #: src\qualcoder\view_av.py:2772
 msgid "Annotate (A)"
 msgstr "注释 (A)"
 
-#: src\qualcoder\code_pdf.py:1030 src\qualcoder\code_text.py:1246
+#: src\qualcoder\code_pdf.py:1030 src\qualcoder\code_text.py:1244
 #: src\qualcoder\manage_references.py:615 src\qualcoder\report_codes.py:2403
 #: src\qualcoder\report_codes.py:3009 src\qualcoder\view_av.py:2773
 msgid "Copy to clipboard"
@@ -1732,35 +1733,35 @@ msgstr "复制到剪贴板"
 msgid "Mark with new code"
 msgstr "用新代码标记"
 
-#: src\qualcoder\code_pdf.py:1032 src\qualcoder\code_text.py:1227
+#: src\qualcoder\code_pdf.py:1032 src\qualcoder\code_text.py:1225
 msgid "in vivo code (V)"
 msgstr "活体代码 (V)"
 
-#: src\qualcoder\code_pdf.py:1034 src\qualcoder\code_text.py:1249
+#: src\qualcoder\code_pdf.py:1034 src\qualcoder\code_text.py:1247
 #: src\qualcoder\view_av.py:2775
 msgid "Edit annotation"
 msgstr "编辑注释"
 
-#: src\qualcoder\code_pdf.py:1038 src\qualcoder\code_text.py:1270
+#: src\qualcoder\code_pdf.py:1038 src\qualcoder\code_text.py:1268
 msgid "Show control panel (H)"
 msgstr "显示控制面板 (H)"
 
-#: src\qualcoder\code_pdf.py:1040 src\qualcoder\code_text.py:1272
+#: src\qualcoder\code_pdf.py:1040 src\qualcoder\code_text.py:1270
 msgid "Hide control panel (H)"
 msgstr "隐藏控制面板 (H)"
 
-#: src\qualcoder\code_pdf.py:1148 src\qualcoder\code_text.py:1476
+#: src\qualcoder\code_pdf.py:1148 src\qualcoder\code_text.py:1474
 #: src\qualcoder\report_codes.py:2477 src\qualcoder\report_codes.py:2517
 #: src\qualcoder\view_av.py:2862
 msgid "Select replacement code"
 msgstr "选择替换代码"
 
 #: src\qualcoder\code_pdf.py:1273 src\qualcoder\code_pdf.py:3168
-#: src\qualcoder\code_text.py:1624 src\qualcoder\view_av.py:2955
+#: src\qualcoder\code_text.py:1622 src\qualcoder\view_av.py:2955
 msgid "Select code to memo"
 msgstr "选择要备忘的代码"
 
-#: src\qualcoder\code_pdf.py:1282 src\qualcoder\code_text.py:1633
+#: src\qualcoder\code_pdf.py:1282 src\qualcoder\code_text.py:1631
 #: src\qualcoder\view_av.py:2964
 msgid "Memo for Coded text: "
 msgstr "编码文本备忘："
@@ -1777,109 +1778,109 @@ msgstr ""
 msgid "Use key presses"
 msgstr "使用按键"
 
-#: src\qualcoder\code_pdf.py:1329 src\qualcoder\code_text.py:1745
+#: src\qualcoder\code_pdf.py:1329 src\qualcoder\code_text.py:1751
 #: src\qualcoder\view_av.py:1491 src\qualcoder\view_image.py:1221
 msgid "Add new code to category"
 msgstr "为类别添加新代码"
 
-#: src\qualcoder\code_pdf.py:1330 src\qualcoder\code_text.py:1746
+#: src\qualcoder\code_pdf.py:1330 src\qualcoder\code_text.py:1752
 #: src\qualcoder\view_av.py:1492 src\qualcoder\view_image.py:1222
 msgid "Add a new category to category"
 msgstr "在类别中添加新类别"
 
-#: src\qualcoder\code_pdf.py:1332 src\qualcoder\code_text.py:1748
+#: src\qualcoder\code_pdf.py:1332 src\qualcoder\code_text.py:1754
 #: src\qualcoder\view_av.py:1494 src\qualcoder\view_image.py:1224
 msgid "Add a new code"
 msgstr "添加新代码"
 
-#: src\qualcoder\code_pdf.py:1333 src\qualcoder\code_text.py:1749
+#: src\qualcoder\code_pdf.py:1333 src\qualcoder\code_text.py:1755
 #: src\qualcoder\view_av.py:1495 src\qualcoder\view_image.py:1225
 msgid "Add a new category"
 msgstr "添加新类别"
 
-#: src\qualcoder\code_pdf.py:1335 src\qualcoder\code_text.py:1751
+#: src\qualcoder\code_pdf.py:1335 src\qualcoder\code_text.py:1757
 #: src\qualcoder\view_av.py:1497 src\qualcoder\view_image.py:1227
 msgid "View or edit memo"
 msgstr "查看或编辑备忘录"
 
-#: src\qualcoder\code_pdf.py:1336 src\qualcoder\code_text.py:1752
-#: src\qualcoder\manage_files.py:516 src\qualcoder\manage_references.py:618
-#: src\qualcoder\report_sql.py:420 src\qualcoder\view_av.py:1498
+#: src\qualcoder\code_pdf.py:1336 src\qualcoder\code_text.py:1758
+#: src\qualcoder\manage_files.py:513 src\qualcoder\manage_references.py:618
+#: src\qualcoder\report_sql.py:422 src\qualcoder\view_av.py:1498
 #: src\qualcoder\view_image.py:1228
 msgid "Delete"
 msgstr "删除"
 
-#: src\qualcoder\code_pdf.py:1341 src\qualcoder\code_text.py:1757
+#: src\qualcoder\code_pdf.py:1341 src\qualcoder\code_text.py:1763
 #: src\qualcoder\view_av.py:1500 src\qualcoder\view_image.py:1233
 msgid "Change code color"
 msgstr "更改代码颜色"
 
-#: src\qualcoder\code_pdf.py:1342 src\qualcoder\code_text.py:1758
+#: src\qualcoder\code_pdf.py:1342 src\qualcoder\code_text.py:1764
 msgid "Show coded files"
 msgstr "显示编码文件"
 
-#: src\qualcoder\code_pdf.py:1343 src\qualcoder\code_text.py:1759
+#: src\qualcoder\code_pdf.py:1343 src\qualcoder\code_text.py:1765
 #: src\qualcoder\view_av.py:1501 src\qualcoder\view_image.py:1234
 msgid "Move code to"
 msgstr "将代码移至"
 
-#: src\qualcoder\code_pdf.py:1344 src\qualcoder\code_text.py:1760
+#: src\qualcoder\code_pdf.py:1344 src\qualcoder\code_text.py:1766
 #: src\qualcoder\view_av.py:1503 src\qualcoder\view_image.py:1236
 msgid "Show codes like"
 msgstr "显示代码，如"
 
-#: src\qualcoder\code_pdf.py:1345 src\qualcoder\code_text.py:1761
+#: src\qualcoder\code_pdf.py:1345 src\qualcoder\code_text.py:1767
 #: src\qualcoder\view_av.py:1504 src\qualcoder\view_image.py:1237
 msgid "Show codes of colour"
 msgstr "显示颜色代码"
 
-#: src\qualcoder\code_pdf.py:1346 src\qualcoder\code_text.py:1762
+#: src\qualcoder\code_pdf.py:1346 src\qualcoder\code_text.py:1768
 #: src\qualcoder\report_exact_matches.py:382
 #: src\qualcoder\report_relations.py:596 src\qualcoder\report_relations.py:1082
-#: src\qualcoder\report_sql.py:508 src\qualcoder\report_sql.py:605
+#: src\qualcoder\report_sql.py:510 src\qualcoder\report_sql.py:607
 #: src\qualcoder\view_av.py:1505 src\qualcoder\view_image.py:1238
 msgid "Sort ascending"
 msgstr "升序排序"
 
-#: src\qualcoder\code_pdf.py:1347 src\qualcoder\code_text.py:1763
+#: src\qualcoder\code_pdf.py:1347 src\qualcoder\code_text.py:1769
 #: src\qualcoder\report_exact_matches.py:383
 #: src\qualcoder\report_relations.py:597 src\qualcoder\report_relations.py:1083
-#: src\qualcoder\report_sql.py:510 src\qualcoder\report_sql.py:607
+#: src\qualcoder\report_sql.py:512 src\qualcoder\report_sql.py:609
 #: src\qualcoder\view_av.py:1506 src\qualcoder\view_image.py:1239
 msgid "Sort descending"
 msgstr "降序排序"
 
-#: src\qualcoder\code_pdf.py:1348 src\qualcoder\code_text.py:1764
+#: src\qualcoder\code_pdf.py:1348 src\qualcoder\code_text.py:1770
 #: src\qualcoder\view_av.py:1507 src\qualcoder\view_image.py:1240
 msgid "Sort category then code ascending"
 msgstr "按类别和代码升序排列"
 
 #: src\qualcoder\code_pdf.py:1434 src\qualcoder\code_pdf.py:1477
-#: src\qualcoder\code_text.py:1852 src\qualcoder\code_text.py:1895
+#: src\qualcoder\code_text.py:1858 src\qualcoder\code_text.py:1901
 #: src\qualcoder\view_av.py:1587 src\qualcoder\view_av.py:2281
 #: src\qualcoder\view_image.py:1323 src\qualcoder\view_image.py:2036
 msgid "Select blank or category"
 msgstr "选择空白或类别"
 
-#: src\qualcoder\code_pdf.py:1492 src\qualcoder\code_text.py:1956
+#: src\qualcoder\code_pdf.py:1492 src\qualcoder\code_text.py:1962
 #: src\qualcoder\view_av.py:501 src\qualcoder\view_image.py:300
 msgid "Showing important codings"
 msgstr "显示重要编码"
 
-#: src\qualcoder\code_pdf.py:1496 src\qualcoder\code_text.py:1959
+#: src\qualcoder\code_pdf.py:1496 src\qualcoder\code_text.py:1965
 #: src\qualcoder\view_av.py:504 src\qualcoder\view_image.py:303
 msgid "Show codings flagged important"
 msgstr "显示标记为重要的编码"
 
-#: src\qualcoder\code_pdf.py:1508 src\qualcoder\code_text.py:1970
+#: src\qualcoder\code_pdf.py:1508 src\qualcoder\code_text.py:1976
 msgid "Show some codes"
 msgstr "显示一些代码"
 
-#: src\qualcoder\code_pdf.py:1511 src\qualcoder\code_text.py:1973
+#: src\qualcoder\code_pdf.py:1511 src\qualcoder\code_text.py:1979
 msgid "Show codes containing the text. (Blank for all)"
 msgstr "显示包含文本的代码。(全部为空）"
 
-#: src\qualcoder\code_pdf.py:1525 src\qualcoder\code_text.py:1987
+#: src\qualcoder\code_pdf.py:1525 src\qualcoder\code_text.py:1993
 #: src\qualcoder\view_av.py:1619 src\qualcoder\view_image.py:1355
 msgid "Select code colors"
 msgstr "选择代码颜色"
@@ -1897,42 +1898,42 @@ msgstr "备忘："
 msgid "EXAMPLES:"
 msgstr "举例说明："
 
-#: src\qualcoder\code_pdf.py:1584 src\qualcoder\code_text.py:387
+#: src\qualcoder\code_pdf.py:1584 src\qualcoder\code_text.py:385
 #: src\qualcoder\view_av.py:305 src\qualcoder\view_image.py:260
 msgid "Search for code"
 msgstr "搜索代码"
 
-#: src\qualcoder\code_pdf.py:1587 src\qualcoder\code_text.py:390
+#: src\qualcoder\code_pdf.py:1587 src\qualcoder\code_text.py:388
 #: src\qualcoder\view_av.py:308 src\qualcoder\view_image.py:263
 msgid "Find and select first code that matches text."
 msgstr "查找并选择第一个与文本匹配的代码。"
 
-#: src\qualcoder\code_pdf.py:1588 src\qualcoder\code_text.py:391
+#: src\qualcoder\code_pdf.py:1588 src\qualcoder\code_text.py:389
 #: src\qualcoder\view_av.py:309 src\qualcoder\view_image.py:264
 msgid "Enter text to match all or partial code:"
 msgstr "输入文本以匹配全部或部分代码："
 
-#: src\qualcoder\code_pdf.py:1611 src\qualcoder\code_text.py:414
+#: src\qualcoder\code_pdf.py:1611 src\qualcoder\code_text.py:412
 #: src\qualcoder\view_av.py:332 src\qualcoder\view_image.py:287
 msgid "Match not found"
 msgstr "未找到匹配"
 
-#: src\qualcoder\code_pdf.py:1611 src\qualcoder\code_text.py:414
+#: src\qualcoder\code_pdf.py:1611 src\qualcoder\code_text.py:412
 #: src\qualcoder\view_av.py:332 src\qualcoder\view_image.py:287
 msgid "No code with matching text found."
 msgstr "未找到与文本匹配的代码。"
 
-#: src\qualcoder\code_pdf.py:1701 src\qualcoder\code_text.py:1103
-#: src\qualcoder\code_text.py:1149 src\qualcoder\view_image.py:1629
+#: src\qualcoder\code_pdf.py:1701 src\qualcoder\code_text.py:1101
+#: src\qualcoder\code_text.py:1147 src\qualcoder\view_image.py:1629
 msgid "Select code"
 msgstr "选择代码"
 
-#: src\qualcoder\code_pdf.py:1720 src\qualcoder\code_text.py:2096
+#: src\qualcoder\code_pdf.py:1720 src\qualcoder\code_text.py:2102
 #: src\qualcoder\view_av.py:1805
 msgid "Text position"
 msgstr "文本位置"
 
-#: src\qualcoder\code_pdf.py:1720 src\qualcoder\code_text.py:2096
+#: src\qualcoder\code_pdf.py:1720 src\qualcoder\code_text.py:2102
 #: src\qualcoder\view_av.py:1805
 msgid "Character position: "
 msgstr "角色定位："
@@ -1941,103 +1942,103 @@ msgstr "角色定位："
 msgid "PDF Image exported"
 msgstr "导出 PDF 图像"
 
-#: src\qualcoder\code_pdf.py:2069 src\qualcoder\code_text.py:2780
+#: src\qualcoder\code_pdf.py:2069 src\qualcoder\code_text.py:2786
 #: src\qualcoder\view_av.py:2320 src\qualcoder\view_image.py:2077
 msgid "Merge code: "
 msgstr "合并代码："
 
-#: src\qualcoder\code_pdf.py:2069 src\qualcoder\code_text.py:2780
+#: src\qualcoder\code_pdf.py:2069 src\qualcoder\code_text.py:2786
 msgid " into code: "
 msgstr " 变成代码："
 
-#: src\qualcoder\code_pdf.py:2070 src\qualcoder\code_text.py:2781
+#: src\qualcoder\code_pdf.py:2070 src\qualcoder\code_text.py:2787
 #: src\qualcoder\view_av.py:2321 src\qualcoder\view_image.py:2078
 msgid "Merge codes"
 msgstr "合并代码"
 
-#: src\qualcoder\code_pdf.py:2132 src\qualcoder\code_text.py:2839
+#: src\qualcoder\code_pdf.py:2132 src\qualcoder\code_text.py:2845
 #: src\qualcoder\view_av.py:2374 src\qualcoder\view_image.py:2133
 msgid "Add new code"
 msgstr "添加新代码"
 
-#: src\qualcoder\code_pdf.py:2132 src\qualcoder\code_text.py:2839
+#: src\qualcoder\code_pdf.py:2132 src\qualcoder\code_text.py:2845
 #: src\qualcoder\view_image.py:2133
 msgid "Code name"
 msgstr "代码名称"
 
-#: src\qualcoder\code_pdf.py:2152 src\qualcoder\code_text.py:2859
-#: src\qualcoder\report_cooccurrence.py:537 src\qualcoder\view_image.py:2149
+#: src\qualcoder\code_pdf.py:2152 src\qualcoder\code_text.py:2865
+#: src\qualcoder\report_cooccurrence.py:941 src\qualcoder\view_image.py:2149
 msgid "New code: "
 msgstr "新代码："
 
-#: src\qualcoder\code_pdf.py:2205 src\qualcoder\code_text.py:2915
+#: src\qualcoder\code_pdf.py:2205 src\qualcoder\code_text.py:2921
 #: src\qualcoder\view_image.py:2172
 msgid "New category: "
 msgstr "新类别："
 
-#: src\qualcoder\code_pdf.py:2228 src\qualcoder\code_text.py:1919
-#: src\qualcoder\code_text.py:2943 src\qualcoder\reports.py:335
+#: src\qualcoder\code_pdf.py:2228 src\qualcoder\code_text.py:1925
+#: src\qualcoder\code_text.py:2949 src\qualcoder\reports.py:335
 #: src\qualcoder\report_codes.py:1208 src\qualcoder\view_av.py:2437
-#: src\qualcoder\view_graph.py:529 src\qualcoder\view_graph.py:600
-#: src\qualcoder\view_graph.py:662 src\qualcoder\view_graph.py:755
-#: src\qualcoder\view_graph.py:1316 src\qualcoder\view_graph.py:1341
-#: src\qualcoder\view_graph.py:1367 src\qualcoder\view_graph.py:1393
-#: src\qualcoder\view_graph.py:1412 src\qualcoder\view_graph.py:1433
+#: src\qualcoder\view_graph.py:1342 src\qualcoder\view_graph.py:1413
+#: src\qualcoder\view_graph.py:1478 src\qualcoder\view_graph.py:1571
+#: src\qualcoder\view_graph.py:2266 src\qualcoder\view_graph.py:2291
+#: src\qualcoder\view_graph.py:2317 src\qualcoder\view_graph.py:2343
+#: src\qualcoder\view_graph.py:2362 src\qualcoder\view_graph.py:2383
 #: src\qualcoder\view_image.py:2201
 msgid "Code: "
 msgstr "代码:"
 
-#: src\qualcoder\code_pdf.py:2240 src\qualcoder\code_text.py:2955
+#: src\qualcoder\code_pdf.py:2240 src\qualcoder\code_text.py:2961
 #: src\qualcoder\view_av.py:2447 src\qualcoder\view_image.py:2205
 msgid "Code deleted: "
 msgstr "代码已删除："
 
-#: src\qualcoder\code_pdf.py:2260 src\qualcoder\code_text.py:2978
+#: src\qualcoder\code_pdf.py:2260 src\qualcoder\code_text.py:2984
 #: src\qualcoder\reports.py:332 src\qualcoder\report_codes.py:1203
-#: src\qualcoder\view_av.py:2464 src\qualcoder\view_charts.py:385
-#: src\qualcoder\view_image.py:2228
+#: src\qualcoder\report_cooccurrence.py:296 src\qualcoder\view_av.py:2464
+#: src\qualcoder\view_charts.py:437 src\qualcoder\view_image.py:2228
 msgid "Category: "
 msgstr "类别："
 
-#: src\qualcoder\code_pdf.py:2276 src\qualcoder\code_text.py:2994
+#: src\qualcoder\code_pdf.py:2276 src\qualcoder\code_text.py:3000
 #: src\qualcoder\view_av.py:2478 src\qualcoder\view_image.py:2242
 msgid "Category deleted: "
 msgstr "类别已删除："
 
-#: src\qualcoder\code_pdf.py:2289 src\qualcoder\code_text.py:3010
+#: src\qualcoder\code_pdf.py:2289 src\qualcoder\code_text.py:3016
 msgid "Memo for Code: "
 msgstr "代码备忘录："
 
-#: src\qualcoder\code_pdf.py:2302 src\qualcoder\code_text.py:3023
+#: src\qualcoder\code_pdf.py:2302 src\qualcoder\code_text.py:3029
 #: src\qualcoder\view_image.py:1817
 msgid "Memo for code: "
 msgstr "代码备忘录："
 
-#: src\qualcoder\code_pdf.py:2312 src\qualcoder\code_text.py:3033
+#: src\qualcoder\code_pdf.py:2312 src\qualcoder\code_text.py:3039
 #: src\qualcoder\view_image.py:2282
 msgid "Memo for Category: "
 msgstr "类别备忘录："
 
-#: src\qualcoder\code_pdf.py:2326 src\qualcoder\code_text.py:3047
+#: src\qualcoder\code_pdf.py:2326 src\qualcoder\code_text.py:3053
 msgid "Memo for category: "
 msgstr "类别备忘录："
 
-#: src\qualcoder\code_pdf.py:2340 src\qualcoder\code_text.py:3061
+#: src\qualcoder\code_pdf.py:2340 src\qualcoder\code_text.py:3067
 #: src\qualcoder\view_av.py:2543 src\qualcoder\view_image.py:2306
 msgid "Rename code"
 msgstr "重命名代码"
 
-#: src\qualcoder\code_pdf.py:2341 src\qualcoder\code_text.py:3062
+#: src\qualcoder\code_pdf.py:2341 src\qualcoder\code_text.py:3068
 #: src\qualcoder\view_av.py:2543 src\qualcoder\view_image.py:2306
 msgid "New code name:"
 msgstr "新代号："
 
-#: src\qualcoder\code_pdf.py:2349 src\qualcoder\code_text.py:3070
+#: src\qualcoder\code_pdf.py:2349 src\qualcoder\code_text.py:3076
 #: src\qualcoder\view_av.py:2550 src\qualcoder\view_image.py:2313
 msgid "Name in use"
 msgstr "使用中的名称"
 
-#: src\qualcoder\code_pdf.py:2350 src\qualcoder\code_text.py:3071
+#: src\qualcoder\code_pdf.py:2350 src\qualcoder\code_text.py:3077
 msgid " is already in use, choose another name."
 msgstr "已被使用，请选择其他名称。"
 
@@ -2045,21 +2046,21 @@ msgstr "已被使用，请选择其他名称。"
 msgid "Code renamed:"
 msgstr "代码重命名："
 
-#: src\qualcoder\code_pdf.py:2380 src\qualcoder\code_text.py:3100
+#: src\qualcoder\code_pdf.py:2380 src\qualcoder\code_text.py:3106
 #: src\qualcoder\view_av.py:2570 src\qualcoder\view_image.py:2334
 msgid "Rename category"
 msgstr "重新命名类别"
 
-#: src\qualcoder\code_pdf.py:2381 src\qualcoder\code_text.py:3101
+#: src\qualcoder\code_pdf.py:2381 src\qualcoder\code_text.py:3107
 #: src\qualcoder\view_av.py:2570 src\qualcoder\view_image.py:2334
 msgid "New category name:"
 msgstr "新类别名称："
 
-#: src\qualcoder\code_pdf.py:2388 src\qualcoder\code_text.py:3108
+#: src\qualcoder\code_pdf.py:2388 src\qualcoder\code_text.py:3114
 msgid "This code name is already in use."
 msgstr "该代号已在使用中。"
 
-#: src\qualcoder\code_pdf.py:2389 src\qualcoder\code_text.py:3109
+#: src\qualcoder\code_pdf.py:2389 src\qualcoder\code_text.py:3115
 msgid "Duplicate code name"
 msgstr "代码名称重复"
 
@@ -2067,27 +2068,27 @@ msgstr "代码名称重复"
 msgid "Category renamed:"
 msgstr "类别更名："
 
-#: src\qualcoder\code_pdf.py:2462 src\qualcoder\code_text.py:3182
+#: src\qualcoder\code_pdf.py:2462 src\qualcoder\code_text.py:3188
 #: src\qualcoder\view_av.py:750 src\qualcoder\view_image.py:756
 msgid "Open memo"
 msgstr "打开备忘录"
 
-#: src\qualcoder\code_pdf.py:2467 src\qualcoder\manage_files.py:459
+#: src\qualcoder\code_pdf.py:2467 src\qualcoder\manage_files.py:456
 msgid "View original text file"
 msgstr "查看原始文本文件"
 
-#: src\qualcoder\code_pdf.py:2469 src\qualcoder\code_text.py:3189
+#: src\qualcoder\code_pdf.py:2469 src\qualcoder\code_text.py:3195
 #: src\qualcoder\view_av.py:751 src\qualcoder\view_image.py:757
 msgid "Next file"
 msgstr "下一个文件"
 
-#: src\qualcoder\code_pdf.py:2470 src\qualcoder\code_text.py:3190
+#: src\qualcoder\code_pdf.py:2470 src\qualcoder\code_text.py:3196
 #: src\qualcoder\view_av.py:752 src\qualcoder\view_image.py:758
 msgid "File with latest coding"
 msgstr "带有最新编码的文件"
 
 #: src\qualcoder\code_pdf.py:2471 src\qualcoder\code_pdf.py:2558
-#: src\qualcoder\code_text.py:3191 src\qualcoder\code_text.py:3292
+#: src\qualcoder\code_text.py:3197 src\qualcoder\code_text.py:3298
 #: src\qualcoder\report_compare_coder_file.py:150
 #: src\qualcoder\report_compare_coder_file.py:209
 #: src\qualcoder\report_file_summary.py:116
@@ -2097,26 +2098,26 @@ msgstr "带有最新编码的文件"
 msgid "Show files like"
 msgstr "显示以下文件"
 
-#: src\qualcoder\code_pdf.py:2472 src\qualcoder\code_text.py:3192
+#: src\qualcoder\code_pdf.py:2472 src\qualcoder\code_text.py:3198
 #: src\qualcoder\report_compare_coder_file.py:151
 #: src\qualcoder\report_file_summary.py:117 src\qualcoder\view_av.py:755
 #: src\qualcoder\view_image.py:761
 msgid "Show files by attributes"
 msgstr "按属性显示文件"
 
-#: src\qualcoder\code_pdf.py:2473 src\qualcoder\code_text.py:3193
+#: src\qualcoder\code_pdf.py:2473 src\qualcoder\code_text.py:3199
 #: src\qualcoder\report_compare_coder_file.py:152
 #: src\qualcoder\report_file_summary.py:118 src\qualcoder\view_av.py:754
 #: src\qualcoder\view_image.py:760
 msgid "Show case files"
 msgstr "显示案件档案"
 
-#: src\qualcoder\code_pdf.py:2474 src\qualcoder\code_text.py:3201
+#: src\qualcoder\code_pdf.py:2474 src\qualcoder\code_text.py:3207
 #: src\qualcoder\view_av.py:756 src\qualcoder\view_image.py:762
 msgid "Sort"
 msgstr "种类"
 
-#: src\qualcoder\code_pdf.py:2476 src\qualcoder\code_text.py:3203
+#: src\qualcoder\code_pdf.py:2476 src\qualcoder\code_text.py:3209
 #: src\qualcoder\report_codes.py:320 src\qualcoder\report_codes.py:367
 #: src\qualcoder\report_codes_by_segments.py:261
 #: src\qualcoder\report_compare_coder_file.py:153
@@ -2126,7 +2127,7 @@ msgstr "种类"
 msgid "Sort by name ascending"
 msgstr "升序排序"
 
-#: src\qualcoder\code_pdf.py:2477 src\qualcoder\code_text.py:3204
+#: src\qualcoder\code_pdf.py:2477 src\qualcoder\code_text.py:3210
 #: src\qualcoder\report_codes.py:321 src\qualcoder\report_codes.py:368
 #: src\qualcoder\report_codes_by_segments.py:262
 #: src\qualcoder\report_compare_coder_file.py:154
@@ -2136,7 +2137,7 @@ msgstr "升序排序"
 msgid "Sort by name descending"
 msgstr "降序排序"
 
-#: src\qualcoder\code_pdf.py:2478 src\qualcoder\code_text.py:3205
+#: src\qualcoder\code_pdf.py:2478 src\qualcoder\code_text.py:3211
 #: src\qualcoder\report_compare_coder_file.py:155
 #: src\qualcoder\report_file_summary.py:121 src\qualcoder\view_av.py:760
 #: src\qualcoder\view_image.py:766
@@ -2144,7 +2145,7 @@ msgstr "降序排序"
 msgid "Sort by case ascending"
 msgstr "升序排序"
 
-#: src\qualcoder\code_pdf.py:2479 src\qualcoder\code_text.py:3206
+#: src\qualcoder\code_pdf.py:2479 src\qualcoder\code_text.py:3212
 #: src\qualcoder\report_compare_coder_file.py:156
 #: src\qualcoder\report_file_summary.py:122 src\qualcoder\view_av.py:761
 #: src\qualcoder\view_image.py:767
@@ -2152,7 +2153,7 @@ msgstr "升序排序"
 msgid "Sort by case descending"
 msgstr "降序排序"
 
-#: src\qualcoder\code_pdf.py:2480 src\qualcoder\code_text.py:3207
+#: src\qualcoder\code_pdf.py:2480 src\qualcoder\code_text.py:3213
 #: src\qualcoder\report_codes.py:322
 #: src\qualcoder\report_codes_by_segments.py:263
 #: src\qualcoder\report_compare_coder_file.py:157
@@ -2162,7 +2163,7 @@ msgstr "降序排序"
 msgid "Sort by date ascending"
 msgstr "降序排序"
 
-#: src\qualcoder\code_pdf.py:2481 src\qualcoder\code_text.py:3208
+#: src\qualcoder\code_pdf.py:2481 src\qualcoder\code_text.py:3214
 #: src\qualcoder\report_codes.py:323
 #: src\qualcoder\report_codes_by_segments.py:264
 #: src\qualcoder\report_compare_coder_file.py:158
@@ -2172,38 +2173,38 @@ msgstr "降序排序"
 msgid "Sort by date descending"
 msgstr "降序排序"
 
-#: src\qualcoder\code_pdf.py:2535 src\qualcoder\code_text.py:3269
+#: src\qualcoder\code_pdf.py:2535 src\qualcoder\code_text.py:3275
 #: src\qualcoder\report_compare_coder_file.py:186
 #: src\qualcoder\report_file_summary.py:152 src\qualcoder\view_av.py:823
 #: src\qualcoder\view_image.py:804
 msgid "Show all files"
 msgstr "显示所有文件"
 
-#: src\qualcoder\code_pdf.py:2536 src\qualcoder\code_text.py:3270
+#: src\qualcoder\code_pdf.py:2536 src\qualcoder\code_text.py:3276
 #: src\qualcoder\report_compare_coder_file.py:187
 #: src\qualcoder\report_file_summary.py:153 src\qualcoder\view_av.py:824
 #: src\qualcoder\view_image.py:805
 msgid "Select case"
 msgstr "选择案例"
 
-#: src\qualcoder\code_pdf.py:2561 src\qualcoder\code_text.py:3295
+#: src\qualcoder\code_pdf.py:2561 src\qualcoder\code_text.py:3301
 #: src\qualcoder\report_compare_coder_file.py:212
 #: src\qualcoder\report_file_summary.py:178 src\qualcoder\view_av.py:849
 #: src\qualcoder\view_image.py:832
 msgid "Show files containing the text. (Blank for all)"
 msgstr "显示包含文本的文件。(全部为空）"
 
-#: src\qualcoder\code_pdf.py:2636 src\qualcoder\code_text.py:1585
+#: src\qualcoder\code_pdf.py:2636 src\qualcoder\code_text.py:1583
 #: src\qualcoder\view_av.py:880 src\qualcoder\view_image.py:695
 msgid "Memo for file: "
 msgstr "备忘存档："
 
-#: src\qualcoder\code_pdf.py:2648 src\qualcoder\code_text.py:1597
-#: src\qualcoder\code_text.py:1598
+#: src\qualcoder\code_pdf.py:2648 src\qualcoder\code_text.py:1595
+#: src\qualcoder\code_text.py:1596
 msgid "Memo:"
 msgstr "备忘："
 
-#: src\qualcoder\code_pdf.py:2693 src\qualcoder\code_text.py:3597
+#: src\qualcoder\code_pdf.py:2693 src\qualcoder\code_text.py:3603
 msgid "Code text: "
 msgstr "代码文本："
 
@@ -2256,7 +2257,7 @@ msgid "Flag important"
 msgstr "重要标志"
 
 #: src\qualcoder\code_pdf.py:3154 src\qualcoder\code_pdf.py:3554
-#: src\qualcoder\code_text.py:3885 src\qualcoder\view_av.py:3001
+#: src\qualcoder\code_text.py:3891 src\qualcoder\view_av.py:3001
 #: src\qualcoder\view_av.py:3202
 msgid "Select code to unmark"
 msgstr "选择代码以取消标记"
@@ -2282,25 +2283,25 @@ msgid "Cannot mark"
 msgstr "无法标记"
 
 #: src\qualcoder\code_pdf.py:3416 src\qualcoder\code_pdf.py:3583
-#: src\qualcoder\code_text.py:1334 src\qualcoder\code_text.py:3748
-#: src\qualcoder\code_text.py:3913
+#: src\qualcoder\code_text.py:1332 src\qualcoder\code_text.py:3754
+#: src\qualcoder\code_text.py:3919
 msgid "No file was selected"
 msgstr "未选择文件"
 
-#: src\qualcoder\code_pdf.py:3420 src\qualcoder\code_text.py:3753
-#: src\qualcoder\code_text.py:4020 src\qualcoder\code_text.py:4157
-#: src\qualcoder\code_text.py:4289 src\qualcoder\view_av.py:3083
+#: src\qualcoder\code_pdf.py:3420 src\qualcoder\code_text.py:3759
+#: src\qualcoder\code_text.py:4016 src\qualcoder\code_text.py:4163
+#: src\qualcoder\code_text.py:4307 src\qualcoder\view_av.py:3083
 msgid "No code was selected"
 msgstr "未选择代码"
 
 #: src\qualcoder\code_pdf.py:3621 src\qualcoder\code_pdf.py:3641
-#: src\qualcoder\code_text.py:1945 src\qualcoder\code_text.py:3952
-#: src\qualcoder\code_text.py:3973 src\qualcoder\view_av.py:3256
+#: src\qualcoder\code_text.py:1951 src\qualcoder\code_text.py:3958
+#: src\qualcoder\code_text.py:3979 src\qualcoder\view_av.py:3256
 #: src\qualcoder\view_av.py:3277
 msgid "Annotation: "
 msgstr "注释："
 
-#: src\qualcoder\code_pdf.py:3635 src\qualcoder\code_text.py:3966
+#: src\qualcoder\code_pdf.py:3635 src\qualcoder\code_text.py:3972
 #: src\qualcoder\view_av.py:3270
 msgid "Annotation added at position: "
 msgstr "在位置处添加注释："
@@ -2309,26 +2310,26 @@ msgstr "在位置处添加注释："
 msgid "for:"
 msgstr "为:"
 
-#: src\qualcoder\code_pdf.py:3663 src\qualcoder\code_text.py:3995
+#: src\qualcoder\code_pdf.py:3663 src\qualcoder\code_text.py:4001
 #: src\qualcoder\view_av.py:3297
 msgid "Annotation removed from position "
 msgstr "从位置上删除注释"
 
-#: src\qualcoder\code_pdf.py:3782 src\qualcoder\code_text.py:5545
+#: src\qualcoder\code_pdf.py:3782 src\qualcoder\code_text.py:5587
 #: src\qualcoder\view_av.py:3495
 msgid "Press O to cycle overlapping codes"
 msgstr "按 O 循环重叠代码"
 
-#: src\qualcoder\code_pdf.py:3829 src\qualcoder\code_text.py:5596
+#: src\qualcoder\code_pdf.py:3829 src\qualcoder\code_text.py:5638
 #, fuzzy
 msgid "ANNOTATED"
 msgstr "附注："
 
-#: src\qualcoder\code_text.py:137
+#: src\qualcoder\code_text.py:135
 msgid "EDITING TEXT MODE (Ctrl+E)"
 msgstr "编辑文本模式 (Ctrl+E)"
 
-#: src\qualcoder\code_text.py:139 src\qualcoder\edit_textfile.py:85
+#: src\qualcoder\code_text.py:137 src\qualcoder\edit_textfile.py:85
 #: src\qualcoder\view_av.py:4071
 msgid ""
 "Avoid selecting sections of text with a combination of not underlined (not "
@@ -2338,80 +2339,80 @@ msgstr ""
 "避免选择未加下划线（未编码/已注释/已指定案例）和加下划线（已编码、已注释、已"
 "指定案例）的文本部分。"
 
-#: src\qualcoder\code_text.py:142 src\qualcoder\edit_textfile.py:87
+#: src\qualcoder\code_text.py:140 src\qualcoder\edit_textfile.py:87
 #: src\qualcoder\view_av.py:4073
 msgid ""
 "Positions of the underlying codes / annotations / case-assigned may not "
 "correctly adjust if text is typed over or deleted."
 msgstr "如果文本被打翻或删除，基础代码/注释/案例分配的位置可能无法正确调整。"
 
-#: src\qualcoder\code_text.py:883
+#: src\qualcoder\code_text.py:881
 msgid "Examples:"
 msgstr "例如:"
 
-#: src\qualcoder\code_text.py:903
+#: src\qualcoder\code_text.py:901
 msgid "Project memo"
 msgstr "项目备忘录"
 
-#: src\qualcoder\code_text.py:912
+#: src\qualcoder\code_text.py:910
 msgid "Delete all codings in this file made by "
 msgstr "删除该文件中所有由"
 
-#: src\qualcoder\code_text.py:923
+#: src\qualcoder\code_text.py:921
 msgid "All codes by "
 msgstr "所有代码由"
 
-#: src\qualcoder\code_text.py:923
+#: src\qualcoder\code_text.py:921
 msgid " deleted from "
 msgstr " 删去"
 
-#: src\qualcoder\code_text.py:1073 src\qualcoder\code_text.py:1123
+#: src\qualcoder\code_text.py:1071 src\qualcoder\code_text.py:1121
 msgid "all matches in file"
 msgstr "文件中的所有匹配"
 
-#: src\qualcoder\code_text.py:1078 src\qualcoder\code_text.py:1128
+#: src\qualcoder\code_text.py:1076 src\qualcoder\code_text.py:1126
 msgid "first match in file"
 msgstr "文件中的第一个匹配"
 
-#: src\qualcoder\code_text.py:1083
+#: src\qualcoder\code_text.py:1081
 msgid "last match in file"
 msgstr "文件中的最后一个匹配"
 
-#: src\qualcoder\code_text.py:1088 src\qualcoder\code_text.py:1137
+#: src\qualcoder\code_text.py:1086 src\qualcoder\code_text.py:1135
 #, fuzzy
 msgid "code within code"
 msgstr "将代码合并到代码中"
 
-#: src\qualcoder\code_text.py:1210 src\qualcoder\view_av.py:2740
+#: src\qualcoder\code_text.py:1208 src\qualcoder\view_av.py:2740
 msgid "Change start position (SHIFT LEFT/ALT RIGHT)"
 msgstr "更改起始位置（左移/右移）"
 
-#: src\qualcoder\code_text.py:1211 src\qualcoder\view_av.py:2741
+#: src\qualcoder\code_text.py:1209 src\qualcoder\view_av.py:2741
 msgid "Change end position (SHIFT RIGHT/ALT LEFT)"
 msgstr "更改末端位置（右移/左移）"
 
-#: src\qualcoder\code_text.py:1226
+#: src\qualcoder\code_text.py:1224
 #, fuzzy
 msgid "Mark with new code (N)"
 msgstr "用新代码标记"
 
-#: src\qualcoder\code_text.py:1247
+#: src\qualcoder\code_text.py:1245
 msgid "Copy with metadata"
 msgstr "与元数据一起复制"
 
-#: src\qualcoder\code_text.py:1250
+#: src\qualcoder\code_text.py:1248
 msgid "Set bookmark (B)"
 msgstr "设置书签 (B)"
 
-#: src\qualcoder\code_text.py:1263
+#: src\qualcoder\code_text.py:1261
 msgid "Edit text analysis prompts"
 msgstr "编辑文本分析提示"
 
-#: src\qualcoder\code_text.py:1673
+#: src\qualcoder\code_text.py:1671
 msgid "Shift codings after clicked position"
 msgstr "点击位置后移动编码"
 
-#: src\qualcoder\code_text.py:1676
+#: src\qualcoder\code_text.py:1674
 msgid ""
 "Shift code positions for all codes after you have clicked on a position in "
 "the text.\n"
@@ -2428,103 +2429,108 @@ msgstr ""
 "正数（向右移动）或负数（向左移动）（-500 至 500）\n"
 "点击的字符位置："
 
-#: src\qualcoder\code_text.py:1921 src\qualcoder\code_text.py:1944
-#: src\qualcoder\view_graph.py:384
+#: src\qualcoder\code_text.py:1735
+#, fuzzy
+msgid "Reference: "
+msgstr "参考资料"
+
+#: src\qualcoder\code_text.py:1927 src\qualcoder\code_text.py:1950
+#: src\qualcoder\view_graph.py:521
 msgid "Text: "
 msgstr "正文："
 
-#: src\qualcoder\code_text.py:1923
+#: src\qualcoder\code_text.py:1929
 msgid "Memos for file: "
 msgstr "备忘录存档："
 
-#: src\qualcoder\code_text.py:1946
+#: src\qualcoder\code_text.py:1952
 msgid "Annotations for file: "
 msgstr "文件注释："
 
-#: src\qualcoder\code_text.py:2302 src\qualcoder\code_text.py:2359
+#: src\qualcoder\code_text.py:2308 src\qualcoder\code_text.py:2365
 msgid "Coded text file exported to: "
 msgstr "导出为编码文本文件："
 
-#: src\qualcoder\code_text.py:2304
+#: src\qualcoder\code_text.py:2310
 msgid "Coded html file exported"
 msgstr "导出已编码的 html 文件"
 
-#: src\qualcoder\code_text.py:2421
+#: src\qualcoder\code_text.py:2427
 msgid "Select a code"
 msgstr "选择代码"
 
-#: src\qualcoder\code_text.py:2600 src\qualcoder\code_text.py:2671
-#: src\qualcoder\code_text.py:2686
+#: src\qualcoder\code_text.py:2606 src\qualcoder\code_text.py:2677
+#: src\qualcoder\code_text.py:2692
 msgid "Show previous coding of selected code"
 msgstr "显示所选代码以前的编码"
 
-#: src\qualcoder\code_text.py:2603 src\qualcoder\code_text.py:2675
-#: src\qualcoder\code_text.py:2689
+#: src\qualcoder\code_text.py:2609 src\qualcoder\code_text.py:2681
+#: src\qualcoder\code_text.py:2695
 msgid "Show next coding of selected code"
 msgstr "显示所选代码的下一个编码"
 
-#: src\qualcoder\code_text.py:3091
+#: src\qualcoder\code_text.py:3097
 msgid "Code renamed from: "
 msgstr "代码重命名自:"
 
-#: src\qualcoder\code_text.py:3091 src\qualcoder\code_text.py:3126
+#: src\qualcoder\code_text.py:3097 src\qualcoder\code_text.py:3132
 msgid " to: "
 msgstr " 到："
 
-#: src\qualcoder\code_text.py:3126 src\qualcoder\view_image.py:2359
+#: src\qualcoder\code_text.py:3132 src\qualcoder\view_image.py:2359
 msgid "Category renamed from: "
 msgstr "类别更名自："
 
-#: src\qualcoder\code_text.py:3186
+#: src\qualcoder\code_text.py:3192
 msgid "view original text file"
 msgstr "查看原始文本文件"
 
-#: src\qualcoder\code_text.py:3195
+#: src\qualcoder\code_text.py:3201
 msgid " next  characters"
 msgstr " 下一个字符"
 
-#: src\qualcoder\code_text.py:3198
+#: src\qualcoder\code_text.py:3204
 msgid " previous  characters"
 msgstr " 以前的人物"
 
-#: src\qualcoder\code_text.py:3199
+#: src\qualcoder\code_text.py:3205
 msgid "Go to bookmark"
 msgstr "转到书签"
 
-#: src\qualcoder\code_text.py:3200 src\qualcoder\code_text.py:3511
-#: src\qualcoder\manage_files.py:524 src\qualcoder\manage_files.py:1037
+#: src\qualcoder\code_text.py:3206 src\qualcoder\code_text.py:3517
+#: src\qualcoder\manage_files.py:521 src\qualcoder\manage_files.py:1034
 msgid "Mark speakers"
 msgstr "标记扬声器"
 
-#: src\qualcoder\code_text.py:3340 src\qualcoder\code_text.py:3396
+#: src\qualcoder\code_text.py:3346 src\qualcoder\code_text.py:3402
 msgid "From: "
 msgstr "来自:"
 
-#: src\qualcoder\code_text.py:3448 src\qualcoder\code_text.py:5413
+#: src\qualcoder\code_text.py:3454 src\qualcoder\code_text.py:5443
 msgid "Entire text file will be loaded"
 msgstr "将加载整个文本文件"
 
-#: src\qualcoder\code_text.py:3497
+#: src\qualcoder\code_text.py:3503
 msgid ""
 "The coder \"{}\" is currently hidden. Do you want to make it visible, so you "
 "can see the speaker codings?"
 msgstr "当前隐藏了编码符“{}”。是否需要将其显示出来，以便查看发言者标记？"
 
-#: src\qualcoder\code_text.py:3499
+#: src\qualcoder\code_text.py:3505
 #, fuzzy
 msgid "Speaker coding"
 msgstr "发言人姓名"
 
-#: src\qualcoder\code_text.py:3511 src\qualcoder\manage_files.py:1037
+#: src\qualcoder\code_text.py:3517 src\qualcoder\manage_files.py:1034
 #, fuzzy
 msgid "No text file selected."
 msgstr "未选择文件"
 
-#: src\qualcoder\code_text.py:3791 src\qualcoder\code_text.py:5284
+#: src\qualcoder\code_text.py:3797 src\qualcoder\code_text.py:5314
 msgid "AI interpretation: "
 msgstr "人工智能解释："
 
-#: src\qualcoder\code_text.py:3792
+#: src\qualcoder\code_text.py:3798
 msgid ""
 "\n"
 "\n"
@@ -2534,7 +2540,7 @@ msgstr ""
 "\n"
 "人工智能搜索提示："
 
-#: src\qualcoder\code_text.py:3793
+#: src\qualcoder\code_text.py:3799
 msgid ""
 "\n"
 "AI model: "
@@ -2542,37 +2548,37 @@ msgstr ""
 "\n"
 "人工智能模型："
 
-#: src\qualcoder\code_text.py:3796
+#: src\qualcoder\code_text.py:3802
 msgid ""
 "Do you want to store the AI interpretation in a memo together with the "
 "coding?<br/><br/>"
 msgstr "您想将人工智能解释与编码一起存储在备忘录中吗？"
 
-#: src\qualcoder\code_text.py:3799
+#: src\qualcoder\code_text.py:3805
 #, fuzzy
 msgid "AI Interpretation"
 msgstr "人工智能解释："
 
-#: src\qualcoder\code_text.py:3967 src\qualcoder\code_text.py:3996
+#: src\qualcoder\code_text.py:3973 src\qualcoder\code_text.py:4002
 #: src\qualcoder\view_av.py:3271 src\qualcoder\view_av.py:3298
 msgid " for: "
 msgstr " 为："
 
-#: src\qualcoder\code_text.py:4036 src\qualcoder\code_text.py:4148
-#: src\qualcoder\code_text.py:4318
+#: src\qualcoder\code_text.py:4032 src\qualcoder\code_text.py:4154
+#: src\qualcoder\code_text.py:4339
 msgid "Select files to code"
 msgstr "选择要编码的文件"
 
-#: src\qualcoder\code_text.py:4044
+#: src\qualcoder\code_text.py:4040
 msgid "Code text using start and end marks: "
 msgstr "使用开始和结束标记对文本进行编码："
 
-#: src\qualcoder\code_text.py:4096
+#: src\qualcoder\code_text.py:4102
 msgid "Coding using start and end marks"
 msgstr "使用开始和结束标记编码"
 
-#: src\qualcoder\code_text.py:4096 src\qualcoder\code_text.py:4265
-#: src\qualcoder\code_text.py:4270 src\qualcoder\code_text.py:4434
+#: src\qualcoder\code_text.py:4102 src\qualcoder\code_text.py:4283
+#: src\qualcoder\code_text.py:4288 src\qualcoder\code_text.py:4464
 msgid ""
 "\n"
 "Code: "
@@ -2580,7 +2586,7 @@ msgstr ""
 "\n"
 "代码:"
 
-#: src\qualcoder\code_text.py:4097
+#: src\qualcoder\code_text.py:4103
 msgid ""
 "\n"
 "With start mark: "
@@ -2588,7 +2594,7 @@ msgstr ""
 "\n"
 "带起始标记："
 
-#: src\qualcoder\code_text.py:4097
+#: src\qualcoder\code_text.py:4103
 msgid ""
 "\n"
 "End mark: "
@@ -2596,31 +2602,31 @@ msgstr ""
 "\n"
 "结束标记："
 
-#: src\qualcoder\code_text.py:4104
+#: src\qualcoder\code_text.py:4110
 msgid " new coded sections found."
 msgstr " 发现新的编码章节。"
 
-#: src\qualcoder\code_text.py:4106
+#: src\qualcoder\code_text.py:4112
 msgid "previously coded."
 msgstr "之前的编码。"
 
-#: src\qualcoder\code_text.py:4118
+#: src\qualcoder\code_text.py:4124
 msgid "Select auto-codings to undo"
 msgstr "选择要撤销的自动编码"
 
-#: src\qualcoder\code_text.py:4135
+#: src\qualcoder\code_text.py:4141
 msgid "Undo autocoding: "
 msgstr "撤销自动编码："
 
-#: src\qualcoder\code_text.py:4163 src\qualcoder\code_text.py:4176
+#: src\qualcoder\code_text.py:4169 src\qualcoder\code_text.py:4182
 msgid "Code sentence"
 msgstr "代码句"
 
-#: src\qualcoder\code_text.py:4166
+#: src\qualcoder\code_text.py:4172
 msgid "Auto code sentence using this text fragment:"
 msgstr "使用该文本片段自动生成代码句："
 
-#: src\qualcoder\code_text.py:4181
+#: src\qualcoder\code_text.py:4187
 msgid ""
 "Define sentence ending. Default is period space.\n"
 "Use \\n for line ending:"
@@ -2628,23 +2634,24 @@ msgstr ""
 "定义句子结尾。默认为句号空格。\n"
 "行尾用 \\n 表示："
 
-#: src\qualcoder\code_text.py:4203
-msgid "Regex compliation error"
+#: src\qualcoder\code_text.py:4209 src\qualcoder\code_text.py:4355
+#, fuzzy
+msgid "Regex compilation error"
 msgstr "Regex 编译错误"
 
-#: src\qualcoder\code_text.py:4253 src\qualcoder\code_text.py:4423
+#: src\qualcoder\code_text.py:4271 src\qualcoder\code_text.py:4453
 msgid "Autocode insert error "
 msgstr "自动代码插入错误"
 
-#: src\qualcoder\code_text.py:4258
+#: src\qualcoder\code_text.py:4276
 msgid " added codes"
 msgstr " 添加代码"
 
-#: src\qualcoder\code_text.py:4265
+#: src\qualcoder\code_text.py:4283
 msgid "Sentence coding: "
 msgstr "句子编码："
 
-#: src\qualcoder\code_text.py:4266 src\qualcoder\code_text.py:4435
+#: src\qualcoder\code_text.py:4284 src\qualcoder\code_text.py:4465
 msgid ""
 "\n"
 "With: "
@@ -2652,7 +2659,7 @@ msgstr ""
 "\n"
 "有了："
 
-#: src\qualcoder\code_text.py:4266 src\qualcoder\code_text.py:4273
+#: src\qualcoder\code_text.py:4284 src\qualcoder\code_text.py:4291
 msgid ""
 "\n"
 "Using line ending: "
@@ -2660,11 +2667,11 @@ msgstr ""
 "\n"
 "使用行尾："
 
-#: src\qualcoder\code_text.py:4269
+#: src\qualcoder\code_text.py:4287
 msgid "Automatic code sentence in files:"
 msgstr "文件中的自动代码句："
 
-#: src\qualcoder\code_text.py:4271
+#: src\qualcoder\code_text.py:4289
 msgid ""
 "\n"
 "With text fragment: "
@@ -2672,140 +2679,140 @@ msgstr ""
 "\n"
 "附文字片段："
 
-#: src\qualcoder\code_text.py:4295
+#: src\qualcoder\code_text.py:4313
 msgid "Automatic coding"
 msgstr "自动编码"
 
-#: src\qualcoder\code_text.py:4298
+#: src\qualcoder\code_text.py:4316
 msgid "Use | to code multiple texts"
 msgstr "使用 | 对多个文本进行编码"
 
-#: src\qualcoder\code_text.py:4299
+#: src\qualcoder\code_text.py:4318
+#, fuzzy
+msgid "Auto code files with the current code using Regex:"
+msgstr "使用该文本的当前代码自动生成代码文件："
+
+#: src\qualcoder\code_text.py:4320
 msgid "Auto code files with the current code for this text:"
 msgstr "使用该文本的当前代码自动生成代码文件："
 
-#: src\qualcoder\code_text.py:4334
-#, fuzzy
-msgid "Regex compilation error"
-msgstr "Regex 编译错误"
-
-#: src\qualcoder\code_text.py:4340
+#: src\qualcoder\code_text.py:4361
 #, fuzzy
 msgid "Autocode Text"
 msgstr "自动代码插入错误"
 
-#: src\qualcoder\code_text.py:4430
+#: src\qualcoder\code_text.py:4460
 #, fuzzy
 msgid "Autocoding error: "
 msgstr "自动代码插入错误"
 
-#: src\qualcoder\code_text.py:4434
+#: src\qualcoder\code_text.py:4464
 msgid "Text coding: "
 msgstr "文本编码："
 
-#: src\qualcoder\code_text.py:4478
+#: src\qualcoder\code_text.py:4508
 msgid "Text reverted to prior to edit"
 msgstr "文本恢复到编辑前"
 
-#: src\qualcoder\code_text.py:4479
+#: src\qualcoder\code_text.py:4509
 msgid "Undo last edited text"
 msgstr "撤销上次编辑的文本"
 
-#: src\qualcoder\code_text.py:5102
+#: src\qualcoder\code_text.py:5132
 msgid "Please finish editing the text before starting an AI search."
 msgstr "请完成文本编辑后再开始人工智能搜索。"
 
-#: src\qualcoder\code_text.py:5103 src\qualcoder\code_text.py:5107
-#: src\qualcoder\code_text.py:5111 src\qualcoder\code_text.py:5115
-#: src\qualcoder\code_text.py:5174 src\qualcoder\code_text.py:5215
-#: src\qualcoder\code_text.py:5257 src\qualcoder\code_text.py:5266
-#: src\qualcoder\code_text.py:5366 src\qualcoder\code_text.py:5369
+#: src\qualcoder\code_text.py:5133 src\qualcoder\code_text.py:5137
+#: src\qualcoder\code_text.py:5141 src\qualcoder\code_text.py:5145
+#: src\qualcoder\code_text.py:5204 src\qualcoder\code_text.py:5245
+#: src\qualcoder\code_text.py:5287 src\qualcoder\code_text.py:5296
+#: src\qualcoder\code_text.py:5396 src\qualcoder\code_text.py:5399
 msgid "AI Search"
 msgstr "人工智能搜索"
 
-#: src\qualcoder\code_text.py:5110
+#: src\qualcoder\code_text.py:5140
 msgid ""
 "The AI is already performing a search. Please stop it before starting a new "
 "one."
 msgstr "人工智能已经在执行搜索。请先停止搜索，然后再开始新的搜索。"
 
-#: src\qualcoder\code_text.py:5114
+#: src\qualcoder\code_text.py:5144
 msgid "The AI is busy, please wait a moment and retry."
 msgstr "人工智能正忙，请稍等片刻后重试。"
 
-#: src\qualcoder\code_text.py:5151
+#: src\qualcoder\code_text.py:5181
 msgid "Searching for related data, please wait..."
 msgstr "正在搜索相关数据，请稍候..."
 
-#: src\qualcoder\code_text.py:5173
+#: src\qualcoder\code_text.py:5203
 msgid "AI: No related data found for \""
 msgstr "人工智能 未找到相关数据"
 
-#: src\qualcoder\code_text.py:5213
+#: src\qualcoder\code_text.py:5243
 msgid "AI: No new data found for \""
 msgstr "人工智能： 未找到以下方面的新数据"
 
-#: src\qualcoder\code_text.py:5214
+#: src\qualcoder\code_text.py:5244
 msgid "\" beside what has already been coded with this code."
 msgstr "旁边是已用此代码编码的内容。"
 
-#: src\qualcoder\code_text.py:5220
+#: src\qualcoder\code_text.py:5250
 msgid ""
 "Potentially related data found, inspecting it closer. Please be patient..."
 msgstr "发现潜在相关数据，正在仔细检查。请耐心等待..."
 
-#: src\qualcoder\code_text.py:5254
+#: src\qualcoder\code_text.py:5284
 msgid "The closer inspection of the first "
 msgstr "仔细观察第一个"
 
-#: src\qualcoder\code_text.py:5255
+#: src\qualcoder\code_text.py:5285
 msgid ""
 "pieces of data yielded no results. You can continue to inspect more by "
 "clicking on \"find more\" in the list on the left."
 msgstr "条数据没有结果。您可以点击左侧列表中的 “查找更多”，继续查看更多信息。"
 
-#: src\qualcoder\code_text.py:5264
+#: src\qualcoder\code_text.py:5294
 msgid ""
 "Upon closer inspection, no pieces of data relevant to your search query "
 "could be identified. Please start a new search."
 msgstr "经仔细检查，未找到与您的搜索查询相关的数据。请重新搜索。"
 
-#: src\qualcoder\code_text.py:5283
+#: src\qualcoder\code_text.py:5313
 msgid "Quote: "
 msgstr "引用："
 
-#: src\qualcoder\code_text.py:5320
+#: src\qualcoder\code_text.py:5350
 msgid ">> Searching (click here to cancel)"
 msgstr ">> 搜索（点击此处取消）"
 
-#: src\qualcoder\code_text.py:5322
+#: src\qualcoder\code_text.py:5352
 msgid "Click here to stop the search"
 msgstr "单击此处停止搜索"
 
-#: src\qualcoder\code_text.py:5327
+#: src\qualcoder\code_text.py:5357
 msgid ">> Find more..."
 msgstr ">> 了解更多..."
 
-#: src\qualcoder\code_text.py:5328
+#: src\qualcoder\code_text.py:5358
 msgid "Click here to analyze more data"
 msgstr "点击此处分析更多数据"
 
-#: src\qualcoder\code_text.py:5353
+#: src\qualcoder\code_text.py:5383
 msgid "Do you want to stop the search?"
 msgstr "你想停止搜索吗？"
 
-#: src\qualcoder\code_text.py:5354 src\qualcoder\manage_files.py:1673
-#: src\qualcoder\__main__.py:2661
+#: src\qualcoder\code_text.py:5384 src\qualcoder\manage_files.py:1670
+#: src\qualcoder\__main__.py:2664
 msgid "Open file"
 msgstr "打开文件"
 
-#: src\qualcoder\code_text.py:5365
+#: src\qualcoder\code_text.py:5395
 msgid ""
 "There are no more pieces of data to analyze for this search. Please start a "
 "new search."
 msgstr "此搜索已无数据可供分析。请重新搜索。"
 
-#: src\qualcoder\code_text.py:5368
+#: src\qualcoder\code_text.py:5398
 msgid "The AI is busy. Please wait a moment and retry."
 msgstr "人工智能正忙。请稍等片刻后重试。"
 
@@ -3111,11 +3118,11 @@ msgstr "期刊："
 msgid "Attribute added to journals:"
 msgstr "为期刊添加属性："
 
-#: src\qualcoder\journals.py:254 src\qualcoder\manage_files.py:1405
+#: src\qualcoder\journals.py:254 src\qualcoder\manage_files.py:1402
 msgid "type"
 msgstr "类型"
 
-#: src\qualcoder\journals.py:358 src\qualcoder\__main__.py:3115
+#: src\qualcoder\journals.py:358 src\qualcoder\__main__.py:3118
 msgid "Journals: "
 msgstr "期刊："
 
@@ -3159,7 +3166,7 @@ msgstr "显示名称如"
 msgid "Show this coder"
 msgstr "显示该编码器"
 
-#: src\qualcoder\journals.py:444 src\qualcoder\manage_files.py:503
+#: src\qualcoder\journals.py:444 src\qualcoder\manage_files.py:500
 msgid "Enter date"
 msgstr "输入日期"
 
@@ -3219,227 +3226,227 @@ msgstr "期刊名称中只能使用：a-z，A-z 0-9 - 空格"
 msgid "Journal name changed from: "
 msgstr "期刊名称由："
 
-#: src\qualcoder\manage_files.py:197
+#: src\qualcoder\manage_files.py:194
 msgid "Rows: "
 msgstr "行："
 
-#: src\qualcoder\manage_files.py:206
+#: src\qualcoder\manage_files.py:203
 msgid "Hidden columns: "
 msgstr "隐藏栏目："
 
-#: src\qualcoder\manage_files.py:208
+#: src\qualcoder\manage_files.py:205
 msgid "No special settings"
 msgstr "无特殊设置"
 
-#: src\qualcoder\manage_files.py:209
+#: src\qualcoder\manage_files.py:206
 msgid "No table display settings or rows or columns selected"
 msgstr "未选择表格显示设置或行或列"
 
-#: src\qualcoder\manage_files.py:211
+#: src\qualcoder\manage_files.py:208
 msgid "Save as:"
 msgstr "另存为："
 
-#: src\qualcoder\manage_files.py:212
+#: src\qualcoder\manage_files.py:209
 msgid "Save Table Display"
 msgstr "保存表格显示"
 
-#: src\qualcoder\manage_files.py:220
+#: src\qualcoder\manage_files.py:217
 msgid "Table display exists"
 msgstr "存在表格显示"
 
-#: src\qualcoder\manage_files.py:221
+#: src\qualcoder\manage_files.py:218
 msgid "This table display setting already exists: "
 msgstr "该表格显示设置已经存在："
 
-#: src\qualcoder\manage_files.py:234 src\qualcoder\manage_files.py:311
+#: src\qualcoder\manage_files.py:231 src\qualcoder\manage_files.py:308
 #: src\qualcoder\report_attributes.py:127
 #: src\qualcoder\report_attributes.py:175
 msgid "Nothing saved"
 msgstr "没有保存"
 
-#: src\qualcoder\manage_files.py:234 src\qualcoder\manage_files.py:311
+#: src\qualcoder\manage_files.py:231 src\qualcoder\manage_files.py:308
 #, fuzzy
 msgid "No saved table displays"
 msgstr "没有保存的表格"
 
-#: src\qualcoder\manage_files.py:240
+#: src\qualcoder\manage_files.py:237
 msgid "Select table display"
 msgstr "选择表格显示"
 
-#: src\qualcoder\manage_files.py:247 src\qualcoder\manage_files.py:634
+#: src\qualcoder\manage_files.py:244 src\qualcoder\manage_files.py:631
 msgid "Load table display settings"
 msgstr "加载表格显示设置"
 
-#: src\qualcoder\manage_files.py:261
+#: src\qualcoder\manage_files.py:258
 msgid "Hidden column: "
 msgstr "隐藏栏："
 
-#: src\qualcoder\manage_files.py:273
+#: src\qualcoder\manage_files.py:270
 msgid "Row settings:"
 msgstr "行设置："
 
-#: src\qualcoder\manage_files.py:287
+#: src\qualcoder\manage_files.py:284
 msgid "Table column not present"
 msgstr "表列不存在"
 
-#: src\qualcoder\manage_files.py:317
+#: src\qualcoder\manage_files.py:314
 #, fuzzy
 msgid "Delete table display"
 msgstr "选择表格显示"
 
-#: src\qualcoder\manage_files.py:324
+#: src\qualcoder\manage_files.py:321
 #, fuzzy
 msgid "Deleted display"
 msgstr "选择表格显示"
 
-#: src\qualcoder\manage_files.py:455
+#: src\qualcoder\manage_files.py:452
 msgid "View"
 msgstr "查看"
 
-#: src\qualcoder\manage_files.py:462
+#: src\qualcoder\manage_files.py:459
 msgid "Pdf pages to images"
 msgstr "将 PDF 页面转换为图像"
 
-#: src\qualcoder\manage_files.py:469
+#: src\qualcoder\manage_files.py:466
 msgid "File type order"
 msgstr "文件类型顺序"
 
-#: src\qualcoder\manage_files.py:481
+#: src\qualcoder\manage_files.py:478
 msgid "Assign case to file"
 msgstr "指定案件归档"
 
-#: src\qualcoder\manage_files.py:486
+#: src\qualcoder\manage_files.py:483
 msgid "Hide values like"
 msgstr "隐藏以下值"
 
-#: src\qualcoder\manage_files.py:505
+#: src\qualcoder\manage_files.py:502
 msgid "Copy reference to clipboard. APA"
 msgstr "将参考文献复制到剪贴板。APA"
 
-#: src\qualcoder\manage_files.py:506
+#: src\qualcoder\manage_files.py:503
 msgid "Copy reference to clipboard. Vancouver"
 msgstr "将参考文献复制到剪贴板。温哥华"
 
-#: src\qualcoder\manage_files.py:514 src\qualcoder\manage_files.py:783
+#: src\qualcoder\manage_files.py:511 src\qualcoder\manage_files.py:780
 msgid "Rename database entry"
 msgstr "重命名数据库条目"
 
-#: src\qualcoder\manage_files.py:515
+#: src\qualcoder\manage_files.py:512
 msgid "Export"
 msgstr "出口"
 
-#: src\qualcoder\manage_files.py:518
+#: src\qualcoder\manage_files.py:515
 msgid "Move file to externally linked file"
 msgstr "将文件移至外部链接文件"
 
-#: src\qualcoder\manage_files.py:520
+#: src\qualcoder\manage_files.py:517
 msgid "Import linked file"
 msgstr "导入链接文件"
 
-#: src\qualcoder\manage_files.py:543
+#: src\qualcoder\manage_files.py:540
 #, fuzzy
 msgid "Original file not found"
 msgstr "未找到文件"
 
-#: src\qualcoder\manage_files.py:543
+#: src\qualcoder\manage_files.py:540
 #, fuzzy
 msgid "Update the file path"
 msgstr "更新文本为"
 
-#: src\qualcoder\manage_files.py:616
+#: src\qualcoder\manage_files.py:613
 msgid "Hide values like:"
 msgstr "隐藏值，如:"
 
-#: src\qualcoder\manage_files.py:679
+#: src\qualcoder\manage_files.py:676
 #, fuzzy
 msgid "Update file path"
 msgstr "更新文本"
 
-#: src\qualcoder\manage_files.py:687
+#: src\qualcoder\manage_files.py:684
 #, fuzzy
 msgid "Fixed file path: "
 msgstr "媒体路径："
 
-#: src\qualcoder\manage_files.py:718
+#: src\qualcoder\manage_files.py:715
 msgid "Image loaded from pdf: "
 msgstr "从 pdf 中加载图像："
 
-#: src\qualcoder\manage_files.py:746 src\qualcoder\manage_files.py:2232
+#: src\qualcoder\manage_files.py:743 src\qualcoder\manage_files.py:2242
 #: src\qualcoder\special_functions.py:143
 msgid "Delete files"
 msgstr "删除文件"
 
-#: src\qualcoder\manage_files.py:792
+#: src\qualcoder\manage_files.py:789
 msgid "Renamed database file entry: "
 msgstr "重命名数据库文件条目："
 
-#: src\qualcoder\manage_files.py:813
+#: src\qualcoder\manage_files.py:810
 msgid "Undo file rename"
 msgstr "撤销文件重命名"
 
-#: src\qualcoder\manage_files.py:823
+#: src\qualcoder\manage_files.py:820
 msgid "Cannot undo"
 msgstr "无法撤销"
 
-#: src\qualcoder\manage_files.py:823
+#: src\qualcoder\manage_files.py:820
 msgid "Another file has this name"
 msgstr "另一个文件的名称是"
 
-#: src\qualcoder\manage_files.py:831
+#: src\qualcoder\manage_files.py:828
 msgid "Reversed renamed database file entry: "
 msgstr "逆转重命名的数据库文件条目："
 
-#: src\qualcoder\manage_files.py:854
+#: src\qualcoder\manage_files.py:851
 msgid "Bulk Rename of database file name entries"
 msgstr "批量重命名数据库文件名条目"
 
-#: src\qualcoder\manage_files.py:877
+#: src\qualcoder\manage_files.py:874
 msgid "Renamed database file entry:"
 msgstr "重命名数据库文件条目："
 
-#: src\qualcoder\manage_files.py:950
+#: src\qualcoder\manage_files.py:947
 msgid "Export to"
 msgstr "出口"
 
-#: src\qualcoder\manage_files.py:955 src\qualcoder\manage_files.py:2161
+#: src\qualcoder\manage_files.py:952 src\qualcoder\manage_files.py:2171
 msgid "Cannot export"
 msgstr "无法出口"
 
-#: src\qualcoder\manage_files.py:955
+#: src\qualcoder\manage_files.py:952
 msgid "Cannot export as linked file\n"
 msgstr "无法导出为链接文件\n"
 
-#: src\qualcoder\manage_files.py:1103
+#: src\qualcoder\manage_files.py:1100
 msgid "File attributes exported to: "
 msgstr "导出到的文件属性："
 
-#: src\qualcoder\manage_files.py:1104
+#: src\qualcoder\manage_files.py:1101
 msgid "File Export"
 msgstr "文件出口"
 
-#: src\qualcoder\manage_files.py:1201
+#: src\qualcoder\manage_files.py:1198
 msgid "Date"
 msgstr "日期"
 
-#: src\qualcoder\manage_files.py:1243
+#: src\qualcoder\manage_files.py:1240
 msgid "Transcript for: "
 msgstr "转载请注明出处："
 
-#: src\qualcoder\manage_files.py:1275 src\qualcoder\manage_files.py:1287
-#: src\qualcoder\manage_files.py:1303 src\qualcoder\manage_files.py:1321
+#: src\qualcoder\manage_files.py:1272 src\qualcoder\manage_files.py:1284
+#: src\qualcoder\manage_files.py:1300 src\qualcoder\manage_files.py:1318
 msgid "Cannot locate media. "
 msgstr "无法定位媒体。"
 
-#: src\qualcoder\manage_files.py:1278 src\qualcoder\manage_files.py:1290
+#: src\qualcoder\manage_files.py:1275 src\qualcoder\manage_files.py:1287
 msgid "Image too large for PIL module. (DecompressionBombError): "
 msgstr "图像对于 PIL 模块来说太大。 （减压炸弹错误）："
 
-#: src\qualcoder\manage_files.py:1317 src\qualcoder\report_file_summary.py:406
+#: src\qualcoder\manage_files.py:1314 src\qualcoder\report_file_summary.py:406
 #: src\qualcoder\report_file_summary.py:459
 msgid "Duration: "
 msgstr "持续时间："
 
-#: src\qualcoder\manage_files.py:1324
+#: src\qualcoder\manage_files.py:1321
 msgid ""
 "Cannot get media duration.\n"
 "VLC not installed."
@@ -3447,63 +3454,63 @@ msgstr ""
 "无法获取媒体持续时间。\n"
 "未安装 VLC。"
 
-#: src\qualcoder\manage_files.py:1339
+#: src\qualcoder\manage_files.py:1336
 msgid "Case linked:"
 msgstr "案例链接："
 
-#: src\qualcoder\manage_files.py:1405
+#: src\qualcoder\manage_files.py:1402
 msgid "Attribute added to files:"
 msgstr "为文件添加属性："
 
-#: src\qualcoder\manage_files.py:1421 src\qualcoder\report_codes.py:1292
-#: src\qualcoder\view_graph.py:941 src\qualcoder\view_graph.py:2102
-#: src\qualcoder\view_graph.py:2129
+#: src\qualcoder\manage_files.py:1418 src\qualcoder\report_codes.py:1292
+#: src\qualcoder\view_graph.py:1757 src\qualcoder\view_graph.py:3057
+#: src\qualcoder\view_graph.py:3084
 msgid "File"
 msgstr "文件"
 
-#: src\qualcoder\manage_files.py:1429 src\qualcoder\manage_files.py:1436
+#: src\qualcoder\manage_files.py:1426 src\qualcoder\manage_files.py:1433
 msgid "Memo for file "
 msgstr "备忘存档"
 
-#: src\qualcoder\manage_files.py:1534 src\qualcoder\manage_references.py:302
+#: src\qualcoder\manage_files.py:1531 src\qualcoder\manage_references.py:302
 msgid "VLC not installed cannot play audio or video."
 msgstr "未安装 VLC 无法播放音频或视频。"
 
-#: src\qualcoder\manage_files.py:1535 src\qualcoder\manage_references.py:303
+#: src\qualcoder\manage_files.py:1532 src\qualcoder\manage_references.py:303
 msgid "View AV error"
 msgstr "查看音频/视频错误"
 
-#: src\qualcoder\manage_files.py:1544 src\qualcoder\manage_files.py:1576
+#: src\qualcoder\manage_files.py:1541 src\qualcoder\manage_files.py:1573
 #: src\qualcoder\manage_references.py:312
 #: src\qualcoder\manage_references.py:341
 msgid "Bad link or non-existent file "
 msgstr "链接错误或文件不存在"
 
-#: src\qualcoder\manage_files.py:1558 src\qualcoder\manage_references.py:323
+#: src\qualcoder\manage_files.py:1555 src\qualcoder\manage_references.py:323
 msgid "view AV error"
 msgstr "查看音频/视频错误"
 
-#: src\qualcoder\manage_files.py:1599
+#: src\qualcoder\manage_files.py:1596
 msgid "New File"
 msgstr "新文件"
 
-#: src\qualcoder\manage_files.py:1599
+#: src\qualcoder\manage_files.py:1596
 msgid "Enter file name"
 msgstr "输入文件名"
 
-#: src\qualcoder\manage_files.py:1639
+#: src\qualcoder\manage_files.py:1636
 msgid "File created: "
 msgstr "创建的文件："
 
-#: src\qualcoder\manage_files.py:1704 src\qualcoder\manage_files.py:1718
-#: src\qualcoder\manage_files.py:1733 src\qualcoder\manage_files.py:1747
-#: src\qualcoder\manage_files.py:1761
+#: src\qualcoder\manage_files.py:1701 src\qualcoder\manage_files.py:1715
+#: src\qualcoder\manage_files.py:1730 src\qualcoder\manage_files.py:1744
+#: src\qualcoder\manage_files.py:1758
 msgid "Cannot copy file: "
 msgstr "无法复制文件："
 
-#: src\qualcoder\manage_files.py:1705 src\qualcoder\manage_files.py:1719
-#: src\qualcoder\manage_files.py:1734 src\qualcoder\manage_files.py:1748
-#: src\qualcoder\manage_files.py:1762
+#: src\qualcoder\manage_files.py:1702 src\qualcoder\manage_files.py:1716
+#: src\qualcoder\manage_files.py:1731 src\qualcoder\manage_files.py:1745
+#: src\qualcoder\manage_files.py:1759
 msgid ""
 "Is the file open?\n"
 "Is there a permission restriction?"
@@ -3511,30 +3518,30 @@ msgstr ""
 "文件是否打开？\n"
 "是否有权限限制？"
 
-#: src\qualcoder\manage_files.py:1706 src\qualcoder\manage_files.py:1720
-#: src\qualcoder\manage_files.py:1735 src\qualcoder\manage_files.py:1749
-#: src\qualcoder\manage_files.py:1763
+#: src\qualcoder\manage_files.py:1703 src\qualcoder\manage_files.py:1717
+#: src\qualcoder\manage_files.py:1732 src\qualcoder\manage_files.py:1746
+#: src\qualcoder\manage_files.py:1760
 msgid "Copy file permission error"
 msgstr "复制文件权限错误"
 
-#: src\qualcoder\manage_files.py:1769 src\qualcoder\manage_files.py:1782
-#: src\qualcoder\manage_files.py:1790
+#: src\qualcoder\manage_files.py:1766 src\qualcoder\manage_files.py:1779
+#: src\qualcoder\manage_files.py:1787
 msgid "Unknown file type"
 msgstr "未知文件类型"
 
-#: src\qualcoder\manage_files.py:1770
+#: src\qualcoder\manage_files.py:1767
 msgid "Trying to import as text"
 msgstr "尝试以文本形式导入"
 
-#: src\qualcoder\manage_files.py:1782 src\qualcoder\manage_files.py:1790
+#: src\qualcoder\manage_files.py:1779 src\qualcoder\manage_files.py:1787
 msgid "Cannot import file"
 msgstr "无法导入文件"
 
-#: src\qualcoder\manage_files.py:1834 src\qualcoder\manage_files.py:2021
+#: src\qualcoder\manage_files.py:1831 src\qualcoder\manage_files.py:2031
 msgid "Duplicate file"
 msgstr "重复文件"
 
-#: src\qualcoder\manage_files.py:1834 src\qualcoder\manage_files.py:2022
+#: src\qualcoder\manage_files.py:1831 src\qualcoder\manage_files.py:2032
 msgid ""
 "Duplicate filename.\n"
 "File not imported"
@@ -3542,100 +3549,100 @@ msgstr ""
 "文件名重复。\n"
 "文件未导入"
 
-#: src\qualcoder\manage_files.py:1850 src\qualcoder\manage_files.py:2067
+#: src\qualcoder\manage_files.py:1847 src\qualcoder\manage_files.py:2077
 msgid " linked"
 msgstr " 链接"
 
-#: src\qualcoder\manage_files.py:1852
+#: src\qualcoder\manage_files.py:1849
 msgid " imported."
 msgstr " 进口的"
 
-#: src\qualcoder\manage_files.py:1889 src\qualcoder\__main__.py:2422
+#: src\qualcoder\manage_files.py:1886 src\qualcoder\__main__.py:2425
 msgid " created."
 msgstr "创建"
 
-#: src\qualcoder\manage_files.py:1966 src\qualcoder\manage_files.py:2010
+#: src\qualcoder\manage_files.py:1993
 #: src\qualcoder\text_file_replacement.py:308
 #: src\qualcoder\text_file_replacement.py:309
 msgid " lines not imported"
 msgstr " 未导入的行"
 
-#: src\qualcoder\manage_files.py:2006 src\qualcoder\refi.py:1226
+#: src\qualcoder\manage_files.py:2019 src\qualcoder\refi.py:1226
 #: src\qualcoder\text_file_replacement.py:304
 msgid "Cannot import"
 msgstr "无法导入"
 
-#: src\qualcoder\manage_files.py:2011
-msgid "lines not imported"
-msgstr "未导入的行"
-
-#: src\qualcoder\manage_files.py:2015
+#: src\qualcoder\manage_files.py:2025
 #: src\qualcoder\text_file_replacement.py:313
 msgid "Cannot import "
 msgstr "无法导入"
 
-#: src\qualcoder\manage_files.py:2065
+#: src\qualcoder\manage_files.py:2075
 msgid " imported"
 msgstr " 进口的"
 
-#: src\qualcoder\manage_files.py:2159
+#: src\qualcoder\manage_files.py:2169
 msgid "This is an external linked file"
 msgstr "这是一个外部链接文件"
 
-#: src\qualcoder\manage_files.py:2169
+#: src\qualcoder\manage_files.py:2179
 msgid "This is a linked file. Will export text representation."
 msgstr "这是一个链接文件。将导出文本表示法。"
 
-#: src\qualcoder\manage_files.py:2171
+#: src\qualcoder\manage_files.py:2181
 msgid "Can export text"
 msgstr "可导出文本"
 
-#: src\qualcoder\manage_files.py:2181
+#: src\qualcoder\manage_files.py:2191
 msgid "Export to "
 msgstr "出口到"
 
-#: src\qualcoder\manage_files.py:2190 src\qualcoder\manage_files.py:2206
-#: src\qualcoder\manage_files.py:2219
+#: src\qualcoder\manage_files.py:2200 src\qualcoder\manage_files.py:2216
+#: src\qualcoder\manage_files.py:2229
 msgid "Files exported"
 msgstr "导出的文件"
 
-#: src\qualcoder\manage_files.py:2191 src\qualcoder\manage_files.py:2207
-#: src\qualcoder\manage_files.py:2220
+#: src\qualcoder\manage_files.py:2201 src\qualcoder\manage_files.py:2217
+#: src\qualcoder\manage_files.py:2230
 msgid " exported to "
 msgstr " 导出至"
 
-#: src\qualcoder\manage_files.py:2193 src\qualcoder\report_sql.py:316
+#: src\qualcoder\manage_files.py:2203 src\qualcoder\report_cooccurrence.py:462
+#: src\qualcoder\report_cooccurrence.py:546
+#: src\qualcoder\report_cooccurrence.py:696
+#: src\qualcoder\report_cooccurrence.py:738 src\qualcoder\report_sql.py:316
 #: src\qualcoder\special_functions.py:116
 #: src\qualcoder\special_functions.py:119
-#: src\qualcoder\special_functions.py:122 src\qualcoder\view_graph.py:2425
-#: src\qualcoder\view_graph.py:2440 src\qualcoder\view_graph.py:2458
-#: src\qualcoder\view_graph.py:2954 src\qualcoder\view_graph.py:3098
+#: src\qualcoder\special_functions.py:122 src\qualcoder\view_charts.py:521
+#: src\qualcoder\view_graph.py:1946 src\qualcoder\view_graph.py:3411
+#: src\qualcoder\view_graph.py:3426 src\qualcoder\view_graph.py:3444
+#: src\qualcoder\view_graph.py:3786 src\qualcoder\view_graph.py:3946
 msgid "Error"
 msgstr "错误"
 
-#: src\qualcoder\manage_files.py:2193
+#: src\qualcoder\manage_files.py:2203
 msgid "File not found"
 msgstr "未找到文件"
 
-#: src\qualcoder\manage_files.py:2250 src\qualcoder\manage_files.py:2417
+#: src\qualcoder\manage_files.py:2260 src\qualcoder\manage_files.py:2427
 msgid "Deleted file: "
 msgstr "删除文件："
 
-#: src\qualcoder\manage_files.py:2261 src\qualcoder\manage_files.py:2293
-#: src\qualcoder\manage_files.py:2357 src\qualcoder\manage_files.py:2391
+#: src\qualcoder\manage_files.py:2271 src\qualcoder\manage_files.py:2303
+#: src\qualcoder\manage_files.py:2367 src\qualcoder\manage_files.py:2401
 #: src\qualcoder\text_file_replacement.py:327
 msgid "Deleting file error: "
 msgstr "删除文件："
 
-#: src\qualcoder\manage_files.py:2438
+#: src\qualcoder\manage_files.py:2448
 msgid "Minimum: "
 msgstr "最低："
 
-#: src\qualcoder\manage_files.py:2439
+#: src\qualcoder\manage_files.py:2449
 msgid "Maximum: "
 msgstr "最大："
 
-#: src\qualcoder\manage_files.py:2470
+#: src\qualcoder\manage_files.py:2480
 msgid ""
 "\n"
 "Externally linked file:\n"
@@ -3643,7 +3650,7 @@ msgstr ""
 "\n"
 "外部链接文件：\n"
 
-#: src\qualcoder\manage_files.py:2521 src\qualcoder\__main__.py:3095
+#: src\qualcoder\manage_files.py:2531 src\qualcoder\__main__.py:3098
 msgid "Files: "
 msgstr "没有文件:"
 
@@ -4105,7 +4112,7 @@ msgid "Project export error "
 msgstr "项目导出错误"
 
 #: src\qualcoder\refi.py:2031 src\qualcoder\refi.py:2037
-#: src\qualcoder\__main__.py:2316 src\qualcoder\__main__.py:2336
+#: src\qualcoder\__main__.py:2319 src\qualcoder\__main__.py:2339
 msgid "Project"
 msgstr "项目"
 
@@ -4160,15 +4167,15 @@ msgid "File Attributes"
 msgstr "文件属性"
 
 #: src\qualcoder\reports.py:161 src\qualcoder\report_comparison_table.py:205
-#: src\qualcoder\report_cooccurrence.py:106
-#: src\qualcoder\report_cooccurrence.py:188
+#: src\qualcoder\report_cooccurrence.py:146
+#: src\qualcoder\report_cooccurrence.py:233
 #: src\qualcoder\report_relations.py:135 src\qualcoder\report_relations.py:217
-#: src\qualcoder\view_graph.py:676 src\qualcoder\view_graph.py:934
+#: src\qualcoder\view_graph.py:1492 src\qualcoder\view_graph.py:1750
 msgid "Select files"
 msgstr "选择文件"
 
 #: src\qualcoder\reports.py:171 src\qualcoder\report_codes_by_segments.py:244
-#: src\qualcoder\report_cooccurrence.py:185
+#: src\qualcoder\report_cooccurrence.py:230
 #: src\qualcoder\report_relations.py:213
 msgid "Files selected by attributes"
 msgstr "按属性选择文件"
@@ -4625,7 +4632,7 @@ msgid "Coder: All coders"
 msgstr "编码员 所有编码员"
 
 #: src\qualcoder\report_codes.py:1279 src\qualcoder\report_codes.py:2327
-#: src\qualcoder\view_av.py:219 src\qualcoder\view_charts.py:383
+#: src\qualcoder\view_av.py:219 src\qualcoder\view_charts.py:435
 msgid "Coder: "
 msgstr "编码器："
 
@@ -4641,7 +4648,7 @@ msgstr "文件："
 msgid "DATE:"
 msgstr "日期："
 
-#: src\qualcoder\report_codes.py:1293 src\qualcoder\__main__.py:2437
+#: src\qualcoder\report_codes.py:1293 src\qualcoder\__main__.py:2440
 msgid "Coder:"
 msgstr "编码器"
 
@@ -4695,7 +4702,7 @@ msgstr "编码："
 
 #: src\qualcoder\report_codes.py:1406 src\qualcoder\report_codes.py:1412
 #: src\qualcoder\report_relations.py:245 src\qualcoder\report_relations.py:246
-#: src\qualcoder\__main__.py:3107
+#: src\qualcoder\__main__.py:3110
 msgid "Codes: "
 msgstr "代码"
 
@@ -4775,8 +4782,8 @@ msgstr "案例备忘录："
 
 #: src\qualcoder\report_codes.py:2396 src\qualcoder\report_codes.py:3006
 #: src\qualcoder\report_exact_matches.py:381
-#: src\qualcoder\report_relations.py:595 src\qualcoder\view_graph.py:2933
-#: src\qualcoder\view_graph.py:3083
+#: src\qualcoder\report_relations.py:595 src\qualcoder\view_graph.py:3761
+#: src\qualcoder\view_graph.py:3930
 msgid "View in context"
 msgstr "按上下文查看"
 
@@ -4867,60 +4874,59 @@ msgstr "文字编码："
 
 #: src\qualcoder\report_code_summary.py:342
 #: src\qualcoder\report_compare_coder_file.py:817
-#: src\qualcoder\report_file_summary.py:651
+#: src\qualcoder\report_file_summary.py:665
 msgid "Total characters: "
 msgstr "总字符数："
 
 #: src\qualcoder\report_code_summary.py:343
-#: src\qualcoder\report_file_summary.py:653
+#: src\qualcoder\report_file_summary.py:667
 msgid "Average characters: "
 msgstr "平均字符数："
 
-#: src\qualcoder\report_code_summary.py:376
+#: src\qualcoder\report_code_summary.py:377
+#, fuzzy
 msgid ""
 "Word calculations: Words use alphabet characters and include the apostrophe. "
-"All other characters are word separators. Excludes English stopwords"
-msgstr ""
-"单词计算： 单词使用字母字符，包括撇号。所有其他字符均为单词分隔符。不包括英文"
-"停止词"
+"All other characters are word separators."
+msgstr "单词计算： 单词使用字母字符，包括撇号。所有其他字符均为单词分隔符"
 
-#: src\qualcoder\report_code_summary.py:379
-#: src\qualcoder\report_file_summary.py:620
+#: src\qualcoder\report_code_summary.py:380
+#: src\qualcoder\report_file_summary.py:629
 msgid "Words: "
 msgstr "字数:"
 
-#: src\qualcoder\report_code_summary.py:390
-#: src\qualcoder\report_file_summary.py:630
+#: src\qualcoder\report_code_summary.py:391
+#: src\qualcoder\report_file_summary.py:639
 msgid "Unique words: "
 msgstr "独特的词语："
 
-#: src\qualcoder\report_code_summary.py:395
-#: src\qualcoder\report_file_summary.py:635
+#: src\qualcoder\report_code_summary.py:396
+#: src\qualcoder\report_file_summary.py:644
 msgid "Top 100 words"
 msgstr "前 100 个单词"
 
-#: src\qualcoder\report_code_summary.py:407
+#: src\qualcoder\report_code_summary.py:408
 msgid "IMAGE CODINGS: "
 msgstr "图像编码："
 
-#: src\qualcoder\report_code_summary.py:462 src\qualcoder\view_image.py:968
+#: src\qualcoder\report_code_summary.py:463 src\qualcoder\view_image.py:968
 msgid "Image: "
 msgstr "图片:"
 
-#: src\qualcoder\report_code_summary.py:463
-#: src\qualcoder\report_code_summary.py:514
+#: src\qualcoder\report_code_summary.py:464
+#: src\qualcoder\report_code_summary.py:515
 #: src\qualcoder\report_file_summary.py:423
 #: src\qualcoder\report_file_summary.py:476
 #: src\qualcoder\report_file_summary.py:564
-#: src\qualcoder\report_file_summary.py:651
+#: src\qualcoder\report_file_summary.py:665
 msgid "Count: "
 msgstr "计数："
 
-#: src\qualcoder\report_code_summary.py:463
+#: src\qualcoder\report_code_summary.py:464
 msgid "Average coded area: "
 msgstr "平均编码面积："
 
-#: src\qualcoder\report_code_summary.py:463
+#: src\qualcoder\report_code_summary.py:464
 #: src\qualcoder\report_compare_coder_file.py:1051
 #: src\qualcoder\report_compare_coder_file.py:1054
 #: src\qualcoder\report_file_summary.py:522
@@ -4928,27 +4934,27 @@ msgstr "平均编码面积："
 msgid " pixels"
 msgstr " 像素"
 
-#: src\qualcoder\report_code_summary.py:464
+#: src\qualcoder\report_code_summary.py:465
 msgid "Average area of image: "
 msgstr "图像的平均面积："
 
-#: src\qualcoder\report_code_summary.py:473
+#: src\qualcoder\report_code_summary.py:474
 msgid "A/V CODINGS: "
 msgstr "奥迪/视频编码："
 
-#: src\qualcoder\report_code_summary.py:513
+#: src\qualcoder\report_code_summary.py:514
 msgid "Media: "
 msgstr "媒体："
 
-#: src\qualcoder\report_code_summary.py:515
+#: src\qualcoder\report_code_summary.py:516
 msgid "Average coded duration: "
 msgstr "平均编码持续时间："
 
-#: src\qualcoder\report_code_summary.py:515
+#: src\qualcoder\report_code_summary.py:516
 msgid " secs"
 msgstr "秒"
 
-#: src\qualcoder\report_code_summary.py:517
+#: src\qualcoder\report_code_summary.py:518
 msgid "Average percent of media: "
 msgstr "媒体的平均百分比："
 
@@ -5086,8 +5092,8 @@ msgstr "共计:"
 
 #: src\qualcoder\report_compare_coder_file.py:560
 #: src\qualcoder\report_compare_coder_file.py:570
-#: src\qualcoder\view_graph.py:530 src\qualcoder\view_graph.py:732
-#: src\qualcoder\view_graph.py:1436
+#: src\qualcoder\view_graph.py:1343 src\qualcoder\view_graph.py:1548
+#: src\qualcoder\view_graph.py:2386
 msgid "msecs"
 msgstr "毫秒"
 
@@ -5173,19 +5179,21 @@ msgstr "文件属性"
 
 #: src\qualcoder\report_comparison_table.py:212
 #: src\qualcoder\report_comparison_table.py:218
-#: src\qualcoder\report_cooccurrence.py:113
-#: src\qualcoder\report_cooccurrence.py:124
+#: src\qualcoder\report_cooccurrence.py:154
+#: src\qualcoder\report_cooccurrence.py:165
+#: src\qualcoder\report_cooccurrence.py:171
 msgid "Files selected"
 msgstr "所选文件"
 
 #: src\qualcoder\report_comparison_table.py:212
-#: src\qualcoder\report_cooccurrence.py:113
-#: src\qualcoder\report_cooccurrence.py:114
+#: src\qualcoder\report_cooccurrence.py:154
+#: src\qualcoder\report_cooccurrence.py:155
 #: src\qualcoder\report_relations.py:144
 msgid "All files selected"
 msgstr "选择所有文件"
 
-#: src\qualcoder\report_comparison_table.py:321 src\qualcoder\view_graph.py:972
+#: src\qualcoder\report_comparison_table.py:321
+#: src\qualcoder\view_graph.py:1788
 msgid "Select cases"
 msgstr "选择案例"
 
@@ -5196,13 +5204,14 @@ msgstr "选择无"
 
 #: src\qualcoder\report_comparison_table.py:361
 #: src\qualcoder\report_comparison_table.py:368
-#: src\qualcoder\report_cooccurrence.py:206
-#: src\qualcoder\report_cooccurrence.py:211
+#: src\qualcoder\report_cooccurrence.py:251
+#: src\qualcoder\report_cooccurrence.py:258
+#: src\qualcoder\report_cooccurrence.py:259
 msgid "Codes selected"
 msgstr "所选代码"
 
 #: src\qualcoder\report_comparison_table.py:361
-#: src\qualcoder\report_cooccurrence.py:206
+#: src\qualcoder\report_cooccurrence.py:251
 msgid "All codes selected"
 msgstr "选择所有代码"
 
@@ -5212,12 +5221,12 @@ msgid "Select one category"
 msgstr "选择空白或类别"
 
 #: src\qualcoder\report_comparison_table.py:491
-#: src\qualcoder\report_cooccurrence.py:404
+#: src\qualcoder\report_cooccurrence.py:799
 msgid "Co-occurrence exported: "
 msgstr "已导出共现："
 
 #: src\qualcoder\report_comparison_table.py:492
-#: src\qualcoder\report_cooccurrence.py:405
+#: src\qualcoder\report_cooccurrence.py:800
 msgid "Co-occurrence exported"
 msgstr "已导出共现"
 
@@ -5229,58 +5238,144 @@ msgstr "点击查看详情。"
 msgid "Click item for context"
 msgstr "单击项目查看上下文"
 
-#: src\qualcoder\report_cooccurrence.py:115
-#: src\qualcoder\report_cooccurrence.py:126
+#: src\qualcoder\report_cooccurrence.py:156
+#: src\qualcoder\report_cooccurrence.py:167
 #: src\qualcoder\report_relations.py:145 src\qualcoder\report_relations.py:155
 msgid "Select files by attributes"
 msgstr "按属性选择文件"
 
-#: src\qualcoder\report_cooccurrence.py:229
+#: src\qualcoder\report_cooccurrence.py:173
+#, fuzzy
+msgid "File selected"
+msgstr "所选文件"
+
+#: src\qualcoder\report_cooccurrence.py:236
+#, fuzzy
+msgid "Attributes selected"
+msgstr "属性已删除： "
+
+#: src\qualcoder\report_cooccurrence.py:279
 msgid "Select categories"
 msgstr "选择类别"
 
-#: src\qualcoder\report_cooccurrence.py:236
+#: src\qualcoder\report_cooccurrence.py:286
 msgid "All categories selected"
 msgstr "选定的所有类别"
 
-#: src\qualcoder\report_cooccurrence.py:248
+#: src\qualcoder\report_cooccurrence.py:294
+#: src\qualcoder\report_cooccurrence.py:307
 msgid "Categories selected"
 msgstr "选择的类别"
 
-#: src\qualcoder\report_cooccurrence.py:511
+#: src\qualcoder\report_cooccurrence.py:298
+#, fuzzy
+msgid "Categories selected "
+msgstr "选择的类别"
+
+#: src\qualcoder\report_cooccurrence.py:419
+#: src\qualcoder\report_cooccurrence.py:502
+#: src\qualcoder\report_cooccurrence.py:515
+#: src\qualcoder\report_cooccurrence.py:715
+#: src\qualcoder\report_cooccurrence.py:728
+msgid "No data"
+msgstr ""
+
+#: src\qualcoder\report_cooccurrence.py:419
+#, fuzzy
+msgid "No visible codes to export."
+msgstr "无数据可导出"
+
+#: src\qualcoder\report_cooccurrence.py:457
+msgid "Exported GraphML for Gephi: "
+msgstr ""
+
+#: src\qualcoder\report_cooccurrence.py:458
+#, fuzzy
+msgid "Gephi Export"
+msgstr "文件出口"
+
+#: src\qualcoder\report_cooccurrence.py:474
+#: src\qualcoder\report_cooccurrence.py:568
+#, fuzzy
+msgid "Label font size 10"
+msgstr "树木字体大小"
+
+#: src\qualcoder\report_cooccurrence.py:479
+#: src\qualcoder\report_cooccurrence.py:573
+#, fuzzy
+msgid "Label font size 8 "
+msgstr "树木字体大小"
+
+#: src\qualcoder\report_cooccurrence.py:502
+msgid "There are no visible codes to plot."
+msgstr ""
+
+#: src\qualcoder\report_cooccurrence.py:515
+msgid "There are no co-occurrences to plot."
+msgstr ""
+
+#: src\qualcoder\report_cooccurrence.py:519
+#, fuzzy
+msgid "Code Co-occurrence Graph"
+msgstr "已导出共现"
+
+#: src\qualcoder\report_cooccurrence.py:558
+#, fuzzy
+msgid "Coloured nodes"
+msgstr "颜色"
+
+#: src\qualcoder\report_cooccurrence.py:563
+msgid "Coloured labels"
+msgstr ""
+
+#: src\qualcoder\report_cooccurrence.py:650
+msgid "Community Clusters Graph"
+msgstr ""
+
+#: src\qualcoder\report_cooccurrence.py:715
+msgid "There are no visible codes to export."
+msgstr ""
+
+#: src\qualcoder\report_cooccurrence.py:728
+#, fuzzy
+msgid "There are no co-occurrences to export."
+msgstr "已导出共现"
+
+#: src\qualcoder\report_cooccurrence.py:911
 #, fuzzy
 msgid "Merge into new code"
 msgstr "并入： 选择代码"
 
-#: src\qualcoder\report_cooccurrence.py:518
+#: src\qualcoder\report_cooccurrence.py:922
 #, fuzzy
 msgid "New code"
 msgstr "新代码："
 
-#: src\qualcoder\report_cooccurrence.py:518
+#: src\qualcoder\report_cooccurrence.py:922
 #, fuzzy
 msgid "Edit name:"
 msgstr "更新名称"
 
-#: src\qualcoder\report_cooccurrence.py:520
+#: src\qualcoder\report_cooccurrence.py:924
 #, fuzzy
 msgid "Merged: "
 msgstr "合并代码："
 
-#: src\qualcoder\report_cooccurrence.py:526
+#: src\qualcoder\report_cooccurrence.py:930
 #, fuzzy
 msgid "Code name exists"
 msgstr "过滤器名称存在"
 
-#: src\qualcoder\report_cooccurrence.py:526
+#: src\qualcoder\report_cooccurrence.py:930
 #, fuzzy
 msgid "Choose another code name"
 msgstr " 选择其他名称"
 
-#: src\qualcoder\report_cooccurrence.py:593
+#: src\qualcoder\report_cooccurrence.py:997
+#, fuzzy
 msgid ""
 "Left click: Show coded text.\n"
-"Right click: Create new combined code from these codes."
+"Right click: merge codes."
 msgstr "左键单击：显示编码文本。\\n右键单击：从这些代码创建新的组合代码。"
 
 #: src\qualcoder\report_exact_matches.py:87
@@ -5320,7 +5415,7 @@ msgstr "无结果"
 
 #: src\qualcoder\report_exact_matches.py:384
 #: src\qualcoder\report_relations.py:598 src\qualcoder\report_relations.py:1084
-#: src\qualcoder\report_sql.py:502 src\qualcoder\report_sql.py:599
+#: src\qualcoder\report_sql.py:504 src\qualcoder\report_sql.py:601
 msgid "Filter equals: "
 msgstr "过滤器等效："
 
@@ -5336,7 +5431,7 @@ msgstr "过滤精度较低或相等："
 
 #: src\qualcoder\report_exact_matches.py:387
 #: src\qualcoder\report_relations.py:601 src\qualcoder\report_relations.py:1085
-#: src\qualcoder\report_sql.py:500 src\qualcoder\report_sql.py:597
+#: src\qualcoder\report_sql.py:502 src\qualcoder\report_sql.py:599
 msgid "Clear filter"
 msgstr "清除过滤器"
 
@@ -5435,14 +5530,14 @@ msgstr "持续时间： 无法获取。未安装 VLC。"
 #: src\qualcoder\report_file_summary.py:421
 #: src\qualcoder\report_file_summary.py:474
 #: src\qualcoder\report_file_summary.py:560
-#: src\qualcoder\report_file_summary.py:648
+#: src\qualcoder\report_file_summary.py:662
 msgid "CODE COUNTS:"
 msgstr "代码数量："
 
 #: src\qualcoder\report_file_summary.py:425
 #: src\qualcoder\report_file_summary.py:477
 #: src\qualcoder\report_file_summary.py:565
-#: src\qualcoder\report_file_summary.py:652
+#: src\qualcoder\report_file_summary.py:666
 msgid "Percent: "
 msgstr "百分比："
 
@@ -5452,7 +5547,7 @@ msgid "Average segment: "
 msgstr "平均分段："
 
 #: src\qualcoder\report_file_summary.py:426
-#: src\qualcoder\report_file_summary.py:478 src\qualcoder\view_graph.py:512
+#: src\qualcoder\report_file_summary.py:478 src\qualcoder\view_graph.py:1325
 msgid " msecs"
 msgstr " 毫秒"
 
@@ -5498,7 +5593,7 @@ msgstr ""
 "无法使用 PIL 模块打开图像以获取大小和详细信息。(DecompressionBombError)"
 
 #: src\qualcoder\report_file_summary.py:558
-#: src\qualcoder\report_file_summary.py:646
+#: src\qualcoder\report_file_summary.py:660
 msgid "CODE COUNT:"
 msgstr "代码计数："
 
@@ -5510,15 +5605,19 @@ msgstr "平均面积："
 msgid "STATISTICS:"
 msgstr "统计："
 
-#: src\qualcoder\report_file_summary.py:617
+#: src\qualcoder\report_file_summary.py:627
 msgid ""
 "Word calculations: Words use alphabet characters and include the apostrophe. "
 "All other characters are word separators"
 msgstr "单词计算： 单词使用字母字符，包括撇号。所有其他字符均为单词分隔符"
 
-#: src\qualcoder\report_file_summary.py:618
-msgid " Excludes English Stopwords"
-msgstr "排除英语停用词"
+#: src\qualcoder\report_file_summary.py:646
+msgid "Applying stopwords: "
+msgstr ""
+
+#: src\qualcoder\report_file_summary.py:648
+msgid "Applying stopwords from: .qualcoder/stopwords.txt"
+msgstr ""
 
 #: src\qualcoder\report_relations.py:241
 msgid ""
@@ -5653,7 +5752,7 @@ msgstr "CSV 文件导出"
 msgid "Running query. Please wait."
 msgstr "正在运行查询。请稍候。"
 
-#: src\qualcoder\report_sql.py:275 src\qualcoder\report_sql.py:571
+#: src\qualcoder\report_sql.py:275 src\qualcoder\report_sql.py:573
 msgid " rows"
 msgstr " 行数"
 
@@ -5677,66 +5776,72 @@ msgstr " 更新行数"
 msgid "SQL Error"
 msgstr "SQL 错误"
 
-#: src\qualcoder\report_sql.py:364
+#: src\qualcoder\report_sql.py:352
+msgid ""
+"Table view\n"
+"Based on coder_names visibility"
+msgstr ""
+
+#: src\qualcoder\report_sql.py:366
 msgid "Default Queries"
 msgstr "默认查询"
 
-#: src\qualcoder\report_sql.py:380
+#: src\qualcoder\report_sql.py:382
 msgid "Saved Queries"
 msgstr "保存的查询"
 
-#: src\qualcoder\report_sql.py:398
+#: src\qualcoder\report_sql.py:400
 msgid "Delete stored sql"
 msgstr "删除存储的 sql"
 
-#: src\qualcoder\report_sql.py:419
+#: src\qualcoder\report_sql.py:421
 msgid "Paste"
 msgstr "粘贴"
 
-#: src\qualcoder\report_sql.py:424
+#: src\qualcoder\report_sql.py:426
 msgid "Save query"
 msgstr "保存查询"
 
-#: src\qualcoder\report_sql.py:472
+#: src\qualcoder\report_sql.py:474
 msgid "The query must have a name"
 msgstr "查询必须有一个名称"
 
-#: src\qualcoder\report_sql.py:473 src\qualcoder\report_sql.py:483
-#: src\qualcoder\view_graph.py:1062
+#: src\qualcoder\report_sql.py:475 src\qualcoder\report_sql.py:485
+#: src\qualcoder\view_graph.py:1991
 msgid "Cannot save"
 msgstr "无法保存"
 
-#: src\qualcoder\report_sql.py:504 src\qualcoder\report_sql.py:601
+#: src\qualcoder\report_sql.py:506 src\qualcoder\report_sql.py:603
 msgid "Filter on text like"
 msgstr "筛选文本，如"
 
-#: src\qualcoder\report_sql.py:506 src\qualcoder\report_sql.py:603
+#: src\qualcoder\report_sql.py:508 src\qualcoder\report_sql.py:605
 msgid "Filter on text starts with"
 msgstr "筛选以"
 
-#: src\qualcoder\report_sql.py:518 src\qualcoder\report_sql.py:524
+#: src\qualcoder\report_sql.py:520 src\qualcoder\report_sql.py:526
 msgid " rows ["
 msgstr " 行 ["
 
-#: src\qualcoder\report_sql.py:518
+#: src\qualcoder\report_sql.py:520
 msgid " asc]"
 msgstr " 升序]"
 
-#: src\qualcoder\report_sql.py:524
+#: src\qualcoder\report_sql.py:526
 msgid " desc]"
 msgstr " 降序]"
 
-#: src\qualcoder\report_sql.py:529 src\qualcoder\report_sql.py:543
-#: src\qualcoder\report_sql.py:624 src\qualcoder\report_sql.py:634
+#: src\qualcoder\report_sql.py:531 src\qualcoder\report_sql.py:545
+#: src\qualcoder\report_sql.py:626 src\qualcoder\report_sql.py:636
 msgid "Text contains:"
 msgstr "文本包含："
 
-#: src\qualcoder\report_sql.py:535 src\qualcoder\report_sql.py:549
-#: src\qualcoder\report_sql.py:561
+#: src\qualcoder\report_sql.py:537 src\qualcoder\report_sql.py:551
+#: src\qualcoder\report_sql.py:563
 msgid " rows [filtered]"
 msgstr " 行 [已筛选]"
 
-#: src\qualcoder\report_sql.py:552
+#: src\qualcoder\report_sql.py:554
 msgid " starts with: "
 msgstr " 以......开头:"
 
@@ -5882,15 +5987,15 @@ msgstr "原创"
 msgid "dark"
 msgstr "暗处"
 
-#: src\qualcoder\settings.py:109 src\qualcoder\view_graph.py:821
+#: src\qualcoder\settings.py:109 src\qualcoder\view_graph.py:1637
 msgid "blue"
 msgstr "蓝"
 
-#: src\qualcoder\settings.py:109 src\qualcoder\view_graph.py:823
+#: src\qualcoder\settings.py:109 src\qualcoder\view_graph.py:1639
 msgid "green"
 msgstr "绿化"
 
-#: src\qualcoder\settings.py:109 src\qualcoder\view_graph.py:824
+#: src\qualcoder\settings.py:109 src\qualcoder\view_graph.py:1640
 msgid "orange"
 msgstr "橘色"
 
@@ -5898,7 +6003,7 @@ msgstr "橘色"
 msgid "purple"
 msgstr "紫色"
 
-#: src\qualcoder\settings.py:109 src\qualcoder\view_graph.py:824
+#: src\qualcoder\settings.py:109 src\qualcoder\view_graph.py:1640
 msgid "yellow"
 msgstr "黄的"
 
@@ -6005,11 +6110,11 @@ msgid ""
 "be lost as well. Do you really want to cancel?"
 msgstr "您似乎已修改了编码器名称。这些更改也将丢失。您确定要取消吗？"
 
-#: src\qualcoder\settings.py:556 src\qualcoder\__main__.py:1789
+#: src\qualcoder\settings.py:556 src\qualcoder\__main__.py:1792
 msgid "Settings"
 msgstr "设置"
 
-#: src\qualcoder\speakers.py:65 src\qualcoder\speakers.py:260
+#: src\qualcoder\speakers.py:65 src\qualcoder\speakers.py:276
 #, fuzzy
 msgid "Speakers"
 msgstr "发言人姓名"
@@ -6024,7 +6129,7 @@ msgstr "代号"
 msgid "Example"
 msgstr "例如:"
 
-#: src\qualcoder\speakers.py:260
+#: src\qualcoder\speakers.py:276
 msgid ""
 "The speaker name cannot be empty. If you want to exclude a speaker from "
 "being marked, deselect the check box on the left."
@@ -6032,19 +6137,24 @@ msgstr ""
 "发言者姓名不能为空。如果您想要从标记中排除某个发言者，请取消选中左侧的复选"
 "框。"
 
-#: src\qualcoder\speakers.py:277
+#: src\qualcoder\speakers.py:290
+#, fuzzy
+msgid "Deselect all"
+msgstr "选择所有"
+
+#: src\qualcoder\speakers.py:320
 msgid "This contains all the speakers that have been marked in documents."
 msgstr "其中包含文档中标记的所有发言者。"
 
-#: src\qualcoder\speakers.py:288
+#: src\qualcoder\speakers.py:331
 msgid "Speakers category could not be found found or created."
 msgstr "无法找到或创建演讲者类别。"
 
-#: src\qualcoder\speakers.py:325
+#: src\qualcoder\speakers.py:368
 msgid "Speaker code could not be found found or created."
 msgstr "无法找到或创建扬声器代码。"
 
-#: src\qualcoder\special_functions.py:113 src\qualcoder\__main__.py:2619
+#: src\qualcoder\special_functions.py:113 src\qualcoder\__main__.py:2622
 msgid "Open project directory"
 msgstr "打开项目目录"
 
@@ -6404,11 +6514,12 @@ msgstr "新代号"
 msgid "Code added: "
 msgstr "代码已添加："
 
-#: src\qualcoder\view_av.py:2495 src\qualcoder\view_image.py:2258
+#: src\qualcoder\view_av.py:2495 src\qualcoder\view_graph.py:4343
+#: src\qualcoder\view_image.py:2258
 msgid "Memo for Code "
 msgstr "代码备忘录"
 
-#: src\qualcoder\view_av.py:2519
+#: src\qualcoder\view_av.py:2519 src\qualcoder\view_graph.py:4350
 msgid "Memo for Category "
 msgstr "类别备忘录"
 
@@ -6577,627 +6688,726 @@ msgstr "发言人姓名"
 msgid "Name:"
 msgstr "名称："
 
-#: src\qualcoder\view_charts.py:120 src\qualcoder\view_charts.py:138
+#: src\qualcoder\view_charts.py:122 src\qualcoder\view_charts.py:140
 msgid "Code frequency"
 msgstr "代码频率"
 
-#: src\qualcoder\view_charts.py:121 src\qualcoder\view_charts.py:139
+#: src\qualcoder\view_charts.py:123 src\qualcoder\view_charts.py:141
 msgid "Code by characters"
 msgstr "按字符编码"
 
-#: src\qualcoder\view_charts.py:122 src\qualcoder\view_charts.py:140
+#: src\qualcoder\view_charts.py:124 src\qualcoder\view_charts.py:142
 msgid "Code by image area"
 msgstr "按图像区域编码"
 
-#: src\qualcoder\view_charts.py:123 src\qualcoder\view_charts.py:141
+#: src\qualcoder\view_charts.py:125 src\qualcoder\view_charts.py:143
 msgid "Code by audio/video segments"
 msgstr "按音频/视频片段编码"
 
-#: src\qualcoder\view_charts.py:127
+#: src\qualcoder\view_charts.py:129
 msgid "Code frequency sunburst"
 msgstr "代码频率太阳纹"
 
-#: src\qualcoder\view_charts.py:128
+#: src\qualcoder\view_charts.py:130
 msgid "Code frequency treemap"
 msgstr "代码频率树状图"
 
-#: src\qualcoder\view_charts.py:129
+#: src\qualcoder\view_charts.py:131
 msgid "Code by characters sunburst"
 msgstr "按字符编码 旭日"
 
-#: src\qualcoder\view_charts.py:130
+#: src\qualcoder\view_charts.py:132
 msgid "Code by characters treemap"
 msgstr "字符代码树状图"
 
-#: src\qualcoder\view_charts.py:131
+#: src\qualcoder\view_charts.py:133
 msgid "Code by image area sunburst"
 msgstr "按图像区域旭日代码"
 
-#: src\qualcoder\view_charts.py:132
+#: src\qualcoder\view_charts.py:134
 msgid "Code by image area treemap"
 msgstr "按图像区域树形图编码"
 
-#: src\qualcoder\view_charts.py:133
+#: src\qualcoder\view_charts.py:135
 msgid "Code by A/V sunburst"
 msgstr "音频/视频旭日代码"
 
-#: src\qualcoder\view_charts.py:134
+#: src\qualcoder\view_charts.py:136
 msgid "Code by A/V treemap"
 msgstr "按音频/视频树形图编码"
 
-#: src\qualcoder\view_charts.py:144
+#: src\qualcoder\view_charts.py:146
 #, fuzzy
 msgid "Files by codes"
 msgstr "文件类型顺序"
 
-#: src\qualcoder\view_charts.py:145
+#: src\qualcoder\view_charts.py:147
 #, fuzzy
 msgid "Codes by files"
 msgstr "文件代码"
 
-#: src\qualcoder\view_charts.py:146
+#: src\qualcoder\view_charts.py:148
 #, fuzzy
 msgid "Cases by codes"
 msgstr "由编码员制作："
 
-#: src\qualcoder\view_charts.py:147
+#: src\qualcoder\view_charts.py:149
 #, fuzzy
 msgid "Codes by cases"
 msgstr "个案代码"
 
-#: src\qualcoder\view_charts.py:159
+#: src\qualcoder\view_charts.py:161
 msgid "Word cloud made from coded text segments"
 msgstr "根据编码文本片段制作的词云"
 
-#: src\qualcoder\view_charts.py:268
+#: src\qualcoder\view_charts.py:320
 #, fuzzy
 msgid "Select stopwords file"
 msgstr "选择部分文件"
 
-#: src\qualcoder\view_charts.py:381
+#: src\qualcoder\view_charts.py:433
 #, fuzzy
 msgid "Coders: all"
 msgstr "编码器："
 
-#: src\qualcoder\view_charts.py:406
+#: src\qualcoder\view_charts.py:458
 msgid "Word cloud"
 msgstr "词汇云"
 
-#: src\qualcoder\view_charts.py:528
+#: src\qualcoder\view_charts.py:498
+#, fuzzy
+msgid "Select folder to save Wordcloud"
+msgstr "选择保存文件的目录"
+
+#: src\qualcoder\view_charts.py:518
+msgid "Success"
+msgstr ""
+
+#: src\qualcoder\view_charts.py:518
+msgid "Wordcloud saved successfully to:\n"
+msgstr ""
+
+#: src\qualcoder\view_charts.py:521
+msgid "Error loading stopwords or generating wordcloud: "
+msgstr ""
+
+#: src\qualcoder\view_charts.py:605
 msgid "Cumulative code count in cases by case"
 msgstr "逐个案例的累积代码计数"
 
-#: src\qualcoder\view_charts.py:583 src\qualcoder\view_charts.py:590
-#: src\qualcoder\view_charts.py:666 src\qualcoder\view_charts.py:673
+#: src\qualcoder\view_charts.py:660 src\qualcoder\view_charts.py:667
+#: src\qualcoder\view_charts.py:743 src\qualcoder\view_charts.py:750
 #, fuzzy
 msgid "Cases"
 msgstr "案例"
 
-#: src\qualcoder\view_charts.py:584 src\qualcoder\view_charts.py:591
-#: src\qualcoder\view_charts.py:665 src\qualcoder\view_charts.py:672
-#: src\qualcoder\view_charts.py:739 src\qualcoder\view_charts.py:746
-#: src\qualcoder\view_charts.py:814 src\qualcoder\view_charts.py:821
+#: src\qualcoder\view_charts.py:661 src\qualcoder\view_charts.py:668
+#: src\qualcoder\view_charts.py:742 src\qualcoder\view_charts.py:749
+#: src\qualcoder\view_charts.py:816 src\qualcoder\view_charts.py:823
+#: src\qualcoder\view_charts.py:891 src\qualcoder\view_charts.py:898
 #, fuzzy
 msgid "Codes"
 msgstr "代码"
 
-#: src\qualcoder\view_charts.py:585 src\qualcoder\view_charts.py:589
-#: src\qualcoder\view_charts.py:667 src\qualcoder\view_charts.py:671
-#: src\qualcoder\view_charts.py:741 src\qualcoder\view_charts.py:745
-#: src\qualcoder\view_charts.py:815 src\qualcoder\view_charts.py:819
+#: src\qualcoder\view_charts.py:662 src\qualcoder\view_charts.py:666
+#: src\qualcoder\view_charts.py:744 src\qualcoder\view_charts.py:748
+#: src\qualcoder\view_charts.py:818 src\qualcoder\view_charts.py:822
+#: src\qualcoder\view_charts.py:892 src\qualcoder\view_charts.py:896
 #, fuzzy
 msgid "Counts"
 msgstr "计数"
 
-#: src\qualcoder\view_charts.py:610
+#: src\qualcoder\view_charts.py:687
 msgid "Cumulative code count in cases by code"
 msgstr "按代码统计案例的累积代码计数"
 
-#: src\qualcoder\view_charts.py:692
+#: src\qualcoder\view_charts.py:769
 #, fuzzy
 msgid "Cumulative code count in files by code"
 msgstr "文件中的自动代码句："
 
-#: src\qualcoder\view_charts.py:740 src\qualcoder\view_charts.py:747
-#: src\qualcoder\view_charts.py:813 src\qualcoder\view_charts.py:820
+#: src\qualcoder\view_charts.py:817 src\qualcoder\view_charts.py:824
+#: src\qualcoder\view_charts.py:890 src\qualcoder\view_charts.py:897
 #, fuzzy
 msgid "Files"
 msgstr "文件："
 
-#: src\qualcoder\view_charts.py:766
+#: src\qualcoder\view_charts.py:843
 #, fuzzy
 msgid "Cumulative code count in codes by file"
 msgstr "文件中的自动代码句："
 
-#: src\qualcoder\view_charts.py:852 src\qualcoder\view_charts.py:999
+#: src\qualcoder\view_charts.py:929 src\qualcoder\view_charts.py:1076
 msgid "Code count - text, images and Audio/Video"
 msgstr "代码计数 - 文本、图像和音频/视频"
 
-#: src\qualcoder\view_charts.py:884 src\qualcoder\view_charts.py:913
-#: src\qualcoder\view_charts.py:942 src\qualcoder\view_charts.py:971
-#: src\qualcoder\view_charts.py:1030 src\qualcoder\view_charts.py:1059
-#: src\qualcoder\view_charts.py:1088 src\qualcoder\view_charts.py:1117
-#: src\qualcoder\view_charts.py:1245 src\qualcoder\view_charts.py:1325
-#: src\qualcoder\view_charts.py:1405 src\qualcoder\view_charts.py:1485
+#: src\qualcoder\view_charts.py:961 src\qualcoder\view_charts.py:990
+#: src\qualcoder\view_charts.py:1019 src\qualcoder\view_charts.py:1048
+#: src\qualcoder\view_charts.py:1107 src\qualcoder\view_charts.py:1136
+#: src\qualcoder\view_charts.py:1165 src\qualcoder\view_charts.py:1194
+#: src\qualcoder\view_charts.py:1322 src\qualcoder\view_charts.py:1402
+#: src\qualcoder\view_charts.py:1482 src\qualcoder\view_charts.py:1562
 msgid "Values"
 msgstr "价值观"
 
-#: src\qualcoder\view_charts.py:892 src\qualcoder\view_charts.py:1038
+#: src\qualcoder\view_charts.py:969 src\qualcoder\view_charts.py:1115
 msgid "Code text by character count"
 msgstr "按字符数编码文本"
 
-#: src\qualcoder\view_charts.py:921 src\qualcoder\view_charts.py:1067
+#: src\qualcoder\view_charts.py:998 src\qualcoder\view_charts.py:1144
 msgid "Code volume by image area (pixels)"
 msgstr "按图像面积（像素）计算的代码量"
 
-#: src\qualcoder\view_charts.py:950 src\qualcoder\view_charts.py:1096
+#: src\qualcoder\view_charts.py:1027 src\qualcoder\view_charts.py:1173
 msgid "Code volume by audio/video segments (milliseconds)"
 msgstr "按音频/视频段划分的代码量（毫秒）"
 
-#: src\qualcoder\view_charts.py:1168
+#: src\qualcoder\view_charts.py:1245
 msgid " chart of counts of codes and categories"
 msgstr " 代码和类别计数表"
 
-#: src\qualcoder\view_charts.py:1262
+#: src\qualcoder\view_charts.py:1339
 msgid " chart of counts of coded text - total characters"
 msgstr " 编码文本计数表 - 字符总数"
 
-#: src\qualcoder\view_charts.py:1342
+#: src\qualcoder\view_charts.py:1419
 msgid " chart of coded image areas - pixels"
 msgstr " 编码图像区域图 - 像素"
 
-#: src\qualcoder\view_charts.py:1422
+#: src\qualcoder\view_charts.py:1499
 msgid " chart of coded audio/video segments - milliseconds"
 msgstr " 音频/视频编码段图表 - 毫秒"
 
-#: src\qualcoder\view_charts.py:1533
+#: src\qualcoder\view_charts.py:1610
 msgid "Attribute bar chart"
 msgstr "属性条形图"
 
-#: src\qualcoder\view_charts.py:1534 src\qualcoder\view_charts.py:1564
+#: src\qualcoder\view_charts.py:1611 src\qualcoder\view_charts.py:1641
 msgid " attribute: "
 msgstr "属性："
 
-#: src\qualcoder\view_charts.py:1563
+#: src\qualcoder\view_charts.py:1640
 msgid "Attribute histogram"
 msgstr "属性直方图"
 
-#: src\qualcoder\view_charts.py:1624
+#: src\qualcoder\view_charts.py:1701
 msgid "Too many codes"
 msgstr "代码太多"
 
-#: src\qualcoder\view_charts.py:1624
+#: src\qualcoder\view_charts.py:1701
 msgid "Too many codes for display. Restricted to 40"
 msgstr "显示代码过多。限制为 40"
 
-#: src\qualcoder\view_charts.py:1629
+#: src\qualcoder\view_charts.py:1706
 msgid "Heatmap"
 msgstr "热图"
 
-#: src\qualcoder\view_charts.py:1656
+#: src\qualcoder\view_charts.py:1733
 msgid "Too many files"
 msgstr "文件过多"
 
-#: src\qualcoder\view_charts.py:1656
+#: src\qualcoder\view_charts.py:1733
 msgid "Too many files for display. Restricted to 40"
 msgstr "文件太多，无法显示。限制为 40"
 
-#: src\qualcoder\view_charts.py:1673
+#: src\qualcoder\view_charts.py:1750
 msgid "Too many cases"
 msgstr "太多案例"
 
-#: src\qualcoder\view_charts.py:1673
+#: src\qualcoder\view_charts.py:1750
 msgid "Too many cases for display. Restricted to 40"
 msgstr "陈列柜太多。限制在 40 个"
 
-#: src\qualcoder\view_graph.py:145
+#: src\qualcoder\view_graph.py:278
 msgid "Are you sure you want to clear the graph?"
 msgstr "您确定要清除图表吗？"
 
-#: src\qualcoder\view_graph.py:386
+#: src\qualcoder\view_graph.py:523
 msgid "Link: "
 msgstr "链接："
 
-#: src\qualcoder\view_graph.py:389
+#: src\qualcoder\view_graph.py:526
 msgid "Reveal hidden items"
 msgstr "揭示隐藏物品"
 
-#: src\qualcoder\view_graph.py:442
+#: src\qualcoder\view_graph.py:641
 msgid "Insert Text"
 msgstr "插入文本"
 
-#: src\qualcoder\view_graph.py:443
+#: src\qualcoder\view_graph.py:642
 msgid "Insert Line"
 msgstr "插入线"
 
-#: src\qualcoder\view_graph.py:444
+#: src\qualcoder\view_graph.py:643
 msgid "Insert coded text items"
 msgstr "插入编码文本项目"
 
-#: src\qualcoder\view_graph.py:445
+#: src\qualcoder\view_graph.py:644
 msgid "Insert coded image items"
 msgstr "插入编码图像项目"
 
-#: src\qualcoder\view_graph.py:446
+#: src\qualcoder\view_graph.py:645
 msgid "Insert coded A/V items"
 msgstr "插入编码音频/视频项目"
 
-#: src\qualcoder\view_graph.py:447
-msgid "Show files"
-msgstr "显示文件"
-
-#: src\qualcoder\view_graph.py:448
-msgid "Show cases"
-msgstr "展示案例"
-
-#: src\qualcoder\view_graph.py:449
+#: src\qualcoder\view_graph.py:646
 msgid "Show memos of coded segments"
 msgstr "显示编码段的备忘录"
 
-#: src\qualcoder\view_graph.py:477
+#: src\qualcoder\view_graph.py:653
+msgid "Radial"
+msgstr ""
+
+#: src\qualcoder\view_graph.py:654
+msgid "Top to Bottom"
+msgstr ""
+
+#: src\qualcoder\view_graph.py:655
+msgid "Left to Right"
+msgstr ""
+
+#: src\qualcoder\view_graph.py:656
+#, fuzzy
+msgid "Right to Left"
+msgstr "右击查看"
+
+#: src\qualcoder\view_graph.py:658
+msgid "Refresh view"
+msgstr ""
+
+#: src\qualcoder\view_graph.py:759
+#, fuzzy
+msgid "There are no codes in this project."
+msgstr "选择编码文本"
+
+#: src\qualcoder\view_graph.py:1290
 msgid "Select audio/video files"
 msgstr "选择音频/视频文件"
 
-#: src\qualcoder\view_graph.py:518 src\qualcoder\view_graph.py:588
-#: src\qualcoder\view_graph.py:644
+#: src\qualcoder\view_graph.py:1331 src\qualcoder\view_graph.py:1401
+#: src\qualcoder\view_graph.py:1460
 msgid "No coded segments for selection"
 msgstr "没有供选择的编码段"
 
-#: src\qualcoder\view_graph.py:520
+#: src\qualcoder\view_graph.py:1333
 msgid "Select coded segment"
 msgstr "选择编码段"
 
-#: src\qualcoder\view_graph.py:545
+#: src\qualcoder\view_graph.py:1358
 msgid "Select image files"
 msgstr "选择图像文件"
 
-#: src\qualcoder\view_graph.py:582
+#: src\qualcoder\view_graph.py:1395
 msgid " width"
 msgstr "宽度"
 
-#: src\qualcoder\view_graph.py:582
+#: src\qualcoder\view_graph.py:1395
 msgid " height:"
 msgstr "高度:"
 
-#: src\qualcoder\view_graph.py:590
+#: src\qualcoder\view_graph.py:1403
 msgid "Select coded area"
 msgstr "选择编码区域"
 
-#: src\qualcoder\view_graph.py:614
-msgid "Select text files"
+#: src\qualcoder\view_graph.py:1428
+#, fuzzy
+msgid "No text files in this project."
+msgstr "未选择文件"
+
+#: src\qualcoder\view_graph.py:1430
+#, fuzzy
+msgid "Step 1/3: Select text files"
 msgstr "选择文本文件"
 
-#: src\qualcoder\view_graph.py:646
-msgid "Select coded text"
-msgstr "选择编码文本"
+#: src\qualcoder\view_graph.py:1437
+#, fuzzy
+msgid "Step 2/3: Select codes"
+msgstr "选择代码"
 
-#: src\qualcoder\view_graph.py:715 src\qualcoder\view_graph.py:1415
+#: src\qualcoder\view_graph.py:1462
+#, fuzzy
+msgid "Step 3/3: Select coded text segments"
+msgstr "选择编码段"
+
+#: src\qualcoder\view_graph.py:1531 src\qualcoder\view_graph.py:2365
 msgid "Memo for area: "
 msgstr "地区备忘录："
 
-#: src\qualcoder\view_graph.py:715 src\qualcoder\view_graph.py:1415
+#: src\qualcoder\view_graph.py:1531 src\qualcoder\view_graph.py:2365
 msgid "width:"
 msgstr "宽度:"
 
-#: src\qualcoder\view_graph.py:716 src\qualcoder\view_graph.py:1416
+#: src\qualcoder\view_graph.py:1532 src\qualcoder\view_graph.py:2366
 msgid "height:"
 msgstr "高度:"
 
-#: src\qualcoder\view_graph.py:732 src\qualcoder\view_graph.py:1436
+#: src\qualcoder\view_graph.py:1548 src\qualcoder\view_graph.py:2386
 msgid "Memo for duration: "
 msgstr "期限备忘录："
 
-#: src\qualcoder\view_graph.py:737
+#: src\qualcoder\view_graph.py:1553
 msgid "No memos"
 msgstr "无备忘录"
 
-#: src\qualcoder\view_graph.py:737
+#: src\qualcoder\view_graph.py:1553
 msgid "No memos for selection"
 msgstr "没有供遴选的备忘录"
 
-#: src\qualcoder\view_graph.py:739
+#: src\qualcoder\view_graph.py:1555
 msgid "Select coding memo"
 msgstr "选择编码备忘录"
 
-#: src\qualcoder\view_graph.py:757 src\qualcoder\view_graph.py:1396
+#: src\qualcoder\view_graph.py:1573 src\qualcoder\view_graph.py:2346
 msgid "Memo for: "
 msgstr "备忘："
 
-#: src\qualcoder\view_graph.py:766
+#: src\qualcoder\view_graph.py:1582
 msgid "Line start item"
 msgstr "线路起始项目"
 
-#: src\qualcoder\view_graph.py:786
+#: src\qualcoder\view_graph.py:1602
 msgid "Line end item(s)"
 msgstr "项目结束项目"
 
-#: src\qualcoder\view_graph.py:821
+#: src\qualcoder\view_graph.py:1637
 msgid "gray"
 msgstr "浅黑"
 
-#: src\qualcoder\view_graph.py:822
+#: src\qualcoder\view_graph.py:1638
 msgid "cyan"
 msgstr "青色"
 
-#: src\qualcoder\view_graph.py:822
+#: src\qualcoder\view_graph.py:1638
 msgid "magenta"
 msgstr "洋红"
 
-#: src\qualcoder\view_graph.py:823
+#: src\qualcoder\view_graph.py:1639
 msgid "red"
 msgstr "红"
 
-#: src\qualcoder\view_graph.py:826
+#: src\qualcoder\view_graph.py:1642
 msgid "white"
 msgstr "白色"
 
-#: src\qualcoder\view_graph.py:827
+#: src\qualcoder\view_graph.py:1643
 msgid "black"
 msgstr "黑色"
 
-#: src\qualcoder\view_graph.py:828
+#: src\qualcoder\view_graph.py:1644
 msgid "Colour"
 msgstr "颜色"
 
-#: src\qualcoder\view_graph.py:847
+#: src\qualcoder\view_graph.py:1663
 msgid "Text object"
 msgstr "文本对象"
 
-#: src\qualcoder\view_graph.py:847
+#: src\qualcoder\view_graph.py:1663
 msgid "Enter text:"
 msgstr "输入文本："
 
-#: src\qualcoder\view_graph.py:853
+#: src\qualcoder\view_graph.py:1669
 msgid "Another item has this exact text"
 msgstr "另一个项目有这样一段文字"
 
-#: src\qualcoder\view_graph.py:912
+#: src\qualcoder\view_graph.py:1728
 msgid "Free text item"
 msgstr "自由文本项目"
 
-#: src\qualcoder\view_graph.py:914
+#: src\qualcoder\view_graph.py:1730
 msgid "Case item"
 msgstr "案例项目"
 
-#: src\qualcoder\view_graph.py:916
+#: src\qualcoder\view_graph.py:1732
 msgid "File item"
 msgstr "文件项目"
 
-#: src\qualcoder\view_graph.py:1054
+#: src\qualcoder\view_graph.py:1983
 msgid "Save graph"
 msgstr "保存图表"
 
-#: src\qualcoder\view_graph.py:1055
+#: src\qualcoder\view_graph.py:1984
 msgid "Graph name"
 msgstr "图表名称"
 
-#: src\qualcoder\view_graph.py:1061
+#: src\qualcoder\view_graph.py:1990
 msgid "Must have a name"
 msgstr "必须有名字"
 
-#: src\qualcoder\view_graph.py:1076
+#: src\qualcoder\view_graph.py:2006
 msgid "Name error"
 msgstr "名称错误"
 
-#: src\qualcoder\view_graph.py:1076
+#: src\qualcoder\view_graph.py:2006
 msgid "This name already used. Choose another name."
 msgstr "此名称已被使用。请选择其他名称。"
 
-#: src\qualcoder\view_graph.py:1218 src\qualcoder\view_graph.py:1226
+#: src\qualcoder\view_graph.py:2168 src\qualcoder\view_graph.py:2176
 msgid "Alphabet ascending"
 msgstr "字母升序"
 
-#: src\qualcoder\view_graph.py:1219 src\qualcoder\view_graph.py:1228
+#: src\qualcoder\view_graph.py:2169 src\qualcoder\view_graph.py:2178
 msgid "Alphabet descending"
 msgstr "字母降序"
 
-#: src\qualcoder\view_graph.py:1220 src\qualcoder\view_graph.py:1230
+#: src\qualcoder\view_graph.py:2170 src\qualcoder\view_graph.py:2180
 msgid "Oldest to newest"
 msgstr "从旧到新"
 
-#: src\qualcoder\view_graph.py:1221 src\qualcoder\view_graph.py:1232
+#: src\qualcoder\view_graph.py:2171 src\qualcoder\view_graph.py:2182
 msgid "Newest to oldest"
 msgstr "从最新到最旧"
 
-#: src\qualcoder\view_graph.py:1233 src\qualcoder\view_graph.py:1466
+#: src\qualcoder\view_graph.py:2183 src\qualcoder\view_graph.py:2416
 msgid "Load graph"
 msgstr "载荷图"
 
-#: src\qualcoder\view_graph.py:1488
+#: src\qualcoder\view_graph.py:2463
 msgid "Load graph errors"
 msgstr "加载图形错误"
 
-#: src\qualcoder\view_graph.py:1489
+#: src\qualcoder\view_graph.py:2464
 msgid "Changing to another report will lose unsaved graph."
 msgstr "切换到其他报告将丢失未保存的图表。"
 
-#: src\qualcoder\view_graph.py:1728
+#: src\qualcoder\view_graph.py:2706
 msgid " does not exist: "
 msgstr " 不存在："
 
-#: src\qualcoder\view_graph.py:1744
+#: src\qualcoder\view_graph.py:2722
 msgid "Delete stored graphs"
 msgstr "删除存储的图表"
 
-#: src\qualcoder\view_graph.py:1988 src\qualcoder\view_graph.py:2056
-#: src\qualcoder\view_graph.py:2158 src\qualcoder\view_graph.py:2232
-#: src\qualcoder\view_graph.py:2374 src\qualcoder\view_graph.py:2509
+#: src\qualcoder\view_graph.py:2929 src\qualcoder\view_graph.py:3021
+#: src\qualcoder\view_graph.py:3117 src\qualcoder\view_graph.py:3210
+#: src\qualcoder\view_graph.py:3351 src\qualcoder\view_graph.py:3503
 msgid "Edit text"
 msgstr "编辑文本"
 
-#: src\qualcoder\view_graph.py:1989 src\qualcoder\view_graph.py:2160
-#: src\qualcoder\view_graph.py:2385 src\qualcoder\view_graph.py:3212
-msgid "Larger font"
-msgstr "字体更大"
-
-#: src\qualcoder\view_graph.py:1990 src\qualcoder\view_graph.py:2161
-#: src\qualcoder\view_graph.py:2386 src\qualcoder\view_graph.py:3213
-msgid "Smaller font"
-msgstr "字体更小"
-
-#: src\qualcoder\view_graph.py:1991 src\qualcoder\view_graph.py:2159
-#: src\qualcoder\view_graph.py:2384 src\qualcoder\view_graph.py:3214
+#: src\qualcoder\view_graph.py:2930 src\qualcoder\view_graph.py:3118
+#: src\qualcoder\view_graph.py:3362 src\qualcoder\view_graph.py:4090
 msgid "Bold toggle"
 msgstr "粗体切换"
 
-#: src\qualcoder\view_graph.py:1992 src\qualcoder\view_graph.py:2162
-msgid "Red text"
-msgstr "红色文本"
+#: src\qualcoder\view_graph.py:2939 src\qualcoder\view_graph.py:3127
+#: src\qualcoder\view_graph.py:3370
+#, fuzzy
+msgid "Text color"
+msgstr "新颜色"
 
-#: src\qualcoder\view_graph.py:1993 src\qualcoder\view_graph.py:2163
-msgid "Green text"
-msgstr "绿色文本"
-
-#: src\qualcoder\view_graph.py:1994 src\qualcoder\view_graph.py:2164
-msgid "Yellow text"
-msgstr "黄色文本"
-
-#: src\qualcoder\view_graph.py:1995 src\qualcoder\view_graph.py:2165
-msgid "Blue text"
-msgstr "蓝色文本"
-
-#: src\qualcoder\view_graph.py:1996 src\qualcoder\view_graph.py:2168
-msgid "Orange text"
-msgstr "橙色文本"
-
-#: src\qualcoder\view_graph.py:1997 src\qualcoder\view_graph.py:2167
-msgid "Cyan text"
-msgstr "青色文本"
-
-#: src\qualcoder\view_graph.py:1998 src\qualcoder\view_graph.py:2166
-msgid "Magenta text"
-msgstr "洋红色文本"
-
-#: src\qualcoder\view_graph.py:1999 src\qualcoder\view_graph.py:2169
-msgid "Gray text"
-msgstr "灰色文本"
-
-#: src\qualcoder\view_graph.py:2000 src\qualcoder\view_graph.py:2170
-msgid "Black text"
-msgstr "黑色文本"
-
-#: src\qualcoder\view_graph.py:2001 src\qualcoder\view_graph.py:2171
-msgid "White text"
-msgstr "白色文本"
-
-#: src\qualcoder\view_graph.py:2003 src\qualcoder\view_graph.py:2173
-msgid "Hide attributes"
-msgstr "隐藏属性"
-
-#: src\qualcoder\view_graph.py:2005 src\qualcoder\view_graph.py:2175
-msgid "Show attributes"
-msgstr "显示属性"
-
-#: src\qualcoder\view_graph.py:2006 src\qualcoder\view_graph.py:2176
-#: src\qualcoder\view_graph.py:2387 src\qualcoder\view_graph.py:2582
-#: src\qualcoder\view_graph.py:2785 src\qualcoder\view_graph.py:2934
-#: src\qualcoder\view_graph.py:3084
-msgid "Remove"
-msgstr "移除"
-
-#: src\qualcoder\view_graph.py:2373
-msgid "Update text"
-msgstr "更新文本"
-
-#: src\qualcoder\view_graph.py:2377 src\qualcoder\view_graph.py:2380
-#: src\qualcoder\view_graph.py:2383
-msgid "Code in context"
-msgstr "上下文中的代码"
-
-#: src\qualcoder\view_graph.py:2388 src\qualcoder\view_graph.py:2574
-#: src\qualcoder\view_graph.py:2777 src\qualcoder\view_graph.py:2935
-#: src\qualcoder\view_graph.py:3331
+#: src\qualcoder\view_graph.py:2940 src\qualcoder\view_graph.py:3128
+#: src\qualcoder\view_graph.py:3371 src\qualcoder\view_graph.py:3574
+#: src\qualcoder\view_graph.py:3765 src\qualcoder\view_graph.py:4479
 msgid "Red"
 msgstr "红"
 
-#: src\qualcoder\view_graph.py:2389 src\qualcoder\view_graph.py:2576
-#: src\qualcoder\view_graph.py:2779 src\qualcoder\view_graph.py:2936
-#: src\qualcoder\view_graph.py:3333
+#: src\qualcoder\view_graph.py:2941 src\qualcoder\view_graph.py:3129
+#: src\qualcoder\view_graph.py:3372 src\qualcoder\view_graph.py:3576
+#: src\qualcoder\view_graph.py:3766 src\qualcoder\view_graph.py:4481
 msgid "Green"
 msgstr "绿色"
 
-#: src\qualcoder\view_graph.py:2390 src\qualcoder\view_graph.py:2575
-#: src\qualcoder\view_graph.py:2778 src\qualcoder\view_graph.py:2937
-#: src\qualcoder\view_graph.py:3332
+#: src\qualcoder\view_graph.py:2942 src\qualcoder\view_graph.py:3130
+#: src\qualcoder\view_graph.py:3373 src\qualcoder\view_graph.py:3575
+#: src\qualcoder\view_graph.py:3767 src\qualcoder\view_graph.py:4480
 msgid "Yellow"
 msgstr "黄色"
 
-#: src\qualcoder\view_graph.py:2391 src\qualcoder\view_graph.py:2577
-#: src\qualcoder\view_graph.py:2780 src\qualcoder\view_graph.py:2938
-#: src\qualcoder\view_graph.py:3334
+#: src\qualcoder\view_graph.py:2943 src\qualcoder\view_graph.py:3131
+#: src\qualcoder\view_graph.py:3374 src\qualcoder\view_graph.py:3577
+#: src\qualcoder\view_graph.py:3768 src\qualcoder\view_graph.py:4482
 msgid "Blue"
 msgstr "蓝色"
 
-#: src\qualcoder\view_graph.py:2392 src\qualcoder\view_graph.py:2578
-#: src\qualcoder\view_graph.py:2781 src\qualcoder\view_graph.py:2940
-#: src\qualcoder\view_graph.py:3335
-msgid "Cyan"
-msgstr "青色"
-
-#: src\qualcoder\view_graph.py:2393 src\qualcoder\view_graph.py:2579
-#: src\qualcoder\view_graph.py:2782 src\qualcoder\view_graph.py:2939
-#: src\qualcoder\view_graph.py:3336
-msgid "Magenta"
-msgstr "品红色"
-
-#: src\qualcoder\view_graph.py:2394 src\qualcoder\view_graph.py:2580
-#: src\qualcoder\view_graph.py:2783 src\qualcoder\view_graph.py:2941
-#: src\qualcoder\view_graph.py:3337
+#: src\qualcoder\view_graph.py:2944 src\qualcoder\view_graph.py:3132
+#: src\qualcoder\view_graph.py:3377 src\qualcoder\view_graph.py:3580
+#: src\qualcoder\view_graph.py:3771 src\qualcoder\view_graph.py:4485
 msgid "Orange"
 msgstr "橙色"
 
-#: src\qualcoder\view_graph.py:2395 src\qualcoder\view_graph.py:2581
-#: src\qualcoder\view_graph.py:2784 src\qualcoder\view_graph.py:2942
-#: src\qualcoder\view_graph.py:3338
+#: src\qualcoder\view_graph.py:2945 src\qualcoder\view_graph.py:3133
+#: src\qualcoder\view_graph.py:3375 src\qualcoder\view_graph.py:3578
+#: src\qualcoder\view_graph.py:3770 src\qualcoder\view_graph.py:4483
+msgid "Cyan"
+msgstr "青色"
+
+#: src\qualcoder\view_graph.py:2946 src\qualcoder\view_graph.py:3134
+#: src\qualcoder\view_graph.py:3376 src\qualcoder\view_graph.py:3579
+#: src\qualcoder\view_graph.py:3769 src\qualcoder\view_graph.py:4484
+msgid "Magenta"
+msgstr "品红色"
+
+#: src\qualcoder\view_graph.py:2947 src\qualcoder\view_graph.py:3135
+#: src\qualcoder\view_graph.py:3378 src\qualcoder\view_graph.py:3581
+#: src\qualcoder\view_graph.py:3772 src\qualcoder\view_graph.py:4486
 msgid "Gray"
 msgstr "灰色"
 
-#: src\qualcoder\view_graph.py:2396
+#: src\qualcoder\view_graph.py:2949 src\qualcoder\view_graph.py:3137
+#: src\qualcoder\view_graph.py:3380
 msgid "Black"
 msgstr "黑色"
 
-#: src\qualcoder\view_graph.py:2397 src\qualcoder\view_graph.py:2943
+#: src\qualcoder\view_graph.py:2950 src\qualcoder\view_graph.py:3138
+#: src\qualcoder\view_graph.py:3381 src\qualcoder\view_graph.py:3773
 msgid "White"
 msgstr "白色"
 
-#: src\qualcoder\view_graph.py:2402
+#: src\qualcoder\view_graph.py:2953 src\qualcoder\view_graph.py:3141
+msgid "Hide attributes"
+msgstr "隐藏属性"
+
+#: src\qualcoder\view_graph.py:2955 src\qualcoder\view_graph.py:3143
+msgid "Show attributes"
+msgstr "显示属性"
+
+#: src\qualcoder\view_graph.py:2957 src\qualcoder\view_graph.py:3145
+#: src\qualcoder\view_graph.py:3383 src\qualcoder\view_graph.py:3583
+#: src\qualcoder\view_graph.py:3775 src\qualcoder\view_graph.py:3932
+msgid "Remove"
+msgstr "移除"
+
+#: src\qualcoder\view_graph.py:2999 src\qualcoder\view_graph.py:3188
+#: src\qualcoder\view_graph.py:3452 src\qualcoder\view_graph.py:3794
+#: src\qualcoder\view_graph.py:3955
+#, fuzzy
+msgid "Remove this item from the graph?"
+msgstr "从类别中删除代码"
+
+#: src\qualcoder\view_graph.py:3350
+msgid "Update text"
+msgstr "更新文本"
+
+#: src\qualcoder\view_graph.py:3354 src\qualcoder\view_graph.py:3357
+#: src\qualcoder\view_graph.py:3360
+#, fuzzy
+msgid "Segment in context"
+msgstr "按上下文查看"
+
+#: src\qualcoder\view_graph.py:3388
 msgid "Update text to"
 msgstr "更新文本为"
 
-#: src\qualcoder\view_graph.py:2425 src\qualcoder\view_graph.py:3098
+#: src\qualcoder\view_graph.py:3411 src\qualcoder\view_graph.py:3946
 msgid "Cannot find image coding in database"
 msgstr "无法在数据库中找到图像编码"
 
-#: src\qualcoder\view_graph.py:2440
+#: src\qualcoder\view_graph.py:3426
 msgid "Cannot find A/V coding in database"
 msgstr "无法在数据库中找到音频/视频编码"
 
-#: src\qualcoder\view_graph.py:2458
+#: src\qualcoder\view_graph.py:3444
 msgid "Cannot find text coding in database"
 msgstr "无法在数据库中找到文本编码"
 
-#: src\qualcoder\view_graph.py:2571 src\qualcoder\view_graph.py:2774
-#: src\qualcoder\view_graph.py:3328
-msgid "Thicker"
-msgstr "更厚"
+#: src\qualcoder\view_graph.py:3564 src\qualcoder\view_graph.py:4469
+#, fuzzy
+msgid "Line style"
+msgstr "线路起始项目"
 
-#: src\qualcoder\view_graph.py:2572 src\qualcoder\view_graph.py:2775
-#: src\qualcoder\view_graph.py:3329
-msgid "Thinner"
-msgstr "稀释剂"
+#: src\qualcoder\view_graph.py:3565 src\qualcoder\view_graph.py:4470
+msgid "Thin (1px)"
+msgstr ""
 
-#: src\qualcoder\view_graph.py:2573 src\qualcoder\view_graph.py:2776
-#: src\qualcoder\view_graph.py:3330
+#: src\qualcoder\view_graph.py:3566 src\qualcoder\view_graph.py:4471
+msgid "Normal (2px)"
+msgstr ""
+
+#: src\qualcoder\view_graph.py:3567 src\qualcoder\view_graph.py:4472
+msgid "Thick (4px)"
+msgstr ""
+
+#: src\qualcoder\view_graph.py:3568 src\qualcoder\view_graph.py:4473
+msgid "Extra thick (6px)"
+msgstr ""
+
+#: src\qualcoder\view_graph.py:3570 src\qualcoder\view_graph.py:4475
 msgid "Dotted"
 msgstr "点状"
 
-#: src\qualcoder\view_graph.py:2954
+#: src\qualcoder\view_graph.py:3571 src\qualcoder\view_graph.py:4476
+msgid "Solid"
+msgstr ""
+
+#: src\qualcoder\view_graph.py:3573 src\qualcoder\view_graph.py:4478
+#, fuzzy
+msgid "Line color"
+msgstr "新颜色"
+
+#: src\qualcoder\view_graph.py:3634
+#, fuzzy
+msgid "Remove this line from the graph?"
+msgstr "从类别中删除代码"
+
+#: src\qualcoder\view_graph.py:3764
+#, fuzzy
+msgid "Color"
+msgstr "颜色"
+
+#: src\qualcoder\view_graph.py:3786
 msgid "Cannot find audio/video coding in database"
 msgstr "无法在数据库中找到音频/视频编码"
 
-#: src\qualcoder\view_graph.py:3339
+#: src\qualcoder\view_graph.py:4069
+#, fuzzy
+msgid "Expand category"
+msgstr "添加类别"
+
+#: src\qualcoder\view_graph.py:4071
+#, fuzzy
+msgid "Collapse category"
+msgstr "重新命名类别"
+
+#: src\qualcoder\view_graph.py:4072
+msgid "Toggle: Ellipse/Rectangle"
+msgstr ""
+
+#: src\qualcoder\view_graph.py:4079
+#, fuzzy
+msgid "Import and link segments"
+msgstr "出口部分"
+
+#: src\qualcoder\view_graph.py:4080
+#, fuzzy
+msgid "Import Co-occurrences"
+msgstr "已导出共现"
+
+#: src\qualcoder\view_graph.py:4081
+#, fuzzy
+msgid "View text and media"
+msgstr "案例文本和媒体"
+
+#: src\qualcoder\view_graph.py:4086
+#, fuzzy
+msgid "Hide memo"
+msgstr "代码备忘录"
+
+#: src\qualcoder\view_graph.py:4137
+#, fuzzy
+msgid "Hide this item?"
+msgstr "线路起始项目"
+
+#: src\qualcoder\view_graph.py:4227
+#, fuzzy
+msgid "No segments"
+msgstr "结束部分"
+
+#: src\qualcoder\view_graph.py:4228
+#, fuzzy
+msgid "There are no new coded segments for this code."
+msgstr "没有供选择的编码段"
+
+#: src\qualcoder\view_graph.py:4303
+msgid "No co-ocurrences"
+msgstr ""
+
+#: src\qualcoder\view_graph.py:4488
 msgid "Hide"
 msgstr "隐藏"
+
+#: src\qualcoder\view_graph.py:4524
+#, fuzzy
+msgid "Hide this line?"
+msgstr "隐藏以下值"
 
 #: src\qualcoder\view_image.py:129 src\qualcoder\view_image.py:869
 msgid "Image coding"
@@ -7298,7 +7508,7 @@ msgstr "高度:"
 msgid " Scale: "
 msgstr " 规模："
 
-#: src\qualcoder\__main__.py:688
+#: src\qualcoder\__main__.py:689
 msgid ""
 "Cannot load config.ini.\n"
 "Character decoding error.\n"
@@ -7308,23 +7518,23 @@ msgstr ""
 "字符解码错误。\n"
 "使用 QualCoder 默认设置。"
 
-#: src\qualcoder\__main__.py:690
+#: src\qualcoder\__main__.py:691
 msgid "Cannot load config.ini file"
 msgstr "无法加载 config.ini 文件"
 
-#: src\qualcoder\__main__.py:1370
+#: src\qualcoder\__main__.py:1373
 msgid "There is already a backup with this name"
 msgstr "已经有一个使用此名称的备份"
 
-#: src\qualcoder\__main__.py:1379
+#: src\qualcoder\__main__.py:1382
 msgid "WARNING: audio and video files NOT backed up. See settings."
 msgstr "警告：不备份音频和视频文件。请参见设置。"
 
-#: src\qualcoder\__main__.py:1381
+#: src\qualcoder\__main__.py:1384
 msgid "Project backup created: "
 msgstr "创建项目备份： "
 
-#: src\qualcoder\__main__.py:1465
+#: src\qualcoder\__main__.py:1468
 msgid ""
 "Welcome\n"
 "\n"
@@ -7338,120 +7548,120 @@ msgstr ""
 "QualCoder 中的新人工智能增强功能需要一些额外设置。您想启用 AI 并开始设置吗？"
 "您也可以稍后从主窗口的 AI 菜单启动 AI 设置向导。点击 “是 ”立即开始。"
 
-#: src\qualcoder\__main__.py:1471
+#: src\qualcoder\__main__.py:1474
 msgid "AI Integration"
 msgstr "人工智能集成"
 
-#: src\qualcoder\__main__.py:1791
+#: src\qualcoder\__main__.py:1794
 msgid "Font"
 msgstr "字体"
 
-#: src\qualcoder\__main__.py:1792
+#: src\qualcoder\__main__.py:1795
 msgid "Tree font size"
 msgstr "树木字体大小"
 
-#: src\qualcoder\__main__.py:1793
+#: src\qualcoder\__main__.py:1796
 msgid "Working directory"
 msgstr "工作目录"
 
-#: src\qualcoder\__main__.py:1794
+#: src\qualcoder\__main__.py:1797
 msgid "Show IDs"
 msgstr "显示 ID"
 
-#: src\qualcoder\__main__.py:1795
+#: src\qualcoder\__main__.py:1798
 msgid "Language"
 msgstr "语言"
 
-#: src\qualcoder\__main__.py:1796
+#: src\qualcoder\__main__.py:1799
 msgid "Timestamp format"
 msgstr "时间戳格式"
 
-#: src\qualcoder\__main__.py:1797
+#: src\qualcoder\__main__.py:1800
 msgid "Speaker name format"
 msgstr "扬声器名称格式"
 
-#: src\qualcoder\__main__.py:1798
+#: src\qualcoder\__main__.py:1801
 msgid "Report text context characters: "
 msgstr "报告文本上下文字符： "
 
-#: src\qualcoder\__main__.py:1799
+#: src\qualcoder\__main__.py:1802
 msgid "Report text context style: "
 msgstr "报告文本上下文样式： "
 
-#: src\qualcoder\__main__.py:1800
+#: src\qualcoder\__main__.py:1803
 msgid "Backup on open"
 msgstr "打开时备份"
 
-#: src\qualcoder\__main__.py:1801
+#: src\qualcoder\__main__.py:1804
 msgid "Backup AV files"
 msgstr "备份音频/视频文件"
 
-#: src\qualcoder\__main__.py:1803
+#: src\qualcoder\__main__.py:1806
 msgid "AI integration is enabled"
 msgstr "启用人工智能集成"
 
-#: src\qualcoder\__main__.py:1805
+#: src\qualcoder\__main__.py:1808
 msgid "AI integration is disabled"
 msgstr "人工智能集成已禁用"
 
-#: src\qualcoder\__main__.py:1806
+#: src\qualcoder\__main__.py:1809
 msgid "Style"
 msgstr "样式"
 
-#: src\qualcoder\__main__.py:1809
+#: src\qualcoder\__main__.py:1812
 #, fuzzy
 msgid "Folder paths / represents backslash"
 msgstr "目录（文件夹）路径 / 表示反斜线"
 
-#: src\qualcoder\__main__.py:2061
+#: src\qualcoder\__main__.py:2064
 msgid "This project contains no text files."
 msgstr "本项目不包含文本文件。"
 
-#: src\qualcoder\__main__.py:2062
+#: src\qualcoder\__main__.py:2065
 msgid "No text files"
 msgstr "无文本文件"
 
-#: src\qualcoder\__main__.py:2075
+#: src\qualcoder\__main__.py:2078
 msgid "This project contains no pdf files."
 msgstr "本项目不包含 pdf 文件。"
 
-#: src\qualcoder\__main__.py:2076
+#: src\qualcoder\__main__.py:2079
 msgid "No pdf files"
 msgstr "无 pdf 文件"
 
-#: src\qualcoder\__main__.py:2091
+#: src\qualcoder\__main__.py:2094
 msgid "This project contains no image files."
 msgstr "本项目不包含图像文件。"
 
-#: src\qualcoder\__main__.py:2092
+#: src\qualcoder\__main__.py:2095
 msgid "No image files"
 msgstr "无图像文件"
 
-#: src\qualcoder\__main__.py:2100
+#: src\qualcoder\__main__.py:2103
 msgid "This project contains no audio/video files."
 msgstr "本项目不包含音频/视频文件。"
 
-#: src\qualcoder\__main__.py:2101
+#: src\qualcoder\__main__.py:2104
 msgid "No a/v files"
 msgstr "无音频/视频文件"
 
-#: src\qualcoder\__main__.py:2104
+#: src\qualcoder\__main__.py:2107
 msgid "VLC is not installed. Cannot code audio/video files."
 msgstr "未安装 VLC。无法编码音频/视频文件。"
 
-#: src\qualcoder\__main__.py:2105
+#: src\qualcoder\__main__.py:2108
 msgid "Install VLC"
 msgstr "安装 VLC"
 
-#: src\qualcoder\__main__.py:2114
+#: src\qualcoder\__main__.py:2117
 msgid "A/V Coding"
 msgstr "音频/视频编码"
 
-#: src\qualcoder\__main__.py:2201
+#: src\qualcoder\__main__.py:2204
 msgid "IMPORTING REFI-QDA PROJECT"
 msgstr "导入 refi-qda 项目"
 
-#: src\qualcoder\__main__.py:2203
+#: src\qualcoder\__main__.py:2206
 msgid ""
 "Step 1: You will be asked for a new QualCoder project name.\n"
 "Step 2: You will be asked for the QDPX file."
@@ -7459,20 +7669,20 @@ msgstr ""
 "第 1 步：系统会要求您输入新的 QualCoder 项目名称。\n"
 "第 2 步：要求您提供 QDPX 文件。"
 
-#: src\qualcoder\__main__.py:2204
+#: src\qualcoder\__main__.py:2207
 msgid "REFI-QDA import steps"
 msgstr "REFI-QDA 导入步骤"
 
-#: src\qualcoder\__main__.py:2208 src\qualcoder\__main__.py:2225
-#: src\qualcoder\__main__.py:2241
+#: src\qualcoder\__main__.py:2211 src\qualcoder\__main__.py:2228
+#: src\qualcoder\__main__.py:2244
 msgid "Project creation"
 msgstr "项目创建"
 
-#: src\qualcoder\__main__.py:2208
+#: src\qualcoder\__main__.py:2211
 msgid "REFI-QDA Project not successfully created"
 msgstr "未成功创建 REFI-QDA 项目"
 
-#: src\qualcoder\__main__.py:2220
+#: src\qualcoder\__main__.py:2223
 #, fuzzy
 msgid ""
 "Step 1: You will be asked for a new QualCoder project name.\n"
@@ -7481,19 +7691,19 @@ msgstr ""
 "第 1 步：系统会要求您输入新的 QualCoder 项目名称。\n"
 "第 2 步：要求您提供 QDPX 文件。"
 
-#: src\qualcoder\__main__.py:2221 src\qualcoder\__main__.py:2237
+#: src\qualcoder\__main__.py:2224 src\qualcoder\__main__.py:2240
 msgid "RQDA import steps"
 msgstr "RQDA 导入步骤"
 
-#: src\qualcoder\__main__.py:2225 src\qualcoder\__main__.py:2241
+#: src\qualcoder\__main__.py:2228 src\qualcoder\__main__.py:2244
 msgid "Project not successfully created"
 msgstr "项目未成功创建"
 
-#: src\qualcoder\__main__.py:2234
+#: src\qualcoder\__main__.py:2237
 msgid "IMPORTING RQDA PROJECT"
 msgstr "导入 RQDA 项目"
 
-#: src\qualcoder\__main__.py:2236
+#: src\qualcoder\__main__.py:2239
 msgid ""
 "Step 1: You will be asked for a new QualCoder project name.\n"
 "Step 2: You will be asked for the RQDA file."
@@ -7501,55 +7711,55 @@ msgstr ""
 "第 1 步：系统会要求您输入新的 QualCoder 项目名称。\n"
 "第 2 步：要求您提供 RQDA 文件。"
 
-#: src\qualcoder\__main__.py:2254
+#: src\qualcoder\__main__.py:2257
 msgid "Are you sure you want to quit?"
 msgstr "你确定要辞职吗？"
 
-#: src\qualcoder\__main__.py:2312
+#: src\qualcoder\__main__.py:2315
 msgid "Enter project name"
 msgstr "输入项目名称"
 
-#: src\qualcoder\__main__.py:2316
+#: src\qualcoder\__main__.py:2319
 msgid "No project created."
 msgstr "未创建项目。"
 
-#: src\qualcoder\__main__.py:2335
+#: src\qualcoder\__main__.py:2338
 msgid "Project creation error "
 msgstr "项目创建错误 "
 
-#: src\qualcoder\__main__.py:2336
+#: src\qualcoder\__main__.py:2339
 msgid " not successfully created"
 msgstr " 未成功创建"
 
-#: src\qualcoder\__main__.py:2422
+#: src\qualcoder\__main__.py:2425
 msgid "New project: "
 msgstr "新项目： "
 
-#: src\qualcoder\__main__.py:2423
+#: src\qualcoder\__main__.py:2426
 msgid "Opening: "
 msgstr "开幕： "
 
-#: src\qualcoder\__main__.py:2433
+#: src\qualcoder\__main__.py:2436
 msgid "New Project Created"
 msgstr "创建新项目"
 
-#: src\qualcoder\__main__.py:2434
+#: src\qualcoder\__main__.py:2437
 msgid "DB Version:"
 msgstr "数据库版本："
 
-#: src\qualcoder\__main__.py:2436
+#: src\qualcoder\__main__.py:2439
 msgid "About: "
 msgstr "关于："
 
-#: src\qualcoder\__main__.py:2440
+#: src\qualcoder\__main__.py:2443
 msgid "Problem creating database "
 msgstr "创建数据库问题 "
 
-#: src\qualcoder\__main__.py:2495
+#: src\qualcoder\__main__.py:2498
 msgid "Coder name changed to: "
 msgstr "编码员姓名改为："
 
-#: src\qualcoder\__main__.py:2518
+#: src\qualcoder\__main__.py:2521
 msgid ""
 "**Research topic, questions and objectives:** \n"
 "\n"
@@ -7570,35 +7780,35 @@ msgstr ""
 "#####\n"
 "(此标记以下的内容均为个人说明，绝不会发送给人工智能）。"
 
-#: src\qualcoder\__main__.py:2523
+#: src\qualcoder\__main__.py:2526
 msgid "Memo for project "
 msgstr "项目备忘录 "
 
-#: src\qualcoder\__main__.py:2530
+#: src\qualcoder\__main__.py:2533
 msgid "Project memo entered."
 msgstr "输入项目备忘录。"
 
-#: src\qualcoder\__main__.py:2560
+#: src\qualcoder\__main__.py:2563
 msgid ""
 "An error occured while writing to the project folder. Please close the "
 "project and try to open it again."
 msgstr "在写入项目文件夹时发生错误。请关闭项目并尝试再次打开。"
 
-#: src\qualcoder\__main__.py:2562
+#: src\qualcoder\__main__.py:2565
 msgid "I/O Error"
 msgstr "输入/输出错误"
 
-#: src\qualcoder\__main__.py:2563
+#: src\qualcoder\__main__.py:2566
 msgid "Close"
 msgstr "关闭"
 
-#: src\qualcoder\__main__.py:2657
+#: src\qualcoder\__main__.py:2660
 msgid ""
 "QualCoder detected that the project was not properly closed the last time it "
 "was used by \""
 msgstr "QualCoder 检测到该项目上次被“ ”使用时未正确关闭。"
 
-#: src\qualcoder\__main__.py:2659
+#: src\qualcoder\__main__.py:2662
 msgid ""
 "In most cases, you can still continue your work as usual. If you encounter "
 "any problems, search for a recent backup in the project folder."
@@ -7606,19 +7816,19 @@ msgstr ""
 "在大多数情况下，您仍然可以照常工作。如果遇到任何问题，请在项目文件夹中查找最"
 "近的备份。"
 
-#: src\qualcoder\__main__.py:2673
+#: src\qualcoder\__main__.py:2676
 msgid "Project cannot be opened since it's already in use by \""
 msgstr "项目已被“ ”使用，因此无法打开。"
 
-#: src\qualcoder\__main__.py:2674
+#: src\qualcoder\__main__.py:2677
 msgid "\". Please retry later."
 msgstr "请稍后重试。"
 
-#: src\qualcoder\__main__.py:2676 src\qualcoder\__main__.py:2689
+#: src\qualcoder\__main__.py:2679 src\qualcoder\__main__.py:2692
 msgid "Cannot open file"
 msgstr "无法打开文件"
 
-#: src\qualcoder\__main__.py:2715
+#: src\qualcoder\__main__.py:2718
 msgid ""
 "Your current coder name (\"{}\") differs from the one last used in the "
 "project (\"{}\"). Do you want to keep your current name or switch to the one "
@@ -7627,99 +7837,99 @@ msgstr ""
 "您当前的编码者名称（“{}”）与项目中上次使用的名称（“{}”）不一致。您要保留当前"
 "名称还是切换为项目中的名称？"
 
-#: src\qualcoder\__main__.py:2718
+#: src\qualcoder\__main__.py:2721
 #, fuzzy
 msgid "Coder name"
 msgstr "代码名称"
 
-#: src\qualcoder\__main__.py:2720
+#: src\qualcoder\__main__.py:2723
 msgid "Keep"
 msgstr "保持"
 
-#: src\qualcoder\__main__.py:2721
+#: src\qualcoder\__main__.py:2724
 msgid "Switch"
 msgstr "切换"
 
-#: src\qualcoder\__main__.py:2722
+#: src\qualcoder\__main__.py:2725
 msgid "Cancel"
 msgstr "取消"
 
-#: src\qualcoder\__main__.py:2731
+#: src\qualcoder\__main__.py:2734
 msgid "Default coder name changed to: "
 msgstr "默认编码器名称更改为 "
 
-#: src\qualcoder\__main__.py:2759 src\qualcoder\__main__.py:2788
-#: src\qualcoder\__main__.py:2808 src\qualcoder\__main__.py:2833
-#: src\qualcoder\__main__.py:2904 src\qualcoder\__main__.py:2928
-#: src\qualcoder\__main__.py:2936 src\qualcoder\__main__.py:2948
-#: src\qualcoder\__main__.py:2956 src\qualcoder\__main__.py:2964
-#: src\qualcoder\__main__.py:2973 src\qualcoder\__main__.py:2981
-#: src\qualcoder\__main__.py:2989
+#: src\qualcoder\__main__.py:2762 src\qualcoder\__main__.py:2791
+#: src\qualcoder\__main__.py:2811 src\qualcoder\__main__.py:2836
+#: src\qualcoder\__main__.py:2907 src\qualcoder\__main__.py:2931
+#: src\qualcoder\__main__.py:2939 src\qualcoder\__main__.py:2951
+#: src\qualcoder\__main__.py:2959 src\qualcoder\__main__.py:2967
+#: src\qualcoder\__main__.py:2976 src\qualcoder\__main__.py:2984
+#: src\qualcoder\__main__.py:2992
 msgid "Updating database to version"
 msgstr "将数据库更新到版本"
 
-#: src\qualcoder\__main__.py:2996
+#: src\qualcoder\__main__.py:2999
 msgid "Deleting code_text coding to deleted files: "
 msgstr "删除已删除文件的编码_文本编码： "
 
-#: src\qualcoder\__main__.py:3003
+#: src\qualcoder\__main__.py:3006
 msgid "Deleting code_image coding to deleted files: "
 msgstr "删除已删除文件的编码图像： "
 
-#: src\qualcoder\__main__.py:3010
+#: src\qualcoder\__main__.py:3013
 msgid "Deleting code_av coding to deleted files: "
 msgstr "删除已删除文件的代码_av 编码： "
 
-#: src\qualcoder\__main__.py:3054
+#: src\qualcoder\__main__.py:3057
 msgid "QualCoder project missing folders. Created empty folders"
 msgstr "QualCoder 项目缺少文件夹。创建了空文件夹"
 
-#: src\qualcoder\__main__.py:3060
+#: src\qualcoder\__main__.py:3063
 msgid "Project Opened: "
 msgstr "项目已开放： "
 
-#: src\qualcoder\__main__.py:3079
+#: src\qualcoder\__main__.py:3082
 msgid "Project summary"
 msgstr "项目总结"
 
-#: src\qualcoder\__main__.py:3080
+#: src\qualcoder\__main__.py:3083
 msgid "Date time now: "
 msgstr "现在的日期时间："
 
-#: src\qualcoder\__main__.py:3082
+#: src\qualcoder\__main__.py:3085
 msgid "Project path: "
 msgstr "项目路径："
 
-#: src\qualcoder\__main__.py:3083
+#: src\qualcoder\__main__.py:3086
 msgid "Project date: "
 msgstr "项目日期："
 
-#: src\qualcoder\__main__.py:3088
+#: src\qualcoder\__main__.py:3091
 msgid "Project memo: "
 msgstr "项目备忘录："
 
-#: src\qualcoder\__main__.py:3103
+#: src\qualcoder\__main__.py:3106
 msgid "Code categories: "
 msgstr "代码类别："
 
-#: src\qualcoder\__main__.py:3122
+#: src\qualcoder\__main__.py:3125
 #, fuzzy
 msgid "Folder paths / represents \\"
 msgstr "目录（文件夹）路径/表示"
 
-#: src\qualcoder\__main__.py:3127
+#: src\qualcoder\__main__.py:3130
 msgid "Bad links to files"
 msgstr "文件链接错误"
 
-#: src\qualcoder\__main__.py:3161
+#: src\qualcoder\__main__.py:3164
 msgid "Closing project: "
 msgstr "结束项目： "
 
-#: src\qualcoder\__main__.py:3228
+#: src\qualcoder\__main__.py:3231
 msgid "Deleting: "
 msgstr "删除： "
 
-#: src\qualcoder\__main__.py:3237
+#: src\qualcoder\__main__.py:3240
 msgid ""
 "The AI is setup and enabled, so there is nothing to do here. Go to AI > "
 "settings to change the current model or other settings."
@@ -7727,54 +7937,54 @@ msgstr ""
 "人工智能已设置并启用，因此这里没有什么可做的。请转到人工智能 > 设置，更改当前"
 "模型或其他设置。"
 
-#: src\qualcoder\__main__.py:3239
+#: src\qualcoder\__main__.py:3242
 msgid "AI Setup Wizard"
 msgstr "人工智能设置向导"
 
-#: src\qualcoder\__main__.py:3241
+#: src\qualcoder\__main__.py:3244
 msgid "AI: Setup Wizard"
 msgstr "人工智能设置向导"
 
-#: src\qualcoder\__main__.py:3244
+#: src\qualcoder\__main__.py:3247
 msgid "AI: Setup Wizard finished"
 msgstr "人工智能：设置向导已完成"
 
-#: src\qualcoder\__main__.py:3253
+#: src\qualcoder\__main__.py:3256
 msgid "Please enable the AI first and set it in Settings."
 msgstr "请先启用人工智能，并在设置中进行设置。"
 
-#: src\qualcoder\__main__.py:3254 src\qualcoder\__main__.py:3258
-#: src\qualcoder\__main__.py:3263 src\qualcoder\__main__.py:3288
+#: src\qualcoder\__main__.py:3257 src\qualcoder\__main__.py:3261
+#: src\qualcoder\__main__.py:3266 src\qualcoder\__main__.py:3291
 msgid "Rebuild AI Memory"
 msgstr "重建人工智能记忆"
 
-#: src\qualcoder\__main__.py:3257
+#: src\qualcoder\__main__.py:3260
 msgid "The AI is busy or not set up correctly."
 msgstr "人工智能忙或设置不正确。"
 
-#: src\qualcoder\__main__.py:3261
+#: src\qualcoder\__main__.py:3264
 msgid ""
 "This will re-read all of your empirical documents, which may take some time. "
 "Do you want to continue?"
 msgstr "这将重新读取您的所有经验文件，可能需要一些时间。您想继续吗？"
 
-#: src\qualcoder\__main__.py:3279 src\qualcoder\__main__.py:3287
+#: src\qualcoder\__main__.py:3282 src\qualcoder\__main__.py:3290
 msgid "Please enable the AI first and set it up in Settings."
 msgstr "请先启用人工智能，并在设置中进行设置。"
 
-#: src\qualcoder\__main__.py:3280
+#: src\qualcoder\__main__.py:3283
 msgid "Ai Chat"
 msgstr "人工智能聊天"
 
-#: src\qualcoder\__main__.py:3300
+#: src\qualcoder\__main__.py:3303
 msgid "This version: "
 msgstr "此版本： "
 
-#: src\qualcoder\__main__.py:3307
+#: src\qualcoder\__main__.py:3310
 msgid "Newer release available: "
 msgstr "可提供更新版本： "
 
-#: src\qualcoder\__main__.py:3312
+#: src\qualcoder\__main__.py:3315
 msgid "Latest Release: "
 msgstr "最新发布： "
 
@@ -7782,6 +7992,77 @@ msgstr "最新发布： "
 #, fuzzy
 msgid "Uncaught Exception"
 msgstr "未捕获异常："
+
+#~ msgid "Regex compliation error"
+#~ msgstr "Regex 编译错误"
+
+#~ msgid "lines not imported"
+#~ msgstr "未导入的行"
+
+#~ msgid ""
+#~ "Word calculations: Words use alphabet characters and include the "
+#~ "apostrophe. All other characters are word separators. Excludes English "
+#~ "stopwords"
+#~ msgstr ""
+#~ "单词计算： 单词使用字母字符，包括撇号。所有其他字符均为单词分隔符。不包括"
+#~ "英文停止词"
+
+#~ msgid " Excludes English Stopwords"
+#~ msgstr "排除英语停用词"
+
+#~ msgid "Show files"
+#~ msgstr "显示文件"
+
+#~ msgid "Show cases"
+#~ msgstr "展示案例"
+
+#~ msgid "Select coded text"
+#~ msgstr "选择编码文本"
+
+#~ msgid "Larger font"
+#~ msgstr "字体更大"
+
+#~ msgid "Smaller font"
+#~ msgstr "字体更小"
+
+#~ msgid "Red text"
+#~ msgstr "红色文本"
+
+#~ msgid "Green text"
+#~ msgstr "绿色文本"
+
+#~ msgid "Yellow text"
+#~ msgstr "黄色文本"
+
+#~ msgid "Blue text"
+#~ msgstr "蓝色文本"
+
+#~ msgid "Orange text"
+#~ msgstr "橙色文本"
+
+#~ msgid "Cyan text"
+#~ msgstr "青色文本"
+
+#~ msgid "Magenta text"
+#~ msgstr "洋红色文本"
+
+#~ msgid "Gray text"
+#~ msgstr "灰色文本"
+
+#~ msgid "Black text"
+#~ msgstr "黑色文本"
+
+#~ msgid "White text"
+#~ msgstr "白色文本"
+
+#~ msgid "Code in context"
+#~ msgstr "上下文中的代码"
+
+#~ msgid "Thicker"
+#~ msgstr "更厚"
+
+#~ msgid "Thinner"
+#~ msgstr "稀释剂"
 
 #~ msgid "Automatic coding in files: "
 #~ msgstr "文件自动编码："
