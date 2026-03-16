@@ -4300,7 +4300,7 @@ class TextGraphicsItem(QtWidgets.QGraphicsTextItem):
         cur.execute(sql, [self.code_or_cat['cid']])
         res = cur.fetchall()
         if not res:
-            Message(self.app, _("No co-ocurrences"), "No overlapping codes this code in the text.").exec()
+            Message(self.app, _("No co-ocurrences"), "No overlapping codes for this code in the text.").exec()
             return
 
         cooc_list = [
