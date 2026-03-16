@@ -234,7 +234,7 @@ Chaque mot est exclu du nuage de mots n-grams=1.</translation>
     <message>
         <location filename="ui_dialog_charts.py" line="335"/>
         <source>Select stopwords list by language</source>
-        <translation>Sélectionnez la liste des mots vides par langue</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -339,7 +339,7 @@ Clic droit pour les options</translation>
     <message>
         <location filename="ui_dialog_graph.py" line="148"/>
         <source>Export to Draw.io</source>
-        <translation>Exporter vers Draw.io</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -983,23 +983,20 @@ Classement par nom de fichier et nom de code.</translation>
     <message>
         <location filename="ui_dialog_cooccurrence.py" line="114"/>
         <source>Export to Gephi. GraphML format</source>
-        <translation>Exporter au format GraphML Gephi</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="ui_dialog_cooccurrence.py" line="115"/>
         <source>Export Co-occurence Graph Image
 Right-click for format options</source>
-        <translation>Exporter le graphe de co-occurence
-Clic-droit pour les options de format</translation>
+        <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="ui_dialog_cooccurrence.py" line="117"/>
         <source>Export Cluster Graph Image
 Right-click for format options
 </source>
-        <translation type="unfinished">Exporter l'image du graphe en grappe
-Clic-droit pour les options de format
-</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1890,34 +1887,29 @@ Appui sur la touche 5 - Avance de 5 secondes</translation>
 <context>
     <name>Dialog_code_summary</name>
     <message>
-        <location filename="ui_dialog_report_code_summary.py" line="67"/>
+        <location filename="ui_dialog_report_code_summary.py" line="64"/>
         <source>Code summary</source>
         <translation>Résumé des codes</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_code_summary.py" line="71"/>
+        <location filename="ui_dialog_report_code_summary.py" line="68"/>
         <source>Code summary report</source>
         <translation>Rapport des résumés des codes</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_code_summary.py" line="68"/>
+        <location filename="ui_dialog_report_code_summary.py" line="65"/>
         <source>Search for next occurence in results</source>
         <translation>Recherche de la prochaine occurrence dans les résultats</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_code_summary.py" line="69"/>
+        <location filename="ui_dialog_report_code_summary.py" line="66"/>
         <source>Search results for text</source>
         <translation>Résultats de la recherche pour le texte</translation>
     </message>
     <message>
-        <location filename="ui_dialog_report_code_summary.py" line="70"/>
+        <location filename="ui_dialog_report_code_summary.py" line="67"/>
         <source>Search:</source>
         <translation>Recherche :</translation>
-    </message>
-    <message>
-        <location filename="ui_dialog_report_code_summary.py" line="72"/>
-        <source>Select stopwords list by language</source>
-        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -2407,7 +2399,7 @@ Clic-droit pour les options : tous (par défaut), premier, code dans le code.</t
     <message>
         <location filename="ui_dialog_report_file_summary.py" line="72"/>
         <source>Select stopwords list by language</source>
-        <translation>Sélectionnez une liste de mots vides par langue</translation>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
