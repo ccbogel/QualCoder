@@ -1008,7 +1008,7 @@ class DialogReportRelations(QtWidgets.QDialog):
 
         if self.dataframe is None:
             return
-        fig = px.box(self.dataframe, x="Code pair", y="Distance (characters)", title=_("Code relations"))
+        fig = px.box(self.dataframe, x=_("Code pair"), y=_("Distance (characters)"), title=_("Code relations"))
         fig.update_traces(quartilemethod="inclusive")  # or "inclusive", or "linear" by default
         fig.show()
 
