@@ -5,7 +5,8 @@ diff-match-patch
 EbookLib
 emoji
 matplotlib
-networkx
+network
+odfpy
 openpyxl
 pandas
 pdfminer.six
