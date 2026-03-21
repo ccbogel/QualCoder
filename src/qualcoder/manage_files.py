@@ -127,7 +127,6 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.ui.pushButton_delete.clicked.connect(self.delete_button_multiple_files)
         self.ui.pushButton_import.setIcon(qta.icon('mdi6.file-document-plus-outline', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_import.clicked.connect(self.import_files)
-        # -- SURVEY IMPORT BUTTON
         self.ui.pushButton_import_survey.setIcon(qta.icon('mdi6.clipboard-text-outline', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_import_survey.clicked.connect(self.import_survey)        
         self.ui.pushButton_link.setIcon(qta.icon('mdi6.link-variant', options=[{'scale_factor': 1.4}]))
@@ -441,7 +440,11 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         row = self.ui.tableWidget.currentRow()
         col = self.ui.tableWidget.currentColumn()
-        item_text = self.ui.tableWidget.item(row, col).text()
+        cell = self.ui.tableWidget.item(row, col)
+        if cell is None:
+            item_text = ""  # used for opening URLs action
+        else:
+            item_text = cell.text()
         # Use these next few lines to use for moving a linked file into or an internal file out of the project folder
         mediapath = None
         risid = None
@@ -1658,6 +1661,11 @@ class DialogManageFiles(QtWidgets.QDialog):
         """ Import from CSV/TSV/ODS/XLSX Header row to contain column headings.
         Process Qual Texts, Cases, Attributes and optional assign autocoding.
         Can assign attributes to either files or cases.
+
+        The Case name can be absent. Or cand be from one primary column, or can also collate values from additional columns.
+
+        Qualitative texts from multiple columns are collated int one file.
+        The header for each block if text is the columns name from the survey
         """
 
         filepath, filter_type = QtWidgets.QFileDialog.getOpenFileName(None, _("Select Survey"), "",
@@ -1665,9 +1673,8 @@ class DialogManageFiles(QtWidgets.QDialog):
         if not filepath: return
 
         msg = _("Import from survey: ") + f"{filepath}\n"
-        # try: # - try here is too broad. Best to remove and fix errors with specfic try excepts
         if filepath.lower().endswith('.csv') or filepath.lower().endswith('.tsv'):
-            delimiter = ','  # Default delimiter
+            delimiter = ','
             try:
                 with open(filepath, 'r', encoding='utf-8') as f:
                     first_line = f.readline()
@@ -1681,15 +1688,17 @@ class DialogManageFiles(QtWidgets.QDialog):
                 delimiter = best_delimiter
             msg += _("\nPresumed column delimiter for csv or tsv file: ") + delimiter
             if delimiter == "\t": msg += "tab"
+
+            # Remove pandas trailing ".0" from numbers. Treat all columns as string
             try:
-                df = pd.read_csv(filepath, sep=delimiter, encoding='utf-8')
+                df = pd.read_csv(filepath, sep=delimiter, encoding='utf-8', dtype=str)
             except UnicodeDecodeError:
-                df = pd.read_csv(filepath, sep=delimiter, encoding='latin1')
+                df = pd.read_csv(filepath, sep=delimiter, encoding='latin1', dtype=str)
 
         elif filepath.lower().endswith('.ods'):
-            df = pd.read_excel(filepath, engine='odf')
+            df = pd.read_excel(filepath, engine='odf', dtype=str)
         else:
-            df = pd.read_excel(filepath)
+            df = pd.read_excel(filepath, dtype=str)
 
         # User determines: Case, Attributes, Qual text, code texts, attributes as case or file.
         columns = [str(c) for c in df.columns]
@@ -1697,7 +1706,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         if not dialog.exec(): return
 
         text_cols, case_cols, attr_cols = dialog.get_selections()
-        filename_col = dialog.get_filename_column()
+        #filename_col = dialog.get_filename_column()
         autocode_enabled = dialog.get_autocode_setting()
         attr_file_or_case = "case"
         if not dialog.get_case_setting() or not case_cols:
@@ -1747,9 +1756,9 @@ class DialogManageFiles(QtWidgets.QDialog):
                 c_vals = [str(row[c]) for c in case_cols if pd.notna(row[c])]
                 case_name = sanitize_name("_".join(c_vals))
 
-            if filename_col and pd.notna(row[filename_col]):
-                base_filename = sanitize_name(row[filename_col])
-            elif case_name:
+            '''if filename_col and pd.notna(row[filename_col]):
+                base_filename = sanitize_name(row[filename_col])'''
+            if case_name:
                 base_filename = f"Survey_{case_name}"
             else:
                 base_filename = f"Survey_Row_{index+1}"
@@ -1826,7 +1835,7 @@ class DialogManageFiles(QtWidgets.QDialog):
             count += 1
 
         # Update attribute type for new attributes, if values were all numeric, default was character
-        msg += "\n" + _("Attributes ") + " (" + attr_file_or_case +"):"
+        msg += "\n" + _("Attributes ") + " (" + attr_file_or_case + "):"
         for key, value in new_attributes.items():
             cur.execute("update attribute_type set valuetype=? where name=?", [value, key])
             msg += f"\n{key} - {value}"
@@ -2756,7 +2765,7 @@ class DialogSurveyImport(QtWidgets.QDialog):
         main_layout = QtWidgets.QVBoxLayout(self)
         
         # File Name Selector
-        top_layout = QtWidgets.QHBoxLayout()
+        '''top_layout = QtWidgets.QHBoxLayout()
         # top_layout.addWidget(QtWidgets.QLabel(_("File Name Column (Optional):")))
         self.combo_filename = QtWidgets.QComboBox()
         self.combo_filename.addItem(_(" [Generate names automatically] "))
@@ -2764,7 +2773,7 @@ class DialogSurveyImport(QtWidgets.QDialog):
         self.combo_filename.setMaximumWidth(450)
         # top_layout.addWidget(self.combo_filename)
         top_layout.addStretch()
-        main_layout.addLayout(top_layout)
+        main_layout.addLayout(top_layout)'''
         layout = QtWidgets.QHBoxLayout()
         
         # Left Panel (Available Columns)
@@ -2780,9 +2789,11 @@ class DialogSurveyImport(QtWidgets.QDialog):
         # Right Panel (Targets)
         right_layout = QtWidgets.QVBoxLayout()
         
-        def create_target_block(label_text, list_widget, max_height=None):
+        def create_target_block(label_text, list_widget, max_height=None, ttip=""):
             block_layout = QtWidgets.QVBoxLayout()
-            block_layout.addWidget(QtWidgets.QLabel(label_text))
+            label = QtWidgets.QLabel(label_text)
+            label.setToolTip(ttip)
+            block_layout.addWidget(label)
             
             h_layout = QtWidgets.QHBoxLayout()
             
@@ -2810,7 +2821,9 @@ class DialogSurveyImport(QtWidgets.QDialog):
         # 1. Cases
         self.list_case = QtWidgets.QListWidget()
         self.list_case.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
-        case_block, self.btn_case_add, self.btn_case_rem = create_target_block(_("1. Cases / Participants (e.g., ID, Name):"), self.list_case, 70)
+        ttip = _("Adding columns to the Case will add those values to the case name") + "\n"
+        ttip += _("Example: using columns id, country --> ID4_Fiji ")
+        case_block, self.btn_case_add, self.btn_case_rem = create_target_block(_("1. Cases / Participants (e.g., ID, Name):"), self.list_case, 70, ttip)
         right_layout.addLayout(case_block)
         
         # 2. Attributes
@@ -2822,7 +2835,10 @@ class DialogSurveyImport(QtWidgets.QDialog):
         # 3. Texts
         self.list_text = QtWidgets.QListWidget()
         self.list_text.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
-        text_block, self.btn_text_add, self.btn_text_rem = create_target_block(_("3. Qualitative Texts:"), self.list_text)
+        ttip2 = _("Multiple qualitative columns will be collated into one file.") + "\n"
+        ttip2 += _("The column name is a header preceding each block of text.")
+
+        text_block, self.btn_text_add, self.btn_text_rem = create_target_block(_("3. Qualitative Texts:"), self.list_text, 70, ttip2)
         right_layout.addLayout(text_block)
         
         layout.addLayout(left_layout)
@@ -2872,10 +2888,10 @@ class DialogSurveyImport(QtWidgets.QDialog):
         attrs = [self.list_attr.item(i).text() for i in range(self.list_attr.count())]
         return texts, cases, attrs
         
-    def get_filename_column(self):
+    '''def get_filename_column(self):
         if self.combo_filename.currentIndex() == 0:
             return None
-        return self.combo_filename.currentText()
+        return self.combo_filename.currentText()'''
         
     def get_autocode_setting(self):
         return self.cb_autocode.isChecked()
