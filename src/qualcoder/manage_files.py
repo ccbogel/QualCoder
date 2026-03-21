@@ -20,13 +20,17 @@ https://qualcoder.wordpress.com/
 https://qualcoder-org.github.io/
 """
 
+from charset_normalizer import from_bytes
 import datetime
 import ebooklib
 from ebooklib import epub
 import fitz
 import json
+# import logging  # Not needed -> L
 import openpyxl
+# import odf  # This is the package that provides the odf module used by pandas for reading .ods # Not needed -> L
 import os.path
+import pandas as pd
 from pathlib import Path
 from pdfminer.converter import PDFPageAggregator
 from pdfminer.layout import LAParams, LTTextLine
@@ -36,6 +40,7 @@ import PIL
 from PIL import Image
 from PyQt6 import QtCore, QtGui, QtWidgets
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
+from random import randint
 import sqlite3
 from typing import Iterable, Any
 from shutil import copyfile, move
@@ -43,12 +48,12 @@ from striprtf.striprtf import rtf_to_text
 from urllib.parse import urlparse
 import webbrowser
 import zipfile
-from charset_normalizer import from_bytes
 
 from .add_attribute import DialogAddAttribute
 from .add_item_name import DialogAddItemName
 from .code_pdf import DialogCodePdf  # For isinstance update files
 from .code_text import DialogCodeText  # for isinstance()
+from .color_selector import colour_ranges, colors
 from .confirm_delete import DialogConfirmDelete
 from .docx import opendocx, getdocumenttext
 from .edit_textfile import DialogEditTextFile
@@ -122,6 +127,9 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.ui.pushButton_delete.clicked.connect(self.delete_button_multiple_files)
         self.ui.pushButton_import.setIcon(qta.icon('mdi6.file-document-plus-outline', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_import.clicked.connect(self.import_files)
+        # -- SURVEY IMPORT BUTTON
+        self.ui.pushButton_import_survey.setIcon(qta.icon('mdi6.clipboard-text-outline', options=[{'scale_factor': 1.4}]))
+        self.ui.pushButton_import_survey.clicked.connect(self.import_survey)        
         self.ui.pushButton_link.setIcon(qta.icon('mdi6.link-variant', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_link.clicked.connect(self.link_files)
         self.ui.pushButton_import_from_linked.setIcon(
@@ -589,11 +597,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 if compare_text != text_:
                     self.ui.tableWidget.setRowHidden(r, True)
             self.rows_hidden.append(f'{self.ui.tableWidget.horizontalHeaderItem(col).text()}\t=\t{compare_text}')
-            rows_showing = 0
-            for r in range(self.ui.tableWidget.rowCount()):
-                if not self.ui.tableWidget.isRowHidden(r):
-                    rows_showing += 1
-            self.ui.label_fcount.setText(f"Files: {rows_showing} / {self.ui.tableWidget.rowCount()}")
+            self.update_label_file_count()  # REMOVE ALL label_fcount REFERENCES
             return
         if action == action_show_values_like:
             text_value, ok = QtWidgets.QInputDialog.getText(self, _("Text filter"), _("Show values like:"),
@@ -603,11 +607,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 for r in range(0, self.ui.tableWidget.rowCount()):
                     if self.ui.tableWidget.item(r, col).text().find(text_value) == -1:
                         self.ui.tableWidget.setRowHidden(r, True)
-            rows_showing = 0
-            for r in range(self.ui.tableWidget.rowCount()):
-                if not self.ui.tableWidget.isRowHidden(r):
-                    rows_showing += 1
-            self.ui.label_fcount.setText(f"Files: {rows_showing} / {self.ui.tableWidget.rowCount()}")
+            self.update_label_file_count()
             return
         if action == action_hide_values_like:
             text_value, ok = QtWidgets.QInputDialog.getText(self, _("Text filter"), _("Hide values like:"),
@@ -617,17 +617,13 @@ class DialogManageFiles(QtWidgets.QDialog):
                 for r in range(0, self.ui.tableWidget.rowCount()):
                     if self.ui.tableWidget.item(r, col).text().find(text_value) != -1:
                         self.ui.tableWidget.setRowHidden(r, True)
-            rows_showing = 0
-            for r in range(self.ui.tableWidget.rowCount()):
-                if not self.ui.tableWidget.isRowHidden(r):
-                    rows_showing += 1
-            self.ui.label_fcount.setText(f"Files: {rows_showing} / {self.ui.tableWidget.rowCount()}")
+            self.update_label_file_count()
             return
         if action == action_show_all:
             for r in range(0, self.ui.tableWidget.rowCount()):
                 self.ui.tableWidget.setRowHidden(r, False)
             self.rows_hidden = []
-            self.ui.label_fcount.setText(f"Files: {self.ui.tableWidget.rowCount()}")
+            self.update_label_file_count()
             self.ui.pushButton_display_load.setToolTip(_("Load table display settings"))
             return
         if action == action_url:
@@ -795,9 +791,9 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.app.delete_backup = False
         self.update_files_in_dialogs()
         # update doc in vectorstore
-        id = int(self.ui.tableWidget.item(row, self.ID_COLUMN).text())
+        id_ = int(self.ui.tableWidget.item(row, self.ID_COLUMN).text())
         if self.app.settings['ai_enable'] == 'True':
-            docs = self.app.get_file_texts(file_ids=[id])
+            docs = self.app.get_file_texts(file_ids=[id_])
             self.app.ai.sources_vectorstore.import_document(docs[0]['id'], docs[0]['name'], docs[0]['fulltext'])
 
     def undo_file_rename(self):
@@ -1194,7 +1190,15 @@ class DialogManageFiles(QtWidgets.QDialog):
                                 'av_text_id': row[7], 'risid': row[8], 'metadata': metadata, 'icon': icon,
                                 'case': self.get_cases_by_filename(row[0]),
                                 'attributes': []})
-
+        # Auto-fix invalid filenames in the database
+        cur2 = self.app.conn.cursor()
+        for s in self.source:
+            if s['name'].strip('.') == '' or s['name'].strip() == '':
+                new_name = f"unnamed_file_{s['id']}"
+                cur2.execute("update source set name=? where id=?", [new_name, s['id']])
+                self.app.conn.commit()
+                self.parent_text_edit.append(_("Auto-renamed invalid file: ") + f"'{s['name']}' -> {new_name}")
+                s['name'] = new_name
         self.header_labels = [_("Name"), _("Memo"), _("Date"), _("Id"), _("Case")]
         # Attributes
         sql = "select name from attribute_type where caseOrFile='file' order by upper(name)"
@@ -1415,7 +1419,7 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         x = self.ui.tableWidget.currentRow()
         y = self.ui.tableWidget.currentColumn()
-        self.ui.label_file.setText(f"{_('File')}: {self.source[x]['name']}")
+        self.update_label_file_count()
         if y == self.MEMO_COLUMN:
             name = self.source[x]['name'].lower()
             cur = self.app.conn.cursor()
@@ -1596,7 +1600,11 @@ class DialogManageFiles(QtWidgets.QDialog):
         ui = DialogAddItemName(self.app, self.source, _('New File'), _('Enter file name'))
         ui.exec()
         name = ui.get_new_name()
+        # --- VALIDATE FILENAME
         if name is None:
+            return
+        if name.strip('.') == '' or name.strip() == '':
+            Message(self.app, _("Warning"), _("Invalid file name."), "warning").exec()
             return
 
         # Create entry details to add to self.source and to database
@@ -1646,6 +1654,191 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.av_dialog_open = None
         self.import_files(True)
 
+    def import_survey(self):
+        """ Import from CSV/TSV/ODS/XLSX Header row to contain column headings.
+        Process Qual Texts, Cases, Attributes and optional assign autocoding.
+        Can assign attributes to either files or cases.
+        """
+
+        filepath, filter_type = QtWidgets.QFileDialog.getOpenFileName(None, _("Select Survey"), "",
+                                                                      _("Data files") + " (*.csv *.CSV *.tsv *.TSV *.ods *.ODS *.xlsx *.XLSX *.xls *.XLS)")
+        if not filepath: return
+
+        msg = _("Import from survey: ") + f"{filepath}\n"
+        # try: # - try here is too broad. Best to remove and fix errors with specfic try excepts
+        if filepath.lower().endswith('.csv') or filepath.lower().endswith('.tsv'):
+            delimiter = ','  # Default delimiter
+            try:
+                with open(filepath, 'r', encoding='utf-8') as f:
+                    first_line = f.readline()
+            except UnicodeDecodeError:
+                with open(filepath, 'r', encoding='latin1') as f:
+                    first_line = f.readline()
+            # Potentially risky method to determine delimiter
+            counts = {',': first_line.count(','), ';': first_line.count(';'), '\t': first_line.count('\t'), '|': first_line.count('|')}
+            best_delimiter = max(counts, key=counts.get)
+            if counts[best_delimiter] > 0:
+                delimiter = best_delimiter
+            msg += _("\nPresumed column delimiter for csv or tsv file: ") + delimiter
+            if delimiter == "\t": msg += "tab"
+            try:
+                df = pd.read_csv(filepath, sep=delimiter, encoding='utf-8')
+            except UnicodeDecodeError:
+                df = pd.read_csv(filepath, sep=delimiter, encoding='latin1')
+
+        elif filepath.lower().endswith('.ods'):
+            df = pd.read_excel(filepath, engine='odf')
+        else:
+            df = pd.read_excel(filepath)
+
+        # User determines: Case, Attributes, Qual text, code texts, attributes as case or file.
+        columns = [str(c) for c in df.columns]
+        dialog = DialogSurveyImport(columns, self)
+        if not dialog.exec(): return
+
+        text_cols, case_cols, attr_cols = dialog.get_selections()
+        filename_col = dialog.get_filename_column()
+        autocode_enabled = dialog.get_autocode_setting()
+        attr_file_or_case = "case"
+        if not dialog.get_case_setting() or not case_cols:
+            attr_file_or_case = "file"
+
+        if not text_cols:
+            Message(self.app, _("Notice"), _("Select at least one Qualitative Text column to analyse.")).exec()
+            return
+
+        cur = self.app.conn.cursor()
+        now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        new_attributes = {}  # Change from character to numeric attribute_type after checking when loading data
+        for col in attr_cols:
+            cur.execute("select name from attribute_type where name=?", [col])
+            if not cur.fetchone():
+                cur.execute("insert into attribute_type (name, date, owner, memo, caseOrFile, valuetype) values(?,?,?,?,?,?)",
+                            (col, now, self.app.settings['codername'], "", attr_file_or_case, "character"))
+                new_attributes[col] = 'numeric'
+
+        def sanitize_name(name_str):
+            return re.sub(r'[\\/:*?"<>|]', '-', str(name_str)).strip()
+
+        count = 0
+        for index, row in df.iterrows():
+            text_content = ""
+            code_positions = []
+
+            for t_col in text_cols:
+                val = str(row[t_col]) if pd.notna(row[t_col]) else ""
+                if val.strip():
+                    if text_content:
+                        text_content += "\n\n"
+
+                    header = f"[{t_col}]:\n"
+                    val_clean = val.strip()
+                    current_len = len(text_content)
+                    text_content += header + val_clean
+                    start_pos = current_len + len(header)
+                    end_pos = start_pos + len(val_clean)
+                    code_positions.append((t_col, start_pos, end_pos, val_clean))
+
+            if not text_content.strip(): continue
+
+            case_name = ""
+            if case_cols:
+                c_vals = [str(row[c]) for c in case_cols if pd.notna(row[c])]
+                case_name = sanitize_name("_".join(c_vals))
+
+            if filename_col and pd.notna(row[filename_col]):
+                base_filename = sanitize_name(row[filename_col])
+            elif case_name:
+                base_filename = f"Survey_{case_name}"
+            else:
+                base_filename = f"Survey_Row_{index+1}"
+            if not base_filename:
+                base_filename = f"Survey_Row_{index+1}"
+
+            filename = base_filename
+            suffix = 1
+            while True:
+                cur.execute("select name from source where name=?", [filename])
+                if not cur.fetchone():
+                    break
+                filename = f"{base_filename}_{suffix}"
+                suffix += 1
+
+            filepath_save = os.path.join(self.app.project_path, "documents", filename + ".txt")
+            with open(filepath_save, 'w', encoding='utf-8') as f:
+                f.write(text_content)
+
+            cur.execute("insert into source(name, fulltext, mediapath, memo, owner, date) values(?,?,?,?,?,?)",
+                        (filename, text_content, None, "", self.app.settings['codername'], now))
+            file_id = cur.lastrowid
+
+            if autocode_enabled:
+                for col_name, start_pos, end_pos, text_chunk in code_positions:
+                    cur.execute("select cid from code_name where name=?", [col_name])
+                    res_code = cur.fetchone()
+                    if res_code:
+                        cid = res_code[0]
+                    else:
+                        grays = next((colr for colr in colour_ranges if colr['name'] == 'gray'), None)
+                        color = colors[randint(grays['min'], grays['max'] - 1)]
+                        cur.execute("insert into code_name (name, memo, owner, date, color) values(?,?,?,?,?)",
+                                    (col_name, "", self.app.settings['codername'], now, color))
+                        cid = cur.lastrowid
+
+                    cur.execute("insert into code_text (cid, fid, seltext, pos0, pos1, owner, date, memo) values(?,?,?,?,?,?,?,?)",
+                                (cid, file_id, text_chunk, start_pos, end_pos, self.app.settings['codername'], now, ""))
+            #  Correct posiciones de autocodificación (aun sin resolver)
+            case_id = -1
+            if case_name:
+                cur.execute("select caseid from cases where name=?", [case_name])
+                res = cur.fetchone()
+                if res:
+                    case_id = res[0]
+                else:
+                    cur.execute("insert into cases (name, memo, owner, date) values(?,?,?,?)",
+                                (case_name, "", self.app.settings['codername'], now))
+                    case_id = cur.lastrowid
+
+                cur.execute("insert into case_text (caseid, fid, pos0, pos1, owner, date, memo) values(?,?,?,?,?,?,?)",
+                            (case_id, file_id, 0, len(text_content), self.app.settings['codername'], now, ""))
+
+            # Insert file or case attributes from survey, and check if character or numeric
+            for i, col in enumerate(attr_cols):
+                val = str(row[col]) if pd.notna(row[col]) else ""
+                if val != "":
+                    try:
+                        float(val)
+                    except ValueError:
+                        try:
+                            new_attributes[col] = "character"
+                        except KeyError:
+                            pass
+                file_or_case_id = file_id
+                if attr_file_or_case == "case":
+                    file_or_case_id = case_id
+                try:
+                    cur.execute("insert into attribute (name, value, id, attr_type, date, owner) values(?,?,?,?,?,?)",
+                                (col, val, file_or_case_id, attr_file_or_case, now, self.app.settings['codername']))
+                except sqlite3.IntegrityError as err:
+                    print(err, "\n", col,val,file_or_case_id,attr_file_or_case)
+                    logger.error(f"Insert into attribute(name, value, id, attr_type, date, owner) {err} {col},{val},{file_or_case_id},{attr_file_or_case}")
+            count += 1
+
+        # Update attribute type for new attributes, if values were all numeric, default was character
+        msg += "\n" + _("Attributes ") + " (" + attr_file_or_case +"):"
+        for key, value in new_attributes.items():
+            cur.execute("update attribute_type set valuetype=? where name=?", [value, key])
+            msg += f"\n{key} - {value}"
+
+        self.app.conn.commit()
+        msg += f"\n{count} " + _("rows imported.")
+        self.app.delete_backup = False
+        self.update_files_in_dialogs()
+        self.load_file_data()
+        Message(self.app, _("Import successful."), _("{} rows imported.").format(count)).exec()
+        self.parent_text_edit.append(msg)
+
     def import_files(self, link=False):
         """ Import files and store into relevant directories (documents, images, audio, video).
         Convert documents to plain text and store this in data.qda
@@ -1658,19 +1851,17 @@ class DialogManageFiles(QtWidgets.QDialog):
 
         param:
             link:   False - files are imported into project folder,
-                    True- files are linked and not imported
+                    True - files are linked and not imported
         """
 
         if self.av_dialog_open is not None:
             self.av_dialog_open.mediaplayer.stop()
             self.av_dialog_open = None
-        dlg = QtWidgets.QFileDialog()
-        dlg.setViewMode(QtWidgets.QFileDialog.ViewMode.List)
-        dlg.setOption(QtWidgets.QFileDialog.Option.DontUseNativeDialog)
-        response = QtWidgets.QFileDialog.getOpenFileNames(None, _('Open file'),
-                                        self.default_import_directory,
-                                        options=QtWidgets.QFileDialog.Option.DontUseNativeDialog
-                                        )
+        response = QtWidgets.QFileDialog.getOpenFileNames(
+            None, 
+            _('Open file'),
+            self.default_import_directory
+        )
         imports = response[0]
         if not imports:
             return
@@ -2172,6 +2363,10 @@ class DialogManageFiles(QtWidgets.QDialog):
             return
         # Currently can only export ONE file at time, due to tableWidget single selection mode
         row = rows[0]
+        # Guard against invalid filenames (e.g. ".", "..")
+        if self.source[row]['name'].strip('.') == '' or self.source[row]['name'].strip() == '':
+            Message(self.app, _("Warning"), _("Invalid file name. Please rename this file before exporting."), "warning").exec()
+            return        
         # Warn of export of text representation of linked files (e.g. odt, docx, txt, md, pdf)
         text_rep = False
         if self.source[row]['mediapath'] is not None and (':' in self.source[row]['mediapath']) \
@@ -2457,6 +2652,23 @@ class DialogManageFiles(QtWidgets.QDialog):
                 tt = tt[1:]
         return tt
 
+    def update_label_file_count(self):
+        """ Update label_file to show file count and current file name. """
+
+        total = self.ui.tableWidget.rowCount()
+        visible = 0
+        for r in range(total):
+            if not self.ui.tableWidget.isRowHidden(r):
+                visible += 1
+        row = self.ui.tableWidget.currentRow()
+        if visible < total:
+            count_text = f"{visible}/{total} " + _("Files")
+        else:
+            count_text = f"{total} " + _("Files")
+        if 0 <= row < len(self.source):
+            count_text += f". {self.source[row]['name']}"
+        self.ui.label_file.setText(count_text)
+
     def fill_table(self):
         """ Fill the table widget with file details. """
 
@@ -2528,5 +2740,145 @@ class DialogManageFiles(QtWidgets.QDialog):
             self.ui.tableWidget.horizontalHeaderItem(self.ATTRIBUTE_START_COLUMN + i).setToolTip(
                 _("Right click header row to hide columns") + "\n" + tt)
 
-        self.ui.label_fcount.setText(_("Files: ") + str(len(self.source)))
+        self.update_label_file_count() # ---
         self.ui.tableWidget.blockSignals(False)
+
+
+class DialogSurveyImport(QtWidgets.QDialog):
+    """ Survey import dialog. To assign cases, attributes and qualitative text. """
+
+    def __init__(self, columns, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle(_("Survey Import Assistant"))
+        self.resize(780, 580) 
+        self.setMaximumWidth(850) 
+        
+        main_layout = QtWidgets.QVBoxLayout(self)
+        
+        # File Name Selector
+        top_layout = QtWidgets.QHBoxLayout()
+        # top_layout.addWidget(QtWidgets.QLabel(_("File Name Column (Optional):")))
+        self.combo_filename = QtWidgets.QComboBox()
+        self.combo_filename.addItem(_(" [Generate names automatically] "))
+        self.combo_filename.addItems(columns)
+        self.combo_filename.setMaximumWidth(450)
+        # top_layout.addWidget(self.combo_filename)
+        top_layout.addStretch()
+        main_layout.addLayout(top_layout)
+        layout = QtWidgets.QHBoxLayout()
+        
+        # Left Panel (Available Columns)
+        left_layout = QtWidgets.QVBoxLayout()
+        left_layout.addWidget(QtWidgets.QLabel(_("Columns:")))
+        self.list_available = QtWidgets.QListWidget()
+        self.list_available.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
+        self.list_available.setMinimumWidth(180)
+        self.list_available.setMaximumWidth(220)
+        self.list_available.addItems(columns)
+        left_layout.addWidget(self.list_available)
+        
+        # Right Panel (Targets)
+        right_layout = QtWidgets.QVBoxLayout()
+        
+        def create_target_block(label_text, list_widget, max_height=None):
+            block_layout = QtWidgets.QVBoxLayout()
+            block_layout.addWidget(QtWidgets.QLabel(label_text))
+            
+            h_layout = QtWidgets.QHBoxLayout()
+            
+            btn_layout = QtWidgets.QVBoxLayout()
+            btn_add = QtWidgets.QPushButton(">")
+            btn_remove = QtWidgets.QPushButton("<")
+            btn_add.setFixedSize(30, 30) 
+            btn_remove.setFixedSize(30, 30)
+            
+            btn_layout.addStretch()
+            btn_layout.addWidget(btn_add)
+            btn_layout.addWidget(btn_remove)
+            btn_layout.addStretch()
+            
+            h_layout.addLayout(btn_layout)
+            if max_height:
+                list_widget.setMaximumHeight(max_height)
+            
+            list_widget.setMaximumWidth(450) 
+            h_layout.addWidget(list_widget)
+            
+            block_layout.addLayout(h_layout)
+            return block_layout, btn_add, btn_remove
+
+        # 1. Cases
+        self.list_case = QtWidgets.QListWidget()
+        self.list_case.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
+        case_block, self.btn_case_add, self.btn_case_rem = create_target_block(_("1. Cases / Participants (e.g., ID, Name):"), self.list_case, 70)
+        right_layout.addLayout(case_block)
+        
+        # 2. Attributes
+        self.list_attr = QtWidgets.QListWidget()
+        self.list_attr.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
+        attr_block, self.btn_attr_add, self.btn_attr_rem = create_target_block(_("2. Attributes (e.g., Age, Gender):"), self.list_attr, 70)
+        right_layout.addLayout(attr_block)
+        
+        # 3. Texts
+        self.list_text = QtWidgets.QListWidget()
+        self.list_text.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.ExtendedSelection)
+        text_block, self.btn_text_add, self.btn_text_rem = create_target_block(_("3. Qualitative Texts:"), self.list_text)
+        right_layout.addLayout(text_block)
+        
+        layout.addLayout(left_layout)
+        layout.addLayout(right_layout)
+        main_layout.addLayout(layout)
+
+        # Case or File Attributes Checkbox
+        self.cb_case = QtWidgets.QCheckBox(_("Assign attributes to cases (check). Files (uncheck)"))
+        self.cb_case.setChecked(False)
+        self.cb_case.setEnabled(False)
+        main_layout.addWidget(self.cb_case)
+
+        # Autocode Checkbox
+        self.cb_autocode = QtWidgets.QCheckBox(_("Autocode text segments using column name"))
+        self.cb_autocode.setChecked(False) 
+        main_layout.addWidget(self.cb_autocode)
+        
+        # OK / Cancel Buttons
+        bbox = QtWidgets.QDialogButtonBox(QtWidgets.QDialogButtonBox.StandardButton.Ok | QtWidgets.QDialogButtonBox.StandardButton.Cancel)
+        bbox.accepted.connect(self.accept)
+        bbox.rejected.connect(self.reject)
+        main_layout.addWidget(bbox)
+        
+        # Button connections
+        self.btn_case_add.clicked.connect(lambda: self.move_items(self.list_available, self.list_case))
+        self.btn_case_rem.clicked.connect(lambda: self.move_items(self.list_case, self.list_available))
+        
+        self.btn_attr_add.clicked.connect(lambda: self.move_items(self.list_available, self.list_attr))
+        self.btn_attr_rem.clicked.connect(lambda: self.move_items(self.list_attr, self.list_available))
+        
+        self.btn_text_add.clicked.connect(lambda: self.move_items(self.list_available, self.list_text))
+        self.btn_text_rem.clicked.connect(lambda: self.move_items(self.list_text, self.list_available))
+
+    def move_items(self, source, dest):
+        for item in source.selectedItems():
+            dest.addItem(item.text())
+            source.takeItem(source.row(item))
+        if self.list_case:
+            self.cb_case.setEnabled(True)
+        else:
+            self.cb_case.setEnabled(False)
+            self.cb_case.setChecked(False)
+
+    def get_selections(self):
+        texts = [self.list_text.item(i).text() for i in range(self.list_text.count())]
+        cases = [self.list_case.item(i).text() for i in range(self.list_case.count())]
+        attrs = [self.list_attr.item(i).text() for i in range(self.list_attr.count())]
+        return texts, cases, attrs
+        
+    def get_filename_column(self):
+        if self.combo_filename.currentIndex() == 0:
+            return None
+        return self.combo_filename.currentText()
+        
+    def get_autocode_setting(self):
+        return self.cb_autocode.isChecked()
+
+    def get_case_setting(self):
+        return self.cb_case.isChecked()
