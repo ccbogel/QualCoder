@@ -257,7 +257,9 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.label_search_regex.setPixmap(qta.icon('mdi6.help').pixmap(22, 22))
         self.ui.label_search_case_sensitive.setPixmap(qta.icon('mdi6.format-letter-case').pixmap(22, 22))
         self.ui.label_search_all_files.setPixmap(qta.icon('mdi6.text-box-multiple-outline').pixmap(22, 22))
-        self.ui.label_font_size.setPixmap(qta.icon('mdi6.format-size').pixmap(22, 22))
+        #self.ui.label_font_size.setPixmap(qta.icon('mdi6.format-size').pixmap(22, 22))
+        self.ui.pushButton_font.setIcon(qta.icon('mdi6.format-size', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_font.clicked.connect(self.change_document_font)
         self.ui.pushButton_previous.setIcon(qta.icon('mdi6.arrow-left', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_previous.setEnabled(False)
         self.ui.pushButton_next.setIcon(qta.icon('mdi6.arrow-right', options=[{'scale_factor': 1.3}]))
@@ -276,7 +278,6 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_exit_edit.pressed.connect(self.edit_mode_toggle)
         self.ui.pushButton_undo_edit.setIcon(qta.icon('mdi6.undo', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_undo_edit.pressed.connect(self.undo_edited_text)
-        self.ui.label_codes_count.setEnabled(False)
         self.ui.treeWidget.setDragEnabled(True)
         self.ui.treeWidget.setAcceptDrops(True)
         self.ui.treeWidget.setDragDropMode(QtWidgets.QAbstractItemView.DragDropMode.InternalMove)
@@ -285,12 +286,6 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
         self.ui.treeWidget.itemPressed.connect(self.fill_code_label_with_selected_code)
         self.ui.comboBox_export.currentIndexChanged.connect(self.export_option_selected)
-        index = self.ui.comboBox_fontsize.findText(str(self.app.settings['docfontsize']),
-                                                   QtCore.Qt.MatchFlag.MatchFixedString)
-        if index == -1:
-            index = 0
-        self.ui.comboBox_fontsize.setCurrentIndex(index)
-        self.ui.comboBox_fontsize.currentTextChanged.connect(self.change_text_font_size)
         self.ui.splitter.setSizes([150, 400])
         try:
             s0 = int(self.app.settings['dialogcodetext_splitter0'])
@@ -370,11 +365,19 @@ class DialogCodeText(QtWidgets.QWidget):
             self.ui.pushButton_default_new_code_color.setStyleSheet(f'background-color: {color}')
         self.default_new_code_color = color
 
-    def change_text_font_size(self):
-        """ Combobox font size changed, range: 8 - 22 points. """
+    def change_document_font(self):
+        """ change document text font and size. """
 
-        font = f'font: {self.ui.comboBox_fontsize.currentText()}pt "{self.app.settings["font"]}";'
-        self.ui.plainTextEdit.setStyleSheet(font)
+        font_ui = DialogFontAndSize(self.app)
+        ok = font_ui.exec()
+        if not ok:
+            return
+        font, size = font_ui.get_font_and_size()
+        doc_font = f'font: {size}pt "{font}";'
+        self.ui.plainTextEdit.setStyleSheet(doc_font)
+        tt = _("Select document font and size.") + "\n"
+        tt += f"{font}  {size}"
+        self.ui.pushButton_font.setToolTip(tt)
 
     def find_code_in_tree(self):
         """ Find a code by name in the codes tree and select it.
@@ -5640,6 +5643,41 @@ class ToolTipEventFilter(QtCore.QObject):
                 receiver.setToolTip(text_)
         # Call Base Class Method to Continue Normal Event Processing
         return super(ToolTipEventFilter, self).eventFilter(receiver, event)
+
+
+class DialogFontAndSize(QtWidgets.QDialog):
+    """ Get font and size. For plaintextedit """
+
+    def __init__(self, app,  parent=None):
+        super().__init__(parent)
+        font = f'font: {app.settings["fontsize"]}pt "{app.settings["font"]}";'
+        self.setStyleSheet(font)
+        self.setWindowTitle(_("Font and size"))
+        self.resize(300, 100)
+        self.setMaximumWidth(300)
+        layout = QtWidgets.QVBoxLayout()
+        self.font_combo = QtWidgets.QFontComboBox()
+        layout.addWidget(self.font_combo)
+
+        self.font_size_combo = QtWidgets.QComboBox()
+        self.font_size_combo.addItems(["8", "10", "12", "14", "16", "18", "20", "22"])
+        index = self.font_size_combo.findText(str(app.settings['docfontsize']),
+                                            QtCore.Qt.MatchFlag.MatchFixedString)
+        if index == -1:
+            index = 0
+        self.font_size_combo.setCurrentIndex(index)
+        layout.addWidget(self.font_size_combo)
+
+        bbox = QtWidgets.QDialogButtonBox(
+            QtWidgets.QDialogButtonBox.StandardButton.Ok | QtWidgets.QDialogButtonBox.StandardButton.Cancel)
+        bbox.accepted.connect(self.accept)
+        bbox.rejected.connect(self.reject)
+        layout.addWidget(bbox)
+        self.setLayout(layout)
+
+    def get_font_and_size(self):
+        return self.font_combo.currentText(), self.font_size_combo.currentText()
+
 
 
 # see https://www.freeformatter.com/html-entities.html
