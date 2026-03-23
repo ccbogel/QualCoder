@@ -165,7 +165,7 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.ui.tableWidget.cellDoubleClicked.connect(self.cell_double_clicked)
         self.ui.tableWidget.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
-        self.ui.tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+        # self.ui.tableWidget.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection) OLD
         self.ui.tableWidget.installEventFilter(self)
         self.ui.tableWidget.horizontalHeader().setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget.horizontalHeader().customContextMenuRequested.connect(self.table_header_menu)
@@ -2347,12 +2347,9 @@ class DialogManageFiles(QtWidgets.QDialog):
         return text_
 
     def export(self):
-        """ Export selected file to selected directory.
+        """ Export selected files to selected directory.
         If an imported file was from a docx, odt, pdf, html, epub then export the original file
         If the file was created within QualCoder (so only in the database), export as plain text.
-        Can only export ONE file at time, due to tableWidget single selection mode
-        Can only export file that was imported into the project folder.
-        Need to check for this condition.
         """
 
         if self.av_dialog_open is not None:
@@ -2363,75 +2360,87 @@ class DialogManageFiles(QtWidgets.QDialog):
         rows = list(set(rows))  # duplicate rows due to multiple columns
         if len(rows) == 0:
             return
-        # Currently single selection mode in tableWidget, 1 row only, so rows[0]
-        if self.source[rows[0]]['mediapath'] is not None and ':' in self.source[rows[0]]['mediapath'] \
-                and (self.source[rows[0]]['fulltext'] is None or self.source[rows[0]]['fulltext'] == ""):
-            msg = _("This is an external linked file") + "\n"
-            msg += self.source[rows[0]]['mediapath'].split(':')[1]
-            Message(self.app, _('Cannot export'), msg, "warning").exec()
-            return
-        # Currently can only export ONE file at time, due to tableWidget single selection mode
-        row = rows[0]
-        # Guard against invalid filenames (e.g. ".", "..")
-        if self.source[row]['name'].strip('.') == '' or self.source[row]['name'].strip() == '':
-            Message(self.app, _("Warning"), _("Invalid file name. Please rename this file before exporting."), "warning").exec()
-            return        
-        # Warn of export of text representation of linked files (e.g. odt, docx, txt, md, pdf)
-        text_rep = False
-        if self.source[row]['mediapath'] is not None and (':' in self.source[row]['mediapath']) \
-                and self.source[row]['fulltext'] != "":
-            msg = _("This is a linked file. Will export text representation.") + "\n"
-            msg += self.source[row]['mediapath'].split(':')[1]
-            Message(self.app, _("Can export text"), msg, "warning").exec()
-            text_rep = True
 
-        filename = self.source[row]['name']
-        if self.source[row]['mediapath'] is None or self.source[row]['mediapath'][0:5] == 'docs:':
-            filename = filename + ".txt"
-        exp_dialog = ExportDirectoryPathDialog(self.app, filename)
-        destination = exp_dialog.filepath
-        if destination is None:
-            return
-        msg = _("Export to ") + f"{destination}\n"
+        destination = self.app.settings['directory']
 
-        # Export audio, video, picture files
-        if self.source[row]['mediapath'] is not None and self.source[row]['mediapath'][
-                                                         0:6] != "/docs/" and text_rep is False:
-            file_path = self.app.project_path + self.source[row]['mediapath']
-            try:
-                copyfile(file_path, destination)
-                msg += f"{destination}\n"
-                Message(self.app, _("Files exported"), msg).exec()
-                self.parent_text_edit.append(filename + _(" exported to ") + msg)
-            except FileNotFoundError:
-                Message(self.app, _("Error"), _("File not found")).exec()
-            return
-
-        # Export pdf, docx, odt, epub, html files if located in documents directory, and text representation
-        document_stored = os.path.exists(self.app.project_path + "/documents/" + self.source[row]['name'])
-        if document_stored and (
-                self.source[row]['mediapath'] is None or self.source[row]['mediapath'][0:6] == "/docs/"):
-            try:
-                copyfile(self.app.project_path + "/documents/" + self.source[row]['name'], destination)
+        export_msg = _("Export to") + f" {destination}\n"
+        files_failed = 0
+        for row in rows:
+            filename = self.source[row]['name']
+            mediapath = self.source[row]['mediapath']
+            # Check for invalid filenames (e.g. ".", "..")
+            if filename.strip('.') == '' or filename.strip() == '':
+                msg = _("Invalid file name. Please rename this file before exporting.")
+                msg += f"\n{filename}"
+                Message(self.app, _("Warning"), msg, "warning").exec()
+                return
+            # Export text representation of linked files (e.g. odt, docx, txt, md, pdf)
+            if mediapath is not None and ':' in mediapath and self.source[row]['fulltext'] != "":
+                export_msg += f"{filename} - " + _("Linked file. Exported text representation.") + "\n"
                 filedata = self.source[row]['fulltext']
-                with open(f"{destination}.txt", 'w', encoding='utf-8-sig') as file_:
-                    file_.write(filedata)
-                msg += f"{destination}\n"
-                Message(self.app, _("Files exported"), msg).exec()
-                self.parent_text_edit.append(filename + _(" exported to ") + msg)
-            except FileNotFoundError as err:
-                logger.warning(str(err))
-                print(err)
-            return
-        # Export transcribed files, user created text files, text representations of linked files
-        if (self.source[row]['mediapath'] is None or self.source[row]['mediapath'][
-                                                     0:5] == 'docs:') and not document_stored:
-            filedata = self.source[row]['fulltext']
-            with open(destination, 'w', encoding='utf-8-sig') as file_:
-                file_.write(filedata)
-            msg += f"{destination}\n"
+                if not filename.endswith(".txt"):
+                    filename += ".txt"
+                path = os.path.join(destination, filename)
+                with open(path, 'w', encoding='utf-8-sig') as textfile:
+                    textfile.write(filedata)
+                continue
+            # Export audio, video, picture files
+            if mediapath is not None and mediapath[0:6] != "/docs/":
+                # Note: [1:] must remove leading slash for os.path.join
+                file_path = os.path.join(self.app.project_path, mediapath[1:])
+                try:
+                    copyfile(file_path, os.path.join(destination, filename))
+                    if filename != mediapath[6:]:
+                        export_msg += f"{filename} ({mediapath[6:]}) " + _("exported.") + "\n"
+                    else:
+                        export_msg += f"{filename} " + _("exported.") + "\n"
+                except FileNotFoundError:
+                    Message(self.app, _("Error"), _("File not found: ") + file_path).exec()
+                    export_msg += f"{file_path} - " + _("Media file NOT exported.") + "\n"
+                    files_failed += 1
+                continue
+            # Export qc-created transcribed files, user-created text files
+            if mediapath is None:  # rest of this not needed as media done above and self.source[row]['fulltext'] != "":
+                export_msg += f"{filename} - " + _("QC or user created file exported.") + "\n"
+                filedata = self.source[row]['fulltext']
+                if not filename.endswith(".txt"):
+                    filename += ".txt"
+                path = os.path.join(destination, filename)
+                with open(path, 'w', encoding='utf-8-sig') as textfile:
+                    textfile.write(filedata)
+                continue
+
+            # Export md, pdf, docx, odt, epub, html files with text rep. if located in documents directory
+            source_path = os.path.join(self.app.project_path, "documents", mediapath[6:])  # 0-6 is /docs/
+            document_exists = os.path.exists(source_path)
+            if document_exists:
+                try:
+                    # Remove '/docs/' from start of mediapath string
+                    copyfile(source_path, os.path.join(destination, mediapath[6:]))
+                    filedata = self.source[row]['fulltext']
+                    if not filename.endswith(".txt"):
+                        filename += ".txt"
+                    path = os.path.join(destination, filename)
+                    with open(path, 'w', encoding='utf-8-sig') as file_:
+                        file_.write(filedata)
+                    if filename != mediapath[6:]:
+                        export_msg += f"{filename} ({mediapath[6:]}) " + _("exported.") + "\n"
+                    else:
+                        export_msg += f"{filename} " + _("exported.") + "\n"
+                except (FileNotFoundError, PermissionError) as err:
+                    files_failed += 1
+                    msg = f"{err}\n{file_path} - " + _("File NOT exported.") + "\n"
+                    logger.warning(msg)
+                    print(msg)
+                    Message(self.app, _("Error"), msg).exec()
+                    continue
+
+        msg = f"{len(rows) - files_failed} " + _(" files exported. ") + _("Exported to: ") + destination
+        if files_failed > 0:
+            msg += _("Files not exported: ") + len(files_failed)
         Message(self.app, _("Files exported"), msg).exec()
-        self.parent_text_edit.append(filename + _(" exported to ") + msg)
+        export_msg += "\n" + msg
+        self.parent_text_edit.append(export_msg)
 
     def delete_button_multiple_files(self):
         """ Delete files from database and update model and widget.
@@ -2534,9 +2543,8 @@ class DialogManageFiles(QtWidgets.QDialog):
         self.app.delete_backup = False
 
     def delete(self):
-        """ Delete one file from database and update model and widget.
-        Deletes only one file due to table single selection mode
-        Also, delete the file from subdirectories, if not externally linked.
+        """ Delete files from database and update model and widget.
+        Also, delete the files from subdirectories, if not externally linked.
         Called by: right-click table context menu.
         """
 
@@ -2548,87 +2556,85 @@ class DialogManageFiles(QtWidgets.QDialog):
         rows = list(set(rows))  # duplicate rows due to multiple columns
         if len(rows) == 0:
             return
-        names = ""
-        names = f"{names}{self.source[rows[0]]['name']}\n"
-        ui = DialogConfirmDelete(self.app, names)
+        filenames = ""
+        for r in rows:
+            filenames += f"\n{self.source[r]['name']}"
+        ui = DialogConfirmDelete(self.app, filenames, _("Delete files"))
         ok = ui.exec()
         if not ok:
             return
 
         cur = self.app.conn.cursor()
-        row = rows[0]
-        file_id = self.source[row]['id']
-        # Delete text source
-        if self.source[row]['mediapath'] is None or self.source[row]['mediapath'][0:5] == 'docs:' or \
-                self.source[row]['mediapath'][0:6] == '/docs/':
-            try:
-                if self.source[row]['mediapath']:
-                    # Legacy for older QualCoder Projects < 3.3
-                    os.remove(self.app.project_path + "/documents/" + self.source[row]['name'])
-                if self.source[row]['mediapath'] is not None and self.source[row]['mediapath'][0:6] == '/docs/':
-                    os.remove(self.app.project_path + "/documents/" + self.source[row]['mediapath'][6:])
-            except OSError as err:
-                logger.warning(_("Deleting file error: ") + str(err))
-            # Delete stored coded sections and source details
-            cur.execute("delete from source where id = ?", [file_id])
-            cur.execute("delete from code_text where fid = ?", [file_id])
-            cur.execute("delete from annotation where fid = ?", [file_id])
-            cur.execute("delete from case_text where fid = ?", [file_id])
-            cur.execute("delete from attribute where attr_type ='file' and id=?", [file_id])
-            self.app.conn.commit()
-            # Delete from vectorstore
-            if self.app.settings['ai_enable'] == 'True':
-                self.app.ai.sources_vectorstore.delete_document(file_id)
-
-                # Delete image, audio or video source
-        # (why not simply use 'else' instead of this complicated second if-clause?)
-        if self.source[row]['mediapath'] is not None and self.source[row]['mediapath'][0:5] != 'docs:' and \
-                self.source[row]['mediapath'][0:6] != '/docs/':
-            # Get linked transcript file id
-            cur.execute("select av_text_id from source where id=?", [file_id])
-            res = cur.fetchone()
-            av_text_id = res[0]
-            # Remove avid links in code_text
-            sql = "select avid from code_av where id=?"
-            cur.execute(sql, [file_id])
-            avids = cur.fetchall()
-            sql = "update code_text set avid=null where avid=?"
-            for avid in avids:
-                cur.execute(sql, [avid[0]])
-            self.app.conn.commit()
-            # Remove folder file, if internally stored
-            if ':' not in self.source[row]['mediapath']:
-                filepath = self.app.project_path + self.source[row]['mediapath']
+        for row in rows:
+            file_id = self.source[row]['id']
+            # Delete text source
+            if self.source[row]['mediapath'] is None or self.source[row]['mediapath'][0:5] == 'docs:' or \
+                    self.source[row]['mediapath'][0:6] == '/docs/':
                 try:
-                    os.remove(filepath)
+                    if self.source[row]['mediapath']:
+                        # Legacy for older QualCoder Projects < 3.3
+                        os.remove(self.app.project_path + "/documents/" + self.source[row]['name'])
+                    if self.source[row]['mediapath'] is not None and self.source[row]['mediapath'][0:6] == '/docs/':
+                        os.remove(self.app.project_path + "/documents/" + self.source[row]['mediapath'][6:])
                 except OSError as err:
                     logger.warning(_("Deleting file error: ") + str(err))
-            # Delete stored coded sections and source details
-            cur.execute("delete from source where id = ?", [file_id])
-            cur.execute("delete from code_image where id = ?", [file_id])
-            cur.execute("delete from code_av where id = ?", [file_id])
-            cur.execute("delete from attribute where attr_type='file' and id=?", [file_id])
-            self.app.conn.commit()
-            # Delete from vectorstore (this should not be necessary since it's not a text file, but just to be sure...)
-            if self.app.settings['ai_enable'] == 'True':
-                self.app.ai.sources_vectorstore.delete_document(file_id)
-
-                # Delete transcription text file
-            if av_text_id is not None:
-                cur.execute("delete from source where id = ?", [res[0]])
-                cur.execute("delete from code_text where fid = ?", [res[0]])
-                cur.execute("delete from annotation where fid = ?", [res[0]])
-                cur.execute("delete from case_text where fid = ?", [res[0]])
-                cur.execute("delete from attribute where attr_type ='file' and id=?", [res[0]])
+                # Delete stored coded sections and source details
+                cur.execute("delete from source where id = ?", [file_id])
+                cur.execute("delete from code_text where fid = ?", [file_id])
+                cur.execute("delete from annotation where fid = ?", [file_id])
+                cur.execute("delete from case_text where fid = ?", [file_id])
+                cur.execute("delete from attribute where attr_type ='file' and id=?", [file_id])
                 self.app.conn.commit()
                 # Delete from vectorstore
                 if self.app.settings['ai_enable'] == 'True':
-                    self.app.ai.sources_vectorstore.delete_document(res[0])
+                    self.app.ai.sources_vectorstore.delete_document(file_id)
 
-        self.files_renamed = [x for x in self.files_renamed if not (file_id == x.get('fid'))]
+            else:  # Delete image, audio or video source
+                # Get linked transcript file id
+                cur.execute("select av_text_id from source where id=?", [file_id])
+                res = cur.fetchone()
+                av_text_id = res[0]
+                # Remove avid links in code_text
+                sql = "select avid from code_av where id=?"
+                cur.execute(sql, [file_id])
+                avids = cur.fetchall()
+                sql = "update code_text set avid=null where avid=?"
+                for avid in avids:
+                    cur.execute(sql, [avid[0]])
+                self.app.conn.commit()
+                # Remove folder file, if internally stored
+                if ':' not in self.source[row]['mediapath']:
+                    filepath = self.app.project_path + self.source[row]['mediapath']
+                    try:
+                        os.remove(filepath)
+                    except OSError as err:
+                        logger.warning(_("Deleting file error: ") + str(err))
+                # Delete stored coded sections and source details
+                cur.execute("delete from source where id = ?", [file_id])
+                cur.execute("delete from code_image where id = ?", [file_id])
+                cur.execute("delete from code_av where id = ?", [file_id])
+                cur.execute("delete from attribute where attr_type='file' and id=?", [file_id])
+                self.app.conn.commit()
+                # Delete from vectorstore (this should not be necessary since it's not a text file, but just to be sure...)
+                if self.app.settings['ai_enable'] == 'True':
+                    self.app.ai.sources_vectorstore.delete_document(file_id)
+
+                # Delete transcription text file
+                if av_text_id is not None:
+                    cur.execute("delete from source where id = ?", [res[0]])
+                    cur.execute("delete from code_text where fid = ?", [res[0]])
+                    cur.execute("delete from annotation where fid = ?", [res[0]])
+                    cur.execute("delete from case_text where fid = ?", [res[0]])
+                    cur.execute("delete from attribute where attr_type ='file' and id=?", [res[0]])
+                    self.app.conn.commit()
+                    # Delete from vectorstore
+                    if self.app.settings['ai_enable'] == 'True':
+                        self.app.ai.sources_vectorstore.delete_document(res[0])
+
+            self.files_renamed = [x for x in self.files_renamed if not (file_id == x.get('fid'))]
         self.update_files_in_dialogs()
         self.check_attribute_placeholders()
-        self.parent_text_edit.append(_("Deleted file: ") + self.source[row]['name'])
+        self.parent_text_edit.append(_("Deleted: ") + filenames)
         self.load_file_data()
         self.app.delete_backup = False
 
