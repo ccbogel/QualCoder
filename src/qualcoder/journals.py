@@ -28,7 +28,9 @@ import logging
 # from spellchecker import SpellChecker
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 import webbrowser
-
+import shutil  # for file copy operations in convert_to_source <- L
+from odf.opendocument import OpenDocumentText  # For ODT export <- L
+from odf.text import P as OdfParagraph  # For ODT export <- L
 from .add_item_name import DialogAddItemName
 from .add_attribute import DialogAddAttribute
 from .confirm_delete import DialogConfirmDelete
@@ -128,11 +130,7 @@ class DialogJournals(QtWidgets.QDialog):
         self.ui.textEdit.textChanged.connect(self.text_changed)
         self.ui.textEdit.installEventFilter(self)
         self.ui.textEdit.setTabChangesFocus(True)
-        #spell = SpellChecker()  # Was testing this out Dont use
-        # spell = SpellChecker(language='de')
-        # spell = SpellChecker(language='es')
-        # spell = SpellChecker(language='fr')
-        # spell = SpellChecker(language='pt')
+        # spell = SpellChecker()  # Was testing this out Dont use
         highlighter = MarkdownHighlighter(self.ui.textEdit, self.app)
         self.ui.tableWidget.setTabKeyNavigation(False)
 
@@ -448,6 +446,10 @@ class DialogJournals(QtWidgets.QDialog):
         if self.rows_hidden:
             action_show_all = menu.addAction(_("Show all rows Ctrl A"))
             self.rows_hidden = False
+        # Convert journal to source file <- L    
+        action_convert_to_source = None
+        if row != -1:
+            action_convert_to_source = menu.addAction(_("Convert journal to source file"))
 
         action = menu.exec(self.ui.tableWidget.mapToGlobal(position))
         if action == action_modified_date_asc:
@@ -529,27 +531,38 @@ class DialogJournals(QtWidgets.QDialog):
             self.ui.textEdit.clear()
             self.ui.textEdit.hide()
             return
+        # convert journal to source <- L
+        if action == action_convert_to_source:
+            self.convert_journal_to_source()
+            return          
 
     def export_all_journals_as_one_file(self):
-        """ Export a collation of all journals as one text file. """
+        """ Export a collation of all journals as one ODT file.
+            TODO consider applying markdown formatting to the export
+        """
 
-        text_ = ""
-        for j in self.journals:
-            text_ += _("Journal: ") + j['name'] + "\n"
-            text_ += j['jentry'] + "\n========\n\n"
-        filename = "Collated_journals.txt"
+        filename = "Collated_journals.odt"
         exp_directory = ExportDirectoryPathDialog(self.app, filename)
         filepath = exp_directory.filepath
         if filepath is None:
             return
-        ''' https://stackoverflow.com/questions/39422573/python-writing-weird-unicode-to-csv
-        Using a byte order mark so that other software recognises UTF-8
-        '''
-        with open(filepath, 'w', encoding='utf-8-sig') as outfile:
-            outfile.write(text_)
-        msg = _("Collated journals exported as text file to: ") + filepath
+        doc = OpenDocumentText()
+        for j in self.journals:
+            header_line = _("Journal: ") + j['name']
+            # TODO use Header format
+            p_header = OdfParagraph(text=header_line)
+            doc.text.addElement(p_header)
+            for line in j['jentry'].split('\n'):
+                p = OdfParagraph(text=line)
+                doc.text.addElement(p)
+            separator = OdfParagraph(text="========")
+            doc.text.addElement(separator)
+            blank = OdfParagraph(text="")
+            doc.text.addElement(blank)
+        doc.save(filepath)
+        msg = _("Collated journals exported: ") + filepath
         self.parent_text_edit.append(msg)
-        Message(self.app, _("Journals exported"), msg).exec()
+        Message(self.app, _("Collated journals exported"), msg).exec()
 
     def view(self):
         """ View and edit journal contents in the textEdit """
@@ -639,19 +652,24 @@ class DialogJournals(QtWidgets.QDialog):
         self.app.delete_backup = False
 
     def export(self):
-        """ Export journal to a plain text file, filename will have .txt ending. """
+        """ Export journal to an ODT file, filename will have .odt ending.
+        TODO consider applying markdown formatting to the export
+        """
 
         row = self.ui.tableWidget.currentRow()
         if row == -1:
             return
-        filename = f"{self.journals[row]['name']}.txt"
+        filename = f"{self.journals[row]['name']}.odt"
         export_dlg = ExportDirectoryPathDialog(self.app, filename)
         filepath = export_dlg.filepath
         if filepath is None:
             return
         data = self.journals[row]['jentry']
-        with open(filepath, 'w', encoding='utf-8') as file_:
-            file_.write(data)
+        doc = OpenDocumentText()
+        for line in data.split('\n'):
+            p = OdfParagraph(text=line)
+            doc.text.addElement(p)
+        doc.save(filepath)
         msg = f'{_("Journal exported to:")} {filepath}'
         Message(self.app, _("Journal export"), msg, "information").exec()
         self.parent_text_edit.append(msg)
@@ -678,11 +696,28 @@ class DialogJournals(QtWidgets.QDialog):
         self.app.delete_backup = False
 
     def table_selection_changed(self):
-        """ Present the journal text for the current selection. """
+        """ Present the journal text for the current selection.
+        Reload journal entry from database to reflect external changes. """
 
         row = self.ui.tableWidget.currentRow()
+        if row == -1:
+            return
+        jid = int(self.ui.tableWidget.item(row, JID_COLUMN).text())
+        # Re-read jentry from database to catch external updates (e.g. from code_text.py)
+        cur = self.app.conn.cursor()
+        cur.execute("select jentry, date from journal where jid=?", [jid])
+        result = cur.fetchone()
+        if result is not None:
+            self.journals[row]['jentry'] = result[0]
+            self.journals[row]['date'] = result[1]
+            # Update date cell in table
+            date_item = self.ui.tableWidget.item(row, DATE_COLUMN)
+            if date_item is not None:
+                self.ui.tableWidget.blockSignals(True)
+                date_item.setText(result[1])
+                self.ui.tableWidget.blockSignals(False)
         self.ui.label_jname.setText(_("Journal: ") + self.journals[row]['name'])
-        self.jid = int(self.ui.tableWidget.item(row, JID_COLUMN).text())
+        self.jid = jid
         self.ui.textEdit.show()
         self.view()
 
@@ -695,7 +730,7 @@ class DialogJournals(QtWidgets.QDialog):
         self.jid = int(self.ui.tableWidget.item(row, JID_COLUMN).text())
         if y == NAME_COLUMN:
             new_name = self.ui.tableWidget.item(row, y).text().strip()
-            # check that no other journal has this name and it is not empty
+            # Check that no other journal has this name and it is not empty
             update = True
             if new_name == "":
                 Message(self.app, _('Warning'), _("No name was entered"), "warning").exec()
@@ -711,7 +746,7 @@ class DialogJournals(QtWidgets.QDialog):
                         _("In the journal name use only: a-z, A-z 0-9 - space"), "warning").exec()
                 update = False
             if update:
-                # update journals list and database
+                # Update journals list and database
                 cur = self.app.conn.cursor()
                 cur.execute("update journal set name=? where name=?",
                             (new_name, self.journals[row]['name']))
@@ -815,6 +850,124 @@ class DialogJournals(QtWidgets.QDialog):
             self.ui.pushButton_next.setEnabled(True)
             self.ui.pushButton_previous.setEnabled(True)
         self.ui.label_search_totals.setText("0 / " + str(len(self.search_indices)))
+    
+    def convert_journal_to_source(self):
+        """ Convert the selected journal into a text source file within the project.
+        The journal content is saved as a .txt file in the project's documents folder
+        and saved in the 'source' table so it appears in Manage Files.
+        If a source with the same name exists, a numeric suffix is appended.
+        Journal attributes are also copied as file attributes. """
+
+        row = self.ui.tableWidget.currentRow()
+        if row == -1:
+            Message(self.app, _("Warning"), _("No journal selected"), "warning").exec()
+            return
+        journal = self.journals[row]
+        journal_name = journal['name']
+        journal_text = journal['jentry']
+        if not journal_text.strip():
+            Message(self.app, _("Warning"), _("Journal is empty. Nothing to convert."), "warning").exec()
+            return
+
+        # Auto-suffix if a source with the same name already exists <- L
+        cur = self.app.conn.cursor()
+        source_name = journal_name
+        cur.execute("select id from source where name=?", [source_name])
+        if cur.fetchone() is not None:
+            suffix = 1
+            while True:
+                candidate = f"{journal_name}_{suffix}"
+                cur.execute("select id from source where name=?", [candidate])
+                if cur.fetchone() is None:
+                    source_name = candidate
+                    break
+                suffix += 1
+
+        # Determine the project documents directory
+        docs_dir = os.path.join(self.app.project_path, "documents")
+        if not os.path.exists(docs_dir):
+            os.makedirs(docs_dir)
+
+        # Write journal content using the resolved source_name
+        source_filename = source_name + ".txt"
+        source_filepath = os.path.join(docs_dir, source_filename)
+        with open(source_filepath, 'w', encoding='utf-8-sig') as f:
+            f.write(journal_text)
+
+        # Insert into the source table using resolved source_name
+        now_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
+        mediapath = '/docs/' + source_name
+        cur.execute(
+            "insert into source (name, fulltext, mediapath, memo, owner, date) values(?,?,?,?,?,?)",
+            (source_name, journal_text, mediapath, _("Converted from journal: ") + journal_name,
+             self.app.settings['codername'], now_date)
+        )
+        self.app.conn.commit()
+        cur.execute("select last_insert_rowid()")
+        new_source_id = cur.fetchone()[0]
+        self.app.delete_backup = False
+
+        # Copy journal attributes as file attributes
+        cur.execute("select name, valuetype from attribute_type where caseOrFile='journal'")
+        journal_attr_types = cur.fetchall()
+        for attr_type in journal_attr_types:
+            attr_name = attr_type[0]
+            attr_valuetype = attr_type[1]
+            # Check if attribute_type exists specifically for 'file'
+            cur.execute("select name, valuetype from attribute_type where name=? and caseOrFile='file'",
+                        [attr_name])
+            existing = cur.fetchone()
+            if existing is None:
+                # Create a new attribute_type for 'file' with a prefixed name to avoid UNIQUE conflict <- L
+                file_attr_name = f"j_{attr_name}"  # prefix to avoid UNIQUE constraint on name <- L
+                # Also check that the prefixed name doesn't already exist <- L
+                cur.execute("select name from attribute_type where name=?", [file_attr_name])
+                if cur.fetchone() is None:
+                    cur.execute(
+                        "insert into attribute_type (name, date, owner, memo, caseOrFile, valuetype) values(?,?,?,?,?,?)",
+                        (file_attr_name, now_date, self.app.settings['codername'], "", 'file', attr_valuetype)
+                    )
+            else:
+                file_attr_name = attr_name  # attribute_type already exists for 'file', use it
+                # Verify valuetype compatibility: numeric journal attr should not go into character file attr
+                if attr_valuetype == "numeric" and existing[1] != "numeric":
+                    file_attr_name = f"j_{attr_name}"  # create separate to preserve type
+                    cur.execute("select name from attribute_type where name=?", [file_attr_name])
+                    if cur.fetchone() is None:
+                        cur.execute(
+                            "insert into attribute_type (name, date, owner, memo, caseOrFile, valuetype) values(?,?,?,?,?,?)",
+                            (file_attr_name, now_date, self.app.settings['codername'], "", 'file', attr_valuetype)
+                        )
+            # Get the journal attribute value
+            cur.execute(
+                "select value from attribute where attr_type='journal' and name=? and id=?",
+                [attr_name, journal['jid']]
+            )
+            attr_res = cur.fetchone()
+            attr_value = attr_res[0] if attr_res else ""
+            # Skip empty values to keep file attributes clean
+            if attr_value == "":
+                continue
+            # Validate numeric values before inserting
+            if attr_valuetype == "numeric" and attr_value != "":
+                try:
+                    float(attr_value)
+                except ValueError:
+                    logger.warning(_("Skipping non-numeric value '%s' for attribute '%s'"), attr_value, attr_name)
+                    continue
+            # Insert the attribute value for the new source file
+            try:
+                cur.execute(
+                    "insert into attribute (name, value, id, attr_type, date, owner) values(?,?,?,?,?,?)",
+                    (file_attr_name, attr_value, new_source_id, 'file', now_date, self.app.settings['codername'])
+                )
+            except Exception as e:
+                logger.warning(_("Could not insert attribute '%s': %s"), file_attr_name, str(e))
+        self.app.conn.commit()
+
+        msg = _("Journal converted to source document: ") + source_name
+        self.parent_text_edit.append(msg)
+        Message(self.app, _("Journal converted to source document"), msg, "information").exec()
 
     def move_to_previous_search_text(self):
         """ Push button pressed to move to previous search text position. """
@@ -868,6 +1021,7 @@ class DialogJournals(QtWidgets.QDialog):
 
     def scroll_text_into_view(self):
         """ Scroll so the selection is in the middle of the screen. """
+
         cursor = self.ui.textEdit.textCursor()
         if cursor.hasSelection():
             cursor_rect = self.ui.textEdit.cursorRect(cursor)
