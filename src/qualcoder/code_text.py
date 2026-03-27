@@ -238,7 +238,9 @@ class DialogCodeText(QtWidgets.QWidget):
         self.setStyleSheet(font)
         tree_font = f'font: {self.app.settings["treefontsize"]}pt "{self.app.settings["font"]}";'
         self.ui.treeWidget.setStyleSheet(tree_font)
-        doc_font = f'font: {self.app.settings["docfontsize"]}pt "{self.app.settings["font"]}";'
+        if 'docfont' not in self.app.settings:
+            self.app.settings['docfont'] = self.app.settings['font']
+        doc_font = f'font: {self.app.settings["docfontsize"]}pt "{self.app.settings["docfont"]}";'
         self.ui.plainTextEdit.setStyleSheet(doc_font)
         self.ui.lineEdit_coder.setText(self.app.settings['codername'])
         self.ui.pushButton_coder.clicked.connect(self.edit_coder_names)
@@ -489,7 +491,9 @@ class DialogCodeText(QtWidgets.QWidget):
         ok = font_ui.exec()
         if not ok:
             return
-        font, size = font_ui.get_font_and_size()
+        size, font = font_ui.get_size_and_font()
+        self.app.settings['docfontsize'] = int(size)
+        self.app.settings['docfont'] = font
         doc_font = f'font: {size}pt "{font}";'
         self.ui.plainTextEdit.setStyleSheet(doc_font)
         tt = _("Select document font and size.") + "\n"
@@ -2503,8 +2507,8 @@ class DialogCodeText(QtWidgets.QWidget):
         6 codebook
         """
 
-        #export_option = self.ui.comboBox_export.currentText()
         # Must use indexes not names for translations, if there are translations
+        # export_option = self.ui.comboBox_export.currentText()
         index = self.ui.comboBox_export.currentIndex()
         if index == 0:
             return
@@ -6640,8 +6644,8 @@ class DialogFontAndSize(QtWidgets.QDialog):
         layout.addWidget(bbox)
         self.setLayout(layout)
 
-    def get_font_and_size(self):
-        return self.font_combo.currentText(), self.font_size_combo.currentText()
+    def get_size_and_font(self):
+        return self.font_size_combo.currentText(), self.font_combo.currentText()
 
 # see https://www.freeformatter.com/html-entities.html
 entities = {"&": "&amp;", '"': '&quot;', "'": "&#39;", "<": "&lt;", ">": "&gt;", "–": "&ndash;", "—": "&mdash;",
