@@ -380,7 +380,8 @@ class DialogManageFiles(QtWidgets.QDialog):
     def eventFilter(self, object_, event):
         """ Using this event filter to
         Ctrl + A to show all rows
-        Ctrl + Z Undo the last  deletion.
+        Ctrl + Z Undo the last deletion.
+        def
         """
 
         if type(event) == QtGui.QKeyEvent:
@@ -390,6 +391,9 @@ class DialogManageFiles(QtWidgets.QDialog):
                 for r in range(0, self.ui.tableWidget.rowCount()):
                     self.ui.tableWidget.setRowHidden(r, False)
                 self.rows_hidden = []
+                return True
+            if key == QtCore.Qt.Key.Key_Delete and self.ui.tableWidget.currentColumn() == 0:
+                self.delete()
                 return True
         return False
 
