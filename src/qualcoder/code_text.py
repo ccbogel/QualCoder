@@ -39,6 +39,10 @@ import webbrowser
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QBrush, QColor
+# Required for the _export_odt_clean method which generates native ODF files with ranged annotations using odfpy <- L
+from odf.opendocument import OpenDocumentText  # Required for the _export_odt_clean method <- L
+from odf import text as odf_text, office as odf_office, dc as odf_dc, style as odf_style  # Required for the _export_odt_clean method <- L
+from odf.namespaces import OFFICENS, DRAWNS  # Required for the _export_odt_clean method <- L
 
 from .add_item_name import DialogAddItemName
 from .ai_search_dialog import DialogAiSearch
@@ -50,6 +54,7 @@ from .confirm_delete import DialogConfirmDelete
 from .helpers import Message, DialogGetStartAndEndMarks, ExportDirectoryPathDialog, MarkdownHighlighter, NumberBar
 from .GUI.ui_dialog_code_text import Ui_Dialog_code_text
 from .memo import DialogMemo
+#from .edit_journal import DialogEditJournal  # journal editor dialog <- L
 from .report_attributes import DialogSelectAttributeParameters
 from .reports import DialogReportCoderComparisons, DialogReportCodeFrequencies  # For isinstance()
 from .report_codes import DialogReportCodes
@@ -63,6 +68,73 @@ ai_search_analysis_max_count = 10  # How many chunks of data are analysed in the
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
+
+
+class CodeResizeHandle(QtWidgets.QWidget):
+    """ Overlay widget used as a visual drag handle for code boundary resizing. """
+
+    def __init__(self, parent_editor, is_start, code_item, main_dialog):
+        super().__init__(parent_editor.viewport())
+        self.editor = parent_editor
+        self.is_start = is_start
+        self.code_item = code_item
+        self.main_dialog = main_dialog
+        
+        # Store original positions in case of cancel or error
+        self.orig_pos0 = code_item['pos0']
+        self.orig_pos1 = code_item['pos1']
+        self.setCursor(Qt.CursorShape.SizeHorCursor)
+        self.setFixedSize(14, 18)
+        # Force PyQt to render the QWidget background
+        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
+        
+        color = self.code_item.get('color', '#0078d7')  # Blue
+        self.setStyleSheet(f"background-color: {color}; border: 2px solid #333; border-radius: 4px;")
+        self.dragging = False
+        self.show()
+        self.raise_()  # Ensure it stays on top of the text
+
+    def mousePressEvent(self, event):
+        if event.button() == Qt.MouseButton.LeftButton:
+            self.dragging = True
+
+    def mouseMoveEvent(self, event):
+        if self.dragging:
+            global_pos = event.globalPosition().toPoint()
+            viewport_pos = self.editor.viewport().mapFromGlobal(global_pos)
+
+            # Move the handle visually
+            cursor = self.editor.cursorForPosition(viewport_pos)
+            cursor_rect = self.editor.cursorRect(cursor)
+            self.move(cursor_rect.x() - 7, cursor_rect.y() + 2)
+            self.raise_()
+            
+            # Clamp new position to text boundaries
+            new_pos = cursor.position() + self.main_dialog.file_['start']
+            max_pos = len(self.main_dialog.text) + self.main_dialog.file_['start']
+            min_pos = self.main_dialog.file_['start']
+            new_pos = max(min_pos, min(new_pos, max_pos))
+            
+            # Update position in memory for live highlight feedback
+            if self.is_start:
+                if new_pos < self.code_item['pos1']:
+                    self.code_item['pos0'] = new_pos
+            else:
+                if new_pos > self.code_item['pos0']:
+                    self.code_item['pos1'] = new_pos
+            
+            # Refresh the text highlighting
+            self.main_dialog.unlight()
+            self.main_dialog.highlight()
+
+    def mouseReleaseEvent(self, event):
+        if event.button() == Qt.MouseButton.LeftButton:
+            self.dragging = False
+            viewport_pos = self.editor.viewport().mapFromGlobal(event.globalPosition().toPoint())
+            cursor = self.editor.cursorForPosition(viewport_pos)
+            new_pos = cursor.position() + self.main_dialog.file_['start']
+            # Pass original positions for potential revert
+            self.main_dialog.update_code_position_from_handle(self.code_item, new_pos, self.is_start, self.orig_pos0, self.orig_pos1)
 
 
 class DialogCodeText(QtWidgets.QWidget):
@@ -119,6 +191,13 @@ class DialogCodeText(QtWidgets.QWidget):
         # Variables associated with right-hand side splitter, for project memo, code rule
         self.project_memo = False
         self.code_rule = False
+        
+        '''# Variables for linked journal
+        self.file_journal_jids = []  # list of (jid, name, jentry) for all journals linked to current file
+        self.file_journal_display_idx = -1  # current index for cycling through journals'''
+
+        # Variables for right pane toggle
+        self.right_pane_size = 260  # Default size, remembers last size before collapse
 
         # Variables for Edit mode
         self.text = ""
@@ -149,6 +228,9 @@ class DialogCodeText(QtWidgets.QWidget):
         self.edit_original_annotations = None
         self.edit_original_case_assignment = None
         self.edit_original_cutoff_datetime = None
+        
+        # For Code Resize Handles Experimental
+        self.active_handles = []
 
         # Setup up widgets
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
@@ -174,6 +256,8 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.plainTextEdit.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.plainTextEdit.customContextMenuRequested.connect(self.text_edit_menu)
         self.ui.plainTextEdit.cursorPositionChanged.connect(self.overlapping_codes_in_text)
+        self.ui.plainTextEdit.verticalScrollBar().valueChanged.connect(self.hide_resize_handles)
+
         self.ui.textEdit_info.setReadOnly(True)
         self.ui.listWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.listWidget.customContextMenuRequested.connect(self.file_menu)
@@ -216,10 +300,16 @@ class DialogCodeText(QtWidgets.QWidget):
         # Right hand side splitter buttons
         self.ui.pushButton_code_rule.setIcon(qta.icon('mdi6.text-shadow'))
         self.ui.pushButton_code_rule.pressed.connect(self.show_code_rule)
+        # Unhide and connect journal button
+        '''self.ui.pushButton_journal.setIcon(qta.icon('mdi6.notebook-outline'))
+        self.ui.pushButton_journal.clicked.connect(self.show_file_journal)  # Left click: read-only view
+        self.ui.pushButton_journal.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.ui.pushButton_journal.customContextMenuRequested.connect(self.journal_button_menu)  # right click'''
         self.ui.pushButton_journal.hide()
         self.ui.pushButton_project_memo.setIcon(qta.icon('mdi6.file-document-outline'))
         self.ui.pushButton_project_memo.pressed.connect(self.show_project_memo)
         self.ui.textEdit_info.tabChangesFocus()
+        
         # Header buttons
         self.ui.pushButton_annotate.setIcon(qta.icon('mdi6.text-box-edit-outline', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_annotate.pressed.connect(self.annotate)
@@ -257,8 +347,9 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.label_search_regex.setPixmap(qta.icon('mdi6.help').pixmap(22, 22))
         self.ui.label_search_case_sensitive.setPixmap(qta.icon('mdi6.format-letter-case').pixmap(22, 22))
         self.ui.label_search_all_files.setPixmap(qta.icon('mdi6.text-box-multiple-outline').pixmap(22, 22))
-        #self.ui.label_font_size.setPixmap(qta.icon('mdi6.format-size').pixmap(22, 22))
         self.ui.pushButton_font.setIcon(qta.icon('mdi6.format-size', options=[{'scale_factor': 1.3}]))
+        tt = _("Select document font and size.") + f"\n{self.app.settings['docfontsize']} {self.app.settings['font']}"
+        self.ui.pushButton_font.setToolTip(tt)
         self.ui.pushButton_font.clicked.connect(self.change_document_font)
         self.ui.pushButton_previous.setIcon(qta.icon('mdi6.arrow-left', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_previous.setEnabled(False)
@@ -286,17 +377,23 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
         self.ui.treeWidget.itemPressed.connect(self.fill_code_label_with_selected_code)
         self.ui.comboBox_export.currentIndexChanged.connect(self.export_option_selected)
-        self.ui.splitter.setSizes([150, 400])
+        self.ui.splitter.setSizes([150, 400, 0])  # 3 values; right pane starts collapsed <- L
         try:
             s0 = int(self.app.settings['dialogcodetext_splitter0'])
             s1 = int(self.app.settings['dialogcodetext_splitter1'])
             if s0 > 5 and s1 > 5:
-                self.ui.splitter.setSizes([s0, s1])
+                self.ui.splitter.setSizes([s0, s1, 0])  # 3 values, right pane collapsed
             v0 = int(self.app.settings['dialogcodetext_splitter_v0'])
             v1 = int(self.app.settings['dialogcodetext_splitter_v1'])
             if v0 > 5 and v1 > 5:
-                # 30s are for the groupboxes containing buttons
                 self.ui.leftsplitter.setSizes([v0, v1, 30])
+        except KeyError:
+            pass
+        # Restore remembered right pane size (but keep panel collapsed until user opens it)
+        try:
+            s2 = int(self.app.settings['dialogcodetext_splitter2'])
+            if s2 > 5:
+                self.right_pane_size = s2
         except KeyError:
             pass
         self.ui.splitter.splitterMoved.connect(self.update_sizes)
@@ -348,8 +445,25 @@ class DialogCodeText(QtWidgets.QWidget):
         self.app.help_wiki("4.1.-Coding-Text")
 
     def show_right_side_pane(self):
-        """ Button press to show hidden right side pane. """
-        self.ui.splitter.setSizes([150, 300, 100])
+        """ Toggle visibility of the right side pane (groupBox_info).
+        Uses splitter sizes to detect actual visibility, since the widget can be
+        visible but collapsed to zero width.
+        Remembers the panel size before collapsing and restores it. """
+
+        sizes = self.ui.splitter.sizes()
+        if sizes[2] > 5:
+            # Remember current size before collapsing
+            self.right_pane_size = sizes[2]
+            self.ui.splitter.setSizes([sizes[0], sizes[1] + sizes[2], 0])
+            self.ui.pushButton_right_side_pane.setIcon(
+                qta.icon('mdi6.arrow-expand-left', options=[{'scale_factor': 1.3}]))
+        else:
+            # Restore previous size
+            new_right = self.right_pane_size
+            new_center = sizes[1] - new_right if sizes[1] > new_right else sizes[1]
+            self.ui.splitter.setSizes([sizes[0], new_center, new_right])
+            self.ui.pushButton_right_side_pane.setIcon(
+                qta.icon('mdi6.arrow-collapse-right', options=[{'scale_factor': 1.3}]))
 
     def set_default_new_code_color(self):
         """ New code colours are usually generated randomly.
@@ -366,9 +480,12 @@ class DialogCodeText(QtWidgets.QWidget):
         self.default_new_code_color = color
 
     def change_document_font(self):
-        """ change document text font and size. """
+        """ Change document text font and size. """
 
-        font_ui = DialogFontAndSize(self.app)
+        tt = self.ui.pushButton_font.toolTip()
+        size_and_font = tt.split("\n")[1]
+        size, font = size_and_font.split(" ", 1)
+        font_ui = DialogFontAndSize(self.app, size, font)
         ok = font_ui.exec()
         if not ok:
             return
@@ -376,7 +493,7 @@ class DialogCodeText(QtWidgets.QWidget):
         doc_font = f'font: {size}pt "{font}";'
         self.ui.plainTextEdit.setStyleSheet(doc_font)
         tt = _("Select document font and size.") + "\n"
-        tt += f"{font}  {size}"
+        tt += f"{size} {font}"
         self.ui.pushButton_font.setToolTip(tt)
 
     def find_code_in_tree(self):
@@ -497,14 +614,14 @@ class DialogCodeText(QtWidgets.QWidget):
             tt += f'\n{_("Codings:")} {res_codings[0]}'
             tt += f"\n{_('From:')} {file_['start']} - {file_['end']}"
             if file_['memo'] != "":
-                tt += f"\nMemo: {file_['memo']}"
+                tt += f"\n{_('Memo')}: {file_['memo']}"
 
             if file_['risid']:
                 ris = Ris(self.app)
                 ris.get_references(file_['risid'])
                 if ris.refs:
                     reference = ris.refs[0]['vancouver']
-                    tt += f"\nREF: {reference}"
+                    tt += f"\n{_('REF')}: {reference}"
 
             file_['tooltip'] = tt
 
@@ -551,7 +668,7 @@ class DialogCodeText(QtWidgets.QWidget):
         tt += f"\n{_('Codings:')} {res[0]}"
         tt += f"\n{_('From:')} {file_size['start']} - {file_size['end']}"
         if self.file_['memo'] != "":
-            tt += f"\nMemo: {self.file_['memo']}"
+            tt += f"\n{_('Memo')}: {self.file_['memo']}"
         # Find item to update tooltip
         items = self.ui.listWidget.findItems(self.file_['name'], Qt.MatchFlag.MatchExactly)
         if len(items) == 0:
@@ -601,6 +718,10 @@ class DialogCodeText(QtWidgets.QWidget):
         sizes = self.ui.splitter.sizes()
         self.app.settings['dialogcodetext_splitter0'] = sizes[0]
         self.app.settings['dialogcodetext_splitter1'] = sizes[1]
+        # Remember right pane size if it is visible
+        if len(sizes) > 2 and sizes[2] > 5:
+            self.right_pane_size = sizes[2]
+            self.app.settings['dialogcodetext_splitter2'] = sizes[2]
         v_sizes = self.ui.leftsplitter.sizes()
         self.app.settings['dialogcodetext_splitter_v0'] = v_sizes[0]
         self.app.settings['dialogcodetext_splitter_v1'] = v_sizes[1]
@@ -614,8 +735,10 @@ class DialogCodeText(QtWidgets.QWidget):
         current = self.ui.treeWidget.currentItem()
         if current is None:
             return
-        # Extra to fill right-hand side splitter details
-        self.show_code_rule()
+        # Only update right-hand side splitter if it was already showing code rules <- L
+        # Do not overwrite journal or project memo views
+        if self.code_rule:
+            self.show_code_rule()
         if current.text(1)[0:3] == 'cat':
             self.ui.label_code.hide()
             self.ui.label_code.setToolTip("")
@@ -857,16 +980,19 @@ class DialogCodeText(QtWidgets.QWidget):
 
         self.codes, self.categories = self.app.get_codes_categories()
 
-    # Right Hand Side splitter details for code rule, project memo
+    # Right Hand Side splitter details for code rule, project memo # And Journal <- L
     def show_code_rule(self):
         """ Show text in right-hand side splitter pane. """
 
-        self.ui.textEdit_info.setPlainText("")
         selected = self.ui.treeWidget.currentItem()
         if selected is None:
             return
+        '''# Clear journal state <- L
+        self.file_journal_jids = []
+        self.file_journal_display_idx = -1'''
         self.project_memo = False
         self.code_rule = True
+        self.ui.textEdit_info.setReadOnly(True)
         self.ui.label_info.setText(selected.text(0))
         txt = ""
         if selected.text(1)[0:3] == 'cat':
@@ -892,18 +1018,187 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.textEdit_info.setReadOnly(True)
         self.ui.textEdit_info.blockSignals(True)
         self.ui.textEdit_info.setText(txt)
+        # Add blockSignals around setText in show_code_rule <- L
+        self.ui.textEdit_info.blockSignals(False)
 
     def show_project_memo(self):
         """ Show project memo in right-hand side splitter pane """
+
+        '''# Clear journal state
+        self.file_journal_jids = []
+        self.file_journal_display_idx = -1'''
 
         cur = self.app.conn.cursor()
         cur.execute("select memo from project")
         res = cur.fetchone()
         self.project_memo = True
         self.code_rule = False
+        self.ui.textEdit_info.setReadOnly(True)
         self.ui.label_info.setText(_("Project memo"))
+        self.ui.textEdit_info.blockSignals(True)
         self.ui.textEdit_info.setText(res[0])
+        self.ui.textEdit_info.blockSignals(False)
+    
+    '''def show_file_journal(self):  # <- L
+        """ Left-click: cycle through journals linked to current file in read-only mode.
+        Each click shows the next journal. If no journals exist, shows empty pane.
+        Journal names match the file name (with optional _N suffix for multiples). """
 
+        if self.file_ is None:
+            return  # silent return <- L
+        self.project_memo = False
+        self.code_rule = False
+        cur = self.app.conn.cursor()
+        base_name = self.file_['name']
+        # Find all journals whose name matches the file name or file name with suffix <- L
+        cur.execute("select jid, name, jentry from journal where name=? or name like ? order by name",  # <- L
+                    [base_name, base_name + "\\_%"])  # <- L
+        results = cur.fetchall()
+        self.file_journal_jids = results  # store full tuples (jid, name, jentry) <- L 
+        if not results:
+            self.file_journal_display_idx = -1
+            self.ui.label_info.setText(_("Journal: ") + base_name + " " + _("(none)"))
+            self.ui.textEdit_info.blockSignals(True)
+            self.ui.textEdit_info.setReadOnly(True)
+            self.ui.textEdit_info.setText("")
+            self.ui.textEdit_info.blockSignals(False)
+            return
+        # Cycle to next journal
+        self.file_journal_display_idx += 1
+        if self.file_journal_display_idx >= len(results):  # wrap around <- L
+            self.file_journal_display_idx = 0
+        idx = self.file_journal_display_idx
+        j_name = results[idx][1]
+        j_text = results[idx][2] if results[idx][2] else ""
+        # Label shows current/total
+        label = f"{_('Journal')}: {j_name}"
+        if len(results) > 1:
+            label += f"  ({idx + 1}/{len(results)}) — {_('click to cycle')}"
+        self.ui.label_info.setText(label)
+        self.ui.textEdit_info.blockSignals(True)
+        self.ui.textEdit_info.setReadOnly(True)  # read-only view
+        self.ui.textEdit_info.setText(j_text)
+        self.ui.textEdit_info.blockSignals(False)'''
+        
+    '''def journal_button_menu(self, position):  # right-click context menu for journal button <- L
+        """ Right-click context menu for journal button.
+        Options: Create new journal, Edit journal (opens dialog). """
+
+        if self.file_ is None:
+            Message(self.app, _('Warning'), _("No file was selected"), "warning").exec()
+            return
+        cur = self.app.conn.cursor()
+        base_name = self.file_['name']
+        cur.execute("select jid, name from journal where name=? or name like ?",
+                    [base_name, base_name + "\\_%"])
+        existing = cur.fetchall()
+
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
+        action_create = None
+        action_edit = None
+        if existing:  # journal(s) already linked — only allow editing <- L
+            action_edit = menu.addAction(_("Edit journal"))
+        else:  # nno journals yet — only allow creation <- L
+            action_create = menu.addAction(_("Create new journal"))
+
+        action = menu.exec(self.ui.pushButton_journal.mapToGlobal(position))
+        if action is None:  # <- L
+            return  # <- L
+        if action == action_create:  # <- L
+            self._create_file_journal()  # <- L
+        elif action == action_edit:  # <- L
+            self._edit_file_journal()  # <- L'''
+
+    '''def _create_file_journal(self):  # <- L
+        """ Create a new journal with the same name as the file.
+        If a journal with that name exists, append _1, _2, etc.
+        Uses the custom journal editor dialog with context menu. """
+
+        if self.file_ is None:
+            return
+        cur = self.app.conn.cursor()
+        base_name = self.file_['name']
+        journal_name = base_name
+        # Check if name exists and find next available suffix
+        cur.execute("select name from journal where name=?", [journal_name])
+        if cur.fetchone() is not None:
+            suffix = 1
+            while True:
+                candidate = f"{base_name}_{suffix}"
+                cur.execute("select name from journal where name=?", [candidate])
+                if cur.fetchone() is None:
+                    journal_name = candidate
+                    break
+                suffix += 1
+        # Open journal editor dialog
+        dlg = DialogEditJournal(self.app, journal_name, "", self.file_)
+        ok = dlg.exec()
+        if not ok:
+            return
+        journal_text = dlg.get_text()
+        if not journal_text.strip():
+            return  # <- L do not create empty journals
+        now_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
+        cur.execute("insert into journal(name, jentry, owner, date) values(?,?,?,?)",
+                    (journal_name, journal_text, self.app.settings['codername'], now_date))
+        self.app.conn.commit()
+        self.app.delete_backup = False
+        self.parent_textEdit.append(_("Journal created: ") + journal_name)
+        self.file_journal_display_idx = -1  # reset cycle index
+        self.show_file_journal()  # refresh the read-only view'''
+
+    '''def _edit_file_journal(self):  # <- L
+        """ Edit an existing journal linked to the current file.
+        If multiple journals exist, let the user select which one to edit.
+        Opens a custom journal editor dialog with context menu options. """
+
+        if self.file_ is None:
+            return
+        cur = self.app.conn.cursor()
+        base_name = self.file_['name']
+        cur.execute("select jid, name, jentry from journal where name=? or name like ? order by name",
+                    [base_name, base_name + "\\_%"])
+        results = cur.fetchall()
+        if not results:
+            Message(self.app, _("Warning"), _("No journals found for this file."), "warning").exec()
+            return
+        # If only one journal, open it directly
+        if len(results) == 1:
+            jid = results[0][0]
+            j_name = results[0][1]
+            j_text = results[0][2] if results[0][2] else ""
+        else:
+            # Multiple journals: let user select which to edit
+            journal_list = [{'name': r[1], 'jid': r[0]} for r in results]
+            ui = DialogSelectItems(self.app, journal_list, _("Select journal to edit"), "single")
+            ok = ui.exec()
+            if not ok:
+                return
+            selected = ui.get_selected()
+            if not selected:
+                return
+            jid = selected['jid']
+            j_name = selected['name']
+            cur.execute("select jentry from journal where jid=?", [jid])
+            res = cur.fetchone()
+            j_text = res[0] if res and res[0] else ""
+        # Open journal editor dialog
+        dlg = DialogEditJournal(self.app, j_name, j_text, self.file_)
+        ok = dlg.exec()
+        if not ok:
+            return
+        new_text = dlg.get_text()
+        if new_text == j_text:  # no changes
+            return
+        now_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
+        cur.execute("update journal set jentry=?, date=? where jid=?",
+                    (new_text, now_date, jid))
+        self.app.conn.commit()
+        self.app.delete_backup = False
+        self.file_journal_display_idx = -1  # reset cycle index after edit
+        self.show_file_journal()  # refresh the read-only view'''
+            
     # Header section widgets
     def delete_all_codes_from_file(self):
         """ Delete all codes from this file by this coder. """
@@ -1195,27 +1490,27 @@ class DialogCodeText(QtWidgets.QWidget):
         action_mark = None
         action_not_important = None
         action_change_code = None
-        action_start_pos = None
-        action_end_pos = None
-        action_change_pos = None
         action_unmark = None
         action_new_code = None
         action_new_invivo_code = None
         submenu_ai_text_analysis = None
+        
+        # --- Handles experimental
+        action_show_handles = None
+        # ---
 
         # Can have multiple coded text at this position
         for item in self.code_text:
             if cursor.position() + self.file_['start'] >= item['pos0'] and cursor.position() <= item['pos1']:
                 action_unmark = QtGui.QAction(_("Unmark (U)"))
                 action_code_memo = QtGui.QAction(_("Memo coded text (M)"))
-                action_start_pos = QtGui.QAction(_("Change start position (SHIFT LEFT/ALT RIGHT)"))
-                action_end_pos = QtGui.QAction(_("Change end position (SHIFT RIGHT/ALT LEFT)"))
-                # action_change_pos = QtGui.QAction(_("Change code position key presses"))
+                # removed action_start_pos, action_end_pos, action_change_pos <- L
                 if item['important'] is None or item['important'] > 1:
                     action_important = QtGui.QAction(_("Add important mark (I)"))
                 if item['important'] == 1:
                     action_not_important = QtGui.QAction(_("Remove important mark"))
                 action_change_code = QtGui.QAction(_("Change code"))
+                action_show_handles = QtGui.QAction(_("Resize"))
         if selected_text != "":
             if self.ui.treeWidget.currentItem() is not None:
                 action_mark = menu.addAction(_("Mark (Q)"))
@@ -1235,14 +1530,14 @@ class DialogCodeText(QtWidgets.QWidget):
             menu.addAction(action_important)
         if action_not_important:
             menu.addAction(action_not_important)
-        if action_change_pos:
-            menu.addAction(action_change_pos)
-        if action_start_pos:
-            menu.addAction(action_start_pos)
-        if action_end_pos:
-            menu.addAction(action_end_pos)
         if action_change_code:
             menu.addAction(action_change_code)
+        
+        # --- Handles experimental
+        if action_show_handles:
+            menu.addAction(action_show_handles)
+        # ---
+       
         action_annotate = menu.addAction(_("Annotate (A)"))
         action_copy = menu.addAction(_("Copy to clipboard"))
         action_copy_metadata = menu.addAction(_("Copy with metadata"))
@@ -1303,12 +1598,6 @@ class DialogCodeText(QtWidgets.QWidget):
         if action == action_code_memo:
             self.coded_text_memo(cursor.position())
             return
-        if action == action_start_pos:
-            self.change_code_start_or_end_position(cursor.position(), "start")
-            return
-        if action == action_end_pos:
-            self.change_code_start_or_end_position(cursor.position(), "end")
-            return
         if action == action_set_bookmark:
             cur = self.app.conn.cursor()
             bookmark_pos = cursor.position() + self.file_['start']
@@ -1318,6 +1607,13 @@ class DialogCodeText(QtWidgets.QWidget):
         if action == action_change_code:
             self.change_code_to_another_code(cursor.position())
             return
+        
+        # ---  handlers experimental
+        if action == action_show_handles:
+            self.display_handles_for_code(cursor.position())
+            return
+        # ---
+        
         if action == action_show_top_groupbox:
             self.ui.groupBox.setVisible(True)
             return
@@ -1349,63 +1645,6 @@ class DialogCodeText(QtWidgets.QWidget):
         # Remaining actions will be the submenu codes
         self.recursive_set_current_item(self.ui.treeWidget.invisibleRootItem(), action.text())
         self.mark()
-
-    def change_code_start_or_end_position(self, position, start_or_end):
-        """ Change start or end pos of code.
-        Args:
-            position: Integer - text cursor position
-            start_or_end: String - 'start' or 'end'
-        """
-
-        if self.file_ is None:
-            return
-        coded_list = []
-        for item in self.code_text:
-            if item['pos0'] <= position + self.file_['start'] <= item['pos1']:
-                coded_list.append(item)
-        if not coded_list:
-            return
-        code_ = []
-        if len(coded_list) == 1:
-            code_ = coded_list[0]
-        # Multiple codes at this position to select from
-        if len(coded_list) > 1:
-            ui = DialogSelectItems(self.app, coded_list, _("Select codes"), "single")
-            ok = ui.exec()
-            if not ok:
-                return
-            code_ = ui.get_selected()
-        if not code_:
-            return
-
-        cur = self.app.conn.cursor()
-        length_sql = "select length(fulltext) from source where id=?"
-        cur.execute(length_sql, [self.file_['id']])
-        fulltext_length = cur.fetchone()[0]
-        title = f"Adjust code {start_or_end}"
-        adjustment, ok = QtWidgets.QInputDialog.getInt(self, title, code_['name'])
-        if not ok:
-            return
-        if start_or_end == "start":
-            code_['pos0'] += adjustment
-            if code_['pos0'] < 0:
-                code_['pos0'] = 0
-            if code_['pos0'] >= code_['pos1']:
-                code_['pos0'] = code_['pos1'] - 1
-        if start_or_end == "end":
-            code_['pos1'] += adjustment
-            if code_['pos1'] <= code_['pos0']:
-                code_['pos1'] = code_['pos0'] + 1
-            if code_['pos1'] > fulltext_length:
-                code_['pos1'] = fulltext_length - 1
-        text_sql = "select substr(fulltext,?,?), length(fulltext) from source where id=?"
-        cur.execute(text_sql, [code_['pos0'], code_['pos1'], self.file_['id']])
-        seltext = cur.fetchone()[0]
-        sql = "update code_text set pos0=?, pos1=?, seltext=? where ctid=?"
-        cur.execute(sql, [code_['pos0'], code_['pos1'], seltext, code_['ctid']])
-        self.app.conn.commit()
-        self.app.delete_backup = False
-        self.get_coded_text_update_eventfilter_tooltips()
 
     def mark_with_new_code(self, in_vivo=False):
         """ Create new code and mark selected text.
@@ -1864,6 +2103,29 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         category = ui.get_selected()
         try:
+            # Always record merge info in target category memo  <- L
+            source_cat = None
+            for c in self.categories:
+                if c['catid'] == catid:
+                    source_cat = c
+                    break
+            if source_cat is not None and category['catid'] is not None:
+                target_cat = None
+                for c in self.categories:
+                    if c['catid'] == category['catid']:
+                        target_cat = c
+                        break
+                if target_cat is not None:
+                    merge_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
+                    source_memo = (source_cat.get('memo', '') or '').strip()
+                    source_owner = source_cat.get('owner', self.app.settings['codername'])
+                    merged_block = f"\n\n[{_('Merged from category:')} {source_cat['name']}, {_('Coder:')} {source_owner}, {_('Merger date:')} {merge_date}]"  
+                    if source_memo:
+                        merged_block += f"\n{source_memo}"
+                    target_memo = target_cat.get('memo', '') or ''
+                    new_memo = (target_memo + merged_block).strip()
+                    cur.execute("update code_cat set memo=? where catid=?", [new_memo, category['catid']])
+                    target_cat['memo'] = new_memo 
             for code in self.codes:
                 if code['catid'] == catid:
                     cur.execute("update code_name set catid=? where catid=?", [category['catid'], catid])
@@ -2190,11 +2452,33 @@ class DialogCodeText(QtWidgets.QWidget):
         cursor.setCharFormat(fmt)
         self.apply_underline_to_overlaps()
 
+    # - def overlapping_codes_in_text(self):
+    # -    """ When coded text is clicked on.
+    # -    Only enabled if two or more codes are here.
+    # -    Adjust for when portion of full text file loaded.
+    # -    Called by: textEdit cursor position changed. """
+    # - 
+    # -    self.overlaps_at_pos = []
+    # -    self.overlaps_at_pos_idx = 0
+    # -    pos = self.ui.plainTextEdit.textCursor().position()
+    # -    for item in self.code_text:
+    # -        if item['pos0'] <= pos + self.file_['start'] <= item['pos1']:
+    # -            self.overlaps_at_pos.append(item)
+    # -    if len(self.overlaps_at_pos) < 2:
+    # -        self.overlaps_at_pos = []
+    # -        self.overlaps_at_pos_idx = 0
+            
+    # --- for handles experimental
+
     def overlapping_codes_in_text(self):
         """ When coded text is clicked on.
         Only enabled if two or more codes are here.
         Adjust for when portion of full text file loaded.
         Called by: textEdit cursor position changed. """
+
+        # Hide handles if the user clicks elsewhere in the editor
+        if hasattr(self, 'active_handles') and self.active_handles:
+            self.hide_resize_handles()
 
         self.overlaps_at_pos = []
         self.overlaps_at_pos_idx = 0
@@ -2207,107 +2491,615 @@ class DialogCodeText(QtWidgets.QWidget):
             self.overlaps_at_pos_idx = 0
 
     def export_option_selected(self):
-        """ ComboBox export option selected. """
-
-        export_option = self.ui.comboBox_export.currentText()
-        if export_option == "":
-            return
-        if export_option == "html":
-            self.export_html_file()
-        if export_option == "odt":
-            self.export_odt_file()
-        if export_option == "txt":
-            self.export_tagged_text()
-        self.ui.comboBox_export.setCurrentIndex(0)
-
-    def export_odt_file(self):
-        """ Export text to open document format with .odt ending.
-        QTextWriter supports plaintext, ODF and HTML.
-        Cannot export tooltips.
-        Called by export_option_selected
+        """ ComboBox export option selected.
+        Routes the expanded comboBox options to their corresponding export methods.
+        indexes:
+        0
+        1 odt highlight
+        2 odt comment
+        3 odt report
+        4 txt
+        5 html
+        6 codebook
         """
 
-        if len(self.ui.plainTextEdit.document().toPlainText()) == 0:
+        #export_option = self.ui.comboBox_export.currentText()
+        # Must use indexes not names for translations, if there are translations
+        index = self.ui.comboBox_export.currentIndex()
+        if index == 0:
             return
-        filename = f"{self.file_['name']}.odt"
+        if index == 1:
+            self.export_odt_file("highlight")
+        elif index == 2:
+            self.export_odt_file("comment")
+        elif index == 3:
+            self.export_odt_file("report")
+        elif index == 4:
+            self.export_tagged_text()
+        elif index == 5:
+            self.export_html_file()
+        elif index == 6:
+            self.export_codebook()
+        self.ui.comboBox_export.setCurrentIndex(0)
+
+    def export_odt_file(self, mode="highlight"):
+        """ Export text to open file format with .odt ending.
+        Args:
+            mode: String - 'highlight', 'comment', or 'report'
+        """
+
+        if self.file_ is None or self.ui.plainTextEdit.toPlainText() == "":
+            return
+        project_header, apa_cite = self._export_project_header()
+        filename = f"{self.file_['name']}_{mode}.odt"
         exp_dir = ExportDirectoryPathDialog(self.app, filename)
         filepath = exp_dir.filepath
         if filepath is None:
             return
+
+        plain_text = self.ui.plainTextEdit.document().toPlainText()
+        current_fid = self.file_['id']
+        offset = self.file_['start']
+        codes_in_file = [c for c in self.code_text if c['fid'] == current_fid]
+
+        # Build the file using QTextDocument
+        doc = QtGui.QTextDocument()
+        cursor = QtGui.QTextCursor(doc)
+
+        # Header: project + file name only
+        header_fmt = QtGui.QTextCharFormat()
+        header_fmt.setFontWeight(QtGui.QFont.Weight.Bold)
+        header_fmt.setFontPointSize(16)
+        cursor.insertText(project_header + "\n", header_fmt)
+        cursor.insertText(_("File: ") + self.file_['name'] + "\n", header_fmt)
+        now_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
+        cursor.insertText(_("Generated report: ") + now_date + "\n\n", header_fmt)
+        
+        norm_fmt = QtGui.QTextCharFormat()
+        norm_fmt.setFontPointSize(12)
+
+        # Content by mode
+        if mode == "highlight":
+            self._export_odt_highlighted(cursor, plain_text, codes_in_file, offset, norm_fmt)
+        elif mode == "comment":
+            self._export_odt_clean(filepath, plain_text, codes_in_file, offset)
+            return
+        elif mode == "report":
+            journal_text = None
+            cur = self.app.conn.cursor()
+            base_name = self.file_['name']
+            cur.execute("select name, jentry from journal where name=? or name like ?",
+                        [base_name, base_name + "\\_%"])
+            journal_results = cur.fetchall()
+            if journal_results:
+                # Combine all journals linked to this file
+                combined = ""
+                for jr in journal_results:
+                    j_name = jr[0]
+                    j_text = jr[1] if jr[1] else ""
+                    if j_text.strip():
+                        combined += f"── {j_name} ──\n{j_text}\n\n"
+                if combined.strip():
+                    reply = QtWidgets.QMessageBox.question(
+                        self, _("Include journal"),
+                        _("Journals are linked to this file. Include them in the report?"),
+                        QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No,
+                        QtWidgets.QMessageBox.StandardButton.Yes)
+                    if reply == QtWidgets.QMessageBox.StandardButton.Yes:
+                        journal_text = combined.strip()
+            self._export_odt_analytical(cursor, plain_text, codes_in_file, offset, norm_fmt, header_fmt, journal_text)
+
+        # Append citation at end (highlighted and analytical modes)
+        cite_fmt = QtGui.QTextCharFormat()
+        cite_fmt.setFontPointSize(12)
+        cite_label_fmt = QtGui.QTextCharFormat()
+        cite_label_fmt.setFontPointSize(12)
+        cite_label_fmt.setFontWeight(QtGui.QFont.Weight.Bold)
+        cursor.movePosition(QtGui.QTextCursor.MoveOperation.End)
+        cursor.insertText("\n\n", norm_fmt)
+        cursor.insertText(_("Software citation") + "\n", cite_label_fmt)
+        cursor.insertText(apa_cite + "\n", cite_fmt)
+        # Write file
         tw = QtGui.QTextDocumentWriter()
         tw.setFileName(filepath)
-        tw.setFormat(b'ODF')  # byte array needed for Windows 10
-        tw.write(self.ui.plainTextEdit.document())
+        tw.setFormat(b'ODF')
+        tw.write(doc)
         msg = _("Coded text file exported: ") + filepath
         self.parent_textEdit.append(msg)
         Message(self.app, _('Coded text file exported'), msg, "information").exec()
+    
+    # _export_project_header helper method #Now Footer
+    def _export_project_header(self):
+        """ Return project name and APA software citation string for export. """  
 
-    def export_html_file(self):
-        """ Export text to html file.
-        Called by export_option_selected.
+        project_name = os.path.basename(self.app.project_path).replace(".qda", "")  
+        header = f"{_('Project')}: {project_name}"
+        apa_cite = ("Curtain, C., & Dröge, K. (2026). QualCoder (Version 4.0) "  
+                    "[Computer software]. https://github.com/ccbogel/QualCoder/releases/")
+        return header, apa_cite
+        
+    # ODT highlighted mode
+    def _export_odt_highlighted(self, cursor, plain_text, codes_in_file, offset, norm_fmt):
+        """ ODT highlighted mode: full text with background-colored coded segments
+        and code name tags at the end of each segment. """
+
+        boundaries = {0, len(plain_text)}
+        for c in codes_in_file:
+            p0 = max(0, int(c['pos0']) - offset)
+            p1 = min(len(plain_text), int(c['pos1']) - offset)
+            boundaries.add(p0)
+            boundaries.add(p1)
+        boundaries = sorted(list(boundaries))
+
+        end_tags = {}
+        for c in codes_in_file:
+            p1 = min(len(plain_text), int(c['pos1']) - offset)
+            if p1 not in end_tags:
+                end_tags[p1] = []
+            end_tags[p1].append({'name': c['name'], 'color': c.get('color', '#cccccc')})
+
+        for i in range(len(boundaries) - 1):
+            b_start = boundaries[i]
+            b_end = boundaries[i + 1]
+            chunk_text = plain_text[b_start:b_end]
+            if not chunk_text:
+                continue
+            active_codes = []
+            for c in codes_in_file:
+                p0 = max(0, int(c['pos0']) - offset)
+                p1 = min(len(plain_text), int(c['pos1']) - offset)
+                if p0 <= b_start and p1 >= b_end:
+                    active_codes.append(c)
+            if not active_codes:
+                cursor.insertText(chunk_text, norm_fmt)
+            else:
+                fmt = QtGui.QTextCharFormat(norm_fmt)
+                color = active_codes[0].get('color', '#cccccc')
+                fmt.setBackground(QBrush(QColor(color)))
+                fg = TextColor(color).recommendation
+                fmt.setForeground(QBrush(QColor(fg)))
+                cursor.insertText(chunk_text, fmt)
+            if b_end in end_tags:
+                for tag in end_tags[b_end]:
+                    tag_fmt = QtGui.QTextCharFormat()
+                    tag_fmt.setBackground(QBrush(QColor(tag['color'])))
+                    fg = TextColor(tag['color']).recommendation
+                    tag_fmt.setForeground(QBrush(QColor(fg)))
+                    tag_fmt.setFontWeight(QtGui.QFont.Weight.Bold)
+                    tag_fmt.setFontPointSize(12)
+                    cursor.insertText(f" [{tag['name']}] ", tag_fmt)
+                del end_tags[b_end]
+    
+    # ODT clean reading mode
+    def _export_odt_clean(self, filepath, plain_text, codes_in_file, offset):
+        """ ODT clean reading mode: plain text with code names as native ODF
+        comments (annotations) spanning their corresponding coded segments.
+        Uses odfpy to produce a proper ODF file with ranged annotations.
         """
 
-        if len(self.ui.plainTextEdit.document().toPlainText()) == 0:
+        project_header, apa_cite = self._export_project_header()
+        doc = OpenDocumentText()
+
+        # Styles
+        header_st = odf_style.Style(name="ExportHeader", family="paragraph")
+        header_st.addElement(odf_style.TextProperties(fontsize="16pt", fontweight="bold"))
+        doc.styles.addElement(header_st)
+
+        normal_st = odf_style.Style(name="ExportNormal", family="paragraph")
+        normal_st.addElement(odf_style.TextProperties(fontsize="12pt"))
+        doc.styles.addElement(normal_st)
+
+        # Header
+        doc.text.addElement(odf_text.P(stylename=header_st, text=project_header))
+        doc.text.addElement(odf_text.P(stylename=header_st, text=_("File: ") + self.file_['name']))
+        report_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
+        doc.text.addElement(odf_text.P(stylename=header_st, text=_("Generated report: ") + report_date))
+        doc.text.addElement(odf_text.P(stylename=normal_st, text=""))
+
+        # Prepare annotation boundaries
+        ann_counter = 0
+        for c in codes_in_file:
+            c['_ann_name'] = f"code_{ann_counter}"
+            ann_counter += 1
+
+        ann_starts = {}
+        ann_ends = {}
+        for c in codes_in_file:
+            p0 = max(0, int(c['pos0']) - offset)
+            p1 = min(len(plain_text), int(c['pos1']) - offset)
+            ann_starts.setdefault(p0, []).append(c)
+            ann_ends.setdefault(p1, []).append(c)
+
+        boundaries = {0, len(plain_text)}
+        for c in codes_in_file:
+            boundaries.add(max(0, int(c['pos0']) - offset))
+            boundaries.add(min(len(plain_text), int(c['pos1']) - offset))
+        for i, ch in enumerate(plain_text):
+            if ch == '\n':
+                boundaries.add(i)
+                boundaries.add(i + 1)
+        boundaries = sorted(boundaries)
+
+        # Build ODF paragraphs
+        current_p = odf_text.P(stylename=normal_st)
+        now_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%dT%H:%M:%S")
+
+        for idx in range(len(boundaries) - 1):
+            b_start = boundaries[idx]
+            b_end = boundaries[idx + 1]
+            chunk = plain_text[b_start:b_end]
+
+            if chunk == '\n':
+                doc.text.addElement(current_p)
+                current_p = odf_text.P(stylename=normal_st)
+                continue
+
+            if b_start in ann_starts:
+                for c in ann_starts[b_start]:
+                    ann = odf_office.Annotation(name=c['_ann_name'])
+                    if (DRAWNS, 'name') in ann.attributes:
+                        del ann.attributes[(DRAWNS, 'name')]
+                    ann.attributes[(OFFICENS, 'name')] = c['_ann_name']
+                    ann.addElement(odf_dc.Creator(text=c.get('owner', '')))
+                    ann.addElement(odf_dc.Date(text=now_date))
+                    comment_text = c['name']
+                    if c.get('memo') and str(c['memo']).strip():
+                        comment_text += "\nMemo: " + str(c['memo'])
+                    ann.addElement(odf_text.P(text=comment_text))
+                    current_p.addElement(ann)
+
+            if chunk:
+                current_p.addText(chunk)
+
+            if b_end in ann_ends:
+                for c in ann_ends[b_end]:
+                    current_p.addElement(odf_office.AnnotationEnd(name=c['_ann_name']))
+
+        doc.text.addElement(current_p)
+
+        # Save
+        doc.save(filepath)
+        msg = _("Coded text file exported: ") + filepath
+        self.parent_textEdit.append(msg)
+        Message(self.app, _('Coded text file exported'), msg, "information").exec()         
+        
+    # ODT analytical report
+    def _export_odt_analytical(self, cursor, plain_text, codes_in_file, offset, norm_fmt, title_fmt, journal_text=None):
+        """ ODT analytical report: frequency table, co-occurrence table, 
+        coded segments with memos, highlighted full file, and optional journal. """ 
+
+        from collections import defaultdict  
+        total_chars = max(len(plain_text), 1)  
+
+        code_memo_lookup = {c['cid']: c.get('memo', '') for c in self.codes} 
+        cat_lookup = {c['catid']: c['name'] for c in self.categories}
+        code_cat_lookup = {}
+        for c in self.codes:
+            if c.get('catid') and c['catid'] in cat_lookup:
+                code_cat_lookup[c['cid']] = cat_lookup[c['catid']]
+
+        seg_co_occurrences = defaultdict(set)
+        for i, c1 in enumerate(codes_in_file): 
+            for j, c2 in enumerate(codes_in_file): 
+                if j <= i or c1['cid'] == c2['cid']:  
+                    continue 
+                if c1['pos0'] < c2['pos1'] and c2['pos0'] < c1['pos1']:  
+                    seg_co_occurrences[(c1['pos0'], c1['pos1'], c1['cid'])].add(c2['name'])  
+                    seg_co_occurrences[(c2['pos0'], c2['pos1'], c2['cid'])].add(c1['name'])  
+
+        title_fmt = QtGui.QTextCharFormat()
+        title_fmt.setFontPointSize(14)
+        title_fmt.setFontWeight(QtGui.QFont.Weight.Bold)
+        norm_fmt = QtGui.QTextCharFormat()
+        norm_fmt.setFontPointSize(12)
+        it_fmt = QtGui.QTextCharFormat()
+        it_fmt.setFontItalic(True)
+        it_fmt.setFontPointSize(12)
+        bold_fmt = QtGui.QTextCharFormat()
+        bold_fmt.setFontPointSize(12)
+        bold_fmt.setFontWeight(QtGui.QFont.Weight.Bold)
+
+        table_fmt = QtGui.QTextTableFormat()
+        table_fmt.setBorder(0.5)
+        table_fmt.setCellPadding(4)
+        table_fmt.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft)
+
+        head_fmt = QtGui.QTextCharFormat()
+        head_fmt.setFontWeight(QtGui.QFont.Weight.Bold)
+        head_fmt.setFontPointSize(12)
+        head_fmt.setBackground(QBrush(QColor("#e0e0e0")))
+
+        # 1. CODE FREQUENCY TABLE
+        cursor.insertText(_("Code Frequency Table") + "\n\n", title_fmt)
+        code_stats = {}
+        for c in codes_in_file:
+            c_name = c['name']
+            c_len = c['pos1'] - c['pos0']
+            if c_name not in code_stats:
+                code_stats[c_name] = {
+                    'cid': c['cid'], 'color': c.get('color', '#cccccc'),
+                    'len': 0, 'freq': 0, 'owners': set(),
+                    'first_date': c.get('date', ''), 'last_date': c.get('date', '')
+                }
+            code_stats[c_name]['len'] += c_len
+            code_stats[c_name]['freq'] += 1
+            code_stats[c_name]['owners'].add(c['owner'])
+            c_date = c.get('date', '')
+            if c_date and c_date < code_stats[c_name]['first_date']:
+                code_stats[c_name]['first_date'] = c_date
+            if c_date and c_date > code_stats[c_name]['last_date']:
+                code_stats[c_name]['last_date'] = c_date
+
+        freq_rows = len(code_stats) + 1
+        freq_table = cursor.insertTable(freq_rows, 5, table_fmt)
+        freq_headers = [_("Code"), _("Frequency / Coverage"), _("Coder(s)"),
+                        _("First coded"), _("Last coded")]
+        for col, text in enumerate(freq_headers): 
+            freq_table.cellAt(0, col).firstCursorPosition().insertText(text, head_fmt) 
+
+        row = 1  
+        for c_name, stats in sorted(code_stats.items()):  
+            cell_cursor = freq_table.cellAt(row, 0).firstCursorPosition() 
+            c_fmt = QtGui.QTextCharFormat()
+            c_fmt.setFontPointSize(12)
+            c_fmt.setBackground(QBrush(QColor(stats['color'])))
+            fg = TextColor(stats['color']).recommendation
+            c_fmt.setForeground(QBrush(QColor(fg)))
+            cell_cursor.insertText(c_name, c_fmt)
+            perc = (stats['len'] / total_chars) * 100
+            freq_table.cellAt(row, 1).firstCursorPosition().insertText(
+                f"{stats['freq']} ({perc:.1f}%)", norm_fmt)
+            freq_table.cellAt(row, 2).firstCursorPosition().insertText(
+                ", ".join(sorted(stats['owners'])), norm_fmt)
+            first_d = stats['first_date'][:16] if stats['first_date'] else ""
+            last_d = stats['last_date'][:16] if stats['last_date'] else ""
+            freq_table.cellAt(row, 3).firstCursorPosition().insertText(first_d, norm_fmt)
+            freq_table.cellAt(row, 4).firstCursorPosition().insertText(last_d, norm_fmt)
+            row += 1
+
+        cursor.movePosition(QtGui.QTextCursor.MoveOperation.End)
+
+        # 2. CODE CO-OCCURRENCES
+        cursor.insertText("\n\n" + _("Code Co-occurrences") + "\n\n", title_fmt)
+        co_occur = defaultdict(int)
+        for i, c1 in enumerate(codes_in_file):
+            for j, c2 in enumerate(codes_in_file):
+                if j <= i or c1['cid'] == c2['cid']:
+                    continue
+                if c1['pos0'] < c2['pos1'] and c2['pos0'] < c1['pos1']:
+                    pair = tuple(sorted([c1['name'], c2['name']]))
+                    co_occur[pair] += 1
+
+        if co_occur:
+            co_rows = len(co_occur) + 1
+            co_table = cursor.insertTable(co_rows, 3, table_fmt)
+            co_headers = [_("Code A"), _("Code B"), _("Co-occurrence frequency")]
+            for col, text in enumerate(co_headers):
+                co_table.cellAt(0, col).firstCursorPosition().insertText(text, head_fmt)
+            r = 1
+            for pair, count in sorted(co_occur.items(), key=lambda x: -x[1]):
+                co_table.cellAt(r, 0).firstCursorPosition().insertText(pair[0], norm_fmt)
+                co_table.cellAt(r, 1).firstCursorPosition().insertText(pair[1], norm_fmt)
+                co_table.cellAt(r, 2).firstCursorPosition().insertText(str(count), norm_fmt)
+                r += 1
+            cursor.movePosition(QtGui.QTextCursor.MoveOperation.End)
+        else:
+            cursor.insertText(_("No co-occurrences found in this file.") + "\n", norm_fmt)
+
+        # 3. CODES AND MEMOS TABLE
+        cursor.insertText("\n\n" + _("Codes and Memos") + "\n\n", title_fmt)
+        codes_with_memos = {}
+        for c in codes_in_file:
+            cid = c['cid']
+            if cid not in codes_with_memos:
+                codes_with_memos[cid] = {
+                    'name': c['name'],
+                    'color': c.get('color', '#cccccc'),
+                    'memo': code_memo_lookup.get(cid, ''),
+                    'category': code_cat_lookup.get(cid, '')
+                }
+        if codes_with_memos:
+            cm_rows = len(codes_with_memos) + 1
+            cm_table = cursor.insertTable(cm_rows, 3, table_fmt)
+            cm_headers = [_("Code"), _("Category"), _("Memo")]
+            for col, text in enumerate(cm_headers):
+                cm_table.cellAt(0, col).firstCursorPosition().insertText(text, head_fmt)
+            cm_row = 1
+            for cid, info in sorted(codes_with_memos.items(), key=lambda x: x[1]['name']):
+                c_fmt = QtGui.QTextCharFormat()
+                c_fmt.setFontPointSize(12)
+                c_fmt.setBackground(QBrush(QColor(info['color'])))
+                fg = TextColor(info['color']).recommendation
+                c_fmt.setForeground(QBrush(QColor(fg)))
+                cm_table.cellAt(cm_row, 0).firstCursorPosition().insertText(info['name'], c_fmt)
+                cm_table.cellAt(cm_row, 1).firstCursorPosition().insertText(info['category'], norm_fmt)
+                memo_text = info['memo'] if info['memo'] else _("No memo")
+                # Replace newlines and common separators to keep memo in a single cell
+                memo_text = memo_text.replace('\r\n', ' | ').replace('\n', ' | ').replace('\r', ' | ')  
+                cm_table.cellAt(cm_row, 2).firstCursorPosition().insertText(memo_text, norm_fmt)
+                cm_row += 1
+            cursor.movePosition(QtGui.QTextCursor.MoveOperation.End)
+        # Separator between codes table and individual coded segments
+        cursor.insertText("\n\n", norm_fmt)
+        separator_fmt = QtGui.QTextCharFormat()
+        separator_fmt.setFontPointSize(14)
+        separator_fmt.setFontWeight(QtGui.QFont.Weight.Bold)
+        cursor.insertText(_("Coded Segments") + "\n", separator_fmt)
+        cursor.insertText("\n", norm_fmt)
+        codes_sorted = sorted(codes_in_file, key=lambda x: x['pos0'])
+        for c in codes_sorted:
+            p0 = max(0, int(c['pos0']) - offset)
+            p1 = min(len(plain_text), int(c['pos1']) - offset)
+            seg = plain_text[p0:p1]
+            cat_name = code_cat_lookup.get(c['cid'], '')
+
+            color = c.get('color', '#cccccc')
+            fg = TextColor(color).recommendation
+            c_header_fmt = QtGui.QTextCharFormat()
+            c_header_fmt.setFontPointSize(12)
+            c_header_fmt.setBackground(QBrush(QColor(color)))
+            c_header_fmt.setForeground(QBrush(QColor(fg)))
+            c_header_bold = QtGui.QTextCharFormat(c_header_fmt)
+            c_header_bold.setFontWeight(QtGui.QFont.Weight.Bold)
+
+            cursor.insertText(f"[{c['pos0']}-{c['pos1']}] ", c_header_bold)
+            if cat_name:
+                cursor.insertText(f"{_('Category')}: {cat_name}, ", c_header_fmt)
+            cursor.insertText(f"{_('Code')}: {c['name']}", c_header_fmt)
+            if c.get('important') == 1:
+                cursor.insertText(" ★", c_header_bold)
+            coding_datetime = c.get('date', '')[:16] if c.get('date') else ''  
+            cursor.insertText(f",  {_('Coder')}: {c['owner']} ({coding_datetime})", c_header_fmt)
+            cursor.insertText("\n", norm_fmt)
+            cursor.insertText("\n", norm_fmt)
+            cursor.insertText(seg, it_fmt)
+            cursor.insertText("\n\n", norm_fmt)
+
+            coded_memo = c.get('memo', '')
+            if coded_memo and str(coded_memo).strip():
+                cursor.insertText(f"[{_('Coded memo')}: {coded_memo}]\n", norm_fmt)
+            else:  
+                cursor.insertText(f"[{_('Coded memo')}: {_('No coded memo')}]\n", norm_fmt)
+
+            co_key = (c['pos0'], c['pos1'], c['cid'])
+            co_codes = seg_co_occurrences.get(co_key, set())
+            if co_codes:
+                cursor.insertText(f"[{_('Co-occurring codes')}: {', '.join(sorted(co_codes))}]\n", norm_fmt)
+            cursor.insertText("\n", norm_fmt)
+
+        # 5. HIGHLIGHTED FULL FILE <- L #20260325
+        cursor.insertText("\n\n", norm_fmt)
+        cursor.insertText("\n", norm_fmt)
+        cursor.insertText(_("Full File (highlight)") + "\n\n", title_fmt)
+        self._export_odt_highlighted(cursor, plain_text, codes_in_file, offset, norm_fmt)
+
+        # 6. FILE MEMO
+        if self.file_ and self.file_.get('memo', '').strip():
+            cursor.movePosition(QtGui.QTextCursor.MoveOperation.End)
+            cursor.insertText("\n\n" + _("File Memo") + "\n\n", title_fmt)
+            cursor.insertText(self.file_['memo'] + "\n", norm_fmt)
+
+        # 7. FILE JOURNAL (if provided)
+        if journal_text:
+            cursor.movePosition(QtGui.QTextCursor.MoveOperation.End)
+            cursor.insertText("\n\n" + _("File Journal") + "\n\n", title_fmt)
+            cursor.insertText(journal_text + "\n", norm_fmt)
+            
+    # Export text to an HTML file with highlighted coded segments and code name tags
+    def export_html_file(self):
+        """ Export text to an HTML file with highlighted coded segments and code name tags,
+        matching the structure of the ODT highlighted export. """
+ 
+        if self.file_ is None or self.ui.plainTextEdit.toPlainText() == "":
             return
+        project_header, apa_cite = self._export_project_header()
         plain_text = self.ui.plainTextEdit.document().toPlainText()
-        # Prepare code text with name and ordering
-        code_text2 = deepcopy(self.code_text)
-        code_ids_used = []
-        for ct in code_text2:
-            for c in self.codes:
-                if ct['cid'] == c['cid']:
-                    ct['codename'] = html.escape(c['name'])
-                    code_ids_used.append(c['cid'])
-                    break
-        code_ids_used = list(set(code_ids_used))
-
-        # Prepare html text
-        html_text = '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">\
-        <html><head><meta charset="utf-8" /></head>\
-        <body style=" font-family:"Noto Sans"; font-size:10pt; font-weight:400; font-style:normal;">'
-        for i, c in enumerate(plain_text):
-            if c == "\n":
-                c = "<br />\n"
+        current_fid = self.file_['id']
+        offset = self.file_['start']
+        codes_in_file = [c for c in self.code_text if c['fid'] == current_fid]
+ 
+        boundaries = {0, len(plain_text)}
+        for c in codes_in_file:
+            p0 = max(0, int(c['pos0']) - offset)
+            p1 = min(len(plain_text), int(c['pos1']) - offset)
+            boundaries.add(p0)
+            boundaries.add(p1)
+        boundaries = sorted(list(boundaries))
+ 
+        end_tags = {}
+        for c in codes_in_file:
+            p1 = min(len(plain_text), int(c['pos1']) - offset)
+            if p1 not in end_tags:
+                end_tags[p1] = []
+            end_tags[p1].append({'name': c['name'], 'color': c.get('color', '#cccccc'),
+                                 'memo': c.get('memo', '')})
+ 
+        html_chunks = []
+        for i in range(len(boundaries) - 1):
+            b_start = boundaries[i]
+            b_end = boundaries[i + 1]
+            chunk_text = plain_text[b_start:b_end]
+            if not chunk_text:
+                continue
+            safe_text = html.escape(chunk_text).replace('\n', '<br>\n')
+            active_codes = []
+            for c in codes_in_file:
+                p0 = max(0, int(c['pos0']) - offset)
+                p1 = min(len(plain_text), int(c['pos1']) - offset)
+                if p0 <= b_start and p1 >= b_end:
+                    active_codes.append(c)
+            if not active_codes:
+                html_chunks.append(safe_text)
             else:
-                if c in entities.keys():
-                    c = entities[c]  # html.escape(c)
-            for ct in code_text2:
-                if ct['pos0'] == i:
-                    title = ct['codename']
-                    if ct['important'] == 1:
-                        title += "\nIMPORTANT"
-                    if ct['memo'] is not None and ct['memo'] != "":
-                        title += f"\nMEMO: {ct['memo']}"
-                    html_text += f'<span title="{title}" style="color:#000000; background-color:{ct["color"]};">'
-                if ct['pos1'] == i:
-                    html_text += "</span>"
-            html_text += c  # Some encoding issues, e.g. the Euro symbol
-        # Add Codes list
-        codes_directory = []
-        for cd in self.codes:
-            if cd['cid'] in code_ids_used:
-                category = None
-                for cat in self.categories:
-                    if cd['catid'] == cat['catid']:
-                        category = cat['name']
-                codes_directory.append([cd['name'], cd['color'], cd['memo'], category])
-        html_text += "<br /><br /><h2>Codes list</h2>\n"
-        for cd in codes_directory:
-            html_text += f'<p><span style="background-color:{cd[1]}">&nbsp;&nbsp;&nbsp;</span> &nbsp;<b>{cd[0]}</b>'
-            if cd[3] is not None:
-                html_text += f"&nbsp;CATEGORY: {cd[3]}"
-            if cd[2] != "":
-                html_text += f"&nbsp;&nbsp;CODE MEMO: {cd[2]}"
-            html_text += '</p>'
-
-        html_text += "\n</body></html>"
+                color = active_codes[0].get('color', '#cccccc')
+                fg = TextColor(color).recommendation
+                titles = []
+                for ac in active_codes:
+                    t = html.escape(ac['name'])
+                    if ac.get('memo'):
+                        t += f" — Memo: {html.escape(str(ac['memo']))}"
+                    titles.append(t)
+                title_attr = html.escape(" | ".join(titles))
+                span = (f'<span style="background-color:{color};color:{fg};" '
+                        f'title="{title_attr}">{safe_text}</span>')
+                html_chunks.append(span)
+            if b_end in end_tags:
+                for tag in end_tags[b_end]:
+                    fg = TextColor(tag['color']).recommendation
+                    tag_html = (f'<span style="background-color:{tag["color"]};color:{fg};'
+                                f'font-weight:bold;font-size:12pt;padding:1px 3px;'
+                                f'border-radius:2px;margin:0 2px;">'
+                                f'[{html.escape(tag["name"])}]</span>')
+                    html_chunks.append(tag_html)
+                del end_tags[b_end]
+ 
+        html_body = "".join(html_chunks)
+        escaped_name = html.escape(self.file_['name'])
+        escaped_header = html.escape(project_header)
+        escaped_apa = html.escape(apa_cite)
+        final_html = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{escaped_header} — {escaped_name}</title>
+    <style>
+        body {{ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+               max-width: 900px; margin: 40px auto; padding: 20px;
+               line-height: 1.8; font-size: 12px; color: #333;
+               background-color: #f9f9f9; }}
+        .header {{ border-bottom: 2px solid #2c3e50; padding-bottom: 15px;
+                   margin-bottom: 25px; }}
+        .header h1 {{ font-size: 1.4em; margin: 0; color: #2c3e50; }}
+        .header h2 {{ font-size: 1.1em; margin: 10px 0 0 0; color: #555; }}
+        .content {{ background: white; padding: 30px; border-radius: 6px;
+                    box-shadow: 0 1px 4px rgba(0,0,0,0.08); }}
+        span[title] {{ cursor: help; border-radius: 2px; padding: 1px 0; }}
+        .footer {{ margin-top:30px; padding-top:10px; border-top:1px solid #ccc;
+                   font-size:12pt; color:#666; }}
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>{escaped_header}</h1>
+        <h2>{_("File:")} {escaped_name}</h2>
+    </div>
+    <div class="content">
+        {html_body}
+    </div>
+    <div class="footer">
+        <b>{_("Software citation")}</b><br>
+        {escaped_apa}
+    </div>
+</body>
+</html>"""
+ 
         html_filename = self.file_['name'] + ".html"
         exp_dir = ExportDirectoryPathDialog(self.app, html_filename)
         filepath = exp_dir.filepath
         if filepath is None:
             return
-        with open(filepath, 'w') as html_file:
-            html_file.write(html_text)
+        with open(filepath, 'w', encoding='utf-8') as f:
+            f.write(final_html)
         msg = _("Coded text file exported to: ") + filepath
         self.parent_textEdit.append(msg)
         Message(self.app, _('Coded html file exported'), msg, "information").exec()
@@ -2316,8 +3108,10 @@ class DialogCodeText(QtWidgets.QWidget):
         """ Export a text file with code tags.
          code tags are surrounded by double braces:
          {{codename{{some coded text}}codename}}. """
-
+ 
         if len(self.ui.plainTextEdit.document().toPlainText()) == 0:
+            return
+        if self.file_ is None:
             return
         plain_text = self.ui.plainTextEdit.document().toPlainText()
         # Prepare code text with name and ordering
@@ -2330,7 +3124,7 @@ class DialogCodeText(QtWidgets.QWidget):
                     code_ids_used.append(c['cid'])
                     break
         code_ids_used = list(set(code_ids_used))
-
+ 
         # Prepare text
         tagged_text = ""
         for i, c in enumerate(plain_text):
@@ -2340,6 +3134,12 @@ class DialogCodeText(QtWidgets.QWidget):
                 if ct['pos1'] == i:
                     tagged_text += "}}" + ct['codename'] + "}}"
             tagged_text += c
+ 
+        # Add project header
+        project_header, apa_cite = self._export_project_header()  # footer
+        tagged_text = (f"{project_header}\n{_('File:')} {self.file_['name']}\n\n"
+                       f"{tagged_text}\n")
+ 
         # Add Codes list
         codes_list = []
         for cd in self.codes:
@@ -2349,25 +3149,68 @@ class DialogCodeText(QtWidgets.QWidget):
                     if cd['catid'] == cat['catid']:
                         category = cat['name']
                 codes_list.append([cd['name'], cd['memo'], category])
-        tagged_text += "\n\n\nCODES LIST\n"
+        tagged_text += "\n\n\n" + _("CODES LIST") + "\n"
         for cd in codes_list:
             tagged_text += cd[0]
             if cd[2] is not None:
-                tagged_text += f" -- CATEGORY: {cd[2]}"
+                tagged_text += f" -- {_('CATEGORY')}: {cd[2]}"
             if cd[1] != "":
-                tagged_text += f" -- CODE MEMO: {cd[1]}"
+                tagged_text += f" -- {_('CODE MEMO')}: {cd[1]}"
             tagged_text += '\n'
-
-        filename = self.file_['name'] + "_tagged.txt"
-        exp_dir = ExportDirectoryPathDialog(self.app, filename)
+ 
+        # Citation at end
+        tagged_text += f"\n\n{_('Software citation')}\n{apa_cite}\n"
+ 
+        export_filename = self.file_['name'] + "_tagged.txt"
+        exp_dir = ExportDirectoryPathDialog(self.app, export_filename)
         filepath = exp_dir.filepath
         if filepath is None:
             return
-        with open(filepath, 'w') as text_file:
+        with open(filepath, 'w', encoding='utf-8') as text_file:
             text_file.write(tagged_text)
         msg = _("Coded text file exported to: ") + filepath
         self.parent_textEdit.append(msg)
         Message(self.app, _('Coded text file exported'), msg, "information").exec()
+        
+    # Export a codebook text file
+    def export_codebook(self):
+        """ Export a codebook text file with only codes used in the current file.
+        Format: Category>>CodeName[TAB]Memo """
+
+        if self.file_ is None:
+            return
+        cur = self.app.conn.cursor()
+        cur.execute("select distinct cid from code_text where fid=?", [self.file_['id']])
+        used_cids = [r[0] for r in cur.fetchall()]
+        if not used_cids:
+            Message(self.app, _("No codes"),
+                    _("This file has no assigned codes to export."), "information").exec()
+            return
+        lines = []
+        for cid in used_cids:
+            for code in self.codes:
+                if code['cid'] == cid:
+                    cat_path = ""
+                    if code['catid'] is not None:
+                        for cat in self.categories:
+                            if cat['catid'] == code['catid']:
+                                cat_path = cat['name'] + " >> "
+                                break
+                    memo = str(code.get('memo', '')).replace('\n', ' ').strip()
+                    lines.append(f"{cat_path}{code['name']}\t{memo}")
+                    break
+        lines.sort()
+        text_content = "\n".join(lines)
+        filename = self.file_['name'] + "_codebook.txt"
+        exp_dir = ExportDirectoryPathDialog(self.app, filename)
+        filepath = exp_dir.filepath
+        if filepath is None:
+            return
+        with open(filepath, 'w', encoding='utf-8') as f:
+            f.write(text_content)
+        msg = _("Codebook exported to: ") + filepath
+        self.parent_textEdit.append(msg)
+        Message(self.app, _('Codebook exported'), msg, "information").exec()
 
     def eventFilter(self, object_, event):
         """ Using this event filter to identify treeWidgetItem drop events.
@@ -2795,6 +3638,23 @@ class DialogCodeText(QtWidgets.QWidget):
         cur = self.app.conn.cursor()
         old_cid = item['cid']
         new_cid = int(parent.text(1).split(':')[1])
+        # Always record merge info in target code memo  <- L
+        target_code = None
+        for c in self.codes:
+            if c['cid'] == new_cid:
+                target_code = c
+                break
+        if target_code is not None:
+            merge_date = datetime.datetime.now().astimezone().strftime("%Y-%m-%d %H:%M:%S")
+            source_memo = item.get('memo', '').strip()
+            source_owner = item.get('owner', self.app.settings['codername'])
+            merged_block = f"\n\n[{_('Merged from code:')} {item['name']}, {_('Coder:')} {source_owner}, {_('Merger date:')} {merge_date}]"  
+            if source_memo:
+                merged_block += f"\n{source_memo}"
+            target_memo = target_code.get('memo', '') or ''
+            new_memo = (target_memo + merged_block).strip()
+            cur.execute("update code_name set memo=? where cid=?", [new_memo, new_cid])
+            target_code['memo'] = new_memo
         # Update cid for each coded segment in text, av, image. Delete where there is an Integrity error
         ct_sql = "select ctid from code_text where cid=?"
         cur.execute(ct_sql, [old_cid])
@@ -3267,7 +4127,7 @@ class DialogCodeText(QtWidgets.QWidget):
             doc_path = self.file_['mediapath'][5:]
             webbrowser.open(doc_path)
             return
-        logger.error("Cannot open text file in browser " + self.file_['mediapath'])
+        logger.error(_("Cannot open text file in browser ") + self.file_['mediapath'])
         print(f"code_text.view_original_text_file. Cannot open text file in browser {self.file_['mediapath']}")
 
     def show_case_files(self):
@@ -3558,9 +4418,12 @@ class DialogCodeText(QtWidgets.QWidget):
             view_file_dialog, context_menu
         param: file_ : dictionary of name, id, memo, characters, start, end, fulltext
         """
-
+        '''# Save pending journal and reload on file switch in load_file <- L
         if file_ is None:
             return
+        # Clear journal state when switching files <- L
+        self.file_journal_jids = []  # <- L
+        self.file_journal_display_idx = -1  # <- L reset cycle index'''
         self.ui.listWidget.blockSignals(True)
         for x in range(self.ui.listWidget.count()):
             if self.ui.listWidget.item(x).text() == file_['name']:
@@ -3608,6 +4471,9 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.checkBox_search_case.setEnabled(True)
         self.ui.checkBox_search_all_files.setEnabled(True)
         # self.search_for_text()
+        '''# Reload linked journal if the right pane was showing one <- L
+        if not self.project_memo and not self.code_rule:  # <- L
+            self.show_file_journal()  # <- L will silently do nothing if no journal exists '''
 
     def get_coded_text_update_eventfilter_tooltips(self):
         """ Called by load_file, and from other dialogs on update.
@@ -3654,7 +4520,7 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         cursor = self.ui.plainTextEdit.textCursor()
         cursor.setPosition(0, QtGui.QTextCursor.MoveMode.MoveAnchor)
-        cursor.setPosition(len(self.text) - 1, QtGui.QTextCursor.MoveMode.KeepAnchor)
+        cursor.setPosition(len(self.text), QtGui.QTextCursor.MoveMode.KeepAnchor) # MODIFIED (removido el - 1)
         cursor.setCharFormat(QtGui.QTextCharFormat())
 
     def highlight(self):
@@ -4460,7 +5326,7 @@ class DialogCodeText(QtWidgets.QWidget):
             print(err)
             self.app.conn.rollback()  # Revert all changes
             logger.error(f"auto_code rollback. {err}")
-            self.parent_textEdit.append(_("Autocoding error: ") + str(e_))
+            self.parent_textEdit.append(_("Autocoding error: ") + str(err))
             # undo_list = []
             raise
         if len(undo_list) > 0:
@@ -5366,9 +6232,9 @@ class DialogCodeText(QtWidgets.QWidget):
             self.ai_search_listview_action_label.setToolTip('')
             self.ai_search_listview_action_label.setVisible(False)
             if self.app.ai.ai_async_is_errored:
-                action_item.setText('(search aborted due to an error)')
+                action_item.setText(_('(search aborted due to an error)'))
             else:
-                action_item.setText('(search finished)')
+                action_item.setText(_('(search finished)'))
 
     def ai_search_list_clicked(self):
         """ Checks if the special action item at the end of the list was clicked 
@@ -5542,6 +6408,103 @@ class DialogCodeText(QtWidgets.QWidget):
 
         return best_doc
 
+# --- handles experimental
+    def display_handles_for_code(self, position):
+        """ Display interactive drag handles to resize a code's boundaries. """
+
+        if self.file_ is None:
+            return
+        coded_text_list = []
+        for item in self.code_text:
+            if item['pos0'] <= position + self.file_['start'] <= item['pos1']:
+                coded_text_list.append(item)
+        if not coded_text_list:
+            return
+        
+        code_to_handle = coded_text_list[-1]
+        if len(coded_text_list) > 1:
+            ui = DialogSelectItems(self.app, coded_text_list, _("Select code to resize"), "single")
+            if ui.exec():
+                code_to_handle = ui.get_selected()
+            else:
+                return
+
+        self.hide_resize_handles()
+
+        # Create start handle
+        cursor_start = self.ui.plainTextEdit.textCursor()
+        cursor_start.setPosition(max(0, code_to_handle['pos0'] - self.file_['start']))
+        rect_start = self.ui.plainTextEdit.cursorRect(cursor_start)
+        h_start = CodeResizeHandle(self.ui.plainTextEdit, True, code_to_handle, self)
+        h_start.move(rect_start.x() - 6, rect_start.y() + 2)
+        self.active_handles.append(h_start)
+
+        # Create end handle
+        cursor_end = self.ui.plainTextEdit.textCursor()
+        cursor_end.setPosition(min(len(self.ui.plainTextEdit.toPlainText()), code_to_handle['pos1'] - self.file_['start']))
+        rect_end = self.ui.plainTextEdit.cursorRect(cursor_end)
+        h_end = CodeResizeHandle(self.ui.plainTextEdit, False, code_to_handle, self)
+        h_end.move(rect_end.x() - 6, rect_end.y() + 2)
+        self.active_handles.append(h_end)
+
+    def hide_resize_handles(self):
+        """ Remove all active resize handles from the screen. """
+        for h in getattr(self, 'active_handles', []):
+            h.hide()
+            h.deleteLater()
+        self.active_handles = []
+
+    def update_code_position_from_handle(self, code_item, new_pos, is_start, orig_pos0, orig_pos1):
+        """ Receive final drop coordinates from a handle and update the database. """
+        if is_start:
+            if new_pos >= code_item['pos1']:
+                code_item['pos0'] = orig_pos0  # Revert visually
+                self.hide_resize_handles()
+                self.unlight()
+                self.highlight()
+                return
+            code_item['pos0'] = new_pos
+        else:
+            if new_pos <= code_item['pos0']:
+                code_item['pos1'] = orig_pos1  # Revert visually
+                self.hide_resize_handles()
+                self.unlight()
+                self.highlight()
+                return
+            code_item['pos1'] = new_pos
+
+        cur = self.app.conn.cursor()
+        cur.execute("select substr(fulltext,?,?) from source where id=?",
+                    [code_item['pos0'] + 1, code_item['pos1'] - code_item['pos0'], code_item['fid']])
+        res = cur.fetchone()
+        
+        if not res:
+            # Revert on extraction error
+            code_item['pos0'] = orig_pos0
+            code_item['pos1'] = orig_pos1
+            self.hide_resize_handles()
+            self.unlight()
+            self.highlight()
+            return
+            
+        seltext = res[0]
+
+        try:
+            sql = "update code_text set pos0=?, pos1=?, seltext=? where ctid=?"
+            cur.execute(sql, [code_item['pos0'], code_item['pos1'], seltext, code_item['ctid']])
+            self.app.conn.commit()
+            self.app.delete_backup = False
+        except sqlite3.IntegrityError:
+            self.app.conn.rollback()
+            # Revert in-memory positions to undo temporary highlight
+            code_item['pos0'] = orig_pos0
+            code_item['pos1'] = orig_pos1
+            Message(self.app, _("Duplicate Error"),
+                    _("This code already exists at this exact location."), "warning").exec()
+        
+        self.hide_resize_handles()
+        self.get_coded_text_update_eventfilter_tooltips()
+
 
 class ToolTipEventFilter(QtCore.QObject):
     """ Used to add a dynamic tooltip for the textEdit.
@@ -5626,7 +6589,7 @@ class ToolTipEventFilter(QtCore.QObject):
                                 memo_text = memo_text[:150] + "..."
                             text_ += "<br /><em>" + _("MEMO: ") + memo_text + "</em>"
                         if item['important'] == 1:
-                            text_ += "<br /><em>IMPORTANT</em>"
+                            text_ += "<br /><em>" + _("IMPORTANT") + "</em>"
                         text_ += "</p>"
                         multiple += 1
                     except Exception as e:
@@ -5646,23 +6609,25 @@ class ToolTipEventFilter(QtCore.QObject):
 
 
 class DialogFontAndSize(QtWidgets.QDialog):
-    """ Get font and size. For plaintextedit """
+    """ Get font and size. For plaintextedit text. """
 
-    def __init__(self, app,  parent=None):
+    def __init__(self, app, size, font, parent=None):
         super().__init__(parent)
-        font = f'font: {app.settings["fontsize"]}pt "{app.settings["font"]}";'
-        self.setStyleSheet(font)
+        style = f'font: {app.settings["fontsize"]}pt "{app.settings["font"]}";'
+        self.setStyleSheet(style)
         self.setWindowTitle(_("Font and size"))
         self.resize(300, 100)
         self.setMaximumWidth(300)
         layout = QtWidgets.QVBoxLayout()
         self.font_combo = QtWidgets.QFontComboBox()
+        index = self.font_combo.findText(font, QtCore.Qt.MatchFlag.MatchFixedString)
+        if index == -1:
+            index = 0
+        self.font_combo.setCurrentIndex(index)
         layout.addWidget(self.font_combo)
-
         self.font_size_combo = QtWidgets.QComboBox()
         self.font_size_combo.addItems(["8", "10", "12", "14", "16", "18", "20", "22"])
-        index = self.font_size_combo.findText(str(app.settings['docfontsize']),
-                                            QtCore.Qt.MatchFlag.MatchFixedString)
+        index = self.font_size_combo.findText(size, QtCore.Qt.MatchFlag.MatchFixedString)
         if index == -1:
             index = 0
         self.font_size_combo.setCurrentIndex(index)
@@ -5677,8 +6642,6 @@ class DialogFontAndSize(QtWidgets.QDialog):
 
     def get_font_and_size(self):
         return self.font_combo.currentText(), self.font_size_combo.currentText()
-
-
 
 # see https://www.freeformatter.com/html-entities.html
 entities = {"&": "&amp;", '"': '&quot;', "'": "&#39;", "<": "&lt;", ">": "&gt;", "–": "&ndash;", "—": "&mdash;",
