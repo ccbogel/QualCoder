@@ -451,6 +451,9 @@
      <property name="minimum">
       <number>9</number>
      </property>
+     <property name="maximum">
+      <number>132</number>
+     </property>
      <property name="singleStep">
       <number>3</number>
      </property>
