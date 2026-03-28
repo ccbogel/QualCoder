@@ -134,6 +134,7 @@ class Ui_Dialog_code_image(object):
         self.gridLayout.addWidget(self.groupBox_2, 0, 0, 1, 1)
         self.horizontalSlider = QtWidgets.QSlider(parent=Dialog_code_image)
         self.horizontalSlider.setMinimum(9)
+        self.horizontalSlider.setMaximum(132)
         self.horizontalSlider.setSingleStep(3)
         self.horizontalSlider.setProperty("value", 99)
         self.horizontalSlider.setOrientation(QtCore.Qt.Orientation.Horizontal)
