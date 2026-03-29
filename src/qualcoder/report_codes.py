@@ -269,7 +269,6 @@ class DialogReportCodes(QtWidgets.QDialog):
         if not self.cases:
             self.ui.listWidget_cases.setHidden(True)
             view = self.ui.comboBox_matrix.view()
-            print("hiding")
             view.setRowHidden(1, True)
             view.setRowHidden(3, True)
             view.setRowHidden(5, True)
