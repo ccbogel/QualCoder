@@ -227,16 +227,14 @@ class DialogReportRelations(QtWidgets.QDialog):
         self.coder_names = self.app.get_coder_names_in_project()
         self.codes, self.categories = self.app.get_codes_categories()
 
-    def _on_project_data_changed(self, event):
+    def _on_project_data_changed(self, tables, source):
         """Refresh the local relations dialog when project events affect it."""
 
-        if not isinstance(event, dict):
+        if source is self or not isinstance(tables, list):
             return
-        tables = event.get("tables", {})
-        if not isinstance(tables, dict):
-            return
+        tables = set(tables)
         watched_tables = {"code_cat", "code_name", "code_text"}
-        if watched_tables.isdisjoint(tables.keys()):
+        if watched_tables.isdisjoint(tables):
             return
 
         self.get_code_data()

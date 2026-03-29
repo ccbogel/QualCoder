@@ -1571,7 +1571,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         """
 
         DialogCodeInAllFiles(self.app, code_dict)
-        self.update_dialog_codes_and_categories()
+        self.update_dialog_codes_and_categories(["code_name", "code_cat", "code_text", "code_av", "code_image"])
 
     def move_code(self, selected):
         """ Move code to another category or to no category.
@@ -1593,7 +1593,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             return
         category = ui.get_selected()
         cur.execute("update code_name set catid=? where cid=?", [category['catid'], cid])
-        self.update_dialog_codes_and_categories()
+        self.update_dialog_codes_and_categories(["code_name"])
 
     def show_codes_like(self):
         """ Show all codes if text is empty.
@@ -1643,12 +1643,13 @@ class DialogCodeAV(QtWidgets.QDialog):
                 item.child(i).setHidden(False)
             self.recursive_traverse(item.child(i), txt)
 
-    def update_dialog_codes_and_categories(self):
-        """ Update code and category tree in DialogCodeImage, DialogCodeAV,
-        DialogCodeText, DialogReportCodes.
-        Not using isinstance for other classes as could not import the classes to test
-        against. There was an import error.
-        Using try except blocks for each instance, as instance may have been deleted. """
+    def update_dialog_codes_and_categories(self, tables: list[str] = []):
+        """Refresh the local dialog after code/category changes and optionally notify other dialogs.
+
+        Args:
+            tables: Optional list of changed database table names to emit to the project event bus.
+                Use an empty list for a local-only refresh without notifying other dialogs.
+        """
 
         self.get_codes_and_categories()
         self.fill_tree()
@@ -1657,72 +1658,21 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.highlight()
         self.get_coded_text_update_eventfilter_tooltips()
 
-        contents = self.tab_reports.layout()
-        if contents:
-            for i in reversed(range(contents.count())):
-                c = contents.itemAt(i).widget()
-                if isinstance(c, DialogReportCodes):
-                    c.get_codes_categories_coders()
-                    c.fill_tree()
-                if isinstance(c, DialogReportCoderComparisons):
-                    c.get_data()
-                    c.fill_tree()
-                if isinstance(c, DialogReportCodeFrequencies):
-                    c.get_data()
-                    c.fill_tree()
+        if self.app.project_events is not None:
+            self.app.project_events.emit_table_changes(tables, source=self)
 
-    def _on_project_data_changed(self, event):
+    def _on_project_data_changed(self, tables, source):
         """Refresh the local media coding UI when project events affect it."""
 
-        if not isinstance(event, dict):
+        if source is self or not isinstance(tables, list):
             return
-        tables = event.get("tables", {})
-        if not isinstance(tables, dict):
-            return
+        tables = set(tables)
 
-        current_av_file_id = int(self.file_["id"]) if self.file_ is not None else None
-        current_text_file_id = int(self.transcription[0]) if self.transcription is not None else None
         code_tree_changed = "code_cat" in tables or "code_name" in tables
 
-        refresh_segments = False
-        refresh_transcript = False
-        refresh_counts = False
-
-        if "code_av" in tables:
-            code_av_change = tables.get("code_av", {})
-            if not isinstance(code_av_change, dict):
-                code_av_change = {}
-            affected_file_ids = code_av_change.get("affected_file_ids", [])
-            if not isinstance(affected_file_ids, list):
-                affected_file_ids = []
-            if current_av_file_id is not None and (len(affected_file_ids) == 0 or current_av_file_id in affected_file_ids):
-                refresh_segments = True
-                refresh_counts = True
-
-        if "code_text" in tables:
-            code_text_change = tables.get("code_text", {})
-            if not isinstance(code_text_change, dict):
-                code_text_change = {}
-            affected_file_ids = code_text_change.get("affected_file_ids", [])
-            if not isinstance(affected_file_ids, list):
-                affected_file_ids = []
-            if current_text_file_id is not None and (len(affected_file_ids) == 0 or current_text_file_id in affected_file_ids):
-                refresh_transcript = True
-                refresh_segments = True
-                refresh_counts = True
-
-        if "code_name" in tables:
-            code_name_change = tables.get("code_name", {})
-            if not isinstance(code_name_change, dict):
-                code_name_change = {}
-            affected_code_ids = code_name_change.get("affected_code_ids", [])
-            if isinstance(affected_code_ids, list) and affected_code_ids:
-                segment_code_ids = {int(item["cid"]) for item in self.segments if item.get("cid") is not None}
-                transcript_code_ids = {int(item["cid"]) for item in self.code_text if item.get("cid") is not None}
-                if segment_code_ids.intersection(affected_code_ids):
-                    refresh_segments = True
-                if transcript_code_ids.intersection(affected_code_ids):
-                    refresh_transcript = True
+        refresh_segments = "code_av" in tables or "code_text" in tables or ("code_name" in tables and bool(self.segments))
+        refresh_transcript = "code_text" in tables or ("code_name" in tables and bool(self.code_text))
+        refresh_counts = "code_av" in tables or "code_text" in tables
 
         if code_tree_changed:
             self.get_codes_and_categories()
@@ -2285,7 +2235,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             cur.execute("update code_cat set supercatid=? where catid=?",
                         [self.categories[found]['supercatid'], self.categories[found]['catid']])
             self.app.conn.commit()
-            self.update_dialog_codes_and_categories()
+            self.update_dialog_codes_and_categories(["code_cat"])
             return
 
         # Find the code in the list
@@ -2309,7 +2259,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             cur.execute("update code_name set catid=? where cid=?",
                         [self.codes[found]['catid'], self.codes[found]['cid']])
             self.app.conn.commit()
-            self.update_dialog_codes_and_categories()
+            self.update_dialog_codes_and_categories(["code_name"])
             self.app.delete_backup = False
 
     def recursive_non_merge_item(self, item, no_merge_list):
@@ -2357,7 +2307,6 @@ class DialogCodeAV(QtWidgets.QDialog):
                 if code['catid'] == catid:
                     cur.execute("update code_name set catid=? where catid=?", [category['catid'], catid])
             cur.execute("delete from code_cat where catid=?", [catid])
-            self.update_dialog_codes_and_categories()
             for cat in self.categories:
                 if cat['supercatid'] == catid:
                     cur.execute("update code_cat set supercatid=? where supercatid=?", [category['catid'], catid])
@@ -2373,7 +2322,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.app.conn.rollback()  # revert all changes
             self.update_dialog_codes_and_categories()
             raise            
-        self.update_dialog_codes_and_categories()
+        self.update_dialog_codes_and_categories(["code_cat", "code_name"])
 
     def merge_codes(self, item, parent):
         """ Merge code with another code .
@@ -2429,7 +2378,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         except:
             self.app.conn.rollback() # revert all changes 
             raise                
-        self.update_dialog_codes_and_categories()
+        self.update_dialog_codes_and_categories(["code_name", "code_text", "code_av", "code_image"])
         self.parent_textEdit.append(msg_)
         self.load_segments()
 
@@ -2454,7 +2403,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                     (item['name'], item['memo'], item['owner'], item['date'], item['catid'], item['color']))
         self.app.conn.commit()
         self.parent_textEdit.append(_("Code added: ") + item['name'])
-        self.update_dialog_codes_and_categories()
+        self.update_dialog_codes_and_categories(["code_name"])
         self.app.delete_backup = False
 
     def add_category(self, supercatid=None):
@@ -2475,7 +2424,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         cur.execute("insert into code_cat (name, memo, owner, date, supercatid) values(?,?,?,?,?)",
                     (item['name'], item['memo'], item['owner'], item['date'], supercatid))
         self.app.conn.commit()
-        self.update_dialog_codes_and_categories()
+        self.update_dialog_codes_and_categories(["code_cat"])
         self.app.delete_backup = False
 
     def delete_category_or_code(self, selected):
@@ -2514,7 +2463,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         cur.execute("delete from code_text where cid=?", [code_['cid'], ])
         self.app.conn.commit()
         self.parent_textEdit.append(_("Code deleted: ") + code_['name'])
-        self.update_dialog_codes_and_categories()
+        self.update_dialog_codes_and_categories(["code_name", "code_text", "code_av", "code_image"])
         self.app.delete_backup = False
 
     def delete_category(self, selected):
@@ -2545,13 +2494,15 @@ class DialogCodeAV(QtWidgets.QDialog):
         cur.execute(sql)
         self.app.conn.commit()
         self.parent_textEdit.append(_("Category deleted: ") + category['name'])
-        self.update_dialog_codes_and_categories()
+        self.update_dialog_codes_and_categories(["code_cat", "code_name"])
         self.app.delete_backup = False
 
     def add_edit_code_memo(self, selected):
         """ View and edit a memo to a code.
         param:
             selected: QTreeWidgetItem """
+
+        changed_tables = []
 
         if selected.text(1)[0:3] == 'cid':
             # find the code in the list
@@ -2576,6 +2527,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                 cur.execute("update code_name set memo=? where cid=?", (memo, self.codes[found]['cid']))
                 self.app.conn.commit()
                 self.app.delete_backup = False
+                changed_tables = ["code_name"]
 
         if selected.text(1)[0:3] == 'cat':
             # Find the category in the list
@@ -2600,7 +2552,8 @@ class DialogCodeAV(QtWidgets.QDialog):
                 cur.execute("update code_cat set memo=? where catid=?", (memo, self.categories[found]['catid']))
                 self.app.conn.commit()
                 self.app.delete_backup = False
-        self.update_dialog_codes_and_categories()
+                changed_tables = ["code_cat"]
+        self.update_dialog_codes_and_categories(changed_tables)
 
     def rename_category_or_code(self, selected):
         """ Rename a code or category. Checks that the proposed code or category name is
@@ -2631,7 +2584,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             cur.execute("update code_name set name=? where cid=?", (new_name, self.codes[found]['cid']))
             self.app.conn.commit()
             self.parent_textEdit.append(_("Code renamed: ") + f"{self.codes[found]['name']} ==> {new_name}")
-            self.update_dialog_codes_and_categories()
+            self.update_dialog_codes_and_categories(["code_name"])
             self.app.delete_backup = False
             return
 
@@ -2659,7 +2612,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                         (new_name, self.categories[found]['catid']))
             self.app.conn.commit()
             self.parent_textEdit.append(_("Category renamed: ") + self.categories[found]['name'] + " ==> " + new_name)
-            self.update_dialog_codes_and_categories()
+            self.update_dialog_codes_and_categories(["code_cat"])
             self.app.delete_backup = False
 
     def change_code_color(self, selected):
@@ -2688,7 +2641,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         cur.execute("update code_name set color=? where cid=?",
                     (self.codes[found]['color'], self.codes[found]['cid']))
         self.app.conn.commit()
-        self.update_dialog_codes_and_categories()
+        self.update_dialog_codes_and_categories(["code_name"])
         self.app.delete_backup = False
 
     # Methods used with the textEdit transcribed text

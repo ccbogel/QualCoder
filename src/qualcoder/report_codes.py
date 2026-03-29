@@ -289,14 +289,12 @@ class DialogReportCodes(QtWidgets.QDialog):
         for row in result:
             self.coders.append(row[0])
 
-    def _on_project_data_changed(self, event):
+    def _on_project_data_changed(self, tables, source):
         """Refresh the local code tree when project events change the code system."""
 
-        if not isinstance(event, dict):
+        if source is self or not isinstance(tables, list):
             return
-        tables = event.get("tables", {})
-        if not isinstance(tables, dict):
-            return
+        tables = set(tables)
         if "code_cat" not in tables and "code_name" not in tables:
             return
         self.code_names, self.categories = self.app.get_codes_categories()

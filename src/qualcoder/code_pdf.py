@@ -1444,7 +1444,6 @@ class DialogCodePdf(QtWidgets.QWidget):
                 if code['catid'] == catid:
                     cur.execute("update code_name set catid=? where catid=?", [category['catid'], catid])
             cur.execute("delete from code_cat where catid=?", [catid])
-            self.update_dialog_codes_and_categories()
             for cat in self.categories:
                 if cat['supercatid'] == catid:
                     cur.execute("update code_cat set supercatid=? where supercatid=?", [category['catid'], catid])
@@ -1461,7 +1460,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             self.app.conn.rollback()  # Revert all changes
             self.update_dialog_codes_and_categories()
             raise
-        self.update_dialog_codes_and_categories()
+        self.update_dialog_codes_and_categories(["code_cat", "code_name"])
 
     def move_code(self, selected):
         """ Move code to another category or to no category.
@@ -1484,7 +1483,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         category = ui.get_selected()
         cur.execute("update code_name set catid=? where cid=?", [category['catid'], cid])
         self.app.conn.commit()
-        self.update_dialog_codes_and_categories()
+        self.update_dialog_codes_and_categories(["code_name"])
 
     def show_important_coded(self):
         """ Show codes flagged as important.
@@ -2027,7 +2026,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             cur.execute("update code_cat set supercatid=? where catid=?",
                         [self.categories[found]['supercatid'], self.categories[found]['catid']])
             self.app.conn.commit()
-            self.update_dialog_codes_and_categories()
+            self.update_dialog_codes_and_categories(["code_cat"])
             self.app.delete_backup = False
             return
 
@@ -2054,7 +2053,7 @@ class DialogCodePdf(QtWidgets.QWidget):
                         [self.codes[found]['catid'], self.codes[found]['cid']])
             self.app.conn.commit()
             self.app.delete_backup = False
-            self.update_dialog_codes_and_categories()
+            self.update_dialog_codes_and_categories(["code_name"])
 
     def merge_codes(self, item, parent):
         """ Merge code with another code.
@@ -2116,7 +2115,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.app.delete_backup = False
         msg = msg.replace("\n", " ")
         self.parent_textEdit.append(msg)
-        self.update_dialog_codes_and_categories()
+        self.update_dialog_codes_and_categories(["code_name", "code_text", "code_av", "code_image"])
         self.get_coded_text_update_eventfilter_tooltips()
         self.display_page_text_objects()
 
@@ -2156,67 +2155,34 @@ class DialogCodePdf(QtWidgets.QWidget):
         except sqlite3.IntegrityError:
             # Can occur with in vivo coding
             return False
-        self.update_dialog_codes_and_categories()
+        self.update_dialog_codes_and_categories(["code_name"])
         self.get_coded_text_update_eventfilter_tooltips()
         return True
 
-    def update_dialog_codes_and_categories(self):
-        """ Update code and category tree here and in DialogReportCodes, ReportCoderComparisons, ReportCodeFrequencies
-        Using try except blocks for each instance, as instance may have been deleted. """
+    def update_dialog_codes_and_categories(self, tables: list[str] = []):
+        """Refresh the local dialog after code/category changes and optionally notify other dialogs.
+
+        Args:
+            tables: Optional list of changed database table names to emit to the project event bus.
+                Use an empty list for a local-only refresh without notifying other dialogs.
+        """
 
         self.get_codes_and_categories()
         self.fill_tree()
         self.get_coded_text_update_eventfilter_tooltips()
 
-        contents = self.tab_reports.layout()
-        if contents:
-            for i in reversed(range(contents.count())):
-                c = contents.itemAt(i).widget()
-                if isinstance(c, DialogReportCodes):
-                    c.get_codes_categories_coders()
-                    c.fill_tree()
-                if isinstance(c, DialogReportCoderComparisons):
-                    c.get_data()
-                    c.fill_tree()
-                if isinstance(c, DialogReportCodeFrequencies):
-                    c.get_data()
-                    c.fill_tree()
-                if isinstance(c, DialogReportCodeSummary):
-                    c.get_codes_and_categories()
-                    c.fill_tree()
+        if self.app.project_events is not None:
+            self.app.project_events.emit_table_changes(tables, source=self)
 
-    def _on_project_data_changed(self, event):
+    def _on_project_data_changed(self, tables, source):
         """Refresh the local PDF coding UI when project events affect it."""
 
-        if not isinstance(event, dict):
+        if source is self or not isinstance(tables, list):
             return
-        tables = event.get("tables", {})
-        if not isinstance(tables, dict):
-            return
+        tables = set(tables)
 
-        current_file_id = int(self.file_["id"]) if self.file_ is not None else None
         code_tree_changed = "code_cat" in tables or "code_name" in tables
-
-        code_text_change = tables.get("code_text", {})
-        if not isinstance(code_text_change, dict):
-            code_text_change = {}
-        affected_file_ids = code_text_change.get("affected_file_ids", [])
-        if not isinstance(affected_file_ids, list):
-            affected_file_ids = []
-        current_file_text_changed = (
-            current_file_id is not None and
-            (len(affected_file_ids) == 0 or current_file_id in affected_file_ids)
-        )
-
-        refresh_current_text = current_file_text_changed
-        if "code_name" in tables and self.code_text:
-            code_name_change = tables.get("code_name", {})
-            if not isinstance(code_name_change, dict):
-                code_name_change = {}
-            affected_code_ids = code_name_change.get("affected_code_ids", [])
-            if isinstance(affected_code_ids, list) and affected_code_ids:
-                current_code_ids = {int(item["cid"]) for item in self.code_text if item.get("cid") is not None}
-                refresh_current_text = refresh_current_text or bool(current_code_ids.intersection(affected_code_ids))
+        refresh_current_text = "code_text" in tables or ("code_name" in tables and bool(self.code_text))
 
         if code_tree_changed:
             self.get_codes_and_categories()
@@ -2225,7 +2191,7 @@ class DialogCodePdf(QtWidgets.QWidget):
                 self.get_coded_text_update_eventfilter_tooltips()
             return
 
-        if "code_text" not in tables or not current_file_text_changed:
+        if "code_text" not in tables or self.file_ is None:
             return
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
@@ -2248,7 +2214,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         cur.execute("insert into code_cat (name, memo, owner, date, supercatid) values(?,?,?,?,?)",
                     (item['name'], item['memo'], item['owner'], item['date'], supercatid))
         self.app.conn.commit()
-        self.update_dialog_codes_and_categories()
+        self.update_dialog_codes_and_categories(["code_cat"])
         self.app.delete_backup = False
         self.parent_textEdit.append(_("New category: ") + item['name'])
 
@@ -2258,6 +2224,8 @@ class DialogCodePdf(QtWidgets.QWidget):
         if selected.text(1)[0:3] == 'cat':
             self.delete_category(selected)
             return  # Avoid error as selected is now None
+        changed_tables = []
+
         if selected.text(1)[0:3] == 'cid':
             self.delete_code(selected)
 
@@ -2284,14 +2252,13 @@ class DialogCodePdf(QtWidgets.QWidget):
         cur.execute("delete from code_image where cid=?", [code_['cid'], ])
         self.app.conn.commit()
         self.app.delete_backup = False
-        self.update_dialog_codes_and_categories()
         self.parent_textEdit.append(_("Code deleted: ") + code_['name'] + "\n")
         # Remove from recent codes
         for item in self.recent_codes:
             if item['name'] == code_['name']:
                 self.recent_codes.remove(item)
                 break
-        self.update_dialog_codes_and_categories()
+        self.update_dialog_codes_and_categories(["code_name", "code_text", "code_av", "code_image"])
         self.display_page_text_objects()
 
     def delete_category(self, selected):
@@ -2319,7 +2286,7 @@ class DialogCodePdf(QtWidgets.QWidget):
               "(select catid from code_cat)"
         cur.execute(sql)
         self.app.conn.commit()
-        self.update_dialog_codes_and_categories()
+        self.update_dialog_codes_and_categories(["code_cat", "code_name"])
         self.app.delete_backup = False
         self.parent_textEdit.append(_("Category deleted: ") + category['name'])
 
@@ -2343,6 +2310,7 @@ class DialogCodePdf(QtWidgets.QWidget):
                 cur.execute("update code_name set memo=? where cid=?", (memo, self.codes[found]['cid']))
                 self.app.conn.commit()
                 self.app.delete_backup = False
+                changed_tables = ["code_name"]
             if memo == "":
                 selected.setData(2, QtCore.Qt.ItemDataRole.DisplayRole, "")
             else:
@@ -2367,12 +2335,13 @@ class DialogCodePdf(QtWidgets.QWidget):
                 cur.execute("update code_cat set memo=? where catid=?", (memo, self.categories[found]['catid']))
                 self.app.conn.commit()
                 self.app.delete_backup = False
+                changed_tables = ["code_cat"]
             if memo == "":
                 selected.setData(2, QtCore.Qt.ItemDataRole.DisplayRole, "")
             else:
                 selected.setData(2, QtCore.Qt.ItemDataRole.DisplayRole, _("Memo"))
                 self.parent_textEdit.append(_("Memo for category: ") + self.categories[found]['name'])
-        self.update_dialog_codes_and_categories()
+        self.update_dialog_codes_and_categories(changed_tables)
 
     def rename_category_or_code(self, selected):
         """ Rename a code or category.
@@ -2416,7 +2385,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             self.app.delete_backup = False
             old_name = self.codes[found]['name']
             self.parent_textEdit.append(f'{_("Code renamed:")} {old_name} -> {new_name}')
-            self.update_dialog_codes_and_categories()
+            self.update_dialog_codes_and_categories(["code_name"])
             self.display_page_text_objects()
             return
 
@@ -2450,7 +2419,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             self.app.conn.commit()
             self.app.delete_backup = False
             old_name = self.categories[found]['name']
-            self.update_dialog_codes_and_categories()
+            self.update_dialog_codes_and_categories(["code_cat"])
             self.parent_textEdit.append(f'{_("Category renamed:")} {old_name} -> {new_name}')
 
     def change_code_color(self, selected):
@@ -2480,7 +2449,7 @@ class DialogCodePdf(QtWidgets.QWidget):
                     (self.codes[found]['color'], self.codes[found]['cid']))
         self.app.conn.commit()
         self.app.delete_backup = False
-        self.update_dialog_codes_and_categories()
+        self.update_dialog_codes_and_categories(["code_name"])
         self.display_page_text_objects()
 
     def file_menu(self, position):

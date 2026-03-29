@@ -103,14 +103,12 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
 
         self.codes, self.categories = self.app.get_codes_categories()
 
-    def _on_project_data_changed(self, event):
+    def _on_project_data_changed(self, tables, source):
         """Refresh the local code tree when project events change the code system."""
 
-        if not isinstance(event, dict):
+        if source is self or not isinstance(tables, list):
             return
-        tables = event.get("tables", {})
-        if not isinstance(tables, dict):
-            return
+        tables = set(tables)
         if "code_cat" not in tables and "code_name" not in tables:
             return
         self.fill_tree()

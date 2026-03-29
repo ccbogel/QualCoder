@@ -300,16 +300,14 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         self.codes = sorted(self.codes, key=lambda i: (i['display_list'][0]))
         self.fill_tree()
 
-    def _on_project_data_changed(self, event):
+    def _on_project_data_changed(self, tables, source):
         """Refresh the local tree when project events change codes or codings."""
 
-        if not isinstance(event, dict):
+        if source is self or not isinstance(tables, list):
             return
-        tables = event.get("tables", {})
-        if not isinstance(tables, dict):
-            return
+        tables = set(tables)
         watched_tables = {"code_cat", "code_name", "code_text", "code_av", "code_image"}
-        if watched_tables.isdisjoint(tables.keys()):
+        if watched_tables.isdisjoint(tables):
             return
         if self.ui.radioButton_2.isChecked():
             self.sort_by_totals()
@@ -597,16 +595,14 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         for row in result:
             self.coders.append(row[0])
 
-    def _on_project_data_changed(self, event):
+    def _on_project_data_changed(self, tables, source):
         """Refresh the local comparison tree when project events touch it."""
 
-        if not isinstance(event, dict):
+        if source is self or not isinstance(tables, list):
             return
-        tables = event.get("tables", {})
-        if not isinstance(tables, dict):
-            return
+        tables = set(tables)
         watched_tables = {"code_cat", "code_name", "code_text"}
-        if watched_tables.isdisjoint(tables.keys()):
+        if watched_tables.isdisjoint(tables):
             return
         if "code_text" in tables:
             self.get_data()

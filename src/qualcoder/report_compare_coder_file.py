@@ -135,14 +135,12 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
             self.coders.append(row[0])
         self.get_files()
 
-    def _on_project_data_changed(self, event):
+    def _on_project_data_changed(self, tables, source):
         """Refresh the local code tree when project events change the code system."""
 
-        if not isinstance(event, dict):
+        if source is self or not isinstance(tables, list):
             return
-        tables = event.get("tables", {})
-        if not isinstance(tables, dict):
-            return
+        tables = set(tables)
         if "code_cat" not in tables and "code_name" not in tables:
             return
         self.codes, self.categories = self.app.get_codes_categories()

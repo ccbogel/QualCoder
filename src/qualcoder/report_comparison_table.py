@@ -143,16 +143,14 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         fresh_code_map = {code["cid"]: code for code in fresh_codes}
         self.codes = [fresh_code_map[cid] for cid in previous_selected_ids if cid in fresh_code_map]
 
-    def _on_project_data_changed(self, event):
+    def _on_project_data_changed(self, tables, source):
         """Refresh the local comparison table when project events affect it."""
 
-        if not isinstance(event, dict):
+        if source is self or not isinstance(tables, list):
             return
-        tables = event.get("tables", {})
-        if not isinstance(tables, dict):
-            return
+        tables = set(tables)
         watched_tables = {"code_cat", "code_name", "code_text", "code_av", "code_image"}
-        if watched_tables.isdisjoint(tables.keys()):
+        if watched_tables.isdisjoint(tables):
             return
 
         self._refresh_selected_codes_from_project()

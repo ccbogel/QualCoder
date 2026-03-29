@@ -172,43 +172,25 @@ class ProjectLockHeartbeatWorker(QtCore.QObject):
 
 
 class ProjectEventBus(QtCore.QObject):
-    """Application-wide event bus for project database changes."""
+    """Application-wide event bus for project database changes.
+    This is used to notify other dialogs (e.g. reports) of changes to the project database, 
+    so they can update their UI (e.g the code tree)."""
 
-    project_data_changed = QtCore.pyqtSignal(object)
+    project_data_changed = QtCore.pyqtSignal(list, object)
 
-    def emit_table_changes(self, tables, source=""):
-        """Emit one normalized project-change event."""
+    def emit_table_changes(self, tables: list[str], source=None):
+        """Emit one project-change event for changed database tables.
 
-        if not isinstance(tables, dict) or len(tables) == 0:
+        Args:
+            tables: List of database table names that changed. An empty list means that no
+                project-wide event is emitted.
+            source: Optional object identifying the emitter. Subscribers can compare this to
+                themselves to ignore events that originated from the same dialog instance.
+        """
+
+        if len(tables) == 0:
             return
-        payload = {
-            "source": str(source if source is not None else ""),
-            "tables": {},
-        }
-        for table_name, table_change in tables.items():
-            if not isinstance(table_name, str) or table_name.strip() == "":
-                continue
-            change = table_change if isinstance(table_change, dict) else {}
-            ops = change.get("ops", [])
-            if isinstance(ops, str):
-                ops = [ops]
-            elif not isinstance(ops, (list, tuple, set)):
-                ops = []
-            normalized = {
-                "ops": sorted({str(op).strip() for op in ops if str(op).strip() != ""}),
-            }
-            for key in ("affected_ids", "affected_file_ids", "affected_code_ids", "affected_cat_ids", "changed_columns"):
-                values = change.get(key, [])
-                if isinstance(values, (list, tuple, set)):
-                    normalized[key] = sorted({value for value in values if value is not None})
-                elif values is None:
-                    normalized[key] = []
-                else:
-                    normalized[key] = [values]
-            payload["tables"][table_name] = normalized
-        if len(payload["tables"]) == 0:
-            return
-        self.project_data_changed.emit(payload)
+        self.project_data_changed.emit(tables, source)
 
 
 class App(object):

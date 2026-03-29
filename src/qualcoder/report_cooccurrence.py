@@ -190,16 +190,14 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         self.ui.tableWidget.setColumnCount(0)
         self.ui.textEdit.clear()
 
-    def _on_project_data_changed(self, event):
+    def _on_project_data_changed(self, tables, source):
         """Refresh the local co-occurrence dialog when project events affect it."""
 
-        if not isinstance(event, dict):
+        if source is self or not isinstance(tables, list):
             return
-        tables = event.get("tables", {})
-        if not isinstance(tables, dict):
-            return
+        tables = set(tables)
         watched_tables = {"code_cat", "code_name", "code_text"}
-        if watched_tables.isdisjoint(tables.keys()):
+        if watched_tables.isdisjoint(tables):
             return
 
         self._refresh_selected_codes_from_project()

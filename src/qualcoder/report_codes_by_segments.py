@@ -172,16 +172,14 @@ class DialogCodesBySegments(QtWidgets.QDialog):
         for row in result:
             self.coders.append(row[0])
 
-    def _on_project_data_changed(self, event):
+    def _on_project_data_changed(self, tables, source):
         """Refresh the local tree when project events affect segment reports."""
 
-        if not isinstance(event, dict):
+        if source is self or not isinstance(tables, list):
             return
-        tables = event.get("tables", {})
-        if not isinstance(tables, dict):
-            return
+        tables = set(tables)
         watched_tables = {"code_cat", "code_name", "code_text", "code_av", "code_image"}
-        if watched_tables.isdisjoint(tables.keys()):
+        if watched_tables.isdisjoint(tables):
             return
 
         current_coder = self.ui.comboBox_coders.currentText()
