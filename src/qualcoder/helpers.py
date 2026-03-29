@@ -22,6 +22,7 @@ https://qualcoder-org.github.io/
 
 import csv
 import datetime
+import fitz
 from io import BytesIO
 import logging
 import os
@@ -490,6 +491,7 @@ class DialogCodeInImage(QtWidgets.QDialog):
     def __init__(self, app, data):
         """ Image_data contains details to show the image and the coded section.
         mediapath may be a link as: 'images:path'
+        For pdf image coding - need to create an image
         param:
             app : class containing app details such as database connection
             data : dictionary {codename, color, file_or_casename, x1, y1, width, height, coder,
@@ -511,7 +513,22 @@ class DialogCodeInImage(QtWidgets.QDialog):
         else:
             abs_path = self.app.project_path + self.data['mediapath']
         self.setWindowTitle(abs_path)
-        image = QtGui.QImage(abs_path)
+        if not self.data['mediapath'].lower().endswith(".pdf"):
+            image = QtGui.QImage(abs_path)
+        else:  # A pdf, must create the image
+            if self.data['mediapath'][:6] == "/docs/":
+                source_path = f"{self.app.project_path}/documents/{self.data['mediapath'][6:]}"
+            if self.data['mediapath'][:5] == "docs:":
+                source_path = self.data['mediapath'][5:]
+            fitz_pdf = fitz.open(source_path)  # Use pymupdf to get page images
+            for page in fitz_pdf:
+                if page.number == data['pdf_page']:
+                    # Only need the current page image of interest
+                    pixmap = page.get_pixmap()
+                    pixmap.save(os.path.join(self.app.confighome, f"tmp_pdf_page.png"))
+            source_path = os.path.join(self.app.confighome, f"tmp_pdf_page.png")
+            image = QtGui.QImage(source_path)
+
         if image.isNull():
             Message(self.app, _('Image error'), _("Cannot open: ") + abs_path, "warning").exec()
             self.close()
