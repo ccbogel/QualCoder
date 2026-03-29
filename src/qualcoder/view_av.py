@@ -231,6 +231,9 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
         self.ui.treeWidget.itemClicked.connect(self.assign_selected_text_to_code)
         self.get_files()
+        project_events = getattr(self.app, "project_events", None)
+        if project_events is not None and hasattr(project_events, "project_data_changed"):
+            project_events.project_data_changed.connect(self._on_project_data_changed)
         self.fill_tree()
         # These signals after the tree is filled the first time
         self.ui.treeWidget.itemCollapsed.connect(self.get_collapsed)
@@ -1667,6 +1670,72 @@ class DialogCodeAV(QtWidgets.QDialog):
                 if isinstance(c, DialogReportCodeFrequencies):
                     c.get_data()
                     c.fill_tree()
+
+    def _on_project_data_changed(self, event):
+        """Refresh the local media coding UI when project events affect it."""
+
+        if not isinstance(event, dict):
+            return
+        tables = event.get("tables", {})
+        if not isinstance(tables, dict):
+            return
+
+        current_av_file_id = int(self.file_["id"]) if self.file_ is not None else None
+        current_text_file_id = int(self.transcription[0]) if self.transcription is not None else None
+        code_tree_changed = "code_cat" in tables or "code_name" in tables
+
+        refresh_segments = False
+        refresh_transcript = False
+        refresh_counts = False
+
+        if "code_av" in tables:
+            code_av_change = tables.get("code_av", {})
+            if not isinstance(code_av_change, dict):
+                code_av_change = {}
+            affected_file_ids = code_av_change.get("affected_file_ids", [])
+            if not isinstance(affected_file_ids, list):
+                affected_file_ids = []
+            if current_av_file_id is not None and (len(affected_file_ids) == 0 or current_av_file_id in affected_file_ids):
+                refresh_segments = True
+                refresh_counts = True
+
+        if "code_text" in tables:
+            code_text_change = tables.get("code_text", {})
+            if not isinstance(code_text_change, dict):
+                code_text_change = {}
+            affected_file_ids = code_text_change.get("affected_file_ids", [])
+            if not isinstance(affected_file_ids, list):
+                affected_file_ids = []
+            if current_text_file_id is not None and (len(affected_file_ids) == 0 or current_text_file_id in affected_file_ids):
+                refresh_transcript = True
+                refresh_segments = True
+                refresh_counts = True
+
+        if "code_name" in tables:
+            code_name_change = tables.get("code_name", {})
+            if not isinstance(code_name_change, dict):
+                code_name_change = {}
+            affected_code_ids = code_name_change.get("affected_code_ids", [])
+            if isinstance(affected_code_ids, list) and affected_code_ids:
+                segment_code_ids = {int(item["cid"]) for item in self.segments if item.get("cid") is not None}
+                transcript_code_ids = {int(item["cid"]) for item in self.code_text if item.get("cid") is not None}
+                if segment_code_ids.intersection(affected_code_ids):
+                    refresh_segments = True
+                if transcript_code_ids.intersection(affected_code_ids):
+                    refresh_transcript = True
+
+        if code_tree_changed:
+            self.get_codes_and_categories()
+            self.fill_tree()
+        elif not refresh_counts and not refresh_segments and not refresh_transcript:
+            return
+
+        if refresh_transcript:
+            self.get_coded_text_update_eventfilter_tooltips()
+        if refresh_segments and self.file_ is not None and self.media is not None:
+            self.load_segments()
+        if refresh_counts and not code_tree_changed:
+            self.fill_code_counts_in_tree()
 
     def keyPressEvent(self, event):
         """ This works best without the modifiers.

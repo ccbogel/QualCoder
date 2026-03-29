@@ -181,6 +181,9 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.ui.treeWidget.customContextMenuRequested.connect(self.treewidget_menu)
         self.eventFilterTT = ToolTipEventFilter()
         self.ui.textEdit.installEventFilter(self.eventFilterTT)
+        project_events = getattr(self.app, "project_events", None)
+        if project_events is not None and hasattr(project_events, "project_data_changed"):
+            project_events.project_data_changed.connect(self._on_project_data_changed)
 
     def splitter_sizes(self):
         """ Detect size changes in splitter and store in app.settings variable. """
@@ -285,6 +288,19 @@ class DialogReportCodes(QtWidgets.QDialog):
         self.coders = [""]
         for row in result:
             self.coders.append(row[0])
+
+    def _on_project_data_changed(self, event):
+        """Refresh the local code tree when project events change the code system."""
+
+        if not isinstance(event, dict):
+            return
+        tables = event.get("tables", {})
+        if not isinstance(tables, dict):
+            return
+        if "code_cat" not in tables and "code_name" not in tables:
+            return
+        self.code_names, self.categories = self.app.get_codes_categories()
+        self.fill_tree()
 
     def get_selected_files_and_cases(self):
         """ Fill file_ids and case_ids Strings used in the search.

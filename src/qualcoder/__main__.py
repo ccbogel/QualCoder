@@ -171,6 +171,46 @@ class ProjectLockHeartbeatWorker(QtCore.QObject):
         self.finished.emit()
 
 
+class ProjectEventBus(QtCore.QObject):
+    """Application-wide event bus for project database changes."""
+
+    project_data_changed = QtCore.pyqtSignal(object)
+
+    def emit_table_changes(self, tables, source=""):
+        """Emit one normalized project-change event."""
+
+        if not isinstance(tables, dict) or len(tables) == 0:
+            return
+        payload = {
+            "source": str(source if source is not None else ""),
+            "tables": {},
+        }
+        for table_name, table_change in tables.items():
+            if not isinstance(table_name, str) or table_name.strip() == "":
+                continue
+            change = table_change if isinstance(table_change, dict) else {}
+            ops = change.get("ops", [])
+            if isinstance(ops, str):
+                ops = [ops]
+            elif not isinstance(ops, (list, tuple, set)):
+                ops = []
+            normalized = {
+                "ops": sorted({str(op).strip() for op in ops if str(op).strip() != ""}),
+            }
+            for key in ("affected_ids", "affected_file_ids", "affected_code_ids", "affected_cat_ids", "changed_columns"):
+                values = change.get(key, [])
+                if isinstance(values, (list, tuple, set)):
+                    normalized[key] = sorted({value for value in values if value is not None})
+                elif values is None:
+                    normalized[key] = []
+                else:
+                    normalized[key] = [values]
+            payload["tables"][table_name] = normalized
+        if len(payload["tables"]) == 0:
+            return
+        self.project_data_changed.emit(payload)
+
+
 class App(object):
     """ General methods for loading settings and recent project stored in .qualcoder folder.
     Savable settings does not contain project name, project path or db connection.
@@ -192,6 +232,7 @@ class App(object):
     ai_models = []
     # This is the sentence transformer embedding function. It is stored here so it must not be reloaded every time a project is opened.
     ai_embedding_function = None
+    project_events = None
     
     def __init__(self):
         self.conn = None
@@ -208,6 +249,7 @@ class App(object):
         self.settings, self.ai_models = self.load_settings()
         self.last_export_directory = copy(self.settings['directory'])
         self.version = qualcoder_version
+        self.project_events = ProjectEventBus()
 
     def read_previous_project_paths(self):
         """ Recent project paths are stored in .qualcoder/recent_projects.txt

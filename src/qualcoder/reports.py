@@ -86,6 +86,9 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         self.ui.treeWidget.itemExpanded.connect(self.get_collapsed)
         self.ui.radioButton.clicked.connect(self.sort_by_alphabet)
         self.ui.radioButton_2.clicked.connect(self.sort_by_totals)
+        project_events = getattr(self.app, "project_events", None)
+        if project_events is not None and hasattr(project_events, "project_data_changed"):
+            project_events.project_data_changed.connect(self._on_project_data_changed)
 
     def select_files_button(self):
         """ Report code frequencies for all files or selected files.
@@ -296,6 +299,22 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         self.categories = sorted(self.categories, key=lambda i: (i['display_list'][0]))
         self.codes = sorted(self.codes, key=lambda i: (i['display_list'][0]))
         self.fill_tree()
+
+    def _on_project_data_changed(self, event):
+        """Refresh the local tree when project events change codes or codings."""
+
+        if not isinstance(event, dict):
+            return
+        tables = event.get("tables", {})
+        if not isinstance(tables, dict):
+            return
+        watched_tables = {"code_cat", "code_name", "code_text", "code_av", "code_image"}
+        if watched_tables.isdisjoint(tables.keys()):
+            return
+        if self.ui.radioButton_2.isChecked():
+            self.sort_by_totals()
+            return
+        self.sort_by_alphabet()
 
     def depthgauge(self, item):
         """ Get depth for treewidget item. """
@@ -559,6 +578,9 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         # These signals after the tree is filled the first time
         self.ui.treeWidget.itemCollapsed.connect(self.get_collapsed)
         self.ui.treeWidget.itemExpanded.connect(self.get_collapsed)
+        project_events = getattr(self.app, "project_events", None)
+        if project_events is not None and hasattr(project_events, "project_data_changed"):
+            project_events.project_data_changed.connect(self._on_project_data_changed)
 
     def get_data(self):
         """ Called from init. gets coders, codes, categories, file_summaries.
@@ -574,6 +596,23 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         self.coders = [""]
         for row in result:
             self.coders.append(row[0])
+
+    def _on_project_data_changed(self, event):
+        """Refresh the local comparison tree when project events touch it."""
+
+        if not isinstance(event, dict):
+            return
+        tables = event.get("tables", {})
+        if not isinstance(tables, dict):
+            return
+        watched_tables = {"code_cat", "code_name", "code_text"}
+        if watched_tables.isdisjoint(tables.keys()):
+            return
+        if "code_text" in tables:
+            self.get_data()
+        else:
+            self.codes, self.categories = self.app.get_codes_categories()
+        self.fill_tree()
 
     def coder_selected(self):
         """ Select coders for comparison - only two coders can be selected. """

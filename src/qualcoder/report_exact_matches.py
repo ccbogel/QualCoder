@@ -103,11 +103,17 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         self.ui.pushButton_run.pressed.connect(self.get_exact_text_matches)
         self.ui.tableWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
+        project_events = getattr(self.app, "project_events", None)
+        if project_events is not None and hasattr(project_events, "project_data_changed"):
+            project_events.project_data_changed.connect(self._on_project_data_changed)
 
     def get_data(self):
         """ Called from init. gets code_names, categories and owner names.
         """
 
+        current_coder = ""
+        if hasattr(self, "ui") and hasattr(self.ui, "comboBox_coders"):
+            current_coder = self.ui.comboBox_coders.currentText()
         self.coder_names = self.app.get_coder_names_in_project()
         self.codes, self.categories = self.app.get_codes_categories()
         sql = "select owner from  code_image union select owner from code_text union select owner from code_av"
@@ -117,7 +123,41 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         self.coders = []
         for row in result:
             self.coders.append(row[0])
-        self.ui.comboBox_coders.insertItems(0, self.coders)
+        if hasattr(self, "ui") and hasattr(self.ui, "comboBox_coders"):
+            self.ui.comboBox_coders.blockSignals(True)
+            self.ui.comboBox_coders.clear()
+            self.ui.comboBox_coders.insertItems(0, self.coders)
+            index = self.ui.comboBox_coders.findText(current_coder)
+            if index >= 0:
+                self.ui.comboBox_coders.setCurrentIndex(index)
+            self.ui.comboBox_coders.blockSignals(False)
+
+    def _on_project_data_changed(self, event):
+        """Refresh the local exact-match dialog when project events affect it."""
+
+        if not isinstance(event, dict):
+            return
+        tables = event.get("tables", {})
+        if not isinstance(tables, dict):
+            return
+        watched_tables = {"code_cat", "code_name", "code_text"}
+        if watched_tables.isdisjoint(tables.keys()):
+            return
+
+        selected_files = {item.text() for item in self.ui.listWidget_files.selectedItems()}
+        self.get_data()
+        available_cids = {code["cid"] for code in self.codes}
+        self.excluded_codes = [item for item in self.excluded_codes if item[0] in available_cids]
+        if "code_cat" in tables or "code_name" in tables:
+            self.excluded_codes = []
+            self.fill_tree()
+        if "code_text" in tables:
+            self.get_files_fill_list_widget()
+            for i in range(self.ui.listWidget_files.count()):
+                item = self.ui.listWidget_files.item(i)
+                item.setSelected(item.text() in selected_files)
+        self.results_display = []
+        self.fill_table()
 
     def get_files_fill_list_widget(self):
         """ Get source files with additional details and fill list widget.

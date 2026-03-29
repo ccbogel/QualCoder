@@ -109,6 +109,9 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         self.ui.treeWidget.itemSelectionChanged.connect(self.code_selected)
         self.ui.listWidget_files.itemClicked.connect(self.file_selected)
         self.ui.textEdit.setReadOnly(True)
+        project_events = getattr(self.app, "project_events", None)
+        if project_events is not None and hasattr(project_events, "project_data_changed"):
+            project_events.project_data_changed.connect(self._on_project_data_changed)
 
     def information(self):
         """ Provide statistical help information. """
@@ -131,6 +134,19 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         for row in result:
             self.coders.append(row[0])
         self.get_files()
+
+    def _on_project_data_changed(self, event):
+        """Refresh the local code tree when project events change the code system."""
+
+        if not isinstance(event, dict):
+            return
+        tables = event.get("tables", {})
+        if not isinstance(tables, dict):
+            return
+        if "code_cat" not in tables and "code_name" not in tables:
+            return
+        self.codes, self.categories = self.app.get_codes_categories()
+        self.fill_tree()
 
     def file_menu(self, position):
         """ Context menu for listWidget files for Sorting files.

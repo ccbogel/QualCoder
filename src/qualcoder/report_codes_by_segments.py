@@ -112,6 +112,9 @@ class DialogCodesBySegments(QtWidgets.QDialog):
         self.segment_rows = []
         self.horizontal_labels = []
         self.xlsx_results = []
+        project_events = getattr(self.app, "project_events", None)
+        if project_events is not None and hasattr(project_events, "project_data_changed"):
+            project_events.project_data_changed.connect(self._on_project_data_changed)
 
     def get_files_and_cases(self, file_sort="name asc"):
         """ Get text files with additional details and fill files list widget.
@@ -168,6 +171,29 @@ class DialogCodesBySegments(QtWidgets.QDialog):
         self.coders = [""]
         for row in result:
             self.coders.append(row[0])
+
+    def _on_project_data_changed(self, event):
+        """Refresh the local tree when project events affect segment reports."""
+
+        if not isinstance(event, dict):
+            return
+        tables = event.get("tables", {})
+        if not isinstance(tables, dict):
+            return
+        watched_tables = {"code_cat", "code_name", "code_text", "code_av", "code_image"}
+        if watched_tables.isdisjoint(tables.keys()):
+            return
+
+        current_coder = self.ui.comboBox_coders.currentText()
+        self.get_codes_categories_coders()
+        self.ui.comboBox_coders.blockSignals(True)
+        self.ui.comboBox_coders.clear()
+        self.ui.comboBox_coders.insertItems(0, self.coders)
+        index = self.ui.comboBox_coders.findText(current_coder)
+        if index >= 0:
+            self.ui.comboBox_coders.setCurrentIndex(index)
+        self.ui.comboBox_coders.blockSignals(False)
+        self.fill_tree()
 
     def get_selected_files_and_cases(self):
         """ Fill file_ids and case_ids Strings used in the search.

@@ -201,6 +201,9 @@ class DialogCodeImage(QtWidgets.QDialog):
             pass
         self.ui.splitter.splitterMoved.connect(self.update_sizes)
         self.ui.splitter_2.splitterMoved.connect(self.update_sizes)
+        project_events = getattr(self.app, "project_events", None)
+        if project_events is not None and hasattr(project_events, "project_data_changed"):
+            project_events.project_data_changed.connect(self._on_project_data_changed)
         self.fill_tree()
         # These signals after the tree is filled the first time
         self.ui.treeWidget.itemCollapsed.connect(self.get_collapsed)
@@ -1009,6 +1012,55 @@ class DialogCodeImage(QtWidgets.QDialog):
                 if isinstance(c, DialogReportCodeFrequencies):
                     c.get_data()
                     c.fill_tree()
+
+    def _on_project_data_changed(self, event):
+        """Refresh the local image coding UI when project events affect it."""
+
+        if not isinstance(event, dict):
+            return
+        tables = event.get("tables", {})
+        if not isinstance(tables, dict):
+            return
+
+        current_file_id = int(self.file_["id"]) if self.file_ is not None else None
+        code_tree_changed = "code_cat" in tables or "code_name" in tables
+        refresh_areas = False
+        refresh_counts = False
+        reload_areas = False
+
+        if "code_image" in tables:
+            code_image_change = tables.get("code_image", {})
+            if not isinstance(code_image_change, dict):
+                code_image_change = {}
+            affected_file_ids = code_image_change.get("affected_file_ids", [])
+            if not isinstance(affected_file_ids, list):
+                affected_file_ids = []
+            if current_file_id is not None and (len(affected_file_ids) == 0 or current_file_id in affected_file_ids):
+                refresh_areas = True
+                refresh_counts = True
+                reload_areas = True
+
+        if "code_name" in tables and self.code_areas:
+            code_name_change = tables.get("code_name", {})
+            if not isinstance(code_name_change, dict):
+                code_name_change = {}
+            affected_code_ids = code_name_change.get("affected_code_ids", [])
+            if isinstance(affected_code_ids, list) and affected_code_ids:
+                current_code_ids = {int(item["cid"]) for item in self.code_areas if item.get("cid") is not None}
+                refresh_areas = refresh_areas or bool(current_code_ids.intersection(affected_code_ids))
+
+        if code_tree_changed:
+            self.get_codes_and_categories()
+            self.fill_tree()
+        elif not refresh_areas and not refresh_counts:
+            return
+
+        if reload_areas:
+            self.get_coded_areas()
+        if refresh_areas:
+            self.redraw_scene()
+        if refresh_counts and not code_tree_changed:
+            self.fill_code_counts_in_tree()
 
     def redraw_scene(self):
         """ Resize image. Triggered by user change in slider. Or resize or move of a coded area.

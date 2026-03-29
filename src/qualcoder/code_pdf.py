@@ -267,6 +267,9 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.checkBox_text.stateChanged.connect(self.update_page)
 
         self.get_files()
+        project_events = getattr(self.app, "project_events", None)
+        if project_events is not None and hasattr(project_events, "project_data_changed"):
+            project_events.project_data_changed.connect(self._on_project_data_changed)
         self.fill_tree()
         # These signals after the tree is filled the first time
         self.ui.treeWidget.itemCollapsed.connect(self.get_collapsed)
@@ -2181,6 +2184,51 @@ class DialogCodePdf(QtWidgets.QWidget):
                 if isinstance(c, DialogReportCodeSummary):
                     c.get_codes_and_categories()
                     c.fill_tree()
+
+    def _on_project_data_changed(self, event):
+        """Refresh the local PDF coding UI when project events affect it."""
+
+        if not isinstance(event, dict):
+            return
+        tables = event.get("tables", {})
+        if not isinstance(tables, dict):
+            return
+
+        current_file_id = int(self.file_["id"]) if self.file_ is not None else None
+        code_tree_changed = "code_cat" in tables or "code_name" in tables
+
+        code_text_change = tables.get("code_text", {})
+        if not isinstance(code_text_change, dict):
+            code_text_change = {}
+        affected_file_ids = code_text_change.get("affected_file_ids", [])
+        if not isinstance(affected_file_ids, list):
+            affected_file_ids = []
+        current_file_text_changed = (
+            current_file_id is not None and
+            (len(affected_file_ids) == 0 or current_file_id in affected_file_ids)
+        )
+
+        refresh_current_text = current_file_text_changed
+        if "code_name" in tables and self.code_text:
+            code_name_change = tables.get("code_name", {})
+            if not isinstance(code_name_change, dict):
+                code_name_change = {}
+            affected_code_ids = code_name_change.get("affected_code_ids", [])
+            if isinstance(affected_code_ids, list) and affected_code_ids:
+                current_code_ids = {int(item["cid"]) for item in self.code_text if item.get("cid") is not None}
+                refresh_current_text = refresh_current_text or bool(current_code_ids.intersection(affected_code_ids))
+
+        if code_tree_changed:
+            self.get_codes_and_categories()
+            self.fill_tree()
+            if refresh_current_text:
+                self.get_coded_text_update_eventfilter_tooltips()
+            return
+
+        if "code_text" not in tables or not current_file_text_changed:
+            return
+        self.get_coded_text_update_eventfilter_tooltips()
+        self.fill_code_counts_in_tree()
 
     def add_category(self, supercatid=None):
         """ When button pressed, add a new category.

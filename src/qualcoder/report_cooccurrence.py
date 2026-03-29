@@ -119,6 +119,8 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         self.subtitle_attributes_selected = ""
 
         self.codes, self.categories = self.app.get_codes_categories()
+        self.code_selection_mode = "all"
+        self.selected_category_ids = []
         self.code_names_list = []
         self.code_names_str = ""
         self.code_ids_str = ""
@@ -135,6 +137,75 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         self.data_colors = []
         self.data_details = []
         self.file_ids_names = self.app.get_text_filenames()
+        project_events = getattr(self.app, "project_events", None)
+        if project_events is not None and hasattr(project_events, "project_data_changed"):
+            project_events.project_data_changed.connect(self._on_project_data_changed)
+        self.process_data()
+
+    def _rebuild_selected_code_strings(self):
+        self.code_names_list = []
+        self.code_names_str = ""
+        self.code_ids_str = ""
+        for code_ in self.selected_codes:
+            self.code_names_list.append(code_["name"])
+            self.code_names_str += f"{code_['name']}|"
+            self.code_ids_str += f",{code_['cid']}"
+        self.code_ids_str = self.code_ids_str[1:] if self.code_ids_str else ""
+
+    def _refresh_selected_codes_from_project(self):
+        fresh_codes, fresh_categories = self.app.get_codes_categories()
+        self.codes, self.categories = fresh_codes, fresh_categories
+
+        if self.code_selection_mode == "all":
+            self.selected_codes = deepcopy(self.codes)
+            self.selected_categories_string = ""
+            self._rebuild_selected_code_strings()
+            return
+
+        if self.code_selection_mode == "categories" and self.selected_category_ids:
+            matched_categories = [cat for cat in self.categories if cat["catid"] in self.selected_category_ids]
+            self.selected_categories_string = "; ".join(cat["name"] for cat in matched_categories)
+            refreshed_codes = []
+            for category in matched_categories:
+                for code_ in self.codes_of_category(category):
+                    if code_ not in refreshed_codes:
+                        refreshed_codes.append(code_)
+            self.selected_codes = refreshed_codes
+            self._rebuild_selected_code_strings()
+            return
+
+        selected_ids = [code["cid"] for code in self.selected_codes if isinstance(code, dict) and code.get("cid") is not None]
+        code_map = {code["cid"]: code for code in self.codes}
+        self.selected_codes = [code_map[cid] for cid in selected_ids if cid in code_map]
+        self.selected_categories_string = ""
+        self._rebuild_selected_code_strings()
+
+    def _clear_results(self):
+        self.result_relations = []
+        self.max_count = 0
+        self.data_counts = []
+        self.data_colors = []
+        self.data_details = []
+        self.ui.tableWidget.setRowCount(0)
+        self.ui.tableWidget.setColumnCount(0)
+        self.ui.textEdit.clear()
+
+    def _on_project_data_changed(self, event):
+        """Refresh the local co-occurrence dialog when project events affect it."""
+
+        if not isinstance(event, dict):
+            return
+        tables = event.get("tables", {})
+        if not isinstance(tables, dict):
+            return
+        watched_tables = {"code_cat", "code_name", "code_text"}
+        if watched_tables.isdisjoint(tables.keys()):
+            return
+
+        self._refresh_selected_codes_from_project()
+        if not self.selected_codes or not self.code_ids_str:
+            self._clear_results()
+            return
         self.process_data()
 
     def select_files(self):
@@ -248,11 +319,15 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         self.selected_codes = ui.get_selected()
         if not self.selected_codes or self.selected_codes[0]['name'] == '':
             self.selected_codes = deepcopy(self.codes)
+            self.code_selection_mode = "all"
+            self.selected_category_ids = []
             Message(self.app, _("Codes selected"), _("All codes selected")).exec()
             self.subtitle_codes_selected = ""
             self.subtitle_categories_selected = ""
         else:
             msg = ""
+            self.code_selection_mode = "codes"
+            self.selected_category_ids = []
             for s in self.selected_codes:
                 msg += f"{s['name']}\n"
             Message(self.app, _("Codes selected"), msg).exec()
@@ -284,10 +359,12 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
         if not selected_categories or selected_categories[0]['name'] == '':
             selected_categories = deepcopy(self.categories)
             msg = _("All categories selected")
+            self.selected_category_ids = [category["catid"] for category in selected_categories if category.get("catid") is not None]
             self.subtitle_categories_selected = ""
             self.subtitle_codes_selected = ""
         else:
             msg = ""
+            self.selected_category_ids = [category["catid"] for category in selected_categories if category.get("catid") is not None]
             for category in selected_categories:
                 msg += f"{category['name']}\n"
                 self.selected_categories_string += category['name'] + "; "
@@ -297,6 +374,7 @@ class DialogReportCooccurrence(QtWidgets.QDialog):
             else:
                 self.subtitle_categories_selected = f"{len(selected_categories)} " + _("Categories selected ")
             self.subtitle_codes_selected = ""
+        self.code_selection_mode = "categories"
         self.selected_codes = []
         for category in selected_categories:
             codes = self.codes_of_category(category)

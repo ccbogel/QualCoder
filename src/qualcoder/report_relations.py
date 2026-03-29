@@ -121,6 +121,9 @@ class DialogReportRelations(QtWidgets.QDialog):
         self.files = []
         for r in res:
             self.files.append({'name': r[0], 'fid': r[1]})
+        project_events = getattr(self.app, "project_events", None)
+        if project_events is not None and hasattr(project_events, "project_data_changed"):
+            project_events.project_data_changed.connect(self._on_project_data_changed)
 
     def select_files(self):
         """ Select files for analysis. """
@@ -223,6 +226,27 @@ class DialogReportRelations(QtWidgets.QDialog):
 
         self.coder_names = self.app.get_coder_names_in_project()
         self.codes, self.categories = self.app.get_codes_categories()
+
+    def _on_project_data_changed(self, event):
+        """Refresh the local relations dialog when project events affect it."""
+
+        if not isinstance(event, dict):
+            return
+        tables = event.get("tables", {})
+        if not isinstance(tables, dict):
+            return
+        watched_tables = {"code_cat", "code_name", "code_text"}
+        if watched_tables.isdisjoint(tables.keys()):
+            return
+
+        self.get_code_data()
+        if "code_cat" in tables or "code_name" in tables:
+            self.fill_tree()
+        self.result_relations = []
+        self.result_summary = []
+        self.dataframe = None
+        self.fill_table()
+        self.ui.tableWidget_statistics.setRowCount(0)
 
     def calculate_code_relations(self):
         """ Calculate the relations for selected codes for THIS coder or ALL coders.

@@ -407,6 +407,9 @@ class DialogCodeText(QtWidgets.QWidget):
         layout.setContentsMargins(0, 0, 0, 0)  # Remove margins if needed
         layout.addWidget(self.number_bar)
         self.ui.lineNumbers.setLayout(layout)
+        project_events = getattr(self.app, "project_events", None)
+        if project_events is not None and hasattr(project_events, "project_data_changed"):
+            project_events.project_data_changed.connect(self._on_project_data_changed)
         self.fill_tree()
         # These signals after the tree is filled the first time
         self.ui.treeWidget.itemCollapsed.connect(self.get_collapsed)
@@ -3764,6 +3767,41 @@ class DialogCodeText(QtWidgets.QWidget):
                 if isinstance(c, DialogReportCodeSummary):
                     c.get_codes_and_categories()
                     c.fill_tree()
+
+    def _on_project_data_changed(self, event):
+        """Refresh the local code tree or text codings when project events touch them."""
+
+        if not isinstance(event, dict):
+            return
+        tables = event.get("tables", {})
+        if not isinstance(tables, dict):
+            return
+        if "code_cat" not in tables and "code_name" not in tables:
+            if "code_text" not in tables:
+                return
+            # Only code_text changed, so refresh tooltips and code counts without rebuilding the tree.
+            code_text_change = tables.get("code_text", {})
+            if not isinstance(code_text_change, dict):
+                return
+            affected_file_ids = code_text_change.get("affected_file_ids", [])
+            if not isinstance(affected_file_ids, list):
+                affected_file_ids = []
+            ai_assisted_coding = self.ui.tabWidget.currentIndex() == 1
+            current_file_matches = (
+                self.file_ is not None and (
+                    len(affected_file_ids) == 0 or int(self.file_['id']) in affected_file_ids
+                )
+            )
+            if current_file_matches:
+                self.get_coded_text_update_eventfilter_tooltips()
+            if current_file_matches or ai_assisted_coding:
+                self.fill_code_counts_in_tree()
+            return
+        self.get_codes_and_categories()
+        self.fill_tree()
+        self.unlight()
+        self.highlight()
+        self.get_coded_text_update_eventfilter_tooltips()
 
     def add_category(self, supercatid=None):
         """ When button pressed, add a new category.
