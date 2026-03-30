@@ -86,6 +86,7 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         self.ui.treeWidget.itemClicked.connect(self.fill_text_edit)
         self.ui.textEdit.setTabChangesFocus(True)
         self.ui.comboBox_stopwords.currentTextChanged.connect(self.fill_text_edit)
+        self.app.project_events.project_data_changed.connect(self._on_project_data_changed)
 
     def splitter_sizes(self):
         """ Detect size changes in splitter and store in app.settings variable. """
@@ -99,6 +100,21 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         Also called on other coding dialogs in the dialog_list. """
 
         self.codes, self.categories = self.app.get_codes_categories()
+
+    def _on_project_data_changed(self, tables, source):
+        """Handle project change events from other dialogs.
+
+        Args:
+            tables: Changed database table names.
+            source: Event emitter, ignored when it is this dialog.
+        """
+
+        if source is self or not isinstance(tables, list):
+            return
+        tables = set(tables)
+        if "code_cat" not in tables and "code_name" not in tables:
+            return
+        self.fill_tree()
 
     def get_collapsed(self, item):
         """ On category collapse or expansion signal, find the collapsed parent category items.

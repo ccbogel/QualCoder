@@ -109,6 +109,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         self.ui.treeWidget.itemSelectionChanged.connect(self.code_selected)
         self.ui.listWidget_files.itemClicked.connect(self.file_selected)
         self.ui.textEdit.setReadOnly(True)
+        self.app.project_events.project_data_changed.connect(self._on_project_data_changed)
 
     def information(self):
         """ Provide statistical help information. """
@@ -131,6 +132,22 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         for row in result:
             self.coders.append(row[0])
         self.get_files()
+
+    def _on_project_data_changed(self, tables, source):
+        """Handle project change events from other dialogs.
+
+        Args:
+            tables: Changed database table names.
+            source: Event emitter, ignored when it is this dialog.
+        """
+
+        if source is self or not isinstance(tables, list):
+            return
+        tables = set(tables)
+        if "code_cat" not in tables and "code_name" not in tables:
+            return
+        self.codes, self.categories = self.app.get_codes_categories()
+        self.fill_tree()
 
     def file_menu(self, position):
         """ Context menu for listWidget files for Sorting files.

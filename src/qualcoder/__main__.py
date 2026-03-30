@@ -171,6 +171,28 @@ class ProjectLockHeartbeatWorker(QtCore.QObject):
         self.finished.emit()
 
 
+class ProjectEventBus(QtCore.QObject):
+    """Application-wide event bus for project database changes.
+    This is used to notify other dialogs (e.g. reports) of changes to the project database, 
+    so they can update their UI (e.g the code tree)."""
+
+    project_data_changed = QtCore.pyqtSignal(list, object)
+
+    def emit_table_changes(self, tables: list[str], source=None):
+        """Emit one project-change event for changed database tables.
+
+        Args:
+            tables: List of database table names that changed. An empty list means that no
+                project-wide event is emitted.
+            source: Optional object identifying the emitter. Subscribers can compare this to
+                themselves to ignore events that originated from the same dialog instance.
+        """
+
+        if len(tables) == 0:
+            return
+        self.project_data_changed.emit(tables, source)
+
+
 class App(object):
     """ General methods for loading settings and recent project stored in .qualcoder folder.
     Savable settings does not contain project name, project path or db connection.
@@ -192,6 +214,7 @@ class App(object):
     ai_models = []
     # This is the sentence transformer embedding function. It is stored here so it must not be reloaded every time a project is opened.
     ai_embedding_function = None
+    project_events = None
     
     def __init__(self):
         self.conn = None
@@ -208,6 +231,7 @@ class App(object):
         self.settings, self.ai_models = self.load_settings()
         self.last_export_directory = copy(self.settings['directory'])
         self.version = qualcoder_version
+        self.project_events = ProjectEventBus()
 
     def read_previous_project_paths(self):
         """ Recent project paths are stored in .qualcoder/recent_projects.txt

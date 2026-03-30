@@ -76,6 +76,8 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         self.ui.splitter.setSizes([500, 0])
 
         self.codes, self.categories = self.app.get_codes_categories()
+        self.code_selection_mode = "all"
+        self.selected_category_ids = []
         self.files = self.app.get_text_filenames()
         # Get attributes
         sql = "select name, valuetype, caseOrFile,0,0 from attribute_type where caseOrFile!='journal'"
@@ -101,6 +103,7 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         self.data_counts = []
         self.data_colors = []
         self.data_list_widget = []   # Used to transfer data from list widget item to DialogCodeIn...
+        self.app.project_events.project_data_changed.connect(self._on_project_data_changed)
 
     def clear_table_and_data(self):
         self.data = []
@@ -111,6 +114,60 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         self.ui.tableWidget.setRowCount(0)
         self.ui.tableWidget.setColumnCount(0)
         self.ui.listWidget.clear()
+
+    def _selected_code_ids(self):
+        return [code["cid"] for code in self.codes if isinstance(code, dict) and code.get("cid") is not None]
+
+    def _refresh_selected_codes_from_project(self):
+        fresh_codes, fresh_categories = self.app.get_codes_categories()
+        self.categories = fresh_categories
+        previous_selected_ids = self._selected_code_ids()
+
+        if self.code_selection_mode == "all":
+            self.codes = fresh_codes
+            return
+
+        if self.code_selection_mode == "categories" and self.selected_category_ids:
+            matched_categories = [cat for cat in fresh_categories if cat["catid"] in self.selected_category_ids]
+            refreshed_codes = []
+            for category in matched_categories:
+                for code_ in self.get_children_of_category(category):
+                    code_copy = dict(code_)
+                    code_copy["name"] = f"{category['name']}:\n{code_copy['name']}"
+                    refreshed_codes.append(code_copy)
+            self.codes = refreshed_codes
+            return
+
+        fresh_code_map = {code["cid"]: code for code in fresh_codes}
+        self.codes = [fresh_code_map[cid] for cid in previous_selected_ids if cid in fresh_code_map]
+
+    def _on_project_data_changed(self, tables, source):
+        """Handle project change events from other dialogs.
+
+        Args:
+            tables: Changed database table names.
+            source: Event emitter, ignored when it is this dialog.
+        """
+
+        if source is self or not isinstance(tables, list):
+            return
+        tables = set(tables)
+        watched_tables = {"code_cat", "code_name", "code_text", "code_av", "code_image"}
+        if watched_tables.isdisjoint(tables):
+            return
+
+        self._refresh_selected_codes_from_project()
+        if not self.codes:
+            self.clear_table_and_data()
+            return
+
+        has_visible_results = bool(self.data_counts) or self.ui.tableWidget.rowCount() > 0 or self.ui.tableWidget.columnCount() > 0
+        if not has_visible_results:
+            return
+
+        self.ui.listWidget.clear()
+        self.data_list_widget = []
+        self.process_files_data()
 
     def select_attribute(self):
         """ Select an attribute.
@@ -358,10 +415,14 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         if not selected or selected[0]['name'] == '':
             #selected = deepcopy(self.codes)
             self.codes = codes
+            self.code_selection_mode = "all"
+            self.selected_category_ids = []
             Message(self.app, _("Codes selected"), _("All codes selected")).exec()
         else:
             msg = ""
             self.codes = []
+            self.code_selection_mode = "codes"
+            self.selected_category_ids = []
             for selected_code in selected:
                 self.codes.append(selected_code)
                 msg += f"{selected_code['name']}\n"
@@ -381,6 +442,8 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
             return
         category = ui.get_selected()
         self.codes = self.get_children_of_category(category)
+        self.code_selection_mode = "categories"
+        self.selected_category_ids = [category["catid"]] if category.get("catid") is not None else []
         for code_ in self.codes:
             code_['name'] = f"{category['name']}:\n{code_['name']}"
         self.clear_table_and_data()
