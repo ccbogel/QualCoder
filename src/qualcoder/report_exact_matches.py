@@ -103,9 +103,7 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         self.ui.pushButton_run.pressed.connect(self.get_exact_text_matches)
         self.ui.tableWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.tableWidget.customContextMenuRequested.connect(self.table_menu)
-        project_events = getattr(self.app, "project_events", None)
-        if project_events is not None and hasattr(project_events, "project_data_changed"):
-            project_events.project_data_changed.connect(self._on_project_data_changed)
+        self.app.project_events.project_data_changed.connect(self._on_project_data_changed)
 
     def get_data(self):
         """ Called from init. gets code_names, categories and owner names.
@@ -133,7 +131,12 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
             self.ui.comboBox_coders.blockSignals(False)
 
     def _on_project_data_changed(self, tables, source):
-        """Refresh the local exact-match dialog when project events affect it."""
+        """Handle project change events from other dialogs.
+
+        Args:
+            tables: Changed database table names.
+            source: Event emitter, ignored when it is this dialog.
+        """
 
         if source is self or not isinstance(tables, list):
             return

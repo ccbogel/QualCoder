@@ -109,9 +109,7 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         self.ui.treeWidget.itemSelectionChanged.connect(self.code_selected)
         self.ui.listWidget_files.itemClicked.connect(self.file_selected)
         self.ui.textEdit.setReadOnly(True)
-        project_events = getattr(self.app, "project_events", None)
-        if project_events is not None and hasattr(project_events, "project_data_changed"):
-            project_events.project_data_changed.connect(self._on_project_data_changed)
+        self.app.project_events.project_data_changed.connect(self._on_project_data_changed)
 
     def information(self):
         """ Provide statistical help information. """
@@ -136,7 +134,12 @@ class DialogCompareCoderByFile(QtWidgets.QDialog):
         self.get_files()
 
     def _on_project_data_changed(self, tables, source):
-        """Refresh the local code tree when project events change the code system."""
+        """Handle project change events from other dialogs.
+
+        Args:
+            tables: Changed database table names.
+            source: Event emitter, ignored when it is this dialog.
+        """
 
         if source is self or not isinstance(tables, list):
             return

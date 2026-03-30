@@ -407,9 +407,7 @@ class DialogCodeText(QtWidgets.QWidget):
         layout.setContentsMargins(0, 0, 0, 0)  # Remove margins if needed
         layout.addWidget(self.number_bar)
         self.ui.lineNumbers.setLayout(layout)
-        project_events = getattr(self.app, "project_events", None)
-        if project_events is not None and hasattr(project_events, "project_data_changed"):
-            project_events.project_data_changed.connect(self._on_project_data_changed)
+        self.app.project_events.project_data_changed.connect(self._on_project_data_changed)
         self.fill_tree()
         # These signals after the tree is filled the first time
         self.ui.treeWidget.itemCollapsed.connect(self.get_collapsed)
@@ -3758,7 +3756,12 @@ class DialogCodeText(QtWidgets.QWidget):
             self.app.project_events.emit_table_changes(tables, source=self)
 
     def _on_project_data_changed(self, tables, source):
-        """Refresh the local code tree or text codings when project events touch them."""
+        """Handle project change events from other dialogs.
+
+        Args:
+            tables: Changed database table names.
+            source: Event emitter, ignored when it is this dialog.
+        """
 
         if source is self or not isinstance(tables, list):
             return

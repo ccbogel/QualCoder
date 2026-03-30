@@ -103,9 +103,7 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         self.data_counts = []
         self.data_colors = []
         self.data_list_widget = []   # Used to transfer data from list widget item to DialogCodeIn...
-        project_events = getattr(self.app, "project_events", None)
-        if project_events is not None and hasattr(project_events, "project_data_changed"):
-            project_events.project_data_changed.connect(self._on_project_data_changed)
+        self.app.project_events.project_data_changed.connect(self._on_project_data_changed)
 
     def clear_table_and_data(self):
         self.data = []
@@ -144,7 +142,12 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         self.codes = [fresh_code_map[cid] for cid in previous_selected_ids if cid in fresh_code_map]
 
     def _on_project_data_changed(self, tables, source):
-        """Refresh the local comparison table when project events affect it."""
+        """Handle project change events from other dialogs.
+
+        Args:
+            tables: Changed database table names.
+            source: Event emitter, ignored when it is this dialog.
+        """
 
         if source is self or not isinstance(tables, list):
             return

@@ -86,9 +86,7 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         self.ui.treeWidget.itemClicked.connect(self.fill_text_edit)
         self.ui.textEdit.setTabChangesFocus(True)
         self.ui.comboBox_stopwords.currentTextChanged.connect(self.fill_text_edit)
-        project_events = getattr(self.app, "project_events", None)
-        if project_events is not None and hasattr(project_events, "project_data_changed"):
-            project_events.project_data_changed.connect(self._on_project_data_changed)
+        self.app.project_events.project_data_changed.connect(self._on_project_data_changed)
 
     def splitter_sizes(self):
         """ Detect size changes in splitter and store in app.settings variable. """
@@ -104,7 +102,12 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         self.codes, self.categories = self.app.get_codes_categories()
 
     def _on_project_data_changed(self, tables, source):
-        """Refresh the local code tree when project events change the code system."""
+        """Handle project change events from other dialogs.
+
+        Args:
+            tables: Changed database table names.
+            source: Event emitter, ignored when it is this dialog.
+        """
 
         if source is self or not isinstance(tables, list):
             return

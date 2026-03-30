@@ -86,9 +86,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         self.ui.treeWidget.itemExpanded.connect(self.get_collapsed)
         self.ui.radioButton.clicked.connect(self.sort_by_alphabet)
         self.ui.radioButton_2.clicked.connect(self.sort_by_totals)
-        project_events = getattr(self.app, "project_events", None)
-        if project_events is not None and hasattr(project_events, "project_data_changed"):
-            project_events.project_data_changed.connect(self._on_project_data_changed)
+        self.app.project_events.project_data_changed.connect(self._on_project_data_changed)
 
     def select_files_button(self):
         """ Report code frequencies for all files or selected files.
@@ -301,7 +299,12 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         self.fill_tree()
 
     def _on_project_data_changed(self, tables, source):
-        """Refresh the local tree when project events change codes or codings."""
+        """Handle project change events from other dialogs.
+
+        Args:
+            tables: Changed database table names.
+            source: Event emitter, ignored when it is this dialog.
+        """
 
         if source is self or not isinstance(tables, list):
             return
@@ -576,9 +579,7 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         # These signals after the tree is filled the first time
         self.ui.treeWidget.itemCollapsed.connect(self.get_collapsed)
         self.ui.treeWidget.itemExpanded.connect(self.get_collapsed)
-        project_events = getattr(self.app, "project_events", None)
-        if project_events is not None and hasattr(project_events, "project_data_changed"):
-            project_events.project_data_changed.connect(self._on_project_data_changed)
+        self.app.project_events.project_data_changed.connect(self._on_project_data_changed)
 
     def get_data(self):
         """ Called from init. gets coders, codes, categories, file_summaries.
@@ -596,7 +597,12 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
             self.coders.append(row[0])
 
     def _on_project_data_changed(self, tables, source):
-        """Refresh the local comparison tree when project events touch it."""
+        """Handle project change events from other dialogs.
+
+        Args:
+            tables: Changed database table names.
+            source: Event emitter, ignored when it is this dialog.
+        """
 
         if source is self or not isinstance(tables, list):
             return

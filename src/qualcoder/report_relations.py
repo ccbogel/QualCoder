@@ -121,9 +121,7 @@ class DialogReportRelations(QtWidgets.QDialog):
         self.files = []
         for r in res:
             self.files.append({'name': r[0], 'fid': r[1]})
-        project_events = getattr(self.app, "project_events", None)
-        if project_events is not None and hasattr(project_events, "project_data_changed"):
-            project_events.project_data_changed.connect(self._on_project_data_changed)
+        self.app.project_events.project_data_changed.connect(self._on_project_data_changed)
 
     def select_files(self):
         """ Select files for analysis. """
@@ -228,7 +226,12 @@ class DialogReportRelations(QtWidgets.QDialog):
         self.codes, self.categories = self.app.get_codes_categories()
 
     def _on_project_data_changed(self, tables, source):
-        """Refresh the local relations dialog when project events affect it."""
+        """Handle project change events from other dialogs.
+
+        Args:
+            tables: Changed database table names.
+            source: Event emitter, ignored when it is this dialog.
+        """
 
         if source is self or not isinstance(tables, list):
             return
