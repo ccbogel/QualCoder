@@ -1122,6 +1122,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 "attribute desc: attribute name ttribute - descending
         """
 
+        # TODO add progress dialog
         # Check a placeholder attribute is present for the file, add if missing
         self.check_attribute_placeholders()
         self.source = []
@@ -1878,10 +1879,17 @@ class DialogManageFiles(QtWidgets.QDialog):
         imports = response[0]
         if not imports:
             return
+
+        steps = len(imports)
+        file_number = 0
+        first_filename = os.path.basename(imports[0])
+        progress = QtWidgets.QProgressDialog(first_filename, None, file_number, steps, self)
+        progress.setWindowModality(QtCore.Qt.WindowModality.WindowModal)
+        progress.setWindowTitle(_("Importing"))
+        progress.setMinimumDuration(0)  # Show immediately
+        progress.show()
         known_file_type = False
-        name_split = imports[0].split("/")
-        temp_filename = name_split[-1]
-        self.default_import_directory = imports[0][0:-len(temp_filename)]
+        self.default_import_directory = os.path.dirname(imports[0])
         pdf_msg = ""
         for import_path in imports:
             link_path = ""
@@ -1893,7 +1901,9 @@ class DialogManageFiles(QtWidgets.QDialog):
                 link_path = import_path
             # Need process events, if many large files are imported, leaves the FileDialog open and covering the screen.
             QtWidgets.QApplication.processEvents()
-            filename = import_path.split("/")[-1]
+            filename = os.path.basename(import_path)
+            progress.setValue(file_number + 1)
+            progress.setLabelText(filename)
             destination = self.app.project_path
             if import_path.split('.')[-1].lower() in ('docx', 'odt', 'rtf', 'txt', 'htm', 'html', 'epub', 'md'):
                 destination += f"/documents/{filename}"
@@ -1990,6 +2000,8 @@ class DialogManageFiles(QtWidgets.QDialog):
                         logger.warning(str(err))
                         Message(self.app, _('Unknown file type'), _("Cannot import file") + f":\n{import_path}",
                                 "warning")
+            file_number += 1
+
         if pdf_msg != "":
             self.parent_text_edit.append(pdf_msg)
         self.load_file_data()
