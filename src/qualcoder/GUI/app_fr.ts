@@ -1562,132 +1562,132 @@ Appui sur la touche 5 - Avance de 5 secondes</translation>
 <context>
     <name>Dialog_code_image</name>
     <message>
-        <location filename="ui_dialog_code_image.py" line="202"/>
+        <location filename="ui_dialog_code_image.py" line="203"/>
         <source>View Image</source>
         <translation>Visualiser l&apos;image</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_image.py" line="221"/>
+        <location filename="ui_dialog_code_image.py" line="222"/>
         <source>Coder:</source>
         <translation>Codeur :</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_image.py" line="226"/>
+        <location filename="ui_dialog_code_image.py" line="227"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File memo&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Mémo de fichier&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_image.py" line="204"/>
+        <location filename="ui_dialog_code_image.py" line="205"/>
         <source>Coded area:</source>
         <translation>Zone codée :</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_image.py" line="205"/>
+        <location filename="ui_dialog_code_image.py" line="206"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This coded area&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Cette zone codée&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_image.py" line="224"/>
+        <location filename="ui_dialog_code_image.py" line="225"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;File with latest coding&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Fichier avec le dernier codage&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_image.py" line="225"/>
+        <location filename="ui_dialog_code_image.py" line="226"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Fichier suivant&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_image.py" line="206"/>
+        <location filename="ui_dialog_code_image.py" line="207"/>
         <source>Show codings flagged important</source>
         <translation>Afficher les codages marqués comme importants</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_image.py" line="227"/>
+        <location filename="ui_dialog_code_image.py" line="228"/>
         <source>Show files using selected file attributes</source>
         <translation>Afficher les fichiers utilisant les attributs de fichiers sélectionnés</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_image.py" line="203"/>
+        <location filename="ui_dialog_code_image.py" line="204"/>
         <source>Image details</source>
         <translation>Détails de l&apos;image</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_image.py" line="207"/>
+        <location filename="ui_dialog_code_image.py" line="208"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export image as html file.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Exporter l&apos;image en tant que fichier html.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_image.py" line="208"/>
+        <location filename="ui_dialog_code_image.py" line="209"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Show captions&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Afficher les légendes&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_image.py" line="209"/>
+        <location filename="ui_dialog_code_image.py" line="210"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Zoom in. W or +&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Zoom avant W ou +&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_image.py" line="210"/>
+        <location filename="ui_dialog_code_image.py" line="211"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Zoom out. Q or -&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Zoom arrière. Q ou -&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_image.py" line="211"/>
+        <location filename="ui_dialog_code_image.py" line="212"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rotate counter-clockwise&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Tourner dans le sens inverse des aiguilles d&apos;une montre&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_image.py" line="212"/>
+        <location filename="ui_dialog_code_image.py" line="213"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rotate clockwise&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rotation dans le sens des aiguilles d&apos;une montre&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_image.py" line="213"/>
+        <location filename="ui_dialog_code_image.py" line="214"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Previous&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Précédent&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_image.py" line="214"/>
+        <location filename="ui_dialog_code_image.py" line="215"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Suivant&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_image.py" line="215"/>
+        <location filename="ui_dialog_code_image.py" line="216"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Pages&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Pages&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_image.py" line="216"/>
+        <location filename="ui_dialog_code_image.py" line="217"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Last Page&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Dernière page&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_image.py" line="217"/>
+        <location filename="ui_dialog_code_image.py" line="218"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Go to page&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Aller à la page&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_image.py" line="218"/>
+        <location filename="ui_dialog_code_image.py" line="219"/>
         <source>Set default colour for new codes</source>
         <translation>Définir la couleur par défaut pour les nouveaux codes</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_image.py" line="219"/>
+        <location filename="ui_dialog_code_image.py" line="220"/>
         <source>PDF controls</source>
         <translation>Contrôles PDF</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_image.py" line="220"/>
+        <location filename="ui_dialog_code_image.py" line="221"/>
         <source>Find code</source>
         <translation>Trouver le code</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_image.py" line="222"/>
+        <location filename="ui_dialog_code_image.py" line="223"/>
         <source>Coder visibility</source>
         <translation>Visibilité du codeur⋅euse</translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_image.py" line="223"/>
+        <location filename="ui_dialog_code_image.py" line="224"/>
         <source>...</source>
         <translation>...</translation>
     </message>
