@@ -1860,8 +1860,8 @@ class DialogManageFiles(QtWidgets.QDialog):
         md is text Markdown format.
         Note importing from html, odt, docx, rtf all formatting is lost.
         Imports images as jpg, jpeg, png which are stored in an images directory.
-        Imports audio as mp3, wav, m4a which are stored in an audio directory.
-        Imports video as mp4, mov, ogg, wmv, webm, m4v which are stored in a video directory.
+        Imports audio as mp3, wav, ogg, m4a which are stored in an audio directory.
+        Imports video as mp4, mov, wmv, webm, m4v which are stored in a video directory.
 
         param:
             link:   False - files are imported into project folder,
@@ -1948,7 +1948,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 else:
                     self.load_media_reference(f"images:{link_path}")
                 known_file_type = True
-            if import_path.split('.')[-1].lower() in ('wav', 'mp3', 'm4a'):
+            if import_path.split('.')[-1].lower() in ('wav', 'mp3', 'm4a', 'ogg'):
                 if link_path == "":
                     destination += f"/audio/{filename}"
                     try:
@@ -1962,7 +1962,7 @@ class DialogManageFiles(QtWidgets.QDialog):
                 else:
                     self.load_media_reference(f"audio:{link_path}")
                 known_file_type = True
-            if import_path.split('.')[-1].lower() in ('mkv', 'mov', 'mp4', 'ogg', 'wmv', 'webm', 'm4v'):
+            if import_path.split('.')[-1].lower() in ('mkv', 'mov', 'mp4', 'wmv', 'webm', 'm4v'):
                 if link_path == "":
                     destination += f"/video/{filename}"
                     try:

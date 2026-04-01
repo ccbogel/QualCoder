@@ -99,9 +99,10 @@ def file_typer(mediapath):
         return "image"
     if len(mediapath) > 4 and mediapath[-4:] == 'jpeg':
         return "image"
-    if mediapath[-3:] in ('mp3', 'wav', 'm4a'):
+    if mediapath[-3:] in ('mp3', 'wav', 'm4a', 'ogg'):
         return "audio"
-    if mediapath[-3:] in ('mkv', 'mov', 'mp4', 'ogg', 'wmv') or mediapath[-4:] == 'webm':
+    # ogg was in video (pre 2 apr 2026)
+    if mediapath[-3:] in ('mkv', 'mov', 'mp4', 'm4v', 'wmv') or mediapath[-4:] == 'webm':
         return "video"
     return "text"
 
