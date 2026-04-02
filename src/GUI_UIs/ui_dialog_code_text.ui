@@ -107,7 +107,7 @@ Right click for options: all, first, last, within another code.</string>
        <string>0 / 0</string>
       </property>
       <property name="alignment">
-       <set>Qt::AlignCenter</set>
+       <set>Qt::AlignmentFlag::AlignCenter</set>
       </property>
      </widget>
      <widget class="QPushButton" name="pushButton_previous">
@@ -161,7 +161,7 @@ Right click for options: all, first, last, within another code.</string>
        <string/>
       </property>
       <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
       </property>
       <property name="wordWrap">
        <bool>true</bool>
@@ -186,7 +186,7 @@ Right click for options: all, first, last, within another code.</string>
        <string/>
       </property>
       <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
       </property>
       <property name="wordWrap">
        <bool>true</bool>
@@ -292,7 +292,7 @@ Right click for options: all (default), first, code within code.</string>
        <string/>
       </property>
       <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       <set>Qt::AlignmentFlag::AlignRight|Qt::AlignmentFlag::AlignTrailing|Qt::AlignmentFlag::AlignVCenter</set>
       </property>
       <property name="wordWrap">
        <bool>true</bool>
@@ -418,17 +418,32 @@ As all assigned positions may be incorrect. </string>
       </item>
       <item>
        <property name="text">
-        <string>html</string>
+        <string>odt highlight</string>
        </property>
       </item>
       <item>
        <property name="text">
-        <string>odt</string>
+        <string>odt comment</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>odt report</string>
        </property>
       </item>
       <item>
        <property name="text">
         <string>txt</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>html</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>codebook</string>
        </property>
       </item>
      </widget>
@@ -555,10 +570,10 @@ Formatted like below for name detection.
        <item>
         <spacer name="horizontalSpacer_2">
          <property name="orientation">
-          <enum>Qt::Horizontal</enum>
+          <enum>Qt::Orientation::Horizontal</enum>
          </property>
          <property name="sizeType">
-          <enum>QSizePolicy::Minimum</enum>
+          <enum>QSizePolicy::Policy::Minimum</enum>
          </property>
          <property name="sizeHint" stdset="0">
           <size>
@@ -640,7 +655,7 @@ Formatted like below for name detection.
        </rect>
       </property>
       <property name="orientation">
-       <enum>Qt::Horizontal</enum>
+       <enum>Qt::Orientation::Horizontal</enum>
       </property>
      </widget>
     </widget>
@@ -725,7 +740,7 @@ Formatted like below for name detection.
       <item>
        <widget class="QSplitter" name="splitter">
         <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+         <enum>Qt::Orientation::Horizontal</enum>
         </property>
         <property name="handleWidth">
          <number>9</number>
@@ -750,7 +765,7 @@ Formatted like below for name detection.
           <item>
            <widget class="QSplitter" name="leftsplitter">
             <property name="orientation">
-             <enum>Qt::Vertical</enum>
+             <enum>Qt::Orientation::Vertical</enum>
             </property>
             <widget class="QTabWidget" name="tabWidget">
              <property name="sizePolicy">
@@ -947,7 +962,7 @@ Formatted like below for name detection.
                <item>
                 <spacer name="horizontalSpacer">
                  <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
+                  <enum>Qt::Orientation::Horizontal</enum>
                  </property>
                  <property name="sizeHint" stdset="0">
                   <size>
@@ -1167,7 +1182,7 @@ Formatted like below for name detection.
           <item row="2" column="0">
            <widget class="QSplitter" name="splitter_2">
             <property name="orientation">
-             <enum>Qt::Vertical</enum>
+             <enum>Qt::Orientation::Vertical</enum>
             </property>
             <widget class="QTextEdit" name="textEdit_info">
              <property name="tabChangesFocus">
