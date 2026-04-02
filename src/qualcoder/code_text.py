@@ -286,7 +286,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_document_memo.pressed.connect(self.active_file_memo)
         self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_file_attributes.pressed.connect(self.get_files_from_attributes)
-        # Buttons under codes tree
+        # Buttons under codes-tree
         self.ui.pushButton_find_code.setIcon(qta.icon('mdi6.card-search-outline', options=[{'scale-factor': 1.2}]))
         self.ui.pushButton_find_code.pressed.connect(self.find_code_in_tree)
         self.ui.pushButton_show_codings_next.setIcon(qta.icon('mdi6.arrow-right'))
@@ -371,6 +371,8 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_exit_edit.pressed.connect(self.edit_mode_toggle)
         self.ui.pushButton_undo_edit.setIcon(qta.icon('mdi6.undo', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_undo_edit.pressed.connect(self.undo_edited_text)
+        self.ui.comboBox_export.currentIndexChanged.connect(self.export_option_selected)
+        # Tree widget
         self.ui.treeWidget.setDragEnabled(True)
         self.ui.treeWidget.setAcceptDrops(True)
         self.ui.treeWidget.setDragDropMode(QtWidgets.QAbstractItemView.DragDropMode.InternalMove)
@@ -378,7 +380,11 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
         self.ui.treeWidget.itemPressed.connect(self.fill_code_label_with_selected_code)
-        self.ui.comboBox_export.currentIndexChanged.connect(self.export_option_selected)
+        # Codes-tree header menu
+        self.ui.treeWidget.header().setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        self.ui.treeWidget.header().customContextMenuRequested.connect(self.codes_tree_header_menu)
+        self.tree_column_widths_auto_resize = True
+
         self.ui.splitter.setSizes([150, 400, 0])  # 3 values; right pane starts collapsed <- L
         try:
             s0 = int(self.app.settings['dialogcodetext_splitter0'])
@@ -786,8 +792,12 @@ class DialogCodeText(QtWidgets.QWidget):
             self.ui.treeWidget.setColumnHidden(1, True)
         else:
             self.ui.treeWidget.setColumnHidden(1, False)
-        self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        if self.tree_column_widths_auto_resize:
+            self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        else:
+            self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Interactive)
         self.ui.treeWidget.header().setStretchLastSection(False)
+
         # Add top level categories
         remove_list = []
         for c in cats:
@@ -978,6 +988,19 @@ class DialogCodeText(QtWidgets.QWidget):
                         item.setText(3, str(code[2]))
                         break
             iterator += 1  # Move to the next item
+
+    def codes_tree_header_menu(self, position):
+        """ treeWidget resize mode - resize to contents or interactive. """
+
+        menu = QtWidgets.QMenu(self)
+        action_resize = menu.addAction(_("Toggle automatic resize"))
+        action = menu.exec(self.ui.treeWidget.mapToGlobal(position))
+        if action == action_resize:
+            self.tree_column_widths_auto_resize = not self.tree_column_widths_auto_resize
+        if self.tree_column_widths_auto_resize:
+            self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        else:
+            self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Interactive)
 
     def get_codes_and_categories(self):
         """ Called from init, delete category/code.
