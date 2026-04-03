@@ -291,9 +291,10 @@ class Ui_DialogCharts(object):
         self.label_bar.setText(_translate("DialogCharts", "Bar charts"))
         self.label_hierarchy.setText(_translate("DialogCharts", "Sunburst and treemap charts"))
         self.label_coder.setText(_translate("DialogCharts", "Select coder"))
+        self.comboBox_coders.setToolTip(_translate("DialogCharts", "Select coder"))
+        self.comboBox_file.setToolTip(_translate("DialogCharts", "Right-click for text filter"))
         self.label_select_file.setText(_translate("DialogCharts", "Select file"))
-        self.comboBox_case.setToolTip(_translate("DialogCharts", "If portions of a text file are assigned to a case, the code frequency and total text characters may be incorrect.\n"
-"Codings from the entire text file are used for the calculations."))
+        self.comboBox_case.setToolTip(_translate("DialogCharts", "Right-click for text filter"))
         self.label_select_case.setToolTip(_translate("DialogCharts", "If portions of a text file are assigned to a case, the code frequency and total text characters may be incorrect.\n"
 "Codings from the entire text file are used for the calculations."))
         self.label_select_case.setText(_translate("DialogCharts", "Select case"))
@@ -302,6 +303,10 @@ class Ui_DialogCharts(object):
         self.lineEdit_filter.setToolTip(_translate("DialogCharts", "Enter number for filter cut off"))
         self.label_filters.setText(_translate("DialogCharts", "<b>Data filters</b>"))
         self.label_chart_options.setText(_translate("DialogCharts", "<b>Coding charts</b>"))
+        self.comboBox_category.setToolTip(_translate("DialogCharts", "Right-click for text filter"))
+        self.label_category.setToolTip(_translate("DialogCharts", "If portions of a text file are assigned to a case,\n"
+"the code frequency and total text characters may be incorrect.\n"
+"Codings from the entire text file are used for the calculations."))
         self.label_category.setText(_translate("DialogCharts", "Select category"))
         self.label_chart_attributes.setText(_translate("DialogCharts", "<b>Attribute charts</b>"))
         self.label_num_attr.setText(_translate("DialogCharts", "Numeric attributes"))
@@ -311,8 +316,8 @@ class Ui_DialogCharts(object):
         self.checkBox_export_html.setText(_translate("DialogCharts", "Export HTML file"))
         self.label_chart_options_2.setText(_translate("DialogCharts", "<b>Heatmap charts</b>"))
         self.label_word_clouds.setText(_translate("DialogCharts", "Word cloud"))
-        self.comboBox_wordcloud_background.setToolTip(_translate("DialogCharts", "<html><head/><body><p>Background</p></body></html>"))
-        self.comboBox_wordcloud_foreground.setToolTip(_translate("DialogCharts", "<html><head/><body><p>Foreground</p></body></html>"))
+        self.comboBox_wordcloud_background.setToolTip(_translate("DialogCharts", "Background"))
+        self.comboBox_wordcloud_foreground.setToolTip(_translate("DialogCharts", "Foreground"))
         self.pushButton_wordcloud.setToolTip(_translate("DialogCharts", "<html><head/><body><p>Make Word Cloud</p></body></html>"))
         self.label_width.setText(_translate("DialogCharts", "Width"))
         self.label_height.setText(_translate("DialogCharts", "Height"))
@@ -325,6 +330,9 @@ class Ui_DialogCharts(object):
         self.comboBox_ngrams.setToolTip(_translate("DialogCharts", "1=One word, 3=3 word phrase, 4=4 word phrase"))
         self.label_upper_count.setToolTip(_translate("DialogCharts", "<html><head/><body><p>This is to allow a wider spread of heatmap colours when there are extreme count differences.</p><p>0 represents no limit.</p></body></html>"))
         self.label_upper_count.setText(_translate("DialogCharts", "Upper count limiter"))
+        self.lineEdit_width.setToolTip(_translate("DialogCharts", "Image width"))
+        self.lineEdit_height.setToolTip(_translate("DialogCharts", "Image height"))
+        self.lineEdit_max_words.setToolTip(_translate("DialogCharts", "Maximum words"))
         self.label_cumulative_bar.setText(_translate("DialogCharts", "<b>Cumulative barchart</b>"))
         self.pushButton_stopwords.setToolTip(_translate("DialogCharts", "Selecting a text file here will override exisitng stopwords in the software, and also override stopwords stored in the .qualcoder configuration folder. \n"
 "This is temporary and must be selected each time the Charts screen is opened.\n"
