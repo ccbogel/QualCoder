@@ -149,6 +149,10 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.ui.listWidget.installEventFilter(self)
         self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
+        # Codes-tree header menu
+        self.ui.treeWidget.header().setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        self.ui.treeWidget.header().customContextMenuRequested.connect(self.codes_tree_header_menu)
+        self.tree_column_widths_auto_resize = True
         # Header widgets
         self.ui.pushButton_zoom_in.setIcon(qta.icon('mdi6.magnify-plus-outline', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_zoom_in.pressed.connect(self.zoom_in)
@@ -457,7 +461,10 @@ class DialogCodeImage(QtWidgets.QDialog):
             self.ui.treeWidget.setColumnHidden(1, True)
         else:
             self.ui.treeWidget.setColumnHidden(1, False)
-        self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        if self.tree_column_widths_auto_resize:
+            self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        else:
+            self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Interactive)
         self.ui.treeWidget.header().setStretchLastSection(False)
         # Add top level categories
         remove_list = []
@@ -640,29 +647,18 @@ class DialogCodeImage(QtWidgets.QDialog):
                         break
             iterator += 1  # Move to the next item
 
-    '''def fill_code_counts_in_tree(self):
-        """ Count instances of each code for current coder and in the selected file.
-        Called by: fill_tree """
+    def codes_tree_header_menu(self, position):
+        """ treeWidget resize mode - resize to contents or interactive. """
 
-        if self.file_ is None:
-            return
-        cur = self.app.conn.cursor()
-        sql = "select count(cid) from code_image_visible where cid=? and id=?"
-        it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
-        item = it.value()
-        count = 0
-        while item and count < 10000:
-            if item.text(1)[0:4] == "cid:":
-                cid = str(item.text(1)[4:])
-                cur.execute(sql, [cid, self.file_['id']])
-                result = cur.fetchone()
-                if result[0] > 0:
-                    item.setText(3, str(result[0]))
-                else:
-                    item.setText(3, "")
-            it += 1
-            item = it.value()
-            count += 1'''
+        menu = QtWidgets.QMenu(self)
+        action_resize = menu.addAction(_("Toggle automatic resize"))
+        action = menu.exec(self.ui.treeWidget.mapToGlobal(position))
+        if action == action_resize:
+            self.tree_column_widths_auto_resize = not self.tree_column_widths_auto_resize
+        if self.tree_column_widths_auto_resize:
+            self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        else:
+            self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Interactive)
 
     def get_collapsed(self, item):
         """ On category collapse or expansion signal, find the collapsed parent category items.
