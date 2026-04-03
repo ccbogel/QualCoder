@@ -106,18 +106,20 @@ class ViewCharts(QDialog):
         self.ui.radioButton_case.clicked.connect(self.fill_combobox_attributes)
 
         self.files = self.app.get_filenames()
-        files_combobox_list = [""]
-        for f in self.files:
-            files_combobox_list.append(f['name'])
-        self.ui.comboBox_file.addItems(files_combobox_list)
-        self.cases = self.app.get_casenames()
-        cases_combobox_list = [""]
-        for f in self.cases:
-            cases_combobox_list.append(f['name'])
-        self.ui.comboBox_case.addItems(cases_combobox_list)
-        self.ui.comboBox_case.currentIndexChanged.connect(self.clear_combobox_files)
+        self.fill_files_combobox()
         self.ui.comboBox_file.currentIndexChanged.connect(self.clear_combobox_cases)
+        self.ui.comboBox_file.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        self.ui.comboBox_file.customContextMenuRequested.connect(self.combobox_file_menu)
+        self.cases = self.app.get_casenames()
+        self.fill_cases_combobox()
+        self.ui.comboBox_case.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        self.ui.comboBox_case.customContextMenuRequested.connect(self.combobox_case_menu)
+        self.ui.comboBox_case.currentIndexChanged.connect(self.clear_combobox_files)
         self.get_selected_categories_and_codes()
+        self.fill_categories_combobox()
+        self.ui.comboBox_category.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        self.ui.comboBox_category.customContextMenuRequested.connect(self.combobox_category_menu)
+
         self.ui.comboBox_pie_charts.currentIndexChanged.connect(self.show_pie_chart)
         pie_combobox_list = ['', _('Code frequency'),
                              _('Code by characters'),
@@ -150,10 +152,7 @@ class ViewCharts(QDialog):
                              ]
         self.ui.comboBox_cumulative_bar.addItems(stacked_bar_combobox_list)
         self.ui.comboBox_cumulative_bar.currentIndexChanged.connect(self.show_cumulative_bar_chart)
-        categories_combobox_list = [""]
-        for c in self.categories:
-            categories_combobox_list.append(c['name'])
-        self.ui.comboBox_category.addItems(categories_combobox_list)
+
         # QIntValidator does not use upper limits, it is based on number of digits entered. eg 99 possible
         self.ui.lineEdit_count_limiter.setValidator(QtGui.QIntValidator(0, 50))
         self.ui.lineEdit_count_limiter.setText("0")
@@ -200,6 +199,69 @@ class ViewCharts(QDialog):
         if index == -1:
             index = 0
         self.ui.comboBox_stopwords.setCurrentIndex(index)
+
+    def fill_files_combobox(self, text=""):
+        files_combobox_list = [""]
+        for f in self.files:
+            files_combobox_list.append(f['name'])
+        self.ui.comboBox_file.addItems(files_combobox_list)
+
+    def combobox_file_menu(self, position):
+        menu = QtWidgets.QMenu(self)
+        action_filter = menu.addAction(_("Text filter"))
+        action = menu.exec(self.ui.comboBox_file.mapToGlobal(position))
+        if action == action_filter:
+            text, ok = QtWidgets.QInputDialog.getText(self, _('File filter'), _('Text:'))
+            if not ok: return
+            items = [self.ui.comboBox_file.itemText(i) for i in range(self.ui.comboBox_file.count())]
+            view = self.ui.comboBox_file.view()
+            for row, item in enumerate(items):
+                if text in item:
+                    view.setRowHidden(row, False)
+                else:
+                    view.setRowHidden(row, True)
+
+    def fill_cases_combobox(self):
+        cases_combobox_list = [""]
+        for f in self.cases:
+            cases_combobox_list.append(f['name'])
+        self.ui.comboBox_case.addItems(cases_combobox_list)
+
+    def combobox_case_menu(self, position):
+        menu = QtWidgets.QMenu(self)
+        action_filter = menu.addAction(_("Text filter"))
+        action = menu.exec(self.ui.comboBox_case.mapToGlobal(position))
+        if action == action_filter:
+            text, ok = QtWidgets.QInputDialog.getText(self, _('Case filter'), _('Text:'))
+            if not ok: return
+            items = [self.ui.comboBox_case.itemText(i) for i in range(self.ui.comboBox_case.count())]
+            view = self.ui.comboBox_case.view()
+            for row, item in enumerate(items):
+                if text in item:
+                    view.setRowHidden(row, False)
+                else:
+                    view.setRowHidden(row, True)
+
+    def fill_categories_combobox(self):
+        categories_combobox_list = [""]
+        for c in self.categories:
+            categories_combobox_list.append(c['name'])
+        self.ui.comboBox_category.addItems(categories_combobox_list)
+
+    def combobox_category_menu(self, position):
+        menu = QtWidgets.QMenu(self)
+        action_filter = menu.addAction(_("Text filter"))
+        action = menu.exec(self.ui.comboBox_category.mapToGlobal(position))
+        if action == action_filter:
+            text, ok = QtWidgets.QInputDialog.getText(self, _('Text filter'), _('Text:'))
+            if not ok: return
+            items = [self.ui.comboBox_category.itemText(i) for i in range(self.ui.comboBox_category.count())]
+            view = self.ui.comboBox_category.view()
+            for row, item in enumerate(items):
+                if text in item:
+                    view.setRowHidden(row, False)
+                else:
+                    view.setRowHidden(row, True)
 
     def get_selected_stopwords_path(self):
         """ Determina de forma segura qué archivo de exclusión enviar a la Nube de Palabras.
