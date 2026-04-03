@@ -245,8 +245,12 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.treeWidget.viewport().installEventFilter(self)
         self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
-        #self.ui.treeWidget.itemSelectionChanged.connect(self.fill_code_label)
         self.ui.treeWidget.itemPressed.connect(self.fill_code_label)
+        # Codes-tree header menu
+        self.ui.treeWidget.header().setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        self.ui.treeWidget.header().customContextMenuRequested.connect(self.codes_tree_header_menu)
+        self.tree_column_widths_auto_resize = True
+
         self.ui.textEdit_2.setReadOnly(True)  # Code examples
         self.ui.splitter.setSizes([150, 400, 150])
         self.ui.splitter_2.setSizes([100, 0])
@@ -565,7 +569,11 @@ class DialogCodePdf(QtWidgets.QWidget):
             self.ui.treeWidget.setColumnHidden(1, True)
         else:
             self.ui.treeWidget.setColumnHidden(1, False)
-        self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        if self.tree_column_widths_auto_resize:
+            self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        else:
+            self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Interactive)
+
         self.ui.treeWidget.header().setStretchLastSection(False)
         # Add top level categories
         remove_list = []
@@ -744,6 +752,19 @@ class DialogCodePdf(QtWidgets.QWidget):
                         item.setText(3, str(code[2]))
                         break
             iterator += 1  # Move to the next item
+
+    def codes_tree_header_menu(self, position):
+        """ treeWidget resize mode - resize to contents or interactive. """
+
+        menu = QtWidgets.QMenu(self)
+        action_resize = menu.addAction(_("Toggle automatic resize"))
+        action = menu.exec(self.ui.treeWidget.mapToGlobal(position))
+        if action == action_resize:
+            self.tree_column_widths_auto_resize = not self.tree_column_widths_auto_resize
+        if self.tree_column_widths_auto_resize:
+            self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        else:
+            self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Interactive)
 
     def get_collapsed(self, item):
         """ On category collapse or expansion signal, find the collapsed parent category items.

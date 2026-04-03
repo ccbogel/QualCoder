@@ -230,6 +230,10 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
         self.ui.treeWidget.itemClicked.connect(self.assign_selected_text_to_code)
+        # Codes-tree header menu
+        self.ui.treeWidget.header().setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
+        self.ui.treeWidget.header().customContextMenuRequested.connect(self.codes_tree_header_menu)
+        self.tree_column_widths_auto_resize = True
         self.get_files()
         self.app.project_events.project_data_changed.connect(self._on_project_data_changed)
         self.fill_tree()
@@ -539,8 +543,12 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.ui.treeWidget.setColumnHidden(1, True)
         else:
             self.ui.treeWidget.setColumnHidden(1, False)
-        self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        if self.tree_column_widths_auto_resize:
+            self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        else:
+            self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Interactive)
         self.ui.treeWidget.header().setStretchLastSection(False)
+
         # Add top level categories
         remove_list = []
         for c in cats:
@@ -551,7 +559,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], f"catid:{c['catid']}", memo])
                 top_item.setToolTip(0, c['name'])
                 if len(c['name']) > 52:
-                    top_item.setText(0, c['name'][:25] + '..' + c['name'][-25:])
+                    top_item.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
                     top_item.setToolTip(0, c['name'])
                 top_item.setToolTip(2, c['memo'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
@@ -580,7 +588,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                         child = QtWidgets.QTreeWidgetItem([c['name'], f"catid:{c['catid']}", memo])
                         child.setToolTip(0, c['name'])
                         if len(c['name']) > 52:
-                            child.setText(0, c['name'][:25] + '..' + c['name'][-25:])
+                            child.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
                             child.setToolTip(0, c['name'])
                         child.setToolTip(2, c['memo'])
                         item.addChild(child)
@@ -606,7 +614,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], f"cid:{c['cid']}", memo])
                 top_item.setToolTip(0, c['name'])
                 if len(c['name']) > 52:
-                    top_item.setText(0, c['name'][:25] + '..' + c['name'][-25:])
+                    top_item.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
                     top_item.setToolTip(0, c['name'])
                 top_item.setToolTip(2, c['memo'])
                 top_item.setBackground(0, QBrush(QColor(c['color']), Qt.BrushStyle.SolidPattern))
@@ -636,7 +644,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                     child.setForeground(0, QBrush(QColor(color)))
                     child.setToolTip(0, c['name'])
                     if len(c['name']) > 52:
-                        child.setText(0, c['name'][:25] + '..' + c['name'][-25:])
+                        child.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
                         child.setToolTip(0, c['name'])
                     child.setToolTip(2, c['memo'])
                     child.setFlags(
@@ -725,6 +733,19 @@ class DialogCodeAV(QtWidgets.QDialog):
                         item.setText(3, str(code[2]))
                         break
             iterator += 1  # Move to the next item
+
+    def codes_tree_header_menu(self, position):
+        """ treeWidget resize mode - resize to contents or interactive. """
+
+        menu = QtWidgets.QMenu(self)
+        action_resize = menu.addAction(_("Toggle automatic resize"))
+        action = menu.exec(self.ui.treeWidget.mapToGlobal(position))
+        if action == action_resize:
+            self.tree_column_widths_auto_resize = not self.tree_column_widths_auto_resize
+        if self.tree_column_widths_auto_resize:
+            self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        else:
+            self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Interactive)
 
     def get_collapsed(self, item):
         """ On category collapse or expansion signal, find the collapsed parent category items.
