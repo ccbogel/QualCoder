@@ -117,6 +117,9 @@
      <height>25</height>
     </rect>
    </property>
+   <property name="toolTip">
+    <string>Select coder</string>
+   </property>
   </widget>
   <widget class="QComboBox" name="comboBox_file">
    <property name="geometry">
@@ -126,6 +129,9 @@
      <width>321</width>
      <height>25</height>
     </rect>
+   </property>
+   <property name="toolTip">
+    <string>Right-click for text filter</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_select_file">
@@ -151,8 +157,7 @@
     </rect>
    </property>
    <property name="toolTip">
-    <string>If portions of a text file are assigned to a case, the code frequency and total text characters may be incorrect.
-Codings from the entire text file are used for the calculations.</string>
+    <string>Right-click for text filter</string>
    </property>
   </widget>
   <widget class="QLabel" name="label_select_case">
@@ -261,6 +266,9 @@ Codings from the entire text file are used for the calculations.</string>
      <height>25</height>
     </rect>
    </property>
+   <property name="toolTip">
+    <string>Right-click for text filter</string>
+   </property>
   </widget>
   <widget class="QLabel" name="label_category">
    <property name="geometry">
@@ -270,6 +278,11 @@ Codings from the entire text file are used for the calculations.</string>
      <width>321</width>
      <height>22</height>
     </rect>
+   </property>
+   <property name="toolTip">
+    <string>If portions of a text file are assigned to a case,
+the code frequency and total text characters may be incorrect.
+Codings from the entire text file are used for the calculations.</string>
    </property>
    <property name="text">
     <string>Select category</string>
@@ -498,7 +511,7 @@ Codings from the entire text file are used for the calculations.</string>
     </rect>
    </property>
    <property name="toolTip">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Background&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    <string>Background</string>
    </property>
   </widget>
   <widget class="QComboBox" name="comboBox_wordcloud_foreground">
@@ -511,7 +524,7 @@ Codings from the entire text file are used for the calculations.</string>
     </rect>
    </property>
    <property name="toolTip">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Foreground&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    <string>Foreground</string>
    </property>
   </widget>
   <widget class="QPushButton" name="pushButton_wordcloud">
@@ -661,6 +674,9 @@ Codings from the entire text file are used for the calculations.</string>
      <height>22</height>
     </rect>
    </property>
+   <property name="toolTip">
+    <string>Image width</string>
+   </property>
   </widget>
   <widget class="QLineEdit" name="lineEdit_height">
    <property name="geometry">
@@ -671,6 +687,9 @@ Codings from the entire text file are used for the calculations.</string>
      <height>22</height>
     </rect>
    </property>
+   <property name="toolTip">
+    <string>Image height</string>
+   </property>
   </widget>
   <widget class="QLineEdit" name="lineEdit_max_words">
    <property name="geometry">
@@ -680,6 +699,9 @@ Codings from the entire text file are used for the calculations.</string>
      <width>71</width>
      <height>22</height>
     </rect>
+   </property>
+   <property name="toolTip">
+    <string>Maximum words</string>
    </property>
   </widget>
   <widget class="QLineEdit" name="lineEdit_count_limiter">
