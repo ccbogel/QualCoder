@@ -1116,7 +1116,7 @@ class CodeResizeHandle(QtWidgets.QWidget):
         self.raise_()  # Ensure it stays on top of the text
 
     def mousePressEvent(self, event):
-        if event.button() == Qt.MouseButton.LeftButton:
+        if event.button() == QtCore.Qt.MouseButton.LeftButton:
             self.dragging = True
 
     def mouseMoveEvent(self, event):
@@ -1149,7 +1149,7 @@ class CodeResizeHandle(QtWidgets.QWidget):
             self.main_dialog.highlight()
 
     def mouseReleaseEvent(self, event):
-        if event.button() == Qt.MouseButton.LeftButton:
+        if event.button() == QtCore.Qt.MouseButton.LeftButton:
             self.dragging = False
             viewport_pos = self.editor.viewport().mapFromGlobal(event.globalPosition().toPoint())
             cursor = self.editor.cursorForPosition(viewport_pos)
