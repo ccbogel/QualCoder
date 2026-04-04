@@ -1104,10 +1104,10 @@ class CodeResizeHandle(QtWidgets.QWidget):
         # Store original positions in case of cancel or error
         self.orig_pos0 = code_item['pos0']
         self.orig_pos1 = code_item['pos1']
-        self.setCursor(Qt.CursorShape.SizeHorCursor)
+        self.setCursor(QtCore.Qt.CursorShape.SizeHorCursor)
         self.setFixedSize(14, 18)
         # Force PyQt to render the QWidget background
-        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
+        self.setAttribute(QtCore.Qt.WidgetAttribute.WA_StyledBackground, True)
 
         color = self.code_item.get('color', '#0078d7')  # Blue
         self.setStyleSheet(f"background-color: {color}; border: 2px solid #333; border-radius: 4px;")
@@ -1157,6 +1157,7 @@ class CodeResizeHandle(QtWidgets.QWidget):
             # Pass original positions for potential revert
             self.main_dialog.update_code_position_from_handle(self.code_item, new_pos, self.is_start, self.orig_pos0,
                                                               self.orig_pos1)
+
 
 class ToolTipEventFilter(QtCore.QObject):
     """ Used to add a dynamic tooltip for the textEdit.
