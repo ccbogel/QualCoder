@@ -53,14 +53,11 @@ from .code_in_all_files import DialogCodeInAllFiles
 from .color_selector import DialogColorSelect
 from .color_selector import colors, TextColor, colour_ranges, show_codes_of_colour_range
 from .confirm_delete import DialogConfirmDelete
-from .helpers import Message, ExportDirectoryPathDialog
+from .helpers import Message, ExportDirectoryPathDialog, ToolTipEventFilter
 from .GUI.ui_dialog_code_pdf import Ui_Dialog_code_pdf
 from .memo import DialogMemo
 from .coder_names import DialogCoderNames
 from .report_attributes import DialogSelectAttributeParameters
-from .reports import DialogReportCoderComparisons, DialogReportCodeFrequencies  # for isinstance()
-from .report_codes import DialogReportCodes
-from .report_code_summary import DialogReportCodeSummary  # for isinstance()
 from .ris import Ris
 from .select_items import DialogSelectItems  # for isinstance()
 
@@ -3774,104 +3771,6 @@ class DialogCodePdf(QtWidgets.QWidget):
     def help(self):
         """ Open help for transcribe section in browser. """
         self.app.help_wiki("4.3.-Coding-Text-on-PDFs")
-
-
-class ToolTipEventFilter(QtCore.QObject):
-    """ Used to add a dynamic tooltip for the textEdit.
-    The tool top text is changed according to its position in the text.
-    If over a coded section the codename(s) or Annotation note are displayed in the tooltip.
-    """
-
-    codes = None
-    code_text = None
-    annotations = None
-    file_id = None
-    offset = 0
-    app = None
-
-    def set_codes_and_annotations(self, app, code_text, codes, annotations, file_):
-        """ Code_text contains the coded text to be displayed in a tooltip.
-        Annotations - a mention is made if current position is annotated
-
-        param:
-            code_text: List of dictionaries of the coded text contains: pos0, pos1, seltext, cid, memo
-            codes: List of dictionaries contains id, name, color
-            annotations: List of dictionaries of
-            offset: integer 0 if all the text is loaded, other numbers mean a portion of the text is loaded,
-            beginning at the offset
-        """
-
-        self.app = app
-        self.code_text = code_text
-        self.codes = codes
-        self.annotations = annotations
-        self.file_id = file_['id']
-        self.offset = file_['start']
-        for item in self.code_text:
-            for c in self.codes:
-                if item['cid'] == c['cid']:
-                    item['name'] = c['name']
-                    item['color'] = c['color']
-
-    def eventFilter(self, receiver, event):
-        # QtGui.QToolTip.showText(QtGui.QCursor.pos(), tip)
-        if event.type() == QtCore.QEvent.Type.ToolTip:
-            cursor = receiver.cursorForPosition(event.pos())
-            pos = cursor.position()
-            receiver.setToolTip("")
-            text_ = ""
-            multiple_msg = '<p style="color:#f89407">' + _("Press O to cycle overlapping codes") + "</p>"
-            multiple = 0
-            # Occasional None type error
-            if self.code_text is None:
-                # Call Base Class Method to Continue Normal Event Processing
-                return super(ToolTipEventFilter, self).eventFilter(receiver, event)
-            for item in self.code_text:
-                if item['pos0'] - self.offset <= pos <= item['pos1'] - self.offset and \
-                        item['seltext'] is not None:
-                    seltext = item['seltext']
-                    seltext = seltext.replace("\n", "")
-                    seltext = seltext.replace("\r", "")
-                    # Selected text with a readable cut off, not cut off halfway through a word.
-                    if len(seltext) > 90:
-                        pre = seltext[0:40].split(' ')
-                        post = seltext[len(seltext) - 40:].split(' ')
-                        try:
-                            pre = pre[:-1]
-                        except IndexError:
-                            pass
-                        try:
-                            post = post[1:]
-                        except IndexError:
-                            pass
-                        seltext = " ".join(pre) + " ... " + " ".join(post)
-                    try:
-                        color = TextColor(item['color']).recommendation
-                        text_ += '<p style="background-color:' + item['color'] + "; color:" + color + '"><em>'
-                        text_ += item['name'] + "</em>"
-                        if self.app.settings['showids']:
-                            text_ += f" [ctid:{item['ctid']}]"
-                        text_ += " (" + item['owner'] + ")"
-                        text_ += "<br />" + seltext
-                        if item['memo'] != "":
-                            text_ += "<br /><em>" + _("MEMO: ") + item['memo'] + "</em>"
-                        if item['important'] == 1:
-                            text_ += "<br /><em>IMPORTANT</em>"
-                        text_ += "</p>"
-                        multiple += 1
-                    except Exception as e:
-                        msg = f"Codes ToolTipEventFilter Exception\n{e} Possible key error:\n{item}"
-                        logger.error(msg)
-            if multiple > 1:
-                text_ = multiple_msg + text_
-            # Check annotations
-            for ann in self.annotations:
-                if ann['pos0'] - self.offset <= pos <= ann['pos1'] - self.offset and self.file_id == ann['fid']:
-                    text_ += "<p>" + _("ANNOTATED") + " (" + ann['owner'] + "): " + ann['memo'] + "</p>"
-            if text_ != "":
-                receiver.setToolTip(text_)
-        # Call Base Class Method to Continue Normal Event Processing
-        return super(ToolTipEventFilter, self).eventFilter(receiver, event)
 
 
 class GraphicsScene(QtWidgets.QGraphicsScene):

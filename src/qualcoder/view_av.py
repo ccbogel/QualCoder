@@ -44,13 +44,10 @@ from .color_selector import DialogColorSelect, colors, TextColor, colour_ranges,
 from .confirm_delete import DialogConfirmDelete
 from .GUI.ui_dialog_code_av import Ui_Dialog_code_av
 from .GUI.ui_dialog_view_av import Ui_Dialog_view_av
-from .helpers import msecs_to_hours_mins_secs, Message, ExportDirectoryPathDialog
+from .helpers import msecs_to_hours_mins_secs, Message, ToolTipEventFilter
 from .memo import DialogMemo
 from .report_attributes import DialogSelectAttributeParameters
-from .reports import DialogReportCoderComparisons, DialogReportCodeFrequencies  # for isinstance()
-from .report_codes import DialogReportCodes
 from .select_items import DialogSelectItems
-# from .speech_to_text import SpeechToText  # Removed as pydub module has error re pyaudioop
 
 # If VLC not installed, it will not crash
 vlc = None
@@ -1140,9 +1137,6 @@ class DialogCodeAV(QtWidgets.QDialog):
             self.app.conn.commit()
             cur.execute("select id, fulltext, name from source where id=?", [tr_id])
             self.transcription = cur.fetchone()
-            '''print("transcription", self.transcription)
-            if self.transcription is None:
-                print("tr_id", tr_id)'''
         self.ui.textEdit.setText(self.transcription[1])
         self.ui.textEdit.ensureCursorVisible()
         self.get_timestamps_from_transcription()
@@ -1182,14 +1176,15 @@ class DialogCodeAV(QtWidgets.QDialog):
         for row in code_results:
             self.code_text.append(dict(zip(keys, row)))
         # Update filter for tooltip and redo formatting
+        transcript_id_and_offset = {"id": self.transcription[0], "start":0}
         if self.important:
             imp_coded = []
             for c in self.code_text:
                 if c['important'] == 1:
                     imp_coded.append(c)
-            self.eventFilterTT.set_codes_and_annotations(self.app, imp_coded, self.codes, self.annotations)
+            self.eventFilterTT.set_codes_and_annotations(self.app, imp_coded, self.codes, self.annotations, transcript_id_and_offset)
         else:
-            self.eventFilterTT.set_codes_and_annotations(self.app, self.code_text, self.codes, self.annotations)
+            self.eventFilterTT.set_codes_and_annotations(self.app, self.code_text, self.codes, self.annotations, transcript_id_and_offset)
         self.unlight()
         self.highlight()
 
@@ -3503,79 +3498,6 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.app.conn.commit()
         self.app.delete_backup = False
         self.load_segments()
-
-
-class ToolTipEventFilter(QtCore.QObject):
-    """ Used to add a dynamic tooltip for the textEdit.
-    The tool top text is changed according to its position in the text.
-    If over a coded section the codename is displayed in the tooltip.
-    Need to add av time segments to the code_text where relevant.
-    """
-
-    codes = None
-    code_text = None
-    annotations = None
-    app = None
-
-    def set_codes_and_annotations(self, app, code_text, codes, annotations):
-        """ Update codes and coded text and annotations for tooltips. """
-
-        self.app = app
-        self.code_text = code_text
-        self.codes = codes
-        self.annotations = annotations
-        for item in self.code_text:
-            for c in self.codes:
-                if item['cid'] == c['cid']:
-                    item['name'] = c['name']
-                    item['color'] = c['color']
-
-    def eventFilter(self, receiver, event):
-        """ Tool tip event filter for textEdit """
-
-        if event.type() == QtCore.QEvent.Type.ToolTip:
-            cursor = receiver.cursorForPosition(event.pos())
-            pos = cursor.position()
-            receiver.setToolTip("")
-            text_ = ""
-            multiple_msg = '<p style="color:#f89407">' + _("Press O to cycle overlapping codes") + "</p>"
-            multiple = 0
-            # Occasional None type error
-            if self.code_text is None:
-                # Call Base Class Method to Continue Normal Event Processing
-                return super(ToolTipEventFilter, self).eventFilter(receiver, event)
-            for item in self.code_text:
-                if item['pos0'] <= pos <= item['pos1']:
-                    try:
-                        text_ += '<p style="background-color:' + item['color']
-                        text_ += '; color:' + TextColor(item['color']).recommendation + '">' + item['name']
-                        if self.app.settings['showids']:
-                            text_ += " [ctid:" + str(item['ctid']) + "] "
-                        if item['avid'] is not None:
-                            text_ += " [" + msecs_to_hours_mins_secs(item['av_pos0'])
-                            text_ += " - " + msecs_to_hours_mins_secs(item['av_pos1']) + "]"
-                        if item['memo'] != "":
-                            text_ += "<br /><em>" + _("MEMO: ") + item['memo'] + "</em>"
-                        if item['important'] == 1:
-                            text_ += "<br /><em>IMPORTANT</em>"
-                        text_ += "</p>"
-                        multiple += 1
-                    except KeyError as e_:
-                        msg_ = f"Codes ToolTipEventFilter {e_}. Key error: "
-                        msg_ += f"{item}\n{self.code_text}"
-                        logger.error(msg_)
-            if multiple > 1:
-                text_ = multiple_msg + text_
-            # Check annotations
-            for ann in self.annotations:
-                # if item['pos0'] - self.offset <= pos and item['pos1'] - self.offset >= pos:
-                if ann['pos0'] <= pos <= ann['pos1']:
-                    text_ += "<p>" + _("ANNOTATED:") + ann['memo'] + "</p>"
-                    break
-            if text_ != "":
-                receiver.setToolTip(text_)
-        # Call Base Class Method to Continue Normal Event Processing
-        return super(ToolTipEventFilter, self).eventFilter(receiver, event)
 
 
 class GraphicsScene(QtWidgets.QGraphicsScene):

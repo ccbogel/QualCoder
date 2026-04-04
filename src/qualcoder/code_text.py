@@ -51,14 +51,11 @@ from .ai_chat import ai_chat_signal_emitter
 from .code_in_all_files import DialogCodeInAllFiles
 from .color_selector import DialogColorSelect, colour_ranges, colors, TextColor, show_codes_of_colour_range
 from .confirm_delete import DialogConfirmDelete
-from .helpers import Message, DialogGetStartAndEndMarks, ExportDirectoryPathDialog, MarkdownHighlighter, NumberBar
+from .helpers import Message, DialogGetStartAndEndMarks, ExportDirectoryPathDialog, NumberBar, CodeResizeHandle, ToolTipEventFilter
 from .GUI.ui_dialog_code_text import Ui_Dialog_code_text
 from .memo import DialogMemo
-#from .edit_journal import DialogEditJournal  # journal editor dialog <- L
+# from .edit_journal import DialogEditJournal  # journal editor dialog <- L
 from .report_attributes import DialogSelectAttributeParameters
-from .reports import DialogReportCoderComparisons, DialogReportCodeFrequencies  # For isinstance()
-from .report_codes import DialogReportCodes
-from .report_code_summary import DialogReportCodeSummary  # For isinstance()
 from .ris import Ris
 from .select_items import DialogSelectItems  # For isinstance()
 from .speakers import DialogSpeakers, speaker_coder_name
@@ -68,73 +65,6 @@ ai_search_analysis_max_count = 10  # How many chunks of data are analysed in the
 
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
-
-
-class CodeResizeHandle(QtWidgets.QWidget):
-    """ Overlay widget used as a visual drag handle for code boundary resizing. """
-
-    def __init__(self, parent_editor, is_start, code_item, main_dialog):
-        super().__init__(parent_editor.viewport())
-        self.editor = parent_editor
-        self.is_start = is_start
-        self.code_item = code_item
-        self.main_dialog = main_dialog
-        
-        # Store original positions in case of cancel or error
-        self.orig_pos0 = code_item['pos0']
-        self.orig_pos1 = code_item['pos1']
-        self.setCursor(Qt.CursorShape.SizeHorCursor)
-        self.setFixedSize(14, 18)
-        # Force PyQt to render the QWidget background
-        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
-        
-        color = self.code_item.get('color', '#0078d7')  # Blue
-        self.setStyleSheet(f"background-color: {color}; border: 2px solid #333; border-radius: 4px;")
-        self.dragging = False
-        self.show()
-        self.raise_()  # Ensure it stays on top of the text
-
-    def mousePressEvent(self, event):
-        if event.button() == Qt.MouseButton.LeftButton:
-            self.dragging = True
-
-    def mouseMoveEvent(self, event):
-        if self.dragging:
-            global_pos = event.globalPosition().toPoint()
-            viewport_pos = self.editor.viewport().mapFromGlobal(global_pos)
-
-            # Move the handle visually
-            cursor = self.editor.cursorForPosition(viewport_pos)
-            cursor_rect = self.editor.cursorRect(cursor)
-            self.move(cursor_rect.x() - 7, cursor_rect.y() + 2)
-            self.raise_()
-            
-            # Clamp new position to text boundaries
-            new_pos = cursor.position() + self.main_dialog.file_['start']
-            max_pos = len(self.main_dialog.text) + self.main_dialog.file_['start']
-            min_pos = self.main_dialog.file_['start']
-            new_pos = max(min_pos, min(new_pos, max_pos))
-            
-            # Update position in memory for live highlight feedback
-            if self.is_start:
-                if new_pos < self.code_item['pos1']:
-                    self.code_item['pos0'] = new_pos
-            else:
-                if new_pos > self.code_item['pos0']:
-                    self.code_item['pos1'] = new_pos
-            
-            # Refresh the text highlighting
-            self.main_dialog.unlight()
-            self.main_dialog.highlight()
-
-    def mouseReleaseEvent(self, event):
-        if event.button() == Qt.MouseButton.LeftButton:
-            self.dragging = False
-            viewport_pos = self.editor.viewport().mapFromGlobal(event.globalPosition().toPoint())
-            cursor = self.editor.cursorForPosition(viewport_pos)
-            new_pos = cursor.position() + self.main_dialog.file_['start']
-            # Pass original positions for potential revert
-            self.main_dialog.update_code_position_from_handle(self.code_item, new_pos, self.is_start, self.orig_pos0, self.orig_pos1)
 
 
 class DialogCodeText(QtWidgets.QWidget):
@@ -6466,7 +6396,6 @@ class DialogCodeText(QtWidgets.QWidget):
                 coded_text_list.append(item)
         if not coded_text_list:
             return
-        
         code_to_handle = coded_text_list[-1]
         if len(coded_text_list) > 1:
             ui = DialogSelectItems(self.app, coded_text_list, _("Select code to resize"), "single")
@@ -6474,7 +6403,6 @@ class DialogCodeText(QtWidgets.QWidget):
                 code_to_handle = ui.get_selected()
             else:
                 return
-
         self.hide_resize_handles()
 
         # Create start handle
@@ -6532,7 +6460,6 @@ class DialogCodeText(QtWidgets.QWidget):
             self.unlight()
             self.highlight()
             return
-            
         seltext = res[0]
 
         try:
@@ -6547,111 +6474,8 @@ class DialogCodeText(QtWidgets.QWidget):
             code_item['pos1'] = orig_pos1
             Message(self.app, _("Duplicate Error"),
                     _("This code already exists at this exact location."), "warning").exec()
-        
         self.hide_resize_handles()
         self.get_coded_text_update_eventfilter_tooltips()
-
-
-class ToolTipEventFilter(QtCore.QObject):
-    """ Used to add a dynamic tooltip for the textEdit.
-    The tool top text is changed according to its position in the text.
-    If over a coded section the codename(s) or Annotation note are displayed in the tooltip.
-    """
-
-    codes = None
-    code_text = None
-    annotations = None
-    file_id = None
-    offset = 0
-    app = None
-
-    def set_codes_and_annotations(self, app, code_text, codes, annotations, file_):
-        """ Code_text contains the coded text to be displayed in a tooptip.
-        Annotations - a mention is made if current position is annotated
-
-        param:
-            code_text: List of dictionaries of the coded text contains: pos0, pos1, seltext, cid, memo
-            codes: List of dictionaries contains id, name, color
-            annotations: List of dictionaries of
-            offset: integer 0 if all the text is loaded, other numbers mean a portion of the text is loaded,
-            beginning at the offset
-        """
-
-        self.app = app
-        self.code_text = code_text
-        self.codes = codes
-        self.annotations = annotations
-        self.file_id = file_['id']
-        self.offset = file_['start']
-        for item in self.code_text:
-            for c in self.codes:
-                if item['cid'] == c['cid']:
-                    item['name'] = c['name']
-                    item['color'] = c['color']
-
-    def eventFilter(self, receiver, event):
-        # QtGui.QToolTip.showText(QtGui.QCursor.pos(), tip)
-        if event.type() == QtCore.QEvent.Type.ToolTip:
-            cursor = receiver.cursorForPosition(event.pos())
-            pos = cursor.position()
-            receiver.setToolTip("")
-            text_ = ""
-            multiple_msg = '<p style="color:#f89407">' + _("Press O to cycle overlapping codes") + "</p>"
-            multiple = 0
-            # Occasional None type error
-            if self.code_text is None:
-                # Call Base Class Method to Continue Normal Event Processing
-                return super(ToolTipEventFilter, self).eventFilter(receiver, event)
-            for item in self.code_text:
-                if item['pos0'] - self.offset <= pos <= item['pos1'] - self.offset and \
-                        item['seltext'] is not None:
-                    seltext = item['seltext']
-                    seltext = seltext.replace("\n", "")
-                    seltext = seltext.replace("\r", "")
-                    # Selected text with a readable cut off, not cut off halfway through a word.
-                    if len(seltext) > 90:
-                        pre = seltext[0:40].split(' ')
-                        post = seltext[len(seltext) - 40:].split(' ')
-                        try:
-                            pre = pre[:-1]
-                        except IndexError:
-                            pass
-                        try:
-                            post = post[1:]
-                        except IndexError:
-                            pass
-                        seltext = " ".join(pre) + " ... " + " ".join(post)
-                    try:
-                        color = TextColor(item['color']).recommendation
-                        text_ += '<p style="background-color:' + item['color'] + "; color:" + color + '"><em>'
-                        text_ += item['name'] + "</em>"
-                        if self.app.settings['showids']:
-                            text_ += " [ctid:" + str(item['ctid']) + "]"
-                        text_ += " (" + item['owner'] + ")"
-                        text_ += "<br />" + seltext
-                        if item['memo'] != "":
-                            memo_text = item['memo']
-                            if len(memo_text) > 150:
-                                memo_text = memo_text[:150] + "..."
-                            text_ += "<br /><em>" + _("MEMO: ") + memo_text + "</em>"
-                        if item['important'] == 1:
-                            text_ += "<br /><em>" + _("IMPORTANT") + "</em>"
-                        text_ += "</p>"
-                        multiple += 1
-                    except Exception as e:
-                        msg = "Codes ToolTipEventFilter Exception\n" + str(e) + ". Possible key error: \n"
-                        msg += str(item)
-                        logger.error(msg)
-            if multiple > 1:
-                text_ = multiple_msg + text_
-            # Check annotations
-            for ann in self.annotations:
-                if ann['pos0'] - self.offset <= pos <= ann['pos1'] - self.offset and self.file_id == ann['fid']:
-                    text_ += "<p>" + _("ANNOTATED") + " (" + ann['owner'] + "): " + ann['memo'] + "</p>"
-            if text_ != "":
-                receiver.setToolTip(text_)
-        # Call Base Class Method to Continue Normal Event Processing
-        return super(ToolTipEventFilter, self).eventFilter(receiver, event)
 
 
 class DialogFontAndSize(QtWidgets.QDialog):
