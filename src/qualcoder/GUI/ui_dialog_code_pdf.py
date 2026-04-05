@@ -239,9 +239,8 @@ class Ui_Dialog_code_pdf(object):
         self.splitter_2 = QtWidgets.QSplitter(parent=self.groupBox_info)
         self.splitter_2.setOrientation(QtCore.Qt.Orientation.Horizontal)
         self.splitter_2.setObjectName("splitter_2")
-        self.textEdit = QtWidgets.QTextEdit(parent=self.splitter_2)
-        self.textEdit.setTabChangesFocus(True)
-        self.textEdit.setObjectName("textEdit")
+        self.plainTextEdit = QtWidgets.QPlainTextEdit(parent=self.splitter_2)
+        self.plainTextEdit.setObjectName("plainTextEdit")
         self.textEdit_2 = QtWidgets.QTextEdit(parent=self.splitter_2)
         self.textEdit_2.setObjectName("textEdit_2")
         self.gridLayout.addWidget(self.splitter_2, 0, 0, 1, 1)
@@ -262,7 +261,7 @@ class Ui_Dialog_code_pdf(object):
         Dialog_code_pdf.setTabOrder(self.pushButton_file_attributes, self.treeWidget)
         Dialog_code_pdf.setTabOrder(self.treeWidget, self.pushButton_important)
         Dialog_code_pdf.setTabOrder(self.pushButton_important, self.scrollArea)
-        Dialog_code_pdf.setTabOrder(self.scrollArea, self.textEdit)
+        Dialog_code_pdf.setTabOrder(self.scrollArea, self.plainTextEdit)
 
     def retranslateUi(self, Dialog_code_pdf):
         _translate = QtCore.QCoreApplication.translate
