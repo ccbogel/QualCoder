@@ -4251,7 +4251,7 @@ class DialogViewAV(QtWidgets.QDialog):
         self.mediaplayer.video_set_key_input(False)
         self.ui.pushButton_play.clicked.connect(self.play_pause)
         self.ui.horizontalSlider_vol.valueChanged.connect(self.set_volume)
-        self.ui.horizontalSlider_vol.setValue(100)
+        self.ui.horizontalSlider_vol.setValue(99)
         self.ui.comboBox_tracks.currentIndexChanged.connect(self.audio_track_changed)
         self.ui.horizontalSlider.setTickPosition(QtWidgets.QSlider.TickPosition.NoTicks)
         self.ui.horizontalSlider.setMouseTracking(True)
@@ -4301,9 +4301,9 @@ class DialogViewAV(QtWidgets.QDialog):
         # Need this for helping set the slider if user sliding before play begins
         # Detect number of audio tracks in media
         self.mediaplayer.play()
-        self.mediaplayer.audio_set_volume(0)
+        #self.mediaplayer.audio_set_volume(0)
+        self.ui.horizontalSlider_vol.setValue(100)
         time.sleep(0.2)
-        # print( self.mediaplayer.audio_get_track_count()) # > 0
         tracks = self.mediaplayer.audio_get_track_description()
         good_tracks = []  # note where track [0] == -1 is a disabled track
         for track in tracks:
