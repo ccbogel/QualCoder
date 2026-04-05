@@ -19,23 +19,20 @@ https://github.com/ccbogel/QualCoder
 https://qualcoder.wordpress.com/
 https://qualcoder-org.github.io/
 """
+
 from binascii import b2a_hex
 from copy import copy, deepcopy
 import datetime
-import fitz
+import fitz  # Also known as pymupdf
 import logging
 import os
 from pdfminer.converter import PDFPageAggregator
-# Unused LTFigure, LTTextBox, LTTextBoxHorizontal, LTImage, LTCurve, LTLine, LTRect
 from pdfminer.layout import LAParams, LTTextLine
 from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
 from pdfminer.pdfpage import PDFPage
 from pdfminer.psparser import PSLiteral  # Partly using for color conversion
 from pdfminer.pdfparser import PDFParser
 from pdfminer.pdfdocument import PDFDocument  # for PDF meta information
-# Using this for determining colourspace, e.g. colorspace': [<PDFObjRef:852>]
-# from pdfminer.pdftypes import PDFObjRef, resolve1
-# from PIL import Image, ImageOps, ImageQt
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 from random import randint
 import re
@@ -53,7 +50,7 @@ from .code_in_all_files import DialogCodeInAllFiles
 from .color_selector import DialogColorSelect
 from .color_selector import colors, TextColor, colour_ranges, show_codes_of_colour_range
 from .confirm_delete import DialogConfirmDelete
-from .helpers import Message, ExportDirectoryPathDialog, ToolTipEventFilter
+from .helpers import Message, ExportDirectoryPathDialog, ToolTipEventFilter, CodeResizeHandle
 from .GUI.ui_dialog_code_pdf import Ui_Dialog_code_pdf
 from .memo import DialogMemo
 from .coder_names import DialogCoderNames
@@ -74,64 +71,48 @@ class DialogCodePdf(QtWidgets.QWidget):
     NAME_COLUMN = 0
     ID_COLUMN = 1
     MEMO_COLUMN = 2
-    app = None
-    parent_textEdit = None
-    tab_reports = None  # Tab widget reports, used for updates to codes
-    codes = []
-    recent_codes = []  # list of recent codes (up to 5) for textedit context menu
-    categories = []
-    tree_sort_option = "all asc"  # all desc, cat then code asc
-    filenames = []
-    file_ = None  # contains filename and file id returned from SelectItems
-    code_text = []
-    annotations = []
-    undo_deleted_codes = []  # undo last deleted code(s), multiple may have been deleted at th same time, so a list
-    different_text_lengths = False
-    metadata = ""
-    default_new_code_color = None
-
-    # Overlapping coded text details
-    overlaps_at_pos = []
-    overlaps_at_pos_idx = 0
-
-    # Search text variables
-    search_indices = []
-    search_index = 0
-    search_term = ""
-    search_type = "3"  # 3 chars or 5 chars or 1 for Enter
-    selected_code_index = 0
-    important = False  # Show/hide important codes
-    attributes = []  # Show selected files using these attributes in list widget
-
-    # Timers to reduce overly sensitive key events: overlap, re-size oversteps by multiple characters
-    code_resize_timer = 0
-    overlap_timer = 0
-    text = ""
-
-    # Variables associated with right-hand side splitter, for project memo, current journal, code rule
 
     def __init__(self, app, parent_textedit, tab_reports):
 
         super(DialogCodePdf, self).__init__()
         self.app = app
-        self.tab_reports = tab_reports
+        self.tab_reports = tab_reports  # Tab widget reports, used for updates to codes
         self.parent_textEdit = parent_textedit
+        self.text = ""
+
+        # Search text variables
         self.search_indices = []
         self.search_index = 0
+        self.search_term = ""
+        self.search_type = "3"  # 3 chars or 5 chars or 1 for Enter
+        self.selected_code_index = 0
+        self.attributes = []  # Show selected files using these attributes in list widget
+
+        # For Code Resize Handles Experimental
+        self.active_handles = []
+
+        # Codes categories and annotations
+        self.codes = []
+        self.categories = []
+        self.recent_codes = []  # Recent codes (up to 5) for textedit context menu
+        self.undo_deleted_codes = []  # Undo last deleted code(s), multiple may have been deleted at th same time, so a list
+        self.code_text = []  # The coded text segments
         self.codes, self.categories = self.app.get_codes_categories()
         self.get_recent_codes()  # After codes obtained!
-        self.tree_sort_option = "all asc"
+        self.tree_sort_option = "all asc"  # all desc, cat then code asc
         self.annotations = self.app.get_annotations()
         self.autocode_history = []
-        self.undo_deleted_codes = []
-        self.journal = False
-        self.project_memo = False
-        self.code_rule = False
-        self.important = False
-        self.attributes = []
         self.default_new_code_color = None
+        self.important = False  # Show/hide important codes
+        self.project_memo = False  # for textEdit2 - show the project meno
+        self.code_rule = False  # for textEdit2  - show code examples
+
+        # Timers to reduce overly sensitive key events: overlap, re-size oversteps by multiple characters
         self.code_resize_timer = datetime.datetime.now()
         self.overlap_timer = datetime.datetime.now()
+        # Overlapping coded text details
+        self.overlaps_at_pos = []
+        self.overlaps_at_pos_idx = 0
 
         # Set up PDF variables
         self.pages = []
@@ -145,6 +126,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.metadata = ""
         self.selected_graphic_textboxes = []
         self.pdf_object_info_text = ""  # Contains details of PDF page objects
+        self.text = ""  # For the textedit
 
         # Used by load_pdf_pages and get_pdf_items_and_hierarchy to fill document_text for length comparison
         # and for each page ['plain_text'], ['plaintext_start], ['plain_txt_end']
@@ -158,31 +140,29 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.setStyleSheet(font)
         tree_font = f'font: {self.app.settings["treefontsize"]}pt "{self.app.settings["font"]}";'
         self.ui.treeWidget.setStyleSheet(tree_font)
+        # Text edit setup
         doc_font = f'font: {self.app.settings["docfontsize"]}pt "{self.app.settings["font"]}";'
-        self.ui.textEdit.setStyleSheet(doc_font)
-        self.ui.lineEdit_coder.setText(self.app.settings['codername'])
-        self.ui.pushButton_coder.clicked.connect(self.edit_coder_names)
-        self.ui.textEdit.setPlainText("")
-        self.ui.textEdit.setAutoFillBackground(True)
-        self.ui.textEdit.setToolTip("")
-        self.ui.textEdit.setMouseTracking(True)
-        self.ui.textEdit.setTextInteractionFlags(
+        self.ui.plainTextEdit.setStyleSheet(doc_font)
+        self.ui.plainTextEdit.setPlainText("")
+        self.ui.plainTextEdit.setAutoFillBackground(True)
+        self.ui.plainTextEdit.setToolTip("")
+        self.ui.plainTextEdit.setMouseTracking(True)
+        self.ui.plainTextEdit.setTextInteractionFlags(
             Qt.TextInteractionFlag.TextSelectableByMouse |
             Qt.TextInteractionFlag.TextSelectableByKeyboard)
-        self.ui.textEdit.installEventFilter(self)
+        self.ui.plainTextEdit.installEventFilter(self)
         self.eventFilterTT = ToolTipEventFilter()
-        self.ui.textEdit.installEventFilter(self.eventFilterTT)
-        self.ui.textEdit.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        self.ui.textEdit.customContextMenuRequested.connect(self.text_edit_menu)
-        self.ui.textEdit.cursorPositionChanged.connect(self.overlapping_codes_in_text)
-        self.ui.listWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        self.ui.listWidget.customContextMenuRequested.connect(self.file_menu)
-        self.ui.listWidget.setStyleSheet(tree_font)
-        self.ui.listWidget.selectionModel().selectionChanged.connect(self.file_selection_changed)
-        self.ui.lineEdit_search.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        self.ui.lineEdit_search.customContextMenuRequested.connect(self.lineedit_search_menu)
+        self.ui.plainTextEdit.installEventFilter(self.eventFilterTT)
+        self.ui.plainTextEdit.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.ui.plainTextEdit.customContextMenuRequested.connect(self.text_edit_menu)
+        self.ui.plainTextEdit.cursorPositionChanged.connect(self.overlapping_codes_in_text)
+        self.ui.plainTextEdit.verticalScrollBar().valueChanged.connect(self.hide_resize_handles)
 
         # Header widgets
+        self.ui.lineEdit_coder.setText(self.app.settings['codername'])
+        self.ui.pushButton_coder.clicked.connect(self.edit_coder_names)
+        self.ui.lineEdit_search.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.ui.lineEdit_search.customContextMenuRequested.connect(self.lineedit_search_menu)
         self.ui.pushButton_object_info.setIcon(qta.icon('mdi6.magnify', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_object_info.pressed.connect(self.show_pdf_object_info)
         self.ui.pushButton_zoom_in.setIcon(qta.icon('mdi6.magnify-plus-outline', options=[{'scale_factor': 1.3}]))
@@ -218,6 +198,13 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.pushButton_last_page.pressed.connect(self.last_page)
         self.ui.pushButton_goto_page.setIcon(qta.icon('mdi6.book-search-outline', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_goto_page.pressed.connect(self.goto_page)
+
+        # Files list widget
+        self.ui.listWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.ui.listWidget.customContextMenuRequested.connect(self.file_menu)
+        self.ui.listWidget.setStyleSheet(tree_font)
+        self.ui.listWidget.selectionModel().selectionChanged.connect(self.file_selection_changed)
+
         # Widgets under Files list
         self.ui.pushButton_latest.setIcon(qta.icon('mdi6.arrow-collapse-right', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_latest.pressed.connect(self.go_to_latest_coded_file)
@@ -235,7 +222,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.pushButton_important.pressed.connect(self.show_important_coded)
         self.ui.pushButton_find_code.setIcon(qta.icon('mdi6.card-search-outline', options=[{'scale-factor': 1.2}]))
         self.ui.pushButton_find_code.pressed.connect(self.find_code_in_tree)
-
+        # Codes tree
         self.ui.treeWidget.setDragEnabled(True)
         self.ui.treeWidget.setAcceptDrops(True)
         self.ui.treeWidget.setDragDropMode(QtWidgets.QAbstractItemView.DragDropMode.InternalMove)
@@ -266,8 +253,12 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.ui.checkBox_image.stateChanged.connect(self.update_page)
         self.ui.checkBox_black_text.stateChanged.connect(self.update_page)
         self.ui.checkBox_text.stateChanged.connect(self.update_page)
-
+        # Files variables
+        self.different_text_lengths = False  # Difference between rendered PDF text and sqlite stored text
+        self.filenames = []
+        self.file_ = None  # Contains filename and file id returned from SelectItems
         self.get_files()
+
         self.app.project_events.project_data_changed.connect(self._on_project_data_changed)
         self.fill_tree()
         # These signals after the tree is filled the first time
@@ -363,7 +354,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             except ValueError:
                 pass
 
-    def get_files(self, ids=None, sort="name asc"):
+    def get_files(self, ids=None, sort:str = "name asc"):
         """ Get pdf files with additional details and fill list widget.
          Called by: init, get_files_from_attributes, show_files_like
          args:
@@ -430,8 +421,8 @@ class DialogCodePdf(QtWidgets.QWidget):
             item.setToolTip(file_['tooltip'])
             self.ui.listWidget.addItem(item)
         self.file_ = None
-        self.code_text = []  # Must be before clearing textEdit, as next calls cursorChanged
-        self.ui.textEdit.setText("")
+        self.code_text = []  # Must be empty, before clearing textEdit, as next calls cursorChanged
+        self.ui.plainTextEdit.setPlainText("")
 
     def update_file_tooltip(self):
         """ Create tooltip for file containing characters, codings and from: to: if partially loaded.
@@ -525,7 +516,7 @@ class DialogCodePdf(QtWidgets.QWidget):
                 self.ui.label_code.setToolTip(tt)
                 break
         # Selected text via textEdit OR via selected text boxes.
-        selected_text = self.ui.textEdit.textCursor().selectedText()
+        selected_text = self.ui.plainTextEdit.textCursor().selectedText()
         if self.scene is not None:
             self.selected_graphic_textboxes = self.scene.selectedItems()
             if len(selected_text) > 0 and len(self.selected_graphic_textboxes) == 0:
@@ -750,7 +741,7 @@ class DialogCodePdf(QtWidgets.QWidget):
                         break
             iterator += 1  # Move to the next item
 
-    def codes_tree_header_menu(self, position):
+    def codes_tree_header_menu(self, position: int):
         """ treeWidget resize mode - resize to contents or interactive. """
 
         menu = QtWidgets.QMenu(self)
@@ -841,7 +832,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.search_indices = []
         # Search only this document
         try:
-            displayed_text = self.file_['fulltext']  # self.ui.textEdit.toPlainText()
+            displayed_text = self.file_['fulltext']  # self.ui.plainTextEdit.toPlainText()
             if displayed_text != "":
                 for match in pattern.finditer(displayed_text):
                     # Get result. char position and search string length
@@ -871,13 +862,13 @@ class DialogCodePdf(QtWidgets.QWidget):
                 self.show_page()
                 break
         # Highlight selected text
-        cursor = self.ui.textEdit.textCursor()
+        cursor = self.ui.plainTextEdit.textCursor()
         start_pos = next_result[0] - self.pages[self.page_num]['plain_text_start']
         end_pos = start_pos + next_result[1]
         cursor.setPosition(start_pos)
-        self.ui.textEdit.setTextCursor(cursor)
+        self.ui.plainTextEdit.setTextCursor(cursor)
         cursor.setPosition(end_pos, QtGui.QTextCursor.MoveMode.KeepAnchor)
-        self.ui.textEdit.setTextCursor(cursor)
+        self.ui.plainTextEdit.setTextCursor(cursor)
         self.ui.label_search_totals.setText(f"{self.search_index + 1} / {len(self.search_indices)}")
         # Select relevant text boxes
         for tb in self.pages[self.page_num]['text_boxes']:
@@ -910,11 +901,11 @@ class DialogCodePdf(QtWidgets.QWidget):
         # Highlight selected text
         start_pos = previous_result[0] - self.pages[self.page_num]['plain_text_start']
         end_pos = start_pos + previous_result[1]
-        cursor = self.ui.textEdit.textCursor()
+        cursor = self.ui.plainTextEdit.textCursor()
         cursor.setPosition(start_pos)
-        self.ui.textEdit.setTextCursor(cursor)
+        self.ui.plainTextEdit.setTextCursor(cursor)
         cursor.setPosition(end_pos, QtGui.QTextCursor.MoveMode.KeepAnchor)
-        self.ui.textEdit.setTextCursor(cursor)
+        self.ui.plainTextEdit.setTextCursor(cursor)
         self.ui.label_search_totals.setText(f"{self.search_index + 1} / {len(self.search_indices)}")
         # Select relevant text boxes
         for tb in self.pages[self.page_num]['text_boxes']:
@@ -928,7 +919,7 @@ class DialogCodePdf(QtWidgets.QWidget):
                 self.scene.setSelectionArea(painter_path)
                 break
 
-    def lineedit_search_menu(self, position):
+    def lineedit_search_menu(self, position: int):
         """ Option to change from automatic search on 3 characters or more to press Enter to search """
 
         menu = QtWidgets.QMenu()
@@ -971,14 +962,14 @@ class DialogCodePdf(QtWidgets.QWidget):
         ui.ui.pushButton_clear.hide()
         ui.exec()
 
-    def text_edit_recent_codes_menu(self, position):
+    def text_edit_recent_codes_menu(self, position: int):
         """ Alternative context menu.
         Shows a list of recent codes to select from.
         Called by R key press in the text edit pane, only if there is some selected text. """
 
-        if self.ui.textEdit.toPlainText() == "":
+        if self.ui.plainTextEdit.toPlainText() == "":
             return
-        selected_text = self.ui.textEdit.textCursor().selectedText()
+        selected_text = self.ui.plainTextEdit.textCursor().selectedText()
         if selected_text == "":
             return
         if len(self.recent_codes) == 0:
@@ -986,19 +977,19 @@ class DialogCodePdf(QtWidgets.QWidget):
         menu = QtWidgets.QMenu()
         for item in self.recent_codes:
             menu.addAction(item['name'])
-        action = menu.exec(self.ui.textEdit.mapToGlobal(position))
+        action = menu.exec(self.ui.plainTextEdit.mapToGlobal(position))
         if action is None:
             return
         # Remaining actions will be the submenu codes
         self.recursive_set_current_item(self.ui.treeWidget.invisibleRootItem(), action.text())
         self.mark()
 
-    def text_edit_menu(self, position):
+    def text_edit_menu(self, position: int):
         """ Context menu for textEdit.
-        Mark, unmark, annotate, copy, memo coded, coded importance. """
+        Mark, unmark, annotate, copy, memo coded, coded importance, code resize. """
 
-        cursor = self.ui.textEdit.cursorForPosition(position)
-        selected_text = self.ui.textEdit.textCursor().selectedText()
+        cursor = self.ui.plainTextEdit.cursorForPosition(position)
+        selected_text = self.ui.plainTextEdit.textCursor().selectedText()
         menu = QtWidgets.QMenu()
         menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
         action_annotate = None
@@ -1009,34 +1000,34 @@ class DialogCodePdf(QtWidgets.QWidget):
         action_mark = None
         action_not_important = None
         action_change_code = None
-        action_change_pos = None
         action_unmark = None
         action_new_code = None
         action_new_invivo_code = None
+        action_show_handles = None
 
         # Can have multiple coded text at this position
         for item in self.code_text:
             if cursor.position() + self.file_['start'] >= item['pos0'] and cursor.position() <= item['pos1']:
                 action_unmark = QtGui.QAction(_("Unmark (U)"))
                 action_code_memo = QtGui.QAction(_("Memo coded text (M)"))
-                action_change_pos = QtGui.QAction(_("Change code position key presses"))
                 if item['important'] is None or item['important'] > 1:
                     action_important = QtGui.QAction(_("Add important mark (I)"))
                 if item['important'] == 1:
                     action_not_important = QtGui.QAction(_("Remove important mark"))
                 action_change_code = QtGui.QAction(_("Change code"))
+                action_show_handles = QtGui.QAction(_("Resize"))
         if action_unmark:
             menu.addAction(action_unmark)
         if action_code_memo:
             menu.addAction(action_code_memo)
-        if action_change_pos:
-            menu.addAction(action_change_pos)
         if action_important:
             menu.addAction(action_important)
         if action_not_important:
             menu.addAction(action_not_important)
         if action_change_code:
             menu.addAction(action_change_code)
+        if action_show_handles:
+            menu.addAction(action_show_handles)
         if selected_text != "":
             if self.ui.treeWidget.currentItem() is not None:
                 action_mark = menu.addAction(_("Mark (Q)"))
@@ -1057,7 +1048,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             action_show_top_groupbox = menu.addAction(_("Show control panel (H)"))
         if not self.ui.groupBox.isHidden():
             action_hide_top_groupbox = menu.addAction(_("Hide control panel (H)"))
-        action = menu.exec(self.ui.textEdit.mapToGlobal(position))
+        action = menu.exec(self.ui.plainTextEdit.mapToGlobal(position))
         if action is None:
             return
         if action == action_important:
@@ -1085,8 +1076,9 @@ class DialogCodePdf(QtWidgets.QWidget):
         if action == action_code_memo:
             self.coded_text_memo(cursor.position())
             return
-        if action == action_change_pos:
-            self.change_code_pos_message()
+        if action == action_show_handles:
+            self.display_handles_for_code(cursor.position())
+            return
         if action == action_change_code:
             self.change_code_to_another_code(cursor.position())
             return
@@ -1106,16 +1098,16 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.recursive_set_current_item(self.ui.treeWidget.invisibleRootItem(), action.text())
         self.mark()
 
-    def mark_with_new_code(self, in_vivo=False):
+    def mark_with_new_code(self, in_vivo: bool = False):
         """ Create new code and mark selected text.
         param:
-            in_vivo : Boolean if True use in vivio text selection as code name """
+            in_vivo : Boolean if True use in_vivo text selection as code name """
 
         codes_copy = deepcopy(self.codes)
         if not in_vivo:
             self.add_code()
         else:
-            self.add_code(catid=None, code_name=self.ui.textEdit.textCursor().selectedText())
+            self.add_code(catid=None, code_name=self.ui.plainTextEdit.textCursor().selectedText())
         new_code = None
         for c in self.codes:
             if c not in codes_copy:
@@ -1127,12 +1119,12 @@ class DialogCodePdf(QtWidgets.QWidget):
             # Find existing code name that matches in vivo selection
             new_code = None
             for c in self.codes:
-                if c['name'] == self.ui.textEdit.textCursor().selectedText():
+                if c['name'] == self.ui.plainTextEdit.textCursor().selectedText():
                     new_code = c
         self.recursive_set_current_item(self.ui.treeWidget.invisibleRootItem(), new_code['name'])
         self.mark()
 
-    def change_code_to_another_code(self, position):
+    def change_code_to_another_code(self, position: int):
         """ Change code to another code """
 
         # Get coded segments at this position
@@ -1200,7 +1192,7 @@ class DialogCodePdf(QtWidgets.QWidget):
                 self.ui.treeWidget.setCurrentItem(item.child(i))
             self.recursive_set_current_item(item.child(i), text_)
 
-    def is_annotated(self, position):
+    def is_annotated(self, position: int):
         """ Check if position is annotated to provide annotation menu option.
         Returns True or False """
 
@@ -1210,7 +1202,7 @@ class DialogCodePdf(QtWidgets.QWidget):
                 return True
         return False
 
-    def set_important(self, position=None, ctid=None, important=True):
+    def set_important(self, position: int | None = None, ctid: int | None = None, important: bool=True):
         """ Set or unset importance to coded text.
         Importance is denoted using '1'
         Coded text items may be based ona text cursor location, if selected by the text edit,
@@ -1223,7 +1215,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         # Need to get coded segments at this position
         if position is None:
             # Called via button
-            position = self.ui.textEdit.textCursor().position()
+            position = self.ui.plainTextEdit.textCursor().position()
         if self.file_ is None:
             return
         coded_text_list = []
@@ -1261,7 +1253,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.get_coded_text_update_eventfilter_tooltips()
         self.update_page()
 
-    def coded_text_memo(self, position=None, ctid=None):
+    def coded_text_memo(self, position: int | None = None, ctid: int | None = None):
         """ Add or edit a memo for this coded text.
         Coded text items may be based ona text cursor location, if selected by tthe text edit,
         or may be based on a ctid if selected via the graphics scene.
@@ -1272,7 +1264,7 @@ class DialogCodePdf(QtWidgets.QWidget):
 
         if position is None:
             # Called via button
-            position = self.ui.textEdit.textCursor().position()
+            position = self.ui.plainTextEdit.textCursor().position()
         if self.file_ is None:
             return
         coded_text_list = []
@@ -1329,7 +1321,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         """ Copy text to clipboard for external use.
         For example adding text to another document. """
 
-        selected_text = self.ui.textEdit.textCursor().selectedText()
+        selected_text = self.ui.plainTextEdit.textCursor().selectedText()
         cb = QtWidgets.QApplication.clipboard()
         cb.setText(selected_text)
 
@@ -1680,9 +1672,6 @@ class DialogCodePdf(QtWidgets.QWidget):
             if key == QtCore.Qt.Key.Key_5:
                 self.get_files_from_attributes()
                 return
-            '''if key == QtCore.Qt.Key.Key_8:
-                self.show_all_codes_in_text()  # Not used
-                return'''
             if key == QtCore.Qt.Key.Key_9:
                 self.show_important_coded()
                 return
@@ -1725,10 +1714,10 @@ class DialogCodePdf(QtWidgets.QWidget):
             self.mark(by_text_boxes=True)
             return
 
-        if not self.ui.textEdit.hasFocus():
+        if not self.ui.plainTextEdit.hasFocus():
             return
-        cursor_pos = self.ui.textEdit.textCursor().position()
-        selected_text = self.ui.textEdit.textCursor().selectedText()
+        cursor_pos = self.ui.plainTextEdit.textCursor().position()
+        selected_text = self.ui.plainTextEdit.textCursor().selectedText()
         codes_here = []
         for item in self.code_text:
             if item['pos0'] <= cursor_pos + self.file_['start'] <= item['pos1']:
@@ -1743,7 +1732,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             return
         # Bookmark
         if key == QtCore.Qt.Key.Key_B and self.file_ is not None:
-            text_pos = self.ui.textEdit.textCursor().position() + self.file_['start']
+            text_pos = self.ui.plainTextEdit.textCursor().position() + self.file_['start']
             cur = self.app.conn.cursor()
             cur.execute("update project set bookmarkfile=?, bookmarkpos=?", [self.file_['id'], text_pos])
             self.app.conn.commit()
@@ -1780,8 +1769,8 @@ class DialogCodePdf(QtWidgets.QWidget):
             self.mark_with_new_code(in_vivo=True)
             return
         # Recent codes context menu
-        if key == QtCore.Qt.Key.Key_R and self.file_ is not None and self.ui.textEdit.textCursor().selectedText() != "":
-            self.text_edit_recent_codes_menu(self.ui.textEdit.cursorRect().topLeft())
+        if key == QtCore.Qt.Key.Key_R and self.file_ is not None and self.ui.plainTextEdit.textCursor().selectedText() != "":
+            self.text_edit_recent_codes_menu(self.ui.plainTextEdit.cursorRect().topLeft())
             return
         # Search, with or without selected
         if key == QtCore.Qt.Key.Key_S and self.file_ is not None:
@@ -1814,7 +1803,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             self.overlaps_at_pos_idx = 0
         item = self.overlaps_at_pos[self.overlaps_at_pos_idx]
         # Remove formatting
-        cursor = self.ui.textEdit.textCursor()
+        cursor = self.ui.plainTextEdit.textCursor()
         cursor.setPosition(int(item['pos0'] - self.file_['start']), QtGui.QTextCursor.MoveMode.MoveAnchor)
         cursor.setPosition(int(item['pos1'] - self.file_['start']), QtGui.QTextCursor.MoveMode.KeepAnchor)
         cursor.setCharFormat(QtGui.QTextCharFormat())
@@ -1838,14 +1827,15 @@ class DialogCodePdf(QtWidgets.QWidget):
         Adjust for when portion of full text file loaded.
         Called by: textEdit cursor position changed. """
 
-        if self.file_ is None:
-            return
+        # Hide handles if the user clicks elsewhere in the editor
+        if hasattr(self, 'active_handles') and self.active_handles:
+            self.hide_resize_handles()
+
         self.overlaps_at_pos = []
         self.overlaps_at_pos_idx = 0
-        pos = self.ui.textEdit.textCursor().position()
+        pos = self.ui.plainTextEdit.textCursor().position()
         for item in self.code_text:
             if item['pos0'] <= pos + self.file_['start'] <= item['pos1']:
-                # logger.debug("Code name for selected pos0:" + str(item['pos0'])+" pos1:"+str(item['pos1'])
                 self.overlaps_at_pos.append(item)
         if len(self.overlaps_at_pos) < 2:
             self.overlaps_at_pos = []
@@ -1898,7 +1888,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         # Change start and end code positions using alt arrow left and alt arrow right
         # and shift arrow left, shift arrow right
 
-        if type(event) == QtGui.QKeyEvent and self.ui.textEdit.hasFocus():
+        if type(event) == QtGui.QKeyEvent and self.ui.plainTextEdit.hasFocus():
             key = event.key()
             mod = event.modifiers()
             # using timer for a lot of things
@@ -1908,7 +1898,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             if diff.microseconds < 10000:
                 return False
 
-            cursor_pos = self.ui.textEdit.textCursor().position()
+            cursor_pos = self.ui.plainTextEdit.textCursor().position()
             codes_here = []
             for item in self.code_text:
                 if item['pos0'] <= cursor_pos + self.file_['start'] <= item['pos1']:
@@ -1952,7 +1942,7 @@ class DialogCodePdf(QtWidgets.QWidget):
     def extend_right(self, code_):
         """ Shift right arrow. """
 
-        if code_['pos1'] + 1 >= len(self.ui.textEdit.toPlainText()):
+        if code_['pos1'] + 1 >= len(self.ui.plainTextEdit.toPlainText()):
             return
         code_['pos1'] += 1
         cur = self.app.conn.cursor()
@@ -2135,7 +2125,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.get_coded_text_update_eventfilter_tooltips()
         self.display_page_text_objects()
 
-    def add_code(self, catid=None, code_name=""):
+    def add_code(self, catid: int | None = None, code_name: str = ""):
         """ Use add_item dialog to get new code text. Add_code_name dialog checks for
         duplicate code name. A random color is selected for the code.
         New code is added to data and database.
@@ -2718,7 +2708,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         file_result = self.app.get_file_texts([file_['id']])
         if not file_result:
             self.file_ = None
-            self.ui.textEdit.clear()
+            self.ui.plainTextEdit.clear()
             self.scene = QtWidgets.QGraphicsScene()
             self.ui.graphicsView.setScene(self.scene)
             return
@@ -2829,41 +2819,6 @@ class DialogCodePdf(QtWidgets.QWidget):
         and are iterated, via the isinstance(Iteratable).
         """
 
-        '''if isinstance(lobj, LTLine):
-            # print("LTLINE", lobj.__dir__())
-            # left, btm, right, top = lobj.x0, lobj.y0, lobj.x1, lobj.y1
-            line_dict = {'x0': round(lobj.x0, 3), 'y0': round(page.mediabox[3] - lobj.y0, 3),
-                         'y1': round(page.mediabox[3] - lobj.y1, 3),
-                         'x1': round(lobj.x1, 3), 'linewidth': lobj.linewidth, 'stroke': lobj.stroke, 'fill': lobj.fill,
-                         'stroking_color': lobj.stroking_color, 'non_stroking_color': lobj.non_stroking_color,
-                         'pts': lobj.pts, 'depth': depth}
-            self.page_dict['lines'].append(line_dict)'''
-
-        '''if isinstance(lobj, LTRect):
-            # print("LTRECT", lobj, type(lobj))
-            rect_dict = {"x": round(lobj.bbox[0], 3), "y": round(page.mediabox[3] - lobj.bbox[1] - lobj.height, 3),
-                         "w": round(lobj.width, 3), "h": round(lobj.height, 3),
-                         "linewidth": lobj.linewidth, "stroke": lobj.stroke, "fill": lobj.fill,
-                         "stroking_color": lobj.stroking_color,
-                         "non_stroking_color": lobj.non_stroking_color, 'is_empty': lobj.is_empty(),
-                         'depth': depth}
-            self.page_dict['rect'].append(rect_dict)'''
-
-        '''if isinstance(lobj, LTCurve):
-            """ LTCurve can be a LTRect, LTImage or LTLine. The LTRect can contain a LTImage. """
-            # print(lobj.__dir__())
-            # left, btm, right, top = lobj.x0, lobj.y0, lobj.x1, lobj.y1
-            curve_dict = {'x0': round(lobj.x0, 3), 'y0': round(page.mediabox[3] - lobj.y0, 3),
-                          'y1': round(page.mediabox[3] - lobj.y1, 3),
-                          'x1': round(lobj.x1, 3), 'linewidth': lobj.linewidth, 'stroke': lobj.stroke,
-                          'fill': lobj.fill,
-                          'stroking_color': lobj.stroking_color, 'non_stroking_color': lobj.non_stroking_color,
-                          'is_empty': lobj.is_empty(),  # 'analyze': lobj.analyze(laparams),
-                          'evenodd': lobj.evenodd,
-                          'pts': [QtCore.QPointF(p[0], page.mediabox[3] - p[1]) for p in lobj.pts],
-                          'depth': depth}
-            self.page_dict['curves'].append(curve_dict)'''
-
         if isinstance(lobj, LTTextLine):  # or isinstance(lobj, LTTextBox):
             # y-coordinates are the distance from the bottom of the page
             #  left, bottom, right, and top
@@ -2882,66 +2837,15 @@ class DialogCodePdf(QtWidgets.QWidget):
             self.text_pos0 += len(text_dict['text'])
             text_dict['pos1'] = self.text_pos0
             char_font_sizes = []
-            # fontnames = []
             text_colors = []
-            # bold = False
             for ltchar in lobj:
                 fontname, fontsize, color = self.get_char_info(ltchar)
                 char_font_sizes.append(fontsize)
-                # if "bold" in fontname.lower():
-                #    bold = True
-                # fontnames.append(fontname)
                 text_colors.append(color)
-            # fontname = fontnames[0]
-            # if fontname.find("+") > 0:
-            #     fontname = fontname.split("+")[1]
-            # text_dict['fontname'] = fontname
+
             text_dict['fontsize'] = int(median(char_font_sizes))
             text_dict['color'] = text_colors[0]
             self.page_dict['text_boxes'].append(text_dict)
-
-        '''if isinstance(lobj, LTImage):
-            # print("IMG", lobj.__dir__())
-            # print("BBOX - x,y,w,h", lobj.bbox)
-            img_dict = {"name": lobj.name, "x": round(lobj.bbox[0],3),
-                        "y": round(page.mediabox[3] - lobj.bbox[1] - lobj.height,3),
-                        "w": round(lobj.width,3), "h": round(lobj.height,3),
-                        'imagemask': lobj.imagemask, 'colorspace': lobj.colorspace,
-                        'depth': depth}
-            if isinstance(lobj.colorspace[0], PDFObjRef):
-                values = resolve1(lobj.colorspace[0])
-                cspace = []
-                for v in values:
-                    if isinstance(v, PDFObjRef):
-                        vres = resolve1(v)
-                        cspace.append(vres)
-                    else:
-                        cspace.append(v)
-                img_dict['colorspace'] = cspace
-            img_dict['stream'] = lobj.stream
-            img_dict['pixmap'] = None
-            if lobj.stream:
-                file_stream = lobj.stream.get_rawdata()
-                file_ext = self.get_image_type(file_stream[0:4])
-                img_dict['filetype'] = file_ext
-                qp = QtGui.QPixmap()
-                qp.loadFromData(file_stream)
-                #print("Testing: CS0:", img_dict['colorspace'][0], file_ext)  # pdfminer.psparser.PSLiteral
-                if str(img_dict['colorspace'][0]) == "/'DeviceCMYK'" and file_ext.lower() in (".jpg", ".jpeg"):
-                    qimg = qp.toImage()
-                    qimg.save(os.path.join(os.path.expanduser('~'), ".qualcoder", "tmp.jpg"))
-                    pil_img = Image.open(os.path.join(os.path.expanduser('~'), ".qualcoder", "tmp.jpg"))
-                    pil_img = ImageOps.invert(pil_img)
-                    qp = ImageQt.toqpixmap(pil_img)
-                    img_dict['pixmap'] = qp.scaled(int(img_dict['w']), int(img_dict['h']))
-                else:
-                    img_dict['pixmap'] = qp.scaled(int(img_dict['w']), int(img_dict['h']))
-                if qp.isNull():
-                    img_dict['pixmap'] = None
-                # else:  # Potential to extract some images.
-                #     file_name = QtWidgets.QFileDialog.getSaveFileName(self, 'Save File', '', '*.jpg')
-                #     qp.save(file_name[0])  # tuple of path and type
-            self.page_dict['images'].append(img_dict)'''
 
         if isinstance(lobj, Iterable):
             # Includes LTFigure objects
@@ -2958,10 +2862,9 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.file_['start'] = page['plain_text_start']
         self.file_['end'] = page['plain_text_end']
         page_rect = page['mediabox']
-        self.ui.textEdit.setText("")
+        self.ui.plainTextEdit.setPlainText("")
         text_edit_text = ""
         self.pdf_object_info_text = ""
-        #    text_edit_text = "PAGE RECT: " + str(page_rect) + "\n"
         self.scene = QtWidgets.QGraphicsScene()
         self.ui.graphicsView.setRenderHint(
             QtGui.QPainter.RenderHint.Antialiasing)  # RenderHint.SmoothPixmapTransform)  # Antialiasing
@@ -2972,35 +2875,6 @@ class DialogCodePdf(QtWidgets.QWidget):
         gray_pen = QtGui.QPen(QtCore.Qt.GlobalColor.gray, 1, QtCore.Qt.PenStyle.SolidLine)
         self.scene.addRect(0, 0, page_rect[2], page_rect[3], gray_pen)
         counter = 0
-        '''if self.ui.checkBox_rect.isChecked():
-            for r in page['rect']:
-                counter += 1
-                self.pdf_object_info_text += f"RECT: {r}\n"
-                item = self.scene.addRect(r['x'], r['y'], r['w'], r['h'])
-                if r['fill']:
-                    color = self.get_qcolor(r['non_stroking_color'])
-                    item.setPen(QtGui.QPen(QtGui.QBrush(QtCore.Qt.BrushStyle.NoBrush), 0))  # Border
-                    item.setBrush(color)
-                if r['stroke']:
-                    color = self.get_qcolor(r['stroking_color'])
-                    item.setPen(QtGui.QPen(color, r['linewidth']))  # Border'''
-        '''if self.ui.checkBox_curve.isChecked():
-            # https://stackoverflow.com/questions/63016214/drawing-multi-point-curve-with-pyqt5
-            # addPath QPainterPath - maybe?
-            for c in page['curves']:
-                counter += 1
-                self.pdf_object_info_text += f"CURVE: {c}\n"
-                if c['stroke'] and not c['fill']:
-                    item = QtGui.QPolygonF(c['pts'])
-                    color = self.get_qcolor(c['stroking_color'])
-                    brush = QtGui.QBrush(QtCore.Qt.BrushStyle.NoBrush)
-                    pen = QtGui.QPen(color, c['linewidth'], QtCore.Qt.PenStyle.SolidLine)  # Border
-                    self.scene.addPolygon(item, pen, brush)
-                if c['fill'] and not c['stroke']:
-                    brush = QtGui.QColor(self.get_qcolor(c['non_stroking_color']))  # Fill
-                    pen = QtGui.QPen(QtGui.QBrush(QtCore.Qt.BrushStyle.NoBrush), 0)  # Border
-                    item = QtGui.QPolygonF(c['pts'])
-                    self.scene.addPolygon(item, pen, brush)'''
         if self.ui.checkBox_image.isChecked():
             # Now only pymupdf page rendering without text is displayed
             for img in page['images']:
@@ -3015,17 +2889,6 @@ class DialogCodePdf(QtWidgets.QWidget):
                 else:
                     print("else", img['name'])
                     pass
-        '''if self.ui.checkBox_line.isChecked():
-            for line in page['lines']:
-                counter += 1
-                self.pdf_object_info_text += f"LINE: {line}\n"
-                color = QtCore.Qt.GlobalColor.black
-                if line['stroke']:
-                    color = self.get_qcolor(line['stroking_color'])
-                if line['fill']:
-                    color = self.get_qcolor(line['non_stroking_color'])
-                line_pen = QtGui.QPen(color, line['linewidth'], QtCore.Qt.PenStyle.SolidLine)
-                self.scene.addLine(line['x0'], line['y0'], line['x1'], line['y1'], line_pen)'''
         self.display_page_text_objects()
         counter += len(page['text_boxes'])
         text_edit_text += f"\n\nOBJECTS: {counter}"
@@ -3033,7 +2896,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.pdf_object_info_text += _("TEXT END CHARACTER POSITION: ") + str(page['plain_text_end']) + "\n"
         self.pdf_object_info_text += _("NUMBER OF CHARACTERS: ") + str(
             page['plain_text_end'] - page['plain_text_start'])
-        self.ui.textEdit.setText(page['plain_text'])
+        self.ui.plainTextEdit.setPlainText(page['plain_text'])
         self.get_coded_text_update_eventfilter_tooltips()
 
     def display_page_text_objects(self):
@@ -3330,11 +3193,11 @@ class DialogCodePdf(QtWidgets.QWidget):
     def unlight(self):
         """ Remove all text highlighting from current file. """
 
-        if self.ui.textEdit.toPlainText() == "":
+        if self.ui.plainTextEdit.toPlainText() == "":
             return
-        cursor = self.ui.textEdit.textCursor()
+        cursor = self.ui.plainTextEdit.textCursor()
         cursor.setPosition(0, QtGui.QTextCursor.MoveMode.MoveAnchor)
-        cursor.setPosition(abs(len(self.ui.textEdit.toPlainText()) - 1), QtGui.QTextCursor.MoveMode.KeepAnchor)
+        cursor.setPosition(abs(len(self.ui.plainTextEdit.toPlainText()) - 1), QtGui.QTextCursor.MoveMode.KeepAnchor)
         cursor.setCharFormat(QtGui.QTextCharFormat())
 
     def highlight(self):
@@ -3345,14 +3208,14 @@ class DialogCodePdf(QtWidgets.QWidget):
         For defined colours in color_selector, make text light on dark, and conversely dark on light
         """
 
-        if self.file_ is None or self.ui.textEdit.toPlainText() == "":
+        if self.file_ is None or self.ui.plainTextEdit.toPlainText() == "":
             return
         # Add coding highlights
         codes = {x['cid']: x for x in self.codes}
         for item in self.code_text:
             fmt = QtGui.QTextCharFormat()
-            cursor = self.ui.textEdit.textCursor()
-            '''print(f"len text {len(self.ui.textEdit.toPlainText())} TEXTEDIT page {self.page_num} pos0 {item['pos0'] - self.file_['start']}"
+            cursor = self.ui.plainTextEdit.textCursor()
+            '''print(f"len text {len(self.ui.plainTextEdit.toPlainText())} TEXTEDIT page {self.page_num} pos0 {item['pos0'] - self.file_['start']}"
                   f" pos1 {item['pos1'] - self.file_['start']}"
                   f" page plain text end {self.pages[self.page_num]['plain_text_end']}")  # tmp'''
             if item['pos0'] > self.pages[self.page_num]['plain_text_end'] or item['pos1'] < self.pages[self.page_num][
@@ -3386,10 +3249,10 @@ class DialogCodePdf(QtWidgets.QWidget):
         for note in self.annotations:
             if len(self.file_.keys()) > 0:  # will be zero if using autocode and no file is loaded
                 # Cursor pos could be negative if annotation was for an earlier text portion
-                cursor = self.ui.textEdit.textCursor()
+                cursor = self.ui.plainTextEdit.textCursor()
                 if note['fid'] == self.file_['id'] and \
                         0 <= int(note['pos0']) - self.file_['start'] < int(note['pos1']) - self.file_['start'] <= \
-                        len(self.ui.textEdit.toPlainText()):
+                        len(self.ui.plainTextEdit.toPlainText()):
                     cursor.setPosition(int(note['pos0']) - self.file_['start'], QtGui.QTextCursor.MoveMode.MoveAnchor)
                     cursor.setPosition(int(note['pos1']) - self.file_['start'], QtGui.QTextCursor.MoveMode.KeepAnchor)
                     format_bold = QtGui.QTextCharFormat()
@@ -3418,7 +3281,7 @@ class DialogCodePdf(QtWidgets.QWidget):
                             overlaps.append([j['pos0'], i['pos1']])
                         elif j['pos1'] != i['pos0']:  # j['pos0'] < i['pos0']:
                             overlaps.append([j['pos1'], i['pos0']])
-        cursor = self.ui.textEdit.textCursor()
+        cursor = self.ui.plainTextEdit.textCursor()
         for o in overlaps:
             fmt = QtGui.QTextCharFormat()
             fmt.setUnderlineStyle(QtGui.QTextCharFormat.UnderlineStyle.SingleUnderline)
@@ -3486,9 +3349,9 @@ class DialogCodePdf(QtWidgets.QWidget):
                     seltext += box['text']
         else:
             # Mark by TextEdit
-            seltext = self.ui.textEdit.textCursor().selectedText()
-            pos0 = self.ui.textEdit.textCursor().selectionStart() + self.file_['start']
-            pos1 = self.ui.textEdit.textCursor().selectionEnd() + self.file_['start']
+            seltext = self.ui.plainTextEdit.textCursor().selectedText()
+            pos0 = self.ui.plainTextEdit.textCursor().selectionStart() + self.file_['start']
+            pos1 = self.ui.plainTextEdit.textCursor().selectionEnd() + self.file_['start']
 
         if pos0 == pos1:
             return
@@ -3562,7 +3425,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.fill_code_counts_in_tree()
         self.display_page_text_objects()
 
-    def unmark(self, position=None, ctid=None):
+    def unmark(self, position: int | None = None, ctid: int | None = None):
         """ Remove code marking by any visible coder from selected text in current file.
         Called by text_edit_context_menu, graphicsview_menu
         Adjust for start of text file, as this may be a smaller portion of the full text file.
@@ -3609,7 +3472,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.app.delete_backup = False
         self.display_page_text_objects()
 
-    def annotate(self, cursor_pos=None):
+    def annotate(self, cursor_pos: int | None = None):
         """ Add view, or remove an annotation for selected text.
         Annotation positions are displayed as bold text.
         Adjust for start of text file, as this may be a smaller portion of the full text file.
@@ -3620,9 +3483,9 @@ class DialogCodePdf(QtWidgets.QWidget):
         if self.file_ is None:
             Message(self.app, _('Warning'), _("No file was selected"), "warning").exec()
             return
-        pos0 = self.ui.textEdit.textCursor().selectionStart()
-        pos1 = self.ui.textEdit.textCursor().selectionEnd()
-        text_length = len(self.ui.textEdit.toPlainText())
+        pos0 = self.ui.plainTextEdit.textCursor().selectionStart()
+        pos1 = self.ui.plainTextEdit.textCursor().selectionEnd()
+        text_length = len(self.ui.plainTextEdit.toPlainText())
         if pos0 >= text_length or pos1 > text_length:
             return
         item = None
@@ -3702,8 +3565,8 @@ class DialogCodePdf(QtWidgets.QWidget):
                                         + f"{item['pos0']} {_('for:')} {self.file_['name']}")
         self.get_coded_text_update_eventfilter_tooltips()
 
-    def get_pdf_metadata(self, filepath):
-        """  """
+    def get_pdf_metadata(self, filepath: str):
+        """ Get metadata from PDF """
 
         fp = open(filepath, 'rb')
         parser = PDFParser(fp)
@@ -3772,6 +3635,100 @@ class DialogCodePdf(QtWidgets.QWidget):
         """ Open help for transcribe section in browser. """
         self.app.help_wiki("4.3.-Coding-Text-on-PDFs")
 
+    # --- handles experimental
+    def display_handles_for_code(self, position):
+        """ Display interactive drag handles to resize a code's boundaries. """
+
+        if self.file_ is None:
+            return
+        coded_text_list = []
+        for item in self.code_text:
+            if item['pos0'] <= position + self.file_['start'] <= item['pos1']:
+                coded_text_list.append(item)
+        if not coded_text_list:
+            return
+        code_to_handle = coded_text_list[-1]
+        if len(coded_text_list) > 1:
+            ui = DialogSelectItems(self.app, coded_text_list, _("Select code to resize"), "single")
+            if ui.exec():
+                code_to_handle = ui.get_selected()
+            else:
+                return
+        self.hide_resize_handles()
+
+        # Create start handle
+        cursor_start = self.ui.plainTextEdit.textCursor()
+        cursor_start.setPosition(max(0, code_to_handle['pos0'] - self.file_['start']))
+        rect_start = self.ui.plainTextEdit.cursorRect(cursor_start)
+        h_start = CodeResizeHandle(self.ui.plainTextEdit, True, code_to_handle, self)
+        h_start.move(rect_start.x() - 6, rect_start.y() + 2)
+        self.active_handles.append(h_start)
+
+        # Create end handle
+        cursor_end = self.ui.plainTextEdit.textCursor()
+        cursor_end.setPosition(
+            min(len(self.ui.plainTextEdit.toPlainText()), code_to_handle['pos1'] - self.file_['start']))
+        rect_end = self.ui.plainTextEdit.cursorRect(cursor_end)
+        h_end = CodeResizeHandle(self.ui.plainTextEdit, False, code_to_handle, self)
+        h_end.move(rect_end.x() - 6, rect_end.y() + 2)
+        self.active_handles.append(h_end)
+
+    def hide_resize_handles(self):
+        """ Remove all active resize handles from the screen. """
+        for h in getattr(self, 'active_handles', []):
+            h.hide()
+            h.deleteLater()
+        self.active_handles = []
+
+    def update_code_position_from_handle(self, code_item, new_pos, is_start, orig_pos0, orig_pos1):
+        """ Receive final drop coordinates from a handle and update the database. """
+        if is_start:
+            if new_pos >= code_item['pos1']:
+                code_item['pos0'] = orig_pos0  # Revert visually
+                self.hide_resize_handles()
+                self.unlight()
+                self.highlight()
+                return
+            code_item['pos0'] = new_pos
+        else:
+            if new_pos <= code_item['pos0']:
+                code_item['pos1'] = orig_pos1  # Revert visually
+                self.hide_resize_handles()
+                self.unlight()
+                self.highlight()
+                return
+            code_item['pos1'] = new_pos
+
+        cur = self.app.conn.cursor()
+        cur.execute("select substr(fulltext,?,?) from source where id=?",
+                    [code_item['pos0'] + 1, code_item['pos1'] - code_item['pos0'], code_item['fid']])
+        res = cur.fetchone()
+
+        if not res:
+            # Revert on extraction error
+            code_item['pos0'] = orig_pos0
+            code_item['pos1'] = orig_pos1
+            self.hide_resize_handles()
+            self.unlight()
+            self.highlight()
+            return
+        seltext = res[0]
+
+        try:
+            sql = "update code_text set pos0=?, pos1=?, seltext=? where ctid=?"
+            cur.execute(sql, [code_item['pos0'], code_item['pos1'], seltext, code_item['ctid']])
+            self.app.conn.commit()
+            self.app.delete_backup = False
+        except sqlite3.IntegrityError:
+            self.app.conn.rollback()
+            # Revert in-memory positions to undo temporary highlight
+            code_item['pos0'] = orig_pos0
+            code_item['pos1'] = orig_pos1
+            Message(self.app, _("Duplicate Error"),
+                    _("This code already exists at this exact location."), "warning").exec()
+        self.hide_resize_handles()
+        self.get_coded_text_update_eventfilter_tooltips()
+
 
 class GraphicsScene(QtWidgets.QGraphicsScene):
     """ set the scene for the graphics objects and re-draw events. """
@@ -3781,15 +3738,7 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
         self.parent = parent
         self.scene_width = 700
         self.scene_height = 560
-        # parent = None
         self.setSceneRect(QtCore.QRectF(0, 0, self.scene_width, self.scene_height))
-
-    '''def mouseMoveEvent(self, mouse_event):
-        """ On mouse move, an item might be repositioned so need to redraw all the link_items.
-        This slows re-drawing down, but is dynamic. """
-
-        super(GraphicsScene, self).mousePressEvent(mouse_event)
-        #for item in self.items():'''
 
     def mousePressEvent(self, mouseEvent):
         super(GraphicsScene, self).mousePressEvent(mouseEvent)
