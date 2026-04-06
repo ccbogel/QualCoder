@@ -217,7 +217,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_file_attributes.pressed.connect(self.get_files_from_attributes)
         # Buttons under codes-tree
-        self.ui.pushButton_find_code.setIcon(qta.icon('mdi6.card-search-outline', options=[{'scale-factor': 1.2}]))
+        self.ui.pushButton_find_code.setIcon(qta.icon('mdi6.card-search-outline', options=[{'scale-factor': 1.3}]))
         self.ui.pushButton_find_code.pressed.connect(self.find_code_in_tree)
         self.ui.pushButton_show_codings_next.setIcon(qta.icon('mdi6.arrow-right'))
         self.ui.pushButton_show_codings_next.pressed.connect(self.show_selected_code_in_text_next)
@@ -438,8 +438,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_font.setToolTip(tt)
 
     def find_code_in_tree(self):
-        """ Find a code by name in the codes tree and select it.
-        """
+        """ Find a code by name in the codes tree and select it. """
 
         dialog = QtWidgets.QInputDialog(None)
         dialog.setStyleSheet(f"* {{font-size:{self.app.settings['fontsize']}pt}} ")
@@ -460,18 +459,44 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.treeWidget.clearSelection()
         item = None
         iterator = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
+        matches = []
         while iterator.value():
             item = iterator.value()
             if "cid" in item.text(1):
                 cid = int(item.text(1)[4:])
                 code_ = next((code_ for code_ in self.codes if code_['cid'] == cid), None)
                 if search_text in code_['name']:
+                    matches.append(code_)
+            iterator += 1
+        if not matches:
+            Message(self.app, _("Match not found"), _("No code with matching text found.")).exec()
+            return
+
+        # Get one selected code from one or more codes.
+        selected = None
+        if len(matches) > 1:
+            ui = DialogSelectItems(self.app, matches, _("Select code"), "single")
+            ok = ui.exec()
+            if not ok:
+                return
+            selected = ui.get_selected()
+            if not selected:
+                return
+        else:
+            selected = matches[0]
+
+        # Set selected in tree
+        item = None
+        iterator = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
+        while iterator.value():
+            item = iterator.value()
+            if "cid" in item.text(1):
+                cid = int(item.text(1)[4:])
+                if cid == selected['cid']:
                     self.ui.treeWidget.setCurrentItem(item)
                     break
             iterator += 1
-        if item is None:
-            Message(self.app, _("Match not found"), _("No code with matching text found.")).exec()
-            return
+
         # Expand parents
         parent = item.parent()
         while parent is not None:
@@ -1455,7 +1480,6 @@ class DialogCodeText(QtWidgets.QWidget):
         
         # --- Handles experimental
         action_show_handles = None
-        # ---
 
         # Can have multiple coded text at this position
         for item in self.code_text:
@@ -1490,12 +1514,10 @@ class DialogCodeText(QtWidgets.QWidget):
             menu.addAction(action_not_important)
         if action_change_code:
             menu.addAction(action_change_code)
-        
         # --- Handles experimental
         if action_show_handles:
             menu.addAction(action_show_handles)
-        # ---
-       
+
         action_annotate = menu.addAction(_("Annotate (A)"))
         action_copy = menu.addAction(_("Copy to clipboard"))
         action_copy_metadata = menu.addAction(_("Copy with metadata"))
@@ -1565,13 +1587,10 @@ class DialogCodeText(QtWidgets.QWidget):
         if action == action_change_code:
             self.change_code_to_another_code(cursor.position())
             return
-        
-        # ---  handlers experimental
+        # ---  handles experimental
         if action == action_show_handles:
             self.display_handles_for_code(cursor.position())
             return
-        # ---
-        
         if action == action_show_top_groupbox:
             self.ui.groupBox.setVisible(True)
             return

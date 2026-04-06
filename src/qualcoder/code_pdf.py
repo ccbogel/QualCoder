@@ -220,7 +220,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         # Widgets under codes tree
         self.ui.pushButton_important.setIcon(qta.icon('mdi6.star-outline', options=[{'scale_factor': 1.4}]))
         self.ui.pushButton_important.pressed.connect(self.show_important_coded)
-        self.ui.pushButton_find_code.setIcon(qta.icon('mdi6.card-search-outline', options=[{'scale-factor': 1.2}]))
+        self.ui.pushButton_find_code.setIcon(qta.icon('mdi6.card-search-outline', options=[{'scale-factor': 1.3}]))
         self.ui.pushButton_find_code.pressed.connect(self.find_code_in_tree)
         # Codes tree
         self.ui.treeWidget.setDragEnabled(True)
@@ -1590,7 +1590,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         """
 
         dialog = QtWidgets.QInputDialog(None)
-        dialog.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        dialog.setStyleSheet(f"* {{font-size:{self.app.settings['fontsize']}pt}} ")
         dialog.setWindowTitle(_("Search for code"))
         dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         dialog.setInputMode(QtWidgets.QInputDialog.InputMode.TextInput)
@@ -1606,6 +1606,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         # Remove selections and search for matching item text
         self.ui.treeWidget.setCurrentItem(None)
         self.ui.treeWidget.clearSelection()
+        matches = []
         item = None
         iterator = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
         while iterator.value():
@@ -1614,12 +1615,37 @@ class DialogCodePdf(QtWidgets.QWidget):
                 cid = int(item.text(1)[4:])
                 code_ = next((code_ for code_ in self.codes if code_['cid'] == cid), None)
                 if search_text in code_['name']:
-                    self.ui.treeWidget.setCurrentItem(item)
-                    break
+                    matches.append(code_)
             iterator += 1
         if item is None:
             Message(self.app, _("Match not found"), _("No code with matching text found.")).exec()
             return
+
+        # Get one selected code from one or more codes.
+        selected = None
+        if len(matches) > 1:
+            ui = DialogSelectItems(self.app, matches, _("Select code"), "single")
+            ok = ui.exec()
+            if not ok:
+                return
+            selected = ui.get_selected()
+            if not selected:
+                return
+        else:
+            selected = matches[0]
+
+        # Set selected in tree
+        item = None
+        iterator = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
+        while iterator.value():
+            item = iterator.value()
+            if "cid" in item.text(1):
+                cid = int(item.text(1)[4:])
+                if cid == selected['cid']:
+                    self.ui.treeWidget.setCurrentItem(item)
+                    break
+            iterator += 1
+
         # Expand parents
         parent = item.parent()
         while parent is not None:
