@@ -49,8 +49,6 @@ from .move_resize_rectangle import DialogMoveResizeRectangle
 from .helpers import ExportDirectoryPathDialog, Message
 from .memo import DialogMemo
 from .report_attributes import DialogSelectAttributeParameters
-from .reports import DialogReportCoderComparisons, DialogReportCodeFrequencies  # for isinstance()
-from .report_codes import DialogReportCodes
 from .ris import Ris
 from .select_items import DialogSelectItems
 
@@ -61,27 +59,6 @@ logger = logging.getLogger(__name__)
 class DialogCodeImage(QtWidgets.QDialog):
     """ View and code images. Create codes and categories.  """
 
-    app = None
-    parent_textEdit = None
-    tab_reports = None  # Tab widget reports, used for updates to codes
-    pixmap = None
-    scene = None
-    files = []  # List of Dictionaries
-    file_ = None  # Dictionary with name, memo, id, mediapath?
-    codes = []
-    categories = []
-    tree_sort_option = "all asc"  # all desc, cat then code asc
-    selection = None  # Initial code rectangle point
-    scale = 1.0
-    code_areas = []
-    important = False  # Show/hide important flagged codes
-    attributes = []
-    undo_deleted_code = None  # Undo last deleted code
-    degrees = 0  # For image rotation
-    show_code_captions = 0  # 0 = no, 1 = code name, 2 = codename + memo
-    pdf_page = None  # display at 1
-    pdf_total_pages = None  # Total pages in pdf
-
     def __init__(self, app, parent_textedit, tab_reports):
         """ Show list of image files.
         On select, Show a scalable and scrollable image.
@@ -91,25 +68,30 @@ class DialogCodeImage(QtWidgets.QDialog):
 
         super(DialogCodeImage, self).__init__()
         self.app = app
-        self.tab_reports = tab_reports
+        self.tab_reports = tab_reports  # Tab widget reports, used for updates to codes
         self.parent_textEdit = parent_textedit
         self.codes = []
         self.categories = []
         self.files = []
-        self.undo_deleted_code = None
-        self.file_ = None
+        self.coded_areas = []
+        self.undo_deleted_code = None  # Undo last deleted code
+        self.file_ = None    # Dictionary with name, memo, id, mediapath
+        self.pixmap = None
         self.log = ""
-        self.scale = 1.0
-        self.selection = None
-        self.important = False
+        self.scale = 1.0  # Image scaling
+        self.selection = None  # Initial code rectangle point
+        self.important = False  # Show/hide important flagged codes
         self.attributes = []
-        self.degrees = 0
+        self.degrees = 0  # For image rotation
         self.get_codes_and_categories()
-        self.tree_sort_option = "all asc"
-        self.show_code_captions = 0
-        self.pdf_page = None
-        self.pdf_total_pages = None
+        self.tree_sort_option = "all asc"  # all desc, cat then code asc
+        self.show_code_captions = 0  # 0 = no, 1 = code name, 2 = codename + memo
         self.default_new_code_color = None
+        self.show_codes_like_filter = ""  # gets filled when text strings are used to show specific code names
+
+        self.pdf_page = None  # display at 1
+        self.pdf_total_pages = None
+
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_code_image()
         self.ui.setupUi(self)
@@ -1274,7 +1256,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             action_color = menu.addAction(_("Change code color"))
             action_move_code = menu.addAction(_("Move code to"))
             action_show_coded_media = menu.addAction(_("Show coded text and media"))
-        action_show_codes_like = menu.addAction(_("Show codes like"))
+        action_show_codes_like = menu.addAction(_("Show codes like") + " " + self.show_codes_like_filter)
         action_show_codes_of_colour = menu.addAction(_("Show codes of colour"))
         action_all_asc = menu.addAction(_("Sort ascending"))
         action_all_desc = menu.addAction(_("Sort descending"))
@@ -1379,18 +1361,27 @@ class DialogCodeImage(QtWidgets.QDialog):
          Input dialog is narrow, so some code below to make it wider. """
 
         dialog = QtWidgets.QInputDialog(None)
-        dialog.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        dialog.setStyleSheet(f"* {{font-size:{self.app.settings['fontsize']}pt}} ")
         dialog.setWindowTitle(_("Show codes containing"))
         dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         dialog.setInputMode(QtWidgets.QInputDialog.InputMode.TextInput)
-        dialog.setLabelText(_("Show codes containing text.\n(Blank for all)"))
+        dlg_text = _("Show codes containing the text. (Blank for all)") + "\n"
+        if self.show_codes_like_filter:
+            dlg_text += _("Filters") + " " + self.show_codes_like_filter
+        dialog.setLabelText(dlg_text)
         dialog.resize(200, 20)
         ok = dialog.exec()
         if not ok:
             return
-        txt = str(dialog.textValue())
+        text_ = str(dialog.textValue())
+        if text_ == "":
+            self.show_codes_like_filter = ""
+        elif self.show_codes_like_filter == "" and text_ != "":
+            self.show_codes_like_filter = ": " + text_
+        else:
+            self.show_codes_like_filter += "|" + text_
         root = self.ui.treeWidget.invisibleRootItem()
-        self.recursive_traverse(root, txt)
+        self.recursive_traverse(root, text_)
 
     def show_codes_of_color(self):
         """ Show all codes in colour range in code tree., ir all codes if no selection.
@@ -1403,6 +1394,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             return
         selected_color = ui.get_selected()
         show_codes_of_colour_range(self.app, self.ui.treeWidget, self.codes, selected_color)
+        self.show_codes_like_filter = ""
 
     def recursive_traverse(self, item, text_):
         """ Find all children codes of this item that match or not and hide or unhide based on 'text'.

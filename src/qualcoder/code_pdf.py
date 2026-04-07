@@ -106,6 +106,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.important = False  # Show/hide important codes
         self.project_memo = False  # for textEdit2 - show the project meno
         self.code_rule = False  # for textEdit2  - show code examples
+        self.show_codes_like_filter = ""  # gets filled when text strings are used to show specific code names
 
         # Timers to reduce overly sensitive key events: overlap, re-size oversteps by multiple characters
         self.code_resize_timer = datetime.datetime.now()
@@ -1352,7 +1353,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             action_color = menu.addAction(_("Change code color"))
             action_show_coded_media = menu.addAction(_("Show coded files"))
             action_move_code = menu.addAction(_("Move code to"))
-        action_show_codes_like = menu.addAction(_("Show codes like"))
+        action_show_codes_like = menu.addAction(_("Show codes like") + " " + self.show_codes_like_filter)
         action_show_codes_of_colour = menu.addAction(_("Show codes of colour"))
         action_all_asc = menu.addAction(_("Sort ascending"))
         action_all_desc = menu.addAction(_("Sort descending"))
@@ -1518,12 +1519,21 @@ class DialogCodePdf(QtWidgets.QWidget):
         dialog.setWindowTitle(_("Show some codes"))
         dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         dialog.setInputMode(QtWidgets.QInputDialog.InputMode.TextInput)
-        dialog.setLabelText(_("Show codes containing the text. (Blank for all)"))
+        dlg_text = _("Show codes containing the text. (Blank for all)") + "\n"
+        if self.show_codes_like_filter:
+            dlg_text += _("Filters") + " " + self.show_codes_like_filter
+        dialog.setLabelText(dlg_text)
         dialog.resize(200, 20)
         ok = dialog.exec()
         if not ok:
             return
         text_ = str(dialog.textValue())
+        if text_ == "":
+            self.show_codes_like_filter = ""
+        elif self.show_codes_like_filter == "" and text_ != "":
+            self.show_codes_like_filter = ": " + text_
+        else:
+            self.show_codes_like_filter += "|" + text_
         root = self.ui.treeWidget.invisibleRootItem()
         self.recursive_traverse(root, text_)
 
@@ -1538,6 +1548,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             return
         selected_color = ui.get_selected()
         show_codes_of_colour_range(self.app, self.ui.treeWidget, self.codes, selected_color)
+        self.show_codes_like_filter = ""
 
     def recursive_traverse(self, item, text_):
         """ Find all children codes of this item that match or not and hide or unhide based on 'text'.

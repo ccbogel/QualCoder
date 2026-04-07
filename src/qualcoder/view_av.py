@@ -75,6 +75,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.files = []
         self.attributes = []  # Show selected files in list widget
         self.file_ = None  # Current file
+        self.show_codes_like_filter = ""  # gets filled when text strings are used to show specific code names
 
         # For transcribed text
         self.annotations = []
@@ -93,7 +94,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.segments = []
         self.segment = {'start': None, 'end': None, 'start_msecs': None, 'end_msecs': None, 'memo': "", 'important': 0,
                         'seltext': ""}
-        self.play_segment_end = None  # TODO Explain what it is for
+        self.play_segment_end = None  # End msecs of a segment that is played
         self.media_duration_text = ""
         self.segment_for_text = None  # When linking segment to text
         self.text_for_segment = {}  # When linking text to segment
@@ -1522,7 +1523,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             action_color = menu.addAction(_("Change code color"))
             action_move_code = menu.addAction(_("Move code to"))
             action_show_coded_media = menu.addAction(_("Show coded text and media"))
-        action_show_codes_like = menu.addAction(_("Show codes like"))
+        action_show_codes_like = menu.addAction(_("Show codes like") + " " + self.show_codes_like_filter)
         action_show_codes_of_colour = menu.addAction(_("Show codes of colour"))
         action_all_asc = menu.addAction(_("Sort ascending"))
         action_all_desc = menu.addAction(_("Sort descending"))
@@ -1624,18 +1625,27 @@ class DialogCodeAV(QtWidgets.QDialog):
 
         # Input dialog narrow, so code below
         dialog = QtWidgets.QInputDialog(None)
-        dialog.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        dialog.setStyleSheet(f"* {{font-size:{self.app.settings['fontsize']}pt}} ")
         dialog.setWindowTitle(_("Show codes containing"))
         dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         dialog.setInputMode(QtWidgets.QInputDialog.InputMode.TextInput)
-        dialog.setLabelText(_("Show codes containing text.\n(Blank for all)"))
+        dlg_text = _("Show codes containing the text. (Blank for all)") + "\n"
+        if self.show_codes_like_filter:
+            dlg_text += _("Filters") + " " + self.show_codes_like_filter
+        dialog.setLabelText(dlg_text)
         dialog.resize(200, 20)
         ok = dialog.exec()
         if not ok:
             return
-        txt = str(dialog.textValue())
+        text_ = str(dialog.textValue())
+        if text_ == "":
+            self.show_codes_like_filter = ""
+        elif self.show_codes_like_filter == "" and text_ != "":
+            self.show_codes_like_filter = ": " + text_
+        else:
+            self.show_codes_like_filter += "|" + text_
         root = self.ui.treeWidget.invisibleRootItem()
-        self.recursive_traverse(root, txt)
+        self.recursive_traverse(root, text_)
 
     def show_codes_of_color(self):
         """ Show all codes in colour range in code tree., ir all codes if no selection.
@@ -1648,6 +1658,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             return
         selected_color = ui.get_selected()
         show_codes_of_colour_range(self.app, self.ui.treeWidget, self.codes, selected_color)
+        self.show_codes_like_filter = ""
 
     def recursive_traverse(self, item, txt):
         """ Find all children codes of this item that match or not and hide or unhide based on 'text'.
