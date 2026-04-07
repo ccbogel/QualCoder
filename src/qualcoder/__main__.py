@@ -178,7 +178,7 @@ class ProjectEventBus(QtCore.QObject):
 
     project_data_changed = QtCore.pyqtSignal(list, object)
 
-    def emit_table_changes(self, tables: list[str], source=None):
+    def emit_table_changes(self, tables: list[str] | None, source=None):
         """Emit one project-change event for changed database tables.
 
         Args:
@@ -188,6 +188,8 @@ class ProjectEventBus(QtCore.QObject):
                 themselves to ignore events that originated from the same dialog instance.
         """
 
+        if tables is None:
+            return
         if len(tables) == 0:
             return
         self.project_data_changed.emit(tables, source)

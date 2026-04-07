@@ -79,6 +79,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.tab_reports = tab_reports  # Tab widget reports, used for updates to codes
         self.parent_textEdit = parent_textedit
         self.text = ""
+        self.files = []
 
         # Search text variables
         self.search_indices = []
@@ -95,7 +96,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.codes = []
         self.categories = []
         self.recent_codes = []  # Recent codes (up to 5) for textedit context menu
-        self.undo_deleted_codes = []  # Undo last deleted code(s), multiple may have been deleted at th same time, so a list
+        self.undo_deleted_codes = []  # Undo last deleted code(s)
         self.code_text = []  # The coded text segments
         self.codes, self.categories = self.app.get_codes_categories()
         self.get_recent_codes()  # After codes obtained!
@@ -107,6 +108,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.project_memo = False  # for textEdit2 - show the project meno
         self.code_rule = False  # for textEdit2  - show code examples
         self.show_codes_like_filter = ""  # gets filled when text strings are used to show specific code names
+        self.show_codes_colour_filter = ""  # gets filled when a code colur is selected
 
         # Timers to reduce overly sensitive key events: overlap, re-size oversteps by multiple characters
         self.code_resize_timer = datetime.datetime.now()
@@ -1353,8 +1355,8 @@ class DialogCodePdf(QtWidgets.QWidget):
             action_color = menu.addAction(_("Change code color"))
             action_show_coded_media = menu.addAction(_("Show coded files"))
             action_move_code = menu.addAction(_("Move code to"))
-        action_show_codes_like = menu.addAction(_("Show codes like") + " " + self.show_codes_like_filter)
-        action_show_codes_of_colour = menu.addAction(_("Show codes of colour"))
+        action_show_codes_like = menu.addAction(_("Show codes like") + ": " + self.show_codes_like_filter)
+        action_show_codes_of_colour = menu.addAction(_("Show codes of colour") + ": " + self.show_codes_colour_filter)
         action_all_asc = menu.addAction(_("Sort ascending"))
         action_all_desc = menu.addAction(_("Sort descending"))
         action_cat_then_code_asc = menu.addAction(_("Sort category then code ascending"))
@@ -1521,21 +1523,17 @@ class DialogCodePdf(QtWidgets.QWidget):
         dialog.setInputMode(QtWidgets.QInputDialog.InputMode.TextInput)
         dlg_text = _("Show codes containing the text. (Blank for all)") + "\n"
         if self.show_codes_like_filter:
-            dlg_text += _("Filters") + " " + self.show_codes_like_filter
+            dlg_text += _("Filters") + ": " + self.show_codes_like_filter
         dialog.setLabelText(dlg_text)
         dialog.resize(200, 20)
         ok = dialog.exec()
         if not ok:
             return
-        text_ = str(dialog.textValue())
-        if text_ == "":
-            self.show_codes_like_filter = ""
-        elif self.show_codes_like_filter == "" and text_ != "":
-            self.show_codes_like_filter = ": " + text_
-        else:
-            self.show_codes_like_filter += "|" + text_
+        self.show_codes_like_filter = str(dialog.textValue())
         root = self.ui.treeWidget.invisibleRootItem()
-        self.recursive_traverse(root, text_)
+        self.recursive_traverse(root, "")  # Show all codes in tree
+        root = self.ui.treeWidget.invisibleRootItem()
+        self.recursive_traverse(root, self.show_codes_like_filter)
 
     def show_codes_of_color(self):
         """ Show all codes in colour range in code tree., ir all codes if no selection.
@@ -1546,8 +1544,11 @@ class DialogCodePdf(QtWidgets.QWidget):
         ok = ui.exec()
         if not ok:
             return
-        selected_color = ui.get_selected()
-        show_codes_of_colour_range(self.app, self.ui.treeWidget, self.codes, selected_color)
+        selected = ui.get_selected()
+        self.show_codes_colour_filter = selected['name']  # colour range name
+        if self.show_codes_colour_filter == "all":
+            self.show_codes_colour_filter = ""
+        show_codes_of_colour_range(self.app, self.ui.treeWidget, self.codes, selected)
         self.show_codes_like_filter = ""
 
     def recursive_traverse(self, item, text_):
@@ -2202,7 +2203,7 @@ class DialogCodePdf(QtWidgets.QWidget):
         self.get_coded_text_update_eventfilter_tooltips()
         return True
 
-    def update_dialog_codes_and_categories(self, tables: list[str] = []):
+    def update_dialog_codes_and_categories(self, tables: list[str]|None = None):
         """Refresh the local dialog after code/category changes and optionally notify other dialogs.
 
         Args:
@@ -2341,6 +2342,7 @@ class DialogCodePdf(QtWidgets.QWidget):
     def add_edit_cat_or_code_memo(self, selected):
         """ View and edit a memo for a category or code. """
 
+        changed_tables = None
         if selected.text(1)[0:3] == 'cid':
             # Find the code in the list
             found = -1

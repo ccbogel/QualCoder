@@ -76,6 +76,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         self.attributes = []  # Show selected files in list widget
         self.file_ = None  # Current file
         self.show_codes_like_filter = ""  # gets filled when text strings are used to show specific code names
+        self.show_codes_colour_filter = ""  # gets filled when a code colur is selected
 
         # For transcribed text
         self.annotations = []
@@ -1523,8 +1524,8 @@ class DialogCodeAV(QtWidgets.QDialog):
             action_color = menu.addAction(_("Change code color"))
             action_move_code = menu.addAction(_("Move code to"))
             action_show_coded_media = menu.addAction(_("Show coded text and media"))
-        action_show_codes_like = menu.addAction(_("Show codes like") + " " + self.show_codes_like_filter)
-        action_show_codes_of_colour = menu.addAction(_("Show codes of colour"))
+        action_show_codes_like = menu.addAction(_("Show codes like") + ": " + self.show_codes_like_filter)
+        action_show_codes_of_colour = menu.addAction(_("Show codes of colour") + ": " + self.show_codes_colour_filter)
         action_all_asc = menu.addAction(_("Sort ascending"))
         action_all_desc = menu.addAction(_("Sort descending"))
         action_cat_then_code_asc = menu.addAction(_("Sort category then code ascending"))
@@ -1631,21 +1632,17 @@ class DialogCodeAV(QtWidgets.QDialog):
         dialog.setInputMode(QtWidgets.QInputDialog.InputMode.TextInput)
         dlg_text = _("Show codes containing the text. (Blank for all)") + "\n"
         if self.show_codes_like_filter:
-            dlg_text += _("Filters") + " " + self.show_codes_like_filter
+            dlg_text += _("Filters") + ": " + self.show_codes_like_filter
         dialog.setLabelText(dlg_text)
         dialog.resize(200, 20)
         ok = dialog.exec()
         if not ok:
             return
-        text_ = str(dialog.textValue())
-        if text_ == "":
-            self.show_codes_like_filter = ""
-        elif self.show_codes_like_filter == "" and text_ != "":
-            self.show_codes_like_filter = ": " + text_
-        else:
-            self.show_codes_like_filter += "|" + text_
+        self.show_codes_like_filter = str(dialog.textValue())
         root = self.ui.treeWidget.invisibleRootItem()
-        self.recursive_traverse(root, text_)
+        self.recursive_traverse(root, "")  # Show all codes in tree
+        root = self.ui.treeWidget.invisibleRootItem()
+        self.recursive_traverse(root, self.show_codes_like_filter)
 
     def show_codes_of_color(self):
         """ Show all codes in colour range in code tree., ir all codes if no selection.
@@ -1656,8 +1653,11 @@ class DialogCodeAV(QtWidgets.QDialog):
         ok = ui.exec()
         if not ok:
             return
-        selected_color = ui.get_selected()
-        show_codes_of_colour_range(self.app, self.ui.treeWidget, self.codes, selected_color)
+        selected = ui.get_selected()
+        self.show_codes_colour_filter = selected['name']  # colour range name
+        if self.show_codes_colour_filter == "all":
+            self.show_codes_colour_filter = ""
+        show_codes_of_colour_range(self.app, self.ui.treeWidget, self.codes, selected)
         self.show_codes_like_filter = ""
 
     def recursive_traverse(self, item, txt):
@@ -1677,7 +1677,7 @@ class DialogCodeAV(QtWidgets.QDialog):
                 item.child(i).setHidden(False)
             self.recursive_traverse(item.child(i), txt)
 
-    def update_dialog_codes_and_categories(self, tables: list[str] = []):
+    def update_dialog_codes_and_categories(self, tables: list[str]|None = None):
         """Refresh the local dialog after code/category changes and optionally notify other dialogs.
 
         Args:
@@ -2357,7 +2357,9 @@ class DialogCodeAV(QtWidgets.QDialog):
             for orphan in orphans:
                 cur.execute(sql, [orphan[0]])
             self.app.conn.commit()
-        except:
+        except Exception as e_:
+            print(e_)
+            logger.warning(e_)
             self.app.conn.rollback()  # revert all changes
             self.update_dialog_codes_and_categories()
             raise            
@@ -2391,8 +2393,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             for ct in ct_res:
                 try:
                     cur.execute("update code_text set cid=? where ctid=?", [new_cid, ct[0]])
-                except sqlite3.IntegrityError as e_:
-                    # print(ct, e_)
+                except sqlite3.IntegrityError:
                     cur.execute("delete from code_text where ctid=?", [ct[0]])
             av_sql = "select avid from code_av where cid=?"
             cur.execute(av_sql, [old_cid])
@@ -2400,8 +2401,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             for av in av_res:
                 try:
                     cur.execute("update code_av set cid=? where avid=?", [new_cid, av[0]])
-                except sqlite3.IntegrityError as e_:
-                    # print(e_)
+                except sqlite3.IntegrityError:
                     cur.execute("delete from code_av where avid=?", [av[0]])
             img_sql = "select imid from code_image where cid=?"
             cur.execute(img_sql, [old_cid])
@@ -2409,13 +2409,14 @@ class DialogCodeAV(QtWidgets.QDialog):
             for img in img_res:
                 try:
                     cur.execute("update code_image set cid=? where imid=?", [new_cid, img[0]])
-                except sqlite3.IntegrityError as e_:
-                    # print(e_)
+                except sqlite3.IntegrityError:
                     cur.execute("delete from code_image where imid=?", [img[0]])
             cur.execute("delete from code_name where cid=?", [old_cid, ])
             self.app.conn.commit()
-        except:
-            self.app.conn.rollback() # revert all changes 
+        except Exception as e_:
+            print(e_)
+            logger.warning(e_)
+            self.app.conn.rollback()  # revert all changes
             raise                
         self.update_dialog_codes_and_categories(["code_name", "code_text", "code_av", "code_image"])
         self.parent_textEdit.append(msg_)
@@ -3664,11 +3665,11 @@ class GraphicsScene(QtWidgets.QGraphicsScene):
         position = QtCore.QPointF(event.scenePos())
         #print("pos:", position.x(), position.y())
         for item in self.items(): # item is QGraphicsProxyWidget
-            #print("X", int(item.scene_from_x), int(item.scene_to_x))
-            #print("Y", item.scene_from_y, item.scene_to_y)
+            # print("X", int(item.scene_from_x), int(item.scene_to_x))
+            # print("Y", item.scene_from_y, item.scene_to_y)
             if isinstance(item, SegmentGraphicsItem) and item.scene_from_x <= position.x() <= item.scene_to_x and \
                 item.scene_from_y <= position.y() <= item.scene_to_y:
-                #print("Found", item.segment)
+                # print("Found", item.segment)
                 item.alternative_context_menu()
                 break
 
@@ -4338,7 +4339,7 @@ class DialogViewAV(QtWidgets.QDialog):
         # Need this for helping set the slider if user sliding before play begins
         # Detect number of audio tracks in media
         self.mediaplayer.play()
-        #self.mediaplayer.audio_set_volume(0)
+        # self.mediaplayer.audio_set_volume(0)
         self.ui.horizontalSlider_vol.setValue(100)
         time.sleep(0.2)
         tracks = self.mediaplayer.audio_get_track_description()

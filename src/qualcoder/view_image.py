@@ -88,6 +88,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.show_code_captions = 0  # 0 = no, 1 = code name, 2 = codename + memo
         self.default_new_code_color = None
         self.show_codes_like_filter = ""  # gets filled when text strings are used to show specific code names
+        self.show_codes_colour_filter = ""  # gets filled when a code colur is selected
 
         self.pdf_page = None  # display at 1
         self.pdf_total_pages = None
@@ -987,7 +988,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.draw_coded_areas()
         self.fill_code_counts_in_tree()
 
-    def update_dialog_codes_and_categories(self, tables: list[str] = []):
+    def update_dialog_codes_and_categories(self, tables: list[str]|None = None):
         """Refresh the local dialog after code/category changes and optionally notify other dialogs.
 
         Args:
@@ -1256,8 +1257,8 @@ class DialogCodeImage(QtWidgets.QDialog):
             action_color = menu.addAction(_("Change code color"))
             action_move_code = menu.addAction(_("Move code to"))
             action_show_coded_media = menu.addAction(_("Show coded text and media"))
-        action_show_codes_like = menu.addAction(_("Show codes like") + " " + self.show_codes_like_filter)
-        action_show_codes_of_colour = menu.addAction(_("Show codes of colour"))
+        action_show_codes_like = menu.addAction(_("Show codes like") + ": " + self.show_codes_like_filter)
+        action_show_codes_of_colour = menu.addAction(_("Show codes of colour") + ": " + self.show_codes_colour_filter)
         action_all_asc = menu.addAction(_("Sort ascending"))
         action_all_desc = menu.addAction(_("Sort descending"))
         action_cat_then_code_asc = menu.addAction(_("Sort category then code ascending"))
@@ -1367,21 +1368,17 @@ class DialogCodeImage(QtWidgets.QDialog):
         dialog.setInputMode(QtWidgets.QInputDialog.InputMode.TextInput)
         dlg_text = _("Show codes containing the text. (Blank for all)") + "\n"
         if self.show_codes_like_filter:
-            dlg_text += _("Filters") + " " + self.show_codes_like_filter
+            dlg_text += _("Filters") + ": " + self.show_codes_like_filter
         dialog.setLabelText(dlg_text)
         dialog.resize(200, 20)
         ok = dialog.exec()
         if not ok:
             return
-        text_ = str(dialog.textValue())
-        if text_ == "":
-            self.show_codes_like_filter = ""
-        elif self.show_codes_like_filter == "" and text_ != "":
-            self.show_codes_like_filter = ": " + text_
-        else:
-            self.show_codes_like_filter += "|" + text_
+        self.show_codes_like_filter = str(dialog.textValue())
         root = self.ui.treeWidget.invisibleRootItem()
-        self.recursive_traverse(root, text_)
+        self.recursive_traverse(root, "")  # Show all codes in tree
+        root = self.ui.treeWidget.invisibleRootItem()
+        self.recursive_traverse(root, self.show_codes_like_filter)
 
     def show_codes_of_color(self):
         """ Show all codes in colour range in code tree., ir all codes if no selection.
@@ -1392,8 +1389,11 @@ class DialogCodeImage(QtWidgets.QDialog):
         ok = ui.exec()
         if not ok:
             return
-        selected_color = ui.get_selected()
-        show_codes_of_colour_range(self.app, self.ui.treeWidget, self.codes, selected_color)
+        selected = ui.get_selected()
+        self.show_codes_colour_filter = selected['name']  # colour range name
+        if self.show_codes_colour_filter == "all":
+            self.show_codes_colour_filter = ""
+        show_codes_of_colour_range(self.app, self.ui.treeWidget, self.codes, selected)
         self.show_codes_like_filter = ""
 
     def recursive_traverse(self, item, text_):
