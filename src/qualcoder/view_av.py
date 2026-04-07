@@ -297,24 +297,46 @@ class DialogCodeAV(QtWidgets.QDialog):
         if not ok:
             return
         search_text = dialog.textValue()
-
         # Remove selections and search for matching item text
         self.ui.treeWidget.setCurrentItem(None)
         self.ui.treeWidget.clearSelection()
         item = None
         iterator = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
+        matches = []
         while iterator.value():
             item = iterator.value()
             if "cid" in item.text(1):
                 cid = int(item.text(1)[4:])
                 code_ = next((code_ for code_ in self.codes if code_['cid'] == cid), None)
                 if search_text in code_['name']:
+                    matches.append(code_)
+            iterator += 1
+        if not matches:
+            Message(self.app, _("Match not found"), _("No code with matching text found.")).exec()
+            return
+        # Get one selected code from one or more codes.
+        selected = None
+        if len(matches) > 1:
+            ui = DialogSelectItems(self.app, matches, _("Select code"), "single")
+            ok = ui.exec()
+            if not ok:
+                return
+            selected = ui.get_selected()
+            if not selected:
+                return
+        else:
+            selected = matches[0]
+        # Set selected in tree
+        item = None
+        iterator = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
+        while iterator.value():
+            item = iterator.value()
+            if "cid" in item.text(1):
+                cid = int(item.text(1)[4:])
+                if cid == selected['cid']:
                     self.ui.treeWidget.setCurrentItem(item)
                     break
             iterator += 1
-        if item is None:
-            Message(self.app, _("Match not found"), _("No code with matching text found.")).exec()
-            return
         # Expand parents
         parent = item.parent()
         while parent is not None:
@@ -1505,6 +1527,7 @@ class DialogCodeAV(QtWidgets.QDialog):
         action_all_asc = menu.addAction(_("Sort ascending"))
         action_all_desc = menu.addAction(_("Sort descending"))
         action_cat_then_code_asc = menu.addAction(_("Sort category then code ascending"))
+        action_find_code = menu.addAction(_("Find code"))
         action = menu.exec(self.ui.treeWidget.mapToGlobal(position))
         if action is None:
             return
@@ -1525,6 +1548,9 @@ class DialogCodeAV(QtWidgets.QDialog):
             return
         if action == action_show_codes_like:
             self.show_codes_like()
+            return
+        if action == action_find_code:
+            self.find_code_in_tree()
             return
         if selected is not None and selected.text(1)[0:3] == 'cid' and action == action_color:
             self.change_code_color(selected)
