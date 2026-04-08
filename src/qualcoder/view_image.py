@@ -73,7 +73,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.codes = []
         self.categories = []
         self.files = []
-        self.coded_areas = []
+        self.code_areas = []
         self.undo_deleted_code = None  # Undo last deleted code
         self.file_ = None    # Dictionary with name, memo, id, mediapath
         self.pixmap = None
