@@ -682,6 +682,26 @@ class TableWidgetItem(QtWidgets.QTableWidgetItem):
 DEFAULT_SQL = ["-- CASE TEXT\nselect cases.name ,  substr(source.fulltext, case_text.pos0, case_text.pos1 -  case_text.pos0 ) as casetext \
 from cases join case_text on  cases.caseid = case_text.caseid join source on source.id= case_text.fid \
 where case_text.pos1 >0",
+"-- CODE COUNT BY CASE\n\
+-- There may be the same code up to three times per case.\n\
+-- This is because the same code was used in text, and images and audio/video.\n\
+-- Each code count is collated for text, images, and A/V separately.\n\n\
+select cases.name as casename, code_name.name as codename,  count(code_name.name) as codecount from code_text\n\
+join code_name on code_name.cid = code_text.cid \n\
+join (case_text join cases on cases.caseid = case_text.caseid) on code_text.fid = case_text.fid\n\
+where (code_text.pos0 >= case_text.pos0 and code_text.pos1 <= case_text.pos1)\n\
+group by casename, codename\n\
+union\n\
+select cases.name as casename, code_name.name as codename,  count(code_name.name) as codecount from code_image\n\
+join code_name on code_name.cid = code_image.cid\n\
+join (case_text join cases on cases.caseid = case_text.caseid) on code_image.id = case_text.fid\n\
+group by casename, codename\n\
+union\n\
+select cases.name as casename, code_name.name as codename,  count(code_name.name) as codecount from code_av\n\
+join code_name on code_name.cid = code_av.cid\n\
+join (case_text join cases on cases.caseid = case_text.caseid) on code_av.id = case_text.fid\n\
+group by casename, codename\n\
+order by casename asc, codename asc",
 "-- SELECT CODED CASE TEXT BY CODE AND CASE ATTRIBUTE WHERE THE CASES ARE SECTIONS WITHIN THE SAME TEXT DOCUMENT \n\
 SELECT cases.name as 'case name', attribute.name as 'Case attribute', attribute.value,\n\
 source.name as 'text file name', code_name.name as 'code name', code_text.pos0, code_text.pos1, seltext \n\
