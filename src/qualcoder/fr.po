@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: QualCoder\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-04-08 10:58+0200\n"
-"PO-Revision-Date: 2026-04-09 09:28+0200\n"
+"PO-Revision-Date: 2026-04-09 14:42+0200\n"
 "Last-Translator: Justin <>\n"
 "Language-Team: French\n"
 "Language: fr\n"
@@ -3205,7 +3205,7 @@ msgstr "Lier une catégorie à une autre"
 
 #: src/qualcoder/code_organiser.py:928
 msgid "Remove category from category"
-msgstr "Supprimer une catégorie d'une catégorie"
+msgstr "Supprimer la catégorie de la catégorie"
 
 #: src/qualcoder/code_organiser.py:932 src/qualcoder/view_graph.py:4088
 msgid "Display memo"
