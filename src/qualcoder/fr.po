@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: QualCoder\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-04-08 10:58+0200\n"
-"PO-Revision-Date: 2026-04-08 11:09+0200\n"
+"PO-Revision-Date: 2026-04-09 09:28+0200\n"
 "Last-Translator: Justin <>\n"
 "Language-Team: French\n"
 "Language: fr\n"
@@ -3181,7 +3181,7 @@ msgstr "Modifications apportées à l'arborescence des codes"
 
 #: src/qualcoder/code_organiser.py:918
 msgid "Link code to category"
-msgstr "Code de lien vers la catégorie"
+msgstr "Lier le code à la catégorie"
 
 #: src/qualcoder/code_organiser.py:919
 msgid "Merge code into code"
@@ -3217,7 +3217,7 @@ msgstr "Mise à jour du nom"
 
 #: src/qualcoder/code_organiser.py:1022
 msgid "Link code: Select category"
-msgstr "Code de lien : Sélectionnez une catégorie"
+msgstr "Lier le code : Sélectionnez une catégorie"
 
 #: src/qualcoder/code_organiser.py:1048
 msgid "Merge into: Select code"
