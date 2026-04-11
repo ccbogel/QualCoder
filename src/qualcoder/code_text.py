@@ -2214,25 +2214,37 @@ class DialogCodeText(QtWidgets.QWidget):
          Show selected codes that contain entered text.
          The input dialog is too narrow, so it is re-created. """
 
-        dialog = QtWidgets.QInputDialog(None)
+        dialog = QtWidgets.QDialog(None)
         dialog.setStyleSheet(f"* {{font-size:{self.app.settings['fontsize']}pt}} ")
         dialog.setWindowTitle(_("Show some codes"))
         dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        dialog.setInputMode(QtWidgets.QInputDialog.InputMode.TextInput)
         dlg_text = _("Show codes containing the text. (Blank for all)") + "\n"
         if self.show_codes_like_filter:
             dlg_text += _("Filter: ") + self.show_codes_like_filter
-        dialog.setLabelText(dlg_text)
-        dialog.resize(200, 20)
+        lbl = QtWidgets.QLabel(dlg_text)
+        line = QtWidgets.QLineEdit()
+        chkbox = QtWidgets.QCheckBox(_("Case sensitive"))
+        btnBox = QtWidgets.QDialogButtonBox()
+        btnBox.setStandardButtons(QtWidgets.QDialogButtonBox.StandardButton.Ok|QtWidgets.QDialogButtonBox.StandardButton.Cancel)
+        layout = QtWidgets.QVBoxLayout()
+        layout.addWidget(lbl)
+        layout.addWidget(chkbox)
+        layout.addWidget(line)
+        layout.addWidget(btnBox)
+        dialog.setLayout(layout)
+        btnBox.rejected.connect(dialog.reject)
+        btnBox.accepted.connect(dialog.accept)
+        dialog.resize(200, 60)
         ok = dialog.exec()
         if not ok:
             return
         self.show_codes_colour_filter = ""
-        self.show_codes_like_filter = str(dialog.textValue())
+        case_sensitive = chkbox.isChecked()
+        self.show_codes_like_filter = line.text()
         root = self.ui.treeWidget.invisibleRootItem()
         self.recursive_traverse(root, "")  # Show all codes in tree
         root = self.ui.treeWidget.invisibleRootItem()
-        self.recursive_traverse(root, self.show_codes_like_filter)
+        self.recursive_traverse(root, self.show_codes_like_filter, case_sensitive)
 
     def show_codes_of_color(self):
         """ Show all codes in colour range in code tree., ir all codes if no selection.
@@ -2251,22 +2263,29 @@ class DialogCodeText(QtWidgets.QWidget):
         show_codes_of_colour_range(self.app, self.ui.treeWidget, self.codes, selected)
         self.show_codes_like_filter = ""
 
-    def recursive_traverse(self, item, text_):
+    def recursive_traverse(self, item, text_="", case_sensitive=False):
         """ Find all children codes of this item that match or not and hide or unhide based on 'text'.
-        Looks at tooltip also because the code text may be shortened to 50 characters for display, and the tooltip
-        is not shortened.
         Recurse through all child categories.
         Called by: show_codes_like
         Args:
             item: a QTreeWidgetItem
             text_:  Text string for matching with code names
+            case_sensitive:  Bool
         """
 
         child_count = item.childCount()
         for i in range(child_count):
-            if "cid:" in item.child(i).text(1) and len(text_) > 0 and text_ not in item.child(i).text(0) and \
-                    text_ not in item.child(i).toolTip(0):
-                item.child(i).setHidden(True)
+            if "cid:" in item.child(i).text(1) and len(text_) > 0:
+                cid = int(item.child(i).text(1)[4:])
+                for c in self.codes:
+                    if cid == c['cid']:
+                        if text_ not in c['name'] and not case_sensitive:
+                            item.child(i).setHidden(True)
+                        if text_.lower() not in c['name'].lower() and case_sensitive:
+                            item.child(i).setHidden(True)
+                        break
+                '''if text_ not in item.child(i).text(0) and text_ not in item.child(i).toolTip(0):
+                    item.child(i).setHidden(True)'''
             if "cid:" in item.child(i).text(1) and text_ == "":
                 item.child(i).setHidden(False)
             self.recursive_traverse(item.child(i), text_)
