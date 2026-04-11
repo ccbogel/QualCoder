@@ -1357,28 +1357,41 @@ class DialogCodeImage(QtWidgets.QDialog):
         self.update_dialog_codes_and_categories(["code_name"])
 
     def show_codes_like(self):
-        """ Show all codes if text parameter is empty.
+        """ Show all codes if text is empty.
          Show selected codes that contain entered text.
-         Input dialog is narrow, so some code below to make it wider. """
+         The input dialog is too narrow, so it is re-created. """
 
-        dialog = QtWidgets.QInputDialog(None)
+        dialog = QtWidgets.QDialog(None)
         dialog.setStyleSheet(f"* {{font-size:{self.app.settings['fontsize']}pt}} ")
-        dialog.setWindowTitle(_("Show codes containing"))
+        dialog.setWindowTitle(_("Show some codes"))
         dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        dialog.setInputMode(QtWidgets.QInputDialog.InputMode.TextInput)
         dlg_text = _("Show codes containing the text. (Blank for all)") + "\n"
         if self.show_codes_like_filter:
-            dlg_text += _("Filters") + ": " + self.show_codes_like_filter
-        dialog.setLabelText(dlg_text)
-        dialog.resize(200, 20)
+            dlg_text += _("Filter: ") + self.show_codes_like_filter
+        lbl = QtWidgets.QLabel(dlg_text)
+        line = QtWidgets.QLineEdit()
+        chkbox = QtWidgets.QCheckBox(_("Case sensitive"))
+        btnBox = QtWidgets.QDialogButtonBox()
+        btnBox.setStandardButtons(QtWidgets.QDialogButtonBox.StandardButton.Ok|QtWidgets.QDialogButtonBox.StandardButton.Cancel)
+        layout = QtWidgets.QVBoxLayout()
+        layout.addWidget(lbl)
+        layout.addWidget(chkbox)
+        layout.addWidget(line)
+        layout.addWidget(btnBox)
+        dialog.setLayout(layout)
+        btnBox.rejected.connect(dialog.reject)
+        btnBox.accepted.connect(dialog.accept)
+        dialog.resize(200, 60)
         ok = dialog.exec()
         if not ok:
             return
-        self.show_codes_like_filter = str(dialog.textValue())
+        self.show_codes_colour_filter = ""
+        case_sensitive = chkbox.isChecked()
+        self.show_codes_like_filter = line.text()
         root = self.ui.treeWidget.invisibleRootItem()
         self.recursive_traverse(root, "")  # Show all codes in tree
         root = self.ui.treeWidget.invisibleRootItem()
-        self.recursive_traverse(root, self.show_codes_like_filter)
+        self.recursive_traverse(root, self.show_codes_like_filter, case_sensitive)
 
     def show_codes_of_color(self):
         """ Show all codes in colour range in code tree., ir all codes if no selection.
@@ -1396,20 +1409,27 @@ class DialogCodeImage(QtWidgets.QDialog):
         show_codes_of_colour_range(self.app, self.ui.treeWidget, self.codes, selected)
         self.show_codes_like_filter = ""
 
-    def recursive_traverse(self, item, text_):
+    def recursive_traverse(self, item, text_="", case_sensitive=False):
         """ Find all children codes of this item that match or not and hide or unhide based on 'text'.
         Recurse through all child categories.
         Called by: show_codes_like
-        param:
+        Args:
             item: a QTreeWidgetItem
             text_:  Text string for matching with code names
+            case_sensitive:  Bool
         """
 
         child_count = item.childCount()
         for i in range(child_count):
-            if "cid:" in item.child(i).text(1) and len(text_) > 0 and \
-                    (text_ not in item.child(i).text(0) or text_ not in item.child(i).toolTip(0)):
-                item.child(i).setHidden(True)
+            if "cid:" in item.child(i).text(1) and len(text_) > 0:
+                cid = int(item.child(i).text(1)[4:])
+                for c in self.codes:
+                    if cid == c['cid']:
+                        if text_ not in c['name'] and not case_sensitive:
+                            item.child(i).setHidden(True)
+                        if text_.lower() not in c['name'].lower() and case_sensitive:
+                            item.child(i).setHidden(True)
+                        break
             if "cid:" in item.child(i).text(1) and text_ == "":
                 item.child(i).setHidden(False)
             self.recursive_traverse(item.child(i), text_)
@@ -2434,15 +2454,8 @@ class DialogViewImage(QtWidgets.QDialog):
     """ View image. View and edit displayed memo.
     Show a scalable and scrollable image.
     The slider values range from 10 to 99.
-
     Linked images have 'image:' at start of mediapath
     """
-
-    app = None
-    image_data = None
-    pixmap = None
-    scene = None
-    degrees = 0  # for rotation
 
     def __init__(self, app, image_data, parent=None):
         """ Image_data contains: {name, mediapath, owner, id, date, memo, fulltext}
@@ -2451,7 +2464,9 @@ class DialogViewImage(QtWidgets.QDialog):
 
         self.app = app
         self.image_data = image_data
-        self.degrees = 0
+        self.degrees = 0  # For rotation
+        self.pixmap = None
+        self.scene = None
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_view_image()
         self.ui.setupUi(self)

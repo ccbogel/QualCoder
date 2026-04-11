@@ -1622,27 +1622,40 @@ class DialogCodeAV(QtWidgets.QDialog):
 
     def show_codes_like(self):
         """ Show all codes if text is empty.
-         Show selected codes that contain entered text. """
+         Show selected codes that contain entered text.
+         The input dialog is too narrow, so it is re-created. """
 
-        # Input dialog narrow, so code below
-        dialog = QtWidgets.QInputDialog(None)
+        dialog = QtWidgets.QDialog(None)
         dialog.setStyleSheet(f"* {{font-size:{self.app.settings['fontsize']}pt}} ")
-        dialog.setWindowTitle(_("Show codes containing"))
+        dialog.setWindowTitle(_("Show some codes"))
         dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        dialog.setInputMode(QtWidgets.QInputDialog.InputMode.TextInput)
         dlg_text = _("Show codes containing the text. (Blank for all)") + "\n"
         if self.show_codes_like_filter:
-            dlg_text += _("Filters") + ": " + self.show_codes_like_filter
-        dialog.setLabelText(dlg_text)
-        dialog.resize(200, 20)
+            dlg_text += _("Filter: ") + self.show_codes_like_filter
+        lbl = QtWidgets.QLabel(dlg_text)
+        line = QtWidgets.QLineEdit()
+        chkbox = QtWidgets.QCheckBox(_("Case sensitive"))
+        btnBox = QtWidgets.QDialogButtonBox()
+        btnBox.setStandardButtons(QtWidgets.QDialogButtonBox.StandardButton.Ok|QtWidgets.QDialogButtonBox.StandardButton.Cancel)
+        layout = QtWidgets.QVBoxLayout()
+        layout.addWidget(lbl)
+        layout.addWidget(chkbox)
+        layout.addWidget(line)
+        layout.addWidget(btnBox)
+        dialog.setLayout(layout)
+        btnBox.rejected.connect(dialog.reject)
+        btnBox.accepted.connect(dialog.accept)
+        dialog.resize(200, 60)
         ok = dialog.exec()
         if not ok:
             return
-        self.show_codes_like_filter = str(dialog.textValue())
+        self.show_codes_colour_filter = ""
+        case_sensitive = chkbox.isChecked()
+        self.show_codes_like_filter = line.text()
         root = self.ui.treeWidget.invisibleRootItem()
         self.recursive_traverse(root, "")  # Show all codes in tree
         root = self.ui.treeWidget.invisibleRootItem()
-        self.recursive_traverse(root, self.show_codes_like_filter)
+        self.recursive_traverse(root, self.show_codes_like_filter, case_sensitive)
 
     def show_codes_of_color(self):
         """ Show all codes in colour range in code tree., ir all codes if no selection.
@@ -1660,22 +1673,30 @@ class DialogCodeAV(QtWidgets.QDialog):
         show_codes_of_colour_range(self.app, self.ui.treeWidget, self.codes, selected)
         self.show_codes_like_filter = ""
 
-    def recursive_traverse(self, item, txt):
+    def recursive_traverse(self, item, text_="", case_sensitive=False):
         """ Find all children codes of this item that match or not and hide or unhide based on 'text'.
         Recurse through all child categories.
         Called by: show_codes_like
-        param:
+        Args:
             item: a QTreeWidgetItem
-            text:  Text string for matching with code names
+            text_:  Text string for matching with code names
+            case_sensitive:  Bool
         """
 
         child_count = item.childCount()
         for i in range(child_count):
-            if "cid:" in item.child(i).text(1) and len(txt) > 0 and txt not in item.child(i).text(0):
-                item.child(i).setHidden(True)
-            if "cid:" in item.child(i).text(1) and txt == "":
+            if "cid:" in item.child(i).text(1) and len(text_) > 0:
+                cid = int(item.child(i).text(1)[4:])
+                for c in self.codes:
+                    if cid == c['cid']:
+                        if text_ not in c['name'] and not case_sensitive:
+                            item.child(i).setHidden(True)
+                        if text_.lower() not in c['name'].lower() and case_sensitive:
+                            item.child(i).setHidden(True)
+                        break
+            if "cid:" in item.child(i).text(1) and text_ == "":
                 item.child(i).setHidden(False)
-            self.recursive_traverse(item.child(i), txt)
+            self.recursive_traverse(item.child(i), text_)
 
     def update_dialog_codes_and_categories(self, tables: list[str]|None = None):
         """Refresh the local dialog after code/category changes and optionally notify other dialogs.
@@ -4083,33 +4104,6 @@ class DialogViewAV(QtWidgets.QDialog):
     Linked a/v have 'audio:' or 'video:' at start of mediapath
     """
 
-    app = None
-    label = None
-    file_ = None
-    abs_path = ""
-    is_paused = False
-    media_duration_text = ""
-    displayframe = None
-    ddialog = None
-    instance = None
-    mediaplayer = None
-    media = None
-
-    # Variables for searching through text
-    search_indices = []  # A list of tuples of (text name, match.start, match length)
-    search_index = 0
-
-    # Variables used for editing the transcribed text file
-    transcription = None
-    time_positions = []
-    speaker_list = []
-    codetext = []
-    annotations = []
-    casetext = []
-    prev_text = ""
-    no_codes_annotes_cases = True
-    code_deletions = []
-
     def __init__(self, app, file_, parent=None):
 
         """ file_ contains: {name, mediapath, owner, id, date, memo, fulltext}
@@ -4118,14 +4112,31 @@ class DialogViewAV(QtWidgets.QDialog):
 
         self.app = app
         self.file_ = file_
-        self.search_indices = []
+        # Search variables
+        self.search_indices = []  # A list of tuples of (text name, match.start, match length)
         self.search_index = 0
+        # Media variables
+        self.label = None
+        self.media_duration_text = ""
+        self.displayframe = None
+        self.ddialog = None
+        self.instance = None
+        self.mediaplayer = None
+        self.media = None
         self.abs_path = ""
         if self.file_['mediapath'][0:6] in ('/audio', '/video'):
             self.abs_path = self.app.project_path + self.file_['mediapath']
         if self.file_['mediapath'][0:6] in ('audio:', 'video:'):
             self.abs_path = self.file_['mediapath'][6:]
         self.is_paused = True
+        # Variables used for editing the transcribed text file
+        self.transcription = None
+        self.codetext = []
+        self.annotations = []
+        self.casetext = []
+        self.prev_text = ""
+        self.no_codes_annotes_cases = True
+        self.code_deletions = []
         self.time_positions = []
         self.speaker_list = []
 
