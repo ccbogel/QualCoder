@@ -708,10 +708,15 @@ class DialogCodeText(QtWidgets.QWidget):
         if self.code_rule:
             self.show_code_rule()
         if current.text(1)[0:3] == 'cat':
-            self.ui.label_code.hide()
-            self.ui.label_code.setToolTip("")
+            style = f"QLabel {{background-color:transparent;}}"
+            self.ui.label_code.setStyleSheet(style)
+            tooltip = ""
+            if self.show_codes_like_filter:
+                tooltip = _("Filtered: ") + self.show_codes_like_filter
+            if self.show_codes_colour_filter:
+                tooltip = _("Filtered: ") + self.show_codes_colour_filter
+            self.ui.label_code.setToolTip(tooltip)
             return
-        self.ui.label_code.show()
         # Set background colour of label to code color, and store current code for underlining
         for c in self.codes:
             if int(current.text(1)[4:]) == c['cid']:
@@ -719,10 +724,14 @@ class DialogCodeText(QtWidgets.QWidget):
                 style = f"QLabel {{background-color:{c['color']}; color: {fg_color};}}"
                 self.ui.label_code.setStyleSheet(style)
                 self.ui.label_code.setAutoFillBackground(True)
-                tt = f"{c['name']}\n"
+                tooltip = f"{c['name']}\n"
                 if c['memo'] != "":
-                    tt += _("Memo: ") + c['memo']
-                self.ui.label_code.setToolTip(tt)
+                    tooltip += _("Memo: ") + c['memo']
+                if self.show_codes_like_filter:
+                    tooltip += "\n" + _("Filtered: ") + self.show_codes_like_filter
+                if self.show_codes_colour_filter:
+                    tooltip += "\n" + _("Filtered: ") + self.show_codes_colour_filter
+                self.ui.label_code.setToolTip(tooltip)
                 break
         selected_text = self.ui.plainTextEdit.textCursor().selectedText()
         if len(selected_text) > 0 and not (QtWidgets.QApplication.mouseButtons() & Qt.MouseButton.RightButton):
@@ -2245,6 +2254,12 @@ class DialogCodeText(QtWidgets.QWidget):
         self.recursive_traverse(root, "")  # Show all codes in tree
         root = self.ui.treeWidget.invisibleRootItem()
         self.recursive_traverse(root, self.show_codes_like_filter, case_sensitive)
+        if self.show_codes_like_filter == "":
+            self.ui.label_code.setPixmap(QtGui.QPixmap())
+            self.ui.label_code.setToolTip("")
+        else:
+            self.ui.label_code.setPixmap(qta.icon('mdi6.filter-outline').pixmap(22, 22))
+            self.ui.label_code.setToolTip(_("Filtered: ") + self.show_codes_like_filter)
 
     def show_codes_of_color(self):
         """ Show all codes in colour range in code tree., ir all codes if no selection.
@@ -2262,6 +2277,12 @@ class DialogCodeText(QtWidgets.QWidget):
             self.show_codes_colour_filter = ""
         show_codes_of_colour_range(self.app, self.ui.treeWidget, self.codes, selected)
         self.show_codes_like_filter = ""
+        if self.show_codes_colour_filter == "":
+            self.ui.label_code.setPixmap(QtGui.QPixmap())
+            self.ui.label_code.setToolTip("")
+        else:
+            self.ui.label_code.setPixmap(qta.icon('mdi6.filter-outline').pixmap(22, 22))
+            self.ui.label_code.setToolTip(_("Filtered: ") + self.show_codes_colour_filter)
 
     def recursive_traverse(self, item, text_="", case_sensitive=False):
         """ Find all children codes of this item that match or not and hide or unhide based on 'text'.
