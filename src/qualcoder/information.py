@@ -74,7 +74,7 @@ class DialogInformation(QtWidgets.QDialog):
         super().accept()
 
 
-about = '<h1 class="western">About QualCoder</h1>\
+about = _('<h1 class="western">About QualCoder</h1>\
 <h2 class="western">Version:</h2>\
 <p>QualCoderVersion</p>\
 <p>Optional: Install VLC for audio and video coding.<br /> \
@@ -167,9 +167,9 @@ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT<br />\
 HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,<br />\
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING<br />\
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR<br />\
-OTHER DEALINGS IN THE SOFTWARE.'
+OTHER DEALINGS IN THE SOFTWARE.')
 
-menu_shortcuts = '<h1>Menu key shortcuts</h1>\n\
+menu_shortcuts = _('<h1>Menu key shortcuts</h1>\n\
 <table><tr><td><b>Menu shortcuts</b></td><td><b>Project menu shortcuts</b></td>\n\
 <td><b>Files and Cases menu shortcuts</b></td></tr>\n\
 <tr><td>Alt 1 Open Project menu</td><td>Ctrl N New project (macOS Cmd N)</td><td>\n\
@@ -190,9 +190,9 @@ Alt F Manage files (macOS Option F)</td></tr>\n\
 <tr><td></td><td>Alt Q Code relations</td><td></td></tr>\n\
 <tr><td></td><td>Alt G Open Graph</td><td></td></tr>\n\
 <tr><td></td><td>Alt U Charts</td><td></td></tr>\n\
-<tr><td></td><td>Alt D Database queries</td><td></td></tr></table>'
+<tr><td></td><td>Alt D Database queries</td><td></td></tr></table>')
 
-manage_section_shortcuts = '<h1>Manage menu section key shortcuts</h1><table>\n\
+manage_section_shortcuts = _('<h1>Manage menu section key shortcuts</h1><table>\n\
 <tr><td><b>Key&nbsp;&nbsp;&nbsp;</b></td><td><b>Manage files</b></td><td><b>Cases</b></td>\n\
 <td><b>Journals</b></td><td><b>References</b></td></tr>\n\
 <tr><td>Ctrl 0</td><td>Help</td><td>Help</td><td>Help</td><td></td></tr>\n\
@@ -207,9 +207,9 @@ manage_section_shortcuts = '<h1>Manage menu section key shortcuts</h1><table>\n\
 <tr><td>Ctrl 9</td><td>Export file</td><td></td><td></td><td></td></tr>\n\
 <tr><td></td><td>Ctrl A Show all rows</td><td>Ctrl A Show all rows</td><td></td><td>L Link selected</td></tr>\n\
 <tr><td></td><td></td><td></td><td></td><td>U Unlink file</td></tr>\n\
-</table>'
+</table>')
 
-view_av_shortcuts = '<br /><h2>Manage files - view A/V shortcuts</h2>\n\
+view_av_shortcuts = _('<br /><h2>Manage files - view A/V shortcuts</h2>\n\
 Alt minus Rewind 30 seconds.<br />Ctrl R Rewind 5 seconds (macOS Cmd R)<br />Alt plus Forward 30 seconds<br />\n\
 Ctrl S OR Ctrl P Start/pause. On start rewind slightly (macOS Cmd S Cmd P)<br />\n\
 Ctrl T Insert timestamp in format [hh.mm.ss]<br />\n\
@@ -217,11 +217,11 @@ Ctrl N Enter a new speakers name into shortcuts (macOS use Button)<br />\n\
 Ctrl D Delete speaker names from shortcuts<br />\n\
 Ctrl 1 .. 8 Insert speaker in format [speaker name]<br />\n\
 Ctrl Shift &gt; Increase play rate (macOS Cmd Shift &gt;)<br />\n\
-Ctrl Shift &lt; Decrease play rate (macOS Cmd Shift &lt;)<br /><br />'
+Ctrl Shift &lt; Decrease play rate (macOS Cmd Shift &lt;)<br /><br />')
 
 menu_shortcuts_display = menu_shortcuts + manage_section_shortcuts + view_av_shortcuts
 
-coding_text_shortcuts = '<h2>Code text key shortcuts</h2>\
+coding_text_shortcuts = _('<h2>Code text key shortcuts</h2>\
 Ctrl 1 Next file<br />\
 Ctrl 2 File with latest coding<br />\
 Ctrl 3 Go to bookmark<br />\
@@ -253,9 +253,9 @@ Alt + Right arrow Shrink coding to the right<br />\
 Shift + Left arrow Extend coding to the left<br />\
 Shift + Right arrow Extend coding to the right<br />\
 ! Exclamation mark key - describes clicked text character position<br />\
-$ Dollar key - Shift all coding postiions after a clicked position by X characters (negative numbers shift left)'
+$ Dollar key - Shift all coding postiions after a clicked position by X characters (negative numbers shift left)')
 
-coding_image_shortcuts = '<h2>Code image key shortcuts</h2>\
+coding_image_shortcuts = _('<h2>Code image key shortcuts</h2>\
 Ctrl 1 Next file<br />\
 Ctrl 2 File with latest coding<br />\
 Ctrl 3 Open file memo<br />\
@@ -267,9 +267,9 @@ Ctrl Z The last code is unmarked, undo and restore that coding<br />\
 Ctrl G Create a grayed-out image with coloured coded highlights (Wait a few seconds)<br />\
 Minus or Q Zoom out<br />\
 Plus or W Zoom in<br />\
-Right-click on image for menu to rotate image'
+Right-click on image for menu to rotate image')
 
-coding_av_shortcuts = '<h2>Code audio/video key shortcuts</h2>\
+coding_av_shortcuts = _('<h2>Code audio/video key shortcuts</h2>\
 Ctrl 1 Next file<br />\
 Ctrl 2 File with latest coding<br />\
 Ctrl 3 Open file memo<br />\
@@ -295,6 +295,6 @@ Ctrl P Play/pause. On start rewind 1 second<br />\
 Ctrl D Play/pause. On start rewind 1 second<br />\
 Ctrl S Start and stop av segment creation<br />\
 Ctrl Shift > Increase play rate<br />\
-Ctrl Shift &lt; Decrease play rate<br />'
+Ctrl Shift &lt; Decrease play rate<br />')
 
 coding_shortcuts_display = coding_text_shortcuts + coding_image_shortcuts + coding_av_shortcuts
