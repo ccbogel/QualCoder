@@ -953,7 +953,7 @@ class DialogJournals(QtWidgets.QDialog):
                 try:
                     float(attr_value)
                 except ValueError:
-                    logger.warning(_("Skipping non-numeric value '%s' for attribute '%s'"), attr_value, attr_name)
+                    logger.warning(_("Skipping non-numeric value for attribute "), attr_value, attr_name)
                     continue
             # Insert the attribute value for the new source file
             try:
@@ -962,7 +962,7 @@ class DialogJournals(QtWidgets.QDialog):
                     (file_attr_name, attr_value, new_source_id, 'file', now_date, self.app.settings['codername'])
                 )
             except Exception as e:
-                logger.warning(_("Could not insert attribute '%s': %s"), file_attr_name, str(e))
+                logger.warning(_("Could not insert attribute: "), file_attr_name, str(e))
         self.app.conn.commit()
 
         msg = _("Journal converted to source document: ") + source_name
