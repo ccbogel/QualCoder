@@ -526,7 +526,7 @@ class DialogCodePdf(QtWidgets.QWidget):
                 self.mark()
             ''' When using search text, textEdit text may be selected as well as the text_box.
             So in this circumstance can select textbox directly or via search text to codet the selected text boxes. '''
-            if len(self.selected_graphic_textboxes) > 0:
+            if len(self.selected_graphic_textboxes) > 0 and not (QtWidgets.QApplication.mouseButtons() & Qt.MouseButton.RightButton):
                 self.mark(by_text_boxes=True)
         # When a code is selected undo the show selected code features
         self.highlight()
