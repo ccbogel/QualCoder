@@ -725,7 +725,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 self.ui.label_code.setToolTip(tt)
                 break
         selected_text = self.ui.plainTextEdit.textCursor().selectedText()
-        if len(selected_text) > 0:
+        if len(selected_text) > 0 and not (QtWidgets.QApplication.mouseButtons() & Qt.MouseButton.RightButton):
             self.mark()
         # When a code is selected undo the show selected code features
         self.highlight()
@@ -2284,8 +2284,6 @@ class DialogCodeText(QtWidgets.QWidget):
                         if text_.lower() not in c['name'].lower() and case_sensitive:
                             item.child(i).setHidden(True)
                         break
-                '''if text_ not in item.child(i).text(0) and text_ not in item.child(i).toolTip(0):
-                    item.child(i).setHidden(True)'''
             if "cid:" in item.child(i).text(1) and text_ == "":
                 item.child(i).setHidden(False)
             self.recursive_traverse(item.child(i), text_)
