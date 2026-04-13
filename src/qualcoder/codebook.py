@@ -21,10 +21,9 @@ https://qualcoder-org.github.io/
 """
 
 from copy import copy
+import html
 import logging
 import os
-import sys
-import traceback
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 
@@ -37,12 +36,7 @@ logger = logging.getLogger(__name__)
 class Codebook:
     """ Create a codebook and export to file. """
 
-    app = None
-    parent_textEdit = None
-    code_names = []
-    categories = []
     memos = False
-    tree = None
 
     def __init__(self, app, parent_textedit, memos=False):
 
@@ -63,14 +57,14 @@ class Codebook:
         codes = copy(self.code_names)
         self.tree.clear()
         self.tree.setColumnCount(4)
-        # add top level categories
+        # Add top level categories
         remove_list = []
         for c in cats:
             if c['supercatid'] is None:
                 memo = ""
                 if c['memo'] != "":
                     memo = "Memo"
-                top_item = QtWidgets.QTreeWidgetItem([c['name'], 'catid:' + str(c['catid']), memo])
+                top_item = QtWidgets.QTreeWidgetItem([c['name'], f"catid:{c['catid']}", memo])
                 self.tree.addTopLevelItem(top_item)
                 remove_list.append(c)
         for item in remove_list:
@@ -78,15 +72,14 @@ class Codebook:
 
         ''' Add child categories. look at each unmatched category, iterate through tree
          to add as child then remove matched categories from the list. '''
-
         count = 0
         while len(cats) > 0 or count < 10000:
             remove_list = []
             for c in cats:
                 it = QtWidgets.QTreeWidgetItemIterator(self.tree)
                 item = it.value()
-                while item:  # while there is an item in the list
-                    if item.text(1) == f'catid:{c["supercatid"]}':
+                while item:
+                    if item.text(1) == f"catid:{c['supercatid']}":
                         memo = ""
                         if c['memo'] != "":
                             memo = "Memo"
@@ -105,7 +98,7 @@ class Codebook:
                 memo = ""
                 if c['memo'] != "":
                     memo = "Memo"
-                top_item = QtWidgets.QTreeWidgetItem([c['name'], f'cid:{c["cid"]}', memo, str(c['freq'])])
+                top_item = QtWidgets.QTreeWidgetItem([c['name'], f"cid:{c['cid']}", memo, str(c['freq'])])
                 self.tree.addTopLevelItem(top_item)
                 remove_items.append(c)
         for item in remove_items:
@@ -119,7 +112,7 @@ class Codebook:
                     memo = ""
                     if c['memo'] != "":
                         memo = "Memo"
-                    child = QtWidgets.QTreeWidgetItem([c['name'], f'cid:{c["cid"]}', memo, str(c['freq'])])
+                    child = QtWidgets.QTreeWidgetItem([c['name'], f"cid:{c['cid']}", memo, str(c['freq'])])
                     item.addChild(child)
                     c['catid'] = -1  # Make unmatchable
                 it += 1
@@ -137,7 +130,7 @@ class Codebook:
         text_edit = QtWidgets.QTextEdit()
         fmt1 = QtGui.QTextBlockFormat()
         fmt1.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft)
-        cursor = QtGui.QTextCursor()
+        # cursor = QtGui.QTextCursor()
         text_edit.textCursor().beginEditBlock()
         text_edit.textCursor().setBlockFormat(fmt1)
         text_edit.textCursor().insertHtml(
@@ -155,11 +148,11 @@ class Codebook:
             for i in range(0, self.depthgauge(item)):
                 prefix += "..."
             if cat:
-                category_text = f'<br/><span style=font-size:14pt>{prefix}Category: {self.convert_entities(item.text(0))}</span><br/>'
+                category_text = f'<br/><span style=font-size:14pt>{prefix}Category: {html.escape(item.text(0))}</span><br/>'
                 memo = ""
                 for i in self.categories:
                     if i['catid'] == id_:
-                        memo = self.convert_entities(i['memo'])
+                        memo = html.escape(i['memo'])
                 text_edit.textCursor().beginEditBlock()
                 text_edit.textCursor().setBlockFormat(fmt1)
                 text_edit.textCursor().insertHtml(category_text)
@@ -172,9 +165,9 @@ class Codebook:
                 for i in self.code_names:
                     if i['cid'] == id_:
                         color = i['color']
-                        memo = self.convert_entities(i['memo'])
+                        memo = html.escape(i['memo'])
                 code_text = prefix + f'<span style="color:{color}">&#9608;</span>Code: '
-                code_text += self.convert_entities(item.text(0))
+                code_text += html.escape(item.text(0))
                 code_text += f", Count: {item.text(3)}<br/>"
                 text_edit.textCursor().beginEditBlock()
                 text_edit.textCursor().setBlockFormat(fmt1)
@@ -237,7 +230,8 @@ class Codebook:
         Message(self.app, _('Codebook exported'), f"Codebook exported:\n{filepath}").exec()
         self.parent_textEdit.append(_("Codebook exported to ") + filepath)
 
-    def depthgauge(self, item):
+    @staticmethod
+    def depthgauge(item):
         """ Get depth for treewidget item. """
 
         depth = 0
@@ -266,19 +260,3 @@ class Codebook:
             if result is not None:
                 c['freq'] += result[0]
 
-    @staticmethod
-    def convert_entities(text):
-        """ Helper function to convert predefiend xml entnties " ' < > &
-        into numeric equivalents #nnn;
-        Also convert None type into ""
-        param: text : String - usually a memo, description, code or category
-        """
-
-        if text is None:
-            return ""
-        text = text.replace('&', '&#038;')  # &#x26; &amp;
-        text = text.replace('"', '&#034;')  # &#x22; &quot;
-        text = text.replace("'", '&#039;')  # &#x27; &apos;
-        text = text.replace('<', '&#060;')  # &#x3C; &lt;
-        text = text.replace('>', '&#062;')  # &#x3E; &gt;
-        return text
