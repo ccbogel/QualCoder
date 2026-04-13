@@ -31,6 +31,7 @@ import re
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import Qt
 
+from .code_in_all_files import DialogCodeInAllFiles
 from .color_selector import TextColor
 from .GUI.ui_dialog_report_code_summary import Ui_Dialog_code_summary
 from .stopwords import *
@@ -48,8 +49,7 @@ logger = logging.getLogger(__name__)
 
 
 class DialogReportCodeSummary(QtWidgets.QDialog):
-    """ Provide a summary report for selected code.
-    """
+    """ Provide a summary report for selected code. """
 
     def __init__(self, app, parent_textedit):
         self.app = app
@@ -74,6 +74,8 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         self.ui.pushButton_search_next.pressed.connect(self.search_results_next)
         self.ui.treeWidget.setStyleSheet(treefont)
         self.ui.treeWidget.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
+        self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
         languages = ["  ", "Deutsch de", "English en", "Español es", "Français fr", "Italiano it", "Português pt"]
         for lang in languages:
             self.ui.comboBox_stopwords.addItem(lang)
@@ -168,8 +170,8 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         while len(cats) > 0 and count < 10000:
             remove_list = []
             for c in cats:
-                it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
-                item = it.value()
+                iterator = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
+                item = iterator.value()
                 count2 = 0
                 while item and count2 < 10000:  # while there is an item in the list
                     if item.text(1) == f'catid:{c["supercatid"]}':
@@ -185,8 +187,8 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
                         else:
                             child.setExpanded(True)
                         remove_list.append(c)
-                    it += 1
-                    item = it.value()
+                    iterator += 1
+                    item = iterator.value()
                     count2 += 1
             for item in remove_list:
                 cats.remove(item)
@@ -214,8 +216,8 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
 
         # Add codes as children
         for c in codes:
-            it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
-            item = it.value()
+            iterator = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
+            item = iterator.value()
             count = 0
             while item and count < 10000:
                 if item.text(1) == f'catid:{c["catid"]}':
@@ -232,8 +234,8 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
                                    Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsDragEnabled)
                     item.addChild(child)
                     c['catid'] = -1  # Make unmatchable
-                it += 1
-                item = it.value()
+                iterator += 1
+                item = iterator.value()
                 count += 1
         self.ui.treeWidget.sortByColumn(0, QtCore.Qt.SortOrder.AscendingOrder)
         # self.ui.treeWidget.expandAll()
@@ -241,15 +243,14 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
 
     def fill_code_counts_in_tree(self):
         """ Count instances of each code.
-        Called by: fill_tree
-        """
+        Called by: fill_tree """
 
         cur = self.app.conn.cursor()
         sql_text = "select count(cid) from code_text where cid=?"
         sql_img = "select count(cid) from code_image where cid=?"
         sql_av = "select count(cid) from code_av where cid=?"
-        it = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
-        item = it.value()
+        iterator = QtWidgets.QTreeWidgetItemIterator(self.ui.treeWidget)
+        item = iterator.value()
         count = 0
         while item and count < 10000:
             if item.text(1)[0:4] == "cid:":
@@ -271,10 +272,28 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
                     item.setText(3, str(coding_count))
                 else:
                     item.setText(3, "")
-
-            it += 1
-            item = it.value()
+            iterator += 1
+            item = iterator.value()
             count += 1
+
+    def tree_menu(self, position):
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
+        selected = self.ui.treeWidget.currentItem()
+        action_show_coded_media = None
+        if selected is not None and selected.text(1)[0:3] == 'cid':
+            action_show_coded_media = menu.addAction(_("Show coded files"))
+        action = menu.exec(self.ui.treeWidget.mapToGlobal(position))
+        if action is not None:
+            if action == action_show_coded_media:
+                found_code = None
+                tofind = int(selected.text(1)[4:])
+                for code in self.codes:
+                    if code['cid'] == tofind:
+                        found_code = code
+                        break
+                if found_code:
+                    DialogCodeInAllFiles(self.app, found_code)
 
     def fill_text_edit(self):
         """ Get data about file and fill text edit. """
@@ -361,7 +380,6 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         text += "  " + _("Average characters: ") + f"{int(avg_chars)}\n"
 
         # Get stopwords from user created list or
-        # TODO default to user selection
         stopwords_file_path = os.path.join(os.path.expanduser('~'), ".qualcoder", "stopwords.txt")
         user_created_stopwords = []
         stopwords = []
@@ -376,7 +394,7 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
                         break
                     user_created_stopwords.append(stopword.strip())  # Remove line ending
             stopwords = user_created_stopwords
-        except FileNotFoundError as err:
+        except FileNotFoundError:
             pass
         if not user_created_stopwords:
             stopwords = []
