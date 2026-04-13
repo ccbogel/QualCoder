@@ -552,7 +552,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
             action_truncate_names = menu.addAction(_("Truncate names"))
         if selected is not None and selected.text(1)[0:3] == 'cid':
             action_show_coded_media = menu.addAction(_("Show coded files"))
-        action_resize = menu.addAction(_("Toggle automatic resize columns"))
+        action_resize = menu.addAction(_("Toggle automatic column resize"))
 
         action = menu.exec(self.ui.treeWidget.mapToGlobal(position))
         if action is not None:
