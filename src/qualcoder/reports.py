@@ -32,6 +32,7 @@ from PyQt6 import QtGui, QtWidgets, QtCore
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QBrush
 
+from .code_in_all_files import DialogCodeInAllFiles
 from .color_selector import TextColor
 from .GUI.ui_dialog_report_comparisons import Ui_Dialog_reportComparisons
 from .GUI.ui_dialog_report_code_frequencies import Ui_Dialog_reportCodeFrequencies
@@ -48,20 +49,14 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
     """ Show code and category frequencies, overall and for each coder in tree widget.
     This is for text, image and av coding. """
 
-    app = None
-    parent_textEdit = None
-    coders = []
-    categories = []
-    codes = []
-    coded = []  # to refactor name
-    file_ids = []
-    attributes = []
-
     def __init__(self, app, parent_textedit):
 
         self.app = app
         self.parent_textEdit = parent_textedit
         self.attributes = []
+        self.coders, self.codes, self.categories, = [], [], []
+        self.coded = []  # Used to refactor name
+        self.file_ids = []
         self.get_data()
         self.calculate_code_frequencies()
         QtWidgets.QDialog.__init__(self)
@@ -84,6 +79,8 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         # These signals after the tree is filled the first time
         self.ui.treeWidget.itemCollapsed.connect(self.get_collapsed)
         self.ui.treeWidget.itemExpanded.connect(self.get_collapsed)
+        self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
         self.ui.radioButton.clicked.connect(self.sort_by_alphabet)
         self.ui.radioButton_2.clicked.connect(self.sort_by_totals)
         self.app.project_events.project_data_changed.connect(self._on_project_data_changed)
@@ -158,9 +155,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable-box', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_file_attributes.setToolTip(ui.tooltip_msg)
         self.file_ids = ui.result_file_ids
-
         self.ui.pushButton_select_files.setToolTip(_("Select files"))
-
         msg = ""
         filenames = self.app.get_filenames()
         for i, f in enumerate(filenames):
@@ -170,7 +165,6 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         if len(ui.result_file_ids) > 20:
             msg += f"\nand more. Total files: {len(ui.result_file_ids)}"
         Message(self.app, _("Files selected by attributes"), msg).exec()
-
         self.get_data()
         self.calculate_code_frequencies()
         self.fill_tree()
@@ -290,7 +284,7 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         self.fill_tree()
 
     def sort_by_alphabet(self, ):
-        """ Sort alphabtically ascending. """
+        """ Sort alphabetically ascending. """
 
         self.get_data()
         self.calculate_code_frequencies()
@@ -533,7 +527,25 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
                 it += 1
                 item = it.value()
         self.ui.treeWidget.sortByColumn(0, QtCore.Qt.SortOrder.AscendingOrder)
-        # self.ui.treeWidget.expandAll()
+
+    def tree_menu(self, position):
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
+        selected = self.ui.treeWidget.currentItem()
+        action_show_coded_media = None
+        if selected is not None and selected.text(1)[0:3] == 'cid':
+            action_show_coded_media = menu.addAction(_("Show coded files"))
+        action = menu.exec(self.ui.treeWidget.mapToGlobal(position))
+        if action is not None:
+            if action == action_show_coded_media:
+                found_code = None
+                tofind = int(selected.text(1)[4:])
+                for code in self.codes:
+                    if code['cid'] == tofind:
+                        found_code = code
+                        break
+                if found_code:
+                    DialogCodeInAllFiles(self.app, found_code)
 
 
 class DialogReportCoderComparisons(QtWidgets.QDialog):
