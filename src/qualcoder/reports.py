@@ -56,6 +56,9 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         self.attributes = []
         self.coders, self.codes, self.categories, = [], [], []
         self.coded = []  # Used to refactor name
+        self.truncated_code_names = True
+        self.contains_long_names = False
+        self.tree_column_widths_auto_resize = True
         self.file_ids = []
         self.get_data()
         self.calculate_code_frequencies()
@@ -444,8 +447,10 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
                 display_list = []
                 for i in c['display_list']:
                     display_list.append(str(i))
-                if len(display_list[0]) > 62:  # Keep category name short
-                    display_list[0] = display_list[0][:30] + '..' + display_list[0][-30:]
+                if self.truncated_code_names:
+                    if len(display_list[0]) > 62:  # Keep category name short
+                        display_list[0] = display_list[0][:30] + '..' + display_list[0][-30:]
+                        self.contains_long_names = True
                 top_item = QtWidgets.QTreeWidgetItem(display_list)
                 top_item.setToolTip(0, c['name'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
@@ -469,8 +474,10 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
                         display_list = []
                         for i in c['display_list']:
                             display_list.append(str(i))
-                        if len(display_list[0]) > 62:  # Keep category name short
-                            display_list[0] = display_list[0][:30] + '..' + display_list[0][-30:]
+                        if self.truncated_code_names:
+                            if len(display_list[0]) > 62:  # Keep category name short
+                                display_list[0] = display_list[0][:30] + '..' + display_list[0][-30:]
+                                self.contains_long_names = True
                         child = QtWidgets.QTreeWidgetItem(display_list)
                         child.setToolTip(0, c['name'])
                         item.addChild(child)
@@ -492,8 +499,10 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
                 display_list = []
                 for i in c['display_list']:
                     display_list.append(str(i))
-                if len(display_list[0]) > 62:  # Keep code name short
-                    display_list[0] = f"{display_list[0][:30]}..{display_list[0][-30:]}"
+                if self.truncated_code_names:
+                    if len(display_list[0]) > 62:  # Keep code name short
+                        display_list[0] = f"{display_list[0][:30]}..{display_list[0][-30:]}"
+                        self.contains_long_names = True
                 top_item = QtWidgets.QTreeWidgetItem(display_list)
                 top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
                 color = TextColor(c['color']).recommendation
@@ -514,8 +523,10 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
                     display_list = []
                     for i in c['display_list']:
                         display_list.append(str(i))
-                    if len(display_list[0]) > 62:  # Keep code name short
-                        display_list[0] = f"{display_list[0][:30]}..{display_list[0][-30:]}"
+                    if self.truncated_code_names:
+                        if len(display_list[0]) > 62:  # Keep code name short
+                            display_list[0] = f"{display_list[0][:30]}..{display_list[0][-30:]}"
+                            self.contains_long_names = True
                     child = QtWidgets.QTreeWidgetItem(display_list)
                     child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
                     color = TextColor(c['color']).recommendation
@@ -533,8 +544,16 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
         selected = self.ui.treeWidget.currentItem()
         action_show_coded_media = None
+        action_expand_names = None
+        if self.contains_long_names:
+            action_expand_names = menu.addAction(_("Expand names"))
+        action_truncate_names = None
+        if self.contains_long_names and self.truncated_code_names is False:
+            action_truncate_names = menu.addAction(_("Truncate names"))
         if selected is not None and selected.text(1)[0:3] == 'cid':
             action_show_coded_media = menu.addAction(_("Show coded files"))
+        action_resize = menu.addAction(_("Toggle automatic resize columns"))
+
         action = menu.exec(self.ui.treeWidget.mapToGlobal(position))
         if action is not None:
             if action == action_show_coded_media:
@@ -546,6 +565,18 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
                         break
                 if found_code:
                     DialogCodeInAllFiles(self.app, found_code)
+            if action == action_expand_names:
+                self.truncated_code_names = False
+                self.fill_tree()
+            if action == action_truncate_names:
+                self.truncated_code_names = True
+                self.fill_tree()
+            if action == action_resize:
+                self.tree_column_widths_auto_resize = not self.tree_column_widths_auto_resize
+            if self.tree_column_widths_auto_resize:
+                self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+            else:
+                self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Interactive)
 
 
 class DialogReportCoderComparisons(QtWidgets.QDialog):
