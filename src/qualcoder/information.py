@@ -92,7 +92,7 @@ Lorenzo Salomón for Spanish translations and for some code development.<br /> \
 Jofen Kihlstrom for past Swedish translations.<br /> \
 To the many members on Github for supporting this project.</p>\
 <h2>Citation</h2>\
-<p>Curtain, C. Dröge, K. (2026) QualCoderVersion [Computer software]. \
+<p>Curtain C, Dröge K, Salomón L, Missaghieh--Poncet J. (2026) QualCoderVersion [Computer software]. \
 Retrieved from https://github.com/ccbogel/QualCoder/releases/tag/QualCoderTag</p>\
 <h2 class="western">Other details</h2> \
 <p>The qda data folder contains folders for imported documents, \

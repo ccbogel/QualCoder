@@ -3345,7 +3345,7 @@ Click "Yes" to start now.')
             logger.warning(str(err))
 
         tag = self.app.version.split("QualCoder ")[1]
-        citation = f"Citation:\nCurtain, C. Dröge, K. (2026) {self.app.version} [Computer software].\n"
+        citation = f"Citation:\nCurtain C, Dröge K, Salomón L, Missaghieh--Poncet J. (2026) {self.app.version} [Computer software].\n"
         citation += f"Retrieved from https://github.com/ccbogel/QualCoder/releases/tag/{tag}\n"
         self.ui.textEdit.append(citation)
 
