@@ -38,8 +38,6 @@ import urllib.request
 import urllib.error as urllib_err
 import webbrowser
 from copy import copy
-import time
-import getpass
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 import qtawesome as qta
@@ -127,49 +125,6 @@ logger.setLevel(logging.DEBUG)
 # The rotating file handler does not work on Windows
 handler = RotatingFileHandler(logfile, maxBytes=log_maxBytes, backupCount=2)
 logger.addHandler(handler)
-
-lock_timeout = 30.0  # in seconds. If a project lockfile is older (= has received no heartbeat for 30 seconds),
-# it is assumed that the host process has died and the project is opened anyways
-lock_heartbeat_interval = 5  # in seconds.
-
-
-class ProjectLockHeartbeatWorker(QtCore.QObject):
-    """
-    This worker thread is invoked on opening a project and will write a regular heartbeat (timestamp) 
-    to the lock file to signify that the project is still in use and the host process did not crash.    
-    """
-    finished = QtCore.pyqtSignal()  # Signal for indicating completion
-    io_error = QtCore.pyqtSignal()  # Signal indicating an error acessing the lock file to write the heartbeat
-
-    def __init__(self, app, lock_file_path):
-        super().__init__()
-        self.app = app
-        self.lock_file_path = lock_file_path
-        self.is_running = True
-        self.lost_connection = False
-
-    def write_heartbeat(self):
-        """Write heartbeat to the lock file every 10 seconds."""
-        last_heartbeat = time.time()
-        while self.is_running:
-            if time.time() - last_heartbeat >= lock_heartbeat_interval:
-                last_heartbeat = time.time()
-                try:
-                    with open(self.lock_file_path, 'w', encoding='utf-8') as lock_file:
-                        lock_file.write(f"{getpass.getuser()}\n{str(time.time())}")
-                    self.lost_connection = False
-                except Exception as e_:
-                    print(e_)
-                    if not self.lost_connection:
-                        self.io_error.emit()
-                    self.lost_connection = True
-            time.sleep(0.1)
-
-    def stop(self):
-        """Stop the heartbeat process."""
-        self.is_running = False
-        self.finished.emit()
-
 
 class ProjectEventBus(QtCore.QObject):
     """Application-wide event bus for project database changes.
@@ -1394,14 +1349,14 @@ class App(object):
         msg = ""
         if self.settings['backup_av_files'] == 'True':
             try:
-                shutil.copytree(self.project_path, backup, ignore=shutil.ignore_patterns('*.lock'))
+                shutil.copytree(self.project_path, backup)
             except FileExistsError as err:
                 msg = _("There is already a backup with this name")
                 print(f"{err}\nmsg")
                 logger.warning(_(msg) + f"\n{err}")
         else:
             shutil.copytree(self.project_path, backup,
-                            ignore=shutil.ignore_patterns('*.lock', '*.mp3', '*.wav', '*.mp4', '*.mov', '*.ogg',
+                            ignore=shutil.ignore_patterns('*.mp3', '*.wav', '*.mp4', '*.mov', '*.ogg',
                                                           '*.wmv', '*.MP3',
                                                           '*.WAV', '*.MP4', '*.MOV', '*.OGG', '*.WMV'))
             # self.ui.textEdit.append(_("WARNING: audio and video files NOT backed up. See settings."))
@@ -1450,9 +1405,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.force_quit = force_quit
         self.journal_display = None
 
-        self.heartbeat_thread = None
-        self.heartbeat_worker = None
-        self.lock_file_path = ''
         self.ai_chat_window = None
         
         if platform.system() == "Windows" and self.app.settings['stylesheet'] == "native":
@@ -2559,71 +2511,6 @@ Click "Yes" to start now.')
             self.ui.textEdit.append(_("Project memo entered."))
             self.app.delete_backup = False
 
-    # lock file helper functions:
-
-    def create_lock_file(self, break_existing_lock=False):
-        """Create the lock file.
-           break_existing_lock: if True, the lock file will be created even if it already exists
-        """
-        if (not break_existing_lock) and os.path.exists(self.lock_file_path):
-            return False
-        try:
-            mode = 'w' if break_existing_lock else 'x'
-            with open(self.lock_file_path, mode, encoding='utf-8') as lock_file:
-                lock_file.write(f"{getpass.getuser()}\n{str(time.time())}")
-            return True
-        except FileExistsError:
-            return False
-
-    def delete_lock_file(self):
-        """ Delete the lock file to release the lock. """
-
-        try:
-            if self.lock_file_path != '':
-                os.remove(self.lock_file_path)
-        except Exception as e_:
-            print("delete_lock_file", e_)
-            logger.debug(e_)
-
-    def lock_file_io_error(self):
-        msg = _('An error occured while writing to the project folder. '
-                'Please close the project and try to open it again.')
-        msg_box = Message(self.app, _("I/O Error"), msg, "critical")
-        btn_close = msg_box.addButton(_("Close"), QtWidgets.QMessageBox.ButtonRole.AcceptRole)
-        btn_ignore = msg_box.addButton("Ignore", QtWidgets.QMessageBox.ButtonRole.RejectRole)
-        msg_box.setDefaultButton(btn_close)
-        msg_box.exec()
-        if msg_box.clickedButton() == btn_close:
-            self.close_project()
-        logger.debug(msg)
-
-    def prepare_heartbeat_thread(self):
-        """ Prepare and start the heartbeat QThread. """
-
-        self.heartbeat_thread = QtCore.QThread()
-        self.heartbeat_worker = ProjectLockHeartbeatWorker(self.app, self.lock_file_path)
-        self.heartbeat_worker.moveToThread(self.heartbeat_thread)
-        self.heartbeat_thread.started.connect(self.heartbeat_worker.write_heartbeat)
-        self.heartbeat_worker.finished.connect(self.heartbeat_thread.quit)
-        self.heartbeat_worker.finished.connect(self.heartbeat_worker.deleteLater)
-        self.heartbeat_thread.finished.connect(self.heartbeat_thread.deleteLater)
-        self.heartbeat_worker.io_error.connect(self.lock_file_io_error)
-        self.heartbeat_thread.start()
-
-    def stop_heartbeat(self, wait=False):
-        """Stop the heartbeat and delete the lock file (if it exists). """
-
-        if self.heartbeat_worker:
-            try:
-                self.heartbeat_worker.stop()
-                if wait:
-                    self.heartbeat_thread.wait()  # Wait for the thread to properly finish
-            except Exception as e_:
-                print(e_)
-                logger.debug(e_)
-        self.delete_lock_file()
-        self.lock_file_path = ''
-
     def open_project(self, path_="", newproject="no"):
         """ Open an existing project.
         if set, also save a backup datetime stamped copy at the same time.
@@ -2659,54 +2546,6 @@ Click "Yes" to start now.')
         if len(path_split) == 2:
             proj_path = path_split[1]
         if len(path) > 3 and proj_path[-4:] == ".qda":
-            # Lock file management
-            self.lock_file_path = os.path.normpath(proj_path + '/project_in_use.lock')
-            if not self.create_lock_file():
-                # Lock file already exists. Checking if it has timed out or not.
-                with open(self.lock_file_path, 'r', encoding='utf-8') as lock_file:
-                    try:
-                        lock_user = lock_file.readline()[:-1]
-                        lock_timestamp = float(lock_file.readline())
-                    except Exception as e_:  # TODO add specific exception
-                        print(e_)
-                        logger.warning(e_)
-                        # lock file seems corrupted/partially written. Retry once in case another instance was writing to the file at the same time:
-                        time.sleep(0.5)
-                        try:
-                            lock_user = lock_file.readline()[:-1]
-                            lock_timestamp = float(lock_file.readline())
-                        except Exception as e_:  # permanent error, break the lock
-                            print(e_)  # TODO determine specific exception
-                            logger.warning(e_)
-                            lock_user = 'unknown'
-                            lock_timestamp = 0.0
-                if float(time.time()) - lock_timestamp > lock_timeout:
-                    # has timed out, break the lock
-                    msg = _(
-                        'QualCoder detected that the project was not properly closed the last time it was used by "') + lock_user + '".\n'
-                    msg += _(
-                        'In most cases, you can still continue your work as usual. If you encounter any problems, search for a recent backup in the project folder.')
-                    logger.warning(msg)
-                    msg_box = Message(self.app, _("Open file"), msg, "information")
-                    msg_box.setStandardButtons(
-                        QtWidgets.QMessageBox.StandardButton.Ok | QtWidgets.QMessageBox.StandardButton.Abort)
-                    msg_box.setDefaultButton(QtWidgets.QMessageBox.StandardButton.Ok)
-                    ret = msg_box.exec()
-                    if ret == QtWidgets.QMessageBox.StandardButton.Abort:
-                        self.app.project_path = ""
-                        self.app.project_name = ""
-                        return
-                    self.create_lock_file(break_existing_lock=True)
-                else:
-                    # lock is valid, project seems to be in use by other user
-                    msg = _('Project cannot be opened since it\'s already in use by "') + lock_user + _(
-                        '". Please retry later.')
-                    logger.warning(msg)
-                    Message(self.app, _("Cannot open file"), msg, "critical").exec()
-                    self.app.project_path = ""
-                    self.app.project_name = ""
-                    return
-            self.prepare_heartbeat_thread()
             try:
                 self.app.create_connection(proj_path)
             except Exception as err:
@@ -2716,7 +2555,6 @@ Click "Yes" to start now.')
         if self.app.conn is None:
             msg += "\n" + proj_path
             Message(self.app, _("Cannot open file"), msg, "critical").exec()
-            self.stop_heartbeat()
             self.app.project_path = ""
             self.app.project_name = ""
             return
@@ -3202,7 +3040,6 @@ Click "Yes" to start now.')
                 print(e_)
                 logger.warning(e_)
                 self.app.conn = None
-        self.stop_heartbeat(wait=True)
         self.delete_backup_folders()
         self.fill_recent_projects_menu_actions()
         self.app.conn = None
