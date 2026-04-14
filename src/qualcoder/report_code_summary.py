@@ -350,7 +350,7 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
             return
         code_ = None
         for c in self.codes:
-            if c['name'] == current.text(0):
+            if c['cid'] == int(current.text(1)[4:]):
                 code_ = c
         if code_ is None:
             return
