@@ -30,6 +30,7 @@ from PyQt6 import QtGui, QtWidgets, QtCore
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QBrush
 
+from .code_in_all_files import DialogCodeInAllFiles
 from .color_selector import TextColor
 from .GUI.ui_report_matching_segments import Ui_DialogMatchingTextSegments
 from .helpers import DialogCodeInText, Message
@@ -99,6 +100,8 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         self.ui.treeWidget.itemExpanded.connect(self.get_collapsed)
         self.get_files_fill_list_widget()
         self.ui.listWidget_files.setSelectionMode(QtWidgets.QListWidget.SelectionMode.ExtendedSelection)
+        self.ui.listWidget_files.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.ui.listWidget_files.customContextMenuRequested.connect(self.listwidget_files_menu)
         self.ui.pushButton_file_filter.pressed.connect(self.select_files_from_attributes)
         self.ui.pushButton_run.pressed.connect(self.get_exact_text_matches)
         self.ui.tableWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
@@ -203,6 +206,41 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
                 tt += _("\nMemo: ") + f['memo']
             item.setToolTip(tt)
             self.ui.listWidget_files.addItem(item)
+
+    def listwidget_files_menu(self, position):
+        """ Context menu for file selection and sorting. """
+
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
+        action_all_files = menu.addAction(_("Select all files"))
+        action_files_like = menu.addAction(_("Select files like"))
+        action_files_none = menu.addAction(_("Select none"))
+        action = menu.exec(self.ui.listWidget_files.mapToGlobal(position))
+        if action == action_all_files:
+            self.ui.listWidget_files.selectAll()
+            self.ui.listWidget_files.item(0).setSelected(False)
+        if action == action_files_none:
+            for i in range(self.ui.listWidget_files.count()):
+                self.ui.listWidget_files.item(i).setSelected(False)
+        if action == action_files_like:
+            # Input dialog narrow, so code below
+            dialog = QtWidgets.QInputDialog(None)
+            dialog.setStyleSheet(f"* {{font-size:{self.app.settings['fontsize']}pt}} ")
+            dialog.setWindowTitle(_("Select files matching text"))
+            dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
+            dialog.setInputMode(QtWidgets.QInputDialog.InputMode.TextInput)
+            dialog.setLabelText(_("Show files containing text"))
+            dialog.resize(200, 30)
+            ok = dialog.exec()
+            if not ok:
+                return
+            dlg_text = str(dialog.textValue())
+            for i in range(self.ui.listWidget_files.count()):
+                item_name = self.ui.listWidget_files.item(i).text()
+                if dlg_text in item_name:
+                    self.ui.listWidget_files.item(i).setSelected(True)
+                else:
+                    self.ui.listWidget_files.item(i).setSelected(False)
 
     def select_files_from_attributes(self):
         """ Select files based on attribute selections.
@@ -340,7 +378,7 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
                     # Create one line result
                     one_line_results = list(matching_codes_list[0])
                     one_line_results[0] = str(one_line_results[0])  # cid
-                    #one_line_results[5] = ""  # coded memo
+                    # one_line_results[5] = ""  # coded memo
                     for row in range(1, len(matching_codes_list)):
                         one_line_results[0] += f", {str(matching_codes_list[row][0])}"  # cid
                         one_line_results[1] += f"|{matching_codes_list[row][1]}"  # codename
@@ -688,13 +726,16 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         Assign selected text to current hovered code. """
 
         menu = QtWidgets.QMenu()
-        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
         selected = self.ui.treeWidget.currentItem()
         action_clear_selected = menu.addAction(_("Clear all"))
         action_select_all = menu.addAction(_("Select all"))
         action_exclude_code = None
         if selected is not None and selected.text(1)[0:3] == 'cid':
             action_exclude_code = menu.addAction(_("Exclude code"))
+        action_show_coded_media = None
+        if selected is not None and selected.text(1)[0:3] == 'cid':
+            action_show_coded_media = menu.addAction(_("Show coded files"))
 
         action = menu.exec(self.ui.treeWidget.mapToGlobal(position))
         if action == action_clear_selected:
@@ -707,9 +748,20 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
             return
         if action == action_select_all:
             self.ui.treeWidget.selectAll()
+            return
         if action == action_exclude_code:
             if selected.text(1)[0:3] != 'cid':
                 return
             cid = int(selected.text(1)[4:])
             self.excluded_codes.append([cid, selected])
             selected.setIcon(0, self.excluded_icon)
+            return
+        if action == action_show_coded_media:
+            found_code = None
+            tofind = int(selected.text(1)[4:])
+            for code in self.codes:
+                if code['cid'] == tofind:
+                    found_code = code
+                    break
+            if found_code:
+                DialogCodeInAllFiles(self.app, found_code)
