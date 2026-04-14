@@ -76,6 +76,11 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         self.ui.treeWidget.setSelectionMode(QtWidgets.QAbstractItemView.SelectionMode.SingleSelection)
         self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
+        # Tree variables
+        self.contains_long_names = False
+        self.truncated_code_names = True
+        self.tree_column_widths_auto_resize = True
+
         languages = ["  ", "Deutsch de", "English en", "Español es", "Français fr", "Italiano it", "Português pt"]
         for lang in languages:
             self.ui.comboBox_stopwords.addItem(lang)
@@ -153,7 +158,12 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
                 memo = ""
                 if c['memo'] != "":
                     memo = _("Memo")
-                top_item = QtWidgets.QTreeWidgetItem([c['name'], f'catid:{c["catid"]}', memo])
+                cat_name = c['name']
+                if self.truncated_code_names:
+                    if len(c['name']) > 62:  # Keep category name short
+                        cat_name = c['name'][:30] + '..' + c['name'][-30:]
+                        self.contains_long_names = True
+                top_item = QtWidgets.QTreeWidgetItem([cat_name, f'catid:{c["catid"]}', memo])
                 top_item.setToolTip(0, c['name'])
                 top_item.setToolTip(2, c['memo'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
@@ -178,7 +188,12 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
                         memo = ""
                         if c['memo'] != "":
                             memo = _("Memo")
-                        child = QtWidgets.QTreeWidgetItem([c['name'], f'catid:{c["catid"]}', memo])
+                        cat_name = c['name']
+                        if self.truncated_code_names:
+                            if len(c['name']) > 62:  # Keep category name short
+                                cat_name = c['name'][:30] + '..' + c['name'][-30:]
+                                self.contains_long_names = True
+                        child = QtWidgets.QTreeWidgetItem([cat_name, f'catid:{c["catid"]}', memo])
                         child.setToolTip(0, c['name'])
                         child.setToolTip(2, c['memo'])
                         item.addChild(child)
@@ -201,7 +216,12 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
                 memo = ""
                 if c['memo'] != "":
                     memo = _("Memo")
-                top_item = QtWidgets.QTreeWidgetItem([c['name'], f'cid:{c["cid"]}', memo])
+                code_name = c['name']
+                if self.truncated_code_names:
+                    if len(c['name']) > 62:  # Keep category name short
+                        code_name = c['name'][:30] + '..' + c['name'][-30:]
+                        self.contains_long_names = True
+                top_item = QtWidgets.QTreeWidgetItem([code_name, f'cid:{c["cid"]}', memo])
                 top_item.setToolTip(0, c['name'])
                 top_item.setToolTip(2, c['memo'])
                 top_item.setBackground(0, QtGui.QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
@@ -224,7 +244,12 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
                     memo = ""
                     if c['memo'] != "":
                         memo = _("Memo")
-                    child = QtWidgets.QTreeWidgetItem([c['name'], f'cid:{c["cid"]}', memo])
+                    code_name = c['name']
+                    if self.truncated_code_names:
+                        if len(c['name']) > 62:  # Keep category name short
+                            code_name = c['name'][:30] + '..' + c['name'][-30:]
+                            self.contains_long_names = True
+                    child = QtWidgets.QTreeWidgetItem([code_name, f'cid:{c["cid"]}', memo])
                     child.setBackground(0, QtGui.QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
                     color = TextColor(c['color']).recommendation
                     child.setForeground(0, QtGui.QBrush(QtGui.QColor(color)))
@@ -238,7 +263,6 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
                 item = iterator.value()
                 count += 1
         self.ui.treeWidget.sortByColumn(0, QtCore.Qt.SortOrder.AscendingOrder)
-        # self.ui.treeWidget.expandAll()
         self.fill_code_counts_in_tree()
 
     def fill_code_counts_in_tree(self):
@@ -283,6 +307,13 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         action_show_coded_media = None
         if selected is not None and selected.text(1)[0:3] == 'cid':
             action_show_coded_media = menu.addAction(_("Show coded files"))
+        action_expand_names = None
+        if self.contains_long_names:
+            action_expand_names = menu.addAction(_("Expand names"))
+        action_truncate_names = None
+        if self.contains_long_names and self.truncated_code_names is False:
+            action_truncate_names = menu.addAction(_("Truncate names"))
+        action_resize = menu.addAction(_("Toggle automatic column resize"))
         action = menu.exec(self.ui.treeWidget.mapToGlobal(position))
         if action is not None:
             if action == action_show_coded_media:
@@ -294,6 +325,19 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
                         break
                 if found_code:
                     DialogCodeInAllFiles(self.app, found_code)
+                return
+            if action == action_expand_names:
+                self.truncated_code_names = False
+                self.fill_tree()
+            if action == action_truncate_names:
+                self.truncated_code_names = True
+                self.fill_tree()
+            if action == action_resize:
+                self.tree_column_widths_auto_resize = not self.tree_column_widths_auto_resize
+            if self.tree_column_widths_auto_resize:
+                self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+            else:
+                self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Interactive)
 
     def fill_text_edit(self):
         """ Get data about file and fill text edit. """
