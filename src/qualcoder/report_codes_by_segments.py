@@ -30,6 +30,7 @@ from PyQt6 import QtGui, QtWidgets, QtCore
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QBrush
 
+from .code_in_all_files import DialogCodeInAllFiles
 from .color_selector import TextColor
 from .GUI.ui_report_codes_by_segments import Ui_DialogSegmentCodings
 from .helpers import Message
@@ -51,28 +52,18 @@ class DialogCodesBySegments(QtWidgets.QDialog):
         text in context.
     """
 
-    app = None
-    parent_textEdit = None
-    code_names = []
-    coders = [""]
-    categories = []
-    files = []
-    cases = []
-    results = []
-    attributes = []
-    # Variables for search restrictions
-    file_ids_string = ""
-    case_ids_string = ""
-
     def __init__(self, app, parent_textedit):
         super(DialogCodesBySegments, self).__init__()
         self.app = app
         self.parent_textEdit = parent_textedit
+        self.code_names, self.categories = [], []
+        self.coders = [""]
         self.get_codes_categories_coders()
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_DialogSegmentCodings()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
+        self.ui.splitter.setSizes([200, 500])
         font = f"font: {self.app.settings['fontsize']}pt "
         font += f'"{self.app.settings["font"]}";'
         self.setStyleSheet(font)
@@ -91,27 +82,34 @@ class DialogCodesBySegments(QtWidgets.QDialog):
         self.ui.pushButton_export_xlsx.clicked.connect(self.export_xlsx_file)
         self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_file_attributes.pressed.connect(self.get_files_from_attributes)
+        self.files, self.cases = [], []
         self.get_files_and_cases()
         self.ui.listWidget_files.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.listWidget_files.customContextMenuRequested.connect(self.listwidget_files_menu)
         self.ui.listWidget_cases.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.ui.listWidget_cases.customContextMenuRequested.connect(self.listwidget_cases_menu)
         self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        self.ui.treeWidget.customContextMenuRequested.connect(self.treewidget_menu)
+        self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
+        # Tree variables
+        self.contains_long_names = False
+        self.truncated_code_names = True
+        self.tree_column_widths_auto_resize = True
         self.fill_tree()
         # These signals after the tree is filled the first time
         self.ui.treeWidget.itemCollapsed.connect(self.get_collapsed)
         self.ui.treeWidget.itemExpanded.connect(self.get_collapsed)
-        self.ui.splitter.setSizes([200, 500])
+
+        # Variables for search restrictions
         self.file_ids_string = ""
         self.case_ids_string = ""
         self.code_ids_string = ""
+
         self.code_columns = []
         self.results = []
         self.attributes = []
         self.segment_rows = []
         self.horizontal_labels = []
-        self.xlsx_results = []
+        self.xlsx_results = []  # For export
         self.app.project_events.project_data_changed.connect(self._on_project_data_changed)
 
     def get_files_and_cases(self, file_sort="name asc"):
@@ -393,11 +391,13 @@ class DialogCodesBySegments(QtWidgets.QDialog):
                 memo = ""
                 if c['memo'] != "":
                     memo = _("Memo")
-                top_item = QtWidgets.QTreeWidgetItem([c['name'], f"catid:{c['catid']}", memo])
-                top_item.setToolTip(0, '')
-                if len(c['name']) > 52:
-                    top_item.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
-                    top_item.setToolTip(0, c['name'])
+                cat_name = c['name']
+                if self.truncated_code_names:
+                    if len(c['name']) > 62:  # Keep category name short
+                        cat_name = c['name'][:30] + '..' + c['name'][-30:]
+                        self.contains_long_names = True
+                top_item = QtWidgets.QTreeWidgetItem([cat_name, f'catid:{c["catid"]}', memo])
+                top_item.setToolTip(0, c['name'])
                 top_item.setToolTip(2, c['memo'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 if f"catid:{c['catid']}" in self.app.collapsed_categories:
@@ -422,11 +422,13 @@ class DialogCodesBySegments(QtWidgets.QDialog):
                         memo = ""
                         if c['memo'] != "":
                             memo = "Memo"
-                        child = QtWidgets.QTreeWidgetItem([c['name'], f"catid:{c['catid']}", memo])
-                        child.setToolTip(0, '')
-                        if len(c['name']) > 52:
-                            child.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
-                            child.setToolTip(0, c['name'])
+                        cat_name = c['name']
+                        if self.truncated_code_names:
+                            if len(c['name']) > 62:  # Keep category name short
+                                cat_name = c['name'][:30] + '..' + c['name'][-30:]
+                                self.contains_long_names = True
+                        child = QtWidgets.QTreeWidgetItem([cat_name, f'catid:{c["catid"]}', memo])
+                        child.setToolTip(0, c['name'])
                         child.setToolTip(2, c['memo'])
                         item.addChild(child)
                         if f"catid:{c['catid']}" in self.app.collapsed_categories:
@@ -448,15 +450,19 @@ class DialogCodesBySegments(QtWidgets.QDialog):
                 memo = ""
                 if c['memo'] != "":
                     memo = "Memo"
-                top_item = QtWidgets.QTreeWidgetItem([c['name'], f"cid:{c['cid']}", memo])
+                code_name = c['name']
+                print(self.truncated_code_names, code_name)
+                if self.truncated_code_names:
+                    if len(c['name']) > 62:  # Keep category name short
+                        code_name = c['name'][:30] + '..' + c['name'][-30:]
+                        self.contains_long_names = True
+                top_item = QtWidgets.QTreeWidgetItem([code_name, f'cid:{c["cid"]}', memo])
+                top_item.setToolTip(0, c['name'])
                 top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
                 color = TextColor(c['color']).recommendation
                 top_item.setForeground(0, QBrush(QtGui.QColor(color)))
                 top_item.setFlags(Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEnabled)
-                top_item.setToolTip(0, '')
-                if len(c['name']) > 52:
-                    top_item.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
-                    top_item.setToolTip(0, c['name'])
+                top_item.setToolTip(0, c['name'])
                 top_item.setToolTip(2, c['memo'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 remove_items.append(c)
@@ -473,15 +479,16 @@ class DialogCodesBySegments(QtWidgets.QDialog):
                     memo = ""
                     if c['memo'] != "":
                         memo = _("Memo")
-                    child = QtWidgets.QTreeWidgetItem([c['name'], f"cid:{c['cid']}", memo])
+                    code_name = c['name']
+                    if self.truncated_code_names:
+                        if len(c['name']) > 62:  # Keep category name short
+                            code_name = c['name'][:30] + '..' + c['name'][-30:]
+                            self.contains_long_names = True
+                    child = QtWidgets.QTreeWidgetItem([code_name, f'cid:{c["cid"]}', memo])
                     child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
                     color = TextColor(c['color']).recommendation
                     child.setForeground(0, QBrush(QtGui.QColor(color)))
                     child.setFlags(Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEnabled)
-                    child.setToolTip(0, '')
-                    if len(c['name']) > 52:
-                        child.setText(0, f"{c['name'][:25]}..{c['name'][-25:]}")
-                        child.setToolTip(0, c['name'])
                     child.setToolTip(2, c['memo'])
                     item.addChild(child)
                     c['catid'] = -1  # make unmatchable
@@ -490,7 +497,6 @@ class DialogCodesBySegments(QtWidgets.QDialog):
                 count += 1
         self.ui.treeWidget.sortByColumn(0, QtCore.Qt.SortOrder.AscendingOrder)
         self.fill_code_counts_in_tree()
-        # self.ui.treeWidget.expandAll()
 
     def fill_code_counts_in_tree(self):
         """ Count instances of each code from all coders and all files. """
@@ -518,15 +524,28 @@ class DialogCodesBySegments(QtWidgets.QDialog):
             item = it.value()
             count += 1
 
-    def treewidget_menu(self, position):
+    def tree_menu(self, position):
         """ Menu to select all codes or other selection parameters. """
 
+        selected = self.ui.treeWidget.currentItem()
         menu = QtWidgets.QMenu()
-        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
         action_all = menu.addAction(_("Select all codes"))
         action_unselect = menu.addAction(_("Remove selections"))
         action_like = menu.addAction(_("Select codes like"))
+        action_show_coded_media = None
+        if selected is not None and selected.text(1)[0:3] == 'cid':
+            action_show_coded_media = menu.addAction(_("Show coded files"))
+        action_expand_names = None
+        if self.contains_long_names and self.truncated_code_names:
+            action_expand_names = menu.addAction(_("Expand names"))
+        action_truncate_names = None
+        if self.contains_long_names and not self.truncated_code_names:
+            action_truncate_names = menu.addAction(_("Truncate names"))
+        action_resize = menu.addAction(_("Toggle automatic column resize"))
         action = menu.exec(self.ui.treeWidget.mapToGlobal(position))
+        if action is None:
+            return
         if action == action_all:
             self.ui.treeWidget.selectAll()
         if action == action_unselect:
@@ -554,6 +573,31 @@ class DialogCodesBySegments(QtWidgets.QDialog):
             for tree_item in tree_items:
                 if 'cid' in tree_item.text(1):
                     tree_item.setSelected(True)
+            return
+        if action == action_show_coded_media:
+            found_code = None
+            tofind = int(selected.text(1)[4:])
+            for code in self.code_names:
+                if code['cid'] == tofind:
+                    found_code = code
+                    break
+            if found_code:
+                DialogCodeInAllFiles(self.app, found_code)
+            return
+        if action == action_expand_names:
+            print("act expand")
+            self.truncated_code_names = False
+            self.fill_tree()
+        if action == action_truncate_names:
+            print("act trunc")
+            self.truncated_code_names = True
+            self.fill_tree()
+        if action == action_resize:
+            self.tree_column_widths_auto_resize = not self.tree_column_widths_auto_resize
+        if self.tree_column_widths_auto_resize:
+            self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        else:
+            self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Interactive)
 
     def export_xlsx_file(self):
         """ Export report to xlsx file.
@@ -570,7 +614,7 @@ class DialogCodesBySegments(QtWidgets.QDialog):
 
         for row, xlsx_row in enumerate(self.xlsx_results):
             for col, data in enumerate(xlsx_row):
-                ws.cell(column=1 + col, row=2 + row , value=data)
+                ws.cell(column=1 + col, row=2 + row, value=data)
 
         filepath, ok = QtWidgets.QFileDialog.getSaveFileName(self,
                                                             _("Save Excel File"), self.app.settings['directory'],
@@ -792,5 +836,4 @@ class DialogCodesBySegments(QtWidgets.QDialog):
         self.ui.tableWidget.resizeColumnsToContents()
         self.ui.tableWidget.setColumnWidth(6, 250)
         self.ui.tableWidget.resizeRowsToContents()
-
 
