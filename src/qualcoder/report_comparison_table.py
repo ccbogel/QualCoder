@@ -430,7 +430,10 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         self.clear_table_and_data()
 
     def select_categories(self):
-        """ Select all codes in selected categories. """
+        """ Select all codes in selected categories.
+        Called by:
+            button
+        """
 
         selection_list = [{'id': -1, 'name': ''}]
         codes, categories = self.app.get_codes_categories()
@@ -441,6 +444,10 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
         if not ok:
             return
         category = ui.get_selected()
+        if category['id'] == -1:
+            self.codes, categories = self.app.get_codes_categories()
+            Message(self.app, _("Everything selected"), _("All codes selected")).exec()
+            return
         self.codes = self.get_children_of_category(category)
         self.code_selection_mode = "categories"
         self.selected_category_ids = [category["catid"]] if category.get("catid") is not None else []
@@ -451,7 +458,8 @@ class DialogReportComparisonTable(QtWidgets.QDialog):
     def get_children_of_category(self, node):
         """ Get child categories and codes of this category node.
         Only keep the category or code name. Used to reposition TextGraphicsItems on moving a category.
-
+        Called by: 
+            select_categories()
         Args:
              node : Dictionary of category
 
