@@ -322,7 +322,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         action_add_important = None
         action_remove_important = None
         if item:
-            action_mark = menu.addAction(_("Appy more codes to this segment"))
+            action_mark = menu.addAction(_("Apply more codes to this segment"))
             action_unmark = menu.addAction(_("Remove code"))
             action_memo = menu.addAction(_("Memo"))
             if item['res']['important']:
