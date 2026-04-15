@@ -332,7 +332,7 @@ QualCoder is distributed under the LGPLv3 LICENSE.
 
 ##  Citation APA style
 
-Curtain, C. Dröge, K. (2025) QualCoder 3.82 [Computer software]. Retrieved from
+Curtain, C. Dröge, K. Missaghieh--Poncet, J. Salomón, L. (2025) QualCoder 3.82 [Computer software]. Retrieved from
 https://github.com/ccbogel/QualCoder/releases/tag/3.8.2
 
 ## Creator
