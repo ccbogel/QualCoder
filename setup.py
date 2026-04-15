@@ -1,16 +1,41 @@
 """ from setup example: https://github.com/pypa/sampleproject/blob/master/setup.py
 """
 import sys
-from setuptools import setup, find_namespace_packages
 from os import path
 
+from setuptools import find_namespace_packages, setup
+
 here = path.abspath(path.dirname(__file__))
+
+
+def load_requirements(filename):
+    """Return package requirements, skipping pip-only directives."""
+    requirements = []
+    with open(path.join(here, filename), encoding='utf-8') as f:
+        for raw_line in f:
+            line = raw_line.strip()
+            if not line or line.startswith('#'):
+                continue
+            if line.startswith((
+                '-r', '--requirement',
+                '-c', '--constraint',
+                '-f', '--find-links',
+                '--index-url', '--extra-index-url',
+            )):
+                continue
+            # Keep URL fragments intact, but drop normal inline comments.
+            if ' #' in line:
+                line = line.split(' #', 1)[0].rstrip()
+            requirements.append(line)
+    return requirements
+
+
 # Get the long description from the README file
 with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
+
 # Get requirements
-with open('requirements.txt') as f:
-    required_modules = f.read().splitlines()
+required_modules = load_requirements('requirements.txt')
 
 mainscript = 'src/qualcoder/__main__.py'
 OPTIONS = {
