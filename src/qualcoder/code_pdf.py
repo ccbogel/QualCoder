@@ -2520,22 +2520,20 @@ class DialogCodePdf(QtWidgets.QWidget):
             selected : QTreeWidgetItem """
 
         if selected.text(1)[0:3] == 'cid':
-            code_ = None
-            for c in self.codes:
-                if c['cid'] == int(selected.text(1)[4:]):
-                    code_ = c
-            new_name, ok = QtWidgets.QInputDialog.getText(self, _("Rename code"),
-                                                          _("New code name:") + " " * 40,
-                                                          QtWidgets.QLineEdit.EchoMode.Normal,
-                                                          code_['name'])
-            if not ok or new_name == '':
+            found_code = None
+            check_codes = []
+            for code_ in self.codes:
+                if code_['cid'] == int(selected.text(1)[4:]):
+                    found_code = code_
+                else:
+                    check_codes.append(code_)
+            ui = DialogAddItemName(self.app, check_codes, _("Rename code"), _("Code name"))
+            ui.ui.lineEdit.setText(found_code['name'])
+            ui.exec()
+            new_name = ui.get_new_name()
+            if new_name is None or new_name == found_code['name']:
                 return
-            # Check that no other code has this name
-            for c in self.codes:
-                if c['name'] == new_name:
-                    Message(self.app, _("Name in use"),
-                            new_name + _(" is already in use, choose another name."), "warning").exec()
-                    return
+
             # Find the code in the list
             found = -1
             for i in range(0, len(self.codes)):
@@ -2560,21 +2558,20 @@ class DialogCodePdf(QtWidgets.QWidget):
             return
 
         if selected.text(1)[0:3] == 'cat':
-            cat = None
-            for c in self.categories:
-                if c['catid'] == int(selected.text(1)[6:]):
-                    cat = c
-            new_name, ok = QtWidgets.QInputDialog.getText(self, _("Rename category"),
-                                                          _("New category name:") + " " * 40,
-                                                          QtWidgets.QLineEdit.EchoMode.Normal, cat['name'])
-            if not ok or new_name == '':
+            found_cat = None
+            check_categories = []
+            for category in self.categories:
+                if category['catid'] == int(selected.text(1)[6:]):
+                    found_cat = category
+                else:
+                    check_categories.append(category)
+            ui = DialogAddItemName(self.app, check_categories, _("Rename category"), _("Category name"))
+            ui.ui.lineEdit.setText(found_cat['name'])
+            ui.exec()
+            new_name = ui.get_new_name()
+            if new_name is None or new_name == found_cat['name']:
                 return
-            # Check that no other category has this name
-            for c in self.categories:
-                if c['name'] == new_name:
-                    msg = _("This code name is already in use.")
-                    Message(self.app, _("Duplicate code name"), msg, "warning").exec()
-                    return
+
             # Find the category in the list
             found = -1
             for i in range(0, len(self.categories)):
