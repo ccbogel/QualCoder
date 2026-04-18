@@ -1364,6 +1364,9 @@ class DialogCodePdf(QtWidgets.QWidget):
             action_merge_category = menu.addAction(_("Merge category into category"))
         action_add_code = menu.addAction(_("Add a new code"))
         action_add_category = menu.addAction(_("Add a new category"))
+        action_expand_collapse = None
+        if selected is not None and selected.text(1)[0:3] == 'cat':
+            action_expand_collapse = menu.addAction(_("Expand or collapse branch"))
         modify_menu = menu.addMenu(_("Modify"))
         action_rename = modify_menu.addAction(_("Rename F2"))
         action_edit_memo = modify_menu.addAction(_("View or edit memo"))
@@ -1399,6 +1402,10 @@ class DialogCodePdf(QtWidgets.QWidget):
                 self.tree_sort_option = "cat and code asc"
                 self.fill_tree()
                 return
+            if action == action_expand_collapse:
+                expand_toggle = not selected.isExpanded()
+                self.recursive_expand_collapse_branch(selected, expand_toggle)
+                return
             if action == action_show_codes_like:
                 self.show_codes_like()
             if selected is not None and action == action_color:
@@ -1433,6 +1440,15 @@ class DialogCodePdf(QtWidgets.QWidget):
                         break
                 if found_code:
                     self.coded_media_dialog(found_code)
+
+    def recursive_expand_collapse_branch(self, item, expand_toggle):
+        """ Set all children of this item to be expanded or collapsed.
+        Recurse through all child categories. """
+
+        child_count = item.childCount()
+        for i in range(child_count):
+            item.setExpanded(expand_toggle)
+            self.recursive_expand_collapse_branch(item.child(i), expand_toggle)
 
     def recursive_non_merge_item(self, item, no_merge_list):
         """ Find matching item to be the current selected item.

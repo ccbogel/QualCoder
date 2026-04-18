@@ -1984,12 +1984,16 @@ class DialogCodeText(QtWidgets.QWidget):
         action_add_code_to_category = None
         action_add_category_to_category = None
         action_merge_category = None
+        action_expand_collapse = None
         if selected is not None and selected.text(1)[0:3] == 'cat':
             action_add_code_to_category = menu.addAction(_("Add new code to category"))
             action_add_category_to_category = menu.addAction(_("Add a new category to category"))
             action_merge_category = menu.addAction(_("Merge category into category"))
         action_add_code = menu.addAction(_("Add a new code"))
         action_add_category = menu.addAction(_("Add a new category"))
+        if selected is not None and selected.text(1)[0:3] == 'cat':
+            action_expand_collapse = menu.addAction(_("Expand or collapse branch"))
+        #action_find_code = menu.addAction(_("Find code"))
         modify_menu = menu.addMenu(_("Modify"))
         action_rename = modify_menu.addAction(_("Rename F2"))
         action_edit_memo = modify_menu.addAction(_("View or edit memo"))
@@ -2014,12 +2018,18 @@ class DialogCodeText(QtWidgets.QWidget):
             if action == action_all_asc:
                 self.tree_sort_option = "all asc"
                 self.fill_tree()
+                return
             if action == action_all_desc:
                 self.tree_sort_option = "all desc"
                 self.fill_tree()
+                return
             if action == action_cat_then_code_asc:
                 self.tree_sort_option = "cat and code asc"
                 self.fill_tree()
+                return
+            '''if action == action_find_code:
+                self.find_code_in_tree()
+                return'''
             if action == action_show_codes_like:
                 self.show_codes_like()
                 return
@@ -2030,19 +2040,29 @@ class DialogCodeText(QtWidgets.QWidget):
                 self.change_code_color(selected)
             if action == action_add_category:
                 self.add_category()
+                return
             if action == action_add_code:
                 self.add_code()
+                return
             if action == action_merge_category:
                 catid = int(selected.text(1).split(":")[1])
                 self.merge_category(catid)
+                return
             if action == action_add_code_to_category:
                 catid = int(selected.text(1).split(":")[1])
                 self.add_code(catid)
+                return
             if action == action_add_category_to_category:
                 catid = int(selected.text(1).split(":")[1])
                 self.add_category(catid)
+                return
             if selected is not None and action == action_move_code:
                 self.move_code(selected)
+                return
+            if action == action_expand_collapse:
+                expand_toggle = not selected.isExpanded()
+                self.recursive_expand_collapse_branch(selected, expand_toggle)
+                return
             if selected is not None and action == action_rename:
                 self.rename_category_or_code(selected)
             if selected is not None and action == action_edit_memo:
@@ -2058,6 +2078,15 @@ class DialogCodeText(QtWidgets.QWidget):
                         break
                 if found_code:
                     self.coded_media_dialog(found_code)
+
+    def recursive_expand_collapse_branch(self, item, expand_toggle):
+        """ Set all children of this item to be expanded or collapsed.
+        Recurse through all child categories. """
+
+        child_count = item.childCount()
+        for i in range(child_count):
+            item.setExpanded(expand_toggle)
+            self.recursive_expand_collapse_branch(item.child(i), expand_toggle)
 
     def recursive_non_merge_item(self, item, no_merge_list):
         """ Find matching item to be the current selected item.

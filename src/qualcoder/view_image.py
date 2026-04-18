@@ -1306,6 +1306,9 @@ class DialogCodeImage(QtWidgets.QDialog):
             action_merge_category = menu.addAction(_("Merge category into category"))
         action_add_code = menu.addAction(_("Add a new code"))
         action_add_category = menu.addAction(_("Add a new category"))
+        action_expand_collapse = None
+        if selected is not None and selected.text(1)[0:3] == 'cat':
+            action_expand_collapse = menu.addAction(_("Expand or collapse branch"))
         modify_menu = menu.addMenu(_("Modify"))
         action_rename = modify_menu.addAction(_("Rename F2"))
         action_edit_memo = modify_menu.addAction(_("View or edit memo"))
@@ -1348,15 +1351,24 @@ class DialogCodeImage(QtWidgets.QDialog):
             return
         if selected is not None and selected.text(1)[0:3] == 'cid' and action == action_color:
             self.change_code_color(selected)
+            return
         if selected is not None and action == action_move_code:
             self.move_code(selected)
+            return
         if action == action_add_category:
             self.add_category()
+            return
         if action == action_add_category_to_category:
             catid = int(selected.text(1).split(":")[1])
             self.add_category(catid)
+            return
         if action == action_add_code:
             self.add_code()
+            return
+        if action == action_expand_collapse:
+            expand_toggle = not selected.isExpanded()
+            self.recursive_expand_collapse_branch(selected, expand_toggle)
+            return
         if action == action_merge_category:
             catid = int(selected.text(1).split(":")[1])
             self.merge_category(catid)
@@ -1381,6 +1393,15 @@ class DialogCodeImage(QtWidgets.QDialog):
                     break
             if found:
                 self.coded_media_dialog(found)
+
+    def recursive_expand_collapse_branch(self, item, expand_toggle):
+        """ Set all children of this item to be expanded or collapsed.
+        Recurse through all child categories. """
+
+        child_count = item.childCount()
+        for i in range(child_count):
+            item.setExpanded(expand_toggle)
+            self.recursive_expand_collapse_branch(item.child(i), expand_toggle)
 
     def coded_media_dialog(self, code_dict):
         """ Display all coded media for this code, in a separate modal dialog.
