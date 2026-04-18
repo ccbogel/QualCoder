@@ -1993,7 +1993,7 @@ class DialogCodeText(QtWidgets.QWidget):
             action_merge_category = menu.addAction(_("Merge category into category"))
         action_add_code = menu.addAction(_("Add a new code"))
         action_add_category = menu.addAction(_("Add a new category"))
-        action_rename = menu.addAction(_("Rename"))
+        action_rename = menu.addAction(_("Rename F2"))
         action_edit_memo = menu.addAction(_("View or edit memo"))
         action_delete = menu.addAction(_("Delete"))
         action_color = None
@@ -2372,6 +2372,8 @@ class DialogCodeText(QtWidgets.QWidget):
         ! Display Clicked character position
         ^ Alt key. Shift code positions. May be needed after the text is edited
             (added or deleted) to shift subsequent codings.
+
+        F2 Rename code or category
         """
 
         key = event.key()
@@ -2417,6 +2419,11 @@ class DialogCodeText(QtWidgets.QWidget):
             if key == QtCore.Qt.Key.Key_0:
                 self.help()
                 return
+        # Rename code or category
+        if self.ui.treeWidget.hasFocus() and key == QtCore.Qt.Key.Key_F2:
+            selected = self.ui.treeWidget.currentItem()
+            self.rename_category_or_code(selected)
+            return
 
         if not self.ui.plainTextEdit.hasFocus():
             return
@@ -3307,7 +3314,6 @@ class DialogCodeText(QtWidgets.QWidget):
                 return True
         # Change start and end code positions using alt arrow left and alt arrow right
         # and shift arrow left, shift arrow right
-
         if type(event) == QtGui.QKeyEvent and object_ is self.ui.plainTextEdit:
             key = event.key()
             mod = event.modifiers()

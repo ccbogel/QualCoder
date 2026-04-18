@@ -1536,7 +1536,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             action_merge_category = menu.addAction(_("Merge category into category"))
         action_add_code = menu.addAction(_("Add a new code"))
         action_add_category = menu.addAction(_("Add a new category"))
-        action_rename = menu.addAction(_("Rename"))
+        action_rename = menu.addAction(_("Rename F2"))
         action_edit_memo = menu.addAction(_("View or edit memo"))
         action_delete = menu.addAction(_("Delete"))
         if selected is not None and selected.text(1)[0:3] == 'cid':
@@ -1827,6 +1827,8 @@ class DialogCodeAV(QtWidgets.QDialog):
         Ctrl + S to start and stop av segment creation
         Ctrl + Shift + > to increase play rate
         Ctrl + Shift + < to decrease play rate
+
+        F2 Rename code or cateegory
         """
 
         key = event.key()
@@ -1869,6 +1871,11 @@ class DialogCodeAV(QtWidgets.QDialog):
         # Rewind 30 seconds Alt R
         if key == QtCore.Qt.Key.Key_Minus and mods == QtCore.Qt.KeyboardModifier.AltModifier:
             self.rewind_30_seconds()
+            return
+        # Rename code or category
+        if self.ui.treeWidget.hasFocus() and key == QtCore.Qt.Key.Key_F2:
+            selected = self.ui.treeWidget.currentItem()
+            self.rename_category_or_code(selected)
             return
         # Ctrl 0 to 9
         if mods & QtCore.Qt.KeyboardModifier.ControlModifier:

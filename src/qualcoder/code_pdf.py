@@ -1364,7 +1364,7 @@ class DialogCodePdf(QtWidgets.QWidget):
             action_merge_category = menu.addAction(_("Merge category into category"))
         action_add_code = menu.addAction(_("Add a new code"))
         action_add_category = menu.addAction(_("Add a new category"))
-        action_rename = menu.addAction(_("Rename"))
+        action_rename = menu.addAction(_("Rename F2"))
         action_edit_memo = menu.addAction(_("View or edit memo"))
         action_delete = menu.addAction(_("Delete"))
         action_color = None
@@ -1786,6 +1786,8 @@ class DialogCodePdf(QtWidgets.QWidget):
         # Display Clicked character position
         Shift + Zoom in
         Ctrl - Zoom out
+
+        F2 Rename code or category
         """
 
         key = event.key()
@@ -1799,6 +1801,12 @@ class DialogCodePdf(QtWidgets.QWidget):
         if key == QtCore.Qt.Key.Key_Z and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
             self.undo_last_unmarked_code()
             return
+        # Rename code or category
+        if self.ui.treeWidget.hasFocus() and key == QtCore.Qt.Key.Key_F2:
+            selected = self.ui.treeWidget.currentItem()
+            self.rename_category_or_code(selected)
+            return
+
         # Ctrl 0 to 9
         if mods & QtCore.Qt.KeyboardModifier.ControlModifier:
             if key == QtCore.Qt.Key.Key_1:

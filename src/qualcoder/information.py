@@ -217,7 +217,8 @@ Ctrl N Enter a new speakers name into shortcuts (macOS use Button)<br />\n\
 Ctrl D Delete speaker names from shortcuts<br />\n\
 Ctrl 1 .. 8 Insert speaker in format [speaker name]<br />\n\
 Ctrl Shift &gt; Increase play rate (macOS Cmd Shift &gt;)<br />\n\
-Ctrl Shift &lt; Decrease play rate (macOS Cmd Shift &lt;)<br /><br />')
+Ctrl Shift &lt; Decrease play rate (macOS Cmd Shift &lt;)<br />\n\
+F2 When tree item selected - Rename code or category<br /><br />')
 
 menu_shortcuts_display = menu_shortcuts + manage_section_shortcuts + view_av_shortcuts
 
@@ -253,7 +254,8 @@ Alt + Right arrow Shrink coding to the right<br />\
 Shift + Left arrow Extend coding to the left<br />\
 Shift + Right arrow Extend coding to the right<br />\
 ! Exclamation mark key - describes clicked text character position<br />\
-$ Dollar key - Shift all coding postiions after a clicked position by X characters (negative numbers shift left)')
+$ Dollar key - Shift all coding postiions after a clicked position by X characters (negative numbers shift left)<br />\
+F2 When tree item selected - Rename code or category')
 
 coding_image_shortcuts = _('<h2>Code image key shortcuts</h2>\
 Ctrl 1 Next file<br />\
@@ -267,7 +269,8 @@ Ctrl Z The last code is unmarked, undo and restore that coding<br />\
 Ctrl G Create a grayed-out image with coloured coded highlights (Wait a few seconds)<br />\
 Minus or Q Zoom out<br />\
 Plus or W Zoom in<br />\
-Right-click on image for menu to rotate image')
+Right-click on image for menu to rotate image<br />\
+F2 When tree item selected - Rename code or category')
 
 coding_av_shortcuts = _('<h2>Code audio/video key shortcuts</h2>\
 Ctrl 1 Next file<br />\
@@ -295,6 +298,7 @@ Ctrl P Play/pause. On start rewind 1 second<br />\
 Ctrl D Play/pause. On start rewind 1 second<br />\
 Ctrl S Start and stop av segment creation<br />\
 Ctrl Shift > Increase play rate<br />\
-Ctrl Shift &lt; Decrease play rate<br />')
+Ctrl Shift &lt; Decrease play rate<br />\n\
+F2 When tree item selected - Rename code or category')
 
 coding_shortcuts_display = coding_text_shortcuts + coding_image_shortcuts + coding_av_shortcuts
