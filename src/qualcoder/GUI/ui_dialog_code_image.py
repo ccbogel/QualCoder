@@ -185,6 +185,8 @@ class Ui_Dialog_code_image(object):
         self.treeWidget.setObjectName("treeWidget")
         self.treeWidget.headerItem().setText(0, "1")
         self.groupBox_code_buttons = QtWidgets.QGroupBox(parent=self.splitter)
+        self.groupBox_code_buttons.setMinimumSize(QtCore.QSize(0, 30))
+        self.groupBox_code_buttons.setMaximumSize(QtCore.QSize(16777215, 30))
         self.groupBox_code_buttons.setTitle("")
         self.groupBox_code_buttons.setObjectName("groupBox_code_buttons")
         self.pushButton_clear_filter_code = QtWidgets.QPushButton(parent=self.groupBox_code_buttons)
