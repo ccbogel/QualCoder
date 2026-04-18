@@ -125,7 +125,7 @@ class DialogCodeAV(QtWidgets.QDialog):
             s0 = int(self.app.settings['dialogcodeav_splitter0'])
             s1 = int(self.app.settings['dialogcodeav_splitter1'])
             if s0 > 10 and s1 > 10:
-                self.ui.splitter.setSizes([s0, 30, s1])
+                self.ui.splitter.setSizes([s0, 30, s1, 30])
             h0 = int(self.app.settings['dialogcodeav_splitter_h0'])
             h1 = int(self.app.settings['dialogcodeav_splitter_h1'])
             if h0 > 10 and h1 > 10:
