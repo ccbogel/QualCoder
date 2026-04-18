@@ -2552,6 +2552,70 @@ data collected. This information will accompany every prompt sent to the AI, res
         response = self.ai_mcp_server.handle_request(request)
         return request, response
 
+    def _compact_mcp_result_content(self, method_name: str, method_params: Dict[str, Any],
+                                    rpc_response: Dict[str, Any]) -> str:
+        """Return a compact MCP result payload for conversation history."""
+
+        compact: Dict[str, Any] = {
+            "action": "mcp_result",
+            "method": str(method_name).strip(),
+        }
+        if not isinstance(rpc_response, dict):
+            compact["error"] = {"message": _("Invalid MCP response.")}
+            return "MCP result:\n" + json.dumps(compact, ensure_ascii=False)
+
+        error_payload = rpc_response.get("error", None)
+        if isinstance(error_payload, dict):
+            compact["error"] = error_payload
+            return "MCP result:\n" + json.dumps(compact, ensure_ascii=False)
+
+        result_payload = rpc_response.get("result", None)
+        if not isinstance(result_payload, dict):
+            compact["result"] = result_payload
+            return "MCP result:\n" + json.dumps(compact, ensure_ascii=False)
+
+        if method_name == "resources/read":
+            compact["requested_uri"] = str(method_params.get("uri", "")).strip()
+            compact_contents: List[Dict[str, Any]] = []
+            raw_contents = result_payload.get("contents", [])
+            if isinstance(raw_contents, list):
+                for item in raw_contents:
+                    if not isinstance(item, dict):
+                        continue
+                    compact_item: Dict[str, Any] = {}
+                    uri = str(item.get("uri", "")).strip()
+                    if uri != "":
+                        compact_item["uri"] = uri
+                    text_blob = item.get("text", None)
+                    if isinstance(text_blob, str) and text_blob.strip() != "":
+                        try:
+                            parsed_payload = json.loads(text_blob)
+                        except Exception:
+                            compact_item["text"] = text_blob
+                        else:
+                            compact_item["payload"] = parsed_payload
+                    blob_value = item.get("blob", None)
+                    if "payload" not in compact_item and "text" not in compact_item and blob_value is not None:
+                        compact_item["blob"] = blob_value
+                    if len(compact_item) > 0:
+                        compact_contents.append(compact_item)
+            compact["contents"] = compact_contents
+            return "MCP result:\n" + json.dumps(compact, ensure_ascii=False)
+
+        if method_name == "tools/call":
+            compact["tool"] = str(method_params.get("name", "")).strip()
+            compact["isError"] = bool(result_payload.get("isError", False))
+            if "structuredContent" in result_payload:
+                compact["payload"] = result_payload.get("structuredContent")
+            elif "content" in result_payload:
+                compact["result"] = result_payload.get("content")
+            else:
+                compact["result"] = result_payload
+            return "MCP result:\n" + json.dumps(compact, ensure_ascii=False)
+
+        compact["result"] = result_payload
+        return "MCP result:\n" + json.dumps(compact, ensure_ascii=False)
+
     def _begin_ai_change_set(self, messages: List[Any], chat_idx: int) -> str:
         """Delegate AI change-set creation to the AI service."""
         ai = getattr(self.app, "ai", None)
@@ -3193,20 +3257,29 @@ data collected. This information will accompany every prompt sent to the AI, res
     def _extract_ref_candidates_from_tool_result(self, tool_result_raw: str) -> List[Dict[str, Any]]:
         """Extract evidence spans from one persisted MCP tool_result message."""
 
-        prefix = "MCP response:\n"
-        if not isinstance(tool_result_raw, str) or not tool_result_raw.startswith(prefix):
+        if not isinstance(tool_result_raw, str):
+            return []
+        raw_text = tool_result_raw
+        if raw_text.startswith("MCP result:\n"):
+            raw_text = raw_text[len("MCP result:\n"):]
+        elif raw_text.startswith("MCP response:\n"):
+            raw_text = raw_text[len("MCP response:\n"):]
+        else:
             return []
         try:
-            rpc_response = json.loads(tool_result_raw[len(prefix):])
+            stored_payload = json.loads(raw_text)
         except Exception:
             return []
-        if not isinstance(rpc_response, dict):
+        if not isinstance(stored_payload, dict):
             return []
 
-        result = rpc_response.get("result", {})
-        if not isinstance(result, dict):
-            return []
-        contents = result.get("contents", [])
+        if str(stored_payload.get("action", "")).strip() == "mcp_result":
+            contents = stored_payload.get("contents", [])
+        else:
+            result = stored_payload.get("result", {})
+            if not isinstance(result, dict):
+                return []
+            contents = result.get("contents", [])
         if not isinstance(contents, list):
             return []
 
@@ -3215,13 +3288,15 @@ data collected. This information will accompany every prompt sent to the AI, res
             if not isinstance(content, dict):
                 continue
             uri = str(content.get("uri", "")).split("?", 1)[0]
-            text_blob = content.get("text", None)
-            if not isinstance(text_blob, str) or text_blob.strip() == "":
-                continue
-            try:
-                payload = json.loads(text_blob)
-            except Exception:
-                continue
+            payload = content.get("payload", None)
+            if not isinstance(payload, dict):
+                text_blob = content.get("text", None)
+                if not isinstance(text_blob, str) or text_blob.strip() == "":
+                    continue
+                try:
+                    payload = json.loads(text_blob)
+                except Exception:
+                    continue
             if not isinstance(payload, dict):
                 continue
 
@@ -3492,7 +3567,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                     {"action": "mcp_call", "method": method_name, "params": method_params},
                     ensure_ascii=False,
                 )
-                result_content = "MCP response:\n" + json.dumps(rpc_response, ensure_ascii=False)
+                result_content = self._compact_mcp_result_content(method_name, method_params, rpc_response)
                 agent_messages.append(AIMessage(content=call_content))
                 agent_messages.append(HumanMessage(content=result_content))
                 if tool_messages_streamed:

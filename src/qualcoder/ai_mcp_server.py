@@ -133,10 +133,35 @@ class AiMcpServer:
             "content": [
                 {
                     "type": "text",
-                    "text": json.dumps(payload, ensure_ascii=False),
+                    "text": self._tool_result_summary_text(payload, is_error),
                 }
             ],
         }
+
+    def _tool_result_summary_text(self, payload: Dict[str, Any], is_error: bool = False) -> str:
+        """Return one short human-readable summary for MCP tool results."""
+
+        if not isinstance(payload, dict):
+            return "Tool call failed." if is_error else "Tool call completed."
+
+        tool_name = str(payload.get("tool", "")).strip()
+        if tool_name == "":
+            return "Tool call failed." if is_error else "Tool call completed."
+
+        if is_error:
+            return f"{tool_name} failed."
+
+        if "created" in payload:
+            return f"{tool_name} {'created' if bool(payload.get('created', False)) else 'did not create'} a result."
+        if "deleted" in payload:
+            return f"{tool_name} {'deleted' if bool(payload.get('deleted', False)) else 'did not delete'} a result."
+        if "moved" in payload:
+            return f"{tool_name} {'moved' if bool(payload.get('moved', False)) else 'did not move'} a result."
+        if "renamed" in payload:
+            return f"{tool_name} {'renamed' if bool(payload.get('renamed', False)) else 'did not rename'} a result."
+        if "preview_token" in payload:
+            return f"{tool_name} prepared a preview."
+        return f"{tool_name} completed."
 
     def _emit_project_table_changes(self, tables: List[str], source: str = "ai_agent") -> None:
         """Emit one app-level project data change event if the event bus exists."""
@@ -1840,7 +1865,7 @@ class AiMcpServer:
     def _codes_tree(self) -> Dict[str, Any]:
         categories = []
         for row in self._fetchall(
-            "SELECT catid, name, ifnull(memo,''), owner, date, supercatid "
+            "SELECT catid, name, ifnull(memo,''), owner, supercatid "
             "FROM code_cat ORDER BY lower(name)"
         ):
             categories.append(
@@ -1849,14 +1874,13 @@ class AiMcpServer:
                     "name": row[1],
                     "memo": row[2],
                     "owner": row[3],
-                    "date": row[4],
-                    "supercatid": row[5],
+                    "supercatid": row[4],
                 }
             )
 
         codes = []
         for row in self._fetchall(
-            "SELECT cid, name, ifnull(memo,''), catid, color, owner, date "
+            "SELECT cid, name, ifnull(memo,''), catid, color, owner "
             "FROM code_name ORDER BY lower(name)"
         ):
             codes.append(
@@ -1867,7 +1891,6 @@ class AiMcpServer:
                     "catid": row[3],
                     "color": row[4],
                     "owner": row[5],
-                    "date": row[6],
                 }
             )
         speaker_prefix = "ðŸ“Œ "
@@ -2206,7 +2229,6 @@ class AiMcpServer:
                     docstore_id = "" if row[1] is None else str(row[1]).strip()
                     source_id = self._to_int(row[2], -1)
                     start_index = self._to_int(row[3], -1)
-                    score = self._to_float(row[5], 0.0)
                     next_cursor = max(next_cursor, position + 1)
 
                     if docstore_id == "":
@@ -2235,14 +2257,10 @@ class AiMcpServer:
 
                     hits.append(
                         {
-                            "rank": position + 1,
-                            "position": position,
-                            "docstore_id": docstore_id,
                             "source_id": (source_id if source_id > 0 else None),
                             "source_name": source_name,
                             "start": (start_index if start_index >= 0 else None),
                             "length": len(text),
-                            "score": score,
                             "text": text,
                         }
                     )
@@ -2261,7 +2279,6 @@ class AiMcpServer:
                     "exclude_cids": exclude_cids,
                     "score_threshold": score_threshold,
                     "total_hits": total_hits,
-                    "returned_hits": len(hits),
                     "next_cursor": next_cursor,
                     "truncated": truncated,
                 },
@@ -2373,18 +2390,13 @@ class AiMcpServer:
             cursor = total_hits
         sliced_hits = ordered_hits[cursor:cursor + page_size]
         returned_hits: List[Dict[str, Any]] = []
-        for pos, hit in enumerate(sliced_hits, start=cursor + 1):
+        for hit in sliced_hits:
             returned_hits.append(
                 {
-                    "rank": pos,
-                    "position": pos - 1,
-                    "docstore_id": str(hit["chunk_id"]),
-                    "chunk_id": hit["chunk_id"],
                     "source_id": hit["source_id"],
                     "source_name": hit["source_name"],
                     "start": hit["start"],
                     "length": hit["length"],
-                    "score": hit["score"],
                     "text": hit["text"],
                 }
             )
@@ -2393,17 +2405,16 @@ class AiMcpServer:
         truncated = next_cursor < total_hits
         return {
             "selection": {
-                "queries": queries,
-                "cursor": cursor,
-                "file_ids": file_ids,
-                "exclude_cids": exclude_cids,
-                "total_hits": total_hits,
-                "returned_hits": len(returned_hits),
-                "next_cursor": next_cursor,
-                "truncated": truncated,
-            },
-            "hits": returned_hits,
-        }
+                    "queries": queries,
+                    "cursor": cursor,
+                    "file_ids": file_ids,
+                    "exclude_cids": exclude_cids,
+                    "total_hits": total_hits,
+                    "next_cursor": next_cursor,
+                    "truncated": truncated,
+                },
+                "hits": returned_hits,
+            }
 
     def _read_regex_search(self, options: Dict[str, Any]) -> Dict[str, Any]:
         pattern_text = str(options.get("pattern", "")).strip()
@@ -2514,8 +2525,6 @@ class AiMcpServer:
 
                     hits.append(
                         {
-                            "order": position + 1,
-                            "position": position,
                             "source_id": source_id,
                             "source_name": source_name,
                             "start": context_start,
@@ -2542,7 +2551,6 @@ class AiMcpServer:
                     "file_ids": file_ids,
                     "exclude_cids": exclude_cids,
                     "total_hits": total_hits,
-                    "returned_hits": len(hits),
                     "next_cursor": next_cursor,
                     "truncated": truncated,
                 },
@@ -3139,7 +3147,7 @@ class AiMcpServer:
         order_sql = "ORDER BY ct.ctid"
         select_sql = (
             "SELECT ct.ctid, ct.cid, ct.fid, ifnull(ct.seltext,''), ct.pos0, "
-            "ct.pos1, ct.owner, ct.date, source.name, code_name.name "
+            "ct.pos1, ct.owner, source.name, code_name.name "
             f"FROM {table_name} AS ct "
             "JOIN source ON source.id = ct.fid "
             "JOIN code_name ON code_name.cid = ct.cid "
@@ -3162,10 +3170,10 @@ class AiMcpServer:
         else:
             diverse_sql = (
                 "SELECT ordered.ctid, ordered.cid, ordered.fid, ifnull(ordered.seltext,''), ordered.pos0, "
-                "ordered.pos1, ordered.owner, ordered.date, source.name, code_name.name "
+                "ordered.pos1, ordered.owner, source.name, code_name.name "
                 "FROM ("
                 "SELECT ct.ctid, ct.cid, ct.fid, ct.seltext, ct.pos0, ct.pos1, "
-                "ct.owner, ct.date, ROW_NUMBER() OVER (PARTITION BY ct.fid ORDER BY ct.ctid) AS rn "
+                "ct.owner, ROW_NUMBER() OVER (PARTITION BY ct.fid ORDER BY ct.ctid) AS rn "
                 f"FROM {table_name} AS ct "
                 + where_sql
                 + ") AS ordered "
@@ -3202,9 +3210,8 @@ class AiMcpServer:
                     "pos0": row[4],
                     "pos1": row[5],
                     "owner": row[6],
-                    "date": row[7],
-                    "source_name": row[8],
-                    "code_name": row[9],
+                    "source_name": row[7],
+                    "code_name": row[8],
                 }
             )
             used_chars += len(quote_text)
@@ -3225,10 +3232,7 @@ class AiMcpServer:
                 "max_chars": max_chars,
                 "cursor": cursor,
                 "file_ids": file_ids,
-                "visible_filter_applied": True,
                 "total_segments": total_segments,
-                "returned_segments": len(segments),
-                "returned_chars": used_chars,
                 "next_cursor": next_cursor,
                 "truncated": truncated,
             },
@@ -3237,13 +3241,13 @@ class AiMcpServer:
 
     def _read_document(self, doc_id: int, start: int, length: int) -> Dict[str, Any]:
         row = self._fetchone(
-            "SELECT id, name, ifnull(memo,''), owner, date, ifnull(fulltext,'') "
+            "SELECT id, name, ifnull(memo,''), owner, ifnull(fulltext,'') "
             "FROM source WHERE id=? AND fulltext is not null",
             (doc_id,),
         )
         if row is None:
             raise ValueError(f"Document id {doc_id} not found.")
-        fulltext = row[5]
+        fulltext = row[4]
         end_pos = min(start + length, len(fulltext))
         excerpt = fulltext[start:end_pos]
         return {
@@ -3251,7 +3255,6 @@ class AiMcpServer:
             "name": row[1],
             "memo": row[2],
             "owner": row[3],
-            "date": row[4],
             "total_length": len(fulltext),
             "start": start,
             "length": len(excerpt),
