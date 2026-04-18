@@ -153,6 +153,8 @@ class Ui_Dialog_code_av(object):
         self.treeWidget.setObjectName("treeWidget")
         self.treeWidget.headerItem().setText(0, "Codes")
         self.groupBox = QtWidgets.QGroupBox(parent=self.splitter)
+        self.groupBox.setMinimumSize(QtCore.QSize(0, 30))
+        self.groupBox.setMaximumSize(QtCore.QSize(16777215, 30))
         self.groupBox.setTitle("")
         self.groupBox.setObjectName("groupBox")
         self.pushButton_clear_filter_code = QtWidgets.QPushButton(parent=self.groupBox)
