@@ -1364,21 +1364,24 @@ class DialogCodePdf(QtWidgets.QWidget):
             action_merge_category = menu.addAction(_("Merge category into category"))
         action_add_code = menu.addAction(_("Add a new code"))
         action_add_category = menu.addAction(_("Add a new category"))
-        action_rename = menu.addAction(_("Rename F2"))
-        action_edit_memo = menu.addAction(_("View or edit memo"))
-        action_delete = menu.addAction(_("Delete"))
+        modify_menu = menu.addMenu(_("Modify"))
+        action_rename = modify_menu.addAction(_("Rename F2"))
+        action_edit_memo = modify_menu.addAction(_("View or edit memo"))
+        action_delete = modify_menu.addAction(_("Delete"))
         action_color = None
         action_show_coded_media = None
         action_move_code = None
         if selected is not None and selected.text(1)[0:3] == 'cid':
-            action_color = menu.addAction(_("Change code color"))
+            action_color = modify_menu.addAction(_("Change code color"))
             action_show_coded_media = menu.addAction(_("Show coded files"))
-            action_move_code = menu.addAction(_("Move code to"))
-        action_show_codes_like = menu.addAction(_("Show codes like") + ": " + self.show_codes_like_filter)
-        action_show_codes_of_colour = menu.addAction(_("Show codes of colour") + ": " + self.show_codes_colour_filter)
-        action_all_asc = menu.addAction(_("Sort ascending"))
-        action_all_desc = menu.addAction(_("Sort descending"))
-        action_cat_then_code_asc = menu.addAction(_("Sort category then code ascending"))
+            action_move_code = modify_menu.addAction(_("Move code to"))
+        filter_menu = menu.addMenu(_("Filter"))
+        action_show_codes_like = filter_menu.addAction(_("Show codes like") + ": " + self.show_codes_like_filter)
+        action_show_codes_of_colour = filter_menu.addAction(_("Show codes of colour") + ": " + self.show_codes_colour_filter)
+        sort_menu = menu.addMenu(_("Sort"))
+        action_all_asc = sort_menu.addAction(_("Sort ascending"))
+        action_all_desc = sort_menu.addAction(_("Sort descending"))
+        action_cat_then_code_asc = sort_menu.addAction(_("Sort category then code ascending"))
         action = menu.exec(self.ui.treeWidget.mapToGlobal(position))
         if action is not None:
             if action == action_show_codes_of_colour:
