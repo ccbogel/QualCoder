@@ -259,7 +259,12 @@ class DialogSQL(QtWidgets.QDialog):
         self.file_data = []
         self.ui.label.setText(_("Running query. Please wait."))
         QtWidgets.QApplication.processEvents()  # stops gui freeze
+
         self.sql = self.ui.textEdit_sql.toPlainText()
+        # Override the sql text, by only using selected text, if it is avaiable.
+        selected_text = self.ui.textEdit_sql.textCursor().selectedText()
+        if selected_text != "":
+            self.sql = selected_text
         cur = self.app.conn.cursor()
         self.sql = str(self.sql)
         QtWidgets.QApplication.processEvents()  # Stops gui freeze
@@ -289,9 +294,12 @@ class DialogSQL(QtWidgets.QDialog):
                 self.ui.label.setText(str(cur.rowcount) + _(" rows updated"))
                 self.app.delete_backup = False
                 self.app.conn.commit()
+            if selected_text != "":
+                text = self.ui.label.text() + "  " + _("Using selected text")
+                self.ui.label.setText(text)
             col_names = []
             if cur.description is not None:
-                col_names = list(map(lambda x: x[0], cur.description))  # gets column names
+                col_names = list(map(lambda x: x[0], cur.description))  # Gets column names
             self.ui.tableWidget_results.setColumnCount(len(col_names))
             self.ui.tableWidget_results.setHorizontalHeaderLabels(col_names)
             self.file_data.append(col_names)
@@ -410,12 +418,20 @@ class DialogSQL(QtWidgets.QDialog):
                     break
             self.get_schema_update_tree_widget()
 
+    def keyPressEvent(self, event):
+
+        key = event.key()
+        mods = event.modifiers()
+        if key == QtCore.Qt.Key.Key_Return and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
+            self.run_sql()
+
     def sql_menu(self, position):
         """ Context menu to textedit_sql
-         Cut Ctrl + X, Copy Ctrl + C, Paste Ctrl + V, Delete, Ctrl + A selectall. """
+         Cut Ctrl + X, Copy Ctrl + C, Paste Ctrl + V, Delete, Ctrl + A selectall.
+         """
 
         menu = QtWidgets.QMenu()
-        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
         action_select_all = menu.addAction(_("Select all"))
         action_copy = menu.addAction(_("Copy"))
         action_paste = menu.addAction(_("Paste"))
@@ -424,6 +440,10 @@ class DialogSQL(QtWidgets.QDialog):
         action_save_query = None
         if len(self.ui.textEdit_sql.toPlainText()) > 2:
             action_save_query = menu.addAction(_("Save query"))
+        action_comment_out = None
+        selected_text = self.ui.textEdit_sql.textCursor().selectedText()
+        if selected_text != "":
+            action_comment_out = menu.addAction(_("Comment out selected text"))
         action = menu.exec(self.ui.textEdit_sql.mapToGlobal(position))
         cursor = self.ui.textEdit_sql.textCursor()
         if action is None:
@@ -459,6 +479,16 @@ class DialogSQL(QtWidgets.QDialog):
             cursor.insertText("SELECT * FROM ")
         if action == action_save_query:
             self.save_query()
+        if action == action_comment_out:
+            pos0 = self.ui.textEdit_sql.textCursor().selectionStart()
+            pos1 = self.ui.textEdit_sql.textCursor().selectionEnd()
+            cursor = QtGui.QTextCursor(self.ui.textEdit_sql.document())
+            cursor.setPosition(pos1)
+            self.ui.textEdit_sql.setTextCursor(cursor)
+            self.ui.textEdit_sql.insertPlainText("*/")
+            cursor.setPosition(pos0)
+            self.ui.textEdit_sql.setTextCursor(cursor)
+            self.ui.textEdit_sql.insertPlainText("/*")
 
     def save_query(self):
         """ Save query in stored_sql table.
