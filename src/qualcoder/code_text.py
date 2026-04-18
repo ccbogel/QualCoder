@@ -218,6 +218,10 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_document_memo.pressed.connect(self.active_file_memo)
         self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_file_attributes.pressed.connect(self.get_files_from_attributes)
+        self.ui.pushButton_clear_filter_file.setIcon(qta.icon('mdi6.filter-off-outline', options=[{'scale_factor': 1.3}]))  # for clear filter <- L
+        self.ui.pushButton_clear_filter_file.pressed.connect(self.clear_file_filter)
+        self.ui.pushButton_clear_filter_file.setToolTip(_("Clear file filter"))
+        self.ui.pushButton_clear_filter_file.setVisible(False)  # hidden until a filter is active
         # Buttons under codes-tree
         self.ui.pushButton_find_code.setIcon(qta.icon('mdi6.card-search-outline', options=[{'scale-factor': 1.3}]))
         self.ui.pushButton_find_code.pressed.connect(self.find_code_in_tree)
@@ -231,6 +235,10 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_show_all_codings.pressed.connect(self.show_all_codes_in_text)
         self.ui.pushButton_important.setIcon(qta.icon('mdi6.star-outline', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_important.pressed.connect(self.show_important_coded)
+        self.ui.pushButton_clear_filter_code.setIcon(qta.icon('mdi6.filter-off-outline', options=[{'scale_factor': 1.3}]))  # for clear filter <- L
+        self.ui.pushButton_clear_filter_code.pressed.connect(self.clear_code_filter)
+        self.ui.pushButton_clear_filter_code.setToolTip(_("Clear code filter"))
+        self.ui.pushButton_clear_filter_code.setVisible(False)  # hidden until a filter is active        
         # Right hand side splitter buttons
         self.ui.pushButton_code_rule.setIcon(qta.icon('mdi6.text-shadow'))
         self.ui.pushButton_code_rule.pressed.connect(self.show_code_rule)
@@ -679,6 +687,8 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable-box', options=[{'scale_factor': 1.3}]))
         self.ui.pushButton_file_attributes.setToolTip(ui.tooltip_msg)
         self.get_files(ui.result_file_ids)
+        self.ui.pushButton_clear_filter_file.setVisible(True) # <- L
+        self.ui.pushButton_clear_filter_file.setStyleSheet("background-color: #1e90ff; color: white;")  # blue
 
     def update_sizes(self):
         """ Called by changed splitter size """
@@ -1488,8 +1498,6 @@ class DialogCodeText(QtWidgets.QWidget):
         action_new_code = None
         action_new_invivo_code = None
         submenu_ai_text_analysis = None
-        
-        # --- Handles experimental
         action_show_handles = None
 
         # Can have multiple coded text at this position
@@ -1525,7 +1533,6 @@ class DialogCodeText(QtWidgets.QWidget):
             menu.addAction(action_not_important)
         if action_change_code:
             menu.addAction(action_change_code)
-        # --- Handles experimental
         if action_show_handles:
             menu.addAction(action_show_handles)
 
@@ -1977,39 +1984,52 @@ class DialogCodeText(QtWidgets.QWidget):
         action_add_code_to_category = None
         action_add_category_to_category = None
         action_merge_category = None
+        action_expand_collapse = None
         if selected is not None and selected.text(1)[0:3] == 'cat':
             action_add_code_to_category = menu.addAction(_("Add new code to category"))
             action_add_category_to_category = menu.addAction(_("Add a new category to category"))
             action_merge_category = menu.addAction(_("Merge category into category"))
         action_add_code = menu.addAction(_("Add a new code"))
         action_add_category = menu.addAction(_("Add a new category"))
-        action_rename = menu.addAction(_("Rename"))
-        action_edit_memo = menu.addAction(_("View or edit memo"))
-        action_delete = menu.addAction(_("Delete"))
+        if selected is not None and selected.text(1)[0:3] == 'cat':
+            action_expand_collapse = menu.addAction(_("Expand or collapse branch"))
+        #action_find_code = menu.addAction(_("Find code"))
+        modify_menu = menu.addMenu(_("Modify"))
+        action_rename = modify_menu.addAction(_("Rename F2"))
+        action_edit_memo = modify_menu.addAction(_("View or edit memo"))
+        action_delete = modify_menu.addAction(_("Delete"))
         action_color = None
         action_show_coded_media = None
         action_move_code = None
         if selected is not None and selected.text(1)[0:3] == 'cid':
-            action_color = menu.addAction(_("Change code color"))
+            action_color = modify_menu.addAction(_("Change code color"))
             action_show_coded_media = menu.addAction(_("Show coded files"))
-            action_move_code = menu.addAction(_("Move code to"))
-        action_show_codes_like = menu.addAction(_("Show codes like") + ": " + self.show_codes_like_filter)
-        action_show_codes_of_colour = menu.addAction(_("Show codes of colour") + ": " + self.show_codes_colour_filter)
-        action_all_asc = menu.addAction(_("Sort ascending"))
-        action_all_desc = menu.addAction(_("Sort descending"))
-        action_cat_then_code_asc = menu.addAction(_("Sort category then code ascending"))
+            action_move_code = modify_menu.addAction(_("Move code to"))
+        filter_menu = menu.addMenu(_("Filter"))
+        action_show_codes_like = filter_menu.addAction(_("Show codes like") + ": " + self.show_codes_like_filter)
+        action_show_codes_of_colour = filter_menu.addAction(_("Show codes of colour") + ": " + self.show_codes_colour_filter)
+        sort_menu = menu.addMenu(_("Sort"))
+        action_all_asc = sort_menu.addAction(_("Sort ascending"))
+        action_all_desc = sort_menu.addAction(_("Sort descending"))
+        action_cat_then_code_asc = sort_menu.addAction(_("Sort category then code ascending"))
 
         action = menu.exec(self.ui.treeWidget.mapToGlobal(position))
         if action is not None:
             if action == action_all_asc:
                 self.tree_sort_option = "all asc"
                 self.fill_tree()
+                return
             if action == action_all_desc:
                 self.tree_sort_option = "all desc"
                 self.fill_tree()
+                return
             if action == action_cat_then_code_asc:
                 self.tree_sort_option = "cat and code asc"
                 self.fill_tree()
+                return
+            '''if action == action_find_code:
+                self.find_code_in_tree()
+                return'''
             if action == action_show_codes_like:
                 self.show_codes_like()
                 return
@@ -2020,19 +2040,29 @@ class DialogCodeText(QtWidgets.QWidget):
                 self.change_code_color(selected)
             if action == action_add_category:
                 self.add_category()
+                return
             if action == action_add_code:
                 self.add_code()
+                return
             if action == action_merge_category:
                 catid = int(selected.text(1).split(":")[1])
                 self.merge_category(catid)
+                return
             if action == action_add_code_to_category:
                 catid = int(selected.text(1).split(":")[1])
                 self.add_code(catid)
+                return
             if action == action_add_category_to_category:
                 catid = int(selected.text(1).split(":")[1])
                 self.add_category(catid)
+                return
             if selected is not None and action == action_move_code:
                 self.move_code(selected)
+                return
+            if action == action_expand_collapse:
+                expand_toggle = not selected.isExpanded()
+                self.recursive_expand_collapse_branch(selected, expand_toggle)
+                return
             if selected is not None and action == action_rename:
                 self.rename_category_or_code(selected)
             if selected is not None and action == action_edit_memo:
@@ -2048,6 +2078,15 @@ class DialogCodeText(QtWidgets.QWidget):
                         break
                 if found_code:
                     self.coded_media_dialog(found_code)
+
+    def recursive_expand_collapse_branch(self, item, expand_toggle):
+        """ Set all children of this item to be expanded or collapsed.
+        Recurse through all child categories. """
+
+        child_count = item.childCount()
+        for i in range(child_count):
+            item.setExpanded(expand_toggle)
+            self.recursive_expand_collapse_branch(item.child(i), expand_toggle)
 
     def recursive_non_merge_item(self, item, no_merge_list):
         """ Find matching item to be the current selected item.
@@ -2257,9 +2296,13 @@ class DialogCodeText(QtWidgets.QWidget):
         if self.show_codes_like_filter == "":
             self.ui.label_code.setPixmap(QtGui.QPixmap())
             self.ui.label_code.setToolTip("")
+            self.ui.pushButton_clear_filter_code.setVisible(False) # for clear filter code <- L
+            self.ui.pushButton_clear_filter_code.setStyleSheet("")
         else:
             self.ui.label_code.setPixmap(qta.icon('mdi6.filter-outline').pixmap(22, 22))
             self.ui.label_code.setToolTip(_("Filtered: ") + self.show_codes_like_filter)
+            self.ui.pushButton_clear_filter_code.setVisible(True)
+            self.ui.pushButton_clear_filter_code.setStyleSheet("background-color: #1e90ff; color: white;")
 
     def show_codes_of_color(self):
         """ Show all codes in colour range in code tree., ir all codes if no selection.
@@ -2280,9 +2323,35 @@ class DialogCodeText(QtWidgets.QWidget):
         if self.show_codes_colour_filter == "":
             self.ui.label_code.setPixmap(QtGui.QPixmap())
             self.ui.label_code.setToolTip("")
+            self.ui.pushButton_clear_filter_code.setVisible(False)  # for clear filter code<- L
+            self.ui.pushButton_clear_filter_code.setStyleSheet("")
         else:
             self.ui.label_code.setPixmap(qta.icon('mdi6.filter-outline').pixmap(22, 22))
             self.ui.label_code.setToolTip(_("Filtered: ") + self.show_codes_colour_filter)
+            self.ui.pushButton_clear_filter_code.setVisible(True)
+            self.ui.pushButton_clear_filter_code.setStyleSheet("background-color: #1e90ff; color: white;")  # blue
+
+    def clear_code_filter(self):
+        """ Clear any active code filter (show codes like or show codes of colour)
+        and restore all codes in the tree. """ # <- L
+        self.show_codes_like_filter = ""
+        self.show_codes_colour_filter = ""
+        root = self.ui.treeWidget.invisibleRootItem()
+        self.recursive_traverse(root, "")  # unhide all codes
+        self.ui.label_code.setPixmap(QtGui.QPixmap())
+        self.ui.label_code.setToolTip("")
+        self.ui.pushButton_clear_filter_code.setVisible(False)
+        self.ui.pushButton_clear_filter_code.setStyleSheet("")  # reset blue style
+
+    def clear_file_filter(self):
+        """ Clear any active file filter (show files like, case files, attributes)
+        and reload all files. """ # <- L
+        self.attributes = []
+        self.ui.pushButton_file_attributes.setIcon(qta.icon('mdi6.variable', options=[{'scale_factor': 1.3}]))
+        self.ui.pushButton_file_attributes.setToolTip(_("Attributes"))
+        self.get_files()  # reload all files without filter
+        self.ui.pushButton_clear_filter_file.setVisible(False)
+        self.ui.pushButton_clear_filter_file.setStyleSheet("")  # reset blue style
 
     def recursive_traverse(self, item, text_="", case_sensitive=False):
         """ Find all children codes of this item that match or not and hide or unhide based on 'text'.
@@ -2300,14 +2369,16 @@ class DialogCodeText(QtWidgets.QWidget):
                 cid = int(item.child(i).text(1)[4:])
                 for c in self.codes:
                     if cid == c['cid']:
-                        if text_ not in c['name'] and not case_sensitive:
-                            item.child(i).setHidden(True)
-                        if text_.lower() not in c['name'].lower() and case_sensitive:
-                            item.child(i).setHidden(True)
+                        if case_sensitive:  # case sensitive: exact match <- L
+                            if text_ not in c['name']:
+                                item.child(i).setHidden(True)
+                        else:  # case insensitive: compare lowercase
+                            if text_.lower() not in c['name'].lower():
+                                item.child(i).setHidden(True)
                         break
             if "cid:" in item.child(i).text(1) and text_ == "":
                 item.child(i).setHidden(False)
-            self.recursive_traverse(item.child(i), text_)
+            self.recursive_traverse(item.child(i), text_, case_sensitive)  # propagate case_sensitive to child nodes <- L
 
     def keyPressEvent(self, event):
         """
@@ -2330,6 +2401,8 @@ class DialogCodeText(QtWidgets.QWidget):
         ! Display Clicked character position
         ^ Alt key. Shift code positions. May be needed after the text is edited
             (added or deleted) to shift subsequent codings.
+
+        F2 Rename code or category
         """
 
         key = event.key()
@@ -2375,6 +2448,11 @@ class DialogCodeText(QtWidgets.QWidget):
             if key == QtCore.Qt.Key.Key_0:
                 self.help()
                 return
+        # Rename code or category
+        if self.ui.treeWidget.hasFocus() and key == QtCore.Qt.Key.Key_F2:
+            selected = self.ui.treeWidget.currentItem()
+            self.rename_category_or_code(selected)
+            return
 
         if not self.ui.plainTextEdit.hasFocus():
             return
@@ -3265,7 +3343,6 @@ class DialogCodeText(QtWidgets.QWidget):
                 return True
         # Change start and end code positions using alt arrow left and alt arrow right
         # and shift arrow left, shift arrow right
-
         if type(event) == QtGui.QKeyEvent and object_ is self.ui.plainTextEdit:
             key = event.key()
             mod = event.modifiers()
@@ -3969,22 +4046,19 @@ class DialogCodeText(QtWidgets.QWidget):
             selected : QTreeWidgetItem """
 
         if selected.text(1)[0:3] == 'cid':
-            code_ = None
-            for c in self.codes:
-                if c['cid'] == int(selected.text(1)[4:]):
-                    code_ = c
-            new_name, ok = QtWidgets.QInputDialog.getText(self, _("Rename code"),
-                                                          _("New code name:") + " " * 40,
-                                                          QtWidgets.QLineEdit.EchoMode.Normal,
-                                                          code_['name'])
-            if not ok or new_name == '':
+            found_code = None
+            check_codes = []
+            for code_ in self.codes:
+                if code_['cid'] == int(selected.text(1)[4:]):
+                    found_code = code_
+                else:
+                    check_codes.append(code_)
+            ui = DialogAddItemName(self.app, check_codes, _("Rename code"), _("Code name"))
+            ui.ui.lineEdit.setText(found_code['name'])
+            ui.exec()
+            new_name = ui.get_new_name()
+            if new_name is None or new_name == found_code['name']:
                 return
-            # Check that no other code has this name
-            for c in self.codes:
-                if c['name'] == new_name:
-                    Message(self.app, _("Name in use"),
-                            new_name + _(" is already in use, choose another name."), "warning").exec()
-                    return
             # Find the code in the list
             found = -1
             for i in range(0, len(self.codes)):
@@ -4003,26 +4077,25 @@ class DialogCodeText(QtWidgets.QWidget):
             self.app.conn.commit()
             self.app.delete_backup = False
             old_name = self.codes[found]['name']
-            self.parent_textEdit.append(_("Code renamed from: ") + old_name + _(" to: ") + new_name)
+            self.parent_textEdit.append(_("Code renamed from: ") + f"{old_name} --> {new_name}")
             self.update_dialog_codes_and_categories(["code_name"])
             return
 
         if selected.text(1)[0:3] == 'cat':
-            cat = None
-            for c in self.categories:
-                if c['catid'] == int(selected.text(1)[6:]):
-                    cat = c
-            new_name, ok = QtWidgets.QInputDialog.getText(self, _("Rename category"),
-                                                          _("New category name:") + " " * 40,
-                                                          QtWidgets.QLineEdit.EchoMode.Normal, cat['name'])
-            if not ok or new_name == '':
+            found_cat = None
+            check_categories = []
+            for category in self.categories:
+                if category['catid'] == int(selected.text(1)[6:]):
+                    found_cat = category
+                else:
+                    check_categories.append(category)
+            ui = DialogAddItemName(self.app, check_categories, _("Rename category"), _("Category name"))
+            ui.ui.lineEdit.setText(found_cat['name'])
+            ui.exec()
+            new_name = ui.get_new_name()
+            if new_name is None or new_name == found_cat['name']:
                 return
-            # Check that no other category has this name
-            for c in self.categories:
-                if c['name'] == new_name:
-                    msg = _("This code name is already in use.")
-                    Message(self.app, _("Duplicate code name"), msg, "warning").exec()
-                    return
+
             # Find the category in the list
             found = -1
             for i in range(0, len(self.categories)):
@@ -4038,7 +4111,7 @@ class DialogCodeText(QtWidgets.QWidget):
             self.app.delete_backup = False
             old_name = self.categories[found]['name']
             self.update_dialog_codes_and_categories(["code_cat"])
-            self.parent_textEdit.append(_("Category renamed from: ") + old_name + _(" to: ") + new_name)
+            self.parent_textEdit.append(_("Category renamed from: ") + f"{old_name} --> {new_name}")
 
     def change_code_color(self, selected):
         """ Change the colour of the currently selected code.
@@ -4191,18 +4264,22 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         if selection['id'] == -1:
             self.get_files()
+            self.ui.pushButton_clear_filter_file.setVisible(False)  # reset filter button when showing all <- L
+            self.ui.pushButton_clear_filter_file.setStyleSheet("")
             return
         cur = self.app.conn.cursor()
         cur.execute('select fid from case_text where caseid=?', [selection['id']])
         res = cur.fetchall()
         file_ids = [r[0] for r in res]
         self.get_files(file_ids)
+        self.ui.pushButton_clear_filter_file.setVisible(True)  # <- L
+        self.ui.pushButton_clear_filter_file.setStyleSheet("background-color: #1e90ff; color: white;")  # blue
 
     def show_files_like(self):
         """ Show files that contain specified filename text.
         If blank, show all files. """
 
-        dialog = QtWidgets.QInputDialog(self)
+        dialog = QtWidgets.QInputDialog(None)  # use None to make it a standalone floating window <- L
         dialog.setStyleSheet(f"* {{font-size:{self.app.settings['fontsize']}pt}} ")
         dialog.setWindowTitle(_("Show files like"))
         dialog.setWindowFlags(dialog.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
@@ -4215,12 +4292,18 @@ class DialogCodeText(QtWidgets.QWidget):
         text_ = str(dialog.textValue())
         if text_ == "":
             self.get_files()
+            self.ui.pushButton_clear_filter_file.setVisible(False)  # hide filter button when showing all <- L
+            self.ui.pushButton_clear_filter_file.setStyleSheet("")
             return
         cur = self.app.conn.cursor()
-        cur.execute('select id from source where name like ?', ['%' + text_ + '%'])
+        cur.execute("select id from source where name like ? and "  # restrict to text files only <- L
+                    "(mediapath is null or mediapath like '/docs/%' or mediapath like 'docs:%')",
+                    ['%' + text_ + '%'])
         res = cur.fetchall()
         file_ids = [r[0] for r in res]
         self.get_files(file_ids)
+        self.ui.pushButton_clear_filter_file.setVisible(True)  # clear filter file <- L
+        self.ui.pushButton_clear_filter_file.setStyleSheet("background-color: #1e90ff; color: white;")  # blue
 
     def prev_chars(self, file_, selected):
         """ Load previous text chunk of the text file.
@@ -4566,7 +4649,7 @@ class DialogCodeText(QtWidgets.QWidget):
             return
         cursor = self.ui.plainTextEdit.textCursor()
         cursor.setPosition(0, QtGui.QTextCursor.MoveMode.MoveAnchor)
-        cursor.setPosition(len(self.text), QtGui.QTextCursor.MoveMode.KeepAnchor) # MODIFIED (removido el - 1)
+        cursor.setPosition(len(self.text), QtGui.QTextCursor.MoveMode.KeepAnchor) # (removido el - 1)
         cursor.setCharFormat(QtGui.QTextCharFormat())
 
     def highlight(self):

@@ -6,9 +6,13 @@ authors:
     orcid: https://orcid.org/0000-0001-5029-7541
   - family-names: Dröge
     given-names: Kai
+    family-names: Missaghieh--Poncet
+    given-names: Justin
+    family-names: Salomón
+    given-names: Lorenzo
 title: "QualCoder"
-version: 3.6
+version: 3.8.2
 keywords: qualitative
-license: MIT
+license: LGPL v3
 repository-code: https://github.com/ccbogel/QualCoder/releases/tag/3.6
-date-released: 2024-02-11
+date-released: 2026-02-26

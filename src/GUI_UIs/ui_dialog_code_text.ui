@@ -904,6 +904,22 @@ Formatted like below for name detection.
                    <string/>
                   </property>
                  </widget>
+                 <widget class="QPushButton" name="pushButton_clear_filter_file">
+                  <property name="geometry">
+                   <rect>
+                    <x>200</x>
+                    <y>0</y>
+                    <width>28</width>
+                    <height>28</height>
+                   </rect>
+                  </property>
+                  <property name="toolTip">
+                   <string>Clear file filter</string>
+                  </property>
+                  <property name="text">
+                   <string/>
+                  </property>
+                 </widget>
                 </widget>
                </item>
               </layout>
@@ -1139,6 +1155,22 @@ Formatted like below for name detection.
               </property>
               <property name="toolTip">
                <string>Find code</string>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+             <widget class="QPushButton" name="pushButton_clear_filter_code">
+              <property name="geometry">
+               <rect>
+                <x>240</x>
+                <y>0</y>
+                <width>28</width>
+                <height>28</height>
+               </rect>
+              </property>
+              <property name="toolTip">
+               <string>Clear code filter</string>
               </property>
               <property name="text">
                <string/>

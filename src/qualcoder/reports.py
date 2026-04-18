@@ -447,10 +447,9 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
                 display_list = []
                 for i in c['display_list']:
                     display_list.append(str(i))
-                if self.truncated_code_names:
-                    if len(display_list[0]) > 62:  # Keep category name short
-                        display_list[0] = display_list[0][:30] + '..' + display_list[0][-30:]
-                        self.contains_long_names = True
+                if self.truncated_code_names and len(display_list[0]) > 62:
+                    display_list[0] = display_list[0][:30] + '..' + display_list[0][-30:]
+                    self.contains_long_names = True
                 top_item = QtWidgets.QTreeWidgetItem(display_list)
                 top_item.setToolTip(0, c['name'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
@@ -474,10 +473,9 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
                         display_list = []
                         for i in c['display_list']:
                             display_list.append(str(i))
-                        if self.truncated_code_names:
-                            if len(display_list[0]) > 62:  # Keep category name short
-                                display_list[0] = display_list[0][:30] + '..' + display_list[0][-30:]
-                                self.contains_long_names = True
+                        if self.truncated_code_names and  len(display_list[0]) > 62:
+                            display_list[0] = display_list[0][:30] + '..' + display_list[0][-30:]
+                            self.contains_long_names = True
                         child = QtWidgets.QTreeWidgetItem(display_list)
                         child.setToolTip(0, c['name'])
                         item.addChild(child)
@@ -499,10 +497,9 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
                 display_list = []
                 for i in c['display_list']:
                     display_list.append(str(i))
-                if self.truncated_code_names:
-                    if len(display_list[0]) > 62:  # Keep code name short
-                        display_list[0] = f"{display_list[0][:30]}..{display_list[0][-30:]}"
-                        self.contains_long_names = True
+                if self.truncated_code_names and len(display_list[0]) > 62:
+                    display_list[0] = f"{display_list[0][:30]}..{display_list[0][-30:]}"
+                    self.contains_long_names = True
                 top_item = QtWidgets.QTreeWidgetItem(display_list)
                 top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
                 color = TextColor(c['color']).recommendation
@@ -523,10 +520,9 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
                     display_list = []
                     for i in c['display_list']:
                         display_list.append(str(i))
-                    if self.truncated_code_names:
-                        if len(display_list[0]) > 62:  # Keep code name short
-                            display_list[0] = f"{display_list[0][:30]}..{display_list[0][-30:]}"
-                            self.contains_long_names = True
+                    if self.truncated_code_names and len(display_list[0]) > 62:
+                        display_list[0] = f"{display_list[0][:30]}..{display_list[0][-30:]}"
+                        self.contains_long_names = True
                     child = QtWidgets.QTreeWidgetItem(display_list)
                     child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
                     color = TextColor(c['color']).recommendation
@@ -534,7 +530,6 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
                     child.setFlags(Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEnabled)
                     child.setToolTip(0, c['name'])
                     item.addChild(child)
-                    c['catid'] = -1  # Make unmatchable
                 it += 1
                 item = it.value()
         self.ui.treeWidget.sortByColumn(0, QtCore.Qt.SortOrder.AscendingOrder)
@@ -543,15 +538,18 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
         menu = QtWidgets.QMenu()
         menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
         selected = self.ui.treeWidget.currentItem()
-        action_show_coded_media = None
         action_expand_names = None
         if self.contains_long_names:
             action_expand_names = menu.addAction(_("Expand names"))
         action_truncate_names = None
         if self.contains_long_names and self.truncated_code_names is False:
             action_truncate_names = menu.addAction(_("Truncate names"))
+        action_show_coded_media = None
         if selected is not None and selected.text(1)[0:3] == 'cid':
             action_show_coded_media = menu.addAction(_("Show coded files"))
+        action_expand_collapse = None
+        if selected is not None and selected.text(1)[0:3] == 'cat':
+            action_expand_collapse = menu.addAction(_("Expand or collapse branch"))
         action_resize = menu.addAction(_("Toggle automatic column resize"))
 
         action = menu.exec(self.ui.treeWidget.mapToGlobal(position))
@@ -565,18 +563,34 @@ class DialogReportCodeFrequencies(QtWidgets.QDialog):
                         break
                 if found_code:
                     DialogCodeInAllFiles(self.app, found_code)
+                return
             if action == action_expand_names:
                 self.truncated_code_names = False
                 self.fill_tree()
+                return
             if action == action_truncate_names:
                 self.truncated_code_names = True
                 self.fill_tree()
+                return
+            if action == action_expand_collapse:
+                expand_toggle = not selected.isExpanded()
+                self.recursive_expand_collapse_branch(selected, expand_toggle)
+                return
             if action == action_resize:
                 self.tree_column_widths_auto_resize = not self.tree_column_widths_auto_resize
             if self.tree_column_widths_auto_resize:
                 self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
             else:
                 self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Interactive)
+
+    def recursive_expand_collapse_branch(self, item, expand_toggle):
+        """ Set all children of this item to be expanded or collapsed.
+        Recurse through all child categories. """
+
+        child_count = item.childCount()
+        for i in range(child_count):
+            item.setExpanded(expand_toggle)
+            self.recursive_expand_collapse_branch(item.child(i), expand_toggle)
 
 
 class DialogReportCoderComparisons(QtWidgets.QDialog):
@@ -593,6 +607,9 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         self.file_summaries = []
         self.codes = []
         self.categories = []
+        self.truncated_code_names = True
+        self.contains_long_names = False
+        self.tree_column_widths_auto_resize = True
         self.get_data()
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_reportComparisons()
@@ -613,6 +630,8 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         font = f'font: {self.app.settings["treefontsize"]}pt "{self.app.settings["font"]}";'
         self.ui.treeWidget.setStyleSheet(font)
         self.ui.treeWidget.setSelectionMode(QtWidgets.QTreeWidget.SelectionMode.ExtendedSelection)
+        self.ui.treeWidget.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.ui.treeWidget.customContextMenuRequested.connect(self.tree_menu)
         self.ui.comboBox_coders.insertItems(0, self.coders)
         self.ui.comboBox_coders.currentTextChanged.connect(self.coder_selected)
         if len(self.coders) == 3:  # includes empty slot
@@ -938,8 +957,9 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         for c in cats:
             if c['supercatid'] is None:
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], f'catid:{c["catid"]}'])
-                if len(c['name']) > 62:
+                if self.truncated_code_names and len(c['name']) > 62:
                     top_item.setText(0, f"{c['name'][:30]}..{c['name'][-30:]}")
+                    self.contains_long_names = True
                 top_item.setToolTip(0, c['name'])
                 self.ui.treeWidget.addTopLevelItem(top_item)
                 if f"catid:{c['catid']}" in self.app.collapsed_categories:
@@ -960,8 +980,9 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
                 while item:  # while there is an item in the list
                     if item.text(1) == f'catid:{c["supercatid"]}':
                         child = QtWidgets.QTreeWidgetItem([c['name'], f'catid:{c["catid"]}'])
-                        if len(c['name']) > 62:
+                        if self.truncated_code_names and len(c['name']) > 62:
                             child.setText(0, f"{c['name'][:30]}..{c['name'][-30:]}")
+                            self.contains_long_names = True
                         child.setToolTip(0, c['name'])
                         item.addChild(child)
                         if f"catid:{c['catid']}" in self.app.collapsed_categories:
@@ -979,8 +1000,9 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
         for c in codes:
             if c['catid'] is None:
                 top_item = QtWidgets.QTreeWidgetItem([c['name'], f'cid:{c["cid"]}'])
-                if len(c['name']) > 62:
+                if self.truncated_code_names and len(c['name']) > 62:
                     top_item.setText(0, f"{c['name'][:30]}..{c['name'][-30:]}")
+                    self.contains_long_names = True
                 top_item.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
                 color = TextColor(c['color']).recommendation
                 top_item.setForeground(0, QBrush(QtGui.QColor(color)))
@@ -998,19 +1020,73 @@ class DialogReportCoderComparisons(QtWidgets.QDialog):
             while item:
                 if item.text(1) == f'catid:{c["catid"]}':
                     child = QtWidgets.QTreeWidgetItem([c['name'], f'cid:{c["cid"]}'])
-                    if len(c['name']) > 62:
+                    if self.truncated_code_names and len(c['name']) > 62:
                         child.setText(0, f"{c['name'][:30]}..{c['name'][-30:]}")
+                        self.contains_long_names = True
                     child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
                     color = TextColor(c['color']).recommendation
                     child.setForeground(0, QBrush(QtGui.QColor(color)))
                     child.setFlags(Qt.ItemFlag.ItemIsSelectable | Qt.ItemFlag.ItemIsUserCheckable | Qt.ItemFlag.ItemIsEnabled)
                     child.setToolTip(0, c['name'])
                     item.addChild(child)
-                    c['catid'] = -1  # Make unmatchable
                 it += 1
                 item = it.value()
         self.ui.treeWidget.sortByColumn(0, QtCore.Qt.SortOrder.AscendingOrder)
-        # self.ui.treeWidget.expandAll()
+
+    def tree_menu(self, position):
+        menu = QtWidgets.QMenu()
+        menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}} ")
+        selected = self.ui.treeWidget.currentItem()
+        action_expand_names = None
+        if self.contains_long_names:
+            action_expand_names = menu.addAction(_("Expand names"))
+        action_truncate_names = None
+        if self.contains_long_names and self.truncated_code_names is False:
+            action_truncate_names = menu.addAction(_("Truncate names"))
+        action_show_coded_media = None
+        if selected is not None and selected.text(1)[0:3] == 'cid':
+            action_show_coded_media = menu.addAction(_("Show coded files"))
+        action_expand_collapse = None
+        if selected is not None and selected.text(1)[0:3] == 'cat':
+            action_expand_collapse = menu.addAction(_("Expand or collapse branch"))
+        action_resize = menu.addAction(_("Toggle automatic column resize"))
+
+        action = menu.exec(self.ui.treeWidget.mapToGlobal(position))
+        if action is not None:
+            if action == action_show_coded_media:
+                found_code = None
+                tofind = int(selected.text(1)[4:])
+                for code in self.codes:
+                    if code['cid'] == tofind:
+                        found_code = code
+                        break
+                if found_code:
+                    DialogCodeInAllFiles(self.app, found_code)
+            if action == action_expand_names:
+                self.truncated_code_names = False
+                self.fill_tree()
+            if action == action_truncate_names:
+                self.truncated_code_names = True
+                self.fill_tree()
+            if action == action_expand_collapse:
+                expand_toggle = not selected.isExpanded()
+                self.recursive_expand_collapse_branch(selected, expand_toggle)
+            if action == action_resize:
+                self.tree_column_widths_auto_resize = not self.tree_column_widths_auto_resize
+            if self.tree_column_widths_auto_resize:
+                self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+            else:
+                self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Interactive)
+
+
+    def recursive_expand_collapse_branch(self, item, expand_toggle):
+        """ Set all children of this item to be expanded or collapsed.
+        Recurse through all child categories. """
+
+        child_count = item.childCount()
+        for i in range(child_count):
+            item.setExpanded(expand_toggle)
+            self.recursive_expand_collapse_branch(item.child(i), expand_toggle)
 
     def information(self):
         """ Provide statistical help information. """

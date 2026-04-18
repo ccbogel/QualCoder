@@ -21,9 +21,7 @@ https://qualcoder-org.github.io/
 """
 
 import os
-import sys
 import logging
-import traceback
 
 from PyQt6 import QtWidgets, QtCore
 from PyQt6.QtGui import QRegularExpressionValidator
@@ -33,18 +31,16 @@ from .GUI.ui_dialog_add_item import Ui_Dialog_add_item
 path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
+
 class DialogAddItemName(QtWidgets.QDialog):
     """ Dialog to get a new code or code category from user.
     Also used for Case and File adding attributes.
+    Also used to rename codes/categories - for this submit an items list excluding the code/cat to change.
     Requires a name for Dialog title (and label in setupUI)
     Requires a list of dictionary 'name' items.
     Dialog returns ok if the item is not a duplicate of a name in the list.
     Returns one item through get_new_name method.
     """
-
-    new_item = None
-    existing_items = []
-    Dialog_addItem = None
 
     def __init__(self, app, items, title, text, reg_expression=None, parent=None):
         """ Params:
@@ -57,13 +53,14 @@ class DialogAddItemName(QtWidgets.QDialog):
 
         super(DialogAddItemName, self).__init__(parent)
         self.existing_items = []
+        self.new_item = None
         for i in items:
             self.existing_items.append(i['name'])
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_add_item()
         self.ui.setupUi(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        self.setStyleSheet("* {font-size:" + str(app.settings['fontsize']) + "pt} ")
+        self.setStyleSheet(f"* {{font-size:{app.settings['fontsize']}pt}} ")
         self.setWindowTitle(title)
         self.ui.label.setText(text)
         if reg_expression:
