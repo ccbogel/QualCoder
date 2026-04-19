@@ -926,16 +926,18 @@ class DialogAIChat(QtWidgets.QDialog):
             base_prompt += project_memo
         return base_prompt
 
-    def _build_mcp_combined_system_prompt(self, phase_prompt: str) -> str:
-        """Combine global agent instructions with phase-specific technical instructions."""
+    def _mcp_base_system_prompt(self) -> str:
+        """Return the stable base system prompt for MCP-backed agent chats."""
 
-        base_prompt = self._general_chat_base_system_prompt().strip()
+        return self._general_chat_base_system_prompt().strip()
+
+    def _build_mcp_combined_system_prompt(self, phase_prompt: str) -> str:
+        """Format one phase-specific MCP task contract as a standalone system prompt."""
+
         phase_text = str(phase_prompt if phase_prompt is not None else "").strip()
-        if base_prompt == "":
-            return phase_text
         if phase_text == "":
-            return base_prompt
-        return base_prompt + "\n\n# Current task contract\n\n" + phase_text
+            return ""
+        return "# Current task contract\n\n" + phase_text
 
     def _resolve_turn_agent_prompts(self, user_message: str) -> List[AgentPromptRecord]:
         """Resolve explicit `/name` prompt references from one user message."""
@@ -3538,6 +3540,7 @@ data collected. This information will accompany every prompt sent to the AI, res
         try:
             history_messages: List[Any] = list(messages)
             agent_messages: List[Any] = [msg for msg in history_messages if not isinstance(msg, SystemMessage)]
+            mcp_base_system_prompt = self._mcp_base_system_prompt()
             ai_change_set_id = self._begin_ai_change_set(history_messages, chat_idx)
             final_hint = ''
             tool_messages: List[Dict[str, str]] = []
@@ -3605,6 +3608,24 @@ data collected. This information will accompany every prompt sent to the AI, res
                 else:
                     tool_messages.append({"msg_type": "single_instruct", "msg_author": "ai_agent", "msg_content": payload})
 
+            def build_phase_request_message(phase_contract: str, trailing_instruction: str) -> HumanMessage:
+                parts: List[str] = []
+                phase_text = str(phase_contract if phase_contract is not None else "").strip()
+                trailing_text = str(trailing_instruction if trailing_instruction is not None else "").strip()
+                if phase_text != "":
+                    parts.append(phase_text)
+                if trailing_text != "":
+                    parts.append(trailing_text)
+                return HumanMessage(content="\n\n".join(parts).strip())
+
+            def build_phase_messages(phase_contract: str, trailing_instruction: str) -> List[Any]:
+                phase_messages: List[Any] = []
+                if mcp_base_system_prompt != "":
+                    phase_messages.append(SystemMessage(content=mcp_base_system_prompt))
+                phase_messages.extend(agent_messages)
+                phase_messages.append(build_phase_request_message(phase_contract, trailing_instruction))
+                return phase_messages
+
             # Ensure baseline environment context exists before planning.
             for method, params in bootstrap_calls:
                 if self.app.ai.is_current_run_canceled():
@@ -3619,12 +3640,13 @@ data collected. This information will accompany every prompt sent to the AI, res
 
             planner_system_prompt = self._build_mcp_combined_system_prompt(self._mcp_planner_system_prompt())
             planner_user_prompt = "Create the initial MCP plan now."
-            append_single_instruct_log("planning", "system", planner_system_prompt)
-            append_single_instruct_log("planning", "user", planner_user_prompt)
+            append_single_instruct_log(
+                "planning",
+                "user",
+                build_phase_request_message(planner_system_prompt, planner_user_prompt).content,
+            )
             self._emit_mcp_status_text(signals, chat_idx, _("Thinking..."))
-            planner_messages: List[Any] = [SystemMessage(content=planner_system_prompt)]
-            planner_messages.extend(agent_messages)
-            planner_messages.append(HumanMessage(content=planner_user_prompt))
+            planner_messages = build_phase_messages(planner_system_prompt, planner_user_prompt)
             try:
                 plan_data = self._invoke_json_llm_with_step_timeout(
                     planner_messages,
@@ -3738,9 +3760,6 @@ data collected. This information will accompany every prompt sent to the AI, res
                     append_tool_exchange(method, display_params if method in allowed_methods else params, response)
 
                 reflection_system_prompt = self._build_mcp_combined_system_prompt(self._mcp_reflection_system_prompt())
-                append_single_instruct_log("reflection", "system", reflection_system_prompt)
-                reflection_messages: List[Any] = [SystemMessage(content=reflection_system_prompt)]
-                reflection_messages.extend(agent_messages)
                 reflection_prompt = "Reflect on sufficiency of the collected evidence and return JSON now."
                 if plan_summary != "":
                     reflection_prompt += "\nInitial plan summary:\n" + plan_summary
@@ -3750,8 +3769,12 @@ data collected. This information will accompany every prompt sent to the AI, res
                         f"(not yet executed because the round limit is {max_calls_per_round}):\n"
                         + json.dumps(deferred_calls, ensure_ascii=False)
                     )
-                append_single_instruct_log("reflection", "user", reflection_prompt)
-                reflection_messages.append(HumanMessage(content=reflection_prompt))
+                append_single_instruct_log(
+                    "reflection",
+                    "user",
+                    build_phase_request_message(reflection_system_prompt, reflection_prompt).content,
+                )
+                reflection_messages = build_phase_messages(reflection_system_prompt, reflection_prompt)
                 try:
                     reflection_data = self._invoke_json_llm_with_step_timeout(
                         reflection_messages,
@@ -3830,15 +3853,12 @@ data collected. This information will accompany every prompt sent to the AI, res
                             "The previous reflection said more evidence may be needed. "
                             "Propose a revised MCP plan now."
                         )
-                        append_single_instruct_log("replanning", "system", replanner_system_prompt)
-                        append_single_instruct_log("replanning", "user", replanner_user_prompt)
-                        replanner_messages: List[Any] = [SystemMessage(content=replanner_system_prompt)]
-                        replanner_messages.extend(agent_messages)
-                        replanner_messages.append(
-                            HumanMessage(
-                                content=replanner_user_prompt
-                            )
+                        append_single_instruct_log(
+                            "replanning",
+                            "user",
+                            build_phase_request_message(replanner_system_prompt, replanner_user_prompt).content,
                         )
+                        replanner_messages = build_phase_messages(replanner_system_prompt, replanner_user_prompt)
                         try:
                             replan_data = self._invoke_json_llm_with_step_timeout(
                                 replanner_messages,
@@ -3953,9 +3973,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                 )
 
             final_system_prompt = self._build_mcp_combined_system_prompt(self._mcp_final_answer_system_prompt())
-            final_stream_messages: List[Any] = [SystemMessage(content=final_system_prompt)]
-            final_stream_messages.extend(agent_messages)
-            final_stream_messages.append(HumanMessage(content=final_prompt))
+            final_stream_messages = build_phase_messages(final_system_prompt, final_prompt)
             result["stream_messages"] = final_stream_messages
             result["tool_messages"] = tool_messages
         except Exception as err:
