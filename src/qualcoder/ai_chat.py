@@ -154,6 +154,16 @@ class PrefixedComboBox(QtWidgets.QComboBox):
         painter.drawControl(QtWidgets.QStyle.ControlElement.CE_ComboBoxLabel, option)
 
 
+class PromptCompletionListWidget(QtWidgets.QListWidget):
+    """Popup list for inline `/prompt` completion in the AI chat input."""
+
+    popupHidden = pyqtSignal()
+
+    def hideEvent(self, event):
+        super().hideEvent(event)
+        self.popupHidden.emit()
+
+
 class DialogAIChat(QtWidgets.QDialog):
     """ AI chat window
     """    
@@ -183,6 +193,7 @@ class DialogAIChat(QtWidgets.QDialog):
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         # self.ui.scrollArea_ai_output.verticalScrollBar().rangeChanged.connect(self.ai_output_scroll_to_bottom)
         self.ui.plainTextEdit_question.installEventFilter(self)
+        self.ui.plainTextEdit_question.viewport().installEventFilter(self)
         self.ui.pushButton_question.pressed.connect(self.button_question_clicked)
         self.ui.progressBar_ai.setMaximum(100)
         self.ui.plainTextEdit_question.setPlaceholderText(_('<your question>'))
@@ -229,6 +240,10 @@ class DialogAIChat(QtWidgets.QDialog):
         self.shortcut_undo_ai_changes = QShortcut(QKeySequence("Ctrl+Shift+U"), self)
         self.shortcut_undo_ai_changes.activated.connect(self._undo_ai_changes_shortcut)
         ai_chat_signal_emitter.newTextChatSignal.connect(self.new_text_chat)
+        self.agent_prompts_catalog = AiAgentPromptsCatalog(self.app)
+        self.ai_mcp_server = AiMcpServer(self.app)
+        self.ai_prompt = None
+        self._setup_prompt_completion()
         self.init_styles()
         self.ai_busy_timer = QtCore.QTimer(self)
         self.ai_busy_timer.timeout.connect(self.update_ai_busy)
@@ -237,9 +252,6 @@ class DialogAIChat(QtWidgets.QDialog):
         self.ai_stream_buffer = ""
         self.ai_stream_in_ref = False
         self.curr_codings = None
-        self.agent_prompts_catalog = AiAgentPromptsCatalog(self.app)
-        self.ai_mcp_server = AiMcpServer(self.app)
-        self.ai_prompt = None
         self.ai_search_code_name = None
         self.ai_search_code_memo = None
         self.chat_list = []
@@ -267,6 +279,361 @@ class DialogAIChat(QtWidgets.QDialog):
         self.set_sidebar_mode(False)
         self._update_undo_button_state()
 
+    def _setup_prompt_completion(self) -> None:
+        """Create the prompt completion popup and initialize transient state."""
+
+        self._prompt_completion_popup = PromptCompletionListWidget(self)
+        self._prompt_completion_popup.setWindowFlags(
+            Qt.WindowType.FramelessWindowHint | Qt.WindowType.SubWindow
+        )
+        self._prompt_completion_popup.setAttribute(
+            Qt.WidgetAttribute.WA_ShowWithoutActivating,
+            True,
+        )
+        self._prompt_completion_popup.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self._prompt_completion_popup.setSelectionMode(
+            QtWidgets.QAbstractItemView.SelectionMode.SingleSelection
+        )
+        self._prompt_completion_popup.setSelectionBehavior(
+            QtWidgets.QAbstractItemView.SelectionBehavior.SelectRows
+        )
+        self._prompt_completion_popup.setMouseTracking(True)
+        self._prompt_completion_popup.viewport().setMouseTracking(True)
+        self._prompt_completion_popup.setHorizontalScrollBarPolicy(
+            Qt.ScrollBarPolicy.ScrollBarAlwaysOff
+        )
+        self._prompt_completion_popup.currentItemChanged.connect(
+            self._prompt_completion_current_item_changed
+        )
+        self._prompt_completion_popup.itemClicked.connect(
+            self._prompt_completion_item_clicked
+        )
+        self._prompt_completion_popup.itemEntered.connect(
+            self._prompt_completion_item_entered
+        )
+        self._prompt_completion_popup.popupHidden.connect(
+            self._prompt_completion_popup_hidden
+        )
+        self.ui.plainTextEdit_question.textChanged.connect(self._sync_prompt_completion)
+        self.ui.plainTextEdit_question.cursorPositionChanged.connect(self._sync_prompt_completion)
+        self._prompt_completion_records: List[AgentPromptRecord] = []
+        self._prompt_inline_completion: Optional[Dict[str, Any]] = None
+        self._prompt_completion_guard = False
+        self._prompt_completion_accepting = False
+        self._prompt_completion_temporarily_disabled = False
+        self._refresh_prompt_completion_records()
+
+    def _suspend_prompt_completion_temporarily(self) -> None:
+        """Pause completion refreshes briefly so editor navigation can finish."""
+
+        if self._prompt_completion_temporarily_disabled:
+            return
+        self._prompt_completion_temporarily_disabled = True
+        QtCore.QTimer.singleShot(0, self._resume_prompt_completion)
+
+    def _resume_prompt_completion(self) -> None:
+        """Re-enable completion refreshes after a temporary navigation pause."""
+
+        self._prompt_completion_temporarily_disabled = False
+
+    def _refresh_prompt_completion_records(self) -> None:
+        """Reload user-callable prompt names for the completion popup."""
+
+        self._prompt_completion_records = self.agent_prompts_catalog.list_prompts(include_internal=False)
+
+    def _prompt_completion_enabled(self) -> bool:
+        """Return whether `/prompt` completion should be active in the current chat."""
+
+        if self.current_chat_idx < 0 or self.current_chat_idx >= len(self.chat_list):
+            return False
+        analysis_type = str(self.chat_list[self.current_chat_idx][2] if self.chat_list[self.current_chat_idx][2] is not None else '')
+        return self._is_agent_chat_type(analysis_type)
+
+    def _current_prompt_completion_context(self) -> Optional[Dict[str, Any]]:
+        """Describe the active `/prompt` token at the caret, if any."""
+
+        if not self._prompt_completion_enabled():
+            return None
+        editor = self.ui.plainTextEdit_question
+        cursor = editor.textCursor()
+        caret_pos = cursor.position()
+        text = editor.toPlainText()
+        if caret_pos < 0 or caret_pos > len(text):
+            return None
+
+        token_start = caret_pos
+        while token_start > 0 and not text[token_start - 1].isspace():
+            token_start -= 1
+
+        token_end = caret_pos
+        while token_end < len(text) and not text[token_end].isspace():
+            token_end += 1
+
+        if caret_pos != token_end:
+            return None
+
+        typed_token = text[token_start:caret_pos]
+        full_token = text[token_start:token_end]
+        if not typed_token.startswith('/') or not full_token.startswith('/'):
+            return None
+        if token_start > 0 and not text[token_start - 1].isspace():
+            return None
+
+        return {
+            "start": token_start,
+            "end": token_end,
+            "typed": typed_token,
+        }
+
+    def _matching_prompt_records(self, prefix: str) -> List[AgentPromptRecord]:
+        """Return prompts that match the currently typed `/prompt` prefix."""
+
+        normalized_prefix = str(prefix if prefix is not None else '').casefold()
+        self._refresh_prompt_completion_records()
+        return [
+            prompt
+            for prompt in self._prompt_completion_records
+            if ('/' + prompt.name).casefold().startswith(normalized_prefix)
+        ]
+
+    def _completion_item_text(self, item: Optional[QtWidgets.QListWidgetItem]) -> str:
+        if item is None:
+            return ''
+        data = item.data(Qt.ItemDataRole.UserRole)
+        if data is None:
+            return str(item.text() if item.text() is not None else '')
+        return str(data)
+
+    def _show_prompt_completion_popup(self, matches: List[AgentPromptRecord]) -> None:
+        """Render the current match list below the input caret."""
+
+        popup = self._prompt_completion_popup
+        with QtCore.QSignalBlocker(popup):
+            popup.clear()
+            for prompt in matches:
+                item = QtWidgets.QListWidgetItem('/' + prompt.name)
+                item.setData(Qt.ItemDataRole.UserRole, '/' + prompt.name)
+                tooltip_lines = []
+                if prompt.description != '':
+                    tooltip_lines.append(_('Prompt description: ') + prompt.description)
+                tooltip_lines.append(f'[{prompt.scope}]')
+                item.setToolTip('\n'.join(tooltip_lines))
+                popup.addItem(item)
+            if popup.count() > 0:
+                popup.setCurrentRow(0)
+
+        cursor_rect = self.ui.plainTextEdit_question.cursorRect()
+        popup_pos = self.ui.plainTextEdit_question.viewport().mapTo(
+            self,
+            cursor_rect.bottomLeft(),
+        )
+        visible_rows = min(max(1, popup.count()), 8)
+        width = max(
+            240,
+            popup.sizeHintForColumn(0) + popup.frameWidth() * 2 + 24,
+        )
+        row_height = popup.sizeHintForRow(0)
+        if row_height <= 0:
+            row_height = popup.fontMetrics().height() + 8
+        height = popup.frameWidth() * 2 + row_height * visible_rows + 4
+        popup.resize(width, height)
+        popup.move(popup_pos)
+        popup.show()
+        popup.raise_()
+        self.ui.plainTextEdit_question.setFocus(Qt.FocusReason.OtherFocusReason)
+
+    def _hide_prompt_completion_popup(self, accept: bool = False) -> None:
+        """Hide the completion popup without changing inline state."""
+
+        popup = self._prompt_completion_popup
+        if popup.isVisible():
+            self._prompt_completion_accepting = accept
+            popup.hide()
+            self._prompt_completion_accepting = False
+        with QtCore.QSignalBlocker(popup):
+            popup.clear()
+
+    def _discard_inline_prompt_completion(self) -> bool:
+        """Remove the transient inline completion suffix if it is still present."""
+
+        state = self._prompt_inline_completion
+        self._prompt_inline_completion = None
+        if not state:
+            return False
+
+        suffix = str(state.get("suffix", ""))
+        start = int(state.get("start", -1))
+        end = int(state.get("end", -1))
+        editor = self.ui.plainTextEdit_question
+        current_text = editor.toPlainText()
+        if suffix == '' or start < 0 or end < start or end > len(current_text):
+            return False
+        if current_text[start:end] != suffix:
+            return False
+
+        cursor = editor.textCursor()
+        cursor.setPosition(start)
+        cursor.setPosition(end, QtGui.QTextCursor.MoveMode.KeepAnchor)
+        if cursor.selectedText() != suffix:
+            return False
+        cursor.removeSelectedText()
+        editor.setTextCursor(cursor)
+        return True
+
+    def _preview_prompt_completion(self, completion_text: str, context: Dict[str, Any]) -> None:
+        """Insert the suggested suffix as selected text so typing can overwrite it."""
+
+        typed = str(context.get("typed", ""))
+        if len(typed) <= 1:
+            self._prompt_inline_completion = None
+            return
+        if not completion_text.startswith(typed):
+            self._prompt_inline_completion = None
+            return
+
+        suffix = completion_text[len(typed):]
+        if suffix == '':
+            self._prompt_inline_completion = None
+            return
+
+        editor = self.ui.plainTextEdit_question
+        cursor = editor.textCursor()
+        insert_start = cursor.position()
+        cursor.insertText(suffix)
+        cursor.setPosition(insert_start)
+        cursor.setPosition(insert_start + len(suffix), QtGui.QTextCursor.MoveMode.KeepAnchor)
+        editor.setTextCursor(cursor)
+        self._prompt_inline_completion = {
+            "start": insert_start,
+            "end": insert_start + len(suffix),
+            "suffix": suffix,
+        }
+
+    def _accept_prompt_completion(self) -> bool:
+        """Commit the current completion selection into the editor."""
+
+        item = self._prompt_completion_popup.currentItem()
+        completion_text = self._completion_item_text(item)
+        if completion_text == '':
+            return False
+
+        context = self._current_prompt_completion_context()
+        if self._prompt_inline_completion is not None:
+            state = self._prompt_inline_completion
+            self._prompt_inline_completion = None
+            cursor = self.ui.plainTextEdit_question.textCursor()
+            cursor.setPosition(int(state.get("end", cursor.position())))
+            cursor.clearSelection()
+            self.ui.plainTextEdit_question.setTextCursor(cursor)
+            self._hide_prompt_completion_popup(accept=True)
+            return True
+
+        if context is None:
+            return False
+
+        cursor = self.ui.plainTextEdit_question.textCursor()
+        cursor.setPosition(int(context["start"]))
+        cursor.setPosition(int(context["end"]), QtGui.QTextCursor.MoveMode.KeepAnchor)
+        cursor.insertText(completion_text)
+        self.ui.plainTextEdit_question.setTextCursor(cursor)
+        self._hide_prompt_completion_popup(accept=True)
+        return True
+
+    def _dismiss_prompt_completion(self, accept: bool = False) -> None:
+        """Close prompt completion and either keep or discard the inline suggestion."""
+
+        if accept:
+            self._accept_prompt_completion()
+            return
+        if self._prompt_completion_guard:
+            return
+        self._prompt_completion_guard = True
+        try:
+            self._hide_prompt_completion_popup(accept=False)
+            self._discard_inline_prompt_completion()
+        finally:
+            self._prompt_completion_guard = False
+
+    def _move_prompt_completion_selection(self, step: int) -> bool:
+        """Move the highlighted completion popup row."""
+
+        popup = self._prompt_completion_popup
+        if not popup.isVisible() or popup.count() == 0:
+            return False
+        current_row = popup.currentRow()
+        if current_row < 0:
+            current_row = 0
+        new_row = max(0, min(popup.count() - 1, current_row + step))
+        if new_row == current_row:
+            return True
+        popup.setCurrentRow(new_row)
+        return True
+
+    def _sync_prompt_completion(self) -> None:
+        """Refresh popup filtering and inline preview after text/caret changes."""
+
+        if self._prompt_completion_guard:
+            return
+        if self._prompt_completion_temporarily_disabled:
+            return
+        if not self._prompt_completion_enabled():
+            self._dismiss_prompt_completion(accept=False)
+            return
+
+        self._prompt_completion_guard = True
+        try:
+            self._discard_inline_prompt_completion()
+            context = self._current_prompt_completion_context()
+            if context is None:
+                self._hide_prompt_completion_popup(accept=False)
+                return
+
+            matches = self._matching_prompt_records(context.get("typed", ""))
+            if len(matches) == 0:
+                self._hide_prompt_completion_popup(accept=False)
+                return
+
+            self._show_prompt_completion_popup(matches)
+            self._preview_prompt_completion('/' + matches[0].name, context)
+        finally:
+            self._prompt_completion_guard = False
+
+    def _prompt_completion_current_item_changed(self, current, previous) -> None:
+        """Update the inline preview when the highlighted popup row changes."""
+
+        del previous
+        if self._prompt_completion_guard or current is None:
+            return
+        context = self._current_prompt_completion_context()
+        completion_text = self._completion_item_text(current)
+        if context is None or completion_text == '':
+            return
+
+        self._prompt_completion_guard = True
+        try:
+            self._discard_inline_prompt_completion()
+            context = self._current_prompt_completion_context()
+            if context is None:
+                return
+            self._preview_prompt_completion(completion_text, context)
+        finally:
+            self._prompt_completion_guard = False
+
+    def _prompt_completion_item_clicked(self, item) -> None:
+        del item
+        self._accept_prompt_completion()
+
+    def _prompt_completion_item_entered(self, item) -> None:
+        if item is not None:
+            self._prompt_completion_popup.setCurrentItem(item)
+
+    def _prompt_completion_popup_hidden(self) -> None:
+        """Discard transient inline text when the popup disappears unexpectedly."""
+
+        if self._prompt_completion_accepting or self._prompt_completion_guard:
+            return
+        self._dismiss_prompt_completion(accept=False)
+
     def init_styles(self):
         """Set up the stylesheets for the ui and the chat entries
         """
@@ -282,6 +649,7 @@ class DialogAIChat(QtWidgets.QDialog):
                 background-color: {self.app.highlight_color()};
             }}
         """)
+        self._prompt_completion_popup.setFont(self.ui.plainTextEdit_question.font())
         self.ui.pushButton_help.setIcon(qta.icon('mdi6.help'))
         self.ui.pushButton_help.setFixedHeight(self.ui.pushButton_delete.height())
         self.ui.pushButton_help.setFixedWidth(self.ui.pushButton_help.height())
@@ -1830,6 +2198,7 @@ data collected. This information will accompany every prompt sent to the AI, res
         self.ui.treeView_chat_list.setCurrentIndex(index)
 
     def chat_list_selection_changed(self, selected=None, deselected=None, force_update=False):
+        self._dismiss_prompt_completion(accept=False)
         current_row = self._chat_list_current_row()
         with QtCore.QSignalBlocker(self.ui.comboBox_ai_chats):
             self.ui.comboBox_ai_chats.setCurrentIndex(current_row)
@@ -2312,6 +2681,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             Message(self.app, _('AI not ready'), msg, "warning").exec()
             return
         self.ai_output_autoscroll = True
+        self._dismiss_prompt_completion(accept=False)
         q = self.ui.plainTextEdit_question.toPlainText()
         if q != '':
             if self.process_message('user', q):
@@ -4165,13 +4535,61 @@ data collected. This information will accompany every prompt sent to the AI, res
             self.process_message('info', fallback, self.current_streaming_chat_idx)
     
     def eventFilter(self, source, event):
-        # Check if the event is a KeyPress, source is the lineEdit, and the key is Enter
-        if (event.type() == QEvent.Type.KeyPress and source is self.ui.plainTextEdit_question and
-            (event.key() == Qt.Key.Key_Return or event.key() == Qt.Key.Key_Enter)):
+        editor = self.ui.plainTextEdit_question
+        editor_viewport = editor.viewport()
+
+        if source in (editor, editor_viewport) and event.type() == QEvent.Type.MouseButtonPress:
+            if self._prompt_completion_popup.isVisible() or self._prompt_inline_completion is not None:
+                click_pos = None
+                try:
+                    click_pos = event.position().toPoint()
+                except Exception:
+                    click_pos = None
+                if click_pos is not None and source is editor:
+                    click_pos = editor_viewport.mapFrom(editor, click_pos)
+                self._suspend_prompt_completion_temporarily()
+                self._dismiss_prompt_completion(accept=False)
+                if click_pos is not None:
+                    cursor = editor.cursorForPosition(click_pos)
+                    editor.setTextCursor(cursor)
+                    editor.setFocus(Qt.FocusReason.MouseFocusReason)
+                    return True
+            return super().eventFilter(source, event)
+
+        if event.type() == QEvent.Type.KeyPress and source is self.ui.plainTextEdit_question:
+            if event.key() in (
+                Qt.Key.Key_Backspace,
+                Qt.Key.Key_Delete,
+                Qt.Key.Key_Left,
+                Qt.Key.Key_Right,
+                Qt.Key.Key_Home,
+                Qt.Key.Key_End,
+            ):
+                if self._prompt_completion_popup.isVisible() or self._prompt_inline_completion is not None:
+                    self._suspend_prompt_completion_temporarily()
+                    self._dismiss_prompt_completion(accept=False)
+                return super().eventFilter(source, event)
+
+            if self._prompt_completion_popup.isVisible():
+                if event.key() == Qt.Key.Key_Down:
+                    if self._move_prompt_completion_selection(1):
+                        return True
+                elif event.key() == Qt.Key.Key_Up:
+                    if self._move_prompt_completion_selection(-1):
+                        return True
+                elif event.key() in (Qt.Key.Key_Tab, Qt.Key.Key_Return, Qt.Key.Key_Enter):
+                    if not event.modifiers() & Qt.KeyboardModifier.ShiftModifier:
+                        if self._accept_prompt_completion():
+                            return True
+                elif event.key() == Qt.Key.Key_Escape:
+                    self._dismiss_prompt_completion(accept=False)
+                    return True
+
             # Shift + Return/Enter creates a new line. Just pressing Return/Enter sends the question to the AI:
-            if not event.modifiers() & Qt.KeyboardModifier.ShiftModifier:
-                self.send_user_question()
-                return True  # Event handled
+            if event.key() in (Qt.Key.Key_Return, Qt.Key.Key_Enter):
+                if not event.modifiers() & Qt.KeyboardModifier.ShiftModifier:
+                    self.send_user_question()
+                    return True  # Event handled
         # For all other cases, return super's eventFilter result
         return super().eventFilter(source, event)
     
