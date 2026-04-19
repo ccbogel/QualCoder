@@ -41,7 +41,11 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
     """ Display all coded media for this code, in a modal dialog.
     Coded media comes from ALL files for this coder.
     Need to store textedit start and end positions so that code in context can be used.
-    Called from code_text, code_av, code_image.
+    Called from:
+        DialogCodeText, DialogCodeImage, DialogCodePdf
+        DialogCodeAV, DialogReportCodeFrequencies,
+        DialogReportCoderComparisons, DialogReportCodeSummary,
+        DialogReportExactTextMatches, DialogCodesBySegments
     """
 
     def __init__(self, app, code_dict, case_or_file="File"):
