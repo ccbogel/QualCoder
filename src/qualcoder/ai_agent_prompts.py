@@ -72,13 +72,13 @@ class AiAgentPromptsCatalog:
             return prompts
         return [item for item in prompts if not item.is_internal]
 
-    def get_prompt(self, name: str) -> Optional[AgentPromptRecord]:
+    def get_prompt(self, name: str, include_internal: bool = False) -> Optional[AgentPromptRecord]:
         """Resolve one explicit user-callable prompt by exact filename match."""
 
         query = str(name if name is not None else "").strip()
         if query == "":
             return None
-        for prompt in self.list_prompts(include_internal=False):
+        for prompt in self.list_prompts(include_internal=include_internal):
             if prompt.name == query:
                 return prompt
         return None
@@ -94,23 +94,30 @@ class AiAgentPromptsCatalog:
                 return prompt
         return None
 
-    def extract_prompt_references(self, text: str) -> List[AgentPromptRecord]:
+    def extract_prompt_references(self, text: str, include_internal: bool = False) -> List[AgentPromptRecord]:
         """Return prompts referenced via exact `/name` tokens in one chat message."""
 
         resolved: List[AgentPromptRecord] = []
-        for candidate in self._extract_prompt_names(text):
-            prompt = self.get_prompt(candidate)
+        for candidate in self._extract_prompt_names(text, include_internal=include_internal):
+            prompt = self.get_prompt(candidate, include_internal=include_internal)
             if prompt is None:
                 continue
             resolved.append(prompt)
         return resolved
 
-    def resolve_prompt_references(self, text: str) -> List[AgentPromptRecord]:
+    def resolve_prompt_references(self, text: str, include_internal: bool = False) -> List[AgentPromptRecord]:
         """Return direct and nested prompt references with stable de-duplicated ordering."""
 
-        return self.expand_prompt_references(self.extract_prompt_references(text))
+        return self.expand_prompt_references(
+            self.extract_prompt_references(text, include_internal=include_internal),
+            include_internal=include_internal,
+        )
 
-    def expand_prompt_references(self, prompts: List[AgentPromptRecord]) -> List[AgentPromptRecord]:
+    def expand_prompt_references(
+        self,
+        prompts: List[AgentPromptRecord],
+        include_internal: bool = False,
+    ) -> List[AgentPromptRecord]:
         """Expand nested prompt references so each resolved prompt appears at most once."""
 
         ordered: List[AgentPromptRecord] = []
@@ -126,7 +133,7 @@ class AiAgentPromptsCatalog:
                 return
 
             visiting.add(key)
-            for nested_prompt in self.extract_prompt_references(prompt.content):
+            for nested_prompt in self.extract_prompt_references(prompt.content, include_internal=include_internal):
                 visit(nested_prompt)
             visiting.remove(key)
 
@@ -199,7 +206,7 @@ class AiAgentPromptsCatalog:
         except OSError:
             return None
 
-    def _extract_prompt_names(self, text: str) -> List[str]:
+    def _extract_prompt_names(self, text: str, include_internal: bool = False) -> List[str]:
         source_text = str(text if text is not None else "")
         if source_text.strip() == "":
             return []
@@ -208,7 +215,9 @@ class AiAgentPromptsCatalog:
         result: List[str] = []
         for match in PROMPT_REFERENCE_PATTERN.finditer(source_text):
             candidate = str(match.group(1) if match is not None else "").strip()
-            if candidate == "" or candidate.startswith("_"):
+            if candidate == "":
+                continue
+            if candidate.startswith("_") and not include_internal:
                 continue
             conflict_key = self._conflict_key(candidate)
             if conflict_key == "" or conflict_key in seen:

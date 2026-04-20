@@ -53,3 +53,19 @@ class TestAiAgentPromptsCatalog(TestCase):
         prompts = self.catalog.resolve_prompt_references("/a")
 
         self.assertEqual(["b", "a"], [prompt.name for prompt in prompts])
+
+    def test_resolve_prompt_references_can_include_internal_prompts_when_enabled(self):
+        self._write_prompt("system", "_agent", "/_shared\n/base\nAgent")
+        self._write_prompt("system", "_shared", "Internal")
+        self._write_prompt("system", "base", "Public")
+
+        prompts = self.catalog.resolve_prompt_references("/_agent", include_internal=True)
+
+        self.assertEqual(["_shared", "base", "_agent"], [prompt.name for prompt in prompts])
+
+    def test_resolve_prompt_references_excludes_internal_prompts_by_default(self):
+        self._write_prompt("system", "_shared", "Internal")
+
+        prompts = self.catalog.resolve_prompt_references("/_shared")
+
+        self.assertEqual([], prompts)

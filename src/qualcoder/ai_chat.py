@@ -1318,26 +1318,58 @@ class DialogAIChat(QtWidgets.QDialog):
 
         return re.sub(r"\{\{([A-Z0-9_]+)\}\}", replace_placeholder, content)
 
-    def _load_internal_agent_prompt_content(self, prompt_name: str) -> str:
-        """Load one internal agent prompt by exact prompt filename."""
+    def _render_base_agent_prompt_record(self, prompt: AgentPromptRecord) -> str:
+        """Render prompt content for inclusion in the rebuilt agent base system prompt."""
 
-        prompt = self.agent_prompts_catalog.get_internal_prompt(prompt_name)
-        if prompt is None:
+        content = str(prompt.content if prompt.content is not None else "").strip()
+        if content == "":
             return ""
-        return self._render_agent_prompt_content(prompt.content)
+        if prompt.is_internal:
+            return self._render_agent_prompt_content(content)
+        return content
+
+    def _collect_agent_base_prompt_context(self) -> Tuple[str, set[str]]:
+        """Build the current agent base prompt and track which prompts it already includes."""
+
+        sections: List[str] = []
+        included_prompt_keys: set[str] = set()
+
+        base_prompt = self.agent_prompts_catalog.get_internal_prompt(self._agent_base_prompt_name())
+        if base_prompt is not None:
+            for prompt in self.agent_prompts_catalog.expand_prompt_references([base_prompt], include_internal=True):
+                prompt_key = str(prompt.name if prompt.name is not None else "").strip().casefold()
+                if prompt_key == "" or prompt_key in included_prompt_keys:
+                    continue
+                included_prompt_keys.add(prompt_key)
+                prompt_text = self._render_base_agent_prompt_record(prompt)
+                if prompt_text != "":
+                    sections.append(prompt_text)
+
+        project_memo = extract_ai_memo(self.app.get_project_memo())
+        if self.app.settings.get('ai_send_project_memo', 'True') == 'True' and len(project_memo) > 0:
+            for prompt in self.agent_prompts_catalog.resolve_prompt_references(project_memo):
+                prompt_key = str(prompt.name if prompt.name is not None else "").strip().casefold()
+                if prompt_key == "" or prompt_key in included_prompt_keys:
+                    continue
+                included_prompt_keys.add(prompt_key)
+                prompt_text = self._render_base_agent_prompt_record(prompt)
+                if prompt_text != "":
+                    sections.append(prompt_text)
+
+            sections.append(
+                '# Information about the current project\n\n'
+                'Here is some background information about the research project the team is working on:\n'
+                + project_memo
+            )
+
+        return '\n\n'.join(section for section in sections if section != ""), included_prompt_keys
 
     def _general_chat_base_system_prompt(self) -> str:
         """Build the base system prompt for the AI agent chat from _agent.md + project memo."""
 
-        base_prompt = self._load_internal_agent_prompt_content(self._agent_base_prompt_name())
+        base_prompt, _ = self._collect_agent_base_prompt_context()
         if base_prompt == "":
             return self.app.ai.get_default_system_prompt()
-
-        project_memo = extract_ai_memo(self.app.get_project_memo())
-        if self.app.settings.get('ai_send_project_memo', 'True') == 'True' and len(project_memo) > 0:
-            base_prompt += '\n\n# Information about the current project\n\n'
-            base_prompt += 'Here is some background information about the research project the team is working on:\n'
-            base_prompt += project_memo
         return base_prompt
 
     def _mcp_base_system_prompt(self) -> str:
@@ -1377,6 +1409,10 @@ class DialogAIChat(QtWidgets.QDialog):
         if len(prompts) == 0:
             return []
 
+        base_prompt_keys: set[str] = set()
+        if 0 <= chat_idx < len(self.chat_list) and self._is_agent_chat_type(self.chat_list[chat_idx][2]):
+            _, base_prompt_keys = self._collect_agent_base_prompt_context()
+
         latest_prompt_content: Dict[str, str] = {}
         for msg in reversed(self.chat_msg_list):
             if len(msg) < 5 or str(msg[2]) != 'prompt':
@@ -1388,6 +1424,9 @@ class DialogAIChat(QtWidgets.QDialog):
 
         loaded_prompts: List[AgentPromptRecord] = []
         for prompt in prompts:
+            prompt_key = str(prompt.name if prompt.name is not None else '').strip().casefold()
+            if prompt_key == '' or prompt_key in base_prompt_keys:
+                continue
             prompt_message = self._build_turn_prompt_message(prompt)
             if latest_prompt_content.get(prompt.name, None) == prompt_message:
                 continue
@@ -2448,6 +2487,12 @@ data collected. This information will accompany every prompt sent to the AI, res
         messages = []
         latest_agent_state_id = -1
         latest_prompt_ids: Dict[str, int] = {}
+        base_prompt_keys: set[str] = set()
+        analysis_type = ''
+        if 0 <= self.current_chat_idx < len(self.chat_list):
+            analysis_type = str(self.chat_list[self.current_chat_idx][2])
+        if self._is_agent_chat_type(analysis_type):
+            _, base_prompt_keys = self._collect_agent_base_prompt_context()
         for msg in self.chat_msg_list:
             if msg[2] == 'agent_state':
                 try:
@@ -2459,6 +2504,8 @@ data collected. This information will accompany every prompt sent to the AI, res
             elif msg[2] == 'prompt':
                 prompt_name = str(msg[3] if msg[3] is not None else '').strip()
                 if prompt_name == '':
+                    continue
+                if prompt_name.casefold() in base_prompt_keys:
                     continue
                 try:
                     msg_id = int(msg[0])
@@ -2476,6 +2523,8 @@ data collected. This information will accompany every prompt sent to the AI, res
             elif msg[2] == 'prompt':
                 prompt_name = str(msg[3] if msg[3] is not None else '').strip()
                 if prompt_name == '':
+                    continue
+                if prompt_name.casefold() in base_prompt_keys:
                     continue
                 try:
                     msg_id = int(msg[0])
