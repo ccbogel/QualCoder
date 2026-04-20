@@ -1264,6 +1264,7 @@ class DialogAIChat(QtWidgets.QDialog):
         template_context = {
             "CURRENT_DATE": datetime.now().date().isoformat(),
             "AI_PERMISSIONS": self._ai_permissions_label(),
+            "AI_LANGUAGE": self.app.ai.get_curr_language(),
         }
 
         def replace_placeholder(match: re.Match) -> str:
