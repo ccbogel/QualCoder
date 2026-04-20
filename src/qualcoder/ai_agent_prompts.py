@@ -16,12 +16,14 @@ through explicit user prompt references.
 from __future__ import annotations
 
 from dataclasses import dataclass
+import logging
 import os
 import re
 from typing import Dict, List, Optional, Tuple
 
 
 PROMPT_REFERENCE_PATTERN = re.compile(r"(?<!\S)/(\S+)")
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -95,22 +97,46 @@ class AiAgentPromptsCatalog:
     def extract_prompt_references(self, text: str) -> List[AgentPromptRecord]:
         """Return prompts referenced via exact `/name` tokens in one chat message."""
 
-        source_text = str(text if text is not None else "")
-        if source_text.strip() == "":
-            return []
-
-        seen: set[str] = set()
         resolved: List[AgentPromptRecord] = []
-        for match in PROMPT_REFERENCE_PATTERN.finditer(source_text):
-            candidate = str(match.group(1) if match is not None else "").strip()
-            if candidate == "" or candidate.startswith("_") or candidate in seen:
-                continue
+        for candidate in self._extract_prompt_names(text):
             prompt = self.get_prompt(candidate)
             if prompt is None:
                 continue
-            seen.add(candidate)
             resolved.append(prompt)
         return resolved
+
+    def resolve_prompt_references(self, text: str) -> List[AgentPromptRecord]:
+        """Return direct and nested prompt references with stable de-duplicated ordering."""
+
+        return self.expand_prompt_references(self.extract_prompt_references(text))
+
+    def expand_prompt_references(self, prompts: List[AgentPromptRecord]) -> List[AgentPromptRecord]:
+        """Expand nested prompt references so each resolved prompt appears at most once."""
+
+        ordered: List[AgentPromptRecord] = []
+        resolved: set[str] = set()
+        visiting: set[str] = set()
+
+        def visit(prompt: AgentPromptRecord) -> None:
+            key = self._conflict_key(prompt.name)
+            if key == "" or key in resolved:
+                return
+            if key in visiting:
+                logger.warning("Detected cyclic AI prompt reference involving '/%s'", prompt.name)
+                return
+
+            visiting.add(key)
+            for nested_prompt in self.extract_prompt_references(prompt.content):
+                visit(nested_prompt)
+            visiting.remove(key)
+
+            resolved.add(key)
+            ordered.append(prompt)
+
+        for prompt in prompts:
+            visit(prompt)
+
+        return ordered
 
     def _prompt_roots(self) -> List[Tuple[str, str]]:
         roots: List[Tuple[str, str]] = []
@@ -172,6 +198,24 @@ class AiAgentPromptsCatalog:
                 return handle.read()
         except OSError:
             return None
+
+    def _extract_prompt_names(self, text: str) -> List[str]:
+        source_text = str(text if text is not None else "")
+        if source_text.strip() == "":
+            return []
+
+        seen: set[str] = set()
+        result: List[str] = []
+        for match in PROMPT_REFERENCE_PATTERN.finditer(source_text):
+            candidate = str(match.group(1) if match is not None else "").strip()
+            if candidate == "" or candidate.startswith("_"):
+                continue
+            conflict_key = self._conflict_key(candidate)
+            if conflict_key == "" or conflict_key in seen:
+                continue
+            seen.add(conflict_key)
+            result.append(candidate)
+        return result
 
     def _infer_description(self, body: str) -> str:
         text = str(body if body is not None else "")

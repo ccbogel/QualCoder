@@ -1356,7 +1356,7 @@ class DialogAIChat(QtWidgets.QDialog):
     def _resolve_turn_agent_prompts(self, user_message: str) -> List[AgentPromptRecord]:
         """Resolve explicit `/name` prompt references from one user message."""
 
-        return self.agent_prompts_catalog.extract_prompt_references(user_message)
+        return self.agent_prompts_catalog.resolve_prompt_references(user_message)
 
     def _build_turn_prompt_message(self, prompt: AgentPromptRecord) -> str:
         """Format one loaded explicit prompt as persistent supplemental instructions."""
