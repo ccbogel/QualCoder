@@ -1255,6 +1255,51 @@ class DialogAIChat(QtWidgets.QDialog):
         )
         self.process_message('env_update', content, self.current_chat_idx)
 
+    def _log_agent_env_update(self, content: str, chat_idx=None) -> None:
+        """Persist one hidden synthetic environment event for agent chats."""
+
+        if chat_idx is None:
+            chat_idx = self.current_chat_idx
+        if chat_idx is None or chat_idx < 0 or chat_idx >= len(self.chat_list):
+            return
+        analysis_type = str(self.chat_list[chat_idx][2])
+        if not self._is_agent_chat_type(analysis_type):
+            return
+        event_text = str(content if content is not None else '').strip()
+        if event_text == '':
+            return
+
+        curr_chat_id = self.chat_list[chat_idx][0]
+        cursor = self.chat_history_conn.cursor()
+        cursor.execute(
+            "SELECT msg_author, msg_content FROM chat_messages "
+            "WHERE chat_id=? AND msg_type='env_update' ORDER BY id DESC LIMIT 1",
+            (curr_chat_id,),
+        )
+        row = cursor.fetchone()
+        if row is not None:
+            prev_author = '' if row[0] is None else str(row[0])
+            prev_content = '' if row[1] is None else str(row[1]).strip()
+            if prev_author == 'system_event' and prev_content == event_text:
+                return
+
+        self.process_message('env_update', event_text, chat_idx)
+
+    def _log_chat_canceled_env_update(self, chat_idx=None, partial_response: bool = False) -> None:
+        """Persist one hidden event stating that the previous assistant turn was canceled."""
+
+        if partial_response:
+            content = _(
+                'System event: The previous assistant turn was canceled by the user before completion. '
+                'If a partial assistant response is present in the conversation, treat it as unfinished unless '
+                'the user asks you to continue it.'
+            )
+        else:
+            content = _(
+                'System event: The previous assistant turn was canceled by the user before completion and did not finish.'
+            )
+        self._log_agent_env_update(content, chat_idx)
+
     def _render_agent_prompt_content(self, content: str) -> str:
         """Replace supported runtime placeholders in the internal agent prompt."""
 
@@ -1570,6 +1615,7 @@ data collected. This information will accompany every prompt sent to the AI, res
         if chat_idx is None:
             chat_idx = self.current_chat_idx
         if self._chat_scope_status(chat_idx) == 'canceled':
+            self._log_chat_canceled_env_update(chat_idx, partial_response=False)
             self.process_message('info', _('Chat has been canceled by the user.'), chat_idx)
             if chat_idx == self.current_chat_idx:
                 self.update_chat_window()
@@ -4368,6 +4414,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             return
 
         if mcp_result.get("canceled", False):
+            self._log_chat_canceled_env_update(chat_idx, partial_response=False)
             self.process_message('info', _('Chat has been canceled by the user.'), chat_idx)
             self._update_undo_button_state()
             return
@@ -4474,6 +4521,8 @@ data collected. This information will accompany every prompt sent to the AI, res
         """
         chat_idx = self.current_streaming_chat_idx
         was_canceled = self._chat_scope_status(chat_idx) == 'canceled'
+        if was_canceled:
+            self._log_chat_canceled_env_update(chat_idx, partial_response=(ai_result != ''))
         self.ai_streaming_output = ''
         if ai_result != '':
             final_text = str(ai_result)
