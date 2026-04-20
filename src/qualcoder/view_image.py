@@ -1307,8 +1307,10 @@ class DialogCodeImage(QtWidgets.QDialog):
         action_add_code = menu.addAction(_("Add a new code"))
         action_add_category = menu.addAction(_("Add a new category"))
         action_expand_collapse = None
+        action_cat_show_coded_files = None
         if selected is not None and selected.text(1)[0:3] == 'cat':
             action_expand_collapse = menu.addAction(_("Expand or collapse branch"))
+            action_cat_show_coded_files = menu.addAction(_("Show coded files"))
         modify_menu = menu.addMenu(_("Modify"))
         action_rename = modify_menu.addAction(_("Rename F2"))
         action_edit_memo = modify_menu.addAction(_("View or edit memo"))
@@ -1319,7 +1321,7 @@ class DialogCodeImage(QtWidgets.QDialog):
         if selected is not None and selected.text(1)[0:3] == 'cid':
             action_color = modify_menu.addAction(_("Change code color"))
             action_move_code = modify_menu.addAction(_("Move code to"))
-            action_show_coded_media = menu.addAction(_("Show coded text and media"))
+            action_show_coded_media = menu.addAction(_("Show coded files"))
         action_find_code = menu.addAction(_("Find code"))
         filter_menu = menu.addMenu(_("Filter"))
         action_show_codes_like = filter_menu.addAction(_("Show codes like") + ": " + self.show_codes_like_filter)
@@ -1384,15 +1386,33 @@ class DialogCodeImage(QtWidgets.QDialog):
             self.add_edit_code_memo(selected)
         if selected is not None and action == action_delete:
             self.delete_category_or_code(selected)
+        if action == action_cat_show_coded_files:
+            branch_codes = self.recursive_get_branch_codes(selected, [])
+            self.coded_media_dialog(branch_codes)
+            return
         if selected is not None and action == action_show_coded_media:
-            found = None
             to_find = int(selected.text(1)[4:])
-            for code in self.codes:
-                if code['cid'] == to_find:
-                    found = code
-                    break
+            found = next((code for code in self.codes if code['cid'] == to_find), None)
             if found:
                 self.coded_media_dialog(found)
+            if found:
+                self.coded_media_dialog(found)
+
+    def recursive_get_branch_codes(self, item, branch_codes):
+        """ Set all children of this item to be expanded or collapsed.
+        Recurse through all child categories. """
+
+        child_count = item.childCount()
+        for i in range(child_count):
+            if item.child(i).text(1)[0:3] == "cid":
+                cid = int(item.child(i).text(1)[4:])
+                for code_ in self.codes:
+                    if cid == code_['cid']:
+                        branch_codes.append(code_)
+                        break
+            if item.child(i).text(1)[0:3] == "cat":
+                self.recursive_get_branch_codes(item.child(i), branch_codes)
+        return branch_codes
 
     def recursive_expand_collapse_branch(self, item, expand_toggle):
         """ Set all children of this item to be expanded or collapsed.

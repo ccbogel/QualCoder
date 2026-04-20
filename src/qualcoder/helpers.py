@@ -541,10 +541,17 @@ class DialogCodeInImage(QtWidgets.QDialog):
                 source_path = self.data['mediapath'][5:]
             fitz_pdf = fitz.open(source_path)  # Use pymupdf to get page images
             for page in fitz_pdf:
-                if page.number == data['pdf_page']:
-                    # Only need the current page image of interest
-                    pixmap = page.get_pixmap()
-                    pixmap.save(os.path.join(self.app.confighome, f"tmp_pdf_page.png"))
+                # TODO fix key error
+                try:
+                    if page.number == data['pdf_page']:
+                        # Only need the current page image of interest
+                        pixmap = page.get_pixmap()
+                        pixmap.save(os.path.join(self.app.confighome, f"tmp_pdf_page.png"))
+                except KeyError as err:
+                    msg = err + "\n" + "pdf iamge coding - pdf_page" + "\ndata:" + str(data)
+                    Message(self.app, "Known error to fix", msg).exec()
+                    print("Note: pdf_page", err, "\n", data)
+                    logger.error()
             source_path = os.path.join(self.app.confighome, f"tmp_pdf_page.png")
             image = QtGui.QImage(source_path)
 
