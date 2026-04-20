@@ -2582,7 +2582,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             "\"summary\": \"one short summary sentence\""
             "}\n"
             "Rules:\n"
-            f"- Write both fields in {language} unless the user message clearly requires another language.\n"
+            f"- Write both fields in {language}.\n"
             "- name must be specific, 2 to 8 words, and must not be a generic placeholder.\n"
             "- name must not contain quotes, line breaks, or ending punctuation.\n"
             "- summary must be one concise sentence, max 160 characters.\n"
