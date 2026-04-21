@@ -251,6 +251,10 @@ class DialogAIChat(QtWidgets.QDialog):
         self.ai_streaming_output = ''
         self.ai_stream_buffer = ""
         self.ai_stream_in_ref = False
+        self.ai_stream_render_pending = False
+        self.ai_stream_render_timer = QtCore.QTimer(self)
+        self.ai_stream_render_timer.setSingleShot(True)
+        self.ai_stream_render_timer.timeout.connect(self._flush_stream_render)
         self.curr_codings = None
         self.ai_search_code_name = None
         self.ai_search_code_memo = None
@@ -1125,6 +1129,7 @@ class DialogAIChat(QtWidgets.QDialog):
     def _clear_stream_preview_buffers(self):
         """Clear transient streamed-preview text without touching persisted chat history."""
 
+        self._cancel_pending_stream_render()
         self.ai_streaming_output = ''
         ai = getattr(self.app, 'ai', None)
         if ai is not None:
@@ -1132,6 +1137,31 @@ class DialogAIChat(QtWidgets.QDialog):
                 ai.ai_streaming_output = ''
             except Exception:
                 pass
+
+    def _schedule_stream_render(self):
+        """Coalesce streaming UI refreshes to avoid re-rendering on every chunk."""
+
+        self.ai_stream_render_pending = True
+        if not self.ai_stream_render_timer.isActive():
+            self.ai_stream_render_timer.start(300)
+
+    def _cancel_pending_stream_render(self):
+        """Cancel any deferred streaming UI refresh."""
+
+        self.ai_stream_render_pending = False
+        if self.ai_stream_render_timer.isActive():
+            self.ai_stream_render_timer.stop()
+
+    def _flush_stream_render(self):
+        """Apply one deferred streaming UI refresh."""
+
+        if not self.ai_stream_render_pending:
+            return
+        if self.is_updating_chat_window:
+            self.ai_stream_render_timer.start(300)
+            return
+        self.ai_stream_render_pending = False
+        self.update_chat_window()
 
     def _chat_scope_active(self, chat_idx=None) -> bool:
         if chat_idx is None:
@@ -2044,7 +2074,7 @@ data collected. This information will accompany every prompt sent to the AI, res
         if self.current_chat_idx > -1:
             self.is_updating_chat_window = True
             try:
-                html = ''
+                html_parts = []
                 self.ui.plainTextEdit_question.setEnabled(True)
                 self.ui.pushButton_question.setEnabled(True)
                 chat = self.chat_list[self.current_chat_idx]
@@ -2074,28 +2104,31 @@ data collected. This information will accompany every prompt sent to the AI, res
                         self.ai_text_start_pos = None
                         self.ai_text_doc_name = None   
                         self.ai_text_text = ''                   
-                            
-                self.ui.ai_output.setText('')  # Clear chat window
+
                 # Show title
-                html += f'<h1 style={self.ai_info_style}>{self._display_chat_name(name, analysis_type)}</h1>'
+                html_parts.append(f'<h1 style={self.ai_info_style}>{self._display_chat_name(name, analysis_type)}</h1>')
                 summary_br = summary.replace('\n', '<br />')
                 display_type = self._display_chat_type_label(analysis_type, preserve_legacy_general=True)
                 if not self._is_agent_chat_type(analysis_type):
-                    html += (f"<p style={self.ai_info_style}><b>{_('Type:')}</b> {display_type}<br /><b>{_('Summary:')}</b> {summary_br}<br /><b>{_('Date:')}</b> {date}<br /><b>{_('Prompt:')}</b> {analysis_prompt}</p>")
+                    html_parts.append(
+                        f"<p style={self.ai_info_style}><b>{_('Type:')}</b> {display_type}<br /><b>{_('Summary:')}</b> {summary_br}<br /><b>{_('Date:')}</b> {date}<br /><b>{_('Prompt:')}</b> {analysis_prompt}</p>"
+                    )
                 else:
-                    html += (f"<p style={self.ai_info_style}><b>{_('Type:')}</b> {display_type}<br /><b>{_('Summary:')}</b> {summary_br}<br /><b>{_('Date:')}</b> {date}</p>")
+                    html_parts.append(
+                        f"<p style={self.ai_info_style}><b>{_('Type:')}</b> {display_type}<br /><b>{_('Summary:')}</b> {summary_br}<br /><b>{_('Date:')}</b> {date}</p>"
+                    )
                 # Show chat messages:
                 agent_status_lines = []
                 agent_status_author = ''
 
                 def flush_agent_status_block():
-                    nonlocal html, agent_status_lines, agent_status_author
+                    nonlocal agent_status_lines, agent_status_author
                     if len(agent_status_lines) == 0:
                         return
                     # body = '<br />'.join(agent_status_lines)
                     body = "".join(agent_status_lines)
                     block = f'{self._ai_agent_heading_html(agent_status_author)}<ul>{body}</ul>'
-                    html += f'<p style={self.ai_status_style}>{block}</p>'
+                    html_parts.append(f'<p style={self.ai_status_style}>{block}</p>')
                     agent_status_lines = []
                     agent_status_author = ''
 
@@ -2140,16 +2173,16 @@ data collected. This information will accompany every prompt sent to the AI, res
                             author = 'unkown'
                         heading = f'{_("User")} ({author}):'
                         txt = f'{self._message_heading_html(heading)}{txt}'
-                        html += f'<p style={self.ai_user_style}>{txt}</p>'
+                        html_parts.append(f'<p style={self.ai_user_style}>{txt}</p>')
                     elif msg_type == 'ai':
                         txt = render_markdown_to_html(msg[4], hr_color=self.markdown_hr_color)
                         author = msg[3]
                         txt = f'{self._ai_agent_heading_html(author)}{txt}'
-                        html += f'<p style={self.ai_response_style}>{txt}</p>'
+                        html_parts.append(f'<p style={self.ai_response_style}>{txt}</p>')
                     elif msg_type == 'info':
                         txt = self._message_heading_html(_("Info:"))
                         txt += msg[4].replace('\n', '<br />')
-                        html += f'<p style={self.ai_info_style}>{txt}</p>'
+                        html_parts.append(f'<p style={self.ai_info_style}>{txt}</p>')
                 flush_agent_status_block()
                 # add partially streamed ai response if needed
                 if self.current_chat_idx == self.current_streaming_chat_idx and len(self.app.ai.ai_streaming_output) > 0:
@@ -2160,7 +2193,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                     txt = self.replace_references(txt, streaming=True)
                     txt = render_markdown_to_html(txt, hr_color=self.markdown_hr_color)
                     txt = f'{self._ai_agent_heading_html()}{txt}'
-                    html += f'<div style={self.ai_response_style}>{txt}</div>'
+                    html_parts.append(f'<div style={self.ai_response_style}>{txt}</div>')
                 elif not self._chat_scope_active(self.current_chat_idx): # streaming finished, add actions
                     actions_list = []
                     if analysis_type == 'topic chat':
@@ -2172,8 +2205,8 @@ data collected. This information will accompany every prompt sent to the AI, res
                         for action in actions_list:
                             actions_html += f'<td style="background-color: {button_color}">{action}</td>'
                         actions_html += '</tr></table>' 
-                        html += f'<p style={self.ai_actions_style}>{actions_html}</p>'
-                self.ui.ai_output.setText(html)
+                        html_parts.append(f'<p style={self.ai_actions_style}>{actions_html}</p>')
+                self.ui.ai_output.setText(''.join(html_parts))
             finally:
                 if scroll_to_bottom:
                     self.ai_output_scroll_to_bottom()
@@ -4560,7 +4593,7 @@ data collected. This information will accompany every prompt sent to the AI, res
         self._update_undo_button_state()
     
     def ai_streaming_callback(self, streamed_text):  # TODO streamed_text unused
-        self.update_chat_window()
+        self._schedule_stream_render()
 
     def ai_stream_process_reference(self, reference):
         '''Replace a reference to the empirical data woth a clicable link'''
@@ -4573,6 +4606,7 @@ data collected. This information will accompany every prompt sent to the AI, res
         """
         chat_idx = self.current_streaming_chat_idx
         was_canceled = self._chat_scope_status(chat_idx) == 'canceled'
+        self._cancel_pending_stream_render()
         if was_canceled:
             self._log_chat_canceled_env_update(chat_idx, partial_response=(ai_result != ''))
         self.ai_streaming_output = ''
@@ -4607,6 +4641,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             
     def ai_error_callback(self, exception_type, value, tb_obj):
         """Called if the AI returns an error"""
+        self._cancel_pending_stream_render()
         self.ai_streaming_output = ''
 
         def _safe_to_text(obj: object) -> str:
