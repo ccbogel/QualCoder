@@ -3,10 +3,14 @@
 """
 Agent prompt discovery for QualCoder AI chats.
 
-Prompts are stored as flat Markdown files in three scopes:
+Prompts are stored as Markdown files in three scopes:
 - system: src/qualcoder/ai_prompts
 - user:   <confighome>/ai_prompts
 - project:<project>/ai_data/ai_prompts
+
+Prompt names are their relative paths without the ``.md`` suffix, normalized to
+use forward slashes. For example ``code-analysis/code-critic.md`` becomes the
+explicit prompt reference ``/code-analysis/code-critic``.
 
 Conflicts are resolved by scope priority: project > user > system.
 Files beginning with "_" are treated as internal prompts and are not available
@@ -75,7 +79,7 @@ class AiAgentPromptsCatalog:
     def get_prompt(self, name: str, include_internal: bool = False) -> Optional[AgentPromptRecord]:
         """Resolve one explicit user-callable prompt by exact filename match."""
 
-        query = str(name if name is not None else "").strip()
+        query = self._normalize_prompt_name(name)
         if query == "":
             return None
         for prompt in self.list_prompts(include_internal=include_internal):
@@ -86,7 +90,7 @@ class AiAgentPromptsCatalog:
     def get_internal_prompt(self, name: str) -> Optional[AgentPromptRecord]:
         """Resolve one internal prompt by exact filename match."""
 
-        query = str(name if name is not None else "").strip()
+        query = self._normalize_prompt_name(name)
         if query == "":
             return None
         for prompt in self.list_prompts(include_internal=True):
@@ -168,36 +172,56 @@ class AiAgentPromptsCatalog:
 
         result: List[AgentPromptRecord] = []
         try:
-            filenames = sorted(os.listdir(root), key=lambda item: item.casefold())
+            entries = list(os.walk(root))
         except OSError:
             return []
 
-        for filename in filenames:
-            if not filename.lower().endswith(".md"):
-                continue
-            path = os.path.join(root, filename)
-            if not os.path.isfile(path):
-                continue
-            raw = self._read_text(path)
-            if raw is None:
-                continue
-            name = filename[:-3]
-            content = raw.strip()
-            result.append(
-                AgentPromptRecord(
-                    scope=scope,
-                    root_path=root,
-                    name=name,
-                    file_path=path,
-                    content=content,
-                    description=self._infer_description(content),
-                    is_internal=name.startswith("_"),
+        entries.sort(key=lambda item: os.path.relpath(item[0], root).casefold())
+        for dirpath, dirnames, filenames in entries:
+            dirnames.sort(key=lambda item: item.casefold())
+            filenames.sort(key=lambda item: item.casefold())
+            for filename in filenames:
+                if not filename.lower().endswith(".md"):
+                    continue
+                path = os.path.join(dirpath, filename)
+                if not os.path.isfile(path):
+                    continue
+                raw = self._read_text(path)
+                if raw is None:
+                    continue
+                rel_path = os.path.relpath(path, root)
+                name = self._normalize_prompt_name(rel_path[:-3])
+                if name == "":
+                    continue
+                content = raw.strip()
+                result.append(
+                    AgentPromptRecord(
+                        scope=scope,
+                        root_path=root,
+                        name=name,
+                        file_path=path,
+                        content=content,
+                        description=self._infer_description(content),
+                        is_internal=self._is_internal_prompt_name(name),
+                    )
                 )
-            )
         return result
 
     def _conflict_key(self, name: str) -> str:
-        return str(name if name is not None else "").strip().casefold()
+        return self._normalize_prompt_name(name).casefold()
+
+    def _normalize_prompt_name(self, name: str) -> str:
+        text = str(name if name is not None else "").strip()
+        if text == "":
+            return ""
+        parts = re.split(r"[\\/]+", text)
+        return "/".join(part for part in parts if part != "")
+
+    def _is_internal_prompt_name(self, name: str) -> bool:
+        normalized_name = self._normalize_prompt_name(name)
+        if normalized_name == "":
+            return False
+        return normalized_name.rsplit("/", 1)[-1].startswith("_")
 
     def _read_text(self, path: str) -> Optional[str]:
         try:
@@ -214,10 +238,10 @@ class AiAgentPromptsCatalog:
         seen: set[str] = set()
         result: List[str] = []
         for match in PROMPT_REFERENCE_PATTERN.finditer(source_text):
-            candidate = str(match.group(1) if match is not None else "").strip()
+            candidate = self._normalize_prompt_name(match.group(1) if match is not None else "")
             if candidate == "":
                 continue
-            if candidate.startswith("_") and not include_internal:
+            if self._is_internal_prompt_name(candidate) and not include_internal:
                 continue
             conflict_key = self._conflict_key(candidate)
             if conflict_key == "" or conflict_key in seen:

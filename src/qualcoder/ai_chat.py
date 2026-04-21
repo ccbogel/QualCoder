@@ -389,39 +389,175 @@ class DialogAIChat(QtWidgets.QDialog):
             "typed": typed_token,
         }
 
-    def _matching_prompt_records(self, prefix: str) -> List[AgentPromptRecord]:
-        """Return prompts that match the currently typed `/prompt` prefix."""
+    def _split_prompt_completion_query(self, typed: str) -> Tuple[str, str]:
+        """Split one `/prompt/path` token into parent path and typed leaf prefix."""
 
-        normalized_prefix = str(prefix if prefix is not None else '').casefold()
+        query = str(typed if typed is not None else '')
+        if query.startswith('/'):
+            query = query[1:]
+        query = query.replace('\\', '/')
+        if query.endswith('/'):
+            return query.rstrip('/'), ''
+        if '/' not in query:
+            return '', query
+        parent, leaf = query.rsplit('/', 1)
+        return parent, leaf
+
+    def _iter_prompt_completion_categories(self) -> List[str]:
+        """Return all category paths derived from the currently resolved prompts."""
+
+        categories: set[str] = set()
+        for prompt in self._prompt_completion_records:
+            parts = [part for part in prompt.name.split('/') if part != '']
+            for idx in range(1, len(parts)):
+                categories.add('/'.join(parts[:idx]))
+        return sorted(categories, key=lambda item: item.casefold())
+
+    def _is_direct_prompt_completion_child(self, full_name: str, parent: str) -> Optional[str]:
+        """Return the direct child name relative to `parent`, if any."""
+
+        normalized_full = str(full_name if full_name is not None else '').strip('/')
+        normalized_parent = str(parent if parent is not None else '').strip('/')
+        if normalized_full == '':
+            return None
+        if normalized_parent == '':
+            if '/' in normalized_full:
+                return None
+            return normalized_full
+        prefix = normalized_parent + '/'
+        if not normalized_full.startswith(prefix):
+            return None
+        remainder = normalized_full[len(prefix):]
+        if remainder == '' or '/' in remainder:
+            return None
+        return remainder
+
+    def _prompt_is_within_category(self, prompt_name: str, category: str) -> bool:
+        """Return whether one prompt belongs to the given category path."""
+
+        normalized_prompt = str(prompt_name if prompt_name is not None else '').strip('/')
+        normalized_category = str(category if category is not None else '').strip('/')
+        if normalized_prompt == '' or normalized_category == '':
+            return False
+        return normalized_prompt.startswith(normalized_category + '/')
+
+    def _matching_prompt_completion_items(self, prefix: str) -> List[Dict[str, Any]]:
+        """Return direct matching categories and prompts for the current token."""
+
         self._refresh_prompt_completion_records()
-        return [
-            prompt
-            for prompt in self._prompt_completion_records
-            if ('/' + prompt.name).casefold().startswith(normalized_prefix)
-        ]
+        parent, leaf = self._split_prompt_completion_query(prefix)
+        normalized_leaf = leaf.casefold()
+        items: List[Dict[str, Any]] = []
+        matched_categories: List[str] = []
 
-    def _completion_item_text(self, item: Optional[QtWidgets.QListWidgetItem]) -> str:
+        for category in self._iter_prompt_completion_categories():
+            child_name = self._is_direct_prompt_completion_child(category, parent)
+            if child_name is None or not child_name.casefold().startswith(normalized_leaf):
+                continue
+            full_insert = '/' + category + '/'
+            matched_categories.append(category)
+            items.append(
+                {
+                    "kind": "category",
+                    "display_text": child_name + '/',
+                    "insert_text": full_insert,
+                    "category_path": category,
+                    "sort_text": child_name.casefold(),
+                    "tooltip": _('Prompt category: ') + full_insert,
+                }
+            )
+
+        for prompt in self._prompt_completion_records:
+            child_name = self._is_direct_prompt_completion_child(prompt.name, parent)
+            if child_name is None or not child_name.casefold().startswith(normalized_leaf):
+                continue
+            tooltip_lines = []
+            if prompt.description != '':
+                tooltip_lines.append(_('Prompt description: ') + prompt.description)
+            tooltip_lines.append(f'/{prompt.name}')
+            tooltip_lines.append(f'[{prompt.scope}]')
+            items.append(
+                {
+                    "kind": "prompt",
+                    "display_text": child_name,
+                    "insert_text": '/' + prompt.name,
+                    "prompt_path": prompt.name,
+                    "sort_text": child_name.casefold(),
+                    "tooltip": '\n'.join(tooltip_lines),
+                    "record": prompt,
+                }
+            )
+
+        if parent == '' and len(matched_categories) > 0:
+            shown_prompt_paths = {
+                str(item.get("insert_text", ""))[1:]
+                for item in items
+                if item.get("kind") == "prompt"
+            }
+            for prompt in self._prompt_completion_records:
+                if prompt.name in shown_prompt_paths:
+                    continue
+                matching_category = next(
+                    (category for category in matched_categories if self._prompt_is_within_category(prompt.name, category)),
+                    None,
+                )
+                if matching_category is None:
+                    continue
+                tooltip_lines = []
+                if prompt.description != '':
+                    tooltip_lines.append(_('Prompt description: ') + prompt.description)
+                tooltip_lines.append(f'/{prompt.name}')
+                tooltip_lines.append(f'[{prompt.scope}]')
+                items.append(
+                    {
+                        "kind": "prompt_descendant",
+                        "display_text": prompt.name,
+                        "insert_text": '/' + prompt.name,
+                        "category_path": matching_category,
+                        "prompt_path": prompt.name,
+                        "sort_text": prompt.name.casefold(),
+                        "tooltip": '\n'.join(tooltip_lines),
+                        "record": prompt,
+                    }
+                )
+
+        if parent == '':
+            items.sort(
+                key=lambda item: (
+                    0 if item.get("kind") == "prompt" else 1,
+                    item.get("sort_text", '') if item.get("kind") == "prompt" else str(item.get("category_path", '')).casefold(),
+                    0 if item.get("kind") == "category" else 1,
+                    str(item.get("prompt_path", '')).casefold(),
+                )
+            )
+        else:
+            items.sort(
+                key=lambda item: (
+                    0 if item.get("kind") == "prompt" else 1 if item.get("kind") == "category" else 2,
+                    item.get("sort_text", ''),
+                )
+            )
+        return items
+
+    def _completion_item_data(self, item: Optional[QtWidgets.QListWidgetItem]) -> Dict[str, Any]:
         if item is None:
-            return ''
+            return {}
         data = item.data(Qt.ItemDataRole.UserRole)
-        if data is None:
-            return str(item.text() if item.text() is not None else '')
-        return str(data)
+        if isinstance(data, dict):
+            return data
+        text = str(item.text() if item.text() is not None else '')
+        return {"display_text": text, "insert_text": text, "kind": "prompt"}
 
-    def _show_prompt_completion_popup(self, matches: List[AgentPromptRecord]) -> None:
+    def _show_prompt_completion_popup(self, matches: List[Dict[str, Any]]) -> None:
         """Render the current match list below the input caret."""
 
         popup = self._prompt_completion_popup
         with QtCore.QSignalBlocker(popup):
             popup.clear()
-            for prompt in matches:
-                item = QtWidgets.QListWidgetItem('/' + prompt.name)
-                item.setData(Qt.ItemDataRole.UserRole, '/' + prompt.name)
-                tooltip_lines = []
-                if prompt.description != '':
-                    tooltip_lines.append(_('Prompt description: ') + prompt.description)
-                tooltip_lines.append(f'[{prompt.scope}]')
-                item.setToolTip('\n'.join(tooltip_lines))
+            for match in matches:
+                item = QtWidgets.QListWidgetItem(str(match.get("display_text", "")))
+                item.setData(Qt.ItemDataRole.UserRole, match)
+                item.setToolTip(str(match.get("tooltip", "")))
                 popup.addItem(item)
             if popup.count() > 0:
                 popup.setCurrentRow(0)
@@ -517,7 +653,8 @@ class DialogAIChat(QtWidgets.QDialog):
         """Commit the current completion selection into the editor."""
 
         item = self._prompt_completion_popup.currentItem()
-        completion_text = self._completion_item_text(item)
+        completion_data = self._completion_item_data(item)
+        completion_text = str(completion_data.get("insert_text", ""))
         if completion_text == '':
             return False
 
@@ -530,6 +667,8 @@ class DialogAIChat(QtWidgets.QDialog):
             cursor.clearSelection()
             self.ui.plainTextEdit_question.setTextCursor(cursor)
             self._hide_prompt_completion_popup(accept=True)
+            if completion_data.get("kind") == "category":
+                QtCore.QTimer.singleShot(0, self._sync_prompt_completion)
             return True
 
         if context is None:
@@ -541,6 +680,8 @@ class DialogAIChat(QtWidgets.QDialog):
         cursor.insertText(completion_text)
         self.ui.plainTextEdit_question.setTextCursor(cursor)
         self._hide_prompt_completion_popup(accept=True)
+        if completion_data.get("kind") == "category":
+            QtCore.QTimer.singleShot(0, self._sync_prompt_completion)
         return True
 
     def _dismiss_prompt_completion(self, accept: bool = False) -> None:
@@ -592,13 +733,13 @@ class DialogAIChat(QtWidgets.QDialog):
                 self._hide_prompt_completion_popup(accept=False)
                 return
 
-            matches = self._matching_prompt_records(context.get("typed", ""))
+            matches = self._matching_prompt_completion_items(context.get("typed", ""))
             if len(matches) == 0:
                 self._hide_prompt_completion_popup(accept=False)
                 return
 
             self._show_prompt_completion_popup(matches)
-            self._preview_prompt_completion('/' + matches[0].name, context)
+            self._preview_prompt_completion(str(matches[0].get("insert_text", "")), context)
         finally:
             self._prompt_completion_guard = False
 
@@ -609,7 +750,7 @@ class DialogAIChat(QtWidgets.QDialog):
         if self._prompt_completion_guard or current is None:
             return
         context = self._current_prompt_completion_context()
-        completion_text = self._completion_item_text(current)
+        completion_text = str(self._completion_item_data(current).get("insert_text", ""))
         if context is None or completion_text == '':
             return
 

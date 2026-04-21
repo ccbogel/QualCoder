@@ -34,6 +34,7 @@ class TestAiAgentPromptsCatalog(TestCase):
             "project": self.project_root,
         }
         path = os.path.join(roots[scope], name + ".md")
+        os.makedirs(os.path.dirname(path), exist_ok=True)
         with open(path, "w", encoding="utf-8") as handle:
             handle.write(content)
 
@@ -69,3 +70,40 @@ class TestAiAgentPromptsCatalog(TestCase):
         prompts = self.catalog.resolve_prompt_references("/_shared")
 
         self.assertEqual([], prompts)
+
+    def test_list_prompts_discovers_nested_prompt_paths(self):
+        self._write_prompt("system", "code-analysis/code-critic", "Critic")
+        self._write_prompt("system", "text-analysis/open-coding", "Open coding")
+
+        prompts = self.catalog.list_prompts()
+
+        self.assertEqual(
+            ["code-analysis/code-critic", "text-analysis/open-coding"],
+            [prompt.name for prompt in prompts],
+        )
+
+    def test_scope_override_uses_full_relative_prompt_path(self):
+        self._write_prompt("system", "code-analysis/review", "System review")
+        self._write_prompt("user", "code-analysis/review", "User review")
+        self._write_prompt("system", "topic-exploration/review", "Topic review")
+
+        prompts = self.catalog.list_prompts()
+
+        self.assertEqual(
+            {
+                "code-analysis/review": ("user", "User review"),
+                "topic-exploration/review": ("system", "Topic review"),
+            },
+            {prompt.name: (prompt.scope, prompt.content) for prompt in prompts},
+        )
+
+    def test_resolve_prompt_references_with_nested_names(self):
+        self._write_prompt("system", "code-analysis/code-critic", "Critic")
+        self._write_prompt("system", "code-analysis/code-comparison", "/code-analysis/code-critic\nCompare")
+
+        prompts = self.catalog.resolve_prompt_references("/code-analysis/code-comparison")
+
+        self.assertEqual(
+            ["code-analysis/code-critic", "code-analysis/code-comparison"],
+            [prompt.name for prompt in prompts],
+        )
