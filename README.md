@@ -1,5 +1,7 @@
 <img src="https://github.com/ccbogel/QualCoder/blob/master/qualcoder.png" width=200 height=200>
 
+Please also read the manual here: [https://qualcoder-org.github.io/]
+
 README QualCoder in other languages : [[Français](https://qualcoder-org.github.io/doc/fr/readme/)]
 
 # QualCoder
