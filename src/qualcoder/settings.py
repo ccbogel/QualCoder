@@ -331,9 +331,37 @@ class DialogSettings(QtWidgets.QDialog):
                 self.ai_models[ai_model_index]['fast_model_context_window'] = '32768' # default
             self.ai_models[ai_model_index]['reasoning_effort'] = self.ui.comboBox_reasoning.currentText()        
 
+    def validate_ai_api_key(self, api_key: str, focus_field: bool = False) -> bool:
+        """Reject API keys that contain non-ASCII characters.
+
+        The current OpenAI-compatible client stack sends the key in an HTTP header,
+        so visually similar Unicode characters break authentication before the request
+        is sent.
+        """
+        invalid_chars = []
+        for char in api_key:
+            if ord(char) > 127:
+                invalid_chars.append(f"{char} (U+{ord(char):04X})")
+                if len(invalid_chars) == 5:
+                    break
+        if not invalid_chars:
+            return True
+
+        msg = _('The API key contains non-ASCII characters and cannot be used.\n'
+                'Please paste the key again exactly as provided by your AI provider. \n\n'
+                'Invalid character(s): ') + ', '.join(invalid_chars)
+        Message.warning(self, _('Invalid API key'), msg)
+        if focus_field:
+            self.ui.lineEdit_ai_api_key.setFocus()
+            self.ui.lineEdit_ai_api_key.selectAll()
+        return False
+
     def ai_api_key_changed(self):
         if int(self.settings['ai_model_index']) >= 0:
-            self.ai_models[int(self.settings['ai_model_index'])]['api_key'] = self.ui.lineEdit_ai_api_key.text()   
+            api_key = self.ui.lineEdit_ai_api_key.text()
+            if not self.validate_ai_api_key(api_key, focus_field=True):
+                return
+            self.ai_models[int(self.settings['ai_model_index'])]['api_key'] = api_key
         self.ai_update_avaliable_models()    
         
     def ai_api_key_show(self, checked):
@@ -520,6 +548,8 @@ class DialogSettings(QtWidgets.QDialog):
         if self.settings['ai_enable'] == 'True' and ai_model_index < 0:
             msg = _('Please select an AI profile or disable the AI altogether.')
             Message(self.app, _('AI profile'), msg).exec()
+            return
+        if self.settings['ai_enable'] == 'True' and not self.validate_ai_api_key(self.ui.lineEdit_ai_api_key.text(), focus_field=True):
             return
         if self.settings['ai_enable'] == 'True' and self.ai_models[ai_model_index]['api_key'] == '':
             msg = _('Please enter a valid API-key for the AI model.')
