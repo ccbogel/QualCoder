@@ -266,6 +266,7 @@ class DialogAIChat(QtWidgets.QDialog):
         self.ai_text_doc_name = ''
         self.ai_text_text = ''
         self.ai_text_start_pos = -1
+        self._chat_ai_profile_snapshots: Dict[int, str] = {}
         self.ai_output_autoscroll = True
         self.setMinimumWidth(0)
         self.ui.widget_chat.setMinimumWidth(0)
@@ -1153,13 +1154,56 @@ class DialogAIChat(QtWidgets.QDialog):
             author = ''
         return author or 'unknown'
 
+    def _normalize_ai_profile_author(self, author: str = '', chat_idx: Optional[int] = None,
+                                     fallback_to_current: bool = False) -> str:
+        """Resolve display/storage author names for AI messages."""
+
+        raw_author = str(author if author is not None else '').strip()
+        if raw_author != '' and raw_author not in ('ai_agent', 'mcp_server', 'system_event'):
+            return raw_author
+
+        if chat_idx is None:
+            chat_idx = self.current_chat_idx
+        if chat_idx is not None and chat_idx >= 0:
+            snapshot = str(self._chat_ai_profile_snapshots.get(int(chat_idx), '')).strip()
+            if snapshot != '':
+                return snapshot
+
+        if fallback_to_current:
+            return self._current_ai_profile_name()
+        return 'unknown'
+
+    def _capture_chat_ai_profile_snapshot(self, chat_idx: Optional[int] = None) -> str:
+        """Freeze the currently selected AI profile for one chat run."""
+
+        if chat_idx is None:
+            chat_idx = self.current_chat_idx
+        author = self._current_ai_profile_name()
+        if chat_idx is not None and chat_idx >= 0:
+            self._chat_ai_profile_snapshots[int(chat_idx)] = author
+        return author
+
+    def _clear_chat_ai_profile_snapshot(self, chat_idx: Optional[int] = None) -> None:
+        """Remove a previously frozen AI profile snapshot for one chat."""
+
+        if chat_idx is None:
+            chat_idx = self.current_chat_idx
+        if chat_idx is None or chat_idx < 0:
+            return
+        self._chat_ai_profile_snapshots.pop(int(chat_idx), None)
+
     def _message_heading_html(self, heading_text: str) -> str:
         safe_heading = html_lib.escape(str(heading_text if heading_text is not None else ""))
         heading_size = self.app.settings['fontsize'] + 1
         return f'<div style="margin-top: 6px; font-size: {heading_size}pt;">⦿ <b>{safe_heading}</b></div>'
 
-    def _ai_agent_heading_html(self, author: str = '') -> str:
-        display_author = self._current_ai_profile_name()
+    def _ai_agent_heading_html(self, author: str = '', chat_idx: Optional[int] = None,
+                               fallback_to_current: bool = False) -> str:
+        display_author = self._normalize_ai_profile_author(
+            author,
+            chat_idx=chat_idx,
+            fallback_to_current=fallback_to_current,
+        )
         return self._message_heading_html(f'{_("AI Agent")} ({display_author}):')
             
     def fill_chat_list(self):
@@ -2268,7 +2312,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                         return
                     # body = '<br />'.join(agent_status_lines)
                     body = "".join(agent_status_lines)
-                    block = f'{self._ai_agent_heading_html(agent_status_author)}<ul>{body}</ul>'
+                    block = f'{self._ai_agent_heading_html(agent_status_author, chat_idx=self.current_chat_idx)}<ul>{body}</ul>'
                     html_parts.append(f'<p style={self.ai_status_style}>{block}</p>')
                     agent_status_lines = []
                     agent_status_author = ''
@@ -2318,7 +2362,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                     elif msg_type == 'ai':
                         txt = render_markdown_to_html(msg[4], hr_color=self.markdown_hr_color)
                         author = msg[3]
-                        txt = f'{self._ai_agent_heading_html(author)}{txt}'
+                        txt = f'{self._ai_agent_heading_html(author, chat_idx=self.current_chat_idx)}{txt}'
                         html_parts.append(f'<p style={self.ai_response_style}>{txt}</p>')
                     elif msg_type == 'info':
                         txt = self._message_heading_html(_("Info:"))
@@ -2333,7 +2377,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                         txt = _('Thinking...')
                     txt = self.replace_references(txt, streaming=True)
                     txt = render_markdown_to_html(txt, hr_color=self.markdown_hr_color)
-                    txt = f'{self._ai_agent_heading_html()}{txt}'
+                    txt = f'{self._ai_agent_heading_html(chat_idx=self.current_chat_idx, fallback_to_current=True)}{txt}'
                     html_parts.append(f'<div style={self.ai_response_style}>{txt}</div>')
                 elif not self._chat_scope_active(self.current_chat_idx): # streaming finished, add actions
                     actions_list = []
@@ -2758,6 +2802,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             return
         if status_text is None or status_text.strip() == '':
             return
+        msg_author = self._normalize_ai_profile_author(msg_author, chat_idx=chat_idx, fallback_to_current=True)
         curr_chat_id = self.chat_list[chat_idx][0]
         cursor = self.chat_history_conn.cursor()
         status_line = status_text.strip()
@@ -3015,6 +3060,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                 self.history_add_message(msg_type, '', msg_content, chat_idx)
                 messages = self.history_get_ai_messages()
                 self.current_streaming_chat_idx = self.current_chat_idx
+                self._capture_chat_ai_profile_snapshot(chat_idx)
                 self.app.ai.start_stream(messages,
                                          result_callback=self.ai_message_callback,
                                          progress_callback=None,
@@ -3034,6 +3080,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                 if 0 <= chat_idx < len(self.chat_list):
                     analysis_type = self.chat_list[chat_idx][2]
                 if self._is_agent_chat_type(analysis_type):
+                    self._capture_chat_ai_profile_snapshot(chat_idx)
                     loaded_prompts = self._persist_explicit_agent_prompts(chat_idx, msg_content)
                     if len(loaded_prompts) == 1:
                         status_text = _('Loaded prompt: {name}').format(
@@ -3070,6 +3117,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                                                 "direct_ai_message": "",
                                             })
                 else:
+                    self._capture_chat_ai_profile_snapshot(chat_idx)
                     self.app.ai.start_stream(messages,
                                              result_callback=self.ai_message_callback,
                                              progress_callback=None,
@@ -3084,7 +3132,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             # create temporary db connection to make it thread safe
             db_conn = sqlite3.connect(self.chat_history_path)
             try: 
-                ai_model_name = self.app.ai_models[int(self.app.settings['ai_model_index'])]['name']
+                ai_model_name = self._normalize_ai_profile_author(chat_idx=chat_idx, fallback_to_current=True)
                 msg_content = strip_think_blocks(msg_content)
                 self.history_add_message(msg_type, ai_model_name, msg_content, chat_idx, db_conn)
                 self.ai_streaming_output = ''
@@ -4632,6 +4680,7 @@ data collected. This information will accompany every prompt sent to the AI, res
         self.ai_streaming_output = ''
         if not isinstance(mcp_result, dict):
             self.process_message('info', _('Error: Invalid result from MCP AI agent chat worker.'), self.current_streaming_chat_idx)
+            self._clear_chat_ai_profile_snapshot(self.current_streaming_chat_idx)
             self._update_undo_button_state()
             return
 
@@ -4642,12 +4691,14 @@ data collected. This information will accompany every prompt sent to the AI, res
         if mcp_result.get("canceled", False):
             self._log_chat_canceled_env_update(chat_idx, partial_response=False)
             self.process_message('info', _('Chat has been canceled by the user.'), chat_idx)
+            self._clear_chat_ai_profile_snapshot(chat_idx)
             self._update_undo_button_state()
             return
 
         err = str(mcp_result.get("error", "")).strip()
         if err != '':
             self.process_message('info', err, chat_idx)
+            self._clear_chat_ai_profile_snapshot(chat_idx)
             self._update_undo_button_state()
             return
 
@@ -4678,16 +4729,19 @@ data collected. This information will accompany every prompt sent to the AI, res
         direct_ai_message = str(mcp_result.get("direct_ai_message", "")).strip()
         if direct_ai_message != "":
             self.process_message('ai', direct_ai_message, chat_idx)
+            self._clear_chat_ai_profile_snapshot(chat_idx)
             self._update_undo_button_state()
             return
 
         stream_messages = mcp_result.get("stream_messages", None)
         if stream_messages is None or not isinstance(stream_messages, list) or len(stream_messages) == 0:
             self.process_message('info', _('Error: Invalid message stream from MCP AI agent chat worker.'), chat_idx)
+            self._clear_chat_ai_profile_snapshot(chat_idx)
             self._update_undo_button_state()
             return
 
         self.current_streaming_chat_idx = chat_idx
+        self._capture_chat_ai_profile_snapshot(chat_idx)
         self.app.ai.start_stream(stream_messages,
                                  result_callback=self.ai_message_callback,
                                  progress_callback=None,
@@ -4767,14 +4821,17 @@ data collected. This information will accompany every prompt sent to the AI, res
                         _('Error: The AI returned an internal control message instead of a final answer. Please try again.'),
                         chat_idx,
                     )
+                    self._clear_chat_ai_profile_snapshot(chat_idx)
                     if was_canceled:
                         self.process_message('info', _('Chat has been canceled by the user. The partial response was kept.'), chat_idx)
                     return
 
             self.process_message('ai', final_text, chat_idx)
+            self._clear_chat_ai_profile_snapshot(chat_idx)
             if was_canceled:
                 self.process_message('info', _('Chat has been canceled by the user. The partial response was kept.'), chat_idx)
         else:
+            self._clear_chat_ai_profile_snapshot(chat_idx)
             if was_canceled:
                 self.process_message('info', _('Chat has been canceled by the user.'), chat_idx)
             else:
@@ -4795,7 +4852,10 @@ data collected. This information will accompany every prompt sent to the AI, res
                     return '<unprintable>'
 
         try:
-            ai_model_name = self.app.ai_models[int(self.app.settings['ai_model_index'])]['name']
+            ai_model_name = self._normalize_ai_profile_author(
+                chat_idx=self.current_streaming_chat_idx,
+                fallback_to_current=True,
+            )
             msg = _('Error communicating with ' + ai_model_name + '\n')
             msg += exception_type.__name__ + ': ' + html_to_text(_safe_to_text(value))
             if hasattr(value, 'message'):
@@ -4811,6 +4871,8 @@ data collected. This information will accompany every prompt sent to the AI, res
             fallback = _('Error while handling AI error callback: ') + _safe_to_text(err)
             logger.error(fallback)
             self.process_message('info', fallback, self.current_streaming_chat_idx)
+        finally:
+            self._clear_chat_ai_profile_snapshot(self.current_streaming_chat_idx)
     
     def eventFilter(self, source, event):
         editor = self.ui.plainTextEdit_question
