@@ -1388,7 +1388,7 @@ class DialogCodeImage(QtWidgets.QDialog):
             self.delete_category_or_code(selected)
         if action == action_cat_show_coded_files:
             branch_codes = self.recursive_get_branch_codes(selected, [])
-            self.coded_media_dialog(branch_codes)
+            self.coded_media_dialog(branch_codes, selected.text(0))
             return
         if selected is not None and action == action_show_coded_media:
             to_find = int(selected.text(1)[4:])
@@ -1423,17 +1423,18 @@ class DialogCodeImage(QtWidgets.QDialog):
             item.setExpanded(expand_toggle)
             self.recursive_expand_collapse_branch(item.child(i), expand_toggle)
 
-    def coded_media_dialog(self, code_dict):
+    def coded_media_dialog(self, code_dict, category_name:str = ""):
         """ Display all coded media for this code, in a separate modal dialog.
         Coded media comes from ALL files for this coder.
         Need to store textedit start and end positions so that code in context can be used.
         Called from tree_menu.
         Re-load the codings may have changed.
-        param:
+        Args:
             code_dict : code dictionary
+            category_name : if a category selected, the category name
         """
 
-        DialogCodeInAllFiles(self.app, code_dict)
+        DialogCodeInAllFiles(self.app, code_dict, "File", category_name)
         self.get_coded_areas()
         self.redraw_scene()
 

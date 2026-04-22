@@ -48,7 +48,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         DialogReportExactTextMatches, DialogCodesBySegments
     """
 
-    def __init__(self, app, codes_list, case_or_file="File"):
+    def __init__(self, app, codes_list, case_or_file="File", category_name=""):
         """ Create dialog with textEdit widget to show all codings of this code.
         Called: code_text.coded_media_dialog , code_av.coded_media_dialog , code_image.coded_media_dialog
         param:
@@ -64,6 +64,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         if isinstance(codes_list, dict):
             self.codes_list = [codes_list]
         self.case_or_file = case_or_file
+        self.category_name = category_name
         QtWidgets.QDialog.__init__(self)
         font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
@@ -71,16 +72,21 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         # Enable custom window hint to enable customizing window controls
         self.setWindowFlags(self.windowFlags() | QtCore.Qt.WindowType.CustomizeWindowHint)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
-        title = _("Coded files: ")  # + self.code_dict['name']
+        title = _("Coded files ")
         if case_or_file == "Case":
-            title = _("Coded cases: ")  # + self.code_dict['name']
+            title = _("Coded cases ")
+        if self.category_name != "":
+            title += _(" of category: ") + self.category_name
         self.setWindowTitle(title)
         self.gridLayout = QtWidgets.QGridLayout(self)
         self.te = QtWidgets.QTextEdit()
         self.gridLayout.addWidget(self.te, 1, 0)
         self.te.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.te.customContextMenuRequested.connect(self.text_edit_menu)
-        msg = _("Left click on heading for coding in context") + "\n"
+        msg = ""
+        if self.category_name != "":
+            msg += _("Codes under category: ") + f"{self.category_name}\n\n"
+        msg += _("Left click on heading for coding in context") + "\n"
         msg += _("Right click on heading to unmark or to add codes") + "\n\n"
         self.te.append(msg)
         self.text_results = []

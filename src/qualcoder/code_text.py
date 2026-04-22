@@ -2069,7 +2069,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 self.delete_category_or_code(selected)
             if action == action_cat_show_coded_files:
                 branch_codes = self.recursive_get_branch_codes(selected, [])
-                self.coded_media_dialog(branch_codes)
+                self.coded_media_dialog(branch_codes, selected.text(0))
                 return
             if selected is not None and action == action_show_coded_media:
                 to_find = int(selected.text(1)[4:])
@@ -3660,7 +3660,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_show_codings_next.setToolTip(tt)
         self.get_coded_text_update_eventfilter_tooltips()
 
-    def coded_media_dialog(self, code_dict):
+    def coded_media_dialog(self, code_dict, category_name:str = ""):
         """ Display all coded media for this code, in a separate modal dialog.
         Coded media comes from ALL files for this coder.
         Need to store textedit start and end positions so that code in context can be used.
@@ -3668,9 +3668,10 @@ class DialogCodeText(QtWidgets.QWidget):
         Re-load coded text as codes may have changed.
         Args:
             code_dict : code dictionary
+            category_name : if a category selected, the category name
         """
 
-        DialogCodeInAllFiles(self.app, code_dict)
+        DialogCodeInAllFiles(self.app, code_dict, "File", category_name)
         self.get_coded_text_update_eventfilter_tooltips()
 
     def item_moved_update_data(self, item, parent):
