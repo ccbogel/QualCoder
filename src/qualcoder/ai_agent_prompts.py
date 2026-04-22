@@ -24,9 +24,11 @@ import logging
 import os
 import re
 from typing import Dict, List, Optional, Tuple
+import yaml
 
 
 PROMPT_REFERENCE_PATTERN = re.compile(r"(?<!\S)/(\S+)")
+PROMPT_FRONTMATTER_PATTERN = re.compile(r"\A---[ \t]*\r?\n(.*?)\r?\n---[ \t]*(?:\r?\n|$)", re.DOTALL)
 logger = logging.getLogger(__name__)
 
 
@@ -180,6 +182,7 @@ class AiAgentPromptsCatalog:
         for dirpath, dirnames, filenames in entries:
             dirnames.sort(key=lambda item: item.casefold())
             filenames.sort(key=lambda item: item.casefold())
+            init_content = self._read_directory_init_content(scope, root, dirpath)
             for filename in filenames:
                 if not filename.lower().endswith(".md"):
                     continue
@@ -193,7 +196,12 @@ class AiAgentPromptsCatalog:
                 name = self._normalize_prompt_name(rel_path[:-3])
                 if name == "":
                     continue
-                content = raw.strip()
+                metadata, prompt_body = self._split_frontmatter(raw)
+                content = self._compose_prompt_content(name, prompt_body, init_content)
+                has_frontmatter_description = isinstance(metadata, dict) and "description" in metadata
+                description = str(metadata.get("description", "") if has_frontmatter_description else "").strip()
+                if description == "" and not has_frontmatter_description:
+                    description = self._infer_description(prompt_body)
                 result.append(
                     AgentPromptRecord(
                         scope=scope,
@@ -201,11 +209,42 @@ class AiAgentPromptsCatalog:
                         name=name,
                         file_path=path,
                         content=content,
-                        description=self._infer_description(content),
+                        description=description,
                         is_internal=self._is_internal_prompt_name(name),
                     )
                 )
         return result
+
+    def _read_directory_init_content(self, scope: str, root: str, dirpath: str) -> str:
+        """Return one subdirectory's `_init.md` content with system fallback for overrides."""
+
+        if root is None or dirpath is None or os.path.normpath(dirpath) == os.path.normpath(root):
+            return ""
+        rel_dir = os.path.relpath(dirpath, root)
+        init_path = os.path.join(dirpath, "_init.md")
+        raw = self._read_text(init_path)
+        if raw is not None:
+            return self._split_frontmatter(raw)[1]
+        if scope == "system":
+            return ""
+        system_init_path = os.path.join(self._system_root, rel_dir, "_init.md")
+        system_raw = self._read_text(system_init_path)
+        if system_raw is None:
+            return ""
+        return self._split_frontmatter(system_raw)[1]
+
+    def _compose_prompt_content(self, name: str, body: str, init_content: str) -> str:
+        """Prepend one subdirectory `_init.md` body to prompts in that same folder."""
+
+        prompt_body = str(body if body is not None else "").strip()
+        if self._normalize_prompt_name(name).rsplit("/", 1)[-1] == "_init":
+            return prompt_body
+        folder_init = str(init_content if init_content is not None else "").strip()
+        if folder_init == "":
+            return prompt_body
+        if prompt_body == "":
+            return folder_init
+        return folder_init + "\n\n" + prompt_body
 
     def _conflict_key(self, name: str) -> str:
         return self._normalize_prompt_name(name).casefold()
@@ -229,6 +268,26 @@ class AiAgentPromptsCatalog:
                 return handle.read()
         except OSError:
             return None
+
+    def _split_frontmatter(self, text: str) -> Tuple[Dict[str, str], str]:
+        """Return frontmatter metadata and Markdown body without the frontmatter block."""
+
+        raw_text = str(text if text is not None else "")
+        match = PROMPT_FRONTMATTER_PATTERN.match(raw_text)
+        if match is None:
+            return {}, raw_text.strip()
+
+        metadata_text = str(match.group(1) if match.group(1) is not None else "")
+        try:
+            metadata = yaml.safe_load(metadata_text)
+        except yaml.YAMLError:
+            logger.warning("Invalid YAML frontmatter in AI prompt file; using raw body.")
+            return {}, raw_text.strip()
+
+        if not isinstance(metadata, dict):
+            metadata = {}
+        body = raw_text[match.end():].strip()
+        return metadata, body
 
     def _extract_prompt_names(self, text: str, include_internal: bool = False) -> List[str]:
         source_text = str(text if text is not None else "")

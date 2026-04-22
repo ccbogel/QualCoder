@@ -107,3 +107,71 @@ class TestAiAgentPromptsCatalog(TestCase):
             ["code-analysis/code-critic", "code-analysis/code-comparison"],
             [prompt.name for prompt in prompts],
         )
+
+    def test_nested_prompt_content_includes_same_folder_init(self):
+        self._write_prompt("system", "code-analysis/_init", "Shared context")
+        self._write_prompt("system", "code-analysis/code-critic", "Prompt body")
+
+        prompt = self.catalog.get_prompt("code-analysis/code-critic")
+
+        self.assertIsNotNone(prompt)
+        self.assertEqual("Shared context\n\nPrompt body", prompt.content)
+
+    def test_nested_prompt_init_references_are_resolved_recursively(self):
+        self._write_prompt("system", "shared/base", "Base prompt")
+        self._write_prompt("system", "code-analysis/_init", "/shared/base\nShared context")
+        self._write_prompt("system", "code-analysis/code-critic", "Prompt body")
+
+        prompts = self.catalog.resolve_prompt_references("/code-analysis/code-critic")
+
+        self.assertEqual(
+            ["shared/base", "code-analysis/code-critic"],
+            [prompt.name for prompt in prompts],
+        )
+
+    def test_user_prompt_uses_system_init_when_local_init_is_missing(self):
+        self._write_prompt("system", "code-analysis/_init", "System shared context")
+        self._write_prompt("user", "code-analysis/code-critic", "User prompt body")
+
+        prompt = self.catalog.get_prompt("code-analysis/code-critic")
+
+        self.assertIsNotNone(prompt)
+        self.assertEqual("user", prompt.scope)
+        self.assertEqual("System shared context\n\nUser prompt body", prompt.content)
+
+    def test_project_prompt_prefers_local_init_over_system_init(self):
+        self._write_prompt("system", "code-analysis/_init", "System shared context")
+        self._write_prompt("project", "code-analysis/_init", "Project shared context")
+        self._write_prompt("project", "code-analysis/code-critic", "Project prompt body")
+
+        prompt = self.catalog.get_prompt("code-analysis/code-critic")
+
+        self.assertIsNotNone(prompt)
+        self.assertEqual("project", prompt.scope)
+        self.assertEqual("Project shared context\n\nProject prompt body", prompt.content)
+
+    def test_prompt_frontmatter_is_not_included_in_loaded_content(self):
+        self._write_prompt(
+            "system",
+            "text-analysis/frontmatter-test",
+            "---\nname: frontmatter-test\ndescription: Frontmatter description\n---\nPrompt body",
+        )
+
+        prompt = self.catalog.get_prompt("text-analysis/frontmatter-test")
+
+        self.assertIsNotNone(prompt)
+        self.assertEqual("Frontmatter description", prompt.description)
+        self.assertEqual("Prompt body", prompt.content)
+
+    def test_empty_frontmatter_description_overrides_inferred_description(self):
+        self._write_prompt(
+            "system",
+            "text-analysis/frontmatter-empty-description",
+            "---\nname: frontmatter-empty-description\ndescription: \"\"\n---\nPrompt body",
+        )
+
+        prompt = self.catalog.get_prompt("text-analysis/frontmatter-empty-description")
+
+        self.assertIsNotNone(prompt)
+        self.assertEqual("", prompt.description)
+        self.assertEqual("Prompt body", prompt.content)
