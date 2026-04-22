@@ -124,7 +124,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
             'important', 'memo', 'owner'
         self.text_results = []
         for code in self.codes_list:
-            cur.execute(sql, [code['cid']])  # [self.code_dict['cid']])
+            cur.execute(sql, [code['cid']])
             results = cur.fetchall()
             for row in results:
                 res_dict = dict(zip(keys, row))
@@ -144,18 +144,18 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
             title += "</span>"
             title += f", {row['pos0']} - {row['pos1']}"
             title += f" ({row['owner']})"
-            title += f" {row['codename']}"
+            title += "  " + _("Code:") + f" {row['codename']}"
             self.te.insertHtml(title)
             row['textedit_end'] = len(self.te.toPlainText())
             self.te.append(f"{row['text']}\n\n")
 
         # Get coded image by file for this coder data
-        sql = "select code_name.name, color, source.name, x1, y1, width, height,"
-        sql += " source.mediapath, source.id, code_image_visible.memo, imid, important, code_image_visible.owner "
-        sql += " from code_image_visible join code_name "
+        sql = "select code_name.name, color, source.name, x1, y1, width, height,source.mediapath, source.id, "
+        sql += "pdf_page, code_image_visible.memo, imid, important, code_image_visible.owner "
+        sql += "from code_image_visible join code_name "
         sql += "on code_name.cid = code_image_visible.cid join source on code_image_visible.id = source.id "
         sql += "where code_name.cid =? "
-        sql += " order by source.name"
+        sql += "order by source.name"
         if self.case_or_file == "Case":
             sql = "select code_name.name, color, cases.name, x1, y1, width, height,  "
             sql += "source.mediapath, source.id, code_image_visible.memo,imid, important, code_image_visible.owner "
@@ -165,11 +165,11 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
             sql += " join source on case_text.fid = source.id "
             sql += "where code_name.cid=? "
             sql += " order by cases.name, code_image_visible.owner "
-        keys = 'codename', 'color', 'file_or_casename', 'x1', 'y1', 'width', 'height', 'mediapath', 'fid', 'memo', \
-            'imid', 'important', 'owner'
+        keys = 'codename', 'color', 'file_or_casename', 'x1', 'y1', 'width', 'height', 'mediapath', 'fid', 'pdf_page', \
+            'memo', 'imid', 'important', 'owner'
         self.image_results = []
         for code in self.codes_list:
-            cur.execute(sql, [code['cid']])  # [self.code_dict['cid']])
+            cur.execute(sql, [code['cid']])
             results = cur.fetchall()
             for row in results:
                 res_dict = dict(zip(keys, row))
@@ -186,7 +186,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
                 title += _(" Case: ") + row['file_or_casename'] + _(" File: ") + row['mediapath']
             else:
                 title += _(" File: ") + row['mediapath']
-            title += f" {row['codename']}"
+            title += "  " + _("Code:") + f" {row['codename']}"
             title += f'</span> ({row["owner"]})</p>'
             self.te.insertHtml(title)
             row['textedit_end'] = len(self.te.toPlainText())
@@ -215,7 +215,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
             'important', 'owner'
         self.av_results = []
         for code in self.codes_list:
-            cur.execute(sql, [code['cid']])  # [self.code_dict['cid']])
+            cur.execute(sql, [code['cid']])
             results = cur.fetchall()
             for row in results:
                 res_dict = dict(zip(keys, row))
@@ -232,7 +232,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
                 title += _("Case: ") + row['file_or_casename'] + _(" File: ") + row['mediapath']
             else:
                 title += _("File: ") + row['mediapath']
-            title += f" {row['codename']}"
+            title += "  " + _("Code:") + f" {row['codename']}"
             title += f'</span> ({row["owner"]})'
             self.te.insertHtml(title)
             start = msecs_to_mins_and_secs(row['pos0'])
@@ -303,9 +303,6 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         # Check the position for an image result
         for row in self.image_results:
             if row['textedit_start'] <= pos < row['textedit_end']:
-                #TODO key error with pdf_page and error with using the correct image
-                #print("check position for img result")
-                #print("key error with ['pdf_page']: if page.number == data['pdf_page']:")
                 ui = DialogCodeInImage(self.app, row)
                 ui.exec()
                 return
