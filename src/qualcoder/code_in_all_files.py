@@ -21,6 +21,7 @@ https://qualcoder-org.github.io/
 """
 
 import datetime
+import fitz
 import logging
 import os
 import sqlite3
@@ -83,12 +84,6 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         self.gridLayout.addWidget(self.te, 1, 0)
         self.te.setContextMenuPolicy(QtCore.Qt.ContextMenuPolicy.CustomContextMenu)
         self.te.customContextMenuRequested.connect(self.text_edit_menu)
-        msg = ""
-        if self.category_name != "":
-            msg += _("Codes under category: ") + f"{self.category_name}\n\n"
-        msg += _("Left click on heading for coding in context") + "\n"
-        msg += _("Right click on heading to unmark or to add codes") + "\n\n"
-        self.te.append(msg)
         self.text_results = []
         self.image_results = []
         self.av_results = []
@@ -104,6 +99,9 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
 
         self.te.blockSignals(True)
         self.te.clear()
+        if self.category_name != "":
+            hmsg = "<h2>" + _("Codes under category: ") + f"{self.category_name}</h2><br />"
+            self.te.insertHtml(hmsg)
         msg = _("Left click on heading for coding in context") + "\n"
         msg += _("Right click on heading to unmark or to add codes") + "\n\n"
         self.te.append(msg)
@@ -138,6 +136,9 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
                 self.text_results.append(res_dict)
 
         # Text insertion into textEdit
+        if self.text_results:
+            hmsg = "<h3>" + _("Coded text") + "<h3><br />"
+            self.te.insertHtml(hmsg)
         for row in self.text_results:
             row['file_or_case'] = self.case_or_file
             row['textedit_start'] = len(self.te.toPlainText())
@@ -147,32 +148,33 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
                 title += _(" File: ") + row['file_or_casename']
             else:
                 title += _("Case: ") + row['file_or_casename'] + _(" File: ") + row['source_name']
-            title += "</span>"
-            title += f", {row['pos0']} - {row['pos1']}"
-            title += f" ({row['owner']})"
+            title += f", {row['pos0']} - {row['pos1']} ({row['owner']})"
             title += "  " + _("Code:") + f" {row['codename']}"
+            title += "</span><br />"
             self.te.insertHtml(title)
             row['textedit_end'] = len(self.te.toPlainText())
-            self.te.append(f"{row['text']}\n\n")
+            self.te.append(f"{row['text']}\n")
+            if row['memo']:
+                self.te.append(_("Memo: ") + row['memo'] + "\n")
 
         # Get coded image by file for this coder data
         sql = "select code_name.name, color, source.name, x1, y1, width, height,source.mediapath, source.id, "
-        sql += "pdf_page, code_image_visible.memo, imid, important, code_image_visible.owner "
+        sql += "pdf_page, code_image_visible.memo, imid, important, code_image_visible.owner, pdf_page "
         sql += "from code_image_visible join code_name "
         sql += "on code_name.cid = code_image_visible.cid join source on code_image_visible.id = source.id "
         sql += "where code_name.cid =? "
         sql += "order by source.name"
         if self.case_or_file == "Case":
-            sql = "select code_name.name, color, cases.name, x1, y1, width, height,  "
-            sql += "source.mediapath, source.id, code_image_visible.memo,imid, important, code_image_visible.owner "
+            sql = "select code_name.name, color, cases.name, x1, y1, width, height, source.mediapath,"
+            sql += "source.id, code_image_visible.memo,imid, important, code_image_visible.owner, pdf_page "
             sql += "from code_image_visible join code_name on code_name.cid = code_image_visible.cid "
             sql += "join (case_text join cases on cases.caseid = case_text.caseid) on "
             sql += "code_image_visible.id = case_text.fid "
-            sql += " join source on case_text.fid = source.id "
+            sql += "join source on case_text.fid = source.id "
             sql += "where code_name.cid=? "
-            sql += " order by cases.name, code_image_visible.owner "
+            sql += "order by cases.name, code_image_visible.owner "
         keys = 'codename', 'color', 'file_or_casename', 'x1', 'y1', 'width', 'height', 'mediapath', 'fid', 'pdf_page', \
-            'memo', 'imid', 'important', 'owner'
+            'memo', 'imid', 'important', 'owner', 'pdf_page'
         self.image_results = []
         for code in self.codes_list:
             cur.execute(sql, [code['cid']])
@@ -183,6 +185,9 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
                 self.image_results.append(res_dict)
 
         # Image - textEdit insertion
+        if self.image_results:
+            hmsg = "<h3>" + _("Coded images") + "<h3><br />"
+            self.te.insertHtml(hmsg)
         for counter, row in enumerate(self.image_results):
             row['file_or_case'] = self.case_or_file
             row['textedit_start'] = len(self.te.toPlainText())
@@ -193,18 +198,21 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
             else:
                 title += _(" File: ") + row['mediapath']
             title += "  " + _("Code:") + f" {row['codename']}"
-            title += f'</span> ({row["owner"]})</p>'
+            title += f' ({row["owner"]})</span></p>'
             self.te.insertHtml(title)
             row['textedit_end'] = len(self.te.toPlainText())
             self.te.append("\n")
             img = {'mediapath': row['mediapath'], 'x1': row['x1'], 'y1': row['y1'], 'width': row['width'],
-                   'height': row['height']}
+                   'height': row['height'], 'pdf_page': row['pdf_page']}
             self.put_image_into_textedit(img, counter, self.te)
-            self.te.append(_("Memo: ") + row['memo'] + "\n\n")
+            if row['memo'] != "":
+                self.te.append(_("Memo: ") + row['memo'] + "\n")
+            else:
+                self.te.append("\n")
 
         # Get coded A/V by file for this coder data
-        sql = "select code_name.name, color, source.name, pos0, pos1, code_av_visible.memo, "
-        sql += "source.mediapath, source.id, avid, important, code_av_visible.owner from code_av_visible join code_name "
+        sql = "select code_name.name, color, source.name, pos0, pos1, code_av_visible.memo, source.mediapath, "
+        sql += "source.id, avid, important, code_av_visible.owner from code_av_visible join code_name "
         sql += "on code_name.cid = code_av_visible.cid join source on code_av_visible.id = source.id "
         sql += "where code_name.cid =? "
         sql += " order by source.name"
@@ -229,6 +237,9 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
                 self.av_results.append(res_dict)
 
         # A/V - textEdit insertion
+        if self.av_results:
+            hmsg = "<h3>" + _("Coded audio / video") + "<h3><br />"
+            self.te.insertHtml(hmsg)
         for row in self.av_results:
             row['file_or_case'] = self.case_or_file
             row['textedit_start'] = len(self.te.toPlainText())
@@ -238,14 +249,16 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
                 title += _("Case: ") + row['file_or_casename'] + _(" File: ") + row['mediapath']
             else:
                 title += _("File: ") + row['mediapath']
-            title += "  " + _("Code:") + f" {row['codename']}"
-            title += f'</span> ({row["owner"]})'
+            title += "  " + _("Code:") + f" {row['codename']} ({row['owner']}) </span>"
             self.te.insertHtml(title)
             start = msecs_to_mins_and_secs(row['pos0'])
             end = msecs_to_mins_and_secs(row['pos1'])
             self.te.insertHtml(f'<br />[{start} - {end}] ')
             row['textedit_end'] = len(self.te.toPlainText())
-            self.te.append(_("Memo: ") + f"{row['memo']}\n\n")
+            if row['memo'] != "":
+                self.te.append(_("Memo: ") + row['memo'] + "\n")
+            else:
+                self.te.append("\n")
         self.te.blockSignals(False)
 
     def put_image_into_textedit(self, img, counter, text_edit):
@@ -259,13 +272,28 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
             text_edit:  the widget that shows the data
         """
 
-        path_ = self.app.project_path
-        if img['mediapath'][0] == "/":
-            path_ = path_ + img['mediapath']
+        abs_path = ""
+        image = None
+        if "images:" in img['mediapath']:
+            abs_path = img['mediapath'].split(':')[1]
         else:
-            path_ = img['mediapath'][7:]
-        document = text_edit.document()
-        image = QtGui.QImageReader(path_).read()
+            abs_path = self.app.project_path + img['mediapath']
+        if not img['mediapath'].lower().endswith(".pdf"):
+            image = QtGui.QImage(abs_path)
+        else:  # A pdf, must create the image
+            if img['mediapath'][:6] == "/docs/":
+                source_path = f"{self.app.project_path}/documents/{img['mediapath'][6:]}"
+            if img['mediapath'][:5] == "docs:":
+                source_path = img['mediapath'][5:]
+            fitz_pdf = fitz.open(source_path)  # Use pymupdf to get page images
+            for page in fitz_pdf:
+                if page.number == img['pdf_page']:
+                    # Only need the current page image of interest
+                    pixmap = page.get_pixmap()
+                    pixmap.save(os.path.join(self.app.confighome, f"tmp_pdf_page.png"))
+            source_path = os.path.join(self.app.confighome, f"tmp_pdf_page.png")
+            image = QtGui.QImage(source_path)
+        #image = QtGui.QImageReader(path_).read()
         image = image.copy(int(img['x1']), int(img['y1']), int(img['width']), int(img['height']))
         # scale to max 300 wide or high. perhaps add option to change maximum limit?
         scaler_w = 1.0
@@ -281,11 +309,13 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         # Need unique image names or the same image from the same path is reproduced
         imagename = os.path.join(self.app.project_path, "images", f"{counter}-{img['mediapath']}")
         url = QtCore.QUrl(imagename)
+        document = text_edit.document()
         document.addResource(QtGui.QTextDocument.ResourceType.ImageResource.value, url, image)
         # See https://doc.qt.io/qt-6/qtextdocument.html#addResource
         # The image can be inserted into the document using the QTextCursor API:
         cursor = text_edit.textCursor()
         image_format = QtGui.QTextImageFormat()
+        # TODO Look at smoothtransformation scaling
         image_format.setWidth(image.width() * scaler)
         image_format.setHeight(image.height() * scaler)
         image_format.setName(url.toString())
