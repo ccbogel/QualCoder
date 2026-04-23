@@ -70,14 +70,14 @@ else:
 
 setup(
     name='Qualcoder',
-    version='3.7',
+    version='4.0',
     url='http://github.com/ccbogel/QualCoder',
-    author='Colin Curtain and Kai Droege',
+    author='Colin Curtain, Kai Dröge, Justin Missaghieh--Poncet, Lorenzo Salomón',
     author_email='ccbogel@hotmail.com',
     description='Qualitative data analysis',
     long_description=long_description,
     classifiers=[
-        'License :: OSI Approved :: MIT License',
+        'License :: OSI Approved :: LGPL v3 License',
         'Programming Language :: Python :: 3',
         'Operating System :: OS Independent',
         'Development Status :: 3 - Alpha'
