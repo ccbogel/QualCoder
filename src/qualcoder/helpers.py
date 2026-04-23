@@ -119,7 +119,7 @@ def file_typer(mediapath):
         return "image"
     if mediapath[-3:] in ('mp3', 'wav', 'm4a', 'ogg'):
         return "audio"
-    # ogg was in video (pre 2 apr 2026)
+    # ogg was in video (pre 2 April 2026)
     if mediapath[-3:] in ('mkv', 'mov', 'mp4', 'm4v', 'wmv') or mediapath[-4:] == 'webm':
         return "video"
     return "text"
@@ -147,13 +147,12 @@ class ExportDirectoryPathDialog:
     If an existing file found, add a counter to the file name until a new file name is made.
      Counter in format _1, _2, etc. """
 
-    filepath = None
-
     def __init__(self, app, filename):
-        """ params:
-                    app : App class
-                    filename: String of filename with extension only"""
+        """ Args:
+                app : App class
+                 filename: String of filename with extension only"""
 
+        self.filepath = None
         extension = filename.split('.')[-1]
         filename_only = filename[0:-len(extension) - 1]
         options = QtWidgets.QFileDialog.Option.DontResolveSymlinks | QtWidgets.QFileDialog.Option.ShowDirsOnly
@@ -181,10 +180,10 @@ class DialogGetStartAndEndMarks(QtWidgets.QDialog):
         case_file_manager, code_text.
     """
 
-    title = ""
-
-    def __init__(self, title, filenames):
-        """ title is a String. Filenames is a String """
+    def __init__(self, title:str = "", filenames:str = ""):
+        """ Args:
+        title is a String.
+        Filenames is a String """
 
         QtWidgets.QDialog.__init__(self)
         self.ui = Ui_Dialog_StartAndEndMarks()
@@ -206,12 +205,6 @@ class DialogCodeInText(QtWidgets.QDialog):
     reports.DialogReportCodes, when results are produced
     """
 
-    app = None
-    data = None
-    te = None
-    code_resize_timer = 0
-    event_filter_on = True
-
     def __init__(self, app, data):
         """ Prepare QDialog window.
         param:
@@ -223,6 +216,7 @@ class DialogCodeInText(QtWidgets.QDialog):
         self.app = app
         self.data = data
         self.code_resize_timer = datetime.datetime.now()
+        self.event_filter_on = False
         QtWidgets.QDialog.__init__(self)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
         font = f"font: {self.app.settings['docfontsize']}pt "
@@ -252,6 +246,7 @@ class DialogCodeInText(QtWidgets.QDialog):
         cur_pos = self.data['pos1']
         text_cursor.setPosition(cur_pos)
         self.te.setTextCursor(text_cursor)
+        self.event_filter_on = True
         if self.event_filter_on:
             tt = _("Resize coding\nAlt+Left Arrow, Alt+Right Arrow\nShift+LeftArrow, Shift+Right Arrow")
             self.te.setToolTip(tt)
@@ -402,10 +397,6 @@ class DialogCodeInAV(QtWidgets.QDialog):
     reports.DialogReportCodes, when results are produced
     """
 
-    app = None
-    data = None
-    frame = None
-
     def __init__(self, app, data):
         """ View audio/video segment in a dialog window.
         mediapath may be a link as: 'video:path'
@@ -493,25 +484,15 @@ class DialogCodeInAV(QtWidgets.QDialog):
 
 class DialogCodeInImage(QtWidgets.QDialog):
     """ View coded section in original image.
-
     Called by: DialogCodeInAllFiles.show_context_of_clicked_heading,
     reports.DialogReportCodes, when results are produced
     """
-
-    app = None
-    data = None
-    pixmap = None
-    label = None
-    scale = None
-    scene = None
-    degrees = 0
-    export_key_timer = 0
 
     def __init__(self, app, data):
         """ Image_data contains details to show the image and the coded section.
         mediapath may be a link as: 'images:path'
         For pdf image coding - need to create an image
-        param:
+        Args:
             app : class containing app details such as database connection
             data : dictionary {codename, color, file_or_casename, x1, y1, width, height, coder,
                     mediapath, fid, memo, file_or_case}
@@ -558,11 +539,13 @@ class DialogCodeInImage(QtWidgets.QDialog):
         self.ui.graphicsView.customContextMenuRequested.connect(self.scene_context_menu)
         tt = _("L rotate clockwise\nR rotate anti-clockwise\n+ - zoom in and out\nE Export Image")
         self.ui.graphicsView.setToolTip(tt)
+        self.degrees = 0
         self.ui.graphicsView.setAlignment(QtCore.Qt.AlignmentFlag.AlignLeft | QtCore.Qt.AlignmentFlag.AlignTop)
         self.installEventFilter(self)
         self.pixmap = QtGui.QPixmap.fromImage(image)
         self.ui.horizontalSlider.setValue(99)
         self.ui.horizontalSlider.setToolTip(_("Key + or W zoom in. Key - or Q zoom out"))
+        self.label = None
         self.ui.scrollArea.setWidget(self.label)
         self.ui.horizontalSlider.valueChanged[int].connect(self.draw_scene)
         # Scale initial picture by height to mostly fit inside scroll area
