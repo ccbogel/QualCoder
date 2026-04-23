@@ -522,7 +522,7 @@ class DialogCodeInImage(QtWidgets.QDialog):
                 source_path = self.data['mediapath'][5:]
             fitz_pdf = fitz.open(source_path)  # Use pymupdf to get page images
             for page in fitz_pdf:
-                if page.number == data['pdf_page']:
+                if page.number == self.data['pdf_page']:
                     # Only need the current page image of interest
                     pixmap = page.get_pixmap()
                     pixmap.save(os.path.join(self.app.confighome, f"tmp_pdf_page.png"))
