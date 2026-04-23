@@ -2,6 +2,7 @@ import os
 import tempfile
 from types import SimpleNamespace
 from unittest import TestCase
+import yaml
 
 from qualcoder.ai_agent_prompts import AiAgentPromptsCatalog
 
@@ -37,6 +38,16 @@ class TestAiAgentPromptsCatalog(TestCase):
         os.makedirs(os.path.dirname(path), exist_ok=True)
         with open(path, "w", encoding="utf-8") as handle:
             handle.write(content)
+
+    def _write_legacy_prompts(self, scope: str, prompts: list[dict]) -> None:
+        paths = {
+            "user": os.path.join(self.temp_dir.name, "user_home", "ai_prompts.yaml"),
+            "project": os.path.join(self.temp_dir.name, "project", "ai_data", "ai_prompts.yaml"),
+        }
+        path = paths[scope]
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        with open(path, "w", encoding="utf-8") as handle:
+            yaml.safe_dump(prompts, handle, allow_unicode=True, sort_keys=False)
 
     def test_resolve_prompt_references_expands_nested_prompts_once(self):
         self._write_prompt("system", "a", "/b\nAlpha")
@@ -175,3 +186,100 @@ class TestAiAgentPromptsCatalog(TestCase):
         self.assertIsNotNone(prompt)
         self.assertEqual("", prompt.description)
         self.assertEqual("Prompt body", prompt.content)
+
+    def test_migrate_legacy_user_prompts_creates_markdown_files(self):
+        self._write_legacy_prompts(
+            "user",
+            [
+                {
+                    "name": "Custom Code Prompt",
+                    "type": "code_analysis",
+                    "description": "Custom description",
+                    "text": "Custom body",
+                },
+                {
+                    "name": "Ignored Search Prompt",
+                    "type": "search",
+                    "description": "Ignored",
+                    "text": "Ignored",
+                },
+            ],
+        )
+
+        result = self.catalog.migrate_legacy_prompts_once()
+
+        self.assertEqual({"migrated": 1, "skipped": 0}, result["user"])
+        migrated_path = os.path.join(self.user_root, "code-analysis", "custom-code-prompt.md")
+        self.assertTrue(os.path.exists(migrated_path))
+        with open(migrated_path, "r", encoding="utf-8") as handle:
+            migrated_text = handle.read()
+        self.assertIn("name: custom-code-prompt", migrated_text)
+        self.assertIn("description: Custom description", migrated_text)
+        self.assertTrue(migrated_text.rstrip().endswith("Custom body"))
+
+    def test_migrate_legacy_project_prompts_skips_existing_target_file(self):
+        self._write_prompt("project", "text-analysis/existing-prompt", "Already there")
+        self._write_legacy_prompts(
+            "project",
+            [
+                {
+                    "name": "Existing Prompt",
+                    "type": "text_analysis",
+                    "description": "Should skip",
+                    "text": "Legacy body",
+                }
+            ],
+        )
+
+        result = self.catalog.migrate_legacy_prompts_once()
+
+        self.assertEqual({"migrated": 0, "skipped": 1}, result["project"])
+        migrated_path = os.path.join(self.project_root, "text-analysis", "existing-prompt.md")
+        with open(migrated_path, "r", encoding="utf-8") as handle:
+            self.assertEqual("Already there", handle.read())
+
+    def test_migrate_legacy_prompts_resolves_slug_collisions_with_suffixes(self):
+        self._write_legacy_prompts(
+            "user",
+            [
+                {
+                    "name": "Foo Bar",
+                    "type": "text_analysis",
+                    "description": "First",
+                    "text": "Body one",
+                },
+                {
+                    "name": "Foo/Bar",
+                    "type": "text_analysis",
+                    "description": "Second",
+                    "text": "Body two",
+                },
+            ],
+        )
+
+        result = self.catalog.migrate_legacy_prompts_once()
+
+        self.assertEqual({"migrated": 2, "skipped": 0}, result["user"])
+        first_path = os.path.join(self.user_root, "text-analysis", "foo-bar.md")
+        second_path = os.path.join(self.user_root, "text-analysis", "foo-bar-2.md")
+        self.assertTrue(os.path.exists(first_path))
+        self.assertTrue(os.path.exists(second_path))
+
+    def test_migrate_legacy_prompts_runs_only_once_per_scope(self):
+        self._write_legacy_prompts(
+            "user",
+            [
+                {
+                    "name": "One Time Prompt",
+                    "type": "text_analysis",
+                    "description": "Once",
+                    "text": "Only once",
+                },
+            ],
+        )
+
+        first_result = self.catalog.migrate_legacy_prompts_once()
+        second_result = self.catalog.migrate_legacy_prompts_once()
+
+        self.assertEqual({"migrated": 1, "skipped": 0}, first_result["user"])
+        self.assertEqual({"migrated": 0, "skipped": 1}, second_result["user"])

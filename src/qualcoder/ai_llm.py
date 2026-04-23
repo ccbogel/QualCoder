@@ -36,6 +36,7 @@ import qtawesome as qta
 import httpx
 
 from openai import OpenAI, BadRequestError
+from .ai_agent_prompts import AiAgentPromptsCatalog
 from .ai_prompts import PromptItem
 from langchain_openai import ChatOpenAI, AzureChatOpenAI
 from langchain_core.globals import set_llm_cache  # Unused
@@ -2199,10 +2200,33 @@ class AiLLM():
 
     def prompt_icon(self):
         return qta.icon('mdi6.script-text-outline', color=self.app.highlight_color())
+
+    def _migrate_legacy_prompts_for_current_scope(self) -> None:
+        """One-time import of legacy user/project prompts into Markdown files."""
+
+        try:
+            catalog = AiAgentPromptsCatalog(self.app)
+            results = catalog.migrate_legacy_prompts_once()
+        except Exception as err:
+            logger.warning("Legacy AI prompt migration failed: %s", err)
+            self.parent_text_edit.append(_('AI: Legacy prompt migration failed.'))
+            return
+
+        for scope in ("user", "project"):
+            scope_result = results.get(scope, {})
+            migrated = int(scope_result.get("migrated", 0) or 0)
+            if migrated > 0:
+                self.parent_text_edit.append(
+                    _('AI: Migrated {count} {scope} prompts to Markdown format.').format(
+                        count=migrated,
+                        scope=scope,
+                    )
+                )
         
     def init_llm(self, main_window, rebuild_vectorstore=False, enable_ai=False):  
         try:
             self.main_window = main_window      
+            self._migrate_legacy_prompts_for_current_scope()
             if enable_ai or self.app.settings['ai_enable'] == 'True':
                 self.parent_text_edit.append(_('AI: Starting up...'))
                 QtWidgets.QApplication.processEvents()  # update ui

@@ -23,12 +23,23 @@ from dataclasses import dataclass
 import logging
 import os
 import re
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
+import unicodedata
 import yaml
 
 
 PROMPT_REFERENCE_PATTERN = re.compile(r"(?<!\S)/(\S+)")
 PROMPT_FRONTMATTER_PATTERN = re.compile(r"\A---[ \t]*\r?\n(.*?)\r?\n---[ \t]*(?:\r?\n|$)", re.DOTALL)
+LEGACY_PROMPT_TYPE_FOLDERS = {
+    "code_analysis": "code-analysis",
+    "topic_analysis": "topic-exploration",
+    "text_analysis": "text-analysis",
+}
+WINDOWS_RESERVED_FILENAMES = {
+    "con", "prn", "aux", "nul",
+    "com1", "com2", "com3", "com4", "com5", "com6", "com7", "com8", "com9",
+    "lpt1", "lpt2", "lpt3", "lpt4", "lpt5", "lpt6", "lpt7", "lpt8", "lpt9",
+}
 logger = logging.getLogger(__name__)
 
 
@@ -151,6 +162,61 @@ class AiAgentPromptsCatalog:
 
         return ordered
 
+    def migrate_legacy_prompts_once(self) -> Dict[str, Dict[str, int]]:
+        """Import legacy YAML prompts for user and project scopes into Markdown files."""
+
+        results: Dict[str, Dict[str, int]] = {}
+
+        confighome = str(getattr(self.app, "confighome", "") if hasattr(self.app, "confighome") else "").strip()
+        if confighome != "":
+            results["user"] = self._migrate_legacy_prompt_scope(
+                legacy_yaml_path=os.path.join(confighome, "ai_prompts.yaml"),
+                markdown_root=os.path.join(confighome, "ai_prompts"),
+            )
+
+        project_path = str(getattr(self.app, "project_path", "") if hasattr(self.app, "project_path") else "").strip()
+        if project_path != "":
+            results["project"] = self._migrate_legacy_prompt_scope(
+                legacy_yaml_path=os.path.join(project_path, "ai_data", "ai_prompts.yaml"),
+                markdown_root=os.path.join(project_path, "ai_data", "ai_prompts"),
+            )
+
+        return results
+
+    def _migrate_legacy_prompt_scope(self, legacy_yaml_path: str, markdown_root: str) -> Dict[str, int]:
+        """One-time import of legacy YAML prompts into the new Markdown folder layout."""
+
+        result = {"migrated": 0, "skipped": 0}
+        raw_legacy_yaml = self._read_text(legacy_yaml_path)
+        if raw_legacy_yaml is None or raw_legacy_yaml.strip() == "":
+            return result
+
+        legacy_prompts = self._load_legacy_prompts_from_yaml(raw_legacy_yaml, legacy_yaml_path)
+        if legacy_prompts is None or len(legacy_prompts) == 0:
+            return result
+
+        existing_paths = self._collect_existing_markdown_paths(markdown_root)
+        planned_targets = self._plan_legacy_prompt_targets(legacy_prompts, markdown_root)
+
+        for prompt, target_path in planned_targets:
+            normalized_desired_path = os.path.normcase(os.path.normpath(target_path))
+            if normalized_desired_path in existing_paths:
+                result["skipped"] += 1
+                continue
+
+            os.makedirs(os.path.dirname(target_path), exist_ok=True)
+            markdown_text = self._build_prompt_markdown_document(
+                self._slug_from_prompt_path(target_path),
+                str(prompt.get("description", "") if isinstance(prompt, dict) else ""),
+                str(prompt.get("text", "") if isinstance(prompt, dict) else ""),
+            )
+            with open(target_path, "w", encoding="utf-8") as handle:
+                handle.write(markdown_text)
+            existing_paths.add(normalized_desired_path)
+            result["migrated"] += 1
+
+        return result
+
     def _prompt_roots(self) -> List[Tuple[str, str]]:
         roots: List[Tuple[str, str]] = []
         roots.append(("system", self._system_root))
@@ -268,6 +334,109 @@ class AiAgentPromptsCatalog:
                 return handle.read()
         except OSError:
             return None
+
+    def _load_legacy_prompts_from_yaml(self, raw_text: str, source_path: str) -> Optional[List[Dict[str, Any]]]:
+        """Parse one legacy ai_prompts.yaml payload and return prompt dictionaries."""
+
+        try:
+            data = yaml.safe_load(raw_text)
+        except yaml.YAMLError:
+            logger.warning("Could not parse legacy AI prompts YAML: %s", source_path)
+            return None
+        if not isinstance(data, list):
+            return []
+        return [item for item in data if isinstance(item, dict)]
+
+    def _collect_existing_markdown_paths(self, root: str) -> set[str]:
+        """Return normalized paths of all existing Markdown files below one prompt root."""
+
+        result: set[str] = set()
+        if root is None or str(root).strip() == "" or not os.path.isdir(root):
+            return result
+        for dirpath, _, filenames in os.walk(root):
+            for filename in filenames:
+                if not filename.lower().endswith(".md"):
+                    continue
+                result.add(os.path.normcase(os.path.normpath(os.path.join(dirpath, filename))))
+        return result
+
+    def _slugify_prompt_filename(self, name: str, max_length: int = 64) -> str:
+        """Convert one prompt name into a portable lowercase filename slug."""
+
+        text = unicodedata.normalize("NFKD", str(name if name is not None else ""))
+        text = "".join(ch for ch in text if not unicodedata.combining(ch))
+        text = text.lower()
+        text = re.sub(r"[^a-z0-9]+", "-", text)
+        text = re.sub(r"-{2,}", "-", text).strip("-")
+        if text == "":
+            text = "prompt"
+        text = text[:max_length].rstrip("-")
+        if text == "":
+            text = "prompt"
+        if text in WINDOWS_RESERVED_FILENAMES:
+            suffix = "-prompt"
+            text = text[:max(1, max_length - len(suffix))].rstrip("-") + suffix
+        return text
+
+    def _plan_legacy_prompt_targets(
+        self,
+        legacy_prompts: List[Dict[str, Any]],
+        markdown_root: str,
+    ) -> List[Tuple[Dict[str, Any], str]]:
+        """Plan deterministic target paths for all migratable legacy prompts in one scope."""
+
+        planned: List[Tuple[Dict[str, Any], str]] = []
+        used_paths: set[str] = set()
+
+        for prompt in legacy_prompts:
+            prompt_type = str(prompt.get("type", "") if isinstance(prompt, dict) else "").strip()
+            target_folder = LEGACY_PROMPT_TYPE_FOLDERS.get(prompt_type, "")
+            if target_folder == "":
+                continue
+
+            prompt_name = str(prompt.get("name", "") if isinstance(prompt, dict) else "").strip()
+            base_slug = self._slugify_prompt_filename(prompt_name)
+            target_dir = os.path.join(markdown_root, target_folder)
+            candidate_slug = base_slug
+            counter = 2
+
+            while True:
+                candidate_path = os.path.join(target_dir, candidate_slug + ".md")
+                normalized_candidate = os.path.normcase(os.path.normpath(candidate_path))
+                if normalized_candidate not in used_paths:
+                    used_paths.add(normalized_candidate)
+                    planned.append((prompt, candidate_path))
+                    break
+                suffix = f"-{counter}"
+                candidate_slug = self._slugify_prompt_filename(base_slug, max_length=max(8, 64 - len(suffix))) + suffix
+                counter += 1
+
+        return planned
+
+    def _slug_from_prompt_path(self, path: str) -> str:
+        """Return one prompt slug from a file path."""
+
+        basename = os.path.basename(str(path if path is not None else ""))
+        if basename.lower().endswith(".md"):
+            basename = basename[:-3]
+        return basename
+
+    def _build_prompt_markdown_document(self, slug: str, description: str, text: str) -> str:
+        """Build one Markdown prompt file with YAML frontmatter."""
+
+        frontmatter = yaml.safe_dump(
+            {
+                "name": str(slug if slug is not None else "").strip(),
+                "description": str(description if description is not None else "").strip(),
+            },
+            allow_unicode=True,
+            sort_keys=False,
+            default_flow_style=False,
+        ).strip()
+        body = str(text if text is not None else "").strip()
+        if body == "":
+            return "---\n" + frontmatter + "\n---\n"
+        return "---\n" + frontmatter + "\n---\n\n" + body + "\n"
 
     def _split_frontmatter(self, text: str) -> Tuple[Dict[str, str], str]:
         """Return frontmatter metadata and Markdown body without the frontmatter block."""
