@@ -133,6 +133,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
             for row in results:
                 res_dict = dict(zip(keys, row))
                 res_dict['codename'] = code['name']
+                res_dict['cid'] = code['cid']
                 self.text_results.append(res_dict)
 
         # Text insertion into textEdit
@@ -182,6 +183,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
             for row in results:
                 res_dict = dict(zip(keys, row))
                 res_dict['codename'] = code['name']
+                res_dict['cid'] = code['cid']
                 self.image_results.append(res_dict)
 
         # Image - textEdit insertion
@@ -234,6 +236,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
             for row in results:
                 res_dict = dict(zip(keys, row))
                 res_dict['codename'] = code['name']
+                res_dict['cid'] = code['cid']
                 self.av_results.append(res_dict)
 
         # A/V - textEdit insertion
@@ -293,7 +296,6 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
                     pixmap.save(os.path.join(self.app.confighome, f"tmp_pdf_page.png"))
             source_path = os.path.join(self.app.confighome, f"tmp_pdf_page.png")
             image = QtGui.QImage(source_path)
-        #image = QtGui.QImageReader(path_).read()
         image = image.copy(int(img['x1']), int(img['y1']), int(img['width']), int(img['height']))
         # scale to max 300 wide or high. perhaps add option to change maximum limit?
         scaler_w = 1.0
@@ -480,8 +482,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
     def mark_with_more_codes(self, item):
         """ Select and apply more codes to this coded segment. """
 
-        # TODO now no code dict
-        codes = [c for c in self.codes if c['cid'] != self.code_dict['cid']]
+        codes = [c for c in self.codes if c['cid'] != item['res']['cid']]
         ui = DialogSelectItems(self.app, codes, _("Select codes"), "multi")
         ok = ui.exec()
         if not ok:
