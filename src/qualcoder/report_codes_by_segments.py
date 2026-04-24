@@ -533,6 +533,9 @@ class DialogCodesBySegments(QtWidgets.QDialog):
         action_all = menu.addAction(_("Select all codes"))
         action_unselect = menu.addAction(_("Remove selections"))
         action_like = menu.addAction(_("Select codes like"))
+        action_cat_show_coded_files = None
+        if selected is not None and selected.text(1)[0:3] == 'cat':
+            action_cat_show_coded_files = menu.addAction(_("Show coded files"))
         action_show_coded_media = None
         if selected is not None and selected.text(1)[0:3] == 'cid':
             action_show_coded_media = menu.addAction(_("Show coded files"))
@@ -584,12 +587,14 @@ class DialogCodesBySegments(QtWidgets.QDialog):
             if found_code:
                 DialogCodeInAllFiles(self.app, found_code)
             return
+        if action == action_cat_show_coded_files:
+            branch_codes = self.recursive_get_branch_codes(selected, [])
+            DialogCodeInAllFiles(self.app, branch_codes, "File", selected.text(0))
+            return
         if action == action_expand_names:
-            print("act expand")
             self.truncated_code_names = False
             self.fill_tree()
         if action == action_truncate_names:
-            print("act trunc")
             self.truncated_code_names = True
             self.fill_tree()
         if action == action_resize:
@@ -598,6 +603,22 @@ class DialogCodesBySegments(QtWidgets.QDialog):
             self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
         else:
             self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Interactive)
+
+    def recursive_get_branch_codes(self, item, branch_codes):
+        """ Set all children of this item to be expanded or collapsed.
+        Recurse through all child categories. """
+
+        child_count = item.childCount()
+        for i in range(child_count):
+            if item.child(i).text(1)[0:3] == "cid":
+                cid = int(item.child(i).text(1)[4:])
+                for code_ in self.code_names:
+                    if cid == code_['cid']:
+                        branch_codes.append(code_)
+                        break
+            if item.child(i).text(1)[0:3] == "cat":
+                self.recursive_get_branch_codes(item.child(i), branch_codes)
+        return branch_codes
 
     def export_xlsx_file(self):
         """ Export report to xlsx file.
