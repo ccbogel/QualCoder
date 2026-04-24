@@ -95,7 +95,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         self.exec()
 
     def get_coded_segments_all_files(self):
-        """ Get coded text by file for this coder data """
+        """ Get coded text by file for this code. """
 
         self.te.blockSignals(True)
         self.te.clear()
@@ -143,16 +143,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         for row in self.text_results:
             row['file_or_case'] = self.case_or_file
             row['textedit_start'] = len(self.te.toPlainText())
-            foregroundcolor = f"color:{TextColor(row['color']).recommendation};"
-            title = f'<span style="background-color:{row["color"]}; {foregroundcolor}\">'
-            if self.case_or_file == "File":
-                title += _(" File: ") + row['file_or_casename']
-            else:
-                title += _("Case: ") + row['file_or_casename'] + _(" File: ") + row['source_name']
-            title += f", {row['pos0']} - {row['pos1']} ({row['owner']})"
-            title += "  " + _("Code:") + f" {row['codename']}"
-            title += "</span><br />"
-            self.te.insertHtml(title)
+            self.insert_title(row)
             row['textedit_end'] = len(self.te.toPlainText())
             self.te.append(f"{row['text']}\n")
             if row['memo']:
@@ -193,17 +184,9 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         for counter, row in enumerate(self.image_results):
             row['file_or_case'] = self.case_or_file
             row['textedit_start'] = len(self.te.toPlainText())
-            foregroundcolor = f"color:{TextColor(row['color']).recommendation};"
-            title = f'<p><span style="background-color:{row["color"]}; {foregroundcolor}">'
-            if self.case_or_file == "Case":
-                title += _(" Case: ") + row['file_or_casename'] + _(" File: ") + row['mediapath']
-            else:
-                title += _(" File: ") + row['mediapath']
-            title += "  " + _("Code:") + f" {row['codename']}"
-            title += f' ({row["owner"]})</span></p>'
-            self.te.insertHtml(title)
+            self.insert_title(row)
             row['textedit_end'] = len(self.te.toPlainText())
-            self.te.append("\n")
+            #self.te.append("\n")
             img = {'mediapath': row['mediapath'], 'x1': row['x1'], 'y1': row['y1'], 'width': row['width'],
                    'height': row['height'], 'pdf_page': row['pdf_page']}
             self.put_image_into_textedit(img, counter, self.te)
@@ -238,7 +221,6 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
                 res_dict['codename'] = code['name']
                 res_dict['cid'] = code['cid']
                 self.av_results.append(res_dict)
-
         # A/V - textEdit insertion
         if self.av_results:
             hmsg = "<h3>" + _("Coded audio / video") + "<h3><br />"
@@ -246,23 +228,35 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         for row in self.av_results:
             row['file_or_case'] = self.case_or_file
             row['textedit_start'] = len(self.te.toPlainText())
-            foregroundcolor = f"color:{TextColor(row['color']).recommendation};"
-            title = f'<span style="background-color:{row["color"]}; {foregroundcolor}">'
-            if self.case_or_file == "Case":
-                title += _("Case: ") + row['file_or_casename'] + _(" File: ") + row['mediapath']
-            else:
-                title += _("File: ") + row['mediapath']
-            title += "  " + _("Code:") + f" {row['codename']} ({row['owner']}) </span>"
-            self.te.insertHtml(title)
+            self.insert_title(row)
             start = msecs_to_mins_and_secs(row['pos0'])
             end = msecs_to_mins_and_secs(row['pos1'])
-            self.te.insertHtml(f'<br />[{start} - {end}] ')
+            self.te.insertHtml(f'<br />Time: [{start} - {end}] ')
             row['textedit_end'] = len(self.te.toPlainText())
             if row['memo'] != "":
                 self.te.append(_("Memo: ") + row['memo'] + "\n")
             else:
                 self.te.append("\n")
+
+        self.te.moveCursor(QtGui.QTextCursor.Start)
         self.te.blockSignals(False)
+
+    def insert_title(self, row):
+        """ Convenience method for a/v, image, text title insertion. """
+
+        foregroundcolor = f"color:{TextColor(row['color']).recommendation};"
+        title = f'<span style="background-color:{row["color"]}; {foregroundcolor}\">'
+        if self.case_or_file == "File":
+            title += _(" File: ") + row['file_or_casename']
+        else:
+            title += _("Case: ") + row['file_or_casename'] + _(" File: ") + row['source_name']
+        if 'pos0' in row.keys():
+            title += f", [{row['pos0']} - {row['pos1']}]"
+        title += "  " + _("Code:") + f" {row['codename']} ({row['owner']})"
+        if row['important']:
+            title += " [!]"
+        title += "</span><br />"
+        self.te.insertHtml(title)
 
     def put_image_into_textedit(self, img, counter, text_edit):
         """ Scale image, add resource to document, insert image.
