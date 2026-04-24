@@ -733,11 +733,16 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
         action_exclude_code = None
         if selected is not None and selected.text(1)[0:3] == 'cid':
             action_exclude_code = menu.addAction(_("Exclude code"))
+        action_cat_show_coded_files = None
+        if selected is not None and selected.text(1)[0:3] == 'cat':
+            action_cat_show_coded_files = menu.addAction(_("Show coded files"))
         action_show_coded_media = None
         if selected is not None and selected.text(1)[0:3] == 'cid':
             action_show_coded_media = menu.addAction(_("Show coded files"))
 
         action = menu.exec(self.ui.treeWidget.mapToGlobal(position))
+        if action is None:
+            return
         if action == action_clear_selected:
             selected = self.ui.treeWidget.selectedItems()
             for tree_item in selected:
@@ -765,3 +770,23 @@ class DialogReportExactTextMatches(QtWidgets.QDialog):
                     break
             if found_code:
                 DialogCodeInAllFiles(self.app, found_code)
+            return
+        if action == action_cat_show_coded_files:
+            branch_codes = self.recursive_get_branch_codes(selected, [])
+            DialogCodeInAllFiles(self.app, branch_codes, "File", selected.text(0))
+            return
+    def recursive_get_branch_codes(self, item, branch_codes):
+        """ Set all children of this item to be expanded or collapsed.
+        Recurse through all child categories. """
+
+        child_count = item.childCount()
+        for i in range(child_count):
+            if item.child(i).text(1)[0:3] == "cid":
+                cid = int(item.child(i).text(1)[4:])
+                for code_ in self.codes:
+                    if cid == code_['cid']:
+                        branch_codes.append(code_)
+                        break
+            if item.child(i).text(1)[0:3] == "cat":
+                self.recursive_get_branch_codes(item.child(i), branch_codes)
+        return branch_codes
