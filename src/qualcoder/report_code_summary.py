@@ -307,6 +307,9 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
         action_show_coded_media = None
         if selected is not None and selected.text(1)[0:3] == 'cid':
             action_show_coded_media = menu.addAction(_("Show coded files"))
+        action_cat_show_coded_files = None
+        if selected is not None and selected.text(1)[0:3] == 'cat':
+            action_cat_show_coded_files = menu.addAction(_("Show coded files"))
         action_expand_names = None
         if self.contains_long_names:
             action_expand_names = menu.addAction(_("Expand names"))
@@ -315,29 +318,50 @@ class DialogReportCodeSummary(QtWidgets.QDialog):
             action_truncate_names = menu.addAction(_("Truncate names"))
         action_resize = menu.addAction(_("Toggle automatic column resize"))
         action = menu.exec(self.ui.treeWidget.mapToGlobal(position))
-        if action is not None:
-            if action == action_show_coded_media:
-                found_code = None
-                tofind = int(selected.text(1)[4:])
-                for code in self.codes:
-                    if code['cid'] == tofind:
-                        found_code = code
+        if action is None:
+            return
+        if action == action_show_coded_media:
+            found_code = None
+            tofind = int(selected.text(1)[4:])
+            for code in self.codes:
+                if code['cid'] == tofind:
+                    found_code = code
+                    break
+            if found_code:
+                DialogCodeInAllFiles(self.app, found_code)
+            return
+        if action == action_cat_show_coded_files:
+            branch_codes = self.recursive_get_branch_codes(selected, [])
+            DialogCodeInAllFiles(self.app, branch_codes, "File", selected.text(0))
+            return
+        if action == action_expand_names:
+            self.truncated_code_names = False
+            self.fill_tree()
+        if action == action_truncate_names:
+            self.truncated_code_names = True
+            self.fill_tree()
+        if action == action_resize:
+            self.tree_column_widths_auto_resize = not self.tree_column_widths_auto_resize
+        if self.tree_column_widths_auto_resize:
+            self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
+        else:
+            self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Interactive)
+
+    def recursive_get_branch_codes(self, item, branch_codes):
+        """ Set all children of this item to be expanded or collapsed.
+        Recurse through all child categories. """
+
+        child_count = item.childCount()
+        for i in range(child_count):
+            if item.child(i).text(1)[0:3] == "cid":
+                cid = int(item.child(i).text(1)[4:])
+                for code_ in self.codes:
+                    if cid == code_['cid']:
+                        branch_codes.append(code_)
                         break
-                if found_code:
-                    DialogCodeInAllFiles(self.app, found_code)
-                return
-            if action == action_expand_names:
-                self.truncated_code_names = False
-                self.fill_tree()
-            if action == action_truncate_names:
-                self.truncated_code_names = True
-                self.fill_tree()
-            if action == action_resize:
-                self.tree_column_widths_auto_resize = not self.tree_column_widths_auto_resize
-            if self.tree_column_widths_auto_resize:
-                self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.ResizeToContents)
-            else:
-                self.ui.treeWidget.header().setSectionResizeMode(QtWidgets.QHeaderView.ResizeMode.Interactive)
+            if item.child(i).text(1)[0:3] == "cat":
+                self.recursive_get_branch_codes(item.child(i), branch_codes)
+        return branch_codes
 
     def fill_text_edit(self):
         """ Get data about file and fill text edit. """
