@@ -126,6 +126,7 @@ logger.setLevel(logging.DEBUG)
 handler = RotatingFileHandler(logfile, maxBytes=log_maxBytes, backupCount=2)
 logger.addHandler(handler)
 
+
 class ProjectEventBus(QtCore.QObject):
     """Application-wide event bus for project database changes.
     This is used to notify other dialogs (e.g. reports) of changes to the project database, 
@@ -169,7 +170,7 @@ class App(object):
 
     ai = None
     ai_models = []
-    # This is the sentence transformer embedding function. It is stored here so it must not be reloaded every time a project is opened.
+    # Sentence transformer embedding function. It is stored here so it must not be reloaded every time a project is opened.
     ai_embedding_function = None
     project_events = None
     
@@ -1514,10 +1515,6 @@ Click "Yes" to start now.')
         self.ui.actionManage_bad_links_to_files.triggered.connect(self.manage_bad_file_links)
         self.ui.actionManage_references.setShortcut('Alt+R')
         self.ui.actionManage_references.triggered.connect(self.manage_references)
-        # Expect twitter / X is not used now
-        # self.ui.actionImport_twitter_data.triggered.connect(self.import_twitter)
-        self.ui.actionImport_twitter_data.setVisible(False)
-        self.ui.menuImport.removeAction(self.ui.actionImport_twitter_data)  # Line does not work
         # Coding menu
         self.ui.actionCodes.triggered.connect(self.text_coding)
         self.ui.actionCodes.setShortcut('Alt+T')
@@ -1530,9 +1527,17 @@ Click "Yes" to start now.')
         self.ui.actionColour_scheme.setShortcut('Alt+E')
         self.ui.actionColour_scheme.triggered.connect(self.code_color_scheme)
         self.ui.actionCode_organiser.triggered.connect(self.code_organiser)
-        # Reports menu
+        # Analysis menu
         self.ui.actionCoding_reports.setShortcut('Alt+K')
         self.ui.actionCoding_reports.triggered.connect(self.report_coding)
+        self.ui.actionCode_co_occurrence.triggered.connect(self.co_occurence)
+        self.ui.actionCode_relations.setShortcut('Alt+Q')
+        self.ui.actionCode_relations.triggered.connect(self.report_code_relations)
+        self.ui.actionCode_text_exact_matches.triggered.connect(self.report_exact_text_matches)
+        self.ui.actionText_segments_by_codes.triggered.connect(self.text_segments_codes_table)
+        self.ui.actionView_Graph.setShortcut('Alt+G')
+        self.ui.actionView_Graph.triggered.connect(self.view_graph_original)
+        # Reports menu
         self.ui.actionCoding_comparison.setShortcut('Alt+L')
         self.ui.actionCoding_comparison.triggered.connect(self.report_coding_comparison)
         self.ui.actionCoding_comparison_by_file.setShortcut('Alt+M')
@@ -1544,16 +1549,9 @@ Click "Yes" to start now.')
         self.ui.actionFile_summary.triggered.connect(self.report_file_summary)
         self.ui.actionCode_summary.setShortcut('Alt+P')
         self.ui.actionCode_summary.triggered.connect(self.report_code_summary)
-        self.ui.actionCode_relations.setShortcut('Alt+Q')
-        self.ui.actionCode_relations.triggered.connect(self.report_code_relations)
-        self.ui.actionCode_co_occurrence.triggered.connect(self.co_occurence)
-        self.ui.actionCode_text_exact_matches.triggered.connect(self.report_exact_text_matches)
-        self.ui.actionText_segments_by_codes.triggered.connect(self.text_segments_codes_table)
-        self.ui.actionView_Graph.setShortcut('Alt+G')
-        self.ui.actionView_Graph.triggered.connect(self.view_graph_original)
+
         self.ui.actionCharts.setShortcut('Alt+U')
         self.ui.actionCharts.triggered.connect(self.view_charts)
-        # TODO self.ui.actionText_mining.triggered.connect(self.text_mining)
         self.ui.actionSQL_statements.setShortcut('Alt+D')
         self.ui.actionSQL_statements.triggered.connect(self.report_sql)
         # AI menu
@@ -1677,22 +1675,22 @@ Click "Yes" to start now.')
         self.ui.actionCode_pdf.setEnabled(False)
         self.ui.actionColour_scheme.setEnabled(False)
         self.ui.actionCode_organiser.setEnabled(False)
-        # Reports menu
+        # Analysis menu
         self.ui.actionCoding_reports.setEnabled(False)
+        self.ui.actionCode_co_occurrence.setEnabled(False)
+        self.ui.actionCode_relations.setEnabled(False)
+        self.ui.actionText_segments_by_codes.setEnabled(False)
+        self.ui.actionView_Graph.setEnabled(False)
+        # Reports menu
         self.ui.actionCoding_comparison.setEnabled(False)
         self.ui.actionCoding_comparison_by_file.setEnabled(False)
         self.ui.actionCode_frequencies.setEnabled(False)
-        self.ui.actionCode_relations.setEnabled(False)
-        self.ui.actionCode_co_occurrence.setEnabled(False)
-        self.ui.actionCode_comparison_table.setEnabled(False)
         self.ui.actionCode_text_exact_matches.setEnabled(False)
-        self.ui.actionText_mining.setEnabled(False)
+        self.ui.actionCode_comparison_table.setEnabled(False)
         self.ui.actionSQL_statements.setEnabled(False)
         self.ui.actionFile_summary.setEnabled(False)
         self.ui.actionCode_summary.setEnabled(False)
-        self.ui.actionText_segments_by_codes.setEnabled(False)
         self.ui.actionCategories.setEnabled(False)
-        self.ui.actionView_Graph.setEnabled(False)
         self.ui.actionCharts.setEnabled(False)
         # Help menu
         self.ui.actionSpecial_functions.setEnabled(False)
@@ -1725,21 +1723,22 @@ Click "Yes" to start now.')
         self.ui.actionCode_pdf.setEnabled(True)
         self.ui.actionColour_scheme.setEnabled(True)
         self.ui.actionCode_organiser.setEnabled(True)
-        # Reports menu
+        # Analysis menu
         self.ui.actionCoding_reports.setEnabled(True)
+        self.ui.actionCode_co_occurrence.setEnabled(True)
+        self.ui.actionCode_relations.setEnabled(True)
+        self.ui.actionCode_text_exact_matches.setEnabled(True)
+        self.ui.actionText_segments_by_codes.setEnabled(True)
+        self.ui.actionView_Graph.setEnabled(True)
+        # Reports menu
         self.ui.actionCoding_comparison.setEnabled(True)
         self.ui.actionCoding_comparison_by_file.setEnabled(True)
         self.ui.actionCode_comparison_table.setEnabled(True)
         self.ui.actionCode_frequencies.setEnabled(True)
-        self.ui.actionCode_relations.setEnabled(True)
-        self.ui.actionCode_co_occurrence.setEnabled(True)
-        self.ui.actionCode_text_exact_matches.setEnabled(True)
         self.ui.actionSQL_statements.setEnabled(True)
         self.ui.actionFile_summary.setEnabled(True)
         self.ui.actionCode_summary.setEnabled(True)
-        self.ui.actionText_segments_by_codes.setEnabled(True)
         self.ui.actionCategories.setEnabled(True)
-        self.ui.actionView_Graph.setEnabled(True)
         self.ui.actionCharts.setEnabled(True)
         # Help menu
         self.ui.actionSpecial_functions.setEnabled(True)
