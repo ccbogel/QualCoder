@@ -451,7 +451,6 @@ class DialogCodesBySegments(QtWidgets.QDialog):
                 if c['memo'] != "":
                     memo = "Memo"
                 code_name = c['name']
-                print(self.truncated_code_names, code_name)
                 if self.truncated_code_names:
                     if len(c['name']) > 62:  # Keep category name short
                         code_name = c['name'][:30] + '..' + c['name'][-30:]
@@ -681,8 +680,6 @@ class DialogCodesBySegments(QtWidgets.QDialog):
         else:
             self.search_by_case()
 
-        '''for r in self.results:
-            print(r)'''
         # Collate results
         # Collate Codes - columns and segments - rows
         self.code_columns = []
