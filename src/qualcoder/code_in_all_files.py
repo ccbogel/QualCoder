@@ -69,7 +69,7 @@ class DialogCodeInAllFiles(QtWidgets.QDialog):
         QtWidgets.QDialog.__init__(self)
         font = f'font: {self.app.settings["fontsize"]}pt "{self.app.settings["font"]}";'
         self.setStyleSheet(font)
-        self.resize(550, 580)
+        self.resize(620, 580)
         # Enable custom window hint to enable customizing window controls
         self.setWindowFlags(self.windowFlags() | QtCore.Qt.WindowType.CustomizeWindowHint)
         self.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
