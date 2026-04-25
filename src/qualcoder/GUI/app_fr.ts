@@ -144,16 +144,6 @@ Les codages de l'ensemble du fichier texte sont utilisés pour les calculs.</tra
         <translation>Nuage de mots</translation>
     </message>
     <message>
-        <location filename="ui_dialog_charts.py" line="314"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Background&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">Fond</translation>
-    </message>
-    <message>
-        <location filename="ui_dialog_charts.py" line="315"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Foreground&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">Avant-plan</translation>
-    </message>
-    <message>
         <location filename="ui_dialog_charts.py" line="322"/>
         <source>Width</source>
         <translation>Largeur</translation>
@@ -2087,11 +2077,6 @@ Appui sur la touche 5 - Avance de 5 secondes</translation>
         <translation></translation>
     </message>
     <message>
-        <location filename="ui_dialog_code_text.py" line="450"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Text font size.&lt;/p&gt;&lt;p&gt;A default size can be set in Settings.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Taille de la police du texte.&lt;/p&gt;&lt;p&gt;Une taille par défaut peut être définie dans Paramètres.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
         <location filename="ui_dialog_code_text.py" line="448"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Auto code using start and end marks.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Autocodage à l'aide de marques de début et de fin.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
@@ -2216,46 +2201,6 @@ car toutes les positions assignées peuvent être incorrectes. </translation>
         <location filename="ui_dialog_code_text.py" line="493"/>
         <source>Use the AI to find data</source>
         <translation>Utiliser l'IA pour trouver des données</translation>
-    </message>
-    <message>
-        <location filename="ui_dialog_code_text.py" line="469"/>
-        <source>8</source>
-        <translation type="obsolete">8</translation>
-    </message>
-    <message>
-        <location filename="ui_dialog_code_text.py" line="470"/>
-        <source>10</source>
-        <translation type="obsolete">10</translation>
-    </message>
-    <message>
-        <location filename="ui_dialog_code_text.py" line="471"/>
-        <source>12</source>
-        <translation type="obsolete">12</translation>
-    </message>
-    <message>
-        <location filename="ui_dialog_code_text.py" line="472"/>
-        <source>14</source>
-        <translation type="obsolete">14</translation>
-    </message>
-    <message>
-        <location filename="ui_dialog_code_text.py" line="473"/>
-        <source>16</source>
-        <translation type="obsolete">16</translation>
-    </message>
-    <message>
-        <location filename="ui_dialog_code_text.py" line="474"/>
-        <source>18</source>
-        <translation type="obsolete">18</translation>
-    </message>
-    <message>
-        <location filename="ui_dialog_code_text.py" line="475"/>
-        <source>20</source>
-        <translation type="obsolete">20</translation>
-    </message>
-    <message>
-        <location filename="ui_dialog_code_text.py" line="476"/>
-        <source>22</source>
-        <translation type="obsolete">22</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="468"/>
@@ -2545,29 +2490,9 @@ Clic-droit pour les options : tous (par défaut), premier, code dans le code.</t
         <translation>Journaux : </translation>
     </message>
     <message>
-        <location filename="ui_dialog_journals.py" line="126"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Create&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">Créer</translation>
-    </message>
-    <message>
-        <location filename="ui_dialog_journals.py" line="127"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Export&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">Exporter</translation>
-    </message>
-    <message>
-        <location filename="ui_dialog_journals.py" line="128"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delete&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">Supprimer</translation>
-    </message>
-    <message>
         <location filename="ui_dialog_journals.py" line="131"/>
         <source>Export all journals as single text file.</source>
         <translation>Exporter tous les journaux dans un seul fichier texte.</translation>
-    </message>
-    <message>
-        <location filename="ui_dialog_journals.py" line="133"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Next&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">Suivant</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="134"/>
@@ -2578,16 +2503,6 @@ Clic-droit pour les options : tous (par défaut), premier, code dans le code.</t
         <location filename="ui_dialog_journals.py" line="135"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search for text.&lt;/p&gt;&lt;p&gt;check &lt;span style=&quot; font-weight:600;&quot;&gt;All journals&lt;/span&gt; for searching all journals&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rechercher du texte.&lt;/p&gt;&lt;p&gt;Cochez &lt;span style=&quot; font-weight:600;&quot;&gt;Tous les journaux&lt;/span&gt; pour rechercher dans tous les journaux&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <location filename="ui_dialog_journals.py" line="136"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;search all journals&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">rechercher tous les journaux</translation>
-    </message>
-    <message>
-        <location filename="ui_dialog_journals.py" line="137"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Previous&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">Précédent</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="138"/>
@@ -2608,11 +2523,6 @@ Clic-droit pour les options : tous (par défaut), premier, code dans le code.</t
         <location filename="ui_dialog_journals.py" line="132"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. &lt;/p&gt;&lt;p&gt;A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A ‘*’ after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;‘&lt;/span&gt;\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;La recherche utilise des expressions régulières (Regex).&lt;/p&gt;&lt;p&gt;Le point « . » est utilisé comme caractère générique. Par exemple, « .ears » correspondra à « bears » et « years ». &lt;/p&gt;&lt;p&gt;Un « ? » après un caractère correspondra à une ou aucune occurrence de ce caractère, par exemple « bears? » correspondra à « bear » et « bears ». &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;Un « * » après un caractère correspondra à zéro ou plusieurs occurrences. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;« &lt;/span&gt;\. correspondra au symbole point, « \? » correspondra au point d'interrogation. « \n » correspondra au symbole de fin de ligne. &lt;/p&gt;&lt;p&gt;Aide-mémoire Regex : &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
-    </message>
-    <message>
-        <location filename="ui_dialog_journals.py" line="140"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add Attribute&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">Ajouter un attribut</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="144"/>
@@ -2676,11 +2586,6 @@ Clic-droit pour les options : tous (par défaut), premier, code dans le code.</t
         <translation>Fichiers</translation>
     </message>
     <message>
-        <location filename="ui_dialog_manage_files.py" line="146"/>
-        <source>Files:</source>
-        <translation type="obsolete">Fichiers :</translation>
-    </message>
-    <message>
         <location filename="ui_dialog_manage_files.py" line="134"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;View file&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Voir le fichier</translation>
@@ -2740,11 +2645,6 @@ Les fichiers texte (de n'importe quelle source) sont exportés à partir du text
 Cannot export text transcription file associated with an audio or video as a linked file.</source>
         <translation>Exportation d'un fichier du dossier de projet en tant que fichier lié.
 Impossible d'exporter le fichier de retranscription de texte associé à un fichier audio ou vidéo en tant que fichier lié.</translation>
-    </message>
-    <message>
-        <location filename="ui_dialog_manage_files.py" line="167"/>
-        <source>File:</source>
-        <translation type="obsolete">Fichier:</translation>
     </message>
     <message>
         <location filename="ui_dialog_manage_files.py" line="148"/>
@@ -2892,11 +2792,6 @@ Pour les enquêtes comportant un grand nombre d'entrées (par exemple, plus de 1
         <location filename="ui_manage_references.py" line="97"/>
         <source>Delete all references that are not assigned to files</source>
         <translation>Supprimer toutes les références qui ne sont pas affectées à des fichiers</translation>
-    </message>
-    <message>
-        <location filename="ui_manage_references.py" line="98"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Edit reference&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="obsolete">Modifier la référence</translation>
     </message>
     <message>
         <location filename="ui_manage_references.py" line="99"/>
@@ -4348,24 +4243,9 @@ N’utilisez pas la fonction « Codage — Codage du texte » avant de relan
         <translation>Quitter</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="329"/>
-        <source>Manage files</source>
-        <translation type="obsolete">Gérer les fichiers</translation>
-    </message>
-    <message>
-        <location filename="ui_main.py" line="330"/>
-        <source>Manage cases</source>
-        <translation type="obsolete">Gérer les cas</translation>
-    </message>
-    <message>
         <location filename="ui_main.py" line="333"/>
         <source>File categories</source>
         <translation>Catégories de fichiers</translation>
-    </message>
-    <message>
-        <location filename="ui_main.py" line="332"/>
-        <source>Manage journals</source>
-        <translation type="obsolete">Gérer les journaux</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="335"/>
@@ -4398,11 +4278,6 @@ N’utilisez pas la fonction « Codage — Codage du texte » avant de relan
         <translation>Importer des attributs</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="339"/>
-        <source>Coding reports</source>
-        <translation type="obsolete">Rapports de codage</translation>
-    </message>
-    <message>
         <location filename="ui_main.py" line="342"/>
         <source>Coding summary</source>
         <translation>Résumé de codage</translation>
@@ -4421,11 +4296,6 @@ N’utilisez pas la fonction « Codage — Codage du texte » avant de relan
         <location filename="ui_main.py" line="379"/>
         <source>Import survey</source>
         <translation>Importer une enquête</translation>
-    </message>
-    <message>
-        <location filename="ui_main.py" line="345"/>
-        <source>Manage attributes</source>
-        <translation type="obsolete">Gérer les attributs</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="348"/>
@@ -4533,11 +4403,6 @@ N’utilisez pas la fonction « Codage — Codage du texte » avant de relan
         <translation>Exporter le texte codé comme du HTML</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="365"/>
-        <source>Manage bad links to files</source>
-        <translation type="obsolete">Gérer les mauvais liens vers les fichiers</translation>
-    </message>
-    <message>
         <location filename="ui_main.py" line="306"/>
         <source>QualCoder</source>
         <translation></translation>
@@ -4613,11 +4478,6 @@ N’utilisez pas la fonction « Codage — Codage du texte » avant de relan
         <translation>Importation de références au format RIS</translation>
     </message>
     <message>
-        <location filename="ui_main.py" line="374"/>
-        <source>Manage references</source>
-        <translation type="obsolete">Gérer les références</translation>
-    </message>
-    <message>
         <location filename="ui_main.py" line="343"/>
         <source>Database queries</source>
         <translation>Requêtes de base de données</translation>
@@ -4631,11 +4491,6 @@ N’utilisez pas la fonction « Codage — Codage du texte » avant de relan
         <location filename="ui_main.py" line="378"/>
         <source>Import plain text codes list</source>
         <translation>Importer une grille de codage en texte brut</translation>
-    </message>
-    <message>
-        <location filename="ui_main.py" line="378"/>
-        <source>Menu Key Shortcuts</source>
-        <translation type="obsolete">Raccourcis des touches de menu</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="381"/>
@@ -4720,42 +4575,47 @@ N’utilisez pas la fonction « Codage — Codage du texte » avant de relan
     <message>
         <location filename="ui_main.py" line="324"/>
         <source>Analysis</source>
-        <translation type="unfinished">Analyse</translation>
+        <translation>Analyse</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="331"/>
         <source>Files</source>
-        <translation type="unfinished"></translation>
+        <translation>Fichiers</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="332"/>
         <source>Cases</source>
-        <translation type="unfinished">Cas</translation>
+        <translation>Cas</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="334"/>
         <source>Journals</source>
-        <translation type="unfinished">Journaux</translation>
+        <translation>Journaux de bord</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="347"/>
         <source>Attributes</source>
-        <translation type="unfinished">Attributs</translation>
+        <translation>Attributs</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="367"/>
         <source>Bad links to files</source>
-        <translation type="unfinished"></translation>
+        <translation>Liens incorrects vers des fichiers</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="376"/>
         <source>References</source>
-        <translation type="unfinished">Références</translation>
+        <translation>Citations</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="380"/>
         <source>Key Shortcuts</source>
-        <translation type="unfinished"></translation>
+        <translation>Raccourcis clavier</translation>
+    </message>
+    <message>
+        <location filename="ui_main.py" line="341"/>
+        <source>Code retrieval</source>
+        <translation>Récupération du code</translation>
     </message>
 </context>
 </TS>

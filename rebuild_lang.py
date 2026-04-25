@@ -35,7 +35,7 @@ import os
 import subprocess
 import sys
 import polib
-
+from lxml import etree
 
 def extract_pot_file(directory, pot_filename):
     """ Called by: update_translation_placeholders """
@@ -79,7 +79,15 @@ def update_po_files(directory, pot_filename, lang_=None):
                     except subprocess.CalledProcessError as exc:
                         print(f"Error updating PO file {po_file}: {exc}")
 
-
+def delete_obsolete_ts(file_ts):
+    parser = etree.XMLParser(remove_blank_text=True)
+    tree = etree.parse(file_ts, parser)
+    root = tree.getroot()
+    obsolete_messages = root.xpath('//message[translation[@type="obsolete"]]')
+    for message in obsolete_messages:
+        message.getparent().remove(message)
+    tree.write(file_ts, encoding='utf-8', xml_declaration=True, pretty_print=True)
+    
 def update_qt_ts_files(lang_=None):
     """ Requires pyludate5
     pip install pyqt5-tools
@@ -123,6 +131,13 @@ def update_qt_ts_files(lang_=None):
     # Compile ts files
     subprocess.call(f'pylupdate5 "{pro_file_path}"', shell=True)
     print("Updated ts translation files")
+    
+    # Delete old .ts files
+    for ts_file in translation_files:
+        ts_path = os.path.join(gui_directory, ts_file)
+        if os.path.exists(ts_path):
+            delete_obsolete_ts(ts_path)
+            print(f"Cleaned obsolete entries in {ts_file}")
 
 def update_translation_placeholders(language=None):
     """ Update po files, update GUI ts files """
@@ -132,7 +147,6 @@ def update_translation_placeholders(language=None):
     extract_pot_file(directory, pot_filename)
     update_po_files(directory, pot_filename, language)
     update_qt_ts_files(language)
-
 
 def recompile_translation(language=None):
     """ Make sure lrelease.exe is in path.
