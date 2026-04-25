@@ -21,7 +21,7 @@ QualCoder_4_0_arm64.dmg: App bundle for newer Macs with Apple Silicon (M1 ... M4
 We are not able to compile a binary for Intel based Macs right now due to incompatibilities in the libraries we use.
 The app bundles are compiled on macOS Sequoia. They might also work on Sonoma and Ventura.
 
-If you do not admin rights on your macOS. The solution is to move the folder to /Users/mylogin/Applications and delete the com.apple.quarantine attribute from the dmg (xattr – d com.apple.quarantine /Users/mylogin/Applications/qualcoder.app).
+If you do not have admin rights on your macOS. The solution is to move the folder to /Users/mylogin/Applications and delete the com.apple.quarantine attribute from the dmg (xattr – d com.apple.quarantine /Users/mylogin/Applications/qualcoder.app).
 
 We are currently not able to sign the app bundles, so you will get a warning that QualCoder is from an unregistered developer. You have to manually allow the app to be executed, if your Gatekeeper is active. Follow these steps:
 
@@ -42,7 +42,7 @@ The binary file may work in other distros also. You need to make it executable, 
 
 ### Linux Fedora
 
-Fedora has a segmentation fault (software crashes) which is, we believe, currently not fixed, regarding audio / video coding. This fault has not been recently tested, so it may or may not still be present.
+Fedora has a segmentation fault (software crashes) which is, we believe, is currently not fixed, regarding audio / video coding. This fault has not been recently tested, so it may or may not still be present.
 
 ## Manual install
 
@@ -52,7 +52,7 @@ For install from source code, download the zip file below and use the instructio
 
 ## Menus and tabs
 
-Menus have been re-shuffled.
+A new menu otpion Analysis has been added. Menu items have been re-organised between Analysis and Reports. 
 
 ## Journals
 
