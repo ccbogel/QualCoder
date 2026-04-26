@@ -21,7 +21,6 @@ https://qualcoder-org.github.io/
 """
 
 
-import sqlite3
 from copy import copy, deepcopy
 import datetime
 # import difflib  # Slow, kept this in case need to revert to it. Now using diff_match_patch
@@ -34,6 +33,8 @@ import os
 import qtawesome as qta  # see: https://pictogrammers.com/library/mdi/
 from random import randint
 import re
+import sqlite3
+import  unicodedata
 import webbrowser
 
 from PyQt6 import QtCore, QtGui, QtWidgets
@@ -4572,17 +4573,12 @@ class DialogCodeText(QtWidgets.QWidget):
         """ Load and display file text for this file.
         Set the file as a selected item in the list widget. (due to the search text function searching across files).
         Get and display coding highlights.
-
         Called from:
             view_file_dialog, context_menu
-        param: file_ : dictionary of name, id, memo, characters, start, end, fulltext
+        Args:
+            file_ : dictionary of name, id, memo, characters, start, end, fulltext
         """
-        '''# Save pending journal and reload on file switch in load_file <- L
-        if file_ is None:
-            return
-        # Clear journal state when switching files <- L
-        self.file_journal_jids = []  # <- L
-        self.file_journal_display_idx = -1  # <- L reset cycle index'''
+
         self.ui.listWidget.blockSignals(True)
         for x in range(self.ui.listWidget.count()):
             if self.ui.listWidget.item(x).text() == file_['name']:
@@ -4611,16 +4607,10 @@ class DialogCodeText(QtWidgets.QWidget):
             self.file_['start_line'] = len(lines) + 1
         self.number_bar.set_first_line(self.file_['start_line'], do_update=False)
         self.text = file_result['fulltext'][self.file_['start']:self.file_['end']]
+        # having '\n' at the end of the text sometimes creates an empty line in QTextEdit, so omit it
         if self.text.endswith('\n'):
-            self.text = self.text[
-                        :-1]  # having '\n' at the end of the text sometimes creates an empty line in QTextEdit, so we omit it
-        # MarkDownHighlighter does not work now using QPlainTextEdit
-        '''if self.file_['name'][-3:].lower() == ".md":
-            highlighter = MarkdownHighlighter(self.ui.plainTextEdit, self.app)
-        else:
-            highlighter = MarkdownHighlighter(self.ui.plainTextEdit, self.app)
-            highlighter.highlighting_rules = []'''
-
+            self.text = self.text[:-1]
+        self.detect_text_direction()
         self.ui.plainTextEdit.setPlainText(self.text)
         self.get_coded_text_update_eventfilter_tooltips()
         self.fill_code_counts_in_tree()
@@ -4629,10 +4619,25 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.lineEdit_search.setEnabled(True)
         self.ui.checkBox_search_case.setEnabled(True)
         self.ui.checkBox_search_all_files.setEnabled(True)
-        # self.search_for_text()
-        '''# Reload linked journal if the right pane was showing one <- L
-        if not self.project_memo and not self.code_rule:  # <- L
-            self.show_file_journal()  # <- L will silently do nothing if no journal exists '''
+
+    def detect_text_direction(self):
+        for char in self.text:
+            bidi = unicodedata.bidirectional(char)
+            if bidi == "L":
+                self.layout_direction = "LtoR"
+                option = self.ui.plainTextEdit.document().defaultTextOption()
+                option.setTextDirection(Qt.LayoutDirection.LeftToRight)
+                option.setAlignment(Qt.AlignmentFlag.AlignLeft)
+                self.ui.plainTextEdit.document().setDefaultTextOption(option)
+                return
+            if bidi in ("R", "AL"):
+                self.ui.plainTextEdit.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
+                self.layout_direction = "RtoL"
+                option = self.ui.plainTextEdit.document().defaultTextOption()
+                option.setTextDirection(Qt.LayoutDirection.RightToLeft)
+                option.setAlignment(Qt.AlignmentFlag.AlignRight)
+                self.ui.plainTextEdit.document().setDefaultTextOption(option)
+                return
 
     def get_coded_text_update_eventfilter_tooltips(self):
         """ Called by load_file, and from other dialogs on update.
