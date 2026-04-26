@@ -247,6 +247,7 @@ N New code - for selected text<br />\
 O Shortcut to cycle through overlapping codes - at clicked position<br />\
 S Search text - may include current selection<br />\
 R Opens a context menu for recently used codes for marking text<br />\
+Ctrl + R Reverse text direction: Left to Right | Right to Left<br />\
 U Unmark at clicked position in the text<br />\
 V assign in vivo code to selected text<br />\
 Alt + Left arrow  Shrink coding to the left <br />\
@@ -301,4 +302,8 @@ Ctrl Shift > Increase play rate<br />\
 Ctrl Shift &lt; Decrease play rate<br />\n\
 F2 When tree item selected - Rename code or category')
 
+database_queries_shortcuts = _('<h2>Database Queries key shortcuts</h2>\
+Ctrl + Enter Run SQL query<br />')
+
 coding_shortcuts_display = coding_text_shortcuts + coding_image_shortcuts + coding_av_shortcuts
+coding_shortcuts_display += database_queries_shortcuts

@@ -39,10 +39,10 @@ import webbrowser
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QBrush, QColor
-# Required for the _export_odt_clean method which generates native ODF files with ranged annotations using odfpy <- L
-from odf.opendocument import OpenDocumentText  # Required for the _export_odt_clean method <- L
-from odf import text as odf_text, office as odf_office, dc as odf_dc, style as odf_style  # Required for the _export_odt_clean method <- L
-from odf.namespaces import OFFICENS, DRAWNS  # Required for the _export_odt_clean method <- L
+# Required for the _export_odt_clean method which generates native ODF files with ranged annotations using odfpy
+from odf.opendocument import OpenDocumentText  # Required for _export_odt_clean method
+from odf import text as odf_text, office as odf_office, dc as odf_dc, style as odf_style  # Required for _export_odt_clean
+from odf.namespaces import OFFICENS, DRAWNS  # Required for _export_odt_clean method
 
 from .add_item_name import DialogAddItemName
 from .ai_search_dialog import DialogAiSearch
@@ -79,6 +79,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.app = app
         self.tab_reports = tab_reports  # Tab widget reports, used for updates to codes in other tabs
         self.parent_textEdit = parent_textedit
+        self.layout_direction = "LtoR"
         self.ui = Ui_Dialog_code_text()
         self.ui.setupUi(self)
 
@@ -1641,7 +1642,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.recursive_set_current_item(self.ui.treeWidget.invisibleRootItem(), action.text())
         self.mark()
 
-    def mark_with_new_code(self, in_vivo=False):
+    def mark_with_new_code(self, in_vivo: bool = False):
         """ Create new code and mark selected text.
         Called through text_edit_menu or N key press - with selected text.
         Args:
@@ -1673,7 +1674,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.recursive_set_current_item(self.ui.treeWidget.invisibleRootItem(), new_code['name'])
         self.mark()
 
-    def change_code_to_another_code(self, position):
+    def change_code_to_another_code(self, position: int):
         """ Change code to another code.
         Args:
             position: Integer - text cursor position
@@ -1743,7 +1744,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 self.ui.treeWidget.setCurrentItem(item.child(i))
             self.recursive_set_current_item(item.child(i), text_)
 
-    def is_annotated(self, position):
+    def is_annotated(self, position: int):
         """ Check if position is annotated to provide annotation menu option.
         Args:
             position: Integer - location in text document
@@ -1757,7 +1758,7 @@ class DialogCodeText(QtWidgets.QWidget):
                 return True
         return False
 
-    def set_important(self, position, important=True):
+    def set_important(self, position: int, important: bool = True):
         """ Set or unset importance to coded text.
         Importance is denoted using '1'
         Args:
@@ -1884,7 +1885,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
 
-    def shift_code_positions(self, position):
+    def shift_code_positions(self, position: int):
         """ After a text file is edited - text added or deleted, code positions may be inaccurate.
          enter a positive or negative integer to shift code positions for all codes after a click position in the
          document.
@@ -1940,7 +1941,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.app.delete_backup = False
         self.get_coded_text_update_eventfilter_tooltips()
 
-    def copy_selected_text_to_clipboard(self, metadata=False):
+    def copy_selected_text_to_clipboard(self, metadata: bool = False):
         """ Copy text to clipboard for external use.
         For example adding text to another document.
         Args:
@@ -2081,7 +2082,11 @@ class DialogCodeText(QtWidgets.QWidget):
 
     def recursive_get_branch_codes(self, item, branch_codes):
         """ Set all children of this item to be expanded or collapsed.
-        Recurse through all child categories. """
+        Recurse through all child categories.
+        Args:
+            item: QTreeWidgetItem
+            branch_codes: List of code dictionaries
+        """
 
         child_count = item.childCount()
         for i in range(child_count):
@@ -2095,9 +2100,13 @@ class DialogCodeText(QtWidgets.QWidget):
                 self.recursive_get_branch_codes(item.child(i), branch_codes)
         return branch_codes
 
-    def recursive_expand_collapse_branch(self, item, expand_toggle):
+    def recursive_expand_collapse_branch(self, item, expand_toggle: bool):
         """ Set all children of this item to be expanded or collapsed.
-        Recurse through all child categories. """
+        Recurse through all child categories.
+        Args:
+            item: QTreeWidgetItem
+            expand_toggle: boolean
+        """
 
         child_count = item.childCount()
         for i in range(child_count):
@@ -2122,7 +2131,7 @@ class DialogCodeText(QtWidgets.QWidget):
             self.recursive_non_merge_item(item.child(i), no_merge_list)
         return no_merge_list
 
-    def merge_category(self, catid):
+    def merge_category(self, catid: int):
         """ Select another category to merge this category into.
         Args:
             catid : Integer category identifier
@@ -2349,7 +2358,7 @@ class DialogCodeText(QtWidgets.QWidget):
 
     def clear_code_filter(self):
         """ Clear any active code filter (show codes like or show codes of colour)
-        and restore all codes in the tree. """ # <- L
+        and restore all codes in the tree. """
         self.show_codes_like_filter = ""
         self.show_codes_colour_filter = ""
         root = self.ui.treeWidget.invisibleRootItem()
@@ -2369,7 +2378,7 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ui.pushButton_clear_filter_file.setVisible(False)
         self.ui.pushButton_clear_filter_file.setStyleSheet("")  # reset blue style
 
-    def recursive_traverse(self, item, text_="", case_sensitive=False):
+    def recursive_traverse(self, item, text_: str = "", case_sensitive: bool = False):
         """ Find all children codes of this item that match or not and hide or unhide based on 'text'.
         Recurse through all child categories.
         Called by: show_codes_like
@@ -2411,6 +2420,7 @@ class DialogCodeText(QtWidgets.QWidget):
         O Shortcut to cycle through overlapping codes - at clicked position
         S search text - may include current selection
         R opens a context menu for recently used codes for marking text
+        Ctrl R - Reverse from left to right to right to left
         U Unmark at selected location
         V assign 'in vivo' code to selected text
         Ctrl 0 to Ctrl 9 - button presses
@@ -2432,6 +2442,23 @@ class DialogCodeText(QtWidgets.QWidget):
         if key == QtCore.Qt.Key.Key_Z and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
             self.undo_last_unmarked_code()
             return
+        # Ctrl R Display Right to Left (Arabic, Hebrew).
+        if key == QtCore.Qt.Key.Key_R and mods == QtCore.Qt.KeyboardModifier.ControlModifier:
+            if self.layout_direction == "LtoR":
+                self.ui.plainTextEdit.setLayoutDirection(Qt.LayoutDirection.RightToLeft)
+                self.layout_direction = "RtoL"
+                option = self.ui.plainTextEdit.document().defaultTextOption()
+                option.setTextDirection(Qt.LayoutDirection.RightToLeft)
+                option.setAlignment(Qt.AlignmentFlag.AlignRight)
+                self.ui.plainTextEdit.document().setDefaultTextOption(option)
+            else:
+                self.layout_direction = "LtoR"
+                option = self.ui.plainTextEdit.document().defaultTextOption()
+                option.setTextDirection(Qt.LayoutDirection.LeftToRight)
+                option.setAlignment(Qt.AlignmentFlag.AlignLeft)
+                self.ui.plainTextEdit.document().setDefaultTextOption(option)
+            return
+
         # Ctrl 0 to 9
         if mods & QtCore.Qt.KeyboardModifier.ControlModifier:
             if key == QtCore.Qt.Key.Key_1:
@@ -4871,7 +4898,7 @@ class DialogCodeText(QtWidgets.QWidget):
         Called by text_edit_context_menu
         Adjust for start of text file, as this may be a smaller portion of the full text file.
 
-        param:
+        Args:
             location: text cursor location, Integer
         """
 
@@ -4914,6 +4941,8 @@ class DialogCodeText(QtWidgets.QWidget):
         Adjust for start of text file, as this may be a smaller portion of the full text file.
 
         Called via context menu, button
+        Args:
+        cursor_pos : None or integer
         """
 
         if self.file_ is None:
