@@ -234,44 +234,46 @@ Varje ord exkluderas i n-grams=1 Word cloud.</translation>
     <message>
         <location filename="ui_dialog_charts.py" line="343"/>
         <source>Select stopwords list by language</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj lista över stoppord efter språk</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="306"/>
         <source>Right-click for text filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Högerklicka för textfilter</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="307"/>
         <source>If portions of a text file are assigned to a case,
 the code frequency and total text characters may be incorrect.
 Codings from the entire text file are used for the calculations.</source>
-        <translation type="unfinished"></translation>
+        <translation>Om delar av en textfil kopplas till ett fall,
+kan kodfrekvensen och det totala antalet tecken i texten bli felaktiga.
+Beräkningarna baseras på kodningarna från hela textfilen.</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="319"/>
         <source>Background</source>
-        <translation type="unfinished"></translation>
+        <translation>Bakgrund</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="320"/>
         <source>Foreground</source>
-        <translation type="unfinished"></translation>
+        <translation>Förgrund</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="333"/>
         <source>Image width</source>
-        <translation type="unfinished"></translation>
+        <translation>Bildens bredd</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="334"/>
         <source>Image height</source>
-        <translation type="unfinished"></translation>
+        <translation>Bildens höjd</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="335"/>
         <source>Maximum words</source>
-        <translation type="unfinished"></translation>
+        <translation>Maxantal ord</translation>
     </message>
 </context>
 <context>
@@ -376,7 +378,7 @@ Högerklicka för alternativ</translation>
     <message>
         <location filename="ui_dialog_graph.py" line="148"/>
         <source>Export to Draw.io</source>
-        <translation type="unfinished"></translation>
+        <translation>Exportera till Draw.io</translation>
     </message>
 </context>
 <context>
@@ -1020,20 +1022,22 @@ Sorterad efter filnamn och kodnamn.</translation>
     <message>
         <location filename="ui_dialog_cooccurrence.py" line="114"/>
         <source>Export to Gephi. GraphML format</source>
-        <translation type="unfinished"></translation>
+        <translation>Exportera till Gephi. GraphML-format</translation>
     </message>
     <message>
         <location filename="ui_dialog_cooccurrence.py" line="115"/>
         <source>Export Co-occurence Graph Image
 Right-click for format options</source>
-        <translation type="unfinished"></translation>
+        <translation>Exportera bild av samförekomstdiagram
+Högerklicka för formatalternativ</translation>
     </message>
     <message>
         <location filename="ui_dialog_cooccurrence.py" line="117"/>
         <source>Export Cluster Graph Image
 Right-click for format options
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Exportera klusterdiagram
+Högerklicka för formatalternativ</translation>
     </message>
 </context>
 <context>
@@ -1061,7 +1065,7 @@ Right-click for format options
     <message>
         <location filename="ui_dialog_import.py" line="94"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delimiter must be a single character.&lt;/p&gt;&lt;p&gt;Enter &apos;ta&apos; for &apos;tab&apos;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; delimiter måste vara en enda karaktär. &lt;/p&gt; &lt;p&gt; enter 'ta' för 'flik' &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
+        <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; delimiter måste vara en enda karaktär. &lt;/p&gt; &lt;p&gt; enter &apos;ta&apos; för &apos;flik&apos; &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_import.py" line="95"/>
@@ -1547,12 +1551,12 @@ Därefter öppnas en meny med alternativ</translation>
     <message>
         <location filename="ui_dialog_code_av.py" line="234"/>
         <source>Clear file filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Rensa filfiltret</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_av.py" line="235"/>
         <source>Clear code filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Rensa kodfiltret</translation>
     </message>
 </context>
 <context>
@@ -1741,12 +1745,12 @@ Därefter öppnas en meny med alternativ</translation>
     <message>
         <location filename="ui_dialog_code_image.py" line="242"/>
         <source>Clear file filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Rensa filfiltret</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_image.py" line="243"/>
         <source>Clear code filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Rensa kodfiltret</translation>
     </message>
 </context>
 <context>
@@ -1796,7 +1800,7 @@ Därefter öppnas en meny med alternativ</translation>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="284"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. &lt;/p&gt;&lt;p&gt;A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A ‘*’ after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;‘&lt;/span&gt;\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: www.rexegg.com/regex-quickstart.html&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; Sök använder regex -funktioner.&lt;/p&gt; &lt;p&gt; a prick '.' används som ett vildkort, t.ex.&quot;.Ears&quot; kommer att matcha &quot;björnar&quot; och &quot;år&quot;.&lt;/p&gt; &lt;p&gt; a '?' Efter att en karaktär kommer att matcha en eller ingen gånger den karaktären, t.ex.‘Bears?’ Kommer att matcha ‘Bear’ och ‘Bears’ &lt;/p&gt; &lt;p&gt; &lt;span style = &quot;bakgrundsfärg: transparent;&quot;&gt; en &quot;*&quot; efter att en karaktär matchar noll eller fler gånger.&lt;/span&gt; &lt;/p&gt; &lt;p&gt; &lt;span style = &quot;bakgrundsfärg: transparent;&quot;&gt; ‘&lt;/span&gt; \.Kommer att matcha pricksymbolen, '\?' Kommer att matcha frågetecknet.‘\ N’ kommer att matcha linjens slutsymbol.&lt;/p&gt; &lt;p&gt; regex cheatsheet: www.rexegg.com/regex-quickstart.html&lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
+        <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; Sök använder regex -funktioner.&lt;/p&gt; &lt;p&gt; a prick &apos;.&apos; används som ett vildkort, t.ex.&quot;.Ears&quot; kommer att matcha &quot;björnar&quot; och &quot;år&quot;.&lt;/p&gt; &lt;p&gt; a &apos;?&apos; Efter att en karaktär kommer att matcha en eller ingen gånger den karaktären, t.ex.‘Bears?’ Kommer att matcha ‘Bear’ och ‘Bears’ &lt;/p&gt; &lt;p&gt; &lt;span style = &quot;bakgrundsfärg: transparent;&quot;&gt; en &quot;*&quot; efter att en karaktär matchar noll eller fler gånger.&lt;/span&gt; &lt;/p&gt; &lt;p&gt; &lt;span style = &quot;bakgrundsfärg: transparent;&quot;&gt; ‘&lt;/span&gt; \.Kommer att matcha pricksymbolen, &apos;\?&apos; Kommer att matcha frågetecknet.‘\ N’ kommer att matcha linjens slutsymbol.&lt;/p&gt; &lt;p&gt; regex cheatsheet: www.rexegg.com/regex-quickstart.html&lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="285"/>
@@ -1946,12 +1950,12 @@ Därefter öppnas en meny med alternativ</translation>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="314"/>
         <source>Clear file filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Rensa filfiltret</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="318"/>
         <source>Clear code filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Rensa kodfiltret</translation>
     </message>
 </context>
 <context>
@@ -1984,7 +1988,7 @@ Därefter öppnas en meny med alternativ</translation>
     <message>
         <location filename="ui_dialog_report_code_summary.py" line="72"/>
         <source>Select stopwords list by language</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj lista över stoppord efter språk</translation>
     </message>
 </context>
 <context>
@@ -2069,7 +2073,7 @@ Därefter öppnas en meny med alternativ</translation>
     <message>
         <location filename="ui_dialog_code_text.py" line="447"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. &lt;/p&gt;&lt;p&gt;A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A ‘*’ after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;‘&lt;/span&gt;\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: www.rexegg.com/regex-quickstart.html&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; Sök använder regex -funktioner.&lt;/p&gt; &lt;p&gt; a prick '.' används som ett vildkort, t.ex.&quot;.Ears&quot; kommer att matcha &quot;björnar&quot; och &quot;år&quot;.&lt;/p&gt; &lt;p&gt; a '?' Efter att en karaktär kommer att matcha en eller ingen gånger den karaktären, t.ex.‘Bears?’ Kommer att matcha ‘Bear’ och ‘Bears’ &lt;/p&gt; &lt;p&gt; &lt;span style = &quot;bakgrundsfärg: transparent;&quot;&gt; en &quot;*&quot; efter att en karaktär matchar noll eller fler gånger.&lt;/span&gt; &lt;/p&gt; &lt;p&gt; &lt;span style = &quot;bakgrundsfärg: transparent;&quot;&gt; ‘&lt;/span&gt; \.Kommer att matcha pricksymbolen, '\?' Kommer att matcha frågetecknet.‘\ N’ kommer att matcha linjens slutsymbol.&lt;/p&gt; &lt;p&gt; regex cheatsheet: www.rexegg.com/regex-quickstart.html&lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
+        <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; Sök använder regex -funktioner.&lt;/p&gt; &lt;p&gt; a prick &apos;.&apos; används som ett vildkort, t.ex.&quot;.Ears&quot; kommer att matcha &quot;björnar&quot; och &quot;år&quot;.&lt;/p&gt; &lt;p&gt; a &apos;?&apos; Efter att en karaktär kommer att matcha en eller ingen gånger den karaktären, t.ex.‘Bears?’ Kommer att matcha ‘Bear’ och ‘Bears’ &lt;/p&gt; &lt;p&gt; &lt;span style = &quot;bakgrundsfärg: transparent;&quot;&gt; en &quot;*&quot; efter att en karaktär matchar noll eller fler gånger.&lt;/span&gt; &lt;/p&gt; &lt;p&gt; &lt;span style = &quot;bakgrundsfärg: transparent;&quot;&gt; ‘&lt;/span&gt; \.Kommer att matcha pricksymbolen, &apos;\?&apos; Kommer att matcha frågetecknet.‘\ N’ kommer att matcha linjens slutsymbol.&lt;/p&gt; &lt;p&gt; regex cheatsheet: www.rexegg.com/regex-quickstart.html&lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="448"/>
@@ -2343,37 +2347,37 @@ Högerklicka för alternativ: alla (standard), första, kod inom kod.</translati
     <message>
         <location filename="ui_dialog_code_text.py" line="460"/>
         <source>odt highlight</source>
-        <translation type="unfinished"></translation>
+        <translation>markering i ODT</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="461"/>
         <source>odt comment</source>
-        <translation type="unfinished"></translation>
+        <translation>odt kommentar</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="462"/>
         <source>odt report</source>
-        <translation type="unfinished"></translation>
+        <translation>ODT rapport</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="465"/>
         <source>codebook</source>
-        <translation type="unfinished"></translation>
+        <translation>Kodbok</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="480"/>
         <source>Select document font and size</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj teckensnitt och storlek</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="487"/>
         <source>Clear file filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Rensa filfiltret</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="500"/>
         <source>Clear code filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Rensa kodfiltret</translation>
     </message>
 </context>
 <context>
@@ -2385,8 +2389,8 @@ Högerklicka för alternativ: alla (standard), första, kod inom kod.</translati
     </message>
     <message>
         <location filename="ui_dialog_coder_names.py" line="85"/>
-        <source>Choose (&#xe2;&#x9c;&#x93;) your coder name. Adjust visibility of others:</source>
-        <translation type="unfinished">Varning: Om du väljer ett annat namn att slå samman med går det inte att ångra. Gör först en säkerhetskopia av projektet.</translation>
+        <source>Choose (â) your coder name. Adjust visibility of others:</source>
+        <translation>Varning: Om du väljer ett annat namn att slå samman med går det inte att ångra. Gör först en säkerhetskopia av projektet.</translation>
     </message>
     <message>
         <location filename="ui_dialog_coder_names.py" line="86"/>
@@ -2510,7 +2514,7 @@ Högerklicka för alternativ: alla (standard), första, kod inom kod.</translati
     <message>
         <location filename="ui_dialog_report_file_summary.py" line="72"/>
         <source>Select stopwords list by language</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj lista över stoppord efter språk</translation>
     </message>
 </context>
 <context>
@@ -2556,12 +2560,12 @@ Högerklicka för alternativ: alla (standard), första, kod inom kod.</translati
     <message>
         <location filename="ui_dialog_journals.py" line="131"/>
         <source>Export all journals as single text file.</source>
-        <translation type="unfinished">&lt;html&gt; &lt;huvud/&gt; &lt;body&gt; &lt;p&gt; exportera alla tidskrifter som enstaka textfil. &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
+        <translation>Exportera alla tidskrifter som enstaka textfil.</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="132"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. &lt;/p&gt;&lt;p&gt;A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A ‘*’ after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;‘&lt;/span&gt;\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; Sök använder regex -funktioner.&lt;/p&gt; &lt;p&gt; a prick '.' används som ett vildkort, t.ex.&quot;.Ears&quot; kommer att matcha &quot;björnar&quot; och &quot;år&quot;.&lt;/p&gt; &lt;p&gt; a '?' Efter att en karaktär kommer att matcha en eller ingen gånger den karaktären, t.ex.‘Bears?’ Kommer att matcha ‘Bear’ och ‘Bears’ &lt;/p&gt; &lt;p&gt; &lt;span style = &quot;bakgrundsfärg: transparent;&quot;&gt; en &quot;*&quot; efter att en karaktär matchar noll eller fler gånger.&lt;/span&gt; &lt;/p&gt; &lt;p&gt; &lt;span style = &quot;bakgrundsfärg: transparent;&quot;&gt; ‘&lt;/span&gt; \.Kommer att matcha pricksymbolen, '\?' Kommer att matcha frågetecknet.‘\ N’ kommer att matcha linjens slutsymbol.&lt;/p&gt; &lt;p&gt; regex cheatsheet: &lt;a href = &quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt; &lt;span style = &quot;Text-Decoration: understyrning;Färg:#000080; &quot;&gt; www.rexegg.com/regex-quickstart.html &lt;/span&gt; &lt;/a&gt; &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
+        <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; Sök använder regex -funktioner.&lt;/p&gt; &lt;p&gt; a prick &apos;.&apos; används som ett vildkort, t.ex.&quot;.Ears&quot; kommer att matcha &quot;björnar&quot; och &quot;år&quot;.&lt;/p&gt; &lt;p&gt; a &apos;?&apos; Efter att en karaktär kommer att matcha en eller ingen gånger den karaktären, t.ex.‘Bears?’ Kommer att matcha ‘Bear’ och ‘Bears’ &lt;/p&gt; &lt;p&gt; &lt;span style = &quot;bakgrundsfärg: transparent;&quot;&gt; en &quot;*&quot; efter att en karaktär matchar noll eller fler gånger.&lt;/span&gt; &lt;/p&gt; &lt;p&gt; &lt;span style = &quot;bakgrundsfärg: transparent;&quot;&gt; ‘&lt;/span&gt; \.Kommer att matcha pricksymbolen, &apos;\?&apos; Kommer att matcha frågetecknet.‘\ N’ kommer att matcha linjens slutsymbol.&lt;/p&gt; &lt;p&gt; regex cheatsheet: &lt;a href = &quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt; &lt;span style = &quot;Text-Decoration: understyrning;Färg:#000080; &quot;&gt; www.rexegg.com/regex-quickstart.html &lt;/span&gt; &lt;/a&gt; &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="133"/>
@@ -2591,7 +2595,7 @@ Högerklicka för alternativ: alla (standard), första, kod inom kod.</translati
     <message>
         <location filename="ui_dialog_journals.py" line="138"/>
         <source>Search all journals</source>
-        <translation type="unfinished">&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; Sök alla tidskrifter &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
+        <translation>Sök alla tidskrifter</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="139"/>
@@ -2626,32 +2630,32 @@ Högerklicka för alternativ: alla (standard), första, kod inom kod.</translati
     <message>
         <location filename="ui_dialog_journals.py" line="126"/>
         <source>Create</source>
-        <translation type="unfinished"></translation>
+        <translation>Skapa</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="127"/>
         <source>Export</source>
-        <translation type="unfinished">Exportera</translation>
+        <translation>Exportera</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="128"/>
         <source>Delete</source>
-        <translation type="unfinished">Radera</translation>
+        <translation>Radera</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="133"/>
         <source>Next</source>
-        <translation type="unfinished"></translation>
+        <translation>Nästa</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="137"/>
         <source>Previous</source>
-        <translation type="unfinished"></translation>
+        <translation>Föregående</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="140"/>
         <source>Add Attribute</source>
-        <translation type="unfinished">Lägg till attribut</translation>
+        <translation>Lägg till attribut</translation>
     </message>
 </context>
 <context>
@@ -2819,7 +2823,11 @@ Formateras enligt nedan för namnigenkänning.
 For csv and tsv files, please avoid using the following in the column names:  , ; |
 
 Surveys with many entries (e.g. more than 1,000) please wait, as importation will be slow.</source>
-        <translation type="unfinished"></translation>
+        <translation>Import av enkäter
+
+För CSV- och TSV-filer bör du undvika att använda följande tecken i kolumnnamnen:  , ; |
+
+Vid enkäter med många svar (t.ex. fler än 1 000) kan det ta längre tid, så var tålmodig.</translation>
     </message>
 </context>
 <context>
@@ -2875,22 +2883,22 @@ Surveys with many entries (e.g. more than 1,000) please wait, as importation wil
     <message>
         <location filename="ui_manage_references.py" line="94"/>
         <source>Delete selected reference</source>
-        <translation type="unfinished">&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; Radera vald referens &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
+        <translation>Radera vald referens </translation>
     </message>
     <message>
         <location filename="ui_manage_references.py" line="95"/>
         <source>Link selected files to selected reference</source>
-        <translation type="unfinished">&lt;html&gt; &lt;Head /&gt; &lt;body&gt; &lt;p&gt; länk Valda filer till vald referens &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
+        <translation>Länk Valda filer till vald referens</translation>
     </message>
     <message>
         <location filename="ui_manage_references.py" line="96"/>
         <source>Unlink selected files from references</source>
-        <translation type="unfinished">&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; Unlink valda filer från referenser &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
+        <translation>Unlink valda filer från referenser</translation>
     </message>
     <message>
         <location filename="ui_manage_references.py" line="97"/>
         <source>Delete all references that are not assigned to files</source>
-        <translation type="unfinished">&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; Radera alla referenser som inte tilldelas filer &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
+        <translation>Radera alla referenser som inte tilldelas filer</translation>
     </message>
     <message>
         <location filename="ui_manage_references.py" line="98"/>
@@ -2900,7 +2908,7 @@ Surveys with many entries (e.g. more than 1,000) please wait, as importation wil
     <message>
         <location filename="ui_manage_references.py" line="99"/>
         <source>Import references. RIS or NBIB (PubMed) format.</source>
-        <translation type="unfinished">&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; Importreferenser.Ris -format. &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
+        <translation>Importera referenser. RIS- eller NBIB-format (PubMed).</translation>
     </message>
     <message>
         <location filename="ui_manage_references.py" line="100"/>
@@ -2909,12 +2917,12 @@ Word matching uses words from reference title.
 Strong matches with 70% or more matching words are linked.
 Linking may be incorrect.
 Review after applying the function.</source>
-        <translation type="unfinished">&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; länkar automatiskt referenser till o tilldelade filnamn. &lt;/p&gt; &lt;p&gt; ordmatchning använder ord från referenstitel. &lt;/p&gt; &lt;p&gt; Starka matchningar med 70% eller mer matchande ord är länkade. &lt;/p&gt; &lt;p&gt; länkning kan vara felaktiga.&lt;/p&gt; &lt;p&gt; granskning efter tillämpningen av funktionen. &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
+        <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; länkar automatiskt referenser till o tilldelade filnamn. &lt;/p&gt; &lt;p&gt; ordmatchning använder ord från referenstitel. &lt;/p&gt; &lt;p&gt; Starka matchningar med 70% eller mer matchande ord är länkade. &lt;/p&gt; &lt;p&gt; länkning kan vara felaktiga.&lt;/p&gt; &lt;p&gt; granskning efter tillämpningen av funktionen. &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="ui_manage_references.py" line="98"/>
         <source>Edit reference</source>
-        <translation type="unfinished"></translation>
+        <translation>Redigera referens</translation>
     </message>
 </context>
 <context>
@@ -3376,7 +3384,7 @@ Wildcards for &apos;like&apos; are % and _</source>
         <translation>Välj parametrar för attributen.
 mellan kräver 2 värden separerade av;till exempel1; 100
 i och inte i kräver 1 eller fler värden separerade av;
-Jokertecken för 'som' är % och _</translation>
+Jokertecken för &apos;som&apos; är % och _</translation>
     </message>
     <message>
         <location filename="ui_report_attribute_parameters.py" line="88"/>
@@ -4166,7 +4174,7 @@ Röd understrykning = tilldelad kod eller kommentar</translation>
     <message>
         <location filename="ui_dialog_view_av.py" line="201"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. &lt;/p&gt;&lt;p&gt;A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A ‘*’ after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;‘&lt;/span&gt;\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; Sök använder regex -funktioner.&lt;/p&gt; &lt;p&gt; a prick '.' används som ett vildkort, t.ex.&quot;.Ears&quot; kommer att matcha &quot;björnar&quot; och &quot;år&quot;.&lt;/p&gt; &lt;p&gt; a '?' Efter att en karaktär kommer att matcha en eller ingen gånger den karaktären, t.ex.‘Bears?’ Kommer att matcha ‘Bear’ och ‘Bears’ &lt;/p&gt; &lt;p&gt; &lt;span style = &quot;bakgrundsfärg: transparent;&quot;&gt; en &quot;*&quot; efter att en karaktär matchar noll eller fler gånger.&lt;/span&gt; &lt;/p&gt; &lt;p&gt; &lt;span style = &quot;bakgrundsfärg: transparent;&quot;&gt; ‘&lt;/span&gt; \.Kommer att matcha pricksymbolen, '\?' Kommer att matcha frågetecknet.‘\ N’ kommer att matcha linjens slutsymbol.&lt;/p&gt; &lt;p&gt; regex cheatsheet: &lt;a href = &quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt; &lt;span style = &quot;Text-Decoration: understyrning;Färg:#000080; &quot;&gt; www.rexegg.com/regex-quickstart.html &lt;/span&gt; &lt;/a&gt; &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
+        <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; Sök använder regex -funktioner.&lt;/p&gt; &lt;p&gt; a prick &apos;.&apos; används som ett vildkort, t.ex.&quot;.Ears&quot; kommer att matcha &quot;björnar&quot; och &quot;år&quot;.&lt;/p&gt; &lt;p&gt; a &apos;?&apos; Efter att en karaktär kommer att matcha en eller ingen gånger den karaktären, t.ex.‘Bears?’ Kommer att matcha ‘Bear’ och ‘Bears’ &lt;/p&gt; &lt;p&gt; &lt;span style = &quot;bakgrundsfärg: transparent;&quot;&gt; en &quot;*&quot; efter att en karaktär matchar noll eller fler gånger.&lt;/span&gt; &lt;/p&gt; &lt;p&gt; &lt;span style = &quot;bakgrundsfärg: transparent;&quot;&gt; ‘&lt;/span&gt; \.Kommer att matcha pricksymbolen, &apos;\?&apos; Kommer att matcha frågetecknet.‘\ N’ kommer att matcha linjens slutsymbol.&lt;/p&gt; &lt;p&gt; regex cheatsheet: &lt;a href = &quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt; &lt;span style = &quot;Text-Decoration: understyrning;Färg:#000080; &quot;&gt; www.rexegg.com/regex-quickstart.html &lt;/span&gt; &lt;/a&gt; &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_av.py" line="202"/>
@@ -4247,7 +4255,7 @@ Röd understrykning = tilldelad kod eller kommentar</translation>
     <message>
         <location filename="ui_dialog_view_text.py" line="79"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot ‘.’ is used as a wild card, e.g. ‘.ears’ will match ‘bears’ and ‘years’. &lt;/p&gt;&lt;p&gt;A ‘?’ after a character will match one or none times that character, e.g. ‘bears?’ will match ‘bear’ and ‘bears’ &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A ‘*’ after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;‘&lt;/span&gt;\. will match the dot symbol, ‘\?’ will match the question mark. ‘\n’ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; Sök använder regex -funktioner.&lt;/p&gt; &lt;p&gt; a prick '.' används som ett vildkort, t.ex.&quot;.Ears&quot; kommer att matcha &quot;björnar&quot; och &quot;år&quot;.&lt;/p&gt; &lt;p&gt; a '?' Efter att en karaktär kommer att matcha en eller ingen gånger den karaktären, t.ex.‘Bears?’ Kommer att matcha ‘Bear’ och ‘Bears’ &lt;/p&gt; &lt;p&gt; &lt;span style = &quot;bakgrundsfärg: transparent;&quot;&gt; en &quot;*&quot; efter att en karaktär matchar noll eller fler gånger.&lt;/span&gt; &lt;/p&gt; &lt;p&gt; &lt;span style = &quot;bakgrundsfärg: transparent;&quot;&gt; ‘&lt;/span&gt; \.Kommer att matcha pricksymbolen, '\?' Kommer att matcha frågetecknet.‘\ N’ kommer att matcha linjens slutsymbol.&lt;/p&gt; &lt;p&gt; regex cheatsheet: &lt;a href = &quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt; &lt;span style = &quot;Text-Decoration: understyrning;Färg:#000080; &quot;&gt; www.rexegg.com/regex-quickstart.html &lt;/span&gt; &lt;/a&gt; &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
+        <translation>&lt;html&gt; &lt;head /&gt; &lt;body&gt; &lt;p&gt; Sök använder regex -funktioner.&lt;/p&gt; &lt;p&gt; a prick &apos;.&apos; används som ett vildkort, t.ex.&quot;.Ears&quot; kommer att matcha &quot;björnar&quot; och &quot;år&quot;.&lt;/p&gt; &lt;p&gt; a &apos;?&apos; Efter att en karaktär kommer att matcha en eller ingen gånger den karaktären, t.ex.‘Bears?’ Kommer att matcha ‘Bear’ och ‘Bears’ &lt;/p&gt; &lt;p&gt; &lt;span style = &quot;bakgrundsfärg: transparent;&quot;&gt; en &quot;*&quot; efter att en karaktär matchar noll eller fler gånger.&lt;/span&gt; &lt;/p&gt; &lt;p&gt; &lt;span style = &quot;bakgrundsfärg: transparent;&quot;&gt; ‘&lt;/span&gt; \.Kommer att matcha pricksymbolen, &apos;\?&apos; Kommer att matcha frågetecknet.‘\ N’ kommer att matcha linjens slutsymbol.&lt;/p&gt; &lt;p&gt; regex cheatsheet: &lt;a href = &quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt; &lt;span style = &quot;Text-Decoration: understyrning;Färg:#000080; &quot;&gt; www.rexegg.com/regex-quickstart.html &lt;/span&gt; &lt;/a&gt; &lt;/p&gt; &lt;/body&gt; &lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="ui_dialog_view_text.py" line="80"/>
@@ -4709,47 +4717,47 @@ Kod inte den här texten förrän du laddar om kodning - kodtext från menyfält
     <message>
         <location filename="ui_main.py" line="397"/>
         <source>Taguette import</source>
-        <translation type="unfinished"></translation>
+        <translation>Import av Taguette</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="324"/>
         <source>Analysis</source>
-        <translation type="unfinished">Analys</translation>
+        <translation>Analys</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="331"/>
         <source>Files</source>
-        <translation type="unfinished">Filer</translation>
+        <translation>Filer</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="332"/>
         <source>Cases</source>
-        <translation type="unfinished">Fall</translation>
+        <translation>Fall</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="334"/>
         <source>Journals</source>
-        <translation type="unfinished">Tidskrifter</translation>
+        <translation>Tidskrifter</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="347"/>
         <source>Attributes</source>
-        <translation type="unfinished">Attribut</translation>
+        <translation>Attribut</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="367"/>
         <source>Bad links to files</source>
-        <translation type="unfinished"></translation>
+        <translation>Felaktiga länkar till filer</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="376"/>
         <source>References</source>
-        <translation type="unfinished">Referenser</translation>
+        <translation>Referenser</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="380"/>
         <source>Key Shortcuts</source>
-        <translation type="unfinished"></translation>
+        <translation>Tangentbordsgenvägar</translation>
     </message>
 </context>
 </TS>

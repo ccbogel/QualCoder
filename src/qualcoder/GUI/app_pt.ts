@@ -236,44 +236,46 @@ Cada palavra é excluída na nuvem de palavras n-grams=1.</translation>
     <message>
         <location filename="ui_dialog_charts.py" line="343"/>
         <source>Select stopwords list by language</source>
-        <translation type="unfinished"></translation>
+        <translation>Selecionar lista de palavras irrelevantes por idioma</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="306"/>
         <source>Right-click for text filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Clique com o botão direito do mouse para acessar o filtro de texto</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="307"/>
         <source>If portions of a text file are assigned to a case,
 the code frequency and total text characters may be incorrect.
 Codings from the entire text file are used for the calculations.</source>
-        <translation type="unfinished"></translation>
+        <translation>Se partes de um arquivo de texto forem atribuídas a um caso,
+a frequência do código e o total de caracteres do texto podem estar incorretos.
+As codificações de todo o arquivo de texto são utilizadas para os cálculos.</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="319"/>
         <source>Background</source>
-        <translation type="unfinished"></translation>
+        <translation>Contexto</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="320"/>
         <source>Foreground</source>
-        <translation type="unfinished"></translation>
+        <translation>Primeiro plano</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="333"/>
         <source>Image width</source>
-        <translation type="unfinished"></translation>
+        <translation>Largura da imagem</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="334"/>
         <source>Image height</source>
-        <translation type="unfinished"></translation>
+        <translation>Altura da imagem</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="335"/>
         <source>Maximum words</source>
-        <translation type="unfinished"></translation>
+        <translation>Máximo de palavras</translation>
     </message>
 </context>
 <context>
@@ -378,7 +380,7 @@ Clique com o botão direito do mouse sobre as opções</translation>
     <message>
         <location filename="ui_dialog_graph.py" line="148"/>
         <source>Export to Draw.io</source>
-        <translation type="unfinished"></translation>
+        <translation>Exportar para o Draw.io</translation>
     </message>
 </context>
 <context>
@@ -1023,20 +1025,22 @@ Ordenado por nome de arquivo e nome de código.</translation>
     <message>
         <location filename="ui_dialog_cooccurrence.py" line="114"/>
         <source>Export to Gephi. GraphML format</source>
-        <translation type="unfinished"></translation>
+        <translation>Exportar para o Gephi. Formato GraphML</translation>
     </message>
     <message>
         <location filename="ui_dialog_cooccurrence.py" line="115"/>
         <source>Export Co-occurence Graph Image
 Right-click for format options</source>
-        <translation type="unfinished"></translation>
+        <translation>Exportar imagem do gráfico de coocorrência
+Clique com o botão direito do mouse para ver as opções de formatação</translation>
     </message>
     <message>
         <location filename="ui_dialog_cooccurrence.py" line="117"/>
         <source>Export Cluster Graph Image
 Right-click for format options
 </source>
-        <translation type="unfinished"></translation>
+        <translation>Exportar imagem do gráfico de agrupamento
+Clique com o botão direito do mouse para ver as opções de formatação</translation>
     </message>
 </context>
 <context>
@@ -1065,7 +1069,7 @@ Right-click for format options
         <location filename="ui_dialog_import.py" line="94"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Delimiter must be a single character.&lt;/p&gt;&lt;p&gt;Enter &apos;ta&apos; for &apos;tab&apos;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>Delimiter deve ser um único caractere.
-Enter 'ta' para 'tab'</translation>
+Enter &apos;ta&apos; para &apos;tab&apos;</translation>
     </message>
     <message>
         <location filename="ui_dialog_import.py" line="95"/>
@@ -1555,12 +1559,12 @@ Em seguida, abre-se um menu de opções.</translation>
     <message>
         <location filename="ui_dialog_code_av.py" line="234"/>
         <source>Clear file filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Limpar filtro de arquivos</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_av.py" line="235"/>
         <source>Clear code filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Limpar filtro de código</translation>
     </message>
 </context>
 <context>
@@ -1749,12 +1753,12 @@ Em seguida, abre-se um menu de opções.</translation>
     <message>
         <location filename="ui_dialog_code_image.py" line="242"/>
         <source>Clear file filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Limpar filtro de arquivos</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_image.py" line="243"/>
         <source>Clear code filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Limpar filtro de código</translation>
     </message>
 </context>
 <context>
@@ -1953,12 +1957,12 @@ Em seguida, abre-se um menu de opções.</translation>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="314"/>
         <source>Clear file filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Limpar filtro de arquivos</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="318"/>
         <source>Clear code filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Limpar filtro de código</translation>
     </message>
 </context>
 <context>
@@ -1991,7 +1995,7 @@ Em seguida, abre-se um menu de opções.</translation>
     <message>
         <location filename="ui_dialog_report_code_summary.py" line="72"/>
         <source>Select stopwords list by language</source>
-        <translation type="unfinished"></translation>
+        <translation>Selecionar lista de palavras irrelevantes por idioma</translation>
     </message>
 </context>
 <context>
@@ -2345,37 +2349,37 @@ Clique com o botão direito para ver as opções: todas (padrão), primeira, có
     <message>
         <location filename="ui_dialog_code_text.py" line="460"/>
         <source>odt highlight</source>
-        <translation type="unfinished"></translation>
+        <translation>destacar em ODT</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="461"/>
         <source>odt comment</source>
-        <translation type="unfinished"></translation>
+        <translation>comentário em ODT</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="462"/>
         <source>odt report</source>
-        <translation type="unfinished"></translation>
+        <translation>relatório ODT</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="465"/>
         <source>codebook</source>
-        <translation type="unfinished"></translation>
+        <translation>Livro de códigos</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="480"/>
         <source>Select document font and size</source>
-        <translation type="unfinished"></translation>
+        <translation>Selecione o tipo e o tamanho da fonte do documento</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="487"/>
         <source>Clear file filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Limpar filtro de arquivos</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="500"/>
         <source>Clear code filter</source>
-        <translation type="unfinished"></translation>
+        <translation>Limpar filtro de código</translation>
     </message>
 </context>
 <context>
@@ -2387,8 +2391,8 @@ Clique com o botão direito para ver as opções: todas (padrão), primeira, có
     </message>
     <message>
         <location filename="ui_dialog_coder_names.py" line="85"/>
-        <source>Choose (&#xe2;&#x9c;&#x93;) your coder name. Adjust visibility of others:</source>
-        <translation type="unfinished">) o seu nome de programador. Ajuste a visibilidade dos outros:
+        <source>Choose (â) your coder name. Adjust visibility of others:</source>
+        <translation> o seu nome de programador. Ajuste a visibilidade dos outros:
         </translation>
     </message>
     <message>
@@ -2513,7 +2517,7 @@ Clique com o botão direito para ver as opções: todas (padrão), primeira, có
     <message>
         <location filename="ui_dialog_report_file_summary.py" line="72"/>
         <source>Select stopwords list by language</source>
-        <translation type="unfinished"></translation>
+        <translation>Selecionar lista de palavras irrelevantes por idioma</translation>
     </message>
 </context>
 <context>
@@ -2569,7 +2573,7 @@ Clique com o botão direito para ver as opções: todas (padrão), primeira, có
     <message>
         <location filename="ui_dialog_journals.py" line="131"/>
         <source>Export all journals as single text file.</source>
-        <translation type="unfinished">Exportar todos os diários como arquivo de texto único.</translation>
+        <translation>Exportar todos os diários como arquivo de texto único.</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="133"/>
@@ -2599,7 +2603,7 @@ Clique com o botão direito para ver as opções: todas (padrão), primeira, có
     <message>
         <location filename="ui_dialog_journals.py" line="138"/>
         <source>Search all journals</source>
-        <translation type="unfinished">Pesquisar todos os diários</translation>
+        <translation>Pesquisar todos os diários</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="139"/>
@@ -2629,32 +2633,32 @@ Clique com o botão direito para ver as opções: todas (padrão), primeira, có
     <message>
         <location filename="ui_dialog_journals.py" line="126"/>
         <source>Create</source>
-        <translation type="unfinished"></translation>
+        <translation>Criar</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="127"/>
         <source>Export</source>
-        <translation type="unfinished">Exportar</translation>
+        <translation>Exportar</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="128"/>
         <source>Delete</source>
-        <translation type="unfinished">Excluir</translation>
+        <translation>Excluir</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="133"/>
         <source>Next</source>
-        <translation type="unfinished"></translation>
+        <translation>Próximo</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="137"/>
         <source>Previous</source>
-        <translation type="unfinished"></translation>
+        <translation>Anterior</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="140"/>
         <source>Add Attribute</source>
-        <translation type="unfinished">Adicionar Atributo</translation>
+        <translation>Adicionar Atributo</translation>
     </message>
 </context>
 <context>
@@ -2824,7 +2828,11 @@ Formate como abaixo para deteção de nome.
 For csv and tsv files, please avoid using the following in the column names:  , ; |
 
 Surveys with many entries (e.g. more than 1,000) please wait, as importation will be slow.</source>
-        <translation type="unfinished"></translation>
+        <translation>Importação de pesquisa
+
+Para arquivos CSV e TSV, evite usar os seguintes caracteres nos nomes das colunas:  , ; |
+
+Em pesquisas com muitas entradas (por exemplo, mais de 1.000), aguarde, pois a importação será lenta.</translation>
     </message>
 </context>
 <context>
@@ -2880,22 +2888,22 @@ Surveys with many entries (e.g. more than 1,000) please wait, as importation wil
     <message>
         <location filename="ui_manage_references.py" line="94"/>
         <source>Delete selected reference</source>
-        <translation type="unfinished">Excluir a referência selecionada</translation>
+        <translation>Excluir a referência selecionada</translation>
     </message>
     <message>
         <location filename="ui_manage_references.py" line="95"/>
         <source>Link selected files to selected reference</source>
-        <translation type="unfinished">Vincular arquivos selecionados à referência selecionada</translation>
+        <translation>Vincular arquivos selecionados à referência selecionada</translation>
     </message>
     <message>
         <location filename="ui_manage_references.py" line="96"/>
         <source>Unlink selected files from references</source>
-        <translation type="unfinished">Desbloqueio de arquivos selecionados a partir de referências</translation>
+        <translation>Desbloqueio de arquivos selecionados a partir de referências</translation>
     </message>
     <message>
         <location filename="ui_manage_references.py" line="97"/>
         <source>Delete all references that are not assigned to files</source>
-        <translation type="unfinished">Excluir todas as referências que não são atribuídas a arquivos</translation>
+        <translation>Excluir todas as referências que não são atribuídas a arquivos</translation>
     </message>
     <message>
         <location filename="ui_manage_references.py" line="98"/>
@@ -2905,7 +2913,7 @@ Surveys with many entries (e.g. more than 1,000) please wait, as importation wil
     <message>
         <location filename="ui_manage_references.py" line="99"/>
         <source>Import references. RIS or NBIB (PubMed) format.</source>
-        <translation type="unfinished">Importar referências. Formato RIS.</translation>
+        <translation>Importar referências. Formato RIS.</translation>
     </message>
     <message>
         <location filename="ui_manage_references.py" line="100"/>
@@ -2914,14 +2922,14 @@ Word matching uses words from reference title.
 Strong matches with 70% or more matching words are linked.
 Linking may be incorrect.
 Review after applying the function.</source>
-        <translation type="unfinished">Vincule automaticamente referências a nomes de arquivos não atribuídos.
+        <translation>Vincule automaticamente referências a nomes de arquivos não atribuídos.
 A correspondência de palavras usa palavras do título da referência. As correspondências fortes com 70% ou mais de palavras correspondentes são vinculadas.
 A vinculação pode estar incorreta. Revise após aplicar a função.</translation>
     </message>
     <message>
         <location filename="ui_manage_references.py" line="98"/>
         <source>Edit reference</source>
-        <translation type="unfinished"></translation>
+        <translation>Editar referência</translation>
     </message>
 </context>
 <context>
@@ -3408,7 +3416,7 @@ Wildcards for &apos;like&apos; are % and _</source>
         <translation>Selecione parâmetros para os atributos. 
 between requer 2 valores separados por ;, por exemplo, 1;100
  in e not in requerem 1 ou mais valores separados por ;
-Os curingas para 'like' são % e _</translation>
+Os curingas para &apos;like&apos; são % e _</translation>
     </message>
     <message>
         <location filename="ui_report_attribute_parameters.py" line="88"/>
@@ -4277,7 +4285,7 @@ Não codifique este texto até que você recarregue Codificação - Texto do có
     </message>
     <message>
         <location filename="ui_dialog_view_text.py" line="79"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot &#xe2;&#x80;&#x98;.&#xe2;&#x80;&#x99; is used as a wild card, e.g. &#xe2;&#x80;&#x98;.ears&#xe2;&#x80;&#x99; will match &#xe2;&#x80;&#x98;bears&#xe2;&#x80;&#x99; and &#xe2;&#x80;&#x98;years&#xe2;&#x80;&#x99;. &lt;/p&gt;&lt;p&gt;A &#xe2;&#x80;&#x98;?&#xe2;&#x80;&#x99; after a character will match one or none times that character, e.g. &#xe2;&#x80;&#x98;bears?&#xe2;&#x80;&#x99; will match &#xe2;&#x80;&#x98;bear&#xe2;&#x80;&#x99; and &#xe2;&#x80;&#x98;bears&#xe2;&#x80;&#x99; &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A &#xe2;&#x80;&#x98;*&#xe2;&#x80;&#x99; after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;&#xe2;&#x80;&#x98;&lt;/span&gt;\. will match the dot symbol, &#xe2;&#x80;&#x98;\?&#xe2;&#x80;&#x99; will match the question mark. &#xe2;&#x80;&#x98;\n&#xe2;&#x80;&#x99; will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Search uses Regex functions. &lt;/p&gt;&lt;p&gt;A dot â.â is used as a wild card, e.g. â.earsâ will match âbearsâ and âyearsâ. &lt;/p&gt;&lt;p&gt;A â?â after a character will match one or none times that character, e.g. âbears?â will match âbearâ and âbearsâ &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;A â*â after a character will match zero or more times. &lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; background-color:transparent;&quot;&gt;â&lt;/span&gt;\. will match the dot symbol, â\?â will match the question mark. â\nâ will match the line ending symbol. &lt;/p&gt;&lt;p&gt;Regex cheatsheet: &lt;a href=&quot;http://www.rexegg.com/regex-quickstart.html&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#000080;&quot;&gt;www.rexegg.com/regex-quickstart.html&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished">A pesquisa usa funções regex.</translation>
     </message>
 </context>
@@ -4719,47 +4727,47 @@ Não codifique este texto até que você recarregue Codificação - Texto do có
     <message>
         <location filename="ui_main.py" line="397"/>
         <source>Taguette import</source>
-        <translation type="unfinished"></translation>
+        <translation>Importação da Taguette</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="324"/>
         <source>Analysis</source>
-        <translation type="unfinished">Analise</translation>
+        <translation>Analise</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="331"/>
         <source>Files</source>
-        <translation type="unfinished">Arquivos</translation>
+        <translation>Arquivos</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="332"/>
         <source>Cases</source>
-        <translation type="unfinished">Casos</translation>
+        <translation>Casos</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="334"/>
         <source>Journals</source>
-        <translation type="unfinished">Diários</translation>
+        <translation>Diários</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="347"/>
         <source>Attributes</source>
-        <translation type="unfinished">Atributos</translation>
+        <translation>Atributos</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="367"/>
         <source>Bad links to files</source>
-        <translation type="unfinished"></translation>
+        <translation>Links inválidos para arquivos</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="376"/>
         <source>References</source>
-        <translation type="unfinished">Referências</translation>
+        <translation>Referências</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="380"/>
         <source>Key Shortcuts</source>
-        <translation type="unfinished"></translation>
+        <translation>Atalhos de teclado</translation>
     </message>
 </context>
 </TS>

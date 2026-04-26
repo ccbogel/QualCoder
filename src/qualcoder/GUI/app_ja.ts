@@ -234,44 +234,46 @@ Each word is excluded in the n-grams=1 Word cloud.</source>
     <message>
         <location filename="ui_dialog_charts.py" line="343"/>
         <source>Select stopwords list by language</source>
-        <translation type="unfinished"></translation>
+        <translation>言語ごとにストップワードリストを選択する</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="306"/>
         <source>Right-click for text filter</source>
-        <translation type="unfinished"></translation>
+        <translation>テキストフィルターを表示するには右クリックしてください</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="307"/>
         <source>If portions of a text file are assigned to a case,
 the code frequency and total text characters may be incorrect.
 Codings from the entire text file are used for the calculations.</source>
-        <translation type="unfinished"></translation>
+        <translation>テキストファイルの一部のみがケースに割り当てられている場合、
+コードの出現頻度やテキストの総文字数が不正確になる可能性があります。
+計算には、テキストファイル全体のコードデータが使用されます。</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="319"/>
         <source>Background</source>
-        <translation type="unfinished"></translation>
+        <translation>背景</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="320"/>
         <source>Foreground</source>
-        <translation type="unfinished"></translation>
+        <translation>前景</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="333"/>
         <source>Image width</source>
-        <translation type="unfinished"></translation>
+        <translation>画像の幅</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="334"/>
         <source>Image height</source>
-        <translation type="unfinished"></translation>
+        <translation>画像の高さ</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="335"/>
         <source>Maximum words</source>
-        <translation type="unfinished"></translation>
+        <translation>最大文字数</translation>
     </message>
 </context>
 <context>
@@ -375,7 +377,7 @@ Right-click for options</source>
     <message>
         <location filename="ui_dialog_graph.py" line="148"/>
         <source>Export to Draw.io</source>
-        <translation type="unfinished"></translation>
+        <translation>Draw.ioにエクスポート</translation>
     </message>
 </context>
 <context>
@@ -1019,20 +1021,22 @@ Ordered by file name and code name.</source>
     <message>
         <location filename="ui_dialog_cooccurrence.py" line="114"/>
         <source>Export to Gephi. GraphML format</source>
-        <translation type="unfinished"></translation>
+        <translation>Gephiにエクスポート。GraphML形式</translation>
     </message>
     <message>
         <location filename="ui_dialog_cooccurrence.py" line="115"/>
         <source>Export Co-occurence Graph Image
 Right-click for format options</source>
-        <translation type="unfinished"></translation>
+        <translation>共起グラフの画像をエクスポート
+右クリックでフォーマットオプションを表示</translation>
     </message>
     <message>
         <location filename="ui_dialog_cooccurrence.py" line="117"/>
         <source>Export Cluster Graph Image
 Right-click for format options
 </source>
-        <translation type="unfinished"></translation>
+        <translation>クラスターグラフの画像をエクスポート
+右クリックで形式のオプションを表示</translation>
     </message>
 </context>
 <context>
@@ -1548,12 +1552,12 @@ Ctrl Shift &lt; 再生レートを最小0.1に下げる</translation>
     <message>
         <location filename="ui_dialog_code_av.py" line="234"/>
         <source>Clear file filter</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイルフィルターをクリアする</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_av.py" line="235"/>
         <source>Clear code filter</source>
-        <translation type="unfinished"></translation>
+        <translation>コードフィルターをクリアする</translation>
     </message>
 </context>
 <context>
@@ -1742,12 +1746,12 @@ Ctrl Shift &lt; 再生レートを最小0.1に下げる</translation>
     <message>
         <location filename="ui_dialog_code_image.py" line="242"/>
         <source>Clear file filter</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイルフィルターをクリアする</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_image.py" line="243"/>
         <source>Clear code filter</source>
-        <translation type="unfinished"></translation>
+        <translation>コードフィルターをクリアする</translation>
     </message>
 </context>
 <context>
@@ -1946,12 +1950,12 @@ Ctrl Shift &lt; 再生レートを最小0.1に下げる</translation>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="314"/>
         <source>Clear file filter</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイルフィルターをクリアする</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="318"/>
         <source>Clear code filter</source>
-        <translation type="unfinished"></translation>
+        <translation>コードフィルターをクリアする</translation>
     </message>
 </context>
 <context>
@@ -1984,7 +1988,7 @@ Ctrl Shift &lt; 再生レートを最小0.1に下げる</translation>
     <message>
         <location filename="ui_dialog_report_code_summary.py" line="72"/>
         <source>Select stopwords list by language</source>
-        <translation type="unfinished"></translation>
+        <translation>言語ごとにストップワードリストを選択する</translation>
     </message>
 </context>
 <context>
@@ -2297,37 +2301,37 @@ Right click for options: all (default), first, code within code.</source>
     <message>
         <location filename="ui_dialog_code_text.py" line="460"/>
         <source>odt highlight</source>
-        <translation type="unfinished"></translation>
+        <translation>odtのハイライト</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="461"/>
         <source>odt comment</source>
-        <translation type="unfinished"></translation>
+        <translation>odt コメント</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="462"/>
         <source>odt report</source>
-        <translation type="unfinished"></translation>
+        <translation>ODTレポート</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="465"/>
         <source>codebook</source>
-        <translation type="unfinished"></translation>
+        <translation>コードブック</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="480"/>
         <source>Select document font and size</source>
-        <translation type="unfinished"></translation>
+        <translation>文書用のフォントとサイズを選択してください</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="487"/>
         <source>Clear file filter</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイルフィルターをクリアする</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="500"/>
         <source>Clear code filter</source>
-        <translation type="unfinished"></translation>
+        <translation>コードフィルターをクリアする</translation>
     </message>
 </context>
 <context>
@@ -2339,8 +2343,8 @@ Right click for options: all (default), first, code within code.</source>
     </message>
     <message>
         <location filename="ui_dialog_coder_names.py" line="85"/>
-        <source>Choose (&#xe2;&#x9c;&#x93;) your coder name. Adjust visibility of others:</source>
-        <translation type="unfinished">コーダー名を選択してください。他のユーザーの表示設定を調整：</translation>
+        <source>Choose (â) your coder name. Adjust visibility of others:</source>
+        <translation>コーダー名を選択してください。他のユーザーの表示設定を調整：</translation>
     </message>
     <message>
         <location filename="ui_dialog_coder_names.py" line="86"/>
@@ -2464,7 +2468,7 @@ Right click for options: all (default), first, code within code.</source>
     <message>
         <location filename="ui_dialog_report_file_summary.py" line="72"/>
         <source>Select stopwords list by language</source>
-        <translation type="unfinished"></translation>
+        <translation>言語ごとにストップワードリストを選択する</translation>
     </message>
 </context>
 <context>
@@ -2510,7 +2514,7 @@ Right click for options: all (default), first, code within code.</source>
     <message>
         <location filename="ui_dialog_journals.py" line="131"/>
         <source>Export all journals as single text file.</source>
-        <translation type="unfinished">すべてのジャーナルを単一のテキストファイルとしてエクスポート</translation>
+        <translation>すべてのジャーナルを単一のテキストファイルとしてエクスポート</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="132"/>
@@ -2545,7 +2549,7 @@ Right click for options: all (default), first, code within code.</source>
     <message>
         <location filename="ui_dialog_journals.py" line="138"/>
         <source>Search all journals</source>
-        <translation type="unfinished">すべてのジャーナルを検索</translation>
+        <translation>すべてのジャーナルを検索</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="139"/>
@@ -2580,32 +2584,32 @@ Right click for options: all (default), first, code within code.</source>
     <message>
         <location filename="ui_dialog_journals.py" line="126"/>
         <source>Create</source>
-        <translation type="unfinished"></translation>
+        <translation>作成</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="127"/>
         <source>Export</source>
-        <translation type="unfinished">輸出</translation>
+        <translation>輸出</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="128"/>
         <source>Delete</source>
-        <translation type="unfinished">削除</translation>
+        <translation>削除</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="133"/>
         <source>Next</source>
-        <translation type="unfinished"></translation>
+        <translation>次へ</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="137"/>
         <source>Previous</source>
-        <translation type="unfinished"></translation>
+        <translation>前へ</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="140"/>
         <source>Add Attribute</source>
-        <translation type="unfinished"></translation>
+        <translation>属性を追加する</translation>
     </message>
 </context>
 <context>
@@ -2773,7 +2777,11 @@ Formatted like below for name detection.
 For csv and tsv files, please avoid using the following in the column names:  , ; |
 
 Surveys with many entries (e.g. more than 1,000) please wait, as importation will be slow.</source>
-        <translation type="unfinished"></translation>
+        <translation>インポートに関する注意事項
+
+CSVおよびTSVファイルの場合、列名には以下の文字を使用しないでください：  , ; |
+
+エントリ数が非常に多いアンケート（例：1,000件以上）については、インポートに時間がかかるため、しばらくお待ちください。</translation>
     </message>
 </context>
 <context>
@@ -2829,22 +2837,22 @@ Surveys with many entries (e.g. more than 1,000) please wait, as importation wil
     <message>
         <location filename="ui_manage_references.py" line="94"/>
         <source>Delete selected reference</source>
-        <translation type="unfinished">選択した参照を削除する</translation>
+        <translation>選択した参照を削除する</translation>
     </message>
     <message>
         <location filename="ui_manage_references.py" line="95"/>
         <source>Link selected files to selected reference</source>
-        <translation type="unfinished">選択したファイルを選択したリファレンスにリンクする</translation>
+        <translation>選択したファイルを選択したリファレンスにリンクする</translation>
     </message>
     <message>
         <location filename="ui_manage_references.py" line="96"/>
         <source>Unlink selected files from references</source>
-        <translation type="unfinished">選択したリファレンスから選択したファイルを削除する</translation>
+        <translation>選択したリファレンスから選択したファイルを削除する</translation>
     </message>
     <message>
         <location filename="ui_manage_references.py" line="97"/>
         <source>Delete all references that are not assigned to files</source>
-        <translation type="unfinished">ファイルに割り当てられていないすべての参照を削除する。</translation>
+        <translation>ファイルに割り当てられていないすべての参照を削除する。</translation>
     </message>
     <message>
         <location filename="ui_manage_references.py" line="98"/>
@@ -2854,7 +2862,7 @@ Surveys with many entries (e.g. more than 1,000) please wait, as importation wil
     <message>
         <location filename="ui_manage_references.py" line="99"/>
         <source>Import references. RIS or NBIB (PubMed) format.</source>
-        <translation type="unfinished">参考文献のインポート RISフォーマット。</translation>
+        <translation>参考文献のインポート RISフォーマット。</translation>
     </message>
     <message>
         <location filename="ui_manage_references.py" line="100"/>
@@ -2863,12 +2871,12 @@ Word matching uses words from reference title.
 Strong matches with 70% or more matching words are linked.
 Linking may be incorrect.
 Review after applying the function.</source>
-        <translation type="unfinished">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;未割り当てのファイル名へのリファレンスを自動的にリンクします。&lt;/p&gt;&lt;p&gt;ワードマッチはリファレンスタイトルの単語を使用します。&lt;/p&gt;&lt;p&gt;70%以上の単語が一致する強いマッチがリンクされます。&lt;/p&gt;&lt;p&gt;リンクが正しくない場合があります。&lt;/p&gt;&lt;p&gt;機能適用後に見直してください。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;未割り当てのファイル名へのリファレンスを自動的にリンクします。&lt;/p&gt;&lt;p&gt;ワードマッチはリファレンスタイトルの単語を使用します。&lt;/p&gt;&lt;p&gt;70%以上の単語が一致する強いマッチがリンクされます。&lt;/p&gt;&lt;p&gt;リンクが正しくない場合があります。&lt;/p&gt;&lt;p&gt;機能適用後に見直してください。&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location filename="ui_manage_references.py" line="98"/>
         <source>Edit reference</source>
-        <translation type="unfinished"></translation>
+        <translation>参照を編集</translation>
     </message>
 </context>
 <context>
@@ -3332,7 +3340,7 @@ Wildcards for &apos;like&apos; are % and _</source>
         <translation>属性のパラメータを選択します。
 betweenには、;で区切られた2つの値が必要です。
  in と not in は、.で区切られた1つ以上の値を必要とします；
-like' のワイルドカードは % と _ です。</translation>
+like&apos; のワイルドカードは % と _ です。</translation>
     </message>
     <message>
         <location filename="ui_report_attribute_parameters.py" line="88"/>
@@ -4667,47 +4675,47 @@ Do not code this text until you reload Coding - Code Text from the menu bar.</so
     <message>
         <location filename="ui_main.py" line="397"/>
         <source>Taguette import</source>
-        <translation type="unfinished"></translation>
+        <translation>タゲットのインポート</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="324"/>
         <source>Analysis</source>
-        <translation type="unfinished">分析</translation>
+        <translation>分析</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="331"/>
         <source>Files</source>
-        <translation type="unfinished">ファイル</translation>
+        <translation>ファイル</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="332"/>
         <source>Cases</source>
-        <translation type="unfinished">事例</translation>
+        <translation>事例</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="334"/>
         <source>Journals</source>
-        <translation type="unfinished">雑誌</translation>
+        <translation>雑誌</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="347"/>
         <source>Attributes</source>
-        <translation type="unfinished">属性</translation>
+        <translation>属性</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="367"/>
         <source>Bad links to files</source>
-        <translation type="unfinished"></translation>
+        <translation>ファイルへのリンクが切れている</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="376"/>
         <source>References</source>
-        <translation type="unfinished">参考文献</translation>
+        <translation>参考文献</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="380"/>
         <source>Key Shortcuts</source>
-        <translation type="unfinished"></translation>
+        <translation>キーボードショートカット</translation>
     </message>
 </context>
 </TS>

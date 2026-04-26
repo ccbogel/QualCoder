@@ -235,44 +235,46 @@ Each word is excluded in the n-grams=1 Word cloud.</source>
     <message>
         <location filename="ui_dialog_charts.py" line="343"/>
         <source>Select stopwords list by language</source>
-        <translation type="unfinished"></translation>
+        <translation>按语言选择停用词列表</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="306"/>
         <source>Right-click for text filter</source>
-        <translation type="unfinished"></translation>
+        <translation>右键单击以启用文本过滤器</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="307"/>
         <source>If portions of a text file are assigned to a case,
 the code frequency and total text characters may be incorrect.
 Codings from the entire text file are used for the calculations.</source>
-        <translation type="unfinished"></translation>
+        <translation>如果仅将文本文件的部分内容分配给某个病例，
+则编码频率和文本总字符数可能会不准确。
+计算时将使用整个文本文件的编码数据。</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="319"/>
         <source>Background</source>
-        <translation type="unfinished"></translation>
+        <translation>背景</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="320"/>
         <source>Foreground</source>
-        <translation type="unfinished"></translation>
+        <translation>前景</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="333"/>
         <source>Image width</source>
-        <translation type="unfinished"></translation>
+        <translation>图片宽度</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="334"/>
         <source>Image height</source>
-        <translation type="unfinished"></translation>
+        <translation>图片高度</translation>
     </message>
     <message>
         <location filename="ui_dialog_charts.py" line="335"/>
         <source>Maximum words</source>
-        <translation type="unfinished"></translation>
+        <translation>最大字数</translation>
     </message>
 </context>
 <context>
@@ -377,7 +379,7 @@ Right-click for options</source>
     <message>
         <location filename="ui_dialog_graph.py" line="148"/>
         <source>Export to Draw.io</source>
-        <translation type="unfinished"></translation>
+        <translation>导出到 Draw.io</translation>
     </message>
 </context>
 <context>
@@ -1022,20 +1024,22 @@ Ordered by file name and code name.</source>
     <message>
         <location filename="ui_dialog_cooccurrence.py" line="114"/>
         <source>Export to Gephi. GraphML format</source>
-        <translation type="unfinished"></translation>
+        <translation>导出到Gephi。GraphML格式</translation>
     </message>
     <message>
         <location filename="ui_dialog_cooccurrence.py" line="115"/>
         <source>Export Co-occurence Graph Image
 Right-click for format options</source>
-        <translation type="unfinished"></translation>
+        <translation>导出共现图图像
+右键单击查看格式选项</translation>
     </message>
     <message>
         <location filename="ui_dialog_cooccurrence.py" line="117"/>
         <source>Export Cluster Graph Image
 Right-click for format options
 </source>
-        <translation type="unfinished"></translation>
+        <translation>导出聚类图图像
+右键单击查看格式选项</translation>
     </message>
 </context>
 <context>
@@ -1080,8 +1084,8 @@ Right-click for format options
         <location filename="ui_dialog_import.py" line="97"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;NONE 123, abc&lt;/p&gt;&lt;p&gt;MINIMAL 123, &amp;quot;abc&amp;quot;&lt;/p&gt;&lt;p&gt;ALL &amp;quot;123&amp;quot;, &amp;quot;abc&amp;quot;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>NONE 123, abc
-MINIMAL 123,'abc';
-ALL '123', 'abc'</translation>
+MINIMAL 123,&apos;abc&apos;;
+ALL &apos;123&apos;, &apos;abc&apos;</translation>
     </message>
     <message>
         <location filename="ui_dialog_import.py" line="98"/>
@@ -1556,12 +1560,12 @@ Ctrl + Shift + &lt; 将播放速率降至最低 0.1</translation>
     <message>
         <location filename="ui_dialog_code_av.py" line="234"/>
         <source>Clear file filter</source>
-        <translation type="unfinished"></translation>
+        <translation>清除文件筛选条件</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_av.py" line="235"/>
         <source>Clear code filter</source>
-        <translation type="unfinished"></translation>
+        <translation>清除代码筛选器</translation>
     </message>
 </context>
 <context>
@@ -1750,12 +1754,12 @@ Ctrl + Shift + &lt; 将播放速率降至最低 0.1</translation>
     <message>
         <location filename="ui_dialog_code_image.py" line="242"/>
         <source>Clear file filter</source>
-        <translation type="unfinished"></translation>
+        <translation>清除文件筛选条件</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_image.py" line="243"/>
         <source>Clear code filter</source>
-        <translation type="unfinished"></translation>
+        <translation>清除代码筛选器</translation>
     </message>
 </context>
 <context>
@@ -1954,12 +1958,12 @@ Ctrl + Shift + &lt; 将播放速率降至最低 0.1</translation>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="314"/>
         <source>Clear file filter</source>
-        <translation type="unfinished"></translation>
+        <translation>清除文件筛选条件</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_pdf.py" line="318"/>
         <source>Clear code filter</source>
-        <translation type="unfinished"></translation>
+        <translation>清除代码筛选器</translation>
     </message>
 </context>
 <context>
@@ -1992,7 +1996,7 @@ Ctrl + Shift + &lt; 将播放速率降至最低 0.1</translation>
     <message>
         <location filename="ui_dialog_report_code_summary.py" line="72"/>
         <source>Select stopwords list by language</source>
-        <translation type="unfinished"></translation>
+        <translation>按语言选择停用词列表</translation>
     </message>
 </context>
 <context>
@@ -2306,37 +2310,37 @@ Right click for options: all (default), first, code within code.</source>
     <message>
         <location filename="ui_dialog_code_text.py" line="460"/>
         <source>odt highlight</source>
-        <translation type="unfinished"></translation>
+        <translation>odt 突出显示</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="461"/>
         <source>odt comment</source>
-        <translation type="unfinished"></translation>
+        <translation>odt 注释</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="462"/>
         <source>odt report</source>
-        <translation type="unfinished"></translation>
+        <translation>ODT 报告</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="465"/>
         <source>codebook</source>
-        <translation type="unfinished"></translation>
+        <translation>编码本</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="480"/>
         <source>Select document font and size</source>
-        <translation type="unfinished"></translation>
+        <translation>选择文档字体和字号</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="487"/>
         <source>Clear file filter</source>
-        <translation type="unfinished"></translation>
+        <translation>清除文件筛选条件</translation>
     </message>
     <message>
         <location filename="ui_dialog_code_text.py" line="500"/>
         <source>Clear code filter</source>
-        <translation type="unfinished"></translation>
+        <translation>清除代码筛选器</translation>
     </message>
 </context>
 <context>
@@ -2348,8 +2352,8 @@ Right click for options: all (default), first, code within code.</source>
     </message>
     <message>
         <location filename="ui_dialog_coder_names.py" line="85"/>
-        <source>Choose (&#xe2;&#x9c;&#x93;) your coder name. Adjust visibility of others:</source>
-        <translation type="unfinished">警告：若选择合并至其他名称，操作不可撤销。请先备份项目。</translation>
+        <source>Choose (â) your coder name. Adjust visibility of others:</source>
+        <translation>警告：若选择合并至其他名称，操作不可撤销。请先备份项目。</translation>
     </message>
     <message>
         <location filename="ui_dialog_coder_names.py" line="86"/>
@@ -2473,7 +2477,7 @@ Right click for options: all (default), first, code within code.</source>
     <message>
         <location filename="ui_dialog_report_file_summary.py" line="72"/>
         <source>Select stopwords list by language</source>
-        <translation type="unfinished"></translation>
+        <translation>按语言选择停用词列表</translation>
     </message>
 </context>
 <context>
@@ -2519,7 +2523,7 @@ Right click for options: all (default), first, code within code.</source>
     <message>
         <location filename="ui_dialog_journals.py" line="131"/>
         <source>Export all journals as single text file.</source>
-        <translation type="unfinished">将所有期刊导出为单一文本文件</translation>
+        <translation>将所有期刊导出为单一文本文件</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="132"/>
@@ -2554,7 +2558,7 @@ Right click for options: all (default), first, code within code.</source>
     <message>
         <location filename="ui_dialog_journals.py" line="138"/>
         <source>Search all journals</source>
-        <translation type="unfinished">搜索所有期刊</translation>
+        <translation>搜索所有期刊</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="139"/>
@@ -2589,32 +2593,32 @@ Right click for options: all (default), first, code within code.</source>
     <message>
         <location filename="ui_dialog_journals.py" line="126"/>
         <source>Create</source>
-        <translation type="unfinished"></translation>
+        <translation>创建</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="127"/>
         <source>Export</source>
-        <translation type="unfinished">出口</translation>
+        <translation>出口</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="128"/>
         <source>Delete</source>
-        <translation type="unfinished">删除</translation>
+        <translation>删除</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="133"/>
         <source>Next</source>
-        <translation type="unfinished"></translation>
+        <translation>下一页</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="137"/>
         <source>Previous</source>
-        <translation type="unfinished"></translation>
+        <translation>上一页</translation>
     </message>
     <message>
         <location filename="ui_dialog_journals.py" line="140"/>
         <source>Add Attribute</source>
-        <translation type="unfinished">添加属性</translation>
+        <translation>添加属性</translation>
     </message>
 </context>
 <context>
@@ -2782,7 +2786,11 @@ Formatted like below for name detection.
 For csv and tsv files, please avoid using the following in the column names:  , ; |
 
 Surveys with many entries (e.g. more than 1,000) please wait, as importation will be slow.</source>
-        <translation type="unfinished"></translation>
+        <translation>导入调查
+
+对于 CSV 和 TSV 文件，请避免在列名中使用以下字符：  , ; |
+
+若调查条目较多（例如超过 1,000 条），请耐心等待，因为导入过程会比较缓慢。</translation>
     </message>
 </context>
 <context>
@@ -2838,22 +2846,22 @@ Surveys with many entries (e.g. more than 1,000) please wait, as importation wil
     <message>
         <location filename="ui_manage_references.py" line="94"/>
         <source>Delete selected reference</source>
-        <translation type="unfinished">删除选定的参考文献</translation>
+        <translation>删除选定的参考文献</translation>
     </message>
     <message>
         <location filename="ui_manage_references.py" line="95"/>
         <source>Link selected files to selected reference</source>
-        <translation type="unfinished">将选定的文件链接到选定的参考文献</translation>
+        <translation>将选定的文件链接到选定的参考文献</translation>
     </message>
     <message>
         <location filename="ui_manage_references.py" line="96"/>
         <source>Unlink selected files from references</source>
-        <translation type="unfinished">从参考文献中解除所选文件的链接</translation>
+        <translation>从参考文献中解除所选文件的链接</translation>
     </message>
     <message>
         <location filename="ui_manage_references.py" line="97"/>
         <source>Delete all references that are not assigned to files</source>
-        <translation type="unfinished">删除所有未分配给文件的引用</translation>
+        <translation>删除所有未分配给文件的引用</translation>
     </message>
     <message>
         <location filename="ui_manage_references.py" line="98"/>
@@ -2863,7 +2871,7 @@ Surveys with many entries (e.g. more than 1,000) please wait, as importation wil
     <message>
         <location filename="ui_manage_references.py" line="99"/>
         <source>Import references. RIS or NBIB (PubMed) format.</source>
-        <translation type="unfinished">导入参考文献。RIS 格式。</translation>
+        <translation>导入参考文献。支持 RIS 或 NBIB（PubMed）格式。</translation>
     </message>
     <message>
         <location filename="ui_manage_references.py" line="100"/>
@@ -2872,7 +2880,7 @@ Word matching uses words from reference title.
 Strong matches with 70% or more matching words are linked.
 Linking may be incorrect.
 Review after applying the function.</source>
-        <translation type="unfinished">自动将引用链接到未指定的文件名。
+        <translation>自动将引用链接到未指定的文件名。
 词语匹配使用参考文献标题中的词语。
 具有 70% 或更多匹配词的强匹配会被链接。
 链接可能不正确。
@@ -2881,7 +2889,7 @@ Review after applying the function.</source>
     <message>
         <location filename="ui_manage_references.py" line="98"/>
         <source>Edit reference</source>
-        <translation type="unfinished"></translation>
+        <translation>编辑引用</translation>
     </message>
 </context>
 <context>
@@ -4683,47 +4691,47 @@ Do not code this text until you reload Coding - Code Text from the menu bar.</so
     <message>
         <location filename="ui_main.py" line="397"/>
         <source>Taguette import</source>
-        <translation type="unfinished"></translation>
+        <translation>导入 Taguette</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="324"/>
         <source>Analysis</source>
-        <translation type="unfinished"></translation>
+        <translation>分析</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="331"/>
         <source>Files</source>
-        <translation type="unfinished">文件</translation>
+        <translation>文件</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="332"/>
         <source>Cases</source>
-        <translation type="unfinished">案例</translation>
+        <translation>案例</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="334"/>
         <source>Journals</source>
-        <translation type="unfinished">期刊</translation>
+        <translation>期刊</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="347"/>
         <source>Attributes</source>
-        <translation type="unfinished">属性</translation>
+        <translation>属性</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="367"/>
         <source>Bad links to files</source>
-        <translation type="unfinished"></translation>
+        <translation>文件链接无效</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="376"/>
         <source>References</source>
-        <translation type="unfinished">参考资料</translation>
+        <translation>参考资料</translation>
     </message>
     <message>
         <location filename="ui_main.py" line="380"/>
         <source>Key Shortcuts</source>
-        <translation type="unfinished"></translation>
+        <translation>快捷键</translation>
     </message>
 </context>
 </TS>
