@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-04-25 17:31+1000\n"
-"PO-Revision-Date: 2026-02-22 09:59+1100\n"
+"PO-Revision-Date: 2026-04-28 08:16+1000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: pt\n"
@@ -1773,7 +1773,7 @@ msgstr "O filtro é igual: "
 #: src\qualcoder\code_pdf.py:770 src\qualcoder\code_text.py:972
 #: src\qualcoder\view_av.py:753 src\qualcoder\view_image.py:676
 msgid "Toggle automatic resize"
-msgstr ""
+msgstr "Ativar/desativar redimensionamento automático"
 
 #: src\qualcoder\code_pdf.py:949 src\qualcoder\code_text.py:1344
 msgid "Automatic search 3 or more characters"
@@ -1917,7 +1917,7 @@ msgstr "Adicionar uma nova categoria"
 #: src\qualcoder\reports.py:554 src\qualcoder\reports.py:1076
 #: src\qualcoder\view_av.py:1542 src\qualcoder\view_image.py:1312
 msgid "Expand or collapse branch"
-msgstr ""
+msgstr "Expandir ou recolher o ramo"
 
 #: src\qualcoder\code_pdf.py:1371 src\qualcoder\code_pdf.py:1381
 #: src\qualcoder\code_text.py:1997 src\qualcoder\code_text.py:2007
@@ -2515,7 +2515,7 @@ msgstr "Duplicado"
 #: src\qualcoder\code_pdf.py:3940 src\qualcoder\code_text.py:6632
 #: src\qualcoder\view_av.py:3788
 msgid "This code already exists at this exact location."
-msgstr ""
+msgstr "Esse código já existe exatamente neste local."
 
 #: src\qualcoder\code_text.py:146
 msgid "EDITING TEXT MODE (Ctrl+E)"
@@ -2549,7 +2549,7 @@ msgstr "Selecione o código de substituição"
 
 #: src\qualcoder\code_text.py:600
 msgid "REF"
-msgstr ""
+msgstr "REF"
 
 #: src\qualcoder\code_text.py:1014
 msgid "Examples:"
@@ -2673,11 +2673,12 @@ msgstr "Diario Diario"
 #: src\qualcoder\code_text.py:2706
 msgid "Journals are linked to this file. Include them in the report?"
 msgstr ""
+"Existem diários vinculados a este arquivo. Deseja incluí-los no relatório?"
 
 #: src\qualcoder\code_text.py:2721 src\qualcoder\code_text.py:3211
 #: src\qualcoder\code_text.py:3283
 msgid "Software citation"
-msgstr ""
+msgstr "Citação de software"
 
 #: src\qualcoder\code_text.py:2737 src\qualcoder\refi.py:2031
 #: src\qualcoder\refi.py:2037 src\qualcoder\__main__.py:2296
@@ -2732,7 +2733,7 @@ msgstr "Co-ocorrência exportada"
 
 #: src\qualcoder\code_text.py:3008
 msgid "No co-occurrences found in this file."
-msgstr ""
+msgstr "Não foram encontradas ocorrências conjuntas neste arquivo."
 
 #: src\qualcoder\code_text.py:3011
 #, fuzzy
@@ -2766,7 +2767,7 @@ msgstr "Co-ocorrência exportada"
 
 #: src\qualcoder\code_text.py:3094
 msgid "Full File (highlight)"
-msgstr ""
+msgstr "Arquivo completo (destaque)"
 
 #: src\qualcoder\code_text.py:3100
 #, fuzzy
@@ -2794,7 +2795,7 @@ msgstr "CÓDIGOS: "
 
 #: src\qualcoder\code_text.py:3277
 msgid "CATEGORY"
-msgstr ""
+msgstr "CATEGORIA"
 
 #: src\qualcoder\code_text.py:3279
 #, fuzzy
@@ -3175,11 +3176,11 @@ msgstr "Clique para gerenciar os arquivos para este caso"
 
 #: src\qualcoder\code_text.py:6367
 msgid "(search aborted due to an error)"
-msgstr ""
+msgstr "(busca interrompida devido a um erro)"
 
 #: src\qualcoder\code_text.py:6369
 msgid "(search finished)"
-msgstr ""
+msgstr "(busca concluída)"
 
 #: src\qualcoder\code_text.py:6384
 #, fuzzy
@@ -3204,7 +3205,7 @@ msgstr "A IA está ocupada. Aguarde um momento e tente novamente."
 
 #: src\qualcoder\code_text.py:6644
 msgid "Font and size"
-msgstr ""
+msgstr "Fonte e tamanho"
 
 #: src\qualcoder\color_selector.py:221
 msgid "Current colour"
@@ -3547,8 +3548,8 @@ msgid ""
 "implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See "
 "the GNU General Public License for more details.</p><p>You should have "
 "received a copy of the GNU Lesser General Public License along with "
-"QualCoder. If not, see <a href=\"https://www.gnu.org/licenses\">https://"
-"www.gnu.org/licenses</a>  </p><h3>License for highlighter.py code</h3><p>## "
+"QualCoder. If not, see <a href=\"https://www.gnu.org/licenses\">https://www."
+"gnu.org/licenses</a>  </p><h3>License for highlighter.py code</h3><p>## "
 "Copyright (C) 2013 Riverbank Computing Limited.<br />## Copyright (C) 2010 "
 "Nokia Corporation and/or its subsidiary(-ies).<br />## All rights reserved."
 "<br />##<br />## This file is part of the examples of PyQt.<br />##<br />## "
@@ -3886,7 +3887,7 @@ msgstr "Nenhum inquérito selecionado."
 
 #: src\qualcoder\journals.py:869
 msgid "Journal is empty. Nothing to convert."
-msgstr ""
+msgstr "O diário está vazio. Não há nada para converter."
 
 #: src\qualcoder\journals.py:902
 #, fuzzy
@@ -3909,7 +3910,7 @@ msgstr "Documento de texto externo: "
 
 #: src\qualcoder\journals.py:970
 msgid "Journal converted to source document"
-msgstr ""
+msgstr "Diário convertido em documento de origem"
 
 #: src\qualcoder\manage_files.py:201
 msgid "Rows: "
@@ -4218,10 +4219,12 @@ msgid ""
 "\n"
 "Presumed column delimiter for csv or tsv file: "
 msgstr ""
+"\n"
+"Delimitador de coluna padrão para arquivos CSV ou TSV: "
 
 #: src\qualcoder\manage_files.py:1721
 msgid "Notice"
-msgstr ""
+msgstr "Aviso"
 
 #: src\qualcoder\manage_files.py:1721
 msgid "Select at least one Qualitative Text column to analyse."
@@ -4329,7 +4332,7 @@ msgstr " importado"
 
 #: src\qualcoder\manage_files.py:2374
 msgid "Invalid file name. Please rename this file before exporting."
-msgstr ""
+msgstr "Nome do arquivo inválido. Renomeie este arquivo antes de exportá-lo."
 
 #: src\qualcoder\manage_files.py:2380
 #, fuzzy
@@ -4448,38 +4451,39 @@ msgstr "Ocultar Colunas"
 #: src\qualcoder\manage_files.py:2831
 msgid "Adding columns to the Case will add those values to the case name"
 msgstr ""
+"Ao adicionar colunas ao caso, esses valores serão adicionados ao nome do caso"
 
 #: src\qualcoder\manage_files.py:2832
 msgid "Example: using columns id, country --> ID4_Fiji "
-msgstr ""
+msgstr "Exemplo: usando as colunas id e country --> ID4_Fiji "
 
 #: src\qualcoder\manage_files.py:2833
 msgid "1. Cases / Participants (e.g., ID, Name):"
-msgstr ""
+msgstr "1. Casos / Participantes (por exemplo, número de identificação, nome):"
 
 #: src\qualcoder\manage_files.py:2839
 msgid "2. Attributes (e.g., Age, Gender):"
-msgstr ""
+msgstr "2. Atributos (por exemplo, idade, sexo):"
 
 #: src\qualcoder\manage_files.py:2845
 msgid "Multiple qualitative columns will be collated into one file."
-msgstr ""
+msgstr "Várias colunas qualitativas serão agrupadas em um único arquivo."
 
 #: src\qualcoder\manage_files.py:2846
 msgid "The column name is a header preceding each block of text."
-msgstr ""
+msgstr "O nome da coluna é um cabeçalho que precede cada bloco de texto."
 
 #: src\qualcoder\manage_files.py:2848
 msgid "3. Qualitative Texts:"
-msgstr ""
+msgstr "3. Textos qualitativos:"
 
 #: src\qualcoder\manage_files.py:2856
 msgid "Assign attributes to cases (check). Files (uncheck)"
-msgstr ""
+msgstr "Atribuir atributos aos casos (marcar). Arquivos (desmarcar)"
 
 #: src\qualcoder\manage_files.py:2862
 msgid "Autocode text segments using column name"
-msgstr ""
+msgstr "Codificar automaticamente segmentos de texto usando o nome da coluna"
 
 #: src\qualcoder\manage_links.py:81
 #, fuzzy
@@ -5079,7 +5083,7 @@ msgstr "Atualizar nome"
 #: src\qualcoder\report_codes_by_segments.py:547
 #: src\qualcoder\report_code_summary.py:319
 msgid "Toggle automatic column resize"
-msgstr ""
+msgstr "Ativar/desativar o redimensionamento automático das colunas"
 
 #: src\qualcoder\reports.py:647
 msgid "Export Excel"
@@ -5711,7 +5715,7 @@ msgstr "Memo para o código: "
 
 #: src\qualcoder\report_codes.py:2503
 msgid "Text memo updated for ctid: "
-msgstr ""
+msgstr "Nota de texto atualizada para o ctid: nota "
 
 #: src\qualcoder\report_codes.py:2506
 #, fuzzy
@@ -5720,7 +5724,7 @@ msgstr "Imagem carregada do pdf:"
 
 #: src\qualcoder\report_codes.py:2509
 msgid "AV memo updated for avid: "
-msgstr ""
+msgstr "Memorando sobre AV atualizado para o Avid: "
 
 #: src\qualcoder\report_codes.py:2621
 msgid "Delete coded section."
@@ -5819,12 +5823,12 @@ msgstr "Top 100 palavras"
 #: src\qualcoder\report_code_summary.py:516
 #: src\qualcoder\report_file_summary.py:646
 msgid "Applying stopwords: "
-msgstr ""
+msgstr "Aplicação de palavras irrelevantes: "
 
 #: src\qualcoder\report_code_summary.py:518
 #: src\qualcoder\report_file_summary.py:648
 msgid "Applying stopwords from: .qualcoder/stopwords.txt"
-msgstr ""
+msgstr "Aplicando palavras irrelevantes do arquivo: .qualcoder/stopwords.txt"
 
 #: src\qualcoder\report_code_summary.py:531
 msgid "IMAGE CODINGS: "
@@ -6205,7 +6209,7 @@ msgstr "Categorias selecionadas"
 #: src\qualcoder\report_cooccurrence.py:794
 #: src\qualcoder\report_cooccurrence.py:807
 msgid "No data"
-msgstr ""
+msgstr "Não há dados"
 
 #: src\qualcoder\report_cooccurrence.py:498
 #, fuzzy
@@ -6214,7 +6218,7 @@ msgstr "Não há dados para exportar"
 
 #: src\qualcoder\report_cooccurrence.py:536
 msgid "Exported GraphML for Gephi: "
-msgstr ""
+msgstr "GraphML exportado para o Gephi: "
 
 #: src\qualcoder\report_cooccurrence.py:537
 #, fuzzy
@@ -6235,11 +6239,11 @@ msgstr "Tamanho da fonte da árvore"
 
 #: src\qualcoder\report_cooccurrence.py:581
 msgid "There are no visible codes to plot."
-msgstr ""
+msgstr "Não há códigos visíveis para plotar."
 
 #: src\qualcoder\report_cooccurrence.py:594
 msgid "There are no co-occurrences to plot."
-msgstr ""
+msgstr "Não há coocorrências para representar graficamente."
 
 #: src\qualcoder\report_cooccurrence.py:598
 #, fuzzy
@@ -6253,15 +6257,15 @@ msgstr "Cor"
 
 #: src\qualcoder\report_cooccurrence.py:642
 msgid "Coloured labels"
-msgstr ""
+msgstr "Colorido "
 
 #: src\qualcoder\report_cooccurrence.py:729
 msgid "Community Clusters Graph"
-msgstr ""
+msgstr "Gráfico de agrupamentos comunitários"
 
 #: src\qualcoder\report_cooccurrence.py:794
 msgid "There are no visible codes to export."
-msgstr ""
+msgstr "Não há códigos visíveis para exportar."
 
 #: src\qualcoder\report_cooccurrence.py:807
 #, fuzzy
@@ -6720,6 +6724,8 @@ msgid ""
 "Table view\n"
 "Based on coder_names visibility"
 msgstr ""
+"Exibição em tabela\n"
+"Com base na visibilidade de coder_names"
 
 #: src\qualcoder\report_sql.py:374
 msgid "Default Queries"
@@ -6995,6 +7001,11 @@ msgid ""
 "\n"
 "Invalid character(s): "
 msgstr ""
+"A chave da API contém caracteres não ASCII e não pode ser usada.\n"
+"Cole a chave novamente, exatamente como foi fornecida pelo seu provedor de "
+"IA. \n"
+"\n"
+"Caractere(s) inválido(s): "
 
 #: src\qualcoder\settings.py:353
 #, fuzzy
@@ -7701,15 +7712,16 @@ msgstr "Selecione o diretório para salvar o arquivo"
 
 #: src\qualcoder\view_charts.py:580
 msgid "Success"
-msgstr ""
+msgstr "Sucesso"
 
 #: src\qualcoder\view_charts.py:580
 msgid "Wordcloud saved successfully to:\n"
-msgstr ""
+msgstr "A nuvem de palavras foi salva com sucesso em:\n"
 
 #: src\qualcoder\view_charts.py:583
 msgid "Error loading stopwords or generating wordcloud: "
 msgstr ""
+"Erro ao carregar palavras irrelevantes ou ao gerar a nuvem de palavras: "
 
 #: src\qualcoder\view_charts.py:667
 msgid "Cumulative code count in cases by case"
@@ -7870,15 +7882,15 @@ msgstr "Mostrar memos de segmentos codificados"
 
 #: src\qualcoder\view_graph.py:653
 msgid "Radial"
-msgstr ""
+msgstr "Radial"
 
 #: src\qualcoder\view_graph.py:654
 msgid "Top to Bottom"
-msgstr ""
+msgstr "De cima a baixo"
 
 #: src\qualcoder\view_graph.py:655
 msgid "Left to Right"
-msgstr ""
+msgstr "Da esquerda para a direita"
 
 #: src\qualcoder\view_graph.py:656
 #, fuzzy
@@ -7887,7 +7899,7 @@ msgstr "Clique direito para ver"
 
 #: src\qualcoder\view_graph.py:658
 msgid "Refresh view"
-msgstr ""
+msgstr "Atualizar visualização"
 
 #: src\qualcoder\view_graph.py:759
 #, fuzzy
@@ -8220,19 +8232,19 @@ msgstr "Item inicial da linha"
 
 #: src\qualcoder\view_graph.py:3565 src\qualcoder\view_graph.py:4470
 msgid "Thin (1px)"
-msgstr ""
+msgstr "Fino (1 px)"
 
 #: src\qualcoder\view_graph.py:3566 src\qualcoder\view_graph.py:4471
 msgid "Normal (2px)"
-msgstr ""
+msgstr "Normal (2 px)"
 
 #: src\qualcoder\view_graph.py:3567 src\qualcoder\view_graph.py:4472
 msgid "Thick (4px)"
-msgstr ""
+msgstr "Gordo (4 px)"
 
 #: src\qualcoder\view_graph.py:3568 src\qualcoder\view_graph.py:4473
 msgid "Extra thick (6px)"
-msgstr ""
+msgstr "Extra grosso (6 px)"
 
 #: src\qualcoder\view_graph.py:3570 src\qualcoder\view_graph.py:4475
 msgid "Dotted"
@@ -8240,7 +8252,7 @@ msgstr "Dotted"
 
 #: src\qualcoder\view_graph.py:3571 src\qualcoder\view_graph.py:4476
 msgid "Solid"
-msgstr ""
+msgstr "Sólido"
 
 #: src\qualcoder\view_graph.py:3573 src\qualcoder\view_graph.py:4478
 #, fuzzy
@@ -8273,7 +8285,7 @@ msgstr "Renomear categoria"
 
 #: src\qualcoder\view_graph.py:4072
 msgid "Toggle: Ellipse/Rectangle"
-msgstr ""
+msgstr "Alternar: Elipse/Retângulo"
 
 #: src\qualcoder\view_graph.py:4079
 #, fuzzy
@@ -8312,7 +8324,7 @@ msgstr "Sem segmentos codificados para seleção"
 
 #: src\qualcoder\view_graph.py:4303
 msgid "No co-ocurrences"
-msgstr ""
+msgstr "Sem coincidências"
 
 #: src\qualcoder\view_graph.py:4488
 msgid "Hide"
@@ -8368,7 +8380,7 @@ msgstr "Mudar ou redimensionar"
 
 #: src\qualcoder\view_image.py:1906
 msgid "Interactive resize"
-msgstr ""
+msgstr "Redimensionamento interativo"
 
 #: src\qualcoder\view_image.py:1913
 msgid "Highlight this area - gray"
