@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-04-25 17:31+1000\n"
-"PO-Revision-Date: 2026-02-22 10:02+1100\n"
+"PO-Revision-Date: 2026-04-28 07:52+1000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: zh\n"
@@ -1710,7 +1710,7 @@ msgstr "过滤器等效："
 #: src\qualcoder\code_pdf.py:770 src\qualcoder\code_text.py:972
 #: src\qualcoder\view_av.py:753 src\qualcoder\view_image.py:676
 msgid "Toggle automatic resize"
-msgstr ""
+msgstr "切换自动调整大小"
 
 #: src\qualcoder\code_pdf.py:949 src\qualcoder\code_text.py:1344
 msgid "Automatic search 3 or more characters"
@@ -1852,7 +1852,7 @@ msgstr "添加新类别"
 #: src\qualcoder\reports.py:554 src\qualcoder\reports.py:1076
 #: src\qualcoder\view_av.py:1542 src\qualcoder\view_image.py:1312
 msgid "Expand or collapse branch"
-msgstr ""
+msgstr "展开或折叠分支"
 
 #: src\qualcoder\code_pdf.py:1371 src\qualcoder\code_pdf.py:1381
 #: src\qualcoder\code_text.py:1997 src\qualcoder\code_text.py:2007
@@ -2435,7 +2435,7 @@ msgstr "重复"
 #: src\qualcoder\code_pdf.py:3940 src\qualcoder\code_text.py:6632
 #: src\qualcoder\view_av.py:3788
 msgid "This code already exists at this exact location."
-msgstr ""
+msgstr "此代码已存在于此位置。"
 
 #: src\qualcoder\code_text.py:146
 msgid "EDITING TEXT MODE (Ctrl+E)"
@@ -2465,7 +2465,7 @@ msgstr "选择替换代码"
 
 #: src\qualcoder\code_text.py:600
 msgid "REF"
-msgstr ""
+msgstr "参考"
 
 #: src\qualcoder\code_text.py:1014
 msgid "Examples:"
@@ -2584,12 +2584,12 @@ msgstr "新期刊"
 
 #: src\qualcoder\code_text.py:2706
 msgid "Journals are linked to this file. Include them in the report?"
-msgstr ""
+msgstr "该文件关联了若干日记账。是否将它们包含在报告中？"
 
 #: src\qualcoder\code_text.py:2721 src\qualcoder\code_text.py:3211
 #: src\qualcoder\code_text.py:3283
 msgid "Software citation"
-msgstr ""
+msgstr "软件引用"
 
 #: src\qualcoder\code_text.py:2737 src\qualcoder\refi.py:2031
 #: src\qualcoder\refi.py:2037 src\qualcoder\__main__.py:2296
@@ -2644,7 +2644,7 @@ msgstr "已导出共现"
 
 #: src\qualcoder\code_text.py:3008
 msgid "No co-occurrences found in this file."
-msgstr ""
+msgstr "在此文件中未找到任何共现词。"
 
 #: src\qualcoder\code_text.py:3011
 #, fuzzy
@@ -2678,7 +2678,7 @@ msgstr "已导出共现"
 
 #: src\qualcoder\code_text.py:3094
 msgid "Full File (highlight)"
-msgstr ""
+msgstr "完整文件（高亮显示）"
 
 #: src\qualcoder\code_text.py:3100
 #, fuzzy
@@ -2705,7 +2705,7 @@ msgstr "编码器："
 
 #: src\qualcoder\code_text.py:3277
 msgid "CATEGORY"
-msgstr ""
+msgstr "分类"
 
 #: src\qualcoder\code_text.py:3279
 #, fuzzy
@@ -3067,11 +3067,11 @@ msgstr "点击此处分析更多数据"
 
 #: src\qualcoder\code_text.py:6367
 msgid "(search aborted due to an error)"
-msgstr ""
+msgstr "（因错误而中止搜索）"
 
 #: src\qualcoder\code_text.py:6369
 msgid "(search finished)"
-msgstr ""
+msgstr "（搜索完成）"
 
 #: src\qualcoder\code_text.py:6384
 msgid "Do you want to stop the search?"
@@ -3093,7 +3093,7 @@ msgstr "人工智能正忙。请稍等片刻后重试。"
 
 #: src\qualcoder\code_text.py:6644
 msgid "Font and size"
-msgstr ""
+msgstr "字体和字号"
 
 #: src\qualcoder\color_selector.py:221
 msgid "Current colour"
@@ -3425,8 +3425,8 @@ msgid ""
 "implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See "
 "the GNU General Public License for more details.</p><p>You should have "
 "received a copy of the GNU Lesser General Public License along with "
-"QualCoder. If not, see <a href=\"https://www.gnu.org/licenses\">https://"
-"www.gnu.org/licenses</a>  </p><h3>License for highlighter.py code</h3><p>## "
+"QualCoder. If not, see <a href=\"https://www.gnu.org/licenses\">https://www."
+"gnu.org/licenses</a>  </p><h3>License for highlighter.py code</h3><p>## "
 "Copyright (C) 2013 Riverbank Computing Limited.<br />## Copyright (C) 2010 "
 "Nokia Corporation and/or its subsidiary(-ies).<br />## All rights reserved."
 "<br />##<br />## This file is part of the examples of PyQt.<br />##<br />## "
@@ -3758,7 +3758,7 @@ msgstr "未选择调查。"
 
 #: src\qualcoder\journals.py:869
 msgid "Journal is empty. Nothing to convert."
-msgstr ""
+msgstr "日志为空。无内容可转换。"
 
 #: src\qualcoder\journals.py:902
 #, fuzzy
@@ -3767,7 +3767,7 @@ msgstr "代码重命名自:"
 
 #: src\qualcoder\journals.py:956
 msgid "Skipping non-numeric value for attribute "
-msgstr ""
+msgstr "跳过属性的非数字值 "
 
 #: src\qualcoder\journals.py:965
 #, fuzzy
@@ -3781,7 +3781,7 @@ msgstr "外部文本文件："
 
 #: src\qualcoder\journals.py:970
 msgid "Journal converted to source document"
-msgstr ""
+msgstr "日志已转换为源文档"
 
 #: src\qualcoder\manage_files.py:201
 msgid "Rows: "
@@ -4083,14 +4083,16 @@ msgid ""
 "\n"
 "Presumed column delimiter for csv or tsv file: "
 msgstr ""
+"\n"
+"CSV 或 TSV 文件的默认列分隔符： "
 
 #: src\qualcoder\manage_files.py:1721
 msgid "Notice"
-msgstr ""
+msgstr "通知"
 
 #: src\qualcoder\manage_files.py:1721
 msgid "Select at least one Qualitative Text column to analyse."
-msgstr ""
+msgstr "请选择至少一个“定性文本”列进行分析。"
 
 #: src\qualcoder\manage_files.py:1843
 #, fuzzy
@@ -4194,7 +4196,7 @@ msgstr " 进口的"
 
 #: src\qualcoder\manage_files.py:2374
 msgid "Invalid file name. Please rename this file before exporting."
-msgstr ""
+msgstr "文件名无效。请在导出前重命名此文件。"
 
 #: src\qualcoder\manage_files.py:2380
 #, fuzzy
@@ -4310,39 +4312,39 @@ msgstr "隐藏列"
 
 #: src\qualcoder\manage_files.py:2831
 msgid "Adding columns to the Case will add those values to the case name"
-msgstr ""
+msgstr "向案例添加列会将这些值添加到案例名称中"
 
 #: src\qualcoder\manage_files.py:2832
 msgid "Example: using columns id, country --> ID4_Fiji "
-msgstr ""
+msgstr "示例：使用 id、country 列 --> ID4_Fiji "
 
 #: src\qualcoder\manage_files.py:2833
 msgid "1. Cases / Participants (e.g., ID, Name):"
-msgstr ""
+msgstr "参与者 "
 
 #: src\qualcoder\manage_files.py:2839
 msgid "2. Attributes (e.g., Age, Gender):"
-msgstr ""
+msgstr "2. 属性（例如：年龄、性别）："
 
 #: src\qualcoder\manage_files.py:2845
 msgid "Multiple qualitative columns will be collated into one file."
-msgstr ""
+msgstr "多个定性列将被合并为一个文件。"
 
 #: src\qualcoder\manage_files.py:2846
 msgid "The column name is a header preceding each block of text."
-msgstr ""
+msgstr "栏目名称是每个文本块前面的标题。"
 
 #: src\qualcoder\manage_files.py:2848
 msgid "3. Qualitative Texts:"
-msgstr ""
+msgstr "3. 定性文本："
 
 #: src\qualcoder\manage_files.py:2856
 msgid "Assign attributes to cases (check). Files (uncheck)"
-msgstr ""
+msgstr "为案件分配属性（勾选）。文件（取消勾选）"
 
 #: src\qualcoder\manage_files.py:2862
 msgid "Autocode text segments using column name"
-msgstr ""
+msgstr "根据列名自动编码文本片段"
 
 #: src\qualcoder\manage_links.py:81
 msgid "Search folders"
@@ -4910,7 +4912,7 @@ msgstr "更新名称"
 #: src\qualcoder\report_codes_by_segments.py:547
 #: src\qualcoder\report_code_summary.py:319
 msgid "Toggle automatic column resize"
-msgstr ""
+msgstr "切换自动调整列宽"
 
 #: src\qualcoder\reports.py:647
 msgid "Export Excel"
@@ -5530,7 +5532,7 @@ msgstr "代码备忘录："
 
 #: src\qualcoder\report_codes.py:2503
 msgid "Text memo updated for ctid: "
-msgstr ""
+msgstr "已更新 ctid 的文本备忘录： "
 
 #: src\qualcoder\report_codes.py:2506
 #, fuzzy
@@ -5539,7 +5541,7 @@ msgstr "从 pdf 中加载图像："
 
 #: src\qualcoder\report_codes.py:2509
 msgid "AV memo updated for avid: "
-msgstr ""
+msgstr "AV备忘录已针对Avid更新： "
 
 #: src\qualcoder\report_codes.py:2621
 msgid "Delete coded section."
@@ -5633,12 +5635,12 @@ msgstr "前 100 个单词"
 #: src\qualcoder\report_code_summary.py:516
 #: src\qualcoder\report_file_summary.py:646
 msgid "Applying stopwords: "
-msgstr ""
+msgstr "应用停用词： "
 
 #: src\qualcoder\report_code_summary.py:518
 #: src\qualcoder\report_file_summary.py:648
 msgid "Applying stopwords from: .qualcoder/stopwords.txt"
-msgstr ""
+msgstr "应用来自 .qualcoder/stopwords.txt 的停用词"
 
 #: src\qualcoder\report_code_summary.py:531
 msgid "IMAGE CODINGS: "
@@ -6019,7 +6021,7 @@ msgstr "选择的类别"
 #: src\qualcoder\report_cooccurrence.py:794
 #: src\qualcoder\report_cooccurrence.py:807
 msgid "No data"
-msgstr ""
+msgstr "无数据"
 
 #: src\qualcoder\report_cooccurrence.py:498
 #, fuzzy
@@ -6028,7 +6030,7 @@ msgstr "无数据可导出"
 
 #: src\qualcoder\report_cooccurrence.py:536
 msgid "Exported GraphML for Gephi: "
-msgstr ""
+msgstr "导出的适用于 Gephi 的 GraphML： "
 
 #: src\qualcoder\report_cooccurrence.py:537
 #, fuzzy
@@ -6049,11 +6051,11 @@ msgstr "树木字体大小"
 
 #: src\qualcoder\report_cooccurrence.py:581
 msgid "There are no visible codes to plot."
-msgstr ""
+msgstr "没有可见的代码可供绘制。"
 
 #: src\qualcoder\report_cooccurrence.py:594
 msgid "There are no co-occurrences to plot."
-msgstr ""
+msgstr "没有可绘制的共现关系。"
 
 #: src\qualcoder\report_cooccurrence.py:598
 #, fuzzy
@@ -6067,15 +6069,15 @@ msgstr "颜色"
 
 #: src\qualcoder\report_cooccurrence.py:642
 msgid "Coloured labels"
-msgstr ""
+msgstr "彩色标签"
 
 #: src\qualcoder\report_cooccurrence.py:729
 msgid "Community Clusters Graph"
-msgstr ""
+msgstr "社区聚类图"
 
 #: src\qualcoder\report_cooccurrence.py:794
 msgid "There are no visible codes to export."
-msgstr ""
+msgstr "没有可导出的代码。"
 
 #: src\qualcoder\report_cooccurrence.py:807
 #, fuzzy
@@ -6522,6 +6524,8 @@ msgid ""
 "Table view\n"
 "Based on coder_names visibility"
 msgstr ""
+"表格视图\n"
+"基于 coder_names 的可见性"
 
 #: src\qualcoder\report_sql.py:374
 msgid "Default Queries"
@@ -6802,6 +6806,10 @@ msgid ""
 "\n"
 "Invalid character(s): "
 msgstr ""
+"API 密钥包含非 ASCII 字符，无法使用。\n"
+"请按照 AI 提供商提供的原样再次粘贴该密钥。\n"
+"\n"
+"无效字符： "
 
 #: src\qualcoder\settings.py:353
 #, fuzzy
@@ -7497,15 +7505,15 @@ msgstr "选择保存文件的目录"
 
 #: src\qualcoder\view_charts.py:580
 msgid "Success"
-msgstr ""
+msgstr "成功"
 
 #: src\qualcoder\view_charts.py:580
 msgid "Wordcloud saved successfully to:\n"
-msgstr ""
+msgstr "词云已成功保存至：\n"
 
 #: src\qualcoder\view_charts.py:583
 msgid "Error loading stopwords or generating wordcloud: "
-msgstr ""
+msgstr "加载停用词或生成词云时发生错误： "
 
 #: src\qualcoder\view_charts.py:667
 msgid "Cumulative code count in cases by case"
@@ -7666,15 +7674,15 @@ msgstr "显示编码段的备忘录"
 
 #: src\qualcoder\view_graph.py:653
 msgid "Radial"
-msgstr ""
+msgstr "径向"
 
 #: src\qualcoder\view_graph.py:654
 msgid "Top to Bottom"
-msgstr ""
+msgstr "从上到下"
 
 #: src\qualcoder\view_graph.py:655
 msgid "Left to Right"
-msgstr ""
+msgstr "从左到右"
 
 #: src\qualcoder\view_graph.py:656
 #, fuzzy
@@ -7683,7 +7691,7 @@ msgstr "右击查看"
 
 #: src\qualcoder\view_graph.py:658
 msgid "Refresh view"
-msgstr ""
+msgstr "刷新视图"
 
 #: src\qualcoder\view_graph.py:759
 #, fuzzy
@@ -8016,19 +8024,19 @@ msgstr "线路起始项目"
 
 #: src\qualcoder\view_graph.py:3565 src\qualcoder\view_graph.py:4470
 msgid "Thin (1px)"
-msgstr ""
+msgstr "细 (1px)"
 
 #: src\qualcoder\view_graph.py:3566 src\qualcoder\view_graph.py:4471
 msgid "Normal (2px)"
-msgstr ""
+msgstr "常规 (2px)"
 
 #: src\qualcoder\view_graph.py:3567 src\qualcoder\view_graph.py:4472
 msgid "Thick (4px)"
-msgstr ""
+msgstr "粗体（4px）"
 
 #: src\qualcoder\view_graph.py:3568 src\qualcoder\view_graph.py:4473
 msgid "Extra thick (6px)"
-msgstr ""
+msgstr "超粗体 (6px)"
 
 #: src\qualcoder\view_graph.py:3570 src\qualcoder\view_graph.py:4475
 msgid "Dotted"
@@ -8036,7 +8044,7 @@ msgstr "点状"
 
 #: src\qualcoder\view_graph.py:3571 src\qualcoder\view_graph.py:4476
 msgid "Solid"
-msgstr ""
+msgstr "实心"
 
 #: src\qualcoder\view_graph.py:3573 src\qualcoder\view_graph.py:4478
 #, fuzzy
@@ -8069,7 +8077,7 @@ msgstr "重新命名类别"
 
 #: src\qualcoder\view_graph.py:4072
 msgid "Toggle: Ellipse/Rectangle"
-msgstr ""
+msgstr "切换：椭圆/矩形"
 
 #: src\qualcoder\view_graph.py:4079
 #, fuzzy
@@ -8108,7 +8116,7 @@ msgstr "没有供选择的编码段"
 
 #: src\qualcoder\view_graph.py:4303
 msgid "No co-ocurrences"
-msgstr ""
+msgstr "无共现"
 
 #: src\qualcoder\view_graph.py:4488
 msgid "Hide"
@@ -8164,7 +8172,7 @@ msgstr "移动或调整大小"
 
 #: src\qualcoder\view_image.py:1906
 msgid "Interactive resize"
-msgstr ""
+msgstr "交互式调整大小"
 
 #: src\qualcoder\view_image.py:1913
 msgid "Highlight this area - gray"
