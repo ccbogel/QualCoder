@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-04-25 17:31+1000\n"
-"PO-Revision-Date: 2026-02-22 10:00+1100\n"
+"PO-Revision-Date: 2026-04-28 08:03+1000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: sv\n"
@@ -170,9 +170,8 @@ msgstr "Tyvärr kunde AI:n inte hitta någon data relaterad till \""
 #: src\qualcoder\ai_chat.py:522
 msgid "Found related data. Analyzing the most relevant segments closer."
 msgstr ""
-"Relaterad data hittad. Analyserar de mest relevanta segmenten "
-"närmare.Relaterad data hittades. Analyserar de mest relevanta segmenten "
-"närmare."
+"Relaterad data hittad. Analyserar de mest relevanta segmenten närmare."
+"Relaterad data hittades. Analyserar de mest relevanta segmenten närmare."
 
 #: src\qualcoder\ai_chat.py:592
 msgid "Analyze more data..."
@@ -490,8 +489,8 @@ msgid ""
 "The AI operation could not be aborted immediately. It may take a moment for "
 "the AI to be ready again."
 msgstr ""
-"AI-operationen kunde inte avbrytas omedelbart. Det kan ta en stund innan "
-"AI:n är redo igen."
+"AI-operationen kunde inte avbrytas omedelbart. Det kan ta en stund innan AI:"
+"n är redo igen."
 
 #: src\qualcoder\ai_llm.py:701
 msgid "AI Error:\n"
@@ -1750,7 +1749,7 @@ msgstr "Filter är lika med: "
 #: src\qualcoder\code_pdf.py:770 src\qualcoder\code_text.py:972
 #: src\qualcoder\view_av.py:753 src\qualcoder\view_image.py:676
 msgid "Toggle automatic resize"
-msgstr ""
+msgstr "Aktivera/inaktivera automatisk storleksanpassning"
 
 #: src\qualcoder\code_pdf.py:949 src\qualcoder\code_text.py:1344
 msgid "Automatic search 3 or more characters"
@@ -1892,7 +1891,7 @@ msgstr "Lägg till en ny kategori"
 #: src\qualcoder\reports.py:554 src\qualcoder\reports.py:1076
 #: src\qualcoder\view_av.py:1542 src\qualcoder\view_image.py:1312
 msgid "Expand or collapse branch"
-msgstr ""
+msgstr "Visa eller dölj grenen"
 
 #: src\qualcoder\code_pdf.py:1371 src\qualcoder\code_pdf.py:1381
 #: src\qualcoder\code_text.py:1997 src\qualcoder\code_text.py:2007
@@ -2478,7 +2477,7 @@ msgstr "Dubblett"
 #: src\qualcoder\code_pdf.py:3940 src\qualcoder\code_text.py:6632
 #: src\qualcoder\view_av.py:3788
 msgid "This code already exists at this exact location."
-msgstr ""
+msgstr "Den här koden finns redan på just den här platsen."
 
 #: src\qualcoder\code_text.py:146
 msgid "EDITING TEXT MODE (Ctrl+E)"
@@ -2511,7 +2510,7 @@ msgstr "Välj ersättningskod"
 
 #: src\qualcoder\code_text.py:600
 msgid "REF"
-msgstr ""
+msgstr "REF"
 
 #: src\qualcoder\code_text.py:1014
 msgid "Examples:"
@@ -2633,11 +2632,13 @@ msgstr "Ny journal"
 #: src\qualcoder\code_text.py:2706
 msgid "Journals are linked to this file. Include them in the report?"
 msgstr ""
+"Det finns tidskrifter kopplade till den här filen. Ska de inkluderas i "
+"rapporten?"
 
 #: src\qualcoder\code_text.py:2721 src\qualcoder\code_text.py:3211
 #: src\qualcoder\code_text.py:3283
 msgid "Software citation"
-msgstr ""
+msgstr "Programvarucitering"
 
 #: src\qualcoder\code_text.py:2737 src\qualcoder\refi.py:2031
 #: src\qualcoder\refi.py:2037 src\qualcoder\__main__.py:2296
@@ -2692,7 +2693,7 @@ msgstr "Samband exporterade"
 
 #: src\qualcoder\code_text.py:3008
 msgid "No co-occurrences found in this file."
-msgstr ""
+msgstr "Inga samförekomster hittades i den här filen."
 
 #: src\qualcoder\code_text.py:3011
 #, fuzzy
@@ -2726,7 +2727,7 @@ msgstr "Samband exporterade"
 
 #: src\qualcoder\code_text.py:3094
 msgid "Full File (highlight)"
-msgstr ""
+msgstr "Hela filen (markering)"
 
 #: src\qualcoder\code_text.py:3100
 #, fuzzy
@@ -2753,7 +2754,7 @@ msgstr "KODARE: "
 
 #: src\qualcoder\code_text.py:3277
 msgid "CATEGORY"
-msgstr ""
+msgstr "KATEGORI"
 
 #: src\qualcoder\code_text.py:3279
 #, fuzzy
@@ -3123,11 +3124,11 @@ msgstr "Klicka här för att analysera mer data"
 
 #: src\qualcoder\code_text.py:6367
 msgid "(search aborted due to an error)"
-msgstr ""
+msgstr "(sökningen avbröts på grund av ett fel)"
 
 #: src\qualcoder\code_text.py:6369
 msgid "(search finished)"
-msgstr ""
+msgstr "(sökningen är klar)"
 
 #: src\qualcoder\code_text.py:6384
 msgid "Do you want to stop the search?"
@@ -3151,7 +3152,7 @@ msgstr "AI:n är upptagen. Vänta en stund och försök igen."
 
 #: src\qualcoder\code_text.py:6644
 msgid "Font and size"
-msgstr ""
+msgstr "Teckensnitt och storlek"
 
 #: src\qualcoder\color_selector.py:221
 msgid "Current colour"
@@ -3486,8 +3487,8 @@ msgid ""
 "implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See "
 "the GNU General Public License for more details.</p><p>You should have "
 "received a copy of the GNU Lesser General Public License along with "
-"QualCoder. If not, see <a href=\"https://www.gnu.org/licenses\">https://"
-"www.gnu.org/licenses</a>  </p><h3>License for highlighter.py code</h3><p>## "
+"QualCoder. If not, see <a href=\"https://www.gnu.org/licenses\">https://www."
+"gnu.org/licenses</a>  </p><h3>License for highlighter.py code</h3><p>## "
 "Copyright (C) 2013 Riverbank Computing Limited.<br />## Copyright (C) 2010 "
 "Nokia Corporation and/or its subsidiary(-ies).<br />## All rights reserved."
 "<br />##<br />## This file is part of the examples of PyQt.<br />##<br />## "
@@ -3819,7 +3820,7 @@ msgstr "Ingen enkät vald."
 
 #: src\qualcoder\journals.py:869
 msgid "Journal is empty. Nothing to convert."
-msgstr ""
+msgstr "Loggen är tom. Det finns inget att konvertera."
 
 #: src\qualcoder\journals.py:902
 #, fuzzy
@@ -3828,7 +3829,7 @@ msgstr "Kodens namn ändrades från: "
 
 #: src\qualcoder\journals.py:956
 msgid "Skipping non-numeric value for attribute "
-msgstr ""
+msgstr "Utelämna icke-numeriska värden för attributet "
 
 #: src\qualcoder\journals.py:965
 #, fuzzy
@@ -3842,7 +3843,7 @@ msgstr "Externt textdokument: "
 
 #: src\qualcoder\journals.py:970
 msgid "Journal converted to source document"
-msgstr ""
+msgstr "Tidskrift omvandlad till källdokument"
 
 #: src\qualcoder\manage_files.py:201
 msgid "Rows: "
@@ -4142,14 +4143,16 @@ msgid ""
 "\n"
 "Presumed column delimiter for csv or tsv file: "
 msgstr ""
+"\n"
+"Förväntad kolumnavgränsare för CSV- eller TSV-filer: "
 
 #: src\qualcoder\manage_files.py:1721
 msgid "Notice"
-msgstr ""
+msgstr "Meddelande"
 
 #: src\qualcoder\manage_files.py:1721
 msgid "Select at least one Qualitative Text column to analyse."
-msgstr ""
+msgstr "Välj minst en kolumn med kvalitativ text som ska analyseras."
 
 #: src\qualcoder\manage_files.py:1843
 #, fuzzy
@@ -4251,7 +4254,7 @@ msgstr " importerad"
 
 #: src\qualcoder\manage_files.py:2374
 msgid "Invalid file name. Please rename this file before exporting."
-msgstr ""
+msgstr "Ogiltigt filnamn. Byt namn på filen innan du exporterar den."
 
 #: src\qualcoder\manage_files.py:2380
 #, fuzzy
@@ -4368,38 +4371,39 @@ msgstr "Dölj kolumner"
 #: src\qualcoder\manage_files.py:2831
 msgid "Adding columns to the Case will add those values to the case name"
 msgstr ""
+"Om du lägger till kolumner i ärendet läggs dessa värden till i ärendets namn"
 
 #: src\qualcoder\manage_files.py:2832
 msgid "Example: using columns id, country --> ID4_Fiji "
-msgstr ""
+msgstr "Exempel: med kolumnerna id, country --> ID4_Fiji "
 
 #: src\qualcoder\manage_files.py:2833
 msgid "1. Cases / Participants (e.g., ID, Name):"
-msgstr ""
+msgstr "1. Ärenden/deltagare (t.ex. ID, namn):"
 
 #: src\qualcoder\manage_files.py:2839
 msgid "2. Attributes (e.g., Age, Gender):"
-msgstr ""
+msgstr "2. Egenskaper (t.ex. ålder, kön):"
 
 #: src\qualcoder\manage_files.py:2845
 msgid "Multiple qualitative columns will be collated into one file."
-msgstr ""
+msgstr "Flera kvalitativa kolumner kommer att sammanställas till en enda fil."
 
 #: src\qualcoder\manage_files.py:2846
 msgid "The column name is a header preceding each block of text."
-msgstr ""
+msgstr "Kolumnnamnet är en rubrik som föregår varje textblock."
 
 #: src\qualcoder\manage_files.py:2848
 msgid "3. Qualitative Texts:"
-msgstr ""
+msgstr "3. Kvalitativa texter:"
 
 #: src\qualcoder\manage_files.py:2856
 msgid "Assign attributes to cases (check). Files (uncheck)"
-msgstr ""
+msgstr "Tilldela attribut till ärenden (markera). Filer (avmarkera)"
 
 #: src\qualcoder\manage_files.py:2862
 msgid "Autocode text segments using column name"
-msgstr ""
+msgstr "Automatisk kodning av textavsnitt med hjälp av kolumnnamn"
 
 #: src\qualcoder\manage_links.py:81
 msgid "Search folders"
@@ -4981,7 +4985,7 @@ msgstr "Uppdatera namn"
 #: src\qualcoder\report_codes_by_segments.py:547
 #: src\qualcoder\report_code_summary.py:319
 msgid "Toggle automatic column resize"
-msgstr ""
+msgstr "Aktivera/inaktivera automatisk kolumnanpassning"
 
 #: src\qualcoder\reports.py:647
 msgid "Export Excel"
@@ -5604,7 +5608,7 @@ msgstr "Anteckning för kod: "
 
 #: src\qualcoder\report_codes.py:2503
 msgid "Text memo updated for ctid: "
-msgstr ""
+msgstr "Textanteckning uppdaterad för ctid: "
 
 #: src\qualcoder\report_codes.py:2506
 #, fuzzy
@@ -5613,7 +5617,7 @@ msgstr "Bild inläst från pdf:"
 
 #: src\qualcoder\report_codes.py:2509
 msgid "AV memo updated for avid: "
-msgstr ""
+msgstr "AV-memo uppdaterat för Avid: "
 
 #: src\qualcoder\report_codes.py:2621
 msgid "Delete coded section."
@@ -5711,12 +5715,12 @@ msgstr "Topp 100 ord"
 #: src\qualcoder\report_code_summary.py:516
 #: src\qualcoder\report_file_summary.py:646
 msgid "Applying stopwords: "
-msgstr ""
+msgstr "Användning av stopord: "
 
 #: src\qualcoder\report_code_summary.py:518
 #: src\qualcoder\report_file_summary.py:648
 msgid "Applying stopwords from: .qualcoder/stopwords.txt"
-msgstr ""
+msgstr "Använda stoppord från: .qualcoder/stopwords.txt"
 
 #: src\qualcoder\report_code_summary.py:531
 msgid "IMAGE CODINGS: "
@@ -6097,7 +6101,7 @@ msgstr "Valda kategorier"
 #: src\qualcoder\report_cooccurrence.py:794
 #: src\qualcoder\report_cooccurrence.py:807
 msgid "No data"
-msgstr ""
+msgstr "Inga uppgifter"
 
 #: src\qualcoder\report_cooccurrence.py:498
 #, fuzzy
@@ -6106,7 +6110,7 @@ msgstr "Ingen data att exportera"
 
 #: src\qualcoder\report_cooccurrence.py:536
 msgid "Exported GraphML for Gephi: "
-msgstr ""
+msgstr "Exporterad GraphML för Gephi: "
 
 #: src\qualcoder\report_cooccurrence.py:537
 #, fuzzy
@@ -6127,11 +6131,11 @@ msgstr "Trädets teckenstorlek"
 
 #: src\qualcoder\report_cooccurrence.py:581
 msgid "There are no visible codes to plot."
-msgstr ""
+msgstr "Det finns inga synliga koder att plotta."
 
 #: src\qualcoder\report_cooccurrence.py:594
 msgid "There are no co-occurrences to plot."
-msgstr ""
+msgstr "Det finns inga samförekomster att plotta."
 
 #: src\qualcoder\report_cooccurrence.py:598
 #, fuzzy
@@ -6145,15 +6149,15 @@ msgstr "Färg"
 
 #: src\qualcoder\report_cooccurrence.py:642
 msgid "Coloured labels"
-msgstr ""
+msgstr "Färgad "
 
 #: src\qualcoder\report_cooccurrence.py:729
 msgid "Community Clusters Graph"
-msgstr ""
+msgstr "Gemenskap "
 
 #: src\qualcoder\report_cooccurrence.py:794
 msgid "There are no visible codes to export."
-msgstr ""
+msgstr "Det finns inga synliga koder att exportera."
 
 #: src\qualcoder\report_cooccurrence.py:807
 #, fuzzy
@@ -6606,6 +6610,8 @@ msgid ""
 "Table view\n"
 "Based on coder_names visibility"
 msgstr ""
+"Tabellvy\n"
+"Baserat på synligheten för coder_names"
 
 #: src\qualcoder\report_sql.py:374
 msgid "Default Queries"
@@ -6887,6 +6893,12 @@ msgid ""
 "\n"
 "Invalid character(s): "
 msgstr ""
+"API-nyckeln innehåller tecken som inte ingår i ASCII-teckensatsen och kan "
+"därför inte användas.\n"
+"Klistra in nyckeln igen exakt så som den tillhandahållits av din AI-"
+"leverantör.\n"
+"\n"
+"Ogiltiga tecken: "
 
 #: src\qualcoder\settings.py:353
 #, fuzzy
@@ -7586,15 +7598,15 @@ msgstr "Välj katalog för att spara filen"
 
 #: src\qualcoder\view_charts.py:580
 msgid "Success"
-msgstr ""
+msgstr "Framgång"
 
 #: src\qualcoder\view_charts.py:580
 msgid "Wordcloud saved successfully to:\n"
-msgstr ""
+msgstr "Ordmolnet har sparats till:\n"
 
 #: src\qualcoder\view_charts.py:583
 msgid "Error loading stopwords or generating wordcloud: "
-msgstr ""
+msgstr "Fel vid inläsning av stopord eller generering av ordmoln: "
 
 #: src\qualcoder\view_charts.py:667
 msgid "Cumulative code count in cases by case"
@@ -7755,15 +7767,15 @@ msgstr "Visa anteckningar för kodade segment"
 
 #: src\qualcoder\view_graph.py:653
 msgid "Radial"
-msgstr ""
+msgstr "Radiell"
 
 #: src\qualcoder\view_graph.py:654
 msgid "Top to Bottom"
-msgstr ""
+msgstr "Från topp till botten"
 
 #: src\qualcoder\view_graph.py:655
 msgid "Left to Right"
-msgstr ""
+msgstr "Från vänster till höger"
 
 #: src\qualcoder\view_graph.py:656
 #, fuzzy
@@ -7772,7 +7784,7 @@ msgstr "Högerklicka för att visa"
 
 #: src\qualcoder\view_graph.py:658
 msgid "Refresh view"
-msgstr ""
+msgstr "Uppdatera vyn"
 
 #: src\qualcoder\view_graph.py:759
 #, fuzzy
@@ -8105,19 +8117,19 @@ msgstr "Rad startobjekt"
 
 #: src\qualcoder\view_graph.py:3565 src\qualcoder\view_graph.py:4470
 msgid "Thin (1px)"
-msgstr ""
+msgstr "Tunn (1 px)"
 
 #: src\qualcoder\view_graph.py:3566 src\qualcoder\view_graph.py:4471
 msgid "Normal (2px)"
-msgstr ""
+msgstr "Normal (2 px)"
 
 #: src\qualcoder\view_graph.py:3567 src\qualcoder\view_graph.py:4472
 msgid "Thick (4px)"
-msgstr ""
+msgstr "Tjock (4 px)"
 
 #: src\qualcoder\view_graph.py:3568 src\qualcoder\view_graph.py:4473
 msgid "Extra thick (6px)"
-msgstr ""
+msgstr "Extra tjock (6 px)"
 
 #: src\qualcoder\view_graph.py:3570 src\qualcoder\view_graph.py:4475
 msgid "Dotted"
@@ -8125,7 +8137,7 @@ msgstr "Prickad"
 
 #: src\qualcoder\view_graph.py:3571 src\qualcoder\view_graph.py:4476
 msgid "Solid"
-msgstr ""
+msgstr "Massiv"
 
 #: src\qualcoder\view_graph.py:3573 src\qualcoder\view_graph.py:4478
 #, fuzzy
@@ -8158,7 +8170,7 @@ msgstr "Byt namn på kategori"
 
 #: src\qualcoder\view_graph.py:4072
 msgid "Toggle: Ellipse/Rectangle"
-msgstr ""
+msgstr "Växla: Ellips/Rektangel"
 
 #: src\qualcoder\view_graph.py:4079
 #, fuzzy
@@ -8197,7 +8209,7 @@ msgstr "Inga kodade segment för val"
 
 #: src\qualcoder\view_graph.py:4303
 msgid "No co-ocurrences"
-msgstr ""
+msgstr "Inga samförekomster"
 
 #: src\qualcoder\view_graph.py:4488
 msgid "Hide"
@@ -8253,7 +8265,7 @@ msgstr "Flytta eller ändra storlek"
 
 #: src\qualcoder\view_image.py:1906
 msgid "Interactive resize"
-msgstr ""
+msgstr "Interaktiv storleksändring"
 
 #: src\qualcoder\view_image.py:1913
 msgid "Highlight this area - gray"
@@ -8333,9 +8345,9 @@ msgstr "Det finns redan en säkerhetskopia med det namnet"
 #: src\qualcoder\__main__.py:1364
 msgid "WARNING: audio and video files NOT backed up. See settings."
 msgstr ""
-"VARNING: ljud‑ och videofiler säkerhetskopieras INTE. Se "
-"inställningarna.VARNING: ljud och videofilerna är INTE säkerhetskopierade, "
-"gå till inställningarna."
+"VARNING: ljud‑ och videofiler säkerhetskopieras INTE. Se inställningarna."
+"VARNING: ljud och videofilerna är INTE säkerhetskopierade, gå till "
+"inställningarna."
 
 #: src\qualcoder\__main__.py:1366
 msgid "Project backup created: "
