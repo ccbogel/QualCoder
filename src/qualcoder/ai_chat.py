@@ -51,7 +51,7 @@ from .ai_search_dialog import DialogAiSearch
 from .GUI.ui_ai_chat import Ui_Dialog_ai_chat
 from .helpers import Message
 from .confirm_delete import DialogConfirmDelete
-from .ai_agent_prompts import AiAgentPromptsCatalog, AgentPromptRecord
+from .ai_agent_prompts import AiAgentPromptsCatalog, AgentPromptRecord, prompt_name_and_scope
 from .ai_prompts import PromptItem
 from .ai_llm import extract_ai_memo, ai_quote_search, strip_think_blocks, AICancelled
 from .ai_mcp_server import AiMcpServer
@@ -1773,7 +1773,7 @@ class DialogAIChat(QtWidgets.QDialog):
                 f'You are discussing the code or category named "{self.ai_search_code_name}" with the following code memo: "{self.ai_search_code_memo}". \n'
                 f'Here is a list of quotes from the empirical data that have been coded with the given code or with subcodes under the given category:\n'
                 f'{ai_data_json}\n'
-                f'Your task is to analyze the given empirical data following these instructions: {self.ai_prompt.text}\n'
+                f'Your task is to analyze the given empirical data following these instructions: {self.ai_prompt.content}\n'
                 f'The whole discussion should be based upon the the empirical data provided and its proper interpretation. '
                 f'Do not make any assumptions which are not supported by the data '
                 f'Please mention the sources that your refer to from the given empirical data, using an html anchor tag of the following form: '
@@ -1785,7 +1785,7 @@ class DialogAIChat(QtWidgets.QDialog):
             if max_ai_data_length_reached:
                 summary += _('\nATTENTION: There was more coded data found, but it had to be truncated because of the limited context window of the AI.')
             logger.debug(f'New code chat. Prompt:\n{ai_instruction}')
-            self.new_chat(_('Code') + f' "{self.ai_search_code_name}"', 'code chat', summary, self.ai_prompt.name_and_scope())
+            self.new_chat(_('Code') + f' "{self.ai_search_code_name}"', 'code chat', summary, prompt_name_and_scope(self.ai_prompt))
             # warn if project memo empty 
             project_memo = extract_ai_memo(self.app.get_project_memo())
             if self.app.settings.get('ai_send_project_memo', 'True') == 'True' and len(project_memo) == 0:
@@ -1824,7 +1824,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             if self.ai_search_code_memo != '':
                 summary += _('\nDescription:') + f' {self.ai_search_code_memo}'
             logger.debug(f'New topic chat.')
-            self.new_chat(_('Topic') + f' "{self.ai_search_code_name}"', 'topic chat', summary, self.ai_prompt.name_and_scope())
+            self.new_chat(_('Topic') + f' "{self.ai_search_code_name}"', 'topic chat', summary, prompt_name_and_scope(self.ai_prompt))
             # warn if project memo empty 
             project_memo = extract_ai_memo(self.app.get_project_memo())
             if self.app.settings.get('ai_send_project_memo', 'True') == 'True' and len(project_memo) == 0:
@@ -1927,7 +1927,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             f'A semantic search in the empirical data resulted in the the following list of chunks of empirical data which might be relevant '
             f'for the analysis of the given topic:\n'   
             f'{ai_data_json}\n'
-            f'Your task is to analyze the given empirical data following these instructions: {self.ai_prompt.text}\n'
+            f'Your task is to analyze the given empirical data following these instructions: {self.ai_prompt.content}\n'
             f'The whole discussion should be based updon the the empirical data provided and its proper interpretation. '
             f'Do not make any assumptions which are not supported by the data. '
             f'Please mention the sources that your refer to from the given empirical data, using an html anchor tag of the following form: '

@@ -187,6 +187,49 @@ class TestAiAgentPromptsCatalog(TestCase):
         self.assertEqual("", prompt.description)
         self.assertEqual("Prompt body", prompt.content)
 
+    def test_list_prompt_variants_can_ignore_init_content(self):
+        self._write_prompt("system", "_search/_init", "Search init")
+        self._write_prompt("system", "_search/focused-search", "Search body")
+
+        with_init = self.catalog.find_prompt_variant(
+            "_search/focused-search",
+            "system",
+            prompt_type="search",
+            include_internal=True,
+            apply_init=True,
+        )
+        without_init = self.catalog.find_prompt_variant(
+            "_search/focused-search",
+            "system",
+            prompt_type="search",
+            include_internal=True,
+            apply_init=False,
+        )
+
+        self.assertIsNotNone(with_init)
+        self.assertIsNotNone(without_init)
+        self.assertEqual("Search init\n\nSearch body", with_init.content)
+        self.assertEqual("Search body", without_init.content)
+
+    def test_find_prompt_variant_filters_by_type_and_scope(self):
+        self._write_prompt("system", "_search/focused-search", "System search")
+        self._write_prompt("user", "_search/focused-search", "User search")
+
+        prompt = self.catalog.find_prompt_variant("_search/focused-search", "user", prompt_type="search", include_internal=True, apply_init=False)
+
+        self.assertIsNotNone(prompt)
+        self.assertEqual("user", prompt.scope)
+        self.assertEqual("User search", prompt.content)
+
+    def test_internal_prompt_folder_is_hidden_from_public_prompt_list(self):
+        self._write_prompt("system", "_search/focused-search", "Internal search")
+
+        public_prompts = self.catalog.list_prompts()
+        internal_prompts = self.catalog.list_prompts(include_internal=True)
+
+        self.assertEqual([], public_prompts)
+        self.assertEqual(["_search/focused-search"], [prompt.name for prompt in internal_prompts])
+
     def test_migrate_legacy_user_prompts_creates_markdown_files(self):
         self._write_legacy_prompts(
             "user",
@@ -198,10 +241,36 @@ class TestAiAgentPromptsCatalog(TestCase):
                     "text": "Custom body",
                 },
                 {
-                    "name": "Ignored Search Prompt",
+                    "name": "Migrated Search Prompt",
                     "type": "search",
-                    "description": "Ignored",
-                    "text": "Ignored",
+                    "description": "Search description",
+                    "text": "Search body",
+                },
+            ],
+        )
+
+        result = self.catalog.migrate_legacy_prompts_once()
+
+        self.assertEqual({"migrated": 2, "skipped": 0}, result["user"])
+        code_path = os.path.join(self.user_root, "code-analysis", "custom-code-prompt.md")
+        self.assertTrue(os.path.exists(code_path))
+        with open(code_path, "r", encoding="utf-8") as handle:
+            migrated_text = handle.read()
+        self.assertIn("name: custom-code-prompt", migrated_text)
+        self.assertIn("description: Custom description", migrated_text)
+        self.assertTrue(migrated_text.rstrip().endswith("Custom body"))
+        search_path = os.path.join(self.user_root, "_search", "migrated-search-prompt.md")
+        self.assertTrue(os.path.exists(search_path))
+
+    def test_migrate_legacy_search_prompts_creates_search_markdown_files(self):
+        self._write_legacy_prompts(
+            "user",
+            [
+                {
+                    "name": "Focused Search Custom",
+                    "type": "search",
+                    "description": "Search description",
+                    "text": "Search body",
                 },
             ],
         )
@@ -209,13 +278,8 @@ class TestAiAgentPromptsCatalog(TestCase):
         result = self.catalog.migrate_legacy_prompts_once()
 
         self.assertEqual({"migrated": 1, "skipped": 0}, result["user"])
-        migrated_path = os.path.join(self.user_root, "code-analysis", "custom-code-prompt.md")
+        migrated_path = os.path.join(self.user_root, "_search", "focused-search-custom.md")
         self.assertTrue(os.path.exists(migrated_path))
-        with open(migrated_path, "r", encoding="utf-8") as handle:
-            migrated_text = handle.read()
-        self.assertIn("name: custom-code-prompt", migrated_text)
-        self.assertIn("description: Custom description", migrated_text)
-        self.assertTrue(migrated_text.rstrip().endswith("Custom body"))
 
     def test_migrate_legacy_project_prompts_skips_existing_target_file(self):
         self._write_prompt("project", "text-analysis/existing-prompt", "Already there")

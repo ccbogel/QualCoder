@@ -36,7 +36,7 @@ import qtawesome as qta
 import httpx
 
 from openai import OpenAI, BadRequestError
-from .ai_agent_prompts import AiAgentPromptsCatalog
+from .ai_agent_prompts import AiAgentPromptsCatalog, AgentPromptRecord
 from .ai_prompts import PromptItem
 from langchain_openai import ChatOpenAI, AzureChatOpenAI
 from langchain_core.globals import set_llm_cache  # Unused
@@ -2862,7 +2862,7 @@ class AiLLM():
         
         return chunk_master_list
     
-    def search_analyze_chunk(self, result_callback, chunk, code_name, code_memo, search_prompt: PromptItem,
+    def search_analyze_chunk(self, result_callback, chunk, code_name, code_memo, search_prompt: AgentPromptRecord,
                              scope_type: str = '', scope_id=None, group_id: str = '',
                              parent_run_id: str = ''):
         """Letting the AI analyze a chunk of data, using the given prompt
@@ -2876,7 +2876,7 @@ class AiLLM():
             chunk: piece of data, type langchain_core.documents.base.Document
             code_name: str
             code_memo: str
-            search_prompt (PromptItem): the prompt used for the analysis
+            search_prompt (AgentPromptRecord): the prompt used for the analysis
         """
         self.start_query(
             self._search_analyze_chunk,
@@ -2892,7 +2892,7 @@ class AiLLM():
             cancel_result=None,
         )
         
-    def _search_analyze_chunk(self, chunk, code_name, code_memo, search_prompt: PromptItem, progress_callback=None, signals=None):                
+    def _search_analyze_chunk(self, chunk, code_name, code_memo, search_prompt: AgentPromptRecord, progress_callback=None, signals=None):                
         if progress_callback is not None:
             progress_callback.emit(_("Stage 2:\nInspecting the data more closely..."))        
 
@@ -2925,7 +2925,7 @@ class AiLLM():
                 content= (f'You are discussing the code named "{code_name}" with the following code memo: "{extract_ai_memo(code_memo)}". \n'
                     'At the end of this message, you will find a chunk of empirical data. \n'
                     'Your task is to use the following instructions to analyze the chunk of empirical data and decide wether it relates to the given code or not. '
-                    f'Instructions: "{search_prompt.text}". \n'
+                    f'Instructions: "{search_prompt.content}". \n'
                     'Summarize your reasoning briefly in the field "interpretation" of the result. '
                     f'In this particular field, always answer in the language "{self.get_curr_language()}".\n'
                     'If you came to the conclusion that the chunk of data '

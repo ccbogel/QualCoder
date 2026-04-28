@@ -27,7 +27,7 @@ import os
 from PyQt6 import QtWidgets, QtCore, QtGui
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QBrush
-from .ai_prompts import PromptsList, DialogAiEditPrompts
+from .ai_agent_prompts import AiAgentPromptsCatalog, AgentPromptRecord, prompt_name_and_scope
 from .color_selector import TextColor
 from .report_attributes import DialogSelectAttributeParameters
 from .GUI.ui_ai_search import Ui_Dialog_AiSearch
@@ -52,6 +52,29 @@ class DialogAiSearch(QtWidgets.QDialog):
     include_coded_segments = False
     selected_file_ids = []
     current_prompt = None
+    prompt_records = []
+
+    def _default_prompt_record(self):
+        """Return the legacy-default prompt for this dialog context when available."""
+
+        default_names = {
+            "search": "_search/focused-search",
+            "code_analysis": "code-analysis/code-summary",
+            "topic_analysis": "topic-exploration/topic-summary",
+        }
+        default_name = default_names.get(self.context, "")
+        if default_name == "":
+            return self.prompt_records[0] if len(self.prompt_records) > 0 else None
+        prompt = self.prompts_catalog.find_prompt_variant(
+            default_name,
+            "system",
+            prompt_type=self.context,
+            include_internal=(self.context == "search"),
+            apply_init=False,
+        )
+        if prompt is not None:
+            return prompt
+        return self.prompt_records[0] if len(self.prompt_records) > 0 else None
 
     def __init__(self, app_, context, selected_id=-1, selected_is_code=True, tree_sort_option="all asc"):
         """Initializes the dialog
@@ -125,22 +148,39 @@ class DialogAiSearch(QtWidgets.QDialog):
         if self.ui.tabWidget.isTabVisible(0):  # code
             self.fill_tree(selected_id, selected_is_code) 
         # prompts
-        self.prompts_list = PromptsList(app_, context)
+        self.prompts_catalog = AiAgentPromptsCatalog(app_)
+        self.prompt_records = self.prompts_catalog.list_prompt_variants(
+            prompt_type=self.context,
+            include_internal=(self.context == "search"),
+            apply_init=False,
+        )
+        if len(self.prompt_records) == 0:
+            msg = _('No prompts available for this analysis type.')
+            Message(self.app, _('AI prompts'), msg, "warning").exec()
+            self.reject()
+            return
         # load last settings
-        last_prompt_name = self.app.settings.get(f'ai_dlg_{self.context}_last_prompt_name', self.prompts_list.prompts[0].name)
-        last_prompt_scope = self.app.settings.get(f'ai_dlg_{self.context}_last_prompt_scope', self.prompts_list.prompts[0].scope)
-        self.current_prompt = self.prompts_list.find_prompt(last_prompt_name, last_prompt_scope, self.context)
+        default_prompt = self._default_prompt_record()
+        last_prompt_name = self.app.settings.get(f'ai_dlg_{self.context}_last_prompt_name', default_prompt.name)
+        last_prompt_scope = self.app.settings.get(f'ai_dlg_{self.context}_last_prompt_scope', default_prompt.scope)
+        self.current_prompt = self.prompts_catalog.find_prompt_variant(
+            last_prompt_name,
+            last_prompt_scope,
+            prompt_type=self.context,
+            include_internal=(self.context == "search"),
+            apply_init=False,
+        )
         if self.current_prompt is None:
-            self.current_prompt = self.prompts_list.prompts[0]
+            self.current_prompt = default_prompt
             msg = _('The last used prompt') + \
                 f' "{last_prompt_name} ({last_prompt_scope})" ' + \
                 _('could not be found. The prompt will be reset to the default.')
             Message(self.app, _('No codes'), msg, "warning").exec()
-        for prompt in self.prompts_list.prompts:
-            self.ui.comboBox_prompts.addItem(prompt.name_and_scope())
+        for prompt in self.prompt_records:
+            self.ui.comboBox_prompts.addItem(prompt_name_and_scope(prompt))
             item_idx = self.ui.comboBox_prompts.count() - 1
             self.ui.comboBox_prompts.setItemData(item_idx, prompt.description, Qt.ItemDataRole.ToolTipRole)
-        self.ui.comboBox_prompts.setCurrentText(self.current_prompt.name_and_scope())
+        self.ui.comboBox_prompts.setCurrentText(prompt_name_and_scope(self.current_prompt))
         self.ui.comboBox_prompts.setToolTip(self.current_prompt.description)
         self.ui.comboBox_prompts.currentIndexChanged.connect(self.on_prompt_selected)
         if context == 'search':
@@ -358,24 +398,15 @@ class DialogAiSearch(QtWidgets.QDialog):
             
     def on_prompt_selected(self, index):
         """ This function will be called whenever the user selects a new item in the combobox. """
-        self.current_prompt = self.prompts_list.prompts[self.ui.comboBox_prompts.currentIndex()]
+        del index
+        if 0 <= self.ui.comboBox_prompts.currentIndex() < len(self.prompt_records):
+            self.current_prompt = self.prompt_records[self.ui.comboBox_prompts.currentIndex()]
         self.ui.comboBox_prompts.setToolTip(self.current_prompt.description)
             
     def change_prompt(self):
         """ Select and edit the prompt for the search. """
-        ui = DialogAiEditPrompts(self.app, self.context)
-        if ui.exec() == QtWidgets.QDialog.DialogCode.Accepted:
-            # Update prompts list and display current prompt:
-            self.prompts_list.read_prompts(self.context)
-            self.ui.comboBox_prompts.clear()
-            for prompt in self.prompts_list.prompts:
-                self.ui.comboBox_prompts.addItem(prompt.name_and_scope())
-            if ui.selected_prompt is not None:
-                self.current_prompt = self.prompts_list.find_prompt(ui.selected_prompt.name, ui.selected_prompt.scope, ui.selected_prompt.type)
-            if self.current_prompt is None:
-                self.current_prompt = self.prompts_list.prompts[0]  # default
-            self.ui.comboBox_prompts.setCurrentText(self.current_prompt.name_and_scope())
-            self.ui.comboBox_prompts.setToolTip(self.current_prompt.description)
+        msg = _('These prompts are now loaded from Markdown files in the new prompt system. Editing them from this dialog is not available yet.')
+        Message(self.app, _('AI prompts'), msg, "information").exec()
 
     def select_attributes(self):
         """ Select files based on attribute selections.

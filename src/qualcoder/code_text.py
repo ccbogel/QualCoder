@@ -45,6 +45,7 @@ from odf import text as odf_text, office as odf_office, dc as odf_dc, style as o
 from odf.namespaces import OFFICENS, DRAWNS  # Required for the _export_odt_clean method <- L
 
 from .add_item_name import DialogAddItemName
+from .ai_agent_prompts import prompt_name_and_scope
 from .ai_search_dialog import DialogAiSearch
 from .ai_prompts import PromptsList, DialogAiEditPrompts
 from .ai_chat import ai_chat_signal_emitter
@@ -4823,7 +4824,7 @@ class DialogCodeText(QtWidgets.QWidget):
             ai_search_result = self.get_overlapping_ai_search_result()
             if ai_search_result is not None:
                 memo = _("AI interpretation: ") + ai_search_result["interpretation"]
-                memo += _("\n\nAI search prompt: ") + self.ai_search_prompt.name_and_scope()
+                memo += _("\n\nAI search prompt: ") + prompt_name_and_scope(self.ai_search_prompt)
                 memo += _("\nAI model: ") + self.ai_search_ai_model
 
                 msg = '<p style="font-size: ' + str(self.app.settings['fontsize']) + 'pt">'

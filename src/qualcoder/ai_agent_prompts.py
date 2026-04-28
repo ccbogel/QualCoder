@@ -13,8 +13,8 @@ use forward slashes. For example ``code-analysis/code-critic.md`` becomes the
 explicit prompt reference ``/code-analysis/code-critic``.
 
 Conflicts are resolved by scope priority: project > user > system.
-Files beginning with "_" are treated as internal prompts and are not available
-through explicit user prompt references.
+Prompt files below path segments beginning with "_" are treated as internal
+prompts and are not available through explicit user prompt references.
 """
 
 from __future__ import annotations
@@ -31,6 +31,7 @@ import yaml
 PROMPT_REFERENCE_PATTERN = re.compile(r"(?<!\S)/(\S+)")
 PROMPT_FRONTMATTER_PATTERN = re.compile(r"\A---[ \t]*\r?\n(.*?)\r?\n---[ \t]*(?:\r?\n|$)", re.DOTALL)
 LEGACY_PROMPT_TYPE_FOLDERS = {
+    "search": "_search",
     "code_analysis": "code-analysis",
     "topic_analysis": "topic-exploration",
     "text_analysis": "text-analysis",
@@ -52,6 +53,16 @@ class AgentPromptRecord:
     content: str
     description: str
     is_internal: bool
+
+
+def prompt_name_and_scope(prompt: AgentPromptRecord) -> str:
+    """Return one stable display label for a prompt record."""
+
+    name = str(getattr(prompt, "name", "") if prompt is not None else "").strip()
+    scope = str(getattr(prompt, "scope", "") if prompt is not None else "").strip()
+    if scope == "":
+        return name
+    return name + f" ({scope})"
 
 
 class AiAgentPromptsCatalog:
@@ -88,6 +99,52 @@ class AiAgentPromptsCatalog:
         if include_internal:
             return prompts
         return [item for item in prompts if not item.is_internal]
+
+    def list_prompt_variants(
+        self,
+        prompt_type: Optional[str] = None,
+        include_internal: bool = False,
+        apply_init: bool = True,
+    ) -> List[AgentPromptRecord]:
+        """Return all prompts across scopes without conflict deduplication."""
+
+        prompts: List[AgentPromptRecord] = []
+        for scope, root in self._prompt_roots():
+            prompts.extend(
+                self._discover_scope(
+                    scope,
+                    root,
+                    apply_init=apply_init,
+                    prompt_type=prompt_type,
+                )
+            )
+        prompts.sort(key=lambda item: (self._scope_priority.get(item.scope, 99), item.name.casefold()))
+        if include_internal:
+            return prompts
+        return [item for item in prompts if not item.is_internal]
+
+    def find_prompt_variant(
+        self,
+        name: str,
+        scope: str,
+        prompt_type: Optional[str] = None,
+        include_internal: bool = False,
+        apply_init: bool = True,
+    ) -> Optional[AgentPromptRecord]:
+        """Find one prompt variant by exact name and scope without deduplicating scopes."""
+
+        query_name = self._normalize_prompt_name(name)
+        query_scope = str(scope if scope is not None else "").strip()
+        if query_name == "" or query_scope == "":
+            return None
+        for prompt in self.list_prompt_variants(
+            prompt_type=prompt_type,
+            include_internal=include_internal,
+            apply_init=apply_init,
+        ):
+            if prompt.name == query_name and prompt.scope == query_scope:
+                return prompt
+        return None
 
     def get_prompt(self, name: str, include_internal: bool = False) -> Optional[AgentPromptRecord]:
         """Resolve one explicit user-callable prompt by exact filename match."""
@@ -234,7 +291,13 @@ class AiAgentPromptsCatalog:
             roots.append(("project", os.path.join(project_path, "ai_data", "ai_prompts")))
         return roots
 
-    def _discover_scope(self, scope: str, root: str) -> List[AgentPromptRecord]:
+    def _discover_scope(
+        self,
+        scope: str,
+        root: str,
+        apply_init: bool = True,
+        prompt_type: Optional[str] = None,
+    ) -> List[AgentPromptRecord]:
         if root is None or str(root).strip() == "" or not os.path.isdir(root):
             return []
 
@@ -248,7 +311,7 @@ class AiAgentPromptsCatalog:
         for dirpath, dirnames, filenames in entries:
             dirnames.sort(key=lambda item: item.casefold())
             filenames.sort(key=lambda item: item.casefold())
-            init_content = self._read_directory_init_content(scope, root, dirpath)
+            init_content = self._read_directory_init_content(scope, root, dirpath) if apply_init else ""
             for filename in filenames:
                 if not filename.lower().endswith(".md"):
                     continue
@@ -261,6 +324,9 @@ class AiAgentPromptsCatalog:
                 rel_path = os.path.relpath(path, root)
                 name = self._normalize_prompt_name(rel_path[:-3])
                 if name == "":
+                    continue
+                current_prompt_type = self._prompt_type_from_name(name)
+                if prompt_type is not None and current_prompt_type != str(prompt_type).strip():
                     continue
                 metadata, prompt_body = self._split_frontmatter(raw)
                 content = self._compose_prompt_content(name, prompt_body, init_content)
@@ -312,6 +378,23 @@ class AiAgentPromptsCatalog:
             return folder_init
         return folder_init + "\n\n" + prompt_body
 
+    def _prompt_type_from_name(self, name: str) -> Optional[str]:
+        """Infer one prompt type from the top-level prompt directory."""
+
+        normalized_name = self._normalize_prompt_name(name)
+        if normalized_name == "" or "/" not in normalized_name:
+            return None
+        top_level = normalized_name.split("/", 1)[0]
+        if top_level == "_search":
+            return "search"
+        if top_level == "code-analysis":
+            return "code_analysis"
+        if top_level == "topic-exploration":
+            return "topic_analysis"
+        if top_level == "text-analysis":
+            return "text_analysis"
+        return None
+
     def _conflict_key(self, name: str) -> str:
         return self._normalize_prompt_name(name).casefold()
 
@@ -326,7 +409,7 @@ class AiAgentPromptsCatalog:
         normalized_name = self._normalize_prompt_name(name)
         if normalized_name == "":
             return False
-        return normalized_name.rsplit("/", 1)[-1].startswith("_")
+        return any(part.startswith("_") for part in normalized_name.split("/"))
 
     def _read_text(self, path: str) -> Optional[str]:
         try:
