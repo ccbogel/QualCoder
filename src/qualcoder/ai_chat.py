@@ -1799,7 +1799,7 @@ data collected. This information will accompany every prompt sent to the AI, res
             self.update_chat_window()  
  
     def new_topic_chat(self):
-        """chat about a free topic in the data"""
+        """Chat about a free topic in the data."""
         if self.app.project_name == "":
             msg = _('No project open.')
             Message(self.app, _('AI not enabled'), msg, "warning").exec()
@@ -1820,11 +1820,11 @@ data collected. This information will accompany every prompt sent to the AI, res
             self.ai_prompt = ui.current_prompt
             # self.filenames = self.app.get_filenames()
             
-            summary = _('Analyzing the free topic "{}" in the data.').format(self.ai_search_code_name)
+            summary = _('Exploring the free topic "{}" in the data.').format(self.ai_search_code_name)
             if self.ai_search_code_memo != '':
                 summary += _('\nDescription:') + f' {self.ai_search_code_memo}'
             logger.debug(f'New topic chat.')
-            self.new_chat(_('Topic') + f' "{self.ai_search_code_name}"', 'topic chat', summary, prompt_name_and_scope(self.ai_prompt))
+            self.new_chat(_('Topic exploration') + f' "{self.ai_search_code_name}"', 'topic chat', summary, prompt_name_and_scope(self.ai_prompt))
             # warn if project memo empty 
             project_memo = extract_ai_memo(self.app.get_project_memo())
             if self.app.settings.get('ai_send_project_memo', 'True') == 'True' and len(project_memo) == 0:
@@ -1923,9 +1923,9 @@ data collected. This information will accompany every prompt sent to the AI, res
         ai_data_json = json.dumps(ai_data)
             
         ai_instruction = (
-            f'You are analyzing the topic "{self.ai_search_code_name}" with the following description: "{self.ai_search_code_memo}". \n'
+            f'You are exploring the topic "{self.ai_search_code_name}" with the following description: "{self.ai_search_code_memo}". \n'
             f'A semantic search in the empirical data resulted in the the following list of chunks of empirical data which might be relevant '
-            f'for the analysis of the given topic:\n'   
+            f'for the exploration of the given topic:\n'   
             f'{ai_data_json}\n'
             f'Your task is to analyze the given empirical data following these instructions: {self.ai_prompt.content}\n'
             f'The whole discussion should be based updon the the empirical data provided and its proper interpretation. '
@@ -2645,9 +2645,9 @@ data collected. This information will accompany every prompt sent to the AI, res
         action_general_chat = menu.addAction(_('New AI Agent Chat'))
         action_general_chat.setIcon(self.app.ai.general_chat_icon())
         action_general_chat.setToolTip(_('Analyze your data together with an AI Agent.'))        
-        action_topic_analysis = menu.addAction(_('New topic analysis chat'))
+        action_topic_analysis = menu.addAction(_('New topic exploration chat'))
         action_topic_analysis.setIcon(self.app.ai.topic_analysis_icon())
-        action_topic_analysis.setToolTip(_('Analyzing a free-search topic together with the AI.'))
+        action_topic_analysis.setToolTip(_('Explore a free-search topic together with the AI.'))
         action_text_analysis = menu.addAction(_('New text analysis chat'))
         action_text_analysis.setIcon(self.app.ai.text_analysis_icon())
         action_text_analysis.setToolTip(_('Analyse a piece of text from your empirical data together with the AI.'))

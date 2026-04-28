@@ -84,7 +84,7 @@ class DialogAiSearch(QtWidgets.QDialog):
             context: the calling context, can be:
                 'search': called from 'Code Text > AI Search', 
                 'code_analysis': called from 'AI Chat > New Code Chat', 
-                'topic_analysis': called from 'AI Chat > New Topic Chat'.
+                'topic_analysis': called from 'AI Chat > New Topic Exploration Chat'.
             selected_id (int): the id of the selected item in the codes and categories tree. -1 if no item is selected.
             selected_is_code (bool): True if the selected item is a code, False if it is a category
         """
@@ -116,8 +116,8 @@ class DialogAiSearch(QtWidgets.QDialog):
             self.ui.checkBox_coded_segments.setVisible(False) 
             self.ui.widget_coder.setVisible(True)
         elif context == 'topic_analysis':
-            self.setWindowTitle('AI Topic Analysis')
-            self.ui.label_what.setText(_('1) Which topic do you want to analyze?'))
+            self.setWindowTitle('AI Topic Exploration')
+            self.ui.label_what.setText(_('1) Which topic do you want to explore?'))
             self.ui.tabWidget.setCurrentIndex(1)
             self.ui.tabWidget.setTabVisible(0, False)  # code search
             self.ui.tabWidget.setTabVisible(1, True)  # free search
