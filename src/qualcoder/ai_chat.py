@@ -46,6 +46,7 @@ import re
 import threading
 import time
 import unicodedata
+from urllib.parse import urlencode
 
 from .ai_search_dialog import DialogAiSearch
 from .GUI.ui_ai_chat import Ui_Dialog_ai_chat
@@ -1127,7 +1128,7 @@ class DialogAIChat(QtWidgets.QDialog):
 
     def _is_agent_chat_type(self, analysis_type: str) -> bool:
         normalized = str(analysis_type if analysis_type is not None else '').strip().lower()
-        return normalized in ('general chat', 'agent chat')
+        return normalized in ('general chat', 'agent chat', 'topic_exploration')
 
     def _display_chat_type_label(self, analysis_type: str, preserve_legacy_general: bool = False) -> str:
         normalized = str(analysis_type if analysis_type is not None else '').strip().lower()
@@ -1136,6 +1137,10 @@ class DialogAIChat(QtWidgets.QDialog):
             return raw_value or 'general chat'
         if normalized == 'agent chat':
             return _('AI Agent Chat')
+        if normalized == 'topic_exploration':
+            return _('Topic exploration')
+        if normalized == 'topic chat':
+            return _('Topic exploration (legacy)')
         return raw_value
 
     def _empty_agent_chat_alias(self) -> str:
@@ -1215,10 +1220,12 @@ class DialogAIChat(QtWidgets.QDialog):
             tooltip_text = self._chat_tooltip_text(chat)
 
             # Creating a new QListWidgetItem
-            if self._is_agent_chat_type(analysis_type):
+            if str(analysis_type).strip().lower() == 'topic_exploration':
+                icon = self.app.ai.topic_exploration_icon()
+            elif self._is_agent_chat_type(analysis_type):
                 icon = self.app.ai.general_chat_icon()
             elif analysis_type == 'topic chat':
-                icon = self.app.ai.topic_analysis_icon()
+                icon = self.app.ai.topic_exploration_icon()
             elif analysis_type == 'text chat':
                 icon = self.app.ai.text_analysis_icon()
             elif analysis_type == 'code chat':
@@ -1649,6 +1656,365 @@ class DialogAIChat(QtWidgets.QDialog):
             loaded_prompts.append(prompt)
         return loaded_prompts
 
+    def _persist_agent_prompt_record(self, chat_idx: int, prompt: AgentPromptRecord) -> None:
+        """Persist one selected prompt as active chat context for future agent turns."""
+
+        if prompt is None or chat_idx < 0 or chat_idx >= len(self.chat_list):
+            return
+        prompt_name = str(prompt.name if prompt.name is not None else '').strip()
+        if prompt_name == '':
+            return
+        prompt_message = self._build_turn_prompt_message(prompt)
+        latest_prompt_content: Optional[str] = None
+        for msg in reversed(self.chat_msg_list):
+            if len(msg) < 5 or str(msg[2]) != 'prompt':
+                continue
+            if str(msg[3] if msg[3] is not None else '').strip() != prompt_name:
+                continue
+            latest_prompt_content = str(msg[4] if msg[4] is not None else '')
+            break
+        if latest_prompt_content == prompt_message:
+            return
+        self.history_add_message('prompt', prompt_name, prompt_message, chat_idx)
+
+    def _selected_source_names(self, file_ids: List[int]) -> List[str]:
+        """Return ordered source names for the selected file ids."""
+
+        normalized_ids: List[int] = []
+        for raw in list(file_ids or []):
+            try:
+                file_id = int(raw)
+            except Exception:
+                continue
+            if file_id > 0:
+                normalized_ids.append(file_id)
+        normalized_ids = list(dict.fromkeys(normalized_ids))
+        if len(normalized_ids) == 0:
+            return []
+        placeholders = ",".join(["?"] * len(normalized_ids))
+        cursor = self.app.conn.cursor()
+        try:
+            cursor.execute(
+                f"SELECT name FROM source WHERE id IN ({placeholders}) ORDER BY CASE id "
+                + " ".join(f"WHEN ? THEN {idx}" for idx in range(len(normalized_ids)))
+                + " ELSE 999999 END",
+                tuple(normalized_ids + normalized_ids),
+            )
+        except Exception:
+            return []
+        return [str(row[0]).strip() for row in cursor.fetchall() if row is not None and row[0] is not None]
+
+    def _topic_exploration_scope_env_update(self, topic_name: str, topic_description: str,
+                                            file_ids: List[int], filter_info: Optional[Dict[str, Any]] = None) -> str:
+        """Build one durable scope note for topic exploration agent chats."""
+
+        topic_text = str(topic_name if topic_name is not None else '').strip()
+        description_text = str(topic_description if topic_description is not None else '').strip()
+        normalized_file_ids: List[int] = []
+        for raw in list(file_ids or []):
+            try:
+                file_id = int(raw)
+            except Exception:
+                continue
+            if file_id > 0 and file_id not in normalized_file_ids:
+                normalized_file_ids.append(file_id)
+        source_names = self._selected_source_names(normalized_file_ids)
+        source_count = len(normalized_file_ids)
+        filter_info = dict(filter_info) if isinstance(filter_info, dict) else {}
+        no_file_filter = bool(filter_info.get("no_file_filter", False))
+        no_case_filter = bool(filter_info.get("no_case_filter", False))
+        has_attribute_filter = bool(filter_info.get("has_attribute_filter", False))
+        case_names = [str(name).strip() for name in list(filter_info.get("selected_case_names", []) or []) if str(name).strip() != ""]
+        no_filters = no_file_filter and no_case_filter and not has_attribute_filter
+
+        lines = [
+            'System event: This AI agent chat was started in topic exploration mode.',
+            f'Focus topic: "{topic_text}".',
+        ]
+        if description_text != '':
+            lines.append('User description: ' + description_text)
+        if no_filters:
+            lines.append('Selected material: The whole project text corpus is in scope. No file, case, or attribute filters were applied.')
+        else:
+            material_parts: List[str] = []
+            if no_file_filter:
+                material_parts.append('No explicit file filter.')
+            else:
+                material_parts.append('An explicit file filter is active.')
+            if len(case_names) > 0:
+                material_parts.append('Selected case(s): ' + ", ".join(case_names) + '.')
+            elif no_case_filter:
+                material_parts.append('No case filter.')
+            if has_attribute_filter:
+                material_parts.append('An attribute filter is active.')
+            if len(source_names) == 0:
+                material_parts.append('The resulting material selection is restricted to a subset of the project documents.')
+            else:
+                preview = ", ".join(source_names[:8])
+                if len(source_names) > 8:
+                    preview += ', ...'
+                material_parts.append(f'Resulting documents ({source_count}): {preview}.')
+            lines.append('Selected material: ' + " ".join(material_parts))
+        lines.append('If additional project material would be helpful, ask the user for permission before including it.')
+        return "\n".join(lines)
+
+    def _topic_exploration_filter_summary(self, file_ids: List[int],
+                                          filter_info: Optional[Dict[str, Any]] = None) -> str:
+        """Build a compact material/filter summary for the chat header."""
+
+        normalized_file_ids: List[int] = []
+        for raw in list(file_ids or []):
+            try:
+                file_id = int(raw)
+            except Exception:
+                continue
+            if file_id > 0 and file_id not in normalized_file_ids:
+                normalized_file_ids.append(file_id)
+        source_names = self._selected_source_names(normalized_file_ids)
+        source_count = len(normalized_file_ids)
+        filter_info = dict(filter_info) if isinstance(filter_info, dict) else {}
+        no_file_filter = bool(filter_info.get("no_file_filter", False))
+        no_case_filter = bool(filter_info.get("no_case_filter", False))
+        has_attribute_filter = bool(filter_info.get("has_attribute_filter", False))
+        case_names = [str(name).strip() for name in list(filter_info.get("selected_case_names", []) or []) if str(name).strip() != ""]
+
+        if no_file_filter and no_case_filter and not has_attribute_filter:
+            return _('Whole project corpus (no file, case, or attribute filters).')
+
+        parts: List[str] = []
+        if not no_file_filter:
+            parts.append(_('explicit file filter'))
+        if len(case_names) > 0:
+            parts.append(_('case(s): {}').format(", ".join(case_names)))
+        elif not no_case_filter:
+            parts.append(_('case filter'))
+        if has_attribute_filter:
+            parts.append(_('attribute filter'))
+
+        details = ", ".join(parts)
+        if details == "":
+            details = _('restricted material selection')
+
+        if len(source_names) == 0:
+            return _('{}; resulting document subset.').format(details[:1].upper() + details[1:])
+
+        preview = ", ".join(source_names[:8])
+        if len(source_names) > 8:
+            preview += ', ...'
+        return _('{}; documents ({}): {}').format(
+            details[:1].upper() + details[1:],
+            source_count,
+            preview,
+        )
+
+    def _topic_exploration_bootstrap_request(self, topic_name: str, topic_description: str, prompt: AgentPromptRecord) -> str:
+        """Build the transient first-turn task for one topic exploration agent chat."""
+
+        topic_text = str(topic_name if topic_name is not None else '').strip()
+        description_text = str(topic_description if topic_description is not None else '').strip()
+        prompt_name = str(prompt.name if prompt is not None and prompt.name is not None else '').strip()
+        if description_text == '':
+            description_text = _('(no description provided)')
+        return (
+            f'Begin the topic exploration for "{topic_text}" now.\n'
+            f'User description: {description_text}\n'
+            f'The selected exploration prompt "/{prompt_name}" is active for this chat.\n'
+            'The semantic search results for the selected material are already available in this conversation. '
+            'Use them to produce the first substantive exploration of the topic, grounded in the retrieved empirical data. '
+            'If you need more of the already found data, continue from the cursor of the semantic search result. '
+            'Do not include additional project material without the user\'s permission. '
+            'When referring to empirical text evidence, add citations in this exact form: {REF: "exact quote from the retrieved evidence"}. '
+            'If you want a direct quote to be visible, write it in normal prose and add REF separately. '
+            'Respond with a detailed analysis rather than a short summary.'
+        )
+
+    def _mcp_topic_exploration_final_answer_system_prompt(self) -> str:
+        """Return the final-answer contract for the initial topic exploration turn."""
+
+        return (
+            "Your task: "
+            "Provide the first substantial topic exploration answer for the user based on the conversation and retrieved project context. "
+            "Do not output JSON. "
+            "Treat MCP execution as already finished for this turn and begin the analysis directly. "
+            "Write a detailed, well-structured analytical response rather than a short summary. "
+            "Do not mention internal MCP stage constraints. "
+            "The final answer must follow the current conversation language. "
+            "Do not make empirical claims without support from retrieved evidence. If support is uncertain, state the uncertainty clearly. "
+            "When you refer to empirical text evidence, add citations in this exact form: "
+            "{REF: \"exact quote from the retrieved evidence\"}. "
+            "The quote inside REF must be copied exactly from retrieved evidence (no paraphrasing, no corrections, no translation). "
+            "Important: REF is machine markup and the quote text inside REF is not shown as normal readable text to the user. "
+            "If you want a direct quote to be visible, write the quote explicitly in normal prose and add REF separately."
+        )
+
+    def _topic_exploration_vector_search_uri(self, topic_name: str, topic_description: str, file_ids: List[int]) -> str:
+        """Build the MCP vector-search URI used to bootstrap one topic exploration chat."""
+
+        query_variants = self.app.ai.generate_code_descriptions(topic_name, topic_description)
+        normalized_queries: List[str] = []
+        seen_queries: set[str] = set()
+        for candidate in list(query_variants or []):
+            text = str(candidate if candidate is not None else '').strip()
+            if text == '':
+                continue
+            key = text.casefold()
+            if key in seen_queries:
+                continue
+            seen_queries.add(key)
+            normalized_queries.append(text)
+        if len(normalized_queries) == 0:
+            fallback_query = str(topic_name if topic_name is not None else '').strip()
+            if fallback_query != '':
+                normalized_queries.append(fallback_query)
+
+        params: List[Tuple[str, str]] = []
+        for query_text in normalized_queries:
+            params.append(("q", query_text))
+        for raw_file_id in list(file_ids or []):
+            try:
+                file_id = int(raw_file_id)
+            except Exception:
+                continue
+            if file_id > 0:
+                params.append(("file_ids", str(file_id)))
+        query_string = urlencode(params, doseq=True)
+        if query_string == '':
+            return "qualcoder://vector/search"
+        return "qualcoder://vector/search?" + query_string
+
+    def _start_mcp_agent_worker(self, messages: List[Any], chat_idx: int, worker_func,
+                                *worker_args) -> None:
+        """Start one MCP-backed agent worker with the standard callback wiring."""
+
+        self.current_streaming_chat_idx = chat_idx
+        self._capture_chat_ai_profile_snapshot(chat_idx)
+        self.app.ai.start_query(
+            worker_func,
+            self.ai_mcp_message_callback,
+            messages,
+            chat_idx,
+            *worker_args,
+            progress_callback=self.ai_mcp_progress_callback,
+            model_kind='large',
+            scope_type='chat',
+            scope_id=chat_idx,
+            cancel_result={
+                "chat_idx": chat_idx,
+                "stream_messages": [],
+                "tool_messages": [],
+                "canceled": True,
+                "direct_ai_message": "",
+            },
+        )
+
+    def _mcp_topic_exploration_worker(self, messages: List[Any], chat_idx: int,
+                                      bootstrap_spec: Dict[str, Any], signals=None) -> Dict[str, Any]:
+        """Run the first topic exploration turn on top of the normal MCP agent flow."""
+
+        result: Dict[str, Any] = {
+            "chat_idx": chat_idx,
+            "stream_messages": [],
+            "tool_messages": [],
+            "canceled": False,
+            "direct_ai_message": "",
+        }
+        spec = dict(bootstrap_spec) if isinstance(bootstrap_spec, dict) else {}
+        topic_name = str(spec.get("topic_name", "")).strip()
+        topic_description = str(spec.get("topic_description", "")).strip()
+        file_ids = list(spec.get("file_ids", []) or [])
+        prompt_name = str(spec.get("prompt_name", "")).strip()
+
+        prompt_record = self.agent_prompts_catalog.find_prompt_variant(
+            prompt_name,
+            str(spec.get("prompt_scope", "")).strip(),
+            prompt_type="topic_exploration",
+            apply_init=False,
+        )
+        if prompt_record is None:
+            raise ValueError(_("The selected topic exploration prompt could not be loaded."))
+
+        history_messages: List[Any] = list(messages)
+        agent_messages: List[Any] = [msg for msg in history_messages if not isinstance(msg, SystemMessage)]
+        mcp_base_system_prompt = self._mcp_base_system_prompt()
+        tool_messages: List[Dict[str, str]] = []
+        tool_messages_streamed = signals is not None and getattr(signals, "progress", None) is not None
+        bootstrap_calls: List[Tuple[str, Dict[str, Any]]] = [
+            ("initialize", {}),
+            ("resources/list", {}),
+            ("resources/templates/list", {}),
+            ("resources/read", {"uri": self._topic_exploration_vector_search_uri(topic_name, topic_description, file_ids)}),
+        ]
+
+        def append_tool_exchange(method_name: str, method_params: Dict[str, Any], rpc_response: Dict[str, Any]):
+            call_content = json.dumps(
+                {"action": "mcp_call", "method": method_name, "params": method_params},
+                ensure_ascii=False,
+            )
+            result_content = self._compact_mcp_result_content(method_name, method_params, rpc_response)
+            agent_messages.append(AIMessage(content=call_content))
+            agent_messages.append(HumanMessage(content=result_content))
+            if tool_messages_streamed:
+                signals.progress.emit(json.dumps({
+                    "chat_idx": chat_idx,
+                    "msg_type": "tool_call",
+                    "msg_author": "ai_agent",
+                    "msg_content": call_content,
+                }, ensure_ascii=False))
+                signals.progress.emit(json.dumps({
+                    "chat_idx": chat_idx,
+                    "msg_type": "tool_result",
+                    "msg_author": "mcp_server",
+                    "msg_content": result_content,
+                }, ensure_ascii=False))
+            else:
+                tool_messages.append({"msg_type": "tool_call", "msg_author": "ai_agent", "msg_content": call_content})
+                tool_messages.append({"msg_type": "tool_result", "msg_author": "mcp_server", "msg_content": result_content})
+
+        def append_single_instruct_log(content: str):
+            payload = json.dumps(
+                {"phase": "topic_exploration", "role": "user", "content": content},
+                ensure_ascii=False,
+            )
+            if tool_messages_streamed:
+                signals.progress.emit(json.dumps({
+                    "chat_idx": chat_idx,
+                    "msg_type": "single_instruct",
+                    "msg_author": "ai_agent",
+                    "msg_content": payload,
+                }, ensure_ascii=False))
+            else:
+                tool_messages.append({"msg_type": "single_instruct", "msg_author": "ai_agent", "msg_content": payload})
+
+        try:
+            self._emit_mcp_status_text(signals, chat_idx, _('Preparing semantic search...'), status_kind="planning")
+            for method, params in bootstrap_calls:
+                if self.app.ai.is_current_run_canceled():
+                    result["canceled"] = True
+                    return result
+                status_text = self.ai_mcp_server.describe_status_event(method, params)
+                self._emit_mcp_status(signals, chat_idx, status_text)
+                _request, response = self._run_mcp_request(method, params)
+                append_tool_exchange(method, params, response)
+
+            self._emit_mcp_status(signals, chat_idx, _('Preparing response...'))
+            final_system_prompt = self._build_mcp_combined_system_prompt(
+                self._mcp_topic_exploration_final_answer_system_prompt()
+            )
+            final_prompt = self._topic_exploration_bootstrap_request(topic_name, topic_description, prompt_record)
+            final_request = (final_system_prompt + "\n\n" + final_prompt).strip()
+            append_single_instruct_log(final_request)
+            final_stream_messages: List[Any] = []
+            if mcp_base_system_prompt != "":
+                final_stream_messages.append(SystemMessage(content=mcp_base_system_prompt))
+            final_stream_messages.extend(agent_messages)
+            final_stream_messages.append(HumanMessage(content=final_request))
+            result["stream_messages"] = final_stream_messages
+            result["tool_messages"] = tool_messages
+            return result
+        except Exception as err:
+            result["error"] = _('Error during MCP-based topic exploration bootstrap: ') + str(err)
+            return result
+
     def new_text_analysis(self):
         """analyze a piece of text from an empirical document"""
         if self.app.project_name == "":
@@ -1798,8 +2164,8 @@ data collected. This information will accompany every prompt sent to the AI, res
             self.process_message('instruct', ai_instruction)
             self.update_chat_window()  
  
-    def new_topic_chat(self):
-        """Chat about a free topic in the data."""
+    def new_topic_exploration(self):
+        """Start a new topic exploration as an MCP-backed AI agent chat."""
         if self.app.project_name == "":
             msg = _('No project open.')
             Message(self.app, _('AI not enabled'), msg, "warning").exec()
@@ -1809,22 +2175,26 @@ data collected. This information will accompany every prompt sent to the AI, res
             Message(self.app, _('AI not enabled'), msg, "warning").exec()
             return
        
-        ui = DialogAiSearch(self.app, 'topic_analysis')
+        ui = DialogAiSearch(self.app, 'topic_exploration')
         ret = ui.exec()
         if ret == QtWidgets.QDialog.DialogCode.Accepted:
-            self.ai_text_doc_id = None
-            self.ai_search_code_name = ui.selected_code_name
-            self.ai_search_code_memo = ui.selected_code_memo
-            
-            self.ai_search_file_ids = ui.selected_file_ids
-            self.ai_prompt = ui.current_prompt
-            # self.filenames = self.app.get_filenames()
-            
-            summary = _('Exploring the free topic "{}" in the data.').format(self.ai_search_code_name)
-            if self.ai_search_code_memo != '':
-                summary += _('\nDescription:') + f' {self.ai_search_code_memo}'
-            logger.debug(f'New topic chat.')
-            self.new_chat(_('Topic exploration') + f' "{self.ai_search_code_name}"', 'topic chat', summary, prompt_name_and_scope(self.ai_prompt))
+            topic_name = str(ui.selected_code_name if ui.selected_code_name is not None else '').strip()
+            topic_description = str(ui.selected_code_memo if ui.selected_code_memo is not None else '').strip()
+            file_ids = list(ui.selected_file_ids or [])
+            filter_info = dict(ui.selected_filter_info) if isinstance(ui.selected_filter_info, dict) else {}
+            prompt_record = ui.current_prompt
+            if prompt_record is None:
+                msg = _('The selected topic exploration prompt could not be loaded.')
+                Message(self.app, _('AI prompts'), msg, "warning").exec()
+                return
+
+            summary = _('Exploring the free topic "{}" in the data.').format(topic_name)
+            if topic_description != '':
+                summary += _('\nDescription:') + f' {topic_description}'
+            summary += _('\nPrompt:') + f' {prompt_name_and_scope(prompt_record)}'
+            summary += _('\nMaterial:') + ' ' + self._topic_exploration_filter_summary(file_ids, filter_info)
+            logger.debug('New topic exploration chat.')
+            self.new_chat(_('Topic exploration') + f' "{topic_name}"', 'topic_exploration', summary, prompt_name_and_scope(prompt_record))
             # warn if project memo empty 
             project_memo = extract_ai_memo(self.app.get_project_memo())
             if self.app.settings.get('ai_send_project_memo', 'True') == 'True' and len(project_memo) == 0:
@@ -1832,20 +2202,29 @@ data collected. This information will accompany every prompt sent to the AI, res
 to include a short description of your project\'s research topics, questions, objectives, and the empirical \
 data collected. This information will accompany every prompt sent to the AI, resulting in much more targeted results.')
                 self.process_message('info', msg)
-            # start analysis
-            self.process_message('system', self.app.ai.get_default_system_prompt())
-            self.process_message('info', _('Searching for related data...'))
-            self.update_chat_window()  
 
             chat_idx = self.current_chat_idx
-            self.app.ai.retrieve_similar_data(
-                lambda chunks, chat_idx=chat_idx: self.new_topic_chat_callback(chunks, chat_idx),
-                self.ai_search_code_name,
-                self.ai_search_code_memo,
-                self.ai_search_file_ids,
-                scope_type='chat',
-                scope_id=chat_idx,
+            self._persist_agent_prompt_record(chat_idx, prompt_record)
+            self.process_message(
+                'env_update',
+                self._topic_exploration_scope_env_update(topic_name, topic_description, file_ids, filter_info),
+                chat_idx,
             )
+            bootstrap_spec = {
+                "topic_name": topic_name,
+                "topic_description": topic_description,
+                "file_ids": file_ids,
+                "filter_info": filter_info,
+                "prompt_name": prompt_record.name,
+                "prompt_scope": prompt_record.scope,
+            }
+            messages = self.history_get_ai_messages()
+            self._start_mcp_agent_worker(messages, chat_idx, self._mcp_topic_exploration_worker, bootstrap_spec)
+
+    def new_topic_chat(self):
+        """Legacy alias for starting a new topic exploration chat."""
+
+        self.new_topic_exploration()
 
     def get_filename(self, id_) -> str:
         """Return the filename for a source id
@@ -2645,9 +3024,9 @@ data collected. This information will accompany every prompt sent to the AI, res
         action_general_chat = menu.addAction(_('New AI Agent Chat'))
         action_general_chat.setIcon(self.app.ai.general_chat_icon())
         action_general_chat.setToolTip(_('Analyze your data together with an AI Agent.'))        
-        action_topic_analysis = menu.addAction(_('New topic exploration chat'))
-        action_topic_analysis.setIcon(self.app.ai.topic_analysis_icon())
-        action_topic_analysis.setToolTip(_('Explore a free-search topic together with the AI.'))
+        action_topic_exploration = menu.addAction(_('New topic exploration chat'))
+        action_topic_exploration.setIcon(self.app.ai.topic_exploration_icon())
+        action_topic_exploration.setToolTip(_('Explore a free-search topic together with the AI agent.'))
         action_text_analysis = menu.addAction(_('New text analysis chat'))
         action_text_analysis.setIcon(self.app.ai.text_analysis_icon())
         action_text_analysis.setToolTip(_('Analyse a piece of text from your empirical data together with the AI.'))
@@ -2668,8 +3047,8 @@ data collected. This information will accompany every prompt sent to the AI, res
             self.new_text_analysis()
         elif action == action_codings_analysis:
             self.new_code_chat()
-        elif action == action_topic_analysis:
-            self.new_topic_chat()
+        elif action == action_topic_exploration:
+            self.new_topic_exploration()
         elif action == action_general_chat:
             self.new_general_chat('', '')
 
@@ -4208,7 +4587,9 @@ data collected. This information will accompany every prompt sent to the AI, res
             label = source_name if source_name != "" else str(source_id)
         return f'(<a href="quote:{source_id}_{abs_start}_{abs_len}">{label}</a>)'
 
-    def _mcp_general_chat_worker(self, messages: List[Any], chat_idx: int, signals=None) -> Dict[str, Any]:
+    def _mcp_general_chat_worker(self, messages: List[Any], chat_idx: int,
+                                 bootstrap_calls_extra: Optional[List[Tuple[str, Dict[str, Any]]]] = None,
+                                 signals=None) -> Dict[str, Any]:
         """Background worker: staged agent flow with MCP resource access."""
 
         result: Dict[str, Any] = {
@@ -4241,6 +4622,11 @@ data collected. This information will accompany every prompt sent to the AI, res
                 ("resources/list", {}),
                 ("resources/templates/list", {}),
             ]
+            if isinstance(bootstrap_calls_extra, list):
+                for item in bootstrap_calls_extra:
+                    if not isinstance(item, tuple) or len(item) != 2:
+                        continue
+                    bootstrap_calls.append((str(item[0]).strip(), dict(item[1]) if isinstance(item[1], dict) else {}))
             planner_json_schema = self._mcp_planner_json_schema()
             reflection_json_schema = self._mcp_reflection_json_schema()
             max_calls_per_round = 8

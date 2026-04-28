@@ -51,6 +51,9 @@ class DialogAiSearch(QtWidgets.QDialog):
     selected_code_memo = ''
     include_coded_segments = False
     selected_file_ids = []
+    selected_case_ids = []
+    selected_case_names = []
+    selected_filter_info = {}
     current_prompt = None
     prompt_records = []
 
@@ -60,7 +63,7 @@ class DialogAiSearch(QtWidgets.QDialog):
         default_names = {
             "search": "_search/focused-search",
             "code_analysis": "code-analysis/code-summary",
-            "topic_analysis": "topic-exploration/topic-summary",
+            "topic_exploration": "topic-exploration/topic-summary",
         }
         default_name = default_names.get(self.context, "")
         if default_name == "":
@@ -76,6 +79,21 @@ class DialogAiSearch(QtWidgets.QDialog):
             return prompt
         return self.prompt_records[0] if len(self.prompt_records) > 0 else None
 
+    def _context_setting_keys(self, suffix: str) -> list[str]:
+        keys = [f'ai_dlg_{self.context}_{suffix}']
+        if self.context == 'topic_exploration':
+            keys.append(f'ai_dlg_topic_analysis_{suffix}')
+        return keys
+
+    def _get_context_setting(self, suffix: str, default=None):
+        for key in self._context_setting_keys(suffix):
+            if key in self.app.settings:
+                return self.app.settings[key]
+        return default
+
+    def _set_context_setting(self, suffix: str, value) -> None:
+        self.app.settings[f'ai_dlg_{self.context}_{suffix}'] = value
+
     def __init__(self, app_, context, selected_id=-1, selected_is_code=True, tree_sort_option="all asc"):
         """Initializes the dialog
 
@@ -84,7 +102,7 @@ class DialogAiSearch(QtWidgets.QDialog):
             context: the calling context, can be:
                 'search': called from 'Code Text > AI Search', 
                 'code_analysis': called from 'AI Chat > New Code Chat', 
-                'topic_analysis': called from 'AI Chat > New Topic Exploration Chat'.
+                'topic_exploration': called from 'AI Chat > New Topic Exploration Chat'.
             selected_id (int): the id of the selected item in the codes and categories tree. -1 if no item is selected.
             selected_is_code (bool): True if the selected item is a code, False if it is a category
         """
@@ -115,7 +133,7 @@ class DialogAiSearch(QtWidgets.QDialog):
             self.ui.tabWidget.setTabVisible(1, False)  # free search
             self.ui.checkBox_coded_segments.setVisible(False) 
             self.ui.widget_coder.setVisible(True)
-        elif context == 'topic_analysis':
+        elif context == 'topic_exploration':
             self.setWindowTitle('AI Topic Exploration')
             self.ui.label_what.setText(_('1) Which topic do you want to explore?'))
             self.ui.tabWidget.setCurrentIndex(1)
@@ -161,8 +179,8 @@ class DialogAiSearch(QtWidgets.QDialog):
             return
         # load last settings
         default_prompt = self._default_prompt_record()
-        last_prompt_name = self.app.settings.get(f'ai_dlg_{self.context}_last_prompt_name', default_prompt.name)
-        last_prompt_scope = self.app.settings.get(f'ai_dlg_{self.context}_last_prompt_scope', default_prompt.scope)
+        last_prompt_name = self._get_context_setting('last_prompt_name', default_prompt.name)
+        last_prompt_scope = self._get_context_setting('last_prompt_scope', default_prompt.scope)
         self.current_prompt = self.prompts_catalog.find_prompt_variant(
             last_prompt_name,
             last_prompt_scope,
@@ -184,11 +202,11 @@ class DialogAiSearch(QtWidgets.QDialog):
         self.ui.comboBox_prompts.setToolTip(self.current_prompt.description)
         self.ui.comboBox_prompts.currentIndexChanged.connect(self.on_prompt_selected)
         if context == 'search':
-            self.ui.tabWidget.setCurrentIndex(int(self.app.settings.get(f'ai_dlg_{self.context}_last_tab_index', 0)))
-        self.ui.lineEdit_free_topic.setText(self.app.settings.get(f'ai_dlg_{self.context}_free_topic', ''))
-        self.ui.textEdit_free_description.setText(self.app.settings.get(f'ai_dlg_{self.context}_free_description', '').replace('\\n', '\n'))        
-        self.ui.checkBox_send_memos.setChecked((self.app.settings.get(f'ai_dlg_{self.context}_send_memos', 'True') == 'True'))
-        self.ui.checkBox_coded_segments.setChecked((self.app.settings.get(f'ai_dlg_{self.context}_coded_segments', 'False') == 'True'))
+            self.ui.tabWidget.setCurrentIndex(int(self._get_context_setting('last_tab_index', 0)))
+        self.ui.lineEdit_free_topic.setText(self._get_context_setting('free_topic', ''))
+        self.ui.textEdit_free_description.setText(self._get_context_setting('free_description', '').replace('\\n', '\n'))        
+        self.ui.checkBox_send_memos.setChecked((self._get_context_setting('send_memos', 'True') == 'True'))
+        self.ui.checkBox_coded_segments.setChecked((self._get_context_setting('coded_segments', 'False') == 'True'))
         # buttons
         self.ui.pushButton_change_prompt.clicked.connect(self.change_prompt)
         self.ui.buttonBox.accepted.connect(self.ok)
@@ -206,12 +224,12 @@ class DialogAiSearch(QtWidgets.QDialog):
     def showEvent(self, event):
         super().showEvent(event)
         # restore position splitter_code_tree:
-        splitter_pos = int(self.app.settings.get(f'ai_dlg_{self.context}_last_splitter_code_tree', 500))
+        splitter_pos = int(self._get_context_setting('last_splitter_code_tree', 500))
         splitter_width = self.ui.splitter_code_tree.size().width()
         splitter_handle = self.ui.splitter_code_tree.handleWidth()
         self.ui.splitter_code_tree.setSizes([splitter_pos, splitter_width - splitter_pos - splitter_handle])
         # restore position splitter_case_files:
-        splitter_pos = int(self.app.settings.get(f'ai_dlg_{self.context}_last_splitter_case_files', 220))
+        splitter_pos = int(self._get_context_setting('last_splitter_case_files', 220))
         splitter_height = self.ui.splitter_case_files.size().height()
         splitter_handle = self.ui.splitter_case_files.handleWidth()
         self.ui.splitter_case_files.setSizes([splitter_pos, splitter_height - splitter_pos - splitter_handle])
@@ -555,6 +573,9 @@ class DialogAiSearch(QtWidgets.QDialog):
         
         # File selection
         self.selected_file_ids = []
+        self.selected_case_ids = []
+        self.selected_case_names = []
+        self.selected_filter_info = {}
         if self.ui.listWidget_files.item(0).isSelected():  # first item selected = add all files
             for i in range(self.ui.listWidget_files.count()):
                 id_ = self.ui.listWidget_files.item(i).data(Qt.ItemDataRole.UserRole)
@@ -566,8 +587,11 @@ class DialogAiSearch(QtWidgets.QDialog):
                 if id_ > -1:
                     self.selected_file_ids.append(id_)
         
+        no_file_filter = self.ui.listWidget_files.item(0).isSelected()
+
         # case filter
-        if not self.ui.listWidget_cases.item(0).isSelected(): 
+        no_case_filter = self.ui.listWidget_cases.item(0).isSelected()
+        if not no_case_filter: 
             # Only apply case filter if the first item (<no case filter>)  
             # is not selected.
             # The case filter will delete all files from self.selected_file_ids that 
@@ -577,6 +601,8 @@ class DialogAiSearch(QtWidgets.QDialog):
                 id_ = item.data(Qt.ItemDataRole.UserRole)
                 if id_ > -1:
                     selected_cases.append(id_)
+                    self.selected_case_ids.append(id_)
+                    self.selected_case_names.append(item.text())
             if len(selected_cases) > 0:
                 selected_cases_str = "(" + ", ".join(map(str, selected_cases)) + ")"
                 files_cases_sql = str('select distinct case_text.fid from case_text '
@@ -596,27 +622,38 @@ class DialogAiSearch(QtWidgets.QDialog):
         if len(self.attribute_file_ids) > 0:
             self.selected_file_ids = [x for x in self.selected_file_ids if x in self.attribute_file_ids]
 
+        self.selected_filter_info = {
+            "no_file_filter": no_file_filter,
+            "no_case_filter": no_case_filter,
+            "has_attribute_filter": (len(self.attribute_file_ids) > 0),
+            "selected_case_ids": list(self.selected_case_ids),
+            "selected_case_names": list(self.selected_case_names),
+        }
+
         if len(self.selected_file_ids) == 0:
             msg = _('After combining all filters, there are not files left for the search. Please check your settings.')
             Message(self.app, _('No files'), msg, "warning").exec()
             return
         
         # Save the settings for the next search
-        self.app.settings[f'ai_dlg_{self.context}_last_prompt_name'] = self.current_prompt.name
-        self.app.settings[f'ai_dlg_{self.context}_last_prompt_scope'] = self.current_prompt.scope
+        self._set_context_setting('last_prompt_name', self.current_prompt.name)
+        self._set_context_setting('last_prompt_scope', self.current_prompt.scope)
         if self.context == 'search':
-            self.app.settings[f'ai_dlg_{self.context}_last_tab_index'] = self.ui.tabWidget.currentIndex()
-        self.app.settings[f'ai_dlg_{self.context}_free_topic'] = self.ui.lineEdit_free_topic.text()
-        self.app.settings[f'ai_dlg_{self.context}_free_description'] = self.ui.textEdit_free_description.toPlainText().replace('\n', '\\n')
-        self.app.settings[f'ai_dlg_{self.context}_last_splitter_code_tree'] = self.ui.splitter_code_tree.sizes()[0]
-        self.app.settings[f'ai_dlg_{self.context}_last_splitter_case_files'] = self.ui.splitter_case_files.sizes()[0]
-        self.app.settings[f'ai_dlg_{self.context}_send_memos'] = 'True' if self.ui.checkBox_send_memos.isChecked() else 'False'
-        self.app.settings[f'ai_dlg_{self.context}_coded_segments'] = 'True' if self.ui.checkBox_coded_segments.isChecked() else 'False'
+            self._set_context_setting('last_tab_index', self.ui.tabWidget.currentIndex())
+        self._set_context_setting('free_topic', self.ui.lineEdit_free_topic.text())
+        self._set_context_setting('free_description', self.ui.textEdit_free_description.toPlainText().replace('\n', '\\n'))
+        self._set_context_setting('last_splitter_code_tree', self.ui.splitter_code_tree.sizes()[0])
+        self._set_context_setting('last_splitter_case_files', self.ui.splitter_case_files.sizes()[0])
+        self._set_context_setting('send_memos', 'True' if self.ui.checkBox_send_memos.isChecked() else 'False')
+        self._set_context_setting('coded_segments', 'True' if self.ui.checkBox_coded_segments.isChecked() else 'False')
         self.accept()
         
     def cancel(self):
         self.selected_code_name = ''
         self.selected_code_memo = ''
         self.selected_file_ids = []
+        self.selected_case_ids = []
+        self.selected_case_names = []
+        self.selected_filter_info = {}
         self.reject()
 

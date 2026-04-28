@@ -2184,6 +2184,9 @@ class AiLLM():
         return qta.icon('mdi6.tag-text-outline', color=self.app.highlight_color())
 
     def topic_analysis_icon(self):
+        return self.topic_exploration_icon()
+
+    def topic_exploration_icon(self):
         return qta.icon('mdi6.star-outline', color=self.app.highlight_color())
 
     def search_icon(self):

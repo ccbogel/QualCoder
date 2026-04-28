@@ -33,6 +33,7 @@ PROMPT_FRONTMATTER_PATTERN = re.compile(r"\A---[ \t]*\r?\n(.*?)\r?\n---[ \t]*(?:
 LEGACY_PROMPT_TYPE_FOLDERS = {
     "search": "_search",
     "code_analysis": "code-analysis",
+    "topic_exploration": "topic-exploration",
     "topic_analysis": "topic-exploration",
     "text_analysis": "text-analysis",
 }
@@ -108,6 +109,7 @@ class AiAgentPromptsCatalog:
     ) -> List[AgentPromptRecord]:
         """Return all prompts across scopes without conflict deduplication."""
 
+        prompt_type = self._normalize_prompt_type(prompt_type)
         prompts: List[AgentPromptRecord] = []
         for scope, root in self._prompt_roots():
             prompts.extend(
@@ -135,6 +137,7 @@ class AiAgentPromptsCatalog:
 
         query_name = self._normalize_prompt_name(name)
         query_scope = str(scope if scope is not None else "").strip()
+        prompt_type = self._normalize_prompt_type(prompt_type)
         if query_name == "" or query_scope == "":
             return None
         for prompt in self.list_prompt_variants(
@@ -390,10 +393,18 @@ class AiAgentPromptsCatalog:
         if top_level == "code-analysis":
             return "code_analysis"
         if top_level == "topic-exploration":
-            return "topic_analysis"
+            return "topic_exploration"
         if top_level == "text-analysis":
             return "text_analysis"
         return None
+
+    def _normalize_prompt_type(self, prompt_type: Optional[str]) -> Optional[str]:
+        value = str(prompt_type if prompt_type is not None else "").strip()
+        if value == "":
+            return None
+        if value == "topic_analysis":
+            return "topic_exploration"
+        return value
 
     def _conflict_key(self, name: str) -> str:
         return self._normalize_prompt_name(name).casefold()
