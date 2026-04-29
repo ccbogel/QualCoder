@@ -209,101 +209,103 @@ manage_section_shortcuts = _('<h1>Manage menu section key shortcuts</h1><table>\
 <tr><td></td><td></td><td></td><td></td><td>U Unlink file</td></tr>\n\
 </table>')
 
-view_av_shortcuts = _('<br /><h2>Manage files - view A/V shortcuts</h2>\n\
-Alt minus Rewind 30 seconds.<br />Ctrl R Rewind 5 seconds (macOS Cmd R)<br />Alt plus Forward 30 seconds<br />\n\
-Ctrl S OR Ctrl P Start/pause. On start rewind slightly (macOS Cmd S Cmd P)<br />\n\
-Ctrl T Insert timestamp in format [hh.mm.ss]<br />\n\
-Ctrl N Enter a new speakers name into shortcuts (macOS use Button)<br />\n\
-Ctrl D Delete speaker names from shortcuts<br />\n\
-Ctrl 1 .. 8 Insert speaker in format [speaker name]<br />\n\
-Ctrl Shift &gt; Increase play rate (macOS Cmd Shift &gt;)<br />\n\
-Ctrl Shift &lt; Decrease play rate (macOS Cmd Shift &lt;)<br />\n\
-F2 When tree item selected - Rename code or category<br /><br />')
+view_av_shortcuts = f'<br /><h2>{_("Manage files - view A/V shortcuts")}</h2>\n\
+Alt - {_("Rewind 30 seconds.")}<br />\n\
+Ctrl R (macOS Cmd R) {_("Rewind 5 seconds")}<br />\n\
+Alt + {_("Forward 30 seconds")}<br />\n\
+Ctrl S OR Ctrl P (macOS Cmd S Cmd P) {_("Start / pause.On start rewind slightly")}<br />\n\
+Ctrl T {_("Insert timestamp in format")}[hh.mm.ss]<br />\n\
+Ctrl N (macOS use Button) {_("Enter a new speakers name into shortcuts")}<br />\n\
+Ctrl D {_("Delete speaker names from shortcuts")}<br />\n\
+Ctrl 1 .. 8 {_("Insert speaker in format[speaker name]")}<br />\n\
+Ctrl Shift &gt; (macOS Cmd Shift &gt;) {_("Increase play rate")}<br />\n\
+Ctrl Shift &lt; (macOS Cmd Shift &lt;) {_("Decrease play rate")}<br />\n\
+F2 {_("When tree item selected - Rename code or category")}<br /><br />'
 
 menu_shortcuts_display = menu_shortcuts + manage_section_shortcuts + view_av_shortcuts
 
-coding_text_shortcuts = _('<h2>Code text key shortcuts</h2>\
-Ctrl 1 Next file<br />\
-Ctrl 2 File with latest coding<br />\
-Ctrl 3 Go to bookmark<br />\
-Ctrl 4 Open file memo<br />\
-Ctrl 5 Filter files by attributes<br />\
-Ctrl 6 Show selected code previous<br />\
-Ctrl 7 Show selected code next<br />\
-Ctrl 8 Show all codes in text (if selected code previous or next has been used)<br />\
-Ctrl 9 Show codes marked important<br />\
-Ctrl 0 Help - opens in browser<br />\
-Ctrl F Jump to search box<br />\
-Ctrl Z The last code that was unmarked, restore that coding<br />\
-Ctrl E Enter and Exit Edit mode<br />\
-A Annotate - Current text selection<br />\
-Q Quick Mark with code - for current selection<br />\
-B Create bookmark - at clicked position<br />\
-H Hide / Unhide top groupbox<br />\
-I Tag code at clicked position as important<br />\
-L Show codes like (when text coding area is in focus)<br />\
-M Memo code - at clicked position<br />\
-N New code - for selected text<br />\
-O Shortcut to cycle through overlapping codes - at clicked position<br />\
-S Search text - may include current selection<br />\
-R Opens a context menu for recently used codes for marking text<br />\
-Ctrl + R Reverse text direction: Left to Right | Right to Left<br />\
-U Unmark at clicked position in the text<br />\
-V assign in vivo code to selected text<br />\
-Alt + Left arrow  Shrink coding to the left <br />\
-Alt + Right arrow Shrink coding to the right<br />\
-Shift + Left arrow Extend coding to the left<br />\
-Shift + Right arrow Extend coding to the right<br />\
-! Exclamation mark key - describes clicked text character position<br />\
-$ Dollar key - Shift all coding postiions after a clicked position by X characters (negative numbers shift left)<br />\
-F2 When tree item selected - Rename code or category')
+coding_text_shortcuts = f'<h2>{_("Code text key shortcuts")}</h2>\
+Ctrl 1 {_("Next file")}<br />\
+Ctrl 2 {_("File with latest coding")}<br />\
+Ctrl 3 {_("Go to bookmark")}<br />\
+Ctrl 4 {_("Open file memo")}<br />\
+Ctrl 5 {_("Filter files by attributes")}<br />\
+Ctrl 6 {_("Show selected code previous")}<br />\
+Ctrl 7 {_("Show selected code next")}<br />\
+Ctrl 8 {_("Show all codes in text ( if selected code previous or next has been used)")}<br />\
+Ctrl 9 {_("Show codes marked important")}<br />\
+Ctrl 0 {_("Help - opens in browser")}<br />\
+Ctrl F {_("Jump to search box")}<br />\
+Ctrl Z {_("The last code that was unmarked, restore that coding")}<br />\
+Ctrl E {_("Enter and Exit Edit mode")}<br />\
+A {_("Annotate - Current text selection")}<br />\
+Q {_("Quick Mark with code - for current selection")}<br />\
+B {_("Create bookmark - at clicked position")}<br />\
+H {_("Hide / Unhide top groupbox")}<br />\
+I {_("Tag code at clicked position as important")}<br />\
+L {_("Show codes like (when text coding area is in focus)")}<br />\
+M {_("Memo code - at clicked position")}<br />\
+N {_("New code - for selected text")}<br />\
+O {_("Shortcut to cycle through overlapping codes - at clicked position")}<br />\
+S {_("Search text - may include current selection")}<br />\
+R {_("Opens a context menu for recently used codes for marking text")}<br />\
+Ctrl R {_("Reverse text direction: Left to Right | Right to Left")}<br />\
+U {_("Unmark At clicked position in the text")}<br />\
+V {_("assign in vivo code to selected text")}<br />\
+{_("Alt Left arrow.Shrink coding to the left")}<br />\
+{_("Alt Right arrow.Shrink coding to the right")}<br />\
+{_("Shift Left arrow.Extend coding to the left")}<br />\
+{_("Shift Right arrow.Extend coding to the right")}<br />\
+! {_("Describes clicked text character position")}<br />\
+$ {_("Shift all coding positions after a clicked position by X characters (negative numbers shift left)")}<br />\
+F2 {_("When tree item selected - Rename code or category")}'
 
-coding_image_shortcuts = _('<h2>Code image key shortcuts</h2>\
-Ctrl 1 Next file<br />\
-Ctrl 2 File with latest coding<br />\
-Ctrl 3 Open file memo<br />\
-Ctrl 4 Filter files by attributes<br />\
-Ctrl 5 Show codes marked important<br />\
-Ctrl 0 Help - opens in browser<br />\
-L Show codes like (when coding area is in focus)<br />\
-Ctrl Z The last code is unmarked, undo and restore that coding<br />\
-Ctrl G Create a grayed-out image with coloured coded highlights (Wait a few seconds)<br />\
-Minus or Q Zoom out<br />\
-Plus or W Zoom in<br />\
-Right-click on image for menu to rotate image<br />\
-F2 When tree item selected - Rename code or category')
+coding_image_shortcuts = f'<h2>{_("Code image key shortcuts")}</h2>\
+Ctrl 1 {_("Next file")}<br />\
+Ctrl 2 {_("File with latest coding")}<br />\
+Ctrl 3 {_("Open file memo")}<br />\
+Ctrl 4 {_("Filter files by attributes")}<br />\
+Ctrl 5 {_("Show codes marked important")}<br />\
+Ctrl 0 {_("Help - opens in browser")}<br />\
+L {_("Show codes like (when coding area is in focus)")}<br />\
+Ctrl Z {_("The last code is unmarked, undo and restore that coding")}<br />\
+Ctrl G {_("Create a grayed-out image with coloured coded highlights (Wait a few seconds)")}<br />\
+Minus or Q {_("Zoom out")}<br />\
+Plus or W {_("Zoom in")}<br />\
+{_("Right - click on image for menu to rotate image")}<br />\
+F2 {_("When tree item selected - Rename code or category")}'
 
-coding_av_shortcuts = _('<h2>Code audio/video key shortcuts</h2>\
-Ctrl 1 Next file<br />\
-Ctrl 2 File with latest coding<br />\
-Ctrl 3 Open file memo<br />\
-Ctrl 4 Filter files by attributes<br />\
-Ctrl 9 Show codes marked important<br />\
-Ctrl 0 Help - opens in browser<br />\
-A Annotate - for current selection<br />\
-G Assign segment to currently selected code, and open memo for segment.<br />\
-I Tag important<br />\
-L Show codes like (when text coding area is in focus)<br />\
-M Memo code - at clicked position<br />\
-O Cycle through overlapping codes at clicked position<br />\
-Q Quick Mark with code - for current selection<br />\
-S Search text - may include current selection<br />\
-R Opens a context menu for recently used codes for marking text<br />\
-! Shows cursor position in text area<br />\
-5 Go forward 5 seconds.<br />\
-Ctrl Z Restore last unmarked code(s) - text code(s) or segment code<br />\
-Alt minus Rewind 30 seconds<br />\
-Ctrl R Rewind 5 seconds<br />\
-Alt + plus Forward 30 seconds<br />\
-Ctrl P Play/pause. On start rewind 1 second<br />\
-Ctrl D Play/pause. On start rewind 1 second<br />\
-Ctrl S Start and stop av segment creation<br />\
-Ctrl Shift > Increase play rate<br />\
-Ctrl Shift &lt; Decrease play rate<br />\n\
-F2 When tree item selected - Rename code or category')
+coding_av_shortcuts = f'<h2>{_("Code audio/video key shortcuts")}</h2>\
+Ctrl 1 {_("Next file")}<br />\
+Ctrl 2 {_("File with latest coding")}<br />\
+Ctrl 3 {_("Open file memo")}<br />\
+Ctrl 4 {_("Filter files by attributes")}<br />\
+Ctrl 9 {_("Show codes marked important")}<br />\
+Ctrl 0 {_("Help - opens in browser")}<br />\
+A {_("Annotate - for current selection")}<br />\
+G {_("Assign segment to currently selected code, and open memo for segment.")}<br />\
+I {_("Tag important")}<br />\
+L {_("Show codes like (when text coding area is in focus)")}<br />\
+M {_("Memo code - at clicked position")}<br />\
+O {_("Cycle through overlapping codes at clicked position")}<br />\
+Q {_("Quick Mark with code - for current selection")}<br />\
+S {_("Search text - may include current selection")}<br />\
+R {_("Opens a context menu for recently used codes for marking text")}<br />\
+! {_("Shows cursor position in text area")}<br />\
+5 {_("Go forward 5 seconds.")}<br />\
+Ctrl Z {_("Restore last unmarked code(s) - text code(s) or segment code")}<br />\
+Alt - {_("Rewind 30 seconds")}<br />\
+Ctrl R {_("Rewind 5 seconds")}<br />\
+Alt + {_("Forward 30 seconds")}<br />\
+Ctrl P {_("Play / pause.On start rewind slightly")}<br />\
+Ctrl D {_("Play / pause.On start rewind slightly")}<br />\
+Ctrl S {_("Start and stop av segment creation")}<br />\
+Ctrl Shift &gt; {_("Increase play rate")}<br />\
+Ctrl Shift &lt; {_("Decrease play rate")}<br />\n\
+F2 {_("When tree item selected - Rename code or category")}'
 
-database_queries_shortcuts = _('<h2>Database Queries key shortcuts</h2>\
-Ctrl + Enter Run SQL query<br />')
+database_queries_shortcuts = f'<h2>{_("Database Queries key shortcuts")}</h2>\
+Ctrl + Enter {_("Run SQL query")}<br />'
 
 coding_shortcuts_display = coding_text_shortcuts + coding_image_shortcuts + coding_av_shortcuts
 coding_shortcuts_display += database_queries_shortcuts
