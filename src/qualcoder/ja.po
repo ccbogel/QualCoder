@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-04-25 17:31+1000\n"
-"PO-Revision-Date: 2026-02-22 09:58+1100\n"
+"PO-Revision-Date: 2026-04-30 07:49+1000\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "Language: ja\n"
@@ -1756,7 +1756,7 @@ msgstr "フィルターは等しい： "
 #: src\qualcoder\code_pdf.py:770 src\qualcoder\code_text.py:972
 #: src\qualcoder\view_av.py:753 src\qualcoder\view_image.py:676
 msgid "Toggle automatic resize"
-msgstr ""
+msgstr "自動サイズ変更を切り替える"
 
 #: src\qualcoder\code_pdf.py:949 src\qualcoder\code_text.py:1344
 msgid "Automatic search 3 or more characters"
@@ -1898,7 +1898,7 @@ msgstr "新しいカテゴリーを追加する"
 #: src\qualcoder\reports.py:554 src\qualcoder\reports.py:1076
 #: src\qualcoder\view_av.py:1542 src\qualcoder\view_image.py:1312
 msgid "Expand or collapse branch"
-msgstr ""
+msgstr "ブランチを展開または折りたたむ"
 
 #: src\qualcoder\code_pdf.py:1371 src\qualcoder\code_pdf.py:1381
 #: src\qualcoder\code_text.py:1997 src\qualcoder\code_text.py:2007
@@ -2485,7 +2485,7 @@ msgstr "重複"
 #: src\qualcoder\code_pdf.py:3940 src\qualcoder\code_text.py:6632
 #: src\qualcoder\view_av.py:3788
 msgid "This code already exists at this exact location."
-msgstr ""
+msgstr "このコードは、まさにこの場所にすでに存在しています。"
 
 #: src\qualcoder\code_text.py:146
 msgid "EDITING TEXT MODE (Ctrl+E)"
@@ -2518,7 +2518,7 @@ msgstr "交換コードを選択"
 
 #: src\qualcoder\code_text.py:600
 msgid "REF"
-msgstr ""
+msgstr "参考文献"
 
 #: src\qualcoder\code_text.py:1014
 msgid "Examples:"
@@ -2638,12 +2638,12 @@ msgstr "新しいジャーナル"
 
 #: src\qualcoder\code_text.py:2706
 msgid "Journals are linked to this file. Include them in the report?"
-msgstr ""
+msgstr "このファイルにはジャーナルがリンクされています。レポートに含めますか？"
 
 #: src\qualcoder\code_text.py:2721 src\qualcoder\code_text.py:3211
 #: src\qualcoder\code_text.py:3283
 msgid "Software citation"
-msgstr ""
+msgstr "ソフトウェアの引用"
 
 #: src\qualcoder\code_text.py:2737 src\qualcoder\refi.py:2031
 #: src\qualcoder\refi.py:2037 src\qualcoder\__main__.py:2296
@@ -2698,7 +2698,7 @@ msgstr "共起語をエクスポート"
 
 #: src\qualcoder\code_text.py:3008
 msgid "No co-occurrences found in this file."
-msgstr ""
+msgstr "このファイルには一致する項目が見つかりませんでした。"
 
 #: src\qualcoder\code_text.py:3011
 #, fuzzy
@@ -2732,7 +2732,7 @@ msgstr "共起語をエクスポート"
 
 #: src\qualcoder\code_text.py:3094
 msgid "Full File (highlight)"
-msgstr ""
+msgstr "ファイル全体（ハイライト）"
 
 #: src\qualcoder\code_text.py:3100
 #, fuzzy
@@ -2759,7 +2759,7 @@ msgstr "コーダーズ"
 
 #: src\qualcoder\code_text.py:3277
 msgid "CATEGORY"
-msgstr ""
+msgstr "カテゴリー"
 
 #: src\qualcoder\code_text.py:3279
 #, fuzzy
@@ -3127,11 +3127,11 @@ msgstr "より詳細なデータ分析はこちら"
 
 #: src\qualcoder\code_text.py:6367
 msgid "(search aborted due to an error)"
-msgstr ""
+msgstr "（エラーのため検索を中止しました）"
 
 #: src\qualcoder\code_text.py:6369
 msgid "(search finished)"
-msgstr ""
+msgstr "（検索完了）"
 
 #: src\qualcoder\code_text.py:6384
 msgid "Do you want to stop the search?"
@@ -3154,7 +3154,7 @@ msgstr "人工知能がビジー状態です。しばらく待ってから再試
 
 #: src\qualcoder\code_text.py:6644
 msgid "Font and size"
-msgstr ""
+msgstr "フォントとサイズ"
 
 #: src\qualcoder\color_selector.py:221
 msgid "Current colour"
@@ -3494,8 +3494,8 @@ msgid ""
 "implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See "
 "the GNU General Public License for more details.</p><p>You should have "
 "received a copy of the GNU Lesser General Public License along with "
-"QualCoder. If not, see <a href=\"https://www.gnu.org/licenses\">https://"
-"www.gnu.org/licenses</a>  </p><h3>License for highlighter.py code</h3><p>## "
+"QualCoder. If not, see <a href=\"https://www.gnu.org/licenses\">https://www."
+"gnu.org/licenses</a>  </p><h3>License for highlighter.py code</h3><p>## "
 "Copyright (C) 2013 Riverbank Computing Limited.<br />## Copyright (C) 2010 "
 "Nokia Corporation and/or its subsidiary(-ies).<br />## All rights reserved."
 "<br />##<br />## This file is part of the examples of PyQt.<br />##<br />## "
@@ -3827,7 +3827,7 @@ msgstr "アンケートは選択されていない。"
 
 #: src\qualcoder\journals.py:869
 msgid "Journal is empty. Nothing to convert."
-msgstr ""
+msgstr "ジャーナルは空です。変換するデータがありません。"
 
 #: src\qualcoder\journals.py:902
 #, fuzzy
@@ -3836,7 +3836,7 @@ msgstr "からコード名を変更： "
 
 #: src\qualcoder\journals.py:956
 msgid "Skipping non-numeric value for attribute "
-msgstr ""
+msgstr "属性の非数値をスキップする "
 
 #: src\qualcoder\journals.py:965
 #, fuzzy
@@ -3850,7 +3850,7 @@ msgstr "外部テキスト文書： "
 
 #: src\qualcoder\journals.py:970
 msgid "Journal converted to source document"
-msgstr ""
+msgstr "属性の非数値をスキップする "
 
 #: src\qualcoder\manage_files.py:201
 msgid "Rows: "
@@ -4152,14 +4152,16 @@ msgid ""
 "\n"
 "Presumed column delimiter for csv or tsv file: "
 msgstr ""
+"\n"
+"CSVまたはTSVファイルの想定される区切り文字： "
 
 #: src\qualcoder\manage_files.py:1721
 msgid "Notice"
-msgstr ""
+msgstr "お知らせ"
 
 #: src\qualcoder\manage_files.py:1721
 msgid "Select at least one Qualitative Text column to analyse."
-msgstr ""
+msgstr "分析対象として、定性テキストの列を少なくとも1つ選択してください。"
 
 #: src\qualcoder\manage_files.py:1843
 #, fuzzy
@@ -4264,6 +4266,8 @@ msgstr " 輸入された。"
 #: src\qualcoder\manage_files.py:2374
 msgid "Invalid file name. Please rename this file before exporting."
 msgstr ""
+"ファイル名が不正です。エクスポートする前に、このファイルの名前を変更してくだ"
+"さい。"
 
 #: src\qualcoder\manage_files.py:2380
 #, fuzzy
@@ -4379,39 +4383,39 @@ msgstr "カラムを隠す"
 
 #: src\qualcoder\manage_files.py:2831
 msgid "Adding columns to the Case will add those values to the case name"
-msgstr ""
+msgstr "ケースに列を追加すると、それらの値がケース名に追加されます"
 
 #: src\qualcoder\manage_files.py:2832
 msgid "Example: using columns id, country --> ID4_Fiji "
-msgstr ""
+msgstr "例：id、country 列を使用する場合 --> ID4_Fiji "
 
 #: src\qualcoder\manage_files.py:2833
 msgid "1. Cases / Participants (e.g., ID, Name):"
-msgstr ""
+msgstr "1. 事例／参加者（例：ID、氏名）："
 
 #: src\qualcoder\manage_files.py:2839
 msgid "2. Attributes (e.g., Age, Gender):"
-msgstr ""
+msgstr "2. 属性（例：年齢、性別）："
 
 #: src\qualcoder\manage_files.py:2845
 msgid "Multiple qualitative columns will be collated into one file."
-msgstr ""
+msgstr "複数の定性カラムが1つのファイルに統合されます。"
 
 #: src\qualcoder\manage_files.py:2846
 msgid "The column name is a header preceding each block of text."
-msgstr ""
+msgstr "列名は、各テキストブロックの先頭にある見出しです。"
 
 #: src\qualcoder\manage_files.py:2848
 msgid "3. Qualitative Texts:"
-msgstr ""
+msgstr "3. 定性的なテキスト："
 
 #: src\qualcoder\manage_files.py:2856
 msgid "Assign attributes to cases (check). Files (uncheck)"
-msgstr ""
+msgstr "ケースに属性を割り当てる（チェック）。ファイル（チェックを外す）"
 
 #: src\qualcoder\manage_files.py:2862
 msgid "Autocode text segments using column name"
-msgstr ""
+msgstr "列名を使用してテキストセグメントを自動コード化"
 
 #: src\qualcoder\manage_links.py:81
 msgid "Search folders"
@@ -5000,7 +5004,7 @@ msgstr "更新名"
 #: src\qualcoder\report_codes_by_segments.py:547
 #: src\qualcoder\report_code_summary.py:319
 msgid "Toggle automatic column resize"
-msgstr ""
+msgstr "列の自動サイズ変更を切り替える"
 
 #: src\qualcoder\reports.py:647
 msgid "Export Excel"
@@ -5623,7 +5627,7 @@ msgstr "コードメモ:"
 
 #: src\qualcoder\report_codes.py:2503
 msgid "Text memo updated for ctid: "
-msgstr ""
+msgstr "ctid のテキストメモを更新しました： "
 
 #: src\qualcoder\report_codes.py:2506
 #, fuzzy
@@ -5632,7 +5636,7 @@ msgstr "pdfから読み込んだ画像："
 
 #: src\qualcoder\report_codes.py:2509
 msgid "AV memo updated for avid: "
-msgstr ""
+msgstr "Avid向けAVメモを更新しました： "
 
 #: src\qualcoder\report_codes.py:2621
 msgid "Delete coded section."
@@ -5730,12 +5734,12 @@ msgstr "トップ100ワード"
 #: src\qualcoder\report_code_summary.py:516
 #: src\qualcoder\report_file_summary.py:646
 msgid "Applying stopwords: "
-msgstr ""
+msgstr "ストップワードの適用： "
 
 #: src\qualcoder\report_code_summary.py:518
 #: src\qualcoder\report_file_summary.py:648
 msgid "Applying stopwords from: .qualcoder/stopwords.txt"
-msgstr ""
+msgstr ".qualcoder/stopwords.txt からストップワードを適用する"
 
 #: src\qualcoder\report_code_summary.py:531
 msgid "IMAGE CODINGS: "
@@ -6116,7 +6120,7 @@ msgstr "選択されたカテゴリー"
 #: src\qualcoder\report_cooccurrence.py:794
 #: src\qualcoder\report_cooccurrence.py:807
 msgid "No data"
-msgstr ""
+msgstr "データなし"
 
 #: src\qualcoder\report_cooccurrence.py:498
 #, fuzzy
@@ -6125,7 +6129,7 @@ msgstr "エクスポートするデータがない"
 
 #: src\qualcoder\report_cooccurrence.py:536
 msgid "Exported GraphML for Gephi: "
-msgstr ""
+msgstr "Gephi用エクスポートされたGraphML： "
 
 #: src\qualcoder\report_cooccurrence.py:537
 #, fuzzy
@@ -6146,11 +6150,11 @@ msgstr "ツリーのフォントサイズ"
 
 #: src\qualcoder\report_cooccurrence.py:581
 msgid "There are no visible codes to plot."
-msgstr ""
+msgstr "プロットするコードが見当たりません。"
 
 #: src\qualcoder\report_cooccurrence.py:594
 msgid "There are no co-occurrences to plot."
-msgstr ""
+msgstr "プロットする共起関係はありません。"
 
 #: src\qualcoder\report_cooccurrence.py:598
 #, fuzzy
@@ -6164,15 +6168,15 @@ msgstr "色彩"
 
 #: src\qualcoder\report_cooccurrence.py:642
 msgid "Coloured labels"
-msgstr ""
+msgstr "色付きラベル"
 
 #: src\qualcoder\report_cooccurrence.py:729
 msgid "Community Clusters Graph"
-msgstr ""
+msgstr "コミュニティ・クラスター図"
 
 #: src\qualcoder\report_cooccurrence.py:794
 msgid "There are no visible codes to export."
-msgstr ""
+msgstr "エクスポートできるコードは表示されていません。"
 
 #: src\qualcoder\report_cooccurrence.py:807
 #, fuzzy
@@ -6626,6 +6630,8 @@ msgid ""
 "Table view\n"
 "Based on coder_names visibility"
 msgstr ""
+"テーブル表示\n"
+"coder_names の可視性に基づく"
 
 #: src\qualcoder\report_sql.py:374
 msgid "Default Queries"
@@ -6906,6 +6912,10 @@ msgid ""
 "\n"
 "Invalid character(s): "
 msgstr ""
+"APIキーに非ASCII文字が含まれているため、使用できません。\n"
+"AIプロバイダーから提供されたキーを、そのまま正確に貼り付けてください。\n"
+"\n"
+"無効な文字： "
 
 #: src\qualcoder\settings.py:353
 #, fuzzy
@@ -7218,8 +7228,8 @@ msgid ""
 "Reload the other tabs.\n"
 "Check accuracy of codings and annotations.\n"
 msgstr ""
-"他のタブを再ロードします。\\nコーディングと注釈の正確さを確認してください。"
-"\\n\n"
+"他のタブを再ロードします。\\nコーディングと注釈の正確さを確認してくださ"
+"い。\\n\n"
 
 #: src\qualcoder\text_file_replacement.py:84
 msgid ""
@@ -7609,15 +7619,16 @@ msgstr "ファイルを保存するディレクトリを選択"
 
 #: src\qualcoder\view_charts.py:580
 msgid "Success"
-msgstr ""
+msgstr "成功"
 
 #: src\qualcoder\view_charts.py:580
 msgid "Wordcloud saved successfully to:\n"
-msgstr ""
+msgstr "ワードクラウドが次の場所に正常に保存されました：\n"
 
 #: src\qualcoder\view_charts.py:583
 msgid "Error loading stopwords or generating wordcloud: "
 msgstr ""
+"ストップワードの読み込みまたはワードクラウドの生成中にエラーが発生しました： "
 
 #: src\qualcoder\view_charts.py:667
 msgid "Cumulative code count in cases by case"
@@ -7778,15 +7789,15 @@ msgstr "コード化されたセグメントのメモを表示"
 
 #: src\qualcoder\view_graph.py:653
 msgid "Radial"
-msgstr ""
+msgstr "ラジアル"
 
 #: src\qualcoder\view_graph.py:654
 msgid "Top to Bottom"
-msgstr ""
+msgstr "上から下まで"
 
 #: src\qualcoder\view_graph.py:655
 msgid "Left to Right"
-msgstr ""
+msgstr "左から右へ"
 
 #: src\qualcoder\view_graph.py:656
 #, fuzzy
@@ -7795,7 +7806,7 @@ msgstr "右クリックで表示"
 
 #: src\qualcoder\view_graph.py:658
 msgid "Refresh view"
-msgstr ""
+msgstr "ページを更新"
 
 #: src\qualcoder\view_graph.py:759
 #, fuzzy
@@ -8128,19 +8139,19 @@ msgstr "行頭項目"
 
 #: src\qualcoder\view_graph.py:3565 src\qualcoder\view_graph.py:4470
 msgid "Thin (1px)"
-msgstr ""
+msgstr "細い（1px）"
 
 #: src\qualcoder\view_graph.py:3566 src\qualcoder\view_graph.py:4471
 msgid "Normal (2px)"
-msgstr ""
+msgstr "通常（2px）"
 
 #: src\qualcoder\view_graph.py:3567 src\qualcoder\view_graph.py:4472
 msgid "Thick (4px)"
-msgstr ""
+msgstr "太字（4px）"
 
 #: src\qualcoder\view_graph.py:3568 src\qualcoder\view_graph.py:4473
 msgid "Extra thick (6px)"
-msgstr ""
+msgstr "極太（6px）"
 
 #: src\qualcoder\view_graph.py:3570 src\qualcoder\view_graph.py:4475
 msgid "Dotted"
@@ -8148,7 +8159,7 @@ msgstr "点線"
 
 #: src\qualcoder\view_graph.py:3571 src\qualcoder\view_graph.py:4476
 msgid "Solid"
-msgstr ""
+msgstr "ソリッド"
 
 #: src\qualcoder\view_graph.py:3573 src\qualcoder\view_graph.py:4478
 #, fuzzy
@@ -8181,7 +8192,7 @@ msgstr "カテゴリー名の変更"
 
 #: src\qualcoder\view_graph.py:4072
 msgid "Toggle: Ellipse/Rectangle"
-msgstr ""
+msgstr "切り替え：楕円／長方形"
 
 #: src\qualcoder\view_graph.py:4079
 #, fuzzy
@@ -8220,7 +8231,7 @@ msgstr "選択用のコード化されたセグメントがない"
 
 #: src\qualcoder\view_graph.py:4303
 msgid "No co-ocurrences"
-msgstr ""
+msgstr "共起なし"
 
 #: src\qualcoder\view_graph.py:4488
 msgid "Hide"
@@ -8276,7 +8287,7 @@ msgstr "移動またはサイズ変更"
 
 #: src\qualcoder\view_image.py:1906
 msgid "Interactive resize"
-msgstr ""
+msgstr "サイズ変更（インタラクティブ）"
 
 #: src\qualcoder\view_image.py:1913
 msgid "Highlight this area - gray"
