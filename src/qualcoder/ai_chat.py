@@ -79,6 +79,7 @@ MARKDOWN_INTERNAL_LINK_PATTERN = re.compile(
     re.IGNORECASE | re.DOTALL,
 )
 MARKDOWN_HR_IMAGE_CACHE: Dict[str, str] = {}
+PROMPT_SLASH_REF_PATTERN = re.compile(r"(?<!\S)/(?!/)[^\s`<>\[\]{}\"']+")
 
 
 def markdown_hr_image_data_uri(color: str) -> str:
@@ -196,6 +197,39 @@ class PromptCompletionListWidget(QtWidgets.QListWidget):
     def hideEvent(self, event):
         super().hideEvent(event)
         self.popupHidden.emit()
+
+
+class PromptSlashReferenceHighlighter(QtGui.QSyntaxHighlighter):
+    """Highlight `/prompt` references in the AI chat input."""
+
+    def __init__(self, document, records_provider, enabled_provider, style_provider):
+        super().__init__(document)
+        self.records_provider = records_provider
+        self.enabled_provider = enabled_provider
+        self.style_provider = style_provider
+
+    def highlightBlock(self, text: str) -> None:
+        try:
+            if not self.enabled_provider():
+                return
+            prompt_names = {
+                str(prompt.name if prompt.name is not None else '').strip('/').casefold()
+                for prompt in self.records_provider()
+            }
+            prompt_names.discard('')
+            styles = self.style_provider()
+        except Exception:
+            return
+
+        for match in PROMPT_SLASH_REF_PATTERN.finditer(text):
+            token = match.group(0).strip()
+            prompt_name = token[1:].rstrip('/.,;:!?').casefold()
+            if prompt_name not in prompt_names:
+                continue
+            fmt = QtGui.QTextCharFormat()
+            valid_style = styles.get("valid", {})
+            fmt.setBackground(QtGui.QBrush(valid_style.get("background", QtGui.QColor())))
+            self.setFormat(match.start(), match.end() - match.start(), fmt)
 
 
 class DialogAIChat(QtWidgets.QDialog):
@@ -347,6 +381,13 @@ class DialogAIChat(QtWidgets.QDialog):
         self._prompt_completion_guard = False
         self._prompt_completion_accepting = False
         self._prompt_completion_temporarily_disabled = False
+        self._prompt_reference_styles: Dict[str, Dict[str, Any]] = {}
+        self._prompt_reference_highlighter = PromptSlashReferenceHighlighter(
+            self.ui.plainTextEdit_question.document(),
+            lambda: self._prompt_completion_records,
+            self._prompt_completion_enabled,
+            lambda: self._prompt_reference_styles,
+        )
         self._prompt_completion_popup.currentItemChanged.connect(
             self._prompt_completion_current_item_changed
         )
@@ -381,6 +422,8 @@ class DialogAIChat(QtWidgets.QDialog):
         """Reload user-callable prompt names for the completion popup."""
 
         self._prompt_completion_records = self.agent_prompts_catalog.list_prompts(include_internal=False)
+        if hasattr(self, "_prompt_reference_highlighter"):
+            self._prompt_reference_highlighter.rehighlight()
 
     def _prompt_completion_enabled(self) -> bool:
         """Return whether `/prompt` completion should be active in the current chat."""
@@ -786,6 +829,88 @@ class DialogAIChat(QtWidgets.QDialog):
             return
         self._dismiss_prompt_completion(accept=False)
 
+    def _blend_colors(self, foreground: QtGui.QColor, background: QtGui.QColor, amount: float) -> QtGui.QColor:
+        """Blend foreground into background by amount in the 0..1 range."""
+
+        amount = max(0.0, min(1.0, float(amount)))
+        if not foreground.isValid():
+            foreground = QtGui.QColor("#287368")
+        if not background.isValid():
+            background = QtGui.QColor("#ffffff")
+        red = round(foreground.red() * amount + background.red() * (1.0 - amount))
+        green = round(foreground.green() * amount + background.green() * (1.0 - amount))
+        blue = round(foreground.blue() * amount + background.blue() * (1.0 - amount))
+        return QtGui.QColor(red, green, blue)
+
+    def _update_prompt_reference_styles(self, background_color: QtGui.QColor) -> None:
+        """Prepare contrast-aware prompt reference styles for input and chat output."""
+
+        user_color = QtGui.QColor(str(getattr(self, "ai_user_color", "#287368")))
+        if not background_color.isValid():
+            background_color = self.ui.plainTextEdit_question.palette().color(
+                self.ui.plainTextEdit_question.viewport().backgroundRole()
+            )
+        is_dark = background_color.lightness() < 128
+        highlight_amount = 0.22 if is_dark else 0.10
+        valid_background = self._blend_colors(user_color, background_color, highlight_amount)
+
+        self._prompt_reference_styles = {
+            "valid": {
+                "foreground": user_color,
+                "background": valid_background,
+                "html_background": valid_background.name(),
+                "html_foreground": user_color.name(),
+            },
+        }
+        if hasattr(self, "_prompt_reference_highlighter"):
+            self._prompt_reference_highlighter.rehighlight()
+
+    def _prompt_reference_prompt_names(self) -> set[str]:
+        """Return known slash-callable prompt names for the current chat."""
+
+        return {
+            str(prompt.name if prompt.name is not None else '').strip('/').casefold()
+            for prompt in self._prompt_completion_records
+            if str(prompt.name if prompt.name is not None else '').strip('/') != ''
+        }
+
+    def _prompt_reference_html_span(self, token: str, known: bool) -> str:
+        """Render one slash reference token as styled HTML."""
+
+        escaped_token = html_lib.escape(str(token if token is not None else ''))
+        if not known:
+            return escaped_token
+        styles = getattr(self, "_prompt_reference_styles", {})
+        valid_style = styles.get("valid", {})
+        background = html_lib.escape(str(valid_style.get("html_background", "")))
+        return (
+            '<span style="'
+            f'background-color: {background};'
+            f'">{escaped_token}</span>'
+        )
+
+    def _render_user_markdown_to_html(self, text: str, hr_color: str = "#e6e6e6", hr_width_px: int = 600) -> str:
+        """Render user Markdown and highlight slash prompt references without altering stored text."""
+
+        if not self._prompt_completion_enabled():
+            return render_markdown_to_html(text, hr_color=hr_color, hr_width_px=hr_width_px)
+
+        known_prompt_names = self._prompt_reference_prompt_names()
+        replacements: Dict[str, str] = {}
+
+        def replace_prompt_ref(match: re.Match) -> str:
+            token = match.group(0)
+            prompt_name = token[1:].rstrip('/.,;:!?').casefold()
+            placeholder = f"QUALCODER_PROMPT_REF_{len(replacements)}_TOKEN"
+            replacements[placeholder] = self._prompt_reference_html_span(token, prompt_name in known_prompt_names)
+            return placeholder
+
+        marked_text = PROMPT_SLASH_REF_PATTERN.sub(replace_prompt_ref, str(text if text is not None else ''))
+        rendered_html = render_markdown_to_html(marked_text, hr_color=hr_color, hr_width_px=hr_width_px)
+        for placeholder, replacement in replacements.items():
+            rendered_html = rendered_html.replace(placeholder, replacement)
+        return rendered_html
+
     def init_styles(self):
         """Set up the stylesheets for the ui and the chat entries
         """
@@ -864,6 +989,7 @@ class DialogAIChat(QtWidgets.QDialog):
             self.ai_status_style = f'"{doc_font} color: {self.ai_status_color};"'
         self.ui.plainTextEdit_question.setStyleSheet(self.ai_user_style[1:-1])
         default_bg_color = self.ui.plainTextEdit_question.palette().color(self.ui.plainTextEdit_question.viewport().backgroundRole())
+        self._update_prompt_reference_styles(default_bg_color)
         self.ui.ai_output.setAutoFillBackground(True)
         self.ui.ai_output.setStyleSheet(f"""
             QLabel#ai_output {{
@@ -3046,6 +3172,8 @@ data collected. This information will accompany every prompt sent to the AI, res
                 self.ui.pushButton_question.setEnabled(True)
                 chat = self.chat_list[self.current_chat_idx]
                 id_, name, analysis_type, summary, date, analysis_prompt = chat
+                if hasattr(self, "_prompt_reference_highlighter"):
+                    self._prompt_reference_highlighter.rehighlight()
                 if analysis_type == 'text chat':
                     # Extract doc info from the summary field:
                     doc_info_pattern = r'<a href="quote:(\d+)_(\d+)_(\d+)">(.+?)</a>'
@@ -3091,6 +3219,8 @@ data collected. This information will accompany every prompt sent to the AI, res
                     1,
                     max(self.ui.ai_output.width(), self.ui.scrollArea_ai_output.viewport().width()) - 24
                 )
+                if self._is_agent_chat_type(analysis_type):
+                    self._refresh_prompt_completion_records()
 
                 def flush_agent_status_block():
                     nonlocal agent_status_lines, agent_status_author
@@ -3138,7 +3268,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                         flush_agent_status_block()
 
                     if msg_type == 'user':
-                        txt = render_markdown_to_html(
+                        txt = self._render_user_markdown_to_html(
                             msg[4],
                             hr_color=self.ai_user_color,
                             hr_width_px=markdown_hr_width,
@@ -3202,6 +3332,8 @@ data collected. This information will accompany every prompt sent to the AI, res
             self.ui.ai_output.setText('')
             self.ui.plainTextEdit_question.setEnabled(False)
             self.ui.pushButton_question.setEnabled(False)
+            if hasattr(self, "_prompt_reference_highlighter"):
+                self._prompt_reference_highlighter.rehighlight()
             
     def _strip_ref_quotes(self, raw: Any) -> str:
         """Remove wrapping quote marks from a REF payload while preserving inner text."""
