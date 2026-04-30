@@ -46,7 +46,7 @@ import re
 import threading
 import time
 import unicodedata
-from urllib.parse import urlencode
+from urllib.parse import urlencode, quote, unquote
 
 from .ai_search_dialog import DialogAiSearch
 from .GUI.ui_ai_chat import Ui_Dialog_ai_chat
@@ -874,6 +874,46 @@ class DialogAIChat(QtWidgets.QDialog):
             if str(prompt.name if prompt.name is not None else '').strip('/') != ''
         }
 
+    def _prompt_reference_records_by_name(self) -> Dict[str, AgentPromptRecord]:
+        """Return prompt records keyed by normalized slash reference name."""
+
+        return {
+            str(prompt.name if prompt.name is not None else '').strip('/').casefold(): prompt
+            for prompt in self._prompt_completion_records
+            if str(prompt.name if prompt.name is not None else '').strip('/') != ''
+        }
+
+    def _prompt_reference_tooltip(self, prompt: AgentPromptRecord) -> str:
+        """Build tooltip text for a recognized slash prompt reference."""
+
+        tooltip_lines = [f'/{prompt.name}']
+        scope = str(prompt.scope if prompt.scope is not None else '').strip()
+        if scope != '':
+            tooltip_lines.append(f'[{scope}]')
+        description = str(prompt.description if prompt.description is not None else '').strip()
+        if description != '':
+            tooltip_lines.append(description)
+        return '\n'.join(tooltip_lines)
+
+    def _prompt_reference_record_at_position(self, pos: QtCore.QPoint) -> Optional[AgentPromptRecord]:
+        """Return the prompt record under a viewport position in the input editor."""
+
+        if not self._prompt_completion_enabled():
+            return None
+        self._refresh_prompt_completion_records()
+        editor = self.ui.plainTextEdit_question
+        cursor = editor.cursorForPosition(pos)
+        char_pos = cursor.position()
+        text = editor.toPlainText()
+        records_by_name = self._prompt_reference_records_by_name()
+        if char_pos < 0 or char_pos > len(text) or len(records_by_name) == 0:
+            return None
+        for match in PROMPT_SLASH_REF_PATTERN.finditer(text):
+            if match.start() <= char_pos <= match.end():
+                prompt_name = match.group(0)[1:].rstrip('/.,;:!?').casefold()
+                return records_by_name.get(prompt_name)
+        return None
+
     def _prompt_reference_html_span(self, token: str, known: bool) -> str:
         """Render one slash reference token as styled HTML."""
 
@@ -883,10 +923,15 @@ class DialogAIChat(QtWidgets.QDialog):
         styles = getattr(self, "_prompt_reference_styles", {})
         valid_style = styles.get("valid", {})
         background = html_lib.escape(str(valid_style.get("html_background", "")))
+        foreground = html_lib.escape(str(valid_style.get("html_foreground", self.ai_user_color)))
+        prompt_name = str(token if token is not None else '')[1:].rstrip('/.,;:!?')
+        href = 'promptref:' + quote(prompt_name, safe='')
         return (
+            f'<a href="{href}" style="color: {foreground}; text-decoration: none;">'
             '<span style="'
             f'background-color: {background};'
             f'">{escaped_token}</span>'
+            '</a>'
         )
 
     def _render_user_markdown_to_html(self, text: str, hr_color: str = "#e6e6e6", hr_width_px: int = 600) -> str:
@@ -5842,6 +5887,14 @@ data collected. This information will accompany every prompt sent to the AI, res
                     return True
             return super().eventFilter(source, event)
 
+        if source is editor_viewport and event.type() == QEvent.Type.ToolTip:
+            prompt = self._prompt_reference_record_at_position(event.pos())
+            if prompt is not None:
+                QtWidgets.QToolTip.showText(event.globalPos(), self._prompt_reference_tooltip(prompt), editor)
+                return True
+            QtWidgets.QToolTip.hideText()
+            return True
+
         if event.type() == QEvent.Type.KeyPress and source is self.ui.plainTextEdit_question:
             if event.key() in (
                 Qt.Key.Key_Backspace,
@@ -5883,7 +5936,13 @@ data collected. This information will accompany every prompt sent to the AI, res
 
         if link:
             # Show tooltip when hovering over a link
-            if link.startswith('coding:'):
+            if link.startswith('promptref:'):
+                prompt_name = unquote(link[len('promptref:'):]).strip('/').casefold()
+                self._refresh_prompt_completion_records()
+                prompt = self._prompt_reference_records_by_name().get(prompt_name)
+                if prompt is not None:
+                    QtWidgets.QToolTip.showText(QCursor.pos(), self._prompt_reference_tooltip(prompt), self.ui.ai_output)
+            elif link.startswith('coding:'):
                 try:
                     coding_id = link[len('coding:'):]
                     cursor = self.app.conn.cursor()
@@ -6003,6 +6062,8 @@ data collected. This information will accompany every prompt sent to the AI, res
                     self._open_text_reference(int(source_id), int(start), end)
             elif link.startswith('action:topic_chat_analyze_more'):
                 self.topic_chat_analyze_more()
+            elif link.startswith('promptref:'):
+                return
 
 # Helper:
 class LlmCallbackHandler(BaseCallbackHandler):
