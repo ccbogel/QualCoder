@@ -469,15 +469,6 @@ class DialogAIChat(QtWidgets.QDialog):
             return None
         return remainder
 
-    def _prompt_is_within_category(self, prompt_name: str, category: str) -> bool:
-        """Return whether one prompt belongs to the given category path."""
-
-        normalized_prompt = str(prompt_name if prompt_name is not None else '').strip('/')
-        normalized_category = str(category if category is not None else '').strip('/')
-        if normalized_prompt == '' or normalized_category == '':
-            return False
-        return normalized_prompt.startswith(normalized_category + '/')
-
     def _matching_prompt_completion_items(self, prefix: str) -> List[Dict[str, Any]]:
         """Return direct matching categories and prompts for the current token."""
 
@@ -485,14 +476,12 @@ class DialogAIChat(QtWidgets.QDialog):
         parent, leaf = self._split_prompt_completion_query(prefix)
         normalized_leaf = leaf.casefold()
         items: List[Dict[str, Any]] = []
-        matched_categories: List[str] = []
 
         for category in self._iter_prompt_completion_categories():
             child_name = self._is_direct_prompt_completion_child(category, parent)
             if child_name is None or not child_name.casefold().startswith(normalized_leaf):
                 continue
             full_insert = '/' + category + '/'
-            matched_categories.append(category)
             items.append(
                 {
                     "kind": "category",
@@ -524,39 +513,6 @@ class DialogAIChat(QtWidgets.QDialog):
                     "record": prompt,
                 }
             )
-
-        if parent == '' and len(matched_categories) > 0:
-            shown_prompt_paths = {
-                str(item.get("insert_text", ""))[1:]
-                for item in items
-                if item.get("kind") == "prompt"
-            }
-            for prompt in self._prompt_completion_records:
-                if prompt.name in shown_prompt_paths:
-                    continue
-                matching_category = next(
-                    (category for category in matched_categories if self._prompt_is_within_category(prompt.name, category)),
-                    None,
-                )
-                if matching_category is None:
-                    continue
-                tooltip_lines = []
-                if prompt.description != '':
-                    tooltip_lines.append(_('Prompt description: ') + prompt.description)
-                tooltip_lines.append(f'/{prompt.name}')
-                tooltip_lines.append(f'[{prompt.scope}]')
-                items.append(
-                    {
-                        "kind": "prompt_descendant",
-                        "display_text": prompt.name,
-                        "insert_text": '/' + prompt.name,
-                        "category_path": matching_category,
-                        "prompt_path": prompt.name,
-                        "sort_text": prompt.name.casefold(),
-                        "tooltip": '\n'.join(tooltip_lines),
-                        "record": prompt,
-                    }
-                )
 
         if parent == '':
             items.sort(
