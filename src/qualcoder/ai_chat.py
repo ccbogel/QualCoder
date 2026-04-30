@@ -1851,7 +1851,6 @@ class DialogAIChat(QtWidgets.QDialog):
             "Treat MCP execution as already finished for this turn and begin the analysis directly. "
             "Write a detailed, well-structured analytical response rather than a short summary. "
             "Do not mention internal MCP stage constraints. "
-            "The final answer must follow the current conversation language. "
             "Do not make empirical claims without support from retrieved evidence. If support is uncertain, state the uncertainty clearly. "
             "When you refer to empirical text evidence, add citations in this exact form: "
             "{REF: \"exact quote from the retrieved evidence\"}. "
@@ -5399,7 +5398,6 @@ data collected. This information will accompany every prompt sent to the AI, res
                 "Now provide the final answer to the user in normal prose. "
                 "Focus on outcomes of this turn and communicate them clearly. "
                 "Do not mention internal MCP stage constraints. "
-                "The final answer must follow the current conversation language. "
                 "When referring to empirical text evidence, cite it as {REF: \"exact quote\"}. "
                 "Remember: REF is invisible markup; if you want a quote to be visible, include the quoted text in normal prose and add REF in addition."
             )
