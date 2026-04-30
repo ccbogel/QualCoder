@@ -78,13 +78,40 @@ MARKDOWN_INTERNAL_LINK_PATTERN = re.compile(
     r"<a\s+href=(['\"])(?:coding|chunk|quote|action):.*?</a>",
     re.IGNORECASE | re.DOTALL,
 )
+MARKDOWN_HR_IMAGE_CACHE: Dict[str, str] = {}
 
 
-def render_markdown_to_html(text: str, hr_color: str = "#e6e6e6") -> str:
+def markdown_hr_image_data_uri(color: str) -> str:
+    """Return a 1x1 PNG data URI in the requested color for Qt rich text."""
+
+    qcolor = QtGui.QColor(str(color if color is not None else "").strip())
+    if not qcolor.isValid():
+        qcolor = QtGui.QColor("#e6e6e6")
+    cache_key = qcolor.name()
+    cached = MARKDOWN_HR_IMAGE_CACHE.get(cache_key, "")
+    if cached != "":
+        return cached
+
+    image = QtGui.QImage(1, 1, QtGui.QImage.Format.Format_ARGB32)
+    image.fill(qcolor)
+    byte_array = QtCore.QByteArray()
+    buffer = QtCore.QBuffer(byte_array)
+    buffer.open(QtCore.QIODevice.OpenModeFlag.WriteOnly)
+    image.save(buffer, "PNG")
+    data_uri = "data:image/png;base64," + bytes(byte_array.toBase64()).decode("ascii")
+    MARKDOWN_HR_IMAGE_CACHE[cache_key] = data_uri
+    return data_uri
+
+
+def render_markdown_to_html(text: str, hr_color: str = "#e6e6e6", hr_width_px: int = 600) -> str:
     """Render AI Markdown for QLabel output while preserving internal QualCoder links."""
 
     source_text = str(text if text is not None else "")
     preserved_links: List[str] = []
+    try:
+        hr_width_px = max(1, int(hr_width_px))
+    except (TypeError, ValueError):
+        hr_width_px = 600
 
     def preserve_quote_link(match: re.Match) -> str:
         token = f"@@QUALCODER_QUOTE_LINK_{len(preserved_links)}@@"
@@ -106,7 +133,11 @@ def render_markdown_to_html(text: str, hr_color: str = "#e6e6e6") -> str:
     )
     rendered_html = re.sub(
         r"<hr\s*/?>",
-        f'<hr style="border: none; border-top: 1px solid {hr_color}; margin: 8px 0;" />',
+        (
+            '<div style="margin: 8px 0;">'
+            f'<img src="{markdown_hr_image_data_uri(hr_color)}" width="{hr_width_px}" height="1" />'
+            '</div>'
+        ),
         rendered_html,
         flags=re.IGNORECASE,
     )
@@ -285,6 +316,7 @@ class DialogAIChat(QtWidgets.QDialog):
         QtCore.QTimer.singleShot(0, self.restore_ai_output_splitter)
         self.ui.scrollArea_ai_output.verticalScrollBar().valueChanged.connect(self.on_ai_output_scroll)
         self.set_sidebar_mode(False)
+        QtCore.QTimer.singleShot(0, self._hide_transient_chat_overlays)
         self._update_undo_button_state()
 
     def _setup_prompt_completion(self) -> None:
@@ -310,6 +342,11 @@ class DialogAIChat(QtWidgets.QDialog):
         self._prompt_completion_popup.setHorizontalScrollBarPolicy(
             Qt.ScrollBarPolicy.ScrollBarAlwaysOff
         )
+        self._prompt_completion_records: List[AgentPromptRecord] = []
+        self._prompt_inline_completion: Optional[Dict[str, Any]] = None
+        self._prompt_completion_guard = False
+        self._prompt_completion_accepting = False
+        self._prompt_completion_temporarily_disabled = False
         self._prompt_completion_popup.currentItemChanged.connect(
             self._prompt_completion_current_item_changed
         )
@@ -322,13 +359,9 @@ class DialogAIChat(QtWidgets.QDialog):
         self._prompt_completion_popup.popupHidden.connect(
             self._prompt_completion_popup_hidden
         )
+        self._prompt_completion_popup.hide()
         self.ui.plainTextEdit_question.textChanged.connect(self._sync_prompt_completion)
         self.ui.plainTextEdit_question.cursorPositionChanged.connect(self._sync_prompt_completion)
-        self._prompt_completion_records: List[AgentPromptRecord] = []
-        self._prompt_inline_completion: Optional[Dict[str, Any]] = None
-        self._prompt_completion_guard = False
-        self._prompt_completion_accepting = False
-        self._prompt_completion_temporarily_disabled = False
         self._refresh_prompt_completion_records()
 
     def _suspend_prompt_completion_temporarily(self) -> None:
@@ -597,6 +630,17 @@ class DialogAIChat(QtWidgets.QDialog):
         with QtCore.QSignalBlocker(popup):
             popup.clear()
 
+    def _hide_transient_chat_overlays(self) -> None:
+        """Hide popup widgets that can otherwise linger after tab initialization."""
+
+        if hasattr(self, "_prompt_completion_popup"):
+            self._hide_prompt_completion_popup(accept=False)
+        try:
+            self.ui.comboBox_ai_chats.hidePopup()
+            self.ui.comboBox_ai_chats.view().hide()
+        except Exception:
+            pass
+
     def _discard_inline_prompt_completion(self) -> bool:
         """Remove the transient inline completion suffix if it is still present."""
 
@@ -779,7 +823,10 @@ class DialogAIChat(QtWidgets.QDialog):
     def _prompt_completion_popup_hidden(self) -> None:
         """Discard transient inline text when the popup disappears unexpectedly."""
 
-        if self._prompt_completion_accepting or self._prompt_completion_guard:
+        if (
+                getattr(self, "_prompt_completion_accepting", False) or
+                getattr(self, "_prompt_completion_guard", False)
+        ):
             return
         self._dismiss_prompt_completion(accept=False)
 
@@ -810,46 +857,57 @@ class DialogAIChat(QtWidgets.QDialog):
         self.ui.toolButton_edit_title.setIcon(qta.icon('mdi6.pencil-outline'))
         self.ui.toolButton_edit_title.setIconSize(QtCore.QSize(16, 16))
         doc_font = f'font: {self.app.settings["docfontsize"]}pt \'{self.app.settings["font"]}\';'
+        self.ai_response_color = "#356399"
+        self.ai_user_color = "#287368"
+        self.ai_status_color = "#808080"
         self.ai_response_style = f'"{doc_font} color: #356399;"'
         self.ai_user_style = f'"{doc_font} color: #287368;"'
         self.ai_info_style = f'"{doc_font}"'
         self.ai_status_style = f'"{doc_font} color: #808080;"'
         self.ai_actions_style = f'"{doc_font}"'
         if self.app.settings['stylesheet'] in ['dark', 'rainbow']:
-            self.ai_response_style = f'"{doc_font} color: #8FB1D8;"'
-            self.ai_user_style = f'"{doc_font} color: #35998A;"'
+            self.ai_response_color = "#8FB1D8"
+            self.ai_user_color = "#35998A"
+            self.ai_status_color = "#B5B5B5"
+            self.ai_response_style = f'"{doc_font} color: {self.ai_response_color};"'
+            self.ai_user_style = f'"{doc_font} color: {self.ai_user_color};"'
             self.ai_info_style = f'"{doc_font}"'
-            self.ai_status_style = f'"{doc_font} color: #B5B5B5;"'
+            self.ai_status_style = f'"{doc_font} color: {self.ai_status_color};"'
         elif self.app.settings['stylesheet'] == 'native':
             # Determine whether dark or light native style is active:
             style_hints = QGuiApplication.styleHints()
             # Older versions fot PyQt6 may not have QGuiApplication.styleHints().colorScheme() e.g. PtQ66 vers 6.2.3
             try:
                 if style_hints.colorScheme() == QtCore.Qt.ColorScheme.Dark:
-                    self.ai_response_style = f'"{doc_font} color: #8FB1D8;"'
-                    self.ai_user_style = f'"{doc_font} color: #35998A;"'
+                    self.ai_response_color = "#8FB1D8"
+                    self.ai_user_color = "#35998A"
+                    self.ai_status_color = "#B5B5B5"
+                    self.ai_response_style = f'"{doc_font} color: {self.ai_response_color};"'
+                    self.ai_user_style = f'"{doc_font} color: {self.ai_user_color};"'
                     self.ai_info_style = f'"{doc_font}"'
-                    self.ai_status_style = f'"{doc_font} color: #B5B5B5;"'
+                    self.ai_status_style = f'"{doc_font} color: {self.ai_status_color};"'
                 else:
-                    self.ai_response_style = f'"{doc_font} color: #356399;"'
-                    self.ai_user_style = f'"{doc_font} color: #287368;"'
+                    self.ai_response_color = "#356399"
+                    self.ai_user_color = "#287368"
+                    self.ai_status_color = "#808080"
+                    self.ai_response_style = f'"{doc_font} color: {self.ai_response_color};"'
+                    self.ai_user_style = f'"{doc_font} color: {self.ai_user_color};"'
                     self.ai_info_style = f'"{doc_font}"'
-                    self.ai_status_style = f'"{doc_font} color: #808080;"'
+                    self.ai_status_style = f'"{doc_font} color: {self.ai_status_color};"'
             except AttributeError as e_:
                 print(f"Using older version of PyQT6? {e_}")
                 logger.debug(f"Using older version of PyQT6? {e_}")
                 pass
         else:
-            self.ai_response_style = f'"{doc_font} color: #356399;"'
-            self.ai_user_style = f'"{doc_font} color: #287368;"'
+            self.ai_response_color = "#356399"
+            self.ai_user_color = "#287368"
+            self.ai_status_color = "#808080"
+            self.ai_response_style = f'"{doc_font} color: {self.ai_response_color};"'
+            self.ai_user_style = f'"{doc_font} color: {self.ai_user_color};"'
             self.ai_info_style = f'"{doc_font}"'
-            self.ai_status_style = f'"{doc_font} color: #808080;"'
+            self.ai_status_style = f'"{doc_font} color: {self.ai_status_color};"'
         self.ui.plainTextEdit_question.setStyleSheet(self.ai_user_style[1:-1])
         default_bg_color = self.ui.plainTextEdit_question.palette().color(self.ui.plainTextEdit_question.viewport().backgroundRole())
-        if default_bg_color.lightness() < 128:
-            self.markdown_hr_color = default_bg_color.lighter(140).name()
-        else:
-            self.markdown_hr_color = default_bg_color.darker(110).name()
         self.ui.ai_output.setAutoFillBackground(True)
         self.ui.ai_output.setStyleSheet(f"""
             QLabel#ai_output {{
@@ -1102,6 +1160,7 @@ class DialogAIChat(QtWidgets.QDialog):
             self.ui.widget_left.setMaximumWidth(16777215)
             self.ui.widget_left.setVisible(True)
             self.ui.widget_top.setVisible(False)
+        self._hide_transient_chat_overlays()
         self.ui.gridLayout.invalidate()
         self.updateGeometry()
         QtCore.QTimer.singleShot(0, self.restore_ai_output_splitter)
@@ -3072,6 +3131,10 @@ data collected. This information will accompany every prompt sent to the AI, res
                 # Show chat messages:
                 agent_status_lines = []
                 agent_status_author = ''
+                markdown_hr_width = max(
+                    1,
+                    max(self.ui.ai_output.width(), self.ui.scrollArea_ai_output.viewport().width()) - 24
+                )
 
                 def flush_agent_status_block():
                     nonlocal agent_status_lines, agent_status_author
@@ -3119,7 +3182,11 @@ data collected. This information will accompany every prompt sent to the AI, res
                         flush_agent_status_block()
 
                     if msg_type == 'user':
-                        txt = msg[4].replace('\n', '<br />')
+                        txt = render_markdown_to_html(
+                            msg[4],
+                            hr_color=self.ai_user_color,
+                            hr_width_px=markdown_hr_width,
+                        )
                         author = msg[3]
                         if author is None or author == '':
                             author = 'unkown'
@@ -3127,7 +3194,11 @@ data collected. This information will accompany every prompt sent to the AI, res
                         txt = f'{self._message_heading_html(heading)}{txt}'
                         html_parts.append(f'<p style={self.ai_user_style}>{txt}</p>')
                     elif msg_type == 'ai':
-                        txt = render_markdown_to_html(msg[4], hr_color=self.markdown_hr_color)
+                        txt = render_markdown_to_html(
+                            msg[4],
+                            hr_color=self.ai_response_color,
+                            hr_width_px=markdown_hr_width,
+                        )
                         author = msg[3]
                         txt = f'{self._ai_agent_heading_html(author, chat_idx=self.current_chat_idx)}{txt}'
                         html_parts.append(f'<p style={self.ai_response_style}>{txt}</p>')
@@ -3143,7 +3214,11 @@ data collected. This information will accompany every prompt sent to the AI, res
                     if len(self.app.ai.ai_streaming_output) != len(txt) and len(txt) == 0:
                         txt = _('Thinking...')
                     txt = self.replace_references(txt, streaming=True)
-                    txt = render_markdown_to_html(txt, hr_color=self.markdown_hr_color)
+                    txt = render_markdown_to_html(
+                        txt,
+                        hr_color=self.ai_response_color,
+                        hr_width_px=markdown_hr_width,
+                    )
                     txt = f'{self._ai_agent_heading_html(chat_idx=self.current_chat_idx, fallback_to_current=True)}{txt}'
                     html_parts.append(f'<div style={self.ai_response_style}>{txt}</div>')
                 elif not self._chat_scope_active(self.current_chat_idx): # streaming finished, add actions
