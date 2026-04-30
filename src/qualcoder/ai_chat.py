@@ -3204,7 +3204,10 @@ data collected. This information will accompany every prompt sent to the AI, res
                         html_parts.append(f'<p style={self.ai_response_style}>{txt}</p>')
                     elif msg_type == 'info':
                         txt = self._message_heading_html(_("Info:"))
-                        txt += msg[4].replace('\n', '<br />')
+                        txt += render_markdown_to_html(
+                            msg[4],
+                            hr_width_px=markdown_hr_width,
+                        )
                         html_parts.append(f'<p style={self.ai_info_style}>{txt}</p>')
                 flush_agent_status_block()
                 # add partially streamed ai response if needed
