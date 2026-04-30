@@ -63,6 +63,8 @@ path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 topic_analysis_max_chunks = 30
+code_analysis_max_segments_total = 200
+code_analysis_min_segment_coverage = 0.30
 
 MARKDOWN_RENDERER = MarkdownIt(
     "commonmark",
@@ -1128,7 +1130,7 @@ class DialogAIChat(QtWidgets.QDialog):
 
     def _is_agent_chat_type(self, analysis_type: str) -> bool:
         normalized = str(analysis_type if analysis_type is not None else '').strip().lower()
-        return normalized in ('general chat', 'agent chat', 'topic_exploration')
+        return normalized in ('general chat', 'agent chat', 'topic_exploration', 'code_analysis')
 
     def _display_chat_type_label(self, analysis_type: str, preserve_legacy_general: bool = False) -> str:
         normalized = str(analysis_type if analysis_type is not None else '').strip().lower()
@@ -1137,6 +1139,10 @@ class DialogAIChat(QtWidgets.QDialog):
             return raw_value or 'general chat'
         if normalized == 'agent chat':
             return _('AI Agent Chat')
+        if normalized == 'code_analysis':
+            return _('Code analysis')
+        if normalized == 'code chat':
+            return _('Code analysis (legacy)')
         if normalized == 'topic_exploration':
             return _('Topic exploration')
         if normalized == 'topic chat':
@@ -1220,7 +1226,9 @@ class DialogAIChat(QtWidgets.QDialog):
             tooltip_text = self._chat_tooltip_text(chat)
 
             # Creating a new QListWidgetItem
-            if str(analysis_type).strip().lower() == 'topic_exploration':
+            if str(analysis_type).strip().lower() == 'code_analysis':
+                icon = self.app.ai.code_analysis_icon()
+            elif str(analysis_type).strip().lower() == 'topic_exploration':
                 icon = self.app.ai.topic_exploration_icon()
             elif self._is_agent_chat_type(analysis_type):
                 icon = self.app.ai.general_chat_icon()
@@ -1692,17 +1700,22 @@ class DialogAIChat(QtWidgets.QDialog):
         if len(normalized_ids) == 0:
             return []
         placeholders = ",".join(["?"] * len(normalized_ids))
-        cursor = self.app.conn.cursor()
+        db_path = os.path.join(self.app.project_path, 'data.qda')
+        conn = sqlite3.connect(db_path)
         try:
+            cursor = conn.cursor()
             cursor.execute(
                 f"SELECT name FROM source WHERE id IN ({placeholders}) ORDER BY CASE id "
                 + " ".join(f"WHEN ? THEN {idx}" for idx in range(len(normalized_ids)))
                 + " ELSE 999999 END",
                 tuple(normalized_ids + normalized_ids),
             )
+            rows = cursor.fetchall()
         except Exception:
             return []
-        return [str(row[0]).strip() for row in cursor.fetchall() if row is not None and row[0] is not None]
+        finally:
+            conn.close()
+        return [str(row[0]).strip() for row in rows if row is not None and row[0] is not None]
 
     def _topic_exploration_scope_env_update(self, topic_name: str, topic_description: str,
                                             file_ids: List[int], filter_info: Optional[Dict[str, Any]] = None) -> str:
@@ -2015,6 +2028,433 @@ class DialogAIChat(QtWidgets.QDialog):
             result["error"] = _('Error during MCP-based topic exploration bootstrap: ') + str(err)
             return result
 
+    def _selected_code_names(self, code_ids: List[int]) -> List[str]:
+        """Return ordered code names for the selected code ids."""
+
+        normalized_ids: List[int] = []
+        for raw in list(code_ids or []):
+            try:
+                code_id = int(raw)
+            except Exception:
+                continue
+            if code_id > 0 and code_id not in normalized_ids:
+                normalized_ids.append(code_id)
+        if len(normalized_ids) == 0:
+            return []
+        placeholders = ",".join(["?"] * len(normalized_ids))
+        db_path = os.path.join(self.app.project_path, 'data.qda')
+        conn = sqlite3.connect(db_path)
+        try:
+            cursor = conn.cursor()
+            cursor.execute(
+                f"SELECT name FROM code_name WHERE cid IN ({placeholders}) ORDER BY CASE cid "
+                + " ".join(f"WHEN ? THEN {idx}" for idx in range(len(normalized_ids)))
+                + " ELSE 999999 END",
+                tuple(normalized_ids + normalized_ids),
+            )
+            rows = cursor.fetchall()
+        except Exception:
+            return []
+        finally:
+            conn.close()
+        return [str(row[0]).strip() for row in rows if row is not None and row[0] is not None]
+
+    def _count_code_segments_for_selection(self, code_ids: List[int], file_ids: List[int], coder_names: List[str]) -> int:
+        """Count matching coded text segments for a code analysis selection."""
+
+        normalized_code_ids: List[int] = []
+        for raw in list(code_ids or []):
+            try:
+                code_id = int(raw)
+            except Exception:
+                continue
+            if code_id > 0 and code_id not in normalized_code_ids:
+                normalized_code_ids.append(code_id)
+        if len(normalized_code_ids) == 0:
+            return 0
+
+        normalized_file_ids: List[int] = []
+        for raw in list(file_ids or []):
+            try:
+                file_id = int(raw)
+            except Exception:
+                continue
+            if file_id > 0 and file_id not in normalized_file_ids:
+                normalized_file_ids.append(file_id)
+
+        normalized_coders: List[str] = []
+        seen_coders: set[str] = set()
+        for raw in list(coder_names or []):
+            coder = str(raw if raw is not None else '').strip()
+            if coder == '':
+                continue
+            key = coder.casefold()
+            if key in seen_coders:
+                continue
+            seen_coders.add(key)
+            normalized_coders.append(coder)
+
+        table_name = "code_text" if len(normalized_coders) > 0 else "code_text_visible"
+        if table_name == "code_text_visible" and not self.ai_mcp_server._view_exists("code_text_visible"):
+            return 0
+
+        where_parts = [f"cid IN ({','.join(['?'] * len(normalized_code_ids))})"]
+        params: List[Any] = list(normalized_code_ids)
+        if len(normalized_file_ids) > 0:
+            where_parts.append(f"fid IN ({','.join(['?'] * len(normalized_file_ids))})")
+            params.extend(normalized_file_ids)
+        if len(normalized_coders) > 0:
+            where_parts.append(f"owner IN ({','.join(['?'] * len(normalized_coders))})")
+            params.extend(normalized_coders)
+
+        db_path = os.path.join(self.app.project_path, 'data.qda')
+        conn = sqlite3.connect(db_path)
+        try:
+            cursor = conn.cursor()
+            cursor.execute(
+                f"SELECT COUNT(*) FROM {table_name} WHERE " + " AND ".join(where_parts),
+                tuple(params),
+            )
+            row = cursor.fetchone()
+            if row is None or row[0] is None:
+                return 0
+            return int(row[0])
+        finally:
+            conn.close()
+
+    def _distribute_integer_budget(self, total_budget: int, item_count: int) -> List[int]:
+        """Distribute a positive integer budget across items, preserving at least one per item."""
+
+        if item_count <= 0:
+            return []
+        if total_budget <= 0:
+            return [1] * item_count
+        if item_count >= total_budget:
+            return [1] * item_count
+        base = total_budget // item_count
+        remainder = total_budget % item_count
+        budgets = [base] * item_count
+        for idx in range(remainder):
+            budgets[idx] += 1
+        return [max(1, value) for value in budgets]
+
+    def _code_analysis_segments_uri(self, cid: int, file_ids: List[int], coder_names: List[str],
+                                    max_segments: int, max_chars: int) -> str:
+        """Build the MCP coded-segments URI used to bootstrap one code analysis chat."""
+
+        params: List[Tuple[str, str]] = [
+            ("strategy", "diverse_by_document"),
+            ("max_segments", str(max(1, int(max_segments)))),
+            ("max_chars", str(max(1, int(max_chars)))),
+        ]
+        for raw_file_id in list(file_ids or []):
+            try:
+                file_id = int(raw_file_id)
+            except Exception:
+                continue
+            if file_id > 0:
+                params.append(("file_ids", str(file_id)))
+        seen_coders: set[str] = set()
+        for raw in list(coder_names or []):
+            coder = str(raw if raw is not None else '').strip()
+            if coder == '':
+                continue
+            key = coder.casefold()
+            if key in seen_coders:
+                continue
+            seen_coders.add(key)
+            params.append(("owner", coder))
+        return f"qualcoder://codes/segments/{int(cid)}?" + urlencode(params, doseq=True)
+
+    def _code_analysis_filter_summary(self, file_ids: List[int], coder_names: List[str],
+                                      filter_info: Optional[Dict[str, Any]] = None) -> str:
+        """Build a compact coder/material summary for the code analysis chat header."""
+
+        material_summary = self._topic_exploration_filter_summary(file_ids, filter_info)
+        normalized_coders: List[str] = []
+        seen_coders: set[str] = set()
+        for raw in list(coder_names or []):
+            coder = str(raw if raw is not None else '').strip()
+            if coder == '':
+                continue
+            key = coder.casefold()
+            if key in seen_coders:
+                continue
+            seen_coders.add(key)
+            normalized_coders.append(coder)
+        if len(normalized_coders) == 0:
+            return _('Visible coders; ') + material_summary
+        return _('Coders: {}; ').format(", ".join(normalized_coders)) + material_summary
+
+    def _code_analysis_scope_env_update(self, code_name: str, code_memo: str, code_ids: List[int],
+                                        coder_names: List[str], file_ids: List[int],
+                                        filter_info: Optional[Dict[str, Any]] = None) -> str:
+        """Build one durable scope note for code analysis agent chats."""
+
+        focus_name = str(code_name if code_name is not None else '').strip()
+        memo_text = str(code_memo if code_memo is not None else '').strip()
+        selected_codes = self._selected_code_names(code_ids)
+        coder_summary = self._code_analysis_filter_summary(file_ids, coder_names, filter_info)
+
+        lines = [
+            'System event: This AI agent chat was started in code analysis mode.',
+            f'Focus code or category: "{focus_name}".',
+        ]
+        if memo_text != '':
+            lines.append('Code memo: ' + memo_text)
+        if len(selected_codes) > 1:
+            preview = ", ".join(selected_codes[:8])
+            if len(selected_codes) > 8:
+                preview += ', ...'
+            lines.append(f'Selected subcodes ({len(selected_codes)}): {preview}')
+        elif len(selected_codes) == 1:
+            lines.append('Selected code: ' + selected_codes[0])
+        lines.append('Selected coding scope: ' + coder_summary)
+        lines.append('Base the analysis on the selected coded segments. If additional project material would be helpful, ask the user for permission before including it.')
+        return "\n".join(lines)
+
+    def _code_analysis_final_bootstrap_prompt(self, code_name: str, code_memo: str, prompt: AgentPromptRecord,
+                                              code_ids: List[int]) -> str:
+        """Build the complete first-turn contract for one code analysis agent chat."""
+
+        focus_name = str(code_name if code_name is not None else '').strip()
+        memo_text = str(code_memo if code_memo is not None else '').strip()
+        prompt_name = str(prompt.name if prompt is not None and prompt.name is not None else '').strip()
+        selected_codes = self._selected_code_names(code_ids)
+        if memo_text == '':
+            memo_text = _('(no memo provided)')
+        code_scope_text = _('one selected code')
+        if len(selected_codes) > 1:
+            code_scope_text = _('{} selected codes').format(len(selected_codes))
+        return (
+            "Your task: "
+            f'Begin the code analysis for "{focus_name}" now. '
+            "Provide the first substantial code analysis answer for the user based on the conversation and retrieved project context. "
+            f'Code memo: {memo_text}\n'
+            f'The selected analysis prompt "/{prompt_name}" is active for this chat.\n'
+            f'The coded segments for {code_scope_text} are already available in this conversation as MCP resource results. '
+            "Treat MCP execution as already finished for this turn and begin the analysis directly. "
+            "Use the retrieved coded segments to produce the first substantive analysis, grounded in the empirical data. "
+            "Write a detailed, well-structured analytical response rather than a short summary. "
+            "Do not output JSON. "
+            "Do not mention internal MCP stage constraints. "
+            "Do not make empirical claims without support from retrieved evidence. If support is uncertain, state the uncertainty clearly. "
+            "If you need more of the already selected coded segments, continue from the cursor of the corresponding code-segment resource result. "
+            "Do not include additional project material without the user's permission. "
+            "When you refer to empirical text evidence, add citations in this exact form: "
+            "{REF: \"exact quote from the retrieved evidence\"}. "
+            "The quote inside REF must be copied exactly from retrieved evidence (no paraphrasing, no corrections, no translation). "
+            "Important: REF is machine markup and the quote text inside REF is not shown as normal readable text to the user. "
+            "If you want a direct quote to be visible, write the quote explicitly in normal prose and add REF separately."
+        )
+
+    def _mcp_code_analysis_worker(self, messages: List[Any], chat_idx: int,
+                                  bootstrap_spec: Dict[str, Any], signals=None) -> Dict[str, Any]:
+        """Run the first code analysis turn on top of the normal MCP agent flow."""
+
+        result: Dict[str, Any] = {
+            "chat_idx": chat_idx,
+            "stream_messages": [],
+            "tool_messages": [],
+            "canceled": False,
+            "direct_ai_message": "",
+            "direct_info_message": "",
+        }
+        spec = dict(bootstrap_spec) if isinstance(bootstrap_spec, dict) else {}
+        focus_name = str(spec.get("code_name", "")).strip()
+        code_memo = str(spec.get("code_memo", "")).strip()
+        file_ids = list(spec.get("file_ids", []) or [])
+        code_ids = list(spec.get("code_ids", []) or [])
+        coder_names = list(spec.get("coder_names", []) or [])
+        prompt_name = str(spec.get("prompt_name", "")).strip()
+
+        prompt_record = self.agent_prompts_catalog.find_prompt_variant(
+            prompt_name,
+            str(spec.get("prompt_scope", "")).strip(),
+            prompt_type="code_analysis",
+            apply_init=False,
+        )
+        if prompt_record is None:
+            raise ValueError(_("The selected code analysis prompt could not be loaded."))
+
+        normalized_code_ids: List[int] = []
+        for raw in code_ids:
+            try:
+                code_id = int(raw)
+            except Exception:
+                continue
+            if code_id > 0 and code_id not in normalized_code_ids:
+                normalized_code_ids.append(code_id)
+        if len(normalized_code_ids) == 0:
+            raise ValueError(_("No codes are available for this code analysis."))
+
+        history_messages: List[Any] = list(messages)
+        agent_messages: List[Any] = [msg for msg in history_messages if not isinstance(msg, SystemMessage)]
+        mcp_base_system_prompt = self._mcp_base_system_prompt()
+        tool_messages: List[Dict[str, str]] = []
+        tool_messages_streamed = signals is not None and getattr(signals, "progress", None) is not None
+        coverage_total_segments = 0
+        coverage_loaded_segments = 0
+        coverage_hit_max_char_limit = False
+        segment_budgets = self._distribute_integer_budget(code_analysis_max_segments_total, len(normalized_code_ids))
+        max_chars_total = max(4000, round(0.5 * (self.app.ai.large_llm_context_window * 4)))
+        char_budgets = self._distribute_integer_budget(max_chars_total, len(normalized_code_ids))
+        bootstrap_calls: List[Tuple[str, Dict[str, Any]]] = [
+            ("initialize", {}),
+            ("resources/list", {}),
+            ("resources/templates/list", {}),
+        ]
+        for idx, code_id in enumerate(normalized_code_ids):
+            bootstrap_calls.append(
+                (
+                    "resources/read",
+                    {
+                        "uri": self._code_analysis_segments_uri(
+                            code_id,
+                            file_ids,
+                            coder_names,
+                            segment_budgets[idx],
+                            char_budgets[idx],
+                        )
+                    },
+                )
+            )
+
+        def append_tool_exchange(method_name: str, method_params: Dict[str, Any], rpc_response: Dict[str, Any]):
+            call_content = json.dumps(
+                {"action": "mcp_call", "method": method_name, "params": method_params},
+                ensure_ascii=False,
+            )
+            result_content = self._compact_mcp_result_content(method_name, method_params, rpc_response)
+            agent_messages.append(AIMessage(content=call_content))
+            agent_messages.append(HumanMessage(content=result_content))
+            if tool_messages_streamed:
+                signals.progress.emit(json.dumps({
+                    "chat_idx": chat_idx,
+                    "msg_type": "tool_call",
+                    "msg_author": "ai_agent",
+                    "msg_content": call_content,
+                }, ensure_ascii=False))
+                signals.progress.emit(json.dumps({
+                    "chat_idx": chat_idx,
+                    "msg_type": "tool_result",
+                    "msg_author": "mcp_server",
+                    "msg_content": result_content,
+                }, ensure_ascii=False))
+            else:
+                tool_messages.append({"msg_type": "tool_call", "msg_author": "ai_agent", "msg_content": call_content})
+                tool_messages.append({"msg_type": "tool_result", "msg_author": "mcp_server", "msg_content": result_content})
+
+        def append_single_instruct_log(content: str):
+            payload = json.dumps(
+                {"phase": "code_analysis", "role": "user", "content": content},
+                ensure_ascii=False,
+            )
+            if tool_messages_streamed:
+                signals.progress.emit(json.dumps({
+                    "chat_idx": chat_idx,
+                    "msg_type": "single_instruct",
+                    "msg_author": "ai_agent",
+                    "msg_content": payload,
+                }, ensure_ascii=False))
+            else:
+                tool_messages.append({"msg_type": "single_instruct", "msg_author": "ai_agent", "msg_content": payload})
+
+        def accumulate_code_segment_coverage(rpc_response: Dict[str, Any]) -> None:
+            nonlocal coverage_total_segments, coverage_loaded_segments, coverage_hit_max_char_limit
+
+            if not isinstance(rpc_response, dict):
+                return
+            result_payload = rpc_response.get("result", None)
+            if not isinstance(result_payload, dict):
+                return
+            contents = result_payload.get("contents", [])
+            if not isinstance(contents, list):
+                return
+            for item in contents:
+                if not isinstance(item, dict):
+                    continue
+                uri = str(item.get("uri", "")).split("?", 1)[0].strip()
+                if re.fullmatch(r"qualcoder://codes/segments/\d+", uri) is None:
+                    continue
+                payload: Optional[Dict[str, Any]] = None
+                text_blob = item.get("text", None)
+                if isinstance(text_blob, str) and text_blob.strip() != "":
+                    try:
+                        parsed = json.loads(text_blob)
+                    except Exception:
+                        parsed = None
+                    if isinstance(parsed, dict):
+                        payload = parsed
+                if payload is None:
+                    raw_payload = item.get("payload", None)
+                    if isinstance(raw_payload, dict):
+                        payload = raw_payload
+                if not isinstance(payload, dict):
+                    continue
+                selection = payload.get("selection", {})
+                segments = payload.get("segments", [])
+                if isinstance(selection, dict):
+                    coverage_total_segments += max(0, int(selection.get("total_segments", 0) or 0))
+                    coverage_hit_max_char_limit = (
+                        coverage_hit_max_char_limit or bool(selection.get("hit_max_char_limit", False))
+                    )
+                if isinstance(segments, list):
+                    coverage_loaded_segments += len(segments)
+
+        try:
+            self._emit_mcp_status_text(signals, chat_idx, _('Preparing coded segments...'), status_kind="planning")
+            for method, params in bootstrap_calls:
+                if self.app.ai.is_current_run_canceled():
+                    result["canceled"] = True
+                    return result
+                status_text = self.ai_mcp_server.describe_status_event(method, params)
+                self._emit_mcp_status(signals, chat_idx, status_text)
+                _request, response = self._run_mcp_request(method, params)
+                append_tool_exchange(method, params, response)
+                if method == "resources/read":
+                    accumulate_code_segment_coverage(response)
+
+            coverage_ratio = 1.0
+            if coverage_total_segments > 0:
+                coverage_ratio = coverage_loaded_segments / coverage_total_segments
+            if coverage_hit_max_char_limit and coverage_ratio < code_analysis_min_segment_coverage:
+                result["tool_messages"] = tool_messages
+                result["direct_info_message"] = _(
+                    'The selected coded material is too large for a meaningful first-pass code analysis in one bootstrap step. '
+                    'Only {loaded} of {total} coded segments ({coverage:.1f}%) could be loaded before the character limit was reached. '
+                    'Please narrow the scope by code, files, cases, attributes, or coders. '
+                    'If you still want to continue, send a follow-up message such as "Analyze anyway".'
+                ).format(
+                    loaded=coverage_loaded_segments,
+                    total=coverage_total_segments,
+                    coverage=coverage_ratio * 100.0,
+                )
+                return result
+
+            self._emit_mcp_status(signals, chat_idx, _('Preparing response...'))
+            final_system_prompt = self._build_mcp_combined_system_prompt(
+                self._code_analysis_final_bootstrap_prompt(
+                    focus_name,
+                    code_memo,
+                    prompt_record,
+                    normalized_code_ids,
+                )
+            )
+            final_request = final_system_prompt.strip()
+            append_single_instruct_log(final_request)
+            final_stream_messages: List[Any] = []
+            if mcp_base_system_prompt != "":
+                final_stream_messages.append(SystemMessage(content=mcp_base_system_prompt))
+            final_stream_messages.extend(agent_messages)
+            final_stream_messages.append(HumanMessage(content=final_request))
+            result["stream_messages"] = final_stream_messages
+            result["tool_messages"] = tool_messages
+            return result
+        except Exception as err:
+            result["error"] = _('Error during MCP-based code analysis bootstrap: ') + str(err)
+            return result
+
     def new_text_analysis(self):
         """analyze a piece of text from an empirical document"""
         if self.app.project_name == "":
@@ -2041,8 +2481,8 @@ class DialogAIChat(QtWidgets.QDialog):
         else:
             return
 
-    def new_code_chat(self):
-        """chat about codings"""
+    def new_code_analysis(self):
+        """Start a new code analysis as an MCP-backed AI agent chat."""
         if self.app.project_name == "":
             msg = _('No project open.')
             Message(self.app, _('AI not enabled'), msg, "warning").exec()
@@ -2055,103 +2495,31 @@ class DialogAIChat(QtWidgets.QDialog):
         ui = DialogAiSearch(self.app, 'code_analysis')
         ret = ui.exec()
         if ret == QtWidgets.QDialog.DialogCode.Accepted:
-            self.ai_text_doc_id = None
-            self.ai_search_code_name = ui.selected_code_name
-            self.ai_search_code_memo = ui.selected_code_memo
-            self.ai_search_file_ids = ui.selected_file_ids
-            self.ai_search_code_ids = ui.selected_code_ids
-            self.ai_search_coder_names = ui.coder_names
-            self.ai_prompt = ui.current_prompt
-            # fetch data
-            # This SQL sorts the results by file id, but not like 1, 1, 1, 2, 2, 3... 
-            # Instead, the results are mixed up in this order: file id = 1, 2, 3, 1, 2, 1...
-            # This tries to ensure that even if the data send to the AI must be cut off at some point 
-            # because of the token limit, there will at least be data from as many different files as 
-            # possible included in the analysis.
-            # The JOIN also adds the source.name so that the AI can refer to a certain document
-            # by its name.     
+            code_name = str(ui.selected_code_name if ui.selected_code_name is not None else '').strip()
+            code_memo = str(ui.selected_code_memo if ui.selected_code_memo is not None else '').strip()
+            file_ids = list(ui.selected_file_ids or [])
+            code_ids = list(ui.selected_code_ids or [])
+            coder_names = list(ui.coder_names or [])
+            filter_info = dict(ui.selected_filter_info) if isinstance(ui.selected_filter_info, dict) else {}
+            prompt_record = ui.current_prompt
+            if prompt_record is None:
+                msg = _('The selected code analysis prompt could not be loaded.')
+                Message(self.app, _('AI prompts'), msg, "warning").exec()
+                return
 
-            code_ids = list(self.ai_search_code_ids or [])
-            file_ids = list(self.ai_search_file_ids or [])
-            coder_names = list(self.ai_search_coder_names or [])
-
-            code_ph  = ",".join(["?"] * len(code_ids))
-            file_ph  = ",".join(["?"] * len(file_ids))
-            owner_ph = ",".join(["?"] * len(coder_names))
-
-            sql = f"""
-                SELECT ordered.*, source.name, code_name.name AS code_name
-                FROM (
-                    SELECT *,
-                        ROW_NUMBER() OVER (PARTITION BY fid ORDER BY ctid) AS rn
-                    FROM code_text
-                    WHERE cid IN ({code_ph})
-                    AND fid IN ({file_ph})
-                    AND owner IN ({owner_ph})
-                ) AS ordered
-                JOIN source ON ordered.fid = source.id
-                JOIN code_name ON ordered.cid = code_name.cid
-                ORDER BY ordered.rn, ordered.fid;
-            """
-
-            params = [*code_ids, *file_ids, *coder_names]
-
-            cursor = self.app.conn.cursor()
-            cursor.execute(sql, params)
-            self.curr_codings = cursor.fetchall()
-            
-            if len(self.curr_codings) == 0:
+            segment_count = self._count_code_segments_for_selection(code_ids, file_ids, coder_names)
+            if segment_count == 0:
                 msg = _('No codings found for this particuar combination of coder, document filter, and code.')
                 Message(self.app, _('Code analysis'), msg, 'warning').exec()
                 return
-            
-            ai_data = []
-            # Limit the amount of data (characters) send to the ai, so the maximum context window is not exceeded.
-            # As a rough estimation, one token is about 4 characters long (in english). 
-            # We want to fill not more than half the context window with our data, so that there is enough
-            # room for the answer and further chats.
-            max_ai_data_length = round(0.5 * (self.app.ai.large_llm_context_window * 4)) 
-            max_ai_data_length_reached = False
-            ai_data_length = 0
-            for row in self.curr_codings:
-                if ai_data_length >= max_ai_data_length:
-                    max_ai_data_length_reached = True
-                    break
-                
-                fulltext = self.app.get_text_fulltext(row[2])
-                line_start, line_end = self.app.get_line_numbers(fulltext, row[4], row[5])
-                ai_data.append({
-                    'source_id': row[0],
-                    'source_name': row[12],
-                    'quote': row[3],
-                    'line_start': line_start,
-                    'line_end': line_end,
-                    'code_name': row[13]
-                })
-                ai_data_length = ai_data_length + len(row[3])
-            if len(ai_data) == 0:
-                msg = _('No coded text found. Please select another code or category, or refine you filters.')
-                Message(self.app, _('AI code analysis'), msg, "warning").exec()
-                return    
-            ai_data_json = json.dumps(ai_data)
-            
-            ai_instruction = (
-                f'You are discussing the code or category named "{self.ai_search_code_name}" with the following code memo: "{self.ai_search_code_memo}". \n'
-                f'Here is a list of quotes from the empirical data that have been coded with the given code or with subcodes under the given category:\n'
-                f'{ai_data_json}\n'
-                f'Your task is to analyze the given empirical data following these instructions: {self.ai_prompt.content}\n'
-                f'The whole discussion should be based upon the the empirical data provided and its proper interpretation. '
-                f'Do not make any assumptions which are not supported by the data '
-                f'Please mention the sources that your refer to from the given empirical data, using an html anchor tag of the following form: '
-                '<a href="coding:{source_id}">{source_name}: {line_start} - {line_end}</a>\n' 
-                f'Always answer in the following language: "{self.app.ai.get_curr_language()}".'
-            )    
-            
-            summary = _('Analyzing the data coded as "{}" ({} pieces of data sent to the AI.)').format(self.ai_search_code_name, len(ai_data))
-            if max_ai_data_length_reached:
-                summary += _('\nATTENTION: There was more coded data found, but it had to be truncated because of the limited context window of the AI.')
-            logger.debug(f'New code chat. Prompt:\n{ai_instruction}')
-            self.new_chat(_('Code') + f' "{self.ai_search_code_name}"', 'code chat', summary, prompt_name_and_scope(self.ai_prompt))
+
+            summary = _('Analyzing the data coded as "{}" ({} matching segments in scope.)').format(code_name, segment_count)
+            if code_memo != '':
+                summary += _('\nMemo:') + f' {code_memo}'
+            summary += _('\nPrompt:') + f' {prompt_name_and_scope(prompt_record)}'
+            summary += _('\nMaterial:') + ' ' + self._code_analysis_filter_summary(file_ids, coder_names, filter_info)
+            logger.debug('New code analysis chat.')
+            self.new_chat(_('Code analysis') + f' "{code_name}"', 'code_analysis', summary, prompt_name_and_scope(prompt_record))
             # warn if project memo empty 
             project_memo = extract_ai_memo(self.app.get_project_memo())
             if self.app.settings.get('ai_send_project_memo', 'True') == 'True' and len(project_memo) == 0:
@@ -2159,10 +2527,31 @@ class DialogAIChat(QtWidgets.QDialog):
 to include a short description of your project\'s research topics, questions, objectives, and the empirical \
 data collected. This information will accompany every prompt sent to the AI, resulting in much more targeted results.')
                 self.process_message('info', msg)
-            # start analysis
-            self.process_message('system', self.app.ai.get_default_system_prompt())
-            self.process_message('instruct', ai_instruction)
-            self.update_chat_window()  
+
+            chat_idx = self.current_chat_idx
+            self._persist_agent_prompt_record(chat_idx, prompt_record)
+            self.process_message(
+                'env_update',
+                self._code_analysis_scope_env_update(code_name, code_memo, code_ids, coder_names, file_ids, filter_info),
+                chat_idx,
+            )
+            bootstrap_spec = {
+                "code_name": code_name,
+                "code_memo": code_memo,
+                "code_ids": code_ids,
+                "coder_names": coder_names,
+                "file_ids": file_ids,
+                "filter_info": filter_info,
+                "prompt_name": prompt_record.name,
+                "prompt_scope": prompt_record.scope,
+            }
+            messages = self.history_get_ai_messages()
+            self._start_mcp_agent_worker(messages, chat_idx, self._mcp_code_analysis_worker, bootstrap_spec)
+
+    def new_code_chat(self):
+        """Legacy alias for starting a new code analysis chat."""
+
+        self.new_code_analysis()
  
     def new_topic_exploration(self):
         """Start a new topic exploration as an MCP-backed AI agent chat."""
@@ -3032,7 +3421,7 @@ data collected. This information will accompany every prompt sent to the AI, res
         action_text_analysis.setToolTip(_('Analyse a piece of text from your empirical data together with the AI.'))
         action_codings_analysis = menu.addAction(_('New code analysis chat'))
         action_codings_analysis.setIcon(self.app.ai.code_analysis_icon())
-        action_codings_analysis.setToolTip(_('Analyze the data collected under a certain code together with the AI.'))
+        action_codings_analysis.setToolTip(_('Analyze the data collected under a certain code together with the AI agent.'))
 
         # Obtain the bottom-left point of the button in global coordinates
         button_rect = self.ui.pushButton_new_analysis.rect()  # Get the button's rect
@@ -3046,7 +3435,7 @@ data collected. This information will accompany every prompt sent to the AI, res
         if action == action_text_analysis:
             self.new_text_analysis()
         elif action == action_codings_analysis:
-            self.new_code_chat()
+            self.new_code_analysis()
         elif action == action_topic_exploration:
             self.new_topic_exploration()
         elif action == action_general_chat:
@@ -5115,6 +5504,13 @@ data collected. This information will accompany every prompt sent to the AI, res
         direct_ai_message = str(mcp_result.get("direct_ai_message", "")).strip()
         if direct_ai_message != "":
             self.process_message('ai', direct_ai_message, chat_idx)
+            self._clear_chat_ai_profile_snapshot(chat_idx)
+            self._update_undo_button_state()
+            return
+
+        direct_info_message = str(mcp_result.get("direct_info_message", "")).strip()
+        if direct_info_message != "":
+            self.process_message('info', direct_info_message, chat_idx)
             self._clear_chat_ai_profile_snapshot(chat_idx)
             self._update_undo_button_state()
             return

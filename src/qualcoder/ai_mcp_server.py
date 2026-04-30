@@ -495,7 +495,8 @@ class AiMcpServer:
                     name="Coded text segments by code id",
                     description=(
                         "Read coded text segments for a code id. Optional query params: strategy "
-                        "(diverse_by_document|recent_first|sequential), max_segments, max_chars, cursor, file_ids."
+                        "(diverse_by_document|recent_first|sequential), max_segments, max_chars, cursor, file_ids, owner. "
+                        "If owner is set, the server reads from code_text instead of code_text_visible."
                     ),
                     mimeType="application/json",
                 ),
@@ -1995,6 +1996,7 @@ class AiMcpServer:
                     continue
                 file_ids.append(max(0, self._to_int(part, -1)))
         file_ids = [fid for fid in file_ids if fid > 0]
+        owners = self._parse_string_list_options(query, ("owner", "owners"))
 
         return {
             "strategy": strategy,
@@ -2002,7 +2004,26 @@ class AiMcpServer:
             "max_chars": max_chars,
             "cursor": cursor,
             "file_ids": file_ids,
+            "owners": owners,
         }
+
+    def _parse_string_list_options(self, query: Dict[str, List[str]], keys: Tuple[str, ...]) -> List[str]:
+        values: List[str] = []
+        for key in keys:
+            for raw in query.get(key, []):
+                parts = [p.strip() for p in str(raw).split(",")]
+                for part in parts:
+                    if part != "":
+                        values.append(part)
+        unique_values: List[str] = []
+        seen: set[str] = set()
+        for value in values:
+            norm = value.casefold()
+            if norm in seen:
+                continue
+            seen.add(norm)
+            unique_values.append(value)
+        return unique_values
 
     def _parse_positive_int_list_options(self, query: Dict[str, List[str]], keys: Tuple[str, ...]) -> List[int]:
         values: List[int] = []
@@ -3127,10 +3148,16 @@ class AiMcpServer:
         file_ids = options.get("file_ids", [])
         if not isinstance(file_ids, list):
             file_ids = []
+        owners = options.get("owners", [])
+        if not isinstance(owners, list):
+            owners = []
 
-        if not self._view_exists("code_text_visible"):
-            raise RuntimeError("Required view 'code_text_visible' not found.")
-        table_name = "code_text_visible"
+        if len(owners) > 0:
+            table_name = "code_text"
+        else:
+            if not self._view_exists("code_text_visible"):
+                raise RuntimeError("Required view 'code_text_visible' not found.")
+            table_name = "code_text_visible"
 
         where_parts = ["ct.cid=?"]
         where_params: List[Any] = [cid]
@@ -3138,6 +3165,10 @@ class AiMcpServer:
             placeholders = ",".join(["?"] * len(file_ids))
             where_parts.append(f"ct.fid IN ({placeholders})")
             where_params.extend(file_ids)
+        if len(owners) > 0:
+            placeholders = ",".join(["?"] * len(owners))
+            where_parts.append(f"ct.owner IN ({placeholders})")
+            where_params.extend(owners)
         where_sql = " WHERE " + " AND ".join(where_parts)
 
         count_sql = f"SELECT count(*) FROM {table_name} AS ct" + where_sql
@@ -3173,40 +3204,45 @@ class AiMcpServer:
                 "ordered.pos1, ordered.owner, source.name, code_name.name "
                 "FROM ("
                 "SELECT ct.ctid, ct.cid, ct.fid, ct.seltext, ct.pos0, ct.pos1, "
-                "ct.owner, ROW_NUMBER() OVER (PARTITION BY ct.fid ORDER BY ct.ctid) AS rn "
+                "ct.owner, ROW_NUMBER() OVER (PARTITION BY ct.fid ORDER BY ifnull(ct.pos0, ct.ctid), ct.ctid) AS rn "
                 f"FROM {table_name} AS ct "
                 + where_sql
                 + ") AS ordered "
                 "JOIN source ON source.id = ordered.fid "
                 "JOIN code_name ON code_name.cid = ordered.cid "
-                "ORDER BY ordered.rn, ordered.fid, ordered.ctid LIMIT ? OFFSET ?"
+                "ORDER BY ordered.rn, ordered.fid, ifnull(ordered.pos0, ordered.ctid), ordered.ctid LIMIT ? OFFSET ?"
             )
             segment_rows = self._fetchall(diverse_sql, tuple(where_params + [max_segments, cursor]))
+            segment_rows.sort(
+                key=lambda row: (
+                    int(row[2]) if row[2] is not None else 0,
+                    int(row[4]) if row[4] is not None else int(row[0]),
+                    int(row[0]) if row[0] is not None else 0,
+                )
+            )
 
         segments: List[Dict[str, Any]] = []
         used_chars = 0
+        hit_max_char_limit = False
         for row in segment_rows:
             if len(segments) >= max_segments:
                 break
 
             quote = "" if row[3] is None else str(row[3])
-            remaining_chars = max_chars - used_chars
-            if remaining_chars <= 0:
+            quote_length = len(quote)
+            if used_chars >= max_chars:
+                hit_max_char_limit = True
                 break
-
-            quote_truncated = False
-            quote_text = quote
-            if len(quote) > remaining_chars:
-                quote_text = quote[:remaining_chars]
-                quote_truncated = True
+            if used_chars + quote_length > max_chars:
+                hit_max_char_limit = True
+                break
 
             segments.append(
                 {
                     "ctid": row[0],
                     "cid": row[1],
                     "fid": row[2],
-                    "quote": quote_text,
-                    "quote_truncated": quote_truncated,
+                    "quote": quote,
                     "pos0": row[4],
                     "pos1": row[5],
                     "owner": row[6],
@@ -3214,9 +3250,7 @@ class AiMcpServer:
                     "code_name": row[8],
                 }
             )
-            used_chars += len(quote_text)
-            if quote_truncated:
-                break
+            used_chars += quote_length
 
         next_cursor = cursor + len(segments)
         if next_cursor > total_segments:
@@ -3235,6 +3269,7 @@ class AiMcpServer:
                 "total_segments": total_segments,
                 "next_cursor": next_cursor,
                 "truncated": truncated,
+                "hit_max_char_limit": hit_max_char_limit,
             },
             "segments": segments,
         }
