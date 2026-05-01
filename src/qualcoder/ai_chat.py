@@ -313,6 +313,7 @@ class DialogAIChat(QtWidgets.QDialog):
         self.ui.comboBox_ai_chats.currentIndexChanged.connect(self.combo_chat_selection_changed)
         self.ui.toolButton_close_sidebar.pressed.connect(self.close_sidebar_view)
         self.ui.toolButton_edit_title.pressed.connect(self.edit_title)
+        self.ai_output_splitter_is_restoring = True
         self.ui.splitter_ai_output.splitterMoved.connect(self.on_ai_output_splitter_moved)
         self.ui.ai_output.linkHovered.connect(self.on_linkHovered)
         self.ui.ai_output.linkActivated.connect(self.on_linkActivated)
@@ -1164,7 +1165,7 @@ class DialogAIChat(QtWidgets.QDialog):
         self._update_undo_button_state()
     
     def close(self):
-        self.on_ai_output_splitter_moved()
+        self.ai_output_splitter_save_timer.stop()
         self.persist_ai_output_splitter_setting()
         if self.chat_history_conn is not None:
             self.chat_history_conn.close()
@@ -1214,15 +1215,24 @@ class DialogAIChat(QtWidgets.QDialog):
             if self.ai_output_splitter_restore_attempts < 20:
                 self.ai_output_splitter_restore_attempts += 1
                 QtCore.QTimer.singleShot(0, self.restore_ai_output_splitter)
+            else:
+                self.ai_output_splitter_is_restoring = False
             return
         self.ai_output_splitter_restore_attempts = 0
         bottom_height = min(self._get_saved_ai_output_splitter_bottom(), max(1, total_height - 1))
         top_height = max(1, total_height - bottom_height)
-        self.ui.splitter_ai_output.setSizes([top_height, bottom_height])
+        self.ai_output_splitter_is_restoring = True
+        try:
+            with QtCore.QSignalBlocker(self.ui.splitter_ai_output):
+                self.ui.splitter_ai_output.setSizes([top_height, bottom_height])
+        finally:
+            self.ai_output_splitter_is_restoring = False
 
     def on_ai_output_splitter_moved(self, pos=None, index=None):
         """Track splitter movement and persist the current lower pane height."""
 
+        if getattr(self, 'ai_output_splitter_is_restoring', False):
+            return
         sizes = self.ui.splitter_ai_output.sizes()
         if len(sizes) < 2:
             return

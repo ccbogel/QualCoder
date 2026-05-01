@@ -1460,6 +1460,10 @@ class MainWindow(QtWidgets.QMainWindow):
             QtWidgets.QApplication.instance().setStyle("Fusion")
        
         QtWidgets.QMainWindow.__init__(self)
+        self.ai_sidebar_splitter_save_timer = QtCore.QTimer(self)
+        self.ai_sidebar_splitter_save_timer.setSingleShot(True)
+        self.ai_sidebar_splitter_save_timer.timeout.connect(self.persist_ai_sidebar_splitter_setting)
+        self.ai_sidebar_splitter_is_restoring = False
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         # Test of macOS menu bar
@@ -2266,6 +2270,14 @@ Click "Yes" to start now.')
             if len(sizes) >= 2 and sizes[1] > 0:
                 self.app.settings['ai_chat_sidebar_width'] = int(sizes[1])
 
+    def persist_ai_sidebar_splitter_setting(self):
+        """Write the AI sidebar splitter width to config.ini after drag operations settle."""
+
+        try:
+            self.app.write_config_ini(self.app.settings, self.app.ai_models)
+        except Exception as e_:
+            logger.debug(f"Could not persist ai sidebar splitter setting: {e_}")
+
     def _apply_ai_sidebar_splitter_sizes(self):
         """Apply main/sidebar splitter sizes from the stored sidebar width."""
 
@@ -2273,7 +2285,12 @@ Click "Yes" to start now.')
         total = sum(sizes) if sum(sizes) > 0 else 1000
         sidebar_width = self._get_saved_ai_sidebar_width(fallback_total=total)
         main_width = max(1, total - sidebar_width)
-        self.ui.splitter.setSizes([main_width, sidebar_width])
+        self.ai_sidebar_splitter_is_restoring = True
+        try:
+            with QtCore.QSignalBlocker(self.ui.splitter):
+                self.ui.splitter.setSizes([main_width, sidebar_width])
+        finally:
+            self.ai_sidebar_splitter_is_restoring = False
 
     def _restore_ai_splitters_after_show(self):
         """Re-apply saved splitter positions once window geometry is finalized."""
@@ -2380,8 +2397,11 @@ Click "Yes" to start now.')
     def on_main_splitter_moved(self, pos, index):  # pos/index are Qt callback args
         """Track current AI sidebar width while user drags splitter."""
 
+        if getattr(self, 'ai_sidebar_splitter_is_restoring', False):
+            return
         if self.ai_chat_sidebar_mode:
             self._remember_ai_sidebar_width()
+            self.ai_sidebar_splitter_save_timer.start(400)
 
     def tab_layout_helper(self, tab_widget, ui):
         """ Used when loading a coding, report or manage dialog  in to a tab widget.
@@ -2506,6 +2526,10 @@ Click "Yes" to start now.')
             if reply != QtWidgets.QMessageBox.StandardButton.Yes:
                 event.ignore()
                 return
+
+        if self.ai_chat_sidebar_mode:
+            self._remember_ai_sidebar_width()
+        self.ai_sidebar_splitter_save_timer.stop()
 
         self.close_project()
 
