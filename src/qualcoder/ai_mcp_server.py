@@ -399,9 +399,9 @@ class AiMcpServer:
         if uri_base == "qualcoder://vector/search":
             return _('Running semantic search in the project data...')
         if uri_base == "qualcoder://search/bm25":
-            return _('Running BM25 search in the project data...')
+            return _('Running keyword search in empirical data (BM25)...')
         if uri_base == "qualcoder://search/regex":
-            return _('Running keyword search in the project data...')
+            return _('Running keyword search in empirical data (Regex)...')
         code_segments_match = re.fullmatch(r"qualcoder://codes/segments/(\d+)", uri_base)
         if code_segments_match is not None:
             cid = int(code_segments_match.group(1))

@@ -5346,7 +5346,7 @@ data collected. This information will accompany every prompt sent to the AI, res
                 "user",
                 build_phase_request_message(planner_system_prompt, planner_user_prompt).content,
             )
-            self._emit_mcp_status_text(signals, chat_idx, _("Thinking..."))
+            self._emit_mcp_status_text(signals, chat_idx, _("Working..."), status_kind="planning")
             planner_messages = build_phase_messages(planner_system_prompt, planner_user_prompt)
             try:
                 plan_data = self._invoke_json_llm_with_step_timeout(
