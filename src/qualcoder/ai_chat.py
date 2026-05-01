@@ -357,11 +357,13 @@ class DialogAIChat(QtWidgets.QDialog):
         ai_output_size_policy = self.ui.ai_output.sizePolicy()
         ai_output_size_policy.setHorizontalPolicy(QtWidgets.QSizePolicy.Policy.Ignored)
         self.ui.ai_output.setSizePolicy(ai_output_size_policy)
+        self.ui.splitter_ai_output.setStretchFactor(0, 1)
+        self.ui.splitter_ai_output.setStretchFactor(1, 0)
         self.ai_output_splitter_save_timer = QtCore.QTimer(self)
         self.ai_output_splitter_save_timer.setSingleShot(True)
         self.ai_output_splitter_save_timer.timeout.connect(self.persist_ai_output_splitter_setting)
         self.ai_output_splitter_restore_attempts = 0
-        QtCore.QTimer.singleShot(0, self.restore_ai_output_splitter)
+        self.schedule_ai_output_splitter_restore()
         self.ui.scrollArea_ai_output.verticalScrollBar().valueChanged.connect(self.on_ai_output_scroll)
         self.set_sidebar_mode(False)
         QtCore.QTimer.singleShot(0, self._hide_transient_chat_overlays)
@@ -1203,23 +1205,46 @@ class DialogAIChat(QtWidgets.QDialog):
             bottom_height = 80
         return max(1, bottom_height)
 
+    def schedule_ai_output_splitter_restore(self):
+        """Restore the AI output splitter after the widget has a real visible layout."""
+
+        self.ai_output_splitter_restore_attempts = 0
+        self.ai_output_splitter_is_restoring = True
+        QtCore.QTimer.singleShot(0, self.restore_ai_output_splitter)
+        QtCore.QTimer.singleShot(60, self.restore_ai_output_splitter)
+        QtCore.QTimer.singleShot(180, self.restore_ai_output_splitter)
+
+    def showEvent(self, event):
+        """Restore splitter geometry when the embedded chat widget becomes visible."""
+
+        super().showEvent(event)
+        self.schedule_ai_output_splitter_restore()
+
     def restore_ai_output_splitter(self):
         """Restore splitter position so the lower pane defaults to 80px when unset."""
 
+        if not self.isVisible() or not self.ui.splitter_ai_output.isVisible():
+            return
+        saved_bottom_height = self._get_saved_ai_output_splitter_bottom()
         sizes = self.ui.splitter_ai_output.sizes()
         total_height = sum(sizes)
         if total_height <= 0:
             total_height = self.ui.splitter_ai_output.height()
+        minimum_top_height = 80
         if total_height <= 0:
             # Layout is not ready yet; retry briefly, but avoid endless retries.
             if self.ai_output_splitter_restore_attempts < 20:
                 self.ai_output_splitter_restore_attempts += 1
-                QtCore.QTimer.singleShot(0, self.restore_ai_output_splitter)
+                QtCore.QTimer.singleShot(30, self.restore_ai_output_splitter)
             else:
                 self.ai_output_splitter_is_restoring = False
             return
+        if total_height < saved_bottom_height + minimum_top_height and self.ai_output_splitter_restore_attempts < 20:
+            self.ai_output_splitter_restore_attempts += 1
+            QtCore.QTimer.singleShot(30, self.restore_ai_output_splitter)
+            return
         self.ai_output_splitter_restore_attempts = 0
-        bottom_height = min(self._get_saved_ai_output_splitter_bottom(), max(1, total_height - 1))
+        bottom_height = min(saved_bottom_height, max(1, total_height - minimum_top_height))
         top_height = max(1, total_height - bottom_height)
         self.ai_output_splitter_is_restoring = True
         try:
@@ -1313,7 +1338,7 @@ class DialogAIChat(QtWidgets.QDialog):
         self._hide_transient_chat_overlays()
         self.ui.gridLayout.invalidate()
         self.updateGeometry()
-        QtCore.QTimer.singleShot(0, self.restore_ai_output_splitter)
+        self.schedule_ai_output_splitter_restore()
 
     def close_sidebar_view(self):
         """Close sidebar mode and return AI chat to the main tab."""

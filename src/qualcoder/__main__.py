@@ -2296,7 +2296,7 @@ Click "Yes" to start now.')
         """Re-apply saved splitter positions once window geometry is finalized."""
 
         if self.ai_chat_window is not None:
-            self.ai_chat_window.restore_ai_output_splitter()
+            self.ai_chat_window.schedule_ai_output_splitter_restore()
         if self.ai_chat_sidebar_mode:
             self._apply_ai_sidebar_splitter_sizes()
             QtCore.QTimer.singleShot(30, self._apply_ai_sidebar_splitter_sizes)
@@ -2305,6 +2305,9 @@ Click "Yes" to start now.')
         """Store the most recent visible main tab other than AI Chat."""
 
         widget = self.ui.tabWidget.widget(index)
+        if widget == self.ui.tab_ai_chat and self.ai_chat_window is not None:
+            self.ai_chat_window.schedule_ai_output_splitter_restore()
+            return
         if widget is None or widget == self.ui.tab_ai_chat:
             return
         if not self.ui.tabWidget.isTabVisible(index):
