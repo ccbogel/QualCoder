@@ -302,6 +302,27 @@ class TestAiAgentPromptsCatalog(TestCase):
         with open(migrated_path, "r", encoding="utf-8") as handle:
             self.assertEqual("Already there", handle.read())
 
+    def test_migrate_legacy_prompts_skips_existing_target_case_insensitively(self):
+        self._write_prompt("user", "text-analysis/Existing-Prompt", "Already there")
+        self._write_legacy_prompts(
+            "user",
+            [
+                {
+                    "name": "Existing Prompt",
+                    "type": "text_analysis",
+                    "description": "Should skip",
+                    "text": "Legacy body",
+                }
+            ],
+        )
+
+        result = self.catalog.migrate_legacy_prompts_once()
+
+        self.assertEqual({"migrated": 0, "skipped": 1}, result["user"])
+        original_path = os.path.join(self.user_root, "text-analysis", "Existing-Prompt.md")
+        with open(original_path, "r", encoding="utf-8") as handle:
+            self.assertEqual("Already there", handle.read())
+
     def test_migrate_legacy_prompts_resolves_slug_collisions_with_suffixes(self):
         self._write_legacy_prompts(
             "user",

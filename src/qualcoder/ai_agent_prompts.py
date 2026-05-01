@@ -409,6 +409,9 @@ class AiAgentPromptsCatalog:
     def _conflict_key(self, name: str) -> str:
         return self._normalize_prompt_name(name).casefold()
 
+    def _portable_path_key(self, path: str) -> str:
+        return os.path.normcase(os.path.normpath(path)).casefold()
+
     def _normalize_prompt_name(self, name: str) -> str:
         text = str(name if name is not None else "").strip()
         if text == "":
@@ -451,7 +454,7 @@ class AiAgentPromptsCatalog:
             for filename in filenames:
                 if not filename.lower().endswith(".md"):
                     continue
-                result.add(os.path.normcase(os.path.normpath(os.path.join(dirpath, filename))))
+                result.add(self._portable_path_key(os.path.join(dirpath, filename)))
         return result
 
     def _slugify_prompt_filename(self, name: str, max_length: int = 64) -> str:
@@ -496,7 +499,7 @@ class AiAgentPromptsCatalog:
 
             while True:
                 candidate_path = os.path.join(target_dir, candidate_slug + ".md")
-                normalized_candidate = os.path.normcase(os.path.normpath(candidate_path))
+                normalized_candidate = self._portable_path_key(candidate_path)
                 if normalized_candidate not in used_paths:
                     used_paths.add(normalized_candidate)
                     planned.append((prompt, candidate_path))
