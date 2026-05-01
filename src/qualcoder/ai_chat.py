@@ -53,7 +53,6 @@ from .GUI.ui_ai_chat import Ui_Dialog_ai_chat
 from .helpers import Message
 from .confirm_delete import DialogConfirmDelete
 from .ai_agent_prompts import AiAgentPromptsCatalog, AgentPromptRecord, prompt_name_and_scope
-from .ai_prompts import PromptItem
 from .ai_llm import extract_ai_memo, ai_quote_search, strip_think_blocks, AICancelled
 from .ai_mcp_server import AiMcpServer
 from .error_dlg import qt_exception_hook
@@ -253,6 +252,7 @@ class DialogAIChat(QtWidgets.QDialog):
         prefixes = {
             "code_analysis": "code-analysis/",
             "topic_exploration": "topic-exploration/",
+            "text_analysis": "text-analysis/",
         }
         prefix = prefixes.get(analysis_type, "")
         if prefix != "" and prompt_label.startswith(prefix):
@@ -1364,7 +1364,7 @@ class DialogAIChat(QtWidgets.QDialog):
 
     def _is_agent_chat_type(self, analysis_type: str) -> bool:
         normalized = str(analysis_type if analysis_type is not None else '').strip().lower()
-        return normalized in ('general chat', 'agent chat', 'topic_exploration', 'code_analysis')
+        return normalized in ('general chat', 'agent chat', 'topic_exploration', 'code_analysis', 'text_analysis')
 
     def _display_chat_type_label(self, analysis_type: str, preserve_legacy_general: bool = False) -> str:
         normalized = str(analysis_type if analysis_type is not None else '').strip().lower()
@@ -1377,6 +1377,10 @@ class DialogAIChat(QtWidgets.QDialog):
             return _('Code analysis')
         if normalized == 'code chat':
             return _('Code analysis (legacy)')
+        if normalized == 'text_analysis':
+            return _('Text analysis')
+        if normalized == 'text chat':
+            return _('Text analysis (legacy)')
         if normalized == 'topic_exploration':
             return _('Topic exploration')
         if normalized == 'topic chat':
@@ -1462,6 +1466,8 @@ class DialogAIChat(QtWidgets.QDialog):
             # Creating a new QListWidgetItem
             if str(analysis_type).strip().lower() == 'code_analysis':
                 icon = self.app.ai.code_analysis_icon()
+            elif str(analysis_type).strip().lower() == 'text_analysis':
+                icon = self.app.ai.text_analysis_icon()
             elif str(analysis_type).strip().lower() == 'topic_exploration':
                 icon = self.app.ai.topic_exploration_icon()
             elif self._is_agent_chat_type(analysis_type):
@@ -2072,7 +2078,6 @@ class DialogAIChat(QtWidgets.QDialog):
             'Do not include additional project material without the user\'s permission. '
             'When referring to empirical text evidence, add citations in this exact form: {REF: "exact quote from the retrieved evidence"}. '
             'If you want a direct quote to be visible, write it in normal prose and add REF separately. '
-            'Respond with a detailed analysis rather than a short summary.'
         )
 
     def _mcp_topic_exploration_final_answer_system_prompt(self) -> str:
@@ -2083,7 +2088,6 @@ class DialogAIChat(QtWidgets.QDialog):
             "Provide the first substantial topic exploration answer for the user based on the conversation and retrieved project context. "
             "Do not output JSON. "
             "Treat MCP execution as already finished for this turn and begin the analysis directly. "
-            "Write a detailed, well-structured analytical response rather than a short summary. "
             "Do not mention internal MCP stage constraints. "
             "Do not make empirical claims without support from retrieved evidence. If support is uncertain, state the uncertainty clearly. "
             "When you refer to empirical text evidence, add citations in this exact form: "
@@ -2464,15 +2468,12 @@ class DialogAIChat(QtWidgets.QDialog):
             f'Begin the code analysis for "{focus_name}" now. '
             "Provide the first substantial code analysis answer for the user based on the conversation and retrieved project context. "
             f'Code memo: {memo_text}\n'
-            f'The selected analysis prompt "/{prompt_name}" is active for this chat.\n'
+            f'The selected analysis prompt "/{prompt_name}" is active for this chat. Use it.\n'
             f'The coded segments for {code_scope_text} are already available in this conversation as MCP resource results. '
             "Treat MCP execution as already finished for this turn and begin the analysis directly. "
-            "Use the retrieved coded segments to produce the first substantive analysis, grounded in the empirical data. "
-            "Write a detailed, well-structured analytical response rather than a short summary. "
             "Do not output JSON. "
             "Do not mention internal MCP stage constraints. "
             "Do not make empirical claims without support from retrieved evidence. If support is uncertain, state the uncertainty clearly. "
-            "If you need more of the already selected coded segments, continue from the cursor of the corresponding code-segment resource result. "
             "Do not include additional project material without the user's permission. "
             "When you refer to empirical text evidence, add citations in this exact form: "
             "{REF: \"exact quote from the retrieved evidence\"}. "
@@ -3036,11 +3037,169 @@ data collected. This information will accompany every prompt sent to the AI, res
             WHERE id IN ({placeholders})
         '''
         cursor.execute(query, topic_chat_embeddings_ids)
-        self.chat_history_conn.commit()           
-        
-    def new_text_chat(self, doc_id, doc_name, text, start_pos, prompt: PromptItem):
-        """Analyze a text passage from an empirical document
-        """
+        self.chat_history_conn.commit()
+
+    def _text_analysis_document_uri(self, doc_id: int, start_pos: int, text_length: int) -> str:
+        """Build the MCP document URI for one selected text passage."""
+
+        params = [
+            ("start", str(max(0, int(start_pos)))),
+            ("length", str(max(1, int(text_length)))),
+        ]
+        return f"qualcoder://documents/text/{int(doc_id)}?" + urlencode(params, doseq=True)
+
+    def _text_analysis_scope_env_update(self, doc_id: int, doc_name: str, start_pos: int, text_length: int) -> str:
+        """Build one durable scope note for text analysis agent chats."""
+
+        return "\n".join(
+            [
+                'System event: This AI agent chat was started in text analysis mode.',
+                f'Source document: "{str(doc_name).strip()}".',
+                f'Selected passage: quote:{int(doc_id)}_{int(start_pos)}_{int(text_length)} ({int(text_length)} characters).',
+                'Base the analysis on the selected text passage. If additional material from the same or another document would be helpful, ask the user for permission before including it.',
+            ]
+        )
+
+    def _text_analysis_final_bootstrap_prompt(self, doc_name: str, prompt: AgentPromptRecord,
+                                              text_length: int) -> str:
+        """Build the complete first-turn contract for one text analysis agent chat."""
+
+        prompt_name = str(prompt.name if prompt is not None and prompt.name is not None else '').strip()
+        source_name = str(doc_name if doc_name is not None else '').strip()
+        return (
+            "Your task: "
+            f'Begin the text analysis for the selected passage from "{source_name}" now. '
+            "Provide the first answer for the user based on the conversation and retrieved project context. "
+            f'The selected passage is {int(text_length)} characters long.\n'
+            f'The selected analysis prompt "/{prompt_name}" is active for this chat. Use it.\n'
+            'The selected text passage is already available in this conversation as an MCP resource result. '
+            'Treat MCP execution as already finished for this turn and begin the analysis directly. '
+            'Do not output JSON. '
+            'Do not mention internal MCP stage constraints. '
+            'Do not make empirical claims without support from retrieved evidence. If support is uncertain, state the uncertainty clearly. '
+            'Do not include additional project material without the user\'s permission. '
+            'When you refer to empirical text evidence, add citations in this exact form: '
+            '{REF: "exact quote from the retrieved evidence"}. '
+            'The quote inside REF must be copied exactly from retrieved evidence (no paraphrasing, no corrections, no translation). '
+            'Important: REF is machine markup and the quote text inside REF is not shown as normal readable text to the user. '
+            'If you want a direct quote to be visible, write the quote explicitly in normal prose and add REF separately.'
+        )
+
+    def _mcp_text_analysis_worker(self, messages: List[Any], chat_idx: int,
+                                  bootstrap_spec: Dict[str, Any], signals=None) -> Dict[str, Any]:
+        """Run the first text analysis turn on top of the normal MCP agent flow."""
+
+        result: Dict[str, Any] = {
+            "chat_idx": chat_idx,
+            "stream_messages": [],
+            "tool_messages": [],
+            "canceled": False,
+            "direct_ai_message": "",
+            "direct_info_message": "",
+        }
+        spec = dict(bootstrap_spec) if isinstance(bootstrap_spec, dict) else {}
+        doc_id = int(spec.get("doc_id", -1) or -1)
+        doc_name = str(spec.get("doc_name", "")).strip()
+        start_pos = int(spec.get("start_pos", 0) or 0)
+        text_length = int(spec.get("text_length", 0) or 0)
+        prompt_name = str(spec.get("prompt_name", "")).strip()
+        prompt_scope = str(spec.get("prompt_scope", "")).strip()
+
+        prompt_record = self.agent_prompts_catalog.find_prompt_variant(
+            prompt_name,
+            prompt_scope,
+            prompt_type="text_analysis",
+            apply_init=False,
+        )
+        if prompt_record is None:
+            raise ValueError(_("The selected text analysis prompt could not be loaded."))
+        if doc_id <= 0 or text_length <= 0:
+            raise ValueError(_("No text passage is available for this text analysis."))
+
+        history_messages: List[Any] = list(messages)
+        agent_messages: List[Any] = [msg for msg in history_messages if not isinstance(msg, SystemMessage)]
+        mcp_base_system_prompt = self._mcp_base_system_prompt()
+        tool_messages: List[Dict[str, str]] = []
+        tool_messages_streamed = signals is not None and getattr(signals, "progress", None) is not None
+        bootstrap_calls: List[Tuple[str, Dict[str, Any]]] = [
+            ("initialize", {}),
+            ("resources/list", {}),
+            ("resources/templates/list", {}),
+            ("resources/read", {"uri": self._text_analysis_document_uri(doc_id, start_pos, text_length)}),
+        ]
+
+        def append_tool_exchange(method_name: str, method_params: Dict[str, Any], rpc_response: Dict[str, Any]):
+            call_content = json.dumps(
+                {"action": "mcp_call", "method": method_name, "params": method_params},
+                ensure_ascii=False,
+            )
+            result_content = self._compact_mcp_result_content(method_name, method_params, rpc_response)
+            agent_messages.append(AIMessage(content=call_content))
+            agent_messages.append(HumanMessage(content=result_content))
+            if tool_messages_streamed:
+                signals.progress.emit(json.dumps({
+                    "chat_idx": chat_idx,
+                    "msg_type": "tool_call",
+                    "msg_author": "ai_agent",
+                    "msg_content": call_content,
+                }, ensure_ascii=False))
+                signals.progress.emit(json.dumps({
+                    "chat_idx": chat_idx,
+                    "msg_type": "tool_result",
+                    "msg_author": "mcp_server",
+                    "msg_content": result_content,
+                }, ensure_ascii=False))
+            else:
+                tool_messages.append({"msg_type": "tool_call", "msg_author": "ai_agent", "msg_content": call_content})
+                tool_messages.append({"msg_type": "tool_result", "msg_author": "mcp_server", "msg_content": result_content})
+
+        def append_single_instruct_log(content: str):
+            payload = json.dumps(
+                {"phase": "text_analysis", "role": "user", "content": content},
+                ensure_ascii=False,
+            )
+            if tool_messages_streamed:
+                signals.progress.emit(json.dumps({
+                    "chat_idx": chat_idx,
+                    "msg_type": "single_instruct",
+                    "msg_author": "ai_agent",
+                    "msg_content": payload,
+                }, ensure_ascii=False))
+            else:
+                tool_messages.append({"msg_type": "single_instruct", "msg_author": "ai_agent", "msg_content": payload})
+
+        try:
+            self._emit_mcp_status_text(signals, chat_idx, _('Preparing selected text passage...'), status_kind="planning")
+            for method, params in bootstrap_calls:
+                if self.app.ai.is_current_run_canceled():
+                    result["canceled"] = True
+                    return result
+                status_text = self.ai_mcp_server.describe_status_event(method, params)
+                self._emit_mcp_status(signals, chat_idx, status_text)
+                _request, response = self._run_mcp_request(method, params)
+                append_tool_exchange(method, params, response)
+
+            self._emit_mcp_status(signals, chat_idx, _('Preparing response...'))
+            final_system_prompt = self._build_mcp_combined_system_prompt(
+                self._text_analysis_final_bootstrap_prompt(doc_name, prompt_record, text_length)
+            )
+            final_request = final_system_prompt.strip()
+            append_single_instruct_log(final_request)
+            final_stream_messages: List[Any] = []
+            if mcp_base_system_prompt != "":
+                final_stream_messages.append(SystemMessage(content=mcp_base_system_prompt))
+            final_stream_messages.extend(agent_messages)
+            final_stream_messages.append(HumanMessage(content=final_request))
+            result["stream_messages"] = final_stream_messages
+            result["tool_messages"] = tool_messages
+            return result
+        except Exception as err:
+            result["error"] = _('Error during MCP-based text analysis bootstrap: ') + str(err)
+            return result
+
+    def new_text_chat(self, doc_id, doc_name, text, start_pos, prompt):
+        """Start one text analysis chat for the selected text passage."""
+
         if self.app.project_name == "":
             msg = _('No project open.')
             Message(self.app, _('AI not enabled'), msg, "warning").exec()
@@ -3049,51 +3208,58 @@ data collected. This information will accompany every prompt sent to the AI, res
             msg = _('The AI is disabled. Go to "AI > Setup Wizard" first.')
             Message(self.app, _('AI not enabled'), msg, "warning").exec()
             return
-        # Limit the amount of data (characters) send to the ai, so the maximum context window is not exceeded.
-        # As a rough estimation, one token is about 4 characters long (in english). 
-        # We want to fill not more than half the context window with our data, so that there is enough
-        # room for the answer and further chats.
-        max_ai_data_length = round(0.5 * (self.app.ai.large_llm_context_window * 4)) 
+        prompt_name = str(getattr(prompt, 'name', '') if prompt is not None else '').strip()
+        prompt_scope = str(getattr(prompt, 'scope', 'system') if prompt is not None else 'system').strip()
+        prompt_record = self.agent_prompts_catalog.find_prompt_variant(
+            prompt_name,
+            prompt_scope,
+            prompt_type="text_analysis",
+            apply_init=False,
+        )
+        if prompt_record is None:
+            msg = _('The selected text analysis prompt could not be loaded.')
+            Message(self.app, _('AI prompts'), msg, "warning").exec()
+            return
+
+        max_ai_data_length = min(
+            max(4000, round(0.5 * (self.app.ai.large_llm_context_window * 4))),
+            int(getattr(self.ai_mcp_server, 'max_read_length', 12000)),
+        )
         if len(text) > max_ai_data_length:
             msg = _('The text is too long to be analyzed in one go. Please select a shorter passage.')
             Message(self.app, _('AI text analysis'), msg, "warning").exec()
             return
-        
+
         self.main_window.ai_go_chat()  # show chat dialog
-        
-        self.ai_prompt = prompt
-        self.ai_text_doc_id = doc_id
-        self.ai_text_doc_name = doc_name
-        self.ai_text_text = text
-        self.ai_text_start_pos = start_pos
-        
-        ai_instruction = (
-            f'At the end of this message, you will find a passage of text extracted from the empirical ' 
-            f'document named "{doc_name}".\n'
-            f'Your task is to analyze this text based on the following instructions: \n'
-            f'"{prompt.text}"\n\n'
-            f'Always answer in the following language: "{self.app.ai.get_curr_language()}".\n'
-            f'Be sure to include references to the original data, using this format '
-            'definition: `{REF: "The text from the original data that you want to reference. '
-            'I have to match this against the original, so it is very important that you don\'t '
-            'change the quoted text in any way. Do not translate or correct errors. Create a '
-            'new reference for every single quote."}`. \n'
-            'These references are invisible text. If you want a direct quote to be '
-            'visible to the user, include it in the normal text and add an additional reference '
-            'in the above format.\n'
-            f'This is the text from the empirical document:\n'
-            f'-- BEGIN EMPIRICAL DATA --'
-            f'"{text}"'
-        )    
-        
-        summary = _('Analyzing text from ') + \
-                  f'<a href="quote:{doc_id}_{start_pos}_{len(text)}">{doc_name}</a> (' + \
-                  str(len(text)) + _(' characters).')
-        logger.debug(f'New text analysis chat. Prompt:\n{ai_instruction}')
-        self.new_chat(_('Text analysis') + f' "{doc_name}"', 'text chat', summary, prompt.name_and_scope())
-        self.process_message('system', self.app.ai.get_default_system_prompt())
-        self.process_message('instruct', ai_instruction)
-        self.update_chat_window()  
+
+        text_length = len(text)
+        summary = (
+            _('Analyzing text from ')
+            + f'<a href="quote:{doc_id}_{start_pos}_{text_length}">{doc_name}</a> ('
+            + str(text_length)
+            + _(' characters).')
+        )
+        summary += _('\nPrompt:') + f' {self._analysis_prompt_display_name_and_scope(prompt_record, "text_analysis")}'
+        logger.debug('New text analysis chat.')
+        self.new_chat(_('Text analysis') + f' "{doc_name}"', 'text_analysis', summary, prompt_name_and_scope(prompt_record))
+
+        chat_idx = self.current_chat_idx
+        self._persist_agent_prompt_record(chat_idx, prompt_record)
+        self.process_message(
+            'env_update',
+            self._text_analysis_scope_env_update(int(doc_id), str(doc_name), int(start_pos), text_length),
+            chat_idx,
+        )
+        bootstrap_spec = {
+            "doc_id": int(doc_id),
+            "doc_name": str(doc_name),
+            "start_pos": int(start_pos),
+            "text_length": text_length,
+            "prompt_name": prompt_record.name,
+            "prompt_scope": prompt_record.scope,
+        }
+        messages = self.history_get_ai_messages()
+        self._start_mcp_agent_worker(messages, chat_idx, self._mcp_text_analysis_worker, bootstrap_spec)
         
     def delete_chat(self):
         """Deletes the currently selected chat, connected to the button

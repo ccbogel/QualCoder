@@ -45,9 +45,8 @@ from odf import text as odf_text, office as odf_office, dc as odf_dc, style as o
 from odf.namespaces import OFFICENS, DRAWNS  # Required for the _export_odt_clean method <- L
 
 from .add_item_name import DialogAddItemName
-from .ai_agent_prompts import prompt_name_and_scope
+from .ai_agent_prompts import AiAgentPromptsCatalog
 from .ai_search_dialog import DialogAiSearch
-from .ai_prompts import PromptsList, DialogAiEditPrompts
 from .ai_chat import ai_chat_signal_emitter
 from .code_in_all_files import DialogCodeInAllFiles
 from .color_selector import DialogColorSelect, colour_ranges, colors, TextColor, show_codes_of_colour_range
@@ -390,6 +389,15 @@ class DialogCodeText(QtWidgets.QWidget):
         self.ai_search_spinner_index = 0
         self.ai_search_spinner_timer = QtCore.QTimer(self)
         self.ai_search_spinner_timer.timeout.connect(self.ai_search_update_spinner)
+
+    def _text_analysis_prompt_menu_label(self, prompt) -> str:
+        """Return the display label for one text-analysis prompt in the context menu."""
+
+        prompt_name = str(getattr(prompt, "name", "") or "").strip()
+        prefix = "text-analysis/"
+        if prompt_name.startswith(prefix):
+            return prompt_name[len(prefix):]
+        return prompt_name
 
     def _ai_search_scope_id(self):
         return id(self)
@@ -1578,9 +1586,13 @@ class DialogCodeText(QtWidgets.QWidget):
             submenu_ai_text_analysis.setToolTipsVisible(True)
             if self.app.ai is not None and self.app.ai.is_ready():
                 submenu_ai_text_analysis.setEnabled(True)
-                prompts_list = PromptsList(self.app, 'text_analysis')
-                for prompt in prompts_list.prompts:
-                    ac = submenu_ai_text_analysis.addAction(prompt.name_and_scope())
+                prompts_catalog = AiAgentPromptsCatalog(self.app)
+                prompt_records = prompts_catalog.list_prompt_variants(
+                    prompt_type='text_analysis',
+                    apply_init=False,
+                )
+                for prompt in prompt_records:
+                    ac = submenu_ai_text_analysis.addAction(self._text_analysis_prompt_menu_label(prompt))
                     ac.setToolTip(prompt.description)
                     ac.setProperty('submenu', 'ai_text_analysis')
                     ac.setData(prompt)
@@ -1665,8 +1677,11 @@ class DialogCodeText(QtWidgets.QWidget):
                                                           action.data())
             return
         if action.property('submenu') == 'ai_text_analysis_prompts':
-            ui = DialogAiEditPrompts(self.app, 'text_analysis')
-            ui.exec()
+            msg = _(
+                'Text analysis prompts are now loaded from Markdown files in the new AI prompt system. '
+                'Editing them from this menu is not available yet.'
+            )
+            Message(self.app, _('AI prompts'), msg, "information").exec()
             return
         # Remaining actions will be the submenu codes
         self.recursive_set_current_item(self.ui.treeWidget.invisibleRootItem(), action.text())
