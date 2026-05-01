@@ -246,6 +246,19 @@ class DialogAIChat(QtWidgets.QDialog):
     last_export_dir = ''
     # filenames = []
 
+    def _analysis_prompt_display_name_and_scope(self, prompt: AgentPromptRecord, analysis_type: str) -> str:
+        """Return the prompt label shown in analysis chat summaries."""
+
+        prompt_label = prompt_name_and_scope(prompt)
+        prefixes = {
+            "code_analysis": "code-analysis/",
+            "topic_exploration": "topic-exploration/",
+        }
+        prefix = prefixes.get(analysis_type, "")
+        if prefix != "" and prompt_label.startswith(prefix):
+            return prompt_label[len(prefix):]
+        return prompt_label
+
     def __init__(self, app, parent_text_edit: QTextEdit, main_window: QtWidgets.QMainWindow):
 
         self.app = app
@@ -2701,10 +2714,11 @@ class DialogAIChat(QtWidgets.QDialog):
             summary = _('Analyzing the data coded as "{}" ({} matching segments in scope.)').format(code_name, segment_count)
             if code_memo != '':
                 summary += _('\nMemo:') + f' {code_memo}'
-            summary += _('\nPrompt:') + f' {prompt_name_and_scope(prompt_record)}'
+            prompt_label = self._analysis_prompt_display_name_and_scope(prompt_record, 'code_analysis')
+            summary += _('\nPrompt:') + f' {prompt_label}'
             summary += _('\nMaterial:') + ' ' + self._code_analysis_filter_summary(file_ids, coder_names, filter_info)
             logger.debug('New code analysis chat.')
-            self.new_chat(_('Code analysis') + f' "{code_name}"', 'code_analysis', summary, prompt_name_and_scope(prompt_record))
+            self.new_chat(_('Code analysis') + f' "{code_name}"', 'code_analysis', summary, prompt_label)
             # warn if project memo empty 
             project_memo = extract_ai_memo(self.app.get_project_memo())
             if self.app.settings.get('ai_send_project_memo', 'True') == 'True' and len(project_memo) == 0:
@@ -2765,10 +2779,11 @@ data collected. This information will accompany every prompt sent to the AI, res
             summary = _('Exploring the free topic "{}" in the data.').format(topic_name)
             if topic_description != '':
                 summary += _('\nDescription:') + f' {topic_description}'
-            summary += _('\nPrompt:') + f' {prompt_name_and_scope(prompt_record)}'
+            prompt_label = self._analysis_prompt_display_name_and_scope(prompt_record, 'topic_exploration')
+            summary += _('\nPrompt:') + f' {prompt_label}'
             summary += _('\nMaterial:') + ' ' + self._topic_exploration_filter_summary(file_ids, filter_info)
             logger.debug('New topic exploration chat.')
-            self.new_chat(_('Topic exploration') + f' "{topic_name}"', 'topic_exploration', summary, prompt_name_and_scope(prompt_record))
+            self.new_chat(_('Topic exploration') + f' "{topic_name}"', 'topic_exploration', summary, prompt_label)
             # warn if project memo empty 
             project_memo = extract_ai_memo(self.app.get_project_memo())
             if self.app.settings.get('ai_send_project_memo', 'True') == 'True' and len(project_memo) == 0:

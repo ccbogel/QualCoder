@@ -94,6 +94,19 @@ class DialogAiSearch(QtWidgets.QDialog):
     def _set_context_setting(self, suffix: str, value) -> None:
         self.app.settings[f'ai_dlg_{self.context}_{suffix}'] = value
 
+    def _prompt_display_name_and_scope(self, prompt: AgentPromptRecord) -> str:
+        """Return the prompt label for this dialog context."""
+
+        prompt_label = prompt_name_and_scope(prompt)
+        prefixes = {
+            "code_analysis": "code-analysis/",
+            "topic_exploration": "topic-exploration/",
+        }
+        prefix = prefixes.get(self.context, "")
+        if prefix != "" and prompt_label.startswith(prefix):
+            return prompt_label[len(prefix):]
+        return prompt_label
+
     def __init__(self, app_, context, selected_id=-1, selected_is_code=True, tree_sort_option="all asc"):
         """Initializes the dialog
 
@@ -195,10 +208,10 @@ class DialogAiSearch(QtWidgets.QDialog):
                 _('could not be found. The prompt will be reset to the default.')
             Message(self.app, _('No codes'), msg, "warning").exec()
         for prompt in self.prompt_records:
-            self.ui.comboBox_prompts.addItem(prompt_name_and_scope(prompt))
+            self.ui.comboBox_prompts.addItem(self._prompt_display_name_and_scope(prompt))
             item_idx = self.ui.comboBox_prompts.count() - 1
             self.ui.comboBox_prompts.setItemData(item_idx, prompt.description, Qt.ItemDataRole.ToolTipRole)
-        self.ui.comboBox_prompts.setCurrentText(prompt_name_and_scope(self.current_prompt))
+        self.ui.comboBox_prompts.setCurrentText(self._prompt_display_name_and_scope(self.current_prompt))
         self.ui.comboBox_prompts.setToolTip(self.current_prompt.description)
         self.ui.comboBox_prompts.currentIndexChanged.connect(self.on_prompt_selected)
         if context == 'search':
