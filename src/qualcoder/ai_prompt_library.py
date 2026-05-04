@@ -30,6 +30,7 @@ path = os.path.abspath(os.path.dirname(__file__))
 logger = logging.getLogger(__name__)
 
 prompt_types = [
+    "general",
     "search",
     "code_analysis",
     "topic_exploration",
@@ -37,6 +38,10 @@ prompt_types = [
 ]
 
 prompt_types_descriptions = {
+    "general": (
+        "These are general-purpose prompts from the root of the prompt library. "
+        "They can be used in the general AI Agent chat."
+    ),
     "search": (
         "These prompts are used in the AI search. They instruct the AI on how to decide \n"
         "whether a chunk of empirical data is related to a given code/search string or not."
@@ -199,6 +204,8 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         self.fill_tree()
 
     def _type_icon(self, prompt_type: str):
+        if prompt_type == "general":
+            return self.app.ai.general_chat_icon()
         if prompt_type == "search":
             return self.app.ai.search_icon()
         if prompt_type == "code_analysis":
@@ -227,6 +234,20 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
             for prompt_type in prompt_types:
                 if self.prompt_type is not None and prompt_type != self.prompt_type:
                     continue
+                if prompt_type == "general":
+                    for prompt in [p for p in self.prompts if p.prompt_type == prompt_type]:
+                        prompt_item = QtWidgets.QTreeWidgetItem(self.ui.treeWidget_prompts)
+                        prompt_item.setText(0, self._prompt_tree_label(prompt))
+                        prompt_item.setToolTip(0, prompt.description)
+                        prompt_item.setIcon(0, self.app.ai.prompt_icon())
+                        prompt_item.setData(0, Qt.ItemDataRole.UserRole, prompt.name)
+                        prompt_item.setData(0, Qt.ItemDataRole.UserRole + 1, prompt.scope)
+                        prompt_item.setData(0, Qt.ItemDataRole.UserRole + 2, prompt.prompt_type)
+                        if prompt is self.selected_prompt:
+                            prompt_item.setSelected(True)
+                        elif selected_path != "" and self._prompt_tree_label(prompt) == selected_path:
+                            prompt_item.setSelected(True)
+                    continue
                 type_item = QtWidgets.QTreeWidgetItem(self.ui.treeWidget_prompts)
                 type_item.setText(0, prompt_type)
                 type_item.setToolTip(0, prompt_types_descriptions.get(prompt_type, ""))
@@ -249,6 +270,11 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
                 if item is not None:
                     item.setSelected(True)
                     item.setExpanded(True)
+            if len(self.ui.treeWidget_prompts.selectedItems()) == 0:
+                first_prompt_item = self._find_first_prompt_item()
+                if first_prompt_item is not None:
+                    self.ui.treeWidget_prompts.setCurrentItem(first_prompt_item)
+                    first_prompt_item.setSelected(True)
             if len(self.ui.treeWidget_prompts.selectedItems()) > 0:
                 self.ui.treeWidget_prompts.scrollToItem(
                     self.ui.treeWidget_prompts.selectedItems()[0],
@@ -270,6 +296,26 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         for i in range(root_item_count):
             item = self.ui.treeWidget_prompts.topLevelItem(i)
             result = self._tree_find_item_by_path_recursive(item, path_)
+            if result is not None:
+                return result
+        return None
+
+    def _find_first_prompt_item(self):
+        root_item_count = self.ui.treeWidget_prompts.topLevelItemCount()
+        for i in range(root_item_count):
+            item = self.ui.treeWidget_prompts.topLevelItem(i)
+            result = self._find_first_prompt_item_recursive(item)
+            if result is not None:
+                return result
+        return None
+
+    def _find_first_prompt_item_recursive(self, item):
+        if item is None:
+            return None
+        if item.data(0, Qt.ItemDataRole.UserRole) is not None:
+            return item
+        for i in range(item.childCount()):
+            result = self._find_first_prompt_item_recursive(item.child(i))
             if result is not None:
                 return result
         return None
@@ -301,7 +347,12 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         if len(self.ui.treeWidget_prompts.selectedItems()) > 0:
             selected_item = self.ui.treeWidget_prompts.selectedItems()[0]
             selected_item.setExpanded(True)
-            if get_item_level(selected_item) == 1:
+            if get_item_level(selected_item) == 0 and selected_item.data(0, Qt.ItemDataRole.UserRole) is not None:
+                selected_name = selected_item.data(0, Qt.ItemDataRole.UserRole)
+                selected_scope = selected_item.data(0, Qt.ItemDataRole.UserRole + 1)
+                selected_type = selected_item.data(0, Qt.ItemDataRole.UserRole + 2)
+                self.selected_prompt = self._find_prompt(selected_name, selected_scope, selected_type)
+            elif get_item_level(selected_item) == 1:
                 selected_name = selected_item.data(0, Qt.ItemDataRole.UserRole)
                 selected_scope = selected_item.data(0, Qt.ItemDataRole.UserRole + 1)
                 selected_type = selected_item.data(0, Qt.ItemDataRole.UserRole + 2)
@@ -356,7 +407,7 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         return "user"
 
     def _selection_context_for_new_prompt(self) -> tuple[str, str]:
-        new_type = self.prompt_type or "search"
+        new_type = self.prompt_type or "general"
         new_scope = self._default_scope_for_new_prompt()
         if self.selected_prompt is not None:
             new_type = self.selected_prompt.prompt_type
@@ -366,7 +417,12 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
             return new_type, new_scope
         selected_item = self.ui.treeWidget_prompts.selectedItems()[0]
         item_level = get_item_level(selected_item)
-        if item_level == 0:
+        if item_level == 0 and selected_item.data(0, Qt.ItemDataRole.UserRole) is not None:
+            new_type = selected_item.data(0, Qt.ItemDataRole.UserRole + 2) or new_type
+            selected_scope = selected_item.data(0, Qt.ItemDataRole.UserRole + 1)
+            if selected_scope:
+                new_scope = selected_scope
+        elif item_level == 0:
             new_type = selected_item.text(0)
         elif item_level == 1:
             new_type = selected_item.data(0, Qt.ItemDataRole.UserRole + 2) or selected_item.parent().text(0)
@@ -603,8 +659,10 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         root = self.catalog.prompt_root_for_scope(prompt.scope)
         folder = self.catalog.prompt_folder_for_type(prompt.prompt_type)
         rel_parts = [part for part in prompt.name.split("/") if part != ""]
-        if root == "" or folder == "" or len(rel_parts) == 0:
+        if root == "" or len(rel_parts) == 0:
             return ""
+        if folder == "":
+            return os.path.join(root, *rel_parts) + ".md"
         return os.path.join(root, folder, *rel_parts) + ".md"
 
     def _cleanup_empty_parent_dirs(self, file_path: str, scope: str) -> None:

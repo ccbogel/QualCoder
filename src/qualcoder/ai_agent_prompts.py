@@ -38,6 +38,7 @@ LEGACY_PROMPT_TYPE_FOLDERS = {
     "text_analysis": "text-analysis",
 }
 PROMPT_TYPE_FOLDERS = {
+    "general": "",
     "search": "_search",
     "code_analysis": "code-analysis",
     "topic_exploration": "topic-exploration",
@@ -451,8 +452,10 @@ class AiAgentPromptsCatalog:
         """Infer one prompt type from the top-level prompt directory."""
 
         normalized_name = self._normalize_prompt_name(name)
-        if normalized_name == "" or "/" not in normalized_name:
+        if normalized_name == "":
             return None
+        if "/" not in normalized_name:
+            return "general"
         top_level = normalized_name.split("/", 1)[0]
         if top_level == "_search":
             return "search"
