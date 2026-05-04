@@ -37,7 +37,6 @@ import httpx
 
 from openai import OpenAI, BadRequestError
 from .ai_agent_prompts import AiAgentPromptsCatalog, AgentPromptRecord
-from .ai_prompts import PromptItem
 from langchain_openai import ChatOpenAI, AzureChatOpenAI
 from langchain_core.globals import set_llm_cache  # Unused
 from langchain_community.cache import InMemoryCache  # Unused

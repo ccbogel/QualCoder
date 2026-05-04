@@ -37,6 +37,12 @@ LEGACY_PROMPT_TYPE_FOLDERS = {
     "topic_analysis": "topic-exploration",
     "text_analysis": "text-analysis",
 }
+PROMPT_TYPE_FOLDERS = {
+    "search": "_search",
+    "code_analysis": "code-analysis",
+    "topic_exploration": "topic-exploration",
+    "text_analysis": "text-analysis",
+}
 WINDOWS_RESERVED_FILENAMES = {
     "con", "prn", "aux", "nul",
     "com1", "com2", "com3", "com4", "com5", "com6", "com7", "com8", "com9",
@@ -243,6 +249,69 @@ class AiAgentPromptsCatalog:
 
         return results
 
+    def prompt_root_for_scope(self, scope: str) -> str:
+        """Return the filesystem root for one prompt scope."""
+
+        query_scope = str(scope if scope is not None else "").strip()
+        for candidate_scope, root in self._prompt_roots():
+            if candidate_scope == query_scope:
+                return root
+        return ""
+
+    def prompt_folder_for_type(self, prompt_type: str) -> str:
+        """Return the top-level folder name for one logical prompt type."""
+
+        normalized_type = self._normalize_prompt_type(prompt_type)
+        if normalized_type is None:
+            return ""
+        return PROMPT_TYPE_FOLDERS.get(normalized_type, "")
+
+    def normalize_prompt_type(self, prompt_type: Optional[str]) -> Optional[str]:
+        """Public wrapper for logical prompt-type normalization."""
+
+        return self._normalize_prompt_type(prompt_type)
+
+    def prompt_type_from_name(self, name: str) -> Optional[str]:
+        """Public wrapper around top-level prompt type inference."""
+
+        return self._prompt_type_from_name(name)
+
+    def prompt_name_within_type(self, name: str) -> str:
+        """Return the portion of one prompt name below its type folder."""
+
+        normalized_name = self._normalize_prompt_name(name)
+        prompt_type = self._prompt_type_from_name(normalized_name)
+        if prompt_type is None:
+            return normalized_name
+        prefix = self.prompt_folder_for_type(prompt_type)
+        if prefix == "":
+            return normalized_name
+        expected_prefix = prefix + "/"
+        if normalized_name.startswith(expected_prefix):
+            return normalized_name[len(expected_prefix):]
+        return normalized_name
+
+    def slugify_prompt_filename(self, name: str, max_length: int = 64) -> str:
+        """Return one portable filename slug for the given prompt name."""
+
+        return self._slugify_prompt_filename(name, max_length=max_length)
+
+    def build_prompt_markdown_document(self, name: str, description: str, text: str) -> str:
+        """Build one Markdown prompt document with frontmatter for editor writes."""
+
+        return self._build_prompt_markdown_document(name, description, text, include_name=True)
+
+    def parse_prompt_markdown_document(self, text: str) -> Tuple[Dict[str, Any], str]:
+        """Parse one Markdown prompt document into frontmatter metadata and body."""
+
+        metadata, body = self._split_frontmatter(text)
+        return dict(metadata), body
+
+    def infer_prompt_description(self, body: str) -> str:
+        """Infer one compact description from the prompt body."""
+
+        return self._infer_description(body)
+
     def _migrate_legacy_prompt_scope(self, legacy_yaml_path: str, markdown_root: str) -> Dict[str, int]:
         """One-time import of legacy YAML prompts into the new Markdown folder layout."""
 
@@ -333,10 +402,7 @@ class AiAgentPromptsCatalog:
                     continue
                 metadata, prompt_body = self._split_frontmatter(raw)
                 content = self._compose_prompt_content(name, prompt_body, init_content)
-                has_frontmatter_description = isinstance(metadata, dict) and "description" in metadata
-                description = str(metadata.get("description", "") if has_frontmatter_description else "").strip()
-                if description == "" and not has_frontmatter_description:
-                    description = self._infer_description(prompt_body)
+                description = str(metadata.get("description", "") if isinstance(metadata, dict) else "").strip()
                 result.append(
                     AgentPromptRecord(
                         scope=scope,
@@ -518,14 +584,18 @@ class AiAgentPromptsCatalog:
             basename = basename[:-3]
         return basename
 
-    def _build_prompt_markdown_document(self, slug: str, description: str, text: str) -> str:
+    def _build_prompt_markdown_document(self, slug: str, description: str, text: str,
+                                        include_name: bool = True) -> str:
         """Build one Markdown prompt file with YAML frontmatter."""
 
+        metadata: Dict[str, str] = {
+            "description": str(description if description is not None else "").strip(),
+        }
+        prompt_name = str(slug if slug is not None else "").strip()
+        if include_name and prompt_name != "":
+            metadata["name"] = prompt_name
         frontmatter = yaml.safe_dump(
-            {
-                "name": str(slug if slug is not None else "").strip(),
-                "description": str(description if description is not None else "").strip(),
-            },
+            metadata,
             allow_unicode=True,
             sort_keys=False,
             default_flow_style=False,
@@ -544,15 +614,15 @@ class AiAgentPromptsCatalog:
             return {}, raw_text.strip()
 
         metadata_text = str(match.group(1) if match.group(1) is not None else "")
+        body = raw_text[match.end():].strip()
         try:
             metadata = yaml.safe_load(metadata_text)
         except yaml.YAMLError:
-            logger.warning("Invalid YAML frontmatter in AI prompt file; using raw body.")
-            return {}, raw_text.strip()
+            logger.warning("Invalid YAML frontmatter in AI prompt file; ignoring metadata.")
+            return {}, body
 
         if not isinstance(metadata, dict):
             metadata = {}
-        body = raw_text[match.end():].strip()
         return metadata, body
 
     def _extract_prompt_names(self, text: str, include_internal: bool = False) -> List[str]:

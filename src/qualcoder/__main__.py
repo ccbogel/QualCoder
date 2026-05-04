@@ -84,7 +84,7 @@ from qualcoder.view_av import DialogCodeAV
 from qualcoder.view_charts import ViewCharts
 from qualcoder.view_graph import ViewGraph
 from qualcoder.view_image import DialogCodeImage
-from qualcoder.ai_prompts import DialogAiEditPrompts
+from qualcoder.ai_prompt_library import DialogAiEditPrompts
 from qualcoder.ai_llm import get_default_ai_models, update_ai_models
 from qualcoder.speakers import speaker_coder_name
 
