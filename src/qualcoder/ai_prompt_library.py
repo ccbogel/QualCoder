@@ -211,6 +211,10 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
             return self.app.ai.text_analysis_icon()
         return self.app.ai.prompt_icon()
 
+    @staticmethod
+    def _prompt_tree_label(prompt: EditorPromptRecord) -> str:
+        return prompt.name_and_scope()
+
     def fill_tree(self):
         old_form_updating = self.form_updating
         self.form_updating = True
@@ -227,21 +231,18 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
                 type_item.setText(0, prompt_type)
                 type_item.setToolTip(0, prompt_types_descriptions.get(prompt_type, ""))
                 type_item.setIcon(0, self._type_icon(prompt_type))
-
-                for scope in prompt_scopes:
-                    scope_item = QtWidgets.QTreeWidgetItem(type_item)
-                    scope_item.setText(0, scope)
-                    scope_item.setToolTip(0, prompt_scope_descriptions.get(scope, ""))
-                    scope_item.setIcon(0, self.app.ai.prompt_scope_icon())
-                    for prompt in [p for p in self.prompts if p.prompt_type == prompt_type and p.scope == scope]:
-                        prompt_item = QtWidgets.QTreeWidgetItem(scope_item)
-                        prompt_item.setText(0, prompt.name)
-                        prompt_item.setToolTip(0, prompt.description)
-                        prompt_item.setIcon(0, self.app.ai.prompt_icon())
-                        if prompt is self.selected_prompt:
-                            prompt_item.setSelected(True)
-                        elif selected_path != "" and "|".join([prompt_type, scope, prompt.name]) == selected_path:
-                            prompt_item.setSelected(True)
+                for prompt in [p for p in self.prompts if p.prompt_type == prompt_type]:
+                    prompt_item = QtWidgets.QTreeWidgetItem(type_item)
+                    prompt_item.setText(0, self._prompt_tree_label(prompt))
+                    prompt_item.setToolTip(0, prompt.description)
+                    prompt_item.setIcon(0, self.app.ai.prompt_icon())
+                    prompt_item.setData(0, Qt.ItemDataRole.UserRole, prompt.name)
+                    prompt_item.setData(0, Qt.ItemDataRole.UserRole + 1, prompt.scope)
+                    prompt_item.setData(0, Qt.ItemDataRole.UserRole + 2, prompt.prompt_type)
+                    if prompt is self.selected_prompt:
+                        prompt_item.setSelected(True)
+                    elif selected_path != "" and "|".join([prompt_type, self._prompt_tree_label(prompt)]) == selected_path:
+                        prompt_item.setSelected(True)
 
             if len(self.ui.treeWidget_prompts.selectedItems()) == 0 and selected_path != "":
                 item = self.tree_find_item_by_path(selected_path.split("|"))
@@ -300,10 +301,10 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         if len(self.ui.treeWidget_prompts.selectedItems()) > 0:
             selected_item = self.ui.treeWidget_prompts.selectedItems()[0]
             selected_item.setExpanded(True)
-            if get_item_level(selected_item) == 2:
-                selected_name = selected_item.text(0)
-                selected_scope = selected_item.parent().text(0)
-                selected_type = selected_item.parent().parent().text(0)
+            if get_item_level(selected_item) == 1:
+                selected_name = selected_item.data(0, Qt.ItemDataRole.UserRole)
+                selected_scope = selected_item.data(0, Qt.ItemDataRole.UserRole + 1)
+                selected_type = selected_item.data(0, Qt.ItemDataRole.UserRole + 2)
                 self.selected_prompt = self._find_prompt(selected_name, selected_scope, selected_type)
 
         old_form_updating = self.form_updating
@@ -368,8 +369,10 @@ class DialogAiEditPrompts(QtWidgets.QDialog):
         if item_level == 0:
             new_type = selected_item.text(0)
         elif item_level == 1:
-            new_type = selected_item.parent().text(0)
-            new_scope = selected_item.text(0)
+            new_type = selected_item.data(0, Qt.ItemDataRole.UserRole + 2) or selected_item.parent().text(0)
+            selected_scope = selected_item.data(0, Qt.ItemDataRole.UserRole + 1)
+            if selected_scope:
+                new_scope = selected_scope
         if new_scope == "system":
             new_scope = self._default_scope_for_new_prompt()
         if new_scope == "project" and self.app.project_path == "":
