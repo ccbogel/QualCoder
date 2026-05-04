@@ -279,7 +279,7 @@ class DialogCodesBySegments(QtWidgets.QDialog):
         """ Context menu for file selection and sorting. """
 
         menu = QtWidgets.QMenu()
-        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}}")
         action_all_files = menu.addAction(_("Select all files"))
         action_files_like = menu.addAction(_("Select files like"))
         action_files_none = menu.addAction(_("Select none"))
@@ -297,7 +297,7 @@ class DialogCodesBySegments(QtWidgets.QDialog):
         if action == action_files_like:
             # Input dialog narrow, so code below
             dialog = QtWidgets.QInputDialog(None)
-            dialog.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            dialog.setStyleSheet(f"* {{font-size:{self.app.settings['fontsize']}pt}}")
             dialog.setWindowTitle(_("Select some files"))
             dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
             dialog.setInputMode(QtWidgets.QInputDialog.InputMode.TextInput)
@@ -326,7 +326,7 @@ class DialogCodesBySegments(QtWidgets.QDialog):
         """ Context menu for case selection. """
 
         menu = QtWidgets.QMenu()
-        menu.setStyleSheet("QMenu {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+        menu.setStyleSheet(f"QMenu {{font-size:{self.app.settings['fontsize']}pt}}")
         action_all_cases = menu.addAction(_("Select all cases"))
         action_cases_like = menu.addAction(_("Select cases like"))
         action_cases_none = menu.addAction(_("Select none"))
@@ -340,7 +340,7 @@ class DialogCodesBySegments(QtWidgets.QDialog):
         if action == action_cases_like:
             # Input dialog narrow, so code below
             dialog = QtWidgets.QInputDialog(None)
-            dialog.setStyleSheet("* {font-size:" + str(self.app.settings['fontsize']) + "pt} ")
+            dialog.setStyleSheet(f"* {{font-size:{self.app.settings['fontsize']}pt}}")
             dialog.setWindowTitle(_("Select some cases"))
             dialog.setWindowFlags(self.windowFlags() & ~QtCore.Qt.WindowType.WindowContextHelpButtonHint)
             dialog.setInputMode(QtWidgets.QInputDialog.InputMode.TextInput)
@@ -394,7 +394,7 @@ class DialogCodesBySegments(QtWidgets.QDialog):
                 cat_name = c['name']
                 if self.truncated_code_names:
                     if len(c['name']) > 62:  # Keep category name short
-                        cat_name = c['name'][:30] + '..' + c['name'][-30:]
+                        cat_name = f"{c['name'][:30]}..{c['name'][-30:]}"
                         self.contains_long_names = True
                 top_item = QtWidgets.QTreeWidgetItem([cat_name, f'catid:{c["catid"]}', memo])
                 top_item.setToolTip(0, c['name'])
@@ -425,7 +425,7 @@ class DialogCodesBySegments(QtWidgets.QDialog):
                         cat_name = c['name']
                         if self.truncated_code_names:
                             if len(c['name']) > 62:  # Keep category name short
-                                cat_name = c['name'][:30] + '..' + c['name'][-30:]
+                                cat_name = f"{c['name'][:30]}..{c['name'][-30:]}"
                                 self.contains_long_names = True
                         child = QtWidgets.QTreeWidgetItem([cat_name, f'catid:{c["catid"]}', memo])
                         child.setToolTip(0, c['name'])
@@ -453,7 +453,7 @@ class DialogCodesBySegments(QtWidgets.QDialog):
                 code_name = c['name']
                 if self.truncated_code_names:
                     if len(c['name']) > 62:  # Keep category name short
-                        code_name = c['name'][:30] + '..' + c['name'][-30:]
+                        code_name = f"{c['name'][:30]}..{c['name'][-30:]}"
                         self.contains_long_names = True
                 top_item = QtWidgets.QTreeWidgetItem([code_name, f'cid:{c["cid"]}', memo])
                 top_item.setToolTip(0, c['name'])
@@ -474,16 +474,16 @@ class DialogCodesBySegments(QtWidgets.QDialog):
             item = it.value()
             count = 0
             while item and count < 10000:
-                if item.text(1) == 'catid:' + str(c['catid']):
+                if item.text(1) == f"catid:{c['catid']}":
                     memo = ""
                     if c['memo'] != "":
                         memo = _("Memo")
                     code_name = c['name']
                     if self.truncated_code_names:
                         if len(c['name']) > 62:  # Keep category name short
-                            code_name = c['name'][:30] + '..' + c['name'][-30:]
+                            code_name = f"{c['name'][:30]}..{c['name'][-30:]}"
                             self.contains_long_names = True
-                    child = QtWidgets.QTreeWidgetItem([code_name, f'cid:{c["cid"]}', memo])
+                    child = QtWidgets.QTreeWidgetItem([code_name, f"cid:{c['cid']}", memo])
                     child.setBackground(0, QBrush(QtGui.QColor(c['color']), Qt.BrushStyle.SolidPattern))
                     color = TextColor(c['color']).recommendation
                     child.setForeground(0, QBrush(QtGui.QColor(color)))
@@ -627,7 +627,6 @@ class DialogCodesBySegments(QtWidgets.QDialog):
             return
         wb = openpyxl.Workbook()
         ws = wb.active
-
         row = 1
         for col, code in enumerate(self.horizontal_labels):
             ws.cell(column=col + 1, row=row, value=code)
@@ -694,14 +693,12 @@ class DialogCodesBySegments(QtWidgets.QDialog):
 
         for row in self.segment_rows:
             row['codes'] = [0] * len(self.code_columns)
-
         for row in self.segment_rows:
             for res in self.results:
                 if res['fid'] == row['fid'] and res['pos0'] == row['pos0'] and res['pos1'] == row['pos1']:
                     for i, codename in enumerate(self.code_columns):
                         if codename == res['codename']:
                             row['codes'][i] = 1
-
         self.fill_table()
 
     def search_by_files(self):
@@ -785,9 +782,6 @@ class DialogCodesBySegments(QtWidgets.QDialog):
         self.horizontal_labels = ["caseid", "case name", "fileid", "file name", "pos0", "pos1", "text"] + self.code_columns
         self.ui.tableWidget.setColumnCount(len(self.horizontal_labels))
         self.ui.tableWidget.setHorizontalHeaderLabels(self.horizontal_labels)
-        font = f"font: {self.app.settings['fontsize']}pt "
-        font += f'"{self.app.settings["font"]}";'
-        self.ui.tableWidget.horizontalHeader().setStyleSheet("QHeaderView {font-size: 8pt; }")
         self.ui.tableWidget.setRowCount(len(self.segment_rows))
 
         self.xlsx_results = []
@@ -797,48 +791,41 @@ class DialogCodesBySegments(QtWidgets.QDialog):
             item = QtWidgets.QTableWidgetItem()
             item.setData(QtCore.Qt.ItemDataRole.DisplayRole, segment['caseid'])
             item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
-            item.setFont(QtGui.QFont(self.app.settings['font'], 8))
             self.ui.tableWidget.setItem(row, 0, item)
             xlsx_row.append(segment['caseid'])
 
             item = QtWidgets.QTableWidgetItem()
             item.setData(QtCore.Qt.ItemDataRole.DisplayRole, segment['casename'])
             item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
-            item.setFont(QtGui.QFont(self.app.settings['font'], 8))
             self.ui.tableWidget.setItem(row, 1, item)
             xlsx_row.append(segment['casename'])
 
             item = QtWidgets.QTableWidgetItem()
             item.setData(QtCore.Qt.ItemDataRole.DisplayRole, segment['fid'])
             item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
-            item.setFont(QtGui.QFont(self.app.settings['font'], 8))
             self.ui.tableWidget.setItem(row, 2, item)
             xlsx_row.append(segment['fid'])
 
             item = QtWidgets.QTableWidgetItem()
             item.setData(QtCore.Qt.ItemDataRole.DisplayRole, segment['filename'])
             item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
-            item.setFont(QtGui.QFont(self.app.settings['font'], 8))
             self.ui.tableWidget.setItem(row, 3, item)
             xlsx_row.append(segment['filename'])
 
             item = QtWidgets.QTableWidgetItem()
             item.setData(QtCore.Qt.ItemDataRole.DisplayRole, segment['pos0'])
             item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
-            item.setFont(QtGui.QFont(self.app.settings['font'], 8))
             self.ui.tableWidget.setItem(row, 4, item)
             xlsx_row.append(segment['pos0'])
 
             item = QtWidgets.QTableWidgetItem()
             item.setData(QtCore.Qt.ItemDataRole.DisplayRole, segment['pos1'])
             item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
-            item.setFont(QtGui.QFont(self.app.settings['font'], 8))
             self.ui.tableWidget.setItem(row, 5, item)
             xlsx_row.append(segment['pos1'])
 
             item = QtWidgets.QTableWidgetItem()
             item.setData(QtCore.Qt.ItemDataRole.DisplayRole, segment['text'])
-            item.setFont(QtGui.QFont(self.app.settings['font'], 6))
             item.setFlags(QtCore.Qt.ItemFlag.ItemIsSelectable | QtCore.Qt.ItemFlag.ItemIsEnabled)
             self.ui.tableWidget.setItem(row, 6, item)
             xlsx_row.append(segment['text'])
