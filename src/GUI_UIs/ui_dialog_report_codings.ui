@@ -44,7 +44,7 @@
       <property name="geometry">
        <rect>
         <x>200</x>
-        <y>45</y>
+        <y>49</y>
         <width>183</width>
         <height>30</height>
        </rect>
@@ -54,7 +54,7 @@
       <property name="geometry">
        <rect>
         <x>200</x>
-        <y>21</y>
+        <y>23</y>
         <width>183</width>
         <height>22</height>
        </rect>
@@ -86,7 +86,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>22</y>
+        <y>24</y>
         <width>130</width>
         <height>22</height>
        </rect>
@@ -99,7 +99,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>45</y>
+        <y>49</y>
         <width>181</width>
         <height>30</height>
        </rect>
@@ -109,7 +109,7 @@
       <property name="geometry">
        <rect>
         <x>120</x>
-        <y>80</y>
+        <y>82</y>
         <width>34</width>
         <height>32</height>
        </rect>
@@ -187,7 +187,7 @@
        <rect>
         <x>10</x>
         <y>-3</y>
-        <width>211</width>
+        <width>191</width>
         <height>23</height>
        </rect>
       </property>
@@ -218,7 +218,7 @@
       <property name="geometry">
        <rect>
         <x>390</x>
-        <y>-1</y>
+        <y>0</y>
         <width>131</width>
         <height>26</height>
        </rect>
@@ -234,7 +234,7 @@
       <property name="geometry">
        <rect>
         <x>200</x>
-        <y>81</y>
+        <y>83</y>
         <width>181</width>
         <height>30</height>
        </rect>
@@ -263,7 +263,7 @@
       <property name="geometry">
        <rect>
         <x>390</x>
-        <y>29</y>
+        <y>30</y>
         <width>131</width>
         <height>26</height>
        </rect>
@@ -291,14 +291,15 @@
      <widget class="QCheckBox" name="checkBox_text_context">
       <property name="geometry">
        <rect>
-        <x>390</x>
-        <y>60</y>
+        <x>200</x>
+        <y>-1</y>
         <width>131</width>
         <height>26</height>
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Surround coded text with pre-text and post-text.&lt;/p&gt;&lt;p&gt;Change Settings for number of characters and display style.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>Surround coded text with pre-text and post-text.
+Change Settings for number of characters and display style.</string>
       </property>
       <property name="text">
        <string>Text context</string>
@@ -307,9 +308,9 @@
      <widget class="QLineEdit" name="lineEdit_search_results">
       <property name="geometry">
        <rect>
-        <x>527</x>
+        <x>537</x>
         <y>85</y>
-        <width>161</width>
+        <width>151</width>
         <height>30</height>
        </rect>
       </property>
@@ -320,7 +321,7 @@
      <widget class="QLabel" name="label_search_results">
       <property name="geometry">
        <rect>
-        <x>527</x>
+        <x>540</x>
         <y>58</y>
         <width>101</width>
         <height>22</height>
@@ -356,7 +357,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>81</y>
+        <y>83</y>
         <width>101</width>
         <height>30</height>
        </rect>
@@ -447,6 +448,22 @@
       </property>
       <property name="text">
        <string>References</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBox_overlaps">
+      <property name="geometry">
+       <rect>
+        <x>390</x>
+        <y>60</y>
+        <width>131</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>Only show codes where there are overlapping or conjoining codes that are in the selected codes</string>
+      </property>
+      <property name="text">
+       <string>Overlaps</string>
       </property>
      </widget>
     </widget>
