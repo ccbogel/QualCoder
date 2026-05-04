@@ -2060,8 +2060,9 @@ class DialogAIChat(QtWidgets.QDialog):
             preview,
         )
 
-    def _topic_exploration_bootstrap_request(self, topic_name: str, topic_description: str, prompt: AgentPromptRecord) -> str:
-        """Build the transient first-turn task for one topic exploration agent chat."""
+    def _topic_exploration_final_bootstrap_prompt(self, topic_name: str, topic_description: str,
+                                                  prompt: AgentPromptRecord) -> str:
+        """Build the complete first-turn contract for one topic exploration agent chat."""
 
         topic_text = str(topic_name if topic_name is not None else '').strip()
         description_text = str(topic_description if topic_description is not None else '').strip()
@@ -2069,32 +2070,21 @@ class DialogAIChat(QtWidgets.QDialog):
         if description_text == '':
             description_text = _('(no description provided)')
         return (
-            f'Begin the topic exploration for "{topic_text}" now.\n'
+            "Your task: "
+            f'Begin the topic exploration for "{topic_text}" now. '
             f'User description: {description_text}\n'
             f'The selected exploration prompt "/{prompt_name}" is active for this chat.\n'
             'The semantic search results for the selected material are already available in this conversation. '
-            'Use them to produce the first substantive exploration of the topic, grounded in the retrieved empirical data. '
-            'If you need more of the already found data, continue from the cursor of the semantic search result. '
+            "Provide the first substantial topic exploration answer for the user based on the conversation and retrieved project context. "
+            'Treat MCP execution as already finished for this turn and begin the analysis directly. '
+            'Do not output JSON. '
+            'Do not mention internal MCP stage constraints. '
+            'Do not make empirical claims without support from retrieved evidence. If support is uncertain, state the uncertainty clearly. '
             'Do not include additional project material without the user\'s permission. '
             'When referring to empirical text evidence, add citations in this exact form: {REF: "exact quote from the retrieved evidence"}. '
-            'If you want a direct quote to be visible, write it in normal prose and add REF separately. '
-        )
-
-    def _mcp_topic_exploration_final_answer_system_prompt(self) -> str:
-        """Return the final-answer contract for the initial topic exploration turn."""
-
-        return (
-            "Your task: "
-            "Provide the first substantial topic exploration answer for the user based on the conversation and retrieved project context. "
-            "Do not output JSON. "
-            "Treat MCP execution as already finished for this turn and begin the analysis directly. "
-            "Do not mention internal MCP stage constraints. "
-            "Do not make empirical claims without support from retrieved evidence. If support is uncertain, state the uncertainty clearly. "
-            "When you refer to empirical text evidence, add citations in this exact form: "
-            "{REF: \"exact quote from the retrieved evidence\"}. "
-            "The quote inside REF must be copied exactly from retrieved evidence (no paraphrasing, no corrections, no translation). "
-            "Important: REF is machine markup and the quote text inside REF is not shown as normal readable text to the user. "
-            "If you want a direct quote to be visible, write the quote explicitly in normal prose and add REF separately."
+            'The quote inside REF must be copied exactly from retrieved evidence (no paraphrasing, no corrections, no translation). '
+            'Important: REF is machine markup and the quote text inside REF is not shown as normal readable text to the user. '
+            'If you want a direct quote to be visible, write the quote explicitly in normal prose and add REF separately.'
         )
 
     def _topic_exploration_vector_search_uri(self, topic_name: str, topic_description: str, file_ids: List[int]) -> str:
@@ -2248,10 +2238,9 @@ class DialogAIChat(QtWidgets.QDialog):
 
             self._emit_mcp_status(signals, chat_idx, _('Preparing response...'))
             final_system_prompt = self._build_mcp_combined_system_prompt(
-                self._mcp_topic_exploration_final_answer_system_prompt()
+                self._topic_exploration_final_bootstrap_prompt(topic_name, topic_description, prompt_record)
             )
-            final_prompt = self._topic_exploration_bootstrap_request(topic_name, topic_description, prompt_record)
-            final_request = (final_system_prompt + "\n\n" + final_prompt).strip()
+            final_request = final_system_prompt.strip()
             append_single_instruct_log(final_request)
             final_stream_messages: List[Any] = []
             if mcp_base_system_prompt != "":
