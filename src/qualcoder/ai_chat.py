@@ -3045,33 +3045,26 @@ data collected. This information will accompany every prompt sent to the AI, res
                 'System event: This AI agent chat was started in text analysis mode.',
                 f'Source document: "{str(doc_name).strip()}".',
                 f'Selected passage: quote:{int(doc_id)}_{int(start_pos)}_{int(text_length)} ({int(text_length)} characters).',
-                'Base the analysis on the selected text passage. If additional material from the same or another document would be helpful, ask the user for permission before including it.',
+                'Base the analysis primarily on the selected text passage.',
+                'If narrowly targeted additional material would directly help to fulfill the active analysis prompt, you may retrieve and use it.',
+                'Keep any expansion tightly focused, such as immediate context from the same document or a small number of closely relevant comparison passages.',
+                'If a broader scope expansion would be helpful, ask the user for permission first.',
             ]
         )
 
-    def _text_analysis_final_bootstrap_prompt(self, doc_name: str, prompt: AgentPromptRecord,
-                                              text_length: int) -> str:
-        """Build the complete first-turn contract for one text analysis agent chat."""
+    def _text_analysis_bootstrap_contract(self, doc_name: str, prompt: AgentPromptRecord,
+                                          text_length: int) -> str:
+        """Build the task contract for the first text-analysis turn before normal agent finalization."""
 
         prompt_name = str(prompt.name if prompt is not None and prompt.name is not None else '').strip()
         source_name = str(doc_name if doc_name is not None else '').strip()
         return (
             "Your task: "
-            f'Begin the text analysis for the selected passage from "{source_name}" now. '
-            "Provide the first answer for the user based on the conversation and retrieved project context. "
+            f'Work on a text analysis request centered on the selected passage from "{source_name}". '
             f'The selected passage is {int(text_length)} characters long.\n'
-            f'The selected analysis prompt "/{prompt_name}" is active for this chat. Use it.\n'
+            f'The selected analysis prompt "/{prompt_name}" is active for this chat and should guide your analysis.\n'
             'The selected text passage is already available in this conversation as an MCP resource result. '
-            'Treat MCP execution as already finished for this turn and begin the analysis directly. '
-            'Do not output JSON. '
-            'Do not mention internal MCP stage constraints. '
-            'Do not make empirical claims without support from retrieved evidence. If support is uncertain, state the uncertainty clearly. '
-            'Do not include additional project material without the user\'s permission. '
-            'When you refer to empirical text evidence, add citations in this exact form: '
-            '{REF: "exact quote from the retrieved evidence"}. '
-            'The quote inside REF must be copied exactly from retrieved evidence (no paraphrasing, no corrections, no translation). '
-            'Important: REF is machine markup and the quote text inside REF is not shown as normal readable text to the user. '
-            'If you want a direct quote to be visible, write the quote explicitly in normal prose and add REF separately.'
+            'Treat this selected passage as the primary focus of the task. '
         )
 
     def _mcp_text_analysis_worker(self, messages: List[Any], chat_idx: int,
@@ -3085,6 +3078,14 @@ data collected. This information will accompany every prompt sent to the AI, res
             "canceled": False,
             "direct_ai_message": "",
             "direct_info_message": "",
+        }
+        allowed_methods = {
+            "initialize",
+            "resources/list",
+            "resources/templates/list",
+            "resources/read",
+            "tools/list",
+            "tools/call",
         }
         spec = dict(bootstrap_spec) if isinstance(bootstrap_spec, dict) else {}
         doc_id = int(spec.get("doc_id", -1) or -1)
@@ -3108,6 +3109,8 @@ data collected. This information will accompany every prompt sent to the AI, res
         history_messages: List[Any] = list(messages)
         agent_messages: List[Any] = [msg for msg in history_messages if not isinstance(msg, SystemMessage)]
         mcp_base_system_prompt = self._mcp_base_system_prompt()
+        ai_change_set_id = self._begin_ai_change_set(history_messages, chat_idx)
+        final_hint = ""
         tool_messages: List[Dict[str, str]] = []
         tool_messages_streamed = signals is not None and getattr(signals, "progress", None) is not None
         bootstrap_calls: List[Tuple[str, Dict[str, Any]]] = [
@@ -3116,6 +3119,24 @@ data collected. This information will accompany every prompt sent to the AI, res
             ("resources/templates/list", {}),
             ("resources/read", {"uri": self._text_analysis_document_uri(doc_id, start_pos, text_length)}),
         ]
+        reflection_json_schema = self._mcp_reflection_json_schema()
+        max_calls_per_round = 8
+        max_reflection_rounds = 4
+        max_total_tool_calls = 20 + len(bootstrap_calls)
+        max_queued_calls = 100
+        total_tool_calls = 0
+        stop_reason = ""
+        latest_plan_summary = _("Prepared the selected text passage for analysis.")
+        latest_reflection_summary = ""
+        pending_user_decision = None
+        deferred_calls_for_next_round: List[Dict[str, Any]] = []
+
+        def _prepare_mcp_request(method_name: str, raw_params: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Any]]:
+            request_params = dict(raw_params) if isinstance(raw_params, dict) else {}
+            display_params = dict(request_params)
+            if method_name == "tools/call" and ai_change_set_id != "":
+                request_params["_ai_change_set_id"] = ai_change_set_id
+            return request_params, display_params
 
         def append_tool_exchange(method_name: str, method_params: Dict[str, Any], rpc_response: Dict[str, Any]):
             call_content = json.dumps(
@@ -3142,9 +3163,13 @@ data collected. This information will accompany every prompt sent to the AI, res
                 tool_messages.append({"msg_type": "tool_call", "msg_author": "ai_agent", "msg_content": call_content})
                 tool_messages.append({"msg_type": "tool_result", "msg_author": "mcp_server", "msg_content": result_content})
 
-        def append_single_instruct_log(content: str):
+        def append_single_instruct_log(phase: str, role: str, content: str):
             payload = json.dumps(
-                {"phase": "text_analysis", "role": "user", "content": content},
+                {
+                    "phase": str(phase if phase is not None else "").strip() or "text_analysis",
+                    "role": str(role if role is not None else "").strip() or "user",
+                    "content": content,
+                },
                 ensure_ascii=False,
             )
             if tool_messages_streamed:
@@ -3163,28 +3188,256 @@ data collected. This information will accompany every prompt sent to the AI, res
                 if self.app.ai.is_current_run_canceled():
                     result["canceled"] = True
                     return result
-                status_text = self.ai_mcp_server.describe_status_event(method, params)
+                request_params, display_params = _prepare_mcp_request(method, params)
+                status_text = self.ai_mcp_server.describe_status_event(method, request_params)
                 self._emit_mcp_status(signals, chat_idx, status_text)
-                _request, response = self._run_mcp_request(method, params)
-                append_tool_exchange(method, params, response)
+                _request, response = self._run_mcp_request(method, request_params)
+                total_tool_calls += 1
+                append_tool_exchange(method, display_params, response)
+
+            reflection_system_prompt = self._build_mcp_combined_system_prompt(
+                self._text_analysis_bootstrap_contract(doc_name, prompt_record, text_length)
+                + "\n\n"
+                + self._mcp_reflection_system_prompt()
+            )
+            reflection_prompt = (
+                "Reflect on whether the currently retrieved evidence is sufficient for this text analysis and return JSON now. "
+                "If not, propose only the minimal additional MCP calls needed."
+            )
+
+            def build_phase_request_message(phase_contract: str, trailing_instruction: str) -> HumanMessage:
+                parts: List[str] = []
+                phase_text = str(phase_contract if phase_contract is not None else "").strip()
+                trailing_text = str(trailing_instruction if trailing_instruction is not None else "").strip()
+                if phase_text != "":
+                    parts.append(phase_text)
+                if trailing_text != "":
+                    parts.append(trailing_text)
+                return HumanMessage(content="\n\n".join(parts).strip())
+
+            def build_phase_messages(phase_contract: str, trailing_instruction: str) -> List[Any]:
+                phase_messages: List[Any] = []
+                if mcp_base_system_prompt != "":
+                    phase_messages.append(SystemMessage(content=mcp_base_system_prompt))
+                phase_messages.extend(agent_messages)
+                phase_messages.append(build_phase_request_message(phase_contract, trailing_instruction))
+                return phase_messages
+
+            for reflection_round in range(max_reflection_rounds):
+                if self.app.ai.is_current_run_canceled():
+                    result["canceled"] = True
+                    return result
+
+                current_reflection_prompt = reflection_prompt
+                if len(deferred_calls_for_next_round) > 0:
+                    current_reflection_prompt += (
+                        "\nDeferred calls from the previous execution queue "
+                        f"(not yet executed because the round limit is {max_calls_per_round}):\n"
+                        + json.dumps(deferred_calls_for_next_round, ensure_ascii=False)
+                    )
+                append_single_instruct_log(
+                    "reflection",
+                    "user",
+                    build_phase_request_message(reflection_system_prompt, current_reflection_prompt).content,
+                )
+                reflection_messages = build_phase_messages(reflection_system_prompt, current_reflection_prompt)
+                try:
+                    reflection_data = self._invoke_json_llm_with_step_timeout(
+                        reflection_messages,
+                        schema_name='mcp_reflection_control',
+                        response_schema=reflection_json_schema,
+                        context='mcp_json_reflection',
+                        step_name=_("Internal reflection"),
+                        status_kind="reflection",
+                        signals=signals,
+                        chat_idx=chat_idx,
+                    )
+                except TimeoutError:
+                    latest_reflection_summary = _('Internal reflection timed out; proceeding with the collected evidence.')
+                    self._emit_mcp_status_text(
+                        signals,
+                        chat_idx,
+                        latest_reflection_summary,
+                        status_kind="reflection",
+                    )
+                    stop_reason = "reflection_timeout"
+                    break
+
+                reflection_summary = str(reflection_data.get("reflection_summary", "")).strip()
+                if reflection_summary != "":
+                    latest_reflection_summary = reflection_summary
+                reflection_brief = str(reflection_data.get("answer_brief", "")).strip()
+                if reflection_brief != "":
+                    final_hint = reflection_brief
+                enough_information = self._json_bool(reflection_data.get("enough_information", False), False)
+                reflection_next_step_note = str(reflection_data.get("next_step_note", "")).strip()
+                continue_deferred_calls = self._json_bool(
+                    reflection_data.get("continue_deferred_calls", False),
+                    False
+                )
+                revised_calls = self._normalize_mcp_calls(
+                    reflection_data.get("revised_calls", []), allowed_methods, max_queued_calls
+                )
+                proposed_next_calls = self._normalize_mcp_calls(
+                    reflection_data.get("proposed_next_calls", []), allowed_methods, max_calls_per_round
+                )
+                short_reflection_note = self._short_reflection_next_step_note(
+                    reflection_summary,
+                    reflection_next_step_note,
+                )
+                if short_reflection_note != "":
+                    self._emit_mcp_status_text(signals, chat_idx, short_reflection_note, status_kind="reflection")
+                user_decision_required = self._json_bool(reflection_data.get("user_decision_required", False), False)
+                decision_question = self._normalize_progress_note(reflection_data.get("decision_question", ""), max_length=600)
+                decision_context = self._normalize_progress_note(reflection_data.get("decision_context", ""), max_length=600)
+                if user_decision_required and decision_question == "":
+                    decision_question = short_reflection_note
+                if user_decision_required and decision_question != "":
+                    pending_user_decision = {
+                        "phase": "reflection",
+                        "question": decision_question,
+                        "context": decision_context,
+                        "proposed_next_calls": proposed_next_calls,
+                    }
+                    result["direct_ai_message"] = decision_question
+                    stop_reason = "awaiting_user_decision"
+                    break
+                if enough_information:
+                    stop_reason = "enough_information"
+                    break
+
+                current_round_calls, deferred_calls = self._split_mcp_call_queue(revised_calls, max_calls_per_round)
+                if continue_deferred_calls and len(deferred_calls) > 0:
+                    current_round_calls = self._merge_mcp_call_lists(current_round_calls, deferred_calls, max_calls_per_round)
+                if len(current_round_calls) == 0:
+                    if continue_deferred_calls and len(deferred_calls_for_next_round) > 0:
+                        current_round_calls, deferred_calls = self._split_mcp_call_queue(
+                            deferred_calls_for_next_round,
+                            max_calls_per_round,
+                        )
+                    else:
+                        deferred_calls = []
+                deferred_calls_for_next_round = list(deferred_calls)
+                if len(current_round_calls) == 0:
+                    stop_reason = "no_more_valid_calls"
+                    break
+
+                for call in current_round_calls:
+                    if self.app.ai.is_current_run_canceled():
+                        result["canceled"] = True
+                        return result
+                    if total_tool_calls >= max_total_tool_calls:
+                        stop_reason = "max_total_tool_calls_reached"
+                        break
+                    method = str(call.get("method", "")).strip()
+                    params = call.get("params", {})
+                    if not isinstance(params, dict):
+                        params = {}
+                    if method not in allowed_methods:
+                        response = {
+                            "jsonrpc": "2.0",
+                            "id": self.ai_mcp_server.new_request_id(),
+                            "error": {"code": -32601, "message": "Method not found", "data": method},
+                        }
+                        append_tool_exchange(method, params, response)
+                        continue
+                    request_params, display_params = _prepare_mcp_request(method, params)
+                    status_text = self.ai_mcp_server.describe_status_event(method, request_params)
+                    self._emit_mcp_status(signals, chat_idx, status_text)
+                    _request, response = self._run_mcp_request(method, request_params)
+                    total_tool_calls += 1
+                    append_tool_exchange(method, display_params, response)
+                if stop_reason == "max_total_tool_calls_reached":
+                    break
+            else:
+                if stop_reason == "":
+                    stop_reason = "max_reflection_rounds_reached"
+
+            if pending_user_decision is not None:
+                agent_state_snapshot = {
+                    "type": "mcp_agent_state",
+                    "latest_plan_summary": self._normalize_progress_note(latest_plan_summary, max_length=600),
+                    "latest_reflection_summary": self._normalize_progress_note(latest_reflection_summary, max_length=600),
+                    "final_hint": self._normalize_progress_note(final_hint, max_length=600),
+                    "stop_reason": stop_reason,
+                    "pending_calls": [],
+                    "pending_user_decision": pending_user_decision,
+                }
+                agent_state_content = json.dumps(agent_state_snapshot, ensure_ascii=False)
+                if tool_messages_streamed:
+                    progress_payload = {
+                        "chat_idx": chat_idx,
+                        "msg_type": "agent_state",
+                        "msg_author": "ai_agent",
+                        "msg_content": agent_state_content,
+                    }
+                    signals.progress.emit(json.dumps(progress_payload, ensure_ascii=False))
+                else:
+                    tool_messages.append(
+                        {
+                            "msg_type": "agent_state",
+                            "msg_author": "ai_agent",
+                            "msg_content": agent_state_content,
+                        }
+                    )
+                result["tool_messages"] = tool_messages
+                result["stream_messages"] = []
+                return result
 
             self._emit_mcp_status(signals, chat_idx, _('Preparing response...'))
-            final_system_prompt = self._build_mcp_combined_system_prompt(
-                self._text_analysis_final_bootstrap_prompt(doc_name, prompt_record, text_length)
+            final_prompt = (
+                "Now provide the final answer to the user in normal prose. "
+                "Focus on outcomes of this turn and communicate them clearly. "
+                "Do not mention internal MCP stage constraints. "
+                "When referring to empirical text evidence, cite it as {REF: \"exact quote\"}. "
+                "Remember: REF is invisible markup; if you want a quote to be visible, include the quoted text in normal prose and add REF in addition."
             )
-            final_request = final_system_prompt.strip()
-            append_single_instruct_log(final_request)
-            final_stream_messages: List[Any] = []
-            if mcp_base_system_prompt != "":
-                final_stream_messages.append(SystemMessage(content=mcp_base_system_prompt))
-            final_stream_messages.extend(agent_messages)
-            final_stream_messages.append(HumanMessage(content=final_request))
+            if final_hint != '':
+                final_prompt += '\nHere is a draft idea from your internal reflection:\n' + final_hint
+            if stop_reason not in ("", "enough_information"):
+                final_prompt += (
+                    "\nIf the available project evidence is incomplete, clearly state uncertainty and "
+                    "mention what additional project material would help."
+                )
+
+            agent_state_snapshot = {
+                "type": "mcp_agent_state",
+                "latest_plan_summary": self._normalize_progress_note(latest_plan_summary, max_length=600),
+                "latest_reflection_summary": self._normalize_progress_note(latest_reflection_summary, max_length=600),
+                "final_hint": self._normalize_progress_note(final_hint, max_length=600),
+                "stop_reason": stop_reason,
+                "pending_calls": [],
+                "pending_user_decision": None,
+            }
+            agent_state_content = json.dumps(agent_state_snapshot, ensure_ascii=False)
+            if tool_messages_streamed:
+                progress_payload = {
+                    "chat_idx": chat_idx,
+                    "msg_type": "agent_state",
+                    "msg_author": "ai_agent",
+                    "msg_content": agent_state_content,
+                }
+                signals.progress.emit(json.dumps(progress_payload, ensure_ascii=False))
+            else:
+                tool_messages.append(
+                    {
+                        "msg_type": "agent_state",
+                        "msg_author": "ai_agent",
+                        "msg_content": agent_state_content,
+                    }
+                )
+
+            final_system_prompt = self._build_mcp_combined_system_prompt(self._mcp_final_answer_system_prompt())
+            final_stream_messages = build_phase_messages(final_system_prompt, final_prompt)
             result["stream_messages"] = final_stream_messages
             result["tool_messages"] = tool_messages
             return result
         except Exception as err:
             result["error"] = _('Error during MCP-based text analysis bootstrap: ') + str(err)
             return result
+        finally:
+            if ai_change_set_id != "":
+                self._discard_empty_ai_change_set(ai_change_set_id)
 
     def new_text_chat(self, doc_id, doc_name, text, start_pos, prompt):
         """Start one text analysis chat for the selected text passage."""
