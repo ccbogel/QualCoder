@@ -1803,11 +1803,26 @@ class DialogReportCodes(QtWidgets.QDialog):
                     t['overlaps'] += f"\nOverlaps: {t['codename']} [{t['pos0']}-{t['pos1']}] : {t2['codename']} [{t2['pos0']}-{t2['pos1']}]"
                     t2['overlaps'] += f"\nOverlaps: {t2['codename']} [{t2['pos0']}-{t2['pos1']}] : {t['codename']} [{t['pos0']}-{t['pos1']}]"
                     continue
-
+        for a in res_av:
+            for a2 in res_av:
+                if a == a2:
+                    continue
+                # Inclusion a inside a2
+                if a['fid'] == a2['fid'] and a['coder'] == a2['coder'] and a['pos0'] >= a2['pos0'] and a['pos1'] <= a2['pos1']:
+                    # print(f"\nINCLUSION: {a2['codename']} contains {a['codename']}")
+                    a2['overlaps'] += f"\nINCLUSION: {a2['codename']} [{a2['pos0']}-{a2['pos1']}] contains: {a['codename']} [{a['pos0']}-{a['pos1']}]"
+                    a['overlaps'] += f"\nINCLUSION: {a['codename']} [{a['pos0']}-{a['pos1']}] within: {a2['codename']} [{a2['pos0']}-{a2['pos1']}]"
+                    # print(a)
+                    continue
+                # left side a is below a2. a overlaps on the right side,
+                if a['fid'] == a2['fid'] and a['coder'] == a2['coder'] and a['pos0'] < a2['pos0'] and a['pos1'] >= a2['pos0']:
+                    # print(f"\nOverlap R:{t2['codename']} - {t['codename']}")
+                    a['overlaps'] += f"\nOverlaps: {a['codename']} [{a['pos0']}-{a['pos1']}] : {a2['codename']} [{a2['pos0']}-{a2['pos1']}]"
+                    a2['overlaps'] += f"\nOverlaps: {a2['codename']} [{a2['pos0']}-{a2['pos1']}] : {a['codename']} [{a['pos0']}-{a['pos1']}]"
+                    continue
         '''for i in img:
             pass
-        for a in av:
-            pass'''
+        '''
         overlaps = []
         for item in res_text:
             if item['overlaps'] != "":
