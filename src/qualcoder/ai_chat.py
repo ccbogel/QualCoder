@@ -46,7 +46,7 @@ import re
 import threading
 import time
 import unicodedata
-from urllib.parse import urlencode, quote, unquote
+from urllib.parse import urlencode, quote, unquote, urlparse, parse_qs, urlunparse
 
 from .ai_search_dialog import DialogAiSearch
 from .GUI.ui_ai_chat import Ui_Dialog_ai_chat
@@ -2008,7 +2008,8 @@ class DialogAIChat(QtWidgets.QDialog):
                     preview += ', ...'
                 material_parts.append(f'Resulting documents ({source_count}): {preview}.')
             lines.append('Selected material: ' + " ".join(material_parts))
-        lines.append('If additional project material would be helpful, ask the user for permission before including it.')
+        lines.append('For the initial exploration turn, keep retrieval within the user-selected material described above.')
+        lines.append('After that first turn, the scope may be expanded if this seems helpful and the user agrees.')
         return "\n".join(lines)
 
     def _topic_exploration_filter_summary(self, file_ids: List[int],
@@ -2114,6 +2115,60 @@ class DialogAIChat(QtWidgets.QDialog):
             return "qualcoder://vector/search"
         return "qualcoder://vector/search?" + query_string
 
+    def _constrain_search_uri_to_file_scope(self, uri: str, allowed_file_ids: List[int]) -> str:
+        """Restrict one MCP search URI to the allowed file scope for the initial turn."""
+
+        normalized_allowed: List[int] = []
+        seen_allowed: set[int] = set()
+        for raw in list(allowed_file_ids or []):
+            try:
+                file_id = int(raw)
+            except Exception:
+                continue
+            if file_id <= 0 or file_id in seen_allowed:
+                continue
+            seen_allowed.add(file_id)
+            normalized_allowed.append(file_id)
+        if len(normalized_allowed) == 0:
+            return str(uri if uri is not None else "").strip()
+
+        raw_uri = str(uri if uri is not None else "").strip()
+        if raw_uri == "":
+            return raw_uri
+        parsed = urlparse(raw_uri)
+        base_uri = f"{parsed.scheme}://{parsed.netloc}{parsed.path}"
+        if base_uri not in (
+            "qualcoder://vector/search",
+            "qualcoder://search/bm25",
+            "qualcoder://search/regex",
+        ):
+            return raw_uri
+
+        query = parse_qs(parsed.query, keep_blank_values=True)
+        existing_file_ids: List[int] = []
+        seen_existing: set[int] = set()
+        for raw in list(query.get("file_ids", []) or []):
+            try:
+                file_id = int(raw)
+            except Exception:
+                continue
+            if file_id <= 0 or file_id in seen_existing:
+                continue
+            seen_existing.add(file_id)
+            existing_file_ids.append(file_id)
+
+        if len(existing_file_ids) > 0:
+            allowed_set = set(normalized_allowed)
+            constrained_file_ids = [fid for fid in existing_file_ids if fid in allowed_set]
+            if len(constrained_file_ids) == 0:
+                constrained_file_ids = list(normalized_allowed)
+        else:
+            constrained_file_ids = list(normalized_allowed)
+
+        query["file_ids"] = [str(fid) for fid in constrained_file_ids]
+        new_query = urlencode(query, doseq=True)
+        return urlunparse((parsed.scheme, parsed.netloc, parsed.path, parsed.params, new_query, parsed.fragment))
+
     def _start_mcp_agent_worker(self, messages: List[Any], chat_idx: int, worker_func,
                                 *worker_args) -> None:
         """Start one MCP-backed agent worker with the standard callback wiring."""
@@ -2184,8 +2239,8 @@ class DialogAIChat(QtWidgets.QDialog):
             ("initialize", {}),
             ("resources/list", {}),
             ("resources/templates/list", {}),
-            ("resources/read", {"uri": self._topic_exploration_vector_search_uri(topic_name, topic_description, file_ids)}),
         ]
+        planner_json_schema = self._mcp_planner_json_schema()
         reflection_json_schema = self._mcp_reflection_json_schema()
         max_calls_per_round = 8
         max_reflection_rounds = 4
@@ -2201,6 +2256,12 @@ class DialogAIChat(QtWidgets.QDialog):
         def _prepare_mcp_request(method_name: str, raw_params: Dict[str, Any]) -> Tuple[Dict[str, Any], Dict[str, Any]]:
             request_params = dict(raw_params) if isinstance(raw_params, dict) else {}
             display_params = dict(request_params)
+            if method_name == "resources/read":
+                raw_uri = str(request_params.get("uri", "")).strip()
+                if raw_uri != "":
+                    constrained_uri = self._constrain_search_uri_to_file_scope(raw_uri, file_ids)
+                    request_params["uri"] = constrained_uri
+                    display_params["uri"] = constrained_uri
             if method_name == "tools/call" and ai_change_set_id != "":
                 request_params["_ai_change_set_id"] = ai_change_set_id
             return request_params, display_params
@@ -2249,8 +2310,26 @@ class DialogAIChat(QtWidgets.QDialog):
             else:
                 tool_messages.append({"msg_type": "single_instruct", "msg_author": "ai_agent", "msg_content": payload})
 
+        def build_phase_request_message(phase_contract: str, trailing_instruction: str) -> HumanMessage:
+            parts: List[str] = []
+            phase_text = str(phase_contract if phase_contract is not None else "").strip()
+            trailing_text = str(trailing_instruction if trailing_instruction is not None else "").strip()
+            if phase_text != "":
+                parts.append(phase_text)
+            if trailing_text != "":
+                parts.append(trailing_text)
+            return HumanMessage(content="\n\n".join(parts).strip())
+
+        def build_phase_messages(phase_contract: str, trailing_instruction: str) -> List[Any]:
+            phase_messages: List[Any] = []
+            if mcp_base_system_prompt != "":
+                phase_messages.append(SystemMessage(content=mcp_base_system_prompt))
+            phase_messages.extend(agent_messages)
+            phase_messages.append(build_phase_request_message(phase_contract, trailing_instruction))
+            return phase_messages
+
         try:
-            self._emit_mcp_status_text(signals, chat_idx, _('Preparing semantic search...'), status_kind="planning")
+            self._emit_mcp_status_text(signals, chat_idx, _('Preparing topic exploration...'), status_kind="planning")
             for method, params in bootstrap_calls:
                 if self.app.ai.is_current_run_canceled():
                     result["canceled"] = True
@@ -2262,45 +2341,153 @@ class DialogAIChat(QtWidgets.QDialog):
                 total_tool_calls += 1
                 append_tool_exchange(method, display_params, response)
 
-            reflection_system_prompt = self._build_mcp_combined_system_prompt(
+            planner_system_prompt = self._build_mcp_combined_system_prompt(
                 self._topic_exploration_bootstrap_contract(topic_name, topic_description, prompt_record)
                 + "\n\n"
-                + self._mcp_reflection_system_prompt()
+                + self._mcp_topic_exploration_planner_system_prompt()
+            )
+            planner_user_prompt = (
+                "Create the initial MCP plan for this topic exploration now. "
+                "Choose the most suitable search strategy and query formulation for the selected topic. "
+                "You may use semantic vector search, BM25 keyword search, regex search, or a focused combination. "
+                "For abstract or theoretical language, consider whether simpler everyday formulations would improve retrieval. "
+                "For this first turn, keep all retrieval strictly within the user-selected material scope already described in the conversation."
+            )
+            append_single_instruct_log(
+                "planning",
+                "user",
+                build_phase_request_message(planner_system_prompt, planner_user_prompt).content,
+            )
+            self._emit_mcp_status_text(signals, chat_idx, _("Working..."), status_kind="planning")
+            planner_messages = build_phase_messages(planner_system_prompt, planner_user_prompt)
+            try:
+                plan_data = self._invoke_json_llm_with_step_timeout(
+                    planner_messages,
+                    schema_name='mcp_planner_control',
+                    response_schema=planner_json_schema,
+                    context='mcp_json_planner',
+                    step_name=_("Internal planning"),
+                    status_kind="planning",
+                    signals=signals,
+                    chat_idx=chat_idx,
+                )
+            except TimeoutError:
+                timeout_msg = _('Internal planning timed out. Please try again.')
+                self._emit_mcp_status_text(signals, chat_idx, timeout_msg, status_kind="planning")
+                result["direct_ai_message"] = timeout_msg
+                result["tool_messages"] = tool_messages
+                result["stream_messages"] = []
+                return result
+
+            planned_calls = self._normalize_mcp_calls(plan_data.get("calls", []), allowed_methods, max_queued_calls)
+            proposed_plan_calls = self._normalize_mcp_calls(
+                plan_data.get("proposed_next_calls", []), allowed_methods, max_calls_per_round
+            )
+            needs_mcp = self._json_bool(plan_data.get("needs_mcp", True), True)
+            plan_summary = str(plan_data.get("plan_summary", "")).strip()
+            if plan_summary != "":
+                latest_plan_summary = plan_summary
+                self._emit_mcp_status_text(signals, chat_idx, plan_summary, status_kind="planning")
+            initial_brief = str(plan_data.get("answer_brief", "")).strip()
+            if initial_brief != "":
+                final_hint = initial_brief
+            planner_user_decision_required = self._json_bool(plan_data.get("user_decision_required", False), False)
+            planner_decision_question = self._normalize_progress_note(plan_data.get("decision_question", ""), max_length=600)
+            planner_decision_context = self._normalize_progress_note(plan_data.get("decision_context", ""), max_length=600)
+            if planner_user_decision_required and planner_decision_question == "":
+                planner_decision_question = self._normalize_progress_note(plan_summary, max_length=600)
+            if planner_user_decision_required and planner_decision_question != "":
+                pending_user_decision = {
+                    "phase": "planning",
+                    "question": planner_decision_question,
+                    "context": planner_decision_context,
+                    "proposed_next_calls": proposed_plan_calls,
+                }
+                result["direct_ai_message"] = planner_decision_question
+                stop_reason = "awaiting_user_decision"
+            if pending_user_decision is not None:
+                agent_state_snapshot = {
+                    "type": "mcp_agent_state",
+                    "latest_plan_summary": self._normalize_progress_note(latest_plan_summary, max_length=600),
+                    "latest_reflection_summary": self._normalize_progress_note(latest_reflection_summary, max_length=600),
+                    "final_hint": self._normalize_progress_note(final_hint, max_length=600),
+                    "stop_reason": stop_reason,
+                    "pending_calls": planned_calls if isinstance(planned_calls, list) else [],
+                    "pending_user_decision": pending_user_decision,
+                }
+                agent_state_content = json.dumps(agent_state_snapshot, ensure_ascii=False)
+                if tool_messages_streamed:
+                    progress_payload = {
+                        "chat_idx": chat_idx,
+                        "msg_type": "agent_state",
+                        "msg_author": "ai_agent",
+                        "msg_content": agent_state_content,
+                    }
+                    signals.progress.emit(json.dumps(progress_payload, ensure_ascii=False))
+                else:
+                    tool_messages.append(
+                        {
+                            "msg_type": "agent_state",
+                            "msg_author": "ai_agent",
+                            "msg_content": agent_state_content,
+                        }
+                    )
+                result["tool_messages"] = tool_messages
+                result["stream_messages"] = []
+                return result
+            if not needs_mcp:
+                planned_calls = []
+
+            reflection_system_prompt = self._build_mcp_combined_system_prompt(
+                self._mcp_reflection_system_prompt()
             )
             reflection_prompt = (
                 "Reflect on whether the currently retrieved evidence is sufficient for this topic exploration and return JSON now. "
                 "If not, propose only the minimal additional MCP calls needed."
             )
 
-            def build_phase_request_message(phase_contract: str, trailing_instruction: str) -> HumanMessage:
-                parts: List[str] = []
-                phase_text = str(phase_contract if phase_contract is not None else "").strip()
-                trailing_text = str(trailing_instruction if trailing_instruction is not None else "").strip()
-                if phase_text != "":
-                    parts.append(phase_text)
-                if trailing_text != "":
-                    parts.append(trailing_text)
-                return HumanMessage(content="\n\n".join(parts).strip())
-
-            def build_phase_messages(phase_contract: str, trailing_instruction: str) -> List[Any]:
-                phase_messages: List[Any] = []
-                if mcp_base_system_prompt != "":
-                    phase_messages.append(SystemMessage(content=mcp_base_system_prompt))
-                phase_messages.extend(agent_messages)
-                phase_messages.append(build_phase_request_message(phase_contract, trailing_instruction))
-                return phase_messages
-
             for reflection_round in range(max_reflection_rounds):
                 if self.app.ai.is_current_run_canceled():
                     result["canceled"] = True
                     return result
 
+                current_round_calls, deferred_calls = self._split_mcp_call_queue(planned_calls, max_calls_per_round)
+                executed_any_call = False
+                for call in current_round_calls:
+                    if self.app.ai.is_current_run_canceled():
+                        result["canceled"] = True
+                        return result
+                    if total_tool_calls >= max_total_tool_calls:
+                        stop_reason = "max_total_tool_calls_reached"
+                        break
+                    method = str(call.get("method", "")).strip()
+                    params = call.get("params", {})
+                    if not isinstance(params, dict):
+                        params = {}
+                    if method not in allowed_methods:
+                        response = {
+                            "jsonrpc": "2.0",
+                            "id": self.ai_mcp_server.new_request_id(),
+                            "error": {"code": -32601, "message": "Method not found", "data": method},
+                        }
+                        append_tool_exchange(method, params, response)
+                        continue
+                    request_params, display_params = _prepare_mcp_request(method, params)
+                    status_text = self.ai_mcp_server.describe_status_event(method, request_params)
+                    self._emit_mcp_status(signals, chat_idx, status_text)
+                    _request, response = self._run_mcp_request(method, request_params)
+                    total_tool_calls += 1
+                    executed_any_call = True
+                    append_tool_exchange(method, display_params, response)
+                if stop_reason == "max_total_tool_calls_reached":
+                    break
+
                 current_reflection_prompt = reflection_prompt
-                if len(deferred_calls_for_next_round) > 0:
+                if len(deferred_calls) > 0:
                     current_reflection_prompt += (
                         "\nDeferred calls from the previous execution queue "
                         f"(not yet executed because the round limit is {max_calls_per_round}):\n"
-                        + json.dumps(deferred_calls_for_next_round, ensure_ascii=False)
+                        + json.dumps(deferred_calls, ensure_ascii=False)
                     )
                 append_single_instruct_log(
                     "reflection",
@@ -2370,52 +2557,60 @@ class DialogAIChat(QtWidgets.QDialog):
                     stop_reason = "awaiting_user_decision"
                     break
                 if enough_information:
+                    planned_calls = revised_calls
                     stop_reason = "enough_information"
                     break
 
-                current_round_calls, deferred_calls = self._split_mcp_call_queue(revised_calls, max_calls_per_round)
                 if continue_deferred_calls and len(deferred_calls) > 0:
-                    current_round_calls = self._merge_mcp_call_lists(current_round_calls, deferred_calls, max_calls_per_round)
-                if len(current_round_calls) == 0:
-                    if continue_deferred_calls and len(deferred_calls_for_next_round) > 0:
-                        current_round_calls, deferred_calls = self._split_mcp_call_queue(
-                            deferred_calls_for_next_round,
-                            max_calls_per_round,
+                    revised_calls = self._merge_mcp_call_lists(revised_calls, deferred_calls, max_queued_calls)
+                if len(revised_calls) == 0:
+                    if executed_any_call:
+                        replanner_system_prompt = self._build_mcp_combined_system_prompt(
+                            self._mcp_topic_exploration_planner_system_prompt()
                         )
-                    else:
-                        deferred_calls = []
-                deferred_calls_for_next_round = list(deferred_calls)
-                if len(current_round_calls) == 0:
-                    stop_reason = "no_more_valid_calls"
-                    break
-
-                for call in current_round_calls:
-                    if self.app.ai.is_current_run_canceled():
-                        result["canceled"] = True
-                        return result
-                    if total_tool_calls >= max_total_tool_calls:
-                        stop_reason = "max_total_tool_calls_reached"
+                        replanner_user_prompt = (
+                            "The previous reflection said more evidence may be needed. "
+                            "Propose a revised MCP plan now."
+                        )
+                        append_single_instruct_log(
+                            "replanning",
+                            "user",
+                            build_phase_request_message(replanner_system_prompt, replanner_user_prompt).content,
+                        )
+                        replanner_messages = build_phase_messages(replanner_system_prompt, replanner_user_prompt)
+                        try:
+                            replan_data = self._invoke_json_llm_with_step_timeout(
+                                replanner_messages,
+                                schema_name='mcp_replanner_control',
+                                response_schema=planner_json_schema,
+                                context='mcp_json_replanner',
+                                step_name=_("Internal replanning"),
+                                status_kind="planning",
+                                signals=signals,
+                                chat_idx=chat_idx,
+                            )
+                        except TimeoutError:
+                            latest_plan_summary = _('Internal replanning timed out; proceeding with the current results.')
+                            self._emit_mcp_status_text(
+                                signals,
+                                chat_idx,
+                                latest_plan_summary,
+                                status_kind="planning",
+                            )
+                            planned_calls = []
+                            stop_reason = "replanner_timeout"
+                            break
+                        replan_summary = str(replan_data.get("plan_summary", "")).strip()
+                        if replan_summary != "":
+                            latest_plan_summary = replan_summary
+                            self._emit_mcp_status_text(signals, chat_idx, replan_summary, status_kind="planning")
+                        revised_calls = self._normalize_mcp_calls(
+                            replan_data.get("calls", []), allowed_methods, max_queued_calls
+                        )
+                    if len(revised_calls) == 0:
+                        stop_reason = "no_more_valid_calls"
                         break
-                    method = str(call.get("method", "")).strip()
-                    params = call.get("params", {})
-                    if not isinstance(params, dict):
-                        params = {}
-                    if method not in allowed_methods:
-                        response = {
-                            "jsonrpc": "2.0",
-                            "id": self.ai_mcp_server.new_request_id(),
-                            "error": {"code": -32601, "message": "Method not found", "data": method},
-                        }
-                        append_tool_exchange(method, params, response)
-                        continue
-                    request_params, display_params = _prepare_mcp_request(method, params)
-                    status_text = self.ai_mcp_server.describe_status_event(method, request_params)
-                    self._emit_mcp_status(signals, chat_idx, status_text)
-                    _request, response = self._run_mcp_request(method, request_params)
-                    total_tool_calls += 1
-                    append_tool_exchange(method, display_params, response)
-                if stop_reason == "max_total_tool_calls_reached":
-                    break
+                planned_calls = revised_calls
             else:
                 if stop_reason == "":
                     stop_reason = "max_reflection_rounds_reached"
@@ -5114,6 +5309,45 @@ data collected. This information will accompany every prompt sent to the AI, res
             "- If the user explicitly asks to create or change project data now and the action is executable, prioritize execution: set needs_mcp=true and include concrete tools/call write actions in calls.\n"
             "- If the task was about collecting information and you have enough evidence in the conversation history already, initiate the final answer by "
             "setting needs_mcp=false and calls=[].\n"
+            "- plan_summary must be one sentence, user-facing, <=160 characters.\n"
+            "- Do not output prose outside JSON.\n"
+        )
+
+    def _mcp_topic_exploration_planner_system_prompt(self) -> str:
+        return (
+            "Your task: Plan the next search steps needed to explore the user's topic in the empirical data. "
+            "Return ONLY one JSON object with this shape:\n"
+            "{"
+            "\"needs_mcp\": true|false, "
+            "\"plan_summary\": \"one short user-facing note\", "
+            "\"user_decision_required\": true|false, "
+            "\"decision_question\": \"optional question\", "
+            "\"decision_context\": \"optional short reason\", "
+            "\"proposed_next_calls\": [{\"method\": \"resources/read\", \"params\": {}}], "
+            "\"calls\": [{\"method\": \"resources/read\", \"params\": {}}], "
+            "\"answer_brief\": \"optional draft answer idea\""
+            "}\n"
+            "Rules:\n"
+            "- In this planner, use only resources/read for search resources.\n"
+            "- Relevant search resources are: qualcoder://vector/search, qualcoder://search/bm25, and qualcoder://search/regex.\n"
+            "- Do not use initialize, resources/list, resources/templates/list, tools/list, or tools/call here unless a later user turn explicitly requires something outside search.\n"
+            "- The current turn already contains initialize, resources/list, and resources/templates/list.\n"
+            "- Use as few search calls as possible, but enough to cover a broad and informative spectrum of potentially relevant material.\n"
+            "- Combine complementary search strategies when useful:\n"
+            "  * vector/search for semantic similarity and conceptually related material\n"
+            "  * search/bm25 for concrete keywords, phrases, and theoretically important terms\n"
+            "  * search/regex for lexical patterns, word stems, spelling variants, or tightly defined textual forms\n"
+            "- When choosing search strings, preserve the original topic idea but broaden it intelligently.\n"
+            "- Consider multiple formulations of the topic, including:\n"
+            "  * simpler everyday language\n"
+            "  * directly related concepts or synonyms\n"
+            "  * narrower facets, contrasting variants, and boundary cases\n"
+            "- If the topic uses scientific or technical language, actively translate it into concrete life-world expressions that may appear in empirical material.\n"
+            "- Prefer a small set of diverse, non-redundant search strings over many similar ones.\n"
+            "- In the first topic-exploration turn, keep all retrieval within the user-selected material scope already described in the conversation.\n"
+            "- Default to user_decision_required=false.\n"
+            "- Set user_decision_required=true only when the global agent rules require a user decision or confirmation.\n"
+            "- If user_decision_required=true, provide one concise natural-language question in decision_question, keep calls empty, and put suggested follow-up MCP actions into proposed_next_calls.\n"
             "- plan_summary must be one sentence, user-facing, <=160 characters.\n"
             "- Do not output prose outside JSON.\n"
         )
